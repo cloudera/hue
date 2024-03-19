@@ -50,9 +50,9 @@ from useradmin.organization import _fitered_queryset
 
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import get_clusters, IS_MULTICLUSTER_ONLY, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS, \
-    has_connectors, TASK_SERVER, APP_BLACKLIST, COLLECT_USAGE, ENABLE_SHARING, ENABLE_CONNECTORS, ENABLE_UNIFIED_ANALYTICS, RAZ, \
-    HUE_IMAGE_VERSION, HUE_HOST_NAME
+from desktop.conf import APP_BLACKLIST, COLLECT_USAGE, DISABLE_SOURCE_AUTOCOMPLETE, ENABLE_CONNECTORS, \
+    ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS, ENABLE_SHARING, ENABLE_UNIFIED_ANALYTICS, get_clusters, has_connectors, \
+    HUE_HOST_NAME, HUE_IMAGE_VERSION, IS_MULTICLUSTER_ONLY, RAZ, TASK_SERVER
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
@@ -1930,7 +1930,8 @@ class ClusterConfig(object):
         'default_limit': None if DEFAULT_LIMIT.get() == 0 else DEFAULT_LIMIT.get(),
         'interpreter_names': [interpreter['type'] for interpreter in interpreters],
         'page': interpreters[0]['page'],
-        'default_sql_interpreter': next((interpreter['type'] for interpreter in interpreters if interpreter.get('is_sql')), 'hive')
+        'default_sql_interpreter': next((interpreter['type'] for interpreter in interpreters if interpreter.get('is_sql')), 'hive'),
+        'source_autocomplete_disabled': DISABLE_SOURCE_AUTOCOMPLETE.get()
       }
     else:
       return None

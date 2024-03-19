@@ -1082,7 +1082,6 @@ There is no bridge to KO for components using this integration. Example using in
     userId: ${ user.id },
     suffix: 'editor',
     assistAvailable: true,
-    autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
     snippetViewSettings: {
       default: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
@@ -1289,10 +1288,6 @@ There is no bridge to KO for components using this integration. Example using in
   }
 
   window.EDITOR_ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
-
-  window.EDITOR_ID = ${ editor_id or 'null' };
-
-  window.NOTEBOOKS_JSON = ${ notebooks_json | n,unicode };
 
   window.SQL_ANALYZER_AUTO_UPLOAD_QUERIES = '${ OPTIMIZER.AUTO_UPLOAD_QUERIES.get() }' === 'True';
 

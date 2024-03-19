@@ -27,6 +27,7 @@ import axios from 'axios';
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
+import { getAxiosInstance } from 'api/utils';
 
 ko.mapping = komapping;
 
@@ -38,7 +39,6 @@ class Autocomplete {}
 
 const globalVars = {
   ko: ko,
-  AUTOCOMPLETE_TIMEOUT: 1,
   CACHEABLE_TTL: 1,
   HAS_LINK_SHARING: true,
   HAS_SQL_ANALYZER: false,
@@ -111,11 +111,14 @@ $.ajaxSetup({
   }
 });
 
-axios.interceptors.request.use(config => {
+const axiosConfigInterceptor = config => {
   console.warn('Actual axios ajax request made to url: ' + config.url);
   console.trace();
   return config;
-});
+};
+
+axios.interceptors.request.use(axiosConfigInterceptor);
+getAxiosInstance().interceptors.request.use(axiosConfigInterceptor);
 
 process.on('unhandledRejection', err => {
   fail(err);
