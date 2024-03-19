@@ -15,15 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import json
 import logging
 import sys
 
 from django.urls import reverse
-from django.db.models import Q
 from django.shortcuts import redirect
-from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_POST
 
 from beeswax.data_export import DOWNLOAD_COOKIE_AGE
@@ -34,7 +31,6 @@ from desktop.lib import export_csvxls
 from desktop.lib.connectors.models import Connector
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document, FilesystemException, _get_gist_document
 from desktop.views import serve_403_error
 from metadata.conf import has_optimizer, has_catalog, has_workload_analytics
@@ -51,38 +47,7 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
-
 LOG = logging.getLogger()
-
-
-def notebooks(request):
-  editor_type = request.GET.get('type', 'notebook')
-
-  if editor_type != 'notebook':
-    if USE_NEW_EDITOR.get():
-      notebooks = [doc.to_dict() for doc in Document2.objects.documents(
-          user=request.user).search_documents(types=['query-%s' % editor_type])]
-    else:
-      notebooks = [
-        d.content_object.to_dict()
-          for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra__startswith='query'))
-          if not d.content_object.is_history and d.content_object.type == 'query-' + editor_type
-      ]
-  else:
-    if USE_NEW_EDITOR.get():
-      notebooks = [doc.to_dict() for doc in Document2.objects.documents(user=request.user).search_documents(types=['notebook'])]
-    else:
-      notebooks = [
-        d.content_object.to_dict()
-          for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook'))
-          if not d.content_object.is_history
-      ]
-
-  return render('notebooks.mako', request, {
-      'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML),
-      'editor_type': editor_type
-  })
-
 
 @check_document_access_permission
 def notebook(request, is_embeddable=False):
@@ -99,8 +64,6 @@ def notebook(request, is_embeddable=False):
     LOG.exception('Spark is not enabled')
 
   return render('notebook.mako', request, {
-      'editor_id': notebook_id or None,
-      'notebooks_json': '{}',
       'is_embeddable': request.GET.get('is_embeddable', False),
       'options_json': json.dumps({
           'languages': get_ordered_interpreters(request.user),
@@ -148,8 +111,6 @@ def editor(request, is_mobile=False, is_embeddable=False):
     template = 'editor_m.mako'
 
   return render(template, request, {
-      'editor_id': editor_id or None,
-      'notebooks_json': '{}',
       'is_embeddable': request.GET.get('is_embeddable', False),
       'editor_type': editor_type,
       'options_json': json.dumps({
@@ -208,7 +169,6 @@ def browse(request, database, table, partition_spec=None):
         compute=compute
     )
     return render('editor2.mako' if ENABLE_HUE_5.get() else 'editor.mako', request, {
-        'notebooks_json': json.dumps([editor.get_data()]),
         'options_json': json.dumps({
             'languages': get_ordered_interpreters(request.user),
             'mode': 'editor',
@@ -295,7 +255,6 @@ def execute_and_watch(request):
     raise PopupException(_('Action %s is unknown') % action)
 
   return render('editor2.mako' if ENABLE_HUE_5.get() else 'editor.mako', request, {
-      'notebooks_json': json.dumps([editor.get_data()]),
       'options_json': json.dumps({
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
           'mode': 'editor',
