@@ -54,6 +54,13 @@ def _remove_duplications(a_list):
 
 def check_has_missing_permission(user, interpreter, user_apps=None):
   permissions = INTERPRETERS.get()[interpreter].PERMISSIONS.get()
+  
+  if permissions == {}:
+    return False
+
+  if len(permissions['users']) == 0 and len(permissions['groups']) == 0:
+    return False
+  
   if user.username in permissions['users']:
     LOG.info(f'User {user.username} explicitly allowed to use {interpreter} by config')
     return False    
