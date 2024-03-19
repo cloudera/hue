@@ -45,7 +45,7 @@ class MyCelery(Celery):
         self.conf.beat_schedule = {
             'check_disk_usage_and_clean_task': {
                 'task': 'filebrowser.check_disk_usage_and_clean_task',
-                'schedule': 1000.0,  # Run every 100 seconds
+                'schedule': 1000.0,  # Run every 1000 seconds
                 'args': (),
                 'kwargs': {'cleanup_threshold': 90},  # Provide task arguments if needed
             },

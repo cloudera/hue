@@ -62,6 +62,14 @@ class Command(BaseCommand):
         type=str,
         default='DEBUG'
     )
+    parser.add_argument('--beat')
+    parser.add_argument(
+        '--schedule_file',
+        type=str,
+        required=True,
+        default='celerybeat-schedule',
+        help='Path to the celerybeat-schedule file'
+    )
 
   def handle(self, *args, **options):
     runcelery(*args, **options)
@@ -71,12 +79,17 @@ class Command(BaseCommand):
 
 def runcelery(*args, **options):
     # Native does not load Hue's config
+    concurrency = int(conf.GUNICORN_NUMBER_OF_WORKERS.get()/4) or options['concurrency']
+    schedule_file = options['schedule_file']
     opts = [
         'celery',
         '--app=' + options['app'],
         'worker',
         '--loglevel=' + options['loglevel'],
-        '--concurrency=' + str(options['concurrency'])
+        '--concurrency=' + str(concurrency),
+        '--beat',
+        '-s',
+        schedule_file
     ]
     drop_privileges_if_necessary(CELERY_OPTIONS)
 
