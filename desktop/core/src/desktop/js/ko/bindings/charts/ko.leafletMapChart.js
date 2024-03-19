@@ -21,6 +21,7 @@ import 'ext/leaflet/leaflet.markercluster';
 import 'ext/leaflet/leaflet.heat';
 import 'ext/leaflet/leaflet.zoombox';
 
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.leafletMapChart = {
@@ -300,7 +301,9 @@ ko.bindingHandlers.leafletMapChart = {
             resizeSubscription.remove();
           });
         } catch (err) {
-          $.jHueNotify.error(err.message);
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+            message: err.message
+          });
         }
       }
 

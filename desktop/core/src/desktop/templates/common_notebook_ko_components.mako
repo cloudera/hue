@@ -423,7 +423,9 @@ else:
         });
 
         clipboard.on('success', function (e) {
-          $.jHueNotify.info(self.snippet.result.data().length + ' ' + window.I18n('result(s) copied to the clipboard'));
+          huePubSub.publish('hue.global.info', {
+            message: self.snippet.result.data().length + ' ' + window.I18n('result(s) copied to the clipboard')
+          });
           e.clearSelection();
           $('.clipboard-content').empty();
         });

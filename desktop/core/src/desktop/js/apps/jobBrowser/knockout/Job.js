@@ -19,6 +19,7 @@ import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
 
 import apiHelper from 'api/apiHelper';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import deleteAllEmptyStringKeys from 'utils/string/deleteAllEmptyStringKeys';
@@ -361,7 +362,7 @@ export default class Job {
             callback(data);
           }
         } else {
-          huePubSub.publish('hue.global.error', { message: data.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
         }
       }
     );
@@ -579,7 +580,7 @@ export default class Job {
 
         this.vm.job().fetchLogs();
       } else {
-        huePubSub.publish('hue.global.error', { message: data.message });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
       }
     }).always(() => {
       this.loadingJob(false);
@@ -686,7 +687,7 @@ export default class Job {
               );
           }
         } else {
-          huePubSub.publish('hue.global.error', { message: data.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
         }
       }
     );
@@ -747,7 +748,7 @@ export default class Job {
             callback(data);
           }
         } else {
-          huePubSub.publish('hue.global.error', { message: data.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
         }
       }
     );
@@ -770,7 +771,7 @@ export default class Job {
           this.progress(data.app.progress);
           this.canWrite(data.app.canWrite);
         } else {
-          huePubSub.publish('hue.global.error', { message: data.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
         }
       }
     );
@@ -816,15 +817,15 @@ export default class Job {
         },
         data => {
           if (data.status === 0) {
-            huePubSub.publish('hue.global.info', {
+            huePubSub.publish(GLOBAL_INFO_TOPIC, {
               message: I18n('Successfully updated Coordinator Job Properties')
             });
           } else {
-            huePubSub.publish('hue.global.error', { message: data.message });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
           }
         }
       ).fail(xhr => {
-        huePubSub.publish('hue.global.error', { message: xhr.responseText });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
       });
     } else if (action === 'sync_workflow') {
       $.get(
@@ -836,11 +837,11 @@ export default class Job {
           $(document).trigger('showSubmitPopup', data);
         }
       ).fail(xhr => {
-        huePubSub.publish('hue.global.error', { message: xhr.responseText });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
       });
     } else {
       this.vm.jobs._control([this.id()], action, data => {
-        huePubSub.publish('hue.global.info', data);
+        huePubSub.publish(GLOBAL_INFO_TOPIC, data);
         this.fetchStatus();
       });
     }

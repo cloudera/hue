@@ -244,7 +244,9 @@ ${ layout.metastore_menubar() }
       ko.applyBindings(viewModel);
 
       if (hueUtils.getParameter("error") != "") {
-        $.jHueNotify.error(hueUtils.getParameter("error"));
+        huePubSub.publish('hue.global.error', {
+          message: hueUtils.getParameter('error')
+        });
       }
 
       $("[rel='tooltip']").tooltip();

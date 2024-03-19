@@ -5423,7 +5423,9 @@ $(document).ready(function () {
 
   function checkResultHighlightingAvailability() {
     if (! searchViewModel.collection.idField()) {
-      $(document).trigger("warn", "${ _('Result highlighting is unavailable: the collection does not have an index field') }");
+      huePubSub.publish('hue.global.warning', {
+        message: "${ _('Result highlighting is unavailable: the collection does not have an index field') }"
+      })
     }
   }
 </script>

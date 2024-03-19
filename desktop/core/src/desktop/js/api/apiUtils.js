@@ -16,6 +16,7 @@
 
 import $ from 'jquery';
 
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
 import logError from 'utils/logError';
 import huePubSub from 'utils/huePubSub';
 
@@ -77,7 +78,7 @@ export const assistErrorCallback = options => {
     if (!options || !options.silenceErrors) {
       logError(errorResponse);
       if (errorMessage && errorMessage.indexOf('AuthorizationException') === -1) {
-        huePubSub.publish('hue.global.error', { message: errorMessage });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: errorMessage });
       }
     }
 

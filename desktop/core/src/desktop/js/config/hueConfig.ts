@@ -33,6 +33,8 @@ import {
   SchedulerInterpreter
 } from './types';
 import huePubSub from 'utils/huePubSub';
+import { GLOBAL_ERROR_TOPIC } from '../reactComponents/AlertComponent/events';
+import { HueAlert } from '../reactComponents/AlertComponent/types';
 
 interface InterpreterMap {
   [AppType.browser]: BrowserInterpreter;
@@ -54,8 +56,8 @@ export const refreshConfig = async (): Promise<HueConfig> => {
       if (apiResponse.status == 0) {
         lastKnownConfig = apiResponse;
         resolve(lastKnownConfig);
-      } else {
-        huePubSub.publish('hue.error', apiResponse.message);
+      } else if (apiResponse.message) {
+        huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: apiResponse.message });
         reject();
       }
     } catch (err) {

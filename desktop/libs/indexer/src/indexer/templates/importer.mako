@@ -2206,7 +2206,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         }
       });
       self.streamCheckConnection = function() {
-        $(".jHueNotify").remove();
+        huePubSub.publish('hide.global.alerts');
         $.post("${ url('indexer:get_db_component') }", {
           "source": ko.mapping.toJSON(self)
         }, function (resp) {
@@ -3003,7 +3003,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         if (!self.readyToIndex()) {
           return;
         }
-        $(".jHueNotify").remove();
+        huePubSub.publish('hide.global.alerts');
 
         self.indexingStarted(true);
 % if not is_embeddable:
@@ -3019,7 +3019,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             self.indexingStarted(false);
             self.isIndexing(false);
           } else if (resp.on_success_url) {
-            $.jHueNotify.info("${ _('Creation success.') }");
+            huePubSub.publish('hue.global.info', {
+              message: "${ _('Creation success.') }"
+            });
             if (resp.pubSubUrl) {
               huePubSub.publish(notebook.pubSubUrl);
             }
@@ -3120,15 +3122,21 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           self.indexingStarted(false);
           if (resp.status === 0) {
             if (resp.history_uuid) {
-              $.jHueNotify.info("${ _('Task submitted') }");
+              huePubSub.publish('hue.global.info', {
+                message: "${ _('Task submitted') }"
+              });
               huePubSub.publish('notebook.task.submitted', resp);
             } else if (resp.on_success_url) {
               if (resp.pub_sub_url) {
                 huePubSub.publish(resp.pub_sub_url);
               }
-              $.jHueNotify.info("${ _('Creation success') }");
+              huePubSub.publish('hue.global.info', {
+                message: "${ _('Creation success') }"
+              });
               if (resp.errors && resp.errors.length) {
-                $.jHueNotify.warn("${ _('Skipped records: ') }" + resp.errors.join(', '));
+                huePubSub.publish('hue.global.warning', {
+                  message: "${ _('Skipped records: ') }" + resp.errors.join(', ')
+                });
               }
               huePubSub.publish('open.link', resp.on_success_url);
             } else if (resp.commands) {
@@ -3316,10 +3324,14 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         fd.append('file', files);
         var file_size = files.size;
         if (file_size === 0) {
-          $.jHueNotify.warn("${ _('This file is empty, please select another file.') }");
+          huePubSub.publish('hue.global.warning', {
+            message: "${ _('This file is empty, please select another file.') }"
+          });
         }
         else if (file_size > 200 * 1024) {          
-          $.jHueNotify.warn("${ _('File size exceeds the supported size (200 KB). Please use the S3, ABFS or HDFS browser to upload files.') }");
+          huePubSub.publish('hue.global.warning', {
+            message: "${ _('File size exceeds the supported size (200 KB). Please use the S3, ABFS or HDFS browser to upload files.') }"
+          });
         } else {
           $.ajax({
             url:"/indexer/api/indexer/upload_local_file",
