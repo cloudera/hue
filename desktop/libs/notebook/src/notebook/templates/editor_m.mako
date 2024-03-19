@@ -177,7 +177,6 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
     user: '${ user.username }',
     userId: ${ user.id },
     assistAvailable: true,
-    autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
     snippetViewSettings: {
       default: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',

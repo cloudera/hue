@@ -170,7 +170,6 @@ export default class NotebookViewModel {
       );
       return foundInterpreter?.displayName || foundInterpreter?.name || self.editorType();
     });
-    self.autocompleteTimeout = options.autocompleteTimeout;
     self.selectedNotebook = ko.observable();
 
     self.combinedContent = ko.observable();

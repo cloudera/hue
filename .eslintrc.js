@@ -2,7 +2,6 @@ const normalGlobals = [];
 
 const hueGlobals = [
   // global_js_constants.mako
-  'AUTOCOMPLETE_TIMEOUT',
   'CACHEABLE_TTL',
   'CSRF_TOKEN',
   'DOCUMENT_TYPES',
