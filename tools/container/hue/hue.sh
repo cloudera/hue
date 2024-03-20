@@ -146,7 +146,9 @@ elif [[ $1 == rungunicornserver ]]; then
   fix_column_issue "axes_accessattempt" "trusted"
   $HUE_BIN/hue rungunicornserver
 elif [[ $1 == start_celery ]]; then
-  start_celery
+  if grep -q '^\[\[task_server\]\]' $HUE_CONF_DIR/zhue_safety_valve.ini && grep -q '^enabled=True' $HUE_CONF_DIR/zhue_safety_valve.ini; then
+    start_celery
+  fi
 fi
 
 exit 0
