@@ -42,7 +42,7 @@ const InputModal: React.FC<InputModalProps> = ({
 }): JSX.Element => {
   const [value, setValue] = useState<string>('');
   const { t } = i18nReact.useTranslation();
-  const { cancelText = t('Close'), submitText = t('Submit') } = i18n;
+  const { cancelText = t('Cancel'), submitText = t('Submit') } = i18n;
 
   return (
     <Modal
