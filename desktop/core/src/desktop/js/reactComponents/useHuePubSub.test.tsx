@@ -1,10 +1,11 @@
 import { renderHook, act } from '@testing-library/react';
 import { useHuePubSub } from './useHuePubSub';
 import huePubSub from '../utils/huePubSub';
+import noop from '../utils/timing/noop';
 
 describe('useHuePubSub', () => {
   const originalSubscribe = huePubSub.subscribe;
-  let publishCallback;
+  let publishCallback: (a: string) => void;
   const remove = jest.fn();
 
   const subscribeMock = jest.fn().mockImplementation((topic, callback) => {
@@ -69,5 +70,20 @@ describe('useHuePubSub', () => {
     });
 
     expect(callbackCalled).toBeTruthy();
+  });
+
+  test("when callback is provided there won't be a state update", () => {
+    const { result } = renderHook(() =>
+      useHuePubSub<string>({
+        topic: 'my.test.topic',
+        callback: noop
+      })
+    );
+
+    act(() => {
+      publishCallback('some info');
+    });
+
+    expect(result.current).not.toEqual('some info');
   });
 });
