@@ -19,8 +19,10 @@ import json
 
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-
-from desktop.lib.ai import BaseService
+from desktop.lib.ai.lib.task import TaskParams, TaskType
+from desktop.lib.ai.lib.base_model import BaseModel
+from desktop.lib.ai.lib.base_service import BaseService
+from desktop.lib.ai.models.sqlcoder import SQLCoderModel
 
 from desktop.conf import AI_INTERFACE
 
@@ -35,15 +37,16 @@ def _get_client():
   })
   return client
 
-class OpenAiService(BaseService):
-  def __init__(self):
+class AiService(BaseService):
+  def __init__(self, model_key: str):
     self.client = _get_client()
+    super().__init__(self.get_model(model_key))
 
-  def process(self, prompt: str) -> str:
+  def get_model(self, model_key: str) -> BaseModel:
+    return SQLCoderModel()
+
+  def call_model(self, data: dict) -> str:
     resource = Resource(self.client)
-    data = json.dumps({
-      'prompt': prompt,
-      'stopping_text': '</code>' # TODO: make this an argument
-    }).encode('utf8')
-    response = resource.post(relpath=_path, data=data)
+    data_str = json.dumps(data).encode('utf8')
+    response = resource.post(relpath=_path, data=data_str)
     return response['inference']
