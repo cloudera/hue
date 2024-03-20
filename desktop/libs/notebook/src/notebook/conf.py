@@ -66,7 +66,7 @@ def check_has_missing_permission(user, interpreter, user_apps=None):
     return False    
   
   matching_groups_qs = user.groups.filter(name__in=permissions['groups'])
-  LOG.info(f'User {user.username} groups {user.groups.all()} matching {permissions["groups"]} {matching_groups_qs.exists()}')
+  LOG.info(f'User {user.username} matching {permissions["groups"]} {matching_groups_qs.exists()}')
   
   return not matching_groups_qs.exists()
 
