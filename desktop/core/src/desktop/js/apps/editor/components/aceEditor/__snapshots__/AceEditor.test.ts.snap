@@ -13,7 +13,6 @@ exports[`AceEditor.vue should render 1`] = `
       autocapitalize="off"
       autocorrect="off"
       class="ace_text-input"
-      data-testid = "query-input-box"
       spellcheck="false"
       style="opacity: 0;"
       wrap="off"
