@@ -23,6 +23,7 @@ import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
 
 import NotebookViewModel from './NotebookViewModel';
+import '../editor/components/ko.syntaxDropdown';
 import {
   ACTIVE_SNIPPET_CONNECTOR_CHANGED_EVENT,
   IGNORE_NEXT_UNLOAD_EVENT
@@ -542,18 +543,12 @@ huePubSub.subscribe('app.dom.loaded', app => {
 
     if (window.EDITOR_ENABLE_QUERY_SCHEDULING) {
       viewModel = new NotebookViewModel(
-        window.EDITOR_ID,
-        window.NOTEBOOKS_JSON,
         window.EDITOR_VIEW_MODEL_OPTIONS,
         window.CoordinatorEditorViewModel,
         window.RunningCoordinatorModel
       );
     } else {
-      viewModel = new NotebookViewModel(
-        window.EDITOR_ID,
-        window.NOTEBOOKS_JSON,
-        window.EDITOR_VIEW_MODEL_OPTIONS
-      );
+      viewModel = new NotebookViewModel(window.EDITOR_VIEW_MODEL_OPTIONS);
     }
     ko.applyBindings(viewModel, $(window.EDITOR_BINDABLE_ELEMENT)[0]);
     viewModel.init();

@@ -1790,6 +1790,26 @@ DJANGO_EMAIL_BACKEND = Config(
   default="django.core.mail.backends.smtp.EmailBackend"
 )
 
+CORS_ENABLED = Config(
+  key="cors_enabled",
+  help=_("Enable or disable Cross-Origin Resource Sharing (CORS). Defaults to True."),
+  type=coerce_bool,
+  default=True
+)
+
+CORS_ALLOW_CREDENTIALS = Config(
+  key="cors_allow_credentials",
+  help=_("This value determines whether the server allows cookies in the cross-site HTTP requests. Defaults to True."),
+  type=coerce_bool,
+  default=True
+)
+
+CORS_ALLOWED_ORIGINS = Config(
+  key="cors_allowed_origins",
+  help=_("A comma separated list of origins allowed for CORS."),
+  type=coerce_csv
+)
+
 ENABLE_SQL_SYNTAX_CHECK = Config(
   key='enable_sql_syntax_check',
   default=True,
@@ -1797,11 +1817,11 @@ ENABLE_SQL_SYNTAX_CHECK = Config(
   help=_('Choose whether to enable SQL syntax check or not.')
 )
 
-EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
-  key='editor_autocomplete_timeout',
-  type=int,
-  default=30000,
-  help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled.')
+DISABLE_SOURCE_AUTOCOMPLETE = Config(
+  key='disable_source_autocomplete',
+  type=coerce_bool,
+  default=False,
+  help=_('Choose whether the editor autocomplete should gather suggestions from external sources or not.')
 )
 
 ENABLE_HUE_5 = Config(
@@ -1927,7 +1947,6 @@ TRACING = ConfigSection(
       help=_('Trace all the requests instead of a few specific ones like the SQL Editor. Much noisiers.')
     ),
 ))
-
 
 def task_server_default_result_directory():
   """Local directory to store task results."""
@@ -2623,9 +2642,8 @@ def is_cm_managed():
 def is_gs_enabled():
   from desktop.lib.idbroker import conf as conf_idbroker # Circular dependencies  desktop.conf -> idbroker.conf -> desktop.conf
 
-  return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or \
-      conf_idbroker.is_idbroker_enabled('gs') or \
-      is_raz_gs()
+  return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or is_raz_gs() or \
+    conf_idbroker.is_idbroker_enabled('gs')
 
 def has_gs_access(user):
   from desktop.auth.backend import is_admin

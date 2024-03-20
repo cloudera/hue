@@ -103,7 +103,6 @@ else:
 <![endif]-->
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
-<%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />
 
 </%def>
 
@@ -129,8 +128,6 @@ else:
   }
 % endif
 </style>
-
-${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode()">
   <div class="navbar-inner">
@@ -2070,7 +2067,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     userId: ${ user.id },
     suffix: '${ suffix }',
     assistAvailable: true,
-    autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
     snippetViewSettings: {
       default: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
@@ -2260,10 +2256,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   });
 
   window.EDITOR_ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
-
-  window.EDITOR_ID = ${ editor_id or 'null' };
-
-  window.NOTEBOOKS_JSON = ${ notebooks_json | n,unicode };
 
   window.SQL_ANALYZER_AUTO_UPLOAD_QUERIES = '${ OPTIMIZER.AUTO_UPLOAD_QUERIES.get() }' === 'True';
 

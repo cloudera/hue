@@ -370,16 +370,16 @@ SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
 EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
 EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 
+if desktop.conf.CORS_ENABLED.get():
+  # Permissive CORS for public /api
+  INSTALLED_APPS.append('corsheaders')
+  MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 
-# Permissive CORS for public /api
-INSTALLED_APPS.append('corsheaders')
-MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
-CORS_URLS_REGEX = r'^/api/.*$|/saml2/login/'
-CORS_ALLOW_CREDENTIALS = True
-if sys.version_info[0] > 2:
-  CORS_ALLOW_ALL_ORIGINS = True
-else:
-  CORS_ORIGIN_ALLOW_ALL = True
+  CORS_URLS_REGEX = r'^/api/.*$|/saml2/login/'
+  CORS_ALLOW_CREDENTIALS = desktop.conf.CORS_ALLOW_CREDENTIALS.get()
+
+  CORS_ALLOWED_ORIGINS = desktop.conf.CORS_ALLOWED_ORIGINS.get() or []
+  CORS_ALLOW_ALL_ORIGINS = not bool(CORS_ALLOWED_ORIGINS)
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):

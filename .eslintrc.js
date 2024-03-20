@@ -2,7 +2,6 @@ const normalGlobals = [];
 
 const hueGlobals = [
   // global_js_constants.mako
-  'AUTOCOMPLETE_TIMEOUT',
   'CACHEABLE_TTL',
   'CSRF_TOKEN',
   'DOCUMENT_TYPES',
@@ -56,6 +55,71 @@ const globals = normalGlobals.concat(hueGlobals).reduce((acc, key) => {
   return acc;
 }, {});
 
+const jsTsVueRules = {
+  'no-useless-constructor': 'off',
+  '@typescript-eslint/no-non-null-assertion': 'off',
+  '@typescript-eslint/no-explicit-any': 'error',
+  '@typescript-eslint/no-this-alias': 'error',
+  '@typescript-eslint/no-unused-vars': 'error',
+  'vue/max-attributes-per-line': [
+    'error',
+    {
+      singleline: 10,
+      multiline: {
+        max: 1,
+        allowFirstLine: false
+      }
+    }
+  ],
+  'vue/html-self-closing': [
+    'error',
+    {
+      html: {
+        void: 'any'
+      }
+    }
+  ],
+  'vue/singleline-html-element-content-newline': 'off' // Conflicts with prettier
+};
+
+const jestRules = {
+  'jest/no-focused-tests': 'error',
+  'jest/valid-expect': 'error',
+  'new-cap': 'off',
+  'no-console': 'off',
+  'no-restricted-syntax': [
+    'error',
+    {
+      selector:
+        'CallExpression[callee.object.name="console"][callee.property.name!=/^(warn|error|info|trace)$/]',
+      message: 'Unexpected property on console object was called'
+    }
+  ],
+  'no-extra-boolean-cast': 'off',
+  'no-invalid-this': 'off',
+  'no-lonely-if': 'error',
+  'no-throw-literal': 'off',
+  'no-unused-vars': [
+    'error',
+    {
+      vars: 'all',
+      args: 'none',
+      ignoreRestSiblings: true,
+      varsIgnorePattern: '_[a-zA-Z0-9_]+'
+    }
+  ],
+  'no-useless-constructor': 'error',
+  'no-var': 'error',
+  'no-undef': 'error',
+  'one-var': 'off',
+  'prefer-arrow-callback': 'error',
+  'prefer-const': ['warn', { destructuring: 'all' }],
+  'require-jsdoc': 'off',
+  strict: 'off',
+  'valid-jsdoc': 'off',
+  curly: ['error', 'all']
+};
+
 module.exports = {
   env: {
     browser: true,
@@ -76,47 +140,21 @@ module.exports = {
         parser: '@typescript-eslint/parser'
       },
       plugins: ['vue', '@typescript-eslint'],
-      rules: {
-        'vue/max-attributes-per-line': [
-          'error',
-          {
-            singleline: 10,
-            multiline: {
-              max: 1,
-              allowFirstLine: false
-            }
-          }
-        ],
-        'vue/html-self-closing': [
-          'error',
-          {
-            html: {
-              void: 'any'
-            }
-          }
-        ],
-        'vue/singleline-html-element-content-newline': 0, // Conflicts with prettier
-        '@typescript-eslint/no-non-null-assertion': 0
-      }
+      rules: jsTsVueRules
     },
     {
       files: ['*.d.ts'],
       extends: ['plugin:@typescript-eslint/recommended'],
       parser: '@typescript-eslint/parser',
       plugins: ['jest', '@typescript-eslint'],
-      rules: {
-        'no-useless-constructor': 0,
-        '@typescript-eslint/no-non-null-assertion': 0
-      }
+      rules: jsTsVueRules
     },
     {
       files: ['*.ts', '*.tsx'],
       extends: ['plugin:@typescript-eslint/recommended'],
       parser: '@typescript-eslint/parser',
       plugins: ['jest', '@typescript-eslint'],
-      rules: {
-        '@typescript-eslint/no-non-null-assertion': 0
-      }
+      rules: jsTsVueRules
     }
   ],
   extends: ['plugin:prettier/recommended'],
@@ -131,42 +169,6 @@ module.exports = {
     }
   },
   plugins: ['jest'],
-  rules: {
-    'jest/no-focused-tests': 'error',
-    'jest/valid-expect': 'error',
-    'new-cap': 0,
-    'no-console': 0,
-    'no-restricted-syntax': [
-      'error',
-      {
-        selector:
-          'CallExpression[callee.object.name="console"][callee.property.name!=/^(warn|error|info|trace)$/]',
-        message: 'Unexpected property on console object was called'
-      }
-    ],
-    'no-extra-boolean-cast': 0,
-    'no-invalid-this': 0,
-    'no-lonely-if': 2,
-    'no-throw-literal': 0,
-    'no-unused-vars': [
-      'error',
-      {
-        vars: 'all',
-        args: 'none',
-        ignoreRestSiblings: true,
-        varsIgnorePattern: '_[a-zA-Z0-9_]+'
-      }
-    ],
-    'no-useless-constructor': 2,
-    'no-var': 1,
-    'no-undef': 2,
-    'one-var': 0,
-    'prefer-arrow-callback': 2,
-    'prefer-const': ['warn', { destructuring: 'all' }],
-    'require-jsdoc': 0,
-    strict: 0,
-    'valid-jsdoc': 0,
-    curly: [2, 'all']
-  },
+  rules: jestRules,
   settings: {}
 };

@@ -32,8 +32,9 @@ import PlusCircleIcon from '@cloudera/cuix-core/icons/react/PlusCircleIcon';
 import { FileOutlined } from '@ant-design/icons';
 
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
+import InputModal from '../../InputModal/InputModal';
 import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
-import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
+import { fetchFiles, mkdir, touch } from '../../../../reactComponents/FileChooser/api';
 import {
   PathAndFileData,
   StorageBrowserTableData,
@@ -59,14 +60,17 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
   const [filePath, setFilePath] = useState<string>(user_home_dir);
   const [filesData, setFilesData] = useState<PathAndFileData>();
   const [files, setFiles] = useState<StorageBrowserTableData[]>();
-  const [loadingFiles, setloadingFiles] = useState(true);
+  const [loadingFiles, setLoadingFiles] = useState(true);
   const [pageStats, setPageStats] = useState<PageStats>();
-  const [pageSize, setPageSize] = useState<number>();
+  const [pageSize, setPageSize] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [sortByColumn, setSortByColumn] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
   //TODO: Add filter functionality
-  const [filterData, setFilterData] = useState<string>('');
+  const [filterData] = useState<string>('');
+  const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
+  const [showNewFileModal, setShowNewFileModal] = useState<boolean>(false);
+  const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const { t } = i18nReact.useTranslation();
 
@@ -79,12 +83,18 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         {
           icon: <FileOutlined />,
           key: 'new_file',
-          label: t('New File')
+          label: t('New File'),
+          onClick: () => {
+            setShowNewFileModal(true);
+          }
         },
         {
           icon: <FolderIcon />,
           key: 'new_folder',
-          label: t('New Folder')
+          label: t('New Folder'),
+          onClick: () => {
+            setShowNewFolderModal(true);
+          }
         }
       ]
     },
@@ -95,18 +105,8 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       children: [
         {
           icon: <ImportIcon />,
-          key: 'upload_file',
-          label: t('File')
-        },
-        {
-          icon: <ImportIcon />,
-          key: 'upload_folder',
-          label: t('Folder')
-        },
-        {
-          icon: <ImportIcon />,
-          key: 'upload_zip',
-          label: t('Zip Folder')
+          key: 'upload',
+          label: t('New Upload')
         }
       ]
     }
@@ -135,8 +135,38 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
     }
   ];
 
+  const handleCreateNewFolder = (folderName: string) => {
+    setLoadingFiles(true);
+    mkdir(folderName, filePath)
+      .then(() => {
+        setRefreshKey(oldKey => oldKey + 1);
+      })
+      .catch(error => {
+        // eslint-disable-next-line no-restricted-syntax
+        console.log(error);
+      })
+      .finally(() => {
+        setLoadingFiles(false);
+      });
+  };
+
+  const handleCreateNewFile = (fileName: string) => {
+    setLoadingFiles(true);
+    touch(fileName, filePath)
+      .then(() => {
+        setRefreshKey(oldKey => oldKey + 1);
+      })
+      .catch(error => {
+        // eslint-disable-next-line no-restricted-syntax
+        console.log(error);
+      })
+      .finally(() => {
+        setLoadingFiles(false);
+      });
+  };
+
   useEffect(() => {
-    setloadingFiles(true);
+    setLoadingFiles(true);
     fetchFiles(filePath, pageSize, pageNumber, filterData, sortByColumn, sortOrder)
       .then(responseFilesData => {
         setFilesData(responseFilesData);
@@ -159,9 +189,9 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
         console.error(error);
       })
       .finally(() => {
-        setloadingFiles(false);
+        setLoadingFiles(false);
       });
-  }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder]);
+  }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder, refreshKey]);
 
   return (
     <Spin spinning={loadingFiles}>
@@ -226,7 +256,23 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
           onSortOrderChange={setSortOrder}
           sortByColumn={sortByColumn}
           sortOrder={sortOrder}
-        ></StorageBrowserTable>
+        />
+        <InputModal
+          title={t('Create New Folder')}
+          inputLabel={t('Enter Folder name here')}
+          submitText={t('Create')}
+          showModal={showNewFolderModal}
+          onSubmit={handleCreateNewFolder}
+          onClose={() => setShowNewFolderModal(false)}
+        />
+        <InputModal
+          title={t('Create New File')}
+          inputLabel={t('Enter File name here')}
+          submitText={t('Create')}
+          showModal={showNewFileModal}
+          onSubmit={handleCreateNewFile}
+          onClose={() => setShowNewFileModal(false)}
+        />
       </div>
     </Spin>
   );

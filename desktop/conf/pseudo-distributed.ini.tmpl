@@ -244,9 +244,11 @@
   # Choose whether to allow multi tenancy or not.
   ## enable_organizations=false
 
-  # Editor autocomplete timeout (ms) when fetching columns, fields, tables etc.
-  # To disable this type of autocompletion set the value to 0.
-  ## editor_autocomplete_timeout=30000
+  # Choose whether the editor autocomplete should gather suggestions from external source or not. The editor
+  # autocomplete uses various sources for its suggestions, listing databases, tables, columns files etc. The results are
+  # cached on the client (see cacheable_ttl) so the calls are kept to a minimum but if you prefer to disable these calls
+  # all together from the editor set this to true.
+  ## disable_source_autocomplete=false
 
   # Enable saved default configurations for Hive, Impala, Spark, and Oozie.
   ## use_default_configuration=false
@@ -1487,6 +1489,9 @@
 
   # Turn on/off impersonation mechanism when talking to Impala
   ## impersonation_enabled=False
+
+  # Impala Coordinator Web Server has Spnego enabled
+  ## coordinator_ui_spnego=false
 
   # Number of initial rows of a result set to ask Impala to cache in order
   # to support re-fetching them for downloading them.

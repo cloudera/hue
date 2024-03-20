@@ -172,6 +172,8 @@ class TrinoApi(Api):
 
       next_uri = status.next_uri
       current_length = len(data)
+      if processed_rows < 0:
+        processed_rows = 0
       data = data[processed_rows:processed_rows + 100]
       processed_rows -= current_length
 
@@ -317,6 +319,26 @@ class TrinoApi(Api):
     }
       for col in columns
     ]
+
+
+  @query_error_handler
+  def explain(self, notebook, snippet):
+    statement = snippet['statement'].rstrip(';')
+    explanation = ''
+
+    if statement:
+      try:
+        TrinoQuery(self.trino_request, 'USE ' + snippet['database']).execute()
+        result = TrinoQuery(self.trino_request, 'EXPLAIN ' + statement).execute()
+        explanation = result.rows
+      except Exception as e:
+        explanation = str(e)
+
+    return {
+      'status': 0,
+      'explanation': explanation,
+      'statement': statement
+    }
 
 
   def download(self, notebook, snippet, file_format='csv'):

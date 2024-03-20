@@ -47,4 +47,4 @@ STOPSIGNAL SIGINT
 USER hive
 ENV USER hive
 WORKDIR ${HUE_HOME}
-CMD ["run_httpd.sh"]
+CMD ["./run_httpd.sh"]
