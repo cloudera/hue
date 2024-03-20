@@ -25,9 +25,9 @@ deactivate
 
 3. Start server
 ```
-uvicorn server:app --reload
+uvicorn server:app --host 0.0.0.0 --port 8888 --reload
 ```
-Hue AI Server should now be available at http://localhost:8000
+Hue AI Server should now be available at http://localhost:8888
 
 Start with `--log-level trace` option to get all logs
 
