@@ -120,7 +120,7 @@ There is no bridge to KO for components using this integration. Example using in
       <ul class="dropdown-menu pull-right">
         <li>
           <!-- ko if: editorMode -->
-          <a data-hue-analytics="editor:new-query-button-click" data-testid = "new-query-notebook-button" href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null, 'blank'); }, attr: { 'title': '${ _('New ') }' +  editorTitle() + '${ _(' Query') }' }">
+          <a data-hue-analytics="editor:new-query-button-click" data-testid = "new-query-button" href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null, 'blank'); }, attr: { 'title': '${ _('New ') }' +  editorTitle() + '${ _(' Query') }' }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
           <!-- /ko -->

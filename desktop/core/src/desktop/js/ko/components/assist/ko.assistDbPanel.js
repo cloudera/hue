@@ -292,7 +292,7 @@ const TEMPLATE =
       <!-- ko if: selectedSource().selectedNamespace() -->
       <!-- ko if: selectedSource().selectedNamespace().selectedDatabase() -->
       <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedNamespace().selectedDatabase() }">
-        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid = "database-select-back-button"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid = "sql-assist-breadcrumb-back"></i>
         <i class="fa assist-breadcrumb-text" data-bind="css: { 'fa-server': nonSqlType, 'fa-database': !nonSqlType }"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumbTitle }"></span>
       </a>
