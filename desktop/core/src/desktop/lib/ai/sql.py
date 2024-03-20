@@ -29,6 +29,7 @@ from desktop.lib.ai.lib.base_service import BaseService
 from desktop.lib.ai.services.openai import OpenAiService
 from desktop.lib.ai.services.bedrock import BedrockService
 from desktop.lib.ai.services.azure import AzureService
+from desktop.lib.ai.services.ai_assistant import AiService
 from desktop.lib.utils.cache import LRUCache
 
 from notebook.api import TableReader
@@ -45,7 +46,7 @@ ADD_TABLE_DATA = AI_INTERFACE.ADD_TABLE_DATA.get()
 
 def _get_service() -> BaseService:
   service_name = AI_INTERFACE.SERVICE.get()
-  model_key = AI_INTERFACE.MODEL.get()
+  model_key: str = AI_INTERFACE.MODEL.get()
 
   if service_name == "openai":
     return OpenAiService(model_key)
@@ -53,6 +54,8 @@ def _get_service() -> BaseService:
     return AzureService(model_key)
   elif service_name == "bedrock":
     return BedrockService(model_key)
+  elif service_name == "ai_assistant":
+    return AiService(model_key)
   else:
     LOG.error("Service configured is invalid")
     raise Exception(f"Invalid service name - {service_name}")
