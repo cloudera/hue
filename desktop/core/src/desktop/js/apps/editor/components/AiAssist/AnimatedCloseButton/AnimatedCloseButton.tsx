@@ -38,7 +38,7 @@ function AnimatedCloseButton({
   onClick,
   size = 'large',
   direction = 'left'
-}: Props) {
+}: Props): JSX.Element {
   return (
     <div
       title={title}

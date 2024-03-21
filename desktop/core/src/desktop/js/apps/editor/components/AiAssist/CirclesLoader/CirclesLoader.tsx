@@ -26,7 +26,7 @@ function CirclesLoader({
 }: {
   repeatCount?: number | string;
   duration?: string;
-}) {
+}): JSX.Element {
   const cy = '12';
   const renderAnimation = begin => (
     <animate

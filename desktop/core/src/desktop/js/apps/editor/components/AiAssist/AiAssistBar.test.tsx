@@ -28,6 +28,19 @@ import AiAssistBar from './AiAssistBar';
 
 import * as hooks from './hooks';
 
+jest.mock('../../../../config/hueConfig', () => {
+  // We need to import the AiActionModes here since Jest mocks
+  // arent allowed to access variables outside of the module
+  const { AiActionModes } = require('./sharedTypes'); 
+  return {
+    getLastKnownConfig: jest.fn().mockReturnValue({
+      hue_config: {
+        ai_enabled_SQL_tasks: Object.values(AiActionModes),
+      },
+    }),
+  };
+});
+
 jest.spyOn(hooks, 'useKeywordCase').mockReturnValue('upper');
 jest.spyOn(hooks, 'useResizeAwareElementSize').mockReturnValue({ height: 100, width: 100 });
 jest.spyOn(hooks, 'useKeyboardShortcuts');
@@ -80,6 +93,9 @@ jest.mock('lodash', () => ({
 // Mock huePubSub
 jest.mock('utils/huePubSub', () => ({
   subscribe: jest.fn(() => ({
+    remove: jest.fn()
+  })),
+  publish: jest.fn(() => ({
     remove: jest.fn()
   }))
 }));
