@@ -20,19 +20,37 @@ import axios from 'axios';
 const tableStyle = {
   width: '100%',
   borderCollapse: 'collapse',
+  border: '1px solid #ddd',
 };
 
 const thStyle = {
-  border: '1px solid #ddd',
   padding: '8px',
   textAlign: 'left',
   backgroundColor: '#f2f2f2',
+  borderBottom: '1px solid #ddd',
 };
 
 const tdStyle = {
-  border: '1px solid #ddd',
   padding: '8px',
+  borderBottom: '1px solid #ddd',
 };
+
+const badgeStyle = {
+  display: 'inline-block', // Makes the element behave like a block but only take up as much width as necessary
+  padding: '4px 8px', // Adds space inside the badge, first value is top and bottom, second is left and right
+  borderRadius: '4px', // Gives the badge rounded corners
+  color: 'white', // Text color
+  backgroundColor: 'green', // Background color, you can replace this with appropriate color values
+  textAlign: 'center', // Centers the text inside the badge
+  minWidth: '75px', // Ensures the badge has at least this width
+};
+
+// Then use it for your status label
+<td style={tdStyle}>
+  <span style={badgeStyle}>SUCCEEDED</span>
+</td>
+
+
 
 const tasks = {
   'document cleanup': {
@@ -49,6 +67,17 @@ const tasks = {
   },
 };
 
+const getBadgeStyle = (status) => ({
+  display: 'inline-block',
+  padding: '4px 8px',
+  borderRadius: '4px',
+  color: 'white',
+  backgroundColor: status === 'SUCCESS' ? 'green' :
+                    status === 'FAILURE' ? 'red' :
+                    status === 'RUNNING' ? 'orange' : 'grey', // Default color
+  textAlign: 'center',
+  minWidth: '75px',
+});
 
 const ScheduleTaskPopup = ({ onClose, onSubmit }) => {
   const [selectedTask, setSelectedTask] = useState('');
@@ -102,36 +131,9 @@ const TaskScheduler = () => {
     };
 
     axios.post('/desktop/api2/handle_submit', payload)
-//     .then(response => {
-//       const taskInfo = {
-//         ...response.data,
-//         time: response.data.time,
-//         progress: response.data.progress,
-//         triggered_by: response.data.triggered_by,
-//         task_name: response.data.taskName,
-//         parameters: response.data.taskParams,
-//         status: response.data.status,
-//         task_id: response.data.task_id, // Assuming the backend returns a unique task ID
-//       };
-//       console.log('task name')
-//       setScheduledTasks(prevTasks => [...prevTasks, taskInfo]);
-//     })
     .catch(error => {
       console.error('Error scheduling task', error);
     });
-//     // Here you would call your backend to schedule the task
-//     console.log(`Scheduling task ${taskName} with params`, taskParams);
-//     // For now we'll just simulate scheduling a task
-//     const taskInfo = {
-//       taskName,
-//       taskParams,
-//       time: new Date().toLocaleTimeString(),
-//       progress: 'Scheduled',
-//       user: 'currentUser', // Replace with actual current user
-//       status: 'In progress',
-//       taskId: Math.random().toString(36).substr(2, 9), // Simulate a unique task ID
-//     };
-//     setScheduledTasks((prevTasks) => [...prevTasks, taskInfo]);
   };
 
   return (
@@ -152,18 +154,56 @@ const TaskScheduler = () => {
 };
 
 
+// A helper function to calculate duration
+const calculateDuration = (start, end) => {
+  if (!start || !end) return 'N/A'; // If either start or end is missing
+
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const duration = endDate - startDate; // Duration in milliseconds
+
+  if (isNaN(duration)) return 'Invalid Dates'; // If dates can't be parsed
+
+  // Convert duration to hours, minutes, and seconds
+  let seconds = Math.floor((duration / 1000) % 60);
+  let minutes = Math.floor((duration / (1000 * 60)) % 60);
+  let hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+  // Build duration string
+  let durationStr = '';
+  if (hours > 0) durationStr += hours + 'h, ';
+  if (minutes > 0 || hours > 0) durationStr += minutes + 'm, ';
+  durationStr += seconds + 's';
+
+  return durationStr;
+};
+
+
 // export const TaskBrowserTable = ({ tasks }) => {
 export const TaskBrowserTable = () => {
   // The tasks prop contains the array of scheduled tasks
   // logic to fetch tasks from database table
 
   const [tasks, setTasks] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(''); // state for the search term
+  const [statusFilter, setStatusFilter] = useState('all'); // state to track status filter
+//   const [userIdFilter, setUserIdFilter] = useState(''); // state to track user_id filter
+//   const [taskIdFilter, setTaskIdFilter] = useState(''); // state to track task_id filter
 
   useEffect(() => {
     const fetchTasks = () => {
     axios.get('/desktop/api2/get_taskserver_tasks/')
         .then(response => {
-            setTasks(response.data);
+            if (Array.isArray(response.data)) {
+            //sort based on timestamp
+            const sortedTasks = response.data.sort((a, b) => {
+                // Assuming 'date_done' is the timestamp field and is in a comparable format
+                return new Date(b.date_done) - new Date(a.date_done);
+            });
+            setTasks(sortedTasks);
+          } else {
+            console.error('Expected an array of tasks, but received:', response.data);
+          }
         })
         .catch(error => {
             console.error('Error fetching tasks', error);
@@ -172,41 +212,115 @@ export const TaskBrowserTable = () => {
 
     fetchTasks();   //fetch tasks initially
     const interval = setInterval(fetchTasks, 5000);
-
     return () => clearInterval(interval); // Cleanup on unmount
 
   }, []);
 
+  const handleSearchChange = (e) => {
+   console.log('Filtering tasks by:', e.target.value);
+    setSearchTerm(e.target.value.toLowerCase());
+    };
+
+  // Function to handle status filter button clicks
+  const handleStatusFilterChange = (status) => {
+    setStatusFilter(status);
+  };
+//
+//   const handleUserIdFilterChange = (e) => {
+//     setUserIdFilter(e.target.value.toLowerCase());
+//   };
+//
+//   const handleTaskIdFilterChange = (e) => {
+//     setTaskIdFilter(e.target.value.toLowerCase());
+//   };
+
+  const filteredTasks = tasks.filter(task => {
+    const taskNameMatch = task.result?.task_name?.toLowerCase().includes(searchTerm);
+    const userIdMatch = task.result?.user_id?.toString().toLowerCase().includes(searchTerm);
+    const taskIdMatch = task.task_id?.toString().toLowerCase().includes(searchTerm);
+    const statusMatch = statusFilter === 'all' || task.status.toLowerCase() === statusFilter;
+
+    return (taskNameMatch || userIdMatch || taskIdMatch) && statusMatch;
+  });
+
+  const buttonStyle = {
+    marginRight: '2px',
+    marginLeft: '2px',
+  };
+
+  // Style for the flex container
+  const flexContainerStyle = {
+    display: 'flex',
+    alignItems: 'center', // This will align the items vertically
+    marginBottom: '10px'
+  };
+
+  // Style for the buttons and input to have spacing
+  const buttonInputStyle = {
+    marginRight: '2px', // This provides spacing to the right of each element
+    marginBottom: '0'   // Removes any default margin-bottom
+  };
+
+
+
+
   // Render the table with the tasks data
   return (
-    <div>
-      <h1 style={{ marginBottom: '10px' }}>Task Browser</h1>
+//     <div>
+// {/*       <h1 style={{ marginBottom: '10px' }}>Task Browser</h1> */}
+    <div className="jobbrowser-full">
+    <div className="content-panel-inner">
+    <div className="hue-breadcrumbs-bar" style={flexContainerStyle}>
+      <input
+        type="text"
+        placeholder="Search by task name, user ID, or task ID..."
+        onChange={handleSearchChange}
+        style={{ ...buttonInputStyle, flexGrow: 1 }} // flexGrow allows the input to take up available space
+      />
+      <button onClick={() => handleStatusFilterChange('success')} style={buttonInputStyle} className="btn btn-success">Succeeded</button>
+          <button onClick={() => handleStatusFilterChange('failure')} style={buttonInputStyle} className="btn btn-danger">Failed</button>
+          <button onClick={() => handleStatusFilterChange('running')} style={buttonInputStyle} className="btn btn-info">Running</button>
+          <button onClick={() => handleStatusFilterChange('all')} style={buttonInputStyle} className="btn">All</button>
+    </div>
+    <div className="hue-jobs-table hue-horizontally-scrollable">
       <table style={tableStyle}>
-        <thead>
+        <thead className="thStyle">
           <tr>
-            <th style={thStyle}>Time</th>
-            <th style={thStyle}>Progress</th>
-            <th style={thStyle}>Triggered By</th>
-            <th style={thStyle}>Task Name</th>
-            <th style={thStyle}>Parameters</th>
-            <th style={thStyle}>Status</th>
-            <th style={thStyle}>Task ID</th>
+            <th style={{ ...thStyle, width: '20%'}}>Task ID</th>
+            <th style={{ ...thStyle, width: '3%'}}>User</th>
+            <th style={{ ...thStyle, width: '5%'}}>Progress</th>
+            <th style={{ ...thStyle, width: '7%'}}>Task Name</th>
+            <th style={{ ...thStyle, width: '10%'}}>Parameters</th>
+            <th style={{ ...thStyle, width: '5%'}}>Status</th>
+            <th style={{ ...thStyle, width: '10%'}}>Started</th>
+            <th style={{ ...thStyle, width: '5%'}}>Duration</th>
           </tr>
         </thead>
-        <tbody>
-          {tasks.map((task, index) => (
-            <tr key={index} style={{ borderBottom: '1px solid #ddd', backgroundColor: index % 2 ? '#f9f9f9' : '#fff' }}>
-              <td style={tdStyle}>{task.time}</td>
-              <td style={tdStyle}>{task.progress}</td>
-              <td style={tdStyle}>{task.triggered_by}</td>
-              <td style={tdStyle}>{task.task_name}</td>
-              <td style={tdStyle}>{JSON.stringify(task.parameters)}</td>
-              <td style={tdStyle}>{task.status}</td>
+        <tbody className="tdStyle">
+            {filteredTasks.map((task, index) => (
+             <tr key={index}>
               <td style={tdStyle}>{task.task_id}</td>
+              <td style={tdStyle}>{task.result?.username}</td>
+              <td style={tdStyle}>{task.progress}</td>
+              <td style={tdStyle}>{task.result?.task_name}</td>
+              <td style={tdStyle}>
+                {task.result?.task_name === 'fileupload'
+                  ? `{file name: ${task.result?.qqfilename}}`
+                  : JSON.stringify(task.parameters)}
+              </td>
+              <td style={tdStyle}>
+                <span style={getBadgeStyle(task.status)}>
+                  {task.status}
+                </span>
+              </td>
+              <td style={tdStyle}>{task.result?.task_start}</td>
+              <td style={tdStyle}>{calculateDuration(task.result?.task_start, task.result?.task_end)}</td>
             </tr>
           ))}
         </tbody>
       </table>
+    </div>
+    </div>
     </div>
   );
 };
