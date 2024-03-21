@@ -1,39 +1,8 @@
-// 'use strict';
-//
-// import * as React from 'react';
-//
-//
-// // This component is rendered if the react loadComponent can't find
-// // which react component to use
-// const FallbackComponent = () => {
-//   return (
-//     <div>Placeholder component 1
-//     </div>
-//   );
-// };
-//
-// export default FallbackComponent;
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './TaskBrowser.scss';
 
-// const tableStyle = {
-//   width: '100%',
-//   borderCollapse: 'collapse',
-// };
-//
-// const thStyle = {
-//   border: '1px solid #ddd',
-//   padding: '8px',
-//   textAlign: 'left',
-//   backgroundColor: '#f2f2f2',
-// };
-//
-// const tdStyle = {
-//   border: '1px solid #ddd',
-//   padding: '8px',
-// };
 
 const tasks = {
   'document cleanup': {
@@ -49,7 +18,6 @@ const tasks = {
     ],
   },
 };
-
 
 const ScheduleTaskPopup = ({ onClose, onSubmit }) => {
   const [selectedTask, setSelectedTask] = useState('');
@@ -69,7 +37,8 @@ const ScheduleTaskPopup = ({ onClose, onSubmit }) => {
   };
 
   return (
-    <div className="popup">
+    <div className="popupStyle">
+      <div className="popupContentStyle">
       <select value={selectedTask} onChange={(e) => setSelectedTask(e.target.value)}>
         <option value="">Select Task</option>
         {Object.keys(tasks).map((taskName) => (
@@ -82,19 +51,27 @@ const ScheduleTaskPopup = ({ onClose, onSubmit }) => {
           name={param.name}
           type="text"
           placeholder={param.name}
-          onChange={handleChange}
+          onChange={(e) => {
+            const { name, value } = e.target;
+            setParams(prev => ({ ...prev, [name]: value }));
+          }}
           value={params[param.name] || ''}
         />
       ))}
       <button onClick={handleSubmit}>Submit</button>
       <button onClick={onClose}>Close</button>
     </div>
+    </div>
   );
 };
 
-const TaskScheduler = () => {
+const TaskBrowser = () => {
   const [showSchedulePopup, setShowSchedulePopup] = useState(false);
   const [scheduledTasks, setScheduledTasks] = useState([]); // Store an array of scheduled tasks
+
+  const [showLogPopup, setShowLogPopup] = useState(false); // This should match where you use it
+  const [currentTaskId, setCurrentTaskId] = useState(null);
+  const [taskLogs, setTaskLogs] = useState("");
 
   const handleScheduleSubmit = (taskName, taskParams) => {
     const payload = {
@@ -103,73 +80,118 @@ const TaskScheduler = () => {
     };
 
     axios.post('/desktop/api2/handle_submit', payload)
-//     .then(response => {
-//       const taskInfo = {
-//         ...response.data,
-//         time: response.data.time,
-//         progress: response.data.progress,
-//         triggered_by: response.data.triggered_by,
-//         task_name: response.data.taskName,
-//         parameters: response.data.taskParams,
-//         status: response.data.status,
-//         task_id: response.data.task_id, // Assuming the backend returns a unique task ID
-//       };
-//       console.log('task name')
-//       setScheduledTasks(prevTasks => [...prevTasks, taskInfo]);
-//     })
     .catch(error => {
       console.error('Error scheduling task', error);
     });
-//     // Here you would call your backend to schedule the task
-//     console.log(`Scheduling task ${taskName} with params`, taskParams);
-//     // For now we'll just simulate scheduling a task
-//     const taskInfo = {
-//       taskName,
-//       taskParams,
-//       time: new Date().toLocaleTimeString(),
-//       progress: 'Scheduled',
-//       user: 'currentUser', // Replace with actual current user
-//       status: 'In progress',
-//       taskId: Math.random().toString(36).substr(2, 9), // Simulate a unique task ID
-//     };
-//     setScheduledTasks((prevTasks) => [...prevTasks, taskInfo]);
+  };
+
+  // This function will open the schedule task popup
+  const handleSchedulePopup = () => {
+    setShowSchedulePopup(true);
+  };
+
+  // Add the function to handle showing logs
+  const handleShowLogs = (taskId) => {
+    // This function should set the current task ID and fetch the logs
+    console.log("hi im in handlelogs");
+    setCurrentTaskId(taskId);
+    // Fetch the logs from the server
+    axios.get(`/desktop/api2/get_task_logs/${taskId}/`)
+      .then(response => {
+        // Assuming the server response contains the logs in the data object
+        setTaskLogs(response.data);
+        setShowLogPopup(true); // Open the popup
+      })
+      .catch(error => {
+        console.error('Error fetching logs:', error);
+        // Handle the error appropriately
+      });
   };
 
   return (
     <div>
-      <button onClick={() => setShowSchedulePopup(true)}>Schedule Task</button>
+
+
       {showSchedulePopup && (
         <ScheduleTaskPopup
           onClose={() => setShowSchedulePopup(false)}
           onSubmit={handleScheduleSubmit}
         />
       )}
+
       <div style={{ margin: '20px 0' }}>
-        <TaskBrowserTable tasks={scheduledTasks} />
+        <TaskBrowserTable tasks={scheduledTasks} handleShowLogs={handleShowLogs} handleSchedulePopup={handleSchedulePopup}/>
       </div>
+      {showLogPopup && (
+        <div className="popupStyle">
+          <div className="popupContentStyle">
+            <h2>Task Logs - {currentTaskId}</h2>
+            <pre>{taskLogs}</pre>
+            <button onClick={() => setShowLogPopup(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };
 
 
+// A helper function to calculate duration
+const calculateDuration = (start, end) => {
+  if (!start || !end) return 'N/A'; // If either start or end is missing
+
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const duration = endDate - startDate; // Duration in milliseconds
+
+  if (isNaN(duration)) return 'Invalid Dates'; // If dates can't be parsed
+
+  // Convert duration to hours, minutes, and seconds
+  let seconds = Math.floor((duration / 1000) % 60);
+  let minutes = Math.floor((duration / (1000 * 60)) % 60);
+  let hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+  // Build duration string
+  let durationStr = '';
+  if (hours > 0) durationStr += hours + 'h, ';
+  if (minutes > 0 || hours > 0) durationStr += minutes + 'm, ';
+  durationStr += seconds + 's';
+
+  return durationStr;
+};
+
+function formatTimestamp(timestamp) {
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+  const date = new Date(timestamp);
+  return date.toLocaleString('en-US', options);
+}
+
+
 // export const TaskBrowserTable = ({ tasks }) => {
-export const TaskBrowserTable = () => {
+export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
+
   // The tasks prop contains the array of scheduled tasks
   // logic to fetch tasks from database table
 
   const [tasks, setTasks] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(''); // New state for the search term
+  const [searchTerm, setSearchTerm] = useState(''); // state for the search term
+  const [statusFilter, setStatusFilter] = useState('all'); // state to track status filter
 
   useEffect(() => {
     const fetchTasks = () => {
     axios.get('/desktop/api2/get_taskserver_tasks/')
         .then(response => {
+            if (Array.isArray(response.data)) {
             //sort based on timestamp
             const sortedTasks = response.data.sort((a, b) => {
                 // Assuming 'date_done' is the timestamp field and is in a comparable format
                 return new Date(b.date_done) - new Date(a.date_done);
             });
             setTasks(sortedTasks);
+          } else {
+            console.error('Expected an array of tasks, but received:', response.data);
+          }
         })
         .catch(error => {
             console.error('Error fetching tasks', error);
@@ -182,55 +204,110 @@ export const TaskBrowserTable = () => {
 
   }, []);
 
+  const handleTaskIdClick = (taskId) => {
+    setCurrentTaskId(taskId);
+    setShowLogsPopup(true);
+    // Here, you could also fetch the logs immediately if you want to
+    fetchTaskLogs(taskId);
+  };
+
+
+
   const handleSearchChange = (e) => {
+   console.log('Filtering tasks by:', e.target.value);
     setSearchTerm(e.target.value.toLowerCase());
+    };
+
+  // Function to handle status filter button clicks
+  const handleStatusFilterChange = (status) => {
+    setStatusFilter(status);
   };
 
   const filteredTasks = tasks.filter(task => {
-    const taskName = task.result?.task_name || '';
-    return taskName.toLowerCase().includes(searchTerm);
+    const taskNameMatch = task.result?.task_name?.toLowerCase().includes(searchTerm);
+    const userIdMatch = task.result?.username?.toString().toLowerCase().includes(searchTerm);
+    const taskIdMatch = task.task_id?.toString().toLowerCase().includes(searchTerm);
+    const statusMatch = statusFilter === 'all' || task.status.toLowerCase() === statusFilter;
+
+    return (taskNameMatch || userIdMatch || taskIdMatch) && statusMatch;
   });
+
+
+
+
 
   // Render the table with the tasks data
   return (
-    <div>
-      <h1 style={{ marginBottom: '10px' }}>Task Browser</h1>
+    <div className="jobbrowser-full">
+    <div className="content-panel-inner">
+    <div className="flex-container-style">
+      <button onClick={handleSchedulePopup} className="btn schedule-task-button">Schedule Task</button>
       <input
         type="text"
-        placeholder="Search by task name..."
+        placeholder="Search by task name, user ID, or task ID..."
         onChange={handleSearchChange}
-        style={{ marginBottom: '10px' }}
+        className="button-input-style"
+        style={{ flexGrow: 1 }} // flexGrow allows the input to take up available space
       />
-      <table className="tableStyle">
-        <thead className="thStyle">
+
+      <button onClick={() => handleStatusFilterChange('success')} className="btn btn-success button-input-style">Succeeded</button>
+          <button onClick={() => handleStatusFilterChange('failure')} className="btn btn-danger button-input-style">Failed</button>
+          <button onClick={() => handleStatusFilterChange('running')} className="btn btn-info button-input-style">Running</button>
+          <button onClick={() => handleStatusFilterChange('all')} className="btn button-input-style">All</button>
+    </div>
+      <table className="tableStyle hue-horizontally-scrollable ">
+        <thead className="thStyle row-grayout-table-header">
           <tr>
-            <th style={thStyle}>Time</th>
-            <th style={thStyle}>Progress</th>
-            <th style={thStyle}>Triggered By</th>
-            <th style={thStyle}>Task Name</th>
-            <th style={thStyle}>Parameters</th>
-            <th style={thStyle}>Status</th>
-            <th style={thStyle}>Task ID</th>
+            <th className="thStyle" style={{ width: '20%' }}>Task ID</th>
+            <th className="thStyle" style={{ width: '3%' }}>User</th>
+            <th className="thStyle" style={{ width: '5%' }}>Progress</th>
+            <th className="thStyle" style={{ width: '7%' }}>Task Name</th>
+            <th className="thStyle" style={{ width: '10%' }}>Parameters</th>
+            <th className="thStyle" style={{ width: '5%' }}>Status</th>
+            <th className="thStyle" style={{ width: '10%' }}>Started</th>
+            <th className="thStyle" style={{ width: '5%' }}>Duration</th>
           </tr>
         </thead>
         <tbody className="tdStyle">
-          {tasks.map((task, index) => (
-            <tr key={index} style={{ borderBottom: '1px solid #ddd', backgroundColor: index % 2 ? '#f9f9f9' : '#fff' }}>
-              <td style={tdStyle}>{task.date_done}</td>
-              <td style={tdStyle}>{task.progress}</td>
-              <td style={tdStyle}>{task.result?.user_id}</td>
-              <td style={tdStyle}>{task.result?.task_name}</td>
-              <td style={tdStyle}>{JSON.stringify(task.parameters)}</td>
-              <td style={tdStyle}>{task.status}</td>
-              <td style={tdStyle}>{task.task_id}</td>
+            {filteredTasks.map((task, index) => (
+            // Determine the class based on the task's status
+
+             <tr key={index}
+             className={
+                task.status === 'SUCCESS' ? 'row-success' :
+                task.status === 'FAILURE' ? 'row-failure' :
+                task.status === 'RUNNING' ? 'row-running' : ''
+              }
+             >
+              <td className="tdStyle" onClick={() => handleShowLogs(task.task_id)}>
+                {task.task_id}
+              </td>
+              <td className="tdStyle">{task.result?.username}</td>
+              <td className="tdStyle">{task.progress}</td>
+              <td className="tdStyle">{task.result?.task_name}</td>
+              <td className="tdStyle">
+                {task.result?.task_name === 'fileupload'
+                  ? `{file name: ${task.result?.qqfilename}}`
+                  : JSON.stringify(task.parameters)}
+              </td>
+              <td className="tdStyle">
+                <span className={`badgeStyle ${task.status === 'SUCCESS' ? 'badgeSuccess' : task.status === 'FAILURE' ? 'badgeFailure' : 'badgeRunning'}`}>
+
+                  {task.status}
+                </span>
+              </td>
+              <td className="tdStyle"> {formatTimestamp(task.result?.task_start)}</td>
+              <td className="tdStyle">{calculateDuration(task.result?.task_start, task.result?.task_end)}</td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
+    </div>
   );
 };
 
-export default TaskScheduler;
+export default TaskBrowser;
+
 
 

@@ -1,18 +1,280 @@
+@import '@cloudera/cuix-core/variables.scss';
+
+// .tableStyle {
+//   width: 100%;
+//   border-collapse: collapse;
+//   border: 1px solid #ddd;
+//   font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+// }
+
 .tableStyle {
-  width: 100%;
+  background-color: rgb(255, 255, 255);
+  border: 1px solid #ddd;
+//   border-bottom-color: rgb(58, 135, 14);
   border-collapse: collapse;
+//   border-left-color: rgb(58, 135, 14);
+//   border-left-style: solid;
+//   border-left-width: 4px;
+//   border-right-color: rgb(58, 135, 14);
+//   border-top-color: rgb(58, 135, 14);
+  color: rgb(66, 66, 66);
+  cursor: pointer;
+  display: table-row;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+//   height: 32px;
+  line-height: 20px;
+  text-indent: 0px;
+  text-size-adjust: 100%;
+  vertical-align: middle;
+  visibility: visible;
 }
 
-.thStyle th {
-  border: 1px solid #ddd;
+.thStyle {
   padding: 8px;
   text-align: left;
   background-color: #f2f2f2;
+  border-bottom: 2px solid #ddd;
+  font-size: 13px;
+
 }
 
-.tdStyle td {
-  border: 1px solid #ddd;
-  padding: 8px;
+.tdStyle {
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 3px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #ddd;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+
 }
+
+// .tdStyle {
+//   background-color: rgb(255, 255, 255);
+//   border-bottom-color: rgb(58, 135, 14);
+//   border-collapse: collapse;
+//   border-left-color: rgb(58, 135, 14);
+//   border-left-style: solid;
+//   border-left-width: 4px;
+//   border-right-color: rgb(58, 135, 14);
+//   border-top-color: rgb(58, 135, 14);
+//   color: rgb(66, 66, 66);
+//   cursor: pointer;
+//   display: table-row;
+//   font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+//   font-size: 14px;
+//   height: 32px;
+//   line-height: 20px;
+//   text-indent: 0px;
+//   text-size-adjust: 100%;
+//   vertical-align: middle;
+//   visibility: visible;
+// }
+
+.popupStyle {
+  position: fixed; // Fixed position to cover the whole screen
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); // Semi-transparent background
+  z-index: 1000; // High z-index to be on top of other content
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popupContentStyle {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1001; // Keep a high z-index
+  width: 60%;  // Adjust width as needed
+  max-height: 80%; // Adjust max height as needed
+  overflow-y: auto; // Add scroll for overflow content
+  position: relative; // Relative positioning within the flex container
+}
+
+.badgeSuccess {
+  background-color: rgb(58, 135, 14);
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-collapse: collapse;
+  border-top-left-radius: 3px;
+  border-top-right-radius:  3px;
+  color: rgb(255, 255, 255);
+  display: inline-block;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 11.844px;
+  font-weight: 700;
+//   height: 14px;
+  line-height: 14px;
+  padding-bottom: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 2px;
+  text-align: left;
+  text-indent: 0px;
+  text-shadow:  0 -1px 0 rgba(0, 0, 0, 0.25);
+  text-size-adjust: 100%;
+  text-wrap: nowrap;
+  vertical-align: baseline;
+  visibility: visible;
+  white-space-collapse: collapse;
+}
+
+.badgeFailure {
+  background-color: rgb(217, 21, 12);
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-collapse: collapse;
+  border-top-left-radius: 3px;
+  border-top-right-radius:  3px;
+  color: rgb(255, 255, 255);
+  display: inline-block;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 11.844px;
+  font-weight: 700;
+//   height: 14px;
+  line-height: 14px;
+  padding-bottom: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 2px;
+  text-align: left;
+  text-indent: 0px;
+  text-shadow:  0 -1px 0 rgba(0, 0, 0, 0.25);
+  text-size-adjust: 100%;
+  text-wrap: nowrap;
+  vertical-align: baseline;
+  visibility: visible;
+  white-space-collapse: collapse;
+}
+
+.badgeRunning {
+  background-color: rgb(255, 163, 25);
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-collapse: collapse;
+  border-top-left-radius: 3px;
+  border-top-right-radius:  3px;
+  color: rgb(255, 255, 255);
+  display: inline-block;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 11.844px;
+  font-weight: 700;
+//   height: 14px;
+  line-height: 14px;
+  padding-bottom: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 2px;
+  text-align: left;
+  text-indent: 0px;
+  text-shadow:  0 -1px 0 rgba(0, 0, 0, 0.25);
+  text-size-adjust: 100%;
+  text-wrap: nowrap;
+  vertical-align: baseline;
+  visibility: visible;
+  white-space-collapse: collapse;
+}
+
+.row-success {
+  border-left: 4px solid green;
+}
+
+.row-failure {
+  border-left: 4px solid red;
+}
+
+.row-running {
+  border-left: 4px solid orange;
+}
+
+.row-grayout-table-header {
+  border-left: 4px solid gray;
+}
+
+
+
+.customCursorClass {
+  cursor: pointer;
+}
+
+.hue-horizontally-scrollable {
+  color: rgb(66, 66, 66);
+  display: block;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+//   height: 2933px;
+  line-height: 20px;
+  overflow-x: auto;
+  text-size-adjust: 100%;
+  visibility: visible;
+//   width: 1852px;
+  -webkit-font-smoothing: antialiased;
+}
+
+table.datatables {
+  border-top: none !important;
+
+  th {
+    border-top: 1px solid cui-blue-300 !important;
+  }
+}
+
+.flex-container-style {
+  display: flex;
+  align-items: center; // Align items vertically
+  justify-content: flex-start; // Align items to the start of the container
+  flex-wrap: wrap; // Allow items to wrap in smaller viewports if necessary
+  gap: 10px; // Spacing between items
+}
+
+.button-input-style {
+  padding-right: 15px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  // Adjust width as necessary, or remove to allow natural width
+}
+
+.pointer {
+    cursor: pointer !important;
+}
+
+.schedule-task-button {
+  padding-right: 15px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+}
+
+.status-filter-button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  // Add specific colors for each button based on class
+  &.success {
+    background-color: green;
+  }
+  &.failed {
+    background-color: red;
+  }
+  &.running {
+    background-color: orange;
+  }
+}
+
+
 
 // ... additional styles ...
