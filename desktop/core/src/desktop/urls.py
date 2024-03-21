@@ -93,6 +93,7 @@ else:
 
 dynamic_patterns += [
   re_path(r'^logs$', desktop_views.log_view, name="desktop.views.log_view"),
+  re_path(r'^task_server$', desktop_views.task_server_view, name='desktop.views.task_server_view'),
   re_path(r'^desktop/log_analytics$', desktop_views.log_analytics),
   re_path(r'^desktop/log_js_error$', desktop_views.log_js_error),
   re_path(r'^desktop/dump_config$', desktop_views.dump_config, name="desktop.views.dump_config"),
@@ -167,6 +168,7 @@ dynamic_patterns += [
   re_path(r'^desktop/api2/doc/restore/?$', desktop_api2.restore_document),
   re_path(r'^desktop/api2/doc/share/link/?$', desktop_api2.share_document_link),
   re_path(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
+  re_path(r'^api/handle_submit?$', desktop_api2.handle_submit),
 
   re_path(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
   re_path(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
@@ -219,6 +221,10 @@ if METRICS.ENABLE_WEB_METRICS.get():
   dynamic_patterns += [
     re_path(r'^desktop/metrics/?', include('desktop.lib.metrics.urls'))
   ]
+
+  # dynamic_patterns += [
+  #   re_path(r'^desktop/metrics2/?', include('desktop.lib.metrics.urls'))
+  # ]
 
 dynamic_patterns += [
   re_path(r'^desktop/connectors/?', include('desktop.lib.connectors.urls'))

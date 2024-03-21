@@ -67,6 +67,8 @@ from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _res
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences
 from libsaml.conf import REQUIRED_GROUPS, REQUIRED_GROUPS_ATTRIBUTE
 from useradmin.models import get_profile
+#TSComment: - remove after task server ui work
+from useradmin.models import User
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -289,6 +291,18 @@ def log_view(request):
     )
   )
 
+def task_server_view(request):
+  """
+  This view renders the Task Server page with basic functionality.
+  """
+  # You can add more logic here if needed
+  logging.debug("task_server_view called with request: %s", request)
+  return render('taskserver_list_tasks.mako',request, {
+    'message': _('tasks #message from views'),
+    'is_embeddable': request.GET.get('is_embeddable', False),
+    'users': User.objects.all(),
+    'users_json': json.dumps(list(User.objects.values_list('id', flat=True)))
+  })
 
 @hue_admin_required
 @access_log_level(logging.WARN)

@@ -688,6 +688,70 @@ def share_document(request):
     'document': doc.to_dict()
   })
 
+from django.http import JsonResponse
+import subprocess
+from rest_framework.decorators import api_view
+import uuid
+
+@api_error_handler
+@require_POST
+# @api_view(['POST'])
+def handle_submit(request):
+  # Extract the task name and params from the request
+  try:
+    data = json.loads(request.body)
+    task_name = data.get('taskName')
+    task_params = data.get('taskParams')
+  except json.JSONDecodeError as e:
+    return JsonResponse({'error': str(e)}, status=500)
+
+  # Check if it's the 'document cleanup' task
+  if task_name == 'document cleanup':
+    keep_days = task_params.get('keep-days')
+    try:
+      #TODO: remove the install_dir. find a way to add the hue_dir here.
+      INSTALL_DIR = "/Users/aselvam/Desktop/work_cloudera/hues/cdh/hue"
+
+      # Run the cleanup command
+      subprocess.check_call(
+        [INSTALL_DIR+'/build/env/bin/hue', 'desktop_document_cleanup', f'--keep-days={keep_days}'])
+      # Return a success response with task info
+      return JsonResponse({
+        'taskName': task_name,
+        'taskParams': task_params,
+        'time': datetime.now().time(),  # Use an appropriate function to get the current time
+        'progress': 'Scheduled',
+        'user': request.user.username,
+        'status': 'In progress',
+        'taskId': uuid.uuid4(),  # Implement a way to generate a unique task ID
+      })
+    except subprocess.CalledProcessError as e:
+      # Handle errors
+      return JsonResponse({'error': str(e)}, status=500)
+
+  elif task_name == 'tmp clean up':
+    cleanup_threshold = task_params.get('threshold for clean up')
+    disk_check_interval =  task_params.get('disk check interval')
+
+    #TODO:  add the tmp clean up logic here / make a call to the tmp clean up views
+
+    return JsonResponse({
+      'taskName': task_name,
+      'taskParams': task_params,
+      'time': datetime.now().time(),  # Use an appropriate function to get the current time
+      'progress': 'Scheduled',
+      'user': request.user.username,
+      'status': 'In progress',
+      'taskId': uuid.uuid4(),  # Implement a way to generate a unique task ID
+    })
+
+  return JsonResponse({
+    'status': 0
+  })
+# Add your URL pattern to call this view
+
+
+
 
 @api_error_handler
 @require_POST
