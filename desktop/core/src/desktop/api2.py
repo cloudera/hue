@@ -689,12 +689,10 @@ def share_document(request):
   })
 
 from django.http import JsonResponse
-import subprocess
-from rest_framework.decorators import api_view
-import uuid
-from desktop.models import Task
 from django.utils import timezone
+import subprocess, uuid, json, datetime
 from django.views.decorators.csrf import csrf_exempt
+import redis
 
 @csrf_exempt
 @api_error_handler
@@ -716,39 +714,42 @@ def handle_submit(request):
       #TODO: remove the install_dir. find a way to add the hue_dir here.
       INSTALL_DIR = "/Users/aselvam/Desktop/work_cloudera/hues/cdh/hue"
 
-      task_uuid = uuid.uuid4()
+      task_uuid = str(uuid.uuid4())
       #manipulation of user value based on models.py, as user is defined as foreign key
       current_username = request.user.username
       current_user = User.objects.get(username=current_username)
       # Run the cleanup command
       subprocess.check_call([INSTALL_DIR+'/build/env/bin/hue', 'desktop_document_cleanup', f'--keep-days={keep_days}'])
 
-      # Create a new Task instance - to write to the django table
-      new_task = Task(
-        time=datetime.now().time(),
-        progress='INP',
-        # triggered_by=request.user.username,
-        triggered_by=current_user,
-        task_name=task_name,  # Assuming task_name is retrieved from request
-        parameters=task_params,  # Assuming task_params is retrieved from request
-        status='Scheduled',
-        task_id=task_uuid,  # Assuming generated_task_id is created somewhere in your logic
-      )
-      new_task.save()
+      # Connect to Redis and store the task details
+      r = redis.Redis(host='localhost', port=6379, db=0)  # Adjust host, port, and db as necessary
+      task_key = f"task:{task_uuid}"
+      task_data = {
+        'task_name': task_name,
+        'parameters': task_params,
+        'triggered_by': current_username,
+        'status': 'Scheduled',
+        'task_id': task_uuid,
+        'time': timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+      }
+
+      # Serialize task_data as a JSON string and save it in Redis
+      r.set(task_key, json.dumps(task_data))
 
       # Return a success response with task info
+      # return JsonResponse(task_data)
+
       return JsonResponse({
         'taskName': task_name,
         'taskParams': task_params,
-        'time': datetime.now().time(),  # Use an appropriate function to get the current time
+        'time': timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
         'progress': 'Scheduled',
-        'user': current_user,
+        'user': current_username,
         'status': 'In progress',
         'task_id': task_uuid,  # Implement a way to generate a unique task ID
       })
     except subprocess.CalledProcessError as e:
-      # Handle errors
-      return JsonResponse({'error': str(e)}, status=500)
+      return JsonResponse({'Error: desktop document cleanup not completed': str(e)}, status=500)
 
   elif task_name == 'tmp clean up':
     cleanup_threshold = task_params.get('threshold for clean up')
@@ -770,7 +771,6 @@ def handle_submit(request):
     'status': 0
   })
 
-import redis
 @csrf_exempt
 @api_error_handler
 #creating a new endpoint to retirve the tasks from the database
@@ -788,6 +788,55 @@ def get_taskserver_tasks(request):
 
   return JsonResponse(tasks, safe=False)
 
+#creating a new endpoint to monitor the status of the task, so that the progress bar in file upload can be stopped at 90%
+@csrf_exempt
+@api_error_handler
+def check_upload_status(request, task_id):
+    r = redis.Redis(host='localhost', port=6379, db=0)  # Adjust as needed
+    task_key = f'celery-task-meta-{task_id}'
+    task_data = r.get(task_key)
+
+    if task_data is None:
+        return JsonResponse({'error': 'Task not found'}, status=404)
+
+    task = json.loads(task_data)
+    # You might want to check if the task has a specific field that indicates finalization
+    is_finalized = task.get('status') == 'SUCCESS'  # Adjust according to your task data structure
+
+    return JsonResponse({'isFinalized': is_finalized})
+
+import re
+from django.http import HttpResponse
+
+def get_task_logs(request, task_id):
+    log_path = '/Users/aselvam/Desktop/work_cloudera/hues/cdh/hue/celery.log'  # Path to your log file
+    task_log = []
+    found = False
+
+    # Compile a regex pattern for efficiency
+    task_pattern = re.compile(rf'\[{task_id}\]')
+    progress_pattern = re.compile(r'progress 100')
+
+    try:
+        with open(log_path, 'r') as log_file:
+            for line in log_file:
+                # Check if the current line has the task_id
+                if task_pattern.search(line):
+                    found = True
+
+                # If the task_id has been found, append the line to the task_log
+                if found:
+                    task_log.append(line)
+                    # Check if we reached 100% progress, then stop
+                    if progress_pattern.search(line):
+                        break
+
+    except FileNotFoundError:
+        return HttpResponse(f'Log file not found at {log_path}', status=404)
+    except Exception as e:
+        return HttpResponse(str(e), status=500)
+
+    return HttpResponse(task_log, content_type='text/plain')
 
 
 @api_error_handler
