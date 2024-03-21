@@ -235,6 +235,7 @@ ${ hueIcons.symbols() }
         <div id="embeddable_useradmin_editpermission" class="embeddable"></div>
         <div id="embeddable_useradmin_configurations" class="embeddable"></div>
         <div id="embeddable_useradmin_newuser" class="embeddable"></div>
+        <div id="embeddable_useradmin_document_cleanup" class="embeddable"></div>
         <div id="embeddable_useradmin_addldapusers" class="embeddable"></div>
         <div id="embeddable_useradmin_addldapgroups" class="embeddable"></div>
         <div id="embeddable_useradmin_edituser" class="embeddable"></div>
@@ -249,6 +250,7 @@ ${ hueIcons.symbols() }
         <div id="embeddable_dump_config" class="embeddable"></div>
         <div id="embeddable_threads" class="embeddable"></div>
         <div id="embeddable_metrics" class="embeddable"></div>
+        <div id="embeddable_taskserver" class="embeddable"></div>
         <div id="embeddable_connectors" class="embeddable"></div>
         <div id="embeddable_analytics" class="embeddable"></div>
         <div id="embeddable_403" class="embeddable"></div>
