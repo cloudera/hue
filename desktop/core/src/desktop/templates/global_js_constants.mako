@@ -104,6 +104,7 @@
     dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
     threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
     metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
+    taskserver: { url: '/task_server', title: '${_('Task Server')}' },
     connectors: { url: '/desktop/connectors', title: '${_('Connectors')}' },
     analytics: { url: '/desktop/analytics', title: '${_('Analytics')}' },
     sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
