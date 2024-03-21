@@ -19,7 +19,9 @@
 @use 'variables' as vars;
 @use 'sharedAiAssistVars' as ai-assist-vars;
 
-$bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // vars.$animation-duration-base
+$bar-vertical-animation-time: (
+  ai-assist-vars.$expand-animation-time * 0.5
+);
 
 .cuix.antd {
   .hue-ai-assist-bar {
@@ -92,6 +94,53 @@ $bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5); // 
   }
 }
 
+// We need to modify some existing editor styles for proper alignment,
+// but only when the AI Assistant is present
+.hue-sql-ai-assistant--present {
+  .snippet-row {
+    // Align right side of the Editor actions (e.g. dropdown for DB selection) with
+    // the AI Assistant bar launcher button.
+    margin-top: 0;
+
+    // When using Data source Notebook there is an additional header with
+    // actions that overlaps with the AI Assistant bar unless we add some extra margin.
+    .snippet-body .card-heading.simple {
+      // Only apply if ancestor elemement indicates it's a notebook snippet
+      .notebook-snippet & {
+        margin-top: 32px;
+      }      
+    }
+  }
+
+  &.hue-sql-ai-assistant--expanded .editor {
+    // No extra top margin needed when the AI Assistant is expanded
+    animation: animateRemovingEditorTopMargin $bar-vertical-animation-time ease-in-out 1 forwards;
+  }
+  &.hue-sql-ai-assistant--contracted .editor {
+    // Extra top margin needed when the AI Assistant is contracted to the launcher button
+    $delay: (ai-assist-vars.$expand-animation-time);
+    animation: $delay animateAddingEditorTopMargin $bar-vertical-animation-time ease-in-out 1
+      forwards;
+  }
+}
+
+@keyframes animateAddingEditorTopMargin {
+  0% {
+    margin-top: 0;
+  }
+  100% {
+    margin-top: 18px;
+  }
+}
+
+@keyframes animateRemovingEditorTopMargin {
+  0% {
+    margin-top: 18px;
+  }
+  100% {
+    margin-top: 0px;
+  }
+}
 
 @keyframes mainBarAnimationIn {
   0% {

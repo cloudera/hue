@@ -22,7 +22,9 @@
 .cuix.antd {
   .hue-ai-assist-toolbar {
     background-color: transparent;
-    width: calc(100% - 84px);
+    width: calc(100% - 170px); // Compensate for the close button and AI icon + title in the bar
+    margin-left: 120px;  // Compensate for the AI icon + title in the bar
+
 
     // Override the default toolbar button styles
     .hue-toolbar-button {

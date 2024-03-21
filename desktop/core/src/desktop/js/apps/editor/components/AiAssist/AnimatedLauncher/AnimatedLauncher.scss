@@ -18,23 +18,61 @@
 
 @use 'variables' as vars;
 @use '../sharedAiAssistVars' as ai-assist-vars;
+@use '../../../../../reactComponents/Toolbar/ToolbarShared.scss' as toolbar-vars;
 
-$adjusted-left-margin: 20px;
+$adjusted-left-margin: 93px;
+
+@mixin twinkle-stars-in-icon {
+  .ai-assist-icon__star-1 {
+    animation: twinkle 1s 1;
+    animation-delay: 0s; 
+  }
+  .ai-assist-icon__star-2 {
+    animation: twinkle 1s 1;
+    animation-delay: 0.25s; 
+  }
+  .ai-assist-icon__star-3 {
+    animation: twinkle 1s 1;
+    animation-delay: 0.5s;
+  }
+  
+  @keyframes twinkle {
+    0%, 100% { fill: currentColor; opacity: 1; }
+    50% { opacity: 0.2; }
+  }  
+}
 
 .cuix.antd {
   .hue-ai-assist-bar__animated-launcher {
     border: 0;
     padding: 0;
-    margin-top: 6px;
-    width: 12px;
-    height: 12px;
     position: absolute;
-    background: vars.$fluidx-blue-400;
-    border-radius: 50%;
+    background: vars.$fluidx-blue-400;    
     box-shadow: 0 0 0 0 vars.$fluidx-blue-300;
     color: vars.$fluidx-blue-600;
-    right: calc(100% - #{$adjusted-left-margin});
     z-index: 2;
+    opacity: 0; 
+  }
+
+  .hue-ai-assist-bar__animated-launcher-icon-title {
+    display: flex;
+  }
+
+  .hue-ai-assist-bar__animated-launcher-btn-container {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    height: toolbar-vars.$toolbar-height-medium;
+
+    .ai-assist-icon--twinkle-once {
+      @include twinkle-stars-in-icon(); 
+    }
+  }
+  .hue-ai-assist-bar__animated-launcher-btn--active,
+  .hue-ai-assist-bar__animated-launcher-btn--active[disabled]:hover {
+    color: vars.$fluidx-blue-800;
+    cursor: default;
   }
 
   .hue-ai-assist-bar__animated-launcher-loading-status {
@@ -65,6 +103,7 @@ $adjusted-left-margin: 20px;
   }
 
   .hue-ai-assist-bar__animated-launcher--loading {
+    opacity: 1;
     animation: loadingAnimation (ai-assist-vars.$expand-animation-time * 0.5) ease-in-out 1;
     border-radius: 12px;
     width: 24px;
@@ -75,6 +114,7 @@ $adjusted-left-margin: 20px;
   }
 
   .hue-ai-assist-bar__animated-launcher--loading-with-status {
+    opacity: 1;
     animation: loadingStatusAnimation (ai-assist-vars.$expand-animation-time * 0.5) ease-in-out 1;
     width: auto;
     display: flex;
@@ -86,6 +126,7 @@ $adjusted-left-margin: 20px;
 
   .hue-ai-assist-bar__animated-launcher--error,
   .hue-ai-assist-bar__animated-launcher--warning {
+    opacity: 1;
     background-color: vars.$fluidx-red-050;
     border-radius: 12px;
     height: 24px;
@@ -102,7 +143,7 @@ $adjusted-left-margin: 20px;
 
   .hue-ai-assist-bar__animated-launcher--warning {
     background-color: vars.$fluidx-orange-050;
-    border: 1px solid #ffe1c1 //vars.$hue-warning-color;
+    border: 1px solid #ffe1c1; //vars.$hue-warning-color;
   }
 
   .hue-ai-assist-bar__animated-launcher-error-text,
@@ -138,23 +179,29 @@ $adjusted-left-margin: 20px;
 @keyframes expandAndSlide {
   0% {
     border-radius: 6px;
-    width: 12px;
-    height: 12px;
+    width: 4px;
+    height: 4px;
+    margin-top: 18px;
     right: calc(100% - #{$adjusted-left-margin});
+    border-radius: 2px;
+    opacity: 0;
   }
 
   10% {
+    opacity: 1;
     border-radius: 12px;
     width: 24px;
     height: 24px;
-    right: calc(calc(100% - #{$adjusted-left-margin}) - 12px);
+    right: calc(100% - calc(#{$adjusted-left-margin} + 20px));
+    margin-top: 8px;
   }
 
   20% {
     border-radius: 12px;
     width: 200px;
     height: 24px;
-    right: calc(100% - 200px);
+    right: calc(100% - 200px - #{$adjusted-left-margin});
+    background: vars.$fluidx-blue-400;
   }
 
   80% {
@@ -171,6 +218,7 @@ $adjusted-left-margin: 20px;
     height: 1px;
     margin-top: 18px;
     right: 46px;
+    opacity: 1;
   }
 }
 

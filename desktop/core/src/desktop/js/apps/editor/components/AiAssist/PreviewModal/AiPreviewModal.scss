@@ -25,6 +25,10 @@ $top: 100px; // Same value as specified in cuix
 // We need to get the cuix class in but we can't add it to the root
 .ant-modal-root {
   .hue-ai-preview-modal {
+    .ant-modal-title {
+      display: flex;
+    }
+
     .hue-ai-preview-modal-inner {
       top: $top;
       max-height: calc(95vh - #{$top});
@@ -62,6 +66,10 @@ $top: 100px; // Same value as specified in cuix
       }
     }
   }
+}
+
+.hue-ai-preview-modal__icon {
+  margin-right: vars.$fluidx-spacing-xs;
 }
 
 .hue-ai-preview-modal__syntax-highlighter {

@@ -28,6 +28,7 @@ import { GuardrailAlert, GuardrailAlertType } from '../guardRails';
 import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDiff';
 import InlineAlertCheck from '../InlineAlertCheck/InlineAlertCheck';
 import { AiActionModes } from '../sharedTypes';
+import AiAssistantIcon from '../../../../../components/icons/AiAssistantIcon';
 
 import { useFormatting, formatClean, removeComments } from './formattingUtils';
 import PreviewInfoPanels from './PreviewInfoPanels/PreviewInfoPanels';
@@ -165,7 +166,12 @@ const PreviewModal = ({
       wrapClassName="cuix hue-ai-preview-modal"
       className="hue-ai-preview-modal-inner"
       open={open}
-      title={titles[actionMode]}
+      title={
+        <>
+          <AiAssistantIcon className="hue-ai-preview-modal__icon" />
+          {titles[actionMode]}
+        </>
+      }
       onCancel={onCancel}
       footer={
         <PreviewModalFooter
