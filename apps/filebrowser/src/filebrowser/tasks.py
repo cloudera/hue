@@ -58,6 +58,7 @@ def upload_file_task(**kwargs):
   postdict = kwargs.get("postdict", None)
   request = _get_request(postdict=postdict, user_id=user_id, scheme=scheme)
   kwargs["username"] = request.user.username
+  kwargs["task_name"] = "fileupload"
   kwargs["state"] = "STARTED"
   kwargs["task_start"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
   upload_file_task.update_state(task_id=task_id, state='STARTED', meta=kwargs)

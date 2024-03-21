@@ -298,7 +298,7 @@ def task_server_view(request):
   # You can add more logic here if needed
   logging.debug("task_server_view called with request: %s", request)
   return render('taskserver_list_tasks.mako',request, {
-    'message': _('tasks #message from views'),
+    'message': _(''),
     'is_embeddable': request.GET.get('is_embeddable', False),
     'users': User.objects.all(),
     'users_json': json.dumps(list(User.objects.values_list('id', flat=True)))

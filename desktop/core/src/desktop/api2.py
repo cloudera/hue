@@ -770,12 +770,24 @@ def handle_submit(request):
     'status': 0
   })
 
+import redis
 @csrf_exempt
 @api_error_handler
 #creating a new endpoint to retirve the tasks from the database
 def get_taskserver_tasks(request):
-  tasks = Task.objects.all().values('time', 'progress', 'triggered_by', 'task_name', 'parameters', 'status', 'task_id')
-  return JsonResponse(list(tasks), safe=False)
+  # tasks = Task.objects.all().values('time', 'progress', 'triggered_by', 'task_name', 'parameters', 'status', 'task_id')
+  # return JsonResponse(list(tasks), safe=False)
+
+  r = redis.Redis(host='localhost', port=6379, db=0)  # Adjust as needed
+  task_keys = r.keys('celery-task-meta-*')  # Adjust pattern as needed
+  tasks = []
+
+  for key in task_keys:
+    task = json.loads(r.get(key))
+    tasks.append(task)
+
+  return JsonResponse(tasks, safe=False)
+
 
 
 @api_error_handler
