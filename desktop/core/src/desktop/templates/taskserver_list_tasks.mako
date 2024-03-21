@@ -45,7 +45,7 @@ ${ layout.menubar(section='task_server') }
 <!--    </script>-->
 
     <div id="some-container">
-      <MyComponent data-reactcomponent='MyComponent' data-props='{"myObj": {"id": 1}, "children": "mako template only", "version" : "${sys.version_info[0]}"}' ></MyComponent>
+      <MyComponent data-reactcomponent='TaskBrowser' data-props='{"myObj": {"id": 1}, "children": "mako template only", "version" : "${sys.version_info[0]}"}' ></MyComponent>
     </div>
 
   </div>

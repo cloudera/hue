@@ -45,10 +45,31 @@ const badgeStyle = {
   minWidth: '75px', // Ensures the badge has at least this width
 };
 
-// Then use it for your status label
-<td style={tdStyle}>
-  <span style={badgeStyle}>SUCCEEDED</span>
-</td>
+
+const popupStyle = {
+  position: 'fixed', // Fixed position to cover the whole screen
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  zIndex: 1000, // High z-index to be on top of other content
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+};
+
+const popupContentStyle = {
+  backgroundColor: '#fff',
+  padding: '20px',
+  borderRadius: '5px',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  zIndex: 1001, // Keep a high z-index
+  width: '60%',  // Adjust width as needed
+  maxHeight: '80%', // Adjust max height as needed
+  overflowY: 'auto', // Add scroll for overflow content
+  position: 'relative', // Relative positioning within the flex container
+};
 
 
 
@@ -124,6 +145,10 @@ const TaskScheduler = () => {
   const [showSchedulePopup, setShowSchedulePopup] = useState(false);
   const [scheduledTasks, setScheduledTasks] = useState([]); // Store an array of scheduled tasks
 
+  const [showLogPopup, setShowLogPopup] = useState(false); // This should match where you use it
+  const [currentTaskId, setCurrentTaskId] = useState(null);
+  const [taskLogs, setTaskLogs] = useState("");
+
   const handleScheduleSubmit = (taskName, taskParams) => {
     const payload = {
       taskName,
@@ -134,6 +159,24 @@ const TaskScheduler = () => {
     .catch(error => {
       console.error('Error scheduling task', error);
     });
+  };
+
+  // Add the function to handle showing logs
+  const handleShowLogs = (taskId) => {
+    // This function should set the current task ID and fetch the logs
+    console.log("hi im in handlelogs");
+    setCurrentTaskId(taskId);
+    // Fetch the logs from the server
+    axios.get(`/desktop/api2/get_task_logs/${taskId}/`)
+      .then(response => {
+        // Assuming the server response contains the logs in the data object
+        setTaskLogs(response.data);
+        setShowLogPopup(true); // Open the popup
+      })
+      .catch(error => {
+        console.error('Error fetching logs:', error);
+        // Handle the error appropriately
+      });
   };
 
   return (
@@ -147,8 +190,17 @@ const TaskScheduler = () => {
       )}
 {/*       <TaskBrowserTable tasks={scheduledTasks} />  */}{/* Pass the scheduled tasks to the table */}
       <div style={{ margin: '20px 0' }}>
-        <TaskBrowserTable tasks={scheduledTasks} />
+        <TaskBrowserTable tasks={scheduledTasks} handleShowLogs={handleShowLogs}/>
       </div>
+      {showLogPopup && (
+        <div style={popupStyle}>
+          <div style={popupContentStyle}>
+            <h2>Task Logs - {currentTaskId}</h2>
+            <pre>{taskLogs}</pre>
+            <button onClick={() => setShowLogPopup(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -178,17 +230,21 @@ const calculateDuration = (start, end) => {
   return durationStr;
 };
 
+function formatTimestamp(timestamp) {
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+  const date = new Date(timestamp);
+  return date.toLocaleString('en-US', options);
+}
+
 
 // export const TaskBrowserTable = ({ tasks }) => {
-export const TaskBrowserTable = () => {
+export const TaskBrowserTable = ({ handleShowLogs }) => {
   // The tasks prop contains the array of scheduled tasks
   // logic to fetch tasks from database table
 
   const [tasks, setTasks] = useState([]);
   const [searchTerm, setSearchTerm] = useState(''); // state for the search term
   const [statusFilter, setStatusFilter] = useState('all'); // state to track status filter
-//   const [userIdFilter, setUserIdFilter] = useState(''); // state to track user_id filter
-//   const [taskIdFilter, setTaskIdFilter] = useState(''); // state to track task_id filter
 
   useEffect(() => {
     const fetchTasks = () => {
@@ -216,6 +272,15 @@ export const TaskBrowserTable = () => {
 
   }, []);
 
+  const handleTaskIdClick = (taskId) => {
+    setCurrentTaskId(taskId);
+    setShowLogsPopup(true);
+    // Here, you could also fetch the logs immediately if you want to
+    fetchTaskLogs(taskId);
+  };
+
+
+
   const handleSearchChange = (e) => {
    console.log('Filtering tasks by:', e.target.value);
     setSearchTerm(e.target.value.toLowerCase());
@@ -236,7 +301,7 @@ export const TaskBrowserTable = () => {
 
   const filteredTasks = tasks.filter(task => {
     const taskNameMatch = task.result?.task_name?.toLowerCase().includes(searchTerm);
-    const userIdMatch = task.result?.user_id?.toString().toLowerCase().includes(searchTerm);
+    const userIdMatch = task.result?.username?.toString().toLowerCase().includes(searchTerm);
     const taskIdMatch = task.task_id?.toString().toLowerCase().includes(searchTerm);
     const statusMatch = statusFilter === 'all' || task.status.toLowerCase() === statusFilter;
 
@@ -299,7 +364,9 @@ export const TaskBrowserTable = () => {
         <tbody className="tdStyle">
             {filteredTasks.map((task, index) => (
              <tr key={index}>
-              <td style={tdStyle}>{task.task_id}</td>
+              <td style={{ ...tdStyle, cursor: 'pointer' }} onClick={() => handleShowLogs(task.task_id)}>
+                {task.task_id}
+              </td>
               <td style={tdStyle}>{task.result?.username}</td>
               <td style={tdStyle}>{task.progress}</td>
               <td style={tdStyle}>{task.result?.task_name}</td>
@@ -313,7 +380,7 @@ export const TaskBrowserTable = () => {
                   {task.status}
                 </span>
               </td>
-              <td style={tdStyle}>{task.result?.task_start}</td>
+              <td style={tdStyle}>{formatTimestamp(task.result?.task_start)}</td>
               <td style={tdStyle}>{calculateDuration(task.result?.task_start, task.result?.task_end)}</td>
             </tr>
           ))}
