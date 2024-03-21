@@ -692,7 +692,11 @@ from django.http import JsonResponse
 import subprocess
 from rest_framework.decorators import api_view
 import uuid
+from desktop.models import Task
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 @api_error_handler
 @require_POST
 # @api_view(['POST'])
@@ -712,18 +716,35 @@ def handle_submit(request):
       #TODO: remove the install_dir. find a way to add the hue_dir here.
       INSTALL_DIR = "/Users/aselvam/Desktop/work_cloudera/hues/cdh/hue"
 
+      task_uuid = uuid.uuid4()
+      #manipulation of user value based on models.py, as user is defined as foreign key
+      current_username = request.user.username
+      current_user = User.objects.get(username=current_username)
       # Run the cleanup command
-      subprocess.check_call(
-        [INSTALL_DIR+'/build/env/bin/hue', 'desktop_document_cleanup', f'--keep-days={keep_days}'])
+      subprocess.check_call([INSTALL_DIR+'/build/env/bin/hue', 'desktop_document_cleanup', f'--keep-days={keep_days}'])
+
+      # Create a new Task instance - to write to the django table
+      new_task = Task(
+        time=datetime.now().time(),
+        progress='INP',
+        # triggered_by=request.user.username,
+        triggered_by=current_user,
+        task_name=task_name,  # Assuming task_name is retrieved from request
+        parameters=task_params,  # Assuming task_params is retrieved from request
+        status='Scheduled',
+        task_id=task_uuid,  # Assuming generated_task_id is created somewhere in your logic
+      )
+      new_task.save()
+
       # Return a success response with task info
       return JsonResponse({
         'taskName': task_name,
         'taskParams': task_params,
         'time': datetime.now().time(),  # Use an appropriate function to get the current time
         'progress': 'Scheduled',
-        'user': request.user.username,
+        'user': current_user,
         'status': 'In progress',
-        'taskId': uuid.uuid4(),  # Implement a way to generate a unique task ID
+        'task_id': task_uuid,  # Implement a way to generate a unique task ID
       })
     except subprocess.CalledProcessError as e:
       # Handle errors
@@ -742,15 +763,19 @@ def handle_submit(request):
       'progress': 'Scheduled',
       'user': request.user.username,
       'status': 'In progress',
-      'taskId': uuid.uuid4(),  # Implement a way to generate a unique task ID
+      'task_id': uuid.uuid4(),  # Implement a way to generate a unique task ID
     })
 
   return JsonResponse({
     'status': 0
   })
-# Add your URL pattern to call this view
 
-
+@csrf_exempt
+@api_error_handler
+#creating a new endpoint to retirve the tasks from the database
+def get_taskserver_tasks(request):
+  tasks = Task.objects.all().values('time', 'progress', 'triggered_by', 'task_name', 'parameters', 'status', 'task_id')
+  return JsonResponse(list(tasks), safe=False)
 
 
 @api_error_handler
