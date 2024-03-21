@@ -16,10 +16,11 @@
   limitations under the License.
 */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import classNames from 'classnames';
 import LinkButton from 'cuix/dist/components/Button/LinkButton';
 
+import AiAssistantIcon from '../../../../../components/icons/AiAssistantIcon';
 import AnimatedCloseButton from '../AnimatedCloseButton/AnimatedCloseButton';
 import CirclesLoader from '../CirclesLoader/CirclesLoader';
 
@@ -51,7 +52,7 @@ function AnimatedLauncher({
   onCloseWarningClick,
   onMoreWarningInfoClick,
   onAnimationEnd
-}: AnimatedLauncherProps) {
+}: AnimatedLauncherProps): JSX.Element {
   const showErrorMessage = !!errorStatusText;
   const showWarningMessage = !!warningStatusText;
 
@@ -63,61 +64,89 @@ function AnimatedLauncher({
     }
   };
 
+  const barIsActive = isExpanded || isAnimating !== 'no';
+
+  // We only want the twinkle animation to run one time and
+  // only if the bar is not expanded when first rendered.
+  // We use useRef to make sure HTML class 'ai-assist-icon--twinkle-once'
+  // is only added once and never removed.
+  const twinkleOnce = useRef(!isExpanded);
+
   return (
-    <button
-      onAnimationEnd={onAnimationEnd}
-      className={classNames('hue-ai-assist-bar__animated-launcher', {
-        'hue-ai-assist-bar__animated-launcher--expanding': isAnimating === 'expand',
-        'hue-ai-assist-bar__animated-launcher--contracting': isAnimating === 'contract',
-        'hue-ai-assist-bar__animated-launcher--expanded': isExpanded,
-        'hue-ai-assist-bar__animated-launcher--loading': isExpanded && isLoading,
-        'hue-ai-assist-bar__animated-launcher--loading-with-status':
-          isExpanded && isLoading && loadingStatusText,
-        'hue-ai-assist-bar__animated-launcher--error': showErrorMessage,
-        'hue-ai-assist-bar__animated-launcher--warning': showWarningMessage
-      })}
-      onClick={handleClickOnCircleOrInfobar}
-    >
-      {isExpanded && isLoading && (
-        <>
-          <CirclesLoader />
-          <div className="hue-ai-assist-bar__animated-launcher-loading-status">
-            {loadingStatusText}
-          </div>
-        </>
-      )}
-      {isExpanded && showErrorMessage && (
-        <>
-          <AnimatedCloseButton
-            title="Close Error Message"
-            className="hue-ai-assist-bar__animated-launcher-error-close-btn"
-            size="small"
-            onClick={onCloseErrorClick}
-          />
-          <div className="hue-ai-assist-bar__animated-launcher-error-text">{errorStatusText}</div>
-        </>
-      )}
-      {isExpanded && showWarningMessage && (
-        <>
-          <AnimatedCloseButton
-            title="Close Warning Message"
-            className="hue-ai-assist-bar__animated-launcher-warning-close-btn"
-            size="small"
-            onClick={onCloseWarningClick}
-          />
-          <div className="hue-ai-assist-bar__animated-launcher-warning-text">
-            {warningStatusText}
-            <LinkButton
-              onClick={onMoreWarningInfoClick}
-              data-event=""
-              className="hue-ai-assist-bar__animated-launcher-warning-link"
-            >
-              More info...
-            </LinkButton>
-          </div>
-        </>
-      )}
-    </button>
+    <>
+      <div className="hue-ai-assist-bar__animated-launcher-btn-container">
+        <LinkButton
+          aria-label={'Assistant'}
+          title={barIsActive ? '' : 'Open the SQL AI Assistant'}
+          className={classNames('hue-ai-assist-bar__animated-launcher-btn', {
+            'hue-ai-assist-bar__animated-launcher-btn--active': barIsActive
+          })}
+          icon={
+            <AiAssistantIcon
+              className={twinkleOnce.current ? 'ai-assist-icon--twinkle-once' : ''}
+            />
+          }
+          disabled={barIsActive}
+          onClick={() => onExpandClick()}
+        >
+          Assistant
+        </LinkButton>
+      </div>
+      <button
+        onAnimationEnd={onAnimationEnd}
+        className={classNames('hue-ai-assist-bar__animated-launcher', {
+          'hue-ai-assist-bar__animated-launcher--expanding': isAnimating === 'expand',
+          'hue-ai-assist-bar__animated-launcher--contracting': isAnimating === 'contract',
+          'hue-ai-assist-bar__animated-launcher--expanded': isExpanded,
+          'hue-ai-assist-bar__animated-launcher--loading': isExpanded && isLoading,
+          'hue-ai-assist-bar__animated-launcher--loading-with-status':
+            isExpanded && isLoading && loadingStatusText,
+          'hue-ai-assist-bar__animated-launcher--error': showErrorMessage,
+          'hue-ai-assist-bar__animated-launcher--warning': showWarningMessage
+        })}
+        onClick={handleClickOnCircleOrInfobar}
+      >
+        {isExpanded && isLoading && (
+          <>
+            <CirclesLoader />
+            <div className="hue-ai-assist-bar__animated-launcher-loading-status">
+              {loadingStatusText}
+            </div>
+          </>
+        )}
+        {isExpanded && showErrorMessage && (
+          <>
+            <AnimatedCloseButton
+              title="Close Error Message"
+              className="hue-ai-assist-bar__animated-launcher-error-close-btn"
+              size="small"
+              onClick={onCloseErrorClick}
+            />
+            <div className="hue-ai-assist-bar__animated-launcher-error-text">{errorStatusText}</div>
+          </>
+        )}
+        {isExpanded && showWarningMessage && (
+          <>
+            <AnimatedCloseButton
+              title="Close Warning Message"
+              className="hue-ai-assist-bar__animated-launcher-warning-close-btn"
+              size="small"
+              onClick={onCloseWarningClick}
+            />
+            <div className="hue-ai-assist-bar__animated-launcher-warning-text">
+              {warningStatusText}
+              <LinkButton
+                onClick={onMoreWarningInfoClick}
+                data-event=""
+                className="hue-ai-assist-bar__animated-launcher-warning-link"
+              >
+                More info...
+              </LinkButton>
+            </div>
+          </>
+        )}
+      </button>
+    </>
   );
 }
 

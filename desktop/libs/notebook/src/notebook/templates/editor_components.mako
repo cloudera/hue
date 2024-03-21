@@ -917,13 +917,15 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <script type="text/html" id="snippet${ suffix }">
   <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible() || $root.editorMode() || saveResultsModalVisible(), selector: '.hover-actions' }">
     <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus() || saveResultsModalVisible(), selector: '.snippet-actions' }">
-      <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
+      <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">                
+        % if AI_INTERFACE.SERVICE.get() != None:        
+        <div class="hue-sql-ai-assistant--present" data-bind="css: {'hue-sql-ai-assistant--expanded' : $root.isAiAssistbarExanded(), 'hue-sql-ai-assistant--contracted' : !$root.isAiAssistbarExanded()}" style="position: relative;">
+        <!-- ko if: activeExecutable() && !$root.isPresentationMode()-->
+            <AiAssistBar class="cuix antd" data-bind="reactWrapper: 'AiAssistBar', props: { activeExecutable: activeExecutable, getIsAiAssistbarExandedObservable: $root.getIsAiAssistbarExandedObservable }"></AiAssistBar>
+        <!-- /ko -->
+        % else:
         <div style="position: relative;">
-          % if AI_INTERFACE.SERVICE.get() != None:
-          <!-- ko if: activeExecutable() && !$root.isPresentationMode()-->            
-              <AiAssistBar class="cuix antd" data-bind="reactWrapper: 'AiAssistBar', props: { activeExecutable: activeExecutable }"></AiAssistBar>            
-          <!-- /ko -->
-          % endif
+        % endif
           <div class="snippet-row" style="position: relative;">
             <div class="snippet-left-bar">
               <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->

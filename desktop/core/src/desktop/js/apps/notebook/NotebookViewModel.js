@@ -182,6 +182,7 @@ export default class NotebookViewModel {
       );
     });
     self.isResultFullScreenMode = ko.observable(false);
+    self.isAiAssistbarExanded = ko.observable(false);
     self.isPresentationMode = ko.computed(() => {
       return self.selectedNotebook() && self.selectedNotebook().isPresentationMode();
     });
@@ -332,6 +333,10 @@ export default class NotebookViewModel {
         callback(foundSnippet);
       }
     };
+
+    huePubSub.subscribe('aiassistbar.bar.toggled', expanded => {
+      self.isAiAssistbarExanded(expanded);
+    });
 
     huePubSub.subscribe('assist.highlight.risk.suggestions', () => {
       if (self.isRightPanelAvailable() && !self.isRightPanelVisible()) {

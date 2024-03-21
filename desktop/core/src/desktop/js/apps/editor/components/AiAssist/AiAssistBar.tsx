@@ -106,9 +106,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   const selectedStatement: string = parsedStatement?.statement || '';
   const lastSelectedStatement = useRef(selectedStatement);
 
-  const [isExpanded, setIsExpanded] = useState(
-    getFromLocalStorage('hue.aiAssistBar.isExpanded', true)
-  );
+  const [isExpanded, setIsExpanded] = useState(() => {
+    const expanded = getFromLocalStorage('hue.aiAssistBar.isExpanded', true);
+    huePubSub.publish('aiassistbar.bar.toggled', expanded);
+    return expanded;
+  });
   const [isAnimating, setIsAnimating] = useState<'no' | 'expand' | 'contract'>('no');
   const [actionMode, setActionMode] = useState<AiActionModes | undefined>();
   const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(false);
@@ -369,6 +371,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     setIsExpanded(prev => {
       const expanded = !prev;
       setInLocalStorage('hue.aiAssistBar.isExpanded', expanded);
+      huePubSub.publish('aiassistbar.bar.toggled', expanded);
       return expanded;
     });
   };
