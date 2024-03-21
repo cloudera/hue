@@ -930,28 +930,6 @@ class DocumentPermission(models.Model):
   class Meta(object):
     unique_together = ('doc', 'perms')
 
-#####################
-# Task Browser Table
-#####################
-
-from django.db import models
-from django.contrib.auth.models import User
-
-class Task(models.Model):
-    time = models.DateTimeField(auto_now_add=True)
-    progress = models.CharField(max_length=100)
-    # triggered_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    triggered_by = models.CharField(max_length=255)
-    task_name = models.CharField(max_length=255)
-    parameters = models.JSONField()  # Requires Django 3.1 or higher
-    status = models.CharField(max_length=100)
-    task_id = models.CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return self.task_name
-
-
-
 
 ###################################################################################################
 # Document2
