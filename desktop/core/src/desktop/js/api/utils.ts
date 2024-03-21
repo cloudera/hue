@@ -25,6 +25,8 @@ import axios, {
 import qs from 'qs';
 
 import { CancellablePromise } from './cancellablePromise';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
+import { HueAlert } from 'reactComponents/AlertComponent/types';
 import { hueWindow } from 'types/types';
 import huePubSub from 'utils/huePubSub';
 import logError from 'utils/logError';
@@ -146,7 +148,7 @@ const notifyError = <T>(
   if (!options || !options.silenceErrors) {
     logError(response);
     if (message.indexOf('AuthorizationException') === -1) {
-      huePubSub.publish('hue.error', message);
+      huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message });
     }
   }
 };

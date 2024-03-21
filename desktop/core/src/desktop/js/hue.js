@@ -52,7 +52,6 @@ import huePubSub from 'utils/huePubSub';
 import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
-
 import sqlUtils from 'sql/sqlUtils';
 
 import 'webComponents/HueIcons';
@@ -77,6 +76,7 @@ import { getLastKnownConfig, refreshConfig } from 'config/hueConfig';
 import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
 import Mustache from 'mustache'; // In hbase/templates/app.mako, jobsub.templates.js, search.ko.js, search.util.js
 import { createReactComponents } from 'reactComponents/createRootElements.js';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
 
 // TODO: Migrate away
 window._ = _;
@@ -152,11 +152,11 @@ $(document).ready(async () => {
         if (resp.history_uuid) {
           huePubSub.publish('open.editor.query', resp);
         } else if (resp.message) {
-          huePubSub.publish('hue.global.error', { message: resp.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: resp.message });
         }
       }
     ).fail(xhr => {
-      huePubSub.publish('hue.global.error', { message: xhr.responseText });
+      huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
     });
   });
 

@@ -18,6 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
 import escapeOutput from 'utils/html/escapeOutput';
 import highlight from 'utils/html/highlight';
 import huePubSub from 'utils/huePubSub';
@@ -159,20 +160,18 @@ class HueDocument {
       response => {
         if (response != null) {
           if (response.status !== 0) {
-            $(document).trigger(
-              'error',
-              'There was an error processing your action: ' + response.message
-            );
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+              message: 'There was an error processing your action: ' + response.message
+            });
           } else {
             self.load();
           }
         }
       }
     ).fail(response => {
-      $(document).trigger(
-        'error',
-        'There was an error processing your action: ' + response.responseText
-      );
+      huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+        message: 'There was an error processing your action: ' + response.responseText
+      });
     });
   }
 
@@ -189,20 +188,18 @@ class HueDocument {
       response => {
         if (response != null) {
           if (response.status !== 0) {
-            $(document).trigger(
-              'error',
-              'There was an error processing your action: ' + response.message
-            );
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+              message: 'There was an error processing your action: ' + response.message
+            });
           } else {
             // self.load();
           }
         }
       }
     ).fail(response => {
-      $(document).trigger(
-        'error',
-        'There was an error processing your action: ' + response.responseText
-      );
+      huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+        message: 'There was an error processing your action: ' + response.responseText
+      });
     });
   }
 

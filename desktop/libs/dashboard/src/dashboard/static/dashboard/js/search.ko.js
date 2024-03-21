@@ -2426,7 +2426,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
 
     self.search = function (callback) {
-      $(".jHueNotify").remove();
+      huePubSub.publish('hide.global.alerts');
       hueAnalytics.log('dashboard', 'search');
       self.isRetrievingResults(true);
 

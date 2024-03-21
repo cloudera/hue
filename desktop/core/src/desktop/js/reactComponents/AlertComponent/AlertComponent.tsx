@@ -14,26 +14,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { AlertProps } from 'antd/lib/alert';
 import Alert from 'cuix/dist/components/Alert/Alert';
 
-import huePubSub from 'utils/huePubSub';
 import './AlertComponent.scss';
-import { i18nReact } from '../../utils/i18nReact';
+import {
+  GLOBAL_ERROR_TOPIC,
+  GLOBAL_INFO_TOPIC,
+  GLOBAL_WARNING_TOPIC,
+  HIDE_GLOBAL_ALERTS_TOPIC
+} from './events';
+import { HueAlert } from './types';
+import { useHuePubSub } from '../useHuePubSub';
+import { i18nReact } from 'utils/i18nReact';
 
-interface HueAlert {
-  message: string;
-}
+type alertType = AlertProps['type'];
 
-type alertType = 'error' | 'info' | 'warning';
 interface VisibleAlert {
   alert: HueAlert;
   type: alertType;
+  timeoutHandle?: number;
 }
 
-const AlertComponent: React.FC = () => {
-  const [alert, setAlerts] = useState<VisibleAlert[]>([]);
+const clearCloseTimeout = (alert: VisibleAlert) => {
+  if (alert.timeoutHandle) {
+    clearTimeout(alert.timeoutHandle);
+  }
+};
 
+const AlertComponent: React.FC = () => {
+  const [alerts, setAlerts] = useState<VisibleAlert[]>([]);
   const updateAlerts = (alert: HueAlert, type: alertType) => {
     if (!alert.message) {
       return;
@@ -47,8 +58,8 @@ const AlertComponent: React.FC = () => {
 
       const newAlert: VisibleAlert = { alert, type };
 
-      if (type === 'info') {
-        setTimeout(() => {
+      if (type === 'info' || alert.noStick) {
+        newAlert.timeoutHandle = setTimeout(() => {
           handleClose(newAlert);
         }, 3000);
       }
@@ -57,35 +68,32 @@ const AlertComponent: React.FC = () => {
     });
   };
 
-  useEffect(() => {
-    const hueSub = huePubSub.subscribe('hue.global.error', (newAlert: HueAlert) => {
-      updateAlerts(newAlert, 'error');
-    });
-    return () => {
-      hueSub.remove();
-    };
-  }, []);
+  useHuePubSub<HueAlert>({
+    topic: GLOBAL_ERROR_TOPIC,
+    callback: newAlert => updateAlerts(newAlert, 'error')
+  });
 
-  useEffect(() => {
-    const hueSub = huePubSub.subscribe('hue.global.info', (newAlert: HueAlert) => {
-      updateAlerts(newAlert, 'info');
-    });
-    return () => {
-      hueSub.remove();
-    };
-  }, []);
+  useHuePubSub<HueAlert>({
+    topic: GLOBAL_INFO_TOPIC,
+    callback: newAlert => updateAlerts(newAlert, 'info')
+  });
 
-  useEffect(() => {
-    const hueSub = huePubSub.subscribe('hue.global.warning', (newAlert: HueAlert) => {
-      updateAlerts(newAlert, 'warning');
-    });
-    return () => {
-      hueSub.remove();
-    };
-  }, []);
+  useHuePubSub<HueAlert>({
+    topic: GLOBAL_WARNING_TOPIC,
+    callback: newAlert => updateAlerts(newAlert, 'warning')
+  });
 
-  const handleClose = (alertObjToClose: VisibleAlert) => {
-    const filteredAlerts = alert.filter(alertObj => alertObj !== alertObjToClose);
+  useHuePubSub<void>({
+    topic: HIDE_GLOBAL_ALERTS_TOPIC,
+    callback: () => {
+      alerts.forEach(visibleAlert => clearCloseTimeout(visibleAlert));
+      setAlerts([]);
+    }
+  });
+
+  const handleClose = (alertToClose: VisibleAlert) => {
+    const filteredAlerts = alerts.filter(alert => alert !== alertToClose);
+    clearCloseTimeout(alertToClose);
     setAlerts(filteredAlerts);
   };
 
@@ -103,15 +111,15 @@ const AlertComponent: React.FC = () => {
 
   return (
     <div className="hue-alert flash-messages cuix antd">
-      {alert.map(alertObj => (
+      {alerts.map(visibleAlert => (
         <Alert
-          key={alertObj.alert.message}
-          type={alertObj.type}
-          message={getHeader(alertObj)}
-          description={alertObj.alert.message}
+          key={visibleAlert.alert.message}
+          type={visibleAlert.type}
+          message={getHeader(visibleAlert)}
+          description={visibleAlert.alert.message}
           showIcon={true}
           closable={true}
-          onClose={() => handleClose(alertObj)}
+          onClose={() => handleClose(visibleAlert)}
         />
       ))}
     </div>

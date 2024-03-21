@@ -25,6 +25,7 @@ import './components/impalaQueries/webcomp';
 import './eventListeners';
 import JobBrowserViewModel from './knockout/JobBrowserViewModel';
 import Job from './knockout/Job';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
 import I18n from 'utils/i18n';
 
 huePubSub.subscribe('app.dom.loaded', app => {
@@ -65,7 +66,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
             if (id) {
               openJob(id);
             } else {
-              huePubSub.publish('hue.global.error', { message: I18n('No log available') });
+              huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: I18n('No log available') });
             }
           }
         );
@@ -112,7 +113,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
     huePubSub.subscribe(
       'submit.rerun.popup.return',
       data => {
-        huePubSub.publish('hue.global.info', { message: I18n('Rerun submitted.') });
+        huePubSub.publish(GLOBAL_INFO_TOPIC, { message: I18n('Rerun submitted.') });
         $('#rerun-modal').modal('hide');
 
         jobBrowserViewModel.job().apiStatus('RUNNING');

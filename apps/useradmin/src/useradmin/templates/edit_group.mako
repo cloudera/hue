@@ -126,11 +126,15 @@ ${ layout.menubar(section='groups') }
         }
         else if (data && data.url) {
           huePubSub.publish('open.link', data.url);
-          $.jHueNotify.info("${ _('Group information updated correctly') }");
+          huePubSub.publish('hue.global.info', {
+            message: "${ _('Group information updated correctly') }"
+          });
         }
       },
       error: function (data) {
-        $.jHueNotify.error(data.responseJSON['message']);
+        huePubSub.publish('hue.global.error', {
+          message: data.responseJSON['message']
+        });
       }
     });
     % endif

@@ -183,7 +183,9 @@ ${layout.menubar(section='groups')}
       dataType:  'json',
       success: function(data) {
         $groupsComponents.find(".delete-group").modal("hide");
-        $.jHueNotify.info("${ _('The groups were deleted.') }");
+        huePubSub.publish('hue.global.info', {
+          message: "${ _('The groups were deleted.') }"
+        });
         if (data && data.url){
           huePubSub.publish('open.link', data.url);
         }

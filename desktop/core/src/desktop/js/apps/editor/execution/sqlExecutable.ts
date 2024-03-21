@@ -39,6 +39,8 @@ import Executor from 'apps/editor/execution/executor';
 import sessionManager from 'apps/editor/execution/sessionManager';
 import dataCatalog from 'catalog/dataCatalog';
 import { ParsedSqlStatement } from 'parse/sqlStatementsParser';
+import { HueAlert } from 'reactComponents/AlertComponent/types';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
 import { hueWindow } from 'types/types';
 import hueAnalytics from 'utils/hueAnalytics';
 import huePubSub from 'utils/huePubSub';
@@ -382,7 +384,9 @@ export default class SqlExecutable {
         this.executeEnded = Date.now();
         this.setStatus(queryStatus.status);
         if (queryStatus.message) {
-          huePubSub.publish('hue.error', queryStatus.message);
+          huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, {
+            message: queryStatus.message
+          });
         }
         break;
       default:

@@ -17,6 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
+import { GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
@@ -48,7 +49,7 @@ export const initializeMiniJobBrowser = () => {
   huePubSub.publish('cluster.config.get.config', configUpdated);
 
   huePubSub.subscribe('submit.rerun.popup.return-mini', () => {
-    huePubSub.publish('hue.global.info', { message: I18n('Rerun submitted.') });
+    huePubSub.publish(GLOBAL_INFO_TOPIC, { message: I18n('Rerun submitted.') });
     $('#rerun-modal-mini').modal('hide');
 
     jobBrowserViewModel.job().apiStatus('RUNNING');

@@ -1007,7 +1007,7 @@ huePubSub.subscribe('app.dom.loaded', app => {
       value => {
         viewModel.isEditing(!viewModel.isEditing());
         if (value) {
-          $('.jHueNotify').remove();
+          huePubSub.publish('hide.global.alerts');
           isAssistAvailable = viewModel.assistAvailable();
           wasLeftPanelVisible = viewModel.isLeftPanelVisible();
           wasRightPanelVisible = viewModel.isRightPanelVisible();
