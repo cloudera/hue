@@ -1458,7 +1458,8 @@ def _create_response(request, _fs, result="success", data="Success"):
       'success': True,
       'uuid': _fs.qquuid,
       'status': 0,
-      'data': data
+      'data': data,
+      'task_id': _fs.qquuid
   }
 
 def perform_upload_task(request, *args, **kwargs):
