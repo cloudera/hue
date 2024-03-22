@@ -2,26 +2,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './TaskBrowser.scss';
+import Modal from 'antd/lib/modal/Modal';
+import { Col, Menu, Row, Spin, Button } from 'antd';
 
 
 const tasks = {
   'document cleanup': {
     params: [{ name: 'keep-days', type: 'integer' }],
   },
-  'fileupload': {
-    params: [{ name: 'file name', type: 'string' }],
-  },
   'tmp clean up': {
     params: [
       { name: 'threshold for clean up', type: 'integer', max: 100 },
-      { name: 'disk check interval', type: 'integer' },
     ],
   },
 };
 
-const ScheduleTaskPopup = ({ onClose, onSubmit }) => {
+const ScheduleTaskPopup = ({ onClose, onSubmit, open }) => {
   const [selectedTask, setSelectedTask] = useState('');
-  const [params, setParams] = useState({});
+  const [params, setParams] = useState({
+    'keep-days': '30', // Default value for "keep days"
+    'threshold for clean up': '90', // Default value for "threshold for clean up"    
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,31 +38,43 @@ const ScheduleTaskPopup = ({ onClose, onSubmit }) => {
   };
 
   return (
-    <div className="popupStyle">
-      <div className="popupContentStyle">
+
+    <Modal
+      title={'Schedule Task'}
+      open={open}
+      onOk={handleSubmit}
+      onCancel={onClose}
+      okText={"Submit"} 
+      width={530}
+      className="hue-file-chooser__modal"
+    >
+      <div className="task-selection">
       <select value={selectedTask} onChange={(e) => setSelectedTask(e.target.value)}>
         <option value="">Select Task</option>
         {Object.keys(tasks).map((taskName) => (
           <option key={taskName} value={taskName}>{taskName}</option>
         ))}
       </select>
-      {selectedTask && tasks[selectedTask].params.map((param) => (
-        <input
-          key={param.name}
+      </div>
+      <div className='vertical-spacer'></div>    
+      {selectedTask && (
+        <div className="parameter-inputs">
+        {tasks[selectedTask].params.map((param) => (
+          <div key={param.name} className="parameter-row">  
+          <label className="parameter-label">{param.name}:</label>
+          <input
           name={param.name}
           type="text"
           placeholder={param.name}
-          onChange={(e) => {
-            const { name, value } = e.target;
-            setParams(prev => ({ ...prev, [name]: value }));
-          }}
+          onChange={handleChange} // Use handleChange for input changes
           value={params[param.name] || ''}
+          className="parameter-input"
         />
+        </div>
       ))}
-      <button onClick={handleSubmit}>Submit</button>
-      <button onClick={onClose}>Close</button>
-    </div>
-    </div>
+      </div>
+    )}
+    </Modal>    
   );
 };
 
@@ -110,15 +123,13 @@ const TaskBrowser = () => {
 
   return (
     <div>
-
-
       {showSchedulePopup && (
         <ScheduleTaskPopup
           onClose={() => setShowSchedulePopup(false)}
           onSubmit={handleScheduleSubmit}
+          open={showSchedulePopup}
         />
       )}
-
       <div style={{ margin: '20px 0' }}>
         <TaskBrowserTable tasks={scheduledTasks} handleShowLogs={handleShowLogs} handleSchedulePopup={handleSchedulePopup}/>
       </div>
@@ -353,17 +364,17 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
           />
         </label>
     </div>
-      <table className="tableStyle hue-horizontally-scrollable ">
-        <thead className="thStyle row-grayout-table-header">
+      <table className="tableStyle hue-horizontally-scrollable" style={{width: "100%"}}>
+        <thead className="thStyle row-grayout-table-header" style={{width: "100%"}}>
           <tr>
             <th className="thStyle" style={{ width: '3%' }}></th>
             <th className="thStyle" style={{ width: '20%' }}>Task ID</th>
-            <th className="thStyle" style={{ width: '3%' }}>User</th>
+            <th className="thStyle" style={{ width: '10%' }}>User</th>
             <th className="thStyle" style={{ width: '5%' }}>Progress</th>
-            <th className="thStyle" style={{ width: '7%' }}>Task Name</th>
-            <th className="thStyle" style={{ width: '10%' }}>Parameters</th>
+            <th className="thStyle" style={{ width: '10%' }}>Task Name</th>
+            <th className="thStyle" style={{ width: '15%' }}>Parameters</th>
             <th className="thStyle" style={{ width: '5%' }}>Status</th>
-            <th className="thStyle" style={{ width: '10%' }}>Started</th>
+            <th className="thStyle" style={{ width: '15%' }}>Started</th>
             <th className="thStyle" style={{ width: '5%' }}>Duration</th>
           </tr>
         </thead>

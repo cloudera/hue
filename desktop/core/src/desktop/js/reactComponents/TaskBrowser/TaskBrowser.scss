@@ -390,6 +390,8 @@ table.datatables {
 .schedule-task-button {
   padding-right: 15px;
   background-color: #007bff;
+  border-bottom-width: 5px;
+  margin-bottom: 5px;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -403,6 +405,8 @@ table.datatables {
 .kill-task-button {
   padding-right: 15px;
   background-color: #dc3545;
+  border-bottom-width: 5px;
+  margin-bottom: 5px;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -430,6 +434,44 @@ table.datatables {
   }
 }
 
+.task-selection {
+  margin-bottom: 2rem;
+}
+
+.task-dropdown {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.parameter-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.parameter-row {
+  display: flex;
+  align-items: center;
+}
+
+.parameter-label {
+  flex: 1; 
+  width: 100px;
+  font-weight: bold;
+  margin-right: 1rem;
+}
+
+.parameter-input {
+  padding: 0.5rem;
+  flex: 1;
+  font-size: 1rem;
+  width:100%
+}
+
+.vertical-spacer {
+  height: 2rem; /* Set the height of the spacer */
+}
 
 
-// ... additional styles ...
