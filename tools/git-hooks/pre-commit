@@ -30,10 +30,9 @@ for FILE in `git diff --cached --name-only` ; do
             ERRORS=true
             echo -e "[ERROR] $FILE: Found pdb.set_trace() debug statements in file.\n"
         fi
-    elif [[ "$FILE" =~ ^.+(js|jsx|ts|tsx)$ ]]; then
-        FOLDERS_PATTERN="^(desktop/core/src/desktop/js|tools/sql-docs|tools/jison)/"
-        echo "Running ESLint for $FILE..."
-        if [[ "$FILE" =~ $FOLDERS_PATTERN ]]; then  # Check if file is inside one of the desired folders
+    elif [[ "$FILE" =~ ^.+\.(js|jsx|ts|tsx)$ ]]; then
+        if [[ "$FILE" =~ $FOLDERS_PATTERN ]]; then  # Check if the file is inside one of the desired folders
+            echo "Running ESLint for $FILE..."
             eslint "$FILE"  # Run ESLint for JavaScript/JSX files
             if [ $? -ne 0 ]; then
                 ERRORS=true
