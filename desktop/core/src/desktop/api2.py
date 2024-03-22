@@ -47,7 +47,7 @@ from beeswax.models import Namespace
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, CUSTOM, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
-from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, ENABLE_CHUNKED_FILE_UPLOADER
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, ENABLE_CHUNKED_FILE_UPLOADER, TASK_SERVER
 from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -101,6 +101,7 @@ def get_config(request):
   config['hue_config']['is_yarn_enabled'] = is_yarn()
   config['hue_config']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
   config['hue_config']['enable_chunked_file_uploader'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
+  config['hue_config']['enable_task_server'] = TASK_SERVER.ENABLED.get()
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
