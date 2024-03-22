@@ -460,6 +460,14 @@ class HiveServer2Dbms(object):
     return tables
 
 
+  def create_result_entry(self, name, entry_type, comment=''):
+    return {
+      'name': name,
+      'type': entry_type,
+      'comment': comment
+    }
+
+
   def _get_tables_via_sparksql(self, database, table_names='*'):
     hql = "SHOW TABLES IN %s" % database
     if table_names != '*':
@@ -472,19 +480,32 @@ class HiveServer2Dbms(object):
     handle = self.execute_and_wait(query, timeout_sec=timeout)
 
     if handle:
-      result = self.fetch(handle, rows=5000)
+      result_table = list(self.fetch(handle, rows=5000).rows())
       self.close(handle)
-
-      # We get back: database | tableName | isTemporary
-      return [{
-          'name': row[1],
-          'type': 'VIEW' if row[2] else 'TABLE',
-          'comment': ''
-        }
-        for row in result.rows()
-      ]
     else:
-      return []
+      result_table = []
+
+    hql = "SHOW VIEWS IN %s" % database
+    if table_names != '*':
+      identifier = self.to_matching_wildcard(table_names)
+      hql += " LIKE '%s'" % (identifier)
+
+    query = hql_query(hql)
+    timeout = SERVER_CONN_TIMEOUT.get()
+
+    handle = self.execute_and_wait(query, timeout_sec=timeout)
+
+    if handle:
+      result_view = list(self.fetch(handle, rows=5000).rows())
+      self.close(handle)
+    else:
+      result_view = []
+
+    filtered_tables = [table for table in result_table if table not in result_view]
+    table_entries = [self.create_result_entry(name=row[0], entry_type='TABLE') for row in filtered_tables]
+    view_entries = [self.create_result_entry(name=row[0], entry_type='VIEW') for row in result_view]
+
+    return table_entries + view_entries
 
 
   def get_table(self, database, table_name):
