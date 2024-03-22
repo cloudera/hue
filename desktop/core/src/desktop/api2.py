@@ -16,6 +16,9 @@
 # limitations under the License.
 
 from future import standard_library
+
+import desktop
+
 standard_library.install_aliases()
 from builtins import map
 import logging
@@ -689,15 +692,11 @@ def share_document(request):
     'document': doc.to_dict()
   })
 
-from django.http import JsonResponse
-from django.utils import timezone
-import subprocess, uuid, json, datetime
-from django.views.decorators.csrf import csrf_exempt
+import datetime
 import redis
 
 @api_error_handler
 @require_POST
-# @api_view(['POST'])
 def handle_submit(request):
   # Extract the task name and params from the request
   try:
@@ -748,15 +747,13 @@ def handle_submit(request):
   })
 
 @api_error_handler
-#creating a new endpoint to retirve the tasks from the database
+#Retirve the tasks from the database
 def get_taskserver_tasks(request):
-  # tasks = Task.objects.all().values('time', 'progress', 'triggered_by', 'task_name', 'parameters', 'status', 'task_id')
-  # return JsonResponse(list(tasks), safe=False)
 
   r = redis.Redis(host='localhost', port=6379, db=0)
   tasks = []
 
-  # Use scan_iter to efficiently iterate over keys m  atching the first pattern
+  # Use scan_iter to efficiently iterate over keys matching the first pattern
   for key in r.scan_iter('celery-task-meta-*'):
     task = json.loads(r.get(key))
     tasks.append(task)
@@ -781,9 +778,29 @@ def check_upload_status(request, task_id):
   is_finalized = task.get('status') == 'SUCCESS'
   is_running = task.get('status') == 'RUNNING'
   is_failure = task.get('status') == 'FAILURE'
+  is_revoked = task.get('status') == 'REVOKED'
 
-  return JsonResponse({'isFinalized': is_finalized, 'isRunning': is_running, 'isFailure': is_failure})
+  return JsonResponse({'isFinalized': is_finalized, 'isRunning': is_running, 'isFailure': is_failure, 'isRevoked': is_revoked})
 
+from django.http import JsonResponse
+from celery.app.control import Control
+from desktop.celery import app as celery_app
+
+@api_error_handler
+def kill_task(request, task_id):
+  # Check the current status of the task
+  status_response = check_upload_status(request, task_id)
+  status_data = json.loads(status_response.content)
+
+  if status_data.get('isFinalized') or status_data.get('isRevoked') or status_data.get('isFailure'):
+    return JsonResponse({'status': 'info', 'message': f'Task {task_id} has already been completed or revoked.'})
+
+  try:
+    control = Control(app=celery_app)
+    control.revoke(task_id, terminate=True)
+    return JsonResponse({'status': 'success', 'message': f'Task {task_id} has been terminated.'})
+  except Exception as e:
+    return JsonResponse({'status': 'error', 'message': f'Failed to terminate task {task_id}: {str(e)}'})
 
 import re
 from django.http import HttpResponse

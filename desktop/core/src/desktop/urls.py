@@ -172,6 +172,7 @@ dynamic_patterns += [
   re_path(r'^desktop/api2/get_taskserver_tasks/?$', desktop_api2.get_taskserver_tasks),
   re_path(r'^desktop/api2/get_task_logs/(?P<task_id>[^/]+)/?$', desktop_api2.get_task_logs),
   re_path(r'^desktop/api2/check_upload_status/(?P<task_id>[^/]+)/?$', desktop_api2.check_upload_status),
+  re_path(r'^desktop/api2/kill_task/(?P<task_id>[^/]+)/?$', desktop_api2.kill_task),
 
   re_path(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
   re_path(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
