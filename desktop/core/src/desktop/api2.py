@@ -695,7 +695,6 @@ import subprocess, uuid, json, datetime
 from django.views.decorators.csrf import csrf_exempt
 import redis
 
-# @csrf_exempt
 @api_error_handler
 @require_POST
 # @api_view(['POST'])
@@ -728,7 +727,7 @@ def handle_submit(request):
     })
 
   elif task_name == 'tmp clean up':
-    from filebrowser.tasks import check_disk_usage_and_clean
+    from filebrowser.tasks import check_disk_usage_and_clean_task
     cleanup_threshold = task_params.get('threshold for clean up')
     disk_check_interval = task_params.get('disk check interval')
     task_kwargs = {
@@ -736,7 +735,7 @@ def handle_submit(request):
       'cleanup_threshold': cleanup_threshold,
       'disk_check_interval': disk_check_interval
     }
-    task = check_disk_usage_and_clean.apply_async(kwargs=task_kwargs)
+    task = check_disk_usage_and_clean_task.apply_async(kwargs=task_kwargs)
 
     return JsonResponse({
       'taskName': task_name,
@@ -748,7 +747,6 @@ def handle_submit(request):
     'status': 0
   })
 
-# @csrf_exempt
 @api_error_handler
 #creating a new endpoint to retirve the tasks from the database
 def get_taskserver_tasks(request):
@@ -770,8 +768,6 @@ def get_taskserver_tasks(request):
 
   return JsonResponse(tasks, safe=False)
 
-#creating a new endpoint to monitor the status of the task, so that the progress bar in file upload can be stopped at 90%
-# @csrf_exempt
 @api_error_handler
 def check_upload_status(request, task_id):
   r = redis.Redis(host='localhost', port=6379, db=0)
