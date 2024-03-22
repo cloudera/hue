@@ -784,7 +784,7 @@ Plugin.prototype.navigateTo = function (path) {
         $scrollingBreadcrumbs.anate({
           scrollLeft: $scrollingBreadcrumbs.width()
         }
-      }, 0
+      }, 
     }
   }).fail(e => {
     if (!_parent.options.suppressErrors) {
