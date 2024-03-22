@@ -781,9 +781,9 @@ Plugin.prototype.navigateTo = function (path) {
 
       window.setTimeout(() => {
         $(_parent.element).parent().scrollTop(0);
-        $scrollingBreadcrumbs.animate({
+        $scrollingBreadcrumbs.anate({
           scrollLeft: $scrollingBreadcrumbs.width()
-        });
+        }
       }, 0);
     }
   }).fail(e => {
