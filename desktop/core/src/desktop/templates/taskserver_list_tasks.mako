@@ -19,7 +19,6 @@ ${ commonheader(_('Task Server'), "about", user, request) | n,unicode }
 ${ layout.menubar(section='task_server') }
 
 
-<div id="tasksComponents" class="taskserver container-fluid">
 <div class="container-fluid">
   <div class="card card-small">
     <h1>${message}</h1> <!-- Display the message passed from the view -->
@@ -49,7 +48,6 @@ ${ layout.menubar(section='task_server') }
     </div>
 
   </div>
-</div>
 </div>
 
 %if not is_embeddable:
