@@ -168,15 +168,12 @@ function formatTimestamp(timestamp) {
 }
 
 
-// export const TaskBrowserTable = ({ tasks }) => {
 export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
-
-  // The tasks prop contains the array of scheduled tasks
-  // logic to fetch tasks from database table
 
   const [tasks, setTasks] = useState([]);
   const [searchTerm, setSearchTerm] = useState(''); // state for the search term
   const [statusFilter, setStatusFilter] = useState({ success: false, failure: false, running: false, all: true }); // state to track status filter
+  const [selectedTasks, setSelectedTasks] = useState([]); // state for check box of a task
 
   useEffect(() => {
     const fetchTasks = () => {
@@ -263,6 +260,38 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
     return (taskNameMatch || userIdMatch || taskIdMatch) && statusMatch;
   });
 
+  const handleKillTask = (taskId) => {
+    axios.post(`/desktop/api2/kill_task/${taskId}/`)
+      .then(response => {
+        const { status, message } = response.data;
+        if (status === 'success') {
+          alert(`Task: ${taskId} has been killed.`);
+        } else if (status === 'info') {
+          alert(`Task: ${taskId} has already been completed or revoked.`);
+        } else {
+          alert(`Task: ${taskId} could not be killed. ${message}`);
+        }
+      })
+      .catch(error => {
+        console.error('Error killing task:', error);
+        alert(`Error killing task: ${error.message}`);
+      });
+  };
+
+  const handleKillSelectedTasks = () => {
+    selectedTasks.forEach(taskId => {
+      handleKillTask(taskId);
+    });
+    setSelectedTasks([]); // Clear the selection after killing the tasks
+  };
+
+  const handleCheckboxChange = (taskId) => {
+    setSelectedTasks(prevSelectedTasks =>
+      prevSelectedTasks.includes(taskId)
+        ? prevSelectedTasks.filter(id => id !== taskId)
+        : [...prevSelectedTasks, taskId]
+    );
+  };
 
 
 
@@ -272,6 +301,7 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
     <div className="content-panel-inner">
     <div className="flex-container-style">
       <button onClick={handleSchedulePopup} className="btn schedule-task-button">Schedule Task</button>
+      <button onClick={handleKillSelectedTasks} className="btn kill-task-button">Kill Task</button>
       <input
         type="text"
         placeholder="Search by task name, user ID, or task ID..."
@@ -326,6 +356,7 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
       <table className="tableStyle hue-horizontally-scrollable ">
         <thead className="thStyle row-grayout-table-header">
           <tr>
+            <th className="thStyle" style={{ width: '3%' }}></th>
             <th className="thStyle" style={{ width: '20%' }}>Task ID</th>
             <th className="thStyle" style={{ width: '3%' }}>User</th>
             <th className="thStyle" style={{ width: '5%' }}>Progress</th>
@@ -341,38 +372,44 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
             // Determine the class based on the task's status
 
              <tr key={index}
-             className={
+               className={
                 task.status === 'SUCCESS' ? 'row-success' :
-                task.status === 'FAILURE' ? 'row-failure' :
+                task.status === 'FAILURE' || task.status === 'REVOKED' ? 'row-failure' :
                 task.status === 'RUNNING' ? 'row-running' : ''
-              }
+               }
              >
-              <td className="tdStyle" onClick={() => handleShowLogs(task.task_id)}>
-                {task.task_id}
-              </td>
-              <td className="tdStyle">{task.result?.username}</td>
-              <td className="tdStyle">{task.result?.progress}</td>
-              <td className="tdStyle">{task.result?.task_name}</td>
-              <td className="tdStyle">
-                {task.result?.task_name === 'fileupload'
-                  ? `{file name: ${task.result?.qqfilename}}`
-                  : JSON.stringify(task.parameters)}
-                {task.result?.task_name === 'document_cleanup'
-                  ? `{keep days: ${task.result?.parameters}}`
-                  : JSON.stringify(task.parameters)}
-                {task.result?.task_name === 'tmp_cleanup'
-                  ? `{cleanup threshold: ${task.result?.parameters}}`
-                  : JSON.stringify(task.parameters)}
-              </td>
-              <td className="tdStyle">
-                <span className={`badgeStyle ${task.status === 'SUCCESS' ? 'badgeSuccess' : task.status === 'FAILURE' ? 'badgeFailure' : 'badgeRunning'}`}>
-
-                  {task.status}
-                </span>
-              </td>
-              <td className="tdStyle"> {formatTimestamp(task.result?.task_start)}</td>
-              <td className="tdStyle">{calculateDuration(task.result?.task_start, task.date_done)}</td>
-            </tr>
+               <td className="tdStyle">
+                 <input
+                   type="checkbox"
+                   checked={selectedTasks.includes(task.task_id)}
+                   onChange={() => handleCheckboxChange(task.task_id)}
+                 />
+               </td>
+               <td className="tdStyle" onClick={() => handleShowLogs(task.task_id)}>
+                 {task.task_id}
+               </td>
+               <td className="tdStyle">{task.result?.username}</td>
+               <td className="tdStyle">{task.result?.progress}</td>
+               <td className="tdStyle">{task.result?.task_name}</td>
+               <td className="tdStyle">
+                 {task.result?.task_name === 'fileupload'
+                   ? `{file name: ${task.result?.qqfilename}}`
+                   : JSON.stringify(task.parameters)}
+                 {task.result?.task_name === 'document_cleanup'
+                   ? `{keep days: ${task.result?.parameters}}`
+                   : JSON.stringify(task.parameters)}
+                 {task.result?.task_name === 'tmp_cleanup'
+                   ? `{cleanup threshold: ${task.result?.parameters}}`
+                   : JSON.stringify(task.parameters)}
+               </td>
+               <td className="tdStyle">
+                 <span className={`badgeStyle ${task.status === 'SUCCESS' ? 'badgeSuccess' : task.status === 'FAILURE' || task.status === 'REVOKED' ? 'badgeFailure' : 'badgeRunning'}`}>
+                   {task.status}
+                 </span>
+               </td>
+               <td className="tdStyle"> {formatTimestamp(task.result?.task_start)}</td>
+               <td className="tdStyle">{calculateDuration(task.result?.task_start, task.date_done)}</td>
+             </tr>
           ))}
         </tbody>
       </table>
