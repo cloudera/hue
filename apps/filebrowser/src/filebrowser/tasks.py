@@ -100,9 +100,6 @@ def _get_request(postdict=None, user_id=None, scheme=None):
 @app.task()
 def document_cleanup_task( **kwargs):
     keep_days = kwargs.get('keep_days')
-    user_id = kwargs.get('user_id')
-    # user = User.objects.get(id=user_id)
-    # user = rewrite_user(user)
     task_id = kwargs.get("qquuid")
     now = timezone.now()
 
@@ -111,29 +108,63 @@ def document_cleanup_task( **kwargs):
     kwargs["state"] = "STARTED"
     kwargs["parameters"] = keep_days
     kwargs["task_id"] = task_id
+    kwargs["progress"] = "0%"
     kwargs["task_start"] = now.strftime("%Y-%m-%dT%H:%M:%S")
 
     try:
-
-        # INSTALL_DIR = "/Users/aselvam/Desktop/work_cloudera/hues/cdh/hue"
         INSTALL_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..'))
-
-        # Update task state to RUNNING
         document_cleanup_task.update_state(task_id=task_id, state='RUNNING', meta=kwargs)
-
-        # Run the cleanup command
         subprocess.check_call([INSTALL_DIR + '/build/env/bin/hue', 'desktop_document_cleanup', f'--keep-days={keep_days}'])
-
-        # Update task state to SUCCESS
         kwargs["state"] = "SUCCESS"
-        print(f"Done success")
+        LOG.info(f"Document_cleanup_task completed successfully.")
     except Exception as err:
-        # Update task state to FAILURE
         document_cleanup_task.update_state(task_id=task_id, state='FAILURE', meta=kwargs)
         raise Exception(f"Upload failed %s" % err)
 
     kwargs["state"] = "SUCCESS"
+    kwargs["progress"] = "100%"
     kwargs["task_end"] = now.strftime("%Y-%m-%dT%H:%M:%S")
     document_cleanup_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
 
     return
+
+import os
+import shutil
+import psutil
+
+@app.task()
+def check_disk_usage_and_clean(**kwargs):
+    task_id = kwargs.get("qquuid")
+    cleanup_threshold = kwargs.get('cleanup_threshold')
+    now = timezone.now()
+
+    kwargs["username"] = kwargs["username"]
+    kwargs["task_name"] = "tmp_cleanup"
+    kwargs["task_id"] = task_id
+    kwargs["parameters"] = cleanup_threshold
+    kwargs["progress"] = "0%"
+    kwargs["task_start"] = now.strftime("%Y-%m-%dT%H:%M:%S")
+
+    disk_usage = psutil.disk_usage('/')
+    if disk_usage.percent >= int(cleanup_threshold):
+        print("Disk usage is above 90%, cleaning up /tmp directory...")
+        tmp_dir = '/tmp'
+        for filename in os.listdir(tmp_dir):
+            file_path = os.path.join(tmp_dir, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+                check_disk_usage_and_clean.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
+                print("/tmp directory cleaned.")
+            except Exception as err:
+                check_disk_usage_and_clean.update_state(task_id=task_id, state='FAILURE', meta=kwargs)
+                raise Exception(f"Failed to delete {file_path}. Reason: {err}")
+
+
+    else:
+        kwargs["progress"] = "100%"
+        check_disk_usage_and_clean.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
+        LOG.info(f"Disk usage is {disk_usage.percent}%, no need to clean up.")
+
