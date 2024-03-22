@@ -51,6 +51,12 @@ app.conf.timezone = TIME_ZONE
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
 
+# Configure Celery to use threads for concurrency
+app.conf.update(
+    task_concurrency=4,  # Use 4 threads for concurrency
+    worker_prefetch_multiplier=1,  # Prefetch one task at a time
+    worker_heartbeat=120
+)
 
 @app.task(bind=True)
 def debug_task(self):
