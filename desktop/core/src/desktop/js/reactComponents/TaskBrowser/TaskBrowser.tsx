@@ -351,7 +351,7 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
                 {task.task_id}
               </td>
               <td className="tdStyle">{task.result?.username}</td>
-              <td className="tdStyle">{task.progress}</td>
+              <td className="tdStyle">{task.result?.progress}</td>
               <td className="tdStyle">{task.result?.task_name}</td>
               <td className="tdStyle">
                 {task.result?.task_name === 'fileupload'
@@ -361,7 +361,7 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
                   ? `{keep days: ${task.result?.parameters}}`
                   : JSON.stringify(task.parameters)}
                 {task.result?.task_name === 'tmp_cleanup'
-                  ? `{keep days: ${task.result?.cleanup_threshold}}`
+                  ? `{cleanup threshold: ${task.result?.parameters}}`
                   : JSON.stringify(task.parameters)}
               </td>
               <td className="tdStyle">
