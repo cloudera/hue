@@ -802,6 +802,12 @@ def kill_task(request, task_id):
   except Exception as e:
     return JsonResponse({'status': 'error', 'message': f'Failed to terminate task {task_id}: {str(e)}'})
 
+import psutil
+
+def get_available_space(request):
+  free_space = psutil.disk_usage('/tmp').free
+  return JsonResponse({'free_space': free_space})
+
 import re
 from django.http import HttpResponse
 
