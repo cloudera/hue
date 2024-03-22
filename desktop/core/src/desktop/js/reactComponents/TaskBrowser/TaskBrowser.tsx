@@ -176,7 +176,7 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
 
   const [tasks, setTasks] = useState([]);
   const [searchTerm, setSearchTerm] = useState(''); // state for the search term
-  const [statusFilter, setStatusFilter] = useState('all'); // state to track status filter
+  const [statusFilter, setStatusFilter] = useState({ success: false, failure: false, running: false, all: true }); // state to track status filter
 
   useEffect(() => {
     const fetchTasks = () => {
@@ -220,14 +220,45 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
 
   // Function to handle status filter button clicks
   const handleStatusFilterChange = (status) => {
-    setStatusFilter(status);
+    setStatusFilter(prevStatusFilter => {
+      const isAll = status === 'all';
+      const newStatusFilter = {
+        ...prevStatusFilter,
+        [status]: isAll ? true : !prevStatusFilter[status],
+      };
+  
+      if (isAll) {
+        // If 'all' is selected, set everything else to false
+        newStatusFilter.success = false;
+        newStatusFilter.failure = false;
+        newStatusFilter.running = false;
+      } else {
+        // If any specific status is toggled, set 'all' to false
+        newStatusFilter.all = false;
+      }
+  
+      // If no individual statuses are selected, default to 'all'
+      if (!newStatusFilter.success && !newStatusFilter.failure && !newStatusFilter.running) {
+        newStatusFilter.all = true;
+      }
+  
+      return newStatusFilter;
+    });
   };
+  
+  
 
   const filteredTasks = tasks.filter(task => {
     const taskNameMatch = task.result?.task_name?.toLowerCase().includes(searchTerm);
     const userIdMatch = task.result?.username?.toString().toLowerCase().includes(searchTerm);
     const taskIdMatch = task.task_id?.toString().toLowerCase().includes(searchTerm);
-    const statusMatch = statusFilter === 'all' || task.status.toLowerCase() === statusFilter;
+    // const statusMatch = statusFilter === 'all' || task.status.toLowerCase() === statusFilter;
+    const statusMatch = statusFilter.all || 
+                      (statusFilter.success && task.status.toLowerCase() === 'success') ||
+                      (statusFilter.failure && task.status.toLowerCase() === 'failure') ||
+                      (statusFilter.running && task.status.toLowerCase() === 'running');
+
+
 
     return (taskNameMatch || userIdMatch || taskIdMatch) && statusMatch;
   });
@@ -249,10 +280,48 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
         style={{ flexGrow: 1 }} // flexGrow allows the input to take up available space
       />
 
-      <button onClick={() => handleStatusFilterChange('success')} className="btn btn-success button-input-style">Succeeded</button>
-          <button onClick={() => handleStatusFilterChange('failure')} className="btn btn-danger button-input-style">Failed</button>
-          <button onClick={() => handleStatusFilterChange('running')} className="btn btn-info button-input-style">Running</button>
-          <button onClick={() => handleStatusFilterChange('all')} className="btn button-input-style">All</button>
+      <label>
+          <input
+            type="checkbox"
+            checked={statusFilter.success}
+            onChange={() => handleStatusFilterChange('success')}
+            className='hue-checkbox checkboxCompleted'
+            style={{ opacity: 0, position: 'absolute', zIndex: -1 }}
+          />
+          <span className="custom-checkbox"></span> 
+          <span className="checkbox-text">Succeeded</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={statusFilter.running}
+            onChange={() => handleStatusFilterChange('running')}
+            className='checkboxRunning'
+            style={{ opacity: 0, position: 'absolute', zIndex: -1 }}
+          />
+          <span className="custom-checkbox"></span> 
+          <span className="checkbox-text">Running</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={statusFilter.failure}
+            onChange={() => handleStatusFilterChange('failure')}
+            className='hue-checkbox checkboxFailed'
+            style={{ opacity: 0, position: 'absolute', zIndex: -1 }}
+          />
+          <span className="custom-checkbox"></span> 
+          <span className="checkbox-text">Failed</span>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={statusFilter.all}
+            onChange={() => handleStatusFilterChange('all')}
+            className='hue-checkbox'
+            style={{ opacity: 0, position: 'absolute', zIndex: -1 }}
+          />
+        </label>
     </div>
       <table className="tableStyle hue-horizontally-scrollable ">
         <thead className="thStyle row-grayout-table-header">
