@@ -2061,68 +2061,56 @@ else:
         });
       };
 
-        function pollForRealProgress(taskIds, listItems, pendingUploads) {
-            var completedUploads = 0; // Track the number of completed uploads
-
-            taskIds.forEach(function(task_id, index) {
-                var listItem = listItems[index];
-                var retryCount = 0;
-                var maxRetries = 5;
+      function pollForRealProgress(taskIds, listItems, pendingUploads) {
+        var completedUploads = 0; // Track the number of completed uploads
+        taskIds.forEach(function(task_id, index) {
+          var listItem = listItems[index];
+          var retryCount = 0;
+          var maxRetries = 5;
                 
-                var interval = setInterval(function() {
-                    $.get('/desktop/api2/check_upload_status/' + task_id, function(data) {
-                        if (data.isFinalized || data.isFailure) {
-                            clearInterval(interval);
-                            completedUploads++; // Increment the count of completed uploads
-                            console.log("complete uploads: ", completedUploads);
+          var interval = setInterval(function() {
+            $.get('/desktop/api2/check_upload_status/' + task_id, function(data) {
+              if (data.isFinalized || data.isFailure) {
+                clearInterval(interval);
+                completedUploads++; // Increment the count of completed uploads
 
-                            if (data.isFinalized) {
-                                listItem.find('.progress-row-bar').css('width', '100%');
-                                listItem.find('.progress-row-text').text('Upload complete.');
-                                console.log("finalized");
-                            } else if (data.isFailure) {
-                                listItem.find('.progress-row-bar').css('width', '100%');
-                                listItem.find('.progress-row-text').text('Upload failed.');
-                                console.log("failed");
-                            }
+                if (data.isFinalized) {
+                  listItem.find('.progress-row-bar').css('width', '100%');
+                  listItem.find('.progress-row-text').text('Upload complete.');
+                } else if (data.isFailure) {
+                  listItem.find('.progress-row-bar').css('width', '100%');
+                  listItem.find('.progress-row-text').text('Upload failed.');
+                }
 
-                            if (completedUploads >= taskIds.length) {
-                                console.log("i reached modal close");
-                                $('#uploadFileModal').modal('hide'); // Close the modal when all uploads are completed
-                                self.retrieveData(true);
-                            }
-                        } else if (data.isRunning) {
-                            console.log("running");
-                            var progressPercentage = 90; // Adjust based on data.progress if available
-                            listItem.find('.progress-row-bar').css('width', progressPercentage + '%');
-                        }
-                    }).fail(function(xhr, textStatus, errorThrown) {
-                      if (xhr.status === 404 && retryCount < maxRetries) {
-                          retryCount++;
-                          console.log("Retrying... attempt " + retryCount);
-                      } else {
-                          clearInterval(interval);
-                          console.log("Error polling for upload status: " + textStatus + " " + errorThrown);
-                      }
-                  });
-              }, 2000);
+                if (completedUploads >= taskIds.length) {
+                  $('#uploadFileModal').modal('hide'); // Close the modal when all uploads are completed
+                  self.retrieveData(true);
+                }
+              } else if (data.isRunning) {
+                console.log("running");
+                var progressPercentage = 90; // Adjust based on data.progress if available
+                listItem.find('.progress-row-bar').css('width', progressPercentage + '%');
+              }
+            }).fail(function(xhr, textStatus, errorThrown) {
+              if (xhr.status === 404 && retryCount < maxRetries) {
+                retryCount++;
+              } else {
+                clearInterval(interval);
+              }
             });
-        }
+          }, 10000);
+        });
+      }
 
-
-
-      self.uploadFile = (function () {
+      self.uploadFile = (function (scheduleUpload) {  
           var uploader; 
+          var scheduleUpload = false;
           
           if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && (window.getLastKnownConfig().hue_config.enable_task_server))  {
             self.pendingUploads(0);
             var action = "/filebrowser/upload/chunks/";
-
             self.taskIds = [];
-            self.listItems = [];
-            console.log("len of taskids - initialization", self.taskIds.length);
-            
-
+            self.listItems = [];          
           
             uploader = new qq.FileUploader({
               element: document.getElementById("fileUploader"),
@@ -2156,31 +2144,17 @@ else:
               template: 'qq-template',
               callbacks: {
                   onProgress: function (id, fileName, loaded, total) {
-                  var percentage = (loaded / total) * 100;
-                  // Cap the displayed percentage at 80%
-                  var cappedPercentage = Math.min(percentage, 80);
-                  // Update the progress bar width and possibly text to reflect the capped progress
-                  $('.qq-upload-files').find('li').each(function() {
+
+                    $('.qq-upload-files').find('li').each(function(){
                       var listItem = $(this);
-                      if (listItem.find('.qq-upload-file-selector').text() === fileName) {
-                          listItem.find('.progress-row-bar').css('width', cappedPercentage + '%');
-                          if (cappedPercentage === 80) {
-                              // Update the status text to indicate that chunk upload is complete and final processing is underway
-                              listItem.find('.progress-row-text').text('Finalizing upload...');
-                          }
+                      if (listItem.find('.qq-upload-file-selector').text() == fileName){
+                        //cap the progress at 80%
+                        listItem.find('.progress-row-bar').css('width', (loaded/total)*80 + '%');
+                        if ((loaded/total) === 80) {
+                          listItem.find('.progress-row-text').text('Finalizing upload...');
+                        }
                       }
-                  });
-
-                  ## orig code
-                  ## $('.qq-upload-files').find('li').each(function(){
-                  ##   var listItem = $(this);
-                  ##   if (listItem.find('.qq-upload-file-selector').text() == fileName){
-                  ##     listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
-                  ##   }
-                  ## });  
-
-                 
-
+                    });            
                   },
 
                   onComplete: function (id, fileName, response) {
@@ -2189,46 +2163,29 @@ else:
                       huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
                     }
                     else {
-
                       var task_id = response.task_id;
-                      console.log("len of taskids - before push", self.taskIds.length);
                       self.taskIds.push(task_id);
-                      //self.listItems = self.listItems || [];
-
                       var listItem = $('.qq-upload-files').find('li').filter(function() {
                         return $(this).find('.qq-upload-file-selector').text() === fileName;
                       });
-                      console.log("list item", listItem);
                       self.listItems.push(listItem);
-                      
-                      //console.log(listItems);
-                      console.log("len of taskIDS", self.taskIds.length);
-                      console.log(response.task_id);
+                      console.log("schedule upload flag:", scheduleUpload);
+                      if (scheduleUpload && self.pendingUploads() === 0) {
+                        console.log("before closing");
+                        $('#uploadFileModal').modal('hide');
+                        $(document).trigger('info', "File upload scheduled. Please check the task server page for progress.")
+                      }
                       pollForRealProgress(self.taskIds, self.listItems, self.pendingUploads())
-                      
-                      console.log("done3");
-
-                      self.filesToHighlight.push(response.path);
-                        
+                      self.filesToHighlight.push(response.path);                       
                     }
-                    console.log("pending uploads before check", self.pendingUploads());
-                    if (self.pendingUploads() === 0) {
-                      console.log("done 4");
-                      console.log("pending uploads in onComplete: ", pendingUploads);
-                      
-                      
+                    if (self.pendingUploads() === 0) {                    
                       self.taskIds=[];
-                      console.log("len of task ids in penduploads=0", self.taskIds.length);
                       self.listItems=[];
-                      console.log("len of listitems in penduploads=0", self.listItems.length);
-                      $('#uploadFileModal').modal('hide');
                       self.retrieveData(true);
-
                     }
                   },
 
                   onAllComplete: function(succeeded, failed){
-                    console.log("on all complete");
                     ##$('#uploadFileModal').modal('hide');
                   },
                   onSubmit: function (id, fileName, responseJSON) {
@@ -2241,11 +2198,12 @@ else:
                     self.pendingUploads(self.pendingUploads() - 1);
                   }
               },
-
               debug: false
             });
           }
-          else if (window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) {
+          // Chunked Fileuploader without Taskserver
+          else if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && !(window.getLastKnownConfig().hue_config.enable_task_server)) {
+            console.log("entering scheduled upload - ", scheduleUpload);
             self.pendingUploads(0);
             var action = "/filebrowser/upload/chunks/";
             uploader = new qq.FileUploader({
@@ -2280,7 +2238,6 @@ else:
               template: 'qq-template',
               callbacks: {
                   onProgress: function (id, fileName, loaded, total) {
-                  console.log(loaded);
                   $('.qq-upload-files').find('li').each(function(){
                     var listItem = $(this);
                     if (listItem.find('.qq-upload-file-selector').text() == fileName){
@@ -2319,6 +2276,7 @@ else:
               debug: false
             });
           }
+          //Regular fileuploads
           else {
             self.pendingUploads(0);
             var action = "/filebrowser/upload/file";
@@ -2393,7 +2351,9 @@ else:
           });
         });
 
-        return function () {
+        return function (isScheduled) {
+          scheduleUpload = isScheduled;
+          console.log("in closure", scheduleUpload)
           $("#uploadFileModal").modal({
             show: true
           });
