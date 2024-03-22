@@ -61,6 +61,7 @@ const jsTsVueRules = {
   '@typescript-eslint/no-explicit-any': 'error',
   '@typescript-eslint/no-this-alias': 'error',
   '@typescript-eslint/no-unused-vars': 'error',
+  '@typescript-eslint/explicit-module-boundary-types': 'error',
   'vue/max-attributes-per-line': [
     'error',
     {
