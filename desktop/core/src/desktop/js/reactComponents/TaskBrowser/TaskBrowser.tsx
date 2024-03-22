@@ -291,6 +291,9 @@ export const TaskBrowserTable = ({ handleShowLogs, handleSchedulePopup }) => {
                 {task.result?.task_name === 'document_cleanup'
                   ? `{keep days: ${task.result?.parameters}}`
                   : JSON.stringify(task.parameters)}
+                {task.result?.task_name === 'tmp_cleanup'
+                  ? `{keep days: ${task.result?.cleanup_threshold}}`
+                  : JSON.stringify(task.parameters)}
               </td>
               <td className="tdStyle">
                 <span className={`badgeStyle ${task.status === 'SUCCESS' ? 'badgeSuccess' : task.status === 'FAILURE' ? 'badgeFailure' : 'badgeRunning'}`}>
