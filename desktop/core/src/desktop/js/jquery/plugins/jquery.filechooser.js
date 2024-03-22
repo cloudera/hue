@@ -789,7 +789,7 @@ Plugin.prototype.navigateTo = function (path) {
   }).fail(e => {
     if (!_parent.options.suppressErrors) {
       huePubSub.publish(GLOBAL_INFO_TOPIC, { message: _parent.options.labels.FILE_NOT_FOUND });
-      _parent.options.onError();
+      _parent.option.onError(
     }
     if (e.status === 404 || e.status === 500) {
       const fs = _parent.options.filesysteminfo[_parent.options.fsSelected || 'hdfs'];
