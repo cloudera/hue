@@ -37,7 +37,7 @@
     <mysql.version>8.0.32</mysql.version>
     <oracle.version>21.3.0.0</oracle.version>
     <pg-embedded.version>0.7.1</pg-embedded.version>
-    <jetty.version>9.4.53.v20231009</jetty.version>
+    <jetty.version>9.4.54.v20240208</jetty.version>
     <impala-profile-extractor.version>7.6.0</impala-profile-extractor.version>
   </properties>
 
