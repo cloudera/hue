@@ -15,19 +15,17 @@
 # limitations under the License.
 
 import logging
-import sys
+import posixpath
+
+from django.utils.translation import gettext as _
+from django.utils.encoding import iri_to_uri
 
 from desktop import conf
 from desktop.lib.raz.clients import AdlsRazClient
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.exceptions_renderable import PopupException
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from urllib.parse import quote as lib_urlquote
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import quote as lib_urlquote
+from urllib.parse import quote, urlencode
 
 
 LOG = logging.getLogger()
@@ -48,12 +46,7 @@ class RazHttpClient(HttpClient):
     https://{storageaccountname}.dfs.core.windows.net/{container}/{path}?sv=2014-02-14&sr=b&
     sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r
     """
-    if sys.version_info[0] < 3 and isinstance(path, unicode):
-      path = path.encode('utf-8')
-
-    do_urlencode = True if params and 'directory' in params and '%' in params['directory'] else False
-
-    url = self._make_url(lib_urlquote(path), params, do_urlencode=do_urlencode)
+    url = self._make_url(quote(path), params)
 
     # For root stats, the root path needs to end with '/' before adding the query params.
     if params and 'action' in params and params['action'] == 'getAccessControl':
@@ -116,3 +109,14 @@ class RazHttpClient(HttpClient):
       return response.get('token')
     else:
       raise PopupException(_('No SAS token in RAZ response'), error_code=403)
+
+  def _make_url(self, path, params, do_urlencode=True):
+    res = self._base_url
+    if path:
+      res += posixpath.normpath('/' + path.lstrip('/'))
+    if params:
+      param_str = urlencode(params, safe='/', quote_via=quote) if do_urlencode else '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
+      res += '?' + param_str
+
+    return iri_to_uri(res)
+
