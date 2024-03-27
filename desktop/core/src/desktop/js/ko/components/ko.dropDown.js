@@ -33,7 +33,7 @@ const TEMPLATE = `
   </a>
   <!-- /ko -->
   <!-- ko if: !menuOnly && (dropDownVisible() && searchable) -->
-  <input class="hue-drop-down-input" data-testid = "hue-database-drop-down-input-textbox" type="text" data-bind="textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
+  <input class="hue-drop-down-input" data-testid = "database-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
   <i class="fa fa-caret-down"></i>
   <!-- /ko -->
   <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }">

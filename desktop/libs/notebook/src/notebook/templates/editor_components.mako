@@ -247,7 +247,7 @@ else:
       <ul class="dropdown-menu pull-right">
         <li>
         <!-- ko if: editorMode -->
-          <a href="javascript:void(0)" data-testid = "new-query-notebook-button" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+          <a href="javascript:void(0)" data-testid = "new-sql-query-button" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
         <!-- /ko -->
@@ -602,7 +602,7 @@ else:
         <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}, onClickOutside: function () { if ($parent.historyFilterVisible() && $parent.historyFilter() === '') { $parent.historyFilterVisible(false) } }">
           <a class="inactive-action" data-testid = "query-history-tab" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
           <div style="margin-left: -15px;" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
-          <input class="input-small inline-tab-filter" data-testid = "query-history-search-input-textbox" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+          <input class="input-small inline-tab-filter" data-testid = "query-history-search-input" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
           <div class="dropdown inline-block inactive-action pointer visible-on-hover">
             <a class="" data-toggle="dropdown" href="javascript: void(0)">
               <i class="fa fa-fw fa-ellipsis-v"></i>
