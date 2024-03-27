@@ -15,19 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
-from nose.tools import assert_equal, assert_false, assert_true, assert_raises
+from nose.tools import assert_equal, assert_raises
+from unittest.mock import patch, Mock
 
 from desktop.lib.rest.raz_http_client import RazHttpClient
 from desktop.lib.exceptions_renderable import PopupException
 
 from hadoop.fs.exceptions import WebHdfsException
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
 
 class TestRazHttpClient():
@@ -93,10 +87,7 @@ class TestRazHttpClient():
         client = RazHttpClient(username='test', base_url='https://gethue.dfs.core.windows.net')
 
         # List call for non-ascii directory name (/user/Tжейкоб)
-        if sys.version_info[0] > 2:
-          params = {'directory': 'user/T\u0436\u0435\u0438\u0306\u043a\u043e\u0431', 'resource': 'filesystem'}
-        else:
-          params = {u'directory': u'user/T\u0436\u0435\u0438\u0306\u043a\u043e\u0431', u'resource': u'filesystem'}
+        params = {'directory': 'user/T\u0436\u0435\u0438\u0306\u043a\u043e\u0431', 'resource': 'filesystem'}
 
         f = client.execute(
           http_method='GET',
@@ -141,12 +132,60 @@ class TestRazHttpClient():
 
         # List call for directory name having %20 like characters (/user/ab%20cd)
         f = client.execute(http_method='GET', path='/test', params={'directory': 'user/ab%20cd', 'resource': 'filesystem'})
-        url = 'https://gethue.dfs.core.windows.net/test?directory=user%2Fab%2520cd&resource=filesystem'
+        url = 'https://gethue.dfs.core.windows.net/test?directory=user/ab%2520cd&resource=filesystem'
 
         raz_get_url.assert_called_with(action='GET', path=url, headers=None)
         raz_http_execute.assert_called_with(
             http_method='GET',
-            path='/test?directory=user%2Fab%2520cd&resource=filesystem&sv=2014-02-14&' \
+            path='/test?directory=user/ab%2520cd&resource=filesystem&sv=2014-02-14&' \
+              'sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            data=None,
+            headers=None,
+            allow_redirects=False,
+            urlencode=False,
+            files=None,
+            stream=False,
+            clear_cookies=False,
+            timeout=120
+        )
+
+        # List call for directory name having objects greater than 5000 and having continuation token param
+        f = client.execute(
+          http_method='GET',
+          path='/test',
+          params={
+            'directory': 'user/test-dir',
+            'resource': 'filesystem',
+            'continuation': 'VBbzu86Hto/ksAkYKRgOZmlsZV8xNDQ5OC5jc3YWhK6wsrzcudoDGAAWiOHZ1/ivtdoDOAAAAA=='
+          }
+        )
+        url = 'https://gethue.dfs.core.windows.net/test?directory=user/test-dir&resource=filesystem&' \
+              'continuation=VBbzu86Hto/ksAkYKRgOZmlsZV8xNDQ5OC5jc3YWhK6wsrzcudoDGAAWiOHZ1/ivtdoDOAAAAA%3D%3D'
+
+        raz_get_url.assert_called_with(action='GET', path=url, headers=None)
+        raz_http_execute.assert_called_with(
+            http_method='GET',
+            path='/test?directory=user/test-dir&resource=filesystem&' \
+              'continuation=VBbzu86Hto/ksAkYKRgOZmlsZV8xNDQ5OC5jc3YWhK6wsrzcudoDGAAWiOHZ1/ivtdoDOAAAAA%3D%3D&sv=2014-02-14&sr=b&' \
+              'sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
+            data=None,
+            headers=None,
+            allow_redirects=False,
+            urlencode=False,
+            files=None,
+            stream=False,
+            clear_cookies=False,
+            timeout=120
+        )
+
+        # List call for testdir~@$&()*!+=; directory name (/user/testdir~@$&()*!+=;)
+        f = client.execute(http_method='GET', path='/test', params={'directory': 'user/testdir~@$&()*!+=;', 'resource': 'filesystem'})
+        url = 'https://gethue.dfs.core.windows.net/test?directory=user/testdir~%40%24%26%28%29%2A%21%2B%3D%3B&resource=filesystem'
+
+        raz_get_url.assert_called_with(action='GET', path=url, headers=None)
+        raz_http_execute.assert_called_with(
+            http_method='GET',
+            path='/test?directory=user/testdir~%40%24%26%28%29%2A%21%2B%3D%3B&resource=filesystem&sv=2014-02-14&' \
               'sr=b&sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r',
             data=None,
             headers=None,
