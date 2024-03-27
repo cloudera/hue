@@ -32,6 +32,19 @@ LOG = logging.getLogger()
 
 
 class RazHttpClient(HttpClient):
+  """
+  A custom HTTP client that adds support for generating Shared Access Signature (SAS) tokens for ABFS.
+
+  This class extends :class:`desktop.lib.rest.http_client.HttpClient`. The main difference is the addition of the `execute` method,
+  which generates a SAS token based on the given parameters and appends it to the URL before making the actual request using the
+  parent class's `execute` method to ABFS for performing the user action.
+
+  Args:
+    username (str): The name of the user associated with the object URL. Used to generate the SAS token.
+    base_url (str): Base URL for the REST API endpoint. Must include protocol (HTTP or HTTPS) and hostname.
+    exc_class (type, optional): An exception type used by this instance when raising errors. Defaults to None.
+    logger (logging.Logger, optional): A logger instance. If not provided, uses the default logger. Defaults to None.
+  """
 
   def __init__(self, username, base_url, exc_class=None, logger=None):
     super(RazHttpClient, self).__init__(base_url, exc_class, logger)
@@ -40,11 +53,19 @@ class RazHttpClient(HttpClient):
   def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True,
               files=None, stream=False, clear_cookies=False, timeout=conf.REST_CONN_TIMEOUT.get(), retry=1):
     """
-    From an object URL we get back the SAS token as a GET param string, e.g.:
-    https://{storageaccountname}.dfs.core.windows.net/{container}/{path}
-    -->
-    https://{storageaccountname}.dfs.core.windows.net/{container}/{path}?sv=2014-02-14&sr=b&
-    sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r
+    Overrides the parent class's `execute` method. Before making the request, generates a SAS token based on the given parameters and
+    appends it to the URL. Then calls the parent class's `execute` method with the modified URL to send the user action request to ABFS.
+
+    Eg: https://{storageaccountname}.dfs.core.windows.net/{container}/{path}
+        -->
+        https://{storageaccountname}.dfs.core.windows.net/{container}/{path}?sv=2014-02-14&sr=b&
+        sig=pJL%2FWyed41tptiwBM5ymYre4qF8wzrO05tS5MCjkutc%3D&st=2015-01-02T01%3A40%3A51Z&se=2015-01-02T02%3A00%3A51Z&sp=r
+
+    Returns:
+      Any: The result returned by the parent class's `execute` method after performing the user action to ABFS.
+
+    Raises:
+      PopupException: When no SAS token is present in the RAZ response.
     """
     url = self._make_url(quote(path), params)
 
@@ -102,6 +123,18 @@ class RazHttpClient(HttpClient):
         raise e
 
   def get_sas_token(self, http_method, username, url, params=None, headers=None):
+    """
+    Request a SAS token from the RAZ service for the specified resource.
+
+    Calls the RAZ client's `get_url` method and returns the received token if available. Otherwise, raises
+    a PopupException indicating a missing token.
+
+    Returns:
+      str: The generated SAS token if successful; otherwise, raises an exception.
+
+    Raises:
+      PopupException: When no SAS token is present in the RAZ response.
+    """
     raz_client = AdlsRazClient(username=username)
     response = raz_client.get_url(action=http_method, path=url, headers=headers)
 
@@ -111,12 +144,22 @@ class RazHttpClient(HttpClient):
       raise PopupException(_('No SAS token in RAZ response'), error_code=403)
 
   def _make_url(self, path, params, do_urlencode=True):
+    """
+    Construct a complete URL with the given path and optional query parameters.
+
+    The method overrides parent class's `_make_url` method to change parameter normalization and ensures proper escaping
+    for RAZ by changing the default behaviour of `urlencode` helper method for special characters.
+
+    Returns:
+      str: A fully qualified URL including the scheme, domain, path, and optionally, query parameters.
+    """
     res = self._base_url
+
     if path:
       res += posixpath.normpath('/' + path.lstrip('/'))
+
     if params:
       param_str = urlencode(params, safe='/', quote_via=quote) if do_urlencode else '&'.join(['%s=%s' % (k, v) for k, v in params.items()])
       res += '?' + param_str
 
     return iri_to_uri(res)
-
