@@ -240,14 +240,14 @@ else:
     <!-- ko template: { ifnot: editorMode() || isPresentationMode(), name: 'notebook-actions' }--><!-- /ko -->
 
     <!-- ko ifnot: isPresentationMode() -->
-    <div class="dropdown pull-right margin-left-10" data-testid = "data-toggle-dropdown-button">
+    <div class="dropdown pull-right margin-left-10" data-testid = "editor-actions-menu">
       <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </a>
       <ul class="dropdown-menu pull-right">
         <li>
         <!-- ko if: editorMode -->
-          <a href="javascript:void(0)" data-testid = "new-sql-query-button" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+          <a href="javascript:void(0)" data-testid = "new-editor-button" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
         <!-- /ko -->
@@ -1715,7 +1715,7 @@ else:
 <script type ="text/html" id="snippet-execution-controls${ suffix }">
   <div class="snippet-actions" style="position: absolute; bottom: 0">
     <!-- ko if: status() == 'loading' -->
-    <a class="snippet-side-btn blue" data-testid = "query-run-button" style="cursor: default;" title="${ _('Creating session') }">
+    <a class="snippet-side-btn blue" style="cursor: default;" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
     <!-- /ko -->
