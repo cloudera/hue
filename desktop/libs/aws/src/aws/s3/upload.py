@@ -36,6 +36,7 @@ else:
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
 
+from desktop.conf import TASK_SERVER
 from desktop.lib.fsmanager import get_client
 from aws.s3 import parse_uri
 from aws.s3.s3fs import S3FileSystemException
@@ -54,7 +55,6 @@ from filebrowser.utils import generate_chunks, calculate_total_size
 
 class S3FineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
-    self._part_num = 1
     self._mp = None
     self._request = request
     self.qquuid = kwargs.get('qquuid')
@@ -64,13 +64,14 @@ class S3FineUploaderChunkedUpload(object):
     if self.file_name:
       self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
     self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
-    self.file_name = kwargs.get('qqfilename')
     self._fs = get_client(fs='s3a', user=self._request.user.username)
     self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
     # Verify that the path exists
     self._fs._stats(self.destination)
     self._bucket = self._fs._get_bucket(self.bucket_name)
     self.filepath = self._fs.join(self.key_name, self.file_name)
+    if kwargs.get('chunk_size', None) != None:
+      self.chunk_size = kwargs.get('chunk_size')
 
   def check_access(self):
     if self._is_s3_upload():
@@ -85,13 +86,24 @@ class S3FineUploaderChunkedUpload(object):
         self.request.META['upload_failed'] = e
         raise PopupException("S3FineUploaderChunkedUpload: Initiating S3 multipart upload to target path: %s failed" % self.filepath)
 
+    self.chunk_size = DEFAULT_WRITE_SIZE
+    logging.debug("Chunk size = %d" % self.chunk_size)
+
     if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
       raise PopupException(_('S3FineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s') %
                             {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize})
 
   def upload_chunks(self):
+    if TASK_SERVER.ENABLED.get():
+      try:
+        self._mp = self._bucket.initiate_multipart_upload(self.filepath)
+      except (S3FileUploadError, S3FileSystemException) as e:
+        LOG.error("S3FineUploaderChunkedUpload: Encountered error in S3UploadHandler check_access: %s" % e)
+        self.request.META['upload_failed'] = e
+        raise PopupException("S3FineUploaderChunkedUpload: Initiating S3 multipart upload to target path: %s failed" % self.filepath)
+
     try:
-      for i, (chunk, total) in enumerate(generate_chunks(self.qquuid, self.qqtotalparts, default_write_size=DEFAULT_WRITE_SIZE), 1):
+      for i, (chunk, total) in enumerate(generate_chunks(self.qquuid, self.qqtotalparts, default_write_size=self.chunk_size), 1):
         LOG.debug("S3FineUploaderChunkedUpload: uploading file %s, part %d, size %d, dest: %s" %
                   (self.file_name, i, total, self.destination))
         self._mp.upload_part_from_file(fp=chunk, part_num=i)

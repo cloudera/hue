@@ -5,6 +5,7 @@
 # Idea files
 .idea
 .run
+.vscode
 
 # pip requirements file
 .requirements

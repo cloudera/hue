@@ -111,6 +111,17 @@ function set_samlcert() {
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
 }
 
+function start_celery() {
+  echo "Starting Celery worker..."
+  # The schedule of periodic tasks performed by celery-beat is stored in the celerybeat-schedule file.
+  touch $HUE_HOME/celerybeat-schedule
+  chmod 644 $HUE_HOME/celerybeat-schedule
+  $HUE_BIN/hue runcelery worker --app desktop.celery --loglevel=DEBUG --schedule_file $HUE_HOME/celerybeat-schedule
+  # Start Redis server
+  redis-server --port 6379
+}
+
+
 # If database connectivity is not set then fail
 ret=$(db_connectivity_check)
 if [[ $ret == "fail" ]];  then
@@ -134,6 +145,10 @@ elif [[ $1 == rungunicornserver ]]; then
   fix_column_issue "axes_accesslog" "trusted"
   fix_column_issue "axes_accessattempt" "trusted"
   $HUE_BIN/hue rungunicornserver
+elif [[ $1 == start_celery ]]; then
+  if grep -q '^\[\[task_server\]\]' $HUE_CONF_DIR/zhue_safety_valve.ini && grep -q '^enabled=True' $HUE_CONF_DIR/zhue_safety_valve.ini; then
+    start_celery
+  fi
 fi
 
 exit 0
