@@ -428,10 +428,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   }, []);
 
   const showBarInlineWarning = guardrailAlert?.type === GuardrailAlertType.INVALID_AI_RESPONSE;
-  const diffSource =
-    actionMode !== AiActionModes.GENERATE && actionMode !== AiActionModes.EDIT
-      ? parsedStatement?.statement
-      : undefined;
+  const diffSource = actionMode !== AiActionModes.GENERATE ? parsedStatement?.statement : undefined;
 
   return (
     <>
