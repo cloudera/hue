@@ -189,7 +189,7 @@ const TEMPLATE = `
   <div class="assist-flex-search">
     <div class="assist-filter">
       <form autocomplete="off">
-        <input class="clearable" data-testid = "sql-assist-filter-input" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${I18n(
+        <input class="clearable" data-testid = "documents-assist-filter-input" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="${I18n(
           'Filter...'
         )}" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>
       </form>
