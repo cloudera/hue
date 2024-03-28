@@ -166,4 +166,22 @@ describe('AiAssistBar', () => {
     expect(getByTestId('mock-preview-modal')).not.toHaveTextContent('Mock generated SQL from NQL');
     expect(getByTestId('mock-preview-modal')).not.toHaveTextContent('Mock generate assumptions');
   });
+
+  it('adds both original and modified SQL to preview modal for Edit', async () => {
+    const user = userEvent.setup();
+    const { getByTestId, getByRole, getByTitle } = render(
+      <AiAssistBar activeExecutable={sqlExecutableMock} />
+    );
+
+    await user.click(getByRole('button', { name: 'Edit SQL using natural language' }));
+    const inputField = getByTitle('Press down arrow to select from history');
+    expect(inputField).toBeInTheDocument();
+
+    await user.type(inputField, 'test prompt input');
+    await user.click(getByRole('button', { name: 'Press enter or click here to execute' }));
+
+    expect(getByTestId('mock-preview-modal')).toBeInTheDocument();
+    expect(getByTestId('mock-preview-modal')).toHaveTextContent('select * from test');
+    expect(getByTestId('mock-preview-modal')).toHaveTextContent('Mock edited SQL from NQL');
+  });
 });
