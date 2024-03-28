@@ -24,7 +24,11 @@ export const HUE_DROP_DOWN_COMPONENT = 'hue-drop-down';
 
 const TEMPLATE = `
   <!-- ko if: !menuOnly && (!dropDownVisible() || !searchable) -->
-  <a class="inactive-action hue-drop-down-active" data-testid = "database-selection-dropdown" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
+  <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="
+    attr: {
+      'data-test-id': dataTestId
+    },
+    toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
     <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
     <!-- ko if: !noLabel && value -->
     <span class="hue-drop-down-selected" data-bind="text: value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': titleTooltip }" ></span>
@@ -157,6 +161,7 @@ class HueDropDown {
     self.dropDownVisible = ko.observable(!!params.showOnInit);
     self.menuOnly = !!params.menuOnly;
     self.noLabel = !!params.noLabel;
+    self.dataTestId = params.dataTestId;
     self.labelAttribute = params.labelAttribute || 'label';
     self.icon = params.icon;
     self.value = params.value;
