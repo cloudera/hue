@@ -34,3 +34,4 @@ PERMISSION_ACTIONS = (
   (PERMISSION_ACTION_GS, "Access to Google File System (GS) from filebrowser and filepicker."),
   (PERMISSION_ACTION_OFS, "Access to Ozone File System (OFS) from filebrowser and filepicker.")
 )
+
