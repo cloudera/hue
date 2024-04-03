@@ -32,10 +32,7 @@ from hadoop import conf
 from hadoop import confparse
 from hadoop import pseudo_hdfs4
 
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import BytesIO as string_io
 
 def test_confparse():
   data = """

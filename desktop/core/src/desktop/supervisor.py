@@ -50,25 +50,8 @@ import desktop.lib.daemon_utils
 import desktop.lib.paths
 import desktop.log
 
-
-if sys.version_info[0] > 2:
-  from daemon.pidfile import TimeoutPIDLockFile
-  from daemon.daemon import DaemonContext
-  open_file = open
-else:
-  from daemon.pidlockfile import PIDLockFile
-  open_file = file
-
-  class TimeoutPIDLockFile(PIDLockFile):
-    """A PIDLockFile subclass that passes through a timeout on acquisition."""
-
-    def __init__(self, lockfile, timeout, **kwargs):
-      PIDLockFile.__init__(self, lockfile, **kwargs)
-      self.timeout = timeout
-
-    def __enter__(self):
-      super(TimeoutPIDLockFile, self).acquire(timeout=self.timeout)
-      return self
+from daemon.pidfile import TimeoutPIDLockFile
+from daemon.daemon import DaemonContext
 
 
 PROC_NAME = 'supervisor'
@@ -149,7 +132,7 @@ class Supervisor(threading.Thread):
       while True:
         self.state = Supervisor.RUNNING
         LOG.info("Starting process %s" % proc_str)
-        pipe = subprocess.Popen(self.cmdv, close_fds=True, stdin=open_file("/dev/null"), **self.popen_kwargs)
+        pipe = subprocess.Popen(self.cmdv, close_fds=True, stdin=open("/dev/null"), **self.popen_kwargs)
         LOG.info("Started proceses (pid %s) %s" % (pipe.pid, proc_str))
         CHILD_PIDS.append(pipe.pid)
         exitcode = pipe.wait()
@@ -333,10 +316,7 @@ def main():
     pidfile_context.break_lock()
 
   if options.daemonize:
-    if sys.version_info[0] > 2:
-      outfile = open_file(os.path.join(log_dir, 'supervisor.out'), 'ba+', 0)
-    else:
-      outfile = open_file(os.path.join(log_dir, 'supervisor.out'), 'a+', 0)
+    outfile = open(os.path.join(log_dir, 'supervisor.out'), 'ba+', 0)
     context = daemon.DaemonContext(
         working_directory=root,
         pidfile=pidfile_context,
@@ -368,10 +348,7 @@ def main():
         preexec_fn = None
 
       if options.daemonize:
-        if sys.version_info[0] > 2:
-          log_stdout = open_file(os.path.join(log_dir, name + '.out'), 'ba+', 0)
-        else:
-          log_stdout = open_file(os.path.join(log_dir, name + '.out'), 'a+', 0)
+        log_stdout = open(os.path.join(log_dir, name + '.out'), 'ba+', 0)
         log_stderr = log_stdout
       else:
         # Passing None to subprocess.Popen later makes the subprocess inherit the

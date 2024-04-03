@@ -25,10 +25,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from libsentry.client2 import SentryClient
 from libsentry.sentry_site import get_sentry_server
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

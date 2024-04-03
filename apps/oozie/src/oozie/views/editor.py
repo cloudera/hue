@@ -60,10 +60,8 @@ from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
 
 from desktop.auth.backend import is_admin
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, activate as activate_translation
-else:
-  from django.utils.translation import ugettext as _, activate as activate_translation
+from django.utils.translation import gettext as _, activate as activate_translation
+
 
 LOG = logging.getLogger()
 

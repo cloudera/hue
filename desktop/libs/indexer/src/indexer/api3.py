@@ -26,7 +26,6 @@ import logging
 import urllib.error
 import openpyxl
 import re
-import sys
 import tempfile
 import uuid
 
@@ -66,17 +65,11 @@ from indexer.models import _save_pipeline
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 from indexer.indexers.flume import FlumeIndexer
 
+from io import StringIO as string_io
+from urllib.parse import urlparse, unquote as urllib_unquote
+from django.utils.translation import gettext as _
+import pandas as pd
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from urllib.parse import urlparse, unquote as urllib_unquote
-  from django.utils.translation import gettext as _
-  import pandas as pd
-else:
-  from StringIO import StringIO as string_io
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlparse
-  from django.utils.translation import ugettext as _
 
 try:
   from beeswax.server import dbms
@@ -106,10 +99,7 @@ def _escape_white_space_characters(s, inverse=False):
   from_ = 0 if inverse else 1
 
   for pair in MAPPINGS.items():
-    if sys.version_info[0] > 2:
-      s = s.replace(pair[to], pair[from_])
-    else:
-      s = s.replace(pair[to], pair[from_]).encode('utf-8')
+    s = s.replace(pair[to], pair[from_])
 
   return s
 
@@ -125,9 +115,6 @@ def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
   file_type = file_format['file_type']
   path = file_format["path"]
-  
-  if sys.version_info[0] < 3 and (file_type == 'excel' or path[-3:] == 'xls' or path[-4:] == 'xlsx'):
-    return JsonResponse({'status': -1, 'message': 'Python2 based Hue does not support Excel file importer'})
 
   if file_format['inputFormat'] == 'localfile':
     if file_type == 'excel':

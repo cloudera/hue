@@ -15,9 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
 from desktop.lib.django_util import render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop import appmanager
@@ -26,12 +23,6 @@ from hadoop.fs import LocalSubFileSystem
 import markdown
 import urllib.request, urllib.parse, urllib.error
 import os
-import sys
-
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
 
 INDEX_FILENAMES = ("index.md", "index.html", "index.txt")
 

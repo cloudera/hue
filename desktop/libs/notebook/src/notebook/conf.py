@@ -28,10 +28,7 @@ from desktop import appmanager
 from desktop.conf import is_oozie_enabled, has_connectors, is_cm_managed, ENABLE_UNIFIED_ANALYTICS, get_clusters
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 
 LOG = logging.getLogger()

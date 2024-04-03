@@ -24,10 +24,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.views import display, listdir_paged
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 def _get_acl_name(acl):

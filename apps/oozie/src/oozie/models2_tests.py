@@ -677,9 +677,8 @@ class TestExternalWorkflowGraph(object):
     node_hierarchy = ['start']
     _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
 
-    expected_node_hierarchy_py2 = ['start', [u'fork-fe93', [[u'shell-bd90'], [u'shell-d64c'], [u'shell-5429'], [u'shell-d8cc']], u'join-7f80'], ['Kill'], ['End']]
     expected_node_hierarchy_py3 = ['start', [u'fork-fe93', [[u'shell-5429'], [u'shell-bd90'], [u'shell-d64c'], [u'shell-d8cc']], u'join-7f80'], ['Kill'], ['End']]
-    assert node_hierarchy == (expected_node_hierarchy_py3 if sys.version_info[0] > 2 else expected_node_hierarchy_py2)
+    assert node_hierarchy == expected_node_hierarchy_py3
 
   def test_gen_workflow_data_from_xml(self):
     self.wf.definition = """<workflow-app name="fork-fork-test" xmlns="uri:oozie:workflow:0.5">
@@ -1120,7 +1119,7 @@ class TestExternalWorkflowGraph(object):
                 workflow_data_02['workflow']['nodes'][7]['type'] ==
                 workflow_data_03['workflow']['nodes'][7]['type'] ==
                 workflow_data_04['workflow']['nodes'][7]['type'] ==
-                'hive-widget' if sys.version_info[0] == 2 else 'spark-widget')
+                'spark-widget')
     assert (len(workflow_data_01['workflow']['nodes'][7]['children']) ==
                 len(workflow_data_02['workflow']['nodes'][7]['children']) ==
                 len(workflow_data_03['workflow']['nodes'][7]['children']) ==

@@ -15,15 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str, object
 import datetime
 import json
 import logging
 import math
 import numbers
-import sys
 import uuid
 
 from datetime import timedelta
@@ -43,12 +39,8 @@ from useradmin.models import User, install_sample_user
 from notebook.conf import EXAMPLES, get_ordered_interpreters
 from notebook.connectors.base import Notebook, get_api as _get_api, get_interpreter
 
-if sys.version_info[0] > 2:
-  from urllib.parse import quote as urllib_quote
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import quote as urllib_quote
+from urllib.parse import quote as urllib_quote
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

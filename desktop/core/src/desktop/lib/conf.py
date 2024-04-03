@@ -88,10 +88,7 @@ try:
 except ImportError:
   from ordereddict import OrderedDict # Python 2.6
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 
 # Magical object for use as a "symbol"
@@ -721,9 +718,9 @@ def coerce_password_from_script(script):
   p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
   stdout, stderr = p.communicate()
 
-  if sys.version_info[0] > 2 and isinstance(stdout, bytes):
+  if isinstance(stdout, bytes):
     stdout = stdout.decode('utf-8')
-  if sys.version_info[0] > 2 and isinstance(stderr, bytes):
+  if isinstance(stderr, bytes):
     stderr = stderr.decode('utf-8')
 
   if p.returncode != 0:

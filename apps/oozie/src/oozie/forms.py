@@ -34,10 +34,7 @@ from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator
   Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
   Email, SubWorkflow, Generic, Bundle, BundledCoordinator
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 
 LOG = logging.getLogger()

@@ -26,7 +26,6 @@ import os
 import random
 import sys
 import threading
-import unittest
 from django.test import TestCase
 
 from hadoop import pseudo_hdfs4
@@ -65,7 +64,7 @@ class WebhdfsTests(TestCase):
     try:
       f.write("hello")
       f.close()
-      assert (b"hello" if sys.version_info[0] > 2 else "hello") == fs.open(test_file).read()
+      assert (b"hello") == fs.open(test_file).read()
       assert 5 == fs.stats(test_file)["size"]
       assert fs.isfile(test_file)
       assert not fs.isfile("/")
@@ -96,14 +95,14 @@ class WebhdfsTests(TestCase):
 
       f = fs.open(test_file, "r")
       f.seek(0, os.SEEK_SET)
-      assert (b"he" if sys.version_info[0] > 2 else "he") == f.read(2)
+      assert (b"he") == f.read(2)
       f.seek(1, os.SEEK_SET)
-      assert (b"el" if sys.version_info[0] > 2 else "el") == f.read(2)
+      assert (b"el") == f.read(2)
       f.seek(-1, os.SEEK_END)
-      assert (b"o" if sys.version_info[0] > 2 else "o") == f.read()
+      assert (b"o") == f.read()
       f.seek(0, os.SEEK_SET)
       f.seek(2, os.SEEK_CUR)
-      assert (b"ll" if sys.version_info[0] > 2 else "ll") == f.read(2)
+      assert (b"ll") == f.read(2)
     finally:
       fs.remove(test_file)
 
@@ -122,14 +121,14 @@ class WebhdfsTests(TestCase):
       f.close()
 
       for i in range(1, 10):
-        f = fs.open(test_file, "rt" if sys.version_info[0] > 2 else "r")
+        f = fs.open(test_file, "rt")
 
         for j in range(1, 100):
           offset = random.randint(0, len(data) - 1)
           f.seek(offset, os.SEEK_SET)
           t = data[offset:offset+50]
-          if sys.version_info[0] > 2:
-            t = t.encode('utf-8')
+          t = t.encode('utf-8')
+
           assert t == f.read(50)
         f.close()
 
@@ -587,13 +586,11 @@ class WebhdfsTests(TestCase):
   def test_check_access(self):
     # Set user to owner
     self.cluster.fs.setuser('test')
-    assert ((b'' if sys.version_info[0] > 2 else '') ==
-                  self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
+    assert ((b'') == self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
 
     # Set user to superuser
     self.cluster.fs.setuser(self.cluster.superuser)
-    assert ((b'' if sys.version_info[0] > 2 else '') ==
-                  self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
+    assert ((b'') == self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
 
     # Set user to non-authorized, non-superuser user
     self.cluster.fs.setuser('nonadmin')

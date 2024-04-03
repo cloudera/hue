@@ -22,7 +22,6 @@ from builtins import object
 import bz2
 import os
 import posixpath
-import sys
 import tarfile
 import tempfile
 
@@ -30,10 +29,8 @@ from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
 from zipfile import ZipFile
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
+
 
 
 __all__ = ['archive_factory']
@@ -72,10 +69,8 @@ class ZipArchive(Archive):
   """
 
   def __init__(self, file):
-    if sys.version_info[0] > 2:
-      self.file = isinstance(file, basestring) and file
-    else:
-      self.file = isinstance(file, basestring) and open(file) or file
+    self.file = isinstance(file, basestring) and file
+    
     self.zfh = ZipFile(self.file)
 
   def extract(self):

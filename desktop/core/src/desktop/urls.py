@@ -15,12 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
-import logging
 import re
-import sys
-
 
 # FIXME: This could be replaced with hooking into the `AppConfig.ready()`
 # signal in Django 1.7:
@@ -54,10 +49,8 @@ from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
 from desktop.settings import is_oidc_configured
 
-if sys.version_info[0] > 2:
-  from django.urls import include, re_path
-else:
-  from django.conf.urls import include, url as re_path
+from django.urls import include, re_path
+
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.

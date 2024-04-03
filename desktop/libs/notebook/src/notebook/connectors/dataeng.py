@@ -27,10 +27,7 @@ from notebook.connectors.altus import DataEngApi as AltusDataEngApi
 from notebook.connectors.base import Api, QueryError
 from jobbrowser.apis.data_eng_api import RUNNING_STATES
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

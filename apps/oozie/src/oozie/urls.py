@@ -22,10 +22,7 @@ from oozie.views import editor2 as oozie_views_editor2
 from oozie.views import api as oozie_views_api
 from oozie.views import dashboard as oozie_views_dashboard
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from django.urls import re_path
 
 IS_URL_NAMESPACED = True
 

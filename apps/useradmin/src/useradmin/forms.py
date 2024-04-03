@@ -18,7 +18,6 @@
 from builtins import object
 import logging
 import re
-import sys
 
 import django.contrib.auth.forms
 from django import forms
@@ -34,10 +33,7 @@ from useradmin.hue_password_policy import hue_get_password_validators
 from useradmin.models import GroupPermission, HuePermission, get_default_user_group, User, Group, Organization
 from useradmin.organization import get_user_request_organization
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import get_language, gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import get_language, ugettext as _, ugettext_lazy as _t
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 
 LOG = logging.getLogger()

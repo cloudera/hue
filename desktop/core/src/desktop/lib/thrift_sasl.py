@@ -30,10 +30,7 @@ import sys
 # TODO: Check whether the following distinction is necessary. Does not appear to
 # break anything when `io.BytesIO` is used everywhere, but there may be some edge
 # cases where things break down.
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import BytesIO as string_io
 
 class TSaslClientTransport(TTransportBase, CReadableTransport):
   START = 1

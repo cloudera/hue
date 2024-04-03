@@ -15,13 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import filter
-from builtins import str
-
 import collections
 import logging
 import json
-import sys
 import threading
 import uuid
 
@@ -35,10 +31,7 @@ from desktop.lib import django_mako
 
 from useradmin.models import install_sample_user
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

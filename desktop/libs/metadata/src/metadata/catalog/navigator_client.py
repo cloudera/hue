@@ -37,10 +37,7 @@ from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_
 from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
 from metadata.metadata_sites import get_navigator_hue_server_name
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 VERSION = 'v9'

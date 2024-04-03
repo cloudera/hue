@@ -41,10 +41,7 @@ from useradmin.models import User
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 

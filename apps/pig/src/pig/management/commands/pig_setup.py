@@ -35,10 +35,7 @@ from useradmin.models import get_default_user_group, install_sample_user
 
 from pig.conf import LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

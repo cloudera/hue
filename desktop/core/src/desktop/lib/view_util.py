@@ -15,12 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Utilities for views (text and number formatting, etc)"""
-from __future__ import division
 
 import datetime
 import logging
 import math
-import sys
 
 from django.urls import reverse
 
@@ -91,11 +89,7 @@ def format_duration_in_millis(duration=0):
   return ":".join(output)
 
 def is_ajax(request):
-  if sys.version_info[0] > 2:
-    _is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.path.startswith('/api/')
-  else:
-    _is_ajax = request.is_ajax()
-
+  _is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.path.startswith('/api/')
   return _is_ajax
 
 def location_to_url(location, strict=True, is_embeddable=False):

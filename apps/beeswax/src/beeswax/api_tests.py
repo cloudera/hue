@@ -16,7 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 import pytest
 import sys
@@ -30,11 +29,7 @@ from useradmin.models import User
 
 from beeswax.api import _autocomplete, get_functions
 
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 LOG = logging.getLogger()
@@ -122,7 +117,6 @@ class TestApi():
             'Returns the timestamp at a month granularity\nparam needs to be a timestamp value\nExample:\n'
             '> SELECT floor_month(CAST(\'yyyy-MM-dd HH:mm:ss\' AS TIMESTAMP)) FROM src;\nyyyy-MM-01 00:00:00'
       })
-
 
     db.client = Mock(query_server = {'dialect': 'impala'})
     data = _autocomplete(db, operation='function')

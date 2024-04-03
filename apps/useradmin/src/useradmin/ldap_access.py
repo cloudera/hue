@@ -18,10 +18,8 @@
 This module provides access to LDAP servers, along with some basic functionality required for Hue and
 User Admin to work seamlessly with LDAP.
 """
-from builtins import str, object
 
 import logging
-import sys
 
 LOG = logging.getLogger()
 
@@ -39,10 +37,8 @@ from desktop.lib.python_util import CaseInsensitiveDict
 
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from django.utils.encoding import smart_str
-else:
-  from django.utils.encoding import smart_text as smart_str
+from django.utils.encoding import smart_str
+
 
 CACHED_LDAP_CONN = None
 

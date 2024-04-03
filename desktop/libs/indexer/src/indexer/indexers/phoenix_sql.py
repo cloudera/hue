@@ -16,22 +16,14 @@
 
 import csv
 import logging
-import sys
-import uuid
 from django.urls import reverse
 
 from notebook.conf import get_ordered_interpreters
 from notebook.models import make_notebook
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from urllib.parse import urlparse, unquote as urllib_unquote
-  from django.utils.translation import gettext as _
-else:
-  from cStringIO import StringIO as string_io
-  from django.utils.translation import ugettext as _
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlparse
+from io import StringIO as string_io
+from urllib.parse import urlparse, unquote as urllib_unquote
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

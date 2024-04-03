@@ -31,10 +31,7 @@ from libzookeeper.models import ZookeeperClient
 from indexer.conf import CORE_INSTANCE_DIR, get_solr_ensemble
 from indexer.utils import copy_configs
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

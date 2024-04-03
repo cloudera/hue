@@ -40,10 +40,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 def get_mocked_config():

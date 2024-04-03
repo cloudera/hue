@@ -34,10 +34,7 @@ from desktop.conf import AUDIT_EVENT_LOG_DIR, CUSTOM_CACHE_CONTROL
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 @pytest.mark.django_db
 def test_view_perms():

@@ -16,18 +16,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next
-from builtins import range
-from builtins import object
 import csv
 import logging
 import os
 import pytz
 import re
 import shutil
-import sys
 import tempfile
 import uuid
 
@@ -40,12 +34,9 @@ from desktop.lib.i18n import force_unicode, smart_str
 from indexer import conf
 from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES, DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from StringIO import StringIO as string_io
+from io import StringIO as string_io
+from django.utils.translation import gettext as _
+
 
 LOG = logging.getLogger()
 TIMESTAMP_PATTERN = '\[([\w\d\s\-\/\:\+]*?)\]'

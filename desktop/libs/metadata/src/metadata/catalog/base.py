@@ -21,10 +21,7 @@ from builtins import object
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 def get_api(request, interface):

@@ -36,10 +36,7 @@ from desktop.lib.view_util import format_duration_in_millis, location_to_url
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

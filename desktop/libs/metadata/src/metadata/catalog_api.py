@@ -35,10 +35,7 @@ from metadata.catalog.base import get_api
 from metadata.catalog.navigator_client import CatalogApiException, CatalogEntityDoesNotExistException, CatalogAuthException
 from metadata.conf import has_catalog, CATALOG, has_catalog_file_search, NAVIGATOR
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

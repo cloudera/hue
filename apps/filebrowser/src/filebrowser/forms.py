@@ -15,14 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import zip
-from builtins import range
 import logging
-import sys
 import urllib.request, urllib.error
-
 from django import forms
 from django.forms import FileField, CharField, BooleanField, Textarea
 from django.forms.formsets import formset_factory, BaseFormSet
@@ -37,12 +31,8 @@ from useradmin.models import User, Group
 
 from filebrowser.lib import rwx
 
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote
-  from django.utils.translation import gettext_lazy as _
-else:
-  from urllib import unquote as urllib_unquote
-  from django.utils.translation import ugettext_lazy as _
+from urllib.parse import unquote as urllib_unquote
+from django.utils.translation import gettext_lazy as _
 
 
 logger = logging.getLogger()

@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import next, str
 import json
 import logging
 import re
@@ -23,7 +22,7 @@ import sys
 import time
 
 from django import forms
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
+from django.core.paginator import Paginator, EmptyPage
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponse, QueryDict
@@ -56,10 +55,8 @@ from beeswax.server.dbms import expand_exception, get_query_server_config, Query
 
 from desktop.auth.backend import is_admin
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
+
 
 
 LOG = logging.getLogger()

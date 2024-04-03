@@ -50,10 +50,7 @@ from hadoop import cluster
 from hadoop.yarn.clients import get_log_client
 from hadoop.yarn import resource_manager_api as resource_manager_api
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -270,12 +267,8 @@ def single_job(request, job):
   failed_tasks = job.filter_tasks(task_states=('failed',))
   recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',))
 
-  if sys.version_info[0] > 2:
-    failed_tasks.sort(key=lambda task: task.execStartTimeMs)
-    recent_tasks.sort(key=lambda task: task.execStartTimeMs, reverse=True)
-  else:
-    failed_tasks.sort(cmp_exec_time)
-    recent_tasks.sort(cmp_exec_time, reverse=True)
+  failed_tasks.sort(key=lambda task: task.execStartTimeMs)
+  recent_tasks.sort(key=lambda task: task.execStartTimeMs, reverse=True)
 
   if request.GET.get('format') == 'json':
     json_failed_tasks = [massage_task_for_json(task) for task in failed_tasks]
@@ -441,10 +434,8 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
   task = None
 
   failed_tasks = job.filter_tasks(task_states=('failed',))
-  if sys.version_info[0] > 2:
-    failed_tasks.sort(key=functools.cmp_to_key(cmp_exec_time))
-  else:
-    failed_tasks.sort(cmp_exec_time)
+  failed_tasks.sort(key=functools.cmp_to_key(cmp_exec_time))
+
   if failed_tasks:
     task = failed_tasks[0]
     if not task.taskAttemptIds and len(failed_tasks) > 1: # In some cases the last task ends up without any attempt
@@ -454,10 +445,8 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
     if job.is_mr2:
       task_states.append('scheduled')
     recent_tasks = job.filter_tasks(task_states=task_states, task_types=('map', 'reduce',))
-    if sys.version_info[0] > 2:
-      recent_tasks.sort(key=functools.cmp_to_key(cmp_exec_time), reverse=True)
-    else:
-      recent_tasks.sort(cmp_exec_time, reverse=True)
+    recent_tasks.sort(key=functools.cmp_to_key(cmp_exec_time), reverse=True)
+
     if recent_tasks:
       task = recent_tasks[0]
 

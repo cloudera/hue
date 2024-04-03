@@ -24,10 +24,7 @@ import sys
 import threading
 import traceback
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import StringIO as string_io
 
 LOG = logging.getLogger()
 

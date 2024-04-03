@@ -15,19 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from hadoop import conf
+
 import logging
 import os
-import sys
 import tempfile
 
+from hadoop import conf
 from hadoop import ssl_client_site
 
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
 
 LOG = logging.getLogger()
 
@@ -59,7 +54,7 @@ def test_ssl_client_site():
 </configuration>
 
     """
-    open_file(os.path.join(hadoop_home, 'ssl-client.xml'), 'w').write(xml)
+    open(os.path.join(hadoop_home, 'ssl-client.xml'), 'w').write(xml)
 
     finish = conf.HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.set_for_testing(hadoop_home)
     ssl_client_site.reset()

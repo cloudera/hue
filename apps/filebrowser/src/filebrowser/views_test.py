@@ -16,19 +16,11 @@
 # limitations under the License.
 #!/usr/bin/env python
 
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import zip
-from builtins import range
-from builtins import object
-from builtins import str
 import json
 import logging
 import os
 import re
 import stat
-import sys
 import tempfile
 import pytest
 
@@ -37,13 +29,11 @@ import urllib.parse
 
 from time import sleep, time
 from avro import schema, datafile, io
-from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
 
 from azure.conf import is_abfs_enabled, is_adls_enabled, ABFS_CLUSTERS
 
 from django.urls import reverse
-from django.utils.encoding import smart_str
 from django.http import HttpResponse
 from django.test import TestCase
 
@@ -55,24 +45,16 @@ from desktop.conf import is_oozie_enabled, RAZ, is_ofs_enabled, OZONE
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.webhdfs import WebHdfs
-from useradmin.models import User, Group
+from useradmin.models import User
 
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE,\
-  REMOTE_STORAGE_HOME
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE, REMOTE_STORAGE_HOME
 from filebrowser.lib.rwx import expand_mode
 from filebrowser.views import snappy_installed, _normalize_path
 
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote, urlparse
-  open_file = open
-  from django.utils.translation import gettext_lazy as _
-  from unittest.mock import patch, Mock
-else:
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlparse
-  open_file = file
-  from django.utils.translation import ugettext_lazy as _
-  from mock import patch, Mock
+from urllib.parse import unquote as urllib_unquote
+from django.utils.translation import gettext_lazy as _
+from unittest.mock import patch, Mock
+
 
 
 LOG = logging.getLogger()
@@ -1117,7 +1099,7 @@ alert("XSS")
 
       # Just upload the current python file
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, # GET param avoids infinite looping
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open(LOCAL_FILE)))
       response = json.loads(resp.content)
 
       assert 0 == response['status'], response
@@ -1127,12 +1109,12 @@ alert("XSS")
 
       f = self.cluster.fs.open(HDFS_FILE)
       actual = f.read(file_size)
-      expected = open_file(LOCAL_FILE).read()
+      expected = open(LOCAL_FILE).read()
       assert actual == expected, 'files do not match: %s != %s' % (len(actual), len(expected))
 
       # Upload again and so fails because file already exits
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open(LOCAL_FILE)))
       response = json.loads(resp.content)
       assert -1 == response['status'], response
       assert 'already exists' in response['data'], response
@@ -1142,7 +1124,7 @@ alert("XSS")
       grant_access("not_me", "not_me", "filebrowser")
       try:
         resp = not_me.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                           dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
+                           dict(dest=HDFS_DEST_DIR, hdfs_file=open(LOCAL_FILE)))
         response = json.loads(resp.content)
         assert -1 == response['status'], response
         assert 'User not_me does not have permissions' in response['data'], response
@@ -1167,7 +1149,7 @@ alert("XSS")
 
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(ZIP_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open(ZIP_FILE)))
       response = json.loads(resp.content)
       assert 0 == response['status'], response
       assert self.cluster.fs.exists(HDFS_ZIP_FILE)
@@ -1244,7 +1226,7 @@ alert("XSS")
     try:
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(TGZ_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open(TGZ_FILE)))
       response = json.loads(resp.content)
       assert 0 == response['status'], response
       assert self.cluster.fs.exists(HDFS_TGZ_FILE)
@@ -1272,7 +1254,7 @@ alert("XSS")
     try:
       # Upload archive
       resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(BZ2_FILE)))
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=open(BZ2_FILE)))
       response = json.loads(resp.content)
       assert 0 == response['status'], response
       assert self.cluster.fs.exists(HDFS_BZ2_FILE)

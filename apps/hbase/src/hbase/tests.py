@@ -35,11 +35,6 @@ from hbase.api import HbaseApi
 from hbase.conf import HBASE_CONF_DIR
 from hbase.hbase_site import get_server_authentication, get_server_principal, get_conf, reset, _CNF_HBASE_IMPERSONATION_ENABLED, is_impersonation_enabled
 
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
-
 
 def test_security_plain():
   tmpdir = tempfile.mkdtemp()
@@ -47,7 +42,7 @@ def test_security_plain():
 
   try:
     xml = hbase_site_xml()
-    open_file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
+    open(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
     reset()
 
     assert 'NOSASL' == get_server_authentication()
@@ -69,7 +64,7 @@ def test_security_kerberos():
 
   try:
     xml = hbase_site_xml(authentication='kerberos')
-    open_file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
+    open(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
     reset()
 
     assert 'KERBEROS' == get_server_authentication()

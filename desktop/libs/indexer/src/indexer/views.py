@@ -29,10 +29,7 @@ from indexer.file_format import get_file_indexable_format_types
 from indexer.management.commands import indexer_setup
 from indexer.indexers.morphline_operations import OPERATORS
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

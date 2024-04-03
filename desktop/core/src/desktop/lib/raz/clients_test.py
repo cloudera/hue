@@ -22,10 +22,7 @@ from django.test import TestCase
 from desktop.conf import RAZ
 from desktop.lib.raz.clients import S3RazClient, AdlsRazClient
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 class S3RazClientLiveTest(TestCase):
 

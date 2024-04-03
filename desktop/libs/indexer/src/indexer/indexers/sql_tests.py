@@ -30,10 +30,7 @@ from beeswax.server import dbms
 from indexer.indexers.sql import SQLIndexer
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 def mock_uuid():
   return '52f840a8-3dde-434d-934a-2d6e06f3687e'

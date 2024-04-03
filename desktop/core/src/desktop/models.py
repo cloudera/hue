@@ -15,16 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next
-from builtins import object
 import calendar
 import json
 import logging
 import os
-import sys
 import uuid
 
 from collections import OrderedDict
@@ -64,12 +58,8 @@ from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH, HUE_DESKTOP_VERSION
 
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
-if sys.version_info[0] > 2:
-  from urllib.parse import quote as urllib_quote
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from urllib import quote as urllib_quote
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from urllib.parse import quote as urllib_quote
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 
 LOG = logging.getLogger()

@@ -23,14 +23,11 @@ import sys
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.models import Document2
-from useradmin.models import User, install_sample_user
+from useradmin.models import User
 
 from beeswax.management.commands.beeswax_install_examples import SampleTable, Command, SampleQuery
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch
 
 
 LOG = logging.getLogger()

@@ -15,12 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import base64
 import json
 import logging
 import struct
-import sys
 
 from django.http import Http404
 from django.views.decorators.http import require_POST
@@ -38,12 +35,9 @@ from metadata.optimizer.base import get_api
 from metadata.optimizer.optimizer_client import NavOptException, _get_table_name, _clean_query
 from metadata.conf import OPTIMIZER
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from base64 import decodebytes
-else:
-  from django.utils.translation import ugettext as _
-  from base64 import decodestring as decodebytes
+from django.utils.translation import gettext as _
+from base64 import decodebytes
+
 
 LOG = logging.getLogger()
 

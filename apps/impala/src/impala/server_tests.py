@@ -26,10 +26,7 @@ from useradmin.models import User
 
 from impala.server import ImpalaDaemonApi, _get_impala_server_url
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger()

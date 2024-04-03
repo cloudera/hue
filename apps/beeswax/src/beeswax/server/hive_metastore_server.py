@@ -15,11 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import logging
-import re
-import sys
-import thrift
 
 from django.utils.encoding import smart_str, force_unicode
 
@@ -36,10 +32,7 @@ from beeswax.server.hive_server2_lib import ResultCompatible
 from beeswax.models import HiveServerQueryHandle, QueryHistory
 from beeswax.server.dbms import Table, DataTable
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -103,7 +96,6 @@ class HiveDataTable(DataTable):
 
     for row in self.results.data:
       yield parse_result_row(row)
-
 
 
 class HiveMetastoreClient(object):

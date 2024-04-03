@@ -31,10 +31,7 @@ from desktop.models import Document as Doc, SAMPLE_USER_ID
 from hadoop.fs.hadoopfs import Hdfs
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 class Document(models.Model):
   owner = models.ForeignKey(

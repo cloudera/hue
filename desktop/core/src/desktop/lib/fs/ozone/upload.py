@@ -26,10 +26,7 @@ from desktop.lib.fsmanager import get_client
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.utils import generate_chunks, calculate_total_size

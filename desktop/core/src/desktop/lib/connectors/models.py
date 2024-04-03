@@ -30,10 +30,7 @@ from desktop.lib.connectors.types import get_connectors_types
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 
 LOG = logging.getLogger()

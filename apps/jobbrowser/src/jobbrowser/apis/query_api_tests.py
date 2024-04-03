@@ -32,10 +32,7 @@ from useradmin.models import User
 from jobbrowser.apis.query_api import QueryApi
 from jobbrowser.apis.query_api import _convert_to_6_digit_ms_local_time
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 LOG = logging.getLogger()

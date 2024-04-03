@@ -17,7 +17,6 @@
 
 import datetime
 import logging
-import sys
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_backends
@@ -31,10 +30,7 @@ from useradmin.hue_password_policy import hue_get_password_validators
 
 from desktop.auth.backend import is_admin
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 if conf.ENABLE_ORGANIZATIONS.get():
   from useradmin.models import User
@@ -206,9 +202,7 @@ class LdapAuthenticationForm(AuthenticationForm):
     self.error_messages['invalid_login'] = _t("Invalid username or password, or your LDAP groups not allowed")
 
   def authenticate(self):
-    request = None
-    if sys.version_info[0] > 2:
-      request = self.request
+    request = self.request
     username = self.cleaned_data.get('username') or ''
     password = self.cleaned_data.get('password')
     server = self.cleaned_data.get('server')

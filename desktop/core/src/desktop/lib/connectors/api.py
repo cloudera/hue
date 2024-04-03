@@ -30,10 +30,7 @@ from desktop.lib.connectors.models import _get_installed_connectors, get_connect
     _augment_connector_properties
 from desktop.lib.connectors.types import get_connectors_types, get_connector_categories, get_connector_by_type
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 

@@ -16,18 +16,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-import sys
-
 from openpyxl import load_workbook
 
 from desktop.lib.export_csvxls import create_generator, make_response
 
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import BytesIO as string_io
+
 
 def content_generator(header, data):
   yield header, data

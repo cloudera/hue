@@ -31,10 +31,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User, update_app_permissions, get_default_user_group, Connector
 from useradmin.permissions import HuePermission, GroupPermission
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 @pytest.mark.django_db

@@ -30,10 +30,7 @@ from desktop.conf import CUSTOM
 from desktop.api_public import get_django_request
 from desktop.lib.django_test_util import Client, make_logged_in_client
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 @pytest.mark.django_db

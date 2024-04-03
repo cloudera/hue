@@ -23,15 +23,11 @@ import codecs
 import logging
 import os
 import re
-import sys
 
 import desktop.conf
 import django.utils.encoding
 
-if sys.version_info[0] > 2:
-  from django.utils.encoding import smart_str as django_smart_unicode
-else:
-  from django.utils.encoding import smart_text as django_smart_unicode
+from django.utils.encoding import smart_str
 
 SITE_ENCODING = None
 REPLACEMENT_CHAR = u'\ufffd'
@@ -67,7 +63,7 @@ def smart_unicode(s, strings_only=False, errors='strict', encoding=None):
   For py3 -> this is becoming a 'string' now (no more 'unicode' in py3).
   """
 
-  return django_smart_unicode(
+  return smart_str(
     s, encoding if encoding is not None else get_site_encoding(), strings_only, errors)
 
 def force_unicode(s, strings_only=False, errors='strict'):
@@ -75,10 +71,7 @@ def force_unicode(s, strings_only=False, errors='strict'):
   Wrapper around Django's version, while supplying our configured encoding.
   Decode char array to unicode.
   """
-  if sys.version_info[0] > 2:
-    return django.utils.encoding.force_str(s, get_site_encoding(), strings_only, errors)
-  else:
-    return django.utils.encoding.force_unicode(s, get_site_encoding(), strings_only, errors)
+  return django.utils.encoding.force_str(s, get_site_encoding(), strings_only, errors)
 
 def smart_str(s, strings_only=False, errors='strict'):
   """

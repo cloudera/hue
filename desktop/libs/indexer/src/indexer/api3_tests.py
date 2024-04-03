@@ -23,12 +23,9 @@ from django.core.files.uploadhandler import InMemoryUploadedFile
 from desktop.settings import BASE_DIR
 from indexer.api3 import upload_local_file, guess_field_types, guess_format
 
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from urllib import unquote as urllib_unquote
-  from mock import patch, Mock, MagicMock
+from urllib.parse import unquote as urllib_unquote
+from unittest.mock import patch, Mock
+
 
 
 def test_xlsx_local_file_upload():

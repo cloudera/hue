@@ -58,14 +58,10 @@ from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format
 from oozie.timezones import TIMEZONES
 
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-  from django.utils.encoding import force_str
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from cStringIO import StringIO as string_io
-  from django.utils.encoding import force_unicode as force_str
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from io import BytesIO as string_io
+from django.utils.encoding import force_str
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
 
 
 LOG = logging.getLogger()

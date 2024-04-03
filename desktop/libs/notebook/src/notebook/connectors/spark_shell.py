@@ -35,10 +35,7 @@ from desktop.auth.backend import rewrite_user
 from notebook.data_export import download as spark_download
 from notebook.connectors.base import Api, QueryError, SessionExpired, _get_snippet_session
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

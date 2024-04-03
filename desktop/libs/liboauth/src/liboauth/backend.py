@@ -44,12 +44,8 @@ except ImportError:
   LOG.warning('oauth2 module not found')
   oauth = None
 
-if sys.version_info[0] > 2:
-  from urllib.parse import urlencode as lib_urlencode
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import urlencode as lib_urlencode
+from urllib.parse import urlencode as lib_urlencode
+from django.utils.translation import gettext as _
 
 
 class OAuthBackend(DesktopBackendBase):

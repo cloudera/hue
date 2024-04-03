@@ -42,10 +42,7 @@ from notebook.decorators import check_editor_access_permission, check_document_a
 from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook, _get_editor_type, get_api, _get_dialect_example
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 

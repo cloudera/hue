@@ -15,15 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range
 import unittest
 import logging
 import pytest
 import random
-import sys
 import subprocess
 
 from filebrowser.lib import xxd
@@ -31,10 +26,8 @@ from filebrowser.lib import xxd
 from django.test import TestCase
 from subprocess import Popen, PIPE
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import StringIO as string_io
+
 
 LOG = logging.getLogger()
 

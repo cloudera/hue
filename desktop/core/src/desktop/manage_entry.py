@@ -86,10 +86,7 @@ def entry():
   if len(sys.argv) > 1:
     subcommand = sys.argv[1]
 
-  if sys.version_info[0] < 3:
-    args = [None]
-  else:
-    args = []
+  args = []
   parser = CommandParser(*args, usage="%(prog)s subcommand [options] [args]", add_help=False)
   parser.parse_known_args(sys.argv[2:])
 
@@ -105,12 +102,9 @@ def entry():
 
   # CM managed configure env vars
   if cm_managed:
-    if sys.version_info[0] > 2:
-      from configparser import NoOptionError, RawConfigParser
-    else:
-      from ConfigParser import NoOptionError, RawConfigParser
+    from configparser import NoOptionError, RawConfigParser
 
-    config = RawConfigParser(strict=False) if sys.version_info[0] > 2 else RawConfigParser()
+    config = RawConfigParser(strict=False)
     config.read(cm_config_file)
     try:
       cm_agent_run_dir = config.get('General', 'agent_wide_credential_cache_location')
@@ -190,7 +184,7 @@ def entry():
         for line in iter(locate_java.stdout.readline, b''):
           if b'JAVA_HOME' in line:
             JAVA_HOME = line.rstrip().split(b'=')[1]
-            if sys.version_info[0] > 2 and type(JAVA_HOME) == bytes:
+            if type(JAVA_HOME) == bytes:
               JAVA_HOME = JAVA_HOME.decode("utf-8")
 
       if JAVA_HOME != "UNKNOWN":

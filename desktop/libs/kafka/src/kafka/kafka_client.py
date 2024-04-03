@@ -30,10 +30,7 @@ from desktop.lib.i18n import smart_unicode
 from kafka.conf import KAFKA
 from libzookeeper.conf import zkensemble
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

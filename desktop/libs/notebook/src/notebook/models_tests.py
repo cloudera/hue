@@ -28,10 +28,7 @@ from useradmin.models import User
 from notebook.conf import EXAMPLES
 from notebook.models import install_custom_examples, Analytics
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger()

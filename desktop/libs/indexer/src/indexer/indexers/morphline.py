@@ -35,10 +35,7 @@ from indexer.file_format import get_file_format_instance, get_file_format_class
 from indexer.indexers.morphline_operations import get_checked_args
 from indexer.solr_client import SolrClient
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

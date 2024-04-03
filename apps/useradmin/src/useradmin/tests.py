@@ -56,10 +56,7 @@ from useradmin.middleware import ConcurrentUserSessionMiddleware
 from useradmin.models import HuePermission, GroupPermission, UserProfile, get_profile, get_default_user_group, User, Group
 from useradmin.hue_password_policy import reset_password_policy
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 class MockRequest(dict):
   pass
@@ -1227,12 +1224,10 @@ class TestUserAdmin(BaseUserAdminTests):
         language="en-us><script>alert('Hacked')</script>"
         )
     )
-    if sys.version_info[0] < 3:
-      assert (b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; '\
-        b'is not one of the available choices.' in response.content)
-    else:
-      assert (b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; '\
-        b'is not one of the available choices.' in response.content)
+    assert (
+      b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; '\
+      b'is not one of the available choices.' in response.content
+    )
     # Hue 4 Admin
     response = edit_user.post('/useradmin/users/edit/admin', dict(
         username="admin",
@@ -1254,12 +1249,10 @@ class TestUserAdmin(BaseUserAdminTests):
         language="en-us><script>alert('Hacked')</script>"
         )
     )
-    if sys.version_info[0] < 3:
-      assert (b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; '\
-        b'is not one of the available choices.' in response.content)
-    else:
-      assert (b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; '\
-        b'is not one of the available choices.' in response.content)
+    assert (
+      b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; '\
+      b'is not one of the available choices.' in response.content
+    )
     # Hue 4, User with access to useradmin app
     response = edit_user.post('/useradmin/users/edit/edit_user', dict(
         username="edit_user",

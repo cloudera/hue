@@ -15,18 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-from __future__ import division
-from builtins import str
-from builtins import range
-from builtins import object
 import csv
 import gzip
 import json
 import logging
 import math
 import re
-import sys
 
 from django.urls import reverse
 from django.http import QueryDict
@@ -49,10 +43,7 @@ from beeswax.server import dbms
 from beeswax.server.dbms import QueryServerException
 from beeswax.views import execute_directly
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

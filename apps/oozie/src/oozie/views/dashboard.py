@@ -61,10 +61,7 @@ from oozie.utils import convert_to_server_timezone
 
 from desktop.auth.backend import is_admin
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 def get_history():
   if ENABLE_V2.get():

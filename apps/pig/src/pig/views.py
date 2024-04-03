@@ -40,10 +40,7 @@ from pig.management.commands import pig_setup
 from pig.models import get_workflow_output, hdfs_link, PigScript,\
   create_or_update_script, get_scripts
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

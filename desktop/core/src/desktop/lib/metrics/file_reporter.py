@@ -47,7 +47,7 @@ class FileReporter(Reporter):
     # rename the file to the real location.
 
     f = tempfile.NamedTemporaryFile(
-        mode='w' if sys.version_info[0] > 2 else 'w+b',
+        mode='w',
         dir=dirname,
         delete=False)
 

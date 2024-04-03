@@ -32,10 +32,7 @@ from notebook.connectors.base import AuthenticationRequired
 from notebook.connectors.sql_alchemy import SqlAlchemyApi, Assist
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger()

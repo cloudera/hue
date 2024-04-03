@@ -37,10 +37,7 @@ from oozie.models import Workflow, Node, Start, End, Kill,\
 from oozie.decorators import check_job_access_permission, check_job_edition_permission
 from oozie.utils import model_to_dict, format_dict_field_values, format_field_value
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 

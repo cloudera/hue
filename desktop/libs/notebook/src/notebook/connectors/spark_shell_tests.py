@@ -25,10 +25,7 @@ from useradmin.models import User
 
 from notebook.connectors.spark_shell import SparkApi
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 @pytest.mark.django_db

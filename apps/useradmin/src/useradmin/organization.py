@@ -26,10 +26,7 @@ from django.utils.functional import SimpleLazyObject
 
 from desktop.conf import ENABLE_ORGANIZATIONS
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 
 LOG = logging.getLogger()

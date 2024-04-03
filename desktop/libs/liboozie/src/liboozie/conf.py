@@ -23,10 +23,7 @@ from desktop import appmanager
 from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool, validate_path
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 
 LOG = logging.getLogger()

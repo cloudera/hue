@@ -16,8 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-from builtins import next, map, str, chr, range, object
 import gzip
 import json
 import logging
@@ -27,11 +25,11 @@ import re
 import shutil
 import socket
 import string
-import sys
 import tempfile
 import threading
 import pytest
 import hadoop
+import sys
 
 from django.test import TestCase
 from django.utils.encoding import smart_str
@@ -79,16 +77,6 @@ from beeswax.server.hive_server2_lib import HiveServerClient, PartitionKeyCompat
 from beeswax.test_base import BeeswaxSampleProvider, is_hive_on_spark, get_available_execution_engines
 from beeswax.hive_site import get_metastore, hiveserver2_jdbc_url
 
-standard_library.install_aliases()
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-  from io import BytesIO as string_io
-  open_file = open
-else:
-  from mock import patch, Mock
-  from cStringIO import StringIO as string_io
-  open_file = file
 
 LOG = logging.getLogger()
 
@@ -433,7 +421,7 @@ for x in sys.stdin:
     # BeeswaxTest.jar is gone
     pytest.skip("Skipping Test")
 
-    src = open_file(os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "BeeswaxTest.jar"))
+    src = open(os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "BeeswaxTest.jar"))
     udf = self.cluster.fs_prefix + "hive1157.jar"
     dest = self.cluster.fs.open(udf, "w")
     shutil.copyfileobj(src, dest)
@@ -2102,10 +2090,7 @@ for x in sys.stdin:
 def test_import_gzip_reader():
   """Test the gzip reader in create table"""
   # Make gzipped data
-  if sys.version_info[0] > 2:
-    data = open(__file__, encoding='utf-8').read()
-  else:
-    data = file(__file__).read()
+  data = open(__file__, encoding='utf-8').read()
   data_gz_sio = string_io()
   gz = gzip.GzipFile(fileobj=data_gz_sio, mode='wb')
   gz_data = data
@@ -2247,7 +2232,7 @@ def test_hive_site():
         return tmpdir
 
     xml = hive_site_xml(is_local=True, use_sasl=False)
-    open_file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+    open(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
     saved = beeswax.conf.HIVE_CONF_DIR
@@ -2278,7 +2263,7 @@ def test_hive_site_host_pattern_local_host():
       is_local=False, use_sasl=False, thrift_uris=thrift_uris, kerberos_principal='test/_HOST@TEST.COM',
       hs2_kerberos_principal='test/_HOST@TEST.COM'
     )
-    open_file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+    open(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
     saved = beeswax.conf.HIVE_CONF_DIR
@@ -2309,7 +2294,7 @@ def test_hive_site_null_hs2krb():
         return tmpdir
 
     xml = hive_site_xml(is_local=True, use_sasl=False, hs2_kerberos_principal=None)
-    open_file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+    open(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
     saved = beeswax.conf.HIVE_CONF_DIR
@@ -2876,12 +2861,8 @@ class TestWithMockedServer(object):
 
   def test_get_history_xss(self):
     sql = 'SELECT count(sample_07.salary) FROM sample_07;"><iFrAME>src="javascript:alert(\'Hue has an xss\');"></iFraME>'
-    if sys.version_info[0] < 3:
-      sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;'\
-        b'src=&quot;javascript:alert(&#39;Hue has an xss&#39;);&quot;&gt;&lt;/iFraME&gt;'
-    else:
-      sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;'\
-        b'src=&quot;javascript:alert(&#x27;Hue has an xss&#x27;);&quot;&gt;&lt;/iFraME&gt;'
+    sql_escaped = b'SELECT count(sample_07.salary) FROM sample_07;&quot;&gt;&lt;iFrAME&gt;'\
+      b'src=&quot;javascript:alert(&#x27;Hue has an xss&#x27;);&quot;&gt;&lt;/iFraME&gt;'
 
     response = _make_query(self.client, sql, submission_type='Save', name='My Name 1', desc='My Description')
     content = json.loads(response.content)
@@ -3157,7 +3138,7 @@ def test_metastore_security():
         return tmpdir
 
     xml = hive_site_xml(is_local=False, use_sasl=True, kerberos_principal='hive/_HOST@test.com')
-    open_file(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
+    open(os.path.join(tmpdir, 'hive-site.xml'), 'w').write(xml)
 
     beeswax.hive_site.reset()
     saved = beeswax.conf.HIVE_CONF_DIR

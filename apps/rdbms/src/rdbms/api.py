@@ -39,10 +39,7 @@ from beeswax.views import authorized_get_query_history, safe_get_design
 from rdbms.forms import SQLForm
 from rdbms.views import save_design
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

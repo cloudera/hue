@@ -31,10 +31,7 @@ from desktop.models import Document2
 
 from useradmin.models import User, Group, Organization, HuePermission
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 LOG = logging.getLogger()

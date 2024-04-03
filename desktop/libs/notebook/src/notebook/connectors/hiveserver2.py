@@ -15,17 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next, object
 import binascii
 import copy
 import json
 import logging
 import re
-import struct
-import sys
 
 from django.urls import reverse
 
@@ -44,12 +38,9 @@ from desktop.models import DefaultConfiguration, Document2
 from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook, \
     get_interpreter, patch_snippet_for_connector
 
-if sys.version_info[0] > 2:
-  from urllib.parse import quote as urllib_quote, unquote as urllib_unquote
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import quote as urllib_quote, unquote as urllib_unquote
+from urllib.parse import quote as urllib_quote, unquote as urllib_unquote
+from django.utils.translation import gettext as _
+
 
 LOG = logging.getLogger()
 
@@ -337,9 +328,9 @@ class HS2Api(Api):
 
     # All good
     server_id, server_guid = handle.get()
-    if sys.version_info[0] > 2:
-      server_id = server_id.decode('utf-8')
-      server_guid = server_guid.decode('utf-8')
+
+    server_id = server_id.decode('utf-8')
+    server_guid = server_guid.decode('utf-8')
 
     response = {
       'secret': server_id,

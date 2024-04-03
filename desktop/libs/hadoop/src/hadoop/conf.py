@@ -23,10 +23,7 @@ import sys
 from desktop.conf import default_ssl_validate, has_connectors
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 
 LOG = logging.getLogger()

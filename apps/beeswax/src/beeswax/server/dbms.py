@@ -15,10 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import logging
 import re
-import sys
 import threading
 import time
 import json
@@ -28,12 +26,11 @@ from django.urls import reverse
 from kazoo.client import KazooClient
 
 from beeswax.models import Compute
-from desktop.conf import CLUSTER_ID, has_connectors
+from desktop.conf import has_connectors
 from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
 from desktop.lib.view_util import location_to_url
-from desktop.models import Cluster
 from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 from indexer.file_format import HiveFormat
 from libzookeeper import conf as libzookeeper_conf
@@ -51,16 +48,9 @@ from beeswax.hive_site import hiveserver2_use_ssl, hiveserver2_impersonation_ena
     hiveserver2_transport_mode, hiveserver2_thrift_http_path
 from beeswax.models import QueryHistory, QUERY_TYPES
 
+from django.utils.encoding import force_str
+from django.utils.translation import gettext as _
 
-if sys.version_info[0] > 2:
-  from django.utils.encoding import force_str
-else:
-  from django.utils.encoding import force_unicode as force_str
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger()
 

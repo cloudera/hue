@@ -15,14 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import range
-from builtins import object
 import ast
 import base64
 import datetime
 import json
 import logging
-import sys
 
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -39,10 +36,7 @@ from useradmin.models import User, UserProfile
 
 from beeswax.design import HQLdesign
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 
 LOG = logging.getLogger()
@@ -485,7 +479,7 @@ class Session(models.Model):
   def get_adjusted_guid_secret(self):
     secret = self.secret
     guid = self.guid
-    if sys.version_info[0] > 2 and not isinstance(self.secret, bytes) and not isinstance(self.guid, bytes):
+    if not isinstance(self.secret, bytes) and not isinstance(self.guid, bytes):
       # only for py3, after bytes saved, bytes wrapped in a string object
       try:
         secret = ast.literal_eval(secret)
@@ -556,16 +550,10 @@ class HiveServerQueryHandle(QueryHandle):
 
   @classmethod
   def get_decoded(cls, secret, guid):
-    if sys.version_info[0] > 2:
-      return base64.b64decode(secret), base64.b64decode(guid)
-    else:
-      return base64.decodestring(secret), base64.decodestring(guid)
+    return base64.b64decode(secret), base64.b64decode(guid)
 
   def get_encoded(self):
-    if sys.version_info[0] > 2:
-      return base64.b64encode(self.secret), base64.b64encode(self.guid)
-    else:
-      return base64.encodestring(self.secret), base64.encodestring(self.guid)
+    return base64.b64encode(self.secret), base64.b64encode(self.guid)
 
 
 # Deprecated. Could be removed.

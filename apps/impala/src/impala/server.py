@@ -32,10 +32,7 @@ from ImpalaService import ImpalaHiveServer2Service
 from impala.impala_flags import get_webserver_certificate_file, is_webserver_spnego_enabled, is_kerberos_enabled
 from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD, DAEMON_API_PASSWORD_SCRIPT, DAEMON_API_AUTH_SCHEME, COORDINATOR_URL
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 

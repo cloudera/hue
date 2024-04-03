@@ -33,12 +33,8 @@ from desktop.lib.i18n import smart_unicode
 from metadata.conf import MANAGER, get_navigator_auth_username, get_navigator_auth_password
 
 
-if sys.version_info[0] > 2:
-  from urllib.parse import quote as urllib_quote
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import quote as urllib_quote
+from urllib.parse import quote as urllib_quote
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 VERSION = 'v19'

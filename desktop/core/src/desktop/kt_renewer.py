@@ -48,9 +48,8 @@ def renew_from_kt():
       subp_stdout = subp.stdout.readlines()
       subp_stderr = subp.stderr.readlines()
 
-      if sys.version_info[0] > 2:
-        subp_stdout = [line.decode() for line in subp.stdout.readlines()]
-        subp_stderr = [line.decode() for line in subp.stderr.readlines()]
+      subp_stdout = [line.decode() for line in subp.stdout.readlines()]
+      subp_stderr = [line.decode() for line in subp.stderr.readlines()]
 
       LOG.error("Couldn't reinit from keytab! `kinit' exited with %s.\n%s\n%s" % (
                 subp.returncode, "\n".join(subp_stdout), "\n".join(subp_stderr)))
@@ -99,14 +98,9 @@ def detect_conf_var():
   try:
     # TODO: the binary check for X-CACHECONF seems fragile, it should be replaced
     # with something more robust.
-    if sys.version_info[0] > 2:
-      f = open(CONF.CCACHE_PATH.get(), "rb")
-      data = f.read()
-      return b"X-CACHECONF:" in data
-    else:
-      f = file(CONF.CCACHE_PATH.get(), "rb")
-      data = f.read()
-      return "X-CACHECONF:" in data
+    f = open(CONF.CCACHE_PATH.get(), "rb")
+    data = f.read()
+    return b"X-CACHECONF:" in data
   finally:
     f.close()
 

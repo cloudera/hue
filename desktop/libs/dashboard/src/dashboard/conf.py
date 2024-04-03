@@ -22,10 +22,7 @@ from desktop.appmanager import get_apps_dict
 
 from notebook.conf import get_ordered_interpreters
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 
 def is_enabled():

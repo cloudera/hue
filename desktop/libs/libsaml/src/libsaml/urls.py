@@ -18,10 +18,7 @@
 import logging
 import sys
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from django.urls import re_path
 
 LOG = logging.getLogger()
 

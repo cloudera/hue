@@ -23,10 +23,7 @@ from desktop.lib.idbroker import conf as conf_idbroker
 
 from hadoop import core_site
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 LOG = logging.getLogger()
 

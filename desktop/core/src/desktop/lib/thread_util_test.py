@@ -23,10 +23,7 @@ import time
 
 from desktop.lib.thread_util import dump_traceback
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import StringIO as string_io
 
 def test_dump_traceback():
   started = threading.Event()

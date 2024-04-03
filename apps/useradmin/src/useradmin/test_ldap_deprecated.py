@@ -36,10 +36,7 @@ from useradmin.views import sync_ldap_users, sync_ldap_groups, import_ldap_users
 from useradmin import ldap_access
 from useradmin.tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 @pytest.mark.django_db

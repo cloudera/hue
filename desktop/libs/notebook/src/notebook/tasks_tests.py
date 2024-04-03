@@ -28,10 +28,7 @@ from useradmin.models import User
 from notebook.connectors.sql_alchemy import SqlAlchemyApi
 from notebook.tasks import run_sync_query, download_to_file, close_statement, get_log
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger()

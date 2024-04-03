@@ -46,12 +46,9 @@ import pwd
 import re
 import shutil
 import stat
-import sys
 
-if sys.version_info[0] > 2:
-  from builtins import open as builtins_open
-else:
-  from __builtin__ import open as builtins_open
+from builtins import open as builtins_open
+
 
 SEEK_SET, SEEK_CUR, SEEK_END = os.SEEK_SET, os.SEEK_CUR, os.SEEK_END
 
@@ -172,7 +169,7 @@ class LocalSubFileSystem(object):
       for i in groups:
         newargs[i] = grp.getgrnam(newargs[i]).gr_gid
 
-      if f == builtins_open and sys.version_info[0] > 2:
+      if f == builtins_open:
         return f(*newargs, encoding='utf-8')
 
       return f(*newargs)

@@ -25,10 +25,7 @@ from useradmin.models import User
 
 from desktop.models import Document2
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 LOG = logging.getLogger()

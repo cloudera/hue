@@ -16,10 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import datetime
 import pytest
-import sys
 
 from django.http import HttpResponse, HttpResponseRedirect
 
@@ -30,8 +28,6 @@ configure_django_for_test()
 from desktop.lib import django_util, exceptions
 from django.db import models
 
-if sys.version_info[0] > 2:
-  unichr = chr
 
 class TestModel(models.Model):
   class Meta(object):

@@ -14,10 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import division
-from builtins import zip
-from builtins import range
-from builtins import object
+
 from functools import reduce
 import copy
 import glob
@@ -26,8 +23,6 @@ import logging
 import math
 import os
 import re
-import types
-import sys
 import struct
 
 from dateutil.parser import parse as dtparse
@@ -37,11 +32,6 @@ from libanalyze import models
 from libanalyze import exprs
 from libanalyze import utils
 from libanalyze.utils import Timer
-
-if sys.version_info[0] > 2:
-  string_types = str
-else:
-  string_types = types.StringTypes
 
 
 LOG = logging.getLogger()
@@ -70,7 +60,7 @@ class SQLOperatorReason(object):
     def __init__(self, node_name, metric_names,
                  rule, exprs=[], to_json=True, **kwargs):
         self.node_name = node_name
-        if isinstance(metric_names, string_types):
+        if isinstance(metric_names, str):
             self.metric_names = [metric_names]
         else:
             self.metric_names = metric_names

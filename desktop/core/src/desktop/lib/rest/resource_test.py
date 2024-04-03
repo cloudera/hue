@@ -23,17 +23,12 @@ from desktop.lib.i18n import smart_unicode, smart_str
 from desktop.lib.rest.resource import Resource
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 def test_concat_unicode_with_ascii_python2():
   try:
     u'The currency is: %s' % '€'
-    if sys.version_info[0] == 2:
-      raise Exception('Should have failed.')
   except UnicodeDecodeError:
     pass
 
@@ -42,15 +37,11 @@ def test_concat_unicode_with_ascii_python2():
 
   try:
     u'%s' % '/user/domain/Джейкоб'
-    if sys.version_info[0] == 2:
-      raise Exception('Should have failed.')
   except UnicodeDecodeError:
     pass
 
   try:
     u'%s' % smart_str('/user/domain/Джейкоб')
-    if sys.version_info[0] == 2:
-      raise Exception('Should have failed.')
   except UnicodeDecodeError:
     pass
 

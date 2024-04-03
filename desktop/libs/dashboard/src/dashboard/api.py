@@ -15,11 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import filter
 import hashlib
 import json
 import logging
-import sys
 import uuid
 
 from desktop.conf import ENABLE_DOWNLOAD
@@ -31,8 +29,6 @@ from desktop.views import serve_403_error
 
 from libsolr.api import SolrApi
 
-from notebook.connectors.base import get_api
-from notebook.dashboard_api import MockRequest
 from search.conf import SOLR_URL
 
 from dashboard.conf import get_engines, USE_GRIDSTER
@@ -44,12 +40,9 @@ from dashboard.facet_builder import _guess_gap, _zoom_range_facet, _new_range_fa
 from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception,\
   NESTED_FACET_FORM, COMPARE_FACET, QUERY_FACET, extract_solr_exception_message
 
-if sys.version_info[0] > 2:
-  from django.utils.encoding import force_str
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.encoding import force_unicode as force_str
-  from django.utils.translation import ugettext as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext as _
+
 
 LOG = logging.getLogger()
 

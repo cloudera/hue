@@ -17,7 +17,6 @@
 
 import sys
 
-from builtins import chr
 from django import forms
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.forms import NumberInput
@@ -29,10 +28,7 @@ from filebrowser.forms import PathField
 from beeswax import common
 from beeswax.models import SavedQuery
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 
 class QueryForm(MultiForm):

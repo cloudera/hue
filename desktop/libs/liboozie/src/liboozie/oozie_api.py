@@ -178,8 +178,8 @@ class OozieApi(object):
     params = self._get_params()
     params['show'] = 'definition'
     job_def = self._root.get('job/%s' % (jobid,), params)
-    if sys.version_info[0] > 2:
-      job_def = job_def.decode()
+    job_def = job_def.decode()
+
     return job_def
 
 
@@ -199,8 +199,8 @@ class OozieApi(object):
       filter_list.append('%s=%s' % (key, val))
     params['logfilter'] = ';'.join(filter_list)
     log = self._root.get('job/%s' % (jobid,), params)
-    if sys.version_info[0] > 2:
-      log = log.decode()
+    log = log.decode()
+
     return log
 
 
@@ -247,8 +247,7 @@ class OozieApi(object):
       params.update(parameters)
 
     resp = self._root.put('job/%s' % jobid, params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
-    if sys.version_info[0] > 2:
-      resp = resp.decode()
+    resp = resp.decode()
 
     return resp
 

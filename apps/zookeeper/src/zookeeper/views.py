@@ -36,10 +36,7 @@ from zookeeper.utils import get_cluster_or_404
 
 from desktop.auth.backend import is_admin
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 def _get_global_overview():

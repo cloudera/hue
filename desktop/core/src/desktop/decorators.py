@@ -23,10 +23,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 try:
   from functools import wraps

@@ -32,10 +32,7 @@ from useradmin.models import User
 
 from metadata.optimizer_api import _convert_queries
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 LOG = logging.getLogger()

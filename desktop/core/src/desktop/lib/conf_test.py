@@ -15,21 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 import configobj
 import logging
 import pytest
 import re
-import sys
 
 from desktop.lib.conf import *
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import StringIO as string_io
+
 
 def my_dynamic_default():
   """

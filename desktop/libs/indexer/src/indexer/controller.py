@@ -36,10 +36,7 @@ from indexer.conf import CORE_INSTANCE_DIR
 from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
 from indexer.solr_client import SolrClient
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

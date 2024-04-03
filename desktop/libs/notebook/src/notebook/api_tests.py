@@ -45,10 +45,7 @@ from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 @pytest.mark.django_db

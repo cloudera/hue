@@ -29,10 +29,7 @@ from rest_framework import exceptions
 from useradmin.models import User
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 @pytest.mark.django_db

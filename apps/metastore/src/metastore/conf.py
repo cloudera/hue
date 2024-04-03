@@ -19,10 +19,7 @@ import sys
 
 from desktop.lib.conf import Config
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 ENABLE_NEW_CREATE_TABLE = Config(

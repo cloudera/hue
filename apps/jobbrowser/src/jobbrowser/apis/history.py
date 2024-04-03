@@ -28,10 +28,7 @@ from notebook.models import Notebook
 from jobbrowser.apis.base_api import Api
 from jobbrowser.conf import MAX_JOB_FETCH
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

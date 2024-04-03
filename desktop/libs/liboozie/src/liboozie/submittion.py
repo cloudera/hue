@@ -35,10 +35,7 @@ from liboozie.oozie_api import get_oozie
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR
 from liboozie.credentials import Credentials
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 

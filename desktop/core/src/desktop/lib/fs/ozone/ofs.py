@@ -22,12 +22,9 @@ import errno
 import logging
 import posixpath
 import stat
-import sys
-import threading
 
 from django.utils.encoding import smart_str
 
-from desktop.lib.rest import http_client, resource
 from desktop.lib.fs.ozone import OFS_ROOT, normpath, is_root, parent_path, _serviceid_join, join as ofs_join
 from desktop.lib.fs.ozone.ofsstat import OzoneFSStat
 from desktop.conf import PERMISSION_ACTION_OFS
@@ -36,12 +33,8 @@ from hadoop.fs.exceptions import WebHdfsException
 from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.webhdfs import WebHdfs
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from urllib.parse import urlparse as lib_urlparse
-else:
-  from django.utils.translation import ugettext as _
-  from urlparse import urlparse as lib_urlparse
+from django.utils.translation import gettext as _
+from urllib.parse import urlparse as lib_urlparse
 
 
 LOG = logging.getLogger()

@@ -15,13 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
 import base64
 import json
 import logging
 import re
-import sys
 import urllib.request, urllib.parse, urllib.error
 
 from desktop.auth.backend import is_admin
@@ -34,13 +31,8 @@ from hbase.api import HbaseApi
 from hbase.management.commands import hbase_setup
 from hbase.server.hbase_lib import get_thrift_type
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from django.utils.translation import gettext as _
-else:
-  from cStringIO import StringIO as string_io
-  from avro import datafile, io
-  from django.utils.translation import ugettext as _
+from io import StringIO as string_io
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

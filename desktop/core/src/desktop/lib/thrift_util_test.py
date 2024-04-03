@@ -14,9 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from builtins import range
-from builtins import object
 import logging
 import os
 import pytest
@@ -26,10 +23,7 @@ import threading
 import time
 import unittest
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 gen_py_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gen-py"))
 if not gen_py_path in sys.path:
@@ -224,38 +218,21 @@ class ThriftUtilTest(TestCase):
     assert struct1.myenumAsString == 'ENUM_ONE'
 
   def test_unpack_guid_secret_in_handle(self):
-    if sys.version_info[0] > 2:
-      hive_handle = ("(TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), catalogName=None,"
-      " schemaName='default', tableName='customers', tableTypes=None),"
-      ")") % (str(b'N\xc5\xed\x14k\xbeI\xda\xb9\x14\xe7\xf2\x9a\xb7\xf0\xa5'), str(b']s(\xb5\xf6ZO\x03\x99\x955\xacl\xb4\x98\xae'))
+    hive_handle = ("(TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), catalogName=None,"
+    " schemaName='default', tableName='customers', tableTypes=None),"
+    ")") % (str(b'N\xc5\xed\x14k\xbeI\xda\xb9\x14\xe7\xf2\x9a\xb7\xf0\xa5'), str(b']s(\xb5\xf6ZO\x03\x99\x955\xacl\xb4\x98\xae'))
 
-      assert (_unpack_guid_secret_in_handle(hive_handle) == ("(TGetTablesReq(sessionHandle=TSessionHandle(sessionId="
-      "THandleIdentifier(guid=da49be6b14edc54e:a5f0b79af2e714b9, secret=034f5af6b528735d:ae98b46cac359599)), catalogName=None, "
-      "schemaName=\'default\', tableName=\'customers\', tableTypes=None),)"))
+    assert (_unpack_guid_secret_in_handle(hive_handle) == ("(TGetTablesReq(sessionHandle=TSessionHandle(sessionId="
+    "THandleIdentifier(guid=da49be6b14edc54e:a5f0b79af2e714b9, secret=034f5af6b528735d:ae98b46cac359599)), catalogName=None, "
+    "schemaName=\'default\', tableName=\'customers\', tableTypes=None),)"))
 
-      impala_handle = ("(TExecuteStatementReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), "
-      "statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False)"
-      ",)") % (str(b'\xc4\xccnI\xf1\xbdJ\xc3\xb2\n\xd5[9\xe1Mr'), str(b'\xb0\x9d\xfd\x82\x94%L\xae\x9ch$f=\xfa{\xd0'))
+    impala_handle = ("(TExecuteStatementReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), "
+    "statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False)"
+    ",)") % (str(b'\xc4\xccnI\xf1\xbdJ\xc3\xb2\n\xd5[9\xe1Mr'), str(b'\xb0\x9d\xfd\x82\x94%L\xae\x9ch$f=\xfa{\xd0'))
 
-      assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TExecuteStatementReq(sessionHandle=TSessionHandle("
-      "sessionId=THandleIdentifier(guid=c34abdf1496eccc4:724de1395bd50ab2, secret=ae4c259482fd9db0:d07bfa3d6624689c)), "
-      "statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False),)"))
-    else:
-      hive_handle = ("(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle(sessionId=THandleIdentifier("
-      "secret=\'\x1aOYj\xf3\x86M\x95\xbb\xc8\xe9/;\xb0{9\', guid=\'\x86\xa6$\xb2\xb8\xdaF\xbd\xbd\xf5\xc5\xf4\xcb\x96\x03<\')), "
-      'runAsync=True, statement="SELECT \'Hello World!\'"),)')
-
-      assert (_unpack_guid_secret_in_handle(hive_handle) == ("(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle("
-      "sessionId=THandleIdentifier(secret=954d86f36a594f1a:397bb03b2fe9c8bb, guid=bd46dab8b224a686:3c0396cbf4c5f5bd)), runAsync=True, "
-      'statement="SELECT \'Hello World!\'"),)'))
-
-      impala_handle = ("(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret="
-      "\'\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0\', guid=\'\xfa\xb0/\x04 \xfeDX\x99\xfcq\xff2\x07\x02\xfe\')), "
-      "tableName=u\'customers\', tableTypes=None, catalogName=None),)")
-
-      assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TGetTablesReq(schemaName=u\'default\', sessionHandle="
-      "TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, guid=5844fe20042fb0fa:fe020732ff71fc99)),"
-      " tableName=u\'customers\', tableTypes=None, catalogName=None),)"))
+    assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TExecuteStatementReq(sessionHandle=TSessionHandle("
+    "sessionId=THandleIdentifier(guid=c34abdf1496eccc4:724de1395bd50ab2, secret=ae4c259482fd9db0:d07bfa3d6624689c)), "
+    "statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False),)"))
 
     # Following should be added to test, but fails because eval doesn't handle null bytes
     # impala_handle = ("(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret="

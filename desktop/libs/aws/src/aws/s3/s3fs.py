@@ -14,16 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
-from builtins import str
-from builtins import object
-import itertools
 import logging
 import os
 import posixpath
 import re
-import sys
 import time
 
 from boto.exception import BotoClientError, S3ResponseError
@@ -38,14 +32,9 @@ from aws.s3.s3stat import S3Stat
 
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
-  from django.utils.translation import gettext as _
-else:
-  from urllib import quote as urllib_quote
-  from urlparse import urlparse as lib_urlparse
-  from django.utils.translation import ugettext as _
+import urllib.request, urllib.error
+from urllib.parse import urlparse as lib_urlparse
+from django.utils.translation import gettext as _
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 BUCKET_NAME_PATTERN = re.compile(

@@ -15,10 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 import logging
 import logging.config
 import os
@@ -33,12 +29,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.log import formatter
 from desktop.log.formatter import MessageOnlyFormatter
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  open_file = open
-else:
-  from cStringIO import StringIO as string_io
-  open_file = file
+from io import StringIO as string_io
 
 DEFAULT_LOG_DIR = 'logs'
 LOG_FORMAT = '[%(asctime)s] %(module)-12s %(levelname)-8s %(message)s'
@@ -68,7 +59,7 @@ def _read_log_conf(proc_name, log_dir):
     return None
 
   try:
-    raw = open_file(log_conf).read()
+    raw = open(log_conf).read()
     sio = string_io(CONF_RE.sub(_repl, raw))
     return sio
   except IOError as ex:

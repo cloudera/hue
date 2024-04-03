@@ -16,15 +16,9 @@
 
 import boto
 import logging
-import requests
-import sys
-import xml.sax
 
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote, urlparse as lib_urlparse, parse_qs, urlencode
-else:
-  from urllib import unquote, urlencode
-  from urlparse import urlparse as lib_urlparse, parse_qs
+from urllib.parse import unquote, parse_qs, urlencode
+
 
 from boto.connection import HTTPRequest
 from boto.exception import BotoClientError

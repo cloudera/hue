@@ -15,19 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from hadoop import conf
 import logging
 import os
-import sys
 import tempfile
 
 from hadoop import hdfs_site
 
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
 
 LOG = logging.getLogger()
 
@@ -51,7 +44,7 @@ def test_hdfs_site():
   </property>
 </configuration>
     """
-    open_file(os.path.join(hadoop_home, 'hdfs-site.xml'), 'w').write(xml)
+    open(os.path.join(hadoop_home, 'hdfs-site.xml'), 'w').write(xml)
 
     finish = conf.HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.set_for_testing(hadoop_home)
     hdfs_site.reset()

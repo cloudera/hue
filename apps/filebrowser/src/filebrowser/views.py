@@ -15,15 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-
-from django.views.decorators.csrf import csrf_exempt
-from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
-from django.core.files.uploadhandler import FileUploadHandler, StopUpload, StopFutureHandlers
-from hadoop.conf import UPLOAD_CHUNK_SIZE
-
-from builtins import object
 import errno
 import logging
 import mimetypes
@@ -38,11 +29,13 @@ import urllib.request, urllib.error
 from bz2 import decompress
 from datetime import datetime
 
+from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+from django.core.files.uploadhandler import StopUpload
+
 from django.core.paginator import EmptyPage, Paginator, Page, InvalidPage
 from django.urls import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
-from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified,\
-    HttpResponseForbidden, HttpResponse, HttpResponseRedirect
+from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified, HttpResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 from django.shortcuts import redirect
@@ -54,7 +47,6 @@ from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import RAZ, ENABLE_NEW_STORAGE_BROWSER, TASK_SERVER
-from desktop.lib import fsmanager
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import render, format_preserving_redirect
@@ -71,17 +63,15 @@ from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_h
 from desktop.lib.view_util import is_ajax
 from desktop.views import serve_403_error
 from hadoop.core_site import get_trash_interval
-from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
 from useradmin.models import User, Group
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE,\
     SHOW_DOWNLOAD_BUTTON, SHOW_UPLOAD_BUTTON, REDIRECT_DOWNLOAD, FILE_DOWNLOAD_CACHE_CONTROL
-from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
-from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
+from filebrowser.forms import RenameForm, UploadFileForm, MkDirForm, EditorForm, TouchForm,\
     RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
     TrashPurgeForm, SetReplicationFactorForm
 
@@ -90,26 +80,15 @@ from aws.s3.upload import S3FineUploaderChunkedUpload
 from azure.abfs.upload import ABFSFineUploaderChunkedUpload
 from desktop.lib.fs.ozone.upload import OFSFineUploaderChunkedUpload
 
-if sys.version_info[0] > 2:
-  import io
-  from io import StringIO as string_io
-  from urllib.parse import quote as urllib_quote
-  from urllib.parse import unquote as urllib_unquote
-  from urllib.parse import urlparse as lib_urlparse
-  from builtins import str as new_str
-  from avro import datafile, io
-  from gzip import decompress as decompress_gzip
-  from django.utils.translation import gettext as _
-else:
-  from cStringIO import StringIO as string_io
-  from urllib import quote as urllib_quote
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlparse as lib_urlparse
-  new_str = unicode
-  import parquet
-  from avro import datafile, io
-  from gzip import GzipFile
-  from django.utils.translation import ugettext as _
+import io
+from io import StringIO as string_io
+from urllib.parse import quote as urllib_quote
+from urllib.parse import unquote as urllib_unquote
+from urllib.parse import urlparse as lib_urlparse
+from builtins import str as new_str
+from avro import datafile, io
+from gzip import decompress as decompress_gzip
+from django.utils.translation import gettext as _
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -808,24 +787,17 @@ def display(request, path):
   # Get contents as string for text mode, or at least try
   uni_contents = None
   if not mode or mode == 'text':
-    if sys.version_info[0] > 2:
-      if not isinstance(contents, str):
-        uni_contents = new_str(contents, encoding, errors='replace')
-        is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
-        # Auto-detect mode
-        if not mode:
-          mode = is_binary and 'binary' or 'text'
-      else:
-        # We already have a string.
-        uni_contents = contents
-        is_binary = False
-        mode = 'text'
-    else:
+    if not isinstance(contents, str):
       uni_contents = new_str(contents, encoding, errors='replace')
       is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
       # Auto-detect mode
       if not mode:
         mode = is_binary and 'binary' or 'text'
+    else:
+      # We already have a string.
+      uni_contents = contents
+      is_binary = False
+      mode = 'text'
 
   # Get contents as bytes
   if mode == "binary":
@@ -1002,10 +974,7 @@ def _read_gzip(fhandle, path, offset, length, stats):
   if offset and offset != 0:
     raise PopupException(_("Offsets are not supported with Gzip compression."))
   try:
-    if sys.version_info[0] > 2:
-      contents = decompress_gzip(fhandle.read())
-    else:
-      contents = GzipFile('', 'r', 0, string_io(fhandle.read())).read(length)
+    contents = decompress_gzip(fhandle.read())
   except Exception as e:
     logging.exception('Could not decompress file at "%s": %s' % (path, e))
     raise PopupException(_("Failed to decompress file."))
@@ -1035,27 +1004,18 @@ def _read_simple(fhandle, path, offset, length, stats):
 
 def detect_gzip(contents):
   '''This is a silly small function which checks to see if the file is Gzip'''
-  if sys.version_info[0] > 2:
-    return contents[:2] == b'\x1f\x8b'
-  else:
-    return contents[:2] == '\x1f\x8b'
+  return contents[:2] == b'\x1f\x8b'
 
 
 def detect_bz2(contents):
   '''This is a silly small function which checks to see if the file is Bz2'''
-  if sys.version_info[0] > 2:
-    return contents[:3] == b'BZh'
-  else:
-    return contents[:3] == 'BZh'
+  return contents[:3] == b'BZh'
 
 
 def detect_avro(contents):
   '''This is a silly small function which checks to see if the file is Avro'''
   # Check if the first three bytes are 'O', 'b' and 'j'
-  if sys.version_info[0] > 2:
-    return contents[:3] == b'\x4F\x62\x6A'
-  else:
-    return contents[:3] == '\x4F\x62\x6A'
+  return contents[:3] == b'\x4F\x62\x6A'
 
 
 def detect_snappy(contents):

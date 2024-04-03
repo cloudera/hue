@@ -44,10 +44,7 @@ class Command(BaseCommand):
 
     if not Document2.objects.filter(type='search-dashboard', owner__username__in=SAMPLE_USER_OWNERS).exists():
       with transaction.atomic():
-        if sys.version_info[0] > 2:
-          management.call_command('loaddata', 'initial_search_examples.json', verbosity=2)
-        else:
-          management.call_command('loaddata', 'initial_search_examples.json', verbosity=2, commit=False)
+        management.call_command('loaddata', 'initial_search_examples.json', verbosity=2)
         Document.objects.sync()
 
       Document2.objects.filter(type='search-dashboard', owner__username__in=SAMPLE_USER_OWNERS).update(parent_directory=examples_dir)

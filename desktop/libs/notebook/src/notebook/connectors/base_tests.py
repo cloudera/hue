@@ -28,10 +28,7 @@ from useradmin.models import User
 
 from notebook.connectors.base import Notebook, get_api
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 @pytest.mark.django_db

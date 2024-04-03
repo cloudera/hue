@@ -30,10 +30,7 @@ from sqoop.api.exception import handle_rest_exception
 from sqoop.api.utils import list_to_dict
 from django.views.decorators.cache import never_cache
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 __all__ = ['get_connectors', 'connectors', 'connector']
 

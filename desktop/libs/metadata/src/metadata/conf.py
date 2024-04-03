@@ -28,10 +28,7 @@ from desktop.lib.paths import get_config_root, get_desktop_root
 from metadata.settings import DJANGO_APPS
 from metadata.catalog import atlas_flags
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 
 OPTIMIZER_AUTH_PASSWORD = None

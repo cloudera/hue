@@ -29,10 +29,7 @@ import desktop.conf
 import desktop.log
 from desktop.lib.paths import get_desktop_root
 from django.core.management.base import BaseCommand, CommandError
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 

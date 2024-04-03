@@ -15,15 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
 from filebrowser import views as filebrowser_views
 from filebrowser import api as filebrowser_api
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from django.urls import re_path
+
 
 urlpatterns = [
   # Base view

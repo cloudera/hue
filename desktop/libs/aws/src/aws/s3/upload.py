@@ -25,13 +25,10 @@ import io
 from future import standard_library
 standard_library.install_aliases()
 import logging
-import sys
 import unicodedata
 
-if sys.version_info[0] > 2:
-  from io import BytesIO as stream_io
-else:
-  from cStringIO import StringIO as stream_io
+from io import BytesIO as stream_io
+
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
@@ -41,10 +38,7 @@ from desktop.lib.fsmanager import get_client
 from aws.s3 import parse_uri
 from aws.s3.s3fs import S3FileSystemException
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 128  # TODO: set in configuration (currently 128 MiB)
 

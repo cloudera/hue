@@ -496,10 +496,7 @@ class TestMapReduce2NoHadoop(object):
     assert not can_modify_job('test3', response.context[0]['job'])
 
     response2 = self.c3.get('/jobbrowser/jobs/job_1356251510842_0054')
-    if sys.version_info[0] < 3:
-      assert b'don&#39;t have permission to access job' in response2.content, response2.content
-    else:
-      assert b'don&#x27;t have permission to access job' in response2.content, response2.content
+    assert b'don&#x27;t have permission to access job' in response2.content, response2.content
 
   def test_kill_job(self):
     job_id = 'application_1356251510842_0054'

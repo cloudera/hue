@@ -15,21 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from hadoop import conf
 import logging
 import os
-import sys
 import tempfile
 
 from desktop.models import get_remote_home_storage
 
+from hadoop import conf
 from hadoop import core_site
 
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
 
 LOG = logging.getLogger()
 
@@ -79,7 +73,7 @@ def test_core_site():
   </property> 
 </configuration>
     """
-    open_file(os.path.join(hadoop_home, 'core-site.xml'), 'w').write(xml)
+    open(os.path.join(hadoop_home, 'core-site.xml'), 'w').write(xml)
 
     finish = (
       conf.HDFS_CLUSTERS.set_for_testing({'default': {}}),

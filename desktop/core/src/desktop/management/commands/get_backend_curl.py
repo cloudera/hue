@@ -29,10 +29,7 @@ from desktop.hue_curl import Curl
 from liboozie.conf import OOZIE_URL, SECURITY_ENABLED as OOZIE_SECURITY_ENABLED
 from search.conf import SOLR_URL, SECURITY_ENABLED as SOLR_SECURITY_ENABLED
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 LOG = logging.getLogger()
 

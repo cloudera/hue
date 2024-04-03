@@ -26,10 +26,7 @@ from desktop.lib.i18n import force_unicode
 
 from metadata.workload_analytics_client import WorkfloadAnalyticsClient
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

@@ -28,10 +28,7 @@ from hadoop.cluster import get_defaultfs
 from libsentry.api2 import get_api
 from libsentry.sentry_site import get_sentry_server_admin_groups
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

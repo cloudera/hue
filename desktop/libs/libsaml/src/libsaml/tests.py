@@ -20,10 +20,7 @@ import sys
 
 from libsaml.conf import xmlsec
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 def test_xmlsec_dynamic_default_no_which():
 

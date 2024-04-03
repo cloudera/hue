@@ -15,11 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import zip
 import logging
 import json
 import re
-import sys
 
 from django.urls import reverse
 from django.http import Http404
@@ -51,10 +49,7 @@ from beeswax.server.dbms import expand_exception, get_query_server_config, Query
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form, \
     safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, parse_out_jobs
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

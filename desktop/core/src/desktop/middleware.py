@@ -25,7 +25,6 @@ import mimetypes
 import os.path
 import re
 import socket
-import sys
 import tempfile
 import time
 import traceback
@@ -69,13 +68,10 @@ from desktop.auth.backend import knox_login_headers
 from libsaml.conf import CDP_LOGOUT_URL
 from urllib.parse import urlparse
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from django.utils.http import url_has_allowed_host_and_scheme
-  from urllib.parse import quote
-else:
-  from django.utils.translation import ugettext as _
-  from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme, urlquote as quote
+from django.utils.translation import gettext as _
+from django.utils.http import url_has_allowed_host_and_scheme
+from urllib.parse import quote
+
 
 
 LOG = logging.getLogger()

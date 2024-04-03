@@ -22,10 +22,7 @@ from builtins import object
 from django.core.exceptions import ValidationError
 from useradmin.conf import PASSWORD_POLICY
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 _PASSWORD_POLICY = None
 

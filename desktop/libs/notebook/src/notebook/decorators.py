@@ -39,10 +39,7 @@ from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, A
   OperationNotSupported
 from notebook.models import _get_editor_type
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

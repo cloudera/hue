@@ -18,15 +18,11 @@
 """
 Misc helper functions
 """
-from __future__ import print_function
 
-from future import standard_library
-standard_library.install_aliases()
 from past.builtins import basestring
 
 import logging
 import re
-import sys
 import time
 
 from datetime import datetime
@@ -34,15 +30,8 @@ from dateutil.parser import parse
 from time import strftime
 from xml.sax.saxutils import escape
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  new_str = str
-else:
-  try:
-    from cStringIO import StringIO as string_io
-  except:
-    from StringIO import StringIO as string_io
-  new_str = unicode
+from io import StringIO as string_io
+
 
 LOG = logging.getLogger()
 _NAME_REGEX = re.compile('^[a-zA-Z][\-_a-zA-Z0-0]*$')
@@ -100,7 +89,7 @@ def format_time(time, format='%d %b %Y %H:%M:%S'):
     return ''
 
   fmt_time = None
-  if type(time) == new_str:
+  if type(time) == str:
     return time
   else:
     try:

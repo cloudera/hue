@@ -15,13 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-from future import standard_library
-standard_library.install_aliases()
 import binascii
 import logging
 import re
-import sys
 
 from django.http import HttpResponseBadRequest
 
@@ -33,14 +29,10 @@ from desktop.conf import VCS
 from desktop.lib.vcs.apis.base_api import Api, GIT_READ_ONLY
 from desktop.lib.vcs.github_client import GithubClientException
 
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import unquote as urllib_unquote, urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
-  from django.utils.translation import gettext as _
-else:
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
-  from django.utils.translation import ugettext as _
+import urllib.request, urllib.error
+from urllib.parse import unquote as urllib_unquote, urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
+from django.utils.translation import gettext as _
+
 
 LOG = logging.getLogger()
 

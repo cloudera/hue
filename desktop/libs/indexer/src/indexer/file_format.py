@@ -23,7 +23,6 @@ import gzip
 import operator
 import itertools
 import logging
-import sys
 
 from desktop.lib import i18n
 
@@ -32,13 +31,10 @@ from indexer.conf import ENABLE_SCALABLE_INDEXER
 from indexer.fields import Field, guess_field_type_from_samples
 from indexer.indexers.morphline_operations import get_operator
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from past.builtins import long
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from StringIO import StringIO as string_io
+from io import StringIO as string_io
+from past.builtins import long
+from django.utils.translation import gettext as _
+
 
 LOG = logging.getLogger()
 

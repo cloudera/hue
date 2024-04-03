@@ -50,10 +50,7 @@ from oozie.models import Workflow, Node, Link, Start, End,\
                          Decision, DecisionEnd, Fork, Join,\
                          Kill
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -703,13 +700,12 @@ def import_workflow_root(workflow, workflow_definition_root, metadata=None, fs=N
 
 def import_workflow(workflow, workflow_definition, metadata=None, fs=None):
   # Parse Workflow Definition
-  if sys.version_info[0] > 2:
-    # In Py3 anything like <?xml version="1.0" encoding="UTF-8"?> at the beginning
-    # of a workflow XML cannot be parsed via etree.fromstring(), since the
-    # workflow_definition string needs to be encoded.
-    workflow_definition_root = etree.XML(workflow_definition.encode())
-  else:
-    workflow_definition_root = etree.fromstring(workflow_definition)
+
+  # In Py3 anything like <?xml version="1.0" encoding="UTF-8"?> at the beginning
+  # of a workflow XML cannot be parsed via etree.fromstring(), since the
+  # workflow_definition string needs to be encoded.
+  workflow_definition_root = etree.XML(workflow_definition.encode())
+
   if workflow_definition_root is None:
     raise RuntimeError(
       _("Could not find any nodes in Workflow definition. Maybe it's malformed?"))
@@ -719,13 +715,12 @@ def import_workflow(workflow, workflow_definition, metadata=None, fs=None):
 
 def generate_v2_graph_nodes(workflow_definition):
   # Parse Workflow Definition
-  if sys.version_info[0] > 2:
-    # In Py3 anything like <?xml version="1.0" encoding="UTF-8"?> at the beginning
-    # of a workflow XML cannot be parsed via etree.fromstring(), since the
-    # workflow_definition string needs to be encoded.
-    workflow_definition_root = etree.XML(workflow_definition.encode())
-  else:
-    workflow_definition_root = etree.fromstring(workflow_definition)
+
+  # In Py3 anything like <?xml version="1.0" encoding="UTF-8"?> at the beginning
+  # of a workflow XML cannot be parsed via etree.fromstring(), since the
+  # workflow_definition string needs to be encoded.
+  workflow_definition_root = etree.XML(workflow_definition.encode())
+
   if workflow_definition_root is None:
     raise MalformedWfDefException()
 

@@ -15,13 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
 import json
 import logging
 
 import sqlparse
-import sys
 
 from django.urls import reverse
 from django.db.models import Q
@@ -40,16 +37,11 @@ from metadata.conf import OPTIMIZER
 
 from notebook.conf import EXAMPLES
 from notebook.connectors.base import Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name, patch_snippet_for_connector
-from notebook.connectors.hiveserver2 import HS2Api
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import escape_rows, make_notebook, upgrade_session_properties, get_api, _get_dialect_example
 
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import unquote as urllib_unquote
+from urllib.parse import unquote as urllib_unquote
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

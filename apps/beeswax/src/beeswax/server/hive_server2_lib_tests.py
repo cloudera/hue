@@ -30,10 +30,7 @@ from beeswax.models import HiveServerQueryHandle, Session
 from beeswax.server.dbms import get_query_server_config, QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerTable, HiveServerClient, HiveServerClientCompatible
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger()
@@ -309,18 +306,14 @@ class TestHiveServerClient():
       try:
         client.get_table(database='database', table_name='table_name')
       except QueryServerException as e:
-        if sys.version_info[0] > 2:
-          req_string = ("TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), "
-            "catalogName=None, schemaName='database', tableName='table_name', tableTypes=None)")\
-            % (str(original_guid), str(original_secret))
-        else:
-          req_string = ("TGetTablesReq(schemaName='database', sessionHandle=TSessionHandle(sessionId=THandleIdentifier"
-            "(secret='%s', guid='%s')), tableName='table_name', tableTypes=None, catalogName=None)")\
-            % ('s\\xb6\\x0ePP\\xbdL\\x17\\xa3\\x0f\\\\\\xf7K\\xe8Y\\x1d',
-               '\\xd9\\xe0hT\\xd6wO\\xe1\\xa3S\\xfb\\x04\\xca\\x93V\\x01') # manually adding '\'
-        assert (
+        req_string = ("TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), "
+          "catalogName=None, schemaName='database', tableName='table_name', tableTypes=None)")\
+          % (str(original_guid), str(original_secret))
+
+        assert(
           "Bad status for request %s:\n%s" % (req_string, get_tables_res) ==
-          str(e))
+          str(e)
+        )
 
 class TestHiveServerTable():
 

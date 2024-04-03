@@ -43,10 +43,7 @@ from notebook.connectors.base import QueryError, QueryExpired
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.models import make_notebook, Notebook
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 LOG = logging.getLogger()

@@ -19,7 +19,6 @@
 import logging
 import json
 import pytest
-import sys
 
 from django.urls import reverse
 
@@ -27,10 +26,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.connectors.models import Connector
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger()

@@ -32,10 +32,7 @@ from django.utils.formats import localize_input
 from desktop.lib.parameterization import find_variables
 from liboozie.oozie_api import get_oozie, DEFAULT_USER
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

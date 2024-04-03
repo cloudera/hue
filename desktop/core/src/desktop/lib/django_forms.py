@@ -17,14 +17,11 @@
 #
 # Extra form fields and widgets.
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import filter
 from builtins import range
 from builtins import object
 import logging
 import json
-import sys
 
 from django.forms import Widget, Field
 from django import forms
@@ -37,13 +34,10 @@ from django.utils.safestring import mark_safe
 import desktop.lib.i18n
 from desktop.lib.i18n import smart_str
 
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import quote_plus as urllib_quote_plus
-  from django.utils.encoding import force_str
-else:
-  from urllib import quote_plus as urllib_quote_plus
-  from django.utils.encoding import force_unicode as force_str
+import urllib.request, urllib.error
+from urllib.parse import quote_plus as urllib_quote_plus
+from django.utils.encoding import force_str
+
 
 LOG = logging.getLogger()
 

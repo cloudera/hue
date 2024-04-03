@@ -16,14 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 import binascii
 import json
 import logging
 import re
-import sys
 
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
@@ -31,11 +27,9 @@ from desktop.lib.rest import resource
 from desktop.conf import VCS
 from desktop.lib.vcs.apis.base_api import GITHUB_OFFICIAL
 
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import unquote as urllib_unquote
-else:
-  from urllib import unquote as urllib_unquote
+import urllib.request, urllib.error
+from urllib.parse import unquote as urllib_unquote
+
 
 LOG = logging.getLogger()
 

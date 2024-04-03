@@ -33,10 +33,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from proxy.views import _rewrite_links
 import proxy.conf
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from StringIO import StringIO as string_io
+from io import StringIO as string_io
 
 
 class Handler(http.server.BaseHTTPRequestHandler):

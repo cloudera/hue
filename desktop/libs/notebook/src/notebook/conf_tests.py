@@ -30,10 +30,7 @@ from useradmin.models import User, update_app_permissions, get_default_user_grou
 from notebook.conf import config_validator, get_ordered_interpreters, _excute_test_query
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 class TestInterpreterConfig(TestCase):

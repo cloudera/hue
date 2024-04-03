@@ -19,10 +19,7 @@ import logging
 import sys
 import unicodedata
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import StringIO as string_io
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
@@ -33,10 +30,7 @@ from desktop.lib.fsmanager import get_client
 from azure.abfs.__init__ import parse_uri
 from azure.abfs.abfs import ABFSFileSystemException
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 DEFAULT_WRITE_SIZE = 100 * 1024 * 1024 # As per Azure doc, maximum blob size is 100MB
 

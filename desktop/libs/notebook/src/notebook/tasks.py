@@ -50,10 +50,7 @@ from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper, Qu
 from notebook.models import make_notebook, MockedDjangoRequest, Notebook
 from notebook.sql_utils import get_current_statement
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from StringIO import StringIO as string_io
+from io import StringIO as string_io
 
 
 LOG_TASK = get_task_logger(__name__)
@@ -137,7 +134,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
     if TASK_SERVER.RESULT_CACHE.get():
       with storage.open(result_key, 'rb') as store:
         with codecs.getreader('utf-8')(store) as text_file:
-          delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
+          delimiter = ','
           csv_reader = csv.reader(text_file, delimiter=delimiter)
           caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
           LOG.info('Caching results %s.' % result_key)
@@ -407,7 +404,7 @@ def _get_data(task_id):
     csv_reader = csv_reader[1:] if csv_reader else []
   else:
     f = storage.open(result_key, 'rb')
-    delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
+    delimiter = ','
     csv_reader = csv.reader(f, delimiter=delimiter)
     headers = next(csv_reader, [])
 

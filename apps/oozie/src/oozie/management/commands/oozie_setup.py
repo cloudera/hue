@@ -39,10 +39,7 @@ from oozie.importlib.workflows import import_workflow_root
 from oozie.importlib.coordinators import import_coordinator_root
 from oozie.importlib.bundles import import_bundle_root
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -369,10 +366,7 @@ class Command(BaseCommand):
 
     if ENABLE_V2.get():
       with transaction.atomic():
-        if sys.version_info[0] > 2:
-          management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
-        else:
-          management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2, commit=False)
+        management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
 
     # Install editor oozie examples without doc1 link
     LOG.info("Using Hue 4, will install oozie editor samples.")

@@ -41,10 +41,7 @@ from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
 from desktop.conf import is_ofs_enabled, is_gs_enabled, is_chunked_fileuploader_enabled
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
@@ -516,8 +513,7 @@ else:
   AUTHENTICATION_BACKENDS = tuple(desktop.conf.AUTH.BACKEND.get())
 
 # AxesBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
-if sys.version_info[0] > 2:
-  AUTHENTICATION_BACKENDS = ('axes.backends.AxesBackend',) + AUTHENTICATION_BACKENDS
+AUTHENTICATION_BACKENDS = ('axes.backends.AxesBackend',) + AUTHENTICATION_BACKENDS
 
 EMAIL_HOST = desktop.conf.SMTP.HOST.get()
 EMAIL_PORT = desktop.conf.SMTP.PORT.get()
@@ -697,10 +693,7 @@ if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE')
 
 # Instrumentation
 if desktop.conf.INSTRUMENTATION.get():
-  if sys.version_info[0] > 2:
-    gc.set_debug(gc.DEBUG_UNCOLLECTABLE)
-  else:
-    gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_OBJECTS)
+  gc.set_debug(gc.DEBUG_UNCOLLECTABLE)
 
 
 if not desktop.conf.DATABASE_LOGGING.get():
@@ -818,10 +811,7 @@ MODULES_TO_PATCH = (
     'django.utils.cache',
 )
 
-if sys.version_info[0] > 2:
-  MIDDLEWARE.append('axes.middleware.AxesMiddleware')  # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
-else:
-  MIDDLEWARE.remove('desktop.middleware.MultipleProxyMiddleware')
+MIDDLEWARE.append('axes.middleware.AxesMiddleware')  # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
 
 try:
   import hashlib

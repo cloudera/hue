@@ -15,33 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import csv
 import logging
 import json
 import os
-import sys
 import pwd
 
 from django.core.management.base import BaseCommand
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import USE_NEW_EDITOR
-from desktop.models import Directory, Document2, Document2Permission
+from desktop.models import Document2, Document2Permission
 from hadoop import cluster
 from notebook.models import import_saved_beeswax_query, make_notebook, MockRequest, _get_example_directory
 from useradmin.models import get_default_user_group, install_sample_user, User
 
-from beeswax.design import hql_query
 from beeswax.conf import LOCAL_EXAMPLES_DATA_DIR
 from beeswax.hive_site import has_concurrency_support
 from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
-from beeswax.server import dbms
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
+
 
 LOG = logging.getLogger()
 

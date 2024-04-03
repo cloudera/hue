@@ -25,10 +25,7 @@ from django.urls import reverse
 from desktop.lib.parameterization import find_parameters, bind_parameters
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 LOG = logging.getLogger()
 

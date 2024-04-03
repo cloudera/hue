@@ -58,12 +58,9 @@ from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_timezone
 from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
 
-if sys.version_info[0] > 2:
-  from django.utils.encoding import force_str
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.encoding import force_unicode as force_str
-  from django.utils.translation import ugettext as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext as _
+
 
 WORKFLOW_DEPTH_LIMIT = 24
 LOG = logging.getLogger()

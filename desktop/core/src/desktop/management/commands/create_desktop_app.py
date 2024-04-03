@@ -19,20 +19,16 @@
 import os
 import re
 import shutil
-import sys
+import logging
+
 from django.core.management.base import CommandError, BaseCommand
 from mako.template import Template
 
-import logging
+from django.utils.translation import gettext as _
 
-if sys.version_info[0] > 2:
-  open_file = open
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  open_file = file
 
 LOG = logging.getLogger()
+
 
 class Command(BaseCommand):
   help = _("Creates a Hue application directory structure.")
@@ -88,7 +84,7 @@ def copy_template(app_template, copy_to, app_name):
       LOG.info("Writing %s" % path_new)
       fp_new = open(path_new, 'w')
       if path_old.endswith(".png"):
-        shutil.copyfileobj(open_file(path_old), fp_new)
+        shutil.copyfileobj(open(path_old), fp_new)
       else:
         fp_new.write( Template(filename=path_old).render(app_name=app_name, app_name_camel=app_name_camel, app_name_spaces=app_name_spaces) )
       fp_new.close()

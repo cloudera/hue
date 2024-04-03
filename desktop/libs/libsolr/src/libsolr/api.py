@@ -16,16 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next
-from builtins import str
-from builtins import zip
-from builtins import object
 import json
 import logging
 import re
-import sys
 
 from itertools import groupby
 
@@ -39,17 +32,11 @@ from desktop.lib.rest import resource
 
 from libsolr.conf import SSL_CERT_CA_VERIFY
 
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.parse, urllib.error
-  from urllib.parse import quote as urllib_quote
-  from urllib.parse import unquote as urllib_unquote
-  new_str = str
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import quote as urllib_quote
-  from urllib import unquote as urllib_unquote
-  new_str = unicode
+import urllib.request, urllib.parse, urllib.error
+from urllib.parse import quote as urllib_quote
+from urllib.parse import unquote as urllib_unquote
+from django.utils.translation import gettext as _
+
 
 LOG = logging.getLogger()
 
@@ -61,7 +48,7 @@ except ImportError as e:
 
 
 def utf_quoter(what):
-  return urllib_quote(new_str(what).encode('utf-8'), safe='~@#$&()*!+=;,.?/\'')
+  return urllib_quote(str(what).encode('utf-8'), safe='~@#$&()*!+=;,.?/\'')
 
 
 class SolrApi(object):
@@ -1105,7 +1092,7 @@ class SolrApi(object):
         response = json.loads(response)
       except ValueError as e:
         # Got some null bytes in the response
-        LOG.error('%s: %s' % (new_str(e), repr(response)))
+        LOG.error('%s: %s' % (str(e), repr(response)))
         response = json.loads(response.replace('\x00', ''))
     return response
 

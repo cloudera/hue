@@ -15,13 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import json
 import logging
 import posixpath
-import sys
 import threading
 import urllib.parse
 
@@ -33,12 +28,9 @@ from hadoop.yarn.clients import get_log_client
 
 from lxml import html
 
-if sys.version_info[0] > 2:
-  from urllib.parse import urlsplit as lib_urlsplit
-  from django.utils.translation import gettext as _
-else:
-  from urlparse import urlsplit as lib_urlsplit
-  from django.utils.translation import ugettext as _
+from urllib.parse import urlsplit as lib_urlsplit
+from django.utils.translation import gettext as _
+
 
 LOG = logging.getLogger()
 

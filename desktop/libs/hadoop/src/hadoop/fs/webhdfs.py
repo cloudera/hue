@@ -27,7 +27,6 @@ import errno
 import logging
 import posixpath
 import stat
-import sys
 import threading
 import time
 import urllib.request, urllib.error
@@ -45,13 +44,8 @@ from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup, get_webhdfs_ssl
 
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote, urlparse
-  from django.utils.translation import gettext as _
-else:
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlparse
-  from django.utils.translation import ugettext as _
+from urllib.parse import unquote as urllib_unquote, urlparse
+from django.utils.translation import gettext as _
 
 
 DEFAULT_HDFS_SUPERUSER = desktop.conf.DEFAULT_HDFS_SUPERUSER.get()

@@ -27,10 +27,7 @@ from libsentry.client import SentryClient
 from libsentry.sentry_ha import get_next_available_server, create_client
 from libsentry.sentry_site import get_sentry_server, is_ha_enabled
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

@@ -24,10 +24,7 @@ from desktop.conf import LDAP
 from useradmin import ldap_access
 from useradmin.views import import_ldap_groups
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 
 class Command(BaseCommand):

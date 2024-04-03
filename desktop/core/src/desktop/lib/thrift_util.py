@@ -49,11 +49,8 @@ from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcard
 from desktop.lib.thrift_sasl import TSaslClientTransport
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 
-if sys.version_info[0] > 2:
-  from past.builtins import long
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from past.builtins import long
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -582,12 +579,8 @@ class SuperClient(object):
 
 def _unpack_guid_secret_in_handle(str_args):
   if 'operationHandle' in str_args or 'sessionHandle' in str_args:
-    if sys.version_info[0] > 2:
-      guid = re.search('guid=(b".*"), secret', str_args) or re.search('guid=(b\'.*\'), secret', str_args)
-      secret = re.search('secret=(b".+?")\)', str_args) or re.search('secret=(b\'.+?\')\)', str_args)
-    else:
-      secret = re.search('secret=(".*"), guid', str_args) or re.search('secret=(\'.*\'), guid', str_args)
-      guid = re.search('guid=(".*")\)\)', str_args) or re.search('guid=(\'.*\')\)\)', str_args)
+    guid = re.search('guid=(b".*"), secret', str_args) or re.search('guid=(b\'.*\'), secret', str_args)
+    secret = re.search('secret=(b".+?")\)', str_args) or re.search('secret=(b\'.+?\')\)', str_args)
 
     if secret and guid:
       try:
@@ -605,7 +598,7 @@ def unpack_guid(guid):
   return "%016x:%016x" % struct.unpack(b"QQ", guid)
 
 def unpack_guid_base64(guid):
-  decoded_guid = base64.b64decode(guid) if sys.version_info[0] > 2 else base64.decodestring(guid)
+  decoded_guid = base64.b64decode(guid)
   return "%016x:%016x" % struct.unpack(b"QQ", decoded_guid)
 
 def simpler_string(thrift_obj):

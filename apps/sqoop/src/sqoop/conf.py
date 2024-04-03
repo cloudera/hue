@@ -23,10 +23,7 @@ from desktop.lib.conf import Config, coerce_bool
 
 from sqoop.settings import NICE_NAME
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 
 SERVER_URL = Config(

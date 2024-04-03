@@ -34,10 +34,7 @@ from importlib import import_module
 if 'oozie' in INSTALLED_APPS:
   from oozie.models import Workflow
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 LOG = logging.getLogger()
 

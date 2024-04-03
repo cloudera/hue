@@ -14,10 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json
 
-from future import standard_library
-standard_library.install_aliases()
 try:
   import oauth2 as oauth
 except:
@@ -25,7 +22,6 @@ except:
 
 import cgi
 import logging
-import sys
 from datetime import datetime
 
 from axes.decorators import axes_dispatch
@@ -48,18 +44,13 @@ from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS, SESSION
 from desktop.lib import fsmanager
 from desktop.lib.django_util import render, login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.log.access import access_log, access_warn, last_access_map
+from desktop.log.access import access_warn, last_access_map
 from desktop.views import samlgroup_check, saml_login_headers
 from desktop.settings import LOAD_BALANCER_COOKIE
 from django.utils.encoding import smart_str
 
-
-if sys.version_info[0] > 2:
-  from urllib.parse import urlencode as urllib_urlencode
-  from django.utils.translation import gettext as _
-else:
-  from urllib import urlencode as urllib_urlencode
-  from django.utils.translation import ugettext as _
+from urllib.parse import urlencode as urllib_urlencode
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

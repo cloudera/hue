@@ -20,7 +20,6 @@ import pytest
 import sys
 
 from desktop.lib.django_test_util import make_logged_in_client
-from unittest.mock import patch, Mock
 
 
 @pytest.mark.django_db

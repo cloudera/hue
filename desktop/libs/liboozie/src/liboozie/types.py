@@ -21,15 +21,10 @@ Oozie API classes.
 This is mostly just codifying the datastructure of the Oozie REST API.
 http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WebServicesAPI.html
 """
-from __future__ import division
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 import logging
 import math
 import re
-import sys
 import time
 
 from time import mktime
@@ -45,12 +40,9 @@ from django.urls import reverse
 
 from desktop.auth.backend import is_admin
 
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from cStringIO import StringIO as string_io
+from io import BytesIO as string_io
+from django.utils.translation import gettext as _
+
 
 LOG = logging.getLogger()
 

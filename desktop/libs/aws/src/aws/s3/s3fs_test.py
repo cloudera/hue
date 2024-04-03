@@ -32,10 +32,7 @@ from aws.s3.s3test_utils import S3TestBase, generate_id
 from aws.s3.upload import DEFAULT_WRITE_SIZE
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 class TestS3FileSystem():

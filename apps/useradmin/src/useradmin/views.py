@@ -15,13 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from builtins import map
 import pwd
 import grp
 import logging
 import subprocess
-import sys
 import json
 
 LOG = logging.getLogger()
@@ -57,11 +54,8 @@ from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapU
 from useradmin.ldap_access import LdapBindException, LdapSearchException
 from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group, Organization
 
-if sys.version_info[0] > 2:
-  unicode = str
-  from django.utils.translation import get_language, gettext as _
-else:
-  from django.utils.translation import get_language, ugettext as _
+from django.utils.translation import get_language, gettext as _
+
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.forms import OrganizationUserChangeForm as UserChangeForm, OrganizationSuperUserChangeForm as SuperUserChangeForm
@@ -861,7 +855,7 @@ def ensure_home_directory(fs, user):
     home_directory = userprofile.home_directory.split('@')[0]
 
   if userprofile is not None and userprofile.home_directory:
-    if not isinstance(home_directory, unicode):
+    if not isinstance(home_directory, str):
       home_directory = home_directory.decode("utf-8")
     fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:

@@ -17,13 +17,11 @@
 #
 # Utilities for django operations.
 
-from builtins import object
 import logging
 import re
 import json
 import socket
 import datetime
-import sys
 
 from django.conf import settings
 from django.core import serializers
@@ -46,10 +44,8 @@ from desktop.lib import django_mako
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.monkey_patches import monkey_patch_request_context_init
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import ngettext as _t, gettext as _
-else:
-  from django.utils.translation import ungettext as _t, ugettext as _
+from django.utils.translation import ngettext as _t, gettext as _
+
 
 
 LOG = logging.getLogger()

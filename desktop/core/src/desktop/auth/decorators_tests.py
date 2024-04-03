@@ -29,10 +29,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from useradmin.models import User, Group, Organization
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 class TestDecorator(TestCase):

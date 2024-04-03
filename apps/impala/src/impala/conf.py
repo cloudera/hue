@@ -29,10 +29,7 @@ from desktop.lib.paths import get_desktop_root
 from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled, is_kerberos_enabled, is_webserver_spnego_enabled
 from impala.settings import NICE_NAME
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 LOG = logging.getLogger()
 

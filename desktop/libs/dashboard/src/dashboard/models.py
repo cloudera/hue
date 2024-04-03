@@ -40,10 +40,7 @@ from notebook.connectors.base import Notebook, _get_snippet_name
 
 from dashboard.dashboard_api import get_engine
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 

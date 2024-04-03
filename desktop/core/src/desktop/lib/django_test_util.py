@@ -16,13 +16,12 @@
 # limitations under the License.
 
 import json
-import logging
 import re
 import django.test.client
 from unittest.mock import Mock
 
 from desktop.conf import ENABLE_ORGANIZATIONS
-from useradmin.models import User, Group, Organization
+from useradmin.models import User, Group
 
 
 class Client(django.test.client.Client):

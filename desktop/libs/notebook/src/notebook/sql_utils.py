@@ -15,19 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
 import hashlib
 import os
 import re
-import sys
 
-from desktop.lib.i18n import smart_str
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from StringIO import StringIO as string_io
+from io import StringIO as string_io
 
 
 # Note: Might be replaceable by sqlparse.split
@@ -86,10 +78,7 @@ def get_current_statement(snippet):
 
 
 def compute_statement_hash(statement):
-  if sys.version_info[0] > 2:
-    return hashlib.sha224(statement.encode()).hexdigest()
-  else:
-    return hashlib.sha224(smart_str(statement)).hexdigest()
+  return hashlib.sha224(statement.encode()).hexdigest()
 
 def split_statements(hql, dialect=None):
   """

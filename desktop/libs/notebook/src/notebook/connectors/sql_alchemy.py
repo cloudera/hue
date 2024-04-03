@@ -49,10 +49,7 @@ Each URL is mapped to one engine and should be created once per process.
 Each query statement grabs a connection from the engine and will return it after its close().
 Disposing the engine closes all its connections.
 '''
-from future import standard_library
-standard_library.install_aliases()
 
-from builtins import next, object
 import datetime
 import json
 import logging
@@ -75,20 +72,15 @@ from librdbms.server import dbms
 from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name, AuthenticationRequired
 from notebook.models import escape_rows
 
-if sys.version_info[0] > 2:
-  from urllib.parse import quote_plus as urllib_quote_plus, urlparse as urllib_urlparse, parse_qs as urllib_parse_qs
-  from past.builtins import long
-  from io import StringIO
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import quote_plus as urllib_quote_plus, urlparse as urllib_urlparse, parse_qs as urllib_parse_qs
-  from cStringIO import StringIO
+from urllib.parse import quote_plus as urllib_quote_plus, urlparse as urllib_urlparse, parse_qs as urllib_parse_qs
+from past.builtins import long
+from django.utils.translation import gettext as _
 
 ENGINES = {}
 CONNECTIONS = {}
 ENGINE_KEY = '%(username)s-%(connector_name)s'
 URL_PATTERN = '(?P<driver_name>.+?://)(?P<host>[^:/ ]+):(?P<port>[0-9]*).*'
+
 
 LOG = logging.getLogger()
 

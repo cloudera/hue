@@ -45,14 +45,10 @@ import hadoop.conf
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.exceptions import PermissionDeniedException
 
-if sys.version_info[0] > 2:
-  from django.utils.encoding import force_str
-  from urllib.parse import urlsplit as lib_urlsplit
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.encoding import force_unicode as force_str
-  from urlparse import urlsplit as lib_urlsplit
-  from django.utils.translation import ugettext as _
+from django.utils.encoding import force_str
+from urllib.parse import urlsplit as lib_urlsplit
+from django.utils.translation import gettext as _
+
 
 LOG = logging.getLogger()
 
@@ -251,10 +247,8 @@ class Hdfs(object):
   def _copy_non_binary_file(self, local_src, remote_dst, chunk_size):
     for data_format in ("ascii", "utf-8", "latin-1", "iso-8859"):
       src_copied = False
-      if sys.version_info[0] > 2:
-        src = open(local_src, encoding=data_format)
-      else:
-        src = codecs.open(local_src, encoding=data_format)
+      src = open(local_src, encoding=data_format)
+
       try:
         self.create(remote_dst, permission=0o755)
         chunk = src.read(chunk_size)

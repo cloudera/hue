@@ -32,10 +32,7 @@ from desktop.models import DefaultConfiguration
 from notebook.connectors.hiveserver2 import HiveConfiguration, ImpalaConfiguration
 from notebook.connectors.spark_shell import SparkConfiguration
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 try:
   from oozie.models2 import WorkflowConfiguration as OozieWorkflowConfiguration

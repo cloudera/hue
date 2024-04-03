@@ -38,10 +38,7 @@ from useradmin import ldap_access
 from useradmin.models import UserProfile, get_profile, User
 from useradmin.views import import_ldap_users
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

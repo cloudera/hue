@@ -21,10 +21,7 @@ from desktop.models import Document2
 from django.contrib.auth.models import User, Group
 from django.core.management.base import BaseCommand
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 LOG = logging.getLogger()
 

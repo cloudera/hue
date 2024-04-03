@@ -23,10 +23,7 @@ import logging
 import sys
 import traceback
 
-if sys.version_info[0] > 2:
-  from django.utils.encoding import force_str
-else:
-  from django.utils.encoding import force_unicode as force_str
+from django.utils.encoding import force_str
 
 import desktop.lib.django_util
 

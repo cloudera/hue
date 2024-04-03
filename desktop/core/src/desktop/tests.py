@@ -16,10 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range, object
 import json
 import logging
 import os
@@ -29,14 +25,12 @@ import sys
 import time
 import uuid
 
-import proxy.conf
 import tempfile
 
 from configobj import ConfigObj
 from django.db.models import query, CharField, SmallIntegerField
 from django.core.management import call_command
 from django.core.paginator import Paginator
-from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
 from django.views.static import serve
@@ -68,14 +62,9 @@ from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages, _get_config_errors
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from unittest.mock import patch, Mock
-  from django.urls import re_path
-else:
-  from cStringIO import StringIO as string_io
-  from mock import patch, Mock
-  from django.conf.urls import url as re_path
+from io import StringIO as string_io
+from unittest.mock import patch, Mock
+from django.urls import re_path
 
 
 LOG = logging.getLogger()
@@ -1501,7 +1490,7 @@ def test_db_migrations_sqlite():
       'PASSWORD': '',
       'HOST': '',
       'PORT': '',
-      'OPTIONS': {} if sys.version_info[0] > 2 else '',
+      'OPTIONS': {},
       'ATOMIC_REQUESTS': True,
       'CONN_MAX_AGE': 0,
     }

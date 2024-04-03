@@ -36,10 +36,7 @@ from metadata.optimizer.base import get_api as get_optimizer_api
 from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

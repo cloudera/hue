@@ -19,13 +19,11 @@
 Helper for reading hive-site.xml
 """
 
-from builtins import str
 import errno
 import logging
 import os.path
 import re
 import socket
-import sys
 
 from desktop.lib import security_util
 from hadoop import confparse
@@ -33,10 +31,6 @@ from hadoop.ssl_client_site import get_trustore_location, get_trustore_password
 
 import beeswax.conf
 
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
 
 LOG = logging.getLogger()
 
@@ -220,7 +214,7 @@ def _parse_hive_site():
 
   _HIVE_SITE_PATH = os.path.join(beeswax.conf.HIVE_CONF_DIR.get(), 'hive-site.xml')
   try:
-    data = open_file(_HIVE_SITE_PATH, 'r').read()
+    data = open(_HIVE_SITE_PATH, 'r').read()
   except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (_HIVE_SITE_PATH, err))
@@ -235,4 +229,4 @@ def get_hive_site_content():
   if not os.path.exists(hive_site_path):
     return ''
   else:
-    return open_file(hive_site_path, 'r').read()
+    return open(hive_site_path, 'r').read()
