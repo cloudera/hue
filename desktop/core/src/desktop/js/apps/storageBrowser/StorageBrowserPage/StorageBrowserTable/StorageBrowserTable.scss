@@ -17,6 +17,7 @@
 @use 'mixins';
 
 $cell-height: 40px;
+$table-placeholder-height: 100px;
 
 .hue-storage-browser__table {
   @include mixins.hue-svg-icon__d3-conflict;
@@ -26,6 +27,11 @@ $cell-height: 40px;
   .hue-storage-browser__table-cell-icon {
     color: vars.$fluidx-blue-700;
     margin-right: 6px;
+  }
+
+  .ant-table-placeholder {
+    height: $table-placeholder-height;
+    text-align: center;
   }
 
   thead {
