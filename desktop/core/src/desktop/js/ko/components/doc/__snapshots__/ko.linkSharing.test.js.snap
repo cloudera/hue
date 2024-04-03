@@ -21,7 +21,11 @@ exports[`ko.linkSharing.js should render component activated 1`] = `
             onSelect: changePerm.bind($data)
           }
         }
-      \\"><a class=\\"inactive-action hue-drop-down-active\\" data-testid=\\"database-selection-dropdown\\" href=\\"javascript:void(0)\\" data-bind=\\"toggle: dropDownVisible, css: { 'blue': dropDownVisible }\\">
+      \\"><a class=\\"inactive-action hue-drop-down-active\\" href=\\"javascript:void(0)\\" data-bind=\\"
+    attr: {
+      'data-test-id': dataTestId
+    },
+    toggle: dropDownVisible, css: { 'blue': dropDownVisible }\\">
     <!-- ko if: icon --><!-- /ko -->
     <!-- ko if: !noLabel && value -->
     <span class=\\"hue-drop-down-selected\\" data-bind=\\"text: value() &amp;&amp; typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': titleTooltip }\\" title=\\"read\\">read</span>
