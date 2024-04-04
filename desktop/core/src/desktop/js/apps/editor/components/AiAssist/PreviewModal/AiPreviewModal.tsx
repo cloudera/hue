@@ -23,6 +23,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { stackoverflowDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { fluidxSlate800, fluidxSpacingS, fluidxSpacingXs } from '@cloudera/cuix-core/variables';
 import { KeywordCase } from 'sql-formatter';
+import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
 import { GuardrailAlert, GuardrailAlertType } from '../guardRails';
 import SyntaxHighlighterDiff from '../SyntaxHighlighterDiff/SyntaxHighlighterDiff';
@@ -109,11 +110,25 @@ const PreviewModal = ({
   };
 
   const [guardRailWarningAcknowledged, setGuardRailWarningAcknowledged] = useState(false);
+
+  const LOCAL_STORAGE_TRANSFORM_KEY = 'hue.aiAssistBar.sqlTransformConf';
+  const savedConfiguration = getFromLocalStorage(LOCAL_STORAGE_TRANSFORM_KEY, {
+    transformToCaseInsensitive: true
+  });
+  const [transformToCaseInsensitive, setTransformToCaseInsensitive] = useState(
+    savedConfiguration.transformToCaseInsensitive
+  );
+
+  const unformattedSql =
+    guardrailAlert?.modifiedSql && transformToCaseInsensitive
+      ? guardrailAlert.modifiedSql
+      : suggestionRaw;
+
   const { formattingConfig, updateFormattingSettings, suggestion, showDiffFrom } = useFormatting({
     dialect,
     keywordCase,
     oldSql: showDiffFromRaw,
-    newSql: suggestionRaw,
+    newSql: unformattedSql,
     nql,
     preventAutoFormat: actionMode === AiActionModes.FIX
   });
@@ -125,7 +140,7 @@ const PreviewModal = ({
   ) {
     const oldCodeHasSyntaxError = actionMode === AiActionModes.FIX;
     const diffDetected = hasDiff({
-      newCode: suggestionRaw,
+      newCode: unformattedSql,
       oldCode: showDiffFromRaw,
       dialect,
       preserveCodeFormat: oldCodeHasSyntaxError
@@ -155,6 +170,14 @@ const PreviewModal = ({
       );
     }
   }
+
+  const handleToggleCaseInsensitive = () => {
+    const newVal = !transformToCaseInsensitive;
+    setInLocalStorage(LOCAL_STORAGE_TRANSFORM_KEY, {
+      transformToCaseInsensitive: newVal
+    });
+    setTransformToCaseInsensitive(newVal);
+  };
 
   const unsafeSql = guardrailAlert?.type === GuardrailAlertType.UNSAFE_SQL;
   const hallucinatedSql = guardrailAlert?.type === GuardrailAlertType.HALLUCINATION;
@@ -226,6 +249,8 @@ const PreviewModal = ({
           explanation={explanation}
           assumptions={assumptions}
           guardrailAlert={guardrailAlert}
+          isCaseInsensitive={transformToCaseInsensitive}
+          onToggleCaseInsensitive={handleToggleCaseInsensitive}
         />
       )}
       {hallucinatedSql && <PreviewWarningPanels guardrailAlert={guardrailAlert} />}
