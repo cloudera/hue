@@ -17,6 +17,8 @@
 */
 
 import React from 'react';
+import LinkButton from 'cuix/dist/components/Button/LinkButton';
+
 import { GuardrailAlert, GuardrailAlertType } from '../../guardRails';
 
 import './PreviewInfoPanels.scss';
@@ -27,6 +29,8 @@ export interface PreviewInfoPanelsProps {
   assumptions?: string;
   alternativeActions?: string;
   guardrailAlert?: GuardrailAlert;
+  isCaseInsensitive?: boolean;
+  onToggleCaseInsensitive: () => void;
 }
 
 const PreviewInfoPanels = ({
@@ -34,11 +38,34 @@ const PreviewInfoPanels = ({
   explanation,
   summary,
   assumptions,
-  guardrailAlert
-}: PreviewInfoPanelsProps) => {
+  guardrailAlert,
+  isCaseInsensitive,
+  onToggleCaseInsensitive
+}: PreviewInfoPanelsProps): JSX.Element | null => {
   const unsafeSqlDetected = guardrailAlert?.type === GuardrailAlertType.UNSAFE_SQL;
-  return explanation || assumptions || unsafeSqlDetected || alternativeActions ? (
+  const hasGuardRailSuggestions = guardrailAlert?.type === GuardrailAlertType.SUGGESTED_IMPROVEMENT;
+  return explanation ||
+    assumptions ||
+    unsafeSqlDetected ||
+    alternativeActions ||
+    hasGuardRailSuggestions ? (
     <div className="hue-preview-info-panels">
+      {hasGuardRailSuggestions && (
+        <p>
+          {isCaseInsensitive
+            ? 'This query has been transformed to use case insensitive pattern matching on string based values for better results.'
+            : 'This query can be transformed to use case insensitive pattern matching on string based values for better results.'}
+          <LinkButton
+            className="hue-preview-info-panels__toggle-pattern-matching-button"
+            data-event=""
+            onClick={() => {
+              onToggleCaseInsensitive();
+            }}
+          >
+            {isCaseInsensitive ? 'Undo' : 'Transform now'}
+          </LinkButton>
+        </p>
+      )}
       {(explanation || assumptions) && (
         <>
           {summary && (

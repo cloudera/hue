@@ -34,5 +34,9 @@
       white-space: pre-line;
       max-width: 80ch;
     }
+
+    .hue-preview-info-panels__toggle-pattern-matching-button {
+      margin-left: vars.$fluidx-spacing-xs;
+    }
   }
 }

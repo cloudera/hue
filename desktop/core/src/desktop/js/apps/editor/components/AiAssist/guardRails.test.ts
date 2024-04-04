@@ -357,4 +357,276 @@ describe('withGuardrails', () => {
     expect(result.guardrailAlert.actions).toContain(exploreActionMsg);
     expect(result.guardrailAlert.actions).toContain(rephrasActionMsg);
   });
+
+  describe('equality transformation', () => {
+    it('should return modified sql and be of type SUGGESTED_IMPROVEMENT', async () => {
+      const mockApiResponse = {
+        sql: `Select * from table1 where col1 = 'value';`,
+        assumptions: 'here is my assumption',
+        tableColumnsMetadata: [
+          {
+            name: 'table1',
+            columns: [
+              { name: 'col1', type: 'varchar(40)' },
+              { name: 'col2', type: 'varchar(40)' }
+            ]
+          }
+        ]
+      };
+      const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+      const result = await withGuardrails(mockFunctionToGuard)({
+        dialect: 'hive'
+      });
+
+      expect(result.guardrailAlert).toBeDefined();
+      expect(result.guardrailAlert.type).toEqual(GuardrailAlertType.SUGGESTED_IMPROVEMENT);
+      expect(result.guardrailAlert.modifiedSql).toEqual(
+        "Select * from table1 where LOWER(col1) LIKE LOWER('%value%');"
+      );
+    });
+
+    it('transforms conditions with double quoted string values', async () => {
+      const mockApiResponse = {
+        sql: `Select * from table1 where col1 = "value";`,
+        assumptions: 'here is my assumption',
+        tableColumnsMetadata: [
+          {
+            name: 'table1',
+            columns: [
+              { name: 'col1', type: 'varchar(40)' },
+              { name: 'col2', type: 'varchar(40)' }
+            ]
+          }
+        ]
+      };
+      const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+      const result = await withGuardrails(mockFunctionToGuard)({
+        dialect: 'hive'
+      });
+
+      expect(result.guardrailAlert).toBeDefined();
+      expect(result.guardrailAlert.type).toEqual(GuardrailAlertType.SUGGESTED_IMPROVEMENT);
+      expect(result.guardrailAlert.modifiedSql).toEqual(
+        "Select * from table1 where LOWER(col1) LIKE LOWER('%value%');"
+      );
+    });
+
+    it('transforms conditions in SQL with line breaks', async () => {
+      const mockApiResponse = {
+        sql: `Select * \nfrom table1\n where col1 = 'value' and \n col2 = 'value2';`,
+        assumptions: 'here is my assumption',
+        tableColumnsMetadata: [
+          {
+            name: 'table1',
+            columns: [
+              { name: 'col1', type: 'varchar(40)' },
+              { name: 'col2', type: 'varchar(40)' }
+            ]
+          }
+        ]
+      };
+      const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+      const result = await withGuardrails(mockFunctionToGuard)({
+        dialect: 'hive'
+      });
+
+      expect(result.guardrailAlert.modifiedSql).toEqual(
+        "Select * \nfrom table1\n where LOWER(col1) LIKE LOWER('%value%') and \n LOWER(col2) LIKE LOWER('%value2%');"
+      );
+    });
+
+    it('transforms conditions with multiple and nested conditions correctly', async () => {
+      const mockApiResponse = {
+        sql: `SELECT * FROM users WHERE name = 'John Doe' AND (age = 30 OR name = 'Bruce S');`,
+        tableColumnsMetadata: [
+          {
+            name: 'users',
+            columns: [
+              { name: 'name', type: 'varchar(100)' },
+              { name: 'age', type: 'int' }
+            ]
+          }
+        ]
+      };
+      const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+      const result = await withGuardrails(mockFunctionToGuard)({
+        dialect: 'hive'
+      });
+
+      expect(result.guardrailAlert.modifiedSql).toEqual(
+        "SELECT * FROM users WHERE LOWER(name) LIKE LOWER('%John Doe%') AND (age = 30 OR LOWER(name) LIKE LOWER('%Bruce S%'));"
+      );
+    });
+
+    it('transforms conditions on joined tables with aliases', async () => {
+      const mockApiResponse = {
+        sql: `SELECT u.id, p.name FROM users u JOIN profiles p ON u.id = p.user_id WHERE p.country = 'USA';`,
+        tableColumnsMetadata: [
+          {
+            name: 'users',
+            columns: [{ name: 'id', type: 'int' }]
+          },
+          {
+            name: 'profiles',
+            columns: [
+              { name: 'name', type: 'text' },
+              { name: 'country', type: 'text' },
+              { name: 'user_id', type: 'int' }
+            ]
+          }
+        ]
+      };
+      const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+      const result = await withGuardrails(mockFunctionToGuard)({
+        dialect: 'hive'
+      });
+
+      expect(result.guardrailAlert.modifiedSql).toEqual(
+        "SELECT u.id, p.name FROM users u JOIN profiles p ON u.id = p.user_id WHERE LOWER(p.country) LIKE LOWER('%USA%');"
+      );
+    });
+
+    it('transforms conditions on joined tables without aliases', async () => {
+      const mockApiResponse = {
+        sql: `SELECT users.id, profiles.name FROM users JOIN profiles ON users.id = profiles.user_id WHERE profiles.country = 'USA';`,
+        tableColumnsMetadata: [
+          {
+            name: 'users',
+            columns: [{ name: 'id', type: 'int' }]
+          },
+          {
+            name: 'profiles',
+            columns: [
+              { name: 'name', type: 'text' },
+              { name: 'country', type: 'text' },
+              { name: 'user_id', type: 'int' }
+            ]
+          }
+        ]
+      };
+      const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+      const result = await withGuardrails(mockFunctionToGuard)({
+        dialect: 'hive'
+      });
+
+      expect(result.guardrailAlert.modifiedSql).toEqual(
+        "SELECT users.id, profiles.name FROM users JOIN profiles ON users.id = profiles.user_id WHERE LOWER(profiles.country) LIKE LOWER('%USA%');"
+      );
+    });
+
+    it('transforms conditions within subqueries', async () => {
+      const mockApiResponse = {
+        sql: `SELECT * FROM orders WHERE customer_id IN (SELECT id FROM customers WHERE city = 'New York');`,
+        tableColumnsMetadata: [
+          {
+            name: 'orders',
+            columns: [{ name: 'customer_id', type: 'int' }]
+          },
+          {
+            name: 'customers',
+            columns: [
+              { name: 'id', type: 'int' },
+              { name: 'city', type: 'varchar(50)' }
+            ]
+          }
+        ]
+      };
+      const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+      const result = await withGuardrails(mockFunctionToGuard)({
+        dialect: 'hive'
+      });
+
+      expect(result.guardrailAlert.modifiedSql).toEqual(
+        "SELECT * FROM orders WHERE customer_id IN (SELECT id FROM customers WHERE LOWER(city) LIKE LOWER('%New York%'));"
+      );
+    });
+
+    it('transforms complex query with JOIN and subquery correctly', async () => {
+      const mockApiResponse = {
+        sql: `SELECT employees.name, departments.name FROM employees JOIN departments ON employees.department_id = departments.id WHERE EXISTS (SELECT * FROM projects WHERE projects.department_id = departments.id AND projects.status = 'Active');`,
+        tableColumnsMetadata: [
+          {
+            name: 'employees',
+            columns: [
+              { name: 'name', type: 'varchar(255)' },
+              { name: 'department_id', type: 'int' }
+            ]
+          },
+          {
+            name: 'departments',
+            columns: [
+              { name: 'name', type: 'varchar(255)' },
+              { name: 'id', type: 'int' }
+            ]
+          },
+          {
+            name: 'projects',
+            columns: [
+              { name: 'department_id', type: 'int' },
+              { name: 'status', type: 'varchar(50)' }
+            ]
+          }
+        ]
+      };
+      const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+      const result = await withGuardrails(mockFunctionToGuard)({
+        dialect: 'mysql'
+      });
+
+      expect(result.guardrailAlert.modifiedSql).toEqual(
+        `SELECT employees.name, departments.name FROM employees JOIN departments ON employees.department_id = departments.id WHERE EXISTS (SELECT * FROM projects WHERE projects.department_id = departments.id AND LOWER(projects.status) LIKE LOWER('%Active%'));`
+      );
+    });
+
+    it('transforms query with condition, order, and limit correctly', async () => {
+      const mockApiResponse = {
+        sql: `SELECT * FROM products WHERE category = 'Furniture' ORDER BY price DESC LIMIT 10;`,
+        tableColumnsMetadata: [
+          {
+            name: 'products',
+            columns: [
+              { name: 'category', type: 'varchar(255)' },
+              { name: 'price', type: 'decimal(10,2)' }
+            ]
+          }
+        ]
+      };
+      const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+      const result = await withGuardrails(mockFunctionToGuard)({
+        dialect: 'postgres'
+      });
+
+      expect(result.guardrailAlert.modifiedSql).toEqual(
+        "SELECT * FROM products WHERE LOWER(category) LIKE LOWER('%Furniture%') ORDER BY price DESC LIMIT 10;"
+      );
+    });
+
+    it('ignores non-string columns and preserves identifiers', async () => {
+      const mockApiResponse = {
+        sql: `SELECT COUNT(*) AS userCount FROM users WHERE signup_date = '2023-01-01';`,
+        tableColumnsMetadata: [
+          {
+            name: 'users',
+            columns: [{ name: 'signup_date', type: 'date' }]
+          }
+        ]
+      };
+      const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+      const result = await withGuardrails(mockFunctionToGuard)({
+        dialect: 'hive'
+      });
+
+      expect(result.guardrailAlert).toBeUndefined();
+    });
+  });
 });
