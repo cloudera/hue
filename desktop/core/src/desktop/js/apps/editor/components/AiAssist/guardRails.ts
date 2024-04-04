@@ -21,12 +21,14 @@ import { SyntaxParser, SyntaxError } from 'parse/types';
 import sqlStatementsParser, { ParsedSqlStatement } from 'parse/sqlStatementsParser';
 
 import { findHallucinations } from './guardRailsHallucinations';
+import { transformToCaseInsensitivePatternMatching } from './guardRailsUnknownDomain';
 
 export enum GuardrailAlertType {
   UNSAFE_SQL = 'UNSAFE_SQL',
   HALLUCINATION = 'HALLUCINATION',
   SYNTAX_ERROR = 'SYNTAX_ERROR',
-  INVALID_AI_RESPONSE = 'INVALID_AI_RESPONSE'
+  INVALID_AI_RESPONSE = 'INVALID_AI_RESPONSE',
+  SUGGESTED_IMPROVEMENT = 'SUGGESTED_IMPROVEMENT'
 }
 
 export const syntaxErrorWarning = (
@@ -159,6 +161,7 @@ export interface GuardrailAlert {
   nql?: string;
   msg?: string;
   aiMsg?: string;
+  modifiedSql?: string;
 }
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -224,6 +227,27 @@ export function withGuardrails(functionToGuard: (...args: any[]) => Promise<any>
                 confirmationText: hallucinationWarning,
                 actions: [rephrasActionMsg, exploreActionMsg]
               };
+            } else {
+              try {
+                // Check if the Guardrails can improve the SQL, e.g. by adding
+                // case insensitive pattern matching.
+                const { modifiedSql } = await transformToCaseInsensitivePatternMatching({
+                  sql,
+                  tableColumnsMetadata,
+                  dialect
+                });
+                if (modifiedSql) {
+                  result.guardrailAlert = {
+                    type: GuardrailAlertType.SUGGESTED_IMPROVEMENT,
+                    modifiedSql
+                  };
+                }
+              } catch (e) {
+                console.error(
+                  'Guardrail error when generating case insensitive pattern matching',
+                  e
+                );
+              }
             }
           }
         }
