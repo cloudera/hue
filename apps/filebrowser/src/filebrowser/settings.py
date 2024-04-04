@@ -28,7 +28,7 @@ from desktop.conf import PERMISSION_ACTION_GS, PERMISSION_ACTION_OFS
 
 
 PERMISSION_ACTIONS = (
-  (PERMISSION_ACTION_S3, "Access to AWS S3 from filebrowser and filepicker."),
+  (PERMISSION_ACTION_S3, "Access to Amazon Web Services (AWS) S3 from filebrowser and filepicker."),
   (PERMISSION_ACTION_ADLS, "Access to Azure Data Lake Storage (ADLS) from filebrowser and filepicker."),
   (PERMISSION_ACTION_ABFS, "Access to Azure Blob File System (ABFS) from filebrowser and filepicker."),
   (PERMISSION_ACTION_GS, "Access to Google File System (GS) from filebrowser and filepicker."),
