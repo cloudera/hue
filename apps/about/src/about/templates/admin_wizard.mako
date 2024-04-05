@@ -23,7 +23,6 @@ from metadata.conf import OPTIMIZER, has_optimizer
 
 from desktop.auth.backend import is_admin
 from desktop.conf import has_connectors
-from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 
 if sys.version_info[0] > 2:
