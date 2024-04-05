@@ -19,7 +19,7 @@ import sys
 from builtins import object
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 
 from django.utils.translation import gettext as _
 
@@ -46,7 +46,7 @@ class OptimizerApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 def check_privileges(view_func):

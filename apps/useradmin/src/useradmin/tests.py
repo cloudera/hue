@@ -41,7 +41,7 @@ from desktop import appmanager
 from desktop.auth.backend import is_admin, create_user
 from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.test_utils import grant_access
 from desktop.views import home, samlgroup_check
 from hadoop import pseudo_hdfs4
@@ -893,7 +893,7 @@ class TestUserAdmin(BaseUserAdminTests):
       assert b"You cannot change a username" in response.content
       # Now make sure that those were materialized
       response = c.get('/useradmin/users/edit/test')
-      assert smart_unicode("Inglés") == response.context[0]["form"].instance.first_name
+      assert smart_str("Inglés") == response.context[0]["form"].instance.first_name
       assert ("Español" if isinstance(response.content, str) else "Español".encode('utf-8')) in response.content
       # Shouldn't be able to demote to non-superuser
       response = c.post('/useradmin/users/edit/test', dict(
@@ -1134,8 +1134,8 @@ class TestUserAdmin(BaseUserAdminTests):
     response = c1.get(reverse('useradmin_views_list_for_autocomplete'))
     content = json.loads(response.content)
 
-    users = [smart_unicode(user['username']) for user in content['users']]
-    groups = [smart_unicode(user['name']) for user in content['groups']]
+    users = [smart_str(user['username']) for user in content['users']]
+    groups = [smart_str(user['name']) for user in content['groups']]
 
     assert [u'user_test_list_for_autocomplete2'] == users
     assert u'group_test_list_for_autocomplete' in groups, groups
@@ -1152,8 +1152,8 @@ class TestUserAdmin(BaseUserAdminTests):
     response = c1.get(reverse('useradmin_views_list_for_autocomplete'), {'include_myself': True})
     content = json.loads(response.content)
 
-    users = [smart_unicode(user['username']) for user in content['users']]
-    groups = [smart_unicode(user['name']) for user in content['groups']]
+    users = [smart_str(user['username']) for user in content['users']]
+    groups = [smart_str(user['name']) for user in content['groups']]
 
     assert [u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2'] == users
     assert u'group_test_list_for_autocomplete' in groups, groups
@@ -1163,8 +1163,8 @@ class TestUserAdmin(BaseUserAdminTests):
     response = c3_other_group.get(reverse('useradmin_views_list_for_autocomplete'), {'include_myself': True})
     content = json.loads(response.content)
 
-    users = [smart_unicode(user['username']) for user in content['users']]
-    groups = [smart_unicode(user['name']) for user in content['groups']]
+    users = [smart_str(user['username']) for user in content['users']]
+    groups = [smart_str(user['name']) for user in content['groups']]
 
     assert [u'user_test_list_for_autocomplete3'] == users
     assert u'group_test_list_for_autocomplete_other_group' in groups, groups
@@ -1175,7 +1175,7 @@ class TestUserAdmin(BaseUserAdminTests):
     response = c4_super_user.get('/desktop/api/users/autocomplete', {'include_myself': True, 'only_mygroups': True})
     content = json.loads(response.content)
 
-    users = [smart_unicode(user['username']) for user in content['users']]
+    users = [smart_str(user['username']) for user in content['users']]
     assert (
       [u'test', u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2', u'user_test_list_for_autocomplete3'] == users)
 
@@ -1187,8 +1187,8 @@ class TestUserAdmin(BaseUserAdminTests):
     response = c4_super_user.get('/desktop/api/users/autocomplete', {'include_myself': True, 'filter': 'Test_list_for_autocomplete'})
     content = json.loads(response.content)
 
-    users = [smart_unicode(user['username']) for user in content['users']]
-    groups = [smart_unicode(user['name']) for user in content['groups']]
+    users = [smart_str(user['username']) for user in content['users']]
+    groups = [smart_str(user['name']) for user in content['groups']]
 
     assert [u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2', u'user_test_list_for_autocomplete3'] == users
     assert [u'group_test_list_for_autocomplete', u'group_test_list_for_autocomplete_other_group'] == groups

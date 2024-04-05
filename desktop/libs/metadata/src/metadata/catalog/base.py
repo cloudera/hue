@@ -19,7 +19,7 @@ import sys
 from builtins import object
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 
 from django.utils.translation import gettext as _
 
@@ -47,7 +47,7 @@ class CatalogApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 class CatalogEntityDoesNotExistException(Exception):
@@ -58,7 +58,7 @@ class CatalogEntityDoesNotExistException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 class CatalogAuthException(Exception):
@@ -69,7 +69,7 @@ class CatalogAuthException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 # Base API

@@ -23,7 +23,7 @@ from urllib.request import Request, urlopen
 
 from django.http import HttpResponse
 
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.views import serve_403_error
 
@@ -46,7 +46,7 @@ def api_error_handler(func):
     except Exception as e:
       LOG.exception('Error running %s' % func)
       response['status'] = -1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
     finally:
       if response:
         return JsonResponse(response)

@@ -114,7 +114,7 @@ def render_to_string_normal(template_name, django_context):
   template = lookup.get_template(template_name)
   data_dict = dict([(str(k), data_dict.get(k)) for k in list(data_dict.keys())])
   result = template.render(**data_dict)
-  return i18n.smart_unicode(result)
+  return i18n.smart_str(result)
 
 # This variable is overridden in test code.
 render_to_string = render_to_string_normal

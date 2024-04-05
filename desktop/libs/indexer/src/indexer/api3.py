@@ -42,7 +42,7 @@ except ImportError:
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.python_util import check_encoding
 from desktop.models import Document2
 from filebrowser.forms import UploadLocalFileForm
@@ -304,7 +304,7 @@ def guess_field_types(request):
     if 'sample' in format_ and format_['sample']:
       format_['sample'] = escape_rows(format_['sample'], nulls_only=True, encoding=encoding)
     for col in format_['columns']:
-      col['name'] = smart_unicode(col['name'], errors='replace', encoding=encoding)
+      col['name'] = smart_str(col['name'], errors='replace', encoding=encoding)
 
   elif file_format['inputFormat'] == 'table':
     sample = get_api(

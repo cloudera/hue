@@ -25,7 +25,7 @@ from subprocess import call
 
 from desktop.lib.rest.http_client import RestException, HttpClient
 from desktop.lib.rest.resource import Resource
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 
 from kafka.conf import KAFKA
 from libzookeeper.conf import zkensemble
@@ -44,7 +44,7 @@ class KafkaApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 class KafkaApi(object):

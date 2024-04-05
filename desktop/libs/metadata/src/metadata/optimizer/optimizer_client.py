@@ -32,7 +32,7 @@ from django.utils.functional import wraps
 from desktop.auth.backend import is_admin
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib import export_csvxls
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 from libsentry.sentry_site import get_hive_sentry_provider
 from libsentry.privilege_checker import get_checker, MissingSentryPrivilegeException
@@ -61,7 +61,7 @@ class NavOptException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 def check_privileges(view_func):

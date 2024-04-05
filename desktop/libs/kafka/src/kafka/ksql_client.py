@@ -23,7 +23,7 @@ import sys
 
 from django.core.cache import cache
 
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 from desktop.conf import has_channels
 
@@ -44,7 +44,7 @@ class KSqlApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 class KSqlApi(object):

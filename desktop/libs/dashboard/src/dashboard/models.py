@@ -34,7 +34,7 @@ import sys
 from django.urls import reverse
 from django.utils.html import escape
 
-from desktop.lib.i18n import smart_unicode, smart_str, force_unicode
+from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import get_data_link, Document2
 from notebook.connectors.base import Notebook, _get_snippet_name
 
@@ -762,15 +762,15 @@ def augment_response(collection, query, response):
         elif field == '_childDocuments_': # Nested documents
           escaped_value = value
         elif isinstance(value, list): # Multivalue field
-          escaped_value = [smart_unicode(escape(val), errors='replace') for val in value]
+          escaped_value = [smart_str(escape(val), errors='replace') for val in value]
         else:
-          value = smart_unicode(value, errors='replace')
+          value = smart_str(value, errors='replace')
           escaped_value = escape(value)
         doc[field] = escaped_value
 
       doc['externalLink'] = link
       doc['details'] = []
-      doc['hueId'] = smart_unicode(doc.get(id_field, ''))
+      doc['hueId'] = smart_str(doc.get(id_field, ''))
       if 'moreLikeThis' in response and response['moreLikeThis'][doc['hueId']].get('numFound'):
         _doc = response['moreLikeThis'][doc['hueId']]
         doc['_childDocuments_'] = _doc['docs']
@@ -782,14 +782,14 @@ def augment_response(collection, query, response):
     id_field = collection.get('idField')
     if id_field:
       for doc in response['response']['docs']:
-        if id_field in doc and smart_unicode(doc[id_field]) in highlighted_fields:
-          highlighting = response['highlighting'][smart_unicode(doc[id_field])]
+        if id_field in doc and smart_str(doc[id_field]) in highlighted_fields:
+          highlighting = response['highlighting'][smart_str(doc[id_field])]
 
           if highlighting:
             escaped_highlighting = {}
             for field, hls in highlighting.items():
               _hls = [
-                escape(smart_unicode(hl, errors='replace')).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
+                escape(smart_str(hl, errors='replace')).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
                 for hl in hls
               ]
               escaped_highlighting[field] = _hls[0] if len(_hls) == 1 else _hls

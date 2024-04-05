@@ -108,7 +108,7 @@ class ExceptionMiddleware(MiddlewareMixin):
   def process_exception(self, request, exception):
     tb = traceback.format_exc()
     logging.info("Processing exception: %s: %s" % (
-      i18n.smart_unicode(exception), i18n.smart_unicode(tb))
+      i18n.smart_str(exception), i18n.smart_str(tb))
     )
 
     if isinstance(exception, PopupException):

@@ -20,7 +20,7 @@ import sys
 from desktop.conf import has_connectors
 from desktop.lib.connectors.models import _get_installed_connectors
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 
 from django.utils.translation import gettext as _
 
@@ -58,4 +58,4 @@ class IndexerApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)

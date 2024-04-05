@@ -25,7 +25,7 @@ from django.utils.encoding import iri_to_uri
 from django.utils.http import urlencode
 
 from desktop import conf
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
 
 
@@ -118,13 +118,13 @@ class Resource(object):
       log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get() if log_response else 0
       duration = time.time() - start_time
       try:
-        req_data = smart_unicode(data, errors='replace')
-        resp_content = smart_unicode(resp.content, errors='replace') if resp and resp.content else ''
+        req_data = smart_str(data, errors='replace')
+        resp_content = smart_str(resp.content, errors='replace') if resp and resp.content else ''
         message = u'%s %s %s%s%s %s%s returned in %dms %s %s %s%s' % (
           method,
           type(self._client._session.auth) if self._client._session and self._client._session.auth else None,
           self._client._base_url,
-          smart_unicode(path, errors='replace'),
+          smart_str(path, errors='replace'),
           iri_to_uri('?' + urlencode(params)) if params else '',
           req_data[:log_length] if data else '',
           log_length and len(req_data) > log_length and '...' or '' if data else '',

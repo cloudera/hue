@@ -22,7 +22,7 @@ import sys
 from django.views.decorators.http import require_GET, require_POST
 
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from libsolr.api import SolrApi
 
 from indexer.solr_client import SolrClient
@@ -42,7 +42,7 @@ def api_error_handler(func):
     except Exception as e:
       LOG.exception('Error running %s' % func.__name__)
       response['status'] = -1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
     finally:
       if response:
         return JsonResponse(response)

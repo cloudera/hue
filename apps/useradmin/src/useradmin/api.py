@@ -19,7 +19,7 @@ import logging
 
 from desktop.decorators import check_superuser_permission
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 
 from useradmin.models import User, Group
 
@@ -35,7 +35,7 @@ def error_handler(view_fn):
     except Exception as e:
       LOG.exception('Error running %s' % view_fn)
       response['status'] = -1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
     return JsonResponse(response)
   return decorator
 

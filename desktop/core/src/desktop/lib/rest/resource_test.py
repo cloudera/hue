@@ -17,9 +17,8 @@
 # limitations under the License.
 
 import json
-import sys
 
-from desktop.lib.i18n import smart_unicode, smart_str
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.resource import Resource
 
 
@@ -32,7 +31,7 @@ def test_concat_unicode_with_ascii_python2():
   except UnicodeDecodeError:
     pass
 
-  assert u'The currency is: €' == u'The currency is: %s' % smart_unicode('€')
+  assert u'The currency is: €' == u'The currency is: %s' % smart_str('€')
 
 
   try:
@@ -45,7 +44,7 @@ def test_concat_unicode_with_ascii_python2():
   except UnicodeDecodeError:
     pass
 
-  u'%s' % smart_unicode('/user/domain/Джейкоб')
+  u'%s' % smart_str('/user/domain/Джейкоб')
 
 
 def test_avoid_concat_unicode_with_ascii():

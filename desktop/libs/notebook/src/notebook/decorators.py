@@ -30,7 +30,7 @@ from dashboard.models import extract_solr_exception_message
 from desktop.conf import ENABLE_HUE_5
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2, Document, FilesystemException
 
@@ -141,7 +141,7 @@ def api_error_handler(f):
     except QueryError as e:
       LOG.exception('Error running %s' % f.__name__)
       response['status'] = 1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
       if response['message'].index("max_row_size"):
         size = re.search(r"(\d+.?\d*) (.B)", response['message'])
         if size and size.group(1):
@@ -165,7 +165,7 @@ def api_error_handler(f):
     except Exception as e:
       LOG.exception('Error running %s' % f.__name__)
       response['status'] = -1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
     finally:
       if response:
         return JsonResponse(response)
