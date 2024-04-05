@@ -61,13 +61,12 @@ def force_unicode(s, strings_only=False, errors='strict'):
   """
   return django.utils.encoding.force_str(s, get_site_encoding(), strings_only, errors)
 
-def smart_str(s, strings_only=False, errors='strict'):
+def smart_str(s, strings_only=False, errors='strict', encoding=None):
   """
   Wrapper around Django's version, while supplying our configured encoding.
   Encode unicode into char array.
   """
-  return django.utils.encoding.smart_str(
-        s, get_site_encoding(), strings_only, errors)
+  return django.utils.encoding.smart_str(s, encoding if encoding is not None else get_site_encoding(), strings_only, errors)
 
 
 _CACHED_ENV = None
