@@ -19,6 +19,7 @@ from builtins import range
 from builtins import object
 import logging
 import os
+import pytest
 import socket
 import sys
 import threading
@@ -36,7 +37,7 @@ if not gen_py_path in sys.path:
 
 from djangothrift_test_gen import TestService
 from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
-from nose.tools import assert_equal, assert_true, assert_raises
+from django.test import TestCase
 from thrift.protocol.TBinaryProtocol import TBinaryProtocolFactory
 from thrift.server import TServer
 from thrift.transport import TSocket
@@ -144,7 +145,7 @@ class TestWithThriftServer(object):
     cls.server.stop_server_process()
 
   def test_basic_operation(self):
-    assert_equal(10, self.client.ping(5))
+    assert 10 == self.client.ping(5)
 
   def test_connection_race(self):
     class Racer(threading.Thread):
@@ -170,9 +171,9 @@ class TestWithThriftServer(object):
 
     for racer in racers:
       racer.join()
-      assert_equal(0, len(racer.errors))
+      assert 0 == len(racer.errors)
 
-class ThriftUtilTest(unittest.TestCase):
+class ThriftUtilTest(TestCase):
   def test_simpler_string(self):
     struct = TestStruct()
     self.assertEquals("TestStruct()",
@@ -271,7 +272,7 @@ class ThriftUtilTest(unittest.TestCase):
     # "sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, "
     # "guid=9144f53015fa33d2:0091efd700000000)), tableName=u\'customers\', tableTypes=None, catalogName=None),)"))
 
-class TestJsonable2Thrift(unittest.TestCase):
+class TestJsonable2Thrift(TestCase):
   """
   Tests a handful of permutations of jsonable2thrift.
   """
@@ -344,7 +345,7 @@ class TestJsonable2Thrift(unittest.TestCase):
     self.assertBackAndForth(TestManyTypes(a_string_list=[u"alpha", u"beta"]))
 
 
-class TestSuperClient(unittest.TestCase):
+class TestSuperClient(TestCase):
 
   def test_wrapper_no_retry(self):
     wrapped_client, transport = Mock(), Mock()
@@ -372,8 +373,9 @@ class TestSuperClient(unittest.TestCase):
       # Could check output for several "Thrift exception; retrying: some error"
 
 
-class TestThriftJWT(unittest.TestCase):
-  def setUp(self):
+@pytest.mark.django_db
+class TestThriftJWT():
+  def setup_method(self):
     self.sample_token = "some_jwt_token"
 
     self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
@@ -425,7 +427,8 @@ class TestThriftJWT(unittest.TestCase):
                 http_url='some_http_url'
               )
 
-              assert_raises(Exception, thrift_util.connect_to_thrift, conf)
+              with pytest.raises(Exception):
+                thrift_util.connect_to_thrift(conf)
 
               # When user not found
               self.user.profile.update_data({'jwt_access_token': self.sample_token})
@@ -439,7 +442,8 @@ class TestThriftJWT(unittest.TestCase):
                 use_sasl=None,
                 http_url='some_http_url'
               )
-              assert_raises(Exception, thrift_util.connect_to_thrift, conf)
+              with pytest.raises(Exception):
+                thrift_util.connect_to_thrift(conf)
             finally:
               reset()
 

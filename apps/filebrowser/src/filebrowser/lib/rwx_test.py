@@ -20,8 +20,9 @@ from builtins import range
 from . import rwx
 
 import unittest
+from django.test import TestCase
 
-class RwxTest(unittest.TestCase):
+class RwxTest(TestCase):
 
   def test_file_type(self):
     self.assertEquals("dir", rwx.filetype(0o40330))

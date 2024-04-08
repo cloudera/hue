@@ -14,14 +14,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from nose.tools import assert_equal
+
 from unittest.mock import Mock
 
 from desktop.lib.fs.gc.gsstat import GSStat
 
 
 class TestGSStat(object):
-  def setUp(self):
+  def setup_method(self):
     self.mock_gs_bucket = Mock()
     self.mock_gs_bucket.name = 'gethue_bucket'
 
@@ -35,31 +35,31 @@ class TestGSStat(object):
   def test_from_bucket(self):
     gs_bucket_stat = GSStat.from_bucket(self.mock_gs_bucket)
 
-    assert_equal(gs_bucket_stat.name, 'gethue_bucket')
-    assert_equal(gs_bucket_stat.path, 'gs://gethue_bucket')
-    assert_equal(gs_bucket_stat.isDir, True)
-    assert_equal(gs_bucket_stat.size, 0)
-    assert_equal(gs_bucket_stat.mtime, None)
+    assert gs_bucket_stat.name == 'gethue_bucket'
+    assert gs_bucket_stat.path == 'gs://gethue_bucket'
+    assert gs_bucket_stat.isDir == True
+    assert gs_bucket_stat.size == 0
+    assert gs_bucket_stat.mtime == None
 
 
   def test_from_key(self):
     gs_key_stat = GSStat.from_key(self.mock_gs_key)
 
-    assert_equal(gs_key_stat.name, 'test.csv')
-    assert_equal(gs_key_stat.path, 'gs://gethue_bucket/test.csv')
-    assert_equal(gs_key_stat.isDir, False)
-    assert_equal(gs_key_stat.size, 123)
-    assert_equal(gs_key_stat.mtime, 1695297780)  # Replace with the expected timestamp
+    assert gs_key_stat.name == 'test.csv'
+    assert gs_key_stat.path == 'gs://gethue_bucket/test.csv'
+    assert gs_key_stat.isDir == False
+    assert gs_key_stat.size == 123
+    assert gs_key_stat.mtime == 1695297780  # Replace with the expected timestamp
 
 
   def test_for_gs_root(self):
     gs_root_stat = GSStat.for_gs_root()
 
-    assert_equal(gs_root_stat.name, 'GS')
-    assert_equal(gs_root_stat.path, 'gs://')
-    assert_equal(gs_root_stat.isDir, True)
-    assert_equal(gs_root_stat.size, 0)
-    assert_equal(gs_root_stat.mtime, None)
+    assert gs_root_stat.name == 'GS'
+    assert gs_root_stat.path == 'gs://'
+    assert gs_root_stat.isDir == True
+    assert gs_root_stat.size == 0
+    assert gs_root_stat.mtime == None
 
 
   def test_to_json_dict(self):
@@ -77,4 +77,4 @@ class TestGSStat(object):
       'aclBit': False
     }
 
-    assert_equal(json_dict, expected_dict)
+    assert json_dict == expected_dict

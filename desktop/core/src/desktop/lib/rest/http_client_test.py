@@ -19,8 +19,6 @@ from requests import Response
 from requests.exceptions import HTTPError
 from desktop.conf import REST_CONN_TIMEOUT
 
-from nose.tools import assert_equal, assert_false, assert_true
-
 from desktop.lib.rest.http_client import RestException, HttpClient
 
 
@@ -36,7 +34,7 @@ def test_http_error_rest_exception():
   headers = {'my header': 'one value'}
   response = build_response('Not found', 404, headers)
   exception = RestException(HTTPError(response=response))
-  assert_equal(headers, exception._headers)
+  assert headers == exception._headers
 
 
 class MockedSession(object):
@@ -61,7 +59,7 @@ def test_clear_cookies():
   client._session = MockedSession({'hue': 'rocks'})
 
   client.execute('put', '/path')
-  assert_true(client._session.cookies)
+  assert client._session.cookies
 
   client.execute('put', '/path', clear_cookies=True)
-  assert_false(client._session.cookies)
+  assert not client._session.cookies

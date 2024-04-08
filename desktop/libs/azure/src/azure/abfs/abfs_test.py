@@ -19,13 +19,13 @@ from __future__ import absolute_import
 import logging
 import json
 import os
+import pytest
 import unittest
 import tempfile
 import time
 
 from django.contrib.auth.models import User
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_false, assert_equal
+from django.test import TestCase
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
@@ -42,12 +42,12 @@ LOG = logging.getLogger()
 """
 Interfaces for ADLS via HttpFs/WebHDFS
 """
-class ABFSTestBase(unittest.TestCase):
-  integration = True
+@pytest.mark.integration
+class ABFSTestBase(TestCase):
 
-  def setUp(self):
+  def setup_method(self, method):
     if not is_abfs_enabled():
-      raise SkipTest
+      pytest.skip("Skipping Test")
     self.client = ABFS.from_config(ABFS_CLUSTERS['default'], ActiveDirectory.from_config(AZURE_ACCOUNTS['default'], version='v2.0'))
     self.c = make_logged_in_client(username='test', is_superuser=False)
     grant_access('test', 'test', 'filebrowser')
@@ -58,38 +58,38 @@ class ABFSTestBase(unittest.TestCase):
     LOG.debug("%s" % self.test_fs)
     self.client.mkdir(self.test_fs)
 
-  def tearDown(self):
+  def teardown_method(self, method):
     self.client.rmtree(self.test_fs)
     
   def test_list(self):
     testfile = 'abfs://'
     filesystems = self.client.listdir(testfile)
     LOG.debug("%s" % filesystems)
-    assert_true(filesystems is not None, filesystems)
+    assert filesystems is not None, filesystems
     
     pathing = self.client.listdir(testfile + filesystems[0],  {"recursive" : "true"} )
     LOG.debug("%s" % pathing)
-    assert_true(pathing is not None, pathing)
+    assert pathing is not None, pathing
     
     directory = self.client.listdir(testfile + filesystems[0] + '/' + pathing[0])
     LOG.debug("%s" % directory)
-    assert_true(directory is not None, directory)
+    assert directory is not None, directory
     
     directory = self.client.listdir(self.test_fs)
     LOG.debug("%s" % directory)
-    assert_true(directory is not None, directory)
+    assert directory is not None, directory
     
     directory = self.client.listdir(abfspath(self.test_fs))
     LOG.debug("%s" % directory)
-    assert_true(directory is not None, directory)
+    assert directory is not None, directory
     
     pathing = self.client._statsf(filesystems[276])
     LOG.debug("%s" % pathing)
-    assert_true(pathing is not None, pathing)
+    assert pathing is not None, pathing
     
     pathing = self.client._statsf(filesystems[277])
     LOG.debug("%s" % pathing)
-    assert_true(pathing is not None, pathing)
+    assert pathing is not None, pathing
     
     
   def test_existence(self):
@@ -100,13 +100,13 @@ class ABFSTestBase(unittest.TestCase):
     self.client.create(test_file)
     
     #Testing root and filesystems
-    assert_true(self.client.exists('abfs://'))
-    assert_true(self.client.exists(test_fs))
+    assert self.client.exists('abfs://')
+    assert self.client.exists(test_fs)
     
     #testing created directories and files
-    assert_true(self.client.exists(test_dir))
-    assert_true(self.client.exists(test_file))
-    assert_false(self.client.exists(test_dir + 'a'))
+    assert self.client.exists(test_dir)
+    assert self.client.exists(test_file)
+    assert not self.client.exists(test_dir + 'a')
      
   def test_stat_output(self):
     """
@@ -123,7 +123,7 @@ class ABFSTestBase(unittest.TestCase):
     #testing filesystems
     result = self.client.stats(test_fs)
     LOG.debug("%s" % result)
-    assert_true(result is not None, result)
+    assert result is not None, result
     result = self.client.listdir_stats(test_fs)
     LOG.debug("%s" % result)
     
@@ -145,10 +145,10 @@ class ABFSTestBase(unittest.TestCase):
     
   def test_mkdir(self):
     test_dir = self.test_fs + '/test_mkdir'
-    assert_false(self.client.exists(test_dir))
+    assert not self.client.exists(test_dir)
     
     self.client.mkdir(test_dir)
-    assert_true(self.client.exists(test_dir))
+    assert self.client.exists(test_dir)
     self.client.isdir(test_dir)
     
     
@@ -169,7 +169,7 @@ class ABFSTestBase(unittest.TestCase):
     
     self.client.flush(test_file, {"position" : test_len} )
     resp = self.client.read(test_file)
-    assert_true(resp == test_string)
+    assert resp == test_string
     self.client.remove(test_file)
   
   def test_rename(self):
@@ -182,28 +182,28 @@ class ABFSTestBase(unittest.TestCase):
     test_file3 = test_fs + '/test 3.txt'
     
     self.client.mkdir(test_dir)
-    assert_true(self.client.exists(test_dir))
-    assert_false(self.client.exists(test_dir2))
+    assert self.client.exists(test_dir)
+    assert not self.client.exists(test_dir2)
     
     self.client.rename(test_dir, test_dir2)
-    assert_false(self.client.exists(test_dir))
-    assert_true(self.client.exists(test_dir2))
+    assert not self.client.exists(test_dir)
+    assert self.client.exists(test_dir2)
     
     self.client.create(test_file)
-    assert_true(self.client.exists(test_file))
-    assert_false(self.client.exists(test_file2))
+    assert self.client.exists(test_file)
+    assert not self.client.exists(test_file2)
     
     self.client.rename(test_file, test_file2)
-    assert_false(self.client.exists(test_file))
-    assert_true(self.client.exists(test_file2))
+    assert not self.client.exists(test_file)
+    assert self.client.exists(test_file2)
     
     self.client.rename(test_dir2, test_dir3)
-    assert_false(self.client.exists(test_dir2))
-    assert_true(self.client.exists(test_dir3))
+    assert not self.client.exists(test_dir2)
+    assert self.client.exists(test_dir3)
     
     self.client.rename(test_dir3, test_dir2)
-    assert_false(self.client.exists(test_dir3))
-    assert_true(self.client.exists(test_dir2))
+    assert not self.client.exists(test_dir3)
+    assert self.client.exists(test_dir2)
     
     
   def test_chmod(self):
@@ -260,12 +260,12 @@ class ABFSTestBase(unittest.TestCase):
       finally:
         remove_from_group(self.user.username, 'has_abfs')
       
-      assert_equal(0, response['status'], response)
+      assert 0 == response['status'], response
       stats = self.client.stats(dest_path)
 
       actual = self.client.read(dest_path)
       expected = file(local_file).read()
-      assert_equal(actual, expected, 'files do not match: %s != %s' % (len(actual), len(expected)))
+      assert actual == expected, 'files do not match: %s != %s' % (len(actual), len(expected))
    
    
   def test_copy_file(self):
@@ -286,7 +286,7 @@ class ABFSTestBase(unittest.TestCase):
     self.client.stats(testdir2 + '/test.txt')
     resp = self.client.read(testdir2 + '/test.txt')
     resp2 = self.client.read(test_file)
-    assert_equal(resp, resp2, "Files %s and %s are not equal" % (test_file, testdir2 + '/test.txt'))
+    assert resp == resp2, "Files %s and %s are not equal" % (test_file, testdir2 + '/test.txt')
     
   
   def test_copy_dir(self):

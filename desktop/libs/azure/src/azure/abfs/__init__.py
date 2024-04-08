@@ -23,7 +23,6 @@ import tempfile
 import posixpath
 import time
 
-from nose.tools import assert_not_equal
 from hadoop.fs import normpath as fs_normpath
 from azure.conf import get_default_abfs_fs
 
@@ -76,7 +75,7 @@ def strip_scheme(path):
     filesystem, file_path = parse_uri(path)[:2]
   except:
     return path
-  assert_not_equal(filesystem, '', 'File System must be Specified')
+  assert filesystem != '', 'File System must be Specified'
   path = filesystem + '/' + file_path
   return path
 

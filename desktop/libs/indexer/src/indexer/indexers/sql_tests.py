@@ -18,9 +18,8 @@
 
 from builtins import object
 import json
+import pytest
 import sys
-
-from nose.tools import assert_equal, assert_true
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.settings import BASE_DIR
@@ -39,9 +38,10 @@ else:
 def mock_uuid():
   return '52f840a8-3dde-434d-934a-2d6e06f3687e'
 
+@pytest.mark.django_db
 class TestSQLIndexer(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -79,7 +79,7 @@ class TestSQLIndexer(object):
     with patch('notebook.models.get_interpreter') as get_interpreter:
       notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    assert_equal(
+    assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
@@ -103,9 +103,8 @@ TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_export_table`;
 
-DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
-    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
-  )
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
+    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
 
   @patch('uuid.uuid4', mock_uuid)
   def test_create_table_from_a_file_to_csv_for_kms_encryption(self):
@@ -157,7 +156,7 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
     ### source dir is in encryption zone, so the scratch dir is in the same dir
-    assert_equal(
+    assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
 (
@@ -177,9 +176,8 @@ CREATE TABLE `default`.`export_table` COMMENT "No comment!"
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_export_table`;
-DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
-    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
-  )
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
+    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
 
     fs = Mock(
         stats=Mock(
@@ -202,7 +200,7 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
     ### source dir is not in encryption zone, so the scratch dir is in user's home dir
-    assert_equal(
+    assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
 (
@@ -222,9 +220,8 @@ CREATE TABLE `default`.`export_table` COMMENT "No comment!"
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_export_table`;
-DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
-      [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
-    )
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
+      [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
 
 class MockRequest(object):
   def __init__(self, fs=None, user=None):
@@ -256,6 +253,7 @@ class MockFs(object):
     return {"mode": 0o0777}
 
 
+@pytest.mark.django_db
 def test_generate_create_text_table_with_data_partition():
   source = {
     u'sourceType': 'hive', u'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id', u'level': 0,
@@ -323,7 +321,7 @@ def test_generate_create_text_table_with_data_partition():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''USE default;''' in sql, sql)
+  assert '''USE default;''' in sql, sql
 
   statement = '''CREATE TABLE `default`.`customer_stats`
 (
@@ -339,15 +337,13 @@ ROW FORMAT   DELIMITED
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
-  assert_true(
-    '''LOAD DATA INPATH '/user/romain/customer_stats.csv' '''
-    '''INTO TABLE `default`.`customer_stats` PARTITION (new_field_1='AAA');''' in sql,
-    sql
-  )
+  assert ('''LOAD DATA INPATH '/user/romain/customer_stats.csv' '''
+    '''INTO TABLE `default`.`customer_stats` PARTITION (new_field_1='AAA');''' in sql), sql
 
 
+@pytest.mark.django_db
 def test_generate_create_kudu_table_with_data():
   source = {
     u'sourceType': 'impala', u'apiHelperType': 'hive', u'sampleCols': [], u'name': u'', u'inputFormat': u'file',
@@ -430,7 +426,7 @@ def test_generate_create_kudu_table_with_data():
     split.return_value = ('/A', 'a')
     sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-    assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`;''' in sql, sql)
+    assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`;''' in sql, sql
 
     statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_index_data`
 (
@@ -456,9 +452,9 @@ ROW FORMAT   DELIMITED
     FIELDS TERMINATED BY ','
   STORED AS TextFile LOCATION '/A'
 TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')'''
-    assert_true(statement in sql, sql)
+    assert statement in sql, sql
 
-    assert_true('''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
+    assert ('''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
         PRIMARY KEY (id)
         PARTITION BY HASH PARTITIONS 16
         STORED AS kudu
@@ -467,11 +463,10 @@ TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')'''
         )
         AS SELECT `id`, `business_id`, `date`, `funny`, `stars`, `text`, `type`, `useful`, `user_id`, `name`, '''
         '''`full_address`, `latitude`, `longitude`, `neighborhoods`, `open`, `review_count`, `state`
-        FROM `default`.`hue__tmp_index_data`''' in sql,
-      sql
-    )
+        FROM `default`.`hue__tmp_index_data`''' in sql), sql
 
 
+@pytest.mark.django_db
 def test_generate_create_parquet_table():
   source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
     '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
@@ -537,7 +532,7 @@ def test_generate_create_parquet_table():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''USE default;''' in sql, sql)
+  assert '''USE default;''' in sql, sql
 
   statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
@@ -553,17 +548,18 @@ def test_generate_create_parquet_table():
   STORED AS TextFile LOCATION '/user/hue/data'
 TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
-  assert_true('''CREATE TABLE `default`.`parquet_table`
+  assert '''CREATE TABLE `default`.`parquet_table`
         STORED AS parquet
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in sql, sql)
+''' in sql, sql
 
-  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql)
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql
 
 
+@pytest.mark.django_db
 def test_generate_create_iceberg_table():
   source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
     '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
@@ -630,7 +626,7 @@ def test_generate_create_iceberg_table():
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
   print(sql)
-  assert_true('''USE default;''' in sql, sql)
+  assert '''USE default;''' in sql, sql
 
   statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
@@ -646,18 +642,19 @@ def test_generate_create_iceberg_table():
   STORED AS TextFile LOCATION '/user/hue/data'
 TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
-  assert_true('''CREATE TABLE `default`.`parquet_table`
+  assert '''CREATE TABLE `default`.`parquet_table`
         STORED BY ICEBERG
 STORED AS parquet
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in sql, sql)
+''' in sql, sql
 
-  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql)
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql
 
 
+@pytest.mark.django_db
 def test_generate_create_orc_table_transactional():
   source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
     '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
@@ -723,7 +720,7 @@ def test_generate_create_orc_table_transactional():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''USE default;''' in sql, sql)
+  assert '''USE default;''' in sql, sql
 
   statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
@@ -739,19 +736,20 @@ def test_generate_create_orc_table_transactional():
   STORED AS TextFile LOCATION '/user/hue/data'
 TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
-  assert_true('''CREATE TABLE `default`.`parquet_table`
+  assert '''CREATE TABLE `default`.`parquet_table`
         STORED AS orc
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in sql, sql)
+''' in sql, sql
 
-  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;
-''' in sql, sql)
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;
+''' in sql, sql
 
 
+@pytest.mark.django_db
 def test_generate_create_empty_kudu_table():
   source = json.loads('''{"sourceType": "impala", "apiHelperType": "impala", "path": "", "inputFormat": "manual"}''')
   destination = json.loads('''{"isTransactional": false, "isInsertOnly": false, "sourceType": "impala", '''
@@ -789,7 +787,7 @@ def test_generate_create_empty_kudu_table():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''CREATE TABLE `default`.`manual_empty_kudu`
+  assert '''CREATE TABLE `default`.`manual_empty_kudu`
 (
   `acct_client` string ,
   `tran_amount` double ,
@@ -798,9 +796,10 @@ def test_generate_create_empty_kudu_table():
   `vrfcn_city_lat` double ,
   `vrfcn_city_lon` double , PRIMARY KEY (acct_client)
 )   STORED AS kudu TBLPROPERTIES('transactional'='false')
-;''' in sql, sql)
+;''' in sql, sql
 
 
+@pytest.mark.django_db
 def test_create_ddl_with_nonascii():
   source = {u'kafkaFieldType': u'delimited', u'rdbmsUsername': u'', u'kafkaFieldTypes': u'',
             u'selectedTableIndex': 0, u'rdbmsJdbcDriverNames': [], u'tableName': u'',
@@ -947,7 +946,7 @@ def test_create_ddl_with_nonascii():
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time=-1,
                                                                               file_encoding=file_encoding).get_str()
 
-  assert_true('''USE default;''' in sql, sql)
+  assert '''USE default;''' in sql, sql
 
   statement = '''CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_renamed_chinese_cities_gb2312`
 (
@@ -961,27 +960,28 @@ def test_create_ddl_with_nonascii():
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
   statement = "LOAD DATA INPATH '/user/admin/renamed_chinese_cities_gb2312.csv' " + \
               "INTO TABLE `default`.`hue__tmp_renamed_chinese_cities_gb2312`;"
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
   statement = '''CREATE TABLE `default`.`renamed_chinese_cities_gb2312`
         STORED AS TextFile
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_renamed_chinese_cities_gb2312`;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
   statement = '''DROP TABLE IF EXISTS `default`.`hue__tmp_renamed_chinese_cities_gb2312`;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
   statement = '''ALTER TABLE `default`.`renamed_chinese_cities_gb2312` ''' + \
               '''SET serdeproperties ("serialization.encoding"="gb2312");'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
 
+@pytest.mark.django_db
 def test_create_ddl_with_abfs():
   finish = ABFS_CLUSTERS.set_for_testing(
     {
@@ -1001,9 +1001,10 @@ def test_create_ddl_with_abfs():
     sql = "\n\n%s;" % db.load_data('default', 'cars', form_data, None, generate_ddl_only=True)
   finally:
     finish()
-  assert_true(u"\'abfs://my-data@yingstorage.dfs.core.windows.net/test_data/cars.csv\'" in sql)
+  assert u"\'abfs://my-data@yingstorage.dfs.core.windows.net/test_data/cars.csv\'" in sql
 
 
+@pytest.mark.django_db
 def test_create_table_from_local():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Hive', 'dialect': 'hive'}
@@ -1052,7 +1053,7 @@ CREATE TABLE IF NOT EXISTS default.test1 (
   `time` bigint,
   `dist` bigint);'''
 
-    assert_equal(statement, sql)
+    assert statement == sql
 
 
 def test_create_table_from_local_mysql():
@@ -1086,9 +1087,10 @@ INSERT INTO default.test1 VALUES ('NY', 'New York', '8143197'), ('CA', 'Los Ange
 ('AZ', 'Phoenix', '1461575'), ('TX', 'San Antonio', '1256509'), ('CA', 'San Diego', '1255540'), \
 ('TX', 'Dallas', '1213825'), ('CA', 'San Jose', '912332');'''
 
-    assert_equal(statement, sql)
+    assert statement == sql
 
 
+@pytest.mark.django_db
 def test_create_table_from_local_impala():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
@@ -1167,9 +1169,10 @@ FROM  default.test1_tmp;
 
 DROP TABLE IF EXISTS default.test1_tmp;'''
 
-    assert_equal(statement, sql)
+    assert statement == sql
 
 
+@pytest.mark.django_db
 def test_create_table_only_header_file_local_impala():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
@@ -1238,9 +1241,10 @@ FROM  default.test1_tmp;
 
 DROP TABLE IF EXISTS default.test1_tmp;'''
 
-    assert_equal(statement, sql)
+    assert statement == sql
 
 
+@pytest.mark.django_db
 def test_create_table_with_drop_column_from_local():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Hive', 'dialect': 'hive'}
@@ -1268,4 +1272,4 @@ CREATE TABLE IF NOT EXISTS default.test1 (
   `hour` bigint,
   `dep` bigint);'''
 
-    assert_equal(statement, sql)
+    assert statement == sql

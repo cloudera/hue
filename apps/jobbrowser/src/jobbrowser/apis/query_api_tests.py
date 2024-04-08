@@ -18,12 +18,11 @@
 
 import json
 import logging
+import os
+import pytest
 import sys
 
 from django.urls import reverse
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
-import os
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
@@ -50,7 +49,7 @@ class TestConvertTo6DigitMsLocalTime():
     # America/New_York timezone is UTC-4
     expected_time = "2023-07-14 08:00:00.123456"
 
-    assert_equal(expected_time, converted_time)
+    assert expected_time == converted_time
 
   @patch.dict(os.environ, {'TZ': 'America/New_York'})
   def convert_3_digit(self):
@@ -60,7 +59,7 @@ class TestConvertTo6DigitMsLocalTime():
     # America/New_York timezone is UTC-4
     expected_time = "2023-07-14 08:00:00.123000"
 
-    assert_equal(expected_time, converted_time)
+    assert expected_time == converted_time
       
   @patch.dict(os.environ, {'TZ': 'America/New_York'})
   def convert_9_digit(self):
@@ -70,7 +69,7 @@ class TestConvertTo6DigitMsLocalTime():
     # America/New_York timezone is UTC-4
     expected_time = "2023-07-14 08:00:00.123456"
 
-    assert_equal(expected_time, converted_time)
+    assert expected_time == converted_time
 
   @patch.dict(os.environ, {'TZ': 'America/New_York'})
   def convert_0_digit(self):
@@ -80,11 +79,12 @@ class TestConvertTo6DigitMsLocalTime():
     # America/New_York timezone is UTC-4
     expected_time = "2023-07-14 08:00:00.000000"
 
-    assert_equal(expected_time, converted_time)    
+    assert expected_time == converted_time    
 
+@pytest.mark.django_db
 class TestApi():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
 
@@ -100,9 +100,9 @@ class TestApi():
 
         resp = QueryApi(self.user).profile(appid, app_type, 'download-profile', app_filters)
 
-        assert_equal(resp.status_code, 200)
-        assert_equal(resp['Content-Disposition'], 'attachment; filename="query-profile_00001.txt"')
-        assert_equal(resp.content, b'Query (id=d94d2fb4815a05c4:b1ccec1500000000):\n  Summary:...')
+        assert resp.status_code == 200
+        assert resp['Content-Disposition'] == 'attachment; filename="query-profile_00001.txt"'
+        assert resp.content == b'Query (id=d94d2fb4815a05c4:b1ccec1500000000):\n  Summary:...'
 
   def test_doc_url(self):
     with patch('jobbrowser.apis.query_api._get_api') as _get_api:
@@ -133,7 +133,7 @@ class TestApi():
         }
 
         result = QueryApi(self.user).app('b246701d30ab0dd1:afc9f65900000000')
-        assert_equal(result.get('doc_url'),
+        assert (result.get('doc_url') ==
                      'https://coordinator:25000/query_plan?query_id=b246701d30ab0dd1:afc9f65900000000')
 
   def test_doc_url_spnego(self):
@@ -168,7 +168,7 @@ class TestApi():
         }
         try:
           result = QueryApi(self.user).app('b246701d30ab0dd1:afc9f65900000000')
-          assert_equal(result.get('doc_url'),
+          assert (result.get('doc_url') ==
                        'https://coordinator:25000/query_plan?'
                        'scheme=https&host=coordinator&port=25000&query_id=b246701d30ab0dd1:afc9f65900000000')
         finally:

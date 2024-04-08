@@ -16,25 +16,25 @@
 # limitations under the License.
 
 import logging
+import pytest
 import os
 import stat
 import tempfile
 import unittest
 
+from django.test import TestCase
 from hadoop import fs, pseudo_hdfs4
-from nose.plugins.attrib import attr
-from nose.tools import assert_equal, assert_true
 
 
 logger = logging.getLogger()
 
 
-class LocalSubFileSystemTest(unittest.TestCase):
-  def setUp(self):
+class LocalSubFileSystemTest(TestCase):
+  def setup_method(self, method):
     self.root = tempfile.mkdtemp()
     self.fs = fs.LocalSubFileSystem(self.root)
 
-  def tearDown(self):
+  def teardown_method(self, method):
     if not os.listdir(self.root):
       os.rmdir(self.root)
     else:
@@ -97,8 +97,8 @@ class LocalSubFileSystemTest(unittest.TestCase):
     self.assertRaises(TypeError, self.fs.open, name="/foo", mode="w")
 
 
-@attr('integration')
-@attr('requires_hadoop')
+@pytest.mark.integration
+@pytest.mark.requires_hadoop
 def test_hdfs_copy():
   minicluster = pseudo_hdfs4.shared_cluster()
   minifs = minicluster.fs
@@ -112,17 +112,17 @@ def test_hdfs_copy():
 
     minifs.copyfile(copy_test_src, copy_test_dst)
     actual = minifs.read(copy_test_dst, 0, len(data) + 100)
-    assert_equal(data, actual)
+    assert data == actual
 
     sb = minifs.stats(copy_test_dst)
-    assert_equal(0o646, stat.S_IMODE(sb.mode))
+    assert 0o646 == stat.S_IMODE(sb.mode)
   finally:
     minifs.do_as_superuser(minifs.rmtree, copy_test_src)
     minifs.do_as_superuser(minifs.rmtree, copy_test_dst)
 
 
-@attr('integration')
-@attr('requires_hadoop')
+@pytest.mark.integration
+@pytest.mark.requires_hadoop
 def test_hdfs_full_copy():
   minicluster = pseudo_hdfs4.shared_cluster()
   minifs = minicluster.fs
@@ -139,12 +139,12 @@ def test_hdfs_full_copy():
     data = "I will not make flatulent noises in class\n" * 2000
     minifs.create(prefix + '/src/file.txt', permission=0o646, data=data)
     minifs.copy(prefix + '/src/file.txt', prefix + '/dest')
-    assert_true(minifs.exists(prefix + '/dest/file.txt'))
+    assert minifs.exists(prefix + '/dest/file.txt')
 
     # Directory to directory copy.
     # No guarantees on directory permissions at the moment.
     minifs.copy(prefix + '/src', prefix + '/dest', True)
-    assert_true(minifs.exists(prefix + '/dest/src'))
+    assert minifs.exists(prefix + '/dest/src')
 
     # Copy directory to file should fail.
     try:
@@ -157,8 +157,8 @@ def test_hdfs_full_copy():
     minifs.do_as_superuser(minifs.rmtree, prefix)
 
 
-@attr('integration')
-@attr('requires_hadoop')
+@pytest.mark.integration
+@pytest.mark.requires_hadoop
 def test_hdfs_copy_from_local():
   minicluster = pseudo_hdfs4.shared_cluster()
   minifs = minicluster.fs
@@ -176,7 +176,7 @@ def test_hdfs_copy_from_local():
 
   minifs.copyFromLocal(path, copy_dest)
   actual = minifs.read(copy_dest, 0, len(data) + 100)
-  assert_equal(data, actual)
+  assert data == actual
 
 
 if __name__ == "__main__":

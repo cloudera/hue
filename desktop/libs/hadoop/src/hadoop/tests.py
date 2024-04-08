@@ -18,11 +18,9 @@
 from future import standard_library
 standard_library.install_aliases()
 import os
+import pytest
 import sys
 
-from nose.tools import assert_true, assert_equal, assert_false
-from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
 
 import desktop.conf as desktop_conf
 
@@ -68,21 +66,21 @@ def test_confparse():
   cp_file = confparse.ConfParse(string_io(data))
 
   for cp in (cp_data, cp_file):
-    assert_equal(cp['fs.default.name'], 'hdfs://localhost:8020')
-    assert_equal(cp.get('with_description'), 'bar')
-    assert_equal(cp.get('not_in_xml', 'abc'), 'abc')
-    assert_equal(cp.getbool('boolean_true'), True)
-    assert_equal(cp.getbool('boolean_false'), False)
-    assert_equal(cp.getbool('not_in_xml', True), True)
+    assert cp['fs.default.name'] == 'hdfs://localhost:8020'
+    assert cp.get('with_description') == 'bar'
+    assert cp.get('not_in_xml', 'abc') == 'abc'
+    assert cp.getbool('boolean_true') == True
+    assert cp.getbool('boolean_false') == False
+    assert cp.getbool('not_in_xml', True) == True
 
     try:
       cp['bogus']
-      assert_true(False, 'Should not get here')
+      assert False, 'Should not get here'
     except KeyError as kerr:
       ex = kerr
 
   cp_empty = confparse.ConfParse("")
-  assert_equal(cp_empty.get('whatever', 'yes'), 'yes')
+  assert cp_empty.get('whatever', 'yes') == 'yes'
 
 def test_tricky_confparse():
   """
@@ -92,9 +90,10 @@ def test_tricky_confparse():
   cp_data = confparse.ConfParse(open(os.path.join(os.path.dirname(__file__),
                                                   "test_data",
                                                   "sample_conf.xml"), 'rb'))
-  assert_equal("org.apache.hadoop.examples.SleepJob", cp_data["mapred.mapper.class"])
+  assert "org.apache.hadoop.examples.SleepJob" == cp_data["mapred.mapper.class"]
 
 
+@pytest.mark.django_db
 def test_config_validator_basic():
   reset = (
     conf.HDFS_CLUSTERS.set_for_testing({'default': {}}),
@@ -106,15 +105,16 @@ def test_config_validator_basic():
   try:
     cli = make_logged_in_client()
     resp = cli.get('/desktop/debug/check_config')
-    assert_true(b'hadoop.hdfs_clusters.default.webhdfs_url' in resp.content)
+    assert b'hadoop.hdfs_clusters.default.webhdfs_url' in resp.content
   finally:
     for old_conf in reset:
       old_conf()
     restore_sys_caches(old_caches)
 
 
-@attr('integration')
-@attr('requires_hadoop')
+@pytest.mark.integration
+@pytest.mark.requires_hadoop
+@pytest.mark.django_db
 def test_config_validator_more():
   # TODO: Setup DN to not load the plugin, which is a common user error.
 
@@ -127,14 +127,15 @@ def test_config_validator_more():
   try:
     resp = cli.get('/debug/check_config')
 
-    assert_false('Failed to access filesystem root' in resp.content)
-    assert_false('Failed to create' in resp.content)
-    assert_false('Failed to chown' in resp.content)
-    assert_false('Failed to delete' in resp.content)
+    assert not 'Failed to access filesystem root' in resp.content
+    assert not 'Failed to create' in resp.content
+    assert not 'Failed to chown' in resp.content
+    assert not 'Failed to delete' in resp.content
   finally:
     restore_sys_caches(old_caches)
 
 
+@pytest.mark.django_db
 def test_non_default_cluster():
   NON_DEFAULT_NAME = 'non_default'
   old_caches = clear_sys_caches()
@@ -144,8 +145,8 @@ def test_non_default_cluster():
   )
   try:
     # This is indeed the only hdfs/mr cluster
-    assert_equal(1, len(cluster.get_all_hdfs()))
-    assert_true(cluster.get_hdfs(NON_DEFAULT_NAME))
+    assert 1 == len(cluster.get_all_hdfs())
+    assert cluster.get_hdfs(NON_DEFAULT_NAME)
 
     cli = make_logged_in_client()
     # That we can get to a view without errors means that the middlewares work
@@ -176,8 +177,7 @@ def test_hdfs_ssl_validate():
     ]
 
     try:
-      assert_equal(conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get(), expected,
-          'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get()))
+      assert conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get())
     finally:
       for reset in resets:
         reset()
@@ -204,8 +204,7 @@ def test_yarn_ssl_validate():
     ]
 
     try:
-      assert_equal(conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get(), expected,
-          'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get()))
+      assert conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get())
     finally:
       for reset in resets:
         reset()

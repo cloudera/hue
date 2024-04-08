@@ -18,9 +18,9 @@
 
 from builtins import object
 import logging
+import pytest
 import sys
 
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false, raises
 from sqlalchemy.exc import UnsupportedCompilationError
 from sqlalchemy.types import NullType, ARRAY, JSON, VARCHAR
 
@@ -41,9 +41,10 @@ else:
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestApi(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
 
     self.user = rewrite_user(User.objects.get(username="test"))
@@ -62,7 +63,7 @@ class TestApi(object):
         'url': 'mysql://'
       }
     }
-    assert_equal(SqlAlchemyApi(self.user, interpreter).backticks, '`')
+    assert SqlAlchemyApi(self.user, interpreter).backticks == '`'
 
     interpreter = {
       'name': 'hive',
@@ -70,7 +71,7 @@ class TestApi(object):
         'url': 'postgresql://'
       }
     }
-    assert_equal(SqlAlchemyApi(self.user, interpreter).backticks, '"')
+    assert SqlAlchemyApi(self.user, interpreter).backticks == '"'
 
 
   def test_create_athena_engine(self):
@@ -107,12 +108,12 @@ class TestApi(object):
 
       data = SqlAlchemyApi(self.user, self.interpreter).fetch_result(notebook, snippet, rows, start_over)
 
-      assert_false(data['has_more'])
-      assert_not_equal(data['has_more'], [])
-      assert_equal(data['has_more'], False)
+      assert not data['has_more']
+      assert data['has_more'] != []
+      assert data['has_more'] == False
 
-      assert_equal(data['data'], [])
-      assert_equal(data['meta'](), [{'type': 'BIGINT_TYPE'}])
+      assert data['data'] == []
+      assert data['meta']() == [{'type': 'BIGINT_TYPE'}]
 
 
   def test_fetch_result_rows(self):
@@ -136,15 +137,15 @@ class TestApi(object):
 
       data = SqlAlchemyApi(self.user, self.interpreter).fetch_result(notebook, snippet, rows, start_over)
 
-      assert_false(data['has_more'])
-      assert_not_equal(data['has_more'], [])
-      assert_equal(data['has_more'], False)
+      assert not data['has_more']
+      assert data['has_more'] != []
+      assert data['has_more'] == False
 
-      assert_equal(data['data'], [['row1'], ['row2']])
-      assert_equal(data['meta'](), [{'type': 'BIGINT_TYPE'}])
+      assert data['data'] == [['row1'], ['row2']]
+      assert data['meta']() == [{'type': 'BIGINT_TYPE'}]
 
 
-  @raises(AuthenticationRequired)
+  @pytest.mark.raises(AuthenticationRequired)
   def test_create_engine_auth_error(self):
     interpreter = {
       'name': 'hive',
@@ -181,7 +182,7 @@ class TestApi(object):
       SqlAlchemyApi(self.user, interpreter)._create_engine()
 
 
-  @raises(AuthenticationRequired)
+  @pytest.mark.raises(AuthenticationRequired)
   def test_create_connection_error(self):
     interpreter = {
       'name': 'hive',
@@ -287,7 +288,7 @@ class TestApi(object):
 
           response = SqlAlchemyApi(self.user, self. interpreter).explain(notebook, snippet)
 
-        assert_equal(explanation, response['explanation'])
+        assert explanation == response['explanation']
 
 
   def test_check_status(self):
@@ -297,11 +298,11 @@ class TestApi(object):
 
       snippet = {'result': {'handle': {'guid': 'guid-1', 'has_result_set': False}}}
       response = SqlAlchemyApi(self.user, self.interpreter).check_status(notebook, snippet)
-      assert_equal(response['status'], 'success')
+      assert response['status'] == 'success'
 
       snippet = {'result': {'handle': {'guid': 'guid-1', 'has_result_set': True}}}
       response = SqlAlchemyApi(self.user, self.interpreter).check_status(notebook, snippet)
-      assert_equal(response['status'], 'available')
+      assert response['status'] == 'available'
 
 
   def test_get_sample_data(self):
@@ -314,11 +315,10 @@ class TestApi(object):
 
           response = SqlAlchemyApi(self.user, self.interpreter).get_sample_data(snippet)
 
-          assert_equal(response['rows'], [[1], [2]])
-          assert_equal(
-            response['full_headers'],
-            [{'name': 'col1', 'type': 'STRING_TYPE', 'comment': ''}]
-          )
+          assert response['rows'] == [[1], [2]]
+          assert (
+            response['full_headers'] ==
+            [{'name': 'col1', 'type': 'STRING_TYPE', 'comment': ''}])
 
 
   def test_get_tables(self):
@@ -332,10 +332,10 @@ class TestApi(object):
             get_view_names.return_value = ['view1']
 
             response = SqlAlchemyApi(self.user, self.interpreter).autocomplete(snippet, database='database1')
-            assert_equal(response['tables_meta'][0]['name'], 'table1')
-            assert_equal(response['tables_meta'][1]['name'], 'view1')
-            assert_equal(response['tables_meta'][0]['type'], 'Table')
-            assert_equal(response['tables_meta'][1]['type'], 'View')
+            assert response['tables_meta'][0]['name'] == 'table1'
+            assert response['tables_meta'][1]['name'] == 'view1'
+            assert response['tables_meta'][0]['type'] == 'Table'
+            assert response['tables_meta'][1]['type'] == 'View'
 
 
   def test_get_sample_data_table(self):
@@ -348,7 +348,7 @@ class TestApi(object):
 
           response = SqlAlchemyApi(self.user, self.interpreter).get_sample_data(snippet, database='database1', table='table1')
 
-          assert_equal(response['rows'], [[1], [2]])
+          assert response['rows'] == [[1], [2]]
 
 
   def test_dialect_trim_statement_semicolon(self):
@@ -400,12 +400,13 @@ class TestApi(object):
       CONNECTIONS.get.return_value = {'logs': log}
 
       data = SqlAlchemyApi(self.user, self.interpreter).get_log(notebook, snippet)
-      assert_equal(data, '\n'.join(log))
+      assert data == '\n'.join(log)
 
 
+@pytest.mark.django_db
 class TestDialects(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
 
@@ -414,31 +415,32 @@ class TestDialects(object):
     interpreter = {'name': 'hive', 'options': {'url': 'dialect://'}, 'dialect_properties': {'sql_identifier_quote': '`'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
-    assert_equal(data, 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n')
+    assert data == 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n'
 
 
     interpreter = {'options': {'url': 'dialect://'}, 'dialect_properties': {'sql_identifier_quote': '"'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
-    assert_equal(data, 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n')
+    assert data == 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n'
 
 
   def test_backticks_without_connectors(self):
     interpreter = {'name': 'hive', 'options': {'url': 'hive://'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
-    assert_equal(data, 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n')
+    assert data == 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n'
 
 
     interpreter = {'name': 'postgresql', 'options': {'url': 'postgresql://'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
-    assert_equal(data, 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n')
+    assert data == 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n'
 
 
+@pytest.mark.django_db
 class TestAutocomplete(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
 
@@ -457,7 +459,7 @@ class TestAutocomplete(object):
 
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet)
 
-          assert_equal(data['databases'], ['SYSTEM', ''])
+          assert data['databases'] == ['SYSTEM', '']
 
   def test_columns_with_null_type(self):
     interpreter = {
@@ -490,8 +492,8 @@ class TestAutocomplete(object):
 
           data = SqlAlchemyApi(self.user, interpreter).autocomplete(snippet, database='database', table='table')
 
-          assert_equal(data['columns'], ['col1', 'col2'])
-          assert_equal([col['type'] for col in data['extended_columns']], ['string', 'null'])
+          assert data['columns'] == ['col1', 'col2']
+          assert [col['type'] for col in data['extended_columns']] == ['string', 'null']
 
   def test_get_keys(self):
 
@@ -511,13 +513,14 @@ class TestAutocomplete(object):
 
       keys = Assist(db, engine, backticks).get_keys(database, table)
 
-      assert_true(keys['primary_keys'])  # For some reason could not mock two level to get some colum names
-      assert_equal(keys['foreign_keys'][0]['to'], 'db2.table2.col2')
+      assert keys['primary_keys']  # For some reason could not mock two level to get some colum names
+      assert keys['foreign_keys'][0]['to'] == 'db2.table2.col2'
 
 
+@pytest.mark.django_db
 class TestUtils():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
 
     self.user = rewrite_user(User.objects.get(username="test"))
@@ -534,10 +537,10 @@ class TestUtils():
     with patch('notebook.connectors.sql_alchemy.str') as str:
       str.side_effect = UnsupportedCompilationError(None, None)
 
-      assert_equal(api._get_column_type_name({'type': VARCHAR}), 'varchar')  # Not complex but not testable otherwise
-      assert_equal(api._get_column_type_name({'type': NullType}), 'null')
-      assert_equal(api._get_column_type_name({'type': ARRAY}), 'array')
-      assert_equal(api._get_column_type_name({'type': JSON}), 'json')
+      assert api._get_column_type_name({'type': VARCHAR}) == 'varchar'  # Not complex but not testable otherwise
+      assert api._get_column_type_name({'type': NullType}) == 'null'
+      assert api._get_column_type_name({'type': ARRAY}) == 'array'
+      assert api._get_column_type_name({'type': JSON}) == 'json'
 
 
   def test_fix_bigquery_db_prefixes(self):
@@ -549,5 +552,5 @@ class TestUtils():
     }
     api = SqlAlchemyApi(self.user, interpreter)
 
-    assert_equal(api._fix_bigquery_db_prefixes('table'), 'table')
-    assert_equal(api._fix_bigquery_db_prefixes('db.table'), 'table')
+    assert api._fix_bigquery_db_prefixes('table') == 'table'
+    assert api._fix_bigquery_db_prefixes('db.table') == 'table'

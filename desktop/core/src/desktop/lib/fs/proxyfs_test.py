@@ -16,12 +16,10 @@
 
 from __future__ import absolute_import
 
+import pytest
 import sys
 
 from builtins import object
-from nose.plugins.attrib import attr
-from nose.tools import assert_raises, assert_false, eq_
-from nose import SkipTest
 
 from useradmin.models import User
 
@@ -36,6 +34,7 @@ else:
   from mock import patch, MagicMock
 
 
+@pytest.mark.django_db
 def test_fs_selection():
   make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
   user = User.objects.get(username='test')
@@ -50,29 +49,30 @@ def test_fs_selection():
 
     proxy_fs.isdir('s3a://bucket/key')
     s3fs.isdir.assert_called_once_with('s3a://bucket/key')
-    assert_false(hdfs.isdir.called)
+    assert not hdfs.isdir.called
 
     proxy_fs.isfile('hdfs://localhost:42/user/alice/file')
     hdfs.isfile.assert_called_once_with('hdfs://localhost:42/user/alice/file')
-    assert_false(s3fs.isfile.called)
+    assert not s3fs.isfile.called
 
     proxy_fs.isdir('adl://net/key')
     adls.isdir.assert_called_once_with('adl://net/key')
-    assert_false(hdfs.isdir.called)
+    assert not hdfs.isdir.called
 
     proxy_fs.isdir('abfs://net/key')
     abfs.isdir.assert_called_once_with('abfs://net/key')
-    assert_false(hdfs.isdir.called)
+    assert not hdfs.isdir.called
 
     proxy_fs.isdir('gs://net/key')
     gs.isdir.assert_called_once_with('gs://net/key')
-    assert_false(hdfs.isdir.called)
+    assert not hdfs.isdir.called
 
     proxy_fs.isdir('ofs://volume/bucket/key')
     ofs.isdir.assert_called_once_with('ofs://volume/bucket/key')
-    assert_false(hdfs.isdir.called)
+    assert not hdfs.isdir.called
 
-    assert_raises(IOError, proxy_fs.stats, 'ftp://host')
+    with pytest.raises(IOError):
+      proxy_fs.stats('ftp://host')
 
 def wrapper(mock):
   def tmp(*args, **kwargs):
@@ -80,6 +80,7 @@ def wrapper(mock):
   return tmp
 
 
+@pytest.mark.django_db
 def test_multi_fs_selection():
   make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
   user = User.objects.get(username='test')
@@ -95,38 +96,40 @@ def test_multi_fs_selection():
 
     proxy_fs.copy('s3a://bucket1/key', 's3a://bucket2/key')
     s3fs.copy.assert_called_once_with('s3a://bucket1/key', 's3a://bucket2/key')
-    assert_false(hdfs.copy.called)
+    assert not hdfs.copy.called
 
     proxy_fs.copyfile('s3a://bucket/key', 'key2')
     s3fs.copyfile.assert_called_once_with('s3a://bucket/key', 'key2')
-    assert_false(hdfs.copyfile.called)
+    assert not hdfs.copyfile.called
 
     proxy_fs.copyfile('adl://net/key', 'key2')
     adls.copyfile.assert_called_once_with('adl://net/key', 'key2')
-    assert_false(hdfs.copyfile.called)
+    assert not hdfs.copyfile.called
 
     proxy_fs.copyfile('abfs:/key', 'key2')
     abfs.copyfile.assert_called_once_with('abfs:/key', 'key2')
-    assert_false(hdfs.copyfile.called)
+    assert not hdfs.copyfile.called
 
     proxy_fs.rename('/tmp/file', 'shmile')
     hdfs.rename.assert_called_once_with('/tmp/file', 'shmile')
-    assert_false(s3fs.rename.called)
+    assert not s3fs.rename.called
 
     proxy_fs.copyfile('gs://bucket/key', 'key2')
     gs.copyfile.assert_called_once_with('gs://bucket/key', 'key2')
-    assert_false(hdfs.copyfile.called)
+    assert not hdfs.copyfile.called
 
     proxy_fs.copyfile('ofs://volume/bucket/key', 'key2')
     ofs.copyfile.assert_called_once_with('ofs://volume/bucket/key', 'key2')
-    assert_false(hdfs.copyfile.called)
+    assert not hdfs.copyfile.called
 
     # Exception can only be thrown if scheme is specified, else default to 1st scheme
-    assert_raises(NotImplementedError, proxy_fs.copy_remote_dir, 's3a://bucket/key', 'adl://tmp/dir')
+    with pytest.raises(NotImplementedError):
+      proxy_fs.copy_remote_dir('s3a://bucket/key', 'adl://tmp/dir')
 
 
 def test_constructor_given_invalid_arguments():
-  assert_raises(ValueError, ProxyFS, {'s3a': {}}, 'hdfs')
+  with pytest.raises(ValueError):
+    ProxyFS({'s3a': {}}, 'hdfs')
 
 
 class MockFs(object):
@@ -142,6 +145,7 @@ class MockFs(object):
 
 
 
+@pytest.mark.django_db
 class TestFsPermissions(object):
 
   def test_fs_permissions_regular_user(self):
@@ -165,13 +169,20 @@ class TestFsPermissions(object):
     remove_from_group(user.username, 'has_ofs')
 
     # No perms by default
-    assert_raises(Exception, f, 's3a://bucket')
-    assert_raises(Exception, f, 'S3A://bucket/key')
-    assert_raises(Exception, f, 'adl://net/key')
-    assert_raises(Exception, f, 'adl:/key')
-    assert_raises(Exception, f, 'abfs:/key')
-    assert_raises(Exception, f, 'gs://bucket/key')
-    assert_raises(Exception, f, 'ofs://volume/bucket/key')
+    with pytest.raises(Exception):
+      f('s3a://bucket')
+    with pytest.raises(Exception):
+      f('S3A://bucket/key')
+    with pytest.raises(Exception):
+      f('adl://net/key')
+    with pytest.raises(Exception):
+      f('adl:/key')
+    with pytest.raises(Exception):
+      f('abfs:/key')
+    with pytest.raises(Exception):
+      f('gs://bucket/key')
+    with pytest.raises(Exception):
+      f('ofs://volume/bucket/key')
     f('hdfs://path')
     f('/tmp')
 

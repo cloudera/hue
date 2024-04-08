@@ -23,7 +23,9 @@ from desktop.log import log_buffer
 import logging
 import unittest
 
-class TestLogBuffer(unittest.TestCase):
+from django.test import TestCase
+
+class TestLogBuffer(TestCase):
   def test_logger(self):
     logger = logging.getLogger()
     handler = log_buffer.FixedBufferHandler()

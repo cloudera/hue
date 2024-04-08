@@ -18,8 +18,6 @@
 
 import sys
 
-from nose.tools import assert_equal, assert_true, assert_false
-
 from libsaml.conf import xmlsec
 
 if sys.version_info[0] > 2:
@@ -34,4 +32,4 @@ def test_xmlsec_dynamic_default_no_which():
       side_effect = OSError('No such file or directory. `which` command is not present')
     )
 
-    assert_equal('/usr/local/bin/xmlsec1', xmlsec())
+    assert '/usr/local/bin/xmlsec1' == xmlsec()

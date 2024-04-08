@@ -25,6 +25,7 @@ from djangothrift_test_gen.ttypes import TestStruct
 import unittest
 
 from desktop.lib.django_test_util import configure_django_for_test, create_tables
+from django.test import TestCase
 
 configure_django_for_test()
 
@@ -40,7 +41,7 @@ class ThriftTestModel(models.Model):
   my_int = models.IntegerField()
   my_struct = ThriftField(TestStruct)
 
-class TestThriftField(unittest.TestCase):
+class TestThriftField(TestCase):
   def test_store_and_retrieve(self):
     create_tables(ThriftTestModel)
     struct = TestStruct()

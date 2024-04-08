@@ -21,14 +21,14 @@ standard_library.install_aliases()
 from builtins import range
 import unittest
 import logging
+import pytest
 import random
 import sys
 import subprocess
 
 from filebrowser.lib import xxd
 
-from nose.plugins.skip import SkipTest
-
+from django.test import TestCase
 from subprocess import Popen, PIPE
 
 if sys.version_info[0] > 2:
@@ -40,7 +40,7 @@ LOG = logging.getLogger()
 
 LENGTH = 1024*10 # 10KB
 
-class XxdTest(unittest.TestCase):
+class XxdTest(TestCase):
   def test_mask_not_alphanumeric(self):
     self.assertEquals( (1, ". X"), xxd.mask_not_alphanumeric("\n X"))
 
@@ -86,12 +86,12 @@ class XxdTest(unittest.TestCase):
     I tested using a temporary file and a side-by-side diff tool (vimdiff).
     """
     # Skip as blocking CI and low usage feature
-    raise SkipTest
+    pytest.skip("Skipping Test")
     try:
       subprocess.check_output('type xxd', shell=True)
     except subprocess.CalledProcessError as e:
       LOG.warning('xxd not found')
-      raise SkipTest
+      pytest.skip("Skipping Test")
     # /dev/random tends to hang on Linux, so we use python instead.
     # It's inefficient, but it's not terrible.
     random_text = "".join(chr(random.getrandbits(8)) for _ in range(LENGTH))

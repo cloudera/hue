@@ -18,7 +18,6 @@
 
 import sys
 
-from nose.tools import assert_true, assert_false
 from desktop.lib.fs.ozone.upload import OFSFileUploadHandler
 
 if sys.version_info[0] > 2:
@@ -37,33 +36,33 @@ class TestOFSFileUploadHandler(object):
       request = Mock(GET={'dest': 'ofs://service-id/vol1/buck1/key'})
       upload_handler = OFSFileUploadHandler(request)
 
-      assert_true(upload_handler._is_ofs_upload())
+      assert upload_handler._is_ofs_upload()
 
       # Check for s3a path
       request = Mock(GET={'dest': 's3a://buck1/key'})
       upload_handler = OFSFileUploadHandler(request)
 
-      assert_false(upload_handler._is_ofs_upload())
+      assert not upload_handler._is_ofs_upload()
 
       # Check for gs path
       request = Mock(GET={'dest': 'gs://buck1/key'})
       upload_handler = OFSFileUploadHandler(request)
 
-      assert_false(upload_handler._is_ofs_upload())
+      assert not upload_handler._is_ofs_upload()
 
       # Check for abfs path
       request = Mock(GET={'dest': 'abfs://container1/key'})
       upload_handler = OFSFileUploadHandler(request)
 
-      assert_false(upload_handler._is_ofs_upload())
+      assert not upload_handler._is_ofs_upload()
 
       # Check for hdfs path
       request = Mock(GET={'dest': '/user/gethue'})
       upload_handler = OFSFileUploadHandler(request)
 
-      assert_false(upload_handler._is_ofs_upload())
+      assert not upload_handler._is_ofs_upload()
 
       request = Mock(GET={'dest': 'hdfs://user/gethue'})
       upload_handler = OFSFileUploadHandler(request)
 
-      assert_false(upload_handler._is_ofs_upload())
+      assert not upload_handler._is_ofs_upload()

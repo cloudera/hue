@@ -18,7 +18,6 @@
 
 from builtins import object
 from django.urls import reverse
-from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access

@@ -18,12 +18,11 @@
 
 from builtins import object
 import json
+import pytest
 import time
 
 from django.urls import reverse
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -38,6 +37,7 @@ from pig.models import create_or_update_script, PigScript
 from pig.api import OozieApi, get
 
 
+@pytest.mark.django_db
 class TestPigBase(object):
   SCRIPT_ATTRS = {
       'id': 1000,
@@ -48,7 +48,7 @@ class TestPigBase(object):
       'hadoopProperties': []
   }
 
-  def setUp(self):
+  def setup_method(self):
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "pig")
     self.user = User.objects.get(username='test')
@@ -69,7 +69,7 @@ class TestMock(TestPigBase):
 
   def test_create_script(self):
     pig_script = self.create_script()
-    assert_equal('Test', pig_script.dict['name'])
+    assert 'Test' == pig_script.dict['name']
 
   def test_check_hcatalogs_sharelib(self):
     api = get(None, None, self.user)
@@ -77,7 +77,7 @@ class TestMock(TestPigBase):
 
     # Regular
     wf = api._create_workflow(pig_script, '[]')
-    assert_false({'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog,hive'} in wf.find_all_parameters(), wf.find_all_parameters())
+    assert not {'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog,hive'} in wf.find_all_parameters(), wf.find_all_parameters()
 
     # With HCat
     pig_script.update_from_dict({
@@ -88,11 +88,11 @@ class TestMock(TestPigBase):
     pig_script.save()
 
     wf = api._create_workflow(pig_script, '[]')
-    assert_true({'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog,hive'} in wf.find_all_parameters(), wf.find_all_parameters())
+    assert {'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog,hive'} in wf.find_all_parameters(), wf.find_all_parameters()
 
     start_link = wf.start.get_link()
     pig_action = start_link.child
-    assert_equal([], pig_action.credentials)
+    assert [] == pig_action.credentials
 
   def test_check_automated_hcatalogs_credentials(self):
     reset = SECURITY_ENABLED.set_for_testing(True)
@@ -122,14 +122,14 @@ class TestMock(TestPigBase):
       wf = api._create_workflow(pig_script, '[]')
       start_link = wf.start.get_link()
       pig_action = start_link.child
-      assert_equal([{u'name': u'hcat', u'value': True}, {u'name': u'hbase', u'value': True}], pig_action.credentials)
+      assert [{u'name': u'hcat', u'value': True}, {u'name': u'hbase', u'value': True}] == pig_action.credentials
     finally:
       reset()
 
 
   def test_editor_view(self):
     response = self.c.get(reverse('pig:app'))
-    assert_true(b'Unsaved script' in response.content)
+    assert b'Unsaved script' in response.content
 
   def test_save(self):
     attrs = {'user': self.user,}
@@ -147,7 +147,7 @@ class TestMock(TestPigBase):
   def parse_oozie_logs(self):
     api = get(None, None, self.user)
 
-    assert_equal(
+    assert (
 '''Run pig script using PigRunner.run() for Pig version 0.8+
   Apache Pig version 0.11.0-cdh4.4.0-SNAPSHOT (rexported)
   compiled Jun 30 2013, 03:40:22
@@ -165,13 +165,14 @@ class TestMock(TestPigBase):
   hdfs://localhost:8020/user/romain/tweets  <dir>
   hdfs://localhost:8020/user/romain/wordcount.jar<r 1>  3165
   hdfs://localhost:8020/user/romain/words  <dir>
-  hdfs://localhost:8020/user/romain/yelp  <dir>''', api._match_logs({'logs': [None, OOZIE_LOGS]}))
+  hdfs://localhost:8020/user/romain/yelp  <dir>''' == api._match_logs({'logs': [None, OOZIE_LOGS]}))
 
 
+@pytest.mark.django_db
 class TestWithHadoop(OozieBase):
 
-  def setUp(self):
-    super(TestWithHadoop, self).setUp()
+  def setup_method(self):
+    super(TestWithHadoop, self).setup_method()
     # FIXME (HUE-2562): The tests unfortunately require superuser at the
     # moment, but should be rewritten to not need it.
     self.c = make_logged_in_client(is_superuser=True)
@@ -210,23 +211,23 @@ class TestWithHadoop(OozieBase):
     workflow = self.api._create_workflow(pig_script, params)
     pig_action = workflow.start.get_child('to').get_full_node()
 
-    assert_equal([
+    assert [
         {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'output=%s' % output_path},
         {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'input=/data'},
         {u'type': u'argument', u'value': u'-optimizer_off'}, {u'type': u'argument', u'value': u'SplitFilter'},
         {u'type': u'argument', u'value': u'-v'},
-    ], pig_action.get_params())
+    ] == pig_action.get_params()
 
-    assert_equal([
+    assert [
         {u'name': u'mapred.map.tasks.speculative.execution', u'value': u'false'},
         {u'name': u'mapred.job.queue', u'value': u'fast'},
-    ], pig_action.get_properties())
+    ] == pig_action.get_properties()
 
-    assert_equal(['/tmp/file'], pig_action.get_files())
+    assert ['/tmp/file'] == pig_action.get_files()
 
-    assert_equal([
+    assert [
         {u'dummy': u'', u'name': u'/tmp/file.zip'},
-    ], pig_action.get_archives())
+    ] == pig_action.get_archives()
 
   def wait_until_completion(self, pig_script_id, timeout=300.0, step=5, expected_status='SUCCEEDED'):
     script = PigScript.objects.get(id=pig_script_id)

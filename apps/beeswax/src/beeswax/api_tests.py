@@ -18,10 +18,10 @@
 
 import json
 import logging
+import pytest
 import sys
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_raises
+from django.test import TestCase
 from requests.exceptions import ReadTimeout
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -40,9 +40,10 @@ else:
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestApi():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -57,13 +58,12 @@ class TestApi():
 
     resp = _autocomplete(db, database='database')
 
-    assert_equal(
-      resp,
+    assert (
+      resp ==
       {
         'code': 500,
         'error': "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)"
-      }
-    )
+      })
 
 
   def test_get_functions(self):
@@ -79,10 +79,9 @@ class TestApi():
 
     resp = get_functions(db)
 
-    assert_equal(
-      resp,
-      [{'name': 'f1'}, {'name': 'f2'}]
-    )
+    assert (
+      resp ==
+      [{'name': 'f1'}, {'name': 'f2'}])
 
 
   def test_get_functions(self):
@@ -94,10 +93,9 @@ class TestApi():
 
       resp = _autocomplete(db, database='default', operation='functions')
 
-      assert_equal(
-        resp['functions'],
-        [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}]
-      )
+      assert (
+        resp['functions'] ==
+        [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}])
 
 
   def test_get_function(self):
@@ -115,19 +113,18 @@ class TestApi():
 
     data = _autocomplete(db, database='floor_month', operation='function')
 
-    assert_equal(
-      data['function'],
+    assert (
+      data['function'] ==
       {
         'name': 'floor_month',
         'signature': 'floor_month(param)',
         'description':
             'Returns the timestamp at a month granularity\nparam needs to be a timestamp value\nExample:\n'
             '> SELECT floor_month(CAST(\'yyyy-MM-dd HH:mm:ss\' AS TIMESTAMP)) FROM src;\nyyyy-MM-01 00:00:00'
-      }
-    )
+      })
 
 
     db.client = Mock(query_server = {'dialect': 'impala'})
     data = _autocomplete(db, operation='function')
 
-    assert_equal(data['function'], {})
+    assert data['function'] == {}

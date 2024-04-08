@@ -56,7 +56,7 @@ jobs:
 
     - name: run tests
       run: |
-        PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
+        PYTHONWARNINGS=always ./build/env/bin/pytest
 
     - name: run python lints
       run: |
