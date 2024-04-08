@@ -57,7 +57,7 @@ const TEMPLATE = `
       <div class="assist-flex-search">
         <div class="assist-filter">
           <form autocomplete="off">
-            <input class="clearable" data-testid = "langref-assist-filter-input" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+            <input class="clearable" data-testid="langref-assist-filter-input" type="text" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
           </form>
         </div>
       </div>

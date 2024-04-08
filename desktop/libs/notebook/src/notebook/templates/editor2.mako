@@ -113,14 +113,14 @@ There is no bridge to KO for components using this integration. Example using in
     <!-- ko template: { ifnot: editorMode() || isPresentationMode(), name: 'editor-execution-actions' }--><!-- /ko -->
 
     <!-- ko ifnot: isPresentationMode() -->
-    <div class="dropdown pull-right margin-left-10" data-testid = "editor-actions-menu">
+    <div class="dropdown pull-right margin-left-10" data-testid="editor-actions-menu">
       <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </a>
       <ul class="dropdown-menu pull-right">
         <li>
           <!-- ko if: editorMode -->
-          <a data-hue-analytics="editor:new-query-button-click" data-testid = "new-editor-button" href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null, 'blank'); }, attr: { 'title': '${ _('New ') }' +  editorTitle() + '${ _(' Query') }' }">
+          <a data-hue-analytics="editor:new-query-button-click" data-testid="new-editor-button" href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null, 'blank'); }, attr: { 'title': '${ _('New ') }' +  editorTitle() + '${ _(' Query') }' }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
           <!-- /ko -->
@@ -676,7 +676,7 @@ There is no bridge to KO for components using this integration. Example using in
 ##    </a>
 ##    <!-- /ko -->
 ##    <!-- ko if: ! isBatchable() || ! wasBatchExecuted() -->
-##    <a class="snippet-side-btn" data-testid = "query-run-button" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading' && status() != 'starting', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }, style: {'padding-left': $parent.isBatchable() ? '2px' : '0' }">
+##    <a class="snippet-side-btn" data-testid="query-run-button" style="padding-right:0" href="javascript: void(0)" data-bind="attr: {'title': $root.editorMode() && result.statements_count() > 1 ? '${ _ko('Execute next statement')}' : '${ _ko('Execute or CTRL + ENTER') }'}, click: function() { wasBatchExecuted(false); execute(); }, visible: status() != 'running' && status() != 'loading' && status() != 'starting', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }, style: {'padding-left': $parent.isBatchable() ? '2px' : '0' }">
 ##      <i class="fa fa-fw fa-play" data-bind="css: { 'snippet-side-single' : ! $parent.isBatchable() }"></i>
 ##    </a>
 ##    <!-- /ko -->
@@ -930,10 +930,10 @@ There is no bridge to KO for components using this integration. Example using in
       <div class="editor-bottom">
         <ul class="editor-bottom-tabs nav nav-tabs">
           <li data-bind="click: function() { currentQueryTab('queryHistory'); }, css: { 'active': currentQueryTab() == 'queryHistory' }">
-            <a data-hue-analytics="editor:bottom-tab-click/query-history" class="inactive-action" data-testid = "query-history-tab" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
+            <a data-hue-analytics="editor:bottom-tab-click/query-history" class="inactive-action" data-testid="query-history-tab" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
           </li>
           <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: { 'active': currentQueryTab() == 'savedQueries' }">
-            <a data-hue-analytics="editor:bottom-tab-click/saved-queries" class="inactive-action" data-testid = "saved-queries-tab" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
+            <a data-hue-analytics="editor:bottom-tab-click/saved-queries" class="inactive-action" data-testid="saved-queries-tab" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
           </li>
           <li data-bind="click: function() { currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
             <a data-hue-analytics="editor:bottom-tab-click/query-result" class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}

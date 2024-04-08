@@ -26,7 +26,7 @@ const TEMPLATE = `
   <!-- ko if: !menuOnly && (!dropDownVisible() || !searchable) -->
   <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="
     attr: {
-      'data-test-id': dataTestId
+      'data-testid': dataTestId
     },
     toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
     <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
@@ -37,7 +37,7 @@ const TEMPLATE = `
   </a>
   <!-- /ko -->
   <!-- ko if: !menuOnly && (dropDownVisible() && searchable) -->
-  <input class="hue-drop-down-input" data-testid = "database-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
+  <input class="hue-drop-down-input" data-testid="database-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
   <i class="fa fa-caret-down"></i>
   <!-- /ko -->
   <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }">
