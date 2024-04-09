@@ -3,7 +3,7 @@
 exports[`ko.dropDown.js should render component 1`] = `
 "<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-drop-down&quot;, params: params }\\"><a class=\\"inactive-action hue-drop-down-active\\" href=\\"javascript:void(0)\\" data-bind=\\"
     attr: {
-      'data-test-id': dataTestId
+      'data-testid': dataTestId
     },
     toggle: dropDownVisible, css: { 'blue': dropDownVisible }\\">
     <!-- ko if: icon --><!-- /ko -->

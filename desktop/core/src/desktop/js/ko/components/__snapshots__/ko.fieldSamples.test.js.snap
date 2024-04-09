@@ -34,7 +34,7 @@ exports[`ko.fieldSamples.js should render component 1`] = `
     <div class=\\"context-popover-sample-controls\\">
       <div class=\\"margin-left-10 inline-block\\" data-bind=\\"component: { name: 'hue-drop-down', params: { value: operation, entries: operations } }\\"><a class=\\"inactive-action hue-drop-down-active\\" href=\\"javascript:void(0)\\" data-bind=\\"
     attr: {
-      'data-test-id': dataTestId
+      'data-testid': dataTestId
     },
     toggle: dropDownVisible, css: { 'blue': dropDownVisible }\\">
     <!-- ko if: icon --><!-- /ko -->
