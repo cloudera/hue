@@ -51,7 +51,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
 
     <a title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
         data-bind="click: $root.save, css: {'btn': true, 'disabled': $root.isSaving()}, visible: coordinator.properties.workflow() && canEdit">
-      <i class="fa fa-save"></i>
+      <i class="fa fa-save" data-testid = "save-as-button"></i>
     </a>
 
     <div class="dropdown pull-right margin-left-10">
