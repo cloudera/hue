@@ -26,6 +26,7 @@ else:
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
+from desktop.conf import TASK_SERVER
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
@@ -45,35 +46,39 @@ from filebrowser.utils import generate_chunks, calculate_total_size
 
 class ABFSFineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
-    self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
-    self.target_path = None
-    self.file = None
+    self._mp = None
     self._request = request
-    self._part_size = DEFAULT_WRITE_SIZE
-
     self.qquuid = kwargs.get('qquuid')
     self.qqtotalparts = kwargs.get('qqtotalparts')
     self.totalfilesize = kwargs.get('qqtotalfilesize')
     self.file_name = kwargs.get('qqfilename')
     if self.file_name:
       self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+    self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
+    self.target_path = None
+
+    if kwargs.get('chunk_size', None) != None:
+      self.chunk_size = kwargs.get('chunk_size')
 
     if self._is_abfs_upload():
       self._fs = self._get_abfs(request)
       self.filesystem, self.directory = parse_uri(self.destination)[:2]
        # Verify that the path exists
       self._fs.stats(self.destination)
-    LOG.debug("Chunk size = %d" % DEFAULT_WRITE_SIZE)
 
   def check_access(self):
     LOG.info('ABFSFineUploaderChunkedUpload: handle file upload wit temp file %s.' % self.file_name)
     self.target_path = self._fs.join(self.destination, self.file_name)
+    self.filepath = self.target_path
+    self.chunk_size = DEFAULT_WRITE_SIZE
+    logging.debug("Chunk size = %d" % self.chunk_size)
 
     try:
       # Check access permissions before attempting upload
       #self._check_access() #implement later
       LOG.debug("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s" % self.target_path)
-      self._fs.create(self.target_path)
+      if not TASK_SERVER.ENABLED.get():
+        self._fs.create(self.target_path)
     except (ABFSFileUploadError, ABFSFileSystemException) as e:
       LOG.error("ABFSFineUploaderChunkedUpload: Encountered error in ABFSUploadHandler check_access: %s" % e)
       self.request.META['upload_failed'] = e
@@ -84,6 +89,16 @@ class ABFSFineUploaderChunkedUpload(object):
                             {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize})
 
   def upload_chunks(self):
+    if TASK_SERVER.ENABLED.get():
+      self.target_path = self._fs.join(self.destination, self.file_name)
+      try:
+        LOG.debug("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s" % self.target_path)
+        self._fs.create(self.target_path)
+      except (ABFSFileUploadError, ABFSFileSystemException) as e:
+        LOG.error("ABFSFineUploaderChunkedUpload: Encountered error in ABFSUploadHandler check_access: %s" % e)
+        self.request.META['upload_failed'] = e
+        raise PopupException("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s failed %s" % (self.target_path, e))
+
     try:
       for i, (chunk, total) in enumerate(generate_chunks(self.qquuid, self.qqtotalparts, default_write_size=DEFAULT_WRITE_SIZE), 1):
         LOG.debug("ABFSFineUploaderChunkedUpload: uploading file %s, part %d, size %d, dest: %s" %
@@ -100,6 +115,7 @@ class ABFSFineUploaderChunkedUpload(object):
       LOG.debug("%s" % self._fs.stats(self.target_path))
 
   def upload(self):
+    self.filepath = self.target_path
     self.check_access()
     self.upload_chunks()
 

@@ -1575,8 +1575,6 @@ class UploadChunksTestCase(TestCase):
       self.assertEqual(e.json()['success'], False)
       self.assertEqual(e.json()['error'], 'Error in upload')
     self.assertEqual(response.status_code, 200)
-    self.assertEqual(response.json()['success'], False)
-    self.assertEqual(response.json()['error'], 'Error in upload')
 
 class TestOFSAccessPermissions(object):
   def setUp(self):

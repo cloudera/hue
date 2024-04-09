@@ -33,6 +33,7 @@ else:
 
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.utils import generate_chunks, calculate_total_size
+from desktop.conf import TASK_SERVER
 
 LOG = logging.getLogger()
 
@@ -45,6 +46,8 @@ class OFSFineUploaderChunkedUpload(object):
     if self.file_name:
       self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
     self.chunk_size = UPLOAD_CHUNK_SIZE.get()
+    if kwargs.get('chunk_size', None) != None:
+      self.chunk_size = kwargs.get('chunk_size')
     self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
     self.target_path = None
     self.file = None
@@ -64,6 +67,7 @@ class OFSFineUploaderChunkedUpload(object):
       LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
       LOG.info('OFSFineUploaderChunkedUpload: inside check_access function.')
       self.target_path = self._fs.join(self.destination, self.file_name)
+      self.filepath = self.target_path
 
     if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
       raise PopupException(_('OFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s') %
@@ -71,6 +75,27 @@ class OFSFineUploaderChunkedUpload(object):
 
   def upload_chunks(self):
     LOG.debug("OFSFineUploaderChunkedUpload: upload_chunks")
+
+    if TASK_SERVER.ENABLED.get():
+      if self._is_ofs_upload():
+        self._fs = self._get_ofs(self._request)
+
+        # Verify that the path exists
+        try:
+          self._fs.stats(self.destination)
+        except Exception as e:
+          raise PopupException(_('Destination path does not exist: %s' % self.destination))
+
+        LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
+        LOG.info('OFSFineUploaderChunkedUpload: inside check_access function.')
+        self.target_path = self._fs.join(self.destination, self.file_name)
+        self.filepath = self.target_path
+
+      if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
+        raise PopupException(
+          _('OFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s') %
+          {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize})
+
     try:
       LOG.debug("OFSFineUploaderChunkedUpload: uploading file part with size: %s" % self._part_size)
       fp = io.BytesIO()
