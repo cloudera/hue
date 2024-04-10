@@ -34,7 +34,7 @@ class TestTrinoApi(unittest.TestCase):
     cls.user = User.objects.get(username="hue_test")
     cls.interpreter = {
       'options': {
-        'url': 'http://example.com:8080'
+        'url': 'https://example.com:8080'
       }
     }
     # Initialize TrinoApi with mock user and interpreter
@@ -295,3 +295,35 @@ class TestTrinoApi(unittest.TestCase):
       # Assert the exception message
       assert_equal(result['explanation'], 'Mocked exception')
 
+
+  @patch('notebook.connectors.trino.DEFAULT_AUTH_USERNAME.get', return_value='mocked_username')
+  @patch('notebook.connectors.trino.DEFAULT_AUTH_PASSWORD.get', return_value='mocked_password')
+  def test_auth_username_and_auth_password_default(self, mock_default_username, mock_default_password):
+    trino_api = TrinoApi(self.user, interpreter=self.interpreter)
+
+    assert_equal(trino_api.auth_username, 'mocked_username')
+    assert_equal(trino_api.auth_password, 'mocked_password')
+
+
+  @patch('notebook.connectors.trino.DEFAULT_AUTH_USERNAME.get', return_value='mocked_username')
+  @patch('notebook.connectors.trino.DEFAULT_AUTH_PASSWORD.get', return_value='mocked_password')
+  def test_auth_username_custom(self, mock_default_username, mock_default_password):
+    self.interpreter['options']['auth_username'] = 'custom_username'
+    self.interpreter['options']['auth_password'] = 'custom_password'
+    trino_api = TrinoApi(self.user, interpreter=self.interpreter)
+
+    assert_equal(trino_api.auth_username, 'custom_username')
+    assert_equal(trino_api.auth_password, 'custom_password')  
+
+  @patch('notebook.connectors.trino.DEFAULT_AUTH_PASSWORD.get', return_value='mocked_password')
+  def test_auth_password_script(self, mock_default_password):
+    interpreter = {
+      'options': {
+        'url': 'https://example.com:8080',
+        'auth_password_script': 'custom_script'
+      }
+    }
+
+    with patch('notebook.connectors.trino.coerce_password_from_script', return_value='custom_password_script'):
+      trino_api = TrinoApi(self.user, interpreter=interpreter)
+      assert_equal(trino_api.auth_password, 'custom_password_script')
