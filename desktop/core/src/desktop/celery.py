@@ -26,35 +26,73 @@ from celery.schedules import crontab
 
 from desktop.conf import TASK_SERVER
 from desktop.settings import TIME_ZONE, INSTALLED_APPS
-
+if hasattr(TASK_SERVER, 'get') and TASK_SERVER.ENABLED.get():
+  from desktop.settings import CELERY_RESULT_BACKEND, CELERY_BROKER_URL
+from django.utils import timezone
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
 
-app = Celery('desktop')
+class HueCelery(Celery):
+  def gen_task_name(self, name, module):
+    if module.endswith('.tasks'):
+      module = module[:-6]
+    return super().gen_task_name(name, module)
 
-# Using a string here means the worker doesn't have to serialize
-# the configuration object to child processes.
-# - namespace='CELERY' means all celery-related configuration keys
-#   should have a `CELERY_` prefix.
-app.config_from_object('django.conf:settings', namespace='CELERY')
-app.conf.timezone = TIME_ZONE
+  # Method to configure the beat_schedule
+  def setup_beat_schedule(self):
+    now = timezone.now()
 
-# Load task modules from all registered Django app configs.
-app.autodiscover_tasks()
+    self.conf.beat_schedule = {
+      'check_disk_usage_and_clean_task': {
+      'task': 'filebrowser.check_disk_usage_and_clean_task',
+      'schedule': 1000.0,  # Run every 1000 seconds
+      'args': (),
+      'kwargs': {'cleanup_threshold': 90},  # Provide task arguments if needed
+      },
+    }
+
+if hasattr(TASK_SERVER, 'get') and TASK_SERVER.ENABLED.get():
+  app = HueCelery('desktop', backend=CELERY_RESULT_BACKEND, broker=CELERY_BROKER_URL)
+  app.conf.broker_transport_options = {'visibility_timeout': 3600}  # 1 hour.
+  app.conf.result_key_prefix = 'desktop_'
+
+  # Call the setup_beat_schedule method
+  app.setup_beat_schedule()
+
+  # Using a string here means the worker doesn't have to serialize
+  # the configuration object to child processes.
+  # - namespace='CELERY' means all celery-related configuration keys
+  #   should have a `CELERY_` prefix.
+  app.config_from_object('django.conf:settings', namespace='CELERY')
+  app.conf.timezone = TIME_ZONE
+
+  # Load task modules from all registered Django app configs.
+  app.autodiscover_tasks()
 
 
-@app.task(bind=True)
-def debug_task(self):
-  print('Request: {0!r}'.format(self.request))
-  return 'Hello'
+  @app.task(bind=True)
+  def debug_task(self):
+    print('Request: {0!r}'.format(self.request))
+    return 'Hello'
 
 
-if 'django_celery_beat' in INSTALLED_APPS and False: # Config not available yet
-  app.conf.beat_schedule = {}
+  if 'django_celery_beat' in INSTALLED_APPS and False: # Config not available yet
+    app.conf.beat_schedule = {}
 
-  if TASK_SERVER.BEAT_SCHEDULES_FILE.get():
-    schedules = imp.load_source('schedules', TASK_SERVER.BEAT_SCHEDULES_FILE.get())
+    if TASK_SERVER.BEAT_SCHEDULES_FILE.get():
+      schedules = imp.load_source('schedules', TASK_SERVER.BEAT_SCHEDULES_FILE.get())
 
-    for schedule in schedules.periodic_tasks:
-      app.conf.beat_schedule.update(schedule)
+      for schedule in schedules.periodic_tasks:
+        app.conf.beat_schedule.update(schedule)
+
+else:
+  app = Celery('desktop')
+  app.config_from_object('django.conf:settings', namespace='CELERY')
+  app.conf.timezone = TIME_ZONE
+  app.autodiscover_tasks()
+
+  @app.task(bind=True)
+  def debug_task(self):
+    print('Request: {0!r}'.format(self.request))
+    return 'Hello'
