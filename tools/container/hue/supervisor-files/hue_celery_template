@@ -1,0 +1,18 @@
+[program:hue_celery]
+directory=${HUE_HOME}
+command=${HUE_HOME}/hue.sh start_celery
+autostart=true
+startretries=3
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+environment=DESKTOP_LOG_DIR="/var/log/${HUEUSER}",PYTHON_EGG_CACHE="${HUE_CONF_DIR}/.python-eggs",HUE_PROCESS_NAME="hue_celery"
+user=${HUEUSER}
+group=${HUEUSER}
+exitcodes=0,2
+autorestart=true
+startsecs=10
+stopwaitsecs=30
+killasgroup=true
+# rlimits
