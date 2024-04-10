@@ -111,19 +111,6 @@ function set_samlcert() {
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
 }
 
-function start_celery() {
-  echo "Starting Celery worker..."
-  # The schedule of periodic tasks performed by celery-beat is stored in the celerybeat-schedule file.
-  touch $HUE_HOME/celerybeat-schedule
-  chmod 644 $HUE_HOME/celerybeat-schedule
-  $HUE_BIN/hue runcelery worker --app desktop.celery --loglevel=DEBUG --schedule_file $HUE_HOME/celerybeat-schedule
-}
-
-function start_redis() {
-  echo "Starting Redis server..."
-  redis-server --port 6379 --daemonize no
-}
-
 # If database connectivity is not set then fail
 ret=$(db_connectivity_check)
 if [[ $ret == "fail" ]];  then
@@ -147,18 +134,6 @@ elif [[ $1 == rungunicornserver ]]; then
   fix_column_issue "axes_accesslog" "trusted"
   fix_column_issue "axes_accessattempt" "trusted"
   $HUE_BIN/hue rungunicornserver
-elif [[ $1 == start_celery ]]; then
-  if awk '/^\[\[task_server\]\]/{flag=1;next}/^\[/{flag=0}flag && /enabled=True/{print "Task server enabled"; exit}' $HUE_CONF_DIR/zhue_safety_valve.ini || \
-     awk '/^\[\[task_server\]\]/{flag=1;next}/^\[/{flag=0}flag && /enabled=True/{print "Task server enabled"; exit}' $HUE_CONF_DIR/zhue.ini || \
-     awk '/^\[\[task_server\]\]/{flag=1;next}/^\[/{flag=0}flag && /enabled=True/{print "Task server enabled"; exit}' $HUE_CONF_DIR/hue.ini; then
-    start_celery
-  fi
-elif [[ $1 == start_redis ]]; then
-  if awk '/^\[\[task_server\]\]/{flag=1;next}/^\[/{flag=0}flag && /enabled=True/{print "Task server enabled"; exit}' $HUE_CONF_DIR/zhue_safety_valve.ini || \
-     awk '/^\[\[task_server\]\]/{flag=1;next}/^\[/{flag=0}flag && /enabled=True/{print "Task server enabled"; exit}' $HUE_CONF_DIR/zhue.ini || \
-     awk '/^\[\[task_server\]\]/{flag=1;next}/^\[/{flag=0}flag && /enabled=True/{print "Task server enabled"; exit}' $HUE_CONF_DIR/hue.ini; then
-    start_redis
-  fi
 fi
 
 exit 0

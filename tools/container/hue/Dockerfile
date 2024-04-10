@@ -56,14 +56,12 @@ ADD supervisor-files/etc/supervisord.conf /etc/supervisord.conf
 ADD supervisor-files/hue_server.conf /etc/supervisor.d/
 ADD supervisor-files/hue_ktrenewer.conf /etc/supervisor.d/
 ADD supervisor-files/hue_loglistener.conf /etc/supervisor.d/
-ADD supervisor-files/hue_celery.conf /etc/supervisor.d/
-ADD supervisor-files/hue_redis.conf /etc/supervisor.d/
 RUN chown -R ${HUEUSER}:${HUEUSER} /etc/supervisord.conf && chown -R ${HUEUSER}:${HUEUSER} /etc/supervisor.d
 
 # Remove chardet package
 RUN rm -rf ${HUE_HOME}/build/env/lib/python3.8/site-packages/pip/_vendor/chardet
 
-EXPOSE 8888 9111 6379
+EXPOSE 8888 9111
 
 # Switch to non-root default user
 USER hive
