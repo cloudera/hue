@@ -39,6 +39,19 @@ RUN set -eux; \
         xmlsec1-openssl \
         zlib-devel
 
+#Install redis
+RUN set -eux; \
+    dnf install -y gcc make && \
+    curl -O http://download.redis.io/redis-stable.tar.gz && \
+    tar xzf redis-stable.tar.gz && \
+    cd redis-stable && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf redis-stable redis-stable.tar.gz && \
+    dnf clean all && \
+    rm -rf /var/cache/yum
+
 RUN set -eux; \
       /usr/bin/pip3.8 install supervisor \
       && curl -s https://files.pythonhosted.org/packages/45/78/4621eb7085162bc4d2252ad92af1cc5ccacbd417a50e2ee74426331aad18/psycopg2_binary-2.9.3-cp38-cp38-musllinux_1_1_x86_64.whl -o /tmp/psycopg2_binary-2.9.3-cp38-cp38-musllinux_1_1_x86_64.whl \
