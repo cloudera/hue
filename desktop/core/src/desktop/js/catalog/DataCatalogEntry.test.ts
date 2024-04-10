@@ -18,9 +18,16 @@ import { merge } from 'lodash';
 
 import { CancellablePromise } from 'api/cancellablePromise';
 import dataCatalog from 'catalog/dataCatalog';
-import DataCatalogEntry, { Sample, TableAnalysis } from 'catalog/DataCatalogEntry';
+import DataCatalogEntry, {
+  FieldSourceMeta,
+  NavigatorMeta,
+  Sample,
+  TableAnalysis,
+  TableSourceMeta
+} from 'catalog/DataCatalogEntry';
 import { Compute, Connector, Namespace } from 'config/types';
 import * as CatalogApi from './api';
+import { hueWindow } from '../types/types';
 
 const connectorOne: Connector = {
   buttonName: '',
@@ -57,8 +64,11 @@ const clearStorage = async (): Promise<void> => {
   await dataCatalog.getCatalog(connectorTwo).clearStorageCascade();
 };
 
-describe('dataCatalogEntry.ts', () => {
-  beforeEach(clearStorage);
+describe('DataCatalogEntry.ts', () => {
+  beforeEach(() => {
+    clearStorage();
+    jest.clearAllMocks();
+  });
 
   afterAll(clearStorage);
 
@@ -178,6 +188,121 @@ describe('dataCatalogEntry.ts', () => {
       const newPromise = entryA.getAnalysis();
       expect(cancelledPromise.cancelled).toBeTruthy();
       expect(newPromise).not.toEqual(cancelledPromise);
+    });
+  });
+
+  describe('getComment', () => {
+    /* To better understand these test it helps to know that for a column the
+       comment can come from multiple sources:
+    
+       1. If Hue is configured to use a service such as Navigator or Atlas it
+          will use the comment from such a service for Hive and Impala (or
+          fallback to below).
+       3. When the table metadata is present it will use that data if it
+          contains a defined comment for that column (from the extended_columns
+          attribute in the table metadata).
+       2. When a column is created directly with the complete path used in
+          dataCatalog.getEntry() and not via tableEntry.getChildren() and
+          there is no parent table metadata or if column comment is undefined
+          in the table metadata we'll fall back to fetching the source
+          metadata for the column (describe on the individual column).
+    */
+
+    it('should use the comment from Navigator/Atlas when defined', async () => {
+      const initialCatalogFlag = (<hueWindow>window).HAS_CATALOG;
+      (<hueWindow>window).HAS_CATALOG = true;
+      const mockNavData = { name: 'colA', description: 'foo' } as NavigatorMeta;
+      const navSpy = jest
+        .spyOn(CatalogApi, 'fetchNavigatorMetadata')
+        .mockReturnValue(CancellablePromise.resolve<NavigatorMeta>(mockNavData));
+      const columnEntry = await getEntry('someDb.someTable.colA', {
+        id: 'hive',
+        dialect: 'hive'
+      } as Connector);
+
+      const comment = await columnEntry.getComment();
+
+      expect(navSpy).toHaveBeenCalled();
+      expect(comment).toEqual(mockNavData.description);
+      (<hueWindow>window).HAS_CATALOG = initialCatalogFlag;
+    });
+
+    it('should only fetch source metadata for an individual column when the comment is undefined in the table metadata', async () => {
+      const sourceMetaSpy = jest
+        .spyOn(CatalogApi, 'fetchSourceMetadata')
+        .mockImplementation(({ entry }) => {
+          if (entry.isTable()) {
+            return CancellablePromise.resolve<TableSourceMeta>({
+              columns: ['colA'],
+              extended_columns: [{ name: 'colA', type: 'int' }] // Comment undefined in table meta
+            });
+          }
+          if (entry.isColumn()) {
+            return CancellablePromise.resolve<FieldSourceMeta>({
+              name: 'colA',
+              comment: 'banana', // Comment is defined in column meta
+              type: 'int'
+            });
+          }
+          return CancellablePromise.reject();
+        });
+      const tableEntry = await getEntry('someDb.someTable');
+      const columns = await tableEntry.getChildren();
+      expect(columns.length).toEqual(1);
+      const columnEntry = columns[0];
+
+      expect(columnEntry.hasResolvedComment()).toBeFalsy();
+      const comment = await columnEntry.getComment();
+
+      expect(comment).toEqual('banana');
+      expect(sourceMetaSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not fetch source metadata for an individual column when the comment is an empty string in the table metadata', async () => {
+      const sourceMetaSpy = jest
+        .spyOn(CatalogApi, 'fetchSourceMetadata')
+        .mockImplementation(({ entry }) => {
+          if (entry.isTable()) {
+            return CancellablePromise.resolve<TableSourceMeta>({
+              columns: ['colA'],
+              extended_columns: [{ name: 'colA', type: 'int', comment: '' }] // Empty column comment in table meta
+            });
+          }
+          return CancellablePromise.reject();
+        });
+      const tableEntry = await getEntry('someDb.someTable');
+      const columns = await tableEntry.getChildren();
+      expect(sourceMetaSpy).toHaveBeenCalledTimes(1);
+      expect(columns.length).toEqual(1);
+      const columnEntry = columns[0];
+
+      expect(columnEntry.hasResolvedComment()).toBeTruthy();
+      const comment = await columnEntry.getComment();
+
+      expect(comment).toEqual('');
+      expect(sourceMetaSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should fetch column source metadata for the comment when there is no table metadata', async () => {
+      const sourceMetaSpy = jest
+        .spyOn(CatalogApi, 'fetchSourceMetadata')
+        .mockImplementation(({ entry }) => {
+          if (entry.isColumn()) {
+            return CancellablePromise.resolve<FieldSourceMeta>({
+              name: 'colA',
+              comment: 'banana', // Comment is defined in column meta
+              type: 'int'
+            });
+          }
+          return CancellablePromise.reject();
+        });
+      const columnEntry = await getEntry('someDb.someTable.someColumn');
+
+      expect(columnEntry.hasResolvedComment()).toBeFalsy();
+      const comment = await columnEntry.getComment();
+
+      expect(comment).toEqual('banana');
+      expect(sourceMetaSpy).toHaveBeenCalled();
     });
   });
 
