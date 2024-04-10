@@ -123,7 +123,7 @@ export interface FieldSourceMeta extends TimestampedData {
   comment?: string | null;
   name: string;
   notFound?: boolean;
-  sample: FieldSample[][];
+  sample?: FieldSample[][];
   type: string;
   key?: ComplexDetails;
   value?: ComplexDetails;
@@ -1050,7 +1050,9 @@ export default class DataCatalogEntry {
     if (this.canHaveNavigatorMetadata()) {
       return typeof this.navigatorMeta !== 'undefined';
     }
-    return typeof this.sourceMeta !== 'undefined';
+    return (
+      typeof this.sourceMeta !== 'undefined' || typeof this.definition?.comment !== 'undefined'
+    );
   }
 
   /**
@@ -1077,7 +1079,7 @@ export default class DataCatalogEntry {
 
       if (this.sourceMeta) {
         resolve(this.sourceMeta.comment || '');
-      } else if (this.definition && this.definition.comment) {
+      } else if (typeof this.definition?.comment !== 'undefined') {
         resolve(this.definition.comment);
       } else {
         const sourceMetaPromise = this.getSourceMeta(options);
