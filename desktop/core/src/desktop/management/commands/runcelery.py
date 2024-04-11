@@ -62,6 +62,14 @@ class Command(BaseCommand):
         type=str,
         default='DEBUG'
     )
+    parser.add_argument('--beat')
+    parser.add_argument(
+        '--schedule_file',
+        type=str,
+        required=True,
+        default='celerybeat-schedule',
+        help='Path to the celerybeat-schedule file'
+    )
 
   def handle(self, *args, **options):
     runcelery(*args, **options)
@@ -71,23 +79,29 @@ class Command(BaseCommand):
 
 def runcelery(*args, **options):
   # Native does not load Hue's config
-  # CeleryCommand().handle_argv(['worker', '--app=desktop.celery', '--concurrency=1', '--loglevel=DEBUG'])
+  concurrency = int(conf.GUNICORN_NUMBER_OF_WORKERS.get()/4) or options['concurrency']
+  schedule_file = options['schedule_file']
   opts = [
-      'runcelery',
-      'worker',
-      '--app=' + options['app'],
-      '--concurrency=' + str(options['concurrency']),
-      '--loglevel=' + options['loglevel']
+    'celery',
+    '--app=' + options['app'],
+    'worker',
+    '--loglevel=' + options['loglevel'],
+    '--concurrency=' + str(concurrency),
+    '--beat',
+    '-s',
+    schedule_file
   ]
   drop_privileges_if_necessary(CELERY_OPTIONS)
 
-  if conf.DEV.get():
-    autoreload.main(celery_main, (opts,))
-  else:
-    celery_main(opts)
+  # Set command-line arguments for Celery
+  sys.argv = opts
+
+  # Call the Celery main function
+  celery_main()
 
   LOG.info("Stopping command '%s'" % ' '.join(opts))
   sys.exit(-1)
+
 
 if __name__ == '__main__':
   runcelery(sys.argv[1:])
