@@ -41,20 +41,22 @@ class LocalSubFileSystemTest(TestCase):
       logger.warning("Tests did not clean up after themselves in %s" % self.root)
 
   def test_resolve_path(self):
-    self.assertEquals(self.root + "/", self.fs._resolve_path("/"))
-    self.assertEquals(self.root + "/foo", self.fs._resolve_path("/foo"))
-    self.assertRaises(fs.IllegalPathException, self.fs._resolve_path, "/../foo")
+    assert self.root + "/" == self.fs._resolve_path("/")
+    assert self.root + "/foo" == self.fs._resolve_path("/foo")
+    with pytest.raises(fs.IllegalPathException):
+      self.fs._resolve_path("/../foo")
     # These are preserved, but that should be ok.
-    self.assertEquals(self.root + "/bar/../foo", self.fs._resolve_path("/bar/../foo"))
+    assert self.root + "/bar/../foo" == self.fs._resolve_path("/bar/../foo")
 
   def test_open_and_remove(self):
-    self.assertRaises(IOError, self.fs.open, "/notfound", "r")
+    with pytest.raises(IOError):
+      self.fs.open("/notfound", "r")
     f = self.fs.open("/x", "w")
     f.write("Hello world\n")
     f.close()
 
     f = self.fs.open("/x")
-    self.assertEquals("Hello world\n", f.read())
+    assert "Hello world\n" == f.read()
     f.close()
 
     self.fs.remove("/x")
@@ -70,8 +72,8 @@ class LocalSubFileSystemTest(TestCase):
     self.fs.open("/abc/x", "w").close()
     self.fs.open("/abc/y", "w").close()
 
-    self.assertEquals(["abc"], self.fs.listdir("/"))
-    self.assertEquals(["x", "y"], sorted(self.fs.listdir("/abc")))
+    assert ["abc"] == self.fs.listdir("/")
+    assert ["x", "y"] == sorted(self.fs.listdir("/abc"))
 
     self.fs.remove("/abc/x")
     self.fs.remove("/abc/y")
@@ -83,9 +85,8 @@ class LocalSubFileSystemTest(TestCase):
     self.fs.open("/abc/y", "w").close()
 
     stats = self.fs.listdir_stats("/")
-    self.assertEquals(["/abc"], [s['path'] for s in stats])
-    self.assertEquals(["/abc/x", "/abc/y"],
-                      sorted(s['path'] for s in self.fs.listdir_stats("/abc")))
+    assert ["/abc"] == [s['path'] for s in stats]
+    assert ["/abc/x", "/abc/y"] == sorted(s['path'] for s in self.fs.listdir_stats("/abc"))
 
     self.fs.remove("/abc/x")
     self.fs.remove("/abc/y")
@@ -94,7 +95,8 @@ class LocalSubFileSystemTest(TestCase):
 
   def test_keyword_args(self):
     # This shouldn't work!
-    self.assertRaises(TypeError, self.fs.open, name="/foo", mode="w")
+    with pytest.raises(TypeError):
+      self.fs.open(name="/foo", mode="w")
 
 
 @pytest.mark.integration

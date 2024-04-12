@@ -52,7 +52,7 @@ class WebhdfsTests(TestCase):
     cls.cluster.fs.mkdir(cls.prefix)
     cls.cluster.fs.chmod(cls.prefix, 0o1777)
 
-  def setup_method(self):
+  def setup_method(self, method):
     self.cluster.fs.setuser('test')
 
   def test_webhdfs(self):

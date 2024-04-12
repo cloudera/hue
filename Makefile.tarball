@@ -29,6 +29,7 @@ PROD_INCLUDES := \
 	tools/app_reg \
 	tools/virtual-bootstrap \
 	tools/relocatable.sh \
+	tools/enable-python27.sh \
 	tools/load-balancer \
 	VERSION \
 	webpack-stats*.json \

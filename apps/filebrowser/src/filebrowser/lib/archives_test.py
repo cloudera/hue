@@ -18,6 +18,8 @@
 from . import archives
 from django.test import TestCase
 import os
+import pytest
+import unittest
 
 from filebrowser.lib.archives import IllegalPathException
 
@@ -69,10 +71,15 @@ class ArchiveTest(TestCase):
     FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test3.tar.gz')
 
     factory = archives.archive_factory(FILE, 'tar.gz')
-    self.assertRaises(IllegalPathException, factory.extract)
+    with pytest.raises(IllegalPathException):
+      factory.extract()
 
     # This file should not be extracted as it contains absolute path
     FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test4.tar.gz')
 
     factory = archives.archive_factory(FILE, 'tar.gz')
-    self.assertRaises(IllegalPathException, factory.extract)
+    with pytest.raises(IllegalPathException):
+      factory.extract()
+
+if __name__ == "__main__":
+  unittest.main()

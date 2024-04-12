@@ -24,7 +24,6 @@ import tempfile
 from django.conf import settings
 from django.test.client import Client
 from django.test import RequestFactory, TestCase
-
 from django.http import HttpResponse
 from django.core import exceptions
 

@@ -49,17 +49,10 @@ class TestInstallExamples():
       with patch('beeswax.views.beeswax_install_examples.SampleQuery') as SampleQuery:
 
         resp = self.client.post(reverse('beeswax:install_examples'), {'db_name': 'default'})
-        print("Response status code:", resp.status_code)
-        print("Response content:", resp.content)
+        data = json.loads(resp.content)
 
-        # Check if response content is not empty
-        assert resp.content, "Response content is empty"
+        assert 0 == data['status'], data
+        assert '' == data['message'], data
 
-        # # Try parsing response content as JSON
-        # try:
-        #   data = json.loads(resp.content)
-        #   print("Parsed JSON data:", data)
-        #   assert 0 == data['status'], data
-        #   assert '' == data['message'], data
-        # except json.JSONDecodeError as e:
-        #   pytest.fail(f"Failed to parse JSON: {e}")
+        SampleTable.assert_called()
+        SampleQuery.assert_called()

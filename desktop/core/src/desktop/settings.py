@@ -507,7 +507,6 @@ SECURE_SSL_REDIRECT = desktop.conf.SECURE_SSL_REDIRECT.get()
 SECURE_SSL_HOST = desktop.conf.SECURE_SSL_HOST.get()
 SECURE_REDIRECT_EXEMPT = desktop.conf.SECURE_REDIRECT_EXEMPT.get()
 
-# django-nose test specifics
 # Turn off cache middleware
 if 'test' in sys.argv:
   CACHE_MIDDLEWARE_SECONDS = 0

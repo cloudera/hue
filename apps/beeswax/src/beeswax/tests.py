@@ -232,7 +232,7 @@ for x in sys.stdin:
     assert len(files) >= 1, files
     assert files[0].endswith(".deflate"), files[0]
 
-    pytest.skip("Skipping test")
+    pytest.skip("Skipping Test")
     # And check that the name is right...
     assert "test_query_with_setting" in [x.profile.name for x in self.cluster.jt.all_jobs().jobs]
 
@@ -440,7 +440,7 @@ for x in sys.stdin:
     UDF is on HDFS.  This was implemented as part of HIVE-1157.
     """
     # BeeswaxTest.jar is gone
-    pytest.skip("Skipping test")
+    pytest.skip("Skipping Test")
 
     src = open_file(os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "BeeswaxTest.jar"))
     udf = self.cluster.fs_prefix + "hive1157.jar"
@@ -485,7 +485,7 @@ for x in sys.stdin:
   def test_sync_query_error(self):
     # We don't use synchronous queries anywhere.
     # It used to call BeeswaxService.executeAndWait()
-    pytest.skip("Skipping test")
+    pytest.skip("Skipping Test")
     # Execute incorrect Query , verify the error code and sqlstate
     hql = """
       SELECT FROM `%(db)s`.`zzzzz`
@@ -543,7 +543,7 @@ for x in sys.stdin:
 
   def test_parameterization(self):
     #@TODO@ Prakash fix this test
-    pytest.skip("Skipping test")
+    pytest.skip("Skipping Test")
     response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", is_parameterized=False, database=self.db_name)
     content = json.loads(response.content)
     # Assert no parameterization was offered
@@ -612,7 +612,7 @@ for x in sys.stdin:
 
   def test_explain_query_i18n(self):
     if is_live_cluster():
-      pytest.skip("Skipping test")('HUE-2884: Skipping test because we cannot guarantee live cluster supports utf8')
+      pytest.skip('HUE-2884: Skipping test because we cannot guarantee live cluster supports utf8')
 
     query = u"SELECT foo FROM `%(db)s`.`test_utf8` WHERE bar='%(val)s'" % {'val': chr(200), 'db': self.db_name}
     response = _make_query(self.client, query, settings=[('hive.explain.user', 'false')], submission_type="Explain")
@@ -624,7 +624,7 @@ for x in sys.stdin:
   def test_query_i18n(self):
     # Test fails because HIVE_PLAN cannot be found and raises FileNotFoundException
     # because of a Hive bug.
-    pytest.skip("Skipping test")
+    pytest.skip("Skipping Test")
 
     # Selecting from utf-8 table should get correct result
     query = u"SELECT * FROM `%(db)s`.`test_utf8` WHERE bar='%(val)s'" % {'val': chr(200), 'db': self.db_name}
@@ -751,7 +751,7 @@ for x in sys.stdin:
 
   def test_multiple_statements_with_params(self):
     #@TODO@ Prakash fix this test
-    pytest.skip("Skipping test")
+    pytest.skip("Skipping Test")
     hql = """
       select ${x} from test;
       select ${y} from test;
@@ -812,7 +812,7 @@ for x in sys.stdin:
 
     So we check the results by looking at the csv files.
     """
-    pytest.skip("Skipping test") # sqlite does not support concurrent transaction
+    pytest.skip("Skipping Test") # sqlite does not support concurrent transaction
 
     PARALLEL_TASKS = 2
     responses = [None] * PARALLEL_TASKS
@@ -932,9 +932,9 @@ for x in sys.stdin:
 
   def test_designs(self):
     #@TODO@ Prakash fix this test
-    pytest.skip("Skipping test")
+    pytest.skip("Skipping Test")
     if is_live_cluster():
-      pytest.skip("Skipping test")('HUE-2902: Skipping because test is not reentrant')
+      pytest.skip('HUE-2902: Skipping because test is not reentrant')
 
     cli = self.client
 
@@ -1045,7 +1045,7 @@ for x in sys.stdin:
     _make_query(client_me, "select two", name='client query 2', submission_type='Save')
 
     # TODO in HUE-1589
-    pytest.skip("Skipping test")
+    pytest.skip("Skipping Test")
 
     finish = conf.SHARE_SAVED_QUERIES.set_for_testing(True)
     try:
@@ -2002,9 +2002,9 @@ for x in sys.stdin:
 
   def test_get_top_terms(self):
     if is_live_cluster():
-      pytest.skip("Skipping test")('HUE-2902: Skipping because test is not reentrant')
+      pytest.skip('HUE-2902: Skipping because test is not reentrant')
     else:
-      pytest.skip("Skipping test")('HUE-2902: Skipping because test is slow currently and API is not used')
+      pytest.skip('HUE-2902: Skipping because test is slow currently and API is not used')
 
     resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
 
@@ -2193,7 +2193,7 @@ def test_index_page():
 
 
 def test_history_page():
-  pytest.skip("Skipping test")
+  pytest.skip("Skipping Test")
 
   client = make_logged_in_client()
   test_user = User.objects.get(username='test')
@@ -2750,7 +2750,7 @@ class TestHiveServer2API(object):
 
   def test_bits_to_bytes_conversion(self):
     if sys.version_info[0] < 3:
-      pytest.skip("Skipping test")
+      pytest.skip("Skipping Test")
 
     nulls = '\x00'
     bitstring = from_string_to_bits(nulls)
@@ -3616,7 +3616,7 @@ def test_sasl_auth_in_large_download():
 
   if hive_site.get_hiveserver2_thrift_sasl_qop() != "auth-conf" or \
      hive_site.get_hiveserver2_authentication() != 'KERBEROS':
-    pytest.skip("Skipping test")
+    pytest.skip("Skipping Test")
 
   client = make_logged_in_client(username="systest", groupname="systest", recreate=False, is_superuser=False)
   user = User.objects.get(username='systest')

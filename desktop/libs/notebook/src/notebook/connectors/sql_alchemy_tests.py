@@ -145,7 +145,6 @@ class TestApi(object):
       assert data['meta']() == [{'type': 'BIGINT_TYPE'}]
 
 
-  @pytest.mark.raises(AuthenticationRequired)
   def test_create_engine_auth_error(self):
     interpreter = {
       'name': 'hive',
@@ -155,7 +154,8 @@ class TestApi(object):
     }
 
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
-      SqlAlchemyApi(self.user, interpreter)._create_engine()
+      with pytest.raises(AuthenticationRequired):
+        SqlAlchemyApi(self.user, interpreter)._create_engine()
 
 
   def test_create_engine_auth(self):
@@ -182,7 +182,6 @@ class TestApi(object):
       SqlAlchemyApi(self.user, interpreter)._create_engine()
 
 
-  @pytest.mark.raises(AuthenticationRequired)
   def test_create_connection_error(self):
     interpreter = {
       'name': 'hive',
@@ -192,8 +191,10 @@ class TestApi(object):
     }
 
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
-      engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
-      SqlAlchemyApi(self.user, interpreter)._create_connection(engine)
+      with pytest.raises(AuthenticationRequired):
+        engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
+        SqlAlchemyApi(self.user, interpreter)._create_connection(engine)
+
 
   def test_create_connection(self):
     interpreter = {

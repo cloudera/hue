@@ -25,6 +25,7 @@ import unittest
 from django.test import TestCase
 from tools.ops.script_runner.lib.log import log_buffer
 
+
 class TestLogBuffer(TestCase):
   def test_logger(self):
     logger = logging.getLogger()

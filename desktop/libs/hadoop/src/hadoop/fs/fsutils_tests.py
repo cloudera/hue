@@ -37,10 +37,10 @@ class FsUtilsTests(TestCase):
   def setup_class(cls):
     cls.cluster = pseudo_hdfs4.shared_cluster()
 
-  def setup_method(self):
+  def setup_method(self, method):
     self.cluster.fs.setuser('test')
 
-  def teardown_method(self):
+  def teardown_method(self, method):
     try:
       self.cluster.fs.purge_trash()
     except Exception as e:

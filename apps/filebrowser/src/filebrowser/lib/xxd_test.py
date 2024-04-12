@@ -42,10 +42,10 @@ LENGTH = 1024*10 # 10KB
 
 class XxdTest(TestCase):
   def test_mask_not_alphanumeric(self):
-    self.assertEquals( (1, ". X"), xxd.mask_not_alphanumeric("\n X"))
+    assert  (1, ". X") == xxd.mask_not_alphanumeric("\n X")
 
   def test_mask_not_printable(self):
-    self.assertEquals( (2, "..@"), xxd.mask_not_alphanumeric("\xff\x90\x40"))
+    assert  (2, "..@") == xxd.mask_not_alphanumeric("\xff\x90\x40")
 
   def _get_offset_width(self, line):
     offset, match, _ = line.partition(":")
@@ -67,13 +67,13 @@ class XxdTest(TestCase):
 
   def _verify_content(self, expected, actual):
     if self._is_offset_width_same(expected, actual):
-      self.assertEquals(expected, actual)
+      assert expected == actual
     else:
       # Not all distributions have the same amount of bits in their 'Offset'
       # This corrects for this to avoid having this test fail when that is the only problem
       corrected_expected = self._standardize_xxd_output(expected)
       corrected_actual = self._standardize_xxd_output(actual)
-      self.assertEquals(corrected_expected, corrected_actual)
+      assert corrected_expected == corrected_actual
 
   def test_compare_to_xxd(self):
     """
@@ -97,7 +97,7 @@ class XxdTest(TestCase):
     random_text = "".join(chr(random.getrandbits(8)) for _ in range(LENGTH))
     p = Popen(["xxd"], shell=True, stdin=PIPE, stdout=PIPE, close_fds=True)
     (stdin, stderr) = p.communicate(random_text)
-    self.assertFalse(stderr)
+    assert not stderr
 
     output = string_io()
     xxd.main(string_io(random_text), output)

@@ -15,15 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# import sys
+import sys
 
-# import ${app_name}
+import ${app_name}
 
-# if sys.version_info[0] > 2:
-#   from django.urls import re_path
-# else:
-#   from django.conf.urls import url as re_path
+if sys.version_info[0] > 2:
+  from django.urls import re_path
+else:
+  from django.conf.urls import url as re_path
 
-# urlpatterns = [
-#   re_path(r'^$', ${app_name}.views.index),
-# ]
+urlpatterns = [
+  re_path(r'^$', ${app_name}.views.index),
+]

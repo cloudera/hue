@@ -32,13 +32,13 @@ class TestLogBuffer(TestCase):
     logger.addHandler(handler)
     msg = "My test logging message"
     logger.warn(msg)
-    self.assertEquals(msg, str(handler.buf))
+    assert msg == str(handler.buf)
 
   def test_overflow(self):
     buffer = log_buffer.FixedBuffer(maxsize=10)
     buffer.insert("0123456789")
     buffer.insert("abcde")
-    self.assertEquals("56789\nabcde", str(buffer))
+    assert "56789\nabcde" == str(buffer)
 
 if __name__ == '__main__':
   unittest.main()

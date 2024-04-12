@@ -22,6 +22,7 @@ import sys
 from desktop.lib.django_test_util import make_logged_in_client
 from unittest.mock import patch, Mock
 
+
 @pytest.mark.django_db
 def test_config_check():
   with patch('beeswax.hive_site.get_metastore_warehouse_dir') as get_metastore_warehouse_dir:
