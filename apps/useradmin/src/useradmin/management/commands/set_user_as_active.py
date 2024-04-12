@@ -1,3 +1,20 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import sys
 import time
@@ -10,12 +27,9 @@ from django.contrib.auth.models import User
 
 import desktop.conf
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 class Command(BaseCommand):
     """
@@ -26,7 +40,7 @@ class Command(BaseCommand):
         parser.add_argument("--usernames", help=_t("One or more user(s) to make active."),nargs='+', action="store",required=True)
 
     def handle(self, *args, **options):
-        if options["usernames"]:
+        if options.get("usernames"):
             try:
                 LOG.info("Setting user %s as active" % options['usernames'])
                 
@@ -35,8 +49,8 @@ class Command(BaseCommand):
                 usernames = options["usernames"]
                 
                 for user in usernames:
-                    isExist = User.objects.filter(username=user).exists()
-                    if (isExist):
+                    is_exist = User.objects.filter(username=user).exists()
+                    if (is_exist):
                         active_user = User.objects.get(username=user)
                         active_user.is_active = True
                         active_user.save()
@@ -44,7 +58,11 @@ class Command(BaseCommand):
                     else:
                         user_not_exist.append(user)
                 
-                LOG.info("User(s) set as Active: %s" % user_exist)
-                LOG.info("User(s) does not exist: %s" % user_not_exist)
+                if (user_exist):
+                    LOG.info("User(s) set as Active: %s" % user_exist)
+
+                if (user_not_exist):
+                    LOG.info("User(s) does not exist: %s" % user_not_exist)
+                
             except Exception as e:
                 LOG.error("EXCEPTION: setting user %s as active failed: %s" % (options['usernames'], e))
