@@ -187,7 +187,7 @@
   window.RAZ_IS_ENABLED = '${ RAZ.IS_ENABLED.get() }' === 'True';
 
   window.ENABLE_HISTORY_V2 = '${ hasattr(ENABLE_HISTORY_V2, 'get') and ENABLE_HISTORY_V2.get() }' === 'True';
-  window.ENABLE_HIVE_QUERY_BROWSER = '${ hasattr(ENABLE_QUERY_BROWSER, 'get') and ENABLE_QUERY_BROWSER.get() }' === 'True';
+  window.ENABLE_HIVE_QUERY_BROWSER = '${ hasattr(ENABLE_HIVE_QUERY_BROWSER, 'get') and ENABLE_HIVE_QUERY_BROWSER.get() }' === 'True';
   window.ENABLE_QUERY_BROWSER = '${ hasattr(ENABLE_QUERY_BROWSER, 'get') and ENABLE_QUERY_BROWSER.get() }' === 'True';
   window.ENABLE_QUERY_STORE = '${ hasattr(QUERY_STORE, 'IS_ENABLED') and hasattr(QUERY_STORE.IS_ENABLED, 'get') and QUERY_STORE.IS_ENABLED.get() }' === 'True'
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
