@@ -27,8 +27,8 @@ import zipfile
 
 from django.http import JsonResponse
 from celery.app.control import Control
-
-if desktop.conf.TASK_SERVER.ENABLED.get():
+from desktop.conf import TASK_SERVER
+if hasattr(TASK_SERVER, 'get') and TASK_SERVER.ENABLED.get():
   from desktop.celery import app as celery_app
 import psutil
 import datetime
@@ -68,6 +68,9 @@ from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
   UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate, _get_gist_document
 from desktop.views import get_banner_message, serve_403_error
+from desktop.log import DEFAULT_LOG_DIR
+from filebrowser.tasks import check_disk_usage_and_clean_task
+from filebrowser.tasks import document_cleanup_task
 
 from hadoop.cluster import is_yarn
 
@@ -713,7 +716,6 @@ def handle_submit(request):
 
   if task_name == 'document cleanup':
     keep_days = task_params.get('keep-days')
-    from filebrowser.tasks import document_cleanup_task
     task_kwargs = {
       'keep_days': keep_days,
       'user_id': request.user.id,
@@ -731,7 +733,6 @@ def handle_submit(request):
     })
 
   elif task_name == 'tmp clean up':
-    from filebrowser.tasks import check_disk_usage_and_clean_task
     cleanup_threshold = task_params.get('threshold for clean up')
     disk_check_interval = task_params.get('disk check interval')
     task_kwargs = {
@@ -751,30 +752,29 @@ def handle_submit(request):
     'status': 0
   })
 
+redis_client = redis.Redis(host='localhost', port=6379, db=0)
 @api_error_handler
 def get_taskserver_tasks(request):
   """Retirve the tasks from the database"""
 
-  r = redis.Redis(host='localhost', port=6379, db=0)
   tasks = []
 
   # Use scan_iter to efficiently iterate over keys matching the first pattern
-  for key in r.scan_iter('celery-task-meta-*'):
-    task = json.loads(r.get(key))
+  for key in redis_client.scan_iter('celery-task-meta-*'):
+    task = json.loads(redis_client.get(key))
     tasks.append(task)
 
   # Use scan_iter to efficiently iterate over keys matching the second pattern
-  for key in r.scan_iter('task:*'):
-    task = json.loads(r.get(key))
+  for key in redis_client.scan_iter('task:*'):
+    task = json.loads(redis_client.get(key))
     tasks.append(task)
 
   return JsonResponse(tasks, safe=False)
 
 @api_error_handler
 def check_upload_status(request, task_id):
-  r = redis.Redis(host='localhost', port=6379, db=0)
   task_key = f'celery-task-meta-{task_id}'
-  task_data = r.get(task_key)
+  task_data = redis_client.get(task_key)
 
   if task_data is None:
     return JsonResponse({'error': 'Task not found'}, status=404)
@@ -809,36 +809,31 @@ def get_available_space(request):
   return JsonResponse({'free_space': free_space})
 
 def get_task_logs(request, task_id):
-  INSTALL_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..'))
-  log_path = INSTALL_DIR + '/celery.log'
+  log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
+  log_file = "%s/rungunicornserver.log" % (log_dir)
   task_log = []
-  found = False
+  escaped_task_id = re.escape(task_id)
 
-  # Compile a regex pattern for efficiency
-  task_pattern = re.compile(rf'\[{task_id}\]')
-  progress_pattern = re.compile(r'progress 100')
-
+  # Using a simpler and more explicit regex to debug
+  task_end_pattern = re.compile(rf"\[{escaped_task_id}\].*succeeded")
+  task_start_pattern = re.compile(rf"\[{escaped_task_id}\].*received")
   try:
-    with open(log_path, 'r') as log_file:
-      for line in log_file:
-        # Check if the current line has the task_id
-        if task_pattern.search(line):
-          found = True
-
-        # If the task_id has been found, append the line to the task_log
-        if found:
+    with open(log_file, 'r') as file:
+      recording = False
+      for line in file:
+        if task_start_pattern.search(line):
+          recording = True  # Start recording log lines
+        if recording:
           task_log.append(line)
-          # Check if we reached 100% progress, then stop
-          if progress_pattern.search(line):
-            break
+        if task_end_pattern.search(line) and recording:
+          break  # Stop recording after finding the end of the task
 
   except FileNotFoundError:
-    return HttpResponse(f'Log file not found at {log_path}', status=404)
+    return HttpResponse(f'Log file not found at {log_file}', status=404)
   except Exception as e:
     return HttpResponse(str(e), status=500)
 
-  return HttpResponse(task_log, content_type='text/plain')
-
+  return HttpResponse(''.join(task_log), content_type='text/plain')
 
 @api_error_handler
 @require_POST

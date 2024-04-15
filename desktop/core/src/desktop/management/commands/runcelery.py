@@ -21,6 +21,7 @@ import sys
 
 from desktop import conf
 from desktop.lib.daemon_utils import drop_privileges_if_necessary
+from desktop.log import DEFAULT_LOG_DIR
 
 from django.core.management.base import BaseCommand
 from django.utils import autoreload
@@ -79,6 +80,8 @@ class Command(BaseCommand):
 
 def runcelery(*args, **options):
   # Native does not load Hue's config
+  log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
+  log_file = "%s/rungunicornserver.log" % (log_dir)
   concurrency = int(conf.GUNICORN_NUMBER_OF_WORKERS.get()/4) or options['concurrency']
   schedule_file = options['schedule_file']
   opts = [
@@ -88,8 +91,8 @@ def runcelery(*args, **options):
     '--loglevel=' + options['loglevel'],
     '--concurrency=' + str(concurrency),
     '--beat',
-    '-s',
-    schedule_file
+    '-s', schedule_file,
+    '--logfile=' + log_file
   ]
   drop_privileges_if_necessary(CELERY_OPTIONS)
 

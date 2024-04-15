@@ -45,7 +45,7 @@ RUN set -eux; \
       xmlsec1-openssl \
       zlib-devel
 
-#Install redis
+# Install redis
 RUN set -eux; \
     dnf install -y gcc make && \
     curl -O http://download.redis.io/redis-stable.tar.gz && \

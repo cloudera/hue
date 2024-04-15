@@ -33,6 +33,7 @@ from desktop.celery import app
 from desktop.conf import TASK_SERVER
 from desktop.lib import fsmanager
 from useradmin.models import User
+from filebrowser.views import UPLOAD_CLASSES
 
 LOG_TASK = get_task_logger(__name__)
 LOG = logging.getLogger()
@@ -68,11 +69,9 @@ def upload_file_task(**kwargs):
   kwargs["state"] = "STARTED"
   now = timezone.now()
   kwargs["task_start"] = now.strftime("%Y-%m-%dT%H:%M:%S")
-  # kwargs["task_start"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
   upload_file_task.update_state(task_id=task_id, state='STARTED', meta=kwargs)
   try:
-    from filebrowser.views import UPLOAD_CLASSES
-    upload_class = UPLOAD_CLASSES.get(kwargs["scheme"], None)
+    upload_class = UPLOAD_CLASSES.get(kwargs["scheme"])
     _fs = upload_class(request, args=[], **kwargs)
     kwargs["state"] = "RUNNING"
     upload_file_task.update_state(task_id=task_id, state='RUNNING', meta=kwargs)
@@ -86,7 +85,7 @@ def upload_file_task(**kwargs):
   kwargs["started"] = now.strftime("%Y-%m-%dT%H:%M:%S")
   kwargs["task_end"] = now.strftime("%Y-%m-%dT%H:%M:%S")
   upload_file_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
-  return
+  return None
 
 def _get_request(postdict=None, user_id=None, scheme=None):
   request = HttpRequest()
@@ -130,7 +129,7 @@ def document_cleanup_task(**kwargs):
   kwargs["task_end"] = now.strftime("%Y-%m-%dT%H:%M:%S")
   document_cleanup_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
 
-  return
+  return None
 
 @app.task()
 def check_disk_usage_and_clean_task(**kwargs):
@@ -170,15 +169,15 @@ def check_disk_usage_and_clean_task(**kwargs):
         check_disk_usage_and_clean_task.update_state(task_id=task_id, state='FAILURE', meta=kwargs)
         raise Exception(f"Failed to delete {file_path}. Reason: {err}")
 
-      kwargs["progress"] = "100%"
-      check_disk_usage_and_clean_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
-      LOG.info("/tmp directory cleaned.")
+    kwargs["progress"] = "100%"
+    check_disk_usage_and_clean_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
+    LOG.info("/tmp directory cleaned.")
 
-    else:
-      kwargs["progress"] = "100%"
-      check_disk_usage_and_clean_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
-      LOG.info(f"Disk usage is {disk_usage.percent}%, no need to clean up.")
+  else:
+    kwargs["progress"] = "100%"
+    check_disk_usage_and_clean_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
+    LOG.info(f"Disk usage is {disk_usage.percent}%, no need to clean up.")
 
-    # Get available disk space after cleanup
-    free_space = psutil.disk_usage('/tmp').free
-    return {'free_space': free_space}
+  # Get available disk space after cleanup
+  free_space = psutil.disk_usage('/tmp').free
+  return {'free_space': free_space}

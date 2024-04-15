@@ -295,7 +295,7 @@ def task_server_view(request):
   This view renders the Task Server page with basic functionality.
   """
   # You can add more logic here if needed
-  logging.debug("task_server_view called with request: %s", request)
+  LOG.debug("task_server_view called with request: %s", request)
   return render('taskserver_list_tasks.mako', request, {
     'message': _(''),
     'is_embeddable': request.GET.get('is_embeddable', False),
