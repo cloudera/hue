@@ -2065,53 +2065,40 @@ else:
         });
       };
 
-      function pollForTaskProgress(taskIds, listItems, pendingUploads) {
-        var completedUploads = 0; // Track the number of completed uploads
-        var totalTasks = taskIds.length;
-        var taskStatus = {}; // Store the status of each task
+      function pollForTaskProgress(taskId, listItem, fileName) {
+        var taskStatus = 'pending';
         var pollingInterval = 10000;
-        // Initialize taskStatus for each task
-        taskIds.forEach(function(task_id) {
-          taskStatus[task_id] = 'pending';
-        });
-                
+
         var doPoll = function() {
-          taskIds.forEach(function(task_id, index) {
-            if (taskStatus[task_id] === 'pending') { // Only poll if the task is still pending
-              $.get('/desktop/api2/check_upload_status/' + task_id, function(data) {
-                var listItem = listItems[index];
-                if (data.isFinalized || data.isFailure || data.is_revoked) {
-                  completedUploads++; // Increment the count of completed uploads
-                  taskStatus[task_id] = data.isFinalized ? 'finalized' : 'failed'; // Update task status
+          if (taskStatus === 'pending') {
+            $.get('/desktop/api2/taskserver/check_upload_status/' + taskId, function(data) {
+              if (data.isFinalized || data.isFailure || data.is_revoked) {
+                taskStatus = data.isFinalized ? 'finalized' : 'failed';
 
-                  if (data.isFinalized) {
-                    listItem.find('.progress-row-bar').css('width', '100%');
-                    listItem.find('.progress-row-text').text('Upload complete.');
-                  } else if (data.isFailure) {
-                    listItem.find('.progress-row-bar').css('width', '100%');
-                    listItem.find('.progress-row-text').text('Upload failed.');
-                    $(document).trigger('error', "${ _('File upload failed. Please check the logs for task id: ') }" + task_id)
-                  }
-
-                  if (completedUploads >= totalTasks) {
-                    $('#uploadFileModal').modal('hide'); // Close the modal when all uploads are completed
-                    self.retrieveData(true);
-                  }
-                } else if (data.isRunning) {
-                    var progressPercentage = 90; // Adjust based on data.progress if available
-                    listItem.find('.progress-row-bar').css('width', progressPercentage + '%');
-                  }
-                }).fail(function(xhr, textStatus, errorThrown) {
-                  if (xhr.status === 404) {
-                    setTimeout(doPoll, 10000); // Retry after 10 seconds
-                  }
-              });
-            }
-          });
-          if (completedUploads < totalTasks) {
-            setTimeout(doPoll, pollingInterval); // Schedule the next poll if not all tasks are completed
+                if (data.isFinalized) {
+                  listItem.find('.progress-row-bar').css('width', '100%');
+                  listItem.find('.progress-row-text').text('Upload complete.');
+                  $(document).trigger('info', fileName + "${ _(' uploaded successfully.') }");
+                  self.retrieveData(true);
+                } else if (data.isFailure) {
+                  listItem.find('.progress-row-bar').css('width', '100%');
+                  listItem.find('.progress-row-text').text('Upload failed.');
+                  $(document).trigger('error', fileName + "${ _(' file upload failed. Please check the logs for task id: ') }" + taskId);
+                }
+                
+              } else if (data.isRunning) {
+                var progressPercentage = 90; // Adjust based on data.progress if available
+                listItem.find('.progress-row-bar').css('width', progressPercentage + '%');
+                setTimeout(doPoll, pollingInterval);
+              }
+            }).fail(function(xhr, textStatus, errorThrown) {
+              if (xhr.status === 404) {
+                setTimeout(doPoll, pollingInterval); // Retry after 10 seconds
+              }
+            });
           }
         };
+        self.retrieveData(true);
         doPoll();
       }
 
@@ -2124,8 +2111,7 @@ else:
             self.pendingUploads(0);
             var action = "/filebrowser/upload/chunks/";
             self.taskIds = [];
-            self.listItems = [];         
-          
+            self.listItems = [];
             uploader = new qq.FileUploader({
               element: document.getElementById("fileUploader"),
               request: {
@@ -2183,11 +2169,11 @@ else:
                         return $(this).find('.qq-upload-file-selector').text() === fileName;
                       });
                       self.listItems.push(listItem);
-                      if (scheduleUpload && self.pendingUploads() === 0) {
-                        $('#uploadFileModal').modal('hide');
-                        $(document).trigger('info', "File upload scheduled. Please check the task server page for progress.")
-                      }
-                      pollForTaskProgress(self.taskIds, self.listItems, self.pendingUploads())
+                        if (scheduleUpload && self.pendingUploads() === 0) {
+                          $('#uploadFileModal').modal('hide');
+                          $(document).trigger('info', "File upload scheduled. Please check the task server page for progress.");
+                        }
+                        pollForTaskProgress(response.task_id, listItem, fileName);
                       self.filesToHighlight.push(response.path);                       
                     }
                     if (self.pendingUploads() === 0) {                    
@@ -2202,7 +2188,7 @@ else:
                       
                       // Make an AJAX request to check available disk space
                       $.ajax({
-                        url: '/desktop/api2/get_available_space/',
+                        url: '/desktop/api2/taskserver/get_available_space/',
                         success: function(response) {
                           var freeSpace = response.free_space;
                           var file = uploader.getFile(id); // Use the stored reference

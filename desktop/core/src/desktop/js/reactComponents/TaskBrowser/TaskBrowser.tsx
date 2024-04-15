@@ -93,9 +93,8 @@ const ShowScheduleTaskPopup = ({ onClose, onSubmit, open }) => {
 const TaskBrowser: React.FC = (): React.ReactElement => {
   const [showSchedulePopup, showScheduleTaskPopup] = useState(false);
   const [scheduledTasks] = useState([]); // Store an array of scheduled tasks
-
   const [showLogPopup, setShowLogPopup] = useState(false); // This should match where you use it
-  const [currentTaskId, setCurrentTaskId] = useState(null);
+  const [, setCurrentTaskId] = useState(null);
   const [taskLogs, setTaskLogs] = useState('');
 
   const handleScheduleSubmit = (taskName, taskParams) => {
@@ -105,7 +104,7 @@ const TaskBrowser: React.FC = (): React.ReactElement => {
     };
 
     axios
-      .post('/desktop/api2/handle_submit', payload, {
+      .post('/desktop/api2/taskserver/handle_submit', payload, {
         transformResponse: [
           function (data) {
             try {
@@ -134,11 +133,33 @@ const TaskBrowser: React.FC = (): React.ReactElement => {
     showScheduleTaskPopup(true);
   };
 
+  const ShowTaskLogsPopup = ({ logs, onClose, open }) => {
+    return (
+      <Modal
+        title="Task Logs"
+        visible={open}
+        onOk={onClose}
+        onCancel={onClose}
+        width={830}
+        footer={[
+          <Button key="back" onClick={onClose}>
+            Close
+          </Button>
+        ]}
+      >
+        <div className="log-content-scrollable">
+          {' '}
+          <pre>{logs}</pre>
+        </div>
+      </Modal>
+    );
+  };
+
   const ShowTaskLogsHandler = taskId => {
     setCurrentTaskId(taskId);
-    get(`/desktop/api2/get_task_logs/${taskId}/`)
+    get(`/desktop/api2/taskserver/get_task_logs/${taskId}/`)
       .then(response => {
-        setTaskLogs(response.data);
+        setTaskLogs(response);
         setShowLogPopup(true);
       })
       .catch(error => {
@@ -165,13 +186,11 @@ const TaskBrowser: React.FC = (): React.ReactElement => {
         />
       </div>
       {showLogPopup && (
-        <div className="popupStyle">
-          <div className="popupContentStyle">
-            <h2>Task Logs - {currentTaskId}</h2>
-            <pre>{taskLogs}</pre>
-            <Button onClick={() => setShowLogPopup(false)}>Close</Button>
-          </div>
-        </div>
+        <ShowTaskLogsPopup
+          logs={taskLogs}
+          open={showLogPopup}
+          onClose={() => setShowLogPopup(false)}
+        />
       )}
     </div>
   );
@@ -295,7 +314,7 @@ export const TaskBrowserTable: React.FC<TaskBrowserTableProps> = ({
 
   useEffect(() => {
     const fetchTasks = () => {
-      get('/desktop/api2/get_taskserver_tasks/', null, {
+      get('/desktop/api2/taskserver/get_taskserver_tasks/', null, {
         transformResponse: data => {
           return data;
         }
@@ -395,7 +414,7 @@ export const TaskBrowserTable: React.FC<TaskBrowserTableProps> = ({
   });
 
   const handleKillTask = taskId => {
-    post(`/desktop/api2/kill_task/${taskId}/`)
+    post(`/desktop/api2/taskserver/kill_task/${taskId}/`)
       .then(response => {
         // Assuming the server response is in the expected format
         const { status, message } = response;
