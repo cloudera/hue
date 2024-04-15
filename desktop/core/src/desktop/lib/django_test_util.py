@@ -18,7 +18,6 @@
 import json
 import logging
 import re
-import pytest
 import django.test.client
 from unittest.mock import Mock
 
@@ -33,16 +32,6 @@ class Client(django.test.client.Client):
   def get_json(self, *args, **kwargs):
     response = self.get(*args, **kwargs)
     return json.JSONDecoder().decode(response.content)
-
-
-def assert_ok_response(response):
-  """
-  Checks that the response returned successfully.
-
-  Returns the response.
-  """
-  assert 200 == response.status_code
-  return response
 
 
 def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None, is_admin=False, request=None):
@@ -103,17 +92,6 @@ def assert_equal_mod_whitespace(first, second, msg=None):
   Asserts that two strings are equal, ignoring whitespace.
   """
   assert compact_whitespace(first) == compact_whitespace(second), msg
-
-def assert_similar_pages(first, second, ratio=0.9, msg=None):
-  """
-  Asserts that most of the lines (90% by default) in the two pages are identical,
-  ignoring leading/trailing spaces.
-  """
-  lines_a = set([l.strip() for l in first.split('\n')])
-  lines_b = set([l.strip() for l in second.split('\n')])
-  common = lines_a.intersection(lines_b)
-  similarity = 1.0 * len(common) / max(len(lines_a), len(lines_b))
-  assert similarity >= ratio, msg
 
 
 def configure_django_for_test():

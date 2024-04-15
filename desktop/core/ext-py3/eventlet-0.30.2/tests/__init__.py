@@ -7,7 +7,6 @@ import functools
 import gc
 import json
 import os
-import pytest
 try:
     import resource
 except ImportError:
@@ -20,6 +19,8 @@ except ImportError:
 import sys
 import unittest
 import warnings
+
+from nose.plugins.skip import SkipTest
 
 import eventlet
 from eventlet import tpool
@@ -53,7 +54,7 @@ def skipped(func, *decorator_args):
     """
     @functools.wraps(func)
     def wrapped(*a, **k):
-        pytest.skip(*decorator_args)
+        raise SkipTest(*decorator_args)
 
     return wrapped
 
@@ -72,7 +73,7 @@ def skip_if(condition):
             else:
                 result = condition(func)
             if result:
-                pytest.skip("Skipping Test")
+                raise SkipTest()
             else:
                 return func(*a, **kw)
         return wrapped
@@ -93,7 +94,7 @@ def skip_unless(condition):
             else:
                 result = condition(func)
             if not result:
-                pytest.skip("Skipping Test")
+                raise SkipTest()
             else:
                 return func(*a, **kw)
         return wrapped
@@ -222,7 +223,8 @@ class LimitedTestCase(unittest.TestCase):
 def check_idle_cpu_usage(duration, allowed_part):
     if resource is None:
         # TODO: use https://code.google.com/p/psutil/
-        pytest.skip('CPU usage testing not supported (`import resource` failed)')
+        from nose.plugins.skip import SkipTest
+        raise SkipTest('CPU usage testing not supported (`import resource` failed)')
 
     r1 = resource.getrusage(resource.RUSAGE_SELF)
     eventlet.sleep(duration)
@@ -365,7 +367,7 @@ def run_python(path, env=None, args=None, timeout=None, pythonpath_extend=None, 
             skip_args = []
             if len(parts) > 1:
                 skip_args.append(parts[1])
-            pytest.skip(*skip_args)
+            raise SkipTest(*skip_args)
         ok = output.rstrip() == b'pass'
         if not ok:
             sys.stderr.write('Program {0} output:\n---\n{1}\n---\n'.format(path, output.decode()))

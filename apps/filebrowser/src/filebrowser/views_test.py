@@ -244,7 +244,7 @@ class TestFileBrowser():
         assert (b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%'
           b'D0%B9%D0%BA%D0%BE%D0%B1%2Femploy%C3%A9s_file.txt",' in response.content), response.content
 
-@pytest.mark.requires_hadoopeeeee
+@pytest.mark.requires_hadoop
 @pytest.mark.integration
 class TestFileBrowserWithHadoop(object):
 
