@@ -300,14 +300,14 @@ const TEMPLATE =
       <!-- ko ifnot: selectedSource().selectedNamespace().selectedDatabase() -->
       <!-- ko if: window.HAS_MULTI_CLUSTER-->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="database-assist-breadcrumb-back"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="databases-assist-breadcrumb-back"></i>
         <i class="fa fa-snowflake-o assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumbTitle }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: window.HAS_MULTI_CLUSTER -->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="database-assist-breadcrumb-back"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="databases-assist-breadcrumb-back"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
       </a>
@@ -316,7 +316,7 @@ const TEMPLATE =
       <!-- /ko -->
       <!-- ko ifnot: selectedSource().selectedNamespace() -->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="'namespace-breadcrumb-back'"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="'namespaces-breadcrumb-back'"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
       </a>
