@@ -624,7 +624,7 @@ else:
         <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
           <a class="inactive-action" data-testid="saved-queries-tab" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
           <div style="margin-left: -15px;" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
-          <input class="input-small inline-tab-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+          <input class="input-small inline-tab-filter" data-testid="query-history-search-input" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
         </li>
         % if ENABLE_QUERY_BUILDER.get():
         <!-- ko if: isSqlDialect -->
