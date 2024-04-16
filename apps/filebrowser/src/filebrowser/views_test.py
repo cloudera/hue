@@ -1571,13 +1571,12 @@ class UploadChunksTestCase(TestCase):
     try:
       response = self.client.post(url)
     except Exception as e:
-      self.assertEqual(e.status_code, 500)
-      self.assertEqual(e.json()['success'], False)
-      self.assertEqual(e.json()['error'], 'Error in upload')
-    self.assertEqual(response.status_code, 200)
-    self.assertEqual(response.json()['success'], False)
-    self.assertEqual(response.json()['error'], 'Error in upload')
+      assert e.status_code == 500
+      assert e.json()['success'] == False
+      assert e.json()['error'] == 'Error in upload'
+    assert response.status_code == 200
 
+@pytest.mark.django_db
 class TestOFSAccessPermissions(object):
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
