@@ -34,7 +34,7 @@ from useradmin.models import User
 
 LOG = logging.getLogger()
 
-@pytest.mark.djanog_db
+@pytest.mark.django_db
 class TestJobsubWithHadoop(OozieServerProvider):
 
   def setup_method(self):

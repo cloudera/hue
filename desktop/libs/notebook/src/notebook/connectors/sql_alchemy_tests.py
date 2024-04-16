@@ -449,7 +449,7 @@ class TestAutocomplete(object):
   def test_empty_database_names(self):
     interpreter = {
       'name': 'hive',
-      'options': {'url': 'phoenix://'}
+      'options': {'url': 'phoenix://hue:8080/hue'}
     }
 
     snippet = MagicMock()
@@ -465,7 +465,7 @@ class TestAutocomplete(object):
   def test_columns_with_null_type(self):
     interpreter = {
       'name': 'hive',
-      'options': {'url': 'phoenix://'}
+      'options': {'url': 'phoenix://hue:8080/hue'}
     }
 
     snippet = MagicMock()

@@ -511,13 +511,6 @@ SECURE_REDIRECT_EXEMPT = desktop.conf.SECURE_REDIRECT_EXEMPT.get()
 if 'test' in sys.argv:
   CACHE_MIDDLEWARE_SECONDS = 0
 
-# Limit Nose coverage to Hue apps
-NOSE_ARGS = [
-  '--cover-package=%s' % ','.join([app.name for app in appmanager.DESKTOP_APPS + appmanager.DESKTOP_LIBS]),
-  '--no-path-adjustment',
-  '--traverse-namespace'
-]
-
 TIME_ZONE = desktop.conf.TIME_ZONE.get()
 
 if desktop.conf.DEMO_ENABLED.get():
