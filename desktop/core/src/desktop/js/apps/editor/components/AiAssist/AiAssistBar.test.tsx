@@ -31,13 +31,14 @@ import * as hooks from './hooks';
 jest.mock('../../../../config/hueConfig', () => {
   // We need to import the AiActionModes here since Jest mocks
   // arent allowed to access variables outside of the module
-  const { AiActionModes } = require('./sharedTypes'); 
+  /* eslint @typescript-eslint/no-var-requires: "off" */
+  const { AiActionModes } = require('./sharedTypes');
   return {
     getLastKnownConfig: jest.fn().mockReturnValue({
       hue_config: {
-        ai_enabled_SQL_tasks: Object.values(AiActionModes),
-      },
-    }),
+        ai_enabled_SQL_tasks: Object.values(AiActionModes)
+      }
+    })
   };
 });
 
@@ -70,7 +71,7 @@ jest.mock('./PreviewModal/AiPreviewModal', () => {
             {assumptions}
             {explanation}
             {summary}
-            {showDiffFrom}
+            <span data-testid="mock-preview-modal-diff">{showDiffFrom}</span>
 
             <button type="button" onClick={() => onInsert(suggestion)}>
               Insert
@@ -199,5 +200,18 @@ describe('AiAssistBar', () => {
     expect(getByTestId('mock-preview-modal')).toBeInTheDocument();
     expect(getByTestId('mock-preview-modal')).toHaveTextContent('select * from test');
     expect(getByTestId('mock-preview-modal')).toHaveTextContent('Mock edited SQL from NQL');
+  });
+
+  it('does pass prop showDiffFrom to the explain preview modal when clicking explain', async () => {
+    const user = userEvent.setup();
+    const { getByTestId, getByRole } = render(<AiAssistBar activeExecutable={sqlExecutableMock} />);
+
+    await user.click(getByRole('button', { name: 'Explain SQL statement' }));
+
+    expect(getByTestId('mock-preview-modal')).toBeInTheDocument();
+    expect(getByTestId('mock-preview-modal')).toHaveTextContent('select * from test');
+    expect(getByTestId('mock-preview-modal-diff')).not.toHaveTextContent('select * from test');
+    expect(getByTestId('mock-preview-modal')).not.toHaveTextContent('test prompt input');
+    expect(getByTestId('mock-preview-modal')).not.toHaveTextContent('Mock generate assumptions');
   });
 });
