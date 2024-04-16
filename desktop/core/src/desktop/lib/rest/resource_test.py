@@ -19,8 +19,6 @@
 import json
 import sys
 
-from nose.tools import assert_equal, assert_false, assert_true, assert_raises
-
 from desktop.lib.i18n import smart_unicode, smart_str
 from desktop.lib.rest.resource import Resource
 
@@ -39,7 +37,7 @@ def test_concat_unicode_with_ascii_python2():
   except UnicodeDecodeError:
     pass
 
-  assert_equal(u'The currency is: €', u'The currency is: %s' % smart_unicode('€'))
+  assert u'The currency is: €' == u'The currency is: %s' % smart_unicode('€')
 
 
   try:
@@ -78,8 +76,8 @@ def test_avoid_concat_unicode_with_ascii():
       resource = Resource(client)
       resp = resource.get('/user/domain/')
 
-      assert_false(exception.called)
-      assert_equal('Good', resp)
+      assert not exception.called
+      assert 'Good' == resp
 
       client.execute = Mock(
         return_value=Mock(
@@ -90,10 +88,10 @@ def test_avoid_concat_unicode_with_ascii():
 
       resp = resource.get('/user/domain/Джейкоб')
 
-      assert_true(client.execute.called)
-      assert_false(exception.called)  # Should not fail anymore now
+      assert client.execute.called
+      assert not exception.called  # Should not fail anymore now
 
       resp = resource.post('/user/domain/Джейкоб', data=json.dumps({'€': '€'}))
 
-      assert_true(client.execute.called)
-      assert_false(exception.called)
+      assert client.execute.called
+      assert not exception.called

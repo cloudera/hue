@@ -18,10 +18,9 @@
 
 from builtins import object
 import json
+import pytest
 
 from django.urls import reverse
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal
 
 from hadoop.conf import HDFS_CLUSTERS
 
@@ -45,9 +44,10 @@ class MockHiveApi(object):
     return [{'name': groupName}]
 
 
+@pytest.mark.django_db
 class TestMockedApi(object):
 
-  def setUp(self):
+  def setup_method(self):
     if not hasattr(api, 'OriginalSentryApi'):
       api.OriginalSentryApi = api.get_api
     api.get_api = mocked_get_api
@@ -60,25 +60,25 @@ class TestMockedApi(object):
     add_to_group("sentry_test")
     add_to_group("sentry_hue")
 
-    raise SkipTest
+    pytest.skip("Skipping Test")
 
-  def tearDown(self):
+  def teardown_method(self):
     api.get_api = api.OriginalSentryApi
 
 
   def test_list_sentry_roles_by_group(self):
     response = self.client.post(reverse("security:list_sentry_roles_by_group"), {'groupName': ''})
-    assert_equal('*', json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content)
+    assert '*' == json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content
 
     response = self.client.post(reverse("security:list_sentry_roles_by_group"), {'groupName': 'test'})
-    assert_equal('test', json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content)
+    assert 'test' == json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content
 
 
     response = self.client_admin.post(reverse("security:list_sentry_roles_by_group"), {'groupName': ''})
-    assert_equal(None, json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content)
+    assert None == json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content
 
     response = self.client_admin.post(reverse("security:list_sentry_roles_by_group"), {'groupName': 'test'})
-    assert_equal('test', json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content)
+    assert 'test' == json.loads(response.content).get('roles', [{'name': ''}])[0]['name'], response.content
 
 
 class TestUtils(object):
@@ -89,17 +89,17 @@ class TestUtils(object):
     clear_sys_caches()
 
     try:
-      assert_equal('', _massage_uri(''))
+      assert '' == _massage_uri('')
 
-      assert_equal('namenode/data', _massage_uri('hdfs:///data'))
+      assert 'namenode/data' == _massage_uri('hdfs:///data')
 
-      assert_equal('hdfs://nn:11/data', _massage_uri('hdfs://nn:11/data'))
+      assert 'hdfs://nn:11/data' == _massage_uri('hdfs://nn:11/data')
 
-      assert_equal('hdfs://logical/data', _massage_uri('hdfs://logical/data'))
+      assert 'hdfs://logical/data' == _massage_uri('hdfs://logical/data')
 
-      assert_equal('namenode/data', _massage_uri('/data'))
+      assert 'namenode/data' == _massage_uri('/data')
 
-      assert_equal('file:///data', _massage_uri('file:///data'))
+      assert 'file:///data' == _massage_uri('file:///data')
     finally:
       finish()
 
@@ -107,23 +107,23 @@ class TestUtils(object):
     clear_sys_caches()
 
     try:
-      assert_equal('', _massage_uri(''))
+      assert '' == _massage_uri('')
 
-      assert_equal('hdfs://fs_defaultfs:8021/data', _massage_uri('hdfs:///data'))
+      assert 'hdfs://fs_defaultfs:8021/data' == _massage_uri('hdfs:///data')
 
-      assert_equal('hdfs://nn:11/data', _massage_uri('hdfs://nn:11/data'))
+      assert 'hdfs://nn:11/data' == _massage_uri('hdfs://nn:11/data')
 
-      assert_equal('hdfs://logical/data', _massage_uri('hdfs://logical/data'))
+      assert 'hdfs://logical/data' == _massage_uri('hdfs://logical/data')
 
-      assert_equal('hdfs://fs_defaultfs:8021/data', _massage_uri('/data'))
+      assert 'hdfs://fs_defaultfs:8021/data' == _massage_uri('/data')
 
-      assert_equal('file:///data', _massage_uri('file:///data'))
+      assert 'file:///data' == _massage_uri('file:///data')
     finally:
       finish()
 
   def test_get_splitted_path(self):
-    assert_equal(('', '', ''), _get_splitted_path(''))
-    assert_equal(('db', '', ''), _get_splitted_path('db'))
-    assert_equal(('db', 'table', ''), _get_splitted_path('db.table'))
-    assert_equal(('db', 'table', 'column'), _get_splitted_path('db.table.column'))
-    assert_equal(('db', 'table', 'column'), _get_splitted_path('db.table.column.blah'))
+    assert ('', '', '') == _get_splitted_path('')
+    assert ('db', '', '') == _get_splitted_path('db')
+    assert ('db', 'table', '') == _get_splitted_path('db.table')
+    assert ('db', 'table', 'column') == _get_splitted_path('db.table.column')
+    assert ('db', 'table', 'column') == _get_splitted_path('db.table.column.blah')

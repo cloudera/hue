@@ -16,10 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 import sys
 import unittest
 
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises
+from django.test import TestCase
 
 from desktop.auth.decorators import admin_required, hue_admin_required
 from desktop.lib.django_test_util import make_logged_in_client
@@ -34,10 +35,10 @@ else:
   from mock import patch, Mock
 
 
-class TestDecorator(unittest.TestCase):
+class TestDecorator(TestCase):
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     cls.client1 = make_logged_in_client(username='admin', recreate=True, is_superuser=True)
     cls.client2 = make_logged_in_client(username='joe', recreate=True, is_superuser=False)
 
@@ -47,7 +48,8 @@ class TestDecorator(unittest.TestCase):
     hello_admin(request)
 
     request = Mock(user=User.objects.get(username='joe'))
-    assert_raises(PopupException, hello_admin, request)
+    with pytest.raises(PopupException):
+      hello_admin(request)
 
 
   def test_hue_admin_required(self):
@@ -55,7 +57,8 @@ class TestDecorator(unittest.TestCase):
     hello_hue_admin(request)
 
     request = Mock(user=User.objects.get(username='joe'))
-    assert_raises(PopupException, hello_hue_admin, request)
+    with pytest.raises(PopupException):
+      hello_hue_admin(request)
 
 
 @admin_required

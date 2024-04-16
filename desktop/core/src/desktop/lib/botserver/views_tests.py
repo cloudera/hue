@@ -18,10 +18,9 @@
 import json
 import logging
 import unittest
+import pytest
 import sys
 
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises
-from nose.plugins.skip import SkipTest
 from django.test import TestCase
 
 from desktop.lib.botserver.views import *
@@ -39,12 +38,12 @@ else:
 
 LOG = logging.getLogger()
 
-class TestBotServer(unittest.TestCase):
+class TestBotServer(TestCase):
   
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     if not conf.SLACK.IS_ENABLED.get():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     # Slack user: test
     cls.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
@@ -54,7 +53,7 @@ class TestBotServer(unittest.TestCase):
     cls.client_not_me = make_logged_in_client(username="test_not_me", groupname="default", recreate=True, is_superuser=False)
     cls.user_not_me = User.objects.get(username="test_not_me")
 
-  def setUp(self):
+  def setup_method(self):
     self.host_domain = 'testserver.gethue.com'
     self.is_http_secure = True # https if true else http
 
@@ -77,8 +76,8 @@ class TestBotServer(unittest.TestCase):
 
         # Bot sending message
         response = handle_on_message(self.host_domain, self.is_http_secure, self.channel_id, bot_id, message_element, self.user_id, self.message_ts)
-        assert_equal(response.status_code, 200)
-        assert_false(_send_message.called)
+        assert response.status_code == 200
+        assert not _send_message.called
 
         help_block = [
           {
@@ -156,9 +155,10 @@ class TestBotServer(unittest.TestCase):
             # For Slack user not Hue user
             get_user.side_effect = SlackBotException('Slack user does not have access to the query')
 
-            assert_raises(SlackBotException, handle_select_statement, self.host_domain, self.is_http_secure, self.channel_id, self.user_id, statement, self.message_ts)
+            with pytest.raises(SlackBotException):
+              handle_select_statement(self.host_domain, self.is_http_secure, self.channel_id, self.user_id, statement, self.message_ts)
             _send_message.assert_called_with('channel', message=detect_msg)
-            assert_false(_make_select_statement_gist.called)
+            assert not _make_select_statement_gist.called
 
             # For Slack user is Hue user
             get_user.side_effect = None
@@ -197,7 +197,8 @@ class TestBotServer(unittest.TestCase):
                       }
                     }
                   }
-                  assert_raises(PopupException, handle_on_link_shared, self.host_domain, "channel", "12.1", links, "<@user_id>")
+                  with pytest.raises(PopupException):
+                    handle_on_link_shared(self.host_domain, "channel", "12.1", links, "<@user_id>")
 
                   # Slack user is Hue user with read access sends link
                   doc.update_permission(self.user, is_link_on=True)
@@ -244,16 +245,18 @@ class TestBotServer(unittest.TestCase):
                   }
 
                   chat_unfurl.assert_called_with(channel=self.channel_id, ts=self.message_ts, unfurls=query_preview)
-                  assert_true(send_result_file.called)
+                  assert send_result_file.called
 
                   # Document does not exist
                   qhistory_url = "https://{host_domain}/hue/editor?editor=109644".format(host_domain=self.host_domain)
-                  assert_raises(SlackBotException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": qhistory_url}], "<@user_id>")
+                  with pytest.raises(SlackBotException):
+                    handle_on_link_shared(self.host_domain, "channel", "12.1", [{"url": qhistory_url}], "<@user_id>")
                   _send_message.assert_called_with('channel', message='Query document not found or does not exist.', message_ts='12.1')
 
                   # Cannot unfurl link with invalid query link
                   inv_qhistory_url = "https://{host_domain}/hue/editor/?type=4".format(host_domain=self.host_domain)
-                  assert_raises(SlackBotException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": inv_qhistory_url}], "<@user_id>")
+                  with pytest.raises(SlackBotException):
+                    handle_on_link_shared(self.host_domain, "channel", "12.1", [{"url": inv_qhistory_url}], "<@user_id>")
                   _send_message.assert_called_with('channel', message='Could not access the query, please check the link again.', message_ts='12.1')
 
   def test_handle_gist_link(self):
@@ -310,7 +313,7 @@ class TestBotServer(unittest.TestCase):
             }
 
             chat_unfurl.assert_called_with(channel=self.channel_id, ts=self.message_ts, unfurls=gist_preview)
-            assert_false(send_result_file.called)
+            assert not send_result_file.called
 
             # Gist link sent directly from Hue to Slack via bot
             users_info.return_value = {
@@ -322,16 +325,18 @@ class TestBotServer(unittest.TestCase):
             handle_on_link_shared(self.host_domain, self.channel_id, self.message_ts, links, self.user_id)
 
             chat_unfurl.assert_called_with(channel=self.channel_id, ts=self.message_ts, unfurls=gist_preview)
-            assert_false(send_result_file.called)
+            assert not send_result_file.called
 
             # Gist document does not exist
             gist_url = "https://{host_domain}/hue/gist?uuid=6d1c407b-d999-4dfd-ad23-d3a46c19a427".format(host_domain=self.host_domain)
-            assert_raises(SlackBotException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": gist_url}], "<@user_id>")
+            with pytest.raises(SlackBotException):
+              handle_on_link_shared(self.host_domain, "channel", "12.1", [{"url": gist_url}], "<@user_id>")
             _send_message.assert_called_with('channel', message='Query document not found or does not exist.', message_ts='12.1')
 
             # Cannot unfurl with invalid gist link
             inv_gist_url = "https://{host_domain}/hue/gist?uuids/=invalid_link".format(host_domain=self.host_domain)
-            assert_raises(SlackBotException, handle_on_link_shared, self.host_domain, "channel", "12.1", [{"url": inv_gist_url}], "<@user_id>")
+            with pytest.raises(SlackBotException):
+              handle_on_link_shared(self.host_domain, "channel", "12.1", [{"url": inv_gist_url}], "<@user_id>")
             _send_message.assert_called_with('channel', message='Could not access the query, please check the link again.', message_ts='12.1')
 
   def test_slack_user_not_hue_user(self):
@@ -350,7 +355,8 @@ class TestBotServer(unittest.TestCase):
         }
         slack_user = check_slack_user_permission(self.host_domain, self.user_id)
 
-        assert_raises(SlackBotException, get_user, "channel", slack_user, "12.1")
+        with pytest.raises(SlackBotException):
+          get_user("channel", slack_user, "12.1")
         _send_message.assert_called_with('channel', message='Corresponding Hue user not found or does not have access.', message_ts='12.1')
 
         # Different domain but same email prefix
@@ -365,7 +371,8 @@ class TestBotServer(unittest.TestCase):
         }
         slack_user = check_slack_user_permission(self.host_domain, self.user_id)
 
-        assert_raises(SlackBotException, get_user, "channel", slack_user, "12.1")
+        with pytest.raises(SlackBotException):
+          get_user("channel", slack_user, "12.1")
         _send_message.assert_called_with('channel', message='Corresponding Hue user not found or does not have access.', message_ts='12.1')
   
   def test_handle_on_app_mention(self):
@@ -376,7 +383,7 @@ class TestBotServer(unittest.TestCase):
           text = '@hue some message'
           handle_on_app_mention(self.host_domain, self.channel_id, self.user_id, text, self.message_ts)
 
-          assert_false(handle_query_bank.called)
+          assert not handle_query_bank.called
 
           text = '@hue queries'
           handle_on_app_mention(self.host_domain, self.channel_id, self.user_id, text, self.message_ts)

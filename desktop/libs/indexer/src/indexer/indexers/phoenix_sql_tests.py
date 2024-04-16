@@ -17,7 +17,6 @@
 # limitations under the License.from indexer.indexers.phoenix_sql import PhoenixIndexer
 
 import sys
-from nose.tools import assert_equal
 
 from desktop.settings import BASE_DIR
 from indexer.indexers.phoenix_sql import PhoenixIndexer
@@ -80,4 +79,4 @@ UPSERT INTO test1 VALUES ('TX', 'Dallas', 1213825);
 
 UPSERT INTO test1 VALUES ('CA', 'San Jose', 912332);'''
 
-    assert_equal(statement, sql)
+    assert statement == sql

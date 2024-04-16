@@ -18,8 +18,6 @@ from __future__ import absolute_import
 
 import os
 
-from nose.tools import eq_
-
 from aws.s3 import s3file
 from aws.s3.s3test_utils import S3TestBase
 
@@ -34,16 +32,16 @@ class S3FileTest(S3TestBase):
     key = self.get_key(path)
     with self.cleaning(path):
       key.set_contents_from_string(QUOTE_EN)
-      eq_(QUOTE_EN, s3file.open(key, 'r').read())
-      eq_(QUOTE_EN[:4], s3file.open(key, 'r').read(length=4))
+      assert QUOTE_EN == s3file.open(key, 'r').read()
+      assert QUOTE_EN[:4] == s3file.open(key, 'r').read(length=4)
 
   def test_unicode_read(self):
     path = self.get_test_path('test_unicode_read.txt')
     key = self.get_key(path)
     with self.cleaning(path):
       key.set_contents_from_string(QUOTE_CH)
-      eq_(QUOTE_CH.encode('utf-8'), s3file.open(key, 'r').read())
-      eq_(QUOTE_CH.encode('utf-8')[:4], s3file.open(key, 'r').read(length=4))
+      assert QUOTE_CH.encode('utf-8') == s3file.open(key, 'r').read()
+      assert QUOTE_CH.encode('utf-8')[:4] == s3file.open(key, 'r').read(length=4)
 
   def test_seek(self):
     path = self.get_test_path('test_seek.txt')
@@ -52,11 +50,11 @@ class S3FileTest(S3TestBase):
       key.set_contents_from_string(QUOTE_EN)
       f = s3file.open(key, 'r')
       f.seek(0, os.SEEK_SET)
-      eq_(QUOTE_EN[:2], f.read(2))
+      assert QUOTE_EN[:2] == f.read(2)
       f.seek(1, os.SEEK_SET)
-      eq_(QUOTE_EN[1:][:2], f.read(2))
+      assert QUOTE_EN[1:][:2] == f.read(2)
       f.seek(-1, os.SEEK_END)
-      eq_(QUOTE_EN[-1:], f.read())
+      assert QUOTE_EN[-1:] == f.read()
       f.seek(0, os.SEEK_SET)
       f.seek(2, os.SEEK_CUR)
-      eq_(QUOTE_EN[2:][:2], f.read(2))
+      assert QUOTE_EN[2:][:2] == f.read(2)

@@ -18,11 +18,10 @@
 
 from builtins import object
 import json
+import pytest
 import sys
 from datetime import datetime
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_false, assert_true, assert_not_equal, assert_raises
 from django.core import management
 from django.db.utils import OperationalError
 
@@ -58,9 +57,10 @@ class MockFs(object):
     pass
 
 
+@pytest.mark.django_db
 class TestClusterConfig(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -69,7 +69,7 @@ class TestClusterConfig(object):
 
   def test_get_fs(self):
     if not has_connectors():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     with patch('desktop.models.appmanager.get_apps_dict') as get_apps_dict:
       with patch('desktop.models.fsmanager.is_enabled_and_has_access') as is_enabled_and_has_access:
@@ -85,7 +85,7 @@ class TestClusterConfig(object):
 
       main_app = ClusterConfig(user=self.user, apps=apps).get_main_quick_action(apps=apps)
 
-      assert_true({'type': 1, 'name': 'SQL'}, main_app)
+      assert {'type': 1, 'name': 'SQL'}, main_app
 
 
   def test_get_remote_storage_home(self):
@@ -97,10 +97,10 @@ class TestClusterConfig(object):
 
     try:
       remote_home_storage = get_remote_home_storage(self.user)
-      assert_equal(remote_home_storage, 'abfs://gethue-container/user/test')
+      assert remote_home_storage == 'abfs://gethue-container/user/test'
 
       remote_home_storage = get_remote_home_storage(self.user_not_me)
-      assert_equal(remote_home_storage, 'abfs://gethue-container/user/test_not_me')
+      assert remote_home_storage == 'abfs://gethue-container/user/test_not_me'
     finally:
       for reset in resets:
         reset()
@@ -113,10 +113,10 @@ class TestClusterConfig(object):
 
     try:
       remote_home_storage = get_remote_home_storage(self.user)
-      assert_equal(remote_home_storage, 's3a://gethue-bucket/user/test')
+      assert remote_home_storage == 's3a://gethue-bucket/user/test'
 
       remote_home_storage = get_remote_home_storage(self.user_not_me)
-      assert_equal(remote_home_storage, 's3a://gethue-bucket/user/test_not_me')
+      assert remote_home_storage == 's3a://gethue-bucket/user/test_not_me'
     finally:
       for reset in resets:
         reset()
@@ -129,31 +129,32 @@ class TestClusterConfig(object):
 
     try:
       remote_home_storage = get_remote_home_storage(self.user)
-      assert_equal(remote_home_storage, 'abfs://gethue-container')
+      assert remote_home_storage == 'abfs://gethue-container'
 
       remote_home_storage = get_remote_home_storage(self.user_not_me)
-      assert_equal(remote_home_storage, 'abfs://gethue-container')
+      assert remote_home_storage == 'abfs://gethue-container'
     finally:
       for reset in resets:
         reset()
 
 
+@pytest.mark.django_db
 class TestDocument2(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="doc2", groupname="doc2", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="doc2")
 
     # This creates the user directories for the new user
     response = self.client.get('/desktop/api2/doc/')
     data = json.loads(response.content)
-    assert_equal('/', data['document']['path'], data)
+    assert '/' == data['document']['path'], data
 
     self.home_dir = Document2.objects.get_home_directory(user=self.user)
 
 
   def test_trash_directory(self):
-    assert_true(Directory.objects.filter(owner=self.user, name=Document2.TRASH_DIR, type='directory').exists())
+    assert Directory.objects.filter(owner=self.user, name=Document2.TRASH_DIR, type='directory').exists()
 
 
   def test_document_create(self):
@@ -176,17 +177,17 @@ class TestDocument2(object):
       new_query = import_saved_beeswax_query(old_query)
       new_query_data = new_query.get_data()
 
-      assert_equal('query-hive', new_query_data['type'])
-      assert_equal('See examples', new_query_data['name'])
-      assert_equal('Example of old format', new_query_data['description'])
+      assert 'query-hive' == new_query_data['type']
+      assert 'See examples' == new_query_data['name']
+      assert 'Example of old format' == new_query_data['description']
 
-      assert_equal('ready', new_query_data['snippets'][0]['status'])
-      assert_equal('See examples', new_query_data['snippets'][0]['name'])
-      assert_equal('SELECT * FROM sample_07', new_query_data['snippets'][0]['statement_raw'])
+      assert 'ready' == new_query_data['snippets'][0]['status']
+      assert 'See examples' == new_query_data['snippets'][0]['name']
+      assert 'SELECT * FROM sample_07' == new_query_data['snippets'][0]['statement_raw']
 
-      assert_equal([], new_query_data['snippets'][0]['properties']['settings'])
-      assert_equal([], new_query_data['snippets'][0]['properties']['files'])
-      assert_equal([], new_query_data['snippets'][0]['properties']['functions'])
+      assert [] == new_query_data['snippets'][0]['properties']['settings']
+      assert [] == new_query_data['snippets'][0]['properties']['files']
+      assert [] == new_query_data['snippets'][0]['properties']['functions']
     finally:
       old_query.delete()
 
@@ -196,24 +197,24 @@ class TestDocument2(object):
     self.home_dir.children.add(doc)
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_true('document' in data)
-    assert_equal(doc.uuid, data['document']['uuid'])
+    assert 'document' in data
+    assert doc.uuid == data['document']['uuid']
 
     # Invalid uuid returns error
     response = self.client.get('/desktop/api2/doc/', {'uuid': '1234-5678-9'})
     data = json.loads(response.content)
-    assert_equal(-1, data['status'])
-    assert_true('not found' in data['message'])
+    assert -1 == data['status']
+    assert 'not found' in data['message']
 
     # Document UUID and XML UUID missmatch
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
     doc.uuid = '1234-5678-9'
     doc.save()
-    assert_not_equal(doc.uuid, data['document']['uuid'])
+    assert doc.uuid != data['document']['uuid']
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['document']['uuid'])
+    assert doc.uuid == data['document']['uuid']
 
 
   def test_directory_create_and_rename(self):
@@ -223,17 +224,17 @@ class TestDocument2(object):
     )
     data = json.loads(response.content)
 
-    assert_equal(0, data['status'], data)
-    assert_true('directory' in data)
-    assert_equal(data['directory']['name'], 'test_mkdir', data)
-    assert_equal(data['directory']['type'], 'directory', data)
+    assert 0 == data['status'], data
+    assert 'directory' in data
+    assert data['directory']['name'] == 'test_mkdir', data
+    assert data['directory']['type'] == 'directory', data
 
     response = self.client.post('/desktop/api2/doc/update', {'uuid': json.dumps(data['directory']['uuid']),
                                                              'name': 'updated'})
 
     data = json.loads(response.content)
-    assert_equal(0, data['status'])
-    assert_equal('updated', data['document']['name'], data)
+    assert 0 == data['status']
+    assert 'updated' == data['document']['name'], data
 
 
   def test_file_move(self):
@@ -245,35 +246,35 @@ class TestDocument2(object):
     # Verify original paths before move operation
     response = self.client.get('/desktop/api2/doc/', {'uuid': source_dir.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv_file_src', data['document']['path'])
+    assert '/test_mv_file_src' == data['document']['path']
 
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv_file_src/query1.sql', data['document']['path'])
+    assert '/test_mv_file_src/query1.sql' == data['document']['path']
 
     response = self.client.post('/desktop/api2/doc/move', {
         'source_doc_uuid': json.dumps(doc.uuid),
         'destination_doc_uuid': json.dumps(target_dir.uuid)
     })
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
+    assert 0 == data['status'], data
 
     # Verify that the paths are updated
     response = self.client.get('/desktop/api2/doc/', {'uuid': source_dir.uuid})
     data = json.loads(response.content)
-    assert_false(any(doc['uuid'] == doc.uuid for doc in data['children']), data['children'])
+    assert not any(doc['uuid'] == doc.uuid for doc in data['children']), data['children']
 
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv_file_dst/query1.sql', data['document']['path'])
+    assert '/test_mv_file_dst/query1.sql' == data['document']['path']
 
     # Verify that last_modified is intact
     doc = Document2.objects.get(id=doc.id)
-    assert_equal(orig_last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+    assert orig_last_modified.strftime('%Y-%m-%dT%H:%M:%S') == doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S')
 
   def test_file_copy(self):
     if not has_oozie:
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     workflow_doc = Document2.objects.create(
         name='Copy Test',
@@ -324,13 +325,13 @@ class TestDocument2(object):
     copy_workflow = Workflow(document=copy_doc)
 
     # Check if document2 and data are in sync
-    assert_equal(copy_doc.name, copy_workflow.get_data()['workflow']['name'])
-    assert_equal(copy_doc.uuid, copy_workflow.get_data()['workflow']['uuid'])
+    assert copy_doc.name == copy_workflow.get_data()['workflow']['name']
+    assert copy_doc.uuid == copy_workflow.get_data()['workflow']['uuid']
 
-    assert_equal(copy_workflow.name, workflow.name + "-copy")
-    assert_not_equal(copy_workflow.deployment_dir, workflow.deployment_dir)
-    assert_not_equal(copy_doc.uuid, workflow_doc.uuid)
-    assert_not_equal(copy_workflow.get_data()['workflow']['uuid'], workflow.get_data()['workflow']['uuid'])
+    assert copy_workflow.name == workflow.name + "-copy"
+    assert copy_workflow.deployment_dir != workflow.deployment_dir
+    assert copy_doc.uuid != workflow_doc.uuid
+    assert copy_workflow.get_data()['workflow']['uuid'] != workflow.get_data()['workflow']['uuid']
 
 
   def test_directory_move(self):
@@ -341,27 +342,27 @@ class TestDocument2(object):
     # Verify original paths before move operation
     response = self.client.get('/desktop/api2/doc/', {'uuid': source_dir.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv', data['document']['path'])
+    assert '/test_mv' == data['document']['path']
 
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv/query1.sql', data['document']['path'])
+    assert '/test_mv/query1.sql' == data['document']['path']
 
     response = self.client.post('/desktop/api2/doc/move', {
         'source_doc_uuid': json.dumps(Directory.objects.get(owner=self.user, name='test_mv').uuid),
         'destination_doc_uuid': json.dumps(Directory.objects.get(owner=self.user, name='test_mv_dst').uuid)
     })
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
+    assert 0 == data['status'], data
 
     # Verify that the paths are updated
     response = self.client.get('/desktop/api2/doc/', {'uuid': source_dir.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv_dst/test_mv', data['document']['path'])
+    assert '/test_mv_dst/test_mv' == data['document']['path']
 
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv_dst/test_mv/query1.sql', data['document']['path'])
+    assert '/test_mv_dst/test_mv/query1.sql' == data['document']['path']
 
 
   def test_directory_children(self):
@@ -377,31 +378,31 @@ class TestDocument2(object):
     # Test that all children directories and documents are returned
     response = self.client.get('/desktop/api2/doc', {'path': '/'})
     data = json.loads(response.content)
-    assert_true('children' in data)
-    assert_equal(5, data['count'])  # This includes the 4 docs and .Trash and Gist
+    assert 'children' in data
+    assert 5 == data['count']  # This includes the 4 docs and .Trash and Gist
 
     # Test filter type
     response = self.client.get('/desktop/api2/doc', {'path': '/', 'type': ['directory']})
     data = json.loads(response.content)
-    assert_equal(['directory'], data['types'])
-    assert_equal(3, data['count'])
-    assert_true(all(doc['type'] == 'directory' for doc in data['children']))
+    assert ['directory'] == data['types']
+    assert 3 == data['count']
+    assert all(doc['type'] == 'directory' for doc in data['children'])
 
     # Test search text
     response = self.client.get('/desktop/api2/doc', {'path': '/', 'text': 'foo'})
     data = json.loads(response.content)
-    assert_equal('foo', data['text'])
-    assert_equal(2, data['count'])
+    assert 'foo' == data['text']
+    assert 2 == data['count']
 
     response = self.client.get('/desktop/api2/doc', {'path': '/', 'text': 'foobar'})
     data = json.loads(response.content)
-    assert_equal(1, data['count'])
+    assert 1 == data['count']
 
     # Test pagination with limit
     response = self.client.get('/desktop/api2/doc', {'path': '/', 'page': 2, 'limit': 2})
     data = json.loads(response.content)
-    assert_equal(5, data['count'])
-    assert_equal(2, len(data['children']))
+    assert 5 == data['count']
+    assert 2 == len(data['children'])
 
 
   def test_update_document(self):
@@ -416,9 +417,9 @@ class TestDocument2(object):
 
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal('initial', data['document']['name'])
-    assert_equal('initial desc', data['document']['description'])
-    assert_equal('query-hive', data['document']['type'])
+    assert 'initial' == data['document']['name']
+    assert 'initial desc' == data['document']['description']
+    assert 'query-hive' == data['document']['type']
 
     # Update document's name and description
     response = self.client.post('/desktop/api2/doc/update', {'uuid': json.dumps(doc.uuid),
@@ -426,12 +427,12 @@ class TestDocument2(object):
                                                              'description': 'updated desc',
                                                              'type': 'bogus-type'})
     data = json.loads(response.content)
-    assert_equal(0, data['status'])
-    assert_true('document' in data, data)
-    assert_equal('updated', data['document']['name'], data)
-    assert_equal('updated desc', data['document']['description'], data)
+    assert 0 == data['status']
+    assert 'document' in data, data
+    assert 'updated' == data['document']['name'], data
+    assert 'updated desc' == data['document']['description'], data
     # Non-whitelisted attributes should remain unchanged
-    assert_equal('query-hive', data['document']['type'], data)
+    assert 'query-hive' == data['document']['type'], data
 
 
   def test_document_trash(self):
@@ -447,54 +448,54 @@ class TestDocument2(object):
     # Test that .Trash is currently empty
     response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
-    assert_equal(0, data['count'])
+    assert 0 == data['count']
 
     # Delete query2.sql
-    assert_false(Document2.objects.get(uuid=query.uuid).is_trashed)
+    assert not Document2.objects.get(uuid=query.uuid).is_trashed
     response = self.client.post('/desktop/api2/doc/delete', {'uuid': json.dumps(query.uuid)})
     data = json.loads(response.content)
-    assert_equal(0, data['status'])
-    assert_true(Document2.objects.get(uuid=query.uuid).is_trashed)
+    assert 0 == data['status']
+    assert Document2.objects.get(uuid=query.uuid).is_trashed
 
     response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
-    assert_equal(1, data['count'])
-    assert_equal(data['children'][0]['uuid'], query.uuid)
+    assert 1 == data['count']
+    assert data['children'][0]['uuid'] == query.uuid
 
     # Delete test_dir directory w/ contents
-    assert_false(Document2.objects.get(uuid=dir.uuid).is_trashed)
+    assert not Document2.objects.get(uuid=dir.uuid).is_trashed
     response = self.client.post('/desktop/api2/doc/delete', {'uuid': json.dumps(dir.uuid)})
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_true(Document2.objects.get(uuid=dir.uuid).is_trashed)
+    assert 0 == data['status'], data
+    assert Document2.objects.get(uuid=dir.uuid).is_trashed
 
     response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
-    assert_equal(2, data['count'])
+    assert 2 == data['count']
 
     # Child document should be in trash too
     response = self.client.get('/desktop/api2/doc', {'path': '/.Trash/test_dir'})
     data = json.loads(response.content)
-    assert_equal(nested_query.uuid, data['children'][0]['uuid'])
+    assert nested_query.uuid == data['children'][0]['uuid']
 
     # Skip Trash (erase) on a directory with contents should erase all children recursively
     response = self.client.post('/desktop/api2/doc/delete', {'uuid': json.dumps(dir.uuid), 'skip_trash': json.dumps(True)})
     data = json.loads(response.content)
-    assert_equal(0, data['status'])
-    assert_false(Document2.objects.filter(uuid=dir.uuid).exists())
-    assert_false(Document2.objects.filter(uuid=nested_query.uuid).exists())
+    assert 0 == data['status']
+    assert not Document2.objects.filter(uuid=dir.uuid).exists()
+    assert not Document2.objects.filter(uuid=nested_query.uuid).exists()
 
     # Verify that only doc in home is .Trash
     response = self.client.get('/desktop/api2/doc', {'path': '/'})
     data = json.loads(response.content)
-    assert_true('children' in data)
-    assert_equal(1, data['count'])
-    assert_true(Document2.TRASH_DIR in [f['name'] for f in data['children']])
+    assert 'children' in data
+    assert 1 == data['count']
+    assert Document2.TRASH_DIR in [f['name'] for f in data['children']]
 
 
   def test_get_history(self):
     history = Document2.objects.get_history(user=self.user, doc_type='query-hive')
-    assert_false(history.filter(name='test_get_history').exists())
+    assert not history.filter(name='test_get_history').exists()
 
     query = Document2.objects.create(
         name='test_get_history',
@@ -505,7 +506,7 @@ class TestDocument2(object):
 
     try:
       history = Document2.objects.get_history(user=self.user, doc_type='query-hive')
-      assert_true(history.filter(name='test_get_history').exists())
+      assert history.filter(name='test_get_history').exists()
     finally:
       query.delete()
 
@@ -526,13 +527,13 @@ class TestDocument2(object):
 
     try:
       history = Document2.objects.get_history(user=self.user, doc_type='query-hive', connector_id=connector.id)
-      assert_false(history.filter(name='test_get_history').exists())
+      assert not history.filter(name='test_get_history').exists()
 
       query.is_history = True
       query.save()
 
       history = Document2.objects.get_history(user=self.user, doc_type='query-hive', connector_id=connector.id)
-      assert_true(history.filter(name='test_get_history').exists())
+      assert history.filter(name='test_get_history').exists()
     finally:
       query.delete()
       connector.delete()
@@ -546,16 +547,16 @@ class TestDocument2(object):
         {'parent_uuid': json.dumps(test_dir.uuid), 'name': json.dumps(Document2.TRASH_DIR)}
     )
     data = json.loads(response.content)
-    assert_equal(-1, data['status'], data)
-    assert_equal('Cannot create or modify directory with name: .Trash', data['message'])
+    assert -1 == data['status'], data
+    assert 'Cannot create or modify directory with name: .Trash' == data['message']
 
     response = self.client.post('/desktop/api2/doc/move', {
         'source_doc_uuid': json.dumps(self.home_dir.uuid),
         'destination_doc_uuid': json.dumps(test_dir.uuid)
     })
     data = json.loads(response.content)
-    assert_equal(-1, data['status'], data)
-    assert_equal('Cannot create or modify directory with name: ', data['message'])
+    assert -1 == data['status'], data
+    assert 'Cannot create or modify directory with name: ' == data['message']
 
     trash_dir = Directory.objects.get(name=Document2.TRASH_DIR, owner=self.user)
     response = self.client.post('/desktop/api2/doc/move', {
@@ -563,8 +564,8 @@ class TestDocument2(object):
         'destination_doc_uuid': json.dumps(test_dir.uuid)
     })
     data = json.loads(response.content)
-    assert_equal(-1, data['status'], data)
-    assert_equal('Cannot create or modify directory with name: .Trash', data['message'])
+    assert -1 == data['status'], data
+    assert 'Cannot create or modify directory with name: .Trash' == data['message']
 
 
   def test_validate_circular_directory(self):
@@ -580,8 +581,8 @@ class TestDocument2(object):
         'destination_doc_uuid': json.dumps(a_dir.uuid)
     })
     data = json.loads(response.content)
-    assert_equal(-1, data['status'], data)
-    assert_true('circular dependency' in data['message'], data)
+    assert -1 == data['status'], data
+    assert 'circular dependency' in data['message'], data
 
     # Test simple case where directory is saved to self as parent
     dir = Directory.objects.create(name='dir', owner=self.user)
@@ -590,8 +591,8 @@ class TestDocument2(object):
       'destination_doc_uuid': json.dumps(dir.uuid)
     })
     data = json.loads(response.content)
-    assert_equal(-1, data['status'], data)
-    assert_true('circular dependency' in data['message'], data)
+    assert -1 == data['status'], data
+    assert 'circular dependency' in data['message'], data
 
 
   def test_api_get_data(self):
@@ -604,8 +605,8 @@ class TestDocument2(object):
     })
     data = json.loads(response.content)
 
-    assert_true('document' in data, data)
-    assert_false(data['data'], data)
+    assert 'document' in data, data
+    assert not data['data'], data
 
     response = self.client.get('/desktop/api2/doc/', {
         'uuid': doc.uuid,
@@ -613,14 +614,14 @@ class TestDocument2(object):
     })
     data = json.loads(response.content)
 
-    assert_true('data' in data, data)
-    assert_equal(data['data'], doc_data)
+    assert 'data' in data, data
+    assert data['data'] == doc_data
 
 
   def test_is_trashed_migration(self):
 
     # Skipping to prevent failing tests in TestOozieSubmissions
-    raise SkipTest
+    pytest.skip("Skipping Test")
 
     start_migration = '0024_auto__add_field_document2_is_managed'
     mid_migration = '0025_auto__add_field_document2_is_trashed'
@@ -636,9 +637,9 @@ class TestDocument2(object):
     trashed_query.trash()
 
     try:
-      assert_false(dir.is_trashed)
-      assert_false(query.is_trashed)
-      assert_true(trashed_query.is_trashed)
+      assert not dir.is_trashed
+      assert not query.is_trashed
+      assert trashed_query.is_trashed
 
       # Reverse migrate to 0025
       management.call_command('migrate', APP, mid_migration, verbosity=0)
@@ -646,38 +647,41 @@ class TestDocument2(object):
       dir = Document2.objects.get(uuid=dir.uuid)
       query = Document2.objects.get(uuid=query.uuid)
       trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
-      assert_false(dir.is_trashed)
-      assert_false(query.is_trashed)
-      assert_true(trashed_query.is_trashed)
+      assert not dir.is_trashed
+      assert not query.is_trashed
+      assert trashed_query.is_trashed
 
       # Reverse migrate to 0024. Deletes 'is_trashed' field from desktop_documents2
       management.call_command('migrate', APP, start_migration, verbosity=0)
 
-      assert_raises(OperationalError, Document2.objects.get, uuid=dir.uuid)
-      assert_raises(OperationalError, Document2.objects.get, uuid=query.uuid)
-      assert_raises(OperationalError, Document2.objects.get, uuid=trashed_query.uuid)
+      with pytest.raises(OperationalError):
+        Document2.objects.get(uuid=dir.uuid)
+      with pytest.raises(OperationalError):
+        Document2.objects.get(uuid=query.uuid)
+      with pytest.raises(OperationalError):
+        Document2.objects.get(uuid=trashed_query.uuid)
 
       # Forward migrate to 0025
       management.call_command('migrate', APP, mid_migration, verbosity=0)
       dir = Document2.objects.get(uuid=dir.uuid)
       query = Document2.objects.get(uuid=query.uuid)
       trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
-      assert_true(dir.is_trashed is None)
-      assert_true(query.is_trashed is None)
-      assert_true(trashed_query.is_trashed is None)
+      assert dir.is_trashed is None
+      assert query.is_trashed is None
+      assert trashed_query.is_trashed is None
 
       # Forward migrate to 0026
       management.call_command('migrate', APP, end_migration, verbosity=0)
       dir = Document2.objects.get(uuid=dir.uuid)
       query = Document2.objects.get(uuid=query.uuid)
       trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
-      assert_true(dir.is_trashed is None)
-      assert_true(query.is_trashed is None)
-      assert_true(trashed_query.is_trashed is None)
+      assert dir.is_trashed is None
+      assert query.is_trashed is None
+      assert trashed_query.is_trashed is None
 
       # New Documents should have is_trashed=False
       query1 = Document2.objects.create(name='new_query.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir)
-      assert_true(query1.is_trashed is False)
+      assert query1.is_trashed is False
 
       # Create history doc
       query1.is_history = True
@@ -695,17 +699,17 @@ class TestDocument2(object):
       trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
       dir = Document2.objects.get(uuid=dir.uuid)
       query = Document2.objects.get(uuid=query.uuid)
-      assert_true(trashed_query.is_trashed)
-      assert_true(dir.is_trashed is False)
-      assert_true(query.is_trashed is False)
+      assert trashed_query.is_trashed
+      assert dir.is_trashed is False
+      assert query.is_trashed is False
 
       # last_modified should be retained post conversion
-      assert_equal(dir_last_modified, dir.last_modified)
-      assert_equal(query_last_modified, query.last_modified)
-      assert_equal(trashed_query_last_modified, trashed_query.last_modified)
+      assert dir_last_modified == dir.last_modified
+      assert query_last_modified == query.last_modified
+      assert trashed_query_last_modified == trashed_query.last_modified
 
       query1 = Document2.objects.get(uuid=query1.uuid)
-      assert_equal(query1_last_modified, query1.last_modified)
+      assert query1_last_modified == query1.last_modified
     finally:
       # Delete docs
       dir.delete()
@@ -714,9 +718,10 @@ class TestDocument2(object):
       trashed_query.delete()
 
 
+@pytest.mark.django_db
 class TestDocument2Permissions(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.default_group = get_default_user_group()
 
     self.client = make_logged_in_client(username="perm_user", groupname=self.default_group.name, recreate=True, is_superuser=False)
@@ -733,7 +738,7 @@ class TestDocument2Permissions(object):
     # This creates the user directories for the new user
     response = self.client.get('/desktop/api2/doc/')
     data = json.loads(response.content)
-    assert_equal('/', data['document']['path'], data)
+    assert '/' == data['document']['path'], data
 
     self.home_dir = Document2.objects.get_home_directory(user=self.user)
 
@@ -744,18 +749,17 @@ class TestDocument2Permissions(object):
 
     response = self.client.get('/desktop/api2/doc/', {'uuid': new_doc.uuid})
     data = json.loads(response.content)
-    assert_equal(new_doc.uuid, data['document']['uuid'], data)
-    assert_true('perms' in data['document'])
-    assert_equal(
+    assert new_doc.uuid == data['document']['uuid'], data
+    assert 'perms' in data['document']
+    assert (
         {
           'read': {'users': [], 'groups': []},
           'write': {'users': [], 'groups': []},
           'link_read': False,
           'link_sharing_on': False,
           'link_write': False,
-        },
-        data['document']['perms']
-    )
+        } ==
+        data['document']['perms'])
 
 
   def test_share_document_read_by_user(self):
@@ -764,12 +768,12 @@ class TestDocument2Permissions(object):
     # owner can view document
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['document']['uuid'], data)
+    assert doc.uuid == data['document']['uuid'], data
 
     # other user cannot view document
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(-1, data['status'])
+    assert -1 == data['status']
 
     # Share read perm by users
     response = self.client.post("/desktop/api2/doc/share", {
@@ -789,16 +793,16 @@ class TestDocument2Permissions(object):
       })
     })
 
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-    assert_true(doc.can_read(self.user))
-    assert_true(doc.can_write(self.user))
-    assert_true(doc.can_read(self.user_not_me))
-    assert_false(doc.can_write(self.user_not_me))
+    assert 0 == json.loads(response.content)['status'], response.content
+    assert doc.can_read(self.user)
+    assert doc.can_write(self.user)
+    assert doc.can_read(self.user_not_me)
+    assert not doc.can_write(self.user_not_me)
 
     # other user can view document
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['document']['uuid'], data)
+    assert doc.uuid == data['document']['uuid'], data
 
     # other user can share document with read permissions
     response = self.client_not_me.post("/desktop/api2/doc/share", {
@@ -816,7 +820,7 @@ class TestDocument2Permissions(object):
         }
       })
     })
-    assert_equal(0, json.loads(response.content)['status'], response.content)
+    assert 0 == json.loads(response.content)['status'], response.content
 
     # other user cannot share document with write permissions
     response = self.client_not_me.post("/desktop/api2/doc/share", {
@@ -834,7 +838,7 @@ class TestDocument2Permissions(object):
         }
       })
     })
-    assert_equal(-1, json.loads(response.content)['status'], response.content)
+    assert -1 == json.loads(response.content)['status'], response.content
 
 
   def test_share_document_read_by_group(self):
@@ -843,12 +847,12 @@ class TestDocument2Permissions(object):
     # owner can view document
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['document']['uuid'], data)
+    assert doc.uuid == data['document']['uuid'], data
 
     # other user cannot view document
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(-1, data['status'])
+    assert -1 == data['status']
 
     response = self.client.post("/desktop/api2/doc/share", {
       'uuid': json.dumps(doc.uuid),
@@ -868,16 +872,16 @@ class TestDocument2Permissions(object):
       })
     })
 
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-    assert_true(doc.can_read(self.user))
-    assert_true(doc.can_write(self.user))
-    assert_true(doc.can_read(self.user_not_me))
-    assert_false(doc.can_write(self.user_not_me))
+    assert 0 == json.loads(response.content)['status'], response.content
+    assert doc.can_read(self.user)
+    assert doc.can_write(self.user)
+    assert doc.can_read(self.user_not_me)
+    assert not doc.can_write(self.user_not_me)
 
     # other user can view document
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['document']['uuid'], data)
+    assert doc.uuid == data['document']['uuid'], data
 
 
   def test_share_document_write_by_user(self):
@@ -886,7 +890,7 @@ class TestDocument2Permissions(object):
     # other user cannot modify document
     response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
     data = json.loads(response.content)
-    assert_equal(-1, data['status'])
+    assert -1 == data['status']
 
     # Share write perm by user
     response = self.client.post("/desktop/api2/doc/share", {
@@ -907,16 +911,16 @@ class TestDocument2Permissions(object):
       })
     })
 
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-    assert_true(doc.can_read(self.user))
-    assert_true(doc.can_write(self.user))
-    assert_true(doc.can_read(self.user_not_me))
-    assert_true(doc.can_write(self.user_not_me))
+    assert 0 == json.loads(response.content)['status'], response.content
+    assert doc.can_read(self.user)
+    assert doc.can_write(self.user)
+    assert doc.can_read(self.user_not_me)
+    assert doc.can_write(self.user_not_me)
 
     # other user can modify document
     response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
     data = json.loads(response.content)
-    assert_equal(0, data['status'])
+    assert 0 == data['status']
 
 
   def test_share_document_write_by_group(self):
@@ -925,7 +929,7 @@ class TestDocument2Permissions(object):
     # other user cannot modify document
     response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
     data = json.loads(response.content)
-    assert_equal(-1, data['status'])
+    assert -1 == data['status']
 
     # Share write perm by group
     response = self.client.post("/desktop/api2/doc/share", {
@@ -946,16 +950,16 @@ class TestDocument2Permissions(object):
       })
     })
 
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-    assert_true(doc.can_read(self.user))
-    assert_true(doc.can_write(self.user))
-    assert_true(doc.can_read(self.user_not_me))
-    assert_true(doc.can_write(self.user_not_me))
+    assert 0 == json.loads(response.content)['status'], response.content
+    assert doc.can_read(self.user)
+    assert doc.can_write(self.user)
+    assert doc.can_read(self.user_not_me)
+    assert doc.can_write(self.user_not_me)
 
     # other user can modify document
     response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
     data = json.loads(response.content)
-    assert_equal(0, data['status'])
+    assert 0 == data['status']
 
 
   def test_share_directory(self):
@@ -973,10 +977,10 @@ class TestDocument2Permissions(object):
     nested_doc = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=nested_dir)
 
     for doc in [parent_dir, child_doc, nested_dir, nested_doc]:
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_false(doc.can_read(self.user_not_me))
-      assert_false(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert not doc.can_read(self.user_not_me)
+      assert not doc.can_write(self.user_not_me)
 
     # Update parent_dir permissions to grant write permissions to default group
     response = self.client.post("/desktop/api2/doc/share", {
@@ -995,12 +999,12 @@ class TestDocument2Permissions(object):
         })
     })
 
-    assert_equal(0, json.loads(response.content)['status'], response.content)
+    assert 0 == json.loads(response.content)['status'], response.content
     for doc in [parent_dir, child_doc, nested_dir, nested_doc]:
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_true(doc.can_read(self.user_not_me))
-      assert_true(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert doc.can_read(self.user_not_me)
+      assert doc.can_write(self.user_not_me)
 
 
   def test_get_shared_documents(self):
@@ -1014,19 +1018,19 @@ class TestDocument2Permissions(object):
     # 2 shared docs should appear in the other user's shared documents response
     response = self.client_not_me.get('/desktop/api2/docs/', {'perms': 'shared'})
     data = json.loads(response.content)
-    assert_true('documents' in data)
-    assert_equal(2, data['count'])
+    assert 'documents' in data
+    assert 2 == data['count']
     doc_names = [doc['name'] for doc in data['documents']]
-    assert_true('query2.sql' in doc_names)
-    assert_true('query3.sql' in doc_names)
-    assert_false('query1.sql' in doc_names)
+    assert 'query2.sql' in doc_names
+    assert 'query3.sql' in doc_names
+    assert not 'query1.sql' in doc_names
 
     # they should also appear in user's home directory get_documents response
     response = self.client_not_me.get('/desktop/api2/doc/')
     data = json.loads(response.content)
     doc_names = [doc['name'] for doc in data['children']]
-    assert_true('query2.sql' in doc_names)
-    assert_true('query3.sql' in doc_names)
+    assert 'query2.sql' in doc_names
+    assert 'query3.sql' in doc_names
 
 
   def test_get_shared_directories(self):
@@ -1053,26 +1057,26 @@ class TestDocument2Permissions(object):
     # 3 shared docs should appear, due to directory rollup
     response = self.client_not_me.get('/desktop/api2/docs/', {'perms': 'shared', 'flatten': 'false'})
     data = json.loads(response.content)
-    assert_true('documents' in data)
-    assert_equal(3, data['count'], data)
+    assert 'documents' in data
+    assert 3 == data['count'], data
     doc_names = [doc['name'] for doc in data['documents']]
-    assert_true('dir1' in doc_names)
-    assert_true('dir3' in doc_names)
-    assert_true('query3.sql' in doc_names)
-    assert_false('dir2' in doc_names)
+    assert 'dir1' in doc_names
+    assert 'dir3' in doc_names
+    assert 'query3.sql' in doc_names
+    assert not 'dir2' in doc_names
 
     # nested documents should not appear
-    assert_false('query1.sql' in doc_names)
-    assert_false('query2.sql' in doc_names)
+    assert not 'query1.sql' in doc_names
+    assert not 'query2.sql' in doc_names
 
     # but nested documents should still be shared/viewable by group
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
     data = json.loads(response.content)
-    assert_equal(doc1.uuid, data['document']['uuid'], data)
+    assert doc1.uuid == data['document']['uuid'], data
 
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc2.uuid})
     data = json.loads(response.content)
-    assert_equal(doc2.uuid, data['document']['uuid'], data)
+    assert doc2.uuid == data['document']['uuid'], data
 
 
   def test_inherit_parent_permissions(self):
@@ -1087,16 +1091,12 @@ class TestDocument2Permissions(object):
 
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
     data = json.loads(response.content)
-    assert_equal(
-        [{'id': self.default_group.id, 'name': self.default_group.name}],
-        data['document']['perms']['read']['groups'],
-        data
-    )
-    assert_equal(
-        [{'id': self.user_not_me.id, 'username': self.user_not_me.username}],
-        data['document']['perms']['write']['users'],
-        data
-    )
+    assert (
+        [{'id': self.default_group.id, 'name': self.default_group.name}] ==
+        data['document']['perms']['read']['groups']), data
+    assert (
+        [{'id': self.user_not_me.id, 'username': self.user_not_me.username}] ==
+        data['document']['perms']['write']['users']), data
 
 
   def test_search_documents(self):
@@ -1128,20 +1128,20 @@ class TestDocument2Permissions(object):
     # 3 total docs (1 owned, 2 shared)
     response = self.client.get('/desktop/api2/docs/', {'type': 'query-hive'})
     data = json.loads(response.content)
-    assert_true('documents' in data)
-    assert_equal(3, data['count'])
+    assert 'documents' in data
+    assert 3 == data['count']
     doc_names = [doc['name'] for doc in data['documents']]
-    assert_true('query1.sql' in doc_names)
-    assert_true('other_query2.sql' in doc_names)
-    assert_true('other_query3.sql' in doc_names)
+    assert 'query1.sql' in doc_names
+    assert 'other_query2.sql' in doc_names
+    assert 'other_query3.sql' in doc_names
 
     # Return history docs
     response = self.client.get('/desktop/api2/docs/', {'type': 'query-hive', 'include_history': 'true'})
     data = json.loads(response.content)
-    assert_true('documents' in data)
-    assert_equal(4, data['count'])
+    assert 'documents' in data
+    assert 4 == data['count']
     doc_names = [doc['name'] for doc in data['documents']]
-    assert_true('history.sql' in doc_names)
+    assert 'history.sql' in doc_names
 
 
   def test_x_share_directory_y_add_file_x_share(self):
@@ -1196,12 +1196,12 @@ class TestDocument2Permissions(object):
       })
     })
 
-    assert_equal(0, json.loads(response.content)['status'], response.content)
+    assert 0 == json.loads(response.content)['status'], response.content
     for doc in [parent_dir, child_doc, user_y_child_doc]:
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_true(doc.can_read(share_test_user))
-      assert_true(doc.can_write(share_test_user))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert doc.can_read(share_test_user)
+      assert doc.can_write(share_test_user)
 
 
   def test_unicode_name(self):
@@ -1216,14 +1216,14 @@ class TestDocument2Permissions(object):
     # Verify that home directory contents return correctly
     response = self.client.get('/desktop/api2/doc/', {'uuid': self.home_dir.uuid})
     data = json.loads(response.content)
-    assert_equal(0, data['status'])
+    assert 0 == data['status']
 
     # Verify that the doc's path is escaped
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(0, data['status'])
+    assert 0 == data['status']
     path = data['document']['path']
-    assert_equal('/My%20Bundle%20a%20vot%C3%A9%20%C2%AB%20non%20%C2%BB%20%C3%A0%20l%E2%80%99accord', path)
+    assert '/My%20Bundle%20a%20vot%C3%A9%20%C2%AB%20non%20%C2%BB%20%C3%A0%20l%E2%80%99accord' == path
 
 
   def test_link_permissions(self):
@@ -1236,45 +1236,45 @@ class TestDocument2Permissions(object):
     )
 
     try:
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_false(doc.can_read(self.user_not_me))
-      assert_false(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert not doc.can_read(self.user_not_me)
+      assert not doc.can_write(self.user_not_me)
 
       doc.share(self.user, name=Document2Permission.LINK_READ_PERM, is_link_on=True)
 
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_true(doc.can_read(self.user_not_me))
-      assert_false(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert doc.can_read(self.user_not_me)
+      assert not doc.can_write(self.user_not_me)
 
-      assert_true(doc.get_permissions('read'))
-      assert_false(doc.get_permissions('write'))
-      assert_false(doc.get_permission('link_read').users.all())
-      assert_false(doc.get_permission('link_read').groups.all())
-      assert_false(doc.get_permission('read'))  # There is no doc listing via links, only direct access
-      assert_false(doc.get_permission('write'))
+      assert doc.get_permissions('read')
+      assert not doc.get_permissions('write')
+      assert not doc.get_permission('link_read').users.all()
+      assert not doc.get_permission('link_read').groups.all()
+      assert not doc.get_permission('read')  # There is no doc listing via links, only direct access
+      assert not doc.get_permission('write')
 
       doc.share(self.user, name=Document2Permission.LINK_READ_PERM, is_link_on=False)
 
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_false(doc.can_read(self.user_not_me))
-      assert_false(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert not doc.can_read(self.user_not_me)
+      assert not doc.can_write(self.user_not_me)
 
       doc.share(self.user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
 
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_true(doc.can_read(self.user_not_me))
-      assert_true(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert doc.can_read(self.user_not_me)
+      assert doc.can_write(self.user_not_me)
 
       doc.share(self.user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=False)
 
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_false(doc.can_read(self.user_not_me))
-      assert_false(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert not doc.can_read(self.user_not_me)
+      assert not doc.can_write(self.user_not_me)
     finally:
       doc.delete()
 
@@ -1288,82 +1288,83 @@ class TestDocument2Permissions(object):
     )
 
     try:
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_false(doc.can_read(self.user_not_me))
-      assert_false(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert not doc.can_read(self.user_not_me)
+      assert not doc.can_write(self.user_not_me)
 
-      assert_equal(0, doc.get_permissions('read').count())
-      assert_equal(0, doc.get_permissions('write').count())
+      assert 0 == doc.get_permissions('read').count()
+      assert 0 == doc.get_permissions('write').count()
 
       # READ and LINK_READ
       doc.share(self.user, name=Document2Permission.LINK_READ_PERM, is_link_on=True)
       doc.share(self.user, name=Document2Permission.READ_PERM, users=[self.user_not_me])
 
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_true(doc.can_read(self.user_not_me))
-      assert_false(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert doc.can_read(self.user_not_me)
+      assert not doc.can_write(self.user_not_me)
 
-      assert_equal(2, doc.get_permissions('read').count())
-      assert_equal(0, doc.get_permissions('write').count())
+      assert 2 == doc.get_permissions('read').count()
+      assert 0 == doc.get_permissions('write').count()
 
       # READ, WRITE and LINK_READ
       doc.share(self.user, name=Document2Permission.WRITE_PERM, users=[self.user_not_me])
 
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_true(doc.can_read(self.user_not_me))
-      assert_true(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert doc.can_read(self.user_not_me)
+      assert doc.can_write(self.user_not_me)
 
-      assert_equal(2, doc.get_permissions('read').count())
-      assert_equal(1, doc.get_permissions('write').count())
+      assert 2 == doc.get_permissions('read').count()
+      assert 1 == doc.get_permissions('write').count()
 
       # READ, WRITE, LINK_READ and LINK_WRITE
       doc.share(self.user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=True)
 
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_true(doc.can_read(self.user_not_me))
-      assert_true(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert doc.can_read(self.user_not_me)
+      assert doc.can_write(self.user_not_me)
 
-      assert_equal(2, doc.get_permissions('read').count())
-      assert_equal(2, doc.get_permissions('write').count())
+      assert 2 == doc.get_permissions('read').count()
+      assert 2 == doc.get_permissions('write').count()
 
       # WRITE and WRITE_READ
       doc.share(self.user, name=Document2Permission.LINK_READ_PERM, is_link_on=False)
       doc.share(self.user, name=Document2Permission.READ_PERM, users=[])
 
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_true(doc.can_read(self.user_not_me))
-      assert_true(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert doc.can_read(self.user_not_me)
+      assert doc.can_write(self.user_not_me)
 
-      assert_equal(1, doc.get_permissions('read').count())
-      assert_equal(2, doc.get_permissions('write').count())
+      assert 1 == doc.get_permissions('read').count()
+      assert 2 == doc.get_permissions('write').count()
 
       # Not shared
       doc.share(self.user, name=Document2Permission.LINK_WRITE_PERM, is_link_on=False)
       doc.share(self.user, name=Document2Permission.WRITE_PERM, users=[])
 
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_false(doc.can_read(self.user_not_me))
-      assert_false(doc.can_write(self.user_not_me))
+      assert doc.can_read(self.user)
+      assert doc.can_write(self.user)
+      assert not doc.can_read(self.user_not_me)
+      assert not doc.can_write(self.user_not_me)
 
-      assert_equal(1, doc.get_permissions('read').count())  # 1 READ but empty people
-      assert_false(doc.get_permissions('read')[0].users.all())
-      assert_false(doc.get_permissions('read')[0].groups.all())
-      assert_equal(1, doc.get_permissions('write').count())  # 1 WRITE but empty people
-      assert_false(doc.get_permissions('write')[0].users.all())
-      assert_false(doc.get_permissions('write')[0].groups.all())
+      assert 1 == doc.get_permissions('read').count()  # 1 READ but empty people
+      assert not doc.get_permissions('read')[0].users.all()
+      assert not doc.get_permissions('read')[0].groups.all()
+      assert 1 == doc.get_permissions('write').count()  # 1 WRITE but empty people
+      assert not doc.get_permissions('write')[0].users.all()
+      assert not doc.get_permissions('write')[0].groups.all()
     finally:
       doc.delete()
 
 
+@pytest.mark.django_db
 class TestDocument2ImportExport(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="perm_user", groupname="default", recreate=True, is_superuser=False)
     self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
 
@@ -1378,7 +1379,7 @@ class TestDocument2ImportExport(object):
     # This creates the user directories for the new user
     response = self.client.get('/desktop/api2/doc/')
     data = json.loads(response.content)
-    assert_equal('/', data['document']['path'], data)
+    assert '/' == data['document']['path'], data
 
     self.home_dir = Document2.objects.get_home_directory(user=self.user)
     self.not_me_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
@@ -1399,11 +1400,11 @@ class TestDocument2ImportExport(object):
     documents = json.loads(response.content)
     documents = json.loads(documents)
 
-    assert_equal(3, len(documents))
-    assert_true('test.wf' in [doc['fields']['name'] for doc in documents])
-    assert_true('query1.sql' in [doc['fields']['name'] for doc in documents])
-    assert_true('query2.sql' in [doc['fields']['name'] for doc in documents])
-    assert_false('query3.sql' in [doc['fields']['name'] for doc in documents])
+    assert 3 == len(documents)
+    assert 'test.wf' in [doc['fields']['name'] for doc in documents]
+    assert 'query1.sql' in [doc['fields']['name'] for doc in documents]
+    assert 'query2.sql' in [doc['fields']['name'] for doc in documents]
+    assert not 'query3.sql' in [doc['fields']['name'] for doc in documents]
 
     # Test that exporting multiple workflows with overlapping dependencies works
     workflow2 = Document2.objects.create(name='test2.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -1413,11 +1414,11 @@ class TestDocument2ImportExport(object):
     documents = json.loads(response.content)
     documents = json.loads(documents)
 
-    assert_equal(4, len(documents))
-    assert_true('test.wf' in [doc['fields']['name'] for doc in documents])
-    assert_true('test2.wf' in [doc['fields']['name'] for doc in documents])
-    assert_true('query1.sql' in [doc['fields']['name'] for doc in documents])
-    assert_true('query2.sql' in [doc['fields']['name'] for doc in documents])
+    assert 4 == len(documents)
+    assert 'test.wf' in [doc['fields']['name'] for doc in documents]
+    assert 'test2.wf' in [doc['fields']['name'] for doc in documents]
+    assert 'query1.sql' in [doc['fields']['name'] for doc in documents]
+    assert 'query2.sql' in [doc['fields']['name'] for doc in documents]
 
 
   def test_export_documents_file_name(self):
@@ -1440,13 +1441,12 @@ class TestDocument2ImportExport(object):
 
     # Test that exporting to a file includes the date and number of documents in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id, workflow2.id])})
-    assert_equal(
-        response['Content-Disposition'], 'attachment; filename="hue-documents-%s-(4).json"' % datetime.today().strftime('%Y-%m-%d')
-    )
+    assert (
+        response['Content-Disposition'] == 'attachment; filename="hue-documents-%s-(4).json"' % datetime.today().strftime('%Y-%m-%d'))
 
     # Test that exporting single file gets the name of the document in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id])})
-    assert_equal(response['Content-Disposition'], 'attachment; filename="' + workflow.name + '.json"')
+    assert response['Content-Disposition'] == 'attachment; filename="' + workflow.name + '.json"'
 
 
   def test_export_directories_with_children(self):
@@ -1470,13 +1470,13 @@ class TestDocument2ImportExport(object):
     documents = json.loads(response.content)
     documents = json.loads(documents)
 
-    assert_equal(6, len(documents))
-    assert_true('dir1' in [doc['fields']['name'] for doc in documents])
-    assert_true('query1.sql' in [doc['fields']['name'] for doc in documents])
-    assert_true('dir2' in [doc['fields']['name'] for doc in documents])
-    assert_true('dir3' in [doc['fields']['name'] for doc in documents])
-    assert_true('query2.sql' in [doc['fields']['name'] for doc in documents])
-    assert_true('query3.sql' in [doc['fields']['name'] for doc in documents])
+    assert 6 == len(documents)
+    assert 'dir1' in [doc['fields']['name'] for doc in documents]
+    assert 'query1.sql' in [doc['fields']['name'] for doc in documents]
+    assert 'dir2' in [doc['fields']['name'] for doc in documents]
+    assert 'dir3' in [doc['fields']['name'] for doc in documents]
+    assert 'query2.sql' in [doc['fields']['name'] for doc in documents]
+    assert 'query3.sql' in [doc['fields']['name'] for doc in documents]
 
 
   def test_import_owned_document(self):
@@ -1498,38 +1498,38 @@ class TestDocument2ImportExport(object):
     response = self.client.post('/desktop/api2/doc/import/', {'documents': documents})
     data = json.loads(response.content)
 
-    assert_true('message' in data, data)
-    assert_true('Installed 1 object' in data['message'], data)
-    assert_true('count' in data)
-    assert_equal(1, data['count'])
-    assert_true('created_count' in data)
-    assert_equal(0, data['created_count'])
-    assert_true('updated_count' in data)
-    assert_equal(1, data['updated_count'])
-    assert_true('documents' in data)
-    assert_true('name' in data['documents'][0])
-    assert_equal('query.sql', data['documents'][0]['name'])
-    assert_true('type' in data['documents'][0])
-    assert_equal('query-hive', data['documents'][0]['type'])
-    assert_true('owner' in data['documents'][0])
-    assert_equal('perm_user', data['documents'][0]['owner'])
+    assert 'message' in data, data
+    assert 'Installed 1 object' in data['message'], data
+    assert 'count' in data
+    assert 1 == data['count']
+    assert 'created_count' in data
+    assert 0 == data['created_count']
+    assert 'updated_count' in data
+    assert 1 == data['updated_count']
+    assert 'documents' in data
+    assert 'name' in data['documents'][0]
+    assert 'query.sql' == data['documents'][0]['name']
+    assert 'type' in data['documents'][0]
+    assert 'query-hive' == data['documents'][0]['type']
+    assert 'owner' in data['documents'][0]
+    assert 'perm_user' == data['documents'][0]['owner']
 
-    assert_equal(1, Document2.objects.filter(name='query.sql').count())
+    assert 1 == Document2.objects.filter(name='query.sql').count()
     imported_doc = Document2.objects.get(name='query.sql')
-    assert_equal(owned_query.uuid, imported_doc.uuid)
-    assert_equal(owned_query.owner, imported_doc.owner)
+    assert owned_query.uuid == imported_doc.uuid
+    assert owned_query.owner == imported_doc.owner
 
     # Test that import non-existing doc creates it, sets parent to home
     Document2.objects.get(name='query.sql').delete()
-    assert_equal(0, Document2.objects.filter(name='query.sql').count())
+    assert 0 == Document2.objects.filter(name='query.sql').count()
 
     response = self.client.post('/desktop/api2/doc/import/', {'documents': documents})
 
-    assert_equal(1, Document2.objects.filter(name='query.sql').count())
+    assert 1 == Document2.objects.filter(name='query.sql').count()
     imported_doc = Document2.objects.get(name='query.sql')
-    assert_equal(owned_query.uuid, imported_doc.uuid)
-    assert_equal(owned_query.owner, imported_doc.owner)
-    assert_equal(owned_query.parent_directory, imported_doc.parent_directory)
+    assert owned_query.uuid == imported_doc.uuid
+    assert owned_query.owner == imported_doc.owner
+    assert owned_query.parent_directory == imported_doc.parent_directory
 
   def test_import_nonowned_document(self):
     owned_query = Document2.objects.create(
@@ -1549,19 +1549,19 @@ class TestDocument2ImportExport(object):
     # Test that importing non-owned doc copies it, sets parent to home
     response = self.client_not_me.post('/desktop/api2/doc/import/', {'documents': documents})
 
-    assert_equal(2, Document2.objects.filter(name='query.sql').count())
+    assert 2 == Document2.objects.filter(name='query.sql').count()
     imported_doc = Document2.objects.get(name='query.sql', owner=self.user_not_me)
-    assert_true(owned_query.uuid != imported_doc.uuid)
-    assert_equal(self.user_not_me, imported_doc.owner)
-    assert_equal(self.not_me_home_dir.uuid, imported_doc.parent_directory.uuid)
+    assert owned_query.uuid != imported_doc.uuid
+    assert self.user_not_me == imported_doc.owner
+    assert self.not_me_home_dir.uuid == imported_doc.parent_directory.uuid
 
     data = json.loads(response.content)
-    assert_true('count' in data)
-    assert_equal(1, data['count'])
-    assert_true('created_count' in data)
-    assert_equal(1, data['created_count'])
-    assert_true('updated_count' in data)
-    assert_equal(0, data['updated_count'])
+    assert 'count' in data
+    assert 1 == data['count']
+    assert 'created_count' in data
+    assert 1 == data['created_count']
+    assert 'updated_count' in data
+    assert 0 == data['updated_count']
 
   def test_import_with_history_dependencies(self):
     query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={},
@@ -1585,13 +1585,13 @@ class TestDocument2ImportExport(object):
       documents = documents.decode('utf-8')
 
     response = self.client_not_me.post('/desktop/api2/doc/import/', {'documents': documents})
-    assert_true(Document2.objects.filter(name='query1.sql').exists())
-    assert_false(Document2.objects.filter(name='query2.sql').exists())
+    assert Document2.objects.filter(name='query1.sql').exists()
+    assert not Document2.objects.filter(name='query2.sql').exists()
 
     data = json.loads(response.content)
-    assert_true('count' in data)
-    assert_equal(2, data['count'])
-    assert_true('created_count' in data)
-    assert_equal(2, data['created_count'])
-    assert_true('updated_count' in data)
-    assert_equal(0, data['updated_count'])
+    assert 'count' in data
+    assert 2 == data['count']
+    assert 'created_count' in data
+    assert 2 == data['created_count']
+    assert 'updated_count' in data
+    assert 0 == data['updated_count']

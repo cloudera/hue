@@ -16,10 +16,10 @@
 # limitations under the License.
 
 import logging
+import pytest
 import unittest
 
-from nose.tools import assert_equals, assert_not_equal
-
+from django.test import TestCase
 from desktop.lib import i18n
 
 from hadoop import pseudo_hdfs4
@@ -29,18 +29,18 @@ from hadoop.fs.fsutils import remove_header, do_overwrite_save
 LOG = logging.getLogger()
 
 
-class FsUtilsTests(unittest.TestCase):
-  requires_hadoop = True
-  integration = True
+@pytest.mark.requires_hadoop
+@pytest.mark.integration
+class FsUtilsTests(TestCase):
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     cls.cluster = pseudo_hdfs4.shared_cluster()
 
-  def setUp(self):
+  def setup_method(self, method):
     self.cluster.fs.setuser('test')
 
-  def tearDown(self):
+  def teardown_method(self, method):
     try:
       self.cluster.fs.purge_trash()
     except Exception as e:
@@ -63,8 +63,8 @@ curacao\t?"""
     encoding = i18n.get_site_encoding()
     do_overwrite_save(fs, path, data.encode(encoding))
 
-    assert_not_equal(data_body, fs.open(path).read())
+    assert data_body != fs.open(path).read()
 
     remove_header(fs, path)
 
-    assert_equals(data_body, fs.open(path).read())
+    assert data_body == fs.open(path).read()

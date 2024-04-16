@@ -21,7 +21,6 @@ import sys
 import threading
 import time
 
-from nose.tools import assert_true
 from desktop.lib.thread_util import dump_traceback
 
 if sys.version_info[0] > 2:
@@ -37,7 +36,7 @@ def test_dump_traceback():
     def run(self):
       started.set()
       stopped.wait(10.0)
-      assert_true(stopped.is_set())
+      assert stopped.is_set()
 
   thread = Thread(name='thread_util_test thread')
   thread.start()
@@ -47,17 +46,17 @@ def test_dump_traceback():
 
   try:
     started.wait(10.0)
-    assert_true(started.is_set())
+    assert started.is_set()
 
     out = string_io()
     dump_traceback(file=out)
 
-    assert_true(header in out.getvalue())
+    assert header in out.getvalue()
 
     out = string_io()
     dump_traceback(file=out, all_threads=False)
 
-    assert_true(header not in out.getvalue())
+    assert header not in out.getvalue()
   finally:
     stopped.set()
     thread.join()

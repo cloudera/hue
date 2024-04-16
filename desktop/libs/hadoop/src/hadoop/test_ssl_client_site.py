@@ -22,8 +22,6 @@ import os
 import sys
 import tempfile
 
-from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal, assert_raises
-
 from hadoop import ssl_client_site
 
 if sys.version_info[0] > 2:
@@ -66,7 +64,7 @@ def test_ssl_client_site():
     finish = conf.HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.set_for_testing(hadoop_home)
     ssl_client_site.reset()
 
-    assert_equal('/etc/cdep-ssl-conf/CA_STANDARD/truststore.jks', ssl_client_site.get_trustore_location())
+    assert '/etc/cdep-ssl-conf/CA_STANDARD/truststore.jks' == ssl_client_site.get_trustore_location()
   finally:
     ssl_client_site.reset()
     if finish:

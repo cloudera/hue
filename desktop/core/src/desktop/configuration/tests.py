@@ -18,8 +18,7 @@
 
 from builtins import object
 import json
-
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
+import pytest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -28,9 +27,10 @@ from desktop.models import DefaultConfiguration
 from useradmin.models import get_default_user_group, User
 
 
+@pytest.mark.django_db
 class TestDefaultConfiguration(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test_admin", groupname="default", recreate=False, is_superuser=True)
     self.client_user = make_logged_in_client(username="test_user", groupname="default", recreate=False, is_superuser=False)
 
@@ -43,7 +43,7 @@ class TestDefaultConfiguration(object):
     grant_access(self.user.username, self.user.username, "desktop")
 
 
-  def tearDown(self):
+  def teardown_method(self):
     DefaultConfiguration.objects.all().delete()
 
 
@@ -66,16 +66,16 @@ class TestDefaultConfiguration(object):
 
     # Verify no default configuration found for app
     configs = DefaultConfiguration.objects.filter(app='hive', is_default=True)
-    assert_equal(configs.count(), 0)
+    assert configs.count() == 0
 
     # Save configuration
     response = self.client.post("/desktop/api/configurations/", {'configuration': json.dumps(configuration)})
     content = json.loads(response.content)
-    assert_equal(content['status'], 0, content)
-    assert_true('configuration' in content, content)
+    assert content['status'] == 0, content
+    assert 'configuration' in content, content
 
     config = DefaultConfiguration.objects.get(app='hive', is_default=True)
-    assert_equal(config.properties_list, configuration['hive']['default'], config.properties_list)
+    assert config.properties_list == configuration['hive']['default'], config.properties_list
 
     # Update with group configuration
     configuration = {
@@ -110,14 +110,14 @@ class TestDefaultConfiguration(object):
 
     response = self.client.post("/desktop/api/configurations/", {'configuration': json.dumps(configuration)})
     content = json.loads(response.content)
-    assert_equal(content['status'], 0, content)
-    assert_true('configuration' in content, content)
+    assert content['status'] == 0, content
+    assert 'configuration' in content, content
 
     config = DefaultConfiguration.objects.get(app='hive', is_default=True)
-    assert_equal(config.properties_list, configuration['hive']['default'], config.properties_list)
+    assert config.properties_list == configuration['hive']['default'], config.properties_list
 
     config = DefaultConfiguration.objects.get(app='hive', groups__in=[self.group])
-    assert_equal(config.properties_list, configuration['hive']['groups'][0]['properties'], config.properties_list)
+    assert config.properties_list == configuration['hive']['groups'][0]['properties'], config.properties_list
 
 
   def test_get_default_configurations(self):
@@ -175,8 +175,8 @@ class TestDefaultConfiguration(object):
       'app': 'hive',
       'user_id': self.user.id})
     content = json.loads(response.content)
-    assert_equal(content['status'], 0, content)
-    assert_equal(content['configuration'], None, content)
+    assert content['status'] == 0, content
+    assert content['configuration'] == None, content
 
     # Creating a default configuration returns default
     response = self.client.post("/desktop/api/configurations/", {'configuration': json.dumps(configuration)})
@@ -185,12 +185,12 @@ class TestDefaultConfiguration(object):
       'app': 'hive',
       'user_id': self.user.id})
     content = json.loads(response.content)
-    assert_equal(content['status'], 0, content)
-    assert_equal(content['configuration']['app'], 'hive', content)
-    assert_equal(content['configuration']['is_default'], True, content)
-    assert_equal(content['configuration']['user'], None, content)
-    assert_equal(content['configuration']['group_ids'], [], content)
-    assert_equal(content['configuration']['properties'], properties, content)
+    assert content['status'] == 0, content
+    assert content['configuration']['app'] == 'hive', content
+    assert content['configuration']['is_default'] == True, content
+    assert content['configuration']['user'] == None, content
+    assert content['configuration']['group_ids'] == [], content
+    assert content['configuration']['properties'] == properties, content
 
     # Creating a group configuration returns group config
     group_properties = [{
@@ -220,12 +220,12 @@ class TestDefaultConfiguration(object):
       'app': 'hive',
       'user_id': self.user.id})
     content = json.loads(response.content)
-    assert_equal(content['status'], 0, content)
-    assert_equal(content['configuration']['app'], 'hive', content)
-    assert_equal(content['configuration']['is_default'], False, content)
-    assert_equal(content['configuration']['user'], None, content)
-    assert_equal(content['configuration']['group_ids'], [self.group.id], content)
-    assert_equal(content['configuration']['properties'], group_properties, content)
+    assert content['status'] == 0, content
+    assert content['configuration']['app'] == 'hive', content
+    assert content['configuration']['is_default'] == False, content
+    assert content['configuration']['user'] == None, content
+    assert content['configuration']['group_ids'] == [self.group.id], content
+    assert content['configuration']['properties'] == group_properties, content
 
     # Creating a user configuration returns user config
     user_properties = [{
@@ -242,9 +242,9 @@ class TestDefaultConfiguration(object):
       'app': 'hive',
       'user_id': self.user.id})
     content = json.loads(response.content)
-    assert_equal(content['status'], 0, content)
-    assert_equal(content['configuration']['app'], 'hive', content)
-    assert_equal(content['configuration']['is_default'], False, content)
-    assert_equal(content['configuration']['user'], self.user.username, content)
-    assert_equal(content['configuration']['group_ids'], [], content)
-    assert_equal(content['configuration']['properties'], user_properties, content)
+    assert content['status'] == 0, content
+    assert content['configuration']['app'] == 'hive', content
+    assert content['configuration']['is_default'] == False, content
+    assert content['configuration']['user'] == self.user.username, content
+    assert content['configuration']['group_ids'] == [], content
+    assert content['configuration']['properties'] == user_properties, content

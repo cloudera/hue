@@ -20,15 +20,10 @@ import os
 import sys
 import tempfile
 
-from nose.tools import assert_equal, assert_false, assert_true
-
 from impala import conf, impala_flags
 
 
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
+open_file = open
 
 LOG = logging.getLogger()
 
@@ -43,8 +38,8 @@ def test_impala_flags():
     if conf.QUERYCACHE_ROWS.get() != expected_rows:
       resets.append(conf.QUERYCACHE_ROWS.set_for_testing(expected_rows))
 
-    assert_equal(conf.QUERYCACHE_ROWS.get(), expected_rows)
-    assert_false(conf.IMPERSONATION_ENABLED.get())
+    assert conf.QUERYCACHE_ROWS.get() == expected_rows
+    assert not conf.IMPERSONATION_ENABLED.get()
 
     flags = """
       -webserver_certificate_file=/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem
@@ -57,14 +52,14 @@ def test_impala_flags():
     resets.append(conf.IMPALA_CONF_DIR.set_for_testing(test_impala_conf_dir))
     impala_flags.reset()
 
-    assert_equal(impala_flags.get_webserver_certificate_file(), '/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem')
-    assert_equal(impala_flags.get_ssl_server_certificate(), '/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem')
-    assert_equal(impala_flags.get_max_result_cache_size(), expected_rows)
-    assert_equal(impala_flags.get_authorized_proxy_user_config(), 'hue=*')
+    assert impala_flags.get_webserver_certificate_file() == '/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem'
+    assert impala_flags.get_ssl_server_certificate() == '/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem'
+    assert impala_flags.get_max_result_cache_size() == expected_rows
+    assert impala_flags.get_authorized_proxy_user_config() == 'hue=*'
 
     # From Config
-    assert_equal(conf.QUERYCACHE_ROWS.get(), expected_rows)
-    assert_true(conf.IMPERSONATION_ENABLED.get())
+    assert conf.QUERYCACHE_ROWS.get() == expected_rows
+    assert conf.IMPERSONATION_ENABLED.get()
   finally:
     impala_flags.reset()
     for reset in resets:

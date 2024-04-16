@@ -18,10 +18,10 @@
 
 from builtins import object
 import json
+import pytest
 import sys
 
 from django.urls import reverse
-from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
@@ -34,9 +34,10 @@ else:
   from mock import patch, Mock, MagicMock
 
 
+@pytest.mark.django_db
 class TestNotebook(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -65,11 +66,11 @@ class TestNotebook(object):
 
     resp = query.execute_and_wait(request=request, include_results=True)
 
-    assert_equal(0, resp.get('status'), resp)
-    assert_equal('available', resp['query_status']['status'], resp)
-    assert_equal([[1], [2]], resp.get('results'), resp)
+    assert 0 == resp.get('status'), resp
+    assert 'available' == resp['query_status']['status'], resp
+    assert [[1], [2]] == resp.get('results'), resp
 
-    assert_equal(2, query.check_status.call_count)
+    assert 2 == query.check_status.call_count
 
 
   def test_check_status(self):
@@ -86,8 +87,8 @@ class TestNotebook(object):
           )
           resp = query.check_status(request=request, operation_id=operation_id)
 
-          assert_equal(0, resp['status'])
-          assert_equal(0, resp['query_status']['status'])
+          assert 0 == resp['status']
+          assert 0 == resp['query_status']['status']
 
 
   def test_statement_with_variables(self):
@@ -99,17 +100,15 @@ class TestNotebook(object):
       ]
     }
 
-    assert_equal(
-      "SELECT * FROM table WHERE city='San Francisco'",
-      Notebook.statement_with_variables(snippet)
-    )
+    assert (
+      "SELECT * FROM table WHERE city='San Francisco'" ==
+      Notebook.statement_with_variables(snippet))
 
     snippet['variables'][0]['value'] = 'Saint-Étienne'
 
-    assert_equal(
-      "SELECT * FROM table WHERE city='Saint-Étienne'",
-      Notebook.statement_with_variables(snippet)
-    )
+    assert (
+      "SELECT * FROM table WHERE city='Saint-Étienne'" ==
+      Notebook.statement_with_variables(snippet))
 
 
 iteration = 0

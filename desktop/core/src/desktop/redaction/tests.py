@@ -25,12 +25,11 @@ from django.utils.encoding import smart_str
 import json
 import logging
 import os
+import pytest
 import random
 import re
 import tempfile
 import threading
-
-from nose.tools import assert_true, assert_equal, assert_not_equal, raises
 
 from desktop.redaction.engine import RedactionEngine, RedactionPolicy, RedactionRule, parse_redaction_policy_from_file, \
     _convert_java_pattern_to_python
@@ -68,21 +67,21 @@ class TestRedactionRule(object):
     ]
 
     for message, redacted_message in test_strings:
-      assert_equal(rule.redact(message), redacted_message)
+      assert rule.redact(message) == redacted_message
 
   def test_non_redacted_string_returns_same_string(self):
     rule = RedactionRule('password=', 'password=".*"', 'password="???"')
 
     message = 'message'
-    assert_true(rule.redact(message) is message)
+    assert rule.redact(message) is message
 
   def test_equality(self):
     rule1 = RedactionRule('password=', 'password=".*"', 'password="???"')
     rule2 = RedactionRule('password=', 'password=".*"', 'password="???"')
     rule3 = RedactionRule('ssn=', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
 
-    assert_equal(rule1, rule2)
-    assert_not_equal(rule1, rule3)
+    assert rule1 == rule2
+    assert rule1 != rule3
 
 
   def test_parse_redaction_policy_from_file(self):
@@ -108,10 +107,10 @@ class TestRedactionRule(object):
 
       policy = parse_redaction_policy_from_file(f.name)
 
-      assert_equal(policy.rules, [
+      assert policy.rules == [
         RedactionRule(u'password=', u'password=".*"', u'password="???"'),
         RedactionRule(None, u'\d{3}-\d{2}-\d{4}', u'XXX-XX-XXXX'),
-      ])
+      ]
 
 
 class TestRedactionEngine(object):
@@ -129,7 +128,7 @@ class TestRedactionEngine(object):
     ]
 
     for message, redacted_message in test_strings:
-      assert_equal(redaction_engine.redact(message), redacted_message)
+      assert redaction_engine.redact(message) == redacted_message
 
   def test_equality(self):
     engine1 = RedactionEngine([
@@ -142,22 +141,22 @@ class TestRedactionEngine(object):
         RedactionRule('ssn=', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
     ])
 
-    assert_equal(engine1, engine2)
-    assert_not_equal(engine1, engine3)
+    assert engine1 == engine2
+    assert engine1 != engine3
 
   def test_redact_empty_string(self):
     engine = RedactionEngine([
         RedactionRule('password=', 'password=".*"', 'password="???"'),
     ])
 
-    assert_equal(engine.redact(None), None)
-    assert_equal(engine.redact(''), '')
+    assert engine.redact(None) == None
+    assert engine.redact('') == ''
 
 
 class TestRedactionLogFilter(object):
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     cls.logger = logging.getLogger(cls.__name__)
 
     cls.handler = MockLoggingHandler()
@@ -173,10 +172,10 @@ class TestRedactionLogFilter(object):
     add_log_redaction_filter_to_logger(engine, cls.logger)
 
   @classmethod
-  def tearDownClass(cls):
+  def teardown_class(cls):
     cls.logger.handlers = []
 
-  def tearDown(self):
+  def teardown_method(self):
     self.handler.reset()
 
   def test_redaction_filter(self):
@@ -225,91 +224,91 @@ class TestRedactionLogFilter(object):
       self.logger.debug(test['message'], *test.get('args', ()))
 
     for test, record in zip(test_strings, self.handler.records):
-      assert_equal(record.getMessage(), test['result_message'])
-      assert_equal(record.message, test['result_message'])
-      assert_equal(record.msg, test.get('result_msg', test['result_message']))
-      assert_equal(record.args, test.get('result_args'))
+      assert record.getMessage() == test['result_message']
+      assert record.message == test['result_message']
+      assert record.msg == test.get('result_msg', test['result_message'])
+      assert record.args == test.get('result_args')
 
   def test_convert_java_pattern_to_python(self):
-    assert_equal(_convert_java_pattern_to_python('1-2'), '1-2')
-    assert_equal(_convert_java_pattern_to_python('$1-$2'), '\\1-\\2')
-    assert_equal(_convert_java_pattern_to_python('\\$1-$2'), '$1-\\2')
-    assert_equal(_convert_java_pattern_to_python('\\$$1-$2'), '$\\1-\\2')
+    assert _convert_java_pattern_to_python('1-2') == '1-2'
+    assert _convert_java_pattern_to_python('$1-$2') == '\\1-\\2'
+    assert _convert_java_pattern_to_python('\\$1-$2') == '$1-\\2'
+    assert _convert_java_pattern_to_python('\\$$1-$2') == '$\\1-\\2'
 
-  @raises(IOError)
   def test_does_not_exist(self):
     path = get_path('thisfiledoesnotexist.json')
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(IOError):
+      parse_redaction_policy_from_file(path)
 
-  @raises(IOError)
   def test_is_dir(self):
     path = '/tmp'
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(IOError):
+      parse_redaction_policy_from_file(path)
 
-  @raises(IOError)
   def test_is_not_json(self):
     path = get_path('not-json.json')
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(IOError):
+      parse_redaction_policy_from_file(path)
 
-  @raises(ValueError)
   def test_no_version(self):
     path = get_path('no-version.json')
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(ValueError):
+      parse_redaction_policy_from_file(path)
 
-  @raises(ValueError)
   def test_unknown_version(self):
     path = get_path('unknown-version.json')
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(ValueError):
+      parse_redaction_policy_from_file(path)
 
-  @raises(ValueError)
   def test_alpha_version(self):
     path = get_path('alpha-version.json')
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(ValueError):
+      parse_redaction_policy_from_file(path)
 
-  @raises(ValueError)
   def test_no_search(self):
     path = get_path('no-search.json')
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(ValueError):
+      parse_redaction_policy_from_file(path)
 
-  @raises(ValueError)
   def test_no_replace(self):
     path = get_path('no-replace.json')
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(ValueError):
+      parse_redaction_policy_from_file(path)
 
-  @raises(ValueError)
   def test_no_brace(self):
     path = get_path('no-brace.json')
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(ValueError):
+      parse_redaction_policy_from_file(path)
 
-  @raises(re.error)
   def test_bad_regex(self):
     path = get_path('bad-regex.json')
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(re.error):
+      parse_redaction_policy_from_file(path)
 
-  @raises(ValueError)
   def test_extra_attr(self):
     path = get_path('extra-attr.json')
-    parse_redaction_policy_from_file(path)
+    with pytest.raises(ValueError):
+      parse_redaction_policy_from_file(path)
 
   def test_empty_file(self):
     path = get_path('empty.json')
     policy = parse_redaction_policy_from_file(path)
-    assert_equal(MESSAGE, policy.redact(MESSAGE))
+    assert MESSAGE == policy.redact(MESSAGE)
 
   def test_empty_rules(self):
     path = get_path('empty-rules.json')
     policy = parse_redaction_policy_from_file(path)
-    assert_equal(MESSAGE, policy.redact(MESSAGE))
+    assert MESSAGE == policy.redact(MESSAGE)
 
   def test_basic_good1(self):
     path = get_path('good-1.json')
     policy = parse_redaction_policy_from_file(path)
-    assert_equal("Hxllx, wxrld", policy.redact("Hello, world"))
+    assert "Hxllx, wxrld" == policy.redact("Hello, world")
 
   def test_int_version(self):
     path = get_path('verint.json')
     policy = parse_redaction_policy_from_file(path)
-    assert_equal("Hxllx, wxrld", policy.redact("Hello, world"))
+    assert "Hxllx, wxrld" == policy.redact("Hello, world")
 
   def test_real_rules(self):
     path = get_path('real-1.json')
@@ -333,7 +332,7 @@ class TestRedactionLogFilter(object):
     ]
 
     for message, redacted_message in messages:
-      assert_equal(redacted_message, policy.redact(message))
+      assert redacted_message == policy.redact(message)
 
   def test_unicode_strings(self):
     path = get_path('real-1.json')
@@ -349,12 +348,12 @@ class TestRedactionLogFilter(object):
       message_to_redact = smart_str(message)
       self.logger.debug("Message to redact : %s " % message_to_redact)
       self.logger.debug("Message after redact : %s " % policy.redact(message_to_redact))
-      assert_equal(redacted_message, policy.redact(message_to_redact))
+      assert redacted_message == policy.redact(message_to_redact)
 
   def test_huge_rules(self):
     path = get_path('huge-1.json')
     policy = parse_redaction_policy_from_file(path)
-    assert_equal("This string is not redadted", policy.redact(MESSAGE))
+    assert "This string is not redadted" == policy.redact(MESSAGE)
 
   def test_back_refs(self):
     path = get_path('replace-1.json')
@@ -371,7 +370,7 @@ class TestRedactionLogFilter(object):
     ]
 
     for message, redacted_message in messages:
-      assert_equal(redacted_message, policy.redact(message))
+      assert redacted_message == policy.redact(message)
 
   def test_ordering(self):
     path = get_path('ordering-1.json')
@@ -386,7 +385,7 @@ class TestRedactionLogFilter(object):
     ]
 
     for message, redacted_message in messages:
-      assert_equal(redacted_message, policy.redact(message))
+      assert redacted_message == policy.redact(message)
 
   def test_case_sensitivity(self):
     path = get_path('case-1.json')
@@ -403,13 +402,13 @@ class TestRedactionLogFilter(object):
     ]
 
     for message, redacted_message in messages:
-      assert_equal(redacted_message, policy.redact(message))
+      assert redacted_message == policy.redact(message)
 
   def test_multithreading(self):
     path = get_path('numbers.json')
     policy = parse_redaction_policy_from_file(path)
 
-    assert_equal("asdf####fdas### H#ll# w#rld", policy.redact("asdf1234fdas666 H3ll0 w0rld"))
+    assert "asdf####fdas### H#ll# w#rld" == policy.redact("asdf1234fdas666 H3ll0 w0rld")
 
     errors = []
     lock = threading.Lock()
@@ -437,7 +436,7 @@ class TestRedactionLogFilter(object):
     for thread in threads:
       thread.join()
 
-    assert_equal(errors, [])
+    assert errors == []
 
 def byte_range(first, last):
   return list(range(first, last+1))

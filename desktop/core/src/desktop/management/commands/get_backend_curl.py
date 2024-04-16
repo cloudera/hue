@@ -126,7 +126,7 @@ class Command(BaseCommand):
                   action="store_true", default=False, dest='verbose'),
     )
 
-  except AttributeError, e:
+  except AttributeError as e:
     baseoption_test = 'BaseCommand' in str(e) and 'option_list' in str(e)
     if baseoption_test:
       def add_arguments(self, parser):
@@ -306,16 +306,16 @@ class Command(BaseCommand):
           LOG.info("TEST: %s %s: Failed in %dms: Response: %s" % (service, service_test, returned_in, response))
 
     log_file = log_dir + '/backend_test_curl.log'
-    print ""
-    print "Tests completed, view logs here: %s" % log_file
-    print "Report:"
+    print ("")
+    print ("Tests completed, view logs here: %s") % log_file
+    print ("Report:")
     cmd = 'grep -A1000 "%s" %s | grep "TEST:" | sed "s/.*INFO.*TEST:/  TEST:/g"' % (str(test_options['NOW']), log_file)
     grep_process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     grep_response = grep_process.communicate()[0]
-    print "%s" % grep_response
-    print ""
-    print "OS Repro Commands are:"
+    print ("%s") % grep_response
+    print ("")
+    print ("OS Repro Commands are:")
     cmd = 'grep -A1000 "%s" %s | grep "OSRUN:" | sed "s/.*INFO.*OSRUN:/  /g"' % (str(test_options['NOW']), log_file)
     grep_process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     grep_response = grep_process.communicate()[0]
-    print "%s" % grep_response
+    print ("%s") % grep_response
