@@ -53,6 +53,7 @@ import I18n from 'utils/i18n';
 import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 
 import sqlUtils from 'sql/sqlUtils';
+import { loadDataCatalogs } from 'reactComponents/loadCatalogs';
 
 import 'webComponents/HueIcons';
 import 'components/sidebar/HueSidebarWebComponent';
@@ -76,7 +77,6 @@ import { getLastKnownConfig, refreshConfig } from 'config/hueConfig';
 import { simpleGet } from 'api/apiUtils'; // In analytics.mako, metrics.mako, threads.mako
 import Mustache from 'mustache'; // In hbase/templates/app.mako, jobsub.templates.js, search.ko.js, search.util.js
 import { createReactComponents } from 'reactComponents/createRootElements.js';
-import { loadDataCatalogs } from 'reactComponents/loadCatalogs';
 
 // TODO: Migrate away
 window._ = _;
