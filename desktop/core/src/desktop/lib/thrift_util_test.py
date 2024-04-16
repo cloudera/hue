@@ -19,6 +19,7 @@ from builtins import range
 from builtins import object
 import logging
 import os
+import pytest
 import socket
 import sys
 import threading
@@ -36,7 +37,7 @@ if not gen_py_path in sys.path:
 
 from djangothrift_test_gen import TestService
 from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
-from nose.tools import assert_equal, assert_true, assert_raises
+from django.test import TestCase
 from thrift.protocol.TBinaryProtocol import TBinaryProtocolFactory
 from thrift.server import TServer
 from thrift.transport import TSocket
@@ -144,7 +145,7 @@ class TestWithThriftServer(object):
     cls.server.stop_server_process()
 
   def test_basic_operation(self):
-    assert_equal(10, self.client.ping(5))
+    assert 10 == self.client.ping(5)
 
   def test_connection_race(self):
     class Racer(threading.Thread):
@@ -170,63 +171,57 @@ class TestWithThriftServer(object):
 
     for racer in racers:
       racer.join()
-      assert_equal(0, len(racer.errors))
+      assert 0 == len(racer.errors)
 
-class ThriftUtilTest(unittest.TestCase):
+class ThriftUtilTest(TestCase):
   def test_simpler_string(self):
     struct = TestStruct()
-    self.assertEquals("TestStruct()",
-      thrift_util.simpler_string(struct))
+    assert "TestStruct()" == thrift_util.simpler_string(struct)
     struct.a = "hello world"
-    self.assertEquals("TestStruct(a='hello world')",
-      thrift_util.simpler_string(struct))
+    assert "TestStruct(a='hello world')" == thrift_util.simpler_string(struct)
     struct.a = ""
     struct.b = 12345
-    self.assertEquals("TestStruct(a='', b=12345)",
-      thrift_util.simpler_string(struct))
+    assert "TestStruct(a='', b=12345)" == thrift_util.simpler_string(struct)
     struct.a = None
-    self.assertEquals("TestStruct(b=12345)",
-      thrift_util.simpler_string(struct))
+    assert "TestStruct(b=12345)" == thrift_util.simpler_string(struct)
 
     nested = TestNesting()
     nested.nested_struct = struct
-    self.assertEquals("TestNesting(nested_struct=TestStruct(b=12345))",
-      thrift_util.simpler_string(nested))
+    assert "TestNesting(nested_struct=TestStruct(b=12345))" == thrift_util.simpler_string(nested)
 
   def test_to_from_bytes(self):
     struct = TestStruct()
     struct.a = "hello world"
     struct.b = 12345
 
-    self.assertEquals(struct, thrift_util.from_bytes(TestStruct, thrift_util.to_bytes(struct)))
-    self.assertEquals(thrift_util.to_bytes(struct),
-      thrift_util.to_bytes(thrift_util.from_bytes(TestStruct, thrift_util.to_bytes(struct))))
+    assert struct == thrift_util.from_bytes(TestStruct, thrift_util.to_bytes(struct))
+    assert thrift_util.to_bytes(struct) == thrift_util.to_bytes(thrift_util.from_bytes(TestStruct, thrift_util.to_bytes(struct)))
 
   def test_empty_string_vs_none(self):
     struct1 = TestStruct()
     struct2 = TestStruct()
     struct2.a = ""
 
-    self.assertNotEquals(thrift_util.to_bytes(struct1), thrift_util.to_bytes(struct2))
-    self.assertNotEquals(struct1, struct2)
+    assert thrift_util.to_bytes(struct1) != thrift_util.to_bytes(struct2)
+    assert struct1 != struct2
 
   def test_enum_as_sequence(self):
     seq = thrift_util.enum_as_sequence(TestEnum)
-    self.assertEquals(len(seq), 3)
-    self.assertEquals(sorted(seq), sorted(['ENUM_ONE', 'ENUM_TWO', 'ENUM_THREE']))
+    assert len(seq) == 3
+    assert sorted(seq) == sorted(['ENUM_ONE', 'ENUM_TWO', 'ENUM_THREE'])
 
   def test_is_thrift_struct(self):
-    self.assertTrue(thrift_util.is_thrift_struct(TestStruct()))
-    self.assertFalse(thrift_util.is_thrift_struct("a string"))
+    assert thrift_util.is_thrift_struct(TestStruct())
+    assert not thrift_util.is_thrift_struct("a string")
 
   def test_fixup_enums(self):
     enum = TestEnum()
     struct1 = TestStruct()
-    self.assertTrue(hasattr(enum, "_VALUES_TO_NAMES"))
+    assert hasattr(enum, "_VALUES_TO_NAMES")
     struct1.myenum = 0
     thrift_util.fixup_enums(struct1, {"myenum": TestEnum})
-    self.assertTrue(hasattr(struct1, "myenumAsString"))
-    self.assertEquals(struct1.myenumAsString, 'ENUM_ONE')
+    assert hasattr(struct1, "myenumAsString")
+    assert struct1.myenumAsString == 'ENUM_ONE'
 
   def test_unpack_guid_secret_in_handle(self):
     if sys.version_info[0] > 2:
@@ -234,7 +229,7 @@ class ThriftUtilTest(unittest.TestCase):
       " schemaName='default', tableName='customers', tableTypes=None),"
       ")") % (str(b'N\xc5\xed\x14k\xbeI\xda\xb9\x14\xe7\xf2\x9a\xb7\xf0\xa5'), str(b']s(\xb5\xf6ZO\x03\x99\x955\xacl\xb4\x98\xae'))
 
-      self.assertEqual(_unpack_guid_secret_in_handle(hive_handle), ("(TGetTablesReq(sessionHandle=TSessionHandle(sessionId="
+      assert (_unpack_guid_secret_in_handle(hive_handle) == ("(TGetTablesReq(sessionHandle=TSessionHandle(sessionId="
       "THandleIdentifier(guid=da49be6b14edc54e:a5f0b79af2e714b9, secret=034f5af6b528735d:ae98b46cac359599)), catalogName=None, "
       "schemaName=\'default\', tableName=\'customers\', tableTypes=None),)"))
 
@@ -242,7 +237,7 @@ class ThriftUtilTest(unittest.TestCase):
       "statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False)"
       ",)") % (str(b'\xc4\xccnI\xf1\xbdJ\xc3\xb2\n\xd5[9\xe1Mr'), str(b'\xb0\x9d\xfd\x82\x94%L\xae\x9ch$f=\xfa{\xd0'))
 
-      self.assertEqual(_unpack_guid_secret_in_handle(impala_handle), ("(TExecuteStatementReq(sessionHandle=TSessionHandle("
+      assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TExecuteStatementReq(sessionHandle=TSessionHandle("
       "sessionId=THandleIdentifier(guid=c34abdf1496eccc4:724de1395bd50ab2, secret=ae4c259482fd9db0:d07bfa3d6624689c)), "
       "statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False),)"))
     else:
@@ -250,7 +245,7 @@ class ThriftUtilTest(unittest.TestCase):
       "secret=\'\x1aOYj\xf3\x86M\x95\xbb\xc8\xe9/;\xb0{9\', guid=\'\x86\xa6$\xb2\xb8\xdaF\xbd\xbd\xf5\xc5\xf4\xcb\x96\x03<\')), "
       'runAsync=True, statement="SELECT \'Hello World!\'"),)')
 
-      self.assertEqual(_unpack_guid_secret_in_handle(hive_handle), ("(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle("
+      assert (_unpack_guid_secret_in_handle(hive_handle) == ("(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle("
       "sessionId=THandleIdentifier(secret=954d86f36a594f1a:397bb03b2fe9c8bb, guid=bd46dab8b224a686:3c0396cbf4c5f5bd)), runAsync=True, "
       'statement="SELECT \'Hello World!\'"),)'))
 
@@ -258,7 +253,7 @@ class ThriftUtilTest(unittest.TestCase):
       "\'\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0\', guid=\'\xfa\xb0/\x04 \xfeDX\x99\xfcq\xff2\x07\x02\xfe\')), "
       "tableName=u\'customers\', tableTypes=None, catalogName=None),)")
 
-      self.assertEqual(_unpack_guid_secret_in_handle(impala_handle), ("(TGetTablesReq(schemaName=u\'default\', sessionHandle="
+      assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TGetTablesReq(schemaName=u\'default\', sessionHandle="
       "TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, guid=5844fe20042fb0fa:fe020732ff71fc99)),"
       " tableName=u\'customers\', tableTypes=None, catalogName=None),)"))
 
@@ -267,11 +262,11 @@ class ThriftUtilTest(unittest.TestCase):
     # "\'\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0\', guid=\'\xd23\xfa\x150\xf5D\x91\x00\x00\x00\x00\xd7\xef\x91\x00\')), "
     # "tableName=u\'customers\', tableTypes=None, catalogName=None),)")
 
-    # self.assertEqual(_unpack_guid_secret_in_handle(impala_handle), ("(TGetTablesReq(schemaName=u\'default\', "
+    # assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TGetTablesReq(schemaName=u\'default\', "
     # "sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, "
     # "guid=9144f53015fa33d2:0091efd700000000)), tableName=u\'customers\', tableTypes=None, catalogName=None),)"))
 
-class TestJsonable2Thrift(unittest.TestCase):
+class TestJsonable2Thrift(TestCase):
   """
   Tests a handful of permutations of jsonable2thrift.
   """
@@ -281,7 +276,7 @@ class TestJsonable2Thrift(unittest.TestCase):
     """
     jsonable = thrift2json(obj)
     back = jsonable2thrift(jsonable, type(obj))
-    self.assertEquals(obj, back)
+    assert obj == back
 
   def test_basic_types(self):
     def help(key, value, expect_failure=False):
@@ -300,7 +295,7 @@ class TestJsonable2Thrift(unittest.TestCase):
 
   def test_default(self):
     x = jsonable2thrift(dict(), TestManyTypes)
-    self.assertEquals(TestManyTypes(a_string_with_default="the_default"), x)
+    assert TestManyTypes(a_string_with_default="the_default") == x
 
   def test_struct(self):
     x = TestManyTypes()
@@ -327,12 +322,12 @@ class TestJsonable2Thrift(unittest.TestCase):
     """
     Checks that bound checking works.
     """
-    self.assertRaises(AssertionError, jsonable2thrift,
-      dict(a_byte=128), TestManyTypes)
-    self.assertRaises(AssertionError, jsonable2thrift,
-      dict(a_byte=-129), TestManyTypes)
-    self.assertRaises(AssertionError, jsonable2thrift,
-      dict(a_byte="not_a_number"), TestManyTypes)
+    with pytest.raises(AssertionError):
+      jsonable2thrift(dict(a_byte=128), TestManyTypes)
+    with pytest.raises(AssertionError):
+      jsonable2thrift(dict(a_byte=-129), TestManyTypes)
+    with pytest.raises(AssertionError):
+      jsonable2thrift(dict(a_byte="not_a_number"), TestManyTypes)
 
   def test_list_of_strings(self):
     """
@@ -344,7 +339,7 @@ class TestJsonable2Thrift(unittest.TestCase):
     self.assertBackAndForth(TestManyTypes(a_string_list=[u"alpha", u"beta"]))
 
 
-class TestSuperClient(unittest.TestCase):
+class TestSuperClient(TestCase):
 
   def test_wrapper_no_retry(self):
     wrapped_client, transport = Mock(), Mock()
@@ -354,7 +349,7 @@ class TestSuperClient(unittest.TestCase):
 
     client = thrift_util.SuperClient(wrapped_client, transport)
 
-    with self.assertRaises(TTransportException):
+    with pytest.raises(TTransportException):
       client.my_call()
       # Could check output for "Not retrying thrift call my_call due to socket timeout"
 
@@ -367,13 +362,14 @@ class TestSuperClient(unittest.TestCase):
 
     client = thrift_util.SuperClient(wrapped_client, transport)
 
-    with self.assertRaises(TTransportException):
+    with pytest.raises(TTransportException):
       client.my_call()
       # Could check output for several "Thrift exception; retrying: some error"
 
 
-class TestThriftJWT(unittest.TestCase):
-  def setUp(self):
+@pytest.mark.django_db
+class TestThriftJWT():
+  def setup_method(self):
     self.sample_token = "some_jwt_token"
 
     self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
@@ -425,7 +421,8 @@ class TestThriftJWT(unittest.TestCase):
                 http_url='some_http_url'
               )
 
-              assert_raises(Exception, thrift_util.connect_to_thrift, conf)
+              with pytest.raises(Exception):
+                thrift_util.connect_to_thrift(conf)
 
               # When user not found
               self.user.profile.update_data({'jwt_access_token': self.sample_token})
@@ -439,7 +436,8 @@ class TestThriftJWT(unittest.TestCase):
                 use_sasl=None,
                 http_url='some_http_url'
               )
-              assert_raises(Exception, thrift_util.connect_to_thrift, conf)
+              with pytest.raises(Exception):
+                thrift_util.connect_to_thrift(conf)
             finally:
               reset()
 

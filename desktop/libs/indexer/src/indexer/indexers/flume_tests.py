@@ -16,8 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
+import pytest
 
 from useradmin.models import User
 
@@ -25,7 +24,7 @@ from indexer.indexers.flume import FlumeIndexer
 
 
 def test_generate_from_directory_to_solr_index():
-  raise SkipTest
+  pytest.skip("Skipping Test")
 
   source = {
     'channelSourceType': 'directory',
@@ -36,7 +35,7 @@ def test_generate_from_directory_to_solr_index():
 
   configs = FlumeIndexer(user=None).generate_config(source=source, destination=destination)
 
-  assert_equal(
+  assert (
     '''SOLR_LOCATOR : {
     # Name of solr collection
     collection : log_analytics_demo
@@ -150,13 +149,9 @@ morphlines : [
     ]
 }
 ]
-'''.strip()
-    ,
-    configs[0][1].strip() # 'agent_morphlines_conf_file'
-  )
+'''.strip() ==
+    configs[0][1].strip())
 
-  assert_equal(
-    ('agent_config_file', 'tier1.sources = source1\n  tier1.channels = channel1\n  tier1.sinks = sink1\n\n\n  tier1.channels.channel1.type = memory\n  tier1.channels.channel1.capacity = 10000\n  tier1.channels.channel1.transactionCapacity = 1000\n\n  \n  tier1.sinks.sink1.type          = org.apache.flume.sink.solr.morphline.MorphlineSolrSink\n  tier1.sinks.sink1.morphlineFile = morphlines.conf\n  tier1.sinks.sink1.morphlineId = hue_accesslogs_no_geo\n  tier1.sinks.sink1.channel       = channel1')
-    ,
-    configs['agent_config_file']
-  )
+  assert (
+    ('agent_config_file', 'tier1.sources = source1\n  tier1.channels = channel1\n  tier1.sinks = sink1\n\n\n  tier1.channels.channel1.type = memory\n  tier1.channels.channel1.capacity = 10000\n  tier1.channels.channel1.transactionCapacity = 1000\n\n  \n  tier1.sinks.sink1.type          = org.apache.flume.sink.solr.morphline.MorphlineSolrSink\n  tier1.sinks.sink1.morphlineFile = morphlines.conf\n  tier1.sinks.sink1.morphlineId = hue_accesslogs_no_geo\n  tier1.sinks.sink1.channel       = channel1') ==
+    configs['agent_config_file'])

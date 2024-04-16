@@ -22,8 +22,6 @@ import os
 import sys
 import tempfile
 
-from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal, assert_raises
-
 from desktop.models import get_remote_home_storage
 
 from hadoop import core_site
@@ -89,13 +87,13 @@ def test_core_site():
     )
     core_site.reset()
 
-    assert_equal(core_site.get_raz_api_url(), 'https://gehue-adls-master:6082/')
-    assert_equal(core_site.get_raz_cluster_name(), 'gehue-adls')
-    assert_equal(core_site.get_raz_s3_default_bucket(), {'host': 's3.us-west-2.amazonaws.com', 'bucket': 'gethue-dev'})
+    assert core_site.get_raz_api_url() == 'https://gehue-adls-master:6082/'
+    assert core_site.get_raz_cluster_name() == 'gehue-adls'
+    assert core_site.get_raz_s3_default_bucket() == {'host': 's3.us-west-2.amazonaws.com', 'bucket': 'gethue-dev'}
 
-    assert_equal(core_site.get_default_fs(), 'abfs://data@gethuedevstorage.dfs.core.windows.net/hue-adls')
+    assert core_site.get_default_fs() == 'abfs://data@gethuedevstorage.dfs.core.windows.net/hue-adls'
 
-    assert_equal(get_remote_home_storage(), 's3a://gethue-dev')
+    assert get_remote_home_storage() == 's3a://gethue-dev'
   finally:
     core_site.reset()
     for f in finish:

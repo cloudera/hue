@@ -20,6 +20,7 @@ from builtins import range
 from builtins import object
 import json
 import logging
+import pytest
 import re
 import sys
 import time
@@ -27,8 +28,7 @@ import unittest
 import pytz
 
 from django.urls import reverse
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_false, assert_equal, assert_raises
+from django.test import TestCase
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
@@ -61,11 +61,11 @@ _INITIALIZED = False
 class TestBrowser(object):
 
   def test_format_counter_name(self):
-    assert_equal("Foo Bar", views.format_counter_name("fooBar"))
-    assert_equal("Foo Bar Baz", views.format_counter_name("fooBarBaz"))
-    assert_equal("Foo", views.format_counter_name("foo"))
-    assert_equal("Foo.", views.format_counter_name("foo."))
-    assert_equal("A Bbb Ccc", views.format_counter_name("A_BBB_CCC"))
+    assert "Foo Bar" == views.format_counter_name("fooBar")
+    assert "Foo Bar Baz" == views.format_counter_name("fooBarBaz")
+    assert "Foo" == views.format_counter_name("foo")
+    assert "Foo." == views.format_counter_name("foo.")
+    assert "A Bbb Ccc" == views.format_counter_name("A_BBB_CCC")
 
 def get_hadoop_job_id(oozie_api, oozie_jobid, action_index=1, timeout=60, step=5):
   hadoop_job_id = None
@@ -81,9 +81,9 @@ def get_hadoop_job_id(oozie_api, oozie_jobid, action_index=1, timeout=60, step=5
   return hadoop_job_id
 
 
-class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
-  requires_hadoop = True
-  integration = True
+@pytest.mark.requires_hadoop
+@pytest.mark.integration
+class TestJobBrowserWithHadoop(TestCase, OozieServerProvider):
 
   @classmethod
   def setup_class(cls):
@@ -159,7 +159,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
                 '{\"name\":\"sleep.job.reduce.sleep.time\",\"value\":\"${REDUCER_SLEEP_TIME}\"}]')
         },
         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-      assert_equal(response.status_code, 200)
+      assert response.status_code == 200
 
     return Document.objects.available_docs(Workflow, cls.user).get(name=job_name).content_object
 
@@ -179,7 +179,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     """
     These views exist, but tend not to be ever called, because they're not in the normal UI.
     """
-    raise SkipTest
+    raise pytest.skip("Skipping Test")
 
     TestJobBrowserWithHadoop.client.get("/jobbrowser/clusterstatus")
     TestJobBrowserWithHadoop.client.get("/jobbrowser/queues")
@@ -191,7 +191,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     """
 
     if is_live_cluster():
-      raise SkipTest('HUE-2902: Skipping because test is not reentrant')
+      pytest.skip('HUE-2902: Skipping because test is not reentrant')
 
     # Create design that will fail because the script file isn't there
     INPUT_DIR = TestJobBrowserWithHadoop.home_dir + '/input'
@@ -238,55 +238,55 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # Select only killed jobs (should be absent)
     # Taking advantage of the fact new jobs are at the top of the list!
     response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'killed'})
-    assert_false(hadoop_job_id_short in response.content)
+    assert not hadoop_job_id_short in response.content
 
     # Select only failed jobs (should be present)
     # Map job should succeed. Reduce job should fail.
     response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'failed'})
-    assert_true(hadoop_job_id_short in response.content)
+    assert hadoop_job_id_short in response.content
 
-    raise SkipTest # Not compatible with MR2
+    raise pytest.skip("Skipping Test") # Not compatible with MR2
 
     # The single job view should have the failed task table
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s' % (hadoop_job_id,))
     html = response.content.lower()
-    assert_true('failed task' in html, html)
+    assert 'failed task' in html, html
 
     # The map task should say success (empty input)
     map_task_id = TestJobBrowserWithHadoop.hadoop_job_id.replace('job', 'task') + '_m_000000'
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks/%s' % (hadoop_job_id, map_task_id))
-    assert_true('succeed' in response.content)
-    assert_true('failed' not in response.content)
+    assert 'succeed' in response.content
+    assert 'failed' not in response.content
 
     # The reduce task should say failed
     reduce_task_id = hadoop_job_id.replace('job', 'task') + '_r_000000'
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks/%s' % (hadoop_job_id, reduce_task_id))
-    assert_true('succeed' not in response.content)
-    assert_true('failed' in response.content)
+    assert 'succeed' not in response.content
+    assert 'failed' in response.content
 
     # Selecting by failed state should include the failed map
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?taskstate=failed' % (hadoop_job_id,))
-    assert_true('r_000000' in response.content)
-    assert_true('m_000000' not in response.content)
+    assert 'r_000000' in response.content
+    assert 'm_000000' not in response.content
 
   def test_jobs_page(self):
     # All jobs page and fetch job ID
     # Taking advantage of the fact new jobs are at the top of the list!
     response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json'})
-    assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content, response.content)
+    assert TestJobBrowserWithHadoop.hadoop_job_id_short in response.content, response.content
 
     # Make sure job succeeded
     response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'completed'})
-    assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+    assert TestJobBrowserWithHadoop.hadoop_job_id_short in response.content
     response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'failed'})
-    assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+    assert not TestJobBrowserWithHadoop.hadoop_job_id_short in response.content
     response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'running'})
-    assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+    assert not TestJobBrowserWithHadoop.hadoop_job_id_short in response.content
     response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'state': 'killed'})
-    assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+    assert not TestJobBrowserWithHadoop.hadoop_job_id_short in response.content
 
   def test_tasks_page(self):
-    raise SkipTest
+    raise pytest.skip("Skipping Test")
 
     # Test tracker page
     early_task_id = TestJobBrowserWithHadoop.hadoop_job_id.replace('job', 'task') + '_m_000000'
@@ -294,21 +294,21 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
     tracker_url = re.search('<a href="(/jobbrowser/trackers/.+?)"', response.content).group(1)
     response = TestJobBrowserWithHadoop.client.get(tracker_url)
-    assert_true('Tracker at' in response.content)
+    assert 'Tracker at' in response.content
 
   def test_job_permissions(self):
     # Login as ourself
     finish = SHARE_JOBS.set_for_testing(True)
     try:
       response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'user': ''})
-      assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+      assert TestJobBrowserWithHadoop.hadoop_job_id_short in response.content
     finally:
       finish()
 
     finish = SHARE_JOBS.set_for_testing(False)
     try:
       response = TestJobBrowserWithHadoop.client.post('/jobbrowser/jobs/', {'format': 'json', 'user': ''})
-      assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+      assert TestJobBrowserWithHadoop.hadoop_job_id_short in response.content
     finally:
       finish()
 
@@ -319,67 +319,68 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     finish = SHARE_JOBS.set_for_testing(True)
     try:
       response = client_not_me.post('/jobbrowser/jobs/', {'format': 'json', 'user': ''})
-      assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+      assert TestJobBrowserWithHadoop.hadoop_job_id_short in response.content
     finally:
       finish()
 
     finish = SHARE_JOBS.set_for_testing(False)
     try:
       response = client_not_me.post('/jobbrowser/jobs/', {'format': 'json', 'user': ''})
-      assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+      assert not TestJobBrowserWithHadoop.hadoop_job_id_short in response.content
     finally:
       finish()
 
   def test_job_counter(self):
-    raise SkipTest
+    raise pytest.skip("Skipping Test")
 
     # Single job page
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s' % TestJobBrowserWithHadoop.hadoop_job_id)
     # Check some counters for single job.
     counters = response.context[0]['job'].counters
     counters_file_bytes_written = counters['org.apache.hadoop.mapreduce.FileSystemCounter']['counters']['FILE_BYTES_WRITTEN']
-    assert_true(counters_file_bytes_written['map'] > 0)
-    assert_true(counters_file_bytes_written['reduce'] > 0)
+    assert counters_file_bytes_written['map'] > 0
+    assert counters_file_bytes_written['reduce'] > 0
 
   def test_task_page(self):
-    raise SkipTest
+    raise pytest.skip("Skipping Test")
 
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context[0]['page'].object_list), 4)
+    assert len(response.context[0]['page'].object_list), 4
     # Select by tasktype
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?tasktype=reduce' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context[0]['page'].object_list), 1)
+    assert len(response.context[0]['page'].object_list), 1
     # Select by taskstate
     response = TestJobBrowserWithHadoop.client.get(
       '/jobbrowser/jobs/%s/tasks?taskstate=succeeded' % (TestJobBrowserWithHadoop.hadoop_job_id,)
     )
-    assert_true(len(response.context[0]['page'].object_list), 4)
+    assert len(response.context[0]['page'].object_list), 4
     # Select by text
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?tasktext=clean' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context[0]['page'].object_list), 1)
+    assert len(response.context[0]['page'].object_list), 1
 
   def test_job_single_logs(self):
     if not is_live_cluster():
-      raise SkipTest
+      raise pytest.skip("Skipping Test")
 
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/single_logs?format=json' % (TestJobBrowserWithHadoop.hadoop_job_id))
     json_resp = json.loads(response.content)
 
-    assert_true('logs' in json_resp)
-    assert_true('Log Type: stdout' in json_resp['logs'][1])
-    assert_true('Log Type: stderr' in json_resp['logs'][2])
-    assert_true('Log Type: syslog' in json_resp['logs'][3])
+    assert 'logs' in json_resp
+    assert 'Log Type: stdout' in json_resp['logs'][1]
+    assert 'Log Type: stderr' in json_resp['logs'][2]
+    assert 'Log Type: syslog' in json_resp['logs'][3]
 
     # Verify that syslog contains log information for a completed oozie job
     match = re.search(r"^Log Type: syslog(.+)Log Length: (?P<log_length>\d+)(.+)$", json_resp['logs'][3], re.DOTALL)
-    assert_true(match and match.group(2), 'Failed to parse log length from syslog')
+    assert match and match.group(2), 'Failed to parse log length from syslog'
     log_length = match.group(2)
-    assert_true(log_length > 0, 'Log Length is 0, expected content in syslog.')
+    assert log_length > 0, 'Log Length is 0, expected content in syslog.'
 
 
+@pytest.mark.django_db
 class TestMapReduce2NoHadoop(object):
 
-  def setUp(self):
+  def setup_method(self):
     # Beware: Monkey patching
     if not hasattr(resource_manager_api, 'old_get_resource_manager_api'):
       resource_manager_api.old_get_resource_manager = resource_manager_api.get_resource_manager
@@ -412,10 +413,10 @@ class TestMapReduce2NoHadoop(object):
         YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True),
         SHARE_JOBS.set_for_testing(False)
     ]
-    assert_true(cluster.is_yarn())
+    assert cluster.is_yarn()
 
 
-  def tearDown(self):
+  def teardown_method(self):
     resource_manager_api.get_resource_manager = getattr(resource_manager_api, 'old_get_resource_manager')
     mapreduce_api.get_mapreduce_api = getattr(mapreduce_api, 'old_get_mapreduce_api')
     history_server_api.get_history_server_api = getattr(history_server_api, 'old_get_history_server_api')
@@ -427,95 +428,96 @@ class TestMapReduce2NoHadoop(object):
   def test_jobs(self):
     response = self.c.post('/jobbrowser/', {'format': 'json'})
     response_content = json.loads(response.content)
-    assert_equal(len(response_content['jobs']), 4)
+    assert len(response_content['jobs']) == 4
 
     response = self.c.post('/jobbrowser/jobs/', {'format': 'json', 'text': 'W=MapReduce-copy2'})
     response_content = json.loads(response.content)
-    assert_equal(len(response_content['jobs']), 1)
+    assert len(response_content['jobs']) == 1
 
   def test_applications_no_start_time(self):
     response = self.c.post('/jobbrowser/', {'format': 'json'})
     data = json.loads(response.content)
     job = [j for j in data['jobs'] if j['id'] == 'application_1428442704693_0007']
-    assert_true(job, job)
+    assert job, job
     job = job[0]
 
-    assert_equal('', job['startTimeFormatted'], data)
-    assert_equal('', job['durationFormatted'], data)
+    assert '' == job['startTimeFormatted'], data
+    assert '' == job['durationFormatted'], data
 
   def test_running_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')
-    assert_true(b'job_1356251510842_0054' in response.content, response.content)
-    assert_true(b'RUNNING' in response.content)
+    assert b'job_1356251510842_0054' in response.content, response.content
+    assert b'RUNNING' in response.content
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054')
-    assert_true(b'job_1356251510842_0054' in response.content)
-    assert_true(b'RUNNING' in response.content)
+    assert b'job_1356251510842_0054' in response.content
+    assert b'RUNNING' in response.content
 
   def test_application_no_start_time(self):
     response = self.c.get('/jobbrowser/jobs/application_1428442704693_0007?format=json')
     data = json.loads(response.content)
 
-    assert_equal('', data['job']['startTimeFormatted'], data)
-    assert_equal('', data['job']['durationFormatted'], data)
+    assert '' == data['job']['startTimeFormatted'], data
+    assert '' == data['job']['durationFormatted'], data
 
   def test_finished_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0009')
-    assert_equal(response.context[0]['job'].jobId, 'job_1356251510842_0009')
+    assert response.context[0]['job'].jobId == 'job_1356251510842_0009'
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009')
-    assert_equal(response.context[0]['job'].jobId, 'job_1356251510842_0009')
+    assert response.context[0]['job'].jobId == 'job_1356251510842_0009'
 
   def test_spark_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1428442704693_0006')
-    assert_equal(response.context[0]['job'].jobId, 'application_1428442704693_0006')
+    assert response.context[0]['job'].jobId == 'application_1428442704693_0006'
 
   def test_yarn_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1428442704693_0007')
-    assert_equal(response.context[0]['job'].jobId, 'job_1356251510842_0009')
+    assert response.context[0]['job'].jobId == 'job_1356251510842_0009'
 
   def job_not_assigned(self):
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009/job_not_assigned//my_url')
-    assert_equal(response.context[0]['jobid'], 'job_1356251510842_0009')
-    assert_equal(response.context[0]['path'], '/my_url')
+    assert response.context[0]['jobid'] == 'job_1356251510842_0009'
+    assert response.context[0]['path'] == '/my_url'
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009/job_not_assigned//my_url?format=json')
     result = json.loads(response.content)
-    assert_equal(result['status'], 0)
+    assert result['status'] == 0
 
   def test_acls_job(self):
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054') # Check in perm decorator
-    assert_true(can_view_job('test', response.context[0]['job']))
-    assert_true(can_modify_job('test', response.context[0]['job']))
+    assert can_view_job('test', response.context[0]['job'])
+    assert can_modify_job('test', response.context[0]['job'])
 
-    assert_true(can_view_job('test2', response.context[0]['job']))
-    assert_false(can_modify_job('test2', response.context[0]['job']))
+    assert can_view_job('test2', response.context[0]['job'])
+    assert not can_modify_job('test2', response.context[0]['job'])
 
-    assert_false(can_view_job('test3', response.context[0]['job']))
-    assert_false(can_modify_job('test3', response.context[0]['job']))
+    assert not can_view_job('test3', response.context[0]['job'])
+    assert not can_modify_job('test3', response.context[0]['job'])
 
     response2 = self.c3.get('/jobbrowser/jobs/job_1356251510842_0054')
     if sys.version_info[0] < 3:
-      assert_true(b'don&#39;t have permission to access job' in response2.content, response2.content)
+      assert b'don&#39;t have permission to access job' in response2.content, response2.content
     else:
-      assert_true(b'don&#x27;t have permission to access job' in response2.content, response2.content)
+      assert b'don&#x27;t have permission to access job' in response2.content, response2.content
 
   def test_kill_job(self):
     job_id = 'application_1356251510842_0054'
     try:
       response = self.c.post('/jobbrowser/jobs/%s/kill?format=json' % job_id)
-      assert_equal(json.loads(response.content), {"status": 0})
+      assert json.loads(response.content) == {"status": 0}
     finally:
       MockResourceManagerApi.APPS[job_id]['state'] = 'RUNNING'
 
     response = self.c2.post('/jobbrowser/jobs/%s/kill?format=json' % job_id)
-    assert_true(b'Kill operation is forbidden.' in response.content, response.content)
+    assert b'Kill operation is forbidden.' in response.content, response.content
 
 
 
+@pytest.mark.django_db
 class TestResourceManagerHaNoHadoop(object):
 
-  def setUp(self):
+  def setup_method(self):
     # Beware: Monkey patching
     if not hasattr(resource_manager_api, 'old_get_resource_manager_api'):
       resource_manager_api.old_ResourceManagerApi = resource_manager_api.ResourceManagerApi
@@ -534,7 +536,7 @@ class TestResourceManagerHaNoHadoop(object):
 
     self.finish = []
 
-  def tearDown(self):
+  def teardown_method(self):
     resource_manager_api.ResourceManagerApi = getattr(resource_manager_api, 'old_ResourceManagerApi')
     resource_manager_api.API_CACHE = None
     mapreduce_api.get_mapreduce_api = getattr(mapreduce_api, 'old_get_mapreduce_api')
@@ -559,12 +561,13 @@ class TestResourceManagerHaNoHadoop(object):
     api = get_api(self.user, jt=None)
 
     api.get_jobs(self.user, username=self.user.username, state='running', text='')
-    assert_false(api.resource_manager_api.from_failover)
+    assert not api.resource_manager_api.from_failover
 
     api.get_jobs(self.user, username=self.user.username, state='running', text='')
-    assert_false(api.resource_manager_api.from_failover)
+    assert not api.resource_manager_api.from_failover
 
-    assert_raises(Exception, api.get_jobs, self.user, username=self.user.username, state='running', text='')
+    with pytest.raises(Exception):
+      api.get_jobs(self.user, username=self.user.username, state='running', text='')
 
 
   def test_failover_ha(self):
@@ -588,38 +591,39 @@ class TestResourceManagerHaNoHadoop(object):
     api = get_api(self.user, jt=None)
 
     api.get_jobs(self.user, username=self.user.username, state='running', text='')
-    assert_false(api.resource_manager_api.from_failover)
+    assert not api.resource_manager_api.from_failover
 
     api.get_jobs(self.user, username=self.user.username, state='running', text='')
-    assert_false(api.resource_manager_api.from_failover)
+    assert not api.resource_manager_api.from_failover
 
     # rm1 is set to to fail the 3rd time
     YARN_CLUSTERS['ha1'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_1_host')
     YARN_CLUSTERS['ha2'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_2_host_active') # Just tells mocked RM that it should say it is active
     api.get_jobs(self.user, username=self.user.username, state='running', text='')
-    assert_true(api.resource_manager_api.from_failover)
+    assert api.resource_manager_api.from_failover
     api.resource_manager_api.from_failover = False
 
     api.get_jobs(self.user, username=self.user.username, state='running', text='')
-    assert_false(api.resource_manager_api.from_failover)
+    assert not api.resource_manager_api.from_failover
 
     # rm2 is set to to fail the 3rd time
     YARN_CLUSTERS['ha1'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_1_host_active')
     YARN_CLUSTERS['ha2'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_2_host')
     api.get_jobs(self.user, username=self.user.username, state='running', text='')
-    assert_true(api.resource_manager_api.from_failover)
+    assert api.resource_manager_api.from_failover
     api.resource_manager_api.from_failover = False
 
     api.get_jobs(self.user, username=self.user.username, state='running', text='')
-    assert_false(api.resource_manager_api.from_failover)
+    assert not api.resource_manager_api.from_failover
 
     # if rm fails and no other active ones we fail
-    assert_raises(Exception, api.get_jobs, self.user, username=self.user.username, state='running', text='')
+    with pytest.raises(Exception):
+      api.get_jobs(self.user, username=self.user.username, state='running', text='')
 
 
 class TestImpalaApi(object):
 
-  def setUp(self):
+  def setup_method(self):
     api = MockImpalaQueryApi('http://url.com')
     self.api = QueryApi(None, impala_api=api)
 
@@ -656,7 +660,7 @@ class TestImpalaApi(object):
     ]
     for i in range(0, len(target)):
       for key, value in target[i].items():
-        assert_equal(response.get('apps')[i].get(key), value)
+        assert response.get('apps')[i].get(key) == value
 
   def test_app(self):
     response = self.api.app('4d497267f34ff17d:817bdfb500000000')
@@ -665,7 +669,7 @@ class TestImpalaApi(object):
       'id': '4d497267f34ff17d:817bdfb500000000',
       'submitted': self.handle_query_start_time('2017-10-25 15:38:12.872825000'),
       'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=4d497267f34ff17d:817bdfb500000000'}.items():
-      assert_equal(response.get(key), value)
+      assert response.get(key) == value
 
     response = self.api.app('8a46a8865624698f:b80b211500000000')
 
@@ -674,11 +678,12 @@ class TestImpalaApi(object):
       'id': '8a46a8865624698f:b80b211500000000',
       'submitted': self.handle_query_start_time('2017-10-25 15:38:26.637010000'), 'apiStatus': 'SUCCEEDED',
       'doc_url': 'http://url.com/query_plan?query_id=8a46a8865624698f:b80b211500000000'}.items():
-      assert_equal(response.get(key), value)
+      assert response.get(key) == value
 
 
+@pytest.mark.django_db
 class TestSparkNoHadoop(object):
-  def setUp(self):
+  def setup_method(self):
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "jobbrowser")
     self.user = User.objects.get(username='test')
@@ -692,7 +697,7 @@ class TestSparkNoHadoop(object):
     job_api.NativeYarnApi = MockYarnApi
     views.get_api = MockYarnApi
 
-  def tearDown(self):
+  def teardown_method(self):
     job_api.NativeYarnApi = getattr(job_api, 'old_NativeYarnApi')
     views.get_api = getattr(views, 'old_get_api')
 
@@ -701,29 +706,29 @@ class TestSparkNoHadoop(object):
     query_executor_data = {u'interface': [u'"jobs"'], u'app_id': [u'"driver_executor_application_1513618343677_0018"']}
     resp_executor = self.c.post('/jobbrowser/api/job/jobs', query_executor_data)
     response_executor = json.loads(resp_executor.content)
-    assert_equal(response_executor['status'], 0)
-    assert_equal(response_executor['app']['executor_id'], 'driver')
+    assert response_executor['status'] == 0
+    assert response_executor['app']['executor_id'] == 'driver'
 
     query_log_data = {u'interface': [u'"jobs"'], u'type': [u'"SPARK"'],
       u'app_id': [u'"application_1513618343677_0018"'], u'name': [u'"default"']}
     resp_log = self.c.post('/jobbrowser/api/job/logs', query_log_data)
     response_log = json.loads(resp_log.content)
-    assert_equal(response_log['status'], 0)
-    assert_equal(response_log['logs']['logs'], 'dummy_logs')
+    assert response_log['status'] == 0
+    assert response_log['logs']['logs'] == 'dummy_logs'
 
     # Spark job status is running
     query_executor_data = {u'interface': [u'"jobs"'], u'app_id': [u'"driver_executor_application_1513618343677_0020"']}
     resp_executor = self.c.post('/jobbrowser/api/job/jobs', query_executor_data)
     response_executor = json.loads(resp_executor.content)
-    assert_equal(response_executor['status'], 0)
-    assert_equal(response_executor['app']['executor_id'], 'driver')
+    assert response_executor['status'] == 0
+    assert response_executor['app']['executor_id'] == 'driver'
 
     query_log_data = {u'interface': [u'"jobs"'], u'type': [u'"SPARK"'],
       u'app_id': [u'"application_1513618343677_0020"'], u'name': [u'"default"']}
     resp_log = self.c.post('/jobbrowser/api/job/logs', query_log_data)
     response_log = json.loads(resp_log.content)
-    assert_equal(response_log['status'], 0)
-    assert_equal(response_log['logs']['logs'], 'dummy_logs')
+    assert response_log['status'] == 0
+    assert response_log['logs']['logs'] == 'dummy_logs'
 
 
 class MockYarnApi(object):
@@ -1757,67 +1762,52 @@ def test_make_log_links():
   """
 
   # FileBrowser
-  assert_equal(
-      """<a href="/filebrowser/view=/user/romain/tmp">hdfs://localhost:8020/user/romain/tmp</a>  &lt;dir&gt;""",
-      LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/tmp  <dir>')
-  )
-  assert_equal(
-      """<a href="/filebrowser/view=/user/romain/tmp">hdfs://localhost:8020/user/romain/tmp</a>&lt;dir&gt;""",
-      LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/tmp<dir>')
-  )
-  assert_equal(
-      """output: <a href="/filebrowser/view=/user/romain/tmp">/user/romain/tmp</a>  &lt;dir&gt;""",
-      LinkJobLogs._make_links('output: /user/romain/tmp  <dir>')
-  )
-  assert_equal(
+  assert (
+      """<a href="/filebrowser/view=/user/romain/tmp">hdfs://localhost:8020/user/romain/tmp</a>  &lt;dir&gt;""" ==
+      LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/tmp  <dir>'))
+  assert (
+      """<a href="/filebrowser/view=/user/romain/tmp">hdfs://localhost:8020/user/romain/tmp</a>&lt;dir&gt;""" ==
+      LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/tmp<dir>'))
+  assert (
+      """output: <a href="/filebrowser/view=/user/romain/tmp">/user/romain/tmp</a>  &lt;dir&gt;""" ==
+      LinkJobLogs._make_links('output: /user/romain/tmp  <dir>'))
+  assert (
       ('Successfully read 3760 records (112648 bytes) from: &quot;<a href="/filebrowser/view=/user/hue/pig/examples/data/midsummer.txt">'
-        '/user/hue/pig/examples/data/midsummer.txt</a>&quot;'),
-      LinkJobLogs._make_links('Successfully read 3760 records (112648 bytes) from: "/user/hue/pig/examples/data/midsummer.txt"')
-  )
-  assert_equal(
-      'data,upper_case  MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff">hdfs://localhost:8020/user/romain/out/fffff</a>,',
-      LinkJobLogs._make_links('data,upper_case  MAP_ONLY  hdfs://localhost:8020/user/romain/out/fffff,')
-  )
-  assert_equal(
-      'MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff">hdfs://localhost:8020/user/romain/out/fffff</a>\n2013',
-      LinkJobLogs._make_links('MAP_ONLY  hdfs://localhost:8020/user/romain/out/fffff\n2013')
-  )
-  assert_equal(
-      ' <a href="/filebrowser/view=/jobs.tsv">/jobs.tsv</a> ',
-      LinkJobLogs._make_links(' /jobs.tsv ')
-  )
-  assert_equal(
-      '<a href="/filebrowser/view=/user/romain/job_pos_2012.tsv">hdfs://localhost:8020/user/romain/job_pos_2012.tsv</a>',
-      LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/job_pos_2012.tsv')
-  )
+        '/user/hue/pig/examples/data/midsummer.txt</a>&quot;') ==
+      LinkJobLogs._make_links('Successfully read 3760 records (112648 bytes) from: "/user/hue/pig/examples/data/midsummer.txt"'))
+  assert (
+      'data,upper_case  MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff">hdfs://localhost:8020/user/romain/out/fffff</a>,' ==
+      LinkJobLogs._make_links('data,upper_case  MAP_ONLY  hdfs://localhost:8020/user/romain/out/fffff,'))
+  assert (
+      'MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff">hdfs://localhost:8020/user/romain/out/fffff</a>\n2013' ==
+      LinkJobLogs._make_links('MAP_ONLY  hdfs://localhost:8020/user/romain/out/fffff\n2013'))
+  assert (
+      ' <a href="/filebrowser/view=/jobs.tsv">/jobs.tsv</a> ' ==
+      LinkJobLogs._make_links(' /jobs.tsv '))
+  assert (
+      '<a href="/filebrowser/view=/user/romain/job_pos_2012.tsv">hdfs://localhost:8020/user/romain/job_pos_2012.tsv</a>' ==
+      LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/job_pos_2012.tsv'))
 
   # JobBrowser
-  assert_equal(
-      """<a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
-      LinkJobLogs._make_links('job_201306261521_0058')
-  )
-  assert_equal(
-      """Hadoop Job IDs executed by Pig: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
-      LinkJobLogs._make_links('Hadoop Job IDs executed by Pig: job_201306261521_0058')
-  )
-  assert_equal(
-      """MapReduceLauncher  - HadoopJobId: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
-      LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058')
-  )
-  assert_equal(
+  assert (
+      """<a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""" ==
+      LinkJobLogs._make_links('job_201306261521_0058'))
+  assert (
+      """Hadoop Job IDs executed by Pig: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""" ==
+      LinkJobLogs._make_links('Hadoop Job IDs executed by Pig: job_201306261521_0058'))
+  assert (
+      """MapReduceLauncher  - HadoopJobId: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""" ==
+      LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058'))
+  assert (
       ('- More information at: http://localhost:50030/jobdetails.jsp?jobid=<a href="/hue/jobbrowser/jobs/job_201306261521_0058">'
-       'job_201306261521_0058</a>'),
-      LinkJobLogs._make_links('- More information at: http://localhost:50030/jobdetails.jsp?jobid=job_201306261521_0058')
-  )
-  assert_equal(
-      ' Logging error messages to: <a href="/hue/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>/attempt_201307091553_002',
-      LinkJobLogs._make_links(' Logging error messages to: job_201307091553_0028/attempt_201307091553_002')
-  )
-  assert_equal(
-      """ pig-<a href="/hue/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>.log""",
-      LinkJobLogs._make_links(' pig-job_201307091553_0028.log')
-  )
-  assert_equal(
-      'MapReduceLauncher  - HadoopJobId: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>. Look at the UI',
-      LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058. Look at the UI')
-  )
+       'job_201306261521_0058</a>') ==
+      LinkJobLogs._make_links('- More information at: http://localhost:50030/jobdetails.jsp?jobid=job_201306261521_0058'))
+  assert (
+      ' Logging error messages to: <a href="/hue/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>/attempt_201307091553_002' ==
+      LinkJobLogs._make_links(' Logging error messages to: job_201307091553_0028/attempt_201307091553_002'))
+  assert (
+      """ pig-<a href="/hue/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>.log""" ==
+      LinkJobLogs._make_links(' pig-job_201307091553_0028.log'))
+  assert (
+      'MapReduceLauncher  - HadoopJobId: <a href="/hue/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>. Look at the UI' ==
+      LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058. Look at the UI'))

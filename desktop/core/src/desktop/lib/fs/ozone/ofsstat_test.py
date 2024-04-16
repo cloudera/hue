@@ -16,12 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from nose.tools import assert_equal
 from desktop.lib.fs.ozone.ofsstat import OzoneFSStat
 
 
 class TestOzoneFSStat(object):
-  def setUp(self):
+  def setup_method(self):
     test_file_status = {
       'pathSuffix': 'testfile.csv', 'type': 'FILE', 'length': 32, 'owner': 'hueadmin', 'group': 'huegroup',
       'permission': '666', 'accessTime': 1677914460588, 'modificationTime': 1677914460588, 'blockSize': 268435456, 'replication': 3}
@@ -32,20 +31,20 @@ class TestOzoneFSStat(object):
 
 
   def test_stat_attributes(self):
-    assert_equal(self.stat.name, 'testfile.csv')
-    assert_equal(self.stat.path, 'ofs://ozone1/gethue/testfile.csv')
-    assert_equal(self.stat.isDir, False)
-    assert_equal(self.stat.type, 'FILE')
-    assert_equal(self.stat.atime, 1677914460)
-    assert_equal(self.stat.mtime, 1677914460)
-    assert_equal(self.stat.user, 'hueadmin')
-    assert_equal(self.stat.group, 'huegroup')
-    assert_equal(self.stat.size, 32)
-    assert_equal(self.stat.blockSize, 268435456)
-    assert_equal(self.stat.replication, 3)
-    assert_equal(self.stat.aclBit, None)
-    assert_equal(self.stat.fileId, None)
-    assert_equal(self.stat.mode, 33206)
+    assert self.stat.name == 'testfile.csv'
+    assert self.stat.path == 'ofs://ozone1/gethue/testfile.csv'
+    assert self.stat.isDir == False
+    assert self.stat.type == 'FILE'
+    assert self.stat.atime == 1677914460
+    assert self.stat.mtime == 1677914460
+    assert self.stat.user == 'hueadmin'
+    assert self.stat.group == 'huegroup'
+    assert self.stat.size == 32
+    assert self.stat.blockSize == 268435456
+    assert self.stat.replication == 3
+    assert self.stat.aclBit == None
+    assert self.stat.fileId == None
+    assert self.stat.mode == 33206
 
 
   def test_to_json_dict(self):
@@ -53,4 +52,4 @@ class TestOzoneFSStat(object):
       'path': 'ofs://ozone1/gethue/testfile.csv', 'size': 32, 'atime': 1677914460, 'mtime': 1677914460, 'mode': 33206, 'user': 'hueadmin',
       'group': 'huegroup', 'blockSize': 268435456, 'replication': 3}
 
-    assert_equal(self.stat.to_json_dict(), expected_json_dict)
+    assert self.stat.to_json_dict() == expected_json_dict

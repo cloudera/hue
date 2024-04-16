@@ -20,8 +20,6 @@ import shutil
 import sys
 import tempfile
 
-from nose.tools import assert_true, assert_equal, assert_false
-
 from sqoop.conf import SQOOP_CONF_DIR
 from sqoop.client.base import SqoopClient
 from sqoop.sqoop_properties import reset
@@ -42,7 +40,7 @@ def test_security_plain():
     reset()
 
     client = SqoopClient('test.com', 'test')
-    assert_false(client._security_enabled)
+    assert not client._security_enabled
   finally:
     reset()
     finish()
@@ -60,7 +58,7 @@ def test_security_kerberos():
     reset()
 
     client = SqoopClient('test.com', 'test')
-    assert_true(client._security_enabled)
+    assert client._security_enabled
   finally:
     reset()
     finish()

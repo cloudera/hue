@@ -22,8 +22,6 @@ import os
 import sys
 import tempfile
 
-from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal, assert_raises
-
 from hadoop import hdfs_site
 
 if sys.version_info[0] > 2:
@@ -58,8 +56,8 @@ def test_hdfs_site():
     finish = conf.HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.set_for_testing(hadoop_home)
     hdfs_site.reset()
 
-    assert_equal(set(hdfs_site.get_nn_sentry_prefixes()), set(['/path/a', '/path/b', '/path/c', '/path/d', '/path/1']))
-    assert_equal(len(hdfs_site.get_nn_sentry_prefixes()), 5)
+    assert set(hdfs_site.get_nn_sentry_prefixes()) == set(['/path/a', '/path/b', '/path/c', '/path/d', '/path/1'])
+    assert len(hdfs_site.get_nn_sentry_prefixes()) == 5
   finally:
     hdfs_site.reset()
     if finish:

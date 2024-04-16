@@ -17,9 +17,8 @@
 # limitations under the License.
 
 import logging
+import pytest
 import sys
-
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false, assert_raises
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.django_test_util import make_logged_in_client
@@ -36,14 +35,16 @@ else:
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestImpalaDaemonApi():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
   def test_get_impala_server_url_when_no_session(self):
-    assert_raises(PopupException, _get_impala_server_url, session=None)
+    with pytest.raises(PopupException):
+      _get_impala_server_url(session=None)
 
 
   def test_digest_auth(self):

@@ -25,12 +25,13 @@ import atexit
 import json
 import logging
 import os
+import pytest
 import subprocess
 import threading
 import time
 
-from nose.tools import assert_true, assert_false
 from django.urls import reverse
+from django.test import TestCase
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
@@ -356,9 +357,8 @@ def verify_history(client, fragment, design=None, reverse=False, server_name='be
   LOG.warning('Cannot find history size. Response context clobbered')
   return -1
 
-
-class BeeswaxSampleProvider(object):
-  integration = True
+@pytest.mark.integration
+class BeeswaxSampleProvider(TestCase):
 
   """
   Setup the test db and install sample data
@@ -407,7 +407,7 @@ class BeeswaxSampleProvider(object):
 
           # Check the cleanup
           databases = db.get_databases()
-          assert_false(db_name in databases)
+          assert not db_name in databases
 
       global _INITIALIZED
       _INITIALIZED = False
