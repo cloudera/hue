@@ -122,7 +122,7 @@ class Cling(object):
                         with open(full_path, "wb") as f: f.write(data)
                         return self.success_no_content(environ, start_response)
                     except:
-                        print (sys.exc_info()[1])
+                        print sys.exc_info()[1]
                         return self.server_error(environ, start_response)
         if environ['REQUEST_METHOD'] not in ('GET', 'HEAD'):
             headers = [('Allow', 'GET, HEAD')]
@@ -148,7 +148,7 @@ class Cling(object):
             else:
                 return ['']
         except (IOError, OSError), e:
-            print (e)
+            print e
             return self.not_found(environ, start_response)
 
     def _full_path(self, path_info):
@@ -280,15 +280,15 @@ def command():
         app = validator(app)
 
     try:
-        print ("Serving %s to http://%s:%d") % (options.rootdir, host, port)
+        print "Serving %s to http://%s:%d" % (options.rootdir, host, port)
         if puttable:
             print("The following paths (relative to server root) may be "+
                   "OVERWRITTEN via HTTP PUT.")
             for p in puttable:
-                print (p)
+                print p
         make_server(host, port, app).serve_forever()
     except KeyboardInterrupt, ki:
-        print ("Ciao, baby!")
+        print "Ciao, baby!"
     except:
         sys.exit("Problem initializing server: %s" % sys.exc_info()[1])
 
