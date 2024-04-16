@@ -15,9 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 import sys
-
-from nose.tools import assert_true, assert_false, assert_equal
 
 from useradmin.models import User
 from desktop.lib.django_test_util import make_logged_in_client
@@ -31,9 +30,10 @@ else:
   from mock import patch, Mock
 
 
+@pytest.mark.django_db
 class TestGetConfigErrors():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -43,7 +43,6 @@ class TestGetConfigErrors():
         appmanager.get_apps_dict.return_value = []  # No oozie app but Oozie URL specified.
         OOZIE_URL_get.return_value = 'http://localhost:11000/oozie'
 
-        assert_equal(
-          [],
-          config_validator(self.user)
-        )
+        assert (
+          [] ==
+          config_validator(self.user))

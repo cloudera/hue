@@ -18,9 +18,8 @@
 
 import logging
 import json
+import pytest
 import sys
-
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.models import Document2
@@ -38,9 +37,10 @@ else:
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestAnalytics(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -55,9 +55,10 @@ class TestAnalytics(object):
       doc.delete()
 
 
+@pytest.mark.django_db
 class TestInstallCustomExamples():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=True, is_admin=True)
     self.user = User.objects.get(username="test")
 
@@ -88,14 +89,13 @@ class TestInstallCustomExamples():
 
         result = install_custom_examples()
 
-        assert_equal(1, len(result))
+        assert 1 == len(result)
         successes, errors = result[0]
 
-        assert_equal([], errors)
-        assert_equal(
-            ['Query Sample: Top salary hive installed.'],
-            successes,
-        )
+        assert [] == errors
+        assert (
+            ['Query Sample: Top salary hive installed.'] ==
+            successes)
     finally:
       for f in finish:
         f()
@@ -106,6 +106,6 @@ class TestInstallCustomExamples():
     try:
       result = install_custom_examples()
 
-      assert_true(result is None, result)
+      assert result is None, result
     finally:
       f()

@@ -19,13 +19,13 @@ from builtins import object
 import atexit
 import logging
 import os
+import pytest
 import socket
 import subprocess
 import threading
 import time
 
 from django.conf import settings
-from nose.plugins.skip import SkipTest
 
 from desktop.lib.paths import get_run_root
 from desktop.lib.rest.http_client import RestException
@@ -41,6 +41,8 @@ service_lock = threading.Lock()
 LOG = logging.getLogger()
 
 
+@pytest.mark.requires_hadoop
+@pytest.mark.integration
 class SqoopServerProvider(object):
   """
   Setup a Sqoop server.
@@ -49,16 +51,13 @@ class SqoopServerProvider(object):
   TEST_SHUTDOWN_PORT = '19081'
   HOME = get_run_root('ext/sqoop/sqoop')
 
-  requires_hadoop = True
-  integration = True
-
   is_running = False
 
   @classmethod
   def setup_class(cls):
 
     if not is_live_cluster():
-      raise SkipTest()
+      pytest.skip("Skipping Test")
 
     cls.cluster = pseudo_hdfs4.shared_cluster()
     cls.client, callback = cls.get_shared_server()

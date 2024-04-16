@@ -15,10 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 import sys
-
-from nose.tools import assert_equal
-
 from desktop.auth.backend import LdapBackend, rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
@@ -28,9 +26,10 @@ if sys.version_info[0] > 2:
 else:
   from mock import patch, Mock
 
+@pytest.mark.django_db
 class TestLdapBackend():
     
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
 
@@ -40,4 +39,4 @@ class TestLdapBackend():
 
       user = LdapBackend().authenticate(request=Mock(), username=Mock(), password=Mock(), server=Mock())
 
-      assert_equal(user, None)
+      assert user == None

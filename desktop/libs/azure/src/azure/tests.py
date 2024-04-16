@@ -14,9 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import pytest
 import unittest
 
-from nose.tools import assert_equal, assert_not_equal
+from django.test import TestCase
 from unittest.mock import patch
 
 from azure import conf
@@ -29,7 +30,7 @@ from desktop.lib.python_util import current_ms_from_utc
 LOG = logging.getLogger()
 
 
-class TestAzureAdl(unittest.TestCase):
+class TestAzureAdl(TestCase):
 
   def test_with_core_site(self):
     try:
@@ -50,8 +51,8 @@ class TestAzureAdl(unittest.TestCase):
               client2 = get_client(name='default', fs='adl', user='test')
 
               provider = get_credential_provider('default', 'hue')
-              assert_equal(provider.get_credentials().get('access_token'), 'access_token')
-              assert_equal(client1, client2) # Should be the same as no support for user based client with credentials & no Expiration
+              assert provider.get_credentials().get('access_token') == 'access_token'
+              assert client1 == client2 # Should be the same as no support for user based client with credentials & no Expiration
     finally:
       for f in finish:
         f()
@@ -75,8 +76,8 @@ class TestAzureAdl(unittest.TestCase):
             client2 = get_client(name='default', fs='adl', user='test')
 
             provider = get_credential_provider('default', 'hue')
-            assert_equal(provider.get_credentials().get('access_token'), 'access_token')
-            assert_equal(client1, client2) # Should be the same as no support for user based client with credentials & no Expiration
+            assert provider.get_credentials().get('access_token') == 'access_token'
+            assert client1 == client2 # Should be the same as no support for user based client with credentials & no Expiration
     finally:
       for f in finish:
         f()
@@ -102,12 +103,12 @@ class TestAzureAdl(unittest.TestCase):
                 get_cab.return_value = {'access_token': 'access_token', 'token_type': 'token_type', 'expires_on': 0}
                 provider = get_credential_provider('default', 'hue')
 
-                assert_equal(provider.get_credentials().get('access_token'), 'access_token')
+                assert provider.get_credentials().get('access_token') == 'access_token'
 
                 client1 = get_client(name='default', fs='adl', user='hue')
                 client2 = get_client(name='default', fs='adl', user='hue')
 
-                assert_not_equal(client1, client2) # Test that with Expiration 0 clients not equal
+                assert client1 != client2 # Test that with Expiration 0 clients not equal
 
                 get_cab.return_value = {
                   'Credentials': {
@@ -118,15 +119,15 @@ class TestAzureAdl(unittest.TestCase):
                 client4 = get_client(name='default', fs='adl', user='hue')
                 client5 = get_client(name='default', fs='adl', user='test')
 
-                assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
-                assert_not_equal(client4, client5) # Test different user have different clients
+                assert client3 == client4 # Test that with 10 sec expiration, clients equal
+                assert client4 != client5 # Test different user have different clients
     finally:
       for f in finish:
         f()
       clear_cache()
 
 
-class TestAzureAbfs(unittest.TestCase):
+class TestAzureAbfs(TestCase):
 
   def test_with_core_site(self):
     try:
@@ -147,8 +148,8 @@ class TestAzureAbfs(unittest.TestCase):
               client2 = get_client(name='default', fs='abfs', user='test')
 
               provider = get_credential_provider('default', 'hue')
-              assert_equal(provider.get_credentials().get('access_token'), 'access_token')
-              assert_equal(client1, client2) # Should be the same as no support for user based client with credentials & no Expiration
+              assert provider.get_credentials().get('access_token') == 'access_token'
+              assert client1 == client2 # Should be the same as no support for user based client with credentials & no Expiration
     finally:
       for f in finish:
         f()
@@ -172,8 +173,8 @@ class TestAzureAbfs(unittest.TestCase):
             client2 = get_client(name='default', fs='abfs', user='test')
 
             provider = get_credential_provider('default', 'hue')
-            assert_equal(provider.get_credentials().get('access_token'), 'access_token')
-            assert_equal(client1, client2) # Should be the same as no support for user based client with credentials & no Expiration
+            assert provider.get_credentials().get('access_token') == 'access_token'
+            assert client1 == client2 # Should be the same as no support for user based client with credentials & no Expiration
     finally:
       for f in finish:
         f()
@@ -199,12 +200,12 @@ class TestAzureAbfs(unittest.TestCase):
                 get_cab.return_value = {'access_token': 'access_token', 'token_type': 'token_type', 'expires_on': 0}
                 provider = get_credential_provider('default', 'hue')
 
-                assert_equal(provider.get_credentials().get('access_token'), 'access_token')
+                assert provider.get_credentials().get('access_token') == 'access_token'
 
                 client1 = get_client(name='default', fs='abfs', user='hue')
                 client2 = get_client(name='default', fs='abfs', user='hue')
 
-                assert_not_equal(client1, client2) # Test that with Expiration 0 clients not equal
+                assert client1 != client2 # Test that with Expiration 0 clients not equal
 
                 get_cab.return_value = {
                   'Credentials': {
@@ -215,8 +216,8 @@ class TestAzureAbfs(unittest.TestCase):
                 client4 = get_client(name='default', fs='abfs', user='hue')
                 client5 = get_client(name='default', fs='abfs', user='test')
 
-                assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
-                assert_not_equal(client4, client5) # Test different user have different clients
+                assert client3 == client4 # Test that with 10 sec expiration, clients equal
+                assert client4 != client5 # Test different user have different clients
     finally:
       for f in finish:
         f()

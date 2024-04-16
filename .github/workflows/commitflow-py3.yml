@@ -10,22 +10,29 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: [3.8, 3.9]
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: run commit title format check
+      run: |
+        ./tools/ci/check_for_commit_message.sh
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Cache pip
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         # This path is specific to Ubuntu
         path: ~/.cache/pip
@@ -36,15 +43,39 @@ jobs:
 
     - name: compile
       run: |
-        python -m pip install --upgrade pip
         sudo apt-get update
-        sudo apt-get install -y python3.8-dev python3.8-venv python3.8-distutils asciidoc libkrb5-dev libldap2-dev libsasl2-dev libsasl2-modules-gssapi-mit libsnappy-dev # This should not be needed as some point
+        sudo apt-get install -y gcc g++ build-essential python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-venv python${{ matrix.python-version }}-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
+        sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
+        sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python${{ matrix.python-version }}
+        sudo apt-get install -y python3-setuptools
+        sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
 
-        export PYTHON_VER=python3.8
+        export PYTHON_VER=python${{ matrix.python-version }}
+        export ROOT=$PWD
         make apps
-
-        make prod
 
     - name: run tests
       run: |
-        PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
+        PYTHONWARNINGS=always ./build/env/bin/pytest
+
+    - name: run python lints
+      run: |
+        ./build/env/bin/pip install pylint==2.5.3 pylint-django==2.3.0 configparser==5.3.0
+        # ./tools/ci/check_for_python_lint.sh
+
+    - name: run documentation lints
+      run: |
+        # Installs to move to image building
+        curl -O https://dl.google.com/go/go1.17.linux-amd64.tar.gz
+        tar -xvf go1.17.linux-amd64.tar.gz
+        export GO111MODULE=on
+        go/bin/go get -u github.com/raviqqe/muffet@v1.5.7
+
+        curl --output hugo_0.69.0_Linux.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-64bit.tar.gz
+        tar -xvf hugo_0.69.0_Linux.tar.gz
+
+        export PATH=$PWD:$HOME/go/bin:$PATH
+
+        # Trigger linting if documentation changes
+        ./tools/ci/check_for_website_dead_links.sh docs/docs-site
+        # ./tools/ci/check_for_website_dead_links.sh docs/gethue

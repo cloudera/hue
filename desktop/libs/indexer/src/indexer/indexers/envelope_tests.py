@@ -17,9 +17,7 @@
 # limitations under the License.
 
 from builtins import object
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
+import pytest
 
 from indexer.indexers.envelope import EnvelopeIndexer
 from useradmin.models import User
@@ -27,8 +25,8 @@ from useradmin.models import User
 
 class TestEnvelope(object):
 
-  def setUp(self):
-    raise SkipTest
+  def setup_method(self):
+    pytest.skip("Skipping Test")
 
 
   def test_generate_from_kafka_to_file_csv(self):
@@ -51,7 +49,7 @@ class TestEnvelope(object):
 
     config = EnvelopeIndexer(username='test').generate_config(properties)
 
-    assert_true('''steps {
+    assert '''steps {
       inputdata {
           input {
               type = kafka
@@ -91,7 +89,7 @@ class TestEnvelope(object):
           }
       }
   }
-  ''' in  config, config)
+  ''' in  config, config
 
 
   def test_generate_from_stream_sfdc_to_hive_table(self):
@@ -113,7 +111,7 @@ class TestEnvelope(object):
 
     config = EnvelopeIndexer(username='test').generate_config(properties)
 
-    assert_true('''steps {
+    assert '''steps {
       inputdata {
           input {
               type = sfdc
@@ -147,7 +145,7 @@ class TestEnvelope(object):
                 table.name = "sfdc"
             }
       }
-  }''' in  config, config)
+  }''' in  config, config
 
 
   def test_generate_from_stream_kafka_to_solr_index(self):
@@ -170,7 +168,7 @@ class TestEnvelope(object):
 
     config = EnvelopeIndexer(username='test').generate_config(properties)
 
-    assert_true('''steps {
+    assert '''steps {
       inputdata {
           input {
               type = kafka
@@ -208,7 +206,7 @@ class TestEnvelope(object):
               collection.name = "traffic"
           }
       }
-  }''' in  config, config)
+  }''' in  config, config
 
 
   def test_generate_from_file_to_kafka(self):
@@ -228,7 +226,7 @@ class TestEnvelope(object):
 
     config = EnvelopeIndexer(username='test').generate_config(properties)
 
-    assert_true('''steps {
+    assert '''steps {
       inputdata {
           input {
               type = filesystem
@@ -259,4 +257,4 @@ class TestEnvelope(object):
           }
       }
   }
-  ''' in  config, config)
+  ''' in  config, config
