@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from nose.tools import assert_equal, assert_raises
+import pytest
 from unittest.mock import patch, Mock
 
 from desktop.lib.rest.raz_http_client import RazHttpClient
@@ -40,7 +40,7 @@ class TestRazHttpClient():
         f = client.execute(http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
 
         url = 'https://gethue.dfs.core.windows.net/gethue/data/customer.csv?action=getStatus'
-        assert_equal('my_file_content', f)
+        assert 'my_file_content' == f
         raz_get_url.assert_called_with(action='GET', path=url, headers=None)
         raz_http_execute.assert_called_with(
             http_method='GET',
@@ -60,7 +60,7 @@ class TestRazHttpClient():
         f = client.execute(http_method='GET', path='/gethue/data/banks (1).csv', params={'action': 'getStatus'})
 
         url = 'https://gethue.dfs.core.windows.net/gethue/data/banks%20%281%29.csv?action=getStatus'
-        assert_equal('my_file_content', f)
+        assert 'my_file_content' == f
         raz_get_url.assert_called_with(action='GET', path=url, headers=None)
         raz_http_execute.assert_called_with(
             http_method='GET',
@@ -243,7 +243,7 @@ class TestRazHttpClient():
 
         raz_get_url.assert_called_with(action='HEAD', path=url, headers=None)
         # Although we are mocking that both times ABFS sends 403 exception but still it retries only twice as per expectation.
-        assert_equal(raz_http_execute.call_count, 2)
+        assert raz_http_execute.call_count == 2
 
         # When ABFS raises exception with code other than 403.
         raz_http_execute.side_effect = WebHdfsException(Mock(response=Mock(status_code=404, text='Error resource not found')))
@@ -251,7 +251,8 @@ class TestRazHttpClient():
         url = 'https://gethue.dfs.core.windows.net/gethue/user/demo?action=getStatus'
 
         # Exception got re-raised for later use.
-        assert_raises(WebHdfsException, client.execute, http_method='HEAD', path='/gethue/user/demo', params={'action': 'getStatus'})
+        with pytest.raises(WebHdfsException):
+          client.execute(http_method='HEAD', path='/gethue/user/demo', params={'action': 'getStatus'})
         raz_get_url.assert_called_with(action='HEAD', path=url, headers=None)
 
 
@@ -262,10 +263,12 @@ class TestRazHttpClient():
       raz_get_url.return_value = None
       client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
 
-      assert_raises(PopupException, client.execute, http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
+      with pytest.raises(PopupException):
+        client.execute(http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
 
       # When no SAS token in response
       raz_get_url.return_value = {}
       client = RazHttpClient(username='test', base_url='https://gethue.blob.core.windows.net')
 
-      assert_raises(PopupException, client.execute, http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})
+      with pytest.raises(PopupException):
+        client.execute(http_method='GET', path='/gethue/data/customer.csv', params={'action': 'getStatus'})

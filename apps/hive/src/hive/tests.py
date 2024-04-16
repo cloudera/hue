@@ -15,22 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import aws
+import pytest
 import sys
 
-import aws
-
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
-
 from desktop.lib.django_test_util import make_logged_in_client
+from unittest.mock import patch, Mock
 
 
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
-
-
+@pytest.mark.django_db
 def test_config_check():
   with patch('beeswax.hive_site.get_metastore_warehouse_dir') as get_metastore_warehouse_dir:
     with patch('aws.s3.s3fs.S3FileSystem._stats') as s3_stat:
@@ -68,7 +61,7 @@ def test_config_check():
           err_msg = 'Failed to access Hive warehouse: %s' % warehouse
           if not isinstance(err_msg, bytes):
             err_msg = err_msg.encode('utf-8')
-          assert_false(err_msg in resp.content, resp)
+          assert not err_msg in resp.content, resp
         finally:
           for old_conf in reset:
             old_conf()

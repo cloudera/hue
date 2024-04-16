@@ -16,6 +16,7 @@
 # limitations under the License.
 from __future__ import unicode_literals
 
+import pytest
 import sys
 
 from django.core import management
@@ -30,24 +31,24 @@ class CmdTests(SimpleTestCase):
       app_name = get_commands()[ldapcmd]
     except:
       app_name = None
-    self.assertIsNotNone(app_name)
+    assert app_name is not None
 
   def runcommand(self):
     old_stdout = sys.stdout
     sys.stdout = out = StringIO()
     try:
-      with self.assertRaises(SystemExit):
+      with pytest.raises(SystemExit):
         management.ManagementUtility(['hue', 'ldaptest']).execute()
     finally:
       sys.stdout = old_stdout
-    self.assertIn("Could not find LDAP_URL server in hue.ini required for authentication", out.getvalue())
+    assert "Could not find LDAP_URL server in hue.ini required for authentication" in out.getvalue()
 
   def handlenoargs(self):
     old_stderr = sys.stderr
     sys.stderr = err = StringIO()
     try:
-      with self.assertRaises(SystemExit):
+      with pytest.raises(SystemExit):
         management.ManagementUtility(['hue', 'ldaptest', '-i']).execute()
     finally:
       sys.stderr = old_stderr
-    self.assertIn("no such option", err.getvalue())
+    assert "no such option" in err.getvalue()

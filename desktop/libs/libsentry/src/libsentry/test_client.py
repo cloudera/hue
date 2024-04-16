@@ -20,8 +20,6 @@ import shutil
 import sys
 import tempfile
 
-from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal, assert_raises
-
 from libsentry import sentry_site
 from libsentry.conf import SENTRY_CONF_DIR
 from libsentry.sentry_site import get_sentry_server_principal,\
@@ -43,14 +41,14 @@ def test_security_plain():
     open_file(os.path.join(tmpdir, 'sentry-site.xml'), 'w').write(xml)
     sentry_site.reset()
 
-    assert_equal('test/test.com@TEST.COM', get_sentry_server_principal())
-    assert_equal(['hive', 'impala', 'hue'], get_sentry_server_admin_groups())
+    assert 'test/test.com@TEST.COM' == get_sentry_server_principal()
+    assert ['hive', 'impala', 'hue'] == get_sentry_server_admin_groups()
 
     security = SentryClient('test.com', 11111, 'test')._get_security()
 
-    assert_equal('test', security['kerberos_principal_short_name'])
-    assert_equal(False, security['use_sasl'])
-    assert_equal('NOSASL', security['mechanism'])
+    assert 'test' == security['kerberos_principal_short_name']
+    assert False == security['use_sasl']
+    assert 'NOSASL' == security['mechanism']
   finally:
     sentry_site.reset()
     finish()
@@ -68,8 +66,8 @@ def test_security_kerberos():
 
     security = SentryClient('test.com', 11111, 'test')._get_security()
 
-    assert_equal(True, security['use_sasl'])
-    assert_equal('GSSAPI', security['mechanism'])
+    assert True == security['use_sasl']
+    assert 'GSSAPI' == security['mechanism']
   finally:
     sentry_site.reset()
     finish()

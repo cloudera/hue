@@ -18,13 +18,13 @@
 from builtins import object
 import json
 import logging
+import pytest
 import sys
 
 from django.urls import reverse
-from nose.tools import assert_true, assert_equal, assert_false, assert_raises
+from django.test import TestCase
 
 from desktop.lib.django_test_util import make_logged_in_client
-
 from impala import conf
 
 if sys.version_info[0] > 2:
@@ -35,9 +35,10 @@ else:
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestImpala(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client()
 
   def test_invalidate(self):
@@ -55,8 +56,8 @@ class TestImpala(object):
         }
       )
 
-      invalidate.assert_called()
+      assert invalidate.called
 
-      assert_equal(response.status_code, 200)
+      assert response.status_code == 200
       content = json.loads(response.content)
-      assert_equal(content['message'], 'Successfully invalidated metadata')
+      assert content['message'] == 'Successfully invalidated metadata'

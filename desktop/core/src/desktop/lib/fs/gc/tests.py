@@ -16,22 +16,19 @@
 from __future__ import absolute_import
 
 import logging
+import pytest
 import unittest
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_not_equal
-
+from django.test import TestCase
 from desktop.conf import is_gs_enabled
-
 from desktop.lib.fsmanager import get_client
 
 LOG = logging.getLogger()
 
 
-class TestGCS(unittest.TestCase):
-  def setUp(self):
+class TestGCS(TestCase):
+  def setup_method(self, method):
     if not is_gs_enabled():
-      raise SkipTest('gs not enabled')
+      pytest.skip('gs not enabled')
 
   def test_with_credentials(self):
     # Simple test that makes sure no errors are thrown.

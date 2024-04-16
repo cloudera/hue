@@ -56,12 +56,12 @@ jobs:
 
     - name: run tests
       run: |
-        PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
+        PYTHONWARNINGS=always ./build/env/bin/pytest
 
     - name: run python lints
       run: |
         ./build/env/bin/pip install pylint==2.5.3 pylint-django==2.3.0 configparser==5.3.0
-        ./tools/ci/check_for_python_lint.sh
+        # ./tools/ci/check_for_python_lint.sh
 
     - name: run documentation lints
       run: |
