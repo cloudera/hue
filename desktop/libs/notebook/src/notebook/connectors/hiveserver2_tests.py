@@ -19,12 +19,10 @@
 from builtins import next, object
 import json
 import logging
+import pytest
 import re
 import sys
 import time
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_raises
 
 from django.urls import reverse
 from TCLIService.ttypes import TStatusCode, TProtocolVersion, TOperationType
@@ -54,6 +52,7 @@ else:
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestApiWithConnectors(object):
 
   NOTEBOOK_JSON = """
@@ -100,9 +99,9 @@ class TestApiWithConnectors(object):
       },
     ]
 
-  def setUp(self):
+  def setup_method(self):
     if not has_connectors():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
 
@@ -164,9 +163,9 @@ class TestApiWithConnectors(object):
 
       get_client.assert_called()
 
-    assert_equal(response.status_code, 200)
+    assert response.status_code == 200
     data = json.loads(response.content)
-    assert_equal(data['status'], 0)
+    assert data['status'] == 0
 
 
   def test_autocomplete_database_impala(self):
@@ -186,10 +185,10 @@ class TestApiWithConnectors(object):
 
       get.assert_called()
 
-    assert_equal(response.status_code, 200)
+    assert response.status_code == 200
     data = json.loads(response.content)
-    assert_equal(data['status'], 0)
-    assert_equal(data['databases'], [{u'comment': u'', u'hdfs_link': u'hdfs://table'}])
+    assert data['status'] == 0
+    assert data['databases'] == [{u'comment': u'', u'hdfs_link': u'hdfs://table'}]
 
 
   def test_sample_data_table_sync_impala(self):
@@ -218,12 +217,12 @@ class TestApiWithConnectors(object):
 
       get.assert_called()
 
-    assert_equal(response.status_code, 200)
+    assert response.status_code == 200
     data = json.loads(response.content)
-    assert_equal(data['status'], 0)
-    assert_equal(data['headers'], ['name'])
-    assert_equal(data['full_headers'], [{'name': 'name'}])
-    assert_equal(data['rows'], [[1], [2]])
+    assert data['status'] == 0
+    assert data['headers'] == ['name']
+    assert data['full_headers'] == [{'name': 'name'}]
+    assert data['rows'] == [[1], [2]]
 
 
   def test_sample_data_table_async_impala(self):
@@ -265,16 +264,17 @@ class TestApiWithConnectors(object):
 
       get.assert_called()
 
-    assert_equal(response.status_code, 200)
+    assert response.status_code == 200
     data = json.loads(response.content)
-    assert_equal(data['status'], 0)
-    assert_equal(data['result']['handle']['secret'], 'server_id')
-    assert_equal(data['result']['handle']['statement'], 'SELECT * from customers')
+    assert data['status'] == 0
+    assert data['result']['handle']['secret'] == 'server_id'
+    assert data['result']['handle']['statement'] == 'SELECT * from customers'
 
 
+@pytest.mark.django_db
 class TestApi():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
 
@@ -293,9 +293,9 @@ class TestApi():
 
         jobs = HS2Api(self.user).get_jobs(notebook, snippet, logs)
 
-        assert_true(jobs, jobs)
-        assert_equal(jobs[0]['name'], 'job_id_00001')
-        assert_equal(jobs[0]['url'], '/jobbrowser/jobs/job_id_00001')
+        assert jobs, jobs
+        assert jobs[0]['name'] == 'job_id_00001'
+        assert jobs[0]['url'] == '/jobbrowser/jobs/job_id_00001'
 
 
   @patch('notebook.connectors.hiveserver2.has_jobbrowser', False)
@@ -312,9 +312,9 @@ class TestApi():
 
         jobs = HS2Api(self.user).get_jobs(notebook, snippet, logs)
 
-        assert_true(jobs, jobs)
-        assert_equal(jobs[0]['name'], 'job_id_00001')
-        assert_equal(jobs[0]['url'], '')  # Is empty
+        assert jobs, jobs
+        assert jobs[0]['name'] == 'job_id_00001'
+        assert jobs[0]['url'] == ''  # Is empty
 
 
   def test_close_statement(self):
@@ -354,7 +354,7 @@ class TestApi():
       api = HS2Api(self.user)
 
       response = api.close_statement(notebook, snippet)
-      assert_equal(response['status'], 0)
+      assert response['status'] == 0
 
       snippet = {
         'id': '7ccdd296-20a3-da33-16ec-db58149aba0b', 'type': 'impala', 'status': 'running',
@@ -373,7 +373,7 @@ class TestApi():
       api = HS2Api(self.user)
       
       response = api.close_statement(notebook, snippet)
-      assert_equal(response['status'], -1)  # snippet['result']['handel'] ['guid'] and ['secret'] are missing
+      assert response['status'] == -1  # snippet['result']['handel'] ['guid'] and ['secret'] are missing
 
 
   def test_get_error_message_from_query(self):
@@ -398,15 +398,15 @@ class TestApi():
 
               api = HS2Api(self.user)
 
-              assert_raises(QueryError, api.execute, notebook, snippet)
+              with pytest.raises(QueryError):
+                api.execute(notebook, snippet)
 
               try:
                 api = api.execute(notebook, snippet)
               except QueryError as e:
-                assert_equal(
-                  e.message,
-                  'Error while compiling statement: FAILED: HiveAccessControlException Permission denied',
-                )
+                assert (
+                  e.message ==
+                  'Error while compiling statement: FAILED: HiveAccessControlException Permission denied')
 
 
   def test_autocomplete_time_out(self):
@@ -423,9 +423,9 @@ class TestApi():
 
       try:
         resp = api.autocomplete(snippet, database='database')
-        assert_false(True)
+        assert not True
       except QueryExpired as e:
-        assert_equal(e.message, "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)")
+        assert e.message == "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)"
 
 
   def test_autocomplete_functions_hive(self):
@@ -441,15 +441,15 @@ class TestApi():
         api = HS2Api(self.user)
         data = api.autocomplete(snippet, operation='functions')
 
-        assert_equal(
-          data['functions'],
-          [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}]
-        )
+        assert (
+          data['functions'] ==
+          [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}])
 
 
+@pytest.mark.django_db
 class TestHiveserver2ApiNonMock(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=False, is_superuser=False)
     self.user = User.objects.get(username='test')
 
@@ -554,22 +554,22 @@ class TestHiveserver2ApiNonMock(object):
     session = json.loads(session_json)
     hql_query = self.api._prepare_hql_query(snippet, statement, session)
 
-    assert_equal([{'key': 'hive.execution.engine', 'value': 'spark'}], hql_query.settings)
-    assert_equal([{'type': 'jar', 'path': '/user/test/myudfs.jar'}], hql_query.file_resources)
-    assert_equal([{'name': 'myUpper', 'class_name': 'org.hue.udf.MyUpper'}], hql_query.functions)
+    assert [{'key': 'hive.execution.engine', 'value': 'spark'}] == hql_query.settings
+    assert [{'type': 'jar', 'path': '/user/test/myudfs.jar'}] == hql_query.file_resources
+    assert [{'name': 'myUpper', 'class_name': 'org.hue.udf.MyUpper'}] == hql_query.functions
 
     config_statements = ', '.join(hql_query.get_configuration_statements())
 
     pattern = re.compile("ADD JAR hdfs://[A-Za-z0-9.:_-]+/user/test/myudfs.jar")
-    assert_true(pattern.search(config_statements), config_statements)
-    assert_true("CREATE TEMPORARY FUNCTION myUpper AS 'org.hue.udf.MyUpper'" in config_statements, config_statements)
+    assert pattern.search(config_statements), config_statements
+    assert "CREATE TEMPORARY FUNCTION myUpper AS 'org.hue.udf.MyUpper'" in config_statements, config_statements
 
 
   def test_upgrade_properties(self):
     properties = None
     # Verify that upgrade will return defaults if current properties not formatted as settings
     upgraded_props = self.api.upgrade_properties(lang='hive', properties=properties)
-    assert_equal(upgraded_props, self.api.get_properties(lang='hive'))
+    assert upgraded_props == self.api.get_properties(lang='hive')
 
     # Verify that upgrade will save old properties and new settings
     properties = [
@@ -584,7 +584,7 @@ class TestHiveserver2ApiNonMock(object):
     ]
     upgraded_props = self.api.upgrade_properties(lang='hive', properties=properties)
     settings = next((prop for prop in upgraded_props if prop['key'] == 'settings'), None)
-    assert_equal(settings['value'], properties)
+    assert settings['value'] == properties
 
     # Verify that already upgraded properties will be unchanged
     properties = [
@@ -626,7 +626,7 @@ class TestHiveserver2ApiNonMock(object):
         }
     ]
     upgraded_props = self.api.upgrade_properties(lang='hive', properties=properties)
-    assert_equal(upgraded_props, properties)
+    assert upgraded_props == properties
 
 
   def test_progress(self):
@@ -686,7 +686,7 @@ class TestHiveserver2ApiNonMock(object):
         INFO  : The url to track the job: http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
     """
 
-    assert_equal(self.api.progress({}, snippet, logs=logs), 5)
+    assert self.api.progress({}, snippet, logs=logs) == 5
 
     logs += """INFO  : Starting Job = job_1466104358744_0003, Tracking URL = """\
       """http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
@@ -699,7 +699,7 @@ class TestHiveserver2ApiNonMock(object):
         INFO  : Ended Job = job_1466104358744_0003
     """
 
-    assert_equal(self.api.progress({}, snippet, logs=logs), 50)
+    assert self.api.progress({}, snippet, logs=logs) == 50
 
     snippet = json.loads("""
         {
@@ -728,7 +728,7 @@ class TestHiveserver2ApiNonMock(object):
 
     logs = "Query 734a81444c85be66:d05f3bb1a6c2d0a5: 0% Complete (1 out of 4693)"
 
-    assert_equal(self.api.progress({}, snippet, logs=logs), 0)
+    assert self.api.progress({}, snippet, logs=logs) == 0
 
     logs += """Query 734a81444c85be66:d05f3bb1a6c2d0a5: 20% Complete (4 out of 4693)
 
@@ -739,7 +739,7 @@ class TestHiveserver2ApiNonMock(object):
     Query 734a81444c85be66:d05f3bb1a6c2d0a5: 50% Complete (234 out of 4693)
     """
 
-    assert_equal(self.api.progress({}, snippet, logs=logs), 50)
+    assert self.api.progress({}, snippet, logs=logs) == 50
 
 
   def test_get_jobs(self):
@@ -815,12 +815,12 @@ class TestHiveserver2ApiNonMock(object):
     """
 
     jobs = self.api.get_jobs(notebook, snippet, logs)
-    assert_true(isinstance(jobs, list))
-    assert_true(len(jobs), 1)
-    assert_equal(jobs[0]['name'], 'job_1466630204796_0059')
-    assert_equal(jobs[0]['started'], True)
-    assert_equal(jobs[0]['finished'], False)
-    assert_true('url' in jobs[0])
+    assert isinstance(jobs, list)
+    assert len(jobs), 1
+    assert jobs[0]['name'] == 'job_1466630204796_0059'
+    assert jobs[0]['started'] == True
+    assert jobs[0]['finished'] == False
+    assert 'url' in jobs[0]
 
     logs += """INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
         INFO  : 2016-06-24 15:55:51,125 Stage-1 map = 0%,  reduce = 0%
@@ -833,10 +833,10 @@ class TestHiveserver2ApiNonMock(object):
 
 
     jobs = self.api.get_jobs(notebook, snippet, logs)
-    assert_true(len(jobs), 1)
-    assert_equal(jobs[0]['name'], 'job_1466630204796_0059')
-    assert_equal(jobs[0]['started'], True)
-    assert_equal(jobs[0]['finished'], True)
+    assert len(jobs), 1
+    assert jobs[0]['name'] == 'job_1466630204796_0059'
+    assert jobs[0]['started'] == True
+    assert jobs[0]['finished'] == True
 
 
   def test_get_current_statement(self):
@@ -867,7 +867,7 @@ class TestHiveserver2ApiNonMock(object):
 
     statement = self.api._get_current_statement(MockDb(), snippet)
 
-    assert_equal('086ecec9a8b89b1b47cce358bdbb343be23b1f8b54ca76bc81927e27', statement['previous_statement_hash'])
+    assert '086ecec9a8b89b1b47cce358bdbb343be23b1f8b54ca76bc81927e27' == statement['previous_statement_hash']
 
 
   def test_plan_extraction_from_profile(self):
@@ -875,26 +875,26 @@ class TestHiveserver2ApiNonMock(object):
       query_id='e147228183f1f0b3:6f086cc600000000', profile=IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE
     )
 
-    assert_true(query_plan)
-    assert_equal(IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN, query_plan)
+    assert query_plan
+    assert IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE_PLAN == query_plan
 
 
 def MockDb():
   def close_operation(handle): pass
 
 
+@pytest.mark.integration
 class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
-  integration = True
 
   @classmethod
   def setup_class(cls):
     if not is_live_cluster():
-      raise SkipTest('These tests can only run on a live cluster')
+      pytest.skip('These tests can only run on a live cluster')
 
     super(TestHiveserver2ApiWithHadoop, cls).setup_class(load_data=False)
 
 
-  def setUp(self):
+  def setup_method(self):
     self.client.post('/beeswax/install_examples')
 
     self.user = User.objects.get(username='test')
@@ -986,15 +986,15 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     response = self.client.post(reverse('notebook:execute'),
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
+    assert 0 == data['status'], data
 
     snippet['result']['handle'] = data['handle']
 
     response = self.client.post(reverse('notebook:get_logs'),
                                   {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_true("SELECT * FROM sample_07 WHERE code='한'" in smart_str(data['logs']))
+    assert 0 == data['status'], data
+    assert "SELECT * FROM sample_07 WHERE code='한'" in smart_str(data['logs'])
 
 
   def test_get_current_statement(self):
@@ -1008,12 +1008,12 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
-    assert_equal(0, data['status'], data)
-    assert_equal(0, data['handle']['statement_id'], data)
-    assert_equal(2, data['handle']['statements_count'], data)
-    assert_equal(True, data['handle']['has_more_statements'], data)
-    assert_equal({'row': 0, 'column': 0}, data['handle']['start'], data)
-    assert_equal({'row': 0, 'column': 51}, data['handle']['end'], data)
+    assert 0 == data['status'], data
+    assert 0 == data['handle']['statement_id'], data
+    assert 2 == data['handle']['statements_count'], data
+    assert True == data['handle']['has_more_statements'], data
+    assert {'row': 0, 'column': 0} == data['handle']['start'], data
+    assert {'row': 0, 'column': 51} == data['handle']['end'], data
 
     snippet['result']['handle'] = data['handle']
 
@@ -1021,12 +1021,12 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
-    assert_equal(0, data['status'], data)
-    assert_equal(1, data['handle']['statement_id'], data)
-    assert_equal(2, data['handle']['statements_count'], data)
-    assert_equal(False, data['handle']['has_more_statements'], data)
-    assert_equal({'row': 1, 'column': 0}, data['handle']['start'], data)
-    assert_equal({'row': 1, 'column': 33}, data['handle']['end'], data)
+    assert 0 == data['status'], data
+    assert 1 == data['handle']['statement_id'], data
+    assert 2 == data['handle']['statements_count'], data
+    assert False == data['handle']['has_more_statements'], data
+    assert {'row': 1, 'column': 0} == data['handle']['start'], data
+    assert {'row': 1, 'column': 33} == data['handle']['end'], data
 
 
   def test_explain(self):
@@ -1042,9 +1042,9 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
     data = json.loads(response.content)
 
-    assert_equal(0, data['status'], data)
-    assert_true('STAGE DEPENDENCIES' in data['explanation'], data)
-    assert_equal(self.statement, data['statement'], data)
+    assert 0 == data['status'], data
+    assert 'STAGE DEPENDENCIES' in data['explanation'], data
+    assert self.statement == data['statement'], data
 
 
   def test_download(self):
@@ -1057,8 +1057,8 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     response = self.client.post(reverse('notebook:download'),
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet), 'format': 'csv'})
 
-    assert_equal(200, response.status_code)
-    assert_equal(('Content-Disposition', 'attachment; filename="Test Query.csv"'), response._headers['content-disposition'])
+    assert 200 == response.status_code
+    assert ('Content-Disposition', 'attachment; filename="Test Query.csv"') == response._headers['content-disposition']
 
 
   def test_get_sample(self):
@@ -1071,26 +1071,26 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
       {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
-    assert_equal(0, data['status'], data)
-    assert_true('headers' in data)
-    assert_true('rows' in data)
-    assert_true(len(data['rows']) > 0)
+    assert 0 == data['status'], data
+    assert 'headers' in data
+    assert 'rows' in data
+    assert len(data['rows']) > 0
 
     response = self.client.post(reverse('notebook:api_sample_data_column',
       kwargs={'database': 'default', 'table': 'sample_07', 'column': 'code'}),
       {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
 
-    assert_equal(0, data['status'], data)
-    assert_true('headers' in data)
-    assert_equal(['code'], data['headers'])
-    assert_true('rows' in data)
-    assert_true(len(data['rows']) > 0)
+    assert 0 == data['status'], data
+    assert 'headers' in data
+    assert ['code'] == data['headers']
+    assert 'rows' in data
+    assert len(data['rows']) > 0
 
 
   def test_fetch_result_size_mr(self):
     if not is_live_cluster():  # Mini-cluster does not have JHS
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     # Assert that a query with no job will return no rows or size
     statement = "SELECT 'hello world';"
@@ -1109,12 +1109,12 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
 
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_true('result' in data)
-    assert_true('rows' in data['result'])
-    assert_true('size' in data['result'])
-    assert_equal(None, data['result']['rows'])
-    assert_equal(None, data['result']['size'])
+    assert 0 == data['status'], data
+    assert 'result' in data
+    assert 'rows' in data['result']
+    assert 'size' in data['result']
+    assert None == data['result']['rows']
+    assert None == data['result']['size']
 
     # Assert that a query with map & reduce task returns rows
     statement = "SELECT DISTINCT code FROM sample_07;"
@@ -1126,12 +1126,12 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
 
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_true('result' in data)
-    assert_true('rows' in data['result'])
-    assert_true('size' in data['result'])
-    assert_equal(823, data['result']['rows'])
-    assert_true(data['result']['size'] > 0, data['result'])
+    assert 0 == data['status'], data
+    assert 'result' in data
+    assert 'rows' in data['result']
+    assert 'size' in data['result']
+    assert 823 == data['result']['rows']
+    assert data['result']['size'] > 0, data['result']
 
     # Assert that a query with multiple jobs returns rows
     statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
@@ -1143,16 +1143,16 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
 
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_true('result' in data)
-    assert_true('rows' in data['result'])
-    assert_equal(23, data['result']['rows'])
-    assert_true(data['result']['size'] > 0, data['result'])
+    assert 0 == data['status'], data
+    assert 'result' in data
+    assert 'rows' in data['result']
+    assert 23 == data['result']['rows']
+    assert data['result']['size'] > 0, data['result']
 
 
   def test_fetch_result_size_spark(self):
     if not is_live_cluster() or not is_hive_on_spark():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     # TODO: Add session cleanup here so we don't have orphan spark sessions
 
@@ -1173,12 +1173,12 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
 
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_true('result' in data)
-    assert_true('rows' in data['result'])
-    assert_true('size' in data['result'])
-    assert_equal(None, data['result']['rows'])
-    assert_equal(None, data['result']['size'])
+    assert 0 == data['status'], data
+    assert 'result' in data
+    assert 'rows' in data['result']
+    assert 'size' in data['result']
+    assert None == data['result']['rows']
+    assert None == data['result']['size']
 
     # Assert that a query that runs a job will return rows and size
     statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
@@ -1190,17 +1190,17 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
 
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_true('result' in data)
-    assert_true('rows' in data['result'])
-    assert_true('size' in data['result'])
-    assert_equal(23, data['result']['rows'])
-    assert_true(data['result']['size'] > 0)
+    assert 0 == data['status'], data
+    assert 'result' in data
+    assert 'rows' in data['result']
+    assert 'size' in data['result']
+    assert 23 == data['result']['rows']
+    assert data['result']['size'] > 0
 
 
   def test_fetch_result_size_impala(self):
     if not is_live_cluster():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     # Create session so that session object is saved to DB for server URL lookup
     session = self.api.create_session(lang='impala')
@@ -1219,12 +1219,12 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                   {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
 
       data = json.loads(response.content)
-      assert_equal(0, data['status'], data)
-      assert_true('result' in data)
-      assert_true('rows' in data['result'])
-      assert_true('size' in data['result'])
-      assert_equal(23, data['result']['rows'])
-      assert_equal(None, data['result']['size'])
+      assert 0 == data['status'], data
+      assert 'result' in data
+      assert 'rows' in data['result']
+      assert 'size' in data['result']
+      assert 23 == data['result']['rows']
+      assert None == data['result']['size']
 
       # Assert that selecting all from partitioned table works
       statement = "SELECT * FROM web_logs;"
@@ -1239,17 +1239,17 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                  {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
 
       data = json.loads(response.content)
-      assert_equal(0, data['status'], data)
-      assert_true('result' in data)
-      assert_true('rows' in data['result'])
-      assert_equal(1000, data['result']['rows'])
+      assert 0 == data['status'], data
+      assert 'result' in data
+      assert 'rows' in data['result']
+      assert 1000 == data['result']['rows']
     finally:
       self.api.close_session(session)
 
 
   def test_fetch_result_abbreviated(self):
     if not is_live_cluster():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     # Create session so that session object is saved to DB for server URL lookup
     session = self.api.create_session(lang='impala')
@@ -1269,10 +1269,10 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                   {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
 
       data = json.loads(response.content)
-      assert_equal(0, data['status'], data)
-      assert_true('result' in data)
-      assert_true('rows' in data['result'])
-      assert_equal(1000, data['result']['rows'])
+      assert 0 == data['status'], data
+      assert 'result' in data
+      assert 'rows' in data['result']
+      assert 1000 == data['result']['rows']
     finally:
       self.api.close_session(session)
 

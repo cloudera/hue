@@ -17,10 +17,10 @@
 # limitations under the License.
 
 import logging
+import pytest
 import sys
 
 from celery import states
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
@@ -38,9 +38,10 @@ LOG = logging.getLogger()
 
 
 
+@pytest.mark.django_db
 class TestRunAsyncQueryTask():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -70,7 +71,7 @@ class TestRunAsyncQueryTask():
 
               meta = download_to_file(notebook, snippet)
 
-              assert_equal(meta['row_counter'], 2, meta)
+              assert meta['row_counter'] == 2, meta
 
 
   def test_close_statement(self):
@@ -93,7 +94,7 @@ class TestRunAsyncQueryTask():
 
             response = close_statement(notebook, snippet)
 
-            assert_equal(response, {'status': 0})
+            assert response == {'status': 0}
 
 
   def test_get_log(self):
@@ -114,13 +115,14 @@ class TestRunAsyncQueryTask():
 
         response = get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id=None)
 
-        assert_equal(response, '')
+        assert response == ''
 
 
 
+@pytest.mark.django_db
 class TestRunSyncQueryTask():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -146,4 +148,4 @@ class TestRunSyncQueryTask():
 
             task = run_sync_query(query, self.user)
 
-            assert_equal(task, {'history_uuid': '1', 'uuid': '1'})
+            assert task == {'history_uuid': '1', 'uuid': '1'}

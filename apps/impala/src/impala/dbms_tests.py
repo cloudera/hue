@@ -17,10 +17,8 @@
 
 import json
 import logging
+import pytest
 import sys
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_equal, assert_false, assert_raises
 
 from django.urls import reverse
 
@@ -39,10 +37,10 @@ else:
 
 LOG = logging.getLogger()
 
-
+@pytest.mark.django_db
 class TestDbms():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client()
 
 
@@ -59,4 +57,4 @@ class TestDbms():
       has_connectors.return_value = True
 
       config = get_query_server_config(connector)
-      assert_true('impersonation_enabled' in config, config)
+      assert 'impersonation_enabled' in config, config

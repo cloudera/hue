@@ -18,10 +18,7 @@
 from builtins import object
 import logging
 
-from nose.tools import assert_equal, assert_true
-
 import beeswax.conf
-
 from liboozie.credentials import Credentials
 
 
@@ -45,12 +42,11 @@ class TestCredentials(object):
 
     creds = Credentials()
 
-    assert_equal({
+    assert {
         'hive2': 'org.apache.oozie.action.hadoop.Hive2Credentials',
         'hbase': 'org.apache.oozie.action.hadoop.HbaseCredentials',
         'hcat': 'org.apache.oozie.action.hadoop.HCatCredentials'
-      }, creds._parse_oozie(oozie_config)
-    )
+      } == creds._parse_oozie(oozie_config)
 
   def test_gen_properties(self):
     creds = Credentials(credentials=TestCredentials.CREDENTIALS.copy())
@@ -67,7 +63,7 @@ class TestCredentials(object):
     )
 
     try:
-      assert_equal({
+      assert {
           'hcat': {
             'xml_name': 'hcat',
             'properties': [
@@ -84,7 +80,7 @@ class TestCredentials(object):
              'xml_name': 'hbase',
              'properties': []
           }
-        }, creds.get_properties(hive_properties))
+        } == creds.get_properties(hive_properties)
     finally:
       for f in finish:
         f()

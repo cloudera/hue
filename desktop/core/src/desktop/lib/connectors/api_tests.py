@@ -17,12 +17,11 @@
 # limitations under the License.
 
 import json
+import pytest
 import sys
 import unittest
 
 from django.urls import reverse
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user, is_admin
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_ORGANIZATIONS
@@ -38,20 +37,21 @@ else:
   from mock import patch, Mock
 
 
+@pytest.mark.django_db
 class TestApi(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="admin_test_connector", recreate=True, is_superuser=False, is_admin=True)
     self.user = User.objects.get(username="admin_test_connector")
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     cls._class_resets = [
       ENABLE_CONNECTORS.set_for_testing(True),
     ]
 
   @classmethod
-  def tearDownClass(cls):
+  def teardown_class(cls):
     for reset in cls._class_resets:
       reset()
 
@@ -67,10 +67,8 @@ class TestApi(object):
         )
         data = json.loads(response.content)
 
-        assert_equal(200, response.status_code)
-        assert_equal(
+        assert 200 == response.status_code
+        assert (
             'Added connectors: Connector 1. '
-            'Already installed connectors: Connector 2',
-            data['message'],
-            data
-        )
+            'Already installed connectors: Connector 2' ==
+            data['message']), data

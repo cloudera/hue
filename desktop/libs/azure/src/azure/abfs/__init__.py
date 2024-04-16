@@ -23,7 +23,6 @@ import tempfile
 import posixpath
 import time
 
-from nose.tools import assert_not_equal
 from hadoop.fs import normpath as fs_normpath
 from azure.conf import get_default_abfs_fs
 
@@ -76,7 +75,8 @@ def strip_scheme(path):
     filesystem, file_path = parse_uri(path)[:2]
   except:
     return path
-  assert_not_equal(filesystem, '', 'File System must be Specified')
+  #@Todo@ to check the use of assert here
+  assert filesystem != '', 'File System must be Specified'
   path = filesystem + '/' + file_path
   return path
 
@@ -201,5 +201,6 @@ def abfsdatetime_to_timestamp(datetime):
   # `'z' is a bad directive in format ...` error (see https://bugs.python.org/issue6641),
   #LOG.debug("%s" %datetime)
   stripped = time.strptime(datetime[:-4], '%a, %d %b %Y %H:%M:%S')
+  #@Todo@ to check the use of assert here
   assert datetime[-4:] == ' GMT', 'Time [%s] is not in GMT.' % datetime
   return int(calendar.timegm(stripped))

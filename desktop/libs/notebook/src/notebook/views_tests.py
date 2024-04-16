@@ -18,10 +18,10 @@
 
 import logging
 import json
+import pytest
 import sys
 
 from django.urls import reverse
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.connectors.models import Connector
@@ -36,9 +36,10 @@ else:
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestInstallExamples():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=True, is_admin=True)
     self.user = User.objects.get(username="test")
 
@@ -70,14 +71,12 @@ class TestInstallExamples():
             resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default', 'dialect': 'mysql'})
             data = json.loads(resp.content)
 
-            assert_equal(0, data['status'], data)
-            assert_equal(
+            assert 0 == data['status'], data
+            assert (
                 'Query Sample: Salary Analysis mysql installed. '
-                'Table default.employe_sample installed.',
-                data['message'],
-                data
-            )
-            assert_equal('', data['errorMessage'], data)
+                'Table default.employe_sample installed.' ==
+                data['message']), data
+            assert '' == data['errorMessage'], data
 
             make_notebook.assert_called()
 
@@ -116,8 +115,8 @@ class TestInstallExamples():
                 resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default'})
                 data = json.loads(resp.content)
 
-                assert_equal(0, data['status'], data)
-                assert_equal(
+                assert 0 == data['status'], data
+                assert (
                     'Query Sample: Top salary hive installed. '
                     'Query Sample: Salary growth hive installed. '
                     'Query Sample: Job loss hive installed. '
@@ -125,11 +124,9 @@ class TestInstallExamples():
                     'Table default.sample_07 installed. '
                     'Table default.sample_08 installed. '
                     'Table default.customers installed. '
-                    'Table default.web_logs installed.',
-                    data['message'],
-                    data
-                )
-                assert_equal('', data['errorMessage'], data)
+                    'Table default.web_logs installed.' ==
+                    data['message']), data
+                assert '' == data['errorMessage'], data
 
                 make_notebook.assert_called()
 
@@ -166,8 +163,8 @@ class TestInstallExamples():
               resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default'})
               data = json.loads(resp.content)
 
-              assert_equal(0, data['status'], data)
-              assert_equal(
+              assert 0 == data['status'], data
+              assert (
                   'Query Sample: Top salary hive installed. '
                   'Query Sample: Salary growth hive installed. '
                   'Query Sample: Job loss hive installed. '
@@ -175,10 +172,8 @@ class TestInstallExamples():
                   'Table default.sample_07 installed. '
                   'Table default.sample_08 installed. '
                   # 'Table default.customers installed. '  # Not supported via INSERT yet
-                  'Table default.web_logs installed.',
-                  data['message'],
-                  data
-              )
-              assert_equal('', data['errorMessage'], data)
+                  'Table default.web_logs installed.' ==
+                  data['message']), data
+              assert '' == data['errorMessage'], data
 
               make_notebook.assert_called()

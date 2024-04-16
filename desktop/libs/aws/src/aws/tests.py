@@ -16,10 +16,9 @@
 import logging
 import unittest
 
-from nose.tools import assert_equal, assert_true, assert_not_equal
-
 from aws import conf
 from aws.client import Client, get_credential_provider
+from django.test import TestCase
 
 from desktop.lib.fsmanager import get_client, clear_cache
 from desktop.lib.python_util import current_ms_from_utc
@@ -31,7 +30,7 @@ from unittest.mock import patch
 LOG = logging.getLogger()
 
 
-class TestAWS(unittest.TestCase):
+class TestAWS(TestCase):
   def test_with_credentials(self):
     try:
       finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'access_key_id': 'access_key_id', 'secret_access_key': 'secret_access_key'}})
@@ -42,8 +41,8 @@ class TestAWS(unittest.TestCase):
           client2 = get_client(name='default', fs='s3a', user='test')
 
           provider = get_credential_provider('default', 'hue')
-          assert_equal(provider.get_credentials().get('AccessKeyId'), conf.AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get())
-          assert_equal(client1, client2) # Should be the same as no support for user based client with credentials & no Expiration
+          assert provider.get_credentials().get('AccessKeyId') == conf.AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get()
+          assert client1 == client2 # Should be the same as no support for user based client with credentials & no Expiration
     finally:
       finish()
       clear_cache()
@@ -68,12 +67,12 @@ class TestAWS(unittest.TestCase):
                 has_iam_metadata.return_value = True
                 provider = get_credential_provider('default', 'hue')
 
-                assert_equal(provider.get_credentials().get('AccessKeyId'), 'AccessKeyId')
+                assert provider.get_credentials().get('AccessKeyId') == 'AccessKeyId'
 
                 client1 = get_client(name='default', fs='s3a', user='hue')
                 client2 = get_client(name='default', fs='s3a', user='hue')
 
-                assert_not_equal(client1, client2) # Test that with Expiration 0 clients not equal
+                assert client1 != client2 # Test that with Expiration 0 clients not equal
 
                 get_cab.return_value = {
                   'Credentials': {'AccessKeyId': 'AccessKeyId', 'Expiration': int(current_ms_from_utc()) + 10*1000}
@@ -82,8 +81,8 @@ class TestAWS(unittest.TestCase):
                 client4 = get_client(name='default', fs='s3a', user='hue')
                 client5 = get_client(name='default', fs='s3a', user='test')
 
-                assert_equal(client3, client4) # Test that with 10 sec expiration, clients equal
-                assert_not_equal(client4, client5) # Test different user have different clients
+                assert client3 == client4 # Test that with 10 sec expiration, clients equal
+                assert client4 != client5 # Test different user have different clients
     finally:
       finish()
       clear_cache()
@@ -108,10 +107,10 @@ class TestAWS(unittest.TestCase):
                 has_iam_metadata.return_value = True
 
                 provider = get_credential_provider('default', 'hue')
-                assert_equal(provider.get_credentials().get('AccessKeyId'), 'AccessKeyId')
+                assert provider.get_credentials().get('AccessKeyId') == 'AccessKeyId'
 
                 client = Client.from_config(conf.AWS_ACCOUNTS['default'], get_credential_provider('default', 'hue'))
-                assert_equal(client._region, 'ap-northeast-1')
+                assert client._region == 'ap-northeast-1'
     finally:
       finish()
       clear_cache()
@@ -138,7 +137,7 @@ class TestAWS(unittest.TestCase):
                   has_iam_metadata.return_value = True
                   client = Client.from_config(None, get_credential_provider('default', 'hue'))
 
-                  assert_equal(client._region, 'us-west-1') # Test different user have different clients
+                  assert client._region == 'us-west-1' # Test different user have different clients
     finally:
       finish()
       clear_cache()
@@ -158,7 +157,7 @@ class TestAWS(unittest.TestCase):
 
       try:
         client = get_client(name='default', fs='s3a', user='hue')
-        assert_true(client)
+        assert client
       finally:
         for reset in resets:
           reset()

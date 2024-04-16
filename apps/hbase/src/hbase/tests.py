@@ -21,10 +21,10 @@ import os
 import shutil
 import sys
 import tempfile
+import pytest
 
-from nose.tools import assert_true, assert_equal
-from nose.plugins.skip import SkipTest
 from django.urls import reverse
+from django.test import TestCase
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
@@ -50,13 +50,13 @@ def test_security_plain():
     open_file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
     reset()
 
-    assert_equal('NOSASL', get_server_authentication())
-    assert_equal('test', get_server_principal())
+    assert 'NOSASL' == get_server_authentication()
+    assert 'test' == get_server_principal()
 
     security = HbaseApi._get_security()
 
-    assert_equal('test', security['kerberos_principal_short_name'])
-    assert_equal(False, security['use_sasl'])
+    assert 'test' == security['kerberos_principal_short_name']
+    assert False == security['use_sasl']
   finally:
     reset()
     finish()
@@ -72,13 +72,13 @@ def test_security_kerberos():
     open_file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
     reset()
 
-    assert_equal('KERBEROS', get_server_authentication())
-    assert_equal('test', get_server_principal())
+    assert 'KERBEROS' == get_server_authentication()
+    assert 'test' == get_server_principal()
 
     security = HbaseApi._get_security()
 
-    assert_equal('test', security['kerberos_principal_short_name'])
-    assert_equal(True, security['use_sasl'])
+    assert 'test' == security['kerberos_principal_short_name']
+    assert True == security['use_sasl']
   finally:
     reset()
     finish()
@@ -113,7 +113,7 @@ def test_impersonation_is_decorator_is_there():
   # Decorator is still there
   from hbased.Hbase import do_as
 
-
+@pytest.mark.django_db
 def test_impersonation():
   from hbased import Hbase as thrift_hbase
 
@@ -134,7 +134,7 @@ def test_impersonation():
   finally:
     get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = impersonation_enabled
 
-  assert_equal({}, proto.get_headers())
+  assert {} == proto.get_headers()
 
 
   get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = 'TRUE'
@@ -146,7 +146,7 @@ def test_impersonation():
   finally:
     get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = impersonation_enabled
 
-  assert_equal({'doAs': u'test_hbase'}, proto.get_headers())
+  assert {'doAs': u'test_hbase'} == proto.get_headers()
 
 
 
@@ -172,15 +172,14 @@ class MockProtocol(object):
     return self.trans._TBufferedTransport__trans.headers
 
 
-
-class TestIntegrationWithHBase(object):
-  integration = True
+@pytest.mark.integration
+class TestIntegrationWithHBase(TestCase):
 
   @classmethod
   def setup_class(cls):
 
     if not is_live_cluster():
-      raise SkipTest('These tests can only run on a live cluster')
+      pytest.skip('These tests can only run on a live cluster')
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
@@ -190,9 +189,9 @@ class TestIntegrationWithHBase(object):
 
   def test_list_tables(self):
     if not is_live_cluster():
-      raise SkipTest('HUE-2910: Skipping because test is not reentrant')
+      pytest.skip('HUE-2910: Skipping because test is not reentrant')
 
     for cluster in HbaseApi(self.user).getClusters():
       resp = self.client.post('/hbase/api/getTableList/' + cluster['name'])
       content = json.loads(resp.content)
-      assert_true('data' in content, content)
+      assert 'data' in content, content

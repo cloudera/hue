@@ -14,9 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import pytest
 import unittest
 
-from nose.tools import assert_equal, assert_raises
+from django.test import TestCase
 from unittest.mock import Mock, patch
 
 from desktop.lib.idbroker.client import IDBroker
@@ -27,7 +28,7 @@ from desktop.lib.exceptions_renderable import PopupException
 LOG = logging.getLogger()
 
 
-class TestIDBrokerClient(unittest.TestCase):
+class TestIDBrokerClient(TestCase):
   def test_username_authentication(self):
     with patch('desktop.lib.idbroker.conf.get_conf') as conf:
       with patch('desktop.lib.idbroker.client.resource.Resource.invoke') as invoke:
@@ -48,9 +49,9 @@ class TestIDBrokerClient(unittest.TestCase):
             client = IDBroker.from_core_site('s3a', 'test')
             cab = client.get_cab()
 
-            assert_equal(invoke.call_count, 2) # get_cab calls twice
-            assert_equal(cab.get('Credentials'), 'Credentials')
-            assert_equal(set_basic_auth.call_count, 1)
+            assert invoke.call_count == 2 # get_cab calls twice
+            assert cab.get('Credentials') == 'Credentials'
+            assert set_basic_auth.call_count == 1
 
 
   def test_kerberos_authentication(self):
@@ -74,9 +75,9 @@ class TestIDBrokerClient(unittest.TestCase):
               client = IDBroker.from_core_site('s3a', 'test')
               cab = client.get_cab()
 
-              assert_equal(invoke.call_count, 2) # get_cab calls twice
-              assert_equal(cab.get('Credentials'), 'Credentials')
-              assert_equal(set_kerberos_auth.call_count, 1)
+              assert invoke.call_count == 2 # get_cab calls twice
+              assert cab.get('Credentials') == 'Credentials'
+              assert set_kerberos_auth.call_count == 1
 
 
   def test_no_idbroker_address_found(self):
@@ -90,11 +91,12 @@ class TestIDBrokerClient(unittest.TestCase):
 
         # No active IDBroker URL available
         get_cab_address.return_value = None
-        assert_raises(PopupException, IDBroker.from_core_site, 's3a', 'test')
+        with pytest.raises(PopupException):
+          IDBroker.from_core_site('s3a', 'test')
 
 
 
-class TestIDBrokerHA(unittest.TestCase):
+class TestIDBrokerHA(TestCase):
   def test_idbroker_non_ha(self):
     with patch('desktop.lib.idbroker.conf.get_conf') as conf:
       with patch('desktop.lib.idbroker.conf.requests.get') as requests_get:
@@ -102,8 +104,8 @@ class TestIDBrokerHA(unittest.TestCase):
         requests_get.return_value = Mock(status_code=200)
 
         idbroker_url = _handle_idbroker_ha(fs='s3a')
-        assert_equal(idbroker_url, 'https://idbroker0.gethue.com:8444/gateway')
-        assert_equal(requests_get.call_count, 1)
+        assert idbroker_url == 'https://idbroker0.gethue.com:8444/gateway'
+        assert requests_get.call_count == 1
 
 
   def test_idbroker_ha(self):
@@ -117,8 +119,8 @@ class TestIDBrokerHA(unittest.TestCase):
         requests_get.side_effect = [Mock(status_code=200), Mock(status_code=404)]
         idbroker_url = _handle_idbroker_ha(fs='s3a')
 
-        assert_equal(idbroker_url, 'https://idbroker0.gethue.com:8444/gateway')
-        assert_equal(requests_get.call_count, 1)
+        assert idbroker_url == 'https://idbroker0.gethue.com:8444/gateway'
+        assert requests_get.call_count == 1
         requests_get.reset_mock()
 
 
@@ -126,8 +128,8 @@ class TestIDBrokerHA(unittest.TestCase):
         requests_get.side_effect = [Mock(status_code=404), Mock(status_code=200)]
         idbroker_url = _handle_idbroker_ha(fs='s3a')
 
-        assert_equal(idbroker_url, 'https://idbroker1.gethue.com:8444/gateway')
-        assert_equal(requests_get.call_count, 2)
+        assert idbroker_url == 'https://idbroker1.gethue.com:8444/gateway'
+        assert requests_get.call_count == 2
         requests_get.reset_mock()
 
 
@@ -135,6 +137,6 @@ class TestIDBrokerHA(unittest.TestCase):
         requests_get.side_effect = [Mock(status_code=404), Mock(status_code=404)]
         idbroker_url = _handle_idbroker_ha(fs='s3a')
 
-        assert_equal(idbroker_url, None)
-        assert_equal(requests_get.call_count, 2)
+        assert idbroker_url == None
+        assert requests_get.call_count == 2
 

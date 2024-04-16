@@ -18,13 +18,11 @@
 
 from __future__ import absolute_import
 import ldap
+import pytest
 import sys
 
 from django.conf import settings
 from django.urls import reverse
-from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_equal, assert_false
 
 import desktop.conf
 from desktop.lib.test_utils import grant_access
@@ -45,6 +43,7 @@ else:
   from mock import patch, Mock, MagicMock
 
 
+@pytest.mark.django_db
 class TestUserAdminLdapDeprecated(BaseUserAdminTests):
   def test_useradmin_ldap_user_group_membership_sync(self):
     settings.MIDDLEWARE.append('useradmin.middleware.LdapSynchronizationMiddleware')
@@ -67,7 +66,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       user.save()
 
       # Should have 0 groups
-      assert_equal(0, user.groups.all().count())
+      assert 0 == user.groups.all().count()
 
       # Make an authenticated request as curly so that we can see call middleware.
       c = make_logged_in_client('curly', 'test', is_superuser=False)
@@ -78,7 +77,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       user = User.objects.get(username='curly')
 
       # Should have 3 groups now. 2 from LDAP and 1 from 'grant_access' call.
-      assert_equal(3, user.groups.all().count(), user.groups.all())
+      assert 3 == user.groups.all().count(), user.groups.all()
 
       # Now remove a group and try again.
       old_group = ldap_access.CACHED_LDAP_CONN._instance.users['curly']['groups'].pop()
@@ -90,7 +89,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       user = User.objects.get(username='curly')
 
       # Should have 2 groups now. 1 from LDAP and 1 from 'grant_access' call.
-      assert_equal(3, user.groups.all().count(), user.groups.all())
+      assert 3 == user.groups.all().count(), user.groups.all()
     finally:
       settings.MIDDLEWARE.remove('useradmin.middleware.LdapSynchronizationMiddleware')
 
@@ -109,46 +108,46 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
         import_members_recursive=False, sync_users=False, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 0)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 0
 
       # Import all members of TestUsers
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 3)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 3
 
       # Should import a group, but will only sync already-imported members
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(User.objects.all().count(), 3)
-      assert_equal(Group.objects.all().count(), 2)
+      assert User.objects.all().count() == 3
+      assert Group.objects.all().count() == 2
       test_admins = Group.objects.get(name='Test Administrators')
-      assert_equal(test_admins.user_set.all().count(), 2)
+      assert test_admins.user_set.all().count() == 2
       larry = User.objects.get(username='lårry')
-      assert_equal(test_admins.user_set.all().order_by('username')[1].username, larry.username)
+      assert test_admins.user_set.all().order_by('username')[1].username == larry.username
 
       # Only sync already imported
       ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(test_users.user_set.all().count(), 2)
-      assert_equal(User.objects.get(username='moe').groups.all().count(), 0)
+      assert test_users.user_set.all().count() == 2
+      assert User.objects.get(username='moe').groups.all().count() == 0
 
       # Import missing user
       ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(test_users.user_set.all().count(), 3)
-      assert_equal(User.objects.get(username='moe').groups.all().count(), 1)
+      assert test_users.user_set.all().count() == 3
+      assert User.objects.get(username='moe').groups.all().count() == 1
 
       # Import all members of TestUsers and members of subgroups
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
         import_members_recursive=True, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 4)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 4
 
       # Make sure Hue groups with naming collisions don't get marked as LDAP groups
       hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
@@ -157,8 +156,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       hue_group.save()
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_false(LdapGroup.objects.filter(group=hue_group).exists())
-      assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
+      assert not LdapGroup.objects.filter(group=hue_group).exists()
+      assert hue_group.user_set.filter(username=hue_user.username).exists()
     finally:
       for finish in reset:
         finish()
@@ -178,47 +177,47 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
         import_members_recursive=False, sync_users=False, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 0)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 0
 
       # Import all members of TestUsers
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 3)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 3
 
       # Should import a group, but will only sync already-imported members
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(User.objects.all().count(), 3)
-      assert_equal(Group.objects.all().count(), 2)
+      assert User.objects.all().count() == 3
+      assert Group.objects.all().count() == 2
       test_admins = Group.objects.get(name='Test Administrators')
-      assert_equal(test_admins.user_set.all().count(), 2)
+      assert test_admins.user_set.all().count() == 2
       larry = User.objects.get(username='lårry')
-      assert_equal(test_admins.user_set.all().order_by('username')[1].username, larry.username)
+      assert test_admins.user_set.all().order_by('username')[1].username == larry.username
 
       # Only sync already imported
-      assert_equal(test_users.user_set.all().count(), 3)
+      assert test_users.user_set.all().count() == 3
       ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(test_users.user_set.all().count(), 2)
-      assert_equal(User.objects.get(username='moe').groups.all().count(), 0)
+      assert test_users.user_set.all().count() == 2
+      assert User.objects.get(username='moe').groups.all().count() == 0
 
       # Import missing user
       ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(test_users.user_set.all().count(), 3)
-      assert_equal(User.objects.get(username='moe').groups.all().count(), 1)
+      assert test_users.user_set.all().count() == 3
+      assert User.objects.get(username='moe').groups.all().count() == 1
 
       # Import all members of TestUsers and not members of suboordinate groups (even though specified)
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=True,
         import_members_recursive=True, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='TestUsers')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 3)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 3
 
       # Nested group import
       # First without recursive import, then with.
@@ -226,19 +225,19 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
         import_members_recursive=False, sync_users=True, import_by_dn=False)
       nested_groups = Group.objects.get(name='NestedGroups')
       nested_group = Group.objects.get(name='NestedGroup')
-      assert_true(LdapGroup.objects.filter(group=nested_groups).exists())
-      assert_true(LdapGroup.objects.filter(group=nested_group).exists())
-      assert_equal(nested_groups.user_set.all().count(), 0, nested_groups.user_set.all())
-      assert_equal(nested_group.user_set.all().count(), 0, nested_group.user_set.all())
+      assert LdapGroup.objects.filter(group=nested_groups).exists()
+      assert LdapGroup.objects.filter(group=nested_group).exists()
+      assert nested_groups.user_set.all().count() == 0, nested_groups.user_set.all()
+      assert nested_group.user_set.all().count() == 0, nested_group.user_set.all()
 
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'NestedGroups', import_members=True,
         import_members_recursive=True, sync_users=True, import_by_dn=False)
       nested_groups = Group.objects.get(name='NestedGroups')
       nested_group = Group.objects.get(name='NestedGroup')
-      assert_true(LdapGroup.objects.filter(group=nested_groups).exists())
-      assert_true(LdapGroup.objects.filter(group=nested_group).exists())
-      assert_equal(nested_groups.user_set.all().count(), 0, nested_groups.user_set.all())
-      assert_equal(nested_group.user_set.all().count(), 1, nested_group.user_set.all())
+      assert LdapGroup.objects.filter(group=nested_groups).exists()
+      assert LdapGroup.objects.filter(group=nested_group).exists()
+      assert nested_groups.user_set.all().count() == 0, nested_groups.user_set.all()
+      assert nested_group.user_set.all().count() == 1, nested_group.user_set.all()
 
       # Make sure Hue groups with naming collisions don't get marked as LDAP groups
       hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
@@ -247,8 +246,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       hue_group.save()
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_false(LdapGroup.objects.filter(group=hue_group).exists())
-      assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
+      assert not LdapGroup.objects.filter(group=hue_group).exists()
+      assert hue_group.user_set.filter(username=hue_user.username).exists()
     finally:
       for finish in reset:
         finish()
@@ -268,46 +267,46 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False,
         import_members_recursive=False, sync_users=False, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 0)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 0
 
       # Import all members of TestUsers
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 2)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 2
 
       # Should import a group, but will only sync already-imported members
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(User.objects.all().count(), 2, User.objects.all())
-      assert_equal(Group.objects.all().count(), 2, Group.objects.all())
+      assert User.objects.all().count() == 2, User.objects.all()
+      assert Group.objects.all().count() == 2, Group.objects.all()
       test_admins = Group.objects.get(name='Test Administrators')
-      assert_equal(test_admins.user_set.all().count(), 1)
+      assert test_admins.user_set.all().count() == 1
       larry = User.objects.get(username='lårry')
-      assert_equal(test_admins.user_set.all().order_by('username')[0].username, larry.username)
+      assert test_admins.user_set.all().order_by('username')[0].username == larry.username
 
       # Only sync already imported
       ldap_access.CACHED_LDAP_CONN.remove_posix_user_group_for_test('posix_person', 'PosixGroup')
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(test_users.user_set.all().count(), 1)
-      assert_equal(User.objects.get(username='posix_person').groups.all().count(), 0)
+      assert test_users.user_set.all().count() == 1
+      assert User.objects.get(username='posix_person').groups.all().count() == 0
 
       # Import missing user
       ldap_access.CACHED_LDAP_CONN.add_posix_user_group_for_test('posix_person', 'PosixGroup')
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(test_users.user_set.all().count(), 2)
-      assert_equal(User.objects.get(username='posix_person').groups.all().count(), 1)
+      assert test_users.user_set.all().count() == 2
+      assert User.objects.get(username='posix_person').groups.all().count() == 1
 
       # Import all members of PosixGroup and members of subgroups
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
         import_members_recursive=True, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 3)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 3
 
       # Make sure Hue groups with naming collisions don't get marked as LDAP groups
       hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
@@ -316,8 +315,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       hue_group.save()
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_false(LdapGroup.objects.filter(group=hue_group).exists())
-      assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
+      assert not LdapGroup.objects.filter(group=hue_group).exists()
+      assert hue_group.user_set.filter(username=hue_user.username).exists()
     finally:
       for finish in reset:
         finish()
@@ -337,46 +336,46 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False,
         import_members_recursive=False, sync_users=False, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 0)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 0
 
       # Import all members of TestUsers
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 2)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 2
 
       # Should import a group, but will only sync already-imported members
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(User.objects.all().count(), 2, User.objects.all())
-      assert_equal(Group.objects.all().count(), 2, Group.objects.all())
+      assert User.objects.all().count() == 2, User.objects.all()
+      assert Group.objects.all().count() == 2, Group.objects.all()
       test_admins = Group.objects.get(name='Test Administrators')
-      assert_equal(test_admins.user_set.all().count(), 1)
+      assert test_admins.user_set.all().count() == 1
       larry = User.objects.get(username='lårry')
-      assert_equal(test_admins.user_set.all().order_by('username')[0].username, larry.username)
+      assert test_admins.user_set.all().order_by('username')[0].username == larry.username
 
       # Only sync already imported
       ldap_access.CACHED_LDAP_CONN.remove_posix_user_group_for_test('posix_person', 'PosixGroup')
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(test_users.user_set.all().count(), 1)
-      assert_equal(User.objects.get(username='posix_person').groups.all().count(), 0)
+      assert test_users.user_set.all().count() == 1
+      assert User.objects.get(username='posix_person').groups.all().count() == 0
 
       # Import missing user
       ldap_access.CACHED_LDAP_CONN.add_posix_user_group_for_test('posix_person', 'PosixGroup')
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_equal(test_users.user_set.all().count(), 2)
-      assert_equal(User.objects.get(username='posix_person').groups.all().count(), 1)
+      assert test_users.user_set.all().count() == 2
+      assert User.objects.get(username='posix_person').groups.all().count() == 1
 
       # Import all members of PosixGroup and members of subgroups (there should be no subgroups)
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'PosixGroup', import_members=True,
         import_members_recursive=True, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='PosixGroup')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 2)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 2
 
       # Import all members of NestedPosixGroups and members of subgroups
       reset_all_users()
@@ -384,11 +383,11 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'NestedPosixGroups', import_members=True,
         import_members_recursive=True, sync_users=True, import_by_dn=False)
       test_users = Group.objects.get(name='NestedPosixGroups')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 0)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 0
       test_users = Group.objects.get(name='PosixGroup')
-      assert_true(LdapGroup.objects.filter(group=test_users).exists())
-      assert_equal(test_users.user_set.all().count(), 2)
+      assert LdapGroup.objects.filter(group=test_users).exists()
+      assert test_users.user_set.all().count() == 2
 
       # Make sure Hue groups with naming collisions don't get marked as LDAP groups
       hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
@@ -397,8 +396,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       hue_group.save()
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'OtherGroup', import_members=False,
         import_members_recursive=False, sync_users=True, import_by_dn=False)
-      assert_false(LdapGroup.objects.filter(group=hue_group).exists())
-      assert_true(hue_group.user_set.filter(username=hue_user.username).exists())
+      assert not LdapGroup.objects.filter(group=hue_group).exists()
+      assert hue_group.user_set.filter(username=hue_user.username).exists()
     finally:
       for finish in reset:
         finish()
@@ -413,24 +412,24 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       # Try importing a user
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'lårry', sync_groups=False, import_by_dn=False)
       larry = User.objects.get(username='lårry')
-      assert_true(larry.first_name == 'Larry')
-      assert_true(larry.last_name == 'Stooge')
-      assert_true(larry.email == 'larry@stooges.com')
-      assert_true(get_profile(larry).creation_method == UserProfile.CreationMethod.EXTERNAL.name)
+      assert larry.first_name == 'Larry'
+      assert larry.last_name == 'Stooge'
+      assert larry.email == 'larry@stooges.com'
+      assert get_profile(larry).creation_method == UserProfile.CreationMethod.EXTERNAL.name
 
       # Should be a noop
       sync_ldap_users(ldap_access.CACHED_LDAP_CONN)
       sync_ldap_groups(ldap_access.CACHED_LDAP_CONN)
-      assert_equal(User.objects.all().count(), 1)
-      assert_equal(Group.objects.all().count(), 0)
+      assert User.objects.all().count() == 1
+      assert Group.objects.all().count() == 0
 
       # Make sure that if a Hue user already exists with a naming collision, we
       # won't overwrite any of that user's information.
       hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'otherguy', sync_groups=False, import_by_dn=False)
       hue_user = User.objects.get(username='otherguy')
-      assert_equal(get_profile(hue_user).creation_method, UserProfile.CreationMethod.HUE.name)
-      assert_equal(hue_user.first_name, 'Different')
+      assert get_profile(hue_user).creation_method == UserProfile.CreationMethod.HUE.name
+      assert hue_user.first_name == 'Different'
 
       # Make sure LDAP groups exist or they won't sync
       import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False,
@@ -440,11 +439,11 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       # Try importing a user and sync groups
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'curly', sync_groups=True, import_by_dn=False)
       curly = User.objects.get(username='curly')
-      assert_equal(curly.first_name, 'Curly')
-      assert_equal(curly.last_name, 'Stooge')
-      assert_equal(curly.email, 'curly@stooges.com')
-      assert_equal(get_profile(curly).creation_method, UserProfile.CreationMethod.EXTERNAL.name)
-      assert_equal(2, curly.groups.all().count(), curly.groups.all())
+      assert curly.first_name == 'Curly'
+      assert curly.last_name == 'Stooge'
+      assert curly.email == 'curly@stooges.com'
+      assert get_profile(curly).creation_method == UserProfile.CreationMethod.EXTERNAL.name
+      assert 2 == curly.groups.all().count(), curly.groups.all()
 
       reset_all_users()
       reset_all_groups()
@@ -453,10 +452,10 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
         finish()
 
 
-  @attr('integration')
+  @pytest.mark.integration
   def test_useradmin_ldap_case_sensitivity(self):
     if is_live_cluster():
-      raise SkipTest('HUE-2897: Cannot yet guarantee database is case sensitive')
+      pytest.skip('HUE-2897: Cannot yet guarantee database is case sensitive')
 
     done = []
     try:
@@ -466,25 +465,25 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       # Test import case sensitivity
       done.append(desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Lårry', sync_groups=False, import_by_dn=False)
-      assert_false(User.objects.filter(username='Lårry').exists())
-      assert_true(User.objects.filter(username='lårry').exists())
+      assert not User.objects.filter(username='Lårry').exists()
+      assert User.objects.filter(username='lårry').exists()
 
       # Test lower case
       User.objects.filter(username__iexact='Rock').delete()
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
-      assert_false(User.objects.filter(username='Rock').exists())
-      assert_true(User.objects.filter(username='rock').exists())
+      assert not User.objects.filter(username='Rock').exists()
+      assert User.objects.filter(username='rock').exists()
 
       done.append(desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
 
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
-      assert_false(User.objects.filter(username='Rock').exists())
-      assert_true(User.objects.filter(username='rock').exists())
+      assert not User.objects.filter(username='Rock').exists()
+      assert User.objects.filter(username='rock').exists()
 
       User.objects.filter(username='Rock').delete()
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
-      assert_false(User.objects.filter(username='Rock').exists())
-      assert_true(User.objects.filter(username='rock').exists())
+      assert not User.objects.filter(username='Rock').exists()
+      assert User.objects.filter(username='rock').exists()
     finally:
       for finish in done:
         finish()
@@ -500,28 +499,28 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
       c = make_logged_in_client('test', is_superuser=True)
 
-      assert_true(c.get(URL))
+      assert c.get(URL)
 
       response = c.post(URL, dict(username_pattern='moe', password1='test', password2='test'))
-      assert_true('Location' in response, response)
-      assert_true('/useradmin/users' in response['Location'], response)
+      assert 'Location' in response, response
+      assert '/useradmin/users' in response['Location'], response
 
       response = c.post(URL, dict(username_pattern='bad_name', password1='test', password2='test'))
-      assert_true('Could not' in response.context[0]['form'].errors['username_pattern'][0], response)
+      assert 'Could not' in response.context[0]['form'].errors['username_pattern'][0], response
 
       # Test wild card
       response = c.post(URL, dict(username_pattern='*rr*', password1='test', password2='test'))
-      assert_true('/useradmin/users' in response['Location'], response)
+      assert '/useradmin/users' in response['Location'], response
 
       # Test regular with spaces (should fail)
       response = c.post(URL, dict(username_pattern='user with space', password1='test', password2='test'))
-      assert_true("Username must not contain whitespaces and ':'" in response.context[0]['form'].errors['username_pattern'][0], response)
+      assert "Username must not contain whitespaces and ':'" in response.context[0]['form'].errors['username_pattern'][0], response
 
       # Test dn with spaces in username and dn (should fail)
       response = c.post(
         URL, dict(username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True)
       )
-      assert_true(b"Could not get LDAP details for users in pattern" in response.content, response)
+      assert b"Could not get LDAP details for users in pattern" in response.content, response
 
       # Removing this test because we are not running log listener
       #response = c.get(reverse(desktop.views.log_view))
@@ -534,17 +533,17 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       response = c.post(
         URL, dict(username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True)
       )
-      assert_true(User.objects.filter(username='spaceless').exists())
+      assert User.objects.filter(username='spaceless').exists()
 
     finally:
       for finish in done:
         finish()
 
 
-  @attr('integration')
+  @pytest.mark.integration
   def test_add_ldap_users_case_sensitivity(self):
     if is_live_cluster():
-      raise SkipTest('HUE-2897: Cannot yet guarantee database is case sensitive')
+      pytest.skip('HUE-2897: Cannot yet guarantee database is case sensitive')
 
     done = []
     try:
@@ -561,24 +560,24 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       # Test ignore case
       done.append(desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
       User.objects.filter(username='moe').delete()
-      assert_false(User.objects.filter(username='Moe').exists())
-      assert_false(User.objects.filter(username='moe').exists())
+      assert not User.objects.filter(username='Moe').exists()
+      assert not User.objects.filter(username='moe').exists()
       response = c.post(URL, dict(username_pattern='Moe', password1='test', password2='test'))
-      assert_true('Location' in response, response)
-      assert_true('/useradmin/users' in response['Location'], response)
-      assert_false(User.objects.filter(username='Moe').exists())
-      assert_true(User.objects.filter(username='moe').exists())
+      assert 'Location' in response, response
+      assert '/useradmin/users' in response['Location'], response
+      assert not User.objects.filter(username='Moe').exists()
+      assert User.objects.filter(username='moe').exists()
 
       # Test lower case
       done.append(desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
       User.objects.filter(username__iexact='Rock').delete()
-      assert_false(User.objects.filter(username='Rock').exists())
-      assert_false(User.objects.filter(username='rock').exists())
+      assert not User.objects.filter(username='Rock').exists()
+      assert not User.objects.filter(username='rock').exists()
       response = c.post(URL, dict(username_pattern='rock', password1='test', password2='test'))
-      assert_true('Location' in response, response)
-      assert_true('/useradmin/users' in response['Location'], response)
-      assert_false(User.objects.filter(username='Rock').exists())
-      assert_true(User.objects.filter(username='rock').exists())
+      assert 'Location' in response, response
+      assert '/useradmin/users' in response['Location'], response
+      assert not User.objects.filter(username='Rock').exists()
+      assert User.objects.filter(username='rock').exists()
     finally:
       for finish in done:
         finish()
@@ -593,26 +592,26 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
     c = make_logged_in_client(username='test', is_superuser=True)
 
-    assert_true(c.get(URL))
+    assert c.get(URL)
 
     response = c.post(URL, dict(groupname_pattern='TestUsers'))
-    assert_true('Location' in response, response)
-    assert_true('/useradmin/groups' in response['Location'])
+    assert 'Location' in response, response
+    assert '/useradmin/groups' in response['Location']
 
     # Test with space
     response = c.post(URL, dict(groupname_pattern='Test Administrators'))
-    assert_true('Location' in response, response)
-    assert_true('/useradmin/groups' in response['Location'], response)
+    assert 'Location' in response, response
+    assert '/useradmin/groups' in response['Location'], response
 
     response = c.post(URL, dict(groupname_pattern='toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'
                                                   'toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'
                                                   'toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'
                                                   'toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'))
-    assert_true('Ensure this value has at most 256 characters' in response.context[0]['form'].errors['groupname_pattern'][0], response)
+    assert 'Ensure this value has at most 256 characters' in response.context[0]['form'].errors['groupname_pattern'][0], response
 
     # Test wild card
     response = c.post(URL, dict(groupname_pattern='*r*'))
-    assert_true('/useradmin/groups' in response['Location'], response)
+    assert '/useradmin/groups' in response['Location'], response
 
   def test_sync_ldap_users_groups(self):
     URL = reverse('useradmin:useradmin_views_sync_ldap_users_groups')
@@ -622,8 +621,8 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
     c = make_logged_in_client('test', is_superuser=True)
 
-    assert_true(c.get(URL))
-    assert_true(c.post(URL))
+    assert c.get(URL)
+    assert c.post(URL)
 
   def test_ldap_exception_handling(self):
     # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
@@ -636,11 +635,12 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       response = c.post(
         reverse('useradmin:useradmin.views.add_ldap_users'), dict(username_pattern='moe', password1='test', password2='test'), follow=True
       )
-      assert_true(b'There was an error when communicating with LDAP' in response.content, response)
+      assert b'There was an error when communicating with LDAP' in response.content, response
 
+@pytest.mark.django_db
+@pytest.mark.requires_hadoop
+@pytest.mark.integration
 class TestUserAdminLdapDeprecatedWithHadoop(BaseUserAdminTests):
-  requires_hadoop = True
-  integration = True
 
   def test_ensure_home_directory_add_ldap_users(self):
     try:
@@ -653,30 +653,30 @@ class TestUserAdminLdapDeprecatedWithHadoop(BaseUserAdminTests):
       c = make_logged_in_client(cluster.superuser, is_superuser=True)
       cluster.fs.setuser(cluster.superuser)
 
-      assert_true(c.get(URL))
+      assert c.get(URL)
 
       response = c.post(URL, dict(username_pattern='moe', password1='test', password2='test'))
-      assert_true('/useradmin/users' in response['Location'])
-      assert_false(cluster.fs.exists('/user/moe'))
+      assert '/useradmin/users' in response['Location']
+      assert not cluster.fs.exists('/user/moe')
 
       # Try same thing with home directory creation.
       response = c.post(URL, dict(username_pattern='curly', password1='test', password2='test', ensure_home_directory=True))
-      assert_true('/useradmin/users' in response['Location'])
-      assert_true(cluster.fs.exists('/user/curly'))
+      assert '/useradmin/users' in response['Location']
+      assert cluster.fs.exists('/user/curly')
 
       response = c.post(URL, dict(username_pattern='bad_name', password1='test', password2='test'))
-      assert_true('Could not' in response.context[0]['form'].errors['username_pattern'][0])
-      assert_false(cluster.fs.exists('/user/bad_name'))
+      assert 'Could not' in response.context[0]['form'].errors['username_pattern'][0]
+      assert not cluster.fs.exists('/user/bad_name')
 
       # See if moe, who did not ask for his home directory, has a home directory.
-      assert_false(cluster.fs.exists('/user/moe'))
+      assert not cluster.fs.exists('/user/moe')
 
       # Try wild card now
       response = c.post(URL, dict(username_pattern='*rr*', password1='test', password2='test', ensure_home_directory=True))
-      assert_true('/useradmin/users' in response['Location'])
-      assert_true(cluster.fs.exists('/user/curly'))
-      assert_true(cluster.fs.exists(u'/user/lårry'))
-      assert_false(cluster.fs.exists('/user/otherguy'))
+      assert '/useradmin/users' in response['Location']
+      assert cluster.fs.exists('/user/curly')
+      assert cluster.fs.exists(u'/user/lårry')
+      assert not cluster.fs.exists('/user/otherguy')
     finally:
       # Clean up
       if cluster.fs.exists('/user/curly'):
@@ -697,6 +697,6 @@ class TestUserAdminLdapDeprecatedWithHadoop(BaseUserAdminTests):
     cluster.fs.setuser(cluster.superuser)
 
     c.post(reverse('useradmin:useradmin.views.add_ldap_users'), dict(username_pattern='curly', password1='test', password2='test'))
-    assert_false(cluster.fs.exists('/user/curly'))
-    assert_true(c.post(URL, dict(ensure_home_directory=True)))
-    assert_true(cluster.fs.exists('/user/curly'))
+    assert not cluster.fs.exists('/user/curly')
+    assert c.post(URL, dict(ensure_home_directory=True))
+    assert cluster.fs.exists('/user/curly')
