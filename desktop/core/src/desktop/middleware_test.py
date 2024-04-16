@@ -17,15 +17,13 @@
 
 import json
 import os
+import pytest
 import sys
 import tempfile
 
 from django.conf import settings
 from django.test.client import Client
-from django.test import RequestFactory
-import unittest
-from nose.tools import assert_equal, assert_false, assert_true, assert_not_in
-from nose.plugins.skip import SkipTest
+from django.test import RequestFactory, TestCase
 from django.http import HttpResponse
 from django.core import exceptions
 
@@ -41,30 +39,32 @@ if sys.version_info[0] > 2:
 else:
   from mock import patch, Mock
 
+@pytest.mark.django_db
 def test_view_perms():
   # Super user
   c = make_logged_in_client()
 
   response = c.get("/useradmin/")
-  assert_equal(200, response.status_code)
+  assert 200 == response.status_code
 
   response = c.get("/useradmin/users/edit/test")
-  assert_equal(200, response.status_code)
+  assert 200 == response.status_code
 
   # Normal user
   c = make_logged_in_client('user', is_superuser=False)
   add_permission('user', 'test-view-group', 'access_view:useradmin:edit_user', 'useradmin')
 
   response = c.get("/useradmin/")
-  assert_equal(401, response.status_code)
+  assert 401 == response.status_code
 
   response = c.get("/useradmin/users/edit/test")
-  assert_equal(401, response.status_code)
+  assert 401 == response.status_code
 
   response = c.get("/useradmin/users/edit/user") # Can access his profile page
-  assert_equal(200, response.status_code, response.content)
+  assert 200 == response.status_code, response.content
 
 
+@pytest.mark.django_db
 def test_ensure_safe_method_middleware():
   try:
     # Super user
@@ -72,18 +72,19 @@ def test_ensure_safe_method_middleware():
 
     # GET works
     response = c.get("/useradmin/")
-    assert_equal(200, response.status_code)
+    assert 200 == response.status_code
 
     # Disallow GET
     done = desktop.conf.HTTP_ALLOWED_METHODS.set_for_testing([])
 
     # GET should not work because allowed methods is empty.
     response = c.get("/useradmin/")
-    assert_equal(405, response.status_code)
+    assert 405 == response.status_code
   finally:
     done()
 
 
+@pytest.mark.django_db
 def test_audit_logging_middleware_enable():
   c = make_logged_in_client(username='test_audit_logging', is_superuser=False)
 
@@ -96,19 +97,20 @@ def test_audit_logging_middleware_enable():
     try:
       # Check if we audit correctly
       response = c.get("/useradmin/permissions/edit/beeswax/access")
-      assert_true('audited' in response, response)
+      assert 'audited' in response, response
 
       audit = open(log_path).readlines()
       for line in audit:
         audit_json = json.loads(line)
         audit_record = list(audit_json.values())[0]
-        assert_equal('test_audit_logging', audit_record['user'], audit_record)
-        assert_equal('/useradmin/permissions/edit/beeswax/access', audit_record['url'], audit_record)
+        assert 'test_audit_logging' == audit_record['user'], audit_record
+        assert '/useradmin/permissions/edit/beeswax/access' == audit_record['url'], audit_record
 
     finally:
       settings.MIDDLEWARE.pop()
       reset()
 
+@pytest.mark.django_db
 def test_audit_logging_middleware_disable():
   c = make_logged_in_client(username='test_audit_logging', is_superuser=False)
 
@@ -116,13 +118,13 @@ def test_audit_logging_middleware_disable():
   try:
     # No middleware yet
     response = c.get("/oozie/")
-    assert_false('audited' in response, response)
+    assert not 'audited' in response, response
   finally:
     reset()
 
 
 def test_ensure_safe_redirect_middleware():
-  raise SkipTest
+  pytest.skip("Skipping Test")
   done = []
   settings.MIDDLEWARE.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
   try:
@@ -134,7 +136,7 @@ def test_ensure_safe_redirect_middleware():
       'username': 'test',
       'password': 'test',
     })
-    assert_equal(302, response.status_code)
+    assert 302 == response.status_code
 
     # Disallow most redirects
     done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\d+$'))
@@ -143,7 +145,7 @@ def test_ensure_safe_redirect_middleware():
       'password': 'test',
       'next': 'http://example.com',
     })
-    assert_equal(403, response.status_code)
+    assert 403 == response.status_code
 
     # Allow all redirects
     done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('.*'))
@@ -152,7 +154,7 @@ def test_ensure_safe_redirect_middleware():
       'password': 'test',
       'next': 'http://example.com',
     })
-    assert_equal(302, response.status_code)
+    assert 302 == response.status_code
 
     # Allow all redirects and disallow most at the same time.
     # should have a logic OR functionality.
@@ -162,12 +164,13 @@ def test_ensure_safe_redirect_middleware():
       'password': 'test',
       'next': 'http://example.com',
     })
-    assert_equal(302, response.status_code)
+    assert 302 == response.status_code
   finally:
     settings.MIDDLEWARE.pop()
     for finish in done:
       finish()
 
+@pytest.mark.django_db
 def test_spnego_middleware():
   done = []
   orig_backends = settings.AUTHENTICATION_BACKENDS
@@ -190,16 +193,16 @@ def test_spnego_middleware():
 
       header = {'HTTP_AUTHORIZATION': 'Negotiate test'}
       response = c.get("/hue/editor/?type=impala", **header)
-      assert_equal(200, response.status_code)
-      assert_equal(response['WWW-Authenticate'], 'Negotiate %s' % authGSSServerResponse.return_value)
+      assert 200 == response.status_code
+      assert response['WWW-Authenticate'] == 'Negotiate %s' % authGSSServerResponse.return_value
 
     c = Client()
     response = c.get("/hue/editor/?type=impala")
-    assert_equal(401, response.status_code)
+    assert 401 == response.status_code
 
     c = Client()
     response = c.get("/desktop/debug/is_alive")
-    assert_equal(200, response.status_code)
+    assert 200 == response.status_code
   finally:
     settings.MIDDLEWARE.pop()
     for finish in done:
@@ -217,9 +220,9 @@ def test_cache_control_middleware():
   try:
     middleware = CacheControlMiddleware(dummy_get_response)
     response = middleware(request)
-    assert_equal(response['Cache-Control'], 'no-cache, no-store, must-revalidate')
-    assert_equal(response['Pragma'], 'no-cache')
-    assert_equal(response['Expires'], '0')
+    assert response['Cache-Control'] == 'no-cache, no-store, must-revalidate'
+    assert response['Pragma'] == 'no-cache'
+    assert response['Expires'] == '0'
   finally:
     reset()
 
@@ -227,9 +230,9 @@ def test_cache_control_middleware():
   try:
     middleware = CacheControlMiddleware(dummy_get_response)
     response = middleware(request)
-    assert_not_in('Cache-Control', response)
-    assert_not_in('Pragma', response)
-    assert_not_in('Expires', response)
+    assert 'Cache-Control' not in response
+    assert 'Pragma' not in response
+    assert 'Expires' not in response
   except exceptions.MiddlewareNotUsed:
     response = dummy_get_response(request)
   finally:
@@ -238,9 +241,10 @@ def test_cache_control_middleware():
 def get_response(request):
   return request
 
-class TestMultipleProxyMiddleware(unittest.TestCase):
+@pytest.mark.django_db
+class TestMultipleProxyMiddleware(TestCase):
 
-  def setUp(self):
+  def setup_method(self, method):
     self.factory = RequestFactory()
     self.middleware = MultipleProxyMiddleware(get_response)
 
@@ -249,17 +253,17 @@ class TestMultipleProxyMiddleware(unittest.TestCase):
     request.META['HTTP_X_FORWARDED_FOR'] = '192.0.2.0, 192.0.2.1, 192.0.2.2'
     request.META['HTTP_X_REAL_IP'] = '192.0.2.1'
     self.middleware(request)
-    assert_equal(request.META['HTTP_X_FORWARDED_FOR'], '192.0.2.1')
+    assert request.META['HTTP_X_FORWARDED_FOR'] == '192.0.2.1'
 
   def test_multiple_proxy_middleware_without_x_real_ip(self):
     request = self.factory.get('/')
     request.META['HTTP_X_FORWARDED_FOR'] = '192.0.2.0, 192.0.2.1, 192.0.2.2'
     self.middleware(request)
-    assert_equal(request.META['HTTP_X_FORWARDED_FOR'], '192.0.2.2')
+    assert request.META['HTTP_X_FORWARDED_FOR'] == '192.0.2.2'
 
   def test_multiple_proxy_middleware_without_x_forwarded_for(self):
     request = self.factory.get('/')
     request.META['REMOTE_ADDR'] = '192.0.2.0'
     self.middleware(request)
-    assert_equal(request.META['HTTP_X_FORWARDED_FOR'], '192.0.2.0')
+    assert request.META['HTTP_X_FORWARDED_FOR'] == '192.0.2.0'
 

@@ -18,6 +18,7 @@ import sys
 import unittest
 
 from nose.tools import assert_equal, assert_raises
+import pytest
 
 from desktop.conf import SDXAAS
 from desktop.lib.sdxaas.knox_jwt import handle_knox_ha, fetch_jwt
@@ -40,7 +41,7 @@ def test_handle_knox_ha():
 
       try:
         knox_url = handle_knox_ha()
-        assert_equal(knox_url, 'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/')
+        assert knox_url == 'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/'
       finally:
         reset()
 
@@ -50,7 +51,7 @@ def test_handle_knox_ha():
 
       try:
         knox_url = handle_knox_ha()
-        assert_equal(knox_url, 'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/')
+        assert knox_url == 'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/'
       finally:
         reset()
 
@@ -61,7 +62,7 @@ def test_handle_knox_ha():
 
       try:
         knox_url = handle_knox_ha()
-        assert_equal(knox_url, None)
+        assert knox_url == None
       finally:
         reset()
 
@@ -81,8 +82,9 @@ def test_fetch_jwt():
           auth=HTTPKerberosAuth(), 
           verify=False
         )
-        assert_equal(jwt_token, "test_jwt_token")
+        assert jwt_token == "test_jwt_token"
 
         # Raises PopupException when knox_url is not available
         handle_knox_ha.return_value = None
-        assert_raises(PopupException, fetch_jwt)
+        with pytest.raises(PopupException):
+          fetch_jwt()

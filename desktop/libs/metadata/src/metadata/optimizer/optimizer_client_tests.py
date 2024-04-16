@@ -17,10 +17,8 @@
 
 from builtins import object
 import logging
+import pytest
 import time
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
@@ -35,15 +33,15 @@ from metadata.optimizer.optimizer_client import OptimizerClient
 LOG = logging.getLogger()
 
 
+@pytest.mark.integration
 class BaseTestOptimizerClient(object):
-  integration = True
   UPLOADED = False
   DATABASE = 'db1'
 
   @classmethod
   def setup_class(cls):
     if not has_optimizer():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
@@ -110,19 +108,19 @@ PARTITIONED BY (
 
     resp = cls.api.upload(data=queries, data_type='queries', source_platform='hive')
 
-    assert_true('status' in resp, resp)
-    assert_true('count' in resp, resp)
+    assert 'status' in resp, resp
+    assert 'count' in resp, resp
 
-    assert_true('state' in resp['status'], resp)
-    assert_true('workloadId' in resp['status'], resp)
-    assert_true('failedQueries' in resp['status'], resp)
-    assert_true('successQueries' in resp['status'], resp)
-    assert_true(resp['status']['state'] in ('WAITING', 'FINISHED', 'FAILED'), resp['status']['state'])
+    assert 'state' in resp['status'], resp
+    assert 'workloadId' in resp['status'], resp
+    assert 'failedQueries' in resp['status'], resp
+    assert 'successQueries' in resp['status'], resp
+    assert resp['status']['state'] in ('WAITING', 'FINISHED', 'FAILED'), resp['status']['state']
 
     resp = cls.api.upload_status(workload_id=resp['status']['workloadId'])
-    assert_true('status' in resp, resp)
-    assert_true('state' in resp['status'], resp)
-    assert_true('workloadId' in resp['status'], resp)
+    assert 'status' in resp, resp
+    assert 'state' in resp['status'], resp
+    assert 'workloadId' in resp['status'], resp
 
 
     i = 0
@@ -132,8 +130,8 @@ PARTITIONED BY (
       time.sleep(1)
       LOG.info('Upload state: %(state)s' % resp['status'])
 
-    assert_true(i < 60 and resp['status']['state'] == 'FINISHED', resp)
-    assert_equal(resp['status']['successQueries'], 8, resp)
+    assert i < 60 and resp['status']['state'] == 'FINISHED', resp
+    assert resp['status']['successQueries'] == 8, resp
 
 
   @classmethod
@@ -147,48 +145,48 @@ class TestOptimizerClient(BaseTestOptimizerClient):
   def test_tenant(self):
     resp = self.api.get_tenant(cluster_id=OPTIMIZER.CLUSTER_ID.get())
 
-    assert_true('tenant' in resp, resp)
+    assert 'tenant' in resp, resp
 
 
   def test_top_tables(self):
     database_name = 'default'
     resp = self.api.top_tables(database_name=database_name)
 
-    assert_true(isinstance(resp['results'], list), resp)
+    assert isinstance(resp['results'], list), resp
 
-    assert_true('eid' in resp['results'][0], resp)
-    assert_true('name' in resp['results'][0], resp)
+    assert 'eid' in resp['results'][0], resp
+    assert 'name' in resp['results'][0], resp
 
     database_name = BaseTestOptimizerClient.DATABASE
     resp = self.api.top_tables(database_name=database_name)
 
-    assert_true(isinstance(resp['results'], list), resp)
+    assert isinstance(resp['results'], list), resp
 
 
   def test_table_details(self):  # Requires test_upload to run before
     resp = self.api.table_details(database_name='default', table_name='emps')
 
-    assert_true('columnCount' in resp, resp)
-    assert_true('createCount' in resp, resp)
-    assert_true('table_ddl' in resp, resp)
-    assert_true('deleteCount' in resp, resp)
-    assert_true('iview_ddl' in resp, resp)
-    assert_true('updateCount' in resp, resp)
-    assert_true('colStats' in resp, resp)
-    assert_true('joinCount' in resp, resp)
-    assert_true('view_ddl' in resp, resp)
-    assert_true('tableStats' in resp, resp)
-    assert_true('queryCount' in resp, resp)
-    assert_true('selectCount' in resp, resp)
-    assert_true('insertCount' in resp, resp)
-    assert_true('tid' in resp, resp)
-    assert_true('type' in resp, resp)
-    assert_true('name' in resp, resp)
+    assert 'columnCount' in resp, resp
+    assert 'createCount' in resp, resp
+    assert 'table_ddl' in resp, resp
+    assert 'deleteCount' in resp, resp
+    assert 'iview_ddl' in resp, resp
+    assert 'updateCount' in resp, resp
+    assert 'colStats' in resp, resp
+    assert 'joinCount' in resp, resp
+    assert 'view_ddl' in resp, resp
+    assert 'tableStats' in resp, resp
+    assert 'queryCount' in resp, resp
+    assert 'selectCount' in resp, resp
+    assert 'insertCount' in resp, resp
+    assert 'tid' in resp, resp
+    assert 'type' in resp, resp
+    assert 'name' in resp, resp
 
     resp = self.api.table_details(database_name=BaseTestOptimizerClient.DATABASE, table_name='Part')
 
-    assert_true('tid' in resp, resp)
-    assert_true('columnCount' in resp, resp)
+    assert 'tid' in resp, resp
+    assert 'columnCount' in resp, resp
 
 
   def test_query_risk(self):
@@ -196,10 +194,10 @@ class TestOptimizerClient(BaseTestOptimizerClient):
 
     resp = self.api.query_risk(query=query, source_platform='hive', db_name=BaseTestOptimizerClient.DATABASE)
 
-    assert_true(len(resp) > 0, resp)
-    assert_true('riskAnalysis' in resp['hints'][0], resp)
-    assert_true('risk' in resp['hints'][0], resp)
-    assert_true('riskRecommendation' in resp['hints'][0], resp)
+    assert len(resp) > 0, resp
+    assert 'riskAnalysis' in resp['hints'][0], resp
+    assert 'risk' in resp['hints'][0], resp
+    assert 'riskRecommendation' in resp['hints'][0], resp
 
 
   def test_query_compatibility(self):
@@ -209,79 +207,79 @@ class TestOptimizerClient(BaseTestOptimizerClient):
 
     resp = self.api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
 
-    assert_true('clauseName' in resp, resp)
-    assert_true('clauseError' in resp, resp)
-    assert_true('queryError' in resp, resp)
-    assert_true('clauseString' in resp, resp)
+    assert 'clauseName' in resp, resp
+    assert 'clauseError' in resp, resp
+    assert 'queryError' in resp, resp
+    assert 'clauseString' in resp, resp
 
 
   def test_top_filters(self):
     resp = self.api.top_filters(db_tables=['%s.Part' % BaseTestOptimizerClient.DATABASE])
 
-    assert_true(len(resp['results']) > 0, resp)
+    assert len(resp['results']) > 0, resp
 
 
   def test_top_joins(self):
     resp = self.api.top_joins(db_tables=['%s.x' % BaseTestOptimizerClient.DATABASE])
 
-    assert_true(len(resp['results']) > 0, resp)
+    assert len(resp['results']) > 0, resp
 
-    assert_true(resp['results'][0]['tables'], [u'%s.x', u'%s.y' % (BaseTestOptimizerClient.DATABASE, BaseTestOptimizerClient.DATABASE)])
-    assert_true('queryIds' in resp['results'][0], resp)
-    assert_true('totalTableCount' in resp['results'][0], resp)
-    assert_true('totalQueryCount' in resp['results'][0], resp)
-    assert_true('joinType' in resp['results'][0], resp)
-    assert_equal(resp['results'][0]['joinCols'], [{u'columns': [u'%s.x.a' % BaseTestOptimizerClient.DATABASE, u'%s.y.a' % BaseTestOptimizerClient.DATABASE]}])
+    assert resp['results'][0]['tables'], [u'%s.x', u'%s.y' % (BaseTestOptimizerClient.DATABASE, BaseTestOptimizerClient.DATABASE)]
+    assert 'queryIds' in resp['results'][0], resp
+    assert 'totalTableCount' in resp['results'][0], resp
+    assert 'totalQueryCount' in resp['results'][0], resp
+    assert 'joinType' in resp['results'][0], resp
+    assert resp['results'][0]['joinCols'] == [{u'columns': [u'%s.x.a' % BaseTestOptimizerClient.DATABASE, u'%s.y.a' % BaseTestOptimizerClient.DATABASE]}]
 
 
   def test_top_aggs(self):
     resp = self.api.top_aggs(db_tables=['%s.Part' % BaseTestOptimizerClient.DATABASE])
 
-    assert_true(len(resp['results']) > 0, resp)
+    assert len(resp['results']) > 0, resp
 
-    assert_true('tables' in resp['results'][0], resp)
-    assert_true('queryIds' in resp['results'][0], resp)
-    assert_true('totalTableCount' in resp['results'][0], resp)
-    assert_true('totalQueryCount' in resp['results'][0], resp)
-    assert_true('type' in resp['results'][0], resp)
-    assert_true('columns' in resp['results'][0], resp)
+    assert 'tables' in resp['results'][0], resp
+    assert 'queryIds' in resp['results'][0], resp
+    assert 'totalTableCount' in resp['results'][0], resp
+    assert 'totalQueryCount' in resp['results'][0], resp
+    assert 'type' in resp['results'][0], resp
+    assert 'columns' in resp['results'][0], resp
 
 
   def test_top_columns(self):
     resp = self.api.top_columns(db_tables=['%s.Part' % BaseTestOptimizerClient.DATABASE])
 
-    assert_true('orderbyColumns' in resp, resp)
-    assert_true('selectColumns' in resp, resp)
-    assert_true('filterColumns' in resp, resp)
-    assert_true('joinColumns' in resp, resp)
-    assert_true('groupbyColumns' in resp, resp)
+    assert 'orderbyColumns' in resp, resp
+    assert 'selectColumns' in resp, resp
+    assert 'filterColumns' in resp, resp
+    assert 'joinColumns' in resp, resp
+    assert 'groupbyColumns' in resp, resp
 
-    assert_true(resp['orderbyColumns'], resp)
-    assert_true('selectColumns' in resp, resp)
-    assert_true('filterColumns' in resp, resp)
-    assert_true('joinColumns' in resp, resp)
-    assert_true('groupbyColumns' in resp, resp)
+    assert resp['orderbyColumns'], resp
+    assert 'selectColumns' in resp, resp
+    assert 'filterColumns' in resp, resp
+    assert 'joinColumns' in resp, resp
+    assert 'groupbyColumns' in resp, resp
 
 
   def test_top_databases(self):
     resp = self.api.top_databases()
 
-    assert_true(len(resp['results']) > 0, resp)
+    assert len(resp['results']) > 0, resp
 
-    assert_true('instanceCount' in resp['results'][0], resp)
-    assert_true('totalTableCount' in resp['results'][0], resp)
+    assert 'instanceCount' in resp['results'][0], resp
+    assert 'totalTableCount' in resp['results'][0], resp
 
 
   def test_similar_queries(self):
-    raise SkipTest # Experimental only
+    pytest.skip("Skipping Test") # Experimental only
 
     source_platform = 'hive'
     query = 'Select * from (Select item.id from item)'
 
     resp = self.api.similar_queries(source_platform=source_platform, query=query)
 
-    assert_true('querySignature' in resp, resp)
-    assert_true('query' in resp, resp)
+    assert 'querySignature' in resp, resp
+    assert 'query' in resp, resp
 
 
 
@@ -404,8 +402,8 @@ GROUP BY account_client,
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=BaseTestOptimizerClient.DATABASE)
     _assert_risks(['>=10 columns present in GROUP BY list.'], resp['hints'])
 
-    assert_equal(resp['noDDL'], ['%s.transactions' % BaseTestOptimizerClient.DATABASE])
-    assert_equal(resp['noStats'], ['%s.transactions' % BaseTestOptimizerClient.DATABASE])
+    assert resp['noDDL'] == ['%s.transactions' % BaseTestOptimizerClient.DATABASE]
+    assert resp['noStats'] == ['%s.transactions' % BaseTestOptimizerClient.DATABASE]
 
 
   def test_risk_cross_join_false_positive(self):
@@ -441,8 +439,8 @@ LIMIT 1000
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
     _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'])
 
-    assert_false(resp['noDDL'], resp) # DDL was uploaded already
-    assert_equal(resp['noStats'], ['%s.web_logs' % BaseTestOptimizerClient.DATABASE])
+    assert not resp['noDDL'], resp # DDL was uploaded already
+    assert resp['noStats'] == ['%s.web_logs' % BaseTestOptimizerClient.DATABASE]
 
 
     source_platform = 'hive'
@@ -480,9 +478,9 @@ LIMIT 1000
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
     _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'])
 
-    assert_equal([suggestion for suggestion in resp['hints'] if suggestion['riskId'] == 22][0]['riskTables'], ['%s.web_logs' % BaseTestOptimizerClient.DATABASE])
-    assert_equal(resp['noDDL'], ['%s.a' % BaseTestOptimizerClient.DATABASE])
-    assert_equal(resp['noStats'], ['%s.a' % BaseTestOptimizerClient.DATABASE, '%s.web_logs' % BaseTestOptimizerClient.DATABASE])
+    assert [suggestion for suggestion in resp['hints'] if suggestion['riskId'] == 22][0]['riskTables'] == ['%s.web_logs' % BaseTestOptimizerClient.DATABASE]
+    assert resp['noDDL'] == ['%s.a' % BaseTestOptimizerClient.DATABASE]
+    assert resp['noStats'] == ['%s.a' % BaseTestOptimizerClient.DATABASE, '%s.web_logs' % BaseTestOptimizerClient.DATABASE]
 
 
 def _assert_risks(risks, suggestions, present=True):
@@ -490,6 +488,6 @@ def _assert_risks(risks, suggestions, present=True):
 
   for risk in risks:
     if present:
-      assert_true(risk in suggestion_names, suggestions)
+      assert risk in suggestion_names, suggestions
     else:
-      assert_false(risk in suggestion_names, suggestions)
+      assert not risk in suggestion_names, suggestions

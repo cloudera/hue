@@ -14,12 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 import sys
 import unittest
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_false, assert_true, assert_raises
-
+from django.test import TestCase
 from desktop.conf import RAZ
 from desktop.lib.raz.clients import S3RazClient, AdlsRazClient
 
@@ -28,20 +27,20 @@ if sys.version_info[0] > 2:
 else:
   from mock import patch, Mock
 
-class S3RazClientLiveTest(unittest.TestCase):
+class S3RazClientLiveTest(TestCase):
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     if not RAZ.IS_ENABLED.get():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
   def test_check_access_s3_list_buckets(self):
 
     url = S3RazClient().get_url()
 
-    assert_true('AWSAccessKeyId=' in url)
-    assert_true('Signature=' in url)
-    assert_true('Expires=' in url)
+    assert 'AWSAccessKeyId=' in url
+    assert 'Signature=' in url
+    assert 'Expires=' in url
 
 
   def test_check_acccess_s3_list_file(self):
@@ -50,24 +49,24 @@ class S3RazClientLiveTest(unittest.TestCase):
 
     url = S3RazClient().get_url(bucket='gethue-test', path='/data/query-hive-weblogs.csv')
 
-    assert_true('data/query-hive-weblogs.csv' in url)
-    assert_true('AWSAccessKeyId=' in url)
-    assert_true('Signature=' in url)
-    assert_true('Expires=' in url)
+    assert 'data/query-hive-weblogs.csv' in url
+    assert 'AWSAccessKeyId=' in url
+    assert 'Signature=' in url
+    assert 'Expires=' in url
 
     url = S3RazClient().get_url(bucket='gethue-test', path='/data/query-hive-weblogs.csv', perm='read', action='write')
 
-    assert_true('data/query-hive-weblogs.csv' in url)
-    assert_true('AWSAccessKeyId=' in url)
-    assert_true('Signature=' in url)
-    assert_true('Expires=' in url)
+    assert 'data/query-hive-weblogs.csv' in url
+    assert 'AWSAccessKeyId=' in url
+    assert 'Signature=' in url
+    assert 'Expires=' in url
 
 
   def test_check_acccess_s3_list_file_no_access(self): pass
 
-class AdlsRazClientTest(unittest.TestCase):
+class AdlsRazClientTest(TestCase):
 
-  def setUp(self):
+  def setup_method(self, method):
     self.username = 'csso_hueuser'
   
   def test_check_rename_operation(self):

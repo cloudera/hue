@@ -21,7 +21,6 @@ standard_library.install_aliases()
 import sys
 
 from desktop.lib.i18n import force_unicode
-from nose.tools import assert_equal
 
 from indexer.utils import field_values_from_separated_file
 
@@ -36,11 +35,11 @@ def test_get_ensemble():
   # Non ascii
   data = string_io('fieldA\nrel=""nofollow"">Twitter for Péché')
   result = list(field_values_from_separated_file(data, delimiter='\t', quote_character='"'))
-  assert_equal(u'rel=""nofollow"">Twitter for Péché', result[0]['fieldA'])
+  assert u'rel=""nofollow"">Twitter for Péché' == result[0]['fieldA']
 
   data = string_io('fieldA\nrel=""nofollow"">Twitter for BlackBerry®')
   result = list(field_values_from_separated_file(data, delimiter='\t', quote_character='"'))
-  assert_equal(u'rel=""nofollow"">Twitter for BlackBerry®', result[0]['fieldA'])
+  assert u'rel=""nofollow"">Twitter for BlackBerry®' == result[0]['fieldA']
 
   # Bad binary
   test_str = b'fieldA\naaa\x80\x02\x03'
@@ -49,4 +48,4 @@ def test_get_ensemble():
   else:
     data = string_io(test_str)
   result = list(field_values_from_separated_file(data, delimiter='\t', quote_character='"'))
-  assert_equal(u'aaa\x02\x03', result[0]['fieldA'])
+  assert u'aaa\x02\x03' == result[0]['fieldA']

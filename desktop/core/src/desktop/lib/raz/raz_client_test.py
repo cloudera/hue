@@ -16,9 +16,9 @@
 
 import base64
 import sys
+import pytest
 import unittest
-
-from nose.tools import assert_equal, assert_true, assert_raises
+from django.test import TestCase
 
 from desktop.lib.raz.raz_client import RazClient, get_raz_client
 from desktop.lib.exceptions_renderable import PopupException
@@ -29,9 +29,9 @@ else:
   from mock import patch, Mock
 
 
-class RazClientTest(unittest.TestCase):
+class RazClientTest(TestCase):
 
-  def setUp(self):
+  def setup_method(self, method):
     self.username = 'gethue'
     self.raz_url = 'https://raz.gethue.com:8080'
     self.raz_urls_ha = 'https://raz_host_1.gethue.com:8080/,https://raz_host_2.gethue.com:8080/'
@@ -50,11 +50,11 @@ class RazClientTest(unittest.TestCase):
       cluster_name='gethueCluster'
     )
 
-    assert_true(isinstance(client, RazClient))
+    assert isinstance(client, RazClient)
 
-    assert_equal(client.raz_url, self.raz_url)
-    assert_equal(client.service_name, 'gethue_adls')
-    assert_equal(client.cluster_name, 'gethueCluster')
+    assert client.raz_url == self.raz_url
+    assert client.service_name == 'gethue_adls'
+    assert client.cluster_name == 'gethueCluster'
 
 
   def test_check_access_adls(self):
@@ -113,7 +113,7 @@ class RazClientTest(unittest.TestCase):
             },
             verify=False
           )
-          assert_equal(resp['token'], "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs=")
+          assert resp['token'] == "nulltenantIdnullnullbnullALLOWEDnullnull1.05nSlN7t/QiPJ1OFlCruTEPLibFbAhEYYj5wbJuaeQqs="
 
 
   def test_handle_raz_req(self):
@@ -156,13 +156,15 @@ class RazClientTest(unittest.TestCase):
           client = RazClient(self.raz_url, 'jwt', username=self.username, service="adls", service_name="cm_adls", cluster_name="cl1")
           client._handle_raz_ha = Mock(return_value=None)
 
-          assert_raises(PopupException, client._handle_raz_req, self.raz_url, request_headers, request_data)
+          with pytest.raises(PopupException):
+            client._handle_raz_req(self.raz_url, request_headers, request_data)
 
           # Should raise PopupException when JWT is None
           fetch_jwt.return_value = None
           client._handle_raz_ha = Mock()
 
-          assert_raises(PopupException, client._handle_raz_req, self.raz_url, request_headers, request_data)
+          with pytest.raises(PopupException):
+            client._handle_raz_req(self.raz_url, request_headers, request_data)
 
 
   def test_handle_adls_action_types_mapping(self):
@@ -174,7 +176,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {'directory': 'user%2Fcsso_hueuser', 'resource': 'filesystem', 'recursive': 'false'}
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'list')
+    assert access_type == 'list'
 
     # Stats
     method = 'HEAD'
@@ -182,21 +184,21 @@ class RazClientTest(unittest.TestCase):
     url_params = {'action': 'getStatus'}
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'get-status')
+    assert access_type == 'get-status'
 
     method = 'HEAD'
     relative_path = '/user'
     url_params = {'resource': 'filesystem'} # Stats call for first-level directories like /user
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'get-status')
+    assert access_type == 'get-status'
 
     method = 'HEAD'
     relative_path = '/'
     url_params = {'action': 'getAccessControl'} # Stats call for root directory path
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'get-acl')
+    assert access_type == 'get-acl'
 
     # Delete path
     method = 'DELETE'
@@ -204,7 +206,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {}
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'delete')
+    assert access_type == 'delete'
 
     # Delete with recursive as true
     method = 'DELETE'
@@ -212,7 +214,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {'recursive': 'true'}
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'delete-recursive')
+    assert access_type == 'delete-recursive'
 
     # Create directory
     method = 'PUT'
@@ -220,7 +222,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {'resource': 'directory'}
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'create-directory')
+    assert access_type == 'create-directory'
 
     # Create file
     method = 'PUT'
@@ -228,7 +230,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {'resource': 'file'}
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'create-file')
+    assert access_type == 'create-file'
 
     # Append
     method = 'PATCH'
@@ -236,7 +238,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {'action': 'append'}
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'write')
+    assert access_type == 'write'
 
     # Flush
     method = 'PATCH'
@@ -244,7 +246,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {'action': 'flush'}
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'write')
+    assert access_type == 'write'
 
     # Chmod
     method = 'PATCH'
@@ -252,7 +254,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {'action': 'setAccessControl'}
 
     access_type = client.handle_adls_req_mapping(method, url_params)
-    assert_equal(access_type, 'set-permission')
+    assert access_type == 'set-permission'
 
 
   def test_handle_relative_path(self):
@@ -264,7 +266,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {}
 
     relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
-    assert_equal(relative_path, "/")
+    assert relative_path == "/"
 
     # When relative path is present in URL
     method = 'GET'
@@ -272,7 +274,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {}
 
     relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
-    assert_equal(relative_path, "/user/csso_hueuser/customer.csv")
+    assert relative_path == "/user/csso_hueuser/customer.csv"
 
     # When relative path present in URL is having quoted whitespaces (%20)
     method = 'GET'
@@ -280,7 +282,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {}
 
     relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
-    assert_equal(relative_path, "/user/csso_hueuser/customer (1).csv")
+    assert relative_path == "/user/csso_hueuser/customer (1).csv"
 
     # When list operation
     method = 'GET'
@@ -288,7 +290,7 @@ class RazClientTest(unittest.TestCase):
     url_params = {'directory': 'user%2Fcsso_hueuser', 'resource': 'filesystem', 'recursive': 'false'}
 
     relative_path = client._handle_relative_path(method, url_params, resource_path, "/")
-    assert_equal(relative_path, "/user/csso_hueuser")
+    assert relative_path == "/user/csso_hueuser"
 
 
   def test_get_raz_client_s3(self):
@@ -301,11 +303,11 @@ class RazClientTest(unittest.TestCase):
       cluster_name='gethueCluster'
     )
 
-    assert_true(isinstance(client, RazClient))
+    assert isinstance(client, RazClient)
 
-    assert_equal(client.raz_url, self.raz_url)
-    assert_equal(client.service_name, 'gethue_s3')
-    assert_equal(client.cluster_name, 'gethueCluster')
+    assert client.raz_url == self.raz_url
+    assert client.service_name == 'gethue_s3'
+    assert client.cluster_name == 'gethueCluster'
 
 
   def test_check_access_s3(self):
@@ -375,8 +377,8 @@ class RazClientTest(unittest.TestCase):
                 },
                 verify=False
               )
-              assert_true(resp)
-              assert_equal(resp['AWSAccessKeyId'], 'AKIA23E77ZX2HVY76YGL')
+              assert resp
+              assert resp['AWSAccessKeyId'] == 'AKIA23E77ZX2HVY76YGL'
 
 
   def test_handle_raz_ha(self):
@@ -396,7 +398,7 @@ class RazClientTest(unittest.TestCase):
           json=request_data, 
           verify=False
         )
-        assert_equal(raz_response.status_code, 200)
+        assert raz_response.status_code == 200
 
         # HA mode - where first URL sends 200 status code
         client = RazClient(self.raz_urls_ha, 'kerberos', username=self.username, service="s3", service_name="cm_s3", cluster_name="cl1")
@@ -409,7 +411,7 @@ class RazClientTest(unittest.TestCase):
           json=request_data, 
           verify=False
         )
-        assert_equal(raz_response.status_code, 200)
+        assert raz_response.status_code == 200
 
         # When no RAZ URL is healthy
         requests_post.return_value = Mock(status_code=404)
@@ -417,5 +419,5 @@ class RazClientTest(unittest.TestCase):
         client = RazClient(self.raz_urls_ha, 'kerberos', username=self.username, service="s3", service_name="cm_s3", cluster_name="cl1")
         raz_response = client._handle_raz_ha(self.raz_urls_ha, auth_handler=HTTPKerberosAuth(), data=request_data, headers={})
 
-        assert_equal(raz_response, None)
+        assert raz_response == None
 

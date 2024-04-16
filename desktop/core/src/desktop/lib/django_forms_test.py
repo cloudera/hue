@@ -17,7 +17,6 @@
 from desktop.lib.django_forms import DependencyAwareForm
 from django import forms
 
-from nose.tools import assert_true, assert_false, assert_equal
 
 def test_dependency_aware_form():
   class Form(DependencyAwareForm):
@@ -32,22 +31,22 @@ def test_dependency_aware_form():
       ("cond", False, "if_false")
     ]
 
-  assert_true(Form({'cond': '', 'if_false': 'hi'}).is_valid())
-  assert_true(Form({'cond': 'on', 'if_true': 'hi'}).is_valid())
-  assert_false(Form({}).is_valid())
+  assert Form({'cond': '', 'if_false': 'hi'}).is_valid()
+  assert Form({'cond': 'on', 'if_true': 'hi'}).is_valid()
+  assert not Form({}).is_valid()
   # Because 'cond' is a boolean field, if it's not specified,
   # it renders as False in the form.
   f = Form({'if_false': ''})
-  assert_false(f.is_valid())
+  assert not f.is_valid()
   # Make sure errors gets populated
-  assert_equal(1, len(f.errors["if_false"]))
-  assert_true(Form({'if_false': 'foo'}).is_valid())
+  assert 1 == len(f.errors["if_false"])
+  assert Form({'if_false': 'foo'}).is_valid()
 
   a = Form(prefix="prefix")
-  assert_equal([('prefix-cond', "True", "prefix-if_true"), ('prefix-cond', 'False', 'prefix-if_false')], a._calculate_data())
-  assert_true(" " not in a.render_dep_metadata())
+  assert [('prefix-cond', "True", "prefix-if_true"), ('prefix-cond', 'False', 'prefix-if_false')] == a._calculate_data()
+  assert " " not in a.render_dep_metadata()
 
   # Check that cleaned_data still gets populated.
   f = Form({'if_false': 'foo'})
   f.is_valid()
-  assert_true(f.cleaned_data)
+  assert f.cleaned_data

@@ -17,12 +17,13 @@
 # limitations under the License.
 
 import json
+import pytest
 import sys
 
 from django.http import HttpResponse
 from django.urls import reverse
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
+
+
 
 from useradmin.models import User
 from desktop.conf import CUSTOM
@@ -35,8 +36,9 @@ else:
   from mock import patch, Mock, MagicMock
 
 
+@pytest.mark.django_db
 class TestCoreApi():
-  def setUp(self):
+  def setup_method(self):
     self.unauthorized_client = Client()
 
   def test_banners(self):
@@ -51,12 +53,13 @@ class TestCoreApi():
 
         get_banner_message.assert_called()
         json_resp = json.loads(response.content)
-        assert_equal(json_resp['configured'], configured_banner)
-        assert_equal(json_resp['system'], system_banner)
+        assert json_resp['configured'] == configured_banner
+        assert json_resp['system'] == system_banner
       finally:
         done()
 
 
+@pytest.mark.django_db
 class TestEditorApi():
   TEST_INTERPRETER = {
     'name': 'MySql', 'displayName': 'MySql', 'type': '1', 'interface': 'sqlalchemy',
@@ -69,7 +72,7 @@ class TestEditorApi():
                            'has_use_statement': False}, 'category': 'editor', 'is_sql': True, 'is_catalog': False
   }
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="api_user", recreate=True, is_superuser=False)
     self.client_not_me = make_logged_in_client(username="not_api_user", recreate=True, is_superuser=False)
 
@@ -77,7 +80,7 @@ class TestEditorApi():
     self.user_not_me = User.objects.get(username="not_api_user")
 
   def test_urls_exist(self):
-    assert_equal(reverse('api:editor_execute', args=['hive']), '/api/v1/editor/execute/hive')
+    assert reverse('api:editor_execute', args=['hive']) == '/api/v1/editor/execute/hive'
 
   def test_editor_execute(self):
     with patch('desktop.api_public.notebook_api.execute') as execute:
@@ -90,7 +93,7 @@ class TestEditorApi():
       execute.assert_called()
       if not execute.call_args.args[1]:
         raise SkipTest()  # Incorrect in Py3 CircleCi
-      assert_equal(execute.call_args.args[1], 'hive')
+      assert execute.call_args.args[1] == 'hive'
       json.loads(execute.call_args.args[0].POST['notebook'])
       json.loads(execute.call_args.args[0].POST['snippet'])
 
@@ -99,6 +102,4 @@ class TestEditorApi():
 
     django_request = get_django_request(request)
 
-    assert_true(
-      hasattr(django_request.user, 'has_hue_permission')
-    )
+    assert hasattr(django_request.user, 'has_hue_permission')

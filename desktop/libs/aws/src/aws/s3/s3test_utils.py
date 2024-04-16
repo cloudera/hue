@@ -17,17 +17,16 @@ from __future__ import absolute_import
 
 from builtins import range
 import os
+import pytest
 import random
 import string
 import unittest
 
-from nose.plugins.skip import SkipTest
-
 import aws
-
 from aws import conf as aws_conf
 from aws.s3 import parse_uri, join
 from contextlib import contextmanager
+from django.test import TestCase
 from desktop.lib.fsmanager import get_client
 
 
@@ -39,11 +38,11 @@ def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
   return ''.join(random.choice(chars) for x in range(size))
 
 
-class S3TestBase(unittest.TestCase):
-  integration = True
+@pytest.mark.integration
+class S3TestBase(TestCase):
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     cls.bucket_name = get_test_bucket()
 
     cls._should_skip = False
@@ -64,12 +63,12 @@ class S3TestBase(unittest.TestCase):
   def shouldSkip(cls):
     return cls._should_skip
 
-  def setUp(self):
+  def setup_method(self, method):
     if self.shouldSkip():
-      raise SkipTest(self._skip_msg)
+      pytest.skip(self._skip_msg)
 
   @classmethod
-  def tearDownClass(cls):
+  def teardown_class(cls):
     if not cls.shouldSkip():
       cls.clean_up(cls.get_test_path())
 
