@@ -53,6 +53,7 @@ import hueUtils from 'utils/hueUtils';
 import I18n from 'utils/i18n';
 import MultiLineEllipsisHandler from 'utils/multiLineEllipsisHandler';
 import sqlUtils from 'sql/sqlUtils';
+import { loadDataCatalogs } from 'reactComponents/loadCatalogs';
 
 import 'webComponents/HueIcons';
 import 'components/sidebar/HueSidebarWebComponent';
