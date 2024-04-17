@@ -6,4 +6,38 @@ python_files = "tests.py test_*.py *_tests.py tests_* *_test.py"
 markers = [
     "integration: live server based tests",
     "requires_hadoop: live hadoop cluster based tests"
-    ]
+]
+
+[tool.ruff]
+target-version = "py38"
+line-length = 140
+# indent-width = 2
+extend-exclude = [
+  "*/ext-py3/*",
+  "desktop/core/src/desktop/lib/wsgiserver.py",
+  "*/migrations/*",
+  "apps/oozie/src/oozie/tests.py",
+  "tools/ops/",
+  "tools/ace-editor/",
+  "*/gen-py/*",
+  "*/org_migrations/*"
+]
+
+[tool.ruff.lint]
+preview = true
+select = [
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+]
+ignore = [
+    "E111",
+    "E114",
+    "W191",
+    "E902",
+]
+
+# [tool.ruff.lint.isort]
+# combine-as-imports = true
+
+[tool.ruff.format]
+docstring-code-format = true
