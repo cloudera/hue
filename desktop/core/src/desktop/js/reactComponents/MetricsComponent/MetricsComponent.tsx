@@ -141,7 +141,7 @@ const MetricsComponent = () => {
               //to make sure antd class gets applied
               getPopupContainer={triggerNode => triggerNode.parentElement}
               ref={dropdownRef}
-              placeholder="Choose a metric"
+              // placeholder="All"
               value={selectedMetric}
               onChange={handleMetricChange}
             >

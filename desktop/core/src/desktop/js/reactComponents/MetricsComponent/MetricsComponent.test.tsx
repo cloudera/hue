@@ -17,6 +17,8 @@
 import React from 'react';
 import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import MetricsComponent from './MetricsComponent';
+import { debug } from '@testing-library/react';
+
 
 jest.mock('api/utils', () => ({
   get: jest.fn(() =>
@@ -56,6 +58,9 @@ describe('MetricsComponent', () => {
   test('Filtering metrics based on name column value', async () => {
     render(<MetricsComponent />);
 
+    console.log('1');
+    console.log(document.body);
+
     const filterInput = screen.getByPlaceholderText('Filter metrics...');
     fireEvent.change(filterInput, { target: { value: 'value' } });
 
@@ -77,7 +82,17 @@ describe('MetricsComponent', () => {
   test('Selecting a specific metric from the dropdown', async () => {
     render(<MetricsComponent />);
 
-    const dropdown = screen.getByPlaceholderText('Choose a metric');
+     // Print out the rendered HTML structure
+    //  console.log('2');
+    // debug();
+    // console.log(screen.container);
+    // console.log(document.body.firstChild);
+    // console.log(document.body);
+
+    // const dropdown = screen.getByRole("");
+    // queryByRole('button', { name: 'test2' }))
+    const dropdown = await screen.getByRole('combobox', { name: ""});
+    // console.log(dropdownButton);
     fireEvent.change(dropdown, { target: { value: 'users' } });
 
     await waitFor(() => {
