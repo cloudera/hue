@@ -108,12 +108,13 @@ class TrinoApi(Api):
     query_client = TrinoQuery(self.trino_request, 'USE ' + database)
     query_client.execute()
 
-    statement = snippet['statement'].rstrip(';')
+    current_statement = self._get_current_statement(notebook, snippet)
+    statement = current_statement['statement']
     query_client = TrinoQuery(self.trino_request, statement)
     response = self.trino_request.post(query_client.query)
     status = self.trino_request.process(response)
 
-    return {
+    response = {
       'row_count': 0,
       'next_uri': status.next_uri,
       'sync': None,
@@ -133,6 +134,9 @@ class TrinoApi(Api):
         'type': 'table'
       }
     }
+    response.update(current_statement)
+
+    return response
 
 
   @query_error_handler
