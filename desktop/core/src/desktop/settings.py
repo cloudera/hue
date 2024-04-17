@@ -744,11 +744,11 @@ if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABL
 
   CELERY_TASK_QUEUES = {
     'low_priority': {
-        'exchange': 'low_priority', # unused
+        'exchange': 'low_priority',  # unused
         'routing_key': 'low_priority',
     },
     'high_priority': {
-        'exchange': 'high_priority', # unused
+        'exchange': 'high_priority',  # unused
         'routing_key': 'high_priority',
     },
     'default': {
