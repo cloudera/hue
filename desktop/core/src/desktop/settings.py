@@ -507,18 +507,9 @@ SECURE_SSL_REDIRECT = desktop.conf.SECURE_SSL_REDIRECT.get()
 SECURE_SSL_HOST = desktop.conf.SECURE_SSL_HOST.get()
 SECURE_REDIRECT_EXEMPT = desktop.conf.SECURE_REDIRECT_EXEMPT.get()
 
-# django-nose test specifics
-TEST_RUNNER = 'desktop.lib.test_runners.HueTestRunner'
 # Turn off cache middleware
 if 'test' in sys.argv:
   CACHE_MIDDLEWARE_SECONDS = 0
-
-# Limit Nose coverage to Hue apps
-NOSE_ARGS = [
-  '--cover-package=%s' % ','.join([app.name for app in appmanager.DESKTOP_APPS + appmanager.DESKTOP_LIBS]),
-  '--no-path-adjustment',
-  '--traverse-namespace'
-]
 
 TIME_ZONE = desktop.conf.TIME_ZONE.get()
 
@@ -747,8 +738,27 @@ if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABL
   CELERY_ACCEPT_CONTENT = ['json']
   CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER.CELERY_RESULT_BACKEND.get()
   CELERY_TASK_SERIALIZER = 'json'
+  CELERY_ENABLE_UTC = True
+  CELERY_TIMEZONE = "America/Los_Angeles"
 
   CELERYD_OPTS = desktop.conf.TASK_SERVER.RESULT_CELERYD_OPTS.get()
+  CELERY_TASK_DEFAULT_QUEUE = 'default'
+
+  CELERY_TASK_QUEUES = {
+    'low_priority': {
+        'exchange': 'low_priority', # unused
+        'routing_key': 'low_priority',
+    },
+    'high_priority': {
+        'exchange': 'high_priority', # unused
+        'routing_key': 'high_priority',
+    },
+    'default': {
+         'exchange': 'default',
+         'routing_key': 'default'
+    },
+  }
+
 
 # %n will be replaced with the first part of the nodename.
 # CELERYD_LOG_FILE="/var/log/celery/%n%I.log"

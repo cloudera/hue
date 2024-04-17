@@ -17,12 +17,13 @@
 # limitations under the License.
 
 import logging
+import pytest
 import sys
+from django.test import TestCase
 from beeswax.server.dbms import get_query_server_config
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 from django.core.cache import caches
-from nose.tools import assert_equal, assert_raises
 
 if sys.version_info[0] > 2:
   from unittest.mock import patch, Mock
@@ -34,7 +35,7 @@ cache = caches[CACHES_HIVE_DISCOVERY_KEY]
 
 
 class TestGetQueryServerConfig():
-  def setUp(self):
+  def setup_method(self):
     cache.clear()
 
   def test_get_default(self):
@@ -46,9 +47,9 @@ class TestGetQueryServerConfig():
 
         query_server = get_query_server_config()
 
-        assert_equal(query_server['server_name'], 'beeswax')
-        assert_equal(query_server['server_host'], 'hive.gethue.com')
-        assert_equal(query_server['server_port'], 10002)
+        assert query_server['server_name'] == 'beeswax'
+        assert query_server['server_host'] == 'hive.gethue.com'
+        assert query_server['server_port'] == 10002
 
   def test_get_impala(self):
 
@@ -59,9 +60,9 @@ class TestGetQueryServerConfig():
 
         query_server = get_query_server_config(name='impala')
 
-        assert_equal(query_server['server_name'], 'impala')
-        assert_equal(query_server['server_host'], 'impala.gethue.com')
-        assert_equal(query_server['server_port'], 10002)
+        assert query_server['server_name'] == 'impala'
+        assert query_server['server_host'] == 'impala.gethue.com'
+        assert query_server['server_port'] == 10002
 
   def test_get_llap(self):
 
@@ -72,9 +73,9 @@ class TestGetQueryServerConfig():
 
         query_server = get_query_server_config(name='llap')
 
-        assert_equal(query_server['server_name'], 'beeswax')
-        assert_equal(query_server['server_host'], 'hive-llap.gethue.com')
-        assert_equal(query_server['server_port'], 10002)
+        assert query_server['server_name'] == 'beeswax'
+        assert query_server['server_host'] == 'hive-llap.gethue.com'
+        assert query_server['server_port'] == 10002
 
   def test_get_llap_discovery(self):
 
@@ -94,10 +95,10 @@ class TestGetQueryServerConfig():
             )
             query_server = get_query_server_config(name='llap')
 
-            assert_equal(query_server['server_name'], 'beeswax')
-            assert_equal(query_server['server_host'], 'hive-llap-1.gethue.com')
+            assert query_server['server_name'] == 'beeswax'
+            assert query_server['server_host'] == 'hive-llap-1.gethue.com'
             # assert_equal(query_server['server_port'], 20000) # Bug Always set to LLAP_SERVER_PORT?
-            assert_equal(query_server['server_port'], 25000)  # To remove this line and comment above when fixed.
+            assert query_server['server_port'] == 25000  # To remove this line and comment above when fixed.
 
   def test_get_llap_ha_discovery_all_server_down(self):
 
@@ -113,11 +114,12 @@ class TestGetQueryServerConfig():
             get_children=Mock(return_value=[])
           )
 
-          assert_raises(PopupException, get_query_server_config, name='llap')
+          with pytest.raises(PopupException):
+            get_query_server_config(name='llap')
           try:
             query_server = get_query_server_config(name='llap')
           except PopupException as e:
-            assert_equal(e.message, 'There is no running Hive LLAP server available')
+            assert e.message == 'There is no running Hive LLAP server available'
 
   def test_get_hive_ha_discovery_all_server_down(self):
 
@@ -137,11 +139,12 @@ class TestGetQueryServerConfig():
                 get_children=Mock(return_value=[])
               )
 
-              assert_raises(PopupException, get_query_server_config, name='hive')
+              with pytest.raises(PopupException):
+                get_query_server_config(name='hive')
               try:
                 query_server = get_query_server_config(name='hive')
               except PopupException as e:
-                assert_equal(e.message, 'There are no running Hive server available')
+                assert e.message == 'There are no running Hive server available'
 
   def test_get_hs2_discovery(self):
 
@@ -160,11 +163,11 @@ class TestGetQueryServerConfig():
           try:
             query_server = get_query_server_config(name='hive')
           except PopupException as e:
-            assert_equal(e.message, 'There are no running Hive server available')
+            assert e.message == 'There are no running Hive server available'
 
-          assert_equal(query_server['server_name'], 'beeswax')
-          assert_equal(query_server['server_host'], 'hive-llap-1.gethue.com')
-          assert_equal(query_server['server_port'], 10000)
+          assert query_server['server_name'] == 'beeswax'
+          assert query_server['server_host'] == 'hive-llap-1.gethue.com'
+          assert query_server['server_port'] == 10000
 
 
 # TODO: all the combinations in new test methods, e.g.:

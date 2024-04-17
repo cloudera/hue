@@ -18,12 +18,11 @@
 
 import json
 import logging
+import pytest
 import sys
-import unittest
+from django.test import TestCase
 
 from django.core.exceptions import FieldError
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user, create_user
 from desktop.conf import ENABLE_ORGANIZATIONS
@@ -41,12 +40,12 @@ else:
 LOG = logging.getLogger()
 
 
-class TestOrganizationSingleUser(unittest.TestCase):
+class TestOrganizationSingleUser(TestCase):
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     if not ENABLE_ORGANIZATIONS.get():  # Skip for now as depends on DB changes
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     cls.user1 = create_user('user1@testorg.gethue.com', 'test', is_superuser=False)
     cls.user2 = create_user('user2@testorg.gethue.com', 'test', is_superuser=True)
@@ -57,7 +56,7 @@ class TestOrganizationSingleUser(unittest.TestCase):
     cls.client2 = make_logged_in_client(username=cls.user2.username)
 
   @classmethod
-  def tearDownClass(cls):
+  def teardown_class(cls):
     cls.user1.delete()
     cls.user2.delete()
     cls.user3.delete()
@@ -70,43 +69,41 @@ class TestOrganizationSingleUser(unittest.TestCase):
   def test_user_group(self):
     user1_organization = Organization.objects.get(name='user1@testorg.gethue.com')
 
-    assert_equal('user1@testorg.gethue.com', self.user1.email)
-    assert_true(self.user1.is_admin)
-    assert_equal(user1_organization, self.user1.organization)
-    assert_equal(
-      list(Group.objects.filter(name='default', organization=user1_organization)),
-      list(self.user1.groups.all())
-    )
+    assert 'user1@testorg.gethue.com' == self.user1.email
+    assert self.user1.is_admin
+    assert user1_organization == self.user1.organization
+    assert (
+      list(Group.objects.filter(name='default', organization=user1_organization)) ==
+      list(self.user1.groups.all()))
 
   def test_users_groups(self):
-    assert_equal(4, User.objects.filter(email__contains='testorg.gethue.com').count(), User.objects.all())
-    assert_equal(4, Organization.objects.filter(name__contains='testorg.gethue.com').count(), Organization.objects.all())
-    assert_equal(4, Group.objects.filter(organization__name__contains='testorg.gethue.com').count(), Group.objects.all())
+    assert 4 == User.objects.filter(email__contains='testorg.gethue.com').count(), User.objects.all()
+    assert 4 == Organization.objects.filter(name__contains='testorg.gethue.com').count(), Organization.objects.all()
+    assert 4 == Group.objects.filter(organization__name__contains='testorg.gethue.com').count(), Group.objects.all()
 
   def test_get_users(self):
     # View
     response = self.client1.get('/useradmin/users/')
-    assert_equal([self.user1], list(response.context[0]['users']))
+    assert [self.user1] == list(response.context[0]['users'])
 
     # API
     response = self.client1.get('/useradmin/api/get_users/')
     data = json.loads(response.content)
 
-    assert_equal(0, data['status'])
-    assert_equal([self.user1.email], [user['username'] for user in data['users']])
+    assert 0 == data['status']
+    assert [self.user1.email] == [user['username'] for user in data['users']]
 
   def test_get_groups(self):
     # View
     response = self.client1.get('/useradmin/groups/')
-    assert_equal(list(self.user1.groups.all()), list(response.context[0]['groups']))
+    assert list(self.user1.groups.all()) == list(response.context[0]['groups'])
 
   def test_get_permissions(self):
     # View
     response = self.client1.get('/useradmin/permissions/')
-    assert_equal(
-      list(HuePermission.objects.filter(organizationgroup__user=self.user1)),
-      list(response.context[0]['permissions'])
-    )
+    assert (
+      list(HuePermission.objects.filter(organizationgroup__user=self.user1)) ==
+      list(response.context[0]['permissions']))
 
   def test_get_documents(self):
     document = Document2.objects.create(
@@ -120,13 +117,13 @@ class TestOrganizationSingleUser(unittest.TestCase):
       response = self.client1.post('/desktop/api2/docs/?text=TestOrganizationSingleUser.test_get_document')
       data = json.loads(response.content)
 
-      assert_equal([document.id], [doc['id'] for doc in data['documents']])
+      assert [document.id] == [doc['id'] for doc in data['documents']]
 
       # Admin other Org
       response = self.client2.post('/desktop/api2/docs/?text=TestOrganizationSingleUser.test_get_document')
       data = json.loads(response.content)
 
-      assert_equal([], data['documents'])
+      assert [] == data['documents']
     finally:
       document.delete()
 
@@ -139,12 +136,8 @@ class TestOrganizationSingleUser(unittest.TestCase):
 
     User.objects.values_list('username', flat=True)
     try:
-      assert_false(
-        User.objects.filter(groups__in=[]).values_list('username', flat=True)
-      )
-      assert_true(
-        User.objects.filter(groups__in=Group.objects.all()).values_list('username', flat=True)
-      )
+      assert not User.objects.filter(groups__in=[]).values_list('username', flat=True)
+      assert User.objects.filter(groups__in=Group.objects.all()).values_list('username', flat=True)
     except FieldError as e:
       LOG.warning('Test currently skipped')
 

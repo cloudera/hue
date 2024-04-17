@@ -60,7 +60,7 @@ commands:
       - run:
           name: run tests
           command: |
-            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
+            PYTHONWARNINGS=always ./build/env/bin/pytest 
 
       - store_artifacts:
           path: test-reports

@@ -15,8 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-from nose.tools import assert_equal, assert_true, assert_raises, assert_false, assert_in, assert_is_none
+import pytest
+from django.test import TestCase
 from unittest.mock import MagicMock, patch, Mock
 
 from desktop.auth.backend import rewrite_user
@@ -25,10 +25,10 @@ from notebook.connectors.trino import TrinoApi
 from useradmin.models import User
 
 
-class TestTrinoApi(unittest.TestCase):
+class TestTrinoApi(TestCase):
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     # Mock user and interpreter
     cls.client = make_logged_in_client(username="hue_test", groupname="default", recreate=True, is_superuser=False)
     cls.user = User.objects.get(username="hue_test")
@@ -47,7 +47,7 @@ class TestTrinoApi(unittest.TestCase):
     expected_result = ('example.com', 8080, 'http')
     result = self.trino_api.parse_api_url(api_url)
 
-    assert_equal(result, expected_result)
+    assert result == expected_result
 
 
   def test_autocomplete_with_database(self):
@@ -58,10 +58,9 @@ class TestTrinoApi(unittest.TestCase):
       snippet = {}
       response = self.trino_api.autocomplete(snippet)
 
-      assert_in('databases', response)   # Check if 'databases' key exists in the response
-      assert_equal(response['databases'],
-      [{'name': 'test_catalog1.test_db1'}, {'name': 'test_catalog2.test_db1'}, {'name': 'test_catalog2.test_db2'}]
-      )
+      assert 'databases' in response   # Check if 'databases' key exists in the response
+      assert (response['databases'] ==
+      [{'name': 'test_catalog1.test_db1'}, {'name': 'test_catalog2.test_db1'}, {'name': 'test_catalog2.test_db2'}])
 
 
   def test_autocomplete_with_database_and_table(self):
@@ -75,8 +74,8 @@ class TestTrinoApi(unittest.TestCase):
       database = 'test_db1'
       response = self.trino_api.autocomplete(snippet, database)
       
-      assert_in('tables_meta', response)   # Check if 'table_meta' key exists in the response
-      assert_equal(response['tables_meta'],
+      assert 'tables_meta' in response   # Check if 'table_meta' key exists in the response
+      assert (response['tables_meta'] ==
       [
       {'name': 'test_table1', 'type': 'table', 'comment': ''},
       {'name': 'test_table2', 'type': 'table', 'comment': ''},
@@ -96,16 +95,16 @@ class TestTrinoApi(unittest.TestCase):
       table = 'test_table1'
       response = self.trino_api.autocomplete(snippet, database, table)
 
-      assert_in('extended_columns', response)   # Check if 'extended_columns' key exists in the response
-      assert_equal(response['extended_columns'],
+      assert 'extended_columns' in response   # Check if 'extended_columns' key exists in the response
+      assert (response['extended_columns'] ==
       [
       {'comment': '', 'name': 'test_column1', 'type': 'str'},
       {'comment': '', 'name': 'test_column2', 'type': 'int'},
       {'comment': '', 'name': 'test_column3', 'type': 'int'}
       ])
 
-      assert_in('columns', response)   # Check if 'columns' key exists in the response
-      assert_equal(response['columns'], ['test_column1', 'test_column2', 'test_column3'])
+      assert 'columns' in response   # Check if 'columns' key exists in the response
+      assert response['columns'] == ['test_column1', 'test_column2', 'test_column3']
 
 
   def test_get_sample_data_success(self):
@@ -120,11 +119,10 @@ class TestTrinoApi(unittest.TestCase):
       # Call the get_sample_data method
       result = self.trino_api.get_sample_data(snippet={}, database='test_db', table='test_table')
 
-      assert_equal(result['status'], 0)
-      assert_equal(result['rows'], [['value1', 'value2'], ['value3', 'value4']])
-      assert_equal(result['full_headers'],
-      [{'name': 'test_column1', 'type': 'string', 'comment': ''}, {'name': 'test_column2', 'type': 'string', 'comment': ''}]
-      )
+      assert result['status'] == 0
+      assert result['rows'] == [['value1', 'value2'], ['value3', 'value4']]
+      assert (result['full_headers'] ==
+      [{'name': 'test_column1', 'type': 'string', 'comment': ''}, {'name': 'test_column2', 'type': 'string', 'comment': ''}])
 
 
   def test_check_status_available(self):
@@ -138,8 +136,8 @@ class TestTrinoApi(unittest.TestCase):
     # Call the check_status method
     result = self.trino_api.check_status(notebook={}, snippet={'result': {'handle': {'next_uri': 'http://url'}}})
 
-    assert_equal(result['status'], 'available')
-    assert_equal(result['next_uri'], 'http://url')
+    assert result['status'] == 'available'
+    assert result['next_uri'] == 'http://url'
 
 
   def test_execute(self):
@@ -158,7 +156,12 @@ class TestTrinoApi(unittest.TestCase):
       mock_trino_request.process.return_value = MagicMock(stats={'state': 'FINISHED'}, next_uri='http://url', id=123, rows=[])
 
       # Call the execute method
-      result = self.trino_api.execute(notebook={}, snippet={'database': 'test_db', 'statement': 'SELECT * FROM test_table;'})
+      snippet = {
+        'database': 'test_db',
+        'statement': 'SELECT * FROM test_table;',
+        'result': {'handle': {}}
+      }
+      result = self.trino_api.execute(notebook={}, snippet=snippet)
 
       expected_result = {
         'row_count': 0,
@@ -171,9 +174,38 @@ class TestTrinoApi(unittest.TestCase):
           'data': [],
           'meta': [],
           'type': 'table'
-        }
+        },
+        'statement_id': 0, 'has_more_statements': False, 'statements_count': 1,
+        'previous_statement_hash': 'd1c7e7dd8869098919761253c921eea865d48ca79d4e43092c321cfd',
+        'start': {'row': 0, 'column': 0}, 'end': {'row': 0, 'column': 23}, 'statement': 'SELECT * FROM test_table'
       }
-      assert_equal(result, expected_result)
+      assert result == expected_result
+
+      # Test multiple query execution
+      snippet = {
+        'database': 'test_db',
+        'statement': 'use test_db;\nshow tables',
+        'result': {'handle': {}}
+      }
+      result = self.trino_api.execute(notebook={}, snippet=snippet)
+
+      expected_result = {
+        'row_count': 0,
+        'next_uri': 'http://url',
+        'sync': None,
+        'has_result_set': True,
+        'guid': 123,
+        'result': {
+          'has_more': True,
+          'data': [],
+          'meta': [],
+          'type': 'table'
+        },
+        'statement_id': 0, 'has_more_statements': True, 'statements_count': 2,
+        'previous_statement_hash': '793204944f1800a86d75684d4be11eccb03b35f68441febb1362fd35',
+        'start': {'row': 0, 'column': 0}, 'end': {'row': 0, 'column': 12}, 'statement': 'use test_db'
+      }
+      assert result == expected_result
 
 
   def test_fetch_result(self):
@@ -221,9 +253,9 @@ class TestTrinoApi(unittest.TestCase):
       'type': 'table'
     }
     
-    assert_equal(result, expected_result)
-    assert_equal(len(result['data']), 6)
-    assert_equal(len(result['meta']), 2)
+    assert result == expected_result
+    assert len(result['data']) == 6
+    assert len(result['meta']) == 2
 
 
   def test_get_select_query(self):
@@ -236,10 +268,9 @@ class TestTrinoApi(unittest.TestCase):
         "FROM test_db.test_table\n"
         "LIMIT 100\n"
     )
-    assert_equal(
-      self.trino_api._get_select_query(database, table, column),
-      expected_statement
-    )
+    assert (
+      self.trino_api._get_select_query(database, table, column) ==
+      expected_statement)
 
     # Test with default parameters
     database = 'test_db'
@@ -249,10 +280,9 @@ class TestTrinoApi(unittest.TestCase):
         "FROM test_db.test_table\n"
         "LIMIT 100\n"
     )
-    assert_equal(
-      self.trino_api._get_select_query(database, table),
-      expected_statement
-    )
+    assert (
+      self.trino_api._get_select_query(database, table) ==
+      expected_statement)
 
 
   def test_explain(self):
@@ -282,9 +312,9 @@ class TestTrinoApi(unittest.TestCase):
       result = self.trino_api.explain(notebook=None, snippet=snippet)
 
       # Assert the result
-      assert_equal(result['status'], 0)
-      assert_equal(result['explanation'], output)
-      assert_equal(result['statement'], 'SELECT * FROM tpch.sf1.partsupp LIMIT 100')
+      assert result['status'] == 0
+      assert result['explanation'] == output
+      assert result['statement'] == 'SELECT * FROM tpch.sf1.partsupp LIMIT 100'
 
       query_instance = TrinoQuery.return_value
       query_instance.execute.side_effect = Exception('Mocked exception')
@@ -293,7 +323,7 @@ class TestTrinoApi(unittest.TestCase):
       result = self.trino_api.explain(notebook=None, snippet=snippet)
 
       # Assert the exception message
-      assert_equal(result['explanation'], 'Mocked exception')
+      assert result['explanation'] == 'Mocked exception'
 
 
   @patch('notebook.connectors.trino.DEFAULT_AUTH_USERNAME.get', return_value='mocked_username')
@@ -301,8 +331,8 @@ class TestTrinoApi(unittest.TestCase):
   def test_auth_username_and_auth_password_default(self, mock_default_username, mock_default_password):
     trino_api = TrinoApi(self.user, interpreter=self.interpreter)
 
-    assert_equal(trino_api.auth_username, 'mocked_username')
-    assert_equal(trino_api.auth_password, 'mocked_password')
+    assert trino_api.auth_username == 'mocked_username'
+    assert trino_api.auth_password == 'mocked_password'
 
 
   @patch('notebook.connectors.trino.DEFAULT_AUTH_USERNAME.get', return_value='mocked_username')
@@ -312,8 +342,8 @@ class TestTrinoApi(unittest.TestCase):
     self.interpreter['options']['auth_password'] = 'custom_password'
     trino_api = TrinoApi(self.user, interpreter=self.interpreter)
 
-    assert_equal(trino_api.auth_username, 'custom_username')
-    assert_equal(trino_api.auth_password, 'custom_password')  
+    assert trino_api.auth_username == 'custom_username'
+    assert trino_api.auth_password == 'custom_password'
 
   @patch('notebook.connectors.trino.DEFAULT_AUTH_PASSWORD.get', return_value='mocked_password')
   def test_auth_password_script(self, mock_default_password):
@@ -326,4 +356,4 @@ class TestTrinoApi(unittest.TestCase):
 
     with patch('notebook.connectors.trino.coerce_password_from_script', return_value='custom_password_script'):
       trino_api = TrinoApi(self.user, interpreter=interpreter)
-      assert_equal(trino_api.auth_password, 'custom_password_script')
+      assert trino_api.auth_password == 'custom_password_script'

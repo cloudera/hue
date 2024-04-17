@@ -19,11 +19,10 @@
 from builtins import object
 import logging
 import json
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
+import pytest
 
 from django.urls import reverse
+from django.test import TestCase
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
@@ -41,8 +40,9 @@ from metadata.catalog.atlas_client import AtlasApi
 LOG = logging.getLogger()
 
 
-class TestAtlas(object):
-  integration = True
+@pytest.mark.django_db
+@pytest.mark.integration
+class TestAtlas(TestCase):
 
   @classmethod
   def setup_class(cls):
@@ -53,7 +53,7 @@ class TestAtlas(object):
     grant_access("test", "test", "metadata")
 
     if not is_live_cluster() or not has_catalog(cls.user):
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     cls.api = AtlasApi(cls.user)
 
@@ -75,8 +75,8 @@ class TestAtlas(object):
     json_resp = json.loads(resp.content)
     LOG.info("Hue response for find_entity with query: %s" % query)
     LOG.info(json_resp)
-    assert_equal(0, json_resp['status'], json_resp)
-    assert_equal(json_resp['entity']['name'], db_name)
+    assert 0 == json_resp['status'], json_resp
+    assert json_resp['entity']['name'] == db_name
 
   def test_api_find_entity_with_type_hive_table(self, type='table', table_name='customers', db_name="default"):
     '''
@@ -90,8 +90,8 @@ class TestAtlas(object):
     json_resp = json.loads(resp.content)
     LOG.info("Hue response for find_entity with query: %s" % query)
     LOG.info(json_resp)
-    assert_equal(0, json_resp['status'], json_resp)
-    assert_equal(json_resp['entity']['name'], table_name)
+    assert 0 == json_resp['status'], json_resp
+    assert json_resp['entity']['name'] == table_name
 
   def test_api_find_entity_with_type_hive_column(self, db_name='default', table_name='customers', field_name='id',
                                                  type='field'):
@@ -106,8 +106,8 @@ class TestAtlas(object):
     json_resp = json.loads(resp.content)
     LOG.info("Hue response for find_entity with query: %s" % query)
     LOG.info(json_resp)
-    assert_equal(0, json_resp['status'], json_resp)
-    assert_equal(json_resp['entity']['name'], field_name)
+    assert 0 == json_resp['status'], json_resp
+    assert json_resp['entity']['name'] == field_name
 
   def test_api_search_entities_interactive_with_owner(self, query='owner:admin'):
     '''
@@ -117,9 +117,9 @@ class TestAtlas(object):
     json_resp = json.loads(resp.content)
     LOG.info("Hue response for entities_interactive with query: %s" % query)
     LOG.info(json_resp)
-    assert_equal(0, json_resp['status'], json_resp)
+    assert 0 == json_resp['status'], json_resp
     owner = query.split(':')[-1]
-    assert_equal(json_resp['results'][0]['owner'], owner)
+    assert json_resp['results'][0]['owner'] == owner
 
   def test_api_search_entities_interactive_with_classification(self, query='classification:class2_test'):
     '''
@@ -129,9 +129,9 @@ class TestAtlas(object):
     json_resp = json.loads(resp.content)
     LOG.info("Hue response for entities_interactive with query: %s" % query)
     LOG.info(json_resp)
-    assert_equal(0, json_resp['status'], json_resp)
+    assert 0 == json_resp['status'], json_resp
     classification = query.split(':')[-1]
-    assert_equal(json_resp['results'][0]['tags'][0], classification)
+    assert json_resp['results'][0]['tags'][0] == classification
 
   def test_api_search_entities_interactive_with_type_db(self, query='type:database'):
     '''
@@ -141,9 +141,9 @@ class TestAtlas(object):
     json_resp = json.loads(resp.content)
     LOG.info("Hue response for entities_interactive with query: %s" % query)
     LOG.info(json_resp)
-    assert_equal(0, json_resp['status'], json_resp)
+    assert 0 == json_resp['status'], json_resp
     entity_type = query.split(':')[-1].upper()
-    assert_equal(json_resp['results'][0]['type'], entity_type)
+    assert json_resp['results'][0]['type'] == entity_type
 
   def test_api_search_entities_interactive_with_type_table(self, query='type:table'):
     '''
@@ -153,12 +153,13 @@ class TestAtlas(object):
     json_resp = json.loads(resp.content)
     LOG.info("Hue response for entities_interactive with query: %s" % query)
     LOG.info(json_resp)
-    assert_equal(0, json_resp['status'], json_resp)
+    assert 0 == json_resp['status'], json_resp
     entity_type = query.split(':')[-1].upper()
-    assert_equal(json_resp['results'][0]['type'], entity_type)
+    assert json_resp['results'][0]['type'] == entity_type
 
-class TestNavigator(object):
-  integration = True
+
+@pytest.mark.integration
+class TestNavigator(TestCase):
 
   @classmethod
   def setup_class(cls):
@@ -169,7 +170,7 @@ class TestNavigator(object):
     grant_access("test", "test", "metadata")
 
     if not is_live_cluster() or not has_catalog(cls.user):
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     cls.api = NavigatorApi(cls.user)
 
@@ -183,37 +184,37 @@ class TestNavigator(object):
   def test_search_entities_view(self):
     resp = self.client.post(reverse('metadata:search_entities'), {'query_s': json.dumps('châteaux'), 'limit': 25, 'sources': json.dumps(['sql'])})
     json_resp = json.loads(resp.content)
-    assert_equal(0, json_resp['status'], json_resp)
+    assert 0 == json_resp['status'], json_resp
 
 
   def test_search_entities_interactive_view(self):
     resp = self.client.post(reverse('metadata:search_entities_interactive'), {'query_s': json.dumps('châteaux'), 'limit': 10, 'sources': json.dumps(['sql'])})
     json_resp = json.loads(resp.content)
-    assert_equal(0, json_resp['status'], json_resp)
+    assert 0 == json_resp['status'], json_resp
 
 
   def test_find_entity(self):
     # Disabled as entities not showing up in time
-    raise SkipTest
+    pytest.skip("Skipping Test")
 
     entity = self.api.find_entity(source_type='HIVE', type='DATABASE', name='default')
-    assert_true('identity' in entity, entity)
+    assert 'identity' in entity, entity
 
 
   def test_api_find_entity(self):
     # Disabled as entities not showing up in time
-    raise SkipTest
+    pytest.skip("Skipping Test")
 
     resp = self.client.get(reverse('metadata:find_entity'), {'type': 'database', 'name': 'default'})
     json_resp = json.loads(resp.content)
-    assert_equal(0, json_resp['status'])
-    assert_true('entity' in json_resp, json_resp)
-    assert_true('identity' in json_resp['entity'], json_resp)
+    assert 0 == json_resp['status']
+    assert 'entity' in json_resp, json_resp
+    assert 'identity' in json_resp['entity'], json_resp
 
 
   def test_api_tags(self):
     # Disabled as entities not showing up in time
-    raise SkipTest
+    pytest.skip("Skipping Test")
 
     entity = self.api.find_entity(source_type='HIVE', type='DATABASE', name='default')
     entity_id = entity['identity']
@@ -222,22 +223,22 @@ class TestNavigator(object):
     resp = self.client.post(reverse('metadata:add_tags'), self._format_json_body({'id': entity_id}))
     json_resp = json.loads(resp.content)
     # add_tags requires a list of tags
-    assert_equal(-1, json_resp['status'])
+    assert -1 == json_resp['status']
 
     resp = self.client.post(reverse('metadata:add_tags'), self._format_json_body({'id': entity_id, 'tags': ['hue_test']}))
     json_resp = json.loads(resp.content)
-    assert_equal(0, json_resp['status'], json_resp)
-    assert_equal(set(tags + ['hue_test']), set(json_resp['entity']['tags']))
+    assert 0 == json_resp['status'], json_resp
+    assert set(tags + ['hue_test']) == set(json_resp['entity']['tags'])
 
     resp = self.client.post(reverse('metadata:delete_tags'), self._format_json_body({'id': entity_id, 'tags': ['hue_test']}))
     json_resp = json.loads(resp.content)
-    assert_equal(0, json_resp['status'], json_resp)
-    assert_true(tags, json_resp['entity']['tags'])
+    assert 0 == json_resp['status'], json_resp
+    assert tags, json_resp['entity']['tags']
 
 
   def test_api_properties(self):
     # Disabled as entities not showing up in time
-    raise SkipTest
+    pytest.skip("Skipping Test")
 
     entity = self.api.find_entity(source_type='HIVE', type='DATABASE', name='default')
     entity_id = entity['identity']
@@ -245,29 +246,29 @@ class TestNavigator(object):
 
     resp = self.client.post(reverse('metadata:update_properties'), self._format_json_body({'id': entity_id, 'properties': {'hue': 'test'}}))
     json_resp = json.loads(resp.content)
-    assert_equal(0, json_resp['status'], json_resp)
+    assert 0 == json_resp['status'], json_resp
     props.update({'hue': 'test'})
-    assert_equal(props, json_resp['entity']['properties'])
+    assert props == json_resp['entity']['properties']
 
     resp = self.client.post(reverse('metadata:delete_metadata_properties'), self._format_json_body({'id': entity_id, 'keys': ['hue']}))
     json_resp = json.loads(resp.content)
-    assert_equal(0, json_resp['status'], json_resp)
+    assert 0 == json_resp['status'], json_resp
     del props['hue']
-    assert_equal(entity['properties'], json_resp['entity']['properties'])
+    assert entity['properties'] == json_resp['entity']['properties']
 
 
   def test_search_entities_interactive(self):
     resp = self.client.post(reverse('metadata:list_tags'), self._format_json_body({'prefix': 'hue'}))
     json_resp = json.loads(resp.content)
-    assert_true('tags' in json_resp)
-    assert_equal(0, json_resp['status'], json_resp)
+    assert 'tags' in json_resp
+    assert 0 == json_resp['status'], json_resp
 
 
   def test_suggest(self):
     resp = self.client.post(reverse('metadata:suggest'), self._format_json_body({'prefix': 'hue'}))
     json_resp = json.loads(resp.content)
-    assert_true('suggest' in json_resp)
-    assert_equal(0, json_resp['status'], json_resp)
+    assert 'suggest' in json_resp
+    assert 0 == json_resp['status'], json_resp
 
 
   def test_lineage(self):
@@ -291,7 +292,7 @@ class TestNavigatorAPI(object):
     ]
 
     _augment_highlighting(query_s, records)
-    assert_equal('', records[0]['parentPath'])
+    assert '' == records[0]['parentPath']
 
   def test_navigator_conf(self):
     resets = [
@@ -307,22 +308,22 @@ class TestNavigatorAPI(object):
     conf.NAVIGATOR_AUTH_PASSWORD = None
 
     try:
-      assert_equal('cm_username', get_navigator_auth_username())
-      assert_equal('cm_pwd', get_navigator_auth_password())
+      assert 'cm_username' == get_navigator_auth_username()
+      assert 'cm_pwd' == get_navigator_auth_password()
 
       reset()
       conf.NAVIGATOR_AUTH_PASSWORD = None
       reset = NAVIGATOR.AUTH_TYPE.set_for_testing('ldap')
 
-      assert_equal('ldap_username', get_navigator_auth_username())
-      assert_equal('ldap_pwd', get_navigator_auth_password())
+      assert 'ldap_username' == get_navigator_auth_username()
+      assert 'ldap_pwd' == get_navigator_auth_password()
 
       reset()
       conf.NAVIGATOR_AUTH_PASSWORD = None
       reset = NAVIGATOR.AUTH_TYPE.set_for_testing('SAML')
 
-      assert_equal('saml_username', get_navigator_auth_username())
-      assert_equal('saml_pwd', get_navigator_auth_password())
+      assert 'saml_username' == get_navigator_auth_username()
+      assert 'saml_pwd' == get_navigator_auth_password()
     finally:
       reset()
       conf.NAVIGATOR_AUTH_PASSWORD = None

@@ -23,8 +23,6 @@ import shutil
 import sys
 import tempfile
 
-from nose.tools import assert_equal
-
 from . import metadata_sites
 from metadata.conf import NAVIGATOR
 from metadata.metadata_sites import get_navigator_server_url
@@ -57,7 +55,7 @@ navigator.audit_log_max_file_size=100
 
       metadata_sites.reset()
 
-      assert_equal(get_navigator_server_url(), 'http://hue-rocks.com:7187')
+      assert get_navigator_server_url() == 'http://hue-rocks.com:7187'
     finally:
       metadata_sites.reset()
       for reset in resets:
@@ -76,7 +74,7 @@ navigator.audit_log_max_file_size=100
     try:
       metadata_sites.reset()
 
-      assert_equal(get_navigator_server_url(), None)
+      assert get_navigator_server_url() == None
     finally:
       metadata_sites.reset()
       for reset in resets:

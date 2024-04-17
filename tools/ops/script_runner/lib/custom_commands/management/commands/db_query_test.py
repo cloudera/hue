@@ -66,7 +66,7 @@ class Command(BaseCommand):
                       default=(datetime.datetime.now())),
       )
 
-  except AttributeError, e:
+  except AttributeError as e:
       baseoption_test = 'BaseCommand' in str(e) and 'option_list' in str(e)
       if baseoption_test:
           def add_arguments(self, parser):

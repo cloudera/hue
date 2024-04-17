@@ -570,15 +570,15 @@ class ApiWrapper():
     self.api = _get_api(request, snippet)
 
   def __getattr__(self, name):
-    if TASK_SERVER.ENABLED.get():
-      from notebook import tasks as ntasks
-      if hasattr(ntasks, name):
-        attr = getattr(ntasks, name)
-        def _method(*args, **kwargs):
-          return attr(*args, **dict(kwargs, postdict=self.request.POST, user_id=self.request.user.id))
-        return _method
-      else:
-        LOG.debug('Skipping Task Server call %s' % name)
+    # if TASK_SERVER.ENABLED.get():
+    #   from notebook import tasks as ntasks
+    #   if hasattr(ntasks, name):
+    #     attr = getattr(ntasks, name)
+    #     def _method(*args, **kwargs):
+    #       return attr(*args, **dict(kwargs, postdict=self.request.POST, user_id=self.request.user.id))
+    #     return _method
+    #   else:
+    #     LOG.debug('Skipping Task Server call %s' % name)
     return getattr(self.api, name)
 
 

@@ -23,7 +23,6 @@ import tempfile
 import posixpath
 import time
 
-from nose.tools import assert_not_equal
 from hadoop.fs import normpath as fs_normpath
 from azure.conf import get_default_abfs_fs
 
@@ -70,14 +69,15 @@ def is_root(uri):
 
 def strip_scheme(path):
   """
-  returns the path without abfss:// or abfs://
+  Returns the path without abfss:// or abfs://
   """
   try:
     filesystem, file_path = parse_uri(path)[:2]
+    if filesystem == '':
+      raise ValueError('File System must be Specified')
+    path = filesystem + '/' + file_path
   except:
     return path
-  assert_not_equal(filesystem, '', 'File System must be Specified')
-  path = filesystem + '/' + file_path
   return path
 
 def strip_path(path):
@@ -193,7 +193,7 @@ def get_home_dir_for_abfs(user=None):
 def abfsdatetime_to_timestamp(datetime):
   """
   Returns timestamp (seconds) by datetime string from ABFS API responses.
-  ABFS REST API returns one types of datetime strings:
+  ABFS REST API returns one type of datetime strings:
   * `Thu, 26 Feb 2015 20:42:07 GMT` for Object HEAD requests
     (see http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html);
   """
@@ -201,5 +201,6 @@ def abfsdatetime_to_timestamp(datetime):
   # `'z' is a bad directive in format ...` error (see https://bugs.python.org/issue6641),
   #LOG.debug("%s" %datetime)
   stripped = time.strptime(datetime[:-4], '%a, %d %b %Y %H:%M:%S')
-  assert datetime[-4:] == ' GMT', 'Time [%s] is not in GMT.' % datetime
+  if datetime[-4:] != ' GMT':
+    raise ValueError('Time [%s] is not in GMT.' % datetime)
   return int(calendar.timegm(stripped))
