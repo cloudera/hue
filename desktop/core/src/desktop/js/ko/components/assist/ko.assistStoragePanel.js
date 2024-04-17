@@ -133,7 +133,7 @@ const TEMPLATE = `
   <div class="assist-flex-search">
     <div class="assist-filter">
       <form autocomplete="off">
-        <input class="clearable" data-testid="files-assist-filter-input" type="text" placeholder="${I18n(
+        <input class="clearable" data-testid="assist-files--filter--input" type="text" placeholder="${I18n(
           'Filter...'
         )}" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS }
         data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>

@@ -316,7 +316,7 @@ const TEMPLATE =
       <!-- /ko -->
       <!-- ko ifnot: selectedSource().selectedNamespace() -->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="namespaces-breadcrumb-back"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="assist-sql--namespaces-breadcrumb-back--button"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
       </a>
