@@ -455,23 +455,26 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     grant_access("write_access_frontend", "write_access_frontend", "metastore")
     user = User.objects.get(username='write_access_frontend')
     
-    def check(client, assertz):
-      response = client.get("/metastore/databases")
-      assertz("Drop</button>" in response.content, response.content)
-      assertz("Create a new database" in response.content, response.content)
-      
-      response = client.get("/metastore/tables/")
-      assertz("Drop</button>" in response.content, response.content)
-      assertz("Create a new table" in response.content, response.content)
+    response = client.get("/metastore/databases")
+    assert not "Drop</button>" in response.content, response.content
+    assert not "Create a new database" in response.content, response.content
     
-    check(client, assert_false)
+    response = client.get("/metastore/tables/")
+    assert not "Drop</button>" in response.content, response.content
+    assert not "Create a new table" in response.content, response.content
     
     # Add access
     group, created = Group.objects.get_or_create(name='write_access_frontend')
     perm, created = HuePermission.objects.get_or_create(app='metastore', action='write')
     GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
+
+    response = client.get("/metastore/databases")
+    assert "Drop</button>" in response.content, response.content
+    assert "Create a new database" in response.content, response.content
     
-    check(client, assert_true)
+    response = client.get("/metastore/tables/")
+    assert "Drop</button>" in response.content, response.content
+    assert "Create a new table" in response.content, response.content
   
   def test_has_write_access_backend(self):
     client = make_logged_in_client(username='write_access_backend', groupname='write_access_backend',
