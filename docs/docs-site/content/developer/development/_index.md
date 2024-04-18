@@ -496,15 +496,9 @@ development mode.
 
 Run the API unit tests
 
-    ./build/env/bin/hue test unit
+    ./build/env/bin/pytest
 
-Open a pull request which will automatically trigger a [CircleCi](https://circleci.com/gh/cloudera/hue) unit test run.
-
-How to run just some parts of the tests, e.g.:
-
-    build/env/bin/hue test specific impala
-    build/env/bin/hue test specific impala.tests:TestMockedImpala
-    build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
+When opening a pull request, it will automatically trigger a [Github Action](https://github.com/cloudera/hue/actions/) that includes running the unit tests.
 
 Run the user interface tests:
 
@@ -512,40 +506,42 @@ Run the user interface tests:
 
 ### Running the API tests
 
-The ``test`` management command prepares the arguments (test app names) and passes them to nose (django_nose.nose_runner). Nose will then magically find all the tests to run.
+In the pyproject.toml file, we define the configuration for pytest, including settings to enable pytest to discover and execute the unit tests.
 
-Tests themselves should be named `*_test.py`.  These will be found as long as they're in packages covered by django.  You can use the
-unittest frameworks, or you can just name your method with the word "test" at a word boundary, and nose will find it. See `apps/hello/src/hello/hello_test.py` for an example.
+For pytest to recognize test files, you should follow the naming convention `*_test.py` or `test_*.py`. Following the pytest framework [convention](https://docs.pytest.org/en/7.1.x/explanation/goodpractices.html#conventions-for-python-test-discovery) for test discovery is recommended. Pytest will gather test items according to the following rules:
 
-To run the unit tests (should take 5-10 minutes):
+1. Test functions or methods prefixed with test_ outside of a class.
+2. Test functions or methods prefixed with test_ inside classes prefixed with Test.
 
-    build/env/bin/hue test unit --with-xunit --with-cover
+You can refer to `desktop/libs/notebook/src/notebook/connectors/trino_tests.py` for an example of how tests are organized.
 
-To run only tests of a particular app, use:
+To run the unit tests with pytest (should not take more than 5-10 minutes):
 
-    build/env/bin/hue test specific <app>
+    ./build/env/bin/pytest
 
-e.g.
+To run the tests of a particular app, use:
 
-    build/env/bin/hue test specific filebrowser
-
-To run a specific test, use:
-
-    build/env/bin/hue test specific <app><module>:<test_func>
-    build/env/bin/hue test specific <app><module>:<class>
+    ./build/env/bin/pytest test_app_path
 
 e.g.
 
-    build/env/bin/hue test specific useradmin.tests:test_user_admin
-    build/env/bin/hue test specific useradmin.tests:AdminTest
+    ./build/env/bin/pytest apps/filebrowser
+
+To run the tests of a specific class, use:
+
+    ./build/env/bin/pytest test_file_path::class
+
+e.g.
+
+    ./build/env/bin/pytest apps/useradmin/src/useradmin/tests.py::TestUserAdmin
 
 To run a specific test in a class, use:
 
-    build/env/bin/hue test specific <app><module>:<class><test_func>
+    ./build/env/bin/pytest test_file_path::class::function
 
-To run all the tests (unit and integration, will require some live clusters or services), use:
+e.g.
 
-    build/env/bin/hue test all
+    ./build/env/bin/pytest apps/useradmin/src/useradmin/tests.py::TestUserAdmin::test_user_admin
 
 Note:
 
@@ -660,7 +656,9 @@ An example of a binding test:
 
 Add the following options:
 
-    ./build/env/bin/hue test unit --with-xunit --with-cover
+    ./build/env/bin/pytest --cov=.
+
+**Note:** Before proceeding, ensure you have installed the pytest-cov package.
 
 For js run:
 
