@@ -12,7 +12,6 @@ markers = [
 target-version = "py38"
 line-length = 140
 force-exclude = true
-# indent-width = 2
 extend-exclude = [
   "*/ext-py3/*",
   "desktop/core/src/desktop/lib/wsgiserver.py",
@@ -34,11 +33,8 @@ ignore = [
     "E111",
     "E114",
     "W191",
-    "E902",
+    "E902", # Skip it because of deleted staged files
 ]
-
-# [tool.ruff.lint.isort]
-# combine-as-imports = true
 
 [tool.ruff.format]
 docstring-code-format = true
