@@ -77,7 +77,10 @@ def _start_server(cluster):
 
   env = cluster._mr2_env.copy()
 
-  hadoop_cp_proc = subprocess.Popen(args=[get_run_root('ext/hadoop/hadoop') + '/bin/hadoop', 'classpath'], env=env, cwd=cluster._tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  hadoop_cp_proc = subprocess.Popen(
+    args=[get_run_root('ext/hadoop/hadoop') + '/bin/hadoop', 'classpath'],
+    env=env, cwd=cluster._tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+  )
   hadoop_cp_proc.wait()
   hadoop_cp = hadoop_cp_proc.stdout.read().strip()
 
@@ -343,10 +346,16 @@ def verify_history(client, fragment, design=None, reverse=False, server_name='be
   Return the size of the history; -1 if we fail to determine it.
   """
   resp = client.get('/%(server_name)s/query_history' % {'server_name': server_name})
-  my_assert = reverse and assert_false or assert_true
-  my_assert(fragment in resp.content, resp.content)
-  if design:
-    my_assert(design in resp.content, resp.content)
+  if reverse:
+    if fragment in resp.content:
+      raise AssertionError(f"Unexpected fragment '{fragment}' found in response:\n{resp.content}")
+    if design and design in resp.content:
+      raise AssertionError(f"Unexpected design '{design}' found in response:\n{resp.content}")
+  else:
+    if fragment not in resp.content:
+      raise AssertionError(f"Fragment '{fragment}' not found in response:\n{resp.content}")
+    if design and design not in resp.content:
+      raise AssertionError(f"Design '{design}' not found in response:\n{resp.content}")
 
   if resp.context:
     try:
@@ -377,7 +386,7 @@ class BeeswaxSampleProvider(TestCase):
     grant_access('test', 'test', 'metastore')
 
     # Weird redirection to avoid binding nonsense.
-    cls.shutdown = [ shutdown ]
+    cls.shutdown = [shutdown]
     cls.init_beeswax_db()
 
   @classmethod

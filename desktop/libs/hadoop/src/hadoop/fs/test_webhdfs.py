@@ -306,9 +306,11 @@ class WebhdfsTests(TestCase):
       sys.setdefaultencoding('utf-8')
 
     def check_existence(name, parent, present=True):
-      assertion = present and assert_true or assert_false
       listing = self.cluster.fs.listdir(parent)
-      assertion(name in listing, "%s should be in %s" % (name, listing))
+      if present:
+        assert name in listing, f"{name} should be in {listing}"
+      else:
+        assert not name in listing, f"{name} should not be in {listing}"
 
     name = u'''pt-Olá_ch-你好_ko-안녕_ru-Здравствуйте%20,.<>~`!@$%^&()_-+='"'''
     prefix = self.prefix + '/tmp/i18n'
