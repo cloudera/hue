@@ -31,6 +31,8 @@ import sys
 import uuid
 
 import desktop.redaction
+from desktop.lib import conf
+from desktop import appmanager
 
 from desktop.lib.paths import get_desktop_root, get_run_root
 from desktop.lib.python_util import force_dict_to_strings
@@ -52,7 +54,7 @@ NICE_NAME = "Hue"
 
 ENV_HUE_PROCESS_NAME = "HUE_PROCESS_NAME"
 ENV_DESKTOP_DEBUG = "DESKTOP_DEBUG"
-LOGGING_CONFIG = None # We're handling our own logging config. Consider upgrading our logging infra to LOGGING_CONFIG
+LOGGING_CONFIG = None  # We're handling our own logging config. Consider upgrading our logging infra to LOGGING_CONFIG
 
 
 ############################################################
@@ -72,9 +74,6 @@ desktop.log.basic_logging(os.environ[ENV_HUE_PROCESS_NAME])
 
 logging.info("Welcome to Hue " + HUE_DESKTOP_VERSION)
 
-# Then we can safely import some more stuff
-from desktop import appmanager
-from desktop.lib import conf
 
 # Add fancy logging
 desktop.log.fancy_logging()
@@ -166,7 +165,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'desktop.middleware.CacheControlMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
-    #'axes.middleware.FailedLoginMiddleware',
+    # 'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
     'crequest.middleware.CrequestMiddleware',
 ]
@@ -194,7 +193,7 @@ INSTALLED_APPS = [
     'django_extensions',
 
     # 'debug_toolbar',
-    #'south', # database migration tool
+    # 'south', # database migration tool
 
     # i18n support
     'django_babel',
@@ -207,7 +206,7 @@ INSTALLED_APPS = [
     'webpack_loader',
     'django_prometheus',
     'crequest',
-    #'django_celery_results',
+    # 'django_celery_results',
     'rest_framework',
     'rest_framework.authtoken',
 ]
@@ -270,9 +269,7 @@ TEMPLATES = [
 AUTH_PROFILE_MODULE = None
 
 LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/" # For djangosaml2 bug.
-
-PYLINTRC = get_run_root('.pylintrc')
+LOGOUT_REDIRECT_URL = "/"  # For djangosaml2 bug.
 
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
@@ -315,7 +312,7 @@ conf.initialize(_app_conf_modules, _config_dir)
 # Now that we've loaded the desktop conf, set the django DEBUG mode based on the conf.
 DEBUG = desktop.conf.DJANGO_DEBUG_MODE.get()
 GTEMPLATE_DEBUG = DEBUG
-if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True and re-apply the loggers
+if DEBUG:  # For simplification, force all DEBUG when django_debug_mode is True and re-apply the loggers
   os.environ[ENV_DESKTOP_DEBUG] = 'True'
   desktop.log.basic_logging(os.environ[ENV_HUE_PROCESS_NAME])
   desktop.log.fancy_logging()
@@ -390,7 +387,7 @@ if os.getenv('DESKTOP_DB_CONFIG'):
       zip(["ENGINE", "NAME", "TEST_NAME", "USER", "PASSWORD", "HOST", "PORT"], conn_string.split(':'))
     )
   )
-  default_db['NAME'] = default_db['NAME'].replace('#', ':') # For is_db_alive command
+  default_db['NAME'] = default_db['NAME'].replace('#', ':')  # For is_db_alive command
 else:
   test_name = os.environ.get('DESKTOP_DB_TEST_NAME', get_desktop_root('desktop-test.db'))
   logging.debug("DESKTOP_DB_TEST_NAME SET: %s" % test_name)
@@ -439,7 +436,7 @@ if desktop.conf.QUERY_DATABASE.HOST.get():
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', # TODO: Parameterize here for all the caches
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',  # TODO: Parameterize here for all the caches
         'LOCATION': 'unique-hue'
     },
     'axes_cache': {
@@ -480,7 +477,7 @@ if desktop.conf.SESSION.TRUSTED_ORIGINS.get():
   TRUSTED_ORIGINS += desktop.conf.SESSION.TRUSTED_ORIGINS.get()
 
 # This is required for knox
-if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have port. Add default knox port
+if desktop.conf.KNOX.KNOX_PROXYHOSTS.get():  # The hosts provided here don't have port. Add default knox port
   if desktop.conf.KNOX.KNOX_PORTS.get():
     hostport = []
     ports = [  # In case the ports are in hostname
@@ -488,7 +485,7 @@ if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have
     ]
     for port in ports + desktop.conf.KNOX.KNOX_PORTS.get():
       if port == '80':
-        port = '' # Default port needs to be empty
+        port = ''  # Default port needs to be empty
       else:
         port = ':' + port
       hostport += [host.split(':')[0] + port for host in desktop.conf.KNOX.KNOX_PROXYHOSTS.get()]
@@ -585,6 +582,7 @@ for middleware in desktop.conf.MIDDLEWARE.get():
 # OpenID Connect
 def is_oidc_configured():
   return 'desktop.auth.backend.OIDCBackend' in AUTHENTICATION_BACKENDS
+
 
 if is_oidc_configured():
   INSTALLED_APPS.append('mozilla_django_oidc')
@@ -746,11 +744,11 @@ if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABL
 
   CELERY_TASK_QUEUES = {
     'low_priority': {
-        'exchange': 'low_priority', # unused
+        'exchange': 'low_priority',  # unused
         'routing_key': 'low_priority',
     },
     'high_priority': {
-        'exchange': 'high_priority', # unused
+        'exchange': 'high_priority',  # unused
         'routing_key': 'high_priority',
     },
     'default': {
@@ -773,7 +771,7 @@ if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABL
     USE_TZ = True
 
 
-PROMETHEUS_EXPORT_MIGRATIONS = False # Needs to be there even when enable_prometheus is not enabled
+PROMETHEUS_EXPORT_MIGRATIONS = False  # Needs to be there even when enable_prometheus is not enabled
 if desktop.conf.ENABLE_PROMETHEUS.get():
   MIDDLEWARE.insert(0, 'django_prometheus.middleware.PrometheusBeforeMiddleware')
   MIDDLEWARE.append('django_prometheus.middleware.PrometheusAfterMiddleware')

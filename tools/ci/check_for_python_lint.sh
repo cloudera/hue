@@ -20,31 +20,24 @@
 HOME=${1:-"."}
 FOUND_ISSUE=-1
 
-files=`git diff --name-only origin/master --diff-filter=b | egrep .py$ | \
-  grep -v /ext-py/ | \
-  grep -v wsgiserver.py | \
-  grep -v /migrations/ | \
-  grep -v apps/oozie/src/oozie/tests.py | \
-  grep -v tools/ops/ | \
-  grep -v apps/beeswax/gen-py/ | \
-  grep -v /org_migrations/`
+files=`git diff --name-only origin/master --diff-filter=b | egrep .py$` 
 
 cd $HOME
 
 if [ ! -z "$files" ];
 then
-  ./build/env/bin/hue runpylint --files "$files"
+  ./build/env/bin/ruff check $files
   FOUND_ISSUE=$?
 else
-  echo "No Python code files changed present"
+  echo "No Python code files changes present."
   FOUND_ISSUE=0
 fi
 
 if [ "$FOUND_ISSUE" -eq "0" ]
 then
-  echo "No Python code styling issues found"
+  echo "No Python code styling issues found."
 else
-  echo "Found some Python code styling issues"
+  echo "Found some Python code styling issues."
 fi
 
 exit $FOUND_ISSUE

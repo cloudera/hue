@@ -58,7 +58,6 @@ define remove_devtree_exclusions
 		      -name '.gitignore' -o \
 		      -name '.*~' -o \
 		      -name '.#*' -o \
-		      -name '.pylintrc' -o \
 		      -name 'build' -o \
 		      -name 'logs' -o \
 		      -name 'tags' -o \
