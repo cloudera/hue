@@ -15,8 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from nose.tools import assert_true, assert_false, assert_equals, assert_raises
-
 from desktop.lib.ai.metadata import semantic_search
 
 class TestMetadata(object):
@@ -26,11 +24,11 @@ class TestMetadata(object):
     query = "people"
 
     results = semantic_search(table_names, query, 1)
-    assert_equals(len(results), 1)
-    assert_equals(results[0], "employees")
+    assert len(results) == 1
+    assert results[0] == "employees"
 
     results = semantic_search(table_names, query, 2)
-    assert_equals(len(results), 2)
+    assert len(results) == 2
 
   def test_semantic_search_large_corpus(self):
     table_names = ["orders", "products", "employees", "suppliers", "categories", "claims",
@@ -45,16 +43,16 @@ class TestMetadata(object):
     query = "people"
 
     results = semantic_search(table_names, query)
-    assert_equals(len(results), 10)
-    assert_equals(results[0], "users")
+    assert len(results) == 10
+    assert results[0] == "users"
 
     query = "names of people who bought the largest number of books"
 
     results = semantic_search(table_names, query)
     print("Results :", results)
-    assert_true("users" in results, msg="users table must be returned as that contains the name column")
-    assert_true("orders" in results)
-    assert_true("books" in results)
+    assert "users" in results, "users table must be returned as that contains the name column"
+    assert "orders" in results
+    assert "books" in results
 
   def test_semantic_search_large_corpus_tpcds(self):
     table_names  = [
@@ -91,9 +89,9 @@ class TestMetadata(object):
     table_results = [result.split(" - ")[0] for result in results]
     print("Table Names:", table_results)
     print("Results :", results)
-    assert_true("date_dim" in table_results, msg="users table must be returned as that contains the name column")
-    assert_true("store_sales" in table_results)
-    assert_true("item" in table_results)
+    assert "date_dim" in table_results, "users table must be returned as that contains the name column"
+    assert "store_sales" in table_results
+    assert "item" in table_results
 
     
   def test_semantic_search_large_corpus_poorly_named_tables(self):
@@ -132,4 +130,4 @@ class TestMetadata(object):
       table_results = [result.split(" - ")[0] for result in results]
       print("Table Names:", table_results)
       print("Results :", results)
-      assert_true("sample_99" in table_results, msg="users table must be returned as that contains the name column")
+      assert "sample_99" in table_results, "users table must be returned as that contains the name column"

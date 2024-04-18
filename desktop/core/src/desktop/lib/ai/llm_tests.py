@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from nose.tools import assert_true, assert_false, assert_equals, assert_raises
 import dataclasses
 import logging
 # Assuming that 'desktop' is a directory at the same level as this file
