@@ -137,7 +137,8 @@ const MetricsComponent = () => {
               onChange={handleFilterInputChange}
               prefix={<SearchOutlined />}
             />
-            <Select data-testid="metric-select"
+            <Select
+              data-testid="metric-select"
               //to make sure antd class gets applied
               getPopupContainer={triggerNode => triggerNode.parentElement}
               ref={dropdownRef}
