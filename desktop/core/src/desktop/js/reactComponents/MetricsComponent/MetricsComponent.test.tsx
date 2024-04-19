@@ -77,7 +77,8 @@ describe('MetricsComponent', () => {
   test('Selecting a specific metric from the dropdown', async () => {
     render(<MetricsComponent />);
 
-    const dropdown = screen.getByPlaceholderText('Choose a metric');
+    // const dropdown = screen.getByPlaceholderText('Choose a metric');
+    const dropdown = screen.getByTestId('metric-select');
     fireEvent.change(dropdown, { target: { value: 'users' } });
 
     await waitFor(() => {
