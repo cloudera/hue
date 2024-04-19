@@ -14,11 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { CSSProperties } from 'react';
+import React from 'react';
 import Table from 'cuix/dist/components/Table/Table';
 import type { ColumnType } from 'antd/es/table';
 import './MetricsComponent.scss';
-import 'cuix/dist/components/Table/Table.css';
 
 interface MetricsTime {
   '1m_rate': number;
@@ -97,7 +96,6 @@ const MetricsTable = ({ caption, dataSource }: MetricsTableProps) => {
         dataSource={dataSource}
         rowKey="name"
         columns={metricsColumns}
-        style={CSSProperties}
         pagination={false}
       />
     </>
