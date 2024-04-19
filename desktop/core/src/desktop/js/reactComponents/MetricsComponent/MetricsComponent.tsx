@@ -138,11 +138,9 @@ const MetricsComponent = () => {
               prefix={<SearchOutlined />}
             />
             <Select
-              data-testid="metric-select"
               //to make sure antd class gets applied
               getPopupContainer={triggerNode => triggerNode.parentElement}
               ref={dropdownRef}
-              // placeholder="Choose a metric"
               value={selectedMetric}
               onChange={handleMetricChange}
             >
