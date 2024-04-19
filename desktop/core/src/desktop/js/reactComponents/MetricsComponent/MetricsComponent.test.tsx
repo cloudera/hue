@@ -33,17 +33,17 @@ jest.mock('api/utils', () => ({
           '95_percentile': 60,
           '999_percentile': 70,
           '99_percentile': 55,
-          'avg': 25,
-          'count': 100,
-          'max': 30,
-          'mean_rate': 22,
-          'min': 20,
-          'std_dev': 5,
-          'sum': 2500
+          avg: 25,
+          count: 100,
+          max: 30,
+          mean_rate: 22,
+          min: 20,
+          std_dev: 5,
+          sum: 2500
         },
         'threads.daemon': { value: 3 },
         'threads.total': { value: 6 },
-        'users': { value: 50 },
+        users: { value: 50 },
         'users.active': { value: 30 },
         'users.active.total': { value: 40 }
       }
