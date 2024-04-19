@@ -28,13 +28,13 @@ interface MetricsTime {
   '95_percentile': number;
   '99_percentile': number;
   '999_percentile': number;
-  'avg': number;
-  'count': number;
-  'max': number;
-  'mean_rate': number;
-  'min': number;
-  'std_dev': number;
-  'sum': number;
+  avg: number;
+  count: number;
+  max: number;
+  mean_rate: number;
+  min: number;
+  std_dev: number;
+  sum: number;
 }
 
 export interface MetricsResponse {
@@ -56,10 +56,10 @@ export interface MetricsResponse {
     'requests.response-time': MetricsTime;
     'threads.daemon': MetricsValue;
     'threads.total': MetricsValue;
-    'users': MetricsValue;
+    users: MetricsValue;
     'users.active': MetricsValue;
     'users.active.total': MetricsValue;
-    'timestamp': string;
+    timestamp: string;
   };
 }
 
