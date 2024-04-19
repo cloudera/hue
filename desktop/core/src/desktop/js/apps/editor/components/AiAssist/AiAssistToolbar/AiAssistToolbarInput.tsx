@@ -22,9 +22,11 @@ import { EnterOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
+import huePubSub from 'utils/huePubSub';
 
 import AiAssistToolbarHistory, { HistoryItem } from './AiAssistToolbarHistory';
 import { useResizeAwareElementSize, useLocalStorageHistory } from '../hooks';
+import { GLOBAL_INFO_TOPIC } from '../../../../../reactComponents/AlertComponent/events';
 
 import './AiAssistToolbarInput.scss';
 
@@ -123,6 +125,12 @@ const calculateDropdownPosition = (
     top: dropdownTop,
     left: textareaLeft
   };
+};
+
+const hasMinimum4Letters = (value: string) => {
+  const trimmed = value?.trim();
+  const atLeast4letters = /(?:[^a-zA-Z]*[a-zA-Z]){4}/;
+  return atLeast4letters.test(trimmed);
 };
 
 function AiAssistToolbarInput({
@@ -226,8 +234,15 @@ function AiAssistToolbarInput({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === ENTER_KEY && !event.shiftKey && value) {
-      handleSubmit();
+    if (event.key === ENTER_KEY && !event.shiftKey) {
+      event.preventDefault();
+      if (hasMinimum4Letters(value)) {
+        handleSubmit();
+      } else {
+        huePubSub.publish(GLOBAL_INFO_TOPIC, {
+          message: 'Please use at least 4 letters in your prompt'
+        });
+      }
     } else if (event.key === ESCAPE_KEY) {
       handleCancel();
     } else if (event.key === TAB_KEY && !dirty && prefill) {
@@ -311,7 +326,7 @@ function AiAssistToolbarInput({
             searchValue={value}
             items={historyItems}
           />
-          {value && (
+          {hasMinimum4Letters(value) && (
             <Button
               disabled={isLoading}
               className={'hue-toolbar-button'}
