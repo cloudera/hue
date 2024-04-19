@@ -92,12 +92,7 @@ const MetricsTable = ({ caption, dataSource }: MetricsTableProps) => {
   return (
     <>
       <h4>{caption}</h4>
-      <Table
-        dataSource={dataSource}
-        rowKey="name"
-        columns={metricsColumns}
-        pagination={false}
-      />
+      <Table dataSource={dataSource} rowKey="name" columns={metricsColumns} pagination={false} />
     </>
   );
 };
