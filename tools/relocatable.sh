@@ -93,13 +93,6 @@ if [[ $PYVER == $MIN_VERSION || $PYVER == $MIN_VERSION.* || $PYVER > $MIN_VERSIO
   virtualenv-make-relocatable "build/env"
   $ENV_PYTHON $VIRTUAL_BOOTSTRAP --relocatable_pth "build/env"
   popd
-else
-  echo "Python version is less than 3.8"
-  if [ -e "$HUE_ROOT/tools/enable-python27.sh" ]; then
-    source $HUE_ROOT/tools/enable-python27.sh
-  fi
-
-  $ENV_PYTHON $VIRTUAL_BOOTSTRAP --relocatable "$HUE_ROOT/build/env"
 fi
 
 # Step 1b. Fix any broken lib64 directory
