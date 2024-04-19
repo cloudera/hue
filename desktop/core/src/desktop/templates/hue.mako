@@ -249,6 +249,7 @@ ${ hueIcons.symbols() }
         <div id="embeddable_dump_config" class="embeddable"></div>
         <div id="embeddable_threads" class="embeddable"></div>
         <div id="embeddable_metrics" class="embeddable"></div>
+        <div id="embeddable_taskserver" class="embeddable"></div>
         <div id="embeddable_connectors" class="embeddable"></div>
         <div id="embeddable_analytics" class="embeddable"></div>
         <div id="embeddable_403" class="embeddable"></div>

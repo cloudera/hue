@@ -1574,9 +1574,6 @@ class UploadChunksTestCase(TestCase):
       assert e.json()['success'] == False
       assert e.json()['error'] == 'Error in upload'
     assert response.status_code == 200
-    assert response.json()['success'] == False
-    assert response.json()['error'] == 'Error in upload'
-
 
 @pytest.mark.django_db
 class TestOFSAccessPermissions(object):
