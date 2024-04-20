@@ -7,7 +7,7 @@
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,37 +32,37 @@ from django.utils.translation import gettext_lazy as _t, gettext as _
 LOG = logging.getLogger()
 
 class Command(BaseCommand):
-    """
-    Handler for making user(s) active.
-    """
+  """
+  Handler for making user(s) active.
+  """
 
-    def add_arguments(self, parser):
-        parser.add_argument("--usernames", help=_t("One or more user(s) to make active."),nargs='+', action="store",required=True)
+  def add_arguments(self, parser):
+    parser.add_argument("--usernames", help=_t("One or more user(s) to make active."),nargs='+', action="store", required=True)
 
-    def handle(self, *args, **options):
-        if options.get("usernames"):
-            try:
-                LOG.info("Setting user %s as active" % options['usernames'])
-                
-                user_exist = []
-                user_not_exist = []
-                usernames = options["usernames"]
-                
-                for user in usernames:
-                    is_exist = User.objects.filter(username=user).exists()
-                    if (is_exist):
-                        active_user = User.objects.get(username=user)
-                        active_user.is_active = True
-                        active_user.save()
-                        user_exist.append(user)
-                    else:
-                        user_not_exist.append(user)
-                
-                if (user_exist):
-                    LOG.info("User(s) set as Active: %s" % user_exist)
+  def handle(self, *args, **options):
+    if options.get("usernames"):
+      try:
+        LOG.info("Setting user %s as active" % options['usernames'])
+        
+        user_exist = []
+        user_not_exist = []
+        usernames = options["usernames"]
+        
+        for user in usernames:
+          is_exist = User.objects.filter(username=user).exists()
+          if (is_exist):
+            active_user = User.objects.get(username=user)
+            active_user.is_active = True
+            active_user.save()
+            user_exist.append(user)
+          else:
+            user_not_exist.append(user)
+        
+        if (user_exist):
+          LOG.info("User(s) set as Active: %s" % user_exist)
 
-                if (user_not_exist):
-                    LOG.info("User(s) does not exist: %s" % user_not_exist)
-                
-            except Exception as e:
-                LOG.error("EXCEPTION: setting user %s as active failed: %s" % (options['usernames'], e))
+        if (user_not_exist):
+          LOG.info("User(s) does not exist: %s" % user_not_exist)
+        
+      except Exception as e:
+        LOG.error("EXCEPTION: setting user %s as active failed: %s" % (options['usernames'], e))
