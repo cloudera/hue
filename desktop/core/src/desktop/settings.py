@@ -20,26 +20,28 @@
 # Local customizations are done by symlinking a file
 # as local_settings.py.
 
-from builtins import map, zip
-import datetime
 import gc
-import json
-import logging
 import os
-import pkg_resources
 import sys
+import json
 import uuid
+import logging
+import datetime
+from builtins import map, zip
+from urllib.parse import urlparse
+
+import redis
+import psutil
+import pkg_resources
 
 import desktop.redaction
-from desktop.lib import conf
-from desktop import appmanager
-
-from desktop.lib.paths import get_desktop_root, get_run_root
-from desktop.lib.python_util import force_dict_to_strings
-
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
-from desktop.conf import is_ofs_enabled, is_gs_enabled, is_chunked_fileuploader_enabled
+from desktop import appmanager
+from desktop.conf import TASK_SERVER_V2, is_chunked_fileuploader_enabled, is_gs_enabled, is_ofs_enabled
+from desktop.lib import conf
+from desktop.lib.paths import get_desktop_root, get_run_root
+from desktop.lib.python_util import force_dict_to_strings
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext_lazy as _
@@ -452,10 +454,10 @@ CACHES[CACHES_HIVE_DISCOVERY_KEY] = {
 
 CACHES_CELERY_KEY = 'celery'
 CACHES_CELERY_QUERY_RESULT_KEY = 'celery_query_results'
-if desktop.conf.TASK_SERVER.ENABLED.get():
-  CACHES[CACHES_CELERY_KEY] = json.loads(desktop.conf.TASK_SERVER.EXECUTION_STORAGE.get())
-  if desktop.conf.TASK_SERVER.RESULT_CACHE.get():
-    CACHES[CACHES_CELERY_QUERY_RESULT_KEY] = json.loads(desktop.conf.TASK_SERVER.RESULT_CACHE.get())
+if desktop.conf.TASK_SERVER_V2.ENABLED.get():
+  CACHES[CACHES_CELERY_KEY] = json.loads(desktop.conf.TASK_SERVER_V2.EXECUTION_STORAGE.get())
+  if desktop.conf.TASK_SERVER_V2.RESULT_CACHE.get():
+    CACHES[CACHES_CELERY_QUERY_RESULT_KEY] = json.loads(desktop.conf.TASK_SERVER_V2.RESULT_CACHE.get())
 
 # Configure sessions
 SESSION_COOKIE_NAME = desktop.conf.SESSION.COOKIE_NAME.get()
@@ -730,16 +732,16 @@ DOCUMENT2_MAX_ENTRIES = 100000
 # Celery settings
 ################################################################
 
-if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
-  CELERY_BROKER_URL = desktop.conf.TASK_SERVER.BROKER_URL.get()
+if desktop.conf.TASK_SERVER_V2.ENABLED.get() or desktop.conf.TASK_SERVER_V2.BEAT_ENABLED.get():
+  CELERY_BROKER_URL = desktop.conf.TASK_SERVER_V2.BROKER_URL.get()
 
   CELERY_ACCEPT_CONTENT = ['json']
-  CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER.CELERY_RESULT_BACKEND.get()
+  CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER_V2.CELERY_RESULT_BACKEND.get()
   CELERY_TASK_SERIALIZER = 'json'
   CELERY_ENABLE_UTC = True
-  CELERY_TIMEZONE = "America/Los_Angeles"
+  CELERY_TIMEZONE = TIME_ZONE
 
-  CELERYD_OPTS = desktop.conf.TASK_SERVER.RESULT_CELERYD_OPTS.get()
+  CELERYD_OPTS = desktop.conf.TASK_SERVER_V2.RESULT_CELERYD_OPTS.get()
   CELERY_TASK_DEFAULT_QUEUE = 'default'
 
   CELERY_TASK_QUEUES = {
@@ -757,6 +759,30 @@ if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABL
     },
   }
 
+  if desktop.conf.TASK_SERVER_V2.ENABLED.get():
+    def initialize_free_disk_space_in_redis():
+      redis_client = parse_broker_url(desktop.conf.TASK_SERVER_V2.BROKER_URL.get())
+      free_space = psutil.disk_usage('/tmp').free
+      available_space = redis_client.get('upload_available_space')
+      if available_space is None:
+        available_space = free_space
+      else:
+        available_space = int(available_space)
+      upload_keys_exist = any(redis_client.scan_iter('upload__*'))
+      redis_client.delete('upload_available_space')
+      if not upload_keys_exist:
+        redis_client.setnx('upload_available_space', free_space)
+      else:
+        redis_client.setnx('upload_available_space', min(free_space, available_space))
+
+    def parse_broker_url(broker_url):
+      parsed_url = urlparse(broker_url)
+      host = parsed_url.hostname
+      port = parsed_url.port
+      db = int(parsed_url.path.lstrip('/'))
+      return redis.Redis(host=host, port=port, db=db)
+
+    initialize_free_disk_space_in_redis()
 
 # %n will be replaced with the first part of the nodename.
 # CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
@@ -765,7 +791,7 @@ if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABL
 # CELERYD_USER = desktop.conf.SERVER_USER.get()
 # CELERYD_GROUP = desktop.conf.SERVER_GROUP.get()
 
-  if desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
+  if desktop.conf.TASK_SERVER_V2.BEAT_ENABLED.get():
     INSTALLED_APPS.append('django_celery_beat')
     INSTALLED_APPS.append('timezone_field')
     USE_TZ = True

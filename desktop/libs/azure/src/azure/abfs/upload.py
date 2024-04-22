@@ -13,36 +13,35 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from future import standard_library
-standard_library.install_aliases()
-import logging
+
 import sys
+import logging
 import unicodedata
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
+
+from azure.abfs.__init__ import parse_uri
+from azure.abfs.abfs import ABFSFileSystemException
+from desktop.conf import TASK_SERVER_V2
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.fsmanager import get_client
+from filebrowser.utils import calculate_total_size, generate_chunks
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
 else:
   from cStringIO import StringIO as string_io
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
-from desktop.conf import TASK_SERVER
-
-from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.fsmanager import get_client
-from azure.abfs.__init__ import parse_uri
-from azure.abfs.abfs import ABFSFileSystemException
-
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
 
-DEFAULT_WRITE_SIZE = 100 * 1024 * 1024 # As per Azure doc, maximum blob size is 100MB
+DEFAULT_WRITE_SIZE = 100 * 1024 * 1024  # As per Azure doc, maximum blob size is 100MB
 
 LOG = logging.getLogger()
 
-from filebrowser.utils import generate_chunks, calculate_total_size
 
 class ABFSFineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
@@ -53,17 +52,17 @@ class ABFSFineUploaderChunkedUpload(object):
     self.totalfilesize = kwargs.get('qqtotalfilesize')
     self.file_name = kwargs.get('qqfilename')
     if self.file_name:
-      self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+      self.file_name = unicodedata.normalize('NFC', self.file_name)  # Normalize unicode
     self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
     self.target_path = None
 
-    if kwargs.get('chunk_size', None) != None:
+    if kwargs.get('chunk_size', None):
       self.chunk_size = kwargs.get('chunk_size')
 
     if self._is_abfs_upload():
       self._fs = self._get_abfs(request)
       self.filesystem, self.directory = parse_uri(self.destination)[:2]
-       # Verify that the path exists
+      # Verify that the path exists
       self._fs.stats(self.destination)
 
   def check_access(self):
@@ -75,9 +74,9 @@ class ABFSFineUploaderChunkedUpload(object):
 
     try:
       # Check access permissions before attempting upload
-      #self._check_access() #implement later
+      # self._check_access() #implement later
       LOG.debug("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s" % self.target_path)
-      if not TASK_SERVER.ENABLED.get():
+      if not TASK_SERVER_V2.ENABLED.get():
         self._fs.create(self.target_path)
     except (ABFSFileUploadError, ABFSFileSystemException) as e:
       LOG.error("ABFSFineUploaderChunkedUpload: Encountered error in ABFSUploadHandler check_access: %s" % e)
@@ -89,7 +88,7 @@ class ABFSFineUploaderChunkedUpload(object):
                             {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize})
 
   def upload_chunks(self):
-    if TASK_SERVER.ENABLED.get():
+    if TASK_SERVER_V2.ENABLED.get():
       self.target_path = self._fs.join(self.destination, self.file_name)
       try:
         LOG.debug("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s" % self.target_path)
@@ -109,7 +108,7 @@ class ABFSFineUploaderChunkedUpload(object):
       LOG.exception('ABFSFineUploaderChunkedUpload: Failed to upload file to ABFS at %s: %s' % (self.target_path, e))
       raise PopupException("ABFSFineUploaderChunkedUpload: S3FileUploadHandler uploading file %s part: %d failed" % (self.filepath, i))
     finally:
-      #finish the upload
+      # finish the upload
       self._fs.flush(self.target_path, {'position': self.totalfilesize})
       LOG.info("ABFSFineUploaderChunkedUpload: has completed file upload to ABFS, total file size is: %d." % self.totalfilesize)
       LOG.debug("%s" % self._fs.stats(self.target_path))
@@ -140,6 +139,7 @@ class ABFSFineUploaderChunkedUpload(object):
     else:
       return None
 
+
 class ABFSFileUploadError(UploadFileException):
   pass
 
@@ -162,11 +162,10 @@ class ABFSFileUploadHandler(FileUploadHandler):
     if self._is_abfs_upload():
       self._fs = self._get_abfs(request)
       self.filesystem, self.directory = parse_uri(self.destination)[:2]
-       # Verify that the path exists
+      # Verify that the path exists
       self._fs.stats(self.destination)
 
     LOG.debug("Chunk size = %d" % DEFAULT_WRITE_SIZE)
-
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_abfs_upload():
@@ -177,7 +176,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
 
       try:
         # Check access permissions before attempting upload
-        #self._check_access() #implement later
+        # self._check_access() #implement later
         LOG.debug("Initiating ABFS upload to target path: %s" % self.target_path)
         self._fs.create(self.target_path)
         self.file = SimpleUploadedFile(name=file_name, content='')
@@ -186,7 +185,6 @@ class ABFSFileUploadHandler(FileUploadHandler):
         LOG.error("Encountered error in ABFSUploadHandler check_access: %s" % e)
         self.request.META['upload_failed'] = e
         raise StopUpload()
-
 
   def receive_data_chunk(self, raw_data, start):
     if self._is_abfs_upload():
@@ -203,7 +201,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
 
   def file_complete(self, file_size):
     if self._is_abfs_upload():
-      #finish the upload
+      # finish the upload
       self._fs.flush(self.target_path, {'position': int(file_size)})
       LOG.info("ABFSFileUploadHandler has completed file upload to ABFS, total file size is: %d." % file_size)
       self.file.size = file_size

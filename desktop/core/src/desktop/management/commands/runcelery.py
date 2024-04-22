@@ -15,16 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 import sys
+import logging
 
-from desktop import conf
-from desktop.lib.daemon_utils import drop_privileges_if_necessary
-from desktop.log import DEFAULT_LOG_DIR
-
+from celery.bin.celery import CeleryCommand, main as celery_main
 from django.core.management.base import BaseCommand
 from django.utils import autoreload
+
+from desktop import conf
+from desktop.conf import TASK_SERVER_V2
+from desktop.lib.daemon_utils import drop_privileges_if_necessary
+from desktop.log import DEFAULT_LOG_DIR
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -35,17 +37,16 @@ SERVER_HELP = r"""
   Run celery worker.
 """
 
-from celery.bin.celery import CeleryCommand
-from celery.bin.celery import main as celery_main
-
 LOG = logging.getLogger()
 CELERY_OPTIONS = {
   'server_user': conf.SERVER_USER.get(),
   'server_group': conf.SERVER_GROUP.get(),
 }
 
+
 class Command(BaseCommand):
   help = SERVER_HELP
+
   def add_arguments(self, parser):
     parser.add_argument('worker')
     parser.add_argument(
@@ -61,7 +62,7 @@ class Command(BaseCommand):
     parser.add_argument(
         '--loglevel',
         type=str,
-        default='DEBUG'
+        default='INFO'
     )
     parser.add_argument('--beat')
     parser.add_argument(
@@ -78,17 +79,19 @@ class Command(BaseCommand):
   def usage(self, subcommand):
     return SERVER_HELP
 
+
 def runcelery(*args, **options):
   # Native does not load Hue's config
   log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
-  log_file = "%s/rungunicornserver.log" % (log_dir)
-  concurrency = int(conf.GUNICORN_NUMBER_OF_WORKERS.get()/4) or options['concurrency']
+  log_file = "%s/celery.log" % (log_dir)
+  concurrency = max(int(conf.GUNICORN_NUMBER_OF_WORKERS.get() / 4), 1) or options['concurrency']
   schedule_file = options['schedule_file']
+  celery_log_level = TASK_SERVER_V2.CELERY_LOG_LEVEL.get()
   opts = [
     'celery',
     '--app=' + options['app'],
     'worker',
-    '--loglevel=' + options['loglevel'],
+    '--loglevel=' + str(celery_log_level),
     '--concurrency=' + str(concurrency),
     '--beat',
     '-s', schedule_file,

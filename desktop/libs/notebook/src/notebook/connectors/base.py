@@ -15,24 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import json
-import logging
 import re
 import sys
+import json
 import time
 import uuid
+import logging
+from builtins import object
 
 from django.utils.encoding import smart_str
 
 from beeswax.common import find_compute, is_compute
 from desktop.auth.backend import is_admin
-from desktop.conf import TASK_SERVER, has_connectors
+from desktop.conf import TASK_SERVER_V2, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from metadata.optimizer.base import get_api as get_optimizer_api
-
 from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
 
@@ -426,7 +425,7 @@ def patch_snippet_for_connector(snippet, user=None):
 def get_api(request, snippet):
   from notebook.connectors.oozie_batch import OozieApi
 
-  if snippet.get('wasBatchExecuted') and not TASK_SERVER.ENABLED.get():
+  if snippet.get('wasBatchExecuted') and not TASK_SERVER_V2.ENABLED.get():
     return OozieApi(user=request.user, request=request)
 
   if snippet.get('type') == 'report':
@@ -576,8 +575,10 @@ class Api(object):
     raise OperationNotSupported()
 
   def download(self, notebook, snippet, file_format='csv'):
-    from beeswax import data_export  # TODO: Move to notebook?
-    from beeswax import conf
+    from beeswax import (
+      conf,
+      data_export,  # TODO: Move to notebook?
+    )
 
     result_wrapper = ExecutionWrapper(self, notebook, snippet)
 

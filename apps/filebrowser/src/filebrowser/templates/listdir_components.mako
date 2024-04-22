@@ -702,7 +702,8 @@ else:
     <div class="qq-uploader-selector" style="margin-left: 10px">
         <div class="qq-upload-drop-area-selector" qq-hide-dropzone><span>${_('Drop the files here to upload')}</span></div>
         <div class="qq-upload-button-selector qq-no-float">${_('Select files')}</div> &nbsp;
-        <span class="muted">${_('or drag and drop them here')}</span>
+        <span class="muted">${_('or drag and drop them here')}</span> &nbsp;
+        <span class="muted free-space-info"></span>
 
         <ul class="qq-upload-list-selector qq-upload-files unstyled qq-no-float" style="margin-right: 0;">
             <li>
@@ -2102,6 +2103,24 @@ else:
         doPoll();
       }
 
+      self.checkAndDisplayAvailableSpace = function () {
+        $.ajax({
+            url: '/filebrowser/upload/taskserver/get_available_space_for_file_uploads/',
+            success: function(response) {
+                if (typeof window.MAX_FILE_SIZE_UPLOAD_LIMIT === 'undefined') {
+                  window.MAX_FILE_SIZE_UPLOAD_LIMIT = 5 * 1024 * 1024 * 1024; // 5GB in bytes
+                }
+                var freeSpace = Math.min(response.upload_available_space, window.MAX_FILE_SIZE_UPLOAD_LIMIT);
+                $('.free-space-info').text('- Max file size upload limit: ' + formatBytes(freeSpace));
+            },
+            error: function(xhr, status, error) {
+                huePubSub.publish('hue.global.error', { message: '${ _("Error checking available space: ") }' + error});
+                $('.free-space-info').text('Error checking available space');
+            }
+        });
+      };
+ 
+
       self.uploadFile = (function () {  
           var uploader; 
           var scheduleUpload;
@@ -2112,6 +2131,7 @@ else:
             var action = "/filebrowser/upload/chunks/";
             self.taskIds = [];
             self.listItems = [];
+            self.checkAndDisplayAvailableSpace();
             uploader = new qq.FileUploader({
               element: document.getElementById("fileUploader"),
               request: {
@@ -2171,9 +2191,12 @@ else:
                       self.listItems.push(listItem);
                         if (scheduleUpload && self.pendingUploads() === 0) {
                           $('#uploadFileModal').modal('hide');
-                          $(document).trigger('info', "File upload scheduled. Please check the task server page for progress.");
+                          huePubSub.publish('hue.global.info', { message: '${ _("File upload scheduled. Please check the task server page for progress.") }'});
                         }
-                        pollForTaskProgress(response.task_id, listItem, fileName);
+                        // Add a delay of 2 seconds before calling pollForTaskProgress, to ensure the upload task is received by the task_server before checking its status. 
+                        setTimeout(function() {
+                          pollForTaskProgress(response.task_id, listItem, fileName);
+                        }, 2000);  
                       self.filesToHighlight.push(response.path);                       
                     }
                     if (self.pendingUploads() === 0) {                    
@@ -2188,13 +2211,20 @@ else:
                       
                       // Make an AJAX request to check available disk space
                       $.ajax({
-                        url: '/desktop/api2/taskserver/get_available_space/',
+                        url: '/filebrowser/upload/taskserver/get_available_space_for_file_uploads/',
                         success: function(response) {
-                          var freeSpace = response.free_space;
+                          if (typeof window.MAX_FILE_SIZE_UPLOAD_LIMIT === 'undefined' || window.MAX_FILE_SIZE_UPLOAD_LIMIT === -1) {
+                            window.MAX_FILE_SIZE_UPLOAD_LIMIT = 5 * 1024 * 1024 * 1024; // 5GB in bytes
+                          }
+                          var freeSpace = Math.min(response.upload_available_space, window.MAX_FILE_SIZE_UPLOAD_LIMIT);
                           var file = uploader.getFile(id); // Use the stored reference
-                          
-                          if ((file.size > freeSpace) && (file.size > window.MAX_FILE_SIZE_UPLOAD_LIMIT*1024*1024)) {
-                            $(document).trigger('info', "Not enough space available to upload this file.")
+                          // Update the free space display
+                          $('.free-space-info').text('- Max file size upload limit: ' + formatBytes(freeSpace));
+                          if ((file.size > freeSpace) || (file.size > window.MAX_FILE_SIZE_UPLOAD_LIMIT)) {
+                            huePubSub.publish('hue.global.error', { message: '${ _("Not enough space available to upload this file.") }'});
+                            deferred.failure(); // Reject the promise to cancel the upload
+                          } else if (file.size > window.MAX_FILE_SIZE_UPLOAD_LIMIT) {
+                            huePubSub.publish('hue.global.error', { message: '${ _("File size is bigger than MAX_FILE_SIZE_UPLOAD_LIMIT.") }'});
                             deferred.failure(); // Reject the promise to cancel the upload
                           } else {
                             var newPath = "/filebrowser/upload/chunks/file?dest=" + encodeURIComponent(self.currentPath().normalize('NFC'));
@@ -2204,7 +2234,7 @@ else:
                           }
                         },
                         error: function(xhr, status, error) {
-                          alert('Error checking available space: ' + error);
+                          huePubSub.publish('hue.global.error', { message: '${ _("Error checking available space: ") }' + error});
                           deferred.failure(); // Reject the promise to cancel the upload
                         }
                       });
