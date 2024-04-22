@@ -35,22 +35,43 @@ else:
 
 LOG = logging.getLogger()
 
+
 class TestAWSConf(TestCase):
   def setup_method(self, method):
     self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test_user")
 
-
   def test_is_enabled(self):
     # When RAZ is not enabled
-    assert not conf.is_enabled()
-
-    # When only RAZ is enabled (S3 in Azure cluster)
-    reset = RAZ.IS_ENABLED.set_for_testing(True)
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(False),
+      conf.AWS_ACCOUNTS.set_for_testing({'default': {
+        'region': None,
+        'host': None,
+        'allow_environment_credentials': 'false'
+      }})
+    ]
     try:
       assert not conf.is_enabled()
     finally:
-      reset()
+      for reset in resets:
+        reset()
+      conf.clear_cache()
+
+    # When only RAZ is enabled (S3 in Azure cluster)
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(True),
+      conf.AWS_ACCOUNTS.set_for_testing({'default': {
+        'region': None,
+        'host': None,
+        'allow_environment_credentials': 'false'
+      }})
+    ]
+    try:
+      assert not conf.is_enabled()
+    finally:
+      for reset in resets:
+        reset()
       conf.clear_cache()
 
     # When RAZ is enabled along with S3 config
@@ -70,17 +91,37 @@ class TestAWSConf(TestCase):
         reset()
       conf.clear_cache()
 
-
   def test_has_s3_access(self):
     # When RAZ is not enabled
-    assert not conf.has_s3_access(self.user)
-
-    # When only RAZ is enabled (S3 in Azure cluster)
-    reset = RAZ.IS_ENABLED.set_for_testing(True)
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(False),
+      conf.AWS_ACCOUNTS.set_for_testing({'default': {
+        'region': None,
+        'host': None,
+        'allow_environment_credentials': 'false'
+      }})
+    ]
     try:
       assert not conf.has_s3_access(self.user)
     finally:
-      reset()
+      for reset in resets:
+        reset()
+      conf.clear_cache()
+
+    # When only RAZ is enabled (S3 in Azure cluster)
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(True),
+      conf.AWS_ACCOUNTS.set_for_testing({'default': {
+        'region': None,
+        'host': None,
+        'allow_environment_credentials': 'false'
+      }})
+    ]
+    try:
+      assert not conf.has_s3_access(self.user)
+    finally:
+      for reset in resets:
+        reset()
       conf.clear_cache()
 
     # When RAZ is enabled along with S3 config
@@ -99,17 +140,37 @@ class TestAWSConf(TestCase):
         reset()
       conf.clear_cache()
 
-
   def test_is_raz_s3(self):
     # When RAZ is not enabled
-    assert not conf.is_raz_s3()
-
-    # When only RAZ is enabled (S3 in Azure cluster)
-    reset = RAZ.IS_ENABLED.set_for_testing(True)
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(False),
+      conf.AWS_ACCOUNTS.set_for_testing({'default': {
+        'region': None,
+        'host': None,
+        'allow_environment_credentials': 'false'
+      }})
+    ]
     try:
       assert not conf.is_raz_s3()
     finally:
-      reset()
+      for reset in resets:
+        reset()
+      conf.clear_cache()
+
+    # When only RAZ is enabled (S3 in Azure cluster)
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(True),
+      conf.AWS_ACCOUNTS.set_for_testing({'default': {
+        'region': None,
+        'host': None,
+        'allow_environment_credentials': 'false'
+      }})
+    ]
+    try:
+      assert not conf.is_raz_s3()
+    finally:
+      for reset in resets:
+        reset()
       conf.clear_cache()
 
     # When RAZ is enabled along with S3 config
