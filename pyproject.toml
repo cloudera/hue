@@ -33,7 +33,6 @@ ignore = [
     "E111",
     "E114",
     "W191",
-    "E902", # Skip it because of deleted staged files
 ]
 
 [tool.ruff.format]
