@@ -71,7 +71,6 @@ trino==0.324.0  # Need to upgrade to the latest version but that requires reques
 git+https://github.com/gethue/thrift.git
 thrift-sasl==0.4.3
 git+https://github.com/gethue/django-babel.git
-werkzeug==2.3.6  # Should remove it here and from devtools.mk
 django-utils-six==2.0
 six==1.16.0
 openai==0.27.4
