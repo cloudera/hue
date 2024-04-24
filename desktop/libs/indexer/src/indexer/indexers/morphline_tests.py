@@ -12,10 +12,9 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.from nose.tools import assert_equal
+# limitations under the License.
 
 from future import standard_library
-standard_library.install_aliases()
 from builtins import zip
 from past.builtins import basestring
 from builtins import object
@@ -44,6 +43,7 @@ if sys.version_info[0] > 2:
 else:
   from StringIO import StringIO as string_io
 
+standard_library.install_aliases()
 
 LOG = logging.getLogger()
 
@@ -258,7 +258,7 @@ class TestIndexer(object):
 
   @pytest.mark.integration
   def test_end_to_end(self):
-    if not is_live_cluster(): # Skipping as requires morplines libs to be setup
+    if not is_live_cluster():  # Skipping as requires morplines libs to be setup
       pytest.skip("Skipping Test")
 
     cluster = shared_cluster()
@@ -293,7 +293,6 @@ class TestIndexer(object):
     schema_fields = indexer.get_kept_field_list(format_['columns'])
     if is_unique_generated:
       schema_fields += [{"name": unique_field, "type": "string"}]
-
 
     # create the collection from the specified fields
     collection_manager = CollectionManagerController("test")
