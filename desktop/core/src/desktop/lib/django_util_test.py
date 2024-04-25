@@ -181,4 +181,4 @@ def test_reverse_with_get():
   assert "/" == reverse_with_get("desktop_views.index", get=dict())
 
 def test_unicode_ok():
-  assert "/?a=x%C3%A9" == reverse_with_get("desktop_views.index", get=dict(a="x" + unichr(233)))
+  assert "/?a=x%C3%A9" == reverse_with_get("desktop_views.index", get=dict(a="x" + chr(233)))

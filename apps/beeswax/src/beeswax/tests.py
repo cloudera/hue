@@ -37,6 +37,9 @@ from django.utils.html import escape
 from django.urls import reverse
 from django.db import transaction
 
+from unittest.mock import patch
+from io import BytesIO as string_io
+
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
   AUTH_PASSWORD_SCRIPT as DEFAULT_AUTH_PASSWORD_SCRIPT, LDAP_USERNAME, LDAP_PASSWORD, USE_NEW_EDITOR

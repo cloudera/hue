@@ -19,6 +19,7 @@ import logging
 import os
 import tempfile
 
+from hadoop import conf
 from hadoop import hdfs_site
 
 

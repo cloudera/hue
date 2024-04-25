@@ -17,7 +17,8 @@
 
 import aws
 import pytest
-import sys
+
+from unittest.mock import patch, Mock
 
 from desktop.lib.django_test_util import make_logged_in_client
 
