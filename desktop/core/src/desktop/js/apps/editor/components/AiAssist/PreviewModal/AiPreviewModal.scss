@@ -21,6 +21,7 @@
 @use 'mixins';
 
 $top: 100px; // Same value as specified in cuix
+$usefulMinHeight: 100px;
 
 // We need to get the cuix class in but we can't add it to the root
 .ant-modal-root {
@@ -46,10 +47,12 @@ $top: 100px; // Same value as specified in cuix
       .ant-modal-body {
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: auto;
 
         .hue-ai-preview-modal__diff-highlighter {
-          max-height: 80%;
+          min-height: $usefulMinHeight;
+          flex: 1 1 auto;
+          overflow: scroll;          
           min-width: 540px;
           display: flex;
           flex-direction: column;
@@ -60,8 +63,14 @@ $top: 100px; // Same value as specified in cuix
           }
         }
 
-        .hue-preview-info-panels {
+        .hue-preview-info-panels, .hue-preview-warning-panels {
+          min-height: $usefulMinHeight;
           overflow: auto;
+          flex: 1 1 auto;
+        }
+
+        .hue-inline-alert-check {
+          flex: 1 1 auto;
         }
       }
     }
