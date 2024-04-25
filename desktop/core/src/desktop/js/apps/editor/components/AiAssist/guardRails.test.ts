@@ -323,6 +323,25 @@ describe('withGuardrails', () => {
     expect(result.guardrailAlert.msg.trim()).toEqual(missingTableWarning('table2'));
   });
 
+  it('should warn on SQL table name hallucinations also with db in the qualifier chain', async () => {
+    const mockApiResponse = {
+      sql: 'Select * from mydb.table2',
+      assumptions: 'here is my assumption',
+      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }] }]
+    };
+    const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
+
+    const result = await withGuardrails(mockFunctionToGuard)({
+      dialect: 'hive'
+    });
+
+    expect(result.guardrailAlert).toBeDefined();
+    expect(result.guardrailAlert.type).toEqual(GuardrailAlertType.HALLUCINATION);
+    expect(result.guardrailAlert.confirmationText).toEqual(hallucinationWarning);
+    expect(result.guardrailAlert.title).toEqual(hallucinationWarningTitle);
+    expect(result.guardrailAlert.msg.trim()).toEqual(missingTableWarning('table2'));
+  });
+
   it('should warn on SQL column name hallucinations', async () => {
     const mockApiResponse = {
       sql: 'Select col2 from table1',

@@ -40,7 +40,7 @@ const extractTablesFromSql = (autocompleteParser: AutocompleteParser, sql: strin
 
   const tableLocations = locations.filter(loc => loc.type === LOCATION_TYPES.TABLE);
   const tableNames = tableLocations.map(
-    loc => loc.identifierChain && loc.identifierChain[0].name
+    loc => loc.identifierChain && loc.identifierChain[loc.identifierChain.length - 1].name
   ) as Array<string>;
   const uniqueTableNames = [...new Set(tableNames)];
   return uniqueTableNames;
