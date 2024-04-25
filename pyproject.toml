@@ -21,7 +21,8 @@ extend-exclude = [
   "tools/ops/",
   "tools/ace-editor/",
   "*/gen-py/*",
-  "*/org_migrations/*"
+  "*/org_migrations/*",
+  "*/old_migrations/*"
 ]
 
 [tool.ruff.lint]
