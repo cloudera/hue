@@ -179,19 +179,29 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
     };
   }, []);
 
+  //function removes ..(previous folder) and .(current folder) from table data
+  const removeDots = (dataSource: StorageBrowserTableData[]) => {
+    return dataSource.length > 2 ? dataSource.slice(2) : [];
+  };
+
+  const locale = {
+    emptyText: t('Folder is empty')
+  };
+
   if (dataSource && pageStats) {
     return (
       <>
         <Table
           className={className}
           columns={getColumns(dataSource[0])}
-          dataSource={dataSource}
+          dataSource={removeDots(dataSource)}
           onRow={onRowClicked}
           pagination={false}
           rowClassName={rowClassName}
           rowKey={(record, index) => record.path + '' + index}
           scroll={{ y: tableHeight }}
           data-testid={`${testId}`}
+          locale={locale}
           {...restProps}
         ></Table>
         <Pagination
