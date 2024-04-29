@@ -92,7 +92,13 @@ class Command(BaseCommand):
 
   def add_arguments(self, parser):
     parser.add_argument('ruff_args', nargs=argparse.REMAINDER, help='Additional Ruff arguments, e.g. check, format, --fix etc.')
-    parser.add_argument('--diff-branch', action='store', dest='diff_branch', default='origin/master', help='Compare with this branch to check only changed files')
+    parser.add_argument(
+      '--diff-branch',
+      action='store',
+      dest='diff_branch',
+      default='origin/master',
+      help='Compare with this branch to check only changed files',
+    )
 
   def handle(self, *args, **options):
     """
@@ -105,15 +111,17 @@ class Command(BaseCommand):
     ruff_package = paths.get_build_dir('env', 'bin', 'ruff')
 
     if not os.path.exists(ruff_package):
-      msg = _("Ruff is not installed. Please run `./build/env/bin/pip install ruff` and try again. Make sure you are in the correct environment.")
+      msg = _(
+        "Ruff is not installed. Please run `./build/env/bin/pip install ruff` and try again. Make sure you are in the correct environment."
+      )
       self.stderr.write(msg + '\n')
       sys.exit(1)
-    
+
     ruff_cmd = [ruff_package] + options.get('ruff_args')
 
-    # Exit with a status code of 0 even if violations were found 
-    # Only fail for actual error
-    if "--exit-zero" not in ruff_cmd:
+    # Exit with a status code of 0 even if linting violations were found and only fail for actual error
+    # Skip adding when running ruff format command
+    if not any(arg in ruff_cmd for arg in ["--exit-zero", "format"]):
       ruff_cmd.append("--exit-zero")
 
     if options.get('diff_branch'):
@@ -127,7 +135,7 @@ class Command(BaseCommand):
 
     try:
       ret = subprocess.run(ruff_cmd, check=True)
-      if ret.returncode!= 0:
+      if ret.returncode != 0:
         sys.exit(1)
     except subprocess.CalledProcessError as e:
       LOG.error(f"Error running ruff command: {e}")
