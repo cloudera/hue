@@ -213,15 +213,15 @@
       userDrawerItem: UserDrawerItem;
       userDrawerChildren: SidebarAccordionSubItem[];
 
-      helpDrawerItem: HelpDrawerItem;
-      helpDrawerChildren: SidebarAccordionSubItem[];
+      helpDrawerItem?: HelpDrawerItem;
+      helpDrawerChildren?: SidebarAccordionSubItem[];
 
       lastEditorDatabase?: EditorDatabaseDetails;
       lastAssistDatabase?: AssistDatabaseDetails;
 
       subTracker: SubscriptionTracker;
     } {
-      return {
+      let sideBarList = {
         userDrawerItem: {
           displayName: (<hueWindow>window).LOGGED_USERNAME || '',
           logoutLabel: I18n('Log Out'),
@@ -229,14 +229,22 @@
         },
         userDrawerChildren: USER_DRAWER_CHILDREN,
 
+        subTracker: new SubscriptionTracker()
+      };
+
+      const helpDrawerList = {
         helpDrawerItem: {
           displayName: I18n('Help'),
           iconHtml: getIconHtml('support')
         },
-        helpDrawerChildren: HELP_DRAWER_CHILDREN,
-
-        subTracker: new SubscriptionTracker()
+        helpDrawerChildren: HELP_DRAWER_CHILDREN
       };
+
+      if ((<hueWindow>window).IS_HELP_MENU_ENABLED) {
+        sideBarList = { ...sideBarList, ...helpDrawerList };
+      }
+
+      return sideBarList;
     },
 
     data(): {
@@ -560,7 +568,7 @@
             huePubSub.publish('get.current.app.name', this.currentAppChanged.bind(this));
           }
         }
-      }
+      }      
     }
   });
 </script>

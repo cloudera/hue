@@ -2156,6 +2156,13 @@ DISABLE_LOCAL_STORAGE = Config(
          "please make this value true in case local storage should not be used.")
 )
 
+IS_HELP_MENU_ENABLED = Config(
+  key='is_help_menu_enabled',
+  default=False,
+  type=coerce_bool,
+  help=_("Whether or not to show the Help menu in the Sidebar")
+)
+
 ENABLE_CONNECTORS = Config(
   key='enable_connectors',
   default=False,
