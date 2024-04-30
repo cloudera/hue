@@ -60,7 +60,7 @@ jobs:
 
     - name: run python lints
       run: |
-        ./tools/ci/check_for_python_lint.sh
+        PYTHONWARNINGS=always ./build/env/bin/hue runruff check
 
     - name: run documentation lints
       run: |
