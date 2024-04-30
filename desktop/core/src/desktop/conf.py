@@ -2158,7 +2158,7 @@ DISABLE_LOCAL_STORAGE = Config(
 
 IS_HELP_MENU_ENABLED = Config(
   key='is_help_menu_enabled',
-  default=False,
+  default=True,
   type=coerce_bool,
   help=_("Whether or not to show the Help menu in the Sidebar")
 )
