@@ -1,0 +1,141 @@
+Rdatatypes
+==========
+
+.. py:data:: dns.rdatatype.A
+   :annotation: = 1
+.. py:data:: dns.rdatatype.A6
+   :annotation: = 38
+.. py:data:: dns.rdatatype.AAAA
+   :annotation: = 28
+.. py:data:: dns.rdatatype.AFSDB
+   :annotation: = 18
+.. py:data:: dns.rdatatype.ANY
+   :annotation: = 255
+.. py:data:: dns.rdatatype.APL
+   :annotation: = 42
+.. py:data:: dns.rdatatype.AVC
+   :annotation: = 258
+.. py:data:: dns.rdatatype.AXFR
+   :annotation: = 252
+.. py:data:: dns.rdatatype.CAA
+   :annotation: = 257
+.. py:data:: dns.rdatatype.CDNSKEY
+   :annotation: = 60
+.. py:data:: dns.rdatatype.CDS
+   :annotation: = 59
+.. py:data:: dns.rdatatype.CERT
+   :annotation: = 37
+.. py:data:: dns.rdatatype.CNAME
+   :annotation: = 5
+.. py:data:: dns.rdatatype.CSYNC
+   :annotation: = 62
+.. py:data:: dns.rdatatype.DHCID
+   :annotation: = 49
+.. py:data:: dns.rdatatype.DLV
+   :annotation: = 32769
+.. py:data:: dns.rdatatype.DNAME
+   :annotation: = 39
+.. py:data:: dns.rdatatype.DNSKEY
+   :annotation: = 48
+.. py:data:: dns.rdatatype.DS
+   :annotation: = 43
+.. py:data:: dns.rdatatype.EUI48
+   :annotation: = 108
+.. py:data:: dns.rdatatype.EUI64
+   :annotation: = 109
+.. py:data:: dns.rdatatype.GPOS
+   :annotation: = 27
+.. py:data:: dns.rdatatype.HINFO
+   :annotation: = 13
+.. py:data:: dns.rdatatype.HIP
+   :annotation: = 55
+.. py:data:: dns.rdatatype.IPSECKEY
+   :annotation: = 45
+.. py:data:: dns.rdatatype.ISDN
+   :annotation: = 20
+.. py:data:: dns.rdatatype.IXFR
+   :annotation: = 251
+.. py:data:: dns.rdatatype.KEY
+   :annotation: = 25
+.. py:data:: dns.rdatatype.KX
+   :annotation: = 36
+.. py:data:: dns.rdatatype.LOC
+   :annotation: = 29
+.. py:data:: dns.rdatatype.MAILA
+   :annotation: = 254
+.. py:data:: dns.rdatatype.MAILB
+   :annotation: = 253
+.. py:data:: dns.rdatatype.MB
+   :annotation: = 7
+.. py:data:: dns.rdatatype.MD
+   :annotation: = 3
+.. py:data:: dns.rdatatype.MF
+   :annotation: = 4
+.. py:data:: dns.rdatatype.MG
+   :annotation: = 8
+.. py:data:: dns.rdatatype.MINFO
+   :annotation: = 14
+.. py:data:: dns.rdatatype.MR
+   :annotation: = 9
+.. py:data:: dns.rdatatype.MX
+   :annotation: = 15
+.. py:data:: dns.rdatatype.NAPTR
+   :annotation: = 35
+.. py:data:: dns.rdatatype.NONE
+   :annotation: = 0
+.. py:data:: dns.rdatatype.NS
+   :annotation: = 2
+.. py:data:: dns.rdatatype.NSAP
+   :annotation: = 22
+.. py:data:: dns.rdatatype.NSAP-PTR
+   :annotation: = 23
+.. py:data:: dns.rdatatype.NSEC
+   :annotation: = 47
+.. py:data:: dns.rdatatype.NSEC3
+   :annotation: = 50
+.. py:data:: dns.rdatatype.NSEC3PARAM
+   :annotation: = 51
+.. py:data:: dns.rdatatype.NULL
+   :annotation: = 10
+.. py:data:: dns.rdatatype.NXT
+   :annotation: = 30
+.. py:data:: dns.rdatatype.OPT
+   :annotation: = 41
+.. py:data:: dns.rdatatype.PTR
+   :annotation: = 12
+.. py:data:: dns.rdatatype.PX
+   :annotation: = 26
+.. py:data:: dns.rdatatype.RP
+   :annotation: = 17
+.. py:data:: dns.rdatatype.RRSIG
+   :annotation: = 46
+.. py:data:: dns.rdatatype.RT
+   :annotation: = 21
+.. py:data:: dns.rdatatype.SIG
+   :annotation: = 24
+.. py:data:: dns.rdatatype.SOA
+   :annotation: = 6
+.. py:data:: dns.rdatatype.SPF
+   :annotation: = 99
+.. py:data:: dns.rdatatype.SRV
+   :annotation: = 33
+.. py:data:: dns.rdatatype.SSHFP
+   :annotation: = 44
+.. py:data:: dns.rdatatype.TA
+   :annotation: = 32768
+.. py:data:: dns.rdatatype.TKEY
+   :annotation: = 249
+.. py:data:: dns.rdatatype.TLSA
+   :annotation: = 52
+.. py:data:: dns.rdatatype.TSIG
+   :annotation: = 250
+.. py:data:: dns.rdatatype.TXT
+   :annotation: = 16
+.. py:data:: dns.rdatatype.UNSPEC
+   :annotation: = 103
+.. py:data:: dns.rdatatype.URI
+   :annotation: = 256
+.. py:data:: dns.rdatatype.WKS
+   :annotation: = 11
+.. py:data:: dns.rdatatype.X25
+   :annotation: = 19
