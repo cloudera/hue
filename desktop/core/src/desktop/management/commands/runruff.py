@@ -53,7 +53,7 @@ class Command(BaseCommand):
         ./build/env/bin/hue runruff check --diff-branch=origin/master --fix
 
     Note:
-      Make sure to install Ruff first by running `pip install ruff` in your environment.
+      Make sure to install Ruff first by running `./build/env/bin/pip install ruff` in your environment.
       This command passes all additional arguments to Ruff, so you can use any Ruff option or flag.
   """)
 
@@ -112,7 +112,7 @@ class Command(BaseCommand):
 
     if not os.path.exists(ruff_package):
       msg = _(
-        "Ruff is not installed. Please run `./build/env/bin/pip install ruff` and try again. Make sure you are in the correct environment."
+        "Ruff is not installed. Please run `./build/env/bin/pip install ruff` and try again. Make sure you are in the correct virtualenv."
       )
       self.stderr.write(msg + '\n')
       sys.exit(1)
