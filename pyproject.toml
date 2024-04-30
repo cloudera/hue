@@ -11,6 +11,7 @@ markers = [
 [tool.ruff]
 target-version = "py38"
 line-length = 140
+indent-width = 2
 force-exclude = true
 extend-exclude = [
   "*/ext-py3/*",
@@ -20,7 +21,8 @@ extend-exclude = [
   "tools/ops/",
   "tools/ace-editor/",
   "*/gen-py/*",
-  "*/org_migrations/*"
+  "*/org_migrations/*",
+  "*/old_migrations/*"
 ]
 
 [tool.ruff.lint]
@@ -32,8 +34,12 @@ select = [
 ignore = [
     "E111",
     "E114",
+    "E117",
     "W191",
 ]
 
 [tool.ruff.format]
 docstring-code-format = true
+docstring-code-line-length = 140
+indent-style = "space"
+quote-style = "preserve"
