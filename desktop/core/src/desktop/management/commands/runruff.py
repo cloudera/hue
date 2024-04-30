@@ -119,11 +119,6 @@ class Command(BaseCommand):
 
     ruff_cmd = [ruff_package] + options.get('ruff_args')
 
-    # Exit with a status code of 0 even if linting violations were found and only fail for actual error
-    # Skip adding when running ruff format command
-    if not any(arg in ruff_cmd for arg in ["--exit-zero", "format"]):
-      ruff_cmd.append("--exit-zero")
-
     if options.get('diff_branch'):
       diff_files = self.diff_files(options['diff_branch'])
 
