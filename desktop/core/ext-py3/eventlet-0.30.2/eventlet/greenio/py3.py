@@ -191,9 +191,12 @@ _open_environment.update(dict(
     FileIO=GreenFileIO,
     os=_original_os,
 ))
+if hasattr(_original_pyio, 'text_encoding'):
+    _open_environment['text_encoding'] = _original_pyio.text_encoding
 
+_pyio_open = getattr(_original_pyio.open, '__wrapped__', _original_pyio.open)
 _open = FunctionType(
-    six.get_function_code(_original_pyio.open),
+    six.get_function_code(_pyio_open),
     _open_environment,
 )
 
