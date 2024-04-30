@@ -383,7 +383,7 @@ def run_isolated(path, prefix='tests/isolated/', **kwargs):
 
 def check_is_timeout(obj):
     value_text = getattr(obj, 'is_timeout', '(missing)')
-    assert obj.is_timeout, 'type={0} str={1} .is_timeout={2}'.format(type(obj), str(obj), value_text)
+    assert eventlet.is_timeout(obj), 'type={0} str={1} .is_timeout={2}'.format(type(obj), str(obj), value_text)
 
 
 @contextlib.contextmanager
