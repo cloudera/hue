@@ -174,6 +174,11 @@ def wrap_is_timeout(base):
     return fun
 
 
+if isinstance(__builtins__, dict):  # seen when running tests on py310, but HOW??
+    _timeout_err = __builtins__.get('TimeoutError', Timeout)
+else:
+    _timeout_err = getattr(__builtins__, 'TimeoutError', Timeout)
+
+
 def is_timeout(obj):
-    py3err = getattr(__builtins__, 'TimeoutError', Timeout)
-    return bool(getattr(obj, 'is_timeout', False)) or isinstance(obj, py3err)
+    return bool(getattr(obj, 'is_timeout', False)) or isinstance(obj, _timeout_err)
