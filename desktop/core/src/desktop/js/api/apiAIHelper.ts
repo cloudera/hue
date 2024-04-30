@@ -234,7 +234,7 @@ const getRelevantTables = async (
   return relevantTables;
 };
 
-const fetchColumnsData = async (databaseName: string, tableName: string, executor: Executor) => {
+const fetchTableDetails = async (databaseName: string, tableName: string, executor: Executor) => {
   const dbEntry = await dataCatalog.getEntry({
     path: [databaseName, tableName],
     connector: executor.connector(),
