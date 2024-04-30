@@ -95,10 +95,14 @@ def get_val_str(value) -> str:
     value = value[:MAX_VALUE_LENGTH].strip() + "..."
   return value
 
+NOT_AVAILABLE_MSG = "/*\nExample rows not available.\n*/"
 def build_sample_data(reader: TableReader, table) -> str:
   table_name = table["name"]
   db_name = table.get("dbName", "")
   col_names = list(map(lambda col: col["name"], table["columns"]))
+
+  if "type" in table and table["type"].lower() == "view":
+    return NOT_AVAILABLE_MSG
 
   try:
     rows = reader.fetch(db_name, table["name"], col_names, SAMPLE_ROWS)
@@ -112,7 +116,7 @@ def build_sample_data(reader: TableReader, table) -> str:
   except Exception as exc:
     LOG.error(f"Error fetching sample data for table {table_name} - {exc}")
 
-  return "/*\nExample rows not available\n*/"
+  return NOT_AVAILABLE_MSG
 
 def get_table_key(table) -> str:
   return json.dumps(table)
