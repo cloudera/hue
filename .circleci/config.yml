@@ -54,7 +54,8 @@ commands:
       - run:
           name: run python lints
           command: |
-            ./tools/ci/check_for_python_lint.sh
+            # ./tools/ci/check_for_python_lint.sh
+            PYTHONWARNINGS=always ./build/env/bin/hue runruff check
 
       - run:
           name: run tests

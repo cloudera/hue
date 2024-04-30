@@ -74,7 +74,7 @@ class TestRazS3Connection():
         assert '/' == http_request.path
         assert '/' == http_request.auth_path
         assert ({
-            'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL',
+            'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL', 
             'Signature': '3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D',
             'Expires': '1617207304'
           } ==
