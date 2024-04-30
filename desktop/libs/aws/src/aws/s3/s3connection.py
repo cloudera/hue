@@ -80,7 +80,7 @@ class RazS3Connection(S3Connection):
     self.username = username
 
     # No auth handler with RAZ
-    anon = RAZ.IS_ENABLED.get() 
+    anon = RAZ.IS_ENABLED.get()
 
     super(RazS3Connection, self).__init__(
       aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key,
