@@ -26,10 +26,19 @@ function check_python38_path() {
 function check_python39_path() {
   export python39_bin="$PYTHON39_PATH/bin/python3.9"
   if [ ! -e "$python39_bin" ]; then
-    echo "Python39 bin does not exists at " $python38_bin
+    echo "Python39 bin does not exists at " $python39_bin
     exit 1
   fi
   export pip39_bin="$PYTHON39_PATH/bin/pip3.9"
+}
+
+function check_python310_path() {
+  export python310_bin="$PYTHON310_PATH/bin/python3.10"
+  if [ ! -e "$python310_bin" ]; then
+    echo "Python310 bin does not exists at " $python310_bin
+    exit 1
+  fi
+  export pip310_bin="$PYTHON310_PATH/bin/pip3.10"
 }
 
 function check_sqlite3() {
@@ -198,8 +207,8 @@ function sles15_install() {
     # NODEJS 18 install
     sudo -- sh -c 'zypper install -y nodejs18 npm20'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip310_bin=${pip310_bin} -- sh -c 'ln -fs ${pip310_bin} $(dirname ${pip310_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
@@ -362,6 +371,52 @@ function ubuntu20_install() {
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    # sqlite3 install
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+        tar zxvf sqlite-autoconf-3350500.tar.gz && \
+        cd sqlite-autoconf-3350500 && \
+        ./configure --prefix=/usr/local/ && make && make install'
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+  fi
+}
+
+function ubuntu22_install() {
+    if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'DEBIAN_FRONTEND=noninteractive apt -qq -y install  \
+        krb5-user \
+        krb5-kdc \
+        krb5-config \
+        libkrb5-dev'
+    sudo -- sh -c 'apt -y install \
+        ldap-utils \
+        libpython3.10-dev \
+        libpython3.10-minimal \
+        libpython3.10-stdlib \
+        libxmlsec1 \
+        libxmlsec1-openssl \
+        netcat \
+        nmap \
+        python3-asn1crypto \
+        python3-cryptography \
+        python3-keyring \
+        python3-psycopg2 \
+        python3-setuptools \
+        python3-wheel \
+        python3.10-venv \
+        openssl \
+        sudo \
+        tar \
+        util-linux'
+    # MySQLdb install
+    # It is pre-installed
+    # NODEJS 20 install
+    sudo -- sh -c 'apt-get install -y curl && \
+      curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
+      apt-get install -y nodejs'
+    # Pip modules install
+    sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip310_bin=${pip310_bin} -- sh -c 'ln -fs ${pip310_bin} $(dirname ${pip310_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
