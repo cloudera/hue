@@ -94,7 +94,7 @@ There is no bridge to KO for components using this integration. Example using in
 % endif
 
     <div class="btn-group">
-      <a data-hue-analytics="editor:save-query-as-click" class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#editorSaveAsModal').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
+      <a data-hue-analytics="editor:save-query-as-click" class="btn" data-testid="editor--save-as--button" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#editorSaveAsModal').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
         <i class="fa fa-save"></i>
       </a>
 
