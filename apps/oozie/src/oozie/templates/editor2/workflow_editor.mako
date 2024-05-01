@@ -57,7 +57,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
       <i class="fa fa-fw fa-save"></i>
     </a>
 
-    <div class="dropdown pull-right margin-left-10">
+    <div class="dropdown pull-right margin-left-10" data-testid="editor--actions--dropdown">
       <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </a>
