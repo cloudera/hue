@@ -16,7 +16,8 @@
   limitations under the License.
 */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getHistoryItems, createHistoryItem, updateHistoryItem } from 'api/apiAIHelper';
 import {
   BugOutlined,
   ThunderboltOutlined,
@@ -32,6 +33,7 @@ import { extractLeadingNqlComments, removeComments } from '../PreviewModal/forma
 import { AiActionModes } from '../sharedTypes';
 
 import './AiAssistToolbar.scss';
+import { HistoryItem } from './AiAssistToolbarHistory';
 
 type ActionModes = AiActionModes | undefined;
 interface AssistToolbarProps {
@@ -52,6 +54,8 @@ interface AssistToolbarProps {
   className?: string;
   onInputSubmit: (value: string) => void;
   onInputChanged: (value: string) => void;
+  databaseName: string;
+  dialect: string;
 }
 
 function AssistToolbar({
@@ -70,9 +74,21 @@ function AssistToolbar({
   loadFixSuggestion,
   isSqlError,
   onInputSubmit,
-  onInputChanged
+  onInputChanged,
+  databaseName,
+  dialect
 }: AssistToolbarProps): JSX.Element {
-  const [isAnimatingInput, setIsAnimatingInput] = React.useState(false);
+  const [isAnimatingInput, setIsAnimatingInput] = useState(false);
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+
+  useEffect(() => {
+    const fetchAndAddHistory = async () => {
+      const history = await getHistoryItems(databaseName, dialect);
+      setHistoryItems(history);
+    };
+
+    fetchAndAddHistory();
+  }, [databaseName, dialect]);
 
   const handleCancelInput = () => {
     setActionMode(undefined);
@@ -104,6 +120,35 @@ function AssistToolbar({
     loadComments(parsedStatement?.statement);
   };
 
+  const handleInputSubmit = (promptValue: string) => {
+    onInputSubmit(promptValue);
+    updateHistory(promptValue);
+  };
+
+  const updateHistory = prompt => {
+    const existingHistoryItem = historyItems.find(item=>item.prompt === prompt);
+    if (existingHistoryItem) {
+      updateHistoryItem(existingHistoryItem)
+        .then((updatedHistoryItem) => {
+          setHistoryItems(prevItems => {
+            const filteredItems = prevItems.filter((item) => item.id !== updatedHistoryItem.id);
+            return [updatedHistoryItem, ...filteredItems];
+          });
+        })
+        .catch(error => {
+          console.error('Could not update history item:', error);
+        });
+    } else {
+      createHistoryItem({ prompt, dialect, db: databaseName })
+        .then(item => {
+          setHistoryItems(prevItems => [item, ...prevItems]);
+        })
+        .catch(error => {
+          console.error('Could not add history item:', error);
+        });
+    }
+  };
+
   const selectedStatement = parsedStatement?.statement?.trim() || '';
   const selectedStatementHasContent = !!selectedStatement;
   const nqlPrompt = extractLeadingNqlComments(selectedStatement);
@@ -133,13 +178,14 @@ function AssistToolbar({
                 isAnimating={isAnimatingInput}
                 isLoading={isLoading}
                 isExpanded={actionMode === AiActionModes.GENERATE && inputExpanded}
-                placeholder="E.g. How many of our unique website vistors are using Mac?"
-                onSubmit={onInputSubmit}
+                placeholder="E.g. How many of our unique website visitors are using Mac?"
+                onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
-                onInputChanged={onInputChanged}
-                value={inputValue}
+                onInputChanged={prompt => onInputChanged(prompt)}
+                promptValue={inputValue}
                 onAnimationEnded={() => setIsAnimatingInput(false)}
                 prefill={inputPrefill}
+                historyItems={historyItems}
               />
             </>
           )}
@@ -158,13 +204,14 @@ function AssistToolbar({
                 isAnimating={isAnimatingInput}
                 isExpanded={actionMode === AiActionModes.EDIT && inputExpanded}
                 isLoading={isLoading}
-                value={inputValue}
+                promptValue={inputValue}
                 placeholder="E.g. Only inlcude people under 50 years"
-                onSubmit={onInputSubmit}
+                onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
-                onInputChanged={onInputChanged}
+                onInputChanged={prompt => onInputChanged(prompt)}
                 onAnimationEnded={() => setIsAnimatingInput(false)}
                 prefill={inputPrefill}
+                historyItems={historyItems}
               />
             </>
           )}

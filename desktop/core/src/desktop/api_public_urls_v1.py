@@ -163,3 +163,10 @@ urlpatterns += [
   re_path(r'^editor/ai/tables', api_public.tables, name='tables'),
   re_path(r'^editor/ai/sql', api_public.sql, name='sql'),
 ]
+
+
+urlpatterns += [
+    re_path(r'^editor/ai/prompts', api_public.get_prompts_by_user, name='get_prompts_by_user'),
+    re_path(r'^editor/ai/prompt/create', api_public.create_prompt, name='create_prompt'),
+    re_path(r'^editor/ai/prompt/update', api_public.update_prompt, name='update_prompt'),
+]

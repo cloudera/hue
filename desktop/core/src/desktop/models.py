@@ -38,6 +38,9 @@ from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKe
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse, NoReverseMatch
+from django.db import models
+from django.contrib.auth.models import User
+
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED
 from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket
@@ -2356,3 +2359,23 @@ def __paginate(page, limit, queryset):
     'page': page,
     'limit': limit
   }
+
+class LlmPrompt(models.Model):
+    prompt = models.TextField()
+    dialect = models.TextField(blank=True, null=True)
+    db = models.TextField(blank=True, null=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    details = models.JSONField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Llm Prompt')
+        verbose_name_plural = _('Llm Prompts')
+
+    def __str__(self):
+        return f"Prompt: {self.prompt[:200]}..."
+
+    @classmethod
+    def get_user_prompts(cls, user):
+        return cls.objects.filter(creator=user)

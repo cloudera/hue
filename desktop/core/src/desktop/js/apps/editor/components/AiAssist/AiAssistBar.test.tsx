@@ -17,17 +17,15 @@
 */
 
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
-
 import Executor from '../../execution/executor';
 import SqlExecutable from '../../execution/sqlExecutable';
 
 import AiAssistBar from './AiAssistBar';
 
 import * as hooks from './hooks';
-
 jest.mock('../../../../config/hueConfig', () => {
   // We need to import the AiActionModes here since Jest mocks
   // arent allowed to access variables outside of the module
@@ -45,7 +43,6 @@ jest.mock('../../../../config/hueConfig', () => {
 jest.spyOn(hooks, 'useKeywordCase').mockReturnValue('upper');
 jest.spyOn(hooks, 'useResizeAwareElementSize').mockReturnValue({ height: 100, width: 100 });
 jest.spyOn(hooks, 'useKeyboardShortcuts');
-jest.spyOn(hooks, 'useLocalStorageHistory').mockReturnValue([[], jest.fn()]);
 
 // Mock AiPreviewModal as an empty component
 jest.mock('./PreviewModal/AiPreviewModal', () => {
@@ -128,7 +125,18 @@ jest.mock('api/apiAIHelper', () => ({
       sql: 'Mock edited SQL from NQL',
       assumptions: 'Mock edited assumptions'
     })
-  }))
+  })),
+  getHistoryItems: jest.fn().mockResolvedValue([
+    {
+      id: 1,
+      prompt: 'Existing Prompt in history',
+      updatedAt: 12351,
+      db: 'default',
+      dialect: 'hive'
+    }
+  ]),
+  createHistoryItem: jest.fn().mockResolvedValue({ prompt: 'created', id: 1 }),
+  updateHistoryItem: jest.fn().mockResolvedValue({ prompt: 'created', id: 1 })
 }));
 
 describe('AiAssistBar', () => {
@@ -150,15 +158,24 @@ describe('AiAssistBar', () => {
   });
 
   it('renders the AI assist bar with toolbar', async () => {
-    const { getByTestId } = render(<AiAssistBar activeExecutable={sqlExecutableMock} />);
+    let getByTestId;
+    await act(async () => {
+      const renderResult = render(<AiAssistBar activeExecutable={sqlExecutableMock} />);
+      getByTestId = renderResult.getByTestId;
+    });
     expect(getByTestId('hue-ai-assist-toolbar')).toBeInTheDocument();
   });
 
   it('clears nql, sql & assumptions state after cancelling a preview modal', async () => {
     const user = userEvent.setup();
-    const { getByTestId, getByRole, getByTitle, queryByTestId } = render(
-      <AiAssistBar activeExecutable={sqlExecutableMock} />
-    );
+    let getByTestId, getByRole, getByTitle, queryByTestId;
+    await act(async () => {
+      const renderResult = render(<AiAssistBar activeExecutable={sqlExecutableMock} />);
+      getByTestId = renderResult.getByTestId;
+      getByRole = renderResult.getByRole;
+      getByTitle = renderResult.getByTitle;
+      queryByTestId = renderResult.queryByTestId;
+    });
 
     expect(queryByTestId('mock-preview-modal')).toBeNull();
 
@@ -173,7 +190,6 @@ describe('AiAssistBar', () => {
     expect(getByTestId('mock-preview-modal')).toHaveTextContent('test prompt input');
     expect(getByTestId('mock-preview-modal')).toHaveTextContent('Mock generated SQL from NQL');
     expect(getByTestId('mock-preview-modal')).toHaveTextContent('Mock generate assumptions');
-
     await user.click(getByRole('button', { name: 'Cancel' }));
     expect(queryByTestId('mock-preview-modal')).toBeNull();
 
@@ -186,10 +202,13 @@ describe('AiAssistBar', () => {
 
   it('adds both original and modified SQL to preview modal for Edit', async () => {
     const user = userEvent.setup();
-    const { getByTestId, getByRole, getByTitle } = render(
-      <AiAssistBar activeExecutable={sqlExecutableMock} />
-    );
-
+    let getByTestId, getByRole, getByTitle;
+    await act(async () => {
+      const renderResult = render(<AiAssistBar activeExecutable={sqlExecutableMock} />);
+      getByTestId = renderResult.getByTestId;
+      getByRole = renderResult.getByRole;
+      getByTitle = renderResult.getByTitle;
+    });
     await user.click(getByRole('button', { name: 'Edit SQL using natural language' }));
     const inputField = getByTitle('Press down arrow to select from history');
     expect(inputField).toBeInTheDocument();
@@ -204,7 +223,12 @@ describe('AiAssistBar', () => {
 
   it('does pass prop showDiffFrom to the explain preview modal when clicking explain', async () => {
     const user = userEvent.setup();
-    const { getByTestId, getByRole } = render(<AiAssistBar activeExecutable={sqlExecutableMock} />);
+    let getByTestId, getByRole;
+    await act(async () => {
+      const renderResult = render(<AiAssistBar activeExecutable={sqlExecutableMock} />);
+      getByTestId = renderResult.getByTestId;
+      getByRole = renderResult.getByRole;
+    });
 
     await user.click(getByRole('button', { name: 'Explain SQL statement' }));
 

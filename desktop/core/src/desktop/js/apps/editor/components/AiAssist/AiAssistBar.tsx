@@ -134,6 +134,8 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   const inputExpanded = actionMode === AiActionModes.EDIT || actionMode === AiActionModes.GENERATE;
   const inputPrefill = inputExpanded ? extractLeadingNqlComments(selectedStatement) : '';
 
+  const databaseName = getDbName(activeExecutable);
+
   const handleStatusUpdate = (status: string) => {
     setLoadingStatusText(status);
   };
@@ -323,7 +325,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     }
   };
 
-  const handleToobarInputSubmit = (userInput: string) => {
+  const handleToobarInputSubmit = userInput => {
     const sqlStatmentToModify = parsedStatement.statement;
     if (actionMode === AiActionModes.GENERATE) {
       generateSqlQuery(userInput, activeExecutable);
@@ -487,6 +489,8 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
             loadComments={loadComments}
             isSqlError={hasIncorrectSql}
             inputPrefill={inputPrefill}
+            databaseName={databaseName}
+            dialect={sqlDialect}
           />
         </div>
         <AnimatedCloseButton

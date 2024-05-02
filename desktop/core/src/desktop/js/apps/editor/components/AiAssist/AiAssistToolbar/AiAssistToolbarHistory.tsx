@@ -29,22 +29,24 @@ import './AiAssistToolbarHistory.scss';
 import TimeAgo from '../../../../../reactComponents/TimeAgo/TimeAgo';
 
 export interface HistoryItem {
-  date: number;
-  value: string;
+  prompt: string;
+  updatedAt?: number;
+  id?: number;
+  db?: string;
+  dialect?: string;
 }
 
 interface HighlightableTextItem {
-  val: string;
+  prompt: string;
   highlight?: boolean;
   key: string;
 }
-
 interface HistoryItemRenderable {
-  date: number;
   highligtableValue: Array<HighlightableTextItem>;
-  value: string;
+  prompt: string;
   length: number;
   active: boolean;
+  updatedAt: number | undefined;
 }
 
 interface AiAssistToolbarHistoryProps {
@@ -53,7 +55,7 @@ interface AiAssistToolbarHistoryProps {
   searchValue: string;
   items: Array<HistoryItem>;
   onHide: () => void;
-  onSelect: (HistoryItem) => void;
+  onSelect: (string) => void;
   onToggleAutoShow: (autoShow: boolean) => void;
   show: boolean;
   ref;
@@ -70,13 +72,13 @@ const AiAssistToolbarHistory = forwardRef(
     {
       position,
       searchValue = '',
-      items,
       onToggleAutoShow,
       onHide,
       onSelect,
       show,
       autoShow,
-      width
+      width,
+      items
     }: AiAssistToolbarHistoryProps,
     ref
   ) => {
@@ -98,7 +100,7 @@ const AiAssistToolbarHistory = forwardRef(
     const lowerCaseSearchValue = searchValue.toLowerCase();
 
     const filteredItems: Array<HistoryItem> = items.filter(item => {
-      const itemValueLowerCase = item.value.toLowerCase();
+      const itemValueLowerCase = item.prompt.toLowerCase();
       return !lowerCaseSearchValue || itemValueLowerCase.includes(lowerCaseSearchValue);
     });
 
@@ -111,24 +113,25 @@ const AiAssistToolbarHistory = forwardRef(
     );
 
     const renderableItems: Array<HistoryItemRenderable> = filteredItems.map((item, index) => {
-      let highlightableText = [{ val: item.value, key: item.value }];
+      let highlightableText = [{ prompt: item.prompt, key: item.prompt }];
       const shouldHighlightText = lowerCaseSearchValue !== '';
       if (shouldHighlightText) {
-        const textChunks = item.value.split(new RegExp(`(${lowerCaseSearchValue})`, 'i'));
+        const textChunks = item.prompt.split(new RegExp(`(${lowerCaseSearchValue})`, 'i'));
 
         highlightableText = textChunks.map((part, index) => ({
-          val: part,
+          prompt: part,
           highlight: part.toLowerCase() === lowerCaseSearchValue,
           key: `${part}${index}`
         }));
       }
 
       return {
-        date: item.date,
+        id: item.id,
         highligtableValue: highlightableText,
-        value: item.value,
-        length: item.value.length,
-        active: index === activeItemIndex
+        prompt: item.prompt,
+        length: item.prompt.length,
+        active: index === activeItemIndex,
+        updatedAt: item.updatedAt
       };
     });
 
@@ -158,7 +161,7 @@ const AiAssistToolbarHistory = forwardRef(
       } else if (e.key === ENTER_KEY && activeItemIndex >= 0) {
         const selectedItem = filteredItems[activeItemIndex];
         setActiveItemIndex(-1);
-        onSelect(selectedItem);
+        onSelect(selectedItem.prompt);
       } else if (e.key === ESCAPE_KEY && activeItemIndex >= 0) {
         setActiveItemIndex(-1);
         onHide();
@@ -209,13 +212,13 @@ const AiAssistToolbarHistory = forwardRef(
                   <li
                     role="menuitem"
                     tabIndex={-1}
-                    key={item.date}
+                    key={item.updatedAt}
                     className={classNames('hue-ai-assist-toolbar-history__item', {
                       'hue-ai-assist-toolbar-history__item--active': item.active
                     })}
-                    title={item.value}
-                    aria-label={item.value}
-                    onClick={() => onSelect({ value: item.value, date: item.date })}
+                    title={item.prompt}
+                    aria-label={item.prompt}
+                    onClick={() => onSelect(item.prompt)}
                     ref={itemRefs[index]}
                   >
                     <HistoryIcon className="hue-ai-assist-toolbar-history__item-icon" />
@@ -226,18 +229,18 @@ const AiAssistToolbarHistory = forwardRef(
                             key={valueContainer.key}
                             className="hue-ai-assist-toolbar-history__item-highlight"
                           >
-                            {valueContainer.val}
+                            {valueContainer.prompt}
                           </span>
                         ) : (
-                          <span key={valueContainer.key}>{valueContainer.val}</span>
+                          <span key={valueContainer.key}>{valueContainer.prompt}</span>
                         )
                       )}
                     </div>
                     <div
-                      title={new Date(item.date).toLocaleString()}
+                      title={new Date(item.updatedAt).toLocaleString()}
                       className="hue-ai-assist-toolbar-history__item-time"
                     >
-                      <TimeAgo value={item.date} />
+                      <TimeAgo value={item.updatedAt} />
                     </div>
                   </li>
                 );

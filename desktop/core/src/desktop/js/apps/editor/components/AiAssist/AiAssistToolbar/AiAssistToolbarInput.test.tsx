@@ -55,7 +55,8 @@ describe('AiAssistToolbarInput', () => {
       onCancel: jest.fn(),
       onInputChanged: jest.fn(),
       onAnimationEnded: jest.fn(),
-      value: ''
+      promptValue: '',
+      historyItems: []
     };
   });
 
@@ -68,13 +69,13 @@ describe('AiAssistToolbarInput', () => {
   });
 
   it('should only render submit button if input contains more than 3 letters', async () => {
-    const { queryByRole, rerender } = render(<AiAssistToolbarInput {...testProps} value="abcd" />);
+    const { queryByRole, rerender } = render(<AiAssistToolbarInput {...testProps} promptValue="abcd" />);
 
     const btnName = 'Press enter or click here to execute';
 
     expect(queryByRole('button', { name: btnName })).toBeInTheDocument();
 
-    rerender(<AiAssistToolbarInput {...testProps} value="abc" />);
+    rerender(<AiAssistToolbarInput {...testProps} promptValue="abc" />);
     expect(queryByRole('button', { name: btnName })).not.toBeInTheDocument();
   });
 
@@ -82,7 +83,7 @@ describe('AiAssistToolbarInput', () => {
     const user = userEvent.setup();
     const onSubmitMock = jest.fn();
     const { getByRole } = render(
-      <AiAssistToolbarInput {...testProps} value="abcd" onSubmit={onSubmitMock} />
+      <AiAssistToolbarInput {...testProps} promptValue="abcd" onSubmit={onSubmitMock} />
     );
 
     expect(onSubmitMock).not.toHaveBeenCalled();
@@ -96,8 +97,7 @@ describe('AiAssistToolbarInput', () => {
     const user = userEvent.setup();
     const onSubmitMock = jest.fn();
     const { getByRole } = render(
-      // We include a non-ascii character to test the regex
-      <AiAssistToolbarInput {...testProps} value="abc好" onSubmit={onSubmitMock} />
+      <AiAssistToolbarInput {...testProps} promptValue="abc好" onSubmit={onSubmitMock} />
     );
 
     expect(onSubmitMock).not.toHaveBeenCalled();
@@ -109,7 +109,7 @@ describe('AiAssistToolbarInput', () => {
     const user = userEvent.setup();
     const onSubmitMock = jest.fn();
     const { getByRole } = render(
-      <AiAssistToolbarInput {...testProps} value="2abc213" onSubmit={onSubmitMock} />
+      <AiAssistToolbarInput {...testProps} promptValue="2abc213" onSubmit={onSubmitMock} />
     );
 
     await user.type(getByRole('textbox'), '{enter}');
@@ -120,7 +120,7 @@ describe('AiAssistToolbarInput', () => {
     const user = userEvent.setup();
     const onSubmitMock = jest.fn();
     const { getByRole } = render(
-      <AiAssistToolbarInput {...testProps} value="2abc213" onSubmit={onSubmitMock} />
+      <AiAssistToolbarInput {...testProps} promptValue="2abc213" onSubmit={onSubmitMock} />
     );
 
     await user.type(getByRole('textbox'), '{enter}');
@@ -140,9 +140,9 @@ describe('AiAssistToolbarInput', () => {
       name: 'Press down arrow to select from history'
     });
     await user.type(inputElement, 'abcd');
-    expect(onChangeMock).toHaveBeenCalledWith('a');
-    expect(onChangeMock).toHaveBeenCalledWith('b');
-    expect(onChangeMock).toHaveBeenCalledWith('c');
-    expect(onChangeMock).toHaveBeenCalledWith('d');
+    expect(onChangeMock).toHaveBeenCalledWith("a");
+    expect(onChangeMock).toHaveBeenCalledWith("b");
+    expect(onChangeMock).toHaveBeenCalledWith("c");
+    expect(onChangeMock).toHaveBeenCalledWith("d");
   });
 });
