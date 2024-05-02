@@ -16,7 +16,8 @@
   limitations under the License.
 */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getHistoryItems, createHistoryItem, updateHistoryItem } from 'api/apiAIHelper';
 import {
   BugOutlined,
   ThunderboltOutlined,
@@ -32,6 +33,7 @@ import { extractLeadingNqlComments, removeComments } from '../PreviewModal/forma
 import { AiActionModes } from '../sharedTypes';
 
 import './AiAssistToolbar.scss';
+import { HistoryItem } from './AiAssistToolbarHistory';
 
 type ActionModes = AiActionModes | undefined;
 interface AssistToolbarProps {
@@ -52,6 +54,8 @@ interface AssistToolbarProps {
   className?: string;
   onInputSubmit: (value: string) => void;
   onInputChanged: (value: string) => void;
+  databaseName: string;
+  dialect: string;
 }
 
 function AssistToolbar({
@@ -70,9 +74,21 @@ function AssistToolbar({
   loadFixSuggestion,
   isSqlError,
   onInputSubmit,
-  onInputChanged
+  onInputChanged,
+  databaseName,
+  dialect
 }: AssistToolbarProps): JSX.Element {
-  const [isAnimatingInput, setIsAnimatingInput] = React.useState(false);
+  const [isAnimatingInput, setIsAnimatingInput] = useState(false);
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+
+  useEffect(() => {
+    const fetchAndAddHistory = async () => {
+      const history = await getHistoryItems(databaseName, dialect);
+      setHistoryItems(history);
+    };
+
+    fetchAndAddHistory();
+  }, [databaseName, dialect]);
 
   const handleCancelInput = () => {
     setActionMode(undefined);
@@ -165,10 +181,11 @@ function AssistToolbar({
                 placeholder={`Query database ${databaseName} using natural language`}
                 onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
-                onInputChanged={onInputChanged}
-                value={inputValue}
+                onInputChanged={prompt => onInputChanged(prompt)}
+                promptValue={inputValue}
                 onAnimationEnded={() => setIsAnimatingInput(false)}
                 prefill={inputPrefill}
+                historyItems={historyItems}
               />
             </>
           )}
@@ -191,9 +208,10 @@ function AssistToolbar({
                 placeholder={`Edit your query for database ${databaseName}`}
                 onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
-                onInputChanged={onInputChanged}
+                onInputChanged={prompt => onInputChanged(prompt)}
                 onAnimationEnded={() => setIsAnimatingInput(false)}
                 prefill={inputPrefill}
+                historyItems={historyItems}
               />
             </>
           )}

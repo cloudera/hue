@@ -24,10 +24,10 @@ import AiAssistToolbarHistory from './AiAssistToolbarHistory'; // Adjust the imp
 
 // Mock data for history items
 const historyItems = [
-  { date: Date.now(), value: 'First Entry' },
-  { date: Date.now() - 10000, value: 'second entry' },
-  { date: Date.now() - 20000, value: 'MixedCASE Entry' },
-  { date: Date.now() - 30000, value: 'Last item' }
+  { updatedAt: Date.now(), prompt: 'First Entry' },
+  { updatedAt: Date.now() - 10000, prompt: 'second entry' },
+  { updatedAt: Date.now() - 20000, prompt: 'MixedCASE Entry', id: 10 },
+  { updatedAt: Date.now() - 30000, prompt: 'Last item' }
 ];
 
 describe('AiAssistToolbarHistory', () => {
@@ -76,7 +76,6 @@ describe('AiAssistToolbarHistory', () => {
         width={300}
       />
     );
-
     expect(getByText((_, element) => element?.textContent === 'First Entry')).toBeInTheDocument();
     expect(getByText((_, element) => element?.textContent === 'second entry')).toBeInTheDocument();
     expect(
@@ -139,7 +138,7 @@ describe('AiAssistToolbarHistory', () => {
 
     await user.click(getByText('First Entry'));
 
-    expect(onSelectMock).toHaveBeenCalledWith(expect.objectContaining({ value: 'First Entry' }));
+    expect(onSelectMock).toHaveBeenCalledWith(historyItems[0].prompt);
   });
 
   test('navigates history items with keyboard and selects an item', async () => {
@@ -169,8 +168,9 @@ describe('AiAssistToolbarHistory', () => {
     await user.keyboard('{ArrowDown}');
     await user.keyboard('{Enter}');
 
-    expect(onSelectMock).toHaveBeenCalledWith(expect.objectContaining(historyItems[1]));
+    expect(onSelectMock).toHaveBeenCalledWith(historyItems[1].prompt);
   });
+
   test('highlights search terms in history items', async () => {
     const onSelectMock = jest.fn();
     const { getByText, rerender } = render(

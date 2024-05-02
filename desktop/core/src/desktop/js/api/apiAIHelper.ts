@@ -16,11 +16,11 @@
   limitations under the License.
 */
 
-import { post } from '../api/utils';
+import { post, get } from '../api/utils';
 import Executor from '../apps/editor/execution/executor';
 import dataCatalog from '../catalog/dataCatalog';
 import { ExtendedColumn } from '../catalog/DataCatalogEntry';
-
+import { HistoryItem } from '../apps/editor/components/AiAssist/AiAssistToolbar/AiAssistToolbarHistory';
 import HueError from './HueError';
 
 const TABLES_API_URL = '/api/v1/editor/ai/tables';
@@ -516,5 +516,42 @@ const generateCommentedSql: GenerateCommentedSql = async ({
     });
   } catch (e) {
     throw augmentError(e, 'Call to AI to comment SQL query failed');
+  }
+};
+
+// Function to fetch history items from the API
+export const getHistoryItems = async (
+  databaseName: string,
+  dialect: string
+): Promise<HistoryItem[]> => {
+  try {
+    const response = await get('/api/v1/editor/ai/prompts', {
+      databaseName: databaseName,
+      dialect: dialect
+    });
+    return response as HistoryItem[];
+  } catch (error) {
+    console.error('Error fetching history items:', error);
+    return [];
+  }
+};
+
+export const createHistoryItem = async (promptItem: HistoryItem): Promise<HistoryItem> => {
+  try {
+    const response = await post('/api/v1/editor/ai/prompt/create', promptItem);
+    return response as HistoryItem;
+  } catch (error) {
+    console.error('Error creating history items:', error);
+    return {} as HistoryItem;
+  }
+};
+
+export const updateHistoryItem = async (promptItem: HistoryItem): Promise<HistoryItem> => {
+  try {
+    const response = await post('/api/v1/editor/ai/prompt/update', promptItem);
+    return response as HistoryItem;
+  } catch (error) {
+    console.error('Error updating history items:', error);
+    return {} as HistoryItem;
   }
 };

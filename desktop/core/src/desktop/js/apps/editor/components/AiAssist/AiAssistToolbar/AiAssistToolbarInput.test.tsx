@@ -142,9 +142,9 @@ describe('AiAssistToolbarInput', () => {
       name: 'Press down arrow to select from history'
     });
     await user.type(inputElement, 'abcd');
-    expect(onChangeMock).toHaveBeenCalledWith('a');
-    expect(onChangeMock).toHaveBeenCalledWith('b');
-    expect(onChangeMock).toHaveBeenCalledWith('c');
-    expect(onChangeMock).toHaveBeenCalledWith('d');
+    expect(onChangeMock).toHaveBeenCalledWith("a");
+    expect(onChangeMock).toHaveBeenCalledWith("b");
+    expect(onChangeMock).toHaveBeenCalledWith("c");
+    expect(onChangeMock).toHaveBeenCalledWith("d");
   });
 });

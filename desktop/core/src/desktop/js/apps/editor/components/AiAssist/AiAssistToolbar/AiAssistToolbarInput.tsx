@@ -25,9 +25,8 @@ import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import huePubSub from 'utils/huePubSub';
 
 import AiAssistToolbarHistory, { HistoryItem } from './AiAssistToolbarHistory';
-import { useResizeAwareElementSize, useLocalStorageHistory } from '../hooks';
+import { useResizeAwareElementSize } from '../hooks';
 import { GLOBAL_INFO_TOPIC } from '../../../../../reactComponents/AlertComponent/events';
-
 import './AiAssistToolbarInput.scss';
 
 const ENTER_KEY = 'Enter';
@@ -37,7 +36,6 @@ const TAB_KEY = 'Tab';
 const MAX_INPUT_WIDTH = 700;
 const MAX_INPUT_LINES = 10;
 const AUTO_SHOW_STORAGE_KEY = 'hue.aiAssistBar.history.autoShow';
-const HISTORY_STORAGE_KEY = 'hue.aiAssistBar.history.items';
 
 const getSingleLineHeight = (singleLineSpanRef: React.RefObject<HTMLSpanElement>): number => {
   return singleLineSpanRef?.current?.clientHeight || 0;
@@ -143,18 +141,20 @@ function AiAssistToolbarInput({
   isLoading,
   isExpanded,
   prefill = '',
-  value
+  promptValue,
+  historyItems
 }: {
   isAnimating: boolean;
   isExpanded: boolean;
   isLoading: boolean;
   placeholder: string;
   prefill?: string;
-  onSubmit: (value: string) => void;
+  onSubmit: (params: string) => void;
   onCancel: () => void;
-  onInputChanged: (value: string) => void;
+  onInputChanged: (params: string) => void;
   onAnimationEnded: () => void;
-  value: string;
+  promptValue: string;
+  historyItems: HistoryItem[];
 }): JSX.Element {
   const autoShow = getFromLocalStorage(AUTO_SHOW_STORAGE_KEY, true);
   const [dirty, setDirty] = useState<boolean>(false);
@@ -165,7 +165,6 @@ function AiAssistToolbarInput({
   const [showHistoryDropdown, setShowHistoryDropdown] = useState<boolean>(autoShow);
   const [singleLinePlaceholderText, setSingleLinePlaceholderText] = useState<string>();
   const [userChoiceAutoShowHistory, setUserChoiceAutoShowHistory] = useState<boolean>(autoShow);
-  const [historyItems, addHistoryItem] = useLocalStorageHistory(HISTORY_STORAGE_KEY, 50);
 
   const toolbarButtonWrapperRef = useRef<HTMLDivElement>(null);
   const spanSizeRef = useRef<HTMLSpanElement>(null);
@@ -175,7 +174,9 @@ function AiAssistToolbarInput({
 
   const resizeAwareMaxWidth = useResizeAwareElementSize(toolbarButtonWrapperRef)?.width;
   const placeholderText = prefill || placeholder;
-  const isMultiLine = isMultiLineSpan(spanSizeRef, spanSingleLineRef, value);
+  const inputPromptValue = promptValue || '';
+
+  const isMultiLine = isMultiLineSpan(spanSizeRef, spanSingleLineRef, inputPromptValue);
 
   useEffect(() => {
     const availableWidth = calculateAvailableWidth(toolbarButtonWrapperRef) || 0;
@@ -187,7 +188,7 @@ function AiAssistToolbarInput({
       updateTextareaDimensions({
         sizeMeasureSpan: spanSizeRef.current,
         textarea: textareaRef.current,
-        userText: value,
+        userText: inputPromptValue,
         maxWidth,
         maxHeight,
         singleLineHeight,
@@ -213,8 +214,7 @@ function AiAssistToolbarInput({
   }, [isAnimating, isExpanded]);
 
   const handleSubmit = () => {
-    addHistoryItem({ value: value, date: new Date().getTime() });
-    onSubmit(value);
+    onSubmit(inputPromptValue);
     setDirty(false);
     setTouched(false);
   };
@@ -228,15 +228,17 @@ function AiAssistToolbarInput({
 
   const handleOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
-    onInputChanged(newValue);
-    setDirty(newValue ? true : false);
+    const updatedPromptValue = newValue || '';
+
+    onInputChanged(updatedPromptValue);
+    setDirty(!!newValue);
     setTouched(true);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === ENTER_KEY && !event.shiftKey) {
       event.preventDefault();
-      if (hasReasonableInputLength(value)) {
+      if (hasReasonableInputLength(inputPromptValue)) {
         handleSubmit();
       } else {
         huePubSub.publish(GLOBAL_INFO_TOPIC, {
@@ -258,14 +260,13 @@ function AiAssistToolbarInput({
     textareaRef.current?.focus();
   };
 
-  const handleHistorySelect = (item: HistoryItem) => {
-    onInputChanged(item.value);
+  const handleHistorySelect = (item: string) => {
+    onInputChanged(item);
     setShowHistoryDropdown(false);
     focusInput();
   };
 
   const executeLabel = 'Press enter or click here to execute';
-
   return (
     <li
       onAnimationEnd={() => {
@@ -286,21 +287,21 @@ function AiAssistToolbarInput({
             }
             disabled={isLoading}
             ref={textareaRef}
-            value={value}
+            value={inputPromptValue}
             onChange={handleOnChange}
             placeholder={singleLinePlaceholderText}
             spellCheck="false"
             className={classNames('hue-ai-assist-toolbar-input__text-input', {
-              ['hue-ai-assist-toolbar-input__text-input--empty']: !value,
+              ['hue-ai-assist-toolbar-input__text-input--empty']: !inputPromptValue,
               ['hue-ai-assist-toolbar-input__text-input--animating']: isAnimating,
               ['hue-ai-assist-toolbar-input__text-input--multi-line']: isMultiLine,
-              ['hue-ai-assist-toolbar-input__text-input--is-prefill']: !value && prefill
+              ['hue-ai-assist-toolbar-input__text-input--is-prefill']: !inputPromptValue && prefill
             })}
             onKeyDown={handleKeyDown}
           />
 
           <span className="hue-ai-assist-toolbar-input__size-reference-element" ref={spanSizeRef}>
-            {value || placeholderText}
+            {inputPromptValue || placeholderText}
           </span>
           <span
             className="hue-ai-assist-toolbar-input__single-line-reference-element"
@@ -323,10 +324,10 @@ function AiAssistToolbarInput({
               setShowHistoryDropdown(false);
             }}
             onSelect={handleHistorySelect}
-            searchValue={value}
+            searchValue={inputPromptValue}
             items={historyItems}
           />
-          {hasReasonableInputLength(value) && (
+          {hasReasonableInputLength(inputPromptValue) && (
             <Button
               disabled={isLoading}
               className={'hue-toolbar-button'}

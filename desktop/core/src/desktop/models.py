@@ -2351,3 +2351,23 @@ def __paginate(page, limit, queryset):
     'page': page,
     'limit': limit
   }
+
+class LlmPrompt(models.Model):
+    prompt = models.TextField()
+    dialect = models.TextField(blank=True, null=True)
+    db = models.TextField(blank=True, null=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    details = models.JSONField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Llm Prompt')
+        verbose_name_plural = _('Llm Prompts')
+
+    def __str__(self):
+        return f"Prompt: {self.prompt[:200]}..."
+
+    @classmethod
+    def get_user_prompts(cls, user):
+        return cls.objects.filter(creator=user)

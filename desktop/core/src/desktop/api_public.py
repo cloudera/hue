@@ -20,8 +20,10 @@ import json
 import dataclasses
 
 from django.http import QueryDict, HttpResponse
+
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
 
 from filebrowser import views as filebrowser_views, api as filebrowser_api
 from indexer import api3 as indexer_api3
@@ -30,11 +32,12 @@ from metadata import optimizer_api
 from notebook import api as notebook_api
 from notebook.conf import get_ordered_interpreters
 from desktop.conf import is_ai_interface_enabled, is_vector_db_enabled
-
+from desktop.models import LlmPrompt
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
+from .serializer import LlmPromptSerializer
 
 from useradmin import views as useradmin_views, api as useradmin_api
 
@@ -418,8 +421,66 @@ def search_entities_interactive(request):
   django_request = get_django_request(request)
   return desktop_api.search_entities_interactive(django_request)
 
+@api_view(["POST"])
+def create_prompt(request):
+    prompt_text = request.data.get("prompt")
+    dialect = request.data.get("dialect")
+    db = request.data.get("db")
+    try:
+        new_prompt = LlmPrompt(creator=request.user, prompt=prompt_text, dialect=dialect, db=db)
+        new_prompt.save()
+        serializer = LlmPromptSerializer(new_prompt, many=False)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({'error': 'Failed to create prompt.'}, status=400)
 
-# IAM
+
+@api_view(["GET"])
+def get_prompts_by_user(request):
+    try:
+        prompts_queryset = LlmPrompt.objects.filter(creator=request.user)
+        database_name = request.query_params.get('databaseName')
+        dialect = request.query_params.get('dialect')
+        limit = request.query_params.get('limit', 20)  # Get 'limit' from query parameters or default to 20
+
+        try:
+          limit = max(1, int(limit))  # Ensure at least one prompt is retrieved and limit is an int
+        except ValueError:
+          return Response({'error': 'Limit parameter must be a positive integer.'}, status=400)
+
+        # Apply additional filters if the parameters exist
+        if database_name:
+            prompts_queryset = prompts_queryset.filter(db=database_name)
+        if dialect:
+            prompts_queryset = prompts_queryset.filter(dialect=dialect)
+
+        prompts_queryset = prompts_queryset.order_by('-updated_at')[:limit]
+        serializer = LlmPromptSerializer(prompts_queryset, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({'error': 'Failed to retrieve prompts: %s' % e}, status=500)
+
+
+@api_view(["POST"])
+def update_prompt(request):
+    prompt_id = request.data.get("id")
+
+    try:
+        prompt = LlmPrompt.objects.get(id=prompt_id, creator=request.user)
+    except LlmPrompt.DoesNotExist:
+        return Response({'error': 'Prompt not found or not owned by user.'}, status=400)
+
+    prompt_text = request.data.get("prompt")
+    dialect = request.data.get("dialect")
+    db = request.data.get("db")
+
+    prompt.prompt = prompt_text
+    prompt.dialect = dialect
+    prompt.db = db
+    prompt.save()
+    serializer = LlmPromptSerializer(prompt, many=False)
+    return Response(serializer.data)
+
 
 @api_view(["GET"])
 def list_for_autocomplete(request):

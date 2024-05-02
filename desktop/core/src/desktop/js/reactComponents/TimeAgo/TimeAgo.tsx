@@ -39,7 +39,7 @@ export const timeAgo = (value: number): string => {
       return `${val} ${postfix}`;
     }
   }
-  return I18n('now');
+  return I18n('just now'); // Changed 'now' to 'just now' for clarity.
 };
 
 interface TimeAgoProps {
