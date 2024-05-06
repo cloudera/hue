@@ -92,11 +92,12 @@ describe('AiAssistToolbarInput', () => {
     expect(onSubmitMock).toHaveBeenCalled();
   });
 
-  it('should call onSubmit when pressing the enter key with more then 4 letters input', async () => {
+  it('should call onSubmit when pressing the enter key with more then 4 non digit input', async () => {
     const user = userEvent.setup();
     const onSubmitMock = jest.fn();
     const { getByRole } = render(
-      <AiAssistToolbarInput {...testProps} value="abcd" onSubmit={onSubmitMock} />
+      // We include a non-ascii character to test the regex
+      <AiAssistToolbarInput {...testProps} value="abc好" onSubmit={onSubmitMock} />
     );
 
     expect(onSubmitMock).not.toHaveBeenCalled();
@@ -104,7 +105,7 @@ describe('AiAssistToolbarInput', () => {
     expect(onSubmitMock).toHaveBeenCalled();
   });
 
-  it('should not call onSubmit when pressing the enter key with less then 4 letters input', async () => {
+  it('should not call onSubmit when pressing the enter key with less then 4 non digit input', async () => {
     const user = userEvent.setup();
     const onSubmitMock = jest.fn();
     const { getByRole } = render(
@@ -115,7 +116,7 @@ describe('AiAssistToolbarInput', () => {
     expect(onSubmitMock).not.toHaveBeenCalled();
   });
 
-  it('should show an info msg when pressing the enter key with less then 4 letters input', async () => {
+  it('should show an info msg when pressing the enter key with less then 4 non digit input', async () => {
     const user = userEvent.setup();
     const onSubmitMock = jest.fn();
     const { getByRole } = render(

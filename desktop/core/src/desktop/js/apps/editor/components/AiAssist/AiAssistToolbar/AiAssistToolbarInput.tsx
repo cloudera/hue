@@ -127,10 +127,10 @@ const calculateDropdownPosition = (
   };
 };
 
-const hasMinimum4Letters = (value: string) => {
+const hasReasonableInputLength = (value: string) => {
   const trimmed = value?.trim();
-  const atLeast4letters = /(?:[^a-zA-Z]*[a-zA-Z]){4}/;
-  return atLeast4letters.test(trimmed);
+  const atLeast4NonDigits = /(?:\D.*?){4}/u;
+  return atLeast4NonDigits.test(trimmed);
 };
 
 function AiAssistToolbarInput({
@@ -236,7 +236,7 @@ function AiAssistToolbarInput({
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === ENTER_KEY && !event.shiftKey) {
       event.preventDefault();
-      if (hasMinimum4Letters(value)) {
+      if (hasReasonableInputLength(value)) {
         handleSubmit();
       } else {
         huePubSub.publish(GLOBAL_INFO_TOPIC, {
@@ -326,7 +326,7 @@ function AiAssistToolbarInput({
             searchValue={value}
             items={historyItems}
           />
-          {hasMinimum4Letters(value) && (
+          {hasReasonableInputLength(value) && (
             <Button
               disabled={isLoading}
               className={'hue-toolbar-button'}
