@@ -133,5 +133,5 @@ class Command(BaseCommand):
       if ret.returncode != 0:
         sys.exit(1)
     except subprocess.CalledProcessError as e:
-      LOG.error(f"Error running ruff command: {e}")
+      LOG.debug(f"Ruff command: {e}")
       sys.exit(1)
