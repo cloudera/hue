@@ -41,7 +41,7 @@ def test_security_plain():
     security = SentryClient('test.com', 11111, 'test')._get_security()
 
     assert 'test' == security['kerberos_principal_short_name']
-    assert False == security['use_sasl']
+    assert False is security['use_sasl']
     assert 'NOSASL' == security['mechanism']
   finally:
     sentry_site.reset()
@@ -60,7 +60,7 @@ def test_security_kerberos():
 
     security = SentryClient('test.com', 11111, 'test')._get_security()
 
-    assert True == security['use_sasl']
+    assert True is security['use_sasl']
     assert 'GSSAPI' == security['mechanism']
   finally:
     sentry_site.reset()

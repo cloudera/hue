@@ -67,9 +67,9 @@ def test_confparse():
     assert cp['fs.default.name'] == 'hdfs://localhost:8020'
     assert cp.get('with_description') == 'bar'
     assert cp.get('not_in_xml', 'abc') == 'abc'
-    assert cp.getbool('boolean_true') == True
-    assert cp.getbool('boolean_false') == False
-    assert cp.getbool('not_in_xml', True) == True
+    assert cp.getbool('boolean_true') is True
+    assert cp.getbool('boolean_false') is False
+    assert cp.getbool('not_in_xml', True) is True
 
     try:
       cp['bogus']

@@ -104,7 +104,7 @@ class TestApi(object):
 
       assert not data['has_more']
       assert data['has_more'] != []
-      assert data['has_more'] == False
+      assert data['has_more'] is False
 
       assert data['data'] == []
       assert data['meta']() == [{'type': 'BIGINT_TYPE'}]
@@ -132,7 +132,7 @@ class TestApi(object):
 
       assert not data['has_more']
       assert data['has_more'] != []
-      assert data['has_more'] == False
+      assert data['has_more'] is False
 
       assert data['data'] == [['row1'], ['row2']]
       assert data['meta']() == [{'type': 'BIGINT_TYPE'}]

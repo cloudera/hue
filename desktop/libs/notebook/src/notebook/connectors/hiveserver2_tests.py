@@ -800,8 +800,8 @@ class TestHiveserver2ApiNonMock(object):
     assert isinstance(jobs, list)
     assert len(jobs), 1
     assert jobs[0]['name'] == 'job_1466630204796_0059'
-    assert jobs[0]['started'] == True
-    assert jobs[0]['finished'] == False
+    assert jobs[0]['started'] is True
+    assert jobs[0]['finished'] is False
     assert 'url' in jobs[0]
 
     logs += """INFO  : Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 1
@@ -816,8 +816,8 @@ class TestHiveserver2ApiNonMock(object):
     jobs = self.api.get_jobs(notebook, snippet, logs)
     assert len(jobs), 1
     assert jobs[0]['name'] == 'job_1466630204796_0059'
-    assert jobs[0]['started'] == True
-    assert jobs[0]['finished'] == True
+    assert jobs[0]['started'] is True
+    assert jobs[0]['finished'] is True
 
   def test_get_current_statement(self):
     snippet = json.loads("""
@@ -984,7 +984,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert 0 == data['status'], data
     assert 0 == data['handle']['statement_id'], data
     assert 2 == data['handle']['statements_count'], data
-    assert True == data['handle']['has_more_statements'], data
+    assert True is data['handle']['has_more_statements'], data
     assert {'row': 0, 'column': 0} == data['handle']['start'], data
     assert {'row': 0, 'column': 51} == data['handle']['end'], data
 
@@ -997,7 +997,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert 0 == data['status'], data
     assert 1 == data['handle']['statement_id'], data
     assert 2 == data['handle']['statements_count'], data
-    assert False == data['handle']['has_more_statements'], data
+    assert False is data['handle']['has_more_statements'], data
     assert {'row': 1, 'column': 0} == data['handle']['start'], data
     assert {'row': 1, 'column': 33} == data['handle']['end'], data
 

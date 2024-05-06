@@ -144,7 +144,7 @@ class HbaseApi(object):
 
   def getRows(self, cluster, tableName, columns, startRowKey, numRows, prefix=False):
     client = self.connectCluster(cluster)
-    if prefix == False:
+    if prefix is False:
       scanner = client.scannerOpen(tableName, smart_str(startRowKey), columns, None, doas=self.user.username)
     else:
       scanner = client.scannerOpenWithPrefix(tableName, smart_str(startRowKey), columns, None, doas=self.user.username)

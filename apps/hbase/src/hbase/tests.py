@@ -51,7 +51,7 @@ def test_security_plain():
     security = HbaseApi._get_security()
 
     assert 'test' == security['kerberos_principal_short_name']
-    assert False == security['use_sasl']
+    assert False is security['use_sasl']
   finally:
     reset()
     finish()
@@ -73,7 +73,7 @@ def test_security_kerberos():
     security = HbaseApi._get_security()
 
     assert 'test' == security['kerberos_principal_short_name']
-    assert True == security['use_sasl']
+    assert True is security['use_sasl']
   finally:
     reset()
     finish()

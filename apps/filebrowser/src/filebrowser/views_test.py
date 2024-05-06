@@ -453,7 +453,7 @@ class TestFileBrowserWithHadoop(object):
 
     # Get current mode and make sure sticky bit is off
     mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
-    assert False == mode[-1]
+    assert False is mode[-1]
 
     # Setup post data
     permissions = ('user_read', 'user_write', 'user_execute',
@@ -468,13 +468,13 @@ class TestFileBrowserWithHadoop(object):
     # Set sticky bit, then check sticky bit is on in hdfs
     response = self.c.post("/filebrowser/chmod", kwargs)
     mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
-    assert True == mode[-1]
+    assert True is mode[-1]
 
     # Unset sticky bit, then check sticky bit is off in hdfs
     del kwargs['sticky']
     response = self.c.post("/filebrowser/chmod", kwargs)
     mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
-    assert False == mode[-1]
+    assert False is mode[-1]
 
   def test_chown(self):
     prefix = self.cluster.fs_prefix + '/test_chown'
@@ -1504,7 +1504,7 @@ class UploadChunksTestCase(TestCase):
     response = self.client.post(url, {'filename': self.filename})
     assert response.status_code == 200
     # In Test Setup HDFS is not available, so it will fail
-    assert response.json()['success'] == False
+    assert response.json()['success'] is False
 
   def test_upload_chunks_large_file(self):
     pytest.skip("Skipping due to failures with pytest, investigation ongoing.")
@@ -1513,7 +1513,7 @@ class UploadChunksTestCase(TestCase):
     url += 'qqchunksize=2000000&qqtotalparts=36&qqtotalfilesize=71138958&qqfilename=ym_2020.csv&qquuid=123'
     response = self.client.post(url, {'filename': self.filename})
     assert response.status_code == 200
-    assert response.json()['success'] == True
+    assert response.json()['success'] is True
     assert response.json()['uuid'] == '123'
 
   def test_upload_chunks_small_file(self):
@@ -1523,7 +1523,7 @@ class UploadChunksTestCase(TestCase):
     response = self.client.post(url, {'qqtotalfilesize': 1000, 'qquuid': '123'})
     assert response.status_code == 200
     # In Test Setup HDFS is not available, so it will fail
-    assert response.json()['success'] == False
+    assert response.json()['success'] is False
 
   def test_upload_chunks_error(self):
     pytest.skip("Skipping due to failures with pytest, investigation ongoing.")
@@ -1533,7 +1533,7 @@ class UploadChunksTestCase(TestCase):
       response = self.client.post(url)
     except Exception as e:
       assert e.status_code == 500
-      assert e.json()['success'] == False
+      assert e.json()['success'] is False
       assert e.json()['error'] == 'Error in upload'
     assert response.status_code == 200
 

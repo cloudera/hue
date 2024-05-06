@@ -175,14 +175,14 @@ class TestConfig(object):
     assert "baz_default" == self.conf.SOME_SECTION.BAZ.get()
 
   def test_coerce_bool(self):
-    assert False == coerce_bool(False)
-    assert False == coerce_bool("FaLsE")
-    assert False == coerce_bool("no")
-    assert False == coerce_bool("0")
-    assert True == coerce_bool("TrUe")
-    assert True == coerce_bool("YES")
-    assert True == coerce_bool("1")
-    assert True == coerce_bool(True)
+    assert False is coerce_bool(False)
+    assert False is coerce_bool("FaLsE")
+    assert False is coerce_bool("no")
+    assert False is coerce_bool("0")
+    assert True is coerce_bool("TrUe")
+    assert True is coerce_bool("YES")
+    assert True is coerce_bool("1")
+    assert True is coerce_bool(True)
     with pytest.raises(Exception):
       coerce_bool(tuple("foo"))
 

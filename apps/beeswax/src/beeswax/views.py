@@ -886,7 +886,7 @@ def _list_designs(user, querydict, page_size, prefix="", is_trashed=False):
     sort_dir, sort_attr = DEFAULT_SORT
   db_queryset = db_queryset.order_by(sort_dir + SORT_ATTR_TRANSLATION[sort_attr])
 
-  designs = [job.content_object for job in db_queryset.all() if job.content_object and job.content_object.is_auto == False]
+  designs = [job.content_object for job in db_queryset.all() if job.content_object and job.content_object.is_auto is False]
 
   pagenum = int(querydict.get(prefix + 'page', 1))
   paginator = Paginator(designs, page_size, allow_empty_first_page=True)

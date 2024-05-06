@@ -210,11 +210,11 @@ class S3FSTest(S3TestBase):
       self.fs.stats(not_exists)
 
     root_stat = self.fs.stats('s3a://')
-    assert True == root_stat.isDir
+    assert True is root_stat.isDir
     assert 's3a://' == root_stat.path
 
     bucket_stat = self.fs.stats('s3a://%s' % self.bucket_name)
-    assert True == bucket_stat.isDir
+    assert True is bucket_stat.isDir
     assert 's3a://%s' % self.bucket_name == bucket_stat.path
 
   def test_copyfile(self):

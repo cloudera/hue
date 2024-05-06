@@ -1332,11 +1332,11 @@ class TestDocument(object):
       # Make sure redacted queries are redacted.
       assert redacted_query == saved_snippets[0]['statement']
       assert redacted_query == saved_snippets[0]['statement_raw']
-      assert True == saved_snippets[0]['is_redacted']
+      assert True is saved_snippets[0]['is_redacted']
 
       assert redacted_query == saved_snippets[1]['statement']
       assert redacted_query == saved_snippets[1]['statement_raw']
-      assert True == saved_snippets[1]['is_redacted']
+      assert True is saved_snippets[1]['is_redacted']
 
       document = Document2.objects.get(pk=self.document2.pk)
       assert redacted_query == document.search

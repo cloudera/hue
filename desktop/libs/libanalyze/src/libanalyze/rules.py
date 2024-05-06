@@ -463,7 +463,7 @@ class TopDownAnalysis(object):
         # Get the plan node execution time
         # Note: ignore DataStreamSender because its metrics is useless
         nodes = execution_profile.find_all_non_fragment_nodes()
-        nodes = [x for x in nodes if x.fragment and x.fragment.is_averaged() == False]
+        nodes = [x for x in nodes if x.fragment and x.fragment.is_averaged() is False]
         nodes = [x for x in nodes if x.name() != 'DataStreamSender']
         metrics = reduce(lambda x, y: x + y.find_metric_by_name('LocalTime'), nodes, [])
         metrics = sorted(metrics, key=lambda x: (x['node'].id(), x['node'].name()))
