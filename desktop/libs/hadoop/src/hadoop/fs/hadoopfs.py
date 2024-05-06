@@ -240,7 +240,7 @@ class Hdfs(object):
           self.append(remote_dst, chunk)
           chunk = src.read(chunk_size)
         LOG.info(_('Copied %s -> %s.') % (local_src, remote_dst))
-      except:
+      except Exception:
         LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
         raise
     finally:
@@ -258,7 +258,7 @@ class Hdfs(object):
           self.append(remote_dst, chunk)
           chunk = src.read(chunk_size)
         src_copied = True
-      except:
+      except Exception:
         LOG.exception(_('Copying %s -> %s failed with %s encoding format') % (local_src, remote_dst, data_format))
         self.remove(remote_dst)
       finally:

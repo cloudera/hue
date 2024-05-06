@@ -307,7 +307,7 @@ def test_spark_configuration(user):
   try:
     spark_hs_api.get_history_server_api().applications()
     status = 'OK'
-  except:
+  except Exception:
     LOG.exception('failed to get spark history server status')
 
   return status

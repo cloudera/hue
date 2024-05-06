@@ -368,7 +368,7 @@ def extract_field_data(field):
 def get_app_nice_name(app_name):
   try:
     return desktop.appmanager.get_desktop_module(app_name).settings.NICE_NAME
-  except:
+  except Exception:
     LOG.exception('failed to get nice name for app %s' % app_name)
     return app_name
 

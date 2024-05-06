@@ -238,7 +238,7 @@ if ENABLE_ORGANIZATIONS.get():
     def clean_organization(self):
       try:
         return Organization.objects.get(id=int(self.cleaned_data.get('organization')))
-      except:
+      except Exception:
         LOG.exception('The organization does not exist.')
         return None
 
@@ -288,7 +288,7 @@ if ENABLE_ORGANIZATIONS.get():
     def clean_organization(self):
       try:
         return Organization.objects.get(id=int(self.cleaned_data.get('organization')))
-      except:
+      except Exception:
         LOG.exception('The organization does not exist.')
         return None
 
@@ -490,7 +490,7 @@ class GroupEditForm(forms.ModelForm):
   def clean_organization(self):
     try:
       return Organization.objects.get(id=int(self.cleaned_data.get('organization')))
-    except:
+    except Exception:
       LOG.exception('The organization does not exist.')
       return None
 

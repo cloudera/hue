@@ -283,7 +283,7 @@ class Command(BaseCommand):
       LOG.info(_(base_dn_msg))
       LOG.warning('hints: check base_dn')
       err_code = 1
-    except:
+    except Exception:
       typ, value, traceback = sys.exc_info()
       LOG.warning("%s %s" % (typ, value))
       LOG.info(_(base_dn_msg))
@@ -330,7 +330,7 @@ class Command(BaseCommand):
       LOG.info(_(base_dn_msg))
       LOG.warning("hints: check base_dn")
       err_code = 1
-    except:
+    except Exception:
       typ, value, traceback = sys.exc_info()
       LOG.warning("%s %s" % (typ, value))
       LOG.info(_(base_dn_msg))
@@ -367,7 +367,7 @@ class Command(BaseCommand):
       LOG.info(_(base_dn_msg))
       LOG.warning('hints: check base_dn')
       err_code = 1
-    except:
+    except Exception:
       typ, value, traceback = sys.exc_info()
       LOG.warning("%s %s" % (typ, value))
       LOG.info(_(base_dn_msg))
@@ -409,7 +409,7 @@ class Command(BaseCommand):
       LOG.info(_(base_dn_msg))
       LOG.warning('hints: check base_dn')
       err_code = 1
-    except:
+    except Exception:
       typ, value, traceback = sys.exc_info()
       LOG.warning("%s %s" % (typ, value))
       LOG.info(_(base_dn_msg))
@@ -485,7 +485,7 @@ class Command(BaseCommand):
         LOG.warning('ldap_url="%s"' % ldap_config.LDAP_URL.get())
         LOG.warning('bind_dn="%s"' % ldap_config.BIND_DN.get())
         err_code = 1
-      except:
+      except Exception:
         typ, value, traceback = sys.exc_info()
         LOG.warning("%s %s" % (typ, value))
         LOG.info(_(ldap_url_msg))
@@ -504,7 +504,7 @@ class Command(BaseCommand):
 
       try:
         LOG.info('LDAP whoami_s() %s' % (connection.ldap_handle.whoami_s()))
-      except:
+      except Exception:
         LOG.warn('Not able to execute whoami_s() command')
 
       if ldap_config.TEST_LDAP_USER.get() is not None:
@@ -516,7 +516,7 @@ class Command(BaseCommand):
           group_dn = None
           try:
             group_dn = ldap.explode_dn(ldap_config.TEST_LDAP_GROUP.get())
-          except:
+          except Exception:
             group_dn = None
 
           if group_dn is not None:

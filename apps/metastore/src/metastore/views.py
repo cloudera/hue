@@ -306,7 +306,7 @@ def get_table_metadata(request, database, table):
       'hdfs_link': table_metadata.hdfs_link,
       'is_view': table_metadata.is_view
     }
-  except:
+  except Exception:
     msg = "Cannot get metadata for table: `%s`.`%s`"
     LOG.exception(msg) % (database, table)
     response['status'] = 1
@@ -349,7 +349,7 @@ def describe_table(request, database, table):
     if app_name != 'impala' and table.partition_keys:
       try:
         partitions = [_massage_partition(database, table, partition) for partition in db.get_partitions(database, table)]
-      except:
+      except Exception:
         LOG.exception('Table partitions could not be retrieved')
 
     return render(renderable, request, {
@@ -620,7 +620,7 @@ def describe_partitions(request, database, table):
 
   try:
     partitions = db.get_partitions(database, table_obj, partition_spec, reverse_sort=reverse_sort)
-  except:
+  except Exception:
     LOG.exception('Table partitions could not be retrieved')
     partitions = []
   massaged_partitions = [_massage_partition(database, table_obj, partition) for partition in partitions]

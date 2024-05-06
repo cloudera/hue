@@ -1037,7 +1037,7 @@ def detect_snappy(contents):
   try:
     import snappy
     return snappy.isValidCompressed(contents)
-  except:
+  except Exception:
     logging.exception('failed to detect snappy')
     return False
 
@@ -1057,7 +1057,7 @@ def snappy_installed():
     return True
   except ImportError:
     return False
-  except:
+  except Exception:
     logging.exception('failed to verify if snappy is installed')
     return False
 

@@ -327,7 +327,7 @@ class WorkflowManager(models.Manager):
     Submission(workflow.owner, workflow, fs, None, {}).remove_deployment_dir()
     try:
       workflow.coordinator_set.update(workflow=None)  # In Django 1.3 could do ON DELETE set NULL
-    except:
+    except Exception:
       LOG.exception('failed to destroy workflow')
 
     workflow.save()

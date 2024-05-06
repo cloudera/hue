@@ -63,7 +63,7 @@ LOG = logging.getLogger()
 def cleanup_tree(cluster, path):
   try:
     cluster.fs.rmtree(path)
-  except:
+  except Exception:
     # Don't let cleanup errors mask earlier failures
     LOG.exception('failed to cleanup %s' % path)
 
@@ -71,7 +71,7 @@ def cleanup_tree(cluster, path):
 def cleanup_file(cluster, path):
   try:
     cluster.fs.remove(path)
-  except:
+  except Exception:
     # Don't let cleanup errors mask earlier failures
     LOG.exception('failed to cleanup %s' % path)
 

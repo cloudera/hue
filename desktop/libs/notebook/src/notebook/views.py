@@ -58,7 +58,7 @@ def notebook(request, is_embeddable=False):
   try:
     from spark.conf import LIVY_SERVER_SESSION_KIND
     is_yarn_mode = LIVY_SERVER_SESSION_KIND.get()
-  except:
+  except Exception:
     LOG.exception('Spark is not enabled')
 
   return render('notebook.mako', request, {

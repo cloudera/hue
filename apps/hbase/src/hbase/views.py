@@ -90,7 +90,7 @@ def api_dump(response):
     try:
       json.dumps(data)
       return data
-    except:
+    except Exception:
       LOG.debug('Failed to dump data as JSON, falling back to raw data.')
       cleaned = {}
       lim = [0]
@@ -100,7 +100,7 @@ def api_dump(response):
           # write data to file in memory
           try:
             output = io.StringIO()
-          except:
+          except Exception:
             output = string_io()
           output.write(data)
 

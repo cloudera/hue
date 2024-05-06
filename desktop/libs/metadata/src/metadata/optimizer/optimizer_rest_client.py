@@ -48,7 +48,7 @@ class OptimizerRestClient(OptimizerClient):
   def _call(self, path, data):
     try:
       return self._root.post(path, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except:
+    except Exception:
       LOG.exception('Error calling Optimize service')
       return {}
 

@@ -17,7 +17,7 @@
 
 try:
   import oauth2 as oauth
-except:
+except Exception:
   oauth = None
 
 import cgi

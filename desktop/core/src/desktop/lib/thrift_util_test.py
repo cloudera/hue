@@ -84,7 +84,7 @@ class SimpleThriftServer(object):
                                        TBufferedTransportFactory(),
                                        TBinaryProtocolFactory())
       server.serve()
-    except:
+    except Exception:
       LOG.exception('failed to start thrift server')
       sys.exit(1)
 
@@ -99,7 +99,7 @@ class SimpleThriftServer(object):
         ping_s.connect(('localhost', self.port))
         ping_s.close()
         return
-      except:
+      except Exception:
         LOG.exception('failed to connect to child server')
         _, status = os.waitpid(self.pid, os.WNOHANG)
         if status != 0:

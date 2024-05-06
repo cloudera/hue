@@ -555,7 +555,7 @@ class HtmlValidationMiddleware(MiddlewareMixin):
     try:
       fn = resolve(request.path)[0]
       fn_name = '%s.%s' % (fn.__module__, fn.__name__)
-    except:
+    except Exception:
       LOG.exception('failed to resolve url')
       fn_name = '<unresolved_url>'
 
@@ -633,7 +633,7 @@ class ProxyMiddleware(MiddlewareMixin):
           'operationText': msg
         }
         return
-      except:
+      except Exception:
         LOG.exception('Unexpected error when authenticating')
         return
 
@@ -762,7 +762,7 @@ class SpnegoMiddleware(MiddlewareMixin):
           }
           access_warn(request, msg)
           return
-        except:
+        except Exception:
           LOG.exception('Unexpected error when authenticating against KDC')
           return
       else:

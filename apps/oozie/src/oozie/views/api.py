@@ -45,7 +45,7 @@ LOG = logging.getLogger()
 try:
   from jobbrowser.views import job_single_logs
   from jobbrowser.models import LinkJobLogs
-except:
+except Exception:
   LOG.warning('Oozie is not enabled')
 
 
@@ -498,5 +498,5 @@ def _get_progress(job, log):
   else:
     try:
       return int(re.findall(r"MapReduceLauncher  - (1?\d?\d)% complete", log)[-1])
-    except:
+    except Exception:
       return 0

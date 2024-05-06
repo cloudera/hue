@@ -114,7 +114,7 @@ def get_spark_status(user):
     if 'test' not in sys.argv:  # Avoid tests hanging
       get_api(user).get_status()
       status = 'OK'
-  except:
+  except Exception:
     LOG.exception('failed to get spark status')
 
   return status

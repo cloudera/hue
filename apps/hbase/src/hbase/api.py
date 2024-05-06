@@ -63,7 +63,7 @@ class HbaseApi(object):
     clusters = []
     try:
       full_config = json.loads(conf.HBASE_CLUSTERS.get().replace("'", "\""))
-    except:
+    except Exception:
       LOG.debug('Failed to read HBase cluster configuration as JSON, falling back to raw configuration.')
       full_config = [conf.HBASE_CLUSTERS.get()]  # hack cause get() is weird
 
@@ -85,7 +85,7 @@ class HbaseApi(object):
       for cluster in clusters:
         if cluster["name"] == name:
           return cluster
-    except:
+    except Exception:
       LOG.exception('failed to get the cluster %s' % name)
     raise PopupException(_("Cluster by the name of %s does not exist in configuration.") % name)
 

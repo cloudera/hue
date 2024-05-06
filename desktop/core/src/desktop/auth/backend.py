@@ -96,7 +96,7 @@ def load_augmentation_class():
     klass = getattr(mod, attr)
     LOG.info("Augmenting users with class: %s" % (klass,))
     return klass
-  except:
+  except Exception:
     LOG.exception('failed to augment class')
     raise ImproperlyConfigured("Could not find user_augmentation_class: %s" % (class_name,))
 
@@ -257,7 +257,7 @@ def knox_login_headers(request):
   try:
     userprofile.update_data({'X-CSRF-TOKEN': request.META['CSRF_COOKIE']})
     userprofile.save()
-  except:
+  except Exception:
     LOG.error("X-CSRF-TOKEN header not found")
 
 

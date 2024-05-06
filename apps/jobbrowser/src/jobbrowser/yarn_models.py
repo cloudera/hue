@@ -653,7 +653,7 @@ class Attempt(object):
           if response:
             debug_info += '\nHTML Response: %s' % response
           LOG.error(debug_info)
-        except:
+        except Exception:
           LOG.exception('failed to build debug info')
 
       logs.append(log)

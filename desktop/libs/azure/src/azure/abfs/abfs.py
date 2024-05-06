@@ -186,7 +186,7 @@ class ABFS(object):
       return ABFSStat.for_root(path)
     try:
       file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
-    except:
+    except Exception:
       raise IOError
 
     if dir_name == '':
@@ -661,7 +661,7 @@ class ABFS(object):
             offset += size
             chunk = src.read(chunk_size)
           self.flush(remote_dst, params={'position': offset})
-        except:
+        except Exception:
           LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
           raise
       finally:
@@ -680,7 +680,7 @@ class ABFS(object):
         raise b
     except b:
       LOG.debug("Permisions have not been set")
-    except:
+    except Exception:
       Exception
 
   def mkswap(self, filename, subdir='', suffix='swp', basedir=None):

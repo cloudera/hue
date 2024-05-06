@@ -99,7 +99,7 @@ def get_dn(fqdn=None):
     else:
       LOG.warning("allowed_hosts value to '*'. It is a security risk")
       val.append('*')
-  except:
+  except Exception:
     LOG.warning("allowed_hosts value to '*'. It is a security risk")
     val.append('*')
   return val
@@ -2575,7 +2575,7 @@ def config_validator(user):
   notebook_doc = None
   try:
     notebook_doc, save_as = _save_notebook(notebook.get_data(), user)
-  except:
+  except Exception:
     res.append(('DATABASE_CHARACTER_SET', str(
       _('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. <br>'
         '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))

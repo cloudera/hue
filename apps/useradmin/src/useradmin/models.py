@@ -182,7 +182,7 @@ def create_profile_for_user(user):
   try:
     p.save()
     return p
-  except:
+  except Exception:
     LOG.exception("Failed to automatically create user profile.")
     return None
 
@@ -235,7 +235,7 @@ def update_app_permissions(**kwargs):
     try:
       for dp in HuePermission.objects.all():
         current.setdefault(dp.app, {})[dp.action] = dp
-    except:
+    except Exception:
       LOG.exception('failed to get permissions')
       return
 
@@ -363,7 +363,7 @@ def install_sample_user(django_user=None):
         user = User.objects.get(id=SAMPLE_USER_ID)
         user.username = django_username
         user.save()
-  except:
+  except Exception:
     LOG.exception('Failed to get or create sample user')
 
   # If sample user doesn't belong to default group, add to default group

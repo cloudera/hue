@@ -361,7 +361,7 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
         if fetch_result is not None:
           unfurl_result = _make_result_table(fetch_result)
           file_status = True
-    except:
+    except Exception:
       pass
 
     result_section = {

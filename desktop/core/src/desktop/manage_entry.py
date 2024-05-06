@@ -41,7 +41,7 @@ def _deprecation_check(arg0):
 def reload_with_cm_env(cm_managed):
   try:
     from django.db.backends.oracle.base import Oracle_datetime
-  except:
+  except Exception:
     if 'LD_LIBRARY_PATH' in os.environ:
       print("We need to reload the process to include LD_LIBRARY_PATH for Oracle backend")
       try:

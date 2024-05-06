@@ -186,7 +186,7 @@ class ImpersonationAuthenticationForm(AuthenticationForm):
   def authenticate(self):
     try:
       super(AuthenticationForm, self).clean()
-    except:
+    except Exception:
       # Expected to fail as login_as is nor provided by the parent Django AuthenticationForm, hence we redo it properly below.
       pass
     request = None

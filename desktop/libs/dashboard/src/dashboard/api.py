@@ -209,7 +209,7 @@ def update_document(request):
   except RestException as e:
     try:
       result['message'] = json.loads(e.message)['error']['msg']
-    except:
+    except Exception:
       LOG.exception('Failed to parse json response')
       result['message'] = force_str(e)
   except Exception as e:

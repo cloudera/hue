@@ -336,12 +336,12 @@ def field_values_from_log(fh, fields=[{'name': 'message', 'type': 'text_general'
   else:
     try:
       timestamp_key = next(iter([field for field in fields if field['type'] in DATE_FIELD_TYPES]))['name']
-    except:
+    except Exception:
       LOG.exception('failed to get timestamp key')
       timestamp_key = None
     try:
       message_key = next(iter([field for field in fields if field['type'] in TEXT_FIELD_TYPES]))['name']
-    except:
+    except Exception:
       LOG.exception('failed to get message key')
       message_key = None
 

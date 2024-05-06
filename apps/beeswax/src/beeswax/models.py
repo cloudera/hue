@@ -357,7 +357,7 @@ class SavedQuery(models.Model):
   def get_query_context(self):
     try:
       return make_query_context('design', self.id)
-    except:
+    except Exception:
       LOG.exception('failed to make query context')
       return ""
 

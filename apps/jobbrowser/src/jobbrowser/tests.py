@@ -130,7 +130,7 @@ class TestJobBrowserWithHadoop(TestCase, OozieServerProvider):
       Workflow.objects.filter(name__contains=cls.username).delete()
       # Remove user home directories.
       cls.cluster.fs.do_as_superuser(cls.cluster.fs.rmtree, cls.home_dir)
-    except:
+    except Exception:
       LOG.exception('failed to teardown %s' % cls.home_dir)
     cls.cluster.fs.setuser(cls.prev_user)
 
@@ -201,7 +201,7 @@ class TestJobBrowserWithHadoop(TestCase, OozieServerProvider):
       TestJobBrowserWithHadoop.cluster.fs.mkdir(TestJobBrowserWithHadoop.home_dir + "/jt-test_failed_jobs")
       TestJobBrowserWithHadoop.cluster.fs.mkdir(INPUT_DIR)
       TestJobBrowserWithHadoop.cluster.fs.rmtree(OUTPUT_DIR)
-    except:
+    except Exception:
       LOG.exception('failed to teardown tests')
 
     job_name = '%s_%s' % (TestJobBrowserWithHadoop.username, 'test_failed_jobs-1')

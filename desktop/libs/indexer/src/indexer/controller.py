@@ -121,13 +121,13 @@ class CollectionManagerController(object):
       try:
         fields = api.schema_fields(collection_or_core_name)
         fields = Collection2._make_luke_from_schema_fields(fields)
-      except:
+      except Exception:
         LOG.exception(_('Could not fetch fields for collection %s.') % collection_or_core_name)
         raise PopupException(_('Could not fetch fields for collection %s. See logs for more info.') % collection_or_core_name)
 
     try:
       uniquekey = api.uniquekey(collection_or_core_name)
-    except:
+    except Exception:
       LOG.exception(_('Could not fetch unique key for collection %s.') % collection_or_core_name)
       raise PopupException(_('Could not fetch unique key for collection %s. See logs for more info.') % collection_or_core_name)
 

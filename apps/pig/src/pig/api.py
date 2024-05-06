@@ -190,7 +190,7 @@ class OozieApi(object):
         try:
           logs, workflow_action, is_really_done = self.get_log(request, job)
           progress = workflow_action[0]['progress']
-        except:
+        except Exception:
           LOG.exception('failed to get progress')
           progress = 0
       else:

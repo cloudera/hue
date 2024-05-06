@@ -59,7 +59,7 @@ LOG = logging.getLogger()
 
 try:
   from beeswax.hive_site import hiveserver2_impersonation_enabled
-except:
+except Exception:
   LOG.warning('Hive is not enabled')
   def hiveserver2_impersonation_enabled(): return True
 
@@ -418,7 +418,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
           debug_info += '\nHTML Response: %s' % response
         response['debug'] = debug_info
         LOG.error(debug_info)
-      except:
+      except Exception:
         LOG.exception('failed to create debug info')
 
   return JsonResponse(response)

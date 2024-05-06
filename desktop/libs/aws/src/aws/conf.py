@@ -321,7 +321,7 @@ def has_iam_metadata():
       IS_IAM_CACHED = 'iam' in metadata
     else:
       IS_IAM_CACHED = False
-  except:
+  except Exception:
     IS_IAM_CACHED = False
     LOG.exception("Encountered error when checking IAM metadata")
   return IS_IAM_CACHED

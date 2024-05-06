@@ -56,7 +56,7 @@ def get_acls(job):
   if job.is_mr2:
     try:
       acls = job.acls
-    except:
+    except Exception:
       LOG.exception('failed to get acls')
       acls = {}
     return acls
@@ -102,7 +102,7 @@ class LinkJobLogs(object):
   def _replace_hdfs_link(self, is_embeddable=False, match=None):
     try:
       return '<a href="%s">%s</a>' % (location_to_url(match.group(0), strict=False, is_embeddable=is_embeddable), match.group(0))
-    except:
+    except Exception:
       LOG.exception('failed to replace hdfs links: %s' % (match.groups(),))
       return match.group(0)
 
@@ -110,7 +110,7 @@ class LinkJobLogs(object):
   def _replace_mr_link(self, match):
     try:
       return '<a href="/hue%s">%s</a>' % (reverse('jobbrowser:jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
-    except:
+    except Exception:
       LOG.exception('failed to replace mr links: %s' % (match.groups(),))
       return match.group(0)
 

@@ -85,7 +85,7 @@ def samlgroup_check(request):
     if REQUIRED_GROUPS.get():
       try:
         userprofile = get_profile(request.user)
-      except:
+      except Exception:
         return False
 
       json_data = json.loads(userprofile.json_data)
@@ -123,7 +123,7 @@ def saml_login_headers(request):
   try:
     userprofile.update_data({'X-CSRF-TOKEN': request.META['CSRF_COOKIE']})
     userprofile.save()
-  except:
+  except Exception:
     LOG.error("X-CSRF-TOKEN header not found")
 
 
@@ -412,7 +412,7 @@ def status_bar(request):
         resp += r.content
       else:
         LOG.warning("Failed to execute status_bar view %s" % (view,))
-    except:
+    except Exception:
       LOG.exception("Failed to execute status_bar view %s" % (view,))
   return HttpResponse(resp)
 

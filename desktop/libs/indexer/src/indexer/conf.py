@@ -56,14 +56,14 @@ def zkensemble():
     clusters = CLUSTERS.get()
     if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
       return '%s/solr' % clusters['default'].HOST_PORTS.get()
-  except:
+  except Exception:
     LOG.warning('Failed to get Zookeeper ensemble')
 
   try:
     from search.conf import SOLR_URL
     parsed = urlparse(SOLR_URL.get())
     return "%s:2181/solr" % (parsed.hostname or 'localhost')
-  except:
+  except Exception:
     LOG.warning('Failed to get Solr url')
 
 

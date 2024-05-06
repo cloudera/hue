@@ -415,7 +415,7 @@ def _readfields(lines, delimiters):
     delimiter = delim.decode('string_escape')
     try:
       fields_list = _get_rows(lines, delimiter)
-    except:
+    except Exception:
       LOG.exception('failed to get rows')
       fields_list = [line.split(delimiter) for line in lines if line]
 

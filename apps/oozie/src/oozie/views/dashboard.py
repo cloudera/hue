@@ -480,14 +480,14 @@ def list_oozie_coordinator(request, job_id):
   try:
     if not ENABLE_V2.get():
       coordinator = get_history().objects.get(oozie_job_id=job_id).job.get_full_node()
-  except:
+  except Exception:
     LOG.exception("Ignoring error getting oozie job coordinator for job_id=%s", job_id)
 
   oozie_bundle = None
   if request.GET.get('bundle_job_id'):
     try:
       oozie_bundle = check_job_access_permission(request, request.GET.get('bundle_job_id'))
-    except:
+    except Exception:
       LOG.exception("Ignoring error getting oozie bundle for job_id=%s", job_id)
 
   if request.GET.get('format') == 'json':
@@ -546,7 +546,7 @@ def list_oozie_bundle(request, job_id):
       bundle = get_history().get_bundle_from_config(oozie_bundle.conf_dict)
     else:
       bundle = get_history().objects.get(oozie_job_id=job_id).job.get_full_node()
-  except:
+  except Exception:
     LOG.exception("Ignoring error getting oozie job bundle for job_id=%s", job_id)
 
   if request.GET.get('format') == 'json':

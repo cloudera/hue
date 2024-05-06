@@ -78,7 +78,7 @@ def get_oozie_status(user):
   try:
     if 'test' not in sys.argv:  # Avoid tests hanging
       status = str(get_oozie(user).get_oozie_status())
-  except:
+  except Exception:
     LOG.exception('failed to get oozie status')
 
   return status
