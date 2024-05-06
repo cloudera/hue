@@ -44,11 +44,3 @@ docstring-code-format = true
 docstring-code-line-length = 140
 indent-style = "space"
 quote-style = "preserve"
-
-[tool.ruff.lint.isort]
-force-single-line = true
-lines-after-imports = 2
-known-first-party = ["desktop", "aws", "azure"]
-
-[tool.ruff.lint.pydocstyle]
-convention = "google"
