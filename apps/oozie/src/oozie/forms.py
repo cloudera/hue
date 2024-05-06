@@ -588,7 +588,7 @@ class UpdateCoordinatorForm(forms.Form):
     super(UpdateCoordinatorForm, self).__init__(*args, **kwargs)
 
     self.fields['endTime'].initial = datetime.fromtimestamp(mktime(oozie_coordinator.endTime))
-    if type(oozie_coordinator.pauseTime) == struct_time:
+    if type(oozie_coordinator.pauseTime) is struct_time:
       self.fields['pauseTime'].initial = datetime.fromtimestamp(mktime(oozie_coordinator.pauseTime))
     self.fields['concurrency'].initial = oozie_coordinator.concurrency
 

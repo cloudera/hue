@@ -90,18 +90,18 @@ def format_time(time, format='%d %b %Y %H:%M:%S'):
     return ''
 
   fmt_time = None
-  if type(time) == str:
+  if type(time) is str:
     return time
   else:
     try:
       fmt_time = strftime(format, time)
-    except:
+    except Exception:
       fmt_time = None
 
     if fmt_time is None:
       try:
         fmt_time = strftime(format + " %f", time)
-      except:
+      except Exception:
         fmt_time = None
 
     return fmt_time

@@ -119,7 +119,7 @@ class GithubClient(object):
 
   @classmethod
   def _get_json(cls, response):
-    if type(response) != dict:
+    if type(response) is not dict:
       try:
         response = json.loads(response)
       except ValueError:

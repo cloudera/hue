@@ -477,7 +477,7 @@ class Workflow(Job):
     """Return a flatten node list ordered by the hierarchy of the nodes in the workflow"""
     def flatten(nodes):
       flat = []
-      if type(nodes) == list:
+      if type(nodes) is list:
         for node in nodes:
           flat.extend(flatten(node))
       else:

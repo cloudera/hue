@@ -622,7 +622,7 @@ def _update_adj_list(adj_list):
 
 def _dig_nodes(nodes, adj_list, user, wf_nodes, nodes_uuid_set):
   for node in nodes:
-    if type(node) != list:
+    if type(node) is not list:
       node = adj_list[node]
       if node['uuid'] not in nodes_uuid_set:
         properties = {}
@@ -694,9 +694,9 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes, nodes_uuid_set):
 def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
   wf_rows = []
   for node in nodes:
-    if type(node) == list and len(node) == 1:
+    if type(node) is list and len(node) == 1:
       node = node[0]
-    if type(node) != list:
+    if type(node) is not list:
       _append_to_wf_rows(
         wf_rows, nodes_uuid_set, row_id=adj_list[node]['uuid'],
         row={
@@ -3159,9 +3159,9 @@ def import_workflow_from_hue_3_7(old_wf):
     wf_rows = []
 
     for node in nodes:
-      if type(node) == list and len(node) == 1:
+      if type(node) is list and len(node) == 1:
         node = node[0]
-      if type(node) != list:
+      if type(node) is not list:
         wf_rows.append({
           "widgets": [{
             "size": size, "name": node.name.title(), "id": uuids[node.id], "widgetType": "%s-widget" % node.node_type,
@@ -3190,7 +3190,7 @@ def import_workflow_from_hue_3_7(old_wf):
                         "widgets": c['widgets'],
                         "columns": []
                       }
-                    for c in col] if type(col) == list else [{
+                    for c in col] if type(col) is list else [{
                         "id": str(uuid.uuid4()),
                         "widgets": col['widgets'],
                         "columns": []
@@ -3222,7 +3222,7 @@ def import_workflow_from_hue_3_7(old_wf):
   # Content
   def _dig_nodes(nodes):
     for node in nodes:
-      if type(node) != list:
+      if type(node) is not list:
         properties = {}
         if '%s-widget' % node.node_type in NODES:
           properties = dict(NODES['%s-widget' % node.node_type].get_fields())
@@ -3424,11 +3424,11 @@ class Coordinator(Job):
     _data = self.data.copy()
 
     start_date = [a for a in self._data['properties']['parameters'] if a['name'] == 'start_date']
-    if start_date and type(start_date[0]['value']) == datetime:
+    if start_date and type(start_date[0]['value']) is datetime:
       start_date[0]['value'] = start_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%S')
 
     end_date = [a for a in self._data['properties']['parameters'] if a['name'] == 'end_date']
-    if end_date and type(end_date[0]['value']) == datetime:
+    if end_date and type(end_date[0]['value']) is datetime:
       end_date[0]['value'] = end_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%S')
 
     return _data
@@ -3441,10 +3441,10 @@ class Coordinator(Job):
 
   @property
   def data(self):
-    if type(self._data['properties']['start']) != datetime and '$' not in self._data['properties']['start']:
+    if type(self._data['properties']['start']) is not datetime and '$' not in self._data['properties']['start']:
       self._data['properties']['start'] = parse(self._data['properties']['start'])
 
-    if type(self._data['properties']['end']) != datetime and '$' not in self._data['properties']['end']:
+    if type(self._data['properties']['end']) is not datetime and '$' not in self._data['properties']['end']:
       self._data['properties']['end'] = parse(self._data['properties']['end'])
 
     if self.document is not None:
@@ -3729,7 +3729,7 @@ class Bundle(Job):
 
   @property
   def data(self):
-    if type(self._data['properties']['kickoff']) == str and sys.version_info[2] == 2:
+    if type(self._data['properties']['kickoff']) is str and sys.version_info[2] == 2:
       self._data['properties']['kickoff'] = parse(self._data['properties']['kickoff'])
 
     if self.document is not None:

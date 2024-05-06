@@ -68,7 +68,7 @@ class JobApi(Api):
 
   def _get_api(self, appid):
     try:
-      if type(appid) == list:
+      if type(appid) is list:
         return self.yarn_api
       elif appid.startswith('task_'):
         return YarnMapReduceTaskApi(self.user, appid)
@@ -80,7 +80,7 @@ class JobApi(Api):
         return SparkExecutorApi(self.user, appid)
       else:
         return self.yarn_api  # application_
-    except:
+    except Exception:
       raise PopupException("Job would have failed due to which there no attempt or appattempt information available")
 
   def _set_request(self, request):

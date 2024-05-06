@@ -187,7 +187,7 @@ def entry():
         for line in iter(locate_java.stdout.readline, b''):
           if b'JAVA_HOME' in line:
             JAVA_HOME = line.rstrip().split(b'=')[1]
-            if type(JAVA_HOME) == bytes:
+            if type(JAVA_HOME) is bytes:
               JAVA_HOME = JAVA_HOME.decode("utf-8")
 
       if JAVA_HOME != "UNKNOWN":

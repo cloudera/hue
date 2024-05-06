@@ -384,7 +384,7 @@ class TruncatingModel(models.Model):
   def __setattr__(self, name, value):
     try:
       field = self._meta.get_field(name)
-      if type(field) in [models.CharField, models.TextField] and type(value) == str:
+      if type(field) in [models.CharField, models.TextField] and type(value) is str:
         value = value[:field.max_length]
     except FieldDoesNotExist:
       pass  # This happens with foreign keys.

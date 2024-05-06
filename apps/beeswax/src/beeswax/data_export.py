@@ -112,18 +112,18 @@ class DataAdapter(object):
     size += 2  # CSV \r\n at the end of row
     for col in row:
       col_type = type(col)
-      if col_type == int:
+      if col_type is int:
         if col == 0:
           size += 1
         elif col < 0:
           size += int(math.log10(-1 * col)) + 2
         else:
           size += int(math.log10(col)) + 1
-      elif col_type == bytes:
+      elif col_type is bytes:
         size += len(col)
-      elif col_type == float:
+      elif col_type is float:
         size += len(str(col))
-      elif col_type == bool:
+      elif col_type is bool:
         size += 4
       elif col_type == type(None):
         size += 4

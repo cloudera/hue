@@ -986,11 +986,11 @@ class SolrApi(object):
 
     for fq in merged_fqs:
       if fq['type'] == 'field':
-        fields = fq['field'] if type(fq['field']) == list else [fq['field']]  # 2D facets support
+        fields = fq['field'] if type(fq['field']) is list else [fq['field']]  # 2D facets support
         for field in fields:
           f = []
           for _filter in fq['filter']:
-            values = _filter['value'] if type(_filter['value']) == list else [_filter['value']]  # 2D facets support
+            values = _filter['value'] if type(_filter['value']) is list else [_filter['value']]  # 2D facets support
             if fields.index(field) < len(values):  # Lowest common field denominator
               value = values[fields.index(field)]
               if value or value is False:
@@ -1053,7 +1053,7 @@ class SolrApi(object):
 
   @classmethod
   def _get_json(cls, response):
-    if type(response) != dict:
+    if type(response) is not dict:
       # Got 'plain/text' mimetype instead of 'application/json'
       try:
         response = json.loads(response)

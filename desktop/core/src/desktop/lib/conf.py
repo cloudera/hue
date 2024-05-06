@@ -226,7 +226,7 @@ class Config(object):
       raise ValueError("%s: '%s' does not match that of the default value %r (%s)"
                       % (key, type, default, pytype(default)))
 
-    if type == bool:
+    if type is bool:
       LOG.warning("%s is of type bool. Resetting it as type 'coerce_bool'."
                " Please fix it permanently" % (key,))
       type = coerce_bool
@@ -648,7 +648,7 @@ def coerce_bool(value):
 
 
 def coerce_string(value):
-  if type(value) == list:
+  if type(value) is list:
     return ','.join(value)
   else:
     return value

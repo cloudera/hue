@@ -676,7 +676,7 @@ print _exec('%(service)s', '%(command)s', %(args)s)
     else:
       hostname = ALTUS.HOSTNAME.get()
 
-    if type(cluster) == dict:
+    if type(cluster) is dict:
       command = 'createAWSCluster'
       arguments = cluster
     else:

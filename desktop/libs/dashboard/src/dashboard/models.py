@@ -906,7 +906,7 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
           new_rows.append(dim_row + row)
         dim_row = new_rows
 
-    if dim_row and type(dim_row[0]) == list:
+    if dim_row and type(dim_row[0]) is list:
       rows.extend(dim_row)
     else:
       rows.append(dim_row)

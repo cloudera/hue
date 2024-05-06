@@ -57,12 +57,12 @@ def api_router(request, url):  # On split, deserialize anything
   def safe_json_load(raw):
     try:
       return json.loads(re.sub(r'(?:\")([0-9]+)(?:\")', r'\1', str(raw)))
-    except:
+    except Exception:
       LOG.debug('Failed to parse input as JSON, falling back to raw input.')
       return raw
 
   def deserialize(data):
-    if type(data) == dict:
+    if type(data) is dict:
       special_type = get_thrift_type(data.pop('hue-thrift-type', ''))
       if special_type:
         return special_type(data)

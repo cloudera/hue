@@ -109,7 +109,7 @@ class YarnApi(JobBrowserApi):
       json = self.resource_manager_api.apps(**filters)
     else:
       json = {}
-    if type(json) == str and 'This is standby RM' in json:
+    if type(json) is str and 'This is standby RM' in json:
       raise Exception(json)
 
     if json.get('apps'):
