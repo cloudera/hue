@@ -57,7 +57,6 @@ def query_error_handler(func):
   return decorator
 
 
-
 class FlinkSqlApi(Api):
 
   def __init__(self, user, interpreter=None):
@@ -67,7 +66,6 @@ class FlinkSqlApi(Api):
     api_url = self.options['url']
 
     self.db = FlinkSqlClient(user=user, api_url=api_url)
-
 
   @query_error_handler
   def create_session(self, lang=None, properties=None):
@@ -101,7 +99,6 @@ class FlinkSqlApi(Api):
     SESSIONS[session_key]['id'] = SESSIONS[session_key]['session_id']
 
     return SESSIONS[session_key]
-
 
   @query_error_handler
   def execute(self, notebook, snippet):
@@ -143,7 +140,6 @@ class FlinkSqlApi(Api):
       }
     }
 
-
   @query_error_handler
   def check_status(self, notebook, snippet):
     global n
@@ -179,13 +175,12 @@ class FlinkSqlApi(Api):
 
     return response
 
-
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
     global n
     session = self._get_session()
     statement_id = snippet['result']['handle']['guid']
-    token = n #rows
+    token = n  # rows
 
     resp = self.db.fetch_results(session['id'], job_id=statement_id, token=token)
 
@@ -205,7 +200,6 @@ class FlinkSqlApi(Api):
         ],
         'type': 'table'
     }
-
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
@@ -228,7 +222,6 @@ class FlinkSqlApi(Api):
 
     return response
 
-
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     if operation == 'hello':
@@ -247,7 +240,6 @@ class FlinkSqlApi(Api):
 
     return response
 
-
   def cancel(self, notebook, snippet):
     session = self._get_session()
     statement_id = snippet['result']['handle']['guid']
@@ -256,7 +248,7 @@ class FlinkSqlApi(Api):
       if session and statement_id:
         self.db.close_statement(session_id=session['id'], job_id=statement_id)
       else:
-        return {'status': -1} # missing operation ids
+        return {'status': -1}  # missing operation ids
     except Exception as e:
       if 'does not exist in current session:' in str(e):
         return {'status': -1}  # skipped
@@ -265,13 +257,11 @@ class FlinkSqlApi(Api):
 
     return {'status': 0}
 
-
   def close_session(self, session):
     # Avoid closing session on page refresh or editor close for now
     pass
     # session = self._get_session()
     # self.db.close_session(session['id'])
-
 
   def _show_databases(self):
     session = self._get_session()
@@ -281,7 +271,6 @@ class FlinkSqlApi(Api):
 
     return [db[0] for db in resp['results'][0]['data']]
 
-
   def _show_tables(self, database):
     session = self._get_session()
     session_id = session['id']
@@ -290,7 +279,6 @@ class FlinkSqlApi(Api):
     resp = self.db.execute_statement(session_id=session_id, statement='SHOW TABLES')
 
     return [table[0] for table in resp['results'][0]['data']]
-
 
   def _get_columns(self, database, table):
     session = self._get_session()

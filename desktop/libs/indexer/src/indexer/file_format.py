@@ -55,8 +55,8 @@ def get_format_types():
       ApacheCombinedFormat,
       SyslogFormat,
       HueLogFormat,
-      #RubyLogFormat,
-      #ParquetFormat
+      # RubyLogFormat,
+      # ParquetFormat
     ])
 
   return formats
@@ -65,12 +65,15 @@ def get_format_types():
 def get_file_indexable_format_types():
   return [format_ for format_ in get_format_types() if format_.is_file_indexable]
 
+
 def _get_format_mapping():
   return dict([(format_.get_name(), format_) for format_ in get_format_types()])
+
 
 def get_file_format_class(type_):
   mapping = _get_format_mapping()
   return mapping[type_] if type_ in mapping else None
+
 
 def get_file_format_instance(file, format_=None):
   file_stream = file['stream']
@@ -364,7 +367,8 @@ class CSVFormat(FileFormat):
 
     columns = len(header)
     columnTypes = {}
-    for i in range(columns): columnTypes[i] = None
+    for i in range(columns):
+      columnTypes[i] = None
 
     checked = 0
     for row in rdr:
@@ -674,7 +678,7 @@ class HiveFormat(CSVFormat):
     "string": "string",
     "timestamp": "date",
     "binary": "string",
-    "decimal": "double", # Won't match decimal(16,6)
+    "decimal": "double",  # Won't match decimal(16,6)
     "date": "date",
   }
 

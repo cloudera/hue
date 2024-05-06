@@ -109,7 +109,6 @@ class TestHiveServerClient():
         original_guid ==
         handle.sessionId.guid)
 
-
   def test_get_configuration(self):
 
     with patch('beeswax.server.hive_server2_lib.HiveServerClient.execute_query_statement') as execute_query_statement:
@@ -233,9 +232,8 @@ class TestHiveServerClient():
         client.get_databases(query)
 
         assert (
-          None == # Should be empty and not '*' with Impala
+          None ==  # Should be empty and not '*' with Impala
           client.call.call_args[0][1].schemaName), client.call.call_args.args
-
 
   def test_get_table_with_error(self):
     query = Mock(
@@ -310,10 +308,11 @@ class TestHiveServerClient():
           "catalogName=None, schemaName='database', tableName='table_name', tableTypes=None)")\
           % (str(original_guid), str(original_secret))
 
-        assert(
+        assert (
           "Bad status for request %s:\n%s" % (req_string, get_tables_res) ==
           str(e)
         )
+
 
 class TestHiveServerTable():
 
@@ -346,7 +345,7 @@ class TestHiveServerTable():
         Mock(stringVal=Mock(
           values=[
             'comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL',
-            'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":\"true\",\"salary\":\"true\",'\
+            'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":\"true\",\"salary\":\"true\",'
             '\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445', 'true', 'insert_only', '1572882268', 'NULL', 'NULL', 'NULL',
             'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1',
           ],
@@ -373,7 +372,6 @@ class TestHiveServerTable():
     assert table.cols[1] == {'col_name': 'description', 'data_type': 'string', 'comment': 'NULL'}
     assert table.cols[2] == {'col_name': 'total_emp', 'data_type': 'int', 'comment': 'NULL'}
     assert table.cols[3] == {'col_name': 'salary', 'data_type': 'int', 'comment': 'NULL'}
-
 
   def test_cols_hive_tez(self):
 
@@ -406,7 +404,7 @@ class TestHiveServerTable():
           nulls='')),
         Mock(stringVal=Mock(
           values=[
-            '', '', '', '', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":'\
+            '', '', '', '', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":'
             '\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":\"true\",\"salary\":\"true\",\"total_emp\":\"true\"}}', '2',
             '1', '822', '3288', '48445', 'TRUE', 'insert_only         ', '1572882268', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL',
             'NULL', 'NULL', 'NULL', 'NULL', '1',
@@ -434,7 +432,6 @@ class TestHiveServerTable():
     assert table.cols[1] == {'col_name': 'description', 'data_type': 'string', 'comment': ''}
     assert table.cols[2] == {'col_name': 'total_emp', 'data_type': 'int', 'comment': ''}
     assert table.cols[3] == {'col_name': 'salary', 'data_type': 'int', 'comment': ''}
-
 
   def test_cols_hive_llap_upstream(self):
 
@@ -464,7 +461,7 @@ class TestHiveServerTable():
         Mock(stringVal=Mock(
           values=[
             'comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL',
-            'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":\"true\",\"salary\":\"true\",'\
+            'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":\"true\",\"salary\":\"true\",'
             '\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445', 'true', 'insert_only', '1572882268', 'NULL', 'NULL', 'NULL',
             'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1',
           ],
@@ -491,7 +488,6 @@ class TestHiveServerTable():
     assert table.cols[1] == {'col_name': 'description', 'data_type': 'string', 'comment': 'NULL'}
     assert table.cols[2] == {'col_name': 'total_emp', 'data_type': 'int', 'comment': 'NULL'}
     assert table.cols[3] == {'col_name': 'salary', 'data_type': 'int', 'comment': 'NULL'}
-
 
   def test_partition_keys_impala(self):
 
@@ -523,7 +519,7 @@ class TestHiveServerTable():
           nulls='')),
         Mock(stringVal=Mock(
           values=['comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'comment', 'NULL', 'NULL',
-            'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":'\
+            'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":'
             '{\"code\":\"true\",\"description\":\"true\",\"salary\":\"true\",\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445',
             'true', 'insert_only', '1572882268', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1',
           ],
@@ -549,7 +545,6 @@ class TestHiveServerTable():
     assert table.partition_keys[0].name == 'date'
     assert table.partition_keys[0].type == 'string'
     assert table.partition_keys[0].comment == 'NULL'
-
 
   def test_partition_keys_hive(self):
 
@@ -583,7 +578,7 @@ class TestHiveServerTable():
         Mock(stringVal=Mock(
           values=[
             'comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'comment', '', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL',
-            'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":'\
+            'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":'
             '\"true\",\"salary\":\"true\",\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445', 'true', 'insert_only',
             '1572882268', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1',
           ],
@@ -609,7 +604,6 @@ class TestHiveServerTable():
     assert table.partition_keys[0].name == 'date'
     assert table.partition_keys[0].type == 'string'
     assert table.partition_keys[0].comment == ''
-
 
   def test_single_primary_key_hive(self):
 
@@ -643,7 +637,7 @@ class TestHiveServerTable():
         Mock(stringVal=Mock(
           values=[
             'comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'comment', '', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL',
-            'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":'\
+            'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":'
             '\"true\",\"salary\":\"true\",\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445', 'true', 'insert_only',
             '1572882268', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1', 'NULL', 'NULL', 'NULL',
             'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL'
@@ -670,7 +664,6 @@ class TestHiveServerTable():
     assert table.primary_keys[0].name == 'id1'
     assert table.primary_keys[0].type == 'NULL'
     assert table.primary_keys[0].comment == 'NULL'
-
 
   def test_multi_primary_keys_hive(self):
 
@@ -705,7 +698,7 @@ class TestHiveServerTable():
         Mock(stringVal=Mock(
           values=[
             'comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'comment', '', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL',
-            'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":'\
+            'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",\"description\":'
             '\"true\",\"salary\":\"true\",\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445', 'true', 'insert_only',
             '1572882268', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1', 'NULL', 'NULL', 'NULL',
             'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL'
@@ -736,7 +729,6 @@ class TestHiveServerTable():
     assert table.primary_keys[1].name == 'id2'
     assert table.primary_keys[1].type == 'NULL'
     assert table.primary_keys[1].comment == 'NULL'
-
 
   def test_foreign_keys_hive(self):
 
@@ -780,7 +772,7 @@ class TestHiveServerTable():
           stringVal=Mock(
             values=[
               'comment', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'comment', '', 'NULL', 'NULL', 'NULL', 'NULL',
-              'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",'\
+              'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '{\"BASIC_STATS\":\"true\",\"COLUMN_STATS\":{\"code\":\"true\",'
               '\"description\":\"true\",\"salary\":\"true\",\"total_emp\":\"true\"}}', '2', '1', '822', '3288', '48445', 'true',
               'insert_only', '1572882268', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', '1',
               'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'Key Sequence:1',
@@ -842,13 +834,13 @@ class TestSessionManagement():
 
             # Reuse session from argument
             (res, session2) = client.call(fn, req, status=None, session=session1)
-            open_session.assert_called_once() # open_session should not be called again, because we're reusing session
+            open_session.assert_called_once()  # open_session should not be called again, because we're reusing session
             assert session1 == session2
 
             # Reuse session from get_session
             get_session.return_value = session1
             (res, session3) = client.call(fn, req, status=None)
-            open_session.assert_called_once() # open_session should not be called again, because we're reusing session
+            open_session.assert_called_once()  # open_session should not be called again, because we're reusing session
             assert session1 == session3
     finally:
       for f in finish:
@@ -877,13 +869,13 @@ class TestSessionManagement():
 
             # Reuse session from argument
             (res, session2) = client.call(fn, req, status=None, session=session1)
-            open_session.assert_called_once() # open_session should not be called again, because we're reusing session
+            open_session.assert_called_once()  # open_session should not be called again, because we're reusing session
             assert session1 == session2
 
             # Reuse session from get_session
             get_session.return_value = session1
             (res, session3) = client.call(fn, req, status=None)
-            open_session.assert_called_once() # open_session should not be called again, because we're reusing session
+            open_session.assert_called_once()  # open_session should not be called again, because we're reusing session
             assert session1 == session3
     finally:
       for f in finish:
@@ -934,7 +926,7 @@ class TestSessionManagement():
 
           # Reuse session from argument
           (res, session2) = client.call(fn, req, status=None, session=session1)
-          open_session.assert_called_once() # open_session should not be called again, because we're reusing session
+          open_session.assert_called_once()  # open_session should not be called again, because we're reusing session
           assert session1 == session2
 
           # Create new session
@@ -992,7 +984,7 @@ class TestSessionManagement():
               assert open_session.call_count == 6
               assert close_session.call_count == 6
 
-              res = client.get_partitions(MagicMock(), MagicMock()) # get_partitions does 2 requests with 1 session each
+              res = client.get_partitions(MagicMock(), MagicMock())  # get_partitions does 2 requests with 1 session each
               assert open_session.call_count == 8
               assert close_session.call_count == 8
     finally:
@@ -1026,8 +1018,8 @@ class TestSessionManagement():
       for f in finish:
         f()
 
-class TestHiveServerClientCompatible():
 
+class TestHiveServerClientCompatible():
 
   def test_get_tables_meta(self):
     client = Mock(

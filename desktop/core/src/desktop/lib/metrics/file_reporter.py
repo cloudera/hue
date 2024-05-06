@@ -67,6 +67,7 @@ class FileReporter(Reporter):
       os.remove(f.name)
       raise
 
+
 _reporter = None
 
 

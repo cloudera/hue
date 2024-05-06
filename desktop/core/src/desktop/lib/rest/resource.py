@@ -144,7 +144,6 @@ class Resource(object):
 
     return resp
 
-
   def get(self, relpath=None, params=None, headers=None, clear_cookies=False):
     """
     Invoke the GET method on a resource.
@@ -155,7 +154,6 @@ class Resource(object):
     @return: A dictionary of the JSON result.
     """
     return self.invoke("GET", relpath, params, headers=headers, allow_redirects=True, clear_cookies=clear_cookies)
-
 
   def delete(self, relpath=None, params=None, headers=None, clear_cookies=False):
     """
@@ -168,7 +166,6 @@ class Resource(object):
     @return: A dictionary of the JSON result.
     """
     return self.invoke("DELETE", relpath, params, headers=headers, clear_cookies=clear_cookies)
-
 
   def post(self, relpath=None, params=None, data=None, contenttype=None, headers=None, files=None, allow_redirects=False,
       clear_cookies=False, log_response=True
@@ -189,7 +186,6 @@ class Resource(object):
       "POST", relpath, params, data, headers=self._make_headers(contenttype, headers), files=files,
       allow_redirects=allow_redirects, clear_cookies=clear_cookies, log_response=log_response
     )
-
 
   def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False, clear_cookies=False, headers=None):
     """
@@ -241,7 +237,7 @@ def log_if_slow_call(duration, message, logger):
   elif duration >= math.floor(INFO_LEVEL_CALL_DURATION_MS / 1000):
     logger.info('SLOW: %.2f - %s' % (duration, message))
   else:
-    #Leave this as logging.debug and not logger.
-    #Otherwise we never get these logging messages even with debug enabled.
-    #Review this in the future to find out why.
+    # Leave this as logging.debug and not logger.
+    # Otherwise we never get these logging messages even with debug enabled.
+    # Review this in the future to find out why.
     logging.debug(message)

@@ -24,7 +24,8 @@ import posixpath
 import re
 import stat as stat_module
 import sys
-import urllib.request, urllib.error
+import urllib.request
+import urllib.error
 
 from bz2 import decompress
 from datetime import datetime
@@ -91,8 +92,8 @@ from gzip import decompress as decompress_gzip
 from django.utils.translation import gettext as _
 
 
-DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
-MAX_CHUNK_SIZE_BYTES = 1024 * 1024 # 1MB
+DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4  # 4KB
+MAX_CHUNK_SIZE_BYTES = 1024 * 1024  # 1MB
 
 # Defaults for "xxd"-style output.
 # Sentences refer to groups of bytes printed together, within a line.
@@ -104,11 +105,11 @@ MAX_FILEEDITOR_SIZE = 256 * 1024
 
 INLINE_DISPLAY_MIMETYPE = re.compile(
     'video/|image/|audio/|application/pdf|application/msword|application/excel|'
-    'application/vnd\.ms|'
-    'application/vnd\.openxmlformats'
+    r'application/vnd\.ms|'
+    r'application/vnd\.openxmlformats'
 )
 
-INLINE_DISPLAY_MIMETYPE_EXCEPTIONS = re.compile('image/svg\+xml')
+INLINE_DISPLAY_MIMETYPE_EXCEPTIONS = re.compile(r'image/svg\+xml')
 
 SCHEME_PREFIXES = {
     's3a': 's3a://',
@@ -132,6 +133,7 @@ if hasattr(ARCHIVE_UPLOAD_TEMPDIR, 'get') and not os.path.exists(ARCHIVE_UPLOAD_
 
 logger = logging.getLogger()
 
+
 class ParquetOptions(object):
   def __init__(self, col=None, format='json', no_headers=True, limit=-1):
     self.col = col
@@ -152,6 +154,7 @@ def index(request):
 
   return view(request, path)
 
+
 def _decode_slashes(path):
   # This is a fix for some installations where the path is still having the slash (/) encoded
   # as %2F while the rest of the path is actually decoded.
@@ -162,6 +165,7 @@ def _decode_slashes(path):
     path = path.replace(encoded_slash, '/')
 
   return path
+
 
 def _normalize_path(path):
   path = _decode_slashes(path)
@@ -174,12 +178,14 @@ def _normalize_path(path):
 
   return path
 
+
 def get_scheme(path):
   path = _normalize_path(path)
   for scheme, prefix in SCHEME_PREFIXES.items():
     if path.startswith(prefix):
       return scheme
   return 'hdfs'
+
 
 def download(request, path):
   """
@@ -404,6 +410,7 @@ def edit(request, path, form=None):
     data['form'] = form
   return render("edit.mako", request, data)
 
+
 def save_file(request):
   """
   The POST endpoint to save a file in the file editor.
@@ -527,6 +534,7 @@ def _massage_page(page, paginator):
       'end_index': page.end_index(),
       'total_count': paginator.count
   }
+
 
 def listdir_paged(request, path):
   """
@@ -662,9 +670,11 @@ def scheme_absolute_path(root, path):
     path = splitPath._replace(scheme=splitRoot.scheme).geturl()
   return path
 
+
 def stat_absolute_path(path, stat):
   stat.path = scheme_absolute_path(path, stat.path)
   return stat
+
 
 def _massage_stats(request, stats):
   """
@@ -1259,6 +1269,7 @@ def rename(request):
 
   return generic_op(RenameForm, request, smart_rename, ["src_path", "dest_path"], None)
 
+
 def set_replication(request):
   def smart_set_replication(src_path, replication_factor):
     result = request.fs.set_replication(urllib_unquote(src_path), replication_factor)
@@ -1266,6 +1277,7 @@ def set_replication(request):
       raise PopupException(_("Setting of replication factor failed"))
 
   return generic_op(SetReplicationFactorForm, request, smart_set_replication, ["src_path", "replication_factor"], None)
+
 
 def mkdir(request):
   def smart_mkdir(path, name):
@@ -1276,6 +1288,7 @@ def mkdir(request):
     request.fs.mkdir(request.fs.join(path, name))
 
   return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path")
+
 
 def touch(request):
   def smart_touch(path, name):
@@ -1292,10 +1305,12 @@ def touch(request):
 
   return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
 
+
 @require_http_methods(["POST"])
 def rmtree(request):
   recurring = []
   params = ["path"]
+
   def bulk_rmtree(*args, **kwargs):
     for arg in args:
       request.fs.do_as_user(request.user, request.fs.rmtree, arg['path'], 'skip_trash' in request.GET)
@@ -1309,6 +1324,7 @@ def rmtree(request):
 def move(request):
   recurring = ['dest_path']
   params = ['src_path']
+
   def bulk_move(*args, **kwargs):
     for arg in args:
       if arg['src_path'] == arg['dest_path']:
@@ -1327,6 +1343,7 @@ def move(request):
 def copy(request):
   recurring = ['dest_path']
   params = ['src_path']
+
   def bulk_copy(*args, **kwargs):
     ofs_skip_files = ''
     for arg in args:
@@ -1355,6 +1372,7 @@ def chmod(request):
                "group_read", "group_write", "group_execute",
                "other_read", "other_write", "other_execute"]
   params = ["path"]
+
   def bulk_chmod(*args, **kwargs):
     op = partial(request.fs.chmod, recursive=request.POST.get('recursive', False))
     for arg in args:
@@ -1380,6 +1398,7 @@ def chown(request):
 
   recurring = ["user", "group", "user_other", "group_other"]
   params = ["path"]
+
   def bulk_chown(*args, **kwargs):
     op = partial(request.fs.chown, recursive=request.POST.get('recursive', False))
     for arg in args:
@@ -1396,6 +1415,7 @@ def chown(request):
 def trash_restore(request):
   recurring = []
   params = ["path"]
+
   def bulk_restore(*args, **kwargs):
     for arg in args:
       request.fs.do_as_user(request.user, request.fs.restore, urllib_unquote(arg['path']))
@@ -1409,6 +1429,7 @@ def trash_restore(request):
 def trash_purge(request):
   return generic_op(TrashPurgeForm, request, request.fs.purge_trash, [], None)
 
+
 def _create_response(request, _fs, result="success", data="Success"):
   return {
       'path': _fs.filepath,
@@ -1420,6 +1441,7 @@ def _create_response(request, _fs, result="success", data="Success"):
       'data': data,
       'task_id': _fs.qquuid
   }
+
 
 def perform_upload_task(request, *args, **kwargs):
   """
@@ -1464,6 +1486,7 @@ def perform_upload_task(request, *args, **kwargs):
       result = "success"
   return _create_response(request, _fs, result=result, data="Success")
 
+
 def extract_upload_data(request, method):
   data = request.POST if method == "POST" else request.GET
   chunks = {
@@ -1478,6 +1501,7 @@ def extract_upload_data(request, method):
     "fileFieldLabel": data.get('fileFieldLabel')
   }
   return chunks
+
 
 @require_http_methods(["POST"])
 def upload_chunks(request):
@@ -1511,6 +1535,7 @@ def upload_chunks(request):
       return JsonResponse({'success': False, 'error': 'Error in upload %s' % str(e)})
   return JsonResponse({'success': False, 'error': 'Unsupported request method'})
 
+
 @require_http_methods(["POST"])
 def upload_complete(request):
   """
@@ -1526,6 +1551,7 @@ def upload_complete(request):
     return JsonResponse(response)
   except Exception as e:
     return JsonResponse({'success': False, 'error': 'Error in upload'})
+
 
 @require_http_methods(["POST"])
 def upload_file(request):
@@ -1581,7 +1607,7 @@ def _upload_file(request):
       except Exception:
         pass
       if already_exists:
-        msg = _('Destination %(name)s already exists.')  % {'name': filepath}
+        msg = _('Destination %(name)s already exists.') % {'name': filepath}
       else:
         msg = _('Copy to %(name)s failed: %(error)s') % {'name': filepath, 'error': ex}
       raise PopupException(msg)
@@ -1634,7 +1660,7 @@ def compress_files_using_batch_job(request):
       except Exception as e:
         response['message'] = _('Exception occurred while compressing files: %s' % e)
     else:
-      response['message'] = _('Error: Output directory is not set.');
+      response['message'] = _('Error: Output directory is not set.')
   else:
     response['message'] = _('ERROR: Configuration parameter enable_extract_uploaded_archive ' +
                             'has to be enabled before calling this method.')
@@ -1664,9 +1690,11 @@ def truncate(toTruncate, charsToKeep=50):
   else:
     return toTruncate
 
+
 def unquote_url(url):
   url = urllib_unquote(url.encode('utf-8') if not isinstance(url, str) else url)
   return url.decode('utf-8') if isinstance(url, bytes) else url
+
 
 def _is_hdfs_superuser(request):
   return request.user.username == request.fs.superuser or request.user.groups.filter(name__exact=request.fs.supergroup).exists()

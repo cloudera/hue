@@ -79,7 +79,7 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s)
         if (source['format']['hasHeader'] and count == 0) or not csv_row:
             continue
         else:
-          _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('varchar', 'timestamp') \
+          _sql = ', '.join(["'{0}'".format(col_val) if columns[count]['type'] in ('varchar', 'timestamp')
             else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
 
           sql += '''\nUPSERT INTO %(table_name)s VALUES (%(csv_row)s);\n''' % {
@@ -87,7 +87,7 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s)
             'table_name': table_name,
             'csv_row': _sql
           }
-   
+
     if dry_run:
       return sql
     else:

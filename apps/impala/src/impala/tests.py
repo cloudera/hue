@@ -56,6 +56,7 @@ class MockDbms(object):
   def get_tables(self, database):
     return ['table1', 'table2']
 
+
 @pytest.mark.django_db
 class TestMockedImpala(object):
 
@@ -113,24 +114,24 @@ class TestMockedImpala(object):
 
         get_hive_metastore_interpreters.return_value = []
         with pytest.raises(PopupException):
-          ddms.invalidate('default') # No hive/metastore configured
+          ddms.invalidate('default')  # No hive/metastore configured
 
         get_hive_metastore_interpreters.return_value = ['hive']
         ddms.invalidate('default')
         ddms.client.query.assert_called_once_with(ddms.client.query.call_args[0][0])
-        assert 'customers' in ddms.client.query.call_args[0][0].hql_query # diff of 1 table
+        assert 'customers' in ddms.client.query.call_args[0][0].hql_query  # diff of 1 table
 
         get_different_tables.return_value = ['customers', '', '', '', '', '', '', '', '', '', '']
         with pytest.raises(PopupException):
-          ddms.invalidate('default') # diff of 11 tables. Limit is 10.
+          ddms.invalidate('default')  # diff of 11 tables. Limit is 10.
 
         ddms.invalidate('default', 'customers')
-        assert ddms.client.query.call_count == 2 # Second call
-        assert 'customers' in ddms.client.query.call_args[0][0].hql_query # invalidate 1 table
+        assert ddms.client.query.call_count == 2  # Second call
+        assert 'customers' in ddms.client.query.call_args[0][0].hql_query  # invalidate 1 table
 
         ddms.invalidate()
-        assert ddms.client.query.call_count == 3 # Third call
-        assert 'customers' not in ddms.client.query.call_args[0][0].hql_query # Full invalidate
+        assert ddms.client.query.call_count == 3  # Third call
+        assert 'customers' not in ddms.client.query.call_args[0][0].hql_query  # Full invalidate
 
 
 @pytest.mark.integration
@@ -181,7 +182,6 @@ class TestImpalaIntegration(object):
       content = json.loads(resp.content)
       assert content['status'] == 0, resp.content
 
-
   @classmethod
   def teardown_class(cls):
     # We need to drop tables before dropping the database
@@ -196,12 +196,11 @@ class TestImpalaIntegration(object):
 
     # Check the cleanup
     databases = cls.db.get_databases()
-    assert not cls.DATABASE in databases
-    assert not '%(db)s_other' % {'db': cls.DATABASE} in databases
+    assert cls.DATABASE not in databases
+    assert '%(db)s_other' % {'db': cls.DATABASE} not in databases
 
     for f in cls.finish:
       f()
-
 
   def test_basic_flow(self):
     dbs = self.db.get_databases()
@@ -244,12 +243,11 @@ class TestImpalaIntegration(object):
     content = json.loads(resp.content)
     assert 0 == content['status']
 
-
   def test_data_download(self):
     hql = 'SELECT * FROM tweets %(limit)s'
 
     FETCH_SIZE = data_export.FETCH_SIZE
-    data_export.FETCH_SIZE = 2 # Decrease fetch size to validate last fetch logic
+    data_export.FETCH_SIZE = 2  # Decrease fetch size to validate last fetch logic
 
     try:
       query = hql_query(hql % {'limit': ''})
@@ -259,7 +257,6 @@ class TestImpalaIntegration(object):
       csv_resp = download(handle, 'csv', self.db)
       csv_content = ''.join(csv_resp.streaming_content)
       assert len(csv_content.strip().split('\n')) == 5 + 1
-
 
       query = hql_query(hql % {'limit': 'LIMIT 0'})
 
@@ -284,7 +281,6 @@ class TestImpalaIntegration(object):
     finally:
       data_export.FETCH_SIZE = FETCH_SIZE
 
-
   def test_explain(self):
     QUERY = """
       SELECT * FROM tweets ORDER BY row_num;
@@ -294,7 +290,6 @@ class TestImpalaIntegration(object):
     assert 'MERGING-EXCHANGE' in json_response['explanation'], json_response
     assert 'SCAN HDFS' in json_response['explanation'], json_response
 
-
   def test_get_table_sample(self):
     client = make_logged_in_client()
 
@@ -303,7 +298,6 @@ class TestImpalaIntegration(object):
     assert 0 == data['status'], data
     assert [u'row_num', u'id_str', u'text'] == data['headers'], data
     assert len(data['rows']), data
-
 
   def test_get_session(self):
     session = None
@@ -324,13 +318,11 @@ class TestImpalaIntegration(object):
         except Exception:
           pass
 
-
   def test_get_settings(self):
     resp = self.client.get(reverse("impala:get_settings"))
     json_resp = json.loads(resp.content)
     assert 0 == json_resp['status']
     assert 'QUERY_TIMEOUT_S' in json_resp['settings']
-
 
   def test_invalidate_tables(self):
     # Helper function to get Impala and Beeswax (HMS) tables
@@ -345,7 +337,7 @@ class TestImpalaIntegration(object):
 
     impala_tables, beeswax_tables = get_impala_beeswax_tables()
     assert impala_tables == beeswax_tables, (
-      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" 
+      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s"
       % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables))
     )
 
@@ -357,7 +349,7 @@ class TestImpalaIntegration(object):
     impala_tables, beeswax_tables = get_impala_beeswax_tables()
     # New table is not found by Impala
     assert 'new_table' in beeswax_tables, beeswax_tables
-    assert not 'new_table' in impala_tables, impala_tables
+    assert 'new_table' not in impala_tables, impala_tables
 
     resp = self.client.post(reverse('impala:invalidate'), {'database': self.DATABASE})
 
@@ -367,7 +359,6 @@ class TestImpalaIntegration(object):
       "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s"
       % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables))
     )
-
 
   def test_refresh_table(self):
     # Helper function to get Impala and Beeswax (HMS) columns
@@ -390,7 +381,7 @@ class TestImpalaIntegration(object):
     impala_columns, beeswax_columns = get_impala_beeswax_columns()
     # New column is not found by Impala
     assert 'new_column' in beeswax_columns, beeswax_columns
-    assert not 'new_column' in impala_columns, impala_columns
+    assert 'new_column' not in impala_columns, impala_columns
 
     resp = self.client.post(reverse('impala:refresh_table', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
 
@@ -398,7 +389,6 @@ class TestImpalaIntegration(object):
     # Invalidate picks up new column
     assert impala_columns == beeswax_columns, ("\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s"
       % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
-
 
   def test_get_exec_summary(self):
     query = """
@@ -423,7 +413,6 @@ class TestImpalaIntegration(object):
     assert 0 == data['status'], data
     assert 'nodes' in data['summary'], data
     assert len(data['summary']['nodes']) > 0, data['summary']['nodes']
-
 
   def test_get_runtime_profile(self):
     query = """
@@ -471,7 +460,7 @@ def test_ssl_cacerts():
     ]
 
     try:
-      assert conf.SSL.CACERTS.get() == expected, ('desktop:%s conf:%s expected:%s got:%s' 
+      assert conf.SSL.CACERTS.get() == expected, ('desktop:%s conf:%s expected:%s got:%s'
         % (desktop_kwargs, conf_kwargs, expected, conf.SSL.CACERTS.get()))
     finally:
       for reset in resets:

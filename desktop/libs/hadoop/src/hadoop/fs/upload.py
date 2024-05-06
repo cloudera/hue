@@ -51,6 +51,7 @@ LOG = logging.getLogger()
 
 UPLOAD_SUBDIR = 'hue-uploads'
 
+
 class LocalFineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
     self._request = request
@@ -59,7 +60,7 @@ class LocalFineUploaderChunkedUpload(object):
     self.totalfilesize = kwargs.get('qqtotalfilesize')
     self.file_name = kwargs.get('qqfilename')
     if self.file_name:
-      self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+      self.file_name = unicodedata.normalize('NFC', self.file_name)  # Normalize unicode
     local = "local:/"
     if local in kwargs.get('dest', ""):
       self.dest = kwargs.get('dest')[len(local):]
@@ -69,13 +70,17 @@ class LocalFineUploaderChunkedUpload(object):
     self.filepath = request.fs.join(self.dest, self.file_name)
     self._file = None
     self.chunk_size = 0
+
   def check_access(self):
     pass
+
   def upload_chunks(self):
     pass
+
   def upload(self):
     self.check_access()
     self.upload_chunks()
+
 
 class HDFSFineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
@@ -85,7 +90,7 @@ class HDFSFineUploaderChunkedUpload(object):
     self.totalfilesize = kwargs.get('qqtotalfilesize')
     self.file_name = kwargs.get('qqfilename')
     if self.file_name:
-      self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+      self.file_name = unicodedata.normalize('NFC', self.file_name)  # Normalize unicode
     self.dest = kwargs.get('dest')
     self.file_name = kwargs.get('qqfilename')
     if kwargs.get('filepath', None) != None:
@@ -138,7 +143,7 @@ class HDFSFineUploaderChunkedUpload(object):
       except Exception:
         pass
       if already_exists:
-        msg = _('Destination %(name)s already exists.')  % {'name': self.filepath}
+        msg = _('Destination %(name)s already exists.') % {'name': self.filepath}
       else:
         msg = _('Copy to %(name)s failed: %(error)s') % {'name': self.filepath, 'error': ex}
       raise PopupException(msg)
@@ -221,6 +226,7 @@ class HDFStemporaryUploadedFile(object):
   def close(self):
     self._file.close()
 
+
 class FineUploaderChunkedUploadHandler(FileUploadHandler):
   """
   A custom file upload handler for handling chunked uploads using FineUploader.
@@ -267,6 +273,7 @@ class FineUploaderChunkedUploadHandler(FileUploadHandler):
     elapsed = time.time() - self._starttime
     LOG.info('Uploaded %s bytes %s to in %s seconds' % (file_size, self.chunk_file_path, elapsed))
 
+
 class HDFSfileUploadHandler(FileUploadHandler):
   """
   Handle file upload by storing data in a temp HDFS file.
@@ -286,7 +293,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
     self._file = None
     self._starttime = 0
     self._activated = False
-    self._destination = request.GET.get('dest', None) # GET param avoids infinite looping
+    self._destination = request.GET.get('dest', None)  # GET param avoids infinite looping
     self.request = request
     fs = fsmanager.get_filesystem('default')
     if not fs:

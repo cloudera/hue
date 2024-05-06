@@ -53,7 +53,7 @@ def create_table(request, database='default'):
   """Create a table by specifying its attributes manually"""
   db = dbms.get(request.user)
   dbs = db.get_databases()
-  databases = [{'name':db, 'url':reverse('beeswax:create_table', kwargs={'database': db})} for db in dbs]
+  databases = [{'name': db, 'url': reverse('beeswax:create_table', kwargs={'database': db})} for db in dbs]
 
   form = MultiForm(
       table=CreateTableForm,
@@ -68,8 +68,8 @@ def create_table(request, database='default'):
 
     if request.POST.get('create'):
       if form.is_valid():
-        columns = [ f.cleaned_data for f in form.columns.forms ]
-        partition_columns = [ f.cleaned_data for f in form.partitions.forms ]
+        columns = [f.cleaned_data for f in form.columns.forms]
+        partition_columns = [f.cleaned_data for f in form.partitions.forms]
         proposed_query = django_mako.render_to_string("create_table_statement.mako", {
             'databases': databases,
             'database': database,
@@ -100,14 +100,15 @@ def create_table(request, database='default'):
 
 IMPORT_PEEK_SIZE = 5 * 1024**2
 IMPORT_PEEK_NLINES = 10
-DELIMITERS = [ hive_val for hive_val, desc, ascii in TERMINATORS ]
-DELIMITER_READABLE = {'\\001' : _('ctrl-As'),
-                      '\\002' : _('ctrl-Bs'),
-                      '\\003' : _('ctrl-Cs'),
-                      '\\t'   : _('tabs'),
-                      ','     : _('commas'),
-                      ' '     : _('spaces')}
+DELIMITERS = [hive_val for hive_val, desc, ascii in TERMINATORS]
+DELIMITER_READABLE = {'\\001': _('ctrl-As'),
+                      '\\002': _('ctrl-Bs'),
+                      '\\003': _('ctrl-Cs'),
+                      '\\t': _('tabs'),
+                      ',': _('commas'),
+                      ' ': _('spaces')}
 FILE_READERS = []
+
 
 def import_wizard(request, database='default'):
   """
@@ -124,7 +125,7 @@ def import_wizard(request, database='default'):
 
   db = dbms.get(request.user)
   dbs = db.get_databases()
-  databases = [{'name':db, 'url':reverse('beeswax:import_wizard', kwargs={'database': db})} for db in dbs]
+  databases = [{'name': db, 'url': reverse('beeswax:import_wizard', kwargs={'database': db})} for db in dbs]
 
   if request.method == 'POST':
     #
@@ -227,7 +228,7 @@ def import_wizard(request, database='default'):
         try:
           fields_list_for_json = list(fields_list)
           if fields_list_for_json:
-            fields_list_for_json[0] = [re.sub('[^\w]', '', a) for a in fields_list_for_json[0]] # Cleaning headers
+            fields_list_for_json[0] = [re.sub(r'[^\w]', '', a) for a in fields_list_for_json[0]]  # Cleaning headers
           apps_list = _get_apps(request.user, '')
           return render('import_wizard_define_columns.mako', request, {
             'apps': apps_list,
@@ -262,7 +263,7 @@ def import_wizard(request, database='default'):
                 'path': path,
                 'skip_header': request.GET.get('removeHeader', 'off').lower() == 'on'
              },
-            'columns': [ f.cleaned_data for f in s3_col_formset.forms ],
+            'columns': [f.cleaned_data for f in s3_col_formset.forms],
             'partition_columns': [],
             'database': database,
             'databases': databases
@@ -328,7 +329,7 @@ def _delim_preview(fs, file_form, encoding, file_types, delimiters):
     LOG.exception(msg)
     raise PopupException(msg)
 
-  n_cols = max([ len(row) for row in fields_list ])
+  n_cols = max([len(row) for row in fields_list])
   # ``delimiter`` is a MultiValueField. delimiter_0 and delimiter_1 are the sub-fields.
   delimiter_0 = delim
   delimiter_1 = ''
@@ -400,12 +401,11 @@ def _readfields(lines, delimiters):
     avg_n_fields = math.floor(sum(len_list) / n_lines)
     sq_of_exp = avg_n_fields * avg_n_fields
 
-    len_list_sq = [l * l for l in len_list]
+    len_list_sq = [len * len for len in len_list]
     exp_of_sq = math.floor(sum(len_list_sq) / n_lines)
     var = exp_of_sq - sq_of_exp
     # Favour more fields
     return (1000.0 / (var + 1)) + avg_n_fields
-
 
   max_score = -1
   res = (None, None)
@@ -463,6 +463,7 @@ class GzipFileReader(object):
     except UnicodeError:
       return None
 
+
 FILE_READERS.append(GzipFileReader)
 
 
@@ -478,6 +479,7 @@ class TextFileReader(object):
       return str(data, encoding, errors='replace').splitlines()[:IMPORT_PEEK_NLINES]
     except UnicodeError:
       return None
+
 
 FILE_READERS.append(TextFileReader)
 

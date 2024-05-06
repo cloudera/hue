@@ -76,6 +76,7 @@ IMAGE_VERSION = None
 def uuid_default():
   return str(uuid.uuid4())
 
+
 def hue_version():
   global HUE_VERSION
 
@@ -83,6 +84,7 @@ def hue_version():
     HUE_VERSION = HUE_DESKTOP_VERSION
 
   return HUE_VERSION
+
 
 def hue_image_version():
   global IMAGE_VERSION
@@ -99,11 +101,14 @@ def hue_image_version():
 
   return IMAGE_VERSION
 
+
 def name_of_hue_host():
   return HUE_HOST_NAME.get()
 
+
 def _version_from_properties(f):
   return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('cloudera.cdh.release')
+
 
 def get_sample_user_install(user):
   if ENABLE_ORGANIZATIONS.get():
@@ -196,7 +201,6 @@ class DefaultConfiguration(models.Model):
 
   class Meta(object):
     ordering = ["app", "-is_default", "user"]
-
 
   @property
   def properties_list(self):
@@ -317,11 +321,11 @@ class DocumentTag(models.Model):
   owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
   tag = models.SlugField()
 
-  DEFAULT = 'default' # Always there
-  TRASH = 'trash' # There when the document is trashed
-  HISTORY = 'history' # There when the document is a submission history
-  EXAMPLE = 'example' # Hue examples
-  IMPORTED2 = 'imported2' # Was imported to document2
+  DEFAULT = 'default'  # Always there
+  TRASH = 'trash'  # There when the document is trashed
+  HISTORY = 'history'  # There when the document is a submission history
+  EXAMPLE = 'example'  # Hue examples
+  IMPORTED2 = 'imported2'  # Was imported to document2
 
   RESERVED = (DEFAULT, TRASH, HISTORY, EXAMPLE, IMPORTED2)
 
@@ -329,7 +333,6 @@ class DocumentTag(models.Model):
 
   class Meta(object):
     unique_together = ('owner', 'tag')
-
 
   def __unicode__(self):
     return force_unicode('%s') % (self.tag,)
@@ -502,7 +505,7 @@ class DocumentManager(models.Manager):
           for dashboard in Collection.objects.all():
             if 'collection' in dashboard.properties_dict:
               col_dict = dashboard.properties_dict['collection']
-              if not 'uuid' in col_dict:
+              if 'uuid' not in col_dict:
                 _uuid = str(uuid.uuid4())
                 col_dict['uuid'] = _uuid
                 dashboard.update_properties({'collection': col_dict})
@@ -538,7 +541,6 @@ class DocumentManager(models.Manager):
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
     except Exception as e:
       LOG.exception('error syncing Document2')
-
 
     if not doc2_only and Document._meta.db_table in table_names:
       # Make sure doc have at least a tag
@@ -827,7 +829,7 @@ class Document(models.Model):
       'owner': self.owner.username,
       'name': self.name,
       'description': self.description,
-      'uuid': None, # no uuid == v1
+      'uuid': None,  # no uuid == v1
       'id': self.id,
       'doc1_id': self.id,
       'object_id': self.object_id,
@@ -846,9 +848,8 @@ class DocumentPermissionManager(models.Manager):
       perms_string = ' and '.join(', '.join(perms).rsplit(', ', 1))
       raise PopupException(_('Only %s permissions are supported, not %s.') % (perms_string, name))
 
-
   def share_to_default(self, document, name='read'):
-    from useradmin.models import get_default_user_group # Remove build dependency
+    from useradmin.models import get_default_user_group  # Remove build dependency
 
     self._check_perm(name)
 
@@ -910,7 +911,7 @@ class DocumentPermission(models.Model):
 
   users = models.ManyToManyField(User, db_index=True, db_table='documentpermission_users')
   groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission_groups')
-  perms = models.CharField(default=READ_PERM, max_length=10, choices=( # one perm
+  perms = models.CharField(default=READ_PERM, max_length=10, choices=(  # one perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
   ))
@@ -969,7 +970,6 @@ class Document2QueryMixin(object):
       docs = docs.distinct()
 
     return docs.defer('description', 'data', 'extra', 'search').order_by('-last_modified')
-
 
   def search_documents(self, types=None, search_text=None, order_by=None):
     """
@@ -1205,7 +1205,7 @@ class Document2(models.Model):
 
   parent_directory = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
 
-  doc = GenericRelation(Document, related_query_name='doc_doc') # Compatibility with Hue 3
+  doc = GenericRelation(Document, related_query_name='doc_doc')  # Compatibility with Hue 3
 
   objects = Document2Manager()
 
@@ -1322,7 +1322,7 @@ class Document2(models.Model):
     return self.dependencies.filter(is_history=True).order_by('-last_modified')
 
   def add_to_history(self, user, data_dict):
-    doc_id = self.id # Need to copy as the clone messes it
+    doc_id = self.id  # Need to copy as the clone messes it
 
     history_doc = self.copy(name=self.name, owner=user)
     history_doc.update_data({'history': data_dict})
@@ -1364,13 +1364,11 @@ class Document2(models.Model):
       raise FilesystemException(_('Cannot save document %s under parent directory %s due to circular dependency') %
                                 (self.name, self.parent_directory.uuid))
 
-
   def inherit_permissions(self):
     if self.parent_directory is not None:
       parent_perms = Document2Permission.objects.filter(doc=self.parent_directory)
       for perm in parent_perms:
         self.share(self.owner, name=perm.perms, users=perm.users.all(), groups=perm.groups.all())
-
 
   def move(self, directory, user):
     if not directory.is_directory:
@@ -1671,7 +1669,6 @@ class Directory(Document2):
 
     return documents.defer('description', 'data', 'extra', 'search').distinct().order_by('-last_modified')
 
-
   def save(self, *args, **kwargs):
     self.type = 'directory'
     super(Directory, self).save(*args, **kwargs)
@@ -1694,10 +1691,10 @@ class Document2Permission(models.Model):
   users = models.ManyToManyField(User, db_index=True, db_table='documentpermission2_users')
   groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission2_groups')
 
-  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # One perm
+  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=(  # One perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
-    (COMMENT_PERM, 'comment'), # Unused
+    (COMMENT_PERM, 'comment'),  # Unused
     (LINK_READ_PERM, 'link read'),
     (LINK_WRITE_PERM, 'link write'),
   ))
@@ -1729,6 +1726,7 @@ class Document2Permission(models.Model):
 
 def get_cluster_config(user):
   return Cluster(user).get_app_config().get_config()
+
 
 def get_remote_home_storage(user=None):
   remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
@@ -1763,7 +1761,6 @@ class ClusterConfig(object):
     self.apps = appmanager.get_apps_dict(self.user) if apps is None else apps
     self.cluster_type = cluster_type
 
-
   def get_config(self):
     app_config = self.get_apps()
     editors = app_config.get('editor')
@@ -1790,7 +1787,7 @@ class ClusterConfig(object):
       ],
       'default_sql_interpreter': default_sql_interpreter,
       'cluster_type': self.cluster_type,
-      'has_computes': self.cluster_type in ('cdw', 'altus', 'snowball'), # or any grouped engine connectors
+      'has_computes': self.cluster_type in ('cdw', 'altus', 'snowball'),  # or any grouped engine connectors
       'hue_config': {
         'enable_sharing': ENABLE_SHARING.get(),
         'collect_usage': COLLECT_USAGE.get()
@@ -1799,7 +1796,6 @@ class ClusterConfig(object):
       'img_version': img_version,
       'hue_version': version_of_hue
     }
-
 
   def get_apps(self):
     apps = OrderedDict([
@@ -1815,7 +1811,6 @@ class ClusterConfig(object):
     ])
 
     return apps
-
 
   def get_main_quick_action(self, apps):
     if not apps:
@@ -1853,7 +1848,6 @@ class ClusterConfig(object):
     else:
       return default_app
 
-
   def _get_home(self):
     return {
       'name': 'home',
@@ -1863,7 +1857,6 @@ class ClusterConfig(object):
       'page': '/home'
     }
 
-
   def displayName(self, dialect, name):
     if ENABLE_UNIFIED_ANALYTICS.get() and dialect == 'hive':
       return 'Unified Analytics'
@@ -1871,7 +1864,6 @@ class ClusterConfig(object):
       return 'HPL/SQL'
     else:
       return name
-
 
   def _get_editor(self):
     interpreters = []
@@ -1999,7 +1991,6 @@ class ClusterConfig(object):
       ]
     elif 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('hdfs', self.user):
       hdfs_connectors.append(_('Files'))
-
 
     remote_home_storage = get_remote_home_storage(self.user)
 
@@ -2163,7 +2154,6 @@ class ClusterConfig(object):
     else:
       return None
 
-
   def _get_scheduler(self):
     interpreters = []
 
@@ -2211,7 +2201,6 @@ class ClusterConfig(object):
     else:
       return None
 
-
   def _get_sdk_apps(self):
     current_app, other_apps, apps_list = _get_apps(self.user)
 
@@ -2248,9 +2237,9 @@ class Cluster(object):
     self.clusters = get_clusters(user)
 
     if IS_MULTICLUSTER_ONLY.get():
-      self.data = self.clusters['Altus'] # Backward compatibility
+      self.data = self.clusters['Altus']  # Backward compatibility
     else:
-      self.data = list(self.clusters.values())[0] # Next: CLUSTER_ID.get() or user persisted
+      self.data = list(self.clusters.values())[0]  # Next: CLUSTER_ID.get() or user persisted
 
   def get_type(self):
     return self.data['type']
@@ -2299,7 +2288,6 @@ def get_user_preferences(user, key=None):
     return dict((x.key, x.value) for x in UserPreferences.objects.filter(user=user))
 
 
-
 def set_user_preferences(user, key, value):
   try:
     x = UserPreferences.objects.get(user=user, key=key)
@@ -2322,17 +2310,17 @@ def get_data_link(meta):
     elif 'fam' in meta:
       link += '[%(fam)s]' % meta
   elif meta['type'] == 'hdfs':
-    link = '/filebrowser/view=%(path)s' % meta # Could add a byte #
+    link = '/filebrowser/view=%(path)s' % meta  # Could add a byte #
   elif meta['type'] == 'link':
     link = meta['link']
   elif meta['type'] == 'hive':
-    link = '/metastore/table/%(database)s/%(table)s' % meta # Could also add col=val
+    link = '/metastore/table/%(database)s/%(table)s' % meta  # Could also add col=val
 
   return link
 
 
 def _get_gist_document(uuid):
-  return Document2.objects.get(uuid=uuid, type='gist') # Workaround until there is a share to all permission
+  return Document2.objects.get(uuid=uuid, type='gist')  # Workaround until there is a share to all permission
 
 
 def __paginate(page, limit, queryset):

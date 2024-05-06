@@ -40,7 +40,7 @@ from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
-MAX_UPLOAD_SIZE = 100 * 1024 * 1024 # 100 MB
+MAX_UPLOAD_SIZE = 100 * 1024 * 1024  # 100 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored')]
 ZK_SOLR_CONFIG_NAMESPACE = 'configs'
@@ -196,7 +196,6 @@ class CollectionManagerController(object):
       # Delete instance directory if we couldn't create a collection.
       shutil.rmtree(instancedir)
       raise PopupException(_('Could not create collection. Check error logs for more info.'))
-
 
   def delete_collection(self, name, core):
     """

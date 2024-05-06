@@ -66,6 +66,7 @@ def get_oozie_job_count():
   '''Returns the maximum of jobs fetched by the API depending on the Hue version'''
   return 100
 
+
 OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',
   dynamic_default=get_oozie_job_count,
@@ -73,14 +74,14 @@ OOZIE_JOBS_COUNT = Config(
   help=_t('Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call.')
 )
 
-ENABLE_V2 = Config( # Until Hue 4
+ENABLE_V2 = Config(  # Until Hue 4
   key='enable_v2',
   default=True,
   type=coerce_bool,
   help=_t('Use version 2 of Editor.')
 )
 
-ENABLE_CRON_SCHEDULING = Config( # Until Hue 3.8
+ENABLE_CRON_SCHEDULING = Config(  # Until Hue 3.8
   key='enable_cron_scheduling',
   default=True,
   type=coerce_bool,

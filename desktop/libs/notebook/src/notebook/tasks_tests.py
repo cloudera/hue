@@ -34,14 +34,12 @@ from unittest.mock import patch, Mock, MagicMock
 LOG = logging.getLogger()
 
 
-
 @pytest.mark.django_db
 class TestRunAsyncQueryTask():
 
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_run_query_only(self):
     with patch('notebook.tasks._get_request') as _get_request:
@@ -70,7 +68,6 @@ class TestRunAsyncQueryTask():
 
               assert meta['row_counter'] == 2, meta
 
-
   def test_close_statement(self):
     with patch('notebook.tasks._get_request') as _get_request:
       with patch('notebook.tasks.download_to_file') as download_to_file:
@@ -93,7 +90,6 @@ class TestRunAsyncQueryTask():
 
             assert response == {'status': 0}
 
-
   def test_get_log(self):
     with patch('notebook.tasks._get_request') as _get_request:
       with patch('notebook.tasks.download_to_file') as download_to_file:
@@ -115,14 +111,12 @@ class TestRunAsyncQueryTask():
         assert response == ''
 
 
-
 @pytest.mark.django_db
 class TestRunSyncQueryTask():
 
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_run_query(self):
     snippet = {'type': 'mysql', 'statement_raw': 'SHOW TABLES', 'variables': []}

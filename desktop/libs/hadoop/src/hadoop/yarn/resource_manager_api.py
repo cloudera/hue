@@ -56,7 +56,7 @@ def get_resource_manager(username=None):
     finally:
       API_CACHE_LOCK.release()
 
-  API_CACHE.setuser(username) # Set the correct user
+  API_CACHE.setuser(username)  # Set the correct user
 
   return API_CACHE
 
@@ -68,7 +68,7 @@ class ResourceManagerApi(object):
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
     self._security_enabled = security_enabled
-    self._thread_local = threading.local() # To store user info
+    self._thread_local = threading.local()  # To store user info
     self.from_failover = False
 
     if self._security_enabled:
@@ -79,7 +79,7 @@ class ResourceManagerApi(object):
   def _get_params(self):
     params = {}
 
-    if self.username != DEFAULT_USER.get(): # We impersonate if needed
+    if self.username != DEFAULT_USER.get():  # We impersonate if needed
       params['doAs'] = self.username
       if not self.security_enabled:
         params['user.name'] = DEFAULT_USER.get()
@@ -96,7 +96,7 @@ class ResourceManagerApi(object):
 
   @property
   def user(self):
-    return self.username # Backward compatibility
+    return self.username  # Backward compatibility
 
   @property
   def username(self):

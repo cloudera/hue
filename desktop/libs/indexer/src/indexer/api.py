@@ -67,7 +67,7 @@ def parse_fields(request):
           result['data'] = []
 
           for field_result in field_results:
-            result['data'].append( (field_result[1], get_type_from_morphline_type(field_result[0])) )
+            result['data'].append((field_result[1], get_type_from_morphline_type(field_result[0])))
 
           result['status'] = 0
         else:
@@ -89,6 +89,7 @@ def parse_fields(request):
     result['message'] = _('Source type %s not supported.') % source_type
 
   return JsonResponse(result)
+
 
 def autocomplete(request):
   searcher = CollectionManagerController(request.user)
@@ -164,7 +165,7 @@ def collections_create(request):
         table = request.POST.get('table')
         columns = [field['name'] for field in collection.get('fields', [])]
 
-        searcher.update_data_from_hive(db, collection.get('name'), database, table, columns) # Not up to date
+        searcher.update_data_from_hive(db, collection.get('name'), database, table, columns)  # Not up to date
 
       response['status'] = 0
       response['message'] = _('Collection created!')
@@ -203,6 +204,7 @@ def collections_import(request):
     response['message'] = _('Collection missing.')
 
   return JsonResponse(response)
+
 
 # Deprecated
 def collections_remove(request):

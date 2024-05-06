@@ -144,6 +144,7 @@ def delete_indexes(request):
 
   return JsonResponse(response)
 
+
 @require_POST
 @api_error_handler
 def index(request):
@@ -157,6 +158,7 @@ def index(request):
   response['message'] = _('Data added')
 
   return JsonResponse(response)
+
 
 @require_POST
 @api_error_handler

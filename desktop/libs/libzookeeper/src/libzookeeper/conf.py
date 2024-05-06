@@ -53,14 +53,14 @@ def zkensemble():
   return "localhost:2181"
 
 
-ENSEMBLE=Config(
+ENSEMBLE = Config(
     "ensemble",
     help="ZooKeeper ensemble. Comma separated list of Host/Port, e.g. localhost:2181,localhost:2182,localhost:2183",
     dynamic_default=zkensemble,
     type=coerce_string,
 )
 
-PRINCIPAL_NAME=Config(
+PRINCIPAL_NAME = Config(
     "principal_name",
     help="Name of Kerberos principal when using security",
     default="zookeeper",

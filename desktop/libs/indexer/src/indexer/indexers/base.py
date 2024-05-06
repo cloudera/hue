@@ -49,7 +49,6 @@ class Base():
   def index(self, source, destination, options=None): pass
 
 
-
 class IndexerApiException(Exception):
   def __init__(self, message=None):
     self.message = message or _('No error message, please check the logs.')

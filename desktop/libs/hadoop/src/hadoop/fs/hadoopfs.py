@@ -55,10 +55,10 @@ LOG = logging.getLogger()
 DEFAULT_USER = "webui"
 
 # The number of bytes to read if not specified
-DEFAULT_READ_SIZE = 1024*1024 # 1MB
+DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 
 # The buffer size of the pipe to hdfs -put during upload
-WRITE_BUFFER_SIZE = 128*1024 # 128K
+WRITE_BUFFER_SIZE = 128 * 1024  # 128K
 
 # Class that we translate into PermissionDeniedException
 HADOOP_ACCESSCONTROLEXCEPTION = "org.apache.hadoop.security.AccessControlException"
@@ -74,9 +74,11 @@ HDFS_ENCODING = 'utf-8'
 textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7f})
 is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
 
+
 def encode_fs_path(path):
   """encode_fs_path(path) -> byte string in utf8"""
   return smart_str(path, HDFS_ENCODING, errors='strict')
+
 
 def decode_fs_path(path):
   """decode_fs_path(bytestring) -> unicode path"""
@@ -154,7 +156,7 @@ class Hdfs(object):
     if schema not in ('hdfs', 'viewfs'):
       # Default to standard for non-hdfs
       return lib_urlsplit(url)
-    url = url[i+3:]
+    url = url[i + 3:]
     i = url.find('/')
     if i == -1:
       # Everything is netloc. Assume path is root.
@@ -289,7 +291,6 @@ class Hdfs(object):
     else:
       LOG.info(_('Skipping %s (not a file).') % local_src)
 
-
   @_coerce_exceptions
   def mktemp(self, subdir='', prefix='tmp', basedir=None):
     """
@@ -344,9 +345,6 @@ class Hdfs(object):
     raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'listdir_stats'})
 
 
-
-
-
 def require_open(func):
   """
   Decorator that ensures that the file instance isn't closed when the
@@ -357,8 +355,6 @@ def require_open(func):
       raise IOError(errno.EBADF, "I/O operation on closed file")
     return func(self, *args, **kwargs)
   return wrapper
-
-
 
 
 class File(object):
@@ -372,7 +368,7 @@ class File(object):
     self._block_cache = BlockCache()
 
     if buffering or mode != "r":
-      raise Exception("buffering and write support not yet implemented") # NYI
+      raise Exception("buffering and write support not yet implemented")  # NYI
 
     stat = self._stat()
 
@@ -380,7 +376,7 @@ class File(object):
       raise IOError(errno.ENOENT, "No such file or directory: '%s'" % path)
     if stat.isDir:
       raise IOError(errno.EISDIR, "Is a directory: '%s'" % path)
-    #TODO(todd) somehow we need to check permissions here - maybe we need an access() call?
+    # TODO(todd) somehow we need to check permissions here - maybe we need an access() call?
 
   # Minimal context manager implementation.
   # See: http://www.python.org/doc/2.5.2/lib/typecontextmanager.html
@@ -389,7 +385,7 @@ class File(object):
 
   def __exit__(self, exc_type, exc_val, exc_tb):
     self.close()
-    return False # don't supress exceptions.
+    return False  # don't supress exceptions.
 
   @require_open
   def seek(self, offset, whence=0):
@@ -407,7 +403,6 @@ class File(object):
   def tell(self):
     return self.pos
 
-
   def _get_block(self, pos):
     """Return the Block instance that contains the given offset"""
     cached_block = self._block_cache.find_block(pos)
@@ -415,7 +410,7 @@ class File(object):
       return cached_block
 
     # Cache "miss" - fetch ahead 500MB worth of blocks
-    new_blocks = self.fs._get_blocks(self.path, pos, 500*1024*1024)
+    new_blocks = self.fs._get_blocks(self.path, pos, 500 * 1024 * 1024)
     self._block_cache.insert_new_blocks(new_blocks)
     result = self._block_cache.find_block(pos)
     if not result:
@@ -457,7 +452,7 @@ class File(object):
     read_so_far = 0
     while read_so_far < length:
       this_data = self._read_in_block(length - read_so_far)
-      if this_data == "": # eof
+      if this_data == "":  # eof
         break
       read_so_far += len(this_data)
       result.append(this_data)
@@ -509,6 +504,7 @@ class FileUpload(object):
                                    close_fds=True,
                                    env=self.subprocess_env,
                                    bufsize=WRITE_BUFFER_SIZE)
+
   @require_open
   def write(self, data):
     """May raise IOError, particularly EPIPE"""

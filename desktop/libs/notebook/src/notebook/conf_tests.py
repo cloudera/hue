@@ -56,7 +56,6 @@ class TestInterpreterConfig(TestCase):
     for reset in cls._class_resets:
       reset()
 
-
   def test_get_ordered_interpreters(self):
     with patch('desktop.lib.connectors.api._get_installed_connectors') as _get_installed_connectors:
       _get_installed_connectors.return_value = [{
@@ -124,7 +123,6 @@ class TestCheckConfig():
         warnings = config_validator(user=self.user)
 
         assert not warnings, warnings
-
 
         _excute_test_query.side_effect = Exception('')
 

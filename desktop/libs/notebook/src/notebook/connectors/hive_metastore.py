@@ -69,11 +69,9 @@ class HiveMetastoreApi(Api):
 
     return _autocomplete(db, database, table, column, nested, query=None, cluster=self.cluster)
 
-
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     return []
-
 
   def _get_db(self, snippet, is_async=False, cluster=None):
     return dbms.get(self.user, query_server=get_query_server_config(name='hms', cluster=cluster))

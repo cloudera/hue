@@ -39,7 +39,6 @@ class TestInstallExamples():
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=True, is_admin=True)
     self.user = User.objects.get(username="test")
 
-
   def test_install_via_insert_mysql(self):
     with patch('notebook.views.Connector.objects') as ConnectorObjects:
       with patch('notebook.views.get_interpreter') as get_interpreter:
@@ -75,7 +74,6 @@ class TestInstallExamples():
             assert '' == data['errorMessage'], data
 
             make_notebook.assert_called()
-
 
   def test_install_via_load_hive(self):
     with patch('notebook.views.Connector.objects') as ConnectorObjects:
@@ -127,7 +125,6 @@ class TestInstallExamples():
                 make_notebook.assert_called()
 
                 fs.do_as_user.assert_called()
-
 
   def test_install_via_insert_hive(self):
     with patch('notebook.views.Connector.objects') as ConnectorObjects:

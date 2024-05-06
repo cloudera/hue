@@ -43,7 +43,7 @@ if ENABLE_NEW_INDEXER.get():
     re_path(r'^$', indexer_views.indexes, name='indexes'),
     re_path(r'^indexes/?$', indexer_views.indexes, name='indexes'),
     re_path(r'^indexes/(?P<index>[^/]+)/?$', indexer_views.indexes, name='indexes'),
-    re_path(r'^collections$', indexer_views.collections, name='collections'), # Old page
+    re_path(r'^collections$', indexer_views.collections, name='collections'),  # Old page
   ]
 else:
   urlpatterns += [
@@ -78,7 +78,7 @@ urlpatterns += [
 
   re_path(r'^api/importer/submit', indexer_api3.importer_submit, name='importer_submit'),
   re_path(r'^api/importer/save/?$', indexer_api3.save_pipeline, name='save_pipeline'),
-  
+
   re_path(r'^api/indexer/upload_local_file/?$', indexer_api3.upload_local_file, name='upload_local_file'),
   re_path(r'^api/indexer/upload_local_file_drag_and_drop/?$', indexer_api3.upload_local_file_drag_and_drop, name='upload_local_file_drag_and_drop'),
 ]

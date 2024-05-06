@@ -29,6 +29,7 @@ from useradmin.models import User
 
 from unittest.mock import patch, Mock
 
+
 @pytest.mark.django_db
 class TestApi(object):
 
@@ -80,7 +81,7 @@ class TestApi(object):
       assert 200 == response.status_code
       chat_postMessage.assert_called_with(channel='channel-1', text='@api_user: message with link', blocks=None, thread_ts=None)
       assert data.get('ok')
-  
+
   def test_generate_slack_install_link(self):
     response = self.client.get(reverse('api:botserver.api.slack_install_link') + '/?hostname=' + self.hostname)
     data = json.loads(response.content)

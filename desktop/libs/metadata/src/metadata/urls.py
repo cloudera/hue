@@ -75,7 +75,7 @@ urlpatterns += [
   re_path(r'^api/optimizer/upload/table_stats/?$', metadata_optimizer_api.upload_table_stats, name='upload_table_stats'),
   re_path(r'^api/optimizer/upload/status/?$', metadata_optimizer_api.upload_status, name='upload_status'),
 
-  #v2
+  # v2
   re_path(r'^api/optimizer/get_tenant/?$', metadata_optimizer_api.get_tenant, name='get_tenant'),
 
   re_path(r'^api/optimizer/top_databases/?$', metadata_optimizer_api.top_databases, name='top_databases'),

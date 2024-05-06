@@ -37,6 +37,7 @@ __all__ = ['get_submissions', 'submissions']
 
 LOG = logging.getLogger()
 
+
 @never_cache
 def get_submissions(request):
   response = {
@@ -52,6 +53,7 @@ def get_submissions(request):
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not get submissions.')))
   return JsonResponse(response)
+
 
 @never_cache
 def submissions(request):

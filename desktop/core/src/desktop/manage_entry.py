@@ -28,6 +28,7 @@ import subprocess
 
 LOG = logging.getLogger()
 
+
 def _deprecation_check(arg0):
   """HUE-71. Deprecate build/env/bin/desktop"""
   if os.path.basename(arg0) == 'desktop':
@@ -35,6 +36,7 @@ def _deprecation_check(arg0):
     msg = "Warning: '%s' has been deprecated. Please use '%s' instead." % (arg0, to_use)
     print(msg, file=sys.stderr)
     LOG.warning(msg)
+
 
 def reload_with_cm_env(cm_managed):
   try:
@@ -51,6 +53,7 @@ def reload_with_cm_env(cm_managed):
       except Exception as exc:
         print('Failed re-exec: %s' % exc)
         sys.exit(1)
+
 
 def entry():
   _deprecation_check(sys.argv[0])
@@ -92,7 +95,7 @@ def entry():
 
   if len(sys.argv) > 1:
     prof_id = subcommand = sys.argv[1]
-    #Check if this is a CM managed cluster
+    # Check if this is a CM managed cluster
     if os.path.isfile(cm_config_file) and not cm_managed and not skip_reload:
       print("ALERT: This appears to be a CM Managed environment")
       print("ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment")
@@ -112,7 +115,7 @@ def entry():
       cm_agent_run_dir = '/var/run/cloudera-scm-agent'
       pass
 
-    #Parse CM supervisor include file for Hue and set env vars
+    # Parse CM supervisor include file for Hue and set env vars
     cm_supervisor_dir = cm_agent_run_dir + '/supervisor/include'
     cm_process_dir = cm_agent_run_dir + '/process'
     hue_env_conf = None
@@ -165,7 +168,7 @@ def entry():
           envval = envval.replace("'", "").rstrip()
           os.environ[envkey] = envval
 
-    #Set JAVA_HOME
+    # Set JAVA_HOME
     if "JAVA_HOME" not in list(os.environ.keys()):
       if os.path.isfile('/usr/lib64/cmf/service/common/cloudera-config.sh'):
         locate_java = subprocess.Popen(
@@ -195,7 +198,7 @@ def entry():
         print("  export JAVA_HOME=<java_home>")
         sys.exit(1)
 
-    #Make sure we set Oracle Client if configured
+    # Make sure we set Oracle Client if configured
     if "LD_LIBRARY_PATH" not in list(os.environ.keys()):
       if "SCM_DEFINES_SCRIPTS" in list(os.environ.keys()):
         for scm_script in os.environ["SCM_DEFINES_SCRIPTS"].split(":"):
@@ -227,7 +230,7 @@ def entry():
       execute_from_command_line(sys.argv)
   except ImproperlyConfigured as e:
     if len(sys.argv) > 1 and sys.argv[1] == 'is_db_alive' and 'oracle' in str(e).lower():
-      print(e, file=sys.stderr) # Oracle connector is improperly configured
+      print(e, file=sys.stderr)  # Oracle connector is improperly configured
       sys.exit(10)
     else:
       raise e
@@ -235,6 +238,7 @@ def entry():
     if "altscript.sh" in str(e).lower():
       print("%s" % e)
       print("HUE_CONF_DIR seems to be set to CM location and '--cm-managed' flag not used")
+
 
 def _profile(prof_id, func):
   """

@@ -68,7 +68,8 @@ if ENABLE_ORGANIZATIONS.get():
 else:
   from django.contrib.auth.models import User, Group
   def get_organization(): pass
-  class Organization(): pass
+  class Organization():
+    pass
 
   monkey_patch_username_validator()
 
@@ -164,8 +165,10 @@ def get_profile(user):
     user._cached_userman_profile = profile
     return profile
 
+
 def group_has_permission(group, perm):
   return GroupPermission.objects.filter(group=group, hue_permission=perm).exists()
+
 
 def group_permissions(group):
   return HuePermission.objects.filter(grouppermission__group=group).all()

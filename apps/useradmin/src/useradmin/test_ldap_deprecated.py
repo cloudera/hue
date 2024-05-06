@@ -89,7 +89,6 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
     finally:
       settings.MIDDLEWARE.remove('useradmin.middleware.LdapSynchronizationMiddleware')
 
-
   def test_useradmin_ldap_suboordinate_group_integration(self):
     reset = []
 
@@ -157,7 +156,6 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
     finally:
       for finish in reset:
         finish()
-
 
   def test_useradmin_ldap_nested_group_integration(self):
     reset = []
@@ -248,7 +246,6 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       for finish in reset:
         finish()
 
-
   def test_useradmin_ldap_suboordinate_posix_group_integration(self):
     reset = []
 
@@ -316,7 +313,6 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
     finally:
       for finish in reset:
         finish()
-
 
   def test_useradmin_ldap_nested_posix_group_integration(self):
     reset = []
@@ -398,7 +394,6 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       for finish in reset:
         finish()
 
-
   def test_useradmin_ldap_user_integration(self):
     done = []
     try:
@@ -447,7 +442,6 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       for finish in done:
         finish()
 
-
   @pytest.mark.integration
   def test_useradmin_ldap_case_sensitivity(self):
     if is_live_cluster():
@@ -484,7 +478,6 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       for finish in done:
         finish()
 
-
   def test_add_ldap_users(self):
     done = []
     try:
@@ -519,11 +512,11 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       assert b"Could not get LDAP details for users in pattern" in response.content, response
 
       # Removing this test because we are not running log listener
-      #response = c.get(reverse(desktop.views.log_view))
-      #whitespaces_message = "{username}: Username must not contain whitespaces".format(username='user with space')
-      #if not isinstance(whitespaces_message, bytes):
+      # response = c.get(reverse(desktop.views.log_view))
+      # whitespaces_message = "{username}: Username must not contain whitespaces".format(username='user with space')
+      # if not isinstance(whitespaces_message, bytes):
       #  whitespaces_message = whitespaces_message.encode('utf-8')
-      #assert_true(whitespaces_message in response.content, response.content)
+      # assert_true(whitespaces_message in response.content, response.content)
 
       # Test dn with spaces in dn, but not username (should succeed)
       response = c.post(
@@ -534,7 +527,6 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
     finally:
       for finish in done:
         finish()
-
 
   @pytest.mark.integration
   def test_add_ldap_users_case_sensitivity(self):
@@ -578,13 +570,11 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       for finish in done:
         finish()
 
-
   def test_add_ldap_groups(self):
     URL = reverse('useradmin:useradmin.views.add_ldap_groups')
 
     # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
     ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
-
 
     c = make_logged_in_client(username='test', is_superuser=True)
 
@@ -632,6 +622,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
         reverse('useradmin:useradmin.views.add_ldap_users'), dict(username_pattern='moe', password1='test', password2='test'), follow=True
       )
       assert b'There was an error when communicating with LDAP' in response.content, response
+
 
 @pytest.mark.django_db
 @pytest.mark.requires_hadoop

@@ -118,7 +118,7 @@ def check_editor_access_permission(view_func):
   return wraps(view_func)(decorate)
 
 
-## Oozie v1 below
+# Oozie v1 below
 
 
 def check_job_access_permission(exception_class=PopupException):

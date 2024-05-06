@@ -156,7 +156,7 @@ def guess_format(request):
     })
     _convert_format(format_)
 
-    if file_format["path"][-3:] == 'xls' or file_format["path"][-4:] == 'xlsx': 
+    if file_format["path"][-3:] == 'xls' or file_format["path"][-4:] == 'xlsx':
       format_ = {
           "quoteChar": "\"",
           "recordSeparator": '\\n',
@@ -188,7 +188,7 @@ def guess_format(request):
         "fieldSeparator": storage.get('field.delim', ',')
       }
     elif table_metadata.details['properties']['format'] == 'parquet':
-      format_ = {"type": "parquet", "hasHeader": False,}
+      format_ = {"type": "parquet", "hasHeader": False, }
     else:
       raise PopupException('Hive table format %s is not supported.' % table_metadata.details['properties']['format'])
   elif file_format['inputFormat'] == 'query':
@@ -242,9 +242,11 @@ def guess_format(request):
   format_['status'] = 0
   return JsonResponse(format_)
 
+
 def decode_utf8(input_iterator):
-  for l in input_iterator:
-    yield l.decode('utf-8')
+  for line in input_iterator:
+    yield line.decode('utf-8')
+
 
 def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
@@ -262,7 +264,7 @@ def guess_field_types(request):
         column_row = [re.sub('[^0-9a-zA-Z]+', '_', col) for col in csv_data[0]]
       else:
         sample = csv_data[:4]
-        column_row = ['field_' + str(count+1) for count, col in enumerate(sample[0])]
+        column_row = ['field_' + str(count + 1) for count, col in enumerate(sample[0])]
 
       field_type_guesses = []
       for count, col in enumerate(column_row):
@@ -646,7 +648,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
       )
       # TODO if rows == MAX_ROWS truncation warning
     elif source['inputFormat'] == 'manual':
-      pass # No need to do anything
+      pass  # No need to do anything
     else:
       response = client.index(name=index_name, data=data, **kwargs)
       errors = [error.get('message', '') for error in response['responseHeader'].get('errors', [])]
@@ -678,7 +680,7 @@ def _large_indexing(request, file_format, collection_name, query=None, start_tim
 
   client = SolrClient(user=request.user)
 
-  if not client.exists(collection_name) and not request.POST.get('show_command'): # if destination['isTargetExisting']:
+  if not client.exists(collection_name) and not request.POST.get('show_command'):  # if destination['isTargetExisting']:
     client.create_index(
       name=collection_name,
       fields=request.POST.get('fields', schema_fields),
@@ -773,12 +775,12 @@ def upload_local_file(request):
       read_file = pd.read_excel(upload_file)
     else:
       read_file = pd.read_excel(upload_file, engine='xlrd')
-  
+
     temp_file = tempfile.NamedTemporaryFile(mode='w', prefix=filename, suffix='.csv', delete=False)
     read_file.to_csv(temp_file, index=False)
     file_type = 'excel'
 
-  else: 
+  else:
     temp_file = tempfile.NamedTemporaryFile(prefix=filename, suffix='.csv', delete=False)
     temp_file.write(upload_file.read())
 

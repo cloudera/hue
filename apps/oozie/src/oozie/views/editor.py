@@ -342,7 +342,6 @@ def clone_workflow(request, workflow):
   return JsonResponse(response)
 
 
-
 @check_job_access_permission()
 def submit_workflow(request, workflow):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
@@ -560,7 +559,7 @@ def create_coordinator_dataset(request, coordinator):
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}) + "#listDataset"
       request.info(_('Dataset created'))
   else:
-    ## Bad
+    # Bad
     response['data'] = _('A POST request is required.')
 
   if response['status'] != 0:
@@ -627,7 +626,7 @@ def create_coordinator_data(request, coordinator, data_type):
       data_form.save()
       response['status'] = 0
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id})
-      request.info(_('Coordinator data created'));
+      request.info(_('Coordinator data created'))
     else:
       response['data'] = data_form.errors
   else:
@@ -714,7 +713,6 @@ def create_bundle(request):
     'bundle': bundle,
     'bundle_form': bundle_form,
   })
-
 
 
 def delete_bundle(request):
@@ -826,7 +824,7 @@ def get_create_bundled_coordinator_html(request, bundle, bundled_coordinator_for
 @check_job_access_permission()
 @check_job_edition_permission(True)
 def edit_bundled_coordinator(request, bundle, bundled_coordinator):
-  bundled_coordinator_instance = BundledCoordinator.objects.get(id=bundled_coordinator) # todo secu
+  bundled_coordinator_instance = BundledCoordinator.objects.get(id=bundled_coordinator)  # todo secu
 
   response = {'status': -1, 'data': 'None'}
 

@@ -27,7 +27,6 @@ from urllib.parse import unquote as urllib_unquote
 from unittest.mock import patch, Mock
 
 
-
 def test_xlsx_local_file_upload():
 
   csv_file = '''test 1,test.2,test_3,test_4

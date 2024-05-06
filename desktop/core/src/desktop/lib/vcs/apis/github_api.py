@@ -71,7 +71,7 @@ class GithubApi(Api):
       request.session['github_callback_fetch'] = request.GET.get('fetchURL')
       response = {
         'status': -1,
-        'auth_url':auth_url
+        'auth_url': auth_url
       }
       if is_ajax(request):
         return JsonResponse(response)

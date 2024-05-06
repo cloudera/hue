@@ -23,9 +23,10 @@ from useradmin.models import User
 
 from unittest.mock import patch, Mock
 
+
 @pytest.mark.django_db
 class TestLdapBackend():
-    
+
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))

@@ -47,7 +47,7 @@ class Command(BaseCommand):
         default=False
     )
     parser.add_argument("--sync-users", help=_t("Sync users in the group."), action="store_true", default=False)
-    parser.add_argument("--server", help=_t("Server to connect to."), action="store",  default=None)
+    parser.add_argument("--server", help=_t("Server to connect to."), action="store", default=None)
 
   def handle(self, group=None, **options):
     if group is None:

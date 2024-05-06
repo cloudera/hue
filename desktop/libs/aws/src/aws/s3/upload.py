@@ -47,6 +47,7 @@ LOG = logging.getLogger()
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.utils import generate_chunks, calculate_total_size
 
+
 class S3FineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
     self._mp = None
@@ -56,7 +57,7 @@ class S3FineUploaderChunkedUpload(object):
     self.totalfilesize = kwargs.get('qqtotalfilesize')
     self.file_name = kwargs.get('qqfilename')
     if self.file_name:
-      self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+      self.file_name = unicodedata.normalize('NFC', self.file_name)  # Normalize unicode
     self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
     self._fs = get_client(fs='s3a', user=self._request.user.username)
     self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
@@ -159,7 +160,6 @@ class S3FileUploadHandler(FileUploadHandler):
       self._fs._stats(self.destination)
       self._bucket = self._fs._get_bucket(self.bucket_name)
 
-
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_s3_upload():
       super(S3FileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
@@ -180,7 +180,6 @@ class S3FileUploadHandler(FileUploadHandler):
         self.request.META['upload_failed'] = e
         raise StopUpload()
 
-
   def receive_data_chunk(self, raw_data, start):
     if self._is_s3_upload():
       try:
@@ -196,7 +195,6 @@ class S3FileUploadHandler(FileUploadHandler):
     else:
       return raw_data
 
-
   def file_complete(self, file_size):
     if self._is_s3_upload():
       # Finish the upload
@@ -207,7 +205,6 @@ class S3FileUploadHandler(FileUploadHandler):
     else:
       return None
 
-
   def _get_s3fs(self, request):
     # Pre 6.0 request.fs did not exist, now it does. The logic for assigning request.fs is not correct for FileUploadHandler.
     fs = get_client(user=request.user.username)
@@ -217,15 +214,12 @@ class S3FileUploadHandler(FileUploadHandler):
 
     return fs
 
-
   def _is_s3_upload(self):
     return self._get_scheme() and self._get_scheme().startswith('S3')
-
 
   def _check_access(self):
     if not self._fs.check_access(self.destination, permission='WRITE'):
       raise S3FileSystemException('Insufficient permissions to write to S3 path "%s".' % self.destination)
-
 
   def _get_scheme(self):
     if self.destination:
@@ -236,7 +230,6 @@ class S3FileUploadHandler(FileUploadHandler):
         raise S3FileSystemException('Destination does not start with a valid scheme.')
     else:
       return None
-
 
   def _get_file_part(self, raw_data):
     fp = stream_io()

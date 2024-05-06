@@ -20,7 +20,7 @@ import sys
 from security import views as security_views
 from security.api import hdfs as security_api_hdfs
 from security.api import hive as security_api_hive
-from security.api import sentry as security_api_sentry 
+from security.api import sentry as security_api_sentry
 
 from django.urls import re_path
 

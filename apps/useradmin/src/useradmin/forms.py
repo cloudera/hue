@@ -45,9 +45,11 @@ def get_server_choices():
   else:
     return []
 
+
 def validate_dn(dn):
   if not dn:
     raise ValidationError(_('Full Distinguished Name required.'))
+
 
 def validate_username(username_pattern):
   validator = re.compile(r"^%s$" % get_username_re_rule())
@@ -59,6 +61,7 @@ def validate_username(username_pattern):
   if not validator.match(username_pattern):
     raise ValidationError(_("Username must not contain whitespaces and ':'"))
 
+
 def validate_groupname(groupname_pattern):
   validator = re.compile(r"^%s$" % get_groupname_re_rule())
 
@@ -69,9 +72,11 @@ def validate_groupname(groupname_pattern):
   if not validator.match(groupname_pattern):
     raise ValidationError(_("Group name can be any character as long as it's 80 characters or fewer."))
 
+
 def validate_first_name(first_name):
   if first_name and len(first_name) > 30:
     raise ValidationError(_('first_name must be fewer than 30 characters.'))
+
 
 def validate_last_name(last_name):
   if last_name and len(last_name) > 30:
@@ -88,9 +93,9 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   username = forms.RegexField(
       label=_t("Username"),
       max_length=30,
-      regex='^%s$' % (get_username_re_rule(),), # Could use UnicodeUsernameValidator()
-      help_text = _t("Required. 30 characters or fewer. No whitespaces or colons."),
-      error_messages = {'invalid': _t("Whitespaces and ':' not allowed") })
+      regex='^%s$' % (get_username_re_rule(),),  # Could use UnicodeUsernameValidator()
+      help_text=_t("Required. 30 characters or fewer. No whitespaces or colons."),
+      error_messages={'invalid': _t("Whitespaces and ':' not allowed")})
 
   password1 = forms.CharField(
       label=_t("New Password"),
@@ -129,7 +134,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   )
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
-    model =  User
+    model = User
     fields = ["username", "first_name", "last_name", "email", "ensure_home_directory"]
 
   def __init__(self, *args, **kwargs):
@@ -205,6 +210,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       self.save_m2m()
     return user
 
+
 if ENABLE_ORGANIZATIONS.get():
   class OrganizationUserChangeForm(UserChangeForm):
     username = None
@@ -214,10 +220,10 @@ if ENABLE_ORGANIZATIONS.get():
     )
 
     class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
-      model =  User
+      model = User
       fields = ["first_name", "last_name", "email", "ensure_home_directory"]
       if ENABLE_ORGANIZATIONS.get():
-        fields.append('organization') # Because of import logic
+        fields.append('organization')  # Because of import logic
 
     def __init__(self, *args, **kwargs):
       super(OrganizationUserChangeForm, self).__init__(*args, **kwargs)
@@ -264,10 +270,10 @@ if ENABLE_ORGANIZATIONS.get():
     )
 
     class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
-      model =  User
+      model = User
       fields = ["first_name", "last_name", "email", "ensure_home_directory"]
       if ENABLE_ORGANIZATIONS.get():
-        fields.append('organization') # Because of import logic
+        fields.append('organization')  # Because of import logic
 
     def __init__(self, *args, **kwargs):
       super(OrganizationUserChangeForm, self).__init__(*args, **kwargs)

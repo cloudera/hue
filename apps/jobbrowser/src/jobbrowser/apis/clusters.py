@@ -42,11 +42,10 @@ class ClusterApi(Api):
     super(ClusterApi, self).__init__(user)
 
     self.version = version
-    self.api = DataWarehouse2Api(self.user) 
-
+    self.api = DataWarehouse2Api(self.user)
 
   def apps(self, filters):
-    #jobs = self.api.list_clusters()
+    # jobs = self.api.list_clusters()
 
     return {
       u'status': 0,
@@ -74,7 +73,6 @@ class ClusterApi(Api):
       } for app in sorted(jobs['clusters'], key=lambda a: a['creationDate'], reverse=True)],
       'total': len(jobs['clusters'])
     }
-
 
   def app(self, appid):
     handle = self.api.describe_cluster(cluster_id=appid)
@@ -113,20 +111,18 @@ class ClusterApi(Api):
         elif result.get('contents') and message.get('status') != -1:
           message['message'] = result.get('contents')
 
-    return message;
-
+    return message
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
-
 
   def profile(self, appid, app_type, app_property):
     return {}
 
   def _api_status(self, status):
-    if status in ['CREATING', 'CREATED', 'ONLINE', 'SCALING_UP', 'SCALING_DOWN', 'STARTING']: # ONLINE ... are from K8s
+    if status in ['CREATING', 'CREATED', 'ONLINE', 'SCALING_UP', 'SCALING_DOWN', 'STARTING']:  # ONLINE ... are from K8s
       return 'RUNNING'
     elif status in ['ARCHIVING', 'COMPLETED', 'TERMINATING', 'STOPPED']:
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # KILLED and FAILED
+      return 'FAILED'  # KILLED and FAILED

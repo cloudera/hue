@@ -32,7 +32,6 @@ from zipfile import ZipFile
 from django.utils.translation import gettext as _
 
 
-
 __all__ = ['archive_factory']
 
 
@@ -62,6 +61,7 @@ class Archive(object):
       except OSError:
         pass
 
+
 class ZipArchive(Archive):
   """
   Acts on a zip file in memory or in a temporary location.
@@ -70,7 +70,7 @@ class ZipArchive(Archive):
 
   def __init__(self, file):
     self.file = isinstance(file, basestring) and file
-    
+
     self.zfh = ZipFile(self.file)
 
   def extract(self):
@@ -242,6 +242,7 @@ def archive_factory(path, archive_type='zip'):
     return TarballArchive(path)
   elif archive_type == 'bz2' or archive_type == 'bzip2':
     return BZ2Archive(path)
+
 
 class IllegalPathException(PopupException):
 

@@ -40,7 +40,7 @@ LOG = logging.getLogger()
 
 JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
                'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')
-BOOLEAN_FIELDS = ('propagate_configuration','capture_output')
+BOOLEAN_FIELDS = ('propagate_configuration', 'capture_output')
 NUMBER_FIELDS_OR_NULL = ('sub_workflow',)
 GMT_TIME_FORMAT = "%Y-%m-%dT%H:%MGMT%z"
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
@@ -134,9 +134,11 @@ def smart_path(path, mapping=None, is_coordinator=False):
 
   return path
 
+
 def contains_symlink(path, mapping):
   vars = find_variables(path)
   return any([var in mapping and '#' in mapping[var] for var in vars]) or '#' in path
+
 
 def utc_datetime_format(utc_time):
   if utc_time and type(utc_time) is datetime:
@@ -180,6 +182,7 @@ def oozie_to_hue_frequency(frequency_string):
     return matches.group('frequency_unit'), matches.group('frequency_number')
   else:
     raise InvalidFrequency(_('invalid frequency: %s') % frequency_string)
+
 
 def convert_to_server_timezone(date, local_tz='UTC', server_tz=None, user=DEFAULT_USER):
   api = get_oozie(user)

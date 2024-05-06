@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -51,7 +51,6 @@ class TestApi(object):
   def teardown_class(cls):
     for reset in cls._class_resets:
       reset()
-
 
   def test_install_connector_examples(self):
 

@@ -31,11 +31,12 @@ def my_dynamic_default():
   """
   return 3 + 4
 
+
 class TestConfig(object):
   """Unit tests for the configuration module."""
 
   # Some test configurations to load
-  CONF_ONE="""
+  CONF_ONE = """
   foo = 123
   list=a,b,c
   """
@@ -56,33 +57,33 @@ class TestConfig(object):
     logging.basicConfig(level=logging.DEBUG)
     cls.conf = ConfigSection(
       members=dict(
-        FOO           = Config("foo",
+        FOO=Config("foo",
                                help="A vanilla configuration param",
                                type=int),
-        BAR           = Config("bar", default=456,
+        BAR=Config("bar", default=456,
                                help="Config with default",
                                type=int),
-        REQ           = Config("req", required=True,
+        REQ=Config("req", required=True,
                                help="A required config",
                                type=int),
-        OPT_NOT_THERE = Config("blahblah"),
-        REQ_NOT_THERE = Config("blah", required=True, help="Another required"),
-        PRIVATE_CONFIG= Config("dontseeme",private=True),
-        DYNAMIC_DEF   = Config("dynamic_default", dynamic_default=my_dynamic_default,
+        OPT_NOT_THERE=Config("blahblah"),
+        REQ_NOT_THERE=Config("blah", required=True, help="Another required"),
+        PRIVATE_CONFIG=Config("dontseeme", private=True),
+        DYNAMIC_DEF=Config("dynamic_default", dynamic_default=my_dynamic_default,
                                type=int),
-        SOME_SECTION  = ConfigSection(
+        SOME_SECTION=ConfigSection(
           "some_section",
           private=True,
-          members=dict(BAZ = Config("baz", default="baz_default"))),
-        LIST          = Config("list", type=list),
-        CLUSTERS      = UnspecifiedConfigSection(
+          members=dict(BAZ=Config("baz", default="baz_default"))),
+        LIST=Config("list", type=list),
+        CLUSTERS=UnspecifiedConfigSection(
           "clusters",
           help="Details about your Hadoop cluster(s)",
           each=ConfigSection(
             help="Details about a cluster - one section for each.",
-            members=dict(HOST = Config("host", help="Hostname for the NN",
+            members=dict(HOST=Config("host", help="Hostname for the NN",
                                        required=True),
-                         PORT = Config("port", help="Thrift port for the NN",
+                         PORT=Config("port", help="Thrift port for the NN",
                                        type=int, default=10090))))))
     cls.conf = cls.conf.bind(
       load_confs([configobj.ConfigObj(infile=string_io(cls.CONF_ONE)),
@@ -112,7 +113,7 @@ class TestConfig(object):
       self.conf.REQ_NOT_THERE.get()
 
   def test_list_values(self):
-    assert ["a","b","c"] == self.conf.LIST.get()
+    assert ["a", "b", "c"] == self.conf.LIST.get()
 
   def test_sections(self):
     assert 2 == len(self.conf.CLUSTERS)
@@ -173,7 +174,6 @@ class TestConfig(object):
       close()
     assert "baz_default" == self.conf.SOME_SECTION.BAZ.get()
 
-
   def test_coerce_bool(self):
     assert False == coerce_bool(False)
     assert False == coerce_bool("FaLsE")
@@ -190,7 +190,7 @@ class TestConfig(object):
     out = string_io()
     self.conf.print_help(out=out, skip_header=True)
     out = out.getvalue().strip()
-    assert not "dontseeme" in out
+    assert "dontseeme" not in out
     assert re.sub("^    (?m)", "", """
     Key: bar (optional)
       Default: 456

@@ -45,7 +45,6 @@ class OptimizerRestClient(OptimizerClient):
 
     self._api = MockApiLib()
 
-
   def _call(self, path, data):
     try:
       return self._root.post(path, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)

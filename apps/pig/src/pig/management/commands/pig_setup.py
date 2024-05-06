@@ -99,7 +99,6 @@ STORE upper_case INTO '$output';
 
     return doc2
 
-
   def handle(self, *args, **options):
     fs = cluster.get_hdfs()
     create_directories(fs, [REMOTE_SAMPLE_DIR.get()])

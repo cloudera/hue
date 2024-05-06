@@ -78,4 +78,4 @@ def is_password_policy_enabled():
 
 
 def get_password_hint():
-  return  get_password_policy().password_hint
+  return get_password_policy().password_hint

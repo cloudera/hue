@@ -46,9 +46,11 @@ def can_view_job(username, job):
   acl = get_acls(job).get('mapreduce.job.acl-view-job', '')
   return acl == '*' or username in acl.split(',')
 
+
 def can_modify_job(username, job):
   acl = get_acls(job).get('mapreduce.job.acl-modify-job', '')
   return acl == '*' or username in acl.split(',')
+
 
 def get_acls(job):
   if job.is_mr2:
@@ -60,6 +62,7 @@ def get_acls(job):
     return acls
   else:
     return job.full_job_conf
+
 
 def can_kill_job(self, user):
   if DISABLE_KILLING_JOBS.get():

@@ -24,7 +24,7 @@ from urllib.parse import urlparse as lib_urlparse
 def splitpath(path):
   split = lib_urlparse(path)
   path_parsed_as_query = ''
-  
+
   # Make sure the splitpath can handle a path that contains "?" since
   # that is the case for the file browser paths.
   if '?' in path:

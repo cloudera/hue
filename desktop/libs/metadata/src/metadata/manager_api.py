@@ -49,7 +49,7 @@ def error_handler(view_fn):
     }
 
     try:
-      if has_catalog(args[0].user): # TODO
+      if has_catalog(args[0].user):  # TODO
         return view_fn(*args, **kwargs)
       else:
         raise CatalogApiException('Navigator API is not configured.')
@@ -121,7 +121,6 @@ tier1.sinks.sink1.type          = org.apache.flume.sink.solr.morphline.Morphline
 tier1.sinks.sink1.morphlineFile = morphlines.conf
 tier1.sinks.sink1.morphlineId = hue_accesslogs_no_geo
 tier1.sinks.sink1.channel       = channel1'''
-
 
   morphline_config = open(os.path.join(config_morphline_path(), 'hue_accesslogs_no_geo.morphline.conf')).read()
   morphline_config = morphline_config.replace(

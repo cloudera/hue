@@ -32,8 +32,10 @@ from indexer.indexers.sql import SQLIndexer
 
 from unittest.mock import patch, Mock, MagicMock
 
+
 def mock_uuid():
   return '52f840a8-3dde-434d-934a-2d6e06f3687e'
+
 
 @pytest.mark.django_db
 class TestSQLIndexer(object):
@@ -41,7 +43,6 @@ class TestSQLIndexer(object):
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_create_table_from_a_file_to_csv(self):
     fs = Mock(
@@ -152,7 +153,7 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
 
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    ### source dir is in encryption zone, so the scratch dir is in the same dir
+    # source dir is in encryption zone, so the scratch dir is in the same dir
     assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
@@ -196,7 +197,7 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
 
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    ### source dir is not in encryption zone, so the scratch dir is in user's home dir
+    # source dir is not in encryption zone, so the scratch dir is in user's home dir
     assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
@@ -219,6 +220,7 @@ TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         FROM `default`.`hue__tmp_export_table`;
 DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
       [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
+
 
 class MockRequest(object):
   def __init__(self, fs=None, user=None):

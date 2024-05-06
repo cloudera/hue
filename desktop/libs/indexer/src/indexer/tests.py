@@ -72,7 +72,7 @@ class TestImporter(object):
       get_filesystem.return_value = None
 
       resp = self.client.get(reverse('indexer:importer'))
-      assert not b"{'value': 'file', 'name': 'Remote File'}" in resp.content
+      assert b"{'value': 'file', 'name': 'Remote File'}" not in resp.content
 
 
 class TestIndexerWithSolr(object):

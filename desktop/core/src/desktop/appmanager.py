@@ -48,6 +48,7 @@ DESKTOP_LIBS = None
 DESKTOP_APPS = None
 DESKTOP_MODULES = []  # Sum of APPS and LIBS
 
+
 def _import_module_or_none(module):
   """Like import_module, but returns None if the module does not exist.
   This will properly handle nested ImportErrors in such a way that, if the
@@ -64,13 +65,14 @@ def _import_module_or_none(module):
     # an import error itself.
     tb = sys.exc_info()[2]
     top_frame = traceback.extract_tb(tb)[-1]
-    err_file = re.sub(r'\.pyc','.py', top_frame[0])
-    my_file = re.sub(r'\.pyc','.py', __file__)
+    err_file = re.sub(r'\.pyc', '.py', top_frame[0])
+    my_file = re.sub(r'\.pyc', '.py', __file__)
     if err_file == my_file:
       return None
     else:
       LOG.error("Failed to import '%s'" % (module,))
       raise
+
 
 class DesktopModuleInfo(object):
   """
@@ -210,12 +212,14 @@ class DesktopModuleInfo(object):
   def __str__(self):
     return "DesktopModule(%s: %s)" % (self.nice_name, self.module.__name__)
 
+
 def get_apps(user):
   return [
     app
       for app in DESKTOP_APPS
       if user.has_hue_permission(action="access", app=app.display_name)
   ]
+
 
 def get_apps_dict(user=None):
   if user is not None:
@@ -224,6 +228,7 @@ def get_apps_dict(user=None):
     apps = DESKTOP_APPS
 
   return dict([(app.name, app) for app in apps])
+
 
 def load_libs():
   global DESKTOP_MODULES

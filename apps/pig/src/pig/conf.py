@@ -41,7 +41,7 @@ REMOTE_SAMPLE_DIR = Config(
 def config_validator(user):
   res = []
 
-  if not 'test' in sys.argv: # Avoid tests hanging
+  if 'test' not in sys.argv:  # Avoid tests hanging
     status = get_oozie_status(user)
 
     if 'NORMAL' not in status:

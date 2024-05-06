@@ -36,7 +36,7 @@ from urllib.parse import quote
 
 LOG = logging.getLogger()
 
-DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024 # 1MB
+DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024  # 1MB
 ILLEGAL_CHARS = r'[\000-\010]|[\013-\014]|[\016-\037]'
 FORMAT_TO_CONTENT_TYPE = {
     'csv': 'application/csv',
@@ -48,6 +48,7 @@ FORMAT_TO_CONTENT_TYPE = {
 def nullify(cell):
   return cell if cell is not None else "NULL"
 
+
 def file_reader(fh):
   """Generator that reads a file, chunk-by-chunk."""
   while True:
@@ -56,6 +57,7 @@ def file_reader(fh):
       fh.close()
       break
     yield chunk
+
 
 def encode_row(row, encoding=None, make_excel_links=False):
   encoded_row = []
@@ -130,7 +132,7 @@ def create_generator(content_generator, format, encoding=None):
     raise Exception("Unknown format: %s" % format)
 
 
-def make_response(generator, format, name, encoding=None, user_agent=None): #TODO: Add support for 3rd party (e.g. nginx file serving)
+def make_response(generator, format, name, encoding=None, user_agent=None):  # TODO: Add support for 3rd party (e.g. nginx file serving)
   """
   @param data An iterator of rows, where every row is a list of strings
   @param format Either "csv" or "xls"

@@ -57,7 +57,7 @@ def _fetch_hive_path(request):
   if '/' in path:
     database, table = path.split('/', 1)
     if '.' in table:
-      table, column  = table.split('.', 1)
+      table, column = table.split('.', 1)
 
   resp = autocomplete(request, database, table, column)
 
@@ -150,7 +150,7 @@ def _to_sentry_privilege(privilege):
   return {
       'component': privilege['component'],
       'serviceName': privilege['serverName'],
-      'authorizables': [{'type': auth['type'], 'name': auth['name_']} for auth in privilege['authorizables']], # TODO URI {'type': 'URI', 'name': _massage_uri('/path')}
+      'authorizables': [{'type': auth['type'], 'name': auth['name_']} for auth in privilege['authorizables']],  # TODO URI {'type': 'URI', 'name': _massage_uri('/path')}
       'action': '*' if privilege['action'].upper() == 'ALL' else privilege['action'],
       'createTime': privilege['timestamp'],
       'grantorPrincipal': privilege['grantorPrincipal'],
@@ -283,7 +283,7 @@ def save_privileges(request):
     for privilege in role['originalPrivileges']:
       if privilege['id'] in old_privileges_ids:
         _drop_sentry_privilege(request.user, role, privilege, component)
-    _hive_add_privileges(request.user, role, modified_privileges, component) # After REVOKES as REVOKE ALL removes everything.
+    _hive_add_privileges(request.user, role, modified_privileges, component)  # After REVOKES as REVOKE ALL removes everything.
 
     result['message'] = _('Privileges updated')
     result['status'] = 0

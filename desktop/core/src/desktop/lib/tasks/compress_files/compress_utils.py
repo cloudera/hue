@@ -22,7 +22,8 @@ from desktop.lib.paths import get_desktop_root, SAFE_CHARACTERS_URI_COMPONENTS, 
 
 from notebook.connectors.base import Notebook
 
-import urllib.request, urllib.error
+import urllib.request
+import urllib.error
 from urllib.parse import quote as urllib_quote
 from django.utils.translation import gettext as _
 
@@ -31,7 +32,7 @@ def compress_files_in_hdfs(request, file_names, upload_path, archive_name):
 
   _upload_compress_files_script_to_hdfs(request.fs)
 
-  files = [{"value": urllib_quote(upload_path.encode('utf-8'), SAFE_CHARACTERS_URI) + '/' + \
+  files = [{"value": urllib_quote(upload_path.encode('utf-8'), SAFE_CHARACTERS_URI) + '/' +
     urllib_quote(file_name.encode('utf-8'), SAFE_CHARACTERS_URI)} for file_name in file_names]
   files.append({'value': '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh'})
   start_time = json.loads(request.POST.get('start_time', '-1'))
@@ -41,7 +42,7 @@ def compress_files_in_hdfs(request, file_names, upload_path, archive_name):
     isManaged=True,
     onSuccessUrl='/filebrowser/view=' + urllib_quote(upload_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
   )
-   
+
   shell_notebook.add_shell_snippet(
       shell_command='compress_files_in_hdfs.sh',
       arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + ','.join(file_names)}, {'value': '-n=' + archive_name}],
@@ -53,13 +54,14 @@ def compress_files_in_hdfs(request, file_names, upload_path, archive_name):
 
   return shell_notebook.execute(request, batch=True)
 
+
 def _upload_compress_files_script_to_hdfs(fs):
   if not fs.exists('/user/' + DEFAULT_USER.get() + '/common/'):
     fs.do_as_user(DEFAULT_USER.get(), fs.mkdir, '/user/' + DEFAULT_USER.get() + '/common/')
     fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0o755)
 
   if not fs.do_as_user(DEFAULT_USER.get(), fs.exists, '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh'):
-    fs.do_as_user(DEFAULT_USER.get(), fs.copyFromLocal, get_desktop_root() + \
-      '/core/src/desktop/lib/tasks/compress_files/compress_in_hdfs.sh',\
+    fs.do_as_user(DEFAULT_USER.get(), fs.copyFromLocal, get_desktop_root() +
+      '/core/src/desktop/lib/tasks/compress_files/compress_in_hdfs.sh',
         '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh')
     fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0o755)

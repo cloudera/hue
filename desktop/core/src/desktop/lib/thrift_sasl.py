@@ -32,6 +32,7 @@ import sys
 # cases where things break down.
 from io import BytesIO as string_io
 
+
 class TSaslClientTransport(TTransportBase, CReadableTransport):
   START = 1
   OK = 2
@@ -121,7 +122,7 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
       if not success:
         raise TTransportException(type=TTransportException.UNKNOWN,
                                   message=self.sasl.getError())
-      if (len(encoded)==len(buffer)):
+      if (len(encoded) == len(buffer)):
         self.encode = False
         self._flushPlain(buffer)
       else:

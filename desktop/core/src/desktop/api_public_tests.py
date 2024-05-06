@@ -24,7 +24,6 @@ from django.http import HttpResponse
 from django.urls import reverse
 
 
-
 from useradmin.models import User
 from desktop.conf import CUSTOM
 from desktop.api_public import get_django_request

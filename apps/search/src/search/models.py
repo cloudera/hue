@@ -55,7 +55,6 @@ class Facet(models.Model):
 
     self.data = json.dumps(data_dict)
 
-
   def get_query_params(self):
     data_dict = json.loads(self.data)
 
@@ -129,14 +128,13 @@ class Result(models.Model):
 
     self.data = json.dumps(data_dict)
 
-
   def get_template(self, with_highlighting=False):
     data_dict = json.loads(self.data)
 
     template = data_dict.get('template')
     if with_highlighting and data_dict.get('highlighting'):
       for field in data_dict.get('highlighting', []):
-        template = re.sub('\{\{%s\}\}' % field, '{{{%s}}}' % field, template)
+        template = re.sub(r'\{\{%s\}\}' % field, '{{{%s}}}' % field, template)
 
     return template
 
@@ -180,7 +178,6 @@ class Sorting(models.Model):
         data_dict[attr] = json.loads(post_data[attr])
 
     self.data = json.dumps(data_dict)
-
 
   def get_query_params(self, client_query=None):
     params = ()
@@ -230,11 +227,11 @@ class CollectionManager(models.Manager):
 # Deprecated see Collection2
 class Collection(models.Model):
   """All the data is now saved into the properties field"""
-  enabled = models.BooleanField(default=False) # Aka shared
+  enabled = models.BooleanField(default=False)  # Aka shared
   name = models.CharField(max_length=40, verbose_name=_t('Solr index name pointing to'))
   label = models.CharField(max_length=100, verbose_name=_t('Friendlier name in UI'))
   is_core_only = models.BooleanField(default=False)
-  cores = models.TextField(default=json.dumps({}), verbose_name=_t('Collection with cores data'), help_text=_t('Solr json')) # Unused
+  cores = models.TextField(default=json.dumps({}), verbose_name=_t('Collection with cores data'), help_text=_t('Solr json'))  # Unused
   properties = models.TextField(
       default=json.dumps({}), verbose_name=_t('Properties'),
       help_text=_t('Hue properties (e.g. results by pages number)')
@@ -264,7 +261,7 @@ class Collection(models.Model):
 
     if 'collection' not in props:
       props['collection'] = self.get_default(user)
-      if self.cores != '{}': # Convert collections from < Hue 3.6
+      if self.cores != '{}':  # Convert collections from < Hue 3.6
         try:
           self._import_hue_3_5_collections(props, user)
         except Exception as e:
@@ -292,11 +289,11 @@ class Collection(models.Model):
 
     for facet in props['collection']['facets']:
       properties = facet['properties']
-      if 'gap' in properties and not 'initial_gap' in properties:
+      if 'gap' in properties and 'initial_gap' not in properties:
         properties['initial_gap'] = properties['gap']
-      if 'start' in properties and not 'initial_start' in properties:
+      if 'start' in properties and 'initial_start' not in properties:
         properties['initial_start'] = properties['start']
-      if 'end' in properties and not 'initial_end' in properties:
+      if 'end' in properties and 'initial_end' not in properties:
         properties['initial_end'] = properties['end']
 
       if facet['widgetType'] == 'histogram-widget':

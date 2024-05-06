@@ -25,6 +25,7 @@ from desktop.lib.thread_util import dump_traceback
 
 from io import StringIO as string_io
 
+
 def test_dump_traceback():
   started = threading.Event()
   stopped = threading.Event()

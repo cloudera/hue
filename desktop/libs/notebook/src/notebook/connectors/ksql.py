@@ -57,10 +57,8 @@ class KSqlApi(Api):
 
     self.url = self.options['url']
 
-
   def _get_db(self):
     return KSqlClientApi(user=self.user, url=self.url)
-
 
   @query_error_handler
   def execute(self, notebook, snippet):
@@ -91,11 +89,9 @@ class KSqlApi(Api):
       }
     }
 
-
   @query_error_handler
   def check_status(self, notebook, snippet):
     return {'status': 'available'}
-
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):

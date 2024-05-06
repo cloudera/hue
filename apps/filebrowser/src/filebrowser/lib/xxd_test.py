@@ -31,14 +31,15 @@ from io import StringIO as string_io
 
 LOG = logging.getLogger()
 
-LENGTH = 1024*10 # 10KB
+LENGTH = 1024 * 10  # 10KB
+
 
 class XxdTest(TestCase):
   def test_mask_not_alphanumeric(self):
-    assert  (1, ". X") == xxd.mask_not_alphanumeric("\n X")
+    assert (1, ". X") == xxd.mask_not_alphanumeric("\n X")
 
   def test_mask_not_printable(self):
-    assert  (2, "..@") == xxd.mask_not_alphanumeric("\xff\x90\x40")
+    assert (2, "..@") == xxd.mask_not_alphanumeric("\xff\x90\x40")
 
   def _get_offset_width(self, line):
     offset, match, _ = line.partition(":")
@@ -95,6 +96,7 @@ class XxdTest(TestCase):
     output = string_io()
     xxd.main(string_io(random_text), output)
     self._verify_content(stdin, output.getvalue())
+
 
 if __name__ == "__main__":
   unittest.main()

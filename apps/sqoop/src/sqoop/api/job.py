@@ -40,6 +40,7 @@ __all__ = ['get_jobs', 'create_job', 'update_job', 'job', 'jobs', 'job_clone', '
 
 LOG = logging.getLogger()
 
+
 @never_cache
 def get_jobs(request):
   response = {
@@ -54,6 +55,7 @@ def get_jobs(request):
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not get jobs.')))
   return JsonResponse(response)
+
 
 @never_cache
 def create_job(request):
@@ -82,6 +84,7 @@ def create_job(request):
     response['errors'] = e.to_dict()
   return JsonResponse(response)
 
+
 @never_cache
 def update_job(request, job):
   if request.method != 'POST':
@@ -108,6 +111,7 @@ def update_job(request, job):
     response['errors'] = e.to_dict()
   return JsonResponse(response)
 
+
 @never_cache
 def jobs(request):
   if request.method == 'GET':
@@ -116,6 +120,7 @@ def jobs(request):
     return create_job(request)
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET or POST request required.'), error_code=405)
+
 
 @never_cache
 @get_job_or_exception()
@@ -132,6 +137,7 @@ def job(request, job):
     return update_job(request, job)
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET or POST request required.'), error_code=405)
+
 
 @never_cache
 @get_job_or_exception()
@@ -157,6 +163,7 @@ def job_clone(request, job):
     response['errors'] = e.to_dict()
   return JsonResponse(response)
 
+
 @never_cache
 @get_job_or_exception()
 def job_delete(request, job):
@@ -178,6 +185,7 @@ def job_delete(request, job):
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
+
 
 @never_cache
 @get_job_or_exception()
@@ -201,6 +209,7 @@ def job_start(request, job):
     response['errors'] = [e.to_dict()]
   return JsonResponse(response)
 
+
 @never_cache
 @get_job_or_exception()
 def job_stop(request, job):
@@ -222,6 +231,7 @@ def job_stop(request, job):
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
+
 
 @never_cache
 @get_job_or_exception()

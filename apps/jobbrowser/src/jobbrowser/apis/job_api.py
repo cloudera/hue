@@ -79,7 +79,7 @@ class JobApi(Api):
       elif appid.find('_executor_') > 0:
         return SparkExecutorApi(self.user, appid)
       else:
-        return self.yarn_api # application_
+        return self.yarn_api  # application_
     except:
       raise PopupException("Job would have failed due to which there no attempt or appattempt information available")
 
@@ -131,7 +131,6 @@ class YarnApi(Api):
       'total': len(apps)
     }
 
-
   def app(self, appid):
     try:
       job = NativeYarnApi(self.user).get_job(jobid=appid)
@@ -147,7 +146,6 @@ class YarnApi(Api):
       msg = 'Could not find job %s.'
       LOG.exception(msg % appid)
       raise PopupException(_(msg) % appid, detail=e)
-
 
     app = massage_job_for_json(job, user=self.user)
 
@@ -208,7 +206,6 @@ class YarnApi(Api):
 
     return common
 
-
   def action(self, operation, app_ids):
     if operation['action'] == 'kill':
       kills = []
@@ -223,7 +220,6 @@ class YarnApi(Api):
     else:
       return {}
 
-
   def logs(self, appid, app_type, log_name, is_embeddable=False):
     logs = ''
     logs_list = []
@@ -235,7 +231,7 @@ class YarnApi(Api):
           logs = parseResponse.get('logs')
           logs_list = parseResponse.get('logsList')
           if logs and len(logs) == 4:
-            if app_type == 'YarnV2' and logs[0]: #logs[0] is diagnostics
+            if app_type == 'YarnV2' and logs[0]:  # logs[0] is diagnostics
               logs = logs[0]
             else:
               logs = logs[1]
@@ -250,7 +246,6 @@ class YarnApi(Api):
     except PopupException as e:
       LOG.warning('No task attempt found for logs: %s' % smart_str(e))
     return {'logs': logs, 'logsList': logs_list}
-
 
   def profile(self, appid, app_type, app_property, app_filters):
     if app_type == 'MAPREDUCE':
@@ -283,7 +278,8 @@ class YarnApi(Api):
     elif status == 'SUCCEEDED':
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # FAILED, KILLED
+      return 'FAILED'  # FAILED, KILLED
+
 
 class YarnAttemptApi(Api):
 
@@ -294,7 +290,6 @@ class YarnAttemptApi(Api):
     self.task_id = '_'.join(app_id.replace(start, 'task_').split('_')[:5])
     self.attempt_id = app_id.split('_')[3]
 
-
   def apps(self):
     attempts = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).attempts
 
@@ -302,7 +297,6 @@ class YarnAttemptApi(Api):
       'apps': [self._massage_task(task) for task in attempts],
       'total': len(attempts)
     }
-
 
   def app(self, appid):
     task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id)
@@ -316,7 +310,6 @@ class YarnAttemptApi(Api):
 
     return common
 
-
   def logs(self, appid, app_type, log_name, is_embeddable=False):
     if log_name == 'default':
       log_name = 'stdout'
@@ -326,45 +319,43 @@ class YarnAttemptApi(Api):
 
     return {'progress': 0, 'logs': syslog if log_name == 'syslog' else stderr if log_name == 'stderr' else stdout}
 
-
   def profile(self, appid, app_type, app_property, app_filters):
     if app_property == 'counters':
       return NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id).counters
 
     return {}
 
-
   def _massage_task(self, task):
     return {
-        #"elapsedMergeTime" : task.elapsedMergeTime,
-        #"shuffleFinishTime" : task.shuffleFinishTime,
+        # "elapsedMergeTime" : task.elapsedMergeTime,
+        # "shuffleFinishTime" : task.shuffleFinishTime,
         'id': task.appAttemptId if hasattr(task, 'appAttemptId') else '',
         'appAttemptId': task.appAttemptId if hasattr(task, 'appAttemptId') else '',
         'blacklistedNodes': task.blacklistedNodes if hasattr(task, 'blacklistedNodes') else '',
-        'containerId' : task.containerId if hasattr(task, 'containerId') else '',
+        'containerId': task.containerId if hasattr(task, 'containerId') else '',
         'diagnostics': task.diagnostics if hasattr(task, 'diagnostics') else '',
-        "startTimeFormatted" : task.startTimeFormatted if hasattr(task, 'startTimeFormatted') else '',
-        "startTime" : int(task.startTime) if hasattr(task, 'startTime') else '',
-        "finishTime" : int(task.finishedTime) if hasattr(task, 'finishedTime') else '',
-        "finishTimeFormatted" : task.finishTimeFormatted if hasattr(task, 'finishTimeFormatted') else '',
-        "type" : task.type + '_ATTEMPT' if hasattr(task, 'type') else '',
+        "startTimeFormatted": task.startTimeFormatted if hasattr(task, 'startTimeFormatted') else '',
+        "startTime": int(task.startTime) if hasattr(task, 'startTime') else '',
+        "finishTime": int(task.finishedTime) if hasattr(task, 'finishedTime') else '',
+        "finishTimeFormatted": task.finishTimeFormatted if hasattr(task, 'finishTimeFormatted') else '',
+        "type": task.type + '_ATTEMPT' if hasattr(task, 'type') else '',
         'nodesBlacklistedBySystem': task.nodesBlacklistedBySystem if hasattr(task, 'nodesBlacklistedBySystem') else '',
         'nodeId': task.nodeId if hasattr(task, 'nodeId') else '',
         'nodeHttpAddress': task.nodeHttpAddress if hasattr(task, 'nodeHttpAddress') else '',
         'logsLink': task.logsLink if hasattr(task, 'logsLink') else '',
         "app_id": self.app_id,
         "task_id": self.task_id,
-        'duration' : task.duration if hasattr(task, 'duration') else '',
-        'durationFormatted' : task.duration if hasattr(task, 'durationFormatted') else '',
+        'duration': task.duration if hasattr(task, 'duration') else '',
+        'durationFormatted': task.duration if hasattr(task, 'durationFormatted') else '',
         'state': task.status if hasattr(task, 'status') else ''
     }
+
 
 class YarnMapReduceTaskApi(Api):
 
   def __init__(self, user, app_id):
     Api.__init__(self, user)
     self.app_id = '_'.join(app_id.replace('task_', 'application_').split('_')[:3])
-
 
   def apps(self, filters):
     filter_params = {
@@ -400,7 +391,6 @@ class YarnMapReduceTaskApi(Api):
       'total': len(tasks)
     }
 
-
   def app(self, appid):
     task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=appid)
 
@@ -414,7 +404,6 @@ class YarnMapReduceTaskApi(Api):
 
     return common
 
-
   def logs(self, appid, app_type, log_name, is_embeddable=False):
     if log_name == 'default':
       log_name = 'stdout'
@@ -426,7 +415,6 @@ class YarnMapReduceTaskApi(Api):
       LOG.warning('No task attempt found for default logs: %s' % e)
       logs = ''
     return {'progress': 0, 'logs': logs}
-
 
   def profile(self, appid, app_type, app_property, app_filters):
     if app_property == 'attempts':
@@ -458,7 +446,7 @@ class YarnMapReduceTaskApi(Api):
     elif status == 'SUCCEEDED':
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # FAILED, KILLED
+      return 'FAILED'  # FAILED, KILLED
 
 
 class YarnMapReduceTaskAttemptApi(Api):
@@ -470,7 +458,6 @@ class YarnMapReduceTaskAttemptApi(Api):
     self.task_id = '_'.join(app_id.replace(start, 'task_').split('_')[:5])
     self.attempt_id = app_id
 
-
   def apps(self):
     attempts = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).attempts
 
@@ -478,7 +465,6 @@ class YarnMapReduceTaskAttemptApi(Api):
       'apps': [self._massage_task(task) for task in attempts],
       'total': len(attempts)
     }
-
 
   def app(self, appid):
     task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id)
@@ -492,7 +478,6 @@ class YarnMapReduceTaskAttemptApi(Api):
 
     return common
 
-
   def logs(self, appid, app_type, log_name, is_embeddable=False):
     if log_name == 'default':
       log_name = 'stdout'
@@ -502,13 +487,11 @@ class YarnMapReduceTaskAttemptApi(Api):
 
     return {'progress': 0, 'logs': syslog if log_name == 'syslog' else stderr if log_name == 'stderr' else stdout}
 
-
   def profile(self, appid, app_type, app_property, app_filters):
     if app_property == 'counters':
       return NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id).counters
 
     return {}
-
 
   def _api_status(self, status):
     if status in ['NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING']:
@@ -516,26 +499,25 @@ class YarnMapReduceTaskAttemptApi(Api):
     elif status == 'SUCCEEDED':
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # FAILED, KILLED
-
+      return 'FAILED'  # FAILED, KILLED
 
   def _massage_task(self, task):
     return {
-        #"elapsedMergeTime" : task.elapsedMergeTime,
-        #"shuffleFinishTime" : task.shuffleFinishTime,
-        "assignedContainerId" : task.assignedContainerId if hasattr(task, 'assignedContainerId') else task.amContainerId if hasattr(task, 'amContainerId') else '',
-        "progress" : task.progress if hasattr(task, 'progress') else '',
-        "elapsedTime" : task.elapsedTime if hasattr(task, 'elapsedTime') else '',
-        "state" : task.state if hasattr(task, 'state') else task.appAttemptState if hasattr(task, 'appAttemptState') else '',
-        #"elapsedShuffleTime" : task.elapsedShuffleTime,
-        #"mergeFinishTime" : task.mergeFinishTime,
-        "rack" : task.rack if hasattr(task, 'rack') else '',
-        #"elapsedReduceTime" : task.elapsedReduceTime,
-        "nodeHttpAddress" : task.nodeHttpAddress if hasattr(task, 'nodeHttpAddress') else '',
-        "type" : task.type + '_ATTEMPT' if hasattr(task, 'type') else '',
-        "startTime" : task.startTime if hasattr(task, 'startTime') else '',
-        "id" : task.id if hasattr(task, 'id') else task.appAttemptId if hasattr(task, 'appAttemptId') else '',
-        "finishTime" : task.finishTime if hasattr(task, 'finishTime') else int(task.finishedTime) if hasattr(task, 'finishedTime') else '',
+        # "elapsedMergeTime" : task.elapsedMergeTime,
+        # "shuffleFinishTime" : task.shuffleFinishTime,
+        "assignedContainerId": task.assignedContainerId if hasattr(task, 'assignedContainerId') else task.amContainerId if hasattr(task, 'amContainerId') else '',
+        "progress": task.progress if hasattr(task, 'progress') else '',
+        "elapsedTime": task.elapsedTime if hasattr(task, 'elapsedTime') else '',
+        "state": task.state if hasattr(task, 'state') else task.appAttemptState if hasattr(task, 'appAttemptState') else '',
+        # "elapsedShuffleTime" : task.elapsedShuffleTime,
+        # "mergeFinishTime" : task.mergeFinishTime,
+        "rack": task.rack if hasattr(task, 'rack') else '',
+        # "elapsedReduceTime" : task.elapsedReduceTime,
+        "nodeHttpAddress": task.nodeHttpAddress if hasattr(task, 'nodeHttpAddress') else '',
+        "type": task.type + '_ATTEMPT' if hasattr(task, 'type') else '',
+        "startTime": task.startTime if hasattr(task, 'startTime') else '',
+        "id": task.id if hasattr(task, 'id') else task.appAttemptId if hasattr(task, 'appAttemptId') else '',
+        "finishTime": task.finishTime if hasattr(task, 'finishTime') else int(task.finishedTime) if hasattr(task, 'finishedTime') else '',
         "app_id": self.app_id,
         "task_id": self.task_id,
         'apiStatus': self._api_status(task.state) if hasattr(task, 'state') else self._api_status(task.appAttemptState) if hasattr(task, 'appAttemptState') else '',

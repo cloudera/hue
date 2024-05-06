@@ -81,9 +81,9 @@ def config_validator(user):
   from hbase.settings import NICE_NAME
 
   try:
-    if not 'test' in sys.argv: # Avoid tests hanging
+    if 'test' not in sys.argv:  # Avoid tests hanging
       api = HbaseApi(user=user)
-      cluster_name = api.getClusters()[0]['name'] # Currently pick first configured cluster
+      cluster_name = api.getClusters()[0]['name']  # Currently pick first configured cluster
       # Check connectivity
       api.connectCluster(cluster_name)
       api.getTableList(cluster_name)
@@ -100,8 +100,6 @@ def config_validator(user):
     msg = "Hbase config thrift_transport=framed is not supported"
     LOG.exception(msg)
     res.append((NICE_NAME, _(msg)))
-
-
 
   res.extend(validate_thrift_transport(THRIFT_TRANSPORT))
 

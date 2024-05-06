@@ -85,7 +85,6 @@ class ConnectorPermission(BasePermission):
     unique_together = ('connector', 'action',)
 
 
-
 if ENABLE_ORGANIZATIONS.get():
   class OrganizationConnectorPermissionManager(models.Manager):
 
@@ -112,8 +111,11 @@ if ENABLE_ORGANIZATIONS.get():
 
 if ENABLE_CONNECTORS.get():
   if ENABLE_ORGANIZATIONS.get():
-    class HuePermission(OrganizationConnectorPermission): pass
+    class HuePermission(OrganizationConnectorPermission):
+      pass
   else:
-    class HuePermission(ConnectorPermission): pass
+    class HuePermission(ConnectorPermission):
+      pass
 else:
-  class HuePermission(BasePermission): pass
+  class HuePermission(BasePermission):
+    pass

@@ -65,10 +65,10 @@ class HbaseApi(object):
       full_config = json.loads(conf.HBASE_CLUSTERS.get().replace("'", "\""))
     except:
       LOG.debug('Failed to read HBase cluster configuration as JSON, falling back to raw configuration.')
-      full_config = [conf.HBASE_CLUSTERS.get()] #hack cause get() is weird
+      full_config = [conf.HBASE_CLUSTERS.get()]  # hack cause get() is weird
 
     for config in full_config:
-      match = re.match('\((?P<name>[^\(\)\|]+)\|(?P<host>.+):(?P<port>[0-9]+)\)', config)
+      match = re.match(r'\((?P<name>[^\(\)\|]+)\|(?P<host>.+):(?P<port>[0-9]+)\)', config)
       if match:
         clusters += [{
           'name': match.group('name'),
@@ -188,7 +188,7 @@ class HbaseApi(object):
   def deleteColumns(self, cluster, tableName, row, columns):
     client = self.connectCluster(cluster)
     Mutation = get_thrift_type('Mutation')
-    mutations = [Mutation(isDelete = True, column=smart_str(column)) for column in columns]
+    mutations = [Mutation(isDelete=True, column=smart_str(column)) for column in columns]
     return client.mutateRow(tableName, smart_str(row), mutations, None, doas=self.user.username)
 
   def deleteColumn(self, cluster, tableName, row, column):
@@ -204,7 +204,7 @@ class HbaseApi(object):
     Mutation = get_thrift_type('Mutation')
     for column in list(data.keys()):
       value = smart_str(data[column]) if data[column] is not None else None
-      mutations.append(Mutation(column=smart_str(column), value=value)) # must use str for API, does thrift coerce by itself?
+      mutations.append(Mutation(column=smart_str(column), value=value))  # must use str for API, does thrift coerce by itself?
     return client.mutateRow(tableName, smart_str(row), mutations, None, doas=self.user.username)
 
   def putColumn(self, cluster, tableName, row, column, value=None):
@@ -220,8 +220,8 @@ class HbaseApi(object):
     aggregate_data = []
     limit = conf.TRUNCATE_LIMIT.get()
     if not isinstance(queries, list):
-      queries=json.loads(queries)
-    queries = sorted(queries, key=lambda query: query['scan_length']) #sort by scan length
+      queries = json.loads(queries)
+    queries = sorted(queries, key=lambda query: query['scan_length'])  # sort by scan length
     for query in queries:
       scan_length = int(query['scan_length'])
       if query['row_key'] == "null":

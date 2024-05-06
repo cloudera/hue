@@ -125,7 +125,7 @@ class SaveResultsTableForm(forms.Form):
       label=_t("Table Name"),
       required=True,
       help_text=_t("Name of the new table")
-  ) # Can also contain a DB prefixed table name, e.g. DB_NAME.TABLE_NAME
+  )  # Can also contain a DB prefixed table name, e.g. DB_NAME.TABLE_NAME
 
   def __init__(self, *args, **kwargs):
     self.db = kwargs.pop('db', None)
@@ -182,6 +182,7 @@ class FunctionForm(forms.Form):
   name = forms.CharField(required=True)
   class_name = forms.CharField(required=True)
 
+
 FunctionFormSet = simple_formset_factory(FunctionForm)
 
 
@@ -208,11 +209,13 @@ class SettingForm(forms.Form):
   key = forms.CharField()
   value = forms.CharField()
 
+
 SettingFormSet = simple_formset_factory(SettingForm)
 
 
 # In theory, there are only 256 of these...
-TERMINATOR_CHOICES = [ (hive_val, desc) for hive_val, desc, ascii in common.TERMINATORS ]
+TERMINATOR_CHOICES = [(hive_val, desc) for hive_val, desc, ascii in common.TERMINATORS]
+
 
 class CreateTableForm(DependencyAwareForm):
   """
@@ -226,7 +229,7 @@ class CreateTableForm(DependencyAwareForm):
 
   # Row Formatting
   row_format = forms.ChoiceField(required=True,
-                                choices=common.to_choices([ "Delimited", "SerDe" ]),
+                                choices=common.to_choices(["Delimited", "SerDe"]),
                                 initial="Delimited")
 
   # Delimited Row
@@ -366,12 +369,13 @@ class CreateByImportDelimForm(forms.Form):
 
 # Note, struct is not currently supported.  (Because it's recursive, for example.)
 HIVE_TYPES = \
-    ( "string", "tinyint", "smallint", "int", "bigint", "boolean",
+    ("string", "tinyint", "smallint", "int", "bigint", "boolean",
       "float", "double", "array", "map", "timestamp", "date",
       "char", "varchar")
 HIVE_PRIMITIVE_TYPES = \
     ("string", "tinyint", "smallint", "int", "bigint", "boolean",
       "float", "double", "timestamp", "date", "char", "varchar")
+
 
 class PartitionTypeForm(forms.Form):
   dependencies = [
@@ -388,6 +392,7 @@ class PartitionTypeForm(forms.Form):
                                       widget=NumberInput(attrs={'min': 1, 'max': 65355}),
                                       validators=[MinValueValidator(1), MaxValueValidator(65355)],
                                       help_text=_t("Specify if column_is varchar"))
+
 
 class ColumnTypeForm(DependencyAwareForm):
   """
@@ -428,7 +433,7 @@ PartitionTypeFormSet = simple_formset_factory(PartitionTypeForm, add_label=_t("A
 
 def _clean_databasename(name):
   try:
-    if name in db.get_databases(): # Will always fail
+    if name in db.get_databases():  # Will always fail
       raise forms.ValidationError(_('Database "%(name)s" already exists.') % {'name': name})
   except Exception:
     return name

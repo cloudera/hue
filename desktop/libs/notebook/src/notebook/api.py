@@ -134,8 +134,8 @@ def _execute_notebook(request, notebook, snippet):
 
   try:
     try:
-      sessions = notebook.get('sessions') and notebook['sessions'] # Session reference for snippet execution without persisting it
-      active_executable = json.loads(request.POST.get('executable', '{}')) # Editor v2
+      sessions = notebook.get('sessions') and notebook['sessions']  # Session reference for snippet execution without persisting it
+      active_executable = json.loads(request.POST.get('executable', '{}'))  # Editor v2
       # TODO: Use statement, database etc. from active_executable
 
       if historify:
@@ -160,7 +160,7 @@ def _execute_notebook(request, notebook, snippet):
       if historify:
         _snippet = [s for s in notebook['snippets'] if s['id'] == snippet['id']][0]
 
-        if 'id' in active_executable: # Editor v2
+        if 'id' in active_executable:  # Editor v2
           # notebook_executable is the 1-to-1 match of active_executable in the notebook structure
           notebook_executable = [e for e in _snippet['executor']['executables'] if e['id'] == active_executable['id']][0]
           if 'handle' in response:
@@ -172,28 +172,28 @@ def _execute_notebook(request, notebook, snippet):
             }
             notebook_executable['operationId'] = history.uuid
 
-        if response.get('handle'): # No failure
-          if 'result' not in _snippet: # Editor v2
+        if response.get('handle'):  # No failure
+          if 'result' not in _snippet:  # Editor v2
             _snippet['result'] = {}
           _snippet['result']['handle'] = response['handle']
           _snippet['result']['statements_count'] = response['handle'].get('statements_count', 1)
           _snippet['result']['statement_id'] = response['handle'].get('statement_id', 0)
           _snippet['result']['handle']['statement'] = response['handle'].get(
               'statement', snippet['statement']
-          ).strip() # For non HS2, as non multi query yet
+          ).strip()  # For non HS2, as non multi query yet
         else:
           _snippet['status'] = 'failed'
 
-        if history: # If _historify failed, history will be None.
+        if history:  # If _historify failed, history will be None.
           # If we get Atomic block exception, something underneath interpreter.execute() crashed and is not handled.
           history.update_data(notebook)
           history.save()
 
           response['history_id'] = history.id
           response['history_uuid'] = history.uuid
-          if notebook['isSaved']: # Keep track of history of saved queries
+          if notebook['isSaved']:  # Keep track of history of saved queries
             response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
-  except QueryError as ex: # We inject the history information from _historify() to the failed queries
+  except QueryError as ex:  # We inject the history information from _historify() to the failed queries
     if response.get('history_id'):
       ex.extra['history_id'] = response['history_id']
     if response.get('history_uuid'):
@@ -465,6 +465,7 @@ def get_logs(request):
 
   return JsonResponse(response)
 
+
 def _save_notebook(notebook, user):
   if notebook.get('type') != 'notebook' and notebook['snippets'][0].get('connector') and \
           notebook['snippets'][0]['connector'].get('dialect'):  # TODO Connector unification
@@ -588,6 +589,7 @@ def _get_statement(notebook):
     except KeyError as e:
       LOG.warning('Could not get statement from query history: %s' % e)
   return ''
+
 
 @require_GET
 @api_error_handler
@@ -801,7 +803,7 @@ def format(request):
   response = {'status': 0}
 
   statements = request.POST.get('statements', '')
-  response['formatted_statements'] = sqlparse.format(statements, reindent=True, keyword_case='upper') # SQL only currently
+  response['formatted_statements'] = sqlparse.format(statements, reindent=True, keyword_case='upper')  # SQL only currently
 
   return JsonResponse(response)
 
@@ -823,7 +825,7 @@ def export_result(request):
 
   api = get_api(request, snippet)
 
-  if data_format == 'hdfs-file': # Blocking operation, like downloading
+  if data_format == 'hdfs-file':  # Blocking operation, like downloading
     if request.fs.isdir(destination):
       if notebook.get('name'):
         destination += '/%(name)s.csv' % notebook

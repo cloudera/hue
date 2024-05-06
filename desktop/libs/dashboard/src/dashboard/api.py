@@ -192,7 +192,7 @@ def update_document(request):
       edits = {
           "id": doc_id,
       }
-      version = None # If there is a version, use it to avoid potential concurrent update conflicts
+      version = None  # If there is a version, use it to avoid potential concurrent update conflicts
 
       for field in document['details']:
         if field['hasChanged'] and field['key'] != '_version_':
@@ -264,7 +264,7 @@ def get_terms(request):
       # maxcount
     }
     if analysis['terms']['prefix']:
-      properties['terms.regex'] = '.*%(prefix)s.*' % analysis['terms'] # Use regexp instead of case sensitive 'terms.prefix'
+      properties['terms.regex'] = '.*%(prefix)s.*' % analysis['terms']  # Use regexp instead of case sensitive 'terms.prefix'
       properties['terms.regex.flag'] = 'case_insensitive'
 
     result['terms'] = SolrApi(SOLR_URL.get(), request.user).terms(collection['name'], field, properties)
@@ -373,7 +373,6 @@ def new_facet(request):
     widget_type = request.POST.get('widget_type')
     window_size = request.POST.get('window_size')
 
-
     result['message'] = ''
     result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type, window_size)
     result['status'] = 0
@@ -399,7 +398,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       "showFieldList": True,
       "showGrid": False,
       "showChart": True,
-      "chartSettings" : {
+      "chartSettings": {
         'chartType': 'pie' if widget_type == 'pie2-widget' else ('timeline' if widget_type == 'timeline-widget' else ('gradientmap' if widget_type == 'gradient-map-widget' else 'bars')),
         'chartSorting': 'none',
         'chartScatterGroup': None,
@@ -417,7 +416,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       "filteredAttributeFieldsAll": True,
       "fields": [],
       "fieldsSelected": [],
-      "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None}, # Use own?
+      "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None},  # Use own?
       'leafletmapOn': False,
       'isGridLayout': False,
       "hasDataForChart": True,
@@ -557,7 +556,7 @@ def get_range_facet(request):
     if action == 'select':
       properties = _guess_gap(solr_api, collection, facet, facet['properties']['start'], facet['properties']['end'])
     else:
-      properties = _zoom_range_facet(solr_api, collection, facet) # Zoom out
+      properties = _zoom_range_facet(solr_api, collection, facet)  # Zoom out
 
     result['properties'] = properties
     result['status'] = 0

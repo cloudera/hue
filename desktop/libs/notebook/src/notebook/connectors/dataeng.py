@@ -39,7 +39,6 @@ class DataEngApi(Api):
     Api.__init__(self, user, interpreter=interpreter, request=request)
     self.cluster_name = cluster_name
 
-
   def execute(self, notebook, snippet):
 
     if snippet['type'] == 'spark2':
@@ -69,7 +68,6 @@ class DataEngApi(Api):
       'has_result_set': False,
     }
 
-
   def check_status(self, notebook, snippet):
     response = {'status': 'running'}
 
@@ -87,7 +85,6 @@ class DataEngApi(Api):
 
     return response
 
-
   def fetch_result(self, notebook, snippet, rows, start_over):
     return {
         'data': [[_('Job successfully completed.')]],
@@ -95,7 +92,6 @@ class DataEngApi(Api):
         'type': 'table',
         'has_more': False,
     }
-
 
   def cancel(self, notebook, snippet):
     if snippet['result']['handle'].get('id'):
@@ -106,7 +102,6 @@ class DataEngApi(Api):
       response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submission.')}
 
     return response
-
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
     # Currently no way to get the logs properly easily
@@ -119,22 +114,19 @@ class DataEngApi(Api):
     # (.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL))
     return ''
 
-
   def get_jobs(self, notebook, snippet, logs):
-    ## 50cf0e00-746b-4d86-b8e3-f2722296df71
+    # 50cf0e00-746b-4d86-b8e3-f2722296df71
     job_id = snippet['result']['handle']['id']
     return [{
         'name': job_id,
         'url': reverse('jobbrowser:jobbrowser.views.apps') + '#!' + job_id,
         'started': True,
-        'finished': False # Would need call to check_status
+        'finished': False  # Would need call to check_status
       }
     ]
 
-
   def close_statement(self, notebook, snippet):
     pass
-
 
   def close_session(self, session):
     pass

@@ -65,7 +65,7 @@ def get_cluster_source_ids(api):
       else:
         # 0 means always false
         cluster_source_ids = 'sourceId:0 AND'
-    cache.set(CLUSTER_SOURCE_IDS_CACHE_KEY, cluster_source_ids, 60 * 60 * 12) # 1/2 Day
+    cache.set(CLUSTER_SOURCE_IDS_CACHE_KEY, cluster_source_ids, 60 * 60 * 12)  # 1/2 Day
 
   return cluster_source_ids
 
@@ -96,13 +96,12 @@ class NavigatorApi(Api):
     # Navigator does not support Kerberos authentication while other components usually requires it
     self._client = UnsecureHttpClient(self._api_url, logger=LOG)
     self._client.set_basic_auth(self._username, self._password)
-    self._root = resource.Resource(self._client, urlencode=False) # For search_entities_interactive
+    self._root = resource.Resource(self._client, urlencode=False)  # For search_entities_interactive
 
     self.__headers = {}
     self.__params = {}
 
-    #self._fillup_properties() # Disabled currently
-
+    # self._fillup_properties() # Disabled currently
 
   def _get_types_from_sources(self, sources):
     default_entity_types = entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'S3BUCKET', 'OPERATION', 'DIRECTORY')
@@ -119,8 +118,7 @@ class NavigatorApi(Api):
 
     return default_entity_types, entity_types
 
-
-  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, 
+  def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None,
                                   facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
       pagination = {
@@ -231,7 +229,7 @@ class NavigatorApi(Api):
           fq_type = default_entity_types
           filterQueries.append('sourceType:s3')
 
-        if query_s.strip().endswith('type:*'): # To list all available types
+        if query_s.strip().endswith('type:*'):  # To list all available types
           fq_type = entity_types
 
       search_terms = [term for term in query_s.strip().split()] if query_s else []
@@ -241,8 +239,8 @@ class NavigatorApi(Api):
           query.append(self._get_boosted_term(term))
         else:
           name, val = term.split(':')
-          if val: # Allow to type non default types, e.g for SQL: type:FIEL*
-            if name == 'type': # Make sure type value still makes sense for the source
+          if val:  # Allow to type non default types, e.g for SQL: type:FIEL*
+            if name == 'type':  # Make sure type value still makes sense for the source
               term = '%s:%s' % (name, val.upper())
               fq_type = entity_types
             if name.lower() not in ['type', 'tags', 'owner', 'originalname', 'originaldescription', 'lastmodifiedby']:
@@ -261,7 +259,7 @@ class NavigatorApi(Api):
       if source_ids:
         body['query'] = source_ids + '(' + body['query'] + ')'
 
-      body['facetFields'] = facetFields or [] # Currently mandatory in API
+      body['facetFields'] = facetFields or []  # Currently mandatory in API
       if facetPrefix:
         body['facetPrefix'] = facetPrefix
       if facetRanges:
@@ -280,7 +278,7 @@ class NavigatorApi(Api):
         clear_cookies=True
       )
 
-      response['results'] = list(islice(self._secure_results(response['results']), limit)) # Apply Sentry perms
+      response['results'] = list(islice(self._secure_results(response['results']), limit))  # Apply Sentry perms
 
       return response
     except RestException as e:
@@ -289,8 +287,6 @@ class NavigatorApi(Api):
         raise CatalogAuthException(_('Failed to authenticate.'))
       else:
         raise CatalogApiException(e.message)
-
-
 
   def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
     """
@@ -327,8 +323,8 @@ class NavigatorApi(Api):
             if val:
               if name == 'type':
                 term = '%s:%s' % (name, val.upper().strip('*'))
-                default_entity_types = entity_types # Make sure type value still makes sense for the source
-              user_filters.append(term + '*') # Manual filter allowed e.g. type:VIE* ca
+                default_entity_types = entity_types  # Make sure type value still makes sense for the source
+              user_filters.append(term + '*')  # Manual filter allowed e.g. type:VIE* ca
 
         filter_query = '*'
 
@@ -362,7 +358,7 @@ class NavigatorApi(Api):
       LOG.info(params)
       response = self._root.get('entities', headers=self.__headers, params=params)
 
-      response = list(islice(self._secure_results(response), limit)) # Apply Sentry perms
+      response = list(islice(self._secure_results(response), limit))  # Apply Sentry perms
 
       return response
     except RestException as e:
@@ -371,7 +367,6 @@ class NavigatorApi(Api):
         raise CatalogAuthException(_('Failed to authenticate.'))
       else:
         raise CatalogApiException(e)
-
 
   def _secure_results(self, results, checker=None):
     # TODO: to move directly to Catalog API
@@ -399,7 +394,6 @@ class NavigatorApi(Api):
     else:
       return results
 
-
   def suggest(self, prefix=None):
     try:
       return self._root.get('interactive/suggestions?query=%s' % (prefix or '*'))
@@ -407,7 +401,6 @@ class NavigatorApi(Api):
       msg = 'Failed to search for entities with search query: %s' % prefix
       LOG.error(msg)
       raise CatalogApiException(e.message)
-
 
   def find_entity(self, source_type, type, name, **filters):
     """
@@ -428,7 +421,7 @@ class NavigatorApi(Api):
 
       filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in list(query_filters.items()))
       filter_query = '%(type)s AND %(filter_query)s' % {
-        'type': '(type:%s)' % 'TABLE OR type:VIEW' if type == 'TABLE' else type, # Impala don't always say that a table is actually a view
+        'type': '(type:%s)' % 'TABLE OR type:VIEW' if type == 'TABLE' else type,  # Impala don't always say that a table is actually a view
         'filter_query': filter_query
       }
 
@@ -455,7 +448,6 @@ class NavigatorApi(Api):
       LOG.error(msg)
       raise CatalogApiException(e.message)
 
-
   def get_entity(self, entity_id):
     """
     GET /api/v3/entities/:id
@@ -467,7 +459,6 @@ class NavigatorApi(Api):
       msg = 'Failed to get entity %s: %s' % (entity_id, str(e))
       LOG.error(msg)
       raise CatalogApiException(e.message)
-
 
   def update_entity(self, entity, **metadata):
     """
@@ -499,7 +490,6 @@ class NavigatorApi(Api):
       LOG.error(msg)
       raise CatalogApiException(e.message)
 
-
   def get_cluster_source_ids(self):
     params = {
       'query': 'clusterName:"%s"' % get_navigator_hue_server_name(),
@@ -509,13 +499,11 @@ class NavigatorApi(Api):
     LOG.info(params)
     return self._root.get('entities', headers=self.__headers, params=params)
 
-
   def add_tags(self, entity_id, tags):
     entity = self.get_entity(entity_id)
     new_tags = entity['tags'] or []
     new_tags.extend(tags)
     return self.update_entity(entity, tags=new_tags)
-
 
   def delete_tags(self, entity_id, tags):
     entity = self.get_entity(entity_id)
@@ -524,7 +512,6 @@ class NavigatorApi(Api):
       if tag in new_tags:
         new_tags.remove(tag)
     return self.update_entity(entity, tags=new_tags)
-
 
   def update_properties(self, entity_id, properties, modified_custom_metadata=None, deleted_custom_metadata_keys=None):
     entity = self.get_entity(entity_id)
@@ -539,7 +526,6 @@ class NavigatorApi(Api):
           del properties['properties'][key]
     return self.update_entity(entity, **properties)
 
-
   def delete_metadata_properties(self, entity_id, property_keys):
     entity = self.get_entity(entity_id)
     new_props = entity['properties'] or {}
@@ -547,7 +533,6 @@ class NavigatorApi(Api):
       if key in new_props:
         del new_props[key]
     return self.update_entity(entity, properties=new_props)
-
 
   def get_lineage(self, entity_id):
     """
@@ -567,7 +552,6 @@ class NavigatorApi(Api):
       LOG.error(msg)
       raise CatalogApiException(e.message)
 
-
   def create_namespace(self, namespace, description=None):
     try:
       data = json.dumps({'name': namespace, 'description': description})
@@ -577,7 +561,6 @@ class NavigatorApi(Api):
       LOG.error(msg)
       raise CatalogApiException(e.message)
 
-
   def get_namespace(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s' % {'namespace': namespace})
@@ -585,7 +568,6 @@ class NavigatorApi(Api):
       msg = 'Failed to get namespace: %s' % namespace
       LOG.error(msg)
       raise CatalogApiException(e.message)
-
 
   def create_namespace_property(self, namespace, properties):
     try:
@@ -602,7 +584,6 @@ class NavigatorApi(Api):
       LOG.error(msg)
       raise CatalogApiException(e.message)
 
-
   def get_namespace_properties(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s/properties' % {'namespace': namespace})
@@ -611,14 +592,13 @@ class NavigatorApi(Api):
       LOG.error(msg)
       raise CatalogApiException(e.message)
 
-
   def map_namespace_property(self, clazz, properties):
     try:
       data = json.dumps(properties)
       return self._root.post(
         'models/packages/nav/classes/%(class)s/properties' % {'class': clazz},
-        data=data, 
-        contenttype=_JSON_CONTENT_TYPE, 
+        data=data,
+        contenttype=_JSON_CONTENT_TYPE,
         clear_cookies=True
       )
 
@@ -627,7 +607,6 @@ class NavigatorApi(Api):
       LOG.error(msg)
       raise CatalogApiException(e.message)
 
-
   def get_model_properties_mapping(self):
     try:
       return self._root.get('models/properties/mappings')
@@ -635,7 +614,6 @@ class NavigatorApi(Api):
       msg = 'Failed to get models properties mappings'
       LOG.error(msg)
       raise CatalogApiException(e.message)
-
 
   def _fillup_properties(self):
     global _HAS_CATALOG_NAMESPACE
@@ -654,7 +632,7 @@ class NavigatorApi(Api):
           "description": "List of Hue document UUIDs related to this entity",
           "multiValued": True,
           "maxLength": 36,
-          "pattern": ".*", # UUID
+          "pattern": ".*",  # UUID
           "enumValues": None,
           "type": "TEXT"
          })
@@ -668,7 +646,6 @@ class NavigatorApi(Api):
 
       _HAS_CATALOG_NAMESPACE = True
 
-
   def _get_boosted_term(self, term):
     return 'AND'.join([
        # Matching fields
@@ -680,10 +657,8 @@ class NavigatorApi(Api):
       # Could add certain customProperties and properties
     ])
 
-
   def _clean_path(self, path):
     return path.rstrip('/').split('/')[-1], self._escape_slashes(path.rstrip('/'))
 
-
   def _escape_slashes(self, s):
-    return s.replace('/', '\/')
+    return s.replace('/', r'\/')

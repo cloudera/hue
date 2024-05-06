@@ -29,6 +29,7 @@ LOG = logging.getLogger()
 def has_kafka():
   return KAFKA.IS_ENABLED.get()
 
+
 def has_kafka_api():
   return bool(KAFKA.API_URL.get())
 

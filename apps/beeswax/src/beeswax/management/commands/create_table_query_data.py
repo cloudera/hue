@@ -40,7 +40,6 @@ class Command(BaseCommand):
   args = ''
   help = 'Create table sys.query_data over hive.hook.proto.base-directory'
 
-
   def handle(self, *args, **options):
     create_table()
 

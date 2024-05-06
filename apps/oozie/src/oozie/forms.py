@@ -75,6 +75,7 @@ class ParameterForm(forms.Form):
     params = filter(lambda key: key in ParameterForm.NON_PARAMETERS, conf_dict.keys())
     return [{'name': name, 'value': conf_dict[name]} for name in params]
 
+
 class WorkflowForm(forms.ModelForm):
   class Meta(object):
     model = Workflow
@@ -93,6 +94,7 @@ class WorkflowForm(forms.ModelForm):
 
 
 SCHEMA_VERSION_CHOICES = ['0.4']
+
 
 class ImportWorkflowForm(WorkflowForm):
   definition_file = forms.FileField(label=_t("Local workflow.xml file"))
@@ -118,6 +120,7 @@ class NodeMetaForm(forms.ModelForm):
     ALWAYS_HIDE = ('workflow', 'children', 'node_type')
     model = Node
     exclude = ALWAYS_HIDE + ('name', 'description')
+
 
 class JavaForm(forms.ModelForm):
   class Meta(object):
@@ -281,6 +284,7 @@ class EmailForm(forms.ModelForm):
       'subject': forms.TextInput(attrs={'class': 'span8'}),
       'body': forms.Textarea(attrs={'class': 'span8'}),
     }
+
 
 class SubWorkflowForm(forms.ModelForm):
 
@@ -562,6 +566,7 @@ class BundleForm(forms.ModelForm):
       'schema_version': forms.widgets.HiddenInput(),
     }
 
+
 class UpdateCoordinatorForm(forms.Form):
   endTime = forms.SplitDateTimeField(
     label='End Time', input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today() + timedelta(days=3),
@@ -586,7 +591,6 @@ class UpdateCoordinatorForm(forms.Form):
     if type(oozie_coordinator.pauseTime) == struct_time:
       self.fields['pauseTime'].initial = datetime.fromtimestamp(mktime(oozie_coordinator.pauseTime))
     self.fields['concurrency'].initial = oozie_coordinator.concurrency
-
 
 
 def design_form_by_type(node_type, user, workflow):

@@ -26,6 +26,7 @@ from useradmin.views import sync_ldap_users_and_groups
 
 from django.utils.translation import gettext_lazy as _t
 
+
 class Command(BaseCommand):
   """
   Handler for syncing the Hue database with LDAP users and groups.

@@ -209,6 +209,7 @@ CDP_LOGOUT_URL = Config(
   default="",
   help=_t("To log users out of magic-sso, CDP control panel use Logout URL"))
 
+
 def get_key_file_password():
   password = os.environ.get('HUE_SAML_KEY_FILE_PASSWORD')
   if password is not None:
@@ -226,6 +227,7 @@ def config_validator(user):
   if USERNAME_SOURCE.get() not in USERNAME_SOURCES:
     res.append(("libsaml.username_source", _("username_source not configured properly. SAML integration may not work.")))
   return res
+
 
 def get_logout_redirect_url():
   # This logic was derived from KNOX.

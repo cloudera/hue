@@ -29,7 +29,7 @@ def content_generator(header, data):
 
 def test_export_csv():
   headers = ["x", "y"]
-  data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None], ["http://gethue.com", "http://gethue.com"] ]
+  data = [["1", "2"], ["3", "4"], ["5,6", "7"], [None, None], ["http://gethue.com", "http://gethue.com"]]
 
   # Check CSV
   generator = create_generator(content_generator(headers, data), "csv")
@@ -59,7 +59,6 @@ def test_export_csv():
   assert (
       'attachment; filename*="g%E3%82%93tbh%E3%82%93jk%EF%BC%9F%EF%BF%A5n.csv"' ==
       response["content-disposition"])
-
 
 
 def test_export_xls():

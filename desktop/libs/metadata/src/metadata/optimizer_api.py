@@ -274,7 +274,7 @@ def top_filters(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   connector = json.loads(request.POST.get('connector', '{}'))
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
-  column_name = request.POST.get('columnName') # Unused
+  column_name = request.POST.get('columnName')  # Unused
 
   api = get_api(request.user, interface)
 
@@ -388,7 +388,7 @@ def _convert_queries(queries_data):
   for query_data in queries_data:
     try:
       snippet = query_data['snippets'][0]
-      if 'guid' in snippet['result']['handle']: # Not failed query
+      if 'guid' in snippet['result']['handle']:  # Not failed query
         guid = snippet['result']['handle']['guid']
         if isinstance(guid, str):
           guid = guid.encode('utf-8')
@@ -493,7 +493,6 @@ def upload_table_stats(request):
   if not OPTIMIZER.AUTO_UPLOAD_STATS.get():
     with_table_stats = with_columns_stats = False
 
-
   for db_table in db_tables:
     path = _get_table_name(db_table)
 
@@ -514,7 +513,7 @@ def upload_table_stats(request):
         stats = dict((stat['data_type'], stat['comment']) for stat in full_table_stats['stats'])
 
         table_stats.append({
-          'table_name': '%(database)s.%(table)s' % path, # DB Prefix
+          'table_name': '%(database)s.%(table)s' % path,  # DB Prefix
           'num_rows': stats.get('numRows', -1),
           'last_modified_time': stats.get('transient_lastDdlTime', -1),
           'total_size': stats.get('totalSize', -1),
@@ -548,7 +547,7 @@ def upload_table_stats(request):
 
         for col_stats in raw_column_stats:
           column_stats.append({
-            'table_name': '%(database)s.%(table)s' % path, # DB Prefix
+            'table_name': '%(database)s.%(table)s' % path,  # DB Prefix
             'column_name': col_stats['col_name'],
             'data_type': col_stats['data_type'],
             "num_distinct": int(col_stats.get('distinct_count')) if col_stats.get('distinct_count') != '' else -1,

@@ -160,7 +160,7 @@ def delete_job(request):
         doc.can_write_or_exception(request.user)
         doc.delete()
         doc2.delete()
-    else: # Old version
+    else:  # Old version
       job = Job.objects.can_read_or_exception(request, job['object_id'])
       Job.objects.can_edit_or_exception(request, job)
       OldWorklow.objects.destroy(job, request.fs)
@@ -263,6 +263,7 @@ def _get_workflows(user):
         } for workflow in [d.content_object for d in Document.objects.get_docs(user, Document2, extra='workflow2').order_by('-id')]
     ]
   return workflows
+
 
 @check_editor_access_permission
 def add_node(request):
@@ -541,12 +542,12 @@ def edit_coordinator(request):
     if coordinator_id and not [a for a in workflows if a['uuid'] == coordinator.data['properties']['workflow']]:
       raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
 
-  if USE_NEW_EDITOR.get(): # In Hue 4, merge with above
+  if USE_NEW_EDITOR.get():  # In Hue 4, merge with above
     workflows = [dict([('uuid', d.uuid), ('name', d.name)])
                       for d in Document2.objects.documents(request.user, include_managed=False).search_documents(types=['oozie-workflow2'])]
 
   can_edit = doc is None or (doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user))
-  if request.GET.get('format') == 'json': # For Editor
+  if request.GET.get('format') == 'json':  # For Editor
     return JsonResponse({
       'coordinator': coordinator.get_data_for_json(),
       'credentials': list(credentials.credentials.keys()),
@@ -719,7 +720,7 @@ def submit_coordinator(request, doc_id):
     return render('/scheduler/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': coordinator.name,
-                 'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id}),
+                 'action': reverse('oozie:editor_submit_coordinator', kwargs={'doc_id': coordinator.id}),
                  'show_dryrun': True,
                  'return_json': request.GET.get('format') == 'json'
                 }, force_template=True)
@@ -731,11 +732,11 @@ def _submit_coordinator(request, coordinator, mapping):
     if IS_MULTICLUSTER_ONLY.get() and get_cluster_config(request.user)['has_computes']:
       mapping['auto-cluster'] = {
         u'additionalClusterResourceTags': [],
-        u'automaticTerminationCondition': u'EMPTY_JOB_QUEUE', #'u'NONE',
+        u'automaticTerminationCondition': u'EMPTY_JOB_QUEUE',  # 'u'NONE',
         u'cdhVersion': u'CDH514',
         u'clouderaManagerPassword': u'guest',
         u'clouderaManagerUsername': u'guest',
-        u'clusterName': u'analytics4', # Add time variable
+        u'clusterName': u'analytics4',  # Add time variable
         u'computeWorkersConfiguration': {
           u'bidUSDPerHr': 0,
           u'groupSize': 0,
@@ -949,7 +950,7 @@ def submit_bundle(request, doc_id):
     return render('/scheduler/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': bundle.name,
-                 'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id}),
+                 'action': reverse('oozie:editor_submit_bundle', kwargs={'doc_id': bundle.id}),
                  'return_json': request.GET.get('format') == 'json',
                  'show_dryrun': False
                 }, force_template=True)

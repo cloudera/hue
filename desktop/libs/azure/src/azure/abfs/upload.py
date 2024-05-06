@@ -32,11 +32,12 @@ from azure.abfs.abfs import ABFSFileSystemException
 
 from django.utils.translation import gettext as _
 
-DEFAULT_WRITE_SIZE = 100 * 1024 * 1024 # As per Azure doc, maximum blob size is 100MB
+DEFAULT_WRITE_SIZE = 100 * 1024 * 1024  # As per Azure doc, maximum blob size is 100MB
 
 LOG = logging.getLogger()
 
 from filebrowser.utils import generate_chunks, calculate_total_size
+
 
 class ABFSFineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
@@ -47,7 +48,7 @@ class ABFSFineUploaderChunkedUpload(object):
     self.totalfilesize = kwargs.get('qqtotalfilesize')
     self.file_name = kwargs.get('qqfilename')
     if self.file_name:
-      self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+      self.file_name = unicodedata.normalize('NFC', self.file_name)  # Normalize unicode
     self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
     self.target_path = None
 
@@ -57,7 +58,7 @@ class ABFSFineUploaderChunkedUpload(object):
     if self._is_abfs_upload():
       self._fs = self._get_abfs(request)
       self.filesystem, self.directory = parse_uri(self.destination)[:2]
-       # Verify that the path exists
+      # Verify that the path exists
       self._fs.stats(self.destination)
 
   def check_access(self):
@@ -69,7 +70,7 @@ class ABFSFineUploaderChunkedUpload(object):
 
     try:
       # Check access permissions before attempting upload
-      #self._check_access() #implement later
+      # self._check_access() #implement later
       LOG.debug("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s" % self.target_path)
       if not TASK_SERVER.ENABLED.get():
         self._fs.create(self.target_path)
@@ -103,7 +104,7 @@ class ABFSFineUploaderChunkedUpload(object):
       LOG.exception('ABFSFineUploaderChunkedUpload: Failed to upload file to ABFS at %s: %s' % (self.target_path, e))
       raise PopupException("ABFSFineUploaderChunkedUpload: S3FileUploadHandler uploading file %s part: %d failed" % (self.filepath, i))
     finally:
-      #finish the upload
+      # finish the upload
       self._fs.flush(self.target_path, {'position': self.totalfilesize})
       LOG.info("ABFSFineUploaderChunkedUpload: has completed file upload to ABFS, total file size is: %d." % self.totalfilesize)
       LOG.debug("%s" % self._fs.stats(self.target_path))
@@ -134,6 +135,7 @@ class ABFSFineUploaderChunkedUpload(object):
     else:
       return None
 
+
 class ABFSFileUploadError(UploadFileException):
   pass
 
@@ -156,11 +158,10 @@ class ABFSFileUploadHandler(FileUploadHandler):
     if self._is_abfs_upload():
       self._fs = self._get_abfs(request)
       self.filesystem, self.directory = parse_uri(self.destination)[:2]
-       # Verify that the path exists
+      # Verify that the path exists
       self._fs.stats(self.destination)
 
     LOG.debug("Chunk size = %d" % DEFAULT_WRITE_SIZE)
-
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_abfs_upload():
@@ -171,7 +172,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
 
       try:
         # Check access permissions before attempting upload
-        #self._check_access() #implement later
+        # self._check_access() #implement later
         LOG.debug("Initiating ABFS upload to target path: %s" % self.target_path)
         self._fs.create(self.target_path)
         self.file = SimpleUploadedFile(name=file_name, content='')
@@ -180,7 +181,6 @@ class ABFSFileUploadHandler(FileUploadHandler):
         LOG.error("Encountered error in ABFSUploadHandler check_access: %s" % e)
         self.request.META['upload_failed'] = e
         raise StopUpload()
-
 
   def receive_data_chunk(self, raw_data, start):
     if self._is_abfs_upload():
@@ -197,7 +197,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
 
   def file_complete(self, file_size):
     if self._is_abfs_upload():
-      #finish the upload
+      # finish the upload
       self._fs.flush(self.target_path, {'position': int(file_size)})
       LOG.info("ABFSFileUploadHandler has completed file upload to ABFS, total file size is: %d." % file_size)
       self.file.size = file_size

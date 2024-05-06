@@ -50,10 +50,11 @@ IS_ENABLED = Config(
     default=False
 )
 
+
 def config_validator(user):
   res = []
 
-  from hadoop import cluster # Avoid dependencies conflicts
+  from hadoop import cluster  # Avoid dependencies conflicts
   yarn_cluster = cluster.get_cluster_conf_for_job_submission()
 
   if yarn_cluster.SECURITY_ENABLED.get() and not os.path.exists(SQOOP_CONF_DIR.get()):

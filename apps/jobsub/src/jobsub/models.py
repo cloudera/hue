@@ -60,7 +60,7 @@ class JobDesign(models.Model):
     return reverse("jobsub.views.submit_design", kwargs=dict(id=self.id))
 
   def clone(self):
-    clone_kwargs = dict([(field.name, getattr(self, field.name)) for field in self._meta.fields if field.name != 'id']);
+    clone_kwargs = dict([(field.name, getattr(self, field.name)) for field in self._meta.fields if field.name != 'id'])
     return self.__class__.objects.create(**clone_kwargs)
 
   def to_jsonable(self):
@@ -71,6 +71,7 @@ class JobDesign(models.Model):
       'type': self.type,
       'data': repr(self.data)
     }
+
 
 class CheckForSetup(models.Model):
   """
@@ -83,7 +84,7 @@ class CheckForSetup(models.Model):
   setup_level = models.IntegerField(default=0)
 
 
-################################## New Models ################################
+# New Models ################################
 
 PATH_MAX = 512
 

@@ -46,6 +46,7 @@ def get_site_encoding():
     SITE_ENCODING = encoding
   return SITE_ENCODING
 
+
 def validate_encoding(encoding):
   """Return True/False on whether the system understands this encoding"""
   try:
@@ -54,12 +55,14 @@ def validate_encoding(encoding):
   except LookupError:
     return False
 
+
 def force_unicode(s, strings_only=False, errors='strict'):
   """
   Wrapper around Django's version, while supplying our configured encoding.
   Decode char array to unicode.
   """
   return django.utils.encoding.force_str(s, get_site_encoding(), strings_only, errors)
+
 
 def smart_str(s, strings_only=False, errors='strict', encoding=None):
   """
@@ -71,6 +74,7 @@ def smart_str(s, strings_only=False, errors='strict', encoding=None):
 
 _CACHED_ENV = None
 
+
 def make_utf8_env():
   """
   Communication with child processes is in utf8. Make a utf8 environment.
@@ -79,7 +83,7 @@ def make_utf8_env():
   if not _CACHED_ENV:
     # LANG are in the form of <language>[.<encoding>[@<modifier>]]
     # We want to replace the "encoding" part with UTF-8
-    lang_re = re.compile('\.([^@]*)')
+    lang_re = re.compile(r'\.([^@]*)')
 
     env = os.environ.copy()
     lang = env.get('LANG', DEFAULT_LANG)

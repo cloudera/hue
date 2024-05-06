@@ -44,7 +44,7 @@ class BeatApi(Api):
           'status': self._massage_status(app),
           'apiStatus': self._api_status(self._massage_status(app)),
           'type': 'celery-beat',
-          'user': app['description'], # No user id available yet
+          'user': app['description'],  # No user id available yet
           'progress': 50,
           'queue': app['queue'],
           'canWrite': self.user.username == app['description'],
@@ -54,7 +54,6 @@ class BeatApi(Api):
       ],
       'total': len(tasks)
     }
-
 
   def app(self, appid):
     appid = appid.rsplit('-')[-1]
@@ -78,7 +77,6 @@ class BeatApi(Api):
       }
     }
 
-
   def action(self, app_ids, operation):
     api = CeleryBeatApi(user=self.user)
 
@@ -94,10 +92,8 @@ class BeatApi(Api):
 
     return {'kills': operations, 'status': len(app_ids) - len(operations), 'message': _('%s signal sent to %s') % (operation['action'], operations)}
 
-
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
-
 
   def profile(self, appid, app_type, app_property, app_filters):
     appid = appid.rsplit('-')[-1]
@@ -109,13 +105,11 @@ class BeatApi(Api):
     else:
       return {}
 
-
   def _api_status(self, status):
     if status == 'RUNNING':
       return 'RUNNING'
     else:
       return 'PAUSED'
-
 
   def _massage_status(self, task):
     return 'RUNNING' if task['enabled'] else 'PAUSED'
@@ -167,14 +161,11 @@ class LivyJobApi(Api):
 
     return common
 
-
   def action(self, appid, action):
     return {}
 
-
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
-
 
   def profile(self, appid, app_type, app_property):
     return {}
@@ -185,4 +176,4 @@ class LivyJobApi(Api):
     elif status in ['COMPLETED']:
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # INTERRUPTED , KILLED, TERMINATED and FAILED
+      return 'FAILED'  # INTERRUPTED , KILLED, TERMINATED and FAILED

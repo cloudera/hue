@@ -164,7 +164,7 @@ def profile(request):
   ])
 
   api = get_api(request.user, interface, cluster=cluster)
-  api._set_request(request) # For YARN
+  api._set_request(request)  # For YARN
 
   resp = api.profile(app_id, app_type, app_property, app_filters)
 

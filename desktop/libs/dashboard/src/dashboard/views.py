@@ -45,18 +45,18 @@ LOG = logging.getLogger()
 
 
 DEFAULT_LAYOUT = [
-     {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
-     {"size":10,"rows":[{"widgets":[
-         {"size":12,"name":"Filter Bar","widgetType":"filter-widget", "id":"99923aef-b233-9420-96c6-15d48293532b",
-          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
-                        {"widgets":[
-         {"size":12,"name":"Grid Results","widgetType":"resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
-          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-        "drops":["temp"],"klass":"card card-home card-column span10"},
+     {"size": 2, "rows": [{"widgets": []}], "drops": ["temp"], "klass": "card card-home card-column span2"},
+     {"size": 10, "rows": [{"widgets": [
+         {"size": 12, "name": "Filter Bar", "widgetType": "filter-widget", "id": "99923aef-b233-9420-96c6-15d48293532b",
+          "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]},
+                        {"widgets": [
+         {"size": 12, "name": "Grid Results", "widgetType": "resultset-widget", "id": "14023aef-b233-9420-96c6-15d48293532b",
+          "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]}],
+        "drops": ["temp"], "klass": "card card-home card-column span10"},
 ]
 
 REPORT_LAYOUT = [
-  {u'klass': u'card card-home card-column span12', u'rows': [{"widgets":[]}], u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12}
+  {u'klass': u'card card-home card-column span12', u'rows': [{"widgets": []}], u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12}
 ]
 
 QUERY_BUILDER_LAYOUT = [
@@ -73,19 +73,19 @@ QUERY_BUILDER_LAYOUT = [
 ]
 
 TEXT_SEARCH_LAYOUT = [
-     {"size":12,"rows":[{"widgets":[
-         {"size":12,"name":"Filter Bar","widgetType":"filter-widget", "id":"99923aef-b233-9420-96c6-15d48293532b",
-          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
-                        {"widgets":[
-         {"size":12,"name":"HTML Results","widgetType":"html-resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
-          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-        "drops":["temp"],"klass":"card card-home card-column span12"},
+     {"size": 12, "rows": [{"widgets": [
+         {"size": 12, "name": "Filter Bar", "widgetType": "filter-widget", "id": "99923aef-b233-9420-96c6-15d48293532b",
+          "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]},
+                        {"widgets": [
+         {"size": 12, "name": "HTML Results", "widgetType": "html-resultset-widget", "id": "14023aef-b233-9420-96c6-15d48293532b",
+          "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]}],
+        "drops": ["temp"], "klass": "card card-home card-column span12"},
 ]
 
 
 def index(request, is_mobile=False):
   engine = request.GET.get('engine', 'solr')
-  cluster = request.POST.get('cluster','""')
+  cluster = request.POST.get('cluster', '""')
   collection_id = request.GET.get('collection')
 
   collections = get_engine(request.user, engine, cluster=cluster).datasets() if engine != 'report' else ['default']
@@ -137,12 +137,14 @@ def index(request, is_mobile=False):
     'is_report': collection.data['collection'].get('engine') == 'report'
   })
 
+
 def index_m(request):
   return index(request, True)
 
+
 def new_search(request):
   engine = request.GET.get('engine', 'solr')
-  cluster = request.POST.get('cluster','""')
+  cluster = request.POST.get('cluster', '""')
 
   collections = get_engine(request.user, engine, cluster=cluster).datasets() if engine != 'report' else ['default']
 
@@ -187,12 +189,13 @@ def new_search(request):
       'is_report': engine == 'report'
     })
 
+
 def browse(request, name, is_mobile=False):
   engine = request.GET.get('engine', 'solr')
   source = request.GET.get('source', 'data')
 
   if engine == 'solr':
-    name = re.sub('^default\.', '', name)
+    name = re.sub(r'^default\.', '', name)
 
   database = name.split('.', 1)[0]
   collections = get_engine(request.user, engine, source=source).datasets(database=database)
@@ -214,10 +217,10 @@ def browse(request, name, is_mobile=False):
       'autoLoad': True,
       'collections': collections,
       'layout': [
-          {"size":12,"rows":[{"widgets":[
-              {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
-               "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-          "drops":["temp"],"klass":"card card-home card-column span10"}
+          {"size": 12, "rows": [{"widgets": [
+              {"size": 12, "name": "Grid Results", "id": "52f07188-f30f-1296-2450-f77e02e1a5c0", "widgetType": "resultset-widget",
+               "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]}],
+          "drops": ["temp"], "klass": "card card-home card-column span10"}
       ],
       'qb_layout': QUERY_BUILDER_LAYOUT,
       'text_search_layout': TEXT_SEARCH_LAYOUT,

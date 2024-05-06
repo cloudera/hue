@@ -108,6 +108,7 @@ def test_impersonation_is_decorator_is_there():
   # Decorator is still there
   from hbased.Hbase import do_as
 
+
 @pytest.mark.django_db
 def test_impersonation():
   from hbased import Hbase as thrift_hbase
@@ -125,24 +126,22 @@ def test_impersonation():
   try:
     client.getTableNames(doas=user.username)
   except AttributeError:
-    pass # We don't mock everything
+    pass  # We don't mock everything
   finally:
     get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = impersonation_enabled
 
   assert {} == proto.get_headers()
-
 
   get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = 'TRUE'
 
   try:
     client.getTableNames(doas=user.username)
   except AttributeError:
-    pass # We don't mock everything
+    pass  # We don't mock everything
   finally:
     get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = impersonation_enabled
 
   assert {'doAs': u'test_hbase'} == proto.get_headers()
-
 
 
 class MockHttpClient(object):
@@ -152,9 +151,11 @@ class MockHttpClient(object):
   def setCustomHeaders(self, headers):
     self.headers = headers
 
+
 class MockTransport(object):
   def __init__(self):
     self._TBufferedTransport__trans = MockHttpClient()
+
 
 class MockProtocol(object):
   def __init__(self):
@@ -180,7 +181,6 @@ class TestIntegrationWithHBase(TestCase):
     cls.user = User.objects.get(username='test')
     add_to_group('test')
     grant_access("test", "test", "indexer")
-
 
   def test_list_tables(self):
     if not is_live_cluster():

@@ -55,6 +55,7 @@ class Operator(object):
       "fields": self._get_default_output_fields()
     }
 
+
 OPERATORS = [
   Operator(
     name="split",
@@ -124,8 +125,10 @@ OPERATORS = [
   ),
 ]
 
+
 def get_operator(operation_name):
   return [operation for operation in OPERATORS if operation.name == operation_name][0]
+
 
 def get_checked_args(operation):
   operation_args = get_operator(operation["type"]).args

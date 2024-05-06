@@ -34,7 +34,7 @@ from io import StringIO as string_io
 
 
 LOG = logging.getLogger()
-_NAME_REGEX = re.compile('^[a-zA-Z][\-_a-zA-Z0-0]*$')
+_NAME_REGEX = re.compile(r'^[a-zA-Z][\-_a-zA-Z0-0]*$')
 
 
 def catch_unicode_time(u_time):
@@ -56,7 +56,7 @@ def parse_timestamp(timestamp, time_format=None):
     return time.strptime(timestamp, time_format)
   except ValueError:
     try:
-      return time.strptime(re.sub(' \w+$', '', timestamp), time_format.replace(' %Z', ''))
+      return time.strptime(re.sub(r' \w+$', '', timestamp), time_format.replace(' %Z', ''))
     except ValueError:
       LOG.error("Failed to convert Oozie timestamp: %s" % time_format)
   except Exception:
@@ -73,7 +73,7 @@ def config_gen(dic):
   print("<configuration>", file=sio)
   # if dic's key contains <,>,& then it will be escaped and if dic's value contains ']]>' then ']]>' will be stripped
   for k, v in sorted(dic.items()):
-    print("<property>\n  <name>%s</name>\n  <value><![CDATA[%s]]></value>\n</property>\n" \
+    print("<property>\n  <name>%s</name>\n  <value><![CDATA[%s]]></value>\n</property>\n"
         % (escape(k), v.replace(']]>', '') if isinstance(v, basestring) else v), file=sio)
   print("</configuration>", file=sio)
   sio.flush()
@@ -83,6 +83,7 @@ def config_gen(dic):
 
 def is_valid_node_name(name):
   return _NAME_REGEX.match(name) is not None
+
 
 def format_time(time, format='%d %b %Y %H:%M:%S'):
   if time is None:
@@ -99,7 +100,7 @@ def format_time(time, format='%d %b %Y %H:%M:%S'):
 
     if fmt_time is None:
       try:
-        fmt_time = strftime(format+" %f", time)
+        fmt_time = strftime(format + " %f", time)
       except:
         fmt_time = None
 

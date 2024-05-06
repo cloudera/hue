@@ -47,7 +47,7 @@ class Credentials(object):
 
   @property
   def class_to_name_credentials(self):
-    return dict((v,k) for k, v in self.credentials.items())
+    return dict((v, k) for k, v in self.credentials.items())
 
   def get_properties(self, hive_properties=None):
     credentials = {}

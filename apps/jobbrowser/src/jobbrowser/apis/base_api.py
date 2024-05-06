@@ -93,13 +93,13 @@ class Api(object):
 
   def apps(self, filters): return {'apps': [], 'total': 0}
 
-  def app(self, appid): return {} # Also contains progress (0-100) and status [RUNNING, SUCCEEDED, PAUSED, FAILED]
+  def app(self, appid): return {}  # Also contains progress (0-100) and status [RUNNING, SUCCEEDED, PAUSED, FAILED]
 
   def action(self, app_ids, operation): return {}
 
   def logs(self, appid, app_type, log_name, is_embeddable=False): return {'progress': 0, 'logs': ''}
 
-  def profile(self, appid, app_type, app_property, app_filters): return {} # Tasks, XML, counters...
+  def profile(self, appid, app_type, app_property, app_filters): return {}  # Tasks, XML, counters...
 
   def _set_request(self, request):
     self.request = request

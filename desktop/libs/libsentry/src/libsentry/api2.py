@@ -233,7 +233,6 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
   def _massage_privilege(self, privilege):
     return {
         'component': privilege.component,
@@ -245,10 +244,8 @@ class SentryApi(object):
         'grantOption': privilege.grantOption == 1,
     }
 
-
   def _massage_authorizable(self, authorizables):
     return [{'type': auth.type, 'name': auth.name} for auth in authorizables]
-
 
   def _massage_string_authorizable(self, authorizables):
     return [{'type': auth.split('=')[0], 'name': auth.split('=')[1]} for auth in authorizables.split('->')]

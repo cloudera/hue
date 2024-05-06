@@ -39,7 +39,6 @@ _CNF_HBASE_USE_THRIFT_HTTP = 'hbase.regionserver.thrift.http'
 _CNF_HBASE_USE_THRIFT_SSL = 'hbase.thrift.ssl.enabled'
 
 
-
 def reset():
   global SITE_DICT
   SITE_DICT = None
@@ -62,6 +61,7 @@ def get_server_principal():
 def get_server_authentication():
   return get_conf().get(_CNF_HBASE_AUTHENTICATION, 'NOSASL').upper()
 
+
 def get_thrift_transport():
   use_framed = get_conf().get(_CNF_HBASE_REGIONSERVER_THRIFT_FRAMED)
   if use_framed is not None:
@@ -70,19 +70,22 @@ def get_thrift_transport():
     else:
       return "buffered"
   else:
-    #Avoid circular import
+    # Avoid circular import
     from hbase.conf import THRIFT_TRANSPORT
     return THRIFT_TRANSPORT.get()
 
+
 def is_impersonation_enabled():
-  #Avoid circular import
+  # Avoid circular import
   from hbase.conf import USE_DOAS
   return get_conf().get(_CNF_HBASE_IMPERSONATION_ENABLED, 'FALSE').upper() == 'TRUE' or USE_DOAS.get()
 
+
 def is_using_thrift_http():
-  #Avoid circular import
+  # Avoid circular import
   from hbase.conf import USE_DOAS
   return get_conf().get(_CNF_HBASE_USE_THRIFT_HTTP, 'FALSE').upper() == 'TRUE' or USE_DOAS.get()
+
 
 def is_using_thrift_ssl():
   return get_conf().get(_CNF_HBASE_USE_THRIFT_SSL, 'FALSE').upper() == 'TRUE'
@@ -92,7 +95,7 @@ def _parse_site():
   global SITE_DICT
   global SITE_PATH
 
-  #Avoid circular import
+  # Avoid circular import
   from hbase.conf import HBASE_CONF_DIR
   SITE_PATH = os.path.join(HBASE_CONF_DIR.get(), 'hbase-site.xml')
   try:
@@ -104,4 +107,3 @@ def _parse_site():
     data = ""
 
   SITE_DICT = confparse.ConfParse(data)
-

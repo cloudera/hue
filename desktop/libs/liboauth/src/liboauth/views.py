@@ -23,7 +23,9 @@ import sys
 
 LOG = logging.getLogger()
 
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 try:
   import httplib2
 except ImportError:
@@ -68,7 +70,6 @@ def show_login_page(request, login_errors=False):
     'socialLinkedin': liboauth.conf.CONSUMER_KEY_LINKEDIN.get() != "" and liboauth.conf.CONSUMER_SECRET_LINKEDIN.get() != "",
     'socialTwitter': liboauth.conf.CONSUMER_KEY_TWITTER.get() != "" and liboauth.conf.CONSUMER_SECRET_TWITTER.get() != ""
  })
-
 
 
 @login_notrequired

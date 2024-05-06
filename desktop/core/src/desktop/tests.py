@@ -114,12 +114,13 @@ def test_home():
   tags = json.loads(response.context[0]['json_tags'])
   assert [] == tags['mine'][0]['docs'], tags
   assert [] == tags['trash']['docs'], tags
-  assert [] == tags['history']['docs'], tags # We currently don't fetch [doc.id]
+  assert [] == tags['history']['docs'], tags  # We currently don't fetch [doc.id]
+
 
 @pytest.mark.django_db
 def test_skip_wizard():
   pytest.skip("Skipping due to failures with pytest, investigation ongoing.")
-  c = make_logged_in_client() # is_superuser
+  c = make_logged_in_client()  # is_superuser
 
   response = c.get('/', follow=True)
   assert ['admin_wizard.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates]
@@ -131,7 +132,6 @@ def test_skip_wizard():
   c.cookies['hueLandingPage'] = ''
   response = c.get('/', follow=True)
   assert ['admin_wizard.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates]
-
 
   c = make_logged_in_client(username="test_skip_wizard", password="test_skip_wizard", is_superuser=False)
 
@@ -146,6 +146,7 @@ def test_skip_wizard():
   response = c.get('/', follow=True)
   assert ['home.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates]
 
+
 @pytest.mark.django_db
 def test_public_views():
   c = Client()
@@ -157,6 +158,7 @@ def test_public_views():
       url = reverse(view)
     response = c.get(url)
     assert 200 == response.status_code
+
 
 def test_prometheus_view():
   if not desktop.conf.ENABLE_PROMETHEUS.get():
@@ -188,9 +190,10 @@ def test_prometheus_view():
   for metric in ALL_PROMETHEUS_METRICS:
     metric = metric if isinstance(metric, bytes) else metric.encode('utf-8')
     if metric not in desktop.metrics.ALLOWED_DJANGO_PROMETHEUS_METRICS:
-      assert not metric in response.content, 'metric: %s \n %s' % (metric, response.content)
+      assert metric not in response.content, 'metric: %s \n %s' % (metric, response.content)
     else:
       assert metric in response.content, 'metric: %s \n %s' % (metric, response.content)
+
 
 @pytest.mark.django_db
 def test_log_view():
@@ -216,6 +219,7 @@ def test_log_view():
   response = c.get(URL)
   assert 200 == response.status_code
 
+
 def test_download_log_view():
   pytest.skip("Skipping Test")
   c = make_logged_in_client()
@@ -228,6 +232,7 @@ def test_download_log_view():
   # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
   response = c.get(URL)
   assert "application/zip" == response.get('Content-Type', '')
+
 
 def hue_version():
   global HUE_VERSION
@@ -301,6 +306,7 @@ def test_status_bar():
   views.register_status_bar_view(lambda _: HttpResponse("foo", status=200))
   views.register_status_bar_view(lambda _: HttpResponse("bar"))
   views.register_status_bar_view(lambda _: None)
+
   def f(r):
     raise Exception()
   views.register_status_bar_view(f)
@@ -342,11 +348,13 @@ def test_paginator():
   assert_page(pgn.page(1), list(range(20)), 1, 20)
   assert_page(pgn.page(2), list(range(20, 25)), 21, 25)
 
+
 @pytest.mark.django_db
 def test_thread_dump():
   c = make_logged_in_client()
   response = c.get("/desktop/debug/threads", HTTP_X_REQUESTED_WITH='XMLHttpRequest')
   assert b"test_thread_dump" in response.content
+
 
 def test_truncating_model():
   class TinyModel(TruncatingModel):
@@ -355,10 +363,10 @@ def test_truncating_model():
 
   a = TinyModel()
 
-  a.short_field = 'a' * 9 # One less than it's max length
+  a.short_field = 'a' * 9  # One less than it's max length
   assert a.short_field == 'a' * 9, 'Short-enough field does not get truncated'
 
-  a.short_field = 'a' * 11 # One more than it's max_length
+  a.short_field = 'a' * 11  # One more than it's max_length
   assert a.short_field == 'a' * 10, 'Too-long field gets truncated'
 
   a.non_string_field = 10**10
@@ -372,6 +380,7 @@ def test_error_handling():
   restore_500_debug = desktop.conf.HTTP_500_DEBUG_MODE.set_for_testing(False)
 
   exc_msg = "error_raising_view: Test earráid handling"
+
   def error_raising_view(request, *args, **kwargs):
     raise Exception(exc_msg)
 
@@ -419,7 +428,7 @@ def test_desktop_permissions():
   USERNAME = 'test_core_permissions'
   GROUPNAME = 'default'
 
-  desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/testserver\/.*$')
+  desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'^\/.*$,^http:\/\/testserver\/.*$')
 
   c = make_logged_in_client(USERNAME, groupname=GROUPNAME, recreate=True, is_superuser=False)
 
@@ -434,7 +443,7 @@ def test_app_permissions():
   USERNAME = 'test_app_permissions'
   GROUPNAME = 'impala_only'
   resets = [
-    desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/testserver\/.*$'),
+    desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'^\/.*$,^http:\/\/testserver\/.*$'),
     HAS_SQL_ENABLED.set_for_testing(False)
   ]
 
@@ -462,16 +471,16 @@ def test_app_permissions():
     check_app(401, 'oozie')
 
     apps = ClusterConfig(user=user).get_apps()
-    assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'browser' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'dashboard' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'sdkapps' in apps, apps
+    assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'pig' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'browser' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'dashboard' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'sdkapps' not in apps, apps
 
     # Should always be enabled as it is a lib
     grant_access(USERNAME, GROUPNAME, "beeswax")
@@ -489,15 +498,15 @@ def test_app_permissions():
 
     apps = ClusterConfig(user=user).get_apps()
     assert 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'browser' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'dashboard' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'sdkapps' in apps, apps
+    assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'pig' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'browser' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'dashboard' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'sdkapps' not in apps, apps
 
     # Add access to hbase
     grant_access(USERNAME, GROUPNAME, "hbase")
@@ -512,17 +521,17 @@ def test_app_permissions():
 
     apps = ClusterConfig(user=user).get_apps()
     assert 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'pig' not in apps.get('editor', {}).get('interpreter_names', []), apps
     if 'hbase' not in desktop.conf.APP_BLACKLIST.get():
       assert 'browser' in apps, apps
       assert 'hbase' in apps['browser']['interpreter_names'], apps['browser']
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'scheduler' in apps, apps
-    assert not 'dashboard' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'sdkapps' in apps, apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'scheduler' not in apps, apps
+    assert 'dashboard' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'sdkapps' not in apps, apps
 
     # Reset all perms
     GroupPermission.objects.filter(group__name=GROUPNAME).delete()
@@ -535,16 +544,16 @@ def test_app_permissions():
     check_app(401, 'oozie')
 
     apps = ClusterConfig(user=user).get_apps()
-    assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'browser' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'dashboard' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'sdkapps' in apps, apps
+    assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'pig' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'browser' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'dashboard' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'sdkapps' not in apps, apps
 
     # Test only impala perm
     grant_access(USERNAME, GROUPNAME, "impala")
@@ -557,16 +566,16 @@ def test_app_permissions():
     check_app(401, 'oozie')
 
     apps = ClusterConfig(user=user).get_apps()
-    assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'browser' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'dashboard' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'sdkapps' in apps, apps
+    assert 'pig' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'browser' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'dashboard' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'sdkapps' not in apps, apps
 
     # Oozie Editor and Browser
     grant_access(USERNAME, GROUPNAME, "oozie")
@@ -580,9 +589,9 @@ def test_app_permissions():
 
     apps = ClusterConfig(user=user).get_apps()
     assert 'scheduler' in apps, apps
-    assert not 'browser' in apps, apps # Actually should be true, but logic not implemented
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'browser' not in apps, apps  # Actually should be true, but logic not implemented
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
 
     grant_access(USERNAME, GROUPNAME, "pig")
     check_app(401, 'hive')
@@ -594,11 +603,11 @@ def test_app_permissions():
     check_app(200, 'oozie')
 
     apps = ClusterConfig(user=user).get_apps()
-    assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
 
     if 'search' not in desktop.conf.APP_BLACKLIST.get():
       grant_access(USERNAME, GROUPNAME, "search")
@@ -611,11 +620,11 @@ def test_app_permissions():
       check_app(200, 'oozie')
 
       apps = ClusterConfig(user=user).get_apps()
-      assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
+      assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-      assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
+      assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
 
     if 'spark' not in desktop.conf.APP_BLACKLIST.get():
       grant_access(USERNAME, GROUPNAME, "spark")
@@ -628,7 +637,7 @@ def test_app_permissions():
       check_app(200, 'oozie')
 
       apps = ClusterConfig(user=user).get_apps()
-      assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
+      assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
@@ -690,6 +699,7 @@ def test_404_handling():
     view_name = view_name.encode('utf-8')
   assert view_name in response.content
 
+
 class RecordingHandler(logging.Handler):
   def __init__(self, *args, **kwargs):
     logging.Handler.__init__(self, *args, **kwargs)
@@ -697,6 +707,7 @@ class RecordingHandler(logging.Handler):
 
   def emit(self, r):
     self.records.append(r)
+
 
 @pytest.mark.django_db
 def test_log_event():
@@ -725,6 +736,7 @@ def test_log_event():
     handler.records[-1].message)
 
   root.removeHandler(handler)
+
 
 def test_validate_path():
   with tempfile.NamedTemporaryFile() as local_file:
@@ -770,6 +782,7 @@ def test_config_check():
       try:
         # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
         os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
+
         def validate_by_spec(error_list):
           pass
 
@@ -786,6 +799,7 @@ def test_config_check():
         else:
           os.environ["HUE_CONF_DIR"] = prev_env_conf
         desktop.views.validate_by_spec = desktop.views.real_validate_by_spec
+
 
 def test_last_access_time():
   pytest.skip("Skipping Test")
@@ -861,6 +875,7 @@ def test_cx_Oracle():
           "So ignore this test failure if your build does not need to work "
           "with an oracle backend.")
 
+
 @pytest.mark.django_db
 class TestStrictRedirection(object):
 
@@ -868,7 +883,7 @@ class TestStrictRedirection(object):
     self.finish = desktop.conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend'])
     self.client = make_logged_in_client()
     self.user = dict(username="test", password="test")
-    desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/example.com\/.*$')
+    desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'^\/.*$,^http:\/\/example.com\/.*$')
 
   def teardown_method(self):
     self.finish()
@@ -1145,7 +1160,6 @@ class TestDocument(object):
       test_doc1.delete()
       child_dir.delete()
 
-
   def test_multiple_home_directories(self):
     home_dir = Directory.objects.get_home_directory(self.user)
     test_doc1 = Document2.objects.create(
@@ -1196,7 +1210,6 @@ class TestDocument(object):
     Document2.objects.filter(name='second_trash_dir').update(name=Document2.TRASH_DIR)
     assert Directory.objects.filter(owner=self.user, name=Document2.TRASH_DIR).count() == 2
 
-
     test_doc2 = Document2.objects.create(
         name='test-doc2',
         type='query-hive',
@@ -1204,12 +1217,12 @@ class TestDocument(object):
         description='',
         parent_directory=home_dir
     )
-    assert home_dir.children.count() == 5 # Including the second trash
+    assert home_dir.children.count() == 5  # Including the second trash
     with pytest.raises(Document2.MultipleObjectsReturned):
         Directory.objects.get(name=Document2.TRASH_DIR)
 
     test_doc1.trash()
-    assert home_dir.children.count() == 3 # As trash documents are merged count is back to 3
+    assert home_dir.children.count() == 3  # As trash documents are merged count is back to 3
     merged_trash_dir = Directory.objects.get(name=Document2.TRASH_DIR, owner=self.user)
 
     test_doc2.trash()
@@ -1218,7 +1231,6 @@ class TestDocument(object):
     children_names = [child.name for child in children]
     assert test_doc2.name in children_names
     assert test_doc1.name in children_names
-
 
   def test_document_copy(self):
     pytest.skip("Skipping Test")
@@ -1254,12 +1266,11 @@ class TestDocument(object):
     assert Document.objects.filter(name=name).count() == 1
     assert doc.description == self.document.description
 
-
   def test_redact_statements(self):
     old_policies = redaction.global_redaction_engine.policies
     redaction.global_redaction_engine.policies = [
       RedactionPolicy([
-        RedactionRule('', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
+        RedactionRule('', r'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
       ])
     ]
 
@@ -1333,7 +1344,7 @@ class TestDocument(object):
       # Make sure unredacted queries are not redacted.
       assert nonsensitive_query == saved_snippets[2]['statement']
       assert nonsensitive_query == saved_snippets[2]['statement_raw']
-      assert not 'is_redacted' in saved_snippets[2]
+      assert 'is_redacted' not in saved_snippets[2]
     finally:
       redaction.global_redaction_engine.policies = old_policies
 
@@ -1341,6 +1352,7 @@ class TestDocument(object):
     c1 = make_logged_in_client(username='test_get_user', groupname='test_get_group', recreate=True, is_superuser=False)
     r1 = c1.get('/desktop/api/doc/get?id=1')
     assert -1, json.loads(r1.content)['status']
+
 
 def test_session_secure_cookie():
   with tempfile.NamedTemporaryFile() as cert_file:
@@ -1411,6 +1423,7 @@ def test_get_data_link():
   assert '/filebrowser/view=/data/hue/1' == get_data_link({'type': 'hdfs', 'path': '/data/hue/1'})
   assert '/metastore/table/default/sample_07' == get_data_link({'type': 'hive', 'database': 'default', 'table': 'sample_07'})
 
+
 def test_get_dn():
   assert ['*'] == desktop.conf.get_dn('')
   assert ['*'] == desktop.conf.get_dn('localhost')
@@ -1435,6 +1448,7 @@ def test_collect_validation_messages_default():
     assert len(error_list) == 0, error_list
   finally:
     os.remove(configspec.name)
+
 
 def test_collect_validation_messages_extras():
   try:
@@ -1473,6 +1487,7 @@ def test_collect_validation_messages_extras():
   assert (u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , '
       'Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ' ==
       error_list[0]['message'])
+
 
 # Test db migration from 5.7,...,5.15 to latest
 @pytest.mark.django_db
@@ -1546,7 +1561,7 @@ def test_db_migrations_mysql():
 def test_forbidden_libs():
   if sys.version_info[0] > 2:
     pytest.skip("Skipping Test")
-  import chardet # chardet license (LGPL) is not compatible and should not be bundled
+  import chardet  # chardet license (LGPL) is not compatible and should not be bundled
 
 
 @pytest.mark.django_db

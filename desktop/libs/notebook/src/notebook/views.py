@@ -46,6 +46,7 @@ from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
+
 @check_document_access_permission
 def notebook(request, is_embeddable=False):
   if not SHOW_NOTEBOOKS.get() or not request.user.has_hue_permission(action="access", app='notebook'):
@@ -222,7 +223,7 @@ def execute_and_watch(request):
 
     sample = get_api(request, snippet).fetch_result(notebook, snippet, 0, start_over=True)
 
-    from indexer.api3 import _index # Will ve moved to the lib
+    from indexer.api3 import _index  # Will ve moved to the lib
     from indexer.file_format import HiveFormat
     from indexer.fields import Field
 

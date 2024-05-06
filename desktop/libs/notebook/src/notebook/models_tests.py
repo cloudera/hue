@@ -59,7 +59,6 @@ class TestInstallCustomExamples():
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=True, is_admin=True)
     self.user = User.objects.get(username="test")
 
-
   def test_install_only_hive_queries(self):
     finish = [
       EXAMPLES.AUTO_LOAD.set_for_testing(True),
@@ -96,7 +95,6 @@ class TestInstallCustomExamples():
     finally:
       for f in finish:
         f()
-
 
   def test_install_auto_load_disabled(self):
     f = EXAMPLES.AUTO_LOAD.set_for_testing(False)

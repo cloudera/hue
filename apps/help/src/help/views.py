@@ -21,14 +21,18 @@ from desktop import appmanager
 from hadoop.fs import LocalSubFileSystem
 
 import markdown
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import os
 
 INDEX_FILENAMES = ("index.md", "index.html", "index.txt")
 
+
 def _unquote_path(path):
   """Normalizes paths."""
   return urllib.parse.unquote(path)
+
 
 def get_help_fs(app_name):
   """
@@ -41,6 +45,7 @@ def get_help_fs(app_name):
     return LocalSubFileSystem(app.help_dir)
   else:
     raise PopupException("App '%s' is not loaded, so no help is available for it!" % app_name)
+
 
 def view(request, app, path):
   """
@@ -79,8 +84,8 @@ def view(request, app, path):
 
   data = {
     'content': content,
-    'apps': sorted([ x for x in appmanager.DESKTOP_MODULES if x.help_dir ],
-      key = lambda app: app.menu_index),
+    'apps': sorted([x for x in appmanager.DESKTOP_MODULES if x.help_dir],
+      key=lambda app: app.menu_index),
     'title': appmanager.get_desktop_module(app).nice_name,
     'current': app,
     'is_embeddable': request.GET.get('is_embeddable', False),

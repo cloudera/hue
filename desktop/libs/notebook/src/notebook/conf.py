@@ -97,7 +97,7 @@ def get_ordered_interpreters(user=None):
     ]
   else:
     if INTERPRETERS_CACHE is None:
-      none_user = None # for getting full list of interpreters
+      none_user = None  # for getting full list of interpreters
       if is_cm_managed():
         extra_interpreters = INTERPRETERS.get()  # Combine the other apps interpreters
         _default_interpreters(none_user)
@@ -146,13 +146,14 @@ def get_ordered_interpreters(user=None):
       'dialect': i.get('dialect', i['type']).lower(),
       'dialect_properties': i.get('dialect_properties') or {},  # Empty when connectors off
       'category': i.get('category', 'editor'),
-      "is_sql": i.get('is_sql') or \
-          i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink", "trino"] or \
+      "is_sql": i.get('is_sql') or
+          i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink", "trino"] or
           i['type'] in ["sql", "sparksql"],
       "is_catalog": i['interface'] in ["hms",],
     }
     for i in interpreters
   ]
+
 
 def computes_for_dialect(dialect, user):
   # import here due to avoid cyclic dependency
@@ -166,6 +167,7 @@ def computes_for_dialect(dialect, user):
   return ns_with_computes
 
 # cf. admin wizard too
+
 
 INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
@@ -313,6 +315,7 @@ EXAMPLES = ConfigSection(
     )
   )
 )
+
 
 def _default_interpreters(user):
   interpreters = []

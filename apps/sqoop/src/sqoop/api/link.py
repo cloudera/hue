@@ -40,6 +40,7 @@ __all__ = ['get_links', 'create_link', 'update_link', 'link', 'links', 'link_clo
 
 LOG = logging.getLogger()
 
+
 @never_cache
 def get_links(request):
   response = {
@@ -53,6 +54,7 @@ def get_links(request):
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not get links.')))
   return JsonResponse(response)
+
 
 @never_cache
 def create_link(request):
@@ -78,6 +80,7 @@ def create_link(request):
     response['errors'] = e.to_dict()
   return JsonResponse(response)
 
+
 @never_cache
 def update_link(request, link):
   response = {
@@ -101,6 +104,7 @@ def update_link(request, link):
     response['errors'] = e.to_dict()
   return JsonResponse(response)
 
+
 @never_cache
 def links(request):
   if request.method == 'GET':
@@ -109,6 +113,7 @@ def links(request):
     return create_link(request)
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET or POST request required.'), error_code=405)
+
 
 @never_cache
 @get_link_or_exception()
@@ -125,6 +130,7 @@ def link(request, link):
     return update_link(request, link)
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET or POST request required.'), error_code=405)
+
 
 @never_cache
 @get_link_or_exception()
@@ -149,6 +155,7 @@ def link_clone(request, link):
     response['status'] = 100
     response['errors'] = e.to_dict()
   return JsonResponse(response)
+
 
 @never_cache
 @get_link_or_exception()

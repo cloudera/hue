@@ -32,7 +32,9 @@ from desktop.lib.rest import resource
 
 from libsolr.conf import SSL_CERT_CA_VERIFY
 
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 from urllib.parse import quote as urllib_quote
 from urllib.parse import unquote as urllib_unquote
 from django.utils.translation import gettext as _
@@ -78,7 +80,6 @@ class SolrApi(object):
       # a cookie so future PUT/POSTs will be pre-authenticated.
       if self.security_enabled:
         self._root.invoke('HEAD', '/')
-
 
   def query(self, collection, query):
     solr_query = {}
@@ -179,7 +180,7 @@ class SolrApi(object):
                   'numBuckets': True,
                   'allBuckets': True,
                   'sort': sort
-                  #'prefix': '' # Forbidden on numeric fields
+                  # 'prefix': '' # Forbidden on numeric fields
               })
             json_facets[facet['id']] = _f['facet'][dim_key]
         elif facet['type'] == 'function':
@@ -187,7 +188,7 @@ class SolrApi(object):
             json_facets[facet['id']] = self._get_aggregate_function(facet['properties']['facets'][0])
             if facet['properties']['compare']['is_enabled']:
               # TODO: global compare override
-              unit = re.split('\d+', facet['properties']['compare']['gap'])[1]
+              unit = re.split(r'\d+', facet['properties']['compare']['gap'])[1]
               json_facets[facet['id']] = {
                 'type': 'range',
                 'field': collection['timeFilter'].get('field'),
@@ -233,7 +234,7 @@ class SolrApi(object):
     if nested_fields:
       fl += urllib_unquote(utf_quoter(',[child parentFilter="%s"]' % ' OR '.join(nested_fields)))
 
-    if collection['template']['moreLikeThis'] and fl != ['*']: # Potential conflict with nested documents
+    if collection['template']['moreLikeThis'] and fl != ['*']:  # Potential conflict with nested documents
       id_field = collection.get('idField', 'id')
       params += (
         ('mlt', 'true'),
@@ -243,8 +244,8 @@ class SolrApi(object):
         ('mlt.maxdf', 50),
         ('mlt.maxntp', 1000),
         ('mlt.count', 10),
-        #('mlt.minwl', 1),
-        #('mlt.maxwl', 1),
+        # ('mlt.minwl', 1),
+        # ('mlt.maxwl', 1),
       )
       fl = '*'
 
@@ -257,7 +258,7 @@ class SolrApi(object):
       ('hl.fragsize', 1000),
     )
 
-    #if query.get('timezone'):
+    # if query.get('timezone'):
     #  params += (('TZ', query.get('timezone')),)
 
     if collection['template']['fieldsSelected']:
@@ -282,7 +283,6 @@ class SolrApi(object):
       response = self._root.get('%(collection)s/select' % solr_query, params)
 
     return self._get_json(response)
-
 
   def _n_facet_dimension(self, widget, _f, facets, dim, timeFilter, collection, can_range=None):
     facet = facets[0]
@@ -311,10 +311,10 @@ class SolrApi(object):
           'allBuckets': True,
           'sort': sort,
           'missing': facet.get('missing', False)
-          #'prefix': '' # Forbidden on numeric fields
+          # 'prefix': '' # Forbidden on numeric fields
       }
       if int(facet['mincount']):
-        _f[f_name]['mincount'] = int(facet['mincount']) # Forbidden on n > 0 field if mincount = 0
+        _f[f_name]['mincount'] = int(facet['mincount'])  # Forbidden on n > 0 field if mincount = 0
 
       if 'start' in facet and not facet.get('type') == 'field':
         _f[f_name].update({
@@ -326,14 +326,14 @@ class SolrApi(object):
 
         # Only on dim 1 currently
         if can_range or (timeFilter and timeFilter['time_field'] == facet['field']
-                         and (widget['id'] not in timeFilter['time_filter_overrides'])): # or facet['widgetType'] != 'bucket-widget'):
+                         and (widget['id'] not in timeFilter['time_filter_overrides'])):  # or facet['widgetType'] != 'bucket-widget'):
           facet['widgetType'] = widget['widgetType']
           _f[f_name].update(self._get_time_filter_query(timeFilter, facet, collection))
 
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])
 
-      if len(facets) > 1: # Get n+1 dimension
+      if len(facets) > 1:  # Get n+1 dimension
         if facets[1]['aggregate']['function'] == 'count':
           self._n_facet_dimension(widget, _f[f_name], facets[1:], dim + 1, timeFilter, collection)
         else:
@@ -348,9 +348,8 @@ class SolrApi(object):
           agg_function = self._get_aggregate_function(_f_agg)
           _f['facet']['agg_%02d_%02d:%s' % (dim, i, agg_function)] = agg_function
         else:
-          self._n_facet_dimension(widget, _f, facets[i:], dim + 1, timeFilter, collection) # Get n+1 dimension
+          self._n_facet_dimension(widget, _f, facets[i:], dim + 1, timeFilter, collection)  # Get n+1 dimension
           break
-
 
   def select(self, collection, query=None, rows=100, start=0):
     if query is None:
@@ -365,7 +364,6 @@ class SolrApi(object):
 
     response = self._root.get('%s/select' % collection, params)
     return self._get_json(response)
-
 
   def suggest(self, collection, query):
     try:
@@ -384,8 +382,7 @@ class SolrApi(object):
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
-  def collections(self): # To drop, used in indexer v1
+  def collections(self):  # To drop, used in indexer v1
     try:
       params = self._get_params() + (
           ('detail', 'true'),
@@ -395,7 +392,6 @@ class SolrApi(object):
       return json.loads(response['znode'].get('data', '{}'))
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def collections2(self):
     try:
@@ -407,7 +403,6 @@ class SolrApi(object):
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   def config(self, name):
     try:
       params = self._get_params() + (
@@ -418,7 +413,6 @@ class SolrApi(object):
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   def configs(self):
     try:
       params = self._get_params() + (
@@ -428,7 +422,6 @@ class SolrApi(object):
       return self._root.get('admin/configs', params=params)['configSets']
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def create_config(self, name, base_config, immutable=False):
     try:
@@ -442,7 +435,6 @@ class SolrApi(object):
       return self._root.post('admin/configs', params=params, contenttype='application/json')
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def delete_config(self, name):
     response = {'status': -1, 'message': ''}
@@ -463,7 +455,6 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
     return response
 
-
   def list_aliases(self):
     try:
       params = self._get_params() + (
@@ -474,13 +465,11 @@ class SolrApi(object):
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   def collection_or_core(self, hue_collection):
     if hue_collection.is_core_only:
       return self.core(hue_collection.name)
     else:
       return self.collection(hue_collection.name)
-
 
   def collection(self, name):
     try:
@@ -488,7 +477,6 @@ class SolrApi(object):
       return collections[name]
     except Exception as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def create_collection2(self, name, config_name=None, shards=1, replication=1, **kwargs):
     try:
@@ -515,7 +503,6 @@ class SolrApi(object):
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   def update_config(self, name, properties):
     try:
       params = self._get_params() + (
@@ -527,7 +514,6 @@ class SolrApi(object):
       return self._get_json(response)
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def add_fields(self, name, fields):
     try:
@@ -542,7 +528,6 @@ class SolrApi(object):
       return self._get_json(response)
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def create_core(self, name, instance_dir, shards=1, replication=1):
     try:
@@ -566,7 +551,6 @@ class SolrApi(object):
       else:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   def create_alias(self, name, collections):
     try:
       params = self._get_params() + (
@@ -584,7 +568,6 @@ class SolrApi(object):
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   def delete_alias(self, name):
     try:
       params = self._get_params() + (
@@ -600,7 +583,6 @@ class SolrApi(object):
         raise PopupException(msg)
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def delete_collection(self, name):
     response = {'status': -1, 'message': ''}
@@ -621,7 +603,6 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
     return response
 
-
   def remove_core(self, name):
     try:
       params = self._get_params() + (
@@ -639,7 +620,6 @@ class SolrApi(object):
         return False
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def cores(self):
     try:
@@ -659,7 +639,6 @@ class SolrApi(object):
       return self._root.get('admin/cores', params=params)
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def get_schema(self, collection):
     try:
@@ -762,7 +741,6 @@ class SolrApi(object):
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   def info_system(self):
     try:
       params = self._get_params() + (
@@ -774,10 +752,9 @@ class SolrApi(object):
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   def sql(self, collection, statement):
     try:
-      if 'limit' not in statement.lower(): # rows is not supported
+      if 'limit' not in statement.lower():  # rows is not supported
         statement = statement + ' LIMIT 100'
 
       params = self._get_params() + (
@@ -805,7 +782,6 @@ class SolrApi(object):
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   def export(self, name, query, fl, sort, rows=100):
     try:
       params = self._get_params() + (
@@ -819,7 +795,6 @@ class SolrApi(object):
       return self._get_json(response)
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def update(self, collection_or_core_name, data, content_type='csv', version=None, **kwargs):
     if content_type == 'csv':
@@ -846,11 +821,10 @@ class SolrApi(object):
     response = self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
     return self._get_json(response)
 
-
   # Deprecated
   def aliases(self):
     try:
-      params = self._get_params() + ( # Waiting for SOLR-4968
+      params = self._get_params() + (  # Waiting for SOLR-4968
           ('detail', 'true'),
           ('path', '/aliases.json'),
       )
@@ -858,7 +832,6 @@ class SolrApi(object):
       return json.loads(response['znode'].get('data', '{}')).get('collection', {})
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   # Deprecated
   def create_collection(self, name, shards=1, replication=1):
@@ -881,7 +854,6 @@ class SolrApi(object):
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-
   # Deprecated
   def remove_collection(self, name):
     try:
@@ -899,7 +871,6 @@ class SolrApi(object):
         return False
     except RestException as e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def _get_params(self):
     if self.security_enabled:
@@ -962,7 +933,7 @@ class SolrApi(object):
         stat_facet = {'min': timeFilter['from'], 'max': timeFilter['to']}
         properties['start'] = None
         properties['end'] = None
-      else: # The user has zoomed in. Only show that section.
+      else:  # The user has zoomed in. Only show that section.
         stat_facet = {'min': properties['min'], 'max': properties['max']}
       _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'],
                            SLOTS=properties['slot'])
@@ -983,7 +954,7 @@ class SolrApi(object):
         stat_facet = stats_json['stats']['stats_fields'][facet['field']]
         properties['start'] = None
         properties['end'] = None
-      else: # the user has zoomed in. Only show that section.
+      else:  # the user has zoomed in. Only show that section.
         stat_facet = {'min': properties['min'], 'max': properties['max']}
       _compute_range_facet(facet['widgetType'], stat_facet, props, properties['start'], properties['end'], SLOTS=properties['slot'])
       return {
@@ -1015,12 +986,12 @@ class SolrApi(object):
 
     for fq in merged_fqs:
       if fq['type'] == 'field':
-        fields = fq['field'] if type(fq['field']) == list else [fq['field']] # 2D facets support
+        fields = fq['field'] if type(fq['field']) == list else [fq['field']]  # 2D facets support
         for field in fields:
           f = []
           for _filter in fq['filter']:
-            values = _filter['value'] if type(_filter['value']) == list else [_filter['value']] # 2D facets support
-            if fields.index(field) < len(values): # Lowest common field denominator
+            values = _filter['value'] if type(_filter['value']) == list else [_filter['value']]  # 2D facets support
+            if fields.index(field) < len(values):  # Lowest common field denominator
               value = values[fields.index(field)]
               if value or value is False:
                 exclude = '-' if _filter['exclude'] else ''
@@ -1029,7 +1000,7 @@ class SolrApi(object):
                   f.append('%s%s:"%s"' % (exclude, field, value))
                 else:
                   f.append('%s{!field f=%s}%s' % (exclude, field, value))
-              else: # Handle empty value selection that are returned using solr facet.missing
+              else:  # Handle empty value selection that are returned using solr facet.missing
                 value = "*"
                 exclude = '-'
                 f.append('%s%s:%s' % (exclude, field, value))
@@ -1057,7 +1028,6 @@ class SolrApi(object):
 
     return params
 
-
   def _get_dimension_aggregates(self, facets):
     aggregates = []
     for agg in facets:
@@ -1067,13 +1037,11 @@ class SolrApi(object):
         return aggregates
     return aggregates
 
-
   def _get_nested_fields(self, collection):
     if collection and collection.get('nested') and collection['nested']['enabled']:
       return [field['filter'] for field in self._flatten_schema(collection['nested']['schema']) if field['selected']]
     else:
       return []
-
 
   def _flatten_schema(self, level):
     fields = []
@@ -1082,7 +1050,6 @@ class SolrApi(object):
       if field['values']:
         fields.extend(self._flatten_schema(field['values']))
     return fields
-
 
   @classmethod
   def _get_json(cls, response):
@@ -1095,7 +1062,6 @@ class SolrApi(object):
         LOG.error('%s: %s' % (str(e), repr(response)))
         response = json.loads(response.replace('\x00', ''))
     return response
-
 
   def uniquekey(self, collection):
     try:
@@ -1110,12 +1076,12 @@ class SolrApi(object):
 
 GAPS = {
     '5MINUTES': {
-        'histogram-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
-        'timeline-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
-        'bucket-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
-        'bar-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
-        'facet-widget': {'coeff': '+1', 'unit': 'MINUTES'}, # ~10 slots
-        'pie-widget': {'coeff': '+1', 'unit': 'MINUTES'} # ~10 slots
+        'histogram-widget': {'coeff': '+3', 'unit': 'SECONDS'},  # ~100 slots
+        'timeline-widget': {'coeff': '+3', 'unit': 'SECONDS'},  # ~100 slots
+        'bucket-widget': {'coeff': '+3', 'unit': 'SECONDS'},  # ~100 slots
+        'bar-widget': {'coeff': '+3', 'unit': 'SECONDS'},  # ~100 slots
+        'facet-widget': {'coeff': '+1', 'unit': 'MINUTES'},  # ~10 slots
+        'pie-widget': {'coeff': '+1', 'unit': 'MINUTES'}  # ~10 slots
     },
     '30MINUTES': {
         'histogram-widget': {'coeff': '+20', 'unit': 'SECONDS'},

@@ -93,7 +93,6 @@ class Command(BaseCommand):
       )
       LOG.info("Logs collection successfully installed")
 
-
   def _setup_collection_from_csv(self, collection, path):
     if not self.client.exists(collection['name']):
       self.client.create_index(
@@ -105,7 +104,6 @@ class Command(BaseCommand):
 
       with open(path) as fh:
         self.client.index(collection['name'], fh.read())
-
 
   def _parse_fields(self, path, separator=',', quote_character='"', fieldtypes={}):
     with open(path) as fh:

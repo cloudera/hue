@@ -39,7 +39,7 @@ from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
-TIMESTAMP_PATTERN = '\[([\w\d\s\-\/\:\+]*?)\]'
+TIMESTAMP_PATTERN = r'\[([\w\d\s\-\/\:\+]*?)\]'
 FIELD_XML_TEMPLATE = '<field name="%(name)s" type="%(type)s" indexed="%(indexed)s" stored="%(stored)s" required="%(required)s" multiValued="%(multiValued)s" />'
 DEFAULT_FIELD = {
   'name': None,
@@ -277,7 +277,7 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
 
     remove_keys = None
     for row in reader:
-      row = dict([(force_unicode(k), force_unicode(v, errors='ignore')) for k, v in row.items()]) # Get rid of invalid binary chars and convert to unicode from DictReader
+      row = dict([(force_unicode(k), force_unicode(v, errors='ignore')) for k, v in row.items()])  # Get rid of invalid binary chars and convert to unicode from DictReader
 
       # Remove keys that aren't in collection
       if remove_keys is None:
@@ -324,7 +324,7 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
       yield row
 
 
-def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general'}, {'name': 'tdate', 'type': 'timestamp'} ]):
+def field_values_from_log(fh, fields=[{'name': 'message', 'type': 'text_general'}, {'name': 'tdate', 'type': 'timestamp'}]):
   """
   Only timestamp and message
   """
@@ -361,7 +361,7 @@ def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general
     last_newline = content.rfind('\n')
     if last_newline > -1:
       buf = content[:last_newline]
-      content = content[last_newline+1:]
+      content = content[last_newline + 1:]
       for row in value_generator(buf):
         yield row
     prev = fh.read()

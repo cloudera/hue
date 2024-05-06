@@ -39,7 +39,7 @@ def config_validator(user):
   v1
   All the configuration happens in apps/beeswax.
   '''
-  from beeswax.design import hql_query # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
+  from beeswax.design import hql_query  # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
   from beeswax.server import dbms
 
   res = []
@@ -49,7 +49,7 @@ def config_validator(user):
 
   try:
     try:
-      if not 'test' in sys.argv:  # Avoid tests hanging
+      if 'test' not in sys.argv:  # Avoid tests hanging
         server = dbms.get(user)
         query = hql_query("SELECT 'Hello World!';")
         handle = server.execute_and_wait(query, timeout_sec=10.0)

@@ -34,12 +34,12 @@ from unittest.mock import patch, Mock
 
 LOG = logging.getLogger()
 
+
 @pytest.mark.django_db
 class TestDbms():
 
   def setup_method(self):
     self.client = make_logged_in_client()
-
 
   def test_get_connector_config(self):
     connector = {

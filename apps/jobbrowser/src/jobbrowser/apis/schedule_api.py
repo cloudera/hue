@@ -68,7 +68,6 @@ class ScheduleApi(Api):
       'total': jobs.total
     }
 
-
   def app(self, appid, offset=1, filters={}):
     oozie_api = get_oozie(self.user)
     coordinator = oozie_api.get_coordinator(jobid=appid)
@@ -76,14 +75,14 @@ class ScheduleApi(Api):
     mock_get = MockGet()
     mock_get.update('offset', offset)
 
-    """ 
+    """
       The Oozie job api supports one or more "status" parameters. The valid status values are:
-      
+
       WAITING, READY, SUBMITTED, RUNNING, SUSPENDED, TIMEDOUT, SUCCEEDED, KILLED, FAILED, IGNORED, SKIPPED
-      
+
       The job browser UI has a generic filter mechanism that is re-used across all different type of jobs, that
       parameter is called "states" and it only has three possible values: completed, running or failed
-      
+
       Here we adapt this to fit the API requirements, "state" becomes "status" and the values are translated
       based on how it's been done historically (for instance list_oozie_coordinator.mako around line 725).
     """
@@ -122,17 +121,14 @@ class ScheduleApi(Api):
 
     return common
 
-
   def action(self, app_ids, action):
     return _manage_oozie_job(self.user, action, app_ids)
-
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     request = MockDjangoRequest(self.user)
     data = get_oozie_job_log(request, job_id=appid)
 
     return {'logs': json.loads(data.content)['log']}
-
 
   def profile(self, appid, app_type, app_property, app_filters):
     if app_property == 'xml':

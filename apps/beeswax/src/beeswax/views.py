@@ -58,23 +58,23 @@ from desktop.auth.backend import is_admin
 from django.utils.translation import gettext as _
 
 
-
 LOG = logging.getLogger()
 
 # For scraping Job IDs from logs
 HADOOP_JOBS_RE = re.compile("Starting Job = ([a-z0-9_]+?),")
-SPARK_APPLICATION_RE = re.compile("Running with YARN Application = (?P<application_id>application_\d+_\d+)")
-TEZ_APPLICATION_RE = re.compile("Executing on YARN cluster with App id ([a-z0-9_]+?)\)")
-TEZ_QUERY_RE = re.compile("\(queryId=([a-z0-9_-]+?)\)")
-
+SPARK_APPLICATION_RE = re.compile(r"Running with YARN Application = (?P<application_id>application_\d+_\d+)")
+TEZ_APPLICATION_RE = re.compile(r"Executing on YARN cluster with App id ([a-z0-9_]+?)\)")
+TEZ_QUERY_RE = re.compile(r"\(queryId=([a-z0-9_-]+?)\)")
 
 
 def index(request):
   return execute_query(request)
 
+
 """
 Design views
 """
+
 
 def save_design(request, form, type_, design, explicit_save):
   """
@@ -92,7 +92,7 @@ def save_design(request, form, type_, design, explicit_save):
   """
   authorized_get_design(request, design.id)
   assert form.saveform.is_valid()
-  sub_design_form = form # Beeswax/Impala case
+  sub_design_form = form  # Beeswax/Impala case
 
   if type_ == models.HQL:
     design_cls = beeswax.design.HQLdesign
@@ -368,7 +368,6 @@ def list_query_history(request):
     }
     return JsonResponse(resp)
 
-
   return render('list_history.mako', request, {
     'request': request,
     'page': page,
@@ -411,9 +410,11 @@ def download(request, id, format, user_agent=None):
       message = e.message
     raise PopupException(message, detail='')
 
+
 """
 Queries Views
 """
+
 
 def execute_query(request, design_id=None, query_history_id=None):
   """
@@ -459,7 +460,7 @@ def execute_query(request, design_id=None, query_history_id=None):
   context = {
     'design': design,
     'apps': apps_list,
-    'query': query_history, # Backward
+    'query': query_history,  # Backward
     'query_history': query_history,
     'autocomplete_base_url': reverse(get_app_name(request) + ':api_autocomplete_databases', kwargs={}),
     'autocomplete_base_url_hive': reverse('beeswax:api_autocomplete_databases', kwargs={}),
@@ -613,6 +614,7 @@ def configuration(request):
 Other views
 """
 
+
 def install_examples(request):
   response = {'status': -1, 'message': ''}
 
@@ -683,6 +685,8 @@ def query_done_cb(request, server_id):
 """
 Utils
 """
+
+
 def massage_columns_for_json(cols):
   massaged_cols = []
   for column in cols:
@@ -969,6 +973,7 @@ def parse_out_jobs(log, engine='mr', with_state=False):
 
   return ret
 
+
 def parse_out_queries(log, engine=None, with_state=False):
   """
   Ideally, Hive would tell us what jobs it has run directly from the Thrift interface.
@@ -1009,6 +1014,7 @@ def parse_out_queries(log, engine=None, with_state=False):
         ret.append(job_id)
 
   return ret
+
 
 def _copy_prefix(prefix, base_dict):
   """Copy keys starting with ``prefix``"""
@@ -1151,6 +1157,8 @@ def get_db_choices(request):
   return [(db, db) for db in dbs]
 
 
-WHITESPACE = re.compile("\s+", re.MULTILINE)
+WHITESPACE = re.compile(r"\s+", re.MULTILINE)
+
+
 def collapse_whitespace(s):
   return WHITESPACE.sub(" ", s).strip()

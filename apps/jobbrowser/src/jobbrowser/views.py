@@ -26,7 +26,9 @@ import re
 import string
 import sys
 import time
-import urllib.request, urllib.error, urllib.parse
+import urllib.request
+import urllib.error
+import urllib.parse
 import urllib.parse
 
 from lxml import html
@@ -256,6 +258,7 @@ def single_spark_job(request, job):
       'job': job
     })
 
+
 @check_job_permission
 def single_job(request, job):
   def cmp_exec_time(task1, task2):
@@ -333,6 +336,7 @@ def kill_job(request, job):
     time.sleep(1)
 
   raise Exception(_("Job did not appear as killed within 15 seconds."))
+
 
 @check_job_permission
 def job_executor_logs(request, job, attempt_index=0, name='syslog', offset=LOG_OFFSET_BYTES):
@@ -438,7 +442,7 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
 
   if failed_tasks:
     task = failed_tasks[0]
-    if not task.taskAttemptIds and len(failed_tasks) > 1: # In some cases the last task ends up without any attempt
+    if not task.taskAttemptIds and len(failed_tasks) > 1:  # In some cases the last task ends up without any attempt
       task = failed_tasks[1]
   else:
     task_states = ['running', 'succeeded']
@@ -517,6 +521,7 @@ def single_task(request, job, taskid):
     'joblnk': job_link
   })
 
+
 @check_job_permission
 def single_task_attempt(request, job, taskid, attemptid):
   jt = get_api(request.user, request.jt)
@@ -535,6 +540,7 @@ def single_task_attempt(request, job, taskid, attemptid):
       "joblnk": job_link,
       "task": task
     })
+
 
 @check_job_permission
 def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_BYTES):
@@ -592,6 +598,7 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
   else:
     return render("attempt_logs.mako", request, context)
 
+
 @check_job_permission
 def task_attempt_counters(request, job, taskid, attemptid):
   """
@@ -606,6 +613,7 @@ def task_attempt_counters(request, job, taskid, attemptid):
     counters = attempt.counters
   return render("counters.html", request, {'counters': counters})
 
+
 @access_log_level(logging.WARN)
 def kill_task_attempt(request, attemptid):
   """
@@ -615,6 +623,7 @@ def kill_task_attempt(request, attemptid):
   ret = request.jt.kill_task_attempt(request.jt.thriftattemptid_from_string(attemptid))
   return render_json({})
 
+
 def trackers(request):
   """
   We get here from /trackers
@@ -622,6 +631,7 @@ def trackers(request):
   trackers = get_tasktrackers(request)
 
   return render("tasktrackers.mako", request, {'trackers': trackers})
+
 
 def single_tracker(request, trackerid):
   jt = get_api(request.user, request.jt)
@@ -631,6 +641,7 @@ def single_tracker(request, trackerid):
   except Exception as e:
     raise PopupException(_('The tracker could not be contacted.'), detail=e)
   return render("tasktracker.mako", request, {'tracker': tracker})
+
 
 def container(request, node_manager_http_address, containerid):
   jt = get_api(request.user, request.jt)
@@ -649,11 +660,13 @@ def clusterstatus(request):
   """
   return render("clusterstatus.html", request, Cluster(request.jt))
 
+
 def queues(request):
   """
   We get here from /queues
   """
   return render("queues.html", request, {"queuelist": request.jt.queues()})
+
 
 @check_job_permission
 def set_job_priority(request, job):
@@ -665,7 +678,9 @@ def set_job_priority(request, job):
   request.jt.set_job_priority(jid, ThriftJobPriority._NAMES_TO_VALUES[priority])
   return render_json({})
 
+
 CONF_VARIABLE_REGEX = r"\$\{(.+)\}"
+
 
 def make_substitutions(conf):
   """
@@ -676,6 +691,7 @@ def make_substitutions(conf):
   this code does not have.
   """
   r = re.compile(CONF_VARIABLE_REGEX)
+
   def sub(s, depth=0):
     # Malformed / malicious confs could make this loop infinitely
     if depth > 100:
@@ -685,7 +701,7 @@ def make_substitutions(conf):
     if m:
       for g in [g for g in m.groups() if g in conf]:
         substr = "${%s}" % g
-        s = s.replace(substr, sub(conf[g], depth+1))
+        s = s.replace(substr, sub(conf[g], depth + 1))
     return s
 
   for k, v in list(conf.items()):
@@ -693,7 +709,8 @@ def make_substitutions(conf):
   return conf
 
 ##################################
-## Helper functions
+# Helper functions
+
 
 def get_shorter_id(hadoop_job_id):
   return "_".join(hadoop_job_id.split("_")[-2:])
@@ -735,7 +752,7 @@ def get_state_link(request, option=None, val='', VALID_OPTIONS=("state", "user",
   return "&".join(["%s=%s" % (key, quote_plus(value)) for key, value in states.items()])
 
 
-## All Unused below
+# All Unused below
 
 # DEAD?
 def dock_jobs(request):
@@ -744,6 +761,8 @@ def dock_jobs(request):
   return render("jobs_dock_info.mako", request, {
     'jobs': matching_jobs
   }, force_template=True)
+
+
 register_status_bar_view(dock_jobs)
 
 
@@ -791,7 +810,7 @@ def jobbrowser(request):
     return lambda job: job.status == state
 
   status = request.jt.cluster_status()
-  alljobs = [] #get_matching_jobs(request)
+  alljobs = []  # get_matching_jobs(request)
   runningjobs = list(filter(check_job_state('RUNNING'), alljobs))
   completedjobs = list(filter(check_job_state('COMPLETED'), alljobs))
   failedjobs = list(filter(check_job_state('FAILED'), alljobs))

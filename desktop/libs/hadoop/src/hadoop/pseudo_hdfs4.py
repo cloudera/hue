@@ -49,10 +49,12 @@ TEST_HDFS_TMP_DIR = os.environ.get('TEST_HDFS_TMP_DIR')
 def is_live_cluster():
   return os.environ.get('LIVE_CLUSTER', 'false').lower() == 'true'
 
+
 def get_fs_prefix(fs):
   prefix = '/tmp/hue_tests_%s' % str(time.time())
   fs.mkdir(prefix, 0o777)
   return prefix
+
 
 def get_db_prefix(name='hive'):
   if is_live_cluster():
@@ -65,7 +67,7 @@ class LiveHdfs(object):
   def __init__(self):
     self.fs = cluster.get_hdfs('default')
     # Assumes /tmp exists and is 1777
-    self.jt = None # Deprecated
+    self.jt = None  # Deprecated
 
     self.fs_prefix = get_fs_prefix(self.fs)
     LOG.info('Using %s as FS root' % self.fs_prefix)
@@ -203,7 +205,6 @@ class PseudoHdfs4(object):
     if self.shutdown_hook is not None:
       self.shutdown_hook()
 
-
   def _tmppath(self, filename):
     return os.path.join(self._tmpdir, filename)
 
@@ -250,7 +251,7 @@ class PseudoHdfs4(object):
     if "JAVA_HOME" in os.environ:
       env['JAVA_HOME'] = os.environ['JAVA_HOME']
 
-    LOG.debug("Hadoop Environment:\n" + "\n".join([ str(x) for x in sorted(env.items()) ]))
+    LOG.debug("Hadoop Environment:\n" + "\n".join([str(x) for x in sorted(env.items())]))
 
     # Format HDFS
     self._format(self.hadoop_conf_dir, env)
@@ -298,13 +299,12 @@ class PseudoHdfs4(object):
 
     self.fs_prefix = get_fs_prefix(self.fs)
 
-
   def _start_mr2(self, env):
     LOG.info("Starting MR2")
 
     self._mr2_env = env.copy()
 
-    LOG.debug("MR2 Environment:\n" + "\n".join([ str(x) for x in sorted(self.mr2_env.items()) ]))
+    LOG.debug("MR2 Environment:\n" + "\n".join([str(x) for x in sorted(self.mr2_env.items())]))
 
     # Run YARN
     self._rm_proc = self._start_daemon('resourcemanager', self.hadoop_conf_dir, self.mr2_env, self._get_yarn_bin(self.mr2_env))
@@ -369,7 +369,6 @@ class PseudoHdfs4(object):
     LOG.debug('Waiting for DN to come up .................\n%s' % (report_out,))
     return False
 
-
   def _is_mr2_ready(self, env):
     if self._rm_proc.poll() is not None:
       self._log_exit('resourcemanager', self._rm_proc.poll())
@@ -380,7 +379,6 @@ class PseudoHdfs4(object):
     if self._hs_proc.poll() is not None:
       self._log_exit('historyserver', self._hs_proc.poll())
       return False
-
 
     # Run a `hadoop job -list all'
     list_all = subprocess.Popen(
@@ -395,7 +393,6 @@ class PseudoHdfs4(object):
 
     LOG.debug('MR2 not ready yet.\n%s\n%s' % (list_all.stderr.read(), list_all.stderr.read()))
     return False
-
 
   def _start_daemon(self, proc_name, conf_dir, env, hadoop_bin=None):
     if hadoop_bin is None:
@@ -443,7 +440,7 @@ class PseudoHdfs4(object):
       'dfs.namenode.safemode.extension': 1,
       'dfs.namenode.safemode.threshold-pct': 0,
       'dfs.datanode.address': '%s:0' % self._fqdn,
-      'dfs.datanode.http.address': '0.0.0.0:0', # Work around webhdfs redirect bug -- bind to all interfaces
+      'dfs.datanode.http.address': '0.0.0.0:0',  # Work around webhdfs redirect bug -- bind to all interfaces
       'dfs.datanode.ipc.address': '%s:0' % self._fqdn,
       'dfs.replication': 1,
       'dfs.safemode.min.datanodes': 1,
@@ -496,7 +493,7 @@ class PseudoHdfs4(object):
       'yarn.nodemanager.local-dirs': self._local_dir,
       'yarn.nodemanager.log-dirs': self._logpath('yarn-logs'),
       'yarn.nodemanager.remote-app-log-dir': '/var/log/hadoop-yarn/apps',
-      'yarn.nodemanager.localizer.address' : '%s:%s' % (self._fqdn, self._nm_port,),
+      'yarn.nodemanager.localizer.address': '%s:%s' % (self._fqdn, self._nm_port,),
       'yarn.nodemanager.aux-services': 'mapreduce_shuffle',
       'yarn.nodemanager.aux-services.mapreduce.shuffle.class': 'org.apache.hadoop.mapred.ShuffleHandler',
       'yarn.nodemanager.webapp.address': '%s:%s' % (self._fqdn, self._nm_webapp_port,),
@@ -512,7 +509,6 @@ class PseudoHdfs4(object):
     }
     self._yarn_site = self._tmppath('conf/yarn-site.xml')
     write_config(yarn_configs, self._tmppath('conf/yarn-site.xml'))
-
 
   def _write_mapred_site(self):
     self._jh_port = find_unused_port()
@@ -584,7 +580,6 @@ def shared_cluster():
   return _shared_cluster
 
 
-
 """
 Manual start from the Hue shell.
 
@@ -597,6 +592,8 @@ pseudo_hdfs4.main()
 >
 exit() # To shutdown cleanly
 """
+
+
 def main():
   logging.basicConfig(level=logging.DEBUG)
 

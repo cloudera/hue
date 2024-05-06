@@ -43,7 +43,7 @@ class HistoryApi(Api):
     for app in tasks:
       # Copied, Document class should have a get_history method (via method or inheritance)
       notebook = Notebook(document=app).get_data()
-      is_notification_manager = False # Supposed SQL Editor query only right now
+      is_notification_manager = False  # Supposed SQL Editor query only right now
       if 'snippets' in notebook:
         statement = notebook['description'] if is_notification_manager else _get_statement(notebook)
         history = {
@@ -83,7 +83,6 @@ class HistoryApi(Api):
       'total': len(tasks)
     }
 
-
   def app(self, appid):
     appid = appid.rsplit('-')[-1]
 
@@ -105,7 +104,6 @@ class HistoryApi(Api):
       }
     }
 
-
   def action(self, app_ids, operation):
     # Notebook API
     pass
@@ -113,12 +111,10 @@ class HistoryApi(Api):
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
 
-
   def profile(self, appid, app_type, app_property, app_filters):
     appid = appid.rsplit('-')[-1]
 
     return {}
-
 
   def _api_status(self, task):
     if task['data']['status'] in ('expired', 'failed'):

@@ -174,15 +174,18 @@ SSL = ConfigSection(
   )
 )
 
+
 def get_auth_username():
   """Get from top level default from desktop"""
   return DEFAULT_AUTH_USERNAME.get()
+
 
 AUTH_USERNAME = Config(
   key="auth_username",
   help=_t("Auth username of the hue user used for authentications."),
   private=True,
   dynamic_default=get_auth_username)
+
 
 def get_auth_password():
   """Get from script or backward compatibility"""
@@ -191,6 +194,7 @@ def get_auth_password():
     return password
 
   return DEFAULT_AUTH_PASSWORD.get()
+
 
 AUTH_PASSWORD = Config(
   key="auth_password",
@@ -207,6 +211,7 @@ AUTH_PASSWORD_SCRIPT = Config(
   default=None
 )
 
+
 def get_daemon_config(key):
   from metadata.conf import MANAGER
   from metadata.manager_client import ManagerApi
@@ -216,17 +221,20 @@ def get_daemon_config(key):
 
   return None
 
+
 def get_daemon_api_username():
   """
     Try to get daemon_api_username from Cloudera Manager API
   """
   return get_daemon_config('webserver_htpassword_user')
 
+
 def get_daemon_api_password():
   """
     Try to get daemon_api_password from Cloudera Manager API
   """
   return get_daemon_config('webserver_htpassword_password')
+
 
 DAEMON_API_PASSWORD = Config(
   key="daemon_api_password",
@@ -259,9 +267,11 @@ DAEMON_API_AUTH_SCHEME = Config(
   default="digest"
 )
 
+
 def get_use_sasl_default():
   """kerberos enabled or password is specified"""
-  return is_kerberos_enabled() or AUTH_PASSWORD.get() is not None # Maps closely to legacy behavior
+  return is_kerberos_enabled() or AUTH_PASSWORD.get() is not None  # Maps closely to legacy behavior
+
 
 USE_SASL = Config(
   key="use_sasl",
@@ -293,7 +303,7 @@ def config_validator(user):
 
   try:
     try:
-      if not 'test' in sys.argv: # Avoid tests hanging
+      if 'test' not in sys.argv:  # Avoid tests hanging
         query_server = get_query_server_config(name='impala')
         server = dbms.get(user, query_server)
         query = hql_query("SELECT 'Hello World!';")

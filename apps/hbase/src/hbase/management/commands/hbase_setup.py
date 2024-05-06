@@ -48,7 +48,7 @@ class Command(BaseCommand):
       user = install_sample_user()
 
     api = HbaseApi(user=user)
-    cluster_name = api.getClusters()[0]['name'] # Currently pick first configured cluster
+    cluster_name = api.getClusters()[0]['name']  # Currently pick first configured cluster
 
     # Check connectivity
     api.connectCluster(cluster_name)
@@ -58,7 +58,6 @@ class Command(BaseCommand):
 
     self.create_binary_table(api, cluster_name)
     self.load_binary_table(api, cluster_name)
-
 
   def create_analytics_table(self, api, cluster_name):
     try:

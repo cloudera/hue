@@ -21,7 +21,9 @@ from builtins import str
 import json
 import logging
 import sys
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 
 from django.db.models import Q
 from django.urls import reverse
@@ -80,6 +82,7 @@ def index(request):
 """
 Database Views
 """
+
 
 def databases(request):
   search_filter = request.GET.get('filter', '')
@@ -232,13 +235,15 @@ def table_queries(request, database, table):
 """
 Table Views
 """
+
+
 def show_tables(request, database=None):
   cluster = _find_cluster(request)
 
   db = _get_db(user=request.user, cluster=cluster)
 
   if database is None:
-    database = 'default' # Assume always 'default'
+    database = 'default'  # Assume always 'default'
 
   if request.GET.get("format", "html") == "json":
     try:
@@ -256,7 +261,7 @@ def show_tables(request, database=None):
 
       search_filter = request.GET.get('filter', '')
 
-      tables = db.get_tables_meta(database=database, table_names=search_filter) # SparkSql returns []
+      tables = db.get_tables_meta(database=database, table_names=search_filter)  # SparkSql returns []
       table_names = [table['name'] for table in tables]
     except Exception as e:
       raise PopupException(_('Failed to retrieve tables for database: %s' % database), detail=e)
@@ -519,6 +524,7 @@ def read_table(request, database, table):
   except Exception as e:
     raise PopupException(_('Cannot read table'), detail=e)
 
+
 @check_has_write_access_permission
 def load_table(request, database, table):
   response = {'status': -1, 'data': 'None'}
@@ -755,7 +761,6 @@ def has_write_access(user):
   return is_admin(user) or user.has_hue_permission(action="write", app=DJANGO_APPS[0])
 
 
-
 def _get_db(user, source_type=None, cluster=None):
   if source_type is None:
     cluster_config = get_cluster_config(user)
@@ -777,6 +782,7 @@ def _find_cluster(request):
   namespace_id = request.GET.get('namespace')
   cluster = find_compute(cluster=cluster, user=request.user, namespace_id=namespace_id, dialect=source_type)
   return cluster
+
 
 def _get_servername(db):
   if has_connectors():

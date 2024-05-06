@@ -51,7 +51,7 @@ def get_schedule(request):
 
 
 # To move to lib in case oozie is blacklisted
-#@check_document_access_permission()
+# @check_document_access_permission()
 def submit_schedule(request, doc_id):
   interface = request.GET.get('interface', request.POST.get('interface', 'hive'))
 

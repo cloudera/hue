@@ -65,7 +65,7 @@ LIVY_SERVER_PORT = Config(
   default="8998")
 
 # Deprecated
-LIVY_SERVER_SESSION_KIND = Config( # Note: this one is ignored by Livy, this should match the current Spark mode
+LIVY_SERVER_SESSION_KIND = Config(  # Note: this one is ignored by Livy, this should match the current Spark mode
    key="livy_server_session_kind",
    help=_t("Configure livy to start in local 'process' mode, or 'yarn' workers."),
    default="yarn"
@@ -111,7 +111,7 @@ def get_spark_status(user):
   status = None
 
   try:
-    if not 'test' in sys.argv: # Avoid tests hanging
+    if 'test' not in sys.argv:  # Avoid tests hanging
       get_api(user).get_status()
       status = 'OK'
   except:

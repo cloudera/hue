@@ -48,6 +48,7 @@ BEESWAX = 'beeswax'
 HIVE_SERVER2 = 'hiveserver2'
 QUERY_TYPES = (HQL, IMPALA, RDBMS, SPARK, HPLSQL) = list(range(5))
 
+
 class QueryHistory(models.Model):
   """
   Holds metadata about all queries that have been executed.
@@ -130,7 +131,6 @@ class QueryHistory(models.Model):
 
     return query_server
 
-
   def get_current_statement(self):
     if self.design is not None:
       design = self.design.get_design()
@@ -150,7 +150,7 @@ class QueryHistory(models.Model):
 
     if self.design is not None:
       design = self.design.get_design()
-      return is_statement_finished and self.statement_number + 1 == design.statement_count # Last statement
+      return is_statement_finished and self.statement_number + 1 == design.statement_count  # Last statement
     else:
       return is_statement_finished
 
@@ -449,7 +449,7 @@ class SessionManager(models.Manager):
       if available_sessions:
         session = available_sessions[0]
       else:
-        session = None # No available session found
+        session = None  # No available session found
 
       return session
 
@@ -513,7 +513,6 @@ class QueryHandle(object):
 
   def __str__(self):
     return '%s %s' % (self.secret, self.guid)
-
 
 
 class HiveServerQueryHandle(QueryHandle):
@@ -596,6 +595,7 @@ class MetaInstall(models.Model):
     except MetaInstall.DoesNotExist:
       return MetaInstall(id=1)
 
+
 class Namespace(models.Model):
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
@@ -639,6 +639,7 @@ class Namespace(models.Model):
       'interface': self.interface,
       'external_id': self.external_id
     }
+
 
 class Compute(models.Model):
   """

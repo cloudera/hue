@@ -549,7 +549,7 @@ def _preprocess_nodes(workflow, transformed_root, workflow_definition_root, node
     if 'cred' in action_el.attrib:
       for full_node in nodes:
         if full_node.name == action_el.attrib['name']:
-          full_node.credentials = [{"name": cred, "value": True} for cred in action_el.attrib['cred'].split(',')];
+          full_node.credentials = [{"name": cred, "value": True} for cred in action_el.attrib['cred'].split(',')]
 
   for full_node in nodes:
     if full_node.node_type == 'start':
@@ -743,11 +743,10 @@ def generate_v2_graph_nodes(workflow_definition):
 
   # Transform XML using XSLT
   transformed_root = transform(workflow_definition_root)
-  node_list = re.sub('[\s]', '', str(transformed_root))
+  node_list = re.sub(r'[\s]', '', str(transformed_root))
   node_list = json.loads(node_list)
 
   return [node for node in node_list if node]
-
 
 
 class MalformedWfDefException(Exception):

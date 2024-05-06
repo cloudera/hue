@@ -58,15 +58,18 @@ try:
   from django_auth_ldap.config import LDAPSearch
 except ImportError:
   LOG.warning('django_auth_ldap module not found')
-  class LDAPSearch: pass
-  class LDAPSearch: pass
+  class LDAPSearch:
+    pass
+  class LDAPSearch:
+    pass
 from liboauth.metrics import oauth_authentication_time
 try:
   from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
   from mozilla_django_oidc.utils import absolutify, import_from_settings
 except ImportError:
   LOG.warning('mozilla_django_oidc module not found')
-  class OIDCAuthenticationBackend: pass
+  class OIDCAuthenticationBackend:
+    pass
 
 from desktop import metrics
 from desktop.conf import AUTH, LDAP, OIDC, ENABLE_ORGANIZATIONS
@@ -99,6 +102,8 @@ def load_augmentation_class():
 
 
 _user_augmentation_class = None
+
+
 def get_user_augmentation_class():
   global _user_augmentation_class
 
@@ -218,11 +223,13 @@ def create_user(username, password, is_superuser=True):
 
   return user
 
+
 def find_or_create_user(username, password=None, is_superuser=True):
   user = find_user(username)
   if user is None:
     user = create_user(username, password, is_superuser)
   return user
+
 
 def ensure_has_a_group(user):
   default_group = get_default_user_group(user=user)
@@ -231,12 +238,14 @@ def ensure_has_a_group(user):
     user.groups.add(default_group)
     user.save()
 
+
 def force_username_case(username):
   if AUTH.FORCE_USERNAME_LOWERCASE.get():
     username = username.lower()
   elif AUTH.FORCE_USERNAME_UPPERCASE.get():
     username = username.upper()
   return username
+
 
 def knox_login_headers(request):
   userprofile = get_profile(request.user)
@@ -250,6 +259,7 @@ def knox_login_headers(request):
     userprofile.save()
   except:
     LOG.error("X-CSRF-TOKEN header not found")
+
 
 class DesktopBackendBase(object):
   """
@@ -475,7 +485,7 @@ class LdapBackend(object):
         username = force_username_case(username)
 
         try:
-          #Avoid circular import from is_admin
+          # Avoid circular import from is_admin
           from useradmin.forms import validate_username
           validate_username(username)
 
@@ -625,7 +635,7 @@ class LdapBackend(object):
     return user
 
   def check_ldap_access_groups(self, server, username):
-    #Avoid circular import from is_admin
+    # Avoid circular import from is_admin
     from useradmin.views import get_find_groups_filter
     allowed_group = False
 
@@ -648,14 +658,14 @@ class LdapBackend(object):
           return True
 
     else:
-      #Login groups not set default to True
+      # Login groups not set default to True
       allowed_group = True
 
     return allowed_group
 
   def import_groups(self, server, user):
     connection = ldap_access.get_connection_from_server(server)
-    #Avoid circular import from is_admin
+    # Avoid circular import from is_admin
     from useradmin.views import import_ldap_users
     import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False, server=server)
 
@@ -841,7 +851,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
       user = rewrite_user(user)
 
       ensure_has_a_group(user)
-      
+
       return user
 
     return None
@@ -955,6 +965,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
   # def filter_users_by_claims(self, claims):
 
   # def verify_claims(self, claims):
+
 
 def delete_oidc_session_tokens(session):
   if session:

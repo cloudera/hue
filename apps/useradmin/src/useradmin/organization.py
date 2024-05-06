@@ -75,7 +75,6 @@ def uuid_default():
   return str(uuid.uuid4())
 
 
-
 class OrganizationManager(models.Manager):
   use_in_migrations = True
 

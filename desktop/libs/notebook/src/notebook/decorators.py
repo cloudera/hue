@@ -52,7 +52,7 @@ def check_editor_access_permission():
       editor_type = request.GET.get('type', 'hive')
       gist_id = request.POST.get('gist')
 
-      if editor_type == 'gist' or gist_id: # Gist don't have permissions currently
+      if editor_type == 'gist' or gist_id:  # Gist don't have permissions currently
         pass
       else:
         if editor_id:  # Open existing saved editor document
@@ -172,8 +172,10 @@ def api_error_handler(f):
 
   return wrapper
 
+
 def _closest_power_of_2(number):
   return math.pow(2, math.ceil(math.log(number, 2)))
+
 
 def _to_size_in_bytes(size, unit):
   unit_size = 1
@@ -188,6 +190,7 @@ def _to_size_in_bytes(size, unit):
     unit_size = unit_size * 1024 * 1024 * 1024 * 1024
 
   return float(size) * unit_size
+
 
 def json_error_handler(view_fn):
   def decorator(*args, **kwargs):

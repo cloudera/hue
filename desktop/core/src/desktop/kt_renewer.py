@@ -27,11 +27,12 @@ SPEC = DjangoCommandSupervisee("kt_renewer")
 
 NEED_KRB181_WORKAROUND = None
 
+
 def renew_from_kt():
   cmdv = [CONF.KINIT_PATH.get(),
-          "-k", # host ticket
-          "-t", CONF.HUE_KEYTAB.get(), # specify keytab
-          "-c", CONF.CCACHE_PATH.get(), # specify credentials cache
+          "-k",  # host ticket
+          "-t", CONF.HUE_KEYTAB.get(),  # specify keytab
+          "-c", CONF.CCACHE_PATH.get(),  # specify credentials cache
           CONF.HUE_PRINCIPAL.get()]
   retries = 0
   max_retries = 3
@@ -69,6 +70,7 @@ def renew_from_kt():
     time.sleep(1.5)
     perform_krb181_workaround()
 
+
 def perform_krb181_workaround():
   cmdv = [CONF.KINIT_PATH.get(),
           "-R",
@@ -89,6 +91,7 @@ def perform_krb181_workaround():
               "for the '%(princ)s' and `krbtgt' principals." % fmt_dict)
     sys.exit(ret)
 
+
 def detect_conf_var():
   """Return true if the ticket cache contains "conf" information as is found
   in ticket caches of Kerboers 1.8.1 or later. This is incompatible with the
@@ -103,6 +106,7 @@ def detect_conf_var():
     return b"X-CACHECONF:" in data
   finally:
     f.close()
+
 
 def run():
   if CONF.HUE_KEYTAB.get() is None:

@@ -59,11 +59,9 @@ class SqlFlowApi(Api):
     if self.options.get('has_ssh'):
       self.url = rewrite_ssh_api_url(self.url)['url']
 
-
   def _get_db(self):
     os.environ['SQLFLOW_DATASOURCE'] = self.interpreter['options']['datasource']
     return sqlflow.Client(server_url='172.18.1.3:50051')  # TODO Send as param instead of ENV
-
 
   @query_error_handler
   @ssh_error_handler
@@ -95,7 +93,6 @@ class SqlFlowApi(Api):
       }
     }
 
-
   def _execute(self, statement):
     db = self._get_db()
 
@@ -121,11 +118,9 @@ class SqlFlowApi(Api):
       'description': description,
     }
 
-
   @query_error_handler
   def check_status(self, notebook, snippet):
     return {'status': 'available'}
-
 
   @query_error_handler
   @ssh_error_handler
@@ -171,7 +166,6 @@ class SqlFlowApi(Api):
     ]
 
     return response
-
 
   def fetch_result(self, notebook, snippet, rows, start_over):
     """Only called at the end of a live query."""

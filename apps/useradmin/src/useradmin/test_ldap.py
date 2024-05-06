@@ -107,7 +107,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
       for finish in reset:
         finish()
 
-
   def test_useradmin_ldap_suboordinate_group_integration(self):
     reset = []
 
@@ -179,7 +178,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
     finally:
       for finish in reset:
         finish()
-
 
   def test_useradmin_ldap_nested_group_integration(self):
     reset = []
@@ -274,7 +272,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
       for finish in reset:
         finish()
 
-
   def test_useradmin_ldap_suboordinate_posix_group_integration(self):
     reset = []
 
@@ -346,7 +343,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
     finally:
       for finish in reset:
         finish()
-
 
   def test_useradmin_ldap_nested_posix_group_integration(self):
     reset = []
@@ -433,8 +429,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
       for finish in reset:
         finish()
 
-
-
   def test_useradmin_ldap_user_integration(self):
     if is_live_cluster():
       raise SkipTest('HUE-2897: Skipping because the DB may not be case sensitive')
@@ -515,7 +509,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
       for finish in done:
         finish()
 
-
   def test_useradmin_ldap_force_uppercase(self):
     if is_live_cluster():
       raise SkipTest('HUE-2897: Skipping because the DB may not be case sensitive')
@@ -541,8 +534,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
     finally:
       for finish in done:
         finish()
-
-
 
   def test_add_ldap_users(self):
     if is_live_cluster():
@@ -609,11 +600,11 @@ class TestUserAdminLdap(BaseUserAdminTests):
         )
       assert b"Could not get LDAP details for users in pattern" in response.content, response.content
       # Removing this test because we are not running log listener
-      #response = c.get(reverse(desktop.views.log_view))
-      #whitespaces_message = "{username}: Username must not contain whitespaces".format(username='user with space')
-      #if not isinstance(whitespaces_message, bytes):
+      # response = c.get(reverse(desktop.views.log_view))
+      # whitespaces_message = "{username}: Username must not contain whitespaces".format(username='user with space')
+      # if not isinstance(whitespaces_message, bytes):
       #  whitespaces_message = whitespaces_message.encode('utf-8')
-      #assert_true(whitespaces_message in response.content, response.content)
+      # assert_true(whitespaces_message in response.content, response.content)
 
       # Test dn with spaces in dn, but not username (should succeed)
       response = c.post(
@@ -626,7 +617,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
     finally:
       for finish in done:
         finish()
-
 
   def test_add_ldap_users_force_uppercase(self):
     if is_live_cluster():
@@ -743,7 +733,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       user_list_a = create_long_username().encode('utf-8') + b", test_longfirstname"
       user_list_b = b"test_longfirstname, " + create_long_username().encode('utf-8')
 
-      assert (b'Failed to import following users: %s' % user_list_a in response.content \
+      assert (b'Failed to import following users: %s' % user_list_a in response.content
         or b'Failed to import following users: %s' % user_list_b in response.content), response.content
 
       # Test with space

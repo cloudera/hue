@@ -42,8 +42,7 @@ class DataWarehouseClusterApi(Api):
     super(DataWarehouseClusterApi, self).__init__(user)
 
     self.version = version
-    self.api = DataWarehouse2Api(self.user) if version == 2 else AnalyticDbApi(self.user) 
-
+    self.api = DataWarehouse2Api(self.user) if version == 2 else AnalyticDbApi(self.user)
 
   def apps(self, filters):
     jobs = self.api.list_clusters()
@@ -54,7 +53,7 @@ class DataWarehouseClusterApi(Api):
         'name': '%(clusterName)s' % app,
         'status': app['status'],
         'apiStatus': self._api_status(app['status']),
-        'type': '%(instanceType)s' % app, #'Altus %(workersGroupSize)sX %(instanceType)s %(cdhVersion)s' % app,
+        'type': '%(instanceType)s' % app,  # 'Altus %(workersGroupSize)sX %(instanceType)s %(cdhVersion)s' % app,
         'user': app['clusterName'].split('-', 1)[0],
         'progress': app.get('progress', 100),
         'queue': 'group',
@@ -64,7 +63,6 @@ class DataWarehouseClusterApi(Api):
       } for app in sorted(jobs['clusters'], key=lambda a: a['creationDate'], reverse=True)],
       'total': len(jobs['clusters'])
     }
-
 
   def app(self, appid):
     handle = self.api.describe_cluster(cluster_id=appid)
@@ -101,12 +99,10 @@ class DataWarehouseClusterApi(Api):
         elif result.get('contents') and message.get('status') != -1:
           message['message'] = result.get('contents')
 
-    return message;
-
+    return message
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
-
 
   def profile(self, app_id, app_type, app_property, app_filters):
     return {}
@@ -119,4 +115,4 @@ class DataWarehouseClusterApi(Api):
     elif status in ['ARCHIVING', 'COMPLETED', 'TERMINATING', 'TERMINATED']:
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # KILLED and FAILED
+      return 'FAILED'  # KILLED and FAILED

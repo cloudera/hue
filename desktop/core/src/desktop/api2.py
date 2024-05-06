@@ -93,6 +93,7 @@ def api_error_handler(func):
 
   return decorator
 
+
 @api_error_handler
 def get_banners(request):
   banners = {
@@ -100,6 +101,7 @@ def get_banners(request):
     'configured': CUSTOM.BANNER_TOP_HTML.get()
   }
   return JsonResponse(banners)
+
 
 @api_error_handler
 def get_config(request):
@@ -170,6 +172,7 @@ def get_hue_config(request):
     'apps': apps
   })
 
+
 @api_error_handler
 def get_context_namespaces(request, interface):
   '''
@@ -204,6 +207,7 @@ def get_context_namespaces(request, interface):
   response['status'] = 0
 
   return JsonResponse(response)
+
 
 @api_error_handler
 def get_context_computes(request, interface):
@@ -420,7 +424,7 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
       notebook = Notebook(document=document)
       notebook = upgrade_session_properties(request, notebook)
       data = json.loads(notebook.data)
-      if document.type == 'query-pig': # Import correctly from before Hue 4.0
+      if document.type == 'query-pig':  # Import correctly from before Hue 4.0
         properties = data['snippets'][0]['properties']
         if 'hadoopProperties' not in properties:
           properties['hadoopProperties'] = []
@@ -428,7 +432,7 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
           properties['parameters'] = []
         if 'resources' not in properties:
           properties['resources'] = []
-      if data.get('uuid') != document.uuid: # Old format < 3.11
+      if data.get('uuid') != document.uuid:  # Old format < 3.11
         data['uuid'] = document.uuid
 
     response['data'] = data
@@ -534,7 +538,6 @@ def update_document(request):
   })
 
 
-
 @api_error_handler
 @require_POST
 def delete_document(request):
@@ -563,6 +566,7 @@ def delete_document(request):
   return JsonResponse({
       'status': 0,
   })
+
 
 @api_error_handler
 @require_POST
@@ -696,6 +700,7 @@ def share_document(request):
     'document': doc.to_dict()
   })
 
+
 @api_error_handler
 @require_POST
 def handle_submit(request):
@@ -745,6 +750,7 @@ def handle_submit(request):
     'status': 0
   })
 
+
 @api_error_handler
 def get_taskserver_tasks(request):
   """Retirve the tasks from the database"""
@@ -763,6 +769,7 @@ def get_taskserver_tasks(request):
 
   return JsonResponse(tasks, safe=False)
 
+
 @api_error_handler
 def check_upload_status(request, task_id):
   redis_client = redis.Redis(host='localhost', port=6379, db=0)
@@ -779,6 +786,7 @@ def check_upload_status(request, task_id):
   is_revoked = task.get('status') == 'REVOKED'
 
   return JsonResponse({'isFinalized': is_finalized, 'isRunning': is_running, 'isFailure': is_failure, 'isRevoked': is_revoked})
+
 
 @api_error_handler
 def kill_task(request, task_id):
@@ -800,6 +808,7 @@ def kill_task(request, task_id):
 def get_available_space(request):
   free_space = psutil.disk_usage('/tmp').free
   return JsonResponse({'free_space': free_space})
+
 
 def get_task_logs(request, task_id):
   log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
@@ -827,6 +836,7 @@ def get_task_logs(request, task_id):
     return HttpResponse(str(e), status=500)
 
   return HttpResponse(''.join(task_log), content_type='text/plain')
+
 
 @api_error_handler
 @require_POST
@@ -976,7 +986,7 @@ def import_documents(request):
 
   stdout = string_io()
   try:
-    with transaction.atomic(): # We wrap both commands to commit loaddata & sync
+    with transaction.atomic():  # We wrap both commands to commit loaddata & sync
       management.call_command('loaddata', f.name, verbosity=3, traceback=True, stdout=stdout)
       Document.objects.sync()
 
@@ -1003,6 +1013,7 @@ def import_documents(request):
     return JsonResponse({'status': -1, 'message': smart_str(e)})
   finally:
     stdout.close()
+
 
 def _update_imported_oozie_document(doc, uuids_map):
   for key, value in uuids_map.items():
@@ -1282,11 +1293,11 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
   if doc['fields']['dependencies']:
     history_deps_list = []
     for index, (uuid, version, is_history) in enumerate(doc['fields']['dependencies']):
-      if not uuid in list(uuids_map.keys()) and not is_history and \
+      if uuid not in list(uuids_map.keys()) and not is_history and \
       not Document2.objects.filter(uuid=uuid, version=version).exists():
         raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
       elif is_history:
-        history_deps_list.insert(0, index) # Insert in decreasing order to facilitate delete
+        history_deps_list.insert(0, index)  # Insert in decreasing order to facilitate delete
         LOG.warning('History dependency with UUID: %s ignored while importing document %s' % (uuid, doc['fields']['name']))
 
     # Delete history dependencies not found in the DB

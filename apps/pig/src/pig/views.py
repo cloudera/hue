@@ -21,7 +21,9 @@ from builtins import str
 import json
 import logging
 import sys
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -44,6 +46,7 @@ from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
+
 
 @ensure_csrf_cookie
 def app(request):

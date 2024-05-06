@@ -17,13 +17,19 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
-import cProfile, logging, os, pstats, sys, time
+import cProfile
+import logging
+import os
+import pstats
+import sys
+import time
 from libanalyze import analyze as a
 from libanalyze import rules
 
 from io import StringIO as string_io
 
 LOG = logging.getLogger()
+
 
 def ordered(obj):
   if isinstance(obj, dict):
@@ -32,6 +38,7 @@ def ordered(obj):
     return sorted(ordered(x) for x in obj)
   else:
     return obj
+
 
 class AnalyzeTest(object):
   def setup_method(self):
@@ -54,10 +61,10 @@ class AnalyzeTest(object):
   def test_performance(self):
     pr = cProfile.Profile()
     pr.enable()
-    ts1 = time.time()*1000.0
+    ts1 = time.time() * 1000.0
     self.analyze.pre_process(self.profile)
     result = self.analyze.run(self.profile)
-    ts2 = time.time()*1000.0
+    ts2 = time.time() * 1000.0
     dts = ts2 - ts1
     pr.disable()
     s = string_io()

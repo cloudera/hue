@@ -30,8 +30,10 @@ from django.utils.translation import gettext as _
 def _get_acl_name(acl):
   return ('default:' if acl['isDefault'] else '') + acl['type'] + ':' + acl['name'] + ':'
 
+
 def _get_acl(acl):
-  return _get_acl_name(acl) + ('r' if acl['r']  else '-') + ('w' if acl['w'] else '-') + ('x' if acl['x'] else '-')
+  return _get_acl_name(acl) + ('r' if acl['r'] else '-') + ('w' if acl['w'] else '-') + ('x' if acl['x'] else '-')
+
 
 def _diff_list_dir(user_listing, hdfs_listing):
   user_files = [f['stats']['path'] for f in user_listing['files']]
@@ -95,7 +97,7 @@ def update_acls(request):
     if all([acl['status'] == 'deleted' for acl in acls]):
       request.fs.remove_acl(path)
     else:
-      renamed_acls = set([_get_acl_name(acl) for acl in original_acls]) - set([_get_acl_name(acl) for acl in acls]) # We need to remove ACLs that have been renamed
+      renamed_acls = set([_get_acl_name(acl) for acl in original_acls]) - set([_get_acl_name(acl) for acl in acls])  # We need to remove ACLs that have been renamed
       _remove_acl_names(request.fs, path, list(renamed_acls))
       _remove_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == 'deleted'])
       _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] in ('new', 'modified')])
@@ -129,9 +131,9 @@ def bulk_add_acls(request):
   recursive = json.loads(request.POST.get('recursive'))
 
   try:
-    checked_paths = [path['path'] for path in checked_paths if path['path'] != path] # Don't touch current path
+    checked_paths = [path['path'] for path in checked_paths if path['path'] != path]  # Don't touch current path
     for path in checked_paths:
-      _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == ''], recursive) # Only saved ones
+      _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == ''], recursive)  # Only saved ones
   except Exception as e:
     raise PopupException(str(e.message))
 

@@ -43,7 +43,6 @@ class TestSparkApi(object):
       }
     self.api = SparkApi(self.user, self.interpreter)
 
-
   def test_get_api(self):
     lang = 'pyspark'
     properties = None
@@ -52,7 +51,6 @@ class TestSparkApi(object):
     spark_api = self.api.get_api()
     assert spark_api.__class__.__name__ == 'LivyClient'
 
-
   def test_get_livy_props_method(self):
     test_properties = [{
         "name": "files",
@@ -60,7 +58,6 @@ class TestSparkApi(object):
       }]
     props = self.api.get_livy_props('scala', test_properties)
     assert props['files'] == ['file_a', 'file_b', 'file_c']
-
 
   def test_create_session_with_config(self):
     lang = 'pyspark'
@@ -125,7 +122,6 @@ class TestSparkApi(object):
               cores = p['value']
           assert cores == 1
 
-
   def test_create_session_plain(self):
     lang = 'pyspark'
     properties = None
@@ -150,7 +146,6 @@ class TestSparkApi(object):
       assert files_properties, session['properties']
       assert files_properties[0]['value'] == [], session['properties']
 
-
   def test_execute(self):
     with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
       with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
@@ -173,7 +168,6 @@ class TestSparkApi(object):
         )
         with pytest.raises(Exception):
           self.api.execute(notebook, snippet)
-
 
   def test_handle_result_data(self):
     # When result data has no complex type.
@@ -213,7 +207,6 @@ class TestSparkApi(object):
     processed_data = self.api._handle_result_data(data, is_complex_type=True)
     assert processed_data == [['0', 535.0, {'site_id': 'BEB'}, {'c_id': 'EF'}, '2023-06-16T23:53:31Z']]
 
-
   def test_check_status(self):
     with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
       with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
@@ -242,7 +235,6 @@ class TestSparkApi(object):
         )
         with pytest.raises(Exception):
           self.api.check_status(notebook, snippet)
-  
 
   def test_get_sample_data(self):
     snippet = Mock()
@@ -279,14 +271,13 @@ class TestSparkApi(object):
     # When table is not transactional
     self.api.describe_table = Mock(
       return_value={
-        'stats': [] # No details regarding transactionality is present in describe response
+        'stats': []  # No details regarding transactionality is present in describe response
       }
     )
     response = self.api.get_sample_data(snippet, 'test_db', 'test_table', 'test_column')
 
     assert response['rows'] == 'test_data'
     assert response['full_headers'] == 'test_meta'
-  
 
   def test_get_select_query(self):
     # With operation as 'hello'
@@ -300,7 +291,6 @@ class TestSparkApi(object):
     # With some column name
     response = self.api._get_select_query('test_db', 'test_table', 'test_column')
     assert response == 'SELECT test_column\nFROM test_db.test_table\nLIMIT 100\n'
-
 
   def test_describe_database(self):
     notebook = Mock()
@@ -336,7 +326,6 @@ class TestSparkApi(object):
       'owner_name': 'demo',
       'parameters': '{Create-by=Kevin, Create-date=09/01/2019}',
       'status': 0}
-
 
   def test_describe_table(self):
     notebook = Mock()
@@ -498,7 +487,6 @@ class TestSparkApi(object):
                   'data_type': 'transient_lastDdlTime'}],
       'status': 0}
 
-
   def test_get_jobs(self):
     local_jobs = [
       {'url': u'http://172.21.1.246:4040/jobs/job/?id=0', 'name': u'0'}
@@ -511,7 +499,6 @@ class TestSparkApi(object):
     ]
     jobs = self.api._get_yarn_jobs(LIVY_YARN_LOG)
     assert jobs == yarn_jobs, jobs
-
 
 
 LIVY_STANDALONE_LOG = """

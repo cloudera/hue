@@ -19,7 +19,9 @@ import base64
 import json
 import logging
 import re
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 
 from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse, render
@@ -41,14 +43,16 @@ LOG = logging.getLogger()
 def has_write_access(user):
   return is_admin(user) or user.has_hue_permission(action="write", app=DJANGO_APPS[0]) or is_impersonation_enabled()
 
+
 def app(request):
   return render('app.mako', request, {
     'can_write': has_write_access(request.user),
     'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
+
 # action/cluster/arg1/arg2/arg3...
-def api_router(request, url): # On split, deserialize anything
+def api_router(request, url):  # On split, deserialize anything
 
   def safe_json_load(raw):
     try:
@@ -65,17 +69,18 @@ def api_router(request, url): # On split, deserialize anything
 
     if hasattr(data, "__iter__"):
       for i, item in enumerate(data):
-        data[i] = deserialize(item) # Sets local binding, needs to set in data
+        data[i] = deserialize(item)  # Sets local binding, needs to set in data
     return data
 
   decoded_url_params = [urllib.parse.unquote(arg) for arg in re.split(r'(?<!\\)/', url.strip('/'))]
   url_params = [safe_json_load((arg, request.POST.get(arg[0:16], arg))[arg[0:15] == 'hbase-post-key-'])
-                for arg in decoded_url_params] # Deserialize later
+                for arg in decoded_url_params]  # Deserialize later
 
   if request.POST.get('dest', False):
     url_params += [request.FILES.get(request.GET.get('dest'))]
 
   return api_dump(HbaseApi(request.user).query(*url_params))
+
 
 def api_dump(response):
   ignored_fields = ('thrift_spec', '__.+__')
@@ -89,17 +94,17 @@ def api_dump(response):
       LOG.debug('Failed to dump data as JSON, falling back to raw data.')
       cleaned = {}
       lim = [0]
-      if isinstance(data, str): # Not JSON dumpable, meaning some sort of bytestring or byte data
-        #detect if avro file
-        if(data[:3] == '\x4F\x62\x6A'):
-          #write data to file in memory
+      if isinstance(data, str):  # Not JSON dumpable, meaning some sort of bytestring or byte data
+        # detect if avro file
+        if (data[:3] == '\x4F\x62\x6A'):
+          # write data to file in memory
           try:
             output = io.StringIO()
           except:
             output = string_io()
           output.write(data)
 
-          #read and parse avro
+          # read and parse avro
           rec_reader = io.DatumReader()
           df_reader = datafile.DataFileReader(output, rec_reader)
           return json.dumps(clean([record for record in df_reader]))

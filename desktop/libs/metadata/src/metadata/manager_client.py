@@ -72,7 +72,6 @@ class ManagerApi(object):
     self._client.set_verify(ssl_cert_ca_verify)
     self._root = Resource(self._client)
 
-
   def has_service(self, service_name, cluster_name=None):
     cluster = self._get_cluster(cluster_name)
     try:
@@ -84,7 +83,6 @@ class ManagerApi(object):
       return service_name in services
     except RestException as e:
       raise ManagerApiException(e)
-
 
   def get_spark_history_server_configs(self, cluster_name=None):
     service_name = "SPARK_ON_YARN"
@@ -98,7 +96,6 @@ class ManagerApi(object):
       })['items']
 
       service_display_names = [service['displayName'] for service in services if service['type'] == service_name]
-
 
       if service_display_names:
         spark_service_display_name = service_display_names[0]
@@ -183,7 +180,6 @@ class ManagerApi(object):
     except RestException as e:
       raise ManagerApiException(e)
 
-
   def get_kafka_brokers(self, cluster_name=None):
     try:
 
@@ -194,7 +190,6 @@ class ManagerApi(object):
       return ','.join(brokers_hosts)
     except RestException as e:
       raise ManagerApiException(e)
-
 
   def get_kudu_master(self, cluster_name=None):
     try:
@@ -210,7 +205,6 @@ class ManagerApi(object):
     except RestException as e:
       raise ManagerApiException(e)
 
-
   def get_kafka_topics(self, broker_host):
     try:
       client = HttpClient('http://%s:24042' % broker_host, logger=LOG)
@@ -219,7 +213,6 @@ class ManagerApi(object):
       return root.get('/api/topics')
     except RestException as e:
       raise ManagerApiException(e)
-
 
   def update_flume_config(self, cluster_name, config_name, config_value):
     service = 'FLUME-1'
@@ -242,10 +235,8 @@ class ManagerApi(object):
       items=data
     )
 
-
   def get_flume_agents(self, cluster_name=None):
     return [host['hostname'] for host in self._get_hosts('FLUME', 'AGENT', cluster_name=cluster_name)]
-
 
   def _get_hosts(self, service_name, role_name, cluster_name=None):
     try:
@@ -261,7 +252,6 @@ class ManagerApi(object):
     except RestException as e:
       raise ManagerApiException(e)
 
-
   def refresh_flume(self, cluster_name, restart=False):
     service = 'FLUME-1'
     cluster = self._get_cluster(cluster_name)
@@ -271,7 +261,6 @@ class ManagerApi(object):
       return self.restart_services(cluster['name'], service, roles)
     else:
       return self.refresh_configs(cluster['name'], service, roles)
-
 
   def refresh_configs(self, cluster_name, service=None, roles=None):
     try:
@@ -288,7 +277,6 @@ class ManagerApi(object):
     except RestException as e:
       raise ManagerApiException(e)
 
-
   def restart_services(self, cluster_name, service=None, roles=None):
     try:
       if service is None:
@@ -304,13 +292,11 @@ class ManagerApi(object):
     except RestException as e:
       raise ManagerApiException(e)
 
-
   def batch(self, items):
     try:
       return self._root.post('batch', data=json.dumps(items), contenttype='application/json')
     except RestException as e:
       raise ManagerApiException(e)
-
 
   def _get_cluster(self, cluster_name=None):
     clusters = self._root.get('clusters/')['items']
@@ -322,11 +308,9 @@ class ManagerApi(object):
 
     return cluster
 
-
   def _get_roles(self, cluster_name, service_name, role_type):
     roles = self._root.get('clusters/%(cluster_name)s/services/%(service_name)s/roles' % {'cluster_name': cluster_name, 'service_name': service_name})['items']
     return [role for role in roles if role['type'] == role_type]
-
 
   def get_impalad_config(self, key=None, impalad_host=None, cluster_name=None):
     if not key or not impalad_host:

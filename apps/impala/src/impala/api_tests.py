@@ -47,7 +47,7 @@ class TestImpala(object):
 
       response = self.client.post(reverse("impala:invalidate"), {
           'flush_all': False,
-          'cluster': json.dumps({"credentials":{},"type":"direct","id":"default","name":"default"}),
+          'cluster': json.dumps({"credentials": {}, "type": "direct", "id": "default", "name": "default"}),
           'database': 'default',
           'table': 'k8s_logs'
         }

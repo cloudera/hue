@@ -65,6 +65,7 @@ class Command(BaseCommand):
 
     copy_template(app_template, app_dir, app_name, app_url)
 
+
 def copy_template(app_template, copy_to, app_name, app_url):
   """copies the specified template directory to the copy_to location"""
 
@@ -73,13 +74,13 @@ def copy_template(app_template, copy_to, app_name, app_url):
 
   # walks the template structure and copies it
   for directory, subdirs, files in os.walk(app_template):
-    relative_dir = directory[len(app_template)+1:].replace('app_name_camel', app_name_camel).replace('app_name',app_name)
+    relative_dir = directory[len(app_template) + 1:].replace('app_name_camel', app_name_camel).replace('app_name', app_name)
     if not os.path.exists(os.path.join(copy_to, relative_dir)):
       os.mkdir(os.path.join(copy_to, relative_dir))
     for f in files:
       if f.endswith('.pyc') or f.startswith("."):
         continue
-        
+
       path_old = os.path.join(directory, f)
       path_new = os.path.join(copy_to, relative_dir, f.replace('app_name_camel', app_name_camel).replace('app_name', app_name))
 
@@ -88,7 +89,7 @@ def copy_template(app_template, copy_to, app_name, app_url):
       if path_old.endswith(".png"):
         shutil.copyfileobj(open(path_old), fp_new)
       else:
-        fp_new.write( Template(filename=path_old).render(app_name=app_name, app_name_camel=app_name_camel, app_name_spaces=app_name_spaces, app_url=app_url) )
+        fp_new.write(Template(filename=path_old).render(app_name=app_name, app_name_camel=app_name_camel, app_name_spaces=app_name_spaces, app_url=app_url))
       fp_new.close()
-        
+
       shutil.copymode(path_old, path_new)

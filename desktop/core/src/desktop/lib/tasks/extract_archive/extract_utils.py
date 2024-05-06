@@ -19,7 +19,9 @@ from future import standard_library
 standard_library.install_aliases()
 import json
 import sys
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 
 from django.urls import reverse
 
@@ -29,6 +31,7 @@ from desktop.lib.paths import get_desktop_root, SAFE_CHARACTERS_URI_COMPONENTS
 from notebook.connectors.base import Notebook
 
 from django.utils.translation import gettext as _
+
 
 def extract_archive_in_hdfs(request, upload_path, file_name):
   _upload_extract_archive_script_to_hdfs(request.fs)

@@ -77,7 +77,8 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
   return c
 
 
-_MULTI_WHITESPACE = re.compile("\s+", flags=re.MULTILINE)
+_MULTI_WHITESPACE = re.compile(r"\s+", flags=re.MULTILINE)
+
 
 def compact_whitespace(s):
   """
@@ -85,6 +86,7 @@ def compact_whitespace(s):
   Also removes leading and trailing whitespace.
   """
   return _MULTI_WHITESPACE.sub(" ", s).strip()
+
 
 def assert_equal_mod_whitespace(first, second, msg=None):
   """

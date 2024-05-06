@@ -121,7 +121,7 @@ def tree(request, id, path):
   znode = zk.get(path)
   children = sorted(zk.get_children_paths(path))
 
-  return render('tree.mako', request, {'cluster': cluster, 'path': path, 'znode': znode, 'children': children, 'clusters': CLUSTERS.get(),})
+  return render('tree.mako', request, {'cluster': cluster, 'path': path, 'znode': znode, 'children': children, 'clusters': CLUSTERS.get(), })
 
 
 def delete(request, id, path):
@@ -137,7 +137,7 @@ def delete(request, id, path):
     except ZooKeeper.NotFound:
       pass
     redir = {
-      'redirect': reverse('zookeeper:tree', kwargs={'id':id, 'path': path[:path.rindex('/')] or '/'})
+      'redirect': reverse('zookeeper:tree', kwargs={'id': id, 'path': path[:path.rindex('/')] or '/'})
     }
 
   return JsonResponse(redir)
@@ -155,12 +155,12 @@ def create(request, id, path):
 
       full_path = ("%s/%s" % (path, form.cleaned_data['name'])).replace('//', '/')
 
-      zk.create(full_path, form.cleaned_data['data'], sequence = form.cleaned_data['sequence'])
+      zk.create(full_path, form.cleaned_data['data'], sequence=form.cleaned_data['sequence'])
       return tree(request, id, path)
   else:
     form = CreateZNodeForm()
 
-  return render('create.mako', request, {'cluster': cluster, 'path': path, 'form': form, 'clusters': CLUSTERS.get(),})
+  return render('create.mako', request, {'cluster': cluster, 'path': path, 'form': form, 'clusters': CLUSTERS.get(), })
 
 
 def edit_as_base64(request, id, path):
@@ -179,11 +179,11 @@ def edit_as_base64(request, id, path):
 
     return tree(request, id, path)
   else:
-    form = EditZNodeForm(dict(\
+    form = EditZNodeForm(dict(
       data=node.get('data64', ''),
       version=node.get('version', '-1')))
 
-  return render('edit.mako', request, {'cluster': cluster, 'path': path, 'form': form, 'clusters': CLUSTERS.get(),})
+  return render('edit.mako', request, {'cluster': cluster, 'path': path, 'form': form, 'clusters': CLUSTERS.get(), })
 
 
 def edit_as_text(request, id, path):
@@ -202,4 +202,4 @@ def edit_as_text(request, id, path):
   else:
     form = EditZNodeForm(dict(data=node.get('data64', '').decode('base64').strip(), version=node.get('version', '-1')))
 
-  return render('edit.mako', request, {'cluster': cluster, 'path': path, 'form': form, 'clusters': CLUSTERS.get(),})
+  return render('edit.mako', request, {'cluster': cluster, 'path': path, 'form': form, 'clusters': CLUSTERS.get(), })

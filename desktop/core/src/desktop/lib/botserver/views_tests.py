@@ -35,8 +35,9 @@ from unittest.mock import patch, Mock
 
 LOG = logging.getLogger()
 
+
 class TestBotServer(TestCase):
-  
+
   @classmethod
   def setup_class(cls):
     if not conf.SLACK.IS_ENABLED.get():
@@ -52,7 +53,7 @@ class TestBotServer(TestCase):
 
   def setup_method(self):
     self.host_domain = 'testserver.gethue.com'
-    self.is_http_secure = True # https if true else http
+    self.is_http_secure = True  # https if true else http
 
     self.email_domain = '.'.join(self.host_domain.split('.')[-2:])
 
@@ -371,7 +372,7 @@ class TestBotServer(TestCase):
         with pytest.raises(SlackBotException):
           get_user("channel", slack_user, "12.1")
         _send_message.assert_called_with('channel', message='Corresponding Hue user not found or does not have access.', message_ts='12.1')
-  
+
   def test_handle_on_app_mention(self):
     with patch('desktop.lib.botserver.views.check_slack_user_permission') as check_slack_user_permission:
       with patch('desktop.lib.botserver.views.get_user') as get_user:
@@ -414,10 +415,10 @@ class TestBotServer(TestCase):
           {
             'type': 'section',
             'text': {'type': 'mrkdwn', 'text': 'Hi <@user_id>, here is the list of all saved queries!'}
-          }, 
+          },
           {
             'type': 'divider'
-          }, 
+          },
           {
             'type': 'section',
             'text': {'type': 'mrkdwn', 'text': '*Name:* Test Query 1 \n *Statement:*\n ```SELECT 1```'}
@@ -427,6 +428,6 @@ class TestBotServer(TestCase):
             'text': {'type': 'mrkdwn', 'text': '*Name:* Test Query 2 \n *Statement:*\n ```SELECT 2```'}
           }
         ]
-        
+
         handle_query_bank(self.channel_id, self.user_id)
         _send_message.assert_called_with(self.channel_id, block_element=test_query_block)

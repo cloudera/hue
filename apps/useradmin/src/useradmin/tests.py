@@ -25,7 +25,9 @@ import re
 import pytest
 import sys
 import time
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 
 from datetime import datetime
 from django.conf import settings
@@ -58,15 +60,19 @@ from useradmin.hue_password_policy import reset_password_policy
 
 from unittest.mock import patch, Mock
 
+
 class MockRequest(dict):
   pass
+
 
 class MockUser(dict):
   def is_authenticated(self):
     return True
 
+
 class MockSession(dict):
   pass
+
 
 def reset_all_users():
   """Reset to a clean state by deleting all users"""
@@ -290,8 +296,10 @@ class LdapTestConnection(object):
           'posix_members': ['posix_person2']},
         }
 
+
 def create_long_username():
   return "A" * 151
+
 
 @pytest.mark.django_db
 def test_invalid_username():
@@ -340,7 +348,6 @@ class TestUserProfile(BaseUserAdminTests):
 
     assert 1 == UserProfile.objects.filter(user=user).count()
 
-
   @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
   def test_get_and_update_profile(self):
     c = make_logged_in_client(username='test', password='test', is_superuser=False, recreate=True)
@@ -384,15 +391,15 @@ class TestSAMLGroupsCheck(BaseUserAdminTests):
       assert not desktop.views.samlgroup_check(request)
 
       # mock saml response
-      userprofile.update_data({"saml_attributes":{"first_name":["test2"],
-                                                  "last_name":["test2"],
-                                                  "email":["test2@test.com"],
-                                                  "groups":["aaa","bbb","ccc"]}})
+      userprofile.update_data({"saml_attributes": {"first_name": ["test2"],
+                                                  "last_name": ["test2"],
+                                                  "email": ["test2@test.com"],
+                                                  "groups": ["aaa", "bbb", "ccc"]}})
       userprofile.save()
 
       # valid one or more valid required groups
       reset.append(libsaml.conf.REQUIRED_GROUPS_ATTRIBUTE.set_for_testing("groups"))
-      reset.append(libsaml.conf.REQUIRED_GROUPS.set_for_testing(["aaa","ddd"]))
+      reset.append(libsaml.conf.REQUIRED_GROUPS.set_for_testing(["aaa", "ddd"]))
       assert desktop.views.samlgroup_check(request)
 
       # invalid required group
@@ -450,11 +457,9 @@ class TestUserAdminMetrics(BaseUserAdminTests):
       userprofile3.hostname = 'host2'
       userprofile3.save()
 
-
   def teardown_method(self):
     reset_all_user_profile()
     super(TestUserAdminMetrics, self).teardown_method()
-
 
   @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
   def test_active_users(self):
@@ -469,7 +474,6 @@ class TestUserAdminMetrics(BaseUserAdminTests):
       metric = json.loads(response.content)['metric']
       assert 3 == metric['users.active.total']['value']
       assert 2 == metric['users.active']['value']
-
 
   @override_settings(AUTHENTICATION_BACKENDS=['desktop.auth.backend.AllowFirstUserDjangoBackend'])
   def test_active_users_prometheus(self):
@@ -596,7 +600,6 @@ class TestUserAdmin(BaseUserAdminTests):
     response = c1.get('/useradmin/users')
     assert b'You do not have permission to access the Useradmin application.' in response.content
 
-
   def test_list_permissions(self):
     c1 = make_logged_in_client(username="nonadmin", is_superuser=False)
     grant_access('nonadmin', 'nonadmin', 'useradmin')
@@ -606,7 +609,7 @@ class TestUserAdmin(BaseUserAdminTests):
     assert 200 == response.status_code
 
     perms = response.context[0]['permissions']
-    assert perms.filter(app='beeswax').exists(), perms # Assumes beeswax is there
+    assert perms.filter(app='beeswax').exists(), perms  # Assumes beeswax is there
 
     reset = APP_BLACKLIST.set_for_testing('beeswax')
     appmanager.DESKTOP_MODULES = []
@@ -615,13 +618,12 @@ class TestUserAdmin(BaseUserAdminTests):
     try:
       response = c1.get('/useradmin/permissions/')
       perms = response.context[0]['permissions']
-      assert not perms.filter(app='beeswax').exists(), perms # beeswax is not there now
+      assert not perms.filter(app='beeswax').exists(), perms  # beeswax is not there now
     finally:
       reset()
       appmanager.DESKTOP_MODULES = []
       appmanager.DESKTOP_APPS = None
       appmanager.load_apps(APP_BLACKLIST.get())
-
 
   def test_list_users(self):
     c = make_logged_in_client(username="test", is_superuser=True)
@@ -632,7 +634,6 @@ class TestUserAdmin(BaseUserAdminTests):
     assert b'fa fa-check' in response.content
 
     assert b'Is active' in response.content
-
 
   def test_default_group(self):
     resets = [
@@ -662,7 +663,6 @@ class TestUserAdmin(BaseUserAdminTests):
     finally:
       for reset in resets:
         reset()
-
 
   def test_group_admin(self):
     c = make_logged_in_client(username="test", is_superuser=True)
@@ -722,13 +722,12 @@ class TestUserAdmin(BaseUserAdminTests):
     response = c.post('/useradmin/groups/new', dict(name="with space"))
     assert len(Group.objects.all()) == group_count + 1
 
-
   def test_user_admin_password_policy(self):
     # Set up password policy
     password_hint = password_error_msg = ("The password must be at least 8 characters long, "
                                           "and must contain both uppercase and lowercase letters, "
                                           "at least one number, and at least one special character.")
-    password_rule = "^(?=.*?[A-Z])(?=(.*[a-z]){1,})(?=(.*[\d]){1,})(?=(.*[\W_]){1,}).{8,}$"
+    password_rule = r"^(?=.*?[A-Z])(?=(.*[a-z]){1,})(?=(.*[\d]){1,})(?=(.*[\W_]){1,}).{8,}$"
 
     resets = [
       useradmin.conf.PASSWORD_POLICY.IS_ENABLED.set_for_testing(True),
@@ -844,7 +843,6 @@ class TestUserAdmin(BaseUserAdminTests):
     finally:
       for reset in resets:
         reset()
-
 
   def test_user_admin(self):
     FUNNY_NAME = 'أحمد@cloudera.com'
@@ -968,7 +966,7 @@ class TestUserAdmin(BaseUserAdminTests):
       group = get_default_user_group()
       response = c.get('/useradmin/users/new')
       assert response
-      assert (('<option value="%s" selected>%s</option>' % (group.id, group.name)) in \
+      assert (('<option value="%s" selected>%s</option>' % (group.id, group.name)) in
         (response.content if isinstance(response.content, str) else response.content.decode()))
 
       # Create a new regular user (duplicate name)
@@ -1129,7 +1127,6 @@ class TestUserAdmin(BaseUserAdminTests):
       'user_test_list_for_autocomplete3', is_superuser=False, groupname='group_test_list_for_autocomplete_other_group'
     )
 
-
     # c1 users should list only 'user_test_list_for_autocomplete2' and group should not list 'group_test_list_for_autocomplete_other_group'
     response = c1.get(reverse('useradmin_views_list_for_autocomplete'))
     content = json.loads(response.content)
@@ -1139,7 +1136,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     assert [u'user_test_list_for_autocomplete2'] == users
     assert u'group_test_list_for_autocomplete' in groups, groups
-    assert not u'group_test_list_for_autocomplete_other_group' in groups, groups
+    assert u'group_test_list_for_autocomplete_other_group' not in groups, groups
 
     reset = ENABLE_ORGANIZATIONS.set_for_testing(True)
     try:
@@ -1157,7 +1154,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     assert [u'user_test_list_for_autocomplete', u'user_test_list_for_autocomplete2'] == users
     assert u'group_test_list_for_autocomplete' in groups, groups
-    assert not u'group_test_list_for_autocomplete_other_group' in groups, groups
+    assert u'group_test_list_for_autocomplete_other_group' not in groups, groups
 
     # c3 is alone
     response = c3_other_group.get(reverse('useradmin_views_list_for_autocomplete'), {'include_myself': True})
@@ -1207,7 +1204,7 @@ class TestUserAdmin(BaseUserAdminTests):
     superuser = User.objects.get(username='test_super')
 
     response = other_client.get('/useradmin/users/edit/test')
-    assert not b"Language Preference" in response.content, response.content
+    assert b"Language Preference" not in response.content, response.content
 
     # Changing language preference will change language setting
     response = client.post('/useradmin/users/edit/test', dict(language='ko'))
@@ -1225,7 +1222,7 @@ class TestUserAdmin(BaseUserAdminTests):
         )
     )
     assert (
-      b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; '\
+      b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; '
       b'is not one of the available choices.' in response.content
     )
     # Hue 4 Admin
@@ -1250,7 +1247,7 @@ class TestUserAdmin(BaseUserAdminTests):
         )
     )
     assert (
-      b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; '\
+      b'Select a valid choice. en-us&gt;&lt;script&gt;alert(&#x27;Hacked&#x27;)&lt;/script&gt; '
       b'is not one of the available choices.' in response.content
     )
     # Hue 4, User with access to useradmin app
@@ -1262,6 +1259,7 @@ class TestUserAdmin(BaseUserAdminTests):
     )
     content = json.loads(response.content)
     assert 'Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.', content['errors'][0]['message'][0]
+
 
 @pytest.mark.django_db
 @pytest.mark.requires_hadoop
@@ -1430,7 +1428,6 @@ class LastActivityMiddlewareTests(object):
     profile = UserProfile.objects.get(user__username='test')
     assert profile.last_activity != 0
 
-
   def test_idle_timeout(self):
     timeout = 5
     reset = [
@@ -1505,7 +1502,7 @@ class ConcurrentUserSessionMiddlewareTests(object):
     now = datetime.now()
     # Session 1 is expired
     assert list(Session.objects.filter(Q(session_key=c.session.session_key)))[0].expire_date <= now
-    assert 302 == c.get('/editor', follow=False).status_code # Redirect to login page
+    assert 302 == c.get('/editor', follow=False).status_code  # Redirect to login page
 
     # Session 2 is still active
     assert list(Session.objects.filter(Q(session_key=c2.session.session_key)))[0].expire_date > now

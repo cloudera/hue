@@ -126,7 +126,7 @@ class WebhdfsTests(TestCase):
         for j in range(1, 100):
           offset = random.randint(0, len(data) - 1)
           f.seek(offset, os.SEEK_SET)
-          t = data[offset:offset+50]
+          t = data[offset:offset + 50]
           t = t.encode('utf-8')
 
           assert t == f.read(50)
@@ -190,7 +190,6 @@ class WebhdfsTests(TestCase):
     finally:
       fs._umask = fs_umask
 
-
   def test_umask_overriden(self):
     fs = self.cluster.fs
 
@@ -209,7 +208,6 @@ class WebhdfsTests(TestCase):
       assert '100333' == '%o' % fs.stats(test_file).mode
     finally:
       fs._umask = fs_umask
-
 
   def test_umask_without_sticky(self):
     fs = self.cluster.fs
@@ -230,7 +228,6 @@ class WebhdfsTests(TestCase):
     finally:
       fs._umask = fs_umask
 
-
   def test_copy_remote_dir(self):
     fs = self.cluster.fs
 
@@ -244,7 +241,7 @@ class WebhdfsTests(TestCase):
     f2.close()
 
     new_owner = 'testcopy'
-    new_owner_dir = self.prefix  + '/' + new_owner + '/test-copy'
+    new_owner_dir = self.prefix + '/' + new_owner + '/test-copy'
 
     fs.copy_remote_dir(src_dir, new_owner_dir, dir_mode=0o755, owner=new_owner)
 
@@ -309,7 +306,7 @@ class WebhdfsTests(TestCase):
       if present:
         assert name in listing, f"{name} should be in {listing}"
       else:
-        assert not name in listing, f"{name} should not be in {listing}"
+        assert name not in listing, f"{name} should not be in {listing}"
 
     name = u'''pt-Olá_ch-你好_ko-안녕_ru-Здравствуйте%20,.<>~`!@$%^&()_-+='"'''
     prefix = self.prefix + '/tmp/i18n'
@@ -546,8 +543,10 @@ class WebhdfsTests(TestCase):
     class test_local(object):
       def __getattribute__(self, name):
         return object.__getattribute__(self, name)
+
       def __setattr__(self, name, value):
         return object.__setattr__(self, name, value)
+
       def __delattr__(self, name):
         return object.__delattr__(self, name)
 

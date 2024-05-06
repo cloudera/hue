@@ -40,8 +40,8 @@ except Exception as e:
 class BeeswaxQueryApi(Api):
 
   def __init__(self, user, cluster=None):
-    self.user=user
-    self.cluster=cluster
+    self.user = user
+    self.cluster = cluster
 
   def apps(self, filters):
     filter_map = self._get_filter_map(filters)
@@ -120,7 +120,7 @@ class BeeswaxQueryApi(Api):
   def action(self, appid, action):
     message = {'message': '', 'status': 0}
 
-    return message;
+    return message
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
@@ -128,12 +128,12 @@ class BeeswaxQueryApi(Api):
   def profile(self, appid, app_type, app_property, app_filters):
     message = {'message': '', 'status': 0}
 
-    return message;
+    return message
 
   def profile_encoded(self, appid):
     message = {'message': '', 'status': 0}
 
-    return message;
+    return message
 
   def _get_status(self, job):
     return 'RUNNING' if len(job[1]) <= 1 else "FINISHED"
@@ -152,18 +152,18 @@ class BeeswaxQueryApi(Api):
     filter_map = {}
     if filters.get("text"):
       filter_names = {
-        'user':'effective_user',
-        'id':'query_id',
-        'name':'state',
-        'type':'stmt_type',
-        'status':'status'
+        'user': 'effective_user',
+        'id': 'query_id',
+        'name': 'state',
+        'type': 'stmt_type',
+        'status': 'status'
       }
 
       def make_lambda(name, value):
         return lambda app: app[name] == value
 
       for key, name in list(filter_names.items()):
-          text_filter = re.search(r"\s*("+key+")\s*:([^ ]+)", filters.get("text"))
+          text_filter = re.search(r"\s*(" + key + r")\s*:([^ ]+)", filters.get("text"))
           if text_filter and text_filter.group(1) == key:
             filter_map[name] = text_filter.group(2).strip()
 
@@ -188,9 +188,9 @@ class BeeswaxQueryApi(Api):
     elif period == 's':
       return float(time) * 1000
     elif period == 'm':
-      return float(time) * 60000 #1000*60
+      return float(time) * 60000  # 1000*60
     elif period == 'h':
-      return float(time) * 3600000 #1000*60*60
+      return float(time) * 3600000  # 1000*60*60
     elif period == 'd':
       return float(time) * 86400000  # 1000*60*60*24
     else:

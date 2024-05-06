@@ -883,8 +883,10 @@ CATEGORIES = [
 def get_connectors_types():
   return CONNECTOR_TYPES
 
+
 def get_connector_categories():
   return CATEGORIES
+
 
 def get_connector_by_type(dialect, interface):
   instance = [

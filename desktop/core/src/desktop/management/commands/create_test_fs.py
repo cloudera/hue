@@ -25,6 +25,7 @@ from hadoop.fs import fs_for_testing
 
 from django.utils.translation import gettext as _
 
+
 class Command(BaseCommand):
   """Creates file system for testing."""
   def handle(self, *args, **options):

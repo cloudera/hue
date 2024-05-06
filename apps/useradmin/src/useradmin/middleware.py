@@ -113,13 +113,13 @@ class LastActivityMiddleware(MiddlewareMixin):
     if logout:
       dt_logout(request, next_page='/')
 
-
   def _total_seconds(self, dt):
     # Keep backward compatibility with Python 2.6 which doesn't support total_seconds()
     if hasattr(dt, 'total_seconds'):
       return dt.total_seconds()
     else:
       return math.floor((dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6)
+
 
 class ConcurrentUserSessionMiddleware(MiddlewareMixin):
   """
@@ -128,7 +128,7 @@ class ConcurrentUserSessionMiddleware(MiddlewareMixin):
   def process_response(self, request, response):
     try:
       user = request.user
-    except AttributeError: # When the request does not store user. We care only about the login request which does store the user.
+    except AttributeError:  # When the request does not store user. We care only about the login request which does store the user.
       return response
 
     # request.session.modified checks if a user just logged in

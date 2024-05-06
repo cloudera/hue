@@ -105,7 +105,6 @@ class TestApiWithConnectors(object):
     self.user = rewrite_user(User.objects.get(username="test"))
     grant_access("test", "default", "notebook")
 
-
   def test_execute_impala(self):
 
     with patch('desktop.lib.connectors.api.CONNECTOR_INSTANCES', TestApi.CONNECTOR):
@@ -152,7 +151,6 @@ class TestApiWithConnectors(object):
         get_client.return_value = tclient
         tclient.get_coordinator_host = Mock(return_value={})
 
-
         response = self.client.post(reverse('notebook:execute'), {
             'notebook': TestApi.NOTEBOOK_JSON,
             'snippet': json.dumps(json.loads(TestApi.NOTEBOOK_JSON)['snippets'][0]),
@@ -163,7 +161,6 @@ class TestApiWithConnectors(object):
     assert response.status_code == 200
     data = json.loads(response.content)
     assert data['status'] == 0
-
 
   def test_autocomplete_database_impala(self):
 
@@ -186,7 +183,6 @@ class TestApiWithConnectors(object):
     data = json.loads(response.content)
     assert data['status'] == 0
     assert data['databases'] == [{u'comment': u'', u'hdfs_link': u'hdfs://table'}]
-
 
   def test_sample_data_table_sync_impala(self):
 
@@ -220,7 +216,6 @@ class TestApiWithConnectors(object):
     assert data['headers'] == ['name']
     assert data['full_headers'] == [{'name': 'name'}]
     assert data['rows'] == [[1], [2]]
-
 
   def test_sample_data_table_async_impala(self):
 
@@ -275,7 +270,6 @@ class TestApi():
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
 
-
   @patch('notebook.connectors.hiveserver2.has_jobbrowser', True)
   def test_get_jobs_with_jobbrowser(self):
     notebook = Mock()
@@ -294,7 +288,6 @@ class TestApi():
         assert jobs[0]['name'] == 'job_id_00001'
         assert jobs[0]['url'] == '/jobbrowser/jobs/job_id_00001'
 
-
   @patch('notebook.connectors.hiveserver2.has_jobbrowser', False)
   def test_get_jobs_without_jobbrowser(self):
     notebook = Mock()
@@ -312,7 +305,6 @@ class TestApi():
         assert jobs, jobs
         assert jobs[0]['name'] == 'job_id_00001'
         assert jobs[0]['url'] == ''  # Is empty
-
 
   def test_close_statement(self):
     with patch('notebook.connectors.hiveserver2.HS2Api._get_db') as _get_db:
@@ -368,10 +360,9 @@ class TestApi():
         'interface': 'impala', 'type': 'direct', 'options': {}}, 'wasBatchExecuted': False, 'dialect': 'impala'
       }
       api = HS2Api(self.user)
-      
+
       response = api.close_statement(notebook, snippet)
       assert response['status'] == -1  # snippet['result']['handel'] ['guid'] and ['secret'] are missing
-
 
   def test_get_error_message_from_query(self):
     with patch('notebook.connectors.hiveserver2.HS2Api._get_db') as _get_db:
@@ -405,7 +396,6 @@ class TestApi():
                   e.message ==
                   'Error while compiling statement: FAILED: HiveAccessControlException Permission denied')
 
-
   def test_autocomplete_time_out(self):
     snippet = {'type': 'hive', 'properties': {}}
 
@@ -423,7 +413,6 @@ class TestApi():
         assert not True
       except QueryExpired as e:
         assert e.message == "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)"
-
 
   def test_autocomplete_functions_hive(self):
     snippet = {'type': 'hive', 'properties': {}}
@@ -456,7 +445,6 @@ class TestHiveserver2ApiNonMock(object):
 
     self.db = dbms.get(self.user, get_query_server_config())
     self.api = HS2Api(self.user)
-
 
   def test_prepare_hql_query(self):
     statement = "SELECT myUpper(description) FROM sample_07 LIMIT 10"
@@ -561,7 +549,6 @@ class TestHiveserver2ApiNonMock(object):
     assert pattern.search(config_statements), config_statements
     assert "CREATE TEMPORARY FUNCTION myUpper AS 'org.hue.udf.MyUpper'" in config_statements, config_statements
 
-
   def test_upgrade_properties(self):
     properties = None
     # Verify that upgrade will return defaults if current properties not formatted as settings
@@ -624,7 +611,6 @@ class TestHiveserver2ApiNonMock(object):
     ]
     upgraded_props = self.api.upgrade_properties(lang='hive', properties=properties)
     assert upgraded_props == properties
-
 
   def test_progress(self):
     snippet = json.loads("""
@@ -738,7 +724,6 @@ class TestHiveserver2ApiNonMock(object):
 
     assert self.api.progress({}, snippet, logs=logs) == 50
 
-
   def test_get_jobs(self):
 
     notebook = json.loads("""
@@ -828,13 +813,11 @@ class TestHiveserver2ApiNonMock(object):
         INFO  : Launching Job 2 out of 2
     """
 
-
     jobs = self.api.get_jobs(notebook, snippet, logs)
     assert len(jobs), 1
     assert jobs[0]['name'] == 'job_1466630204796_0059'
     assert jobs[0]['started'] == True
     assert jobs[0]['finished'] == True
-
 
   def test_get_current_statement(self):
     snippet = json.loads("""
@@ -866,7 +849,6 @@ class TestHiveserver2ApiNonMock(object):
 
     assert '086ecec9a8b89b1b47cce358bdbb343be23b1f8b54ca76bc81927e27' == statement['previous_statement_hash']
 
-
   def test_plan_extraction_from_profile(self):
     query_plan = self.api._get_impala_profile_plan(
       query_id='e147228183f1f0b3:6f086cc600000000', profile=IMPALA_CUSTOMER_QUERY_SAMPLE_PROFILE
@@ -890,7 +872,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
     super(TestHiveserver2ApiWithHadoop, cls).setup_class(load_data=False)
 
-
   def setup_method(self):
     self.client.post('/beeswax/install_examples')
 
@@ -904,7 +885,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     self.api = HS2Api(self.user)
 
     self.statement = 'SELECT description, salary FROM sample_07 WHERE (sample_07.salary > 100000) ORDER BY salary DESC LIMIT 1000'
-
 
   def create_query_document(self, owner, query_type='hive', database='default',
                             name='Test Query', description='Test Query', statement='',
@@ -930,7 +910,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     notebook_doc, save_as = _save_notebook(notebook.get_data(), owner)
     return notebook_doc
 
-
   def get_snippet(self, notebook, snippet_idx=0):
     data = notebook.get_data()
     snippet = data['snippets'][snippet_idx]
@@ -941,7 +920,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
       snippet['result']['handle'] = {}
 
     return snippet
-
 
   def execute_and_wait(self, query_doc, snippet_idx=0, timeout=30.0, wait=1.0):
     notebook = Notebook(document=query_doc)
@@ -972,7 +950,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
     return snippet
 
-
   def test_query_with_unicode(self):
     statement = "SELECT * FROM sample_07 WHERE code='한';"
 
@@ -992,7 +969,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     data = json.loads(response.content)
     assert 0 == data['status'], data
     assert "SELECT * FROM sample_07 WHERE code='한'" in smart_str(data['logs'])
-
 
   def test_get_current_statement(self):
     multi_statement = "SELECT description, salary FROM sample_07 LIMIT 20;\r\nSELECT AVG(salary) FROM sample_07;"
@@ -1025,7 +1001,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert {'row': 1, 'column': 0} == data['handle']['start'], data
     assert {'row': 1, 'column': 33} == data['handle']['end'], data
 
-
   def test_explain(self):
     # Hive 2 with Tez set hive.explain.user to true by default, but this test is expecting output when this setting
     # is set to false.
@@ -1043,7 +1018,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert 'STAGE DEPENDENCIES' in data['explanation'], data
     assert self.statement == data['statement'], data
 
-
   def test_download(self):
     statement = "SELECT 'hello world';"
 
@@ -1056,7 +1030,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
 
     assert 200 == response.status_code
     assert ('Content-Disposition', 'attachment; filename="Test Query.csv"') == response._headers['content-disposition']
-
 
   def test_get_sample(self):
     doc = self.create_query_document(owner=self.user, statement=self.statement)
@@ -1083,7 +1056,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert ['code'] == data['headers']
     assert 'rows' in data
     assert len(data['rows']) > 0
-
 
   def test_fetch_result_size_mr(self):
     if not is_live_cluster():  # Mini-cluster does not have JHS
@@ -1146,7 +1118,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert 23 == data['result']['rows']
     assert data['result']['size'] > 0, data['result']
 
-
   def test_fetch_result_size_spark(self):
     if not is_live_cluster() or not is_hive_on_spark():
       pytest.skip("Skipping Test")
@@ -1193,7 +1164,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert 'size' in data['result']
     assert 23 == data['result']['rows']
     assert data['result']['size'] > 0
-
 
   def test_fetch_result_size_impala(self):
     if not is_live_cluster():
@@ -1242,7 +1212,6 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
       assert 1000 == data['result']['rows']
     finally:
       self.api.close_session(session)
-
 
   def test_fetch_result_abbreviated(self):
     if not is_live_cluster():

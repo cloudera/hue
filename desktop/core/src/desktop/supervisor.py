@@ -88,6 +88,7 @@ SHOULD_STOP = False
 # killing them forceably (seconds)
 WAIT_FOR_DEATH = 5
 
+
 class SuperviseeSpec(object):
   """
   A specification of something that should be supervised.
@@ -102,6 +103,7 @@ class SuperviseeSpec(object):
     """
     self.drop_root = drop_root
 
+
 class DjangoCommandSupervisee(SuperviseeSpec):
   """A supervisee which is simply a desktop django management command."""
   def __init__(self, django_command, **kwargs):
@@ -111,6 +113,7 @@ class DjangoCommandSupervisee(SuperviseeSpec):
   @property
   def cmdv(self):
     return [HUE_BIN, self.django_command]
+
 
 class Supervisor(threading.Thread):
   """A thread responsible for keeping the supervised subprocess running"""
@@ -200,8 +203,10 @@ def shutdown(sups):
 
   sys.exit(1)
 
+
 def sig_handler(signum, frame):
   raise SystemExit("Signal %d received. Exiting" % signum)
+
 
 def parse_args():
   parser = optparse.OptionParser()
@@ -218,8 +223,10 @@ def parse_args():
   (options, args) = parser.parse_args()
   return options
 
+
 def get_pid_cmdline(pid):
   return subprocess.Popen(["ps", "-p", str(pid), "-o", "cmd", "h"], stdout=subprocess.PIPE, close_fds=True).communicate()[0]
+
 
 def get_supervisees():
   """Pull the supervisor specifications out of the entry point."""

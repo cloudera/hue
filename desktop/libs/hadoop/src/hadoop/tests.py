@@ -34,6 +34,7 @@ from hadoop import pseudo_hdfs4
 
 from io import BytesIO as string_io
 
+
 def test_confparse():
   data = """
     <configuration>
@@ -78,6 +79,7 @@ def test_confparse():
 
   cp_empty = confparse.ConfParse("")
   assert cp_empty.get('whatever', 'yes') == 'yes'
+
 
 def test_tricky_confparse():
   """
@@ -125,10 +127,10 @@ def test_config_validator_more():
   try:
     resp = cli.get('/debug/check_config')
 
-    assert not 'Failed to access filesystem root' in resp.content
-    assert not 'Failed to create' in resp.content
-    assert not 'Failed to chown' in resp.content
-    assert not 'Failed to delete' in resp.content
+    assert 'Failed to access filesystem root' not in resp.content
+    assert 'Failed to create' not in resp.content
+    assert 'Failed to chown' not in resp.content
+    assert 'Failed to delete' not in resp.content
   finally:
     restore_sys_caches(old_caches)
 
@@ -138,8 +140,8 @@ def test_non_default_cluster():
   NON_DEFAULT_NAME = 'non_default'
   old_caches = clear_sys_caches()
   reset = (
-    conf.HDFS_CLUSTERS.set_for_testing({ NON_DEFAULT_NAME: { } }),
-    conf.MR_CLUSTERS.set_for_testing({ NON_DEFAULT_NAME: { } }),
+    conf.HDFS_CLUSTERS.set_for_testing({NON_DEFAULT_NAME: {}}),
+    conf.MR_CLUSTERS.set_for_testing({NON_DEFAULT_NAME: {}}),
   )
   try:
     # This is indeed the only hdfs/mr cluster

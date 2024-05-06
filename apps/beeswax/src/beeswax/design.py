@@ -286,4 +286,3 @@ def denormalize_formset_dict(data_dict_list, formset, attr_list):
 
   res[str(formset.management_form.add_prefix('next_form_id'))] = str(len(data_dict_list))
   return res
-

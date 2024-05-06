@@ -57,7 +57,6 @@ class PrometheusApi(object):
     self._client.set_verify(ssl_cert_ca_verify)
     self._root = Resource(self._client)
 
-
   def query(self, query):
     try:
       return self._root.get('query', {

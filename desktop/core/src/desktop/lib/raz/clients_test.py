@@ -24,6 +24,7 @@ from desktop.lib.raz.clients import S3RazClient, AdlsRazClient
 
 from unittest.mock import patch, Mock
 
+
 class S3RazClientLiveTest(TestCase):
 
   @classmethod
@@ -38,7 +39,6 @@ class S3RazClientLiveTest(TestCase):
     assert 'AWSAccessKeyId=' in url
     assert 'Signature=' in url
     assert 'Expires=' in url
-
 
   def test_check_acccess_s3_list_file(self):
     # e.g. 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
@@ -58,14 +58,14 @@ class S3RazClientLiveTest(TestCase):
     assert 'Signature=' in url
     assert 'Expires=' in url
 
-
   def test_check_acccess_s3_list_file_no_access(self): pass
+
 
 class AdlsRazClientTest(TestCase):
 
   def setup_method(self, method):
     self.username = 'csso_hueuser'
-  
+
   def test_check_rename_operation(self):
     with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
       with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
@@ -84,7 +84,7 @@ class AdlsRazClientTest(TestCase):
 
             check_access.assert_called_with(
               headers={
-                'x-ms-version': '2019-12-12', 
+                'x-ms-version': '2019-12-12',
                 'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir?some_random_sas_token'
               },
               method='PUT',

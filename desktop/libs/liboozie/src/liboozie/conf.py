@@ -52,7 +52,7 @@ REMOTE_DEPLOYMENT_DIR = Config(
   )
 )
 
-SSL_CERT_CA_VERIFY=Config(
+SSL_CERT_CA_VERIFY = Config(
   key="ssl_cert_ca_verify",
   help="In secure mode (HTTPS), if SSL certificates from Oozie Rest APIs have to be verified against certificate authority",
   dynamic_default=default_ssl_validate,
@@ -76,7 +76,7 @@ def get_oozie_status(user):
   status = 'down'
 
   try:
-    if not 'test' in sys.argv:  # Avoid tests hanging
+    if 'test' not in sys.argv:  # Avoid tests hanging
       status = str(get_oozie(user).get_oozie_status())
   except:
     LOG.exception('failed to get oozie status')

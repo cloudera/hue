@@ -47,7 +47,7 @@ def fetch_hive_path(request):
   if '/' in path:
     database, table = path.split('/', 1)
     if '.' in table:
-      table, column  = table.split('.', 1)
+      table, column = table.split('.', 1)
 
   resp = autocomplete(request, database, table, column)
 

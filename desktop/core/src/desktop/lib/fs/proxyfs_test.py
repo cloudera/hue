@@ -67,6 +67,7 @@ def test_fs_selection():
     with pytest.raises(IOError):
       proxy_fs.stats('ftp://host')
 
+
 def wrapper(mock):
   def tmp(*args, **kwargs):
     return mock
@@ -135,7 +136,6 @@ class MockFs(object):
 
   def filebrowser_action(self):
     return self._filebrowser_action
-
 
 
 @pytest.mark.django_db
@@ -226,4 +226,3 @@ class TestFsPermissions(object):
     f('/tmp')
     f('gs://bucket/key')
     f('ofs://volume/bucket/key')
-

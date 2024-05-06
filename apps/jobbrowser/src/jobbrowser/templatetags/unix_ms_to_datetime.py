@@ -25,12 +25,13 @@ from django.utils.translation import gettext as _
 
 register = django.template.Library()
 
+
 @register.filter(name='unix_ms_to_datetime')
 def unix_ms_to_datetime(unixtime):
   """unixtime is seconds since the epoch"""
   if unixtime:
     return datetime.datetime.fromtimestamp(math.floor(unixtime / 1000))
   return _("No time")
+
+
 unix_ms_to_datetime.is_safe = True
-
-

@@ -32,6 +32,7 @@ from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
+
 @api_error_handler
 def get_channels(request):
 
@@ -46,6 +47,7 @@ def get_channels(request):
     'channels': bot_channels,
   })
 
+
 @api_error_handler
 def send_message(request):
   channel = request.POST.get('channel')
@@ -57,6 +59,7 @@ def send_message(request):
   return JsonResponse({
     'ok': slack_response.get('ok'),
   })
+
 
 @login_notrequired
 @api_error_handler
@@ -76,6 +79,7 @@ def generate_slack_install_link(request):
     install_link += quote_plus(changed_data)
 
   return JsonResponse({'link': install_link})
+
 
 def _send_message(channel_info, message=None, block_element=None, message_ts=None):
   try:

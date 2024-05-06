@@ -36,6 +36,7 @@ from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
+
 class HiveQueryApi(Api):
   HEADERS = {'X-Requested-By': 'das'}
 

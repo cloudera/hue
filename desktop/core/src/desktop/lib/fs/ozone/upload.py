@@ -34,6 +34,7 @@ from desktop.conf import TASK_SERVER
 
 LOG = logging.getLogger()
 
+
 class OFSFineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
     self.qquuid = kwargs.get('qquuid')
@@ -41,7 +42,7 @@ class OFSFineUploaderChunkedUpload(object):
     self.totalfilesize = kwargs.get('qqtotalfilesize')
     self.file_name = kwargs.get('qqfilename')
     if self.file_name:
-      self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+      self.file_name = unicodedata.normalize('NFC', self.file_name)  # Normalize unicode
     self.chunk_size = UPLOAD_CHUNK_SIZE.get()
     if kwargs.get('chunk_size', None) != None:
       self.chunk_size = kwargs.get('chunk_size')
@@ -195,7 +196,6 @@ class OFSFileUploadHandler(FileUploadHandler):
 
     LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
 
-
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_ofs_upload():
       super(OFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
@@ -214,7 +214,6 @@ class OFSFileUploadHandler(FileUploadHandler):
         self.request.META['upload_failed'] = e
         raise StopUpload()
 
-
   def receive_data_chunk(self, raw_data, start):
     if self._is_ofs_upload():
       LOG.debug("OFSfileUploadHandler receive_data_chunk")
@@ -227,7 +226,6 @@ class OFSFileUploadHandler(FileUploadHandler):
         raise StopUpload()
     else:
       return raw_data
-
 
   def file_complete(self, file_size):
     if self._is_ofs_upload():

@@ -84,7 +84,6 @@ class ImpalaServerClient(HiveServerClient):
 
     return self._serialize_exec_summary(resp.summary)
 
-
   def get_runtime_profile(self, operation_handle, session_handle):
     """
     Calls Impala HS2 API's GetRuntimeProfile method on the given query handle
@@ -101,7 +100,6 @@ class ImpalaServerClient(HiveServerClient):
     resp = self.call(self._client.GetRuntimeProfile, req)
 
     return resp.profile
-
 
   def _serialize_exec_summary(self, summary):
     try:
@@ -166,28 +164,23 @@ class ImpalaDaemonApi(object):
   def __str__(self):
     return "ImpalaDaemonApi at %s" % self._url
 
-
   @property
   def url(self):
     return self._url
-
 
   @property
   def security_enabled(self):
     return self._security_enabled
 
-
   @property
   def user(self):
     return self._thread_local.user
-
 
   def set_user(self, user):
     if hasattr(user, 'username'):
       self._thread_local.user = user.username
     else:
       self._thread_local.user = user
-
 
   def get_queries(self):
     params = {
@@ -203,7 +196,6 @@ class ImpalaDaemonApi(object):
     except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
 
-
   def get_query(self, query_id):
     params = {
       'query_id': query_id,
@@ -218,7 +210,6 @@ class ImpalaDaemonApi(object):
         return resp
     except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
-
 
   def get_query_profile(self, query_id):
     params = {

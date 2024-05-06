@@ -165,4 +165,3 @@ USERNAME_MAP = Config(
     type=coerce_json_dict,
     default='{}'
 )
-

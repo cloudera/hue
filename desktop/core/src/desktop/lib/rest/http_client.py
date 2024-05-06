@@ -29,9 +29,9 @@ from urllib3.contrib import pyopenssl
 
 from desktop import conf
 
-import urllib.request, urllib.error
+import urllib.request
+import urllib.error
 from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
-
 
 
 pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()

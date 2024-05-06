@@ -113,7 +113,7 @@ def make_notebook(
     if settings is not None:
       _update_property_value(sessions_properties, 'files', files)
   elif editor_type == 'java':
-    sessions_properties = [] # Java options
+    sessions_properties = []  # Java options
   else:
     sessions_properties = []
 
@@ -128,7 +128,7 @@ def make_notebook(
          'id': None
       }
     ],
-    'selectedSnippet': editor_connector, # TODO: might need update in notebook.ko.js
+    'selectedSnippet': editor_connector,  # TODO: might need update in notebook.ko.js
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
@@ -205,7 +205,7 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
         'type': _snippet['type'],
         'properties': HS2Api.get_properties(snippet['type']),
         'id': None
-      } for _snippet in _snippets # Non unique types currently
+      } for _snippet in _snippets  # Non unique types currently
     ],
     'selectedSnippet': _snippets[0]['type'],
     'showHistory': False,
@@ -515,7 +515,7 @@ def _convert_type(btype, bdata):
   elif btype == RDBMS:
     data = json.loads(bdata)
     return data['query']['server']
-  elif btype == SPARK: # We should not import
+  elif btype == SPARK:  # We should not import
     return 'spark'
   else:
     return 'hive'
@@ -543,6 +543,7 @@ def _get_example_directory(user):
     name=Document2.EXAMPLES_DIR
   )
   return examples_dir
+
 
 def _get_dialect_example(dialect):
   sample_user = install_sample_user()
@@ -723,6 +724,7 @@ class MockRequest():
     self.jt = jt
     self.POST = {}
     self.GET = {}
+
 
 def install_custom_examples():
   if EXAMPLES.AUTO_LOAD.get():

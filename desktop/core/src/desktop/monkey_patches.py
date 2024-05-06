@@ -91,6 +91,7 @@ def monkey_patch_md5(modules_to_patch):
   Modules must use `import hashlib` and not `from hashlib import md5`.
   """
   orig_hashlib_md5 = hashlib.md5
+
   def _non_security_md5(*args, **kwargs):
     kwargs['usedforsecurity'] = False
     return orig_hashlib_md5(*args, **kwargs)

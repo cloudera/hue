@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -38,7 +38,6 @@ class TestNotebook(object):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
-
   def test_get_api(self):
     request = Mock()
     snippet = {
@@ -47,7 +46,6 @@ class TestNotebook(object):
     }
 
     get_api(request=request, snippet=snippet)
-
 
   def test_execute_and_wait(self):
     query = Notebook()
@@ -69,7 +67,6 @@ class TestNotebook(object):
 
     assert 2 == query.check_status.call_count
 
-
   def test_check_status(self):
     query = Notebook()
 
@@ -86,7 +83,6 @@ class TestNotebook(object):
 
           assert 0 == resp['status']
           assert 0 == resp['query_status']['status']
-
 
   def test_statement_with_variables(self):
     snippet = {
@@ -109,6 +105,8 @@ class TestNotebook(object):
 
 
 iteration = 0
+
+
 def check_status_side_effect(request, operation_id):
   """First time query is still running, second time the execution is finished."""
   global iteration

@@ -29,7 +29,7 @@ LOG = logging.getLogger()
 
 
 FETCH_SIZE = 1000
-DOWNLOAD_COOKIE_AGE = 1800 # 30 minutes
+DOWNLOAD_COOKIE_AGE = 1800  # 30 minutes
 
 
 def download(handle, format, db, id=None, file_name='query_result', user_agent=None):
@@ -108,8 +108,8 @@ class DataAdapter(object):
   # Avoid serialization to string where possible
   def _getsizeofascii(self, row):
     size = 0
-    size += max(len(row) - 1, 0) # CSV commas between columns
-    size += 2 # CSV \r\n at the end of row
+    size += max(len(row) - 1, 0)  # CSV commas between columns
+    size += 2  # CSV \r\n at the end of row
     for col in row:
       col_type = type(col)
       if col_type == int:

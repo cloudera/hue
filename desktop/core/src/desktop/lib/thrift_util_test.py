@@ -26,7 +26,7 @@ import unittest
 from unittest.mock import patch, Mock
 
 gen_py_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gen-py"))
-if not gen_py_path in sys.path:
+if gen_py_path not in sys.path:
   sys.path.insert(1, gen_py_path)
 
 from djangothrift_test_gen import TestService
@@ -167,6 +167,7 @@ class TestWithThriftServer(object):
       racer.join()
       assert 0 == len(racer.errors)
 
+
 class ThriftUtilTest(TestCase):
   def test_simpler_string(self):
     struct = TestStruct()
@@ -242,6 +243,7 @@ class ThriftUtilTest(TestCase):
     # assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TGetTablesReq(schemaName=u\'default\', "
     # "sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, "
     # "guid=9144f53015fa33d2:0091efd700000000)), tableName=u\'customers\', tableTypes=None, catalogName=None),)"))
+
 
 class TestJsonable2Thrift(TestCase):
   """
@@ -330,7 +332,6 @@ class TestSuperClient(TestCase):
       client.my_call()
       # Could check output for "Not retrying thrift call my_call due to socket timeout"
 
-
   def test_wrapper_with_retry(self):
     wrapped_client, transport = Mock(), Mock()
     wrapped_client.my_call = Mock(
@@ -351,7 +352,6 @@ class TestThriftJWT():
 
     self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test_user"))
-
 
   def test_jwt_thrift(self):
     with patch('desktop.lib.thrift_util.TBinaryProtocol'):
@@ -378,7 +378,6 @@ class TestThriftJWT():
               set_bearer_auth.assert_called_with('some_jwt_token')
             finally:
               reset()
-
 
   def test_jwt_thrift_exceptions(self):
     with patch('desktop.lib.thrift_util.TBinaryProtocol'):

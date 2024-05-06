@@ -29,7 +29,8 @@ from desktop.conf import VCS
 from desktop.lib.vcs.apis.base_api import Api, GIT_READ_ONLY
 from desktop.lib.vcs.github_client import GithubClientException
 
-import urllib.request, urllib.error
+import urllib.request
+import urllib.error
 from urllib.parse import unquote as urllib_unquote, urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
 from django.utils.translation import gettext as _
 
@@ -43,8 +44,8 @@ class GithubReadOnlyApi(Api):
   """
 
   OWNER_RE = "(?P<owner>[A-Za-z0-9](?:-?[A-Za-z0-9]){0,38})"
-  REPO_RE = "(?P<repo>[\w\.@\:\-~]+)"
-  BRANCH_RE = "(?P<branch>[\w\.@\:\-~]+)"
+  REPO_RE = r"(?P<repo>[\w\.@\:\-~]+)"
+  BRANCH_RE = r"(?P<branch>[\w\.@\:\-~]+)"
 
   DEFAULT_SCOPES = ['repo', 'user']
 

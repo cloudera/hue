@@ -38,7 +38,6 @@ from unittest.mock import patch, Mock
 LOG = logging.getLogger()
 
 
-
 @pytest.mark.django_db
 class TestApi():
 
@@ -50,7 +49,6 @@ class TestApi():
     if not ENABLE_ORGANIZATIONS.get():
       add_to_group('test')
       grant_access("test", "test", "metadata")
-
 
   def test_risk_ui_api(self):
     snippet = {
@@ -109,12 +107,10 @@ class TestOptimizerApi(TestCase):
     grant_access("test", "test", "metadata")
     grant_access("test", "test", "optimizer")
 
-
   @classmethod
   def teardown_class(cls):
     cls.user.is_superuser = False
     cls.user.save()
-
 
   # Should run first
   def test_upload(self):

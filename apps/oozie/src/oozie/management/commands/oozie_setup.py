@@ -68,8 +68,7 @@ class Command(BaseCommand):
           workflow.save()
           Workflow.objects.initialize(workflow)
           import_workflow_root(workflow=workflow, workflow_definition_root=workflow_root, metadata=metadata, fs=self.fs)
-          workflow.doc.all().delete() # Delete doc as it messes up the example sharing
-
+          workflow.doc.all().delete()  # Delete doc as it messes up the example sharing
 
   def _import_coordinators(self, directory):
 
@@ -90,7 +89,6 @@ class Command(BaseCommand):
           coordinator.save()
           import_coordinator_root(coordinator=coordinator, coordinator_definition_root=coordinator_root, metadata=metadata)
 
-
   def _import_bundles(self, directory):
 
     for example_directory_name in os.listdir(directory):
@@ -110,7 +108,6 @@ class Command(BaseCommand):
           bundle.name = bundle_root.get('name')
           bundle.save()
           import_bundle_root(bundle=bundle, bundle_definition_root=bundle_root, metadata=metadata)
-
 
   def _install_mapreduce_example(self):
     doc2 = None
@@ -272,7 +269,6 @@ class Command(BaseCommand):
 
     return doc2
 
-
   def _install_pyspark_example(self):
     doc2 = None
     name = _('PySpark Pi Estimator Job')
@@ -328,7 +324,6 @@ class Command(BaseCommand):
 
     unmanaged_dir = os.path.join(data_dir, 'unmanaged')
     self._import_workflows(unmanaged_dir, managed=False)
-
 
   def handle(self, *args, **options):
     self.user = install_sample_user()

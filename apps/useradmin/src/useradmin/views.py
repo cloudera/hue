@@ -861,13 +861,14 @@ def ensure_home_directory(fs, user):
   else:
     LOG.warning("Not creating home directory of %s as his profile is empty" % user)
 
+
 def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   """
   Syncs the Hue database with the underlying Unix system, by importing users and
   groups from 'getent passwd' and 'getent groups'. This should also pull in
   users who are accessible via NSS.
   """
-  hadoop_groups = dict((group.gr_name, group) for group in grp.getgrall() \
+  hadoop_groups = dict((group.gr_name, group) for group in grp.getgrall()
       if (group.gr_gid >= min_gid and group.gr_gid < max_gid) or group.gr_name == 'hadoop')
   user_groups = dict()
 
@@ -890,7 +891,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
         user_groups[member].append(hue_group)
 
   # Now let's import the users
-  hadoop_users = dict((user.pw_name, user) for user in pwd.getpwall() \
+  hadoop_users = dict((user.pw_name, user) for user in pwd.getpwall()
       if (user.pw_uid >= min_uid and user.pw_uid < max_uid) or user.pw_name in grp.getgrnam('hadoop').gr_mem)
   for username, user in hadoop_users.items():
     try:
@@ -967,7 +968,6 @@ def _get_find_groups_filter(ldap_info, server=None):
   sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
   sanitized_dn = sanitized_dn.replace(r'\5c,', r'\5c\2c')
 
-
   if (group_member_attr.lower() == 'memberuid'):
     find_groups_filter = "(&" + group_filter + "(" + group_member_attr + "=" + ldap_info['username'] + "))"
   elif (group_member_attr.lower() == 'member' or group_member_attr.lower() == 'uniquemember'):
@@ -1028,7 +1028,7 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
         group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
         for group_info in group_ldap_info:
           if Group.objects.filter(name=group_info['name']).exists():
-          # Add only if user isn't part of group.
+            # Add only if user isn't part of group.
             current_ldap_groups.add(Group.objects.get(name=group_info['name']))
             if not user.groups.filter(name=group_info['name']).exists():
               groups = import_ldap_groups(
@@ -1087,7 +1087,7 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1, fai
       LOG.warning('Found multiple groups for member %s.' % smart_str(group_info['dn']))
     else:
       for group in groups:
-        _import_ldap_members(connection, group, group_info, count+1, max_count, failed_users=failed_users)
+        _import_ldap_members(connection, group, group_info, count + 1, max_count, failed_users=failed_users)
 
   for posix_member in posix_members:
     LOG.debug("Importing posix user %s into group %s" % (smart_str(posix_member), smart_str(group.name)))
@@ -1139,7 +1139,7 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
 
     try:
       group = Group.objects.get(name=group_info['name'])
-      _sync_ldap_members(connection, group, group_info, count+1, max_count, failed_users=failed_users)
+      _sync_ldap_members(connection, group, group_info, count + 1, max_count, failed_users=failed_users)
     except Group.DoesNotExist:
       LOG.warning("Synchronizing group %s failed. Group does not exist." % smart_str(group.name))
 

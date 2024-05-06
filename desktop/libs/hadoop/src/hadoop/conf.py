@@ -91,13 +91,13 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       ),
       NN_KERBEROS_PRINCIPAL=Config(
           "nn_kerberos_principal",
-          help="Kerberos principal for NameNode", # Unused
+          help="Kerberos principal for NameNode",  # Unused
           default="hdfs",
           type=str
       ),
       DN_KERBEROS_PRINCIPAL=Config(
           "dn_kerberos_principal",
-          help="Kerberos principal for DataNode", # Unused
+          help="Kerberos principal for DataNode",  # Unused
           default="hdfs",
           type=str
       ),
@@ -121,8 +121,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       HADOOP_CONF_DIR=Config(
           key="hadoop_conf_dir",
           dynamic_default=get_hadoop_conf_dir_default,
-          help=
-            "Directory of the Hadoop configuration. Defaults to the environment variable HADOOP_CONF_DIR when set, "
+          help="Directory of the Hadoop configuration. Defaults to the environment variable HADOOP_CONF_DIR when set, "
             "or '/etc/hadoop/conf'.",
           type=str
       ),
@@ -179,7 +178,7 @@ MR_CLUSTERS = UnspecifiedConfigSection(
           help="Whether Hue should use this cluster to run jobs",
           default=True,
           type=coerce_bool
-      ), # True here for backward compatibility
+      ),  # True here for backward compatibility
     )
   )
 )
@@ -193,12 +192,14 @@ def get_spark_history_server_from_cm():
     return ManagerApi().get_spark_history_server_url()
   return None
 
+
 def get_spark_history_server_url():
   """
     Try to get Spark history server URL from Cloudera Manager API, otherwise give default URL
   """
   url = get_spark_history_server_from_cm()
   return url if url else 'http://localhost:18088'
+
 
 def get_spark_history_server_security_enabled():
   """
@@ -231,7 +232,7 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
-                       default=False, type=coerce_bool), # False here for backward compatibility
+                       default=False, type=coerce_bool),  # False here for backward compatibility
       IS_YARN=Config("is_yarn", help="Attribute set only on YARN clusters and not MR1 ones.",
                      default=True, type=coerce_bool),
       RESOURCE_MANAGER_API_URL=Config("resourcemanager_api_url",
@@ -316,7 +317,7 @@ def test_yarn_configurations(user):
   result = []
 
   try:
-    from jobbrowser.api import get_api # Required for cluster HA testing
+    from jobbrowser.api import get_api  # Required for cluster HA testing
   except Exception as e:
     LOG.warning('Jobbrowser is disabled, skipping test_yarn_configurations')
     return result

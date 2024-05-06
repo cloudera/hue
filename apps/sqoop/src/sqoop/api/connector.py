@@ -37,6 +37,7 @@ __all__ = ['get_connectors', 'connectors', 'connector']
 
 LOG = logging.getLogger()
 
+
 @never_cache
 def get_connectors(request):
   response = {
@@ -51,11 +52,13 @@ def get_connectors(request):
     response.update(handle_rest_exception(e, _('Could not get connectors.')))
   return JsonResponse(response)
 
+
 def connectors(request):
   if request.method == 'GET':
     return get_connectors(request)
   else:
     raise StructuredException(code="INVALID_METHOD", message=_('GET request required.'), error_code=405)
+
 
 @never_cache
 @get_connector_or_exception()

@@ -59,14 +59,12 @@ class KafkaApi(object):
     self._client = HttpClient(self._api_url, logger=LOG)
     self._root = Resource(self._client)
 
-
   def topics(self):
     try:
       response = self._root.get('topics')
       return json.loads(response)
     except RestException as e:
       raise KafkaApiException(e)
-
 
   def create_topic(self, name, partitions=1, replication_factor=1):
     # Create/delete topics are not available in the REST API.
@@ -95,7 +93,6 @@ class SchemaRegistryApi(object):
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
     self._root = Resource(self._client)
-
 
   def subjects(self):
     try:

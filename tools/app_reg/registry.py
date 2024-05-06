@@ -40,7 +40,7 @@ class AppRegistry(object):
     """Open the existing registry"""
     self._reg_path = os.path.join(common.HUE_APP_REG_DIR, 'app.reg')
     self._initialized = False
-    self._apps = { }    # Map of name -> HueApp
+    self._apps = {}    # Map of name -> HueApp
     self._open()
 
   def _open(self):
@@ -171,14 +171,13 @@ class HueApp(object):
     """get_conffiles() -> A list of config (.ini) files"""
     return glob.glob(os.path.join(self.abs_path, 'conf', '*.ini'))
 
-
   def install_conf(self):
     """
     install_conf() -> True/False
 
     Symlink the app's conf/*.ini files into the conf directory.
     """
-    installed = [ ]
+    installed = []
 
     for target in self.get_conffiles():
       link_name = os.path.join(common.HUE_CONF_DIR, os.path.basename(target))
@@ -212,7 +211,6 @@ class HueApp(object):
             LOG.error("Failed to cleanup link %s: %s" % (link_name, ex2))
         return False
     return True
-
 
   def uninstall_conf(self):
     """uninstall_conf() -> True/False"""

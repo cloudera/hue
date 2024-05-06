@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -22,11 +22,12 @@ from libsaml.conf import xmlsec
 
 from unittest.mock import patch, Mock
 
+
 def test_xmlsec_dynamic_default_no_which():
 
   with patch('libsaml.conf.subprocess') as subprocess:
     subprocess.Popen = Mock(
-      side_effect = OSError('No such file or directory. `which` command is not present')
+      side_effect=OSError('No such file or directory. `which` command is not present')
     )
 
     assert '/usr/local/bin/xmlsec1' == xmlsec()

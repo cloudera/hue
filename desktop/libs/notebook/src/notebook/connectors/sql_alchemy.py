@@ -91,7 +91,7 @@ def query_error_handler(func):
       return func(*args, **kwargs)
     except OperationalError as e:
       message = str(e)
-      if '1045' in message: # 'Access denied' # MySQL
+      if '1045' in message:  # 'Access denied' # MySQL
         raise AuthenticationRequired(message=message)
       else:
         raise e
@@ -207,14 +207,12 @@ class SqlAlchemyApi(Api):
 
     return create_engine(url, **options)
 
-
   def _get_session(self, notebook, snippet):
     for session in notebook['sessions']:
       if session['type'] == snippet['type']:
         return session
 
     return None
-
 
   def _create_connection(self, engine):
     connection = None
@@ -227,7 +225,6 @@ class SqlAlchemyApi(Api):
       raise AuthenticationRequired(message='Could not establish connection to datasource: %s' % e)
 
     return connection
-
 
   @query_error_handler
   def execute(self, notebook, snippet):
@@ -284,7 +281,6 @@ class SqlAlchemyApi(Api):
 
     return response
 
-
   @query_error_handler
   def explain(self, notebook, snippet):
     session = self._get_session(notebook, snippet)
@@ -302,7 +298,7 @@ class SqlAlchemyApi(Api):
         explanation = ''
       else:
         try:
-          result = connection.execute('EXPLAIN '+ statement)
+          result = connection.execute('EXPLAIN ' + statement)
           explanation = "\n".join("{}: {},".format(k, v) for row in result for k, v in row.items())
         except ProgrammingError:
           pass
@@ -314,7 +310,6 @@ class SqlAlchemyApi(Api):
       'explanation': explanation,
       'statement': statement
     }
-
 
   @query_error_handler
   def check_status(self, notebook, snippet):
@@ -336,7 +331,6 @@ class SqlAlchemyApi(Api):
 
     return response
 
-
   @query_error_handler
   def progress(self, notebook, snippet, logs=''):
     progress = 50
@@ -354,7 +348,6 @@ class SqlAlchemyApi(Api):
         stats = stats.get('stats', {})
         progress = stats.get('completedSplits', 0) * 100 // stats.get('totalSplits', 1)
     return progress
-
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
@@ -375,7 +368,6 @@ class SqlAlchemyApi(Api):
       'type': 'table'
     }
 
-
   def _assign_types(self, results, meta):
     result = results and results[0]
     if result:
@@ -393,16 +385,13 @@ class SqlAlchemyApi(Api):
         else:
           meta[index]['type'] = 'STRING_TYPE'
 
-
   @query_error_handler
   def fetch_result_metadata(self):
     pass
 
-
   @query_error_handler
   def cancel(self, notebook, snippet):
     return self.close_statement(notebook, snippet)
-
 
   @query_error_handler
   def get_log(self, notebook, snippet, startFrom=None, size=None):
@@ -425,11 +414,9 @@ class SqlAlchemyApi(Api):
     finally:
       return result
 
-
   def close_session(self, session):
     engine = self._get_engine()
     engine.dispose()  # ENGINE_KEY currently includes the current user
-
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
@@ -478,7 +465,6 @@ class SqlAlchemyApi(Api):
     response['status'] = 0
     return response
 
-
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     engine = self._get_engine()
@@ -522,7 +508,6 @@ class SqlAlchemyApi(Api):
         'backticks': self.backticks
     })
 
-
   def _get_column_type_name(self, col):
     try:
       name = str(col.get('type'))
@@ -530,7 +515,6 @@ class SqlAlchemyApi(Api):
       name = col.get('type').__visit_name__.lower()
 
     return name
-
 
   def _fix_bigquery_db_prefixes(self, table_or_column):
     if self.options['url'].startswith('bigquery://'):

@@ -41,8 +41,10 @@ CELERY_OPTIONS = {
   'server_group': conf.SERVER_GROUP.get(),
 }
 
+
 class Command(BaseCommand):
   help = SERVER_HELP
+
   def add_arguments(self, parser):
     parser.add_argument('worker')
     parser.add_argument(
@@ -75,11 +77,12 @@ class Command(BaseCommand):
   def usage(self, subcommand):
     return SERVER_HELP
 
+
 def runcelery(*args, **options):
   # Native does not load Hue's config
   log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
   log_file = "%s/rungunicornserver.log" % (log_dir)
-  concurrency = int(conf.GUNICORN_NUMBER_OF_WORKERS.get()/4) or options['concurrency']
+  concurrency = int(conf.GUNICORN_NUMBER_OF_WORKERS.get() / 4) or options['concurrency']
   schedule_file = options['schedule_file']
   opts = [
     'celery',

@@ -24,6 +24,7 @@ from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
+
 def get_all_queries():
   with open(os.path.join(os.path.dirname(__file__), 'data/queries.json')) as file:
     queries = json.load(file)

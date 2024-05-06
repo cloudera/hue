@@ -33,7 +33,6 @@ def test_concat_unicode_with_ascii_python2():
 
   assert u'The currency is: €' == u'The currency is: %s' % smart_str('€')
 
-
   try:
     u'%s' % '/user/domain/Джейкоб'
   except UnicodeDecodeError:

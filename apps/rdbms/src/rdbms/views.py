@@ -50,6 +50,8 @@ def configuration_error(request, *args, **kwargs):
 """
 Decorators
 """
+
+
 def ensure_configuration(view_func):
   def _decorator(*args, **kwargs):
     if conf.DATABASES.get():
@@ -62,6 +64,8 @@ def ensure_configuration(view_func):
 """
 Queries Views
 """
+
+
 @ensure_configuration
 def execute_query(request, design_id=None, query_history_id=None):
   """

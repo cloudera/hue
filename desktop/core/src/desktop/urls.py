@@ -64,7 +64,7 @@ handler500 = 'desktop.views.serve_500_error'
 dynamic_patterns = [
   re_path(r'^hue/accounts/login', desktop_auth_views.dt_login, name='desktop_auth_views_dt_login'),
   re_path(r'^hue/accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
-  re_path(r'^accounts/login/?$', desktop_auth_views.dt_login), # Deprecated
+  re_path(r'^accounts/login/?$', desktop_auth_views.dt_login),  # Deprecated
   re_path(r'^accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
   re_path(r'^profile$', desktop_auth_views.profile),
   re_path(r'^login/oauth/?$', desktop_auth_views.oauth_login),
@@ -94,7 +94,7 @@ dynamic_patterns += [
   re_path(r'^desktop/get_debug_level', desktop_views.get_debug_level),
   re_path(r'^desktop/set_all_debug', desktop_views.set_all_debug),
   re_path(r'^desktop/reset_all_debug', desktop_views.reset_all_debug),
-  re_path(r'^bootstrap.js$', desktop_views.bootstrap), # unused
+  re_path(r'^bootstrap.js$', desktop_views.bootstrap),  # unused
 
   re_path(r'^desktop/status_bar/?$', desktop_views.status_bar),
   re_path(r'^desktop/debug/is_alive$', desktop_views.is_alive),

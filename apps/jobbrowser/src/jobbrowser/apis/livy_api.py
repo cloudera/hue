@@ -50,7 +50,6 @@ class LivySessionsApi(Api):
       'total': jobs['total']
     }
 
-
   def app(self, appid):
     appid = appid.rsplit('-')[-1]
     api = get_api(self.user)
@@ -73,14 +72,11 @@ class LivySessionsApi(Api):
       }
     }
 
-
   def action(self, appid, action):
     return {}
 
-
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
-
 
   def profile(self, appid, app_type, app_property, app_filters):
     appid = appid.rsplit('-')[-1]
@@ -92,14 +88,13 @@ class LivySessionsApi(Api):
     else:
       return {}
 
-
   def _api_status(self, status):
     if status in ['CREATING', 'CREATED', 'TERMINATING']:
       return 'RUNNING'
     elif status in ['ARCHIVING', 'COMPLETED']:
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # KILLED and FAILED
+      return 'FAILED'  # KILLED and FAILED
 
 
 class LivyJobApi(Api):
@@ -148,14 +143,11 @@ class LivyJobApi(Api):
 
     return common
 
-
   def action(self, appid, action):
     return {}
 
-
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
-
 
   def profile(self, appid, app_type, app_property):
     return {}
@@ -166,4 +158,4 @@ class LivyJobApi(Api):
     elif status in ['COMPLETED']:
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # INTERRUPTED , KILLED, TERMINATED and FAILED
+      return 'FAILED'  # INTERRUPTED , KILLED, TERMINATED and FAILED

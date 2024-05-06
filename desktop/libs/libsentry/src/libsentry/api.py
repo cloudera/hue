@@ -230,7 +230,6 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
   def _massage_privilege(self, privilege):
     return {
         'scope': privilege.privilegeScope,
@@ -243,7 +242,6 @@ class SentryApi(object):
         'grantOption': privilege.grantOption == 1,
         'column': privilege.columnName,
     }
-
 
   def _massage_authorizable(self, authorizable):
     return {

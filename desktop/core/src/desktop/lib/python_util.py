@@ -235,6 +235,7 @@ def isISO8859_1(data):
   else:
     return True
 
+
 def isCP1252(data):
   try:
     data.decode('cp1252')
@@ -242,6 +243,7 @@ def isCP1252(data):
     return False
   else:
     return True
+
 
 def isUTF8Strict(data):
   try:
@@ -286,6 +288,7 @@ def check_encoding(data):
       return 'iso-8859-1'
     else:
       return 'cp1252'
+
 
 def current_ms_from_utc():
   return (datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(0)).total_seconds() * 1000

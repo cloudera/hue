@@ -40,12 +40,12 @@ class SQLdesign(object):
   """
   Represents an SQL design, with methods to perform (de)serialization.
   """
-  _QUERY_ATTRS = [ 'query', 'type', 'database', 'server' ]
+  _QUERY_ATTRS = ['query', 'type', 'database', 'server']
 
   def __init__(self, form=None, query_type=None):
     """Initialize the design from a valid form data."""
     if form is not None:
-      self._data_dict = dict(query = normalize_form_dict(form, SQLdesign._QUERY_ATTRS))
+      self._data_dict = dict(query=normalize_form_dict(form, SQLdesign._QUERY_ATTRS))
       if query_type is not None:
         self._data_dict['query']['type'] = query_type
 

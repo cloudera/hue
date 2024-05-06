@@ -88,6 +88,7 @@ ALLOW_UNSECURE_HTML = Config(
   default=False
 )
 
+
 def get_properties():
   if ENGINES.get():
     engines = ENGINES.get()
@@ -108,6 +109,7 @@ def get_properties():
         'nesting': False,
       },
     }
+
 
 def get_engines(user):
   engines = []
@@ -134,7 +136,6 @@ def get_engines(user):
     ]
 
   return engines
-
 
 
 ENGINES = UnspecifiedConfigSection(

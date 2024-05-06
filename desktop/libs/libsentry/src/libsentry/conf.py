@@ -26,14 +26,14 @@ from django.utils.translation import gettext_lazy as _t
 LOG = logging.getLogger()
 
 
-HOSTNAME=Config(
+HOSTNAME = Config(
   key='hostname',
   help=_t('Hostname or IP of server.'),
   type=str,
   default='localhost',
 )
 
-PORT=Config(
+PORT = Config(
   key='port',
   help=_t('Port the sentry service is running on.'),
   type=int,
@@ -46,7 +46,7 @@ SENTRY_CONF_DIR = Config(
   default=os.environ.get("SENTRY_CONF_DIR", '/etc/sentry/conf')
 )
 
-PRIVILEGE_CHECKER_CACHING=Config(
+PRIVILEGE_CHECKER_CACHING = Config(
   key='privilege_checker_caching',
   help=_t('Number of seconds when the privilege list of a user is cached.'),
   type=int,
@@ -55,7 +55,7 @@ PRIVILEGE_CHECKER_CACHING=Config(
 
 
 def is_enabled():
-  from hadoop import cluster # Avoid dependencies conflicts
+  from hadoop import cluster  # Avoid dependencies conflicts
   cluster = cluster.get_cluster_conf_for_job_submission()
 
   return HOSTNAME.get() != 'localhost' and cluster.SECURITY_ENABLED.get()

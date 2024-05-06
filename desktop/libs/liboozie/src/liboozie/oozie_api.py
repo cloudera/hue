@@ -32,7 +32,7 @@ from liboozie.utils import config_gen
 
 LOG = logging.getLogger()
 DEFAULT_USER = DEFAULT_USER.get()
-API_VERSION = 'v1' # Overridden to v2 for SLA
+API_VERSION = 'v1'  # Overridden to v2 for SLA
 
 
 _XML_CONTENT_TYPE = 'application/xml;charset=UTF-8'
@@ -182,7 +182,6 @@ class OozieApi(object):
 
     return job_def
 
-
   def get_job_log(self, jobid, logfilter=None):
     """
     get_job_log(jobid) -> Log (xml string)
@@ -203,7 +202,6 @@ class OozieApi(object):
 
     return log
 
-
   def get_job_graph(self, jobid, format='svg'):
     params = self._get_params()
     params['show'] = 'graph'
@@ -211,7 +209,6 @@ class OozieApi(object):
     params['format'] = format
     svg_data = self._root.get('job/%s' % (jobid,), params)
     return svg_data
-
 
   def get_job_status(self, jobid):
     params = self._get_params()

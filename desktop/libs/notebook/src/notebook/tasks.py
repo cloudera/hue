@@ -302,7 +302,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
       return output.getvalue()
 
 
-def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch updated guid in download_to_file from DB
+def get_jobs(notebook, snippet, logs, **kwargs):  # Re implementation to fetch updated guid in download_to_file from DB
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
 
@@ -427,6 +427,7 @@ def fetch_result_size(*args, **kwargs):
   info = result.info
   return {'rows': info.get('row_counter', 0)}
 
+
 def cancel(*args, **kwargs):
   notebook = args[0]
   snippet = args[1]
@@ -487,6 +488,7 @@ def _cleanup(notebook, snippet):
   storage.delete(_log_key(notebook, snippet))
   caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook, snippet))
 
+
 def _get_query_key(notebook, snippet):
   if ENABLE_HUE_5.get():
     if snippet.get('executable'):
@@ -503,20 +505,26 @@ def _get_query_key(notebook, snippet):
   else:
     return query_key
 
+
 def _log_key(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_log'
+
 
 def _result_key(task_id):
   return task_id + '_result'
 
+
 def _fetch_progress_key(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_fetch_progress'
+
 
 def _cancel_statement_async_id(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_cancel'
 
+
 def _close_statement_async_id(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_close'
+
 
 def _get_request(postdict=None, user_id=None):
   request = HttpRequest()

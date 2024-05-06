@@ -152,7 +152,7 @@ def dt_login(request, from_modal=False):
 
         userprofile.first_login = False
         userprofile.last_activity = datetime.now()
-        if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL: # This is to fix a bug in Hue 4.3
+        if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL:  # This is to fix a bug in Hue 4.3
           userprofile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
         userprofile.update_data({'auth_backend': user.backend})
         try:
@@ -200,7 +200,7 @@ def dt_login(request, from_modal=False):
       request.method == 'POST' and request.user.username != request.POST.get('username'):
     # local user login failed, give the right auth_form with 'server' field
     auth_form = auth_forms.LdapAuthenticationForm()
-  
+
   if not from_modal and SESSION.ENABLE_TEST_COOKIE.get():
     request.session.set_test_cookie()
 
@@ -224,7 +224,7 @@ def dt_login(request, from_modal=False):
   })
 
   if not request.user.is_authenticated:
-    response.delete_cookie(LOAD_BALANCER_COOKIE) # Note: might be re-balanced to another Hue on login.
+    response.delete_cookie(LOAD_BALANCER_COOKIE)  # Note: might be re-balanced to another Hue on login.
 
   return response
 
@@ -274,12 +274,13 @@ def profile(request):
   """
   return render(None, request, _profile_dict(request.user))
 
+
 def _profile_dict(user):
   return dict(
     username=user.username,
     first_name=user.first_name,
     last_name=user.last_name,
-    last_login=str(user.last_login), # datetime object needs to be converted
+    last_login=str(user.last_login),  # datetime object needs to be converted
     email=user.email
   )
 

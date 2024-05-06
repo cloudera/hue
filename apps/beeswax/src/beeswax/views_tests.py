@@ -39,7 +39,6 @@ class TestInstallExamples():
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=True, is_admin=True)
     self.user = User.objects.get(username="test")
 
-
   def test_install_via_insert_mysql(self):
 
     with patch('beeswax.views.beeswax_install_examples.SampleTable') as SampleTable:

@@ -32,13 +32,14 @@ from aws.s3.s3stat import S3Stat
 
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
-import urllib.request, urllib.error
+import urllib.request
+import urllib.error
 from urllib.parse import urlparse as lib_urlparse
 from django.utils.translation import gettext as _
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 BUCKET_NAME_PATTERN = re.compile(
-  "^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
+  r"^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
 
 LOG = logging.getLogger()
 
@@ -47,9 +48,11 @@ class S3FileSystemException(IOError):
   def __init__(self, *args, **kwargs):
     super(S3FileSystemException, self).__init__(*args, **kwargs)
 
+
 class S3ListAllBucketsException(S3FileSystemException):
   def __init__(self, *args, **kwargs):
     super(S3FileSystemException, self).__init__(*args, **kwargs)
+
 
 def auth_error_handler(view_fn):
   def decorator(*args, **kwargs):
@@ -105,7 +108,7 @@ class S3FileSystem(object):
     except S3ResponseError as e:
       if e.status == 301 or e.status == 400:
         raise S3FileSystemException(
-          _('Failed to retrieve bucket "%s" in region "%s" with "%s". Your bucket is in region "%s"') % 
+          _('Failed to retrieve bucket "%s" in region "%s" with "%s". Your bucket is in region "%s"') %
           (name, self._get_location(), e.message or e.reason, self.get_bucket_location(name)))
       else:
         raise e
@@ -202,7 +205,7 @@ class S3FileSystem(object):
         raise S3FileSystemException(_('User is not authorized to access path: "%s"') % path)
       else:
         raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
-    except Exception as e: # SSL errors show up here, because they've been remapped in boto
+    except Exception as e:  # SSL errors show up here, because they've been remapped in boto
       raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, str(e)))
     if key is None:
       key = self._get_key(path, validate=False)
@@ -371,7 +374,6 @@ class S3FileSystem(object):
             LOG.error(msg)
             raise S3FileSystemException(msg)
 
-
   @translate_s3_error
   @auth_error_handler
   def remove(self, path, skip_trash=True):
@@ -444,7 +446,7 @@ class S3FileSystem(object):
   def _copy(self, src, dst, recursive, use_src_basename):
     src_st = self.stats(src)
     if src_st.isDir and not recursive:
-      return # omitting directory
+      return  # omitting directory
 
     dst = s3.abspath(src, dst)
     dst_st = self._stats(dst)
@@ -502,7 +504,7 @@ class S3FileSystem(object):
       self.rmtree(old, skipTrash=True)
     else:
       raise S3FileSystemException('Destination path is same as source path, skipping the operation.')
-  
+
   @translate_s3_error
   @auth_error_handler
   def _check_key_parent_path(self, src, dst):
@@ -589,5 +591,5 @@ class S3FileSystem(object):
     self.user = user  # Only used in Cluster middleware request.fs
 
   def get_upload_chuck_size(self):
-    from hadoop.conf import UPLOAD_CHUNK_SIZE # circular dependency
+    from hadoop.conf import UPLOAD_CHUNK_SIZE  # circular dependency
     return UPLOAD_CHUNK_SIZE.get()

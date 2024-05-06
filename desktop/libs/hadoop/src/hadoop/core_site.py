@@ -55,6 +55,7 @@ _CNF_AZURE_CLIENT_ENDPOINT = 'fs.azure.account.oauth2.client.endpoint'
 
 _CNF_SECURITY = 'hadoop.security.authentication'
 
+
 def reset():
   """Reset the cached conf"""
   global _CORE_SITE_DICT
@@ -96,6 +97,7 @@ def get_trash_interval():
   """
   return get_conf().get(_CNF_TRASH_INTERVAL, 0)
 
+
 def get_s3a_access_key():
   """
   Get S3A AWS access key ID
@@ -103,12 +105,14 @@ def get_s3a_access_key():
   """
   return get_conf().get(_CNF_S3A_ACCESS_KEY)
 
+
 def get_s3a_secret_key():
   """
   Get S3A AWS secret key
   https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html
   """
   return get_conf().get(_CNF_S3A_SECRET_KEY)
+
 
 def get_s3a_session_token():
   return get_conf().get(_CNF_S3A_SESSION_TOKEN)
@@ -126,11 +130,13 @@ def get_raz_api_url():
 
   return s3a_raz_url or adls_raz_url
 
+
 def get_raz_cluster_name():
   """
   Get the name of the Cluster where Raz is running.
   """
   return get_conf().get(_CNF_S3A_RAZ_CLUSTER_NAME, '') or get_conf().get(_CNF_ADLS_RAZ_CLUSTER_NAME, '')
+
 
 def get_raz_s3_default_bucket():
   """
@@ -145,8 +151,10 @@ def get_raz_s3_default_bucket():
         'bucket': match.group('bucket')
       }
 
+
 def get_default_fs():
   return get_conf().get(_CNF_DEFAULT_FS)
+
 
 def get_adls_client_id():
   """
@@ -155,12 +163,14 @@ def get_adls_client_id():
   """
   return get_conf().get(_CNF_ADLS_CLIENT_ID)
 
+
 def get_adls_authentication_code():
   """
   Get ADLS secret key
   https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html
   """
   return get_conf().get(_CNF_ADLS_AUTHENTICATION_CODE)
+
 
 def get_adls_refresh_url():
   """
@@ -169,6 +179,7 @@ def get_adls_refresh_url():
   """
   return get_conf().get(_CNF_ADLS_REFRESH_URL)
 
+
 def get_adls_grant_type():
   """
   Get ADLS provider type
@@ -176,14 +187,18 @@ def get_adls_grant_type():
   """
   return get_conf().get(_CNF_ADLS_GRANT_TYPE)
 
+
 def is_kerberos_enabled():
   return get_conf().get(_CNF_SECURITY) == 'kerberos'
+
 
 def get_azure_client_id():
   return get_conf().get(_CNF_AZURE_CLIENT_ID)
 
+
 def get_azure_client_secret():
   return get_conf().get(_CNF_AZURE_CLIENT_SECRET)
+
 
 def get_azure_client_endpoint():
   return get_conf().get(_CNF_AZURE_CLIENT_ENDPOINT)

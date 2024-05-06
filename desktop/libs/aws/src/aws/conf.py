@@ -34,17 +34,19 @@ DEFAULT_CALLING_FORMAT = 'boto.s3.connection.OrdinaryCallingFormat'
 SUBDOMAIN_ENDPOINT_RE = 's3.(?P<region>[a-z0-9-]+).amazonaws.com'
 HYPHEN_ENDPOINT_RE = 's3-(?P<region>[a-z0-9-]+).amazonaws.com'
 DUALSTACK_ENDPOINT_RE = 's3.dualstack.(?P<region>[a-z0-9-]+).amazonaws.com'
-AWS_ACCOUNT_REGION_DEFAULT = 'us-east-1' # Location.USEast
+AWS_ACCOUNT_REGION_DEFAULT = 'us-east-1'  # Location.USEast
 PERMISSION_ACTION_S3 = "s3_access"
 REGION_CACHED = None
 IS_IAM_CACHED = None
 IS_EC2_CACHED = None
+
 
 def clear_cache():
   global REGION_CACHED, IS_IAM_CACHED, IS_EC2_CACHED
   REGION_CACHED = None
   IS_IAM_CACHED = None
   IS_EC2_CACHED = None
+
 
 def get_locations():
   return ('EU',  # Ireland
@@ -289,7 +291,7 @@ def is_ec2_instance():
     # Low chance of false positive
     IS_EC2_CACHED = (os.path.exists('/sys/hypervisor/uuid') and open('/sys/hypervisor/uuid', 'r').read()[:3].lower() == 'ec2') or \
       (
-        os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and \
+        os.path.exists('/sys/devices/virtual/dmi/id/product_uuid') and
         open('/sys/devices/virtual/dmi/id/product_uuid', 'r').read()[:3].lower() == 'ec2'
       )
   except Exception as e:
@@ -335,13 +337,13 @@ def has_s3_access(user):
 def is_raz_s3():
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
 
-  return (RAZ.IS_ENABLED.get() and 'default' in list(AWS_ACCOUNTS.keys()) and \
+  return (RAZ.IS_ENABLED.get() and 'default' in list(AWS_ACCOUNTS.keys()) and
           AWS_ACCOUNTS['default'].HOST.get() and AWS_ACCOUNTS['default'].get_raw())
 
 
 def config_validator(user):
   res = []
-  import desktop.lib.fsmanager # Circular dependecy
+  import desktop.lib.fsmanager  # Circular dependecy
 
   if is_enabled():
     try:

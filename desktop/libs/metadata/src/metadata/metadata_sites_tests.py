@@ -55,7 +55,6 @@ navigator.audit_log_max_file_size=100
         reset()
       shutil.rmtree(tmpdir)
 
-
   def test_missing_navigator_site(self):
     tmpdir = tempfile.mkdtemp()
     shutil.rmtree(tmpdir)

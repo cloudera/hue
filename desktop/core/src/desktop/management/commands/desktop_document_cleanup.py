@@ -72,7 +72,7 @@ class Command(BaseCommand):
     deleteRecords = self.deleteRecordsBase
 
     totalObjects = objClass.objects.filter(
-      **{'%s' % filterType: filterValue, '%s__lte' % dateField: self.timeDeltaObj,}) \
+      **{'%s' % filterType: filterValue, '%s__lte' % dateField: self.timeDeltaObj, }) \
       .values_list("id", flat=True)
     LOG.info("Looping through %s objects. %s objects to be deleted." % (objClass.__name__, totalObjects.count()))
     while totalObjects.count():
@@ -84,7 +84,7 @@ class Command(BaseCommand):
         checkCount = 0
       LOG.info("%s objects left: %s" % (objClass.__name__, totalObjects.count()))
       deleteObjects = objClass.objects.filter(
-        **{'%s' % filterType: filterValue, '%s__lte' % dateField: self.timeDeltaObj,}) \
+        **{'%s' % filterType: filterValue, '%s__lte' % dateField: self.timeDeltaObj, }) \
                         .values_list("id", flat=True)[:deleteRecords]
       try:
         objClass.objects.filter(pk__in=list(deleteObjects)).delete()
@@ -100,7 +100,7 @@ class Command(BaseCommand):
           deleteRecords = max(deleteRecords - 10, 1)
         LOG.info("Decreasing max delete records to: %s" % deleteRecords)
       totalObjects = objClass.objects.filter(
-        **{'%s' % filterType: filterValue, '%s__lte' % dateField: self.timeDeltaObj,}) \
+        **{'%s' % filterType: filterValue, '%s__lte' % dateField: self.timeDeltaObj, }) \
         .values_list("id", flat=True)
 
   def handle(self, *args, **options):

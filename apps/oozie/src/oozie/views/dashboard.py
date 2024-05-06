@@ -24,7 +24,9 @@ import os
 import re
 import sys
 import time
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 
 from django.forms.formsets import formset_factory
 from django.http import HttpResponse
@@ -63,11 +65,13 @@ from desktop.auth.backend import is_admin
 
 from django.utils.translation import gettext as _
 
+
 def get_history():
   if ENABLE_V2.get():
     return History
   else:
     return OldHistory
+
 
 def get_workflow():
   if ENABLE_V2.get():
@@ -90,6 +94,7 @@ Permissions checking happens by calling:
   * check_job_access_permission()
   * check_job_edition_permission()
 """
+
 
 def _get_workflows(user):
   return [{
@@ -299,7 +304,6 @@ def list_oozie_bundles(request):
     response['total_jobs'] = total_jobs
     return JsonResponse(response, encoder=JSONEncoderForHTML)
 
-
   return render('dashboard/list_oozie_bundles.mako', request, {
     'jobs': [],
     'has_job_edition_permission': has_job_edition_permission,
@@ -380,8 +384,11 @@ def list_oozie_workflow(request, job_id):
     hue_workflow = (hue_coord and hue_coord.workflow) or (history and history.get_workflow()) or \
                     get_history().get_workflow_from_config(oozie_workflow.conf_dict)
 
-    if hue_coord and hue_coord.workflow: Job.objects.can_read_or_exception(request, hue_coord.workflow.id)
-    if hue_workflow: Job.objects.can_read_or_exception(request, hue_workflow.id)
+    if hue_coord and hue_coord.workflow:
+      Job.objects.can_read_or_exception(request, hue_coord.workflow.id)
+
+    if hue_workflow:
+      Job.objects.can_read_or_exception(request, hue_workflow.id)
 
     if hue_workflow:
       workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
@@ -394,7 +401,6 @@ def list_oozie_workflow(request, job_id):
   for action in oozie_workflow.actions:
     action.oozie_coordinator = oozie_coordinator
     action.oozie_bundle = oozie_bundle
-
 
   if request.GET.get('format') == 'json':
     if not workflow_graph and request.GET.get('is_jb2'):
@@ -446,7 +452,7 @@ def list_oozie_workflow(request, job_id):
     'oozie_slas': oozie_slas,
     'hue_workflow': hue_workflow,
     'hue_coord': hue_coord,
-    'parameters': dict((var, val) for var, val in parameters.items() if var not in ParameterForm.NON_PARAMETERS and \
+    'parameters': dict((var, val) for var, val in parameters.items() if var not in ParameterForm.NON_PARAMETERS and
                   var != 'oozie.use.system.libpath' or var == 'oozie.wf.application.path'),
     'has_job_edition_permission': has_job_edition_permission,
     'workflow_graph': workflow_graph,
@@ -662,7 +668,7 @@ def list_oozie_sla(request):
 
     job_name = request.POST.get('job_name')
 
-    if re.match('.*-oozie-\w+-[WCB]', job_name):
+    if re.match(r'.*-oozie-\w+-[WCB]', job_name):
       params['id'] = job_name
       params['parent_id'] = job_name
     else:
@@ -677,7 +683,7 @@ def list_oozie_sla(request):
     oozie_slas = oozie_api.get_oozie_slas(**params)
 
   else:
-    oozie_slas = [] # or get latest?
+    oozie_slas = []  # or get latest?
 
   if request.GET.get('format') == 'json':
     massaged_slas = []
@@ -784,6 +790,7 @@ def sync_coord_workflow(request, job_id):
   if not isinstance(popup, str):
     popup = popup.decode('utf-8')
   return JsonResponse(popup, safe=False)
+
 
 @show_oozie_error
 def rerun_oozie_job(request, job_id, app_path=None):
@@ -1080,6 +1087,7 @@ def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozi
 
   return actions
 
+
 def massaged_coordinator_actions_for_json(coordinator, oozie_bundle):
   coordinator_id = coordinator.id
   coordinator_actions = coordinator.get_working_actions()
@@ -1088,12 +1096,12 @@ def massaged_coordinator_actions_for_json(coordinator, oozie_bundle):
   related_job_ids = []
   related_job_ids.append('coordinator_job_id=%s' % coordinator_id)
   if oozie_bundle is not None:
-    related_job_ids.append('bundle_job_id=%s' %oozie_bundle.id)
+    related_job_ids.append('bundle_job_id=%s' % oozie_bundle.id)
 
   for action in coordinator_actions:
     massaged_action = {
       'id': action.id,
-      'url': action.externalId and \
+      'url': action.externalId and
             reverse('oozie:list_oozie_workflow', kwargs={'job_id': action.externalId}) + '?%s' % '&'.join(related_job_ids) or '',
       'number': action.actionNumber,
       'type': 'schedule-task',
@@ -1124,7 +1132,7 @@ def massaged_bundle_actions_for_json(bundle):
   for action in bundle_actions:
     massaged_action = {
       'id': action.coordJobId,
-      'url': action.coordJobId and \
+      'url': action.coordJobId and
             reverse('oozie:list_oozie_coordinator', kwargs={'job_id': action.coordJobId}) + '?bundle_job_id=%s' % bundle.id or '',
       'name': action.coordJobName,
       'type': action.type,
@@ -1194,9 +1202,9 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
         'lastModTimeFormatted': last_modified_time_millis and format_duration_in_millis(last_modified_time_millis) or None,
         'kickoffTime': hasattr(job, 'kickoffTime') and job.kickoffTime and format_time(job.kickoffTime) or '',
         'kickoffTimeInMillis': hasattr(job, 'kickoffTime') and job.kickoffTime and time.mktime(catch_unicode_time(job.kickoffTime)) or 0,
-        'nextMaterializedTime': hasattr(job, 'nextMaterializedTime') and \
+        'nextMaterializedTime': hasattr(job, 'nextMaterializedTime') and
                                 job.nextMaterializedTime and format_time(job.nextMaterializedTime) or '',
-        'nextMaterializedTimeInMillis': hasattr(job, 'nextMaterializedTime') and \
+        'nextMaterializedTimeInMillis': hasattr(job, 'nextMaterializedTime') and
                                         job.nextMaterializedTime and time.mktime(job.nextMaterializedTime) or 0,
         'timeOut': hasattr(job, 'timeOut') and job.timeOut or None,
         'endTime': job.endTime and format_time(job.endTime) or None,
@@ -1281,8 +1289,8 @@ def check_job_edition_permission(oozie_job, user):
 
 
 def has_job_edition_permission(oozie_job, user):
-  return (is_admin(user) or oozie_job.user == user.username or \
-    (oozie_job.group and user.groups.filter(name__in=oozie_job.group.split(",")).exists()) or \
+  return (is_admin(user) or oozie_job.user == user.username or
+    (oozie_job.group and user.groups.filter(name__in=oozie_job.group.split(",")).exists()) or
     (oozie_job.acl and user.username in oozie_job.acl.split(',')))
 
 

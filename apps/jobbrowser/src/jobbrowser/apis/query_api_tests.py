@@ -37,6 +37,7 @@ from unittest.mock import patch, Mock
 
 LOG = logging.getLogger()
 
+
 class TestConvertTo6DigitMsLocalTime():
   @patch.dict(os.environ, {'TZ': 'America/New_York'})
   def convert_6_digit(self):
@@ -57,7 +58,7 @@ class TestConvertTo6DigitMsLocalTime():
     expected_time = "2023-07-14 08:00:00.123000"
 
     assert expected_time == converted_time
-      
+
   @patch.dict(os.environ, {'TZ': 'America/New_York'})
   def convert_9_digit(self):
     start_time = "2023-07-14 12:00:00.123456789"
@@ -76,7 +77,8 @@ class TestConvertTo6DigitMsLocalTime():
     # America/New_York timezone is UTC-4
     expected_time = "2023-07-14 08:00:00.000000"
 
-    assert expected_time == converted_time    
+    assert expected_time == converted_time
+
 
 @pytest.mark.django_db
 class TestApi():
@@ -84,7 +86,6 @@ class TestApi():
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
-
 
   def test_download_profile(self):
     with patch('jobbrowser.apis.query_api._get_api') as _get_api:

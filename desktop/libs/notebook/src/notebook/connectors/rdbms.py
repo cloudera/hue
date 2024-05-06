@@ -77,11 +77,9 @@ class RdbmsApi(Api):
       }
     }
 
-
   @query_error_handler
   def check_status(self, notebook, snippet):
     return {'status': 'expired'}
-
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
@@ -92,26 +90,21 @@ class RdbmsApi(Api):
       'type': 'table'
     }
 
-
   @query_error_handler
   def fetch_result_metadata(self):
     pass
-
 
   @query_error_handler
   def cancel(self, notebook, snippet):
     return {'status': 0}
 
-
   @query_error_handler
   def get_log(self, notebook, snippet, startFrom=None, size=None):
     return 'No logs'
 
-
   @query_error_handler
   def close_statement(self, notebook, snippet):
     return {'status': -1}
-
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
@@ -139,7 +132,6 @@ class RdbmsApi(Api):
 
     response['status'] = 0
     return response
-
 
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):

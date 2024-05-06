@@ -43,7 +43,8 @@ def get_components(principal):
   """
   if not principal:
     return None
-  return re.split('[\/@]', str(principal))
+  return re.split(r'[\/@]', str(principal))
+
 
 def replace_hostname_pattern(components, host):
   fqdn = host
@@ -51,8 +52,10 @@ def replace_hostname_pattern(components, host):
     fqdn = get_localhost_name()
   return '%s/%s@%s' % (components[0], fqdn.lower(), components[2])
 
+
 def get_localhost_name():
   return socket.getfqdn()
+
 
 def get_fqdn(hostname_or_ip):
   # Get hostname
