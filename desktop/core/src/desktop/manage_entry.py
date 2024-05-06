@@ -127,14 +127,14 @@ def entry():
         hue_env_conf = file
         hue_env_conf = cm_supervisor_dir + "/" + hue_env_conf
 
-    if hue_env_conf == None:
+    if hue_env_conf is None:
       process_dirs = fnmatch.filter(os.listdir(cm_process_dir), '*%s*' % cm_hue_string)
       process_dirs.sort()
       hue_process_dir = cm_process_dir + "/" + process_dirs[-1]
       hue_env_conf = fnmatch.filter(os.listdir(hue_process_dir), 'supervisor.conf')[0]
       hue_env_conf = hue_process_dir + "/" + hue_env_conf
 
-    if not hue_env_conf == None:
+    if hue_env_conf is not None:
       if os.path.isfile(hue_env_conf):
         hue_env_conf_file = open(hue_env_conf, "r")
         for line in hue_env_conf_file:
@@ -158,7 +158,7 @@ def entry():
       print("")
       print("If the above does not work, make sure Hue has been started on this server.")
 
-    if not envline == None:
+    if envline is not None:
       # spliting envline by "environment=" won't work since new key cdp_environment was added
       environment = envline.replace("environment=", "")
       for envvar in environment.split(","):

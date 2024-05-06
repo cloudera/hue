@@ -2391,7 +2391,7 @@ def validate_ldap(user, config):
       bind_password = get_ldap_bind_password(config)
 
       if bool(bind_dn) != bool(bind_password):
-        if bind_dn == None:
+        if bind_dn is None:
           res.append((LDAP.BIND_DN,
                     str(_("If you set bind_password, then you must set bind_dn."))))
         else:

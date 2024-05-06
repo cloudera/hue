@@ -93,13 +93,13 @@ class HDFSFineUploaderChunkedUpload(object):
       self.file_name = unicodedata.normalize('NFC', self.file_name)  # Normalize unicode
     self.dest = kwargs.get('dest')
     self.file_name = kwargs.get('qqfilename')
-    if kwargs.get('filepath', None) != None:
+    if kwargs.get('filepath', None) is not None:
       self.filepath = kwargs.get('filepath')
     else:
       self.filepath = request.fs.join(self.dest, self.file_name)
       kwargs['filepath'] = self.filepath
     self._file = None
-    if kwargs.get('chunk_size', None) != None:
+    if kwargs.get('chunk_size', None) is not None:
       self.chunk_size = kwargs.get('chunk_size')
 
   def check_access(self):

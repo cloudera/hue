@@ -65,7 +65,7 @@ class S3FineUploaderChunkedUpload(object):
     self._fs._stats(self.destination)
     self._bucket = self._fs._get_bucket(self.bucket_name)
     self.filepath = self._fs.join(self.key_name, self.file_name)
-    if kwargs.get('chunk_size', None) != None:
+    if kwargs.get('chunk_size', None) is not None:
       self.chunk_size = kwargs.get('chunk_size')
 
   def check_access(self):

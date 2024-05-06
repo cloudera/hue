@@ -991,7 +991,7 @@ class TestFileBrowserWithHadoop(object):
 
     response = c_no_home.get('/filebrowser', follow=True)
     assert '/' == response.context[0]['path']
-    assert None == response.context[0]['home_directory']
+    assert None is response.context[0]['home_directory']
 
   def test_download(self):
     prefix = self.cluster.fs_prefix + '/test_download'

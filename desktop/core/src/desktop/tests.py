@@ -290,7 +290,7 @@ def test_prefs():
 
   # Check non-existent value
   response = c.get('/desktop/api2/user_preferences/doesNotExist')
-  assert None == json.loads(response.content)['data']
+  assert None is json.loads(response.content)['data']
 
 
 @pytest.mark.django_db
@@ -1407,7 +1407,7 @@ def test_session_secure_cookie():
 
 
 def test_get_data_link():
-  assert None == get_data_link({})
+  assert None is get_data_link({})
   assert 'gethue.com' == get_data_link({'type': 'link', 'link': 'gethue.com'})
 
   assert (

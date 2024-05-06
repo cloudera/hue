@@ -1245,7 +1245,7 @@ class Document2(models.Model):
 
   @property
   def is_home_directory(self):
-    return self.is_directory and self.parent_directory == None and self.name == self.HOME_DIR
+    return self.is_directory and self.parent_directory is None and self.name == self.HOME_DIR
 
   @property
   def is_trash_directory(self):

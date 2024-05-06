@@ -52,7 +52,7 @@ class ABFSFineUploaderChunkedUpload(object):
     self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
     self.target_path = None
 
-    if kwargs.get('chunk_size', None) != None:
+    if kwargs.get('chunk_size', None) is not None:
       self.chunk_size = kwargs.get('chunk_size')
 
     if self._is_abfs_upload():

@@ -147,7 +147,7 @@ def _get_template_lib(template, kwargs):
     del kwargs['template_lib']
 
   # Default based on file extension
-  if template_lib == None:
+  if template_lib is None:
     if template.endswith('.mako'):
       return MAKO
     else:

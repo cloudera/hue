@@ -37,4 +37,4 @@ class TestLdapBackend():
 
       user = LdapBackend().authenticate(request=Mock(), username=Mock(), password=Mock(), server=Mock())
 
-      assert user == None
+      assert user is None

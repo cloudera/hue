@@ -117,7 +117,7 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
     # If the length doesn't change, then we must be using a QOP
     # of auth and we should no longer call sasl.encode(), otherwise
     # we encode every time.
-    if self.encode == None:
+    if self.encode is None:
       success, encoded = self.sasl.encode(buffer)
       if not success:
         raise TTransportException(type=TTransportException.UNKNOWN,

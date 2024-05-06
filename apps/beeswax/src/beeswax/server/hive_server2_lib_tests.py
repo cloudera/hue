@@ -225,15 +225,13 @@ class TestHiveServerClient():
       client.get_databases(query)
 
       assert (
-        None !=
-        client.call.call_args[0][1].schemaName), client.call.call_args.args
+        None is not client.call.call_args[0][1].schemaName), client.call.call_args.args
 
       with patch.dict(self.query_server, {'dialect': 'impala'}, clear=True):
         client.get_databases(query)
 
         assert (
-          None ==  # Should be empty and not '*' with Impala
-          client.call.call_args[0][1].schemaName), client.call.call_args.args
+          None is client.call.call_args[0][1].schemaName), client.call.call_args.args  # Should be empty and not '*' with Impala
 
   def test_get_table_with_error(self):
     query = Mock(

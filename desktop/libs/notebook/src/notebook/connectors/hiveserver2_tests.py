@@ -1082,8 +1082,8 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert 'result' in data
     assert 'rows' in data['result']
     assert 'size' in data['result']
-    assert None == data['result']['rows']
-    assert None == data['result']['size']
+    assert None is data['result']['rows']
+    assert None is data['result']['size']
 
     # Assert that a query with map & reduce task returns rows
     statement = "SELECT DISTINCT code FROM sample_07;"
@@ -1145,8 +1145,8 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     assert 'result' in data
     assert 'rows' in data['result']
     assert 'size' in data['result']
-    assert None == data['result']['rows']
-    assert None == data['result']['size']
+    assert None is data['result']['rows']
+    assert None is data['result']['size']
 
     # Assert that a query that runs a job will return rows and size
     statement = "SELECT app, COUNT(1) AS count FROM web_logs GROUP BY app ORDER BY count DESC;"
@@ -1191,7 +1191,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
       assert 'rows' in data['result']
       assert 'size' in data['result']
       assert 23 == data['result']['rows']
-      assert None == data['result']['size']
+      assert None is data['result']['size']
 
       # Assert that selecting all from partitioned table works
       statement = "SELECT * FROM web_logs;"

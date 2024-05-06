@@ -247,6 +247,6 @@ class TestJwtAuthentication():
 
       try:
         jku = JwtAuthentication()._handle_jku_ha()
-        assert jku == None
+        assert jku is None
       finally:
         reset()

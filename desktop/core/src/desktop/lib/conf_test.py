@@ -108,7 +108,7 @@ class TestConfig(object):
     assert 456 == self.conf.BAR.get()
     assert 345 == self.conf.REQ.get()
 
-    assert None == self.conf.OPT_NOT_THERE.get()
+    assert None is self.conf.OPT_NOT_THERE.get()
     with pytest.raises(KeyError):
       self.conf.REQ_NOT_THERE.get()
 
@@ -149,7 +149,7 @@ class TestConfig(object):
       # Check default values
       close_foo3 = self.conf.FOO.set_for_testing(present=False)
       try:
-        assert None == self.conf.FOO.get()
+        assert None is self.conf.FOO.get()
       finally:
         close_foo3()
     finally:

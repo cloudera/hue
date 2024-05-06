@@ -192,7 +192,7 @@ class MockGet(object):
 
   @property
   def properties(self):
-    if self._prop == None:
+    if self._prop is None:
       self._prop = {}
     return self._prop
 

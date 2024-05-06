@@ -44,7 +44,7 @@ class OFSFineUploaderChunkedUpload(object):
     if self.file_name:
       self.file_name = unicodedata.normalize('NFC', self.file_name)  # Normalize unicode
     self.chunk_size = UPLOAD_CHUNK_SIZE.get()
-    if kwargs.get('chunk_size', None) != None:
+    if kwargs.get('chunk_size', None) is not None:
       self.chunk_size = kwargs.get('chunk_size')
     self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
     self.target_path = None
