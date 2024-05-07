@@ -22,6 +22,7 @@ import re
 from desktop.lib.utils.cache import LRUCache
 from desktop.conf import SEMANTIC_SEARCH
 
+DEFAULT_TOP_K = SEMANTIC_SEARCH.TOP_K.get()
 _embedding_model = SEMANTIC_SEARCH.EMBEDDING_MODEL.get()
 corpus_cache = LRUCache(SEMANTIC_SEARCH.CACHE_SIZE.get())
 # Could create a similar cache for query, but might be an overkill
@@ -56,7 +57,7 @@ def _get_words(text) -> list:
   return list(set(words))
 
 # Perform semantic search on the corpus using the provided query
-def semantic_search(corpus, query, limit=10):
+def semantic_search(corpus, query, limit = DEFAULT_TOP_K):
   if len(corpus) < limit:
     return corpus
 
