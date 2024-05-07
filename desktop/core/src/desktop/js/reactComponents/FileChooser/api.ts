@@ -76,5 +76,5 @@ export const touch = async (fileName: string, path: string): Promise<void> => {
   await post(TOUCH_API_URL, { name: fileName, path: path });
 };
 
-export const content_summary = (path: string): CancellablePromise<ContentSummary> =>
+export const fetchContentSummary = (path: string): CancellablePromise<ContentSummary> =>
   get(CONTENT_SUMMARY_API_URL + path);

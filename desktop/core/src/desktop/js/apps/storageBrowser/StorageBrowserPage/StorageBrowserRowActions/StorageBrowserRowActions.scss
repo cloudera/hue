@@ -14,8 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 @use 'mixins';
+@use 'variables' as vars;
 $action-dropdown-width: 214px;
 
+//TODO: Remove styling for cuix button
 .hue-storage-browser__table-actions-btn {
   box-shadow: none;
   background-color: transparent;

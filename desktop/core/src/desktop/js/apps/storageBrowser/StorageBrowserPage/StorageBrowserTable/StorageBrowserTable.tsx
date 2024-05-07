@@ -30,7 +30,7 @@ import {
   SortOrder
 } from '../../../../reactComponents/FileChooser/types';
 import Pagination from '../../../../reactComponents/Pagination/Pagination';
-import StorageBrowserActions from '../StorageBrowserActions/StorageBrowserActions';
+import StorageBrowserRowActions from '../StorageBrowserRowActions/StorageBrowserRowActions';
 import './StorageBrowserTable.scss';
 import Tooltip from 'antd/es/tooltip';
 import SummaryModal from '../../SummaryModal/SummaryModal';
@@ -76,7 +76,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   const [tableHeight, setTableHeight] = useState<number>();
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
   //TODO: accept multiple files and folder select
-  const [selectedFilePath, setSelectedFilePath] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<string>('');
 
   const { t } = i18nReact.useTranslation();
 
@@ -93,6 +93,11 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
       onSortByColumnChange(columnClicked);
       onSortOrderChange(SortOrder.ASC);
     }
+  };
+
+  const onViewSummary = (filePath: string) => {
+    setSelectedFile(filePath);
+    setShowSummaryModal(true);
   };
 
   const getColumns = (file: StorageBrowserTableData) => {
@@ -131,7 +136,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
           </Tooltip>
         );
       } else {
-        column.width = key === 'mtime' ? '15%' : '8.5%';
+        column.width = key === 'mtime' ? '15%' : '9%';
       }
       columns.push(column);
     }
@@ -140,13 +145,9 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
       title: '',
       key: 'actions',
       render: (_, record: StorageBrowserTableData) => (
-        <StorageBrowserActions
-          onSelectFile={setSelectedFilePath}
-          onSelectSummary={setShowSummaryModal}
-          rowData={record}
-        />
+        <StorageBrowserRowActions onViewSummary={onViewSummary} rowData={record} />
       ),
-      width: '2%'
+      width: '4%'
     });
     return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
   };
@@ -232,7 +233,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
         />
         <SummaryModal
           showModal={showSummaryModal}
-          path={selectedFilePath}
+          path={selectedFile}
           onClose={() => setShowSummaryModal(false)}
         ></SummaryModal>
       </>

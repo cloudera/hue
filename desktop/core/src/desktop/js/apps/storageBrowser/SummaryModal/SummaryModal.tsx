@@ -19,7 +19,8 @@ import { Row, Col, Spin } from 'antd';
 
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
-import { content_summary } from '../../../reactComponents/FileChooser/api';
+import formatBytes from '../../../utils/formatBytes';
+import { fetchContentSummary } from '../../../reactComponents/FileChooser/api';
 import './SummaryModal.scss';
 
 interface SummaryModalProps {
@@ -32,20 +33,6 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ showModal, onClose, path })
   const { t } = i18nReact.useTranslation();
   const [loadingSummary, setLoadingSummary] = useState(true);
   const [summary, setSummary] = useState([]);
-
-  const formatBytes = (bytes, decimals) => {
-    if (bytes == -1) {
-      return 'Not available';
-    }
-    if (bytes == 0) {
-      return '0 Byte';
-    }
-    const k = 1024;
-    const dm = decimals + 1 || 3;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return (bytes / Math.pow(k, i)).toPrecision(dm) + ' ' + sizes[i];
-  };
 
   const getSummary = () => {
     const cols = summary.map((item, index) => (
@@ -72,7 +59,7 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ showModal, onClose, path })
       return;
     }
     setLoadingSummary(true);
-    content_summary(path)
+    fetchContentSummary(path)
       .then(responseSummary => {
         const summaryData = [
           ['DISKSPACE CONSUMED', formatBytes(responseSummary.summary.spaceConsumed, 4)],
@@ -95,21 +82,18 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ showModal, onClose, path })
       });
   }, [path]);
 
+  //TODO:Handle long modal title
   return (
     <Modal
       className="hue-summary-modal"
       okText={t('Close')}
-      onOk={() => {
-        onClose();
-      }}
+      onOk={onClose}
       open={showModal}
       title={t('Summary for ') + path}
       cancellable={false}
-      onCancel={() => {
-        onClose();
-      }}
+      onCancel={onClose}
     >
-      <Spin spinning={loadingSummary}>{summary ? getSummary() : <div />}</Spin>
+      <Spin spinning={loadingSummary}>{summary && getSummary()}</Spin>
     </Modal>
   );
 };

@@ -15,27 +15,27 @@
 // limitations under the License.
 
 import React from 'react';
-import { Dropdown, Button } from 'antd';
-import type { MenuProps } from 'antd';
+import { Dropdown } from 'antd';
+import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
+import { BorderlessButton } from 'cuix/dist/components/Button';
 import MoreVerticalIcon from '@cloudera/cuix-core/icons/react/MoreVerticalIcon';
 import InfoIcon from '@cloudera/cuix-core/icons/react/InfoIcon';
+
 import { i18nReact } from '../../../../utils/i18nReact';
 import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
 
-import './StorageBrowserActions.scss';
+import './StorageBrowserRowActions.scss';
 
-interface StorageBrowserActionsProps {
+interface StorageBrowserRowActionsProps {
   rowData: StorageBrowserTableData;
-  onSelectFile: (path: string) => void;
-  onSelectSummary: (showModal: boolean) => void;
+  onViewSummary: (selectedFilePath: string) => void;
 }
 
-const StorageBrowserActions: React.FC<StorageBrowserActionsProps> = ({
+const StorageBrowserRowActions = ({
   rowData,
-  onSelectFile,
-  onSelectSummary
-}): JSX.Element => {
+  onViewSummary
+}: StorageBrowserRowActionsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const isHDFS = () => {
@@ -48,25 +48,17 @@ const StorageBrowserActions: React.FC<StorageBrowserActionsProps> = ({
   };
 
   //TODO: handle multiple file selection scenarios
-  const isSummaryEnabled = () => {
-    if (isHDFS() || isOFS()) {
-      if (rowData.type === 'file') {
-        return true;
-      }
-    }
-    return false;
-  };
+  const isSummaryEnabled = () => (isHDFS() || isOFS()) && rowData.type === 'file';
 
   const getActions = () => {
-    const actions: MenuProps['items'] = [];
+    const actions: MenuItemType[] = [];
     if (isSummaryEnabled()) {
       actions.push({
         key: 'content_summary',
         icon: <InfoIcon />,
         label: t('View Summary'),
         onClick: () => {
-          onSelectFile(rowData.path);
-          onSelectSummary(true);
+          onViewSummary(rowData.path);
         }
       });
     }
@@ -80,13 +72,16 @@ const StorageBrowserActions: React.FC<StorageBrowserActionsProps> = ({
         items: getActions(),
         className: 'hue-storage-browser__table-actions-menu'
       }}
-      trigger={['click', 'hover']}
+      trigger={['click']}
     >
-      <Button onClick={e => e.stopPropagation()} className="hue-storage-browser__table-actions-btn">
-        <MoreVerticalIcon />
-      </Button>
+      <BorderlessButton
+        onClick={e => e.stopPropagation()}
+        className="hue-storage-browser__table-actions-btn"
+        data-event=""
+        icon={<MoreVerticalIcon />}
+      />
     </Dropdown>
   );
 };
 
-export default StorageBrowserActions;
+export default StorageBrowserRowActions;
