@@ -22,7 +22,6 @@ from desktop.conf import default_ssl_validate
 from libzookeeper.conf import ENSEMBLE
 
 from urllib.parse import urlparse
-new_str = str
 from django.utils.translation import gettext_lazy as _t
 
 LOG = logging.getLogger()

@@ -135,7 +135,7 @@ class QueryHistory(object):
 QUERY_HISTORY = QueryHistory(max_user=QUERY_HISTORY_CACHE_MAX_USER_COUNT, max_history_per_user=QUERY_HISTORY_CACHE_MAX_LENGTH_PER_USER)
 
 
-# If fresh user get from _get_query_history_latest else get _get_query_history_from. 
+# If fresh user get from _get_query_history_latest else get _get_query_history_from.
 # if results set from _get_query_history_from less than limit merge results with cache else call _get_query_history_latest
 def get_query_history(request_user=None, start_date=None, start_time=None, query_id=None, status=None, limit=None):
   _init_table()
@@ -195,7 +195,7 @@ def _init_table():
 def _get_query_history_latest(
     request_user=None, query_id=None, start_date=None, start_time=None, status=None, limit=25, force_refresh=False):
   proposed_query = django_mako.render_to_string(
-    "select_table_query_data_latest.mako", 
+    "select_table_query_data_latest.mako",
     {'table': {
       'name': 'query_data',
       'request_user': request_user,

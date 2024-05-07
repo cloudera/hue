@@ -15,9 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-
 from builtins import zip
 from past.builtins import basestring
 import csv
@@ -31,14 +28,6 @@ import uuid
 
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-
-LOG = logging.getLogger()
-
-try:
-  from simple_salesforce.api import Salesforce
-  from simple_salesforce.exceptions import SalesforceRefusedRequest
-except ImportError:
-  LOG.warning('simple_salesforce module not found')
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -70,6 +59,13 @@ from urllib.parse import urlparse, unquote as urllib_unquote
 from django.utils.translation import gettext as _
 import pandas as pd
 
+LOG = logging.getLogger()
+
+try:
+  from simple_salesforce.api import Salesforce
+  from simple_salesforce.exceptions import SalesforceRefusedRequest
+except ImportError:
+  LOG.warning('simple_salesforce module not found')
 
 try:
   from beeswax.server import dbms

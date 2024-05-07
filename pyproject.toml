@@ -48,6 +48,10 @@ ignore = [
 "desktop/libs/liboozie/src/liboozie/submission2.py" = ["E501"]
 "desktop/libs/libanalyze/src/libanalyze/rules.py" = ["E501"]
 "apps/hbase/src/hbase/api.py" = ["E501"]
+"desktop/libs/librdbms/src/librdbms/server/mysql_lib.py" = ["E402"]
+"desktop/core/src/desktop/urls.py" = ["E402"]
+"desktop/core/src/desktop/lib/thrift_util_test.py" = ["E402"]
+"desktop/core/src/desktop/auth/backend.py" = ["E402"]
 
 [tool.ruff.format]
 docstring-code-format = true

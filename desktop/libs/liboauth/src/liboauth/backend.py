@@ -18,34 +18,34 @@
 See desktop/auth/backend.py
 """
 
-from future import standard_library
-standard_library.install_aliases()
 import json
 import cgi
 import logging
 import sys
 
-LOG = logging.getLogger()
 
 from desktop.auth.backend import force_username_case, DesktopBackendBase
+from urllib.parse import urlencode as lib_urlencode
+from django.utils.translation import gettext as _
 
 from useradmin.models import get_profile, get_default_user_group, UserProfile, User
 
 import liboauth.conf
 import liboauth.metrics
 
+LOG = logging.getLogger()
+
 try:
   import httplib2
 except ImportError:
   LOG.warning('httplib2 module not found')
+
+
 try:
   import oauth2 as oauth
 except ImportError:
   LOG.warning('oauth2 module not found')
   oauth = None
-
-from urllib.parse import urlencode as lib_urlencode
-from django.utils.translation import gettext as _
 
 
 class OAuthBackend(DesktopBackendBase):

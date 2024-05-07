@@ -13,10 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from future import standard_library
-standard_library.install_aliases()
+
 import logging
-import sys
 import unicodedata
 
 from io import StringIO as string_io
@@ -30,13 +28,13 @@ from desktop.lib.fsmanager import get_client
 from azure.abfs.__init__ import parse_uri
 from azure.abfs.abfs import ABFSFileSystemException
 
+from filebrowser.utils import generate_chunks, calculate_total_size
+
 from django.utils.translation import gettext as _
 
 DEFAULT_WRITE_SIZE = 100 * 1024 * 1024  # As per Azure doc, maximum blob size is 100MB
 
 LOG = logging.getLogger()
-
-from filebrowser.utils import generate_chunks, calculate_total_size
 
 
 class ABFSFineUploaderChunkedUpload(object):

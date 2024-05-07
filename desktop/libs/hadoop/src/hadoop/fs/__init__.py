@@ -29,10 +29,7 @@ We maintain this usage of paths as arguments.
 When possible, the interfaces here have fidelity to the
 native python interfaces.
 """
-from __future__ import division
-from future import standard_library
 from functools import reduce
-standard_library.install_aliases()
 from builtins import map
 from builtins import range
 from builtins import object

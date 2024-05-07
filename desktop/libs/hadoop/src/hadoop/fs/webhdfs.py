@@ -19,8 +19,6 @@
 Interfaces for Hadoop filesystem access via HttpFs/WebHDFS
 """
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import oct
 from builtins import object
 import errno

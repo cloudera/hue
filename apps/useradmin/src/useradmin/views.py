@@ -21,15 +21,9 @@ import logging
 import subprocess
 import json
 
-LOG = logging.getLogger()
-
 from axes.conf import settings
 from axes.models import AccessAttempt
 from axes.utils import reset
-try:
-  import ldap
-except ImportError:
-  LOG.warning('ldap module not found')
 
 from django.urls import reverse
 from django.forms import ValidationError
@@ -56,6 +50,11 @@ from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile,
 
 from django.utils.translation import get_language, gettext as _
 
+LOG = logging.getLogger()
+try:
+  import ldap
+except ImportError:
+  LOG.warning('ldap module not found')
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.forms import OrganizationUserChangeForm as UserChangeForm, OrganizationSuperUserChangeForm as SuperUserChangeForm

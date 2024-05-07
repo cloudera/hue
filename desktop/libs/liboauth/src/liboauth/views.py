@@ -15,21 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-
 import logging
-import sys
-
-LOG = logging.getLogger()
 
 import urllib.request
 import urllib.parse
 import urllib.error
-try:
-  import httplib2
-except ImportError:
-  LOG.warning('httplib2 module not found')
 
 import django.contrib.auth.views
 from django.core.exceptions import SuspiciousOperation
@@ -51,6 +41,13 @@ import liboauth.conf
 from liboauth.backend import OAuthBackend
 
 from django.utils.translation import gettext as _
+
+LOG = logging.getLogger()
+
+try:
+  import httplib2
+except ImportError:
+  LOG.warning('httplib2 module not found')
 
 
 @login_notrequired

@@ -23,10 +23,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from desktop.lib.django_test_util import configure_django_for_test, create_tables
 from desktop.lib.django_util import reverse_with_get, timesince, humanize_duration
-configure_django_for_test()
 
 from desktop.lib import django_util, exceptions
 from django.db import models
+
+configure_django_for_test()
 
 
 class TestModel(models.Model):

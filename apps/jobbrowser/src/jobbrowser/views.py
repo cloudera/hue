@@ -16,8 +16,7 @@
 # limitations under the License.
 
 from past.builtins import cmp
-from future import standard_library
-standard_library.install_aliases()
+
 from builtins import filter
 from builtins import str
 import functools
@@ -54,6 +53,11 @@ from hadoop.yarn import resource_manager_api as resource_manager_api
 
 from django.utils.translation import gettext as _
 
+from jobbrowser.conf import LOG_OFFSET, SHARE_JOBS
+from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
+from jobbrowser.models import can_view_job, can_kill_job, LinkJobLogs
+from jobbrowser.yarn_models import Application
+
 LOG = logging.getLogger()
 
 
@@ -62,11 +66,6 @@ try:
 except Exception:
   LOG.warning('Hive is not enabled')
   def hiveserver2_impersonation_enabled(): return True
-
-from jobbrowser.conf import LOG_OFFSET, SHARE_JOBS
-from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
-from jobbrowser.models import can_view_job, can_kill_job, LinkJobLogs
-from jobbrowser.yarn_models import Application
 
 
 LOG_OFFSET_BYTES = LOG_OFFSET.get()

@@ -20,6 +20,14 @@ User Admin to work seamlessly with LDAP.
 """
 
 import logging
+import re
+
+import desktop.conf
+from desktop.lib.python_util import CaseInsensitiveDict
+
+from useradmin.models import User
+
+from django.utils.encoding import smart_str
 
 LOG = logging.getLogger()
 
@@ -30,15 +38,6 @@ try:
 except ImportError:
   LOG.warning('ldap module not found')
   SCOPE_SUBTREE = None
-import re
-
-import desktop.conf
-from desktop.lib.python_util import CaseInsensitiveDict
-
-from useradmin.models import User
-
-from django.utils.encoding import smart_str
-
 
 CACHED_LDAP_CONN = None
 

@@ -15,9 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
 import logging
 import socket
 import sys

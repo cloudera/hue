@@ -61,13 +61,9 @@ application's conf.py. During startup, Desktop binds configuration files to your
 variables.
 """
 
-# The Config object unfortunately has a kwarg called "type", and everybody is
-# using it. So instead of breaking compatibility, we make a "pytype" alias.
-
 from __future__ import print_function
 from six import string_types
 from builtins import object
-pytype = type
 
 import json
 import logging
@@ -99,6 +95,10 @@ SUPPORTED_THRIFT_TRANSPORTS = ('buffered', 'framed')
 
 # a BoundContainer(BoundConfig) object which has all of the application's configs as members
 GLOBAL_CONFIG = None
+
+# The Config object unfortunately has a kwarg called "type", and everybody is
+# using it. So instead of breaking compatibility, we make a "pytype" alias.
+pytype = type
 
 LOG = logging.getLogger()
 

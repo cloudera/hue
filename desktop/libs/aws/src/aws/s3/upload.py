@@ -22,8 +22,6 @@ See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
 import io
-from future import standard_library
-standard_library.install_aliases()
 import logging
 import unicodedata
 
@@ -35,17 +33,18 @@ from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFut
 
 from desktop.conf import TASK_SERVER
 from desktop.lib.fsmanager import get_client
+from desktop.lib.exceptions_renderable import PopupException
 from aws.s3 import parse_uri
 from aws.s3.s3fs import S3FileSystemException
+
+from filebrowser.utils import generate_chunks, calculate_total_size
+
 
 from django.utils.translation import gettext as _
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 128  # TODO: set in configuration (currently 128 MiB)
 
 LOG = logging.getLogger()
-
-from desktop.lib.exceptions_renderable import PopupException
-from filebrowser.utils import generate_chunks, calculate_total_size
 
 
 class S3FineUploaderChunkedUpload(object):

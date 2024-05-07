@@ -25,6 +25,8 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import HttpResponse
 
+from django.template.context_processors import csrf
+
 from mako.lookup import TemplateLookup, TemplateCollection
 
 from desktop.lib import apputil, i18n
@@ -138,9 +140,6 @@ def url(view_name, *args, **view_args):
   """URL tag for use in templates - like {% url ... %} in django"""
   from django.urls import reverse
   return reverse(view_name, args=args, kwargs=view_args)
-
-
-from django.template.context_processors import csrf
 
 
 def csrf_token(request):

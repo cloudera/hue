@@ -22,10 +22,7 @@ Only some utils and Hdfs are still used.
 
 Interfaces for Hadoop filesystem access via the HADOOP-4707 Thrift APIs.
 """
-from __future__ import division
 from past.builtins import cmp
-from future import standard_library
-standard_library.install_aliases()
 from builtins import object
 import codecs
 import errno

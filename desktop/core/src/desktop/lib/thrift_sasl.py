@@ -17,10 +17,7 @@
 # under the License.
 #
 """ SASL transports for Thrift. """
-from __future__ import absolute_import
 
-from future import standard_library
-standard_library.install_aliases()
 from thrift.transport import TTransport
 from thrift.transport.TTransport import *
 from thrift.protocol import TBinaryProtocol

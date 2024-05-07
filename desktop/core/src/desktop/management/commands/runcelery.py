@@ -28,12 +28,12 @@ from django.utils import autoreload
 
 from django.utils.translation import gettext as _
 
+from celery.bin.celery import CeleryCommand
+from celery.bin.celery import main as celery_main
+
 SERVER_HELP = r"""
   Run celery worker.
 """
-
-from celery.bin.celery import CeleryCommand
-from celery.bin.celery import main as celery_main
 
 LOG = logging.getLogger()
 CELERY_OPTIONS = {
