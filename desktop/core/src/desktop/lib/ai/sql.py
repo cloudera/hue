@@ -18,6 +18,8 @@
 import logging
 LOG = logging.getLogger()
 
+import json
+
 from desktop.lib.ai.types import SQLResponse
 
 from desktop.lib.ai.lib.base_model import BaseModel
@@ -113,12 +115,7 @@ def build_sample_data(reader: TableReader, table) -> str:
   return "/*\nExample rows not available\n*/"
 
 def get_table_key(table) -> str:
-  table_name = table["name"]
-  db_name = table.get("dbName", "")
-  col_names = list(map(lambda col: col["name"], table["columns"]))
-  col_names.sort()
-  col_names = ",".join(col_names)
-  return f"{db_name}.{table_name}-{col_names}"
+  return json.dumps(table)
 
 def format_metadata(metadata, reader) -> str:
   table_metadatas = []
