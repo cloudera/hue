@@ -37,7 +37,7 @@ def ordered(obj):
     return obj
 
 
-class TestAnalyze(object):
+class AnalyzeTest(object):
   def setup_method(self):
     self.profile = a.analyze(
         a.parse(
