@@ -89,7 +89,11 @@ def copy_template(app_template, copy_to, app_name, app_url):
       if path_old.endswith(".png"):
         shutil.copyfileobj(open(path_old), fp_new)
       else:
-        fp_new.write(Template(filename=path_old).render(app_name=app_name, app_name_camel=app_name_camel, app_name_spaces=app_name_spaces, app_url=app_url))
+        fp_new.write(
+          Template(filename=path_old).render(
+            app_name=app_name, app_name_camel=app_name_camel, app_name_spaces=app_name_spaces, app_url=app_url
+          )
+        )
       fp_new.close()
 
       shutil.copymode(path_old, path_new)

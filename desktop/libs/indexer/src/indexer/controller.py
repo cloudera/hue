@@ -259,7 +259,13 @@ class CollectionManagerController(object):
           data = json.dumps([value for value in field_values_from_log(fh, fields)])
           content_type = 'json'
         elif data_type == 'separated':
-          data = json.dumps([value for value in field_values_from_separated_file(fh, kwargs.get('separator', ','), kwargs.get('quote_character', '"'), fields)], indent=2)
+          data = json.dumps(
+            [
+              value
+              for value in field_values_from_separated_file(fh, kwargs.get('separator', ','), kwargs.get('quote_character', '"'), fields)
+            ],
+            indent=2,
+          )
           content_type = 'json'
         else:
           raise PopupException(_('Could not update index. Unknown type %s') % data_type)

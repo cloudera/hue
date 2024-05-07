@@ -135,7 +135,8 @@ class QueryHistory(object):
 QUERY_HISTORY = QueryHistory(max_user=QUERY_HISTORY_CACHE_MAX_USER_COUNT, max_history_per_user=QUERY_HISTORY_CACHE_MAX_LENGTH_PER_USER)
 
 
-# If fresh user get from _get_query_history_latest else get _get_query_history_from. if results set from _get_query_history_from less than limit merge results with cache else call _get_query_history_latest
+# If fresh user get from _get_query_history_latest else get _get_query_history_from. 
+# if results set from _get_query_history_from less than limit merge results with cache else call _get_query_history_latest
 def get_query_history(request_user=None, start_date=None, start_time=None, query_id=None, status=None, limit=None):
   _init_table()
 
@@ -156,7 +157,15 @@ def get_query_history(request_user=None, start_date=None, start_time=None, query
       cached = _n_filter(filter_list, cached)[:limit]
       return {'data': cached}
 
-  data = _get_query_history_latest(request_user=request_user, start_date=start_date, start_time=start_time, query_id=query_id, status=status, limit=limit, force_refresh=True)
+  data = _get_query_history_latest(
+    request_user=request_user,
+    start_date=start_date,
+    start_time=start_time,
+    query_id=query_id,
+    status=status,
+    limit=limit,
+    force_refresh=True
+  )
   QUERY_HISTORY.set(request_user, data['data'], filters)
   return data
 
@@ -183,8 +192,20 @@ def _init_table():
     raise PopupException(_('Could not initialize query history table.'))
 
 
-def _get_query_history_latest(request_user=None, query_id=None, start_date=None, start_time=None, status=None, limit=25, force_refresh=False):
-  proposed_query = django_mako.render_to_string("select_table_query_data_latest.mako", {'table': {'name': 'query_data', 'request_user': request_user, 'query_id': query_id, 'start_date': start_date, 'start_time': start_time, 'status': status, 'limit': limit, 'force_refresh': force_refresh}})
+def _get_query_history_latest(
+    request_user=None, query_id=None, start_date=None, start_time=None, status=None, limit=25, force_refresh=False):
+  proposed_query = django_mako.render_to_string(
+    "select_table_query_data_latest.mako", 
+    {'table': {
+      'name': 'query_data',
+      'request_user': request_user,
+      'query_id': query_id,
+      'start_date': start_date,
+      'start_time': start_time,
+      'status': status,
+      'limit': limit,
+      'force_refresh': force_refresh
+    }})
   data = _execute_query(proposed_query, limit)
   for row in data['data']:
     if row[1]:

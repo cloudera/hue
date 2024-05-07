@@ -206,7 +206,7 @@ class OozieApi(object):
         'endTime': job.endTime and format_time(job.endTime) or None,
         'status': job.status,
         'isRunning': job.is_running(),
-        'duration': job.endTime and job.startTime and format_duration_in_millis((time.mktime(job.endTime) - time.mktime(job.startTime)) * 1000) or None,
+        'duration': job.endTime and job.startTime and format_duration_in_millis((time.mktime(job.endTime) - time.mktime(job.startTime)) * 1000) or None,  # noqa: E501
         'appName': hue_pig and hue_pig.dict['name'] or _('Unsaved script'),
         'scriptId': hue_pig and hue_pig.id or -1,
         'scriptContent': hue_pig and hue_pig.dict['script'] or '',
@@ -217,7 +217,7 @@ class OozieApi(object):
         'canEdit': has_job_edition_permission(job, self.user),
         'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id': job.id, 'action': 'kill'}),
         'watchUrl': reverse('pig:watch', kwargs={'job_id': job.id}) + '?format=python',
-        'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
+        'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),  # noqa: E501
         'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
         'run': hasattr(job, 'run') and job.run or 0,
         'frequency': hasattr(job, 'frequency') and job.frequency or None,

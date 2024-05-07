@@ -40,7 +40,7 @@ from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 TIMESTAMP_PATTERN = r'\[([\w\d\s\-\/\:\+]*?)\]'
-FIELD_XML_TEMPLATE = '<field name="%(name)s" type="%(type)s" indexed="%(indexed)s" stored="%(stored)s" required="%(required)s" multiValued="%(multiValued)s" />'
+FIELD_XML_TEMPLATE = '<field name="%(name)s" type="%(type)s" indexed="%(indexed)s" stored="%(stored)s" required="%(required)s" multiValued="%(multiValued)s" />'  # noqa: E501
 DEFAULT_FIELD = {
   'name': None,
   'type': 'text',
@@ -85,10 +85,14 @@ class SolrConfigXml(object):
     self.xml = xml
 
   def defaultField(self, df=None):
-    self.xml = force_unicode(force_unicode(self.xml).replace(u'<str name="df">text</str>', u'<str name="df">%s</str>' % force_unicode(df) if df is not None else ''))
+    self.xml = force_unicode(
+      force_unicode(self.xml).replace('<str name="df">text</str>', '<str name="df">%s</str>' % force_unicode(df) if df is not None else '')
+    )
 
 
-def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True, is_solr_six_or_more=False, is_solr_hdfs_mode=True, is_sentry_protected=False):
+def copy_configs(
+  fields, unique_key_field, df, solr_cloud_mode=True, is_solr_six_or_more=False, is_solr_hdfs_mode=True, is_sentry_protected=False
+):
   # Create temporary copy of solr configs
   tmp_path = tempfile.mkdtemp()
 
@@ -277,7 +281,8 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
 
     remove_keys = None
     for row in reader:
-      row = dict([(force_unicode(k), force_unicode(v, errors='ignore')) for k, v in row.items()])  # Get rid of invalid binary chars and convert to unicode from DictReader
+      # Get rid of invalid binary chars and convert to unicode from DictReader
+      row = dict([(force_unicode(k), force_unicode(v, errors='ignore')) for k, v in row.items()])
 
       # Remove keys that aren't in collection
       if remove_keys is None:

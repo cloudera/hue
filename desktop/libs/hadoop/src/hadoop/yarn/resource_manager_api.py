@@ -52,7 +52,9 @@ def get_resource_manager(username=None):
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
         if yarn_cluster is None:
           raise PopupException(_('No Resource Manager are available.'))
-        API_CACHE = ResourceManagerApi(yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        API_CACHE = ResourceManagerApi(
+          yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get()
+        )
     finally:
       API_CACHE_LOCK.release()
 
@@ -124,11 +126,15 @@ class ResourceManagerApi(object):
 
   def app(self, app_id):
     params = self._get_params()
-    return self._execute(self._root.get, 'cluster/apps/%(app_id)s' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._execute(
+      self._root.get, 'cluster/apps/%(app_id)s' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE}
+    )
 
   def appattempts(self, app_id):
     params = self._get_params()
-    return self._execute(self._root.get, 'cluster/apps/%(app_id)s/appattempts' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._execute(
+      self._root.get, 'cluster/apps/%(app_id)s/appattempts' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE}
+    )
 
   def appattempts_attempt(self, app_id, attempt_id):
     attempts = self.appattempts(app_id)
@@ -151,7 +157,13 @@ class ResourceManagerApi(object):
 
     try:
       params = self._get_params()
-      return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+      return self._execute(
+        self._root.put,
+        'cluster/apps/%(app_id)s/state' % {'app_id': app_id},
+        params=params,
+        data=json.dumps(data),
+        contenttype=_JSON_CONTENT_TYPE,
+      )
     finally:
       if token:
         self.cancel_token(token)

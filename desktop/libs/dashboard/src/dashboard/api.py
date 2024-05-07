@@ -37,8 +37,16 @@ from dashboard.dashboard_api import get_engine
 from dashboard.data_export import download as export_download
 from dashboard.decorators import allow_viewer_only
 from dashboard.facet_builder import _guess_gap, _zoom_range_facet, _new_range_facet
-from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception,\
-  NESTED_FACET_FORM, COMPARE_FACET, QUERY_FACET, extract_solr_exception_message
+from dashboard.models import (
+  Collection2,
+  augment_solr_response,
+  pairwise2,
+  augment_solr_exception,
+  NESTED_FACET_FORM,
+  COMPARE_FACET,
+  QUERY_FACET,
+  extract_solr_exception_message,
+)
 
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
@@ -115,12 +123,12 @@ def index_fields_dynamic(request):
 
     result['message'] = ''
     result['fields'] = [
-        Collection2._make_field(name, properties)
-        for name, properties in dynamic_fields['fields'].items() if 'dynamicBase' in properties
+      Collection2._make_field(name, properties) for name, properties in dynamic_fields['fields'].items() if 'dynamicBase' in properties
     ]
     result['gridlayout_header_fields'] = [
-        Collection2._make_gridlayout_header_field({'name': name, 'type': properties.get('type')}, True)
-        for name, properties in dynamic_fields['fields'].items() if 'dynamicBase' in properties
+      Collection2._make_gridlayout_header_field({'name': name, 'type': properties.get('type')}, True)
+      for name, properties in dynamic_fields['fields'].items()
+      if 'dynamicBase' in properties
     ]
     result['status'] = 0
   except Exception as e:
@@ -190,7 +198,7 @@ def update_document(request):
 
     if document['hasChanged']:
       edits = {
-          "id": doc_id,
+        "id": doc_id,
       }
       version = None  # If there is a version, use it to avoid potential concurrent update conflicts
 
@@ -200,7 +208,9 @@ def update_document(request):
         if field['key'] == '_version_':
           version = field['value']
 
-      result['update'] = SolrApi(SOLR_URL.get(), request.user).update(collection['name'], json.dumps([edits]), content_type='json', version=version)
+      result['update'] = SolrApi(SOLR_URL.get(), request.user).update(
+        collection['name'], json.dumps([edits]), content_type='json', version=version
+      )
       result['message'] = _('Document successfully updated.')
       result['status'] = 0
     else:
@@ -392,35 +402,37 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'missing': False,
     'isDate': False,
     'slot': 0,
-    'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentile': 50}
+    'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentile': 50},
   }
   template = {
-      "showFieldList": True,
-      "showGrid": False,
-      "showChart": True,
-      "chartSettings": {
-        'chartType': 'pie' if widget_type == 'pie2-widget' else ('timeline' if widget_type == 'timeline-widget' else ('gradientmap' if widget_type == 'gradient-map-widget' else 'bars')),
-        'chartSorting': 'none',
-        'chartScatterGroup': None,
-        'chartScatterSize': None,
-        'chartScope': 'world',
-        'chartX': None,
-        'chartYSingle': None,
-        'chartYMulti': [],
-        'chartData': [],
-        'chartMapLabel': None,
-        'chartSelectorType': 'bar'
-      },
-      "fieldsAttributes": [],
-      "fieldsAttributesFilter": "",
-      "filteredAttributeFieldsAll": True,
-      "fields": [],
-      "fieldsSelected": [],
-      "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None},  # Use own?
-      'leafletmapOn': False,
-      'isGridLayout': False,
-      "hasDataForChart": True,
-      "rows": 25,
+    "showFieldList": True,
+    "showGrid": False,
+    "showChart": True,
+    "chartSettings": {
+      'chartType': 'pie'
+      if widget_type == 'pie2-widget'
+      else ('timeline' if widget_type == 'timeline-widget' else ('gradientmap' if widget_type == 'gradient-map-widget' else 'bars')),
+      'chartSorting': 'none',
+      'chartScatterGroup': None,
+      'chartScatterSize': None,
+      'chartScope': 'world',
+      'chartX': None,
+      'chartYSingle': None,
+      'chartYMulti': [],
+      'chartData': [],
+      'chartMapLabel': None,
+      'chartSelectorType': 'bar',
+    },
+    "fieldsAttributes": [],
+    "fieldsAttributesFilter": "",
+    "filteredAttributeFieldsAll": True,
+    "fields": [],
+    "fieldsSelected": [],
+    "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None},  # Use own?
+    'leafletmapOn': False,
+    'isGridLayout': False,
+    "hasDataForChart": True,
+    "rows": 25,
   }
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
@@ -430,14 +442,27 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['statementUuid'] = collection['selectedDocument'].get('uuid')
       doc = Document2.objects.get_by_uuid(user=user, uuid=collection['selectedDocument']['uuid'], perm_type='read')
       snippets = doc.data_dict.get('snippets', [])
-      properties['result'] = {'handle': {'statement_id': 0, 'statements_count': 1, 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}}
+      properties['result'] = {
+        'handle': {'statement_id': 0, 'statements_count': 1, 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}
+      }
       if snippets:
         properties['engine'] = snippets[0]['type']
     else:
       properties['statementUuid'] = ''
     properties['statement'] = ''
     properties['uuid'] = facet_field
-    properties['facets'] = [{'canRange': False, 'field': 'blank', 'limit': 10, 'mincount': 0, 'sort': 'desc', 'aggregate': {'function': 'count'}, 'isDate': False, 'type': 'field'}]
+    properties['facets'] = [
+      {
+        'canRange': False,
+        'field': 'blank',
+        'limit': 10,
+        'mincount': 0,
+        'sort': 'desc',
+        'aggregate': {'function': 'count'},
+        'isDate': False,
+        'type': 'field',
+      }
+    ]
     facet_type = 'statement'
   else:
     api = get_engine(user, collection)
@@ -452,7 +477,15 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     else:
       facet_type = 'field'
 
-    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget', 'gradient-map-widget'):
+    if widget_type in (
+      'bucket-widget',
+      'pie2-widget',
+      'timeline-widget',
+      'tree2-widget',
+      'text-facet-widget',
+      'hit-widget',
+      'gradient-map-widget',
+    ):
       # properties = {'canRange': False, 'stacked': False, 'limit': 10} # TODO: Lighter weight top nested facet
 
       properties['facets_form'] = NESTED_FACET_FORM
@@ -538,7 +571,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'properties': properties,
     # Hue 4+
     'template': template,
-    'queryResult': {}
+    'queryResult': {},
   }
 
 

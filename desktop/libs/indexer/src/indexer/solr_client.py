@@ -97,7 +97,9 @@ class SolrClient(object):
       if self.is_solr_six_or_more():
         config_sets = self.list_configs()
         if not config_sets:
-          raise PopupException(_('Solr does not have any predefined (secure: %s) configSets: %s') % (self.is_sentry_protected(), self.list_configs()))
+          raise PopupException(
+            _('Solr does not have any predefined (secure: %s) configSets: %s') % (self.is_sentry_protected(), self.list_configs())
+          )
 
         if not config_name or config_name not in config_sets:
           config_name_target = 'managedTemplate'

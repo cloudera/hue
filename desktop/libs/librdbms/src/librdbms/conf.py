@@ -99,7 +99,8 @@ def config_validator(user):
       if engine in ('sqlite', 'sqlite3'):
         res.append((DATABASES[server].NAME, _("Database name should not be empty for the SQLite backend.")))
       if engine == 'oracle':
-        res.append((DATABASES[server].NAME, _("Database name should not be empty for the Oracle backend. It should be the SID of your database.")))
+        res.append((
+          DATABASES[server].NAME, _("Database name should not be empty for the Oracle backend. It should be the SID of your database.")))
       if engine in ('postgresql_psycopg2', 'postgresql'):
         res.append((DATABASES[server].NAME, _("Database name should not be empty for the PostgreSQL backend.")))
 

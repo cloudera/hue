@@ -121,7 +121,17 @@ def tree(request, id, path):
   znode = zk.get(path)
   children = sorted(zk.get_children_paths(path))
 
-  return render('tree.mako', request, {'cluster': cluster, 'path': path, 'znode': znode, 'children': children, 'clusters': CLUSTERS.get(), })
+  return render(
+    'tree.mako',
+    request,
+    {
+      'cluster': cluster,
+      'path': path,
+      'znode': znode,
+      'children': children,
+      'clusters': CLUSTERS.get(),
+    },
+  )
 
 
 def delete(request, id, path):

@@ -397,7 +397,9 @@ def submit_single_action(request, doc_id, node_id):
   workflow.import_workspace(request.fs, parent_wf.deployment_dir, request.user)
   workflow.document = parent_doc
 
-  return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:submit_single_action', kwargs={'doc_id': doc_id, 'node_id': node_id}))
+  return _submit_workflow_helper(
+    request, workflow, submit_action=reverse('oozie:submit_single_action', kwargs={'doc_id': doc_id, 'node_id': node_id})
+  )
 
 
 def _submit_workflow_helper(request, workflow, submit_action):
@@ -629,7 +631,9 @@ def save_coordinator(request):
         owner=request.user,
         is_managed=coordinator_data.get('isManaged')
     )
-    Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
+    Document.objects.link(
+      coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2'
+    )
 
   scheduled_id = coordinator_data['properties']['workflow'] or coordinator_data['properties']['document']
   if scheduled_id:
@@ -742,7 +746,7 @@ def _submit_coordinator(request, coordinator, mapping):
           u'groupSize': 0,
           u'useSpot': False
         },
-        u'environmentName': u'crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:analytics/236ebdda-18bd-428a-9d2b-cd6973d42946',
+        u'environmentName': u'crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:analytics/236ebdda-18bd-428a-9d2b-cd6973d42946',  # noqa: E501
         u'instanceBootstrapScript': u'',
         u'instanceType': u'm4.xlarge',
         u'jobSubmissionGroupName': u'',
@@ -775,7 +779,7 @@ def _submit_coordinator(request, coordinator, mapping):
   #           }
   #         }
         ],
-        u'namespaceName': u'crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410',
+        u'namespaceName': u'crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410',  # noqa: E501
         u'publicKey': DEFAULT_PUBLIC_KEY.get(),
         u'serviceType': u'SPARK',
         u'workersConfiguration': {},
@@ -792,7 +796,9 @@ def _submit_coordinator(request, coordinator, mapping):
     return job_id
   except RestException as ex:
     LOG.exception('Error submitting coordinator')
-    raise PopupException(_("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex), error_code=200)
+    raise PopupException(
+      _("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex), error_code=200
+    )
 
 
 @check_editor_access_permission
@@ -959,7 +965,12 @@ def submit_bundle(request, doc_id):
 def _submit_bundle(request, bundle, properties):
   try:
     deployment_mapping = {}
-    coords = dict([(c.uuid, c) for c in Document2.objects.filter(type='oozie-coordinator2', uuid__in=[b['coordinator'] for b in bundle.data['coordinators']])])
+    coords = dict(
+      [
+        (c.uuid, c)
+        for c in Document2.objects.filter(type='oozie-coordinator2', uuid__in=[b['coordinator'] for b in bundle.data['coordinators']])
+      ]
+    )
 
     for i, bundled in enumerate(bundle.data['coordinators']):
       coord = coords[bundled['coordinator']]

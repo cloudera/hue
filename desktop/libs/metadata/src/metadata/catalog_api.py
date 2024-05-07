@@ -393,7 +393,8 @@ def update_properties(request):
   request.audit = {
     'allowed': is_allowed,
     'operation': '%s_UPDATE_PROPERTIES' % interface.upper(),
-    'operationText': 'Updating custom metadata %s, deleted custom metadata keys %s and properties %s of entity %s' % (modified_custom_metadata, deleted_custom_metadata_keys, properties, entity_id)
+    'operationText': 'Updating custom metadata %s, deleted custom metadata keys %s and properties %s of entity %s' % (
+      modified_custom_metadata, deleted_custom_metadata_keys, properties, entity_id)
   }
 
   if not entity_id:

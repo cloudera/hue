@@ -122,7 +122,7 @@ def help_message(user_id):
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*Share query/gist links* in channel which unfurls in a rich preview, showing query details and result in message thread if available."
+        "text": "*Share query/gist links* in channel which unfurls in a rich preview, showing query details and result in message thread if available."  # noqa: E501
       }
     },
     {
@@ -198,7 +198,11 @@ def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements,
 
 
 def handle_select_statement(host_domain, is_http_secure, channel_id, user_id, statement, message_ts):
-  msg = 'Hi <@{user}> \n Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'.format(user=user_id)
+  msg = (
+    'Hi <@{user}> \n Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'.format(
+      user=user_id
+    )
+  )
   _send_message(channel_id, message=msg)
 
   # Check Slack user perms to send gist link

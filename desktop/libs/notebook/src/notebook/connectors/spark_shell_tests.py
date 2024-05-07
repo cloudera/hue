@@ -576,7 +576,7 @@ LIVY_STANDALONE_LOG = """
   15/10/05 14:02:37 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool
   15/10/05 14:02:37 INFO DAGScheduler: ShuffleMapStage 0 (reduceByKey at <stdin>:1) finished in 0.973 s
   15/10/05 14:02:37 INFO DAGScheduler: looking for newly runnable stages
-"""
+"""  # noqa: E501
 LIVY_YARN_LOG = """
   15/10/05 13:51:21 INFO client.RMProxy: Connecting to ResourceManager at huetest-1.test.com/175.18.213.12:8032
   15/10/05 13:51:21 INFO yarn.Client: Requesting a new application from cluster with 3 NodeManagers
@@ -629,4 +629,4 @@ LIVY_YARN_LOG = """
         tracking URL: http://huetest-1.test.com:8088/proxy/application_1444070328046_0002/
         user: huetest
   15/10/05 13:52:24 INFO yarn.Client: Application report for application_1444070328046_0002 (state: RUNNING)
-"""
+"""  # noqa: E501

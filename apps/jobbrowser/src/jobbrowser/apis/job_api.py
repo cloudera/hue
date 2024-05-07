@@ -505,7 +505,7 @@ class YarnMapReduceTaskAttemptApi(Api):
     return {
         # "elapsedMergeTime" : task.elapsedMergeTime,
         # "shuffleFinishTime" : task.shuffleFinishTime,
-        "assignedContainerId": task.assignedContainerId if hasattr(task, 'assignedContainerId') else task.amContainerId if hasattr(task, 'amContainerId') else '',
+        "assignedContainerId": task.assignedContainerId if hasattr(task, 'assignedContainerId') else task.amContainerId if hasattr(task, 'amContainerId') else '',  # noqa: E501
         "progress": task.progress if hasattr(task, 'progress') else '',
         "elapsedTime": task.elapsedTime if hasattr(task, 'elapsedTime') else '',
         "state": task.state if hasattr(task, 'state') else task.appAttemptState if hasattr(task, 'appAttemptState') else '',
@@ -520,7 +520,7 @@ class YarnMapReduceTaskAttemptApi(Api):
         "finishTime": task.finishTime if hasattr(task, 'finishTime') else int(task.finishedTime) if hasattr(task, 'finishedTime') else '',
         "app_id": self.app_id,
         "task_id": self.task_id,
-        'apiStatus': self._api_status(task.state) if hasattr(task, 'state') else self._api_status(task.appAttemptState) if hasattr(task, 'appAttemptState') else '',
+        'apiStatus': self._api_status(task.state) if hasattr(task, 'state') else self._api_status(task.appAttemptState) if hasattr(task, 'appAttemptState') else '',  # noqa: E501
         'host': task.host if hasattr(task, 'host') else '',
         'rpcPort': task.rpcPort if hasattr(task, 'rpcPort') else '',
         'diagnosticsInfo': task.diagnosticsInfo if hasattr(task, 'diagnosticsInfo') else ''

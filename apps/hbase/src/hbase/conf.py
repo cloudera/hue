@@ -47,7 +47,7 @@ TRUNCATE_LIMIT = Config(
 THRIFT_TRANSPORT = Config(
   key="thrift_transport",
   default="buffered",
-  help=_t("Should come from hbase-site.xml, do not set. 'framed' is used to chunk up responses, used with the nonblocking server in Thrift but is not supported in Hue."
+  help=_t("Should come from hbase-site.xml, do not set. 'framed' is used to chunk up responses, used with the nonblocking server in Thrift but is not supported in Hue."  # noqa: E501
        "'buffered' used to be the default of the HBase Thrift Server. Default is buffered when not set in hbase-site.xml."),
   type=str
 )
@@ -61,7 +61,7 @@ HBASE_CONF_DIR = Config(
 # Hidden, just for making patching of older version of Hue easier. To remove in Hue 4.
 USE_DOAS = Config(
   key='use_doas',
-  help=_t('Should come from hbase-site.xml, do not set. Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties.'),
+  help=_t('Should come from hbase-site.xml, do not set. Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties.'),  # noqa: E501
   default=False,
   type=coerce_bool
 )

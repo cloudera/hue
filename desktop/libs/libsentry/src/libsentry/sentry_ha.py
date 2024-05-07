@@ -64,7 +64,8 @@ def get_next_available_server(client_class, username, failed_host=None, componen
       client = create_client_fn(client_class, username, next_server, component)
       client.list_sentry_roles_by_group(groupName='*')
       # If above operation succeeds, return client
-      LOG.info('Successfully connected to Sentry server %s, after attempting [%s], returning client.' % (client.host, ', '.join(attempted_hosts)))
+      LOG.info(
+        'Successfully connected to Sentry server %s, after attempting [%s], returning client.' % (client.host, ', '.join(attempted_hosts)))
       return next_server, attempted_hosts
     except StructuredThriftTransportException as e:
       # If we have come back around to the original failed client, exit

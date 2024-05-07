@@ -209,7 +209,7 @@ class OAuthBackend(DesktopBackendBase):
       access_type = "offline"
       approval_prompt = "force"
 
-      url = "{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&state={state}&access_type={access_type}&approval_prompt={approval_prompt}".format(
+      url = "{token_request_uri}?response_type={response_type}&client_id={client_id}&redirect_uri={redirect_uri}&scope={scope}&state={state}&access_type={access_type}&approval_prompt={approval_prompt}".format(  # noqa: E501
          token_request_uri=token_request_uri,
          response_type=response_type,
          client_id=consumer_key,
@@ -226,7 +226,7 @@ class OAuthBackend(DesktopBackendBase):
        scope = "email"
        grant_type = "client_credentials"
 
-       url = "{token_request_uri}?client_id={client_id}&redirect_uri={redirect_uri}&grant_type={grant_type}&scope={scope}&state={state}".format(
+       url = "{token_request_uri}?client_id={client_id}&redirect_uri={redirect_uri}&grant_type={grant_type}&scope={scope}&state={state}".format(  # noqa: E501
            token_request_uri=token_request_uri,
            client_id=consumer_key,
            redirect_uri=redirect_uri,
@@ -240,7 +240,7 @@ class OAuthBackend(DesktopBackendBase):
        token_request_uri = liboauth.conf.REQUEST_TOKEN_URL_LINKEDIN.get()
        scope = "r_emailaddress"
 
-       url = "{token_request_uri}?response_type={response_type}&client_id={client_id}&scope={scope}&state={state}&redirect_uri={redirect_uri}".format(
+       url = "{token_request_uri}?response_type={response_type}&client_id={client_id}&scope={scope}&state={state}&redirect_uri={redirect_uri}".format(  # noqa: E501
              token_request_uri=token_request_uri,
              response_type=response_type,
              client_id=consumer_key,

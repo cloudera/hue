@@ -667,7 +667,7 @@ class TestHiveserver2ApiNonMock(object):
         INFO  : number of splits:1
         INFO  : Submitting tokens for job: job_1466104358744_0003
         INFO  : The url to track the job: http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466104358744_0003/
-    """
+    """  # noqa: E501
 
     assert self.api.progress({}, snippet, logs=logs) == 5
 
@@ -794,7 +794,7 @@ class TestHiveserver2ApiNonMock(object):
             INFO  : The url to track the job: http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466630204796_0059/
             INFO  : Starting Job = job_1466630204796_0059, Tracking URL = http://jennykim-1.vpc.cloudera.com:8088/proxy/application_1466630204796_0059/
             INFO  : Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1466630204796_0059
-    """
+    """  # noqa: E501
 
     jobs = self.api.get_jobs(notebook, snippet, logs)
     assert isinstance(jobs, list)

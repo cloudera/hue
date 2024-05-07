@@ -59,10 +59,10 @@ def list_hdfs(request, path):
     else:
       json_response = display(request, path)
   except IOError:
-    # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
+    # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)  # noqa: E501
     json_response = JsonResponse({'files': [], 'page': {}, 'error': 'FILE_NOT_FOUND'})
   except Exception as e:
-    # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)
+    # AccessControlException: Permission denied: user=test, access=READ_EXECUTE, inode="/tmp/dir":romain:supergroup:drwxr-xr-x:group::r-x,group:bob:---,group:test:---,default:user::rwx,default:group::r--,default:mask::r--,default:other::rwx (error 403)  # noqa: E501
     json_response = JsonResponse({'files': [], 'page': {}, 'error': 'ACCESS_DENIED'})
 
   if json.loads(request.GET.get('isDiffMode', 'false')):
@@ -97,7 +97,8 @@ def update_acls(request):
     if all([acl['status'] == 'deleted' for acl in acls]):
       request.fs.remove_acl(path)
     else:
-      renamed_acls = set([_get_acl_name(acl) for acl in original_acls]) - set([_get_acl_name(acl) for acl in acls])  # We need to remove ACLs that have been renamed
+      # We need to remove ACLs that have been renamed
+      renamed_acls = set([_get_acl_name(acl) for acl in original_acls]) - set([_get_acl_name(acl) for acl in acls])
       _remove_acl_names(request.fs, path, list(renamed_acls))
       _remove_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] == 'deleted'])
       _modify_acl_entries(request.fs, path, [acl for acl in acls if acl['status'] in ('new', 'modified')])

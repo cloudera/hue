@@ -49,7 +49,6 @@ LOG = logging.getLogger()
 
 
 class MockDbms(object):
-
   def get_databases(self):
     return ['db1', 'db2']
 
@@ -59,7 +58,6 @@ class MockDbms(object):
 
 @pytest.mark.django_db
 class TestMockedImpala(object):
-
   def setup_method(self):
     self.client = make_logged_in_client()
 
@@ -136,7 +134,6 @@ class TestMockedImpala(object):
 
 @pytest.mark.integration
 class TestImpalaIntegration(object):
-
   @classmethod
   def setup_class(cls):
     cls.finish = []
@@ -153,7 +150,7 @@ class TestImpalaIntegration(object):
     queries = [
       'DROP TABLE IF EXISTS %(db)s.tweets;' % {'db': cls.DATABASE},
       'DROP DATABASE IF EXISTS %(db)s CASCADE;' % {'db': cls.DATABASE},
-      'CREATE DATABASE %(db)s;' % {'db': cls.DATABASE}
+      'CREATE DATABASE %(db)s;' % {'db': cls.DATABASE},
     ]
 
     for query in queries:
@@ -162,19 +159,26 @@ class TestImpalaIntegration(object):
       content = json.loads(resp.content)
       assert content['status'] == 0, resp.content
 
-    queries = ["""
+    queries = [
+      """
       CREATE TABLE tweets (row_num INTEGER, id_str STRING, text STRING) STORED AS PARQUET;
-    """, """
+    """,
+      """
       INSERT INTO TABLE tweets VALUES (1, "531091827395682000", "My dad looks younger than costa");
-    """, """
+    """,
+      """
       INSERT INTO TABLE tweets VALUES (2, "531091827781550000", "There is a thin line between your partner being vengeful and you reaping the consequences of your bad actions towards your partner.");
-    """, """
+    """,  # noqa: E501
+      """
       INSERT INTO TABLE tweets VALUES (3, "531091827768979000", "@Mustang_Sally83 and they need to get into you :))))");
-    """, """
+    """,
+      """
       INSERT INTO TABLE tweets VALUES (4, "531091827114668000", "@RachelZJohnson thank you rach!xxx");
-    """, """
+    """,
+      """
       INSERT INTO TABLE tweets VALUES (5, "531091827949309000", "i think @WWERollins was robbed of the IC title match this week on RAW also i wonder if he will get a rematch i hope so @WWE");
-    """]
+    """,  # noqa: E501
+    ]
 
     for query in queries:
       resp = _make_query(cls.client, query, database=cls.DATABASE, local=False, server_name='impala')
@@ -185,11 +189,16 @@ class TestImpalaIntegration(object):
   @classmethod
   def teardown_class(cls):
     # We need to drop tables before dropping the database
-    queries = ["""
+    queries = [
+      """
       DROP TABLE IF EXISTS %(db)s.tweets;
-    """ % {'db': cls.DATABASE}, """
+    """
+      % {'db': cls.DATABASE},
+      """
       DROP DATABASE %(db)s CASCADE;
-    """ % {'db': cls.DATABASE}]
+    """
+      % {'db': cls.DATABASE},
+    ]
     for query in queries:
       resp = _make_query(cls.client, query, database='default', local=False, server_name='impala')
       resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
@@ -296,7 +305,7 @@ class TestImpalaIntegration(object):
     resp = client.get(reverse('impala:get_sample_data', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
     data = json.loads(resp.content)
     assert 0 == data['status'], data
-    assert [u'row_num', u'id_str', u'text'] == data['headers'], data
+    assert ['row_num', 'id_str', 'text'] == data['headers'], data
     assert len(data['rows']), data
 
   def test_get_session(self):
@@ -336,9 +345,10 @@ class TestImpalaIntegration(object):
       return impala_tables, beeswax_tables
 
     impala_tables, beeswax_tables = get_impala_beeswax_tables()
-    assert impala_tables == beeswax_tables, (
-      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s"
-      % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables))
+    assert impala_tables == beeswax_tables, "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (
+      self.DATABASE,
+      ','.join(impala_tables),
+      ','.join(beeswax_tables),
     )
 
     hql = """
@@ -355,9 +365,10 @@ class TestImpalaIntegration(object):
 
     impala_tables, beeswax_tables = get_impala_beeswax_tables()
     # Invalidate picks up new table
-    assert impala_tables == beeswax_tables, (
-      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s"
-      % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables))
+    assert impala_tables == beeswax_tables, "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (
+      self.DATABASE,
+      ','.join(impala_tables),
+      ','.join(beeswax_tables),
     )
 
   def test_refresh_table(self):
@@ -370,8 +381,12 @@ class TestImpalaIntegration(object):
       return impala_columns, beeswax_columns
 
     impala_columns, beeswax_columns = get_impala_beeswax_columns()
-    assert impala_columns == beeswax_columns, ("\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s"
-      % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
+    assert impala_columns == beeswax_columns, "\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s" % (
+      self.DATABASE,
+      'tweets',
+      ','.join(impala_columns),
+      ','.join(beeswax_columns),
+    )
 
     hql = """
       ALTER TABLE tweets ADD COLUMNS (new_column INT);
@@ -387,8 +402,12 @@ class TestImpalaIntegration(object):
 
     impala_columns, beeswax_columns = get_impala_beeswax_columns()
     # Invalidate picks up new column
-    assert impala_columns == beeswax_columns, ("\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s"
-      % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
+    assert impala_columns == beeswax_columns, "\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s" % (
+      self.DATABASE,
+      'tweets',
+      ','.join(impala_columns),
+      ','.join(beeswax_columns),
+    )
 
   def test_get_exec_summary(self):
     query = """
@@ -448,20 +467,23 @@ def create_saved_query(app_name, owner):
 
 def test_ssl_cacerts():
   for desktop_kwargs, conf_kwargs, expected in [
-      ({'present': False}, {'present': False}, ''),
-      ({'present': False}, {'data': 'local-cacerts.pem'}, 'local-cacerts.pem'),
-
-      ({'data': 'global-cacerts.pem'}, {'present': False}, 'global-cacerts.pem'),
-      ({'data': 'global-cacerts.pem'}, {'data': 'local-cacerts.pem'}, 'local-cacerts.pem'),
-      ]:
+    ({'present': False}, {'present': False}, ''),
+    ({'present': False}, {'data': 'local-cacerts.pem'}, 'local-cacerts.pem'),
+    ({'data': 'global-cacerts.pem'}, {'present': False}, 'global-cacerts.pem'),
+    ({'data': 'global-cacerts.pem'}, {'data': 'local-cacerts.pem'}, 'local-cacerts.pem'),
+  ]:
     resets = [
       desktop_conf.SSL_CACERTS.set_for_testing(**desktop_kwargs),
       conf.SSL.CACERTS.set_for_testing(**conf_kwargs),
     ]
 
     try:
-      assert conf.SSL.CACERTS.get() == expected, ('desktop:%s conf:%s expected:%s got:%s'
-        % (desktop_kwargs, conf_kwargs, expected, conf.SSL.CACERTS.get()))
+      assert conf.SSL.CACERTS.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (
+        desktop_kwargs,
+        conf_kwargs,
+        expected,
+        conf.SSL.CACERTS.get(),
+      )
     finally:
       for reset in resets:
         reset()
@@ -469,25 +491,28 @@ def test_ssl_cacerts():
 
 def test_ssl_validate():
   for desktop_kwargs, conf_kwargs, expected in [
-      ({'present': False}, {'present': False}, True),
-      ({'present': False}, {'data': False}, False),
-      ({'present': False}, {'data': True}, True),
-
-      ({'data': False}, {'present': False}, False),
-      ({'data': False}, {'data': False}, False),
-      ({'data': False}, {'data': True}, True),
-
-      ({'data': True}, {'present': False}, True),
-      ({'data': True}, {'data': False}, False),
-      ({'data': True}, {'data': True}, True),
-      ]:
+    ({'present': False}, {'present': False}, True),
+    ({'present': False}, {'data': False}, False),
+    ({'present': False}, {'data': True}, True),
+    ({'data': False}, {'present': False}, False),
+    ({'data': False}, {'data': False}, False),
+    ({'data': False}, {'data': True}, True),
+    ({'data': True}, {'present': False}, True),
+    ({'data': True}, {'data': False}, False),
+    ({'data': True}, {'data': True}, True),
+  ]:
     resets = [
       desktop_conf.SSL_VALIDATE.set_for_testing(**desktop_kwargs),
       conf.SSL.VALIDATE.set_for_testing(**conf_kwargs),
     ]
 
     try:
-      assert conf.SSL.VALIDATE.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.SSL.VALIDATE.get())
+      assert conf.SSL.VALIDATE.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (
+        desktop_kwargs,
+        conf_kwargs,
+        expected,
+        conf.SSL.VALIDATE.get(),
+      )
     finally:
       for reset in resets:
         reset()
@@ -495,9 +520,9 @@ def test_ssl_validate():
 
 def test_thrift_over_http_config():
   resets = [
-      conf.SERVER_HOST.set_for_testing('impalad_host'),
-      conf.SERVER_PORT.set_for_testing(21050),
-      conf.USE_THRIFT_HTTP.set_for_testing(True)
+    conf.SERVER_HOST.set_for_testing('impalad_host'),
+    conf.SERVER_PORT.set_for_testing(21050),
+    conf.USE_THRIFT_HTTP.set_for_testing(True),
   ]
   with patch('impala.dbms.get_hs2_http_port') as get_hs2_http_port:
     get_hs2_http_port.return_value = 30000
@@ -513,10 +538,10 @@ def test_thrift_over_http_config():
 
 def test_thrift_over_http_config_with_proxy_endpoint():
   resets = [
-      conf.SERVER_HOST.set_for_testing('impala_proxy'),
-      conf.SERVER_PORT.set_for_testing(36000),
-      conf.USE_THRIFT_HTTP.set_for_testing(True),
-      conf.PROXY_ENDPOINT.set_for_testing('/endpoint')
+    conf.SERVER_HOST.set_for_testing('impala_proxy'),
+    conf.SERVER_PORT.set_for_testing(36000),
+    conf.USE_THRIFT_HTTP.set_for_testing(True),
+    conf.PROXY_ENDPOINT.set_for_testing('/endpoint'),
   ]
   with patch('impala.dbms.get_hs2_http_port') as get_hs2_http_port:
     get_hs2_http_port.return_value = 30000
@@ -531,16 +556,22 @@ def test_thrift_over_http_config_with_proxy_endpoint():
 
 
 class TestImpalaDbms(object):
-
   def test_get_impala_nested_select(self):
     assert ImpalaDbms.get_nested_select('default', 'customers', 'id', None) == ('id', '`default`.`customers`')
-    assert (ImpalaDbms.get_nested_select('default', 'customers', 'email_preferences', 'categories/promos/') ==
-                 ('email_preferences.categories.promos', '`default`.`customers`'))
-    assert (ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'key') ==
-                 ('key', '`default`.`customers`.`addresses`'))
-    assert (ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'value/street_1/') ==
-                 ('street_1', '`default`.`customers`.`addresses`'))
-    assert (ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/order_date') ==
-                 ('order_date', '`default`.`customers`.`orders`'))
-    assert (ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/items/item/product_id') ==
-                 ('product_id', '`default`.`customers`.`orders`.`items`'))
+    assert ImpalaDbms.get_nested_select('default', 'customers', 'email_preferences', 'categories/promos/') == (
+      'email_preferences.categories.promos',
+      '`default`.`customers`',
+    )
+    assert ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'key') == ('key', '`default`.`customers`.`addresses`')
+    assert ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'value/street_1/') == (
+      'street_1',
+      '`default`.`customers`.`addresses`',
+    )
+    assert ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/order_date') == (
+      'order_date',
+      '`default`.`customers`.`orders`',
+    )
+    assert ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/items/item/product_id') == (
+      'product_id',
+      '`default`.`customers`.`orders`.`items`',
+    )

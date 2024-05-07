@@ -93,7 +93,9 @@ def massaged_tags_for_json(docs, user):
 
   ts['trash'] = massaged_tags(trash_tag, tag_doc_mapping)
   ts['history'] = massaged_tags(history_tag, tag_doc_mapping)
-  tags = list(set(list(tag_doc_mapping.keys()) + [tag for tag in DocumentTag.objects.get_tags(user=user)]))  # List of all personal and shared tags
+
+  # List of all personal and shared tags
+  tags = list(set(list(tag_doc_mapping.keys()) + [tag for tag in DocumentTag.objects.get_tags(user=user)]))
 
   for tag in tags:
     massaged_tag = massaged_tags(tag, tag_doc_mapping)
@@ -177,12 +179,17 @@ def massaged_documents_for_json(documents, user):
       'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
      }
   };
-  """
+  """  # noqa: E501
   docs = {}
 
   for document in documents:
     try:
-      url = document.content_object and hasattr(document.content_object, 'get_absolute_url') and document.content_object.get_absolute_url() or ''
+      url = (
+        document.content_object
+        and hasattr(document.content_object, 'get_absolute_url')
+        and document.content_object.get_absolute_url()
+        or ''
+      )
     except Exception:
       LOG.exception('failed to get absolute url')
       # If app of document is disabled

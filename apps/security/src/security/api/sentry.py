@@ -135,7 +135,9 @@ def list_sentry_privileges_by_role(request):
 
     sentry_privileges = get_api(request.user, component).list_sentry_privileges_by_role(serviceName, roleName)
 
-    result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '.'.join([auth['name'] for auth in privilege['authorizables']]))
+    result['sentry_privileges'] = sorted(
+      sentry_privileges, key=lambda privilege: '.'.join([auth['name'] for auth in privilege['authorizables']])
+    )
     result['message'] = ''
     result['status'] = 0
   except Exception as e:
@@ -150,7 +152,8 @@ def _to_sentry_privilege(privilege):
   return {
       'component': privilege['component'],
       'serviceName': privilege['serverName'],
-      'authorizables': [{'type': auth['type'], 'name': auth['name_']} for auth in privilege['authorizables']],  # TODO URI {'type': 'URI', 'name': _massage_uri('/path')}
+      # TODO URI {'type': 'URI', 'name': _massage_uri('/path')}
+      'authorizables': [{'type': auth['type'], 'name': auth['name_']} for auth in privilege['authorizables']],
       'action': '*' if privilege['action'].upper() == 'ALL' else privilege['action'],
       'createTime': privilege['timestamp'],
       'grantorPrincipal': privilege['grantorPrincipal'],
@@ -362,7 +365,9 @@ def list_sentry_privileges_by_authorizable(request):
 
     _privileges = []
 
-    for authorizable, roles in get_api(request.user, component).list_sentry_privileges_by_authorizable(serviceName=serviceName, authorizableSet=authorizableSet, groups=groups):
+    for authorizable, roles in get_api(request.user, component).list_sentry_privileges_by_authorizable(
+      serviceName=serviceName, authorizableSet=authorizableSet, groups=groups
+    ):
       for role, privileges in roles.items():
         for privilege in privileges:
           privilege['roleName'] = role
@@ -472,7 +477,9 @@ def list_sentry_privileges_for_provider(request):
     authorizableHierarchy = json.loads(request.POST.get('authorizableHierarchy'))
     component = request.POST.get('component')
 
-    sentry_privileges = get_api(request.user, component).list_sentry_privileges_for_provider(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
+    sentry_privileges = get_api(request.user, component).list_sentry_privileges_for_provider(
+      groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy
+    )
     result['sentry_privileges'] = sentry_privileges
     result['message'] = ''
     result['status'] = 0

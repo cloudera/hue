@@ -111,7 +111,8 @@ class ManagerApi(object):
         shs_server_hostId = shs_server_hostRef[0]['hostId'] if shs_server_hostRef else None
 
         if shs_server_name and shs_server_hostId:
-          shs_server_configs = self._root.get('clusters/%(cluster_name)s/services/%(spark_service_display_name)s/roles/%(shs_server_name)s/config' % {
+          shs_server_configs = self._root.get(
+            'clusters/%(cluster_name)s/services/%(spark_service_display_name)s/roles/%(shs_server_name)s/config' % {
             'cluster_name': cluster['name'],
             'spark_service_display_name': spark_service_display_name,
             'shs_server_name': shs_server_name
@@ -220,7 +221,7 @@ class ManagerApi(object):
     roleConfigGroup = [role['roleConfigGroupRef']['roleConfigGroupName'] for role in self._get_roles(cluster['name'], service, 'AGENT')]
     data = {
       u'items': [{
-        u'url': u'/api/v8/clusters/%(cluster_name)s/services/%(service)s/roleConfigGroups/%(roleConfigGroups)s/config?message=Updated%20service%20and%20role%20type%20configurations.'.replace('%(cluster_name)s', urllib_quote(cluster['name'])).replace('%(service)s', service).replace('%(roleConfigGroups)s', roleConfigGroup[0]),
+        u'url': u'/api/v8/clusters/%(cluster_name)s/services/%(service)s/roleConfigGroups/%(roleConfigGroups)s/config?message=Updated%20service%20and%20role%20type%20configurations.'.replace('%(cluster_name)s', urllib_quote(cluster['name'])).replace('%(service)s', service).replace('%(roleConfigGroups)s', roleConfigGroup[0]),  # noqa: E501
         u'body': {
           u'items': [
             {u'name': config_name, u'value': config_value}
@@ -265,9 +266,12 @@ class ManagerApi(object):
   def refresh_configs(self, cluster_name, service=None, roles=None):
     try:
       if service is None:
-        return self._root.post('clusters/%(cluster_name)s/commands/refresh' % {'cluster_name': cluster_name}, contenttype="application/json")
+        return self._root.post(
+          'clusters/%(cluster_name)s/commands/refresh' % {'cluster_name': cluster_name}, contenttype="application/json")
       elif roles is None:
-        return self._root.post('clusters/%(cluster_name)s/services/%(service)s/roleCommands/refresh' % {'cluster_name': cluster_name, 'service': service}, contenttype="application/json")
+        return self._root.post(
+          'clusters/%(cluster_name)s/services/%(service)s/roleCommands/refresh' % {'cluster_name': cluster_name, 'service': service},
+          contenttype="application/json")
       else:
         return self._root.post(
             'clusters/%(cluster_name)s/services/%(service)s/roleCommands/refresh' % {'cluster_name': cluster_name, 'service': service},
@@ -280,9 +284,12 @@ class ManagerApi(object):
   def restart_services(self, cluster_name, service=None, roles=None):
     try:
       if service is None:
-        return self._root.post('clusters/%(cluster_name)s/commands/restart' % {'cluster_name': cluster_name}, contenttype="application/json")
+        return self._root.post(
+          'clusters/%(cluster_name)s/commands/restart' % {'cluster_name': cluster_name}, contenttype="application/json")
       elif roles is None:
-        return self._root.post('clusters/%(cluster_name)s/services/%(service)s/roleCommands/restart' % {'cluster_name': cluster_name, 'service': service}, contenttype="application/json")
+        return self._root.post(
+          'clusters/%(cluster_name)s/services/%(service)s/roleCommands/restart' % {'cluster_name': cluster_name, 'service': service},
+          contenttype="application/json")
       else:
         return self._root.post(
             'clusters/%(cluster_name)s/services/%(service)s/roleCommands/restart' % {'cluster_name': cluster_name, 'service': service},
@@ -309,7 +316,8 @@ class ManagerApi(object):
     return cluster
 
   def _get_roles(self, cluster_name, service_name, role_type):
-    roles = self._root.get('clusters/%(cluster_name)s/services/%(service_name)s/roles' % {'cluster_name': cluster_name, 'service_name': service_name})['items']
+    roles = self._root.get(
+      'clusters/%(cluster_name)s/services/%(service_name)s/roles' % {'cluster_name': cluster_name, 'service_name': service_name})['items']
     return [role for role in roles if role['type'] == role_type]
 
   def get_impalad_config(self, key=None, impalad_host=None, cluster_name=None):
@@ -340,11 +348,13 @@ class ManagerApi(object):
           'spark_service_display_name': impala_service_display_name
         })['items']
 
-        impalad_server_names = [server['name'] for server in servers if server['type'] == role_type and server['hostRef']['hostId'] == impalad_hostId]
+        impalad_server_names = [
+          server['name'] for server in servers if server['type'] == role_type and server['hostRef']['hostId'] == impalad_hostId]
         impalad_server_name = impalad_server_names[0] if impalad_server_names else None
 
         if impalad_server_name:
-          server_configs = self._root.get('clusters/%(cluster_name)s/services/%(spark_service_display_name)s/roles/%(shs_server_name)s/config' % {
+          server_configs = self._root.get(
+            'clusters/%(cluster_name)s/services/%(spark_service_display_name)s/roles/%(shs_server_name)s/config' % {
             'cluster_name': cluster['name'],
             'spark_service_display_name': impala_service_display_name,
             'shs_server_name': impalad_server_name

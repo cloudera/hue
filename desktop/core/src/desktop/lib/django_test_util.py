@@ -28,12 +28,15 @@ class Client(django.test.client.Client):
   """
   Extends client to have a get_json method.
   """
+
   def get_json(self, *args, **kwargs):
     response = self.get(*args, **kwargs)
     return json.JSONDecoder().decode(response.content)
 
 
-def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None, is_admin=False, request=None):
+def make_logged_in_client(
+  username="test", password="test", is_superuser=True, recreate=False, groupname=None, is_admin=False, request=None
+):
   """
   Create a client with a user already logged in.
 
@@ -109,7 +112,7 @@ def configure_django_for_test():
 
 
 def create_tables(model):
-  """ Create all tables for the given model.
+  """Create all tables for the given model.
 
   This is a subset of django.core.management.commands.migrate
   """

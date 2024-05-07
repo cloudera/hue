@@ -53,6 +53,6 @@ class LoadDataForm(forms.Form):
       # We give these numeric names because column names
       # may be unpleasantly arbitrary.
       name = "partition_%d" % i
-      char_field = forms.CharField(required=True, label=_t("%(column_name)s (partition key with type %(column_type)s)") % {'column_name': column.name, 'column_type': column.type})
+      char_field = forms.CharField(required=True, label=_t("%(column_name)s (partition key with type %(column_type)s)") % {'column_name': column.name, 'column_type': column.type})  # noqa: E501
       self.fields[name] = char_field
       self.partition_columns[name] = column.name

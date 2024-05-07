@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from future import standard_library
+
 standard_library.install_aliases()
 import os
 import pytest
@@ -86,9 +87,7 @@ def test_tricky_confparse():
   We found (experimentally) that dealing with a file
   sometimes triggered the wrong results here.
   """
-  cp_data = confparse.ConfParse(open(os.path.join(os.path.dirname(__file__),
-                                                  "test_data",
-                                                  "sample_conf.xml"), 'rb'))
+  cp_data = confparse.ConfParse(open(os.path.join(os.path.dirname(__file__), "test_data", "sample_conf.xml"), 'rb'))
   assert "org.apache.hadoop.examples.SleepJob" == cp_data["mapred.mapper.class"]
 
 
@@ -159,25 +158,28 @@ def test_non_default_cluster():
 
 def test_hdfs_ssl_validate():
   for desktop_kwargs, conf_kwargs, expected in [
-      ({'present': False}, {'present': False}, True),
-      ({'present': False}, {'data': False}, False),
-      ({'present': False}, {'data': True}, True),
-
-      ({'data': False}, {'present': False}, False),
-      ({'data': False}, {'data': False}, False),
-      ({'data': False}, {'data': True}, True),
-
-      ({'data': True}, {'present': False}, True),
-      ({'data': True}, {'data': False}, False),
-      ({'data': True}, {'data': True}, True),
-      ]:
+    ({'present': False}, {'present': False}, True),
+    ({'present': False}, {'data': False}, False),
+    ({'present': False}, {'data': True}, True),
+    ({'data': False}, {'present': False}, False),
+    ({'data': False}, {'data': False}, False),
+    ({'data': False}, {'data': True}, True),
+    ({'data': True}, {'present': False}, True),
+    ({'data': True}, {'data': False}, False),
+    ({'data': True}, {'data': True}, True),
+  ]:
     resets = [
       desktop_conf.SSL_VALIDATE.set_for_testing(**desktop_kwargs),
       conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.set_for_testing(**conf_kwargs),
     ]
 
     try:
-      assert conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get())
+      assert conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (
+        desktop_kwargs,
+        conf_kwargs,
+        expected,
+        conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get(),
+      )
     finally:
       for reset in resets:
         reset()
@@ -185,18 +187,16 @@ def test_hdfs_ssl_validate():
 
 def test_yarn_ssl_validate():
   for desktop_kwargs, conf_kwargs, expected in [
-      ({'present': False}, {'present': False}, True),
-      ({'present': False}, {'data': False}, False),
-      ({'present': False}, {'data': True}, True),
-
-      ({'data': False}, {'present': False}, False),
-      ({'data': False}, {'data': False}, False),
-      ({'data': False}, {'data': True}, True),
-
-      ({'data': True}, {'present': False}, True),
-      ({'data': True}, {'data': False}, False),
-      ({'data': True}, {'data': True}, True),
-      ]:
+    ({'present': False}, {'present': False}, True),
+    ({'present': False}, {'data': False}, False),
+    ({'present': False}, {'data': True}, True),
+    ({'data': False}, {'present': False}, False),
+    ({'data': False}, {'data': False}, False),
+    ({'data': False}, {'data': True}, True),
+    ({'data': True}, {'present': False}, True),
+    ({'data': True}, {'data': False}, False),
+    ({'data': True}, {'data': True}, True),
+  ]:
     resets = [
       conf.YARN_CLUSTERS.set_for_testing({'default': {}}),
       desktop_conf.SSL_VALIDATE.set_for_testing(**desktop_kwargs),
@@ -204,7 +204,12 @@ def test_yarn_ssl_validate():
     ]
 
     try:
-      assert conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get())
+      assert conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (
+        desktop_kwargs,
+        conf_kwargs,
+        expected,
+        conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get(),
+      )
     finally:
       for reset in resets:
         reset()

@@ -145,7 +145,18 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
                   'mapred.queue.names': CLUSTER_QUEUE_NAMES},
                  tmppath('in-conf/mapred-site.xml'))
 
-    hadoop_policy_keys = ['client', 'client.datanode', 'datanode', 'inter.datanode', 'namenode', 'inter.tracker', 'job.submission', 'task.umbilical', 'refresh.policy', 'admin.operations']
+    hadoop_policy_keys = [
+      'client',
+      'client.datanode',
+      'datanode',
+      'inter.datanode',
+      'namenode',
+      'inter.tracker',
+      'job.submission',
+      'task.umbilical',
+      'refresh.policy',
+      'admin.operations',
+    ]
     hadoop_policy_config = {}
     for policy in hadoop_policy_keys:
       hadoop_policy_config['security.' + policy + '.protocol.acl'] = '*'
@@ -271,7 +282,9 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       ["fs.defaultFS", "jobclient.completion.poll.interval",
        "dfs.namenode.checkpoint.period", "dfs.namenode.checkpoint.dir",
        'hadoop.proxyuser.' + self.superuser + '.groups', 'hadoop.proxyuser.' + self.superuser + '.hosts'])
-    write_config(self.config, tmppath("conf/hdfs-site.xml"), ["fs.defaultFS", "dfs.namenode.http-address", "dfs.namenode.secondary.http-address"])
+    write_config(
+      self.config, tmppath("conf/hdfs-site.xml"), ["fs.defaultFS", "dfs.namenode.http-address", "dfs.namenode.secondary.http-address"]
+    )
     # mapred.job.tracker isn't written out into self.config, so we fill
     # that one out more manually.
     write_config({'mapred.job.tracker': 'localhost:%d' % self.jobtracker_port},

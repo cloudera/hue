@@ -43,7 +43,8 @@ class Credentials(object):
     self.credentials = self._parse_oozie(configuration)
 
   def _parse_oozie(self, configuration_dic):
-    return dict([cred.strip().split('=') for cred in configuration_dic.get('oozie.credentials.credentialclasses', '').strip().split(',') if cred])
+    return dict(
+      [cred.strip().split('=') for cred in configuration_dic.get('oozie.credentials.credentialclasses', '').strip().split(',') if cred])
 
   @property
   def class_to_name_credentials(self):

@@ -61,7 +61,7 @@ class Command(BaseCommand):
 
   def create_analytics_table(self, api, cluster_name):
     try:
-      api.createTable(cluster_name, 'analytics_demo', [{'properties': {'name': 'hour'}}, {'properties': {'name': 'day'}}, {'properties': {'name': 'total'}}])
+      api.createTable(cluster_name, 'analytics_demo', [{'properties': {'name': 'hour'}}, {'properties': {'name': 'day'}}, {'properties': {'name': 'total'}}])  # noqa: E501
     except AlreadyExists:
       pass
 

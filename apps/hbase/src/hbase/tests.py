@@ -33,7 +33,14 @@ from useradmin.models import User
 
 from hbase.api import HbaseApi
 from hbase.conf import HBASE_CONF_DIR
-from hbase.hbase_site import get_server_authentication, get_server_principal, get_conf, reset, _CNF_HBASE_IMPERSONATION_ENABLED, is_impersonation_enabled
+from hbase.hbase_site import (
+  get_server_authentication,
+  get_server_principal,
+  get_conf,
+  reset,
+  _CNF_HBASE_IMPERSONATION_ENABLED,
+  is_impersonation_enabled,
+)
 
 
 def test_security_plain():
@@ -80,10 +87,7 @@ def test_security_kerberos():
     shutil.rmtree(tmpdir)
 
 
-def hbase_site_xml(
-    kerberos_principal='test/test.com@TEST.COM',
-    authentication='NOSASL'):
-
+def hbase_site_xml(kerberos_principal='test/test.com@TEST.COM', authentication='NOSASL'):
   return """
     <configuration>
 
@@ -141,7 +145,7 @@ def test_impersonation():
   finally:
     get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = impersonation_enabled
 
-  assert {'doAs': u'test_hbase'} == proto.get_headers()
+  assert {'doAs': 'test_hbase'} == proto.get_headers()
 
 
 class MockHttpClient(object):
@@ -170,10 +174,8 @@ class MockProtocol(object):
 
 @pytest.mark.integration
 class TestIntegrationWithHBase(TestCase):
-
   @classmethod
   def setup_class(cls):
-
     if not is_live_cluster():
       pytest.skip('These tests can only run on a live cluster')
 

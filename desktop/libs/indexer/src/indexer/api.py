@@ -191,7 +191,9 @@ def collections_import(request):
     unique_key, fields = searcher.get_fields(collection.get('name'))
 
     # Create collection and metadata.
-    hue_collection, created = Collection.objects.get_or_create(name=collection.get('name'), solr_properties='{}', is_enabled=True, user=request.user)
+    hue_collection, created = Collection.objects.get_or_create(
+      name=collection.get('name'), solr_properties='{}', is_enabled=True, user=request.user
+    )
     properties_dict = hue_collection.properties_dict
     properties_dict['data_type'] = 'separated'
     properties_dict['field_order'] = [field_name for field_name in fields]
@@ -243,7 +245,9 @@ def collections_fields(request, collection):
   unique_key, fields = searcher.get_fields(collection)
 
   response['status'] = 0
-  response['fields'] = [(field, fields[field]['type'], fields[field].get('indexed', None), fields[field].get('stored', None)) for field in fields]
+  response['fields'] = [
+    (field, fields[field]['type'], fields[field].get('indexed', None), fields[field].get('stored', None)) for field in fields
+  ]
   response['unique_key'] = unique_key
 
   return JsonResponse(response)

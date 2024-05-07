@@ -131,8 +131,10 @@ tier1.sinks.sink1.channel       = channel1'''
 
   responses = {}
 
-  responses['agent_config_file'] = api.update_flume_config(cluster_name=None, config_name='agent_config_file', config_value=flume_agent_config)
-  responses['agent_morphlines_conf_file'] = api.update_flume_config(cluster_name=None, config_name='agent_morphlines_conf_file', config_value=morphline_config)
+  responses['agent_config_file'] = api.update_flume_config(
+    cluster_name=None, config_name='agent_config_file', config_value=flume_agent_config)
+  responses['agent_morphlines_conf_file'] = api.update_flume_config(
+    cluster_name=None, config_name='agent_morphlines_conf_file', config_value=morphline_config)
 
   responses['refresh_flume'] = api.refresh_flume(cluster_name=None, restart=True)
 

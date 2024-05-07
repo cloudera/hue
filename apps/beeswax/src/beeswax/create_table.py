@@ -156,7 +156,7 @@ def import_wizard(request, database='default'):
       cancel_s3_column_def = request.POST.get('cancel_create')  # Step 3 -> 2
 
       # Exactly one of these should be True
-      if len([_f for _f in (do_s2_auto_delim, do_s2_user_delim, do_s3_column_def, do_hive_create, cancel_s2_user_delim, cancel_s3_column_def) if _f]) != 1:
+      if len([_f for _f in (do_s2_auto_delim, do_s2_user_delim, do_s3_column_def, do_hive_create, cancel_s2_user_delim, cancel_s3_column_def) if _f]) != 1:  # noqa: E501
         raise PopupException(_('Invalid form submission'))
 
       if not do_s2_auto_delim:
@@ -190,7 +190,8 @@ def import_wizard(request, database='default'):
           raise PopupException(_('Path location "%s" is invalid: %s') % (path, e))
 
         delim_is_auto = True
-        fields_list, n_cols, s2_delim_form = _delim_preview(request.fs, s1_file_form, encoding, [reader.TYPE for reader in FILE_READERS], DELIMITERS)
+        fields_list, n_cols, s2_delim_form = _delim_preview(
+          request.fs, s1_file_form, encoding, [reader.TYPE for reader in FILE_READERS], DELIMITERS)
 
       if (do_s2_user_delim or do_s3_column_def or cancel_s3_column_def) and s2_delim_form.is_valid():
         # Delimit based on input
@@ -243,7 +244,8 @@ def import_wizard(request, database='default'):
             'databases': databases
           })
         except Exception as e:
-          raise PopupException(_("The selected delimiter is creating an un-even number of columns. Please make sure you don't have empty columns."), detail=e)
+          raise PopupException(_(
+            "The selected delimiter is creating an un-even number of columns. Please make sure you don't have empty columns."), detail=e)
 
       #
       # Final: Execute

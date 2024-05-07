@@ -65,7 +65,8 @@ def get_organization(email, is_multi_user=False):
       organization, created = Organization.objects.get_or_create(name=domain, domain=domain, is_multi_user=is_multi_user)
       LOG.info("Materializing organization %s in the database, is_multi_user=%s" % (domain, is_multi_user))
     else:
-      LOG.warning('No organization domain found for email %s' % email)  # For Backends without emails or when organization enabled by default
+      # For Backends without emails or when organization enabled by default
+      LOG.warning('No organization domain found for email %s' % email)
       organization = None
 
   return organization

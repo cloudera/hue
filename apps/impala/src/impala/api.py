@@ -148,12 +148,26 @@ def alanize(request):
 
     heatmap = {}
     summary = analyzer.summary(profile)
-    heatmapMetrics = ['AverageThreadTokens', 'BloomFilterBytes', 'PeakMemoryUsage', 'PerHostPeakMemUsage', 'PrepareTime', 'RowsProduced', 'TotalCpuTime', 'TotalNetworkReceiveTime', 'TotalNetworkSendTime', 'TotalStorageWaitTime', 'TotalTime']
+    heatmapMetrics = [
+      'AverageThreadTokens',
+      'BloomFilterBytes',
+      'PeakMemoryUsage',
+      'PerHostPeakMemUsage',
+      'PrepareTime',
+      'RowsProduced',
+      'TotalCpuTime',
+      'TotalNetworkReceiveTime',
+      'TotalNetworkSendTime',
+      'TotalStorageWaitTime',
+      'TotalTime',
+    ]
     for key in heatmapMetrics:
       metrics = analyzer.heatmap_by_host(profile, key)
       if metrics['data']:
         heatmap[key] = metrics
-    response['data'] = {'query': {'healthChecks': result[0]['result'], 'summary': summary, 'heatmap': heatmap, 'heatmapMetrics': sorted(list(heatmap.keys()))}}
+    response['data'] = {
+      'query': {'healthChecks': result[0]['result'], 'summary': summary, 'heatmap': heatmap, 'heatmapMetrics': sorted(list(heatmap.keys()))}
+    }
     response['status'] = 0
   return JsonResponse(response)
 

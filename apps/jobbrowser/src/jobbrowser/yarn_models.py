@@ -628,7 +628,8 @@ class Attempt(object):
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
-      if self.type == 'Oozie Launcher' and not self.task.job.status == 'FINISHED':  # Yarn currently dumps with 500 error with doas in running state
+      # Yarn currently dumps with 500 error with doas in running state
+      if self.type == 'Oozie Launcher' and not self.task.job.status == 'FINISHED':
         params = {}
       else:
         params = {

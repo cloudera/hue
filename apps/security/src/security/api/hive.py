@@ -91,7 +91,10 @@ def list_sentry_privileges_by_role(request):
   try:
     roleName = request.POST.get('roleName')
     sentry_privileges = get_api(request.user).list_sentry_privileges_by_role(roleName)
-    result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '%s.%s.%s.%s' % (privilege['server'], privilege['database'], privilege['table'], privilege['URI']))
+    result['sentry_privileges'] = sorted(
+      sentry_privileges,
+      key=lambda privilege: '%s.%s.%s.%s' % (privilege['server'], privilege['database'], privilege['table'], privilege['URI']),
+    )
     result['message'] = ''
     result['status'] = 0
   except Exception as e:
@@ -420,7 +423,9 @@ def list_sentry_privileges_for_provider(request):
     roleSet = json.loads(request.POST.get('roleSet'))
     authorizableHierarchy = json.loads(request.POST.get('authorizableHierarchy'))
 
-    sentry_privileges = get_api(request.user).list_sentry_privileges_for_provider(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
+    sentry_privileges = get_api(request.user).list_sentry_privileges_for_provider(
+      groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy
+    )
     result['sentry_privileges'] = sentry_privileges
     result['message'] = ''
     result['status'] = 0

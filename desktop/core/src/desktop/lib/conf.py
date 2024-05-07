@@ -193,7 +193,9 @@ class BoundConfig(object):
     self.config.print_help(*args, **kwargs)
 
   def __repr__(self):
-    return repr("%s(config=%s, bind_to=%s, grab_key=%s)" % (str(self.__class__), repr(self.config), repr(self.bind_to), repr(self.grab_key)))
+    return repr(
+      "%s(config=%s, bind_to=%s, grab_key=%s)" % (str(self.__class__), repr(self.config), repr(self.bind_to), repr(self.grab_key))
+    )
 
 
 class Config(object):
@@ -722,7 +724,12 @@ def validate_thrift_transport(confvar):
   Returns [(confvar, error_msg)] or []
   """
   transport = confvar.get()
-  error_res = [(confvar, 'Thrift transport %s not supported. Please choose a supported transport: %s' % (transport, ', '.join(SUPPORTED_THRIFT_TRANSPORTS)))]
+  error_res = [
+    (
+      confvar,
+      'Thrift transport %s not supported. Please choose a supported transport: %s' % (transport, ', '.join(SUPPORTED_THRIFT_TRANSPORTS)),
+    )
+  ]
 
   if transport not in SUPPORTED_THRIFT_TRANSPORTS:
     return error_res

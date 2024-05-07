@@ -36,7 +36,9 @@ class Command(BaseCommand):
   def add_arguments(self, parser):
     parser.add_argument('user', type=str)
 
-    parser.add_argument("--dn", help=_t("Whether or not the user should be imported by distinguished name."), action="store_true", default=False)
+    parser.add_argument(
+      "--dn", help=_t("Whether or not the user should be imported by distinguished name."), action="store_true", default=False
+    )
     parser.add_argument("--sync-groups", help=_t("Sync groups of the users."), action="store_true", default=False)
     parser.add_argument("--server", help=_t("Server to connect to."), action="store", default=None)
 

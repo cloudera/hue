@@ -49,7 +49,9 @@ def get_jobs(request):
     'jobs': []
   }
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
+    c = client.SqoopClient(
+      conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get()
+    )
     jobs = c.get_jobs()
     response['jobs'] = list_to_dict(jobs)
   except RestException as e:
@@ -69,13 +71,17 @@ def create_job(request):
   }
 
   if 'job' not in request.POST:
-    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving job'), data={'errors': 'job is missing.'}, error_code=400)
+    raise StructuredException(
+      code="INVALID_REQUEST_ERROR", message=_('Error saving job'), data={'errors': 'job is missing.'}, error_code=400
+    )
 
   d = json.loads(smart_str(request.POST.get('job')))
   job = client.Job.from_dict(d)
 
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
+    c = client.SqoopClient(
+      conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get()
+    )
     response['job'] = c.create_job(job).to_dict()
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not create job.')))
@@ -97,12 +103,16 @@ def update_job(request, job):
   }
 
   if 'job' not in request.POST:
-    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving job'), data={'errors': 'job is missing.'}, error_code=400)
+    raise StructuredException(
+      code="INVALID_REQUEST_ERROR", message=_('Error saving job'), data={'errors': 'job is missing.'}, error_code=400
+    )
 
   job.update_from_dict(json.loads(smart_str(request.POST.get('job'))))
 
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
+    c = client.SqoopClient(
+      conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get()
+    )
     response['job'] = c.update_job(job).to_dict()
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not update job.')))
@@ -154,7 +164,9 @@ def job_clone(request, job):
   job.id = -1
   job.name = '%s-copy' % job.name
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
+    c = client.SqoopClient(
+      conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get()
+    )
     response['job'] = c.create_job(job).to_dict()
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not clone job.')))
@@ -177,7 +189,9 @@ def job_delete(request, job):
   }
 
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
+    c = client.SqoopClient(
+      conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get()
+    )
     c.delete_job(job)
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not delete job.')))
@@ -200,7 +214,9 @@ def job_start(request, job):
   }
 
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
+    c = client.SqoopClient(
+      conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get()
+    )
     response['submission'] = c.start_job(job).to_dict()
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not start job.')))
@@ -223,7 +239,9 @@ def job_stop(request, job):
   }
 
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
+    c = client.SqoopClient(
+      conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get()
+    )
     response['submission'] = c.stop_job(job).to_dict()
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not stop job.')))
@@ -246,7 +264,9 @@ def job_status(request, job):
   }
 
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
+    c = client.SqoopClient(
+      conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get()
+    )
     response['submission'] = c.get_job_status(job).to_dict()
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not get job status.')))

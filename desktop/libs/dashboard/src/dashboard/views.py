@@ -56,16 +56,16 @@ DEFAULT_LAYOUT = [
 ]
 
 REPORT_LAYOUT = [
-  {u'klass': u'card card-home card-column span12', u'rows': [{"widgets": []}], u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12}
+  {u'klass': u'card card-home card-column span12', u'rows': [{"widgets": []}], u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12}  # noqa: E501
 ]
 
 QUERY_BUILDER_LAYOUT = [
   {u'klass': u'card card-home card-column span12', u'rows': [
     {u'widgets': [
-        {u'name': u'Filter Bar', u'widgetType': u'filter-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'abe50df3-a5a0-408a-8122-019d779b4354', u'size': 12}],
+        {u'name': u'Filter Bar', u'widgetType': u'filter-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'abe50df3-a5a0-408a-8122-019d779b4354', u'size': 12}],  # noqa: E501
      u'id': u'22532a0a-8e43-603a-daa9-77d5d233fd7f', u'columns': []},
         {u'widgets': [], u'id': u'ebb7fe4d-64c5-c660-bdc0-02a77ff8321e', u'columns': []},
-        {u'widgets': [{u'name': u'Grid Results', u'widgetType': u'resultset-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'14023aef-b233-9420-96c6-15d48293532b', u'size': 12}],
+        {u'widgets': [{u'name': u'Grid Results', u'widgetType': u'resultset-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'14023aef-b233-9420-96c6-15d48293532b', u'size': 12}],  # noqa: E501
     u'id': u'2bfa8b4b-f7f3-1491-4de0-282130c6ab61', u'columns': []}
     ],
     u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12
@@ -252,8 +252,12 @@ def save(request):
     if collection['id']:
       dashboard_doc = Document2.objects.get(id=collection['id'])
     else:
-      dashboard_doc = Document2.objects.create(name=collection['name'], uuid=collection['uuid'], type='search-dashboard', owner=request.user, description=collection['label'])
-      Document.objects.link(dashboard_doc, owner=request.user, name=collection['name'], description=collection['label'], extra='search-dashboard')
+      dashboard_doc = Document2.objects.create(
+        name=collection['name'], uuid=collection['uuid'], type='search-dashboard', owner=request.user, description=collection['label']
+      )
+      Document.objects.link(
+        dashboard_doc, owner=request.user, name=collection['name'], description=collection['label'], extra='search-dashboard'
+      )
 
     dashboard_doc.update_data({
         'collection': collection,

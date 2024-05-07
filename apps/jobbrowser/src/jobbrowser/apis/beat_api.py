@@ -90,7 +90,11 @@ class BeatApi(Api):
       except Exception:
         LOG.exception('Could not stop job %s' % app_id)
 
-    return {'kills': operations, 'status': len(app_ids) - len(operations), 'message': _('%s signal sent to %s') % (operation['action'], operations)}
+    return {
+      'kills': operations,
+      'status': len(app_ids) - len(operations),
+      'message': _('%s signal sent to %s') % (operation['action'], operations),
+    }
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}

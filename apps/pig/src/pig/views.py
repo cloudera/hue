@@ -233,8 +233,14 @@ def watch(request, job_id):
     'progress': oozie_workflow.get_progress(),
     'isRunning': oozie_workflow.is_running(),
     'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id': oozie_workflow.id, 'action': 'kill'}),
-    'rerunUrl': reverse('oozie:rerun_oozie_job', kwargs={'job_id': oozie_workflow.id, 'app_path': urllib.parse.quote(oozie_workflow.appPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)}),
-    'actions': workflow_actions
+    'rerunUrl': reverse(
+      'oozie:rerun_oozie_job',
+      kwargs={
+        'job_id': oozie_workflow.id,
+        'app_path': urllib.parse.quote(oozie_workflow.appPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
+      },
+    ),
+    'actions': workflow_actions,
   }
 
   response = {

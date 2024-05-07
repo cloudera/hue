@@ -46,7 +46,7 @@ class BeeswaxQueryApi(Api):
   def apps(self, filters):
     filter_map = self._get_filter_map(filters)
     limit = filters.get('pagination', {'limit': 25}).get('limit')
-    jobs = query_history.get_query_history(request_user=filter_map.get('effective_user'), start_date=filter_map.get('date'), start_time=filter_map.get('time'), query_id=filter_map.get('query_id'), status=filter_map.get('status'), limit=limit)
+    jobs = query_history.get_query_history(request_user=filter_map.get('effective_user'), start_date=filter_map.get('date'), start_time=filter_map.get('time'), query_id=filter_map.get('query_id'), status=filter_map.get('status'), limit=limit)  # noqa: E501
 
     current_time = current_ms_from_utc()
     apps = {

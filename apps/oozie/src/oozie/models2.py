@@ -843,8 +843,10 @@ class Node(object):
     if self.data['type'] == 'fork':
       links = [link for link in self.data['children'] if link['to'] in node_mapping]
       if len(links) != len(self.data['children']):
-        LOG.warning('Fork has some children links that do not exist, ignoring them: links %s, existing links %s, links %s, existing links %s'
-                 % (len(links), len(self.data['children']), links, self.data['children']))
+        LOG.warning(
+          'Fork has some children links that do not exist, ignoring them: links %s, existing links %s, links %s, existing links %s'
+          % (len(links), len(self.data['children']), links, self.data['children'])
+        )
         self.data['children'] = links
 
     if self.data['type'] == AltusAction.TYPE or (('altus' in mapping.get('cluster', '') and (self.data['type'] == SparkDocumentAction.TYPE

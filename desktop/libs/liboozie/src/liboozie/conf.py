@@ -128,9 +128,16 @@ def config_validator(user):
     api = get_oozie(user, api_version="v2")
 
     configuration = api.get_configuration()
-    if 'org.apache.oozie.service.MetricsInstrumentationService' in [c.strip() for c in configuration.get('oozie.services.ext', '').split(',')]:
+    if 'org.apache.oozie.service.MetricsInstrumentationService' in [
+      c.strip() for c in configuration.get('oozie.services.ext', '').split(',')
+    ]:
       metrics = api.get_metrics()
-      sharelib_url = 'gauges' in metrics and 'libs.sharelib.system.libpath' in metrics['gauges'] and [metrics['gauges']['libs.sharelib.system.libpath']['value']] or []
+      sharelib_url = (
+        'gauges' in metrics
+        and 'libs.sharelib.system.libpath' in metrics['gauges']
+        and [metrics['gauges']['libs.sharelib.system.libpath']['value']]
+        or []
+      )
     else:
       intrumentation = api.get_instrumentation()
       sharelib_url = [

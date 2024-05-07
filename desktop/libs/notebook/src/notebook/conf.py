@@ -467,7 +467,7 @@ def _excute_test_query(client, connector_id, interpreter=None):
       "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"%(connector_id)s","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
       "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
   }
-  """ % {
+  """ % {  # noqa: E501
     'connector_id': connector_id,
   }
   snippet = json.loads(notebook_json)['snippets'][0]

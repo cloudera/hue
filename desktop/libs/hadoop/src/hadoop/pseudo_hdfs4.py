@@ -557,13 +557,29 @@ def shared_cluster():
       closers = [
         hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
         hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
-
         hadoop.conf.YARN_CLUSTERS['default'].HOST.set_for_testing(fqdn),
         hadoop.conf.YARN_CLUSTERS['default'].PORT.set_for_testing(cluster._rm_port),
-
-        hadoop.conf.YARN_CLUSTERS['default'].RESOURCE_MANAGER_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
-        hadoop.conf.YARN_CLUSTERS['default'].PROXY_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
-        hadoop.conf.YARN_CLUSTERS['default'].HISTORY_SERVER_API_URL.set_for_testing('%s:%s' % (cluster._fqdn, cluster._jh_web_port,)),
+        hadoop.conf.YARN_CLUSTERS['default'].RESOURCE_MANAGER_API_URL.set_for_testing(
+          'http://%s:%s'
+          % (
+            cluster._fqdn,
+            cluster._rm_webapp_port,
+          )
+        ),
+        hadoop.conf.YARN_CLUSTERS['default'].PROXY_API_URL.set_for_testing(
+          'http://%s:%s'
+          % (
+            cluster._fqdn,
+            cluster._rm_webapp_port,
+          )
+        ),
+        hadoop.conf.YARN_CLUSTERS['default'].HISTORY_SERVER_API_URL.set_for_testing(
+          '%s:%s'
+          % (
+            cluster._fqdn,
+            cluster._jh_web_port,
+          )
+        ),
       ]
 
       old_caches = clear_sys_caches()

@@ -41,6 +41,14 @@ ignore = [
     "E731"
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"desktop/libs/notebook/src/notebook/connectors/altus.py" = ["E501"]
+"desktop/libs/notebook/src/notebook/connectors/altus_adb.py" = ["E501"]
+"desktop/libs/metadata/src/metadata/catalog/dummy_client.py" = ["E501"]
+"desktop/libs/liboozie/src/liboozie/submission2.py" = ["E501"]
+"desktop/libs/libanalyze/src/libanalyze/rules.py" = ["E501"]
+"apps/hbase/src/hbase/api.py" = ["E501"]
+
 [tool.ruff.format]
 docstring-code-format = true
 docstring-code-line-length = 140

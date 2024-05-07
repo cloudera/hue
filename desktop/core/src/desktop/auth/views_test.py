@@ -44,12 +44,7 @@ from unittest.mock import patch, Mock, MagicMock
 
 
 def get_mocked_config():
-  return {
-    'mocked_ldap': {
-      'users': {},
-      'groups': {}
-    }
-  }
+  return {'mocked_ldap': {'users': {}, 'groups': {}}}
 
 
 @pytest.mark.django_db
@@ -120,10 +115,14 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     assert not cluster.fs.exists("/user/%s" % self.test_username)
     fs.do_as_superuser(fs.create, "/user/%s" % self.test_username)
 
-    response = self.c.post('/hue/accounts/login/', {
+    response = self.c.post(
+      '/hue/accounts/login/',
+      {
         'username': self.test_username,
         'password': "test-hue-foo2",
-      }, follow=True)
+      },
+      follow=True,
+    )
 
     assert 200 == response.status_code, "Expected ok status."
     assert '/about' in response.content, response.content
@@ -131,10 +130,14 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     # 'Could not create home directory.' won't show up because the messages are consumed before
 
   def test_login_expiration(self):
-    response = self.c.post('/hue/accounts/login/', {
+    response = self.c.post(
+      '/hue/accounts/login/',
+      {
         'username': self.test_username,
         'password': "test-hue-foo2",
-      }, follow=True)
+      },
+      follow=True,
+    )
     assert 200 == response.status_code, "Expected ok status."
 
     self.reset.append(conf.AUTH.EXPIRES_AFTER.set_for_testing(10000))
@@ -145,10 +148,14 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     # Deactivate user
     old_settings = settings.ADMINS
     settings.ADMINS = []
-    response = self.c.post('/hue/accounts/login/', {
+    response = self.c.post(
+      '/hue/accounts/login/',
+      {
         'username': self.test_username,
         'password': "test-hue-foo2",
-      }, follow=True)
+      },
+      follow=True,
+    )
     assert 200 == response.status_code, "Expected ok status."
     assert "Account deactivated. Please contact an administrator." in response.content, response.content
     settings.ADMINS = old_settings
@@ -163,7 +170,6 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
 
 @pytest.mark.django_db
 class TestLdapLogin(PseudoHdfsTestBase):
-
   reset = []
   test_username = 'test_ldap_login'
 
@@ -215,11 +221,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     assert 200 == response.status_code, "Expected ok status."
     assert not response.context[0]['first_login_ever']
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username,
-        'password': "ldap1",
-        'server': "LDAP"
-    })
+    response = self.c.post('/hue/accounts/login/', {'username': self.test_username, 'password': "ldap1", 'server': "LDAP"})
 
     assert 302 == response.status_code, "Expected ok redirect status."
     assert response.url == "/"
@@ -287,11 +289,9 @@ class TestLdapLogin(PseudoHdfsTestBase):
     assert not self.cluster.fs.do_as_user(self.test_username, cluster.fs.exists, "/user/%s" % self.test_username)
     fs.do_as_superuser(fs.create, "/user/%s" % self.test_username)
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username,
-        'password': "test-hue-ldap2",
-        'server': "LDAP"
-    }, follow=True)
+    response = self.c.post(
+      '/hue/accounts/login/', {'username': self.test_username, 'password': "test-hue-ldap2", 'server': "LDAP"}, follow=True
+    )
     assert 200 == response.status_code, "Expected ok status."
     assert '/about' in response.content, response.content
     # Custom login process should not do 'http-equiv="refresh"' but call the correct view
@@ -300,22 +300,14 @@ class TestLdapLogin(PseudoHdfsTestBase):
   def test_login_ignore_case(self):
     self.reset.append(conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username.upper(),
-        'password': "ldap1",
-        'server': "LDAP"
-    })
+    response = self.c.post('/hue/accounts/login/', {'username': self.test_username.upper(), 'password': "ldap1", 'server': "LDAP"})
     assert 302 == response.status_code, "Expected ok redirect status."
     assert 1 == len(User.objects.all())
     assert self.test_username == User.objects.all()[0].username
 
     self.c.logout()
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username,
-        'password': "ldap1",
-        'server': "LDAP"
-    })
+    response = self.c.post('/hue/accounts/login/', {'username': self.test_username, 'password': "ldap1", 'server': "LDAP"})
     assert 302 == response.status_code, "Expected ok redirect status."
     assert 1 == len(User.objects.all())
     assert self.test_username == User.objects.all()[0].username
@@ -323,21 +315,13 @@ class TestLdapLogin(PseudoHdfsTestBase):
   def test_login_force_lower_case(self):
     self.reset.append(conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username.upper(),
-        'password': "ldap1",
-        'server': "LDAP"
-    })
+    response = self.c.post('/hue/accounts/login/', {'username': self.test_username.upper(), 'password': "ldap1", 'server': "LDAP"})
     assert 302 == response.status_code, "Expected ok redirect status."
     assert 1 == len(User.objects.all())
 
     self.c.logout()
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username,
-        'password': "ldap1",
-        'server': "LDAP"
-    })
+    response = self.c.post('/hue/accounts/login/', {'username': self.test_username, 'password': "ldap1", 'server': "LDAP"})
     assert 302 == response.status_code, "Expected ok redirect status."
     assert 1 == len(User.objects.all())
     assert self.test_username == User.objects.all()[0].username
@@ -346,22 +330,14 @@ class TestLdapLogin(PseudoHdfsTestBase):
     self.reset.append(conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
     self.reset.append(conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username.upper(),
-        'password': "ldap1",
-        'server': "LDAP"
-    })
+    response = self.c.post('/hue/accounts/login/', {'username': self.test_username.upper(), 'password': "ldap1", 'server': "LDAP"})
     assert 302 == response.status_code, "Expected ok redirect status."
     assert 1 == len(User.objects.all())
     assert self.test_username == User.objects.all()[0].username
 
     self.c.logout()
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username,
-        'password': "ldap1",
-        'server': "LDAP"
-    })
+    response = self.c.post('/hue/accounts/login/', {'username': self.test_username, 'password': "ldap1", 'server': "LDAP"})
     assert 302 == response.status_code, "Expected ok redirect status."
     assert 1 == len(User.objects.all())
     assert self.test_username == User.objects.all()[0].username
@@ -370,14 +346,19 @@ class TestLdapLogin(PseudoHdfsTestBase):
     self.reset.append(conf.LDAP.SYNC_GROUPS_ON_LOGIN.set_for_testing(True))
     ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
     # Make sure LDAP groups exist or they won't sync
-    import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
-    import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+    import_ldap_groups(
+      ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False
+    )
+    import_ldap_groups(
+      ldap_access.CACHED_LDAP_CONN,
+      'Test Administrators',
+      import_members=False,
+      import_members_recursive=False,
+      sync_users=False,
+      import_by_dn=False,
+    )
 
-    response = self.c.post('/hue/accounts/login/', {
-      'username': "curly",
-      'password': "ldap1",
-      'server': "TestUsers"
-    })
+    response = self.c.post('/hue/accounts/login/', {'username': "curly", 'password': "ldap1", 'server': "TestUsers"})
     assert 302 == response.status_code, response.status_code
     assert 1 == len(User.objects.all())
     # The two curly are a part of in LDAP and the default group.
@@ -386,7 +367,6 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
 @pytest.mark.django_db
 class TestRemoteUserLogin(PseudoHdfsTestBase):
-
   reset = []
   test_username = "test_remote_user_login"
 
@@ -539,7 +519,9 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
 
   def setup_method(self):
     self.c = Client()
-    self.reset.append(conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.LdapBackend', 'desktop.auth.backend.AllowFirstUserDjangoBackend']))
+    self.reset.append(
+      conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.LdapBackend', 'desktop.auth.backend.AllowFirstUserDjangoBackend'])
+    )
     self.reset.append(conf.LDAP.LDAP_URL.set_for_testing('does not matter'))
 
   def teardown_method(self):
@@ -554,11 +536,7 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
   def test_login_with_ldap(self):
     ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
 
-    response = self.c.post('/hue/accounts/login/', {
-      'username': "curly",
-      'password': "ldap1",
-      'server': "LDAP"
-    })
+    response = self.c.post('/hue/accounts/login/', {'username': "curly", 'password': "ldap1", 'server': "LDAP"})
     assert 302 == response.status_code, response.status_code
     assert 1 == len(User.objects.all())
 
@@ -589,7 +567,7 @@ class TestMultipleBackendLoginNoHadoop(TestCase):
 
     # Override auth backend, settings are only loaded from conf at initialization so we can't use set_for_testing
     cls.auth_backends = settings.AUTHENTICATION_BACKENDS
-    settings.AUTHENTICATION_BACKENDS = (['desktop.auth.backend.LdapBackend', 'desktop.auth.backend.AllowFirstUserDjangoBackend'])
+    settings.AUTHENTICATION_BACKENDS = ['desktop.auth.backend.LdapBackend', 'desktop.auth.backend.AllowFirstUserDjangoBackend']
 
     # Need to recreate LdapBackend class with new monkey patched base class
     reload(backend)
@@ -620,30 +598,22 @@ class TestMultipleBackendLoginNoHadoop(TestCase):
     assert 200 == response.status_code, "Expected ok status."
     assert response.context[0]['first_login_ever']
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username,
-        'password': "ldap1",
-        'password1': "ldap1",
-        'password2': "ldap1",
-        'server': "Local"
-    })
+    response = self.c.post(
+      '/hue/accounts/login/',
+      {'username': self.test_username, 'password': "ldap1", 'password1': "ldap1", 'password2': "ldap1", 'server': "Local"},
+    )
     assert 302 == response.status_code, "Expected ok redirect status."
     assert response.url == "/"
 
     self.c.get('/accounts/logout')
 
-    response = self.c.post('/hue/accounts/login/', {
-        'username': self.test_username,
-        'password': "ldap1",
-        'server': "LDAP"
-    })
+    response = self.c.post('/hue/accounts/login/', {'username': self.test_username, 'password': "ldap1", 'server': "LDAP"})
     assert 302 == response.status_code, "Expected ok redirect status."
     assert response.url == "/"
 
 
 @pytest.mark.django_db
 class TestLogin(PseudoHdfsTestBase):
-
   reset = []
   test_username = "test_login"
 
@@ -697,7 +667,7 @@ class TestLogin(PseudoHdfsTestBase):
     assert any([template in _template.filename for _template in response.templates]), response.content  # Go to superuser wizard
 
   def test_login_expiration(self):
-    """ Expiration test without superusers """
+    """Expiration test without superusers"""
     old_settings = settings.ADMINS
     self.reset.append(conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"]))
     self.reset.append(conf.AUTH.EXPIRES_AFTER.set_for_testing(0))
@@ -733,7 +703,7 @@ class TestLogin(PseudoHdfsTestBase):
       settings.ADMINS = old_settings
 
   def test_login_expiration_with_superusers(self):
-    """ Expiration test with superusers """
+    """Expiration test with superusers"""
     self.reset.append(conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"]))
     self.reset.append(conf.AUTH.EXPIRES_AFTER.set_for_testing(0))
     self.reset.append(conf.AUTH.EXPIRE_SUPERUSERS.set_for_testing(True))
@@ -784,9 +754,7 @@ class TestLogin(TestCase):
   def setup_method(self, method):
     self.c = Client()
 
-    self.reset.append(
-      conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend'])
-    )
+    self.reset.append(conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend']))
 
   def teardown_method(self, method):
     for finish in self.reset:
@@ -797,9 +765,7 @@ class TestLogin(TestCase):
       Group.objects.filter(name=self.test_username).delete()
 
   def test_login_does_not_reset_groups(self):
-    self.reset.append(
-      conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"])
-    )
+    self.reset.append(conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"]))
 
     client = make_logged_in_client(username=self.test_username, password="test")
     client.get('/accounts/logout')
@@ -825,9 +791,7 @@ class TestLogin(TestCase):
     assert 'desktop.auth.backend.AllowFirstUserDjangoBackend' == existing_profile.data['auth_backend']
 
   def test_login_long_username(self):
-    self.reset.append(
-      conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"])
-    )
+    self.reset.append(conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"]))
 
     c = Client()
 
@@ -877,7 +841,9 @@ class TestImpersonationBackend(TestCase):
     user = User.objects.get(username=self.test_username)
     group, created = Group.objects.get_or_create(name=self.test_username)
 
-    response = self.client.post('/hue/accounts/login/', dict(username=self.test_username, password="test", login_as=self.test_login_as_username), follow=True)
+    response = self.client.post(
+      '/hue/accounts/login/', dict(username=self.test_username, password="test", login_as=self.test_login_as_username), follow=True
+    )
     assert 200 == response.status_code
     assert self.test_login_as_username == response.context[0]['user'].username
 
