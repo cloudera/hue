@@ -245,7 +245,7 @@ const fetchColumnsData = async (databaseName: string, tableName: string, executo
   const type = dbEntry.definition?.type;
   const comment = dbEntry.definition?.comment;
 
-  const foreignKeys = dbEntry.sourceMeta?.foreign_keys?.map(keyDetails => {
+  const foreignKeys = dbEntry.sourceMeta?.foreign_keys.map(keyDetails => {
     const toParts = keyDetails.to.split('.');
     return {
       fromColumn: keyDetails.name,
@@ -280,17 +280,7 @@ export const getRelevantTableDetails = async (
   const relevantTables = [];
   for (const tableName of tableNames) {
     try {
-      const columns = await fetchColumnsData(databaseName, tableName, executor);
-      const tableDetails = {
-        dbName: databaseName,
-        name: tableName,
-        columns: columns
-          .map(({ definition }) => {
-            return definition as ExtendedColumn;
-          })
-          .filter(def => def !== undefined),
-        partitions: columns.partitions
-      };
+      const tableDetails = await fetchTableDetails(databaseName, tableName, executor);
       relevantTables.push(tableDetails);
     } catch (error) {
       console.error(`Could not fetch columns data for table: ${tableName}`, error);
