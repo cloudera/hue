@@ -63,7 +63,8 @@ def _get_service() -> BaseService:
 def build_create_table_ddl(table: dict) -> str:
   table_name = table["name"]
 
-  formatted_columns = []
+  details = []
+
   for col in table["columns"]:
     column_str = f'{col["name"]} {col["type"]}'
     if col.get("comment"):
@@ -72,10 +73,19 @@ def build_create_table_ddl(table: dict) -> str:
       column_str += ' PRIMARY KEY'
     if col.get("partitionKey"):
       column_str += ' PARTITIONED BY'
-    formatted_columns.append(column_str)
-  column_names = ', '.join(formatted_columns)
+    details.append(column_str)
 
-  return f'CREATE TABLE {table_name} ({column_names});'
+  for key in table.get("foreignKeys", []):
+    details.append(f"FOREIGN KEY ({key['fromColumn']}) REFERENCES {key['toTable']} ({key['toColumn']})")
+
+  details_str = ', '.join(details)
+  ddl = f'CREATE TABLE {table_name} ({details_str})'
+
+  table_comment = table.get("comment")
+  if table_comment != None:
+    ddl = f"{ddl} COMMENT '{table_comment}'"
+
+  return ddl + ';'
 
 def get_val_str(value) -> str:
   value = str(value).strip()
