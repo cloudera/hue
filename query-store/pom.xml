@@ -39,6 +39,7 @@
     <pg-embedded.version>0.7.1</pg-embedded.version>
     <jetty.version>9.4.54.v20240208</jetty.version>
     <impala-profile-extractor.version>7.6.0</impala-profile-extractor.version>
+    <commons.lang3.version>3.8.1</commons.lang3.version>
   </properties>
 
   <modules>
