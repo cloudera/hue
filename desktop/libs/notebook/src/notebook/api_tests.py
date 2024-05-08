@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -45,10 +45,7 @@ from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 @pytest.mark.django_db
@@ -95,7 +92,6 @@ class TestApi(object):
     self.doc1 = Document.objects.link(
       self.doc2, owner=self.user, name=self.doc2.name, description=self.doc2.description, extra=self.doc2.type
     )
-
 
   def test_save_notebook(self):
     # Test that saving a new document with a new parent will set the parent_directory
@@ -215,7 +211,6 @@ class TestApi(object):
     doc = Document2.objects.get(pk=data['id'])
     assert 'query-mysql' == doc.type
 
-
   def test_save_notebook_with_connector_on(self):
     if not ENABLE_CONNECTORS.get():
       pytest.skip("Skipping Test")
@@ -245,7 +240,6 @@ class TestApi(object):
     doc = Document2.objects.get(pk=data['id'])
     assert 'query-mysql' == doc.type
 
-
   def test_historify(self):
     # Starts with no history
     assert 0 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
@@ -264,7 +258,6 @@ class TestApi(object):
 
     assert 2 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
     assert 3 == Document.objects.filter(name__contains=self.notebook['name']).count()
-
 
   def test_get_history(self):
     assert 0 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
@@ -285,7 +278,6 @@ class TestApi(object):
 
     # TODO: test that query history for shared query only returns docs accessible by current user
 
-
   def test_clear_history(self):
     assert 0 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
     _historify(self.notebook, self.user)
@@ -303,7 +295,6 @@ class TestApi(object):
     assert not Document2.objects.filter(type='query-hive', is_history=True).exists()
     assert Document2.objects.filter(type='query-hive', is_history=False).exists()
     assert Document2.objects.filter(type='query-impala', is_history=True).exists()
-
 
   def test_delete_notebook(self):
     trash_notebook_json = """
@@ -381,7 +372,6 @@ class TestApi(object):
     assert 'Trashed 0 notebook(s) and failed to delete 1 notebook(s).' == data['message'], data
     assert ['ea22da5f-b69c-4843-b17d-dea5c74c41d1'] == data['errors']
 
-
   def test_query_error_encoding(self):
     @api_error_handler
     def send_exception(message):
@@ -411,7 +401,6 @@ FROM déclenché c, c.addresses a"""
     data = json.loads(response.content)
     assert 1 == data['status']
 
-
   def test_notebook_autocomplete(self):
 
     with patch('notebook.api.get_api') as get_api:
@@ -430,7 +419,6 @@ FROM déclenché c, c.addresses a"""
 
       data = json.loads(response.content)
       assert data == {'status': 0}  # We get back empty instead of failure with QueryExpired to silence end user messages
-
 
   def test_autocomplete_functions(self):
     # Note: better test would be to mock autocomplete() and not get_api() with hive and mysql dialects
@@ -535,7 +523,7 @@ class TestNotebookApiMocked(object):
     self.user_not_me = User.objects.get(username="not_perm_user")
 
     # Beware: Monkey patch HS2API Mock API
-    if not hasattr(notebook.connectors.hiveserver2, 'original_HS2Api'): # Could not monkey patch base.get_api
+    if not hasattr(notebook.connectors.hiveserver2, 'original_HS2Api'):  # Could not monkey patch base.get_api
       notebook.connectors.hiveserver2.original_HS2Api = notebook.connectors.hiveserver2.HS2Api
     notebook.connectors.hiveserver2.HS2Api = MockedApi
 
@@ -557,7 +545,6 @@ class TestNotebookApiMocked(object):
     if originalCluster.FS_CACHE is None:
       originalCluster.FS_CACHE = {}
     originalCluster.FS_CACHE["default"] = self.original_fs
-
 
   @pytest.mark.integration
   def test_export_result(self):
@@ -599,7 +586,6 @@ class TestNotebookApiMocked(object):
     assert 0 == data['status'], data
     assert '/user/hue/Test Hive Query.csv' == data['watch_url']['destination'], data
 
-
     response = self.client.post(reverse('notebook:export_result'), {
         'notebook': notebook_json,
         'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
@@ -625,7 +611,6 @@ class TestNotebookApiMocked(object):
       assert 0 == data['status'], data
       assert 'adl:/user/hue/path.csv' == data['watch_url']['destination'], data
 
-
     response = self.client.post(reverse('notebook:export_result'), {
       'notebook': notebook_json,
       'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
@@ -637,7 +622,6 @@ class TestNotebookApiMocked(object):
     data = json.loads(response.content)
     assert -1 == data['status'], data
     assert 'The destination is not an empty directory!' == data['message'], data
-
 
   def test_download_result(self):
     notebook_json = """
@@ -730,8 +714,9 @@ def test_get_interpreters_to_show():
 
     resets.append(INTERPRETERS_SHOWN_ON_WHEEL.set_for_testing('java,pig'))
 
+    # 'get_interpreters_to_show did not return interpreters in the correct order expected'
     assert (
-      list(expected_interpreters.values()) == get_ordered_interpreters()), 'get_interpreters_to_show did not return interpreters in the correct order expected'
+      list(expected_interpreters.values()) == get_ordered_interpreters())
   finally:
     for reset in resets:
       reset()
@@ -817,7 +802,7 @@ def test_get_ordered_interpreters():
             )
           )
           assert [interpreter['dialect'] for interpreter in get_ordered_interpreters()] == ['hive', 'phoenix']
-           
+
           # Check twice(
           assert [interpreter['dialect'] for interpreter in get_ordered_interpreters()] == ['hive', 'phoenix']
   finally:

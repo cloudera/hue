@@ -28,12 +28,9 @@ from useradmin.organization import _fitered_queryset, get_user_request_organizat
 from desktop.conf import CONNECTORS, ENABLE_ORGANIZATIONS
 from desktop.lib.connectors.types import get_connectors_types
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 
 LOG = logging.getLogger()
@@ -248,4 +245,4 @@ class ConnectorNotFoundException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)

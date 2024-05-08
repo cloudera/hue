@@ -15,21 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from hadoop import conf
 import logging
 import os
-import sys
 import tempfile
 
 from desktop.models import get_remote_home_storage
 
+from hadoop import conf
 from hadoop import core_site
 
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
 
 LOG = logging.getLogger()
 
@@ -65,10 +59,10 @@ def test_core_site():
     <name>fs.s3a.bucket.gethue-dev.endpoint</name>
     <value>s3.us-west-2.amazonaws.com</value>
   </property>
-  <property>    
-    <name>fs.azure.ext.raz.rest.host.url</name>    
-    <value>https://gehue-adls-master:6082/</value>  
-  </property> 
+  <property>
+    <name>fs.azure.ext.raz.rest.host.url</name>
+    <value>https://gehue-adls-master:6082/</value>
+  </property>
   <property>
     <name>fs.azure.ext.raz.adls.access.cluster.name</name>
     <value>gehue-adls</value>
@@ -76,10 +70,10 @@ def test_core_site():
   <property>
     <name>fs.defaultFS</name>
     <value>abfs://data@gethuedevstorage.dfs.core.windows.net/hue-adls</value>
-  </property> 
+  </property>
 </configuration>
     """
-    open_file(os.path.join(hadoop_home, 'core-site.xml'), 'w').write(xml)
+    open(os.path.join(hadoop_home, 'core-site.xml'), 'w').write(xml)
 
     finish = (
       conf.HDFS_CLUSTERS.set_for_testing({'default': {}}),

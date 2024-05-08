@@ -27,10 +27,7 @@ from oozie import conf
 from oozie.models import Workflow, Dataset, DataInput, DataOutput
 from oozie.utils import oozie_to_django_datetime, oozie_to_hue_frequency
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -126,6 +123,7 @@ def _reconcile_datasets(coordinator, objects, root, namespace):
     dataoutput.pk = None
     dataoutput.save()
   # @TODO(abe): reconcile instance times
+
 
 def _set_properties(coordinator, root, namespace):
   namespaces = {

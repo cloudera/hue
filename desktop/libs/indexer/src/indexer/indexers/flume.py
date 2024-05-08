@@ -28,10 +28,7 @@ from useradmin.models import User
 
 from desktop.lib.exceptions_renderable import PopupException
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -41,7 +38,6 @@ class FlumeIndexer(object):
 
   def __init__(self, user):
     self.user = user
-
 
   def start(self, destination_name, file_format, destination):
     responses = {'status': 0}
@@ -58,7 +54,6 @@ class FlumeIndexer(object):
       responses['on_success_url'] = reverse('search:browse', kwargs={'name': destination_name})
 
     return responses
-
 
   def generate_config(self, source, destination):
     configs = []
@@ -159,7 +154,6 @@ tier1.sinks.sink1.batchSize = 20''' % {
     configs.append(('agent_config_file', flume_config))
 
     return configs
-
 
   def generate_morphline_config(self, destination):
     # TODO manage generic config, cf. MorphlineIndexer

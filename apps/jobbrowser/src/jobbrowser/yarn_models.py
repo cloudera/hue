@@ -15,9 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 from builtins import object
 import logging
@@ -40,10 +37,7 @@ from hadoop.yarn.clients import get_log_client
 
 from jobbrowser.models import format_unixtime_ms
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -257,7 +251,6 @@ class Job(object):
         else:
           self.progress = self.reduces_percent_complete
 
-
   def _fixup(self):
     jobid = self.id
 
@@ -343,6 +336,7 @@ class Job(object):
       self._job_attempts = self.api.job_attempts(self.id)['jobAttempts']
     return self._job_attempts
 
+
 class YarnV2Job(Job):
   def __init__(self, api, attrs):
     self.api = api
@@ -418,6 +412,7 @@ class YarnV2Job(Job):
 
     return self._job_attempts
 
+
 # There's are tasks for Oozie workflow so we create a dummy one.
 class YarnTask(object):
   def __init__(self, job):
@@ -426,6 +421,7 @@ class YarnTask(object):
   def get_attempt(self, attempt_id):
     json = self.job.api.appattempts_attempt(self.job.id, attempt_id)
     return YarnV2Attempt(self, json)
+
 
 class KilledJob(Job):
 
@@ -629,7 +625,8 @@ class Attempt(object):
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
-      if self.type == 'Oozie Launcher' and not self.task.job.status == 'FINISHED': # Yarn currently dumps with 500 error with doas in running state
+      # Yarn currently dumps with 500 error with doas in running state
+      if self.type == 'Oozie Launcher' and not self.task.job.status == 'FINISHED':
         params = {}
       else:
         params = {
@@ -654,12 +651,13 @@ class Attempt(object):
           if response:
             debug_info += '\nHTML Response: %s' % response
           LOG.error(debug_info)
-        except:
+        except Exception:
           LOG.exception('failed to build debug info')
 
       logs.append(log)
 
     return logs + [''] * (3 - len(logs))
+
 
 class YarnV2Attempt(Attempt):
   def __init__(self, task, attrs):
@@ -690,6 +688,7 @@ class YarnV2Attempt(Attempt):
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
     setattr(self, 'status', 'RUNNING' if self.finishedTime == 0 else 'SUCCEEDED')
     setattr(self, 'properties', {})
+
 
 class Container(object):
 

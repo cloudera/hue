@@ -27,10 +27,7 @@ from django.test import TestCase
 from desktop.lib.django_test_util import make_logged_in_client
 from impala import conf
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 LOG = logging.getLogger()
 
@@ -50,7 +47,7 @@ class TestImpala(object):
 
       response = self.client.post(reverse("impala:invalidate"), {
           'flush_all': False,
-          'cluster': json.dumps({"credentials":{},"type":"direct","id":"default","name":"default"}),
+          'cluster': json.dumps({"credentials": {}, "type": "direct", "id": "default", "name": "default"}),
           'database': 'default',
           'table': 'k8s_logs'
         }

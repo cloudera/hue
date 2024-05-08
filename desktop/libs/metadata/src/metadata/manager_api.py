@@ -35,10 +35,7 @@ from metadata.catalog.navigator_client import CatalogApiException
 from metadata.conf import has_catalog
 from metadata.manager_client import ManagerApi
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -52,7 +49,7 @@ def error_handler(view_fn):
     }
 
     try:
-      if has_catalog(args[0].user): # TODO
+      if has_catalog(args[0].user):  # TODO
         return view_fn(*args, **kwargs)
       else:
         raise CatalogApiException('Navigator API is not configured.')
@@ -125,7 +122,6 @@ tier1.sinks.sink1.morphlineFile = morphlines.conf
 tier1.sinks.sink1.morphlineId = hue_accesslogs_no_geo
 tier1.sinks.sink1.channel       = channel1'''
 
-
   morphline_config = open(os.path.join(config_morphline_path(), 'hue_accesslogs_no_geo.morphline.conf')).read()
   morphline_config = morphline_config.replace(
     '${SOLR_COLLECTION}', 'log_analytics_demo'
@@ -135,8 +131,10 @@ tier1.sinks.sink1.channel       = channel1'''
 
   responses = {}
 
-  responses['agent_config_file'] = api.update_flume_config(cluster_name=None, config_name='agent_config_file', config_value=flume_agent_config)
-  responses['agent_morphlines_conf_file'] = api.update_flume_config(cluster_name=None, config_name='agent_morphlines_conf_file', config_value=morphline_config)
+  responses['agent_config_file'] = api.update_flume_config(
+    cluster_name=None, config_name='agent_config_file', config_value=flume_agent_config)
+  responses['agent_morphlines_conf_file'] = api.update_flume_config(
+    cluster_name=None, config_name='agent_morphlines_conf_file', config_value=morphline_config)
 
   responses['refresh_flume'] = api.refresh_flume(cluster_name=None, restart=True)
 

@@ -22,12 +22,9 @@ import errno
 import logging
 import posixpath
 import stat
-import sys
-import threading
 
 from django.utils.encoding import smart_str
 
-from desktop.lib.rest import http_client, resource
 from desktop.lib.fs.ozone import OFS_ROOT, normpath, is_root, parent_path, _serviceid_join, join as ofs_join
 from desktop.lib.fs.ozone.ofsstat import OzoneFSStat
 from desktop.conf import PERMISSION_ACTION_OFS
@@ -36,12 +33,8 @@ from hadoop.fs.exceptions import WebHdfsException
 from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.webhdfs import WebHdfs
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from urllib.parse import urlparse as lib_urlparse
-else:
-  from django.utils.translation import ugettext as _
-  from urlparse import urlparse as lib_urlparse
+from django.utils.translation import gettext as _
+from urllib.parse import urlparse as lib_urlparse
 
 
 LOG = logging.getLogger()
@@ -149,20 +142,20 @@ class OzoneFS(WebHdfs):
         if ex.server_exc == 'FileNotFoundException' or ex.code == 404:
           return None
         raise ex
-    
+
     return OzoneFSStat(json['FileStatus'], path, self._netloc)
-  
+
   def _handle_serviceid_path_status(self):
     json = {
       'FileStatuses': {
         'FileStatus': [{
-          'pathSuffix': self._netloc, 'type': 'DIRECTORY', 'length': 0, 'owner': '', 'group': '', 
+          'pathSuffix': self._netloc, 'type': 'DIRECTORY', 'length': 0, 'owner': '', 'group': '',
           'permission': '777', 'accessTime': 0, 'modificationTime': 0, 'blockSize': 0, 'replication': 0
           }]
         }
       }
     return json
-  
+
   def stats(self, path):
     """
     stats(path) -> OzoneFSStat
@@ -198,7 +191,7 @@ class OzoneFS(WebHdfs):
 
     if not result['boolean']:
       raise IOError(_("Rename failed: %s -> %s") % (smart_str(old, errors='replace'), smart_str(new, errors='replace')))
-  
+
   def rename_star(self, old_dir, new_dir):
     """Equivalent to `mv old_dir/* new"""
     if not self.isdir(old_dir):
@@ -208,7 +201,7 @@ class OzoneFS(WebHdfs):
       self.mkdir(new_dir)
     elif not self.isdir(new_dir):
       raise IOError(errno.ENOTDIR, _("'%s' is not a directory") % new_dir)
-  
+
     ls = self.listdir(old_dir)
     for dirent in ls:
       self.rename(_serviceid_join(ofs_join(old_dir, dirent), self._netloc), _serviceid_join(ofs_join(new_dir, dirent), self._netloc))
@@ -269,7 +262,7 @@ class OzoneFS(WebHdfs):
     if not self.exists(src):
       raise IOError(errno.ENOENT, _("File not found: %s") % src)
 
-    skip_file_list = '' # Store the files to skip copying which are greater than the upload_chunck_size()
+    skip_file_list = ''  # Store the files to skip copying which are greater than the upload_chunck_size()
 
     if self.isdir(src):
       # 'src' is directory.
@@ -290,7 +283,7 @@ class OzoneFS(WebHdfs):
       self.do_as_user(owner, self.mkdir, dest, mode=dir_mode)
 
       # Copy files in 'src' directory to 'dest'.
-      
+
       skip_file_list = self.copy_remote_dir(src, dest, dir_mode, owner, skip_file_list)
     else:
       # 'src' is a file.

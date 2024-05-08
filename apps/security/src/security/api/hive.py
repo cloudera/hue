@@ -29,10 +29,7 @@ from hadoop.cluster import get_defaultfs
 
 from beeswax.api import autocomplete
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -50,7 +47,7 @@ def fetch_hive_path(request):
   if '/' in path:
     database, table = path.split('/', 1)
     if '.' in table:
-      table, column  = table.split('.', 1)
+      table, column = table.split('.', 1)
 
   resp = autocomplete(request, database, table, column)
 
@@ -94,7 +91,10 @@ def list_sentry_privileges_by_role(request):
   try:
     roleName = request.POST.get('roleName')
     sentry_privileges = get_api(request.user).list_sentry_privileges_by_role(roleName)
-    result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '%s.%s.%s.%s' % (privilege['server'], privilege['database'], privilege['table'], privilege['URI']))
+    result['sentry_privileges'] = sorted(
+      sentry_privileges,
+      key=lambda privilege: '%s.%s.%s.%s' % (privilege['server'], privilege['database'], privilege['table'], privilege['URI']),
+    )
     result['message'] = ''
     result['status'] = 0
   except Exception as e:
@@ -423,7 +423,9 @@ def list_sentry_privileges_for_provider(request):
     roleSet = json.loads(request.POST.get('roleSet'))
     authorizableHierarchy = json.loads(request.POST.get('authorizableHierarchy'))
 
-    sentry_privileges = get_api(request.user).list_sentry_privileges_for_provider(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
+    sentry_privileges = get_api(request.user).list_sentry_privileges_for_provider(
+      groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy
+    )
     result['sentry_privileges'] = sentry_privileges
     result['message'] = ''
     result['status'] = 0

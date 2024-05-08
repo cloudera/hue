@@ -25,10 +25,8 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 from django.core.cache import caches
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
+
 
 LOG = logging.getLogger()
 cache = caches[CACHES_HIVE_DISCOVERY_KEY]

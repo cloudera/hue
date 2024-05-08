@@ -46,10 +46,7 @@ try:
 except RuntimeError:
   has_oozie = False
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 class MockFs(object):
@@ -77,7 +74,6 @@ class TestClusterConfig(object):
 
         ClusterConfig(user=self.user)
 
-
   def test_get_main_quick_action(self):
     with patch('desktop.models.get_user_preferences') as get_user_preferences:
       get_user_preferences.return_value = json.dumps({'app': 'editor', 'interpreter': 1})
@@ -86,7 +82,6 @@ class TestClusterConfig(object):
       main_app = ClusterConfig(user=self.user, apps=apps).get_main_quick_action(apps=apps)
 
       assert {'type': 1, 'name': 'SQL'}, main_app
-
 
   def test_get_remote_storage_home(self):
     # When default home ends with /user in RAZ ADLS env.
@@ -152,10 +147,8 @@ class TestDocument2(object):
 
     self.home_dir = Document2.objects.get_home_directory(user=self.user)
 
-
   def test_trash_directory(self):
     assert Directory.objects.filter(owner=self.user, name=Document2.TRASH_DIR, type='directory').exists()
-
 
   def test_document_create(self):
     sql = 'SELECT * FROM sample_07'
@@ -191,7 +184,6 @@ class TestDocument2(object):
     finally:
       old_query.delete()
 
-
   def test_get_document(self):
     doc = Document2.objects.create(name='test_doc', type='query-hive', owner=self.user, data={})
     self.home_dir.children.add(doc)
@@ -216,7 +208,6 @@ class TestDocument2(object):
     data = json.loads(response.content)
     assert doc.uuid == data['document']['uuid']
 
-
   def test_directory_create_and_rename(self):
     response = self.client.post(
         '/desktop/api2/doc/mkdir',
@@ -235,7 +226,6 @@ class TestDocument2(object):
     data = json.loads(response.content)
     assert 0 == data['status']
     assert 'updated' == data['document']['name'], data
-
 
   def test_file_move(self):
     source_dir = Directory.objects.create(name='test_mv_file_src', owner=self.user, parent_directory=self.home_dir)
@@ -333,7 +323,6 @@ class TestDocument2(object):
     assert copy_doc.uuid != workflow_doc.uuid
     assert copy_workflow.get_data()['workflow']['uuid'] != workflow.get_data()['workflow']['uuid']
 
-
   def test_directory_move(self):
     source_dir = Directory.objects.create(name='test_mv', owner=self.user, parent_directory=self.home_dir)
     target_dir = Directory.objects.create(name='test_mv_dst', owner=self.user, parent_directory=self.home_dir)
@@ -363,7 +352,6 @@ class TestDocument2(object):
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
     assert '/test_mv_dst/test_mv/query1.sql' == data['document']['path']
-
 
   def test_directory_children(self):
     # Creates 2 directories and 2 queries and saves to home directory
@@ -404,7 +392,6 @@ class TestDocument2(object):
     assert 5 == data['count']
     assert 2 == len(data['children'])
 
-
   def test_update_document(self):
     doc = Document2.objects.create(
       name='initial',
@@ -433,7 +420,6 @@ class TestDocument2(object):
     assert 'updated desc' == data['document']['description'], data
     # Non-whitelisted attributes should remain unchanged
     assert 'query-hive' == data['document']['type'], data
-
 
   def test_document_trash(self):
     # Create document under home and directory under home with child document
@@ -492,7 +478,6 @@ class TestDocument2(object):
     assert 1 == data['count']
     assert Document2.TRASH_DIR in [f['name'] for f in data['children']]
 
-
   def test_get_history(self):
     history = Document2.objects.get_history(user=self.user, doc_type='query-hive')
     assert not history.filter(name='test_get_history').exists()
@@ -509,7 +494,6 @@ class TestDocument2(object):
       assert history.filter(name='test_get_history').exists()
     finally:
       query.delete()
-
 
   def test_get_history_with_connector(self):
     connector = Connector.objects.create(
@@ -537,7 +521,6 @@ class TestDocument2(object):
     finally:
       query.delete()
       connector.delete()
-
 
   def test_validate_immutable_user_directories(self):
     # Test that home and Trash directories cannot be recreated or modified
@@ -567,7 +550,6 @@ class TestDocument2(object):
     assert -1 == data['status'], data
     assert 'Cannot create or modify directory with name: .Trash' == data['message']
 
-
   def test_validate_circular_directory(self):
     # Test that saving a document with cycle raises an error, i.e. - This should fail:
     # a.parent_directory = b
@@ -594,7 +576,6 @@ class TestDocument2(object):
     assert -1 == data['status'], data
     assert 'circular dependency' in data['message'], data
 
-
   def test_api_get_data(self):
     doc_data = {'info': 'hello', 'is_history': False}
     doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data=json.dumps(doc_data))
@@ -616,7 +597,6 @@ class TestDocument2(object):
 
     assert 'data' in data, data
     assert data['data'] == doc_data
-
 
   def test_is_trashed_migration(self):
 
@@ -742,7 +722,6 @@ class TestDocument2Permissions(object):
 
     self.home_dir = Document2.objects.get_home_directory(user=self.user)
 
-
   def test_default_permissions(self):
     # Tests that for a new doc by default, read/write perms are set to no users and no groups
     new_doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -760,7 +739,6 @@ class TestDocument2Permissions(object):
           'link_write': False,
         } ==
         data['document']['perms'])
-
 
   def test_share_document_read_by_user(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -840,7 +818,6 @@ class TestDocument2Permissions(object):
     })
     assert -1 == json.loads(response.content)['status'], response.content
 
-
   def test_share_document_read_by_group(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
 
@@ -883,7 +860,6 @@ class TestDocument2Permissions(object):
     data = json.loads(response.content)
     assert doc.uuid == data['document']['uuid'], data
 
-
   def test_share_document_write_by_user(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
 
@@ -922,7 +898,6 @@ class TestDocument2Permissions(object):
     data = json.loads(response.content)
     assert 0 == data['status']
 
-
   def test_share_document_write_by_group(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
 
@@ -960,7 +935,6 @@ class TestDocument2Permissions(object):
     response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
     data = json.loads(response.content)
     assert 0 == data['status']
-
 
   def test_share_directory(self):
     # Test that updating the permissions for a directory updates all nested documents accordingly, with file structure:
@@ -1006,7 +980,6 @@ class TestDocument2Permissions(object):
       assert doc.can_read(self.user_not_me)
       assert doc.can_write(self.user_not_me)
 
-
   def test_get_shared_documents(self):
     not_shared = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
     shared_1 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -1023,7 +996,7 @@ class TestDocument2Permissions(object):
     doc_names = [doc['name'] for doc in data['documents']]
     assert 'query2.sql' in doc_names
     assert 'query3.sql' in doc_names
-    assert not 'query1.sql' in doc_names
+    assert 'query1.sql' not in doc_names
 
     # they should also appear in user's home directory get_documents response
     response = self.client_not_me.get('/desktop/api2/doc/')
@@ -1031,7 +1004,6 @@ class TestDocument2Permissions(object):
     doc_names = [doc['name'] for doc in data['children']]
     assert 'query2.sql' in doc_names
     assert 'query3.sql' in doc_names
-
 
   def test_get_shared_directories(self):
     # Tests that when fetching the shared documents for a user, they are grouped by top-level directory when possible
@@ -1063,11 +1035,11 @@ class TestDocument2Permissions(object):
     assert 'dir1' in doc_names
     assert 'dir3' in doc_names
     assert 'query3.sql' in doc_names
-    assert not 'dir2' in doc_names
+    assert 'dir2' not in doc_names
 
     # nested documents should not appear
-    assert not 'query1.sql' in doc_names
-    assert not 'query2.sql' in doc_names
+    assert 'query1.sql' not in doc_names
+    assert 'query2.sql' not in doc_names
 
     # but nested documents should still be shared/viewable by group
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
@@ -1077,7 +1049,6 @@ class TestDocument2Permissions(object):
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc2.uuid})
     data = json.loads(response.content)
     assert doc2.uuid == data['document']['uuid'], data
-
 
   def test_inherit_parent_permissions(self):
     # Tests that when saving a document to a shared directory, the doc/dir inherits same permissions
@@ -1097,7 +1068,6 @@ class TestDocument2Permissions(object):
     assert (
         [{'id': self.user_not_me.id, 'username': self.user_not_me.username}] ==
         data['document']['perms']['write']['users']), data
-
 
   def test_search_documents(self):
     owned_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
@@ -1142,7 +1112,6 @@ class TestDocument2Permissions(object):
     assert 4 == data['count']
     doc_names = [doc['name'] for doc in data['documents']]
     assert 'history.sql' in doc_names
-
 
   def test_x_share_directory_y_add_file_x_share(self):
     # Test that when another User, Y, adds a doc to dir shared by User X, User X doesn't fail to share the dir next time:
@@ -1203,7 +1172,6 @@ class TestDocument2Permissions(object):
       assert doc.can_read(share_test_user)
       assert doc.can_write(share_test_user)
 
-
   def test_unicode_name(self):
     doc = Document2.objects.create(
         name='My Bundle a voté « non » à l’accord',
@@ -1224,7 +1192,6 @@ class TestDocument2Permissions(object):
     assert 0 == data['status']
     path = data['document']['path']
     assert '/My%20Bundle%20a%20vot%C3%A9%20%C2%AB%20non%20%C2%BB%20%C3%A0%20l%E2%80%99accord' == path
-
 
   def test_link_permissions(self):
     doc = Document2.objects.create(
@@ -1404,7 +1371,7 @@ class TestDocument2ImportExport(object):
     assert 'test.wf' in [doc['fields']['name'] for doc in documents]
     assert 'query1.sql' in [doc['fields']['name'] for doc in documents]
     assert 'query2.sql' in [doc['fields']['name'] for doc in documents]
-    assert not 'query3.sql' in [doc['fields']['name'] for doc in documents]
+    assert 'query3.sql' not in [doc['fields']['name'] for doc in documents]
 
     # Test that exporting multiple workflows with overlapping dependencies works
     workflow2 = Document2.objects.create(name='test2.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -1419,7 +1386,6 @@ class TestDocument2ImportExport(object):
     assert 'test2.wf' in [doc['fields']['name'] for doc in documents]
     assert 'query1.sql' in [doc['fields']['name'] for doc in documents]
     assert 'query2.sql' in [doc['fields']['name'] for doc in documents]
-
 
   def test_export_documents_file_name(self):
     query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={},
@@ -1447,7 +1413,6 @@ class TestDocument2ImportExport(object):
     # Test that exporting single file gets the name of the document in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id])})
     assert response['Content-Disposition'] == 'attachment; filename="' + workflow.name + '.json"'
-
 
   def test_export_directories_with_children(self):
     # Test that exporting a directory exports children docs
@@ -1477,7 +1442,6 @@ class TestDocument2ImportExport(object):
     assert 'dir3' in [doc['fields']['name'] for doc in documents]
     assert 'query2.sql' in [doc['fields']['name'] for doc in documents]
     assert 'query3.sql' in [doc['fields']['name'] for doc in documents]
-
 
   def test_import_owned_document(self):
     owned_query = Document2.objects.create(

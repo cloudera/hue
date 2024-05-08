@@ -29,20 +29,17 @@ from useradmin.models import User
 
 from impala.dbms import get_query_server_config
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 LOG = logging.getLogger()
+
 
 @pytest.mark.django_db
 class TestDbms():
 
   def setup_method(self):
     self.client = make_logged_in_client()
-
 
   def test_get_connector_config(self):
     connector = {

@@ -15,15 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str, object
 import datetime
 import json
 import logging
 import math
 import numbers
-import sys
 import uuid
 
 from datetime import timedelta
@@ -35,7 +31,7 @@ from django.utils.html import escape
 
 from desktop.conf import has_connectors, TASK_SERVER
 from desktop.lib.connectors.models import _get_installed_connectors
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.paths import SAFE_CHARACTERS_URI
 from desktop.models import Directory, Document2
 from useradmin.models import User, install_sample_user
@@ -43,12 +39,8 @@ from useradmin.models import User, install_sample_user
 from notebook.conf import EXAMPLES, get_ordered_interpreters
 from notebook.connectors.base import Notebook, get_api as _get_api, get_interpreter
 
-if sys.version_info[0] > 2:
-  from urllib.parse import quote as urllib_quote
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import quote as urllib_quote
+from urllib.parse import quote as urllib_quote
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -72,7 +64,7 @@ def escape_rows(rows, nulls_only=False, encoding=None):
           escaped_field = 'NULL'
         else:
           # Prevent error when getting back non utf8 like charset=iso-8859-1
-          escaped_field = smart_unicode(field, errors='replace', encoding=encoding)
+          escaped_field = smart_str(field, errors='replace', encoding=encoding)
           if not nulls_only:
             escaped_field = escape(escaped_field).replace(' ', '&nbsp;')
         escaped_row.append(escaped_field)
@@ -121,7 +113,7 @@ def make_notebook(
     if settings is not None:
       _update_property_value(sessions_properties, 'files', files)
   elif editor_type == 'java':
-    sessions_properties = [] # Java options
+    sessions_properties = []  # Java options
   else:
     sessions_properties = []
 
@@ -136,7 +128,7 @@ def make_notebook(
          'id': None
       }
     ],
-    'selectedSnippet': editor_connector, # TODO: might need update in notebook.ko.js
+    'selectedSnippet': editor_connector,  # TODO: might need update in notebook.ko.js
     'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
@@ -213,7 +205,7 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
         'type': _snippet['type'],
         'properties': HS2Api.get_properties(snippet['type']),
         'id': None
-      } for _snippet in _snippets # Non unique types currently
+      } for _snippet in _snippets  # Non unique types currently
     ],
     'selectedSnippet': _snippets[0]['type'],
     'showHistory': False,
@@ -523,7 +515,7 @@ def _convert_type(btype, bdata):
   elif btype == RDBMS:
     data = json.loads(bdata)
     return data['query']['server']
-  elif btype == SPARK: # We should not import
+  elif btype == SPARK:  # We should not import
     return 'spark'
   else:
     return 'hive'
@@ -551,6 +543,7 @@ def _get_example_directory(user):
     name=Document2.EXAMPLES_DIR
   )
   return examples_dir
+
 
 def _get_dialect_example(dialect):
   sample_user = install_sample_user()
@@ -731,6 +724,7 @@ class MockRequest():
     self.jt = jt
     self.POST = {}
     self.GET = {}
+
 
 def install_custom_examples():
   if EXAMPLES.AUTO_LOAD.get():

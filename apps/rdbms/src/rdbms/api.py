@@ -39,10 +39,7 @@ from beeswax.views import authorized_get_query_history, safe_get_design
 from rdbms.forms import SQLForm
 from rdbms.views import save_design
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -177,7 +174,7 @@ def execute_query(request, design_id=None):
       response['message'] = _('There was an error with your query.')
       response['errors'] = form.errors
   except RuntimeError as e:
-    response['message']= str(e)
+    response['message'] = str(e)
 
   return JsonResponse(response, encoder=ResultEncoder)
 
@@ -215,7 +212,7 @@ def explain_query(request):
       response['message'] = _('There was an error with your query.')
       response['errors'] = form.errors
   except RuntimeError as e:
-    response['message']= str(e)
+    response['message'] = str(e)
 
   return JsonResponse(response)
 
@@ -347,7 +344,7 @@ def get_query_form(request, design_id=None):
     raise RuntimeError(_("No databases are available. Permissions could be missing."))
 
   form = SQLForm(request.POST)
-  form.fields['server'].choices = servers # Could not do it in the form
-  form.fields['database'].choices = databases # Could not do it in the form
+  form.fields['server'].choices = servers  # Could not do it in the form
+  form.fields['database'].choices = databases  # Could not do it in the form
 
   return form

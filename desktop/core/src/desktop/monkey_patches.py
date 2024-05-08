@@ -16,11 +16,9 @@
 # limitations under the License.
 
 import hashlib
-import imp
 import importlib
 import logging
 import re
-import sys
 
 from django.conf import settings
 from django.core.validators import RegexValidator
@@ -93,17 +91,16 @@ def monkey_patch_md5(modules_to_patch):
   Modules must use `import hashlib` and not `from hashlib import md5`.
   """
   orig_hashlib_md5 = hashlib.md5
+
   def _non_security_md5(*args, **kwargs):
     kwargs['usedforsecurity'] = False
     return orig_hashlib_md5(*args, **kwargs)
 
   LOG.debug("Start monkey patch md5 ...")
-  if sys.version_info[0] > 2:
-    hashlib_spec = importlib.util.find_spec('hashlib')
-    patched_hashlib = importlib.util.module_from_spec(hashlib_spec)
-    hashlib_spec.loader.exec_module(patched_hashlib)
-  else:
-    patched_hashlib = imp.load_module('hashlib', *imp.find_module('hashlib'))
+
+  hashlib_spec = importlib.util.find_spec('hashlib')
+  patched_hashlib = importlib.util.module_from_spec(hashlib_spec)
+  hashlib_spec.loader.exec_module(patched_hashlib)
 
   patched_hashlib.md5 = _non_security_md5
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -31,10 +31,7 @@ from useradmin.models import User, update_app_permissions, get_default_user_grou
 from useradmin.permissions import HuePermission, GroupPermission
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 @pytest.mark.django_db
@@ -59,18 +56,15 @@ class TestConnectors(object):
     for reset in cls._class_resets:
       reset()
 
-
   def test_page(self):
     response = self.client.get("/desktop/connectors/")
 
     assert 200 == response.status_code
 
-
   def test_get_connector_types(self):
     response = self.client.post("/desktop/connectors/api/types/")
 
     assert 200 == response.status_code
-
 
   def test_create_connector_perm(self):
     response = self.client.post("/desktop/connectors/api/instance/update/")
@@ -78,7 +72,6 @@ class TestConnectors(object):
 
     response = self.client.post("/desktop/connectors/api/instance/delete/")
     assert 401 == response.status_code
-
 
   def test_test_connector(self):
     connector = {
@@ -144,7 +137,6 @@ class TestConnectorListing(TestCase):
 
     update_app_permissions()
 
-
   def test_get_installed_editor_connectors(self):
 
     with patch('desktop.lib.connectors.models.Connector.objects.all') as ConnectorObjectsAll:
@@ -157,7 +149,6 @@ class TestConnectorListing(TestCase):
       editor_category = [category for category in connectors if category['category'] == 'editor']
       assert editor_category, connectors
       assert 1 == len(editor_category), editor_category
-
 
   def test_get_connectors_for_user(self):
     connector = Connector.objects.create(

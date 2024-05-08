@@ -38,10 +38,7 @@ from indexer.indexers.morphline import MorphlineIndexer
 from indexer.solr_client import SolrClient
 from indexer.solr_client_tests import MockSolrCdhCloudHdfsApi
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from StringIO import StringIO as string_io
+from io import StringIO as string_io
 
 standard_library.install_aliases()
 

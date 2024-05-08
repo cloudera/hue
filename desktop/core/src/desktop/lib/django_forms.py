@@ -17,14 +17,11 @@
 #
 # Extra form fields and widgets.
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import filter
 from builtins import range
 from builtins import object
 import logging
 import json
-import sys
 
 from django.forms import Widget, Field
 from django import forms
@@ -37,13 +34,11 @@ from django.utils.safestring import mark_safe
 import desktop.lib.i18n
 from desktop.lib.i18n import smart_str
 
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import quote_plus as urllib_quote_plus
-  from django.utils.encoding import force_str
-else:
-  from urllib import quote_plus as urllib_quote_plus
-  from django.utils.encoding import force_unicode as force_str
+import urllib.request
+import urllib.error
+from urllib.parse import quote_plus as urllib_quote_plus
+from django.utils.encoding import force_str
+
 
 LOG = logging.getLogger()
 
@@ -56,6 +51,7 @@ except ImportError:
   class StrAndUnicode(object):
     def __str__(self):
       return self.code
+
 
 class SplitDateTimeWidget(forms.MultiWidget):
   """
@@ -90,6 +86,7 @@ class SplitDateTimeWidget(forms.MultiWidget):
     if value:
       return [value.date(), value.time().replace(microsecond=0)]
     return [None, None]
+
 
 class MultipleInputWidget(Widget):
   """
@@ -126,6 +123,7 @@ class MultipleInputWidget(Widget):
     non_empty = lambda x: len(x) != 0
     return list(filter(non_empty, data.getlist(name)))
 
+
 class MultipleInputField(Field):
   widget = MultipleInputWidget
 
@@ -135,7 +133,9 @@ class MultipleInputField(Field):
   def clean(self, value):
     return value
 
+
 OTHER_VAL, OTHER_PRES = "__other__", "Other..."
+
 
 class ChoiceOrOtherWidget(MultiWidget):
   """
@@ -160,11 +160,12 @@ class ChoiceOrOtherWidget(MultiWidget):
     else:
       return [OTHER_VAL, value]
 
+
 class ChoiceOrOtherField(MultiValueField):
   def __init__(self, choices, initial=None, *args, **kwargs):
     assert not kwargs.get('required', False), "required=True is not supported"
 
-    allchoices = [x for x in choices] # Force choices into a list.
+    allchoices = [x for x in choices]  # Force choices into a list.
     allchoices.append((OTHER_VAL, OTHER_PRES))
     self.widget = ChoiceOrOtherWidget(choices=allchoices)
     choice_initial, other_initial = None, None
@@ -195,12 +196,14 @@ class ChoiceOrOtherField(MultiValueField):
         raise ValidationError("Either select from the drop-down or select %s" % OTHER_PRES)
       return data_list[0]
 
+
 class KeyValueWidget(Textarea):
   def render(self, name, value, attrs=None):
     # If we have a dictionary, render back into a string.
     if isinstance(value, dict):
       value = " ".join("=".join([k, v]) for k, v in value.items())
     return super(KeyValueWidget, self).render(name, value, attrs)
+
 
 class KeyValueField(CharField):
   """
@@ -220,6 +223,7 @@ class KeyValueField(CharField):
       return dict(kvpair.split('=', 2) for kvpair in value.split())
     except Exception:
       raise ValidationError("Not in key=value format.")
+
 
 class UnicodeEncodingField(ChoiceOrOtherField):
   """
@@ -334,6 +338,7 @@ class MultiForm(object):
         LOG.error(smart_str(f.errors))
         r = False
     return r
+
 
 class SubmitButton(Input):
   """
@@ -508,6 +513,7 @@ class BaseSimpleFormSet(StrAndUnicode):
 
     return valid and not bool(self.non_form_errors())
 
+
 def simple_formset_factory(form, add_label="+", formset=BaseSimpleFormSet, initial=None):
   """Return a FormSet for the given form class."""
   attrs = {
@@ -516,6 +522,7 @@ def simple_formset_factory(form, add_label="+", formset=BaseSimpleFormSet, initi
     'initial': initial
   }
   return type(form.__name__ + 'SimpleFormSet', (formset,), attrs)
+
 
 class DependencyAwareForm(forms.Form):
   """

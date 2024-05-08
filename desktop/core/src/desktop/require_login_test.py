@@ -24,10 +24,7 @@ import pytest
 from django.test.client import Client
 import django
 
-if sys.version_info[0] > 2:
-  from unittest.mock import Mock
-else:
-  from mock import Mock
+from unittest.mock import Mock
 
 
 @pytest.mark.django_db

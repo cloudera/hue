@@ -25,7 +25,7 @@ from django.utils.encoding import iri_to_uri
 from django.utils.http import urlencode
 
 from desktop import conf
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
 
 
@@ -118,13 +118,13 @@ class Resource(object):
       log_length = conf.REST_RESPONSE_SIZE.get() != -1 and conf.REST_RESPONSE_SIZE.get() if log_response else 0
       duration = time.time() - start_time
       try:
-        req_data = smart_unicode(data, errors='replace')
-        resp_content = smart_unicode(resp.content, errors='replace') if resp and resp.content else ''
+        req_data = smart_str(data, errors='replace')
+        resp_content = smart_str(resp.content, errors='replace') if resp and resp.content else ''
         message = u'%s %s %s%s%s %s%s returned in %dms %s %s %s%s' % (
           method,
           type(self._client._session.auth) if self._client._session and self._client._session.auth else None,
           self._client._base_url,
-          smart_unicode(path, errors='replace'),
+          smart_str(path, errors='replace'),
           iri_to_uri('?' + urlencode(params)) if params else '',
           req_data[:log_length] if data else '',
           log_length and len(req_data) > log_length and '...' or '' if data else '',
@@ -134,7 +134,7 @@ class Resource(object):
           resp_content[:log_length] if resp else '',
           log_length and len(resp_content) > log_length and '...' or '' if resp else ''
         )
-      except:
+      except Exception:
         short_call_name = '%s %s' % (method, self._client._base_url)
         LOG.exception('Error logging return call %s' % short_call_name)
         message = '%s returned in %dms' % (short_call_name, duration)
@@ -143,7 +143,6 @@ class Resource(object):
       log_if_slow_call(duration=duration, message=message, logger=self._client.logger)
 
     return resp
-
 
   def get(self, relpath=None, params=None, headers=None, clear_cookies=False):
     """
@@ -156,7 +155,6 @@ class Resource(object):
     """
     return self.invoke("GET", relpath, params, headers=headers, allow_redirects=True, clear_cookies=clear_cookies)
 
-
   def delete(self, relpath=None, params=None, headers=None, clear_cookies=False):
     """
     Invoke the DELETE method on a resource.
@@ -168,7 +166,6 @@ class Resource(object):
     @return: A dictionary of the JSON result.
     """
     return self.invoke("DELETE", relpath, params, headers=headers, clear_cookies=clear_cookies)
-
 
   def post(self, relpath=None, params=None, data=None, contenttype=None, headers=None, files=None, allow_redirects=False,
       clear_cookies=False, log_response=True
@@ -189,7 +186,6 @@ class Resource(object):
       "POST", relpath, params, data, headers=self._make_headers(contenttype, headers), files=files,
       allow_redirects=allow_redirects, clear_cookies=clear_cookies, log_response=log_response
     )
-
 
   def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False, clear_cookies=False, headers=None):
     """
@@ -241,7 +237,7 @@ def log_if_slow_call(duration, message, logger):
   elif duration >= math.floor(INFO_LEVEL_CALL_DURATION_MS / 1000):
     logger.info('SLOW: %.2f - %s' % (duration, message))
   else:
-    #Leave this as logging.debug and not logger.
-    #Otherwise we never get these logging messages even with debug enabled.
-    #Review this in the future to find out why.
+    # Leave this as logging.debug and not logger.
+    # Otherwise we never get these logging messages even with debug enabled.
+    # Review this in the future to find out why.
     logging.debug(message)

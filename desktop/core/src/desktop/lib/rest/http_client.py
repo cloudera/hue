@@ -14,14 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 import logging
 import posixpath
 import requests
 import threading
-import sys
 
 from django.utils.encoding import iri_to_uri, smart_str
 from django.utils.http import urlencode
@@ -33,12 +29,9 @@ from urllib3.contrib import pyopenssl
 
 from desktop import conf
 
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
-else:
-  from urllib import quote as urllib_quote
-  from urlparse import urlparse as lib_urlparse
+import urllib.request
+import urllib.error
+from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
 
 
 pyopenssl.DEFAULT_SSL_CIPHER_LIST = conf.SSL_CIPHER_LIST.get()

@@ -29,10 +29,7 @@ from oozie.models import Job, Node, Dataset
 
 from desktop.auth.backend import is_admin
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -121,7 +118,7 @@ def check_editor_access_permission(view_func):
   return wraps(view_func)(decorate)
 
 
-## Oozie v1 below
+# Oozie v1 below
 
 
 def check_job_access_permission(exception_class=PopupException):

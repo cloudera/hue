@@ -25,10 +25,7 @@ from desktop.lib.scheduler.lib.hive import HiveSchedulerApi
 
 from jobbrowser.apis.base_api import Api
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -58,7 +55,6 @@ class HiveScheduleApi(Api):
       'total': len(tasks)
     }
 
-
   def app(self, appid):
     appid = appid.rsplit('-')[-1]
     api = HiveSchedulerApi(user=self.user)
@@ -83,7 +79,6 @@ class HiveScheduleApi(Api):
         }
     }
 
-
   def action(self, app_ids, operation):
     api = HiveSchedulerApi(user=self.user)
 
@@ -103,10 +98,8 @@ class HiveScheduleApi(Api):
         'message': _('%s signal sent to %s') % (operation['action'], operations)
     }
 
-
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
-
 
   def profile(self, appid, app_type, app_property, app_filters):
     appid = appid.rsplit('-')[-1]
@@ -124,13 +117,11 @@ class HiveScheduleApi(Api):
     else:
       return {}
 
-
   def _api_status(self, status):
     if status == 'RUNNING':
       return 'RUNNING'
     else:
       return 'PAUSED'
-
 
   def _massage_status(self, task):
     return 'RUNNING' if task['enabled'] else 'PAUSED'

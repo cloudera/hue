@@ -21,10 +21,8 @@ from desktop.models import set_user_preferences
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
+
 
 logging.basicConfig()
 LOG = logging.getLogger()
@@ -46,7 +44,7 @@ class Command(BaseCommand):
                   action="store", default="all", dest='username'),
     )
 
-  except AttributeError, e:
+  except AttributeError as e:
     baseoption_test = 'BaseCommand' in str(e) and 'option_list' in str(e)
     if baseoption_test:
       def add_arguments(self, parser):

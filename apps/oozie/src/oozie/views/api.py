@@ -37,10 +37,7 @@ from oozie.models import Workflow, Node, Start, End, Kill,\
 from oozie.decorators import check_job_access_permission, check_job_edition_permission
 from oozie.utils import model_to_dict, format_dict_field_values, format_field_value
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -48,7 +45,7 @@ LOG = logging.getLogger()
 try:
   from jobbrowser.views import job_single_logs
   from jobbrowser.models import LinkJobLogs
-except:
+except Exception:
   LOG.warning('Oozie is not enabled')
 
 
@@ -225,9 +222,11 @@ def _validate_nodes_json(json_nodes, errors, user, workflow):
       node_result = True
     link_result = _validate_node_links_json(node['node_type'], node_dict['child_links'], _errors)
     result = result and node_result and link_result
-    if 'name' not in node and ( 'node_type' not in node or 'id' not in node ):
-      raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': 'Node is missing a name.'}, error_code=400)
-    errors[node.get('name', '%s-%s' % ( node.get('node_type'), node.get('id')))] = _errors
+    if 'name' not in node and ('node_type' not in node or 'id' not in node):
+      raise StructuredException(
+        code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': 'Node is missing a name.'}, error_code=400
+      )
+    errors[node.get('name', '%s-%s' % (node.get('node_type'), node.get('id')))] = _errors
 
   return result
 
@@ -246,9 +245,9 @@ def _update_workflow_nodes_json(workflow, json_nodes, id_map, user):
         # sub_workflow is None
         node.sub_workflow = None
       except Workflow.DoesNotExist:
-        raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': 'Chosen subworkflow does not exist.'}, error_code=400)
+        raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': 'Chosen subworkflow does not exist.'}, error_code=400)  # noqa: E501
     elif node.node_type == 'fork' and json_node['node_type'] == 'decision':
-      node.save() # Need to save in case database throws error when performing delete.
+      node.save()  # Need to save in case database throws error when performing delete.
       node = node.convert_to_decision()
     node.save()
 
@@ -314,8 +313,12 @@ def _workflow(request, workflow):
 
 
 @error_handler
-@check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
-@check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
+@check_job_access_permission(
+  exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401))
+)
+@check_job_edition_permission(
+  exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401))
+)
 def workflow_validate_node(request, workflow, node_type):
   response = {'status': -1, 'data': {}}
 
@@ -331,8 +334,12 @@ def workflow_validate_node(request, workflow, node_type):
 
 # Workflow and child links are SPECIAL.
 @error_handler
-@check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
-@check_job_edition_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
+@check_job_access_permission(
+  exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401))
+)
+@check_job_edition_permission(
+  exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401))
+)
 def workflow_save(request, workflow):
   if request.method != 'POST':
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be POST request.'), error_code=405)
@@ -343,7 +350,9 @@ def workflow_save(request, workflow):
   form = WorkflowForm(data=json_workflow)
 
   if not form.is_valid():
-    raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': form.errors}, error_code=400)
+    raise StructuredException(
+      code="INVALID_REQUEST_ERROR", message=_('Error saving workflow'), data={'errors': form.errors}, error_code=400
+    )
 
   json_nodes = json_workflow['nodes']
   id_map = {}
@@ -385,7 +394,9 @@ def workflow_save(request, workflow):
 
 
 @error_handler
-@check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
+@check_job_access_permission(
+  exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401))
+)
 def workflow(request, workflow):
   if request.method != 'GET':
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be GET request.'), error_code=405)
@@ -394,7 +405,9 @@ def workflow(request, workflow):
 
 
 @error_handler
-@check_job_access_permission(exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401)))
+@check_job_access_permission(
+  exception_class=(lambda x: StructuredException(code="UNAUTHORIZED_REQUEST_ERROR", message=x, data=None, error_code=401))
+)
 def workflow_actions(request, workflow):
   if request.method != 'GET':
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be GET request.'), error_code=405)
@@ -415,9 +428,9 @@ def workflows(request):
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be GET request.'), error_code=405)
 
   if request.GET.get('managed', 'false').lower() == 'false':
-    extra='jobsub'
+    extra = 'jobsub'
   else:
-    extra=''
+    extra = ''
 
   workflow_docs = Document.objects.get_docs(request.user, Workflow, extra=extra)
 
@@ -432,7 +445,7 @@ def workflows(request):
 
 
 def autocomplete_properties(request):
-  return JsonResponse({ 'properties': _STD_PROPERTIES })
+  return JsonResponse({'properties': _STD_PROPERTIES})
 
 
 @error_handler
@@ -500,6 +513,6 @@ def _get_progress(job, log):
     return 100
   else:
     try:
-      return int(re.findall("MapReduceLauncher  - (1?\d?\d)% complete", log)[-1])
-    except:
+      return int(re.findall(r"MapReduceLauncher  - (1?\d?\d)% complete", log)[-1])
+    except Exception:
       return 0

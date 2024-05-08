@@ -32,10 +32,7 @@ from aws.s3.s3test_utils import S3TestBase, generate_id
 from aws.s3.upload import DEFAULT_WRITE_SIZE
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 class TestS3FileSystem():
@@ -150,7 +147,6 @@ class S3FSTest(S3TestBase):
       add_to_group('test')
       cls.user = User.objects.get(username="test")
 
-
   def test_open(self):
     path = self.get_test_path('test_open.txt')
 
@@ -174,7 +170,6 @@ class S3FSTest(S3TestBase):
       with pytest.raises(Exception):
         self.fs.open(path, mode='?r')
 
-
   def test_read(self):
     path = self.get_test_path('test_read.txt')
     with self.cleaning(path):
@@ -184,14 +179,11 @@ class S3FSTest(S3TestBase):
       assert 'Hel' == self.fs.read(path, 0, 3)
       assert 'ell' == self.fs.read(path, 1, 3)
 
-
   def test_isfile(self):
     pass
 
-
   def test_isdir(self):
     pass
-
 
   def test_exists(self):
     dir_path = self.get_test_path('test_exists')
@@ -210,7 +202,6 @@ class S3FSTest(S3TestBase):
     fake_bucket = 'fake%s' % generate_id(8, string.ascii_lowercase + string.digits)
     assert not self.fs.exists('s3a://%s' % fake_bucket)
 
-
   def test_stats(self):
     with pytest.raises(ValueError):
       self.fs.stats('ftp://archive')
@@ -219,13 +210,12 @@ class S3FSTest(S3TestBase):
       self.fs.stats(not_exists)
 
     root_stat = self.fs.stats('s3a://')
-    assert True == root_stat.isDir
+    assert True is root_stat.isDir
     assert 's3a://' == root_stat.path
 
     bucket_stat = self.fs.stats('s3a://%s' % self.bucket_name)
-    assert True == bucket_stat.isDir
+    assert True is bucket_stat.isDir
     assert 's3a://%s' % self.bucket_name == bucket_stat.path
-
 
   def test_copyfile(self):
     src_path = self.get_test_path('test_copy_file_src')
@@ -238,7 +228,6 @@ class S3FSTest(S3TestBase):
       self.fs.copyfile(src_path, dst_path)
       actual = self.fs.read(dst_path, 0, len(data) + 100)
       assert data == actual
-
 
   def test_full_copy(self):
     src_path = self.get_test_path('test_full_copy_src')
@@ -269,7 +258,6 @@ class S3FSTest(S3TestBase):
       with pytest.raises(S3FileSystemException):
         self.fs.copy(src_path, dst_file_path, True)
 
-
   def test_copy_remote_dir(self):
     src_dir = self.get_test_path('test_copy_remote_dir_src')
     dst_dir = self.get_test_path('test_copy_remote_dir_dst')
@@ -291,7 +279,6 @@ class S3FSTest(S3TestBase):
       assert src_names
       assert src_names == dst_names
 
-
   def test_copy_from_local(self):
     src_name = 'test_copy_from_local_src'
     src_path = os.path.join(tempfile.gettempdir(), src_name)
@@ -306,7 +293,6 @@ class S3FSTest(S3TestBase):
       self.fs.copyFromLocal(src_path, dst_path)
       actual = self.fs.read(dst_path, 0, len(data) + 100)
       assert data == actual
-
 
   def test_rename_dir(self):
     src_dir = self.get_test_path('test_rename_dir_src')
@@ -337,12 +323,11 @@ class S3FSTest(S3TestBase):
 
       # Assert that the children files are not duplicated at top-level destination
       bucket_ls = self.bucket.list()
-      assert not 'file_one.txt' in bucket_ls
-      assert not 'file_two.txt' in bucket_ls
+      assert 'file_one.txt' not in bucket_ls
+      assert 'file_two.txt' not in bucket_ls
 
       # Assert that only the renamed directory, and not an empty file, exists
       assert 1 == len([key for key in bucket_ls if key.name.strip('/') == self.get_key(dst_dir).name.strip('/')])
-
 
   def test_rename_star(self):
     src_dir = self.get_test_path('test_rename_star_src')
@@ -370,7 +355,6 @@ class S3FSTest(S3TestBase):
       assert src_names
       assert src_names == dst_names
 
-
   def test_rmtree(self):
     with pytest.raises(NotImplementedError):
       self.fs.rmtree('universe', skipTrash=False)
@@ -390,11 +374,9 @@ class S3FSTest(S3TestBase):
       assert not self.fs.exists(nested_dir)
       assert not self.fs.exists(directory)
 
-
   def test_listing_buckets(self):
     buckets = self.fs.listdir('s3a://')
     assert len(buckets) > 0
-
 
   def test_mkdir(self):
     dir_path = self.get_test_path('test_mkdir')
@@ -402,7 +384,6 @@ class S3FSTest(S3TestBase):
 
     self.fs.mkdir(dir_path)
     assert self.fs.exists(dir_path)
-
 
   def test_upload_file(self):
     with tempfile.NamedTemporaryFile() as local_file:
@@ -430,7 +411,6 @@ class S3FSTest(S3TestBase):
       actual = f.read(file_size)
       expected = file(local_file).read()
       assert actual == expected, 'files do not match: %s != %s' % (len(actual), len(expected))
-
 
   def test_check_access(self):
     dir_path = self.get_test_path('test_check_access')

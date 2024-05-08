@@ -23,14 +23,11 @@ import sys
 
 from django.core.cache import cache
 
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 from desktop.conf import has_channels
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 if has_channels():
   from notebook.consumer import _send_to_channel
@@ -47,7 +44,7 @@ class KSqlApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 class KSqlApi(object):
@@ -72,14 +69,12 @@ class KSqlApi(object):
 
     self.client = client = KSQLAPI(self._api_url)
 
-
   def show_tables(self):
     try:
       response = self.client.ksql('SHOW TABLES')
       return response[0]['tables']
     except Exception as e:
       raise KSqlApiException(e)
-
 
   def show_topics(self):
     try:
@@ -88,14 +83,12 @@ class KSqlApi(object):
     except Exception as e:
       raise KSqlApiException(e)
 
-
   def show_streams(self):
     try:
       response = self.client.ksql('SHOW STREAMS')
       return response[0]['streams']
     except Exception as e:
       raise KSqlApiException(e)
-
 
   def get_columns(self, table):
     try:
@@ -104,12 +97,10 @@ class KSqlApi(object):
     except Exception as e:
       raise KSqlApiException(e)
 
-
   def ksql(self, statement):
     response = self.client.ksql(statement)
     LOG.debug('ksqlDB response: %s' % response)
     return response[0] if response else {'@type': 'queries', 'queries': []}  # INSERTs return empty currently
-
 
   def query(self, statement, channel_name=None):
     data = []
@@ -188,10 +179,8 @@ class KSqlApi(object):
 
     return data, metadata
 
-
   def cancel(self, notebook, snippet):
     return {'status': -1}
-
 
   def _decode_result(self, result):
     columns = []

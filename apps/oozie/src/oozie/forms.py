@@ -34,10 +34,7 @@ from oozie.models import Workflow, Node, Java, Mapreduce, Streaming, Coordinator
   Dataset, DataInput, DataOutput, Pig, Link, Hive, Sqoop, Ssh, Shell, DistCp, Fs,\
   Email, SubWorkflow, Generic, Bundle, BundledCoordinator
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 
 LOG = logging.getLogger()
@@ -78,6 +75,7 @@ class ParameterForm(forms.Form):
     params = filter(lambda key: key in ParameterForm.NON_PARAMETERS, conf_dict.keys())
     return [{'name': name, 'value': conf_dict[name]} for name in params]
 
+
 class WorkflowForm(forms.ModelForm):
   class Meta(object):
     model = Workflow
@@ -96,6 +94,7 @@ class WorkflowForm(forms.ModelForm):
 
 
 SCHEMA_VERSION_CHOICES = ['0.4']
+
 
 class ImportWorkflowForm(WorkflowForm):
   definition_file = forms.FileField(label=_t("Local workflow.xml file"))
@@ -121,6 +120,7 @@ class NodeMetaForm(forms.ModelForm):
     ALWAYS_HIDE = ('workflow', 'children', 'node_type')
     model = Node
     exclude = ALWAYS_HIDE + ('name', 'description')
+
 
 class JavaForm(forms.ModelForm):
   class Meta(object):
@@ -285,6 +285,7 @@ class EmailForm(forms.ModelForm):
       'body': forms.Textarea(attrs={'class': 'span8'}),
     }
 
+
 class SubWorkflowForm(forms.ModelForm):
 
   def __init__(self, *args, **kwargs):
@@ -304,7 +305,7 @@ class SubWorkflowForm(forms.ModelForm):
   def clean_sub_workflow(self):
     try:
       return Workflow.objects.get(id=int(self.cleaned_data.get('sub_workflow')))
-    except:
+    except Exception:
       LOG.exception('The sub-workflow could not be found.')
       return None
 
@@ -565,6 +566,7 @@ class BundleForm(forms.ModelForm):
       'schema_version': forms.widgets.HiddenInput(),
     }
 
+
 class UpdateCoordinatorForm(forms.Form):
   endTime = forms.SplitDateTimeField(
     label='End Time', input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today() + timedelta(days=3),
@@ -586,10 +588,9 @@ class UpdateCoordinatorForm(forms.Form):
     super(UpdateCoordinatorForm, self).__init__(*args, **kwargs)
 
     self.fields['endTime'].initial = datetime.fromtimestamp(mktime(oozie_coordinator.endTime))
-    if type(oozie_coordinator.pauseTime) == struct_time:
+    if type(oozie_coordinator.pauseTime) is struct_time:
       self.fields['pauseTime'].initial = datetime.fromtimestamp(mktime(oozie_coordinator.pauseTime))
     self.fields['concurrency'].initial = oozie_coordinator.concurrency
-
 
 
 def design_form_by_type(node_type, user, workflow):

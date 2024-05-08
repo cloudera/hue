@@ -20,10 +20,7 @@ import sys
 from beeswax.urls import urlpatterns as beeswax_urls
 from impala import api as impala_api
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from django.urls import re_path
 
 urlpatterns = [
   re_path(r'^api/invalidate$', impala_api.invalidate, name='invalidate'),

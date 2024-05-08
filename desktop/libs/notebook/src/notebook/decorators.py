@@ -30,7 +30,7 @@ from dashboard.models import extract_solr_exception_message
 from desktop.conf import ENABLE_HUE_5
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2, Document, FilesystemException
 
@@ -39,10 +39,7 @@ from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, A
   OperationNotSupported
 from notebook.models import _get_editor_type
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -55,7 +52,7 @@ def check_editor_access_permission():
       editor_type = request.GET.get('type', 'hive')
       gist_id = request.POST.get('gist')
 
-      if editor_type == 'gist' or gist_id: # Gist don't have permissions currently
+      if editor_type == 'gist' or gist_id:  # Gist don't have permissions currently
         pass
       else:
         if editor_id:  # Open existing saved editor document
@@ -144,7 +141,7 @@ def api_error_handler(f):
     except QueryError as e:
       LOG.exception('Error running %s' % f.__name__)
       response['status'] = 1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
       if response['message'].index("max_row_size"):
         size = re.search(r"(\d+.?\d*) (.B)", response['message'])
         if size and size.group(1):
@@ -168,15 +165,17 @@ def api_error_handler(f):
     except Exception as e:
       LOG.exception('Error running %s' % f.__name__)
       response['status'] = -1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
     finally:
       if response:
         return JsonResponse(response)
 
   return wrapper
 
+
 def _closest_power_of_2(number):
   return math.pow(2, math.ceil(math.log(number, 2)))
+
 
 def _to_size_in_bytes(size, unit):
   unit_size = 1
@@ -191,6 +190,7 @@ def _to_size_in_bytes(size, unit):
     unit_size = unit_size * 1024 * 1024 * 1024 * 1024
 
   return float(size) * unit_size
+
 
 def json_error_handler(view_fn):
   def decorator(*args, **kwargs):

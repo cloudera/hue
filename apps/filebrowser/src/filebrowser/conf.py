@@ -15,23 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-
 from desktop.conf import ENABLE_DOWNLOAD
 from desktop.lib.conf import Config, coerce_bool
 from desktop.conf import is_oozie_enabled
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+
 
 MAX_SNAPPY_DECOMPRESSION_SIZE = Config(
   key="max_snappy_decompression_size",
   help=_("Max snappy decompression size in bytes."),
   private=True,
-  default=1024*1024*25,
+  default=1024 * 1024 * 25,
   type=int)
 
 ARCHIVE_UPLOAD_TEMPDIR = Config(
@@ -52,9 +47,11 @@ CONCURRENT_MAX_CONNECTIONS = Config(
   type=int,
   help=_('Configure the maximum number of concurrent connections(chunks) for file uploads using the chunked file uploader.'))
 
+
 def get_desktop_enable_download():
   """Get desktop enable_download default"""
   return ENABLE_DOWNLOAD.get()
+
 
 SHOW_DOWNLOAD_BUTTON = Config(
   key="show_download_button",
@@ -78,7 +75,7 @@ ENABLE_EXTRACT_UPLOADED_ARCHIVE = Config(
 
 REDIRECT_DOWNLOAD = Config(
   key="redirect_download",
-  help=_("Redirect client to WebHdfs or S3 for file download. Note: Turning this on will "\
+  help=_("Redirect client to WebHdfs or S3 for file download. Note: Turning this on will "
     "override notebook/redirect_whitelist for user selected file downloads on WebHdfs & S3."),
   type=coerce_bool,
   default=False)

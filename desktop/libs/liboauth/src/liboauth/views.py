@@ -15,19 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-
 import logging
-import sys
 
-LOG = logging.getLogger()
-
-import urllib.request, urllib.parse, urllib.error
-try:
-  import httplib2
-except ImportError:
-  LOG.warning('httplib2 module not found')
+import urllib.request
+import urllib.parse
+import urllib.error
 
 import django.contrib.auth.views
 from django.core.exceptions import SuspiciousOperation
@@ -48,10 +40,14 @@ from desktop.log.access import access_warn, last_access_map
 import liboauth.conf
 from liboauth.backend import OAuthBackend
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
+
+LOG = logging.getLogger()
+
+try:
+  import httplib2
+except ImportError:
+  LOG.warning('httplib2 module not found')
 
 
 @login_notrequired
@@ -71,7 +67,6 @@ def show_login_page(request, login_errors=False):
     'socialLinkedin': liboauth.conf.CONSUMER_KEY_LINKEDIN.get() != "" and liboauth.conf.CONSUMER_SECRET_LINKEDIN.get() != "",
     'socialTwitter': liboauth.conf.CONSUMER_KEY_TWITTER.get() != "" and liboauth.conf.CONSUMER_SECRET_TWITTER.get() != ""
  })
-
 
 
 @login_notrequired

@@ -33,10 +33,7 @@ from librdbms.design import SQLdesign
 from beeswax import models as beeswax_models
 from beeswax.views import safe_get_design
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -53,6 +50,8 @@ def configuration_error(request, *args, **kwargs):
 """
 Decorators
 """
+
+
 def ensure_configuration(view_func):
   def _decorator(*args, **kwargs):
     if conf.DATABASES.get():
@@ -65,6 +64,8 @@ def ensure_configuration(view_func):
 """
 Queries Views
 """
+
+
 @ensure_configuration
 def execute_query(request, design_id=None, query_history_id=None):
   """

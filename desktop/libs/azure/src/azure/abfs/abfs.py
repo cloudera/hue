@@ -18,14 +18,11 @@
 """
 Interfaces for ABFS
 """
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
+
 import logging
 import os
 import sys
 import threading
-import re
 
 from math import ceil
 from posixpath import join
@@ -42,18 +39,17 @@ from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
 from azure.conf import PERMISSION_ACTION_ABFS, is_raz_abfs
 
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import quote as urllib_quote
-  from urllib.parse import urlparse as lib_urlparse
-else:
-  from urlparse import urlparse as lib_urlparse
-  from urllib import quote as urllib_quote
+import urllib.request
+import urllib.error
+from urllib.parse import quote as urllib_quote
+from urllib.parse import urlparse as lib_urlparse
+
 
 LOG = logging.getLogger()
 
 # Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
+
 
 class ABFSFileSystemException(IOError):
 
@@ -134,7 +130,7 @@ class ABFS(object):
 
   def _getheaders(self):
     headers = {
-      "x-ms-version": "2019-12-12" # For latest SAS support
+      "x-ms-version": "2019-12-12"  # For latest SAS support
     }
 
     if self._token_type and self._access_token:
@@ -190,7 +186,7 @@ class ABFS(object):
       return ABFSStat.for_root(path)
     try:
       file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
-    except:
+    except Exception:
       raise IOError
 
     if dir_name == '':
@@ -293,7 +289,6 @@ class ABFS(object):
     listofDir = self.listdir_stats(path, params)
 
     return [x.name for x in listofDir]
-
 
   def listfilesystems(self, root=Init_ABFS.ABFS_ROOT, params=None, **kwargs):
     """
@@ -594,9 +589,6 @@ class ABFS(object):
     Renames a file
     """
     rename_source = Init_ABFS.strip_scheme(old)
-    if sys.version_info[0] < 3 and isinstance(rename_source, unicode):
-      rename_source = rename_source.encode('utf-8')
-
     headers = {'x-ms-rename-source': '/' + urllib_quote(rename_source)}
 
     try:
@@ -669,7 +661,7 @@ class ABFS(object):
             offset += size
             chunk = src.read(chunk_size)
           self.flush(remote_dst, params={'position': offset})
-        except:
+        except Exception:
           LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
           raise
       finally:
@@ -688,7 +680,7 @@ class ABFS(object):
         raise b
     except b:
       LOG.debug("Permisions have not been set")
-    except:
+    except Exception:
       Exception
 
   def mkswap(self, filename, subdir='', suffix='swp', basedir=None):
@@ -718,9 +710,9 @@ class ABFS(object):
     return self._filebrowser_action
 
   # Other Methods to condense stuff
-  #----------------------------
+  # ----------------------------
   # Write Files on creation
-  #----------------------------
+  # ----------------------------
   def _writedata(self, path, data, size):
     """
     Adds text to a given file
@@ -733,11 +725,11 @@ class ABFS(object):
         length = chunk_size
       else:
         length = chunk
-      self._append(path, data[i*chunk_size:i*chunk_size + length], length)
+      self._append(path, data[i * chunk_size:i * chunk_size + length], length)
     self.flush(path, {'position': int(size)})
 
   # Use Patch HTTP request
-  #----------------------------
+  # ----------------------------
   def _patching_sl(self, schemeless_path, param, data=None, header=None, **kwargs):
     """
     A wraper function for patch

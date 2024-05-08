@@ -15,31 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import json
 import logging
 import re
-import sys
 import time
 import uuid
-
-from django.utils.encoding import smart_str
 
 from beeswax.common import find_compute, is_compute
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from metadata.optimizer.base import get_api as get_optimizer_api
 
 from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -81,7 +74,7 @@ class QueryError(Exception):
     self.extra = {}
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 class Notebook(object):

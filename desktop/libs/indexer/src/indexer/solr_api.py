@@ -22,15 +22,12 @@ import sys
 from django.views.decorators.http import require_GET, require_POST
 
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from libsolr.api import SolrApi
 
 from indexer.solr_client import SolrClient
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -45,7 +42,7 @@ def api_error_handler(func):
     except Exception as e:
       LOG.exception('Error running %s' % func.__name__)
       response['status'] = -1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
     finally:
       if response:
         return JsonResponse(response)
@@ -147,6 +144,7 @@ def delete_indexes(request):
 
   return JsonResponse(response)
 
+
 @require_POST
 @api_error_handler
 def index(request):
@@ -160,6 +158,7 @@ def index(request):
   response['message'] = _('Data added')
 
   return JsonResponse(response)
+
 
 @require_POST
 @api_error_handler

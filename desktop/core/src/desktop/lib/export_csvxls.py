@@ -18,33 +18,25 @@
 """
 Common library to export either CSV or XLS.
 """
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next, object
 import gc
 import logging
 import numbers
 import openpyxl
 import re
 import six
-import sys
 import tablib
 
 from django.http import StreamingHttpResponse, HttpResponse
 from django.utils.encoding import smart_str
 from desktop.lib import i18n
 
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-  from urllib.parse import quote
-else:
-  from StringIO import StringIO as string_io
-  from django.utils.http import urlquote as quote
+from io import BytesIO as string_io
+from urllib.parse import quote
 
 
 LOG = logging.getLogger()
 
-DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024 # 1MB
+DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024  # 1MB
 ILLEGAL_CHARS = r'[\000-\010]|[\013-\014]|[\016-\037]'
 FORMAT_TO_CONTENT_TYPE = {
     'csv': 'application/csv',
@@ -56,6 +48,7 @@ FORMAT_TO_CONTENT_TYPE = {
 def nullify(cell):
   return cell if cell is not None else "NULL"
 
+
 def file_reader(fh):
   """Generator that reads a file, chunk-by-chunk."""
   while True:
@@ -64,6 +57,7 @@ def file_reader(fh):
       fh.close()
       break
     yield chunk
+
 
 def encode_row(row, encoding=None, make_excel_links=False):
   encoded_row = []
@@ -138,7 +132,7 @@ def create_generator(content_generator, format, encoding=None):
     raise Exception("Unknown format: %s" % format)
 
 
-def make_response(generator, format, name, encoding=None, user_agent=None): #TODO: Add support for 3rd party (e.g. nginx file serving)
+def make_response(generator, format, name, encoding=None, user_agent=None):  # TODO: Add support for 3rd party (e.g. nginx file serving)
   """
   @param data An iterator of rows, where every row is a list of strings
   @param format Either "csv" or "xls"

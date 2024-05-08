@@ -42,12 +42,10 @@ from notebook.decorators import check_editor_access_permission, check_document_a
 from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook, _get_editor_type, get_api, _get_dialect_example
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
+
 
 @check_document_access_permission
 def notebook(request, is_embeddable=False):
@@ -60,7 +58,7 @@ def notebook(request, is_embeddable=False):
   try:
     from spark.conf import LIVY_SERVER_SESSION_KIND
     is_yarn_mode = LIVY_SERVER_SESSION_KIND.get()
-  except:
+  except Exception:
     LOG.exception('Spark is not enabled')
 
   return render('notebook.mako', request, {
@@ -225,7 +223,7 @@ def execute_and_watch(request):
 
     sample = get_api(request, snippet).fetch_result(notebook, snippet, 0, start_over=True)
 
-    from indexer.api3 import _index # Will ve moved to the lib
+    from indexer.api3 import _index  # Will ve moved to the lib
     from indexer.file_format import HiveFormat
     from indexer.fields import Field
 

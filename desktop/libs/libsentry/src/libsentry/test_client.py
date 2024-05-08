@@ -17,7 +17,6 @@
 
 import os
 import shutil
-import sys
 import tempfile
 
 from libsentry import sentry_site
@@ -26,11 +25,6 @@ from libsentry.sentry_site import get_sentry_server_principal,\
   get_sentry_server_admin_groups
 from libsentry.client import SentryClient
 
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
-
 
 def test_security_plain():
   tmpdir = tempfile.mkdtemp()
@@ -38,7 +32,7 @@ def test_security_plain():
 
   try:
     xml = sentry_site_xml(provider='default')
-    open_file(os.path.join(tmpdir, 'sentry-site.xml'), 'w').write(xml)
+    open(os.path.join(tmpdir, 'sentry-site.xml'), 'w').write(xml)
     sentry_site.reset()
 
     assert 'test/test.com@TEST.COM' == get_sentry_server_principal()
@@ -47,7 +41,7 @@ def test_security_plain():
     security = SentryClient('test.com', 11111, 'test')._get_security()
 
     assert 'test' == security['kerberos_principal_short_name']
-    assert False == security['use_sasl']
+    assert False is security['use_sasl']
     assert 'NOSASL' == security['mechanism']
   finally:
     sentry_site.reset()
@@ -61,12 +55,12 @@ def test_security_kerberos():
 
   try:
     xml = sentry_site_xml(provider='default', authentication='kerberos')
-    open_file(os.path.join(tmpdir, 'sentry-site.xml'), 'w').write(xml)
+    open(os.path.join(tmpdir, 'sentry-site.xml'), 'w').write(xml)
     sentry_site.reset()
 
     security = SentryClient('test.com', 11111, 'test')._get_security()
 
-    assert True == security['use_sasl']
+    assert True is security['use_sasl']
     assert 'GSSAPI' == security['mechanism']
   finally:
     sentry_site.reset()

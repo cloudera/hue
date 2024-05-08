@@ -28,10 +28,7 @@ from desktop import appmanager
 from desktop.conf import is_oozie_enabled, has_connectors, is_cm_managed, ENABLE_UNIFIED_ANALYTICS, get_clusters
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool, coerce_csv
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 
 LOG = logging.getLogger()
@@ -100,7 +97,7 @@ def get_ordered_interpreters(user=None):
     ]
   else:
     if INTERPRETERS_CACHE is None:
-      none_user = None # for getting full list of interpreters
+      none_user = None  # for getting full list of interpreters
       if is_cm_managed():
         extra_interpreters = INTERPRETERS.get()  # Combine the other apps interpreters
         _default_interpreters(none_user)
@@ -149,13 +146,14 @@ def get_ordered_interpreters(user=None):
       'dialect': i.get('dialect', i['type']).lower(),
       'dialect_properties': i.get('dialect_properties') or {},  # Empty when connectors off
       'category': i.get('category', 'editor'),
-      "is_sql": i.get('is_sql') or \
-          i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink", "trino"] or \
+      "is_sql": i.get('is_sql') or
+          i['interface'] in ["hiveserver2", "rdbms", "jdbc", "solr", "sqlalchemy", "ksql", "flink", "trino"] or
           i['type'] in ["sql", "sparksql"],
       "is_catalog": i['interface'] in ["hms",],
     }
     for i in interpreters
   ]
+
 
 def computes_for_dialect(dialect, user):
   # import here due to avoid cyclic dependency
@@ -169,6 +167,7 @@ def computes_for_dialect(dialect, user):
   return ns_with_computes
 
 # cf. admin wizard too
+
 
 INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
@@ -316,6 +315,7 @@ EXAMPLES = ConfigSection(
     )
   )
 )
+
 
 def _default_interpreters(user):
   interpreters = []
@@ -467,7 +467,7 @@ def _excute_test_query(client, connector_id, interpreter=None):
       "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"%(connector_id)s","status":"running","statement":"select * from web_logs","properties":{"settings":[],"variables":[],"files":[],"functions":[]},"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,"statement":"select * from web_logs","operation_type":0,"modified_row_count":null,"guid":"7xm6+epkRx6dyvYvGNYePA==an"}},"lastExecuted": 1462554843817,"database":"default"}],
       "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
   }
-  """ % {
+  """ % {  # noqa: E501
     'connector_id': connector_id,
   }
   snippet = json.loads(notebook_json)['snippets'][0]

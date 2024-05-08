@@ -21,12 +21,10 @@ import django
 import math
 import sys
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 register = django.template.Library()
+
 
 @register.filter(name='unix_ms_to_datetime')
 def unix_ms_to_datetime(unixtime):
@@ -34,6 +32,6 @@ def unix_ms_to_datetime(unixtime):
   if unixtime:
     return datetime.datetime.fromtimestamp(math.floor(unixtime / 1000))
   return _("No time")
+
+
 unix_ms_to_datetime.is_safe = True
-
-

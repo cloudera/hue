@@ -31,13 +31,11 @@ from notebook.models import _get_notebook_api, make_notebook, MockRequest
 
 from jobbrowser.apis.base_api import Api
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
+
 
 class HiveQueryApi(Api):
   HEADERS = {'X-Requested-By': 'das'}

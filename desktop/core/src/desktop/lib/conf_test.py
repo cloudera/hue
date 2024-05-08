@@ -15,21 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 import configobj
 import logging
 import pytest
 import re
-import sys
 
 from desktop.lib.conf import *
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import StringIO as string_io
+
 
 def my_dynamic_default():
   """
@@ -37,11 +31,12 @@ def my_dynamic_default():
   """
   return 3 + 4
 
+
 class TestConfig(object):
   """Unit tests for the configuration module."""
 
   # Some test configurations to load
-  CONF_ONE="""
+  CONF_ONE = """
   foo = 123
   list=a,b,c
   """
@@ -62,33 +57,33 @@ class TestConfig(object):
     logging.basicConfig(level=logging.DEBUG)
     cls.conf = ConfigSection(
       members=dict(
-        FOO           = Config("foo",
+        FOO=Config("foo",
                                help="A vanilla configuration param",
                                type=int),
-        BAR           = Config("bar", default=456,
+        BAR=Config("bar", default=456,
                                help="Config with default",
                                type=int),
-        REQ           = Config("req", required=True,
+        REQ=Config("req", required=True,
                                help="A required config",
                                type=int),
-        OPT_NOT_THERE = Config("blahblah"),
-        REQ_NOT_THERE = Config("blah", required=True, help="Another required"),
-        PRIVATE_CONFIG= Config("dontseeme",private=True),
-        DYNAMIC_DEF   = Config("dynamic_default", dynamic_default=my_dynamic_default,
+        OPT_NOT_THERE=Config("blahblah"),
+        REQ_NOT_THERE=Config("blah", required=True, help="Another required"),
+        PRIVATE_CONFIG=Config("dontseeme", private=True),
+        DYNAMIC_DEF=Config("dynamic_default", dynamic_default=my_dynamic_default,
                                type=int),
-        SOME_SECTION  = ConfigSection(
+        SOME_SECTION=ConfigSection(
           "some_section",
           private=True,
-          members=dict(BAZ = Config("baz", default="baz_default"))),
-        LIST          = Config("list", type=list),
-        CLUSTERS      = UnspecifiedConfigSection(
+          members=dict(BAZ=Config("baz", default="baz_default"))),
+        LIST=Config("list", type=list),
+        CLUSTERS=UnspecifiedConfigSection(
           "clusters",
           help="Details about your Hadoop cluster(s)",
           each=ConfigSection(
             help="Details about a cluster - one section for each.",
-            members=dict(HOST = Config("host", help="Hostname for the NN",
+            members=dict(HOST=Config("host", help="Hostname for the NN",
                                        required=True),
-                         PORT = Config("port", help="Thrift port for the NN",
+                         PORT=Config("port", help="Thrift port for the NN",
                                        type=int, default=10090))))))
     cls.conf = cls.conf.bind(
       load_confs([configobj.ConfigObj(infile=string_io(cls.CONF_ONE)),
@@ -113,12 +108,12 @@ class TestConfig(object):
     assert 456 == self.conf.BAR.get()
     assert 345 == self.conf.REQ.get()
 
-    assert None == self.conf.OPT_NOT_THERE.get()
+    assert None is self.conf.OPT_NOT_THERE.get()
     with pytest.raises(KeyError):
       self.conf.REQ_NOT_THERE.get()
 
   def test_list_values(self):
-    assert ["a","b","c"] == self.conf.LIST.get()
+    assert ["a", "b", "c"] == self.conf.LIST.get()
 
   def test_sections(self):
     assert 2 == len(self.conf.CLUSTERS)
@@ -154,7 +149,7 @@ class TestConfig(object):
       # Check default values
       close_foo3 = self.conf.FOO.set_for_testing(present=False)
       try:
-        assert None == self.conf.FOO.get()
+        assert None is self.conf.FOO.get()
       finally:
         close_foo3()
     finally:
@@ -179,16 +174,15 @@ class TestConfig(object):
       close()
     assert "baz_default" == self.conf.SOME_SECTION.BAZ.get()
 
-
   def test_coerce_bool(self):
-    assert False == coerce_bool(False)
-    assert False == coerce_bool("FaLsE")
-    assert False == coerce_bool("no")
-    assert False == coerce_bool("0")
-    assert True == coerce_bool("TrUe")
-    assert True == coerce_bool("YES")
-    assert True == coerce_bool("1")
-    assert True == coerce_bool(True)
+    assert False is coerce_bool(False)
+    assert False is coerce_bool("FaLsE")
+    assert False is coerce_bool("no")
+    assert False is coerce_bool("0")
+    assert True is coerce_bool("TrUe")
+    assert True is coerce_bool("YES")
+    assert True is coerce_bool("1")
+    assert True is coerce_bool(True)
     with pytest.raises(Exception):
       coerce_bool(tuple("foo"))
 
@@ -196,7 +190,7 @@ class TestConfig(object):
     out = string_io()
     self.conf.print_help(out=out, skip_header=True)
     out = out.getvalue().strip()
-    assert not "dontseeme" in out
+    assert "dontseeme" not in out
     assert re.sub("^    (?m)", "", """
     Key: bar (optional)
       Default: 456

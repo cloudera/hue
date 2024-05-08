@@ -15,7 +15,7 @@
 ## limitations under the License.
 <%!
 import sys
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.views import commonheader, commonfooter
 from django.utils.encoding import force_unicode
 if sys.version_info[0] > 2:
@@ -189,7 +189,7 @@ ${layout.menubar(section='query')}
                     % if item is None:
                       NULL
                     % else:
-                      ${ smart_unicode(item, errors='ignore') | u }
+                      ${ smart_str(item, errors='ignore') | u }
                     % endif
                   </td>
                 % endfor

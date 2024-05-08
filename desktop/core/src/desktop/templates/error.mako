@@ -16,7 +16,7 @@
 <%!
 import sys
 from desktop.views import commonheader, commonfooter
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop import conf
 from desktop.auth.backend import is_admin
 
@@ -37,11 +37,11 @@ ${ commonheader(_('Error'), app_name, user, request, "40px") | n,unicode }
           <h1 class="card-heading simple">${ _('Error!') }</h1>
           <div class="card-body">
             <p>
-              <pre>${ smart_unicode(error) }</pre>
+              <pre>${ smart_str(error) }</pre>
 
               %if traceback and is_admin(user):
                 <textarea style="width: 100%;" rows=80 readonly="readonly">
-                ${ smart_unicode(traceback) }
+                ${ smart_str(traceback) }
                 </textarea>
               %endif
 

@@ -14,18 +14,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json
 
-from future import standard_library
-standard_library.install_aliases()
 try:
   import oauth2 as oauth
-except:
+except Exception:
   oauth = None
 
 import cgi
 import logging
-import sys
 from datetime import datetime
 
 from axes.decorators import axes_dispatch
@@ -48,18 +44,13 @@ from desktop.conf import OAUTH, ENABLE_ORGANIZATIONS, SESSION
 from desktop.lib import fsmanager
 from desktop.lib.django_util import render, login_notrequired, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.log.access import access_log, access_warn, last_access_map
+from desktop.log.access import access_warn, last_access_map
 from desktop.views import samlgroup_check, saml_login_headers
 from desktop.settings import LOAD_BALANCER_COOKIE
 from django.utils.encoding import smart_str
 
-
-if sys.version_info[0] > 2:
-  from urllib.parse import urlencode as urllib_urlencode
-  from django.utils.translation import gettext as _
-else:
-  from urllib import urlencode as urllib_urlencode
-  from django.utils.translation import ugettext as _
+from urllib.parse import urlencode as urllib_urlencode
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -161,7 +152,7 @@ def dt_login(request, from_modal=False):
 
         userprofile.first_login = False
         userprofile.last_activity = datetime.now()
-        if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL: # This is to fix a bug in Hue 4.3
+        if userprofile.creation_method == UserProfile.CreationMethod.EXTERNAL:  # This is to fix a bug in Hue 4.3
           userprofile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
         userprofile.update_data({'auth_backend': user.backend})
         try:
@@ -209,7 +200,7 @@ def dt_login(request, from_modal=False):
       request.method == 'POST' and request.user.username != request.POST.get('username'):
     # local user login failed, give the right auth_form with 'server' field
     auth_form = auth_forms.LdapAuthenticationForm()
-  
+
   if not from_modal and SESSION.ENABLE_TEST_COOKIE.get():
     request.session.set_test_cookie()
 
@@ -233,7 +224,7 @@ def dt_login(request, from_modal=False):
   })
 
   if not request.user.is_authenticated:
-    response.delete_cookie(LOAD_BALANCER_COOKIE) # Note: might be re-balanced to another Hue on login.
+    response.delete_cookie(LOAD_BALANCER_COOKIE)  # Note: might be re-balanced to another Hue on login.
 
   return response
 
@@ -283,12 +274,13 @@ def profile(request):
   """
   return render(None, request, _profile_dict(request.user))
 
+
 def _profile_dict(user):
   return dict(
     username=user.username,
     first_name=user.first_name,
     last_name=user.last_name,
-    last_login=str(user.last_login), # datetime object needs to be converted
+    last_login=str(user.last_login),  # datetime object needs to be converted
     email=user.email
   )
 

@@ -30,10 +30,7 @@ from useradmin.models import User, update_app_permissions, get_default_user_grou
 from notebook.conf import config_validator, get_ordered_interpreters, _excute_test_query
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 class TestInterpreterConfig(TestCase):
@@ -58,7 +55,6 @@ class TestInterpreterConfig(TestCase):
   def teardown_class(cls):
     for reset in cls._class_resets:
       reset()
-
 
   def test_get_ordered_interpreters(self):
     with patch('desktop.lib.connectors.api._get_installed_connectors') as _get_installed_connectors:
@@ -127,7 +123,6 @@ class TestCheckConfig():
         warnings = config_validator(user=self.user)
 
         assert not warnings, warnings
-
 
         _excute_test_query.side_effect = Exception('')
 

@@ -24,10 +24,7 @@ from desktop.conf import has_connectors
 from desktop.lib.exceptions import StructuredThriftTransportException
 from beeswax.settings import NICE_NAME
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 LOG = logging.getLogger()
 
@@ -42,7 +39,7 @@ def config_validator(user):
   v1
   All the configuration happens in apps/beeswax.
   '''
-  from beeswax.design import hql_query # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
+  from beeswax.design import hql_query  # dbms is dependent on beeswax.conf, import in method to avoid circular dependency
   from beeswax.server import dbms
 
   res = []
@@ -52,7 +49,7 @@ def config_validator(user):
 
   try:
     try:
-      if not 'test' in sys.argv:  # Avoid tests hanging
+      if 'test' not in sys.argv:  # Avoid tests hanging
         server = dbms.get(user)
         query = hql_query("SELECT 'Hello World!';")
         handle = server.execute_and_wait(query, timeout_sec=10.0)

@@ -29,10 +29,7 @@ from desktop.lib.rest.http_client import HttpClient, RestException
 from metadata.conf import CATALOG, get_catalog_search_cluster
 from metadata.catalog.base import CatalogAuthException, CatalogApiException, CatalogEntityDoesNotExistException, Api
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -59,9 +56,9 @@ class AtlasApi(Api):
     'hive_column': 'FIELD'
   }
 
-  CLASSIFICATION_RE = re.compile('(?:tag|tags|classification)\s*\:\s*(?:(?:\"([^"]+)\")|([^ ]+))\s*', re.IGNORECASE)
-  TYPE_RE = re.compile('type\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
-  OWNER_RE = re.compile('owner\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
+  CLASSIFICATION_RE = re.compile('(?:tag|tags|classification)\\s*\\:\\s*(?:(?:\"([^"]+)\")|([^ ]+))\\s*', re.IGNORECASE)
+  TYPE_RE = re.compile(r'type\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
+  OWNER_RE = re.compile(r'owner\s*\:\s*([^ ]+)\s*', re.IGNORECASE)
 
   def __init__(self, user=None):
     super(AtlasApi, self).__init__(user)
@@ -94,13 +91,12 @@ class AtlasApi(Api):
     elif self._password:
       self._client.set_basic_auth(self._username, self._password)
 
-    self._root = resource.Resource(self._client, urlencode=False) # For search_entities_interactive
+    self._root = resource.Resource(self._client, urlencode=False)  # For search_entities_interactive
 
     self.__headers = {}
     self.__params = ()
 
-    #self._fillup_properties() # Disabled currently
-
+    # self._fillup_properties() # Disabled currently
 
   def _get_types_from_sources(self, sources):
     default_entity_types = entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'S3BUCKET', 'OPERATION', 'DIRECTORY')
@@ -124,16 +120,16 @@ class AtlasApi(Api):
       "description": atlas_entity['attributes'].get('description'),
       "identity": atlas_entity['guid'],
       "internalType": atlas_entity['typeName'],
-      "meaningNames": atlas_entity['meaningNames'], # Atlas specific
-      "meanings": atlas_entity['meanings'], # Atlas specific
+      "meaningNames": atlas_entity['meaningNames'],  # Atlas specific
+      "meanings": atlas_entity['meanings'],  # Atlas specific
       "name": atlas_entity['attributes'].get('name'),
       "original_name": atlas_entity['attributes'].get('name'),
       "originalDescription": None,
       "originalName": atlas_entity['attributes'].get('name'),
       "owner": atlas_entity['attributes'].get('owner'),
-      "parentPath": '', # Set below
-      "properties": {}, # Set below
-      "sourceType": '', # Set below
+      "parentPath": '',  # Set below
+      "properties": {},  # Set below
+      "sourceType": '',  # Set below
       "classifications": [],
       "tags": atlas_entity['classificationNames'],
       "type": self.ATLAS_TO_NAV_TYPE.get(atlas_entity['typeName'].lower()) or atlas_entity['typeName']
@@ -198,7 +194,7 @@ class AtlasApi(Api):
         atlas_response = self._root.get('/v2/search/dsl?query=%s' % dsl_query, headers=self.__headers,
                                        params=self.__params)
 
-      if not 'entities' in atlas_response or len(atlas_response['entities']) < 1:
+      if 'entities' not in atlas_response or len(atlas_response['entities']) < 1:
         raise CatalogEntityDoesNotExistException('Could not find entity with query: %s' % dsl_query)
 
       for atlas_entity in atlas_response['entities']:
@@ -413,7 +409,6 @@ class AtlasApi(Api):
       LOG.error(msg)
       raise CatalogApiException(e.message)
 
-
   def update_entity(self, entity, **metadata):
     """
     PUT /api/v3/entities/:id
@@ -438,7 +433,6 @@ class AtlasApi(Api):
       else:
         raise raise_popup_exception('Failed to update entity', detail=e)
 
-
   def get_cluster_source_ids(self):
     return []
     # params = (
@@ -449,13 +443,11 @@ class AtlasApi(Api):
     # LOG.info(params)
     # return self._root.get('entities', headers=self.__headers, params=params)
 
-
   def add_tags(self, entity_id, tags):
     entity = self.get_entity(entity_id)
     new_tags = entity['tags'] or []
     new_tags.extend(tags)
     return self.update_entity(entity, tags=new_tags)
-
 
   def delete_tags(self, entity_id, tags):
     entity = self.get_entity(entity_id)
@@ -464,7 +456,6 @@ class AtlasApi(Api):
       if tag in new_tags:
         new_tags.remove(tag)
     return self.update_entity(entity, tags=new_tags)
-
 
   def update_properties(self, entity_id, properties, modified_custom_metadata=None, deleted_custom_metadata_keys=None):
     entity = self.get_entity(entity_id)
@@ -479,7 +470,6 @@ class AtlasApi(Api):
           del properties['properties'][key]
     return self.update_entity(entity, **properties)
 
-
   def delete_metadata_properties(self, entity_id, property_keys):
     entity = self.get_entity(entity_id)
     new_props = entity['properties'] or {}
@@ -487,7 +477,6 @@ class AtlasApi(Api):
       if key in new_props:
         del new_props[key]
     return self.update_entity(entity, properties=new_props)
-
 
   def get_lineage(self, entity_id):
     """
@@ -508,7 +497,6 @@ class AtlasApi(Api):
       else:
         raise raise_popup_exception('Failed to get lineage', detail=e)
 
-
   def create_namespace(self, namespace, description=None):
     try:
       data = json.dumps({'name': namespace, 'description': description})
@@ -519,7 +507,6 @@ class AtlasApi(Api):
       else:
         raise raise_popup_exception('Failed to create namespace', detail=e)
 
-
   def get_namespace(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s' % {'namespace': namespace})
@@ -528,7 +515,6 @@ class AtlasApi(Api):
         raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
       else:
         raise raise_popup_exception('Failed to get namespace', detail=e)
-
 
   def create_namespace_property(self, namespace, properties):
     try:
@@ -541,7 +527,6 @@ class AtlasApi(Api):
       else:
         raise raise_popup_exception('Failed to create namespace', detail=e)
 
-
   def get_namespace_properties(self, namespace):
     try:
       return self._root.get('models/namespaces/%(namespace)s/properties' % {'namespace': namespace})
@@ -550,7 +535,6 @@ class AtlasApi(Api):
         raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
       else:
         raise raise_popup_exception('Failed to create namespace', detail=e)
-
 
   def map_namespace_property(self, clazz, properties):
     try:
@@ -563,7 +547,6 @@ class AtlasApi(Api):
       else:
         raise raise_popup_exception('Failed to map class', detail=e)
 
-
   def get_model_properties_mapping(self):
     try:
       return self._root.get('models/properties/mappings')
@@ -572,7 +555,6 @@ class AtlasApi(Api):
         raise raise_popup_exception('Hue could not authenticate to Atlas', detail=e)
       else:
         raise raise_popup_exception('Failed to get models properties mappings', detail=e)
-
 
   def _fillup_properties(self):
     global _HAS_CATALOG_NAMESPACE
@@ -591,7 +573,7 @@ class AtlasApi(Api):
           "description": "List of Hue document UUIDs related to this entity",
           "multiValued": True,
           "maxLength": 36,
-          "pattern": ".*", # UUID
+          "pattern": ".*",  # UUID
           "enumValues": None,
           "type": "TEXT"
          })
@@ -604,7 +586,6 @@ class AtlasApi(Api):
           }])
 
       _HAS_CATALOG_NAMESPACE = True
-
 
   def _get_boosted_term(self, term):
     return 'AND'.join([
@@ -619,6 +600,5 @@ class AtlasApi(Api):
   def _clean_path(self, path):
     return path.rstrip('/').split('/')[-1], self._escape_slashes(path.rstrip('/'))
 
-
   def _escape_slashes(self, s):
-    return s.replace('/', '\/')
+    return s.replace('/', r'\/')

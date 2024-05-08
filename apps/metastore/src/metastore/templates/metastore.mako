@@ -23,7 +23,6 @@ else:
 
 from desktop import conf
 from desktop.conf import USE_NEW_EDITOR
-from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
 from desktop.webpack_utils import get_hue_bundles
 from metastore.conf import SHOW_TABLE_ERD

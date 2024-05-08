@@ -25,15 +25,12 @@ from subprocess import call
 
 from desktop.lib.rest.http_client import RestException, HttpClient
 from desktop.lib.rest.resource import Resource
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 
 from kafka.conf import KAFKA
 from libzookeeper.conf import zkensemble
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -47,7 +44,7 @@ class KafkaApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 class KafkaApi(object):
@@ -62,14 +59,12 @@ class KafkaApi(object):
     self._client = HttpClient(self._api_url, logger=LOG)
     self._root = Resource(self._client)
 
-
   def topics(self):
     try:
       response = self._root.get('topics')
       return json.loads(response)
     except RestException as e:
       raise KafkaApiException(e)
-
 
   def create_topic(self, name, partitions=1, replication_factor=1):
     # Create/delete topics are not available in the REST API.
@@ -98,7 +93,6 @@ class SchemaRegistryApi(object):
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
     self._root = Resource(self._client)
-
 
   def subjects(self):
     try:

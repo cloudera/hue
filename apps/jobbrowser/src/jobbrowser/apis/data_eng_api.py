@@ -18,16 +18,13 @@
 import logging
 import sys
 
-from datetime import datetime,  timedelta
+from datetime import datetime, timedelta
 
 from notebook.connectors.altus import DataEngApi, DATE_FORMAT
 
 from jobbrowser.apis.base_api import Api
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -59,10 +56,8 @@ class DataEngClusterApi(Api):
       'total': len(jobs)
     }
 
-
   def app(self, appid):
     return {}
-
 
   def action(self, appid, action):
     message = {'message': '', 'status': 0}
@@ -78,12 +73,10 @@ class DataEngClusterApi(Api):
         elif result.get('contents') and message.get('status') != -1:
           message['message'] = result.get('contents')
 
-    return message;
-
+    return message
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
-
 
   def profile(self, appid, app_type, app_property):
     return {}
@@ -94,7 +87,7 @@ class DataEngClusterApi(Api):
     elif status in ['ARCHIVING', 'COMPLETED', 'TERMINATING']:
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # KILLED and FAILED
+      return 'FAILED'  # KILLED and FAILED
 
 
 class DataEngJobApi(Api):
@@ -155,14 +148,11 @@ class DataEngJobApi(Api):
 
     return common
 
-
   def action(self, appid, action):
     return {}
 
-
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
-
 
   def profile(self, appid, app_type, app_property):
     return {}
@@ -173,4 +163,4 @@ class DataEngJobApi(Api):
     elif status in ['COMPLETED']:
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # INTERRUPTED , KILLED, TERMINATED and FAILED
+      return 'FAILED'  # INTERRUPTED , KILLED, TERMINATED and FAILED

@@ -26,10 +26,7 @@ from desktop.lib.connectors.models import Connector
 
 from useradmin.organization import _fitered_queryset, get_user_request_organization
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.organization import OrganizationGroup as Group, Organization
@@ -88,7 +85,6 @@ class ConnectorPermission(BasePermission):
     unique_together = ('connector', 'action',)
 
 
-
 if ENABLE_ORGANIZATIONS.get():
   class OrganizationConnectorPermissionManager(models.Manager):
 
@@ -115,8 +111,11 @@ if ENABLE_ORGANIZATIONS.get():
 
 if ENABLE_CONNECTORS.get():
   if ENABLE_ORGANIZATIONS.get():
-    class HuePermission(OrganizationConnectorPermission): pass
+    class HuePermission(OrganizationConnectorPermission):
+      pass
   else:
-    class HuePermission(ConnectorPermission): pass
+    class HuePermission(ConnectorPermission):
+      pass
 else:
-  class HuePermission(BasePermission): pass
+  class HuePermission(BasePermission):
+    pass

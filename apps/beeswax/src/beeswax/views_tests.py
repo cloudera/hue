@@ -26,10 +26,7 @@ import pytest
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch
 
 
 LOG = logging.getLogger()
@@ -41,7 +38,6 @@ class TestInstallExamples():
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=True, is_admin=True)
     self.user = User.objects.get(username="test")
-
 
   def test_install_via_insert_mysql(self):
 

@@ -22,10 +22,7 @@ import sys
 from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params, is_linkable, hdfs_link_js
 from liboozie.oozie_api import get_oozie
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -54,7 +51,7 @@ class WorkflowApi(Api):
     wf_list = oozie_api.get_workflows(**kwargs)
 
     return {
-      'apps':[{
+      'apps': [{
         'id': app['id'],
         'name': app['appName'],
         'status': app['status'],
@@ -69,7 +66,6 @@ class WorkflowApi(Api):
       } for app in massaged_oozie_jobs_for_json(wf_list.jobs, self.user)['jobs']],
       'total': wf_list.total
     }
-
 
   def app(self, appid):
     if '@' in appid:
@@ -103,10 +99,8 @@ class WorkflowApi(Api):
 
     return common
 
-
   def action(self, app_ids, action):
     return _manage_oozie_job(self.user, action, app_ids)
-
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     if '@' in appid:
@@ -116,7 +110,6 @@ class WorkflowApi(Api):
     data = get_oozie_job_log(request, job_id=appid)
 
     return {'logs': json.loads(data.content)['log']}
-
 
   def profile(self, appid, app_type, app_property, app_filters):
     if '@' in appid:
@@ -133,7 +126,9 @@ class WorkflowApi(Api):
       workflow = oozie_api.get_job(jobid=appid)
       return {
         'properties': workflow.conf_dict,
-        'properties_display': [{'name': key, 'value': val, 'link': is_linkable(key, val) and hdfs_link_js(val)} for key, val in workflow.conf_dict.items()],
+        'properties_display': [
+          {'name': key, 'value': val, 'link': is_linkable(key, val) and hdfs_link_js(val)} for key, val in workflow.conf_dict.items()
+        ],
       }
 
     return {}
@@ -146,7 +141,7 @@ class WorkflowApi(Api):
     elif status == 'SUCCEEDED':
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # KILLED and FAILED
+      return 'FAILED'  # KILLED and FAILED
 
   def _get_variables(self, workflow):
     parameters = []
@@ -184,7 +179,6 @@ class WorkflowActionApi(Api):
     common['properties']['workflow_id'] = appid.split('@', 1)[0]
 
     return common
-
 
   def logs(self, appid, app_type, log_name=None):
     return {'progress': 0, 'logs': ''}
@@ -229,7 +223,7 @@ def _filter_oozie_jobs(user, filters, kwargs):
       kwargs['cnt'] = min(filters['pagination']['limit'], OOZIE_JOBS_COUNT_LIMIT)
 
     if filters.get('states'):
-      states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
+      states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'], }
       for _state in filters.get('states'):
         for _status in states_filters[_state]:
           kwargs['filters'].extend([('status', _status)])

@@ -61,17 +61,15 @@ from desktop.monkey_patches import monkey_patch_username_validator
 from useradmin.conf import DEFAULT_USER_GROUP
 from useradmin.permissions import HuePermission, GroupPermission, LdapGroup
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.organization import OrganizationUser as User, OrganizationGroup as Group, get_organization, Organization
 else:
   from django.contrib.auth.models import User, Group
   def get_organization(): pass
-  class Organization(): pass
+  class Organization():
+    pass
 
   monkey_patch_username_validator()
 
@@ -167,8 +165,10 @@ def get_profile(user):
     user._cached_userman_profile = profile
     return profile
 
+
 def group_has_permission(group, perm):
   return GroupPermission.objects.filter(group=group, hue_permission=perm).exists()
+
 
 def group_permissions(group):
   return HuePermission.objects.filter(grouppermission__group=group).all()
@@ -182,7 +182,7 @@ def create_profile_for_user(user):
   try:
     p.save()
     return p
-  except:
+  except Exception:
     LOG.exception("Failed to automatically create user profile.")
     return None
 
@@ -235,7 +235,7 @@ def update_app_permissions(**kwargs):
     try:
       for dp in HuePermission.objects.all():
         current.setdefault(dp.app, {})[dp.action] = dp
-    except:
+    except Exception:
       LOG.exception('failed to get permissions')
       return
 
@@ -363,7 +363,7 @@ def install_sample_user(django_user=None):
         user = User.objects.get(id=SAMPLE_USER_ID)
         user.username = django_username
         user.save()
-  except:
+  except Exception:
     LOG.exception('Failed to get or create sample user')
 
   # If sample user doesn't belong to default group, add to default group

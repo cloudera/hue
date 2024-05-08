@@ -15,13 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 import json
 import logging
 import sys
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -40,20 +40,18 @@ from pig.management.commands import pig_setup
 from pig.models import get_workflow_output, hdfs_link, PigScript,\
   create_or_update_script, get_scripts
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
+
 
 @ensure_csrf_cookie
 def app(request):
   autocomplete_base_url = ''
   try:
     autocomplete_base_url = reverse('beeswax:api_autocomplete_databases', kwargs={}) + '/'
-  except:
+  except Exception:
     LOG.exception('failed to find autocomplete base url')
 
   return render('app.mako', request, {
@@ -210,7 +208,7 @@ def delete(request):
       pig_script.can_edit_or_exception(request.user)
       pig_script.doc.all().delete()
       pig_script.delete()
-    except:
+    except Exception:
       LOG.exception('failed to delete pig script')
       None
 
@@ -233,8 +231,14 @@ def watch(request, job_id):
     'progress': oozie_workflow.get_progress(),
     'isRunning': oozie_workflow.is_running(),
     'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id': oozie_workflow.id, 'action': 'kill'}),
-    'rerunUrl': reverse('oozie:rerun_oozie_job', kwargs={'job_id': oozie_workflow.id, 'app_path': urllib.parse.quote(oozie_workflow.appPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)}),
-    'actions': workflow_actions
+    'rerunUrl': reverse(
+      'oozie:rerun_oozie_job',
+      kwargs={
+        'job_id': oozie_workflow.id,
+        'app_path': urllib.parse.quote(oozie_workflow.appPath.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
+      },
+    ),
+    'actions': workflow_actions,
   }
 
   response = {

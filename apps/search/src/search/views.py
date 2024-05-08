@@ -26,10 +26,7 @@ from search.management.commands import search_setup
 
 from desktop.auth.backend import is_admin
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -47,7 +44,7 @@ def install_examples(request):
     try:
       data = request.POST.get('data')
       indexer_setup.Command().handle(data=data)
-      if 'log_analytics_demo' == data: # Hue documents installed only one time
+      if 'log_analytics_demo' == data:  # Hue documents installed only one time
         search_setup.Command().handle()
       result['status'] = 0
     except Exception as e:

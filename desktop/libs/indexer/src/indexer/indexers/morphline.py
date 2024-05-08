@@ -35,10 +35,7 @@ from indexer.file_format import get_file_format_instance, get_file_format_class
 from indexer.indexers.morphline_operations import get_checked_args
 from indexer.solr_client import SolrClient
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -201,7 +198,7 @@ class MorphlineIndexer(object):
       "get_kept_args": get_checked_args,
       "grok_dictionaries_location": grok_dicts_loc if self.fs and self.fs.exists(grok_dicts_loc) else None,
       "geolite_db_location": geolite_loc if self.fs and self.fs.exists(geolite_loc) else None,
-      "zk_host": self.solr_client.get_zookeeper_host() ## offline test?
+      "zk_host": self.solr_client.get_zookeeper_host()  # offline test?
     }
 
     oozie_workspace = CONFIG_INDEXING_TEMPLATES_PATH.get()
@@ -224,7 +221,7 @@ def _create_solr_collection(user, fs, client, destination, index_name, kwargs):
   for field in fields:
     for operation in field['operations']:
       if operation['type'] == 'split':
-        field['multiValued'] = True # Solr requires multiValued to be set when splitting
+        field['multiValued'] = True  # Solr requires multiValued to be set when splitting
         kwargs['f.%(name)s.split' % field] = 'true'
         kwargs['f.%(name)s.separator' % field] = operation['settings']['splitChar'] or ','
 

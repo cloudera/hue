@@ -28,10 +28,7 @@ from notebook.models import _get_notebook_api
 from kafka.conf import has_kafka_api
 from kafka.kafka_client import KafkaApi, KafkaApiException, SchemaRegistryApi
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()

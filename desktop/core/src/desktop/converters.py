@@ -29,10 +29,7 @@ from notebook.api import _historify
 from notebook.models import import_saved_beeswax_query, import_saved_java_job, import_saved_mapreduce_job, \
   import_saved_pig_script, import_saved_shell_job
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -50,7 +47,6 @@ class DocumentConverter(object):
     self.imported_tag = DocumentTag.objects.get_imported2_tag(user=self.user)
     self.imported_doc_count = 0
     self.failed_doc_ids = []
-
 
   def convert(self):
     self._convert_saved_queries()
@@ -83,7 +79,6 @@ class DocumentConverter(object):
       except Exception as e:
         LOG.exception("Failed to set is_trashed field with exception: %s" % e)
 
-
   def _convert_saved_queries(self):
     # Convert SavedQuery documents
     try:
@@ -110,7 +105,6 @@ class DocumentConverter(object):
           LOG.exception('Failed to import SavedQuery document id: %d' % doc.id)
     except ImportError:
       LOG.warning('Cannot convert Saved Query documents: beeswax app is not installed')
-
 
   def _convert_query_histories(self):
     # Convert SQL Query history documents
@@ -146,7 +140,6 @@ class DocumentConverter(object):
           LOG.exception('Failed to import history document id: %d' % doc.id)
     except ImportError as e:
       LOG.warning('Cannot convert history documents: beeswax app is not installed')
-
 
   def _convert_job_designs(self):
     # Convert Job Designer documents
@@ -193,7 +186,6 @@ class DocumentConverter(object):
     except ImportError as e:
       LOG.warning('Cannot convert Job Designer documents: oozie app is not installed')
 
-
   def _convert_pig_scripts(self):
     # Convert PigScript documents
     try:
@@ -222,7 +214,6 @@ class DocumentConverter(object):
     except ImportError as e:
       LOG.warning('Cannot convert Pig documents: pig app is not installed')
 
-
   def _get_unconverted_docs(self, content_type, only_history=False):
     docs = Document.objects.get_docs(self.user, content_type).filter(owner=self.user)
 
@@ -238,7 +229,6 @@ class DocumentConverter(object):
       tags.append(DocumentTag.objects.get_history_tag(user=self.user))
 
     return docs.exclude(tags__in=tags)
-
 
   def _get_parent_directory(self, document):
     """
@@ -257,7 +247,6 @@ class DocumentConverter(object):
       )
     return parent_dir
 
-
   def _sync_permissions(self, document, document2):
     """
     Syncs (creates) Document2Permissions based on the DocumentPermissions found for a given document.
@@ -269,7 +258,6 @@ class DocumentConverter(object):
         doc2_permission.users.add(*perm.users.all())
       if perm.groups:
         doc2_permission.groups.add(*perm.groups.all())
-
 
   def _create_doc2(self, document, doctype, name=None, description=None, data=None):
     try:

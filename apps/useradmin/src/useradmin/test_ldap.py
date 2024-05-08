@@ -38,10 +38,7 @@ from useradmin.views import sync_ldap_users, sync_ldap_groups, import_ldap_users
     add_ldap_users, add_ldap_groups, sync_ldap_users_groups
 from useradmin.tests import BaseUserAdminTests, LdapTestConnection, reset_all_groups, reset_all_users, create_long_username
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 def get_multi_ldap_config():
@@ -109,7 +106,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
       for finish in reset:
         finish()
-
 
   def test_useradmin_ldap_suboordinate_group_integration(self):
     reset = []
@@ -182,7 +178,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
     finally:
       for finish in reset:
         finish()
-
 
   def test_useradmin_ldap_nested_group_integration(self):
     reset = []
@@ -277,7 +272,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
       for finish in reset:
         finish()
 
-
   def test_useradmin_ldap_suboordinate_posix_group_integration(self):
     reset = []
 
@@ -349,7 +343,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
     finally:
       for finish in reset:
         finish()
-
 
   def test_useradmin_ldap_nested_posix_group_integration(self):
     reset = []
@@ -436,8 +429,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
       for finish in reset:
         finish()
 
-
-
   def test_useradmin_ldap_user_integration(self):
     if is_live_cluster():
       raise SkipTest('HUE-2897: Skipping because the DB may not be case sensitive')
@@ -518,7 +509,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
       for finish in done:
         finish()
 
-
   def test_useradmin_ldap_force_uppercase(self):
     if is_live_cluster():
       raise SkipTest('HUE-2897: Skipping because the DB may not be case sensitive')
@@ -544,8 +534,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
     finally:
       for finish in done:
         finish()
-
-
 
   def test_add_ldap_users(self):
     if is_live_cluster():
@@ -612,11 +600,11 @@ class TestUserAdminLdap(BaseUserAdminTests):
         )
       assert b"Could not get LDAP details for users in pattern" in response.content, response.content
       # Removing this test because we are not running log listener
-      #response = c.get(reverse(desktop.views.log_view))
-      #whitespaces_message = "{username}: Username must not contain whitespaces".format(username='user with space')
-      #if not isinstance(whitespaces_message, bytes):
+      # response = c.get(reverse(desktop.views.log_view))
+      # whitespaces_message = "{username}: Username must not contain whitespaces".format(username='user with space')
+      # if not isinstance(whitespaces_message, bytes):
       #  whitespaces_message = whitespaces_message.encode('utf-8')
-      #assert_true(whitespaces_message in response.content, response.content)
+      # assert_true(whitespaces_message in response.content, response.content)
 
       # Test dn with spaces in dn, but not username (should succeed)
       response = c.post(
@@ -629,7 +617,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
     finally:
       for finish in done:
         finish()
-
 
   def test_add_ldap_users_force_uppercase(self):
     if is_live_cluster():
@@ -710,9 +697,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
     user, created = ldap_access.get_or_create_ldap_user(username=user_info[0]['username'])
     user.first_name = user_info[0]['first']
     user.last_name = 'ชมหรือด่า อย่าไปรับ ให้กลับคืนไป'[:30]
-    if sys.version_info[0] == 2:
-      with pytest.raises(DatabaseError):
-        user.save() # 'Incorrect string value: '\\xE0\\xB8\\' for column 'last_name' at row 1'
 
     user.last_name = user_info[0]['last']
     user.save()
@@ -745,14 +729,11 @@ class TestUserAdminLdap(BaseUserAdminTests):
       # Import test_longfirstname user
       ldap_access.CACHED_LDAP_CONN.add_user_group_for_test('uid=test_longfirstname,ou=People,dc=example,dc=com', 'TestUsers')
       response = c.post(URL, dict(server='multi_ldap_conf', groupname_pattern='TestUsers', import_members=True), follow=True)
-      if sys.version_info[0] > 2:
-        user_list_a = create_long_username().encode('utf-8') + b", test_longfirstname"
-        user_list_b = b"test_longfirstname, " + create_long_username().encode('utf-8')
-      else:
-        user_list_a = create_long_username() + b", test_longfirstname"
-        user_list_b = b"test_longfirstname, " + create_long_username()
 
-      assert (b'Failed to import following users: %s' % user_list_a in response.content \
+      user_list_a = create_long_username().encode('utf-8') + b", test_longfirstname"
+      user_list_b = b"test_longfirstname, " + create_long_username().encode('utf-8')
+
+      assert (b'Failed to import following users: %s' % user_list_a in response.content
         or b'Failed to import following users: %s' % user_list_b in response.content), response.content
 
       # Test with space

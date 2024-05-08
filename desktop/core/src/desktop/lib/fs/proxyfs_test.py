@@ -14,24 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 import pytest
-import sys
 
 from builtins import object
 
 from useradmin.models import User
 
-from desktop.auth.backend import rewrite_user
 from desktop.lib.fs import ProxyFS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission, remove_from_group
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, MagicMock
-else:
-  from mock import patch, MagicMock
+from unittest.mock import patch, MagicMock
 
 
 @pytest.mark.django_db
@@ -73,6 +66,7 @@ def test_fs_selection():
 
     with pytest.raises(IOError):
       proxy_fs.stats('ftp://host')
+
 
 def wrapper(mock):
   def tmp(*args, **kwargs):
@@ -142,7 +136,6 @@ class MockFs(object):
 
   def filebrowser_action(self):
     return self._filebrowser_action
-
 
 
 @pytest.mark.django_db
@@ -233,4 +226,3 @@ class TestFsPermissions(object):
     f('/tmp')
     f('gs://bucket/key')
     f('ofs://volume/bucket/key')
-

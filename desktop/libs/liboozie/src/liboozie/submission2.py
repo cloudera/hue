@@ -43,10 +43,7 @@ from liboozie.conf import REMOTE_DEPLOYMENT_DIR, USE_LIBPATH_FOR_JARS
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -620,7 +617,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'),
     # In Py3 because of i18n, the xml data is not properly utf-8 encoded for some languages.
     # This can later throw UnicodeEncodeError exception for request body in HDFS or other FS API calls. To tackle this,
     # We are converting the data into bytes by utf-8 encoding instead of str type.
-    data = smart_str(data).encode('utf-8') if sys.version_info[0] > 2 else smart_str(data)
+    data = smart_str(data).encode('utf-8')
 
     if do_as:
       self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0o644, data=data)
@@ -679,7 +676,7 @@ print _exec('%(service)s', '%(command)s', %(args)s)
     else:
       hostname = ALTUS.HOSTNAME.get()
 
-    if type(cluster) == dict:
+    if type(cluster) is dict:
       command = 'createAWSCluster'
       arguments = cluster
     else:

@@ -15,17 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
 from beeswax import views as beeswax_views
 from beeswax import create_database as beeswax_create_database
 from beeswax import create_table as beeswax_create_table
 from beeswax import api as beeswax_api
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from django.urls import re_path
+
 
 urlpatterns = [
   re_path(r'^$', beeswax_views.index, name='index'),

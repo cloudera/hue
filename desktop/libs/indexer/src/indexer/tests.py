@@ -32,10 +32,7 @@ from useradmin.models import User
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 def test_get_ensemble():
@@ -75,7 +72,7 @@ class TestImporter(object):
       get_filesystem.return_value = None
 
       resp = self.client.get(reverse('indexer:importer'))
-      assert not b"{'value': 'file', 'name': 'Remote File'}" in resp.content
+      assert b"{'value': 'file', 'name': 'Remote File'}" not in resp.content
 
 
 class TestIndexerWithSolr(object):

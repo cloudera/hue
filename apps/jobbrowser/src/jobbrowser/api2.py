@@ -23,7 +23,7 @@ from urllib.request import Request, urlopen
 
 from django.http import HttpResponse
 
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.views import serve_403_error
 
@@ -32,10 +32,7 @@ from jobbrowser.apis.query_store import query_store_proxy, stream_download_bundl
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS, USE_PROXY
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -49,7 +46,7 @@ def api_error_handler(func):
     except Exception as e:
       LOG.exception('Error running %s' % func)
       response['status'] = -1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
     finally:
       if response:
         return JsonResponse(response)
@@ -167,7 +164,7 @@ def profile(request):
   ])
 
   api = get_api(request.user, interface, cluster=cluster)
-  api._set_request(request) # For YARN
+  api._set_request(request)  # For YARN
 
   resp = api.profile(app_id, app_type, app_property, app_filters)
 

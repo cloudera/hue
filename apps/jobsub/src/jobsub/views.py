@@ -45,10 +45,7 @@ from oozie.utils import model_to_dict, format_dict_field_values,\
 
 from desktop.auth.backend import is_admin
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 MAX_DESIGNS = 250
@@ -115,8 +112,10 @@ def list_designs(request):
       'apps': appmanager.get_apps_dict()
     })
 
+
 def not_available(request):
   return render("not_available.mako", request, {})
+
 
 def _get_design(user, design_id):
   """Raise PopupException if design doesn't exist"""
@@ -206,7 +205,7 @@ def save_design(request, design_id):
   data = format_dict_field_values(request.POST.copy())
   _save_design(request.user, design_id, data)
 
-  return get_design(request, design_id);
+  return get_design(request, design_id)
 
 
 def _save_design(user, design_id, data):

@@ -31,10 +31,8 @@ from desktop.models import Document as Doc, SAMPLE_USER_ID
 from hadoop.fs.hadoopfs import Hdfs
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
 
 class Document(models.Model):
   owner = models.ForeignKey(
@@ -47,10 +45,10 @@ class Document(models.Model):
   is_design = models.BooleanField(default=True, db_index=True, verbose_name=_t('Is a user document, not a document submission.'),
                                      help_text=_t('If the document is not a submitted job but a real query, script, workflow.'))
 
-  def is_editable(self, user): # Deprecated
+  def is_editable(self, user):  # Deprecated
     return is_admin(user) or self.owner == user
 
-  def can_edit_or_exception(self, user, exception_class=PopupException): # Deprecated
+  def can_edit_or_exception(self, user, exception_class=PopupException):  # Deprecated
     if self.is_editable(user):
       return True
     else:
@@ -97,7 +95,7 @@ class PigScript(Document):
   def use_hcatalog(self):
     script = self.dict['script']
     return ('org.apache.hcatalog.pig.HCatStorer' in script or 'org.apache.hcatalog.pig.HCatLoader' in script) or \
-        ('org.apache.hive.hcatalog.pig.HCatLoader' in script or 'org.apache.hive.hcatalog.pig.HCatStorer' in script) # New classes
+        ('org.apache.hive.hcatalog.pig.HCatLoader' in script or 'org.apache.hive.hcatalog.pig.HCatStorer' in script)  # New classes
 
   @property
   def use_hbase(self):
@@ -138,7 +136,7 @@ class PigScript2(object):
     script = self.dict['script']
 
     return ('org.apache.hcatalog.pig.HCatStorer' in script or 'org.apache.hcatalog.pig.HCatLoader' in script) or \
-        ('org.apache.hive.hcatalog.pig.HCatLoader' in script or 'org.apache.hive.hcatalog.pig.HCatStorer' in script) # New classes
+        ('org.apache.hive.hcatalog.pig.HCatLoader' in script or 'org.apache.hive.hcatalog.pig.HCatStorer' in script)  # New classes
 
   @property
   def use_hbase(self):
@@ -150,7 +148,7 @@ class PigScript2(object):
 def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, is_design=True):
   try:
     pig_script = PigScript.objects.get(id=id)
-    if id == str(SAMPLE_USER_ID): # Special case for the Example, just create an history
+    if id == str(SAMPLE_USER_ID):  # Special case for the Example, just create an history
       is_design = False
       raise PigScript.DoesNotExist()
     pig_script.doc.get().can_write_or_exception(user)

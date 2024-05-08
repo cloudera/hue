@@ -19,7 +19,6 @@
 import logging
 import json
 import pytest
-import sys
 
 from django.urls import reverse
 
@@ -27,10 +26,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.connectors.models import Connector
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger()
@@ -42,7 +38,6 @@ class TestInstallExamples():
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=True, is_admin=True)
     self.user = User.objects.get(username="test")
-
 
   def test_install_via_insert_mysql(self):
     with patch('notebook.views.Connector.objects') as ConnectorObjects:
@@ -79,7 +74,6 @@ class TestInstallExamples():
             assert '' == data['errorMessage'], data
 
             make_notebook.assert_called()
-
 
   def test_install_via_load_hive(self):
     with patch('notebook.views.Connector.objects') as ConnectorObjects:
@@ -131,7 +125,6 @@ class TestInstallExamples():
                 make_notebook.assert_called()
 
                 fs.do_as_user.assert_called()
-
 
   def test_install_via_insert_hive(self):
     with patch('notebook.views.Connector.objects') as ConnectorObjects:

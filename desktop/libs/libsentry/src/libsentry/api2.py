@@ -27,10 +27,7 @@ from libsentry.client2 import SentryClient
 from libsentry.sentry_ha import get_next_available_server, create_client
 from libsentry.sentry_site import get_sentry_server, is_ha_enabled
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 LOG = logging.getLogger()
@@ -49,7 +46,8 @@ def ha_error_handler(func):
         raise PopupException(_('Failed to connect to Sentry server %s, and Sentry HA is not enabled.') % args[0].client.host, detail=e)
       else:
         LOG.warning("Failed to connect to Sentry server %s, will attempt to find next available host." % args[0].client.host)
-        server, attempts = get_next_available_server(client_class=SentryClient, username=args[0].client.username, failed_host=args[0].client.host, component=args[0].client.component)
+        server, attempts = get_next_available_server(
+          client_class=SentryClient, username=args[0].client.username, failed_host=args[0].client.host, component=args[0].client.component)
         if server is not None:
           args[0].client = create_client(SentryClient, args[0].client.username, server, args[0].client.component)
           set_api_cache(server)
@@ -236,7 +234,6 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
   def _massage_privilege(self, privilege):
     return {
         'component': privilege.component,
@@ -248,10 +245,8 @@ class SentryApi(object):
         'grantOption': privilege.grantOption == 1,
     }
 
-
   def _massage_authorizable(self, authorizables):
     return [{'type': auth.type, 'name': auth.name} for auth in authorizables]
-
 
   def _massage_string_authorizable(self, authorizables):
     return [{'type': auth.split('=')[0], 'name': auth.split('=')[1]} for auth in authorizables.split('->')]

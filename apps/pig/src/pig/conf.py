@@ -23,10 +23,7 @@ from liboozie.conf import get_oozie_status
 
 from pig.settings import NICE_NAME
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 
 LOCAL_SAMPLE_DIR = Config(
@@ -44,7 +41,7 @@ REMOTE_SAMPLE_DIR = Config(
 def config_validator(user):
   res = []
 
-  if not 'test' in sys.argv: # Avoid tests hanging
+  if 'test' not in sys.argv:  # Avoid tests hanging
     status = get_oozie_status(user)
 
     if 'NORMAL' not in status:

@@ -16,15 +16,9 @@
 
 import boto
 import logging
-import requests
-import sys
-import xml.sax
 
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote, urlparse as lib_urlparse, parse_qs, urlencode
-else:
-  from urllib import unquote, urlencode
-  from urlparse import urlparse as lib_urlparse, parse_qs
+from urllib.parse import unquote, parse_qs, urlencode
+
 
 from boto.connection import HTTPRequest
 from boto.exception import BotoClientError
@@ -92,7 +86,6 @@ class RazS3Connection(S3Connection):
                 suppress_consec_slashes=suppress_consec_slashes, anon=anon,
                 validate_certs=validate_certs, profile_name=profile_name)
 
-
   def make_request(self, method, bucket='', key='', headers=None, data='',
                     query_args=None, sender=None, override_num_retries=None,
                     retry_handler=None):
@@ -113,7 +106,7 @@ class RazS3Connection(S3Connection):
     if query_args:
       # Clean prefix to remove s3a%3A//[S3_BUCKET]/ for sending correct relative path to RAZ
       if 'prefix=s3a%3A//' in query_args:
-        qs_parsed = parse_qs(query_args) # all strings will be unquoted
+        qs_parsed = parse_qs(query_args)  # all strings will be unquoted
         prefix_relative_path = qs_parsed['prefix'][0].partition(bucket + '/')[2]
         qs_parsed['prefix'][0] = prefix_relative_path
 
@@ -149,12 +142,10 @@ class RazS3Connection(S3Connection):
     return self._mexe(http_request, sender, override_num_retries,
                       retry_handler=retry_handler)
 
-
   def get_signed_url(self, action='GET', url=None, headers=None, data=None):
     raz_client = S3RazClient(username=self.username)
 
     return raz_client.get_url(action, url, headers, data)
-
 
   def _required_auth_capability(self):
     """

@@ -51,7 +51,7 @@ def get_schedule(request):
 
 
 # To move to lib in case oozie is blacklisted
-#@check_document_access_permission()
+# @check_document_access_permission()
 def submit_schedule(request, doc_id):
   interface = request.GET.get('interface', request.POST.get('interface', 'hive'))
 
@@ -105,4 +105,4 @@ def submit_schedule(request, doc_id):
       force_template=True
   ).content
 
-  return JsonResponse(popup.decode("utf-8") if sys.version_info[0] > 2 else popup, safe=False)
+  return JsonResponse(popup.decode("utf-8"), safe=False)

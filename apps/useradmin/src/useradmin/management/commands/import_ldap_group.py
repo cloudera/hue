@@ -24,10 +24,7 @@ from desktop.conf import LDAP
 from useradmin import ldap_access
 from useradmin.views import import_ldap_groups
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 
 class Command(BaseCommand):
@@ -41,7 +38,9 @@ class Command(BaseCommand):
   def add_arguments(self, parser):
     parser.add_argument('group', type=str)
 
-    parser.add_argument("--dn", help=_t("Whether or not the user should be imported by distinguished name."), action="store_true", default=False)
+    parser.add_argument(
+      "--dn", help=_t("Whether or not the user should be imported by distinguished name."), action="store_true", default=False
+    )
     parser.add_argument("--import-members", help=_t("Import users from the group."), action="store_true", default=False)
     parser.add_argument(
         "--import-members-recursive",
@@ -50,7 +49,7 @@ class Command(BaseCommand):
         default=False
     )
     parser.add_argument("--sync-users", help=_t("Sync users in the group."), action="store_true", default=False)
-    parser.add_argument("--server", help=_t("Server to connect to."), action="store",  default=None)
+    parser.add_argument("--server", help=_t("Server to connect to."), action="store", default=None)
 
   def handle(self, group=None, **options):
     if group is None:

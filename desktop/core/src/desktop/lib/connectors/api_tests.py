@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -31,10 +31,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User, update_app_permissions, get_default_user_group, Connector
 from useradmin.permissions import HuePermission, GroupPermission
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 @pytest.mark.django_db
@@ -54,7 +51,6 @@ class TestApi(object):
   def teardown_class(cls):
     for reset in cls._class_resets:
       reset()
-
 
   def test_install_connector_examples(self):
 

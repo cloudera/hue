@@ -24,7 +24,7 @@ from django.utils.translation import gettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib import fsmanager
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
 from desktop.lib.fs.gc.gs import get_gs_home_directory
 
@@ -44,7 +44,7 @@ def error_handler(view_fn):
     except Exception as e:
       LOG.exception('Error running %s' % view_fn)
       response['status'] = -1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
     return JsonResponse(response)
   return decorator
 
@@ -64,7 +64,7 @@ def get_filesystems(request):
 
 
 @error_handler
-def get_filesystems_with_home_dirs(request): # Using as a public API only for now
+def get_filesystems_with_home_dirs(request):  # Using as a public API only for now
   filesystems = []
   user_home_dir = ''
 
@@ -107,9 +107,10 @@ def touch(request):
 
   if name and (posixpath.sep in name):
     raise Exception(_("Error creating %s file. Slashes are not allowed in filename." % name))
-  
+
   request.fs.create(request.fs.join(path, name))
   return HttpResponse(status=200)
+
 
 @error_handler
 def rename(request):
@@ -131,6 +132,7 @@ def rename(request):
 
   request.fs.rename(src_path, dest_path)
   return HttpResponse(status=200)
+
 
 @error_handler
 def content_summary(request, path):

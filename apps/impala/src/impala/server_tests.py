@@ -26,10 +26,7 @@ from useradmin.models import User
 
 from impala.server import ImpalaDaemonApi, _get_impala_server_url
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock
 
 
 LOG = logging.getLogger()
@@ -45,7 +42,6 @@ class TestImpalaDaemonApi():
   def test_get_impala_server_url_when_no_session(self):
     with pytest.raises(PopupException):
       _get_impala_server_url(session=None)
-
 
   def test_digest_auth(self):
 
@@ -72,7 +68,6 @@ class TestImpalaDaemonApi():
           server._client.set_digest_auth.assert_not_called()
           server._client.set_kerberos_auth.assert_not_called()
           server._client.set_basic_auth.assert_not_called()
-
 
   def test_basic_auth(self):
 
@@ -104,7 +99,6 @@ class TestImpalaDaemonApi():
             server._client.set_digest_auth.assert_not_called()
             server._client.set_kerberos_auth.assert_not_called()
 
-
   def test_kerberos_auth(self):
 
     with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
@@ -126,7 +120,6 @@ class TestImpalaDaemonApi():
       with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
         with patch('impala.server.HttpClient') as HttpClient:
           with patch('impala.server.is_webserver_spnego_enabled') as is_webserver_spnego_enabled:
-
 
             DAEMON_API_USERNAME_get.return_value = None
             DAEMON_API_PASSWORD_get.return_value = 'impala'
