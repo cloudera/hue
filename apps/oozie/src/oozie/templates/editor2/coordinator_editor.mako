@@ -54,7 +54,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-save"></i>
     </a>
 
-    <div class="dropdown pull-right margin-left-10" data-testid="editor--actions--dropdown">
+    <div class="dropdown pull-right margin-left-10">
       <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </a>
