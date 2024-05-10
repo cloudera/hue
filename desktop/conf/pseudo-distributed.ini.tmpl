@@ -339,6 +339,73 @@
   # default value is false
   ## disable_local_storage = false
 
+  # Interface for SQL AI Assistant
+  # ----------------
+  [[ai_interface]]
+    # API service to be used for AI tasks. AI is disabled when a service is not configured.
+    # Type: string. Possible values: azure, openai, bedrock, ai_assistant
+    ## service=azure
+
+    # API service version to be used for AI tasks. Optional.
+    # Type: string.
+    ## service_version='2024-02-15-preview'
+
+    # Indicates if the LLM is trusted or not. Turn on to disable the warning.
+    # Type: bool. Default: True.
+    ## trusted_service=True
+
+    # Model to be used for AI tasks. Eg: gpt, llama. Each service has a default model.
+    # Type: string. Optional.
+    ## model='gpt'
+
+    # A fully qualified name for the model to be used. Each model has a default model_name.
+    # Type: string. Optional.
+    ## model_name='gpt-35-turbo-16k'
+
+    # Service API base URL. Used only by azure & ai_assistant services.
+    # Type: string.
+    ## base_url='https://hue-ai.openai.azure.com/'
+
+    # When enabled, sample rows from the table are added to the prompt.
+    # Default: True.
+    ## add_table_data=True
+
+    # Size of the LRU cache used for storing table sample data
+    # Type: int. Default: 500.
+    ## table_data_cache_size=500
+
+    # Number of Tables to load from a database initially
+    # Type: int. Default: 20.
+    ## auto_fetch_table_meta_limit=20
+
+    # Service API secret token
+    # Type: string.
+    ## token=0fe9122b8f7658a85835417d875b42b
+
+    # A secure way to accept token via jceks. Run this script to produce the service API token.
+    ## token_script="/path/to/altscript.sh hue.ai_assistant.token /etc/hue/sql-ai.jceks"
+
+    # A comma-separated list of SQL related AI tasks available in the editor.
+    # Possible values: Any combination of the following.
+    ## enabled_sql_tasks=generate,edit,explain,optimize,fix,comment
+
+  [[semantic_search]]
+    # Tech used for semantic search.
+    # Type: string. Default: vector_search. Possible values: vector_search or vector_db.
+    ## relevancy=vector_search
+
+    # Model used for data embedding. Must be compatible with SentenceTransformer.
+    # Type: string. Default: all-MiniLM-L6-v2.
+    ## embedding_model=all-MiniLM-L6-v2
+
+    # Number of items with the highest ranking returned by semantic search.
+    # Type: int. Default: 10.
+    ## top_k=10
+
+    # Size of the LRU cache used for storing embeddings.
+    # Type: int. Default: 5000.
+    ## cache_size=5000
+
   # Administrators
   # ----------------
   [[django_admins]]
@@ -1009,7 +1076,7 @@
   ## Default limit to use in SELECT statements if not present. Set to 0 to disable.
   # default_limit=5000
 
-  ## Set the default interpreter for all users. 
+  ## Set the default interpreter for all users.
   ## Starred interpreters at user level will get more priority than the value below.
   # default_interpreter=
 
