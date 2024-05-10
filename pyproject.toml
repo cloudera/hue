@@ -22,7 +22,9 @@ extend-exclude = [
   "tools/ace-editor/",
   "*/gen-py/*",
   "*/org_migrations/*",
-  "*/old_migrations/*"
+  "*/old_migrations/*",
+  "desktop/core/src/desktop/app_template/src/app_name/*",
+  "desktop/core/src/desktop/app_template_proxy/src/app_name/*"
 ]
 
 [tool.ruff.lint]
@@ -30,6 +32,7 @@ preview = true
 select = [
     "E", # pycodestyle errors
     "W", # pycodestyle warnings
+    "I", # isort
 ]
 ignore = [
     "E111",
@@ -43,3 +46,46 @@ docstring-code-format = true
 docstring-code-line-length = 140
 indent-style = "space"
 quote-style = "preserve"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+length-sort-straight = true
+known-first-party = [
+    "about",
+    "beeswax",
+    "filebrowser",
+    "hbase",
+    "help",
+    "hive",
+    "impala",
+    "jobbrowser",
+    "jobsub",
+    "metastore",
+    "oozie",
+    "pig",
+    "proxy",
+    "rdbms",
+    "search",
+    "security",
+    "spark",
+    "sqoop",
+    "useradmin",
+    "zookeeper",
+    "desktop",
+    "aws",
+    "azure",
+    "dashboard",
+    "hadoop",
+    "indexer",
+    "kafka",
+    "libanalyze",
+    "liboauth",
+    "liboozie",
+    "librdbms",
+    "libsaml",
+    "libsentry",
+    "libsolr",
+    "libzookeeper",
+    "metadata",
+    "notebook"
+]
