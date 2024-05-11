@@ -794,6 +794,7 @@
   window.IS_LDAP_SETUP = '${ 'desktop.auth.backend.LdapBackend' in conf.AUTH.BACKEND.get() }' === 'True';
   window.LOGGED_USERNAME = '${ user.username }';
   window.LOGGED_USER_ID = ${ user.id };
+  window.ENABLE_HELP_MENU = '${conf.ENABLE_HELP_MENU.get()}' === 'True';
 
   <%
     # TODO remove

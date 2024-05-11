@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,29 +16,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-import glob
-import logging
 import os
-import socket
-import stat
 import sys
-
+import glob
+import stat
+import socket
+import logging
+import datetime
 from collections import OrderedDict
 
 from django.db import connection
 
-from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
-
 from desktop import appmanager
-from desktop.redaction.engine import parse_redaction_policy_from_file
-from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool, coerce_csv, coerce_json_dict, \
-    validate_path, list_of_compiled_res, coerce_str_lowercase, coerce_password_from_script, coerce_string
+from desktop.lib.conf import (
+  Config,
+  ConfigSection,
+  UnspecifiedConfigSection,
+  coerce_bool,
+  coerce_csv,
+  coerce_json_dict,
+  coerce_password_from_script,
+  coerce_str_lowercase,
+  coerce_string,
+  list_of_compiled_res,
+  validate_path,
+)
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root, get_run_root
+from desktop.redaction.engine import parse_redaction_policy_from_file
+from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
 
 if sys.version_info[0] > 2:
   from builtins import str as new_str
+
   from django.utils.translation import gettext_lazy as _
 else:
   new_str = unicode
@@ -51,6 +61,7 @@ LOG = logging.getLogger()
 def is_oozie_enabled():
   """Oozie needs to be available as it is the backend."""
   return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0
+
 
 def coerce_database(database):
   if database == 'mysql':
@@ -84,6 +95,7 @@ def coerce_file(path):
 def coerce_timedelta(value):
   return datetime.timedelta(seconds=int(value))
 
+
 def get_dn(fqdn=None):
   """This function returns fqdn(if possible)"""
   val = []
@@ -102,10 +114,11 @@ def get_dn(fqdn=None):
     else:
       LOG.warning("allowed_hosts value to '*'. It is a security risk")
       val.append('*')
-  except:
+  except Exception as e:
     LOG.warning("allowed_hosts value to '*'. It is a security risk")
     val.append('*')
   return val
+
 
 def coerce_positive_integer(integer):
   integer = int(integer)
@@ -115,9 +128,11 @@ def coerce_positive_integer(integer):
 
   return integer
 
+
 def is_lb_enabled():
   """Check for Hue Load Balancer is available"""
   return bool(HUE_LOAD_BALANCER.get())
+
 
 def coerce_zero_or_positive_integer(integer):
   integer = int(integer)
@@ -127,33 +142,41 @@ def coerce_zero_or_positive_integer(integer):
 
   return integer
 
+
 def is_https_enabled():
   """Hue is configured for HTTPS."""
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
+
 
 def get_slack_client_id():
   """Returns Slack Client ID if set as environment variable else None"""
   return os.environ.get('SLACK_CLIENT_ID')
 
+
 def get_slack_client_secret():
   """Returns Slack Client Secret if set as environment variable else None"""
   return os.environ.get('SLACK_CLIENT_SECRET')
+
 
 def get_slack_verification_token():
   """Returns Slack Verification Token if set as environment variable else None"""
   return os.environ.get('SLACK_VERIFICATION_TOKEN')
 
+
 def get_slack_bot_user_token():
   """Returns Slack Bot User Token if set as environment variable else None"""
   return os.environ.get('SLACK_BOT_USER_TOKEN')
+
 
 def is_python2():
   """Hue is running on Python 2."""
   return sys.version_info[0] == 2
 
+
 def is_custom_jwt_auth_enabled():
   """Returns True if key server url is set else returns False"""
   return bool(AUTH.JWT.KEY_SERVER_URL.get())
+
 
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",
@@ -407,8 +430,10 @@ SSL_CIPHER_LIST = Config(
     '!KRB5-DES-CBC3-SHA',
   ]))
 
+
 def has_ssl_no_renegotiation():
   return sys.version_info[:2] >= (3, 7)
+
 
 SSL_NO_RENEGOTIATION = Config(
   key="ssl_no_renegotiation",
@@ -476,12 +501,12 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
   help=_('X-Content-Type-Options: nosniff. This is a HTTP response header feature that helps prevent attacks '
     'based on MIME-type confusion.'),
   type=str,
-  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;"+
-          "img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
-          "style-src 'self' 'unsafe-inline' fonts.googleapis.com;"+
-          "connect-src 'self' *.google-analytics.com;"+
-          "frame-src *;"+
-          "child-src 'self' data: *.vimeo.com;"+
+  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;" +
+          "img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;" +
+          "style-src 'self' 'unsafe-inline' fonts.googleapis.com;" +
+          "connect-src 'self' *.google-analytics.com;" +
+          "frame-src *;" +
+          "child-src 'self' data: *.vimeo.com;" +
           "object-src 'none'")
 
 SECURE_SSL_REDIRECT = Config(
@@ -524,14 +549,17 @@ LDAP_USERNAME = Config(
   private=True,
   default="hue")
 
+
 def get_auth_username():
   """Backward compatibility"""
   return LDAP_USERNAME.get()
+
 
 AUTH_USERNAME = Config(
   key="auth_username",
   help=_("Auth username of the hue user used for authentications. For example for LDAP Authentication with HiveServer2/Impala."),
   dynamic_default=get_auth_username)
+
 
 def get_auth_password():
   """Get from script or backward compatibility"""
@@ -548,11 +576,12 @@ def get_auth_password():
   if password is not None:
     return password
 
-  password = LDAP_PASSWORD.get() # 2 levels for backward compatibility
+  password = LDAP_PASSWORD.get()  # 2 levels for backward compatibility
   if password:
     return password
 
   return LDAP_PASSWORD_SCRIPT.get()
+
 
 AUTH_PASSWORD = Config(
   key="auth_password",
@@ -661,9 +690,9 @@ REDIRECT_WHITELIST = Config(
   key="redirect_whitelist",
   help=_("Comma-separated list of regular expressions, which match the redirect URL."
          "For example, to restrict to your local domain and FQDN, the following value can be used:"
-         "  ^\/.*$,^http:\/\/www.mydomain.com\/.*$"),
+         r"  ^\/.*$,^http:\/\/www.mydomain.com\/.*$"),
   type=list_of_compiled_res(skip_empty=True),
-  default='^(\/[a-zA-Z0-9]+.*|\/)$')
+  default=r'^(\/[a-zA-Z0-9]+.*|\/)$')
 
 USE_X_FORWARDED_HOST = Config(
   key="use_x_forwarded_host",
@@ -702,7 +731,7 @@ CLUSTER_ID = Config(
   private=False,
   default='default')
 
-DEMO_ENABLED = Config( # Internal and Temporary
+DEMO_ENABLED = Config(  # Internal and Temporary
   key="demo_enabled",
   help=_("To set to true in combination when using Hue demo backend."),
   type=coerce_bool,
@@ -770,18 +799,23 @@ def default_secure_cookie():
   """Enable secure cookies if HTTPS is enabled."""
   return is_https_enabled()
 
+
 def default_ssl_cacerts():
   """Path to default Certificate Authority certificates"""
   return SSL_CACERTS.get()
+
 
 def default_ssl_validate():
   """Choose whether Hue should validate certificates received from the server."""
   return SSL_VALIDATE.get()
 
+
 #
 # Email (SMTP) settings
 #
 _default_from_email = None
+
+
 def default_from_email():
   """Email for hue@<host-fqdn>"""
   global _default_from_email
@@ -802,6 +836,7 @@ def default_database_options():
     return {'timeout': 30}
   else:
     return {}
+
 
 def get_deprecated_login_lock_out_by_combination_browser_user_agent():
   """Return value of deprecated LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP config"""
@@ -880,10 +915,12 @@ METRICS = ConfigSection(
   )
 )
 
+
 def is_gunicorn_report_enabled():
   return 'rungunicornserver' in sys.argv \
     and METRICS.LOCATION.get() is not None \
     and METRICS.COLLECTION_INTERVAL.get() is not None
+
 
 SLACK = ConfigSection(
   key='slack',
@@ -1032,7 +1069,7 @@ SESSION = ConfigSection(
       key='ttl',
       help=_("The cookie containing the users' session ID will expire after this amount of time in seconds."),
       type=int,
-      default=60*60*24*14,
+      default=60 * 60 * 24 * 14,
     ),
     SECURE=Config(
       key='secure',
@@ -1056,7 +1093,7 @@ SESSION = ConfigSection(
       key='csrf_cookie_age',
       help=_("CRSF cookie age defaults to 1 year. If the value is set to 0, it means per session. Time in seconds"),
       type=int,
-      default=60*60*24*7*52,
+      default=60 * 60 * 24 * 7 * 52,
     ),
     CONCURRENT_USER_SESSION_LIMIT=Config(
       key="concurrent_user_session_limit",
@@ -1117,7 +1154,7 @@ KERBEROS = ConfigSection(
       key='reinit_frequency',
       help=_("Frequency in seconds with which Hue will renew its keytab."),
       type=int,
-      default=60*60), #1h
+      default=60 * 60),  # 1h
     CCACHE_PATH=Config(
       key='ccache_path',
       help=_("Path to keep Kerberos credentials cached."),
@@ -1135,7 +1172,7 @@ KERBEROS = ConfigSection(
       key='kinit_path',
       help=_("Path to Kerberos 'kinit' command."),
       type=str,
-      default="kinit", # use PATH!
+      default="kinit",  # use PATH!
     ),
     MUTUAL_AUTHENTICATION=Config(
       key='mutual_authentication',
@@ -1149,7 +1186,7 @@ KERBEROS = ConfigSection(
 SASL_MAX_BUFFER = Config(
   key="sasl_max_buffer",
   help=_("This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication."),
-  default=2*1024*1024,  # 2 MB
+  default=2 * 1024 * 1024,  # 2 MB
   type=int
 )
 
@@ -1796,6 +1833,7 @@ def default_feedback_url():
   """A version-specific URL."""
   return "http://groups.google.com/a/cloudera.org/group/hue-user"
 
+
 FEEDBACK_URL = Config(
   key="feedback_url",
   help=_("Link for 'feedback' tab."),
@@ -1879,9 +1917,11 @@ HTTP_500_DEBUG_MODE = Config(
   default=True
 )
 
+
 def get_instrumentation_default():
   """If django_debug_mode is True, this is automatically enabled"""
   return DJANGO_DEBUG_MODE.get()
+
 
 INSTRUMENTATION = Config(
   key='instrumentation',
@@ -1965,8 +2005,10 @@ ENABLE_NEW_STORAGE_BROWSER = Config(
   default=False
 )
 
+
 def is_chunked_fileuploader_enabled():
-  return ENABLE_CHUNKED_FILE_UPLOADER.get();
+  return ENABLE_CHUNKED_FILE_UPLOADER.get()
+
 
 ENABLE_CHUNKED_FILE_UPLOADER = Config(
   key="enable_chunked_file_uploader",
@@ -1975,7 +2017,7 @@ ENABLE_CHUNKED_FILE_UPLOADER = Config(
   default=False
 )
 
-USE_NEW_EDITOR = Config( # To remove in Hue 4
+USE_NEW_EDITOR = Config(  # To remove in Hue 4
   key='',
   default=True,
   type=coerce_bool,
@@ -2074,6 +2116,7 @@ TRACING = ConfigSection(
       help=_('Trace all the requests instead of a few specific ones like the SQL Editor. Much noisiers.')
     ),
 ))
+
 
 def task_server_default_result_directory():
   """Local directory to store task results."""
@@ -2323,6 +2366,7 @@ def has_multi_clusters():
   '''If Hue is configured to talk to more than one completely independent clusters'''
   return len(CLUSTERS.get()) > 1
 
+
 def has_connectors():
   '''When the connector feature is turned on'''
   return ENABLE_CONNECTORS.get()
@@ -2363,9 +2407,11 @@ ENABLE_GIST = Config(
   help=_('Turn on the Gist snippet sharing.')
 )
 
+
 def default_gist_preview():
   """Gist preview only enabled automatically in private setups."""
   return not ENABLE_ORGANIZATIONS.get()
+
 
 ENABLE_GIST_PREVIEW = Config(
   key='enable_gist_preview',
@@ -2394,6 +2440,13 @@ DISABLE_LOCAL_STORAGE = Config(
   type=coerce_bool,
   help=_("Hue uses Localstorage to keep the users settings and database preferences,"
          "please make this value true in case local storage should not be used.")
+)
+
+ENABLE_HELP_MENU = Config(
+  key='enable_help_menu',
+  default=True,
+  type=coerce_bool,
+  help=_("Whether or not to show the Help menu in the Sidebar")
 )
 
 ENABLE_CONNECTORS = Config(
@@ -2459,10 +2512,12 @@ CONNECTORS = UnspecifiedConfigSection(
   )
 )
 
+
 def _get_raz_url():
   """Check if we can guess if Raz is configured"""
   from hadoop.core_site import get_raz_api_url  # Avoid circular import
   return get_raz_api_url()
+
 
 def has_raz_url():
   """Check if we can guess if Raz is configured"""
@@ -2482,9 +2537,11 @@ SDXAAS = ConfigSection(
   )
 )
 
+
 def is_sdxaas_jwt_enabled():
   """Check if SDXaaS token url is configured"""
   return bool(SDXAAS.TOKEN_URL.get())
+
 
 def handle_raz_api_auth():
   """Return RAZ authentication type from JWT (if SDXaaS token URL is set) or KERBEROS"""
@@ -2595,7 +2652,7 @@ def validate_ldap(user, config):
       bind_password = get_ldap_bind_password(config)
 
       if bool(bind_dn) != bool(bind_password):
-        if bind_dn == None:
+        if bind_dn is None:
           res.append((LDAP.BIND_DN,
                     new_str(_("If you set bind_password, then you must set bind_dn."))))
         else:
@@ -2622,6 +2679,7 @@ def validate_ldap(user, config):
                   "<username> replacement string for authentication."))))
 
   return res
+
 
 def validate_database(user):
   res = []
@@ -2680,6 +2738,7 @@ def validate_database(user):
 
   return res
 
+
 def config_validator(user):
   """
   config_validator() -> [ (config_variable, error_message) ]
@@ -2688,8 +2747,8 @@ def config_validator(user):
   """
   from beeswax.models import QueryHistory, SavedQuery, Session
   from desktop.lib import i18n
-  from desktop.models import Document, Document2 # Avoid cyclic loop
-  from desktop.settings import DOCUMENT2_MAX_ENTRIES # Avoid cyclic loop
+  from desktop.models import Document, Document2  # Avoid cyclic loop
+  from desktop.settings import DOCUMENT2_MAX_ENTRIES  # Avoid cyclic loop
   from oozie.models import Job
 
   res = []
@@ -2770,14 +2829,14 @@ def config_validator(user):
   except Exception as e:
     LOG.warning('Config check failed because Oozie app not installed %s' % e)
 
-  from notebook.models import make_notebook
   from notebook.api import _save_notebook
+  from notebook.models import make_notebook
 
   notebook = make_notebook(name='test', editor_type='hive', statement='select "ทดสอบ"', status='ready')
   notebook_doc = None
   try:
     notebook_doc, save_as = _save_notebook(notebook.get_data(), user)
-  except:
+  except Exception as e:
     res.append(('DATABASE_CHARACTER_SET', new_str(
       _('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. <br>'
         '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))
@@ -2790,6 +2849,7 @@ def config_validator(user):
     res.append(('[desktop] use_new_editor', new_str(_('This configuration flag has been deprecated.'))))
 
   return res
+
 
 def get_redaction_policy():
   """
@@ -2858,6 +2918,7 @@ def get_ldap_bind_password(ldap_config):
 
   return password
 
+
 PERMISSION_ACTION_GS = "gs_access"
 
 GC_ACCOUNTS = UnspecifiedConfigSection(
@@ -2875,20 +2936,23 @@ GC_ACCOUNTS = UnspecifiedConfigSection(
   )
 )
 
+
 def is_cm_managed():
   return 'cloudera-scm-agent' in os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
 
 
 def is_gs_enabled():
-  from desktop.lib.idbroker import conf as conf_idbroker # Circular dependencies  desktop.conf -> idbroker.conf -> desktop.conf
+  from desktop.lib.idbroker import conf as conf_idbroker  # Circular dependencies  desktop.conf -> idbroker.conf -> desktop.conf
 
   return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or is_raz_gs() or \
     conf_idbroker.is_idbroker_enabled('gs')
+
 
 def has_gs_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated and user.is_active and (
     is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser") or is_raz_gs())
+
 
 def is_raz_gs():
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
@@ -2956,6 +3020,7 @@ OZONE = UnspecifiedConfigSection(
     )
   )
 )
+
 
 def is_ofs_enabled():
   return ('default' in list(OZONE.keys()) and OZONE['default'].get_raw() and OZONE['default'].WEBHDFS_URL.get())
