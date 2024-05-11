@@ -133,7 +133,7 @@ import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
 data-testid attributes are custom attributes that can be added to HTML elements to identify them for testing purposes. They are commonly used in testing frameworks and tools to locate and interact with elements on web pages. 
 
 Hue follows a pattern of 
-```ts
+```
 area--action--role
 ```
 while adding data-testids
@@ -144,7 +144,7 @@ editor-coordinator--save-as--button , editor-sql-assist--refresh--button
 In this manner, these data-testids can be added along with the other HTML attributes. 
 
 Example:
-```ts
+```
 <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="assist-sql--databases-breadcrumb-back--button"></i>
 ```
 
