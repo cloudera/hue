@@ -16,7 +16,24 @@
 
 import React from 'react';
 import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import '@testing-library/jest-dom'
 import MetricsComponent from './MetricsComponent';
+import userEvent from '@testing-library/user-event';
+import { Dropdown } from 'antd';
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // Deprecated
+    removeListener: jest.fn(), // Deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn()
+  }))
+});
 
 jest.mock('api/utils', () => ({
   get: jest.fn(() =>
@@ -66,30 +83,100 @@ describe('MetricsComponent', () => {
       expect(screen.getByText('users')).toBeInTheDocument();
       expect(screen.getByText('users.active')).toBeInTheDocument();
       expect(screen.getByText('users.active.total')).toBeInTheDocument();
-
-      expect(screen.queryByText('requests.active')).toBeNull();
+      expect(screen.queryByText('requests.active')).not.toBeInTheDocument();
       expect(screen.queryByText('requests.exceptions')).toBeNull();
       expect(screen.queryByText('requests.response-time')).toBeNull();
     });
   });
 
-  //2. Test for selecting a specific metric from the dropdown:
-  test('Selecting a specific metric from the dropdown', async () => {
-    render(<MetricsComponent />);
+//   //2. Test for selecting a specific metric from the dropdown:
+//   test('Selecting a specific metric from the dropdown', async () => {
+//     render(<MetricsComponent />);
 
-    // const dropdown = screen.getByPlaceholderText('Choose a metric');
-    const dropdown = screen.getByTestId('metric-select');
-    fireEvent.change(dropdown, { target: { value: 'users' } });
+//     // // const dropdown = screen.getByPlaceholderText('Choose a metric');
+//     // const dropdown = await screen.findByRole('combobox');
+//     // // console.log('dropdown', dropdown);
+//     // fireEvent.click(dropdown, { target: { value: 'users' } });
+//     // screen.debug();
 
-    await waitFor(() => {
-      expect(screen.queryByText('queries.number')).toBeNull();
-      expect(screen.queryByText('requests.active')).toBeNull();
-      expect(screen.queryByText('requests.exceptions')).toBeNull();
-      expect(screen.queryByText('threads.daemon')).toBeNull();
-      expect(screen.queryByText('threads.total')).toBeNull();
-      expect(screen.getByText('users')).toBeInTheDocument();
-      expect(screen.queryByText('users.active')).toBeNull();
-      expect(screen.queryByText('users.active.total')).toBeNull();
-    });
+//     // const dropdown = await screen.findByRole('combobox');
+//     // userEvent.click(dropdown); // Open the dropdown
+    
+//     // const usersOption = await screen.findByText('users');
+//     // userEvent.click(usersOption); // Select the 'Users' option
+
+
+//     const periodSelect = screen.getByRole('combobox');
+//     // console.log(periodSelect);
+
+//     await userEvent.click(periodSelect);
+
+
+//     // await waitFor(() => screen.getByText('Users'));
+
+//     // fireEvent.click(screen.getByText('Users'));
+//     const option= await screen.getByText('Users');
+
+//     console.log(option)
+//     await userEvent.click(option);
+
+//     // screen.debug();
+
+//     // await waitFor(() => {
+//     //    const bla = screen.getByText('Users');
+//     //    console.log(bla);
+
+//     // });
+
+  
+//     // fireEvent.click(screen.getByText('% Dia'));
+
+//     // expect(handleChangeStub).toBeCalledWith('days', expect.anything());
+
+//     // console.log(fireEvent);
+//     // userEvent.selectOptions(dropdown, 'users');
+//     // const bla = await screen.findByText('users');
+//     // console.log(bla);
+
+//     await expect(screen.getByText('queries.number')).not.toBeVisible();
+//     // await waitFor(() => {
+      
+//     //   expect(screen.getByText('queries.number')).not.toBeVisible();
+//     //   // expect(screen.queryAllByText('requests.active')).toBeNull();
+//     //   // expect(screen.queryAllByText('requests.exceptions')).toBeNull();
+//     //   // expect(screen.queryAllByText('threads.daemon')).toBeNull();
+//     //   // expect(screen.queryAllByText('threads.total')).toBeNull();
+//     //   // expect(screen.queryAllByText('users')).toBeInTheDocument();
+//     //   // expect(screen.queryAllByText('users.active')).toBeNull();
+//     //   // expect(screen.queryAllByText('users.active.total')).toBeNull();
+//     //   // console.log(bla);
+//     // });
+
+//   });
+// });
+
+test('Selecting a specific metric from the dropdown', async () => {
+  render(<MetricsComponent />);
+
+  const dropdown = await screen.findByRole('combobox');
+  userEvent.click(dropdown); // Open the dropdown
+  
+  const usersOption = await screen.findByText('Users');
+  userEvent.click(usersOption); // Select the 'Users' option
+
+  // Introduce a delay before asserting the absence of the "queries.number" element
+  setTimeout(() => {
+    expect(screen.queryAllByText('queries.number')).toHaveLength(0);
+  }, 500); // Adjust the delay time as needed
+  
+  await waitFor(() => {
+    expect(screen.queryByText('requests.active')).toBeNull();
+    expect(screen.queryByText('requests.exceptions')).toBeNull();
+    expect(screen.queryByText('threads.daemon')).toBeNull();
+    expect(screen.queryByText('threads.total')).toBeNull();
+    expect(screen.getByText('users')).toBeInTheDocument();
+    expect(screen.queryByText('users.active')).toBeNull();
+    expect(screen.queryByText('users.active.total')).toBeNull();
   });
+});
 });

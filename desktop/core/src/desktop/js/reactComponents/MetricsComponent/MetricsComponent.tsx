@@ -143,6 +143,7 @@ const MetricsComponent = () => {
               ref={dropdownRef}
               value={selectedMetric}
               onChange={handleMetricChange}
+              data-testid="metric-select"
             >
               <Option value="">All</Option>
               <Option value="queries.number">Queries Number</Option>
