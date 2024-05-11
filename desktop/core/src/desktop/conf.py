@@ -16,29 +16,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-import glob
-import logging
 import os
-import socket
-import stat
 import sys
-
+import glob
+import stat
+import socket
+import logging
+import datetime
 from collections import OrderedDict
 
 from django.db import connection
 
-from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
-
 from desktop import appmanager
-from desktop.redaction.engine import parse_redaction_policy_from_file
-from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool, coerce_csv, coerce_json_dict, \
-    validate_path, list_of_compiled_res, coerce_str_lowercase, coerce_password_from_script, coerce_string
+from desktop.lib.conf import (
+  Config,
+  ConfigSection,
+  UnspecifiedConfigSection,
+  coerce_bool,
+  coerce_csv,
+  coerce_json_dict,
+  coerce_password_from_script,
+  coerce_str_lowercase,
+  coerce_string,
+  list_of_compiled_res,
+  validate_path,
+)
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root, get_run_root
+from desktop.redaction.engine import parse_redaction_policy_from_file
+from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
 
 if sys.version_info[0] > 2:
   from builtins import str as new_str
+
   from django.utils.translation import gettext_lazy as _
 else:
   new_str = unicode
@@ -104,7 +114,7 @@ def get_dn(fqdn=None):
     else:
       LOG.warning("allowed_hosts value to '*'. It is a security risk")
       val.append('*')
-  except:
+  except Exception as e:
     LOG.warning("allowed_hosts value to '*'. It is a security risk")
     val.append('*')
   return val
@@ -2579,14 +2589,14 @@ def config_validator(user):
   except Exception as e:
     LOG.warning('Config check failed because Oozie app not installed %s' % e)
 
-  from notebook.models import make_notebook
   from notebook.api import _save_notebook
+  from notebook.models import make_notebook
 
   notebook = make_notebook(name='test', editor_type='hive', statement='select "ทดสอบ"', status='ready')
   notebook_doc = None
   try:
     notebook_doc, save_as = _save_notebook(notebook.get_data(), user)
-  except:
+  except Exception as e:
     res.append(('DATABASE_CHARACTER_SET', new_str(
       _('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. <br>'
         '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))
