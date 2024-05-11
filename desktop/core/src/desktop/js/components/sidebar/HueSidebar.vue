@@ -240,7 +240,7 @@
         helpDrawerChildren: HELP_DRAWER_CHILDREN
       };
 
-      if ((<hueWindow>window).IS_HELP_MENU_ENABLED) {
+      if ((<hueWindow>window).ENABLE_HELP_MENU) {
         sideBarList = { ...sideBarList, ...helpDrawerList };
       }
 
@@ -568,7 +568,7 @@
             huePubSub.publish('get.current.app.name', this.currentAppChanged.bind(this));
           }
         }
-      }      
+      }
     }
   });
 </script>
