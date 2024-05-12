@@ -19,6 +19,8 @@ UPLOAD_PATH=
 FILE_NAMES=
 ARCHIVE_NAME=
 
+PYTHON_VERSION=$(python -c 'import sys; print(sys.version_info[0])')
+
 function usage()
 {
     echo "Arguments '-u', '-f' and '-n' are mandatory."
@@ -89,7 +91,12 @@ done
 set +x
 if [ $exit_status == 0 ]
 then
-	encoded_output_dir=`python -c "import urllib;print urllib.quote(raw_input())" <<< "$temp_output_dir/$ARCHIVE_NAME"`
+	if [ $PYTHON_VERSION -gt 2 ]
+	then
+		encoded_output_dir=`python -c "import urllib.parse;print(urllib.parse.quote(input()))" <<< "$temp_output_dir/$ARCHIVE_NAME"`
+	else
+		encoded_output_dir=`python -c "import urllib;print urllib.quote(raw_input())" <<< "$temp_output_dir/$ARCHIVE_NAME"`
+	fi
 	echo "Copying $encoded_output_dir to '$UPLOAD_PATH' in HDFS"
 	hadoop fs -put -f $encoded_output_dir "$UPLOAD_PATH"
 	exit_status=$(echo $?)
