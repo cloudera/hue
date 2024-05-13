@@ -15,29 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import json
-import requests
-import sys
-import textwrap
 import time
-
-from django.utils.translation import gettext as _
+import textwrap
 from urllib.parse import urlparse
 
-from beeswax import conf
-from beeswax import data_export
-from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD
+import requests
+from django.utils.translation import gettext as _
+from trino.auth import BasicAuthentication
+from trino.client import ClientSession, TrinoQuery, TrinoRequest
+from trino.exceptions import TrinoConnectionError
+
+from beeswax import conf, data_export
+from desktop.conf import AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, AUTH_USERNAME as DEFAULT_AUTH_USERNAME
 from desktop.lib import export_csvxls
 from desktop.lib.conf import coerce_password_from_script
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
-from notebook.connectors.base import Api, QueryError, ExecutionWrapper, ResultWrapper
-
-from trino import exceptions
-from trino.auth import BasicAuthentication
-from trino.client import ClientSession, TrinoRequest, TrinoQuery
+from notebook.connectors.base import Api, ExecutionWrapper, QueryError, ResultWrapper
 
 
 def query_error_handler(func):
@@ -47,8 +43,8 @@ def query_error_handler(func):
     except RestException as e:
       try:
         message = force_unicode(json.loads(e.message)['errors'])
-      except:
-        message = e.message
+      except Exception as ex:
+        message = ex.message
       message = force_unicode(message)
       raise QueryError(message)
     except Exception as e:
@@ -81,7 +77,6 @@ class TrinoApi(Api):
       auth=self.auth
     )
 
-
   def get_auth_password(self):
     auth_password_script = self.options.get('auth_password_script')
     return (
@@ -90,21 +85,35 @@ class TrinoApi(Api):
         else DEFAULT_AUTH_PASSWORD.get()
     )
 
+  def _format_identifier(self, identifier):
+    # Remove any backticks
+    identifier = identifier.replace('`', '')
+
+    # Check if already formatted
+    if not (identifier.startswith('"') and identifier.endswith('"')):
+      # Check if it's a multi-part identifier (e.g., catalog.schema)
+      if '.' in identifier:
+        # Split and format each part separately
+        identifier = '"{}"'.format('"."'.join(identifier.split('.')))
+      else:
+        # Format single-part identifier
+        identifier = f'"{identifier}"'
+
+    return identifier
 
   @query_error_handler
   def parse_api_url(self, api_url):
     parsed_url = urlparse(api_url)
     return parsed_url.hostname, parsed_url.port, parsed_url.scheme
 
-
   @query_error_handler
   def create_session(self, lang=None, properties=None):
     pass
 
-
   @query_error_handler
   def execute(self, notebook, snippet):
     database = snippet['database']
+    database = self._format_identifier(database)
     query_client = TrinoQuery(self.trino_request, 'USE ' + database)
     query_client.execute()
 
@@ -138,7 +147,6 @@ class TrinoApi(Api):
 
     return response
 
-
   @query_error_handler
   def check_status(self, notebook, snippet):
     response = {}
@@ -153,7 +161,7 @@ class TrinoApi(Api):
       if _status.stats['state'] == 'QUEUED':
         status = 'waiting'
       elif _status.stats['state'] == 'RUNNING':
-        status = 'available' # need to verify
+        status = 'available'  # need to verify
       else:
         status = 'available'
 
@@ -176,7 +184,7 @@ class TrinoApi(Api):
       try:
         response = self.trino_request.get(next_uri)
       except requests.exceptions.RequestException as e:
-        raise trino.exceptions.TrinoConnectionError("failed to fetch: {}".format(e))
+        raise TrinoConnectionError("failed to fetch: {}".format(e))
 
       status = self.trino_request.process(response)
       data += status.rows
@@ -209,7 +217,6 @@ class TrinoApi(Api):
       'type': 'table'
     }
 
-
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
@@ -231,9 +238,8 @@ class TrinoApi(Api):
 
     return response
 
-
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=False, is_async=False, operation=None):
     statement = self._get_select_query(database, table, column, operation)
     query_client = TrinoQuery(self.trino_request, statement)
     query_client.execute()
@@ -248,12 +254,13 @@ class TrinoApi(Api):
 
     return response
 
-
   def _get_select_query(self, database, table, column=None, operation=None, limit=100):
     if operation == 'hello':
       statement = "SELECT 'Hello World!'"
     else:
-      column = '%(column)s' % {'column': column} if column else '*'
+      database = self._format_identifier(database)
+      table = self._format_identifier(table)
+      column = '%(column)s' % {'column': self._format_identifier(column)} if column else '*'
       statement = textwrap.dedent('''\
           SELECT %(column)s
           FROM %(database)s.%(table)s
@@ -267,13 +274,12 @@ class TrinoApi(Api):
 
     return statement
 
-
   def close_statement(self, notebook, snippet):
     try:
       if snippet['result']['handle']['next_uri']:
         self.trino_request.delete(snippet['result']['handle']['next_uri'])
       else:
-        return {'status': -1} # missing operation ids
+        return {'status': -1}  # missing operation ids
     except Exception as e:
       if 'does not exist in current session:' in str(e):
         return {'status': -1}  # skipped
@@ -282,11 +288,9 @@ class TrinoApi(Api):
 
     return {'status': 0}
 
-
   def close_session(self, session):
     # Avoid closing session on page refresh or editor close for now
     pass
-
 
   def _show_databases(self):
     catalogs = self._show_catalogs()
@@ -299,7 +303,6 @@ class TrinoApi(Api):
 
     return databases
 
-
   def _show_catalogs(self):
     query_client = TrinoQuery(self.trino_request, 'SHOW CATALOGS')
     response = query_client.execute()
@@ -308,8 +311,8 @@ class TrinoApi(Api):
 
     return catalogs
 
-
   def _show_tables(self, database):
+    database = self._format_identifier(database)
     query_client = TrinoQuery(self.trino_request, 'USE ' + database)
     query_client.execute()
     query_client = TrinoQuery(self.trino_request, 'SHOW TABLES')
@@ -323,10 +326,11 @@ class TrinoApi(Api):
       for table in tables
     ]
 
-
   def _get_columns(self, database, table):
+    database = self._format_identifier(database)
     query_client = TrinoQuery(self.trino_request, 'USE ' + database)
     query_client.execute()
+    table = self._format_identifier(table)
     query_client = TrinoQuery(self.trino_request, 'DESCRIBE ' + table)
     response = query_client.execute()
     columns = response.rows
@@ -339,7 +343,6 @@ class TrinoApi(Api):
       for col in columns
     ]
 
-
   @query_error_handler
   def explain(self, notebook, snippet):
     statement = snippet['statement'].rstrip(';')
@@ -347,7 +350,9 @@ class TrinoApi(Api):
 
     if statement:
       try:
-        TrinoQuery(self.trino_request, 'USE ' + snippet['database']).execute()
+        database = snippet['database']
+        database = self._format_identifier(database)
+        TrinoQuery(self.trino_request, 'USE ' + database).execute()
         result = TrinoQuery(self.trino_request, 'EXPLAIN ' + statement).execute()
         explanation = result.rows
       except Exception as e:
@@ -358,7 +363,6 @@ class TrinoApi(Api):
       'explanation': explanation,
       'statement': statement
     }
-
 
   def download(self, notebook, snippet, file_format='csv'):
     result_wrapper = TrinoExecutionWrapper(self, notebook, snippet)
@@ -398,7 +402,7 @@ class TrinoExecutionWrapper(ExecutionWrapper):
 
   def _until_available(self):
     if self.snippet['result']['handle'].get('sync', False):
-      return # Request is already completed
+      return  # Request is already completed
 
     count = 0
     sleep_seconds = 1
