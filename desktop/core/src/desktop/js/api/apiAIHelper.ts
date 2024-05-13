@@ -297,7 +297,7 @@ interface getTableListParams {
 }
 const getTableList = async ({ databaseName, executor }: getTableListParams) => {
   if (!databaseName) {
-    throw new HueError('Filed to load tables. Missing database.');
+    throw new HueError('Failed to load tables. Missing database selection.');
   }
   const dbEntry = await dataCatalog.getEntry({
     path: databaseName,
