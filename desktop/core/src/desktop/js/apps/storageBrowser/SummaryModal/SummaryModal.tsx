@@ -30,7 +30,7 @@ interface SummaryModalProps {
   onClose: () => void;
 }
 
-const SummaryModal: React.FC<SummaryModalProps> = ({ showModal, onClose, path }): JSX.Element => {
+const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [loadingSummary, setLoadingSummary] = useState(true);
   const [summary, setSummary] = useState([]);

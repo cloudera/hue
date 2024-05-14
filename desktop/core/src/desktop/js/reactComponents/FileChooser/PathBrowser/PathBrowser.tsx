@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import React, { useRef, useEffect, useState, RefObject } from 'react';
-import { Input, Button, Dropdown } from 'antd';
+import { Input, Dropdown } from 'antd';
+import { BorderlessButton } from 'cuix/dist/components/Button';
 import type { MenuProps } from 'antd';
 
 import HdfsIcon from '../../../components/icons/HdfsIcon';
@@ -39,13 +40,13 @@ const defaultProps = {
   testId: 'hue-path-browser'
 };
 
-const PathBrowser: React.FC<PathBrowserProps> = ({
+const PathBrowser = ({
   breadcrumbs,
   onFilepathChange,
   seperator,
   showIcon,
   testId
-}) => {
+}: PathBrowserProps): JSX.Element => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const icons = {
@@ -162,12 +163,12 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                     autoFocus
                     data-testid={`${testId}-dropdown`}
                   >
-                    <Button
+                    <BorderlessButton
                       className="hue-path-browser__dropdown-button"
                       data-testid={`${testId}-dropdown-btn`}
                     >
                       ..
-                    </Button>
+                    </BorderlessButton>
                   </Dropdown>
                   <div
                     className="hue-path-browser__breadcrumb-seperator"
@@ -196,7 +197,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                 </>
               )}
             </div>
-            <Button
+            <BorderlessButton
               className="hue-path-browser__toggle-breadcrumb-input-btn"
               aria-label="hue-path-browser__toggle-breadcrumb-input-btn"
               title="Edit path"
@@ -204,7 +205,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                 setIsEditMode(true);
               }}
               data-testid={`${testId}-toggle-input-btn`}
-            ></Button>
+            ></BorderlessButton>
           </div>
         ) : (
           <div ref={wrapperRef}>

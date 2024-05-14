@@ -25,7 +25,7 @@ interface DropDownMenuItemProps {
   onFilepathChange: (path: string) => void;
 }
 
-const DropDownMenuItem: React.FC<DropDownMenuItemProps> = ({ label, url, onFilepathChange }) => {
+const DropDownMenuItem = ({ label, url, onFilepathChange }: DropDownMenuItemProps): JSX.Element => {
   const handleFilepathChange = () => {
     onFilepathChange(url);
   };

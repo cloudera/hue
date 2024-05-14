@@ -32,14 +32,14 @@ interface InputModalProps {
   title: string;
 }
 
-const InputModal: React.FC<InputModalProps> = ({
+const InputModal = ({
   inputLabel,
   onClose,
   onSubmit,
   showModal,
   title,
   ...i18n
-}): JSX.Element => {
+}: InputModalProps): JSX.Element => {
   const [value, setValue] = useState<string>('');
   const { t } = i18nReact.useTranslation();
   const { cancelText = t('Cancel'), submitText = t('Submit') } = i18n;

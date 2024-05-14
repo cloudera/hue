@@ -17,26 +17,28 @@
 @use 'variables' as vars;
 
 $heading-font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$icon-size: 32px;
 
-.hue-common-header {
-  background-color: vars.$fluidx-gray-100;
-  height: 32px;
-  padding: 16px 16px 8px 16px;
-  display: flex;
+.antd.cuix {
+  .hue-common-header {
+    background-color: vars.$fluidx-gray-100;
+    padding: vars.$fluidx-spacing-s vars.$fluidx-spacing-s vars.$fluidx-spacing-xs;
+    display: flex;
+  }
 
-  .hue-header-icon {
+  .hue-header-icon > svg {
     margin-right: 10px;
     flex: 0 0 auto;
-    height: 24px;
-    width: 24px;
+    height: $icon-size;
+    color: vars.$fluidx-gray-700;
   }
 
   .hue-header-title {
     flex: 0 0 auto;
     font-family: $heading-font-family;
-    font-size: vars.$fluidx-heading-h3-size;
-    line-height: vars.$fluidx-heading-h3-line-height;
-    font-weight: vars.$fluidx-heading-h3-weight;
+    font-size: vars.$fluidx-heading-h2-size;
+    line-height: vars.$fluidx-heading-h2-line-height;
+    font-weight: vars.$fluidx-heading-h2-weight;
     color: vars.$text-color;
   }
 }

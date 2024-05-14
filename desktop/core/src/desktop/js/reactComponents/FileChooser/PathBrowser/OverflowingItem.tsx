@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Button } from 'antd';
+import { BorderlessButton } from 'cuix/dist/components/Button';
 
 import OverflowTooltip from './OverflowTooltip';
 import './OverflowingItem.scss';
@@ -30,7 +30,7 @@ const defaultProps = {
   testId: 'hue-path-browser__overflowing'
 };
 
-const OverflowingItem: React.FC<OverflowingItemProps> = ({ label, onClick, testId }) => {
+const OverflowingItem = ({ label, onClick, testId }: OverflowingItemProps): JSX.Element => {
   const textElementRef = useRef<HTMLDivElement>(null);
   const [isOverflown, setIsOverflown] = useState(false);
   const compareSize = () => {
@@ -50,16 +50,16 @@ const OverflowingItem: React.FC<OverflowingItemProps> = ({ label, onClick, testI
     };
   }, []);
 
+  //TODO: Add textElementRef to cuix button
   return (
     <OverflowTooltip isOverflowing={isOverflown} title={label} toolTipTriggers={['hover', 'focus']}>
-      <Button
-        ref={textElementRef}
+      <BorderlessButton
         className="hue-path-browser__overflowing-label"
         onClick={onClick}
         data-testid={`${testId}-label`}
       >
         {label}
-      </Button>
+      </BorderlessButton>
     </OverflowTooltip>
   );
 };
