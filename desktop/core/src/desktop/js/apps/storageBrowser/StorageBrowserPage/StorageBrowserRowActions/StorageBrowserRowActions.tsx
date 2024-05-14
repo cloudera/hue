@@ -24,6 +24,7 @@ import InfoIcon from '@cloudera/cuix-core/icons/react/InfoIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
+import { isHDFS, isOFS } from '../../../../../js/utils/storageBrowserUtils';
 
 import './StorageBrowserRowActions.scss';
 
@@ -38,17 +39,9 @@ const StorageBrowserRowActions = ({
 }: StorageBrowserRowActionsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const isHDFS = () => {
-    const currentPath = rowData.path.toLowerCase();
-    return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0;
-  };
-
-  const isOFS = () => {
-    return rowData.path.toLowerCase().indexOf('ofs://') === 0;
-  };
-
   //TODO: handle multiple file selection scenarios
-  const isSummaryEnabled = () => (isHDFS() || isOFS()) && rowData.type === 'file';
+  const isSummaryEnabled = () =>
+    (isHDFS(rowData.path) || isOFS(rowData.path)) && rowData.type === 'file';
 
   const getActions = () => {
     const actions: MenuItemType[] = [];

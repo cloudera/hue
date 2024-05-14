@@ -22,6 +22,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 import formatBytes from '../../../utils/formatBytes';
 import { fetchContentSummary } from '../../../reactComponents/FileChooser/api';
 import './SummaryModal.scss';
+import { ContentSummary } from '../../../reactComponents/FileChooser/types';
 
 interface SummaryModalProps {
   path: string;
@@ -54,6 +55,20 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ showModal, onClose, path })
     return rows;
   };
 
+  const updateSummaryData = (responseSummary: ContentSummary) => {
+    const summaryData = [
+      ['DISKSPACE CONSUMED', formatBytes(responseSummary.summary.spaceConsumed)],
+      ['BYTES USED', formatBytes(responseSummary.summary.length)],
+      ['NAMESPACE QUOTA', formatBytes(responseSummary.summary.quota)],
+      ['DISKSPACE QUOTA', formatBytes(responseSummary.summary.spaceQuota)],
+      ['REPLICATION FACTOR', responseSummary.summary.replication],
+      [,],
+      ['NUMBER OF DIRECTORIES', responseSummary.summary.directoryCount],
+      ['NUMBER OF FILES', responseSummary.summary.fileCount]
+    ];
+    setSummary(summaryData);
+  };
+
   useEffect(() => {
     if (path === '') {
       return;
@@ -61,17 +76,7 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ showModal, onClose, path })
     setLoadingSummary(true);
     fetchContentSummary(path)
       .then(responseSummary => {
-        const summaryData = [
-          ['DISKSPACE CONSUMED', formatBytes(responseSummary.summary.spaceConsumed)],
-          ['BYTES USED', formatBytes(responseSummary.summary.length)],
-          ['NAMESPACE QUOTA', formatBytes(responseSummary.summary.quota)],
-          ['DISKSPACE QUOTA', formatBytes(responseSummary.summary.spaceQuota)],
-          ['REPLICATION FACTOR', responseSummary.summary.replication],
-          [,],
-          ['NUMBER OF DIRECTORIES', responseSummary.summary.directoryCount],
-          ['NUMBER OF FILES', responseSummary.summary.fileCount]
-        ];
-        setSummary(summaryData);
+        updateSummaryData(responseSummary);
       })
       .catch(error => {
         huePubSub.publish('hue.error', error);
