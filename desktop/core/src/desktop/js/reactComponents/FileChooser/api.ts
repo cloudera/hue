@@ -15,12 +15,13 @@
 // limitations under the License.
 import { get, post } from '../../api/utils';
 import { CancellablePromise } from '../../api/cancellablePromise';
-import { PathAndFileData, SortOrder } from './types';
+import { PathAndFileData, ContentSummary, SortOrder } from './types';
 
 const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 const VIEWFILES_API_URl = '/api/v1/storage/view=';
 const MAKE_DIRECTORY_API_URL = '/api/v1/storage/mkdir';
 const TOUCH_API_URL = '/api/v1/storage/touch';
+const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary=';
 
 export interface ApiFileSystem {
   file_system: string;
@@ -74,3 +75,6 @@ export const mkdir = async (folderName: string, path: string): Promise<void> => 
 export const touch = async (fileName: string, path: string): Promise<void> => {
   await post(TOUCH_API_URL, { name: fileName, path: path });
 };
+
+export const fetchContentSummary = (path: string): CancellablePromise<ContentSummary> =>
+  get(CONTENT_SUMMARY_API_URL + path);
