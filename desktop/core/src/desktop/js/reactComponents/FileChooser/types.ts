@@ -80,6 +80,20 @@ export interface PathAndFileData {
   pagesize: number;
 }
 
+export interface ContentSummary {
+  summary: {
+    directoryCount: number;
+    ecPolicy: string;
+    fileCount: number;
+    length: number;
+    quota: number;
+    spaceConsumed: number;
+    spaceQuota: number;
+    typeQuota: number;
+    replication: number;
+  };
+}
+
 export enum SortOrder {
   ASC = 'ascending',
   DSC = 'descending',
