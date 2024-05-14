@@ -18,6 +18,16 @@
 import re
 from typing import List, Dict
 
+def extract_sql_content(text: str) -> str:
+  matches = re.findall(f'```sql(.*?)```', text, flags=re.DOTALL)
+  return matches[0] if len(matches) > 0 else ''
+
 def extract_tag_content(tag: str, text: str) -> str:
   matches = re.findall(f'<{tag}>(.*?)</{tag}>', text, flags=re.DOTALL)
-  return matches[0] if len(matches) > 0 else ''
+  if len(matches) > 0:
+    return matches[0]
+  elif tag == 'code':
+    # Temporary fix until CDPD-69903
+    return extract_sql_content(text)
+  else:
+    return ''
