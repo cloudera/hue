@@ -62,10 +62,10 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ showModal, onClose, path })
     fetchContentSummary(path)
       .then(responseSummary => {
         const summaryData = [
-          ['DISKSPACE CONSUMED', formatBytes(responseSummary.summary.spaceConsumed, 4)],
-          ['BYTES USED', formatBytes(responseSummary.summary.length, 4)],
-          ['NAMESPACE QUOTA', formatBytes(responseSummary.summary.quota, 4)],
-          ['DISKSPACE QUOTA', formatBytes(responseSummary.summary.spaceQuota, 4)],
+          ['DISKSPACE CONSUMED', formatBytes(responseSummary.summary.spaceConsumed)],
+          ['BYTES USED', formatBytes(responseSummary.summary.length)],
+          ['NAMESPACE QUOTA', formatBytes(responseSummary.summary.quota)],
+          ['DISKSPACE QUOTA', formatBytes(responseSummary.summary.spaceQuota)],
           ['REPLICATION FACTOR', responseSummary.summary.replication],
           [,],
           ['NUMBER OF DIRECTORIES', responseSummary.summary.directoryCount],

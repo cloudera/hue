@@ -25,7 +25,7 @@ const formatBytes = (bytes: number, decimalPoints?: number): string => {
   const dm = decimalPoints ? decimalPoints : 2;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return (bytes / Math.pow(k, i)).toPrecision(dm) + ' ' + sizes[i];
+  return (bytes / Math.pow(k, i)).toFixed(dm) + ' ' + sizes[i];
 };
 
 export default formatBytes;
