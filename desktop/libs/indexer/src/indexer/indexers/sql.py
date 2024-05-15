@@ -139,7 +139,7 @@ class SQLIndexer(object):
     "escapeChar"    = "\\\\"
     ''' % source['format']
 
-    use_temp_table = table_format in ('parquet', 'orc', 'kudu') or is_transactional or isIceberg
+    use_temp_table = table_format in ('parquet', 'orc', 'kudu', 'avro') or is_transactional or isIceberg
     if use_temp_table: # We'll be using a temp table to load data
       if load_data:
         table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name
@@ -159,7 +159,7 @@ class SQLIndexer(object):
       collection_delimiter = None
       map_delimiter = None
 
-    if external or (load_data and table_format in ('parquet', 'orc', 'kudu')): # We'll use location to load data
+    if external or (load_data and table_format in ('parquet', 'orc', 'kudu', 'avro')): # We'll use location to load data
       if not self.fs.isdir(external_path): # File selected
         external_path, external_file_name = Hdfs.split(external_path)
 
@@ -209,7 +209,7 @@ class SQLIndexer(object):
             'serde_name': serde_name,
             'serde_properties': serde_properties,
             'file_format': file_format,
-            'external': external or load_data and table_format in ('parquet', 'orc', 'kudu'),
+            'external': external or load_data and table_format in ('parquet', 'orc', 'kudu', 'avro'),
             'path': external_path,
             'primary_keys': primary_keys if table_format == 'kudu' and not load_data else [],
             'tbl_properties': tbl_properties
@@ -269,7 +269,7 @@ class SQLIndexer(object):
           extra_create_properties += "\nTBLPROPERTIES('transactional'='true', 'transactional_properties'='%s')" % \
               default_transactional_type
 
-      sql += '''\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s`%(comment)s
+      sql += '''\n\nCREATE %(table_type)sTABLE `%(database)s`.`%(final_table_name)s`%(comment)s
         %(extra_create_properties)s
         AS SELECT %(columns_list)s
         FROM `%(database)s`.`%(table_name)s`;''' % {
@@ -278,7 +278,8 @@ class SQLIndexer(object):
           'table_name': table_name,
           'extra_create_properties': extra_create_properties,
           'columns_list': ', '.join(columns_list),
-          'comment': ' COMMENT "%s"' % comment if comment else ''
+          'comment': ' COMMENT "%s"' % comment if comment else '',
+          'table_type': 'EXTERNAL ' if external and not is_transactional else ''
       }
       sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
           'database': database,
