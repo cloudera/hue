@@ -19,6 +19,9 @@ import Table from 'cuix/dist/components/Table/Table';
 import type { ColumnType } from 'antd/es/table';
 import './MetricsComponent.scss';
 
+interface MetricsValue {
+  value: number;
+}
 interface MetricsTime {
   '1m_rate': number;
   '5m_rate': number;
@@ -36,6 +39,9 @@ interface MetricsTime {
   sum: number;
 }
 
+interface MetricsCount {
+  count: number;
+}
 export interface MetricsResponse {
   metric: {
     'auth.ldap.auth-time': MetricsTime;
@@ -62,32 +68,30 @@ export interface MetricsResponse {
   };
 }
 
-interface MetricsValue {
-  value: number;
-}
-
-interface MetricsCount {
-  count: number;
+interface DataSourceItem {
+  name: string;
+  value: number | MetricsTime;
 }
 
 interface MetricsTableProps {
   caption: string;
-  dataSource: { name: string; value: any }[];
+  dataSource: DataSourceItem[];
 }
 
-const MetricsTable = ({ caption, dataSource }: MetricsTableProps) => {
-  const metricsColumns: ColumnType[] = [];
-
-  metricsColumns.push({
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name'
-  });
-  metricsColumns.push({
-    title: 'Value',
-    dataIndex: 'value',
-    key: 'value'
-  });
+const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
+  const metricsColumns: ColumnType<DataSourceItem>[] = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name'
+    },
+    {
+      title: 'Value',
+      dataIndex: 'value',
+      key: 'value',
+      render: value => (typeof value === 'number' ? value : JSON.stringify(value))
+    }
+  ];
 
   return (
     <>

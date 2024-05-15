@@ -23,7 +23,7 @@ import './MetricsComponent.scss';
 
 const { Option } = Select;
 
-const MetricsComponent = () => {
+const MetricsComponent: React.FC = (): JSX.Element => {
   const [metrics, setMetrics] = useState<MetricsResponse>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
