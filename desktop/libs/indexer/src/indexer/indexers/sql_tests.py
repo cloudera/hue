@@ -16,27 +16,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import json
-import pytest
-import sys
+from builtins import object
+from unittest.mock import MagicMock, Mock, patch
 
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.settings import BASE_DIR
-from useradmin.models import User
+import pytest
 
 from azure.conf import ABFS_CLUSTERS
 from beeswax.server import dbms
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.settings import BASE_DIR
 from indexer.indexers.sql import SQLIndexer
+from useradmin.models import User
 
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
 
 def mock_uuid():
   return '52f840a8-3dde-434d-934a-2d6e06f3687e'
+
 
 @pytest.mark.django_db
 class TestSQLIndexer(object):
@@ -44,7 +40,6 @@ class TestSQLIndexer(object):
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_create_table_from_a_file_to_csv(self):
     fs = Mock(
@@ -155,7 +150,7 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
 
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    ### source dir is in encryption zone, so the scratch dir is in the same dir
+    # source dir is in encryption zone, so the scratch dir is in the same dir
     assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
@@ -170,7 +165,8 @@ ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
     )
   STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;
-LOAD DATA INPATH '/enc_zn/upload_dir/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+LOAD DATA INPATH '/enc_zn/upload_dir/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' \
+INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
 CREATE TABLE `default`.`export_table` COMMENT "No comment!"
         STORED AS csv
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
@@ -199,7 +195,7 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
 
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    ### source dir is not in encryption zone, so the scratch dir is in user's home dir
+    # source dir is not in encryption zone, so the scratch dir is in user's home dir
     assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
@@ -214,7 +210,8 @@ ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
     )
   STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;
-LOAD DATA INPATH '/user/test/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+LOAD DATA INPATH '/user/test/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' \
+INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
 CREATE TABLE `default`.`export_table` COMMENT "No comment!"
         STORED AS csv
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
@@ -222,6 +219,7 @@ TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         FROM `default`.`hue__tmp_export_table`;
 DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
       [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
+
 
 class MockRequest(object):
   def __init__(self, fs=None, user=None):
