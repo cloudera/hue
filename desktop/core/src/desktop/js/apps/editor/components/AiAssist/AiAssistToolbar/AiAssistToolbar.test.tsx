@@ -1,20 +1,22 @@
 jest.mock('./AiAssistToolbarInput');
 
 import React from 'react';
-import { render,act } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import AssistToolbar from './AiAssistToolbar';
 import { AiActionModes } from '../sharedTypes';
-  
-jest.mock( 'api/apiAIHelper', () => ({
-  getHistoryItems: jest.fn().mockResolvedValue([{
-    id: 1,
-    prompt: 'Existing Prompt in history',
-    updatedAt: 12351,
-    db: 'default',
-    dialect: 'hive'
-  }]),
+
+jest.mock('api/apiAIHelper', () => ({
+  getHistoryItems: jest.fn().mockResolvedValue([
+    {
+      id: 1,
+      prompt: 'Existing Prompt in history',
+      updatedAt: 12351,
+      db: 'default',
+      dialect: 'hive'
+    }
+  ]),
   createHistoryItem: jest.fn().mockResolvedValue({ prompt: 'created', id: 1 }),
   updateHistoryItem: jest.fn().mockResolvedValue({ prompt: 'created', id: 1 })
 }));
@@ -55,7 +57,6 @@ describe('AssistToolbar', () => {
     dialect: ''
   };
 
-
   it('renders AiAssistToolbarInput mock correctly', async () => {
     let getAllByTestId;
     await act(async () => {
@@ -63,7 +64,6 @@ describe('AssistToolbar', () => {
         <AssistToolbar {...defaultProps} actionMode={AiActionModes.GENERATE} />
       );
       getAllByTestId = renderResult.getAllByTestId;
-
     });
     const aiAssistToolbarInputs = getAllByTestId('mock-ai-assist-toolbar-input');
     expect(aiAssistToolbarInputs).toHaveLength(2);
@@ -72,7 +72,9 @@ describe('AssistToolbar', () => {
   it('should disable edit, explain, optimize and fix buttons on empty statement', async () => {
     let getByTitle;
     await act(async () => {
-      const renderResult = render(<AssistToolbar {...defaultProps} parsedStatement={{ statement: '' }} />);
+      const renderResult = render(
+        <AssistToolbar {...defaultProps} parsedStatement={{ statement: '' }} />
+      );
       getByTitle = renderResult.getByTitle;
     });
 
@@ -102,8 +104,10 @@ describe('AssistToolbar', () => {
   it('should enable generate button if the statement only has nql comment', async () => {
     let getByTitle;
     await act(async () => {
-       const renderResult = render(<AssistToolbar {...defaultProps} parsedStatement={{ statement: '/* NQL: do stuff */' }} />)
-       getByTitle = renderResult.getByTitle
+      const renderResult = render(
+        <AssistToolbar {...defaultProps} parsedStatement={{ statement: '/* NQL: do stuff */' }} />
+      );
+      getByTitle = renderResult.getByTitle;
     });
     const generateButton = getByTitle('Generate SQL using natural language');
     expect(generateButton).toBeEnabled();
@@ -115,7 +119,6 @@ describe('AssistToolbar', () => {
       renderResult = render(<AssistToolbar {...defaultProps} isLoading />);
       getByTitle = renderResult.getByTitle;
     });
-
 
     const editButton = getByTitle('Edit selected SQL statement using natural language');
     expect(editButton).toBeDisabled();
@@ -129,7 +132,9 @@ describe('AssistToolbar', () => {
     const fixButton = getByTitle('Fix the selected SQL statement');
     expect(fixButton).toBeDisabled();
 
-    renderResult.rerender(<AssistToolbar {...defaultProps} parsedStatement={{ statement: '' }} isLoading />);
+    renderResult.rerender(
+      <AssistToolbar {...defaultProps} parsedStatement={{ statement: '' }} isLoading />
+    );
     const generateButton = getByTitle('Generate SQL using natural language');
     expect(generateButton).toBeDisabled();
   });
@@ -141,8 +146,23 @@ describe('AssistToolbar', () => {
     );
     const generateButton = getByTitle('Generate SQL using natural language');
     await user.click(generateButton);
-    
+
     expect(mockSetActionMode).toHaveBeenCalledWith(AiActionModes.GENERATE);
+  });
+
+  it('should show the db name in the input', async () => {
+    const user = userEvent.setup();
+    const { getByTitle, getByText } = render(
+      <AssistToolbar
+        {...defaultProps}
+        databaseName="testDatabase"
+        parsedStatement={{ statement: '' }}
+      />
+    );
+    const generateButton = getByTitle('Generate SQL using natural language');
+    await user.click(generateButton);
+
+    expect(getByText('Query database testDatabase using natural language')).toBeInTheDocument();
   });
 
   it('should toggle action edit action mode correctly', async () => {
@@ -153,7 +173,6 @@ describe('AssistToolbar', () => {
     expect(mockSetActionMode).toHaveBeenCalledWith(AiActionModes.EDIT);
   });
 
-
   it('should disable buttons when isLoading is true', async () => {
     const props = { ...defaultProps, isLoading: true };
     let getByTitle;
@@ -161,7 +180,7 @@ describe('AssistToolbar', () => {
       const renderResult = render(<AssistToolbar {...props} />);
       getByTitle = renderResult.getByTitle;
     });
-  
+
     const generateButton = getByTitle('Generate SQL using natural language');
     expect(generateButton).toBeDisabled();
   });
@@ -191,7 +210,6 @@ describe('AssistToolbar', () => {
     expect(mockLoadFixSuggestion).toHaveBeenCalledWith('SELECT * FROM table');
   });
 
-
   it('should call loadComments on comment button click', async () => {
     const user = userEvent.setup();
     const props = { ...defaultProps };
@@ -204,7 +222,7 @@ describe('AssistToolbar', () => {
   it('hides the action buttons if the action is missing in the showActions prop', async () => {
     const props = { ...defaultProps, isSqlError: true, showActions: [] };
     await act(async () => {
-      const {queryByTitle} = render(<AssistToolbar {...props} />);
+      const { queryByTitle } = render(<AssistToolbar {...props} />);
       expect(queryByTitle('Fix the selected SQL statement')).toBeNull();
       expect(queryByTitle('Comment SQL')).toBeNull();
       expect(queryByTitle('Optimize the selected SQL statement')).toBeNull();

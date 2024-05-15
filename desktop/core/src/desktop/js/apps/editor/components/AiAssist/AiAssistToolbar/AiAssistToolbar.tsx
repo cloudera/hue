@@ -126,12 +126,12 @@ function AssistToolbar({
   };
 
   const updateHistory = prompt => {
-    const existingHistoryItem = historyItems.find(item=>item.prompt === prompt);
+    const existingHistoryItem = historyItems.find(item => item.prompt === prompt);
     if (existingHistoryItem) {
       updateHistoryItem(existingHistoryItem)
-        .then((updatedHistoryItem) => {
+        .then(updatedHistoryItem => {
           setHistoryItems(prevItems => {
-            const filteredItems = prevItems.filter((item) => item.id !== updatedHistoryItem.id);
+            const filteredItems = prevItems.filter(item => item.id !== updatedHistoryItem.id);
             return [updatedHistoryItem, ...filteredItems];
           });
         })
@@ -178,7 +178,7 @@ function AssistToolbar({
                 isAnimating={isAnimatingInput}
                 isLoading={isLoading}
                 isExpanded={actionMode === AiActionModes.GENERATE && inputExpanded}
-                placeholder="E.g. How many of our unique website visitors are using Mac?"
+                placeholder={`Query database ${databaseName} using natural language`}
                 onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
                 onInputChanged={prompt => onInputChanged(prompt)}
@@ -205,7 +205,7 @@ function AssistToolbar({
                 isExpanded={actionMode === AiActionModes.EDIT && inputExpanded}
                 isLoading={isLoading}
                 promptValue={inputValue}
-                placeholder="E.g. Only inlcude people under 50 years"
+                placeholder={`Edit your query for database ${databaseName}`}
                 onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
                 onInputChanged={prompt => onInputChanged(prompt)}

@@ -71,6 +71,7 @@ interface PreviewModalProps {
   lineNumberStart: number;
   dialect: string;
   keywordCase: KeywordCase | undefined;
+  databaseName: string;
 }
 
 const PreviewModal = ({
@@ -88,14 +89,15 @@ const PreviewModal = ({
   showDiffFrom: showDiffFromRaw = '',
   lineNumberStart = 1,
   dialect,
-  keywordCase
+  keywordCase, 
+  databaseName
 }: PreviewModalProps): JSX.Element => {
   const titles = {
-    [AiActionModes.GENERATE]: 'Generated SQL - suggestion',
-    [AiActionModes.EDIT]: 'Edited SQL - suggestion',
-    [AiActionModes.OPTIMIZE]: 'Optimized SQL - suggestion',
-    [AiActionModes.EXPLAIN]: 'Explained SQL',
-    [AiActionModes.FIX]: 'Fixed SQL - suggestion'
+    [AiActionModes.GENERATE]: `Generated SQL for ${databaseName} - suggestion`,
+    [AiActionModes.EDIT]: `Edited SQL for ${databaseName} - suggestion`,
+    [AiActionModes.OPTIMIZE]: `Optimized SQL for ${databaseName} - suggestion`,
+    [AiActionModes.EXPLAIN]: `Explained SQL for ${databaseName}`,
+    [AiActionModes.FIX]: `Fixed SQL for ${databaseName} - suggestion`
   };
   const titlesOnNoDiff = {
     [AiActionModes.OPTIMIZE]: 'Optimized SQL - no suggestion',
