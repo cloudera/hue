@@ -104,6 +104,35 @@ function AssistToolbar({
     loadComments(parsedStatement?.statement);
   };
 
+  const handleInputSubmit = (promptValue: string) => {
+    onInputSubmit(promptValue);
+    updateHistory(promptValue);
+  };
+
+  const updateHistory = prompt => {
+    const existingHistoryItem = historyItems.find(item => item.prompt === prompt);
+    if (existingHistoryItem) {
+      updateHistoryItem(existingHistoryItem)
+        .then(updatedHistoryItem => {
+          setHistoryItems(prevItems => {
+            const filteredItems = prevItems.filter(item => item.id !== updatedHistoryItem.id);
+            return [updatedHistoryItem, ...filteredItems];
+          });
+        })
+        .catch(error => {
+          console.error('Could not update history item:', error);
+        });
+    } else {
+      createHistoryItem({ prompt, dialect, db: databaseName })
+        .then(item => {
+          setHistoryItems(prevItems => [item, ...prevItems]);
+        })
+        .catch(error => {
+          console.error('Could not add history item:', error);
+        });
+    }
+  };
+
   const selectedStatement = parsedStatement?.statement?.trim() || '';
   const selectedStatementHasContent = !!selectedStatement;
   const nqlPrompt = extractLeadingNqlComments(selectedStatement);
@@ -133,8 +162,8 @@ function AssistToolbar({
                 isAnimating={isAnimatingInput}
                 isLoading={isLoading}
                 isExpanded={actionMode === AiActionModes.GENERATE && inputExpanded}
-                placeholder="E.g. How many of our unique website vistors are using Mac?"
-                onSubmit={onInputSubmit}
+                placeholder={`Query database ${databaseName} using natural language`}
+                onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
                 onInputChanged={onInputChanged}
                 value={inputValue}
@@ -158,9 +187,9 @@ function AssistToolbar({
                 isAnimating={isAnimatingInput}
                 isExpanded={actionMode === AiActionModes.EDIT && inputExpanded}
                 isLoading={isLoading}
-                value={inputValue}
-                placeholder="E.g. Only inlcude people under 50 years"
-                onSubmit={onInputSubmit}
+                promptValue={inputValue}
+                placeholder={`Edit your query for database ${databaseName}`}
+                onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
                 onInputChanged={onInputChanged}
                 onAnimationEnded={() => setIsAnimatingInput(false)}

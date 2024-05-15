@@ -35,15 +35,16 @@ describe('PreviewModal', () => {
     showDiffFrom: '',
     lineNumberStart: 1,
     dialect: 'hive',
-    keywordCase: undefined
+    keywordCase: undefined,
+    databaseName: 'testDatabase',
   };
 
   test.each([
-    [AiActionModes.GENERATE, 'Generated SQL - suggestion'],
-    [AiActionModes.EDIT, 'Edited SQL - suggestion'],
-    [AiActionModes.OPTIMIZE, 'Optimized SQL - suggestion'],
-    [AiActionModes.EXPLAIN, 'Explained SQL'],
-    [AiActionModes.FIX, 'Fixed SQL - suggestion']
+    [AiActionModes.GENERATE, 'Generated SQL for testDatabase - suggestion'],
+    [AiActionModes.EDIT, 'Edited SQL for testDatabase - suggestion'],
+    [AiActionModes.OPTIMIZE, 'Optimized SQL for testDatabase - suggestion'],
+    [AiActionModes.EXPLAIN, 'Explained SQL for testDatabase'],
+    [AiActionModes.FIX, 'Fixed SQL for testDatabase - suggestion']
   ])('displays the correct title for %s action mode with diff', (actionMode, expectedTitle) => {
     render(
       <PreviewModal

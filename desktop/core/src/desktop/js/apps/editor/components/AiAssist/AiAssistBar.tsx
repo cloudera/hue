@@ -529,6 +529,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
           dialect={sqlDialect}
           keywordCase={keywordCase}
           guardrailAlert={guardrailAlert}
+          databaseName={getDbName(activeExecutable)}
         />
       )}
     </>
