@@ -193,7 +193,7 @@ function AiAssistToolbarInput({
       setHistoryDropdownPostion(calculateDropdownPosition(textareaRef.current, isMultiLine));
       setHistoryDropdownWidth(textareaRef.current.parentElement?.clientWidth);
     }
-  }, [value, prefill, resizeAwareMaxWidth]);
+  }, [inputPromptValue, prefill, resizeAwareMaxWidth, placeholderText]);
 
   useEffect(() => {
     if (!isAnimating && isExpanded) {
