@@ -189,14 +189,14 @@ function sles15_install() {
       java-11-openjdk-devel \
       java-11-openjdk-headless \
       krb5-client pam_krb5 krb5-plugin-kdb-ldap \
-      libpcap \
+      libpcap1 \
       ncurses-devel \
       nmap \
       xmlsec1 xmlsec1-devel  xmlsec1-openssl-devel'
     # MySQLdb install
     sudo -- sh -c 'zypper install -y libmariadb-devel mariadb-client python3-mysqlclient'
-    # NODEJS 14 install
-    sudo -- sh -c 'zypper install -y nodejs18 npm16'
+    # NODEJS 18 install
+    sudo -- sh -c 'zypper install -y nodejs18 npm20'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
