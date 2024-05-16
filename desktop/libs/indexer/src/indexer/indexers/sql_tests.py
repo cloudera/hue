@@ -16,27 +16,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import json
-import pytest
-import sys
+from builtins import object
+from unittest.mock import MagicMock, Mock, patch
 
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.settings import BASE_DIR
-from useradmin.models import User
+import pytest
 
 from azure.conf import ABFS_CLUSTERS
 from beeswax.server import dbms
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.settings import BASE_DIR
 from indexer.indexers.sql import SQLIndexer
+from useradmin.models import User
 
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
 
 def mock_uuid():
   return '52f840a8-3dde-434d-934a-2d6e06f3687e'
+
 
 @pytest.mark.django_db
 class TestSQLIndexer(object):
@@ -44,7 +40,6 @@ class TestSQLIndexer(object):
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_create_table_from_a_file_to_csv(self):
     fs = Mock(
@@ -155,7 +150,7 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
 
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    ### source dir is in encryption zone, so the scratch dir is in the same dir
+    # source dir is in encryption zone, so the scratch dir is in the same dir
     assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
@@ -170,7 +165,8 @@ ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
     )
   STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;
-LOAD DATA INPATH '/enc_zn/upload_dir/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+LOAD DATA INPATH '/enc_zn/upload_dir/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' \
+INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
 CREATE TABLE `default`.`export_table` COMMENT "No comment!"
         STORED AS csv
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
@@ -199,7 +195,7 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
 
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    ### source dir is not in encryption zone, so the scratch dir is in user's home dir
+    # source dir is not in encryption zone, so the scratch dir is in user's home dir
     assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
@@ -214,7 +210,8 @@ ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
     )
   STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;
-LOAD DATA INPATH '/user/test/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+LOAD DATA INPATH '/user/test/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' \
+INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
 CREATE TABLE `default`.`export_table` COMMENT "No comment!"
         STORED AS csv
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
@@ -222,6 +219,7 @@ TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         FROM `default`.`hue__tmp_export_table`;
 DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
       [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
+
 
 class MockRequest(object):
   def __init__(self, fs=None, user=None):
@@ -557,6 +555,157 @@ TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ''' in sql, sql
 
   assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql
+
+  destination['useDefaultLocation'] = False
+  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
+
+  assert '''USE default;''' in sql, sql
+
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
+(
+  `acct_client` string ,
+  `tran_amount` double ,
+  `tran_country_cd` string ,
+  `vrfcn_city` string ,
+  `vrfcn_city_lat` double ,
+  `vrfcn_city_lon` double ) ROW FORMAT   DELIMITED
+    FIELDS TERMINATED BY ','
+    COLLECTION ITEMS TERMINATED BY '\\002'
+    MAP KEYS TERMINATED BY '\\003'
+  STORED AS TextFile LOCATION '/user/hue/data'
+TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;'''
+  assert statement in sql, sql
+
+  assert '''CREATE EXTERNAL TABLE `default`.`parquet_table`
+        STORED AS parquet
+        AS SELECT *
+        FROM `default`.`hue__tmp_parquet_table`;
+''' in sql, sql
+
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql
+
+
+@pytest.mark.django_db
+def test_generate_create_avro_table():
+  source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
+    '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
+    '''"Corpus Christi","40.7807998657","-73.9772033691"],["Thomson Reuters","2400000.0","US","Albany","35.7976989746",'''
+    '''"-78.6252975464"],'''
+    '''["OpenX","2200000.0","US","Des Moines","40.5411987305","-119.586898804"]],"sampleCols":[{"operations":[],"comment":"",'''
+    '''"nested":[],'''
+    '''"name":"acct_client","level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,'''
+    '''"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],'''
+    '''"comment":"","nested":[],"name":"tran_amount","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"double",'''
+    '''"showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_country_cd","level":0,"keyType":'''
+    '''"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,'''
+    '''"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"vrfcn_city",'''
+    '''"level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"",'''
+    '''"multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],'''
+    '''"name":"vrfcn_city_lat","level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,'''
+    '''"length":100,'''
+    '''"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":false,"scale":0},{"operations":[],'''
+    '''"comment":"","nested":[],"name":"vrfcn_city_lon","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":false,'''
+    '''"scale":0}],"inputFormat":"file","inputFormatsAll":[{"value":"file","name":"File"},{"value":"manual","name":"Manually"},'''
+    '''{"value":"query","name":"SQL Query"},{"value":"table","name":"Table"}],"inputFormatsManual":[{"value":"manual","name":'''
+    '''"Manually"}],"inputFormats":[{"value":"file","name":"File"},{"value":"manual","name":"Manually"},{"value":"query","name":'''
+    '''"SQL Query"},{"value":"table","name":"Table"}],"path":"/user/hue/data/query-hive-360.csv","isObjectStore":false,"table":"",'''
+    '''"tableName":"","databaseName":"default","apiHelperType":"hive","query":"","draggedQuery":"","format":{"type":"csv",'''
+    '''"fieldSeparator":",","recordSeparator":"\\n","quoteChar":"\\"","hasHeader":true,"status":0},"show":true,"defaultName":'''
+    '''"default.query-hive-360"}'''
+  )
+  destination = json.loads('''{"isTransactional": false, "isInsertOnly": false, "sourceType": "hive", "name":"default.avro_table"'''
+    ''',"apiHelperType":"hive","description":"","outputFormat":"table","outputFormatsList":[{"name":"Table","value":"table"},'''
+    '''{"name":"Solr index","value":"index"},{"name":"File","value":"file"},{"name":"Database","value":"database"}],'''
+    '''"outputFormats":[{"name":"Table","value":"table"},{"name":"Solr index","value":"index"}],"columns":[{"operations":[],'''
+    '''"comment":"","nested":[],"name":"acct_client","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":'''
+    '''false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_amount","level":0,"keyType":"string","required":false,'''
+    '''"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":'''
+    '''"double","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_country_cd","level":0,'''
+    '''"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"",'''
+    '''"multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":'''
+    '''[],"name":"vrfcn_city","level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":'''
+    '''100,"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],'''
+    '''"comment":"","nested":[],"name":"vrfcn_city_lat","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":'''
+    '''false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"vrfcn_city_lon","level":0,"keyType":"string","required":'''
+    '''false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,'''
+    '''"type":"double","showProperties":false,"scale":0}],"bulkColumnNames":"acct_client,tran_amount,tran_country_cd,vrfcn_city,'''
+    '''vrfcn_city_lat,vrfcn_city_lon","showProperties":false,"isTargetExisting":false,"isTargetChecking":false,"existingTargetUrl":'''
+    '''"","tableName":"avro_table","databaseName":"default","tableFormat":"avro","KUDU_DEFAULT_RANGE_PARTITION_COLUMN":'''
+    '''{"values":[{"value":""}],"name":"VALUES","lower_val":0,"include_lower_val":"<=","upper_val":1,"include_upper_val":"<="},'''
+    '''"KUDU_DEFAULT_PARTITION_COLUMN":{"columns":[],"range_partitions":[{"values":[{"value":""}],"name":"VALUES","lower_val":0,'''
+    '''"include_lower_val":"<=","upper_val":1,"include_upper_val":"<="}],"name":"HASH","int_val":16},"tableFormats":[{"value":'''
+    '''"text","name":"Text"},{"value":"parquet","name":"Parquet"},{"value":"kudu","name":"Kudu"},{"value":"csv","name":"Csv"},'''
+    '''{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},{"value":"orc",'''
+    '''"name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],"importData":true,'''
+    '''"isIceberg":false,"useCopy":false,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv",'''
+    '''"hasHeader":true,"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002",'''
+    '''"customMapDelimiter":"\\\\003","customRegexp":""}'''
+  )
+
+  path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
+  request = MockRequest(fs=MockFs(path=path))
+
+  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
+
+  assert '''USE default;''' in sql, sql
+
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_avro_table`
+(
+  `acct_client` string ,
+  `tran_amount` double ,
+  `tran_country_cd` string ,
+  `vrfcn_city` string ,
+  `vrfcn_city_lat` double ,
+  `vrfcn_city_lon` double ) ROW FORMAT   DELIMITED
+    FIELDS TERMINATED BY ','
+    COLLECTION ITEMS TERMINATED BY '\\002'
+    MAP KEYS TERMINATED BY '\\003'
+  STORED AS TextFile LOCATION '/user/hue/data'
+TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;'''
+  assert statement in sql, sql
+
+  assert '''CREATE TABLE `default`.`avro_table`
+        STORED AS avro
+        AS SELECT *
+        FROM `default`.`hue__tmp_avro_table`;
+''' in sql, sql
+
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_avro_table`;''' in sql, sql
+
+  destination['useDefaultLocation'] = False
+  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
+
+  assert '''USE default;''' in sql, sql
+
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_avro_table`
+(
+  `acct_client` string ,
+  `tran_amount` double ,
+  `tran_country_cd` string ,
+  `vrfcn_city` string ,
+  `vrfcn_city_lat` double ,
+  `vrfcn_city_lon` double ) ROW FORMAT   DELIMITED
+    FIELDS TERMINATED BY ','
+    COLLECTION ITEMS TERMINATED BY '\\002'
+    MAP KEYS TERMINATED BY '\\003'
+  STORED AS TextFile LOCATION '/user/hue/data'
+TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;'''
+  assert statement in sql, sql
+
+  assert '''CREATE EXTERNAL TABLE `default`.`avro_table`
+        STORED AS avro
+        AS SELECT *
+        FROM `default`.`hue__tmp_avro_table`;
+''' in sql, sql
+
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_avro_table`;''' in sql, sql
 
 
 @pytest.mark.django_db
