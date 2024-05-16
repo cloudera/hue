@@ -245,7 +245,7 @@ const fetchTableDetails = async (databaseName: string, tableName: string, execut
   const type = dbEntry.definition?.type;
   const comment = dbEntry.definition?.comment;
 
-  const foreignKeys = dbEntry.sourceMeta?.foreign_keys.map(keyDetails => {
+  const foreignKeys = dbEntry.sourceMeta?.foreign_keys?.map(keyDetails => {
     const toParts = keyDetails.to.split('.');
     return {
       fromColumn: keyDetails.name,
@@ -266,7 +266,7 @@ const fetchTableDetails = async (databaseName: string, tableName: string, execut
       })
       .filter(def => def !== undefined),
     partitions: children.partitions,
-    foreignKeys
+    foreignKeys: foreignKeys || []
   };
 };
 
