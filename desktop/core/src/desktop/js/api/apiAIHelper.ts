@@ -241,8 +241,33 @@ const fetchColumnsData = async (databaseName: string, tableName: string, executo
     namespace: executor.namespace(),
     compute: executor.compute()
   });
-  const columns = await dbEntry.getChildren();
-  return columns;
+
+  const type = dbEntry.definition?.type;
+  const comment = dbEntry.definition?.comment;
+
+  const foreignKeys = dbEntry.sourceMeta?.foreign_keys?.map(keyDetails => {
+    const toParts = keyDetails.to.split('.');
+    return {
+      fromColumn: keyDetails.name,
+      toColumn: toParts.pop(),
+      toTable: toParts.join('.')
+    };
+  });
+
+  const children = await dbEntry.getChildren();
+  return {
+    dbName: databaseName,
+    name: tableName,
+    type,
+    comment,
+    columns: children
+      .map(({ definition }) => {
+        return definition as ExtendedColumn;
+      })
+      .filter(def => def !== undefined),
+    partitions: children.partitions,
+    foreignKeys: foreignKeys || []
+  };
 };
 
 export const getRelevantTableDetails = async (
