@@ -27,7 +27,9 @@ from urllib.parse import urlparse
 
 from beeswax import conf
 from beeswax import data_export
+from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD
 from desktop.lib import export_csvxls
+from desktop.lib.conf import coerce_password_from_script
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
@@ -62,9 +64,12 @@ class TrinoApi(Api):
     self.server_host, self.server_port, self.http_scheme = self.parse_api_url(self.options['url'])
     self.auth = None
 
-    if self.options.get('auth_username') and self.options.get('auth_password'):
-      self.auth_username = self.options['auth_username']
-      self.auth_password = self.options['auth_password']
+    auth_username = self.options.get('auth_username', DEFAULT_AUTH_USERNAME.get())
+    auth_password = self.options.get('auth_password', self.get_auth_password())
+
+    if auth_username and auth_password:
+      self.auth_username = auth_username
+      self.auth_password = auth_password
       self.auth = BasicAuthentication(self.auth_username, self.auth_password)
 
     trino_session = ClientSession(user.username)
@@ -75,6 +80,16 @@ class TrinoApi(Api):
       http_scheme=self.http_scheme,
       auth=self.auth
     )
+
+
+  def get_auth_password(self):
+    auth_password_script = self.options.get('auth_password_script')
+    return (
+        coerce_password_from_script(auth_password_script)
+        if auth_password_script
+        else DEFAULT_AUTH_PASSWORD.get()
+    )
+
 
   @query_error_handler
   def parse_api_url(self, api_url):
@@ -93,12 +108,13 @@ class TrinoApi(Api):
     query_client = TrinoQuery(self.trino_request, 'USE ' + database)
     query_client.execute()
 
-    statement = snippet['statement'].rstrip(';')
+    current_statement = self._get_current_statement(notebook, snippet)
+    statement = current_statement['statement']
     query_client = TrinoQuery(self.trino_request, statement)
     response = self.trino_request.post(query_client.query)
     status = self.trino_request.process(response)
 
-    return {
+    response = {
       'row_count': 0,
       'next_uri': status.next_uri,
       'sync': None,
@@ -118,6 +134,9 @@ class TrinoApi(Api):
         'type': 'table'
       }
     }
+    response.update(current_statement)
+
+    return response
 
 
   @query_error_handler

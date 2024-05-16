@@ -53,8 +53,7 @@ from django.utils.html import escape
 from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import RAZ
-from desktop.conf import ENABLE_NEW_STORAGE_BROWSER
+from desktop.conf import RAZ, ENABLE_NEW_STORAGE_BROWSER, TASK_SERVER
 from desktop.lib import fsmanager
 from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
@@ -1458,10 +1457,11 @@ def _create_response(request, _fs, result="success", data="Success"):
       'success': True,
       'uuid': _fs.qquuid,
       'status': 0,
-      'data': data
+      'data': data,
+      'task_id': _fs.qquuid
   }
 
-def perform_upload(request, *args, **kwargs):
+def perform_upload_task(request, *args, **kwargs):
   """
   Uploads a file to the specified destination.
   Args:
@@ -1479,12 +1479,29 @@ def perform_upload(request, *args, **kwargs):
   """
   scheme = get_scheme(kwargs['dest'])
   upload_class = UPLOAD_CLASSES.get(scheme, LocalFineUploaderChunkedUpload)
-  _fs = upload_class(request, **kwargs)
-  _fs.upload()
-  if scheme == 'hdfs':
-    result = _massage_stats(request, stat_absolute_path(_fs.filepath, request.fs.stats(_fs.filepath)))
+  result = None
+
+  if TASK_SERVER.ENABLED.get():
+    # If task server is enabled, upload the file to the task server.
+    print("Uploading file to task server")
+    _fs = upload_class(request, **kwargs)
+    _fs.check_access()
+    from filebrowser.tasks import upload_file_task, error_handler
+    kwargs["user_id"] = request.user.id
+    kwargs["scheme"] = scheme
+    kwargs["filepath"] = _fs.filepath
+    kwargs["chunk_size"] = _fs.chunk_size
+    task_id = kwargs.get("qquuid")
+    upload_file_task.apply_async(task_id=task_id, args=(), kwargs=kwargs, link_error=error_handler.s(), queue="default")
+    result = "task started %s" % task_id
+    logger.info("Task started %s" % task_id)
   else:
-    result = "success"
+    _fs = upload_class(request, **kwargs)
+    _fs.upload()
+    if scheme == 'hdfs':
+      result = _massage_stats(request, stat_absolute_path(_fs.filepath, request.fs.stats(_fs.filepath)))
+    else:
+      result = "success"
   return _create_response(request, _fs, result=result, data="Success")
 
 def extract_upload_data(request, method):
@@ -1525,13 +1542,13 @@ def upload_chunks(request):
     return JsonResponse({'success': True, 'uuid': request.GET.get('qquuid')})
 
   # case where file is smaller than the chunk size
-  if int(request.GET.get("qqtotalparts", 0)) == 0 and int(request.GET.get("qqtotalfilesize", 0)) <= 2000000:
+  if int(request.GET.get("qqtotalparts", 0)) == 0:
     chunks = extract_upload_data(request, "GET")
     try:
-      response = perform_upload(request, **chunks)
+      response = perform_upload_task(request, **chunks)
       return JsonResponse(response)
     except Exception as e:
-      return JsonResponse({'success': False, 'error': 'Error in upload'})
+      return JsonResponse({'success': False, 'error': 'Error in upload %s' % str(e)})
   return JsonResponse({'success': False, 'error': 'Unsupported request method'})
 
 @require_http_methods(["POST"])
@@ -1545,7 +1562,7 @@ def upload_complete(request):
   """
   chunks = extract_upload_data(request, "POST")
   try:
-    response = perform_upload(request, **chunks)
+    response = perform_upload_task(request, **chunks)
     return JsonResponse(response)
   except Exception as e:
     return JsonResponse({'success': False, 'error': 'Error in upload'})

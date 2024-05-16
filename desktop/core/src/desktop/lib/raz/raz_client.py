@@ -66,7 +66,6 @@ class RazClient(object):
     self.cluster_name = cluster_name
     self.requestid = str(uuid.uuid4())
 
-
   def check_access(self, method, url, params=None, headers=None, data=None):
     LOG.debug("Check access: method {%s}, url {%s}, params {%s}, headers {%s}" % (method, url, params, headers))
 
@@ -138,7 +137,6 @@ class RazClient(object):
           if signed_response is not None:
             return dict([(i.key, i.value) for i in signed_response.signer_generated_headers])
 
-
   def _handle_raz_req(self, raz_url, request_headers, request_data):
     if self.auth_type == 'kerberos':
       auth_handler = requests_kerberos.HTTPKerberosAuth(mutual_authentication=requests_kerberos.OPTIONAL)
@@ -157,11 +155,10 @@ class RazClient(object):
 
     return raz_response
 
-
   def _handle_raz_ha(self, raz_url, headers, data, auth_handler=None, verify=False):
     raz_urls_list = raz_url.split(',')
     params = {
-      'headers': headers, 
+      'headers': headers,
       'json': data,
       'verify': verify
     }
@@ -172,18 +169,17 @@ class RazClient(object):
     raz_response = None
     for r_url in raz_urls_list:
       r_url = "%s/api/authz/%s/access?doAs=%s" % (r_url.strip(' ').rstrip('/'), self.service, self.username)
-      LOG.info('Attempting to connect to RAZ URL: %s' % r_url)
+      LOG.debug('Attempting to connect to RAZ URL: %s' % r_url)
 
       try:
         raz_response = requests.post(r_url, **params)
       except Exception as e:
         if 'Failed to establish a new connection' in str(e):
-          LOG.warning('Raz URL %s is not available.' % r_url)
+          LOG.debug('Raz URL %s is not available.' % r_url)
 
       # Check response for None and if response code is successful (200), return the raz response.
       if (raz_response is not None) and (raz_response.status_code == 200):
         return raz_response
-
 
   def _make_adls_request(self, request_data, method, path, url_params, resource_path):
     resource_path = resource_path.split('/', 1)
@@ -209,7 +205,6 @@ class RazClient(object):
       }
     })
 
-
   def _handle_relative_path(self, method, params, resource_path, relative_path):
     if len(resource_path) == 2:
       relative_path += resource_path[1]
@@ -219,7 +214,6 @@ class RazClient(object):
 
     # Unquoting the full relative_path to catch edge cases like path having whitespaces or non-ascii chars.
     return lib_urlunquote(relative_path)
-
 
   def handle_adls_req_mapping(self, method, params):
     if method == 'HEAD':
@@ -251,16 +245,16 @@ class RazClient(object):
 
     return access_type
 
-
   def _make_s3_request(self, request_data, request_headers, method, params, headers, url_params, endpoint, resource_path, data=None):
 
     # In GET operations with non-ascii chars, only the non-ascii part is URL encoded.
     # We need to unquote the path fully before making a signed request for RAZ.
-    if method == 'GET' and 'prefix' in url_params and '%' in url_params['prefix']:
-      if sys.version_info[0] < 3 and isinstance(url_params['prefix'], unicode):
-        url_params['prefix'] = url_params['prefix'].encode()
+    if method == 'GET':
+      if url_params.get('prefix') and '%' in url_params['prefix']:
+        url_params['prefix'] = lib_urlunquote(url_params['prefix'])
 
-      url_params['prefix'] = lib_urlunquote(url_params['prefix'])
+      if url_params.get('marker') and '%' in url_params['marker']:
+        url_params['marker'] = lib_urlunquote(url_params['marker'])
 
     allparams = [raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in url_params.items()]
     allparams.extend([raz_signer.StringListStringMapProto(key=key, value=[val]) for key, val in params.items()])

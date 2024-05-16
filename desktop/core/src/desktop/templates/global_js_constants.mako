@@ -104,6 +104,7 @@
     dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
     threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
     metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
+    taskserver: { url: '/task_server', title: '${_('Task Server')}' },
     connectors: { url: '/desktop/connectors', title: '${_('Connectors')}' },
     analytics: { url: '/desktop/analytics', title: '${_('Analytics')}' },
     sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
@@ -187,7 +188,7 @@
   window.RAZ_IS_ENABLED = '${ RAZ.IS_ENABLED.get() }' === 'True';
 
   window.ENABLE_HISTORY_V2 = '${ hasattr(ENABLE_HISTORY_V2, 'get') and ENABLE_HISTORY_V2.get() }' === 'True';
-  window.ENABLE_HIVE_QUERY_BROWSER = '${ hasattr(ENABLE_QUERY_BROWSER, 'get') and ENABLE_QUERY_BROWSER.get() }' === 'True';
+  window.ENABLE_HIVE_QUERY_BROWSER = '${ hasattr(ENABLE_HIVE_QUERY_BROWSER, 'get') and ENABLE_HIVE_QUERY_BROWSER.get() }' === 'True';
   window.ENABLE_QUERY_BROWSER = '${ hasattr(ENABLE_QUERY_BROWSER, 'get') and ENABLE_QUERY_BROWSER.get() }' === 'True';
   window.ENABLE_QUERY_STORE = '${ hasattr(QUERY_STORE, 'IS_ENABLED') and hasattr(QUERY_STORE.IS_ENABLED, 'get') and QUERY_STORE.IS_ENABLED.get() }' === 'True'
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
@@ -797,6 +798,7 @@
   window.IS_LDAP_SETUP = '${ 'desktop.auth.backend.LdapBackend' in conf.AUTH.BACKEND.get() }' === 'True';
   window.LOGGED_USERNAME = '${ user.username }';
   window.LOGGED_USER_ID = ${ user.id };
+  window.ENABLE_HELP_MENU = '${conf.ENABLE_HELP_MENU.get()}' === 'True';
 
   <%
     # TODO remove

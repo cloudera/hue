@@ -21,14 +21,13 @@ from builtins import zip
 from builtins import range
 from builtins import object
 import logging
+import pytest
 import os
 import random
 import sys
 import threading
 import unittest
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_false, assert_true, assert_equals, assert_raises, assert_not_equals
+from django.test import TestCase
 
 from hadoop import pseudo_hdfs4
 from hadoop.fs.exceptions import WebHdfsException
@@ -40,12 +39,12 @@ from functools import reduce
 LOG = logging.getLogger()
 
 
-class WebhdfsTests(unittest.TestCase):
-  requires_hadoop = True
-  integration = True
+@pytest.mark.requires_hadoop
+@pytest.mark.integration
+class WebhdfsTests(TestCase):
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     cls.cluster = pseudo_hdfs4.shared_cluster()
     cls.prefix = cls.cluster.fs_prefix + '/WebhdfsTests'
 
@@ -53,7 +52,7 @@ class WebhdfsTests(unittest.TestCase):
     cls.cluster.fs.mkdir(cls.prefix)
     cls.cluster.fs.chmod(cls.prefix, 0o1777)
 
-  def setUp(self):
+  def setup_method(self, method):
     self.cluster.fs.setuser('test')
 
   def test_webhdfs(self):
@@ -66,12 +65,12 @@ class WebhdfsTests(unittest.TestCase):
     try:
       f.write("hello")
       f.close()
-      assert_equals(b"hello" if sys.version_info[0] > 2 else "hello", fs.open(test_file).read())
-      assert_equals(5, fs.stats(test_file)["size"])
-      assert_true(fs.isfile(test_file))
-      assert_false(fs.isfile("/"))
-      assert_true(fs.isdir("/"))
-      assert_false(fs.isdir(test_file))
+      assert (b"hello" if sys.version_info[0] > 2 else "hello") == fs.open(test_file).read()
+      assert 5 == fs.stats(test_file)["size"]
+      assert fs.isfile(test_file)
+      assert not fs.isfile("/")
+      assert fs.isdir("/")
+      assert not fs.isdir(test_file)
     finally:
       fs.remove(test_file)
 
@@ -83,7 +82,7 @@ class WebhdfsTests(unittest.TestCase):
 
     # Create home dir
     fs.create_home_dir("/user/test_webhdfs")
-    assert_true(fs.isdir("/user/test_webhdfs"))
+    assert fs.isdir("/user/test_webhdfs")
     fs.do_as_superuser(fs.rmtree, "/user/test_webhdfs")
 
   def test_seek(self):
@@ -97,14 +96,14 @@ class WebhdfsTests(unittest.TestCase):
 
       f = fs.open(test_file, "r")
       f.seek(0, os.SEEK_SET)
-      assert_equals(b"he" if sys.version_info[0] > 2 else "he", f.read(2))
+      assert (b"he" if sys.version_info[0] > 2 else "he") == f.read(2)
       f.seek(1, os.SEEK_SET)
-      assert_equals(b"el" if sys.version_info[0] > 2 else "el", f.read(2))
+      assert (b"el" if sys.version_info[0] > 2 else "el") == f.read(2)
       f.seek(-1, os.SEEK_END)
-      assert_equals(b"o" if sys.version_info[0] > 2 else "o", f.read())
+      assert (b"o" if sys.version_info[0] > 2 else "o") == f.read()
       f.seek(0, os.SEEK_SET)
       f.seek(2, os.SEEK_CUR)
-      assert_equals(b"ll" if sys.version_info[0] > 2 else "ll", f.read(2))
+      assert (b"ll" if sys.version_info[0] > 2 else "ll") == f.read(2)
     finally:
       fs.remove(test_file)
 
@@ -131,7 +130,7 @@ class WebhdfsTests(unittest.TestCase):
           t = data[offset:offset+50]
           if sys.version_info[0] > 2:
             t = t.encode('utf-8')
-          assert_equals(t, f.read(50))
+          assert t == f.read(50)
         f.close()
 
     finally:
@@ -150,7 +149,8 @@ class WebhdfsTests(unittest.TestCase):
     fs.setuser("notsuperuser")
     f = fs.open(test_file)
 
-    assert_raises(WebHdfsException, f.read)
+    with pytest.raises(WebHdfsException):
+      f.read()
 
   def test_umask(self):
     fs = self.cluster.fs
@@ -169,8 +169,8 @@ class WebhdfsTests(unittest.TestCase):
       f.close()
 
       # Check currrent permissions are 777 (666 for file)
-      assert_equals('40755', '%o' % fs.stats(test_dir).mode)
-      assert_equals('100644', '%o' % fs.stats(test_file).mode)
+      assert '40755' == '%o' % fs.stats(test_dir).mode
+      assert '100644' == '%o' % fs.stats(test_file).mode
     finally:
       fs._umask = fs_umask
 
@@ -186,8 +186,8 @@ class WebhdfsTests(unittest.TestCase):
       fs.create(test_file)
 
       # Check currrent permissions are not 777 (666 for file)
-      assert_equals('41700', '%o' % fs.stats(test_dir).mode)
-      assert_equals('100600', '%o' % fs.stats(test_file).mode)
+      assert '41700' == '%o' % fs.stats(test_dir).mode
+      assert '100600' == '%o' % fs.stats(test_file).mode
     finally:
       fs._umask = fs_umask
 
@@ -206,8 +206,8 @@ class WebhdfsTests(unittest.TestCase):
       test_file = prefix + '/umask_test.txt'
       fs.create(test_file, permission=0o333)
 
-      assert_equals('40333', '%o' % fs.stats(test_dir).mode)
-      assert_equals('100333', '%o' % fs.stats(test_file).mode)
+      assert '40333' == '%o' % fs.stats(test_dir).mode
+      assert '100333' == '%o' % fs.stats(test_file).mode
     finally:
       fs._umask = fs_umask
 
@@ -226,8 +226,8 @@ class WebhdfsTests(unittest.TestCase):
       test_file = prefix + '/umask_test.txt'
       fs.create(test_file)
 
-      assert_equals('41755', '%o' % fs.stats(test_dir).mode)
-      assert_equals('100644', '%o' % fs.stats(test_file).mode)
+      assert '41755' == '%o' % fs.stats(test_dir).mode
+      assert '100644' == '%o' % fs.stats(test_file).mode
     finally:
       fs._umask = fs_umask
 
@@ -250,22 +250,22 @@ class WebhdfsTests(unittest.TestCase):
     fs.copy_remote_dir(src_dir, new_owner_dir, dir_mode=0o755, owner=new_owner)
 
     dir_stat = fs.stats(new_owner_dir)
-    assert_equals(new_owner, dir_stat.user)
+    assert new_owner == dir_stat.user
     # assert_equals(new_owner, dir_stat.group) We inherit supergroup now
-    assert_equals('40755', '%o' % dir_stat.mode)
+    assert '40755' == '%o' % dir_stat.mode
 
     src_stat = fs.listdir_stats(src_dir)
     dest_stat = fs.listdir_stats(new_owner_dir)
 
     src_names = set([stat.name for stat in src_stat])
     dest_names = set([stat.name for stat in dest_stat])
-    assert_true(src_names)
-    assert_equals(src_names, dest_names)
+    assert src_names
+    assert src_names == dest_names
 
     for stat in dest_stat:
-      assert_equals('testcopy', stat.user)
+      assert 'testcopy' == stat.user
       # assert_equals('testcopy', stat.group) We inherit supergroup now
-      assert_equals('100644', '%o' % stat.mode)
+      assert '100644' == '%o' % stat.mode
 
   def test_two_files_open(self):
     """
@@ -285,17 +285,17 @@ class WebhdfsTests(unittest.TestCase):
   def test_urlsplit(self):
     """Test Hdfs urlsplit"""
     url = 'hdfs://nn.no.port/foo/bar'
-    assert_equals(('hdfs', 'nn.no.port', '/foo/bar', '', ''), Hdfs.urlsplit(url))
+    assert ('hdfs', 'nn.no.port', '/foo/bar', '', '') == Hdfs.urlsplit(url)
     url = 'hdfs://nn:8020/foo/bar'
-    assert_equals(('hdfs', 'nn:8020', '/foo/bar', '', ''), Hdfs.urlsplit(url))
+    assert ('hdfs', 'nn:8020', '/foo/bar', '', '') == Hdfs.urlsplit(url)
     url = 'hdfs://nn:8020//foo//bar'
-    assert_equals(('hdfs', 'nn:8020', '/foo/bar', '', ''), Hdfs.urlsplit(url))
+    assert ('hdfs', 'nn:8020', '/foo/bar', '', '') == Hdfs.urlsplit(url)
     url = 'hdfs://nn:8020'
-    assert_equals(('hdfs', 'nn:8020', '/', '', ''), Hdfs.urlsplit(url))
+    assert ('hdfs', 'nn:8020', '/', '', '') == Hdfs.urlsplit(url)
     url = '/foo/bar'
-    assert_equals(('hdfs', '', '/foo/bar', '', ''), Hdfs.urlsplit(url))
+    assert ('hdfs', '', '/foo/bar', '', '') == Hdfs.urlsplit(url)
     url = 'foo//bar'
-    assert_equals(('hdfs', '', 'foo/bar', '', ''), Hdfs.urlsplit(url))
+    assert ('hdfs', '', 'foo/bar', '', '') == Hdfs.urlsplit(url)
 
   def test_i18n_namespace(self):
     if sys.version_info[0] > 2:
@@ -306,9 +306,11 @@ class WebhdfsTests(unittest.TestCase):
       sys.setdefaultencoding('utf-8')
 
     def check_existence(name, parent, present=True):
-      assertion = present and assert_true or assert_false
       listing = self.cluster.fs.listdir(parent)
-      assertion(name in listing, "%s should be in %s" % (name, listing))
+      if present:
+        assert name in listing, f"{name} should be in {listing}"
+      else:
+        assert not name in listing, f"{name} should not be in {listing}"
 
     name = u'''pt-Olá_ch-你好_ko-안녕_ru-Здравствуйте%20,.<>~`!@$%^&()_-+='"'''
     prefix = self.prefix + '/tmp/i18n'
@@ -375,21 +377,21 @@ class WebhdfsTests(unittest.TestCase):
 
       # Check currrent permissions are not 777 (666 for file)
       fs.chmod(dir1, 0o1000, recursive=True)
-      assert_equals(0o41000, fs.stats(dir1).mode)
-      assert_equals(0o41000, fs.stats(subdir1).mode)
-      assert_equals(0o101000, fs.stats(file1).mode)
+      assert 0o41000 == fs.stats(dir1).mode
+      assert 0o41000 == fs.stats(subdir1).mode
+      assert 0o101000 == fs.stats(file1).mode
 
       # Chmod non-recursive
       fs.chmod(dir1, 0o1222, recursive=False)
-      assert_equals(0o41222, fs.stats(dir1).mode)
-      assert_equals(0o41000, fs.stats(subdir1).mode)
-      assert_equals(0o101000, fs.stats(file1).mode)
+      assert 0o41222 == fs.stats(dir1).mode
+      assert 0o41000 == fs.stats(subdir1).mode
+      assert 0o101000 == fs.stats(file1).mode
 
       # Chmod recursive
       fs.chmod(dir1, 0o1444, recursive=True)
-      assert_equals(0o41444, fs.stats(dir1).mode)
-      assert_equals(0o41444, fs.stats(subdir1).mode)
-      assert_equals(0o101444, fs.stats(file1).mode)
+      assert 0o41444 == fs.stats(dir1).mode
+      assert 0o41444 == fs.stats(subdir1).mode
+      assert 0o101444 == fs.stats(file1).mode
     finally:
       fs.rmtree(dir1, skip_trash=True)
       fs.setuser('test')
@@ -417,15 +419,15 @@ class WebhdfsTests(unittest.TestCase):
 
       # Chown non-recursive
       fs.chown(dir1, 'test', recursive=False)
-      assert_equals('test', fs.stats(dir1).user)
+      assert 'test' == fs.stats(dir1).user
       assert_not_equals('test', fs.stats(subdir1).user)
       assert_not_equals('test', fs.stats(file1).user)
 
       # Chown recursive
       fs.chown(dir1, 'test', recursive=True)
-      assert_equals('test', fs.stats(dir1).user)
-      assert_equals('test', fs.stats(subdir1).user)
-      assert_equals('test', fs.stats(file1).user)
+      assert 'test' == fs.stats(dir1).user
+      assert 'test' == fs.stats(subdir1).user
+      assert 'test' == fs.stats(file1).user
     finally:
       fs.rmtree(dir1, skip_trash=True)
       fs.setuser('test')
@@ -436,21 +438,21 @@ class WebhdfsTests(unittest.TestCase):
     try:
       # Trash
       self.cluster.fs.open(PATH, 'w').close()
-      assert_true(self.cluster.fs.exists(PATH))
+      assert self.cluster.fs.exists(PATH)
       self.cluster.fs.remove(PATH)
-      assert_false(self.cluster.fs.exists(PATH))
-      assert_equals(self.cluster.fs.join(self.cluster.fs.get_home_dir(), '.Trash'), self.cluster.fs.trash_path())
-      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
+      assert not self.cluster.fs.exists(PATH)
+      assert self.cluster.fs.join(self.cluster.fs.get_home_dir(), '.Trash') == self.cluster.fs.trash_path()
+      assert self.cluster.fs.exists(self.cluster.fs.trash_path(PATH))
       trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
       trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
       exists = list(map(self.cluster.fs.exists, trash_paths))
-      assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
+      assert reduce(lambda a, b: a or b, exists), trash_paths
       trash_path = reduce(lambda a, b: a[0] and a or b, list(zip(exists, trash_paths)))[1]
 
       # Restore
       self.cluster.fs.restore(trash_path)
-      assert_false(self.cluster.fs.exists(trash_path))
-      assert_true(self.cluster.fs.exists(PATH))
+      assert not self.cluster.fs.exists(trash_path)
+      assert self.cluster.fs.exists(PATH)
     finally:
       try:
         self.cluster.fs.rmtree(PATH)
@@ -463,20 +465,20 @@ class WebhdfsTests(unittest.TestCase):
     try:
       # Trash
       self.cluster.fs.open(PATH, 'w').close()
-      assert_true(self.cluster.fs.exists(PATH))
+      assert self.cluster.fs.exists(PATH)
       self.cluster.fs.remove(PATH)
-      assert_false(self.cluster.fs.exists(PATH))
-      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
+      assert not self.cluster.fs.exists(PATH)
+      assert self.cluster.fs.exists(self.cluster.fs.trash_path(PATH))
       trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
       trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
       exists = list(map(self.cluster.fs.exists, trash_paths))
-      assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
+      assert reduce(lambda a, b: a or b, exists), trash_paths
       trash_path = reduce(lambda a, b: a[0] and a or b, list(zip(exists, trash_paths)))[1]
 
       # Purge
       self.cluster.fs.purge_trash()
-      assert_false(self.cluster.fs.exists(trash_path))
-      assert_false(self.cluster.fs.exists(PATH))
+      assert not self.cluster.fs.exists(trash_path)
+      assert not self.cluster.fs.exists(PATH)
     finally:
       try:
         self.cluster.fs.rmtree(PATH)
@@ -489,23 +491,24 @@ class WebhdfsTests(unittest.TestCase):
     try:
       # Trash
       self.cluster.fs.open(PATH, 'w').close()
-      assert_true(self.cluster.fs.exists(PATH))
+      assert self.cluster.fs.exists(PATH)
       self.cluster.fs.remove(PATH)
-      assert_false(self.cluster.fs.exists(PATH))
-      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
+      assert not self.cluster.fs.exists(PATH)
+      assert self.cluster.fs.exists(self.cluster.fs.trash_path(PATH))
       trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
       trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
       exists = list(map(self.cluster.fs.exists, trash_paths))
-      assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
+      assert reduce(lambda a, b: a or b, exists), trash_paths
       trash_path = reduce(lambda a, b: a[0] and a or b, list(zip(exists, trash_paths)))[1]
 
       # Purge
       self.cluster.fs.purge_trash()
-      assert_false(self.cluster.fs.exists(trash_path))
-      assert_false(self.cluster.fs.exists(PATH))
+      assert not self.cluster.fs.exists(trash_path)
+      assert not self.cluster.fs.exists(PATH)
 
       # Restore fail
-      assert_raises(IOError, self.cluster.fs.restore, trash_path)
+      with pytest.raises(IOError):
+        self.cluster.fs.restore(trash_path)
     finally:
       try:
         self.cluster.fs.rmtree(PATH)
@@ -518,18 +521,19 @@ class WebhdfsTests(unittest.TestCase):
     try:
       # Trash
       self.cluster.fs.open(PATH, 'w').close()
-      assert_true(self.cluster.fs.exists(PATH))
+      assert self.cluster.fs.exists(PATH)
       self.cluster.fs.remove(PATH)
-      assert_false(self.cluster.fs.exists(PATH))
-      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
+      assert not self.cluster.fs.exists(PATH)
+      assert self.cluster.fs.exists(self.cluster.fs.trash_path(PATH))
       trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
       trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
       exists = list(map(self.cluster.fs.exists, trash_paths))
-      assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
+      assert reduce(lambda a, b: a or b, exists), trash_paths
       trash_path = reduce(lambda a, b: a[0] and a or b, list(zip(exists, trash_paths)))[1]
 
       # Restore
-      assert_raises(IOError, self.cluster.fs.do_as_user, 'nouser', self.cluster.fs.restore, trash_path)
+      with pytest.raises(IOError):
+        self.cluster.fs.do_as_user('nouser', self.cluster.fs.restore, trash_path)
     finally:
       try:
         self.cluster.fs.rmtree(PATH)
@@ -564,10 +568,10 @@ class WebhdfsTests(unittest.TestCase):
         # If there is a thread local issue, then this will fail.
         PATH = self.cluster.fs.join(self.cluster.fs.get_home_dir(), 'trash_test')
         self.cluster.fs.open(PATH, 'w').close()
-        assert_true(self.cluster.fs.exists(PATH))
+        assert self.cluster.fs.exists(PATH)
         self.cluster.fs.remove(PATH)
-        assert_false(self.cluster.fs.exists(PATH))
-        assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
+        assert not self.cluster.fs.exists(PATH)
+        assert self.cluster.fs.exists(self.cluster.fs.trash_path(PATH))
     finally:
       if sys.version_info[0] > 2:
         pass
@@ -583,17 +587,18 @@ class WebhdfsTests(unittest.TestCase):
   def test_check_access(self):
     # Set user to owner
     self.cluster.fs.setuser('test')
-    assert_equals(b'' if sys.version_info[0] > 2 else '',
+    assert ((b'' if sys.version_info[0] > 2 else '') ==
                   self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
 
     # Set user to superuser
     self.cluster.fs.setuser(self.cluster.superuser)
-    assert_equals(b'' if sys.version_info[0] > 2 else '',
+    assert ((b'' if sys.version_info[0] > 2 else '') ==
                   self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
 
     # Set user to non-authorized, non-superuser user
     self.cluster.fs.setuser('nonadmin')
-    assert_raises(WebHdfsException, self.cluster.fs.check_access, path='/user/test', aclspec='rw-')
+    with pytest.raises(WebHdfsException):
+      self.cluster.fs.check_access(path='/user/test', aclspec='rw-')
 
   def test_list(self):
     test_file = self.prefix + "/fortest.txt"

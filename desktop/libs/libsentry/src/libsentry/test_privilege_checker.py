@@ -18,8 +18,7 @@
 
 from builtins import object
 import pickle
-
-from nose.tools import assert_equal, assert_false, assert_true
+import pytest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -90,9 +89,10 @@ class MockSentryApiV2(object):
     ]
 
 
+@pytest.mark.django_db
 class TestPrivilegeChecker(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
     grant_access("test", "test", "libsentry")
@@ -123,9 +123,9 @@ class TestPrivilegeChecker(object):
         return None
 
     authorizableSet = self.checker._to_sentry_authorizables(objects=objectSet, key=test_key_fn)
-    assert_equal(expectedSet, authorizableSet, authorizableSet)
+    assert expectedSet == authorizableSet, authorizableSet
     # Original list of objects should not be mutated
-    assert_true(['bar', 'baz', 'foo'], sorted(objectSet, reverse=True))
+    assert ['bar', 'baz', 'foo'], sorted(objectSet, reverse=True)
 
 
   def test_end_to_end(self):
@@ -150,7 +150,7 @@ class TestPrivilegeChecker(object):
           return None
 
       filtered_set = self.checker.filter_objects(objects=objectSet, action=action, key=test_key_fn)
-      assert_equal(expectedSet, list(filtered_set), list(filtered_set))
+      assert expectedSet == list(filtered_set), list(filtered_set)
 
 
   def test_columns_select(self):
@@ -174,7 +174,7 @@ class TestPrivilegeChecker(object):
     ]
 
     sort_keys = ['server', 'db', 'table', 'column', 'URI']
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+    assert expected_filtered_set == sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys]))
 
 
   def test_columns_insert(self):
@@ -197,7 +197,7 @@ class TestPrivilegeChecker(object):
     ]
 
     sort_keys = ['server', 'db', 'table', 'column', 'URI']
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+    assert expected_filtered_set == sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys]))
 
 
   def test_tables_select(self):
@@ -221,7 +221,7 @@ class TestPrivilegeChecker(object):
     ]
 
     sort_keys = ['server', 'db', 'table', 'column', 'URI']
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+    assert expected_filtered_set == sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys]))
 
 
   def test_tables_insert(self):
@@ -244,7 +244,7 @@ class TestPrivilegeChecker(object):
     ]
 
     sort_keys = ['server', 'db', 'table', 'column', 'URI']
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+    assert expected_filtered_set == sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys]))
 
 
   def test_dbs_select(self):
@@ -265,7 +265,7 @@ class TestPrivilegeChecker(object):
     ]
 
     sort_keys = ['server', 'db', 'table', 'column', 'URI']
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+    assert expected_filtered_set == sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys]))
 
 
   def test_dbs_insert(self):
@@ -288,7 +288,7 @@ class TestPrivilegeChecker(object):
     ]
 
     sort_keys = ['server', 'db', 'table', 'column', 'URI']
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+    assert expected_filtered_set == sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys]))
 
 
   def test_collections_query(self):
@@ -312,7 +312,7 @@ class TestPrivilegeChecker(object):
     ]
 
     sort_keys = ['server', 'db', 'table', 'column', 'URI', 'serviceName', 'component', 'type', 'name']
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])), sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+    assert expected_filtered_set == sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])), sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys]))
 
 
   def test_collections_update(self):
@@ -335,8 +335,7 @@ class TestPrivilegeChecker(object):
     ]
 
     sort_keys = ['server', 'db', 'table', 'column', 'URI', 'serviceName', 'component', 'type', 'name']
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])),
-                 sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+    assert expected_filtered_set == sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])), sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys]))
 
 
   def test_config(self):
@@ -354,8 +353,7 @@ class TestPrivilegeChecker(object):
     ]
 
     sort_keys = ['server', 'db', 'table', 'column', 'URI', 'serviceName', 'component', 'type', 'name']
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])),
-                 sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+    assert expected_filtered_set == sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])), sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys]))
 
 
   def test_uri(self):
@@ -376,5 +374,4 @@ class TestPrivilegeChecker(object):
     ]
 
     sort_keys = ['server', 'db', 'table', 'column', 'URI', 'serviceName', 'component', 'type', 'name']
-    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])),
-                 sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
+    assert expected_filtered_set == sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])), sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys]))

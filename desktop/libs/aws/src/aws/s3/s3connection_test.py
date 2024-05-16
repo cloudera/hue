@@ -19,9 +19,6 @@ import requests
 import six
 import sys
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
-
 from desktop.conf import RAZ
 
 from aws.client import _make_client
@@ -39,12 +36,12 @@ LOG = logging.getLogger()
 
 class TestRazS3Connection():
 
-  def setUp(self):
+  def setup_method(self):
     self.finish = [
       RAZ.IS_ENABLED.set_for_testing(True)
     ]
 
-  def tearDown(self):
+  def teardown_method(self):
     for f in self.finish:
       f()
 
@@ -63,26 +60,24 @@ class TestRazS3Connection():
 
         buckets = client.make_request(method='GET', bucket='', key='',)
 
-        assert_equal(['<Bucket: demo-gethue>', '<Bucket: gethue-test>'], buckets)
+        assert ['<Bucket: demo-gethue>', '<Bucket: gethue-test>'] == buckets
 
         http_request = _mexe.call_args.args[0]
 
         if isinstance(http_request, six.string_types):
           raise SkipTest()  # Incorrect in Py3 CircleCi
 
-        assert_equal('GET', http_request.method)
-        assert_equal(
-          's3-us-west-1.amazonaws.com:443' if sys.version_info[0] > 2 else 's3-us-west-1.amazonaws.com',
-          http_request.host
-        )
-        assert_equal('/', http_request.path)
-        assert_equal('/', http_request.auth_path)
-        assert_equal({
+        assert 'GET' == http_request.method
+        assert (
+          ('s3-us-west-1.amazonaws.com:443' if sys.version_info[0] > 2 else 's3-us-west-1.amazonaws.com') ==
+          http_request.host)
+        assert '/' == http_request.path
+        assert '/' == http_request.auth_path
+        assert ({
             'AWSAccessKeyId': 'AKIA23E77ZX2HVY76YGL',
             'Signature': '3lhK%2BwtQ9Q2u5VDIqb4MEpoY3X4%3D',
             'Expires': '1617207304'
-          },
-          http_request.headers
-        )
-        assert_equal({}, http_request.params)
-        assert_equal('', http_request.body)
+          } ==
+          http_request.headers)
+        assert {} == http_request.params
+        assert '' == http_request.body

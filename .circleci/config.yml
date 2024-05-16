@@ -23,7 +23,7 @@ commands:
             export DEBIAN_FRONTEND=noninteractive
             sudo apt-get update
             sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
-            curl -sL https://deb.nodesource.com/setup_14.x | sudo bash - && sudo apt-get install -y nodejs
+            curl -sL https://deb.nodesource.com/setup_20.x | sudo bash - && sudo apt-get install -y nodejs
             curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
             sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
 
@@ -54,13 +54,12 @@ commands:
       - run:
           name: run python lints
           command: |
-            ./build/env/bin/pip install pylint==2.5.3 pylint-django==2.3.0 configparser==5.3.0
-            ./tools/ci/check_for_python_lint.sh
+            PYTHONWARNINGS=always ./build/env/bin/hue runruff check
 
       - run:
           name: run tests
           command: |
-            PYTHONWARNINGS=always ./build/env/bin/hue test unit --with-xunit --with-cover
+            PYTHONWARNINGS=always ./build/env/bin/pytest 
 
       - store_artifacts:
           path: test-reports

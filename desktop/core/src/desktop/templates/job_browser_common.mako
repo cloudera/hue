@@ -1761,7 +1761,7 @@
           <div
             data-bind="visible:properties.plan && properties.plan().plan_json && properties.plan().plan_json.plan_nodes.length">
             <div class="query-plan" data-bind="
-               attr: { id: $root.contextId('queries-page-plan-graph') }
+               attr: { id: $root.contextId('queries-page-plan-graph') },
                impalaDagre: { value: properties.plan && properties.plan(), height: $root.isMini() ? 535 : 600 }
             ">
               <svg style="width:100%;height:100%;position:relative;"
@@ -1802,16 +1802,15 @@
         </div>
         <div class="tab-pane" data-bind="attr: { id: $root.contextId('queries-page-profile') }"
              data-profile="profile">
-          <button class="btn" type="button" data-clipboard-target="#query-impala-profile" style="float: right;"
-                  data-bind="
-                visible: properties.profile && properties.profile().profile,
-                clipboard: {
-                  onSuccess: function() {
-                    huePubSub.publish('hue.global.info', {
-                      message: "${ _("Profile copied to clipboard!") }"
-                    }
-                  }
-                }">
+          <button class="btn" type="button" data-clipboard-target="#query-impala-profile" style="float: right;" data-bind="
+            visible: properties.profile && properties.profile().profile,
+            clipboard: {
+              onSuccess: function() {
+                huePubSub.publish('hue.global.info', {
+                  message: '${ _("Profile copied to clipboard!") }'
+                })
+              }
+            }">
           <i class="fa fa-fw fa-clipboard"></i> ${ _('Clipboard') }
           </button>
           <button class="btn" type="button" style="float: right;" data-bind="

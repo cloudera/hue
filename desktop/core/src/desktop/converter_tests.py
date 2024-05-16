@@ -19,8 +19,7 @@
 from builtins import object
 from datetime import datetime
 import json
-
-from nose.tools import assert_equal, assert_false, assert_true
+import pytest
 
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
@@ -36,9 +35,10 @@ from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document, Document2, DocumentPermission, DocumentTag
 
 
+@pytest.mark.django_db
 class TestDocumentConverter(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="doc2", groupname="doc2", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="doc2")
     grant_access("doc2", "doc2", "beeswax")
@@ -48,7 +48,7 @@ class TestDocumentConverter(object):
     # This creates the user directories for the new user
     response = self.client.get('/desktop/api2/doc/')
     data = json.loads(response.content)
-    assert_equal('/', data['document']['path'], data)
+    assert '/' == data['document']['path'], data
 
     self.home_dir = Document2.objects.get_home_directory(user=self.user)
 
@@ -89,12 +89,12 @@ class TestDocumentConverter(object):
 
     try:
       # Test that corresponding doc2 is created after convert
-      assert_equal(0, Document2.objects.filter(owner=self.user, type='query-hive').count())
+      assert 0 == Document2.objects.filter(owner=self.user, type='query-hive').count()
 
       converter = DocumentConverter(self.user)
       converter.convert()
 
-      assert_equal(2, Document2.objects.filter(owner=self.user, type='query-hive').count())
+      assert 2 == Document2.objects.filter(owner=self.user, type='query-hive').count()
 
       #
       # Query
@@ -102,26 +102,26 @@ class TestDocumentConverter(object):
       doc2 = Document2.objects.get(owner=self.user, type='query-hive', is_history=False)
 
       # Verify Document2 attributes
-      assert_equal(doc.name, doc2.data_dict['name'])
-      assert_equal(doc.description, doc2.data_dict['description'])
+      assert doc.name == doc2.data_dict['name']
+      assert doc.description == doc2.data_dict['description']
 
       # Verify session type
-      assert_equal('hive', doc2.data_dict['sessions'][0]['type'])
+      assert 'hive' == doc2.data_dict['sessions'][0]['type']
 
       # Verify snippet values
-      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-      assert_equal(sql, doc2.data_dict['snippets'][0]['statement'])
-      assert_equal(sql, doc2.data_dict['snippets'][0]['statement_raw'])
-      assert_equal('etl', doc2.data_dict['snippets'][0]['database'])
+      assert 'ready' == doc2.data_dict['snippets'][0]['status']
+      assert sql == doc2.data_dict['snippets'][0]['statement']
+      assert sql == doc2.data_dict['snippets'][0]['statement_raw']
+      assert 'etl' == doc2.data_dict['snippets'][0]['database']
 
       # Verify snippet properties
-      assert_equal(settings, doc2.data_dict['snippets'][0]['properties']['settings'])
-      assert_equal(file_resources, doc2.data_dict['snippets'][0]['properties']['files'])
-      assert_equal(functions, doc2.data_dict['snippets'][0]['properties']['functions'])
+      assert settings == doc2.data_dict['snippets'][0]['properties']['settings']
+      assert file_resources == doc2.data_dict['snippets'][0]['properties']['files']
+      assert functions == doc2.data_dict['snippets'][0]['properties']['functions']
 
       # Verify default properties
-      assert_true(doc2.data_dict['isSaved'])
-      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+      assert doc2.data_dict['isSaved']
+      assert doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S') == doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S')
 
       #
       # Query History
@@ -129,26 +129,26 @@ class TestDocumentConverter(object):
       doc2 = Document2.objects.get(owner=self.user, type='query-hive', is_history=True)
 
       # Verify Document2 attributes
-      assert_equal(doch.name, doc2.data_dict['name'])
-      assert_equal(doch.description, doc2.data_dict['description'])
-      assert_equal(doch.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+      assert doch.name == doc2.data_dict['name']
+      assert doch.description == doc2.data_dict['description']
+      assert doch.last_modified.strftime('%Y-%m-%dT%H:%M:%S') == doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S')
 
       # Verify session type
-      assert_false(doc2.data_dict['sessions'])
+      assert not doc2.data_dict['sessions']
 
       # Verify snippet values
-      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-      assert_equal(sql, doc2.data_dict['snippets'][0]['statement'])
-      assert_equal(sql, doc2.data_dict['snippets'][0]['statement_raw'])
-      assert_equal('etl', doc2.data_dict['snippets'][0]['database'])
+      assert 'ready' == doc2.data_dict['snippets'][0]['status']
+      assert sql == doc2.data_dict['snippets'][0]['statement']
+      assert sql == doc2.data_dict['snippets'][0]['statement_raw']
+      assert 'etl' == doc2.data_dict['snippets'][0]['database']
 
       # Verify snippet properties
-      assert_equal(settings, doc2.data_dict['snippets'][0]['properties']['settings'])
-      assert_equal(file_resources, doc2.data_dict['snippets'][0]['properties']['files'])
-      assert_equal(functions, doc2.data_dict['snippets'][0]['properties']['functions'])
+      assert settings == doc2.data_dict['snippets'][0]['properties']['settings']
+      assert file_resources == doc2.data_dict['snippets'][0]['properties']['files']
+      assert functions == doc2.data_dict['snippets'][0]['properties']['functions']
 
       # Verify default properties
-      assert_false(doc2.data_dict['isSaved'])
+      assert not doc2.data_dict['isSaved']
 
 
       #
@@ -157,7 +157,7 @@ class TestDocumentConverter(object):
       converter = DocumentConverter(self.user)
       converter.convert()
 
-      assert_equal(2, Document2.objects.filter(owner=self.user, type='query-hive').count())
+      assert 2 == Document2.objects.filter(owner=self.user, type='query-hive').count()
     finally:
       query.delete()
       query2.delete()
@@ -184,20 +184,20 @@ class TestDocumentConverter(object):
 
     try:
       # Test that corresponding doc2 is created after convert
-      assert_equal(0, Document2.objects.filter(owner=self.user, type='query-hive').count())
+      assert 0 == Document2.objects.filter(owner=self.user, type='query-hive').count()
 
       converter = DocumentConverter(self.user)
       converter.convert()
 
-      assert_equal(1, Document2.objects.filter(owner=self.user, type='query-hive').count())
+      assert 1 == Document2.objects.filter(owner=self.user, type='query-hive').count()
 
       doc2 = Document2.objects.get(owner=self.user, type='query-hive', is_history=False)
 
       # Verify name is maintained
-      assert_equal('Test / Hive query', doc2.name)
+      assert 'Test / Hive query' == doc2.name
 
       # Verify Document2 path is stripped of invalid chars
-      assert_equal('/Test%20/%20Hive%20query', doc2.path)
+      assert '/Test%20/%20Hive%20query' == doc2.path
     finally:
       query.delete()
 
@@ -225,7 +225,7 @@ class TestDocumentConverter(object):
 
     try:
       # Test that corresponding doc2 is created after convert
-      assert_false(Document2.objects.filter(owner=self.user, type='query-impala').exists())
+      assert not Document2.objects.filter(owner=self.user, type='query-impala').exists()
 
       converter = DocumentConverter(self.user)
       converter.convert()
@@ -233,24 +233,24 @@ class TestDocumentConverter(object):
       doc2 = Document2.objects.get(owner=self.user, type='query-impala')
 
       # Verify Document2 attributes
-      assert_equal(doc.name, doc2.data_dict['name'])
-      assert_equal(doc.description, doc2.data_dict['description'])
-      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+      assert doc.name == doc2.data_dict['name']
+      assert doc.description == doc2.data_dict['description']
+      assert doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S') == doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S')
 
       # Verify session type
-      assert_equal('impala', doc2.data_dict['sessions'][0]['type'])
+      assert 'impala' == doc2.data_dict['sessions'][0]['type']
 
       # Verify snippet values
-      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-      assert_equal(sql, doc2.data_dict['snippets'][0]['statement'])
-      assert_equal(sql, doc2.data_dict['snippets'][0]['statement_raw'])
-      assert_equal('etl', doc2.data_dict['snippets'][0]['database'])
+      assert 'ready' == doc2.data_dict['snippets'][0]['status']
+      assert sql == doc2.data_dict['snippets'][0]['statement']
+      assert sql == doc2.data_dict['snippets'][0]['statement_raw']
+      assert 'etl' == doc2.data_dict['snippets'][0]['database']
 
       # Verify snippet properties
-      assert_equal(settings, doc2.data_dict['snippets'][0]['properties']['settings'])
+      assert settings == doc2.data_dict['snippets'][0]['properties']['settings']
 
       # Verify default properties
-      assert_true(doc2.data_dict['isSaved'])
+      assert doc2.data_dict['isSaved']
     finally:
       query.delete()
 
@@ -283,7 +283,7 @@ class TestDocumentConverter(object):
 
     try:
       # Test that corresponding doc2 is created after convert
-      assert_false(Document2.objects.filter(owner=self.user, type='query-sqlite').exists())
+      assert not Document2.objects.filter(owner=self.user, type='query-sqlite').exists()
 
       converter = DocumentConverter(self.user)
       converter.convert()
@@ -291,17 +291,17 @@ class TestDocumentConverter(object):
       doc2 = Document2.objects.get(owner=self.user, type='query-sqlite')
 
       # Verify Document2 attributes
-      assert_equal(doc.name, doc2.data_dict['name'])
-      assert_equal(doc.description, doc2.data_dict['description'])
-      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+      assert doc.name == doc2.data_dict['name']
+      assert doc.description == doc2.data_dict['description']
+      assert doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S') == doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S')
 
       # Verify session type
-      assert_equal('sqlite', doc2.data_dict['sessions'][0]['type'])
+      assert 'sqlite' == doc2.data_dict['sessions'][0]['type']
 
       # Verify snippet values
-      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-      assert_equal(sql, doc2.data_dict['snippets'][0]['statement'])
-      assert_equal(sql, doc2.data_dict['snippets'][0]['statement_raw'])
+      assert 'ready' == doc2.data_dict['snippets'][0]['status']
+      assert sql == doc2.data_dict['snippets'][0]['statement']
+      assert sql == doc2.data_dict['snippets'][0]['statement_raw']
     finally:
       query.delete()
 
@@ -328,7 +328,7 @@ class TestDocumentConverter(object):
 
     try:
       # Test that corresponding doc2 is created after convert
-      assert_false(Document2.objects.filter(owner=self.user, type='query-mapreduce').exists())
+      assert not Document2.objects.filter(owner=self.user, type='query-mapreduce').exists()
 
       converter = DocumentConverter(self.user)
       converter.convert()
@@ -336,9 +336,9 @@ class TestDocumentConverter(object):
       doc2 = Document2.objects.get(owner=self.user, type='query-mapreduce')
 
       # Verify snippet values
-      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-      assert_equal('/user/hue/oozie/examples/lib/hadoop-examples.jar', doc2.data_dict['snippets'][0]['properties']['app_jar'])
-      assert_equal(['sleep.job.map.sleep.time=5', 'sleep.job.reduce.sleep.time=10'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+      assert 'ready' == doc2.data_dict['snippets'][0]['status']
+      assert '/user/hue/oozie/examples/lib/hadoop-examples.jar' == doc2.data_dict['snippets'][0]['properties']['app_jar']
+      assert ['sleep.job.map.sleep.time=5', 'sleep.job.reduce.sleep.time=10'] == doc2.data_dict['snippets'][0]['properties']['hadoopProperties']
     finally:
       wf.delete()
 
@@ -369,7 +369,7 @@ class TestDocumentConverter(object):
 
     try:
       # Test that corresponding doc2 is created after convert
-      assert_false(Document2.objects.filter(owner=self.user, type='query-shell').exists())
+      assert not Document2.objects.filter(owner=self.user, type='query-shell').exists()
 
       converter = DocumentConverter(self.user)
       converter.convert()
@@ -377,14 +377,14 @@ class TestDocumentConverter(object):
       doc2 = Document2.objects.get(owner=self.user, type='query-shell')
 
       # Verify snippet values
-      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-      assert_equal('hello.py', doc2.data_dict['snippets'][0]['properties']['command_path'])
-      assert_equal(['baz'], doc2.data_dict['snippets'][0]['properties']['arguments'])
-      assert_equal(['foo=bar'], doc2.data_dict['snippets'][0]['properties']['env_var'])
-      assert_equal(['mapred.job.queue.name=test'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
-      assert_equal(['test.zip'], doc2.data_dict['snippets'][0]['properties']['archives'])
-      assert_equal([{'type': 'file', 'path': 'hello.py'}], doc2.data_dict['snippets'][0]['properties']['files'])
-      assert_equal(True, doc2.data_dict['snippets'][0]['properties']['capture_output'])
+      assert 'ready' == doc2.data_dict['snippets'][0]['status']
+      assert 'hello.py' == doc2.data_dict['snippets'][0]['properties']['command_path']
+      assert ['baz'] == doc2.data_dict['snippets'][0]['properties']['arguments']
+      assert ['foo=bar'] == doc2.data_dict['snippets'][0]['properties']['env_var']
+      assert ['mapred.job.queue.name=test'] == doc2.data_dict['snippets'][0]['properties']['hadoopProperties']
+      assert ['test.zip'] == doc2.data_dict['snippets'][0]['properties']['archives']
+      assert [{'type': 'file', 'path': 'hello.py'}] == doc2.data_dict['snippets'][0]['properties']['files']
+      assert True == doc2.data_dict['snippets'][0]['properties']['capture_output']
     finally:
       wf.delete()
 
@@ -418,7 +418,7 @@ class TestDocumentConverter(object):
 
     try:
       # Test that corresponding doc2 is created after convert
-      assert_false(Document2.objects.filter(owner=self.user, type='query-java').exists())
+      assert not Document2.objects.filter(owner=self.user, type='query-java').exists()
 
       converter = DocumentConverter(self.user)
       converter.convert()
@@ -426,15 +426,15 @@ class TestDocumentConverter(object):
       doc2 = Document2.objects.get(owner=self.user, type='query-java')
 
       # Verify snippet values
-      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-      assert_equal('/user/hue/oozie/workspaces/lib/hadoop-examples.jar', doc2.data_dict['snippets'][0]['properties']['app_jar'])
-      assert_equal('org.apache.hadoop.examples.terasort.TeraGen', doc2.data_dict['snippets'][0]['properties']['class'])
-      assert_equal('1000 ${output_dir}/teragen', doc2.data_dict['snippets'][0]['properties']['args'])
-      assert_equal('-Dexample-property=natty', doc2.data_dict['snippets'][0]['properties']['java_opts'])
-      assert_equal(['mapred.job.queue.name=test'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
-      assert_equal(['my_archive', 'my_archive2'], doc2.data_dict['snippets'][0]['properties']['archives'])
-      assert_equal([{'type': 'file', 'path': 'my_file'}, {'type': 'file', 'path': 'my_file2'}], doc2.data_dict['snippets'][0]['properties']['files'])
-      assert_equal(True, doc2.data_dict['snippets'][0]['properties']['capture_output'])
+      assert 'ready' == doc2.data_dict['snippets'][0]['status']
+      assert '/user/hue/oozie/workspaces/lib/hadoop-examples.jar' == doc2.data_dict['snippets'][0]['properties']['app_jar']
+      assert 'org.apache.hadoop.examples.terasort.TeraGen' == doc2.data_dict['snippets'][0]['properties']['class']
+      assert '1000 ${output_dir}/teragen' == doc2.data_dict['snippets'][0]['properties']['args']
+      assert '-Dexample-property=natty' == doc2.data_dict['snippets'][0]['properties']['java_opts']
+      assert ['mapred.job.queue.name=test'] == doc2.data_dict['snippets'][0]['properties']['hadoopProperties']
+      assert ['my_archive', 'my_archive2'] == doc2.data_dict['snippets'][0]['properties']['archives']
+      assert [{'type': 'file', 'path': 'my_file'}, {'type': 'file', 'path': 'my_file2'}] == doc2.data_dict['snippets'][0]['properties']['files']
+      assert True == doc2.data_dict['snippets'][0]['properties']['capture_output']
     finally:
       wf.delete()
 
@@ -468,7 +468,7 @@ class TestDocumentConverter(object):
 
     try:
       # Test that corresponding doc2 is created after convert
-      assert_false(Document2.objects.filter(owner=self.user, type='query-pig').exists())
+      assert not Document2.objects.filter(owner=self.user, type='query-pig').exists()
 
       converter = DocumentConverter(self.user)
       converter.convert()
@@ -476,12 +476,12 @@ class TestDocumentConverter(object):
       doc2 = Document2.objects.get(owner=self.user, type='query-pig')
 
       # Verify snippet values
-      assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
-      assert_equal(attrs['script'], doc2.data_dict['snippets'][0]['statement'], doc2.data_dict)
-      assert_equal(attrs['script'], doc2.data_dict['snippets'][0]['statement_raw'])
-      assert_equal(['mapred.job.queue.name=pig', 'mapreduce.task.profile=true'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
-      assert_equal(['input=/user/test/data', 'verbose=true'], doc2.data_dict['snippets'][0]['properties']['parameters'])
-      assert_equal(['/user/test/test.txt', '/user/test/test.jar'], doc2.data_dict['snippets'][0]['properties']['resources'])
+      assert 'ready' == doc2.data_dict['snippets'][0]['status']
+      assert attrs['script'] == doc2.data_dict['snippets'][0]['statement'], doc2.data_dict
+      assert attrs['script'] == doc2.data_dict['snippets'][0]['statement_raw']
+      assert ['mapred.job.queue.name=pig', 'mapreduce.task.profile=true'] == doc2.data_dict['snippets'][0]['properties']['hadoopProperties']
+      assert ['input=/user/test/data', 'verbose=true'] == doc2.data_dict['snippets'][0]['properties']['parameters']
+      assert ['/user/test/test.txt', '/user/test/test.jar'] == doc2.data_dict['snippets'][0]['properties']['resources']
     finally:
       pig_script.delete()
 
@@ -510,14 +510,14 @@ class TestDocumentConverter(object):
       converter.convert()
 
       # Should have a directory named after custom tag
-      assert_true(Directory.objects.filter(owner=self.user, name=custom_tag.tag, parent_directory=self.home_dir).exists())
+      assert Directory.objects.filter(owner=self.user, name=custom_tag.tag, parent_directory=self.home_dir).exists()
 
       # But ignore reserved tags (default)
-      assert_false(Directory.objects.filter(owner=self.user, name=default_tag.tag, parent_directory=self.home_dir).exists())
+      assert not Directory.objects.filter(owner=self.user, name=default_tag.tag, parent_directory=self.home_dir).exists()
 
       # Document should exist under custom directory
       project_dir = Directory.objects.get(owner=self.user, name=custom_tag.tag, parent_directory=self.home_dir)
-      assert_true(Document2.objects.filter(owner=self.user, name='Impala query', parent_directory=project_dir).exists())
+      assert Document2.objects.filter(owner=self.user, name='Impala query', parent_directory=project_dir).exists()
     finally:
       query.delete()
 
@@ -552,9 +552,9 @@ class TestDocumentConverter(object):
 
       doc2 = Document2.objects.get(owner=self.user, name=query.name)
       # Test that doc2 has same read permissions
-      assert_true(other_user in doc2.get_permission('read').users.all())
-      assert_true(test_group in doc2.get_permission('read').groups.all())
+      assert other_user in doc2.get_permission('read').users.all()
+      assert test_group in doc2.get_permission('read').groups.all()
       # Test that doc2 has same write permissions
-      assert_true(other_user in doc2.get_permission('write').users.all())
+      assert other_user in doc2.get_permission('write').users.all()
     finally:
       query.delete()

@@ -16,35 +16,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import json
-import sys
+from builtins import object
+from unittest.mock import MagicMock, Mock, patch
 
-from nose.tools import assert_equal, assert_true
-
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.settings import BASE_DIR
-from useradmin.models import User
+import pytest
 
 from azure.conf import ABFS_CLUSTERS
 from beeswax.server import dbms
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.settings import BASE_DIR
 from indexer.indexers.sql import SQLIndexer
+from useradmin.models import User
 
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
 
 def mock_uuid():
   return '52f840a8-3dde-434d-934a-2d6e06f3687e'
 
+
+@pytest.mark.django_db
 class TestSQLIndexer(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_create_table_from_a_file_to_csv(self):
     fs = Mock(
@@ -79,7 +74,7 @@ class TestSQLIndexer(object):
     with patch('notebook.models.get_interpreter') as get_interpreter:
       notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    assert_equal(
+    assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
@@ -103,9 +98,8 @@ TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_export_table`;
 
-DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
-    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
-  )
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
+    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
 
   @patch('uuid.uuid4', mock_uuid)
   def test_create_table_from_a_file_to_csv_for_kms_encryption(self):
@@ -156,8 +150,8 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
 
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    ### source dir is in encryption zone, so the scratch dir is in the same dir
-    assert_equal(
+    # source dir is in encryption zone, so the scratch dir is in the same dir
+    assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
 (
@@ -171,15 +165,15 @@ ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
     )
   STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;
-LOAD DATA INPATH '/enc_zn/upload_dir/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+LOAD DATA INPATH '/enc_zn/upload_dir/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' \
+INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
 CREATE TABLE `default`.`export_table` COMMENT "No comment!"
         STORED AS csv
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_export_table`;
-DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
-    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
-  )
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
+    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
 
     fs = Mock(
         stats=Mock(
@@ -201,8 +195,8 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
 
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    ### source dir is not in encryption zone, so the scratch dir is in user's home dir
-    assert_equal(
+    # source dir is not in encryption zone, so the scratch dir is in user's home dir
+    assert (
       [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
 (
@@ -216,15 +210,16 @@ ROW FORMAT   SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
     )
   STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;
-LOAD DATA INPATH '/user/test/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
+LOAD DATA INPATH '/user/test/.scratchdir/52f840a8-3dde-434d-934a-2d6e06f3687e/data.csv' \
+INTO TABLE `default`.`hue__tmp_export_table` PARTITION (day='20200101');
 CREATE TABLE `default`.`export_table` COMMENT "No comment!"
         STORED AS csv
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_export_table`;
-DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')],
-      [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
-    )
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
+      [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
+
 
 class MockRequest(object):
   def __init__(self, fs=None, user=None):
@@ -256,6 +251,7 @@ class MockFs(object):
     return {"mode": 0o0777}
 
 
+@pytest.mark.django_db
 def test_generate_create_text_table_with_data_partition():
   source = {
     u'sourceType': 'hive', u'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id', u'level': 0,
@@ -323,7 +319,7 @@ def test_generate_create_text_table_with_data_partition():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''USE default;''' in sql, sql)
+  assert '''USE default;''' in sql, sql
 
   statement = '''CREATE TABLE `default`.`customer_stats`
 (
@@ -339,15 +335,13 @@ ROW FORMAT   DELIMITED
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
-  assert_true(
-    '''LOAD DATA INPATH '/user/romain/customer_stats.csv' '''
-    '''INTO TABLE `default`.`customer_stats` PARTITION (new_field_1='AAA');''' in sql,
-    sql
-  )
+  assert ('''LOAD DATA INPATH '/user/romain/customer_stats.csv' '''
+    '''INTO TABLE `default`.`customer_stats` PARTITION (new_field_1='AAA');''' in sql), sql
 
 
+@pytest.mark.django_db
 def test_generate_create_kudu_table_with_data():
   source = {
     u'sourceType': 'impala', u'apiHelperType': 'hive', u'sampleCols': [], u'name': u'', u'inputFormat': u'file',
@@ -430,7 +424,7 @@ def test_generate_create_kudu_table_with_data():
     split.return_value = ('/A', 'a')
     sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-    assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`;''' in sql, sql)
+    assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_index_data`;''' in sql, sql
 
     statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_index_data`
 (
@@ -456,9 +450,9 @@ ROW FORMAT   DELIMITED
     FIELDS TERMINATED BY ','
   STORED AS TextFile LOCATION '/A'
 TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')'''
-    assert_true(statement in sql, sql)
+    assert statement in sql, sql
 
-    assert_true('''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
+    assert ('''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
         PRIMARY KEY (id)
         PARTITION BY HASH PARTITIONS 16
         STORED AS kudu
@@ -467,11 +461,10 @@ TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')'''
         )
         AS SELECT `id`, `business_id`, `date`, `funny`, `stars`, `text`, `type`, `useful`, `user_id`, `name`, '''
         '''`full_address`, `latitude`, `longitude`, `neighborhoods`, `open`, `review_count`, `state`
-        FROM `default`.`hue__tmp_index_data`''' in sql,
-      sql
-    )
+        FROM `default`.`hue__tmp_index_data`''' in sql), sql
 
 
+@pytest.mark.django_db
 def test_generate_create_parquet_table():
   source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
     '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
@@ -537,7 +530,7 @@ def test_generate_create_parquet_table():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''USE default;''' in sql, sql)
+  assert '''USE default;''' in sql, sql
 
   statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
@@ -553,17 +546,169 @@ def test_generate_create_parquet_table():
   STORED AS TextFile LOCATION '/user/hue/data'
 TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
-  assert_true('''CREATE TABLE `default`.`parquet_table`
+  assert '''CREATE TABLE `default`.`parquet_table`
         STORED AS parquet
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in sql, sql)
+''' in sql, sql
 
-  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql)
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql
+
+  destination['useDefaultLocation'] = False
+  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
+
+  assert '''USE default;''' in sql, sql
+
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
+(
+  `acct_client` string ,
+  `tran_amount` double ,
+  `tran_country_cd` string ,
+  `vrfcn_city` string ,
+  `vrfcn_city_lat` double ,
+  `vrfcn_city_lon` double ) ROW FORMAT   DELIMITED
+    FIELDS TERMINATED BY ','
+    COLLECTION ITEMS TERMINATED BY '\\002'
+    MAP KEYS TERMINATED BY '\\003'
+  STORED AS TextFile LOCATION '/user/hue/data'
+TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;'''
+  assert statement in sql, sql
+
+  assert '''CREATE EXTERNAL TABLE `default`.`parquet_table`
+        STORED AS parquet
+        AS SELECT *
+        FROM `default`.`hue__tmp_parquet_table`;
+''' in sql, sql
+
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql
 
 
+@pytest.mark.django_db
+def test_generate_create_avro_table():
+  source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
+    '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
+    '''"Corpus Christi","40.7807998657","-73.9772033691"],["Thomson Reuters","2400000.0","US","Albany","35.7976989746",'''
+    '''"-78.6252975464"],'''
+    '''["OpenX","2200000.0","US","Des Moines","40.5411987305","-119.586898804"]],"sampleCols":[{"operations":[],"comment":"",'''
+    '''"nested":[],'''
+    '''"name":"acct_client","level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,'''
+    '''"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],'''
+    '''"comment":"","nested":[],"name":"tran_amount","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"double",'''
+    '''"showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_country_cd","level":0,"keyType":'''
+    '''"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,'''
+    '''"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"vrfcn_city",'''
+    '''"level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"",'''
+    '''"multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],'''
+    '''"name":"vrfcn_city_lat","level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,'''
+    '''"length":100,'''
+    '''"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":false,"scale":0},{"operations":[],'''
+    '''"comment":"","nested":[],"name":"vrfcn_city_lon","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":false,'''
+    '''"scale":0}],"inputFormat":"file","inputFormatsAll":[{"value":"file","name":"File"},{"value":"manual","name":"Manually"},'''
+    '''{"value":"query","name":"SQL Query"},{"value":"table","name":"Table"}],"inputFormatsManual":[{"value":"manual","name":'''
+    '''"Manually"}],"inputFormats":[{"value":"file","name":"File"},{"value":"manual","name":"Manually"},{"value":"query","name":'''
+    '''"SQL Query"},{"value":"table","name":"Table"}],"path":"/user/hue/data/query-hive-360.csv","isObjectStore":false,"table":"",'''
+    '''"tableName":"","databaseName":"default","apiHelperType":"hive","query":"","draggedQuery":"","format":{"type":"csv",'''
+    '''"fieldSeparator":",","recordSeparator":"\\n","quoteChar":"\\"","hasHeader":true,"status":0},"show":true,"defaultName":'''
+    '''"default.query-hive-360"}'''
+  )
+  destination = json.loads('''{"isTransactional": false, "isInsertOnly": false, "sourceType": "hive", "name":"default.avro_table"'''
+    ''',"apiHelperType":"hive","description":"","outputFormat":"table","outputFormatsList":[{"name":"Table","value":"table"},'''
+    '''{"name":"Solr index","value":"index"},{"name":"File","value":"file"},{"name":"Database","value":"database"}],'''
+    '''"outputFormats":[{"name":"Table","value":"table"},{"name":"Solr index","value":"index"}],"columns":[{"operations":[],'''
+    '''"comment":"","nested":[],"name":"acct_client","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":'''
+    '''false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_amount","level":0,"keyType":"string","required":false,'''
+    '''"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":'''
+    '''"double","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_country_cd","level":0,'''
+    '''"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"",'''
+    '''"multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":'''
+    '''[],"name":"vrfcn_city","level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":'''
+    '''100,"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},{"operations":[],'''
+    '''"comment":"","nested":[],"name":"vrfcn_city_lat","level":0,"keyType":"string","required":false,"precision":10,"keep":true,'''
+    '''"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":'''
+    '''false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"vrfcn_city_lon","level":0,"keyType":"string","required":'''
+    '''false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,'''
+    '''"type":"double","showProperties":false,"scale":0}],"bulkColumnNames":"acct_client,tran_amount,tran_country_cd,vrfcn_city,'''
+    '''vrfcn_city_lat,vrfcn_city_lon","showProperties":false,"isTargetExisting":false,"isTargetChecking":false,"existingTargetUrl":'''
+    '''"","tableName":"avro_table","databaseName":"default","tableFormat":"avro","KUDU_DEFAULT_RANGE_PARTITION_COLUMN":'''
+    '''{"values":[{"value":""}],"name":"VALUES","lower_val":0,"include_lower_val":"<=","upper_val":1,"include_upper_val":"<="},'''
+    '''"KUDU_DEFAULT_PARTITION_COLUMN":{"columns":[],"range_partitions":[{"values":[{"value":""}],"name":"VALUES","lower_val":0,'''
+    '''"include_lower_val":"<=","upper_val":1,"include_upper_val":"<="}],"name":"HASH","int_val":16},"tableFormats":[{"value":'''
+    '''"text","name":"Text"},{"value":"parquet","name":"Parquet"},{"value":"kudu","name":"Kudu"},{"value":"csv","name":"Csv"},'''
+    '''{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},{"value":"orc",'''
+    '''"name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],"importData":true,'''
+    '''"isIceberg":false,"useCopy":false,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv",'''
+    '''"hasHeader":true,"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002",'''
+    '''"customMapDelimiter":"\\\\003","customRegexp":""}'''
+  )
+
+  path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
+  request = MockRequest(fs=MockFs(path=path))
+
+  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
+
+  assert '''USE default;''' in sql, sql
+
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_avro_table`
+(
+  `acct_client` string ,
+  `tran_amount` double ,
+  `tran_country_cd` string ,
+  `vrfcn_city` string ,
+  `vrfcn_city_lat` double ,
+  `vrfcn_city_lon` double ) ROW FORMAT   DELIMITED
+    FIELDS TERMINATED BY ','
+    COLLECTION ITEMS TERMINATED BY '\\002'
+    MAP KEYS TERMINATED BY '\\003'
+  STORED AS TextFile LOCATION '/user/hue/data'
+TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;'''
+  assert statement in sql, sql
+
+  assert '''CREATE TABLE `default`.`avro_table`
+        STORED AS avro
+        AS SELECT *
+        FROM `default`.`hue__tmp_avro_table`;
+''' in sql, sql
+
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_avro_table`;''' in sql, sql
+
+  destination['useDefaultLocation'] = False
+  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
+
+  assert '''USE default;''' in sql, sql
+
+  statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_avro_table`
+(
+  `acct_client` string ,
+  `tran_amount` double ,
+  `tran_country_cd` string ,
+  `vrfcn_city` string ,
+  `vrfcn_city_lat` double ,
+  `vrfcn_city_lon` double ) ROW FORMAT   DELIMITED
+    FIELDS TERMINATED BY ','
+    COLLECTION ITEMS TERMINATED BY '\\002'
+    MAP KEYS TERMINATED BY '\\003'
+  STORED AS TextFile LOCATION '/user/hue/data'
+TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
+;'''
+  assert statement in sql, sql
+
+  assert '''CREATE EXTERNAL TABLE `default`.`avro_table`
+        STORED AS avro
+        AS SELECT *
+        FROM `default`.`hue__tmp_avro_table`;
+''' in sql, sql
+
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_avro_table`;''' in sql, sql
+
+
+@pytest.mark.django_db
 def test_generate_create_iceberg_table():
   source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
     '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
@@ -630,7 +775,7 @@ def test_generate_create_iceberg_table():
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
   print(sql)
-  assert_true('''USE default;''' in sql, sql)
+  assert '''USE default;''' in sql, sql
 
   statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
@@ -646,18 +791,19 @@ def test_generate_create_iceberg_table():
   STORED AS TextFile LOCATION '/user/hue/data'
 TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
-  assert_true('''CREATE TABLE `default`.`parquet_table`
+  assert '''CREATE TABLE `default`.`parquet_table`
         STORED BY ICEBERG
 STORED AS parquet
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in sql, sql)
+''' in sql, sql
 
-  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql)
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql
 
 
+@pytest.mark.django_db
 def test_generate_create_orc_table_transactional():
   source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
     '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
@@ -723,7 +869,7 @@ def test_generate_create_orc_table_transactional():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''USE default;''' in sql, sql)
+  assert '''USE default;''' in sql, sql
 
   statement = '''CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`hue__tmp_parquet_table`
 (
@@ -739,19 +885,20 @@ def test_generate_create_orc_table_transactional():
   STORED AS TextFile LOCATION '/user/hue/data'
 TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
-  assert_true('''CREATE TABLE `default`.`parquet_table`
+  assert '''CREATE TABLE `default`.`parquet_table`
         STORED AS orc
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in sql, sql)
+''' in sql, sql
 
-  assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;
-''' in sql, sql)
+  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;
+''' in sql, sql
 
 
+@pytest.mark.django_db
 def test_generate_create_empty_kudu_table():
   source = json.loads('''{"sourceType": "impala", "apiHelperType": "impala", "path": "", "inputFormat": "manual"}''')
   destination = json.loads('''{"isTransactional": false, "isInsertOnly": false, "sourceType": "impala", '''
@@ -789,7 +936,7 @@ def test_generate_create_empty_kudu_table():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert_true('''CREATE TABLE `default`.`manual_empty_kudu`
+  assert '''CREATE TABLE `default`.`manual_empty_kudu`
 (
   `acct_client` string ,
   `tran_amount` double ,
@@ -798,9 +945,10 @@ def test_generate_create_empty_kudu_table():
   `vrfcn_city_lat` double ,
   `vrfcn_city_lon` double , PRIMARY KEY (acct_client)
 )   STORED AS kudu TBLPROPERTIES('transactional'='false')
-;''' in sql, sql)
+;''' in sql, sql
 
 
+@pytest.mark.django_db
 def test_create_ddl_with_nonascii():
   source = {u'kafkaFieldType': u'delimited', u'rdbmsUsername': u'', u'kafkaFieldTypes': u'',
             u'selectedTableIndex': 0, u'rdbmsJdbcDriverNames': [], u'tableName': u'',
@@ -947,7 +1095,7 @@ def test_create_ddl_with_nonascii():
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time=-1,
                                                                               file_encoding=file_encoding).get_str()
 
-  assert_true('''USE default;''' in sql, sql)
+  assert '''USE default;''' in sql, sql
 
   statement = '''CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_renamed_chinese_cities_gb2312`
 (
@@ -961,27 +1109,28 @@ def test_create_ddl_with_nonascii():
     MAP KEYS TERMINATED BY '\\003'
   STORED AS TextFile TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
   statement = "LOAD DATA INPATH '/user/admin/renamed_chinese_cities_gb2312.csv' " + \
               "INTO TABLE `default`.`hue__tmp_renamed_chinese_cities_gb2312`;"
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
   statement = '''CREATE TABLE `default`.`renamed_chinese_cities_gb2312`
         STORED AS TextFile
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_renamed_chinese_cities_gb2312`;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
   statement = '''DROP TABLE IF EXISTS `default`.`hue__tmp_renamed_chinese_cities_gb2312`;'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
   statement = '''ALTER TABLE `default`.`renamed_chinese_cities_gb2312` ''' + \
               '''SET serdeproperties ("serialization.encoding"="gb2312");'''
-  assert_true(statement in sql, sql)
+  assert statement in sql, sql
 
 
+@pytest.mark.django_db
 def test_create_ddl_with_abfs():
   finish = ABFS_CLUSTERS.set_for_testing(
     {
@@ -1001,9 +1150,10 @@ def test_create_ddl_with_abfs():
     sql = "\n\n%s;" % db.load_data('default', 'cars', form_data, None, generate_ddl_only=True)
   finally:
     finish()
-  assert_true(u"\'abfs://my-data@yingstorage.dfs.core.windows.net/test_data/cars.csv\'" in sql)
+  assert u"\'abfs://my-data@yingstorage.dfs.core.windows.net/test_data/cars.csv\'" in sql
 
 
+@pytest.mark.django_db
 def test_create_table_from_local():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Hive', 'dialect': 'hive'}
@@ -1052,7 +1202,7 @@ CREATE TABLE IF NOT EXISTS default.test1 (
   `time` bigint,
   `dist` bigint);'''
 
-    assert_equal(statement, sql)
+    assert statement == sql
 
 
 def test_create_table_from_local_mysql():
@@ -1086,9 +1236,10 @@ INSERT INTO default.test1 VALUES ('NY', 'New York', '8143197'), ('CA', 'Los Ange
 ('AZ', 'Phoenix', '1461575'), ('TX', 'San Antonio', '1256509'), ('CA', 'San Diego', '1255540'), \
 ('TX', 'Dallas', '1213825'), ('CA', 'San Jose', '912332');'''
 
-    assert_equal(statement, sql)
+    assert statement == sql
 
 
+@pytest.mark.django_db
 def test_create_table_from_local_impala():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
@@ -1167,9 +1318,10 @@ FROM  default.test1_tmp;
 
 DROP TABLE IF EXISTS default.test1_tmp;'''
 
-    assert_equal(statement, sql)
+    assert statement == sql
 
 
+@pytest.mark.django_db
 def test_create_table_only_header_file_local_impala():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
@@ -1238,9 +1390,10 @@ FROM  default.test1_tmp;
 
 DROP TABLE IF EXISTS default.test1_tmp;'''
 
-    assert_equal(statement, sql)
+    assert statement == sql
 
 
+@pytest.mark.django_db
 def test_create_table_with_drop_column_from_local():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Hive', 'dialect': 'hive'}
@@ -1268,4 +1421,4 @@ CREATE TABLE IF NOT EXISTS default.test1 (
   `hour` bigint,
   `dep` bigint);'''
 
-    assert_equal(statement, sql)
+    assert statement == sql

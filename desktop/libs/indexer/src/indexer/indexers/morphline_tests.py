@@ -12,21 +12,17 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.from nose.tools import assert_equal
+# limitations under the License.
 
 from future import standard_library
-standard_library.install_aliases()
 from builtins import zip
 from past.builtins import basestring
 from builtins import object
 from copy import deepcopy
 
 import logging
+import pytest
 import sys
-
-from nose.tools import assert_equal, assert_true
-from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
@@ -47,10 +43,12 @@ if sys.version_info[0] > 2:
 else:
   from StringIO import StringIO as string_io
 
+standard_library.install_aliases()
 
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestIndexer(object):
 
   simpleCSVString = """id,Rating,Location,Name,Time
@@ -115,7 +113,7 @@ class TestIndexer(object):
     'quoteChar': '"'
   }
 
-  def setUp(self):
+  def setup_method(self):
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "indexer")
     add_to_group("test")
@@ -124,7 +122,7 @@ class TestIndexer(object):
 
     self.finish = ENABLE_SCALABLE_INDEXER.set_for_testing(True)
 
-  def tearDown(self):
+  def teardown_method(self):
     self.finish()
 
   def test_guess_csv_format(self):
@@ -140,15 +138,15 @@ class TestIndexer(object):
     expected_format = self.simpleCSVFormat
     expected_format_for_malformedCSV = self.maldformedCSVFormat
 
-    assert_equal(expected_format, guessed_format)
-    assert_equal(expected_format_for_malformedCSV, processed_guess_format)
+    assert expected_format == guessed_format
+    assert expected_format_for_malformedCSV == processed_guess_format
 
     # test fields
     expected_fields = self.simpleCSVFields
 
     for expected, actual in zip(expected_fields, fields):
       for key in ("name", "type"):
-        assert_equal(expected[key], actual[key])
+        assert expected[key] == actual[key]
 
   def test_guess_format_invalid_csv_format(self):
     indexer = MorphlineIndexer(self.user, solr_client=self.solr_client)
@@ -159,7 +157,7 @@ class TestIndexer(object):
     guessed_format["fieldSeparator"] = "invalid separator"
 
     fields = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
-    assert_equal(fields, [])
+    assert fields == []
 
     stream.seek(0)
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
@@ -167,7 +165,7 @@ class TestIndexer(object):
     guessed_format["recordSeparator"] = "invalid separator"
 
     fields = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
-    assert_equal(fields, [])
+    assert fields == []
 
     stream.seek(0)
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
@@ -175,7 +173,7 @@ class TestIndexer(object):
     guessed_format["quoteChar"] = "invalid quoteChar"
 
     fields = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
-    assert_equal(fields, [])
+    assert fields == []
 
   def test_generate_csv_morphline(self):
     indexer = MorphlineIndexer(self.user, solr_client=self.solr_client)
@@ -184,13 +182,13 @@ class TestIndexer(object):
         "format": self.simpleCSVFormat
       })
 
-    assert_true(isinstance(morphline, basestring))
+    assert isinstance(morphline, basestring)
 
   def test_generate_apache_combined_morphline(self):
     self._test_fixed_type_format_generate_morphline(ApacheCombinedFormat)
 
   def test_generate_ruby_logs_morphline(self):
-    raise SkipTest
+    pytest.skip("Skipping Test")
     self._test_fixed_type_format_generate_morphline(RubyLogFormat)
 
   def test_generate_hue_log_morphline(self):
@@ -258,10 +256,10 @@ class TestIndexer(object):
 
     self._test_generate_field_operation_morphline(find_replace_dict)
 
-  @attr('integration')
+  @pytest.mark.integration
   def test_end_to_end(self):
-    if not is_live_cluster(): # Skipping as requires morplines libs to be setup
-      raise SkipTest()
+    if not is_live_cluster():  # Skipping as requires morplines libs to be setup
+      pytest.skip("Skipping Test")
 
     cluster = shared_cluster()
     fs = cluster.fs
@@ -296,7 +294,6 @@ class TestIndexer(object):
     if is_unique_generated:
       schema_fields += [{"name": unique_field, "type": "string"}]
 
-
     # create the collection from the specified fields
     collection_manager = CollectionManagerController("test")
     if collection_manager.collection_exists(collection_name):
@@ -315,7 +312,7 @@ class TestIndexer(object):
         "format": format_instance.get_format()
       })
 
-    assert_true(isinstance(morphline, basestring))
+    assert isinstance(morphline, basestring)
 
   def _test_generate_field_operation_morphline(self, operation_format):
     fields = deepcopy(TestIndexer.simpleCSVFields)
@@ -327,7 +324,7 @@ class TestIndexer(object):
         "format": TestIndexer.simpleCSVFormat
       })
 
-    assert_true(isinstance(morphline, basestring))
+    assert isinstance(morphline, basestring)
 
 
 class MockedRequest(object):

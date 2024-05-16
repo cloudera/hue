@@ -18,10 +18,11 @@
 from builtins import zip
 import json
 import logging
+import pytest
 import sys
 
 from django.urls import reverse
-from nose.tools import assert_equal, assert_true, assert_false
+from django.test import TestCase
 
 from desktop.auth.backend import rewrite_user
 from desktop.conf import ENABLE_ORGANIZATIONS
@@ -41,9 +42,10 @@ LOG = logging.getLogger()
 
 
 
+@pytest.mark.django_db
 class TestApi():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -95,11 +97,11 @@ class TestApi():
       })
 
       data = json.loads(response.content)
-      assert_equal(0, data['status'], data)
+      assert 0 == data['status'], data
 
 
-class TestOptimizerApi(object):
-  integration = True
+@pytest.mark.integration
+class TestOptimizerApi(TestCase):
 
   @classmethod
   def setup_class(cls):
@@ -245,4 +247,4 @@ class TestOptimizerApi(object):
     ]
 
     for query, expected_query in zip(csv_queries, expected_queries):
-      assert_equal(query, expected_query)
+      assert query == expected_query
