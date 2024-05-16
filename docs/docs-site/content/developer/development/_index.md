@@ -664,14 +664,25 @@ For js run:
 
     npm run test-coverage
 
-### Continuous Integration (CI)
+### Python Linting 
 
-[CircleCi](https://circleci.com/gh/cloudera/hue) automatically run the unit tests (Python, Javascript, linting) on branch updates and pull requests. Branches containing `ci-commit-master` will try to be auto pushed to master if the run is green and the Github permissions match.
-This logic is described in the [config.yml](https://github.com/cloudera/hue/tree/master/.circleci).
+Hue uses [Ruff](https://docs.astral.sh/ruff/) for linting its backend codebase. The Ruff related configs can be found in the [pyproject.toml](https://github.com/cloudera/hue/blob/master/pyproject.toml) file present at the project root.
 
-The runs happen in an image based on [latest Hue's image](https://hub.docker.com/u/gethue/).
+The Github Action CI checks are also leveraging the Ruff linting on branch updates and pull requests.
 
-Note: until the `desktop/ext-py` dependencies are moved to a `requirement.txt`, adding new Python modules will require adding them first to the Docker image by building a Hue branch which has them.
+To manually check for linting violations **on the modified files**, run:
+
+    ./build/env/bin/hue runruff check
+
+The above command will lint all the files modified w.r.t `origin/master` by default and to change the base branch for finding all modified files, simply add the `--diff-branch=<new_base_branch>` argument like below:
+
+    ./build/env/bin/hue runruff check --diff-branch=<new_base_branch>
+
+Ruff can also autofix most of the flagged violations:
+
+    ./build/env/bin/hue/runruff check --fix
+
+Some flagged violations can't be autofixed by Ruff and requires manual fixing. Other Ruff supported commands are listed [here](https://docs.astral.sh/ruff/configuration/#full-command-line-interface)
 
 ### Integration tests
 
