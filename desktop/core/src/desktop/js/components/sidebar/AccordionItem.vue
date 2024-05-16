@@ -29,7 +29,7 @@
   >
     <button
       class="sidebar-base-btn sidebar-sidebar-item"
-      data-testid="siderbar--query-editor--button"
+      :data-testid="`sidebar--${item.displayName.replace(/\s/g, '-').toLowerCase()}--button`"
       :aria-label="item.displayName"
       :class="{ 'sidebar-active': isActive, 'sidebar-accordion-item-btn-open': tooltip }"
       @click="toggleOpen"
