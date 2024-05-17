@@ -61,62 +61,14 @@ const MetricsComponent: React.FC = (): JSX.Element => {
   }, [searchQuery, metrics]);
 
   const parseMetricsData = (data: MetricsResponse) => {
-    const metricsData = [
-      {
-        caption: 'queries.number',
-        dataSource: [{ name: 'value', value: data.metric['queries.number'].value }]
-      },
-      {
-        caption: 'requests.active',
-        dataSource: [{ name: 'count', value: data.metric['requests.active'].count }]
-      },
-      {
-        caption: 'requests.exceptions',
-        dataSource: [{ name: 'count', value: data.metric['requests.exceptions'].count }]
-      },
-      {
-        caption: 'requests.response-time',
-        dataSource: [
-          { name: '15m_rate', value: data.metric['requests.response-time']['15m_rate'] },
-          { name: '1m_rate', value: data.metric['requests.response-time']['1m_rate'] },
-          { name: '5m_rate', value: data.metric['requests.response-time']['5m_rate'] },
-          { name: '75_percentile', value: data.metric['requests.response-time']['75_percentile'] },
-          { name: '95_percentile', value: data.metric['requests.response-time']['95_percentile'] },
-          {
-            name: '999_percentile',
-            value: data.metric['requests.response-time']['999_percentile']
-          },
-          { name: '99_percentile', value: data.metric['requests.response-time']['99_percentile'] },
-          { name: 'avg', value: data.metric['requests.response-time']['avg'] },
-          { name: 'count', value: data.metric['requests.response-time']['count'] },
-          { name: 'max', value: data.metric['requests.response-time']['max'] },
-          { name: 'mean_rate', value: data.metric['requests.response-time']['mean_rate'] },
-          { name: 'min', value: data.metric['requests.response-time']['min'] },
-          { name: 'std_dev', value: data.metric['requests.response-time']['std_dev'] },
-          { name: 'sum', value: data.metric['requests.response-time']['sum'] }
-        ]
-      },
-      {
-        caption: 'threads.daemon',
-        dataSource: [{ name: 'value', value: data.metric['threads.daemon'].value }]
-      },
-      {
-        caption: 'threads.total',
-        dataSource: [{ name: 'value', value: data.metric['threads.total'].value }]
-      },
-      { caption: 'users', dataSource: [{ name: 'value', value: data.metric['users'].value }] },
-      {
-        caption: 'users.active',
-        dataSource: [{ name: 'value', value: data.metric['users.active'].value }]
-      },
-      {
-        caption: 'users.active.total',
-        dataSource: [{ name: 'value', value: data.metric['users.active.total'].value }]
-      }
-    ];
-    return metricsData;
+    return Object.keys(data.metric).map(key => ({
+      caption: key,
+      dataSource: Object.keys(data.metric[key]).map(subKey => ({
+        name: subKey,
+        value: data.metric[key][subKey]
+      }))
+    }));
   };
-
   const handleMetricChange = (value: string) => {
     setSelectedMetric(value);
     setShowAllTables(value === '');
@@ -137,6 +89,7 @@ const MetricsComponent: React.FC = (): JSX.Element => {
               onChange={handleFilterInputChange}
               prefix={<SearchOutlined />}
             />
+
             <Select
               //to make sure antd class gets applied
               getPopupContainer={triggerNode => triggerNode.parentElement}
@@ -146,15 +99,12 @@ const MetricsComponent: React.FC = (): JSX.Element => {
               data-testid="metric-select"
             >
               <Option value="">All</Option>
-              <Option value="queries.number">Queries Number</Option>
-              <Option value="requests.active">Active Requests</Option>
-              <Option value="requests.exceptions">Exceptional Requests</Option>
-              <Option value="requests.response-time">Requests Response-time</Option>
-              <Option value="threads.daemon">Daemon Threads</Option>
-              <Option value="threads.total">Total Threads</Option>
-              <Option value="users">Users</Option>
-              <Option value="users.active">Active Users</Option>
-              <Option value="users.active.total">Total Active Users</Option>
+              {metrics &&
+                Object.keys(metrics.metric).map(key => (
+                  <Option key={key} value={key}>
+                    {key}
+                  </Option>
+                ))}
             </Select>
           </>
         )}
