@@ -128,6 +128,10 @@ else:
   }
   #param-container .btn-group {
     margin-left: 10px;
+    position: fixed;
+  }
+  #param-container .btn-group.open {
+    position: absolute !important;
   }
 </style>
 
@@ -167,6 +171,14 @@ else:
     _el.datepicker('show');
     huePubSub.subscribeOnce('hide.datepicker', function () {
       _el.datepicker('hide');
+    });
+    $(document).on("click.hideDatepicker", function (event) {
+      if (!$(event.target).closest(".datepicker, .calendar-link, input[type='text']").length) {
+        _el.datepicker('hide');
+      }
+    });
+    $(".calendar-link, input[type='text']").on("click.stopPropagation", function(event) {
+      event.stopPropagation();
     });
   });
 
