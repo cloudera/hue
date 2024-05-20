@@ -15,28 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import json
+import logging
 
-from django.http import QueryDict, HttpResponse
-from rest_framework.permissions import AllowAny
+from django.http import HttpResponse, QueryDict
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import AllowAny
 
-from filebrowser import views as filebrowser_views, api as filebrowser_api
-from indexer import api3 as indexer_api3
-from metadata import optimizer_api
-from notebook import api as notebook_api
-from notebook.conf import get_ordered_interpreters
-
+from beeswax import api as beeswax_api
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
-
-from useradmin import views as useradmin_views, api as useradmin_api
-
-from beeswax import api as beeswax_api
-
+from filebrowser import api as filebrowser_api, views as filebrowser_views
+from indexer import api3 as indexer_api3
+from metadata import optimizer_api
+from notebook import api as notebook_api
+from notebook.conf import get_ordered_interpreters
+from useradmin import api as useradmin_api, views as useradmin_views
 
 LOG = logging.getLogger()
 
