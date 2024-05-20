@@ -234,6 +234,36 @@ def storage_content_summary(request, path):
   django_request = get_django_request(request)
   return filebrowser_api.content_summary(django_request, path)
 
+@api_view(["POST"])
+def storage_move(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.move(django_request)
+
+@api_view(["POST"])
+def storage_copy(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.copy(django_request)
+
+@api_view(["POST"])
+def storage_set_replication(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.set_replication(django_request)
+
+@api_view(["POST"])
+def storage_rmtree(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.rmtree(django_request)
+
+@api_view(["POST"])
+def storage_trash_restore(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.storage_trash_restore(django_request)
+
+@api_view(["POST"])
+def storage_trash_purge(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.storage_trash_purge(django_request)
+
 # Importer
 
 @api_view(["POST"])

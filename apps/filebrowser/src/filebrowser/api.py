@@ -149,14 +149,20 @@ def move(request):
 
 @error_handler
 def copy(request):
-  # TODO: Change it
   src_path = request.POST.get('src_path')
   dest_path = request.POST.get('dest_path')
 
   if src_path == dest_path:
     raise Exception(_('Source and destination path cannot be same.'))
 
-  request.fs.rename(src_path, dest_path)
+  # Copy method for Ozone FS returns a string of skipped files if their size is greater than configured chunk size.
+  if src_path.startswith('ofs://'):
+    ofs_skip_files = request.fs.copy(src_path, dest_path, recursive=True, owner=request.user)
+    if ofs_skip_files:
+      return HttpResponse(ofs_skip_files, status=200)
+  else:
+    request.fs.copy(src_path, dest_path, recursive=True, owner=request.user)
+
   return HttpResponse(status=200)
 
 
@@ -201,14 +207,6 @@ def rmtree(request):
   skip_trash = request.POST.get('skip_trash', False)
 
   request.fs.rmtree(path, skip_trash)
-
-  return HttpResponse(status=200)
-
-
-@error_handler
-def trash_restore(request):
-  path = request.POST.get('path')
-  request.fs.restore(path)
 
   return HttpResponse(status=200)
 

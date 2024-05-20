@@ -100,6 +100,12 @@ urlpatterns += [
   re_path(r'^storage/touch$', api_public.storage_touch, name='storage_touch'),
   re_path(r'^storage/rename$', api_public.storage_rename, name='storage_rename'),
   re_path(r'^storage/content_summary=(?P<path>.*)$', api_public.storage_content_summary, name='storage_content_summary'),
+  re_path(r'^storage/move$', api_public.storage_move, name='storage_move'),
+  re_path(r'^storage/copy$', api_public.storage_copy, name='storage_copy'),
+  re_path(r'^storage/set_replication$', api_public.storage_set_replication, name='storage_set_replication'),
+  re_path(r'^storage/rmtree$', api_public.storage_rmtree, name='storage_rmtree'),
+  re_path(r'^storage/trash/restore$', api_public.storage_trash_restore, name='storage_trash_restore'),
+  re_path(r'^storage/trash/purge$', api_public.storage_trash_purge, name='storage_trash_purge'),
 ]
 
 urlpatterns += [
