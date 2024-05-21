@@ -15,23 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import, unicode_literals
-from __future__ import print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
-import imp
 import os
+import imp
 
 from celery import Celery
 from celery.schedules import crontab
 
-from desktop.conf import TASK_SERVER
-from desktop.settings import TIME_ZONE, INSTALLED_APPS
-if hasattr(TASK_SERVER, 'get') and TASK_SERVER.ENABLED.get():
-  from desktop.settings import CELERY_RESULT_BACKEND, CELERY_BROKER_URL
+from desktop.conf import TASK_SERVER_V2
+from desktop.settings import INSTALLED_APPS, TIME_ZONE
+
+if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
+  from desktop.settings import CELERY_BROKER_URL, CELERY_RESULT_BACKEND
 from django.utils import timezone
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
+
 
 class HueCelery(Celery):
   def gen_task_name(self, name, module):
@@ -41,18 +42,27 @@ class HueCelery(Celery):
 
   # Method to configure the beat_schedule
   def setup_beat_schedule(self):
-    now = timezone.now()
 
-    self.conf.beat_schedule = {
-      'check_disk_usage_and_clean_task': {
-      'task': 'filebrowser.check_disk_usage_and_clean_task',
-      'schedule': 1000.0,  # Run every 1000 seconds
-      'args': (),
-      'kwargs': {'cleanup_threshold': 90},  # Provide task arguments if needed
-      },
-    }
+    beat_schedule = {}
+    if TASK_SERVER_V2.CHECK_DISK_USAGE_AND_CLEAN_TASK_ENABLED.get():
+      beat_schedule['check_disk_usage_and_clean_task'] = {
+        'task': 'filebrowser.check_disk_usage_and_clean_task',
+        'schedule': TASK_SERVER_V2.CHECK_DISK_USAGE_AND_CLEAN_TASK_PERIODIC_INTERVAL.get(),
+        'args': (),
+        'kwargs': {'cleanup_threshold': TASK_SERVER_V2.DISK_USAGE_CLEANUP_THRESHOLD.get()},
+      }
 
-if hasattr(TASK_SERVER, 'get') and TASK_SERVER.ENABLED.get():
+    if TASK_SERVER_V2.CLEANUP_STALE_UPLOADS_IN_REDIS_ENABLED.get():
+      beat_schedule['cleanup_stale_uploads'] = {
+        'task': 'filebrowser.cleanup_stale_uploads',
+        'schedule': TASK_SERVER_V2.CLEANUP_STALE_UPLOADS_IN_REDIS_PERIODIC_INTERVAL.get(),
+        'args': ()
+      }
+
+    self.conf.beat_schedule = beat_schedule
+
+
+if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
   app = HueCelery('desktop', backend=CELERY_RESULT_BACKEND, broker=CELERY_BROKER_URL)
   app.conf.broker_transport_options = {'visibility_timeout': 3600}  # 1 hour.
   app.conf.result_key_prefix = 'desktop_'

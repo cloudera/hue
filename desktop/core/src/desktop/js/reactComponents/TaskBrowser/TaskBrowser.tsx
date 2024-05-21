@@ -262,6 +262,9 @@ export const TaskBrowserTable: React.FC<TaskBrowserTableProps> = ({
           {record.result?.task_name === 'tmp_cleanup' && (
             <span>{`{cleanup threshold: ${record.result?.parameters}}`}</span>
           )}
+          {record.result?.task_name === 'cleanup_stale_uploads' && (
+            <span>{`{cleanup timedelta: ${record.result?.parameters}}`}</span>
+          )}
         </div>
       )
     },
@@ -280,7 +283,7 @@ export const TaskBrowserTable: React.FC<TaskBrowserTableProps> = ({
     {
       title: t('Duration'),
       key: 'duration',
-      render: (_, record) => calculateDuration(record.result?.task_start, record.date_done)
+      render: (_, record) => calculateDuration(record.result?.task_start, record.result?.task_end)
     }
   ];
 

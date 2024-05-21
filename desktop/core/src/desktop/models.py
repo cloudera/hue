@@ -16,20 +16,21 @@
 # limitations under the License.
 
 from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next
-from builtins import object
-import calendar
-import json
-import logging
+
 import os
 import sys
+import json
 import uuid
-
+import logging
+import calendar
+from builtins import next, object
 from collections import OrderedDict
 from itertools import chain
 
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db import connection, models, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
@@ -37,7 +38,9 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.urls import reverse, NoReverseMatch
+from django.db import models
+from django.urls import NoReverseMatch, reverse
+from django.contrib.auth.models import User
 
 from dashboard.conf import get_engines, HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED
 from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket
@@ -48,27 +51,50 @@ from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreter
 from useradmin.models import User, Group, get_organization
 from useradmin.organization import _fitered_queryset
 
+from dashboard.conf import HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED, get_engines
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import APP_BLACKLIST, COLLECT_USAGE, DISABLE_SOURCE_AUTOCOMPLETE, ENABLE_CONNECTORS, \
-    ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS, ENABLE_SHARING, ENABLE_UNIFIED_ANALYTICS, get_clusters, has_connectors, \
-    HUE_HOST_NAME, HUE_IMAGE_VERSION, IS_MULTICLUSTER_ONLY, RAZ, TASK_SERVER
+from desktop.conf import (
+  APP_BLACKLIST,
+  COLLECT_USAGE,
+  DISABLE_SOURCE_AUTOCOMPLETE,
+  ENABLE_CONNECTORS,
+  ENABLE_ORGANIZATIONS,
+  ENABLE_PROMETHEUS,
+  ENABLE_SHARING,
+  ENABLE_UNIFIED_ANALYTICS,
+  HUE_HOST_NAME,
+  HUE_IMAGE_VERSION,
+  IS_MULTICLUSTER_ONLY,
+  RAZ,
+  TASK_SERVER_V2,
+  get_clusters,
+  has_connectors,
+)
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
-from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
+from desktop.lib.i18n import force_unicode
+from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS, get_run_root
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH, HUE_DESKTOP_VERSION
-
 from filebrowser.conf import REMOTE_STORAGE_HOME
+from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket
+from indexer.conf import ENABLE_DIRECT_UPLOAD
+from kafka.conf import has_kafka
+from metadata.conf import get_optimizer_mode
+from notebook.conf import DEFAULT_INTERPRETER, DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
+from useradmin.models import Group, User, get_organization
+from useradmin.organization import _fitered_queryset
 
 if sys.version_info[0] > 2:
   from urllib.parse import quote as urllib_quote
+
   from django.utils.translation import gettext as _, gettext_lazy as _t
 else:
   from urllib import quote as urllib_quote
+
   from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
@@ -86,6 +112,7 @@ IMAGE_VERSION = None
 def uuid_default():
   return str(uuid.uuid4())
 
+
 def hue_version():
   global HUE_VERSION
 
@@ -93,6 +120,7 @@ def hue_version():
     HUE_VERSION = HUE_DESKTOP_VERSION
 
   return HUE_VERSION
+
 
 def hue_image_version():
   global IMAGE_VERSION
@@ -109,11 +137,14 @@ def hue_image_version():
 
   return IMAGE_VERSION
 
+
 def name_of_hue_host():
   return HUE_HOST_NAME.get()
 
+
 def _version_from_properties(f):
   return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('cloudera.cdh.release')
+
 
 def get_sample_user_install(user):
   if ENABLE_ORGANIZATIONS.get():
@@ -206,7 +237,6 @@ class DefaultConfiguration(models.Model):
 
   class Meta(object):
     ordering = ["app", "-is_default", "user"]
-
 
   @property
   def properties_list(self):
@@ -327,11 +357,11 @@ class DocumentTag(models.Model):
   owner = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
   tag = models.SlugField()
 
-  DEFAULT = 'default' # Always there
-  TRASH = 'trash' # There when the document is trashed
-  HISTORY = 'history' # There when the document is a submission history
-  EXAMPLE = 'example' # Hue examples
-  IMPORTED2 = 'imported2' # Was imported to document2
+  DEFAULT = 'default'  # Always there
+  TRASH = 'trash'  # There when the document is trashed
+  HISTORY = 'history'  # There when the document is a submission history
+  EXAMPLE = 'example'  # Hue examples
+  IMPORTED2 = 'imported2'  # Was imported to document2
 
   RESERVED = (DEFAULT, TRASH, HISTORY, EXAMPLE, IMPORTED2)
 
@@ -339,7 +369,6 @@ class DocumentTag(models.Model):
 
   class Meta(object):
     unique_together = ('owner', 'tag')
-
 
   def __unicode__(self):
     return force_unicode('%s') % (self.tag,)
@@ -456,7 +485,7 @@ class DocumentManager(models.Manager):
     table_names = connection.introspection.table_names()
 
     try:
-      from oozie.models import Workflow, Coordinator, Bundle
+      from oozie.models import Bundle, Coordinator, Workflow
 
       if \
           Workflow._meta.db_table in table_names or \
@@ -512,7 +541,7 @@ class DocumentManager(models.Manager):
           for dashboard in Collection.objects.all():
             if 'collection' in dashboard.properties_dict:
               col_dict = dashboard.properties_dict['collection']
-              if not 'uuid' in col_dict:
+              if 'uuid' not in col_dict:
                 _uuid = str(uuid.uuid4())
                 col_dict['uuid'] = _uuid
                 dashboard.update_properties({'collection': col_dict})
@@ -548,7 +577,6 @@ class DocumentManager(models.Manager):
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
     except Exception as e:
       LOG.exception('error syncing Document2')
-
 
     if not doc2_only and Document._meta.db_table in table_names:
       # Make sure doc have at least a tag
@@ -837,7 +865,7 @@ class Document(models.Model):
       'owner': self.owner.username,
       'name': self.name,
       'description': self.description,
-      'uuid': None, # no uuid == v1
+      'uuid': None,  # no uuid == v1
       'id': self.id,
       'doc1_id': self.id,
       'object_id': self.object_id,
@@ -856,9 +884,8 @@ class DocumentPermissionManager(models.Manager):
       perms_string = ' and '.join(', '.join(perms).rsplit(', ', 1))
       raise PopupException(_('Only %s permissions are supported, not %s.') % (perms_string, name))
 
-
   def share_to_default(self, document, name='read'):
-    from useradmin.models import get_default_user_group # Remove build dependency
+    from useradmin.models import get_default_user_group  # Remove build dependency
 
     self._check_perm(name)
 
@@ -920,7 +947,7 @@ class DocumentPermission(models.Model):
 
   users = models.ManyToManyField(User, db_index=True, db_table='documentpermission_users')
   groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission_groups')
-  perms = models.CharField(default=READ_PERM, max_length=10, choices=( # one perm
+  perms = models.CharField(default=READ_PERM, max_length=10, choices=(  # one perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
   ))
@@ -979,7 +1006,6 @@ class Document2QueryMixin(object):
       docs = docs.distinct()
 
     return docs.defer('description', 'data', 'extra', 'search').order_by('-last_modified')
-
 
   def search_documents(self, types=None, search_text=None, order_by=None):
     """
@@ -1215,7 +1241,7 @@ class Document2(models.Model):
 
   parent_directory = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
 
-  doc = GenericRelation(Document, related_query_name='doc_doc') # Compatibility with Hue 3
+  doc = GenericRelation(Document, related_query_name='doc_doc')  # Compatibility with Hue 3
 
   objects = Document2Manager()
 
@@ -1255,7 +1281,7 @@ class Document2(models.Model):
 
   @property
   def is_home_directory(self):
-    return self.is_directory and self.parent_directory == None and self.name == self.HOME_DIR
+    return self.is_directory and self.parent_directory is None and self.name == self.HOME_DIR
 
   @property
   def is_trash_directory(self):
@@ -1332,7 +1358,7 @@ class Document2(models.Model):
     return self.dependencies.filter(is_history=True).order_by('-last_modified')
 
   def add_to_history(self, user, data_dict):
-    doc_id = self.id # Need to copy as the clone messes it
+    doc_id = self.id  # Need to copy as the clone messes it
 
     history_doc = self.copy(name=self.name, owner=user)
     history_doc.update_data({'history': data_dict})
@@ -1374,13 +1400,11 @@ class Document2(models.Model):
       raise FilesystemException(_('Cannot save document %s under parent directory %s due to circular dependency') %
                                 (self.name, self.parent_directory.uuid))
 
-
   def inherit_permissions(self):
     if self.parent_directory is not None:
       parent_perms = Document2Permission.objects.filter(doc=self.parent_directory)
       for perm in parent_perms:
         self.share(self.owner, name=perm.perms, users=perm.users.all(), groups=perm.groups.all())
-
 
   def move(self, directory, user):
     if not directory.is_directory:
@@ -1681,7 +1705,6 @@ class Directory(Document2):
 
     return documents.defer('description', 'data', 'extra', 'search').distinct().order_by('-last_modified')
 
-
   def save(self, *args, **kwargs):
     self.type = 'directory'
     super(Directory, self).save(*args, **kwargs)
@@ -1704,10 +1727,10 @@ class Document2Permission(models.Model):
   users = models.ManyToManyField(User, db_index=True, db_table='documentpermission2_users')
   groups = models.ManyToManyField(Group, db_index=True, db_table='documentpermission2_groups')
 
-  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # One perm
+  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=(  # One perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
-    (COMMENT_PERM, 'comment'), # Unused
+    (COMMENT_PERM, 'comment'),  # Unused
     (LINK_READ_PERM, 'link read'),
     (LINK_WRITE_PERM, 'link write'),
   ))
@@ -1739,6 +1762,7 @@ class Document2Permission(models.Model):
 
 def get_cluster_config(user):
   return Cluster(user).get_app_config().get_config()
+
 
 def get_remote_home_storage(user=None):
   remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
@@ -1773,7 +1797,6 @@ class ClusterConfig(object):
     self.apps = appmanager.get_apps_dict(self.user) if apps is None else apps
     self.cluster_type = cluster_type
 
-
   def get_config(self):
     app_config = self.get_apps()
     editors = app_config.get('editor')
@@ -1800,7 +1823,7 @@ class ClusterConfig(object):
       ],
       'default_sql_interpreter': default_sql_interpreter,
       'cluster_type': self.cluster_type,
-      'has_computes': self.cluster_type in ('cdw', 'altus', 'snowball'), # or any grouped engine connectors
+      'has_computes': self.cluster_type in ('cdw', 'altus', 'snowball'),  # or any grouped engine connectors
       'hue_config': {
         'enable_sharing': ENABLE_SHARING.get(),
         'collect_usage': COLLECT_USAGE.get()
@@ -1809,7 +1832,6 @@ class ClusterConfig(object):
       'img_version': img_version,
       'hue_version': version_of_hue
     }
-
 
   def get_apps(self):
     apps = OrderedDict([
@@ -1825,7 +1847,6 @@ class ClusterConfig(object):
     ])
 
     return apps
-
 
   def get_main_quick_action(self, apps):
     if not apps:
@@ -1863,7 +1884,6 @@ class ClusterConfig(object):
     else:
       return default_app
 
-
   def _get_home(self):
     return {
       'name': 'home',
@@ -1873,7 +1893,6 @@ class ClusterConfig(object):
       'page': '/home'
     }
 
-
   def displayName(self, dialect, name):
     if ENABLE_UNIFIED_ANALYTICS.get() and dialect == 'hive':
       return 'Unified Analytics'
@@ -1881,7 +1900,6 @@ class ClusterConfig(object):
       return 'HPL/SQL'
     else:
       return name
-
 
   def _get_editor(self):
     interpreters = []
@@ -2009,7 +2027,6 @@ class ClusterConfig(object):
       ]
     elif 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('hdfs', self.user):
       hdfs_connectors.append(_('Files'))
-
 
     remote_home_storage = get_remote_home_storage(self.user)
 
@@ -2173,7 +2190,6 @@ class ClusterConfig(object):
     else:
       return None
 
-
   def _get_scheduler(self):
     interpreters = []
 
@@ -2199,7 +2215,7 @@ class ClusterConfig(object):
         }
       ])
 
-    if TASK_SERVER.BEAT_ENABLED.get():
+    if TASK_SERVER_V2.BEAT_ENABLED.get():
       interpreters.append({
           'type': 'celery-beat',
           'displayName': _('Scheduled Tasks'),
@@ -2220,7 +2236,6 @@ class ClusterConfig(object):
         }
     else:
       return None
-
 
   def _get_sdk_apps(self):
     current_app, other_apps, apps_list = _get_apps(self.user)
@@ -2258,9 +2273,9 @@ class Cluster(object):
     self.clusters = get_clusters(user)
 
     if IS_MULTICLUSTER_ONLY.get():
-      self.data = self.clusters['Altus'] # Backward compatibility
+      self.data = self.clusters['Altus']  # Backward compatibility
     else:
-      self.data = list(self.clusters.values())[0] # Next: CLUSTER_ID.get() or user persisted
+      self.data = list(self.clusters.values())[0]  # Next: CLUSTER_ID.get() or user persisted
 
   def get_type(self):
     return self.data['type']
@@ -2309,7 +2324,6 @@ def get_user_preferences(user, key=None):
     return dict((x.key, x.value) for x in UserPreferences.objects.filter(user=user))
 
 
-
 def set_user_preferences(user, key, value):
   try:
     x = UserPreferences.objects.get(user=user, key=key)
@@ -2332,17 +2346,17 @@ def get_data_link(meta):
     elif 'fam' in meta:
       link += '[%(fam)s]' % meta
   elif meta['type'] == 'hdfs':
-    link = '/filebrowser/view=%(path)s' % meta # Could add a byte #
+    link = '/filebrowser/view=%(path)s' % meta  # Could add a byte #
   elif meta['type'] == 'link':
     link = meta['link']
   elif meta['type'] == 'hive':
-    link = '/metastore/table/%(database)s/%(table)s' % meta # Could also add col=val
+    link = '/metastore/table/%(database)s/%(table)s' % meta  # Could also add col=val
 
   return link
 
 
 def _get_gist_document(uuid):
-  return Document2.objects.get(uuid=uuid, type='gist') # Workaround until there is a share to all permission
+  return Document2.objects.get(uuid=uuid, type='gist')  # Workaround until there is a share to all permission
 
 
 def __paginate(page, limit, queryset):

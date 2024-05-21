@@ -339,6 +339,80 @@
   # default value is false
   ## disable_local_storage = false
 
+  # Whether or not to show the Help menu in the Sidebar.
+  # Default value is true
+  ## enable_help_menu=true
+
+  # Enable chunked file uploader
+  ## enable_chunked_file_uploader=false
+
+  # Interface for SQL AI Assistant
+  # ----------------
+  [[ai_interface]]
+    # API service to be used for AI tasks. AI is disabled when a service is not configured.
+    # Type: string. Possible values: azure, openai, bedrock, ai_assistant
+    ## service=azure
+
+    # API service version to be used for AI tasks. Optional.
+    # Type: string.
+    ## service_version='2024-02-15-preview'
+
+    # Indicates if the LLM is trusted or not. Turn on to disable the warning.
+    # Type: bool. Default: True.
+    ## trusted_service=True
+
+    # Model to be used for AI tasks. Eg: gpt, llama. Each service has a default model.
+    # Type: string. Optional.
+    ## model='gpt'
+
+    # A fully qualified name for the model to be used. Each model has a default model_name.
+    # Type: string. Optional.
+    ## model_name='gpt-35-turbo-16k'
+
+    # Service API base URL. Used only by azure & ai_assistant services.
+    # Type: string.
+    ## base_url='https://hue-ai.openai.azure.com/'
+
+    # When enabled, sample rows from the table are added to the prompt.
+    # Default: True.
+    ## add_table_data=True
+
+    # Size of the LRU cache used for storing table sample data
+    # Type: int. Default: 500.
+    ## table_data_cache_size=500
+
+    # Number of Tables to load from a database initially
+    # Type: int. Default: 20.
+    ## auto_fetch_table_meta_limit=20
+
+    # Service API secret token
+    # Type: string.
+    ## token=0fe9122b8f7658a85835417d875b42b
+
+    # A secure way to accept token via jceks. Run this script to produce the service API token.
+    ## token_script="/path/to/altscript.sh hue.ai_assistant.token /etc/hue/sql-ai.jceks"
+
+    # A comma-separated list of SQL related AI tasks available in the editor.
+    # Possible values: Any combination of the following.
+    ## enabled_sql_tasks=generate,edit,explain,optimize,fix,comment
+
+  [[semantic_search]]
+    # Tech used for semantic search.
+    # Type: string. Default: vector_search. Possible values: vector_search or vector_db.
+    ## relevancy=vector_search
+
+    # Model used for data embedding. Must be compatible with SentenceTransformer.
+    # Type: string. Default: all-MiniLM-L6-v2.
+    ## embedding_model=all-MiniLM-L6-v2
+
+    # Number of items with the highest ranking returned by semantic search.
+    # Type: int. Default: 10.
+    ## top_k=10
+
+    # Size of the LRU cache used for storing embeddings.
+    # Type: int. Default: 5000.
+    ## cache_size=5000
+
   # Administrators
   # ----------------
   [[django_admins]]
@@ -917,6 +991,59 @@
 
    # Django cache to use to store temporarily used data during query execution. This is in addition to result_file_storage and result_backend.
    ## execution_storage='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
+
+  # Configuration options for the Task Server V2
+  # ------------------------------------------------------------------------
+  [[task_server_v2]]
+
+   # If resource intensive or blocking can be delegated to an already running task server.
+   ## enabled=False
+
+   # Switch on the integration with the Task Scheduler.
+   ## beat_enabled=False
+
+   # Number of query results rows to fetch into the result storage.
+   ## fetch_result_limit=2000
+
+   # Django file storage class to use to temporarily store query results
+   ## result_storage='{"backend": "django.core.files.storage.FileSystemStorage", "properties": {"location": "./logs"}}'
+
+   # How the task server and tasks communicate.
+   ## broker_url=amqp://guest:guest@localhost//
+
+   # Where to store task results. Defaults to local file system path. Celery comes with a several other backends.
+   ## celery_result_backend=file:///$HUE_ROOT/logs
+
+   # Default options provided to the task server at startup.
+   ## celeryd_opts='--time-limit=300'
+
+   # Django cache to use to store temporarily used data during query execution. This is in addition to result_file_storage and result_backend.
+   ## execution_storage='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
+
+   # Set the log level for celery
+   ## celery_log_level='INFO'
+
+   # Switch on this peroidic cleaner which checks disk usage and makes space for file uploads
+   ## check_disk_usage_and_clean_task_enabled=False
+
+   # Time interval in seconds to run this peroidic cleaner which checks disk usage and makes space for file uploads
+   ## check_disk_usage_and_clean_task_periodic_interval=1000
+
+   # Clean up files in /tmp folder if the disk usage is beyond the threshold
+   ## disk_usage_cleanup_threshold=90
+
+   # Clean up files older than timedelta. Unit of timedelta is minutes
+   ## disk_usage_and_clean_task_time_delta=60
+
+   # Switch on this peroidic cleaner which cleans up failed upload tasks stored in redis
+   ## cleanup_stale_uploads_in_redis_enabled=False
+
+   # Time interval in seconds to run this peroidic cleaner which cleans up failed upload tasks stored in redis
+   ## cleanup_stale_uploads_task_periodic_interval=900
+
+   # Redis keys of format 'Upload__*' older than timedelta will be cleaned up. Unit of timedelta is minutes
+   ## cleanup_stale_uploads_task_time_delta=60
+
 
   # Settings for the Google Cloud lib
   # ------------------------------------------------------------------------

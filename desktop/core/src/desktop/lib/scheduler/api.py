@@ -15,25 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
 
 from django.forms.formsets import formset_factory
 from django.urls import reverse
 
 from desktop.auth.backend import is_admin
-from desktop.conf import TASK_SERVER
-from desktop.models import Document2
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.i18n import force_unicode
 from desktop.lib.scheduler.lib.api import get_api
+from desktop.models import Document2
 
 LOG = logging.getLogger()
 
 try:
   from oozie.decorators import check_document_access_permission
   from oozie.forms import ParameterForm
-  from oozie.views.editor2 import edit_coordinator, new_coordinator, Coordinator
+  from oozie.views.editor2 import Coordinator, edit_coordinator, new_coordinator
 except Exception as e:
   LOG.warning('Oozie application is not enabled: %s' % e)
 
@@ -51,7 +50,7 @@ def get_schedule(request):
 
 
 # To move to lib in case oozie is blacklisted
-#@check_document_access_permission()
+# @check_document_access_permission()
 def submit_schedule(request, doc_id):
   interface = request.GET.get('interface', request.POST.get('interface', 'hive'))
 

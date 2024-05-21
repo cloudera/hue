@@ -15,72 +15,87 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import map
-import logging
 import os
 import re
-import json
 import sys
-import tempfile
+import json
+import logging
 import zipfile
+import tempfile
+from builtins import map
 
 from celery.app.control import Control
-from desktop.conf import TASK_SERVER
-if hasattr(TASK_SERVER, 'get') and TASK_SERVER.ENABLED.get():
+
+from desktop.conf import TASK_SERVER_V2
+
+if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
   from desktop.celery import app as celery_app
-import psutil
-import datetime
-import redis
-import re
-from django.http import HttpResponse, JsonResponse
-
-
+  from desktop.settings import parse_broker_url
 from collections import defaultdict
 from datetime import datetime
 
 from django.core import management
 from django.db import transaction
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.utils.html import escape
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
-from metadata.conf import has_catalog
-from metadata.catalog_api import search_entities as metadata_search_entities, _highlight, \
-  search_entities_interactive as metadata_search_entities_interactive
-from notebook.connectors.base import Notebook
-from useradmin.models import User, Group
-
 from beeswax.models import Namespace
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_CONNECTORS, ENABLE_GIST_PREVIEW, CUSTOM, get_clusters, IS_K8S_ONLY, ENABLE_SHARING
-from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, ENABLE_CHUNKED_FILE_UPLOADER, TASK_SERVER
 from desktop.conf import AI_INTERFACE, is_ai_interface_enabled, is_ai_trusted_service, ai_service_name, is_vector_db_enabled
-from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
+from desktop.conf import (
+  CUSTOM,
+  ENABLE_CHUNKED_FILE_UPLOADER,
+  ENABLE_CONNECTORS,
+  ENABLE_GIST_PREVIEW,
+  ENABLE_NEW_STORAGE_BROWSER,
+  ENABLE_SHARING,
+  IS_K8S_ONLY,
+  TASK_SERVER_V2,
+  get_clusters,
+)
+from desktop.lib.conf import GLOBAL_CONFIG, BoundContainer, is_anonymous
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
-from desktop.lib.i18n import smart_str, force_unicode
+from desktop.lib.i18n import force_unicode, smart_str
 from desktop.lib.paths import get_desktop_root
-from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
-  UserPreferences, get_user_preferences, set_user_preferences, get_cluster_config, __paginate, _get_gist_document
-from desktop.views import get_banner_message, serve_403_error
 from desktop.log import DEFAULT_LOG_DIR
-from filebrowser.tasks import check_disk_usage_and_clean_task
-from filebrowser.tasks import document_cleanup_task
-
+from desktop.models import (
+  Directory,
+  Document,
+  Document2,
+  FilesystemException,
+  UserPreferences,
+  __paginate,
+  _get_gist_document,
+  get_cluster_config,
+  get_user_preferences,
+  set_user_preferences,
+  uuid_default,
+)
+from desktop.views import get_banner_message, serve_403_error
+from filebrowser.tasks import check_disk_usage_and_clean_task, document_cleanup_task
 from hadoop.cluster import is_yarn
+from metadata.catalog_api import (
+  _highlight,
+  search_entities as metadata_search_entities,
+  search_entities_interactive as metadata_search_entities_interactive,
+)
+from metadata.conf import has_catalog
+from notebook.connectors.base import Notebook
+from useradmin.models import Group, User
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
+
   from django.utils.translation import gettext as _
 else:
-  from StringIO import StringIO as string_io
   from django.utils.translation import ugettext as _
+  from StringIO import StringIO as string_io
 
 LOG = logging.getLogger()
 
@@ -101,6 +116,7 @@ def api_error_handler(func):
 
   return decorator
 
+
 @api_error_handler
 def get_banners(request):
   banners = {
@@ -108,6 +124,7 @@ def get_banners(request):
     'configured': CUSTOM.BANNER_TOP_HTML.get()
   }
   return JsonResponse(banners)
+
 
 @api_error_handler
 def get_config(request):
@@ -122,7 +139,7 @@ def get_config(request):
   config['hue_config']['is_vector_db_enabled'] = is_vector_db_enabled()
   config['hue_config']['auto_fetch_table_meta_limit'] = AI_INTERFACE.AUTO_FETCH_TABLE_META_LIMIT.get()
   config['hue_config']['enable_chunked_file_uploader'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
-  config['hue_config']['enable_task_server'] = TASK_SERVER.ENABLED.get()
+  config['hue_config']['enable_task_server'] = TASK_SERVER_V2.ENABLED.get()
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
@@ -184,6 +201,7 @@ def get_hue_config(request):
     'apps': apps
   })
 
+
 @api_error_handler
 def get_context_namespaces(request, interface):
   '''
@@ -218,6 +236,7 @@ def get_context_namespaces(request, interface):
   response['status'] = 0
 
   return JsonResponse(response)
+
 
 @api_error_handler
 def get_context_computes(request, interface):
@@ -434,7 +453,7 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
       notebook = Notebook(document=document)
       notebook = upgrade_session_properties(request, notebook)
       data = json.loads(notebook.data)
-      if document.type == 'query-pig': # Import correctly from before Hue 4.0
+      if document.type == 'query-pig':  # Import correctly from before Hue 4.0
         properties = data['snippets'][0]['properties']
         if 'hadoopProperties' not in properties:
           properties['hadoopProperties'] = []
@@ -442,7 +461,7 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
           properties['parameters'] = []
         if 'resources' not in properties:
           properties['resources'] = []
-      if data.get('uuid') != document.uuid: # Old format < 3.11
+      if data.get('uuid') != document.uuid:  # Old format < 3.11
         data['uuid'] = document.uuid
 
     response['data'] = data
@@ -548,7 +567,6 @@ def update_document(request):
   })
 
 
-
 @api_error_handler
 @require_POST
 def delete_document(request):
@@ -578,6 +596,7 @@ def delete_document(request):
       'status': 0,
   })
 
+
 @api_error_handler
 @require_POST
 def copy_document(request):
@@ -603,7 +622,7 @@ def copy_document(request):
 
   # Import workspace for all oozie jobs
   if document.type == 'oozie-workflow2' or document.type == 'oozie-bundle2' or document.type == 'oozie-coordinator2':
-    from oozie.models2 import Workflow, Coordinator, Bundle, _import_workspace
+    from oozie.models2 import Bundle, Coordinator, Workflow, _import_workspace
     # Update the name field in the json 'data' field
     if document.type == 'oozie-workflow2':
       workflow = Workflow(document=document)
@@ -710,6 +729,7 @@ def share_document(request):
     'document': doc.to_dict()
   })
 
+
 @api_error_handler
 @require_POST
 def handle_submit(request):
@@ -759,40 +779,57 @@ def handle_submit(request):
     'status': 0
   })
 
+
 @api_error_handler
 def get_taskserver_tasks(request):
+  if not TASK_SERVER_V2.ENABLED.get():
+    return JsonResponse({'error': 'Task server is not enabled'}, status=400)
+
   """Retirve the tasks from the database"""
-  redis_client = redis.Redis(host='localhost', port=6379, db=0)
+  redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
   tasks = []
+  try:
+    # Use scan_iter to efficiently iterate over keys matching the first pattern
+    for key in redis_client.scan_iter('celery-task-meta-*'):
+      task = json.loads(redis_client.get(key))
+      tasks.append(task)
 
-  # Use scan_iter to efficiently iterate over keys matching the first pattern
-  for key in redis_client.scan_iter('celery-task-meta-*'):
-    task = json.loads(redis_client.get(key))
-    tasks.append(task)
+    # Use scan_iter to efficiently iterate over keys matching the second pattern
+    for key in redis_client.scan_iter('task:*'):
+      task = json.loads(redis_client.get(key))
+      tasks.append(task)
 
-  # Use scan_iter to efficiently iterate over keys matching the second pattern
-  for key in redis_client.scan_iter('task:*'):
-    task = json.loads(redis_client.get(key))
-    tasks.append(task)
+    return JsonResponse(tasks, safe=False)
+  except Exception as e:
+    LOG.exception("Failed to retrieve tasks: %s", str(e))
+    return JsonResponse({'error': str(e)}, status=500)
+  finally:
+    redis_client.close()
 
-  return JsonResponse(tasks, safe=False)
 
 @api_error_handler
 def check_upload_status(request, task_id):
-  redis_client = redis.Redis(host='localhost', port=6379, db=0)
-  task_key = f'celery-task-meta-{task_id}'
-  task_data = redis_client.get(task_key)
+  redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
+  try:
+    task_key = f'celery-task-meta-{task_id}'
+    task_data = redis_client.get(task_key)
 
-  if task_data is None:
-    return JsonResponse({'error': 'Task not found'}, status=404)
+    if task_data is None:
+      return JsonResponse({'error': 'Task not found'}, status=404)
 
-  task = json.loads(task_data)
-  is_finalized = task.get('status') == 'SUCCESS'
-  is_running = task.get('status') == 'RUNNING'
-  is_failure = task.get('status') == 'FAILURE'
-  is_revoked = task.get('status') == 'REVOKED'
+    task = json.loads(task_data)
+    is_finalized = task.get('status') == 'SUCCESS'
+    is_running = task.get('status') == 'RUNNING'
+    is_failure = task.get('status') == 'FAILURE'
+    is_revoked = task.get('status') == 'REVOKED'
 
-  return JsonResponse({'isFinalized': is_finalized, 'isRunning': is_running, 'isFailure': is_failure, 'isRevoked': is_revoked})
+    return JsonResponse({'isFinalized': is_finalized, 'isRunning': is_running, 'isFailure': is_failure, 'isRevoked': is_revoked})
+  except Exception as e:
+    LOG.exception("Failed to check upload status: %s", str(e))
+    return JsonResponse({'error': str(e)}, status=500)
+  finally:
+    redis_client.close()
+
 
 @api_error_handler
 def kill_task(request, task_id):
@@ -811,13 +848,9 @@ def kill_task(request, task_id):
     return JsonResponse({'status': 'error', 'message': f'Failed to terminate task {task_id}: {str(e)}'})
 
 
-def get_available_space(request):
-  free_space = psutil.disk_usage('/tmp').free
-  return JsonResponse({'free_space': free_space})
-
 def get_task_logs(request, task_id):
   log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
-  log_file = "%s/rungunicornserver.log" % (log_dir)
+  log_file = "%s/celery.log" % (log_dir)
   task_log = []
   escaped_task_id = re.escape(task_id)
 
@@ -841,6 +874,7 @@ def get_task_logs(request, task_id):
     return HttpResponse(str(e), status=500)
 
   return HttpResponse(''.join(task_log), content_type='text/plain')
+
 
 @api_error_handler
 @require_POST
@@ -933,45 +967,45 @@ def topological_sort(docs):
 
   '''There is a bug in django 1.11 (https://code.djangoproject.com/ticket/26291)
      and we are handling it via sorting the given documents in topological format.
-     
+
      Hence this function is needed only if we are using Python2 based Hue as it uses django 1.11
      and python3 based Hue don't require this method as it uses django 3.2.
 
      input => docs: -> list of documents which needs to import in Hue
-     output => serialized_doc: -> list of sorted documents 
+     output => serialized_doc: -> list of sorted documents
      (if document1 is dependent on document2 then document1 is listed after document2)'''
 
   size = len(docs)
   graph = defaultdict(list)
-  for doc in docs:     ## creating a graph, assuming a document is a node of graph
+  for doc in docs:     # creating a graph, assuming a document is a node of graph
     dep_size = len(doc['fields']['dependencies'])
     for i in range(dep_size):
       graph[(doc['fields']['dependencies'])[i][0]].append(doc['fields']['uuid'])
 
   visited = {}
   _doc = {}
-  for doc in docs:     ## making all the nodes of graph unvisited and capturing the doc in the dict with uuid as key
+  for doc in docs:     # making all the nodes of graph unvisited and capturing the doc in the dict with uuid as key
     _doc[doc['fields']['uuid']] = doc
     visited[doc['fields']['uuid']] = False
-  
+
   stack = []
-  for doc in docs:     ## calling _topological_sort function to sort the doc if node is not visited
-    if visited[doc['fields']['uuid']] == False:
+  for doc in docs:     # calling _topological_sort function to sort the doc if node is not visited
+    if not visited[doc['fields']['uuid']]:
       _topological_sort(doc['fields']['uuid'], visited, stack, graph)
-  
-  stack = stack[::-1]  ## list is in revered order so we are just reversing it
+
+  stack = stack[::-1]  # list is in revered order so we are just reversing it
 
   serialized_doc = []
   for i in range(size):
     serialized_doc.append(_doc[stack[i]])
-    
+
   return serialized_doc
 
 
 def _topological_sort(vertex, visited, stack, graph):
   visited[vertex] = True
   for i in graph[vertex]:
-    if visited[i] == False:
+    if not visited[i]:
       _topological_sort(i, visited, stack, graph)
 
   stack.append(vertex)
@@ -1031,10 +1065,10 @@ def import_documents(request):
       # Set last modified date to now
       doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
       docs.append(doc)
-  
+
   if sys.version_info[0] < 3:
-    ## In Django 1.11 loaddata cannot deserialize fixtures with forward references hence 
-    ## calling the topological_sort function to sort the document
+    # In Django 1.11 loaddata cannot deserialize fixtures with forward references hence
+    # calling the topological_sort function to sort the document
     docs = topological_sort(docs)
 
   f = tempfile.NamedTemporaryFile(mode='w+', suffix='.json')
@@ -1043,7 +1077,7 @@ def import_documents(request):
 
   stdout = string_io()
   try:
-    with transaction.atomic(): # We wrap both commands to commit loaddata & sync
+    with transaction.atomic():  # We wrap both commands to commit loaddata & sync
       management.call_command('loaddata', f.name, verbosity=3, traceback=True, stdout=stdout)
       Document.objects.sync()
 
@@ -1070,6 +1104,7 @@ def import_documents(request):
     return JsonResponse({'status': -1, 'message': smart_str(e)})
   finally:
     stdout.close()
+
 
 def _update_imported_oozie_document(doc, uuids_map):
   for key, value in uuids_map.items():
@@ -1349,11 +1384,11 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
   if doc['fields']['dependencies']:
     history_deps_list = []
     for index, (uuid, version, is_history) in enumerate(doc['fields']['dependencies']):
-      if not uuid in list(uuids_map.keys()) and not is_history and \
+      if uuid not in list(uuids_map.keys()) and not is_history and \
       not Document2.objects.filter(uuid=uuid, version=version).exists():
         raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
       elif is_history:
-        history_deps_list.insert(0, index) # Insert in decreasing order to facilitate delete
+        history_deps_list.insert(0, index)  # Insert in decreasing order to facilitate delete
         LOG.warning('History dependency with UUID: %s ignored while importing document %s' % (uuid, doc['fields']['name']))
 
     # Delete history dependencies not found in the DB

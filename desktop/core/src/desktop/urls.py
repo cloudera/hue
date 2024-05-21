@@ -17,42 +17,34 @@
 
 from __future__ import absolute_import
 
-import logging
 import re
 import sys
+import logging
 
+from django.conf import settings
+from django.views.static import serve
+from rest_framework_simplejwt.views import (
+  TokenObtainPairView,
+  TokenRefreshView,
+  TokenVerifyView,
+)
 
 # FIXME: This could be replaced with hooking into the `AppConfig.ready()`
 # signal in Django 1.7:
 #
 # https://docs.djangoproject.com/en/1.7/ref/applications/#django.apps.AppConfig.ready
 #
-
 import desktop.lib.metrics.file_reporter
-desktop.lib.metrics.file_reporter.start_file_reporter()
-
-from django.conf import settings
-from django.views.static import serve
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
-
-from notebook import views as notebook_views
-from useradmin import views as useradmin_views
-
-from desktop import appmanager
-
-from desktop import views as desktop_views
-from desktop import api as desktop_api
-from desktop import api2 as desktop_api2
-from desktop import api_public_urls_v1
+from desktop import api as desktop_api, api2 as desktop_api2, api_public_urls_v1, appmanager, views as desktop_views
 from desktop.auth import views as desktop_auth_views
-from desktop.conf import METRICS, USE_NEW_EDITOR, ANALYTICS, has_connectors, ENABLE_PROMETHEUS, SLACK
+from desktop.conf import ANALYTICS, ENABLE_PROMETHEUS, METRICS, SLACK, USE_NEW_EDITOR, has_connectors
 from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
 from desktop.settings import is_oidc_configured
+from notebook import views as notebook_views
+from useradmin import views as useradmin_views
+
+desktop.lib.metrics.file_reporter.start_file_reporter()
 
 if sys.version_info[0] > 2:
   from django.urls import include, re_path
@@ -71,7 +63,7 @@ handler500 = 'desktop.views.serve_500_error'
 dynamic_patterns = [
   re_path(r'^hue/accounts/login', desktop_auth_views.dt_login, name='desktop_auth_views_dt_login'),
   re_path(r'^hue/accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
-  re_path(r'^accounts/login/?$', desktop_auth_views.dt_login), # Deprecated
+  re_path(r'^accounts/login/?$', desktop_auth_views.dt_login),  # Deprecated
   re_path(r'^accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
   re_path(r'^profile$', desktop_auth_views.profile),
   re_path(r'^login/oauth/?$', desktop_auth_views.oauth_login),
@@ -101,7 +93,7 @@ dynamic_patterns += [
   re_path(r'^desktop/get_debug_level', desktop_views.get_debug_level),
   re_path(r'^desktop/set_all_debug', desktop_views.set_all_debug),
   re_path(r'^desktop/reset_all_debug', desktop_views.reset_all_debug),
-  re_path(r'^bootstrap.js$', desktop_views.bootstrap), # unused
+  re_path(r'^bootstrap.js$', desktop_views.bootstrap),  # unused
 
   re_path(r'^desktop/status_bar/?$', desktop_views.status_bar),
   re_path(r'^desktop/debug/is_alive$', desktop_views.is_alive),
@@ -174,7 +166,6 @@ dynamic_patterns += [
   re_path(r'^desktop/api2/taskserver/check_upload_status/(?P<task_id>[^/]+)/?$', desktop_api2.check_upload_status,
           name="desktop_api2.check_upload_status"),
   re_path(r'^desktop/api2/taskserver/kill_task/(?P<task_id>[^/]+)/?$', desktop_api2.kill_task, name="desktop_api2.kill_task"),
-  re_path(r'^desktop/api2/taskserver/get_available_space/?$', desktop_api2.get_available_space, name="desktop_api2.get_available_space"),
 
   re_path(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
   re_path(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
