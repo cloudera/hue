@@ -26,7 +26,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from azure.abfs.__init__ import abfspath
-from desktop.conf import ENABLE_CONNECTORS, TASK_SERVER_V2
+from desktop.conf import ENABLE_CONNECTORS
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
