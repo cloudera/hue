@@ -36,7 +36,7 @@ from django.http import FileResponse, HttpRequest
 from beeswax.data_export import DataAdapter
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
-from desktop.conf import ENABLE_HUE_5, TASK_SERVER_V2
+from desktop.conf import ENABLE_HUE_5, TASK_SERVER
 from desktop.lib import export_csvxls, fsmanager
 from desktop.models import Document2
 from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
@@ -68,7 +68,7 @@ STATE_MAP = {
   states.REJECTED: 'rejected',
   states.IGNORED: 'ignored'
 }
-storage_info = json.loads(TASK_SERVER_V2.RESULT_STORAGE.get())
+storage_info = json.loads(TASK_SERVER.RESULT_STORAGE.get())
 storage = get_storage_class(storage_info.get('backend'))(**storage_info.get('properties', {}))
 
 
@@ -130,7 +130,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
       for chunk in response:
         f.write(chunk.encode('utf-8'))
 
-    if TASK_SERVER_V2.RESULT_CACHE.get():
+    if TASK_SERVER.RESULT_CACHE.get():
       with storage.open(result_key, 'rb') as store:
         with codecs.getreader('utf-8')(store) as text_file:
           delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
@@ -234,7 +234,7 @@ def _patch_status(notebook):
 def execute(*args, **kwargs):
   notebook = args[0]
   snippet = args[1]
-  kwargs['max_rows'] = TASK_SERVER_V2.FETCH_RESULT_LIMIT.get()
+  kwargs['max_rows'] = TASK_SERVER.FETCH_RESULT_LIMIT.get()
   _patch_status(notebook)
 
   task = download_to_file.apply_async(args=args, kwargs=kwargs, task_id=notebook['uuid'])
@@ -283,7 +283,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
   elif state in states.EXCEPTION_STATES:
     return ''
 
-  if TASK_SERVER_V2.RESULT_CACHE.get():
+  if TASK_SERVER.RESULT_CACHE.get():
     return ''
   else:
     if not startFrom:
@@ -395,7 +395,7 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
 def _get_data(task_id):
   result_key = _result_key(task_id)
 
-  if TASK_SERVER_V2.RESULT_CACHE.get():
+  if TASK_SERVER.RESULT_CACHE.get():
     csv_reader = caches[CACHES_CELERY_QUERY_RESULT_KEY].get(result_key)  # TODO check if expired
     if csv_reader is None:
       raise QueryError('Cached results %s not found.' % result_key)

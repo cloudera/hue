@@ -27,7 +27,7 @@ from django.utils.encoding import smart_str
 
 from beeswax.common import find_compute, is_compute
 from desktop.auth.backend import is_admin
-from desktop.conf import TASK_SERVER_V2, has_connectors
+from desktop.conf import TASK_SERVER, has_connectors
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
@@ -425,7 +425,7 @@ def patch_snippet_for_connector(snippet, user=None):
 def get_api(request, snippet):
   from notebook.connectors.oozie_batch import OozieApi
 
-  if snippet.get('wasBatchExecuted') and not TASK_SERVER_V2.ENABLED.get():
+  if snippet.get('wasBatchExecuted') and not TASK_SERVER.ENABLED.get():
     return OozieApi(user=request.user, request=request)
 
   if snippet.get('type') == 'report':

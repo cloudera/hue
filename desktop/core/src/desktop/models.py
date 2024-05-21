@@ -52,7 +52,7 @@ from desktop.conf import (
   HUE_IMAGE_VERSION,
   IS_MULTICLUSTER_ONLY,
   RAZ,
-  TASK_SERVER_V2,
+  TASK_SERVER,
   get_clusters,
   has_connectors,
 )
@@ -2200,7 +2200,7 @@ class ClusterConfig(object):
         }
       ])
 
-    if TASK_SERVER_V2.BEAT_ENABLED.get():
+    if TASK_SERVER.BEAT_ENABLED.get():
       interpreters.append({
           'type': 'celery-beat',
           'displayName': _('Scheduled Tasks'),
