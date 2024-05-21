@@ -30,7 +30,7 @@ from django.db.models import Count
 from django.db.models.functions import Trunc
 from django.utils.html import escape
 
-from desktop.conf import TASK_SERVER_V2, has_connectors
+from desktop.conf import has_connectors
 from desktop.lib.connectors.models import _get_installed_connectors
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.paths import SAFE_CHARACTERS_URI
