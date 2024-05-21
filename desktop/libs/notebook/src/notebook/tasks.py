@@ -16,21 +16,18 @@
 # limitations under the License.
 
 from __future__ import absolute_import, unicode_literals
-from future import standard_library
-standard_library.install_aliases()
 
+import csv
+import sys
+import json
+import time
+import codecs
+import logging
+import datetime
 from builtins import next, object
 
-import codecs
-import csv
-import datetime
-import json
-import logging
-import sys
-import time
-
-from celery.utils.log import get_task_logger
 from celery import states
+from celery.utils.log import get_task_logger
 from django.core.cache import caches
 from django.core.files.storage import get_storage_class
 from django.db import transaction
@@ -39,16 +36,15 @@ from django.http import FileResponse, HttpRequest
 from beeswax.data_export import DataAdapter
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
-from desktop.conf import ENABLE_HUE_5, TASK_SERVER
+from desktop.conf import ENABLE_HUE_5, TASK_SERVER_V2
 from desktop.lib import export_csvxls, fsmanager
 from desktop.models import Document2
 from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
-from useradmin.models import User
-
 from notebook.api import _get_statement
-from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper, QueryError
-from notebook.models import make_notebook, MockedDjangoRequest, Notebook
+from notebook.connectors.base import ExecutionWrapper, QueryError, QueryExpired, get_api
+from notebook.models import MockedDjangoRequest, Notebook, make_notebook
 from notebook.sql_utils import get_current_statement
+from useradmin.models import User
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -72,7 +68,7 @@ STATE_MAP = {
   states.REJECTED: 'rejected',
   states.IGNORED: 'ignored'
 }
-storage_info = json.loads(TASK_SERVER.RESULT_STORAGE.get())
+storage_info = json.loads(TASK_SERVER_V2.RESULT_STORAGE.get())
 storage = get_storage_class(storage_info.get('backend'))(**storage_info.get('properties', {}))
 
 
@@ -134,7 +130,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
       for chunk in response:
         f.write(chunk.encode('utf-8'))
 
-    if TASK_SERVER.RESULT_CACHE.get():
+    if TASK_SERVER_V2.RESULT_CACHE.get():
       with storage.open(result_key, 'rb') as store:
         with codecs.getreader('utf-8')(store) as text_file:
           delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
@@ -238,7 +234,7 @@ def _patch_status(notebook):
 def execute(*args, **kwargs):
   notebook = args[0]
   snippet = args[1]
-  kwargs['max_rows'] = TASK_SERVER.FETCH_RESULT_LIMIT.get()
+  kwargs['max_rows'] = TASK_SERVER_V2.FETCH_RESULT_LIMIT.get()
   _patch_status(notebook)
 
   task = download_to_file.apply_async(args=args, kwargs=kwargs, task_id=notebook['uuid'])
@@ -287,7 +283,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
   elif state in states.EXCEPTION_STATES:
     return ''
 
-  if TASK_SERVER.RESULT_CACHE.get():
+  if TASK_SERVER_V2.RESULT_CACHE.get():
     return ''
   else:
     if not startFrom:
@@ -305,7 +301,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
       return output.getvalue()
 
 
-def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch updated guid in download_to_file from DB
+def get_jobs(notebook, snippet, logs, **kwargs):  # Re implementation to fetch updated guid in download_to_file from DB
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
 
@@ -399,7 +395,7 @@ def fetch_result(notebook, snippet, rows, start_over, **kwargs):
 def _get_data(task_id):
   result_key = _result_key(task_id)
 
-  if TASK_SERVER.RESULT_CACHE.get():
+  if TASK_SERVER_V2.RESULT_CACHE.get():
     csv_reader = caches[CACHES_CELERY_QUERY_RESULT_KEY].get(result_key)  # TODO check if expired
     if csv_reader is None:
       raise QueryError('Cached results %s not found.' % result_key)
@@ -429,6 +425,7 @@ def fetch_result_size(*args, **kwargs):
 
   info = result.info
   return {'rows': info.get('row_counter', 0)}
+
 
 def cancel(*args, **kwargs):
   notebook = args[0]
@@ -490,6 +487,7 @@ def _cleanup(notebook, snippet):
   storage.delete(_log_key(notebook, snippet))
   caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook, snippet))
 
+
 def _get_query_key(notebook, snippet):
   if ENABLE_HUE_5.get():
     if snippet.get('executable'):
@@ -506,20 +504,26 @@ def _get_query_key(notebook, snippet):
   else:
     return query_key
 
+
 def _log_key(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_log'
+
 
 def _result_key(task_id):
   return task_id + '_result'
 
+
 def _fetch_progress_key(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_fetch_progress'
+
 
 def _cancel_statement_async_id(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_cancel'
 
+
 def _close_statement_async_id(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_close'
+
 
 def _get_request(postdict=None, user_id=None):
   request = HttpRequest()
