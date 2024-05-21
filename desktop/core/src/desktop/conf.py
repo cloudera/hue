@@ -2132,6 +2132,119 @@ TASK_SERVER = ConfigSection(
     ),
 ))
 
+TASK_SERVER_V2 = ConfigSection(
+  key="task_server_v2",
+  help=_("Task Server V2 configuration."),
+  members=dict(
+    ENABLED=Config(
+      key='enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('If resource intensive or blocking can be delegated to an already running task server.')
+    ),
+    BROKER_URL=Config(
+      key='broker_url',
+      default='amqp://guest:guest@localhost//',
+      help=_('How the task server and tasks communicate.')
+    ),
+    CELERY_RESULT_BACKEND=Config(
+      key='celery_result_backend',
+      dynamic_default=task_server_default_result_directory,
+      help=_('Where to store task results. Defaults to local file system path. Celery comes with a several other backends.')
+    ),
+    RESULT_CELERYD_OPTS=Config(
+      key='celeryd_opts',
+      default='--time-limit=300',
+      help=_('Default options provided to the task server at startup.')
+    ),
+    BEAT_ENABLED=Config(
+      key='beat_enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('Switch on the integration with the Task Scheduler.')
+    ),
+    BEAT_SCHEDULES_FILE=Config(
+      key='beat_schedules_file',
+      default='',
+      type=str,
+      help=_('Path to a file containing a list of beat schedules.')
+    ),
+    FETCH_RESULT_LIMIT=Config(
+      key='fetch_result_limit',
+      default=2000,
+      type=coerce_positive_integer,
+      help=_('Number of query results rows to fetch into the result storage.')
+    ),
+    RESULT_CACHE=Config(
+      key='result_cache',
+      type=str,
+      help=_('Django file cache class to use to temporarily store query results'),
+      default='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://localhost:6379/0", '
+      '"OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
+    ),
+    RESULT_STORAGE=Config(
+      key='result_storage',
+      type=str,
+      help=_('Django file storage class to use to persist query results'),
+      default='{"backend": "django.core.files.storage.FileSystemStorage", "properties": {"location": "./logs"}}'
+    ),
+    EXECUTION_STORAGE=Config(
+      key='execution_storage',
+      type=str,
+      help=_('Django cache to use to store temporarily used data during query execution. '
+      'This is in addition to result_file_storage and result_backend.'),
+      default='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
+    ),
+    CELERY_LOG_LEVEL=Config(
+      key='celery_log_level',
+      type=str,
+      help=_('Log level of celery workers.'),
+      default='INFO'
+    ),
+    CHECK_DISK_USAGE_AND_CLEAN_TASK_ENABLED=Config(
+      key='check_disk_usage_and_clean_task_enabled',
+      type=coerce_bool,
+      help=_('enable this peroidic cleaner which checks disk usage and makes space for file uploads'),
+      default=False
+    ),
+    CHECK_DISK_USAGE_AND_CLEAN_TASK_PERIODIC_INTERVAL=Config(
+      key='check_disk_usage_and_clean_task_periodic_interval',
+      type=coerce_positive_integer,
+      help=_('set the time interval in seconds to run this peroidic cleaner which checks disk usage and makes space for file uploads'),
+      default=1000
+    ),
+    DISK_USAGE_CLEANUP_THRESHOLD=Config(
+      key='disk_usage_cleanup_threshold',
+      type=coerce_positive_integer,
+      help=_('Clean up files in /tmp folder if the disk usage is beyond the threshold'),
+      default=90
+    ),
+    DISK_USAGE_AND_CLEAN_TASK_TIME_DELTA=Config(
+      key='disk_usage_and_clean_task_time_delta',
+      type=coerce_positive_integer,
+      help=_('Clean up files older than timedelta. Unit of timedelta is minutes'),
+      default=60
+    ),
+    CLEANUP_STALE_UPLOADS_IN_REDIS_ENABLED=Config(
+      key='cleanup_stale_uploads_in_redis_enabled',
+      type=coerce_bool,
+      help=_('enable this peroidic cleaner which cleans up failed upload tasks stored in redis'),
+      default=False
+    ),
+    CLEANUP_STALE_UPLOADS_IN_REDIS_PERIODIC_INTERVAL=Config(
+      key='cleanup_stale_uploads_task_periodic_interval',
+      type=coerce_positive_integer,
+      help=_('set the time interval in seconds to run this peroidic cleaner which cleans up failed upload tasks stored in redis'),
+      default=900
+    ),
+    CLEANUP_STALE_UPLOADS_TASK_TIME_DELTA=Config(
+      key='cleanup_stale_uploads_task_time_delta',
+      type=coerce_positive_integer,
+      help=_('Redis keys of format Upload__* older than timedelta will be cleaned up. Unit of timedelta is minutes'),
+      default=60
+    ),
+))
+
 
 def has_channels():
   return sys.version_info[0] > 2 and WEBSOCKETS.ENABLED.get()

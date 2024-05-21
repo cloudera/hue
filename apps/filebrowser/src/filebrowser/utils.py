@@ -16,10 +16,19 @@
 import io
 import os
 import logging
+from datetime import datetime
+
+from desktop.conf import TASK_SERVER_V2
+from desktop.lib.django_util import JsonResponse
+from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+
+if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
+  from desktop.settings import parse_broker_url
 LOG = logging.getLogger()
 
-from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 128
+
 
 def calculate_total_size(uuid, totalparts):
   total = 0
@@ -32,6 +41,7 @@ def calculate_total_size(uuid, totalparts):
     except OSError as e:
       LOG.error(f"calculate_total_size: For the file '{file_path}' error occurred: {e}")
   return total
+
 
 def generate_chunks(uuid, totalparts, default_write_size=DEFAULT_WRITE_SIZE):
   fp = io.BytesIO()
@@ -62,3 +72,52 @@ def generate_chunks(uuid, totalparts, default_write_size=DEFAULT_WRITE_SIZE):
     fp.close()
   for file_path in files:
     os.remove(file_path)
+
+
+def get_available_space_for_file_uploads(request):
+  redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
+  try:
+    upload_available_space = int(redis_client.get('upload_available_space'))
+    if upload_available_space is None:
+      raise ValueError("upload_available_space key not set in Redis")
+    return JsonResponse({'upload_available_space': upload_available_space})
+  except Exception as e:
+    LOG.exception("Failed to get available space: %s", str(e))
+    return JsonResponse({'error': str(e)}, status=500)
+  finally:
+    redis_client.close()
+
+
+def reserve_space_for_file_uploads(uuid, file_size):
+  redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
+  try:
+    upload_available_space = int(redis_client.get('upload_available_space'))
+    if upload_available_space is None:
+      raise ValueError("upload_available_space key not set in Redis")
+    if upload_available_space >= file_size:
+      redis_client.decrby('upload_available_space', file_size)
+      redis_client.set(f'upload__{uuid}', file_size)
+      redis_client.set(f'upload__{uuid}_timestamp', int(datetime.now().timestamp()))
+      return True
+    else:
+      return False
+  except Exception as e:
+    LOG.exception("Failed to reserve space: %s", str(e))
+    return False
+  finally:
+    redis_client.close()
+
+
+def release_reserved_space_for_file_uploads(uuid):
+  redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
+  try:
+    reserved_space = redis_client.get(f'upload__{uuid}')
+    if reserved_space:
+      file_size = int(redis_client.get(f'upload__{uuid}'))
+      redis_client.incrby('upload_available_space', file_size)
+      redis_client.delete(f'upload__{uuid}')
+      redis_client.delete(f'upload__{uuid}_timestamp')
+  except Exception as e:
+    LOG.exception("Failed to release reserved space: %s", str(e))
+  finally:
+    redis_client.close()
