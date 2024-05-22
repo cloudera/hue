@@ -19,87 +19,58 @@
 $icon-margin: 5px;
 $action-dropdown-width: 214px;
 
-.hue-storage-browser-tabContent {
-  background-color: vars.$fluidx-white;
-  margin: vars.$fluidx-spacing-s 0;
+.antd.cuix {
+  .hue-storage-browser-tabContent {
+    margin: vars.$fluidx-spacing-s 0;
+  }
 
   .hue-storage-browser__title-bar {
     display: flex;
-    align-items: center;
     margin: 0 vars.$fluidx-spacing-s;
-    padding-top: vars.$fluidx-spacing-s;
+  }
 
-    .hue-storage-browser__icon {
-      margin-right: vars.$fluidx-spacing-xs;
-      flex: 0 0 auto;
-      height: 24px;
-      width: 24px;
-    }
+  .hue-storage-browser__icon {
+    margin-right: vars.$fluidx-spacing-xs;
+    flex: 0 0 auto;
+    height: vars.$fluidx-heading-h3-line-height;
+  }
 
-    .hue-storage-browser__folder-name {
-      flex: 0 0 auto;
-      font-size: vars.$fluidx-heading-h3-size;
-      line-height: vars.$fluidx-heading-h3-line-height;
-      font-weight: vars.$fluidx-heading-h3-weight;
-    }
+  .hue-storage-browser__folder-name {
+    flex: 0 0 auto;
+    font-size: vars.$fluidx-heading-h3-size;
+    line-height: vars.$fluidx-heading-h3-line-height;
+    font-weight: vars.$fluidx-heading-h3-weight;
   }
 
   .hue-storage-browser__path-browser-panel {
     display: flex;
     margin: vars.$fluidx-spacing-xs 0;
-    //TODO: Remove nesting of classes.
-    .hue-storage-browser__filePath {
-      flex: 0 0 auto;
-      color: vars.$text-color;
-      font-weight: 600;
-      margin: 0 vars.$fluidx-spacing-xs 0 vars.$fluidx-spacing-s;
+    align-items: center;
+  }
+
+  .hue-storage-browser__filePath {
+    flex: 0 0 auto;
+    font-weight: 600;
+    margin: 0 vars.$fluidx-spacing-xs 0 vars.$fluidx-spacing-s;
+  }
+
+  .hue-storage-browser__actions-bar {
+    display: flex;
+    margin: vars.$fluidx-spacing-s;
+    justify-content: space-between;
+  }
+
+  .hue-storage-browser__search {
+    width: 30%;
+  }
+
+  .hue-storage-browser__actions-bar-right {
+    display: flex;
+    gap: vars.$fluidx-spacing-xs;
+
+    .cdp-icon-dropdown {
+      margin-left: $icon-margin;
     }
-  }
-}
-
-.hue-storage-browser__actions-bar {
-  display: flex;
-  margin: vars.$fluidx-spacing-s;
-  justify-content: space-between;
-  @include mixins.hue-svg-icon__d3-conflict;
-}
-
-.hue-storage-browser__search {
-  flex: 0 0 auto;
-  display: flex;
-}
-
-.hue-storage-browser__actions-bar-right {
-  display: flex;
-  height: 32px;
-}
-
-.hue-storage-browser__bulk-action-btn {
-  flex: 0 0 auto;
-  color: vars.$fluidx-blue-600;
-  margin-right: vars.$fluidx-spacing-xs;
-  border: solid 1px vars.$fluidx-gray-300;
-  box-shadow: none;
-  background-color: transparent;
-
-  .cdp-icon-dropdown {
-    margin-left: $icon-margin;
-  }
-}
-
-.hue-storage-browser__new-btn {
-  flex: 0 0 auto;
-  color: vars.$fluidx-white;
-  background-color: vars.$fluidx-blue-600;
-  border: solid 1px vars.$fluidx-blue-600;
-  box-shadow: none;
-
-  .cdp-icon-dropdown {
-    margin-left: $icon-margin;
-  }
-
-  .cdp-icon-plus-circle {
-    margin-right: $icon-margin;
   }
 }
 

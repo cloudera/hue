@@ -15,8 +15,10 @@
 // limitations under the License.
 
 import React, { useState, useEffect } from 'react';
-import { Spin, Input, Dropdown, Button } from 'antd';
+import { Spin, Dropdown, Input } from 'antd';
 import type { MenuProps } from 'antd';
+import Button from 'cuix/dist/components/Button';
+import { PrimaryButton } from 'cuix/dist/components/Button';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
@@ -27,7 +29,6 @@ import DownloadIcon from '@cloudera/cuix-core/icons/react/DownloadIcon';
 import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import ImportIcon from '@cloudera/cuix-core/icons/react/ImportIcon';
-import PlusCircleIcon from '@cloudera/cuix-core/icons/react/PlusCircleIcon';
 //TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
 import { FileOutlined } from '@ant-design/icons';
 
@@ -53,10 +54,10 @@ const defaultProps = {
   testId: 'hue-storage-browser-tabContent'
 };
 
-const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
+const StorageBrowserTabContent = ({
   user_home_dir,
   testId
-}): JSX.Element => {
+}: StorageBrowserTabContentProps): JSX.Element => {
   const [filePath, setFilePath] = useState<string>(user_home_dir);
   const [filesData, setFilesData] = useState<PathAndFileData>();
   const [files, setFiles] = useState<StorageBrowserTableData[]>();
@@ -198,15 +199,15 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
       <div className="hue-storage-browser-tabContent" data-testid={testId}>
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
           <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
-          <div className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
+          <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
             {filesData?.breadcrumbs[filesData?.breadcrumbs?.length - 1].label}
-          </div>
+          </h3>
         </div>
         <div
           className="hue-storage-browser__path-browser-panel"
           data-testid={`${testId}-path-browser-panel`}
         >
-          <div className="hue-storage-browser__filePath">{t('File Path:')}</div>
+          <span className="hue-storage-browser__filePath">{t('File Path:')}</span>
           <PathBrowser
             breadcrumbs={filesData?.breadcrumbs}
             onFilepathChange={setFilePath}
@@ -225,7 +226,7 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
               }}
               trigger={['hover', 'click']}
             >
-              <Button className="hue-storage-browser__bulk-action-btn">
+              <Button data-event={''}>
                 {t('Bulk Actions')}
                 <DropDownIcon />
               </Button>
@@ -238,10 +239,10 @@ const StorageBrowserTabContent: React.FC<StorageBrowserTabContentProps> = ({
               }}
               trigger={['hover', 'click']}
             >
-              <Button className="hue-storage-browser__new-btn" icon={<PlusCircleIcon />}>
+              <PrimaryButton data-event={''}>
                 {t('New')}
                 <DropDownIcon />
-              </Button>
+              </PrimaryButton>
             </Dropdown>
           </div>
         </div>

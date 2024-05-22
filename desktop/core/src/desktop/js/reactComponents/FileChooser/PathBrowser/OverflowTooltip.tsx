@@ -29,13 +29,13 @@ const defaultProps = {
   testId: 'hue-overflowing'
 };
 
-const OverflowTooltip: React.FC<OverflowTooltipProps> = ({
+const OverflowTooltip = ({
   title,
   isOverflowing,
   toolTipTriggers,
   children,
   testId
-}) => {
+}: OverflowTooltipProps): JSX.Element => {
   return isOverflowing ? (
     <Tooltip title={title} trigger={toolTipTriggers} data-testid={`${testId}-tooltip`}>
       {children}

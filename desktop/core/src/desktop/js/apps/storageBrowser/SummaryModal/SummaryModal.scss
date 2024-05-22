@@ -15,10 +15,12 @@
 // limitations under the License.
 @use 'variables' as vars;
 
-.hue-summary-modal__row.ant-row {
-  margin-bottom: vars.$fluidx-spacing-s;
+.antd.cuix {
+  .hue-summary-modal__row {
+    margin-bottom: vars.$fluidx-spacing-s;
 
-  &:last-child {
-    margin-bottom: 0;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }

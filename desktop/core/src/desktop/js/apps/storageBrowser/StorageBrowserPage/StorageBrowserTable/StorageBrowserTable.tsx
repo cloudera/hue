@@ -57,7 +57,7 @@ const defaultProps = {
   testId: 'hue-storage-browser__table'
 };
 
-const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
+const StorageBrowserTable = ({
   className,
   dataSource,
   onFilepathChange,
@@ -72,7 +72,7 @@ const StorageBrowserTable: React.FC<StorageBrowserTableProps> = ({
   rowClassName,
   testId,
   ...restProps
-}): JSX.Element => {
+}: StorageBrowserTableProps): JSX.Element => {
   const [tableHeight, setTableHeight] = useState<number>();
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
   //TODO: accept multiple files and folder select
