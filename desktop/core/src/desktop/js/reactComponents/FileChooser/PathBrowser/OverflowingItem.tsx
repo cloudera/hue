@@ -31,14 +31,12 @@ const defaultProps = {
 };
 
 const OverflowingItem = ({ label, onClick, testId }: OverflowingItemProps): JSX.Element => {
-  const textElementRef = useRef<HTMLDivElement>(null);
+  const textElementRef = useRef<HTMLSpanElement>(null);
   const [isOverflown, setIsOverflown] = useState(false);
   const compareSize = () => {
     const element = textElementRef.current;
 
-    const compare = element
-      ? element.offsetWidth < element.scrollWidth || element.offsetHeight < element.scrollHeight
-      : false;
+    const compare = element ? element.offsetWidth < element.scrollWidth : false;
     setIsOverflown(compare);
   };
 
@@ -57,8 +55,9 @@ const OverflowingItem = ({ label, onClick, testId }: OverflowingItemProps): JSX.
         className="hue-path-browser__overflowing-label"
         onClick={onClick}
         data-testid={`${testId}-label`}
+        data-event={''}
       >
-        {label}
+        <span ref={textElementRef}>{label}</span>
       </BorderlessButton>
     </OverflowTooltip>
   );

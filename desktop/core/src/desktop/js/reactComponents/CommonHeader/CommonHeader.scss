@@ -16,9 +16,6 @@
 
 @use 'variables' as vars;
 
-$heading-font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$icon-size: 32px;
-
 .antd.cuix {
   .hue-common-header {
     background-color: vars.$fluidx-gray-100;
@@ -29,13 +26,12 @@ $icon-size: 32px;
   .hue-header-icon > svg {
     margin-right: 10px;
     flex: 0 0 auto;
-    height: $icon-size;
+    height: vars.$fluidx-heading-h2-line-height;
     color: vars.$fluidx-gray-700;
   }
 
   .hue-header-title {
     flex: 0 0 auto;
-    font-family: $heading-font-family;
     font-size: vars.$fluidx-heading-h2-size;
     line-height: vars.$fluidx-heading-h2-line-height;
     font-weight: vars.$fluidx-heading-h2-weight;

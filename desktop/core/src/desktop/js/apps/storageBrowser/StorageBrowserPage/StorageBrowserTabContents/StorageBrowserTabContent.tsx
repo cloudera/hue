@@ -194,29 +194,6 @@ const StorageBrowserTabContent = ({
       });
   }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder, refreshKey]);
 
-  const tempBreadcrumbs = [
-    {
-      url: 'ofs://',
-      label: 'ofs://'
-    },
-    {
-      url: 'ofs://demo',
-      label: 'demo'
-    },
-    {
-      url: 'ofs://demo/tesbjhbjhs cksbdjkbcksdbckjbdcbks',
-      label: 'tesbjhbjhscksbdjkbcksdbckjbdcbks'
-    },
-    {
-      url: 'ofs://demo/tesbjhbjhs cksbdjkbcksdbckjbdcbksrturur',
-      label: 'tesbjhbjhscksbdjkbcksdbckjbdcbkshrrturt'
-    },
-    {
-      url: 'ofs://demo/tesbjhbjhscksbdjkbcksdbckjbdcbks/djbcjusbvjdbsvsjndscnjudsyvcysvdcuydvcuyw',
-      label: 'djbcjusbvjdbsvsjndscnjudsyvcysvdcuydvcuyw'
-    }
-  ];
-
   return (
     <Spin spinning={loadingFiles}>
       <div className="hue-storage-browser-tabContent" data-testid={testId}>
@@ -232,7 +209,7 @@ const StorageBrowserTabContent = ({
         >
           <span className="hue-storage-browser__filePath">{t('File Path:')}</span>
           <PathBrowser
-            breadcrumbs={tempBreadcrumbs}
+            breadcrumbs={filesData?.breadcrumbs}
             onFilepathChange={setFilePath}
             seperator={'/'}
             showIcon={false}

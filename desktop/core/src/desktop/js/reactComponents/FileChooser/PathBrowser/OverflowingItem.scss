@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 @use 'variables' as vars;
+@use 'mixins';
 
 .antd.cuix {
   .hue-path-browser__overflowing-label {
@@ -24,9 +25,8 @@
     border: none;
 
     >span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      @include mixins.nowrap-ellipsis;
+
       max-width: 150ch;
       display: inline !important;
     }

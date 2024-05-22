@@ -42,9 +42,7 @@ $table-placeholder-height: 100px;
   .hue-storage-browser__table-row {
     td.ant-table-cell {
       height: $cell-height;
-      white-space: nowrap;
-      overflow-x: hidden;
-      text-overflow: ellipsis;
+      @include mixins.nowrap-ellipsis;
     }
   }
 

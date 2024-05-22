@@ -47,7 +47,7 @@ const InputModal = ({
   return (
     <Modal
       cancelText={cancelText}
-      className="hue-input-modal"
+      className="hue-input-modal cuix antd"
       okText={submitText}
       onCancel={() => {
         setValue('');

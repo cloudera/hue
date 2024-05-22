@@ -15,6 +15,7 @@
 // limitations under the License.
 
 @use 'variables' as vars;
+@use 'mixins';
 
 $icon-width: 24px;
 $icon-height: 24px;
@@ -83,8 +84,6 @@ $icon-height: 24px;
 
 .hue-path-browser__dropdown {
   width: 200px;
-  background-color: vars.$fluidx-gray-200;
-  padding: 0;
 
   .ant-dropdown-menu {
     max-height: 200px;
@@ -93,9 +92,6 @@ $icon-height: 24px;
   }
 
   .ant-dropdown-menu-title-content {
-    display: inline-block;
-    overflow-x: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    @include mixins.nowrap-ellipsis;
   }
 }

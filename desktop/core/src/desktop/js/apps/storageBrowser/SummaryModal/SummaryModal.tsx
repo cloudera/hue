@@ -90,7 +90,7 @@ const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Elem
   //TODO:Handle long modal title
   return (
     <Modal
-      className="hue-summary-modal"
+      className="hue-summary-modal cuix antd"
       okText={t('Close')}
       onOk={onClose}
       open={showModal}

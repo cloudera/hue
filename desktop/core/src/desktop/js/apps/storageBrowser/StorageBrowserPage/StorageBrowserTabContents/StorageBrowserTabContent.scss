@@ -18,7 +18,6 @@
 
 $icon-margin: 5px;
 $action-dropdown-width: 214px;
-$icon-height: 24px;
 
 .antd.cuix {
   .hue-storage-browser-tabContent {
@@ -33,7 +32,7 @@ $icon-height: 24px;
   .hue-storage-browser__icon {
     margin-right: vars.$fluidx-spacing-xs;
     flex: 0 0 auto;
-    height: $icon-height;
+    height: vars.$fluidx-heading-h3-line-height;
   }
 
   .hue-storage-browser__folder-name {

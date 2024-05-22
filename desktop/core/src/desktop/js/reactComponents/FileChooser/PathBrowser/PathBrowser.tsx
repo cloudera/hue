@@ -17,7 +17,7 @@
 import React, { useRef, useEffect, useState, RefObject } from 'react';
 import { Input, Dropdown } from 'antd';
 import { BorderlessButton } from 'cuix/dist/components/Button';
-import type { MenuProps } from 'antd';
+import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
 import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
@@ -25,9 +25,7 @@ import AdlsIcon from '../../../components/icons/AdlsIcon';
 
 import { BreadcrumbData } from '../types';
 import Breadcrumb from './Breadcrumb/Breadcrumb';
-import DropDownMenuItem from './DropdownMenuItem/DropdownMenuItem';
 import './PathBrowser.scss';
-
 interface PathBrowserProps {
   breadcrumbs?: BreadcrumbData[];
   onFilepathChange: (path: string) => void;
@@ -88,17 +86,11 @@ const PathBrowser = ({
   useOutsideAlerter(wrapperRef);
 
   const extractMenuItems = (breadcrumbMenu: BreadcrumbData[]) => {
-    const menu: MenuProps['items'] = breadcrumbMenu.map(breadcrumb => {
+    const menu: MenuItemType[] = breadcrumbMenu.map(breadcrumb => {
       return {
         key: breadcrumb.url,
-        label: (
-          <DropDownMenuItem
-            key={breadcrumb.url}
-            label={breadcrumb.label}
-            url={breadcrumb.url}
-            onFilepathChange={onFilepathChange}
-          />
-        )
+        label: breadcrumb.label,
+        onClick: () => onFilepathChange(breadcrumb.url)
       };
     });
     return menu;
@@ -154,7 +146,7 @@ const PathBrowser = ({
                     {seperator}
                   </div>
                   <Dropdown
-                    overlayClassName="hue-path-browser__dropdown"
+                    overlayClassName="hue-path-browser__dropdown cuix antd"
                     menu={{
                       items: extractMenuItems(breadcrumbs.slice(1, breadcrumbs.length - 2)),
                       className: 'hue-path-browser__dropdown-menu'
