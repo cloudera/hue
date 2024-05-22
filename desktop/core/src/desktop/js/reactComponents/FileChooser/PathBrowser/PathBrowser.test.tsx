@@ -135,10 +135,10 @@ describe('Pathbrowser', () => {
         />
       );
       //From the given testconfig: The dropdown menu would consist of menu button with label test2. 'test2' should not be visible until the dropdown button is clicked.
-      expect(screen.queryByRole('button', { name: 'test2' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'test2' })).not.toBeInTheDocument();
       const dropdownButton = await screen.getByRole('button', { name: '..' });
       await user.click(dropdownButton);
-      expect(screen.getByRole('button', { name: 'test2' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'test2' })).toBeInTheDocument();
     });
 
     test('calls onFilepathChange on click of breadcrumb', async () => {

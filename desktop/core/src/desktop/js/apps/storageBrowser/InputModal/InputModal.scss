@@ -16,19 +16,8 @@
 @use 'variables' as vars;
 @use 'mixins';
 
-.hue-input-modal {
-  @include mixins.hue-svg-icon__d3-conflict;
-
-  .hue-input-modal__description {
-    color: vars.$fluidx-black;
-    margin-bottom: 14px;
+.antd.cuix {
+  .hue-input-modal__input-label {
+    color: vars.$fluidx-gray-700;
   }
-
-  .hue-input-modal__input {
-    height: vars.$fluidx-spacing-l;
-  }
-}
-
-.hue-input-modal__input-label {
-  color: vars.$fluidx-gray-700;
 }

@@ -27,7 +27,7 @@ import { fetchFileSystems } from '../../../reactComponents/FileChooser/api';
 
 import './StorageBrowserPage.scss';
 
-const StorageBrowserPage: React.FC = (): JSX.Element => {
+const StorageBrowserPage = (): JSX.Element => {
   const [fileSystemTabs, setFileSystemTabs] = useState<TabsProps['items'] | undefined>();
   const [loading, setLoading] = useState(true);
 
@@ -58,7 +58,7 @@ const StorageBrowserPage: React.FC = (): JSX.Element => {
   }, []);
 
   return (
-    <div className="hue-storage-browser">
+    <div className="hue-storage-browser cuix antd">
       <CommonHeader title={t('Storage Browser')} icon={<DataBrowserIcon />} />
       <Spin spinning={loading}>
         <Tabs className="hue-storage-browser__tab" defaultActiveKey="0" items={fileSystemTabs} />
