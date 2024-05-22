@@ -67,4 +67,5 @@ Read more in the [documentation](https://docs.gethue.com/developer/development/)
 SQL Editor, Parsers [components](https://docs.gethue.com/developer/components/) and REST/Python/CLI [APIs](https://docs.gethue.com/developer/api/).
 
 # License
+
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
