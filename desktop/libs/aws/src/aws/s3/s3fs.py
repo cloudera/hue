@@ -91,7 +91,7 @@ def get_s3_home_directory(user=None):
 
   if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('s3a://'):
     remote_home_s3 = REMOTE_STORAGE_HOME.get()
-  elif AWS_ACCOUNTS.get('default') and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get() and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get().startswith('s3a://'):
+  elif 'default' in AWS_ACCOUNTS and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get() and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get().startswith('s3a://'):
     remote_home_s3 = AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get()
   else:
     remote_home_s3 = 's3a://'

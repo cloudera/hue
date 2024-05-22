@@ -83,7 +83,7 @@ def get_gs_home_directory(user=None):
 
   if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('gs://'):
     remote_home_gs = REMOTE_STORAGE_HOME.get()
-  elif GC_ACCOUNTS.get('default') and GC_ACCOUNTS['default'].DEFAULT_HOME_PATH.get() and GC_ACCOUNTS['default'].DEFAULT_HOME_PATH.get().startswith('gs://'):
+  elif 'default' in GC_ACCOUNTS and GC_ACCOUNTS['default'].DEFAULT_HOME_PATH.get() and GC_ACCOUNTS['default'].DEFAULT_HOME_PATH.get().startswith('gs://'):
     remote_home_gs = GC_ACCOUNTS['default'].DEFAULT_HOME_PATH.get()
   else:
     remote_home_gs = 'gs://'

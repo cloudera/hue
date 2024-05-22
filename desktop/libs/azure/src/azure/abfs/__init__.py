@@ -184,7 +184,7 @@ def get_abfs_home_directory(user=None):
 
   if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('abfs://'):
     remote_home_abfs = REMOTE_STORAGE_HOME.get()
-  elif ABFS_CLUSTERS.get('default') and ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get() and ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get().startswith('abfs://'):
+  elif 'default' in ABFS_CLUSTERS and ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get() and ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get().startswith('abfs://'):
     remote_home_abfs = ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get()
 
   remote_home_abfs = _handle_user_dir_raz(user, remote_home_abfs)
