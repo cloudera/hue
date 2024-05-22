@@ -24,7 +24,7 @@ import posixpath
 import time
 
 from hadoop.fs import normpath as fs_normpath
-from azure.conf import get_default_abfs_fs
+from azure.conf import get_default_abfs_fs, ABFS_CLUSTERS
 
 from desktop.conf import RAZ
 from filebrowser.conf import REMOTE_STORAGE_HOME
@@ -170,7 +170,7 @@ def abfspath(path, fs_defaultfs=None):
   return path
 
 
-def get_home_dir_for_abfs(user=None):
+def get_abfs_home_directory(user=None):
   """
   Attempts to go to the directory set in the config file or core-site.xml else defaults to abfs://
   """
@@ -184,6 +184,8 @@ def get_home_dir_for_abfs(user=None):
 
   if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('abfs://'):
     remote_home_abfs = REMOTE_STORAGE_HOME.get()
+  elif ABFS_CLUSTERS.get('default') and ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get() and ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get().startswith('abfs://'):
+    remote_home_abfs = ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get()
 
   remote_home_abfs = _handle_user_dir_raz(user, remote_home_abfs)
 

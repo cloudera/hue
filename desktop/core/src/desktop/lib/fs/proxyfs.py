@@ -31,7 +31,7 @@ from aws.conf import is_raz_s3
 from aws.s3.s3fs import get_s3_home_directory
 
 from azure.conf import is_raz_abfs
-from azure.abfs.__init__ import get_home_dir_for_abfs
+from azure.abfs.__init__ import get_abfs_home_directory
 
 
 LOG = logging.getLogger()
@@ -222,7 +222,7 @@ class ProxyFS(object):
     if is_raz_s3():
       home_path = get_s3_home_directory(User.objects.get(username=self.getuser()))
     elif is_raz_abfs():
-      home_path = get_home_dir_for_abfs(User.objects.get(username=self.getuser()))
+      home_path = get_abfs_home_directory(User.objects.get(username=self.getuser()))
     elif is_raz_gs():
       home_path = get_gs_home_directory(User.objects.get(username=self.getuser()))
 

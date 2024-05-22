@@ -265,6 +265,12 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         default=14400,
         type=int
       ),
+      DEFAULT_HOME_PATH=Config(
+        key="default_home_path",
+        type=str,
+        default=None,
+        help="Optionally set this for a different home directory path. e.g. s3a://gethue"
+      ),
     )
   )
 )

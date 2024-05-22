@@ -32,7 +32,7 @@ from boto.s3.key import Key
 from boto.s3.prefix import Prefix
 
 from aws import s3
-from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3, is_raz_s3
+from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3, is_raz_s3, AWS_ACCOUNTS
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
@@ -89,9 +89,12 @@ def auth_error_handler(view_fn):
 def get_s3_home_directory(user=None):
   from desktop.models import _handle_user_dir_raz
 
-  remote_home_s3 = 's3a://'
   if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('s3a://'):
     remote_home_s3 = REMOTE_STORAGE_HOME.get()
+  elif AWS_ACCOUNTS.get('default') and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get() and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get().startswith('s3a://'):
+    remote_home_s3 = AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get()
+  else:
+    remote_home_s3 = 's3a://'
 
   remote_home_s3 = _handle_user_dir_raz(user, remote_home_s3)
 

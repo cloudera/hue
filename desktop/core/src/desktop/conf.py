@@ -2804,7 +2804,13 @@ GC_ACCOUNTS = UnspecifiedConfigSection(
         key='json_credentials',
         type=str,
         default=None,
-      )
+      ),
+      DEFAULT_HOME_PATH=Config(
+        key="default_home_path",
+        type=str,
+        default=None,
+        help="Optionally set this for a different home directory path. e.g. gs://gethue"
+      ),
     )
   )
 )

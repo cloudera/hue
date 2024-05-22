@@ -1751,20 +1751,13 @@ def get_cluster_config(user):
 
 def get_remote_home_storage(user=None):
   remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
-
-  if not remote_home_storage:
-    if get_raz_api_url() and get_raz_s3_default_bucket():
-      remote_home_storage = 's3a://%(bucket)s' % get_raz_s3_default_bucket()
-
-  remote_home_storage = _handle_user_dir_raz(user, remote_home_storage)
-
-  return remote_home_storage
+  return _handle_user_dir_raz(user, remote_home_storage)
 
 
 def _handle_user_dir_raz(user, remote_home_storage):
-  # In RAZ env, apppend username so that it defaults to user's dir and doesn't give 403 error
-  if user and remote_home_storage and RAZ.IS_ENABLED.get() and remote_home_storage.endswith('/user'):
-    remote_home_storage += '/' + user.username
+  # In RAZ environment, apppend username so that it defaults to user's directory and does not give 403 error
+  if user and remote_home_storage and RAZ.IS_ENABLED.get() and remote_home_storage.endswith(('/user', '/user/')):
+    remote_home_storage = remote_home_storage.rstrip('/') + '/' + user.username
 
   return remote_home_storage
 
@@ -2017,7 +2010,7 @@ class ClusterConfig(object):
 
     for hdfs_connector in hdfs_connectors:
       force_home = remote_home_storage and not remote_home_storage.startswith('/')
-      home_path = self.user.get_home_directory(force_home=force_home).encode('utf-8')
+      home_path = self.user.get_home_directory(force_home=force_home)
       interpreters.append({
         'type': 'hdfs',
         'displayName': hdfs_connector,
@@ -2030,7 +2023,8 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
-      home_path = remote_home_storage if remote_home_storage else 's3a://'.encode('utf-8')
+      from aws.s3.s3fs import get_s3_home_directory
+      home_path = get_s3_home_directory(self.user)
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
@@ -2040,7 +2034,8 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('gs', self.user):
-      home_path = remote_home_storage if remote_home_storage else 'gs://'.encode('utf-8')
+      from desktop.lib.fs.gc.gs import get_gs_home_directory
+      home_path = get_gs_home_directory(self.user)
       interpreters.append({
         'type': 'gs',
         'displayName': _('GS'),
@@ -2050,7 +2045,8 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
-      home_path = remote_home_storage if remote_home_storage else 'adl:/'.encode('utf-8')
+      # ADLS does not have a dedicated get_home_directory method
+      home_path = remote_home_storage if remote_home_storage else 'adl:/'
       interpreters.append({
         'type': 'adls',
         'displayName': _('ADLS'),
@@ -2060,8 +2056,8 @@ class ClusterConfig(object):
       })
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
-      from azure.abfs.__init__ import get_home_dir_for_abfs
-      home_path = remote_home_storage if remote_home_storage else get_home_dir_for_abfs(self.user).encode('utf-8')
+      from azure.abfs.__init__ import get_abfs_home_directory
+      home_path = get_abfs_home_directory(self.user)
       interpreters.append({
         'type': 'abfs',
         'displayName': _('ABFS'),
@@ -2072,7 +2068,7 @@ class ClusterConfig(object):
 
     if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('ofs', self.user):
       from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
-      home_path = get_ofs_home_directory().encode('utf-8')
+      home_path = get_ofs_home_directory()
       interpreters.append({
         'type': 'ofs',
         'displayName': _('Ozone'),

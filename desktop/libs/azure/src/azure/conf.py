@@ -77,8 +77,12 @@ def get_default_abfs_url():
 def get_default_abfs_fs():
   default_fs = core_site.get_default_fs()
 
-  return default_fs if default_fs and default_fs.startswith('abfs://') and \
-                       ABFS_CLUSTERS['default'].ENABLE_DEFAULTFS_FROM_CORESITE.get() else ABFS_CLUSTERS['default'].FS_DEFAULTFS.get()
+  return (
+    default_fs
+    if default_fs and default_fs.startswith('abfs://') and ABFS_CLUSTERS['default'].ENABLE_DEFAULTFS_FROM_CORESITE.get()
+    else ABFS_CLUSTERS['default'].FS_DEFAULTFS.get()
+  )
+
 
 ADLS_CLUSTERS = UnspecifiedConfigSection(
   "adls_clusters",
@@ -148,11 +152,26 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
         key="enable_defaultfs_from_coresite",
         type=coerce_bool,
         default=True,
-        help="Enable this param to use the defaultFS from core-site.xml"),
-      FS_DEFAULTFS=Config("fs_defaultfs", help="abfs://<container_name>@<account_name>.dfs.core.windows.net", type=str, default=None),
-      WEBHDFS_URL=Config("webhdfs_url",
-                         help="https://<account_name>.dfs.core.windows.net",
-                         type=str, default=None),
+        help="Enable this to use the defaultFS value from core-site.xml"
+      ),
+      FS_DEFAULTFS=Config(
+        key="fs_defaultfs",
+        help="abfs://<container_name>@<account_name>.dfs.core.windows.net",
+        type=str,
+        default=None
+      ),
+      WEBHDFS_URL=Config(
+        key="webhdfs_url",
+        help="https://<account_name>.dfs.core.windows.net",
+        type=str,
+        default=None
+      ),
+      DEFAULT_HOME_PATH=Config(
+        key="default_home_path",
+        type=str,
+        default=None,
+        help="Optionally set this for a different home directory path. e.g. abfs://gethue"
+      ),
     )
   )
 )

@@ -307,7 +307,7 @@ class ABFS(object):
     """
     Attempts to go to the directory set by the user in the configuration file. If not defaults to abfs://
     """
-    return Init_ABFS.get_home_dir_for_abfs()
+    return Init_ABFS.get_abfs_home_directory()
 
   # Find or alter information about the URI path
   # --------------------------------

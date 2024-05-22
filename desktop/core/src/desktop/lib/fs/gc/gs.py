@@ -27,7 +27,7 @@ from boto.gs.key import Key
 from boto.s3.prefix import Prefix
 from django.utils.translation import gettext as _
 
-from desktop.conf import PERMISSION_ACTION_GS, is_raz_gs
+from desktop.conf import PERMISSION_ACTION_GS, is_raz_gs, GC_ACCOUNTS
 from desktop.lib.fs.gc import GS_ROOT, abspath, parse_uri, translate_gs_error, normpath, join as gs_join
 from desktop.lib.fs.gc.gsstat import GSStat
 from desktop.lib.fs.gc.gsfile import open as gsfile_open
@@ -81,9 +81,12 @@ def auth_error_handler(view_fn):
 def get_gs_home_directory(user=None):
   from desktop.models import _handle_user_dir_raz
 
-  remote_home_gs = 'gs://'
   if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('gs://'):
     remote_home_gs = REMOTE_STORAGE_HOME.get()
+  elif GC_ACCOUNTS.get('default') and GC_ACCOUNTS['default'].DEFAULT_HOME_PATH.get() and GC_ACCOUNTS['default'].DEFAULT_HOME_PATH.get().startswith('gs://'):
+    remote_home_gs = GC_ACCOUNTS['default'].DEFAULT_HOME_PATH.get()
+  else:
+    remote_home_gs = 'gs://'
 
   remote_home_gs = _handle_user_dir_raz(user, remote_home_gs)
 
