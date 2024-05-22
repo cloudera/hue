@@ -17,11 +17,13 @@
 @use 'variables' as vars;
 @import '../../../components/styles/mixins';
 
-.hue-storage-browser {
-  @include fillAbsolute;
-  @include flexRowLayout;
+.antd.cuix {
+  .hue-storage-browser {
+    @include fillAbsolute;
+    @include flexRowLayout;
 
-  display: flex;
+    display: flex;
+  }
 
   .hue-storage-browser__tab {
     background-color: vars.$fluidx-gray-100;
@@ -34,4 +36,3 @@
     }
   }
 }
-

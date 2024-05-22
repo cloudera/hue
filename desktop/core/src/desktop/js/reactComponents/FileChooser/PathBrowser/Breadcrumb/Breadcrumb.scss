@@ -13,12 +13,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+.antd.cuix {
+  .hue-path-browser__breadcrumb {
+    display: contents;
 
-.hue-path-browser__breadcrumb {
-  display: contents;
-
-  .hue-path-browser__overflowing-label {
-    min-width: var(--minWidth);
+    .hue-path-browser__overflowing-label {
+      min-width: var(--minWidth);
+    }
   }
 }
-

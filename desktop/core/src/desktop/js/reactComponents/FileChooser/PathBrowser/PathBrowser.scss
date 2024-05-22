@@ -15,121 +15,83 @@
 // limitations under the License.
 
 @use 'variables' as vars;
+@use 'mixins';
 
 $icon-width: 24px;
 $icon-height: 24px;
 
-.hue-path-browser {
-  display: flex;
-  width: 100%;
+.antd.cuix {
+  .hue-path-browser {
+    display: flex;
+    width: 100%;
 
-  .hue-path-browser__file-system-icon {
-    object-fit: cover;
-    width: $icon-width;
-    height: $icon-height;
-    margin: 0 vars.$fluidx-spacing-xs;
+    .hue-path-browser__file-system-icon {
+      object-fit: cover;
+      width: $icon-width;
+      height: $icon-height;
+      margin: 0 vars.$fluidx-spacing-xs;
+    }
+
+    .hue-path-browser__toggle-breadcrumb-input-btn:empty {
+      pointer-events: auto;
+      width: 60px;
+      visibility: visible;
+      background-color: transparent;
+      padding: 0;
+
+      &:hover {
+        cursor: text;
+      }
+    }
   }
 
-  .hue-path-browser__toggle-breadcrumb-input-btn:empty {
-    pointer-events: auto;
-    width: 60px;
-    visibility: visible;
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    background-color: vars.$fluidx-white;
+  .hue-path-browser__breadcrumbs {
+    display: flex;
+    gap: vars.$fluidx-spacing-xs;
+    max-width: 60%;
 
     &:hover {
-      cursor: text;
-      background-color: vars.$fluidx-gray-100;
+      cursor: pointer;
     }
 
-    &:focus {
-      background-color: vars.$fluidx-gray-100;
+    .hue-path-browser__breadcrumb:last-of-type button:last-of-type {
+      color: vars.$fluidx-gray-700;
     }
-  }
-}
-
-.hue-path-browser__breadcrumbs {
-  /* stylelint-disable no-invalid-position-at-import-rule */
-  @import './OverflowingItem.scss';
-
-  display: flex;
-  gap: vars.$fluidx-spacing-xs;
-  max-width: 60%;
-
-  &:hover {
-    cursor: pointer;
   }
 
   .hue-path-browser__dropdown-button {
-    border: none;
-    box-shadow: none;
-    background-color: transparent;
-
     &:hover {
-      background-color: vars.$fluidx-gray-100;
+      background-color: transparent;
     }
 
     &:focus {
-      background-color: vars.$fluidx-gray-100;
+      background-color: transparent;
     }
   }
 
-  .hue-path-browser__breadcrumb:last-of-type button:last-of-type {
-    color: vars.$fluidx-gray-700;
+  .hue-path-browser__breadcrumb-seperator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
   }
-}
 
-.hue-path-browser__breadcrumb-seperator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 0 0 auto;
+  .hue-path-browser__input {
+    width: 300px;
+    flex: 0 0 auto;
+  }
 }
 
 .hue-path-browser__dropdown {
   width: 200px;
-  background-color: vars.$fluidx-gray-200;
 
   .ant-dropdown-menu {
     max-height: 200px;
     overflow-y: scroll;
+    padding: 0;
   }
 
   .ant-dropdown-menu-title-content {
-    display: inline-block;
-    overflow-x: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-}
-
-.hue-path-browser-panel {
-  .hue-path-browser__input {
-    width: 300px;
-    flex: 0 0 auto;
-
-    .ant-input-prefix {
-      width: $icon-width;
-      height: $icon-height;
-      object-fit: cover;
-    }
-  }
-
-  .hue-path-browser-panel__button {
-    border: none;
-    box-shadow: none;
-    color: vars.$fluidx-blue-400;
-    padding: 0;
-    width: 100%;
-
-    &:hover {
-      border: vars.$fluidx-gray-300 solid 1px;
-    }
-
-    &:focus {
-      border: vars.$fluidx-gray-300 solid 1px;
-    }
+    @include mixins.nowrap-ellipsis;
   }
 }
