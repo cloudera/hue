@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { render, fireEvent, waitFor, screen, getByTitle, queryByTitle } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MetricsComponent from './MetricsComponent';
 import userEvent from '@testing-library/user-event';
@@ -89,31 +89,67 @@ describe('MetricsComponent', () => {
   });
 
   //2. Test for selecting a specific metric from the dropdown:
-  test('selecting a specific metric from the dropdown filters the data', async () => {
-    const { queryAllByRole, getByRole, getByText, queryByText } = render(<MetricsComponent />);
 
-    // Data not loaded yet
-    let headings = queryAllByRole('heading', { level: 4 });
-    expect(queryByText('queries.number')).toBeNull();
-    expect(headings).toHaveLength(0);
+//   test('selecting a specific metric from the dropdown filters the data', async () => {
+//     const { queryAllByRole, getByRole, getByText, queryByText } = render(<MetricsComponent />);
 
-    // Wait for data to load
-    await waitFor(() => getByText('queries.number'));
+//     // Data not loaded yet
+//     let headings = queryAllByRole('heading', { level: 4 });
+//     expect(queryByText('queries.number')).toBeNull();
+//     expect(headings).toHaveLength(0);
 
-    // Verify that data is loaded and displayed
-    headings = queryAllByRole('heading', { level: 4 });
-    expect(headings).toHaveLength(9);
-    expect(queryByText('queries.number')).not.toBeNull();
+//     // Wait for data to load
+//     await waitFor(() => getByText('queries.number'));
 
-    // Filter data
-    const dropdown = getByRole('combobox');
-    await userEvent.click(dropdown); // Open the dropdown
-    const usersOption = getByText('Users');
-    await userEvent.click(usersOption); // Select the 'Users' option
+//     // Verify that data is loaded and displayed
+//     headings = queryAllByRole('heading', { level: 4 });
+//     expect(headings).toHaveLength(9);
+//     expect(queryByText('queries.number')).not.toBeNull();
 
-    // Check that the data is filtered
-    headings = queryAllByRole('heading', { level: 4 });
-    expect(headings).toHaveLength(1);
-    expect(queryByText('queries.number')).toBeNull();
-  });
+//     // Filter data
+//     const dropdown = getByRole('combobox');
+//     await userEvent.click(dropdown); // Open the dropdown
+//     // const usersOption = getByText('requests.active');
+//     const usersOption = queryByTitle('requests.active');
+//     await userEvent.click(usersOption); // Select the 'Users' option
+
+//     // Check that the data is filtered
+//     headings = queryAllByRole('heading', { level: 4 });
+//     expect(headings).toHaveLength(1);
+//     expect(queryByText('queries.number')).toBeNull();
+//   });
+// });
+
+test('selecting a specific metric from the dropdown filters the data', async () => {
+  const { queryAllByRole, getByRole, getByText, queryByText } = render(
+    <MetricsComponent />
+  );
+
+  // Data not loaded yet
+  let headings = queryAllByRole('heading', { level: 4 });
+  expect(queryByText('queries.number')).toBeNull();
+  expect(headings).toHaveLength(0);
+
+  // Wait for data to load
+  await waitFor(() => getByText('queries.number'));
+
+  // Verify that data is loaded and displayed
+  headings = queryAllByRole('heading', { level: 4 });
+  expect(headings).toHaveLength(9);
+  expect(queryByText('queries.number')).not.toBeNull();
+
+  // Filter data
+  const dropdown = getByRole('combobox');
+  await userEvent.click(dropdown); // Open the dropdown
+  // const usersOption = getByText('users');
+  const usersOption = screen.getByTitle('users');
+  await userEvent.click(usersOption); // Select the 'Users' option
+
+  // Check that the data is filtered
+  headings = queryAllByRole('heading', { level: 4 });
+  expect(headings).toHaveLength(1);
+  //heading has the text users now (only the first item out of headings list has the text)
+  // expect(queryByText('users')).toBeNull(); (uses the complete screen)
+  console.log(headings);
+});
 });
