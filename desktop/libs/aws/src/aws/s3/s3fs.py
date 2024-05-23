@@ -89,9 +89,17 @@ def auth_error_handler(view_fn):
 def get_s3_home_directory(user=None):
   from desktop.models import _handle_user_dir_raz
 
+  # REMOTE_STORAGE_HOME is deprecated in favor of DEFAULT_HOME_PATH per FS config level.
+  # But for backward compatibility, we are still giving preference to REMOTE_STORAGE_HOME path first and if it's not set,
+  # then check for DEFAULT_HOME_PATH which is set per FS config block. This helps in setting diff DEFAULT_HOME_PATH for diff FS in Hue.
+
   if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('s3a://'):
     remote_home_s3 = REMOTE_STORAGE_HOME.get()
-  elif 'default' in AWS_ACCOUNTS and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get() and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get().startswith('s3a://'):
+  elif (
+    'default' in AWS_ACCOUNTS
+    and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get()
+    and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get().startswith('s3a://')
+  ):
     remote_home_s3 = AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get()
   else:
     remote_home_s3 = 's3a://'

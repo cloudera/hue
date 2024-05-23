@@ -182,6 +182,10 @@ def get_abfs_home_directory(user=None):
   except:
     remote_home_abfs = 'abfs://'
 
+  # REMOTE_STORAGE_HOME is deprecated in favor of DEFAULT_HOME_PATH per FS config level.
+  # But for backward compatibility, we are still giving preference to REMOTE_STORAGE_HOME path first and if it's not set,
+  # then check for DEFAULT_HOME_PATH which is set per FS config block. This helps in setting diff DEFAULT_HOME_PATH for diff FS in Hue.
+
   if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('abfs://'):
     remote_home_abfs = REMOTE_STORAGE_HOME.get()
   elif 'default' in ABFS_CLUSTERS and ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get() and ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get().startswith('abfs://'):
