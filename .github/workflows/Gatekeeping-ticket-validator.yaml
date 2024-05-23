@@ -1,0 +1,32 @@
+<!--
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+name: GATEKEEPING_TICKET_VALIDATOR
+on:
+  issue_comment:
+      types: [created, edited]
+  pull_request:
+      types: [opened, edited, reopened, synchronize]
+
+jobs:
+  validator:
+     uses: Kitchen/gatekeeping-common/.github/workflows/gatekeeping_start.yaml@master
+     with:
+       start_keyword: 'gate-ticket'
+       labels: "gk-ticket-validation-fail,gk-ticket-validation-pass"
+       gk_source_repo: "Kitchen/gatekeeping-ticket-validator"
+       gk_action: "ticket_validator"
