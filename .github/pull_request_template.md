@@ -27,6 +27,6 @@ While creating the PR, Please go to the `Preview` tab and select appropriate tem
 * If your branch regex does not follow the above list, do not select the PR template.
 
 Template Issues
-* If a template was not selected, then follow the [label-based triggering](https://cloudera.atlassian.net/wiki/spaces/ENG/pages/10776412161) approach to trigger required jobs on demand. 
+* If a template was not selected, then follow the [label-based triggering](https://cloudera.atlassian.net/wiki/spaces/ENG/pages/10776412161) approach to trigger required jobs on demand.
 
 * If a wrong template was selected, close and create another PR by selecting the right template to execute the pre-commit CI pipeline automatically.
