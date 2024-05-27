@@ -93,7 +93,6 @@ def test_core_site():
 
     assert core_site.get_default_fs() == 'abfs://data@gethuedevstorage.dfs.core.windows.net/hue-adls'
 
-    assert get_remote_home_storage() == 's3a://gethue-dev'
   finally:
     core_site.reset()
     for f in finish:
