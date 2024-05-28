@@ -17,13 +17,14 @@ import io
 import os
 import logging
 from datetime import datetime
+from urllib.parse import urlparse
+
+import redis
 
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.django_util import JsonResponse
 from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
 
-if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
-  from desktop.settings import parse_broker_url
 LOG = logging.getLogger()
 
 
@@ -72,6 +73,14 @@ def generate_chunks(uuid, totalparts, default_write_size=DEFAULT_WRITE_SIZE):
     fp.close()
   for file_path in files:
     os.remove(file_path)
+
+
+def parse_broker_url(broker_url):
+  parsed_url = urlparse(broker_url)
+  host = parsed_url.hostname
+  port = parsed_url.port
+  db = int(parsed_url.path.lstrip('/'))
+  return redis.Redis(host=host, port=port, db=db)
 
 
 def get_available_space_for_file_uploads(request):
