@@ -18,7 +18,7 @@
 
 While creating the PR, Please go to the `Preview` tab and select appropriate template:
 
-* [cdpd-master](?expand=1&template=pull_request_template_cdpd-master.md)
+* [cdpd-master|cdw-master|cdw-master-staging|CDWH-*](?expand=1&template=pull_request_template_cdpd-master.md)
 * [unified-branch](?expand=1&template=pull_request_template_unified_branch.md)
 * [CDH-7.1.\*](?expand=1&template=pull_request_template_private_cloud.md)
 * [CDH-7.2.\*](?expand=1&template=pull_request_template_public_cloud.md)
