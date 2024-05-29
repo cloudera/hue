@@ -34,7 +34,9 @@ from desktop.lib import fsmanager
 from filebrowser.utils import release_reserved_space_for_file_uploads, reserve_space_for_file_uploads
 
 if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
-  from desktop.settings import TIME_ZONE, initialize_free_disk_space_in_redis, parse_broker_url
+  from desktop.management.commands.rungunicornserver import initialize_free_disk_space_in_redis
+  from desktop.settings import TIME_ZONE
+  from filebrowser.utils import parse_broker_url
 from filebrowser.views import UPLOAD_CLASSES
 from useradmin.models import User
 
