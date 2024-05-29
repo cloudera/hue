@@ -30,7 +30,7 @@ from desktop.conf import TASK_SERVER_V2
 
 if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
   from desktop.celery import app as celery_app
-  from desktop.settings import parse_broker_url
+  from filebrowser.utils import parse_broker_url
 from collections import defaultdict
 from datetime import datetime
 

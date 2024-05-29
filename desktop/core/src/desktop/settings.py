@@ -28,10 +28,7 @@ import uuid
 import logging
 import datetime
 from builtins import map, zip
-from urllib.parse import urlparse
 
-import redis
-import psutil
 import pkg_resources
 
 import desktop.redaction
@@ -758,31 +755,6 @@ if desktop.conf.TASK_SERVER_V2.ENABLED.get() or desktop.conf.TASK_SERVER_V2.BEAT
          'routing_key': 'default'
     },
   }
-
-  if desktop.conf.TASK_SERVER_V2.ENABLED.get():
-    def initialize_free_disk_space_in_redis():
-      redis_client = parse_broker_url(desktop.conf.TASK_SERVER_V2.BROKER_URL.get())
-      free_space = psutil.disk_usage('/tmp').free
-      available_space = redis_client.get('upload_available_space')
-      if available_space is None:
-        available_space = free_space
-      else:
-        available_space = int(available_space)
-      upload_keys_exist = any(redis_client.scan_iter('upload__*'))
-      redis_client.delete('upload_available_space')
-      if not upload_keys_exist:
-        redis_client.setnx('upload_available_space', free_space)
-      else:
-        redis_client.setnx('upload_available_space', min(free_space, available_space))
-
-    def parse_broker_url(broker_url):
-      parsed_url = urlparse(broker_url)
-      host = parsed_url.hostname
-      port = parsed_url.port
-      db = int(parsed_url.path.lstrip('/'))
-      return redis.Redis(host=host, port=port, db=db)
-
-    initialize_free_disk_space_in_redis()
 
 # %n will be replaced with the first part of the nodename.
 # CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
