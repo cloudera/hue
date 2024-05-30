@@ -20,4 +20,4 @@ on:
     types: [opened, synchronize, edited, labeled]
 jobs:
   TRIGGER-TESTS:
-    uses: Kitchen/RE-github-workflows/.github/workflows/trigger-on-prt-cdpd-master-and-public-cloud.yaml@main
+    uses: Kitchen/RE-github-workflows/.github/workflows/trigger-on-prt-cdpd-master.yaml@main
