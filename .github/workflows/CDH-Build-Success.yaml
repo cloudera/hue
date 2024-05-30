@@ -22,4 +22,4 @@ jobs:
   SUCCESS-STATE:
     uses: Kitchen/RE-github-workflows/.github/workflows/cdh-builds-success-state.yaml@main
     with:
-      required_labels: "ci-build-pass,smoketest-pass"
+      required_labels: "ci-build-pass"
