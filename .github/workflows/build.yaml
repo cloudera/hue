@@ -17,11 +17,6 @@
 name: BUILD
 on:
   pull_request:
-    types: [labeled]
 jobs:
   BUILD:
-    if: github.event_name == 'pull_request' && 
-     !contains(toJson(github.event.pull_request.labels), 'ci-build-pass') && 
-     !contains(toJson(github.event.pull_request.labels), 'ci-build-inp') && 
-     contains(toJson(github.event.pull_request.labels), 'gk-ticket-validation-pass')
     uses: Kitchen/RE-github-workflows/.github/workflows/CI_CDPD_BUILD.yaml@main
