@@ -15,28 +15,28 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-import calendar
-import errno
 import re
+import time
+import errno
 import logging
+import calendar
 import tempfile
 import posixpath
-import time
 
-from hadoop.fs import normpath as fs_normpath
-from azure.conf import get_default_abfs_fs, ABFS_CLUSTERS
-
+from azure.conf import ABFS_CLUSTERS, get_default_abfs_fs
 from desktop.conf import RAZ
 from filebrowser.conf import REMOTE_STORAGE_HOME
+from hadoop.fs import normpath as fs_normpath
 
 LOG = logging.getLogger()
 
-#check this first for problems
+# check this first for problems
 ABFS_PATH_RE = re.compile(
-  '^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(@[^.]*?\.dfs\.core\.windows\.net)?(/(.*?)/?)?$')
+  r'^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(@[^.]*?\.dfs\.core\.windows\.net)?(/(.*?)/?)?$')
 ABFS_ROOT_S = 'abfss://'
 ABFS_ROOT = 'abfs://'
 ABFSACCOUNT_NAME = re.compile('^/*[aA][bB][fF][sS]{1,2}://[$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9](@.*?)$')
+
 
 def parse_uri(uri):
   """
@@ -50,6 +50,7 @@ def parse_uri(uri):
   account_name_and_path = match.group(2) or ''
   return match.group(1), direct_name, account_name_and_path
 
+
 def only_filesystem_and_account_name(uri):
   """
   Given a path returns only the filesystem and account name,
@@ -59,6 +60,7 @@ def only_filesystem_and_account_name(uri):
   if match and match.group(2):
     return match.group(1) + match.group(2)
   return uri
+
 
 def is_root(uri):
   """
@@ -76,9 +78,10 @@ def strip_scheme(path):
     if filesystem == '':
       raise ValueError('File System must be Specified')
     path = filesystem + '/' + file_path
-  except:
+  except Exception:
     return path
   return path
+
 
 def strip_path(path):
   """
@@ -88,6 +91,7 @@ def strip_path(path):
     return path
   split_path = path.split('/')
   return split_path[len(split_path) - 1]
+
 
 def normpath(path):
   """
@@ -102,6 +106,7 @@ def normpath(path):
   else:
     normalized = fs_normpath(path)
   return normalized
+
 
 def parent_path(path):
   """
@@ -123,6 +128,7 @@ def parent_path(path):
   if path.lower().startswith(ABFS_ROOT):
     return normpath(ABFS_ROOT + filesystem + '/' + parent)
   return normpath(ABFS_ROOT_S + filesystem + '/' + parent)
+
 
 def join(first, *complist):
   """
@@ -151,13 +157,13 @@ def abfspath(path, fs_defaultfs=None):
   if fs_defaultfs is None:
     try:
       fs_defaultfs = get_default_abfs_fs()
-    except:
+    except Exception:
       LOG.warning("Configuration for ABFS is not set, may run into errors")
       return path
   filesystem, dir_name = ("", "")
   try:
     filesystem, dir_name = parse_uri(path)[:2]
-  except:
+  except Exception:
     return path
   account_name = ABFSACCOUNT_NAME.match(fs_defaultfs)
   LOG.debug("%s" % fs_defaultfs)
@@ -179,7 +185,7 @@ def get_abfs_home_directory(user=None):
   try:
     filesystem = parse_uri(get_default_abfs_fs())[0]
     remote_home_abfs = "abfs://" + filesystem
-  except:
+  except Exception:
     remote_home_abfs = 'abfs://'
 
   # REMOTE_STORAGE_HOME is deprecated in favor of DEFAULT_HOME_PATH per FS config level.
@@ -205,7 +211,7 @@ def abfsdatetime_to_timestamp(datetime):
   """
   # There is chance (depends on platform) to get
   # `'z' is a bad directive in format ...` error (see https://bugs.python.org/issue6641),
-  #LOG.debug("%s" %datetime)
+  # LOG.debug("%s" %datetime)
   stripped = time.strptime(datetime[:-4], '%a, %d %b %Y %H:%M:%S')
   if datetime[-4:] != ' GMT':
     raise ValueError('Time [%s] is not in GMT.' % datetime)

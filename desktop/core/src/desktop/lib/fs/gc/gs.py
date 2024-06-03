@@ -16,33 +16,30 @@
 # limitations under the License.
 import os
 import re
+import time
 import logging
 import posixpath
-import time
 
 from boto.exception import BotoClientError, GSResponseError
 from boto.gs.connection import Location
 from boto.gs.key import Key
-
 from boto.s3.prefix import Prefix
 from django.utils.translation import gettext as _
 
-from desktop.conf import PERMISSION_ACTION_GS, is_raz_gs, GC_ACCOUNTS
-from desktop.lib.fs.gc import GS_ROOT, abspath, parse_uri, translate_gs_error, normpath, join as gs_join
-from desktop.lib.fs.gc.gsstat import GSStat
-from desktop.lib.fs.gc.gsfile import open as gsfile_open
-
-from filebrowser.conf import REMOTE_STORAGE_HOME
-
 from aws.s3.s3fs import S3FileSystem
-
+from desktop.conf import GC_ACCOUNTS, PERMISSION_ACTION_GS, is_raz_gs
+from desktop.lib.fs.gc import GS_ROOT, abspath, join as gs_join, normpath, parse_uri, translate_gs_error
+from desktop.lib.fs.gc.gsfile import open as gsfile_open
+from desktop.lib.fs.gc.gsstat import GSStat
+from filebrowser.conf import REMOTE_STORAGE_HOME
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 BUCKET_NAME_PATTERN = re.compile(
-"^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
+r"^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
 
 
 LOG = logging.getLogger()
+
 
 class GSFileSystemException(IOError):
   def __init__(self, *args, **kwargs):
@@ -107,7 +104,7 @@ class GSFileSystem(S3FileSystem):
       headers=headers,
       filebrowser_action=filebrowser_action
     )
-  
+
   @staticmethod
   def join(*comp_list):
     return gs_join(*comp_list)
@@ -163,7 +160,7 @@ class GSFileSystem(S3FileSystem):
 
     Returns:
       GSStat: An object representing the stats of the file or directory.
-    
+
     Raises:
       GSFileSystemException: If the file or directory does not exist.
     """
@@ -354,7 +351,7 @@ class GSFileSystem(S3FileSystem):
   def _stats(self, path):
     if GSFileSystem.isroot(path):
       return GSStat.for_gs_root()
-    
+
     try:
       key = self._get_key(path)
     except BotoClientError as e:
@@ -366,7 +363,7 @@ class GSFileSystem(S3FileSystem):
         raise GSFileSystemException(_('User is not authorized to access path: "%s"') % path)
       else:
         raise GSFileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
-    except Exception as e: # SSL errors show up here, because they've been remapped in boto
+    except Exception as e:  # SSL errors show up here, because they've been remapped in boto
       raise GSFileSystemException(_('Failed to access path "%s": %s') % (path, str(e)))
 
     if key is None:
@@ -374,9 +371,9 @@ class GSFileSystem(S3FileSystem):
       bucket = self._get_bucket(bucket_name)
 
       key = Key(bucket, key_name)
-    
+
     return self._stats_key(key, self.fs)
-  
+
   @staticmethod
   def _stats_key(key, fs='gs'):
     if key.size is not None:
@@ -409,7 +406,7 @@ class GSFileSystem(S3FileSystem):
     """
     src_st = self.stats(src)
     if src_st.isDir and not recursive:
-      return None # omitting directory
+      return None  # omitting directory
 
     # Check if the source is a directory and destination is not a directory
     dst = abspath(src, dst)
@@ -428,7 +425,7 @@ class GSFileSystem(S3FileSystem):
     src_bucket = self._get_bucket(src_bucket)
     dst_bucket = self._get_bucket(dst_bucket)
 
-    # Determine whether to keep the source basename when copying directories and 
+    # Determine whether to keep the source basename when copying directories and
     # calculate the cut-off length for key names accordingly.
     if keep_src_basename:
       cut = len(posixpath.dirname(src_key))  # cut of the parent directory name

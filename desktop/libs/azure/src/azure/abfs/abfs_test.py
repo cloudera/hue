@@ -262,7 +262,7 @@ class ABFSTestBase(TestCase):
     try:
       LOG.debug("%s" % resp)
       resp = self.client.read(test_file, length=test_len)
-    except:
+    except Exception:
       LOG.debug("Not written yet")
 
     self.client.flush(test_file, {"position": test_len})

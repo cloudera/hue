@@ -18,42 +18,34 @@
 """
 Interfaces for ABFS
 """
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import logging
-import os
-import sys
-import threading
-import re
 
+import os
+import re
+import sys
+import logging
+import threading
+import urllib.error
+import urllib.request
+from builtins import object
 from math import ceil
 from posixpath import join
-
-from hadoop.hdfs_site import get_umask_mode
-from hadoop.fs.exceptions import WebHdfsException
-
-from desktop.conf import RAZ
-from desktop.lib.rest import http_client, resource
-from desktop.lib.rest.raz_http_client import RazHttpClient
+from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
 
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
 from azure.conf import PERMISSION_ACTION_ABFS, is_raz_abfs
-
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import quote as urllib_quote
-  from urllib.parse import urlparse as lib_urlparse
-else:
-  from urlparse import urlparse as lib_urlparse
-  from urllib import quote as urllib_quote
+from desktop.conf import RAZ
+from desktop.lib.rest import http_client, resource
+from desktop.lib.rest.raz_http_client import RazHttpClient
+from hadoop.fs.exceptions import WebHdfsException
+from hadoop.hdfs_site import get_umask_mode
 
 LOG = logging.getLogger()
 
 # Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
+
 
 class ABFSFileSystemException(IOError):
 
@@ -134,7 +126,7 @@ class ABFS(object):
 
   def _getheaders(self):
     headers = {
-      "x-ms-version": "2019-12-12" # For latest SAS support
+      "x-ms-version": "2019-12-12"  # For latest SAS support
     }
 
     if self._token_type and self._access_token:
@@ -190,7 +182,7 @@ class ABFS(object):
       return ABFSStat.for_root(path)
     try:
       file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
-    except:
+    except Exception:
       raise IOError
 
     if dir_name == '':
@@ -293,7 +285,6 @@ class ABFS(object):
     listofDir = self.listdir_stats(path, params)
 
     return [x.name for x in listofDir]
-
 
   def listfilesystems(self, root=Init_ABFS.ABFS_ROOT, params=None, **kwargs):
     """
@@ -682,14 +673,6 @@ class ABFS(object):
     Check access of a file/directory (Work in Progress/Not Ready)
     """
     raise NotImplementedError("")
-    try:
-      status = self.stats(path)
-      if 'x-ms-permissions' not in status.keys():
-        raise b
-    except b:
-      LOG.debug("Permisions have not been set")
-    except:
-      Exception
 
   def mkswap(self, filename, subdir='', suffix='swp', basedir=None):
     """
@@ -718,9 +701,9 @@ class ABFS(object):
     return self._filebrowser_action
 
   # Other Methods to condense stuff
-  #----------------------------
+  # ----------------------------
   # Write Files on creation
-  #----------------------------
+  # ----------------------------
   def _writedata(self, path, data, size):
     """
     Adds text to a given file
@@ -733,11 +716,11 @@ class ABFS(object):
         length = chunk_size
       else:
         length = chunk
-      self._append(path, data[i*chunk_size:i*chunk_size + length], length)
+      self._append(path, data[i * chunk_size:i * chunk_size + length], length)
     self.flush(path, {'position': int(size)})
 
   # Use Patch HTTP request
-  #----------------------------
+  # ----------------------------
   def _patching_sl(self, schemeless_path, param, data=None, header=None, **kwargs):
     """
     A wraper function for patch

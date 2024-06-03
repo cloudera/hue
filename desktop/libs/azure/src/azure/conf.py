@@ -15,12 +15,11 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-import logging
 import sys
+import logging
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script, coerce_bool
+from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.idbroker import conf as conf_idbroker
-
 from hadoop import core_site
 
 if sys.version_info[0] > 2:
@@ -36,12 +35,14 @@ REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/<version>tok
 META_DATA_URL = 'http://169.254.169.254/metadata/instance'
 AZURE_METADATA = None
 
+
 def get_default_client_id():
   """
   Attempt to set AWS client id from script, else core-site, else None
   """
   client_id_script = AZURE_ACCOUNTS['default'].CLIENT_ID_SCRIPT.get()
   return client_id_script or core_site.get_adls_client_id() or core_site.get_azure_client_id()
+
 
 def get_default_secret_key():
   """
@@ -50,11 +51,13 @@ def get_default_secret_key():
   client_secret_script = AZURE_ACCOUNTS['default'].CLIENT_SECRET_SCRIPT.get()
   return client_secret_script or core_site.get_adls_authentication_code() or core_site.get_azure_client_secret()
 
+
 def get_default_tenant_id():
   """
   Attempt to set AWS tenant id from script, else core-site, else None
   """
   return AZURE_ACCOUNTS['default'].TENANT_ID_SCRIPT.get()
+
 
 def get_refresh_url(conf, version):
   refresh_url = core_site.get_adls_refresh_url() or core_site.get_azure_client_endpoint()
@@ -62,17 +65,22 @@ def get_refresh_url(conf, version):
     refresh_url = REFRESH_URL.replace('<tenant_id>', conf.TENANT_ID.get()).replace('<version>', version + '/' if version else '')
   return refresh_url
 
+
 def get_default_region():
   return ""
+
 
 def get_default_adls_url():
   return ADLS_CLUSTERS['default'].WEBHDFS_URL.get()
 
+
 def get_default_adls_fs():
   return ADLS_CLUSTERS['default'].FS_DEFAULTFS.get()
 
+
 def get_default_abfs_url():
   return ABFS_CLUSTERS['default'].WEBHDFS_URL.get()
+
 
 def get_default_abfs_fs():
   default_fs = core_site.get_default_fs()
@@ -176,34 +184,47 @@ ABFS_CLUSTERS = UnspecifiedConfigSection(
   )
 )
 
+
 def is_raz_abfs():
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
   return (RAZ.IS_ENABLED.get() and 'default' in list(ABFS_CLUSTERS.keys()))
 
+
 def is_adls_enabled():
-  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() \
+  return ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get()
     or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ADLS_CLUSTERS.keys())
 
+
 def is_abfs_enabled():
-  return is_raz_abfs() or \
-    ('default' in list(AZURE_ACCOUNTS.keys()) and AZURE_ACCOUNTS['default'].get_raw() and AZURE_ACCOUNTS['default'].CLIENT_ID.get() or \
-    (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())) and 'default' in list(ABFS_CLUSTERS.keys())
+  return (
+    is_raz_abfs()
+    or (
+      'default' in list(AZURE_ACCOUNTS.keys())
+      and AZURE_ACCOUNTS['default'].get_raw()
+      and AZURE_ACCOUNTS['default'].CLIENT_ID.get()
+      or (conf_idbroker.is_idbroker_enabled('azure') and has_azure_metadata())
+    )
+    and 'default' in list(ABFS_CLUSTERS.keys())
+  )
+
 
 def has_adls_access(user):
-  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
   from desktop.auth.backend import is_admin
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
 
   return user.is_authenticated and user.is_active and (
     is_admin(user) or user.has_hue_permission(action="adls_access", app="filebrowser") or RAZ.IS_ENABLED.get()
   )
 
+
 def has_abfs_access(user):
-  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
   from desktop.auth.backend import is_admin
+  from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
 
   return user.is_authenticated and user.is_active and (
     is_admin(user) or user.has_hue_permission(action="abfs_access", app="filebrowser") or RAZ.IS_ENABLED.get()
   )
+
 
 def azure_metadata():
   global AZURE_METADATA
@@ -217,13 +238,15 @@ def azure_metadata():
       AZURE_METADATA = False
   return AZURE_METADATA
 
+
 def has_azure_metadata():
   return azure_metadata() is not None
+
 
 def config_validator(user):
   res = []
 
-  import desktop.lib.fsmanager # Avoid cyclic loop
+  import desktop.lib.fsmanager  # Avoid cyclic loop
 
   if is_adls_enabled() or is_abfs_enabled():
     try:

@@ -915,7 +915,7 @@ class TestDocument2Permissions(object):
     doc_names = [doc['name'] for doc in data['documents']]
     assert 'query2.sql' in doc_names
     assert 'query3.sql' in doc_names
-    assert not 'query1.sql' in doc_names
+    assert 'query1.sql' not in doc_names
 
     # they should also appear in user's home directory get_documents response
     response = self.client_not_me.get('/desktop/api2/doc/')
@@ -954,11 +954,11 @@ class TestDocument2Permissions(object):
     assert 'dir1' in doc_names
     assert 'dir3' in doc_names
     assert 'query3.sql' in doc_names
-    assert not 'dir2' in doc_names
+    assert 'dir2' not in doc_names
 
     # nested documents should not appear
-    assert not 'query1.sql' in doc_names
-    assert not 'query2.sql' in doc_names
+    assert 'query1.sql' not in doc_names
+    assert 'query2.sql' not in doc_names
 
     # but nested documents should still be shared/viewable by group
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
@@ -1253,7 +1253,7 @@ class TestDocument2ImportExport(object):
     assert 'test.wf' in [doc['fields']['name'] for doc in documents]
     assert 'query1.sql' in [doc['fields']['name'] for doc in documents]
     assert 'query2.sql' in [doc['fields']['name'] for doc in documents]
-    assert not 'query3.sql' in [doc['fields']['name'] for doc in documents]
+    assert 'query3.sql' not in [doc['fields']['name'] for doc in documents]
 
     # Test that exporting multiple workflows with overlapping dependencies works
     workflow2 = Document2.objects.create(name='test2.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
