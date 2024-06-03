@@ -79,6 +79,7 @@ REDIRECT_DOWNLOAD = Config(
   default=False,
 )
 
+# DEPRECATED in favor of DEFAULT_HOME_PATH per FS config level.
 REMOTE_STORAGE_HOME = Config(
   key="remote_storage_home",
   type=str,

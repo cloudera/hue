@@ -15,12 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import json
 import logging
 import operator
 import mimetypes
 import posixpath
-import os
 from io import BytesIO as string_io
 
 from django.core.files.uploadhandler import StopUpload
@@ -30,8 +30,8 @@ from django.utils.http import http_date
 from django.utils.translation import gettext as _
 from django.views.static import was_modified_since
 
-from azure.abfs.__init__ import get_home_dir_for_abfs
 from aws.s3.s3fs import S3ListAllBucketsException, get_s3_home_directory
+from azure.abfs.__init__ import get_abfs_home_directory
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib import fsmanager, i18n

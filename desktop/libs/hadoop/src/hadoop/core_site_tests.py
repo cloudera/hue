@@ -56,10 +56,10 @@ def test_core_site():
     <name>fs.s3a.bucket.gethue-dev.endpoint</name>
     <value>s3.us-west-2.amazonaws.com</value>
   </property>
-  <property>    
-    <name>fs.azure.ext.raz.rest.host.url</name>    
-    <value>https://gehue-adls-master:6082/</value>  
-  </property> 
+  <property>
+    <name>fs.azure.ext.raz.rest.host.url</name>
+    <value>https://gehue-adls-master:6082/</value>
+  </property>
   <property>
     <name>fs.azure.ext.raz.adls.access.cluster.name</name>
     <value>gehue-adls</value>
@@ -67,7 +67,7 @@ def test_core_site():
   <property>
     <name>fs.defaultFS</name>
     <value>abfs://data@gethuedevstorage.dfs.core.windows.net/hue-adls</value>
-  </property> 
+  </property>
 </configuration>
     """
     open(os.path.join(hadoop_home, 'core-site.xml'), 'w').write(xml)
@@ -84,7 +84,6 @@ def test_core_site():
 
     assert core_site.get_default_fs() == 'abfs://data@gethuedevstorage.dfs.core.windows.net/hue-adls'
 
-    assert get_remote_home_storage() == 's3a://gethue-dev'
   finally:
     core_site.reset()
     for f in finish:

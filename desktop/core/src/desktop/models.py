@@ -1755,20 +1755,13 @@ def get_cluster_config(user):
 
 def get_remote_home_storage(user=None):
   remote_home_storage = REMOTE_STORAGE_HOME.get() if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() else None
-
-  if not remote_home_storage:
-    if get_raz_api_url() and get_raz_s3_default_bucket():
-      remote_home_storage = 's3a://%(bucket)s' % get_raz_s3_default_bucket()
-
-  remote_home_storage = _handle_user_dir_raz(user, remote_home_storage)
-
-  return remote_home_storage
+  return _handle_user_dir_raz(user, remote_home_storage)
 
 
 def _handle_user_dir_raz(user, remote_home_storage):
-  # In RAZ env, apppend username so that it defaults to user's dir and doesn't give 403 error
-  if user and remote_home_storage and RAZ.IS_ENABLED.get() and remote_home_storage.endswith('/user'):
-    remote_home_storage += '/' + user.username
+  # In RAZ environment, apppend username so that it defaults to user's directory and does not give 403 error
+  if user and remote_home_storage and RAZ.IS_ENABLED.get() and remote_home_storage.endswith(('/user', '/user/')):
+    remote_home_storage = remote_home_storage.rstrip('/') + '/' + user.username
 
   return remote_home_storage
 
