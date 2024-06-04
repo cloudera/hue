@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, fireEvent, waitFor, screen, getByTitle, queryByTitle } from '@testing-library/react';
+import { render, waitFor, screen, within, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MetricsComponent from './MetricsComponent';
 import userEvent from '@testing-library/user-event';
@@ -67,8 +67,10 @@ jest.mock('api/utils', () => ({
   )
 }));
 
-//1. Test for filtering metrics based on input
 describe('MetricsComponent', () => {
+
+//1. Test for filtering metrics based on input
+  
   test('Filtering metrics based on name column value', async () => {
     render(<MetricsComponent />);
 
@@ -88,68 +90,59 @@ describe('MetricsComponent', () => {
     });
   });
 
-  //2. Test for selecting a specific metric from the dropdown:
+//2. Test for selecting a specific metric from the dropdown:
 
-//   test('selecting a specific metric from the dropdown filters the data', async () => {
-//     const { queryAllByRole, getByRole, getByText, queryByText } = render(<MetricsComponent />);
+  test('selecting a specific metric from the dropdown filters the data', async () => {
+    const { queryAllByRole, getByRole, getByText, queryByText } = render(
+      <MetricsComponent />
+    );
 
-//     // Data not loaded yet
-//     let headings = queryAllByRole('heading', { level: 4 });
-//     expect(queryByText('queries.number')).toBeNull();
-//     expect(headings).toHaveLength(0);
+    // Wait for data to load
+    await waitFor(() => getByText('queries.number'));
 
-//     // Wait for data to load
-//     await waitFor(() => getByText('queries.number'));
+    // Verify that all data is loaded and displayed correctly
+    let headings = queryAllByRole('heading', { level: 4 });
+    console.log('Initial headings length:', headings.length);
+    expect(headings).toHaveLength(9); // Check that there are 9 headings initially
 
-//     // Verify that data is loaded and displayed
-//     headings = queryAllByRole('heading', { level: 4 });
-//     expect(headings).toHaveLength(9);
-//     expect(queryByText('queries.number')).not.toBeNull();
+    // Open the dropdown
+    const dropdown = getByRole('combobox');
+    console.log('Opening dropdown...');
+    await userEvent.click(dropdown); // Simulate click to open dropdown
+    
+    // Wait for the dropdown options to be rendered
+    const dropdownOptions = await waitFor(() => getByRole('listbox'));
 
-//     // Filter data
-//     const dropdown = getByRole('combobox');
-//     await userEvent.click(dropdown); // Open the dropdown
-//     // const usersOption = getByText('requests.active');
-//     const usersOption = queryByTitle('requests.active');
-//     await userEvent.click(usersOption); // Select the 'Users' option
+    // Log text content of each option for debugging
+    const options = within(dropdownOptions).getAllByRole('option');
+    options.forEach(option => {
+      console.log('Option:', option.textContent);
+    });
 
-//     // Check that the data is filtered
-//     headings = queryAllByRole('heading', { level: 4 });
-//     expect(headings).toHaveLength(1);
-//     expect(queryByText('queries.number')).toBeNull();
-//   });
-// });
+    // Find and select the 'users' option
+    const usersOption = options.find(option => option.textContent && option.textContent.toLowerCase().includes('users'));
+    console.log('Users option found:', usersOption ? usersOption.textContent : 'None');
+    expect(usersOption).toBeDefined();
 
-test('selecting a specific metric from the dropdown filters the data', async () => {
-  const { queryAllByRole, getByRole, getByText, queryByText } = render(
-    <MetricsComponent />
-  );
+    // Ensure the option is not undefined before clicking
+    if (usersOption) {
+      await userEvent.click(usersOption); // Select the 'users' option
+    }
 
-  // Data not loaded yet
-  let headings = queryAllByRole('heading', { level: 4 });
-  expect(queryByText('queries.number')).toBeNull();
-  expect(headings).toHaveLength(0);
+    // Wait for the UI to update and check the filtered data
+    await waitFor(() => {
+      headings = queryAllByRole('heading', { level: 4 });
+      console.log('Headings length after filter:', headings.length);
+      return headings.length === 1;
+    });
 
-  // Wait for data to load
-  await waitFor(() => getByText('queries.number'));
+    // Final assertions to ensure correct filtering
+    headings = queryAllByRole('heading', { level: 4 });
+    console.log('Final headings length:', headings.length);
+    expect(headings).toHaveLength(1); // Only one heading should be present after filtering
+    expect(headings[0]).toHaveTextContent('users'); // The visible heading should be 'users'
 
-  // Verify that data is loaded and displayed
-  headings = queryAllByRole('heading', { level: 4 });
-  expect(headings).toHaveLength(9);
-  expect(queryByText('queries.number')).not.toBeNull();
-
-  // Filter data
-  const dropdown = getByRole('combobox');
-  await userEvent.click(dropdown); // Open the dropdown
-  // const usersOption = getByText('users');
-  const usersOption = screen.getByTitle('users');
-  await userEvent.click(usersOption); // Select the 'Users' option
-
-  // Check that the data is filtered
-  headings = queryAllByRole('heading', { level: 4 });
-  expect(headings).toHaveLength(1);
-  //heading has the text users now (only the first item out of headings list has the text)
-  // expect(queryByText('users')).toBeNull(); (uses the complete screen)
-  console.log(headings);
-});
+    // Ensure that 'queries.number' is no longer present after filtering
+    expect(queryByText('queries.number')).toBeNull();
+  });
 });
