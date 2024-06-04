@@ -14,18 +14,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-name: Remove smoketest triggered labels
+name: Remove labels
 on:
   pull_request:
     types: [labeled]
 
 jobs:
-  TRIGGER-SMOKE-TESTS:
-    if: (github.event.label.name == 'smoketest-pass')||(github.event.label.name == 'smoketest-fail')
-    runs-on: [ci_builds]
-    steps:
-     - name: remove smoketests-triggered labels
-       uses: Kitchen/RE-thirdparty-actions/actions/add-labels@main
-       with:
-          remove-labels: smoketests-triggered
-          repo-token: ${{ steps.secrets.outputs.JENKINS_GH_USER_TOKEN}}
+  REMOVE-LABELS:
+    uses: Kitchen/RE-github-workflows/.github/workflows/remove-labels.yaml@main
