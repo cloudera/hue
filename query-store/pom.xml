@@ -18,7 +18,7 @@
     <hadoop.version>3.1.1.7.2.18.0-641</hadoop.version>
     <hive.version>3.1.3000.2024.0.19.0-SNAPSHOT</hive.version>
     <tez.version>0.9.1.2024.0.19.0-SNAPSHOT</tez.version>
-    <ozone.version>1.4.0.719.2.0-b26</ozone.version>
+    <ozone.version>1.4.0.719.2.0-b30</ozone.version>
 
     <javac.version>1.8</javac.version>
     <guice.version>4.2.3</guice.version>
