@@ -49,7 +49,7 @@ function install_prerequisite() {
     source /opt/rh/rh-nodejs14/enable
   fi
 
-  export SQLITE3_PATH=${SQLITE3_PATH:-"$TOOLS_HOME/sqlite/sqlite3"}
+  export SQLITE3_PATH=${SQLITE3_PATH:-"$TOOLS_HOME/sqlite/bin/sqlite3"}
   if [[ $1 != "redhat9" && $1 != "redhat9_ppc" ]]; then
     check_python38_path
   else
@@ -98,11 +98,11 @@ export HUE_WEBPACK_CONFIG='webpack.config.internal.js'
 export PYTHON_H=$PYTHON38_PATH/include/python3.8/Python.h
 export PYTHON_VER=python3.8
 export SYS_PYTHON=$PYTHON38_PATH/bin/python3.8
-export SQLITE3_PATH=${SQLITE3_PATH:="${TOOLS_HOME}/sqlite/sqlite3"}
+export SQLITE3_PATH=${SQLITE3_PATH:="${TOOLS_HOME}/sqlite/bin/sqlite3"}
 export ORACLE_INSTANTCLIENT19_PATH="/opt/toolchain/instantclient_19_15"
 export LD_LIBRARY_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_PATH
 export LD_RUN_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH
-export PATH=$HOME/.local/bin:$PYTHON38_PATH/bin:${TOOLS_HOME}/sqlite:/usr/bin:$PATH
+export PATH=$HOME/.local/bin:$PYTHON38_PATH/bin:${TOOLS_HOME}/sqlite/bin:/usr/bin:$PATH
 
 if [[ $DOCKEROS == "redhat9" || $DOCKEROS == "redhat9_ppc" ]]; then
   export PYTHON_H=$PYTHON39_PATH/include/python3.9/Python.h
