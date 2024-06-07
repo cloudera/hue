@@ -21,6 +21,4 @@ on:
 
 jobs:
   TRIGGER-SMOKE-TESTS:
-    if: contains(toJson(github.event.pull_request.labels), 'ci-build-pass') && 
-      (github.event.label.name == 'trigger-smoke-tests')
-    uses: Kitchen/RE-github-workflows/.github/workflows/CI_TRIGGER_ART.yaml@main
+    uses: Kitchen/RE-github-workflows/.github/workflows/ondemand-smoketests.yaml@main

@@ -20,9 +20,5 @@ on:
     types: [labeled]
 
 jobs:
-  TRIGGER-SMOKE-TESTS:
-    if: contains(toJson(github.event.pull_request.labels), 'ci-build-pass') && 
-      (github.event.label.name == 'trigger-precommit-tier-tests') &&
-      contains(toJson(github.event.pull_request.labels), 'smoketest-pass')
-    concurrency:
-    uses: Kitchen/RE-github-workflows/.github/workflows/ci-precommit-tier-tests.yaml@main
+  TRIGGER-PRECOMMIT-TIER-TESTS:
+    uses: Kitchen/RE-github-workflows/.github/workflows/ondemand-ci-precommit-tier-tests.yaml@main
