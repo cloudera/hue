@@ -16,7 +16,7 @@
  limitations under the License. -->
 
 ----------
-To override the job votes use the labels below (Only Gatekeepers and Admins)
-* CDH-BUILD        = ci-build-pass
+To override the job votes use the labels below (Only Gatekeepers and Privileged Users)
+* CDH-BUILD    (starts automatically on PR creation and new commit push)    = ci-build-pass
 -----------
 * To re-run build use Re-run all jobs / Re-run failed jobs option from the Github UI
