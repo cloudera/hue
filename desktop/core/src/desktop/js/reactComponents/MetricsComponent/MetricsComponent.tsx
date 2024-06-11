@@ -62,6 +62,7 @@ const MetricsComponent: React.FC = (): JSX.Element => {
 
   const parseMetricsData = (data: MetricsResponse) => {
     return Object.keys(data.metric).map(key => ({
+      //skip all the caption starting with python.. and auth..
       caption: key,
       dataSource: Object.keys(data.metric[key]).map(subKey => ({
         name: subKey,
