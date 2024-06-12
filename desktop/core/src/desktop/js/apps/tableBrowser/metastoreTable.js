@@ -320,7 +320,7 @@ class MetastoreTable {
           const found =
             analysis.properties &&
             analysis.properties.some(property => {
-              if (property.col_name.toLowerCase() === 'view original text:') {
+              if (['view original text:', 'original query:'].includes(property.col_name.toLowerCase())) {
                 apiHelper
                   .formatSql({ statements: property.data_type })
                   .then(formatResponse => {
