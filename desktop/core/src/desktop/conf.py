@@ -173,6 +173,19 @@ GUNICORN_NUMBER_OF_WORKERS = Config(
   type=int,
   default=1)
 
+GUNICORN_WORKER_TIMEOUT = Config(
+  key="gunicorn_worker_timeout",
+  help=_("Workers silent for more than this many seconds are killed and restarted."),
+  type=int,
+  default=900)
+
+GUNICORN_WORKER_GRACEFUL_TIMEOUT = Config(
+  key="gunicorn_worker_graceful_timeout",
+  help=_("After receiving a restart signal, workers have this much time to finish serving requests. "
+         "Workers still alive after the timeout (starting from the receipt of the restart signal) are force killed."),
+  type=int,
+  default=900)
+
 HTTP_HOST = Config(
   key="http_host",
   help=_("HTTP host to bind to."),

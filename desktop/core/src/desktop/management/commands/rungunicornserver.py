@@ -221,7 +221,7 @@ def rungunicornserver(args=[], options={}):
       'enable_stdio_inheritance': None,
       'errorlog': "-",
       'forwarded_allow_ips': None,
-      'graceful_timeout': 900,                # Timeout for graceful workers restart.
+      'graceful_timeout': conf.GUNICORN_WORKER_GRACEFUL_TIMEOUT.get(),
       'group': conf.SERVER_GROUP.get(),
       'initgroups': None,
       'keepalive': 120,                       # seconds to wait for requests on a keep-alive connection.
@@ -254,7 +254,7 @@ def rungunicornserver(args=[], options={}):
       'syslog_facility': None,
       'syslog_prefix': None,
       'threads': conf.CHERRYPY_SERVER_THREADS.get(),
-      'timeout': 900,                         # Workers silent for more than this many seconds are killed and restarted.
+      'timeout': conf.GUNICORN_WORKER_TIMEOUT.get(),
       'umask': None,
       'user': conf.SERVER_USER.get(),
       'worker_class': conf.GUNICORN_WORKER_CLASS.get(),
