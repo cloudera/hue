@@ -15,29 +15,38 @@
 // limitations under the License.
 
 import React, { useEffect, useState } from 'react';
-import { i18nReact } from '../../../../utils/i18nReact';
-import Table from 'cuix/dist/components/Table';
 import { ColumnProps } from 'antd/lib/table';
+import { Dropdown, Input } from 'antd';
+import { MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
+import Tooltip from 'antd/es/tooltip';
+
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import SortAscending from '@cloudera/cuix-core/icons/react/SortAscendingIcon';
 import SortDescending from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
+import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
+import ImportIcon from '@cloudera/cuix-core/icons/react/ImportIcon';
 //TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
 import { FileOutlined } from '@ant-design/icons';
 
+import { PrimaryButton } from 'cuix/dist/components/Button';
+import Table from 'cuix/dist/components/Table';
+
+import { i18nReact } from '../../../../utils/i18nReact';
+import { mkdir, touch } from '../../../../reactComponents/FileChooser/api';
 import {
   PageStats,
   StorageBrowserTableData,
   SortOrder
 } from '../../../../reactComponents/FileChooser/types';
 import Pagination from '../../../../reactComponents/Pagination/Pagination';
-import StorageBrowserRowActions from '../StorageBrowserRowActions/StorageBrowserRowActions';
-import './StorageBrowserTable.scss';
-import Tooltip from 'antd/es/tooltip';
-import SummaryModal from '../../SummaryModal/SummaryModal';
+import StorageBrowserActions from '../StorageBrowserActions/StorageBrowserActions';
+import InputModal from '../../InputModal/InputModal';
 
+import './StorageBrowserTable.scss';
 interface StorageBrowserTableProps {
   className?: string;
   dataSource?: StorageBrowserTableData[];
+  filePath: string;
   onFilepathChange: (path: string) => void;
   onPageNumberChange: (pageNumber: number) => void;
   onPageSizeChange: (pageSize: number) => void;
@@ -48,6 +57,8 @@ interface StorageBrowserTableProps {
   sortByColumn: string;
   sortOrder: SortOrder;
   rowClassName?: string;
+  setRefreshKey: (value: number) => void;
+  setLoadingFiles: (value: boolean) => void;
   testId?: string;
 }
 
@@ -60,6 +71,7 @@ const defaultProps = {
 const StorageBrowserTable = ({
   className,
   dataSource,
+  filePath,
   onFilepathChange,
   onPageNumberChange,
   onPageSizeChange,
@@ -70,15 +82,55 @@ const StorageBrowserTable = ({
   pageSize,
   pageStats,
   rowClassName,
+  setRefreshKey,
+  setLoadingFiles,
   testId,
   ...restProps
 }: StorageBrowserTableProps): JSX.Element => {
   const [tableHeight, setTableHeight] = useState<number>();
-  const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
-  //TODO: accept multiple files and folder select
-  const [selectedFile, setSelectedFile] = useState<string>('');
+  const [selectedFiles, setSelectedFiles] = useState<StorageBrowserTableData[]>([]);
+  const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
+  const [showNewFileModal, setShowNewFileModal] = useState<boolean>(false);
 
   const { t } = i18nReact.useTranslation();
+
+  const newActionsMenuItems: MenuItemGroupType[] = [
+    {
+      key: 'create',
+      type: 'group',
+      label: t('CREATE'),
+      children: [
+        {
+          icon: <FileOutlined />,
+          key: 'new_file',
+          label: t('New File'),
+          onClick: () => {
+            setShowNewFileModal(true);
+          }
+        },
+        {
+          icon: <FolderIcon />,
+          key: 'new_folder',
+          label: t('New Folder'),
+          onClick: () => {
+            setShowNewFolderModal(true);
+          }
+        }
+      ]
+    },
+    {
+      key: 'upload',
+      type: 'group',
+      label: t('UPLOAD'),
+      children: [
+        {
+          icon: <ImportIcon />,
+          key: 'upload',
+          label: t('New Upload')
+        }
+      ]
+    }
+  ];
 
   const onColumnTitleClicked = (columnClicked: string) => {
     if (columnClicked === sortByColumn) {
@@ -93,11 +145,6 @@ const StorageBrowserTable = ({
       onSortByColumnChange(columnClicked);
       onSortOrderChange(SortOrder.ASC);
     }
-  };
-
-  const onViewSummary = (filePath: string) => {
-    setSelectedFile(filePath);
-    setShowSummaryModal(true);
   };
 
   const getColumns = (file: StorageBrowserTableData) => {
@@ -135,20 +182,11 @@ const StorageBrowserTable = ({
             <span className="hue-storage-browser__table-cell-name">{record.name}</span>
           </Tooltip>
         );
-      } else {
-        column.width = key === 'mtime' ? '15%' : '9%';
+      } else if (key === 'mtime') {
+        column.width = '15%';
       }
       columns.push(column);
     }
-    columns.push({
-      dataIndex: 'actions',
-      title: '',
-      key: 'actions',
-      render: (_, record: StorageBrowserTableData) => (
-        <StorageBrowserRowActions onViewSummary={onViewSummary} rowData={record} />
-      ),
-      width: '4%'
-    });
     return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
   };
 
@@ -164,6 +202,12 @@ const StorageBrowserTable = ({
     };
   };
 
+  const rowSelection = {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: StorageBrowserTableData[]) => {
+      setSelectedFiles(selectedRows);
+    }
+  };
+
   //pagination related functions handled by parent
   const onPreviousPageButtonClicked = (previousPageNumber: number) => {
     //If previous page does not exists api returns 0
@@ -173,6 +217,36 @@ const StorageBrowserTable = ({
   const onNextPageButtonClicked = (nextPageNumber: number, numPages: number) => {
     //If next page does not exists api returns 0
     onPageNumberChange(nextPageNumber === 0 ? numPages : nextPageNumber);
+  };
+
+  const handleCreateNewFolder = (folderName: string) => {
+    setLoadingFiles(true);
+    mkdir(folderName, filePath)
+      .then(() => {
+        setRefreshKey(oldKey => oldKey + 1);
+      })
+      .catch(error => {
+        // eslint-disable-next-line no-restricted-syntax
+        console.log(error);
+      })
+      .finally(() => {
+        setLoadingFiles(false);
+      });
+  };
+
+  const handleCreateNewFile = (fileName: string) => {
+    setLoadingFiles(true);
+    touch(fileName, filePath)
+      .then(() => {
+        setRefreshKey(oldKey => oldKey + 1);
+      })
+      .catch(error => {
+        // eslint-disable-next-line no-restricted-syntax
+        console.log(error);
+      })
+      .finally(() => {
+        setLoadingFiles(false);
+      });
   };
 
   useEffect(() => {
@@ -210,6 +284,26 @@ const StorageBrowserTable = ({
   if (dataSource && pageStats) {
     return (
       <>
+        <div className="hue-storage-browser__actions-bar">
+          <Input className="hue-storage-browser__search" placeholder={t('Search')} />
+          <div className="hue-storage-browser__actions-bar-right">
+            <StorageBrowserActions selectedFiles={selectedFiles} />
+            <Dropdown
+              overlayClassName="hue-storage-browser__actions-dropdown"
+              menu={{
+                items: newActionsMenuItems,
+                className: 'hue-storage-browser__action-menu'
+              }}
+              trigger={['hover', 'click']}
+            >
+              <PrimaryButton data-event={''}>
+                {t('New')}
+                <DropDownIcon />
+              </PrimaryButton>
+            </Dropdown>
+          </div>
+        </div>
+
         <Table
           className={className}
           columns={getColumns(dataSource[0])}
@@ -218,11 +312,16 @@ const StorageBrowserTable = ({
           pagination={false}
           rowClassName={rowClassName}
           rowKey={(record, index) => record.path + '' + index}
+          rowSelection={{
+            type: 'checkbox',
+            ...rowSelection
+          }}
           scroll={{ y: tableHeight }}
           data-testid={`${testId}`}
           locale={locale}
           {...restProps}
-        ></Table>
+        />
+
         <Pagination
           onNextPageButtonClicked={onNextPageButtonClicked}
           onPageNumberChange={onPageNumberChange}
@@ -231,11 +330,23 @@ const StorageBrowserTable = ({
           pageSize={pageSize}
           pageStats={pageStats}
         />
-        <SummaryModal
-          showModal={showSummaryModal}
-          path={selectedFile}
-          onClose={() => setShowSummaryModal(false)}
-        ></SummaryModal>
+
+        <InputModal
+          title={t('Create New Folder')}
+          inputLabel={t('Enter Folder name here')}
+          submitText={t('Create')}
+          showModal={showNewFolderModal}
+          onSubmit={handleCreateNewFolder}
+          onClose={() => setShowNewFolderModal(false)}
+        />
+        <InputModal
+          title={t('Create New File')}
+          inputLabel={t('Enter File name here')}
+          submitText={t('Create')}
+          showModal={showNewFileModal}
+          onSubmit={handleCreateNewFile}
+          onClose={() => setShowNewFileModal(false)}
+        />
       </>
     );
   } else {

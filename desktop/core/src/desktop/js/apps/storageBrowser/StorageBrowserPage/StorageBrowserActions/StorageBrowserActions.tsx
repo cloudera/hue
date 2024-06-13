@@ -14,34 +14,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Dropdown } from 'antd';
 import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
-import { BorderlessButton } from 'cuix/dist/components/Button';
-import MoreVerticalIcon from '@cloudera/cuix-core/icons/react/MoreVerticalIcon';
+import Button from 'cuix/dist/components/Button';
+import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 import InfoIcon from '@cloudera/cuix-core/icons/react/InfoIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
-import { isHDFS, isOFS } from '../../../../../js/utils/storageBrowserUtils';
+import { isHDFS, isOFS } from '../../../../utils/storageBrowserUtils';
 
-import './StorageBrowserRowActions.scss';
+import SummaryModal from '../../SummaryModal/SummaryModal';
+
+import './StorageBrowserActions.scss';
 
 interface StorageBrowserRowActionsProps {
-  rowData: StorageBrowserTableData;
-  onViewSummary: (selectedFilePath: string) => void;
+  selectedFiles: StorageBrowserTableData[];
 }
 
-const StorageBrowserRowActions = ({
-  rowData,
-  onViewSummary
-}: StorageBrowserRowActionsProps): JSX.Element => {
+const StorageBrowserActions = ({ selectedFiles }: StorageBrowserRowActionsProps): JSX.Element => {
+  const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
+  const [selectedFile, setSelectedFile] = useState<string>('');
+
   const { t } = i18nReact.useTranslation();
 
-  //TODO: handle multiple file selection scenarios
-  const isSummaryEnabled = () =>
-    (isHDFS(rowData.path) || isOFS(rowData.path)) && rowData.type === 'file';
+  const isSummaryEnabled = () => {
+    return (
+      selectedFiles.length == 1 &&
+      (isHDFS(selectedFiles[0].path) || isOFS(selectedFiles[0].path)) &&
+      selectedFiles[0].type === 'file'
+    );
+  };
 
   const getActions = () => {
     const actions: MenuItemType[] = [];
@@ -51,7 +56,8 @@ const StorageBrowserRowActions = ({
         icon: <InfoIcon />,
         label: t('View Summary'),
         onClick: () => {
-          onViewSummary(rowData.path);
+          setSelectedFile(selectedFiles[0].path);
+          setShowSummaryModal(true);
         }
       });
     }
@@ -59,22 +65,27 @@ const StorageBrowserRowActions = ({
   };
 
   return (
-    <Dropdown
-      overlayClassName="hue-storage-browser__table-actions-dropdown"
-      menu={{
-        items: getActions(),
-        className: 'hue-storage-browser__table-actions-menu'
-      }}
-      trigger={['click']}
-    >
-      <BorderlessButton
-        onClick={e => e.stopPropagation()}
-        className="hue-storage-browser__table-actions-btn"
-        data-event=""
-        icon={<MoreVerticalIcon />}
+    <>
+      <Dropdown
+        overlayClassName="hue-storage-browser__table-actions-dropdown"
+        menu={{
+          items: getActions(),
+          className: 'hue-storage-browser__table-actions-menu'
+        }}
+        trigger={['click', 'hover']}
+      >
+        <Button onClick={e => e.stopPropagation()} data-event="">
+          Actions
+          <DropDownIcon />
+        </Button>
+      </Dropdown>
+      <SummaryModal
+        showModal={showSummaryModal}
+        path={selectedFile}
+        onClose={() => setShowSummaryModal(false)}
       />
-    </Dropdown>
+    </>
   );
 };
 
-export default StorageBrowserRowActions;
+export default StorageBrowserActions;
