@@ -18,7 +18,7 @@ import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
-import StorageBrowserRowActions from './StorageBrowserRowActions';
+import StorageBrowserActions from './StorageBrowserActions';
 import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
 
 describe('StorageBrowserRowActions', () => {
@@ -33,65 +33,79 @@ describe('StorageBrowserRowActions', () => {
     type: '',
     path: ''
   };
+  const mockRecord2: StorageBrowserTableData[] = [
+    {
+      name: 'test',
+      size: '0\u00a0bytes',
+      user: 'demo',
+      group: 'demo',
+      permission: 'drwxr-xr-x',
+      mtime: 'May 12, 2024 10:37 PM',
+      type: 'file',
+      path: ''
+    },
+    {
+      name: 'testFolder',
+      size: '0\u00a0bytes',
+      user: 'demo',
+      group: 'demo',
+      permission: 'drwxr-xr-x',
+      mtime: 'May 12, 2024 10:37 PM',
+      type: 'dir',
+      path: ''
+    }
+  ];
+
+  test('does not render view summary option when there are multiple records', async () => {
+    const user = userEvent.setup();
+    const { getByRole, queryByRole } = render(
+      <StorageBrowserActions selectedFiles={mockRecord2} />
+    );
+    await user.click(getByRole('button'));
+    expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+  });
+
   test('renders view summary option when record is a hdfs file', async () => {
-    const onViewSummary = jest.fn();
     const user = userEvent.setup();
     mockRecord.path = '/user/demo/test';
     mockRecord.type = 'file';
     const { getByRole, queryByRole } = render(
-      <StorageBrowserRowActions rowData={mockRecord} onViewSummary={onViewSummary} />
+      <StorageBrowserActions selectedFiles={[mockRecord]} />
     );
     await user.click(getByRole('button'));
     expect(queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
   });
 
   test('renders view summary option when record is a ofs file', async () => {
-    const onViewSummary = jest.fn();
     const user = userEvent.setup();
     mockRecord.path = 'ofs://demo/test';
     mockRecord.type = 'file';
     const { getByRole, queryByRole } = render(
-      <StorageBrowserRowActions rowData={mockRecord} onViewSummary={onViewSummary} />
+      <StorageBrowserActions selectedFiles={[mockRecord]} />
     );
     await user.click(getByRole('button'));
     expect(queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
   });
 
   test('does not render view summary option when record is a hdfs folder', async () => {
-    const onViewSummary = jest.fn();
     const user = userEvent.setup();
     mockRecord.path = '/user/demo/test';
     mockRecord.type = 'dir';
     const { getByRole, queryByRole } = render(
-      <StorageBrowserRowActions rowData={mockRecord} onViewSummary={onViewSummary} />
+      <StorageBrowserActions selectedFiles={[mockRecord]} />
     );
     await user.click(getByRole('button'));
     expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
   });
 
   test('does not render view summary option when record is a an abfs file', async () => {
-    const onViewSummary = jest.fn();
     const user = userEvent.setup();
     mockRecord.path = 'abfs://demo/test';
     mockRecord.type = 'file';
     const { getByRole, queryByRole } = render(
-      <StorageBrowserRowActions rowData={mockRecord} onViewSummary={onViewSummary} />
+      <StorageBrowserActions selectedFiles={[mockRecord]} />
     );
     await user.click(getByRole('button'));
     expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
-  });
-
-  test('calls onViewSummary after View summary menu option is clicked', async () => {
-    const onViewSummary = jest.fn();
-    const user = userEvent.setup();
-    mockRecord.path = '/user/demo/test';
-    mockRecord.type = 'file';
-    const { getByRole } = render(
-      <StorageBrowserRowActions rowData={mockRecord} onViewSummary={onViewSummary} />
-    );
-    await user.click(getByRole('button'));
-    expect(onViewSummary).not.toBeCalled();
-    await user.click(getByRole('menuitem', { name: 'View Summary' }));
-    expect(onViewSummary).toBeCalled();
   });
 });
