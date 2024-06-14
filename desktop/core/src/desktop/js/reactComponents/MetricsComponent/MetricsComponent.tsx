@@ -62,15 +62,20 @@ const MetricsComponent: React.FC = (): JSX.Element => {
 
   const parseMetricsData = (data: MetricsResponse) => {
     return Object.keys(data.metric)
-    .filter(key => !key.startsWith('auth') && !key.startsWith('multiprocessing') && !key.startsWith('python.gc'))
-    .map(key => ({
-      //skip all the caption starting with python.. and auth..
-      caption: key,
-      dataSource: Object.keys(data.metric[key]).map(subKey => ({
-        name: subKey,
-        value: data.metric[key][subKey]
-      }))
-    }));
+      .filter(
+        key =>
+          !key.startsWith('auth') &&
+          !key.startsWith('multiprocessing') &&
+          !key.startsWith('python.gc')
+      )
+      .map(key => ({
+        //skip all the caption starting with python.. and auth..
+        caption: key,
+        dataSource: Object.keys(data.metric[key]).map(subKey => ({
+          name: subKey,
+          value: data.metric[key][subKey]
+        }))
+      }));
   };
   const handleMetricChange = (value: string) => {
     setSelectedMetric(value);
@@ -104,12 +109,17 @@ const MetricsComponent: React.FC = (): JSX.Element => {
               <Option value="">All</Option>
               {metrics &&
                 Object.keys(metrics.metric)
-                .filter(key => !key.startsWith('auth') && !key.startsWith('multiprocessing') && !key.startsWith('python.gc'))
-                .map(key => (
-                  <Option key={key} value={key}>
-                    {key}
-                  </Option>
-                ))}
+                  .filter(
+                    key =>
+                      !key.startsWith('auth') &&
+                      !key.startsWith('multiprocessing') &&
+                      !key.startsWith('python.gc')
+                  )
+                  .map(key => (
+                    <Option key={key} value={key}>
+                      {key}
+                    </Option>
+                  ))}
             </Select>
           </>
         )}
