@@ -61,7 +61,9 @@ const MetricsComponent: React.FC = (): JSX.Element => {
   }, [searchQuery, metrics]);
 
   const parseMetricsData = (data: MetricsResponse) => {
-    return Object.keys(data.metric).map(key => ({
+    return Object.keys(data.metric)
+    .filter(key => !key.startsWith('auth') && !key.startsWith('multiprocessing') && !key.startsWith('python.gc'))
+    .map(key => ({
       //skip all the caption starting with python.. and auth..
       caption: key,
       dataSource: Object.keys(data.metric[key]).map(subKey => ({
@@ -101,7 +103,9 @@ const MetricsComponent: React.FC = (): JSX.Element => {
             >
               <Option value="">All</Option>
               {metrics &&
-                Object.keys(metrics.metric).map(key => (
+                Object.keys(metrics.metric)
+                .filter(key => !key.startsWith('auth') && !key.startsWith('multiprocessing') && !key.startsWith('python.gc'))
+                .map(key => (
                   <Option key={key} value={key}>
                     {key}
                   </Option>
