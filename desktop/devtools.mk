@@ -21,10 +21,7 @@
 DEVTOOLS += \
 	ipython[5.2.0] \
 	ipdb[0.13.9] \
-	nose[1.3.7] \
-	coverage[4.4.2] \
-	nosetty[0.4] \
-	werkzeug[2.3.6]
+	coverage[4.4.2]
 
 PYPI_MIRROR ?= https://pypi.python.org/simple/
 

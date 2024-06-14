@@ -17,53 +17,70 @@
 @use 'mixins';
 
 $cell-height: 40px;
+$table-placeholder-height: 100px;
+$action-dropdown-width: 214px;
+$icon-margin: 5px;
 
-.hue-storage-browser__table {
-  @include mixins.hue-svg-icon__d3-conflict;
+.antd.cuix {
+  .hue-storage-browser__actions-bar {
+    display: flex;
+    margin: vars.$fluidx-spacing-s;
+    justify-content: space-between;
+  }
 
-  margin: 0 vars.$fluidx-spacing-s;
+  .hue-storage-browser__search {
+    width: 30%;
+  }
+
+  .hue-storage-browser__actions-bar-right {
+    display: flex;
+    gap: vars.$fluidx-spacing-xs;
+
+    .cdp-icon-dropdown {
+      margin-left: $icon-margin;
+    }
+  }
+
+  .hue-storage-browser__table {
+    margin: 0 vars.$fluidx-spacing-s;
+
+    .ant-table-placeholder {
+      height: $table-placeholder-height;
+      text-align: center;
+    }
+
+    th.ant-table-cell {
+      height: $cell-height;
+      background-color: vars.$fluidx-gray-040;
+    }
+  }
 
   .hue-storage-browser__table-cell-icon {
     color: vars.$fluidx-blue-700;
     margin-right: 6px;
   }
 
-  thead {
-    //TODO:Check why height isnt applied in safari browser
-    height: $cell-height;
-    background-color: vars.$fluidx-gray-040;
+  .hue-storage-browser__table-row {
+    td.ant-table-cell {
+      height: $cell-height;
+      @include mixins.nowrap-ellipsis;
+    }
   }
 
-  th.ant-table-cell {
-    text-align: left;
+  .hue-storage-browser__table-cell-name {
+    color: vars.$fluidx-blue-700;
   }
 
-  table {
-    width: 100%;
+  .hue-storage-browser__table-column-header {
+    display: flex;
   }
-}
 
-.hue-storage-browser__table-row {
-  height: $cell-height;
-  border-bottom: solid 1px vars.$fluidx-gray-300;
-
-  td.ant-table-cell {
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-    //ellipsis does not work without display as block or specifying max-width. Display as block not possible in table
-    max-width: 400px;
+  .hue-storage-browser__table-column-title {
+    text-transform: capitalize;
   }
 }
 
-.hue-storage-browser__table-cell-name {
-  color: vars.$fluidx-blue-700;
-}
-
-.hue-storage-browser__table-column-header {
-  display: flex;
-}
-
-.hue-storage-browser__table-column-title {
-  text-transform: capitalize;
+.hue-storage-browser__actions-dropdown {
+  width: $action-dropdown-width;
+  @include mixins.hue-svg-icon__d3-conflict;
 }

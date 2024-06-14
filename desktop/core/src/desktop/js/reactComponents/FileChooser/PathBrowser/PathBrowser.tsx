@@ -15,8 +15,9 @@
 // limitations under the License.
 
 import React, { useRef, useEffect, useState, RefObject } from 'react';
-import { Input, Button, Dropdown } from 'antd';
-import type { MenuProps } from 'antd';
+import { Input, Dropdown } from 'antd';
+import { BorderlessButton } from 'cuix/dist/components/Button';
+import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
 import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
@@ -24,9 +25,7 @@ import AdlsIcon from '../../../components/icons/AdlsIcon';
 
 import { BreadcrumbData } from '../types';
 import Breadcrumb from './Breadcrumb/Breadcrumb';
-import DropDownMenuItem from './DropdownMenuItem/DropdownMenuItem';
 import './PathBrowser.scss';
-
 interface PathBrowserProps {
   breadcrumbs?: BreadcrumbData[];
   onFilepathChange: (path: string) => void;
@@ -39,13 +38,13 @@ const defaultProps = {
   testId: 'hue-path-browser'
 };
 
-const PathBrowser: React.FC<PathBrowserProps> = ({
+const PathBrowser = ({
   breadcrumbs,
   onFilepathChange,
   seperator,
   showIcon,
   testId
-}) => {
+}: PathBrowserProps): JSX.Element => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const icons = {
@@ -87,17 +86,11 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
   useOutsideAlerter(wrapperRef);
 
   const extractMenuItems = (breadcrumbMenu: BreadcrumbData[]) => {
-    const menu: MenuProps['items'] = breadcrumbMenu.map(breadcrumb => {
+    const menu: MenuItemType[] = breadcrumbMenu.map(breadcrumb => {
       return {
         key: breadcrumb.url,
-        label: (
-          <DropDownMenuItem
-            key={breadcrumb.url}
-            label={breadcrumb.label}
-            url={breadcrumb.url}
-            onFilepathChange={onFilepathChange}
-          />
-        )
+        label: breadcrumb.label,
+        onClick: () => onFilepathChange(breadcrumb.url)
       };
     });
     return menu;
@@ -153,7 +146,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                     {seperator}
                   </div>
                   <Dropdown
-                    overlayClassName="hue-path-browser__dropdown"
+                    overlayClassName="hue-path-browser__dropdown cuix antd"
                     menu={{
                       items: extractMenuItems(breadcrumbs.slice(1, breadcrumbs.length - 2)),
                       className: 'hue-path-browser__dropdown-menu'
@@ -162,12 +155,12 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                     autoFocus
                     data-testid={`${testId}-dropdown`}
                   >
-                    <Button
+                    <BorderlessButton
                       className="hue-path-browser__dropdown-button"
                       data-testid={`${testId}-dropdown-btn`}
                     >
                       ..
-                    </Button>
+                    </BorderlessButton>
                   </Dropdown>
                   <div
                     className="hue-path-browser__breadcrumb-seperator"
@@ -196,7 +189,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                 </>
               )}
             </div>
-            <Button
+            <BorderlessButton
               className="hue-path-browser__toggle-breadcrumb-input-btn"
               aria-label="hue-path-browser__toggle-breadcrumb-input-btn"
               title="Edit path"
@@ -204,7 +197,7 @@ const PathBrowser: React.FC<PathBrowserProps> = ({
                 setIsEditMode(true);
               }}
               data-testid={`${testId}-toggle-input-btn`}
-            ></Button>
+            ></BorderlessButton>
           </div>
         ) : (
           <div ref={wrapperRef}>

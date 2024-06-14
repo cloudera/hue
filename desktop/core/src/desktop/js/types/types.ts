@@ -68,4 +68,5 @@ export interface hueWindow {
   hueDebug?: HueDebug;
   hueDebugAnalytics?: boolean;
   gtag?: (type: string, name: string, parameters: { action: string; version: string }) => void;
+  ENABLE_HELP_MENU?: boolean;
 }

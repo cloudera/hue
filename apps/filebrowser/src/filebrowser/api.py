@@ -15,22 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import logging
 import posixpath
-import os
 
 from django.http import HttpResponse
 from django.utils.translation import gettext as _
 
-from desktop.lib.django_util import JsonResponse
-from desktop.lib import fsmanager
-from desktop.lib.i18n import smart_unicode
-from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
-from desktop.lib.fs.gc.gs import get_gs_home_directory
-
-from azure.abfs.__init__ import get_home_dir_for_abfs
 from aws.s3.s3fs import get_s3_home_directory
-
+from azure.abfs.__init__ import get_abfs_home_directory
+from desktop.lib import fsmanager
+from desktop.lib.django_util import JsonResponse
+from desktop.lib.fs.gc.gs import get_gs_home_directory
+from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+from desktop.lib.i18n import smart_unicode
 from filebrowser.views import _normalize_path
 
 LOG = logging.getLogger()
@@ -64,7 +62,7 @@ def get_filesystems(request):
 
 
 @error_handler
-def get_filesystems_with_home_dirs(request): # Using as a public API only for now
+def get_filesystems_with_home_dirs(request):  # Using as a public API only for now
   filesystems = []
   user_home_dir = ''
 
@@ -76,7 +74,7 @@ def get_filesystems_with_home_dirs(request): # Using as a public API only for no
     elif fs == 'gs':
       user_home_dir = get_gs_home_directory(request.user)
     elif fs == 'abfs':
-      user_home_dir = get_home_dir_for_abfs(request.user)
+      user_home_dir = get_abfs_home_directory(request.user)
     elif fs == 'ofs':
       user_home_dir = get_ofs_home_directory()
 
@@ -107,9 +105,10 @@ def touch(request):
 
   if name and (posixpath.sep in name):
     raise Exception(_("Error creating %s file. Slashes are not allowed in filename." % name))
-  
+
   request.fs.create(request.fs.join(path, name))
   return HttpResponse(status=200)
+
 
 @error_handler
 def rename(request):
@@ -131,6 +130,7 @@ def rename(request):
 
   request.fs.rename(src_path, dest_path)
   return HttpResponse(status=200)
+
 
 @error_handler
 def content_summary(request, path):

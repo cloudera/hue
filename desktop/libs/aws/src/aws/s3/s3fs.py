@@ -16,15 +16,14 @@
 
 from __future__ import absolute_import
 
-from builtins import str
-from builtins import object
-import itertools
-import logging
 import os
-import posixpath
 import re
 import sys
 import time
+import logging
+import itertools
+import posixpath
+from builtins import object, str
 
 from boto.exception import BotoClientError, S3ResponseError
 from boto.s3.connection import Location
@@ -32,24 +31,26 @@ from boto.s3.key import Key
 from boto.s3.prefix import Prefix
 
 from aws import s3
-from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3, is_raz_s3
-from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
+from aws.conf import AWS_ACCOUNTS, PERMISSION_ACTION_S3, get_default_region, get_locations, is_raz_s3
+from aws.s3 import S3A_ROOT, normpath, s3file, translate_s3_error
 from aws.s3.s3stat import S3Stat
-
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
 if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
+  import urllib.error
+  import urllib.request
   from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
+
   from django.utils.translation import gettext as _
 else:
   from urllib import quote as urllib_quote
-  from urlparse import urlparse as lib_urlparse
+
   from django.utils.translation import ugettext as _
+  from urlparse import urlparse as lib_urlparse
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 BUCKET_NAME_PATTERN = re.compile(
-  "^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
+  r"^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
 
 LOG = logging.getLogger()
 
@@ -58,9 +59,11 @@ class S3FileSystemException(IOError):
   def __init__(self, *args, **kwargs):
     super(S3FileSystemException, self).__init__(*args, **kwargs)
 
+
 class S3ListAllBucketsException(S3FileSystemException):
   def __init__(self, *args, **kwargs):
     super(S3FileSystemException, self).__init__(*args, **kwargs)
+
 
 def auth_error_handler(view_fn):
   def decorator(*args, **kwargs):
@@ -89,9 +92,20 @@ def auth_error_handler(view_fn):
 def get_s3_home_directory(user=None):
   from desktop.models import _handle_user_dir_raz
 
-  remote_home_s3 = 's3a://'
+  # REMOTE_STORAGE_HOME is deprecated in favor of DEFAULT_HOME_PATH per FS config level.
+  # But for backward compatibility, we are still giving preference to REMOTE_STORAGE_HOME path first and if it's not set,
+  # then check for DEFAULT_HOME_PATH which is set per FS config block. This helps in setting diff DEFAULT_HOME_PATH for diff FS in Hue.
+
   if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('s3a://'):
     remote_home_s3 = REMOTE_STORAGE_HOME.get()
+  elif (
+    'default' in AWS_ACCOUNTS
+    and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get()
+    and AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get().startswith('s3a://')
+  ):
+    remote_home_s3 = AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.get()
+  else:
+    remote_home_s3 = 's3a://'
 
   remote_home_s3 = _handle_user_dir_raz(user, remote_home_s3)
 
@@ -116,7 +130,7 @@ class S3FileSystem(object):
     except S3ResponseError as e:
       if e.status == 301 or e.status == 400:
         raise S3FileSystemException(
-          _('Failed to retrieve bucket "%s" in region "%s" with "%s". Your bucket is in region "%s"') % 
+          _('Failed to retrieve bucket "%s" in region "%s" with "%s". Your bucket is in region "%s"') %
           (name, self._get_location(), e.message or e.reason, self.get_bucket_location(name)))
       else:
         raise e
@@ -213,7 +227,7 @@ class S3FileSystem(object):
         raise S3FileSystemException(_('User is not authorized to access path: "%s"') % path)
       else:
         raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
-    except Exception as e: # SSL errors show up here, because they've been remapped in boto
+    except Exception as e:  # SSL errors show up here, because they've been remapped in boto
       raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, str(e)))
     if key is None:
       key = self._get_key(path, validate=False)
@@ -382,7 +396,6 @@ class S3FileSystem(object):
             LOG.error(msg)
             raise S3FileSystemException(msg)
 
-
   @translate_s3_error
   @auth_error_handler
   def remove(self, path, skip_trash=True):
@@ -455,7 +468,7 @@ class S3FileSystem(object):
   def _copy(self, src, dst, recursive, use_src_basename):
     src_st = self.stats(src)
     if src_st.isDir and not recursive:
-      return # omitting directory
+      return  # omitting directory
 
     dst = s3.abspath(src, dst)
     dst_st = self._stats(dst)
@@ -513,7 +526,7 @@ class S3FileSystem(object):
       self.rmtree(old, skipTrash=True)
     else:
       raise S3FileSystemException('Destination path is same as source path, skipping the operation.')
-  
+
   @translate_s3_error
   @auth_error_handler
   def _check_key_parent_path(self, src, dst):
@@ -600,5 +613,5 @@ class S3FileSystem(object):
     self.user = user  # Only used in Cluster middleware request.fs
 
   def get_upload_chuck_size(self):
-    from hadoop.conf import UPLOAD_CHUNK_SIZE # circular dependency
+    from hadoop.conf import UPLOAD_CHUNK_SIZE  # circular dependency
     return UPLOAD_CHUNK_SIZE.get()

@@ -11,8 +11,8 @@ environment=DESKTOP_LOG_DIR="/var/log/${HUEUSER}",PYTHON_EGG_CACHE="${HUE_CONF_D
 user=${HUEUSER}
 group=${HUEUSER}
 exitcodes=0,2
-autorestart=true
-startsecs=10
+autorestart=false
+startsecs=20
 stopwaitsecs=30
 killasgroup=true
 # rlimits

@@ -82,7 +82,7 @@ const TEMPLATE = `
     <!-- ko if: window.getLastKnownConfig().has_computes && !hideLabels --><span class="editor-header-title">${I18n(
       'Active database'
     )}</span><!-- /ko -->
-    <div data-bind="component: { name: 'hue-drop-down', params: { titleName: 'Database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${I18n(
+    <div data-bind="component: { name: 'hue-drop-down', params: { dataTestId: 'editor--database-selection--dropdown', titleName: 'Database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${I18n(
       'Active database'
     )}' } }" style="display: inline-block"></div>
     <!-- /ko -->
