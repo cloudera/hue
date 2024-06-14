@@ -98,7 +98,7 @@ describe('MetricsComponent', () => {
 
     const select = screen.getByTestId('metric-select').firstElementChild;
     if (select) {
-      fireEvent.click(select);
+      fireEvent.mouseDown(select);
     }
 
     // Query for the dropdown menu which is now in the document
