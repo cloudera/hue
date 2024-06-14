@@ -32,6 +32,7 @@ import { PrimaryButton } from 'cuix/dist/components/Button';
 import Table from 'cuix/dist/components/Table';
 
 import { i18nReact } from '../../../../utils/i18nReact';
+import huePubSub from '../../../../utils/huePubSub';
 import { mkdir, touch } from '../../../../reactComponents/FileChooser/api';
 import {
   PageStats,
@@ -226,8 +227,8 @@ const StorageBrowserTable = ({
         setRefreshKey(oldKey => oldKey + 1);
       })
       .catch(error => {
-        // eslint-disable-next-line no-restricted-syntax
-        console.log(error);
+        huePubSub.publish('hue.error', error);
+        setShowNewFolderModal(false);
       })
       .finally(() => {
         setLoadingFiles(false);
@@ -241,8 +242,8 @@ const StorageBrowserTable = ({
         setRefreshKey(oldKey => oldKey + 1);
       })
       .catch(error => {
-        // eslint-disable-next-line no-restricted-syntax
-        console.log(error);
+        huePubSub.publish('hue.error', error);
+        setShowNewFileModal(false);
       })
       .finally(() => {
         setLoadingFiles(false);

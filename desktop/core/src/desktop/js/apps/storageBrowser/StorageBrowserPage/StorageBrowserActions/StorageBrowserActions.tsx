@@ -41,10 +41,11 @@ const StorageBrowserActions = ({ selectedFiles }: StorageBrowserRowActionsProps)
   const { t } = i18nReact.useTranslation();
 
   const isSummaryEnabled = () => {
+    const selectedFile = selectedFiles[0];
     return (
       selectedFiles.length == 1 &&
-      (isHDFS(selectedFiles[0].path) || isOFS(selectedFiles[0].path)) &&
-      selectedFiles[0].type === 'file'
+      (isHDFS(selectedFile.path) || isOFS(selectedFile.path)) &&
+      selectedFile.type === 'file'
     );
   };
 
@@ -74,8 +75,8 @@ const StorageBrowserActions = ({ selectedFiles }: StorageBrowserRowActionsProps)
         }}
         trigger={['click', 'hover']}
       >
-        <Button onClick={e => e.stopPropagation()} data-event="">
-          Actions
+        <Button data-event="">
+          {t('Actions')}
           <DropDownIcon />
         </Button>
       </Dropdown>
