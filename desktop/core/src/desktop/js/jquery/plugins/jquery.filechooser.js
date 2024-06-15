@@ -874,7 +874,7 @@ function initUploader(path, _parent, el, labels) {
           }
         },
         onSubmit: function (id, fileName) {
-          let newPath =
+          const newPath =
             '/filebrowser/upload/chunks/file?dest=' + encodeURIComponent(path.normalize('NFC'));
           this.setEndpoint(newPath);
           num_of_pending_uploads++;

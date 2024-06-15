@@ -14,26 +14,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
+import shutil
 import logging
 import subprocess
-import os
-
-import shutil
-import psutil
 from datetime import datetime, timedelta
 
-from celery.utils.log import get_task_logger
+import pytz
+import psutil
 from celery import states
-from django.db import transaction
+from celery.utils.log import get_task_logger
 from django.http import HttpRequest
 from django.utils import timezone
 
 from desktop.auth.backend import rewrite_user
 from desktop.celery import app
-from desktop.conf import TASK_SERVER
+from desktop.conf import TASK_SERVER_V2
 from desktop.lib import fsmanager
-from useradmin.models import User
+from filebrowser.utils import release_reserved_space_for_file_uploads, reserve_space_for_file_uploads
+
+if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
+  from desktop.management.commands.rungunicornserver import initialize_free_disk_space_in_redis
+  from desktop.settings import TIME_ZONE
+  from filebrowser.utils import parse_broker_url
 from filebrowser.views import UPLOAD_CLASSES
+from useradmin.models import User
 
 LOG_TASK = get_task_logger(__name__)
 LOG = logging.getLogger()
@@ -52,14 +57,17 @@ STATE_MAP = {
   states.IGNORED: 'ignored'
 }
 
+
 @app.task
 def error_handler(request, exc, traceback):
   print('Task {0} raised exception: {1!r}\n{2!r}'.format(
     request.id, exc, traceback))
 
+
 @app.task()
 def upload_file_task(**kwargs):
   task_id = kwargs.get("qquuid")
+  file_size = kwargs.get("qqtotalfilesize")
   user_id = kwargs["user_id"]
   scheme = kwargs["scheme"]
   postdict = kwargs.get("postdict", None)
@@ -67,9 +75,16 @@ def upload_file_task(**kwargs):
   kwargs["username"] = request.user.username
   kwargs["task_name"] = "fileupload"
   kwargs["state"] = "STARTED"
-  now = timezone.now()
-  kwargs["task_start"] = now.strftime("%Y-%m-%dT%H:%M:%S")
+  kwargs["task_start"] = timezone.now().astimezone(pytz.timezone(TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
+  kwargs["started"] = timezone.now().astimezone(pytz.timezone(TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
   upload_file_task.update_state(task_id=task_id, state='STARTED', meta=kwargs)
+
+  # Reserve space for upload
+  if not reserve_space_for_file_uploads(task_id, file_size):
+    kwargs["state"] = "FAILURE"
+    upload_file_task.update_state(task_id=task_id, state='FAILURE', meta=kwargs)
+    raise Exception("Insufficient space for upload")
+
   try:
     upload_class = UPLOAD_CLASSES.get(kwargs["scheme"])
     _fs = upload_class(request, args=[], **kwargs)
@@ -82,10 +97,12 @@ def upload_file_task(**kwargs):
     raise Exception(f"Upload failed %s" % err)
 
   kwargs["state"] = "SUCCESS"
-  kwargs["started"] = now.strftime("%Y-%m-%dT%H:%M:%S")
-  kwargs["task_end"] = now.strftime("%Y-%m-%dT%H:%M:%S")
+  kwargs["task_end"] = timezone.now().astimezone(pytz.timezone(TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S.%f")
+  kwargs["progress"] = "100%"
   upload_file_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
+  release_reserved_space_for_file_uploads(task_id)
   return None
+
 
 def _get_request(postdict=None, user_id=None, scheme=None):
   request = HttpRequest()
@@ -100,11 +117,11 @@ def _get_request(postdict=None, user_id=None, scheme=None):
 
   return request
 
+
 @app.task()
 def document_cleanup_task(**kwargs):
   keep_days = kwargs.get('keep_days')
   task_id = kwargs.get("qquuid")
-  now = timezone.now()
 
   kwargs["username"] = kwargs["username"]
   kwargs["task_name"] = "document_cleanup"
@@ -112,7 +129,7 @@ def document_cleanup_task(**kwargs):
   kwargs["parameters"] = keep_days
   kwargs["task_id"] = task_id
   kwargs["progress"] = "0%"
-  kwargs["task_start"] = now.strftime("%Y-%m-%dT%H:%M:%S")
+  kwargs["task_start"] = timezone.now().astimezone(pytz.timezone(TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S")
 
   try:
     INSTALL_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..'))
@@ -121,63 +138,109 @@ def document_cleanup_task(**kwargs):
     kwargs["state"] = "SUCCESS"
     LOG.info(f"Document_cleanup_task completed successfully.")
   except Exception as err:
+    kwargs["state"] = "FAILURE"
     document_cleanup_task.update_state(task_id=task_id, state='FAILURE', meta=kwargs)
     raise Exception(f"Upload failed %s" % err)
 
   kwargs["state"] = "SUCCESS"
   kwargs["progress"] = "100%"
-  kwargs["task_end"] = now.strftime("%Y-%m-%dT%H:%M:%S")
+  kwargs["task_end"] = timezone.now().astimezone(pytz.timezone(TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S.%f")
   document_cleanup_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
 
   return None
 
+
 @app.task()
 def check_disk_usage_and_clean_task(**kwargs):
   task_id = kwargs.get("qquuid")
-  default_cleanup_threshold = 90
-  cleanup_threshold = kwargs.get('cleanup_threshold', default_cleanup_threshold)
+  cleanup_threshold = kwargs.get('cleanup_threshold', TASK_SERVER_V2.DISK_USAGE_CLEANUP_THRESHOLD)
   username = kwargs.get("username", "celery_scheduler")
-  now = timezone.now()
+  now = timezone.now().astimezone(pytz.timezone(TIME_ZONE))
   kwargs = {
     "username": username,
     "task_name": "tmp_cleanup",
     "task_id": task_id,
     "parameters": cleanup_threshold,
     "progress": "0%",
-    "task_start": now.strftime("%Y-%m-%dT%H:%M:%S")
+    "task_start": now.strftime("%Y-%m-%dT%H:%M:%S.%f"),
   }
+
+  check_disk_usage_and_clean_task.update_state(task_id=task_id, state=states.STARTED, meta=kwargs)
+
+  def delete_old_files(directory, current_time, time_delta):
+    for root, dirs, files in os.walk(directory):
+      for file in files:
+        file_path = os.path.join(root, file)
+        try:
+          file_modified_time = datetime.fromtimestamp(os.path.getmtime(file_path))
+          file_modified_time = timezone.make_aware(file_modified_time, timezone.get_default_timezone())
+          if file_modified_time < current_time - time_delta:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+              os.unlink(file_path)
+              LOG.info(f"Deleted file {file_path}")
+        except PermissionError:
+          LOG.warning(f"Permission denied: unable to delete {file_path}")
+        except Exception as err:
+          check_disk_usage_and_clean_task.update_state(task_id=task_id, state=states.FAILURE, meta=kwargs)
+          raise Exception(f"Failed to delete {file_path}. Reason: {err}")
+        finally:
+          kwargs["task_end"] = timezone.now().astimezone(pytz.timezone(TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S.%f")
 
   disk_usage = psutil.disk_usage('/')
   if disk_usage.percent >= int(cleanup_threshold):
     LOG.info(f"Disk usage is above {cleanup_threshold}%, cleaning up /tmp directory...")
     tmp_dir = '/tmp'
-    for filename in os.listdir(tmp_dir):
-      file_path = os.path.join(tmp_dir, filename)
-      try:
-        file_modified_time = datetime.fromtimestamp(os.path.getmtime(file_path))
-        # Make file_modified_time timezone-aware
-        file_modified_time = timezone.make_aware(file_modified_time, timezone.get_default_timezone())
-        if file_modified_time < now - timedelta(minutes=15):
-          if os.path.isfile(file_path) or os.path.islink(file_path):
-            os.unlink(file_path)
-          elif os.path.isdir(file_path):
-            shutil.rmtree(file_path)
-          LOG.info(f"Deleted {file_path}")
-      except PermissionError:
-        LOG.warning(f"Permission denied: unable to delete {file_path}")
-      except Exception as err:
-        check_disk_usage_and_clean_task.update_state(task_id=task_id, state='FAILURE', meta=kwargs)
-        raise Exception(f"Failed to delete {file_path}. Reason: {err}")
-
+    delete_old_files(tmp_dir, now, timedelta(minutes=TASK_SERVER_V2.DISK_USAGE_AND_CLEAN_TASK_TIME_DELTA.get()))
     kwargs["progress"] = "100%"
-    check_disk_usage_and_clean_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
+    kwargs["task_end"] = timezone.now().astimezone(pytz.timezone(TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S.%f")
+    check_disk_usage_and_clean_task.update_state(task_id=task_id, state=states.SUCCESS, meta=kwargs)
     LOG.info("/tmp directory cleaned.")
-
   else:
     kwargs["progress"] = "100%"
-    check_disk_usage_and_clean_task.update_state(task_id=task_id, state='SUCCESS', meta=kwargs)
+    kwargs["task_end"] = timezone.now().astimezone(pytz.timezone(TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S.%f")
+    check_disk_usage_and_clean_task.update_state(task_id=task_id, state=states.SUCCESS, meta=kwargs)
     LOG.info(f"Disk usage is {disk_usage.percent}%, no need to clean up.")
 
   # Get available disk space after cleanup
   free_space = psutil.disk_usage('/tmp').free
   return {'free_space': free_space}
+
+
+@app.task()
+def cleanup_stale_uploads(**kwargs):
+  timedelta_minutes = kwargs.get("timeout_minutes", TASK_SERVER_V2.CLEANUP_STALE_UPLOADS_TASK_TIME_DELTA.get())
+  username = kwargs.get("username", "celery_scheduler")
+  task_id = kwargs.get("qquuid")
+  kwargs = {
+    "username": username,
+    "task_name": "cleanup_stale_uploads",
+    "task_id": task_id,
+    "parameters": timedelta_minutes,
+    "progress": "0%",
+    "task_start": timezone.now().astimezone(pytz.timezone(TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S"),
+  }
+  cleanup_stale_uploads.update_state(task_id=task_id, state=states.STARTED, meta=kwargs)
+  redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
+  try:
+    current_time = int(datetime.now().timestamp())
+
+    for key in redis_client.scan_iter('upload__*'):
+      timestamp_key = f'{key.decode()}_timestamp'
+      timestamp = redis_client.get(timestamp_key)
+
+      if timestamp:
+        timestamp = int(timestamp)
+        if current_time - timestamp > timedelta_minutes * 60:
+          file_size = int(redis_client.get(key))
+          redis_client.incrby('upload_available_space', file_size)
+          redis_client.delete(key)
+          redis_client.delete(timestamp_key)
+    initialize_free_disk_space_in_redis()
+    kwargs["progress"] = "100%"
+    kwargs["task_end"] = timezone.now().astimezone(pytz.timezone(TIME_ZONE)).strftime("%Y-%m-%dT%H:%M:%S.%f")
+    cleanup_stale_uploads.update_state(task_id=task_id, state=states.SUCCESS, meta=kwargs)
+  except Exception as e:
+    cleanup_stale_uploads.update_state(task_id=task_id, state=states.FAILURE, meta={"error": str(e)})
+    LOG.exception("Failed to cleanup stale uploads: %s", str(e))
+  finally:
+    redis_client.close()

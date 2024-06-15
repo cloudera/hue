@@ -25,7 +25,7 @@ interface BreadcrumbProps {
   onFilepathChange: (path: string) => void;
 }
 
-const Breadcrumb: React.FC<BreadcrumbProps> = ({ label, url, onFilepathChange }) => {
+const Breadcrumb = ({ label, url, onFilepathChange }: BreadcrumbProps): JSX.Element => {
   const handleFilepathChange = () => {
     onFilepathChange(url);
   };

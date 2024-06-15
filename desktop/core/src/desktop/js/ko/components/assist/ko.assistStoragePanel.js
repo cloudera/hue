@@ -85,7 +85,7 @@ const TEMPLATE = `
       <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.storage.refresh'); }" title="${I18n(
         'Manual refresh'
-      )}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
+      )}"><i class="pointer fa fa-refresh" data-testid="assist-sql--refresh--button" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
 
@@ -133,7 +133,7 @@ const TEMPLATE = `
   <div class="assist-flex-search">
     <div class="assist-filter">
       <form autocomplete="off">
-        <input class="clearable" type="text" placeholder="${I18n(
+        <input class="clearable" data-testid="assist-files--filter--input" type="text" placeholder="${I18n(
           'Filter...'
         )}" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS }
         data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>

@@ -16,40 +16,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import json
-import pytest
-import sys
+from builtins import object
 from datetime import datetime
+from unittest.mock import patch
 
+import pytest
 from django.core import management
 from django.db.utils import OperationalError
 
-from beeswax.models import SavedQuery
 from beeswax.design import hql_query
-from notebook.models import import_saved_beeswax_query
-from useradmin.models import get_default_user_group, User
-
-from filebrowser.conf import REMOTE_STORAGE_HOME
-
-from desktop.conf import has_connectors, RAZ
+from beeswax.models import SavedQuery
+from desktop.conf import RAZ, has_connectors
 from desktop.converters import DocumentConverter
 from desktop.lib.connectors.models import Connector
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document2, Document, Document2Permission, ClusterConfig, get_remote_home_storage
+from desktop.models import ClusterConfig, Directory, Document, Document2, Document2Permission, get_remote_home_storage
+from filebrowser.conf import REMOTE_STORAGE_HOME
+from notebook.models import import_saved_beeswax_query
+from useradmin.models import User, get_default_user_group
 
 try:
   from oozie.models2 import Workflow
+
   has_oozie = True
 except RuntimeError:
   has_oozie = False
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
 
 class MockFs(object):
@@ -59,7 +53,6 @@ class MockFs(object):
 
 @pytest.mark.django_db
 class TestClusterConfig(object):
-
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
@@ -77,7 +70,6 @@ class TestClusterConfig(object):
 
         ClusterConfig(user=self.user)
 
-
   def test_get_main_quick_action(self):
     with patch('desktop.models.get_user_preferences') as get_user_preferences:
       get_user_preferences.return_value = json.dumps({'app': 'editor', 'interpreter': 1})
@@ -87,13 +79,22 @@ class TestClusterConfig(object):
 
       assert {'type': 1, 'name': 'SQL'}, main_app
 
-
   def test_get_remote_storage_home(self):
-    # When default home ends with /user in RAZ ADLS env.
-    resets = [
-      RAZ.IS_ENABLED.set_for_testing(True),
-      REMOTE_STORAGE_HOME.set_for_testing('abfs://gethue-container/user')
-    ]
+    # When REMOTE_STORAGE_HOME is set.
+    resets = [REMOTE_STORAGE_HOME.set_for_testing('hdfs://gethue/dir')]
+
+    try:
+      remote_home_storage = get_remote_home_storage(self.user)
+      assert remote_home_storage == 'hdfs://gethue/dir'
+
+      remote_home_storage = get_remote_home_storage(self.user_not_me)
+      assert remote_home_storage == 'hdfs://gethue/dir'
+    finally:
+      for reset in resets:
+        reset()
+
+    # When REMOTE_STORAGE_HOME is set and ends with /user in RAZ environment.
+    resets = [RAZ.IS_ENABLED.set_for_testing(True), REMOTE_STORAGE_HOME.set_for_testing('abfs://gethue-container/user')]
 
     try:
       remote_home_storage = get_remote_home_storage(self.user)
@@ -105,34 +106,15 @@ class TestClusterConfig(object):
       for reset in resets:
         reset()
 
-    # When default home ends with /user in RAZ S3 env.
-    resets = [
-      RAZ.IS_ENABLED.set_for_testing(True),
-      REMOTE_STORAGE_HOME.set_for_testing('s3a://gethue-bucket/user')
-    ]
+    # When REMOTE_STORAGE_HOME is not set.
+    resets = [REMOTE_STORAGE_HOME.set_for_testing(None)]
 
     try:
       remote_home_storage = get_remote_home_storage(self.user)
-      assert remote_home_storage == 's3a://gethue-bucket/user/test'
+      assert remote_home_storage is None
 
       remote_home_storage = get_remote_home_storage(self.user_not_me)
-      assert remote_home_storage == 's3a://gethue-bucket/user/test_not_me'
-    finally:
-      for reset in resets:
-        reset()
-
-    # When default home does not ends with /user in RAZ env
-    resets = [
-      RAZ.IS_ENABLED.set_for_testing(True),
-      REMOTE_STORAGE_HOME.set_for_testing('abfs://gethue-container')
-    ]
-
-    try:
-      remote_home_storage = get_remote_home_storage(self.user)
-      assert remote_home_storage == 'abfs://gethue-container'
-
-      remote_home_storage = get_remote_home_storage(self.user_not_me)
-      assert remote_home_storage == 'abfs://gethue-container'
+      assert remote_home_storage is None
     finally:
       for reset in resets:
         reset()
@@ -140,7 +122,6 @@ class TestClusterConfig(object):
 
 @pytest.mark.django_db
 class TestDocument2(object):
-
   def setup_method(self):
     self.client = make_logged_in_client(username="doc2", groupname="doc2", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="doc2")
@@ -152,10 +133,8 @@ class TestDocument2(object):
 
     self.home_dir = Document2.objects.get_home_directory(user=self.user)
 
-
   def test_trash_directory(self):
     assert Directory.objects.filter(owner=self.user, name=Document2.TRASH_DIR, type='directory').exists()
-
 
   def test_document_create(self):
     sql = 'SELECT * FROM sample_07'
@@ -166,11 +145,7 @@ class TestDocument2(object):
     # is_trashed
     # is_redacted
     old_query = SavedQuery.objects.create(
-        type=SavedQuery.TYPES_MAPPING['hql'],
-        owner=self.user,
-        data=design.dumps(),
-        name='See examples',
-        desc='Example of old format'
+      type=SavedQuery.TYPES_MAPPING['hql'], owner=self.user, data=design.dumps(), name='See examples', desc='Example of old format'
     )
 
     try:
@@ -190,7 +165,6 @@ class TestDocument2(object):
       assert [] == new_query_data['snippets'][0]['properties']['functions']
     finally:
       old_query.delete()
-
 
   def test_get_document(self):
     doc = Document2.objects.create(name='test_doc', type='query-hive', owner=self.user, data={})
@@ -216,11 +190,9 @@ class TestDocument2(object):
     data = json.loads(response.content)
     assert doc.uuid == data['document']['uuid']
 
-
   def test_directory_create_and_rename(self):
     response = self.client.post(
-        '/desktop/api2/doc/mkdir',
-        {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps('test_mkdir')}
+      '/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps('test_mkdir')}
     )
     data = json.loads(response.content)
 
@@ -229,13 +201,11 @@ class TestDocument2(object):
     assert data['directory']['name'] == 'test_mkdir', data
     assert data['directory']['type'] == 'directory', data
 
-    response = self.client.post('/desktop/api2/doc/update', {'uuid': json.dumps(data['directory']['uuid']),
-                                                             'name': 'updated'})
+    response = self.client.post('/desktop/api2/doc/update', {'uuid': json.dumps(data['directory']['uuid']), 'name': 'updated'})
 
     data = json.loads(response.content)
     assert 0 == data['status']
     assert 'updated' == data['document']['name'], data
-
 
   def test_file_move(self):
     source_dir = Directory.objects.create(name='test_mv_file_src', owner=self.user, parent_directory=self.home_dir)
@@ -252,10 +222,9 @@ class TestDocument2(object):
     data = json.loads(response.content)
     assert '/test_mv_file_src/query1.sql' == data['document']['path']
 
-    response = self.client.post('/desktop/api2/doc/move', {
-        'source_doc_uuid': json.dumps(doc.uuid),
-        'destination_doc_uuid': json.dumps(target_dir.uuid)
-    })
+    response = self.client.post(
+      '/desktop/api2/doc/move', {'source_doc_uuid': json.dumps(doc.uuid), 'destination_doc_uuid': json.dumps(target_dir.uuid)}
+    )
     data = json.loads(response.content)
     assert 0 == data['status'], data
 
@@ -277,18 +246,10 @@ class TestDocument2(object):
       pytest.skip("Skipping Test")
 
     workflow_doc = Document2.objects.create(
-        name='Copy Test',
-        type='oozie-workflow2',
-        owner=self.user,
-        data={},
-        parent_directory=self.home_dir
+      name='Copy Test', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir
     )
     Document.objects.link(
-      workflow_doc,
-      owner=workflow_doc.owner,
-      name=workflow_doc.name,
-      description=workflow_doc.description,
-      extra='workflow2'
+      workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2'
     )
 
     workflow = Workflow(user=self.user)
@@ -313,9 +274,7 @@ class TestDocument2(object):
         ProxyFS.real_copy_remote_dir = ProxyFS.copy_remote_dir
 
       ProxyFS.copy_remote_dir = copy_remote_dir
-      response = self.client.post('/desktop/api2/doc/copy', {
-        'uuid': json.dumps(workflow_doc.uuid)
-      })
+      response = self.client.post('/desktop/api2/doc/copy', {'uuid': json.dumps(workflow_doc.uuid)})
     finally:
       Workflow.check_workspace = Workflow.real_check_workspace
       ProxyFS.copy_remote_dir = ProxyFS.real_copy_remote_dir
@@ -333,7 +292,6 @@ class TestDocument2(object):
     assert copy_doc.uuid != workflow_doc.uuid
     assert copy_workflow.get_data()['workflow']['uuid'] != workflow.get_data()['workflow']['uuid']
 
-
   def test_directory_move(self):
     source_dir = Directory.objects.create(name='test_mv', owner=self.user, parent_directory=self.home_dir)
     target_dir = Directory.objects.create(name='test_mv_dst', owner=self.user, parent_directory=self.home_dir)
@@ -348,10 +306,13 @@ class TestDocument2(object):
     data = json.loads(response.content)
     assert '/test_mv/query1.sql' == data['document']['path']
 
-    response = self.client.post('/desktop/api2/doc/move', {
+    response = self.client.post(
+      '/desktop/api2/doc/move',
+      {
         'source_doc_uuid': json.dumps(Directory.objects.get(owner=self.user, name='test_mv').uuid),
-        'destination_doc_uuid': json.dumps(Directory.objects.get(owner=self.user, name='test_mv_dst').uuid)
-    })
+        'destination_doc_uuid': json.dumps(Directory.objects.get(owner=self.user, name='test_mv_dst').uuid),
+      },
+    )
     data = json.loads(response.content)
     assert 0 == data['status'], data
 
@@ -363,7 +324,6 @@ class TestDocument2(object):
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
     assert '/test_mv_dst/test_mv/query1.sql' == data['document']['path']
-
 
   def test_directory_children(self):
     # Creates 2 directories and 2 queries and saves to home directory
@@ -404,15 +364,9 @@ class TestDocument2(object):
     assert 5 == data['count']
     assert 2 == len(data['children'])
 
-
   def test_update_document(self):
     doc = Document2.objects.create(
-      name='initial',
-      description='initial desc',
-      type='query-hive',
-      owner=self.user,
-      data={},
-      parent_directory=self.home_dir
+      name='initial', description='initial desc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir
     )
 
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
@@ -422,10 +376,9 @@ class TestDocument2(object):
     assert 'query-hive' == data['document']['type']
 
     # Update document's name and description
-    response = self.client.post('/desktop/api2/doc/update', {'uuid': json.dumps(doc.uuid),
-                                                             'name': 'updated',
-                                                             'description': 'updated desc',
-                                                             'type': 'bogus-type'})
+    response = self.client.post(
+      '/desktop/api2/doc/update', {'uuid': json.dumps(doc.uuid), 'name': 'updated', 'description': 'updated desc', 'type': 'bogus-type'}
+    )
     data = json.loads(response.content)
     assert 0 == data['status']
     assert 'document' in data, data
@@ -433,7 +386,6 @@ class TestDocument2(object):
     assert 'updated desc' == data['document']['description'], data
     # Non-whitelisted attributes should remain unchanged
     assert 'query-hive' == data['document']['type'], data
-
 
   def test_document_trash(self):
     # Create document under home and directory under home with child document
@@ -492,17 +444,11 @@ class TestDocument2(object):
     assert 1 == data['count']
     assert Document2.TRASH_DIR in [f['name'] for f in data['children']]
 
-
   def test_get_history(self):
     history = Document2.objects.get_history(user=self.user, doc_type='query-hive')
     assert not history.filter(name='test_get_history').exists()
 
-    query = Document2.objects.create(
-        name='test_get_history',
-        type='query-hive',
-        owner=self.user,
-        is_history=True
-    )
+    query = Document2.objects.create(name='test_get_history', type='query-hive', owner=self.user, is_history=True)
 
     try:
       history = Document2.objects.get_history(user=self.user, doc_type='query-hive')
@@ -510,20 +456,10 @@ class TestDocument2(object):
     finally:
       query.delete()
 
-
   def test_get_history_with_connector(self):
-    connector = Connector.objects.create(
-        name='MySql',
-        dialect='mysql'
-    )
+    connector = Connector.objects.create(name='MySql', dialect='mysql')
 
-    query = Document2.objects.create(
-        name='test_get_history',
-        type='query-hive',
-        owner=self.user,
-        is_history=False,
-        connector=connector
-    )
+    query = Document2.objects.create(name='test_get_history', type='query-hive', owner=self.user, is_history=False, connector=connector)
 
     try:
       history = Document2.objects.get_history(user=self.user, doc_type='query-hive', connector_id=connector.id)
@@ -538,35 +474,30 @@ class TestDocument2(object):
       query.delete()
       connector.delete()
 
-
   def test_validate_immutable_user_directories(self):
     # Test that home and Trash directories cannot be recreated or modified
     test_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
     response = self.client.post(
-        '/desktop/api2/doc/mkdir',
-        {'parent_uuid': json.dumps(test_dir.uuid), 'name': json.dumps(Document2.TRASH_DIR)}
+      '/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(test_dir.uuid), 'name': json.dumps(Document2.TRASH_DIR)}
     )
     data = json.loads(response.content)
     assert -1 == data['status'], data
     assert 'Cannot create or modify directory with name: .Trash' == data['message']
 
-    response = self.client.post('/desktop/api2/doc/move', {
-        'source_doc_uuid': json.dumps(self.home_dir.uuid),
-        'destination_doc_uuid': json.dumps(test_dir.uuid)
-    })
+    response = self.client.post(
+      '/desktop/api2/doc/move', {'source_doc_uuid': json.dumps(self.home_dir.uuid), 'destination_doc_uuid': json.dumps(test_dir.uuid)}
+    )
     data = json.loads(response.content)
     assert -1 == data['status'], data
     assert 'Cannot create or modify directory with name: ' == data['message']
 
     trash_dir = Directory.objects.get(name=Document2.TRASH_DIR, owner=self.user)
-    response = self.client.post('/desktop/api2/doc/move', {
-        'source_doc_uuid': json.dumps(trash_dir.uuid),
-        'destination_doc_uuid': json.dumps(test_dir.uuid)
-    })
+    response = self.client.post(
+      '/desktop/api2/doc/move', {'source_doc_uuid': json.dumps(trash_dir.uuid), 'destination_doc_uuid': json.dumps(test_dir.uuid)}
+    )
     data = json.loads(response.content)
     assert -1 == data['status'], data
     assert 'Cannot create or modify directory with name: .Trash' == data['message']
-
 
   def test_validate_circular_directory(self):
     # Test that saving a document with cycle raises an error, i.e. - This should fail:
@@ -576,50 +507,45 @@ class TestDocument2(object):
     c_dir = Directory.objects.create(name='c', owner=self.user)
     b_dir = Directory.objects.create(name='b', owner=self.user, parent_directory=c_dir)
     a_dir = Directory.objects.create(name='a', owner=self.user, parent_directory=b_dir)
-    response = self.client.post('/desktop/api2/doc/move', {
-        'source_doc_uuid': json.dumps(c_dir.uuid),
-        'destination_doc_uuid': json.dumps(a_dir.uuid)
-    })
+    response = self.client.post(
+      '/desktop/api2/doc/move', {'source_doc_uuid': json.dumps(c_dir.uuid), 'destination_doc_uuid': json.dumps(a_dir.uuid)}
+    )
     data = json.loads(response.content)
     assert -1 == data['status'], data
     assert 'circular dependency' in data['message'], data
 
     # Test simple case where directory is saved to self as parent
     dir = Directory.objects.create(name='dir', owner=self.user)
-    response = self.client.post('/desktop/api2/doc/move', {
-      'source_doc_uuid': json.dumps(dir.uuid),
-      'destination_doc_uuid': json.dumps(dir.uuid)
-    })
+    response = self.client.post(
+      '/desktop/api2/doc/move', {'source_doc_uuid': json.dumps(dir.uuid), 'destination_doc_uuid': json.dumps(dir.uuid)}
+    )
     data = json.loads(response.content)
     assert -1 == data['status'], data
     assert 'circular dependency' in data['message'], data
-
 
   def test_api_get_data(self):
     doc_data = {'info': 'hello', 'is_history': False}
     doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data=json.dumps(doc_data))
     doc_data.update({'id': doc.id, 'uuid': doc.uuid})
 
-    response = self.client.get('/desktop/api2/doc/', {
+    response = self.client.get(
+      '/desktop/api2/doc/',
+      {
         'uuid': doc.uuid,
-    })
+      },
+    )
     data = json.loads(response.content)
 
     assert 'document' in data, data
     assert not data['data'], data
 
-    response = self.client.get('/desktop/api2/doc/', {
-        'uuid': doc.uuid,
-        'data': 'true'
-    })
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid, 'data': 'true'})
     data = json.loads(response.content)
 
     assert 'data' in data, data
     assert data['data'] == doc_data
 
-
   def test_is_trashed_migration(self):
-
     # Skipping to prevent failing tests in TestOozieSubmissions
     pytest.skip("Skipping Test")
 
@@ -720,13 +646,12 @@ class TestDocument2(object):
 
 @pytest.mark.django_db
 class TestDocument2Permissions(object):
-
   def setup_method(self):
     self.default_group = get_default_user_group()
 
     self.client = make_logged_in_client(username="perm_user", groupname=self.default_group.name, recreate=True, is_superuser=False)
     self.client_not_me = make_logged_in_client(
-        username="not_perm_user", groupname=self.default_group.name, recreate=True, is_superuser=False
+      username="not_perm_user", groupname=self.default_group.name, recreate=True, is_superuser=False
     )
 
     self.user = User.objects.get(username="perm_user")
@@ -742,7 +667,6 @@ class TestDocument2Permissions(object):
 
     self.home_dir = Document2.objects.get_home_directory(user=self.user)
 
-
   def test_default_permissions(self):
     # Tests that for a new doc by default, read/write perms are set to no users and no groups
     new_doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -751,16 +675,13 @@ class TestDocument2Permissions(object):
     data = json.loads(response.content)
     assert new_doc.uuid == data['document']['uuid'], data
     assert 'perms' in data['document']
-    assert (
-        {
-          'read': {'users': [], 'groups': []},
-          'write': {'users': [], 'groups': []},
-          'link_read': False,
-          'link_sharing_on': False,
-          'link_write': False,
-        } ==
-        data['document']['perms'])
-
+    assert {
+      'read': {'users': [], 'groups': []},
+      'write': {'users': [], 'groups': []},
+      'link_read': False,
+      'link_sharing_on': False,
+      'link_write': False,
+    } == data['document']['perms']
 
   def test_share_document_read_by_user(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -776,22 +697,24 @@ class TestDocument2Permissions(object):
     assert -1 == data['status']
 
     # Share read perm by users
-    response = self.client.post("/desktop/api2/doc/share", {
-      'uuid': json.dumps(doc.uuid),
-      'data': json.dumps({
-        'read': {
-          'user_ids': [
-            self.user.id,
-            self.user_not_me.id
-          ],
-          'group_ids': [],
-        },
-        'write': {
-          'user_ids': [],
-          'group_ids': [],
-        }
-      })
-    })
+    response = self.client.post(
+      "/desktop/api2/doc/share",
+      {
+        'uuid': json.dumps(doc.uuid),
+        'data': json.dumps(
+          {
+            'read': {
+              'user_ids': [self.user.id, self.user_not_me.id],
+              'group_ids': [],
+            },
+            'write': {
+              'user_ids': [],
+              'group_ids': [],
+            },
+          }
+        ),
+      },
+    )
 
     assert 0 == json.loads(response.content)['status'], response.content
     assert doc.can_read(self.user)
@@ -805,41 +728,46 @@ class TestDocument2Permissions(object):
     assert doc.uuid == data['document']['uuid'], data
 
     # other user can share document with read permissions
-    response = self.client_not_me.post("/desktop/api2/doc/share", {
-      'uuid': json.dumps(doc.uuid),
-      'data': json.dumps({
-        'read': {
-          'user_ids': [],
-          'group_ids': [
-            self.default_group.id
-          ],
-        },
-        'write': {
-          'user_ids': [],
-          'group_ids': [],
-        }
-      })
-    })
+    response = self.client_not_me.post(
+      "/desktop/api2/doc/share",
+      {
+        'uuid': json.dumps(doc.uuid),
+        'data': json.dumps(
+          {
+            'read': {
+              'user_ids': [],
+              'group_ids': [self.default_group.id],
+            },
+            'write': {
+              'user_ids': [],
+              'group_ids': [],
+            },
+          }
+        ),
+      },
+    )
     assert 0 == json.loads(response.content)['status'], response.content
 
     # other user cannot share document with write permissions
-    response = self.client_not_me.post("/desktop/api2/doc/share", {
-      'uuid': json.dumps(doc.uuid),
-      'data': json.dumps({
-        'read': {
-          'user_ids': [],
-          'group_ids': [],
-        },
-        'write': {
-          'user_ids': [],
-          'group_ids': [
-            self.default_group.id
-          ],
-        }
-      })
-    })
+    response = self.client_not_me.post(
+      "/desktop/api2/doc/share",
+      {
+        'uuid': json.dumps(doc.uuid),
+        'data': json.dumps(
+          {
+            'read': {
+              'user_ids': [],
+              'group_ids': [],
+            },
+            'write': {
+              'user_ids': [],
+              'group_ids': [self.default_group.id],
+            },
+          }
+        ),
+      },
+    )
     assert -1 == json.loads(response.content)['status'], response.content
-
 
   def test_share_document_read_by_group(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -854,23 +782,15 @@ class TestDocument2Permissions(object):
     data = json.loads(response.content)
     assert -1 == data['status']
 
-    response = self.client.post("/desktop/api2/doc/share", {
-      'uuid': json.dumps(doc.uuid),
-      'data': json.dumps({
-        'read': {
-          'user_ids': [
-            self.user.id
-          ],
-          'group_ids': [
-            self.default_group.id
-          ]
-        },
-        'write': {
-          'user_ids': [],
-          'group_ids': []
-        }
-      })
-    })
+    response = self.client.post(
+      "/desktop/api2/doc/share",
+      {
+        'uuid': json.dumps(doc.uuid),
+        'data': json.dumps(
+          {'read': {'user_ids': [self.user.id], 'group_ids': [self.default_group.id]}, 'write': {'user_ids': [], 'group_ids': []}}
+        ),
+      },
+    )
 
     assert 0 == json.loads(response.content)['status'], response.content
     assert doc.can_read(self.user)
@@ -883,7 +803,6 @@ class TestDocument2Permissions(object):
     data = json.loads(response.content)
     assert doc.uuid == data['document']['uuid'], data
 
-
   def test_share_document_write_by_user(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
 
@@ -893,23 +812,15 @@ class TestDocument2Permissions(object):
     assert -1 == data['status']
 
     # Share write perm by user
-    response = self.client.post("/desktop/api2/doc/share", {
-      'uuid': json.dumps(doc.uuid),
-      'data': json.dumps({
-        'read': {
-          'user_ids': [
-            self.user.id
-          ],
-          'group_ids': []
-        },
-        'write': {
-          'user_ids': [
-            self.user_not_me.id
-          ],
-          'group_ids': []
-        }
-      })
-    })
+    response = self.client.post(
+      "/desktop/api2/doc/share",
+      {
+        'uuid': json.dumps(doc.uuid),
+        'data': json.dumps(
+          {'read': {'user_ids': [self.user.id], 'group_ids': []}, 'write': {'user_ids': [self.user_not_me.id], 'group_ids': []}}
+        ),
+      },
+    )
 
     assert 0 == json.loads(response.content)['status'], response.content
     assert doc.can_read(self.user)
@@ -921,7 +832,6 @@ class TestDocument2Permissions(object):
     response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
     data = json.loads(response.content)
     assert 0 == data['status']
-
 
   def test_share_document_write_by_group(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -932,23 +842,15 @@ class TestDocument2Permissions(object):
     assert -1 == data['status']
 
     # Share write perm by group
-    response = self.client.post("/desktop/api2/doc/share", {
-      'uuid': json.dumps(doc.uuid),
-      'data': json.dumps({
-        'read': {
-          'user_ids': [
-            self.user.id
-          ],
-          'group_ids': []
-        },
-        'write': {
-          'user_ids': [],
-          'group_ids': [
-            self.default_group.id
-          ]
-        }
-      })
-    })
+    response = self.client.post(
+      "/desktop/api2/doc/share",
+      {
+        'uuid': json.dumps(doc.uuid),
+        'data': json.dumps(
+          {'read': {'user_ids': [self.user.id], 'group_ids': []}, 'write': {'user_ids': [], 'group_ids': [self.default_group.id]}}
+        ),
+      },
+    )
 
     assert 0 == json.loads(response.content)['status'], response.content
     assert doc.can_read(self.user)
@@ -960,7 +862,6 @@ class TestDocument2Permissions(object):
     response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
     data = json.loads(response.content)
     assert 0 == data['status']
-
 
   def test_share_directory(self):
     # Test that updating the permissions for a directory updates all nested documents accordingly, with file structure:
@@ -983,21 +884,13 @@ class TestDocument2Permissions(object):
       assert not doc.can_write(self.user_not_me)
 
     # Update parent_dir permissions to grant write permissions to default group
-    response = self.client.post("/desktop/api2/doc/share", {
+    response = self.client.post(
+      "/desktop/api2/doc/share",
+      {
         'uuid': json.dumps(parent_dir.uuid),
-        'data': json.dumps({
-          'read': {
-            'user_ids': [],
-            'group_ids': []
-          },
-          'write': {
-            'user_ids': [],
-            'group_ids': [
-              self.default_group.id
-            ]
-          }
-        })
-    })
+        'data': json.dumps({'read': {'user_ids': [], 'group_ids': []}, 'write': {'user_ids': [], 'group_ids': [self.default_group.id]}}),
+      },
+    )
 
     assert 0 == json.loads(response.content)['status'], response.content
     for doc in [parent_dir, child_doc, nested_dir, nested_doc]:
@@ -1005,7 +898,6 @@ class TestDocument2Permissions(object):
       assert doc.can_write(self.user)
       assert doc.can_read(self.user_not_me)
       assert doc.can_write(self.user_not_me)
-
 
   def test_get_shared_documents(self):
     not_shared = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -1023,7 +915,7 @@ class TestDocument2Permissions(object):
     doc_names = [doc['name'] for doc in data['documents']]
     assert 'query2.sql' in doc_names
     assert 'query3.sql' in doc_names
-    assert not 'query1.sql' in doc_names
+    assert 'query1.sql' not in doc_names
 
     # they should also appear in user's home directory get_documents response
     response = self.client_not_me.get('/desktop/api2/doc/')
@@ -1031,7 +923,6 @@ class TestDocument2Permissions(object):
     doc_names = [doc['name'] for doc in data['children']]
     assert 'query2.sql' in doc_names
     assert 'query3.sql' in doc_names
-
 
   def test_get_shared_directories(self):
     # Tests that when fetching the shared documents for a user, they are grouped by top-level directory when possible
@@ -1063,11 +954,11 @@ class TestDocument2Permissions(object):
     assert 'dir1' in doc_names
     assert 'dir3' in doc_names
     assert 'query3.sql' in doc_names
-    assert not 'dir2' in doc_names
+    assert 'dir2' not in doc_names
 
     # nested documents should not appear
-    assert not 'query1.sql' in doc_names
-    assert not 'query2.sql' in doc_names
+    assert 'query1.sql' not in doc_names
+    assert 'query2.sql' not in doc_names
 
     # but nested documents should still be shared/viewable by group
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
@@ -1077,7 +968,6 @@ class TestDocument2Permissions(object):
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc2.uuid})
     data = json.loads(response.content)
     assert doc2.uuid == data['document']['uuid'], data
-
 
   def test_inherit_parent_permissions(self):
     # Tests that when saving a document to a shared directory, the doc/dir inherits same permissions
@@ -1091,35 +981,26 @@ class TestDocument2Permissions(object):
 
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
     data = json.loads(response.content)
-    assert (
-        [{'id': self.default_group.id, 'name': self.default_group.name}] ==
-        data['document']['perms']['read']['groups']), data
-    assert (
-        [{'id': self.user_not_me.id, 'username': self.user_not_me.username}] ==
-        data['document']['perms']['write']['users']), data
-
+    assert [{'id': self.default_group.id, 'name': self.default_group.name}] == data['document']['perms']['read']['groups'], data
+    assert [{'id': self.user_not_me.id, 'username': self.user_not_me.username}] == data['document']['perms']['write']['users'], data
 
   def test_search_documents(self):
     owned_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
-    owned_query = Document2.objects.create(
-        name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=owned_dir
-    )
+    owned_query = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=owned_dir)
     owned_history = Document2.objects.create(
-        name='history.sql', type='query-hive', owner=self.user, data={}, is_history=True, parent_directory=owned_dir
+      name='history.sql', type='query-hive', owner=self.user, data={}, is_history=True, parent_directory=owned_dir
     )
-    owned_workflow = Document2.objects.create(
-        name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=owned_dir
-    )
+    owned_workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=owned_dir)
 
     other_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
     not_shared = Document2.objects.create(
-        name='other_query1.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir
+      name='other_query1.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir
     )
     shared_1 = Document2.objects.create(
-        name='other_query2.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir
+      name='other_query2.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir
     )
     shared_2 = Document2.objects.create(
-        name='other_query3.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir
+      name='other_query3.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir
     )
 
     shared_1.share(user=self.user_not_me, name='read', users=[self.user], groups=[])
@@ -1143,7 +1024,6 @@ class TestDocument2Permissions(object):
     doc_names = [doc['name'] for doc in data['documents']]
     assert 'history.sql' in doc_names
 
-
   def test_x_share_directory_y_add_file_x_share(self):
     # Test that when another User, Y, adds a doc to dir shared by User X, User X doesn't fail to share the dir next time:
     # /
@@ -1157,44 +1037,28 @@ class TestDocument2Permissions(object):
     user_y = User.objects.create(username='user_y', password="user_y")
 
     # Share the dir with user_not_me
-    response = self.client.post("/desktop/api2/doc/share", {
-      'uuid': json.dumps(parent_dir.uuid),
-      'data': json.dumps({
-        'read': {
-          'user_ids': [],
-          'group_ids': []
-        },
-        'write': {
-          'user_ids': [user_y.id],
-          'group_ids': []
-        }
-      })
-    })
+    response = self.client.post(
+      "/desktop/api2/doc/share",
+      {
+        'uuid': json.dumps(parent_dir.uuid),
+        'data': json.dumps({'read': {'user_ids': [], 'group_ids': []}, 'write': {'user_ids': [user_y.id], 'group_ids': []}}),
+      },
+    )
 
     user_y_child_doc = Document2.objects.create(
-        name='other_query1.sql',
-        type='query-hive',
-        owner=user_y,
-        data={},
-        parent_directory=parent_dir
+      name='other_query1.sql', type='query-hive', owner=user_y, data={}, parent_directory=parent_dir
     )
 
     share_test_user = User.objects.create(username='share_test_user', password="share_test_user")
 
     # Share the dir with another user - share_test_user
-    response = self.client.post("/desktop/api2/doc/share", {
-      'uuid': json.dumps(parent_dir.uuid),
-      'data': json.dumps({
-        'read': {
-          'user_ids': [],
-          'group_ids': []
-        },
-        'write': {
-          'user_ids': [share_test_user.id],
-          'group_ids': []
-        }
-      })
-    })
+    response = self.client.post(
+      "/desktop/api2/doc/share",
+      {
+        'uuid': json.dumps(parent_dir.uuid),
+        'data': json.dumps({'read': {'user_ids': [], 'group_ids': []}, 'write': {'user_ids': [share_test_user.id], 'group_ids': []}}),
+      },
+    )
 
     assert 0 == json.loads(response.content)['status'], response.content
     for doc in [parent_dir, child_doc, user_y_child_doc]:
@@ -1203,14 +1067,9 @@ class TestDocument2Permissions(object):
       assert doc.can_read(share_test_user)
       assert doc.can_write(share_test_user)
 
-
   def test_unicode_name(self):
     doc = Document2.objects.create(
-        name='My Bundle a voté « non » à l’accord',
-        type='oozie-workflow2',
-        owner=self.user,
-        data={},
-        parent_directory=self.home_dir
+      name='My Bundle a voté « non » à l’accord', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir
     )
 
     # Verify that home directory contents return correctly
@@ -1225,14 +1084,9 @@ class TestDocument2Permissions(object):
     path = data['document']['path']
     assert '/My%20Bundle%20a%20vot%C3%A9%20%C2%AB%20non%20%C2%BB%20%C3%A0%20l%E2%80%99accord' == path
 
-
   def test_link_permissions(self):
     doc = Document2.objects.create(
-        name='test_link_permissions.sql',
-        type='query-hive',
-        owner=self.user,
-        data={},
-        parent_directory=self.home_dir
+      name='test_link_permissions.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir
     )
 
     try:
@@ -1280,11 +1134,7 @@ class TestDocument2Permissions(object):
 
   def test_combined_permissions(self):
     doc = Document2.objects.create(
-        name='test_combined_permissions.sql',
-        type='query-hive',
-        owner=self.user,
-        data={},
-        parent_directory=self.home_dir
+      name='test_combined_permissions.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir
     )
 
     try:
@@ -1363,7 +1213,6 @@ class TestDocument2Permissions(object):
 
 @pytest.mark.django_db
 class TestDocument2ImportExport(object):
-
   def setup_method(self):
     self.client = make_logged_in_client(username="perm_user", groupname="default", recreate=True, is_superuser=False)
     self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
@@ -1388,7 +1237,7 @@ class TestDocument2ImportExport(object):
     query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
     query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
     query3 = Document2.objects.create(
-        name='query3.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir, is_history=True
+      name='query3.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir, is_history=True
     )
     workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
     workflow.dependencies.add(query1)
@@ -1404,7 +1253,7 @@ class TestDocument2ImportExport(object):
     assert 'test.wf' in [doc['fields']['name'] for doc in documents]
     assert 'query1.sql' in [doc['fields']['name'] for doc in documents]
     assert 'query2.sql' in [doc['fields']['name'] for doc in documents]
-    assert not 'query3.sql' in [doc['fields']['name'] for doc in documents]
+    assert 'query3.sql' not in [doc['fields']['name'] for doc in documents]
 
     # Test that exporting multiple workflows with overlapping dependencies works
     workflow2 = Document2.objects.create(name='test2.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -1420,34 +1269,28 @@ class TestDocument2ImportExport(object):
     assert 'query1.sql' in [doc['fields']['name'] for doc in documents]
     assert 'query2.sql' in [doc['fields']['name'] for doc in documents]
 
-
   def test_export_documents_file_name(self):
-    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={},
-                                      parent_directory=self.home_dir)
-    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={},
-                                      parent_directory=self.home_dir)
-    query3 = Document2.objects.create(name='query3.sql', type='query-hive', owner=self.user, data={},
-                                      parent_directory=self.home_dir, is_history=True)
-    workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={},
-                                        parent_directory=self.home_dir)
+    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+    query3 = Document2.objects.create(
+      name='query3.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir, is_history=True
+    )
+    workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
     workflow.dependencies.add(query1)
     workflow.dependencies.add(query2)
     workflow.dependencies.add(query3)
 
     # Test that exporting multiple workflows with overlapping dependencies works
-    workflow2 = Document2.objects.create(name='test2.wf', type='oozie-workflow2', owner=self.user, data={},
-                                         parent_directory=self.home_dir)
+    workflow2 = Document2.objects.create(name='test2.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
     workflow2.dependencies.add(query1)
 
     # Test that exporting to a file includes the date and number of documents in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id, workflow2.id])})
-    assert (
-        response['Content-Disposition'] == 'attachment; filename="hue-documents-%s-(4).json"' % datetime.today().strftime('%Y-%m-%d'))
+    assert response['Content-Disposition'] == 'attachment; filename="hue-documents-%s-(4).json"' % datetime.today().strftime('%Y-%m-%d')
 
     # Test that exporting single file gets the name of the document in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id])})
     assert response['Content-Disposition'] == 'attachment; filename="' + workflow.name + '.json"'
-
 
   def test_export_directories_with_children(self):
     # Test that exporting a directory exports children docs
@@ -1478,14 +1321,13 @@ class TestDocument2ImportExport(object):
     assert 'query2.sql' in [doc['fields']['name'] for doc in documents]
     assert 'query3.sql' in [doc['fields']['name'] for doc in documents]
 
-
   def test_import_owned_document(self):
     owned_query = Document2.objects.create(
       name='query.sql',
       type='query-hive',
       owner=self.user,
       data=json.dumps({'description': 'original_query'}),
-      parent_directory=self.home_dir
+      parent_directory=self.home_dir,
     )
 
     # Test that importing existing doc updates it and retains owner, UUID
@@ -1537,7 +1379,7 @@ class TestDocument2ImportExport(object):
       type='query-hive',
       owner=self.user,
       data=json.dumps({'description': 'original_query'}),
-      parent_directory=self.home_dir
+      parent_directory=self.home_dir,
     )
 
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([owned_query.id]), 'format': 'json'})
@@ -1564,12 +1406,11 @@ class TestDocument2ImportExport(object):
     assert 0 == data['updated_count']
 
   def test_import_with_history_dependencies(self):
-    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={},
-                                      parent_directory=self.home_dir)
-    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={},
-                                      parent_directory=self.home_dir, is_history=True)
-    workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={},
-                                        parent_directory=self.home_dir)
+    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+    query2 = Document2.objects.create(
+      name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir, is_history=True
+    )
+    workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=self.home_dir)
     workflow.dependencies.add(query1)
     workflow.dependencies.add(query2)
 

@@ -316,11 +316,12 @@ class MetastoreTable {
             this.partitions.loading(false);
             this.partitions.loaded(true);
           }
-
+          // Currently checking for Impala and Hive
+          const viewSqlPropertyColumnNames = new Set(['view original text:', 'original query:']);
           const found =
             analysis.properties &&
             analysis.properties.some(property => {
-              if (property.col_name.toLowerCase() === 'view original text:') {
+              if (viewSqlPropertyColumnNames.has(property.col_name.toLowerCase())) {
                 apiHelper
                   .formatSql({ statements: property.data_type })
                   .then(formatResponse => {

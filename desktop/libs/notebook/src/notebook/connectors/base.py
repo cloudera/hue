@@ -15,13 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import json
-import logging
 import re
 import sys
+import json
 import time
 import uuid
+import logging
+from builtins import object
 
 from django.utils.encoding import smart_str
 
@@ -32,7 +32,6 @@ from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from metadata.optimizer.base import get_api as get_optimizer_api
-
 from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
 
@@ -48,10 +47,12 @@ LOG = logging.getLogger()
 class SessionExpired(Exception):
   pass
 
+
 class QueryExpired(Exception):
   def __init__(self, message=None):
     super(QueryExpired, self).__init__()
     self.message = message
+
 
 class AuthenticationRequired(Exception):
   def __init__(self, message=None):
@@ -61,9 +62,11 @@ class AuthenticationRequired(Exception):
   def __str__(self):
     return 'AuthenticationRequired: %s' % self.message
 
+
 class OperationTimeout(Exception):
   def __str__(self):
     return 'OperationTimeout'
+
 
 class OperationNotSupported(Exception):
   pass
@@ -95,7 +98,7 @@ class Notebook(object):
           'description': '',
           'type': 'notebook',
           'isSaved': False,
-          'isManaged': False, # Aka isTask
+          'isManaged': False,  # Aka isTask
           'skipHistorify': False,
           'sessions': [],
           'snippets': [],
@@ -280,7 +283,7 @@ class Notebook(object):
     }
 
   def _add_session(self, data, snippet_type):
-    from notebook.connectors.hiveserver2 import HS2Api # Cyclic dependency
+    from notebook.connectors.hiveserver2 import HS2Api  # Cyclic dependency
 
     if snippet_type not in [_s['type'] for _s in data['sessions']]:
       data['sessions'].append({
@@ -298,7 +301,6 @@ class Notebook(object):
     snippet['wasBatchExecuted'] = batch
 
     return _execute_notebook(request, notebook_data, snippet)
-
 
   def execute_and_wait(self, request, timeout_sec=30.0, sleep_interval=1, include_results=False):
     """
@@ -361,7 +363,7 @@ def get_interpreter(connector_type, user=None):
   ]
 
   if not interpreter:
-    if connector_type == 'hbase': # TODO move to connectors
+    if connector_type == 'hbase':  # TODO move to connectors
       interpreter = [{
         'name': 'hbase',
         'type': 'hbase',
@@ -440,18 +442,15 @@ def get_api(request, snippet):
   elif is_compute(snippet):
     LOG.debug("Finding the compute from db using snippet: %s" % snippet)
     interpreter = find_compute(cluster=snippet, user=request.user)
-  elif has_connectors() and snippet.get('connector'):
-    LOG.debug("Connectors are enabled and picking the connector from snippet['connector']")
-    interpreter = snippet['connector']
-  if not interpreter:
+  else:
     LOG.debug("Picking up the connectors from the configs using connector_name: %s" % connector_name)
     interpreter = get_interpreter(connector_type=connector_name, user=request.user)
 
   interface = interpreter['interface']
 
   # reconstruct 'custom' interpreter.
-  if snippet.get('type') and snippet.get('type') == 'custom': 
-    interface = snippet.get('interface') 
+  if snippet.get('type') and snippet.get('type') == 'custom':
+    interface = snippet.get('interface')
     interpreter['options'] = snippet.get('options')
 
   LOG.debug('Selected interpreter %s interface=%s compute=%s' % (
@@ -533,7 +532,7 @@ def get_api(request, snippet):
     from notebook.connectors.kafka import KafkaApi
     return KafkaApi(request.user)
   elif interface == 'pig':
-    return OozieApi(user=request.user, request=request) # Backward compatibility until Hue 4
+    return OozieApi(user=request.user, request=request)  # Backward compatibility until Hue 4
   else:
     raise PopupException(_('Notebook connector interface not recognized: %s') % interface)
 
@@ -576,8 +575,10 @@ class Api(object):
     raise OperationNotSupported()
 
   def download(self, notebook, snippet, file_format='csv'):
-    from beeswax import data_export #TODO: Move to notebook?
-    from beeswax import conf
+    from beeswax import (
+      conf,
+      data_export,  # TODO: Move to notebook?
+    )
 
     result_wrapper = ExecutionWrapper(self, notebook, snippet)
 
@@ -694,7 +695,7 @@ class Api(object):
     if should_close:
       try:
         self.close_statement(notebook, snippet)  # Close all the time past multi queries
-      except:
+      except Exception:
         LOG.warning('Could not close previous multiquery query')
 
     return resp
@@ -706,7 +707,7 @@ class Api(object):
 def _get_snippet_name(notebook, unique=False, table_format=False):
   name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
   if table_format:
-    name = re.sub('[-|\s:]', '_', name)
+    name = re.sub(r'[-|\s:]', '_', name)
   return name
 
 
@@ -742,7 +743,7 @@ class ExecutionWrapper(object):
 
   def _until_available(self):
     if self.snippet['result']['handle'].get('sync', False):
-      return # Request is already completed
+      return  # Request is already completed
 
     count = 0
     sleep_seconds = 1
