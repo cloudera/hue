@@ -69,7 +69,6 @@ const MetricsComponent: React.FC = (): JSX.Element => {
           !key.startsWith('python.gc')
       )
       .map(key => ({
-        //skip all the caption starting with python.. and auth..
         caption: key,
         dataSource: Object.keys(data.metric[key]).map(subKey => ({
           name: subKey,
