@@ -19,21 +19,6 @@ import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MetricsComponent from './MetricsComponent';
 
-// Mock matchMedia for compatibility with certain UI libraries
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: jest.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(), // Deprecated
-    removeListener: jest.fn(), // Deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn()
-  }))
-});
-
 // Mock the API call to return sample metrics data
 jest.mock('api/utils', () => ({
   get: jest.fn(() =>
