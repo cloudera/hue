@@ -79,17 +79,6 @@ interface MetricsTableProps {
   dataSource: DataSourceItem[];
 }
 const metricLabels: { [key: string]: string } = {
-  'auth.ldap.auth-time': I18n('LDAP Authentication Time'),
-  'auth.oauth.auth-time': I18n('OAuth Authentication Time'),
-  'auth.pam.auth-time': I18n('PAM Authentication Time'),
-  'auth.saml2.auth-time': I18n('SAML2 Authentication Time'),
-  'auth.spnego.auth-time': I18n('SPNEGO Authentication Time'),
-  'multiprocessing.processes.daemon': I18n('Daemon Processes'),
-  'multiprocessing.processes.total': I18n('Total Processes'),
-  'python.gc.generation.0': I18n('Python GC Generation 0'),
-  'python.gc.generation.1': I18n('Python GC Generation 1'),
-  'python.gc.generation.2': I18n('Python GC Generation 2'),
-  'python.gc.objects': I18n('Python GC Objects'),
   'queries.number': I18n('Number of Queries'),
   'requests.active': I18n('Active Requests'),
   'requests.exceptions': I18n('Request Exceptions'),
