@@ -19,32 +19,32 @@
 .metrics-component {
   background-color: $fluidx-gray-100;
   padding: 0 24px 24px 24px;
-}
 
-.antd .metrics-heading {
-  color: $fluidx-gray-700;
-  padding-left: $font-size-lg;
-  font-size: $fluidx-heading-h4-size;
-  line-height: $fluidx-heading-h4-line-height;
-  font-weight: $fluidx-heading-h4-weight;
-}
+  .metrics-heading {
+    color: $fluidx-gray-700;
+    padding-left: $font-size-lg;
+    font-size: $fluidx-heading-h4-size;
+    line-height: $fluidx-heading-h4-line-height;
+    font-weight: $fluidx-heading-h4-weight;
+  }
 
-.antd .ant-table-wrapper {
-  margin-bottom: $font-size-xl;
-}
+  .ant-table-wrapper {
+    margin-bottom: $font-size-xl;
+  }
 
-.antd .ant-input-affix-wrapper {
-  margin: $font-size-sm;
-  width: 30%;
-}
+  .ant-input-affix-wrapper {
+    margin: $font-size-sm;
+    width: 30%;
+  }
 
-.antd .ant-table th {
-  width: 30%;
-}
+  .metrics-table th {
+    width: 30%;
+  }
 
-.antd .ant-select {
-  border: 1px solid $fluidx-gray-600;
-  border-radius: $border-radius-base;
-  background-color: $fluidx-white;
-  min-width: 200px;
+  .ant-select {
+    border: 1px solid $fluidx-gray-600;
+    border-radius: $border-radius-base;
+    background-color: $fluidx-white;
+    min-width: 200px;
+  }
 }
