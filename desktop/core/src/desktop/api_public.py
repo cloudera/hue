@@ -284,13 +284,13 @@ def storage_rmtree(request):
 @api_view(["POST"])
 def storage_trash_restore(request):
   django_request = get_django_request(request)
-  return filebrowser_api.storage_trash_restore(django_request)
+  return filebrowser_api.trash_restore(django_request)
 
 
 @api_view(["POST"])
 def storage_trash_purge(request):
   django_request = get_django_request(request)
-  return filebrowser_api.storage_trash_purge(django_request)
+  return filebrowser_api.trash_purge(django_request)
 
 
 # Importer
