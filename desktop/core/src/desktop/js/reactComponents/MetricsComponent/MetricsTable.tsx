@@ -96,7 +96,7 @@ const metricLabels: { [key: string]: string } = {
   'requests.response-time': I18n('Request Response Time'),
   'threads.daemon': I18n('Daemon Threads'),
   'threads.total': I18n('Total Threads'),
-  'users': I18n('Users'),
+  users: I18n('Users'),
   'users.active': I18n('Active Users'),
   'users.active.total': I18n('Total Active Users')
 };
@@ -126,8 +126,13 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
 
   return (
     <>
-      <h4 className='metrics-heading'>{caption}</h4>
-      <Table dataSource={transformedDataSource} rowKey="name" columns={metricsColumns} pagination={false} />
+      <h4 className="metrics-heading">{caption}</h4>
+      <Table
+        dataSource={transformedDataSource}
+        rowKey="name"
+        columns={metricsColumns}
+        pagination={false}
+      />
     </>
   );
 };
