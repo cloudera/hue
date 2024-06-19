@@ -18,6 +18,7 @@ import React from 'react';
 import Table from 'cuix/dist/components/Table/Table';
 import type { ColumnType } from 'antd/es/table';
 import './MetricsComponent.scss';
+import I18n from 'utils/i18n';
 
 interface MetricsValue {
   value: number;
@@ -77,8 +78,38 @@ interface MetricsTableProps {
   caption: string;
   dataSource: DataSourceItem[];
 }
+const metricLabels: { [key: string]: string } = {
+  'auth.ldap.auth-time': I18n('LDAP Authentication Time'),
+  'auth.oauth.auth-time': I18n('OAuth Authentication Time'),
+  'auth.pam.auth-time': I18n('PAM Authentication Time'),
+  'auth.saml2.auth-time': I18n('SAML2 Authentication Time'),
+  'auth.spnego.auth-time': I18n('SPNEGO Authentication Time'),
+  'multiprocessing.processes.daemon': I18n('Daemon Processes'),
+  'multiprocessing.processes.total': I18n('Total Processes'),
+  'python.gc.generation.0': I18n('Python GC Generation 0'),
+  'python.gc.generation.1': I18n('Python GC Generation 1'),
+  'python.gc.generation.2': I18n('Python GC Generation 2'),
+  'python.gc.objects': I18n('Python GC Objects'),
+  'queries.number': I18n('Number of Queries'),
+  'requests.active': I18n('Active Requests'),
+  'requests.exceptions': I18n('Request Exceptions'),
+  'requests.response-time': I18n('Request Response Time'),
+  'threads.daemon': I18n('Daemon Threads'),
+  'threads.total': I18n('Total Threads'),
+  'users': I18n('Users'),
+  'users.active': I18n('Active Users'),
+  'users.active.total': I18n('Total Active Users')
+};
+
+const transformMetricNames = (dataSource: DataSourceItem[]): DataSourceItem[] =>
+  dataSource.map(item => ({
+    ...item,
+    name: metricLabels[item.name] || item.name
+  }));
 
 const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
+  const transformedDataSource = transformMetricNames(dataSource);
+
   const metricsColumns: ColumnType<DataSourceItem>[] = [
     {
       title: 'Name',
@@ -96,7 +127,7 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
   return (
     <>
       <h4 className='metrics-heading'>{caption}</h4>
-      <Table dataSource={dataSource} rowKey="name" columns={metricsColumns} pagination={false} />
+      <Table dataSource={transformedDataSource} rowKey="name" columns={metricsColumns} pagination={false} />
     </>
   );
 };
