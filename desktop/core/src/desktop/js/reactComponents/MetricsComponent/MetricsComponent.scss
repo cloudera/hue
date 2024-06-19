@@ -28,11 +28,8 @@
     font-weight: $fluidx-heading-h4-weight;
   }
 
-  .ant-table-wrapper {
+  .metrics-filter {
     margin-bottom: $font-size-xl;
-  }
-
-  .ant-input-affix-wrapper {
     margin: $font-size-sm;
     width: 30%;
   }
@@ -41,7 +38,7 @@
     width: 30%;
   }
 
-  .ant-select {
+  .metrics-select {
     border: 1px solid $fluidx-gray-600;
     border-radius: $border-radius-base;
     background-color: $fluidx-white;
