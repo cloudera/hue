@@ -90,14 +90,16 @@ const MetricsComponent: React.FC = (): JSX.Element => {
       <Spin spinning={loading}>
         {!error && (
           <>
-            <Input className = "metrics-filter"
+            <Input
+              className="metrics-filter"
               placeholder="Filter metrics..."
               value={searchQuery}
               onChange={handleFilterInputChange}
               prefix={<SearchOutlined />}
             />
 
-            <Select className="metrics-select"
+            <Select
+              className="metrics-select"
               //to make sure antd class gets applied
               getPopupContainer={triggerNode => triggerNode.parentElement}
               ref={dropdownRef}

@@ -127,7 +127,7 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
   return (
     <>
       <h4 className="metrics-heading">{caption}</h4>
-      <Table 
+      <Table
         className="metrics-table"
         dataSource={transformedDataSource}
         rowKey="name"
