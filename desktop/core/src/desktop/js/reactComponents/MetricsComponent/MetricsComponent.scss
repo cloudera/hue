@@ -31,6 +31,8 @@
   .metrics-filter {
     margin: $font-size-sm;
     width: 30%;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
   }
 
   .metrics-table th {
