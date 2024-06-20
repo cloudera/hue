@@ -196,7 +196,7 @@ def set_replication(request):
 
   result = request.fs.set_replication(src_path, replication_factor)
   if not result:
-    raise Exception(_("Failed setting replication factor."))
+    raise Exception(_("Failed to set the replication factor."))
 
   return HttpResponse(status=200)
 
