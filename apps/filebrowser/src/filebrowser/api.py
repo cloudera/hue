@@ -46,6 +46,7 @@ def error_handler(view_fn):
       response['status'] = -1
       response['message'] = smart_unicode(e)
     return JsonResponse(response)
+
   return decorator
 
 
@@ -80,10 +81,12 @@ def get_filesystems_with_home_dirs(request): # Using as a public API only for no
     elif fs == 'ofs':
       user_home_dir = get_ofs_home_directory()
 
-    filesystems.append({
-      'file_system': fs,
-      'user_home_directory': user_home_dir,
-    })
+    filesystems.append(
+      {
+        'file_system': fs,
+        'user_home_directory': user_home_dir,
+      }
+    )
 
   return JsonResponse(filesystems, safe=False)
 
@@ -117,11 +120,11 @@ def rename(request):
   dest_path = request.POST.get('dest_path')
 
   if "#" in dest_path:
-    raise Exception(_(
-      "Error renaming %s to %s. Hashes are not allowed in file or directory names." % (os.path.basename(src_path), dest_path)
-      ))
+    raise Exception(
+      _("Error renaming %s to %s. Hashes are not allowed in file or directory names." % (os.path.basename(src_path), dest_path))
+    )
 
-  # If dest_path doesn't have a directory specified, use same dir.
+  # If dest_path doesn't have a directory specified, use same directory.
   if "/" not in dest_path:
     src_dir = os.path.dirname(src_path)
     dest_path = request.fs.join(src_dir, dest_path)
@@ -131,6 +134,37 @@ def rename(request):
 
   request.fs.rename(src_path, dest_path)
   return HttpResponse(status=200)
+
+@error_handler
+def move(request):
+  src_path = request.POST.get('src_path')
+  dest_path = request.POST.get('dest_path')
+
+  if src_path == dest_path:
+    raise Exception(_('Source and destination path cannot be same.'))
+
+  request.fs.rename(src_path, dest_path)
+  return HttpResponse(status=200)
+
+
+@error_handler
+def copy(request):
+  src_path = request.POST.get('src_path')
+  dest_path = request.POST.get('dest_path')
+
+  if src_path == dest_path:
+    raise Exception(_('Source and destination path cannot be same.'))
+
+  # Copy method for Ozone FS returns a string of skipped files if their size is greater than configured chunk size.
+  if src_path.startswith('ofs://'):
+    ofs_skip_files = request.fs.copy(src_path, dest_path, recursive=True, owner=request.user)
+    if ofs_skip_files:
+      return HttpResponse(ofs_skip_files, status=200)
+  else:
+    request.fs.copy(src_path, dest_path, recursive=True, owner=request.user)
+
+  return HttpResponse(status=200)
+
 
 @error_handler
 def content_summary(request, path):
@@ -144,11 +178,49 @@ def content_summary(request, path):
     return JsonResponse(response, status=404)
 
   try:
-    stats = request.fs.get_content_summary(path)
+    content_summary = request.fs.get_content_summary(path)
     replication_factor = request.fs.stats(path)['replication']
-    stats.summary.update({'replication': replication_factor})
-    response['summary'] = stats.summary
+
+    content_summary.summary.update({'replication': replication_factor})
+    response['summary'] = content_summary.summary
   except Exception as e:
     raise Exception(_('Failed to fetch content summary for "%s". ') % path)
 
   return JsonResponse(response)
+
+
+@error_handler
+def set_replication(request):
+  src_path = request.POST.get('src_path')
+  replication_factor = request.POST.get('replication_factor')
+
+  result = request.fs.set_replication(src_path, replication_factor)
+  if not result:
+    raise Exception(_("Failed to set the replication factor."))
+
+  return HttpResponse(status=200)
+
+
+@error_handler
+def rmtree(request):
+  path = request.POST.get('path')
+  skip_trash = request.POST.get('skip_trash', False)
+
+  request.fs.rmtree(path, skip_trash)
+
+  return HttpResponse(status=200)
+
+
+@error_handler
+def trash_restore(request):
+  path = request.POST.get('path')
+  request.fs.restore(path)
+
+  return HttpResponse(status=200)
+
+
+@error_handler
+def trash_purge(request):
+  request.fs.purge_trash()
+
+  return HttpResponse(status=200)
