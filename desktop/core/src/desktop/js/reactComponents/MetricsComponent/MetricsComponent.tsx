@@ -25,6 +25,7 @@ const { Option } = Select;
 
 const MetricsComponent: React.FC = (): JSX.Element => {
   const [metrics, setMetrics] = useState<MetricsResponse>();
+  const [filteredKeys, setFilteredKeys] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -38,6 +39,13 @@ const MetricsComponent: React.FC = (): JSX.Element => {
       try {
         const response = await get<MetricsResponse>('/desktop/metrics/', { format: 'json' });
         setMetrics(response);
+        const keys = Object.keys(response.metric).filter(
+          key =>
+            !key.startsWith('auth') &&
+            !key.startsWith('multiprocessing') &&
+            !key.startsWith('python.gc')
+        );
+        setFilteredKeys(keys);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -61,20 +69,13 @@ const MetricsComponent: React.FC = (): JSX.Element => {
   }, [searchQuery, metrics]);
 
   const parseMetricsData = (data: MetricsResponse) => {
-    return Object.keys(data.metric)
-      .filter(
-        key =>
-          !key.startsWith('auth') &&
-          !key.startsWith('multiprocessing') &&
-          !key.startsWith('python.gc')
-      )
-      .map(key => ({
-        caption: key,
-        dataSource: Object.keys(data.metric[key]).map(subKey => ({
-          name: subKey,
-          value: data.metric[key][subKey]
-        }))
-      }));
+    return filteredKeys.map(key => ({
+      caption: key,
+      dataSource: Object.keys(data.metric[key]).map(subKey => ({
+        name: subKey,
+        value: data.metric[key][subKey]
+      }))
+    }));
   };
   const handleMetricChange = (value: string) => {
     setSelectedMetric(value);
@@ -108,19 +109,11 @@ const MetricsComponent: React.FC = (): JSX.Element => {
               data-testid="metric-select"
             >
               <Option value="">All</Option>
-              {metrics &&
-                Object.keys(metrics.metric)
-                  .filter(
-                    key =>
-                      !key.startsWith('auth') &&
-                      !key.startsWith('multiprocessing') &&
-                      !key.startsWith('python.gc')
-                  )
-                  .map(key => (
-                    <Option key={key} value={key}>
-                      {key}
-                    </Option>
-                  ))}
+              {filteredKeys.map(key => (
+                <Option key={key} value={key}>
+                  {key}
+                </Option>
+              ))}
             </Select>
           </>
         )}
