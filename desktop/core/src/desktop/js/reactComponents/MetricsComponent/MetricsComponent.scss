@@ -31,7 +31,19 @@
   .metrics-filter {
     margin: $font-size-sm;
     width: 30%;
+    // .ant-input:focus {
+    //   outline: none;
+    //   border-color: transparent;
+    // }
+    // .ant-input-prefix 
+    .ant-input {
+      &:focus {
+        outline: none !important;
+        border-color: transparent !important;
+        box-shadow: none !important;
+      }
   }
+}
 
   .metrics-table th {
     width: 30%;
