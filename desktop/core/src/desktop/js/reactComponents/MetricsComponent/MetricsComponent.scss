@@ -31,7 +31,12 @@
   .metrics-filter {
     margin: $font-size-sm;
     width: 30%;
-  }
+
+    input {
+      box-shadow: none;
+      -webkit-box-shadow: none;
+    }
+}
 
   .metrics-table th {
     width: 30%;
@@ -42,5 +47,6 @@
     border-radius: $border-radius-base;
     background-color: $fluidx-white;
     min-width: 200px;
+    height: 32px;
   }
 }
