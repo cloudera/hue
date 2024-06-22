@@ -101,77 +101,15 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
 
 ${layout.menubar(section='metrics')}
 
-<div id="metricsComponents" class="container-fluid">
-  <div class="card card-small margin-top-10">
-    <!-- ko if: metrics() -->
-    <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0,topSnap: '${ TOP_SNAP }', triggerAdjust: ${ is_embeddable and "0" or "106" }}">
-      <ul class="nav nav-pills">
-        <li data-bind="css: { 'active': $root.selectedMetric() === 'All' }">
-          <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedMetric('All') }"></a>
-        </li>
-        <!-- ko foreach: metricsKeys -->
-        <!-- ko ifnot: $root.isUnusedMetric($data)-->
-        <li data-bind="css: { 'active': $root.selectedMetric() === $data }">
-          <a href="javascript:void(0)" data-bind="text: $data, click: function(){ $root.selectedMetric($data) }"></a>
-        </li>
-        <!-- /ko -->
-        <!-- /ko -->
-      </ul>
-      <input type="text" data-bind="clearable: metricsFilter, valueUpdate: 'afterkeydown'"
-          class="input-xlarge pull-right margin-bottom-10" placeholder="${_('Filter metrics...')}">
-    </div>
+<script type="text/javascript">
+  (function () {
+    window.createReactComponents('#MetricsComponent');
+  })();
+</script>
 
-    <div class="margin-top-10">
-      <!-- ko if: $root.selectedMetric() === 'All' && $root.isMasterEmpty()-->
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th width="30%">${ _('Name') }</th>
-            <th>${ _('Value') }</th>
-          </tr>
-        </thead>
-        <tfoot>
-          <tr>
-              <td colspan="2">${ _('There are no metrics matching your filter') }</td>
-          </tr>
-        </tfoot>
-      </table>
-      <!-- /ko -->
-      <div data-bind="foreach: {data: Object.keys($root.filteredMetrics()).sort(), as: '_masterkey'}">
-      <!-- ko if: ($root.selectedMetric() === 'All' && $root.filteredMetrics()[_masterkey]) || $root.selectedMetric() === _masterkey-->
-      <!-- ko ifnot: $root.isUnusedMetric(_masterkey)-->
-      <h4 data-bind="text: _masterkey"></h4>
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th width="30%">${ _('Name') }</th>
-            <th>${ _('Value') }</th>
-          </tr>
-        </thead>
-        <!-- ko if: $root.filteredMetrics()[_masterkey] -->
-        <tbody data-bind="foreach: {'data': Object.keys($root.filteredMetrics()[_masterkey])}">
-          <tr>
-            <td data-bind="text: $data"></td>
-            <td data-bind="text: $root.filteredMetrics()[_masterkey][$data]"></td>
-          </tr>
-        </tbody>
-        <!-- /ko -->
-        <!-- ko ifnot: $root.filteredMetrics()[_masterkey] -->
-        <tfoot>
-          <tr>
-            <td colspan="2">${ _('There are no metrics matching your filter') }</td>
-          </tr>
-          </tfoot>
-        <!-- /ko -->
-        </table>
-        <!-- /ko -->
-        <!-- /ko -->
-      </div>
-    </div>
-  <!-- /ko -->
-  </div>
+<div id="MetricsComponent">
+<MetricsComponent data-reactcomponent='MetricsComponent'></MetricsComponent>
 </div>
-
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
