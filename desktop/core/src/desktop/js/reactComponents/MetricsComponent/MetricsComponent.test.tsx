@@ -78,7 +78,6 @@ describe('MetricsComponent', () => {
   test('selecting a specific metric from the dropdown filters the data using click events', async () => {
     render(<MetricsComponent />);
 
-    // Wait for data to load and ensure any option like 'queries.number' is present
     await waitFor(() => screen.getByText('queries.number'));
 
     const select = screen.getByTestId('metric-select').firstElementChild;
@@ -86,16 +85,14 @@ describe('MetricsComponent', () => {
       fireEvent.mouseDown(select);
     }
 
-    // Query for the dropdown menu which is now in the document
     const dropdown = document.querySelector('.ant-select');
 
-    // Choose any option like the 1st from the metrics and then click on it
     const secondOption = dropdown?.querySelectorAll('.ant-select-item')[1];
     if (secondOption) {
       fireEvent.click(secondOption);
       await waitFor(() => {
         const headings = screen.queryAllByRole('heading', { level: 4 });
-        expect(headings).toHaveLength(1); // This should fail if the filter does not work
+        expect(headings).toHaveLength(1);
       });
     }
   });
