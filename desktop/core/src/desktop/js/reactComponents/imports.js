@@ -1,5 +1,5 @@
 // ADD NEW REACT COMPONENTS HERE
-// For a react root we need a way to match an imported module with a component name
+// We need a way to match an imported module with a component name
 // so we handle the imports dynamically for that reason.
 export async function loadComponent(name) {
   switch (name) {
@@ -11,6 +11,9 @@ export async function loadComponent(name) {
 
     case 'StorageBrowserPage':
       return (await import('../apps/storageBrowser/StorageBrowserPage/StorageBrowserPage')).default;
+
+    case 'MetricsComponent':
+      return (await import('./MetricsComponent/MetricsComponent')).default;
 
     // Application global components here
     case 'AppBanner':
