@@ -96,4 +96,15 @@ describe('MetricsComponent', () => {
       });
     }
   });
+
+  // Test for ensuring metrics starting with 'python.gc', 'multiprocessing', and 'auth' are not displayed
+  test('ensuring metrics starting with auth, multiprocessing and python.gc are not displayed', async () => {
+    render(<MetricsComponent />);
+
+    await waitFor(() => {
+      expect(screen.queryByText('auth.login')).not.toBeInTheDocument();
+      expect(screen.queryByText('multiprocessing.cpu')).not.toBeInTheDocument();
+      expect(screen.queryByText('python.gc.collect')).not.toBeInTheDocument();
+    });
+  });
 });
