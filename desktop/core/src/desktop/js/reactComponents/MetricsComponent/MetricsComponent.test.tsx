@@ -102,9 +102,9 @@ describe('MetricsComponent', () => {
     render(<MetricsComponent />);
 
     await waitFor(() => {
-      expect(screen.queryByText('auth.login')).not.toBeInTheDocument();
-      expect(screen.queryByText('multiprocessing.cpu')).not.toBeInTheDocument();
-      expect(screen.queryByText('python.gc.collect')).not.toBeInTheDocument();
+      expect(screen.queryByText('auth.ldap.auth-time')).not.toBeInTheDocument();
+      expect(screen.queryByText('multiprocessing.processes.total')).not.toBeInTheDocument();
+      expect(screen.queryByText('python.gc.objects')).not.toBeInTheDocument();
     });
   });
 });
