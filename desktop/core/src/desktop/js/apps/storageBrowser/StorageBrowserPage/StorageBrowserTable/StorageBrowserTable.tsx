@@ -288,7 +288,11 @@ const StorageBrowserTable = ({
         <div className="hue-storage-browser__actions-bar">
           <Input className="hue-storage-browser__search" placeholder={t('Search')} />
           <div className="hue-storage-browser__actions-bar-right">
-            <StorageBrowserActions selectedFiles={selectedFiles} />
+            <StorageBrowserActions
+              selectedFiles={selectedFiles}
+              setLoadingFiles={setLoadingFiles}
+              setRefreshKey={setRefreshKey}
+            />
             <Dropdown
               overlayClassName="hue-storage-browser__actions-dropdown"
               menu={{

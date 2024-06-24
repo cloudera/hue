@@ -56,56 +56,124 @@ describe('StorageBrowserRowActions', () => {
     }
   ];
 
-  test('does not render view summary option when there are multiple records', async () => {
-    const user = userEvent.setup();
-    const { getByRole, queryByRole } = render(
-      <StorageBrowserActions selectedFiles={mockRecord2} />
-    );
-    await user.click(getByRole('button'));
-    expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+  const setLoadingFiles = jest.fn();
+  const setRefreshKey = jest.fn();
+  describe('Summary option', () => {
+    test('does not render view summary option when there are multiple records', async () => {
+      const user = userEvent.setup();
+      const { getByRole, queryByRole } = render(
+        <StorageBrowserActions
+          setLoadingFiles={setLoadingFiles}
+          setRefreshKey={setRefreshKey}
+          selectedFiles={mockRecord2}
+        />
+      );
+      await user.click(getByRole('button'));
+      expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+    });
+
+    test('renders view summary option when record is a hdfs file', async () => {
+      const user = userEvent.setup();
+      mockRecord.path = '/user/demo/test';
+      mockRecord.type = 'file';
+      const { getByRole, queryByRole } = render(
+        <StorageBrowserActions
+          setLoadingFiles={setLoadingFiles}
+          setRefreshKey={setRefreshKey}
+          selectedFiles={[mockRecord]}
+        />
+      );
+      await user.click(getByRole('button'));
+      expect(queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
+    });
+
+    test('renders view summary option when record is a ofs file', async () => {
+      const user = userEvent.setup();
+      mockRecord.path = 'ofs://demo/test';
+      mockRecord.type = 'file';
+      const { getByRole, queryByRole } = render(
+        <StorageBrowserActions
+          setLoadingFiles={setLoadingFiles}
+          setRefreshKey={setRefreshKey}
+          selectedFiles={[mockRecord]}
+        />
+      );
+      await user.click(getByRole('button'));
+      expect(queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
+    });
+
+    test('does not render view summary option when record is a hdfs folder', async () => {
+      const user = userEvent.setup();
+      mockRecord.path = '/user/demo/test';
+      mockRecord.type = 'dir';
+      const { getByRole, queryByRole } = render(
+        <StorageBrowserActions
+          setLoadingFiles={setLoadingFiles}
+          setRefreshKey={setRefreshKey}
+          selectedFiles={[mockRecord]}
+        />
+      );
+      await user.click(getByRole('button'));
+      expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+    });
+
+    test('does not render view summary option when record is a an abfs file', async () => {
+      const user = userEvent.setup();
+      mockRecord.path = 'abfs://demo/test';
+      mockRecord.type = 'file';
+      const { getByRole, queryByRole } = render(
+        <StorageBrowserActions
+          setLoadingFiles={setLoadingFiles}
+          setRefreshKey={setRefreshKey}
+          selectedFiles={[mockRecord]}
+        />
+      );
+      await user.click(getByRole('button'));
+      expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+    });
   });
 
-  test('renders view summary option when record is a hdfs file', async () => {
-    const user = userEvent.setup();
-    mockRecord.path = '/user/demo/test';
-    mockRecord.type = 'file';
-    const { getByRole, queryByRole } = render(
-      <StorageBrowserActions selectedFiles={[mockRecord]} />
-    );
-    await user.click(getByRole('button'));
-    expect(queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
-  });
+  describe('Rename option', () => {
+    test('does not render view summary option when there are multiple records', async () => {
+      const user = userEvent.setup();
+      const { getByRole, queryByRole } = render(
+        <StorageBrowserActions
+          setLoadingFiles={setLoadingFiles}
+          setRefreshKey={setRefreshKey}
+          selectedFiles={mockRecord2}
+        />
+      );
+      await user.click(getByRole('button'));
+      expect(queryByRole('menuitem', { name: 'Rename' })).toBeNull();
+    });
+    test('does not render rename option when record is a a root folder', async () => {
+      const user = userEvent.setup();
+      mockRecord.path = 'abfs://';
+      mockRecord.type = 'dir';
+      const { getByRole, queryByRole } = render(
+        <StorageBrowserActions
+          setLoadingFiles={setLoadingFiles}
+          setRefreshKey={setRefreshKey}
+          selectedFiles={[mockRecord]}
+        />
+      );
+      await user.click(getByRole('button'));
+      expect(queryByRole('menuitem', { name: 'Rename' })).toBeNull();
+    });
 
-  test('renders view summary option when record is a ofs file', async () => {
-    const user = userEvent.setup();
-    mockRecord.path = 'ofs://demo/test';
-    mockRecord.type = 'file';
-    const { getByRole, queryByRole } = render(
-      <StorageBrowserActions selectedFiles={[mockRecord]} />
-    );
-    await user.click(getByRole('button'));
-    expect(queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
-  });
-
-  test('does not render view summary option when record is a hdfs folder', async () => {
-    const user = userEvent.setup();
-    mockRecord.path = '/user/demo/test';
-    mockRecord.type = 'dir';
-    const { getByRole, queryByRole } = render(
-      <StorageBrowserActions selectedFiles={[mockRecord]} />
-    );
-    await user.click(getByRole('button'));
-    expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
-  });
-
-  test('does not render view summary option when record is a an abfs file', async () => {
-    const user = userEvent.setup();
-    mockRecord.path = 'abfs://demo/test';
-    mockRecord.type = 'file';
-    const { getByRole, queryByRole } = render(
-      <StorageBrowserActions selectedFiles={[mockRecord]} />
-    );
-    await user.click(getByRole('button'));
-    expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+    test('renders rename option when record is a a file or a folder', async () => {
+      const user = userEvent.setup();
+      mockRecord.path = 'abfs://test';
+      mockRecord.type = 'dir';
+      const { getByRole, queryByRole } = render(
+        <StorageBrowserActions
+          setLoadingFiles={setLoadingFiles}
+          setRefreshKey={setRefreshKey}
+          selectedFiles={[mockRecord]}
+        />
+      );
+      await user.click(getByRole('button'));
+      expect(queryByRole('menuitem', { name: 'Rename' })).not.toBeNull();
+    });
   });
 });
