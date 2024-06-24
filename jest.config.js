@@ -7,13 +7,16 @@ module.exports = {
   },
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '^\\./desktop/core/src/desktop/js/(.*)$': '<rootDir>/desktop/core/src/desktop/js/$1'
+    '^\\./desktop/core/src/desktop/js/(.*)$': '<rootDir>/desktop/core/src/desktop/js/$1',
+    '^@vue/test-utils': '<rootDir>/node_modules/@vue/test-utils/dist/vue-test-utils.cjs.js'
   },
   moduleDirectories: ['node_modules', 'desktop/core/src/desktop/js'],
   modulePaths: ['desktop/core/src/desktop/js'],
   testMatch: ['<rootDir>/desktop/core/src/desktop/js/**/*.test.(js|jsx|ts|tsx)'],
   testEnvironment: 'jest-environment-jsdom',
-  testURL: 'https://www.gethue.com/hue',
+  testEnvironmentOptions: {
+    url: 'https://www.gethue.com/hue'
+  },
   setupFilesAfterEnv: ['<rootDir>/desktop/core/src/desktop/js/jest/jest.init.js'],
   watchPathIgnorePatterns: ['<rootDir>/desktop/core/src/desktop/static'],
   testPathIgnorePatterns: [
