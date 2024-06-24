@@ -490,7 +490,7 @@ Create a directory at a specific path:
     curl -X POST https://demo.gethue.com/api/v1/storage/mkdir
     
 - **name:** name of the directory
-- **path:** specific path where user wants to create the directory
+- **path:** specific path where you wants to create the directory
 
 ### Create File
 
@@ -499,7 +499,7 @@ Create a file at a specific path:
     curl -X POST https://demo.gethue.com/api/v1/storage/touch
     
 - **name:** name of the file
-- **path:** specific path where user wants to create the file
+- **path:** specific path where you want to create the file
 
 ### Rename
 
@@ -517,7 +517,7 @@ Move a file or directory to a destination path:
     curl -X POST https://demo.gethue.com/api/v1/storage/move
     
 - **src_path:** path of the selected file or directory
-- **dest_path:** target path for moving the selected file or directory
+- **dest_path:** path at which you want to move the selected file or directory
 
 ### Copy
 
@@ -526,9 +526,9 @@ Copy a file or directory to a destination path:
     curl -X POST https://demo.gethue.com/api/v1/storage/copy
     
 - **src_path:** path of the selected file or directory
-- **dest_path:** target path for copying the selected file or directory
+- **dest_path:** path at which you want to save the copy of the selected file or directory
 
-**Note:** For **Apache Ozone** filesystem, copy operation returns a string of skipped files if their size is greater than configured chunk size.
+**Note:** On the **Apache Ozone** filesystem, the copy operation returns a string of skipped files if their size is greater than the configured chunk size.
 
 ### Get Content Summary
 
@@ -547,7 +547,7 @@ Delete a file or directory:
 - **path:** path of the selected file or directory
 - **skip_trash:** boolean value to determine moving deleted file or directory to trash or not
 
-**Note:** `skip_trash` field is currently supported only for HDFS.
+**Note:** Currently, the `skip_trash` field is only supported for HDFS.
 
 ### Set Replication
 
@@ -564,7 +564,7 @@ Restore a specific file or directory from trash in **HDFS**:
 
     curl -X POST https://demo.gethue.com/api/v1/storage/trash/restore
     
-- **path:** path of the specific file or directory to restore from trash directory
+- **path:** path of the specific file or directory that you want to restore from the trash directory
 
 ### Purge Trash
 
