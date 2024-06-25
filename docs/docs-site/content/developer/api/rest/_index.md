@@ -472,15 +472,15 @@ Specify a path of the file to download:
 
     curl -X GET https://demo.gethue.com/api/v1/storage/download=s3a://demo-gethue/data/web_logs/index_data.csv
 
-- download: file path from any configured remote file system
+- **download:** path of the file you want to download
 
 ### Upload
 
-Upload a local file to a remote destination folder:
+Upload a local file to a remote destination directory:
 
     curl -X POST https://demo.gethue.com/api/v1/storage/upload/file?dest=s3a://demo-gethue/web_log_data/ --form hdfs_file=@README.md
 
-- **dest:** folder path will be created if it does not exist yet
+- **dest:** Path of the directory for uploading a file. A new directory is created in the specified path if it does not exist.
 - **hdfs_file:** relative or absolute path to a file. It should be read more like a `local_file`, this field is not related to HDFS.
 
 ### Create Directory
@@ -489,8 +489,88 @@ Create a directory at a specific path:
 
     curl -X POST https://demo.gethue.com/api/v1/storage/mkdir
     
-- **name:** name of the directory
-- **path:** specific path where user wants to create the directory
+- **name:** name of the directory you want to create
+- **path:** path where you want to create the directory
+
+### Create File
+
+Create a file at a specific path:
+
+    curl -X POST https://demo.gethue.com/api/v1/storage/touch
+    
+- **name:** name of the file you want to create
+- **path:** path where you want to create the file
+
+### Rename
+
+Rename a file or directory:
+
+    curl -X POST https://demo.gethue.com/api/v1/storage/rename
+    
+- **src_path:** path of the file or directory you want to rename
+- **dest_path:** path after renaming the selected file or directory
+
+### Move
+
+Move a file or directory to a destination path:
+
+    curl -X POST https://demo.gethue.com/api/v1/storage/move
+    
+- **src_path:** path of the file or directory that you want to move
+- **dest_path:** path at which you want to move the selected file or directory
+
+### Copy
+
+Copy a file or directory to a destination path:
+
+    curl -X POST https://demo.gethue.com/api/v1/storage/copy
+    
+- **src_path:** path of the file or directory you want to copy
+- **dest_path:** path at which you want to save the copy of the selected file or directory
+
+**Note:** On the **Apache Ozone** filesystem, the copy operation returns a string of skipped files if their size is greater than the configured chunk size.
+
+### Get Content Summary
+
+Fetch the content summary for a specific file on **HDFS** or **Apache Ozone**:
+
+    curl -X GET https://demo.gethue.com/api/v1/storage/content_summary=/user/hue/weblogs.csv
+
+    curl -X GET https://demo.gethue.com/api/v1/storage/content_summary=ofs://ozone1/testvolume/testbucket/testfile.csv
+
+### Delete
+
+Delete a file or directory:
+
+    curl -X POST https://demo.gethue.com/api/v1/storage/rmtree
+    
+- **path:** path of the file or directory you want to delete
+- **skip_trash:** Boolean value to indicate whether to move the deleted file or directory to the trash directory. Specify `False` to move the file to the trash.
+
+**Note:** Currently, the `skip_trash` field is only supported on HDFS.
+
+### Set Replication
+
+Set the replication factor for a file on **HDFS**:
+
+    curl -X POST https://demo.gethue.com/api/v1/storage/set_replication
+    
+- **src_path:** path of the file for setting the replication factor
+- **replication_factor:** numerical value for setting the replication factor for the file
+
+### Restore Trash
+
+Restore a specific file or directory from trash on **HDFS**:
+
+    curl -X POST https://demo.gethue.com/api/v1/storage/trash/restore
+    
+- **path:** path of the file or directory that you want to restore from the trash directory
+
+### Purge Trash
+
+Purge the trash directory on **HDFS**:
+
+    curl -X POST https://demo.gethue.com/api/v1/storage/trash/purge
 
 ## Data Importer
 
