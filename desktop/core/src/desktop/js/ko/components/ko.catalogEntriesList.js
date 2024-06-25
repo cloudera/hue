@@ -341,7 +341,7 @@ class CatalogEntriesList {
 
       let { data, meta } = response;
 
-      if (isComplex && ['map', 'array', 'struct'].includes(dataType)) {
+      if (isComplex) {
         if (dataType === 'array') {
           meta = [{ name: 'item', type: '' }];
         } else if (dataType === 'map') {

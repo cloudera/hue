@@ -16,20 +16,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import pytest
 import sys
+import logging
+from unittest.mock import Mock, patch
+
+import pytest
+from django.core.cache import caches
 from django.test import TestCase
-from beeswax.server.dbms import get_query_server_config
-from beeswax.server.dbms import HiveServer2Dbms
+
+from beeswax.server.dbms import HiveServer2Dbms, get_query_server_config
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
-from django.core.cache import caches
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
 LOG = logging.getLogger()
 cache = caches[CACHES_HIVE_DISCOVERY_KEY]
@@ -175,7 +172,7 @@ class TestGetQueryServerConfig():
 # HIVE_DISCOVERY_LLAP_HA.get() --> True
 # ...
 
-          
+
 class TestHiveServer2Dbms():
 
   def test_get_nested_select_no_nested(self):

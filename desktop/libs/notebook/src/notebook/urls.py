@@ -17,13 +17,9 @@
 
 import sys
 
-from notebook import views as notebook_views
-from notebook import api as notebook_api
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from notebook import api as notebook_api, views as notebook_views
 
 # Views
 urlpatterns = [

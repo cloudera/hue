@@ -15,17 +15,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import zip
-import logging
-import json
 import re
 import sys
+import json
+import logging
+from builtins import zip
 
-from django.urls import reverse
 from django.http import Http404
+from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
-
 from thrift.transport.TTransport import TTransportException
+
+import beeswax.models
+from beeswax.conf import USE_GET_LOG_API
+from beeswax.data_export import upload
+from beeswax.design import HQLdesign
+from beeswax.forms import QueryForm
+from beeswax.models import QueryHistory, Session
+from beeswax.server import dbms
+from beeswax.server.dbms import QueryServerException, QueryServerTimeoutException, SubQueryTable, expand_exception, get_query_server_config
+from beeswax.views import (
+  _get_query_handle_and_state,
+  authorized_get_design,
+  authorized_get_query_history,
+  make_parameterization_form,
+  massage_columns_for_json,
+  parse_out_jobs,
+  safe_get_design,
+  save_design,
+)
 from desktop.auth.backend import is_admin
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse
@@ -34,28 +53,10 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.parameterization import substitute_variables
 from metastore import parser
-from notebook.models import escape_rows, MockedDjangoRequest, make_notebook
 from metastore.conf import FORCE_HS2_METADATA
 from metastore.views import _get_db, _get_servername
+from notebook.models import MockedDjangoRequest, escape_rows, make_notebook
 from useradmin.models import User
-
-import beeswax.models
-from beeswax.data_export import upload
-from beeswax.design import HQLdesign
-from beeswax.conf import USE_GET_LOG_API
-from beeswax.forms import QueryForm
-from beeswax.models import Session, QueryHistory
-from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException, \
-    SubQueryTable
-from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form, \
-    safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, parse_out_jobs
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -87,7 +88,7 @@ def error_handler(view_fn):
       }
 
       if re.search('database is locked|Invalid query handle|not JSON serializable', message, re.IGNORECASE):
-        response['status'] = 2 # Frontend will not display this type of error
+        response['status'] = 2  # Frontend will not display this type of error
         LOG.warning('error_handler silencing the exception: %s' % e)
       return JsonResponse(response)
   return decorator
@@ -131,17 +132,17 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
 
       cols_extended = massage_columns_for_json(table.cols)
 
-      if table.is_impala_only: # Expand Kudu table information
+      if table.is_impala_only:  # Expand Kudu table information
         if db.client.query_server['dialect'] != 'impala':
           query_server = get_query_server_config('impala', connector=cluster)
           db = dbms.get(db.client.user, query_server, cluster=cluster)
 
-        col_options = db.get_table_describe(database, table.name) # Expand columns information
+        col_options = db.get_table_describe(database, table.name)  # Expand columns information
         extra_col_options = dict([(col[0], dict(list(zip(col_options.cols(), col)))) for col in col_options.rows()])
         for col_props in cols_extended:
           col_props.update(extra_col_options.get(col_props['name'], {}))
 
-        primary_keys = [col['name'] for col in extra_col_options.values() if col.get('primary_key') == 'true'] # Until IMPALA-8291
+        primary_keys = [col['name'] for col in extra_col_options.values() if col.get('primary_key') == 'true']  # Until IMPALA-8291
         foreign_keys = []  # Not supported yet
       else:
         primary_keys = [pk.name for pk in table.primary_keys]
@@ -279,7 +280,7 @@ def watch_query_refresh_json(request, id):
   query_history = authorized_get_query_history(request, id, must_exist=True)
   db = dbms.get(request.user, query_history.get_query_server_config())
 
-  if not request.POST.get('next'): # We need this as multi query would fail as current query is closed
+  if not request.POST.get('next'):  # We need this as multi query would fail as current query is closed
     handle, state = _get_query_handle_and_state(query_history)
     query_history.save_state(state)
 
@@ -1010,7 +1011,7 @@ def get_query_form(request):
 
   query_form = QueryForm()
   query_form.bind(request.POST)
-  query_form.query.fields['database'].choices = databases # Could not do it in the form
+  query_form.query.fields['database'].choices = databases  # Could not do it in the form
 
   return query_form
 
@@ -1018,6 +1019,8 @@ def get_query_form(request):
 """
 Utils
 """
+
+
 def _extract_nested_type(parse_tree, nested_path):
   nested_tokens = nested_path.strip('/').split('/')
 
