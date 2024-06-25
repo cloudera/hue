@@ -37,6 +37,7 @@ describe('isHDFS function', () => {
   test('returns true for paths starting with "hdfs"', () => {
     expect(isHDFS('hdfs://path/to/file')).toBe(true);
     expect(isHDFS('hdfs://')).toBe(true);
+    expect(isHDFS('HDFS://')).toBe(true);
   });
 
   test('returns false for other paths', () => {
@@ -51,6 +52,7 @@ describe('isOFS function', () => {
   test('returns true for paths starting with "ofs://"', () => {
     expect(isOFS('ofs://path/to/file')).toBe(true);
     expect(isOFS('ofs://')).toBe(true);
+    expect(isOFS('OFS://')).toBe(true);
   });
 
   test('returns false for other paths', () => {
@@ -66,6 +68,7 @@ describe('isS3 function', () => {
   test('returns true for paths starting with "s3a://"', () => {
     expect(isS3('s3a://path/to/file')).toBe(true);
     expect(isS3('s3a://')).toBe(true);
+    expect(isS3('S3A://')).toBe(true);
   });
 
   test('returns false for other paths', () => {
@@ -81,6 +84,7 @@ describe('isGS function', () => {
   test('returns true for paths starting with "gs://"', () => {
     expect(isGS('gs://path/to/file')).toBe(true);
     expect(isGS('gs://')).toBe(true);
+    expect(isGS('GS://')).toBe(true);
   });
 
   test('returns false for other paths', () => {
@@ -96,6 +100,7 @@ describe('isABFS function', () => {
   test('returns true for paths starting with "abfs://"', () => {
     expect(isABFS('abfs://path/to/file')).toBe(true);
     expect(isABFS('abfs://')).toBe(true);
+    expect(isABFS('ABFS://')).toBe(true);
   });
 
   test('returns false for other paths', () => {

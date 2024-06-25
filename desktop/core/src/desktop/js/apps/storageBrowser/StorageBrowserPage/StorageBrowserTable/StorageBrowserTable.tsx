@@ -291,7 +291,7 @@ const StorageBrowserTable = ({
             <StorageBrowserActions
               selectedFiles={selectedFiles}
               setLoadingFiles={setLoadingFiles}
-              setRefreshKey={setRefreshKey}
+              onSuccessfulAction={setRefreshKey}
             />
             <Dropdown
               overlayClassName="hue-storage-browser__actions-dropdown"

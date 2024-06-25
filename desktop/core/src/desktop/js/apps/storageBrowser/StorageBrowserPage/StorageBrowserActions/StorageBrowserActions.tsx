@@ -47,14 +47,14 @@ import './StorageBrowserActions.scss';
 
 interface StorageBrowserRowActionsProps {
   selectedFiles: StorageBrowserTableData[];
-  setRefreshKey: (value: number) => void;
+  onSuccessfulAction: (value: number) => void;
   setLoadingFiles: (value: boolean) => void;
 }
 
 const StorageBrowserActions = ({
   selectedFiles,
   setLoadingFiles,
-  setRefreshKey
+  onSuccessfulAction
 }: StorageBrowserRowActionsProps): JSX.Element => {
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
   const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
@@ -66,7 +66,7 @@ const StorageBrowserActions = ({
     setLoadingFiles(true);
     rename(selectedFile, newName)
       .then(() => {
-        setRefreshKey((oldKey: number) => oldKey + 1);
+        onSuccessfulAction((oldKey: number) => oldKey + 1);
       })
       .catch(error => {
         huePubSub.publish('hue.error', error);
