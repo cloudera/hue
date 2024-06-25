@@ -96,6 +96,11 @@ urlpatterns += [
     notebook_api.get_sample_data,
     name='api_sample_data_column'
   ),
+  re_path(
+    r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$',
+    notebook_api.get_sample_data,
+    name='api_sample_data_nested'
+  ),
 
   # SQLite
   re_path(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[^/?]*)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),

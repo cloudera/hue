@@ -330,6 +330,43 @@ class CatalogEntriesList {
       }
     });
 
+    /**
+     * Transforms the data and metadata of a complex response.
+     * This function processes the response based on the column type (map, array, struct)
+     * and appropriately formats the data and metadata for sampling.
+     */
+    self.transformData = function (response, isComplex, dataType) {
+      const encodeToHtml = value => JSON.stringify(value).replace(/"/g, '&quot;');
+      const decodeFromHtml = str => str.replace(/&quot;/g, '"');
+
+      let { data, meta } = response;
+
+      if (isComplex && ['map', 'array', 'struct'].includes(dataType)) {
+        if (dataType === 'array') {
+          meta = [{ name: 'item', type: '' }];
+        } else if (dataType === 'map') {
+          meta = [
+            { name: 'key', type: '' },
+            { name: 'value', type: '' }
+          ];
+          data = data.map(item => {
+            const jsonDict = JSON.parse(decodeFromHtml(item[0]));
+            const keys = Object.keys(jsonDict).map(encodeToHtml);
+            const values = Object.values(jsonDict).map(encodeToHtml);
+            return [keys, values];
+          });
+        } else if (dataType === 'struct' && data.length > 0 && data[0].length > 0) {
+          const jsonDict = JSON.parse(decodeFromHtml(data[0][0]));
+          meta = Object.keys(jsonDict).map(key => ({ name: key, type: '' }));
+          data = data.map(item => {
+            const jsonValues = Object.values(JSON.parse(decodeFromHtml(item[0])));
+            return jsonValues.map(encodeToHtml);
+          });
+        }
+      }
+      return { data, meta };
+    };
+
     // TODO: Can be computed based on contents (instead of always suggesting all col types etc.)
     self.knownFacetValues = ko.pureComputed(() => {
       if (self.catalogEntry().isDatabase()) {
@@ -583,6 +620,11 @@ class CatalogEntriesList {
           });
           self.lastSamplePromise
             .then(sample => {
+              const isComplex = self.catalogEntry().isComplex();
+              const dataType = self.catalogEntry().getType();
+              const { data, meta } = self.transformData(sample, isComplex, dataType);
+              sample.meta = meta;
+              sample.data = data;
               childPromise
                 .then(() => {
                   if (sample.meta && sample.meta.length && sample.data && sample.data.length) {

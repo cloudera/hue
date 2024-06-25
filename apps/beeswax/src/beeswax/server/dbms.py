@@ -666,15 +666,15 @@ class HiveServer2Dbms(object):
       else:
         hql = "SELECT * FROM `%s`.`%s` LIMIT %s;" % (database, table.name, limit)
     else:
+      select_clause, from_clause = self.get_nested_select(database, table.name, column, nested)
       if operation == 'distinct':
-        hql = "SELECT DISTINCT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
+        hql = 'SELECT DISTINCT %s FROM %s LIMIT %s;' % (select_clause, from_clause, limit)
       elif operation == 'max':
-        hql = "SELECT max(%s) FROM `%s`.`%s`;" % (column, database, table.name)
+        hql = 'SELECT max(%s) FROM %s;' % (select_clause, from_clause)
       elif operation == 'min':
-        hql = "SELECT min(%s) FROM `%s`.`%s`;" % (column, database, table.name)
+        hql = 'SELECT min(%s) FROM %s;' % (select_clause, from_clause)
       else:
-        hql = "SELECT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
-      # TODO: Add nested select support for HS2
+        hql = 'SELECT %s FROM %s LIMIT %s;' % (select_clause, from_clause, limit)
 
     if hql:
       if generate_sql_only:
@@ -688,6 +688,33 @@ class HiveServer2Dbms(object):
           self.close(handle)
 
     return result
+
+
+  def get_nested_select(self, database, table, column, nested):
+    """
+    Given a column or nested type, return the corresponding SELECT and FROM clauses in Hive's nested-type syntax
+    """
+    select_clause = column
+    from_clause = f"{database}.{table}"
+
+    if nested:
+      nested_tokens = nested.strip('/').split('/')
+      for i, token in enumerate(nested_tokens):
+        if token == 'item':
+          from_clause += f" LATERAL VIEW explode({select_clause}) temp_table AS temp_item{i}"
+          select_clause = f"temp_item{i}"
+        elif token == 'key':
+          from_clause += f" LATERAL VIEW explode({select_clause}) temp_table AS temp_key{i}, temp_value{i}"
+          select_clause = f"temp_key{i}"
+        elif token == 'value':
+          from_clause += f" LATERAL VIEW explode({select_clause}) temp_table AS temp_key{i}, temp_value{i}"
+          select_clause = f"temp_value{i}"
+        else:
+          select_clause += f".{token}"
+    else:
+      select_clause = column
+
+    return select_clause, from_clause
 
 
   def _get_sample_partition_query(self, database, table, column='*', limit=100, operation=None):

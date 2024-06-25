@@ -163,7 +163,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
         response = parse_tree
         # If column or nested type is scalar/primitive, add sample of values
         if parser.is_scalar_type(parse_tree['type']):
-          sample = _get_sample_data(db, database, table, column, cluster=cluster)
+          sample = _get_sample_data(db, database, table, column, nested, cluster=cluster)
           if 'rows' in sample:
             response['sample'] = sample['rows']
       else:
@@ -713,18 +713,18 @@ def clear_history(request):
 
 
 @error_handler
-def get_sample_data(request, database, table, column=None):
+def get_sample_data(request, database, table, column=None, nested=None):
   app_name = get_app_name(request)
   cluster = json.loads(request.POST.get('cluster', '{}'))
 
   query_server = get_query_server_config(app_name, connector=cluster)
   db = dbms.get(request.user, query_server)
 
-  response = _get_sample_data(db, database, table, column, cluster=cluster)
+  response = _get_sample_data(db, database, table, column, nested, cluster=cluster)
   return JsonResponse(response)
 
 
-def _get_sample_data(db, database, table, column, is_async=False, cluster=None, operation=None):
+def _get_sample_data(db, database, table, column, nested, is_async=False, cluster=None, operation=None):
   if operation == 'hello':
     table_obj = None
   else:
@@ -738,7 +738,7 @@ def _get_sample_data(db, database, table, column, is_async=False, cluster=None, 
     response['message'] = _('Not getting sample data as this is a view which can be expensive when run.')
     return response
 
-  sample_data = db.get_sample(database, table_obj, column, generate_sql_only=is_async, operation=operation)
+  sample_data = db.get_sample(database, table_obj, column, nested, generate_sql_only=is_async, operation=operation)
   response = {'status': -1}
 
   if sample_data:
