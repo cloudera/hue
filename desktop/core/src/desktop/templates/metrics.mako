@@ -103,12 +103,12 @@ ${layout.menubar(section='metrics')}
 
 <script type="text/javascript">
   (function () {
-    window.createReactComponents('#MetricsComponent');
+    window.createReactComponents('#Metrics');
   })();
 </script>
 
-<div id="MetricsComponent">
-<MetricsComponent data-reactcomponent='MetricsComponent'></MetricsComponent>
+<div id="Metrics">
+<Metrics data-reactcomponent='Metrics'></Metrics>
 </div>
 
 %if not is_embeddable:
