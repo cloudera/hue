@@ -22,7 +22,7 @@ import 'ext/bootstrap-datepicker.min';
 import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
 
-import { HIDE_GLOBAL_ALERTS_TOPIC } from 'reactComponents/AlertComponent/events';
+import { HIDE_GLOBAL_ALERTS_TOPIC } from 'reactComponents/GlobalAlert/events';
 import { registerHueWorkers } from 'sql/workers/hueWorkerHandler';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
