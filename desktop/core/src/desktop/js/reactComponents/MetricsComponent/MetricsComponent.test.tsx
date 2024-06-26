@@ -54,7 +54,6 @@ jest.mock('api/utils', () => ({
 }));
 
 describe('MetricsComponent', () => {
-  // Test for filtering metrics based on input
   test('Filtering metrics based on name column value', async () => {
     render(<MetricsComponent />);
 
@@ -74,7 +73,6 @@ describe('MetricsComponent', () => {
     });
   });
 
-  // Test for selecting a specific metric from the dropdown
   test('selecting a specific metric from the dropdown filters the data using click events', async () => {
     render(<MetricsComponent />);
 
@@ -97,7 +95,6 @@ describe('MetricsComponent', () => {
     }
   });
 
-  // Test for ensuring metrics starting with 'python.gc', 'multiprocessing', and 'auth' are not displayed
   test('ensuring metrics starting with auth, multiprocessing and python.gc are not displayed', async () => {
     render(<MetricsComponent />);
 
