@@ -1,4 +1,4 @@
-// ADD NEW RACT COMPONENTS HERE
+// ADD NEW REACT COMPONENTS HERE
 // We need a way to match an imported module with a component name
 // so we handle the imports dynamically for that reason.
 export async function loadComponent(name) {
@@ -9,6 +9,9 @@ export async function loadComponent(name) {
 
     case 'StorageBrowserPage':
       return (await import('../apps/storageBrowser/StorageBrowserPage/StorageBrowserPage')).default;
+
+    case 'MetricsComponent':
+      return (await import('./MetricsComponent/MetricsComponent')).default;
 
     // Application global components here
     case 'AppBanner':
