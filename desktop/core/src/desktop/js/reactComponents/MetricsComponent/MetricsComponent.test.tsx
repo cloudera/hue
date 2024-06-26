@@ -105,6 +105,7 @@ describe('MetricsComponent', () => {
       expect(screen.queryByText('auth.ldap.auth-time')).not.toBeInTheDocument();
       expect(screen.queryByText('multiprocessing.processes.total')).not.toBeInTheDocument();
       expect(screen.queryByText('python.gc.objects')).not.toBeInTheDocument();
+      expect(screen.queryByText('users')).toBeInTheDocument();
     });
   });
 });
