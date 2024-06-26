@@ -758,7 +758,7 @@ Alternative:
 
 ### Dask SQL
 
-[dask-sql](https://dask-sql.readthedocs.io) adds a SQL layer on top of Dask.
+dask-sql adds a SQL layer on top of Dask.
 It uses the Presto wire protocol for communication, so the SqlAlchemy dialect for Presto should be added to the Python system or Hue Python virtual environment:
 
     ./build/env/bin/pip install pyhive
