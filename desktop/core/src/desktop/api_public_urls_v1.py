@@ -86,6 +86,11 @@ urlpatterns += [
     api_public.get_sample_data,
     name='editor_sample_data_column',
   ),
+  re_path(
+      r"^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
+      api_public.get_sample_data,
+      name="editor_sample_data_nested",
+  ),
 ]
 
 urlpatterns += [
