@@ -220,11 +220,15 @@ const StorageBrowserTable = ({
     onPageNumberChange(nextPageNumber === 0 ? numPages : nextPageNumber);
   };
 
+  const reloadData = () => {
+    setRefreshKey(oldKey => oldKey + 1);
+  };
+
   const handleCreateNewFolder = (folderName: string) => {
     setLoadingFiles(true);
     mkdir(folderName, filePath)
       .then(() => {
-        setRefreshKey(oldKey => oldKey + 1);
+        reloadData();
       })
       .catch(error => {
         huePubSub.publish('hue.error', error);
@@ -239,7 +243,7 @@ const StorageBrowserTable = ({
     setLoadingFiles(true);
     touch(fileName, filePath)
       .then(() => {
-        setRefreshKey(oldKey => oldKey + 1);
+        reloadData();
       })
       .catch(error => {
         huePubSub.publish('hue.error', error);
@@ -291,7 +295,7 @@ const StorageBrowserTable = ({
             <StorageBrowserActions
               selectedFiles={selectedFiles}
               setLoadingFiles={setLoadingFiles}
-              onSuccessfulAction={setRefreshKey}
+              onSuccessfulAction={reloadData}
             />
             <Dropdown
               overlayClassName="hue-storage-browser__actions-dropdown"

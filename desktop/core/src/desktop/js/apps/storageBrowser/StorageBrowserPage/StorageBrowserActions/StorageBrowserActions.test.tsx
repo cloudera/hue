@@ -14,12 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 import StorageBrowserActions from './StorageBrowserActions';
-import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
+import {
+  StorageBrowserTableData,
+  ContentSummary
+} from '../../../../reactComponents/FileChooser/types';
 import * as StorageBrowserApi from '../../../../reactComponents/FileChooser/api';
 import { CancellablePromise } from '../../../../api/cancellablePromise';
 
@@ -60,6 +63,29 @@ describe('StorageBrowserRowActions', () => {
 
   const setLoadingFiles = jest.fn();
   const onSuccessfulAction = jest.fn();
+
+  const setUpActionMenu = async (
+    records: StorageBrowserTableData[],
+    recordPath?: string,
+    recordType?: string
+  ) => {
+    const user = userEvent.setup();
+    if (recordPath) {
+      records[0].path = recordPath;
+    }
+    if (recordType) {
+      records[0].type = recordType;
+    }
+    const { getByRole } = render(
+      <StorageBrowserActions
+        setLoadingFiles={setLoadingFiles}
+        onSuccessfulAction={onSuccessfulAction}
+        selectedFiles={records}
+      />
+    );
+    await user.click(getByRole('button'));
+  };
+
   describe('Summary option', () => {
     let summaryApiMock;
 
@@ -88,213 +114,84 @@ describe('StorageBrowserRowActions', () => {
     });
 
     test('does not render view summary option when there are multiple records selected', async () => {
-      const user = userEvent.setup();
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={mockTwoRecords}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+      await setUpActionMenu(mockTwoRecords);
+      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
     });
 
     test('renders view summary option when record is a hdfs file', async () => {
-      const user = userEvent.setup();
-      mockRecord.path = '/user/demo/test';
-      mockRecord.type = 'file';
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
+      await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
     });
 
     test('renders view summary option when record is a ofs file', async () => {
-      const user = userEvent.setup();
-      mockRecord.path = 'ofs://demo/test';
-      mockRecord.type = 'file';
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
+      await setUpActionMenu([mockRecord], 'ofs://demo/test', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
     });
 
     test('does not render view summary option when record is a hdfs folder', async () => {
-      const user = userEvent.setup();
-      mockRecord.path = '/user/demo/test';
-      mockRecord.type = 'dir';
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+      await setUpActionMenu([mockRecord], '/user/demo/test', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
     });
 
     test('does not render view summary option when record is a an abfs file', async () => {
-      const user = userEvent.setup();
-      mockRecord.path = 'abfs://demo/test';
-      mockRecord.type = 'file';
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+      await setUpActionMenu([mockRecord], 'abfs://demo/test', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
     });
 
     test('renders summary modal when view summary option is clicked', async () => {
       const user = userEvent.setup();
-      mockRecord.path = '/user/demo/test';
-      mockRecord.type = 'file';
       setUpMock();
-      const { getByRole, queryByRole, findByText } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      await user.click(queryByRole('menuitem', { name: 'View Summary' }));
-      expect(await findByText('Summary for /user/demo/test')).toBeInTheDocument();
+      await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
+      await user.click(screen.queryByRole('menuitem', { name: 'View Summary' }));
+      expect(await screen.findByText('Summary for /user/demo/test')).toBeInTheDocument();
     });
   });
 
   describe('Rename option', () => {
     test('does not render view summary option when there are multiple records selected', async () => {
-      const user = userEvent.setup();
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={mockTwoRecords}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'Rename' })).toBeNull();
+      await setUpActionMenu(mockTwoRecords);
+      expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
     test('does not render rename option when selected record is a abfs root folder', async () => {
-      const user = userEvent.setup();
-      mockRecord.path = 'abfs://';
-      mockRecord.type = 'dir';
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'Rename' })).toBeNull();
+      await setUpActionMenu([mockRecord], 'abfs://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
     test('does not render rename option when selected record is a gs root folder', async () => {
-      const user = userEvent.setup();
-      mockRecord.path = 'gs://';
-      mockRecord.type = 'dir';
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'Rename' })).toBeNull();
+      await setUpActionMenu([mockRecord], 'gs://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
     test('does not render rename option when selected record is a s3 root folder', async () => {
-      const user = userEvent.setup();
-      mockRecord.path = 's3a://';
-      mockRecord.type = 'dir';
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'Rename' })).toBeNull();
+      await setUpActionMenu([mockRecord], 's3a://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
+    });
+
+    test('does not render rename option when selected record is a ofs root folder', async () => {
+      await setUpActionMenu([mockRecord], 'ofs://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
     test('does not render rename option when selected record is a ofs service ID folder', async () => {
-      const user = userEvent.setup();
-      mockRecord.path = 'ofs://serviceID';
-      mockRecord.type = 'dir';
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'Rename' })).toBeNull();
+      await setUpActionMenu([mockRecord], 'ofs://serviceID', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
     test('does not render rename option when selected record is a ofs volume folder', async () => {
-      const user = userEvent.setup();
-      mockRecord.path = 'ofs://serviceID/volume';
-      mockRecord.type = 'dir';
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'Rename' })).toBeNull();
+      await setUpActionMenu([mockRecord], 'ofs://serviceID/volume', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
     test('renders rename option when selected record is a file or a folder', async () => {
-      const user = userEvent.setup();
-      mockRecord.path = 'abfs://test';
-      mockRecord.type = 'dir';
-      const { getByRole, queryByRole } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      expect(queryByRole('menuitem', { name: 'Rename' })).not.toBeNull();
+      await setUpActionMenu([mockRecord], 'abfs://test', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Rename' })).not.toBeNull();
     });
 
     test('renders rename modal when rename option is clicked', async () => {
       const user = userEvent.setup();
-      mockRecord.path = 'abfs://test';
-      mockRecord.type = 'dir';
-      const { getByRole, queryByRole, findByText } = render(
-        <StorageBrowserActions
-          setLoadingFiles={setLoadingFiles}
-          onSuccessfulAction={onSuccessfulAction}
-          selectedFiles={[mockRecord]}
-        />
-      );
-      await user.click(getByRole('button'));
-      await user.click(queryByRole('menuitem', { name: 'Rename' }));
-      expect(await findByText('Enter new name here')).toBeInTheDocument();
+      await setUpActionMenu([mockRecord], 'abfs://test', 'dir');
+      await user.click(screen.queryByRole('menuitem', { name: 'Rename' }));
+      expect(await screen.findByText('Enter new name here')).toBeInTheDocument();
     });
   });
 });

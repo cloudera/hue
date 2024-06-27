@@ -35,7 +35,8 @@ import {
   inTrash,
   isABFS,
   isGS,
-  isS3
+  isS3,
+  isOFSRoot
 } from '../../../../utils/storageBrowserUtils';
 import { rename } from '../../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../../utils/huePubSub';
@@ -47,7 +48,7 @@ import './StorageBrowserActions.scss';
 
 interface StorageBrowserRowActionsProps {
   selectedFiles: StorageBrowserTableData[];
-  onSuccessfulAction: (value: number) => void;
+  onSuccessfulAction: () => void;
   setLoadingFiles: (value: boolean) => void;
 }
 
@@ -66,7 +67,7 @@ const StorageBrowserActions = ({
     setLoadingFiles(true);
     rename(selectedFile, newName)
       .then(() => {
-        onSuccessfulAction((oldKey: number) => oldKey + 1);
+        onSuccessfulAction();
       })
       .catch(error => {
         huePubSub.publish('hue.error', error);
@@ -78,25 +79,27 @@ const StorageBrowserActions = ({
   };
 
   const isSummaryEnabled = () => {
+    if (selectedFiles.length !== 1) {
+      return false;
+    }
     const selectedFile = selectedFiles[0];
-    return (
-      selectedFiles.length == 1 &&
-      (isHDFS(selectedFile.path) || isOFS(selectedFile.path)) &&
-      selectedFile.type === 'file'
-    );
+    return (isHDFS(selectedFile.path) || isOFS(selectedFile.path)) && selectedFile.type === 'file';
   };
 
   const isRenameEnabled = () => {
-    const selectedFile = selectedFiles[0];
+    if (selectedFiles.length !== 1) {
+      return false;
+    }
+    const selectedFilePath = selectedFiles[0].path;
     return (
-      selectedFiles.length == 1 &&
-      (isHDFS(selectedFile.path) ||
-        (isS3(selectedFile.path) && !isS3Root(selectedFile.path)) ||
-        (isGS(selectedFile.path) && !isGSRoot(selectedFile.path)) ||
-        (isABFS(selectedFile.path) && !isABFSRoot(selectedFile.path)) ||
-        (isOFS(selectedFile.path) &&
-          !isOFSServiceID(selectedFile.path) &&
-          !isOFSVol(selectedFile.path)))
+      isHDFS(selectedFilePath) ||
+      (isS3(selectedFilePath) && !isS3Root(selectedFilePath)) ||
+      (isGS(selectedFilePath) && !isGSRoot(selectedFilePath)) ||
+      (isABFS(selectedFilePath) && !isABFSRoot(selectedFilePath)) ||
+      (isOFS(selectedFilePath) &&
+        !isOFSRoot(selectedFilePath) &&
+        !isOFSServiceID(selectedFilePath) &&
+        !isOFSVol(selectedFilePath))
     );
   };
 
