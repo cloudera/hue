@@ -46,7 +46,7 @@ categories:
 
 Hello Everyone!
 
-Hue, the open-source SQL Assistant for querying databases and data warehouses, is now extending its support to Trino. This integration marks a significant step in enhancing data mesh and SQL federation capabilities.
+Hue Editor, the open-source SQL Assistant for querying databases and data warehouses, is now extending its support to Trino. This integration marks a significant step in enhancing data mesh and SQL federation capabilities.
 
 ### What is Trino?
 
