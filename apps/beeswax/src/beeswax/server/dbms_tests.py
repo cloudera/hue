@@ -16,19 +16,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import pytest
 import sys
+import logging
+from unittest.mock import Mock, patch
+
+import pytest
+from django.core.cache import caches
 from django.test import TestCase
-from beeswax.server.dbms import get_query_server_config
+
+from beeswax.server.dbms import HiveServer2Dbms, get_query_server_config
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
-from django.core.cache import caches
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
 LOG = logging.getLogger()
 cache = caches[CACHES_HIVE_DISCOVERY_KEY]
@@ -173,3 +171,38 @@ class TestGetQueryServerConfig():
 # TODO: all the combinations in new test methods, e.g.:
 # HIVE_DISCOVERY_LLAP_HA.get() --> True
 # ...
+
+
+class TestHiveServer2Dbms():
+
+  def test_get_nested_select_no_nested(self):
+    select_clause, from_clause = HiveServer2Dbms.get_nested_select(self, "db", "tbl", "col", None)
+    assert select_clause == "col"
+    assert from_clause == "db.tbl"
+
+  def test_get_nested_select_with_array_item(self):
+    select_clause, from_clause = HiveServer2Dbms.get_nested_select(self, "db", "tbl", "col", "item")
+    assert select_clause == "temp_item0"
+    assert from_clause == "db.tbl LATERAL VIEW explode(col) temp_table AS temp_item0"
+
+  def test_get_nested_select_with_map_key(self):
+    select_clause, from_clause = HiveServer2Dbms.get_nested_select(self, "db", "tbl", "col", "key")
+    assert select_clause == "temp_key0"
+    assert from_clause == "db.tbl LATERAL VIEW explode(col) temp_table AS temp_key0, temp_value0"
+
+  def test_get_nested_select_with_map_value(self):
+    select_clause, from_clause = HiveServer2Dbms.get_nested_select(self, "db", "tbl", "col", "value")
+    assert select_clause == "temp_value0"
+    assert from_clause == "db.tbl LATERAL VIEW explode(col) temp_table AS temp_key0, temp_value0"
+
+  def test_get_nested_select_with_nested_path(self):
+    select_clause, from_clause = HiveServer2Dbms.get_nested_select(self, "db", "tbl", "col", "item/key/value")
+    assert select_clause == "temp_value2"
+    assert from_clause == ("db.tbl LATERAL VIEW explode(col) temp_table AS temp_item0 "
+                            "LATERAL VIEW explode(temp_item0) temp_table AS temp_key1, temp_value1 "
+                            "LATERAL VIEW explode(temp_key1) temp_table AS temp_key2, temp_value2")
+
+  def test_get_nested_select_with_struct_path(self):
+    select_clause, from_clause = HiveServer2Dbms.get_nested_select(self, "db", "tbl", "col", "item/field1")
+    assert select_clause == "temp_item0.field1"
+    assert from_clause == "db.tbl LATERAL VIEW explode(col) temp_table AS temp_item0"
