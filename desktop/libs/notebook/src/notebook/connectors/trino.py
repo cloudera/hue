@@ -104,8 +104,9 @@ class TrinoApi(Api):
 
   @query_error_handler
   def execute(self, notebook, snippet):
+    catalog = snippet['catalog']
     database = snippet['database']
-    query_client = TrinoQuery(self.trino_request, 'USE ' + database)
+    query_client = TrinoQuery(self.trino_request, 'USE ' + catalog + '.' + database)
     query_client.execute()
 
     current_statement = self._get_current_statement(notebook, snippet)
@@ -211,15 +212,17 @@ class TrinoApi(Api):
 
 
   @query_error_handler
-  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
+  def autocomplete(self, snippet, catalog=None, database=None, table=None, column=None, nested=None, operation=None):
     response = {}
 
-    if database is None:
-      response['databases'] = self._show_databases()
+    if catalog is None:
+      response['catalogs'] = self._show_catalogs()
+    elif database is None:
+      response['databases'] = self._show_databases(catalog)
     elif table is None:
-      response['tables_meta'] = self._show_tables(database)
+      response['tables_meta'] = self._show_tables(catalog, database)
     elif column is None:
-      columns = self._get_columns(database, table)
+      columns = self._get_columns(catalog, database, table)
       response['columns'] = [col['name'] for col in columns]
       response['extended_columns'] = [{
         'comment': col.get('comment'),
@@ -288,14 +291,10 @@ class TrinoApi(Api):
     pass
 
 
-  def _show_databases(self):
-    catalogs = self._show_catalogs()
-    databases = []
-
-    for catalog in catalogs:
-      query_client = TrinoQuery(self.trino_request, 'SHOW SCHEMAS FROM ' + catalog)
-      response = query_client.execute()
-      databases += [f'{catalog}.{item}' for sublist in response.rows for item in sublist]
+  def _show_databases(self, catalog):
+    query_client = TrinoQuery(self.trino_request, 'SHOW SCHEMAS FROM ' + catalog)
+    response = query_client.execute()
+    databases = [item for sublist in response.rows for item in sublist]
 
     return databases
 
@@ -309,8 +308,8 @@ class TrinoApi(Api):
     return catalogs
 
 
-  def _show_tables(self, database):
-    query_client = TrinoQuery(self.trino_request, 'USE ' + database)
+  def _show_tables(self, catalog, database):
+    query_client = TrinoQuery(self.trino_request, 'USE ' + catalog + '.' + database)
     query_client.execute()
     query_client = TrinoQuery(self.trino_request, 'SHOW TABLES')
     response = query_client.execute()
@@ -324,8 +323,8 @@ class TrinoApi(Api):
     ]
 
 
-  def _get_columns(self, database, table):
-    query_client = TrinoQuery(self.trino_request, 'USE ' + database)
+  def _get_columns(self, catalog, database, table):
+    query_client = TrinoQuery(self.trino_request, 'USE ' + catalog + '.' + database)
     query_client.execute()
     query_client = TrinoQuery(self.trino_request, 'DESCRIBE ' + table)
     response = query_client.execute()

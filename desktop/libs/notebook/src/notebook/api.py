@@ -759,7 +759,12 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   action = request.POST.get('operation', 'schema')
 
   try:
-    autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested, action)
+    if snippet['type'] == 'trino':
+      catalog = None
+      # extract the form param from for catalog
+      autocomplete_data = get_api(request, snippet).autocomplete(snippet, catalog, database, table, column, nested, action)
+    else:
+      autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested, action)
     response.update(autocomplete_data)
   except QueryExpired as e:
     LOG.warning('Expired query seen: %s' % e)
