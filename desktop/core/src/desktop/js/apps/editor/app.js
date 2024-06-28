@@ -49,6 +49,8 @@ huePubSub.subscribe('app.dom.loaded', app => {
   if (app === 'editor') {
     window.MAIN_SCROLLABLE = '.page-content';
 
+    console.info('Editor v2 enabled.');
+
     let isLeftNavOpen = false;
     huePubSub.subscribe(
       'left.nav.open.toggle',
