@@ -20,6 +20,10 @@ const deXSS = (str?: undefined | boolean | string | number | null, options?: IOp
   if (str === null) {
     return 'null';
   }
+  //Fix for sanitize HTML returns empty string for boolean false values.
+  if (typeof str === 'boolean') {
+    return str.toString();
+  }
   if (typeof str !== 'undefined') {
     return sanitizeHtml(str as string, options) || '';
   }
