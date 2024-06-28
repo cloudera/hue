@@ -24,43 +24,110 @@ import InfoIcon from '@cloudera/cuix-core/icons/react/InfoIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
-import { isHDFS, isOFS } from '../../../../utils/storageBrowserUtils';
+import {
+  isHDFS,
+  isOFS,
+  isABFSRoot,
+  isGSRoot,
+  isOFSServiceID,
+  isOFSVol,
+  isS3Root,
+  inTrash,
+  isABFS,
+  isGS,
+  isS3,
+  isOFSRoot
+} from '../../../../utils/storageBrowserUtils';
+import { rename } from '../../../../reactComponents/FileChooser/api';
+import huePubSub from '../../../../utils/huePubSub';
 
 import SummaryModal from '../../SummaryModal/SummaryModal';
+import InputModal from '../../InputModal/InputModal';
 
 import './StorageBrowserActions.scss';
 
 interface StorageBrowserRowActionsProps {
   selectedFiles: StorageBrowserTableData[];
+  onSuccessfulAction: () => void;
+  setLoadingFiles: (value: boolean) => void;
 }
 
-const StorageBrowserActions = ({ selectedFiles }: StorageBrowserRowActionsProps): JSX.Element => {
+const StorageBrowserActions = ({
+  selectedFiles,
+  setLoadingFiles,
+  onSuccessfulAction
+}: StorageBrowserRowActionsProps): JSX.Element => {
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
+  const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<string>('');
 
   const { t } = i18nReact.useTranslation();
 
+  const handleRename = (newName: string) => {
+    setLoadingFiles(true);
+    rename(selectedFile, newName)
+      .then(() => {
+        onSuccessfulAction();
+      })
+      .catch(error => {
+        huePubSub.publish('hue.error', error);
+        setShowRenameModal(false);
+      })
+      .finally(() => {
+        setLoadingFiles(false);
+      });
+  };
+
   const isSummaryEnabled = () => {
+    if (selectedFiles.length !== 1) {
+      return false;
+    }
     const selectedFile = selectedFiles[0];
+    return (isHDFS(selectedFile.path) || isOFS(selectedFile.path)) && selectedFile.type === 'file';
+  };
+
+  const isRenameEnabled = () => {
+    if (selectedFiles.length !== 1) {
+      return false;
+    }
+    const selectedFilePath = selectedFiles[0].path;
     return (
-      selectedFiles.length == 1 &&
-      (isHDFS(selectedFile.path) || isOFS(selectedFile.path)) &&
-      selectedFile.type === 'file'
+      isHDFS(selectedFilePath) ||
+      (isS3(selectedFilePath) && !isS3Root(selectedFilePath)) ||
+      (isGS(selectedFilePath) && !isGSRoot(selectedFilePath)) ||
+      (isABFS(selectedFilePath) && !isABFSRoot(selectedFilePath)) ||
+      (isOFS(selectedFilePath) &&
+        !isOFSRoot(selectedFilePath) &&
+        !isOFSServiceID(selectedFilePath) &&
+        !isOFSVol(selectedFilePath))
     );
   };
 
   const getActions = () => {
     const actions: MenuItemType[] = [];
-    if (isSummaryEnabled()) {
-      actions.push({
-        key: 'content_summary',
-        icon: <InfoIcon />,
-        label: t('View Summary'),
-        onClick: () => {
-          setSelectedFile(selectedFiles[0].path);
-          setShowSummaryModal(true);
-        }
-      });
+    if (selectedFiles && selectedFiles.length > 0 && !inTrash(selectedFiles[0].path)) {
+      if (isSummaryEnabled()) {
+        actions.push({
+          key: 'content_summary',
+          icon: <InfoIcon />,
+          label: t('View Summary'),
+          onClick: () => {
+            setSelectedFile(selectedFiles[0].path);
+            setShowSummaryModal(true);
+          }
+        });
+      }
+      if (isRenameEnabled()) {
+        actions.push({
+          key: 'rename',
+          icon: <InfoIcon />,
+          label: t('Rename'),
+          onClick: () => {
+            setSelectedFile(selectedFiles[0].path);
+            setShowRenameModal(true);
+          }
+        });
+      }
     }
     return actions;
   };
@@ -84,6 +151,14 @@ const StorageBrowserActions = ({ selectedFiles }: StorageBrowserRowActionsProps)
         showModal={showSummaryModal}
         path={selectedFile}
         onClose={() => setShowSummaryModal(false)}
+      />
+      <InputModal
+        title={t('Rename')}
+        inputLabel={t('Enter new name here')}
+        submitText={t('Rename')}
+        showModal={showRenameModal}
+        onSubmit={handleRename}
+        onClose={() => setShowRenameModal(false)}
       />
     </>
   );

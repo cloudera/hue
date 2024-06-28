@@ -22,6 +22,7 @@ const VIEWFILES_API_URl = '/api/v1/storage/view=';
 const MAKE_DIRECTORY_API_URL = '/api/v1/storage/mkdir';
 const TOUCH_API_URL = '/api/v1/storage/touch';
 const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary=';
+const RENAME_API_URL = '/api/v1/storage/rename';
 
 export interface ApiFileSystem {
   file_system: string;
@@ -78,3 +79,7 @@ export const touch = async (fileName: string, path: string): Promise<void> => {
 
 export const fetchContentSummary = (path: string): CancellablePromise<ContentSummary> =>
   get(CONTENT_SUMMARY_API_URL + path);
+
+export const rename = async (src_path: string, dest_path: string): Promise<void> => {
+  await post(RENAME_API_URL, { src_path: src_path, dest_path: dest_path });
+};

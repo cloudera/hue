@@ -22,3 +22,43 @@ export const isHDFS = (path: string): boolean => {
 export const isOFS = (path: string): boolean => {
   return path.toLowerCase().indexOf('ofs://') === 0;
 };
+
+export const isS3 = (path: string): boolean => {
+  return path.toLowerCase().indexOf('s3a://') === 0;
+};
+
+export const isGS = (path: string): boolean => {
+  return path.toLowerCase().indexOf('gs://') === 0;
+};
+
+export const isABFS = (path: string): boolean => {
+  return path.toLowerCase().indexOf('abfs://') === 0;
+};
+
+export const isS3Root = (path: string): boolean => {
+  return isS3(path) && path.toLowerCase() === 's3a://';
+};
+
+export const isGSRoot = (path: string): boolean => {
+  return isGS(path) && path.toLowerCase() === 'gs://';
+};
+
+export const isABFSRoot = (path: string): boolean => {
+  return isABFS(path) && path.toLowerCase() === 'abfs://';
+};
+
+export const isOFSRoot = (path: string): boolean => {
+  return isOFS(path) && path.toLowerCase() === 'ofs://';
+};
+
+export const isOFSServiceID = (path: string): boolean => {
+  return isOFS(path) && path.split('/').length === 3 && path.split('/')[2] !== '';
+};
+
+export const isOFSVol = (path: string): boolean => {
+  return isOFS(path) && path.split('/').length === 4 && path.split('/')[3] !== '';
+};
+
+export const inTrash = (path: string): boolean => {
+  return path.match(/^\/user\/.+?\/\.Trash/) !== null;
+};

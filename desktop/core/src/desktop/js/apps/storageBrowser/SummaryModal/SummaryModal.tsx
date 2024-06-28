@@ -70,22 +70,21 @@ const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Elem
   };
 
   useEffect(() => {
-    if (path === '') {
-      return;
+    if (showModal) {
+      setLoadingSummary(true);
+      fetchContentSummary(path)
+        .then(responseSummary => {
+          updateSummaryData(responseSummary);
+        })
+        .catch(error => {
+          huePubSub.publish('hue.error', error);
+          onClose();
+        })
+        .finally(() => {
+          setLoadingSummary(false);
+        });
     }
-    setLoadingSummary(true);
-    fetchContentSummary(path)
-      .then(responseSummary => {
-        updateSummaryData(responseSummary);
-      })
-      .catch(error => {
-        huePubSub.publish('hue.error', error);
-        onClose();
-      })
-      .finally(() => {
-        setLoadingSummary(false);
-      });
-  }, [path]);
+  }, [path, showModal]);
 
   //TODO:Handle long modal title
   return (
