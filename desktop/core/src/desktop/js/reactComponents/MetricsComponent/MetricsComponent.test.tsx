@@ -54,7 +54,6 @@ jest.mock('api/utils', () => ({
 }));
 
 describe('MetricsComponent', () => {
-  // Test for filtering metrics based on input
   test('Filtering metrics based on name column value', async () => {
     render(<MetricsComponent />);
 
@@ -74,7 +73,6 @@ describe('MetricsComponent', () => {
     });
   });
 
-  // Test for selecting a specific metric from the dropdown
   test('selecting a specific metric from the dropdown filters the data using click events', async () => {
     render(<MetricsComponent />);
 
@@ -95,5 +93,16 @@ describe('MetricsComponent', () => {
         expect(headings).toHaveLength(1);
       });
     }
+  });
+
+  test('ensuring metrics starting with auth, multiprocessing and python.gc are not displayed', async () => {
+    render(<MetricsComponent />);
+
+    await waitFor(() => {
+      expect(screen.queryByText('auth.ldap.auth-time')).not.toBeInTheDocument();
+      expect(screen.queryByText('multiprocessing.processes.total')).not.toBeInTheDocument();
+      expect(screen.queryByText('python.gc.objects')).not.toBeInTheDocument();
+      expect(screen.queryByText('users')).toBeInTheDocument();
+    });
   });
 });
