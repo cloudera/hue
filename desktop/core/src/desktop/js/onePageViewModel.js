@@ -27,7 +27,7 @@ import waitForVariable from 'utils/timing/waitForVariable';
 import getParameter from 'utils/url/getParameter';
 import getSearchParameter from 'utils/url/getSearchParameter';
 import { ASSIST_GET_DATABASE_EVENT, ASSIST_GET_SOURCE_EVENT } from 'ko/components/assist/events';
-import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
 
 class OnePageViewModel {
   constructor() {

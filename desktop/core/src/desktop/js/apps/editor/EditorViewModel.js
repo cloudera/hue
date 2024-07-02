@@ -27,7 +27,7 @@ import Notebook from 'apps/editor/notebook';
 import ChartTransformers from 'apps/notebook/chartTransformers';
 import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
-import { GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import huePubSub from 'utils/huePubSub';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import UUID from 'utils/string/UUID';

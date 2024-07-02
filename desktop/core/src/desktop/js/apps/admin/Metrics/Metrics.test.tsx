@@ -17,7 +17,7 @@
 import React from 'react';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import MetricsComponent from './MetricsComponent';
+import Metrics from './Metrics';
 
 // Mock the API call to return sample metrics data
 jest.mock('api/utils', () => ({
@@ -53,10 +53,10 @@ jest.mock('api/utils', () => ({
   )
 }));
 
-describe('MetricsComponent', () => {
+describe('Metrics', () => {
   // Test for filtering metrics based on input
   test('Filtering metrics based on name column value', async () => {
-    render(<MetricsComponent />);
+    render(<Metrics />);
 
     const filterInput = screen.getByPlaceholderText('Filter metrics...');
     fireEvent.change(filterInput, { target: { value: 'value' } });
@@ -76,7 +76,7 @@ describe('MetricsComponent', () => {
 
   // Test for selecting a specific metric from the dropdown
   test('selecting a specific metric from the dropdown filters the data using click events', async () => {
-    render(<MetricsComponent />);
+    render(<Metrics />);
 
     await waitFor(() => screen.getByText('queries.number'));
 

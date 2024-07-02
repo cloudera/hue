@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.dateRangePicker = {
