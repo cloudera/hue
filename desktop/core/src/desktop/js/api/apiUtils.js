@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 
-import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
 import logError from 'utils/logError';
 import huePubSub from 'utils/huePubSub';
 
