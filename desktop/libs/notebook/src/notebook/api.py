@@ -772,7 +772,7 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
 @require_POST
 @check_document_access_permission
 @api_error_handler
-def get_sample_data(request, server=None, database=None, table=None, column=None):
+def get_sample_data(request, server=None, database=None, table=None, column=None, nested=None):
   response = {'status': -1}
 
   # Passed by check_document_access_permission but unused by APIs
@@ -781,7 +781,7 @@ def get_sample_data(request, server=None, database=None, table=None, column=None
   is_async = json.loads(request.POST.get('async', 'false'))
   operation = json.loads(request.POST.get('operation', '"default"'))
 
-  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column, is_async=is_async, operation=operation)
+  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column, nested, is_async=is_async, operation=operation)
   response.update(sample_data)
 
   response['status'] = 0
