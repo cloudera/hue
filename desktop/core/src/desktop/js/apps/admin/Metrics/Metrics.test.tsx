@@ -17,7 +17,7 @@
 import React from 'react';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import MetricsComponent from './MetricsComponent';
+import Metrics from './Metrics';
 
 // Mock the API call to return sample metrics data
 jest.mock('api/utils', () => ({
@@ -53,9 +53,9 @@ jest.mock('api/utils', () => ({
   )
 }));
 
-describe('MetricsComponent', () => {
+describe('Metrics', () => {
   test('Filtering metrics based on name column value', async () => {
-    render(<MetricsComponent />);
+    render(<Metrics />);
 
     const filterInput = screen.getByPlaceholderText('Filter metrics...');
     fireEvent.change(filterInput, { target: { value: 'value' } });
@@ -74,7 +74,7 @@ describe('MetricsComponent', () => {
   });
 
   test('selecting a specific metric from the dropdown filters the data using click events', async () => {
-    render(<MetricsComponent />);
+    render(<Metrics />);
 
     await waitFor(() => screen.getByText('queries.number'));
 
@@ -124,7 +124,7 @@ describe('MetricsComponent', () => {
         })
       )
     }));
-    render(<MetricsComponent />);
+    render(<Metrics />);
 
     await waitFor(() => {
       expect(screen.queryByText('auth.ldap.auth-time')).not.toBeInTheDocument();

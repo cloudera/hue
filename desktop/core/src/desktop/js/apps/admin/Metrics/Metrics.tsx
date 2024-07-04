@@ -19,11 +19,11 @@ import MetricsTable, { MetricsResponse } from './MetricsTable';
 import { Spin, Input, Select, Alert } from 'antd';
 import { get } from 'api/utils';
 import { SearchOutlined } from '@ant-design/icons';
-import './MetricsComponent.scss';
+import './Metrics.scss';
 
 const { Option } = Select;
 
-const MetricsComponent: React.FC = (): JSX.Element => {
+const Metrics: React.FC = (): JSX.Element => {
   const [metrics, setMetrics] = useState<MetricsResponse>();
   const [filteredKeys, setFilteredKeys] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -139,4 +139,4 @@ const MetricsComponent: React.FC = (): JSX.Element => {
   );
 };
 
-export default MetricsComponent;
+export default Metrics;
