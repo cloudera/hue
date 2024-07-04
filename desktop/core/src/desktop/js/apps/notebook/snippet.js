@@ -42,7 +42,7 @@ import {
   GLOBAL_ERROR_TOPIC,
   GLOBAL_INFO_TOPIC,
   GLOBAL_WARNING_TOPIC
-} from 'reactComponents/AlertComponent/events';
+} from 'reactComponents/GlobalAlert/events';
 import { POST_FROM_LOCATION_WORKER_EVENT } from 'sql/workers/events';
 import {
   ACTIVE_STATEMENT_CHANGED_EVENT,

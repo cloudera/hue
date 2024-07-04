@@ -135,7 +135,7 @@ ${ hueIcons.symbols() }
 
   <div class="main-page">
     <AppBanner data-reactcomponent='AppBanner'></AppBanner>
-    <AlertComponent data-reactcomponent='AlertComponent'></AlertComponent>
+    <GlobalAlert data-reactcomponent='GlobalAlert'></GlobalAlert>
     <WelcomeTour data-reactcomponent='WelcomeTour'></WelcomeTour>
 
     <nav class="navbar navbar-default">

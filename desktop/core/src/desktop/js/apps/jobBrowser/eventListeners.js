@@ -16,7 +16,7 @@
 
 import $ from 'jquery';
 import huePubSub from '../../utils/huePubSub';
-import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 
 $(document).off('shown', '.jb-logs-link');
 $(document).on('shown', '.jb-logs-link', e => {

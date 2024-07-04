@@ -10,15 +10,15 @@ export async function loadComponent(name) {
     case 'StorageBrowserPage':
       return (await import('../apps/storageBrowser/StorageBrowserPage/StorageBrowserPage')).default;
 
-    case 'MetricsComponent':
-      return (await import('./MetricsComponent/MetricsComponent')).default;
+    case 'Metrics':
+      return (await import('../apps/admin/Metrics/Metrics')).default;
 
     // Application global components here
     case 'AppBanner':
       return (await import('./AppBanner/AppBanner')).default;
 
-    case 'AlertComponent':
-      return (await import('./AlertComponent/AlertComponent')).default;
+    case 'GlobalAlert':
+      return (await import('./GlobalAlert/GlobalAlert')).default;
 
     case 'ReactExampleGlobal':
       return (await import('./ReactExampleGlobal/ReactExampleGlobal')).default;

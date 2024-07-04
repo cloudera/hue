@@ -58,7 +58,7 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
-import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import { EXECUTABLE_UPDATED_TOPIC } from './execution/events';
 
 // TODO: Remove together with ENABLE_HUE_5. Temporary here for debug

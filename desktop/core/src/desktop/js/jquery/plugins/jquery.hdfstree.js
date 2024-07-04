@@ -16,7 +16,7 @@
 
 import jQuery from 'jquery';
 
-import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import scrollbarWidth from 'utils/screen/scrollbarWidth';

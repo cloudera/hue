@@ -18,7 +18,7 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
-import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
 import escapeOutput from 'utils/html/escapeOutput';
 import highlight from 'utils/html/highlight';
 import huePubSub from 'utils/huePubSub';

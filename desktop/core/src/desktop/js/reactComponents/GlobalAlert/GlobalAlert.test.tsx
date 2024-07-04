@@ -20,7 +20,7 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import huePubSub from '../../utils/huePubSub';
 
-import AlertComponent, { HueAlert } from './AlertComponent';
+import GlobalAlert, { HueAlert } from './GlobalAlert';
 import {
   GLOBAL_ERROR_TOPIC,
   GLOBAL_INFO_TOPIC,
@@ -28,9 +28,9 @@ import {
   HIDE_GLOBAL_ALERTS_TOPIC
 } from './events';
 
-describe('AlertComponent', () => {
+describe('GlobalAlert', () => {
   it('should show a global error message', async () => {
-    render(<AlertComponent />);
+    render(<GlobalAlert />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
     act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Some error' }));
@@ -41,7 +41,7 @@ describe('AlertComponent', () => {
   });
 
   it('should show multiple global error messages', async () => {
-    render(<AlertComponent />);
+    render(<GlobalAlert />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
     act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 1' }));
@@ -54,7 +54,7 @@ describe('AlertComponent', () => {
   });
 
   it("shouldn't show empty error messages", async () => {
-    render(<AlertComponent />);
+    render(<GlobalAlert />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
     act(() => huePubSub.publish<HueAlert>('hue.global.error', { message: '' }));
@@ -63,7 +63,7 @@ describe('AlertComponent', () => {
   });
 
   it('should show unique error messages', async () => {
-    render(<AlertComponent />);
+    render(<GlobalAlert />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
 
     act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 1' }));
@@ -78,7 +78,7 @@ describe('AlertComponent', () => {
 
   it('should close alerts when clicked', async () => {
     const user = userEvent.setup();
-    render(<AlertComponent />);
+    render(<GlobalAlert />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
     act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 1' }));
     act(() => huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Error 2' }));
@@ -112,7 +112,7 @@ describe('AlertComponent', () => {
 
   it('should close info alerts automatically after 3 seconds', async () => {
     jest.useFakeTimers();
-    render(<AlertComponent />);
+    render(<GlobalAlert />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
     act(() => huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: 'info' }));
     expect(screen.queryAllByRole('alert')).toHaveLength(1);
@@ -124,7 +124,7 @@ describe('AlertComponent', () => {
 
   it('should close warning alerts when when noStick is set to true', async () => {
     jest.useFakeTimers();
-    render(<AlertComponent />);
+    render(<GlobalAlert />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
     act(() =>
       huePubSub.publish<HueAlert>(GLOBAL_WARNING_TOPIC, { message: 'Some warning', noStick: true })
@@ -138,7 +138,7 @@ describe('AlertComponent', () => {
 
   it('should close error alerts when when noStick is set to true', async () => {
     jest.useFakeTimers();
-    render(<AlertComponent />);
+    render(<GlobalAlert />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
     act(() =>
       huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message: 'Some error', noStick: true })
@@ -151,7 +151,7 @@ describe('AlertComponent', () => {
   });
 
   it('should close all alerts "hide.global.alerts" is published', async () => {
-    render(<AlertComponent />);
+    render(<GlobalAlert />);
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
     act(() => huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: 'Some info' }));
     act(() => huePubSub.publish<HueAlert>(GLOBAL_WARNING_TOPIC, { message: 'Some warning' }));

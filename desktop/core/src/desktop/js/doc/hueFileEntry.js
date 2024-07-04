@@ -22,7 +22,7 @@ import huePubSub from 'utils/huePubSub';
 import HueDocument from 'doc/hueDocument';
 import { DOCUMENT_TYPE_I18n, DOCUMENT_TYPES } from 'doc/docSupport';
 import { SHOW_DELETE_DOC_MODAL_EVENT } from 'ko/components/ko.deleteDocModal';
-import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
 
 const SORTS = {
   defaultAsc: (a, b) => {

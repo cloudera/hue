@@ -22,7 +22,7 @@ import apiHelper from 'api/apiHelper';
 import MetastoreColumn from 'apps/tableBrowser/metastoreColumn';
 import MetastoreTableSamples from 'apps/tableBrowser/metastoreTableSamples';
 import MetastoreTablePartitions from 'apps/tableBrowser/metastoreTablePartitions';
-import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import deXSS from 'utils/html/deXSS';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';

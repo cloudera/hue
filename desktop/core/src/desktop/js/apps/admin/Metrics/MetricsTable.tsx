@@ -17,7 +17,7 @@
 import React from 'react';
 import Table from 'cuix/dist/components/Table/Table';
 import type { ColumnType } from 'antd/es/table';
-import './MetricsComponent.scss';
+import './Metrics.scss';
 import I18n from 'utils/i18n';
 
 interface MetricsValue {

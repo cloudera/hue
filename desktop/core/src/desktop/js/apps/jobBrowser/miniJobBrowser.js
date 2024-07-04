@@ -17,7 +17,7 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
-import { GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 

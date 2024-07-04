@@ -35,7 +35,7 @@ import changeURL from 'utils/url/changeURL';
 import changeURLParameter from 'utils/url/changeURLParameter';
 import getParameter from 'utils/url/getParameter';
 import UUID from 'utils/string/UUID';
-import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 
 export default class NotebookViewModel {
   constructor(options, CoordinatorEditorViewModel, RunningCoordinatorModel) {

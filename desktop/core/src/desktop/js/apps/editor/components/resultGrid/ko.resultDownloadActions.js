@@ -20,7 +20,7 @@ import * as ko from 'knockout';
 import { SHOW_DOWNLOAD_RESULT_MODAL_EVENT } from 'apps/editor/components/resultGrid/ko.resultDownloadModal';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
-import { GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import I18n from 'utils/i18n';
 import huePubSub from 'utils/huePubSub';
 import html2text from 'utils/html/html2text';
