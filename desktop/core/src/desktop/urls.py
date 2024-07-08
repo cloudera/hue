@@ -65,9 +65,12 @@ handler500 = 'desktop.views.serve_500_error'
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="HUE Public APIs",
+      title="Snippets API",
       default_version='v1',
-      description="HUE Public APIs"
+      description="Test description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
