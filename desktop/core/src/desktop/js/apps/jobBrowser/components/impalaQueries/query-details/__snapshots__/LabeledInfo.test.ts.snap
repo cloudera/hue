@@ -11,11 +11,9 @@ exports[`LabeledInfo.vue should render 1`] = `
     class="labled-info-value"
   >
     
-    
     <div>
       Some item
     </div>
-    
     
   </div>
 </div>
