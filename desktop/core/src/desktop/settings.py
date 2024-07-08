@@ -208,6 +208,7 @@ INSTALLED_APPS = [
     # 'django_celery_results',
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
 ]
 
 WEBPACK_LOADER = {

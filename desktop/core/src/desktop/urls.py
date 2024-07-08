@@ -28,6 +28,9 @@ from rest_framework_simplejwt.views import (
   TokenRefreshView,
   TokenVerifyView,
 )
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 # FIXME: This could be replaced with hooking into the `AppConfig.ready()`
 # signal in Django 1.7:
@@ -57,6 +60,20 @@ else:
 handler403 = 'desktop.views.serve_403_error'
 handler404 = 'desktop.views.serve_404_error'
 handler500 = 'desktop.views.serve_500_error'
+
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Snippets API",
+      default_version='v1',
+      description="Test description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
 
 
 # Some django-wide URLs
@@ -237,6 +254,11 @@ if ENABLE_PROMETHEUS.get():
     re_path('', include('django_prometheus.urls')),
   ]
 
+dynamic_patterns += [
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+]
 
 static_patterns = []
 
