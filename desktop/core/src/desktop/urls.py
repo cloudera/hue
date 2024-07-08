@@ -47,6 +47,7 @@ from desktop.settings import is_oidc_configured
 from notebook import views as notebook_views
 from useradmin import views as useradmin_views
 
+
 desktop.lib.metrics.file_reporter.start_file_reporter()
 
 if sys.version_info[0] > 2:
