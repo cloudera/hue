@@ -1,7 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Modal.vue should render a modal 1`] = `
-<transition-stub>
+<transition-stub
+  appear="false"
+  css="true"
+  name="hue-modal"
+  persisted="false"
+>
   <div
     class="hue-modal-mask"
   >
