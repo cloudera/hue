@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ko.syntaxDropdown.js should match snapshot 1`] = `
-"<html><head></head><body><div id=\\"sqlSyntaxDropdown\\" data-bind=\\"component: { name: 'sql-syntax-dropdown', params: $data }\\">
-<div class=\\"hue-syntax-drop-down\\" data-bind=\\"
+"<html><head></head><body><div id="sqlSyntaxDropdown" data-bind="component: { name: 'sql-syntax-dropdown', params: $data }">
+<div class="hue-syntax-drop-down" data-bind="
   style: {
     'left': left() + 'px',
     'top': top() + 'px'
@@ -18,27 +18,27 @@ exports[`ko.syntaxDropdown.js should match snapshot 1`] = `
       menuOnly: true
     }
   }
-\\" style=\\"left: 10px; top: 20px;\\">
+" style="left: 10px; top: 20px;">
   <!-- ko if: !menuOnly && (!dropDownVisible() || !searchable) --><!-- /ko -->
   <!-- ko if: !menuOnly && (dropDownVisible() && searchable) --><!-- /ko -->
-  <div class=\\"hue-drop-down-container open\\" data-bind=\\"css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }\\">
-    <div style=\\"overflow-y: auto;\\" class=\\"dropdown-menu\\" data-bind=\\"visible: filteredEntries().length > 0\\">
+  <div class="hue-drop-down-container open" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }">
+    <div style="overflow-y: auto;" class="dropdown-menu" data-bind="visible: filteredEntries().length > 0">
       <!-- ko if: foreachVisible --><!-- /ko -->
       <!-- ko ifnot: foreachVisible -->
-      <ul class=\\"hue-inner-drop-down\\" data-bind=\\"foreach: filteredEntries\\">
+      <ul class="hue-inner-drop-down" data-bind="foreach: filteredEntries">
         <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider --><!-- /ko -->
         <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
-        <li><a href=\\"javascript:void(0)\\" data-bind=\\"text: $data &amp;&amp; typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { let previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }\\">foo</a></li>
+        <li><a href="javascript:void(0)" data-bind="text: $data &amp;&amp; typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { let previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }">foo</a></li>
         <!-- /ko -->
       
         <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider -->
-        <li class=\\"divider\\"></li>
+        <li class="divider"></li>
         <!-- /ko -->
         <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider --><!-- /ko -->
       
         <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider --><!-- /ko -->
         <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
-        <li><a href=\\"javascript:void(0)\\" data-bind=\\"text: $data &amp;&amp; typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { let previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }\\">Ignore this type of error</a></li>
+        <li><a href="javascript:void(0)" data-bind="text: $data &amp;&amp; typeof $data[$parent.labelAttribute] !== 'undefined' ? $data[$parent.labelAttribute] : $data, click: function () { let previous = $parent.value(); $parent.value($data); $parent.onSelect($data, previous); }">Ignore this type of error</a></li>
         <!-- /ko -->
       </ul>
       <!-- /ko -->
@@ -48,4 +48,4 @@ exports[`ko.syntaxDropdown.js should match snapshot 1`] = `
 </div></body></html>"
 `;
 
-exports[`ko.syntaxDropdown.js should render component on show event 1`] = `"<html><head></head><body><div id=\\"sqlSyntaxDropdown\\" data-bind=\\"component: { name: 'sql-syntax-dropdown', params: $data }\\"></div></body></html>"`;
+exports[`ko.syntaxDropdown.js should render component on show event 1`] = `"<html><head></head><body><div id="sqlSyntaxDropdown" data-bind="component: { name: 'sql-syntax-dropdown', params: $data }"></div></body></html>"`;

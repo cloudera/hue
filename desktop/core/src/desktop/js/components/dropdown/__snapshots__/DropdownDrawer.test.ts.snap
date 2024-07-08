@@ -10,7 +10,9 @@ exports[`DropdownDrawer.vue should render dropdown drawer with slots 1`] = `
     style="top: 100%; left: 0px;"
   >
     
-    <stub />
+    <div>
+      Some item
+    </div>
     
   </div>
 </div>

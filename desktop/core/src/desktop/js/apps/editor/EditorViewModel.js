@@ -37,9 +37,6 @@ import getParameter from 'utils/url/getParameter';
 
 export default class EditorViewModel {
   constructor(options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
-    // eslint-disable-next-line no-restricted-syntax
-    console.log('Editor v2 enabled.');
-
     this.snippetViewSettings = options.snippetViewSettings;
 
     this.URLS = {

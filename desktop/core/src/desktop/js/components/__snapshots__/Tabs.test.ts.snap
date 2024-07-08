@@ -39,8 +39,9 @@ exports[`Tabs.vue should render tabs 1`] = `
     class="hue-tab-container"
   >
     
-    
-    <div>
+    <div
+      style=""
+    >
       
       foo
       
@@ -52,7 +53,6 @@ exports[`Tabs.vue should render tabs 1`] = `
       bar
       
     </div>
-    
     
   </div>
 </div>
