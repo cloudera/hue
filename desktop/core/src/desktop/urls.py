@@ -22,7 +22,6 @@ import sys
 import logging
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from rest_framework.permissions import AllowAny
 from django.conf import settings
 from django.views.static import serve
 from rest_framework_simplejwt.views import (
@@ -204,12 +203,8 @@ dynamic_patterns += [
 ]
 
 dynamic_patterns += [
-  re_path('api/schema',
-        SpectacularAPIView.as_view(),
-        name='schema'),
-  re_path('api/swagger',
-        SpectacularSwaggerView.as_view(url_name='schema'),
-        name='swagger-ui'),
+  re_path('api/schema', SpectacularAPIView.as_view(),name='schema'),
+  re_path('api/swagger', SpectacularSwaggerView.as_view(),name='swagger-ui'),
 
   re_path('^api/v1/token/auth/?$', TokenObtainPairView.as_view(), name='token_obtain'),
   re_path('^api/v1/token/verify/?$', TokenVerifyView.as_view(), name='token_verify'),
