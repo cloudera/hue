@@ -204,11 +204,11 @@ dynamic_patterns += [
 ]
 
 dynamic_patterns += [
-    re_path('api/schema',
-        SpectacularAPIView.as_view(permission_classes=(AllowAny,)),
+  re_path('api/schema',
+        SpectacularAPIView.as_view(),
         name='schema'),
   re_path('api/swagger',
-        SpectacularSwaggerView.as_view(url_name='schema', permission_classes=(AllowAny,)),
+        SpectacularSwaggerView.as_view(url_name='schema'),
         name='swagger-ui'),
 
   re_path('^api/v1/token/auth/?$', TokenObtainPairView.as_view(), name='token_obtain'),
