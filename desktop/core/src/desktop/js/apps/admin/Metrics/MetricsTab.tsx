@@ -14,15 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import MetricsTable, { MetricsResponse, MetricsTableProps } from './MetricsTable';
-import { Spin, Input, Select, Alert } from 'antd';
+import { Spin, Alert } from 'antd';
 import { get } from '../../../api/utils';
-import { SearchOutlined } from '@ant-design/icons';
 import { i18nReact } from '../../../utils/i18nReact';
-import './Metrics.scss';
+import AdminHeader from '../AdminHeader';
 
-const { Option } = Select;
+import './Metrics.scss';
 
 const Metrics: React.FC = (): JSX.Element => {
   const [metrics, setMetrics] = useState<MetricsResponse>();
@@ -30,10 +29,9 @@ const Metrics: React.FC = (): JSX.Element => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedMetric, setSelectedMetric] = useState<string>('');
+  const [selectedMetric, setSelectedMetric] = useState<string>('All');
   const [showAllTables, setShowAllTables] = useState(true);
   const [filteredMetricsData, setFilteredMetricsData] = useState<MetricsTableProps[]>([]);
-  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,11 +78,11 @@ const Metrics: React.FC = (): JSX.Element => {
   };
   const handleMetricChange = (value: string) => {
     setSelectedMetric(value);
-    setShowAllTables(value === '');
+    setShowAllTables(value === 'All');
   };
 
-  const handleFilterInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+  const handleFilterInputChange = (filterValue: string) => {
+    setSearchQuery(filterValue);
   };
 
   const { t } = i18nReact.useTranslation();
@@ -93,32 +91,14 @@ const Metrics: React.FC = (): JSX.Element => {
     <div className="cuix antd metrics-component">
       <Spin spinning={loading}>
         {!error && (
-          <>
-            <Select
-              className="metrics-select"
-              //to make sure antd class gets applied
-              getPopupContainer={triggerNode => triggerNode.parentElement}
-              ref={dropdownRef}
-              value={selectedMetric}
-              onChange={handleMetricChange}
-              data-testid="metric-select"
-            >
-              <Option value="">All</Option>
-              {filteredKeys.map(key => (
-                <Option key={key} value={key}>
-                  {key}
-                </Option>
-              ))}
-            </Select>
-
-            <Input
-              className="metrics-filter"
-              placeholder={t('Filter metrics...')}
-              value={searchQuery}
-              onChange={handleFilterInputChange}
-              prefix={<SearchOutlined />}
-            />
-          </>
+          <AdminHeader
+            options={['All', ...filteredKeys]}
+            selectedValue={selectedMetric}
+            onSelectChange={handleMetricChange}
+            filterValue={searchQuery}
+            onFilterChange={handleFilterInputChange}
+            placeholder={t('Filter metrics...')}
+          />
         )}
 
         {error && (
