@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Spin } from 'antd';
 
 import { i18nReact } from '../../../../utils/i18nReact';
@@ -47,9 +47,7 @@ const StorageBrowserTabContent = ({
 }: StorageBrowserTabContentProps): JSX.Element => {
   const [filePath, setFilePath] = useState<string>(user_home_dir);
   const [filesData, setFilesData] = useState<PathAndFileData>();
-  const [files, setFiles] = useState<StorageBrowserTableData[]>();
   const [loadingFiles, setLoadingFiles] = useState(true);
-  const [pageStats, setPageStats] = useState<PageStats>();
   const [pageSize, setPageSize] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [sortByColumn, setSortByColumn] = useState<string>('');
@@ -61,23 +59,11 @@ const StorageBrowserTabContent = ({
 
   const { t } = i18nReact.useTranslation();
 
-  useEffect(() => {
+  const getFiles = useCallback(async () => {
     setLoadingFiles(true);
     fetchFiles(filePath, pageSize, pageNumber, filterData, sortByColumn, sortOrder)
       .then(responseFilesData => {
         setFilesData(responseFilesData);
-        const tableData: StorageBrowserTableData[] = responseFilesData.files.map(file => ({
-          name: file.name,
-          size: file.humansize,
-          user: file.stats.user,
-          group: file.stats.group,
-          permission: file.rwx,
-          mtime: file.mtime,
-          type: file.type,
-          path: file.path
-        }));
-        setFiles(tableData);
-        setPageStats(responseFilesData.page);
         setPageSize(responseFilesData.pagesize);
       })
       .catch(error => {
@@ -87,7 +73,11 @@ const StorageBrowserTabContent = ({
       .finally(() => {
         setLoadingFiles(false);
       });
-  }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder, refreshKey]);
+  }, [filePath, pageSize, pageNumber, filterData, sortByColumn, sortOrder]);
+
+  useEffect(() => {
+    getFiles()
+  }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder]);
 
   return (
     <Spin spinning={loadingFiles}>
@@ -111,8 +101,7 @@ const StorageBrowserTabContent = ({
           />
         </div>
         <StorageBrowserTable
-          dataSource={files}
-          pageStats={pageStats}
+          filesData={filesData}
           pageSize={pageSize}
           onFilepathChange={setFilePath}
           onPageSizeChange={setPageSize}
@@ -121,7 +110,7 @@ const StorageBrowserTabContent = ({
           onSortOrderChange={setSortOrder}
           sortByColumn={sortByColumn}
           sortOrder={sortOrder}
-          setRefreshKey={setRefreshKey}
+          refetchData={getFiles}
           setLoadingFiles={setLoadingFiles}
           filePath={filePath}
         />

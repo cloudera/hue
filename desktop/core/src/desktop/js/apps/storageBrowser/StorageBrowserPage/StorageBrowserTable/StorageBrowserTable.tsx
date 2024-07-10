@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ColumnProps } from 'antd/lib/table';
 import { Dropdown, Input } from 'antd';
 import { MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
@@ -37,16 +37,23 @@ import { mkdir, touch } from '../../../../reactComponents/FileChooser/api';
 import {
   PageStats,
   StorageBrowserTableData,
-  SortOrder
+  SortOrder,
+  PathAndFileData
 } from '../../../../reactComponents/FileChooser/types';
 import Pagination from '../../../../reactComponents/Pagination/Pagination';
 import StorageBrowserActions from '../StorageBrowserActions/StorageBrowserActions';
 import InputModal from '../../InputModal/InputModal';
 
 import './StorageBrowserTable.scss';
+
+enum BrowserViewType {
+  dir = 'dir',
+  file = 'file',
+}
+
 interface StorageBrowserTableProps {
   className?: string;
-  dataSource?: StorageBrowserTableData[];
+  filesData?: PathAndFileData;
   filePath: string;
   onFilepathChange: (path: string) => void;
   onPageNumberChange: (pageNumber: number) => void;
@@ -54,11 +61,10 @@ interface StorageBrowserTableProps {
   onSortByColumnChange: (sortByColumn: string) => void;
   onSortOrderChange: (sortOrder: SortOrder) => void;
   pageSize: number;
-  pageStats?: PageStats;
   sortByColumn: string;
   sortOrder: SortOrder;
   rowClassName?: string;
-  setRefreshKey: (value: number) => void;
+  refetchData: () => void;
   setLoadingFiles: (value: boolean) => void;
   testId?: string;
 }
@@ -71,7 +77,7 @@ const defaultProps = {
 
 const StorageBrowserTable = ({
   className,
-  dataSource,
+  filesData,
   filePath,
   onFilepathChange,
   onPageNumberChange,
@@ -81,9 +87,8 @@ const StorageBrowserTable = ({
   sortByColumn,
   sortOrder,
   pageSize,
-  pageStats,
   rowClassName,
-  setRefreshKey,
+  refetchData,
   setLoadingFiles,
   testId,
   ...restProps
@@ -92,8 +97,24 @@ const StorageBrowserTable = ({
   const [selectedFiles, setSelectedFiles] = useState<StorageBrowserTableData[]>([]);
   const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
   const [showNewFileModal, setShowNewFileModal] = useState<boolean>(false);
+  const [viewType, setViewType] = useState<BrowserViewType>(BrowserViewType.dir);
 
   const { t } = i18nReact.useTranslation();
+
+  const tableData: StorageBrowserTableData[] = useMemo(() => {
+    return filesData?.files
+      ?.filter(file => !['.', '..'].includes(file.name)) // removes ..(previous folder) and .(current folder)
+      .map(file => ({
+        name: file.name,
+        size: file.humansize,
+        user: file.stats.user,
+        group: file.stats.group,
+        permission: file.rwx,
+        mtime: file.mtime,
+        type: file.type,
+        path: file.path
+      })) ?? []
+  }, [filesData]);
 
   const newActionsMenuItems: MenuItemGroupType[] = [
     {
@@ -194,11 +215,14 @@ const StorageBrowserTable = ({
   const onRowClicked = (record: StorageBrowserTableData) => {
     return {
       onClick: () => {
+        onFilepathChange(record.path);
         if (record.type === 'dir') {
-          onFilepathChange(record.path);
+          setViewType(BrowserViewType.dir);
           onPageNumberChange(1);
         }
-        //TODO: handle onclick file
+        if (record.type === 'file') {
+          setViewType(BrowserViewType.file);
+        }
       }
     };
   };
@@ -220,15 +244,11 @@ const StorageBrowserTable = ({
     onPageNumberChange(nextPageNumber === 0 ? numPages : nextPageNumber);
   };
 
-  const reloadData = () => {
-    setRefreshKey(oldKey => oldKey + 1);
-  };
-
   const handleCreateNewFolder = (folderName: string) => {
     setLoadingFiles(true);
     mkdir(folderName, filePath)
       .then(() => {
-        reloadData();
+        refetchData();
       })
       .catch(error => {
         huePubSub.publish('hue.error', error);
@@ -243,7 +263,7 @@ const StorageBrowserTable = ({
     setLoadingFiles(true);
     touch(fileName, filePath)
       .then(() => {
-        reloadData();
+        refetchData();
       })
       .catch(error => {
         huePubSub.publish('hue.error', error);
@@ -277,46 +297,51 @@ const StorageBrowserTable = ({
     };
   }, []);
 
-  //function removes ..(previous folder) and .(current folder) from table data
-  const removeDots = (dataSource: StorageBrowserTableData[]) => {
-    return dataSource.length > 2 ? dataSource.slice(2) : [];
-  };
+  useEffect(() => {
+    if (filesData?.files?.length) {
+      setViewType(BrowserViewType.dir);
+    }
+  }, [filesData]);
 
   const locale = {
     emptyText: t('Folder is empty')
   };
 
-  if (dataSource && pageStats) {
-    return (
-      <>
-        <div className="hue-storage-browser__actions-bar">
-          <Input className="hue-storage-browser__search" placeholder={t('Search')} />
-          <div className="hue-storage-browser__actions-bar-right">
-            <StorageBrowserActions
-              selectedFiles={selectedFiles}
-              setLoadingFiles={setLoadingFiles}
-              onSuccessfulAction={reloadData}
-            />
-            <Dropdown
-              overlayClassName="hue-storage-browser__actions-dropdown"
-              menu={{
-                items: newActionsMenuItems,
-                className: 'hue-storage-browser__action-menu'
-              }}
-              trigger={['hover', 'click']}
-            >
-              <PrimaryButton data-event={''}>
-                {t('New')}
-                <DropDownIcon />
-              </PrimaryButton>
-            </Dropdown>
-          </div>
+  return (
+    <>
+      <div className="hue-storage-browser__actions-bar">
+        <Input className="hue-storage-browser__search" placeholder={t('Search')} />
+        <div className="hue-storage-browser__actions-bar-right">
+          {viewType === BrowserViewType.dir && (
+            <>
+              <StorageBrowserActions
+                selectedFiles={selectedFiles}
+                setLoadingFiles={setLoadingFiles}
+                onSuccessfulAction={refetchData}
+              />
+              <Dropdown
+                overlayClassName="hue-storage-browser__actions-dropdown"
+                menu={{
+                  items: newActionsMenuItems,
+                  className: 'hue-storage-browser__action-menu'
+                }}
+                trigger={['hover', 'click']}
+              >
+                <PrimaryButton data-event={''}>
+                  {t('New')}
+                  <DropDownIcon />
+                </PrimaryButton>
+              </Dropdown>
+            </>
+          )}
         </div>
+      </div>
 
+      {viewType === BrowserViewType.dir && tableData.length > 0 && (
         <Table
           className={className}
-          columns={getColumns(dataSource[0])}
-          dataSource={removeDots(dataSource)}
+          columns={getColumns(tableData[0])}
+          dataSource={tableData}
           onRow={onRowClicked}
           pagination={false}
           rowClassName={rowClassName}
@@ -330,37 +355,42 @@ const StorageBrowserTable = ({
           locale={locale}
           {...restProps}
         />
+      )}
 
+      {viewType === BrowserViewType.file && (
+        // TODO: code for file view
+        <div> File view</div>
+      )}
+
+      {filesData?.page && (
         <Pagination
           onNextPageButtonClicked={onNextPageButtonClicked}
           onPageNumberChange={onPageNumberChange}
           onPageSizeChange={onPageSizeChange}
           onPreviousPageButtonClicked={onPreviousPageButtonClicked}
           pageSize={pageSize}
-          pageStats={pageStats}
+          pageStats={filesData?.page}
         />
+      )}
 
-        <InputModal
-          title={t('Create New Folder')}
-          inputLabel={t('Enter Folder name here')}
-          submitText={t('Create')}
-          showModal={showNewFolderModal}
-          onSubmit={handleCreateNewFolder}
-          onClose={() => setShowNewFolderModal(false)}
-        />
-        <InputModal
-          title={t('Create New File')}
-          inputLabel={t('Enter File name here')}
-          submitText={t('Create')}
-          showModal={showNewFileModal}
-          onSubmit={handleCreateNewFile}
-          onClose={() => setShowNewFileModal(false)}
-        />
-      </>
-    );
-  } else {
-    return <div />;
-  }
+      <InputModal
+        title={t('Create New Folder')}
+        inputLabel={t('Enter Folder name here')}
+        submitText={t('Create')}
+        showModal={showNewFolderModal}
+        onSubmit={handleCreateNewFolder}
+        onClose={() => setShowNewFolderModal(false)}
+      />
+      <InputModal
+        title={t('Create New File')}
+        inputLabel={t('Enter File name here')}
+        submitText={t('Create')}
+        showModal={showNewFileModal}
+        onSubmit={handleCreateNewFile}
+        onClose={() => setShowNewFileModal(false)}
+      />
+    </>
+  );
 };
 
 StorageBrowserTable.defaultProps = defaultProps;
