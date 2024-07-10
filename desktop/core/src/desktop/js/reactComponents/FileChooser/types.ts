@@ -103,5 +103,5 @@ export enum SortOrder {
 
 export enum BrowserViewType {
   dir = 'dir',
-  file = 'file',
+  file = 'file'
 }

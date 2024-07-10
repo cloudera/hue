@@ -23,10 +23,7 @@ import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
 import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
 import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
-import {
-  PathAndFileData,
-  SortOrder
-} from '../../../../reactComponents/FileChooser/types';
+import { PathAndFileData, SortOrder } from '../../../../reactComponents/FileChooser/types';
 
 import './StorageBrowserTabContent.scss';
 
