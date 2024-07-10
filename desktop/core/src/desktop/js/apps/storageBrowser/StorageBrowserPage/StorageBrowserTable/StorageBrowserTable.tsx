@@ -35,21 +35,16 @@ import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import { mkdir, touch } from '../../../../reactComponents/FileChooser/api';
 import {
-  PageStats,
   StorageBrowserTableData,
   SortOrder,
-  PathAndFileData
+  PathAndFileData,
+  BrowserViewType
 } from '../../../../reactComponents/FileChooser/types';
 import Pagination from '../../../../reactComponents/Pagination/Pagination';
 import StorageBrowserActions from '../StorageBrowserActions/StorageBrowserActions';
 import InputModal from '../../InputModal/InputModal';
 
 import './StorageBrowserTable.scss';
-
-enum BrowserViewType {
-  dir = 'dir',
-  file = 'file',
-}
 
 interface StorageBrowserTableProps {
   className?: string;
@@ -102,18 +97,20 @@ const StorageBrowserTable = ({
   const { t } = i18nReact.useTranslation();
 
   const tableData: StorageBrowserTableData[] = useMemo(() => {
-    return filesData?.files
-      ?.filter(file => !['.', '..'].includes(file.name)) // removes ..(previous folder) and .(current folder)
-      .map(file => ({
-        name: file.name,
-        size: file.humansize,
-        user: file.stats.user,
-        group: file.stats.group,
-        permission: file.rwx,
-        mtime: file.mtime,
-        type: file.type,
-        path: file.path
-      })) ?? []
+    return (
+      filesData?.files
+        ?.filter(file => !['.', '..'].includes(file.name)) // removes ..(previous folder) and .(current folder)
+        .map(file => ({
+          name: file.name,
+          size: file.humansize,
+          user: file.stats.user,
+          group: file.stats.group,
+          permission: file.rwx,
+          mtime: file.mtime,
+          type: file.type,
+          path: file.path
+        })) ?? []
+    );
   }, [filesData]);
 
   const newActionsMenuItems: MenuItemGroupType[] = [
@@ -217,11 +214,7 @@ const StorageBrowserTable = ({
       onClick: () => {
         onFilepathChange(record.path);
         if (record.type === 'dir') {
-          setViewType(BrowserViewType.dir);
           onPageNumberChange(1);
-        }
-        if (record.type === 'file') {
-          setViewType(BrowserViewType.file);
         }
       }
     };
@@ -298,7 +291,9 @@ const StorageBrowserTable = ({
   }, []);
 
   useEffect(() => {
-    if (filesData?.files?.length) {
+    if (filesData?.type === 'file') {
+      setViewType(BrowserViewType.file);
+    } else {
       setViewType(BrowserViewType.dir);
     }
   }, [filesData]);
@@ -337,10 +332,10 @@ const StorageBrowserTable = ({
         </div>
       </div>
 
-      {viewType === BrowserViewType.dir && tableData.length > 0 && (
+      {viewType === BrowserViewType.dir && (
         <Table
           className={className}
-          columns={getColumns(tableData[0])}
+          columns={getColumns(tableData[0] ?? [])}
           dataSource={tableData}
           onRow={onRowClicked}
           pagination={false}

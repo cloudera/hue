@@ -25,8 +25,6 @@ import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
 import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
 import {
   PathAndFileData,
-  StorageBrowserTableData,
-  PageStats,
   SortOrder
 } from '../../../../reactComponents/FileChooser/types';
 
@@ -55,8 +53,6 @@ const StorageBrowserTabContent = ({
   //TODO: Add filter functionality
   const [filterData] = useState<string>('');
 
-  const [refreshKey, setRefreshKey] = useState<number>(0);
-
   const { t } = i18nReact.useTranslation();
 
   const getFiles = useCallback(async () => {
@@ -76,7 +72,7 @@ const StorageBrowserTabContent = ({
   }, [filePath, pageSize, pageNumber, filterData, sortByColumn, sortOrder]);
 
   useEffect(() => {
-    getFiles()
+    getFiles();
   }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder]);
 
   return (
