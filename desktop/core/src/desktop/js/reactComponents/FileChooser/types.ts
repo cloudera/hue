@@ -78,6 +78,7 @@ export interface PathAndFileData {
   files: File[];
   page: PageStats;
   pagesize: number;
+  type?: string;
 }
 
 export interface ContentSummary {
@@ -98,4 +99,9 @@ export enum SortOrder {
   ASC = 'ascending',
   DSC = 'descending',
   NONE = 'none'
+}
+
+export enum BrowserViewType {
+  dir = 'dir',
+  file = 'file'
 }
