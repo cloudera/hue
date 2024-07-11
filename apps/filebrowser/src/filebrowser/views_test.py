@@ -1695,7 +1695,7 @@ class TestFileChooserRedirect(object):
       # S3A - default_s3_home
       resets = [
         REMOTE_STORAGE_HOME.set_for_testing(None),
-        AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.set_for_testing(None),
+        AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': None}})
       ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
@@ -1708,7 +1708,7 @@ class TestFileChooserRedirect(object):
 
       resets = [
         REMOTE_STORAGE_HOME.set_for_testing(None),
-        AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.set_for_testing('s3a://my_bucket'),
+        AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': 's3a://my_bucket'}})
       ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
@@ -1721,7 +1721,7 @@ class TestFileChooserRedirect(object):
       resets = [
         RAZ.IS_ENABLED.set_for_testing(True),
         REMOTE_STORAGE_HOME.set_for_testing(None),
-        AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.set_for_testing('s3a://my_bucket')
+        AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': 's3a://my_bucket'}})
       ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
@@ -1735,7 +1735,7 @@ class TestFileChooserRedirect(object):
       resets = [
         RAZ.IS_ENABLED.set_for_testing(True),
         REMOTE_STORAGE_HOME.set_for_testing(None),
-        AWS_ACCOUNTS['default'].DEFAULT_HOME_PATH.set_for_testing('s3a://my_bucket/user')
+        AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': 's3a://my_bucket/user'}})
       ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
