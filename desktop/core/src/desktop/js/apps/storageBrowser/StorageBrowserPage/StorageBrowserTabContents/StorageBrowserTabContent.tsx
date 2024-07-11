@@ -47,14 +47,13 @@ const StorageBrowserTabContent = ({
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [sortByColumn, setSortByColumn] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
-  //TODO: Add filter functionality
-  const [filterData] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const { t } = i18nReact.useTranslation();
 
   const getFiles = useCallback(async () => {
     setLoadingFiles(true);
-    fetchFiles(filePath, pageSize, pageNumber, filterData, sortByColumn, sortOrder)
+    fetchFiles(filePath, pageSize, pageNumber, searchTerm, sortByColumn, sortOrder)
       .then(responseFilesData => {
         setFilesData(responseFilesData);
         setPageSize(responseFilesData.pagesize);
@@ -66,11 +65,11 @@ const StorageBrowserTabContent = ({
       .finally(() => {
         setLoadingFiles(false);
       });
-  }, [filePath, pageSize, pageNumber, filterData, sortByColumn, sortOrder]);
+  }, [filePath, pageSize, pageNumber, searchTerm, sortByColumn, sortOrder]);
 
   useEffect(() => {
     getFiles();
-  }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder]);
+  }, [getFiles]);
 
   return (
     <Spin spinning={loadingFiles}>
@@ -101,6 +100,7 @@ const StorageBrowserTabContent = ({
           onPageNumberChange={setPageNumber}
           onSortByColumnChange={setSortByColumn}
           onSortOrderChange={setSortOrder}
+          onSearch={setSearchTerm}
           sortByColumn={sortByColumn}
           sortOrder={sortOrder}
           refetchData={getFiles}
