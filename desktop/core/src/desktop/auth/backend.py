@@ -72,7 +72,6 @@ from desktop import metrics
 from desktop.conf import AUTH, LDAP, OIDC, ENABLE_ORGANIZATIONS
 from desktop.settings import LOAD_BALANCER_COOKIE
 
-from filebrowser.conf import REMOTE_STORAGE_HOME
 from useradmin import ldap_access
 from useradmin.models import get_profile, get_default_user_group, install_sample_user, UserProfile, User
 from useradmin.organization import get_organization
