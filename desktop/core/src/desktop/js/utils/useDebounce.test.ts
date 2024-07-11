@@ -14,19 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import { renderHook, act } from '@testing-library/react';
-import useDebounce from './useDebounce';
-
-type SomeFunction = (...args: string[]) => void;
+import useDebounce, { SomeFunction } from './useDebounce';
 
 const mockFunction: jest.Mock<SomeFunction> = jest.fn();
-let delay: number;
+const delay = 1000;
 jest.useFakeTimers();
 
-beforeEach(() => {
-  delay = 1000;
-});
-
 afterEach(() => {
+  jest.clearAllTimers();
   mockFunction.mockReset();
 });
 
