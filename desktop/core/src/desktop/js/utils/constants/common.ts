@@ -13,36 +13,5 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { useRef, useEffect } from 'react';
-import { DEBOUNCE_DELAY } from './constants/common';
 
-type Timer = ReturnType<typeof setTimeout>;
-export type SomeFunction = (arg: string) => void;
-
-const useDebounce = <Func extends SomeFunction>(func: Func, delay = DEBOUNCE_DELAY): Func => {
-  const timer = useRef<Timer>();
-
-  useEffect(() => {
-    return () => {
-      if (!timer.current) {
-        return;
-      }
-      clearTimeout(timer.current);
-    };
-  }, []);
-
-  const debouncedFunction = ((...args) => {
-    if (timer.current) {
-      clearTimeout(timer.current);
-    }
-    const newTimer = setTimeout(() => {
-      func(...args);
-    }, delay);
-
-    timer.current = newTimer;
-  }) as Func;
-
-  return debouncedFunction;
-};
-
-export default useDebounce;
+export const DEBOUNCE_DELAY = 300;

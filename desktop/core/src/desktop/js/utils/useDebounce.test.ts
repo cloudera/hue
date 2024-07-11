@@ -15,9 +15,10 @@
 // limitations under the License.
 import { renderHook, act } from '@testing-library/react';
 import useDebounce, { SomeFunction } from './useDebounce';
+import { DEBOUNCE_DELAY } from './constants/common';
 
 const mockFunction: jest.Mock<SomeFunction> = jest.fn();
-const delay = 1000;
+const delay = DEBOUNCE_DELAY;
 jest.useFakeTimers();
 
 afterEach(() => {

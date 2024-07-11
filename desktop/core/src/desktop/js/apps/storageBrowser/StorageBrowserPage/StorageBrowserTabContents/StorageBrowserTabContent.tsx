@@ -69,7 +69,7 @@ const StorageBrowserTabContent = ({
 
   useEffect(() => {
     getFiles();
-  }, [filePath, pageSize, pageNumber, sortByColumn, sortOrder, searchTerm]);
+  }, [getFiles]);
 
   return (
     <Spin spinning={loadingFiles}>

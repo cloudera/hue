@@ -34,6 +34,7 @@ import Table from 'cuix/dist/components/Table';
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import useDebounce from '../../../../utils/useDebounce';
+import { DEBOUNCE_DELAY } from '../../../../utils/constants/common';
 
 import { mkdir, touch } from '../../../../reactComponents/FileChooser/api';
 import {
@@ -274,7 +275,7 @@ const StorageBrowserTable = ({
   const handleSearch = useCallback(
     useDebounce(searchTerm => {
       onSearch(encodeURIComponent(searchTerm));
-    }, 300),
+    }, DEBOUNCE_DELAY),
     [onSearch]
   );
 
