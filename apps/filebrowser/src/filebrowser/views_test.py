@@ -1449,6 +1449,7 @@ class TestS3AccessPermissions(object):
     finally:
       remove_from_group(self.user.username, 'has_s3')
 
+@pytest.mark.django_db
 class TestABFSAccessPermissions(object):
 
   def setup_method(self):
