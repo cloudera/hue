@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import { AlertProps } from 'antd/lib/alert';
 import Alert from 'cuix/dist/components/Alert/Alert';
 
-import './AlertComponent.scss';
+import './GlobalAlert.scss';
 import {
   GLOBAL_ERROR_TOPIC,
   GLOBAL_INFO_TOPIC,
@@ -43,7 +43,7 @@ const clearCloseTimeout = (alert: VisibleAlert) => {
   }
 };
 
-const AlertComponent: React.FC = () => {
+const GlobalAlert: React.FC = () => {
   const [alerts, setAlerts] = useState<VisibleAlert[]>([]);
   const updateAlerts = (alert: HueAlert, type: alertType) => {
     if (!alert.message) {
@@ -126,4 +126,4 @@ const AlertComponent: React.FC = () => {
   );
 };
 
-export default AlertComponent;
+export default GlobalAlert;

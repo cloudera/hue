@@ -25,7 +25,7 @@ import './components/impalaQueries/webcomp';
 import './eventListeners';
 import JobBrowserViewModel from './knockout/JobBrowserViewModel';
 import Job from './knockout/Job';
-import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import I18n from 'utils/i18n';
 
 huePubSub.subscribe('app.dom.loaded', app => {

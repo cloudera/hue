@@ -18,8 +18,29 @@
 
 $cell-height: 40px;
 $table-placeholder-height: 100px;
+$action-dropdown-width: 214px;
+$icon-margin: 5px;
 
 .antd.cuix {
+  .hue-storage-browser__actions-bar {
+    display: flex;
+    margin: vars.$fluidx-spacing-s;
+    justify-content: space-between;
+  }
+
+  .hue-storage-browser__search {
+    width: 30%;
+  }
+
+  .hue-storage-browser__actions-bar-right {
+    display: flex;
+    gap: vars.$fluidx-spacing-xs;
+
+    .cdp-icon-dropdown {
+      margin-left: $icon-margin;
+    }
+  }
+
   .hue-storage-browser__table {
     margin: 0 vars.$fluidx-spacing-s;
 
@@ -57,4 +78,9 @@ $table-placeholder-height: 100px;
   .hue-storage-browser__table-column-title {
     text-transform: capitalize;
   }
+}
+
+.hue-storage-browser__actions-dropdown {
+  width: $action-dropdown-width;
+  @include mixins.hue-svg-icon__d3-conflict;
 }

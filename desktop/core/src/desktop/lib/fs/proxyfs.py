@@ -191,6 +191,9 @@ class ProxyFS(object):
   def restore(self, path):
     self._get_fs(path).restore(path)
 
+  def set_replication(self, src_path, replication_factor):
+    return self._get_fs(src_path).set_replication(src_path, replication_factor)
+
   def create(self, path, *args, **kwargs):
     self._get_fs(path).create(path, *args, **kwargs)
 

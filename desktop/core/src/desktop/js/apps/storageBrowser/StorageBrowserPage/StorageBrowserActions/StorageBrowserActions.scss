@@ -17,17 +17,7 @@
 @use 'variables' as vars;
 $action-dropdown-width: 214px;
 
-//TODO: Remove styling for cuix button
-.antd.cuix {
-  .hue-storage-browser__table-actions-btn {
-    box-shadow: none;
-    background-color: transparent;
-    border: none;
-  }
-}
-
 .hue-storage-browser__table-actions-dropdown {
-  align-items: center;
   width: $action-dropdown-width;
   @include mixins.hue-svg-icon__d3-conflict;
 }

@@ -508,7 +508,7 @@ Run the user interface tests:
 
 In the pyproject.toml file, we define the configuration for pytest, including settings to enable pytest to discover and execute the unit tests.
 
-For pytest to recognize test files, you should follow the naming convention `*_test.py` or `test_*.py`. Following the pytest framework [convention](https://docs.pytest.org/en/7.1.x/explanation/goodpractices.html#conventions-for-python-test-discovery) for test discovery is recommended. Pytest will gather test items according to the following rules:
+For pytest to recognize test files, you should follow the naming convention `*_test.py` or `test_*.py`. Following the pytest framework convention for test discovery is recommended. Pytest will gather test items according to the following rules:
 
 1. Test functions or methods prefixed with test_ outside of a class.
 2. Test functions or methods prefixed with test_ inside classes prefixed with Test.
@@ -769,7 +769,7 @@ Push to the CDN:
 
 ### Docker
 
-Docker images are at https://hub.docker.com/u/gethue/:
+Docker images are at https://hub.docker.com/u/gethue/
 
     docker build https://github.com/cloudera/hue.git#release-4.11.0 -t gethue/hue:4.11.0 -f tools/docker/hue/Dockerfile
     docker tag gethue/hue:4.11.0 gethue/hue:latest
@@ -819,8 +819,6 @@ A Pypi token will be needed. For doing a test release https://test.pypi.org/proj
 
     rm -rf dist && python3 -m build && python3 -m twine upload --repository testpypi dist/*
     python3 -m pip install --index-url https://test.pypi.org/simple/ gethue --upgrade
-
-Read more on [Python packaging](https://packaging.python.org/tutorials/packaging-projects/#generating-distribution-archives).
 
 ### Documentation
 

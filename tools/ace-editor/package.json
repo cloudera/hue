@@ -13,7 +13,7 @@
         "url": "http://github.com/ajaxorg/ace.git"
     },
     "dependencies": {
-        "mime": "1.2.x"
+        "mime": "1.4.1"
     },
     "devDependencies": {
         "asyncjs": "0.0.x",

@@ -21,7 +21,7 @@ import 'ext/leaflet/leaflet.markercluster';
 import 'ext/leaflet/leaflet.heat';
 import 'ext/leaflet/leaflet.zoombox';
 
-import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
 import huePubSub from 'utils/huePubSub';
 
 ko.bindingHandlers.leafletMapChart = {

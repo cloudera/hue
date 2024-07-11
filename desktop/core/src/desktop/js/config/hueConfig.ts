@@ -33,8 +33,8 @@ import {
   SchedulerInterpreter
 } from './types';
 import huePubSub from 'utils/huePubSub';
-import { GLOBAL_ERROR_TOPIC } from '../reactComponents/AlertComponent/events';
-import { HueAlert } from '../reactComponents/AlertComponent/types';
+import { GLOBAL_ERROR_TOPIC } from '../reactComponents/GlobalAlert/events';
+import { HueAlert } from '../reactComponents/GlobalAlert/types';
 
 interface InterpreterMap {
   [AppType.browser]: BrowserInterpreter;

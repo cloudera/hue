@@ -16,9 +16,6 @@
 @use 'variables' as vars;
 @use 'mixins';
 
-$icon-margin: 5px;
-$action-dropdown-width: 214px;
-
 .antd.cuix {
   .hue-storage-browser-tabContent {
     margin: vars.$fluidx-spacing-s 0;
@@ -53,28 +50,4 @@ $action-dropdown-width: 214px;
     font-weight: 600;
     margin: 0 vars.$fluidx-spacing-xs 0 vars.$fluidx-spacing-s;
   }
-
-  .hue-storage-browser__actions-bar {
-    display: flex;
-    margin: vars.$fluidx-spacing-s;
-    justify-content: space-between;
-  }
-
-  .hue-storage-browser__search {
-    width: 30%;
-  }
-
-  .hue-storage-browser__actions-bar-right {
-    display: flex;
-    gap: vars.$fluidx-spacing-xs;
-
-    .cdp-icon-dropdown {
-      margin-left: $icon-margin;
-    }
-  }
-}
-
-.hue-storage-browser__actions-dropdown {
-  width: $action-dropdown-width;
-  @include mixins.hue-svg-icon__d3-conflict;
 }

@@ -25,8 +25,8 @@ import axios, {
 import qs from 'qs';
 
 import { CancellablePromise } from './cancellablePromise';
-import { GLOBAL_ERROR_TOPIC } from 'reactComponents/AlertComponent/events';
-import { HueAlert } from 'reactComponents/AlertComponent/types';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
+import { HueAlert } from 'reactComponents/GlobalAlert/types';
 import { hueWindow } from 'types/types';
 import huePubSub from 'utils/huePubSub';
 import logError from 'utils/logError';
