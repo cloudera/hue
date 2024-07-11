@@ -18,7 +18,6 @@ import useDebounce, { SomeFunction } from './useDebounce';
 import { DEBOUNCE_DELAY } from './constants/common';
 
 const mockFunction: jest.Mock<SomeFunction> = jest.fn();
-const delay = DEBOUNCE_DELAY;
 jest.useFakeTimers();
 
 afterEach(() => {
@@ -33,7 +32,7 @@ describe('useDebounce', () => {
   });
 
   it('should not call the function immediately when called with arguments', () => {
-    const { result } = renderHook(() => useDebounce(mockFunction, delay));
+    const { result } = renderHook(() => useDebounce(mockFunction));
     act(() => {
       result.current('test');
     });
@@ -41,23 +40,23 @@ describe('useDebounce', () => {
   });
 
   it('should call the function with the latest arguments after the delay', async () => {
-    const { result } = renderHook(() => useDebounce(mockFunction, delay));
+    const { result } = renderHook(() => useDebounce(mockFunction));
     act(() => {
       result.current('test1');
       result.current('test2'); // Simulate multiple calls before delay
     });
-    jest.advanceTimersByTime(delay);
+    jest.advanceTimersByTime(DEBOUNCE_DELAY);
     expect(mockFunction).toHaveBeenCalledTimes(1);
     expect(mockFunction).toHaveBeenCalledWith('test2'); // Only the latest arguments should be passed
   });
 
   it('should cancel the previous timeout if called again before delay', () => {
-    const { result } = renderHook(() => useDebounce(mockFunction, delay));
+    const { result } = renderHook(() => useDebounce(mockFunction));
     act(() => {
       result.current('test1');
       result.current('test2');
     });
-    jest.advanceTimersByTime(delay / 2); // Advance half the delay to simulate a race condition
+    jest.advanceTimersByTime(DEBOUNCE_DELAY / 2); // Advance half the delay to simulate a race condition
     result.current('test3');
 
     jest.runAllTimers();
@@ -72,7 +71,7 @@ describe('useDebounce', () => {
       result.current('test');
     });
     unmount();
-    jest.advanceTimersByTime(delay);
+    jest.advanceTimersByTime(DEBOUNCE_DELAY);
     expect(mockFunction).not.toHaveBeenCalled();
   });
 
