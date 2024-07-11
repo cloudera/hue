@@ -22,7 +22,7 @@ import apiHelper from 'api/apiHelper';
 import MetastoreColumn from 'apps/tableBrowser/metastoreColumn';
 import MetastoreTableSamples from 'apps/tableBrowser/metastoreTableSamples';
 import MetastoreTablePartitions from 'apps/tableBrowser/metastoreTablePartitions';
-import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/AlertComponent/events';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import deXSS from 'utils/html/deXSS';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
@@ -316,11 +316,12 @@ class MetastoreTable {
             this.partitions.loading(false);
             this.partitions.loaded(true);
           }
-
+          // Currently checking for Impala and Hive
+          const viewSqlPropertyColumnNames = new Set(['view original text:', 'original query:']);
           const found =
             analysis.properties &&
             analysis.properties.some(property => {
-              if (property.col_name.toLowerCase() === 'view original text:') {
+              if (viewSqlPropertyColumnNames.has(property.col_name.toLowerCase())) {
                 apiHelper
                   .formatSql({ statements: property.data_type })
                   .then(formatResponse => {

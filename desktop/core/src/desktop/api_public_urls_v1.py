@@ -39,7 +39,9 @@ urlpatterns += [
   re_path(r'^banners/?$', api_public.get_banners, name='core_banners'),
   re_path(r'^get_config/?$', api_public.get_config),
   re_path(r'^get_namespaces/(?P<interface>[\w\-]+)/?$', api_public.get_context_namespaces),  # To remove
+]
 
+urlpatterns += [
   re_path(r'^editor/create_notebook/?$', api_public.create_notebook, name='editor_create_notebook'),
   re_path(r'^editor/create_session/?$', api_public.create_session, name='editor_create_session'),
   re_path(r'^editor/close_session/?$', api_public.close_session, name='editor_close_session'),
@@ -52,42 +54,42 @@ urlpatterns += [
   re_path(r'^editor/close_statement/?$', api_public.close_statement, name='editor_close_statement'),
   re_path(r'^editor/get_logs/?$', api_public.get_logs, name='editor_get_logs'),
   re_path(r'^editor/get_history/?', api_public.get_history, name='editor_get_history'),
-
   re_path(r'^editor/describe/(?P<database>[^/]*)/?$', api_public.describe, name='editor_describe_database'),
   re_path(r'^editor/describe/(?P<database>[^/]*)/(?P<table>[\w_\-]+)/?$', api_public.describe, name='editor_describe_table'),
   re_path(
-    r'^editor/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$',
-    api_public.describe,
-    name='editor_describe_column'
+    r'^editor/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', api_public.describe, name='editor_describe_column'
   ),
-
   re_path(r'^editor/autocomplete/?$', api_public.autocomplete, name='editor_autocomplete_databases'),
   re_path(
-      r"^editor/autocomplete/(?P<database>[^/?]*)/?$",
-      api_public.autocomplete,
-      name="editor_autocomplete_tables",
+    r"^editor/autocomplete/(?P<database>[^/?]*)/?$",
+    api_public.autocomplete,
+    name="editor_autocomplete_tables",
   ),
   re_path(
-      r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$",
-      api_public.autocomplete,
-      name="editor_autocomplete_columns",
+    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$",
+    api_public.autocomplete,
+    name="editor_autocomplete_columns",
   ),
   re_path(
-      r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$",
-      api_public.autocomplete,
-      name="editor_autocomplete_column",
+    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$",
+    api_public.autocomplete,
+    name="editor_autocomplete_column",
   ),
   re_path(
-      r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
-      api_public.autocomplete,
-      name="editor_autocomplete_nested",
+    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
+    api_public.autocomplete,
+    name="editor_autocomplete_nested",
   ),
-
   re_path(r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', api_public.get_sample_data, name='editor_sample_data'),
   re_path(
     r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
     api_public.get_sample_data,
-    name='editor_sample_data_column'
+    name='editor_sample_data_column',
+  ),
+  re_path(
+      r"^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
+      api_public.get_sample_data,
+      name="editor_sample_data_nested",
   ),
 ]
 
@@ -100,13 +102,19 @@ urlpatterns += [
   re_path(r'^storage/touch$', api_public.storage_touch, name='storage_touch'),
   re_path(r'^storage/rename$', api_public.storage_rename, name='storage_rename'),
   re_path(r'^storage/content_summary=(?P<path>.*)$', api_public.storage_content_summary, name='storage_content_summary'),
+  re_path(r'^storage/move$', api_public.storage_move, name='storage_move'),
+  re_path(r'^storage/copy$', api_public.storage_copy, name='storage_copy'),
+  re_path(r'^storage/set_replication$', api_public.storage_set_replication, name='storage_set_replication'),
+  re_path(r'^storage/rmtree$', api_public.storage_rmtree, name='storage_rmtree'),
+  re_path(r'^storage/trash/restore$', api_public.storage_trash_restore, name='storage_trash_restore'),
+  re_path(r'^storage/trash/purge$', api_public.storage_trash_purge, name='storage_trash_purge'),
 ]
 
 urlpatterns += [
   re_path(
     r'^(?P<dialect>.+)/analyze/(?P<database>\w+)/(?P<table>\w+)(?:/(?P<columns>\w+))?/?$',
     api_public.analyze_table,
-    name='dialect_analyze_table'
+    name='dialect_analyze_table',
   ),
 ]
 
@@ -124,13 +132,11 @@ urlpatterns += [
 urlpatterns += [
   re_path(r'^connector/types/?$', api_public.get_connector_types, name='connector_get_types'),
   re_path(r'^connector/instances/?$', api_public.get_connectors_instances, name='connector_get_instances'),
-
   re_path(r'^connector/instance/new/(?P<dialect>[\w\-]+)/(?P<interface>[\w\-]+)$', api_public.new_connector, name='connector_new'),
   re_path(r'^connector/instance/get/(?P<id>\d+)$', api_public.get_connector, name='connector_get'),
   re_path(r'^connector/instance/delete/?$', api_public.delete_connector, name='connector_delete'),
   re_path(r'^connector/instance/update/?$', api_public.update_connector, name='connector_update'),
   re_path(r'^connector/instance/test/?$', api_public.test_connector, name='connector_test'),
-
   re_path(r'^connector/examples/install/?$', api_public.install_connector_examples, name='connector_install_examples'),
 ]
 
@@ -141,7 +147,6 @@ urlpatterns += [
   re_path(r'^optimizer/top_joins/?$', api_public.top_joins, name='optimizer_top_joins'),
   re_path(r'^optimizer/top_filters/?$', api_public.top_filters, name='optimizer_top_filters'),
   re_path(r'^optimizer/top_aggs/?$', api_public.top_aggs, name='optimizer_top_aggs'),
-
   re_path(r'^optimizer/query_risk/?$', api_public.query_risk, name='optimizer_query_risk'),
   re_path(r'^optimizer/predict/?$', api_public.predict, name='optimizer_predict'),
   re_path(r'^optimizer/query_compatibility/?$', api_public.query_compatibility, name='optimizer_query_compatibility'),
@@ -155,6 +160,5 @@ urlpatterns += [
 urlpatterns += [
   re_path(r'^iam/users/autocomplete', api_public.list_for_autocomplete, name='iam_users_list_for_autocomplete'),
   re_path(r'^iam/users/?$', api_public.get_users_by_id, name='iam_get_users_by_id'),
-
   re_path(r'^iam/get_users/?', api_public.get_users, name='iam_get_users'),
 ]

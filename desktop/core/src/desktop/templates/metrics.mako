@@ -40,138 +40,17 @@ else:
 ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
 %endif
 
+${layout.menubar(section='metrics')}
 
 <script type="text/javascript">
   (function () {
-    var MetricsViewModel = function () {
-      var self = this;
-      self.metricsFilter = ko.observable();
-      self.metrics = ko.observableArray();
-      self.selectedMetric = ko.observable('All');
-      self.metricsKeys = ko.pureComputed(function () {
-        return Object.keys(self.metrics()).sort()
-      });
-      self.isMasterEmpty = ko.pureComputed(function () {
-        return self.filteredMetrics().length === 0 || Object.keys(self.filteredMetrics()).filter(function (key) {
-            return self.filteredMetrics()[key] !== null
-          }).length === 0;
-      });
-      self.filteredMetrics = ko.pureComputed(function () {
-        if (self.metricsFilter()) {
-          var lowerQuery = self.metricsFilter().toLowerCase();
-          var result = {};
-          Object.keys(self.metrics()).forEach(function (key) {
-            var filteredSubMetric = {};
-            var atleastOne = false;
-            Object.keys(self.metrics()[key]).forEach(function (subMetricKey) {
-              if (subMetricKey.toLowerCase().indexOf(lowerQuery) !== -1) {
-                filteredSubMetric[subMetricKey] = self.metrics()[key][subMetricKey];
-                atleastOne = true;
-              }
-            });
-            if (atleastOne) {
-              result[key] = filteredSubMetric;
-            } else {
-              result[key] = null;
-            }
-          });
-          return result;
-        }
-        return self.metrics();
-      });
-      var successCallback = function (data) {
-        self.metrics(data.metric);
-      };
-      self.fetchMetrics = function () {
-        window.simpleGet('/desktop/metrics/', {}, {
-          successCallback: successCallback
-        });
-      };
-      self.isUnusedMetric = function (metricKey) {
-        return metricKey.startsWith("auth") || metricKey.startsWith("multiprocessing") || metricKey.startsWith("python.gc");
-      }
-    };
-
-    $(document).ready(function () {
-      var viewModel = new MetricsViewModel();
-      ko.applyBindings(viewModel, $('#metricsComponents')[0]);
-    });
+    window.createReactComponents('#Metrics');
   })();
 </script>
 
-${layout.menubar(section='metrics')}
-
-<div id="metricsComponents" class="container-fluid">
-  <div class="card card-small margin-top-10">
-    <!-- ko if: metrics() -->
-    <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0,topSnap: '${ TOP_SNAP }', triggerAdjust: ${ is_embeddable and "0" or "106" }}">
-      <ul class="nav nav-pills">
-        <li data-bind="css: { 'active': $root.selectedMetric() === 'All' }">
-          <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedMetric('All') }"></a>
-        </li>
-        <!-- ko foreach: metricsKeys -->
-        <!-- ko ifnot: $root.isUnusedMetric($data)-->
-        <li data-bind="css: { 'active': $root.selectedMetric() === $data }">
-          <a href="javascript:void(0)" data-bind="text: $data, click: function(){ $root.selectedMetric($data) }"></a>
-        </li>
-        <!-- /ko -->
-        <!-- /ko -->
-      </ul>
-      <input type="text" data-bind="clearable: metricsFilter, valueUpdate: 'afterkeydown'"
-          class="input-xlarge pull-right margin-bottom-10" placeholder="${_('Filter metrics...')}">
-    </div>
-
-    <div class="margin-top-10">
-      <!-- ko if: $root.selectedMetric() === 'All' && $root.isMasterEmpty()-->
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th width="30%">${ _('Name') }</th>
-            <th>${ _('Value') }</th>
-          </tr>
-        </thead>
-        <tfoot>
-          <tr>
-              <td colspan="2">${ _('There are no metrics matching your filter') }</td>
-          </tr>
-        </tfoot>
-      </table>
-      <!-- /ko -->
-      <div data-bind="foreach: {data: Object.keys($root.filteredMetrics()).sort(), as: '_masterkey'}">
-      <!-- ko if: ($root.selectedMetric() === 'All' && $root.filteredMetrics()[_masterkey]) || $root.selectedMetric() === _masterkey-->
-      <!-- ko ifnot: $root.isUnusedMetric(_masterkey)-->
-      <h4 data-bind="text: _masterkey"></h4>
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th width="30%">${ _('Name') }</th>
-            <th>${ _('Value') }</th>
-          </tr>
-        </thead>
-        <!-- ko if: $root.filteredMetrics()[_masterkey] -->
-        <tbody data-bind="foreach: {'data': Object.keys($root.filteredMetrics()[_masterkey])}">
-          <tr>
-            <td data-bind="text: $data"></td>
-            <td data-bind="text: $root.filteredMetrics()[_masterkey][$data]"></td>
-          </tr>
-        </tbody>
-        <!-- /ko -->
-        <!-- ko ifnot: $root.filteredMetrics()[_masterkey] -->
-        <tfoot>
-          <tr>
-            <td colspan="2">${ _('There are no metrics matching your filter') }</td>
-          </tr>
-          </tfoot>
-        <!-- /ko -->
-        </table>
-        <!-- /ko -->
-        <!-- /ko -->
-      </div>
-    </div>
-  <!-- /ko -->
-  </div>
+<div id="Metrics">
+<Metrics data-reactcomponent='Metrics'></Metrics>
 </div>
-
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }

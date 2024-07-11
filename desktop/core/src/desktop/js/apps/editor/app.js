@@ -22,7 +22,7 @@ import 'ext/bootstrap-datepicker.min';
 import 'ext/jquery.hotkeys';
 import 'jquery/plugins/jquery.hdfstree';
 
-import { HIDE_GLOBAL_ALERTS_TOPIC } from 'reactComponents/AlertComponent/events';
+import { HIDE_GLOBAL_ALERTS_TOPIC } from 'reactComponents/GlobalAlert/events';
 import { registerHueWorkers } from 'sql/workers/hueWorkerHandler';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
@@ -48,6 +48,8 @@ const HUE_PUB_SUB_EDITOR_ID = 'editor';
 huePubSub.subscribe('app.dom.loaded', app => {
   if (app === 'editor') {
     window.MAIN_SCROLLABLE = '.page-content';
+
+    console.info('Editor v2 enabled.');
 
     let isLeftNavOpen = false;
     huePubSub.subscribe(
