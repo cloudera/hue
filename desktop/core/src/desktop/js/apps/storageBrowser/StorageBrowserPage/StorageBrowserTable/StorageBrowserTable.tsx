@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { ColumnProps } from 'antd/lib/table';
 import { Dropdown, Input } from 'antd';
 import { MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
@@ -33,6 +33,8 @@ import Table from 'cuix/dist/components/Table';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
+import useDebounce from '../../../../utils/useDebounce';
+
 import { mkdir, touch } from '../../../../reactComponents/FileChooser/api';
 import {
   StorageBrowserTableData,
@@ -55,6 +57,7 @@ interface StorageBrowserTableProps {
   onPageSizeChange: (pageSize: number) => void;
   onSortByColumnChange: (sortByColumn: string) => void;
   onSortOrderChange: (sortOrder: SortOrder) => void;
+  onSearch: (searchTerm: string) => void;
   pageSize: number;
   sortByColumn: string;
   sortOrder: SortOrder;
@@ -79,6 +82,7 @@ const StorageBrowserTable = ({
   onPageSizeChange,
   onSortByColumnChange,
   onSortOrderChange,
+  onSearch,
   sortByColumn,
   sortOrder,
   pageSize,
@@ -267,6 +271,13 @@ const StorageBrowserTable = ({
       });
   };
 
+  const handleSearch = useCallback(
+    useDebounce(searchTerm => {
+      onSearch(encodeURIComponent(searchTerm));
+    }),
+    [onSearch]
+  );
+
   useEffect(() => {
     //TODO: handle table resize
     const calculateTableHeight = () => {
@@ -305,7 +316,14 @@ const StorageBrowserTable = ({
   return (
     <>
       <div className="hue-storage-browser__actions-bar">
-        <Input className="hue-storage-browser__search" placeholder={t('Search')} />
+        <Input
+          className="hue-storage-browser__search"
+          placeholder={t('Search')}
+          allowClear={true}
+          onChange={event => {
+            handleSearch(event.target.value);
+          }}
+        />
         <div className="hue-storage-browser__actions-bar-right">
           {viewType === BrowserViewType.dir && (
             <>
