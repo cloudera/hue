@@ -453,19 +453,6 @@
                     }
                   });
 
-                  if (appName === 'editor' && (<hueWindow>window).SHOW_ADD_MORE_EDITORS) {
-                    subApps.push({ type: 'spacer' });
-                    const url = (<hueWindow>window).HAS_CONNECTORS
-                      ? '/desktop/connectors'
-                      : 'https://docs.gethue.com/administrator/configuration/connectors/';
-                    subApps.push({
-                      type: 'navigation',
-                      name: 'editor-AddMoreInterpreters',
-                      displayName: I18n('Edit list...'),
-                      url,
-                      handler: (event: Event) => onHueLinkClick(event, url)
-                    });
-                  }
                   const mainUrl = (<SidebarNavigationItem>subApps[0]).url || config.page || '/';
                   appsItems.push({
                     type: 'accordion',
