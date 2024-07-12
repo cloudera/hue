@@ -211,9 +211,6 @@
 
   window.SHOW_NOTEBOOKS = '${ SHOW_NOTEBOOKS.get() }' === 'True'
   window.SHOW_UPLOAD_BUTTON = '${ hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get() }' === 'True'
-  % if is_admin(user):
-  window.SHOW_ADD_MORE_EDITORS = true;
-  % endif
 
   window.UPLOAD_CHUNK_SIZE = ${ UPLOAD_CHUNK_SIZE.get() };
   window.MAX_FILE_SIZE_UPLOAD_LIMIT = ${ MAX_FILE_SIZE_UPLOAD_LIMIT.get() if hasattr(MAX_FILE_SIZE_UPLOAD_LIMIT, 'get') and MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 else 'undefined' };
@@ -374,7 +371,6 @@
     'Done.': '${ _('Done.') }',
     'Drop a SQL file here': '${_('Drop a SQL file here')}',
     'Drop iPython/Zeppelin notebooks here': '${_('Drop iPython/Zeppelin notebooks here')}',
-    'Edit list...': '${ _('Edit list...') }',
     'Edit Profile': '${ _('Edit Profile') }',
     'Edit tags': '${ _('Edit tags') }',
     'Edit this privilege': '${ _('Edit this privilege') }',
