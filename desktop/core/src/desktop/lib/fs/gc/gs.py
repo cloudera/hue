@@ -141,7 +141,7 @@ class GSFileSystem(S3FileSystem):
     return parent_dir
 
   def create_home_dir(self, home_path):
-    # When GS raz is enabled, try to create user home dir for REMOTE_STORAGE_HOME path
+    # When GS raz is enabled, try to create user home directory
     if is_raz_gs():
       LOG.debug('Attempting to create user directory for path: %s' % home_path)
       try:

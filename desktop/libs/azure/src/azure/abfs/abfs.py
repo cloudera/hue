@@ -362,7 +362,7 @@ class ABFS(object):
       self._writedata(path, data, len(data))
 
   def create_home_dir(self, home_path):
-    # When ABFS raz is enabled, try to create user home dir for REMOTE_STORAGE_HOME path
+    # When ABFS raz is enabled, try to create user home directory
     if is_raz_abfs():
       LOG.debug('Attempting to create user directory for path: %s' % home_path)
       try:
