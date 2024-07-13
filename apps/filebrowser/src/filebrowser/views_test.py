@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,66 +14,42 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#!/usr/bin/env python
 
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import zip
-from builtins import range
-from builtins import object
-from builtins import str
-import json
-import logging
 import os
 import re
+import json
 import stat
-import sys
+import logging
 import tempfile
-import pytest
-
-import urllib.request, urllib.error
+import urllib.error
 import urllib.parse
-
+import urllib.request
 from time import sleep, time
-from avro import schema, datafile, io
-from aws.s3.s3fs import S3FileSystemException
-from aws.s3.s3test_utils import get_test_bucket
+from unittest.mock import Mock, patch
+from urllib.parse import unquote as urllib_unquote
 
-from azure.conf import is_abfs_enabled, is_adls_enabled, ABFS_CLUSTERS
-
-from django.urls import reverse
-from django.utils.encoding import smart_str
+import pytest
+from avro import datafile, io, schema
 from django.http import HttpResponse
 from django.test import TestCase
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
+from aws.conf import AWS_ACCOUNTS
+from aws.s3.s3fs import S3FileSystemException
+from aws.s3.s3test_utils import get_test_bucket
+from azure.conf import ABFS_CLUSTERS, is_abfs_enabled, is_adls_enabled
+from desktop.conf import OZONE, RAZ, is_ofs_enabled, is_oozie_enabled
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
+from desktop.lib.test_utils import add_permission, add_to_group, grant_access, remove_from_group
 from desktop.lib.view_util import location_to_url
-from desktop.conf import is_oozie_enabled, RAZ, is_ofs_enabled, OZONE
-
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE, REMOTE_STORAGE_HOME
+from filebrowser.lib.rwx import expand_mode
+from filebrowser.views import _normalize_path, snappy_installed
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.webhdfs import WebHdfs
-from useradmin.models import User, Group
-
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE,\
-  REMOTE_STORAGE_HOME
-from filebrowser.lib.rwx import expand_mode
-from filebrowser.views import snappy_installed, _normalize_path
-
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote, urlparse
-  open_file = open
-  from django.utils.translation import gettext_lazy as _
-  from unittest.mock import patch, Mock
-else:
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlparse
-  open_file = file
-  from django.utils.translation import ugettext_lazy as _
-  from mock import patch, Mock
-
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
@@ -81,21 +57,21 @@ LOG = logging.getLogger()
 def cleanup_tree(cluster, path):
   try:
     cluster.fs.rmtree(path)
-  except:
+  except Exception:
     # Don't let cleanup errors mask earlier failures
     LOG.exception('failed to cleanup %s' % path)
+
 
 def cleanup_file(cluster, path):
   try:
     cluster.fs.remove(path)
-  except:
+  except Exception:
     # Don't let cleanup errors mask earlier failures
     LOG.exception('failed to cleanup %s' % path)
 
 
 @pytest.mark.django_db
-class TestFileBrowser():
-
+class TestFileBrowser:
   def setup_method(self):
     self.client = make_logged_in_client(username="test_filebrowser", groupname='test_filebrowser', recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test_filebrowser")
@@ -103,26 +79,19 @@ class TestFileBrowser():
     add_to_group(self.user.username, 'test_filebrowser')
 
   def test_listdir_paged(self):
-
     with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
       with patch('filebrowser.views.snappy_installed') as snappy_installed:
         snappy_installed.return_value = False
         get_filesystem.return_value = Mock(
           stats=Mock(
-            return_value=Mock(
-              isDir=True,
-              size=1024,
-              path=b'/',
-              mtime=None,
-              mode=stat.S_IFDIR
-            ),
+            return_value=Mock(isDir=True, size=1024, path=b'/', mtime=None, mode=stat.S_IFDIR),
           ),
           normpath=Mock(return_value='/'),
           listdir_stats=Mock(
             return_value=[]  # Add "Mock files here"
           ),
           superuser='hdfs',
-          supergroup='hdfs'
+          supergroup='hdfs',
         )
 
         response = self.client.get('/filebrowser/view=')
@@ -131,123 +100,164 @@ class TestFileBrowser():
         dir_listing = response.context[0]['files']
         assert 1 == len(dir_listing)
 
-
   def test_listdir_paged_with_non_ascii(self):
     parent_dir = Mock(
       isDir=True,
       size=0,
-      path=u'/user/systest/test5/Tжейкоб/..',
+      path='/user/systest/test5/Tжейкоб/..',
       mtime=1581717441.0,
       mode=16877,
-      user=u'systest',
-      type=u'DIRECTORY',
+      user='systest',
+      type='DIRECTORY',
       to_json_dict=Mock(
-        return_value={'size': 0, 'group': u'supergroup', 'blockSize': 0, 'replication': 0, 'user': u'systest',
-                      'mtime': 1581717441.0, 'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/..',
-                      'atime': 0.0, 'mode': 16877}
-      )
+        return_value={
+          'size': 0,
+          'group': 'supergroup',
+          'blockSize': 0,
+          'replication': 0,
+          'user': 'systest',
+          'mtime': 1581717441.0,
+          'path': '/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/..',
+          'atime': 0.0,
+          'mode': 16877,
+        }
+      ),
     )
-    parent_dir.name = u'..'
+    parent_dir.name = '..'
     self_dir = Mock(
       isDir=True,
       size=0,
-      path=u'/user/systest/test5/Tжейкоб',
+      path='/user/systest/test5/Tжейкоб',
       mtime=1581717441.0,
       mode=16877,
-      user=u'systest',
-      type=u'DIRECTORY',
+      user='systest',
+      type='DIRECTORY',
       to_json_dict=Mock(
-        return_value={'size': 0, 'group': u'supergroup', 'blockSize': 0, 'replication': 0, 'user': u'systest',
-                      'mtime': 1581717441.0, 'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431',
-                      'atime': 0.0, 'mode': 16877}
-      )
+        return_value={
+          'size': 0,
+          'group': 'supergroup',
+          'blockSize': 0,
+          'replication': 0,
+          'user': 'systest',
+          'mtime': 1581717441.0,
+          'path': '/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431',
+          'atime': 0.0,
+          'mode': 16877,
+        }
+      ),
     )
-    self_dir.name = u'Tжейкоб'
+    self_dir.name = 'Tжейкоб'
     file_1 = Mock(
       isDir=False,
       size=9,
-      path=u'/user/systest/test5/Tжейкоб/file_1.txt',
-      mtime=1581670301.0, mode=33279,
-      user=u'systest',
-      type=u'FILE',
+      path='/user/systest/test5/Tжейкоб/file_1.txt',
+      mtime=1581670301.0,
+      mode=33279,
+      user='systest',
+      type='FILE',
       to_json_dict=Mock(
-        return_value={'size': 9, 'group': u'supergroup', 'blockSize': 134217728, 'replication': 1, 'user': u'systest',
-                      'mtime': 1581670301.0,
-                      'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/file_1.txt',
-                      'atime': 1581708019.0, 'mode': 33279}
-      )
+        return_value={
+          'size': 9,
+          'group': 'supergroup',
+          'blockSize': 134217728,
+          'replication': 1,
+          'user': 'systest',
+          'mtime': 1581670301.0,
+          'path': '/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/file_1.txt',
+          'atime': 1581708019.0,
+          'mode': 33279,
+        }
+      ),
     )
-    file_1.name = u'file_1.txt'
+    file_1.name = 'file_1.txt'
     file_2 = Mock(
       isDir=False,
       size=0,
-      path=u'/user/systest/test5/Tжейкоб/文件_2.txt',
+      path='/user/systest/test5/Tжейкоб/文件_2.txt',
       mtime=1581707672.0,
       mode=33188,
-      user=u'systest',
-      type=u'FILE',
+      user='systest',
+      type='FILE',
       to_json_dict=Mock(
-        return_value={'size': 18, 'group': u'supergroup', 'blockSize': 134217728, 'replication': 1, 'user': u'systest',
-                      'mtime': 1581707672.0,
-                      'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/\u6587\u4ef6_2.txt',
-                      'atime': 1581707672.0, 'mode': 33188}
-      )
+        return_value={
+          'size': 18,
+          'group': 'supergroup',
+          'blockSize': 134217728,
+          'replication': 1,
+          'user': 'systest',
+          'mtime': 1581707672.0,
+          'path': '/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/\u6587\u4ef6_2.txt',
+          'atime': 1581707672.0,
+          'mode': 33188,
+        }
+      ),
     )
-    file_2.name = u'文件_2.txt'
+    file_2.name = '文件_2.txt'
     file_3 = Mock(
       isDir=False,
       size=0,
-      path=u'/user/systest/test5/Tжейкоб/employés_file.txt',
+      path='/user/systest/test5/Tжейкоб/employés_file.txt',
       mtime=1581039792.0,
       mode=33188,
-      user=u'systest',
-      type=u'FILE',
+      user='systest',
+      type='FILE',
       to_json_dict=Mock(
-        return_value={'size': 0, 'group': u'supergroup', 'blockSize': 134217728, 'replication': 1, 'user': u'systest',
-                      'mtime': 1581039792.0,
-                      'path': u'/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/employ\xe9s_file.txt',
-                      'atime': 1581708003.0, 'mode': 33188}
-      )
+        return_value={
+          'size': 0,
+          'group': 'supergroup',
+          'blockSize': 134217728,
+          'replication': 1,
+          'user': 'systest',
+          'mtime': 1581039792.0,
+          'path': '/user/systest/test5/T\u0436\u0435\u0439\u043a\u043e\u0431/employ\xe9s_file.txt',
+          'atime': 1581708003.0,
+          'mode': 33188,
+        }
+      ),
     )
-    file_3.name = u'employés_file.txt'
+    file_3.name = 'employés_file.txt'
 
     with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
       with patch('filebrowser.views.snappy_installed') as snappy_installed:
         snappy_installed.return_value = False
         get_filesystem.return_value = Mock(
-          stats=Mock(
-            return_value=self_dir
-          ),
+          stats=Mock(return_value=self_dir),
           normpath=WebHdfs.norm_path,
           is_sentry_managed=Mock(return_value=False),
-          listdir_stats=Mock(
-            return_value=[parent_dir, file_1, file_2, file_3]
-          ),
+          listdir_stats=Mock(return_value=[parent_dir, file_1, file_2, file_3]),
           superuser='hdfs',
-          supergroup='hdfs'
+          supergroup='hdfs',
         )
 
         response = self.client.get(
           '/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1'
-          '?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json&_=1581670214204')
+          '?pagesize=45&pagenum=1&filter=&sortby=name&descending=false&format=json&_=1581670214204'
+        )
 
         assert 200 == response.status_code
         dir_listing = json.loads(response.content)['files']
         assert 5 == len(dir_listing)
         assert b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5",' in response.content, response.content
-        assert (b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ft'
-          b'est5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1",' in response.content), response.content
-        assert (b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D'
-          b'0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2Ffile_1.txt",' in response.content), response.content
-        assert (b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D'
-          b'0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2F%E6%96%87%E4%BB%B6_2.txt",' in response.content), response.content
-        assert (b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%'
-          b'D0%B9%D0%BA%D0%BE%D0%B1%2Femploy%C3%A9s_file.txt",' in response.content), response.content
+        assert (
+          b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ft' b'est5%2FT%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1",' in response.content
+        ), response.content
+        assert (
+          b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D'
+          b'0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2Ffile_1.txt",' in response.content
+        ), response.content
+        assert (
+          b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D'
+          b'0%B5%D0%B9%D0%BA%D0%BE%D0%B1%2F%E6%96%87%E4%BB%B6_2.txt",' in response.content
+        ), response.content
+        assert (
+          b'"url": "/filebrowser/view=%2Fuser%2Fsystest%2Ftest5%2FT%D0%B6%D0%B5%'
+          b'D0%B9%D0%BA%D0%BE%D0%B1%2Femploy%C3%A9s_file.txt",' in response.content
+        ), response.content
+
 
 @pytest.mark.requires_hadoop
 @pytest.mark.integration
 class TestFileBrowserWithHadoop(object):
-
   def setup_method(self):
     self.c = make_logged_in_client(username='test', is_superuser=False)
     grant_access('test', 'test', 'filebrowser')
@@ -289,7 +299,6 @@ class TestFileBrowserWithHadoop(object):
     assert not self.cluster.fs.exists(PATH_1)
     assert not self.cluster.fs.exists(PATH_2)
     assert not self.cluster.fs.exists(PATH_3)
-
 
   def test_move(self):
     prefix = self.cluster.fs_prefix + '/test-move'
@@ -376,7 +385,6 @@ class TestFileBrowserWithHadoop(object):
     assert self.cluster.fs.exists(SUB_PATH2_2)
     assert self.cluster.fs.exists(SUB_PATH2_3)
 
-
   def test_mkdir_singledir(self):
     prefix = self.cluster.fs_prefix + '/test-filebrowser-mkdir'
 
@@ -398,7 +406,6 @@ class TestFileBrowserWithHadoop(object):
     dir_listing = response.context[0]['files']
     assert 3 == len(dir_listing)
     assert dir_listing[2]['name'] == success_path
-
 
   def test_touch(self):
     prefix = self.cluster.fs_prefix + '/test-filebrowser-touch'
@@ -422,7 +429,6 @@ class TestFileBrowserWithHadoop(object):
     assert 3 == len(file_listing)
     assert file_listing[2]['name'] == success_path
 
-
   def test_chmod(self):
     prefix = self.cluster.fs_prefix + '/test_chmod'
 
@@ -430,17 +436,25 @@ class TestFileBrowserWithHadoop(object):
     SUBPATH = PATH + '/test'
     self.cluster.fs.mkdir(SUBPATH)
 
-    permissions = ('user_read', 'user_write', 'user_execute',
-        'group_read', 'group_write', 'group_execute',
-        'other_read', 'other_write', 'other_execute',
-        'sticky') # Order matters!
+    permissions = (
+      'user_read',
+      'user_write',
+      'user_execute',
+      'group_read',
+      'group_write',
+      'group_execute',
+      'other_read',
+      'other_write',
+      'other_execute',
+      'sticky',
+    )  # Order matters!
 
     # Get current mode, change mode, check mode
     # Start with checking current mode
     assert 0o41777 != int(self.cluster.fs.stats(PATH)["mode"])
 
     # Setup post data
-    permissions_dict = dict(list(zip(permissions, [True]*len(permissions))))
+    permissions_dict = dict(list(zip(permissions, [True] * len(permissions))))
     kwargs = {'path': [PATH]}
     kwargs.update(permissions_dict)
 
@@ -466,7 +480,6 @@ class TestFileBrowserWithHadoop(object):
     assert 0o41777 == int(self.cluster.fs.stats(PATH_2)["mode"])
     assert 0o41777 == int(self.cluster.fs.stats(PATH_3)["mode"])
 
-
   def test_chmod_sticky(self):
     prefix = self.cluster.fs_prefix + '/test_chmod_sticky'
 
@@ -475,13 +488,21 @@ class TestFileBrowserWithHadoop(object):
 
     # Get current mode and make sure sticky bit is off
     mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
-    assert False == mode[-1]
+    assert False is mode[-1]
 
     # Setup post data
-    permissions = ('user_read', 'user_write', 'user_execute',
-        'group_read', 'group_write', 'group_execute',
-        'other_read', 'other_write', 'other_execute',
-        'sticky') # Order matters!
+    permissions = (
+      'user_read',
+      'user_write',
+      'user_execute',
+      'group_read',
+      'group_write',
+      'group_execute',
+      'other_read',
+      'other_write',
+      'other_execute',
+      'sticky',
+    )  # Order matters!
     permissions_dict = dict([x for x in zip(permissions, mode) if x[1]])
     permissions_dict['sticky'] = True
     kwargs = {'path': [PATH]}
@@ -490,14 +511,13 @@ class TestFileBrowserWithHadoop(object):
     # Set sticky bit, then check sticky bit is on in hdfs
     response = self.c.post("/filebrowser/chmod", kwargs)
     mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
-    assert True == mode[-1]
+    assert True is mode[-1]
 
     # Unset sticky bit, then check sticky bit is off in hdfs
     del kwargs['sticky']
     response = self.c.post("/filebrowser/chmod", kwargs)
     mode = expand_mode(int(self.cluster.fs.stats(PATH)["mode"]))
-    assert False == mode[-1]
-
+    assert False is mode[-1]
 
   def test_chown(self):
     prefix = self.cluster.fs_prefix + '/test_chown'
@@ -505,13 +525,13 @@ class TestFileBrowserWithHadoop(object):
 
     # Login as Non Hadoop superuser
     response = self.c.post(reverse('index'))
-    assert not 'Change owner' in response.content
+    assert 'Change owner' not in response.content
 
     # Only the Hadoop superuser really has carte blanche here
     c2 = make_logged_in_client(self.cluster.superuser)
     self.cluster.fs.setuser(self.cluster.superuser)
 
-    PATH = u"%s/test-chown-en-Español" % prefix
+    PATH = "%s/test-chown-en-Español" % prefix
     self.cluster.fs.mkdir(PATH)
     c2.post("/filebrowser/chown", dict(path=[PATH], user="x", group="y"))
     assert "x" == self.cluster.fs.stats(PATH)["user"]
@@ -529,8 +549,8 @@ class TestFileBrowserWithHadoop(object):
     assert "z" == self.cluster.fs.stats(SUBPATH)["user"]
 
     # Test bulk chown
-    PATH_2 = u"/test-chown-en-Español2"
-    PATH_3 = u"/test-chown-en-Español2"
+    PATH_2 = "/test-chown-en-Español2"
+    PATH_3 = "/test-chown-en-Español2"
     self.cluster.fs.mkdir(PATH_2)
     self.cluster.fs.mkdir(PATH_3)
     c2.post("/filebrowser/chown", dict(path=[PATH_2, PATH_3], user="x", group="y", recursive=True))
@@ -539,14 +559,13 @@ class TestFileBrowserWithHadoop(object):
     assert "x" == self.cluster.fs.stats(PATH_3)["user"]
     assert "y" == self.cluster.fs.stats(PATH_3)["group"]
 
-
   def test_rename(self):
     prefix = self.cluster.fs_prefix + '/test_rename'
     self.cluster.fs.mkdir(prefix)
 
-    PREFIX = u"%s/test-rename/" % prefix
-    NAME = u"test-rename-before"
-    NEW_NAME = u"test-rename-after"
+    PREFIX = "%s/test-rename/" % prefix
+    NAME = "test-rename-before"
+    NEW_NAME = "test-rename-after"
     self.cluster.fs.mkdir(PREFIX + NAME)
     op = "rename"
     # test for full path rename
@@ -555,7 +574,6 @@ class TestFileBrowserWithHadoop(object):
     # test for smart rename
     self.c.post("/filebrowser/rename", dict(src_path=PREFIX + NAME, dest_path=NEW_NAME))
     assert self.cluster.fs.exists(PREFIX + NEW_NAME)
-
 
   def test_listdir(self):
     # Delete user's home if there's already something there
@@ -577,8 +595,8 @@ class TestFileBrowserWithHadoop(object):
     # And even when the byte string can't be decoded properly (big5), the listdir
     # still succeeds.
     orig_paths = [
-      u'greek-Ελληνικά',
-      u'chinese-漢語',
+      'greek-Ελληνικά',
+      'chinese-漢語',
     ]
 
     prefix = home + '/test-filebrowser/'
@@ -624,13 +642,12 @@ class TestFileBrowserWithHadoop(object):
     response = self.c.get('/filebrowser/home_relative_view=/test_dir')
     assert '%s/test_dir' % home == response.context[0]['path']
 
-
   def test_listdir_sort_and_filter(self):
     prefix = self.cluster.fs_prefix + '/test_rename'
     self.cluster.fs.mkdir(prefix)
 
     BASE = '%s/test_sort_and_filter' % prefix
-    FUNNY_NAME = u'greek-Ελληνικά'
+    FUNNY_NAME = 'greek-Ελληνικά'
 
     self.cluster.fs.mkdir(BASE)
     # Create 10 files
@@ -700,7 +717,6 @@ class TestFileBrowserWithHadoop(object):
     page = resp.context[0]['page']
     assert {} == page
 
-
   def test_view_snappy_compressed(self):
     if not snappy_installed():
       pytest.skip("Skipping Test")
@@ -737,8 +753,9 @@ class TestFileBrowserWithHadoop(object):
       response = self.c.get('/filebrowser/view=%s/test-view.stillsnappy' % prefix)
       assert 'snappy' == response.context[0]['view']['compression']
       assert (
-        response.context[0]['view']['contents'] ==
-        'The broadcasters of your area in voluntary cooperation with the FCC and other authorities.'), response
+        response.context[0]['view']['contents']
+        == 'The broadcasters of your area in voluntary cooperation with the FCC and other authorities.'
+      ), response
 
       # Largest snappy compressed file
       finish.append(MAX_SNAPPY_DECOMPRESSION_SIZE.set_for_testing(1))
@@ -748,7 +765,6 @@ class TestFileBrowserWithHadoop(object):
     finally:
       for done in finish:
         done()
-
 
   def test_view_snappy_compressed_avro(self):
     if not snappy_installed():
@@ -772,10 +788,8 @@ class TestFileBrowserWithHadoop(object):
       """)
 
       # Cannot use StringIO with datafile writer!
-      f = self.cluster.fs.open(prefix +'/test-view.compressed.avro', "w")
-      data_file_writer = datafile.DataFileWriter(f, io.DatumWriter(),
-                                                  writers_schema=test_schema,
-                                                  codec='snappy')
+      f = self.cluster.fs.open(prefix + '/test-view.compressed.avro', "w")
+      data_file_writer = datafile.DataFileWriter(f, io.DatumWriter(), writers_schema=test_schema, codec='snappy')
       dummy_datum = {
         'name': 'Test',
         'integer': 10,
@@ -797,7 +811,6 @@ class TestFileBrowserWithHadoop(object):
     finally:
       for done in finish:
         done()
-
 
   def test_view_avro(self):
     prefix = self.cluster.fs_prefix + '/test_view_avro'
@@ -844,7 +857,6 @@ class TestFileBrowserWithHadoop(object):
     # we should fail to do a bad thing if they specify compression when it's not set.
     response = self.c.get('/filebrowser/view=%s/test-view2.avro?compression=gzip' % prefix)
     assert 'Failed to decompress' in response.context[0]['message']
-
 
   def test_view_parquet(self):
     prefix = self.cluster.fs_prefix + '/test_view_parquet'
@@ -902,7 +914,6 @@ class TestFileBrowserWithHadoop(object):
 
     assert 'FRANCE' in response.context[0]['view']['contents']
 
-
   def test_view_parquet_snappy(self):
     if not snappy_installed():
       pytest.skip("Skipping Test")
@@ -918,7 +929,6 @@ class TestFileBrowserWithHadoop(object):
     response = self.c.get('/filebrowser/view=%s/test-parquet-snappy.parquet' % prefix)
 
     assert 'SR3_ndw_otlt_cmf_xref_INA' in response.context[0]['view']['contents'], response.context[0]['view']['contents']
-
 
   def test_view_bz2(self):
     prefix = self.cluster.fs_prefix + '/test_view_bz2'
@@ -936,7 +946,6 @@ class TestFileBrowserWithHadoop(object):
 
     response = self.c.get('/filebrowser/view=%s/test-view.bz2' % prefix)
     assert 'test' in response.context[0]['view']['contents']
-
 
   def test_view_gz(self):
     prefix = self.cluster.fs_prefix + '/test_view_gz'
@@ -974,20 +983,19 @@ class TestFileBrowserWithHadoop(object):
     response = self.c.get('/filebrowser/view=%s/test-view2.gz?compression=gzip' % prefix)
     assert "Failed to decompress" in response.context[0]['message']
 
-
   def test_view_i18n(self):
     # Test viewing files in different encodings
-    content = u'pt-Olá en-hello ch-你好 ko-안녕 ru-Здравствуйте'
+    content = 'pt-Olá en-hello ch-你好 ko-안녕 ru-Здравствуйте'
     view_i18n_helper(self.c, self.cluster, 'utf-8', content)
     view_i18n_helper(self.c, self.cluster, 'utf-16', content)
 
-    content = u'你好-big5'
+    content = '你好-big5'
     view_i18n_helper(self.c, self.cluster, 'big5', content)
 
-    content = u'こんにちは-shift-jis'
+    content = 'こんにちは-shift-jis'
     view_i18n_helper(self.c, self.cluster, 'shift_jis', content)
 
-    content = u'안녕하세요-johab'
+    content = '안녕하세요-johab'
     view_i18n_helper(self.c, self.cluster, 'johab', content)
 
     # Test that the default view is home
@@ -995,7 +1003,6 @@ class TestFileBrowserWithHadoop(object):
     assert response.context[0]['path'] == '/'
     response = self.c.get('/filebrowser/view=/?default_to_home=1')
     assert "/filebrowser/view=/user/test" == urllib_unquote(response["location"])
-
 
   def test_view_access(self):
     prefix = self.cluster.fs_prefix
@@ -1009,7 +1016,6 @@ class TestFileBrowserWithHadoop(object):
 
     response = self.c.get('/filebrowser/view=/test-does-not-exist')
     assert 'Cannot access' in response.context[0]['message']
-
 
   def test_index(self):
     HOME_DIR = '/user/test'
@@ -1027,8 +1033,7 @@ class TestFileBrowserWithHadoop(object):
 
     response = c_no_home.get('/filebrowser', follow=True)
     assert '/' == response.context[0]['path']
-    assert None == response.context[0]['home_directory']
-
+    assert None is response.context[0]['home_directory']
 
   def test_download(self):
     prefix = self.cluster.fs_prefix + '/test_download'
@@ -1051,7 +1056,7 @@ alert("XSS")
 
     # The client does not support redirecting to another host. follow=False
     response = self.c.get('/filebrowser/download=%s/xss?disposition=inline' % prefix, follow=False)
-    if response.status_code == 302: # Redirects to webhdfs
+    if response.status_code == 302:  # Redirects to webhdfs
       assert response.url.find('webhdfs') >= 0
     else:
       assert 200 == response.status_code
@@ -1065,32 +1070,30 @@ alert("XSS")
     response = not_me.get('/filebrowser/download=%s/xss?disposition=inline' % prefix, follow=True)
     assert 'User not_me is not authorized to download' in response.context[0]['message'], response.context[0]['message']
 
-
   def test_edit_i18n(self):
     prefix = self.cluster.fs_prefix + '/test_view_gz'
     self.cluster.fs.mkdir(prefix)
 
     # Test utf-8
-    pass_1 = u'en-hello pt-Olá ch-你好 ko-안녕 ru-Здравствуйте'
-    pass_2 = pass_1 + u'yi-העלא'
+    pass_1 = 'en-hello pt-Olá ch-你好 ko-안녕 ru-Здравствуйте'
+    pass_2 = pass_1 + 'yi-העלא'
     edit_i18n_helper(self.c, self.cluster, 'utf-8', pass_1, pass_2)
 
     # Test utf-16
     edit_i18n_helper(self.c, self.cluster, 'utf-16', pass_1, pass_2)
 
     # Test cjk
-    pass_1 = u'big5-你好'
-    pass_2 = pass_1 + u'世界'
+    pass_1 = 'big5-你好'
+    pass_2 = pass_1 + '世界'
     edit_i18n_helper(self.c, self.cluster, 'big5', pass_1, pass_2)
 
-    pass_1 = u'shift_jis-こんにちは'
-    pass_2 = pass_1 + u'世界'
+    pass_1 = 'shift_jis-こんにちは'
+    pass_2 = pass_1 + '世界'
     edit_i18n_helper(self.c, self.cluster, 'shift_jis', pass_1, pass_2)
 
-    pass_1 = u'johab-안녕하세요'
-    pass_2 = pass_1 + u'세상'
+    pass_1 = 'johab-안녕하세요'
+    pass_2 = pass_1 + '세상'
     edit_i18n_helper(self.c, self.cluster, 'johab', pass_1, pass_2)
-
 
   def test_upload_file(self):
     with tempfile.NamedTemporaryFile() as local_file:
@@ -1116,8 +1119,10 @@ alert("XSS")
       assert stats['group'] == USER_NAME
 
       # Just upload the current python file
-      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, # GET param avoids infinite looping
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
+      resp = self.c.post(
+        '/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,  # GET param avoids infinite looping
+        dict(dest=HDFS_DEST_DIR, hdfs_file=open(LOCAL_FILE)),
+      )
       response = json.loads(resp.content)
 
       assert 0 == response['status'], response
@@ -1127,12 +1132,11 @@ alert("XSS")
 
       f = self.cluster.fs.open(HDFS_FILE)
       actual = f.read(file_size)
-      expected = open_file(LOCAL_FILE).read()
+      expected = open(LOCAL_FILE).read()
       assert actual == expected, 'files do not match: %s != %s' % (len(actual), len(expected))
 
       # Upload again and so fails because file already exits
-      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
+      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, dict(dest=HDFS_DEST_DIR, hdfs_file=open(LOCAL_FILE)))
       response = json.loads(resp.content)
       assert -1 == response['status'], response
       assert 'already exists' in response['data'], response
@@ -1141,8 +1145,7 @@ alert("XSS")
       not_me = make_logged_in_client("not_me", is_superuser=False)
       grant_access("not_me", "not_me", "filebrowser")
       try:
-        resp = not_me.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                           dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(LOCAL_FILE)))
+        resp = not_me.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, dict(dest=HDFS_DEST_DIR, hdfs_file=open(LOCAL_FILE)))
         response = json.loads(resp.content)
         assert -1 == response['status'], response
         assert 'User not_me does not have permissions' in response['data'], response
@@ -1166,14 +1169,12 @@ alert("XSS")
       self.cluster.fs.chmod(HDFS_DEST_DIR, 0o700)
 
       # Upload archive
-      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(ZIP_FILE)))
+      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, dict(dest=HDFS_DEST_DIR, hdfs_file=open(ZIP_FILE)))
       response = json.loads(resp.content)
       assert 0 == response['status'], response
       assert self.cluster.fs.exists(HDFS_ZIP_FILE)
 
-      resp = self.c.post('/filebrowser/extract_archive',
-                         dict(upload_path=HDFS_DEST_DIR, archive_name='te st.zip'))
+      resp = self.c.post('/filebrowser/extract_archive', dict(upload_path=HDFS_DEST_DIR, archive_name='te st.zip'))
       response = json.loads(resp.content)
       assert 0 == response['status'], response
       assert 'handle' in response and response['handle']['id'], response
@@ -1192,7 +1193,7 @@ alert("XSS")
       self.cluster.fs.chown(test_dir, 'test')
       self.cluster.fs.chmod(test_dir, 0o700)
       for i in range(3):
-        f = self.cluster.fs.open(test_file + "%s" %i, "w")
+        f = self.cluster.fs.open(test_file + "%s" % i, "w")
         f.close()
 
       resp = self.c.post('/filebrowser/compress_files', {'upload_path': pre, 'files[]': [test_direct], 'archive_name': 'test_compress.zip'})
@@ -1212,7 +1213,6 @@ alert("XSS")
         end_time = time()
       assert timeout_time > end_time, response
 
-
     ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
     prefix = self.cluster.fs_prefix + '/test_compress_files'
     self.cluster.fs.mkdir(prefix)
@@ -1220,12 +1220,11 @@ alert("XSS")
     try:
       make_and_test_dir(prefix, 'testdir')
       make_and_test_dir(prefix, 'test dir1')
-      #make_and_test_dir(prefix, 'test\ndir2')
-      #make_and_test_dir(prefix, 'test\tdir3')
+      # make_and_test_dir(prefix, 'test\ndir2')
+      # make_and_test_dir(prefix, 'test\tdir3')
     finally:
       ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(False)
       cleanup_tree(self.cluster, prefix)
-
 
   def test_extract_tgz(self):
     ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
@@ -1243,21 +1242,18 @@ alert("XSS")
 
     try:
       # Upload archive
-      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(TGZ_FILE)))
+      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, dict(dest=HDFS_DEST_DIR, hdfs_file=open(TGZ_FILE)))
       response = json.loads(resp.content)
       assert 0 == response['status'], response
       assert self.cluster.fs.exists(HDFS_TGZ_FILE)
 
-      resp = self.c.post('/filebrowser/extract_archive',
-                         dict(upload_path=HDFS_DEST_DIR, archive_name='test.tar.gz'))
+      resp = self.c.post('/filebrowser/extract_archive', dict(upload_path=HDFS_DEST_DIR, archive_name='test.tar.gz'))
       response = json.loads(resp.content)
       assert 0 == response['status'], response
       assert 'handle' in response and response['handle']['id'], response
 
     finally:
       cleanup_file(self.cluster, HDFS_TGZ_FILE)
-
 
   def test_extract_bz2(self):
     ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
@@ -1271,21 +1267,18 @@ alert("XSS")
 
     try:
       # Upload archive
-      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=open_file(BZ2_FILE)))
+      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, dict(dest=HDFS_DEST_DIR, hdfs_file=open(BZ2_FILE)))
       response = json.loads(resp.content)
       assert 0 == response['status'], response
       assert self.cluster.fs.exists(HDFS_BZ2_FILE)
 
-      resp = self.c.post('/filebrowser/extract_archive',
-                         dict(upload_path=HDFS_DEST_DIR, archive_name='test.txt.bz2'))
+      resp = self.c.post('/filebrowser/extract_archive', dict(upload_path=HDFS_DEST_DIR, archive_name='test.txt.bz2'))
       response = json.loads(resp.content)
       assert 0 == response['status'], response
       assert 'handle' in response and response['handle']['id'], response
 
     finally:
       cleanup_file(self.cluster, HDFS_BZ2_FILE)
-
 
   def test_trash(self):
     prefix = self.cluster.fs_prefix + '/test_trash'
@@ -1317,13 +1310,14 @@ alert("XSS")
     response = self.c.get('/filebrowser/view=/user/test?default_to_trash', follow=True)
     assert any(['.Trash' in page for page, code in response.redirect_chain]), response.redirect_chain
 
+
 def view_i18n_helper(c, cluster, encoding, content):
   """
   Write the content in the given encoding directly into the filesystem.
   Then try to view it and make sure the data is correct.
   """
   prefix = cluster.fs_prefix + '/test_view_i18n'
-  filename = prefix + u'/test-view-carácter-internacional'
+  filename = prefix + '/test-view-carácter-internacional'
   bytestring = content.encode(encoding)
 
   try:
@@ -1335,10 +1329,10 @@ def view_i18n_helper(c, cluster, encoding, content):
     assert response.context[0]['view']['contents'] == content
 
     response = c.get('/filebrowser/view=%s?encoding=%s&end=8&begin=1' % (filename, encoding))
-    assert (response.context[0]['view']['contents'] ==
-                 str(bytestring[0:8], encoding, errors='replace'))
+    assert response.context[0]['view']['contents'] == str(bytestring[0:8], encoding, errors='replace')
   finally:
     cleanup_file(cluster, filename)
+
 
 def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
   """
@@ -1346,7 +1340,7 @@ def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
   """
   p = cluster.fs_prefix + '/test_edit_i18n'
   # This path is non-normalized to test normalization too
-  filename = p + u'//test-filebrowser//./test-edit-carácter-internacional with space and () en-hello pt-Olá ch-你好 ko-안녕 ru-Здравствуйте'
+  filename = p + '//test-filebrowser//./test-edit-carácter-internacional with space and () en-hello pt-Olá ch-你好 ko-안녕 ru-Здравствуйте'
 
   # File doesn't exist - should be empty
   edit_url = '/filebrowser/edit=' + filename
@@ -1360,10 +1354,7 @@ def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
 
   try:
     # Put some data in there and post
-    response = c.post("/filebrowser/save", dict(
-        path=filename,
-        contents=contents_pass_1,
-        encoding=encoding), follow=True)
+    response = c.post("/filebrowser/save", dict(path=filename, contents=contents_pass_1, encoding=encoding), follow=True)
     assert response.context[0]['form'].data['path'] == filename
     assert response.context[0]['form'].data['contents'] == contents_pass_1
 
@@ -1372,19 +1363,16 @@ def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
     # And its contents should be what we expect
     f = cluster.fs.open(filename)
     assert f.read() == contents_pass_1.encode(encoding)
-    assert not '\r\n' in f.read() # No CRLF line terminators
+    assert '\r\n' not in f.read()  # No CRLF line terminators
     f.close()
 
     # We should be able to overwrite the file with another save
-    response = c.post("/filebrowser/save", dict(
-        path=filename,
-        contents=contents_pass_2,
-        encoding=encoding), follow=True)
+    response = c.post("/filebrowser/save", dict(path=filename, contents=contents_pass_2, encoding=encoding), follow=True)
     assert response.context[0]['form'].data['path'] == filename
     assert response.context[0]['form'].data['contents'] == contents_pass_2
     f = cluster.fs.open(filename)
     assert f.read() == contents_pass_2.encode(encoding)
-    assert not '\r\n' in f.read() # No CRLF line terminators
+    assert '\r\n' not in f.read()  # No CRLF line terminators
     f.close()
 
     # TODO(todd) add test for maintaining ownership/permissions
@@ -1400,9 +1388,9 @@ def test_location_to_url():
   assert prefix + '/' == location_to_url('hdfs://localhost:8020')
   assert prefix + 's3a://bucket/key' == location_to_url('s3a://bucket/key')
 
+
 @pytest.mark.django_db
 class TestS3AccessPermissions(object):
-
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     grant_access('test', 'test', 'filebrowser')
@@ -1431,11 +1419,12 @@ class TestS3AccessPermissions(object):
       self.client.get('/filebrowser/edit=S3A://bucket/hue')
 
     # 500 for real currently
-#     with tempfile.NamedTemporaryFile() as local_file: # Flaky
-#       DEST_DIR = 'S3A://bucket/hue'
-#       LOCAL_FILE = local_file.name
-#       assert_raises(
-#  S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+
+  #     with tempfile.NamedTemporaryFile() as local_file: # Flaky
+  #       DEST_DIR = 'S3A://bucket/hue'
+  #       LOCAL_FILE = local_file.name
+  #       assert_raises(
+  # S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
 
   def test_has_default_permissions(self):
     if not get_test_bucket():
@@ -1449,8 +1438,9 @@ class TestS3AccessPermissions(object):
     finally:
       remove_from_group(self.user.username, 'has_s3')
 
-class TestABFSAccessPermissions(object):
 
+@pytest.mark.django_db
+class TestABFSAccessPermissions(object):
   def setup_method(self):
     if not is_abfs_enabled():
       pytest.skip("Skipping Test")
@@ -1465,11 +1455,12 @@ class TestABFSAccessPermissions(object):
     assert 500 == response.status_code
 
     # 500 for real currently
-#     with tempfile.NamedTemporaryFile() as local_file: # Flaky
-#       DEST_DIR = 'S3A://bucket/hue'
-#       LOCAL_FILE = local_file.name
-#       assert_raises(
-#  S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+
+  #     with tempfile.NamedTemporaryFile() as local_file: # Flaky
+  #       DEST_DIR = 'S3A://bucket/hue'
+  #       LOCAL_FILE = local_file.name
+  #       assert_raises(
+  # S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
 
   def test_has_default_permissions(self):
     add_permission(self.user.username, 'has_abfs', permname='abfs_access', appname='filebrowser')
@@ -1480,8 +1471,8 @@ class TestABFSAccessPermissions(object):
     finally:
       remove_from_group(self.user.username, 'has_abfs')
 
-class TestADLSAccessPermissions(object):
 
+class TestADLSAccessPermissions(object):
   def setup_method(self):
     if not is_adls_enabled():
       pytest.skip("Skipping Test")
@@ -1511,11 +1502,12 @@ class TestADLSAccessPermissions(object):
     assert_raises(IOError, self.client.get, '/filebrowser/edit=ADL://hue-test-01')
 
     # 500 for real currently
-#     with tempfile.NamedTemporaryFile() as local_file: # Flaky
-#       DEST_DIR = 'S3A://bucket/hue'
-#       LOCAL_FILE = local_file.name
-#       assert_raises(
-#  S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+
+  #     with tempfile.NamedTemporaryFile() as local_file: # Flaky
+  #       DEST_DIR = 'S3A://bucket/hue'
+  #       LOCAL_FILE = local_file.name
+  #       assert_raises(
+  # S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
 
   def test_has_default_permissions(self):
     add_permission(self.user.username, 'has_adls', permname='adls_access', appname='filebrowser')
@@ -1542,7 +1534,7 @@ class UploadChunksTestCase(TestCase):
     response = self.client.post(url, {'filename': self.filename})
     assert response.status_code == 200
     # In Test Setup HDFS is not available, so it will fail
-    assert response.json()['success'] == False
+    assert response.json()['success'] is False
 
   def test_upload_chunks_large_file(self):
     pytest.skip("Skipping due to failures with pytest, investigation ongoing.")
@@ -1551,7 +1543,7 @@ class UploadChunksTestCase(TestCase):
     url += 'qqchunksize=2000000&qqtotalparts=36&qqtotalfilesize=71138958&qqfilename=ym_2020.csv&qquuid=123'
     response = self.client.post(url, {'filename': self.filename})
     assert response.status_code == 200
-    assert response.json()['success'] == True
+    assert response.json()['success'] is True
     assert response.json()['uuid'] == '123'
 
   def test_upload_chunks_small_file(self):
@@ -1561,7 +1553,7 @@ class UploadChunksTestCase(TestCase):
     response = self.client.post(url, {'qqtotalfilesize': 1000, 'qquuid': '123'})
     assert response.status_code == 200
     # In Test Setup HDFS is not available, so it will fail
-    assert response.json()['success'] == False
+    assert response.json()['success'] is False
 
   def test_upload_chunks_error(self):
     pytest.skip("Skipping due to failures with pytest, investigation ongoing.")
@@ -1571,9 +1563,10 @@ class UploadChunksTestCase(TestCase):
       response = self.client.post(url)
     except Exception as e:
       assert e.status_code == 500
-      assert e.json()['success'] == False
+      assert e.json()['success'] is False
       assert e.json()['error'] == 'Error in upload'
     assert response.status_code == 200
+
 
 @pytest.mark.django_db
 class TestOFSAccessPermissions(object):
@@ -1619,7 +1612,6 @@ class TestOFSAccessPermissions(object):
 
 @pytest.mark.django_db
 class TestFileChooserRedirect(object):
-
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     grant_access('test', 'test', 'filebrowser')
@@ -1659,27 +1651,24 @@ class TestFileChooserRedirect(object):
         reset()
 
       # ABFS - default_abfs_home
-      reset = ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(None)
+      resets = [
+        ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(None),
+        ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.set_for_testing(None),
+        REMOTE_STORAGE_HOME.set_for_testing(None),
+      ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
 
         assert 302 == response.status_code
         assert '/filebrowser/view=abfs%3A%2F%2F' == response.url
       finally:
-        reset()
-
-      reset = ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing('abfs://data-container@mystorage.dfs.core.windows.net')
-      try:
-        response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
-
-        assert 302 == response.status_code
-        assert '/filebrowser/view=abfs%3A%2F%2Fdata-container' == response.url
-      finally:
-        reset()
+        for reset in resets:
+          reset()
 
       resets = [
-        RAZ.IS_ENABLED.set_for_testing(True),
-        REMOTE_STORAGE_HOME.set_for_testing('abfs://data-container')
+        ABFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing('abfs://data-container@mystorage.dfs.core.windows.net'),
+        ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.set_for_testing(None),
+        REMOTE_STORAGE_HOME.set_for_testing(None),
       ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
@@ -1692,7 +1681,22 @@ class TestFileChooserRedirect(object):
 
       resets = [
         RAZ.IS_ENABLED.set_for_testing(True),
-        REMOTE_STORAGE_HOME.set_for_testing('abfs://data-container/user')
+        ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.set_for_testing('abfs://data-container'),
+        REMOTE_STORAGE_HOME.set_for_testing(None),
+      ]
+      try:
+        response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
+
+        assert 302 == response.status_code
+        assert '/filebrowser/view=abfs%3A%2F%2Fdata-container' == response.url
+      finally:
+        for reset in resets:
+          reset()
+
+      resets = [
+        RAZ.IS_ENABLED.set_for_testing(True),
+        ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.set_for_testing('abfs://data-container/user'),
+        REMOTE_STORAGE_HOME.set_for_testing(None),
       ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_abfs_home')
@@ -1704,16 +1708,20 @@ class TestFileChooserRedirect(object):
           reset()
 
       # S3A - default_s3_home
-      reset = REMOTE_STORAGE_HOME.set_for_testing(None)
+      resets = [REMOTE_STORAGE_HOME.set_for_testing(None), AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': None}})]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
 
         assert 302 == response.status_code
         assert '/filebrowser/view=s3a%3A%2F%2F' == response.url
       finally:
-        reset()
+        for reset in resets:
+          reset()
 
-      reset = REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket')
+      resets = [
+        REMOTE_STORAGE_HOME.set_for_testing(None),
+        AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': 's3a://my_bucket'}}),
+      ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
 
@@ -1724,7 +1732,8 @@ class TestFileChooserRedirect(object):
 
       resets = [
         RAZ.IS_ENABLED.set_for_testing(True),
-        REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket')
+        REMOTE_STORAGE_HOME.set_for_testing(None),
+        AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': 's3a://my_bucket'}}),
       ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
@@ -1737,7 +1746,8 @@ class TestFileChooserRedirect(object):
 
       resets = [
         RAZ.IS_ENABLED.set_for_testing(True),
-        REMOTE_STORAGE_HOME.set_for_testing('s3a://my_bucket/user')
+        REMOTE_STORAGE_HOME.set_for_testing(None),
+        AWS_ACCOUNTS.set_for_testing({'default': {'default_home_path': 's3a://my_bucket/user'}}),
       ]
       try:
         response = self.client.get('/filebrowser/view=%2F?default_s3_home')
@@ -1754,13 +1764,13 @@ class TestFileChooserRedirect(object):
         with patch('filebrowser.views.listdir_paged') as listdir_paged:
           stats.isDir.return_value = True
           listdir_paged.return_value = HttpResponse()
-        
+
           response = self.client.get('/filebrowser/view=')
 
           _normalize_path.assert_called_with('/')
 
-class TestNormalizePath(object):
 
+class TestNormalizePath(object):
   def test_should_decode_encoded_slash_only(self):
     encoded_path = '%2Fsome%2Fpath%20with%20space%20in name'
     expected_path = '/some/path%20with%20space%20in name'
