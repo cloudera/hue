@@ -16,7 +16,10 @@
 
 import sanitizeHtml, { IOptions } from 'sanitize-html';
 
-const deXSS = (str?: undefined | boolean | string | number | null, options?: IOptions): string => {
+const deXSS = (
+  str?: undefined | boolean | string | number | null | unknown,
+  options?: IOptions
+): string => {
   if (str === null) {
     return 'null';
   }
@@ -25,7 +28,15 @@ const deXSS = (str?: undefined | boolean | string | number | null, options?: IOp
     return str.toString();
   }
   if (typeof str !== 'undefined') {
-    return sanitizeHtml(str as string, options) || '';
+    // This handles cases where 'str' is a object, ensuring it is properly
+    // serialized into a JSON format before sanitization.
+    let finalStr: string;
+    if (typeof str === 'object' && !Array.isArray(str)) {
+      finalStr = JSON.stringify(str);
+    } else {
+      finalStr = str.toString();
+    }
+    return sanitizeHtml(finalStr, options) || '';
   }
   return '';
 };
