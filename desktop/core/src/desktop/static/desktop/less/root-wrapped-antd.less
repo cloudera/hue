@@ -9,11 +9,11 @@
 .ant-modal-root {
   // We need to reset some global styles from Bootstrap to prevent them from
   // interfering with the Antd styles
-  @import './reset-globals.less';
+  @import url('./reset-globals.less');
 
   // Import global antd styles
-  @import 'antd/dist/antd.less';
-  @import 'node_modules/cuix/dist/styles/variables.less';
+  @import url('antd/dist/antd.less');
+  @import url('node_modules/cuix/dist/styles/variables.less');
 
   // Required global overrides:
   .ant-modal-mask,
@@ -32,9 +32,9 @@ body.ant-scrolling-effect {
 }
 
 // We need these styles available outside the .antd wrapper
-@import 'antd/es/menu/style/index.less';
-@import 'antd/es/style/core/motion.less';
-@import 'antd/es/dropdown/style/index.less';
-@import 'antd/es/tooltip/style/index.less';
-@import 'antd/es/spin/style/index.less';
-@import 'antd/es/tabs/style/index.less';
+@import url('antd/es/menu/style/index.less');
+@import url('antd/es/style/core/motion.less');
+@import url('antd/es/dropdown/style/index.less');
+@import url('antd/es/tooltip/style/index.less');
+@import url('antd/es/spin/style/index.less');
+@import url('antd/es/tabs/style/index.less');
