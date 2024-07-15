@@ -151,10 +151,13 @@
       activeVariables(): void {
         this.$emit(
           'variables-changed',
-          this.activeVariables.reduce((result, variable) => {
-            result[variable.name] = variable;
-            return result;
-          }, <VariableIndex>{})
+          this.activeVariables.reduce(
+            (result, variable) => {
+              result[variable.name] = variable;
+              return result;
+            },
+            <VariableIndex>{}
+          )
         );
       },
       locations(locations?: IdentifierLocation[]): void {

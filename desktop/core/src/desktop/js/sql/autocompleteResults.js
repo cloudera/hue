@@ -1803,8 +1803,8 @@ class AutocompleteResults {
         const replaceWith = table.alias
           ? table.alias + '.'
           : suggestAggregateFunctions.tables.length > 1
-          ? table.identifierChain[table.identifierChain.length - 1].name + '.'
-          : '';
+            ? table.identifierChain[table.identifierChain.length - 1].name + '.'
+            : '';
         if (table.identifierChain.length > 1) {
           substitutions.push({
             replace: new RegExp(
