@@ -770,8 +770,8 @@ nv.models.multiBarWithBrushChart = function () {
           x.range()[_l + typeof (isDescending ? -1 : 0)] !== 'undefined'
             ? _l + (isDescending ? -1 : 0)
             : isDescending
-            ? _leftEdges.length - 1
-            : 0;
+              ? _leftEdges.length - 1
+              : 0;
         const _fromRange = typeof x.range()[_l] !== 'undefined' ? x.range()[_l] : 0;
 
         if (isDescending) {

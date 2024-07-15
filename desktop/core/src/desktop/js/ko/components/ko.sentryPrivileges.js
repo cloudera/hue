@@ -170,8 +170,8 @@ const TEMPLATE = `
       <button data-loading-text="${I18n(
         'Deleting...'
       )}" class="btn btn-danger" data-bind="click: function() { roleToUpdate().savePrivileges(roleToUpdate()); }">${I18n(
-  'Yes, delete'
-)}</button>
+        'Yes, delete'
+      )}</button>
     </div>
   </div>
 `;

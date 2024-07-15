@@ -837,14 +837,12 @@ registerBinding(NAME, {
               'highlighted',
               'line'
             );
-            ace
-              .require('ace/lib/dom')
-              .importCssString(
-                '.highlighted {\
+            ace.require('ace/lib/dom').importCssString(
+              '.highlighted {\
                   background-color: #E3F7FF;\
                   position: absolute;\
               }'
-              );
+            );
             editor.scrollToLine(range.start.row + lineOffset, true, true, () => {});
           }, 0);
         }

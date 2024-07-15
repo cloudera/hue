@@ -55,8 +55,8 @@ const TEMPLATE = `
           )} <a class="pointer" data-bind="hueLink: $data.dependents[1].absoluteUrl, text: $data.dependents[1].name"></a>
             <!-- ko if: $data.dependents.length > 2 -->
               ${I18n('and')} <span data-bind="text: $data.dependents.length - 2"></span> ${I18n(
-  'other'
-)}
+                'other'
+              )}
             <!-- /ko -->
           <!-- /ko -->
           )
