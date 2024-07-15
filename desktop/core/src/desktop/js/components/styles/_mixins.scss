@@ -159,10 +159,7 @@ $hue-panel-border-radius: 3px;
 
 @mixin fillAbsolute {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0 0 0 0;
 }
 
 // Flexbox mixins
@@ -254,8 +251,7 @@ $hue-panel-border-radius: 3px;
   @include flex-direction($direction);
   @include display-flex;
 
-  column-gap: 10px;
-  row-gap: 10px;
+  gap: 10px 10px;
 
   > * {
     flex: 1;
