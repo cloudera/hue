@@ -95,8 +95,8 @@
 
   &:hover,
   &:focus,
-    // CDP less has some very specific style we'll need to override
-  &:focus:not(:hover):not(.ant-btn) {
+    
+  &:focus:not(:hover, .ant-btn) {
     text-decoration: none;
     outline: none;
   }
@@ -200,7 +200,7 @@
     color: $sidebar-hover-color;
   }
 
-  &:focus:not(:hover):not(.sidebar-active),
+  &:focus:not(:hover, .sidebar-active),
   &:hover:focus:not(.sidebar-active) {
     color: $sidebar-hover-color;
     outline: none;

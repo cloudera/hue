@@ -26,7 +26,7 @@ import huePubSub from 'utils/huePubSub';
 
 import AiAssistToolbarHistory, { HistoryItem } from './AiAssistToolbarHistory';
 import { useResizeAwareElementSize } from '../hooks';
-import { GLOBAL_INFO_TOPIC } from '../../../../../reactComponents/AlertComponent/events';
+import { GLOBAL_INFO_TOPIC } from '../../../../../reactComponents/GlobalAlert/events';
 import './AiAssistToolbarInput.scss';
 
 const ENTER_KEY = 'Enter';
