@@ -1638,9 +1638,12 @@ class ApiHelper {
             if (response && response.data) {
               deferred.resolve(response.data);
             } else {
-              const timeout = window.setTimeout(() => {
-                pollForAnalysis();
-              }, 1000 + tries * 500); // TODO: Adjust once fully implemented;
+              const timeout = window.setTimeout(
+                () => {
+                  pollForAnalysis();
+                },
+                1000 + tries * 500
+              ); // TODO: Adjust once fully implemented;
               promise.onCancel(() => {
                 window.clearTimeout(timeout);
               });

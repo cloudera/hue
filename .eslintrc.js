@@ -60,15 +60,19 @@ const jsTsVueRules = {
   '@typescript-eslint/no-non-null-assertion': 'off',
   '@typescript-eslint/no-explicit-any': 'error',
   '@typescript-eslint/no-this-alias': 'error',
-  '@typescript-eslint/no-unused-vars': 'error',
+  '@typescript-eslint/no-unused-vars': [
+    'error',
+    {
+      varsIgnorePattern: '__webpack.*'
+    }
+  ],
   '@typescript-eslint/explicit-module-boundary-types': 'error',
   'vue/max-attributes-per-line': [
     'error',
     {
       singleline: 10,
       multiline: {
-        max: 1,
-        allowFirstLine: false
+        max: 1
       }
     }
   ],
@@ -80,6 +84,8 @@ const jsTsVueRules = {
       }
     }
   ],
+  'vue/multi-word-component-names': 'off',
+  'vue/require-toggle-inside-transition': 'off',
   'vue/singleline-html-element-content-newline': 'off' // Conflicts with prettier
 };
 

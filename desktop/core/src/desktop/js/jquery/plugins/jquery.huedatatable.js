@@ -444,8 +444,8 @@ $.fn.hueDataTable = function (oInit) {
         const invisibleOffset = $t.data('oInit')['forceInvisible']
           ? $t.data('oInit')['forceInvisible']
           : aoColumns.length < 100
-          ? 10
-          : 1;
+            ? 10
+            : 1;
         const scrollable = $t.parents($t.data('oInit')['scrollable']);
         let visibleRows = Math.ceil(
           (scrollable.height() - Math.max($t.offset().top, 0)) / rowHeight

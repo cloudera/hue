@@ -145,7 +145,7 @@ export default class NotebookViewModel {
         });
         $.each(notebook.presentationSnippets(), key => {
           // Dead statements
-          if (!key in statementKeys) {
+          if ((!key) in statementKeys) {
             delete notebook.presentationSnippets()[key];
           }
         });

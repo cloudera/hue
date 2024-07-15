@@ -963,8 +963,8 @@ class Snippet {
         ? self.selectedStatement()
           ? self.selectedStatement()
           : self.positionStatement() !== null
-          ? self.positionStatement().statement
-          : self.statement_raw()
+            ? self.positionStatement().statement
+            : self.statement_raw()
         : self.statement_raw();
       const variables = self.variables().reduce((variables, variable) => {
         variables[variable.name()] = variable;
@@ -2109,8 +2109,8 @@ class Snippet {
                   match === null
                     ? null
                     : typeof match[3] !== 'undefined'
-                    ? parseInt(match[3])
-                    : null
+                      ? parseInt(match[3])
+                      : null
               });
               self.status('with-sql-analyzer-report');
             }
@@ -2123,8 +2123,8 @@ class Snippet {
                   match === null
                     ? null
                     : typeof match[3] !== 'undefined'
-                    ? parseInt(match[3])
-                    : null
+                      ? parseInt(match[3])
+                      : null
               });
               self.status('with-sql-analyzer-report');
             }

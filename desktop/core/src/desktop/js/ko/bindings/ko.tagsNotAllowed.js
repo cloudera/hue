@@ -24,8 +24,8 @@ ko.bindingHandlers.tagsNotAllowed = {
     const valueObservable = ko.isObservable(params)
       ? params
       : params.textInput
-      ? params.textInput
-      : params.value;
+        ? params.textInput
+        : params.value;
     const value = valueObservable();
     const escaped = value.replace(/<|>/g, '');
     if (escaped !== value) {

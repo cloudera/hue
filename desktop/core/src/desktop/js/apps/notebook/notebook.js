@@ -695,8 +695,8 @@ class Notebook {
               data.status == -3
                 ? 'expired'
                 : data.status == 0
-                ? data.query_status.status
-                : 'failed';
+                  ? data.query_status.status
+                  : 'failed';
             if (status && item.status() != status) {
               item.status(status);
             }

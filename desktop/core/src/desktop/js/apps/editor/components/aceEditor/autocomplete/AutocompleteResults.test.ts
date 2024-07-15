@@ -262,7 +262,7 @@ describe('AutocompleteResults.ts', () => {
               source_autocomplete_disabled: false
             }
           }
-        } as HueConfig)
+        }) as HueConfig
     );
 
     const subject = createSubject();
@@ -288,7 +288,7 @@ describe('AutocompleteResults.ts', () => {
               source_autocomplete_disabled: true
             }
           }
-        } as HueConfig)
+        }) as HueConfig
     );
     const subject = createSubject();
     const suggestions: Suggestion[] = [];
