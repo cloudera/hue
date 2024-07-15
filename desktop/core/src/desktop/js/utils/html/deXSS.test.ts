@@ -66,4 +66,39 @@ describe('deXSS.ts', () => {
   it('should dump an uppercase javascript url', () => {
     expect(deXSS('<a href="JAVASCRIPT:alert(\'foo\')">Hax</a>')).toEqual('<a>Hax</a>');
   });
+
+  it('should return a comma-separated string for an array', () => {
+    expect(deXSS([1, 2, 3])).toEqual('1,2,3');
+  });
+
+  it('should return JSON string for an object', () => {
+    expect(deXSS({ key: 'value' })).toEqual('{"key":"value"}');
+  });
+
+  it('should return JSON string for a map', () => {
+    const map = new Map();
+    map.set('key', 'value');
+    expect(deXSS(Object.fromEntries(map))).toEqual('{"key":"value"}');
+  });
+
+  it('should return JSON string for a nested object', () => {
+    const nestedObject = {
+      key1: 'value1',
+      key2: {
+        nestedKey: 'nestedValue'
+      }
+    };
+    expect(deXSS(nestedObject)).toEqual('{"key1":"value1","key2":{"nestedKey":"nestedValue"}}');
+  });
+
+  it('should return JSON string for a complex map', () => {
+    const map = new Map();
+    map.set('struct', {
+      array1: [1, 2, 3],
+      array2: ['a', 'b', 'c']
+    });
+    expect(deXSS(Object.fromEntries(map))).toEqual(
+      '{"struct":{"array1":[1,2,3],"array2":["a","b","c"]}}'
+    );
+  });
 });
