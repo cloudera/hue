@@ -244,14 +244,12 @@ $sidebar-drawer-behind-z-index: $sidebar-z-index - 1;
     ul {
       display: block;
       line-height: 20px;
-      margin-block-start: 1em;
-      margin-block-end: 1em;
+      margin-block: 1em 1em;
       padding-inline-start: 40px;
 
       ol,
       ul {
-        margin-block-start: 0;
-        margin-block-end: 0;
+        margin-block: 0 0;
       }
 
       li {

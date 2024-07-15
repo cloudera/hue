@@ -35,7 +35,7 @@ const Breadcrumb = ({ label, url, onFilepathChange }: BreadcrumbProps): JSX.Elem
   return (
     <div
       className="hue-path-browser__breadcrumb"
-      style={{ '--minWidth': `${minWidth}` } as React.CSSProperties}
+      style={{ '--min-width': `${minWidth}` } as React.CSSProperties}
     >
       <OverflowingItem onClick={handleFilepathChange} label={label} />
     </div>
