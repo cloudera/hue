@@ -227,8 +227,8 @@ const ASSIST_TABLE_TEMPLATES = `
       <li class="assist-entry assist-no-entries"><!-- ko if: catalogEntry.isTableOrView() -->${I18n(
         'No columns found'
       )}<!--/ko--><!-- ko if: catalogEntry.isDatabase() -->${I18n(
-  'No tables found'
-)}<!--/ko--><!-- ko if: catalogEntry.isField() -->${I18n('No results found')}<!--/ko--></li>
+        'No tables found'
+      )}<!--/ko--><!-- ko if: catalogEntry.isField() -->${I18n('No results found')}<!--/ko--></li>
     </ul>
     <!-- /ko -->
     <!-- ko if: ! hasErrors() && hasEntries() && ! loading() && filteredEntries().length > 0 -->

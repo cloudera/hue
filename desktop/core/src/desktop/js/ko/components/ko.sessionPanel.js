@@ -68,8 +68,8 @@ const TEMPLATE = `
                     <a class="inactive-action pointer margin-left-10" title="${I18n(
                       'Save session settings as default'
                     )}" rel="tooltip" data-bind="click: saveDefaultUserProperties"><i class="fa fa-save"></i> ${I18n(
-  'Set as default settings'
-)}</a>
+                      'Set as default settings'
+                    )}</a>
                   <!-- /ko -->
                   <!-- ko if: session.type === 'impala' && typeof session.http_addr != 'undefined' -->
                     <a class="margin-left-10" data-bind="attr: { 'href': session.http_addr }" target="_blank">
