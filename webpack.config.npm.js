@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const fs = require('fs');
@@ -61,27 +61,27 @@ const copySourceConfig = {
     usedExports: true
   },
   plugins: [
-    new CleanWebpackPlugin([DIST_DIR]),
+    new CleanWebpackPlugin({ cleanOnceBeforeBuildPatterns: [DIST_DIR] }),
     new CopyWebpackPlugin({
       patterns: [
         { from: './NPM-README.md', to: `${DIST_DIR}/README.md` },
         {
           from: './package.json',
           to: `${DIST_DIR}/package.json`,
-          transform: (content) => {
+          transform: content => {
             // Remove local dependencies (currently only cuix) since it is not needed
             // and cannot be accessed by the npm registry.
-            const contentStr = content.toString();      
+            const contentStr = content.toString();
             const contentObj = JSON.parse(contentStr);
 
             // Iterate over the dependencies and remove local references
-            Object.keys(contentObj.dependencies || {}).forEach((key) => {
+            Object.keys(contentObj.dependencies || {}).forEach(key => {
               const value = contentObj.dependencies[key];
-              if (value.startsWith("file:")) {
+              if (value.startsWith('file:')) {
                 delete contentObj.dependencies[key];
               }
             });
-            
+
             return JSON.stringify(contentObj, null, 2);
           }
         },
@@ -195,7 +195,9 @@ const vue3WebCompWrapperConfig = Object.assign({}, defaultConfig, {
     globalObject: `(typeof self !== 'undefined' ? self : this)`
   },
   plugins: [
-    new CleanWebpackPlugin([`${WRAPPER_DIR}/src`, `${WRAPPER_DIR}/dist`]),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: [`${WRAPPER_DIR}/src`, `${WRAPPER_DIR}/dist`]
+    }),
     new CopyWebpackPlugin({
       patterns: [{ from: `${JS_ROOT}/vue/wrapper/`, to: `${WRAPPER_DIR}/src` }]
     })
