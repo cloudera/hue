@@ -16,7 +16,7 @@
 
 const fs = require('fs');
 const webpack = require('webpack');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const {
   BUNDLES,
   getPluginConfig,
@@ -133,7 +133,11 @@ const config = {
     maxAssetSize: 400 * 1024 // 400kb
   },
   plugins: getPluginConfig(BUNDLES.HUE).concat([
-    new CleanWebpackPlugin([`${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`])
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: [
+        `${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`
+      ]
+    })
   ]),
   resolve: {
     extensions: ['.json', '.jsx', '.js', '.tsx', '.ts', '.vue'],
