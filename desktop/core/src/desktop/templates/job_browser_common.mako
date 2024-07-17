@@ -42,7 +42,7 @@
       <th width="5%">${_('Status')}</th>
       <th width="3%">${_('Progress')}</th>
       <th width="5%">${_('Group')}</th>
-      <th width="10%" data-bind="text: $root.interface() != 'schedules' ? '${_('Started')}' : '${_('Modified')}'"></th>
+      <th width="10%" data-bind="text: $root.interface() != 'schedules' ? '${_('Started')}' : '${_('Next Materialized')}'"></th>
       <th width="6%">${_('Duration')}</th>
       <th width="15%">${_('Id')}</th>
     </tr>
