@@ -33,6 +33,7 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
   private BufferedReader reader;
   private long offset = 0;
   private long lastOffset = 0;
+  private boolean isLineSplit = false;
 
   public ImpalaEventReader(ImpalaFileReader fileReader, Path filePath,
       FileProcessingStatus fileStatus) throws IOException {
@@ -42,7 +43,19 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
 
     this.fs = filePath.getFileSystem(fileReader.getConfig());
 
+    this.isLineSplit = isLineSplit();
     setOffset(0);
+  }
+
+  private boolean isLineSplit() throws IOException {
+    // In CDW there could be cases where a line might be split into 16k chunks
+
+    setOffset(0);
+    String line = reader.readLine();
+
+    // Files with split lines must be prefixed with 3 lines of metadata.
+    // We can use this metadata to detect line split condition.
+    return line != null && StringUtils.countMatches(line, " ") != 2;
   }
 
   public long getOffset() throws IOException {
@@ -103,7 +116,7 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
       // TODO: Improve the following three blocks - while, if & if while
 
       while (line != null && StringUtils.countMatches(line, " ") != 2) {
-        // Skip invalid lines if any. fluentd in CDW adds 3 lines at the begining.
+        // Skip invalid lines if any. fluentd in CDW adds 3 lines at the beginning.
         lastOffset = offset;
         line = readLine();
       }
@@ -114,7 +127,7 @@ public class ImpalaEventReader implements EventReader<ImpalaRuntimeProfileTree> 
         return null;
       }
 
-      if (StringUtils.countMatches(line, " ") == 2) {
+      if (this.isLineSplit && StringUtils.countMatches(line, " ") == 2) {
         // In CDW there could be cases where a line might be split into 16k chunks
         String nextLine = getNextLine();
         while(nextLine != null && nextLine.length() > 0 && StringUtils.countMatches(nextLine, " ") == 0) {
