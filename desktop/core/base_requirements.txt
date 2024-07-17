@@ -81,6 +81,7 @@ boto3==1.28.81
 -r ${ROOT}/desktop/core/pytorch_requirements.txt
 sentence-transformers==2.2.2
 psutil==5.8.0
+drf-spectacular[sidecar]==0.27.2
 -e file://${ROOT}/desktop/core/ext-py3/boto-2.49.0
 -e file://${ROOT}/desktop/core/ext-py3/django-axes-5.13.0
 -e file://${ROOT}/desktop/core/ext-py3/djangosaml2-0.18.0
