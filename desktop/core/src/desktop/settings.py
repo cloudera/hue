@@ -208,6 +208,8 @@ INSTALLED_APPS = [
     # 'django_celery_results',
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_spectacular',
+    'drf_spectacular_sidecar'
 ]
 
 WEBPACK_LOADER = {
@@ -325,8 +327,18 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
       'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': desktop.conf.AUTH.API_AUTH.get()
+    'DEFAULT_AUTHENTICATION_CLASSES': desktop.conf.AUTH.API_AUTH.get(),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Hue Public API',
+    'VERSION': '1.0.0',
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+}
+
+
 if desktop.conf.is_custom_jwt_auth_enabled() and \
   'desktop.auth.api_authentications.JwtAuthentication' not in REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']:
   REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].insert(0, 'desktop.auth.api_authentications.JwtAuthentication')

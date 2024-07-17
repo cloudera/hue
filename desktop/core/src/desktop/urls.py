@@ -15,25 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 import re
-import sys
-import logging
 
 from django.conf import settings
+from django.urls import include, re_path
 from django.views.static import serve
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import (
   TokenObtainPairView,
   TokenRefreshView,
   TokenVerifyView,
 )
 
-# FIXME: This could be replaced with hooking into the `AppConfig.ready()`
-# signal in Django 1.7:
-#
-# https://docs.djangoproject.com/en/1.7/ref/applications/#django.apps.AppConfig.ready
-#
 import desktop.lib.metrics.file_reporter
 from desktop import api as desktop_api, api2 as desktop_api2, api_public_urls_v1, appmanager, views as desktop_views
 from desktop.auth import views as desktop_auth_views
@@ -46,10 +39,6 @@ from useradmin import views as useradmin_views
 
 desktop.lib.metrics.file_reporter.start_file_reporter()
 
-if sys.version_info[0] > 2:
-  from django.urls import include, re_path
-else:
-  from django.conf.urls import include, url as re_path
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
@@ -202,9 +191,12 @@ dynamic_patterns += [
 ]
 
 dynamic_patterns += [
-  re_path('^api/v1/token/auth/?$', TokenObtainPairView.as_view(), name='token_obtain'),
-  re_path('^api/v1/token/verify/?$', TokenVerifyView.as_view(), name='token_verify'),
-  re_path('^api/v1/token/refresh/?$', TokenRefreshView.as_view(), name='token_refresh'),
+  re_path(r'^api/schema/?$', SpectacularAPIView.as_view(), name='schema'),
+  re_path(r'^api/swagger/?$', SpectacularSwaggerView.as_view(), name='swagger-ui'),
+
+  re_path(r'^api/v1/token/auth/?$', TokenObtainPairView.as_view(), name='token_obtain'),
+  re_path(r'^api/v1/token/verify/?$', TokenVerifyView.as_view(), name='token_verify'),
+  re_path(r'^api/v1/token/refresh/?$', TokenRefreshView.as_view(), name='token_refresh'),
 
   re_path(r'^api/v1/', include(('desktop.api_public_urls_v1', 'api'), 'api')),
 ]
