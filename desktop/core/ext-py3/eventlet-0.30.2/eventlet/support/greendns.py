@@ -661,7 +661,8 @@ def _net_write(sock, data, expiration):
 
 
 def udp(q, where, timeout=DNS_QUERY_TIMEOUT, port=53,
-        af=None, source=None, source_port=0, ignore_unexpected=False):
+        af=None, source=None, source_port=0, ignore_unexpected=False,
+        ignore_errors=False):
     """coro friendly replacement for dns.query.udp
     Return the response obtained after sending a query via UDP.
 
@@ -686,7 +687,10 @@ def udp(q, where, timeout=DNS_QUERY_TIMEOUT, port=53,
     @type source_port: int
     @param ignore_unexpected: If True, ignore responses from unexpected
     sources.  The default is False.
-    @type ignore_unexpected: bool"""
+    @type ignore_unexpected: bool
+    @param ignore_errors: if various format errors or response mismatches occur,
+    continue listening.
+    @type ignore_errors: bool"""
 
     wire = q.to_wire()
     if af is None:
@@ -747,18 +751,31 @@ def udp(q, where, timeout=DNS_QUERY_TIMEOUT, port=53,
                 addr = from_address[0]
                 addr = dns.ipv6.inet_ntoa(dns.ipv6.inet_aton(addr))
                 from_address = (addr, from_address[1], from_address[2], from_address[3])
-            if from_address == destination:
+            if from_address != destination:
+                if ignore_unexpected:
+                    continue
+                else:
+                    raise dns.query.UnexpectedSource(
+                        'got a response from %s instead of %s'
+                        % (from_address, destination))
+            try:
+                r = dns.message.from_wire(wire, keyring=q.keyring, request_mac=q.mac)
+                if not q.is_response(r):
+                    raise dns.query.BadResponse()
                 break
-            if not ignore_unexpected:
-                raise dns.query.UnexpectedSource(
-                    'got a response from %s instead of %s'
-                    % (from_address, destination))
+            except dns.message.Truncated as e:
+                if ignore_errors and not q.is_response(e.message()):
+                    continue
+                else:
+                    raise
+            except Exception:
+                if ignore_errors:
+                    continue
+                else:
+                    raise
     finally:
         s.close()
 
-    r = dns.message.from_wire(wire, keyring=q.keyring, request_mac=q.mac)
-    if not q.is_response(r):
-        raise dns.query.BadResponse()
     return r
 
 
