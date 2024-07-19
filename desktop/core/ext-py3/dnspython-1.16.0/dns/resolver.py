@@ -910,7 +910,8 @@ class Resolver(object):
                             response = dns.query.udp(request, nameserver,
                                                      timeout, port,
                                                      source=source,
-                                                     source_port=source_port)
+                                                     source_port=source_port,
+                                                     ignore_errors=True)
                             if response.flags & dns.flags.TC:
                                 # Response truncated; retry with TCP.
                                 tcp_attempt = True
