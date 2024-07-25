@@ -20,6 +20,4 @@ on:
     types: [labeled]
 jobs:
   SUCCESS-STATE:
-    uses: Kitchen/RE-github-workflows/.github/workflows/cdh-builds-success-state.yaml@main
-    with:
-      required_labels: "ci-build-pass,smoketest-pass,precommit-tier-tests-pass"
+    uses: Kitchen/RE-github-workflows/.github/workflows/cdh-build-success-state.yaml@main
