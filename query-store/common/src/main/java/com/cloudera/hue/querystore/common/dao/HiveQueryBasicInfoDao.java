@@ -102,13 +102,19 @@ public interface HiveQueryBasicInfoDao extends JdbiDao<HiveQueryBasicInfo> {
       @Define("checkUser") boolean checkUser, @Bind("userName") String userName
   );
 
+  /**
+   * Using sub-query instead of join to keep things simple as the tables have ambiguous columns.
+   * Also an application is expected to handle only a limited set of Hive queries.
+  */
   @RegisterBeanMapper(HiveQueryBasicInfo.class)
   @SqlQuery(
       "select * from hive_query " +
       "where start_time >= :startTime AND start_time \\<= :endTime " +
       "<if(checkUser)> AND request_user = :userName <endif> " +
 
-      "<if(checkText)>AND (query_id = :text OR query LIKE :queryText) <endif>" +
+      "<if(checkText)>AND (query_id = :text OR query LIKE :queryText OR id in (" +
+          "select hive_query_id from dag_info where dag_id = :text OR application_id = :text" +
+      ")) <endif>" +
 
       "<if(checkStatus)> AND status in (<status>) <endif> " +
       "<if(checkQueueName)> AND queue_name in (<queueName>) <endif> " +
