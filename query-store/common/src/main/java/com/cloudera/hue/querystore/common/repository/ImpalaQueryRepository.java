@@ -38,6 +38,7 @@ public class ImpalaQueryRepository extends JdbiRepository<ImpalaQueryEntity, Imp
 
     List<ImpalaQueryEntity> queries = dao.search(
       params.getStartTime(), params.getEndTime(),
+      params.getFromId(),
       checkCurrentUser(role), currentUserName,
 
       isNotNull(search.getText()), search.getText(), search.getQueryText(),
@@ -59,6 +60,7 @@ public class ImpalaQueryRepository extends JdbiRepository<ImpalaQueryEntity, Imp
   public long getSearchSize(QuerySearchParams params, String currentUserName, AppAuthentication.Role role) {
     return dao.getSearchSize(
       params.getStartTime(), params.getEndTime(),
+      params.getFromId(),
       checkCurrentUser(role), currentUserName
     );
   }

@@ -39,6 +39,7 @@ public interface ImpalaQueryDao extends JdbiDao<ImpalaQueryEntity> {
   @SqlQuery(
     "select * from impala_query " +
     "where start_time >= :startTime AND start_time \\<= :endTime " +
+    "AND id >= :fromId " +
     "<if(checkCurrentUser)>AND user_name = :currentUser <endif> " +
 
     "<if(checkText)>AND (query_id = :text OR query_text LIKE :queryText) <endif>" +
@@ -56,6 +57,7 @@ public interface ImpalaQueryDao extends JdbiDao<ImpalaQueryEntity> {
   @UseStringTemplateEngine
   List<ImpalaQueryEntity> search(
     @Bind("startTime") Long startTime, @Bind("endTime") Long endTime,
+    @Bind("fromId") Integer fromId,
     @Define("checkCurrentUser") Boolean checkCurrentUser, @Bind("currentUser") String currentUser,
 
     @Define("checkText") Boolean checkText, @Bind("text") String text, @Bind("queryText") String queryText,
@@ -79,10 +81,12 @@ public interface ImpalaQueryDao extends JdbiDao<ImpalaQueryEntity> {
 
   @SqlQuery("select count(*) from impala_query " +
       "where start_time >= :startTime AND start_time \\<= :endTime " +
+      "AND id >= :fromId " +
       "<if(checkCurrentUser)> AND user_name = :currentUser <endif> ")
   @UseStringTemplateEngine
   long getSearchSize(
     @Bind("startTime") Long startTime, @Bind("endTime") Long endTime,
+    @Bind("fromId") Integer fromId,
     @Define("checkCurrentUser") boolean checkCurrentUser, @Bind("currentUser") String currentUser
   );
 
