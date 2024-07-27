@@ -94,11 +94,13 @@ public interface HiveQueryBasicInfoDao extends JdbiDao<HiveQueryBasicInfo> {
   @SqlQuery(
       "select count(*) from hive_query " +
       "where start_time >= :startTime AND start_time \\<= :endTime " +
+      "AND id >= :fromId " +
       "<if(checkUser)> AND request_user = :userName <endif> "
   )
   @UseStringTemplateEngine
   long getSearchResultsCount(
       @Bind("startTime") Long startTime, @Bind("endTime") Long endTime,
+      @Bind("fromId") Integer fromId,
       @Define("checkUser") boolean checkUser, @Bind("userName") String userName
   );
 
@@ -110,6 +112,7 @@ public interface HiveQueryBasicInfoDao extends JdbiDao<HiveQueryBasicInfo> {
   @SqlQuery(
       "select * from hive_query " +
       "where start_time >= :startTime AND start_time \\<= :endTime " +
+      "AND id >= :fromId " +
       "<if(checkUser)> AND request_user = :userName <endif> " +
 
       "<if(checkText)>AND (query_id = :text OR query LIKE :queryText OR id in (" +
@@ -128,6 +131,7 @@ public interface HiveQueryBasicInfoDao extends JdbiDao<HiveQueryBasicInfo> {
   @UseStringTemplateEngine
   List<HiveQueryBasicInfo> getSearchResults(
       @Bind("startTime") Long startTime, @Bind("endTime") Long endTime,
+      @Bind("fromId") Integer fromId,
       @Define("checkUser") boolean checkUser, @Bind("userName") String userName,
 
       @Define("checkText") Boolean checkText, @Bind("text") String text, @Bind("queryText") String queryText,

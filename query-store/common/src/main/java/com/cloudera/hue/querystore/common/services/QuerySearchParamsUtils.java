@@ -16,6 +16,7 @@ public class QuerySearchParamsUtils {
       standardizeStr(params.getSortText()),
       standardizeStartTime(params.getStartTime(), params.getEndTime()),
       standardizeEndTime(params.getStartTime(), params.getEndTime()),
+      standardizeFromId(params.getFromId()),
       standardizeFacets(params.getFacets()),
 
       standardizeLimit(params.getLimit()),
@@ -63,6 +64,10 @@ public class QuerySearchParamsUtils {
   }
 
   private static int standardizeOffset(Integer offset) {
-    return offset == null ? 0 : offset;
+    return Math.max(0, offset == null ? 0 : offset);
+  }
+
+  private static int standardizeFromId(Integer fromId) {
+    return Math.max(0, fromId == null ? 0 : fromId);
   }
 }

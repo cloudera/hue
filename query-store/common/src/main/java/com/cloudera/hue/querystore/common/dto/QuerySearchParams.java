@@ -13,6 +13,7 @@ public class QuerySearchParams {
   private String sortText;
   private Long startTime;
   private Long endTime;
+  private Integer fromId;
   private List<Facet> facets;
 
   private Integer limit;

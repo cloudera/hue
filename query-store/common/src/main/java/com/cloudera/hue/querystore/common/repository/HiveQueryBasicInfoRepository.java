@@ -104,7 +104,12 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
   }
 
   public long getSearchResultsCount(QuerySearchParams params, String userName, AppAuthentication.Role role) {
-    return dao.getSearchResultsCount(params.getStartTime(), params.getEndTime(), checkCurrentUser(role), userName);
+    params = QuerySearchParamsUtils.standardize(params);
+    return dao.getSearchResultsCount(
+      params.getStartTime(), params.getEndTime(),
+      params.getFromId(),
+      checkCurrentUser(role), userName
+    );
   }
 
   public List<HiveQueryBasicInfo> getSearchResults(QuerySearchParams reqParams, String userName, Role role) {
@@ -115,6 +120,7 @@ public class HiveQueryBasicInfoRepository extends JdbiRepository<HiveQueryBasicI
 
     List<HiveQueryBasicInfo> searchResultList = dao.getSearchResults(
         params.getStartTime(), params.getEndTime(),
+        params.getFromId(),
         checkCurrentUser(role), userName,
 
         isNotNull(fields.getText()), fields.getText(), fields.getQueryText(),
