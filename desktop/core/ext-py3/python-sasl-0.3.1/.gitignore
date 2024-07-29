@@ -3,3 +3,6 @@ build
 *.pyc
 dist
 sasl.egg-info
+
+# built file
+sasl/saslwrapper.cpp

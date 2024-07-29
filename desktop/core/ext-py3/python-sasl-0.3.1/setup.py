@@ -21,6 +21,7 @@ from distutils.version import LooseVersion
 import os
 import platform
 from setuptools import setup, Extension
+from Cython.Build import cythonize
 import sys
 
 
@@ -38,13 +39,12 @@ if sys.platform == 'darwin':
             os.environ['MACOSX_DEPLOYMENT_TARGET'] = '10.9'
 
 
-sasl_module = Extension('sasl.saslwrapper',
-                        sources=['sasl/saslwrapper.cpp'],
+sasl_module = Extension('sasl.saslwrapper', ['sasl/saslwrapper.pyx'],
                         include_dirs=["sasl"],
                         libraries=["sasl2"],
                         language="c++")
 setup(name='sasl',
-      version='0.3.1',
+      version='0.3.1+ada03f9f68a01416eb5689674672bca8140e14a7',
       url="http://github.com/cloudera/python-sasl",
       maintainer="Todd Lipcon",
       maintainer_email="todd@cloudera.com",
@@ -55,6 +55,6 @@ setup(name='sasl',
       ],
       packages=['sasl'],
       install_requires=['six'],
-      ext_modules=[sasl_module],
+      ext_modules=cythonize([sasl_module]),
       include_package_data=True,
       license='Apache License, Version 2.0')
