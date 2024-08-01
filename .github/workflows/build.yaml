@@ -17,6 +17,7 @@
 name: BUILD
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
 jobs:
   BUILD:
-    uses: Kitchen/RE-github-workflows/.github/workflows/CI_CDPD_BUILD.yaml@main
+    uses: Kitchen/RE-github-workflows/.github/workflows/build-gate-validation-check.yaml@main
