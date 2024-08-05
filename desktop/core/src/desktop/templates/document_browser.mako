@@ -81,7 +81,12 @@ else:
           <div class="container-fluid">
             <div class="pull-right" style="padding-right: 10px">
               <div class="doc-browser-folder-actions" data-bind="visible: activeEntry && activeEntry() && !activeEntry().hasErrors()">
+                <!-- ko if: searchVisible -->
+                <div class="doc-browser-action doc-browser-search-container pull-left"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery"></div>
+                <!-- /ko -->
                 <!-- ko with: activeEntry -->
+                <div class="doc-browser-action doc-browser-type-filter margin-right-10 pull-left" data-bind="component: { name: 'hue-drop-down', params: { value: serverTypeFilter, entries: DOCUMENT_TYPES, linkTitle: '${ _ko('Type filter') }' } }"></div>
+                <a class="btn margin-right-20" title="${_('Search')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
                 <!-- ko if: app === 'documents' -->
                 <div class="inline">
                   <span class="dropdown">
@@ -565,8 +570,12 @@ else:
           self.activeEntry().search(query);
         });
 
+        self.searchVisible = ko.observable(false);
+        self.searchFocus = ko.observable(false);
+
         huePubSub.subscribe('file.browser.directory.opened', function () {
           self.searchQuery('');
+          self.searchVisible(false);
           $('.tooltip').hide();
         });
 
