@@ -1045,7 +1045,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <!-- ko if: $root.createWizard.source.inputFormat() === 'manual' -->
 
                 <form class="form-inline inline-table" data-bind="foreach: columns">
-                  <!-- ko if: ['table'].indexOf(outputFormat()) != -1 -->
+                  <!-- ko if: $parent.outputFormat() === 'table' -->
                     <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }">
                       <i class="fa fa-minus"></i>
                     </a>
