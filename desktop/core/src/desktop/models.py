@@ -1276,13 +1276,26 @@ class Document2(models.Model):
     return (self.uuid, self.version, self.is_history)
 
   def copy(self, name, owner, description=None):
+    # TODO: Check why we choose to mutate the object (x in x.copy()).
+    # There's some code in api2.py that creates Workflow etc with the mutated reference after copy..
     copy_doc = self
+    source_owner = self.owner
+    target_directory = self.parent_directory
 
     copy_doc.pk = None
     copy_doc.id = None
     copy_doc.uuid = uuid_default()
     copy_doc.name = name
     copy_doc.owner = owner
+
+    # If this is a shared document with the user, and it resides in the owner's home directory, we have to put the
+    # copy in the user's home directory (as the user will not be able to browse the owner's home directory).
+    # Note that if the document to be copied resides in a shared directory (not home) the copy will end up in the same
+    # shared directory. Being able to copy it implies that the user can browse the parent directory.
+    if source_owner != owner and (target_directory is None or target_directory.is_home_directory):
+      user_home_directory = Document2.objects.get_home_directory(owner)
+      copy_doc.parent_directory = user_home_directory
+
     if description:
       copy_doc.description = description
     copy_doc.save()

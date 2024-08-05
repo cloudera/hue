@@ -123,11 +123,22 @@ class TestClusterConfig(object):
 @pytest.mark.django_db
 class TestDocument2(object):
   def setup_method(self):
-    self.client = make_logged_in_client(username="doc2", groupname="doc2", recreate=True, is_superuser=False)
-    self.user = User.objects.get(username="doc2")
+    self.default_group = get_default_user_group()
 
-    # This creates the user directories for the new user
+    self.client = make_logged_in_client(username="doc2", groupname=self.default_group.name, recreate=True, is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="not_doc2", groupname=self.default_group.name, recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="doc2")
+    self.user_not_me = User.objects.get(username="not_doc2")
+
+    grant_access(self.user.username, self.user.username, "desktop")
+    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
+
+    # This creates the user directories for the new users
     response = self.client.get('/desktop/api2/doc/')
+    data = json.loads(response.content)
+    assert '/' == data['document']['path'], data
+    response = self.client_not_me.get('/desktop/api2/doc/')
     data = json.loads(response.content)
     assert '/' == data['document']['path'], data
 
@@ -291,6 +302,55 @@ class TestDocument2(object):
     assert copy_workflow.deployment_dir != workflow.deployment_dir
     assert copy_doc.uuid != workflow_doc.uuid
     assert copy_workflow.get_data()['workflow']['uuid'] != workflow.get_data()['workflow']['uuid']
+
+  def test_copy_of_shared_doc_in_home(self):
+    user_not_me_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
+
+    doc_to_copy = Document2.objects.create(
+      name='new_doc', type='query-hive', owner=self.user_not_me, data={}, parent_directory=user_not_me_home_dir
+    )
+    # "user_not_me" can view document
+    assert doc_to_copy.can_read(self.user_not_me)
+    # "user" cannot view document
+    assert not doc_to_copy.can_read(self.user)
+    # "user_not_me" shares with user
+    doc_to_copy.share(self.user_not_me, users=[self.user])
+    # "user" can view document
+    assert doc_to_copy.can_read(self.user)
+    # The doc resides in the home directory of "user_not_me"
+    assert doc_to_copy.parent_directory == user_not_me_home_dir
+
+    # "user" makes a copy of the doc owned by "user_not_me" which resides in the home directory of "user_not_me"
+    copied_doc = doc_to_copy.copy(name=doc_to_copy.name + '-copy', owner=self.user)
+
+    # The copy should be located in the home folder of "user"
+    user_home_dir = Document2.objects.get_home_directory(user=self.user)
+    assert user_home_dir != user_not_me_home_dir
+    assert copied_doc.parent_directory == user_home_dir
+
+  def test_copy_of_doc_in_shared_folder(self):
+    user_not_me_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
+    user_not_me_shared_dir = Directory.objects.create(name='test_dir', owner=self.user_not_me, parent_directory=user_not_me_home_dir)
+
+    doc_to_copy = Document2.objects.create(
+        name='new_doc', type='query-hive', owner=self.user_not_me, data={}, parent_directory=user_not_me_shared_dir
+    )
+    # "user_not_me" can view document
+    assert doc_to_copy.can_read(self.user_not_me)
+    # "user" cannot view document
+    assert not doc_to_copy.can_read(self.user)
+    # "user_not_me" shares the parent directory with user
+    user_not_me_shared_dir.share(self.user_not_me, users=[self.user])
+    # "user" can view document
+    assert doc_to_copy.can_read(self.user)
+    # The doc resides in the shared directory of "user_not_me"
+    assert doc_to_copy.parent_directory == user_not_me_shared_dir
+
+    # "user" makes a copy of the doc owned by "user_not_me" which resides in the shared directory of "user_not_me"
+    copied_doc = doc_to_copy.copy(name=doc_to_copy.name + '-copy', owner=self.user)
+
+    # The copy should be located in the shared directory of "user_not_me"
+    assert copied_doc.parent_directory == user_not_me_shared_dir
 
   def test_directory_move(self):
     source_dir = Directory.objects.create(name='test_mv', owner=self.user, parent_directory=self.home_dir)
