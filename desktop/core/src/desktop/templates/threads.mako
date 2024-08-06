@@ -52,6 +52,7 @@ ${layout.menubar(section='threads')}
 
 <div id="threadsComponents" class="container-fluid">
   <div class="card card-small" style="padding-top: 10px">
+  <h1>hello Ananya </h1>
     <pre data-bind="text: $root.threads"></pre>
   </div>
 </div>
