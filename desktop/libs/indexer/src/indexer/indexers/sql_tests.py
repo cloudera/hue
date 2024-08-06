@@ -1422,3 +1422,45 @@ CREATE TABLE IF NOT EXISTS default.test1 (
   `dep` bigint);'''
 
     assert statement == sql
+
+
+@pytest.mark.django_db
+def test_create_table_with_manual_steps():
+  with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
+    get_interpreter.return_value = {'Name': 'Hive', 'dialect': 'hive'}
+    source = {
+    'sourceType': 'impala', 'path': '', 'inputFormat': 'manual',
+    'format': {
+        'quoteChar': '"',
+        'fieldSeparator': ','
+      }
+    }
+    destination = {
+    'sourceType': 'impala', 'name': 'complex_test2.test3', 'description': '', 'tableFormat': 'text',
+    'columns': [
+      {'name': 'new_field_1', 'type': 'string', 'keep': True},
+      {'name': 'new_field_2', 'type': 'string', 'keep': True}
+    ],
+    'partitionColumns': [], 'kuduPartitionColumns': [], 'primaryKeys': [], 'importData': True, 'useDefaultLocation': True,
+    'nonDefaultLocation': '', 'isTransactional': True, 'isInsertOnly': True, 'useCopy': False, 'hasHeader': False,
+    'useCustomDelimiters': False, 'customFieldDelimiter': ',', 'customCollectionDelimiter': '', 'customMapDelimiter': '',
+    'customRegexp': '', 'isIceberg': False,
+    'compute': {'id': 'default', 'name': 'default', 'type': 'direct', 'credentials': {}},
+    'namespace': {
+      'id': 'default', 'name': 'default', 'status': 'CREATED',
+      'computes': [{'id': 'default', 'name': 'default', 'type': 'direct', 'credentials': {}}]},
+    'databaseName': 'complex_test2',
+    'tableName': 'test3',
+    'isTransactional': True
+    }
+    sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_a_file(source, destination).get_str()
+
+    statement = '''USE complex_test2;
+
+CREATE TABLE `complex_test2`.`test3`
+(
+  `new_field_1` string ,
+  `new_field_2` string )   STORED AS TextFile TBLPROPERTIES('transactional'='true')
+;'''
+
+    assert statement == sql
