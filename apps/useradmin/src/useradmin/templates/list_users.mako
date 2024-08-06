@@ -240,7 +240,9 @@ ${layout.menubar(section='users')}
       dataType: 'json',
       success: function(data) {
         $usersComponents.find(".delete-user").modal("hide");
-        $.jHueNotify.info("${ _('The users were deleted.') }")
+        huePubSub.publish('hue.global.info', {
+          message: "${ _('The users were deleted.') }"
+        });
         if (data && data.url){
           huePubSub.publish('open.link', data.url);
         }
@@ -248,10 +250,14 @@ ${layout.menubar(section='users')}
       error: function(response, status, err) {
         $usersComponents.find(".delete-user").modal("hide");
         if (response.responseJSON && response.responseJSON.message && response.status == 401) {
-          $.jHueNotify.error(response.responseJSON.message);
+          huePubSub.publish('hue.global.error', {
+            message: response.responseJSON.message
+          });
         }
         else {
-          $.jHueNotify.error("${ _('An unknown error has occurred while deleting the user. Please try again.') }");
+          huePubSub.publish('hue.global.error', {
+            message: "${ _('An unknown error has occurred while deleting the user. Please try again.') }"
+          });
         }
       }
     });
@@ -283,14 +289,18 @@ ${layout.menubar(section='users')}
               }
               else if (data && data.url) {
                 $usersComponents.find(".sync-ldap").modal("hide");
-                $.jHueNotify.info("${ _('The users and groups were updated correctly.') }");
+                huePubSub.publish('hue.global.info', {
+                  message: "${ _('The users and groups were updated correctly.') }"
+                });
                 huePubSub.publish('open.link', data.url);
               }
             },
             error: function(data) {
               $usersComponents.find('input[type="submit"]').removeAttr("disabled");
               $usersComponents.find(".sync-ldap").modal("hide");
-              $.jHueNotify.error(data.responseJSON['message']);
+              huePubSub.publish('hue.global.error', {
+                message: data.responseJSON['message']
+              });
               huePubSub.publish('open.link', data.url);
             }
           });

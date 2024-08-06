@@ -29,7 +29,6 @@ PROD_INCLUDES := \
 	tools/app_reg \
 	tools/virtual-bootstrap \
 	tools/relocatable.sh \
-	tools/enable-python27.sh \
 	tools/load-balancer \
 	VERSION \
 	webpack-stats*.json \
@@ -58,7 +57,6 @@ define remove_devtree_exclusions
 		      -name '.gitignore' -o \
 		      -name '.*~' -o \
 		      -name '.#*' -o \
-		      -name '.pylintrc' -o \
 		      -name 'build' -o \
 		      -name 'logs' -o \
 		      -name 'tags' -o \

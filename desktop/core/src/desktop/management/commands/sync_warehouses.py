@@ -17,15 +17,18 @@
 
 # HUE_CONF_DIR=/etc/hue/conf HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1 /opt/hive/build/env/bin/hue sync_warehouses
 
-from beeswax import models
-from django.core.management.base import BaseCommand
-from hadoop import confparse
-import json
-from kubernetes import client, config
-import logging
 import os
 import re
 import sys
+import json
+import logging
+
+from django.core.management.base import BaseCommand
+from kubernetes import client, config
+
+from beeswax import models
+from beeswax.conf import AUTH_PASSWORD, AUTH_USERNAME
+from hadoop import confparse
 
 LOG = logging.getLogger()
 
@@ -94,7 +97,9 @@ def get_computes_from_k8s():
   catalogs = []
   computes = []
 
-  for n in core_v1.list_namespace().items:
+  label_selector = os.environ.get("K8S_LABEL_SELECTOR")  # clusterid=env-urmgt6-env
+
+  for n in core_v1.list_namespace(label_selector=label_selector).items:
     try:
       namespace = n.metadata.name
       LOG.info('Getting details for ns: %s' % namespace)
@@ -102,7 +107,7 @@ def get_computes_from_k8s():
         'name': n.metadata.labels.get('displayname'),
         'description': '%s (%s)' % (n.metadata.labels.get('displayname'), n.metadata.name),
         'external_id': namespace,
-        #'creation_timestamp': n.metadata.labels.get('creation_timestamp'),
+        # 'creation_timestamp': n.metadata.labels.get('creation_timestamp'),
       }
 
       if namespace.startswith('warehouse-'):
@@ -118,6 +123,7 @@ def get_computes_from_k8s():
 
   return computes
 
+
 def update_hive_configs(namespace, hive, host, port=80):
   hs2_stfs = apps_v1.read_namespaced_stateful_set('hiveserver2', namespace)
 
@@ -131,6 +137,8 @@ def update_hive_configs(namespace, hive, host, port=80):
     {"name": "server_port", "value": port},
     {"name": "transport_mode", "value": 'http'},
     {"name": "http_url", "value": 'http://%s:%s/cliservice' % (host, port)},
+    {"name": "auth_username", "value": AUTH_USERNAME.get()},
+    {"name": "auth_password", "value": AUTH_PASSWORD.get()},
     {"name": "is_llap", "value": False},
     {"name": "use_sasl", "value": True},
     {"name": "hive_metastore_uris", "value": hive_metastore_uris},
@@ -183,6 +191,7 @@ def populate_impala(namespace, impala):
       impala['server_port'] = next((p.port for p in ports if p.name == 'http'), 28000)
       impala['api_port'] = next((p.port for p in ports if p.name == 'web'), 25000)
       update_impala_configs(namespace, impala, 'coordinator.%s.svc.cluster.local' % namespace)
+
 
 def update_impala_configs(namespace, impala, host):
   hive_configs = core_v1.read_namespaced_config_map('impala-coordinator-hive-conf', namespace)

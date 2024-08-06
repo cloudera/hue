@@ -19,6 +19,7 @@ import * as ko from 'knockout';
 import koMapping from 'knockout.mapping';
 
 import componentUtils from './componentUtils';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import UUID from 'utils/string/UUID';
@@ -169,8 +170,8 @@ const TEMPLATE = `
       <button data-loading-text="${I18n(
         'Deleting...'
       )}" class="btn btn-danger" data-bind="click: function() { roleToUpdate().savePrivileges(roleToUpdate()); }">${I18n(
-  'Yes, delete'
-)}</button>
+        'Yes, delete'
+      )}</button>
     </div>
   </div>
 `;
@@ -469,7 +470,7 @@ class Role {
     };
 
     self.saveGroups = function () {
-      $('.jHueNotify').remove();
+      huePubSub.publish('hide.global.alerts');
       $.post(
         '/security/api/hive/update_role_groups',
         {
@@ -483,16 +484,16 @@ class Role {
               self.originalGroups.push(group);
             });
           } else {
-            huePubSub.publish('hue.global.error', { message: data.message });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
           }
         }
       ).fail(xhr => {
-        huePubSub.publish('hue.global.error', { message: xhr.responseText });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
       });
     };
 
     self.create = function () {
-      $('.jHueNotify').remove();
+      huePubSub.publish('hide.global.alerts');
       if (self.isValid()) {
         self.isLoading(true);
         $.post(
@@ -502,7 +503,7 @@ class Role {
           },
           data => {
             if (data.status === 0) {
-              $(document).trigger('info', data.message);
+              huePubSub.publish(GLOBAL_INFO_TOPIC, { message: data.message });
               vm.showCreateRole(false);
               self.reset();
               const role = new Role(vm, data.role);
@@ -511,12 +512,12 @@ class Role {
               vm.listSentryPrivilegesByAuthorizable();
               $(document).trigger('createdRole');
             } else {
-              huePubSub.publish('hue.global.error', { message: data.message });
+              huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
             }
           }
         )
           .fail(xhr => {
-            huePubSub.publish('hue.global.error', { message: xhr.responseText });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
           })
           .always(() => {
             self.isLoading(false);
@@ -525,7 +526,7 @@ class Role {
     };
 
     self.update = function () {
-      $('.jHueNotify').remove();
+      huePubSub.publish('hide.global.alerts');
       if (self.isValid()) {
         self.isLoading(true);
         $.post(
@@ -535,17 +536,17 @@ class Role {
           },
           data => {
             if (data.status === 0) {
-              $(document).trigger('info', data.message);
+              huePubSub.publish(GLOBAL_INFO_TOPIC, { message: data.message });
               vm.showCreateRole(false);
               vm.listSentryPrivilegesByAuthorizable();
               $(document).trigger('createdRole');
             } else {
-              huePubSub.publish('hue.global.error', { message: data.message });
+              huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
             }
           }
         )
           .fail(xhr => {
-            huePubSub.publish('hue.global.error', { message: xhr.responseText });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
           })
           .always(() => {
             self.isLoading(false);
@@ -554,7 +555,7 @@ class Role {
     };
 
     self.remove = function (role) {
-      $('.jHueNotify').remove();
+      huePubSub.publish('hide.global.alerts');
       self.isLoading(true);
       $.post(
         '/security/api/hive/drop_sentry_role',
@@ -567,12 +568,12 @@ class Role {
             vm.listSentryPrivilegesByAuthorizable();
             $(document).trigger('removedRole');
           } else {
-            huePubSub.publish('hue.global.error', { message: data.message });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
           }
         }
       )
         .fail(xhr => {
-          huePubSub.publish('hue.global.error', { message: xhr.responseText });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
         })
         .always(() => {
           self.isLoading(false);
@@ -580,7 +581,7 @@ class Role {
     };
 
     self.savePrivileges = function (role) {
-      $('.jHueNotify').remove();
+      huePubSub.publish('hide.global.alerts');
       $.post(
         '/security/api/hive/save_privileges',
         {
@@ -591,11 +592,11 @@ class Role {
             vm.listSentryPrivilegesByAuthorizable();
             $(document).trigger('createdRole');
           } else {
-            huePubSub.publish('hue.global.error', { message: data.message });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
           }
         }
       ).fail(xhr => {
-        huePubSub.publish('hue.global.error', { message: xhr.responseText });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
       });
     };
   }
@@ -748,12 +749,12 @@ class SentryPrivilegesViewModel {
               self.privileges(_privileges);
             }
           } else {
-            huePubSub.publish('hue.global.error', { message: data.message });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
           }
         }
       })
         .fail(xhr => {
-          huePubSub.publish('hue.global.error', { message: xhr.responseText });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
         })
         .always(() => {
           self.isLoadingPrivileges(false);

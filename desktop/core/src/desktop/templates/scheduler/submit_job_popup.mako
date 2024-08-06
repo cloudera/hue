@@ -185,7 +185,9 @@ else:
             if (data.message) {
               message = data.message;
             }
-            $.jHueNotify.error(data.message + (data.detail ? (': ' + data.detail) : ''));
+            huePubSub.publish('hue.global.error', {
+              message: data.message + (data.detail ? (': ' + data.detail) : '')
+            });
           }
         }
       });

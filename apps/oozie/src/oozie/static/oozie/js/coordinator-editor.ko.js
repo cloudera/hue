@@ -246,7 +246,7 @@ var CoordinatorEditorViewModel = (function () {
     self.save = function (cb) {
       if (!self.isSaving()) {
         self.isSaving(true);
-        $(".jHueNotify").remove();
+        huePubSub.publish('hide.global.alerts');
         $.post("/oozie/editor/coordinator/save/", {
           "coordinator": ko.mapping.toJSON(self.coordinator, COORDINATOR_MAPPING)
         }, function (data) {
@@ -259,7 +259,7 @@ var CoordinatorEditorViewModel = (function () {
             if (typeof cb === 'function') {
               cb(data);
             } else {
-              $(document).trigger("info", data.message);
+              huePubSub.publish('hue.global.info', { message: data.message });
             }
             if (!cb) { // cb from integrated scheduler
               hueUtils.changeURL('/hue/oozie/editor/coordinator/edit/?coordinator=' + data.id);
@@ -277,7 +277,7 @@ var CoordinatorEditorViewModel = (function () {
     };
 
     self.gen_xml = function () {
-      $(".jHueNotify").remove();
+      huePubSub.publish('hide.global.alerts');
       hueAnalytics.log('oozie/editor/coordinator', 'gen_xml');
 
       $.post("/oozie/editor/coordinator/gen_xml/", {
@@ -295,7 +295,7 @@ var CoordinatorEditorViewModel = (function () {
     };
 
     self.showSubmitPopup = function () {
-      $(".jHueNotify").remove();
+      huePubSub.publish('hide.global.alerts');
 
       if (!self.coordinator.isDirty()) {
         hueAnalytics.log('oozie/editor/coordinator', 'submit');

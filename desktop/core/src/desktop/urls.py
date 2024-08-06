@@ -15,49 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
-import logging
 import re
-import sys
-
-
-# FIXME: This could be replaced with hooking into the `AppConfig.ready()`
-# signal in Django 1.7:
-#
-# https://docs.djangoproject.com/en/1.7/ref/applications/#django.apps.AppConfig.ready
-#
-
-import desktop.lib.metrics.file_reporter
-desktop.lib.metrics.file_reporter.start_file_reporter()
 
 from django.conf import settings
+from django.urls import include, re_path
 from django.views.static import serve
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
+  TokenObtainPairView,
+  TokenRefreshView,
+  TokenVerifyView,
 )
 
-from notebook import views as notebook_views
-from useradmin import views as useradmin_views
-
-from desktop import appmanager
-
-from desktop import views as desktop_views
-from desktop import api as desktop_api
-from desktop import api2 as desktop_api2
-from desktop import api_public_urls_v1
+import desktop.lib.metrics.file_reporter
+from desktop import api as desktop_api, api2 as desktop_api2, api_public_urls_v1, appmanager, views as desktop_views
 from desktop.auth import views as desktop_auth_views
-from desktop.conf import METRICS, USE_NEW_EDITOR, ANALYTICS, has_connectors, ENABLE_PROMETHEUS, SLACK
+from desktop.conf import ANALYTICS, ENABLE_PROMETHEUS, METRICS, SLACK, USE_NEW_EDITOR, has_connectors
 from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
 from desktop.settings import is_oidc_configured
+from notebook import views as notebook_views
+from useradmin import views as useradmin_views
 
-if sys.version_info[0] > 2:
-  from django.urls import include, re_path
-else:
-  from django.conf.urls import include, url as re_path
+desktop.lib.metrics.file_reporter.start_file_reporter()
+
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
@@ -71,7 +52,7 @@ handler500 = 'desktop.views.serve_500_error'
 dynamic_patterns = [
   re_path(r'^hue/accounts/login', desktop_auth_views.dt_login, name='desktop_auth_views_dt_login'),
   re_path(r'^hue/accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
-  re_path(r'^accounts/login/?$', desktop_auth_views.dt_login), # Deprecated
+  re_path(r'^accounts/login/?$', desktop_auth_views.dt_login),  # Deprecated
   re_path(r'^accounts/logout/?$', desktop_auth_views.dt_logout, {'next_page': '/'}),
   re_path(r'^profile$', desktop_auth_views.profile),
   re_path(r'^login/oauth/?$', desktop_auth_views.oauth_login),
@@ -93,6 +74,7 @@ else:
 
 dynamic_patterns += [
   re_path(r'^logs$', desktop_views.log_view, name="desktop.views.log_view"),
+  re_path(r'^task_server$', desktop_views.task_server_view, name='desktop.views.task_server_view'),
   re_path(r'^desktop/log_analytics$', desktop_views.log_analytics),
   re_path(r'^desktop/log_js_error$', desktop_views.log_js_error),
   re_path(r'^desktop/dump_config$', desktop_views.dump_config, name="desktop.views.dump_config"),
@@ -100,7 +82,7 @@ dynamic_patterns += [
   re_path(r'^desktop/get_debug_level', desktop_views.get_debug_level),
   re_path(r'^desktop/set_all_debug', desktop_views.set_all_debug),
   re_path(r'^desktop/reset_all_debug', desktop_views.reset_all_debug),
-  re_path(r'^bootstrap.js$', desktop_views.bootstrap), # unused
+  re_path(r'^bootstrap.js$', desktop_views.bootstrap),  # unused
 
   re_path(r'^desktop/status_bar/?$', desktop_views.status_bar),
   re_path(r'^desktop/debug/is_alive$', desktop_views.is_alive),
@@ -167,6 +149,12 @@ dynamic_patterns += [
   re_path(r'^desktop/api2/doc/restore/?$', desktop_api2.restore_document),
   re_path(r'^desktop/api2/doc/share/link/?$', desktop_api2.share_document_link),
   re_path(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
+  re_path(r'^desktop/api2/taskserver/handle_submit/?$', desktop_api2.handle_submit, name="desktop_api2.handle_submit"),
+  re_path(r'^desktop/api2/taskserver/get_taskserver_tasks/?$', desktop_api2.get_taskserver_tasks, name="desktop_api2.get_taskserver_tasks"),
+  re_path(r'^desktop/api2/taskserver/get_task_logs/(?P<task_id>[^/]+)/?$', desktop_api2.get_task_logs, name="desktop_api2.get_task_logs"),
+  re_path(r'^desktop/api2/taskserver/check_upload_status/(?P<task_id>[^/]+)/?$', desktop_api2.check_upload_status,
+          name="desktop_api2.check_upload_status"),
+  re_path(r'^desktop/api2/taskserver/kill_task/(?P<task_id>[^/]+)/?$', desktop_api2.kill_task, name="desktop_api2.kill_task"),
 
   re_path(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
   re_path(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
@@ -203,9 +191,12 @@ dynamic_patterns += [
 ]
 
 dynamic_patterns += [
-  re_path('^api/v1/token/auth/?$', TokenObtainPairView.as_view(), name='token_obtain'),
-  re_path('^api/v1/token/verify/?$', TokenVerifyView.as_view(), name='token_verify'),
-  re_path('^api/v1/token/refresh/?$', TokenRefreshView.as_view(), name='token_refresh'),
+  re_path(r'^api/schema/?$', SpectacularAPIView.as_view(), name='schema'),
+  re_path(r'^api/swagger/?$', SpectacularSwaggerView.as_view(), name='swagger-ui'),
+
+  re_path(r'^api/v1/token/auth/?$', TokenObtainPairView.as_view(), name='token_obtain'),
+  re_path(r'^api/v1/token/verify/?$', TokenVerifyView.as_view(), name='token_verify'),
+  re_path(r'^api/v1/token/refresh/?$', TokenRefreshView.as_view(), name='token_refresh'),
 
   re_path(r'^api/v1/', include(('desktop.api_public_urls_v1', 'api'), 'api')),
 ]

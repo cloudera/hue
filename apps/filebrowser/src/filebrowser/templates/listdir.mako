@@ -164,20 +164,39 @@ ${ fb_components.menubar() }
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           % if show_upload_button:
           <!-- ko if: isS3 -->
-            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isS3Root()}, click: function(){ if (!isS3Root()) { uploadFile() }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+            <!-- ko ifnot: isTaskServerEnabled -->
+            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isS3Root()}, click: function(){ if (!isS3Root()) { uploadFile(false) }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+            <!-- /ko -->
+            <!-- ko if: isTaskServerEnabled -->
+            <a class="btn fileToolbarBtn" title="${_('Select a file to upload. The file will first be saved locally and then automatically transferred to the designated file system (e.g., S3, Azure) in the background. The upload modal closes immediately after the file is queued, allowing you to continue working. A notification, \'File upload scheduled. Please check the task server page for progress,\' will confirm the upload has started. This feature is especially useful for large files, as it eliminates the need to wait for the upload to complete.')}" data-bind="visible: !inTrash(), css: {'disabled': isS3Root()}, click: function(){ if (!isS3Root()) { checkAndDisplayAvailableSpace(); uploadFile(true); }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Schedule Upload')}</a>
+            <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: isGS -->
             <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isGSRoot()}, click: function(){ if (!isGSRoot()) { uploadFile() }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
           <!-- /ko -->
           <!-- ko if: isABFS -->
-            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isABFSRoot()}, click: function(){ if (!isABFSRoot()) { uploadFile() }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+            <!-- ko ifnot: isTaskServerEnabled -->
+            <a class="btn fileToolbarBtn" title="${_('Upload files')}" data-bind="visible: !inTrash(), css: {'disabled': isABFSRoot()}, click: function(){ if (!isABFSRoot()) { uploadFile(false) }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}</a>
+            <!-- /ko -->
+            <!-- ko if: isTaskServerEnabled -->
+            <a class="btn fileToolbarBtn" title="${_('Select a file to upload. The file will first be saved locally and then automatically transferred to the designated file system (e.g., S3, Azure) in the background. The upload modal closes immediately after the file is queued, allowing you to continue working. A notification, \'File upload scheduled. Please check the task server page for progress,\' will confirm the upload has started. This feature is especially useful for large files, as it eliminates the need to wait for the upload to complete.')}" data-bind="visible: !inTrash(), css: {'disabled': isABFSRoot()}, click: function(){ if (!isABFSRoot()) { checkAndDisplayAvailableSpace(); uploadFile(true); }}"><i class="fa fa-arrow-circle-o-up"></i> ${_('Schedule Upload')}</a>
+            <!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: isS3() || isGS() || isABFS() -->
+          <!-- ko ifnot: isTaskServerEnabled -->
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
-            <a data-hue-analytics="filebrowser:upload-btn-click" href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: uploadFile, visible: !inTrash(), css: {'disabled': (isOFS() && (isOFSRoot() || isOFSServiceID() || isOFSVol()))}">
+            <a data-hue-analytics="filebrowser:upload-btn-click" href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: function() { uploadFile(false); }, visible: !inTrash(), css: {'disabled': (isOFS() && (isOFSRoot() || isOFSServiceID() || isOFSVol()))}">
               <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
             </a>
           </div>
+          <!-- /ko -->
+          <!-- ko if: isTaskServerEnabled -->
+          <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
+            <a data-hue-analytics="filebrowser:upload-btn-click" href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Select a file to upload. The file will first be saved locally and then automatically transferred to the designated file system (e.g., S3, Azure) in the background. The upload modal closes immediately after the file is queued, allowing you to continue working. A notification, \'File upload scheduled. Please check the task server page for progress,\' will confirm the upload has started. This feature is especially useful for large files, as it eliminates the need to wait for the upload to complete.')}" data-bind="click: function() { checkAndDisplayAvailableSpace(); uploadFile(true);}, visible: !inTrash(), css: {'disabled': (isOFS() && (isOFSRoot() || isOFSServiceID() || isOFSVol()))}">
+              <i class="fa fa-arrow-circle-o-up"></i> ${_('Schedule Upload')}
+            </a>
+          </div>
+          <!-- /ko -->
           <!-- /ko -->
           % endif
           <div class="btn-group" style="vertical-align: middle">

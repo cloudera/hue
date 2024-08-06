@@ -29,7 +29,10 @@ if six.PY2:
 _original_socket = eventlet.patcher.original('socket').socket
 
 
-socket_timeout = eventlet.timeout.wrap_is_timeout(socket.timeout)
+if sys.version_info >= (3, 10):
+    socket_timeout = socket.timeout  # Really, TimeoutError
+else:
+    socket_timeout = eventlet.timeout.wrap_is_timeout(socket.timeout)
 
 
 def socket_connect(descriptor, address):

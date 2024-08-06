@@ -22,7 +22,7 @@ else:
   from django.utils.translation import ugettext as _
 
 from desktop.auth.backend import is_admin, is_hue_admin
-from desktop.conf import METRICS, has_connectors, ANALYTICS
+from desktop.conf import METRICS, has_connectors, ANALYTICS, TASK_SERVER_V2
 
 def is_selected(section, matcher):
   if section == matcher:
@@ -73,6 +73,11 @@ def is_selected(section, matcher):
                 % if METRICS.ENABLE_WEB_METRICS.get():
                 <li class="${is_selected(section, 'metrics')}">
                   <a href="${ url('desktop.lib.metrics.views.index') }">${_('Metrics')}</a>
+                </li>
+                % endif
+                % if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
+                <li class="${is_selected(section, 'task_server')}">
+                  <a href="${ url('desktop.views.task_server_view') }">${_('Task Server')}</a>
                 </li>
                 % endif
               % endif

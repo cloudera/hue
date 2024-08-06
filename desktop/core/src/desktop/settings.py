@@ -20,24 +20,25 @@
 # Local customizations are done by symlinking a file
 # as local_settings.py.
 
-from builtins import map, zip
-import datetime
 import gc
-import json
-import logging
 import os
-import pkg_resources
 import sys
+import json
 import uuid
+import logging
+import datetime
+from builtins import map, zip
+
+import pkg_resources
 
 import desktop.redaction
-
-from desktop.lib.paths import get_desktop_root, get_run_root
-from desktop.lib.python_util import force_dict_to_strings
-
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
-from desktop.conf import is_ofs_enabled, is_gs_enabled, is_chunked_fileuploader_enabled
+from desktop import appmanager
+from desktop.conf import TASK_SERVER_V2, is_chunked_fileuploader_enabled, is_gs_enabled, is_ofs_enabled
+from desktop.lib import conf
+from desktop.lib.paths import get_desktop_root, get_run_root
+from desktop.lib.python_util import force_dict_to_strings
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext_lazy as _
@@ -52,7 +53,7 @@ NICE_NAME = "Hue"
 
 ENV_HUE_PROCESS_NAME = "HUE_PROCESS_NAME"
 ENV_DESKTOP_DEBUG = "DESKTOP_DEBUG"
-LOGGING_CONFIG = None # We're handling our own logging config. Consider upgrading our logging infra to LOGGING_CONFIG
+LOGGING_CONFIG = None  # We're handling our own logging config. Consider upgrading our logging infra to LOGGING_CONFIG
 
 
 ############################################################
@@ -72,9 +73,6 @@ desktop.log.basic_logging(os.environ[ENV_HUE_PROCESS_NAME])
 
 logging.info("Welcome to Hue " + HUE_DESKTOP_VERSION)
 
-# Then we can safely import some more stuff
-from desktop import appmanager
-from desktop.lib import conf
 
 # Add fancy logging
 desktop.log.fancy_logging()
@@ -166,7 +164,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'desktop.middleware.CacheControlMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
-    #'axes.middleware.FailedLoginMiddleware',
+    # 'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
     'crequest.middleware.CrequestMiddleware',
 ]
@@ -194,7 +192,7 @@ INSTALLED_APPS = [
     'django_extensions',
 
     # 'debug_toolbar',
-    #'south', # database migration tool
+    # 'south', # database migration tool
 
     # i18n support
     'django_babel',
@@ -207,9 +205,11 @@ INSTALLED_APPS = [
     'webpack_loader',
     'django_prometheus',
     'crequest',
-    #'django_celery_results',
+    # 'django_celery_results',
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_spectacular',
+    'drf_spectacular_sidecar'
 ]
 
 WEBPACK_LOADER = {
@@ -270,9 +270,7 @@ TEMPLATES = [
 AUTH_PROFILE_MODULE = None
 
 LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/" # For djangosaml2 bug.
-
-PYLINTRC = get_run_root('.pylintrc')
+LOGOUT_REDIRECT_URL = "/"  # For djangosaml2 bug.
 
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
@@ -315,7 +313,7 @@ conf.initialize(_app_conf_modules, _config_dir)
 # Now that we've loaded the desktop conf, set the django DEBUG mode based on the conf.
 DEBUG = desktop.conf.DJANGO_DEBUG_MODE.get()
 GTEMPLATE_DEBUG = DEBUG
-if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True and re-apply the loggers
+if DEBUG:  # For simplification, force all DEBUG when django_debug_mode is True and re-apply the loggers
   os.environ[ENV_DESKTOP_DEBUG] = 'True'
   desktop.log.basic_logging(os.environ[ENV_HUE_PROCESS_NAME])
   desktop.log.fancy_logging()
@@ -329,8 +327,18 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
       'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': desktop.conf.AUTH.API_AUTH.get()
+    'DEFAULT_AUTHENTICATION_CLASSES': desktop.conf.AUTH.API_AUTH.get(),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Hue Public API',
+    'VERSION': '1.0.0',
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+}
+
+
 if desktop.conf.is_custom_jwt_auth_enabled() and \
   'desktop.auth.api_authentications.JwtAuthentication' not in REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES']:
   REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'].insert(0, 'desktop.auth.api_authentications.JwtAuthentication')
@@ -370,16 +378,16 @@ SERVER_EMAIL = desktop.conf.DJANGO_SERVER_EMAIL.get()
 EMAIL_BACKEND = desktop.conf.DJANGO_EMAIL_BACKEND.get()
 EMAIL_SUBJECT_PREFIX = 'Hue %s - ' % desktop.conf.CLUSTER_ID.get()
 
+if desktop.conf.CORS_ENABLED.get():
+  # Permissive CORS for public /api
+  INSTALLED_APPS.append('corsheaders')
+  MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 
-# Permissive CORS for public /api
-INSTALLED_APPS.append('corsheaders')
-MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
-CORS_URLS_REGEX = r'^/api/.*$|/saml2/login/'
-CORS_ALLOW_CREDENTIALS = True
-if sys.version_info[0] > 2:
-  CORS_ALLOW_ALL_ORIGINS = True
-else:
-  CORS_ORIGIN_ALLOW_ALL = True
+  CORS_URLS_REGEX = r'^/api/.*$|/saml2/login/'
+  CORS_ALLOW_CREDENTIALS = desktop.conf.CORS_ALLOW_CREDENTIALS.get()
+
+  CORS_ALLOWED_ORIGINS = desktop.conf.CORS_ALLOWED_ORIGINS.get() or []
+  CORS_ALLOW_ALL_ORIGINS = not bool(CORS_ALLOWED_ORIGINS)
 
 # Configure database
 if os.getenv('DESKTOP_DB_CONFIG'):
@@ -390,7 +398,7 @@ if os.getenv('DESKTOP_DB_CONFIG'):
       zip(["ENGINE", "NAME", "TEST_NAME", "USER", "PASSWORD", "HOST", "PORT"], conn_string.split(':'))
     )
   )
-  default_db['NAME'] = default_db['NAME'].replace('#', ':') # For is_db_alive command
+  default_db['NAME'] = default_db['NAME'].replace('#', ':')  # For is_db_alive command
 else:
   test_name = os.environ.get('DESKTOP_DB_TEST_NAME', get_desktop_root('desktop-test.db'))
   logging.debug("DESKTOP_DB_TEST_NAME SET: %s" % test_name)
@@ -439,7 +447,7 @@ if desktop.conf.QUERY_DATABASE.HOST.get():
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', # TODO: Parameterize here for all the caches
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',  # TODO: Parameterize here for all the caches
         'LOCATION': 'unique-hue'
     },
     'axes_cache': {
@@ -461,10 +469,10 @@ CACHES[CACHES_WEBHDFS_DELEGATION_TOKEN_KEY] = {
 
 CACHES_CELERY_KEY = 'celery'
 CACHES_CELERY_QUERY_RESULT_KEY = 'celery_query_results'
-if desktop.conf.TASK_SERVER.ENABLED.get():
-  CACHES[CACHES_CELERY_KEY] = json.loads(desktop.conf.TASK_SERVER.EXECUTION_STORAGE.get())
-  if desktop.conf.TASK_SERVER.RESULT_CACHE.get():
-    CACHES[CACHES_CELERY_QUERY_RESULT_KEY] = json.loads(desktop.conf.TASK_SERVER.RESULT_CACHE.get())
+if desktop.conf.TASK_SERVER_V2.ENABLED.get():
+  CACHES[CACHES_CELERY_KEY] = json.loads(desktop.conf.TASK_SERVER_V2.EXECUTION_STORAGE.get())
+  if desktop.conf.TASK_SERVER_V2.RESULT_CACHE.get():
+    CACHES[CACHES_CELERY_QUERY_RESULT_KEY] = json.loads(desktop.conf.TASK_SERVER_V2.RESULT_CACHE.get())
 
 # Configure sessions
 SESSION_COOKIE_NAME = desktop.conf.SESSION.COOKIE_NAME.get()
@@ -486,7 +494,7 @@ if desktop.conf.SESSION.TRUSTED_ORIGINS.get():
   TRUSTED_ORIGINS += desktop.conf.SESSION.TRUSTED_ORIGINS.get()
 
 # This is required for knox
-if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have port. Add default knox port
+if desktop.conf.KNOX.KNOX_PROXYHOSTS.get():  # The hosts provided here don't have port. Add default knox port
   if desktop.conf.KNOX.KNOX_PORTS.get():
     hostport = []
     ports = [  # In case the ports are in hostname
@@ -494,7 +502,7 @@ if desktop.conf.KNOX.KNOX_PROXYHOSTS.get(): # The hosts provided here don't have
     ]
     for port in ports + desktop.conf.KNOX.KNOX_PORTS.get():
       if port == '80':
-        port = '' # Default port needs to be empty
+        port = ''  # Default port needs to be empty
       else:
         port = ':' + port
       hostport += [host.split(':')[0] + port for host in desktop.conf.KNOX.KNOX_PROXYHOSTS.get()]
@@ -513,18 +521,9 @@ SECURE_SSL_REDIRECT = desktop.conf.SECURE_SSL_REDIRECT.get()
 SECURE_SSL_HOST = desktop.conf.SECURE_SSL_HOST.get()
 SECURE_REDIRECT_EXEMPT = desktop.conf.SECURE_REDIRECT_EXEMPT.get()
 
-# django-nose test specifics
-TEST_RUNNER = 'desktop.lib.test_runners.HueTestRunner'
 # Turn off cache middleware
 if 'test' in sys.argv:
   CACHE_MIDDLEWARE_SECONDS = 0
-
-# Limit Nose coverage to Hue apps
-NOSE_ARGS = [
-  '--cover-package=%s' % ','.join([app.name for app in appmanager.DESKTOP_APPS + appmanager.DESKTOP_LIBS]),
-  '--no-path-adjustment',
-  '--traverse-namespace'
-]
 
 TIME_ZONE = desktop.conf.TIME_ZONE.get()
 
@@ -600,6 +599,7 @@ for middleware in desktop.conf.MIDDLEWARE.get():
 # OpenID Connect
 def is_oidc_configured():
   return 'desktop.auth.backend.OIDCBackend' in AUTHENTICATION_BACKENDS
+
 
 if is_oidc_configured():
   INSTALLED_APPS.append('mozilla_django_oidc')
@@ -747,14 +747,32 @@ DOCUMENT2_MAX_ENTRIES = 100000
 # Celery settings
 ################################################################
 
-if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
-  CELERY_BROKER_URL = desktop.conf.TASK_SERVER.BROKER_URL.get()
+if desktop.conf.TASK_SERVER_V2.ENABLED.get() or desktop.conf.TASK_SERVER_V2.BEAT_ENABLED.get():
+  CELERY_BROKER_URL = desktop.conf.TASK_SERVER_V2.BROKER_URL.get()
 
   CELERY_ACCEPT_CONTENT = ['json']
-  CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER.CELERY_RESULT_BACKEND.get()
+  CELERY_RESULT_BACKEND = desktop.conf.TASK_SERVER_V2.CELERY_RESULT_BACKEND.get()
   CELERY_TASK_SERIALIZER = 'json'
+  CELERY_ENABLE_UTC = True
+  CELERY_TIMEZONE = TIME_ZONE
 
-  CELERYD_OPTS = desktop.conf.TASK_SERVER.RESULT_CELERYD_OPTS.get()
+  CELERYD_OPTS = desktop.conf.TASK_SERVER_V2.RESULT_CELERYD_OPTS.get()
+  CELERY_TASK_DEFAULT_QUEUE = 'default'
+
+  CELERY_TASK_QUEUES = {
+    'low_priority': {
+        'exchange': 'low_priority',  # unused
+        'routing_key': 'low_priority',
+    },
+    'high_priority': {
+        'exchange': 'high_priority',  # unused
+        'routing_key': 'high_priority',
+    },
+    'default': {
+         'exchange': 'default',
+         'routing_key': 'default'
+    },
+  }
 
 # %n will be replaced with the first part of the nodename.
 # CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
@@ -763,13 +781,13 @@ if desktop.conf.TASK_SERVER.ENABLED.get() or desktop.conf.TASK_SERVER.BEAT_ENABL
 # CELERYD_USER = desktop.conf.SERVER_USER.get()
 # CELERYD_GROUP = desktop.conf.SERVER_GROUP.get()
 
-  if desktop.conf.TASK_SERVER.BEAT_ENABLED.get():
+  if desktop.conf.TASK_SERVER_V2.BEAT_ENABLED.get():
     INSTALLED_APPS.append('django_celery_beat')
     INSTALLED_APPS.append('timezone_field')
-    USE_TZ = True
+    USE_TZ = False
 
 
-PROMETHEUS_EXPORT_MIGRATIONS = False # Needs to be there even when enable_prometheus is not enabled
+PROMETHEUS_EXPORT_MIGRATIONS = False  # Needs to be there even when enable_prometheus is not enabled
 if desktop.conf.ENABLE_PROMETHEUS.get():
   MIDDLEWARE.insert(0, 'django_prometheus.middleware.PrometheusBeforeMiddleware')
   MIDDLEWARE.append('django_prometheus.middleware.PrometheusAfterMiddleware')

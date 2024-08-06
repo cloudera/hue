@@ -53,8 +53,8 @@ ko.bindingHandlers.hueSpinner = {
         options.overlay
           ? 'hue-spinner-overlay'
           : options.inline
-          ? 'hue-spinner-inline'
-          : 'hue-spinner'
+            ? 'hue-spinner-inline'
+            : 'hue-spinner'
       );
       if (options.blackout) {
         $container.addClass('hue-spinner-blackout');

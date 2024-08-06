@@ -17,9 +17,8 @@
 # limitations under the License.
 
 import logging
+import pytest
 import sys
-
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
@@ -37,9 +36,10 @@ else:
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestStandardTables():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -67,19 +67,20 @@ class TestStandardTables():
     interpreter = {'type': 'mysql', 'dialect': 'mysql'}
 
     design = SampleQuery(design_dict)
-    assert_false(Document2.objects.filter(name='TestStandardTables Query').exists())
+    assert not Document2.objects.filter(name='TestStandardTables Query').exists()
 
     with patch('notebook.models.get_interpreter') as get_interpreter:
       design.install(django_user=self.user, interpreter=interpreter)
 
-      assert_true(Document2.objects.filter(name='TestStandardTables Query').exists())
+      assert Document2.objects.filter(name='TestStandardTables Query').exists()
       query = Document2.objects.filter(name='TestStandardTables Query').get()
-      assert_equal('query-mysql', query.type)
+      assert 'query-mysql' == query.type
 
 
+@pytest.mark.django_db
 class TestHiveServer2():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -105,14 +106,14 @@ class TestHiveServer2():
     interpreter = {'type': 'hive', 'dialect': 'hive'}
 
     design = SampleQuery(design_dict)
-    assert_false(Document2.objects.filter(name='TestBeswaxHiveTables Query').exists())
+    assert not Document2.objects.filter(name='TestBeswaxHiveTables Query').exists()
 
     with patch('notebook.models.get_interpreter') as get_interpreter:
       design.install(django_user=self.user, interpreter=interpreter)
 
-      assert_true(Document2.objects.filter(name='TestBeswaxHiveTables Query').exists())
+      assert Document2.objects.filter(name='TestBeswaxHiveTables Query').exists()
       query = Document2.objects.filter(name='TestBeswaxHiveTables Query').get()
-      assert_equal('query-hive', query.type)
+      assert 'query-hive' == query.type
 
 
   def test_create_table_load_data_but_no_fs(self):
@@ -134,9 +135,10 @@ class TestHiveServer2():
 
 
 
+@pytest.mark.django_db
 class TestTransactionalTables():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
 

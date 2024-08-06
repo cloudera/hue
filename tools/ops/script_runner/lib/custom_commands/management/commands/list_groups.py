@@ -66,12 +66,12 @@ class Command(BaseCommand):
             user = User.objects.get(username = options['username'])
             groups = user.groups.all()
             for group in groups:
-              print group.name
+              print (group.name)
           else:
             LOG.info("Listing all groups")
             groups = Group.objects.all()
             for group in groups:
-              print group.name
+              print (group.name)
 
         except Exception as e:
             LOG.warn("EXCEPTION: Listing groups failed, %s" % e)

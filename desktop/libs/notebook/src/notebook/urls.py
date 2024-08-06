@@ -17,20 +17,15 @@
 
 import sys
 
-from notebook import views as notebook_views
-from notebook import api as notebook_api
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from notebook import api as notebook_api, views as notebook_views
 
 # Views
 urlpatterns = [
   re_path(r'^$', notebook_views.notebook, name='index'),
   re_path(r'^notebook/?$', notebook_views.notebook, name='notebook'),
   re_path(r'^notebook_embeddable/?$', notebook_views.notebook_embeddable, name='notebook_embeddable'),
-  re_path(r'^notebooks/?$', notebook_views.notebooks, name='notebooks'),
   re_path(r'^new/?$', notebook_views.new, name='new'),
   re_path(r'^download/?$', notebook_views.download, name='download'),
   re_path(r'^install_examples/?$', notebook_views.install_examples, name='install_examples'),
@@ -96,6 +91,11 @@ urlpatterns += [
     r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
     notebook_api.get_sample_data,
     name='api_sample_data_column'
+  ),
+  re_path(
+    r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$',
+    notebook_api.get_sample_data,
+    name='api_sample_data_nested'
   ),
 
   # SQLite

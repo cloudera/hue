@@ -25,7 +25,7 @@ interface BreadcrumbProps {
   onFilepathChange: (path: string) => void;
 }
 
-const Breadcrumb: React.FC<BreadcrumbProps> = ({ label, url, onFilepathChange }) => {
+const Breadcrumb = ({ label, url, onFilepathChange }: BreadcrumbProps): JSX.Element => {
   const handleFilepathChange = () => {
     onFilepathChange(url);
   };
@@ -35,7 +35,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ label, url, onFilepathChange })
   return (
     <div
       className="hue-path-browser__breadcrumb"
-      style={{ '--minWidth': `${minWidth}` } as React.CSSProperties}
+      style={{ '--min-width': `${minWidth}` } as React.CSSProperties}
     >
       <OverflowingItem onClick={handleFilepathChange} label={label} />
     </div>

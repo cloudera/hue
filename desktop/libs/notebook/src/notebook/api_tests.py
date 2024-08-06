@@ -18,12 +18,10 @@
 
 from builtins import object
 import json
+import pytest
 import sys
 
 from collections import OrderedDict
-from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_false
 
 from django.test.client import Client
 from django.urls import reverse
@@ -53,9 +51,10 @@ else:
   from mock import patch, Mock
 
 
+@pytest.mark.django_db
 class TestApi(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
 
@@ -101,7 +100,7 @@ class TestApi(object):
   def test_save_notebook(self):
     # Test that saving a new document with a new parent will set the parent_directory
     home_dir = Document2.objects.get_home_directory(self.user)
-    assert_equal(home_dir.uuid, self.doc2.parent_directory.uuid)
+    assert home_dir.uuid == self.doc2.parent_directory.uuid
 
     new_dir = Directory.objects.create(name='new_dir', owner=self.user, parent_directory=home_dir)
     notebook_cp = self.notebook.copy()
@@ -112,9 +111,9 @@ class TestApi(object):
     response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
     data = json.loads(response.content)
 
-    assert_equal(0, data['status'], data)
+    assert 0 == data['status'], data
     doc = Document2.objects.get(pk=data['id'])
-    assert_equal(new_dir.uuid, doc.parent_directory.uuid)
+    assert new_dir.uuid == doc.parent_directory.uuid
 
     # Test that saving a new document with a no parent will map it to its home dir
     notebook_json = """
@@ -148,13 +147,51 @@ class TestApi(object):
     response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
     data = json.loads(response.content)
 
-    assert_equal(0, data['status'], data)
+    assert 0 == data['status'], data
     doc = Document2.objects.get(pk=data['id'])
-    assert_equal(Document2.objects.get_home_directory(self.user).uuid, doc.parent_directory.uuid)
+    assert Document2.objects.get_home_directory(self.user).uuid == doc.parent_directory.uuid
 
     # Test that saving a notebook will save the search field to the first statement text
-    assert_equal(doc.search, "select * from default.web_logs where app = 'metastore';")
+    assert doc.search == "select * from default.web_logs where app = 'metastore';"
+    assert doc.type == "query-hive"
 
+  def test_type_when_saving_an_actual_notebook(self):
+    notebook_json = """
+      {
+        "selectedSnippet": "hive",
+        "showHistory": false,
+        "description": "Test Notebook",
+        "name": "Test Notebook",
+        "sessions": [
+            {
+                "type": "hive",
+                "properties": [],
+                "id": null
+            }
+        ],
+        "type": "notebook",
+        "id": null,
+        "snippets": [{"id":"2b7d1f46-17a0-30af-efeb-33d4c29b1055","type":"hive","status":"running","statement_raw":""" \
+                      """"select * from default.web_logs where app = '${app_name}';","variables":""" \
+                      """[{"name":"app_name","value":"metastore"}],"statement":""" \
+                      """"select 1;","properties":{"settings":[],"files":[],"functions":[]},""" \
+                      """"result":{"id":"b424befa-f4f5-8799-a0b4-79753f2552b1","type":"table","handle":{"log_context":null,""" \
+                      """"statements_count":1,"end":{"column":21,"row":0},"statement_id":0,"has_more_statements":false,""" \
+                      """"start":{"column":0,"row":0},"secret":"rVRWw7YPRGqPT7LZ/TeFaA==an","has_result_set":true,""" \
+                      """"statement":"select * from default.web_logs where app = 'metastore';","operation_type":0,""" \
+                      """"modified_row_count":null,"guid":"7xm6"}},"lastExecuted": 1462554843817,"database":"default"}],
+                      "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
+                  }
+                  """
+
+    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
+    data = json.loads(response.content)
+
+    assert 0 == data['status'], data
+    assert 'notebook' == data['type'], data
+    doc = Document2.objects.get(pk=data['id'])
+
+    assert doc.type == "notebook"
 
   def test_save_notebook_with_connector_off(self):
     reset = ENABLE_CONNECTORS.set_for_testing(False)
@@ -174,14 +211,14 @@ class TestApi(object):
     finally:
       reset()
 
-    assert_equal(0, data['status'], data)
+    assert 0 == data['status'], data
     doc = Document2.objects.get(pk=data['id'])
-    assert_equal('query-mysql', doc.type)
+    assert 'query-mysql' == doc.type
 
 
   def test_save_notebook_with_connector_on(self):
     if not ENABLE_CONNECTORS.get():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     notebook_cp = self.notebook.copy()
     notebook_cp.pop('id')
@@ -204,37 +241,37 @@ class TestApi(object):
     finally:
       connector.delete()
 
-    assert_equal(0, data['status'], data)
+    assert 0 == data['status'], data
     doc = Document2.objects.get(pk=data['id'])
-    assert_equal('query-mysql', doc.type)
+    assert 'query-mysql' == doc.type
 
 
   def test_historify(self):
     # Starts with no history
-    assert_equal(0, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
-    assert_equal(1, Document.objects.filter(name__contains=self.notebook['name']).count())
+    assert 0 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
+    assert 1 == Document.objects.filter(name__contains=self.notebook['name']).count()
 
     history_doc = _historify(self.notebook, self.user)
 
-    assert_true(history_doc.id > 0)
+    assert history_doc.id > 0
 
     # Test that historify creates new Doc2 and linked Doc1
-    assert_equal(1, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
-    assert_equal(2, Document.objects.filter(name__contains=self.notebook['name']).count())
+    assert 1 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
+    assert 2 == Document.objects.filter(name__contains=self.notebook['name']).count()
 
     # Historify again
     history_doc = _historify(self.notebook, self.user)
 
-    assert_equal(2, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
-    assert_equal(3, Document.objects.filter(name__contains=self.notebook['name']).count())
+    assert 2 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
+    assert 3 == Document.objects.filter(name__contains=self.notebook['name']).count()
 
 
   def test_get_history(self):
-    assert_equal(0, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
+    assert 0 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
     _historify(self.notebook, self.user)
     _historify(self.notebook, self.user)
     _historify(self.notebook, self.user)
-    assert_equal(3, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
+    assert 3 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
 
     # History should not return history objects that don't have the given doc type
     Document2.objects.create(name='Impala History', type='query-impala', data=self.notebook_json, owner=self.user, is_history=True)
@@ -242,19 +279,19 @@ class TestApi(object):
     # Verify that get_history API returns history objects for given type and current user
     response = self.client.get(reverse('notebook:get_history'), {'doc_type': 'hive'})
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_equal(3, len(data['history']), data)
-    assert_true(all(doc['type'] == 'query-hive' for doc in data['history']), data)
+    assert 0 == data['status'], data
+    assert 3 == len(data['history']), data
+    assert all(doc['type'] == 'query-hive' for doc in data['history']), data
 
     # TODO: test that query history for shared query only returns docs accessible by current user
 
 
   def test_clear_history(self):
-    assert_equal(0, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
+    assert 0 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
     _historify(self.notebook, self.user)
     _historify(self.notebook, self.user)
     _historify(self.notebook, self.user)
-    assert_equal(3, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
+    assert 3 == Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count()
 
     # Clear history should not clear history objects that don't have the given doc type
     Document2.objects.create(name='Impala History', type='query-impala', owner=self.user, is_history=True)
@@ -262,10 +299,10 @@ class TestApi(object):
     # clear history should retain original document but wipe history
     response = self.client.post(reverse('notebook:clear_history'), {'notebook': self.notebook_json, 'doc_type': 'hive'})
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_false(Document2.objects.filter(type='query-hive', is_history=True).exists())
-    assert_true(Document2.objects.filter(type='query-hive', is_history=False).exists())
-    assert_true(Document2.objects.filter(type='query-impala', is_history=True).exists())
+    assert 0 == data['status'], data
+    assert not Document2.objects.filter(type='query-hive', is_history=True).exists()
+    assert Document2.objects.filter(type='query-hive', is_history=False).exists()
+    assert Document2.objects.filter(type='query-impala', is_history=True).exists()
 
 
   def test_delete_notebook(self):
@@ -294,20 +331,20 @@ class TestApi(object):
     # Assert that the notebook is first saved
     response = self.client.post(reverse('notebook:save_notebook'), {'notebook': trash_notebook_json})
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
+    assert 0 == data['status'], data
 
     # Test that deleting it moves it to the user's Trash folder
     notebook_doc = Document2.objects.get(id=data['id'])
     trash_notebooks = [Notebook(notebook_doc).get_data()]
     response = self.client.post(reverse('notebook:delete'), {'notebooks': json.dumps(trash_notebooks)})
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_equal('Trashed 1 notebook(s)', data['message'], data)
+    assert 0 == data['status'], data
+    assert 'Trashed 1 notebook(s)' == data['message'], data
 
     response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
     trash_uuids = [doc['uuid'] for doc in data['children']]
-    assert_true(notebook_doc.uuid in trash_uuids, data)
+    assert notebook_doc.uuid in trash_uuids, data
 
     # Test that any errors are reported in the response
     nonexistant_doc = {
@@ -340,9 +377,9 @@ class TestApi(object):
     trash_notebooks = [nonexistant_doc]
     response = self.client.post(reverse('notebook:delete'), {'notebooks': json.dumps(trash_notebooks)})
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_equal('Trashed 0 notebook(s) and failed to delete 1 notebook(s).', data['message'], data)
-    assert_equal(['ea22da5f-b69c-4843-b17d-dea5c74c41d1'], data['errors'])
+    assert 0 == data['status'], data
+    assert 'Trashed 0 notebook(s) and failed to delete 1 notebook(s).' == data['message'], data
+    assert ['ea22da5f-b69c-4843-b17d-dea5c74c41d1'] == data['errors']
 
 
   def test_query_error_encoding(self):
@@ -356,7 +393,7 @@ a.*
 FROM customers c, c.addresses a"""
     response = send_exception(message)
     data = json.loads(response.content)
-    assert_equal(1, data['status'])
+    assert 1 == data['status']
 
     message = """SELECT
 \u2002\u2002a.key,
@@ -364,7 +401,7 @@ FROM customers c, c.addresses a"""
 FROM customers c, c.addresses a"""
     response = send_exception(message)
     data = json.loads(response.content)
-    assert_equal(1, data['status'])
+    assert 1 == data['status']
 
     message = u"""SELECT
 a.key,
@@ -372,7 +409,7 @@ a.*
 FROM déclenché c, c.addresses a"""
     response = send_exception(message)
     data = json.loads(response.content)
-    assert_equal(1, data['status'])
+    assert 1 == data['status']
 
 
   def test_notebook_autocomplete(self):
@@ -392,7 +429,7 @@ FROM déclenché c, c.addresses a"""
       )
 
       data = json.loads(response.content)
-      assert_equal(data, {'status': 0})  # We get back empty instead of failure with QueryExpired to silence end user messages
+      assert data == {'status': 0}  # We get back empty instead of failure with QueryExpired to silence end user messages
 
 
   def test_autocomplete_functions(self):
@@ -414,14 +451,13 @@ FROM déclenché c, c.addresses a"""
           'operation': 'functions'
       })
 
-      assert_equal(response.status_code, 200)
+      assert response.status_code == 200
       data = json.loads(response.content)
-      assert_equal(data['status'], 0)
+      assert data['status'] == 0
 
-      assert_equal(
-        data['functions'],
-        [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}]
-      )
+      assert (
+        data['functions'] ==
+        [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}])
 
 
 class MockedApi(Api):
@@ -488,9 +524,10 @@ class MockFs(object):
     self._user = value
 
 
+@pytest.mark.django_db
 class TestNotebookApiMocked(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
 
@@ -514,7 +551,7 @@ class TestNotebookApiMocked(object):
     grant_access("not_perm_user", "default", "hive")
     add_permission('test', 'has_adls', permname='adls_access', appname='filebrowser')
 
-  def tearDown(self):
+  def teardown_method(self):
     notebook.connectors.hiveserver2.HS2Api = notebook.connectors.hiveserver2.original_HS2Api
 
     if originalCluster.FS_CACHE is None:
@@ -522,7 +559,7 @@ class TestNotebookApiMocked(object):
     originalCluster.FS_CACHE["default"] = self.original_fs
 
 
-  @attr('integration')
+  @pytest.mark.integration
   def test_export_result(self):
     notebook_json = """
       {
@@ -559,8 +596,8 @@ class TestNotebookApiMocked(object):
     })
 
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_equal('/user/hue/Test Hive Query.csv', data['watch_url']['destination'], data)
+    assert 0 == data['status'], data
+    assert '/user/hue/Test Hive Query.csv' == data['watch_url']['destination'], data
 
 
     response = self.client.post(reverse('notebook:export_result'), {
@@ -572,8 +609,8 @@ class TestNotebookApiMocked(object):
     })
 
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_equal('/user/hue/path.csv', data['watch_url']['destination'], data)
+    assert 0 == data['status'], data
+    assert '/user/hue/path.csv' == data['watch_url']['destination'], data
 
     if is_adls_enabled():
       response = self.client.post(reverse('notebook:export_result'), {
@@ -585,8 +622,8 @@ class TestNotebookApiMocked(object):
       })
 
       data = json.loads(response.content)
-      assert_equal(0, data['status'], data)
-      assert_equal('adl:/user/hue/path.csv', data['watch_url']['destination'], data)
+      assert 0 == data['status'], data
+      assert 'adl:/user/hue/path.csv' == data['watch_url']['destination'], data
 
 
     response = self.client.post(reverse('notebook:export_result'), {
@@ -598,8 +635,8 @@ class TestNotebookApiMocked(object):
     })
 
     data = json.loads(response.content)
-    assert_equal(-1, data['status'], data)
-    assert_equal('The destination is not an empty directory!', data['message'], data)
+    assert -1 == data['status'], data
+    assert 'The destination is not an empty directory!' == data['message'], data
 
 
   def test_download_result(self):
@@ -634,7 +671,7 @@ class TestNotebookApiMocked(object):
         'format': 'csv'
     })
     content = b"".join(response)
-    assert_true(len(content) > 0)
+    assert len(content) > 0
 
 
 def test_get_interpreters_to_show():
@@ -688,16 +725,13 @@ def test_get_interpreters_to_show():
     notebook.conf.INTERPRETERS_CACHE = None
 
     # 'get_interpreters_to_show should return the same as get_interpreters when interpreters_shown_on_wheel is unset'
-    assert_equal(
-      list(default_interpreters.values()), get_ordered_interpreters()
-    )
+    assert (
+      list(default_interpreters.values()) == get_ordered_interpreters())
 
     resets.append(INTERPRETERS_SHOWN_ON_WHEEL.set_for_testing('java,pig'))
 
-    assert_equal(
-      list(expected_interpreters.values()), get_ordered_interpreters(),
-      'get_interpreters_to_show did not return interpreters in the correct order expected'
-    )
+    assert (
+      list(expected_interpreters.values()) == get_ordered_interpreters()), 'get_interpreters_to_show did not return interpreters in the correct order expected'
   finally:
     for reset in resets:
       reset()
@@ -754,14 +788,10 @@ def test_get_ordered_interpreters():
               }),)
             )
           )
-          assert_equal(
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['phoenix']
-          )
-          assert_equal(  # Check twice because of cache
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['phoenix']
-          )
+          assert [interpreter['dialect'] for interpreter in get_ordered_interpreters()] == ['phoenix']
+
+          # Check twice because of cache(
+          assert [interpreter['dialect'] for interpreter in get_ordered_interpreters()] == ['phoenix']
 
           is_cm_managed.return_value = True
           notebook.conf.INTERPRETERS_CACHE = None
@@ -772,14 +802,9 @@ def test_get_ordered_interpreters():
             )
           )
 
-          assert_equal(
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['hive']
-          )
-          assert_equal(  # Check twice
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['hive']
-          )
+          assert [interpreter['dialect'] for interpreter in get_ordered_interpreters()] == ['hive']
+          # Check twice
+          assert [interpreter['dialect'] for interpreter in get_ordered_interpreters()] == ['hive']
 
           notebook.conf.INTERPRETERS_CACHE = None
 
@@ -791,14 +816,10 @@ def test_get_ordered_interpreters():
               }),)
             )
           )
-          assert_equal(
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['hive', 'phoenix']
-          )
-          assert_equal(  # Check twice
-            [interpreter['dialect'] for interpreter in get_ordered_interpreters()],
-            ['hive', 'phoenix']
-          )
+          assert [interpreter['dialect'] for interpreter in get_ordered_interpreters()] == ['hive', 'phoenix']
+           
+          # Check twice(
+          assert [interpreter['dialect'] for interpreter in get_ordered_interpreters()] == ['hive', 'phoenix']
   finally:
     for reset in resets:
       reset()
@@ -814,19 +835,20 @@ class TestQueriesMetrics(object):
     with patch('desktop.models.Document2.objects') as doc2_value_mock:
       doc2_value_mock.filter.return_value.count.return_value = 12500
       count = num_of_queries()
-      assert_equal(12500, count)
+      assert 12500 == count
 
       if not ENABLE_PROMETHEUS.get():
-        raise SkipTest
+        pytest.skip("Skipping Test")
 
       c = Client()
       response = c.get('/metrics')
-      assert_true(b'hue_queries_numbers 12500.0' in response.content, response.content)
+      assert b'hue_queries_numbers 12500.0' in response.content, response.content
 
 
+@pytest.mark.django_db
 class TestEditor(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
 
     self.user = User.objects.get(username="test")
@@ -844,6 +866,6 @@ class TestEditor(object):
 
       with patch('desktop.middleware.fsmanager') as fsmanager:
         response = self.client.get(reverse('notebook:editor'), {'editor': doc.id, 'is_embeddable': True})
-        assert_equal(200, response.status_code)
+        assert 200 == response.status_code
     finally:
       doc.delete()

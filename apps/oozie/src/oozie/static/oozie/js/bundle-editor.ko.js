@@ -121,7 +121,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
           }
           self.bundle.id(data.id);
           self.bundle.tracker().markCurrentStateAsClean();
-          $(document).trigger("info", data.message);
+          huePubSub.publish('hue.global.info', { message: data.message });
           hueUtils.changeURL('/hue/oozie/editor/bundle/edit/?bundle=' + data.id);
         }
         else {
@@ -137,7 +137,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
 
   self.showSubmitPopup = function () {
     // If self.bundle.id() == null, need to save wf for now
-    $(".jHueNotify").remove();
+    huePubSub.publish('hide.global.alerts');
     if (!self.bundle.isDirty()) {
       hueAnalytics.log('oozie/editor/bundle', 'submit');
       $.get("/oozie/editor/bundle/submit/" + self.bundle.id(), {

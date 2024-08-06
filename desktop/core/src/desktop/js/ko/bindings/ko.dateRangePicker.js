@@ -17,6 +17,9 @@
 import $ from 'jquery';
 import * as ko from 'knockout';
 
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
+import huePubSub from 'utils/huePubSub';
+
 ko.bindingHandlers.dateRangePicker = {
   INTERVAL_OPTIONS: [
     {
@@ -428,10 +431,9 @@ ko.bindingHandlers.dateRangePicker = {
               .find('.end-date')
               .datepicker('setValue', _tmpl.find('.end-date').data('original-val'));
           }
-          // non-sticky error notification
-          $.jHueNotify.notify({
-            level: 'ERROR',
-            message: 'The end cannot be before the starting moment'
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+            message: 'The end cannot be before the starting moment',
+            noStick: true
           });
         }
       } else {

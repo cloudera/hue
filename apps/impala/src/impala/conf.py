@@ -73,6 +73,12 @@ IMPERSONATION_ENABLED = Config(
   type=coerce_bool,
   dynamic_default=is_impersonation_enabled)
 
+COORDINATOR_UI_SPNEGO = Config(
+  key='coordinator_ui_spnego',
+  help=_t("Impala Coordinator Web Server has Spnego enabled."),
+  type=coerce_bool,
+  default=False)
+
 QUERYCACHE_ROWS = Config(
   key='querycache_rows',
   help=_t("Number of initial rows of a resultset to ask Impala to cache in order to"
@@ -121,7 +127,8 @@ CONFIG_WHITELIST = Config(
 USER_SCRATCH_DIR_PERMISSION = Config(
   key="user_scratch_dir_permission",
   help=_t("Due to IMPALA-10272, the importer fails with READ permissions."
-          "Setting this to True, means setting the scratch directory and its file to 777 so the importer does not fail with permission issue."),
+          "Setting this to True, means setting the scratch directory and its file to 777 so the importer "
+          "does not fail with permission issue."),
   type=coerce_bool,
   default=False
 )

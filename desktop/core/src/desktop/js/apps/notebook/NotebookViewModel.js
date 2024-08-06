@@ -35,9 +35,10 @@ import changeURL from 'utils/url/changeURL';
 import changeURLParameter from 'utils/url/changeURLParameter';
 import getParameter from 'utils/url/getParameter';
 import UUID from 'utils/string/UUID';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 
 export default class NotebookViewModel {
-  constructor(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
+  constructor(options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
     const self = this;
 
     self.URLS = {
@@ -144,7 +145,7 @@ export default class NotebookViewModel {
         });
         $.each(notebook.presentationSnippets(), key => {
           // Dead statements
-          if (!key in statementKeys) {
+          if ((!key) in statementKeys) {
             delete notebook.presentationSnippets()[key];
           }
         });
@@ -170,7 +171,6 @@ export default class NotebookViewModel {
       );
       return foundInterpreter?.displayName || foundInterpreter?.name || self.editorType();
     });
-    self.autocompleteTimeout = options.autocompleteTimeout;
     self.selectedNotebook = ko.observable();
 
     self.combinedContent = ko.observable();
@@ -360,7 +360,9 @@ export default class NotebookViewModel {
           const options = {
             successCallback: function (result) {
               if (result && result.exists) {
-                $(document).trigger('info', result.path + ' saved successfully.');
+                huePubSub.publish(GLOBAL_INFO_TOPIC, {
+                  message: result.path + ' saved successfully.'
+                });
               } else {
                 self._ajaxError(result);
               }
@@ -449,14 +451,13 @@ export default class NotebookViewModel {
     };
 
     self.init = function () {
-      if (editor_id) {
-        self.openNotebook(editor_id);
+      const editorId = options?.editorId || getParameter('editor');
+      if (editorId) {
+        self.openNotebook(editorId);
       } else if (getParameter('gist') !== '') {
         self.newNotebook(getParameter('type'));
       } else if (getParameter('editor') !== '') {
         self.openNotebook(getParameter('editor'));
-      } else if (notebooks.length > 0) {
-        self.loadNotebook(notebooks[0]); // Old way of loading json for /browse
       } else if (getParameter('type') !== '') {
         self.newNotebook(getParameter('type'));
       } else {
@@ -617,7 +618,7 @@ export default class NotebookViewModel {
             }
             deferredOpen.resolve();
           } else {
-            huePubSub.publish('hue.global.error', { message: data.message });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
             deferredOpen.reject();
             self.newNotebook();
           }

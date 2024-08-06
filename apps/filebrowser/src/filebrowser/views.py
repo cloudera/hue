@@ -15,106 +15,115 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-
-from django.views.decorators.csrf import csrf_exempt
-from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
-from django.core.files.uploadhandler import FileUploadHandler, StopUpload, StopFutureHandlers
-from hadoop.conf import UPLOAD_CHUNK_SIZE
-
-from builtins import object
+import os
+import re
+import sys
+import stat as stat_module
 import errno
 import logging
-import mimetypes
 import operator
-import os
+import mimetypes
 import posixpath
-import re
-import stat as stat_module
-import sys
-import urllib.request, urllib.error
-
+import urllib.error
+import urllib.request
+from builtins import object
 from bz2 import decompress
 from datetime import datetime
+from functools import partial
 
-from django.core.paginator import EmptyPage, Paginator, Page, InvalidPage
+from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
+from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
+from django.shortcuts import redirect
+from django.template.defaultfilters import filesizeformat, stringformat
 from django.urls import reverse
-from django.template.defaultfilters import stringformat, filesizeformat
-from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified,\
-    HttpResponseForbidden, HttpResponse, HttpResponseRedirect
+from django.utils.html import escape
+from django.utils.http import http_date
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
-from django.shortcuts import redirect
-from functools import partial
-from django.utils.http import http_date
-from django.utils.html import escape
 
 from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
+from aws.s3.upload import S3FineUploaderChunkedUpload
+from azure.abfs.upload import ABFSFineUploaderChunkedUpload
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import RAZ
-from desktop.conf import ENABLE_NEW_STORAGE_BROWSER
-from desktop.lib import fsmanager
-from desktop.lib import i18n
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, RAZ, TASK_SERVER_V2
+from desktop.lib import fsmanager, i18n
 from desktop.lib.conf import coerce_bool
-from desktop.lib.django_util import render, format_preserving_redirect
-from desktop.lib.django_util import JsonResponse
-from desktop.lib.export_csvxls import file_reader
+from desktop.lib.django_util import JsonResponse, format_preserving_redirect, render
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.export_csvxls import file_reader
 from desktop.lib.fs import splitpath
-from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
 from desktop.lib.fs.gc.gs import get_gs_home_directory
+from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+from desktop.lib.fs.ozone.upload import OFSFineUploaderChunkedUpload
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import SAFE_CHARACTERS_URI, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from desktop.lib.view_util import is_ajax
 from desktop.views import serve_403_error
-from hadoop.core_site import get_trash_interval
-from hadoop.fs.hadoopfs import Hdfs
-from hadoop.fs.exceptions import WebHdfsException
-from hadoop.fs.fsutils import do_overwrite_save
-from useradmin.models import User, Group
-
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE,\
-    SHOW_DOWNLOAD_BUTTON, SHOW_UPLOAD_BUTTON, REDIRECT_DOWNLOAD, FILE_DOWNLOAD_CACHE_CONTROL
+from filebrowser.conf import (
+  ARCHIVE_UPLOAD_TEMPDIR,
+  ENABLE_EXTRACT_UPLOADED_ARCHIVE,
+  FILE_DOWNLOAD_CACHE_CONTROL,
+  MAX_SNAPPY_DECOMPRESSION_SIZE,
+  REDIRECT_DOWNLOAD,
+  SHOW_DOWNLOAD_BUTTON,
+  SHOW_UPLOAD_BUTTON,
+)
+from filebrowser.forms import (
+  ChmodFormSet,
+  ChownFormSet,
+  CopyFormSet,
+  EditorForm,
+  MkDirForm,
+  RenameForm,
+  RenameFormSet,
+  RestoreFormSet,
+  RmTreeFormSet,
+  SetReplicationFactorForm,
+  TouchForm,
+  TrashPurgeForm,
+  UploadArchiveForm,
+  UploadFileForm,
+)
+from filebrowser.lib import xxd
 from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
-from filebrowser.lib import xxd
-from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
-    RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
-    TrashPurgeForm, SetReplicationFactorForm
-
+from hadoop.conf import UPLOAD_CHUNK_SIZE
+from hadoop.core_site import get_trash_interval
+from hadoop.fs.exceptions import WebHdfsException
+from hadoop.fs.fsutils import do_overwrite_save
+from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.upload import HDFSFineUploaderChunkedUpload, LocalFineUploaderChunkedUpload
-from aws.s3.upload import S3FineUploaderChunkedUpload
-from azure.abfs.upload import ABFSFineUploaderChunkedUpload
-from desktop.lib.fs.ozone.upload import OFSFineUploaderChunkedUpload
+from useradmin.models import Group, User
 
 if sys.version_info[0] > 2:
   import io
-  from io import StringIO as string_io
-  from urllib.parse import quote as urllib_quote
-  from urllib.parse import unquote as urllib_unquote
-  from urllib.parse import urlparse as lib_urlparse
   from builtins import str as new_str
-  from avro import datafile, io
   from gzip import decompress as decompress_gzip
+  from io import StringIO as string_io
+  from urllib.parse import quote as urllib_quote, unquote as urllib_unquote, urlparse as lib_urlparse
+
+  from avro import datafile, io
   from django.utils.translation import gettext as _
 else:
+  from urllib import quote as urllib_quote, unquote as urllib_unquote
+
   from cStringIO import StringIO as string_io
-  from urllib import quote as urllib_quote
-  from urllib import unquote as urllib_unquote
   from urlparse import urlparse as lib_urlparse
   new_str = unicode
+  from gzip import GzipFile
+
   import parquet
   from avro import datafile, io
-  from gzip import GzipFile
   from django.utils.translation import ugettext as _
 
 
-DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
-MAX_CHUNK_SIZE_BYTES = 1024 * 1024 # 1MB
+DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4  # 4KB
+MAX_CHUNK_SIZE_BYTES = 1024 * 1024  # 1MB
 
 # Defaults for "xxd"-style output.
 # Sentences refer to groups of bytes printed together, within a line.
@@ -125,12 +134,10 @@ BYTES_PER_SENTENCE = 2
 MAX_FILEEDITOR_SIZE = 256 * 1024
 
 INLINE_DISPLAY_MIMETYPE = re.compile(
-    'video/|image/|audio/|application/pdf|application/msword|application/excel|'
-    'application/vnd\.ms|'
-    'application/vnd\.openxmlformats'
+    r'video/|image/|audio/|application/pdf|application/msword|application/excel|application/vnd\.ms|application/vnd\.openxmlformats'
 )
 
-INLINE_DISPLAY_MIMETYPE_EXCEPTIONS = re.compile('image/svg\+xml')
+INLINE_DISPLAY_MIMETYPE_EXCEPTIONS = re.compile(r'image/svg\+xml')
 
 SCHEME_PREFIXES = {
     's3a': 's3a://',
@@ -149,10 +156,11 @@ UPLOAD_CLASSES = {
     'local': LocalFineUploaderChunkedUpload,
 }
 
-if not os.path.exists(ARCHIVE_UPLOAD_TEMPDIR.get()):
+if hasattr(ARCHIVE_UPLOAD_TEMPDIR, 'get') and not os.path.exists(ARCHIVE_UPLOAD_TEMPDIR.get()):
   os.makedirs(ARCHIVE_UPLOAD_TEMPDIR.get())
 
 logger = logging.getLogger()
+
 
 class ParquetOptions(object):
   def __init__(self, col=None, format='json', no_headers=True, limit=-1):
@@ -174,6 +182,7 @@ def index(request):
 
   return view(request, path)
 
+
 def _decode_slashes(path):
   # This is a fix for some installations where the path is still having the slash (/) encoded
   # as %2F while the rest of the path is actually decoded.
@@ -184,6 +193,7 @@ def _decode_slashes(path):
     path = path.replace(encoded_slash, '/')
 
   return path
+
 
 def _normalize_path(path):
   path = _decode_slashes(path)
@@ -196,12 +206,14 @@ def _normalize_path(path):
 
   return path
 
+
 def get_scheme(path):
   path = _normalize_path(path)
   for scheme, prefix in SCHEME_PREFIXES.items():
     if path.startswith(prefix):
       return scheme
   return 'hdfs'
+
 
 def download(request, path):
   """
@@ -272,8 +284,8 @@ def view(request, path):
 
   # default_abfs_home is set in jquery.filechooser.js
   if 'default_abfs_home' in request.GET:
-    from azure.abfs.__init__ import get_home_dir_for_abfs
-    home_dir_path = get_home_dir_for_abfs(request.user)
+    from azure.abfs.__init__ import get_abfs_home_directory
+    home_dir_path = get_abfs_home_directory(request.user)
     if request.fs.isdir(home_dir_path):
       return format_preserving_redirect(
           request,
@@ -426,6 +438,7 @@ def edit(request, path, form=None):
     data['form'] = form
   return render("edit.mako", request, data)
 
+
 def save_file(request):
   """
   The POST endpoint to save a file in the file editor.
@@ -549,6 +562,7 @@ def _massage_page(page, paginator):
       'end_index': page.end_index(),
       'total_count': paginator.count
   }
+
 
 def listdir_paged(request, path):
   """
@@ -684,9 +698,11 @@ def scheme_absolute_path(root, path):
     path = splitPath._replace(scheme=splitRoot.scheme).geturl()
   return path
 
+
 def stat_absolute_path(path, stat):
   stat.path = scheme_absolute_path(path, stat.path)
   return stat
+
 
 def _massage_stats(request, stats):
   """
@@ -1068,7 +1084,7 @@ def detect_snappy(contents):
   try:
     import snappy
     return snappy.isValidCompressed(contents)
-  except:
+  except ImportError:
     logging.exception('failed to detect snappy')
     return False
 
@@ -1088,7 +1104,7 @@ def snappy_installed():
     return True
   except ImportError:
     return False
-  except:
+  except Exception as e:
     logging.exception('failed to verify if snappy is installed')
     return False
 
@@ -1300,6 +1316,7 @@ def rename(request):
 
   return generic_op(RenameForm, request, smart_rename, ["src_path", "dest_path"], None)
 
+
 def set_replication(request):
   def smart_set_replication(src_path, replication_factor):
     result = request.fs.set_replication(urllib_unquote(src_path), replication_factor)
@@ -1307,6 +1324,7 @@ def set_replication(request):
       raise PopupException(_("Setting of replication factor failed"))
 
   return generic_op(SetReplicationFactorForm, request, smart_set_replication, ["src_path", "replication_factor"], None)
+
 
 def mkdir(request):
   def smart_mkdir(path, name):
@@ -1317,6 +1335,7 @@ def mkdir(request):
     request.fs.mkdir(request.fs.join(path, name))
 
   return generic_op(MkDirForm, request, smart_mkdir, ["path", "name"], "path")
+
 
 def touch(request):
   def smart_touch(path, name):
@@ -1333,10 +1352,12 @@ def touch(request):
 
   return generic_op(TouchForm, request, smart_touch, ["path", "name"], "path")
 
+
 @require_http_methods(["POST"])
 def rmtree(request):
   recurring = []
   params = ["path"]
+
   def bulk_rmtree(*args, **kwargs):
     for arg in args:
       request.fs.do_as_user(request.user, request.fs.rmtree, arg['path'], 'skip_trash' in request.GET)
@@ -1350,6 +1371,7 @@ def rmtree(request):
 def move(request):
   recurring = ['dest_path']
   params = ['src_path']
+
   def bulk_move(*args, **kwargs):
     for arg in args:
       if arg['src_path'] == arg['dest_path']:
@@ -1368,6 +1390,7 @@ def move(request):
 def copy(request):
   recurring = ['dest_path']
   params = ['src_path']
+
   def bulk_copy(*args, **kwargs):
     ofs_skip_files = ''
     for arg in args:
@@ -1396,6 +1419,7 @@ def chmod(request):
                "group_read", "group_write", "group_execute",
                "other_read", "other_write", "other_execute"]
   params = ["path"]
+
   def bulk_chmod(*args, **kwargs):
     op = partial(request.fs.chmod, recursive=request.POST.get('recursive', False))
     for arg in args:
@@ -1421,6 +1445,7 @@ def chown(request):
 
   recurring = ["user", "group", "user_other", "group_other"]
   params = ["path"]
+
   def bulk_chown(*args, **kwargs):
     op = partial(request.fs.chown, recursive=request.POST.get('recursive', False))
     for arg in args:
@@ -1437,6 +1462,7 @@ def chown(request):
 def trash_restore(request):
   recurring = []
   params = ["path"]
+
   def bulk_restore(*args, **kwargs):
     for arg in args:
       request.fs.do_as_user(request.user, request.fs.restore, urllib_unquote(arg['path']))
@@ -1450,6 +1476,7 @@ def trash_restore(request):
 def trash_purge(request):
   return generic_op(TrashPurgeForm, request, request.fs.purge_trash, [], None)
 
+
 def _create_response(request, _fs, result="success", data="Success"):
   return {
       'path': _fs.filepath,
@@ -1458,10 +1485,12 @@ def _create_response(request, _fs, result="success", data="Success"):
       'success': True,
       'uuid': _fs.qquuid,
       'status': 0,
-      'data': data
+      'data': data,
+      'task_id': _fs.qquuid
   }
 
-def perform_upload(request, *args, **kwargs):
+
+def perform_upload_task(request, *args, **kwargs):
   """
   Uploads a file to the specified destination.
   Args:
@@ -1479,13 +1508,31 @@ def perform_upload(request, *args, **kwargs):
   """
   scheme = get_scheme(kwargs['dest'])
   upload_class = UPLOAD_CLASSES.get(scheme, LocalFineUploaderChunkedUpload)
-  _fs = upload_class(request, **kwargs)
-  _fs.upload()
-  if scheme == 'hdfs':
-    result = _massage_stats(request, stat_absolute_path(_fs.filepath, request.fs.stats(_fs.filepath)))
+  result = None
+
+  if TASK_SERVER_V2.ENABLED.get():
+    # If task server is enabled, upload the file to the task server.
+    print("Uploading file to task server")
+    _fs = upload_class(request, **kwargs)
+    _fs.check_access()
+    from filebrowser.tasks import error_handler, upload_file_task
+    kwargs["user_id"] = request.user.id
+    kwargs["scheme"] = scheme
+    kwargs["filepath"] = _fs.filepath
+    kwargs["chunk_size"] = _fs.chunk_size
+    task_id = kwargs.get("qquuid")
+    upload_file_task.apply_async(task_id=task_id, args=(), kwargs=kwargs, link_error=error_handler.s(), queue="default")
+    result = "task started %s" % task_id
+    logger.info("Task started %s" % task_id)
   else:
-    result = "success"
+    _fs = upload_class(request, **kwargs)
+    _fs.upload()
+    if scheme == 'hdfs':
+      result = _massage_stats(request, stat_absolute_path(_fs.filepath, request.fs.stats(_fs.filepath)))
+    else:
+      result = "success"
   return _create_response(request, _fs, result=result, data="Success")
+
 
 def extract_upload_data(request, method):
   data = request.POST if method == "POST" else request.GET
@@ -1501,6 +1548,7 @@ def extract_upload_data(request, method):
     "fileFieldLabel": data.get('fileFieldLabel')
   }
   return chunks
+
 
 @require_http_methods(["POST"])
 def upload_chunks(request):
@@ -1525,14 +1573,15 @@ def upload_chunks(request):
     return JsonResponse({'success': True, 'uuid': request.GET.get('qquuid')})
 
   # case where file is smaller than the chunk size
-  if int(request.GET.get("qqtotalparts", 0)) == 0 and int(request.GET.get("qqtotalfilesize", 0)) <= 2000000:
+  if int(request.GET.get("qqtotalparts", 0)) == 0:
     chunks = extract_upload_data(request, "GET")
     try:
-      response = perform_upload(request, **chunks)
+      response = perform_upload_task(request, **chunks)
       return JsonResponse(response)
     except Exception as e:
-      return JsonResponse({'success': False, 'error': 'Error in upload'})
+      return JsonResponse({'success': False, 'error': 'Error in upload %s' % str(e)})
   return JsonResponse({'success': False, 'error': 'Unsupported request method'})
+
 
 @require_http_methods(["POST"])
 def upload_complete(request):
@@ -1545,10 +1594,11 @@ def upload_complete(request):
   """
   chunks = extract_upload_data(request, "POST")
   try:
-    response = perform_upload(request, **chunks)
+    response = perform_upload_task(request, **chunks)
     return JsonResponse(response)
   except Exception as e:
     return JsonResponse({'success': False, 'error': 'Error in upload'})
+
 
 @require_http_methods(["POST"])
 def upload_file(request):
@@ -1604,7 +1654,7 @@ def _upload_file(request):
       except Exception:
         pass
       if already_exists:
-        msg = _('Destination %(name)s already exists.')  % {'name': filepath}
+        msg = _('Destination %(name)s already exists.') % {'name': filepath}
       else:
         msg = _('Copy to %(name)s failed: %(error)s') % {'name': filepath, 'error': ex}
       raise PopupException(msg)
@@ -1657,7 +1707,7 @@ def compress_files_using_batch_job(request):
       except Exception as e:
         response['message'] = _('Exception occurred while compressing files: %s' % e)
     else:
-      response['message'] = _('Error: Output directory is not set.');
+      response['message'] = _('Error: Output directory is not set.')
   else:
     response['message'] = _('ERROR: Configuration parameter enable_extract_uploaded_archive ' +
                             'has to be enabled before calling this method.')
@@ -1687,9 +1737,11 @@ def truncate(toTruncate, charsToKeep=50):
   else:
     return toTruncate
 
+
 def unquote_url(url):
   url = urllib_unquote(url.encode('utf-8') if not isinstance(url, str) else url)
   return url.decode('utf-8') if isinstance(url, bytes) else url
+
 
 def _is_hdfs_superuser(request):
   return request.user.username == request.fs.superuser or request.user.groups.filter(name__exact=request.fs.supergroup).exists()

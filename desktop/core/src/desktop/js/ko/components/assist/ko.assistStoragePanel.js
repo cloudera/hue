@@ -57,7 +57,9 @@ const TEMPLATE = `
             url: '/filebrowser/upload/file?dest=' + (source.type === 'adls' ? 'adl:' : '') + path,
             params: { dest: path },
             paramName: 'hdfs_file',
-            onError: function(x, e){ $(document).trigger('error', e); },
+            onError: function(x, e){
+              huePubSub.publish('hue.global.error', { message: e });
+            },
             onComplete: function () { huePubSub.publish('assist.storage.refresh'); } }" title="${I18n(
               'Upload file'
             )}" href="javascript:void(0)">
@@ -72,7 +74,7 @@ const TEMPLATE = `
             url: '/filebrowser/upload/file?dest=' + abfsPath,
             params: { dest: abfsPath },
             paramName: 'hdfs_file',
-            onError: function(x, e){ $(document).trigger('error', e); },
+            onError: function(x, e){ huePubSub.publish('hue.global.error', { message: e }); },
             onComplete: function () { huePubSub.publish('assist.storage.refresh'); } }" title="${I18n(
               'Upload file'
             )}" href="javascript:void(0)">
@@ -83,7 +85,7 @@ const TEMPLATE = `
       <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.storage.refresh'); }" title="${I18n(
         'Manual refresh'
-      )}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
+      )}"><i class="pointer fa fa-refresh" data-testid="assist-sql--refresh--button" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
 
@@ -131,7 +133,7 @@ const TEMPLATE = `
   <div class="assist-flex-search">
     <div class="assist-filter">
       <form autocomplete="off">
-        <input class="clearable" type="text" placeholder="${I18n(
+        <input class="clearable" data-testid="assist-files--filter--input" type="text" placeholder="${I18n(
           'Filter...'
         )}" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS }
         data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/>

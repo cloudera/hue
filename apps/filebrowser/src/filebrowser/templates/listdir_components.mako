@@ -22,7 +22,7 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
 from desktop.lib.django_util import reverse_with_get, extract_field_data
 from django.utils.encoding import smart_str
 
-from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, FILE_UPLOAD_CHUNK_SIZE, CONCURRENT_MAX_CONNECTIONS
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, FILE_UPLOAD_CHUNK_SIZE, CONCURRENT_MAX_CONNECTIONS, MAX_FILE_SIZE_UPLOAD_LIMIT
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -702,7 +702,8 @@ else:
     <div class="qq-uploader-selector" style="margin-left: 10px">
         <div class="qq-upload-drop-area-selector" qq-hide-dropzone><span>${_('Drop the files here to upload')}</span></div>
         <div class="qq-upload-button-selector qq-no-float">${_('Select files')}</div> &nbsp;
-        <span class="muted">${_('or drag and drop them here')}</span>
+        <span class="muted">${_('or drag and drop them here')}</span> &nbsp;
+        <span class="muted free-space-info"></span>
 
         <ul class="qq-upload-list-selector qq-upload-files unstyled qq-no-float" style="margin-right: 0;">
             <li>
@@ -1107,6 +1108,10 @@ else:
 
       self.isOFS = ko.pureComputed(function () {
         return self.currentPath().toLowerCase().indexOf('ofs://') === 0;
+      });
+
+      self.isTaskServerEnabled = ko.computed(function() {
+        return window.getLastKnownConfig().hue_config.enable_chunked_file_uploader && window.getLastKnownConfig().hue_config.enable_task_server;
       });
 
       self.scheme = ko.pureComputed(function () {
@@ -1533,14 +1538,18 @@ else:
               self.retrieveData(true);
             },
             error: function(xhr){
-              $.jHueNotify.error(xhr.responseText);
+              huePubSub.publish('hue.global.error', {
+                message: xhr.responseText
+              });
               resetPrimaryButtonsStatus();
               $('#moveDestination').val('');
             }
           });
 
           if (mode === 'nomodal') {
-            $.jHueNotify.info('${ _('Items moving to') } "' + $('#moveDestination').val() + '"');
+            huePubSub.publish('hue.global.info', {
+              message: "${ _('Items moving to') } \"" + $('#moveDestination').val() + '"'
+            });
             $("#moveForm").submit();
           } else {
             $("#moveModal").modal({
@@ -1573,7 +1582,9 @@ else:
           }
         }
         else {
-          $.jHueNotify.warn("${ _('You cannot copy a folder into itself.') }");
+          huePubSub.publish('hue.global.warning', {
+            message: "${ _('You cannot copy a folder into itself.') }"
+          });
           $('#moveDestination').val('');
         }
       };
@@ -1602,7 +1613,9 @@ else:
             self.retrieveData(true);
           },
           error: function(xhr){
-            $.jHueNotify.error(xhr.responseText);
+            huePubSub.publish('hue.global.error', {
+              message: xhr.responseText
+            });
             resetPrimaryButtonsStatus();
           }
         });
@@ -1791,7 +1804,9 @@ else:
         const path = $('<input>').val(self.selectedFile().path).appendTo('body').select()
         document.execCommand('copy');
         path.remove();
-        $.jHueNotify.info('${_('Path copied successfully to the clipboard')}');
+        huePubSub.publish('hue.global.info', {
+          message: "${_('Path copied successfully to the clipboard')}"
+        });
       }
 
       self.openInImporter = function () {
@@ -1810,7 +1825,9 @@ else:
             $('#submit-wf-modal').modal('show');
           });
         % else:
-          $.jHueNotify.warn("${ _('Submitting is not available as the Oozie app is disabled') }");
+          huePubSub.publish('hue.global.warning', {
+            message: "${ _('Submitting is not available as the Oozie app is disabled') }"
+          });
         % endif
       };
 
@@ -1863,7 +1880,9 @@ else:
           "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (data) {
           if (data.status == 0) {
-            $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
+            huePubSub.publish('hue.global.info', {
+              message: "${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }"
+            });
             huePubSub.publish('notebook.task.submitted', data);
           } else {
             huePubSub.publish('hue.global.error', {message: data.message});
@@ -1899,7 +1918,9 @@ else:
           "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (data) {
           if (data.status == 0) {
-            $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
+            huePubSub.publish('hue.global.info', {
+              message: "${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }"
+            });
             huePubSub.publish('notebook.task.submitted', data);
           } else {
             huePubSub.publish('hue.global.error', {message: data.message});
@@ -2045,9 +2066,190 @@ else:
         });
       };
 
-      self.uploadFile = (function () {
-          var uploader;  
-          if (window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) {
+      function pollForTaskProgress(taskId, listItem, fileName) {
+        var taskStatus = 'pending';
+        var pollingInterval = 10000;
+
+        var doPoll = function() {
+          if (taskStatus === 'pending') {
+            $.get('/desktop/api2/taskserver/check_upload_status/' + taskId, function(data) {
+              if (data.isFinalized || data.isFailure || data.is_revoked) {
+                taskStatus = data.isFinalized ? 'finalized' : 'failed';
+
+                if (data.isFinalized) {
+                  listItem.find('.progress-row-bar').css('width', '100%');
+                  listItem.find('.progress-row-text').text('Upload complete.');
+                  $(document).trigger('info', fileName + "${ _(' uploaded successfully.') }");
+                  self.retrieveData(true);
+                } else if (data.isFailure) {
+                  listItem.find('.progress-row-bar').css('width', '100%');
+                  listItem.find('.progress-row-text').text('Upload failed.');
+                  $(document).trigger('error', fileName + "${ _(' file upload failed. Please check the logs for task id: ') }" + taskId);
+                }
+                
+              } else if (data.isRunning) {
+                var progressPercentage = 90; // Adjust based on data.progress if available
+                listItem.find('.progress-row-bar').css('width', progressPercentage + '%');
+                setTimeout(doPoll, pollingInterval);
+              }
+            }).fail(function(xhr, textStatus, errorThrown) {
+              if (xhr.status === 404) {
+                setTimeout(doPoll, pollingInterval); // Retry after 10 seconds
+              }
+            });
+          }
+        };
+        self.retrieveData(true);
+        doPoll();
+      }
+
+      self.checkAndDisplayAvailableSpace = function () {
+        $.ajax({
+            url: '/filebrowser/upload/taskserver/get_available_space_for_file_uploads/',
+            success: function(response) {
+                if (typeof window.MAX_FILE_SIZE_UPLOAD_LIMIT === 'undefined') {
+                  window.MAX_FILE_SIZE_UPLOAD_LIMIT = 5 * 1024 * 1024 * 1024; // 5GB in bytes
+                }
+                var freeSpace = Math.min(response.upload_available_space, window.MAX_FILE_SIZE_UPLOAD_LIMIT);
+                $('.free-space-info').text('- Max file size upload limit: ' + formatBytes(freeSpace));
+            },
+            error: function(xhr, status, error) {
+                huePubSub.publish('hue.global.error', { message: '${ _("Error checking available space: ") }' + error});
+                $('.free-space-info').text('Error checking available space');
+            }
+        });
+      };
+ 
+
+      self.uploadFile = (function () {  
+          var uploader; 
+          var scheduleUpload;
+          
+          if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && (window.getLastKnownConfig().hue_config.enable_task_server))  {
+            
+            self.pendingUploads(0);
+            var action = "/filebrowser/upload/chunks/";
+            self.taskIds = [];
+            self.listItems = [];
+            self.checkAndDisplayAvailableSpace();
+            uploader = new qq.FileUploader({
+              element: document.getElementById("fileUploader"),
+              request: {
+                  endpoint: action,
+                  paramsInBody: false,
+                  params: {
+                      dest: self.currentPath(),
+                      inputName: "hdfs_file"
+                  }
+              },
+              maxConnections: window.CONCURRENT_MAX_CONNECTIONS || 5,
+              chunking: {
+                  enabled: true,
+                  concurrent: {
+                      enabled: true
+                  },
+                  partSize: window.FILE_UPLOAD_CHUNK_SIZE || 5242880,
+                  success: {
+                      endpoint: "/filebrowser/upload/complete/"
+                  },
+                  paramNames: {
+                      partIndex: "qqpartindex",
+                      partByteOffset: "qqpartbyteoffset",
+                      chunkSize: "qqchunksize",
+                      totalFileSize: "qqtotalfilesize",
+                      totalParts: "qqtotalparts"
+                  }
+              },
+
+              template: 'qq-template',
+              callbacks: {
+                  onProgress: function (id, fileName, loaded, total) {
+
+                    $('.qq-upload-files').find('li').each(function(){
+                      var listItem = $(this);
+                      if (listItem.find('.qq-upload-file-selector').text() == fileName){
+                        //cap the progress at 80%
+                        listItem.find('.progress-row-bar').css('width', (loaded/total)*80 + '%');
+                        if ((loaded/total) === 80) {
+                          listItem.find('.progress-row-text').text('Finalizing upload...');
+                        }
+                      }
+                    });            
+                  },
+
+                  onComplete: function (id, fileName, response) {
+                    self.pendingUploads(self.pendingUploads() - 1);
+                    if (response.status != 0) {
+                      huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
+                    }
+                    else {
+                      var task_id = response.task_id;
+                      self.taskIds.push(task_id);
+                      var listItem = $('.qq-upload-files').find('li').filter(function() {
+                        return $(this).find('.qq-upload-file-selector').text() === fileName;
+                      });
+                      self.listItems.push(listItem);
+                        if (scheduleUpload && self.pendingUploads() === 0) {
+                          $('#uploadFileModal').modal('hide');
+                          huePubSub.publish('hue.global.info', { message: '${ _("File upload scheduled. Please check the task server page for progress.") }'});
+                        }
+                        // Add a delay of 2 seconds before calling pollForTaskProgress, to ensure the upload task is received by the task_server before checking its status. 
+                        setTimeout(function() {
+                          pollForTaskProgress(response.task_id, listItem, fileName);
+                        }, 2000);  
+                      self.filesToHighlight.push(response.path);                       
+                    }
+                    if (self.pendingUploads() === 0) {                    
+                      self.taskIds=[];
+                      self.listItems=[];
+                      self.retrieveData(true);
+                    }
+                  },
+                  onSubmit: function (id, fileName, responseJSON) {
+                      var deferred = new qq.Promise(); // Create a promise to defer the upload
+                      var uploader = this;
+                      
+                      // Make an AJAX request to check available disk space
+                      $.ajax({
+                        url: '/filebrowser/upload/taskserver/get_available_space_for_file_uploads/',
+                        success: function(response) {
+                          if (typeof window.MAX_FILE_SIZE_UPLOAD_LIMIT === 'undefined' || window.MAX_FILE_SIZE_UPLOAD_LIMIT === -1) {
+                            window.MAX_FILE_SIZE_UPLOAD_LIMIT = 5 * 1024 * 1024 * 1024; // 5GB in bytes
+                          }
+                          var freeSpace = Math.min(response.upload_available_space, window.MAX_FILE_SIZE_UPLOAD_LIMIT);
+                          var file = uploader.getFile(id); // Use the stored reference
+                          // Update the free space display
+                          $('.free-space-info').text('- Max file size upload limit: ' + formatBytes(freeSpace));
+                          if ((file.size > freeSpace) || (file.size > window.MAX_FILE_SIZE_UPLOAD_LIMIT)) {
+                            huePubSub.publish('hue.global.error', { message: '${ _("Not enough space available to upload this file.") }'});
+                            deferred.failure(); // Reject the promise to cancel the upload
+                          } else if (file.size > window.MAX_FILE_SIZE_UPLOAD_LIMIT) {
+                            huePubSub.publish('hue.global.error', { message: '${ _("File size is bigger than MAX_FILE_SIZE_UPLOAD_LIMIT.") }'});
+                            deferred.failure(); // Reject the promise to cancel the upload
+                          } else {
+                            var newPath = "/filebrowser/upload/chunks/file?dest=" + encodeURIComponent(self.currentPath().normalize('NFC'));
+                            uploader.setEndpoint(newPath);
+                            self.pendingUploads(self.pendingUploads() + 1);
+                            deferred.success(); // Resolve the promise to allow the upload
+                          }
+                        },
+                        error: function(xhr, status, error) {
+                          huePubSub.publish('hue.global.error', { message: '${ _("Error checking available space: ") }' + error});
+                          deferred.failure(); // Reject the promise to cancel the upload
+                        }
+                      });
+
+                      return deferred; // Return the promise to Fine Uploader
+                  },
+                  onCancel: function (id, fileName) {
+                    self.pendingUploads(self.pendingUploads() - 1);
+                  }
+              },
+              debug: false
+            });
+          }
+          // Chunked Fileuploader without Taskserver
+          else if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && !(window.getLastKnownConfig().hue_config.enable_task_server)) {
             self.pendingUploads(0);
             var action = "/filebrowser/upload/chunks/";
             uploader = new qq.FileUploader({
@@ -2082,7 +2284,6 @@ else:
               template: 'qq-template',
               callbacks: {
                   onProgress: function (id, fileName, loaded, total) {
-                  console.log(loaded);
                   $('.qq-upload-files').find('li').each(function(){
                     var listItem = $(this);
                     if (listItem.find('.qq-upload-file-selector').text() == fileName){
@@ -2093,10 +2294,10 @@ else:
                   onComplete: function (id, fileName, response) {
                     self.pendingUploads(self.pendingUploads() - 1);
                     if (response.status != 0) {
-                      $(document).trigger('error', "${ _('Error: ') }" + response.data);
+                      huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
                     }
                     else {
-                      $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+                      huePubSub.publish('hue.global.info', {message: response.path + "${ _(' uploaded successfully.') }"});
                       self.filesToHighlight.push(response.path);
                     }
                     if (self.pendingUploads() == 0) {
@@ -2121,6 +2322,7 @@ else:
               debug: false
             });
           }
+          //Regular fileuploads
           else {
             self.pendingUploads(0);
             var action = "/filebrowser/upload/file";
@@ -2158,10 +2360,11 @@ else:
               onComplete: function (id, fileName, response) {
                 self.pendingUploads(self.pendingUploads() - 1);
                 if (response.status != 0) {
-                  $(document).trigger('error', "${ _('Error: ') }" + response.data);
+                  huePubSub.publish('hue.global.error', {message: "${ _('Error: ') }" + response.data});
+                  
                 }
                 else {
-                  $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+                  huePubSub.publish('hue.global.info', {message: response.path + "${ _(' uploaded successfully.') }"});
                   self.filesToHighlight.push(response.path);
                 }
                 if (self.pendingUploads() == 0) {
@@ -2194,7 +2397,8 @@ else:
           });
         });
 
-        return function () {
+        return function (isScheduled) {
+          scheduleUpload = isScheduled;
           $("#uploadFileModal").modal({
             show: true
           });
@@ -2365,7 +2569,9 @@ else:
               $('#progressStatusBar div').width(progress.toFixed() + "%");
             },
             canceled: function () {
-              $.jHueNotify.info(I18n('The upload has been canceled'));
+              huePubSub.publish('hue.global.info', {
+                message: I18n('The upload has been canceled')
+              });
             },
             complete: function (data) {
               if (data.xhr.response != '') {
@@ -2374,7 +2580,7 @@ else:
                   if (response.status != 0) {
                     huePubSub.publish('hue.global.error', {message: response.data});
                   } else {
-                    $(document).trigger('info', response.path + ' ' + I18n('uploaded successfully'));
+                    huePubSub.publish('hue.global.info', { message: response.path + ' ' + I18n('uploaded successfully')});
                     fileBrowserViewModel.filesToHighlight.push(response.path);
                   }
                 }
@@ -2508,7 +2714,9 @@ else:
           }
         });
         if(isMoveOnSelf){
-          $.jHueNotify.warn("${ _('You cannot copy a folder into itself.') }");
+          huePubSub.publish('hue.global.warning', {
+            message: "${ _('You cannot copy a folder into itself.') }"
+          });
           $('#moveDestination').val('');
           return false;
         }
@@ -2572,7 +2780,9 @@ else:
 
       huePubSub.subscribe('submit.popup.return', function (data) {
         if (data.type == 'external_workflow') {
-          $.jHueNotify.info('${_('Workflow submitted.')}');
+          huePubSub.publish('hue.global.info', {
+            message: "${_('Workflow submitted.')}"
+          });
           huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
           huePubSub.publish('browser.job.open.link', data.job_id);
           $('.submit-modal').modal('hide');
@@ -2667,7 +2877,9 @@ else:
         onEnter: function (el) {
           var target_path = stripHashes(el.val());
           if (el.val().split('/')[2] === '' && window.RAZ_IS_ENABLED){
-            $.jHueNotify.warn("${ _('Listing of buckets is not allowed. Redirecting to the home directory.') }");
+            huePubSub.publish('hue.global.warning', {
+              message: "${ _('Listing of buckets is not allowed. Redirecting to the home directory.') }"
+            });
             target_path = window.USER_HOME_DIR;
           } 
           fileBrowserViewModel.targetPath("${url('filebrowser:filebrowser.views.view', path='')}" + encodeURIComponent(target_path)); 

@@ -27,6 +27,7 @@ import waitForVariable from 'utils/timing/waitForVariable';
 import getParameter from 'utils/url/getParameter';
 import getSearchParameter from 'utils/url/getSearchParameter';
 import { ASSIST_GET_DATABASE_EVENT, ASSIST_GET_SOURCE_EVENT } from 'ko/components/assist/events';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
 
 class OnePageViewModel {
   constructor() {
@@ -412,11 +413,11 @@ class OnePageViewModel {
             } else if (app !== '500') {
               self.loadApp('500');
             } else {
-              $.jHueNotify.error(
-                I18n(
+              huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+                message: I18n(
                   'It looks like you are offline or an unknown error happened. Please refresh the page.'
                 )
-              );
+              });
             }
           }
         });
@@ -555,6 +556,12 @@ class OnePageViewModel {
           self.getActiveAppViewModel(viewModel => {
             viewModel.fetchMetrics();
           });
+        }
+      },
+      {
+        url: '/task_server',
+        app: function () {
+          self.loadApp('taskserver');
         }
       },
       {

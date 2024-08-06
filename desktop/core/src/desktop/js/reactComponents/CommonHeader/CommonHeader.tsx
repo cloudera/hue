@@ -34,9 +34,9 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({ title, icon, testId }) => {
       <div className="hue-header-icon" data-testid={`${testId}-icon`}>
         {icon}
       </div>
-      <div className="hue-header-title" data-testid={`${testId}-title`}>
+      <h2 className="hue-header-title" data-testid={`${testId}-title`}>
         {title}
-      </div>
+      </h2>
       {/* TODO: Add actions dropdown*/}
     </div>
   );

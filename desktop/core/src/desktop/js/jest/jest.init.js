@@ -27,6 +27,7 @@ import axios from 'axios';
 import $ from 'jquery';
 import * as ko from 'knockout';
 import komapping from 'knockout.mapping';
+import { getAxiosInstance } from 'api/utils';
 
 ko.mapping = komapping;
 
@@ -38,7 +39,6 @@ class Autocomplete {}
 
 const globalVars = {
   ko: ko,
-  AUTOCOMPLETE_TIMEOUT: 1,
   CACHEABLE_TTL: 1,
   HAS_LINK_SHARING: true,
   HAS_SQL_ANALYZER: false,
@@ -111,11 +111,14 @@ $.ajaxSetup({
   }
 });
 
-axios.interceptors.request.use(config => {
+const axiosConfigInterceptor = config => {
   console.warn('Actual axios ajax request made to url: ' + config.url);
   console.trace();
   return config;
-});
+};
+
+axios.interceptors.request.use(axiosConfigInterceptor);
+getAxiosInstance().interceptors.request.use(axiosConfigInterceptor);
 
 process.on('unhandledRejection', err => {
   fail(err);
@@ -123,3 +126,19 @@ process.on('unhandledRejection', err => {
 
 jest.mock('../utils/i18nReact');
 jest.mock('../utils/hueAnalytics');
+
+//Official workaround for TypeError: window.matchMedia is not a function
+//learn more: https://jestjs.io/docs/manual-mocks#mocking-methods-which-are-not-implemented-in-jsdom
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // Deprecated
+    removeListener: jest.fn(), // Deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn()
+  }))
+});

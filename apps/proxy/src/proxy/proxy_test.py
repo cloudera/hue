@@ -24,9 +24,9 @@ from builtins import str
 import threading
 import logging
 import http.server
+import pytest
 import sys
 
-from nose.tools import assert_true, assert_false
 from django.test.client import Client
 from desktop.lib.django_test_util import make_logged_in_client
 
@@ -75,7 +75,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                    self.log_date_time_string(),
                    fmt % args))
 
-
+@pytest.mark.django_db
 def run_test_server():
   """
   Returns the server, and a method to close it out.
@@ -91,11 +91,12 @@ def run_test_server():
     # Make sure the server thread is done.
     print("Closing thread " + str(thread))
     thread.join(10.0) # Wait at most 10 seconds
-    assert_false(thread.is_alive())
+    assert not thread.is_alive()
 
   return httpd, finish
 run_test_server.__test__ = False
 
+@pytest.mark.django_db
 def test_proxy_get():
   """
   Proxying test.
@@ -110,19 +111,20 @@ def test_proxy_get():
       response_get = client.get('/proxy/127.0.0.1/%s/' % httpd.server_port, dict(foo="bar"))
     finally:
       finish_conf()
-    assert_true(b"Hello there" in response_get.content)
-    assert_true(b"You requested: /?foo=bar." in response_get.content)
+    assert b"Hello there" in response_get.content
+    assert b"You requested: /?foo=bar." in response_get.content
     proxy_url = "/proxy/127.0.0.1/%s/foo.jpg" % httpd.server_port
     if not isinstance(proxy_url, bytes):
       proxy_url = proxy_url.encode('utf-8')
-    assert_true(proxy_url in response_get.content)
+    assert proxy_url in response_get.content
     proxy_url = "/proxy/127.0.0.1/%s/baz?with=parameter" % httpd.server_port
     if not isinstance(proxy_url, bytes):
       proxy_url = proxy_url.encode('utf-8')
-    assert_true(proxy_url in response_get.content)
+    assert proxy_url in response_get.content
   finally:
     finish()
 
+@pytest.mark.django_db
 def test_proxy_post():
   """
   Proxying test, using POST.
@@ -136,13 +138,14 @@ def test_proxy_post():
       response_post = client.post('/proxy/127.0.0.1/%s/' % httpd.server_port, dict(foo="bar", foo2="bar"))
     finally:
       finish_conf()
-    assert_true(b"Hello there" in response_post.content)
-    assert_true(b"You requested: /." in response_post.content)
-    assert_true(b"foo=bar" in response_post.content)
-    assert_true(b"foo2=bar" in response_post.content)
+    assert b"Hello there" in response_post.content
+    assert b"You requested: /." in response_post.content
+    assert b"foo=bar" in response_post.content
+    assert b"foo2=bar" in response_post.content
   finally:
     finish()
 
+@pytest.mark.django_db
 def test_blacklist():
   client = make_logged_in_client('test')
   finish_confs = [
@@ -152,13 +155,13 @@ def test_blacklist():
   try:
     # Request 1: Hit the blacklist
     resp = client.get('/proxy/localhost/1234//foo//fred/')
-    assert_true(b"is blocked" in resp.content)
+    assert b"is blocked" in resp.content
 
     # Request 2: This is not a match
     httpd, finish = run_test_server()
     try:
       resp = client.get('/proxy/localhost/%s//foo//fred_ok' % (httpd.server_port,))
-      assert_true(b"Hello there" in resp.content)
+      assert b"Hello there" in resp.content
     finally:
       finish()
   finally:
@@ -183,21 +186,17 @@ def test_rewriting():
   Tests that simple re-writing is working.
   """
   html = "<a href='foo'>bar</a><a href='http://alpha.com'>baz</a>"
-  assert_true(b'<a href="/proxy/abc.com/80/sub/foo">bar</a>' in _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/")),
-    msg="Relative links")
-  assert_true(b'<a href="/proxy/alpha.com/80/">baz</a>' in _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/")),
-    msg="Absolute links")
+  assert b'<a href="/proxy/abc.com/80/sub/foo">bar</a>' in _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/")), "Relative links"
+  assert b'<a href="/proxy/alpha.com/80/">baz</a>' in _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/")), "Absolute links"
 
   # Test url with port and invalid port
   html = "<a href='http://alpha.com:1234/bar'>bar</a><a href='http://alpha.com:-1/baz'>baz</a>"
-  assert_true(b'<a href="/proxy/alpha.com/1234/bar">bar</a><a>baz</a>' in
-              _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/")),
-              msg="URL with invalid port")
+  assert (b'<a href="/proxy/alpha.com/1234/bar">bar</a><a>baz</a>' in
+              _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/"))), "URL with invalid port"
 
   html = """
   <img src="/static/hadoop-logo.jpg"/><br>
   """
   rewritten = _rewrite_links(UrlLibFileWrapper(html, "http://abc.com/sub/"))
-  assert_true(b'<img src="/proxy/abc.com/80/static/hadoop-logo.jpg">' in
-              rewritten,
-              msg="Rewrite images")
+  assert (b'<img src="/proxy/abc.com/80/static/hadoop-logo.jpg">' in
+              rewritten), "Rewrite images"

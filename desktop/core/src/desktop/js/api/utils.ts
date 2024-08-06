@@ -16,14 +16,17 @@
 
 import axios, {
   AxiosError,
+  AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
-  AxiosTransformer,
+  AxiosResponseTransformer,
   CancelToken
 } from 'axios';
 import qs from 'qs';
 
 import { CancellablePromise } from './cancellablePromise';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
+import { HueAlert } from 'reactComponents/GlobalAlert/types';
 import { hueWindow } from 'types/types';
 import huePubSub from 'utils/huePubSub';
 import logError from 'utils/logError';
@@ -42,7 +45,7 @@ export interface DefaultApiResponse {
 export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
   silenceErrors?: boolean;
   ignoreSuccessErrors?: boolean;
-  transformResponse?: AxiosTransformer;
+  transformResponse?: AxiosResponseTransformer;
   qsEncodeData?: boolean;
   handleSuccess?: (
     response: T & DefaultApiResponse,
@@ -77,6 +80,8 @@ axiosInstance.interceptors.response.use(response => {
   }
   return response;
 });
+
+export const getAxiosInstance = (): AxiosInstance => axiosInstance;
 
 export const setBaseUrl = (newBaseUrl: string): void => {
   baseUrl = newBaseUrl;
@@ -143,7 +148,7 @@ const notifyError = <T>(
   if (!options || !options.silenceErrors) {
     logError(response);
     if (message.indexOf('AuthorizationException') === -1) {
-      huePubSub.publish('hue.error', message);
+      huePubSub.publish<HueAlert>(GLOBAL_ERROR_TOPIC, { message });
     }
   }
 };

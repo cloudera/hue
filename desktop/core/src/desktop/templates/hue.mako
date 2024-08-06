@@ -35,6 +35,7 @@
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
+<%namespace name="jbCommon" file="/job_browser_common.mako" />
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -123,12 +124,6 @@
   </script>
 % endif
 
-<div id="jHueNotify" class="alert hide">
-  <button class="close">&times;</button>
-  <div class="message"></div> 
-</div>
-
-
 ${ hueIcons.symbols() }
 
 <!-- fake fields are a workaround for chrome autofill getting the wrong fields, readonly needed for 1password -->
@@ -140,7 +135,7 @@ ${ hueIcons.symbols() }
 
   <div class="main-page">
     <AppBanner data-reactcomponent='AppBanner'></AppBanner>
-    <AlertComponent data-reactcomponent='AlertComponent'></AlertComponent>
+    <GlobalAlert data-reactcomponent='GlobalAlert'></GlobalAlert>
     <WelcomeTour data-reactcomponent='WelcomeTour'></WelcomeTour>
 
     <nav class="navbar navbar-default">
@@ -254,6 +249,7 @@ ${ hueIcons.symbols() }
         <div id="embeddable_dump_config" class="embeddable"></div>
         <div id="embeddable_threads" class="embeddable"></div>
         <div id="embeddable_metrics" class="embeddable"></div>
+        <div id="embeddable_taskserver" class="embeddable"></div>
         <div id="embeddable_connectors" class="embeddable"></div>
         <div id="embeddable_analytics" class="embeddable"></div>
         <div id="embeddable_403" class="embeddable"></div>
@@ -339,6 +335,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
 ${ commonHeaderFooterComponents.footer(messages) }
+
+## This includes common knockout templates that are shared with the Job Browser page and the mini job browser panel
+## available in the upper right corner throughout Hue
+%if 'jobbrowser' in apps:
+${ jbCommon.include() }
+%endif
 
 <div class="monospace-preload" style="opacity: 0; height: 0; width: 0;">
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }

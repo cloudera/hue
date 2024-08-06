@@ -1173,7 +1173,6 @@ var autocompleter = new AceAutocompleteWrapper({
   user: HIVE_AUTOCOMPLETE_USER,
   oldEditor: true,
   optEnabled: false,
-  timeout: AUTOCOMPLETE_TIMEOUT
 });
 
 var truncateOutput = function (obj) {
@@ -1739,7 +1738,9 @@ $(document).ready(function () {
 
   $("#download-excel").click(function () {
     if (viewModel.design.results.columns().length > 255) {
-      $.jHueNotify.warn("${ _('Results exceeds maximum number of columns permitted by Excel, will truncate results to 255 columns.') }")
+      huePubSub.publish('hue.global.warning', {
+        message: "${ _('Results exceeds maximum number of columns permitted by Excel, will truncate results to 255 columns.') }"
+      });
     }
   });
 
@@ -2249,7 +2250,9 @@ function trySaveAsDesign() {
     $('#saveAs').find('.control-group').removeClass('error');
     hueAnalytics.log('beeswax', 'design/save-as');
   } else if (viewModel.design.name()) {
-    $.jHueNotify.error("${_('No query provided to save.')}");
+    huePubSub.publish('hue.global.error', {
+      message: "${_('No query provided to save.')}"
+    });
     $('#saveAs').modal('hide');
   } else {
     $('#saveas-query-name').addClass('error');
@@ -2356,7 +2359,9 @@ function formatQuery() {
       }
       viewModel.design.query.value(codeMirror.getValue());
     } else {
-      $.jHueNotify.error(data);
+      huePubSub.publish('hue.global.error', {
+        message: data
+      });
     }
   });
 }
@@ -2392,7 +2397,7 @@ $(document).on('server.unmanageable_error', function (e, responseText) {
 // Other
 $(document).on('saved.design', function (e, id) {
   $('#saveAs').modal('hide');
-  $(document).trigger('info', "${_('Query saved.')}");
+  huePubSub.publish('hue.global.info', { message: "${_('Query saved.')}"});
   huePubSub.publish('open.link', "/${ app_name }/execute/design/" + id);
 });
 $(document).on('error_save.design', function (e, message) {
@@ -2440,7 +2445,7 @@ $(document).on('error_cancel.query', function (e, message) {
   huePubSub.publish('hue.global.error', {message: "${ _('Problem: ') }" + message});
 });
 $(document).on('cancelled.query', function (e) {
-  $(document).trigger("info", "${ _('Query canceled!') }")
+  huePubSub.publish('hue.global.info', { message: "${ _('Query canceled!') }"});
 });
 
 function updateSidebarTooltips(selector) {

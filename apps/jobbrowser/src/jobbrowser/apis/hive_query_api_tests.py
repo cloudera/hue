@@ -18,31 +18,27 @@
 
 import json
 import logging
+import pytest
 import sys
 
 from django.db import connection
 from django.urls import reverse
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_raises
 
 from desktop.auth.backend import rewrite_user
 from desktop.conf import QUERY_DATABASE
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 
 LOG = logging.getLogger()
 
 
-
+@pytest.mark.django_db
 class TestHiveQueryApiNotebook():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
 
@@ -70,4 +66,4 @@ class TestHiveQueryApiNotebook():
         is_task=False,
       )
 
-      assert_equal(0, response_data['status'])
+      assert 0 == response_data['status']

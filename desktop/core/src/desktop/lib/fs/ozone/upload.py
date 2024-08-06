@@ -15,8 +15,8 @@
 # limitations under the License.
 
 import io
-import logging
 import sys
+import logging
 import unicodedata
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -31,10 +31,12 @@ if sys.version_info[0] > 2:
 else:
   from django.utils.translation import ugettext as _
 
+from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
-from filebrowser.utils import generate_chunks, calculate_total_size
+from filebrowser.utils import calculate_total_size, generate_chunks
 
 LOG = logging.getLogger()
+
 
 class OFSFineUploaderChunkedUpload(object):
   def __init__(self, request, *args, **kwargs):
@@ -43,8 +45,10 @@ class OFSFineUploaderChunkedUpload(object):
     self.totalfilesize = kwargs.get('qqtotalfilesize')
     self.file_name = kwargs.get('qqfilename')
     if self.file_name:
-      self.file_name = unicodedata.normalize('NFC', self.file_name) # Normalize unicode
+      self.file_name = unicodedata.normalize('NFC', self.file_name)  # Normalize unicode
     self.chunk_size = UPLOAD_CHUNK_SIZE.get()
+    if kwargs.get('chunk_size', None):
+      self.chunk_size = kwargs.get('chunk_size')
     self.destination = kwargs.get('dest', None)  # GET param avoids infinite looping
     self.target_path = None
     self.file = None
@@ -64,6 +68,7 @@ class OFSFineUploaderChunkedUpload(object):
       LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
       LOG.info('OFSFineUploaderChunkedUpload: inside check_access function.')
       self.target_path = self._fs.join(self.destination, self.file_name)
+      self.filepath = self.target_path
 
     if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
       raise PopupException(_('OFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s') %
@@ -71,6 +76,27 @@ class OFSFineUploaderChunkedUpload(object):
 
   def upload_chunks(self):
     LOG.debug("OFSFineUploaderChunkedUpload: upload_chunks")
+
+    if TASK_SERVER_V2.ENABLED.get():
+      if self._is_ofs_upload():
+        self._fs = self._get_ofs(self._request)
+
+        # Verify that the path exists
+        try:
+          self._fs.stats(self.destination)
+        except Exception as e:
+          raise PopupException(_('Destination path does not exist: %s' % self.destination))
+
+        LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
+        LOG.info('OFSFineUploaderChunkedUpload: inside check_access function.')
+        self.target_path = self._fs.join(self.destination, self.file_name)
+        self.filepath = self.target_path
+
+      if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
+        raise PopupException(
+          _('OFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s') %
+          {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize})
+
     try:
       LOG.debug("OFSFineUploaderChunkedUpload: uploading file part with size: %s" % self._part_size)
       fp = io.BytesIO()
@@ -173,7 +199,6 @@ class OFSFileUploadHandler(FileUploadHandler):
 
     LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
 
-
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_ofs_upload():
       super(OFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
@@ -192,7 +217,6 @@ class OFSFileUploadHandler(FileUploadHandler):
         self.request.META['upload_failed'] = e
         raise StopUpload()
 
-
   def receive_data_chunk(self, raw_data, start):
     if self._is_ofs_upload():
       LOG.debug("OFSfileUploadHandler receive_data_chunk")
@@ -205,7 +229,6 @@ class OFSFileUploadHandler(FileUploadHandler):
         raise StopUpload()
     else:
       return raw_data
-
 
   def file_complete(self, file_size):
     if self._is_ofs_upload():

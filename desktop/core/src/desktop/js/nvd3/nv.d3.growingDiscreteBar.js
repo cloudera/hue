@@ -290,8 +290,8 @@ nv.models.growingDiscreteBar = function () {
               getY(d, i) < 0
                 ? y(0)
                 : y(0) - y(getY(d, i)) < 1
-                ? y(0) - 1 //make 1 px positive bars show up above y=0
-                : y(getY(d, i));
+                  ? y(0) - 1 //make 1 px positive bars show up above y=0
+                  : y(getY(d, i));
 
           return 'translate(' + left + ', ' + top + ')';
         })

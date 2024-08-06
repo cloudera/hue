@@ -1,5 +1,6 @@
 import os
 import os.path
+import sys
 
 import eventlet
 
@@ -22,7 +23,9 @@ class BackdoorTest(tests.LimitedTestCase):
     def _run_test_on_client_and_server(self, client, server_thread):
         f = client.makefile('rw')
         assert 'Python' in f.readline()
-        f.readline()  # build info
+        if sys.version_info < (3, 10):
+            # Starting in py310, build info is included in version line
+            f.readline()  # build info
         f.readline()  # help info
         assert 'InteractiveConsole' in f.readline()
         self.assertEqual('>>> ', f.read(4))

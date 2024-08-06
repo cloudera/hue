@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import React from 'react';
-import { Button, Dropdown } from 'antd';
+import { Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { i18nReact } from '../../utils/i18nReact';
-
+import { BorderlessButton } from 'cuix/dist/components/Button';
 import PageFirstIcon from '@cloudera/cuix-core/icons/react/PageFirstIcon';
 import PagePreviousIcon from '@cloudera/cuix-core/icons/react/PagePreviousIcon';
 import PageNextIcon from '@cloudera/cuix-core/icons/react/PageNextIcon';
@@ -41,15 +41,15 @@ const defaultProps = {
   pageSizeOptions: [10, 50, 500, 1000]
 };
 
-const Pagination: React.FC<PaginationProps> = ({
+const Pagination = ({
   onNextPageButtonClicked,
   onPageNumberChange,
   onPageSizeChange,
   onPreviousPageButtonClicked,
   pageSize,
-  pageSizeOptions,
+  pageSizeOptions = [],
   pageStats
-}): JSX.Element => {
+}: PaginationProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const currentPageSize = pageSize;
@@ -58,15 +58,16 @@ const Pagination: React.FC<PaginationProps> = ({
     return {
       key: option,
       label: (
-        <Button
+        <BorderlessButton
           onClick={() => {
             onPageSizeChange(option);
             onPageNumberChange(1);
           }}
           className="hue-pagination__page-size-menu-item-btn"
+          data-event={''}
         >
           {option}
-        </Button>
+        </BorderlessButton>
       )
     };
   });
@@ -76,39 +77,44 @@ const Pagination: React.FC<PaginationProps> = ({
       <div className="hue-pagination__page-size-control">
         {t('Rows per page: ')}
         <Dropdown menu={{ items: pageSizeOptionsMenu }}>
-          <Button className="hue-pagination__page-size-menu-btn">
-            <div>
-              <span>{currentPageSize}</span>
-              <DropdownIcon />
-            </div>
-          </Button>
+          <BorderlessButton
+            className="hue-pagination__page-size-menu-btn"
+            data-event={''}
+            icon={<DropdownIcon />}
+            iconPosition="right"
+          >
+            {currentPageSize}
+          </BorderlessButton>
         </Dropdown>
       </div>
       <div className="hue-pagination__rows-stats-display">
         {pageStats.start_index} - {pageStats.end_index} of {pageStats.total_count}
       </div>
       <div className="hue-pagination__control-buttons-panel">
-        <Button onClick={() => onPageNumberChange(1)} className="hue-pagination__control-button">
-          <PageFirstIcon />
-        </Button>
-        <Button
+        <BorderlessButton
+          onClick={() => onPageNumberChange(1)}
+          className="hue-pagination__control-button"
+          data-event={''}
+          icon={<PageFirstIcon />}
+        />
+        <BorderlessButton
           onClick={() => onPreviousPageButtonClicked(pageStats.previous_page_number)}
           className="hue-pagination__control-button"
-        >
-          <PagePreviousIcon />
-        </Button>
-        <Button
+          data-event={''}
+          icon={<PagePreviousIcon />}
+        />
+        <BorderlessButton
           onClick={() => onNextPageButtonClicked(pageStats.next_page_number, pageStats.num_pages)}
           className="hue-pagination__control-button"
-        >
-          <PageNextIcon />
-        </Button>
-        <Button
+          data-event={''}
+          icon={<PageNextIcon />}
+        />
+        <BorderlessButton
           onClick={() => onPageNumberChange(pageStats.num_pages)}
           className="hue-pagination__control-button"
-        >
-          <PageLastIcon />
-        </Button>
+          data-event={''}
+          icon={<PageLastIcon />}
+        />
       </div>
     </div>
   );

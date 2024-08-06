@@ -27,7 +27,7 @@ import sqlUtils from 'sql/sqlUtils';
 import { matchesType } from 'sql/reference/typeUtils';
 import { DIALECT } from 'apps/editor/snippet';
 import { cancelActiveRequest } from 'api/apiUtils';
-import { findBrowserConnector, getRootFilePath } from 'config/hueConfig';
+import { findBrowserConnector, getLastKnownConfig, getRootFilePath } from 'config/hueConfig';
 import equalIgnoreCase from 'utils/string/equalIgnoreCase';
 import {
   findUdf,
@@ -256,6 +256,8 @@ class AutocompleteResults {
     this.snippet = options.snippet;
     this.dialect = () => this.snippet.type();
     this.editor = options.editor;
+    this.sourceAutocompleteDisabled =
+      !!getLastKnownConfig()?.app_config?.editor?.source_autocomplete_disabled;
     this.temporaryOnly =
       options.snippet.autocompleteSettings && options.snippet.autocompleteSettings.temporaryOnly;
 
@@ -450,31 +452,32 @@ class AutocompleteResults {
       return promise;
     };
 
-    const colRefPromise = this.handleColumnReference();
-    const databasesPromise = this.loadDatabases();
-
     trackPromise(this.handleKeywords());
-    trackPromise(this.handleColRefKeywords(colRefPromise));
     trackPromise(this.handleIdentifiers());
     trackPromise(this.handleColumnAliases());
     trackPromise(this.handleCommonTableExpressions());
     trackPromise(this.handleOptions());
-    trackPromise(this.handleFunctions(colRefPromise));
-    trackPromise(this.handleDatabases(databasesPromise));
-    const tablesPromise = trackPromise(this.handleTables(databasesPromise));
-    const columnsPromise = trackPromise(this.handleColumns(colRefPromise, tablesPromise));
-    trackPromise(this.handleValues(colRefPromise));
-    trackPromise(this.handlePaths());
 
-    if (!this.temporaryOnly) {
-      trackPromise(this.handleJoins());
-      trackPromise(this.handleJoinConditions());
-      trackPromise(this.handleAggregateFunctions());
-      trackPromise(this.handleGroupBys(columnsPromise));
-      trackPromise(this.handleOrderBys(columnsPromise));
-      trackPromise(this.handleFilters());
-      trackPromise(this.handlePopularTables(tablesPromise));
-      trackPromise(this.handlePopularColumns(columnsPromise));
+    if (!this.sourceAutocompleteDisabled) {
+      const colRefPromise = this.handleColumnReference();
+      const databasesPromise = this.loadDatabases();
+      trackPromise(this.handleColRefKeywords(colRefPromise));
+      trackPromise(this.handleFunctions(colRefPromise));
+      trackPromise(this.handleDatabases(databasesPromise));
+      const tablesPromise = trackPromise(this.handleTables(databasesPromise));
+      const columnsPromise = trackPromise(this.handleColumns(colRefPromise, tablesPromise));
+      trackPromise(this.handleValues(colRefPromise));
+      trackPromise(this.handlePaths());
+      if (!this.temporaryOnly) {
+        trackPromise(this.handleJoins());
+        trackPromise(this.handleJoinConditions());
+        trackPromise(this.handleAggregateFunctions());
+        trackPromise(this.handleGroupBys(columnsPromise));
+        trackPromise(this.handleOrderBys(columnsPromise));
+        trackPromise(this.handleFilters());
+        trackPromise(this.handlePopularTables(tablesPromise));
+        trackPromise(this.handlePopularColumns(columnsPromise));
+      }
     }
 
     await Promise.all(promises);
@@ -672,12 +675,17 @@ class AutocompleteResults {
         });
       } else if (type === 'UDFREF') {
         try {
-          const types = await getReturnTypesForUdf(
-            sqlReferenceRepository,
-            this.snippet.connector(),
-            columnAlias.udfRef
-          );
-          const resolvedType = types.length === 1 ? types[0] : 'T';
+          let resolvedType = 'T';
+          if (!this.sourceAutocompleteDisabled) {
+            const types = await getReturnTypesForUdf(
+              sqlReferenceRepository,
+              this.snippet.connector(),
+              columnAlias.udfRef
+            );
+            if (types.length === 1) {
+              resolvedType = types[0];
+            }
+          }
           columnAliasSuggestions.push({
             value: columnAlias.name,
             meta: resolvedType,
@@ -1483,8 +1491,7 @@ class AutocompleteResults {
             resolve();
           },
           silenceErrors: true,
-          errorCallback: resolve,
-          timeout: AUTOCOMPLETE_TIMEOUT
+          errorCallback: resolve
         })
       );
     });
@@ -1796,8 +1803,8 @@ class AutocompleteResults {
         const replaceWith = table.alias
           ? table.alias + '.'
           : suggestAggregateFunctions.tables.length > 1
-          ? table.identifierChain[table.identifierChain.length - 1].name + '.'
-          : '';
+            ? table.identifierChain[table.identifierChain.length - 1].name + '.'
+            : '';
         if (table.identifierChain.length > 1) {
           substitutions.push({
             replace: new RegExp(

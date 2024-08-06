@@ -18,24 +18,28 @@
 # A couple of test cases for the log buffer
 #
 
-import log_buffer
+
 import logging
 import unittest
 
-class TestLogBuffer(unittest.TestCase):
+from django.test import TestCase
+from tools.ops.script_runner.lib.log import log_buffer
+
+
+class TestLogBuffer(TestCase):
   def test_logger(self):
     logger = logging.getLogger()
     handler = log_buffer.FixedBufferHandler()
     logger.addHandler(handler)
     msg = "My test logging message"
     logger.warn(msg)
-    self.assertEquals(msg, str(handler.buf))
+    assert msg == str(handler.buf)
 
   def test_overflow(self):
     buffer = log_buffer.FixedBuffer(maxsize=10)
     buffer.insert("0123456789")
     buffer.insert("abcde")
-    self.assertEquals("56789\nabcde", str(buffer))
+    assert "56789\nabcde" == str(buffer)
 
 if __name__ == '__main__':
   unittest.main()

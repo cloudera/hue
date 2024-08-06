@@ -15,29 +15,28 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-import calendar
-import errno
 import re
+import time
+import errno
 import logging
+import calendar
 import tempfile
 import posixpath
-import time
 
-from nose.tools import assert_not_equal
-from hadoop.fs import normpath as fs_normpath
-from azure.conf import get_default_abfs_fs
-
+from azure.conf import ABFS_CLUSTERS, get_default_abfs_fs
 from desktop.conf import RAZ
 from filebrowser.conf import REMOTE_STORAGE_HOME
+from hadoop.fs import normpath as fs_normpath
 
 LOG = logging.getLogger()
 
-#check this first for problems
+# check this first for problems
 ABFS_PATH_RE = re.compile(
-  '^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(@[^.]*?\.dfs\.core\.windows\.net)?(/(.*?)/?)?$')
+  r'^/*[aA][bB][fF][sS]{1,2}://([$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9])(@[^.]*?\.dfs\.core\.windows\.net)?(/(.*?)/?)?$')
 ABFS_ROOT_S = 'abfss://'
 ABFS_ROOT = 'abfs://'
 ABFSACCOUNT_NAME = re.compile('^/*[aA][bB][fF][sS]{1,2}://[$a-z0-9](?!.*--)[-a-z0-9]{1,61}[a-z0-9](@.*?)$')
+
 
 def parse_uri(uri):
   """
@@ -51,6 +50,7 @@ def parse_uri(uri):
   account_name_and_path = match.group(2) or ''
   return match.group(1), direct_name, account_name_and_path
 
+
 def only_filesystem_and_account_name(uri):
   """
   Given a path returns only the filesystem and account name,
@@ -61,6 +61,7 @@ def only_filesystem_and_account_name(uri):
     return match.group(1) + match.group(2)
   return uri
 
+
 def is_root(uri):
   """
   Checks if Uri is the Root Directory
@@ -70,15 +71,17 @@ def is_root(uri):
 
 def strip_scheme(path):
   """
-  returns the path without abfss:// or abfs://
+  Returns the path without abfss:// or abfs://
   """
   try:
     filesystem, file_path = parse_uri(path)[:2]
-  except:
+    if filesystem == '':
+      raise ValueError('File System must be Specified')
+    path = filesystem + '/' + file_path
+  except Exception:
     return path
-  assert_not_equal(filesystem, '', 'File System must be Specified')
-  path = filesystem + '/' + file_path
   return path
+
 
 def strip_path(path):
   """
@@ -88,6 +91,7 @@ def strip_path(path):
     return path
   split_path = path.split('/')
   return split_path[len(split_path) - 1]
+
 
 def normpath(path):
   """
@@ -102,6 +106,7 @@ def normpath(path):
   else:
     normalized = fs_normpath(path)
   return normalized
+
 
 def parent_path(path):
   """
@@ -123,6 +128,7 @@ def parent_path(path):
   if path.lower().startswith(ABFS_ROOT):
     return normpath(ABFS_ROOT + filesystem + '/' + parent)
   return normpath(ABFS_ROOT_S + filesystem + '/' + parent)
+
 
 def join(first, *complist):
   """
@@ -151,13 +157,13 @@ def abfspath(path, fs_defaultfs=None):
   if fs_defaultfs is None:
     try:
       fs_defaultfs = get_default_abfs_fs()
-    except:
+    except Exception:
       LOG.warning("Configuration for ABFS is not set, may run into errors")
       return path
   filesystem, dir_name = ("", "")
   try:
     filesystem, dir_name = parse_uri(path)[:2]
-  except:
+  except Exception:
     return path
   account_name = ABFSACCOUNT_NAME.match(fs_defaultfs)
   LOG.debug("%s" % fs_defaultfs)
@@ -170,7 +176,7 @@ def abfspath(path, fs_defaultfs=None):
   return path
 
 
-def get_home_dir_for_abfs(user=None):
+def get_abfs_home_directory(user=None):
   """
   Attempts to go to the directory set in the config file or core-site.xml else defaults to abfs://
   """
@@ -179,11 +185,17 @@ def get_home_dir_for_abfs(user=None):
   try:
     filesystem = parse_uri(get_default_abfs_fs())[0]
     remote_home_abfs = "abfs://" + filesystem
-  except:
+  except Exception:
     remote_home_abfs = 'abfs://'
+
+  # REMOTE_STORAGE_HOME is deprecated in favor of DEFAULT_HOME_PATH per FS config level.
+  # But for backward compatibility, we are still giving preference to REMOTE_STORAGE_HOME path first and if it's not set,
+  # then check for DEFAULT_HOME_PATH which is set per FS config block. This helps in setting diff DEFAULT_HOME_PATH for diff FS in Hue.
 
   if hasattr(REMOTE_STORAGE_HOME, 'get') and REMOTE_STORAGE_HOME.get() and REMOTE_STORAGE_HOME.get().startswith('abfs://'):
     remote_home_abfs = REMOTE_STORAGE_HOME.get()
+  elif 'default' in ABFS_CLUSTERS and ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get() and ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get().startswith('abfs://'):
+    remote_home_abfs = ABFS_CLUSTERS['default'].DEFAULT_HOME_PATH.get()
 
   remote_home_abfs = _handle_user_dir_raz(user, remote_home_abfs)
 
@@ -193,13 +205,14 @@ def get_home_dir_for_abfs(user=None):
 def abfsdatetime_to_timestamp(datetime):
   """
   Returns timestamp (seconds) by datetime string from ABFS API responses.
-  ABFS REST API returns one types of datetime strings:
+  ABFS REST API returns one type of datetime strings:
   * `Thu, 26 Feb 2015 20:42:07 GMT` for Object HEAD requests
     (see http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html);
   """
   # There is chance (depends on platform) to get
   # `'z' is a bad directive in format ...` error (see https://bugs.python.org/issue6641),
-  #LOG.debug("%s" %datetime)
+  # LOG.debug("%s" %datetime)
   stripped = time.strptime(datetime[:-4], '%a, %d %b %Y %H:%M:%S')
-  assert datetime[-4:] == ' GMT', 'Time [%s] is not in GMT.' % datetime
+  if datetime[-4:] != ' GMT':
+    raise ValueError('Time [%s] is not in GMT.' % datetime)
   return int(calendar.timegm(stripped))

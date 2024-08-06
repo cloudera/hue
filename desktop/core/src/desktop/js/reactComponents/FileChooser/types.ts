@@ -78,10 +78,30 @@ export interface PathAndFileData {
   files: File[];
   page: PageStats;
   pagesize: number;
+  type?: string;
+}
+
+export interface ContentSummary {
+  summary: {
+    directoryCount: number;
+    ecPolicy: string;
+    fileCount: number;
+    length: number;
+    quota: number;
+    spaceConsumed: number;
+    spaceQuota: number;
+    typeQuota: number;
+    replication: number;
+  };
 }
 
 export enum SortOrder {
   ASC = 'ascending',
   DSC = 'descending',
   NONE = 'none'
+}
+
+export enum BrowserViewType {
+  dir = 'dir',
+  file = 'file'
 }
