@@ -140,7 +140,7 @@ class SQLIndexer(object):
         }
       else:  # Manual
         row_format = ''
-        file_format = table_format
+        file_format = 'TextFile' if table_format == 'text' else table_format
         skip_header = False
         if table_format == 'kudu':
           columns = [col for col in columns if col['name'] in primary_keys] + [col for col in columns if col['name'] not in primary_keys]
@@ -185,7 +185,7 @@ class SQLIndexer(object):
       tbl_properties['skip.header.line.count'] = '1'
     # The temp table is not transactional, but final table can be if is_transactional.
     # tbl_properties that don't exist in previous versions can safely be added without error.
-    tbl_properties['transactional'] = 'false'
+    tbl_properties['transactional'] = str(destination['isTransactional']).lower() if source['inputFormat'] == 'manual' else 'false'
 
     sql += django_mako.render_to_string("gen/create_table_statement.mako", {
         'table': {
