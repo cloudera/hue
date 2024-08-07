@@ -69,7 +69,7 @@
     </div>
     <div data-bind="template: { name: 'internal-row-template', foreach: oozieRows}">
     </div>
-    <div class="container-fluid" data-bind="visible: $root.isEditing() && rows().length > 0">
+    <div class="container-fluid" data-bind="visible: $root.isEditing() && rows().length > 0 && !containsDecisionNode()">
       <div class="row-fluid">
         <div data-bind="visible: enableOozieDropOnAfter, css: {'span4 offset4': true, 'drop-target': true, 'drop-target-dragging': $root.isDragging(), 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data, false); widgetDraggedAdditionalHandler(_w); } }">
           <span data-bind="visible: oozieRows().length == 0">${ _('Drop your action here') }</span>

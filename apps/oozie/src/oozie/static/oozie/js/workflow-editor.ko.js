@@ -1432,6 +1432,13 @@ var ExtendedColumn = function (size, rows, viewModel) {
     return _row;
   }, self);
 
+  self.containsDecisionNode = ko.pureComputed(function () {
+    return self.rows().some(function (row) {
+      return row.widgets().some(function (widget) {
+        return widget.widgetType() === 'decision-widget';
+      });
+    });
+  });
 
   self.oozieRows = ko.computed(function () {
     var _rows = [];
