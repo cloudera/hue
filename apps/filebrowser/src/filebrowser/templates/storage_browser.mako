@@ -24,12 +24,4 @@
     ${ render_bundle(bundle) | n,unicode }
 % endfor
 
-<script type="text/javascript">
-  (function () {
-    window.createReactComponents('#storageBrowser');
-  })();
-</script>
-
-<div id="storageBrowser">
-  <StorageBrowserPage data-reactcomponent='StorageBrowserPage'></StorageBrowserPage>
-</div>
+<StorageBrowserPage data-reactcomponent='StorageBrowserPage'></StorageBrowserPage>
