@@ -460,6 +460,12 @@ CACHES[CACHES_HIVE_DISCOVERY_KEY] = {
     'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     'LOCATION': CACHES_HIVE_DISCOVERY_KEY
 }
+CACHES_WEBHDFS_DELEGATION_TOKEN_KEY = 'webhdfs_delegation_token'
+CACHES[CACHES_WEBHDFS_DELEGATION_TOKEN_KEY] = {
+    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    'LOCATION': CACHES_WEBHDFS_DELEGATION_TOKEN_KEY,
+    'TIMEOUT': desktop.conf.KERBEROS.REINIT_FREQUENCY
+}
 
 CACHES_CELERY_KEY = 'celery'
 CACHES_CELERY_QUERY_RESULT_KEY = 'celery_query_results'
