@@ -42,10 +42,13 @@ const TEMPLATE = `
       'Show details'
     )}</a></li>
     <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-edit"></i> ${I18n(
-      'Open document'
+      'Open'
+    )}</a></li>
+    <li><a href="javascript: void(0);" data-bind="click: function() { $data.selected(true); $data.parent.copy() }"><i class="fa fa-fw fa-files-o"></i> ${I18n(
+  'Copy'
     )}</a></li>
     <li><a href="javascript: void(0);" data-bind="click: function() { $data.selected(true); huePubSub.publish('doc.show.delete.modal', $data.parent); }"><i class="fa fa-fw fa-trash-o"></i> ${I18n(
-      'Delete document'
+      'Delete'
     )}</a></li>
     <!-- /ko -->
     <!-- ko if: $containerContext.sharingEnabled -->
