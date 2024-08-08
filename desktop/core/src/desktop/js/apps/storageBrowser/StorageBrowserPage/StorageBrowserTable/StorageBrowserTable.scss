@@ -30,6 +30,10 @@ $icon-margin: 5px;
 
   .hue-storage-browser__search {
     width: 30%;
+
+    .ant-input {
+      box-shadow: none;
+    }
   }
 
   .hue-storage-browser__actions-bar-right {
