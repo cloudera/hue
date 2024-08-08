@@ -195,7 +195,7 @@ const StorageBrowserTable = ({
         key: `${key}`
       };
       if (key === 'name') {
-        column.width = '45%';
+        column.width = '40%';
         //TODO: Apply tooltip only for truncated values
         column.render = (_, record: StorageBrowserTableData) => (
           <Tooltip title={record.name}>
@@ -206,7 +206,9 @@ const StorageBrowserTable = ({
           </Tooltip>
         );
       } else if (key === 'mtime') {
-        column.width = '15%';
+        column.width = '20%';
+      } else if (key === 'permission') {
+        column.width = '12%';
       }
       columns.push(column);
     }

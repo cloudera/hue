@@ -17,22 +17,23 @@
 @use 'variables' as vars;
 @import '../../../components/styles/mixins';
 
-.antd.cuix {
-  .hue-storage-browser {
-    @include fillAbsolute;
-    @include flexRowLayout;
+.hue-storage-browser.antd.cuix {
+  @include fillAbsolute;
+  @include flexRowLayout;
 
-    display: flex;
+  height: 100%;
+
+  .ant-spin-nested-loading {
+    height: 100%;
+
+    .ant-spin-container {
+      height: 100%;
+    }
   }
 
   .hue-storage-browser__tab {
     background-color: vars.$fluidx-gray-100;
     padding: 0 16px;
-    //TODO: Find fix so the flex is applied
-    flex: 0 0 100%;
-
-    .ant-tabs-content-holder {
-      height: 100vh;
-    }
+    height: 100%;
   }
 }
