@@ -357,12 +357,6 @@ def test_paginator():
   assert_page(pgn.page(2), list(range(20, 25)), 21, 25)
 
 
-@pytest.mark.django_db
-def test_thread_dump():
-  c = make_logged_in_client()
-  response = c.get("/desktop/debug/threads", HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-  assert b"test_thread_dump" in response.content
-
 
 def test_truncating_model():
   class TinyModel(TruncatingModel):

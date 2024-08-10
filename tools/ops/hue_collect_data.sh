@@ -180,7 +180,6 @@ main()
       OUTPUT_DIR_DATE=${OUTPUT_DIR_BASE}/${START_DATE}
       OUTPUT_DIR=${OUTPUT_DIR_DATE}/${PID}
       HUE_USAGE_FILE=${OUTPUT_DIR}/cpu_mem_usage/cpu_mem_usage
-      HUE_THREADS_FILE=${OUTPUT_DIR}/threads/threads
       HUE_STRACE_FILE=${OUTPUT_DIR}/strace/strace
       HUE_LSOF_FILE=${OUTPUT_DIR}/lsof/lsof
       HUE_ENVIRON_FILE=${OUTPUT_DIR}/environ/environ
@@ -218,7 +217,6 @@ main()
          HUE_HTTP="http"
       fi
       HUE_PASS_URL="${HUE_HTTP}://${HUE_SERVER}:${HUE_PORT}/accounts/login/"
-      HUE_THREADS_URL="${HUE_HTTP}://${HUE_SERVER}:${HUE_PORT}/desktop/debug/threads"
    
       if [[ ! -z ${COLLECT_THREADS} ]]
       then
@@ -267,12 +265,7 @@ main()
 
          if [[ ! -z ${COLLECT_THREADS} ]]
          then
-            echo "Getting a thread dump:"
-            ${MKDIR} `dirname ${HUE_THREADS_FILE}`
-            do_curl \
-                 GET \
-                 "${HUE_THREADS_URL}" \
-                 -L -o ${HUE_THREADS_FILE}_${DATE}
+            echo "Shifted from CherryPy server to Gunicorn server. Can't collect Threads here"
          fi
 
          sleep ${RUN_WAIT}
