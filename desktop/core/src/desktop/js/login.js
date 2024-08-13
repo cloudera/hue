@@ -31,17 +31,14 @@ import { createReactComponents } from './reactComponents/createRootElements';
 window.addEventListener('DOMContentLoaded', () => {
   createReactComponents('.login-page');
   $("form").on("submit", function () {
-    console.log("test1");
     window.setTimeout(function () {
       $(".logo").find("img").addClass("waiting");
     }, 1000);
   });
 
   $(document).keypress(function (event) {
-    console.log("test2");
       var keycode = event.keyCode ? event.keyCode : event.which;
       if(keycode == '13') {
-        console.log("test3");
         $("[type=submit]").click();
       }
   });
@@ -50,9 +47,6 @@ window.addEventListener('DOMContentLoaded', () => {
   var backendNames = JSON.parse(loginData.getAttribute('data-backend-names'));
   var nextUrl = JSON.parse(loginData.getAttribute('data-next-url'));
 
-  console.log("test4");
-  console.log(loginData);
-  debugger;
   if (backendNames.includes('AllowAllBackend')) {
     document.getElementById('id_password').value = 'password';
   }
