@@ -15,29 +15,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import os
-import pytest
 import sys
+import json
 import tempfile
 
+import pytest
 from django.conf import settings
-from django.test.client import Client
-from django.test import RequestFactory, TestCase
-from django.http import HttpResponse
+from django.contrib.auth.models import AnonymousUser
 from django.core import exceptions
+from django.core.files.uploadhandler import MemoryFileUploadHandler, TemporaryFileUploadHandler
+from django.http import HttpResponse
+from django.test import RequestFactory, TestCase
+from django.test.client import Client
 
 import desktop.conf
-
-from desktop.middleware import CacheControlMiddleware, MultipleProxyMiddleware
 from desktop.conf import AUDIT_EVENT_LOG_DIR, CUSTOM_CACHE_CONTROL
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_permission
+from desktop.middleware import CacheControlMiddleware, CustomUploadHandlerMiddleware, MultipleProxyMiddleware
+from hadoop.fs.upload import FineUploaderChunkedUploadHandler, HDFSfileUploadHandler
 
 if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
+  from unittest.mock import Mock, patch
 else:
-  from mock import patch, Mock
+  from mock import Mock, patch
+
 
 @pytest.mark.django_db
 def test_view_perms():
@@ -60,7 +63,7 @@ def test_view_perms():
   response = c.get("/useradmin/users/edit/test")
   assert 401 == response.status_code
 
-  response = c.get("/useradmin/users/edit/user") # Can access his profile page
+  response = c.get("/useradmin/users/edit/user")  # Can access his profile page
   assert 200 == response.status_code, response.content
 
 
@@ -92,7 +95,7 @@ def test_audit_logging_middleware_enable():
   with tempfile.NamedTemporaryFile("w+t") as log_tmp:
     log_path = log_tmp.name
     reset = AUDIT_EVENT_LOG_DIR.set_for_testing(log_path)
-    settings.MIDDLEWARE.append('desktop.middleware.AuditLoggingMiddleware') # Re-add middleware
+    settings.MIDDLEWARE.append('desktop.middleware.AuditLoggingMiddleware')  # Re-add middleware
 
     try:
       # Check if we audit correctly
@@ -110,6 +113,7 @@ def test_audit_logging_middleware_enable():
       settings.MIDDLEWARE.pop()
       reset()
 
+
 @pytest.mark.django_db
 def test_audit_logging_middleware_disable():
   c = make_logged_in_client(username='test_audit_logging', is_superuser=False)
@@ -118,7 +122,7 @@ def test_audit_logging_middleware_disable():
   try:
     # No middleware yet
     response = c.get("/oozie/")
-    assert not 'audited' in response, response
+    assert 'audited' not in response, response
   finally:
     reset()
 
@@ -139,7 +143,7 @@ def test_ensure_safe_redirect_middleware():
     assert 302 == response.status_code
 
     # Disallow most redirects
-    done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\d+$'))
+    done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'^\d+$'))
     response = c.post("/hue/accounts/login/", {
       'username': 'test',
       'password': 'test',
@@ -158,7 +162,7 @@ def test_ensure_safe_redirect_middleware():
 
     # Allow all redirects and disallow most at the same time.
     # should have a logic OR functionality.
-    done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('\d+,.*'))
+    done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'\d+,.*'))
     response = c.post("", {
       'username': 'test',
       'password': 'test',
@@ -169,6 +173,7 @@ def test_ensure_safe_redirect_middleware():
     settings.MIDDLEWARE.pop()
     for finish in done:
       finish()
+
 
 @pytest.mark.django_db
 def test_spnego_middleware():
@@ -209,6 +214,7 @@ def test_spnego_middleware():
       finish()
     settings.AUTHENTICATION_BACKENDS = orig_backends
 
+
 def test_cache_control_middleware():
   c = Client()
   request = c.get("/")
@@ -238,8 +244,10 @@ def test_cache_control_middleware():
   finally:
     reset()
 
+
 def get_response(request):
   return request
+
 
 @pytest.mark.django_db
 class TestMultipleProxyMiddleware(TestCase):
@@ -267,3 +275,41 @@ class TestMultipleProxyMiddleware(TestCase):
     self.middleware(request)
     assert request.META['HTTP_X_FORWARDED_FOR'] == '192.0.2.0'
 
+
+@pytest.mark.django_db
+class TestCustomUploadHandlerMiddleware:
+
+  def setup_method(self, method):
+    self.factory = RequestFactory()
+    self.middleware = CustomUploadHandlerMiddleware(get_response=lambda request: request)
+
+  def test_process_request_for_doc_import(self):
+    request = self.factory.get('/desktop/api2/doc/import')
+    request.user = AnonymousUser()
+
+    self.middleware.process_request(request)
+
+    assert len(request.upload_handlers) == 3
+    assert isinstance(request.upload_handlers[0], HDFSfileUploadHandler)
+    assert isinstance(request.upload_handlers[1], MemoryFileUploadHandler)
+    assert isinstance(request.upload_handlers[2], TemporaryFileUploadHandler)
+
+  def test_process_request_for_other_paths(self):
+    request = self.factory.get('/some/other/path')
+    request.user = AnonymousUser()
+
+    self.middleware.process_request(request)
+
+    assert len(request.upload_handlers) > 0  # Ensure there are handlers
+
+    # Check if the handlers are of the expected types
+    expected_handler_types = (HDFSfileUploadHandler, FineUploaderChunkedUploadHandler,
+                              MemoryFileUploadHandler, TemporaryFileUploadHandler)
+
+    for handler in request.upload_handlers:
+      assert isinstance(handler, expected_handler_types), \
+        f"Unexpected handler type: {type(handler)}"
+
+
+def get_response(request):
+  return request
