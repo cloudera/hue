@@ -16,7 +16,7 @@
 
 <%!
   import sys
-
+  import json
   from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
 
   from desktop.conf import CUSTOM, ENABLE_ORGANIZATIONS
@@ -37,7 +37,12 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 <div class="login-page">
   <AppBanner data-reactcomponent='AppBanner'></AppBanner>
   <div class="login-container">
-
+    <div id="login-data"
+      data-backend-names="${json.dumps(backend_names)}"
+      data-next-url="${json.dumps(next)}"
+      style="display: none;">
+    <!-- This div acts as a bridge to pass data to external JS -->
+    </div>
     <form method="POST" action="${action}" autocomplete="off">
       ${ csrf_token(request) | n,unicode }
 
@@ -160,39 +165,5 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   </div>
    % endif
 </div>
-
-<script>
-  $(document).ready(function () {
-    $("form").on("submit", function () {
-      window.setTimeout(function () {
-        $(".logo").find("img").addClass("waiting");
-      }, 1000);
-    });
-
-    $(document).keypress(function (event) {
-        var keycode = event.keyCode ? event.keyCode : event.which;
-        if(keycode == '13') {
-          $("[type=submit]").click();
-        }
-    });
-
-    %if 'AllowAllBackend' in backend_names:
-      $('#id_password').val('password');
-    %endif
-
-    %if backend_names == ['OAuthBackend']:
-      $("input").css({"display": "block", "margin-left": "auto", "margin-right": "auto"});
-      $("input").bind('click', function () {
-        window.location.replace('/login/oauth/');
-        return false;
-      });
-    %endif
-
-    % if next:
-      var $redirect = $('input[name="next"]');
-      $redirect.val($redirect.val() + window.location.hash);
-    % endif
-  });
-</script>
 
 ${ commonfooter(None, messages) | n,unicode }
