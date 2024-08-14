@@ -15,6 +15,8 @@
 // limitations under the License.
 
 // Ensure singletons
+import '@testing-library/jest-dom';
+
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
