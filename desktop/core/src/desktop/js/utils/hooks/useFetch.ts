@@ -17,7 +17,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiFetchOptions, get } from '../../api/utils';
 
-type IOptions<T, U> = {
+export type IOptions<T, U> = {
   urlPrefix?: string;
   params?: U;
   fetchOptions?: ApiFetchOptions<T>;

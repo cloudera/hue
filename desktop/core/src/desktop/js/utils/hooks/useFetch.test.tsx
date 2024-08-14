@@ -16,7 +16,7 @@
 
 import { render, screen, waitFor, act } from '@testing-library/react';
 import React from 'react';
-import useFetch from './useFetch';
+import useFetch, { IOptions } from './useFetch';
 import { get } from '../../api/utils';
 
 // Mock the `get` function
@@ -30,7 +30,10 @@ const mockEndpoint = '/endpoint';
 const mockUrl = `${mockUrlPrefix}${mockEndpoint}`;
 
 // Create a test component that uses the hook
-const TestComponent: React.FC<{ url?: string; options?: any }> = ({ url, options }) => {
+const TestComponent: React.FC<{ url?: string; options?: IOptions<string, string> }> = ({
+  url,
+  options
+}) => {
   const { data, loading, error, refetch } = useFetch(url, options);
 
   if (loading) {
