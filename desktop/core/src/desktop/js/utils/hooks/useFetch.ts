@@ -39,30 +39,36 @@ const useFetch = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IUseF
 
   const fetchOptionsDefault: ApiFetchOptions<T> = {
     silenceErrors: false,
-    ignoreSuccessErrors: true,
+    ignoreSuccessErrors: true
   };
 
-  const fetchOptions = useMemo(() => ({ ...fetchOptionsDefault, ...localOptions?.fetchOptions }), [localOptions]);
+  const fetchOptions = useMemo(
+    () => ({ ...fetchOptionsDefault, ...localOptions?.fetchOptions }),
+    [localOptions]
+  );
 
-  const fetchData = useCallback(async (isForced: boolean = false) => {
-    // Avoid fetching data if the skip option is true
-    // or if the URL is not provided
-    if ((options?.skip && !isForced) || !url) {
-      return;
-    }
-    setLoading(true);
-    setError(undefined);
+  const fetchData = useCallback(
+    async (isForced: boolean = false) => {
+      // Avoid fetching data if the skip option is true
+      // or if the URL is not provided
+      if ((options?.skip && !isForced) || !url) {
+        return;
+      }
+      setLoading(true);
+      setError(undefined);
 
-    try {
-      const fetchUrl = localOptions?.urlPrefix ? `${localOptions.urlPrefix}${url}` : url;
-      const response = await get<T, U>(fetchUrl, localOptions?.params, fetchOptions);
-      setData(response);
-    } catch (error) {
-      setError(error);
-    } finally {
-      setLoading(false);
-    }
-  }, [url, localOptions, fetchOptions]);
+      try {
+        const fetchUrl = localOptions?.urlPrefix ? `${localOptions.urlPrefix}${url}` : url;
+        const response = await get<T, U>(fetchUrl, localOptions?.params, fetchOptions);
+        setData(response);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [url, localOptions, fetchOptions]
+  );
 
   useEffect(() => {
     fetchData();
