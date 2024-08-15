@@ -14,9 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { render, screen, waitFor, act } from '@testing-library/react';
-import React from 'react';
-import useFetch, { IOptions } from './useFetch';
+import { renderHook, act, waitFor } from '@testing-library/react';
+import useFetch from './useFetch';
 import { get } from '../../api/utils';
 
 // Mock the `get` function
@@ -28,71 +27,50 @@ const mockGet = get as jest.MockedFunction<typeof get>;
 const mockUrlPrefix = 'https://api.example.com';
 const mockEndpoint = '/endpoint';
 const mockUrl = `${mockUrlPrefix}${mockEndpoint}`;
-
-// Create a test component that uses the hook
-const TestComponent: React.FC<{ url?: string; options?: IOptions<string, string> }> = ({
-  url,
-  options
-}) => {
-  const { data, loading, error, refetch } = useFetch(url, options);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-  if (data) {
-    return (
-      <>
-        <div>Data: {JSON.stringify(data)}</div>
-        <button onClick={refetch}>Refetch</button>
-      </>
-    );
-  }
-
-  return null;
+const mockData = { id: 1, product: 'Hue' };
+const mockOptions = {
+  params: { id: 1 }
 };
 
 describe('useFetch', () => {
+  beforeAll(() => {
+    jest.clearAllMocks();
+  });
+
   beforeEach(() => {
+    mockGet.mockResolvedValue(mockData);
+  });
+
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should fetch data successfully', async () => {
-    const mockData = { id: 1, product: 'Hue' };
-    mockGet.mockResolvedValue(mockData);
-
-    render(<TestComponent url={mockEndpoint} />);
-
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    const { result } = renderHook(() => useFetch(mockUrl));
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(screen.getByText(`Data: ${JSON.stringify(mockData)}`)).toBeInTheDocument();
+      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
     });
   });
 
   it('should fetch data with params successfully', async () => {
-    const mockData = { id: 1, product: 'Hue' };
-    mockGet.mockResolvedValue(mockData);
+    const { result } = renderHook(() => useFetch(mockUrl, mockOptions));
 
-    const mockParams = { id: 1 };
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(true);
 
-    render(
-      <TestComponent
-        url={mockEndpoint}
-        options={{
-          urlPrefix: mockUrlPrefix,
-          params: mockParams
-        }}
-      />
-    );
-
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, mockParams, expect.any(Object));
-      expect(screen.getByText(`Data: ${JSON.stringify(mockData)}`)).toBeInTheDocument();
+    waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(mockUrl, mockOptions.params, expect.any(Object));
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
     });
   });
 
@@ -100,76 +78,105 @@ describe('useFetch', () => {
     const mockError = new Error('Fetch error');
     mockGet.mockRejectedValue(mockError);
 
-    render(<TestComponent url={mockEndpoint} />);
+    const { result } = renderHook(() => useFetch(mockUrl));
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(true);
 
-    await waitFor(() => {
-      expect(screen.getByText(`Error: ${mockError.message}`)).toBeInTheDocument();
+    waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(result.current.data).toBeUndefined();
+      expect(result.current.error).toEqual(mockError);
+      expect(result.current.loading).toBe(false);
     });
   });
 
   it('should respect the skip option', () => {
-    render(<TestComponent url={mockEndpoint} options={{ skip: true }} />);
+    const { result } = renderHook(() => useFetch(mockUrl, { skip: true }));
 
-    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    expect(screen.queryByText(/Error:/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Data:/)).not.toBeInTheDocument();
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(false);
+    expect(mockGet).not.toHaveBeenCalled();
   });
 
   it('should call refetch function', async () => {
-    const mockData = { id: 1, product: 'Hue' };
-    mockGet.mockResolvedValueOnce(mockData).mockResolvedValueOnce(mockData);
+    const { result } = renderHook(() => useFetch(mockUrl));
 
-    render(<TestComponent url={mockEndpoint} />);
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(true);
 
-    await waitFor(() => {
-      expect(screen.getByText(`Data: ${JSON.stringify(mockData)}`)).toBeInTheDocument();
+    waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
     });
+
+    mockGet.mockResolvedValueOnce({ ...mockData, product: 'Hue 2' });
 
     act(() => {
-      screen.getByText('Refetch').click();
+      result.current.refetch();
     });
 
-    await waitFor(() => {
-      expect(screen.getByText(`Data: ${JSON.stringify(mockData)}`)).toBeInTheDocument();
+    waitFor(() => {
+      expect(mockGet).toHaveBeenCalledTimes(2);
+      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(result.current.data).toEqual({ ...mockData, product: 'Hue 2' });
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
     });
   });
 
   it('should handle URL prefix correctly', async () => {
-    const mockData = { id: 1, product: 'Hue' };
-    mockGet.mockResolvedValue(mockData);
+    const { result } = renderHook(() => useFetch(mockEndpoint, { urlPrefix: mockUrlPrefix }));
 
-    render(<TestComponent url={mockEndpoint} options={{ urlPrefix: mockUrlPrefix }} />);
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(true);
 
-    await waitFor(() => {
+    waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
-      expect(screen.getByText(`Data: ${JSON.stringify(mockData)}`)).toBeInTheDocument();
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
     });
   });
 
   it('should update options correctly', async () => {
-    const mockData = { id: 1, product: 'Hue' };
-    mockGet.mockResolvedValue(mockData);
-
-    const { rerender } = render(
-      <TestComponent url={mockEndpoint} options={{ urlPrefix: mockUrlPrefix }} />
+    const { result, rerender } = renderHook(
+      (props: { url: string; options }) => useFetch(props.url, props.options),
+      {
+        initialProps: { url: mockUrl, options: mockOptions }
+      }
     );
 
-    await waitFor(() => {
-      expect(screen.getByText(`Data: ${JSON.stringify(mockData)}`)).toBeInTheDocument();
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(true);
+
+    waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(mockUrl, mockOptions.params, expect.any(Object));
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
     });
 
-    rerender(
-      <TestComponent url={mockEndpoint} options={{ urlPrefix: 'https://api.example.com/v2' }} />
-    );
+    const newOptions = {
+      params: { id: 2 }
+    };
+    const newMockData = { ...mockData, id: 2 };
+    mockGet.mockResolvedValueOnce(newMockData);
 
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(
-        'https://api.example.com/v2/endpoint',
-        undefined,
-        expect.any(Object)
-      );
+    rerender({ url: mockUrl, options: newOptions });
+
+    waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(mockUrl, newOptions.params, expect.any(Object));
+      expect(result.current.data).toEqual(newMockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
     });
   });
 });
