@@ -13,21 +13,21 @@ if os.environ.get('VIRTUALENV_INTERPRETER_RUNNING'):
     if os.path.realpath(os.path.dirname(__file__)) == os.path.realpath(path):
       sys.path.remove(path)
 
-import base64
-import codecs
-import optparse
 import re
-import shutil
-import logging
+import glob
 import zlib
 import errno
-import glob
-import distutils.sysconfig
+import base64
+import codecs
+import shutil
 import struct
-import subprocess
+import logging
 import pkgutil
+import optparse
 import tempfile
 import textwrap
+import subprocess
+import distutils.sysconfig
 from distutils.util import strtobool
 from os.path import join
 
@@ -82,7 +82,6 @@ else:
     import winreg
   except ImportError:
     import _winreg as winreg
-
 
   def get_installed_pythons():
     try:
@@ -869,8 +868,9 @@ def install_wheel(project_names, py_executable, search_dirs=None,
   # PIP_FIND_LINKS uses space as the path separator and thus cannot have paths
   # with spaces in them. Convert any of those to local file:// URL form.
   try:
-    from urlparse import urljoin
     from urllib import pathname2url
+
+    from urlparse import urljoin
   except ImportError:
     from urllib.parse import urljoin
     from urllib.request import pathname2url
@@ -1128,8 +1128,8 @@ def install_python(home_dir, lib_dir, inc_dir, bin_dir, site_packages, clear, sy
 
   if clear:
     rmtree(lib_dir)
-    ## FIXME: why not delete it?
-    ## Maybe it should delete everything with #!/path/to/venv/python in it
+    # FIXME: why not delete it?
+    # Maybe it should delete everything with #!/path/to/venv/python in it
     logger.notify('Not deleting %s', bin_dir)
 
   if hasattr(sys, 'real_prefix'):
@@ -1259,7 +1259,7 @@ def install_python(home_dir, lib_dir, inc_dir, bin_dir, site_packages, clear, sy
       os.unlink(pyd_pth)
 
   if sys.executable != py_executable:
-    ## FIXME: could I just hard link?
+    # FIXME: could I just hard link?
     executable = sys.executable
     shutil.copyfile(executable, py_executable)
     make_exe(py_executable)
@@ -1303,7 +1303,7 @@ def install_python(home_dir, lib_dir, inc_dir, bin_dir, site_packages, clear, sy
       copyfile(py_executable, python_executable, symlink)
 
       if is_win:
-        for name in ['libexpat.dll', 'libpypy.dll', 'libpypy-c.dll',
+        for name in ['libpypy.dll', 'libpypy-c.dll',
                      'libeay32.dll', 'ssleay32.dll', 'sqlite3.dll',
                      'tcl85.dll', 'tk85.dll']:
           src = join(prefix, name)
@@ -1365,7 +1365,7 @@ def install_python(home_dir, lib_dir, inc_dir, bin_dir, site_packages, clear, sy
       mach_o_change(py_executable,
                     os.path.join(prefix, 'Python'),
                     '@executable_path/../.Python')
-    except:
+    except:  # noqa: E722
       e = sys.exc_info()[1]
       logger.warn("Could not call mach_o_change: %s. "
                   "Trying to call install_name_tool instead." % e)
@@ -1375,7 +1375,7 @@ def install_python(home_dir, lib_dir, inc_dir, bin_dir, site_packages, clear, sy
            os.path.join(prefix, 'Python'),
            '@executable_path/../.Python',
            py_executable])
-      except:
+      except:  # noqa: E722
         logger.fatal("Could not call install_name_tool -- you must "
                      "have Apple's development tools installed")
         raise
@@ -1447,7 +1447,7 @@ def install_python(home_dir, lib_dir, inc_dir, bin_dir, site_packages, clear, sy
   if os.path.exists(pydistutils):
     logger.notify('Please make sure you remove any previous custom paths from '
                   'your %s file.' % pydistutils)
-  ## FIXME: really this should be calculated earlier
+  # FIXME: really this should be calculated earlier
 
   fix_local_scheme(home_dir, symlink)
 
@@ -1517,10 +1517,10 @@ def install_python_config(home_dir, bin_dir, prompt=None):
 def install_distutils(home_dir):
   distutils_path = change_prefix(distutils.__path__[0], home_dir)
   mkdir(distutils_path)
-  ## FIXME: maybe this prefix setting should only be put in place if
-  ## there's a local distutils.cfg with a prefix setting?
+  # FIXME: maybe this prefix setting should only be put in place if
+  # there's a local distutils.cfg with a prefix setting?
   home_dir = os.path.abspath(home_dir)
-  ## FIXME: this is breaking things, removing for now:
+  # FIXME: this is breaking things, removing for now:
   # distutils_cfg = DISTUTILS_CFG + "\n[install]\nprefix=%s\n" % home_dir
   writefile(os.path.join(distutils_path, '__init__.py'), DISTUTILS_INIT)
   writefile(os.path.join(distutils_path, 'distutils.cfg'), DISTUTILS_CFG, overwrite=False)
@@ -1543,7 +1543,7 @@ def fix_local_scheme(home_dir, symlink=True):
         for subdir_name in os.listdir(home_dir):
           if subdir_name == 'local':
             continue
-          copyfile(os.path.abspath(os.path.join(home_dir, subdir_name)), \
+          copyfile(os.path.abspath(os.path.join(home_dir, subdir_name)),
                    os.path.join(local_path, subdir_name), symlink)
 
 
@@ -1613,7 +1613,7 @@ def is_executable(exe):
 
 
 ############################################################
-## Relocating the environment:
+# Relocating the environment:
 
 def make_environment_relocatable(home_dir):
   """
@@ -1628,7 +1628,7 @@ def make_environment_relocatable(home_dir):
       'on this environment to update it' % activate_this)
   fixup_scripts(home_dir, bin_dir)
   fixup_pth_and_egg_link(home_dir)
-  ## FIXME: need to fix up distutils.cfg
+  # FIXME: need to fix up distutils.cfg
 
 
 def make_pth_relocatable(home_dir):
@@ -1816,7 +1816,7 @@ def make_relative_path(source, dest, dest_is_directory=True):
 
 
 ############################################################
-## Bootstrap script creation:
+# Bootstrap script creation:
 
 def create_bootstrap_script(extra_text, python_version=''):
   """
@@ -1870,14 +1870,14 @@ def create_bootstrap_script(extra_text, python_version=''):
   return content.replace('##EXT' 'END##', extra_text)
 
 
-##EXTEND##
+# EXTEND##
 
 def convert(s):
   b = base64.b64decode(s.encode('ascii'))
   return zlib.decompress(b).decode('utf-8')
 
 
-##file site.py
+# file site.py
 SITE_PY = convert("""
 eJzFPf1z2zaWv/OvwMqToZTKdOJ0e3tO3RsncVrfuYm3yc7m1vXoKAmyWFMkS5C2tTd3f/u9DwAE
 +CHb2+6cphNLJPDw8PC+8PAeOhqNTopCZkuxyZd1KoWScblYiyKu1kqs8lJU66Rc7hdxWW3h6eIm
@@ -2022,7 +2022,7 @@ cA/j+zX4tbtTIfGjujOKpj83aHOgXnIQbvYduNXEC4UMm4T21Bs+GHABuCa7v//LR/TvpjHa7oe7
 AVijEPwfucjncQ==
 """)
 
-##file activate.sh
+# file activate.sh
 ACTIVATE_SH = convert("""
 eJytVd9v2kAMfs9fYQLq2m4MscdNVKMqEkgtVIQxbeuUHolpTgsXdHehpT/+9/mSEBJS2MOaB0ji
 z77P9menDpOAK5jzEGERKw0zhFihD/dcB2CrKJYewoyLFvM0XzGNNpzOZbSAGVPBqVWHdRSDx4SI
@@ -2040,7 +2040,7 @@ uGJ/EFQs0ayEWLCQM5V9N4g+1+8UbXOJzF8bqhKtIqIwicWvzNFROZJlpfD8A7Vc044R0FxkcezG
 VzsV75usvTdYef+57v5n1b225qhXfwEmxHEs
 """)
 
-##file activate.fish
+# file activate.fish
 ACTIVATE_FISH = convert("""
 eJyFVVFv2zYQftevuMoOnBS1gr0WGIZ08RADSRw4boBhGGhGOsUcKFIjKbUu9uN7lC2JsrXWDzZM
 fnf38e6+uwlsdsJCLiRCUVkHrwiVxYy+hHqDbQKvQl3z1ImaO0xyYXdbeP9FuJ1QwMFUSnmcP4dL
@@ -2059,7 +2059,7 @@ kT7AP379lQZLSnFDLtwWihfYxw4nZd+ZR7myfkI2ZTRCuRxmF/bCzkbhcElvYamW9PbDGrvqPKC0
 wYyNuRPSTcd/B48Ppeg=
 """)
 
-##file activate.csh
+# file activate.csh
 ACTIVATE_CSH = convert("""
 eJx1U2FP2zAQ/e5f8TAV3Soo+0zXbYUiDQkKQgVp2ibjJNfFUuIg22nVf885SVFLO3+I7Lt3fr6X
 d8eY58ZjYQpCWfuAhFB7yrAyIYf0Ve1SQmLsuU6DWepAw9TnEoOFq0rwdjAUx/hV1Ui1tVWAqy1M
@@ -2072,7 +2072,7 @@ xlW2JBtOGcyYVW7SnB3v6RS91g3gKapZ0oWxbHVteYIIq3iv7QeuSrUj6KSqQ+yqsxDj1ivNQxKF
 YON10Q+NH/ARS95i5Tuqq2Vxfvc23f/FO6zrtXXmJr+ZtMY9/A15ZXFWtmch2rEQ4g1ryVHH
 """)
 
-##file activate.bat
+# file activate.bat
 ACTIVATE_BAT = convert("""
 eJx9Ul9LhEAQfxf8DoOclI/dYyFkaCmcq4gZQTBUrincuZFbff12T133TM+nnd35/Zvxlr7XDFhV
 mUZHOVhFlOWP3g4DUriIWoVomYZpNBWUtGpaWgImO191pFkSpzlcmgaI70jVX7n2Qp8tuByg+46O
@@ -2082,7 +2082,7 @@ MCqnOxv7/x7Np6yv9P2Ker5dmX8yNyCkkWnbZy3N5LarczlqL8htx2EM9rQ/2H5BvIsIEi8OEG8U
 +g8CsNTr
 """)
 
-##file deactivate.bat
+# file deactivate.bat
 DEACTIVATE_BAT = convert("""
 eJyFkN0KgkAUhO8F32EQpHqFQEjQUPAPMaErqVxzId3IrV6/XST/UDx3c86c4WMO5FYysKJQFVVp
 CEfqxsnJ9DI7SA25i20fFqs3HO+GYLsDZ7h8GM3xfLHrg1QNvpSX4CWpQGvokZk4uqrQAjXjyElB
@@ -2090,7 +2090,7 @@ a5IjCz0r+2dHcehHCe5MZNmB5R7TdqMqECMptHZh6DN/utb7Zs6Cej8OXYE5J04YOKFvD4GkHuJ0
 pilSd1jG6n87tDZ+BUwUOepI6CGSkFMYWf0ihvT33Qj1A+tCkSI=
 """)
 
-##file activate.ps1
+# file activate.ps1
 ACTIVATE_PS = convert("""
 eJylWdmO41hyfW+g/0FTU7C7IXeJIqmtB/3AnZRIStxF2kaBm7gv4ipyMF/mB3+Sf8GXVGVl1tLT
 43ECSqR4b5wbETeWE8z/+a///vNCDaN6cYtSf5G1dbNw/IVXNIu6aCvX9xa3qsgWl0IJ/7IYinbh
@@ -2181,7 +2181,7 @@ i4QdudHFkN0u6fSKiT09QLv2mtSblt5nNzBR6UReePNs+khE4rHcXuoK21igUKHl1c3MXMgPu7y8
 rKQDxR6N/rffXv+lROXet/9Q+l9I4D1U
 """)
 
-##file distutils-init.py
+# file distutils-init.py
 DISTUTILS_INIT = convert("""
 eJytV1uL4zYUfvevOE0ottuMW9q3gVDa3aUMXXbLMlDKMBiNrSTqOJKRlMxkf33PkXyRbGe7Dw2E
 UXTu37lpxLFV2oIyifAncxmOL0xLIfcG+gv80x9VW6maw7o/CANSWWBwFtqeWMPlGY6qPjV8A0bB
@@ -2208,14 +2208,14 @@ kzp1/+7hGBuY4pk0XD/0Ao/oTe/XGrfyM773aB7iUhgkpy+dwAMalxMP0DrBcsVw/6p25+/hobP9
 GBknrWExDhLJ1bwt1NcCNblaFbMKCyvmX0PeRaQ=
 """)
 
-##file distutils.cfg
+# file distutils.cfg
 DISTUTILS_CFG = convert("""
 eJxNj00KwkAMhfc9xYNuxe4Ft57AjYiUtDO1wXSmNJnK3N5pdSEEAu8nH6lxHVlRhtDHMPATA4uH
 xJ4EFmGbvfJiicSHFRzUSISMY6hq3GLCRLnIvSTnEefN0FIjw5tF0Hkk9Q5dRunBsVoyFi24aaLg
 9FDOlL0FPGluf4QjcInLlxd6f6rqkgPu/5nHLg0cXCscXoozRrP51DRT3j9QNl99AP53T2Q=
 """)
 
-##file activate_this.py
+# file activate_this.py
 ACTIVATE_THIS = convert("""
 eJyNU01v2zAMvetXEB4K21jnDOstQA4dMGCHbeihlyEIDMWmE62yJEiKE//7kXKdpEWLzYBt8evx
 kRSzLPs6wiEoswM8YdMpjUXcq1Dz6RZa1cSiTkJdr86GsoTRHuCotBayiWqQEYGtMCgfD1KjGYBe
@@ -2229,7 +2229,7 @@ m8eg6WYWqR6SL5OjKMGfSrYt/6kxxQtOpeAgj1LXBNmpE2ElmCSIy5H0zFd8gJ924HWijWhb2hRC
 VF5PnJ+ts3a9/Mz38RpG/AUSzYUW
 """)
 
-##file python-config
+# file python-config
 PYTHON_CONFIG = convert("""
 eJyNVV1P2zAUfc+v8ODBiSABxlulTipbO6p1LWqBgVhlhcZpPYUkctzSivHfd6+dpGloGH2Ja/ue
 e+65Hz78xNhtf3x90xmw7vCWsRPGLvpDNuz87MKfdKMWSWxZ4ilNpCLZJiuWc66SVFUOZkkcirll
