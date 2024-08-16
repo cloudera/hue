@@ -28,7 +28,7 @@ type IUseLoadData<T> = {
   data?: T;
   loading: boolean;
   error?: Error;
-  refetch: () => void;
+  reloadData: () => void;
 };
 
 const useLoadData = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IUseLoadData<T> => {
@@ -47,7 +47,7 @@ const useLoadData = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IU
     [localOptions]
   );
 
-  const fetchData = useCallback(
+  const loadData = useCallback(
     async (isForced: boolean = false) => {
       // Avoid fetching data if the skip option is true
       // or if the URL is not provided
@@ -71,8 +71,8 @@ const useLoadData = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IU
   );
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    loadData();
+  }, [loadData]);
 
   useEffect(() => {
     // set new options if they are different (deep comparison)
@@ -81,7 +81,7 @@ const useLoadData = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IU
     }
   }, [options]);
 
-  return { data, loading, error, refetch: () => fetchData(true) };
+  return { data, loading, error, reloadData: () => loadData(true) };
 };
 
 export default useLoadData;

@@ -118,7 +118,7 @@ describe('useLoadData', () => {
     mockGet.mockResolvedValueOnce({ ...mockData, product: 'Hue 2' });
 
     act(() => {
-      result.current.refetch();
+      result.current.reloadData();
     });
 
     waitFor(() => {
