@@ -63,7 +63,6 @@ interface StorageBrowserTableProps {
   sortOrder: SortOrder;
   rowClassName?: string;
   refetchData: () => void;
-  setLoadingFiles: (value: boolean) => void;
   testId?: string;
 }
 
@@ -88,10 +87,10 @@ const StorageBrowserTable = ({
   pageSize,
   rowClassName,
   refetchData,
-  setLoadingFiles,
   testId,
   ...restProps
 }: StorageBrowserTableProps): JSX.Element => {
+  const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
   const [tableHeight, setTableHeight] = useState<number>();
   const [selectedFiles, setSelectedFiles] = useState<StorageBrowserTableData[]>([]);
   const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
