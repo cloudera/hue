@@ -78,7 +78,7 @@ openai==1.44.1
 pyformatting==0.3.3
 boto3==1.28.81
 -r ${ROOT}/desktop/core/pytorch_requirements.txt
-sentence-transformers==2.2.2
+sentence-transformers==3.0.1
 psutil==5.8.0
 drf-spectacular[sidecar]==0.27.2
 -e file://${ROOT}/desktop/core/ext-py3/boto-2.49.0

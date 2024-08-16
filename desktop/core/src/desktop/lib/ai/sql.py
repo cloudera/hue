@@ -32,6 +32,7 @@ from desktop.lib.ai.services.openai import OpenAiService
 from desktop.lib.ai.services.bedrock import BedrockService
 from desktop.lib.ai.services.azure import AzureService
 from desktop.lib.ai.services.ai_assistant import AiService
+from desktop.lib.ai.services.vllm import VLLMService
 from desktop.lib.utils.cache import LRUCache
 
 from notebook.api import TableReader
@@ -58,6 +59,8 @@ def _get_service() -> BaseService:
     return BedrockService(model_key)
   elif service_name == "ai_assistant":
     return AiService(model_key)
+  elif service_name == "vllm":
+    return VLLMService(model_key)
   else:
     LOG.error("Service configured is invalid")
     raise Exception(f"Invalid service name - {service_name}")
