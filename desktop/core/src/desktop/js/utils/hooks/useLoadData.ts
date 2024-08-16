@@ -24,14 +24,14 @@ export type IOptions<T, U> = {
   skip?: boolean;
 };
 
-type IUseFetch<T> = {
+type IUseLoadData<T> = {
   data?: T;
   loading: boolean;
   error?: Error;
   refetch: () => void;
 };
 
-const useFetch = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IUseFetch<T> => {
+const useLoadData = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IUseLoadData<T> => {
   const [localOptions, setLocalOptions] = useState<IOptions<T, U> | undefined>(options);
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -84,4 +84,4 @@ const useFetch = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IUseF
   return { data, loading, error, refetch: () => fetchData(true) };
 };
 
-export default useFetch;
+export default useLoadData;

@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { renderHook, act, waitFor } from '@testing-library/react';
-import useFetch from './useFetch';
+import useLoadData from './useLoadData';
 import { get } from '../../api/utils';
 
 // Mock the `get` function
@@ -32,7 +32,7 @@ const mockOptions = {
   params: { id: 1 }
 };
 
-describe('useFetch', () => {
+describe('useLoadData', () => {
   beforeAll(() => {
     jest.clearAllMocks();
   });
@@ -46,7 +46,7 @@ describe('useFetch', () => {
   });
 
   it('should fetch data successfully', async () => {
-    const { result } = renderHook(() => useFetch(mockUrl));
+    const { result } = renderHook(() => useLoadData(mockUrl));
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
     expect(result.current.loading).toBe(true);
@@ -60,7 +60,7 @@ describe('useFetch', () => {
   });
 
   it('should fetch data with params successfully', async () => {
-    const { result } = renderHook(() => useFetch(mockUrl, mockOptions));
+    const { result } = renderHook(() => useLoadData(mockUrl, mockOptions));
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
@@ -78,7 +78,7 @@ describe('useFetch', () => {
     const mockError = new Error('Fetch error');
     mockGet.mockRejectedValue(mockError);
 
-    const { result } = renderHook(() => useFetch(mockUrl));
+    const { result } = renderHook(() => useLoadData(mockUrl));
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
@@ -93,7 +93,7 @@ describe('useFetch', () => {
   });
 
   it('should respect the skip option', () => {
-    const { result } = renderHook(() => useFetch(mockUrl, { skip: true }));
+    const { result } = renderHook(() => useLoadData(mockUrl, { skip: true }));
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
@@ -102,7 +102,7 @@ describe('useFetch', () => {
   });
 
   it('should call refetch function', async () => {
-    const { result } = renderHook(() => useFetch(mockUrl));
+    const { result } = renderHook(() => useLoadData(mockUrl));
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
@@ -131,7 +131,7 @@ describe('useFetch', () => {
   });
 
   it('should handle URL prefix correctly', async () => {
-    const { result } = renderHook(() => useFetch(mockEndpoint, { urlPrefix: mockUrlPrefix }));
+    const { result } = renderHook(() => useLoadData(mockEndpoint, { urlPrefix: mockUrlPrefix }));
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
@@ -147,7 +147,7 @@ describe('useFetch', () => {
 
   it('should update options correctly', async () => {
     const { result, rerender } = renderHook(
-      (props: { url: string; options }) => useFetch(props.url, props.options),
+      (props: { url: string; options }) => useLoadData(props.url, props.options),
       {
         initialProps: { url: mockUrl, options: mockOptions }
       }
