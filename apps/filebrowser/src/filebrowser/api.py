@@ -217,7 +217,7 @@ def get_trash_path(request):
   response = {}
 
   trash_path = request.fs.trash_path(path)
-  user_home_trash_path = request.fs.join(request.fs.current_trash_path(trash_path), request.user.get_home_directory().lstrip())
+  user_home_trash_path = request.fs.join(request.fs.current_trash_path(trash_path), request.user.get_home_directory().lstrip('/'))
 
   if request.fs.isdir(user_home_trash_path):
     response['trash_path'] = user_home_trash_path
