@@ -17,17 +17,26 @@
 @use 'mixins';
 
 .antd.cuix {
+  .ant-spin-nested-loading,
+  .ant-spin-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
   .hue-storage-browser-tabContent {
-    margin: vars.$fluidx-spacing-s 0;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin: vars.$fluidx-spacing-s;
   }
 
   .hue-storage-browser__title-bar {
     display: flex;
-    margin: 0 vars.$fluidx-spacing-s;
+    gap: vars.$fluidx-spacing-xs;
   }
 
   .hue-storage-browser__icon {
-    margin-right: vars.$fluidx-spacing-xs;
     flex: 0 0 auto;
     height: vars.$fluidx-heading-h3-line-height;
   }
@@ -41,13 +50,12 @@
 
   .hue-storage-browser__path-browser-panel {
     display: flex;
-    margin: vars.$fluidx-spacing-xs 0;
     align-items: center;
+    gap: vars.$fluidx-spacing-xs;
   }
 
   .hue-storage-browser__filePath {
     flex: 0 0 auto;
     font-weight: 600;
-    margin: 0 vars.$fluidx-spacing-xs 0 vars.$fluidx-spacing-s;
   }
 }

@@ -23,11 +23,16 @@ import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
 import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
 import { VIEWFILES_API_URl } from '../../../../reactComponents/FileChooser/api';
-import { PathAndFileData, SortOrder } from '../../../../reactComponents/FileChooser/types';
+import {
+  BrowserViewType,
+  PathAndFileData,
+  SortOrder
+} from '../../../../reactComponents/FileChooser/types';
 import { DEFAULT_PAGE_SIZE } from '../../../../utils/constants/storageBrowser';
 import useLoadData from '../../../../utils/hooks/useLoadData';
 
 import './StorageBrowserTabContent.scss';
+import StorageFilePage from '../../StorageFilePage/StorageFilePage';
 
 interface StorageBrowserTabContentProps {
   user_home_dir: string;
@@ -73,7 +78,7 @@ const StorageBrowserTabContent = ({
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
           <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
           <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
-            {filesData?.breadcrumbs[filesData?.breadcrumbs?.length - 1].label}
+            {filesData?.path?.split('/').pop()}
           </h3>
         </div>
         <div
@@ -88,20 +93,24 @@ const StorageBrowserTabContent = ({
             showIcon={false}
           />
         </div>
-        <StorageBrowserTable
-          filesData={filesData}
-          pageSize={pageSize}
-          onFilepathChange={setFilePath}
-          onPageSizeChange={setPageSize}
-          onPageNumberChange={setPageNumber}
-          onSortByColumnChange={setSortByColumn}
-          onSortOrderChange={setSortOrder}
-          onSearch={setSearchTerm}
-          sortByColumn={sortByColumn}
-          sortOrder={sortOrder}
-          refetchData={reloadData}
-          filePath={filePath}
-        />
+        {filesData?.type === BrowserViewType.file ? (
+          <StorageFilePage fileData={filesData} />
+        ) : (
+          <StorageBrowserTable
+            filesData={filesData}
+            pageSize={pageSize}
+            onFilepathChange={setFilePath}
+            onPageSizeChange={setPageSize}
+            onPageNumberChange={setPageNumber}
+            onSortByColumnChange={setSortByColumn}
+            onSortOrderChange={setSortOrder}
+            onSearch={setSearchTerm}
+            sortByColumn={sortByColumn}
+            sortOrder={sortOrder}
+            refetchData={reloadData}
+            filePath={filePath}
+          />
+        )}
       </div>
     </Spin>
   );
