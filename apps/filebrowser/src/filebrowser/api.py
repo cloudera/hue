@@ -212,6 +212,25 @@ def rmtree(request):
 
 
 @error_handler
+def get_trash_path(request):
+  path = _normalize_path(request.GET.get('path'))
+  response = {}
+
+  trash_path = request.fs.trash_path(path)
+  user_home_trash_path = request.fs.join(request.fs.current_trash_path(trash_path), request.user.get_home_directory().lstrip('/'))
+
+  if request.fs.isdir(user_home_trash_path):
+    response['trash_path'] = user_home_trash_path
+  elif request.fs.isdir(trash_path):
+    response['trash_path'] = trash_path
+  else:
+    response['message'] = _('Trash path not found: The requested trash path for user does not exist.')
+    return JsonResponse(response, status=404)
+
+  return JsonResponse(response)
+
+
+@error_handler
 def trash_restore(request):
   path = request.POST.get('path')
   request.fs.restore(path)
