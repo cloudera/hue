@@ -16,7 +16,7 @@
 
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { ColumnProps } from 'antd/lib/table';
-import { Dropdown, Input } from 'antd';
+import { Dropdown, Input, Spin } from 'antd';
 import { MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
 import Tooltip from 'antd/es/tooltip';
 
@@ -351,41 +351,43 @@ const StorageBrowserTable = ({
         </div>
       </div>
 
-      {viewType === BrowserViewType.dir && (
-        <Table
-          className={className}
-          columns={getColumns(tableData[0] ?? [])}
-          dataSource={tableData}
-          onRow={onRowClicked}
-          pagination={false}
-          rowClassName={rowClassName}
-          rowKey={(record, index) => record.path + '' + index}
-          rowSelection={{
-            type: 'checkbox',
-            ...rowSelection
-          }}
-          scroll={{ y: tableHeight }}
-          data-testid={`${testId}`}
-          locale={locale}
-          {...restProps}
-        />
-      )}
+      <Spin spinning={loadingFiles}>
+        {viewType === BrowserViewType.dir && (
+          <Table
+            className={className}
+            columns={getColumns(tableData[0] ?? [])}
+            dataSource={tableData}
+            onRow={onRowClicked}
+            pagination={false}
+            rowClassName={rowClassName}
+            rowKey={(record, index) => record.path + '' + index}
+            rowSelection={{
+              type: 'checkbox',
+              ...rowSelection
+            }}
+            scroll={{ y: tableHeight }}
+            data-testid={`${testId}`}
+            locale={locale}
+            {...restProps}
+          />
+        )}
 
-      {viewType === BrowserViewType.file && (
-        // TODO: code for file view
-        <div> File view</div>
-      )}
+        {viewType === BrowserViewType.file && (
+          // TODO: code for file view
+          <div> File view</div>
+        )}
 
-      {filesData?.page && (
-        <Pagination
-          onNextPageButtonClicked={onNextPageButtonClicked}
-          onPageNumberChange={onPageNumberChange}
-          onPageSizeChange={onPageSizeChange}
-          onPreviousPageButtonClicked={onPreviousPageButtonClicked}
-          pageSize={pageSize}
-          pageStats={filesData?.page}
-        />
-      )}
+        {filesData?.page && (
+          <Pagination
+            onNextPageButtonClicked={onNextPageButtonClicked}
+            onPageNumberChange={onPageNumberChange}
+            onPageSizeChange={onPageSizeChange}
+            onPreviousPageButtonClicked={onPreviousPageButtonClicked}
+            pageSize={pageSize}
+            pageStats={filesData?.page}
+          />
+        )}
+      </Spin>
 
       <InputModal
         title={t('Create New Folder')}
