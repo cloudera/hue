@@ -33,12 +33,13 @@
 
   .hue-storage-browser__tab {
     display: flex;
+    flex: 1;
     background-color: vars.$fluidx-gray-100;
     padding: 0 16px;
 
     .ant-tabs-content-holder {
       display: flex;
-      height: calc(100vh - 172px);
+      flex: 1;
       overflow: auto;
 
       .ant-tabs-content,
