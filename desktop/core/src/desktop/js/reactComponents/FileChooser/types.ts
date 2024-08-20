@@ -72,18 +72,6 @@ export interface BreadcrumbData {
   url: string;
 }
 
-interface FileStats {
-  atime: string;
-  blockSize: number;
-  group: string;
-  mode: number;
-  mtime: string;
-  path: string;
-  replication: number;
-  size: number;
-  user: string;
-}
-
 interface FileView {
   contents: string;
 }
@@ -95,7 +83,7 @@ export interface PathAndFileData {
   page: PageStats;
   pagesize: number;
   type?: string;
-  stats: FileStats;
+  stats: Stats;
   rwx: string;
   view: FileView;
 }
