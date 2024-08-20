@@ -281,6 +281,12 @@ def storage_rmtree(request):
   return filebrowser_api.rmtree(django_request)
 
 
+@api_view(["GET"])
+def storage_get_trash_path(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.get_trash_path(django_request)
+
+
 @api_view(["POST"])
 def storage_trash_restore(request):
   django_request = get_django_request(request)
