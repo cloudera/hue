@@ -106,6 +106,7 @@ urlpatterns += [
   re_path(r'^storage/copy$', api_public.storage_copy, name='storage_copy'),
   re_path(r'^storage/set_replication$', api_public.storage_set_replication, name='storage_set_replication'),
   re_path(r'^storage/rmtree$', api_public.storage_rmtree, name='storage_rmtree'),
+  re_path(r'^storage/trash/get_trash_path$', api_public.storage_get_trash_path, name='storage_get_trash_path'),
   re_path(r'^storage/trash/restore$', api_public.storage_trash_restore, name='storage_trash_restore'),
   re_path(r'^storage/trash/purge$', api_public.storage_trash_purge, name='storage_trash_purge'),
 ]
