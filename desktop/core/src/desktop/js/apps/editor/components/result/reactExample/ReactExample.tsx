@@ -14,7 +14,7 @@ import { Ace } from '../../../../../ext/ace';
 
 import { CURSOR_POSITION_CHANGED_EVENT } from '../../aceEditor/AceLocationHandler';
 import ReactExampleGlobal from '../../../../../reactComponents/ReactExampleGlobal/ReactExampleGlobal';
-import { useHuePubSub } from '../../../../../reactComponents/useHuePubSub';
+import { useHuePubSub } from '../../../../../utils/hooks/useHuePubSub';
 import SqlExecutable from '../../../execution/sqlExecutable';
 
 import './ReactExample.scss';
