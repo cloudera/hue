@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const formatBytes = (bytes: number, decimalPoints?: number): string => {
-  if (bytes == -1) {
+const formatBytes = (bytes?: number, decimalPoints: number = 2): string => {
+  if (bytes === -1 || bytes == undefined) {
     return 'Not available';
   }
-  if (bytes == 0) {
+  if (bytes === 0) {
     return '0 Byte';
   }
   const k = 1024;
-  const dm = decimalPoints ? decimalPoints : 2;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const dm = i === 0 ? 0 : decimalPoints; // Don't show decimal points for Bytes
   return (bytes / Math.pow(k, i)).toFixed(dm) + ' ' + sizes[i];
 };
 

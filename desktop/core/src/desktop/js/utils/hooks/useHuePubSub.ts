@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { useState, useEffect } from 'react';
-import huePubSub from '../utils/huePubSub';
+import huePubSub from '../huePubSub';
 
 // Basic helper hook to let a component subscribe to a huePubSub topic and rerender for each message
 // by placing the message/info in a state that is automatically updated.
