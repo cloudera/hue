@@ -62,7 +62,7 @@ const useLoadData = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IU
         const response = await get<T, U>(fetchUrl, localOptions?.params, fetchOptions);
         setData(response);
       } catch (error) {
-        setError(error);
+        setError(error instanceof Error ? error : new Error(error));
       } finally {
         setLoading(false);
       }
