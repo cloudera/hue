@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Modal from 'antd/lib/modal/Modal';
 import { Col, Menu, Row, Spin, Button } from 'antd';
 
@@ -22,10 +22,11 @@ import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
 import AdlsIcon from '../../../components/icons/AdlsIcon';
 
-import { fetchFileSystems, fetchFiles } from '../api';
+import { ApiFileSystem, FILESYSTEMS_API_URL, VIEWFILES_API_URl } from '../api';
 import { FileSystem, PathAndFileData } from '../types';
 import './FileChooserModal.scss';
 import PathBrowser from '../PathBrowser/PathBrowser';
+import useLoadData from '../../../utils/hooks/useLoadData';
 
 interface FileProps {
   show: boolean;
@@ -37,11 +38,7 @@ interface FileProps {
 const defaultProps = { title: 'Choose a file', okText: 'Select' };
 
 const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }) => {
-  const [fileSystemList, setFileSystemList] = useState<FileSystem[] | undefined>();
   const [filePath, setFilePath] = useState<string | undefined>();
-  const [filesData, setFilesData] = useState<PathAndFileData | undefined>();
-  const [loading, setLoading] = useState(true);
-  const [loadingFiles, setloadingFiles] = useState(true);
 
   const icons = {
     hdfs: <HdfsIcon />,
@@ -49,59 +46,36 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
     s3: <S3Icon />
   };
 
-  const handleOk = () => {
-    //temporary until the file is selected through the file chooser component
-    onCancel();
-  };
+  //temporary until the file is selected through the file chooser component
+  const handleOk = onCancel;
+  const handleCancel = onCancel;
 
-  const handleCancel = () => {
-    onCancel();
-  };
+  const { data: fileSystemsData, loading: loadingFilesSystem } =
+    useLoadData<ApiFileSystem[]>(FILESYSTEMS_API_URL);
 
-  useEffect(() => {
-    if (show && !fileSystemList) {
-      setLoading(true);
-      fetchFileSystems()
-        .then(fileSystems => {
-          const fileSystemsObj = fileSystems.map((system, index) => {
-            return {
-              label: system.file_system,
-              key: index,
-              icon: icons[system.file_system],
-              user_home_dir: system.user_home_directory
-            };
-          });
-          setFileSystemList(fileSystemsObj);
-          if (fileSystems.length !== 0) {
-            setFilePath(fileSystems[0].user_home_directory);
-          }
-        })
-        .catch(error => {
-          //TODO: Properly handle errors.
-          console.error(error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [show]);
+  const fileSystemList: FileSystem[] | undefined = useMemo(
+    () =>
+      fileSystemsData?.map((system, index) => {
+        return {
+          label: system.file_system,
+          key: index,
+          icon: icons[system.file_system],
+          user_home_dir: system.user_home_directory
+        };
+      }),
+    [fileSystemsData]
+  );
 
   useEffect(() => {
-    if (filePath) {
-      setloadingFiles(true);
-      fetchFiles(filePath)
-        .then(responseFilesData => {
-          setFilesData(responseFilesData);
-        })
-        .catch(error => {
-          //TODO: handle errors
-          console.error(error);
-        })
-        .finally(() => {
-          setloadingFiles(false);
-        });
+    if (fileSystemsData && fileSystemsData?.length !== 0) {
+      setFilePath(fileSystemsData[0].user_home_directory);
     }
-  }, [filePath]);
+  }, [fileSystemsData]);
+
+  const { data: filesData, loading: loadingFiles } = useLoadData<PathAndFileData>(filePath, {
+    urlPrefix: VIEWFILES_API_URl,
+    skip: !!filePath
+  });
 
   return (
     <Modal
@@ -113,13 +87,13 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
       width={930}
       className="hue-file-chooser__modal"
     >
-      <Spin spinning={loading}>
+      <Spin spinning={loadingFilesSystem || loadingFiles}>
         <Row>
           <Col span={5}>
             <Menu
               items={fileSystemList}
               onSelect={selectedMenuItem => {
-                setFilePath(fileSystemList[selectedMenuItem.key].user_home_dir);
+                setFilePath(fileSystemList?.[selectedMenuItem.key].user_home_dir);
               }}
               className="hue-file-system__panel"
             ></Menu>

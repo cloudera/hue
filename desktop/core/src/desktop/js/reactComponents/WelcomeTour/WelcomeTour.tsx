@@ -19,7 +19,7 @@ import Joyride from 'react-joyride';
 
 import { hueWindow } from 'types/types';
 import I18n from 'utils/i18n';
-import { useHuePubSub } from '../useHuePubSub';
+import { useHuePubSub } from '../../utils/hooks/useHuePubSub';
 
 import './WelcomeTour.scss';
 import scssVariables from './WelcomeTour.module.scss';

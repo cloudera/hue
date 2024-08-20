@@ -26,7 +26,7 @@ import {
   HIDE_GLOBAL_ALERTS_TOPIC
 } from './events';
 import { HueAlert } from './types';
-import { useHuePubSub } from '../useHuePubSub';
+import { useHuePubSub } from '../../utils/hooks/useHuePubSub';
 import { i18nReact } from 'utils/i18nReact';
 
 type alertType = AlertProps['type'];

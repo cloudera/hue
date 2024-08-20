@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Spin } from 'antd';
 
 import { i18nReact } from '../../../../utils/i18nReact';
@@ -22,8 +22,10 @@ import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
 import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
-import { fetchFiles } from '../../../../reactComponents/FileChooser/api';
+import { VIEWFILES_API_URl } from '../../../../reactComponents/FileChooser/api';
 import { PathAndFileData, SortOrder } from '../../../../reactComponents/FileChooser/types';
+import { DEFAULT_PAGE_SIZE } from '../../../../utils/constants/storageBrowser';
+import useLoadData from '../../../../utils/hooks/useLoadData';
 
 import './StorageBrowserTabContent.scss';
 
@@ -41,9 +43,7 @@ const StorageBrowserTabContent = ({
   testId
 }: StorageBrowserTabContentProps): JSX.Element => {
   const [filePath, setFilePath] = useState<string>(user_home_dir);
-  const [filesData, setFilesData] = useState<PathAndFileData>();
-  const [loadingFiles, setLoadingFiles] = useState(true);
-  const [pageSize, setPageSize] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [sortByColumn, setSortByColumn] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
@@ -51,28 +51,24 @@ const StorageBrowserTabContent = ({
 
   const { t } = i18nReact.useTranslation();
 
-  const getFiles = useCallback(async () => {
-    setLoadingFiles(true);
-    fetchFiles(filePath, pageSize, pageNumber, searchTerm, sortByColumn, sortOrder)
-      .then(responseFilesData => {
-        setFilesData(responseFilesData);
-        setPageSize(responseFilesData.pagesize);
-      })
-      .catch(error => {
-        //TODO: handle errors
-        console.error(error);
-      })
-      .finally(() => {
-        setLoadingFiles(false);
-      });
-  }, [filePath, pageSize, pageNumber, searchTerm, sortByColumn, sortOrder]);
-
-  useEffect(() => {
-    getFiles();
-  }, [getFiles]);
+  const {
+    data: filesData,
+    loading,
+    reloadData
+  } = useLoadData<PathAndFileData>(filePath, {
+    urlPrefix: VIEWFILES_API_URl,
+    params: {
+      pagesize: pageSize.toString(),
+      pagenum: pageNumber.toString(),
+      filter: searchTerm,
+      sortby: sortByColumn,
+      descending: sortOrder === SortOrder.DSC ? 'true' : 'false'
+    },
+    skip: filePath === '' || filePath === undefined
+  });
 
   return (
-    <Spin spinning={loadingFiles}>
+    <Spin spinning={loading}>
       <div className="hue-storage-browser-tabContent" data-testid={testId}>
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
           <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
@@ -103,8 +99,7 @@ const StorageBrowserTabContent = ({
           onSearch={setSearchTerm}
           sortByColumn={sortByColumn}
           sortOrder={sortOrder}
-          refetchData={getFiles}
-          setLoadingFiles={setLoadingFiles}
+          refetchData={reloadData}
           filePath={filePath}
         />
       </div>

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { Tabs, Spin } from 'antd';
 import type { TabsProps } from 'antd';
 
@@ -23,39 +23,27 @@ import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 import { i18nReact } from '../../../utils/i18nReact';
 import CommonHeader from '../../../reactComponents/CommonHeader/CommonHeader';
 import StorageBrowserTabContent from './StorageBrowserTabContents/StorageBrowserTabContent';
-import { fetchFileSystems } from '../../../reactComponents/FileChooser/api';
+import { ApiFileSystem, FILESYSTEMS_API_URL } from '../../../reactComponents/FileChooser/api';
 
 import './StorageBrowserPage.scss';
+import useLoadData from '../../../utils/hooks/useLoadData';
 
 const StorageBrowserPage = (): JSX.Element => {
-  const [fileSystemTabs, setFileSystemTabs] = useState<TabsProps['items'] | undefined>();
-  const [loading, setLoading] = useState(true);
-
   const { t } = i18nReact.useTranslation();
 
-  useEffect(() => {
-    if (!fileSystemTabs) {
-      setLoading(true);
-      fetchFileSystems()
-        .then(fileSystems => {
-          const fileSystemsObj = fileSystems.map(system => {
-            return {
-              label: system.file_system.toUpperCase(),
-              key: system.file_system + '_tab',
-              children: <StorageBrowserTabContent user_home_dir={system.user_home_directory} />
-            };
-          });
-          setFileSystemTabs(fileSystemsObj);
-        })
-        .catch(error => {
-          //TODO: Properly handle errors.
-          console.error(error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, []);
+  const { data: fileSystems, loading } = useLoadData<ApiFileSystem[]>(FILESYSTEMS_API_URL);
+
+  const fileSystemTabs: TabsProps['items'] | undefined = useMemo(
+    () =>
+      fileSystems?.map(system => {
+        return {
+          label: system.file_system.toUpperCase(),
+          key: system.file_system + '_tab',
+          children: <StorageBrowserTabContent user_home_dir={system.user_home_directory} />
+        };
+      }),
+    [fileSystems]
+  );
 
   return (
     <div className="hue-storage-browser cuix antd">
