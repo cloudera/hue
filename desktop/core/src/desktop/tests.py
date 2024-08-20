@@ -58,7 +58,7 @@ from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.settings import DATABASES
 from desktop.views import _get_config_errors, check_config, collect_validation_messages, generate_configspec, home, load_confs
-from notebook.conf import ENABLE_ALL_INTERPRETERS
+from notebook.conf import ENABLE_ALL_INTERPRETERS, SHOW_NOTEBOOKS
 from useradmin.models import GroupPermission, User
 
 LOG = logging.getLogger()
@@ -451,7 +451,8 @@ def test_app_permissions():
   resets = [
     desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'^\/.*$,^http:\/\/testserver\/.*$'),
     HAS_SQL_ENABLED.set_for_testing(False),
-    ENABLE_ALL_INTERPRETERS.set_for_testing(True),
+    ENABLE_ALL_INTERPRETERS.set_for_testing(False),
+    SHOW_NOTEBOOKS.set_for_testing(True)
   ]
 
   try:
