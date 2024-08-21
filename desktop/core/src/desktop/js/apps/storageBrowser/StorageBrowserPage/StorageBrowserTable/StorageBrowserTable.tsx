@@ -111,7 +111,8 @@ const StorageBrowserTable = ({
           permission: file.rwx,
           mtime: file.mtime,
           type: file.type,
-          path: file.path
+          path: file.path,
+          replication: file.stats.replication
         })) ?? []
     );
   }, [filesData]);
@@ -211,7 +212,9 @@ const StorageBrowserTable = ({
       }
       columns.push(column);
     }
-    return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
+    return columns.filter(
+      col => col.dataIndex !== 'type' && col.dataIndex !== 'path' && col.dataIndex !== 'replication'
+    );
   };
 
   const onRowClicked = (record: StorageBrowserTableData) => {
@@ -394,6 +397,8 @@ const StorageBrowserTable = ({
         inputLabel={t('Enter Folder name here')}
         submitText={t('Create')}
         showModal={showNewFolderModal}
+        inputType="text"
+        initialInputValue={''}
         onSubmit={handleCreateNewFolder}
         onClose={() => setShowNewFolderModal(false)}
       />
@@ -402,6 +407,8 @@ const StorageBrowserTable = ({
         inputLabel={t('Enter File name here')}
         submitText={t('Create')}
         showModal={showNewFileModal}
+        inputType="text"
+        initialInputValue={''}
         onSubmit={handleCreateNewFile}
         onClose={() => setShowNewFileModal(false)}
       />

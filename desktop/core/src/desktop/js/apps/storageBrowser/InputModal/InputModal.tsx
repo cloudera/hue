@@ -21,26 +21,31 @@ import { i18nReact } from '../../../utils/i18nReact';
 
 import './InputModal.scss';
 
+type InputValueType = string | number;
 //TODO: Add unit tests
-interface InputModalProps {
+interface InputModalProps<T> {
   cancelText?: string;
   inputLabel: string;
   submitText?: string;
   onClose: () => void;
-  onSubmit: (value: string) => void;
+  onSubmit: <T>(value: T) => void;
   showModal: boolean;
   title: string;
+  inputType: 'number' | 'text';
+  initialInputValue: T;
 }
 
-const InputModal = ({
+const InputModal = <T,>({
   inputLabel,
   onClose,
   onSubmit,
   showModal,
   title,
+  inputType,
+  initialInputValue,
   ...i18n
-}: InputModalProps): JSX.Element => {
-  const [value, setValue] = useState<string>('');
+}: InputModalProps<T>): JSX.Element => {
+  const [value, setValue] = useState<T>(initialInputValue);
   const { t } = i18nReact.useTranslation();
   const { cancelText = t('Cancel'), submitText = t('Submit') } = i18n;
 
@@ -50,12 +55,12 @@ const InputModal = ({
       className="hue-input-modal cuix antd"
       okText={submitText}
       onCancel={() => {
-        setValue('');
+        setValue(initialInputValue);
         onClose();
       }}
       onOk={() => {
         onSubmit(value);
-        setValue('');
+        setValue(initialInputValue);
         onClose();
       }}
       open={showModal}
@@ -65,6 +70,7 @@ const InputModal = ({
       <Input
         className="hue-input-modal__input"
         value={value}
+        type={inputType}
         onInput={e => {
           setValue((e.target as HTMLInputElement).value);
         }}

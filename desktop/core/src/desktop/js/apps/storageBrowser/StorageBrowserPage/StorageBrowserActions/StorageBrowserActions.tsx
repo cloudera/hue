@@ -21,6 +21,7 @@ import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 import Button from 'cuix/dist/components/Button';
 import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 import InfoIcon from '@cloudera/cuix-core/icons/react/InfoIcon';
+import SettingsIcon from '@cloudera/cuix-core/icons/react/SettingsIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
@@ -59,13 +60,15 @@ const StorageBrowserActions = ({
 }: StorageBrowserRowActionsProps): JSX.Element => {
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
   const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
+  const [showSetReplicationModal, setShowSetReplicationModal] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<string>('');
+  let replicationFactor: number;
 
   const { t } = i18nReact.useTranslation();
 
-  const handleRename = (newName: string) => {
+  const handleRename = (value: string) => {
     setLoadingFiles(true);
-    rename(selectedFile, newName)
+    rename(selectedFile, String(value))
       .then(() => {
         onSuccessfulAction();
       })
@@ -77,6 +80,9 @@ const StorageBrowserActions = ({
         setLoadingFiles(false);
       });
   };
+
+  //TODO: integrate with api
+  const handleSetReplication = () => {};
 
   const isSummaryEnabled = () => {
     if (selectedFiles.length !== 1) {
@@ -103,6 +109,14 @@ const StorageBrowserActions = ({
     );
   };
 
+  const isSetReplicationEnabled = () => {
+    if (selectedFiles.length !== 1) {
+      return false;
+    }
+    const selectedFile = selectedFiles[0];
+    return isHDFS(selectedFile.path) && selectedFile.type === 'file';
+  };
+
   const getActions = () => {
     const actions: MenuItemType[] = [];
     if (selectedFiles && selectedFiles.length > 0 && !inTrash(selectedFiles[0].path)) {
@@ -125,6 +139,19 @@ const StorageBrowserActions = ({
           onClick: () => {
             setSelectedFile(selectedFiles[0].path);
             setShowRenameModal(true);
+          }
+        });
+      }
+      if (isSetReplicationEnabled()) {
+        // eslint-disable-next-line no-restricted-syntax
+        replicationFactor = selectedFiles[0].replication;
+        actions.push({
+          key: 'setReplication',
+          icon: <SettingsIcon />,
+          label: t('Set replication'),
+          onClick: () => {
+            setSelectedFile(selectedFiles[0].path);
+            setShowSetReplicationModal(true);
           }
         });
       }
@@ -157,8 +184,20 @@ const StorageBrowserActions = ({
         inputLabel={t('Enter new name here')}
         submitText={t('Rename')}
         showModal={showRenameModal}
+        inputType="text"
+        initialInputValue={''}
         onSubmit={handleRename}
         onClose={() => setShowRenameModal(false)}
+      />
+      <InputModal
+        title={t('Set replication factor for')}
+        inputLabel={t('Replication factor:')}
+        submitText={t('Submit')}
+        inputType="number"
+        initialInputValue={replicationFactor}
+        showModal={showSetReplicationModal}
+        onSubmit={handleSetReplication}
+        onClose={() => setShowSetReplicationModal(false)}
       />
     </>
   );
