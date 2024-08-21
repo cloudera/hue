@@ -105,6 +105,8 @@ def get_zk_hs2():
   if zk.exists(znode):
     LOG.debug("Selecting up Hive server via the following node {0}".format(znode))
     hiveservers = zk.get_children(znode)
+    if hiveservers and 'sequence' in hiveservers[0]:
+      hiveservers.sort(key=lambda x: re.findall(r'sequence=\d+', x)[0])
   zk.stop()
   return hiveservers
 
@@ -240,8 +242,6 @@ def get_query_server_config(name='beeswax', connector=None):
         else:
           cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
       else:
-        # Setting hs2 cache in-case there is no HS2 discovery
-        cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
         if HIVE_DISCOVERY_HS2.get():
           # Replace ActiveEndpoint if the current HS2 is down
           hiveservers = get_zk_hs2()
@@ -266,6 +266,9 @@ def get_query_server_config(name='beeswax', connector=None):
           else:
             LOG.error('Currently there are no HiveServer2 running')
             raise PopupException(_('Currently there are no HiveServer2 running'))
+        else:
+          # Setting hs2 cache in-case there is no HS2 discovery
+          cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
 
       activeEndpoint = json.loads(cache.get("hiveserver2"))
 
@@ -285,11 +288,11 @@ def get_query_server_config(name='beeswax', connector=None):
           'use_sasl': HIVE_USE_SASL.get()
       }
     else:
-      kerberos_principal = get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
+      kerberos_principal = get_hiveserver2_kerberos_principal(activeEndpoint["host"])
       query_server = {
           'server_name': 'beeswax' if name != 'hplsql' else 'hplsql',
           'server_host': activeEndpoint["host"],
-          'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else HIVE_SERVER_PORT.get(),
+          'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else activeEndpoint["port"],
           'principal': kerberos_principal,
           'http_url': '%(protocol)s://%(host)s:%(port)s/%(end_point)s' % {
               'protocol': 'https' if hiveserver2_use_ssl() else 'http',
