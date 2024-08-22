@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,67 +15,52 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range, object
-import json
-import logging
 import os
-import pytest
-import subprocess
 import sys
+import json
 import time
 import uuid
-
-import proxy.conf
+import logging
 import tempfile
+import subprocess
+from io import StringIO as string_io
+from unittest.mock import Mock, patch
 
+import pytest
 from configobj import ConfigObj
-from django.db.models import query, CharField, SmallIntegerField
 from django.core.management import call_command
 from django.core.paginator import Paginator
 from django.db import connection
-from django.urls import reverse
-from django.test.client import Client
-from django.views.static import serve
+from django.db.models import CharField, SmallIntegerField, query
 from django.http import HttpResponse
-
-from dashboard.conf import HAS_SQL_ENABLED
-from desktop.settings import DATABASES
-from useradmin.models import GroupPermission, User
+from django.test.client import Client
+from django.urls import re_path, reverse
+from django.views.static import serve
 
 import desktop
 import desktop.conf
 import desktop.urls
-import desktop.redaction as redaction
 import desktop.views as views
-
-from desktop.auth.backend import rewrite_user
+import notebook.conf
+import desktop.redaction as redaction
+from dashboard.conf import HAS_SQL_ENABLED
 from desktop.appmanager import DESKTOP_APPS
+from desktop.auth.backend import rewrite_user
+from desktop.lib.conf import _configs_from_dir, validate_path
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.conf import _configs_from_dir
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 from desktop.lib.test_utils import grant_access
 from desktop.middleware import DJANGO_VIEW_AUTH_WHITELIST
-from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties, ClusterConfig, HUE_VERSION
+from desktop.models import HUE_VERSION, ClusterConfig, Directory, Document, Document2, _version_from_properties, get_data_link
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
-from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages, _get_config_errors
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from unittest.mock import patch, Mock
-  from django.urls import re_path
-else:
-  from cStringIO import StringIO as string_io
-  from mock import patch, Mock
-  from django.conf.urls import url as re_path
-
+from desktop.settings import DATABASES
+from desktop.views import _get_config_errors, check_config, collect_validation_messages, generate_configspec, home, load_confs
+from notebook.conf import ENABLE_ALL_INTERPRETERS, SHOW_NOTEBOOKS
+from useradmin.models import GroupPermission, User
 
 LOG = logging.getLogger()
 
@@ -91,6 +75,7 @@ def test_home():
   assert 200 == response.status_code
 
   from pig.models import PigScript
+
   script, created = PigScript.objects.get_or_create(owner=user)
   doc = Document.objects.link(script, owner=script.owner, name='test_home')
 
@@ -125,15 +110,18 @@ def test_home():
   tags = json.loads(response.context[0]['json_tags'])
   assert [] == tags['mine'][0]['docs'], tags
   assert [] == tags['trash']['docs'], tags
-  assert [] == tags['history']['docs'], tags # We currently don't fetch [doc.id]
+  assert [] == tags['history']['docs'], tags  # We currently don't fetch [doc.id]
+
 
 @pytest.mark.django_db
 def test_skip_wizard():
   pytest.skip("Skipping due to failures with pytest, investigation ongoing.")
-  c = make_logged_in_client() # is_superuser
+  c = make_logged_in_client()  # is_superuser
 
   response = c.get('/', follow=True)
-  assert ['admin_wizard.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates]
+  assert ['admin_wizard.mako' in _template.filename for _template in response.templates], [
+    _template.filename for _template in response.templates
+  ]
 
   c.cookies['hueLandingPage'] = 'home'
   response = c.get('/', follow=True)
@@ -141,8 +129,9 @@ def test_skip_wizard():
 
   c.cookies['hueLandingPage'] = ''
   response = c.get('/', follow=True)
-  assert ['admin_wizard.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates]
-
+  assert ['admin_wizard.mako' in _template.filename for _template in response.templates], [
+    _template.filename for _template in response.templates
+  ]
 
   c = make_logged_in_client(username="test_skip_wizard", password="test_skip_wizard", is_superuser=False)
 
@@ -157,6 +146,7 @@ def test_skip_wizard():
   response = c.get('/', follow=True)
   assert ['home.mako' in _template.filename for _template in response.templates], [_template.filename for _template in response.templates]
 
+
 @pytest.mark.django_db
 def test_public_views():
   c = Client()
@@ -168,6 +158,7 @@ def test_public_views():
       url = reverse(view)
     response = c.get(url)
     assert 200 == response.status_code
+
 
 def test_prometheus_view():
   if not desktop.conf.ENABLE_PROMETHEUS.get():
@@ -199,9 +190,10 @@ def test_prometheus_view():
   for metric in ALL_PROMETHEUS_METRICS:
     metric = metric if isinstance(metric, bytes) else metric.encode('utf-8')
     if metric not in desktop.metrics.ALLOWED_DJANGO_PROMETHEUS_METRICS:
-      assert not metric in response.content, 'metric: %s \n %s' % (metric, response.content)
+      assert metric not in response.content, 'metric: %s \n %s' % (metric, response.content)
     else:
       assert metric in response.content, 'metric: %s \n %s' % (metric, response.content)
+
 
 @pytest.mark.django_db
 def test_log_view():
@@ -227,6 +219,7 @@ def test_log_view():
   response = c.get(URL)
   assert 200 == response.status_code
 
+
 def test_download_log_view():
   pytest.skip("Skipping Test")
   c = make_logged_in_client()
@@ -234,29 +227,36 @@ def test_download_log_view():
   URL = reverse(views.download_log_view)
 
   LOG = logging.getLogger()
-  LOG.warning(u'une voix m’a réveillé')
+  LOG.warning('une voix m’a réveillé')
 
   # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
   response = c.get(URL)
   assert "application/zip" == response.get('Content-Type', '')
+
 
 def hue_version():
   global HUE_VERSION
   HUE_VERSION_BAK = HUE_VERSION
 
   try:
-    assert 'cdh6.x-SNAPSHOT' == _version_from_properties(string_io(
-      """# Autogenerated build properties
+    assert 'cdh6.x-SNAPSHOT' == _version_from_properties(
+      string_io(
+        """# Autogenerated build properties
       version=3.9.0-cdh5.9.0-SNAPSHOT
       git.hash=f5fbe90b6a1d0c186b0ddc6e65ce5fc8d24725c8
       cloudera.cdh.release=cdh6.x-SNAPSHOT
-      cloudera.hash=f5fbe90b6a1d0c186b0ddc6e65ce5fc8d24725c8aaaaa"""))
+      cloudera.hash=f5fbe90b6a1d0c186b0ddc6e65ce5fc8d24725c8aaaaa"""
+      )
+    )
 
-    assert not _version_from_properties(string_io(
-      """# Autogenerated build properties
+    assert not _version_from_properties(
+      string_io(
+        """# Autogenerated build properties
       version=3.9.0-cdh5.9.0-SNAPSHOT
       git.hash=f5fbe90b6a1d0c186b0ddc6e65ce5fc8d24725c8
-      cloudera.hash=f5fbe90b6a1d0c186b0ddc6e65ce5fc8d24725c8aaaaa"""))
+      cloudera.hash=f5fbe90b6a1d0c186b0ddc6e65ce5fc8d24725c8aaaaa"""
+      )
+    )
 
     assert not _version_from_properties(string_io(''))
   finally:
@@ -296,7 +296,7 @@ def test_prefs():
 
   # Check non-existent value
   response = c.get('/desktop/api2/user_preferences/doesNotExist')
-  assert None == json.loads(response.content)['data']
+  assert None is json.loads(response.content)['data']
 
 
 @pytest.mark.django_db
@@ -312,8 +312,10 @@ def test_status_bar():
   views.register_status_bar_view(lambda _: HttpResponse("foo", status=200))
   views.register_status_bar_view(lambda _: HttpResponse("bar"))
   views.register_status_bar_view(lambda _: None)
+
   def f(r):
     raise Exception()
+
   views.register_status_bar_view(f)
 
   response = c.get("/desktop/status_bar")
@@ -326,6 +328,7 @@ def test_paginator():
   """
   Test that the paginator works with partial list.
   """
+
   def assert_page(page, data, start, end):
     assert page.object_list == data
     assert page.start_index() == start
@@ -353,11 +356,13 @@ def test_paginator():
   assert_page(pgn.page(1), list(range(20)), 1, 20)
   assert_page(pgn.page(2), list(range(20, 25)), 21, 25)
 
+
 @pytest.mark.django_db
 def test_thread_dump():
   c = make_logged_in_client()
   response = c.get("/desktop/debug/threads", HTTP_X_REQUESTED_WITH='XMLHttpRequest')
   assert b"test_thread_dump" in response.content
+
 
 def test_truncating_model():
   class TinyModel(TruncatingModel):
@@ -366,10 +371,10 @@ def test_truncating_model():
 
   a = TinyModel()
 
-  a.short_field = 'a' * 9 # One less than it's max length
+  a.short_field = 'a' * 9  # One less than it's max length
   assert a.short_field == 'a' * 9, 'Short-enough field does not get truncated'
 
-  a.short_field = 'a' * 11 # One more than it's max_length
+  a.short_field = 'a' * 11  # One more than it's max_length
   assert a.short_field == 'a' * 10, 'Too-long field gets truncated'
 
   a.non_string_field = 10**10
@@ -383,6 +388,7 @@ def test_error_handling():
   restore_500_debug = desktop.conf.HTTP_500_DEBUG_MODE.set_for_testing(False)
 
   exc_msg = "error_raising_view: Test earráid handling"
+
   def error_raising_view(request, *args, **kwargs):
     raise Exception(exc_msg)
 
@@ -390,14 +396,13 @@ def test_error_handling():
     raise PopupException(exc_msg, title="earráid", detail=exc_msg)
 
   # Add an error view
-  error_url_pat = [
-      re_path('^500_internal_error$', error_raising_view),
-      re_path('^popup_exception$', popup_exception_view)
-  ]
+  error_url_pat = [re_path('^500_internal_error$', error_raising_view), re_path('^popup_exception$', popup_exception_view)]
   desktop.urls.urlpatterns.extend(error_url_pat)
   try:
+
     def store_exc_info(*args, **kwargs):
       pass
+
     # Disable the test client's exception forwarding
     c = make_logged_in_client()
     c.store_exc_info = store_exc_info
@@ -430,7 +435,7 @@ def test_desktop_permissions():
   USERNAME = 'test_core_permissions'
   GROUPNAME = 'default'
 
-  desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/testserver\/.*$')
+  desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'^\/.*$,^http:\/\/testserver\/.*$')
 
   c = make_logged_in_client(USERNAME, groupname=GROUPNAME, recreate=True, is_superuser=False)
 
@@ -445,8 +450,10 @@ def test_app_permissions():
   USERNAME = 'test_app_permissions'
   GROUPNAME = 'impala_only'
   resets = [
-    desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/testserver\/.*$'),
-    HAS_SQL_ENABLED.set_for_testing(False)
+    desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'^\/.*$,^http:\/\/testserver\/.*$'),
+    HAS_SQL_ENABLED.set_for_testing(False),
+    ENABLE_ALL_INTERPRETERS.set_for_testing(True),
+    SHOW_NOTEBOOKS.set_for_testing(True)
   ]
 
   try:
@@ -458,9 +465,7 @@ def test_app_permissions():
 
     def check_app(status_code, app_name):
       if app_name in DESKTOP_APPS:
-        assert (
-            status_code ==
-            c.get('/' + app_name, follow=True).status_code), 'status_code=%s app_name=%s' % (status_code, app_name)
+        assert status_code == c.get('/' + app_name, follow=True).status_code, 'status_code=%s app_name=%s' % (status_code, app_name)
 
     # Access to nothing
     check_app(401, 'beeswax')
@@ -472,17 +477,20 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(401, 'oozie')
 
+    # Clean INTERPRETERS_CACHE before every get_apps() call to have dynamic interpreters value for test_user
+    # because every testcase below needs clean INTERPRETERS_CACHE value as ENABLE_ALL_INTERPRETERS is now false by default.
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
-    assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'browser' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'dashboard' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'sdkapps' in apps, apps
+    assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'pig' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'browser' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'dashboard' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'sdkapps' not in apps, apps
 
     # Should always be enabled as it is a lib
     grant_access(USERNAME, GROUPNAME, "beeswax")
@@ -498,17 +506,18 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(401, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
     assert 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'browser' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'dashboard' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'sdkapps' in apps, apps
+    assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'pig' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'browser' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'dashboard' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'sdkapps' not in apps, apps
 
     # Add access to hbase
     grant_access(USERNAME, GROUPNAME, "hbase")
@@ -521,19 +530,20 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(401, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
     assert 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'pig' not in apps.get('editor', {}).get('interpreter_names', []), apps
     if 'hbase' not in desktop.conf.APP_BLACKLIST.get():
       assert 'browser' in apps, apps
       assert 'hbase' in apps['browser']['interpreter_names'], apps['browser']
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'scheduler' in apps, apps
-    assert not 'dashboard' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'sdkapps' in apps, apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'scheduler' not in apps, apps
+    assert 'dashboard' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'sdkapps' not in apps, apps
 
     # Reset all perms
     GroupPermission.objects.filter(group__name=GROUPNAME).delete()
@@ -545,17 +555,18 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(401, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
-    assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'browser' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'dashboard' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'sdkapps' in apps, apps
+    assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'pig' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'browser' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'dashboard' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'sdkapps' not in apps, apps
 
     # Test only impala perm
     grant_access(USERNAME, GROUPNAME, "impala")
@@ -567,17 +578,18 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(401, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
-    assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'browser' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'dashboard' in apps, apps
-    assert not 'scheduler' in apps, apps
-    assert not 'sdkapps' in apps, apps
+    assert 'pig' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'browser' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'dashboard' not in apps, apps
+    assert 'scheduler' not in apps, apps
+    assert 'sdkapps' not in apps, apps
 
     # Oozie Editor and Browser
     grant_access(USERNAME, GROUPNAME, "oozie")
@@ -589,11 +601,12 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(200, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
     assert 'scheduler' in apps, apps
-    assert not 'browser' in apps, apps # Actually should be true, but logic not implemented
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'browser' not in apps, apps  # Actually should be true, but logic not implemented
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
 
     grant_access(USERNAME, GROUPNAME, "pig")
     check_app(401, 'hive')
@@ -604,12 +617,13 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(200, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
-    assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-    assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'solr' not in apps.get('editor', {}).get('interpreter_names', []), apps
+    assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
 
     if 'search' not in desktop.conf.APP_BLACKLIST.get():
       grant_access(USERNAME, GROUPNAME, "search")
@@ -621,12 +635,13 @@ def test_app_permissions():
       check_app(401, 'spark')
       check_app(200, 'oozie')
 
+      notebook.conf.INTERPRETERS_CACHE = None
       apps = ClusterConfig(user=user).get_apps()
-      assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
+      assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
-      assert not 'spark' in apps.get('editor', {}).get('interpreter_names', []), apps
+      assert 'spark' not in apps.get('editor', {}).get('interpreter_names', []), apps
 
     if 'spark' not in desktop.conf.APP_BLACKLIST.get():
       grant_access(USERNAME, GROUPNAME, "spark")
@@ -638,8 +653,9 @@ def test_app_permissions():
       check_app(200, 'spark')
       check_app(200, 'oozie')
 
+      notebook.conf.INTERPRETERS_CACHE = None
       apps = ClusterConfig(user=user).get_apps()
-      assert not 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
+      assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'pig' in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'solr' in apps.get('editor', {}).get('interpreter_names', []), apps
@@ -652,6 +668,7 @@ def test_app_permissions():
   finally:
     for f in resets:
       f()
+    notebook.conf.INTERPRETERS_CACHE = None
 
 
 @pytest.mark.django_db
@@ -701,6 +718,7 @@ def test_404_handling():
     view_name = view_name.encode('utf-8')
   assert view_name in response.content
 
+
 class RecordingHandler(logging.Handler):
   def __init__(self, *args, **kwargs):
     logging.Handler.__init__(self, *args, **kwargs)
@@ -708,6 +726,7 @@ class RecordingHandler(logging.Handler):
 
   def emit(self, r):
     self.records.append(r)
+
 
 @pytest.mark.django_db
 def test_log_event():
@@ -729,13 +748,12 @@ def test_log_event():
   assert "INFO" == handler.records[-1].levelname
   assert "Untrusted log event from user test: foo3" == handler.records[-1].message
 
-  c.post("/desktop/log_frontend_event", {
-    "message": "01234567" * 1024})
+  c.post("/desktop/log_frontend_event", {"message": "01234567" * 1024})
   assert "INFO" == handler.records[-1].levelname
-  assert ("Untrusted log event from user test: " ==
-    handler.records[-1].message)
+  assert "Untrusted log event from user test: " == handler.records[-1].message
 
   root.removeHandler(handler)
+
 
 def test_validate_path():
   with tempfile.NamedTemporaryFile() as local_file:
@@ -764,7 +782,7 @@ def test_config_check():
         desktop.conf.SECRET_KEY_SCRIPT.set_for_testing(present=False),
         desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
         desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
-        desktop.conf.DEFAULT_SITE_ENCODING.set_for_testing('klingon')
+        desktop.conf.DEFAULT_SITE_ENCODING.set_for_testing('klingon'),
       )
 
       cli = make_logged_in_client()
@@ -781,6 +799,7 @@ def test_config_check():
       try:
         # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
         os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
+
         def validate_by_spec(error_list):
           pass
 
@@ -797,6 +816,7 @@ def test_config_check():
         else:
           os.environ["HUE_CONF_DIR"] = prev_env_conf
         desktop.views.validate_by_spec = desktop.views.real_validate_by_spec
+
 
 def test_last_access_time():
   pytest.skip("Skipping Test")
@@ -864,22 +884,26 @@ def test_cx_Oracle():
 
   try:
     import cx_Oracle
+
     return
   except ImportError as ex:
     if "No module named" in ex.message:
-      assert (False, "cx_Oracle skipped its build. This happens if "
-          "env var ORACLE_HOME or ORACLE_INSTANTCLIENT_HOME is not defined. "
-          "So ignore this test failure if your build does not need to work "
-          "with an oracle backend.")
+      assert (
+        False,
+        "cx_Oracle skipped its build. This happens if "
+        "env var ORACLE_HOME or ORACLE_INSTANTCLIENT_HOME is not defined. "
+        "So ignore this test failure if your build does not need to work "
+        "with an oracle backend.",
+      )
+
 
 @pytest.mark.django_db
 class TestStrictRedirection(object):
-
   def setup_method(self):
     self.finish = desktop.conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend'])
     self.client = make_logged_in_client()
     self.user = dict(username="test", password="test")
-    desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/example.com\/.*$')
+    desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'^\/.*$,^http:\/\/example.com\/.*$')
 
   def teardown_method(self):
     self.finish()
@@ -887,21 +911,23 @@ class TestStrictRedirection(object):
   def test_redirection_blocked(self):
     # Redirection with code 301 should be handled properly
     # Redirection with Status code 301 example reference: http://www.somacon.com/p145.php
-    self._test_redirection(redirection_url='http://www.somacon.com/color/html_css_table_border_styles.php',
-                           expected_status_code=403)
+    self._test_redirection(redirection_url='http://www.somacon.com/color/html_css_table_border_styles.php', expected_status_code=403)
     # Redirection with code 302 should be handled properly
-    self._test_redirection(redirection_url='http://www.google.com',
-                           expected_status_code=403)
+    self._test_redirection(redirection_url='http://www.google.com', expected_status_code=403)
 
   def test_redirection_allowed(self):
     # Redirection to the host where Hue is running should be OK.
     self._test_redirection(redirection_url='/', expected_status_code=302)
     self._test_redirection(redirection_url='/pig', expected_status_code=302)
     self._test_redirection(redirection_url='http://testserver/', expected_status_code=302)
-    self._test_redirection(redirection_url='https://testserver/', expected_status_code=302, **{
-      'SERVER_PORT': '443',
-      'wsgi.url_scheme': 'https',
-    })
+    self._test_redirection(
+      redirection_url='https://testserver/',
+      expected_status_code=302,
+      **{
+        'SERVER_PORT': '443',
+        'wsgi.url_scheme': 'https',
+      },
+    )
     self._test_redirection(redirection_url='http://example.com/', expected_status_code=302)
 
   def _test_redirection(self, redirection_url, expected_status_code, **kwargs):
@@ -917,7 +943,6 @@ class TestStrictRedirection(object):
 
 
 class BaseTestPasswordConfig(object):
-
   SCRIPT = '%s -c "print(\'\\n password from script \\n\')"' % sys.executable
 
   def get_config_password(self):
@@ -961,9 +986,7 @@ class BaseTestPasswordConfig(object):
   def test_password_script_raises_exception(self):
     resets = [
       self.get_config_password().set_for_testing(present=False),
-      self.get_config_password_script().set_for_testing(
-          '%s -c "import sys; sys.exit(1)"' % sys.executable
-      ),
+      self.get_config_password_script().set_for_testing('%s -c "import sys; sys.exit(1)"' % sys.executable),
     ]
 
     try:
@@ -987,7 +1010,6 @@ class BaseTestPasswordConfig(object):
 
 
 class TestSecretKeyConfig(BaseTestPasswordConfig):
-
   def get_config_password(self):
     return desktop.conf.SECRET_KEY
 
@@ -999,7 +1021,6 @@ class TestSecretKeyConfig(BaseTestPasswordConfig):
 
 
 class TestDatabasePasswordConfig(BaseTestPasswordConfig):
-
   def get_config_password(self):
     return desktop.conf.DATABASE.PASSWORD
 
@@ -1011,7 +1032,6 @@ class TestDatabasePasswordConfig(BaseTestPasswordConfig):
 
 
 class TestLDAPPasswordConfig(BaseTestPasswordConfig):
-
   def get_config_password(self):
     return desktop.conf.AUTH_PASSWORD
 
@@ -1028,7 +1048,6 @@ class TestLDAPPasswordConfig(BaseTestPasswordConfig):
 
 @pytest.mark.django_db
 class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):
-
   def setup_method(self):
     self.finish = desktop.conf.LDAP.LDAP_SERVERS.set_for_testing({'test': {}})
 
@@ -1046,7 +1065,6 @@ class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):
 
 
 class TestSMTPPasswordConfig(BaseTestPasswordConfig):
-
   def get_config_password(self):
     return desktop.conf.SMTP.PASSWORD
 
@@ -1059,7 +1077,6 @@ class TestSMTPPasswordConfig(BaseTestPasswordConfig):
 
 @pytest.mark.django_db
 class TestDocument(object):
-
   def setup_method(self):
     make_logged_in_client(username="original_owner", groupname="test_doc", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="original_owner")
@@ -1067,19 +1084,10 @@ class TestDocument(object):
     make_logged_in_client(username="copy_owner", groupname="test_doc", recreate=True, is_superuser=False)
     self.copy_user = User.objects.get(username="copy_owner")
 
-    self.document2 = Document2.objects.create(
-        name='Test Document2',
-        type='search-dashboard',
-        owner=self.user,
-        description='Test Document2'
-    )
+    self.document2 = Document2.objects.create(name='Test Document2', type='search-dashboard', owner=self.user, description='Test Document2')
 
     self.document = Document.objects.link(
-        content_object=self.document2,
-        owner=self.user,
-        name='Test Document',
-        description='Test Document',
-        extra='test'
+      content_object=self.document2, owner=self.user, name='Test Document', description='Test Document', extra='test'
     )
 
     self.document.save()
@@ -1098,30 +1106,14 @@ class TestDocument(object):
 
   def test_document_trashed_and_restore(self):
     home_dir = Directory.objects.get_home_directory(self.user)
-    test_dir, created = Directory.objects.get_or_create(
-        parent_directory=home_dir,
-        owner=self.user,
-        name='test_dir'
-    )
+    test_dir, created = Directory.objects.get_or_create(parent_directory=home_dir, owner=self.user, name='test_dir')
     test_doc = Document2.objects.create(
-        name='Test Document2',
-        type='search-dashboard',
-        owner=self.user,
-        description='Test Document2',
-        parent_directory=test_dir
+      name='Test Document2', type='search-dashboard', owner=self.user, description='Test Document2', parent_directory=test_dir
     )
 
-    child_dir, created = Directory.objects.get_or_create(
-        parent_directory=test_dir,
-        owner=self.user,
-        name='child_dir'
-    )
+    child_dir, created = Directory.objects.get_or_create(parent_directory=test_dir, owner=self.user, name='child_dir')
     test_doc1 = Document2.objects.create(
-        name='Test Document2',
-        type='search-dashboard',
-        owner=self.user,
-        description='Test Document2',
-        parent_directory=child_dir
+      name='Test Document2', type='search-dashboard', owner=self.user, description='Test Document2', parent_directory=child_dir
     )
 
     assert not test_dir.is_trashed
@@ -1156,16 +1148,9 @@ class TestDocument(object):
       test_doc1.delete()
       child_dir.delete()
 
-
   def test_multiple_home_directories(self):
     home_dir = Directory.objects.get_home_directory(self.user)
-    test_doc1 = Document2.objects.create(
-        name='test-doc1',
-        type='query-hive',
-        owner=self.user,
-        description='',
-        parent_directory=home_dir
-    )
+    test_doc1 = Document2.objects.create(name='test-doc1', type='query-hive', owner=self.user, description='', parent_directory=home_dir)
 
     assert home_dir.children.exclude(name__in=['.Trash', 'Gist']).count() == 2
 
@@ -1175,11 +1160,7 @@ class TestDocument(object):
     assert Document2.objects.filter(owner=self.user, name=Document2.HOME_DIR).count() == 2
 
     test_doc2 = Document2.objects.create(
-        name='test-doc2',
-        type='query-hive',
-        owner=self.user,
-        description='',
-        parent_directory=second_home_dir
+      name='test-doc2', type='query-hive', owner=self.user, description='', parent_directory=second_home_dir
     )
     assert second_home_dir.children.count() == 1
 
@@ -1192,13 +1173,7 @@ class TestDocument(object):
 
   def test_multiple_trash_directories(self):
     home_dir = Directory.objects.get_home_directory(self.user)
-    test_doc1 = Document2.objects.create(
-        name='test-doc1',
-        type='query-hive',
-        owner=self.user,
-        description='',
-        parent_directory=home_dir
-    )
+    test_doc1 = Document2.objects.create(name='test-doc1', type='query-hive', owner=self.user, description='', parent_directory=home_dir)
 
     assert home_dir.children.count() == 3
 
@@ -1207,20 +1182,13 @@ class TestDocument(object):
     Document2.objects.filter(name='second_trash_dir').update(name=Document2.TRASH_DIR)
     assert Directory.objects.filter(owner=self.user, name=Document2.TRASH_DIR).count() == 2
 
-
-    test_doc2 = Document2.objects.create(
-        name='test-doc2',
-        type='query-hive',
-        owner=self.user,
-        description='',
-        parent_directory=home_dir
-    )
-    assert home_dir.children.count() == 5 # Including the second trash
+    test_doc2 = Document2.objects.create(name='test-doc2', type='query-hive', owner=self.user, description='', parent_directory=home_dir)
+    assert home_dir.children.count() == 5  # Including the second trash
     with pytest.raises(Document2.MultipleObjectsReturned):
-        Directory.objects.get(name=Document2.TRASH_DIR)
+      Directory.objects.get(name=Document2.TRASH_DIR)
 
     test_doc1.trash()
-    assert home_dir.children.count() == 3 # As trash documents are merged count is back to 3
+    assert home_dir.children.count() == 3  # As trash documents are merged count is back to 3
     merged_trash_dir = Directory.objects.get(name=Document2.TRASH_DIR, owner=self.user)
 
     test_doc2.trash()
@@ -1229,7 +1197,6 @@ class TestDocument(object):
     children_names = [child.name for child in children]
     assert test_doc2.name in children_names
     assert test_doc1.name in children_names
-
 
   def test_document_copy(self):
     pytest.skip("Skipping Test")
@@ -1265,13 +1232,14 @@ class TestDocument(object):
     assert Document.objects.filter(name=name).count() == 1
     assert doc.description == self.document.description
 
-
   def test_redact_statements(self):
     old_policies = redaction.global_redaction_engine.policies
     redaction.global_redaction_engine.policies = [
-      RedactionPolicy([
-        RedactionRule('', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
-      ])
+      RedactionPolicy(
+        [
+          RedactionRule('', r'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
+        ]
+      )
     ]
 
     logfilter.add_log_redaction_filter_to_logger(redaction.global_redaction_engine, logging.root)
@@ -1287,12 +1255,12 @@ class TestDocument(object):
           'sqlDialect': True,
           'snippetImage': '/static/beeswax/art/icon_beeswax_48.png',
           'placeHolder': 'Example: SELECT * FROM tablename, or press CTRL + space',
-          'aceMode': 'ace/mode/hive'
-         },
+          'aceMode': 'ace/mode/hive',
+        },
         'id': '10a29cda-063f-1439-4836-d0c460154075',
         'statement_raw': sensitive_query,
         'statement': sensitive_query,
-        'type': 'hive'
+        'type': 'hive',
       },
       {
         'status': 'ready',
@@ -1300,12 +1268,12 @@ class TestDocument(object):
           'sqlDialect': True,
           'snippetImage': '/static/impala/art/icon_impala_48.png',
           'placeHolder': 'Example: SELECT * FROM tablename, or press CTRL + space',
-          'aceMode': 'ace/mode/impala'
-         },
+          'aceMode': 'ace/mode/impala',
+        },
         'id': 'e17d195a-beb5-76bf-7489-a9896eeda67a',
         'statement_raw': sensitive_query,
         'statement': sensitive_query,
-        'type': 'impala'
+        'type': 'impala',
       },
       {
         'status': 'ready',
@@ -1313,12 +1281,12 @@ class TestDocument(object):
           'sqlDialect': True,
           'snippetImage': '/static/beeswax/art/icon_beeswax_48.png',
           'placeHolder': 'Example: SELECT * FROM tablename, or press CTRL + space',
-          'aceMode': 'ace/mode/hive'
-         },
+          'aceMode': 'ace/mode/hive',
+        },
         'id': '10a29cda-063f-1439-4836-d0c460154075',
         'statement_raw': nonsensitive_query,
         'statement': nonsensitive_query,
-        'type': 'hive'
+        'type': 'hive',
       },
     ]
 
@@ -1332,11 +1300,11 @@ class TestDocument(object):
       # Make sure redacted queries are redacted.
       assert redacted_query == saved_snippets[0]['statement']
       assert redacted_query == saved_snippets[0]['statement_raw']
-      assert True == saved_snippets[0]['is_redacted']
+      assert True is saved_snippets[0]['is_redacted']
 
       assert redacted_query == saved_snippets[1]['statement']
       assert redacted_query == saved_snippets[1]['statement_raw']
-      assert True == saved_snippets[1]['is_redacted']
+      assert True is saved_snippets[1]['is_redacted']
 
       document = Document2.objects.get(pk=self.document2.pk)
       assert redacted_query == document.search
@@ -1344,7 +1312,7 @@ class TestDocument(object):
       # Make sure unredacted queries are not redacted.
       assert nonsensitive_query == saved_snippets[2]['statement']
       assert nonsensitive_query == saved_snippets[2]['statement_raw']
-      assert not 'is_redacted' in saved_snippets[2]
+      assert 'is_redacted' not in saved_snippets[2]
     finally:
       redaction.global_redaction_engine.policies = old_policies
 
@@ -1352,6 +1320,7 @@ class TestDocument(object):
     c1 = make_logged_in_client(username='test_get_user', groupname='test_get_group', recreate=True, is_superuser=False)
     r1 = c1.get('/desktop/api/doc/get?id=1')
     assert -1, json.loads(r1.content)['status']
+
 
 def test_session_secure_cookie():
   with tempfile.NamedTemporaryFile() as cert_file:
@@ -1406,21 +1375,20 @@ def test_session_secure_cookie():
 
 
 def test_get_data_link():
-  assert None == get_data_link({})
+  assert None is get_data_link({})
   assert 'gethue.com' == get_data_link({'type': 'link', 'link': 'gethue.com'})
 
-  assert (
-    '/hbase/#Cluster/document_demo/query/20150527' ==
-    get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'}))
-  assert (
-      '/hbase/#Cluster/document_demo/query/20150527[f1]' ==
-      get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'}))
-  assert (
-      '/hbase/#Cluster/document_demo/query/20150527[f1:c1]' ==
-      get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'}))
+  assert '/hbase/#Cluster/document_demo/query/20150527' == get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'})
+  assert '/hbase/#Cluster/document_demo/query/20150527[f1]' == get_data_link(
+    {'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'}
+  )
+  assert '/hbase/#Cluster/document_demo/query/20150527[f1:c1]' == get_data_link(
+    {'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'}
+  )
 
   assert '/filebrowser/view=/data/hue/1' == get_data_link({'type': 'hdfs', 'path': '/data/hue/1'})
   assert '/metastore/table/default/sample_07' == get_data_link({'type': 'hive', 'database': 'default', 'table': 'sample_07'})
+
 
 def test_get_dn():
   assert ['*'] == desktop.conf.get_dn('')
@@ -1447,6 +1415,7 @@ def test_collect_validation_messages_default():
   finally:
     os.remove(configspec.name)
 
+
 def test_collect_validation_messages_extras():
   try:
     # Generate the spec file
@@ -1456,24 +1425,13 @@ def test_collect_validation_messages_extras():
     conf = load_confs(configspec.name, _configs_from_dir(config_dir))
 
     test_conf = ConfigObj()
-    test_conf['extrasection'] = {
-      'key1': 'value1',
-      'key2': 'value1'
-    }
-    extrasubsection = {
-      'key1': 'value1',
-      'key2': 'value1'
-    }
+    test_conf['extrasection'] = {'key1': 'value1', 'key2': 'value1'}
+    extrasubsection = {'key1': 'value1', 'key2': 'value1'}
     # Test with extrasections as well as existing subsection, keyvalues in existing section [desktop]
     test_conf['desktop'] = {
       'extrasubsection': extrasubsection,
       'extrakey': 'value1',
-      'auth': {
-        'ignore_username_case': 'true',
-        'extrasubsubsection': {
-          'extrakey': 'value1'
-        }
-      }
+      'auth': {'ignore_username_case': 'true', 'extrasubsubsection': {'extrakey': 'value1'}},
     }
     conf.merge(test_conf)
     error_list = []
@@ -1481,9 +1439,12 @@ def test_collect_validation_messages_extras():
   finally:
     os.remove(configspec.name)
   assert len(error_list) == 1
-  assert (u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , '
-      'Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ' ==
-      error_list[0]['message'])
+  assert (
+    'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , '
+    'Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] '
+    == error_list[0]['message']
+  )
+
 
 # Test db migration from 5.7,...,5.15 to latest
 @pytest.mark.django_db
@@ -1557,12 +1518,11 @@ def test_db_migrations_mysql():
 def test_forbidden_libs():
   if sys.version_info[0] > 2:
     pytest.skip("Skipping Test")
-  import chardet # chardet license (LGPL) is not compatible and should not be bundled
+  import chardet  # chardet license (LGPL) is not compatible and should not be bundled
 
 
 @pytest.mark.django_db
-class TestGetConfigErrors():
-
+class TestGetConfigErrors:
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
@@ -1575,13 +1535,5 @@ class TestGetConfigErrors():
     request = Mock(user=self.user)
 
     with patch('desktop.views.appmanager') as appmanager:
-      appmanager.DESKTOP_MODULES = [
-        Mock(
-          conf=Mock(
-            config_validator=lambda user: [(u'Connector 1', 'errored because of ...')]
-          )
-        )
-      ]
-      assert (
-        [{'name': 'Connector 1', 'message': 'errored because of ...'}] ==
-        _get_config_errors(request, cache=False))
+      appmanager.DESKTOP_MODULES = [Mock(conf=Mock(config_validator=lambda user: [('Connector 1', 'errored because of ...')]))]
+      assert [{'name': 'Connector 1', 'message': 'errored because of ...'}] == _get_config_errors(request, cache=False)
