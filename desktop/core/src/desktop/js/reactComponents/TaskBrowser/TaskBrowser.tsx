@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { act } from '@testing-library/react';
 import { i18nReact } from '../../../js/utils/i18nReact';
 import axios from 'axios';
 import { post, get, extractErrorMessage } from '../../../js/api/utils.ts';
@@ -116,15 +115,13 @@ const TaskBrowser: React.FC = (): React.ReactElement => {
         ]
       })
       .then(() => {
-        act(() => huePubSub.publish('hue.global.info', { message: `Task submitted successfully` }));
+        huePubSub.publish('hue.global.info', { message: `Task submitted successfully` });
       })
       .catch(error => {
         const errorMessage = extractErrorMessage(error);
-        act(() =>
-          huePubSub.publish('hue.global.error', {
-            message: `Failed to submit scheduling task ${errorMessage}`
-          })
-        );
+        huePubSub.publish('hue.global.error', {
+          message: `Failed to submit scheduling task ${errorMessage}`
+        });
       });
   };
 
@@ -163,9 +160,7 @@ const TaskBrowser: React.FC = (): React.ReactElement => {
         setShowLogPopup(true);
       })
       .catch(error => {
-        act(() =>
-          huePubSub.publish('hue.global.error', { message: `Error fetching task logs: ${error}` })
-        );
+        huePubSub.publish('hue.global.error', { message: `Error fetching task logs: ${error}` });
       });
   };
 
@@ -334,20 +329,16 @@ export const TaskBrowserTable: React.FC<TaskBrowserTableProps> = ({
             });
             setTasks(sortedTasks);
           } else {
-            act(() =>
-              huePubSub.publish('hue.global.error', {
-                message: `Expected an array of tasks, but received: ${tasks}`
-              })
-            );
+            huePubSub.publish('hue.global.error', {
+              message: `Expected an array of tasks, but received: ${tasks}`
+            });
           }
         })
         .catch(error => {
           const errorMessage = extractErrorMessage(error);
-          act(() =>
-            huePubSub.publish('hue.global.error', {
-              message: `Error fetching tasks from redis ${errorMessage}`
-            })
-          );
+          huePubSub.publish('hue.global.error', {
+            message: `Error fetching tasks from redis ${errorMessage}`
+          });
         })
         .finally(() => {
           setTimeout(fetchTasks, 5000);
@@ -422,30 +413,22 @@ export const TaskBrowserTable: React.FC<TaskBrowserTableProps> = ({
         // Assuming the server response is in the expected format
         const { status, message } = response;
         if (status === 'success') {
-          act(() =>
-            huePubSub.publish('hue.global.error', { message: `Task: ${taskId} has been killed.` })
-          );
+          huePubSub.publish('hue.global.error', { message: `Task: ${taskId} has been killed.` });
         } else if (status === 'info') {
-          act(() =>
-            huePubSub.publish('', {
-              message: `Task: ${taskId} has already been completed or revoked.`
-            })
-          );
+          huePubSub.publish('', {
+            message: `Task: ${taskId} has already been completed or revoked.`
+          });
         } else {
-          act(() =>
-            huePubSub.publish('hue.global.error', {
-              message: `Task: ${taskId} could not be killed. ${message}`
-            })
-          );
+          huePubSub.publish('hue.global.error', {
+            message: `Task: ${taskId} could not be killed. ${message}`
+          });
         }
       })
       .catch(error => {
         const errorMessage = extractErrorMessage(error);
-        act(() =>
-          huePubSub.publish('hue.global.error', {
-            message: `Task not killed - Error: ${errorMessage}`
-          })
-        );
+        huePubSub.publish('hue.global.error', {
+          message: `Task not killed - Error: ${errorMessage}`
+        });
       });
   };
 
