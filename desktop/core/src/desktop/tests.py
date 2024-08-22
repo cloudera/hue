@@ -432,7 +432,7 @@ def test_error_handling():
 @pytest.mark.django_db
 def test_desktop_permissions():
   USERNAME = 'test_core_permissions'
-  GROUPNAME = 'default'
+  GROUPNAME = 'default_core_permissions'
 
   desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'^\/.*$,^http:\/\/testserver\/.*$')
 
