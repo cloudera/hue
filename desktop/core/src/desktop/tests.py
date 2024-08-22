@@ -41,6 +41,7 @@ import desktop
 import desktop.conf
 import desktop.urls
 import desktop.views as views
+import notebook.conf
 import desktop.redaction as redaction
 from dashboard.conf import HAS_SQL_ENABLED
 from desktop.appmanager import DESKTOP_APPS
@@ -476,6 +477,9 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(401, 'oozie')
 
+    # Clean INTERPRETERS_CACHE before every get_apps() call to have dynamic interpreters value for test_user
+    # because every testcase below needs clean INTERPRETERS_CACHE value as ENABLE_ALL_INTERPRETERS is now false by default.
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
     assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
@@ -502,6 +506,7 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(401, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
     assert 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
@@ -525,6 +530,7 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(401, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
     assert 'hive' in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
@@ -549,6 +555,7 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(401, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
     assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'impala' not in apps.get('editor', {}).get('interpreter_names', []), apps
@@ -571,6 +578,7 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(401, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
     assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
@@ -593,6 +601,7 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(200, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
     assert 'scheduler' in apps, apps
     assert 'browser' not in apps, apps  # Actually should be true, but logic not implemented
@@ -608,6 +617,7 @@ def test_app_permissions():
     check_app(401, 'spark')
     check_app(200, 'oozie')
 
+    notebook.conf.INTERPRETERS_CACHE = None
     apps = ClusterConfig(user=user).get_apps()
     assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
     assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
@@ -625,6 +635,7 @@ def test_app_permissions():
       check_app(401, 'spark')
       check_app(200, 'oozie')
 
+      notebook.conf.INTERPRETERS_CACHE = None
       apps = ClusterConfig(user=user).get_apps()
       assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
@@ -642,6 +653,7 @@ def test_app_permissions():
       check_app(200, 'spark')
       check_app(200, 'oozie')
 
+      notebook.conf.INTERPRETERS_CACHE = None
       apps = ClusterConfig(user=user).get_apps()
       assert 'hive' not in apps.get('editor', {}).get('interpreter_names', []), apps
       assert 'impala' in apps.get('editor', {}).get('interpreter_names', []), apps
@@ -656,6 +668,7 @@ def test_app_permissions():
   finally:
     for f in resets:
       f()
+    notebook.conf.INTERPRETERS_CACHE = None
 
 
 @pytest.mark.django_db
