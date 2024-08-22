@@ -451,7 +451,7 @@ def test_app_permissions():
   resets = [
     desktop.conf.REDIRECT_WHITELIST.set_for_testing(r'^\/.*$,^http:\/\/testserver\/.*$'),
     HAS_SQL_ENABLED.set_for_testing(False),
-    ENABLE_ALL_INTERPRETERS.set_for_testing(False),
+    ENABLE_ALL_INTERPRETERS.set_for_testing(True),
     SHOW_NOTEBOOKS.set_for_testing(True)
   ]
 
