@@ -296,7 +296,8 @@ def _default_interpreters(user):
       ('impala', {'name': 'Impala', 'interface': 'hiveserver2', 'options': {}}),
     )
 
-  # Behind a flag for supporting old scenario. We can always remove this config and stop supporting the old scenario.
+  # Other interpreters are behind a flag to not enable them by default. Users need to explicitly add configs for enabling them or
+  # if they want to revert to old scenario, they can disable the flag which will show all default interpreters for every whitelisted app.
   if ENABLE_ALL_INTERPRETERS.get():
     if 'pig' in apps:
       interpreters.append(('pig', {'name': 'Pig', 'interface': 'oozie', 'options': {}}))
