@@ -22,10 +22,7 @@
 
   .metrics-heading {
     color: $fluidx-gray-700;
-    padding-left: $font-size-lg;
     font-size: $fluidx-heading-h4-size;
-    line-height: $fluidx-heading-h4-line-height;
-    font-weight: $fluidx-heading-h4-weight;
   }
 
   .metrics-filter {
@@ -38,8 +35,11 @@
     }
   }
 
-  .metrics-table th {
-    width: 30%;
+  .metrics-table {
+    th {
+      width: 30%;
+    }
+    margin-bottom: $font-size-base;
   }
 
   .metrics-select {

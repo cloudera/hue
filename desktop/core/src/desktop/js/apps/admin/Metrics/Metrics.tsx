@@ -91,14 +91,6 @@ const Metrics: React.FC = (): JSX.Element => {
       <Spin spinning={loading}>
         {!error && (
           <>
-            <Input
-              className="metrics-filter"
-              placeholder="Filter metrics..."
-              value={searchQuery}
-              onChange={handleFilterInputChange}
-              prefix={<SearchOutlined />}
-            />
-
             <Select
               className="metrics-select"
               //to make sure antd class gets applied
@@ -115,6 +107,14 @@ const Metrics: React.FC = (): JSX.Element => {
                 </Option>
               ))}
             </Select>
+
+            <Input
+              className="metrics-filter"
+              placeholder="Filter metrics..."
+              value={searchQuery}
+              onChange={handleFilterInputChange}
+              prefix={<SearchOutlined />}
+            />
           </>
         )}
 

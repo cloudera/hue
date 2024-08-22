@@ -115,13 +115,14 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
 
   return (
     <>
-      <h4 className="metrics-heading">{caption}</h4>
       <Table
         className="metrics-table"
         dataSource={transformedDataSource}
         rowKey="name"
         columns={metricsColumns}
         pagination={false}
+        title={() => <h4 className="metrics-heading">{caption}</h4>}
+        bordered
       />
     </>
   );
