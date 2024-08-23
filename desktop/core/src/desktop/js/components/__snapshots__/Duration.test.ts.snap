@@ -2,12 +2,12 @@
 
 exports[`Duration.vue should render 1`] = `
 <span>
-  342:56:07
+  473352:00:00
 </span>
 `;
 
 exports[`Duration.vue should render short format 1`] = `
 <span>
-  14days
+  54years
 </span>
 `;
