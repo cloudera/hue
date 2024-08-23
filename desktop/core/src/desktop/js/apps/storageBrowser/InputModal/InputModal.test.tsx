@@ -162,6 +162,9 @@ describe('InputModal', () => {
     const cancelButton = within(inputModal).getByRole('button', { name: 'Cancel' });
 
     await user.tab();
+    if (!closeIconButton.matches(':focus')) {
+      await user.tab(); // Tab again if the focus is on the sentinel
+    }
     expect(closeIconButton).toHaveFocus();
     await user.tab();
     expect(inputTextBox).toHaveFocus();
