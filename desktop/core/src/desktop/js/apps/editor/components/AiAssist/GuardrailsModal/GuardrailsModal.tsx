@@ -29,7 +29,7 @@ interface GuardrailsModalProps {
   alert: GuardrailAlert;
 }
 
-const GuardrailsModal = ({ open, alert, onClose }: GuardrailsModalProps) => {
+const GuardrailsModal = ({ open, alert, onClose }: GuardrailsModalProps): JSX.Element => {
   return (
     <Modal
       wrapClassName="cuix hue-ai-guardrails-modal"

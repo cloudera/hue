@@ -35,51 +35,37 @@ $border-color: #d6d8db;
 .hive-timeline {
   .timeline-bars {
     margin-bottom: 10px;
-
     transition: width 0.5s ease-out;
-
     font-size: 0;
     overflow: hidden;
-
     user-select: none;
-
     box-sizing: border-box;
 
     .bar {
       display: inline-block;
-
       font-size: 12px;
       text-align: center;
       white-space: nowrap;
-
       overflow: hidden;
       text-overflow: ellipsis;
-
       box-sizing: border-box;
-
       vertical-align: top;
     }
 
     .groups {
       height: 30px;
-
       white-space: nowrap;
-
       overflow: hidden;
 
       .bar {
         width: 25%;
         height: 30px;
         font-weight: bold;
-
         padding-top: 5px;
-
         border: solid $border-color;
-        border-width: 1px 1px 0px 1px;
+        border-width: 1px 1px 0 1px;
         border-radius: 10px 10px 0 0;
-
         box-sizing: border-box;
-
         background-color: #F7F7F7;
       }
     }
@@ -87,18 +73,14 @@ $border-color: #d6d8db;
     .sub-groups {
       height: 40px;
       border: 1px solid $border-color;
-
       white-space: nowrap;
-
       border-radius: 0 0 10px 10px;
       overflow: hidden;
 
       .bar {
         width: 10%;
         height: 40px;
-
         padding-top: 10px;
-
         border-left: 1px solid $border-color;
         box-sizing: border-box;
 
@@ -137,31 +119,25 @@ $border-color: #d6d8db;
     }
 
     tr {
-      margin: 0px 0px 0px 15px;
+      margin: 0 0 0 15px;
       overflow: hidden;
     }
 
     td {
       border: 1px solid #e5e5e5;
-      padding: 5px;
-
       min-width: 50px;
       max-width: 600px;
-
       white-space: nowrap;
       overflow: auto;
-
       padding: 5px;
     }
 
     i {
       display: inline-block;
-
       width: .85em;
       height: .85em;
       border: 1px solid $border-color;
       border-radius: .5em;
-
       margin-right: 5px;
       margin-top: 1px;
     }
@@ -170,9 +146,11 @@ $border-color: #d6d8db;
       &:nth-of-type(1) i {
         @include hue-bkg(0);
       }
+
       &:nth-of-type(2) i {
         @include hue-bkg(40);
       }
+
       &:nth-of-type(3) i {
         @include hue-bkg(80);
       }
@@ -182,6 +160,7 @@ $border-color: #d6d8db;
       &:nth-of-type(1) i {
         @include hue-bkg(200);
       }
+
       &:nth-of-type(2) i {
         @include hue-bkg(160);
       }
@@ -197,9 +176,11 @@ $border-color: #d6d8db;
       &:nth-of-type(1) i {
         @include hue-bkg(240);
       }
+
       &:nth-of-type(2) i {
         @include hue-bkg(280);
       }
+
       &:nth-of-type(3) i {
         @include hue-bkg(320);
       }
@@ -209,10 +190,7 @@ $border-color: #d6d8db;
   .timeline-details {
     display: flex;
     flex-wrap: wrap;
-
-    column-gap: 10px;
-    row-gap: 10px;
-
+    gap: 10px 10px;
     align-items: flex-start;
   }
 }

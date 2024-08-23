@@ -44,6 +44,8 @@
     }
   ],
   "rules": {
+    "rule-empty-line-before": null,
+    "declaration-empty-line-before": null,
     "alpha-value-notation": null,
     "at-rule-empty-line-before": null,
     "at-rule-no-vendor-prefix": null,

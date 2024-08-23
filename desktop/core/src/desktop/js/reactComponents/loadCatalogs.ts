@@ -19,34 +19,20 @@
 import { getLastKnownConfig } from 'config/hueConfig';
 import huePubSub from 'utils/huePubSub';
 import sleep from 'utils/timing/sleep';
+import DataCatalogEntry, { DatabaseSourceMeta, SourceMeta } from 'catalog/DataCatalogEntry';
 
-const fetchColumnsData = async (databaseName: string, tableName: string, executor: any) => {
-  const dbEntry = await executor.dataCatalog.getEntry({
+const fetchColumnsData = async (
+  databaseName: string,
+  tableName: string,
+  entry: DataCatalogEntry
+): Promise<DataCatalogEntry[]> => {
+  const dbEntry = await entry.dataCatalog.getEntry({
     path: [databaseName, tableName],
-    connector: executor.connector,
-    namespace: executor.namespace,
-    compute: executor.compute
+    namespace: entry.namespace,
+    compute: entry.compute
   });
   const columns = await dbEntry.getChildren();
   return columns;
-};
-
-export const getRelevantTableDetails = async (
-  databaseName: string,
-  tableNames: string[],
-  executor: any
-): Promise<any[]> => {
-  const relevantTables: any[] = [];
-  for (const tableName of tableNames) {
-    const columns = await fetchColumnsData(databaseName, tableName, executor);
-    const tableDetails = {
-      tableName: tableName,
-      columns: columns.map(({ definition }: any) => definition),
-      partitions: columns.partitions
-    };
-    relevantTables.push(tableDetails);
-  }
-  return relevantTables;
 };
 
 export async function loadDataCatalogs(): Promise<void> {
@@ -57,8 +43,8 @@ export async function loadDataCatalogs(): Promise<void> {
 
   huePubSub.subscribe(
     'fetch_tables_metadata',
-    async (data: { sourceMetaPromise: Promise<any>; entry: any }) => {
-      const dataCatalogEntry = await data.sourceMetaPromise;
+    async (data: { sourceMetaPromise: Promise<SourceMeta>; entry: DataCatalogEntry }) => {
+      const dataCatalogEntry = (await data.sourceMetaPromise) as DatabaseSourceMeta;
       if (!dataCatalogEntry.tables_meta) {
         return;
       }

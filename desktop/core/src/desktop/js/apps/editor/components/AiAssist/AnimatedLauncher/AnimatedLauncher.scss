@@ -25,21 +25,31 @@ $adjusted-left-margin: 93px;
 @mixin twinkle-stars-in-icon {
   .ai-assist-icon__star-1 {
     animation: twinkle 1s 1;
-    animation-delay: 0s; 
+    animation-delay: 0s;
   }
+
   .ai-assist-icon__star-2 {
     animation: twinkle 1s 1;
-    animation-delay: 0.25s; 
+    animation-delay: 0.25s;
   }
+
   .ai-assist-icon__star-3 {
     animation: twinkle 1s 1;
     animation-delay: 0.5s;
   }
-  
+
   @keyframes twinkle {
-    0%, 100% { fill: currentColor; opacity: 1; }
-    50% { opacity: 0.2; }
-  }  
+    0%,
+    100% {
+      fill: currentColor;
+      opacity: 1;
+    }
+  }
+  @keyframes twinkle {
+    50% {
+      opacity: 0.2;
+    }
+  }
 }
 
 .cuix.antd {
@@ -47,11 +57,11 @@ $adjusted-left-margin: 93px;
     border: 0;
     padding: 0;
     position: absolute;
-    background: vars.$fluidx-blue-400;    
+    background: vars.$fluidx-blue-400;
     box-shadow: 0 0 0 0 vars.$fluidx-blue-300;
     color: vars.$fluidx-blue-600;
     z-index: 2;
-    opacity: 0; 
+    opacity: 0;
   }
 
   .hue-ai-assist-bar__animated-launcher-icon-title {
@@ -66,9 +76,10 @@ $adjusted-left-margin: 93px;
     height: toolbar-vars.$toolbar-height-medium;
 
     .ai-assist-icon--twinkle-once {
-      @include twinkle-stars-in-icon(); 
+      @include twinkle-stars-in-icon();
     }
   }
+
   .hue-ai-assist-bar__animated-launcher-btn--active,
   .hue-ai-assist-bar__animated-launcher-btn--active[disabled]:hover {
     color: vars.$fluidx-blue-800;
@@ -178,7 +189,6 @@ $adjusted-left-margin: 93px;
 
 @keyframes expandAndSlide {
   0% {
-    border-radius: 6px;
     width: 4px;
     height: 4px;
     margin-top: 18px;

@@ -159,8 +159,10 @@ function AiAssistToolbarInput({
   const autoShow = getFromLocalStorage(AUTO_SHOW_STORAGE_KEY, true);
   const [dirty, setDirty] = useState<boolean>(false);
   const [touched, setTouched] = useState<boolean>(false);
-  const [historyDropdownPostion, setHistoryDropdownPostion] =
-    useState<{ top: number; left: number }>();
+  const [historyDropdownPostion, setHistoryDropdownPostion] = useState<{
+    top: number;
+    left: number;
+  }>();
   const [historyDropdownWidth, setHistoryDropdownWidth] = useState<number>();
   const [showHistoryDropdown, setShowHistoryDropdown] = useState<boolean>(autoShow);
   const [singleLinePlaceholderText, setSingleLinePlaceholderText] = useState<string>();

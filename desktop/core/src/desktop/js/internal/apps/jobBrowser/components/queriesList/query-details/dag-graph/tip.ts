@@ -26,6 +26,7 @@ import debounce from '../../../../../../common/debounce';
  */
 let _element = null; // jQuery tooltip DOM element
 let _bubble = null; // Tooltip bubble in _element
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let _svg = null; // HTML svg tag that contains the element
 let _svgPoint = null; // A SVGPoint object
 

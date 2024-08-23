@@ -19,7 +19,7 @@
 import React from 'react';
 import { render, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import Executor from '../../execution/executor';
 import SqlExecutable from '../../execution/sqlExecutable';
 

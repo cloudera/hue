@@ -23,7 +23,6 @@ $border-lite: #e6e8eb;
 
 .dag-swimlane {
   position: relative;
-
   border: 1px solid $border-color;
   border-radius: 5px;
   padding: 10px;
@@ -37,13 +36,14 @@ $border-lite: #e6e8eb;
       padding-bottom: 10px;
     }
   }
+
   .process-visuals {
     //@extend .force-scrollbar;
 
     position: absolute;
     left: 100px;
-    right: 0px;
-    top: 0px;
+    right: 0;
+    top: 0;
     overflow: auto;
 
     .consolidated-view {
@@ -59,12 +59,11 @@ $border-lite: #e6e8eb;
     margin: 9px 10px 5px 10px;
 
     .ruler-line {
-      margin: 0px -10px 0px -10px;
+      margin: 0 -10px 0 -10px;
       border-top: 1px solid $border-color;
     }
 
     .mark-container {
-      overflow: hidden;
       font-size: 0;
       overflow: hidden;
       white-space: nowrap;
@@ -72,20 +71,16 @@ $border-lite: #e6e8eb;
       .ruler-mark {
         display: inline-block;
         border-left: 1px solid $border-color;
-
         margin-right: -1px;
         margin-bottom: -2px;
-
         font-size: 12px;
-
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
 
         .sub-marks {
           display: block;
-          padding: 0px;
-
+          padding: 0;
           margin-bottom: -8px;
 
           li {
@@ -102,6 +97,7 @@ $border-lite: #e6e8eb;
             &:nth-child(2n) {
               height: 8px;
             }
+
             &:nth-child(6) {
               height: 12px;
             }
@@ -116,12 +112,11 @@ $border-lite: #e6e8eb;
 .dag-swimlane-consolidated-process {
   position: absolute;
   cursor: default;
-
-  top: 0px;
-  bottom: 0px;
+  top: 0;
+  bottom: 0;
   border: 1px solid white;
-
   transition: top .2s;
+
   &.focused {
     top: -10px;
     border-top-left-radius: 5px;
@@ -133,11 +128,9 @@ $border-lite: #e6e8eb;
   text-align: right;
   padding-right: 5px;
   padding-top: 5px;
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
   height: 30px;
 }
 
@@ -153,10 +146,11 @@ $border-lite: #e6e8eb;
   .process-line, .event-bar, .event-bubble {
     cursor: default;
   }
+
   .base-line {
     position: relative;
     height: 1px;
-    margin: 0px -10px;
+    margin: 0 -10px;
     top: $process-height * 0.5;
     border-top: 1px dotted $border-color;
   }
@@ -168,7 +162,6 @@ $border-lite: #e6e8eb;
   .process-line {
     top: $process-height * 0.5 - 1;
     height: 3px;
-
     left: 0%;
     right: 100%;
     transition: left $event-anim-duration ease-out, right $event-anim-duration ease-out;
@@ -181,7 +174,6 @@ $border-lite: #e6e8eb;
     border-radius: 2px;
     border: 1px solid;
     margin-right: -1px;
-
     left: 0%;
     right: 100%;
     transition: left $event-anim-duration ease-out, right $event-anim-duration ease-out;
@@ -189,7 +181,6 @@ $border-lite: #e6e8eb;
 
   .dag-swimlane-event {
     top: $process-height * 0.5;
-
     left: 0%;
     transition: left $event-anim-duration ease-out;
 
@@ -202,42 +193,32 @@ $border-lite: #e6e8eb;
 
     .event-bubble {
       position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-
+      inset: 0 0 0 0;
       -webkit-transition: top .2s, right .2s, bottom .2s, left .2s, border-width .2s; /* Safari */
       transition: top .2s, right .2s, bottom .2s, left .2s, border-width .2s;
       transition-timing-function: cubic-bezier(1.44);
-
       border-radius: 7px;
-      border: 0px solid;
+      border: 0 solid;
       background-color: white;
     }
   }
 
   .dag-swimlane-blocking-event {
     top: $process-height * 0.5;
-
     left: 0%;
     height: 0;
     transition: left $event-anim-duration ease-out, height $event-anim-duration ease-out;
 
     .event-line {
       position: absolute;
-      top: 0px;
+      top: 0;
       border-left: 1px solid;
     }
   }
 
   &:hover {
     .event-bubble {
-      top: -7px;
-      right: -8px;
-      bottom: -8px;
-      left: -7px;
-
+      inset: -7px -8px -8px -7px;
       border: 2px solid;
     }
   }

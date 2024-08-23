@@ -22,7 +22,7 @@ exports[`DagSwimlane.vue should render 1`] = `
       <div
         class="consolidated-view-label"
       >
-         Consolidated 
+        Consolidated
       </div>
     </div>
     <div

@@ -27,13 +27,11 @@
           v-for="process in normalizedProcesses"
           :key="process._id + index"
           :process="process"
-          @showTooltip="showTooltip"
-          @hideTooltip="hideTooltip"
+          @show-tooltip="showTooltip"
+          @hide-tooltip="hideTooltip"
           @click="click"
         />
-        <div class="consolidated-view-label">
-          Consolidated
-        </div>
+        <div class="consolidated-view-label">Consolidated</div>
       </div>
       <div class="process-visuals">
         <div class="zoom-panel">
@@ -42,8 +40,8 @@
             :key="process._id + index"
             :process="process"
             :processor="processor"
-            @showTooltip="showTooltip"
-            @hideTooltip="hideTooltip"
+            @show-tooltip="showTooltip"
+            @hide-tooltip="hideTooltip"
             @click="click"
           />
           <div v-if="consolidate" class="consolidated-view">
@@ -53,8 +51,8 @@
               :focused-process="focusedProcess"
               :process="process"
               :processor="processor"
-              @showTooltip="showTooltip"
-              @hideTooltip="hideTooltip"
+              @show-tooltip="showTooltip"
+              @hide-tooltip="hideTooltip"
               @click="click"
             />
           </div>

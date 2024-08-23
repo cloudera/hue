@@ -21,29 +21,21 @@
 .visual-explain-container {
   height: 100%;
   margin-bottom: 10px;
-
   border: 1px solid #CCC;
   border-radius: 5px;
   overflow: hidden;
 
   .running-anim {
     text-align: center;
-
     margin: auto;
     position: absolute;
-
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    inset: 0 0 0 0;
   }
 
   .error-title {
     margin: 10px 0 0 10px;
   }
-}
 
-.visual-explain-container {
   background-color: white;
   position: relative;
 
@@ -51,6 +43,7 @@
     .fa-ellipsis-v, .download-button {
       display: none;
     }
+
     .explain-container, svg {
       height: 100%;
     }
@@ -80,26 +73,23 @@
 
 .visual-explain-detail-container {
   width: 500px;
-  position: absolute;
   top: 50px;
   background-color: #FFF;
   z-index: 100000;
-
   position: absolute;
   display: block;
-
   max-height: 200px;
+  right: 50px;
 }
+
 .visual-explain-detail-container .close {
   margin: 10px 15px;
   z-index: 9999;
 }
+
 .visual-explain-detail-container .visual-explain-detail {
   border: 1px solid #DDD;
   border-radius: 5px;
-}
-.visual-explain-detail-container {
-  right: 50px;
 }
 
 rect.operator__box {
@@ -122,7 +112,6 @@ rect.operator__box {
 
 .operator body {
   cursor: pointer;
-
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 8px 10px;
   background-color: rgba(0, 0, 0, 0);
@@ -186,7 +175,6 @@ rect.operator__box {
   border: 1px solid #DDD;
   position: absolute;
   display: block;
-
   background-color: #FFF;
 
   .close {
@@ -204,7 +192,6 @@ rect.operator__box {
     max-height: 200px;
     overflow: scroll;
     background: #FFF;
-
     width: 500px;
     border: none !important;
     margin: 0 0 0 0 !important;
@@ -219,6 +206,7 @@ rect.operator__box {
       font-size: 20px;
       font-weight: bold;
     }
+
     .block-body {
       padding: 10px 0;
     }

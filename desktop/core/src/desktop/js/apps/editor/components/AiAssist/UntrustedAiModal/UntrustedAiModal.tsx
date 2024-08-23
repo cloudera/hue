@@ -29,7 +29,10 @@ export interface UntrustedAiModalProps {
   aiAssistBarExpanded: boolean;
 }
 
-const UntrustedAiModal = ({onCloseBar, aiAssistBarExpanded}) => {
+const UntrustedAiModal = ({
+  onCloseBar,
+  aiAssistBarExpanded
+}: UntrustedAiModalProps): JSX.Element => {
   const storedUntrustedServiceApproval = getFromLocalStorage(
     'hue.aiAssistBar.untrustedServiceApproved',
     false
@@ -44,7 +47,7 @@ const UntrustedAiModal = ({onCloseBar, aiAssistBarExpanded}) => {
   useEffect(() => {
     if (aiAssistBarExpanded && !isTrustedService && !untrustedServiceApproved) {
       setShowUntrustedServiceModal(true);
-    }    
+    }
   }, [aiAssistBarExpanded]);
 
   const handleUntrustedServiceModalAccept = () => {

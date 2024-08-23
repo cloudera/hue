@@ -22,8 +22,8 @@
     <ProcessLine
       :process="process"
       :processor="processor"
-      @showTooltip="showTooltip"
-      @hideTooltip="hideTooltip"
+      @show-tooltip="showTooltip"
+      @hide-tooltip="hideTooltip"
       @click="click"
     />
     <BlockingEvent
@@ -32,8 +32,8 @@
       :blocking="blocking"
       :process="process"
       :processor="processor"
-      @showTooltip="showTooltip"
-      @hideTooltip="hideTooltip"
+      @show-tooltip="showTooltip"
+      @hide-tooltip="hideTooltip"
       @click="click"
     />
     <EventBar
@@ -43,8 +43,8 @@
       :bar-index="index"
       :process="process"
       :processor="processor"
-      @showTooltip="showTooltip"
-      @hideTooltip="hideTooltip"
+      @show-tooltip="showTooltip"
+      @hide-tooltip="hideTooltip"
       @click="click"
     />
     <EventToken
@@ -53,8 +53,8 @@
       :event="event"
       :process="process"
       :processor="processor"
-      @showTooltip="showTooltip"
-      @hideTooltip="hideTooltip"
+      @show-tooltip="showTooltip"
+      @hide-tooltip="hideTooltip"
       @click="click"
     />
   </div>
@@ -94,13 +94,13 @@
     },
 
     methods: {
-      sendMouseAction(name: string, type: string, process: Process, options: unknown): void {
+      sendMouseAction(name: string, type: string, process: VertexProcess, options: unknown): void {
         this.$emit(name, type, process, options);
       },
 
       showTooltip(
         type: string,
-        process: Process,
+        process: VertexProcess,
         options: { mouseEvent: MouseEvent; events: ProcessEvent[] }
       ): void {
         if (type === 'event') {
@@ -108,9 +108,10 @@
           const events = process.events;
           const eventsUnderMouse: ProcessEvent[] = [];
 
-          const eventElements: NodeListOf<HTMLElement> = this.$el.querySelectorAll(
-            '.dag-swimlane-event'
-          );
+          // Linting not picking up existance of NodeListOf below
+          // eslint-disable-next-line no-undef
+          const eventElements: NodeListOf<HTMLElement> =
+            this.$el.querySelectorAll('.dag-swimlane-event');
 
           eventElements.forEach((element: HTMLElement, index: number) => {
             const offsetLeft = element.getBoundingClientRect().left;
@@ -130,11 +131,11 @@
         this.sendMouseAction('showTooltip', type, process, options);
       },
 
-      hideTooltip(type: string, process: Process, options: unknown): void {
+      hideTooltip(type: string, process: VertexProcess, options: unknown): void {
         this.sendMouseAction('hideTooltip', type, process, options);
       },
 
-      click(type: string, process: Process, options: unknown): void {
+      click(type: string, process: VertexProcess, options: unknown): void {
         this.sendMouseAction('click', type, process, options);
       }
     }

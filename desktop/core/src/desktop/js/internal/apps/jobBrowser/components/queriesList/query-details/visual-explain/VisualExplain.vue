@@ -57,13 +57,15 @@
   import { defineComponent, PropType } from 'vue';
 
   import { Query, KeyHash } from '../..';
-  import { toggleFullScreen } from 'utils/hueUtils';
+  import hueUtils from 'utils/hueUtils';
 
   import { saveAs } from 'file-saver';
 
   import explain from './libs/index';
 
   import './visual-explain.scss';
+
+  const toggleFullScreen = hueUtils.toggleFullScreen;
 
   export default defineComponent({
     props: {

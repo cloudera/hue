@@ -22,7 +22,8 @@ describe('QueryTable.vue', () => {
     const wrapper = shallowMount(QueryTable, {
       propsData: {
         queries: [],
-        totalQueries: 0
+        totalQueries: 0,
+        updateTime: 0
       }
     });
     expect(wrapper.element).toMatchSnapshot();

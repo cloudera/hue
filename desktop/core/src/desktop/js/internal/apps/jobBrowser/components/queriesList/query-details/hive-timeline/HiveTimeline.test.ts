@@ -20,7 +20,7 @@ import HiveTimeline from './HiveTimeline.vue';
 describe('HiveTimeline.vue', () => {
   it('should render', () => {
     const wrapper = shallowMount(HiveTimeline, {
-      props: {}
+      props: { perf: { test: 1 } }
     });
     expect(wrapper.element).toMatchSnapshot();
   });

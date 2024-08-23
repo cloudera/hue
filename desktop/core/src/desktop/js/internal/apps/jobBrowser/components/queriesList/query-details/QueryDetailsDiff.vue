@@ -19,7 +19,7 @@
 <template>
   <div>
     <div class="buttons-container">
-      <hue-button @click="showQueries" borderless>
+      <hue-button borderless @click="showQueries">
         <em class="fa fa-chevron-left" />
         Queries
       </hue-button>

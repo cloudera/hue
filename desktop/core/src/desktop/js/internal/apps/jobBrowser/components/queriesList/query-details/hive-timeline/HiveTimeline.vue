@@ -39,15 +39,9 @@
       </div>
 
       <div class="sub-groups">
-        <div class="bar" :data-value="normalizedPerf.compile" title="Compile">
-          Compile
-        </div>
-        <div class="bar" :data-value="normalizedPerf.parse" title="Parse">
-          Parse
-        </div>
-        <div class="bar" :data-value="normalizedPerf.TezBuildDag" title="Build Dag">
-          Build Dag
-        </div>
+        <div class="bar" :data-value="normalizedPerf.compile" title="Compile">Compile</div>
+        <div class="bar" :data-value="normalizedPerf.parse" title="Parse">Parse</div>
+        <div class="bar" :data-value="normalizedPerf.TezBuildDag" title="Build Dag">Build Dag</div>
 
         <div class="bar" :data-value="normalizedPerf.TezSubmitDag" title="Submit Dag">
           Submit Dag
@@ -60,9 +54,7 @@
           Submit To Running
         </div>
 
-        <div class="bar" :data-value="normalizedPerf.TezRunDag" title="Run Dag">
-          Run Dag
-        </div>
+        <div class="bar" :data-value="normalizedPerf.TezRunDag" title="Run Dag">Run Dag</div>
 
         <div
           class="bar"
@@ -193,7 +185,7 @@
         required: true
       },
       scale: {
-        type: Object as PropType<number>,
+        type: Number as PropType<number>,
         default: 1
       }
     },
@@ -216,7 +208,8 @@
 
     methods: {
       fmtDuration: (val: number) => duration(val, true),
-
+      // Linting not picking up existance of NodeListOf below
+      // eslint-disable-next-line no-undef
       alignBars(bars: NodeListOf<HTMLElement>, perf: NormalizedHivePerf): void {
         bars.forEach((bar: HTMLElement) => {
           const perfValue = parseInt(bar.dataset.value || '0');

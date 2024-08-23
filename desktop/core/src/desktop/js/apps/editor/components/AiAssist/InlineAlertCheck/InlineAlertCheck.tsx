@@ -35,7 +35,7 @@ const InlineAlertCheck = ({
   onCheckboxChange,
   msg,
   checkboxLabel
-}: InlineAlertCheckProps) => {
+}: InlineAlertCheckProps): JSX.Element | null => {
   return show ? (
     <div className="hue-inline-alert-check">
       <Alert

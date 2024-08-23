@@ -19,9 +19,7 @@
 @use 'variables' as vars;
 @use 'sharedAiAssistVars' as ai-assist-vars;
 
-$bar-vertical-animation-time: (
-  ai-assist-vars.$expand-animation-time * 0.5
-);
+$bar-vertical-animation-time: (ai-assist-vars.$expand-animation-time * 0.5);
 
 .cuix.antd {
   .hue-ai-assist-bar {
@@ -108,7 +106,7 @@ $bar-vertical-animation-time: (
       // Only apply if ancestor elemement indicates it's a notebook snippet
       .notebook-snippet & {
         margin-top: 32px;
-      }      
+      }
     }
   }
 
@@ -116,9 +114,11 @@ $bar-vertical-animation-time: (
     // No extra top margin needed when the AI Assistant is expanded
     animation: animateRemovingEditorTopMargin $bar-vertical-animation-time ease-in-out 1 forwards;
   }
+
   &.hue-sql-ai-assistant--contracted .editor {
     // Extra top margin needed when the AI Assistant is contracted to the launcher button
     $delay: (ai-assist-vars.$expand-animation-time);
+
     animation: $delay animateAddingEditorTopMargin $bar-vertical-animation-time ease-in-out 1
       forwards;
   }
@@ -128,6 +128,7 @@ $bar-vertical-animation-time: (
   0% {
     margin-top: 0;
   }
+
   100% {
     margin-top: 18px;
   }
@@ -137,8 +138,9 @@ $bar-vertical-animation-time: (
   0% {
     margin-top: 18px;
   }
+
   100% {
-    margin-top: 0px;
+    margin-top: 0;
   }
 }
 

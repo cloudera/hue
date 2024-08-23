@@ -89,7 +89,7 @@ const PreviewModal = ({
   showDiffFrom: showDiffFromRaw = '',
   lineNumberStart = 1,
   dialect,
-  keywordCase, 
+  keywordCase,
   databaseName
 }: PreviewModalProps): JSX.Element => {
   const titles = {

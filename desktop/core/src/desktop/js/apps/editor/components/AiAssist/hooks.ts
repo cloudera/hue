@@ -22,9 +22,16 @@ import huePubSub from 'utils/huePubSub';
 
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 
+// We are using a terminals_ prop in SyntaxParser which is not published in the
+// SyntaxParser interface
+type Terminals = { [key: number]: string };
+
 // Determines the most common case (upper/lower) of the keywords in the
 // statement currently selected by the editor
-export const useKeywordCase = (parser: any, selectedStatement: string) => {
+export const useKeywordCase = (
+  parser: { terminals_?: Terminals },
+  selectedStatement: string
+): string => {
   const [autoFormatCount, setAutoFormatCount] = useState(0);
   useEffect(() => {
     // Subscribe to autoformatting events from the editor itself
@@ -38,7 +45,7 @@ export const useKeywordCase = (parser: any, selectedStatement: string) => {
   }, []);
 
   const sqlKeywords = useMemo(() => {
-    const terminals: { [key: number]: string } = parser?.terminals_ || {};
+    const terminals: Terminals = parser?.terminals_ || {};
     const onlyLettersRegex = /^[A-Za-z]+$/;
     const upperCase = Object.values(terminals).filter(str => onlyLettersRegex.test(str));
     const lowerCase = upperCase.map(keyword => keyword.toLowerCase());
@@ -106,7 +113,7 @@ export const useResizeAwareElementSize = (
   return size;
 };
 
-export const useKeyboardShortcuts = (shortcuts: Record<string, () => void>) => {
+export const useKeyboardShortcuts = (shortcuts: Record<string, () => void>): void => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const { key, ctrlKey, metaKey } = event;

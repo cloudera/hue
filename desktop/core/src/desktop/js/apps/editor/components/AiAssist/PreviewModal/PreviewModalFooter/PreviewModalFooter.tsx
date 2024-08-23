@@ -41,7 +41,7 @@ const PreviewModalFooter = ({
   primaryButtonLabel,
   showCopyToClipboard,
   suggestion
-}: PreviewModalFooterProps) => {
+}: PreviewModalFooterProps): JSX.Element => {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = (text: string): void => {
