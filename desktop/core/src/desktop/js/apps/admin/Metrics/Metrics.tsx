@@ -19,6 +19,7 @@ import MetricsTable, { MetricsResponse } from './MetricsTable';
 import { Spin, Input, Select, Alert } from 'antd';
 import { get } from 'api/utils';
 import { SearchOutlined } from '@ant-design/icons';
+import I18n from 'utils/i18n';
 import './Metrics.scss';
 
 const { Option } = Select;
@@ -110,7 +111,7 @@ const Metrics: React.FC = (): JSX.Element => {
 
             <Input
               className="metrics-filter"
-              placeholder="Filter metrics..."
+              placeholder={I18n("Filter metrics...")}
               value={searchQuery}
               onChange={handleFilterInputChange}
               prefix={<SearchOutlined />}
