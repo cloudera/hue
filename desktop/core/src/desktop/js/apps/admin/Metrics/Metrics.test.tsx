@@ -90,8 +90,9 @@ describe('Metrics', () => {
       fireEvent.click(secondOption);
       await waitFor(() => {
         // const headings = screen.queryAllByRole('heading', { level: 4 });
-        const headings = screen.queryAllByText((_, element) => 
-          element?.tagName.toLowerCase() === 'span' && element?.className === 'metrics-heading'
+        const headings = screen.queryAllByText(
+          (_, element) =>
+            element?.tagName.toLowerCase() === 'span' && element?.className === 'metrics-heading'
         );
         expect(headings).toHaveLength(1);
       });
