@@ -17,7 +17,8 @@
 name: BUILD
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled]
+    types: [labeled]
+
 jobs:
-  BUILD:
-    uses: Kitchen/RE-github-workflows/.github/workflows/build-gate-validation-check.yaml@main
+  build:
+    uses: Kitchen/RE-github-workflows/.github/workflows/trigger-build.yaml@main
