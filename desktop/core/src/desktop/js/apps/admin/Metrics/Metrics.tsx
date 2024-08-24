@@ -111,7 +111,7 @@ const Metrics: React.FC = (): JSX.Element => {
 
             <Input
               className="metrics-filter"
-              placeholder={I18n("Filter metrics...")}
+              placeholder={I18n('Filter metrics...')}
               value={searchQuery}
               onChange={handleFilterInputChange}
               prefix={<SearchOutlined />}
