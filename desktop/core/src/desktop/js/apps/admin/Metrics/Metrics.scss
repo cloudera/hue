@@ -16,13 +16,14 @@
 
 @import '../../components/styles/variables';
 
-.metrics-component {
+.metrics-component.antd.cuix {
   background-color: $fluidx-gray-100;
   padding: 0 24px 24px 24px;
 
   .metrics-heading {
-    color: $fluidx-gray-700;
-    font-size: $fluidx-heading-h4-size;
+    font-size: $font-size-base;
+    font-weight: 500;
+    color: $fluidx-gray-900;
   }
 
   .metrics-filter {
@@ -38,7 +39,9 @@
   .metrics-table {
     th {
       width: 30%;
+      background-color: #fafbfc;
     }
+
     margin-bottom: $font-size-base;
   }
 
