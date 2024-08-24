@@ -14,10 +14,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-name: Run tests via pull-request template
+name: Main Workflow
 on:
   pull_request:
     types: [opened, synchronize, edited, labeled]
 jobs:
-  TRIGGER-TESTS:
-    uses: Kitchen/RE-github-workflows/.github/workflows/trigger-on-prt-unified-branch.yaml@main
+  RUN:
+    uses: Kitchen/RE-github-workflows/.github/workflows/trigger-on-prt-unified-branch-new.yaml@main
