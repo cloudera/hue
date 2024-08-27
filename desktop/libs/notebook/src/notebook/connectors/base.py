@@ -528,6 +528,9 @@ def get_api(request, snippet):
   elif interface == 'trino':
     from notebook.connectors.trino import TrinoApi
     return TrinoApi(request.user, interpreter=interpreter)
+  elif interface == 'trino-python':
+    from notebook.connectors.trino_python import PythonApiTrino
+    return PythonApiTrino(request.user, interpreter=interpreter)
   elif interface == 'kafka':
     from notebook.connectors.kafka import KafkaApi
     return KafkaApi(request.user)
