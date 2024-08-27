@@ -167,6 +167,7 @@ MIDDLEWARE = [
     # 'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
     'crequest.middleware.CrequestMiddleware',
+    'desktop.middleware.CSPMiddleware',
 ]
 
 # if os.environ.get(ENV_DESKTOP_DEBUG):

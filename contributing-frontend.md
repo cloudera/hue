@@ -19,7 +19,7 @@ A react root element (or the first container element within it) must include the
 If your react component isn't dependent on any Knockout observables or Vue components you can integrate it by adding a small script and a component reference directly in the HTML code. The following example integrates MyComponent as a react root in an HTML/mako file.
 
 ```HTML
-<script type="text/javascript">
+<script type="text/javascript" nonce="${ request.csp_nonce }">
   (function () {
     window.createReactComponents('#some-container');
   })();

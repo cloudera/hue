@@ -34,7 +34,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
-${ commonHeaderFooterComponents.footer(messages) }
+${ commonHeaderFooterComponents.footer(messages, csp_nonce) }
 
   </body>
 </html>

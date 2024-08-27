@@ -33,7 +33,7 @@ else:
 %>
 
 <%def name="header_pollers(user, is_s3_enabled, apps)">
-  <script type="text/javascript">
+  <script nonce="${request.csp_nonce}" type="text/javascript">
     Dropzone.autoDiscover = false;
     moment.locale(window.navigator.userLanguage || window.navigator.language);
     localeFormat = function (time) {
@@ -230,7 +230,7 @@ else:
 
 </%def>
 
-<%def name="footer(messages)">
+<%def name="footer(messages, csp_nonce)">
 
 <div id="progressStatus" class="uploadstatus well hide">
   <h4>${ _('Upload progress') }</h4>
@@ -267,7 +267,7 @@ else:
 
 <div class="clipboard-content"></div>
 
-<script type="text/javascript">
+<script nonce="${request.csp_nonce if request else csp_nonce}" type="text/javascript">
 
   $(document).ready(function () {
 

@@ -49,7 +49,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="${request.csp_nonce}">
   $(document).ready(function () {
     $('.reload').on('click', function () {
       location.reload();

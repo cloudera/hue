@@ -356,7 +356,7 @@ else:
   </script>
 
 
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="${request.csp_nonce}">
     (function () {
 
       var aceUtil = ace.require('ace/autocomplete/util');
@@ -722,7 +722,7 @@ else:
     <!-- /ko -->
   </script>
 
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="${request.csp_nonce}">
     (function () {
 
       var COMMENT_LOAD_DELAY = 1500;

@@ -161,7 +161,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
    % endif
 </div>
 
-<script>
+<script nonce="${ request.csp_nonce }">
   $(document).ready(function () {
     $("form").on("submit", function () {
       window.setTimeout(function () {
@@ -195,4 +195,4 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   });
 </script>
 
-${ commonfooter(None, messages) | n,unicode }
+${ commonfooter(None, messages, False, request.csp_nonce) | n,unicode }

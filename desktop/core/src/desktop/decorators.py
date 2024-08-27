@@ -17,6 +17,8 @@
 
 import logging
 import sys
+import base64
+import os
 
 from desktop.auth.backend import is_admin
 from desktop.lib.exceptions_renderable import PopupException
@@ -99,3 +101,14 @@ def api_error_handler(func):
         return JsonResponse(response)
 
   return decorator
+
+
+def with_csp_header(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        response = view_func(request, *args, **kwargs)
+        nonce = base64.b64encode(os.urandom(16)).decode('utf-8')
+        csp_policy = f"script-src 'nonce-{nonce}' 'strict-dynamic' 'unsafe-eval';"
+        response['Content-Security-Policy'] = csp_policy
+        return response
+    return _wrapped_view

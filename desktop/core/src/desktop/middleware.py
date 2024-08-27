@@ -18,6 +18,7 @@
 from __future__ import absolute_import
 
 from builtins import object
+import base64
 import inspect
 import json
 import logging
@@ -970,6 +971,20 @@ class MultipleProxyMiddleware:
     if 'HTTP_X_FORWARDED_FOR' not in request.META and 'REMOTE_ADDR' in request.META:
       request.META['HTTP_X_FORWARDED_FOR'] = request.META['REMOTE_ADDR']
     return self.get_response(request)
+
+
+class CSPMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        nonce = base64.b64encode(os.urandom(16)).decode('utf-8')
+        request.csp_nonce = nonce  # Make nonce available in the request
+        response = self.get_response(request)
+        csp_policy = "script-src 'nonce-{}' 'strict-dynamic' 'unsafe-eval';".format(nonce)
+
+        response['Content-Security-Policy'] = csp_policy
+        return response
 
 
 class CacheControlMiddleware(MiddlewareMixin):

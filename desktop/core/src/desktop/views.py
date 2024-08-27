@@ -31,6 +31,7 @@ import traceback
 import zipfile
 import validate
 
+from desktop.decorators import with_csp_header
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -128,6 +129,7 @@ def saml_login_headers(request):
   except:
     LOG.error("X-CSRF-TOKEN header not found")
 
+@with_csp_header
 def hue(request):
   current_app, other_apps, apps_list = _get_apps(request.user, '')
   clusters = list(get_clusters(request.user).values())
@@ -654,7 +656,8 @@ def is_idle(request):
 def commonfooter_m(request, messages=None):
   return commonfooter(request, messages, True)
 
-def commonfooter(request, messages=None, is_mobile=False):
+
+def commonfooter(request, messages=None, is_mobile=False, csp_nonce=None):
   """
   Returns the rendered common footer
   """
@@ -666,9 +669,9 @@ def commonfooter(request, messages=None, is_mobile=False):
   template = 'common_footer.mako'
   if is_mobile:
     template = 'common_footer_m.mako'
-
   return django_mako.render_to_string(template, {
     'request': request,
+    'csp_nonce': csp_nonce,
     'messages': messages,
     'version': hue_version(),
     'collect_usage': collect_usage(),

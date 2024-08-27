@@ -124,7 +124,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript">
+  <script nonce="${request.csp_nonce}" type="text/javascript">
     (function () {
       function MultiGroupAlternative(alt, params, initiallyChecked) {
         var self = this;
@@ -215,7 +215,7 @@ else:
     })();
   </script>
 
-  <script type="text/javascript">
+  <script nonce="${request.csp_nonce}" type="text/javascript">
     (function () {
 
       function PropertySelectorViewModel(params) {
@@ -297,7 +297,7 @@ else:
     })();
   </script>
 
-  <script type="text/html" id="property">
+  <script nonce="${request.csp_nonce}" type="text/html" id="property">
     <div class="config-property" data-bind="visibleOnHover: { selector: '.hover-actions' }">
       <label class="config-label" data-bind="click: function(data, event){ $(event.target).siblings('.config-controls').find('.config-property-add-value a').click(); }">
         <!-- ko text: label --><!-- /ko --><!-- ko if: typeof helpText !== 'undefined' --><div class="property-help" data-bind="tooltip: { title: helpText(), placement: 'bottom' }"><i class="fa fa-question-circle-o"></i></div><!-- /ko -->
@@ -365,7 +365,7 @@ else:
     <input type="text" class="input-small" data-bind="numericTextInput: { value: value, precision: 0, allowEmpty: true }" /> <select class="input-mini" data-bind="options: units, value: selectedUnit"></select>
   </script>
 
-  <script type="text/javascript">
+  <script nonce="${request.csp_nonce}"  type="text/javascript">
     (function () {
       var JVM_MEM_PATTERN = /([0-9]+)([MG])$/;
       var UNITS = {'MB': 'M', 'GB': 'G'};
@@ -427,7 +427,7 @@ else:
     <div class="clearfix"></div>
   </script>
 
-  <script type="text/javascript">
+  <script nonce="${request.csp_nonce}" type="text/javascript">
     (function () {
 
       function KeyValueListInputViewModel(params) {
@@ -530,7 +530,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript">
+  <script nonce="${request.csp_nonce}" type="text/javascript">
     (function () {
 
       function NameValueListInputViewModel(params) {
@@ -595,7 +595,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript">
+  <script nonce="${request.csp_nonce}" type="text/javascript">
     (function () {
 
       function FunctionListInputViewModel(params) {
@@ -649,7 +649,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript">
+  <script nonce="${request.csp_nonce}"  type="text/javascript">
     (function () {
 
       var identifyType = function (path) {
@@ -729,7 +729,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript">
+  <script nonce="${request.csp_nonce}" type="text/javascript">
     (function () {
       function CsvListInputViewModel(params) {
         this.valueObservable = params.value;

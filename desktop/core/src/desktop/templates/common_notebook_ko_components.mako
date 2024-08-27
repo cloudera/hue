@@ -74,7 +74,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="${request.csp_nonce}">
     (function () {
       var WHEEL_RADIUS = 75;
       var PLUS_ICON_RADIUS = 27.859; // FA-5X
@@ -353,7 +353,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="${request.csp_nonce}">
     (function () {
 
       function DownloadResultsViewModel (params, element) {
@@ -778,7 +778,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="${request.csp_nonce}">
     (function () {
 
       function AceKeyboardShortcutsViewModel () {

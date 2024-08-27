@@ -142,24 +142,26 @@ if USE_NEW_EDITOR.get():
   <%
     global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
   %>
-  <script src="${global_constants_url}"></script>
+  <script nonce="${ request.csp_nonce }" src="${global_constants_url}"></script>
   % endif
 
   % if not conf.DEV.get():
-  <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
+  <script nonce="${ request.csp_nonce }" src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
 
   % for bundle in get_hue_bundles('login' if section == 'login' else 'hue', 'LOGIN' if section == 'login' else 'DEFAULT'):
-    ${ render_bundle(bundle, config='LOGIN' if section == 'login' else 'DEFAULT') | n,unicode }
+      ## Instead of trying to assign to a variable, directly operate within expressions.
+      ${render_bundle(bundle, config='LOGIN' if section == 'login' else 'DEFAULT').replace('<script ', '<script nonce="' + request.csp_nonce + '" ') | n}
   % endfor
 
-  <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
-  <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
-  <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
-  <script src="${ static('desktop/js/popover-extra-placements.js') }"></script>
-  <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
+
+  <script nonce="${ request.csp_nonce }" src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
+  <script nonce="${ request.csp_nonce }" src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
+  <script nonce="${ request.csp_nonce }" src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
+  <script nonce="${ request.csp_nonce }" src="${ static('desktop/js/popover-extra-placements.js') }"></script>
+  <script nonce="${ request.csp_nonce }" src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
+  <script nonce="${ request.csp_nonce }" src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script nonce="${ request.csp_nonce }" src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
 % if user.is_authenticated:
   ${ hueAceAutocompleter.hueAceAutocompleter() }
@@ -168,9 +170,9 @@ if USE_NEW_EDITOR.get():
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
 % if user.is_authenticated:
-  <script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
+  <script  nonce="${ request.csp_nonce }" src="${ static('desktop/ext/js/localforage.min.js') }"></script>
 
-  <script type="text/javascript">
+  <script  nonce="${ request.csp_nonce }" type="text/javascript">
     $(document).ready(function () {
       localforage.config({
         version: 1.0,
@@ -200,7 +202,7 @@ ${ hueIcons.symbols() }
 
 
 % if hasattr(request, 'environ') and request.environ.get("PATH_INFO").find("/hue/") < 0:
-  <script>
+  <script  nonce="${ request.csp_nonce }">
     window.location.replace(window.HUE_BASE_URL || "/");
   </script>
 % endif
@@ -556,8 +558,8 @@ ${ hueIcons.symbols() }
   </ul>
 
   <!-- UserVoice JavaScript SDK -->
-  <script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
-  <script>
+  <script nonce="${ request.csp_nonce }" >(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+  <script nonce="${ request.csp_nonce }">
   UserVoice = window.UserVoice || [];
   function showClassicWidget() {
     UserVoice.push(['showLightbox', 'classic_widget', {
