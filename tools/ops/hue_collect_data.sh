@@ -44,7 +44,6 @@ parse_arguments()
   COLLECT_STRACE=true
   COLLECT_LSOF=true
   COLLECT_NETSTAT=true
-  COLLECT_THREADS=
   #This is necessary to handle AD auth, doesn't seem to hurt non-ad auth
   #if they have multiple ldap servers or for some reason the drop down
   #at login says something other than "LDAP", then this must match the drop
@@ -72,10 +71,6 @@ parse_arguments()
       ;;
     -n|--netstat)
       COLLECT_NETSTAT=
-      shift
-      ;;
-    -t|--threads)
-      COLLECT_THREADS=$1
       shift
       ;;
     -u|--hueuser)
@@ -218,11 +213,6 @@ main()
       fi
       HUE_PASS_URL="${HUE_HTTP}://${HUE_SERVER}:${HUE_PORT}/accounts/login/"
    
-      if [[ ! -z ${COLLECT_THREADS} ]]
-      then
-         hue_login
-      fi
-   
       echo "Gathering info:"
       for (( x=1; x<=${RUNS}; x++ ))
       do
@@ -261,11 +251,6 @@ main()
             do_lsof \
                  ${PID} \
                  ${HUE_LSOF_FILE}_${DATE}
-         fi
-
-         if [[ ! -z ${COLLECT_THREADS} ]]
-         then
-            echo "Shifted from CherryPy server to Gunicorn server. Can't collect Threads here"
          fi
 
          sleep ${RUN_WAIT}
