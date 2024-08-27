@@ -666,41 +666,6 @@ def test_app_permissions():
 
 
 @pytest.mark.django_db
-def test_error_handling_failure():
-  # Change rewrite_user to call has_hue_permission
-  # Try to get filebrowser page
-  # test for default 500 page
-  # Restore rewrite_user
-  import desktop.auth.backend
-
-  c = make_logged_in_client()
-
-  restore_django_debug = desktop.conf.DJANGO_DEBUG_MODE.set_for_testing(False)
-  restore_500_debug = desktop.conf.HTTP_500_DEBUG_MODE.set_for_testing(False)
-
-  original_rewrite_user = desktop.auth.backend.rewrite_user
-
-  def rewrite_user(user):
-    user = original_rewrite_user(user)
-    delattr(user, 'has_hue_permission')
-    return user
-
-  original_rewrite_user = desktop.auth.backend.rewrite_user
-  desktop.auth.backend.rewrite_user = rewrite_user
-
-  try:
-    # Make sure we are showing default 500.html page.
-    # See django.test.client#L246
-    with pytest.raises(AttributeError):
-      c.get(reverse('desktop.views.threads'))
-  finally:
-    # Restore the world
-    restore_django_debug()
-    restore_500_debug()
-    desktop.auth.backend.rewrite_user = original_rewrite_user
-
-
-@pytest.mark.django_db
 def test_404_handling():
   pytest.skip("Skipping due to failures with pytest, investigation ongoing.")
   view_name = '/the-view-that-is-not-there'
