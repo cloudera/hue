@@ -31,7 +31,6 @@ import traceback
 import zipfile
 import validate
 
-from desktop.decorators import with_csp_header
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -129,7 +128,6 @@ def saml_login_headers(request):
   except:
     LOG.error("X-CSRF-TOKEN header not found")
 
-@with_csp_header
 def hue(request):
   current_app, other_apps, apps_list = _get_apps(request.user, '')
   clusters = list(get_clusters(request.user).values())
