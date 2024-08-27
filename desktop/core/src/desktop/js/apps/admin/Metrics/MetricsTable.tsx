@@ -18,7 +18,9 @@ import React from 'react';
 import Table from 'cuix/dist/components/Table/Table';
 import type { ColumnType } from 'antd/es/table';
 import './Metrics.scss';
-import I18n from 'utils/i18n';
+import { i18nReact } from 'utils/i18nReact';
+
+const { t } = i18nReact.useTranslation();
 
 interface MetricsValue {
   value: number;
@@ -79,15 +81,15 @@ interface MetricsTableProps {
   dataSource: DataSourceItem[];
 }
 const metricLabels: { [key: string]: string } = {
-  'queries.number': I18n('Number of Queries'),
-  'requests.active': I18n('Active Requests'),
-  'requests.exceptions': I18n('Request Exceptions'),
-  'requests.response-time': I18n('Request Response Time'),
-  'threads.daemon': I18n('Daemon Threads'),
-  'threads.total': I18n('Total Threads'),
-  users: I18n('Users'),
-  'users.active': I18n('Active Users'),
-  'users.active.total': I18n('Total Active Users')
+  'queries.number': t('Number of Queries'),
+  'requests.active': t('Active Requests'),
+  'requests.exceptions': t('Request Exceptions'),
+  'requests.response-time': t('Request Response Time'),
+  'threads.daemon': t('Daemon Threads'),
+  'threads.total': t('Total Threads'),
+  users: t('Users'),
+  'users.active': t('Active Users'),
+  'users.active.total': t('Total Active Users')
 };
 
 const transformMetricNames = (dataSource: DataSourceItem[]): DataSourceItem[] =>

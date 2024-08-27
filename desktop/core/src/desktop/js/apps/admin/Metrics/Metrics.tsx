@@ -19,7 +19,7 @@ import MetricsTable, { MetricsResponse } from './MetricsTable';
 import { Spin, Input, Select, Alert } from 'antd';
 import { get } from 'api/utils';
 import { SearchOutlined } from '@ant-design/icons';
-import I18n from 'utils/i18n';
+import { i18nReact } from 'utils/i18nReact';
 import './Metrics.scss';
 
 const { Option } = Select;
@@ -87,6 +87,8 @@ const Metrics: React.FC = (): JSX.Element => {
     setSearchQuery(e.target.value);
   };
 
+  const { t } = i18nReact.useTranslation();
+
   return (
     <div className="cuix antd metrics-component">
       <Spin spinning={loading}>
@@ -111,7 +113,7 @@ const Metrics: React.FC = (): JSX.Element => {
 
             <Input
               className="metrics-filter"
-              placeholder={I18n('Filter metrics...')}
+              placeholder={t('Filter metrics...')}
               value={searchQuery}
               onChange={handleFilterInputChange}
               prefix={<SearchOutlined />}
