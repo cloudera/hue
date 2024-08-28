@@ -17,7 +17,6 @@
 
 from future import standard_library
 
-standard_library.install_aliases()
 import json
 import logging
 import os
@@ -68,6 +67,8 @@ from desktop.models import Settings, hue_version, _get_apps, UserPreferences
 from libsaml.conf import REQUIRED_GROUPS, REQUIRED_GROUPS_ATTRIBUTE
 from useradmin.models import get_profile
 from useradmin.models import User
+
+standard_library.install_aliases()
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
