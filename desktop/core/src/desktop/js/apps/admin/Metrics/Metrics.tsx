@@ -19,7 +19,7 @@ import MetricsTable, { MetricsResponse } from './MetricsTable';
 import { Spin, Input, Select, Alert } from 'antd';
 import { get } from 'api/utils';
 import { SearchOutlined } from '@ant-design/icons';
-import { i18nReact } from 'utils/i18nReact';
+import { i18nReact } from '../../../utils/i18nReact';
 import './Metrics.scss';
 
 const { Option } = Select;

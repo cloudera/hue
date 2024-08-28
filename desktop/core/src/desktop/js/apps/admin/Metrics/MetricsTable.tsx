@@ -18,7 +18,7 @@ import React from 'react';
 import Table from 'cuix/dist/components/Table/Table';
 import type { ColumnType } from 'antd/es/table';
 import './Metrics.scss';
-import { i18nReact } from 'utils/i18nReact';
+import { i18nReact } from '../../../utils/i18nReact';
 
 const { t } = i18nReact.useTranslation();
 
