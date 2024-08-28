@@ -357,7 +357,6 @@ def test_paginator():
   assert_page(pgn.page(2), list(range(20, 25)), 21, 25)
 
 
-
 def test_truncating_model():
   class TinyModel(TruncatingModel):
     short_field = CharField(max_length=10)
