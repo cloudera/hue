@@ -19,20 +19,14 @@
 import os
 import re
 import shutil
-import sys
-from django.core.management.base import CommandError, BaseCommand
-from mako.template import Template
-
 import logging
 
-if sys.version_info[0] > 2:
-  open_file = open
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  open_file = file
+from django.core.management.base import BaseCommand, CommandError
+from django.utils.translation import gettext as _
+from mako.template import Template
 
 LOG = logging.getLogger()
+
 
 class Command(BaseCommand):
   help = _("Creates a Hue application directory structure.")
@@ -51,7 +45,7 @@ class Command(BaseCommand):
     else:
       app_dir = os.getcwd()
 
-    app_template = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','..','app_template'))
+    app_template = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'app_template'))
     assert os.path.isdir(app_template), _("App template dir missing: %(template)s.") % {'template': app_template}
     app_dir = os.path.join(app_dir, app_name)
 
@@ -67,6 +61,7 @@ class Command(BaseCommand):
 
     copy_template(app_template, app_dir, app_name)
 
+
 def copy_template(app_template, copy_to, app_name):
   """copies the specified template directory to the copy_to location"""
 
@@ -75,22 +70,22 @@ def copy_template(app_template, copy_to, app_name):
 
   # walks the template structure and copies it
   for directory, subdirs, files in os.walk(app_template):
-    relative_dir = directory[len(app_template)+1:].replace('app_name_camel', app_name_camel).replace('app_name',app_name)
+    relative_dir = directory[len(app_template) + 1:].replace('app_name_camel', app_name_camel).replace('app_name', app_name)
     if not os.path.exists(os.path.join(copy_to, relative_dir)):
       os.mkdir(os.path.join(copy_to, relative_dir))
     for f in files:
       if f.endswith('.pyc') or f.startswith("."):
         continue
-        
+
       path_old = os.path.join(directory, f)
       path_new = os.path.join(copy_to, relative_dir, f.replace('app_name_camel', app_name_camel).replace('app_name', app_name))
 
       LOG.info("Writing %s" % path_new)
       fp_new = open(path_new, 'w')
       if path_old.endswith(".png"):
-        shutil.copyfileobj(open_file(path_old), fp_new)
+        shutil.copyfileobj(open(path_old), fp_new)
       else:
-        fp_new.write( Template(filename=path_old).render(app_name=app_name, app_name_camel=app_name_camel, app_name_spaces=app_name_spaces) )
+        fp_new.write(Template(filename=path_old).render(app_name=app_name, app_name_camel=app_name_camel, app_name_spaces=app_name_spaces))
       fp_new.close()
-        
+
       shutil.copymode(path_old, path_new)

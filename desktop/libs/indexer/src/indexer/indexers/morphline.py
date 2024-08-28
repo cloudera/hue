@@ -14,32 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
-from builtins import object
-import logging
 import os
 import sys
-
+import logging
+from builtins import object
 from collections import deque
 
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from mako.lookup import TemplateLookup
 
 from desktop.models import Document2
+from indexer.conf import CONFIG_INDEXER_LIBS_PATH, CONFIG_INDEXING_TEMPLATES_PATH
+from indexer.fields import get_field_type
+from indexer.file_format import get_file_format_class, get_file_format_instance
+from indexer.indexers.morphline_operations import get_checked_args
+from indexer.solr_client import SolrClient
 from notebook.connectors.base import get_api
 from notebook.models import Notebook, make_notebook
 from useradmin.models import User
-
-from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH, CONFIG_INDEXER_LIBS_PATH
-from indexer.fields import get_field_type
-from indexer.file_format import get_file_format_instance, get_file_format_class
-from indexer.indexers.morphline_operations import get_checked_args
-from indexer.solr_client import SolrClient
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -201,7 +194,7 @@ class MorphlineIndexer(object):
       "get_kept_args": get_checked_args,
       "grok_dictionaries_location": grok_dicts_loc if self.fs and self.fs.exists(grok_dicts_loc) else None,
       "geolite_db_location": geolite_loc if self.fs and self.fs.exists(geolite_loc) else None,
-      "zk_host": self.solr_client.get_zookeeper_host() ## offline test?
+      "zk_host": self.solr_client.get_zookeeper_host()  # offline test?
     }
 
     oozie_workspace = CONFIG_INDEXING_TEMPLATES_PATH.get()
@@ -224,7 +217,7 @@ def _create_solr_collection(user, fs, client, destination, index_name, kwargs):
   for field in fields:
     for operation in field['operations']:
       if operation['type'] == 'split':
-        field['multiValued'] = True # Solr requires multiValued to be set when splitting
+        field['multiValued'] = True  # Solr requires multiValued to be set when splitting
         kwargs['f.%(name)s.split' % field] = 'true'
         kwargs['f.%(name)s.separator' % field] = operation['settings']['splitChar'] or ','
 

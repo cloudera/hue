@@ -15,25 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
 import sys
+import json
+import logging
+
+from django.utils.translation import gettext as _
 
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import get_cluster_config
-
-from indexer.solr_client import SolrClient
 from indexer.fields import FIELD_TYPES, Field
 from indexer.file_format import get_file_indexable_format_types
-from indexer.management.commands import indexer_setup
 from indexer.indexers.morphline_operations import OPERATORS
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from indexer.management.commands import indexer_setup
+from indexer.solr_client import SolrClient
 
 LOG = logging.getLogger()
 

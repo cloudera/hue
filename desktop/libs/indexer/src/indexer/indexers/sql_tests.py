@@ -36,23 +36,21 @@ def mock_uuid():
 
 @pytest.mark.django_db
 class TestSQLIndexer(object):
-
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
   def test_create_table_from_a_file_to_csv(self):
-    fs = Mock(
-      stats=Mock(return_value={'mode': 0o0777})
-    )
+    fs = Mock(stats=Mock(return_value={'mode': 0o0777}))
 
     def source_dict(key):
       return {
         'path': 'hdfs:///path/data.csv',
         'format': {'quoteChar': '"', 'fieldSeparator': ','},
-        'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id'}],
-        'sourceType': 'hive'
+        'sampleCols': [{'operations': [], 'comment': '', 'name': 'customers.id'}],
+        'sourceType': 'hive',
       }.get(key, Mock())
+
     source = MagicMock()
     source.__getitem__.side_effect = source_dict
 
@@ -66,16 +64,18 @@ class TestSQLIndexer(object):
         'columns': [{'name': 'id', 'type': 'int'}],
         'partitionColumns': [{'name': 'day', 'type': 'date', 'partitionValue': '20200101'}],
         'description': 'No comment!',
-        'sourceType': 'hive-1'
+        'sourceType': 'hive-1',
       }.get(key, Mock())
+
     destination = MagicMock()
     destination.__getitem__.side_effect = destination_dict
 
     with patch('notebook.models.get_interpreter') as get_interpreter:
       notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
-    assert (
-      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+    assert [
+      statement.strip()
+      for statement in '''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
 (
@@ -98,8 +98,8 @@ TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_export_table`;
 
-DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
-    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')
+    ] == [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
 
   @patch('uuid.uuid4', mock_uuid)
   def test_create_table_from_a_file_to_csv_for_kms_encryption(self):
@@ -119,9 +119,10 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
       return {
         'path': '/enc_zn/upload_dir/data.csv',
         'format': {'quoteChar': '"', 'fieldSeparator': ','},
-        'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id'}],
-        'sourceType': 'hive'
+        'sampleCols': [{'operations': [], 'comment': '', 'name': 'customers.id'}],
+        'sourceType': 'hive',
       }.get(key, Mock())
+
     source = MagicMock()
     source.__getitem__.side_effect = enc_source_dict
 
@@ -135,24 +136,24 @@ DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
         'columns': [{'name': 'id', 'type': 'int'}],
         'partitionColumns': [{'name': 'day', 'type': 'date', 'partitionValue': '20200101'}],
         'description': 'No comment!',
-        'sourceType': 'hive-1'
+        'sourceType': 'hive-1',
       }.get(key, Mock())
+
     destination = MagicMock()
     destination.__getitem__.side_effect = destination_dict
 
     fs = Mock(
-        stats=Mock(
-          return_value=MockStat()
-        ),
-        parent_path=mock_parent_path,
-        get_home_dir=Mock(return_value='/user/test'),
+      stats=Mock(return_value=MockStat()),
+      parent_path=mock_parent_path,
+      get_home_dir=Mock(return_value='/user/test'),
     )
 
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
     # source dir is in encryption zone, so the scratch dir is in the same dir
-    assert (
-      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+    assert [
+      statement.strip()
+      for statement in '''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
 (
   `id` int ) COMMENT "No comment!"
@@ -172,32 +173,32 @@ CREATE TABLE `default`.`export_table` COMMENT "No comment!"
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_export_table`;
-DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
-    [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')  # noqa: E501
+    ] == [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
 
     fs = Mock(
-        stats=Mock(
-          return_value=MockStat(encBit=False)
-        ),
-        parent_path=mock_parent_path,
-        get_home_dir=Mock(return_value='/user/test'),
+      stats=Mock(return_value=MockStat(encBit=False)),
+      parent_path=mock_parent_path,
+      get_home_dir=Mock(return_value='/user/test'),
     )
 
     def source_dict(key):
       return {
         'path': '/user/test/data.csv',
         'format': {'quoteChar': '"', 'fieldSeparator': ','},
-        'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id'}],
-        'sourceType': 'hive'
+        'sampleCols': [{'operations': [], 'comment': '', 'name': 'customers.id'}],
+        'sourceType': 'hive',
       }.get(key, Mock())
+
     source = MagicMock()
     source.__getitem__.side_effect = source_dict
 
     notebook = SQLIndexer(user=self.user, fs=fs).create_table_from_a_file(source, destination)
 
     # source dir is not in encryption zone, so the scratch dir is in user's home dir
-    assert (
-      [statement.strip() for statement in u'''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
+    assert [
+      statement.strip()
+      for statement in '''DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;
 CREATE TABLE IF NOT EXISTS `default`.`hue__tmp_export_table`
 (
   `id` int ) COMMENT "No comment!"
@@ -217,8 +218,8 @@ CREATE TABLE `default`.`export_table` COMMENT "No comment!"
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_export_table`;
-DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')] ==
-      [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')])
+DROP TABLE IF EXISTS `default`.`hue__tmp_export_table`;'''.split(';')  # noqa: E501
+    ] == [statement.strip() for statement in notebook.get_data()['snippets'][0]['statement_raw'].split(';')]
 
 
 class MockRequest(object):
@@ -254,66 +255,292 @@ class MockFs(object):
 @pytest.mark.django_db
 def test_generate_create_text_table_with_data_partition():
   source = {
-    u'sourceType': 'hive', u'sampleCols': [{u'operations': [], u'comment': u'', u'name': u'customers.id', u'level': 0,
-    u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'partitionValue': u'',
-    u'multiValued': False, u'unique': False, u'type': u'bigint', u'showProperties': False, u'keep': True},
-    {u'operations': [], u'comment': u'', u'name': u'customers.name', u'level': 0, u'keyType': u'string', u'required': False,
-    u'nested': [], u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False, u'unique': False,
-    u'type': u'string', u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'',
-    u'name': u'customers.email_preferences', u'level': 0, u'keyType': u'string', u'required': False, u'nested': [],
-    u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False, u'unique': False, u'type':
-    u'string', u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'', u'name': u'customers.addresses',
-    u'level': 0, u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100,
-    u'partitionValue': u'', u'multiValued': False, u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True},
-    {u'operations': [], u'comment': u'', u'name': u'customers.orders', u'level': 0, u'keyType': u'string', u'required': False,
-    u'nested': [], u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False, u'unique': False,
-    u'type': u'string', u'showProperties': False, u'keep': True}], u'name': u'', u'inputFormat': u'file',
-    u'format': {u'status': 0, u'fieldSeparator': u',', u'hasHeader': True, u'quoteChar': u'"',
-    u'recordSeparator': u'\\n', u'type': u'csv'}, u'defaultName': u'default.customer_stats', u'show': True,
-    u'tableName': u'', u'sample': [], u'apiHelperType': u'hive', u'inputFormatsAll': [{u'name': u'File', u'value': u'file'},
-    {u'name': u'Manually', u'value': u'manual'}, {u'name': u'SQL Query', u'value': u'query'},
-    {u'name': u'Table', u'value': u'table'}], u'query': u'', u'databaseName': u'default', u'table': u'',
-    u'inputFormats': [{u'name': u'File', u'value': u'file'}, {u'name': u'Manually', u'value': u'manual'},
-    {u'name': u'SQL Query', u'value': u'query'}, {u'name': u'Table', u'value': u'table'}],
-    u'path': u'/user/romain/customer_stats.csv', u'draggedQuery': u'',
-    u'inputFormatsManual': [{u'name': u'Manually', u'value': u'manual'}], u'isObjectStore': False
+    'sourceType': 'hive',
+    'sampleCols': [
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'customers.id',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'unique': False,
+        'type': 'bigint',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'customers.name',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'customers.email_preferences',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'customers.addresses',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'customers.orders',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+    ],
+    'name': '',
+    'inputFormat': 'file',
+    'format': {'status': 0, 'fieldSeparator': ',', 'hasHeader': True, 'quoteChar': '"', 'recordSeparator': '\\n', 'type': 'csv'},
+    'defaultName': 'default.customer_stats',
+    'show': True,
+    'tableName': '',
+    'sample': [],
+    'apiHelperType': 'hive',
+    'inputFormatsAll': [
+      {'name': 'File', 'value': 'file'},
+      {'name': 'Manually', 'value': 'manual'},
+      {'name': 'SQL Query', 'value': 'query'},
+      {'name': 'Table', 'value': 'table'},
+    ],
+    'query': '',
+    'databaseName': 'default',
+    'table': '',
+    'inputFormats': [
+      {'name': 'File', 'value': 'file'},
+      {'name': 'Manually', 'value': 'manual'},
+      {'name': 'SQL Query', 'value': 'query'},
+      {'name': 'Table', 'value': 'table'},
+    ],
+    'path': '/user/romain/customer_stats.csv',
+    'draggedQuery': '',
+    'inputFormatsManual': [{'name': 'Manually', 'value': 'manual'}],
+    'isObjectStore': False,
   }
   destination = {
-    u'isTransactional': False, u'isInsertOnly': False, u'sourceType': 'hive',
-    u'KUDU_DEFAULT_PARTITION_COLUMN': {u'int_val': 16, u'name': u'HASH', u'columns': [],
-    u'range_partitions': [{u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES', u'include_lower_val': u'<=',
-    u'lower_val': 0, u'values': [{u'value': u''}]}]}, u'isTargetChecking': False, u'tableName': u'customer_stats',
-    u'outputFormatsList': [{u'name': u'Table', u'value': u'table'}, {u'name': u'Solr index', u'value': u'index'},
-    {u'name': u'File', u'value': u'file'}, {u'name': u'Database', u'value': u'database'}], u'customRegexp': u'',
-    u'isTargetExisting': False, u'partitionColumns': [{u'operations': [], u'comment': u'', u'name': u'new_field_1',
-    u'level': 0, u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': True, u'length': 100,
-    u'partitionValue': u'AAA', u'multiValued': False, u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True}],
-    u'useCustomDelimiters': False, u'apiHelperType': u'hive', u'kuduPartitionColumns': [],
-    u'outputFormats': [{u'name': u'Table', u'value': u'table'}, {u'name': u'Solr index', u'value': u'index'}],
-    u'customMapDelimiter': u'\\003', u'showProperties': False, u'useDefaultLocation': True, u'description': u'',
-    u'primaryKeyObjects': [], u'customFieldDelimiter': u',', u'existingTargetUrl': u'', u'importData': True, u'isIceberg': False,
-    u'useCopy': False, u'databaseName': u'default', u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {u'include_upper_val': u'<=', u'upper_val': 1,
-    u'name': u'VALUES', u'include_lower_val': u'<=', u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [],
-    u'outputFormat': u'table', u'nonDefaultLocation': u'/user/romain/customer_stats.csv', u'name': u'default.customer_stats',
-    u'tableFormat': u'text', 'ouputFormat': u'table',
-    u'bulkColumnNames': u'customers.id,customers.name,customers.email_preferences,customers.addresses,customers.orders',
-    u'columns': [{u'operations': [], u'comment': u'', u'name': u'customers.id', u'level': 0, u'keyType': u'string',
-    u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
-    u'unique': False, u'type': u'bigint', u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'',
-    u'name': u'customers.name', u'level': 0, u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False,
-    u'length': 100, u'partitionValue': u'', u'multiValued': False, u'unique': False, u'type': u'string', u'showProperties': False,
-    u'keep': True}, {u'operations': [], u'comment': u'', u'name': u'customers.email_preferences', u'level': 0, u'keyType': u'string',
-    u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
-    u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'',
-    u'name': u'customers.addresses', u'level': 0, u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False,
-    u'length': 100, u'partitionValue': u'', u'multiValued': False, u'unique': False, u'type': u'string', u'showProperties': False,
-    u'keep': True}, {u'operations': [], u'comment': u'', u'name': u'customers.orders', u'level': 0, u'keyType': u'string',
-    u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
-    u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True}], u'hasHeader': True,
-    u'tableFormats': [{u'name': u'Text', u'value': u'text'}, {u'name': u'Parquet', u'value': u'parquet'},
-    {u'name': u'Kudu', u'value': u'kudu'}, {u'name': u'Csv', u'value': u'csv'}, {u'name': u'Avro', u'value': u'avro'},
-    {u'name': u'Json', u'value': u'json'}, {u'name': u'Regexp', u'value': u'regexp'}, {u'name': u'ORC', u'value': u'orc'}],
-    u'customCollectionDelimiter': u'\\002'
+    'isTransactional': False,
+    'isInsertOnly': False,
+    'sourceType': 'hive',
+    'KUDU_DEFAULT_PARTITION_COLUMN': {
+      'int_val': 16,
+      'name': 'HASH',
+      'columns': [],
+      'range_partitions': [
+        {'include_upper_val': '<=', 'upper_val': 1, 'name': 'VALUES', 'include_lower_val': '<=', 'lower_val': 0, 'values': [{'value': ''}]}
+      ],
+    },
+    'isTargetChecking': False,
+    'tableName': 'customer_stats',
+    'outputFormatsList': [
+      {'name': 'Table', 'value': 'table'},
+      {'name': 'Solr index', 'value': 'index'},
+      {'name': 'File', 'value': 'file'},
+      {'name': 'Database', 'value': 'database'},
+    ],
+    'customRegexp': '',
+    'isTargetExisting': False,
+    'partitionColumns': [
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'new_field_1',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': True,
+        'length': 100,
+        'partitionValue': 'AAA',
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      }
+    ],
+    'useCustomDelimiters': False,
+    'apiHelperType': 'hive',
+    'kuduPartitionColumns': [],
+    'outputFormats': [{'name': 'Table', 'value': 'table'}, {'name': 'Solr index', 'value': 'index'}],
+    'customMapDelimiter': '\\003',
+    'showProperties': False,
+    'useDefaultLocation': True,
+    'description': '',
+    'primaryKeyObjects': [],
+    'customFieldDelimiter': ',',
+    'existingTargetUrl': '',
+    'importData': True,
+    'isIceberg': False,
+    'useCopy': False,
+    'databaseName': 'default',
+    'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {
+      'include_upper_val': '<=',
+      'upper_val': 1,
+      'name': 'VALUES',
+      'include_lower_val': '<=',
+      'lower_val': 0,
+      'values': [{'value': ''}],
+    },
+    'primaryKeys': [],
+    'outputFormat': 'table',
+    'nonDefaultLocation': '/user/romain/customer_stats.csv',
+    'name': 'default.customer_stats',
+    'tableFormat': 'text',
+    'ouputFormat': 'table',
+    'bulkColumnNames': 'customers.id,customers.name,customers.email_preferences,customers.addresses,customers.orders',
+    'columns': [
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'customers.id',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'unique': False,
+        'type': 'bigint',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'customers.name',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'customers.email_preferences',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'customers.addresses',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'customers.orders',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+    ],
+    'hasHeader': True,
+    'tableFormats': [
+      {'name': 'Text', 'value': 'text'},
+      {'name': 'Parquet', 'value': 'parquet'},
+      {'name': 'Kudu', 'value': 'kudu'},
+      {'name': 'Csv', 'value': 'csv'},
+      {'name': 'Avro', 'value': 'avro'},
+      {'name': 'Json', 'value': 'json'},
+      {'name': 'Regexp', 'value': 'regexp'},
+      {'name': 'ORC', 'value': 'orc'},
+    ],
+    'customCollectionDelimiter': '\\002',
   }
   request = MockRequest(fs=MockFs())
 
@@ -337,86 +564,422 @@ ROW FORMAT   DELIMITED
 ;'''
   assert statement in sql, sql
 
-  assert ('''LOAD DATA INPATH '/user/romain/customer_stats.csv' '''
-    '''INTO TABLE `default`.`customer_stats` PARTITION (new_field_1='AAA');''' in sql), sql
+  assert (
+    '''LOAD DATA INPATH '/user/romain/customer_stats.csv' '''
+    '''INTO TABLE `default`.`customer_stats` PARTITION (new_field_1='AAA');''' in sql
+  ), sql
 
 
 @pytest.mark.django_db
 def test_generate_create_kudu_table_with_data():
   source = {
-    u'sourceType': 'impala', u'apiHelperType': 'hive', u'sampleCols': [], u'name': u'', u'inputFormat': u'file',
-    u'format': {u'quoteChar': u'"', u'recordSeparator': u'\\n', u'type': u'csv', u'hasHeader': True, u'fieldSeparator': u','},
-    u'show': True, u'tableName': u'', u'sample': [], u'defaultName': u'index_data', u'query': u'', u'databaseName': u'default',
-    u'table': u'', u'inputFormats': [{u'name': u'File', u'value': u'file'}, {u'name': u'Manually', u'value': u'manual'}],
-    u'path': u'/user/admin/index_data.csv', u'draggedQuery': u'', u'isObjectStore': False
+    'sourceType': 'impala',
+    'apiHelperType': 'hive',
+    'sampleCols': [],
+    'name': '',
+    'inputFormat': 'file',
+    'format': {'quoteChar': '"', 'recordSeparator': '\\n', 'type': 'csv', 'hasHeader': True, 'fieldSeparator': ','},
+    'show': True,
+    'tableName': '',
+    'sample': [],
+    'defaultName': 'index_data',
+    'query': '',
+    'databaseName': 'default',
+    'table': '',
+    'inputFormats': [{'name': 'File', 'value': 'file'}, {'name': 'Manually', 'value': 'manual'}],
+    'path': '/user/admin/index_data.csv',
+    'draggedQuery': '',
+    'isObjectStore': False,
   }
   destination = {
-    u'isTransactional': False, u'isInsertOnly': False, u'sourceType': 'impala',
-    u'KUDU_DEFAULT_PARTITION_COLUMN': {u'int_val': 16, u'name': u'HASH', u'columns': [],
-    u'range_partitions': [{u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES', u'include_lower_val': u'<=',
-    u'lower_val': 0, u'values': [{u'value': u''}]}]}, u'tableName': u'index_data',
-    u'outputFormatsList': [{u'name': u'Table', u'value': u'table'}, {u'name': u'Solr+index', u'value': u'index'},
-    {u'name': u'File', u'value': u'file'}, {u'name': u'Database', u'value': u'database'}], u'customRegexp': u'',
-    u'isTargetExisting': False, u'partitionColumns': [], u'useCustomDelimiters': True,
-    u'kuduPartitionColumns': [{u'int_val': 16, u'name': u'HASH', u'columns': [u'id'],
-    u'range_partitions': [{u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES', u'include_lower_val': u'<=',
-    u'lower_val': 0, u'values': [{u'value': u''}]}]}], u'outputFormats': [{u'name': u'Table', u'value': u'table'},
-    {u'name': u'Solr+index', u'value': u'index'}], u'customMapDelimiter': None, u'showProperties': False, u'useDefaultLocation': True,
-    u'description': u'Big Data', u'primaryKeyObjects': [{u'operations': [], u'comment': u'', u'name': u'id', u'level': 0,
-    u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False,
-    u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True}], u'customFieldDelimiter': u',',
-    u'existingTargetUrl': u'', u'importData': True, u'isIceberg': False, u'useCopy': False, u'databaseName': u'default',
-    u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES',
-    u'include_lower_val': u'<=', u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [u'id'],
-    u'outputFormat': u'table', u'nonDefaultLocation': u'/user/admin/index_data.csv', u'name': u'index_data',
-    u'tableFormat': u'kudu',
-    u'bulkColumnNames': u'business_id,cool,date,funny,id,stars,text,type,useful,user_id,name,full_address,latitude,'
-    'longitude,neighborhoods,open,review_count,state', u'columns': [{u'operations': [], u'comment': u'', u'name': u'business_id',
-    u'level': 0, u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100,
-    u'multiValued': False, u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True},
-    {u'operations': [], u'comment': u'', u'name': u'cool', u'level': 0, u'keyType': u'string', u'required': False,
-    u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False, u'unique': False, u'type': u'bigint',
-    u'showProperties': False, u'keep': False}, {u'operations': [], u'comment': u'', u'name': u'date', u'level': 0,
-    u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False,
-    u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'',
-    u'name': u'funny', u'level': 0, u'scale': 4, u'precision': 10, u'keyType': u'string', u'required': False, u'nested': [],
-    u'isPartition': False, u'length': 100, u'multiValued': False, u'unique': False, u'type': u'decimal', u'showProperties': False,
-    u'keep': True}, {u'operations': [], u'comment': u'', u'name': u'id', u'level': 0, u'keyType': u'string', u'required': False,
-    u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False, u'unique': False, u'type': u'string',
-    u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'', u'name': u'stars', u'level': 0,
-    u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False,
-    u'unique': False, u'type': u'bigint', u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'',
-    u'name': u'text', u'level': 0, u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100,
-    u'multiValued': False, u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True},
-    {u'operations': [], u'comment': u'', u'name': u'type', u'level': 0, u'keyType': u'string', u'required': False, u'nested': [],
-    u'isPartition': False, u'length': 100, u'multiValued': False, u'unique': False, u'type': u'string', u'showProperties': False,
-    u'keep': True}, {u'operations': [], u'comment': u'', u'name': u'useful', u'level': 0, u'keyType': u'string', u'required': False,
-    u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False, u'unique': False, u'type': u'bigint',
-    u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'', u'name': u'user_id', u'level': 0,
-    u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False,
-    u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'',
-    u'name': u'name', u'level': 0, u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False,
-    u'length': 100, u'multiValued': False, u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True},
-    {u'operations': [], u'comment': u'', u'name': u'full_address', u'level': 0, u'keyType': u'string', u'required': False,
-    u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False, u'unique': False, u'type': u'string',
-    u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'', u'name': u'latitude', u'level': 0,
-    u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False,
-    u'unique': False, u'type': u'double', u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'',
-    u'name': u'longitude', u'level': 0, u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False,
-    u'length': 100, u'multiValued': False, u'unique': False, u'type': u'double', u'showProperties': False, u'keep': True},
-    {u'operations': [], u'comment': u'', u'name': u'neighborhoods', u'level': 0, u'keyType': u'string', u'required': False,
-    u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False, u'unique': False, u'type': u'string',
-    u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'', u'name': u'open', u'level': 0,
-    u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False,
-    u'unique': False, u'type': u'string', u'showProperties': False, u'keep': True}, {u'operations': [], u'comment': u'',
-    u'name': u'review_count', u'level': 0, u'keyType': u'string', u'required': False, u'nested': [], u'isPartition': False,
-    u'length': 100, u'multiValued': False, u'unique': False, u'type': u'bigint', u'showProperties': False, u'keep': True},
-    {u'operations': [], u'comment': u'', u'name': u'state', u'level': 0, u'keyType': u'string', u'required': False,
-    u'nested': [], u'isPartition': False, u'length': 100, u'multiValued': False, u'unique': False, u'type': u'string',
-    u'showProperties': False, u'keep': True}], u'hasHeader': True, u'tableFormats': [{u'name': u'Text', u'value': u'text'},
-    {u'name': u'Parquet', u'value': u'parquet'}, {u'name': u'Json', u'value': u'json'}, {u'name': u'Kudu', u'value': u'kudu'},
-    {u'name': u'Avro', u'value': u'avro'}, {u'name': u'Regexp', u'value': u'regexp'}, {u'name': u'RCFile', u'value': u'rcfile'},
-    {u'name': u'ORC', u'value': u'orc'}, {u'name': u'SequenceFile', u'value': u'sequencefile'}], u'customCollectionDelimiter': None
+    'isTransactional': False,
+    'isInsertOnly': False,
+    'sourceType': 'impala',
+    'KUDU_DEFAULT_PARTITION_COLUMN': {
+      'int_val': 16,
+      'name': 'HASH',
+      'columns': [],
+      'range_partitions': [
+        {'include_upper_val': '<=', 'upper_val': 1, 'name': 'VALUES', 'include_lower_val': '<=', 'lower_val': 0, 'values': [{'value': ''}]}
+      ],
+    },
+    'tableName': 'index_data',
+    'outputFormatsList': [
+      {'name': 'Table', 'value': 'table'},
+      {'name': 'Solr+index', 'value': 'index'},
+      {'name': 'File', 'value': 'file'},
+      {'name': 'Database', 'value': 'database'},
+    ],
+    'customRegexp': '',
+    'isTargetExisting': False,
+    'partitionColumns': [],
+    'useCustomDelimiters': True,
+    'kuduPartitionColumns': [
+      {
+        'int_val': 16,
+        'name': 'HASH',
+        'columns': ['id'],
+        'range_partitions': [
+          {
+            'include_upper_val': '<=',
+            'upper_val': 1,
+            'name': 'VALUES',
+            'include_lower_val': '<=',
+            'lower_val': 0,
+            'values': [{'value': ''}],
+          }
+        ],
+      }
+    ],
+    'outputFormats': [{'name': 'Table', 'value': 'table'}, {'name': 'Solr+index', 'value': 'index'}],
+    'customMapDelimiter': None,
+    'showProperties': False,
+    'useDefaultLocation': True,
+    'description': 'Big Data',
+    'primaryKeyObjects': [
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'id',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      }
+    ],
+    'customFieldDelimiter': ',',
+    'existingTargetUrl': '',
+    'importData': True,
+    'isIceberg': False,
+    'useCopy': False,
+    'databaseName': 'default',
+    'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {
+      'include_upper_val': '<=',
+      'upper_val': 1,
+      'name': 'VALUES',
+      'include_lower_val': '<=',
+      'lower_val': 0,
+      'values': [{'value': ''}],
+    },
+    'primaryKeys': ['id'],
+    'outputFormat': 'table',
+    'nonDefaultLocation': '/user/admin/index_data.csv',
+    'name': 'index_data',
+    'tableFormat': 'kudu',
+    'bulkColumnNames': 'business_id,cool,date,funny,id,stars,text,type,useful,user_id,name,full_address,latitude,'
+    'longitude,neighborhoods,open,review_count,state',
+    'columns': [
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'business_id',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'cool',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'bigint',
+        'showProperties': False,
+        'keep': False,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'date',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'funny',
+        'level': 0,
+        'scale': 4,
+        'precision': 10,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'decimal',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'id',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'stars',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'bigint',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'text',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'type',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'useful',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'bigint',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'user_id',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'name',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'full_address',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'latitude',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'double',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'longitude',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'double',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'neighborhoods',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'open',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'review_count',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'bigint',
+        'showProperties': False,
+        'keep': True,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'name': 'state',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'multiValued': False,
+        'unique': False,
+        'type': 'string',
+        'showProperties': False,
+        'keep': True,
+      },
+    ],
+    'hasHeader': True,
+    'tableFormats': [
+      {'name': 'Text', 'value': 'text'},
+      {'name': 'Parquet', 'value': 'parquet'},
+      {'name': 'Json', 'value': 'json'},
+      {'name': 'Kudu', 'value': 'kudu'},
+      {'name': 'Avro', 'value': 'avro'},
+      {'name': 'Regexp', 'value': 'regexp'},
+      {'name': 'RCFile', 'value': 'rcfile'},
+      {'name': 'ORC', 'value': 'orc'},
+      {'name': 'SequenceFile', 'value': 'sequencefile'},
+    ],
+    'customCollectionDelimiter': None,
   }
   request = MockRequest(fs=MockFs())
 
@@ -452,7 +1015,8 @@ ROW FORMAT   DELIMITED
 TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')'''
     assert statement in sql, sql
 
-    assert ('''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
+    assert (
+      '''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
         PRIMARY KEY (id)
         PARTITION BY HASH PARTITIONS 16
         STORED AS kudu
@@ -460,13 +1024,15 @@ TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')'''
         'kudu.num_tablet_replicas'='1'
         )
         AS SELECT `id`, `business_id`, `date`, `funny`, `stars`, `text`, `type`, `useful`, `user_id`, `name`, '''
-        '''`full_address`, `latitude`, `longitude`, `neighborhoods`, `open`, `review_count`, `state`
-        FROM `default`.`hue__tmp_index_data`''' in sql), sql
+      '''`full_address`, `latitude`, `longitude`, `neighborhoods`, `open`, `review_count`, `state`
+        FROM `default`.`hue__tmp_index_data`''' in sql
+    ), sql
 
 
 @pytest.mark.django_db
 def test_generate_create_parquet_table():
-  source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
+  source = json.loads(
+    '''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
     '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
     '''"Corpus Christi","40.7807998657","-73.9772033691"],["Thomson Reuters","2400000.0","US","Albany","35.7976989746",'''
     '''"-78.6252975464"],'''
@@ -494,7 +1060,8 @@ def test_generate_create_parquet_table():
     '''"fieldSeparator":",","recordSeparator":"\\n","quoteChar":"\\"","hasHeader":true,"status":0},"show":true,"defaultName":'''
     '''"default.query-hive-360"}'''
   )
-  destination = json.loads('''{"isTransactional": false, "isInsertOnly": false, "sourceType": "hive", "name":"default.parquet_table"'''
+  destination = json.loads(
+    '''{"isTransactional": false, "isInsertOnly": false, "sourceType": "hive", "name":"default.parquet_table"'''
     ''',"apiHelperType":"hive","description":"","outputFormat":"table","outputFormatsList":[{"name":"Table","value":"table"},'''
     '''{"name":"Solr index","value":"index"},{"name":"File","value":"file"},{"name":"Database","value":"database"}],'''
     '''"outputFormats":[{"name":"Table","value":"table"},{"name":"Solr index","value":"index"}],"columns":[{"operations":[],'''
@@ -548,11 +1115,14 @@ TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
   assert statement in sql, sql
 
-  assert '''CREATE TABLE `default`.`parquet_table`
+  assert (
+    '''CREATE TABLE `default`.`parquet_table`
         STORED AS parquet
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in sql, sql
+'''
+    in sql
+  ), sql
 
   assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql
 
@@ -710,7 +1280,8 @@ TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 
 @pytest.mark.django_db
 def test_generate_create_iceberg_table():
-  source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
+  source = json.loads(
+    '''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
     '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
     '''"Corpus Christi","40.7807998657","-73.9772033691"],["Thomson Reuters","2400000.0","US","Albany","35.7976989746",'''
     '''"-78.6252975464"],'''
@@ -738,7 +1309,8 @@ def test_generate_create_iceberg_table():
     '''"fieldSeparator":",","recordSeparator":"\\n","quoteChar":"\\"","hasHeader":true,"status":0},"show":true,"defaultName":'''
     '''"default.query-hive-360"}'''
   )
-  destination = json.loads('''{"isTransactional": false, "isInsertOnly": false, "sourceType": "hive", "name":"default.parquet_table"'''
+  destination = json.loads(
+    '''{"isTransactional": false, "isInsertOnly": false, "sourceType": "hive", "name":"default.parquet_table"'''
     ''',"apiHelperType":"hive","description":"","outputFormat":"table","outputFormatsList":[{"name":"Table","value":"table"},'''
     '''{"name":"Solr index","value":"index"},{"name":"File","value":"file"},{"name":"Database","value":"database"}],'''
     '''"outputFormats":[{"name":"Table","value":"table"},{"name":"Solr index","value":"index"}],"columns":[{"operations":[],'''
@@ -793,19 +1365,23 @@ TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
   assert statement in sql, sql
 
-  assert '''CREATE TABLE `default`.`parquet_table`
+  assert (
+    '''CREATE TABLE `default`.`parquet_table`
         STORED BY ICEBERG
 STORED AS parquet
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in sql, sql
+'''
+    in sql
+  ), sql
 
   assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;''' in sql, sql
 
 
 @pytest.mark.django_db
 def test_generate_create_orc_table_transactional():
-  source = json.loads('''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
+  source = json.loads(
+    '''{"sourceType": "hive", "name":"","sample":[["Bank Of America","3000000.0","US","Miami","37.6801986694",'''
     '''"-121.92150116"],["Citi Bank","2800000.0","US","Richmond","37.5242004395","-77.4932022095"],["Deutsche Bank","2600000.0","US",'''
     '''"Corpus Christi","40.7807998657","-73.9772033691"],["Thomson Reuters","2400000.0","US","Albany","35.7976989746",'''
     '''"-78.6252975464"],'''
@@ -832,36 +1408,37 @@ def test_generate_create_orc_table_transactional():
     '''"apiHelperType":"hive","query":"","draggedQuery":"","format":{"type":"csv","fieldSeparator":",","recordSeparator":"\\n",'''
     '''"quoteChar":"\\"","hasHeader":true,"status":0},"show":true,"defaultName":"default.query-hive-360"}'''
   )
-  destination = json.loads('''{"isTransactional": true, "isInsertOnly": true, "sourceType": "hive", "name":'''
-  '''"default.parquet_table","apiHelperType":"hive","description":"","outputFormat":"table","outputFormatsList":'''
-  '''[{"name":"Table","value":"table"},{"name":"Solr index","value":"index"},{"name":"File","value":"file"},'''
-  '''{"name":"Database","value":"database"}],"outputFormats":[{"name":"Table","value":"table"},{"name":"Solr index","value":"index"}],'''
-  '''"columns":[{"operations":[],"comment":"","nested":[],"name":"acct_client","level":0,"keyType":"string","required":false,'''
-  '''"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,'''
-  '''"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_amount",'''
-  '''"level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,'''
-  '''"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":false,"scale":0},'''
-  '''{"operations":[],"comment":"","nested":[],"name":"tran_country_cd","level":0,"keyType":"string","required":false,'''
-  '''"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,'''
-  '''"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"vrfcn_city",'''
-  '''"level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,'''
-  '''"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},'''
-  '''{"operations":[],"comment":"","nested":[],"name":"vrfcn_city_lat","level":0,"keyType":"string","required":false,'''
-  '''"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,'''
-  '''"type":"double","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"vrfcn_city_lon",'''
-  '''"level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":'''
-  '''"","multiValued":false,"unique":false,"type":"double","showProperties":false,"scale":0}],"bulkColumnNames":"acct_client,'''
-  '''tran_amount,tran_country_cd,vrfcn_city,vrfcn_city_lat,vrfcn_city_lon","showProperties":false,"isTargetExisting":false,'''
-  '''"isTargetChecking":false,"existingTargetUrl":"","tableName":"parquet_table","databaseName":"default","tableFormat":"orc",'''
-  '''"KUDU_DEFAULT_RANGE_PARTITION_COLUMN":{"values":[{"value":""}],"name":"VALUES","lower_val":0,"include_lower_val":"<=",'''
-  '''"upper_val":1,"include_upper_val":"<="},"KUDU_DEFAULT_PARTITION_COLUMN":{"columns":[],"range_partitions":[{"values":'''
-  '''[{"value":""}],"name":"VALUES","lower_val":0,"include_lower_val":"<=","upper_val":1,"include_upper_val":"<="}],"name":"HASH",'''
-  '''"int_val":16},"tableFormats":[{"value":"text","name":"Text"},{"value":"parquet","name":"Parquet"},{"value":"kudu","name":"Kudu"},'''
-  '''{"value":"csv","name":"Csv"},{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},'''
-  '''{"value":"orc","name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],'''
-  '''"importData":true,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
-  '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
-  '''"customRegexp":"","isIceberg":false,"useCopy":false}'''
+  destination = json.loads(
+    '''{"isTransactional": true, "isInsertOnly": true, "sourceType": "hive", "name":'''
+    '''"default.parquet_table","apiHelperType":"hive","description":"","outputFormat":"table","outputFormatsList":'''
+    '''[{"name":"Table","value":"table"},{"name":"Solr index","value":"index"},{"name":"File","value":"file"},'''
+    '''{"name":"Database","value":"database"}],"outputFormats":[{"name":"Table","value":"table"},{"name":"Solr index","value":"index"}],'''
+    '''"columns":[{"operations":[],"comment":"","nested":[],"name":"acct_client","level":0,"keyType":"string","required":false,'''
+    '''"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,'''
+    '''"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"tran_amount",'''
+    '''"level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,'''
+    '''"partitionValue":"","multiValued":false,"unique":false,"type":"double","showProperties":false,"scale":0},'''
+    '''{"operations":[],"comment":"","nested":[],"name":"tran_country_cd","level":0,"keyType":"string","required":false,'''
+    '''"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,'''
+    '''"type":"string","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"vrfcn_city",'''
+    '''"level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,'''
+    '''"partitionValue":"","multiValued":false,"unique":false,"type":"string","showProperties":false,"scale":0},'''
+    '''{"operations":[],"comment":"","nested":[],"name":"vrfcn_city_lat","level":0,"keyType":"string","required":false,'''
+    '''"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,'''
+    '''"type":"double","showProperties":false,"scale":0},{"operations":[],"comment":"","nested":[],"name":"vrfcn_city_lon",'''
+    '''"level":0,"keyType":"string","required":false,"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":'''
+    '''"","multiValued":false,"unique":false,"type":"double","showProperties":false,"scale":0}],"bulkColumnNames":"acct_client,'''
+    '''tran_amount,tran_country_cd,vrfcn_city,vrfcn_city_lat,vrfcn_city_lon","showProperties":false,"isTargetExisting":false,'''
+    '''"isTargetChecking":false,"existingTargetUrl":"","tableName":"parquet_table","databaseName":"default","tableFormat":"orc",'''
+    '''"KUDU_DEFAULT_RANGE_PARTITION_COLUMN":{"values":[{"value":""}],"name":"VALUES","lower_val":0,"include_lower_val":"<=",'''
+    '''"upper_val":1,"include_upper_val":"<="},"KUDU_DEFAULT_PARTITION_COLUMN":{"columns":[],"range_partitions":[{"values":'''
+    '''[{"value":""}],"name":"VALUES","lower_val":0,"include_lower_val":"<=","upper_val":1,"include_upper_val":"<="}],"name":"HASH",'''
+    '''"int_val":16},"tableFormats":[{"value":"text","name":"Text"},{"value":"parquet","name":"Parquet"},{"value":"kudu","name":"Kudu"},'''
+    '''{"value":"csv","name":"Csv"},{"value":"avro","name":"Avro"},{"value":"json","name":"Json"},{"value":"regexp","name":"Regexp"},'''
+    '''{"value":"orc","name":"ORC"}],"partitionColumns":[],"kuduPartitionColumns":[],"primaryKeys":[],"primaryKeyObjects":[],'''
+    '''"importData":true,"useDefaultLocation":true,"nonDefaultLocation":"/user/hue/data/query-hive-360.csv","hasHeader":true,'''
+    '''"useCustomDelimiters":false,"customFieldDelimiter":",","customCollectionDelimiter":"\\\\002","customMapDelimiter":"\\\\003",'''
+    '''"customRegexp":"","isIceberg":false,"useCopy":false}'''
   )
 
   path = {'isDir': False, 'split': ('/user/hue/data', 'query-hive-360.csv'), 'listdir': ['/user/hue/data']}
@@ -887,21 +1464,28 @@ TBLPROPERTIES('skip.header.line.count'='1', 'transactional'='false')
 ;'''
   assert statement in sql, sql
 
-  assert '''CREATE TABLE `default`.`parquet_table`
+  assert (
+    '''CREATE TABLE `default`.`parquet_table`
         STORED AS orc
 TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
         AS SELECT *
         FROM `default`.`hue__tmp_parquet_table`;
-''' in sql, sql
+'''
+    in sql
+  ), sql
 
-  assert '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;
-''' in sql, sql
+  assert (
+    '''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;
+'''
+    in sql
+  ), sql
 
 
 @pytest.mark.django_db
 def test_generate_create_empty_kudu_table():
   source = json.loads('''{"sourceType": "impala", "apiHelperType": "impala", "path": "", "inputFormat": "manual"}''')
-  destination = json.loads('''{"isTransactional": false, "isInsertOnly": false, "sourceType": "impala", '''
+  destination = json.loads(
+    '''{"isTransactional": false, "isInsertOnly": false, "sourceType": "impala", '''
     '''"name":"default.manual_empty_kudu","apiHelperType":"impala","description":"","outputFormat":"table",'''
     '''"columns":[{"operations":[],"comment":"","nested":[],"name":"acct_client","level":0,"keyType":"string","required":false,'''
     '''"precision":10,"keep":true,"isPartition":false,"length":100,"partitionValue":"","multiValued":false,"unique":false,'''
@@ -936,7 +1520,8 @@ def test_generate_create_empty_kudu_table():
 
   sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination).get_str()
 
-  assert '''CREATE TABLE `default`.`manual_empty_kudu`
+  assert (
+    '''CREATE TABLE `default`.`manual_empty_kudu`
 (
   `acct_client` string ,
   `tran_amount` double ,
@@ -945,155 +1530,421 @@ def test_generate_create_empty_kudu_table():
   `vrfcn_city_lat` double ,
   `vrfcn_city_lon` double , PRIMARY KEY (acct_client)
 )   STORED AS kudu TBLPROPERTIES('transactional'='false')
-;''' in sql, sql
+;'''
+    in sql
+  ), sql
 
 
 @pytest.mark.django_db
 def test_create_ddl_with_nonascii():
-  source = {u'kafkaFieldType': u'delimited', u'rdbmsUsername': u'', u'kafkaFieldTypes': u'',
-            u'selectedTableIndex': 0, u'rdbmsJdbcDriverNames': [], u'tableName': u'',
-            u'sample': [[u'Weihaiwei', u'\u5a01\u6d77\u536b\u5e02', u'Weihai', u'\u5a01\u6d77\u5e02', u'1949-11-01'],
-                        [u'Xingshan', u'\u5174\u5c71\u5e02', u'Hegang', u'\u9e64\u5c97\u5e02', u'1950-03-23'],
-                        [u"Xi'an", u'\u897f\u5b89\u5e02', u'Liaoyuan', u'\u8fbd\u6e90\u5e02', u'1952-04-03'],
-                        [u'Nanzheng', u'\u5357\u90d1\u5e02', u'Hanzhong', u'\u6c49\u4e2d\u5e02', u'1953-10-24'],
-                        [u'Dihua', u'\u8fea\u5316\u5e02', u'?r\xfcmqi', u'\u4e4c\u9c81\u6728\u9f50\u5e02', u'1953-11-20']],
-            u'rdbmsTypes': [], u'isFetchingDatabaseNames': False, u'rdbmsDbIsValid': False, u'query': u'',
-            u'channelSourceSelectedHosts': [], u'table': u'', u'rdbmsAllTablesSelected': False,
-            u'inputFormatsManual': [{u'name': u'Manually', u'value': u'manual'}], u'rdbmsPassword': u'',
-            u'isObjectStore': False, u'tables': [{u'name': u''}], u'streamUsername': u'',
-            u'kafkaSchemaManual': u'detect', u'connectorSelection': u'sfdc', u'namespace':
-              {u'status': u'CREATED', u'computes':
-                [{u'credentials': {}, u'type': u'direct', u'id': u'default', u'name': u'default'}],
-               u'id': u'default', u'name': u'default'}, u'rdbmsIsAllTables': False, u'rdbmsDatabaseNames': [],
-            u'hasStreamSelected': False, u'channelSourcePath': u'/var/log/hue-httpd/access_log',
-            u'channelSourceHosts': [], u'show': True, u'streamObjects': [], u'streamPassword': u'',
-            u'tablesNames': [], u'sampleCols': [{u'operations': [], u'comment': u'', u'unique': False,
-                                                 u'name': u'Before', u'level': 0, u'keyType': u'string',
-                                                 u'required': False, u'precision': 10, u'nested': [],
-                                                 u'isPartition': False, u'length': 100, u'partitionValue': u'',
-                                                 u'multiValued': False, u'keep': True, u'type': u'string',
-                                                 u'showProperties': False, u'scale': 0},
-                                                {u'operations': [], u'comment': u'', u'unique': False,
-                                                 u'name': u'old_Chinese_name', u'level': 0, u'keyType':
-                                                   u'string', u'required': False, u'precision': 10, u'nested': [],
-                                                 u'isPartition': False, u'length': 100, u'partitionValue': u'',
-                                                 u'multiValued': False, u'keep': True, u'type': u'string',
-                                                 u'showProperties': False, u'scale': 0},
-                                                {u'operations': [], u'comment': u'', u'unique': False,
-                                                 u'name': u'After', u'level': 0, u'keyType': u'string',
-                                                 u'required': False, u'precision': 10, u'nested': [],
-                                                 u'isPartition': False, u'length': 100, u'partitionValue': u'',
-                                                 u'multiValued': False, u'keep': True, u'type': u'string',
-                                                 u'showProperties': False, u'scale': 0},
-                                                {u'operations': [], u'comment': u'', u'unique': False,
-                                                 u'name': u'new_Chinese_name', u'level': 0, u'keyType':
-                                                   u'string', u'required': False, u'precision': 10, u'nested': [],
-                                                 u'isPartition': False, u'length': 100, u'partitionValue': u'',
-                                                 u'multiValued': False, u'keep': True, u'type': u'string',
-                                                 u'showProperties': False, u'scale': 0},
-                                                {u'operations': [], u'comment': u'', u'unique': False,
-                                                 u'name': u'Renamed_date', u'level': 0, u'keyType': u'string',
-                                                 u'required': False, u'precision': 10, u'nested': [],
-                                                 u'isPartition': False, u'length': 100, u'partitionValue': u'',
-                                                 u'multiValued': False, u'keep': True, u'type': u'string',
-                                                 u'showProperties': False, u'scale': 0}], u'rdbmsDatabaseName': u'',
-            u'sourceType': u'hive', u'inputFormat': u'file', u'format': {u'status': 0, u'fieldSeparator': u',',
-                                                                         u'hasHeader': True, u'quoteChar': u'"',
-                                                                         u'recordSeparator': u'\\n', u'type': u'csv'},
-            u'connectorList': [{u'name': u'Salesforce', u'value': u'sfdc'}], u'kafkaFieldDelimiter': u',',
-            u'rdbmsPort': u'', u'rdbmsTablesExclude': [], u'isFetchingDriverNames': False, u'publicStreams':
-              [{u'name': u'Kafka Topics', u'value': u'kafka'}, {u'name': u'Flume Agent', u'value': u'flume'}],
-            u'channelSourceTypes': [{u'name': u'Directory or File', u'value': u'directory'},
-                                    {u'name': u'Program', u'value': u'exec'},
-                                    {u'name': u'Syslogs', u'value': u'syslogs'},
-                                    {u'name': u'HTTP', u'value': u'http'}],
-            u'databaseName': u'default', u'inputFormats': [{u'name': u'File', u'value': u'file'},
-                                                           {u'name': u'External Database', u'value': u'rdbms'},
-                                                           {u'name': u'Manually', u'value': u'manual'}],
-            u'path': u'/user/admin/renamed_chinese_cities_gb2312.csv', u'streamToken': u'', u'kafkaFieldNames': u'',
-            u'streamSelection': u'kafka', u'compute': {u'credentials': {}, u'type': u'direct',
-                                                       u'id': u'default', u'name': u'default'},
-            u'name': u'', u'kafkaFieldSchemaPath': u'', u'kafkaTopics': [], u'rdbmsJdbcDriver': u'',
-            u'rdbmsHostname': u'', u'isFetchingTableNames': False, u'rdbmsType': None, u'inputFormatsAll':
-              [{u'name': u'File', u'value': u'file'}, {u'name': u'External Database', u'value': u'rdbms'},
-               {u'name': u'Manually', u'value': u'manual'}], u'rdbmsTableNames': [],
-            u'streamEndpointUrl': u'https://login.salesforce.com/services/Soap/u/42.0', u'kafkaSelectedTopics': u''}
-  destination = {u'isTransactionalVisible': True, u'KUDU_DEFAULT_PARTITION_COLUMN':
-    {u'int_val': 16, u'name': u'HASH', u'columns': [], u'range_partitions':
-      [{u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES', u'include_lower_val': u'<=',
-        u'lower_val': 0, u'values': [{u'value': u''}]}]}, u'namespaces':
-    [{u'status': u'CREATED', u'computes': [{u'credentials': {}, u'type': u'direct', u'id': u'default', u'name': u'default'}],
-      u'id': u'default', u'name': u'default'}], u'isTargetChecking': False, 'ouputFormat': u'table',
-                 u'tableName': u'renamed_chinese_cities_gb2312', u'outputFormatsList':
-                   [{u'name': u'Table', u'value': u'table'}, {u'name': u'Search index', u'value': u'index'},
-                    {u'name': u'Database', u'value': u'database'}, {u'name': u'Folder', u'value': u'file'},
-                    {u'name': u'HBase Table', u'value': u'hbase'}],
-                 u'fieldEditorPlaceHolder': u'Example: SELECT * FROM [object Promise]', u'indexerDefaultField': [],
-                 u'fieldEditorValue':
-                   u'SELECT Before,\n    old_Chinese_name,\n    After,\n    new_Chinese_name,\n    Renamed_date\n FROM [object Promise];',
-                 u'customRegexp': u'', u'customLineDelimiter': u'\\n', u'isTargetExisting': False,
-                 u'customEnclosedByDelimiter': u"'", u'indexerConfigSets': [], u'sourceType': u'hive',
-                 u'useCustomDelimiters': False, u'apiHelperType': u'hive', u'numMappers': 1,
-                 u'fieldEditorDatabase': u'default', u'namespace': {u'status': u'CREATED', u'computes':
-      [{u'credentials': {}, u'type': u'direct', u'id': u'default', u'name': u'default'}], u'id': u'default', u'name': u'default'},
-                 u'indexerPrimaryKeyObject': [], u'kuduPartitionColumns': [], u'rdbmsFileOutputFormats':
-                   [{u'name': u'text', u'value': u'text'}, {u'name': u'sequence', u'value': u'sequence'},
-                    {u'name': u'avro', u'value': u'avro'}], u'outputFormats': [{u'name': u'Table', u'value': u'table'},
-                                                                               {u'name': u'Search index', u'value': u'index'}],
-                 u'fieldEditorEnabled': False, u'indexerDefaultFieldObject': [],
-                 u'customMapDelimiter': u'', u'partitionColumns': [], u'rdbmsFileOutputFormat': u'text',
-                 u'showProperties': False, u'isTransactional': True, u'useDefaultLocation': True, u'description': u'',
-                 u'customFieldsDelimiter': u',', u'primaryKeyObjects': [], u'customFieldDelimiter': u',',
-                 u'rdbmsSplitByColumn': [], u'existingTargetUrl': u'', u'channelSinkTypes':
-                   [{u'name': u'This topic', u'value': u'kafka'}, {u'name': u'Solr', u'value': u'solr'},
-                    {u'name': u'HDFS', u'value': u'hdfs'}], u'defaultName': u'default.renamed_chinese_cities_gb2312',
-                 u'isTransactionalUpdateEnabled': False, u'importData': True, u'isIceberg': False, u'useCopy': False, u'databaseName':
-                 u'default', u'indexerRunJob': False, u'indexerReplicationFactor': 1, u'KUDU_DEFAULT_RANGE_PARTITION_COLUMN':
-                   {u'include_upper_val': u'<=', u'upper_val': 1, u'name': u'VALUES', u'include_lower_val': u'<=',
-                    u'lower_val': 0, u'values': [{u'value': u''}]}, u'primaryKeys': [], u'indexerConfigSet': u'',
-                 u'sqoopJobLibPaths': [{u'path': u''}], u'outputFormat': u'table',
-                 u'nonDefaultLocation': u'/user/admin/renamed_chinese_cities_gb2312.csv',
-                 u'compute': {u'credentials': {}, u'type': u'direct', u'id': u'default', u'name': u'default'},
-                 u'name': u'default.renamed_chinese_cities_gb2312', u'tableFormat': u'text', u'isInsertOnly': True,
-                 u'targetNamespaceId': u'default', u'bulkColumnNames': u'Before,old_Chinese_name,After,new_Chinese_name,Renamed_date',
-                 u'columns': [{u'operations': [], u'comment': u'', u'unique': False, u'name': u'Before', u'level': 0,
-                               u'keyType': u'string', u'required': False, u'precision': 10, u'nested': [],
-                               u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
-                               u'keep': True, u'type': u'string', u'showProperties': False, u'scale': 0},
-                              {u'operations': [], u'comment': u'', u'unique': False, u'name': u'old_Chinese_name',
-                               u'level': 0, u'keyType': u'string', u'required': False, u'precision': 10, u'nested': [],
-                               u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
-                               u'keep': True, u'type': u'string', u'showProperties': False, u'scale': 0},
-                              {u'operations': [], u'comment': u'', u'unique': False, u'name': u'After', u'level': 0,
-                               u'keyType': u'string', u'required': False, u'precision': 10, u'nested': [],
-                               u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
-                               u'keep': True, u'type': u'string', u'showProperties': False, u'scale': 0},
-                              {u'operations': [], u'comment': u'', u'unique': False, u'name': u'new_Chinese_name',
-                               u'level': 0, u'keyType': u'string', u'required': False, u'precision': 10, u'nested': [],
-                               u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
-                               u'keep': True, u'type': u'string', u'showProperties': False, u'scale': 0},
-                              {u'operations': [], u'comment': u'', u'unique': False, u'name': u'Renamed_date',
-                               u'level': 0, u'keyType': u'string', u'required': False, u'precision': 10, u'nested': [],
-                               u'isPartition': False, u'length': 100, u'partitionValue': u'', u'multiValued': False,
-                               u'keep': True, u'type': u'string', u'showProperties': False, u'scale': 0}],
-                 u'hasHeader': True, u'indexerPrimaryKey': [], u'tableFormats':
-                   [{u'name': u'Text', u'value': u'text'}, {u'name': u'Parquet', u'value': u'parquet'},
-                    {u'name': u'Csv', u'value': u'csv'}, {u'name': u'Avro', u'value': u'avro'},
-                    {u'name': u'Json', u'value': u'json'}, {u'name': u'Regexp', u'value': u'regexp'},
-                    {u'name': u'ORC', u'value': u'orc'}], u'customCollectionDelimiter': u'', u'indexerNumShards': 1,
-                 u'useFieldEditor': False, u'indexerJobLibPath': u'/tmp/smart_indexer_lib'}
+  source = {
+    'kafkaFieldType': 'delimited',
+    'rdbmsUsername': '',
+    'kafkaFieldTypes': '',
+    'selectedTableIndex': 0,
+    'rdbmsJdbcDriverNames': [],
+    'tableName': '',
+    'sample': [
+      ['Weihaiwei', '\u5a01\u6d77\u536b\u5e02', 'Weihai', '\u5a01\u6d77\u5e02', '1949-11-01'],
+      ['Xingshan', '\u5174\u5c71\u5e02', 'Hegang', '\u9e64\u5c97\u5e02', '1950-03-23'],
+      ["Xi'an", '\u897f\u5b89\u5e02', 'Liaoyuan', '\u8fbd\u6e90\u5e02', '1952-04-03'],
+      ['Nanzheng', '\u5357\u90d1\u5e02', 'Hanzhong', '\u6c49\u4e2d\u5e02', '1953-10-24'],
+      ['Dihua', '\u8fea\u5316\u5e02', '?r\xfcmqi', '\u4e4c\u9c81\u6728\u9f50\u5e02', '1953-11-20'],
+    ],
+    'rdbmsTypes': [],
+    'isFetchingDatabaseNames': False,
+    'rdbmsDbIsValid': False,
+    'query': '',
+    'channelSourceSelectedHosts': [],
+    'table': '',
+    'rdbmsAllTablesSelected': False,
+    'inputFormatsManual': [{'name': 'Manually', 'value': 'manual'}],
+    'rdbmsPassword': '',
+    'isObjectStore': False,
+    'tables': [{'name': ''}],
+    'streamUsername': '',
+    'kafkaSchemaManual': 'detect',
+    'connectorSelection': 'sfdc',
+    'namespace': {
+      'status': 'CREATED',
+      'computes': [{'credentials': {}, 'type': 'direct', 'id': 'default', 'name': 'default'}],
+      'id': 'default',
+      'name': 'default',
+    },
+    'rdbmsIsAllTables': False,
+    'rdbmsDatabaseNames': [],
+    'hasStreamSelected': False,
+    'channelSourcePath': '/var/log/hue-httpd/access_log',
+    'channelSourceHosts': [],
+    'show': True,
+    'streamObjects': [],
+    'streamPassword': '',
+    'tablesNames': [],
+    'sampleCols': [
+      {
+        'operations': [],
+        'comment': '',
+        'unique': False,
+        'name': 'Before',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'precision': 10,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'keep': True,
+        'type': 'string',
+        'showProperties': False,
+        'scale': 0,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'unique': False,
+        'name': 'old_Chinese_name',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'precision': 10,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'keep': True,
+        'type': 'string',
+        'showProperties': False,
+        'scale': 0,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'unique': False,
+        'name': 'After',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'precision': 10,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'keep': True,
+        'type': 'string',
+        'showProperties': False,
+        'scale': 0,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'unique': False,
+        'name': 'new_Chinese_name',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'precision': 10,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'keep': True,
+        'type': 'string',
+        'showProperties': False,
+        'scale': 0,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'unique': False,
+        'name': 'Renamed_date',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'precision': 10,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'keep': True,
+        'type': 'string',
+        'showProperties': False,
+        'scale': 0,
+      },
+    ],
+    'rdbmsDatabaseName': '',
+    'sourceType': 'hive',
+    'inputFormat': 'file',
+    'format': {'status': 0, 'fieldSeparator': ',', 'hasHeader': True, 'quoteChar': '"', 'recordSeparator': '\\n', 'type': 'csv'},
+    'connectorList': [{'name': 'Salesforce', 'value': 'sfdc'}],
+    'kafkaFieldDelimiter': ',',
+    'rdbmsPort': '',
+    'rdbmsTablesExclude': [],
+    'isFetchingDriverNames': False,
+    'publicStreams': [{'name': 'Kafka Topics', 'value': 'kafka'}, {'name': 'Flume Agent', 'value': 'flume'}],
+    'channelSourceTypes': [
+      {'name': 'Directory or File', 'value': 'directory'},
+      {'name': 'Program', 'value': 'exec'},
+      {'name': 'Syslogs', 'value': 'syslogs'},
+      {'name': 'HTTP', 'value': 'http'},
+    ],
+    'databaseName': 'default',
+    'inputFormats': [
+      {'name': 'File', 'value': 'file'},
+      {'name': 'External Database', 'value': 'rdbms'},
+      {'name': 'Manually', 'value': 'manual'},
+    ],
+    'path': '/user/admin/renamed_chinese_cities_gb2312.csv',
+    'streamToken': '',
+    'kafkaFieldNames': '',
+    'streamSelection': 'kafka',
+    'compute': {'credentials': {}, 'type': 'direct', 'id': 'default', 'name': 'default'},
+    'name': '',
+    'kafkaFieldSchemaPath': '',
+    'kafkaTopics': [],
+    'rdbmsJdbcDriver': '',
+    'rdbmsHostname': '',
+    'isFetchingTableNames': False,
+    'rdbmsType': None,
+    'inputFormatsAll': [
+      {'name': 'File', 'value': 'file'},
+      {'name': 'External Database', 'value': 'rdbms'},
+      {'name': 'Manually', 'value': 'manual'},
+    ],
+    'rdbmsTableNames': [],
+    'streamEndpointUrl': 'https://login.salesforce.com/services/Soap/u/42.0',
+    'kafkaSelectedTopics': '',
+  }
+  destination = {
+    'isTransactionalVisible': True,
+    'KUDU_DEFAULT_PARTITION_COLUMN': {
+      'int_val': 16,
+      'name': 'HASH',
+      'columns': [],
+      'range_partitions': [
+        {'include_upper_val': '<=', 'upper_val': 1, 'name': 'VALUES', 'include_lower_val': '<=', 'lower_val': 0, 'values': [{'value': ''}]}
+      ],
+    },
+    'namespaces': [
+      {
+        'status': 'CREATED',
+        'computes': [{'credentials': {}, 'type': 'direct', 'id': 'default', 'name': 'default'}],
+        'id': 'default',
+        'name': 'default',
+      }
+    ],
+    'isTargetChecking': False,
+    'ouputFormat': 'table',
+    'tableName': 'renamed_chinese_cities_gb2312',
+    'outputFormatsList': [
+      {'name': 'Table', 'value': 'table'},
+      {'name': 'Search index', 'value': 'index'},
+      {'name': 'Database', 'value': 'database'},
+      {'name': 'Folder', 'value': 'file'},
+      {'name': 'HBase Table', 'value': 'hbase'},
+    ],
+    'fieldEditorPlaceHolder': 'Example: SELECT * FROM [object Promise]',
+    'indexerDefaultField': [],
+    'fieldEditorValue': 'SELECT Before,\n    old_Chinese_name,\n    After,\n    new_Chinese_name,\n    Renamed_date\n FROM [object Promise];',  # noqa: E501
+    'customRegexp': '',
+    'customLineDelimiter': '\\n',
+    'isTargetExisting': False,
+    'customEnclosedByDelimiter': "'",
+    'indexerConfigSets': [],
+    'sourceType': 'hive',
+    'useCustomDelimiters': False,
+    'apiHelperType': 'hive',
+    'numMappers': 1,
+    'fieldEditorDatabase': 'default',
+    'namespace': {
+      'status': 'CREATED',
+      'computes': [{'credentials': {}, 'type': 'direct', 'id': 'default', 'name': 'default'}],
+      'id': 'default',
+      'name': 'default',
+    },
+    'indexerPrimaryKeyObject': [],
+    'kuduPartitionColumns': [],
+    'rdbmsFileOutputFormats': [
+      {'name': 'text', 'value': 'text'},
+      {'name': 'sequence', 'value': 'sequence'},
+      {'name': 'avro', 'value': 'avro'},
+    ],
+    'outputFormats': [{'name': 'Table', 'value': 'table'}, {'name': 'Search index', 'value': 'index'}],
+    'fieldEditorEnabled': False,
+    'indexerDefaultFieldObject': [],
+    'customMapDelimiter': '',
+    'partitionColumns': [],
+    'rdbmsFileOutputFormat': 'text',
+    'showProperties': False,
+    'isTransactional': True,
+    'useDefaultLocation': True,
+    'description': '',
+    'customFieldsDelimiter': ',',
+    'primaryKeyObjects': [],
+    'customFieldDelimiter': ',',
+    'rdbmsSplitByColumn': [],
+    'existingTargetUrl': '',
+    'channelSinkTypes': [{'name': 'This topic', 'value': 'kafka'}, {'name': 'Solr', 'value': 'solr'}, {'name': 'HDFS', 'value': 'hdfs'}],
+    'defaultName': 'default.renamed_chinese_cities_gb2312',
+    'isTransactionalUpdateEnabled': False,
+    'importData': True,
+    'isIceberg': False,
+    'useCopy': False,
+    'databaseName': 'default',
+    'indexerRunJob': False,
+    'indexerReplicationFactor': 1,
+    'KUDU_DEFAULT_RANGE_PARTITION_COLUMN': {
+      'include_upper_val': '<=',
+      'upper_val': 1,
+      'name': 'VALUES',
+      'include_lower_val': '<=',
+      'lower_val': 0,
+      'values': [{'value': ''}],
+    },
+    'primaryKeys': [],
+    'indexerConfigSet': '',
+    'sqoopJobLibPaths': [{'path': ''}],
+    'outputFormat': 'table',
+    'nonDefaultLocation': '/user/admin/renamed_chinese_cities_gb2312.csv',
+    'compute': {'credentials': {}, 'type': 'direct', 'id': 'default', 'name': 'default'},
+    'name': 'default.renamed_chinese_cities_gb2312',
+    'tableFormat': 'text',
+    'isInsertOnly': True,
+    'targetNamespaceId': 'default',
+    'bulkColumnNames': 'Before,old_Chinese_name,After,new_Chinese_name,Renamed_date',
+    'columns': [
+      {
+        'operations': [],
+        'comment': '',
+        'unique': False,
+        'name': 'Before',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'precision': 10,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'keep': True,
+        'type': 'string',
+        'showProperties': False,
+        'scale': 0,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'unique': False,
+        'name': 'old_Chinese_name',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'precision': 10,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'keep': True,
+        'type': 'string',
+        'showProperties': False,
+        'scale': 0,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'unique': False,
+        'name': 'After',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'precision': 10,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'keep': True,
+        'type': 'string',
+        'showProperties': False,
+        'scale': 0,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'unique': False,
+        'name': 'new_Chinese_name',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'precision': 10,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'keep': True,
+        'type': 'string',
+        'showProperties': False,
+        'scale': 0,
+      },
+      {
+        'operations': [],
+        'comment': '',
+        'unique': False,
+        'name': 'Renamed_date',
+        'level': 0,
+        'keyType': 'string',
+        'required': False,
+        'precision': 10,
+        'nested': [],
+        'isPartition': False,
+        'length': 100,
+        'partitionValue': '',
+        'multiValued': False,
+        'keep': True,
+        'type': 'string',
+        'showProperties': False,
+        'scale': 0,
+      },
+    ],
+    'hasHeader': True,
+    'indexerPrimaryKey': [],
+    'tableFormats': [
+      {'name': 'Text', 'value': 'text'},
+      {'name': 'Parquet', 'value': 'parquet'},
+      {'name': 'Csv', 'value': 'csv'},
+      {'name': 'Avro', 'value': 'avro'},
+      {'name': 'Json', 'value': 'json'},
+      {'name': 'Regexp', 'value': 'regexp'},
+      {'name': 'ORC', 'value': 'orc'},
+    ],
+    'customCollectionDelimiter': '',
+    'indexerNumShards': 1,
+    'useFieldEditor': False,
+    'indexerJobLibPath': '/tmp/smart_indexer_lib',
+  }
 
-  file_encoding = u'gb2312'
+  file_encoding = 'gb2312'
   path = {
     'isDir': False,
     'split': ('/user/admin', 'renamed_chinese_cities_gb2312.csv'),
     'listdir': ['/user/admin/data'],
-    'parent_path': '/user/admin/.scratchdir/03d184ad-dd11-4ae1-aace-378daaa094e5/renamed_chinese_cities_gb2312.csv/..'
+    'parent_path': '/user/admin/.scratchdir/03d184ad-dd11-4ae1-aace-378daaa094e5/renamed_chinese_cities_gb2312.csv/..',
   }
   request = MockRequest(fs=MockFs(path=path))
 
-  sql = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time=-1,
-                                                                              file_encoding=file_encoding).get_str()
+  sql = (
+    SQLIndexer(user=request.user, fs=request.fs)
+    .create_table_from_a_file(source, destination, start_time=-1, file_encoding=file_encoding)
+    .get_str()
+  )
 
   assert '''USE default;''' in sql, sql
 
@@ -1111,8 +1962,9 @@ def test_create_ddl_with_nonascii():
 ;'''
   assert statement in sql, sql
 
-  statement = "LOAD DATA INPATH '/user/admin/renamed_chinese_cities_gb2312.csv' " + \
-              "INTO TABLE `default`.`hue__tmp_renamed_chinese_cities_gb2312`;"
+  statement = (
+    "LOAD DATA INPATH '/user/admin/renamed_chinese_cities_gb2312.csv' " + "INTO TABLE `default`.`hue__tmp_renamed_chinese_cities_gb2312`;"
+  )
   assert statement in sql, sql
 
   statement = '''CREATE TABLE `default`.`renamed_chinese_cities_gb2312`
@@ -1125,8 +1977,7 @@ TBLPROPERTIES('transactional'='true', 'transactional_properties'='insert_only')
   statement = '''DROP TABLE IF EXISTS `default`.`hue__tmp_renamed_chinese_cities_gb2312`;'''
   assert statement in sql, sql
 
-  statement = '''ALTER TABLE `default`.`renamed_chinese_cities_gb2312` ''' + \
-              '''SET serdeproperties ("serialization.encoding"="gb2312");'''
+  statement = '''ALTER TABLE `default`.`renamed_chinese_cities_gb2312` ''' + '''SET serdeproperties ("serialization.encoding"="gb2312");'''
   assert statement in sql, sql
 
 
@@ -1136,12 +1987,12 @@ def test_create_ddl_with_abfs():
     {
       'default': {
         'fs_defaultfs': 'abfs://my-data@yingstorage.dfs.core.windows.net',
-        'webhdfs_url': 'https://yingstorage.dfs.core.windows.net'
+        'webhdfs_url': 'https://yingstorage.dfs.core.windows.net',
       }
     }
   )
 
-  form_data = {'path': u'abfs://my-data/test_data/cars.csv', 'partition_columns': [], 'overwrite': False}
+  form_data = {'path': 'abfs://my-data/test_data/cars.csv', 'partition_columns': [], 'overwrite': False}
   sql = ''
   request = MockRequest(fs=MockFs())
   query_server_config = dbms.get_query_server_config(name='impala')
@@ -1150,17 +2001,14 @@ def test_create_ddl_with_abfs():
     sql = "\n\n%s;" % db.load_data('default', 'cars', form_data, None, generate_ddl_only=True)
   finally:
     finish()
-  assert u"\'abfs://my-data@yingstorage.dfs.core.windows.net/test_data/cars.csv\'" in sql
+  assert "'abfs://my-data@yingstorage.dfs.core.windows.net/test_data/cars.csv'" in sql
 
 
 @pytest.mark.django_db
 def test_create_table_from_local():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Hive', 'dialect': 'hive'}
-    source = {
-      'path': '',
-      'sourceType': 'hive'
-    }
+    source = {'path': '', 'sourceType': 'hive'}
     destination = {
       'name': 'default.test1',
       'columns': [
@@ -1180,7 +2028,7 @@ def test_create_table_from_local():
         {'name': 'dist', 'type': 'bigint', 'keep': True},
       ],
       'indexerPrimaryKey': [],
-      'sourceType': 'hive'
+      'sourceType': 'hive',
     }
     sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
 
@@ -1208,11 +2056,7 @@ CREATE TABLE IF NOT EXISTS default.test1 (
 def test_create_table_from_local_mysql():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'MySQL', 'dialect': 'mysql'}
-    source = {
-      'path': BASE_DIR + '/apps/beeswax/data/tables/us_population.csv',
-      'sourceType': 'mysql',
-      'format': {'hasHeader': False}
-    }
+    source = {'path': BASE_DIR + '/apps/beeswax/data/tables/us_population.csv', 'sourceType': 'mysql', 'format': {'hasHeader': False}}
     destination = {
       'name': 'default.test1',
       'columns': [
@@ -1220,7 +2064,7 @@ def test_create_table_from_local_mysql():
         {'name': 'field_2', 'type': 'string', 'keep': True},
         {'name': 'field_3', 'type': 'bigint', 'keep': True},
       ],
-      'sourceType': 'mysql'
+      'sourceType': 'mysql',
     }
     sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
 
@@ -1243,11 +2087,7 @@ INSERT INTO default.test1 VALUES ('NY', 'New York', '8143197'), ('CA', 'Los Ange
 def test_create_table_from_local_impala():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
-    source = {
-      'path': BASE_DIR + '/apps/beeswax/data/tables/flights.csv',
-      'sourceType': 'impala',
-      'format': {'hasHeader': True}
-    }
+    source = {'path': BASE_DIR + '/apps/beeswax/data/tables/flights.csv', 'sourceType': 'impala', 'format': {'hasHeader': True}}
     destination = {
       'name': 'default.test1',
       'columns': [
@@ -1266,7 +2106,7 @@ def test_create_table_from_local_impala():
         {'name': 'time', 'type': 'bigint', 'keep': True},
         {'name': 'dist', 'type': 'bigint', 'keep': True},
       ],
-      'sourceType': 'impala'
+      'sourceType': 'impala',
     }
     sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
 
@@ -1325,11 +2165,7 @@ DROP TABLE IF EXISTS default.test1_tmp;'''
 def test_create_table_only_header_file_local_impala():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Impala', 'dialect': 'impala'}
-    source = {
-      'path': BASE_DIR + '/apps/beeswax/data/tables/onlyheader.csv',
-      'sourceType': 'impala',
-      'format': {'hasHeader': True}
-    }
+    source = {'path': BASE_DIR + '/apps/beeswax/data/tables/onlyheader.csv', 'sourceType': 'impala', 'format': {'hasHeader': True}}
     destination = {
       'name': 'default.test1',
       'columns': [
@@ -1348,7 +2184,7 @@ def test_create_table_only_header_file_local_impala():
         {'name': 'time', 'type': 'bigint', 'keep': True},
         {'name': 'dist', 'type': 'bigint', 'keep': True},
       ],
-      'sourceType': 'impala'
+      'sourceType': 'impala',
     }
     sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
 
@@ -1397,10 +2233,7 @@ DROP TABLE IF EXISTS default.test1_tmp;'''
 def test_create_table_with_drop_column_from_local():
   with patch('indexer.indexers.sql.get_interpreter') as get_interpreter:
     get_interpreter.return_value = {'Name': 'Hive', 'dialect': 'hive'}
-    source = {
-      'path': '',
-      'sourceType': 'hive'
-    }
+    source = {'path': '', 'sourceType': 'hive'}
     destination = {
       'name': 'default.test1',
       'columns': [
@@ -1411,7 +2244,7 @@ def test_create_table_with_drop_column_from_local():
         {'name': 'arr', 'type': 'bigint', 'keep': False},
       ],
       'indexerPrimaryKey': [],
-      'sourceType': 'hive'
+      'sourceType': 'hive',
     }
     sql = SQLIndexer(user=Mock(), fs=Mock()).create_table_from_local_file(source, destination).get_str()
 

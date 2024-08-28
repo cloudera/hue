@@ -14,26 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
-from builtins import object
-import logging
 import os
 import sys
+import logging
+from builtins import object
 
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
+from desktop.lib.exceptions_renderable import PopupException
 from hadoop.fs.hadoopfs import Hdfs
 from indexer.conf import CONFIG_JARS_LIBS_PATH, config_morphline_path
 from libzookeeper.conf import zkensemble
 from notebook.models import make_notebook
 from useradmin.models import User
-
-from desktop.lib.exceptions_renderable import PopupException
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -44,7 +38,6 @@ class EnvelopeIndexer(object):
     self.fs = fs
     self.jt = jt
     self.username = username
-
 
   def _upload_workspace(self, configs):
     from oozie.models2 import Job
@@ -60,7 +53,6 @@ class EnvelopeIndexer(object):
 
     return hdfs_workspace_path
 
-
   def run(self, request, collection_name, configs, input_path, start_time=None, lib_path=None):
     workspace_path = self._upload_workspace(configs)
 
@@ -70,8 +62,8 @@ class EnvelopeIndexer(object):
     task = make_notebook(
       name=_('Indexing into %s') % collection_name,
       editor_type='notebook',
-      #on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
-      #pub_sub_url='assist.collections.refresh',
+      # on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
+      # pub_sub_url='assist.collections.refresh',
       is_task=True,
       is_notebook=True,
       last_executed=start_time
@@ -97,7 +89,6 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
     )
 
     return task.execute(request, batch=True)
-
 
   def generate_config(self, properties):
     configs = {
@@ -168,7 +159,6 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
     else:
       raise PopupException(_('Input format not recognized: %(inputFormat)s') % properties)
 
-
     extra_step = ''
     properties['output_deriver'] = """
         deriver {
@@ -176,7 +166,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
           query.literal = \"\"\"SELECT * from inputdata\"\"\"
         }"""
 
-    if properties['inputFormat'] == 'stream' and properties['topics'] == 'NavigatorAuditEvents': # Kudu does not support upper case names
+    if properties['inputFormat'] == 'stream' and properties['topics'] == 'NavigatorAuditEvents':  # Kudu does not support upper case names
       properties['output_deriver'] = """
           deriver {
             type = sql
@@ -204,7 +194,6 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
                 FROM inputdata
             \"\"\"
           }"""
-
 
     if properties['ouputFormat'] == 'file':
       output = """
@@ -245,7 +234,7 @@ SPARK_KAFKA_VERSION=0.10 spark2-submit envelope.jar envelope.conf"""
               table.name = "%(output_table)s"
           }""" % properties
     elif properties['ouputFormat'] == 'index':
-      if True: # Workaround until envelope Solr output is official
+      if True:  # Workaround until envelope Solr output is official
         morphline_config = open(os.path.join(config_morphline_path(), 'navigator_topic.morphline.conf')).read()
         configs['navigator_topic.morphline.conf'] = morphline_config.replace(
           '${SOLR_COLLECTION}', properties['collectionName']
@@ -355,7 +344,7 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
   collection_name = destination['name']
   indexer = EnvelopeIndexer(request.user, request.fs)
 
-  lib_path = None # Todo optional input field
+  lib_path = None  # Todo optional input field
   input_path = None
 
   if file_format['inputFormat'] == 'table':
@@ -394,7 +383,7 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
 
       if True:
         properties['window'] = ''
-      else: # For "KafkaSQL"
+      else:  # For "KafkaSQL"
         properties['window'] = '''
             window {
                 enabled = true
@@ -420,12 +409,12 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
       }
 
   if destination['outputFormat'] == 'table':
-    if destination['isTargetExisting']: # Todo: check if format matches
+    if destination['isTargetExisting']:  # Todo: check if format matches
       pass
     else:
-      destination['importData'] = False # Avoid LOAD DATA
+      destination['importData'] = False  # Avoid LOAD DATA
       if destination['tableFormat'] == 'kudu':
-        properties['kafkaFieldNames'] = properties['kafkaFieldNames'].lower() # Kudu names should be all lowercase
+        properties['kafkaFieldNames'] = properties['kafkaFieldNames'].lower()  # Kudu names should be all lowercase
       # Create table
       if not request.POST.get('show_command'):
         SQLIndexer(
@@ -452,11 +441,10 @@ def _envelope_job(request, file_format, destination, start_time=None, lib_path=N
     if file_format['inputFormat'] == 'stream':
       properties['format'] = 'csv'
     else:
-      properties['format'] = file_format['tableFormat'] # or csv
+      properties['format'] = file_format['tableFormat']  # or csv
   elif destination['outputFormat'] == 'index':
     properties['collectionName'] = collection_name
     properties['connection'] = SOLR_URL.get()
-
 
   properties["app_name"] = 'Data Ingest'
   properties["inputFormat"] = file_format['inputFormat']

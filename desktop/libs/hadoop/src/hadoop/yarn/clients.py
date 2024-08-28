@@ -15,24 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next
-import logging
-import sys
-import threading
 import time
-import urllib.parse
 import heapq
+import logging
+import threading
+import urllib.parse
+from urllib.parse import urlsplit as lib_urlsplit
 
 from desktop.lib.rest.http_client import HttpClient
-
 from hadoop import cluster
-
-if sys.version_info[0] > 2:
-  from urllib.parse import urlsplit as lib_urlsplit
-else:
-  from urlparse import urlsplit as lib_urlsplit
 
 LOG = logging.getLogger()
 

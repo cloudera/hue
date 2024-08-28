@@ -15,17 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-from django.core.management.base import BaseCommand
-from desktop import conf
-from desktop import supervisor
 import os
 import sys
+import logging
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.core.management.base import BaseCommand
+from django.utils.translation import gettext as _
+
+from desktop import conf, supervisor
 
 SERVER_HELP = r"""
   Run Hue using either the CherryPy server or the Spawning server, based on
@@ -33,6 +30,7 @@ SERVER_HELP = r"""
 """
 
 LOG = logging.getLogger()
+
 
 class Command(BaseCommand):
   help = _("Web server for Hue.")
@@ -43,6 +41,7 @@ class Command(BaseCommand):
   def usage(self, subcommand):
     return SERVER_HELP
 
+
 def runserver():
   script_name = "rungunicornserver"
   if conf.USE_CHERRYPY_SERVER.get():
@@ -51,6 +50,7 @@ def runserver():
   os.execv(cmdv[0], cmdv)
   LOG.error("Failed to exec '%s' with argument '%s'" % (cmdv[0], cmdv[1],))
   sys.exit(-1)
+
 
 if __name__ == '__main__':
   runserver()

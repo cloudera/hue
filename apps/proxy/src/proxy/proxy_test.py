@@ -17,26 +17,19 @@
 #
 # Tests for proxy app.
 
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-import threading
-import logging
-import http.server
-import pytest
 import sys
+import logging
+import threading
+import http.server
+from builtins import str
+from io import StringIO as string_io
 
+import pytest
 from django.test.client import Client
-from desktop.lib.django_test_util import make_logged_in_client
 
-from proxy.views import _rewrite_links
 import proxy.conf
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from StringIO import StringIO as string_io
+from desktop.lib.django_test_util import make_logged_in_client
+from proxy.views import _rewrite_links
 
 
 class Handler(http.server.BaseHTTPRequestHandler):
@@ -75,6 +68,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                    self.log_date_time_string(),
                    fmt % args))
 
+
 @pytest.mark.django_db
 def run_test_server():
   """
@@ -90,11 +84,14 @@ def run_test_server():
   def finish():
     # Make sure the server thread is done.
     print("Closing thread " + str(thread))
-    thread.join(10.0) # Wait at most 10 seconds
+    thread.join(10.0)  # Wait at most 10 seconds
     assert not thread.is_alive()
 
   return httpd, finish
+
+
 run_test_server.__test__ = False
+
 
 @pytest.mark.django_db
 def test_proxy_get():
@@ -124,6 +121,7 @@ def test_proxy_get():
   finally:
     finish()
 
+
 @pytest.mark.django_db
 def test_proxy_post():
   """
@@ -144,6 +142,7 @@ def test_proxy_post():
     assert b"foo2=bar" in response_post.content
   finally:
     finish()
+
 
 @pytest.mark.django_db
 def test_blacklist():
@@ -180,6 +179,7 @@ class UrlLibFileWrapper(string_io):
   def geturl(self):
     """URL we were initialized with."""
     return self.url
+
 
 def test_rewriting():
   """

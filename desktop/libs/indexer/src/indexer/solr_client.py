@@ -16,31 +16,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
-import json
 import os
-import shutil
 import sys
+import json
+import shutil
+import logging
+from builtins import object
+
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
-from libsolr.api import SolrApi
-from libzookeeper.models import ZookeeperClient
-
 from indexer.conf import CORE_INSTANCE_DIR, get_solr_ensemble
 from indexer.utils import copy_configs
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from libsolr.api import SolrApi
+from libzookeeper.models import ZookeeperClient
 
 LOG = logging.getLogger()
 
 
-MAX_UPLOAD_SIZE = 100 * 1024 * 1024 # 100 MB
+MAX_UPLOAD_SIZE = 100 * 1024 * 1024  # 100 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored'), ('M', 'multivalued')]
 ZK_SOLR_CONFIG_NAMESPACE = 'configs'
@@ -61,7 +56,6 @@ class SolrClient(object):
   def __init__(self, user, api=None):
     self.user = user
     self.api = api if api is not None else SolrApi(user=self.user)
-
 
   def get_indexes(self, include_cores=False):
     indexes = []
@@ -96,13 +90,14 @@ class SolrClient(object):
 
     return sorted(indexes, key=lambda index: index['name'])
 
-
   def create_index(self, name, fields, config_name=None, unique_key_field=None, df=None, shards=1, replication=1):
     if self.is_solr_cloud_mode():
       if self.is_solr_six_or_more():
         config_sets = self.list_configs()
         if not config_sets:
-          raise PopupException(_('Solr does not have any predefined (secure: %s) configSets: %s') % (self.is_sentry_protected(), self.list_configs()))
+          raise PopupException(
+            _('Solr does not have any predefined (secure: %s) configSets: %s') % (self.is_sentry_protected(), self.list_configs())
+          )
 
         if not config_name or config_name not in config_sets:
           config_name_target = 'managedTemplate'
@@ -139,7 +134,7 @@ class SolrClient(object):
         if self.is_solr_six_or_more():
           self.api.update_config(name, {
             'add-updateprocessor': {
-              "name" : "tolerant",
+              "name": "tolerant",
               "class": "solr.TolerantUpdateProcessorFactory",
               "maxErrors": "100"
             }
@@ -150,18 +145,15 @@ class SolrClient(object):
     else:
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
 
-
   def create_alias(self, name, collections):
     return self.api.create_alias(name, collections)
 
-
   def index(self, name, data, content_type='csv', version=None, **kwargs):
-    """
+    r"""
     e.g. Parameters: separator = ',', fieldnames = 'a,b,c', header=true, skip 'a,b', encapsulator="
       escape=\, map, split, overwrite=true, rowid=id
     """
     return self.api.update(name, data, content_type=content_type, version=version, **kwargs)
-
 
   def exists(self, name):
     try:
@@ -170,7 +162,6 @@ class SolrClient(object):
     except Exception as e:
       LOG.info('Check if index %s existed failed: %s' % (name, e))
       return False
-
 
   def delete_index(self, name, keep_config=True):
     if not self.is_solr_cloud_mode():
@@ -193,33 +184,26 @@ class SolrClient(object):
             self.api.add_collection(name)
             raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
     else:
-      if not 'Cannot unload non-existent core' in json.dumps(result):
+      if 'Cannot unload non-existent core' not in json.dumps(result):
         raise PopupException(_('Could not remove collection: %(message)s') % result)
-
 
   def sample_index(self, collection, rows=100):
     return self.api.select(collection, rows=min(rows, 1000))
 
-
   def get_config(self, collection):
     return self.api.config(collection)
-
 
   def list_configs(self):
     return self.api.configs()
 
-
   def list_schema(self, index_name):
     return self.api.get_schema(index_name)
-
 
   def delete_alias(self, name):
     return self.api.delete_alias(name)
 
-
   def update_config(self, name, properties):
     return self.api.update_config(name, properties)
-
 
   def is_solr_cloud_mode(self):
     global _IS_SOLR_CLOUD
@@ -229,7 +213,6 @@ class SolrClient(object):
 
     return _IS_SOLR_CLOUD
 
-
   def is_solr_six_or_more(self):
     global _IS_SOLR_6_OR_MORE
 
@@ -237,7 +220,6 @@ class SolrClient(object):
       self._fillup_properties()
 
     return _IS_SOLR_6_OR_MORE
-
 
   def is_solr_with_hdfs(self):
     global _IS_SOLR_WITH_HDFS
@@ -247,7 +229,6 @@ class SolrClient(object):
 
     return _IS_SOLR_WITH_HDFS
 
-
   def is_sentry_protected(self):
     global _IS_SENTRY_PROTECTED
 
@@ -256,7 +237,6 @@ class SolrClient(object):
 
     return _IS_SENTRY_PROTECTED
 
-
   def get_zookeeper_host(self):
     global _ZOOKEEPER_HOST
 
@@ -264,7 +244,6 @@ class SolrClient(object):
       self._fillup_properties()
 
     return _ZOOKEEPER_HOST
-
 
   # Deprecated
   def _create_cloud_config(self, name, fields, unique_key_field, df):
@@ -293,7 +272,6 @@ class SolrClient(object):
       finally:
         shutil.rmtree(tmp_path)
 
-
   # Deprecated
   def _create_non_solr_cloud_index(self, name, fields, unique_key_field, df):
     # Create instance directory locally.
@@ -315,7 +293,6 @@ class SolrClient(object):
       raise PopupException(_('Could not create index. Check error logs for more info.'), detail=e)
     finally:
       shutil.rmtree(instancedir)
-
 
   def _fillup_properties(self):
     global _IS_SOLR_CLOUD
@@ -340,13 +317,11 @@ class SolrClient(object):
       if '-Dsolr.authorization.sentry.site' in command_line_arg:
         _IS_SENTRY_PROTECTED = True
 
-
   @staticmethod
   def _port_field_types(field):
-    if not field['type'].startswith('p'): # Check for automatically converting to new default Solr types
+    if not field['type'].startswith('p'):  # Check for automatically converting to new default Solr types
       field['type'] = field['type'].replace('long', 'plong').replace('double', 'pdouble').replace('date', 'pdate')
     return field
-
 
   @staticmethod
   def _reset_properties():
@@ -357,7 +332,6 @@ class SolrClient(object):
     global _IS_SENTRY_PROTECTED
 
     _IS_SOLR_CLOUD = _IS_SOLR_6_OR_MORE = _IS_SOLR_6_OR_MORE = _IS_SOLR_WITH_HDFS = _ZOOKEEPER_HOST = _IS_SENTRY_PROTECTED = None
-
 
   # Used by morphline indexer
   def get_index_schema(self, index_name):

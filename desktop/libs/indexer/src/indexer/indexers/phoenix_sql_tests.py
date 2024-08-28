@@ -17,14 +17,10 @@
 # limitations under the License.from indexer.indexers.phoenix_sql import PhoenixIndexer
 
 import sys
+from unittest.mock import MagicMock, Mock, patch
 
 from desktop.settings import BASE_DIR
 from indexer.indexers.phoenix_sql import PhoenixIndexer
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
 
 
 def test_create_table_phoenix():

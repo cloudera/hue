@@ -15,35 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import range
-from builtins import object
 import ast
-import base64
-import datetime
 import json
+import base64
 import logging
-import sys
-
-from django.db import models
-from django.contrib.contenttypes.fields import GenericRelation
-from django.urls import reverse
-
+import datetime
 from enum import Enum
-from TCLIService.ttypes import TSessionHandle, THandleIdentifier, TOperationState, TOperationHandle, TOperationType
 
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models
+from django.urls import reverse
+from django.utils.translation import gettext as _, gettext_lazy as _t
+from TCLIService.ttypes import THandleIdentifier, TOperationHandle, TOperationState, TOperationType, TSessionHandle
+
+from beeswax.design import HQLdesign
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, Document2
 from desktop.redaction import global_redaction_engine
 from librdbms.server import dbms as librdbms_dbms
 from useradmin.models import User, UserProfile
-
-from beeswax.design import HQLdesign
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
 
 LOG = logging.getLogger()
 
@@ -53,6 +43,7 @@ QUERY_SUBMISSION_TIMEOUT = datetime.timedelta(0, 60 * 60)               # 1 hour
 BEESWAX = 'beeswax'
 HIVE_SERVER2 = 'hiveserver2'
 QUERY_TYPES = (HQL, IMPALA, RDBMS, SPARK, HPLSQL) = list(range(5))
+
 
 class QueryHistory(models.Model):
   """
@@ -136,7 +127,6 @@ class QueryHistory(models.Model):
 
     return query_server
 
-
   def get_current_statement(self):
     if self.design is not None:
       design = self.design.get_design()
@@ -156,7 +146,7 @@ class QueryHistory(models.Model):
 
     if self.design is not None:
       design = self.design.get_design()
-      return is_statement_finished and self.statement_number + 1 == design.statement_count # Last statement
+      return is_statement_finished and self.statement_number + 1 == design.statement_count  # Last statement
     else:
       return is_statement_finished
 
@@ -363,7 +353,7 @@ class SavedQuery(models.Model):
   def get_query_context(self):
     try:
       return make_query_context('design', self.id)
-    except:
+    except Exception:
       LOG.exception('failed to make query context')
       return ""
 
@@ -455,7 +445,7 @@ class SessionManager(models.Manager):
       if available_sessions:
         session = available_sessions[0]
       else:
-        session = None # No available session found
+        session = None  # No available session found
 
       return session
 
@@ -485,7 +475,7 @@ class Session(models.Model):
   def get_adjusted_guid_secret(self):
     secret = self.secret
     guid = self.guid
-    if sys.version_info[0] > 2 and not isinstance(self.secret, bytes) and not isinstance(self.guid, bytes):
+    if not isinstance(self.secret, bytes) and not isinstance(self.guid, bytes):
       # only for py3, after bytes saved, bytes wrapped in a string object
       try:
         secret = ast.literal_eval(secret)
@@ -519,7 +509,6 @@ class QueryHandle(object):
 
   def __str__(self):
     return '%s %s' % (self.secret, self.guid)
-
 
 
 class HiveServerQueryHandle(QueryHandle):
@@ -556,16 +545,10 @@ class HiveServerQueryHandle(QueryHandle):
 
   @classmethod
   def get_decoded(cls, secret, guid):
-    if sys.version_info[0] > 2:
-      return base64.b64decode(secret), base64.b64decode(guid)
-    else:
-      return base64.decodestring(secret), base64.decodestring(guid)
+    return base64.b64decode(secret), base64.b64decode(guid)
 
   def get_encoded(self):
-    if sys.version_info[0] > 2:
-      return base64.b64encode(self.secret), base64.b64encode(self.guid)
-    else:
-      return base64.encodestring(self.secret), base64.encodestring(self.guid)
+    return base64.b64encode(self.secret), base64.b64encode(self.guid)
 
 
 # Deprecated. Could be removed.
@@ -607,6 +590,7 @@ class MetaInstall(models.Model):
       return MetaInstall.objects.get(id=1)
     except MetaInstall.DoesNotExist:
       return MetaInstall(id=1)
+
 
 class Namespace(models.Model):
   name = models.CharField(default='', max_length=255)
@@ -651,6 +635,7 @@ class Namespace(models.Model):
       'interface': self.interface,
       'external_id': self.external_id
     }
+
 
 class Compute(models.Model):
   """

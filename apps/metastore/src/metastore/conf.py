@@ -15,15 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
+from django.utils.translation import gettext_lazy as _
 
 from desktop.lib.conf import Config
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
-
 
 ENABLE_NEW_CREATE_TABLE = Config(
   key="enable_new_create_table",
@@ -34,7 +28,7 @@ ENABLE_NEW_CREATE_TABLE = Config(
 
 FORCE_HS2_METADATA = Config(
   key="force_hs2_metadata",
-  help=_("Flag to force all metadata calls (e.g. list tables, table or column details...) to happen via HiveServer2 if available instead of Impala."),
+  help=_("Flag to force all metadata calls (e.g. list tables, table or column details...) to happen via HiveServer2 if available instead of Impala."),  # noqa: E501
   type=bool,
   default=False
 )

@@ -15,17 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import logging
 import os.path
-import subprocess
-import sys
 import argparse
+import subprocess
 
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
 
 from desktop.lib import paths
-
 
 LOG = logging.getLogger()
 
@@ -132,6 +131,5 @@ class Command(BaseCommand):
       ret = subprocess.run(ruff_cmd, check=True)
       if ret.returncode != 0:
         sys.exit(1)
-    except subprocess.CalledProcessError as e:
-      LOG.debug(f"Ruff command: {e}")
+    except subprocess.CalledProcessError:
       sys.exit(1)

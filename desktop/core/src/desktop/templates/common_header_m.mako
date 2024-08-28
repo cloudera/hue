@@ -17,7 +17,7 @@
 import sys
 
 from desktop import conf
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.webpack_utils import get_hue_bundles
 from metadata.conf import has_optimizer, OPTIMIZER
 
@@ -47,7 +47,7 @@ if USE_NEW_EDITOR.get():
 </%def>
 <%def name="get_title(title)">
   % if title:
-    ${smart_unicode(title).upper()}
+    ${smart_str(title).upper()}
   % endif
 </%def>
 <html lang="en">

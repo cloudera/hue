@@ -15,34 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import division
-from __future__ import absolute_import
-from builtins import next
-from builtins import object
-import logging
-import math
-from datetime import datetime
+from __future__ import absolute_import, division
+
 import sys
+import math
+import logging
+from builtins import next, object
+from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.db import DatabaseError
 from django.db.models import Q
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.translation import gettext as _
 
 from desktop.auth.views import dt_logout
 from desktop.conf import AUTH, LDAP, SESSION
 from desktop.lib.security_util import get_localhost_name
-
 from useradmin import ldap_access
-from useradmin.models import UserProfile, get_profile, User
+from useradmin.models import User, UserProfile, get_profile
 from useradmin.views import import_ldap_users
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -116,13 +109,13 @@ class LastActivityMiddleware(MiddlewareMixin):
     if logout:
       dt_logout(request, next_page='/')
 
-
   def _total_seconds(self, dt):
     # Keep backward compatibility with Python 2.6 which doesn't support total_seconds()
     if hasattr(dt, 'total_seconds'):
       return dt.total_seconds()
     else:
       return math.floor((dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6)
+
 
 class ConcurrentUserSessionMiddleware(MiddlewareMixin):
   """
@@ -131,7 +124,7 @@ class ConcurrentUserSessionMiddleware(MiddlewareMixin):
   def process_response(self, request, response):
     try:
       user = request.user
-    except AttributeError: # When the request does not store user. We care only about the login request which does store the user.
+    except AttributeError:  # When the request does not store user. We care only about the login request which does store the user.
       return response
 
     # request.session.modified checks if a user just logged in

@@ -15,16 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import errno
-import logging
 import os
 import sys
 import time
-
+import errno
+import logging
+from builtins import object
 from string import Template
 
 from django.utils.functional import wraps
+from django.utils.translation import gettext as _
 
 from beeswax.hive_site import get_hive_site_content
 from desktop.lib.exceptions_renderable import PopupException
@@ -32,21 +32,14 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.parameterization import find_variables
 from desktop.lib.paths import get_desktop_root
 from desktop.models import Document2
-from indexer.conf import CONFIG_JDBC_LIBS_PATH
-from metadata.conf import ALTUS
-from oozie.utils import convert_to_server_timezone
-
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
-
+from indexer.conf import CONFIG_JDBC_LIBS_PATH
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR, USE_LIBPATH_FOR_JARS
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from metadata.conf import ALTUS
+from oozie.utils import convert_to_server_timezone
 
 LOG = logging.getLogger()
 
@@ -96,7 +89,7 @@ class Submission(object):
       local_tz = self.job.data.get('properties')['timezone']
 
     # Modify start_date & end_date only when it's a coordinator
-    from oozie.models2 import Coordinator, Bundle
+    from oozie.models2 import Bundle, Coordinator
     if type(self.job) is Coordinator:
       if 'start_date' in self.properties:
         properties['start_date'] = convert_to_server_timezone(self.properties['start_date'], local_tz)
@@ -292,8 +285,8 @@ python altus.py
               self.fs.do_as_user(self.user, self.fs.copyFromLocal, os.path.join(source_path, name), destination_path)
 
         elif action.data['type'] == 'impala' or action.data['type'] == 'impala-document':
-          from oozie.models2 import _get_impala_url
           from impala.impala_flags import get_ssl_server_certificate
+          from oozie.models2 import _get_impala_url
 
           if action.data['type'] == 'impala-document':
             from notebook.models import Notebook
@@ -620,7 +613,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'),
     # In Py3 because of i18n, the xml data is not properly utf-8 encoded for some languages.
     # This can later throw UnicodeEncodeError exception for request body in HDFS or other FS API calls. To tackle this,
     # We are converting the data into bytes by utf-8 encoding instead of str type.
-    data = smart_str(data).encode('utf-8') if sys.version_info[0] > 2 else smart_str(data)
+    data = smart_str(data).encode('utf-8')
 
     if do_as:
       self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0o644, data=data)
@@ -679,7 +672,7 @@ print _exec('%(service)s', '%(command)s', %(args)s)
     else:
       hostname = ALTUS.HOSTNAME.get()
 
-    if type(cluster) == dict:
+    if type(cluster) is dict:
       command = 'createAWSCluster'
       arguments = cluster
     else:

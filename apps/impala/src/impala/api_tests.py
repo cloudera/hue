@@ -15,22 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
+import sys
 import json
 import logging
-import pytest
-import sys
+from builtins import object
+from unittest.mock import Mock, patch
 
-from django.urls import reverse
+import pytest
 from django.test import TestCase
+from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from impala import conf
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
 LOG = logging.getLogger()
 
@@ -50,7 +46,7 @@ class TestImpala(object):
 
       response = self.client.post(reverse("impala:invalidate"), {
           'flush_all': False,
-          'cluster': json.dumps({"credentials":{},"type":"direct","id":"default","name":"default"}),
+          'cluster': json.dumps({"credentials": {}, "type": "direct", "id": "default", "name": "default"}),
           'database': 'default',
           'table': 'k8s_logs'
         }

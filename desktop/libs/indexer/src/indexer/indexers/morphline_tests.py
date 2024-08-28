@@ -14,34 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-from builtins import zip
-from past.builtins import basestring
-from builtins import object
-from copy import deepcopy
-
-import logging
-import pytest
 import sys
+import logging
+from builtins import object, zip
+from copy import deepcopy
+from io import StringIO as string_io
+
+import pytest
+from future import standard_library
+from past.builtins import basestring
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access, add_to_group
+from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster, shared_cluster
-from useradmin.models import User
-
 from indexer.conf import ENABLE_SCALABLE_INDEXER
 from indexer.controller import CollectionManagerController
-from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogFormat
 from indexer.fields import Field
-from indexer.indexers.morphline_operations import get_operator
+from indexer.file_format import ApacheCombinedFormat, HueLogFormat, RubyLogFormat
 from indexer.indexers.morphline import MorphlineIndexer
+from indexer.indexers.morphline_operations import get_operator
 from indexer.solr_client import SolrClient
 from indexer.solr_client_tests import MockSolrCdhCloudHdfsApi
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from StringIO import StringIO as string_io
+from useradmin.models import User
 
 standard_library.install_aliases()
 

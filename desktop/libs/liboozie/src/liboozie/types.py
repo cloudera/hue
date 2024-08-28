@@ -21,36 +21,23 @@ Oozie API classes.
 This is mostly just codifying the datastructure of the Oozie REST API.
 http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WebServicesAPI.html
 """
-from __future__ import division
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import logging
-import math
 import re
-import sys
+import math
 import time
-
+import logging
+from io import BytesIO as string_io
 from time import mktime
 
+from django.urls import reverse
+from django.utils.translation import gettext as _
+
+import hadoop.confparse
+from desktop.auth.backend import is_admin
 from desktop.lib import i18n
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_warn
-
-import hadoop.confparse
-from liboozie.utils import parse_timestamp, format_time, catch_unicode_time
-
-from django.urls import reverse
-
-from desktop.auth.backend import is_admin
-
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from cStringIO import StringIO as string_io
+from liboozie.utils import catch_unicode_time, format_time, parse_timestamp
 
 LOG = logging.getLogger()
 
@@ -256,7 +243,7 @@ class CoordinatorAction(Action):
     else:
       self.conf_dict = {}
 
-    self.title = ' %s-%s'% (self.actionNumber, format_time(self.nominalTime))
+    self.title = ' %s-%s' % (self.actionNumber, format_time(self.nominalTime))
 
 
 class BundleAction(Action):
@@ -311,7 +298,7 @@ class BundleAction(Action):
     """How much more time before the next action."""
     if self.lastAction is None:
       return 0
-      
+
     next = mktime(parse_timestamp(self.lastAction))
     start = mktime(parse_timestamp(self.startTime))
     end = mktime(parse_timestamp(self.endTime))
@@ -325,7 +312,7 @@ class BundleAction(Action):
 
 
 class Job(object):
-  MAX_LOG_SIZE = 3500 * 20 # 20 pages
+  MAX_LOG_SIZE = 3500 * 20  # 20 pages
 
   """
   Accessing log and definition will trigger Oozie API calls.
@@ -501,10 +488,10 @@ class Workflow(Job):
 
   def get_progress(self, full_node_list=None):
     if self.status in ('SUCCEEDED', 'KILLED', 'FAILED'):
-      return 100 # Case of decision nodes
+      return 100  # Case of decision nodes
     else:
       if full_node_list is not None:            # Should remove the un-reached branches if decision node
-        total_actions = len(full_node_list) - 1 # -1 because of Kill node
+        total_actions = len(full_node_list) - 1  # -1 because of Kill node
       else:
         total_actions = len(self.actions)
       return int(sum([action.is_finished() for action in self.actions]) / float(max(total_actions, 1)) * 100)
@@ -559,7 +546,6 @@ class Coordinator(Job):
 
     if self.pauseTime:
       self.pauseTime = parse_timestamp(self.pauseTime)
-
 
     # For when listing/mixing all the jobs together
     self.id = self.coordJobId
@@ -723,4 +709,3 @@ class CoordinatorList(JobList):
 class BundleList(JobList):
   def __init__(self, api, json_dict, filters=None):
     super(BundleList, self).__init__(Bundle, 'bundlejobs', api, json_dict, filters)
-

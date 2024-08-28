@@ -15,22 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
 import logging
-import sys
+from urllib.parse import urlparse
 
-from desktop.lib.conf import Config, coerce_bool
+from django.utils.translation import gettext_lazy as _t
+
 from desktop.conf import default_ssl_validate
+from desktop.lib.conf import Config, coerce_bool
 from libzookeeper.conf import ENSEMBLE
-
-if sys.version_info[0] > 2:
-  from urllib.parse import urlparse
-  new_str = str
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
-  from urlparse import urlparse
 
 LOG = logging.getLogger()
 
@@ -49,9 +41,9 @@ def zkensemble_path():
   """
   try:
     parsed = urlparse(ENSEMBLE.get())
-    if parsed.port == 9983: # Standalone Solr cloud
+    if parsed.port == 9983:  # Standalone Solr cloud
       return ''
-  except:
+  except Exception:
     LOG.warning('Failed to get Zookeeper ensemble path')
 
   return '/solr'

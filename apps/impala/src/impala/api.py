@@ -15,41 +15,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-## Main views are inherited from Beeswax.
+# Main views are inherited from Beeswax.
 
-import base64
-import logging
-import json
-import struct
 import sys
+import json
+import base64
+import struct
+import logging
 
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from beeswax.api import error_handler
 from beeswax.models import Session
 from beeswax.server import dbms as beeswax_dbms
 from beeswax.views import authorized_get_query_history
-
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.thrift_util import unpack_guid
 from desktop.models import Document2
-
-from jobbrowser.apis.query_api import _get_api
 from impala import dbms
-from impala.server import get_api as get_impalad_api, _get_impala_server_url
-
+from impala.server import _get_impala_server_url, get_api as get_impalad_api
+from jobbrowser.apis.query_api import _get_api
 from libanalyze import analyze as analyzer, rules
-
 from notebook.models import make_notebook
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
-
 LOG = logging.getLogger()
-ANALYZER = rules.TopDownAnalysis() # We need to parse some files so save as global
+ANALYZER = rules.TopDownAnalysis()  # We need to parse some files so save as global
 
 
 @require_POST
@@ -60,7 +51,7 @@ def invalidate(request):
   table = request.POST.get('table', None)
   flush_all = request.POST.get('flush_all', 'false').lower() == 'true'
 
-  query_server = dbms.get_query_server_config(connector=None) # TODO: connector support
+  query_server = dbms.get_query_server_config(connector=None)  # TODO: connector support
   db = beeswax_dbms.get(request.user, query_server=query_server)
 
   response = {'status': 0, 'message': ''}
@@ -128,6 +119,7 @@ def get_runtime_profile(request, query_history_id):
 
   return JsonResponse(response)
 
+
 @require_POST
 @error_handler
 def alanize(request):
@@ -150,14 +142,29 @@ def alanize(request):
 
     heatmap = {}
     summary = analyzer.summary(profile)
-    heatmapMetrics = ['AverageThreadTokens', 'BloomFilterBytes', 'PeakMemoryUsage', 'PerHostPeakMemUsage', 'PrepareTime', 'RowsProduced', 'TotalCpuTime', 'TotalNetworkReceiveTime', 'TotalNetworkSendTime', 'TotalStorageWaitTime', 'TotalTime']
+    heatmapMetrics = [
+      'AverageThreadTokens',
+      'BloomFilterBytes',
+      'PeakMemoryUsage',
+      'PerHostPeakMemUsage',
+      'PrepareTime',
+      'RowsProduced',
+      'TotalCpuTime',
+      'TotalNetworkReceiveTime',
+      'TotalNetworkSendTime',
+      'TotalStorageWaitTime',
+      'TotalTime',
+    ]
     for key in heatmapMetrics:
       metrics = analyzer.heatmap_by_host(profile, key)
       if metrics['data']:
         heatmap[key] = metrics
-    response['data'] = { 'query': { 'healthChecks' : result[0]['result'], 'summary': summary, 'heatmap': heatmap, 'heatmapMetrics': sorted(list(heatmap.keys())) } }
+    response['data'] = {
+      'query': {'healthChecks': result[0]['result'], 'summary': summary, 'heatmap': heatmap, 'heatmapMetrics': sorted(list(heatmap.keys()))}
+    }
     response['status'] = 0
   return JsonResponse(response)
+
 
 def alanize_metrics(request):
   response = {'status': -1}
@@ -176,6 +183,7 @@ def alanize_metrics(request):
     response['status'] = 0
   return JsonResponse(response)
 
+
 @require_POST
 @error_handler
 def alanize_fix(request):
@@ -193,7 +201,7 @@ def alanize_fix(request):
       is_task=True,
       compute=cluster
     )
-    response['details'] = { 'task': notebook.execute(request, batch=True) }
+    response['details'] = {'task': notebook.execute(request, batch=True)}
     response['status'] = 0
 
   return JsonResponse(response)

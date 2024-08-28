@@ -13,25 +13,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
 
 import logging
-import pytest
-import sys
-import unittest
 
-from aws import conf
+import pytest
 from django.test import TestCase
 
+from aws import conf
 from desktop.conf import RAZ
 from desktop.lib.django_test_util import make_logged_in_client
-
 from useradmin.models import User
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch
-else:
-  from mock import patch
 
 LOG = logging.getLogger()
 

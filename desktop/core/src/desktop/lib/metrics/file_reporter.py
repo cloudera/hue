@@ -14,16 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import logging
 import os
 import sys
+import json
+import logging
 import tempfile
 
 from pyformance.reporters.reporter import Reporter
 
 from desktop.lib.metrics import global_registry
-
 
 LOG = logging.getLogger()
 
@@ -47,7 +46,7 @@ class FileReporter(Reporter):
     # rename the file to the real location.
 
     f = tempfile.NamedTemporaryFile(
-        mode='w' if sys.version_info[0] > 2 else 'w+b',
+        mode='w',
         dir=dirname,
         delete=False)
 
@@ -66,6 +65,7 @@ class FileReporter(Reporter):
       LOG.exception('failed to write metrics to file')
       os.remove(f.name)
       raise
+
 
 _reporter = None
 

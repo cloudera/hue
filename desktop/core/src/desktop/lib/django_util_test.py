@@ -16,22 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import datetime
-import pytest
-import sys
 
+import pytest
+from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 
+from desktop.lib import django_util, exceptions
 from desktop.lib.django_test_util import configure_django_for_test, create_tables
-from desktop.lib.django_util import reverse_with_get, timesince, humanize_duration
+from desktop.lib.django_util import humanize_duration, reverse_with_get, timesince
+
 configure_django_for_test()
 
-from desktop.lib import django_util, exceptions
-from django.db import models
-
-if sys.version_info[0] > 2:
-  unichr = chr
 
 class TestModel(models.Model):
   class Meta(object):
@@ -40,6 +36,7 @@ class TestModel(models.Model):
   my_int = models.IntegerField()
   my_str = models.TextField(max_length=100)
   last_modified = models.DateTimeField(auto_now=True)
+
 
 @pytest.mark.django_db
 class TestDjangoUtil(object):
@@ -80,7 +77,7 @@ class TestDjangoUtil(object):
         django_util.encode_json(TestModel(my_int=3, my_str="foo")))
     assert ('[{"model": "TEST_APP.testmodel", "pk": null, "fields": {"my_int": 3, "my_str": "foo", "last_modified": null}}]' ==
         django_util.encode_json([TestModel(my_int=3, my_str="foo")]))
-  
+
   def test_timesince(self):
     assert timesince(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(1000)) == "16 minutes, 40 seconds"
     assert timesince(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(60)) == "1 minute"
@@ -107,7 +104,6 @@ class TestDjangoUtil(object):
     assert humanize_duration(seconds=1, abbreviate=True) == "1s"
     assert humanize_duration(seconds=2, abbreviate=True) == "2s"
 
-
   def test_encode_json_to_jsonable(self):
     class Foo(object):
       def to_jsonable(self):
@@ -120,7 +116,7 @@ class TestDjangoUtil(object):
     class Bar(object):
       to_jsonable = "not a callable"
     with pytest.raises(TypeError):
-      django_util.encode_json([ Bar() ])
+      django_util.encode_json([Bar()])
 
   def test_encode_json_thrift(self):
     # TODO(philip): I've avoided writing this because
@@ -138,7 +134,6 @@ class TestDjangoUtil(object):
     # Fine names
     for x in ["a", "$", "_", "a9", "a9$"]:
       django_util.render_json("whatever-value", x)
-
 
   def test_exceptions(self):
     msg = "b0rked file"
@@ -168,6 +163,7 @@ def test_popup_injection():
   with pytest.raises(AssertionError):
     django_util.render_injected("foo", "bar")
 
+
 def test_reverse_with_get():
   # Basic view
   assert "/" == reverse_with_get("desktop_views.index")
@@ -175,14 +171,15 @@ def test_reverse_with_get():
   assert "/desktop/api2/user_preferences/foo" == reverse_with_get("desktop.api2.user_preferences", kwargs=dict(key="foo"))
   # Arguments for the view as well as GET parameters
   assert ("/desktop/api2/user_preferences/foo?a=1&b=2" ==
-    reverse_with_get("desktop.api2.user_preferences", kwargs=dict(key="foo"), get=dict(a=1,b=2)))
+    reverse_with_get("desktop.api2.user_preferences", kwargs=dict(key="foo"), get=dict(a=1, b=2)))
   # You can use a list of args instead of kwargs, too
   assert ("/desktop/api2/user_preferences/foo?a=1&b=2" ==
-    reverse_with_get("desktop.api2.user_preferences", args=["foo"], get=dict(a=1,b=2)))
+    reverse_with_get("desktop.api2.user_preferences", args=["foo"], get=dict(a=1, b=2)))
   # Just GET parameters
   assert "/?a=1" == reverse_with_get("desktop_views.index", get=dict(a="1"))
   # No GET parameters
   assert "/" == reverse_with_get("desktop_views.index", get=dict())
 
+
 def test_unicode_ok():
-  assert "/?a=x%C3%A9" == reverse_with_get("desktop_views.index", get=dict(a="x" + unichr(233)))
+  assert "/?a=x%C3%A9" == reverse_with_get("desktop_views.index", get=dict(a="x" + chr(233)))

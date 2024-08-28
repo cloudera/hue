@@ -15,18 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-import logging
 import os
-import os.path
-import fnmatch
 import sys
+import fnmatch
+import logging
+import os.path
 import traceback
 import subprocess
 
 LOG = logging.getLogger()
+
 
 def _deprecation_check(arg0):
   """HUE-71. Deprecate build/env/bin/desktop"""
@@ -36,10 +34,11 @@ def _deprecation_check(arg0):
     print(msg, file=sys.stderr)
     LOG.warning(msg)
 
+
 def reload_with_cm_env(cm_managed):
   try:
     from django.db.backends.oracle.base import Oracle_datetime
-  except:
+  except Exception:
     if 'LD_LIBRARY_PATH' in os.environ:
       print("We need to reload the process to include LD_LIBRARY_PATH for Oracle backend")
       try:
@@ -52,12 +51,12 @@ def reload_with_cm_env(cm_managed):
         print('Failed re-exec: %s' % exc)
         sys.exit(1)
 
+
 def entry():
   _deprecation_check(sys.argv[0])
 
   from django.core.exceptions import ImproperlyConfigured
-  from django.core.management import execute_from_command_line, find_commands
-  from django.core.management import CommandParser
+  from django.core.management import CommandParser, execute_from_command_line, find_commands
   from django.core.management.base import BaseCommand
 
   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
@@ -86,16 +85,13 @@ def entry():
   if len(sys.argv) > 1:
     subcommand = sys.argv[1]
 
-  if sys.version_info[0] < 3:
-    args = [None]
-  else:
-    args = []
+  args = []
   parser = CommandParser(*args, usage="%(prog)s subcommand [options] [args]", add_help=False)
   parser.parse_known_args(sys.argv[2:])
 
   if len(sys.argv) > 1:
     prof_id = subcommand = sys.argv[1]
-    #Check if this is a CM managed cluster
+    # Check if this is a CM managed cluster
     if os.path.isfile(cm_config_file) and not cm_managed and not skip_reload:
       print("ALERT: This appears to be a CM Managed environment")
       print("ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment")
@@ -105,12 +101,9 @@ def entry():
 
   # CM managed configure env vars
   if cm_managed:
-    if sys.version_info[0] > 2:
-      from configparser import NoOptionError, RawConfigParser
-    else:
-      from ConfigParser import NoOptionError, RawConfigParser
+    from configparser import NoOptionError, RawConfigParser
 
-    config = RawConfigParser(strict=False) if sys.version_info[0] > 2 else RawConfigParser()
+    config = RawConfigParser(strict=False)
     config.read(cm_config_file)
     try:
       cm_agent_run_dir = config.get('General', 'agent_wide_credential_cache_location')
@@ -118,7 +111,7 @@ def entry():
       cm_agent_run_dir = '/var/run/cloudera-scm-agent'
       pass
 
-    #Parse CM supervisor include file for Hue and set env vars
+    # Parse CM supervisor include file for Hue and set env vars
     cm_supervisor_dir = cm_agent_run_dir + '/supervisor/include'
     cm_process_dir = cm_agent_run_dir + '/process'
     hue_env_conf = None
@@ -130,14 +123,14 @@ def entry():
         hue_env_conf = file
         hue_env_conf = cm_supervisor_dir + "/" + hue_env_conf
 
-    if hue_env_conf == None:
+    if hue_env_conf is None:
       process_dirs = fnmatch.filter(os.listdir(cm_process_dir), '*%s*' % cm_hue_string)
       process_dirs.sort()
       hue_process_dir = cm_process_dir + "/" + process_dirs[-1]
       hue_env_conf = fnmatch.filter(os.listdir(hue_process_dir), 'supervisor.conf')[0]
       hue_env_conf = hue_process_dir + "/" + hue_env_conf
 
-    if not hue_env_conf == None:
+    if hue_env_conf is not None:
       if os.path.isfile(hue_env_conf):
         hue_env_conf_file = open(hue_env_conf, "r")
         for line in hue_env_conf_file:
@@ -161,7 +154,7 @@ def entry():
       print("")
       print("If the above does not work, make sure Hue has been started on this server.")
 
-    if not envline == None:
+    if envline is not None:
       # spliting envline by "environment=" won't work since new key cdp_environment was added
       environment = envline.replace("environment=", "")
       for envvar in environment.split(","):
@@ -171,7 +164,7 @@ def entry():
           envval = envval.replace("'", "").rstrip()
           os.environ[envkey] = envval
 
-    #Set JAVA_HOME
+    # Set JAVA_HOME
     if "JAVA_HOME" not in list(os.environ.keys()):
       if os.path.isfile('/usr/lib64/cmf/service/common/cloudera-config.sh'):
         locate_java = subprocess.Popen(
@@ -190,7 +183,7 @@ def entry():
         for line in iter(locate_java.stdout.readline, b''):
           if b'JAVA_HOME' in line:
             JAVA_HOME = line.rstrip().split(b'=')[1]
-            if sys.version_info[0] > 2 and type(JAVA_HOME) == bytes:
+            if type(JAVA_HOME) is bytes:
               JAVA_HOME = JAVA_HOME.decode("utf-8")
 
       if JAVA_HOME != "UNKNOWN":
@@ -201,7 +194,7 @@ def entry():
         print("  export JAVA_HOME=<java_home>")
         sys.exit(1)
 
-    #Make sure we set Oracle Client if configured
+    # Make sure we set Oracle Client if configured
     if "LD_LIBRARY_PATH" not in list(os.environ.keys()):
       if "SCM_DEFINES_SCRIPTS" in list(os.environ.keys()):
         for scm_script in os.environ["SCM_DEFINES_SCRIPTS"].split(":"):
@@ -233,7 +226,7 @@ def entry():
       execute_from_command_line(sys.argv)
   except ImproperlyConfigured as e:
     if len(sys.argv) > 1 and sys.argv[1] == 'is_db_alive' and 'oracle' in str(e).lower():
-      print(e, file=sys.stderr) # Oracle connector is improperly configured
+      print(e, file=sys.stderr)  # Oracle connector is improperly configured
       sys.exit(10)
     else:
       raise e
@@ -241,6 +234,7 @@ def entry():
     if "altscript.sh" in str(e).lower():
       print("%s" % e)
       print("HUE_CONF_DIR seems to be set to CM location and '--cm-managed' flag not used")
+
 
 def _profile(prof_id, func):
   """
