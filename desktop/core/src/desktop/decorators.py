@@ -17,8 +17,6 @@
 
 import logging
 import sys
-import base64
-import os
 
 from desktop.auth.backend import is_admin
 from desktop.lib.exceptions_renderable import PopupException
@@ -101,4 +99,3 @@ def api_error_handler(func):
         return JsonResponse(response)
 
   return decorator
-
