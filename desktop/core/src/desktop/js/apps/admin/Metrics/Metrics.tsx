@@ -15,9 +15,9 @@
 // limitations under the License.
 
 import React, { useState, useEffect, useRef } from 'react';
-import MetricsTable, { MetricsResponse } from './MetricsTable';
+import MetricsTable, { MetricsResponse, MetricsTableProps } from './MetricsTable';
 import { Spin, Input, Select, Alert } from 'antd';
-import { get } from 'api/utils';
+import { get } from '../../../api/utils';
 import { SearchOutlined } from '@ant-design/icons';
 import { i18nReact } from '../../../utils/i18nReact';
 import './Metrics.scss';
@@ -32,7 +32,7 @@ const Metrics: React.FC = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedMetric, setSelectedMetric] = useState<string>('');
   const [showAllTables, setShowAllTables] = useState(true);
-  const [filteredMetricsData, setFilteredMetricsData] = useState<MetricsData[]>([]);
+  const [filteredMetricsData, setFilteredMetricsData] = useState<MetricsTableProps[]>([]);
   const dropdownRef = useRef(null);
 
   useEffect(() => {

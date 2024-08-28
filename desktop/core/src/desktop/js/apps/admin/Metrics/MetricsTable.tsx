@@ -74,7 +74,7 @@ interface DataSourceItem {
   value: number | MetricsTime;
 }
 
-interface MetricsTableProps {
+export interface MetricsTableProps {
   caption: string;
   dataSource: DataSourceItem[];
 }
