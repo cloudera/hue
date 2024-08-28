@@ -20,8 +20,6 @@ Interfaces for ABFS
 """
 
 import os
-import re
-import sys
 import logging
 import threading
 import urllib.error
@@ -585,9 +583,6 @@ class ABFS(object):
     Renames a file
     """
     rename_source = Init_ABFS.strip_scheme(old)
-    if sys.version_info[0] < 3 and isinstance(rename_source, unicode):
-      rename_source = rename_source.encode('utf-8')
-
     headers = {'x-ms-rename-source': '/' + urllib_quote(rename_source)}
 
     try:
@@ -660,7 +655,7 @@ class ABFS(object):
             offset += size
             chunk = src.read(chunk_size)
           self.flush(remote_dst, params={'position': offset})
-        except:
+        except Exception:
           LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
           raise
       finally:

@@ -16,27 +16,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import base64
-import json
-import logging
 import sys
+import json
 import uuid
+import base64
+import logging
+from urllib.parse import unquote as lib_urlunquote, urlparse as lib_urlparse
 
 import requests
 import requests_kerberos
 
-from desktop.conf import AUTH_USERNAME
+import desktop.lib.raz.signer_protos_pb2 as raz_signer
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.sdxaas.knox_jwt import fetch_jwt
-
-import desktop.lib.raz.signer_protos_pb2 as raz_signer
-
-if sys.version_info[0] > 2:
-  from urllib.parse import urlparse as lib_urlparse, unquote as lib_urlunquote
-else:
-  from urlparse import urlparse as lib_urlparse
-  from urllib import unquote as lib_urlunquote
-
 
 LOG = logging.getLogger()
 
@@ -266,8 +258,8 @@ class RazClient(object):
       (method, headers, allparams, endpoint, resource_path, data)
     )
 
-    # Raz signed request proto call expects data as bytes instead of str for Py3.
-    if sys.version_info[0] > 2 and data is not None and not isinstance(data, bytes):
+    # Raz signed request proto call expects data as bytes instead of str.
+    if data is not None and not isinstance(data, bytes):
       data = data.encode()
 
     raz_req = raz_signer.SignRequestProto(
@@ -282,10 +274,7 @@ class RazClient(object):
         time_offset=0
     )
     raz_req_serialized = raz_req.SerializeToString()
-    if sys.version_info[0] > 2:
-      signed_request = base64.b64encode(raz_req_serialized).decode('utf-8')
-    else:
-      signed_request = base64.b64encode(raz_req_serialized)
+    signed_request = base64.b64encode(raz_req_serialized).decode('utf-8')
 
     request_headers["Accept-Encoding"] = "gzip,deflate"
     request_data["context"] = {

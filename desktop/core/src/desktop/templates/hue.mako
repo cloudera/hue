@@ -20,7 +20,7 @@
   from desktop import conf
   from desktop.auth.backend import is_admin
   from desktop.conf import ENABLE_HUE_5, has_multi_clusters
-  from desktop.lib.i18n import smart_unicode
+  from desktop.lib.i18n import smart_str
   from desktop.models import hue_version
   from desktop.views import _ko, commonshare, login_modal
   from desktop.webpack_utils import get_hue_bundles
@@ -328,7 +328,7 @@ ${ hueAceAutocompleter.hueAceAutocompleter() }
 ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
 % if request is not None:
-${ smart_unicode(login_modal(request).content) | n,unicode }
+${ smart_str(login_modal(request).content) | n,unicode }
 % endif
 
 

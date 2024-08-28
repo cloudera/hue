@@ -18,7 +18,6 @@
 import sys
 
 from desktop import conf
-from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
 if sys.version_info[0] > 2:

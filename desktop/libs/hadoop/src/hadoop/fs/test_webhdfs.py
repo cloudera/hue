@@ -16,25 +16,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import map
-from builtins import zip
-from builtins import range
-from builtins import object
-import logging
-import pytest
 import os
-import random
 import sys
+import random
+import logging
 import threading
-import unittest
+from builtins import map, object, range, zip
+from functools import reduce
+
+import pytest
 from django.test import TestCase
 
 from hadoop import pseudo_hdfs4
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.pseudo_hdfs4 import is_live_cluster
-from functools import reduce
-
 
 LOG = logging.getLogger()
 
@@ -65,7 +61,7 @@ class WebhdfsTests(TestCase):
     try:
       f.write("hello")
       f.close()
-      assert (b"hello" if sys.version_info[0] > 2 else "hello") == fs.open(test_file).read()
+      assert (b"hello") == fs.open(test_file).read()
       assert 5 == fs.stats(test_file)["size"]
       assert fs.isfile(test_file)
       assert not fs.isfile("/")
@@ -96,14 +92,14 @@ class WebhdfsTests(TestCase):
 
       f = fs.open(test_file, "r")
       f.seek(0, os.SEEK_SET)
-      assert (b"he" if sys.version_info[0] > 2 else "he") == f.read(2)
+      assert (b"he") == f.read(2)
       f.seek(1, os.SEEK_SET)
-      assert (b"el" if sys.version_info[0] > 2 else "el") == f.read(2)
+      assert (b"el") == f.read(2)
       f.seek(-1, os.SEEK_END)
-      assert (b"o" if sys.version_info[0] > 2 else "o") == f.read()
+      assert (b"o") == f.read()
       f.seek(0, os.SEEK_SET)
       f.seek(2, os.SEEK_CUR)
-      assert (b"ll" if sys.version_info[0] > 2 else "ll") == f.read(2)
+      assert (b"ll") == f.read(2)
     finally:
       fs.remove(test_file)
 
@@ -122,14 +118,14 @@ class WebhdfsTests(TestCase):
       f.close()
 
       for i in range(1, 10):
-        f = fs.open(test_file, "rt" if sys.version_info[0] > 2 else "r")
+        f = fs.open(test_file, "rt")
 
         for j in range(1, 100):
           offset = random.randint(0, len(data) - 1)
           f.seek(offset, os.SEEK_SET)
-          t = data[offset:offset+50]
-          if sys.version_info[0] > 2:
-            t = t.encode('utf-8')
+          t = data[offset:offset + 50]
+          t = t.encode('utf-8')
+
           assert t == f.read(50)
         f.close()
 
@@ -191,7 +187,6 @@ class WebhdfsTests(TestCase):
     finally:
       fs._umask = fs_umask
 
-
   def test_umask_overriden(self):
     fs = self.cluster.fs
 
@@ -210,7 +205,6 @@ class WebhdfsTests(TestCase):
       assert '100333' == '%o' % fs.stats(test_file).mode
     finally:
       fs._umask = fs_umask
-
 
   def test_umask_without_sticky(self):
     fs = self.cluster.fs
@@ -231,7 +225,6 @@ class WebhdfsTests(TestCase):
     finally:
       fs._umask = fs_umask
 
-
   def test_copy_remote_dir(self):
     fs = self.cluster.fs
 
@@ -245,7 +238,7 @@ class WebhdfsTests(TestCase):
     f2.close()
 
     new_owner = 'testcopy'
-    new_owner_dir = self.prefix  + '/' + new_owner + '/test-copy'
+    new_owner_dir = self.prefix + '/' + new_owner + '/test-copy'
 
     fs.copy_remote_dir(src_dir, new_owner_dir, dir_mode=0o755, owner=new_owner)
 
@@ -310,7 +303,7 @@ class WebhdfsTests(TestCase):
       if present:
         assert name in listing, f"{name} should be in {listing}"
       else:
-        assert not name in listing, f"{name} should not be in {listing}"
+        assert name not in listing, f"{name} should not be in {listing}"
 
     name = u'''pt-Olá_ch-你好_ko-안녕_ru-Здравствуйте%20,.<>~`!@$%^&()_-+='"'''
     prefix = self.prefix + '/tmp/i18n'
@@ -547,8 +540,10 @@ class WebhdfsTests(TestCase):
     class test_local(object):
       def __getattribute__(self, name):
         return object.__getattribute__(self, name)
+
       def __setattr__(self, name, value):
         return object.__setattr__(self, name, value)
+
       def __delattr__(self, name):
         return object.__delattr__(self, name)
 
@@ -587,13 +582,11 @@ class WebhdfsTests(TestCase):
   def test_check_access(self):
     # Set user to owner
     self.cluster.fs.setuser('test')
-    assert ((b'' if sys.version_info[0] > 2 else '') ==
-                  self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
+    assert ((b'') == self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
 
     # Set user to superuser
     self.cluster.fs.setuser(self.cluster.superuser)
-    assert ((b'' if sys.version_info[0] > 2 else '') ==
-                  self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
+    assert ((b'') == self.cluster.fs.check_access(path='/user/test', aclspec='rw-'))  # returns zero-length content
 
     # Set user to non-authorized, non-superuser user
     self.cluster.fs.setuser('nonadmin')

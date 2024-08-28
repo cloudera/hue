@@ -15,27 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
 
+from django.utils.translation import gettext as _
+
+from beeswax.design import hql_query
+from beeswax.models import QUERY_TYPES
+from beeswax.server import dbms
+from beeswax.server.dbms import (
+  HiveServer2Dbms,
+  QueryServerException,
+  QueryServerTimeoutException,
+  get_query_server_config as beeswax_query_server_config,
+  get_query_server_config_via_connector,
+)
 from desktop.conf import CLUSTER_ID, has_connectors
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.models import Cluster
-from beeswax.design import hql_query
-from beeswax.models import QUERY_TYPES
-from beeswax.server import dbms
-from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException, \
-  get_query_server_config as beeswax_query_server_config, get_query_server_config_via_connector
-
 from impala import conf
 from impala.impala_flags import get_hs2_http_port
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -102,12 +102,10 @@ class ImpalaDbms(HiveServer2Dbms):
     from_clause = '.'.join('`%s`' % token.strip('`') for token in from_tokens)
     return select_clause, from_clause
 
-
   @classmethod
   def get_histogram_query(cls, database, table, column, nested=None):
     select_clause, from_clause = cls.get_nested_select(database, table, column, nested)
     return 'SELECT histogram(%s) FROM %s' % (select_clause, from_clause)
-
 
   # Deprecated
   def invalidate(self, database=None, table=None, flush_all=False):
@@ -145,7 +143,6 @@ class ImpalaDbms(HiveServer2Dbms):
       if handle:
         self.close(handle)
 
-
   def refresh_table(self, database, table):
     handle = None
     try:
@@ -158,7 +155,6 @@ class ImpalaDbms(HiveServer2Dbms):
     finally:
       if handle:
         self.close(handle)
-
 
   def get_histogram(self, database, table, column, nested=None):
     """
@@ -185,14 +181,11 @@ class ImpalaDbms(HiveServer2Dbms):
 
     return results
 
-
   def get_exec_summary(self, query_handle, session_handle):
     return self.client._client.get_exec_summary(query_handle, session_handle)
 
-
   def get_runtime_profile(self, query_handle, session_handle):
     return self.client._client.get_runtime_profile(query_handle, session_handle)
-
 
   def _get_beeswax_tables(self, database):
     beeswax_query_server = dbms.get(
@@ -202,7 +195,6 @@ class ImpalaDbms(HiveServer2Dbms):
       )
     )
     return beeswax_query_server.get_tables(database=database)
-
 
   def _get_different_tables(self, database):
     beeswax_tables = self._get_beeswax_tables(database)

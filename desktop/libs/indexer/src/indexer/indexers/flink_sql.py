@@ -14,18 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
-import logging
 import sys
+import logging
 
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from notebook.models import make_notebook
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -46,7 +41,7 @@ class FlinkIndexer():
 
     source_type = source['sourceType']
 
-    from desktop.api_public import _get_interpreter_from_dialect   # due to a circular import
+    from desktop.api_public import _get_interpreter_from_dialect  # due to a circular import
     interpreter = _get_interpreter_from_dialect('flink', self.user)
     editor_type = interpreter['type']  # destination['sourceType']
 

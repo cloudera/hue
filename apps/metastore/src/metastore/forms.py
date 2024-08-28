@@ -15,21 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
 from django import forms
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
-from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
-from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
 from filebrowser.forms import PathField
-
-from beeswax import common
-from beeswax.models import SavedQuery
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
 class DbForm(forms.Form):
@@ -63,6 +52,6 @@ class LoadDataForm(forms.Form):
       # We give these numeric names because column names
       # may be unpleasantly arbitrary.
       name = "partition_%d" % i
-      char_field = forms.CharField(required=True, label=_t("%(column_name)s (partition key with type %(column_type)s)") % {'column_name': column.name, 'column_type': column.type})
+      char_field = forms.CharField(required=True, label=_t("%(column_name)s (partition key with type %(column_type)s)") % {'column_name': column.name, 'column_type': column.type})  # noqa: E501
       self.fields[name] = char_field
       self.partition_columns[name] = column.name

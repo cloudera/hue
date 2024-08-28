@@ -15,8 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
 from django.urls import re_path
 
 from notebook import api as notebook_api, views as notebook_views

@@ -15,24 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
-import socket
 import sys
+import socket
+import logging
 
-from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME, \
-    AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, has_connectors
-from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
+from desktop.conf import (
+  AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,
+  AUTH_USERNAME as DEFAULT_AUTH_USERNAME,
+  default_ssl_cacerts,
+  default_ssl_validate,
+  has_connectors,
+)
+from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_csv, coerce_password_from_script
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.paths import get_desktop_root
-
 from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled, is_kerberos_enabled, is_webserver_spnego_enabled
 from impala.settings import NICE_NAME
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 LOG = logging.getLogger()
 
@@ -177,15 +178,18 @@ SSL = ConfigSection(
   )
 )
 
+
 def get_auth_username():
   """Get from top level default from desktop"""
   return DEFAULT_AUTH_USERNAME.get()
+
 
 AUTH_USERNAME = Config(
   key="auth_username",
   help=_t("Auth username of the hue user used for authentications."),
   private=True,
   dynamic_default=get_auth_username)
+
 
 def get_auth_password():
   """Get from script or backward compatibility"""
@@ -194,6 +198,7 @@ def get_auth_password():
     return password
 
   return DEFAULT_AUTH_PASSWORD.get()
+
 
 AUTH_PASSWORD = Config(
   key="auth_password",
@@ -210,6 +215,7 @@ AUTH_PASSWORD_SCRIPT = Config(
   default=None
 )
 
+
 def get_daemon_config(key):
   from metadata.conf import MANAGER
   from metadata.manager_client import ManagerApi
@@ -219,17 +225,20 @@ def get_daemon_config(key):
 
   return None
 
+
 def get_daemon_api_username():
   """
     Try to get daemon_api_username from Cloudera Manager API
   """
   return get_daemon_config('webserver_htpassword_user')
 
+
 def get_daemon_api_password():
   """
     Try to get daemon_api_password from Cloudera Manager API
   """
   return get_daemon_config('webserver_htpassword_password')
+
 
 DAEMON_API_PASSWORD = Config(
   key="daemon_api_password",
@@ -262,9 +271,11 @@ DAEMON_API_AUTH_SCHEME = Config(
   default="digest"
 )
 
+
 def get_use_sasl_default():
   """kerberos enabled or password is specified"""
-  return is_kerberos_enabled() or AUTH_PASSWORD.get() is not None # Maps closely to legacy behavior
+  return is_kerberos_enabled() or AUTH_PASSWORD.get() is not None  # Maps closely to legacy behavior
+
 
 USE_SASL = Config(
   key="use_sasl",
@@ -296,7 +307,7 @@ def config_validator(user):
 
   try:
     try:
-      if not 'test' in sys.argv: # Avoid tests hanging
+      if 'test' not in sys.argv:  # Avoid tests hanging
         query_server = get_query_server_config(name='impala')
         server = dbms.get(user, query_server)
         query = hql_query("SELECT 'Hello World!';")

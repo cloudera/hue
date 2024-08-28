@@ -15,20 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
-import logging
 import sys
+import logging
+from builtins import str
 
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
-from desktop.lib.parameterization import find_parameters, bind_parameters
+from desktop.lib.parameterization import bind_parameters, find_parameters
 from useradmin.models import User
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
 
 LOG = logging.getLogger()
 
@@ -63,7 +59,7 @@ class JobDesign(models.Model):
     return reverse("jobsub.views.submit_design", kwargs=dict(id=self.id))
 
   def clone(self):
-    clone_kwargs = dict([(field.name, getattr(self, field.name)) for field in self._meta.fields if field.name != 'id']);
+    clone_kwargs = dict([(field.name, getattr(self, field.name)) for field in self._meta.fields if field.name != 'id'])
     return self.__class__.objects.create(**clone_kwargs)
 
   def to_jsonable(self):
@@ -74,6 +70,7 @@ class JobDesign(models.Model):
       'type': self.type,
       'data': repr(self.data)
     }
+
 
 class CheckForSetup(models.Model):
   """
@@ -86,7 +83,7 @@ class CheckForSetup(models.Model):
   setup_level = models.IntegerField(default=0)
 
 
-################################## New Models ################################
+# New Models ################################
 
 PATH_MAX = 512
 

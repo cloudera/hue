@@ -15,19 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-import hashlib
 import os
 import re
-import sys
-
-from desktop.lib.i18n import smart_str
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from StringIO import StringIO as string_io
+import hashlib
+from io import StringIO as string_io
 
 
 # Note: Might be replaceable by sqlparse.split
@@ -50,6 +41,7 @@ def get_statements(hql_query, dialect=None):
     })
   return statements
 
+
 def get_current_statement(snippet):
   # Multiquery, if not first statement or arrived to the last query
   should_close = False
@@ -59,7 +51,7 @@ def get_current_statement(snippet):
 
   statements = get_statements(snippet['statement'], snippet['dialect'] if 'dialect' in snippet else None)
 
-  statement_id = min(statement_id, len(statements) - 1) # In case of removal of statements
+  statement_id = min(statement_id, len(statements) - 1)  # In case of removal of statements
   previous_statement_hash = compute_statement_hash(statements[statement_id]['statement'])
   non_edited_statement = previous_statement_hash == handle.get('previous_statement_hash') or not handle.get('previous_statement_hash')
 
@@ -86,10 +78,8 @@ def get_current_statement(snippet):
 
 
 def compute_statement_hash(statement):
-  if sys.version_info[0] > 2:
-    return hashlib.sha224(statement.encode()).hexdigest()
-  else:
-    return hashlib.sha224(smart_str(statement)).hexdigest()
+  return hashlib.sha224(statement.encode()).hexdigest()
+
 
 def split_statements(hql, dialect=None):
   """
@@ -154,11 +144,13 @@ def split_statements(hql, dialect=None):
 
   if current and current != ';':
     current = current.strip()
-    statements.append(((start_row, start_col), (end_row, end_col+1), current))
+    statements.append(((start_row, start_col), (end_row, end_col + 1), current))
 
   return statements
 
-_SEMICOLON_WHITESPACE = re.compile(";\s*$")
+
+_SEMICOLON_WHITESPACE = re.compile(r";\s*$")
+
 
 def strip_trailing_semicolon(query):
   """As a convenience, we remove trailing semicolons from queries."""

@@ -15,33 +15,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
 import sys
-
+import logging
+from builtins import object
 from datetime import datetime, timedelta
+
 from django.core.paginator import Paginator
+from django.utils.translation import gettext as _
 
-from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.rest.http_client import RestException
-
-from hadoop.conf import YARN_CLUSTERS
-from hadoop.cluster import rm_ha
-
-import hadoop.yarn.history_server_api as history_server_api
 import hadoop.yarn.mapreduce_api as mapreduce_api
 import hadoop.yarn.node_manager_api as node_manager_api
+import hadoop.yarn.history_server_api as history_server_api
 import hadoop.yarn.resource_manager_api as resource_manager_api
 import hadoop.yarn.spark_history_server_api as spark_history_server_api
-
-from jobbrowser.conf import SHARE_JOBS
-from jobbrowser.yarn_models import Application, YarnV2Job, Job as YarnJob, KilledJob as KilledYarnJob, Container, SparkJob
 from desktop.auth.backend import is_admin
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.rest.http_client import RestException
+from hadoop.cluster import rm_ha
+from hadoop.conf import YARN_CLUSTERS
+from jobbrowser.conf import SHARE_JOBS
+from jobbrowser.yarn_models import Application, Container, Job as YarnJob, KilledJob as KilledYarnJob, SparkJob, YarnV2Job
 
 LOG = logging.getLogger()
 
@@ -93,8 +86,8 @@ class YarnApi(JobBrowserApi):
 
   @rm_ha
   def get_jobs(self, user, **kwargs):
-    state_filters = {'running': 'UNDEFINED', 'completed': 'SUCCEEDED', 'failed': 'FAILED', 'killed': 'KILLED',}
-    states_filters = {'running': 'NEW,NEW_SAVING,SUBMITTED,ACCEPTED,RUNNING', 'completed': 'FINISHED', 'failed': 'FAILED,KILLED',}
+    state_filters = {'running': 'UNDEFINED', 'completed': 'SUCCEEDED', 'failed': 'FAILED', 'killed': 'KILLED', }
+    states_filters = {'running': 'NEW,NEW_SAVING,SUBMITTED,ACCEPTED,RUNNING', 'completed': 'FINISHED', 'failed': 'FAILED,KILLED', }
     filters = {}
 
     if kwargs['username']:
@@ -108,11 +101,11 @@ class YarnApi(JobBrowserApi):
     if kwargs.get('time_value'):
       filters['startedTimeBegin'] = self._get_started_time_begin(kwargs.get('time_value'), kwargs.get('time_unit'))
 
-    if self.resource_manager_api: # This happens when yarn is not configured, but we need jobbrowser for Impala
+    if self.resource_manager_api:  # This happens when yarn is not configured, but we need jobbrowser for Impala
       json = self.resource_manager_api.apps(**filters)
     else:
       json = {}
-    if type(json) == str and 'This is standby RM' in json:
+    if type(json) is str and 'This is standby RM' in json:
       raise Exception(json)
 
     if json.get('apps'):
@@ -147,11 +140,9 @@ class YarnApi(JobBrowserApi):
                   is_admin(user) or
                   job.user == user.username]
 
-
   def _get_job_from_history_server(self, job_id):
     resp = self.history_server_api.job(self.user, job_id)
     return YarnJob(self.history_server_api, resp['job'])
-
 
   @rm_ha
   def get_job(self, jobid):
@@ -237,5 +228,5 @@ class ApplicationNotRunning(Exception):
 class JobExpired(Exception):
 
   def __init__(self, job):
-    super(JobExpired, self).__init__('JobExpired: %s' %job)
+    super(JobExpired, self).__init__('JobExpired: %s' % job)
     self.job = job

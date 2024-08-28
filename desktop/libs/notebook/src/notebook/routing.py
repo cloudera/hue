@@ -17,13 +17,9 @@
 
 import sys
 
+from django.urls import re_path
+
 from desktop.conf import has_channels
-
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
-
 
 if has_channels():
   from notebook import consumer

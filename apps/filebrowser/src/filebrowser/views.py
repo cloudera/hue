@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import io
 import os
 import re
 import sys
@@ -26,11 +27,15 @@ import mimetypes
 import posixpath
 import urllib.error
 import urllib.request
-from builtins import object
+from builtins import object, str as new_str
 from bz2 import decompress
 from datetime import datetime
 from functools import partial
+from gzip import decompress as decompress_gzip
+from io import StringIO as string_io
+from urllib.parse import quote as urllib_quote, unquote as urllib_unquote, urlparse as lib_urlparse
 
+from avro import datafile, io
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
 from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
@@ -39,6 +44,7 @@ from django.template.defaultfilters import filesizeformat, stringformat
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import http_date
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
@@ -99,28 +105,6 @@ from hadoop.fs.fsutils import do_overwrite_save
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.upload import HDFSFineUploaderChunkedUpload, LocalFineUploaderChunkedUpload
 from useradmin.models import Group, User
-
-if sys.version_info[0] > 2:
-  import io
-  from builtins import str as new_str
-  from gzip import decompress as decompress_gzip
-  from io import StringIO as string_io
-  from urllib.parse import quote as urllib_quote, unquote as urllib_unquote, urlparse as lib_urlparse
-
-  from avro import datafile, io
-  from django.utils.translation import gettext as _
-else:
-  from urllib import quote as urllib_quote, unquote as urllib_unquote
-
-  from cStringIO import StringIO as string_io
-  from urlparse import urlparse as lib_urlparse
-  new_str = unicode
-  from gzip import GzipFile
-
-  import parquet
-  from avro import datafile, io
-  from django.utils.translation import ugettext as _
-
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4  # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024 * 1024  # 1MB
@@ -825,24 +809,17 @@ def display(request, path):
   # Get contents as string for text mode, or at least try
   uni_contents = None
   if not mode or mode == 'text':
-    if sys.version_info[0] > 2:
-      if not isinstance(contents, str):
-        uni_contents = new_str(contents, encoding, errors='replace')
-        is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
-        # Auto-detect mode
-        if not mode:
-          mode = is_binary and 'binary' or 'text'
-      else:
-        # We already have a string.
-        uni_contents = contents
-        is_binary = False
-        mode = 'text'
-    else:
+    if not isinstance(contents, str):
       uni_contents = new_str(contents, encoding, errors='replace')
       is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
       # Auto-detect mode
       if not mode:
         mode = is_binary and 'binary' or 'text'
+    else:
+      # We already have a string.
+      uni_contents = contents
+      is_binary = False
+      mode = 'text'
 
   # Get contents as bytes
   if mode == "binary":
@@ -1019,10 +996,7 @@ def _read_gzip(fhandle, path, offset, length, stats):
   if offset and offset != 0:
     raise PopupException(_("Offsets are not supported with Gzip compression."))
   try:
-    if sys.version_info[0] > 2:
-      contents = decompress_gzip(fhandle.read())
-    else:
-      contents = GzipFile('', 'r', 0, string_io(fhandle.read())).read(length)
+    contents = decompress_gzip(fhandle.read())
   except Exception as e:
     logging.exception('Could not decompress file at "%s": %s' % (path, e))
     raise PopupException(_("Failed to decompress file."))
@@ -1052,27 +1026,18 @@ def _read_simple(fhandle, path, offset, length, stats):
 
 def detect_gzip(contents):
   '''This is a silly small function which checks to see if the file is Gzip'''
-  if sys.version_info[0] > 2:
-    return contents[:2] == b'\x1f\x8b'
-  else:
-    return contents[:2] == '\x1f\x8b'
+  return contents[:2] == b'\x1f\x8b'
 
 
 def detect_bz2(contents):
   '''This is a silly small function which checks to see if the file is Bz2'''
-  if sys.version_info[0] > 2:
-    return contents[:3] == b'BZh'
-  else:
-    return contents[:3] == 'BZh'
+  return contents[:3] == b'BZh'
 
 
 def detect_avro(contents):
   '''This is a silly small function which checks to see if the file is Avro'''
   # Check if the first three bytes are 'O', 'b' and 'j'
-  if sys.version_info[0] > 2:
-    return contents[:3] == b'\x4F\x62\x6A'
-  else:
-    return contents[:3] == '\x4F\x62\x6A'
+  return contents[:3] == b'\x4F\x62\x6A'
 
 
 def detect_snappy(contents):

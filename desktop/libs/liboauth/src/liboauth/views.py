@@ -15,43 +15,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-
 import logging
-import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+
+import django.contrib.auth.views
+from django.contrib.auth import authenticate, get_backends, login
+from django.contrib.sessions.models import Session
+from django.core.exceptions import SuspiciousOperation
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.utils.translation import gettext as _
+
+import liboauth.conf
+from desktop.auth.backend import AllowFirstUserDjangoBackend
+from desktop.auth.forms import AuthenticationForm, UserCreationForm
+from desktop.lib.django_util import login_notrequired, render
+from desktop.log.access import access_warn, last_access_map
+from hadoop.fs.exceptions import WebHdfsException
+from liboauth.backend import OAuthBackend
+from useradmin.models import User
+from useradmin.views import ensure_home_directory
 
 LOG = logging.getLogger()
 
-import urllib.request, urllib.parse, urllib.error
 try:
   import httplib2
 except ImportError:
   LOG.warning('httplib2 module not found')
-
-import django.contrib.auth.views
-from django.core.exceptions import SuspiciousOperation
-from django.contrib.auth import login, get_backends, authenticate
-from django.contrib.sessions.models import Session
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from hadoop.fs.exceptions import WebHdfsException
-from useradmin.models import User
-from useradmin.views import ensure_home_directory
-
-from desktop.auth.backend import AllowFirstUserDjangoBackend
-from desktop.auth.forms import UserCreationForm, AuthenticationForm
-from desktop.lib.django_util import render
-from desktop.lib.django_util import login_notrequired
-from desktop.log.access import access_warn, last_access_map
-
-import liboauth.conf
-from liboauth.backend import OAuthBackend
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 
 @login_notrequired
@@ -71,7 +63,6 @@ def show_login_page(request, login_errors=False):
     'socialLinkedin': liboauth.conf.CONSUMER_KEY_LINKEDIN.get() != "" and liboauth.conf.CONSUMER_SECRET_LINKEDIN.get() != "",
     'socialTwitter': liboauth.conf.CONSUMER_KEY_TWITTER.get() != "" and liboauth.conf.CONSUMER_SECRET_TWITTER.get() != ""
  })
-
 
 
 @login_notrequired

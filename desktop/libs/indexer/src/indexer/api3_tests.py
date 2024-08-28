@@ -15,20 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import sys
-from django.utils.datastructures import MultiValueDict
+import json
+from unittest.mock import Mock, patch
+from urllib.parse import unquote as urllib_unquote
+
 from django.core.files.uploadhandler import InMemoryUploadedFile
+from django.utils.datastructures import MultiValueDict
 
 from desktop.settings import BASE_DIR
-from indexer.api3 import upload_local_file, guess_field_types, guess_format
-
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from urllib import unquote as urllib_unquote
-  from mock import patch, Mock, MagicMock
+from indexer.api3 import guess_field_types, guess_format, upload_local_file
 
 
 def test_xlsx_local_file_upload():

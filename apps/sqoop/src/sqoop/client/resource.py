@@ -14,16 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import sys
+import json
+
+from django.utils.translation import gettext as _
 
 from desktop.lib.python_util import force_dict_to_strings
 from desktop.lib.rest.resource import Resource
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 
 class SqoopResource(Resource):
@@ -73,7 +70,6 @@ class SqoopResource(Resource):
     """
     return self.invoke("DELETE", relpath, params, None, headers)
 
-
   def post(self, relpath=None, params=None, data=None, headers=None):
     """
     Invoke the POST method on a resource.
@@ -85,7 +81,6 @@ class SqoopResource(Resource):
     @return: A dictionary of the JSON result.
     """
     return self.invoke("POST", relpath, params, data, headers)
-
 
   def put(self, relpath=None, params=None, data=None, headers=None):
     """
@@ -99,8 +94,7 @@ class SqoopResource(Resource):
     """
     return self.invoke("PUT", relpath, params, data, headers)
 
-
   def _make_headers(self, contenttype=None):
     if contenttype:
-      return { 'Content-Type': contenttype }
+      return {'Content-Type': contenttype}
     return None

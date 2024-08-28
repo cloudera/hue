@@ -15,17 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
-import sys
 import os
+import sys
+import json
+import logging
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
+
 
 def get_all_queries():
   with open(os.path.join(os.path.dirname(__file__), 'data/queries.json')) as file:
