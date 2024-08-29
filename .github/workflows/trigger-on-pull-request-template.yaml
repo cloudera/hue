@@ -17,7 +17,7 @@
 name: Main Workflow
 on:
   pull_request:
-    types: [opened, synchronize, edited, labeled]
+    types: [opened, synchronize, edited, labeled, closed]
 jobs:
   RUN:
     uses: Kitchen/RE-github-workflows/.github/workflows/trigger-on-prt-unified-branch-new.yaml@main
