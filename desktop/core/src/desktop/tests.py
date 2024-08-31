@@ -667,7 +667,7 @@ def test_app_permissions():
 @pytest.mark.django_db
 def test_error_handling_failure():
   # Change rewrite_user to call has_hue_permission
-  # Try to get filebrowser page
+  # Try to get logs page
   # test for default 500 page
   # Restore rewrite_user
   import desktop.auth.backend
