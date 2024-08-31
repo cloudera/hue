@@ -38,7 +38,6 @@ from django.http.response import StreamingHttpResponse
 from django.shortcuts import redirect, render as django_render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-from future import standard_library
 from webpack_loader.utils import get_static
 
 import desktop.conf
@@ -67,12 +66,11 @@ from desktop.models import Settings, UserPreferences, _get_apps, hue_version
 from libsaml.conf import REQUIRED_GROUPS, REQUIRED_GROUPS_ATTRIBUTE
 from useradmin.models import User, get_profile
 
-standard_library.install_aliases()
-
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
 
   from django.utils.translation import gettext as _
+
 else:
   from django.utils.translation import ugettext as _
   from StringIO import StringIO as string_io
@@ -90,7 +88,7 @@ def samlgroup_check(request):
     if REQUIRED_GROUPS.get():
       try:
         userprofile = get_profile(request.user)
-      except Exception as e:
+      except Exception:
         return False
 
       json_data = json.loads(userprofile.json_data)
@@ -128,7 +126,7 @@ def saml_login_headers(request):
   try:
     userprofile.update_data({'X-CSRF-TOKEN': request.META['CSRF_COOKIE']})
     userprofile.save()
-  except Exception as e:
+  except Exception:
     LOG.error("X-CSRF-TOKEN header not found")
 
 
@@ -372,7 +370,7 @@ def download_log_view(request):
       response['Content-Disposition'] = 'attachment; filename=hue-logs-%s.zip' % t
       response['Content-Length'] = length
       return response
-    except Exception as e:
+    except Exception:
       LOG.exception("Couldn't construct zip file to write logs")
       return log_view(request)
 
@@ -417,7 +415,7 @@ def status_bar(request):
         resp += r.content
       else:
         LOG.warning("Failed to execute status_bar view %s" % (view,))
-    except Exception as e:
+    except Exception:
       LOG.exception("Failed to execute status_bar view %s" % (view,))
   return HttpResponse(resp)
 
@@ -910,5 +908,5 @@ def antixss(value):
 def topo(request, location='world'):
   file_path = os.path.join('desktop', 'ext', 'topo', location + '.topo.json')
   response = StreamingHttpResponse(streaming_content=staticfiles_storage.open(file_path))
-  # //return settings.STATIC_URL + path
+  # return settings.STATIC_URL + path
   return response
