@@ -26,9 +26,9 @@
     <dropwizard.version>2.1.9</dropwizard.version>
     <guava.version>32.0.1-jre</guava.version>
     <junit.version>4.13</junit.version>
-    <jackson.version>2.13.4.2</jackson.version>
+    <jackson.version>2.15.0</jackson.version>
     <jackson.modules.version>2.15.0</jackson.modules.version>
-    <jersey.version>2.35</jersey.version>
+    <jersey.version>2.36</jersey.version>
     <lombok.version>1.18.20</lombok.version>
     <protobuf.version>3.21.12</protobuf.version>
     <jdbi.version>3.30.0</jdbi.version>
