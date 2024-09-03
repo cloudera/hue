@@ -21,23 +21,25 @@ Mapping files have a series of search/replace instructions in the form
 s/<old_value>/<new_value>/
 This will rewrite the configurations if any changes are required.
 """
-import logging
+import os
 import sys
+import glob
+import string
+import logging
 
-import os, glob, string
-import desktop.conf
-import desktop.log
-from desktop.lib.paths import get_desktop_root
 from django.core.management.base import BaseCommand, CommandError
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
+
+import desktop.log
+import desktop.conf
+from desktop.lib.paths import get_desktop_root
 
 LOG = logging.getLogger()
 
+
 class Command(BaseCommand):
   help = _('Upgrades the Hue configuration with a mapping file.')
+
   def add_arguments(self, parser):
     parser.add_argument('--mapping_file', help=_('Location of the mapping file.'))
 
@@ -47,8 +49,8 @@ class Command(BaseCommand):
     for r in required:
       if not options.get(r):
         raise CommandError(_("--%(param)s is required.") % {'param': r})
-  
-    # Pull out all the mappings  
+
+    # Pull out all the mappings
     mapping_file = options["mapping_file"]
     mapping_handle = open(mapping_file, 'r')
     mappings = []
@@ -76,14 +78,12 @@ class Command(BaseCommand):
             new_value = mapping[1]
 
             if old_value in line[0]:
-              LOG.info("Replacing %s with %s in line %s" % 
-                  (old_value, new_value, '='.join(line),)) 
+              LOG.info("Replacing %s with %s in line %s" %
+                  (old_value, new_value, '='.join(line),))
               line[0] = line[0].replace(old_value, new_value)
-            
-      
+
       # Rewrite file with replacements made
       conf_handle.close()
       conf_handle = open(conf_file, 'w')
-      data_to_write = ''.join([ '='.join(split) for split in data ])
+      data_to_write = ''.join(['='.join(split) for split in data])
       conf_handle.write(data_to_write)
-

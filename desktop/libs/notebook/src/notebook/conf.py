@@ -158,6 +158,7 @@ def computes_for_dialect(dialect, user):
 
 # cf. admin wizard too
 
+
 INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
   help="One entry for each type of snippet.",

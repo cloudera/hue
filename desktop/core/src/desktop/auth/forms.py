@@ -15,26 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 import logging
-import sys
+import datetime
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_backends
 from django.contrib.auth.forms import AuthenticationForm as DjangoAuthenticationForm, UserCreationForm as DjangoUserCreationForm
-from django.forms import CharField, TextInput, PasswordInput, ChoiceField, ValidationError, Form
-from django.utils.safestring import mark_safe
+from django.forms import CharField, ChoiceField, Form, PasswordInput, TextInput, ValidationError
 from django.utils.encoding import smart_str
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 from desktop import conf
-from useradmin.hue_password_policy import hue_get_password_validators
-
 from desktop.auth.backend import is_admin
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from useradmin.hue_password_policy import hue_get_password_validators
 
 if conf.ENABLE_ORGANIZATIONS.get():
   from useradmin.models import User
@@ -48,13 +42,16 @@ LOG = logging.getLogger()
 def get_backend_names():
   return get_backends and [backend.__class__.__name__ for backend in get_backends()]
 
+
 def is_active_directory():
   return 'LdapBackend' in get_backend_names() and (
     bool(conf.LDAP.NT_DOMAIN.get()) or bool(conf.LDAP.LDAP_SERVERS.get()) or conf.LDAP.LDAP_URL.get() is not None
   )
 
+
 def get_ldap_server_keys():
   return [(ldap_server_record_key) for ldap_server_record_key in conf.LDAP.LDAP_SERVERS.get()]
+
 
 def get_server_choices():
   if conf.LDAP.LDAP_SERVERS.get():
@@ -77,7 +74,7 @@ class AuthenticationForm(DjangoAuthenticationForm):
     'inactive': _t("Account deactivated. Please contact an administrator."),
   }
 
-  username = CharField(label=_t("Username"), widget=TextInput(attrs={'maxlength': 150, 'placeholder': _t("Username"), 'autocomplete': 'off', 'autofocus': 'autofocus'}))
+  username = CharField(label=_t("Username"), widget=TextInput(attrs={'maxlength': 150, 'placeholder': _t("Username"), 'autocomplete': 'off', 'autofocus': 'autofocus'}))  # noqa: E501
   password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'placeholder': _t("Password"), 'autocomplete': 'off'}))
 
   def authenticate(self):
@@ -103,7 +100,9 @@ class AuthenticationForm(DjangoAuthenticationForm):
 
         if not user.is_active:
           if settings.ADMINS:
-            raise ValidationError(mark_safe(_("Account deactivated. Please contact an <a href=\"mailto:%s\">administrator</a>.") % settings.ADMINS[0][1]))
+            raise ValidationError(
+              mark_safe(_("Account deactivated. Please contact an <a href=\"mailto:%s\">administrator</a>.") % settings.ADMINS[0][1])
+            )
           else:
             raise ValidationError(self.error_messages['inactive'])
       except User.DoesNotExist:
@@ -124,7 +123,7 @@ class OrganizationAuthenticationForm(Form):
   }
 
   # username = None
-  email = CharField(label=_t("Email"), widget=TextInput(attrs={'maxlength': 150, 'placeholder': _t("Email"), 'autocomplete': 'off', 'autofocus': 'autofocus'}))
+  email = CharField(label=_t("Email"), widget=TextInput(attrs={'maxlength': 150, 'placeholder': _t("Email"), 'autocomplete': 'off', 'autofocus': 'autofocus'}))  # noqa: E501
   password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'placeholder': _t("Password"), 'autocomplete': 'off'}))
 
   def __init__(self, request=None, *args, **kwargs):
@@ -182,16 +181,18 @@ class OrganizationAuthenticationForm(Form):
 
 
 class ImpersonationAuthenticationForm(AuthenticationForm):
-  login_as = CharField(label=_t("Login as"), max_length=30, widget=TextInput(attrs={'placeholder': _t("Login as username"), 'autocomplete': 'off'}))
+  login_as = CharField(
+    label=_t("Login as"), max_length=30, widget=TextInput(attrs={'placeholder': _t("Login as username"), 'autocomplete': 'off'})
+  )
 
   def authenticate(self):
     try:
       super(AuthenticationForm, self).clean()
-    except:
+    except Exception:
       # Expected to fail as login_as is nor provided by the parent Django AuthenticationForm, hence we redo it properly below.
       pass
     request = None
-    self.user_cache = authenticate(request, username=self.cleaned_data.get('username'), password=self.cleaned_data.get('password'), login_as=self.cleaned_data.get('login_as'))
+    self.user_cache = authenticate(request, username=self.cleaned_data.get('username'), password=self.cleaned_data.get('password'), login_as=self.cleaned_data.get('login_as'))  # noqa: E501
     return self.user_cache
 
 
@@ -206,9 +207,7 @@ class LdapAuthenticationForm(AuthenticationForm):
     self.error_messages['invalid_login'] = _t("Invalid username or password, or your LDAP groups not allowed")
 
   def authenticate(self):
-    request = None
-    if sys.version_info[0] > 2:
-      request = self.request
+    request = self.request
     username = self.cleaned_data.get('username') or ''
     password = self.cleaned_data.get('password')
     server = self.cleaned_data.get('server')

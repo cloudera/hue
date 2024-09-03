@@ -15,15 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
 import sys
+import logging
+from builtins import object
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 
@@ -46,15 +42,16 @@ class Credentials(object):
     self.credentials = self._parse_oozie(configuration)
 
   def _parse_oozie(self, configuration_dic):
-    return dict([cred.strip().split('=') for cred in configuration_dic.get('oozie.credentials.credentialclasses', '').strip().split(',') if cred])
+    return dict(
+      [cred.strip().split('=') for cred in configuration_dic.get('oozie.credentials.credentialclasses', '').strip().split(',') if cred])
 
   @property
   def class_to_name_credentials(self):
-    return dict((v,k) for k, v in self.credentials.items())
+    return dict((v, k) for k, v in self.credentials.items())
 
   def get_properties(self, hive_properties=None):
     credentials = {}
-    from beeswax import hive_site, conf
+    from beeswax import conf, hive_site
 
     if not hasattr(conf.HIVE_SERVER_HOST, 'get') or not conf.HIVE_SERVER_HOST.get():
       LOG.warning('Could not get all the Oozie credentials: beeswax app is blacklisted.')

@@ -16,34 +16,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import json
-import logging
 import os
 import sys
+import json
 import time
 import uuid
-
+import logging
+from builtins import object
 from tempfile import NamedTemporaryFile
 
 from django.core.cache import cache
 from django.utils.functional import wraps
+from django.utils.translation import gettext as _
 
 from desktop.auth.backend import is_admin
-from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib import export_csvxls
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
+from libsentry.privilege_checker import MissingSentryPrivilegeException, get_checker
 from libsentry.sentry_site import get_hive_sentry_provider
-from libsentry.privilege_checker import get_checker, MissingSentryPrivilegeException
-
 from metadata.conf import OPTIMIZER, get_optimizer_url
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -64,7 +57,7 @@ class NavOptException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 def check_privileges(view_func):
@@ -111,8 +104,7 @@ class OptimizerClient(object):
 
     self._api = ApiLib("navopt", self._api_url, self._auth_key, self._auth_key_secret)
 
-    self._tenant_id = tenant_id if tenant_id else _get_tenant_id(self) # Aka "workload"
-
+    self._tenant_id = tenant_id if tenant_id else _get_tenant_id(self)  # Aka "workload"
 
   def _call(self, *kwargs):
     start_time = time.time()
@@ -130,10 +122,8 @@ class OptimizerClient(object):
     else:
       return data
 
-
   def get_tenant(self, cluster_id='default'):
     return self._call('getTenant', {'clusterId': cluster_id})
-
 
   def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
     if data_type in ('table_stats', 'cols_stats'):
@@ -157,7 +147,7 @@ class OptimizerClient(object):
       }
 
     f_queries_path = NamedTemporaryFile(suffix=data_suffix)
-    f_queries_path.close() # Reopened as real file below to work well with the command
+    f_queries_path.close()  # Reopened as real file below to work well with the command
 
     try:
       f_queries = open(f_queries_path.name, 'w+')
@@ -186,7 +176,7 @@ class OptimizerClient(object):
       }
       parameters.update(extra_parameters)
       response = self._api.call_api('upload', parameters)
-      status = json.loads(response) # Workaround getting back a string
+      status = json.loads(response)  # Workaround getting back a string
 
       status['count'] = len(data)
       return status
@@ -195,7 +185,6 @@ class OptimizerClient(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
     finally:
       os.remove(f_queries_path.name)
-
 
   def upload_status(self, workload_id):
     return self._call('uploadStatus', {'tenant': self._tenant_id, 'workloadId': workload_id})
@@ -213,7 +202,6 @@ class OptimizerClient(object):
       }
     )
 
-
   @check_privileges
   def table_details(self, database_name, table_name, page_size=100, startingToken=None, connector=None):
     return self._call(
@@ -227,7 +215,6 @@ class OptimizerClient(object):
       }
     )
 
-
   def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None, connector=None):
     return self._call(
       'getQueryCompatible', {
@@ -239,7 +226,6 @@ class OptimizerClient(object):
         'startingToken': startingToken
       }
     )
-
 
   def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None, connector=None):
     response = self._call(
@@ -265,7 +251,6 @@ class OptimizerClient(object):
       'noDDL': response.get('noDDL', []),
     }
 
-
   def predict(self, before_cursor, after_cursor, connector):
     response = self._call(
       'predict', {
@@ -282,7 +267,6 @@ class OptimizerClient(object):
       'statement': predictions and predictions[0]['statement']
     }
 
-
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None, connector=None):
     if is_admin(self.user):
       return self._call(
@@ -298,7 +282,6 @@ class OptimizerClient(object):
     else:
       raise PopupException(_('Call not supported'))
 
-
   @check_privileges
   def top_filters(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     args = {
@@ -311,7 +294,6 @@ class OptimizerClient(object):
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
 
     return self._call('getTopFilters', args)
-
 
   @check_privileges
   def top_aggs(self, db_tables=None, page_size=100, startingToken=None, connector=None):
@@ -339,7 +321,6 @@ class OptimizerClient(object):
 
     return results
 
-
   @check_privileges
   def top_columns(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     args = {
@@ -357,7 +338,6 @@ class OptimizerClient(object):
       for section in ['orderbyColumns', 'selectColumns', 'filterColumns', 'joinColumns', 'groupbyColumns']:
         results[section] = list(_secure_results(results[section], self.user))
     return results
-
 
   @check_privileges
   def top_joins(self, db_tables=None, page_size=100, startingToken=None, connector=None):
@@ -380,7 +360,6 @@ class OptimizerClient(object):
           filtered_joins.append(result)
       results['results'] = filtered_joins
     return results
-
 
   def top_databases(self, page_size=100, startingToken=None, connector=None):
     args = {

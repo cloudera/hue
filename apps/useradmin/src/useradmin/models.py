@@ -37,41 +37,36 @@ Note that Django itself has a notion of users, groups, and permissions. We re-us
 notion of permissions. The permissions notion in Django is strongly tied to what models you may or may not edit, and there are
 elaborations to manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
 """
-import collections
+import sys
 import json
 import logging
-import sys
-
+import collections
 from datetime import datetime
 from enum import Enum
 
-from django.db import connection, models, transaction
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.cache import cache
+from django.db import connection, models, transaction
 from django.utils import timezone as dtz
+from django.utils.translation import gettext_lazy as _t
 
 from desktop import appmanager
-from desktop.conf import ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS
-from desktop.lib.connectors.models import _get_installed_connectors, Connector
+from desktop.conf import ENABLE_CONNECTORS, ENABLE_ORGANIZATIONS
+from desktop.lib.connectors.models import Connector, _get_installed_connectors
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
-
 from useradmin.conf import DEFAULT_USER_GROUP
-from useradmin.permissions import HuePermission, GroupPermission, LdapGroup
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+from useradmin.permissions import GroupPermission, HuePermission, LdapGroup
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.organization import OrganizationUser as User, OrganizationGroup as Group, get_organization, Organization
+  from useradmin.organization import Organization, OrganizationGroup as Group, OrganizationUser as User, get_organization
 else:
-  from django.contrib.auth.models import User, Group
+  from django.contrib.auth.models import Group, User
   def get_organization(): pass
-  class Organization(): pass
+  class Organization():
+    pass
 
   monkey_patch_username_validator()
 
@@ -167,8 +162,10 @@ def get_profile(user):
     user._cached_userman_profile = profile
     return profile
 
+
 def group_has_permission(group, perm):
   return GroupPermission.objects.filter(group=group, hue_permission=perm).exists()
+
 
 def group_permissions(group):
   return HuePermission.objects.filter(grouppermission__group=group).all()
@@ -182,7 +179,7 @@ def create_profile_for_user(user):
   try:
     p.save()
     return p
-  except:
+  except Exception:
     LOG.exception("Failed to automatically create user profile.")
     return None
 
@@ -235,7 +232,7 @@ def update_app_permissions(**kwargs):
     try:
       for dp in HuePermission.objects.all():
         current.setdefault(dp.app, {})[dp.action] = dp
-    except:
+    except Exception:
       LOG.exception('failed to get permissions')
       return
 
@@ -363,7 +360,7 @@ def install_sample_user(django_user=None):
         user = User.objects.get(id=SAMPLE_USER_ID)
         user.username = django_username
         user.save()
-  except:
+  except Exception:
     LOG.exception('Failed to get or create sample user')
 
   # If sample user doesn't belong to default group, add to default group

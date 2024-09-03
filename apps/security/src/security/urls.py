@@ -17,15 +17,10 @@
 
 import sys
 
-from security import views as security_views
-from security.api import hdfs as security_api_hdfs
-from security.api import hive as security_api_hive
-from security.api import sentry as security_api_sentry 
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from security import views as security_views
+from security.api import hdfs as security_api_hdfs, hive as security_api_hive, sentry as security_api_sentry
 
 urlpatterns = [
   re_path(r'^$', security_views.hive, name='index'),

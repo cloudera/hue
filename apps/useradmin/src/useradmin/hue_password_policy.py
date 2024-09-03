@@ -17,15 +17,12 @@
 
 import re
 import sys
-
 from builtins import object
-from django.core.exceptions import ValidationError
-from useradmin.conf import PASSWORD_POLICY
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
+from useradmin.conf import PASSWORD_POLICY
 
 _PASSWORD_POLICY = None
 
@@ -81,4 +78,4 @@ def is_password_policy_enabled():
 
 
 def get_password_hint():
-  return  get_password_policy().password_hint
+  return get_password_policy().password_hint

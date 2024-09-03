@@ -15,25 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
-import yaml
-import sys
 import os
+import sys
+import json
+import logging
 from urllib.parse import quote_plus
 
-from desktop.lib.botserver.slack_client import slack_client
-from desktop.lib.exceptions_renderable import PopupException
+import yaml
+from django.utils.translation import gettext as _
+
 from desktop.decorators import api_error_handler
+from desktop.lib.botserver.slack_client import slack_client
 from desktop.lib.django_util import JsonResponse, login_notrequired
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.settings import BASE_DIR
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 LOG = logging.getLogger()
+
 
 @api_error_handler
 def get_channels(request):
@@ -49,6 +47,7 @@ def get_channels(request):
     'channels': bot_channels,
   })
 
+
 @api_error_handler
 def send_message(request):
   channel = request.POST.get('channel')
@@ -60,6 +59,7 @@ def send_message(request):
   return JsonResponse({
     'ok': slack_response.get('ok'),
   })
+
 
 @login_notrequired
 @api_error_handler
@@ -79,6 +79,7 @@ def generate_slack_install_link(request):
     install_link += quote_plus(changed_data)
 
   return JsonResponse({'link': install_link})
+
 
 def _send_message(channel_info, message=None, block_element=None, message_ts=None):
   try:

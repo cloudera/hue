@@ -15,35 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import zip
-from builtins import range
 import logging
-import sys
-import urllib.request, urllib.error
+import urllib.error
+import urllib.request
+from urllib.parse import unquote as urllib_unquote
 
 from django import forms
-from django.forms import FileField, CharField, BooleanField, Textarea
-from django.forms.formsets import formset_factory, BaseFormSet
+from django.forms import BooleanField, CharField, FileField, Textarea
+from django.forms.formsets import BaseFormSet, formset_factory
+from django.utils.translation import gettext_lazy as _
 
 from aws.s3 import S3A_ROOT, normpath as s3_normpath
 from azure.abfs.__init__ import ABFS_ROOT, normpath as abfs_normpath
-from desktop.lib.fs.ozone import OFS_ROOT, normpath as ofs_normpath
-from desktop.lib.fs.gc import GS_ROOT, normpath as gs_normpath
 from desktop.lib import i18n
-from hadoop.fs import normpath
-from useradmin.models import User, Group
-
+from desktop.lib.fs.gc import GS_ROOT, normpath as gs_normpath
+from desktop.lib.fs.ozone import OFS_ROOT, normpath as ofs_normpath
 from filebrowser.lib import rwx
-
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote
-  from django.utils.translation import gettext_lazy as _
-else:
-  from urllib import unquote as urllib_unquote
-  from django.utils.translation import ugettext_lazy as _
-
+from hadoop.fs import normpath
+from useradmin.models import Group, User
 
 logger = logging.getLogger()
 
@@ -108,30 +97,38 @@ class EditorForm(forms.Form):
       return i18n.get_site_encoding()
     return encoding
 
+
 class RenameForm(forms.Form):
   op = "rename"
   src_path = CharField(label=_("File to rename"), help_text=_("The file to rename."))
   dest_path = CharField(label=_("New name"), help_text=_("Rename the file to:"))
 
+
 class BaseRenameFormSet(FormSet):
   op = "rename"
 
+
 RenameFormSet = formset_factory(RenameForm, formset=BaseRenameFormSet, extra=0)
+
 
 class CopyForm(forms.Form):
   op = "copy"
   src_path = CharField(label=_("File to copy"), help_text=_("The file to copy."))
   dest_path = CharField(label=_("Destination location"), help_text=_("Copy the file to:"))
 
+
 class BaseCopyFormSet(FormSet):
   op = "copy"
 
+
 CopyFormSet = formset_factory(CopyForm, formset=BaseCopyFormSet, extra=0)
+
 
 class SetReplicationFactorForm(forms.Form):
   op = "setreplication"
   src_path = CharField(label=_("File to set replication factor"), help_text=_("The file to set replication factor."))
   replication_factor = CharField(label=_("Value of replication factor"), help_text=_("The value of replication factor."))
+
 
 class UploadFileForm(forms.Form):
   op = "upload"
@@ -140,53 +137,67 @@ class UploadFileForm(forms.Form):
   dest = PathField(label=_("Destination Path"), help_text=_("Filename or directory to upload to."), required=False)  # Used actually?
   extract_archive = BooleanField(required=False)
 
+
 class UploadLocalFileForm(forms.Form):
   op = "upload"
   file = FileField(label=_("File to Upload"))
+
 
 class UploadArchiveForm(forms.Form):
   op = "upload"
   archive = FileField(label=_("Archive to Upload"))
   dest = PathField(label=_("Destination Path"), help_text=_("Archive to upload to."))
 
+
 class RemoveForm(forms.Form):
   op = "remove"
   path = PathField(label=_("File to remove"))
+
 
 class RmDirForm(forms.Form):
   op = "rmdir"
   path = PathField(label=_("Directory to remove"))
 
+
 class RmTreeForm(forms.Form):
   op = "rmtree"
   path = PathField(label=_("Directory to remove (recursively)"))
 
+
 class BaseRmTreeFormset(FormSet):
   op = "rmtree"
 
+
 RmTreeFormSet = formset_factory(RmTreeForm, formset=BaseRmTreeFormset, extra=0)
+
 
 class RestoreForm(forms.Form):
   op = "rmtree"
   path = PathField(label=_("Path to restore"))
 
+
 class BaseRestoreFormset(FormSet):
   op = "restore"
 
+
 RestoreFormSet = formset_factory(RestoreForm, formset=BaseRestoreFormset, extra=0)
+
 
 class TrashPurgeForm(forms.Form):
   op = "purge_trash"
+
 
 class MkDirForm(forms.Form):
   op = "mkdir"
   path = PathField(label=_("Path in which to create the directory"))
   name = PathField(label=_("Directory Name"))
 
+
 class TouchForm(forms.Form):
   op = "touch"
   path = PathField(label=_("Path in which to create the file"))
   name = PathField(label=_("File Name"))
+
 
 class ChownForm(forms.Form):
   op = "chown"
@@ -205,10 +216,13 @@ class ChownForm(forms.Form):
     self.all_groups = [group.name for group in Group.objects.all()]
     self.all_users = [user.username for user in User.objects.all()]
 
+
 class BaseChownFormSet(FormSet):
   op = "chown"
 
+
 ChownFormSet = formset_factory(ChownForm, formset=BaseChownFormSet, extra=0)
+
 
 class ChmodForm(forms.Form):
   op = "chmod"
@@ -252,7 +266,9 @@ class ChmodForm(forms.Form):
     if hasattr(self, "cleaned_data"):
       self.cleaned_data["mode"] = rwx.compress_mode([self.cleaned_data[name] for name in self.names])
 
+
 class BaseChmodFormSet(FormSet):
   op = "chmod"
+
 
 ChmodFormSet = formset_factory(ChmodForm, formset=BaseChmodFormSet, extra=0)

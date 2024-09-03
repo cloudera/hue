@@ -15,18 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from django.urls import re_path
 
 LOG = logging.getLogger()
 
 try:
   from djangosaml2 import views as djangosaml2_views
+
   from libsaml import views as libsaml_views
 except ImportError:
   LOG.warning('djangosaml2 module not found')

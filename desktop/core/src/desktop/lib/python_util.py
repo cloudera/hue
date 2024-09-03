@@ -15,24 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-from six import string_types
-
-import datetime
-import logging
+import sys
 import select
 import socket
-import sys
+import logging
+import datetime
+from builtins import object
+from codecs import BOM_UTF8, BOM_UTF16_BE, BOM_UTF16_LE, BOM_UTF32_BE, BOM_UTF32_LE
+
+from django.utils.translation import gettext as _
+from six import string_types
 
 from desktop import conf
 from desktop.lib.i18n import smart_str
-
-from codecs import BOM_UTF8, BOM_UTF16_BE, BOM_UTF16_LE, BOM_UTF32_BE, BOM_UTF32_LE
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 BOMS = (
     (BOM_UTF8, "UTF-8"),
@@ -238,6 +233,7 @@ def isISO8859_1(data):
   else:
     return True
 
+
 def isCP1252(data):
   try:
     data.decode('cp1252')
@@ -245,6 +241,7 @@ def isCP1252(data):
     return False
   else:
     return True
+
 
 def isUTF8Strict(data):
   try:
@@ -289,6 +286,7 @@ def check_encoding(data):
       return 'iso-8859-1'
     else:
       return 'cp1252'
+
 
 def current_ms_from_utc():
   return (datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(0)).total_seconds() * 1000

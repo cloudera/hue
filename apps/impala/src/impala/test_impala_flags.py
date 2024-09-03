@@ -15,15 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
-import sys
+import logging
 import tempfile
 
 from impala import conf, impala_flags
-
-
-open_file = open
 
 LOG = logging.getLogger()
 
@@ -47,7 +43,7 @@ def test_impala_flags():
       -max_result_cache_size=%d
       -authorized_proxy_user_config=hue=*
     """ % expected_rows
-    open_file(os.path.join(test_impala_conf_dir, 'impalad_flags'), 'w').write(flags)
+    open(os.path.join(test_impala_conf_dir, 'impalad_flags'), 'w').write(flags)
 
     resets.append(conf.IMPALA_CONF_DIR.set_for_testing(test_impala_conf_dir))
     impala_flags.reset()

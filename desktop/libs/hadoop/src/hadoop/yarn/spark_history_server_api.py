@@ -15,30 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import json
 import logging
 import posixpath
-import sys
 import threading
 import urllib.parse
+from urllib.parse import urlsplit as lib_urlsplit
+
+from django.utils.translation import gettext as _
+from lxml import html
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 from hadoop import cluster
 from hadoop.yarn.clients import get_log_client
-
-from lxml import html
-
-if sys.version_info[0] > 2:
-  from urllib.parse import urlsplit as lib_urlsplit
-  from django.utils.translation import gettext as _
-else:
-  from urlparse import urlsplit as lib_urlsplit
-  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger()
 
@@ -60,7 +50,11 @@ def get_history_server_api():
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
         if yarn_cluster is None:
           raise PopupException(_('No Spark History Server is available.'))
-        API_CACHE = SparkHistoryServerApi(yarn_cluster.SPARK_HISTORY_SERVER_URL.get(), yarn_cluster.SPARK_HISTORY_SERVER_SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        API_CACHE = SparkHistoryServerApi(
+          yarn_cluster.SPARK_HISTORY_SERVER_URL.get(),
+          yarn_cluster.SPARK_HISTORY_SERVER_SECURITY_ENABLED.get(),
+          yarn_cluster.SSL_CERT_CA_VERIFY.get(),
+        )
     finally:
       API_CACHE_LOCK.release()
 
@@ -120,13 +114,25 @@ class SparkHistoryServerApi(object):
     return self._root.get('applications/%(app_id)s/stages/%(stage_id)s' % {'app_id': app_id, 'stage_id': stage_id}, headers=self.headers)
 
   def stage_attempt(self, app_id, stage_id, stage_attempt_id):
-    return self._root.get('applications/%(app_id)s/stages/%(stage_id)s/%(stage_attempt_id)s' % {'app_id': app_id, 'stage_id': stage_id, 'stage_attempt_id': stage_attempt_id}, headers=self.headers)
+    return self._root.get(
+      'applications/%(app_id)s/stages/%(stage_id)s/%(stage_attempt_id)s'
+      % {'app_id': app_id, 'stage_id': stage_id, 'stage_attempt_id': stage_attempt_id},
+      headers=self.headers,
+    )
 
   def task_summary(self, app_id, stage_id, stage_attempt_id):
-    return self._root.get('applications/%(app_id)s/stages/%(stage_id)s/%(stage_attempt_id)s/taskSummary' % {'app_id': app_id, 'stage_id': stage_id, 'stage_attempt_id': stage_attempt_id}, headers=self.headers)
+    return self._root.get(
+      'applications/%(app_id)s/stages/%(stage_id)s/%(stage_attempt_id)s/taskSummary'
+      % {'app_id': app_id, 'stage_id': stage_id, 'stage_attempt_id': stage_attempt_id},
+      headers=self.headers,
+    )
 
   def task_list(self, app_id, stage_id, stage_attempt_id):
-    return self._root.get('applications/%(app_id)s/stages/%(stage_id)s/%(stage_attempt_id)s/taskList' % {'app_id': app_id, 'stage_id': stage_id, 'stage_attempt_id': stage_attempt_id}, headers=self.headers)
+    return self._root.get(
+      'applications/%(app_id)s/stages/%(stage_id)s/%(stage_attempt_id)s/taskList'
+      % {'app_id': app_id, 'stage_id': stage_id, 'stage_attempt_id': stage_attempt_id},
+      headers=self.headers,
+    )
 
   def storages(self, app_id):
     return self._root.get('applications/%(app_id)s/storage/rdd' % {'app_id': app_id}, headers=self.headers)
@@ -138,7 +144,9 @@ class SparkHistoryServerApi(object):
     return self._root.get('applications/%(app_id)s/logs' % {'app_id': app_id}, headers=self.headers)
 
   def download_attempt_logs(self, app_id, attempt_id):
-    return self._root.get('applications/%(app_id)s/%(attempt_id)s/logs' % {'app_id': app_id, 'attempt_id': attempt_id}, headers=self.headers)
+    return self._root.get(
+      'applications/%(app_id)s/%(attempt_id)s/logs' % {'app_id': app_id, 'attempt_id': attempt_id}, headers=self.headers
+    )
 
   def download_executors_logs(self, request, job, name, offset):
     log_links = self.get_executors_loglinks(job)

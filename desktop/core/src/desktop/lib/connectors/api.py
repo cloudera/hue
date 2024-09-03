@@ -15,25 +15,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
-import sys
 
-from useradmin.models import update_app_permissions
-from notebook.conf import config_validator, _connector_to_interpreter
+from django.utils.translation import gettext as _
 
 from desktop.auth.decorators import admin_required
 from desktop.decorators import api_error_handler
+from desktop.lib.connectors.models import (
+  Connector,
+  _augment_connector_properties,
+  _create_connector_examples,
+  _get_installed_connectors,
+  get_connectors_types,
+)
+from desktop.lib.connectors.types import get_connector_by_type, get_connector_categories, get_connectors_types
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.connectors.models import _get_installed_connectors, get_connectors_types, Connector, _create_connector_examples, \
-    _augment_connector_properties
-from desktop.lib.connectors.types import get_connectors_types, get_connector_categories, get_connector_by_type
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from notebook.conf import _connector_to_interpreter, config_validator
+from useradmin.models import update_app_permissions
 
 LOG = logging.getLogger()
 

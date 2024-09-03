@@ -16,23 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
-import pytest
 import sys
+import json
+import logging
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.models import Document2
-from useradmin.models import User
-
 from notebook.conf import EXAMPLES
-from notebook.models import install_custom_examples, Analytics
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
+from notebook.models import Analytics, install_custom_examples
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
@@ -61,7 +56,6 @@ class TestInstallCustomExamples():
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=True, is_admin=True)
     self.user = User.objects.get(username="test")
-
 
   def test_install_only_hive_queries(self):
     finish = [
@@ -99,7 +93,6 @@ class TestInstallCustomExamples():
     finally:
       for f in finish:
         f()
-
 
   def test_install_auto_load_disabled(self):
     f = EXAMPLES.AUTO_LOAD.set_for_testing(False)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,26 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
+from unittest.mock import Mock, patch
+
 import pytest
-import sys
+from django.core.exceptions import FieldError
 from django.test import TestCase
 
-from django.core.exceptions import FieldError
-
-from desktop.auth.backend import rewrite_user, create_user
+from desktop.auth.backend import create_user, rewrite_user
 from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.models import Document2
-
-from useradmin.models import User, Group, Organization, HuePermission
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
-
+from useradmin.models import Group, HuePermission, Organization, User
 
 LOG = logging.getLogger()
 

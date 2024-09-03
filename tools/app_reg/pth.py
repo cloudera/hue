@@ -19,20 +19,11 @@
 Tools to manipulate the .pth file in the virtualenv.
 """
 
+import os
 import glob
 import logging
-import os
-import sys
 
 import common
-
-py2or3 = "2"
-if sys.version_info[0] > 2:
-  from builtins import object
-  open_file = open
-  py2or3 = "3"
-else:
-  open_file = file
 
 LOG = logging.getLogger(__name__)
 PTH_FILE = 'hue.pth'
@@ -63,7 +54,7 @@ class PthFile(object):
 
   def _read(self):
     if os.path.exists(self._path):
-      self._entries = set(open_file(self._path).read().split('\n'))
+      self._entries = set(open(self._path).read().split('\n'))
 
   def add(self, app):
     """
@@ -139,11 +130,7 @@ class PthFile(object):
     with open(self._path, 'w') as _file:
       # We want the Hue libraries to come before system libraries in
       # case there is a name collision.
-      if py2or3 == "2":
-        _file.write("import sys; sys.__plen = len(sys.path)\n")
       _file.write('\n'.join(sorted(self._entries)))
-      if py2or3 == "2":
-        _file.write("\nimport sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; sys.path[0:0]=new\n")
     LOG.info('=== Saved %s' % self._path)
 
   def sync(self, apps):

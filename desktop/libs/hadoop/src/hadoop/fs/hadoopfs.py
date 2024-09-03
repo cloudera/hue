@@ -22,47 +22,36 @@ Only some utils and Hdfs are still used.
 
 Interfaces for Hadoop filesystem access via the HADOOP-4707 Thrift APIs.
 """
-from __future__ import division
-from past.builtins import cmp
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import codecs
-import errno
-import logging
-import math
 import os
-import posixpath
-import random
-import subprocess
 import sys
+import math
+import errno
+import codecs
+import random
+import logging
+import posixpath
+import subprocess
+from builtins import object
+from urllib.parse import urlsplit as lib_urlsplit
 
-from django.utils.encoding import smart_str
-
-from desktop.lib import i18n
+from django.utils.encoding import force_str, smart_str
+from django.utils.translation import gettext as _
+from past.builtins import cmp
 
 import hadoop.conf
-from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
+from desktop.lib import i18n
+from hadoop.fs import SEEK_CUR, SEEK_END, SEEK_SET, normpath
 from hadoop.fs.exceptions import PermissionDeniedException
-
-if sys.version_info[0] > 2:
-  from django.utils.encoding import force_str
-  from urllib.parse import urlsplit as lib_urlsplit
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.encoding import force_unicode as force_str
-  from urlparse import urlsplit as lib_urlsplit
-  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger()
 
 DEFAULT_USER = "webui"
 
 # The number of bytes to read if not specified
-DEFAULT_READ_SIZE = 1024*1024 # 1MB
+DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 
 # The buffer size of the pipe to hdfs -put during upload
-WRITE_BUFFER_SIZE = 128*1024 # 128K
+WRITE_BUFFER_SIZE = 128 * 1024  # 128K
 
 # Class that we translate into PermissionDeniedException
 HADOOP_ACCESSCONTROLEXCEPTION = "org.apache.hadoop.security.AccessControlException"
@@ -78,9 +67,11 @@ HDFS_ENCODING = 'utf-8'
 textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7f})
 is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
 
+
 def encode_fs_path(path):
   """encode_fs_path(path) -> byte string in utf8"""
   return smart_str(path, HDFS_ENCODING, errors='strict')
+
 
 def decode_fs_path(path):
   """decode_fs_path(bytestring) -> unicode path"""
@@ -158,7 +149,7 @@ class Hdfs(object):
     if schema not in ('hdfs', 'viewfs'):
       # Default to standard for non-hdfs
       return lib_urlsplit(url)
-    url = url[i+3:]
+    url = url[i + 3:]
     i = url.find('/')
     if i == -1:
       # Everything is netloc. Assume path is root.
@@ -185,9 +176,9 @@ class Hdfs(object):
     if home_path is None:
       home_path = self.get_home_dir()
 
+    from desktop.conf import DEFAULT_HDFS_SUPERUSER
     from hadoop.hdfs_site import get_umask_mode
     from useradmin.conf import HOME_DIR_PERMISSIONS, USE_HOME_DIR_PERMISSIONS
-    from desktop.conf import DEFAULT_HDFS_SUPERUSER
     mode = int(HOME_DIR_PERMISSIONS.get(), 8) if USE_HOME_DIR_PERMISSIONS.get() else (0o777 & (0o1777 ^ get_umask_mode()))
     if not self.exists(home_path):
       user = self.user
@@ -242,7 +233,7 @@ class Hdfs(object):
           self.append(remote_dst, chunk)
           chunk = src.read(chunk_size)
         LOG.info(_('Copied %s -> %s.') % (local_src, remote_dst))
-      except:
+      except Exception:
         LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
         raise
     finally:
@@ -251,10 +242,8 @@ class Hdfs(object):
   def _copy_non_binary_file(self, local_src, remote_dst, chunk_size):
     for data_format in ("ascii", "utf-8", "latin-1", "iso-8859"):
       src_copied = False
-      if sys.version_info[0] > 2:
-        src = open(local_src, encoding=data_format)
-      else:
-        src = codecs.open(local_src, encoding=data_format)
+      src = open(local_src, encoding=data_format)
+
       try:
         self.create(remote_dst, permission=0o755)
         chunk = src.read(chunk_size)
@@ -262,7 +251,7 @@ class Hdfs(object):
           self.append(remote_dst, chunk)
           chunk = src.read(chunk_size)
         src_copied = True
-      except:
+      except Exception:
         LOG.exception(_('Copying %s -> %s failed with %s encoding format') % (local_src, remote_dst, data_format))
         self.remove(remote_dst)
       finally:
@@ -294,7 +283,6 @@ class Hdfs(object):
         self._copy_non_binary_file(local_src, remote_dst, chunk_size=chunk_size)
     else:
       LOG.info(_('Skipping %s (not a file).') % local_src)
-
 
   @_coerce_exceptions
   def mktemp(self, subdir='', prefix='tmp', basedir=None):
@@ -350,9 +338,6 @@ class Hdfs(object):
     raise NotImplementedError(_("%(function)s has not been implemented.") % {'function': 'listdir_stats'})
 
 
-
-
-
 def require_open(func):
   """
   Decorator that ensures that the file instance isn't closed when the
@@ -363,8 +348,6 @@ def require_open(func):
       raise IOError(errno.EBADF, "I/O operation on closed file")
     return func(self, *args, **kwargs)
   return wrapper
-
-
 
 
 class File(object):
@@ -378,7 +361,7 @@ class File(object):
     self._block_cache = BlockCache()
 
     if buffering or mode != "r":
-      raise Exception("buffering and write support not yet implemented") # NYI
+      raise Exception("buffering and write support not yet implemented")  # NYI
 
     stat = self._stat()
 
@@ -386,7 +369,7 @@ class File(object):
       raise IOError(errno.ENOENT, "No such file or directory: '%s'" % path)
     if stat.isDir:
       raise IOError(errno.EISDIR, "Is a directory: '%s'" % path)
-    #TODO(todd) somehow we need to check permissions here - maybe we need an access() call?
+    # TODO(todd) somehow we need to check permissions here - maybe we need an access() call?
 
   # Minimal context manager implementation.
   # See: http://www.python.org/doc/2.5.2/lib/typecontextmanager.html
@@ -395,7 +378,7 @@ class File(object):
 
   def __exit__(self, exc_type, exc_val, exc_tb):
     self.close()
-    return False # don't supress exceptions.
+    return False  # don't supress exceptions.
 
   @require_open
   def seek(self, offset, whence=0):
@@ -413,7 +396,6 @@ class File(object):
   def tell(self):
     return self.pos
 
-
   def _get_block(self, pos):
     """Return the Block instance that contains the given offset"""
     cached_block = self._block_cache.find_block(pos)
@@ -421,7 +403,7 @@ class File(object):
       return cached_block
 
     # Cache "miss" - fetch ahead 500MB worth of blocks
-    new_blocks = self.fs._get_blocks(self.path, pos, 500*1024*1024)
+    new_blocks = self.fs._get_blocks(self.path, pos, 500 * 1024 * 1024)
     self._block_cache.insert_new_blocks(new_blocks)
     result = self._block_cache.find_block(pos)
     if not result:
@@ -463,7 +445,7 @@ class File(object):
     read_so_far = 0
     while read_so_far < length:
       this_data = self._read_in_block(length - read_so_far)
-      if this_data == "": # eof
+      if this_data == "":  # eof
         break
       read_so_far += len(this_data)
       result.append(this_data)
@@ -515,6 +497,7 @@ class FileUpload(object):
                                    close_fds=True,
                                    env=self.subprocess_env,
                                    bufsize=WRITE_BUFFER_SIZE)
+
   @require_open
   def write(self, data):
     """May raise IOError, particularly EPIPE"""

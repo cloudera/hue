@@ -29,35 +29,25 @@ We maintain this usage of paths as arguments.
 When possible, the interfaces here have fidelity to the
 native python interfaces.
 """
-from __future__ import division
-from future import standard_library
-from functools import reduce
-standard_library.install_aliases()
-from builtins import map
-from builtins import range
-from builtins import object
-import errno
-import grp
-import logging
-import math
 import os
-import posixpath
-import pwd
 import re
-import shutil
+import grp
+import pwd
+import math
 import stat
-import sys
-
-if sys.version_info[0] > 2:
-  from builtins import open as builtins_open
-else:
-  from __builtin__ import open as builtins_open
+import errno
+import shutil
+import logging
+import posixpath
+from builtins import map, object, open as builtins_open, range
+from functools import reduce
 
 SEEK_SET, SEEK_CUR, SEEK_END = os.SEEK_SET, os.SEEK_CUR, os.SEEK_END
 
 
 # The web (and POSIX) always uses forward slash as a separator
-LEADING_DOUBLE_SEPARATORS = re.compile("^" + posixpath.sep*2)
+LEADING_DOUBLE_SEPARATORS = re.compile("^" + posixpath.sep * 2)
+
 
 def normpath(path):
   """
@@ -72,6 +62,7 @@ def normpath(path):
 
 class IllegalPathException(Exception):
   pass
+
 
 class LocalSubFileSystem(object):
   """
@@ -106,7 +97,7 @@ class LocalSubFileSystem(object):
     self.root = root
     self.name = "file://%s" % self.root
     if not os.path.isdir(root):
-      logging.fatal("Root(%s) not found." % root + 
+      logging.fatal("Root(%s) not found." % root +
         "  Perhaps you need to run manage.py create_test_fs")
 
   def _resolve_path(self, path):
@@ -162,6 +153,7 @@ class LocalSubFileSystem(object):
       paths = [0]
     # complicated way of taking the intersection of three lists.
     assert not reduce(set.intersection, list(map(set, [paths, users, groups])))
+
     def wrapped(*args):
       self = args[0]
       newargs = list(args[1:])
@@ -172,7 +164,7 @@ class LocalSubFileSystem(object):
       for i in groups:
         newargs[i] = grp.getgrnam(newargs[i]).gr_gid
 
-      if f == builtins_open and sys.version_info[0] > 2:
+      if f == builtins_open:
         return f(*newargs, encoding='utf-8')
 
       return f(*newargs)
@@ -185,7 +177,7 @@ class LocalSubFileSystem(object):
   mkdir = _wrap(os.mkdir)
   rmdir = _wrap(os.rmdir)
   listdir = _wrap(os.listdir)
-  rename = _wrap(os.rename, paths=[0,1])
+  rename = _wrap(os.rename, paths=[0, 1])
   exists = _wrap(os.path.exists)
   isfile = _wrap(os.path.isfile)
   isdir = _wrap(os.path.isdir)
@@ -235,6 +227,7 @@ class LocalSubFileSystem(object):
   def __repr__(self):
     return "LocalFileSystem(%s)" % repr(self.root)
 
+
 class FakeStatus(object):
   """
   A fake implementation of HDFS health RPCs.
@@ -246,16 +239,16 @@ class FakeStatus(object):
   def get_messages(self):
     """Warnings/lint checks."""
     return [
-      dict(type="WARNING",message="All your base belong to us."),
+      dict(type="WARNING", message="All your base belong to us."),
       dict(type="INFO", message="Hamster Dance!")
     ]
 
   def get_health(self):
     o = dict()
-    GB = 1024*1024*1024
-    o["bytesTotal"] = 5*GB
-    o["bytesUsed"] = math.floor(5*GB / 2)
-    o["bytesRemaining"] = 2*GB
+    GB = 1024 * 1024 * 1024
+    o["bytesTotal"] = 5 * GB
+    o["bytesUsed"] = math.floor(5 * GB / 2)
+    o["bytesRemaining"] = 2 * GB
     o["bytesNonDfs"] = math.floor(GB / 2)
     o["liveDataNodes"] = 13
     o["deadDataNodes"] = 2
@@ -269,8 +262,8 @@ class FakeStatus(object):
       dinfo["name"] = "fake-%d" % i
       dinfo["storageID"] = "fake-id-%d" % i
       dinfo["host"] = "fake-host-%d" % i
-      dinfo["capacity"] =  123456789
-      dinfo["dfsUsed"] =    23456779
+      dinfo["capacity"] = 123456789
+      dinfo["dfsUsed"] = 23456779
       dinfo["remaining"] = 100000010
       dinfo["xceiverCount"] = 3
       dinfo["state"] = "NORMAL_STATE"
@@ -280,8 +273,8 @@ class FakeStatus(object):
       dinfo["name"] = "fake-dead-%d" % i
       dinfo["storageID"] = "fake-dead-id-%d" % i
       dinfo["host"] = "fake-dead-host-%d" % i
-      dinfo["capacity"] =  523456789
-      dinfo["dfsUsed"] =    23456779
+      dinfo["capacity"] = 523456789
+      dinfo["dfsUsed"] = 23456779
       dinfo["remaining"] = 500000010
       dinfo["xceiverCount"] = 3
       dinfo["state"] = "DECOMISSION_INPROGRESS"

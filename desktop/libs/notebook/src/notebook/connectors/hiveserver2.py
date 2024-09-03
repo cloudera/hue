@@ -340,9 +340,9 @@ class HS2Api(Api):
 
     # All good
     server_id, server_guid = handle.get()
-    if sys.version_info[0] > 2:
-      server_id = server_id.decode('utf-8')
-      server_guid = server_guid.decode('utf-8')
+
+    server_id = server_id.decode('utf-8')
+    server_guid = server_guid.decode('utf-8')
 
     response = {
       'secret': server_id,

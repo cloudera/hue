@@ -16,13 +16,10 @@
 # limitations under the License.
 
 import re
-import socket
 import sys
+import socket
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 # Pattern to replace with hostname
 HOSTNAME_PATTERN = '_HOST'
@@ -46,7 +43,8 @@ def get_components(principal):
   """
   if not principal:
     return None
-  return re.split('[\/@]', str(principal))
+  return re.split(r'[\/@]', str(principal))
+
 
 def replace_hostname_pattern(components, host):
   fqdn = host
@@ -54,8 +52,10 @@ def replace_hostname_pattern(components, host):
     fqdn = get_localhost_name()
   return '%s/%s@%s' % (components[0], fqdn.lower(), components[2])
 
+
 def get_localhost_name():
   return socket.getfqdn()
+
 
 def get_fqdn(hostname_or_ip):
   # Get hostname

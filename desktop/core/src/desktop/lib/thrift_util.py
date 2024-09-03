@@ -30,7 +30,8 @@ import threading
 from builtins import map, object, range
 
 from django.conf import settings
-from past.builtins import basestring
+from django.utils.translation import gettext as _
+from past.builtins import basestring, long
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 from thrift.Thrift import TApplicationException, TType
@@ -44,13 +45,6 @@ from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
 from desktop.lib.thrift_sasl import TSaslClientTransport
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from past.builtins import long
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -591,12 +585,8 @@ class SuperClient(object):
 
 def _unpack_guid_secret_in_handle(str_args):
   if 'operationHandle' in str_args or 'sessionHandle' in str_args:
-    if sys.version_info[0] > 2:
-      guid = re.search('guid=(b".*"), secret', str_args) or re.search('guid=(b\'.*\'), secret', str_args)
-      secret = re.search(r'secret=(b".+?")\)', str_args) or re.search('secret=(b\'.+?\')\\)', str_args)
-    else:
-      secret = re.search('secret=(".*"), guid', str_args) or re.search('secret=(\'.*\'), guid', str_args)
-      guid = re.search(r'guid=(".*")\)\)', str_args) or re.search('guid=(\'.*\')\\)\\)', str_args)
+    guid = re.search('guid=(b".*"), secret', str_args) or re.search('guid=(b\'.*\'), secret', str_args)
+    secret = re.search(r'secret=(b".+?")\)', str_args) or re.search('secret=(b\'.+?\')\\)', str_args)
 
     if secret and guid:
       try:
@@ -616,7 +606,7 @@ def unpack_guid(guid):
 
 
 def unpack_guid_base64(guid):
-  decoded_guid = base64.b64decode(guid) if sys.version_info[0] > 2 else base64.decodestring(guid)
+  decoded_guid = base64.b64decode(guid)
   return "%016x:%016x" % struct.unpack(b"QQ", decoded_guid)
 
 

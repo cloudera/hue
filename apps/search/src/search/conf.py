@@ -17,13 +17,9 @@
 
 import sys
 
+from django.utils.translation import gettext_lazy as _
+
 from desktop.lib.conf import Config, coerce_bool
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
-
 
 SOLR_URL = Config(
   key="solr_url",

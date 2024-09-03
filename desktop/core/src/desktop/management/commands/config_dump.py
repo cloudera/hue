@@ -22,17 +22,16 @@ this command is still a few steps away from dumping a ConfigObj-compatible,
 textual representation.
 """
 from __future__ import print_function
-from django.core.management.base import BaseCommand
-import desktop.appmanager
-import textwrap
+
 import sys
+import textwrap
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.core.management.base import BaseCommand
+from django.utils.translation import gettext as _
 
+import desktop.appmanager
 from desktop.lib.conf import BoundContainer, is_anonymous
+
 
 class Command(BaseCommand):
   def __init__(self, *args, **kwargs):
@@ -46,12 +45,11 @@ class Command(BaseCommand):
     self.recurse(desktop.lib.conf.GLOBAL_CONFIG)
 
   def p(self, s):
-    print(" "*self.indent + s)
+    print(" " * self.indent + s)
 
   def fill(self, s):
     print(textwrap.fill(s.strip(),
-      initial_indent=" "*self.indent, subsequent_indent=" "*self.indent))
-    
+      initial_indent=" " * self.indent, subsequent_indent=" " * self.indent))
 
   def recurse(self, config_obj):
     if isinstance(config_obj, BoundContainer):
@@ -63,7 +61,7 @@ class Command(BaseCommand):
       self.p("%s:" % key)
       self.indent += 2
       print(textwrap.fill(config_obj.config.help or _("No help available."),
-        initial_indent=" "*self.indent, subsequent_indent=" "*self.indent))
+        initial_indent=" " * self.indent, subsequent_indent=" " * self.indent))
       print()
       for v in list(config_obj.get().values()):
         self.recurse(v)

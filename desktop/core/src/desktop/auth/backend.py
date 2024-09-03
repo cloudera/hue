@@ -297,10 +297,7 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
   ModelBackend.
   """
   def authenticate(self, *args, **kwargs):
-    if sys.version_info[0] > 2:
-      request = args[0]
-    else:
-      request = None
+    request = args[0]
 
     password = kwargs['password']
 
@@ -350,10 +347,7 @@ class ImpersonationBackend(django.contrib.auth.backends.ModelBackend):
   Does not support a multiple backends setup.
   """
   def authenticate(self, *args, **kwargs):
-    if sys.version_info[0] > 2:
-      request = args[0]
-    else:
-      request = None
+    request = args[0]
 
     username = kwargs['username']
     password = kwargs['password']
@@ -605,10 +599,7 @@ class LdapBackend(object):
     try:
       allowed_group = self.check_ldap_access_groups(server, username)
       if allowed_group:
-        if sys.version_info[0] > 2:
-          user = self._backend.authenticate(request, username=username, password=password)
-        else:
-          user = self._backend.authenticate(username=username, password=password)
+        user = self._backend.authenticate(request, username=username, password=password)
       else:
         LOG.warning("%s not in an allowed login group" % username)
         return None
@@ -820,10 +811,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
 
 class OIDCBackend(OIDCAuthenticationBackend):
   def authenticate(self, *args, **kwargs):
-    if sys.version_info[0] > 2:
-      self.request = args[0]
-    else:
-      self.request = None
+    self.request = args[0]
 
     if not self.request:
       return None

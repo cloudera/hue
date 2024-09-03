@@ -15,63 +15,49 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range
-from past.builtins import basestring
-from builtins import object
-import json
-import copy
-import logging
 import re
 import sys
+import copy
+import json
 import time
+import logging
 import zipfile
-
+from builtins import object, range
 from datetime import datetime, timedelta
-from string import Template
+from io import BytesIO as string_io
 from itertools import chain
+from string import Template
 
-from django.db import models, transaction
-from django.db.models import Q
-from django.urls import reverse
-from django.core.validators import RegexValidator
+import django.utils.timezone as dtz
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.core.validators import RegexValidator
+from django.db import models, transaction
+from django.db.models import Q
 from django.forms.models import inlineformset_factory
-from django.utils.encoding import smart_str
-import django.utils.timezone as dtz
+from django.urls import reverse
+from django.utils.encoding import force_str, smart_str
+from django.utils.translation import gettext as _, gettext_lazy as _t
+from past.builtins import basestring
 
 from desktop.auth.backend import is_admin
-from desktop.log.access import access_warn
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
+from desktop.log.access import access_warn
 from desktop.models import Document
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.hadoopfs import Hdfs
-from liboozie.submittion import Submission
-from liboozie.submittion import create_directories
-from useradmin.models import User
-
+from liboozie.submittion import Submission, create_directories
 from oozie.conf import REMOTE_SAMPLE_DIR
-from oozie.utils import utc_datetime_format
 from oozie.timezones import TIMEZONES
-
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-  from django.utils.encoding import force_str
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from cStringIO import StringIO as string_io
-  from django.utils.encoding import force_unicode as force_str
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
+from oozie.utils import utc_datetime_format
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
 PATH_MAX = 512
-name_validator = RegexValidator(regex='^[a-zA-Z_][\-_a-zA-Z0-9]{1,39}$',
+name_validator = RegexValidator(regex=r'^[a-zA-Z_][\-_a-zA-Z0-9]{1,39}$',
                                 message=_('Enter a valid value: combination of 2 - 40 letters and digits starting by a letter'))
 # To sync in worklow.models.js
 DEFAULT_SLA = [
@@ -127,10 +113,10 @@ class Job(models.Model):
     db_index=True,
     verbose_name=_t('Owner'),
     help_text=_t('Person who can modify the job.')
-  ) # Deprecated
-  name = models.CharField(max_length=255, blank=False, validators=[name_validator], # Deprecated
+  )  # Deprecated
+  name = models.CharField(max_length=255, blank=False, validators=[name_validator],  # Deprecated
       help_text=_t('Name of the job, which must be unique per user.'), verbose_name=_t('Name'))
-  description = models.CharField(max_length=1024, blank=True, verbose_name=_t('Description'), # Deprecated
+  description = models.CharField(max_length=1024, blank=True, verbose_name=_t('Description'),  # Deprecated
                                  help_text=_t('The purpose of the job.'))
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Last modified'))
   schema_version = models.CharField(max_length=128, verbose_name=_t('Schema version'),
@@ -138,11 +124,11 @@ class Job(models.Model):
   deployment_dir = models.CharField(max_length=1024, blank=True, verbose_name=_t('HDFS deployment directory'),
                                     help_text=_t('The path on the HDFS where all the workflows and '
                                                 'dependencies must be uploaded.'))
-  is_shared = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is shared'), # Deprecated
+  is_shared = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is shared'),  # Deprecated
                                   help_text=_t('Enable other users to have access to this job.'))
   parameters = models.TextField(default='[{"name":"oozie.use.system.libpath","value":"true"}]', verbose_name=_t('Oozie parameters'),
                                 help_text=_t('Parameters used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
-  is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'), blank=True, # Deprecated
+  is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'), blank=True,  # Deprecated
                                    help_text=_t('If this job is trashed.'))
   doc = GenericRelation(Document, related_query_name='oozie_doc')
   data = models.TextField(blank=True, default=json.dumps({}))  # e.g. data=json.dumps({'sla': [python data], ...})
@@ -231,7 +217,7 @@ class Job(models.Model):
     for param in self.get_parameters():
       params[param['name'].strip()] = param['value']
 
-    return  [{'name': name, 'value': value} for name, value in params.items()]
+    return [{'name': name, 'value': value} for name, value in params.items()]
 
   def can_read(self, user):
     try:
@@ -271,7 +257,7 @@ class Job(models.Model):
 
   @property
   def sla_enabled(self):
-    return self.sla[0]['value'] # #1 is enabled
+    return self.sla[0]['value']  # #1 is enabled
 
 
 class WorkflowManager(models.Manager):
@@ -331,8 +317,8 @@ class WorkflowManager(models.Manager):
   def destroy(self, workflow, fs):
     Submission(workflow.owner, workflow, fs, None, {}).remove_deployment_dir()
     try:
-      workflow.coordinator_set.update(workflow=None) # In Django 1.3 could do ON DELETE set NULL
-    except:
+      workflow.coordinator_set.update(workflow=None)  # In Django 1.3 could do ON DELETE set NULL
+    except Exception:
       LOG.exception('failed to destroy workflow')
 
     workflow.save()
@@ -371,7 +357,7 @@ class Workflow(Job):
     return json.loads(self.job_properties)
 
   def clone(self, fs, new_owner=None):
-    source_deployment_dir = self.deployment_dir # Needed
+    source_deployment_dir = self.deployment_dir  # Needed
     nodes = self.node_set.all()
     links = Link.objects.filter(parent__workflow=self)
 
@@ -458,7 +444,7 @@ class Workflow(Job):
 
     graph_edges = set([edge for node in self.node_set.all() for edge in node.get_children_links()])
 
-    return len(graph_edges - removed_edges) > 0 # Graph does not have unseen edges
+    return len(graph_edges - removed_edges) > 0  # Graph does not have unseen edges
 
   def find_parameters(self):
     params = set()
@@ -482,7 +468,7 @@ class Workflow(Job):
     """Return a flatten node list ordered by the hierarchy of the nodes in the workflow"""
     def flatten(nodes):
       flat = []
-      if type(nodes) == list:
+      if type(nodes) is list:
         for node in nodes:
           flat.extend(flatten(node))
       else:
@@ -512,7 +498,7 @@ class Workflow(Job):
       return reverse('oozie:edit_workflow', kwargs={'workflow': self.id}) + '#editWorkflow'
 
   def get_hierarchy(self):
-    node = Start.objects.get(workflow=self) # Uncached version of start.
+    node = Start.objects.get(workflow=self)  # Uncached version of start.
     kill = Kill.objects.get(workflow=node.workflow)
     # Special case: manage error email actions separately
     try:
@@ -531,7 +517,7 @@ class Workflow(Job):
     parents = node.get_parents()
 
     if isinstance(node, End):
-      return [] # Not returning the end node
+      return []  # Not returning the end node
     elif isinstance(node, Decision):
       children = node.get_children('start')
       return [[node] + [[self.get_hierarchy_rec(node=child) for child in children],
@@ -567,7 +553,7 @@ class Workflow(Job):
 
   @classmethod
   def gen_status_graph_from_xml(cls, user, oozie_workflow):
-    from oozie.importlib.workflows import import_workflow # Circular dependency
+    from oozie.importlib.workflows import import_workflow  # Circular dependency
 
     try:
       with transaction.atomic():
@@ -588,7 +574,7 @@ class Workflow(Job):
     if mapping is None:
       mapping = {}
     tmpl = 'editor/gen/workflow.xml.mako'
-    xml = re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self, 'mapping': mapping}))
+    xml = re.sub(re.compile('\\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'workflow': self, 'mapping': mapping}))
     return force_str(xml)
 
   def compress(self, mapping=None, fp=string_io()):
@@ -632,7 +618,7 @@ class Workflow(Job):
   @property
   def credentials(self):
     sub_lists = [node.credentials for node in self.node_list if hasattr(node, 'credentials')]
-    return set([item['name'] for l in sub_lists for item in l if item['value']])
+    return set([item['name'] for sub in sub_lists for item in sub if item['value']])
 
 
 class Link(models.Model):
@@ -835,7 +821,7 @@ class Node(models.Model):
 
   @property
   def sla_enabled(self):
-    return self.sla[0]['value'] # #1 is enabled
+    return self.sla[0]['value']  # #1 is enabled
 
   @property
   def credentials(self):
@@ -1033,7 +1019,7 @@ class Hive(Action):
   params = models.TextField(
     default="[]",
     verbose_name=_t('Parameters'),
-    help_text=_t('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': node_type.title()}
+    help_text=_t('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}') % {'type': node_type.title()}
   )
   files = models.TextField(default="[]", verbose_name=_t('Files'),
       help_text=_t('List of names or paths of files to be added to the distributed cache and the task running directory.'))
@@ -1126,7 +1112,7 @@ class Ssh(Action):
   command = models.CharField(max_length=256, verbose_name=_t('%(type)s command') % {'type': node_type.title()},
                              help_text=_t('The command that will be executed.'))
   params = models.TextField(default="[]", verbose_name=_t('Arguments'),
-                            help_text=_t('The arguments of the %(type)s command.')  % {'type': node_type.title()})
+                            help_text=_t('The arguments of the %(type)s command.') % {'type': node_type.title()})
   capture_output = models.BooleanField(
     default=False,
     verbose_name=_t('Capture output'),
@@ -1206,7 +1192,6 @@ class DistCp(Action):
                                           'Properties specified in the Job Properties element override properties specified in the '
                                           'files specified in the Job XML element.'))
 
-
   def get_properties(self):
     return json.loads(self.job_properties)
 
@@ -1238,7 +1223,6 @@ class Fs(Action):
   )
   touchzs = models.TextField(default="[]", verbose_name=_t('Create or touch a file'), blank=True,
                             help_text=_t('Creates a zero length file in the specified path if none exists or touch it.'))
-
 
   def get_deletes(self):
     return json.loads(self.deletes)
@@ -1467,9 +1451,9 @@ DATASET_FREQUENCY = ['MINUTE', 'HOUR', 'DAY', 'MONTH', 'YEAR']
 class Coordinator(Job):
   frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
                                               help_text=_t('The number of units of the rate at which '
-                                                           'data is periodically created.')) # unused
+                                                           'data is periodically created.'))  # unused
   frequency_unit = models.CharField(max_length=20, choices=FREQUENCY_UNITS, default='days', verbose_name=_t('Frequency unit'),
-                                    help_text=_t('The unit of the rate at which data is periodically created.')) # unused
+                                    help_text=_t('The unit of the rate at which data is periodically created.'))  # unused
   timezone = models.CharField(
     max_length=32,
     choices=TIMEZONES,
@@ -1532,7 +1516,7 @@ class Coordinator(Job):
     if mapping is None:
       mapping = {}
     tmpl = "editor/gen/coordinator.xml.mako"
-    return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n',
+    return re.sub(re.compile('\\s*\n+', re.MULTILINE), '\n',
       django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
 
   def clone(self, new_owner=None):
@@ -1601,7 +1585,7 @@ class Coordinator(Job):
     index = [prop['name'] for prop in props]
 
     for prop in self.coordinatorworkflow.get_parameters():
-      if not prop['name'] in index:
+      if prop['name'] not in index:
         props.append(prop)
         index.append(prop['name'])
 
@@ -1725,6 +1709,7 @@ class Coordinator(Job):
   class Meta(object):
     if sys.version_info[0] < 3:
       manager_inheritance_from_future = True
+
 
 class DatasetManager(models.Manager):
   def can_read_or_exception(self, request, dataset_id):
@@ -1897,7 +1882,7 @@ class Bundle(Job):
     tmpl = "editor/gen/bundle.xml.mako"
 
     return force_str(
-              re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
+              re.sub(re.compile('\\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
                 'bundle': self,
                 'mapping': mapping
            })))
@@ -1991,6 +1976,7 @@ class Bundle(Job):
   class Meta(object):
     if sys.version_info[0] < 3:
       manager_inheritance_from_future = True
+
 
 class HistoryManager(models.Manager):
   def create_from_submission(self, submission):
@@ -2098,6 +2084,7 @@ def find_parameters(instance, fields=None):
           params.append(name)
 
   return params
+
 
 def find_json_parameters(fields):
   # To make smarter

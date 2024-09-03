@@ -15,15 +15,11 @@
 # limitations under the License.import logging
 
 import sys
-
 from builtins import object
 
-from indexer.argument import TextArgument, CheckboxArgument, MappingArgument
+from django.utils.translation import gettext as _
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from indexer.argument import CheckboxArgument, MappingArgument, TextArgument
 
 
 class Operator(object):
@@ -57,6 +53,7 @@ class Operator(object):
       "settings": dict([arg.get_default_arg_pair() for arg in self._args]),
       "fields": self._get_default_output_fields()
     }
+
 
 OPERATORS = [
   Operator(
@@ -127,8 +124,10 @@ OPERATORS = [
   ),
 ]
 
+
 def get_operator(operation_name):
   return [operation for operation in OPERATORS if operation.name == operation_name][0]
+
 
 def get_checked_args(operation):
   operation_args = get_operator(operation["type"]).args

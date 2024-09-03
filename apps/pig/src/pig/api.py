@@ -15,27 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import json
-import logging
 import sys
+import json
 import time
+import logging
+from builtins import object
 
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.lib.i18n import smart_str
 from desktop.lib.view_util import format_duration_in_millis
 from liboozie.oozie_api import get_oozie
-from oozie.models import Workflow, Pig
+from oozie.models import Pig, Workflow
 from oozie.views.api import get_log as get_workflow_logs
 from oozie.views.editor import _submit_workflow
-from desktop.auth.backend import is_admin
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -50,20 +45,18 @@ class OozieApi(object):
   """
 
   WORKFLOW_NAME = 'pig-app-hue-script'
-  LOG_START_PATTERN = '(Pig script \[(?:[\w.-]+)\] content:.+)'
+  LOG_START_PATTERN = r'(Pig script \[(?:[\w.-]+)\] content:.+)'
   LOG_END_PATTERN = '(&lt;&lt;&lt; Invocation of Pig command completed &lt;&lt;&lt;|' \
                     '&lt;&lt;&lt; Invocation of Main class completed &lt;&lt;&lt;|' \
                     '<<< Invocation of Pig command completed <<<|' \
                     '<<< Invocation of Main class completed <<<)'
   MAX_DASHBOARD_JOBS = 100
 
-
   def __init__(self, fs, jt, user):
     self.oozie_api = get_oozie(user)
     self.fs = fs
     self.jt = jt
     self.user = user
-
 
   def submit(self, pig_script, params):
     workflow = None
@@ -78,7 +71,6 @@ class OozieApi(object):
 
     return oozie_wf
 
-
   def _create_workflow(self, pig_script, params):
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.schema_version = 'uri:oozie:workflow:0.5'
@@ -90,7 +82,7 @@ class OozieApi(object):
     Workflow.objects.initialize(workflow, self.fs)
 
     script_path = workflow.deployment_dir + '/script.pig'
-    if self.fs: # For testing, difficult to mock
+    if self.fs:  # For testing, difficult to mock
       self.fs.do_as_user(self.user.username, self.fs.create, script_path, data=smart_str(pig_script.dict['script']))
 
     files = []
@@ -141,7 +133,7 @@ class OozieApi(object):
     if pig_script.use_hbase and self.oozie_api.security_enabled:
       credentials.append({'name': 'hbase', 'value': True})
     if credentials:
-      action.credentials = credentials # Note, action.credentials is a @setter here
+      action.credentials = credentials  # Note, action.credentials is a @setter here
       action.save()
 
     action.add_node(workflow.end)
@@ -151,7 +143,6 @@ class OozieApi(object):
     start_link.save()
 
     return workflow
-
 
   def _build_parameters(self, params):
     pig_params = []
@@ -168,13 +159,11 @@ class OozieApi(object):
 
     return pig_params
 
-
   def stop(self, job_id):
     return self.oozie_api.job_control(job_id, 'kill')
 
-
   def get_jobs(self):
-    kwargs = {'cnt': OozieApi.MAX_DASHBOARD_JOBS,}
+    kwargs = {'cnt': OozieApi.MAX_DASHBOARD_JOBS, }
     kwargs['filters'] = [
         ('user', self.user.username),
         ('name', OozieApi.WORKFLOW_NAME)
@@ -182,11 +171,9 @@ class OozieApi(object):
 
     return self.oozie_api.get_workflows(**kwargs).jobs
 
-
   def get_log(self, request, oozie_workflow, make_links=True):
     return get_workflow_logs(request, oozie_workflow, make_links=make_links, log_start_pattern=self.LOG_START_PATTERN,
                              log_end_pattern=self.LOG_END_PATTERN)
-
 
   def massaged_jobs_for_json(self, request, oozie_jobs, hue_jobs):
     jobs = []
@@ -195,13 +182,13 @@ class OozieApi(object):
     for job in oozie_jobs:
       if job.is_running():
         job = self.oozie_api.get_job(job.id)
-        get_copy = request.GET.copy() # Hacky, would need to refactor JobBrowser get logs
+        get_copy = request.GET.copy()  # Hacky, would need to refactor JobBrowser get logs
         get_copy['format'] = 'python'
         request.GET = get_copy
         try:
           logs, workflow_action, is_really_done = self.get_log(request, job)
           progress = workflow_action[0]['progress']
-        except:
+        except Exception:
           LOG.exception('failed to get progress')
           progress = 0
       else:
@@ -217,7 +204,7 @@ class OozieApi(object):
         'endTime': job.endTime and format_time(job.endTime) or None,
         'status': job.status,
         'isRunning': job.is_running(),
-        'duration': job.endTime and job.startTime and format_duration_in_millis(( time.mktime(job.endTime) - time.mktime(job.startTime) ) * 1000) or None,
+        'duration': job.endTime and job.startTime and format_duration_in_millis((time.mktime(job.endTime) - time.mktime(job.startTime)) * 1000) or None,  # noqa: E501
         'appName': hue_pig and hue_pig.dict['name'] or _('Unsaved script'),
         'scriptId': hue_pig and hue_pig.id or -1,
         'scriptContent': hue_pig and hue_pig.dict['script'] or '',
@@ -226,9 +213,9 @@ class OozieApi(object):
         'user': job.user,
         'absoluteUrl': job.get_absolute_url(),
         'canEdit': has_job_edition_permission(job, self.user),
-        'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'kill'}),
+        'killUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id': job.id, 'action': 'kill'}),
         'watchUrl': reverse('pig:watch', kwargs={'job_id': job.id}) + '?format=python',
-        'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),
+        'created': hasattr(job, 'createdTime') and job.createdTime and job.createdTime and ((job.type == 'Bundle' and job.createdTime) or format_time(job.createdTime)),  # noqa: E501
         'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
         'run': hasattr(job, 'run') and job.run or 0,
         'frequency': hasattr(job, 'frequency') and job.frequency or None,
@@ -248,4 +235,3 @@ def format_time(st_time):
 
 def has_job_edition_permission(oozie_job, user):
   return is_admin(user) or oozie_job.user == user.username
-

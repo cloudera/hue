@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 import os
-import sys
 import json
 import uuid
 import logging
@@ -26,6 +23,7 @@ import calendar
 from builtins import next, object
 from collections import OrderedDict
 from itertools import chain
+from urllib.parse import quote as urllib_quote
 
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -35,6 +33,7 @@ from django.db import connection, models, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.urls import NoReverseMatch, reverse
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 from dashboard.conf import HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED, get_engines
 from desktop import appmanager
@@ -72,16 +71,6 @@ from metadata.conf import get_optimizer_mode
 from notebook.conf import DEFAULT_INTERPRETER, DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
 from useradmin.models import Group, User, get_organization
 from useradmin.organization import _fitered_queryset
-
-if sys.version_info[0] > 2:
-  from urllib.parse import quote as urllib_quote
-
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from urllib import quote as urllib_quote
-
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
 
 LOG = logging.getLogger()
 

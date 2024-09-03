@@ -15,22 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import pytest
 import sys
+import json
 import unittest
+from unittest.mock import Mock, patch
 
+import pytest
 from django.urls import reverse
 
 from desktop import conf
 from desktop.lib.django_test_util import make_logged_in_client
-
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
 @pytest.mark.django_db
 class TestApi(object):
@@ -83,7 +79,7 @@ class TestApi(object):
       assert 200 == response.status_code
       chat_postMessage.assert_called_with(channel='channel-1', text='@api_user: message with link', blocks=None, thread_ts=None)
       assert data.get('ok')
-  
+
   def test_generate_slack_install_link(self):
     response = self.client.get(reverse('api:botserver.api.slack_install_link') + '/?hostname=' + self.hostname)
     data = json.loads(response.content)

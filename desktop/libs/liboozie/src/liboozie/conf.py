@@ -15,19 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import oct, object
-import logging
 import sys
+import logging
+from builtins import object, oct
+
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 from desktop import appmanager
 from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool, validate_path
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
 
 LOG = logging.getLogger()
 
@@ -55,7 +51,7 @@ REMOTE_DEPLOYMENT_DIR = Config(
   )
 )
 
-SSL_CERT_CA_VERIFY=Config(
+SSL_CERT_CA_VERIFY = Config(
   key="ssl_cert_ca_verify",
   help="In secure mode (HTTPS), if SSL certificates from Oozie Rest APIs have to be verified against certificate authority",
   dynamic_default=default_ssl_validate,
@@ -79,9 +75,9 @@ def get_oozie_status(user):
   status = 'down'
 
   try:
-    if not 'test' in sys.argv:  # Avoid tests hanging
+    if 'test' not in sys.argv:  # Avoid tests hanging
       status = str(get_oozie(user).get_oozie_status())
-  except:
+  except Exception:
     LOG.exception('failed to get oozie status')
 
   return status
@@ -131,9 +127,16 @@ def config_validator(user):
     api = get_oozie(user, api_version="v2")
 
     configuration = api.get_configuration()
-    if 'org.apache.oozie.service.MetricsInstrumentationService' in [c.strip() for c in configuration.get('oozie.services.ext', '').split(',')]:
+    if 'org.apache.oozie.service.MetricsInstrumentationService' in [
+      c.strip() for c in configuration.get('oozie.services.ext', '').split(',')
+    ]:
       metrics = api.get_metrics()
-      sharelib_url = 'gauges' in metrics and 'libs.sharelib.system.libpath' in metrics['gauges'] and [metrics['gauges']['libs.sharelib.system.libpath']['value']] or []
+      sharelib_url = (
+        'gauges' in metrics
+        and 'libs.sharelib.system.libpath' in metrics['gauges']
+        and [metrics['gauges']['libs.sharelib.system.libpath']['value']]
+        or []
+      )
     else:
       intrumentation = api.get_instrumentation()
       sharelib_url = [

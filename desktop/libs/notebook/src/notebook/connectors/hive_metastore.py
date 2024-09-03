@@ -15,23 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
 
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode, smart_str
 from desktop.lib.rest.http_client import RestException
-
-from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from notebook.connectors.base import Api, OperationNotSupported, OperationTimeout, QueryError, QueryExpired
 
 LOG = logging.getLogger()
 
@@ -39,7 +33,7 @@ LOG = logging.getLogger()
 try:
   from beeswax.api import _autocomplete
   from beeswax.server import dbms
-  from beeswax.server.dbms import get_query_server_config, QueryServerException
+  from beeswax.server.dbms import QueryServerException, get_query_server_config
 except ImportError as e:
   LOG.warning('Hive and HiveMetastoreServer interfaces are not enabled: %s' % e)
   hive_settings = None
@@ -72,11 +66,9 @@ class HiveMetastoreApi(Api):
 
     return _autocomplete(db, database, table, column, nested, query=None, cluster=self.cluster)
 
-
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     return []
-
 
   def _get_db(self, snippet, is_async=False, cluster=None):
     return dbms.get(self.user, query_server=get_query_server_config(name='hms', cluster=cluster))

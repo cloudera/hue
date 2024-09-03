@@ -15,24 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import re
 import sys
 import time
+import logging
 
-from django.urls import reverse
 from django.http import QueryDict
+from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
-
 from notebook.connectors.base import Api, QueryError
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -64,7 +58,6 @@ class OozieApi(Api):
     self.fs = self.request.fs
     self.jt = self.request.jt
 
-
   def execute(self, notebook, snippet):
     # Get document from notebook
     if not notebook.get('uuid', ''):
@@ -90,7 +83,6 @@ class OozieApi(Api):
       'has_result_set': True,
     }
 
-
   def check_status(self, notebook, snippet):
     response = {'status': 'running'}
 
@@ -115,7 +107,6 @@ class OozieApi(Api):
 
     return response
 
-
   def fetch_result(self, notebook, snippet, rows, start_over):
     log_output = self.get_log(notebook, snippet)
     results = self._get_results(log_output, snippet['type'])
@@ -127,7 +118,6 @@ class OozieApi(Api):
         'has_more': False,
     }
 
-
   def cancel(self, notebook, snippet):
     job_id = snippet['result']['handle']['id']
 
@@ -138,7 +128,6 @@ class OozieApi(Api):
 
     return {'status': 0}
 
-
   def get_log(self, notebook, snippet, startFrom=0, size=None):
     job_id = snippet['result']['handle']['id']
 
@@ -147,13 +136,11 @@ class OozieApi(Api):
 
     return logs if logs else oozie_job.log
 
-
   def progress(self, notebook, snippet, logs=None):
     job_id = snippet['result']['handle']['id']
 
     oozie_job = check_job_access_permission(self.request, job_id)
     return oozie_job.get_progress()
-
 
   def get_jobs(self, notebook, snippet, logs):
     jobs = []
@@ -171,14 +158,11 @@ class OozieApi(Api):
         })
     return jobs
 
-
   def close_statement(self, notebook, snippet):
     pass
 
-
   def close_session(self, session):
     pass
-
 
   def _get_log_output(self, oozie_workflow):
     log_output = ''
@@ -203,7 +187,6 @@ class OozieApi(Api):
 
       attempts += 1
     return log_output
-
 
   def _get_results(self, log_output, action_type):
     results = ''

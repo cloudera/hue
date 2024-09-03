@@ -17,13 +17,9 @@
 
 import sys
 
+from django.urls import re_path
+
 from desktop.lib.scheduler import api
-
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
-
 
 urlpatterns = [
   re_path(r'^api/schedule/new/?$', api.get_schedule, name='scheduler.api.new_schedule'),

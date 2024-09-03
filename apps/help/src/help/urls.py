@@ -17,12 +17,9 @@
 
 import sys
 
-from help import views as help_views
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from help import views as help_views
 
 urlpatterns = [
   re_path(r'^$', help_views.view, {"app": "desktop", "path": "/index.html"}),

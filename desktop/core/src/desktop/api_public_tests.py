@@ -16,24 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import pytest
 import sys
+import json
+from unittest.mock import MagicMock, Mock, patch
 
+import pytest
 from django.http import HttpResponse
 from django.urls import reverse
 
-
-
-from useradmin.models import User
-from desktop.conf import CUSTOM
 from desktop.api_public import get_django_request
+from desktop.conf import CUSTOM
 from desktop.lib.django_test_util import Client, make_logged_in_client
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from useradmin.models import User
 
 
 @pytest.mark.django_db

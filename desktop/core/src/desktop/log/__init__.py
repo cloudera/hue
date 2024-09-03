@@ -15,30 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-import logging
-import logging.config
 import os
-import os.path
 import re
 import sys
-
+import logging
+import os.path
+import logging.config
+from io import StringIO as string_io
 from logging import FileHandler
 from logging.handlers import RotatingFileHandler, SocketHandler
 
 from desktop.lib.paths import get_desktop_root
 from desktop.log import formatter
 from desktop.log.formatter import MessageOnlyFormatter
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  open_file = open
-else:
-  from cStringIO import StringIO as string_io
-  open_file = file
 
 DEFAULT_LOG_DIR = 'logs'
 LOG_FORMAT = '[%(asctime)s] %(module)-12s %(levelname)-8s %(message)s'
@@ -68,7 +57,7 @@ def _read_log_conf(proc_name, log_dir):
     return None
 
   try:
-    raw = open_file(log_conf).read()
+    raw = open(log_conf).read()
     sio = string_io(CONF_RE.sub(_repl, raw))
     return sio
   except IOError as ex:
@@ -92,7 +81,7 @@ def get_audit_logger():
   from desktop.conf import AUDIT_EVENT_LOG_DIR, AUDIT_LOG_MAX_FILE_SIZE
 
   audit_logger = logging.getLogger('audit')
-  if not [hclass for hclass in audit_logger.handlers if isinstance(hclass, AuditHandler)]: # Don't add handler twice
+  if not [hclass for hclass in audit_logger.handlers if isinstance(hclass, AuditHandler)]:  # Don't add handler twice
     size, unit = int(AUDIT_LOG_MAX_FILE_SIZE.get()[:-2]), AUDIT_LOG_MAX_FILE_SIZE.get()[-2:]
     maxBytes = size * 1024 ** (1 if unit == 'KB' else 2 if unit == 'MB' else 3)
 
@@ -203,14 +192,15 @@ def basic_logging(proc_name, log_dir=None):
   if hasattr(DATABASE_LOGGING, 'get') and not DATABASE_LOGGING.get():
     def disable_database_logging():
       logger = logging.getLogger()
-      logger.manager.loggerDict['django.db.backends'].level = 20 # INFO level
+      logger.manager.loggerDict['django.db.backends'].level = 20  # INFO level
     disable_database_logging()
+
 
 def fancy_logging():
   """Configure logging into a buffer for /logs endpoint."""
   from .log_buffer import FixedBufferHandler
 
-  BUFFER_SIZE = 1500 * 200 # This is the size in characters, not bytes. Targets about 1500 rows.
+  BUFFER_SIZE = 1500 * 200  # This is the size in characters, not bytes. Targets about 1500 rows.
   buffer_handler = FixedBufferHandler(BUFFER_SIZE)
   _formatter = formatter.Formatter(LOG_FORMAT, DATE_FORMAT)
 
@@ -228,7 +218,7 @@ def get_all_debug():
 
 
 def set_all_debug():
-  from desktop.settings import ENV_HUE_PROCESS_NAME # Circular dependency
+  from desktop.settings import ENV_HUE_PROCESS_NAME  # Circular dependency
   global FORCE_DEBUG
 
   FORCE_DEBUG = True
@@ -237,7 +227,7 @@ def set_all_debug():
 
 
 def reset_all_debug():
-  from desktop.settings import ENV_HUE_PROCESS_NAME # Circular dependency
+  from desktop.settings import ENV_HUE_PROCESS_NAME  # Circular dependency
   global FORCE_DEBUG
 
   FORCE_DEBUG = False
