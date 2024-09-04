@@ -17,17 +17,32 @@
 
 import os
 import logging
+import mimetypes
 import posixpath
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
+from django.utils.http import http_date
 from django.utils.translation import gettext as _
+from django.views.static import was_modified_since
 
 from aws.s3.s3fs import get_s3_home_directory
 from azure.abfs.__init__ import get_abfs_home_directory
 from desktop.lib import fsmanager
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.export_csvxls import file_reader
 from desktop.lib.fs.gc.gs import get_gs_home_directory
 from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+from filebrowser.conf import (
+  ARCHIVE_UPLOAD_TEMPDIR,
+  ENABLE_EXTRACT_UPLOADED_ARCHIVE,
+  FILE_DOWNLOAD_CACHE_CONTROL,
+  MAX_SNAPPY_DECOMPRESSION_SIZE,
+  REDIRECT_DOWNLOAD,
+  SHOW_DOWNLOAD_BUTTON,
+  SHOW_UPLOAD_BUTTON,
+)
+from filebrowser.views import _can_inline_display, _normalize_path
+from hadoop.fs.exceptions import WebHdfsException
 from desktop.lib.i18n import smart_str
 from filebrowser.views import _normalize_path
 
@@ -62,8 +77,23 @@ def get_filesystems(request):
   return JsonResponse(response)
 
 
-@error_handler
-def get_filesystems_with_home_dirs(request):  # Using as a public API only for now
+def api_error_handler(view_fn):
+  """
+  Decorator to handle exceptions and return a JSON response with an error message.
+  """
+  def decorator(*args, **kwargs):
+    try:
+      return view_fn(*args, **kwargs)
+    except Exception as e:
+      LOG.exception(f'Error running {view_fn.__name__}: {str(e)}')
+      # TODO: Improve error response with better context
+      return JsonResponse({'error': str(e)}, status=500)
+
+  return decorator
+
+
+@api_error_handler
+def get_filesystems_with_home_dirs(request):
   filesystems = []
   user_home_dir = ''
 
@@ -87,6 +117,73 @@ def get_filesystems_with_home_dirs(request):  # Using as a public API only for n
     )
 
   return JsonResponse(filesystems, safe=False)
+
+
+def download(request):
+  """
+  Downloads a file.
+
+  This is inspired by django.views.static.serve (?disposition={attachment, inline})
+
+  :param request: The current request object
+  :return: A response object with the file contents or an error message
+  """
+  path = request.GET.get('path')
+  path = _normalize_path(path)
+
+  # TODO: Improve config name?
+  if not SHOW_DOWNLOAD_BUTTON.get():
+    return HttpResponse('Download operation is not allowed.', status=403)
+
+  if not request.fs.exists(path):
+    return HttpResponse(f'File does not exist: {path}', status=404)
+
+  if not request.fs.isfile(path):
+    return HttpResponse(f'{path} is not a file.', status=400)
+
+  content_type = mimetypes.guess_type(path)[0] or 'application/octet-stream'
+  stats = request.fs.stats(path)
+  if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), stats['mtime'], stats['size']):
+    return HttpResponseNotModified()
+
+  try:
+    with request.fs.open(path) as fh:
+      # First, verify read permissions on the file.
+      try:
+        request.fs.read(path, offset=0, length=1)
+      except WebHdfsException as e:
+        if e.code == 403:
+          return HttpResponse(f'User {request.user.username} is not authorized to download file at path: {path}', status=403)
+        elif request.fs._get_scheme(path).lower() == 'abfs' and e.code == 416:
+          # Safe to skip ABFS exception of code 416 for zero length objects, file will get downloaded anyway.
+          LOG.debug('Skipping exception from ABFS:' + str(e))
+        else:
+          return HttpResponse(f'Failed to download file at path {path}: {str(e)}', status=500)  # TODO: status code?
+
+      if REDIRECT_DOWNLOAD.get() and hasattr(fh, 'read_url'):
+        response = HttpResponseRedirect(fh.read_url())
+        setattr(response, 'redirect_override', True)
+      else:
+        response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
+
+        response["Last-Modified"] = http_date(stats['mtime'])
+        response["Content-Length"] = stats['size']
+        response['Content-Disposition'] = (
+          request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') if _can_inline_display(path) else 'attachment'
+        )
+
+        if FILE_DOWNLOAD_CACHE_CONTROL.get():
+          response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
+
+      request.audit = {
+        'operation': 'DOWNLOAD',
+        'operationText': 'User %s downloaded file at path "%s"' % (request.user.username, path),
+        'allowed': True,
+      }
+
+      return response
+  except Exception as e:
+    return HttpResponse(f'Failed to download file at path {path}: {str(e)}', status=500)  # TODO: status code?
 
 
 @error_handler

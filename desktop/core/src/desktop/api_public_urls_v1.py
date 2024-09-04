@@ -92,9 +92,7 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^storage/filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
   re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='storage_view'),
-  re_path(r'^storage/download=(?P<path>.*)$', api_public.storage_download, name='storage_download'),
   re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),
   re_path(r'^storage/mkdir$', api_public.storage_mkdir, name='storage_mkdir'),
   re_path(r'^storage/touch$', api_public.storage_touch, name='storage_touch'),
@@ -107,6 +105,11 @@ urlpatterns += [
   re_path(r'^storage/trash/get_trash_path$', api_public.storage_get_trash_path, name='storage_get_trash_path'),
   re_path(r'^storage/trash/restore$', api_public.storage_trash_restore, name='storage_trash_restore'),
   re_path(r'^storage/trash/purge$', api_public.storage_trash_purge, name='storage_trash_purge'),
+]
+
+urlpatterns += [
+  re_path(r'^storage/filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
+  re_path(r'^storage/download/?$', api_public.storage_download, name='storage_download'),
 ]
 
 urlpatterns += [
