@@ -254,7 +254,18 @@ npm-install:
 
 .PHONY: create-static
 create-static:
-	./build/env/bin/python ./build/env/bin/hue collectstatic --noinput
+	@if [ -d "./build/env" ]; then \
+	  echo "Using Python environment from ./build/env"; \
+	  ./build/env/bin/python ./build/env/bin/hue collectstatic --noinput; \
+	elif [ -d "./build/env_38" ]; then \
+	  echo "Using Python environment from ./build/env_38"; \
+	  ./build/env_38/bin/python ./build/env_38/bin/hue collectstatic --noinput; \
+	elif [ -d "./build/env_39" ]; then \
+	  echo "Using Python environment from ./build/env_39"; \
+	  ./build/env_39/bin/python ./build/env_39/bin/hue collectstatic --noinput; \
+	else \
+	  echo "Neither ./build/env nor ./build/env_39 exist."; \
+	fi
 
 # <<<< DEV ONLY
 .PHONY: doc

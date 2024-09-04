@@ -38,7 +38,7 @@ HUE_PTH_DIR = os.environ.get('HUE_PTH_DIR', None)
 HUE_CONF_DIR = os.path.join(INSTALL_ROOT, 'desktop', 'conf')
 
 # Virtual env
-VIRTUAL_ENV = os.path.join(INSTALL_ROOT, 'build', 'env')
+VIRTUAL_ENV = os.environ.get("BLD_DIR_ENV", os.path.join(INSTALL_ROOT, 'build', 'env'))
 
 # The Python executable in virtualenv
 ENV_PYTHON = os.path.join(VIRTUAL_ENV, 'bin', 'python')

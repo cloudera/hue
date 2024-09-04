@@ -116,6 +116,12 @@ elif [[ $DOCKEROS == "ubuntu22" || $DOCKEROS == "sles15" ]]; then
   export PYTHON_VER=python3.10
   export SYS_PYTHON=$PYTHON310_PATH/bin/python3.10
   export PATH=$PYTHON310_PATH/bin:$PATH
+elif [[ $DOCKEROS == "redhat8" ]]; then
+  export PYTHON_H=$PYTHON38_PATH/include/python3.8/Python.h
+  export PYTHON_VER=python3.8
+  export SYS_PYTHON=$PYTHON38_PATH/bin/python3.8
+  export PATH=$PYTHON38_PATH/bin:$PATH
+  export BLD_DIR_ENV="$ROOT/build/env_38"
 fi
 
 HUE_SRC=$(realpath $WORK_DIR/../..)
@@ -125,5 +131,19 @@ cd $HUE_SRC
 big_console_header "Hue Build Start" "$@"
 make apps docs
 bash -x ./tools/relocatable.sh
+
+# Configure environment for Red Hat 8 with Python 3.9
+if [[ $DOCKEROS == "redhat8" ]]; then
+  export PYTHON_H=$PYTHON39_PATH/include/python3.9/Python.h
+  export PYTHON_VER=python3.9
+  export SYS_PYTHON=$PYTHON39_PATH/bin/python3.9
+  export PATH=$PYTHON39_PATH/bin:$PATH
+  export BLD_DIR_ENV="$ROOT/build/env_39"
+  
+  # Build applications again
+  make apps docs
+  bash -x ./tools/relocatable.sh
+fi
+
 make prod
 big_console_header "Hue Build End" "$@"
