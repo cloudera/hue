@@ -240,7 +240,10 @@ def get_query_server_config(name='beeswax', connector=None):
             })
           )
         else:
-          cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
+          cache.set("hiveserver2", json.dumps({
+            "host": HIVE_SERVER_HOST.get(),
+            "port": HIVE_HTTP_THRIFT_PORT.get() if hiveserver2_transport_mode() == 'HTTP' else HIVE_SERVER_PORT.get()
+          }))
       else:
         if HIVE_DISCOVERY_HS2.get():
           # Replace ActiveEndpoint if the current HS2 is down
@@ -268,7 +271,10 @@ def get_query_server_config(name='beeswax', connector=None):
             raise PopupException(_('Currently there are no HiveServer2 running'))
         else:
           # Setting hs2 cache in-case there is no HS2 discovery
-          cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
+          cache.set("hiveserver2", json.dumps({
+            "host": HIVE_SERVER_HOST.get(),
+            "port": HIVE_HTTP_THRIFT_PORT.get() if hiveserver2_transport_mode() == 'HTTP' else HIVE_SERVER_PORT.get()
+          }))
 
       activeEndpoint = json.loads(cache.get("hiveserver2"))
 
@@ -292,7 +298,7 @@ def get_query_server_config(name='beeswax', connector=None):
       query_server = {
           'server_name': 'beeswax' if name != 'hplsql' else 'hplsql',
           'server_host': activeEndpoint["host"],
-          'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else activeEndpoint["port"],
+          'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else int(activeEndpoint["port"]),
           'principal': kerberos_principal,
           'http_url': '%(protocol)s://%(host)s:%(port)s/%(end_point)s' % {
               'protocol': 'https' if hiveserver2_use_ssl() else 'http',
