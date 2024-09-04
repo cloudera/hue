@@ -222,9 +222,9 @@ def storage_view(request, path):
 
 
 @api_view(["GET"])
-def storage_download(request, path):
+def storage_download(request):
   django_request = get_django_request(request)
-  return filebrowser_views.download(django_request, path)
+  return filebrowser_views.download(django_request)
 
 
 @api_view(["POST"])
