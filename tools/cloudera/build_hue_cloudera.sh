@@ -49,7 +49,7 @@ function install_prerequisite() {
   fi
 
   export SQLITE3_PATH=${SQLITE3_PATH:-"$TOOLS_HOME/sqlite/sqlite3"}
-  if [[ $1 == "redhat9" || $1 == "redhat9_ppc" ]]; then
+  if [[ $1 == "redhat9" || $1 == "redhat9_ppc" || $1 == "redhat8" || $1 == "redhat8-arm64" ]]; then
     check_python39_path
   elif [[ $1 == "ubuntu22" || $1 == "sles15" ]]; then
     check_python310_path
@@ -77,6 +77,8 @@ function install_prerequisite() {
     redhat9_install
   elif [[ $1 == "ubuntu22" ]]; then
     ubuntu22_install
+  elif [[ $1 == "redhat8-arm64" ]]; then
+    redhat8_arm64_install
   fi
 
 }
@@ -106,7 +108,7 @@ export LD_LIBRARY_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_P
 export LD_RUN_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH
 export PATH=$HOME/.local/bin:$PYTHON38_PATH/bin:${TOOLS_HOME}/sqlite:/usr/bin:$PATH
 
-if [[ $DOCKEROS == "redhat9" || $DOCKEROS == "redhat9_ppc" ]]; then
+if [[ $DOCKEROS == "redhat9" || $DOCKEROS == "redhat9_ppc" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat8-arm64" ]]; then
   export PYTHON_H=$PYTHON39_PATH/include/python3.9/Python.h
   export PYTHON_VER=python3.9
   export SYS_PYTHON=$PYTHON39_PATH/bin/python3.9

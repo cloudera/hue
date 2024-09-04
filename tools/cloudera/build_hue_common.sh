@@ -296,8 +296,39 @@ function redhat8_install() {
     sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash - && \
       yum install -y nodejs'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
+    # sqlite3 install
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      tar zxvf sqlite-autoconf-3350500.tar.gz && \
+      cd sqlite-autoconf-3350500 && \
+      ./configure --prefix=/usr/local/ && make && make install'
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+  fi
+}
+
+function redhat8_arm64_install() {
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    # pre-req install
+    sudo -- sh -c 'yum install -y \
+      java-11-openjdk \
+      java-11-openjdk-devel \
+      java-11-openjdk-headless \
+      krb5-workstation \
+      ncurses-devel \
+      nmap-ncat \
+      xmlsec1 \
+      xmlsec1-openssl \
+      libss \
+      ncurses-c++-libs'
+    # MySQLdb install
+    sudo -- sh -c 'yum install -y python3-mysqlclient'
+    # NODEJS 20 install
+    sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash - && \
+      yum install -y nodejs'
+    # Pip modules install
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
