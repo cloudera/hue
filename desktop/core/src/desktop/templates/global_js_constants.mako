@@ -102,7 +102,6 @@
     admin_wizard: { url: '/about/admin_wizard', title: '${_('Admin Wizard')}' },
     logs: { url: '/logs', title: '${_('Logs')}' },
     dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
-    threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
     metrics: { url: '/desktop/metrics', title: '${_('Metrics')}' },
     taskserver: { url: '/task_server', title: '${_('Task Server')}' },
     connectors: { url: '/desktop/connectors', title: '${_('Connectors')}' },
