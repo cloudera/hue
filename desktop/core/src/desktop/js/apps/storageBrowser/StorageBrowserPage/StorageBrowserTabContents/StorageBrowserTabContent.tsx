@@ -40,7 +40,7 @@ interface StorageBrowserTabContentProps {
 }
 
 const defaultProps = {
-  testId: 'hue-storage-browser-tabContent'
+  testId: 'hue-storage-browser-tab-content'
 };
 
 const StorageBrowserTabContent = ({
@@ -74,7 +74,7 @@ const StorageBrowserTabContent = ({
 
   return (
     <Spin spinning={loading}>
-      <div className="hue-storage-browser-tabContent" data-testid={testId}>
+      <div className="hue-storage-browser-tab-content" data-testid={testId}>
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
           <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
           <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>

@@ -17,6 +17,7 @@
 @use 'mixins';
 
 .antd.cuix {
+
   .ant-spin-nested-loading,
   .ant-spin-container {
     display: flex;
@@ -24,7 +25,7 @@
     flex: 1;
   }
 
-  .hue-storage-browser-tabContent {
+  .hue-storage-browser-tab-content {
     display: flex;
     flex: 1;
     flex-direction: column;
