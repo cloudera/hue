@@ -21,11 +21,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 import Button, { PrimaryButton } from 'cuix/dist/components/Button';
 import { getFileMetaData } from './StorageFilePage.util';
 
-type StorageFileMetaDataProps = {
-  fileData: PathAndFileData;
-};
-
-const StorageFilePage = ({ fileData }: StorageFileMetaDataProps): JSX.Element => {
+const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [isEditing, setIsEditing] = React.useState(false);
   const [fileContent, setFileContent] = React.useState(fileData.view?.contents);

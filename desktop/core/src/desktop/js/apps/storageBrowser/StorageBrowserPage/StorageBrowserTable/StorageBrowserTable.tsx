@@ -199,9 +199,7 @@ const StorageBrowserTable = ({
             <span className="hue-storage-browser__table-cell-icon">
               {record.type === 'dir' ? <FolderIcon /> : <FileOutlined />}
             </span>
-            <span className="hue-storage-browser__table-cell-name">
-              {record.name}
-            </span>
+            <span className="hue-storage-browser__table-cell-name">{record.name}</span>
           </Tooltip>
         );
       } else if (key === 'mtime') {
