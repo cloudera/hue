@@ -5,15 +5,6 @@ import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-// Mock the translation function
-jest.mock('../../../utils/i18nReact', () => ({
-  i18nReact: {
-    useTranslation: () => ({
-      t: (key: string) => key
-    })
-  }
-}));
-
 // Mock data for fileData
 const mockFileData: PathAndFileData = {
   path: '/path/to/file.txt',
@@ -23,10 +14,9 @@ const mockFileData: PathAndFileData = {
     group: 'testgroup',
     mtime: '1617877200',
     atime: '1617877200',
-    blockSize: 4096,
     mode: 33188,
-    replication: 1,
-    path: '/path/to/file.txt'
+    path: '/path/to/file.txt',
+    aclBit: false
   },
   rwx: 'rwxr-xr-x',
   breadcrumbs: [],
@@ -60,6 +50,8 @@ describe('StorageFilePage', () => {
     expect(screen.getByText('rwxr-xr-x')).toBeInTheDocument();
     expect(screen.getByText('Last Modified')).toBeInTheDocument();
     expect(screen.getByText('April 8, 2021 at 03:50 PM')).toBeInTheDocument();
+    expect(screen.getByText('Content')).toBeInTheDocument();
+    expect(screen.getByText('Initial file content')).toBeInTheDocument
   });
 
   it('shows edit button and hides save/cancel buttons initially', () => {
