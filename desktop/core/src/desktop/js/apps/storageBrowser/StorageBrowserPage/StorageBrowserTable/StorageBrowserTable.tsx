@@ -16,7 +16,7 @@
 
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { ColumnProps } from 'antd/lib/table';
-import { Dropdown, Input, Spin } from 'antd';
+import { Dropdown, Input, Spin, Tooltip } from 'antd';
 import { MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
 
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
@@ -195,14 +195,14 @@ const StorageBrowserTable = ({
       if (key === 'name') {
         column.width = '40%';
         column.render = (_, record: StorageBrowserTableData) => (
-          <>
+          <Tooltip title={record.name} mouseEnterDelay={1.5}>
             <span className="hue-storage-browser__table-cell-icon">
               {record.type === 'dir' ? <FolderIcon /> : <FileOutlined />}
             </span>
-            <span className="hue-storage-browser__table-cell-name" title={record.name}>
+            <span className="hue-storage-browser__table-cell-name">
               {record.name}
             </span>
-          </>
+          </Tooltip>
         );
       } else if (key === 'mtime') {
         column.width = '20%';
@@ -331,7 +331,7 @@ const StorageBrowserTable = ({
             }}
             trigger={['hover', 'click']}
           >
-            <PrimaryButton data-event={''}>
+            <PrimaryButton data-event="">
               {t('New')}
               <DropDownIcon />
             </PrimaryButton>
