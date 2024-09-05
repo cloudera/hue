@@ -15,44 +15,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-
-standard_library.install_aliases()
-import json
-import logging
 import os
 import re
-import six
-import socket
 import sys
-import tempfile
+import json
 import time
-import traceback
+import socket
+import logging
 import zipfile
-import validate
+import tempfile
+import traceback
+from io import StringIO as string_io
+from wsgiref.util import FileWrapper
 
-from django.http import HttpResponseRedirect
+import six
+import validate
+import django.views.debug
+from configobj import ConfigObj, ConfigObjError, get_extra_values
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.shortcuts import render as django_render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.http.response import StreamingHttpResponse
+from django.shortcuts import redirect, render as django_render
 from django.urls import reverse
-from django.shortcuts import redirect
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
-from configobj import ConfigObj, get_extra_values, ConfigObjError
-from wsgiref.util import FileWrapper
 from webpack_loader.utils import get_static
-import django.views.debug
 
 import desktop.conf
 import desktop.log.log_buffer
-
 from desktop import appmanager
-from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
+from desktop.api import _get_docs, massaged_documents_for_json, massaged_tags_for_json
 from desktop.auth.backend import is_admin
 from desktop.auth.decorators import admin_required, hue_admin_required
-from desktop.conf import USE_NEW_EDITOR, HUE_LOAD_BALANCER, get_clusters, ENABLE_CONNECTORS
+from desktop.conf import ENABLE_CONNECTORS, HUE_LOAD_BALANCER, USE_NEW_EDITOR, get_clusters
 from desktop.lib import django_mako, fsmanager
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig, _configs_from_dir
 from desktop.lib.config_spec_dump import ConfigSpec
@@ -61,21 +57,16 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.lib.view_util import is_ajax
-from desktop.log.access import access_log_level, access_warn, AccessInfo
-from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, \
-                        get_all_debug as _get_all_debug, DEFAULT_LOG_DIR
-from desktop.models import Settings, hue_version, _get_apps, UserPreferences
+from desktop.log import (
+  DEFAULT_LOG_DIR,
+  get_all_debug as _get_all_debug,
+  reset_all_debug as _reset_all_debug,
+  set_all_debug as _set_all_debug,
+)
+from desktop.log.access import AccessInfo, access_log_level, access_warn
+from desktop.models import Settings, UserPreferences, _get_apps, hue_version
 from libsaml.conf import REQUIRED_GROUPS, REQUIRED_GROUPS_ATTRIBUTE
-from useradmin.models import get_profile
-from useradmin.models import User
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from django.utils.translation import gettext as _
-else:
-  from StringIO import StringIO as string_io
-  from django.utils.translation import ugettext as _
-
+from useradmin.models import User, get_profile
 
 LOG = logging.getLogger()
 
@@ -83,12 +74,13 @@ LOG = logging.getLogger()
 def is_alive(request):
   return HttpResponse('')
 
+
 def samlgroup_check(request):
   if 'SAML2Backend' in desktop.auth.forms.get_backend_names():
     if REQUIRED_GROUPS.get():
       try:
         userprofile = get_profile(request.user)
-      except:
+      except Exception:
         return False
 
       json_data = json.loads(userprofile.json_data)
@@ -115,6 +107,7 @@ def samlgroup_check(request):
       LOG.info("User %s found in the required SAML groups %s" % (request.user.username, ",".join(saml_group_found)))
   return True
 
+
 def saml_login_headers(request):
   userprofile = get_profile(request.user)
   try:
@@ -125,8 +118,9 @@ def saml_login_headers(request):
   try:
     userprofile.update_data({'X-CSRF-TOKEN': request.META['CSRF_COOKIE']})
     userprofile.save()
-  except:
+  except Exception:
     LOG.error("X-CSRF-TOKEN header not found")
+
 
 def hue(request):
   current_app, other_apps, apps_list = _get_apps(request.user, '')
@@ -270,15 +264,18 @@ def log_view(request):
         prev_log_file_size = os.path.getsize(prev_log_file)
         with open(prev_log_file, 'rb') as fh1:
           fh1.seek(prev_log_file_size - BUF_SIZE - log_file_size)
-          for l in fh1.readlines(): buffer.append(l)
+          for line in fh1.readlines():
+            buffer.append(line)
       # read the current log file
       with open(log_file, 'rb') as fh:
         fh.seek(0)
-        for l in fh.readlines(): buffer.append(l)
+        for line in fh.readlines():
+          buffer.append(line)
     else:
       with open(log_file, 'rb') as fh:
         fh.seek(log_file_size - BUF_SIZE)
-        for l in fh.readlines(): buffer.append(l)
+        for line in fh.readlines():
+          buffer.append(line)
     return render('logs.mako', request, dict(
         log=buffer,
         query=request.GET.get("q", ""),
@@ -289,6 +286,7 @@ def log_view(request):
       log=[_("No logs found!")], query='', hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)
     )
   )
+
 
 def task_server_view(request):
   """
@@ -302,6 +300,7 @@ def task_server_view(request):
     'users': User.objects.all(),
     'users_json': json.dumps(list(User.objects.values_list('id', flat=True)))
   })
+
 
 @hue_admin_required
 @access_log_level(logging.WARN)
@@ -327,22 +326,25 @@ def download_log_view(request):
         prev_log_file_size = os.path.getsize(prev_log_file)
         with open(prev_log_file, 'rb') as fh1:
           fh1.seek(prev_log_file_size - BUF_SIZE - log_file_size)
-          for l in fh1.readlines(): buffer.append(l)
+          for line in fh1.readlines():
+            buffer.append(line)
       # read the current log file
       with open(log_file, 'rb') as fh:
         fh.seek(0)
-        for l in fh.readlines(): buffer.append(l)
+        for line in fh.readlines():
+          buffer.append(line)
     else:
       with open(log_file, 'rb') as fh:
         fh.seek(log_file_size - BUF_SIZE)
-        for l in fh.readlines(): buffer.append(l)
+        for line in fh.readlines():
+          buffer.append(line)
     try:
       # We want to avoid doing a '\n'.join of the entire log in memory
       # in case it is rather big. So we write it to a file line by line
       # and pass that file to zipfile, which might follow a more efficient path.
       tmp = tempfile.NamedTemporaryFile()
       log_tmp = tempfile.NamedTemporaryFile("w+t") if sys.version_info[0] == 2 else tempfile.NamedTemporaryFile("w+t", encoding='utf-8')
-      for l in buffer:
+      for line in buffer:
         log_tmp.write(smart_str(l, errors='replace'))
       # This is not just for show - w/out flush, we often get truncated logs
       log_tmp.flush()
@@ -360,7 +362,7 @@ def download_log_view(request):
       response['Content-Disposition'] = 'attachment; filename=hue-logs-%s.zip' % t
       response['Content-Length'] = length
       return response
-    except Exception as e:
+    except Exception:
       LOG.exception("Couldn't construct zip file to write logs")
       return log_view(request)
 
@@ -384,6 +386,8 @@ def bootstrap(request):
 
 
 _status_bar_views = []
+
+
 def register_status_bar_view(view):
   global _status_bar_views
   _status_bar_views.append(view)
@@ -403,7 +407,7 @@ def status_bar(request):
         resp += r.content
       else:
         LOG.warning("Failed to execute status_bar view %s" % (view,))
-    except:
+    except Exception:
       LOG.exception("Failed to execute status_bar view %s" % (view,))
   return HttpResponse(resp)
 
@@ -414,19 +418,6 @@ def dump_config(request):
     return HttpResponse(_("You must be a superuser."))
 
   return render("dump_config.mako", request, {})
-
-
-@hue_admin_required
-@access_log_level(logging.WARN)
-def threads(request):
-  """Dumps out server threads. Useful for debugging."""
-  out = string_io()
-  dump_traceback(file=out)
-
-  if is_ajax(request):
-    return HttpResponse(out.getvalue(), content_type="text/plain")
-  else:
-    return render("threads.mako", request, {'text': out.getvalue(), 'is_embeddable': request.GET.get('is_embeddable', False)})
 
 
 @hue_admin_required
@@ -483,10 +474,12 @@ def global_js_constants(request):
 def ace_sql_location_worker(request):
   return HttpResponse(render('ace_sql_location_worker.mako', request, None), content_type="application/javascript")
 
+
 def ace_sql_syntax_worker(request):
   return HttpResponse(render('ace_sql_syntax_worker.mako', request, None), content_type="application/javascript")
 
-#Redirect to static resources no need for auth. Fails with 401 with Knox.
+
+# Redirect to static resources no need for auth. Fails with 401 with Knox.
 @login_notrequired
 def dynamic_bundle(request, config, bundle_name):
   try:
@@ -498,16 +491,20 @@ def dynamic_bundle(request, config, bundle_name):
     LOG.exception("Failed loading dynamic bundle %s: %s" % (bundle_name, ex))
   return render("404.mako", request, dict(uri=request.build_absolute_uri()), status=404)
 
+
 def assist_m(request):
   return render('assist_m.mako', request, None)
 
+
 def index(request):
   return redirect('desktop_views_hue')
+
 
 def csrf_failure(request, reason=None):
   """Registered handler for CSRF."""
   access_warn(request, reason)
   return render("403_csrf.mako", request, dict(uri=request.build_absolute_uri()), status=403)
+
 
 @login_notrequired
 def serve_403_error(request, *args, **kwargs):
@@ -515,10 +512,12 @@ def serve_403_error(request, *args, **kwargs):
   access_warn(request, "403 access forbidden")
   return render("403.mako", request, dict(uri=request.build_absolute_uri()), status=403)
 
+
 def serve_404_error(request, *args, **kwargs):
   """Registered handler for 404. We just return a simple error"""
   access_warn(request, "404 not found")
   return render("404.mako", request, dict(uri=request.build_absolute_uri()), status=404)
+
 
 def serve_500_error(request, *args, **kwargs):
   """Registered handler for 500. We use the debug view to make debugging easier."""
@@ -543,6 +542,7 @@ def serve_500_error(request, *args, **kwargs):
     #   - Certain missing imports
     #   - Packaging and install issues
     pass
+
 
 _LOG_LEVELS = {
   "critical": logging.CRITICAL,
@@ -616,6 +616,7 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
     'banner_message': get_banner_message(request)
   })
 
+
 def get_banner_message(request):
   banner_message = None
   forwarded_host = request.get_host()
@@ -636,23 +637,30 @@ def get_banner_message(request):
 
   return banner_message
 
+
 def commonshare():
   return django_mako.render_to_string("common_share.mako", {})
+
 
 def commonshare2():
   return django_mako.render_to_string("common_share2.mako", {})
 
+
 def commonimportexport(request):
   return django_mako.render_to_string("common_import_export.mako", {'request': request})
+
 
 def login_modal(request):
   return desktop.auth.views.dt_login(request, True)
 
+
 def is_idle(request):
   return HttpResponse("no!")
 
+
 def commonfooter_m(request, messages=None):
   return commonfooter(request, messages, True)
+
 
 def commonfooter(request, messages=None, is_mobile=False):
   """
@@ -690,6 +698,7 @@ CONFIG_VALIDATOR = 'config_validator'
 # The actual viewing of all errors may choose to disregard the cache.
 #
 _CONFIG_ERROR_LIST = None
+
 
 def _get_config_errors(request, cache=True):
   """Returns a list of (confvar, err_msg) tuples."""
@@ -745,6 +754,7 @@ def validate_by_spec(error_list):
   finally:
     if configspec:
       os.remove(configspec.name)
+
 
 def load_confs(configspecpath, conf_source=None):
   """Loads and merges all of the configurations passed in,
@@ -880,6 +890,7 @@ def reset_all_debug(request):
 def _ko(str=""):
   return _(str).replace("'", "\\'")
 
+
 # This global Mako filtering option, use it with ${ yourvalue | n,antixss }
 def antixss(value):
   xss_regex = re.compile(r'<[^>]+>')
@@ -889,5 +900,5 @@ def antixss(value):
 def topo(request, location='world'):
   file_path = os.path.join('desktop', 'ext', 'topo', location + '.topo.json')
   response = StreamingHttpResponse(streaming_content=staticfiles_storage.open(file_path))
-  #//return settings.STATIC_URL + path
+  # return settings.STATIC_URL + path
   return response
