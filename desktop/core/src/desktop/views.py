@@ -25,6 +25,7 @@ import logging
 import zipfile
 import tempfile
 import traceback
+from io import StringIO as string_io
 from wsgiref.util import FileWrapper
 
 import six
@@ -37,6 +38,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.http.response import StreamingHttpResponse
 from django.shortcuts import redirect, render as django_render
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 from webpack_loader.utils import get_static
 
@@ -65,16 +67,6 @@ from desktop.log.access import AccessInfo, access_log_level, access_warn
 from desktop.models import Settings, UserPreferences, _get_apps, hue_version
 from libsaml.conf import REQUIRED_GROUPS, REQUIRED_GROUPS_ATTRIBUTE
 from useradmin.models import User, get_profile
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-
-  from django.utils.translation import gettext as _
-
-else:
-  from django.utils.translation import ugettext as _
-  from StringIO import StringIO as string_io
-
 
 LOG = logging.getLogger()
 
