@@ -51,7 +51,7 @@ describe('StorageFilePage', () => {
     expect(screen.getByText('Last Modified')).toBeInTheDocument();
     expect(screen.getByText('April 8, 2021 at 03:50 PM')).toBeInTheDocument();
     expect(screen.getByText('Content')).toBeInTheDocument();
-    expect(screen.getByText('Initial file content')).toBeInTheDocument;
+    expect(screen.getByText('Initial file content')).toBeInTheDocument();
   });
 
   it('shows edit button and hides save/cancel buttons initially', () => {
