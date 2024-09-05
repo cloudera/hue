@@ -15,28 +15,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import next, filter, map, object
-import logging
-import json
 import re
 import sys
-
+import json
+import logging
+from builtins import filter, map, next, object
 from operator import itemgetter
 
 from TCLIService import TCLIService
-from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq, TStatusCode, TGetResultSetMetadataReq, \
-  TGetColumnsReq, TTypeId, TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation, \
-  TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq, TCloseOperationReq, TFetchResultsResp, TRowSet, TGetFunctionsReq, \
-  TGetCrossReferenceReq, TGetPrimaryKeysReq
-
-from desktop.lib import python_util, thrift_util
-from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT, ENABLE_XFF_FOR_HIVE_IMPALA, ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA
+from TCLIService.ttypes import (
+  TCancelOperationReq,
+  TCloseOperationReq,
+  TCloseSessionReq,
+  TExecuteStatementReq,
+  TFetchOrientation,
+  TFetchResultsReq,
+  TFetchResultsResp,
+  TGetColumnsReq,
+  TGetCrossReferenceReq,
+  TGetFunctionsReq,
+  TGetLogReq,
+  TGetOperationStatusReq,
+  TGetPrimaryKeysReq,
+  TGetResultSetMetadataReq,
+  TGetSchemasReq,
+  TGetTablesReq,
+  TOpenSessionReq,
+  TRowSet,
+  TStatusCode,
+  TTypeId,
+)
 
 from beeswax import conf as beeswax_conf, hive_site
-from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, MAX_CATALOG_SQL_ENTRIES
-from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
-from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException, reset_ha
+from beeswax.hive_site import hiveserver2_use_ssl
+from beeswax.models import HiveServerQueryHandle, HiveServerQueryHistory, Session
+from beeswax.server.dbms import DataTable, InvalidSessionQueryServerException, QueryServerException, Table, reset_ha
+from desktop.conf import DEFAULT_USER, ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA, ENABLE_XFF_FOR_HIVE_IMPALA, USE_THRIFT_HTTP_JWT
+from desktop.lib import python_util, thrift_util
 from notebook.connectors.base import get_interpreter
 
 if sys.version_info[0] > 2:
@@ -874,13 +890,21 @@ class HiveServerClient(object):
     req = TGetTablesReq(schemaName=database, tableName=table_names, tableTypes=table_types)
     (res, session) = self.call(self._client.GetTables, req)
 
-    results, schema = self.fetch_result(
-      res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=MAX_CATALOG_SQL_ENTRIES.get()
-    )
-    self._close(res.operationHandle, session)
-
+    table_metadata = []
     cols = ('TABLE_NAME', 'TABLE_TYPE', 'REMARKS')
-    return HiveServerTRowSet(results.results, schema.schema).cols(cols)
+
+    while True:
+      results, schema = self.fetch_result(
+        res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=MAX_CATALOG_SQL_ENTRIES.get()
+      )
+      fetched_tables = HiveServerTRowSet(results.results, schema.schema).cols(cols)
+      table_metadata += fetched_tables
+
+      if len(fetched_tables) == 0 or MAX_CATALOG_SQL_ENTRIES.get() == len(table_metadata):
+        break
+
+    self._close(res.operationHandle, session)
+    return table_metadata
 
   def get_tables(self, database, table_names, table_types=None):
     if not table_types:

@@ -19,18 +19,20 @@ import Duration, { duration } from './Duration.vue';
 
 describe('Duration.vue', () => {
   it('should render', () => {
+    const fixedTimestamp = new Date('2024-01-01T00:00:00Z').getTime();
     const wrapper = shallowMount(Duration, {
       propsData: {
-        value: 1234567890
+        value: fixedTimestamp
       }
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('should render short format', () => {
+    const fixedTimestamp = new Date('2024-01-01T00:00:00Z').getTime();
     const wrapper = shallowMount(Duration, {
       propsData: {
-        value: 1234567890,
+        value: fixedTimestamp,
         short: true
       }
     });

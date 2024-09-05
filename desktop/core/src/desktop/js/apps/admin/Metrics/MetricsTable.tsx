@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Table from 'cuix/dist/components/Table/Table';
 import type { ColumnType } from 'antd/es/table';
 import './Metrics.scss';
-import I18n from 'utils/i18n';
+import { i18nReact } from '../../../utils/i18nReact';
 
 interface MetricsValue {
   value: number;
@@ -74,56 +74,58 @@ interface DataSourceItem {
   value: number | MetricsTime;
 }
 
-interface MetricsTableProps {
+export interface MetricsTableProps {
   caption: string;
   dataSource: DataSourceItem[];
 }
+
 const metricLabels: { [key: string]: string } = {
-  'queries.number': I18n('Number of Queries'),
-  'requests.active': I18n('Active Requests'),
-  'requests.exceptions': I18n('Request Exceptions'),
-  'requests.response-time': I18n('Request Response Time'),
-  'threads.daemon': I18n('Daemon Threads'),
-  'threads.total': I18n('Total Threads'),
-  users: I18n('Users'),
-  'users.active': I18n('Active Users'),
-  'users.active.total': I18n('Total Active Users')
+  'queries.number': 'Number of Queries',
+  'requests.active': 'Active Requests',
+  'requests.exceptions': 'Request Exceptions',
+  'requests.response-time': 'Request Response Time',
+  'threads.daemon': 'Daemon Threads',
+  'threads.total': 'Total Threads',
+  users: 'Users',
+  'users.active': 'Active Users',
+  'users.active.total': 'Total Active Users'
 };
 
-const transformMetricNames = (dataSource: DataSourceItem[]): DataSourceItem[] =>
-  dataSource.map(item => ({
-    ...item,
-    name: metricLabels[item.name] || item.name
-  }));
+const metricsColumns: ColumnType<DataSourceItem>[] = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    key: 'name'
+  },
+  {
+    title: 'Value',
+    dataIndex: 'value',
+    key: 'value',
+    render: value => (typeof value === 'number' ? value : JSON.stringify(value))
+  }
+];
 
 const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
-  const transformedDataSource = transformMetricNames(dataSource);
+  const { t } = i18nReact.useTranslation();
 
-  const metricsColumns: ColumnType<DataSourceItem>[] = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name'
-    },
-    {
-      title: 'Value',
-      dataIndex: 'value',
-      key: 'value',
-      render: value => (typeof value === 'number' ? value : JSON.stringify(value))
-    }
-  ];
+  const transformedDataSource: DataSourceItem[] = useMemo(
+    () =>
+      dataSource.map(item => ({
+        ...item,
+        name: t(metricLabels[item.name]) || item.name
+      })),
+    [dataSource]
+  );
 
   return (
-    <>
-      <h4 className="metrics-heading">{caption}</h4>
-      <Table
-        className="metrics-table"
-        dataSource={transformedDataSource}
-        rowKey="name"
-        columns={metricsColumns}
-        pagination={false}
-      />
-    </>
+    <Table
+      className="metrics-table"
+      dataSource={transformedDataSource}
+      rowKey="name"
+      columns={metricsColumns}
+      pagination={false}
+      title={() => <span className="metrics-heading">{caption}</span>}
+    />
   );
 };
 

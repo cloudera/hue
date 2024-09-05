@@ -534,15 +534,6 @@ class OnePageViewModel {
       },
       { url: '/desktop/dump_config', app: 'dump_config' },
       {
-        url: '/desktop/debug/threads',
-        app: function () {
-          self.loadApp('threads');
-          self.getActiveAppViewModel(viewModel => {
-            viewModel.fetchThreads();
-          });
-        }
-      },
-      {
         url: '/gist',
         app: function () {
           const uuid = getUrlParameter('uuid');
