@@ -5,6 +5,13 @@ import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
+jest.mock('../../../utils/dateTimeUtils', () => ({
+  ...jest.requireActual('../../../utils/dateTimeUtils'),
+  formatTimestamp: () => {
+    return 'April 8, 2021 at 00:00 AM';
+  }
+}));
+
 // Mock data for fileData
 const mockFileData: PathAndFileData = {
   path: '/path/to/file.txt',
@@ -37,19 +44,6 @@ const mockFileData: PathAndFileData = {
 };
 
 describe('StorageFilePage', () => {
-  const RealDate = Date;
-  beforeAll(() => {
-    // Set up the mock date
-    const fixedDate = new Date('2021-04-08T12:00:00Z'); // Use a fixed date/time in UTC
-    global.Date = jest.fn(() => fixedDate) as unknown as jest.MockedClass<typeof Date>;
-    global.Date.now = jest.fn(() => fixedDate.getTime());
-  });
-
-  afterAll(() => {
-    // Restore the real Date object
-    global.Date = RealDate;
-  });
-
   it('renders file metadata and content', () => {
     render(<StorageFilePage fileData={mockFileData} />);
 
@@ -62,7 +56,7 @@ describe('StorageFilePage', () => {
     expect(screen.getByText('Permissions')).toBeInTheDocument();
     expect(screen.getByText('rwxr-xr-x')).toBeInTheDocument();
     expect(screen.getByText('Last Modified')).toBeInTheDocument();
-    expect(screen.getByText('April 8, 2021 at 05:30 PM')).toBeInTheDocument();
+    expect(screen.getByText('April 8, 2021 at 00:00 AM')).toBeInTheDocument();
     expect(screen.getByText('Content')).toBeInTheDocument();
     expect(screen.getByText('Initial file content')).toBeInTheDocument();
   });
