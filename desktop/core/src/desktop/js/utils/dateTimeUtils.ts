@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { DateTimeFormatOptions } from "luxon";
+import { DateTimeFormatOptions } from 'luxon';
 
 /**
  * Calculates the duration between two dates.
