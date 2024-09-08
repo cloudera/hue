@@ -23,7 +23,7 @@ jobs:
   test_starter:
      uses: Kitchen/gatekeeping-common/.github/workflows/gatekeeping_start.yaml@master
      with:
-       start_keyword: 'gate-test:'
+       start_keyword: 'gate-test:.+'
        labels: "gk-system-test-fail,gk-system-test-pass"
        gk_source_repo: "Kitchen/gatekeeping-test"
        gk_action: "test_starter"
