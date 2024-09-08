@@ -216,15 +216,32 @@ def storage_get_filesystems(request):
 
 
 @api_view(["GET"])
-def storage_view(request, path):
+def storage_view(request):
   django_request = get_django_request(request)
-  return filebrowser_views.view(django_request, path)
+  return filebrowser_views.view(django_request)
+
+
+@api_view(["GET"])
+def storage_stat(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.stat(django_request)
+
+
+@api_view(["GET"])
+def storage_listdir_paged(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.listdir_paged(django_request)
+
+@api_view(["GET"])
+def storage_display(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.display(django_request)
 
 
 @api_view(["GET"])
 def storage_download(request):
   django_request = get_django_request(request)
-  return filebrowser_views.download(django_request)
+  return filebrowser_api.download(django_request)
 
 
 @api_view(["POST"])
@@ -252,9 +269,9 @@ def storage_rename(request):
 
 
 @api_view(["GET"])
-def storage_content_summary(request, path):
+def storage_content_summary(request):
   django_request = get_django_request(request)
-  return filebrowser_api.content_summary(django_request, path)
+  return filebrowser_api.content_summary(django_request)
 
 
 @api_view(["POST"])
@@ -269,13 +286,13 @@ def storage_copy(request):
   return filebrowser_api.copy(django_request)
 
 
-@api_view(["POST"])
+@api_view(["PUT"])
 def storage_set_replication(request):
   django_request = get_django_request(request)
   return filebrowser_api.set_replication(django_request)
 
 
-@api_view(["POST"])
+@api_view(["DELETE"])
 def storage_rmtree(request):
   django_request = get_django_request(request)
   return filebrowser_api.rmtree(django_request)
@@ -293,7 +310,7 @@ def storage_trash_restore(request):
   return filebrowser_api.trash_restore(django_request)
 
 
-@api_view(["POST"])
+@api_view(["DELETE"])
 def storage_trash_purge(request):
   django_request = get_django_request(request)
   return filebrowser_api.trash_purge(django_request)
