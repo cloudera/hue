@@ -97,19 +97,22 @@ urlpatterns += [
   re_path(r'^storage/mkdir$', api_public.storage_mkdir, name='storage_mkdir'),
   re_path(r'^storage/touch$', api_public.storage_touch, name='storage_touch'),
   re_path(r'^storage/rename$', api_public.storage_rename, name='storage_rename'),
-  re_path(r'^storage/content_summary=(?P<path>.*)$', api_public.storage_content_summary, name='storage_content_summary'),
   re_path(r'^storage/move$', api_public.storage_move, name='storage_move'),
   re_path(r'^storage/copy$', api_public.storage_copy, name='storage_copy'),
-  re_path(r'^storage/set_replication$', api_public.storage_set_replication, name='storage_set_replication'),
-  re_path(r'^storage/rmtree$', api_public.storage_rmtree, name='storage_rmtree'),
-  re_path(r'^storage/trash/get_trash_path$', api_public.storage_get_trash_path, name='storage_get_trash_path'),
-  re_path(r'^storage/trash/restore$', api_public.storage_trash_restore, name='storage_trash_restore'),
-  re_path(r'^storage/trash/purge$', api_public.storage_trash_purge, name='storage_trash_purge'),
 ]
 
 urlpatterns += [
   re_path(r'^storage/filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
+  re_path(r'^storage/list/?$', api_public.storage_listdir_paged, name='storage_listdir_paged'),
+  re_path(r'^storage/stat/?$', api_public.storage_stat, name='storage_stat'),
+  re_path(r'^storage/display/?$', api_public.storage_display, name='storage_display'),
   re_path(r'^storage/download/?$', api_public.storage_download, name='storage_download'),
+  re_path(r'^storage/delete/?$', api_public.storage_rmtree, name='storage_rmtree'),
+  re_path(r'^storage/content_summary/?$', api_public.storage_content_summary, name='storage_content_summary'),
+  re_path(r'^storage/replication/?$', api_public.storage_set_replication, name='storage_set_replication'),
+  re_path(r'^storage/trash/path/?$', api_public.storage_get_trash_path, name='storage_get_trash_path'),
+  re_path(r'^storage/trash/restore/?$', api_public.storage_trash_restore, name='storage_trash_restore'),
+  re_path(r'^storage/trash/purge/?$', api_public.storage_trash_purge, name='storage_trash_purge'),
 ]
 
 urlpatterns += [
