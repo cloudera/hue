@@ -17,20 +17,25 @@
 
 import os
 import logging
+import operator
 import mimetypes
 import posixpath
 
+from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
 from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
 from django.utils.http import http_date
 from django.utils.translation import gettext as _
 from django.views.static import was_modified_since
 
-from aws.s3.s3fs import get_s3_home_directory
+from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
 from azure.abfs.__init__ import get_abfs_home_directory
-from desktop.lib import fsmanager
+from desktop.auth.backend import is_admin
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, RAZ, TASK_SERVER_V2
+from desktop.lib import fsmanager, i18n
+from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.export_csvxls import file_reader
-from desktop.lib.fs.gc.gs import get_gs_home_directory
+from desktop.lib.fs.gc.gs import GSListAllBucketsException, get_gs_home_directory
 from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
 from desktop.lib.i18n import smart_unicode
 from filebrowser.conf import (
@@ -42,8 +47,24 @@ from filebrowser.conf import (
   SHOW_DOWNLOAD_BUTTON,
   SHOW_UPLOAD_BUTTON,
 )
-from filebrowser.views import _can_inline_display, _normalize_path
+from filebrowser.lib import xxd
+from filebrowser.views import (
+  BYTES_PER_LINE,
+  BYTES_PER_SENTENCE,
+  DEFAULT_CHUNK_SIZE_BYTES,
+  MAX_CHUNK_SIZE_BYTES,
+  MAX_FILEEDITOR_SIZE,
+  _can_inline_display,
+  _is_hdfs_superuser,
+  _massage_page,
+  _massage_stats,
+  _normalize_path,
+  read_contents,
+  stat_absolute_path,
+)
+from hadoop.core_site import get_trash_interval
 from hadoop.fs.exceptions import WebHdfsException
+from useradmin.models import Group, User
 
 LOG = logging.getLogger()
 
@@ -76,6 +97,7 @@ def get_filesystems(request):
   return JsonResponse(response)
 
 
+# TODO: Improve error response further with better context -- Error UX Phase 1 item
 def api_error_handler(view_fn):
   """
   Decorator to handle exceptions and return a JSON response with an error message.
@@ -85,7 +107,6 @@ def api_error_handler(view_fn):
       return view_fn(*args, **kwargs)
     except Exception as e:
       LOG.exception(f'Error running {view_fn.__name__}: {str(e)}')
-      # TODO: Improve error response with better context
       return JsonResponse({'error': str(e)}, status=500)
 
   return decorator
@@ -118,6 +139,7 @@ def get_filesystems_with_home_dirs(request):
   return JsonResponse(filesystems, safe=False)
 
 
+@api_error_handler
 def download(request):
   """
   Downloads a file.
@@ -185,7 +207,286 @@ def download(request):
     return HttpResponse(f'Failed to download file at path {path}: {str(e)}', status=500)  # TODO: status code?
 
 
-@error_handler
+@api_error_handler
+def listdir_paged(request):
+  """
+  A paginated version of listdir.
+
+  Query parameters:
+    pagenum           - The page number to show. Defaults to 1.
+    pagesize          - How many to show on a page. Defaults to 15.
+    sortby=?          - Specify attribute to sort by. Accepts: (type, name, atime, mtime, size, user, group). Defaults to name.
+    descending        - Specify a descending sort order. Default to false.
+    filter=?          - Specify a substring filter to search for in the filename field.
+  """
+  path = request.GET.get('path', '/')  # Set default path for index directory
+  path = _normalize_path(path)
+
+  if not request.fs.isdir(path):
+    return HttpResponse(f'{path} is not a directory.', status=400)
+
+  pagenum = int(request.GET.get('pagenum', 1))
+  pagesize = int(request.GET.get('pagesize', 30))
+
+  do_as = None
+  if is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security"):
+    do_as = request.GET.get('doas', request.user.username)
+  if hasattr(request, 'doas'):
+    do_as = request.doas
+
+  # if request.fs._get_scheme(path) == 'hdfs':
+  #   home_dir_path = request.user.get_home_directory()
+  # else:
+  #   home_dir_path = None
+
+  # breadcrumbs = parse_breadcrumbs(path)
+
+  try:
+    if do_as:
+      all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
+    else:
+      all_stats = request.fs.listdir_stats(path)
+  except (S3ListAllBucketsException, GSListAllBucketsException) as e:
+    return HttpResponse(f'Bucket listing is not allowed: {str(e)}', status=403)
+
+  # Filter first
+  filter_string = request.GET.get('filter')
+  if filter_string:
+    filtered_stats = [sb for sb in all_stats if filter_string in sb['name']]
+    all_stats = filtered_stats
+
+  # Sort next
+  sortby = request.GET.get('sortby')
+  descending_param = request.GET.get('descending')
+  if sortby:
+    if sortby not in ('type', 'name', 'atime', 'mtime', 'user', 'group', 'size'):
+      LOG.info(f'Invalid sort attribute {sortby} for list directory operation. Skipping it.')
+    else:
+      all_stats = sorted(all_stats, key=operator.attrgetter(sortby), reverse=coerce_bool(descending_param))
+
+  # Do pagination
+  try:
+    paginator = Paginator(all_stats, pagesize, allow_empty_first_page=True)
+    page = paginator.page(pagenum)
+    shown_stats = page.object_list
+  except EmptyPage:
+    message = "No results found for the requested page."
+    LOG.warn(message)
+    return HttpResponse(message, status=404)  # TODO: status code?
+
+  # TODO: Current same dir stats below?
+
+  # # Include same dir always as first option to see stats of the current folder.
+  # current_stat = request.fs.stats(path)
+  # # The 'path' field would be absolute, but we want its basename to be
+  # # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
+  # current_stat.path = path
+  # current_stat.name = "."
+  # shown_stats.insert(0, current_stat)
+
+  # Include parent dir always as second option, unless at filesystem root or when RAZ is enabled.
+  if not (request.fs.isroot(path) or RAZ.IS_ENABLED.get()):
+    parent_path = request.fs.parent_path(path)
+    parent_stat = request.fs.stats(parent_path)
+    # The 'path' field would be absolute, but we want its basename to be
+    # actually '..' for display purposes. Encode it since _massage_stats expects byte strings.
+    parent_stat['path'] = parent_path
+    parent_stat['name'] = ".."
+    shown_stats.insert(0, parent_stat)
+
+  if page:
+    # TODO: Check if we need to clean response of _massage_stats
+    page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
+
+  # TODO: Shift below fields to /get_config?
+  is_hdfs = request.fs._get_scheme(path) == 'hdfs'
+  is_trash_enabled = is_hdfs and int(get_trash_interval()) > 0
+  is_fs_superuser = is_hdfs and _is_hdfs_superuser(request)
+
+  response = {
+      # 'path': path,
+      # 'breadcrumbs': breadcrumbs,
+      # 'current_request_path': '/filebrowser/view=' + urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
+      'is_trash_enabled': is_trash_enabled,
+      'files': page.object_list if page else [],
+      'page': _massage_page(page, paginator) if page else {},  # TODO: Check if we need to clean response of _massage_page
+      'pagesize': pagesize,
+      # 'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
+      # 'descending': descending_param,
+
+      # The following should probably be deprecated
+      # TODO: Check what to keep or what to remove? or move some fields to /get_config?
+
+      'cwd_set': True,
+      'file_filter': 'any',
+      # 'current_dir_path': path,
+      'is_fs_superuser': is_fs_superuser,
+      'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
+      'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
+      'superuser': request.fs.superuser,
+      'supergroup': request.fs.supergroup,
+      # 'is_sentry_managed': request.fs.is_sentry_managed(path),
+      # 'apps': list(appmanager.get_apps_dict(request.user).keys()),
+      'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
+      'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
+      # 'is_embeddable': request.GET.get('is_embeddable', False),
+      # 's3_listing_not_allowed': s3_listing_not_allowed
+  }
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def display(request):
+  """
+  Implements displaying part of a file.
+
+  GET arguments are length, offset, mode, compression and encoding
+  with reasonable defaults chosen.
+
+  Note that display by length and offset are on bytes, not on characters.
+  """
+  path = request.GET.get('path', '/')  # Set default path for index directory
+  path = _normalize_path(path)
+
+  if not request.fs.isfile(path):
+    return HttpResponse(f'{path} is not a file.', status=400)
+
+  # TODO: Check if we still need this or not
+  # # display inline files just if it's not an ajax request
+  # if not is_ajax(request):
+  #   if _can_inline_display(path):
+  #     return redirect(reverse('filebrowser:filebrowser_views_download', args=[path]) + '?disposition=inline')
+
+  stats = request.fs.stats(path)
+  encoding = request.GET.get('encoding') or i18n.get_site_encoding()
+
+  # I'm mixing URL-based parameters and traditional
+  # HTTP GET parameters, since URL-based parameters
+  # can't naturally be optional.
+
+  # Need to deal with possibility that length is not present
+  # because the offset came in via the toolbar manual byte entry.
+  end = request.GET.get("end")
+  if end:
+    end = int(end)
+
+  begin = request.GET.get("begin", 1)
+  if begin:
+    # Subtract one to zero index for file read
+    begin = int(begin) - 1
+
+  if end:
+    offset = begin
+    length = end - begin
+    if begin >= end:
+      return HttpResponse("First byte to display must be before last byte to display.", status=400)
+  else:
+    length = int(request.GET.get("length", DEFAULT_CHUNK_SIZE_BYTES))
+    # Display first block by default.
+    offset = int(request.GET.get("offset", 0))
+
+  mode = request.GET.get("mode")
+  compression = request.GET.get("compression")
+
+  if mode and mode not in ["binary", "text"]:
+    return HttpResponse("Mode must be one of 'binary' or 'text'.", status=400)
+  if offset < 0:
+    return HttpResponse("Offset may not be less than zero.", status=400)
+  if length < 0:
+    return HttpResponse("Length may not be less than zero.", status=400)
+  if length > MAX_CHUNK_SIZE_BYTES:
+    return HttpResponse(f'Cannot request chunks greater than {MAX_CHUNK_SIZE_BYTES} bytes.', status=400)
+
+  # Do not decompress in binary mode.
+  if mode == 'binary':
+    compression = 'none'
+
+  # Read out based on meta.
+  compression, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
+
+  # Get contents as string for text mode, or at least try
+  file_contents = None
+  if mode is None or mode == 'text':
+    if isinstance(contents, str):
+      file_contents = contents
+      is_binary = False
+      mode = 'text'
+    else:
+      # TODO: Check if the content is used in OLD CODE, when is_binary was true and replacement character was found.
+      # TODO: Then finally check how is binary content sent, is old UI reading from uni_content or the below xxd_out??
+      try:
+        file_contents = contents.decode(encoding)
+        is_binary = False
+        mode = 'text'
+      except UnicodeDecodeError:
+        file_contents = contents
+        is_binary = True
+        mode = 'binary' if mode is None else mode
+
+  # Get contents as bytes
+  if mode == "binary":
+    xxd_out = list(xxd.xxd(offset, contents, BYTES_PER_LINE, BYTES_PER_SENTENCE))
+
+  # TODO: Check what all UI needs and clean the field below, currently commenting out few duplicates which needs to be verified.
+
+  # dirname = posixpath.dirname(path)
+  # Start with index-like data:
+
+  stats = request.fs.stats(path)
+  data = _massage_stats(request, stat_absolute_path(path, stats))  # TODO: Stats required again?
+  # data["is_embeddable"] = request.GET.get('is_embeddable', False)
+
+  # And add a view structure:
+  # data["success"] = True
+  data["view"] = {
+      'offset': offset,
+      'length': length,
+      'end': offset + len(contents),
+      # 'dirname': dirname,
+      'mode': mode,
+      'compression': compression,
+      # 'size': stats.size,
+      'max_chunk_size': str(MAX_CHUNK_SIZE_BYTES)
+  }
+  # data["filename"] = os.path.basename(path)
+  data["editable"] = stats.size < MAX_FILEEDITOR_SIZE  # TODO: To improve this limit and sent it as /get_config? Needs discussion.
+
+  # TODO: Understand the comment. Then check why are we logging file content? Then also check how is masked_binary_data used? Finally improve code.
+  if mode == "binary":
+    # This might be the wrong thing for ?format=json; doing the
+    # xxd'ing in javascript might be more compact, or sending a less
+    # intermediate representation...
+    LOG.debug("xxd: " + str(xxd_out))
+    data['view']['xxd'] = xxd_out
+    data['view']['masked_binary_data'] = False
+  else:
+    data['view']['contents'] = file_contents
+    data['view']['masked_binary_data'] = is_binary
+
+  # data['breadcrumbs'] = parse_breadcrumbs(path)
+  # data['show_download_button'] = SHOW_DOWNLOAD_BUTTON.get()  # TODO: Add as /get_config?
+
+  return JsonResponse(data)
+
+
+@api_error_handler
+def stat(request):
+  """
+  Returns the generic stats of FS object.
+  """
+  path = request.GET.get('path')
+  path = _normalize_path(path)
+
+  if not request.fs.exists(path):
+    return HttpResponse(f'Object does not exist: {path}', status=404)
+
+  stats = request.fs.stats(path)
+
+  return JsonResponse(_massage_stats(request, stat_absolute_path(path, stats)))
+
+
+@api_error_handler
 def mkdir(request):
   path = request.POST.get('path')
   name = request.POST.get('name')
@@ -197,7 +498,7 @@ def mkdir(request):
   return HttpResponse(status=200)
 
 
-@error_handler
+@api_error_handler
 def touch(request):
   path = request.POST.get('path')
   name = request.POST.get('name')
@@ -209,7 +510,7 @@ def touch(request):
   return HttpResponse(status=200)
 
 
-@error_handler
+@api_error_handler
 def rename(request):
   src_path = request.POST.get('src_path')
   dest_path = request.POST.get('dest_path')
@@ -231,7 +532,7 @@ def rename(request):
   return HttpResponse(status=200)
 
 
-@error_handler
+@api_error_handler
 def move(request):
   src_path = request.POST.get('src_path')
   dest_path = request.POST.get('dest_path')
@@ -243,7 +544,7 @@ def move(request):
   return HttpResponse(status=200)
 
 
-@error_handler
+@api_error_handler
 def copy(request):
   src_path = request.POST.get('src_path')
   dest_path = request.POST.get('dest_path')
@@ -262,54 +563,56 @@ def copy(request):
   return HttpResponse(status=200)
 
 
-@error_handler
-def content_summary(request, path):
+@api_error_handler
+def content_summary(request):
+  path = request.GET.get('path')
   path = _normalize_path(path)
-  response = {}
 
   if not path:
-    raise Exception(_('Path parameter is required to fetch content summary.'))
+    return HttpResponse("Path parameter is required to fetch content summary.", status=400)
 
   if not request.fs.exists(path):
-    return JsonResponse(response, status=404)
+    return HttpResponse(f'Path does not exist: {path}', status=404)
 
+  response = {}
   try:
     content_summary = request.fs.get_content_summary(path)
     replication_factor = request.fs.stats(path)['replication']
 
     content_summary.summary.update({'replication': replication_factor})
     response['summary'] = content_summary.summary
-  except Exception as e:
-    raise Exception(_('Failed to fetch content summary for "%s". ') % path)
+  except Exception:
+    return HttpResponse(f'Failed to fetch content summary for path: {path}', status=500)
 
   return JsonResponse(response)
 
 
-@error_handler
+@api_error_handler
 def set_replication(request):
-  src_path = request.POST.get('src_path')
-  replication_factor = request.POST.get('replication_factor')
+  path = request.PUT.get('path')
+  replication_factor = request.PUT.get('replication_factor')
 
-  result = request.fs.set_replication(src_path, replication_factor)
+  result = request.fs.set_replication(path, replication_factor)
   if not result:
-    raise Exception(_("Failed to set the replication factor."))
+    return HttpResponse("Failed to set the replication factor.", status=500)
 
   return HttpResponse(status=200)
 
 
-@error_handler
+@api_error_handler
 def rmtree(request):
-  path = request.POST.get('path')
-  skip_trash = request.POST.get('skip_trash', False)
+  path = request.DELETE.get('path')
+  skip_trash = request.DELETE.get('skip_trash', False)
 
   request.fs.rmtree(path, skip_trash)
 
   return HttpResponse(status=200)
 
 
-@error_handler
+@api_error_handler
 def get_trash_path(request):
-  path = _normalize_path(request.GET.get('path'))
+  path = request.GET.get('path')
+  path = _normalize_path(path)
   response = {}
 
   trash_path = request.fs.trash_path(path)
@@ -320,13 +623,12 @@ def get_trash_path(request):
   elif request.fs.isdir(trash_path):
     response['trash_path'] = trash_path
   else:
-    response['message'] = _('Trash path not found: The requested trash path for user does not exist.')
-    return JsonResponse(response, status=404)
+    response['trash_path'] = None
 
   return JsonResponse(response)
 
 
-@error_handler
+@api_error_handler
 def trash_restore(request):
   path = request.POST.get('path')
   request.fs.restore(path)
@@ -334,7 +636,7 @@ def trash_restore(request):
   return HttpResponse(status=200)
 
 
-@error_handler
+@api_error_handler
 def trash_purge(request):
   request.fs.purge_trash()
 
