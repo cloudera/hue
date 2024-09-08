@@ -25,7 +25,7 @@ jobs:
   validator:
      uses: Kitchen/gatekeeping-common/.github/workflows/gatekeeping_start.yaml@master
      with:
-       start_keyword: 'gate-ticket'
+       start_keyword: '^\s*gate-ticket\s*$'
        labels: "gk-ticket-validation-fail,gk-ticket-validation-pass,gk-ticket-jira-error,gk-ticket-commit-error"
        gk_source_repo: "Kitchen/gatekeeping-ticket-validator"
        gk_action: "ticket_validator"
