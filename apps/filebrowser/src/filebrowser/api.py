@@ -452,7 +452,7 @@ def display(request):
   # data["filename"] = os.path.basename(path)
   data["editable"] = stats.size < MAX_FILEEDITOR_SIZE  # TODO: To improve this limit and sent it as /get_config? Needs discussion.
 
-  # TODO: Understand the comment. Then check why are we logging file content? Then also check how is masked_binary_data used? Finally improve code.
+  # TODO: Understand the comment. Check why are we logging file content? Also check how is masked_binary_data used? Finally improve code.
   if mode == "binary":
     # This might be the wrong thing for ?format=json; doing the
     # xxd'ing in javascript might be more compact, or sending a less
