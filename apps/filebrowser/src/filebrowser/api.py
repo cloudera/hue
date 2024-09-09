@@ -486,6 +486,74 @@ def stat(request):
 
 
 @api_error_handler
+def upload_file(request):
+  """
+  A wrapper around the actual upload view function to clean up the temporary file afterwards if it fails.
+
+  Returns JSON.
+  """
+  response = {}
+
+  try:
+    response = _upload_file(request)
+  except Exception as e:
+    LOG.exception('Upload operation failed.')
+
+    file = request.FILES.get('file')
+    if file and hasattr(file, 'remove'):  # TODO: Call from proxyFS -- Check feasibility of this old comment
+      file.remove()
+
+    return HttpResponse(str(e).split('\n', 1)[0], status=500)  # TODO: Check error message and status code
+
+  return JsonResponse(response)
+
+
+def _upload_file(request):
+  """
+  Handles file uploaded by HDFSfileUploadHandler.
+
+  The uploaded file is stored in HDFS at its destination with a .tmp suffix.
+  We just need to rename it to the destination path.
+  """
+  response = {}
+
+  if request.META.get('upload_failed'):
+    return HttpResponse(request.META.get('upload_failed'), status=500)  # TODO: Check error message and status code
+
+  uploaded_file = request.FILES['file']
+  dest_path = request.GET['destination_path']
+
+  filepath = request.fs.join(dest_path, uploaded_file.name)
+
+  if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
+    return HttpResponse(f'Upload failed: {posixpath.sep} is not allowed in the filename {uploaded_file.name}.', status=500)  # TODO: code?
+
+  try:
+    request.fs.upload(file=uploaded_file, path=dest_path, username=request.user.username)
+  except IOError as ex:
+    already_exists = False
+    try:
+      already_exists = request.fs.exists(dest_path)
+    except Exception:
+      pass
+
+    if already_exists:
+      messsage = f'Upload failed: Destination {filepath} already exists.'
+    else:
+      messsage = f'Upload error: Copy to {filepath} failed: {str(ex)}'
+    return HttpResponse(messsage, status=500)  # TODO: Check error messages above and status code
+
+  # TODO: Check response fields below
+  response.update({
+      'path': filepath,
+      'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
+      # 'next': request.GET.get("next")
+  })
+
+  return JsonResponse(response)
+
+
+@api_error_handler
 def mkdir(request):
   path = request.POST.get('path')
   name = request.POST.get('name')
