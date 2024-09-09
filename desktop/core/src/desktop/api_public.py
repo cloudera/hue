@@ -232,6 +232,7 @@ def storage_listdir_paged(request):
   django_request = get_django_request(request)
   return filebrowser_api.listdir_paged(django_request)
 
+
 @api_view(["GET"])
 def storage_display(request):
   django_request = get_django_request(request)
