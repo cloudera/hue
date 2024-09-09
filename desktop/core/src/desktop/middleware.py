@@ -22,6 +22,7 @@ import base64
 import inspect
 import json
 import logging
+import pdb
 import mimetypes
 import os.path
 import re
@@ -69,6 +70,83 @@ from desktop.auth.backend import knox_login_headers
 
 from libsaml.conf import CDP_LOGOUT_URL
 from urllib.parse import urlparse
+
+import base64
+import os
+
+# Number of random bytes in the nonce:
+NONCE_BYTES = 24
+
+def generate_nonce():
+    """ Return a unique base64 encoded nonce hash."""
+    nonce = os.urandom(NONCE_BYTES)
+    return base64.b64encode(nonce).decode()
+
+
+def nonce_exists(response):
+    """Check for preexisting nonce in style and script.
+
+     Args:
+         response (:obj:): Django response object
+
+     Returns:
+         nonce_found (dict): Dictionary of nonces found
+         has_nonce (bool): True if any nonce has been found
+     """
+    try:
+        csp = response['Content-Security-Policy']
+    except KeyError:
+        csp = response['Content-Security-Policy-Report-Only']
+
+    nonce_found = {}
+
+    if csp:
+        csp_split = csp.split(';')
+        for directive in csp_split:
+            if 'nonce-' not in directive:
+                continue
+            if 'script-src' in directive:
+                nonce_found['script'] = directive
+            if 'style-src' in directive:
+                nonce_found['style'] = directive
+
+    has_nonce = any(nonce_found)
+
+    return nonce_found, has_nonce
+
+
+def get_header(response):
+    """Get the CSP header type.
+
+    This is basically a check for:
+        Content-Security-Policy or Content-Security-Policy-Report-Only
+
+    Args:
+        response (:obj:): Django response object
+
+    Returns:
+         dict:
+            name: CPS header policy. i.e. Report-Only or not
+            csp: CSP directives associated with the header
+            bool: False if neither policy header is found
+    """
+    policies = [
+        "Content-Security-Policy",
+        "Content-Security-Policy-Report-Only"
+    ]
+
+    try:
+        name = policies[0]
+        csp = response[policies[0]]
+    except KeyError:
+        try:
+            name = policies[1]
+            csp = response[policies[1]]
+        except KeyError:
+            return False
+
+    return {'name': name, 'csp': csp}
+
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -901,19 +979,48 @@ class MetricsMiddleware(MiddlewareMixin):
 
 
 class ContentSecurityPolicyMiddleware(MiddlewareMixin):
-  def __init__(self, get_response):
-    self.get_response = get_response
-    self.secure_content_security_policy = SECURE_CONTENT_SECURITY_POLICY.get()
-    if not self.secure_content_security_policy:
-      LOG.info('Unloading ContentSecurityPolicyMiddleware')
-      raise exceptions.MiddlewareNotUsed
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.secure_content_security_policy = SECURE_CONTENT_SECURITY_POLICY.get()
+        if not self.secure_content_security_policy:
+            logger.info('Unloading ContentSecurityPolicyMiddleware')
+            raise exceptions.MiddlewareNotUsed
 
-  def process_response(self, request, response):
-    if self.secure_content_security_policy and not 'Content-Security-Policy' in response:
-      response["Content-Security-Policy"] = self.secure_content_security_policy
+    def process_request(self, request):
+        csp_nonce = getattr(settings, 'CSP_NONCE', False)
+        if csp_nonce:
+            nonce = generate_nonce()
+            request.csp_nonce = nonce
 
-    return response
+    def process_response(self, request, response):
+        # Add the secure CSP if it doesn't exist
+        if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
+            response["Content-Security-Policy"] = self.secure_content_security_policy
 
+        # Proceed with nonce handling
+        header = get_header(response)
+        if not header or not hasattr(request, 'csp_nonce'):
+            return response
+
+        nonce_found, has_nonce = nonce_exists(response)
+        if has_nonce:
+            logger.error("Nonce already exists: {}".format(nonce_found))
+            return response
+
+        nonce = getattr(request, 'csp_nonce', None)
+        csp_split = header['csp'].split(';')
+        new_csp = []
+        
+        nonce_directive = f"'nonce-{nonce}'" if nonce else ''
+        for p in csp_split:
+            directive = p.lstrip().split(' ')[0]
+            if directive in ('script-src', 'style-src') and nonce:
+                p += f" {nonce_directive}"
+            new_csp.append(p)
+
+        # Set the CSP header with the new policy including the nonce
+        response[header['name']] = "; ".join(new_csp)  # Added space for consistency after ";"
+        return response
 
 class MimeTypeJSFileFixStreamingMiddleware(MiddlewareMixin):
   """
@@ -973,18 +1080,18 @@ class MultipleProxyMiddleware:
     return self.get_response(request)
 
 
-class CSPMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
+# class CSPMiddleware:
+    # def __init__(self, get_response):
+    #     self.get_response = get_response
 
-    def __call__(self, request):
-        nonce = base64.b64encode(os.urandom(16)).decode('utf-8')
-        request.csp_nonce = nonce  # Make nonce available in the request
-        response = self.get_response(request)
-        csp_policy = "script-src 'nonce-{}' 'strict-dynamic' 'unsafe-eval';".format(nonce)
+    # def __call__(self, request):
+    #     nonce = base64.b64encode(os.urandom(16)).decode('utf-8')
+    #     request.csp_nonce = nonce  # Make nonce available in the request
+    #     response = self.get_response(request)
+    #     csp_policy = "script-src 'nonce-{}' 'strict-dynamic' 'unsafe-eval';".format(nonce)
 
-        response['Content-Security-Policy'] = csp_policy
-        return response
+    #     response['Content-Security-Policy'] = csp_policy
+    #     return response
 
 
 class CacheControlMiddleware(MiddlewareMixin):

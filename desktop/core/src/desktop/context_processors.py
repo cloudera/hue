@@ -40,3 +40,33 @@ def get_app_name(request):
 
   if match is not None:
     return match.group(1)
+
+
+def nonce(request):
+    """ Pass the nonce cases to their respective template calls.
+
+    Args:
+        request (:obj:) Django request object
+
+    Returns:
+        dict:
+            script_nonce (str): Cryptographic nonce for use in <script> tags or empty string.
+            style_nonce (str): Cryptographic nonce for use in <style> tags or empty string.
+
+    """
+    script = getattr(request, 'script_nonce', False)
+    style = getattr(request, 'style_nonce', False)
+
+    # Only include nonce in the dictionary if a value is set
+    nonce_dict = {}
+    if script:
+        nonce_dict['script_nonce'] = 'nonce={}'.format(script)
+    else:
+        nonce_dict['script_nonce'] = ''
+    
+    if style:
+        nonce_dict['style_nonce'] = 'nonce={}'.format(style)
+    else:
+        nonce_dict['style_nonce'] = ''
+
+    return nonce_dict
