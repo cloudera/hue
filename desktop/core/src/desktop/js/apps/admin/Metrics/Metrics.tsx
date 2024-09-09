@@ -15,10 +15,11 @@
 // limitations under the License.
 
 import React, { useState, useEffect, useRef } from 'react';
-import MetricsTable, { MetricsResponse } from './MetricsTable';
+import MetricsTable, { MetricsResponse, MetricsTableProps } from './MetricsTable';
 import { Spin, Input, Select, Alert } from 'antd';
-import { get } from 'api/utils';
+import { get } from '../../../api/utils';
 import { SearchOutlined } from '@ant-design/icons';
+import { i18nReact } from '../../../utils/i18nReact';
 import './Metrics.scss';
 
 const { Option } = Select;
@@ -31,7 +32,7 @@ const Metrics: React.FC = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedMetric, setSelectedMetric] = useState<string>('');
   const [showAllTables, setShowAllTables] = useState(true);
-  const [filteredMetricsData, setFilteredMetricsData] = useState<MetricsData[]>([]);
+  const [filteredMetricsData, setFilteredMetricsData] = useState<MetricsTableProps[]>([]);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -86,19 +87,13 @@ const Metrics: React.FC = (): JSX.Element => {
     setSearchQuery(e.target.value);
   };
 
+  const { t } = i18nReact.useTranslation();
+
   return (
     <div className="cuix antd metrics-component">
       <Spin spinning={loading}>
         {!error && (
           <>
-            <Input
-              className="metrics-filter"
-              placeholder="Filter metrics..."
-              value={searchQuery}
-              onChange={handleFilterInputChange}
-              prefix={<SearchOutlined />}
-            />
-
             <Select
               className="metrics-select"
               //to make sure antd class gets applied
@@ -115,6 +110,14 @@ const Metrics: React.FC = (): JSX.Element => {
                 </Option>
               ))}
             </Select>
+
+            <Input
+              className="metrics-filter"
+              placeholder={t('Filter metrics...')}
+              value={searchQuery}
+              onChange={handleFilterInputChange}
+              prefix={<SearchOutlined />}
+            />
           </>
         )}
 
