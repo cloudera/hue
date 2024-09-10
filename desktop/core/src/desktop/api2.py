@@ -177,7 +177,7 @@ def get_hue_config(request):
         conf['values'] = recurse_conf(module.get().values())
       else:
         conf['default'] = str(module.config.default)
-        if 'password' in module.config.key:
+        if module.config.secret or 'password' in module.config.key:
           conf['value'] = '*' * 10
         elif sys.version_info[0] > 2:
           conf['value'] = str(module.get_raw())

@@ -200,7 +200,7 @@ class BoundConfig(object):
 
 class Config(object):
   def __init__(self, key=_ANONYMOUS, default=None, dynamic_default=None,
-               required=False, help=None, type=str, private=False):
+               required=False, help=None, type=str, private=False, secret=False):
     """
     Initialize a new Configurable variable.
 
@@ -213,6 +213,7 @@ class Config(object):
                     str is the default. Should raise an exception in the case
                     that it cannot be coerced.
     @param private  if True, does not emit help text
+    @param secret   if True, masks the config value
     """
     if not callable(type):
       raise ValueError("%s: The type argument '%s()' is not callable" % (key, type))
@@ -240,6 +241,7 @@ class Config(object):
     self.help = help
     self.type = type
     self.private = private
+    self.secret = secret
 
     # It makes no sense to be required if you have a default,
     # since you'll never throw the "not set" error.
