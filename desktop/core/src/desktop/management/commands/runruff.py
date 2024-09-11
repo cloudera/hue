@@ -47,10 +47,10 @@ class Command(BaseCommand):
         ./build/env/bin/hue runruff check file1.py file2.py
 
       Run Ruff linting on files changed between the current branch and a specified diff branch:
-        ./build/env/bin/hue runruff check --diff-branch=origin/master
+        ./build/env/bin/hue runruff --diff-branch=origin/master check
 
       Automatically fix all Ruff errors on files changed between the current branch and a specified diff branch:
-        ./build/env/bin/hue runruff check --diff-branch=origin/master --fix
+        ./build/env/bin/hue runruff --diff-branch=origin/master check --fix
 
     Note:
       Make sure to install Ruff first by running `./build/env/bin/pip install ruff` in your environment.
