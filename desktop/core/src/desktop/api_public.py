@@ -251,13 +251,13 @@ def storage_upload_file(request):
   return filebrowser_views.upload_file(django_request)
 
 
-@api_view(["POST"])
+@api_view(["PUT"])
 def storage_mkdir(request):
   django_request = get_django_request(request)
   return filebrowser_api.mkdir(django_request)
 
 
-@api_view(["POST"])
+@api_view(["PUT"])
 def storage_touch(request):
   django_request = get_django_request(request)
   return filebrowser_api.touch(django_request)

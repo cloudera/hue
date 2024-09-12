@@ -102,6 +102,7 @@ def api_error_handler(view_fn):
   """
   Decorator to handle exceptions and return a JSON response with an error message.
   """
+
   def decorator(*args, **kwargs):
     try:
       return view_fn(*args, **kwargs)
@@ -304,33 +305,31 @@ def listdir_paged(request):
   is_fs_superuser = is_hdfs and _is_hdfs_superuser(request)
 
   response = {
-      # 'path': path,
-      # 'breadcrumbs': breadcrumbs,
-      # 'current_request_path': '/filebrowser/view=' + urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
-      'is_trash_enabled': is_trash_enabled,
-      'files': page.object_list if page else [],
-      'page': _massage_page(page, paginator) if page else {},  # TODO: Check if we need to clean response of _massage_page
-      'pagesize': pagesize,
-      # 'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
-      # 'descending': descending_param,
-
-      # The following should probably be deprecated
-      # TODO: Check what to keep or what to remove? or move some fields to /get_config?
-
-      'cwd_set': True,
-      'file_filter': 'any',
-      # 'current_dir_path': path,
-      'is_fs_superuser': is_fs_superuser,
-      'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
-      'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
-      'superuser': request.fs.superuser,
-      'supergroup': request.fs.supergroup,
-      # 'is_sentry_managed': request.fs.is_sentry_managed(path),
-      # 'apps': list(appmanager.get_apps_dict(request.user).keys()),
-      'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
-      'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
-      # 'is_embeddable': request.GET.get('is_embeddable', False),
-      # 's3_listing_not_allowed': s3_listing_not_allowed
+    # 'path': path,
+    # 'breadcrumbs': breadcrumbs,
+    # 'current_request_path': '/filebrowser/view=' + urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
+    'is_trash_enabled': is_trash_enabled,
+    'files': page.object_list if page else [],
+    'page': _massage_page(page, paginator) if page else {},  # TODO: Check if we need to clean response of _massage_page
+    'pagesize': pagesize,
+    # 'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
+    # 'descending': descending_param,
+    # The following should probably be deprecated
+    # TODO: Check what to keep or what to remove? or move some fields to /get_config?
+    'cwd_set': True,
+    'file_filter': 'any',
+    # 'current_dir_path': path,
+    'is_fs_superuser': is_fs_superuser,
+    'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
+    'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
+    'superuser': request.fs.superuser,
+    'supergroup': request.fs.supergroup,
+    # 'is_sentry_managed': request.fs.is_sentry_managed(path),
+    # 'apps': list(appmanager.get_apps_dict(request.user).keys()),
+    'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
+    'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
+    # 'is_embeddable': request.GET.get('is_embeddable', False),
+    # 's3_listing_not_allowed': s3_listing_not_allowed
   }
 
   return JsonResponse(response)
@@ -440,14 +439,14 @@ def display(request):
   # And add a view structure:
   # data["success"] = True
   data["view"] = {
-      'offset': offset,
-      'length': length,
-      'end': offset + len(contents),
-      # 'dirname': dirname,
-      'mode': mode,
-      'compression': compression,
-      # 'size': stats.size,
-      'max_chunk_size': str(MAX_CHUNK_SIZE_BYTES)
+    'offset': offset,
+    'length': length,
+    'end': offset + len(contents),
+    # 'dirname': dirname,
+    'mode': mode,
+    'compression': compression,
+    # 'size': stats.size,
+    'max_chunk_size': str(MAX_CHUNK_SIZE_BYTES),
   }
   # data["filename"] = os.path.basename(path)
   data["editable"] = stats.size < MAX_FILEEDITOR_SIZE  # TODO: To improve this limit and sent it as /get_config? Needs discussion.
@@ -545,88 +544,90 @@ def _upload_file(request):
     return HttpResponse(messsage, status=500)  # TODO: Check error messages above and status code
 
   # TODO: Check response fields below
-  response.update({
+  response.update(
+    {
       'path': filepath,
       'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
       # 'next': request.GET.get("next")
-  })
+    }
+  )
 
   return JsonResponse(response)
 
 
 @api_error_handler
 def mkdir(request):
-  path = request.POST.get('path')
-  name = request.POST.get('name')
+  path = request.PUT.get('path')
+  name = request.PUT.get('name')
 
   if name and (posixpath.sep in name or "#" in name):
-    raise Exception(_("Error creating %s directory. Slashes or hashes are not allowed in directory name." % name))
+    return HttpResponse(f"Error creating {name} directory. Slashes or hashes are not allowed in directory name.", status=400)
 
   request.fs.mkdir(request.fs.join(path, name))
-  return HttpResponse(status=200)
+  return HttpResponse(status=201)
 
 
 @api_error_handler
 def touch(request):
-  path = request.POST.get('path')
-  name = request.POST.get('name')
+  path = request.PUT.get('path')
+  name = request.PUT.get('name')
 
   if name and (posixpath.sep in name):
-    raise Exception(_("Error creating %s file. Slashes are not allowed in filename." % name))
+    return HttpResponse(f"Error creating {name} file: Slashes are not allowed in filename.", status=400)
 
   request.fs.create(request.fs.join(path, name))
-  return HttpResponse(status=200)
+  return HttpResponse(status=201)
 
 
 @api_error_handler
 def rename(request):
-  src_path = request.POST.get('src_path')
-  dest_path = request.POST.get('dest_path')
+  source_path = request.POST.get('source_path')
+  destination_path = request.POST.get('destination_path')
 
-  if "#" in dest_path:
-    raise Exception(
-      _("Error renaming %s to %s. Hashes are not allowed in file or directory names." % (os.path.basename(src_path), dest_path))
+  if "#" in destination_path:
+    return HttpResponse(
+      f"Error creating {os.path.basename(source_path)} to {destination_path}: Hashes are not allowed in file or directory names", status=400
     )
 
   # If dest_path doesn't have a directory specified, use same directory.
-  if "/" not in dest_path:
-    src_dir = os.path.dirname(src_path)
-    dest_path = request.fs.join(src_dir, dest_path)
+  if "/" not in destination_path:
+    source_dir = os.path.dirname(source_path)
+    destination_path = request.fs.join(source_dir, destination_path)
 
-  if request.fs.exists(dest_path):
-    raise Exception(_('The destination path "%s" already exists.') % dest_path)
+  if request.fs.exists(destination_path):
+    return HttpResponse(f"The destination path {destination_path} already exists.", status=500)  # TODO: Status code?
 
-  request.fs.rename(src_path, dest_path)
+  request.fs.rename(source_path, destination_path)
   return HttpResponse(status=200)
 
 
 @api_error_handler
 def move(request):
-  src_path = request.POST.get('src_path')
-  dest_path = request.POST.get('dest_path')
+  source_path = request.POST.get('source_path')
+  destination_path = request.POST.get('destination_path')
 
-  if src_path == dest_path:
-    raise Exception(_('Source and destination path cannot be same.'))
+  if source_path == destination_path:
+    return HttpResponse('Source and destination path cannot be same.', status=400)
 
-  request.fs.rename(src_path, dest_path)
+  request.fs.rename(source_path, destination_path)
   return HttpResponse(status=200)
 
 
 @api_error_handler
 def copy(request):
-  src_path = request.POST.get('src_path')
-  dest_path = request.POST.get('dest_path')
+  source_path = request.POST.get('source_path')
+  destination_path = request.POST.get('destination_path')
 
-  if src_path == dest_path:
-    raise Exception(_('Source and destination path cannot be same.'))
+  if source_path == destination_path:
+    return HttpResponse('Source and destination path cannot be same.', status=400)
 
   # Copy method for Ozone FS returns a string of skipped files if their size is greater than configured chunk size.
-  if src_path.startswith('ofs://'):
-    ofs_skip_files = request.fs.copy(src_path, dest_path, recursive=True, owner=request.user)
+  if source_path.startswith('ofs://'):
+    ofs_skip_files = request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
     if ofs_skip_files:
-      return HttpResponse(ofs_skip_files, status=200)
+      return JsonResponse(ofs_skip_files, status=200)
   else:
-    request.fs.copy(src_path, dest_path, recursive=True, owner=request.user)
+    request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
 
   return HttpResponse(status=200)
 
