@@ -21,30 +21,31 @@ from desktop.lib.ai.models.gpt import GPTModel
 
 from desktop.conf import AI_INTERFACE, get_ai_service_token
 
-_api_url = AI_INTERFACE.BASE_URL.get()
+_api_url = AI_INTERFACE.BASE_URL.get() # type: ignore
 _api_key = get_ai_service_token()
-_api_version = AI_INTERFACE.SERVICE_VERSION.get() or "2024-02-15-preview"
+_api_version = AI_INTERFACE.SERVICE_VERSION.get() or "2024-02-15-preview" # type: ignore
 
 class AzureService(BaseService):
   def __init__(self, model_key: str):
-    import openai
-    openai.api_type = "azure"
-    openai.api_base = _api_url
-    openai.api_key = _api_key
-    openai.api_version = _api_version
-    self.openai = openai
+    from openai import AzureOpenAI
+    self.client = AzureOpenAI(
+        api_key=_api_key,
+        azure_endpoint=_api_url,
+        api_version=_api_version
+    )
 
     super().__init__(self.get_model(model_key))
 
   def get_model(self, model_key: str) -> BaseModel:
     return GPTModel()
 
-  def call_model(self, data: dict) -> str:
-    deployment_name = AI_INTERFACE.MODEL_NAME.get()
-    response = self.openai.ChatCompletion.create(
-      engine=deployment_name,
+  def call_model(self, data) -> str:
+    deployment_name = AI_INTERFACE.MODEL_NAME.get() # type: ignore
+    response = self.client.chat.completions.create(
+      model=deployment_name,
       temperature=0,
-      messages=[data]
+      messages=[data] # type: ignore
     )
-    choices = response.choices[0]
-    return choices.message.content.strip()
+
+    content = response.choices[0].message.content
+    return content.strip() if content else ""
