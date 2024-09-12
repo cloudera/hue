@@ -95,17 +95,16 @@ urlpatterns += [
 
 urlpatterns += [
   re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='storage_view'),
-
-  re_path(r'^storage/mkdir$', api_public.storage_mkdir, name='storage_mkdir'),
-  re_path(r'^storage/touch$', api_public.storage_touch, name='storage_touch'),
-  re_path(r'^storage/rename$', api_public.storage_rename, name='storage_rename'),
-  re_path(r'^storage/move$', api_public.storage_move, name='storage_move'),
-  re_path(r'^storage/copy$', api_public.storage_copy, name='storage_copy'),
 ]
 
 urlpatterns += [
   re_path(r'^storage/filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
   re_path(r'^storage/list/?$', api_public.storage_listdir_paged, name='storage_listdir_paged'),
+  re_path(r'^storage/create/file/?$', api_public.storage_touch, name='storage_touch'),
+  re_path(r'^storage/create/directory/?$', api_public.storage_mkdir, name='storage_mkdir'),
+  re_path(r'^storage/rename/?$', api_public.storage_rename, name='storage_rename'),
+  re_path(r'^storage/move/?$', api_public.storage_move, name='storage_move'),
+  re_path(r'^storage/copy/?$', api_public.storage_copy, name='storage_copy'),
   re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),
 
   re_path(r'^storage/stat/?$', api_public.storage_stat, name='storage_stat'),
