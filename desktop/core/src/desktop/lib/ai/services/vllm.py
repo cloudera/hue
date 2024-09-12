@@ -18,30 +18,33 @@
 from desktop.lib.ai.lib.base_service import BaseService
 
 from desktop.lib.ai.lib.base_model import BaseModel
-from desktop.lib.ai.models.gpt import GPTModel
+from desktop.lib.ai.models.llama import LlamaModel
 
 from desktop.conf import AI_INTERFACE, get_ai_service_token
 
-API_KEY = get_ai_service_token()
+_api_key = get_ai_service_token() or "EMPTY"
+_api_url = AI_INTERFACE.BASE_URL.get()
 
-class OpenAiService(BaseService):
+class VLLMService(BaseService):
   def __init__(self, model_key: str):
     from openai import OpenAI
 
     self.client = OpenAI(
-        api_key=API_KEY
+        api_key=_api_key,
+        base_url=_api_url,
     )
 
     super().__init__(self.get_model(model_key))
 
   def get_model(self, model_key: str) -> BaseModel:
-    return GPTModel()
+    return LlamaModel()
 
   def call_model(self, data: dict) -> str:
     model_name = AI_INTERFACE.MODEL_NAME.get() or self.model.get_default_name() # type: ignore
     response = self.client.chat.completions.create(
         model=model_name,
-        temperature=0,
+        temperature=1,
+        max_tokens=4096,
         messages=[data] # type: ignore
     )
 
