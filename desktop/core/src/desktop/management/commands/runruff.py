@@ -15,17 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import logging
 import os.path
-import subprocess
-import sys
 import argparse
+import subprocess
 
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
 
 from desktop.lib import paths
-
 
 LOG = logging.getLogger()
 
