@@ -322,6 +322,16 @@ def storage_trash_purge(request):
   django_request = get_django_request(request)
   return filebrowser_api.trash_purge(django_request)
 
+@api_view(["POST"])
+def storage_compress_files_using_batch_job(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.compress_files_using_batch_job(django_request)
+
+@api_view(["POST"])
+def storage_extract_archive_using_batch_job(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.extract_archive_using_batch_job(django_request)
+
 
 # Importer
 

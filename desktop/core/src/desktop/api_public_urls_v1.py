@@ -115,6 +115,8 @@ urlpatterns += [
   re_path(r'^storage/trash/path/?$', api_public.storage_get_trash_path, name='storage_get_trash_path'),
   re_path(r'^storage/trash/restore/?$', api_public.storage_trash_restore, name='storage_trash_restore'),
   re_path(r'^storage/trash/purge/?$', api_public.storage_trash_purge, name='storage_trash_purge'),
+  re_path(r'^storage/extract_archive/?', api_public.storage_extract_archive_using_batch_job, name='storage_extract_archive_using_batch_job'),
+  re_path(r'^storage/compress_files/?', api_public.storage_compress_files_using_batch_job, name='storage_compress_files_using_batch_job'),
 ]
 
 urlpatterns += [
