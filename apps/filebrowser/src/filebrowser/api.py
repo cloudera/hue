@@ -38,6 +38,8 @@ from desktop.lib.export_csvxls import file_reader
 from desktop.lib.fs.gc.gs import GSListAllBucketsException, get_gs_home_directory
 from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
 from desktop.lib.i18n import smart_unicode
+from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
+from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from filebrowser.conf import (
   ARCHIVE_UPLOAD_TEMPDIR,
   ENABLE_EXTRACT_UPLOADED_ARCHIVE,
@@ -739,3 +741,45 @@ def trash_purge(request):
   request.fs.purge_trash()
 
   return HttpResponse(status=200)
+
+
+@api_error_handler
+def extract_archive_using_batch_job(request):
+
+  if not ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
+    return HttpResponse("Extract archive operation is disabled by configuration.", status=500)  # TODO: status code?
+
+  upload_path = request.fs.netnormpath(request.POST.get('upload_path'))
+  archive_name = request.POST.get('archive_name')
+
+  if upload_path and archive_name:
+    try:
+      # TODO: Check is we really require urllib_unquote here? Maybe need to improve old oozie methods also?
+      # upload_path = urllib_unquote(upload_path)
+      # archive_name = urllib_unquote(archive_name)
+      response = extract_archive_in_hdfs(request, upload_path, archive_name)
+    except Exception as e:
+      return HttpResponse(f'Failed to extract archive: {str(e)}', status=500)  # TODO: status code?
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def compress_files_using_batch_job(request):
+
+  if not ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
+    return HttpResponse("Compress files operation is disabled by configuration.", status=500)  # TODO: status code?
+
+  upload_path = request.fs.netnormpath(request.POST.get('upload_path'))
+  archive_name = request.POST.get('archive_name')
+  file_names = request.POST.getlist('files[]')  # TODO: Check if this param is correct? Need to improve it?
+
+  if upload_path and file_names and archive_name:
+    try:
+      response = compress_files_in_hdfs(request, file_names, upload_path, archive_name)
+    except Exception as e:
+      return HttpResponse(f'Failed to compress files: {str(e)}', status=500)  # TODO: status code?
+  else:
+    return HttpResponse('Output directory is not set.', status=500)  # TODO: status code?
+
+  return JsonResponse(response)
