@@ -102,6 +102,7 @@ urlpatterns += [
   re_path(r'^storage/list/?$', api_public.storage_listdir_paged, name='storage_listdir_paged'),
   re_path(r'^storage/create/file/?$', api_public.storage_touch, name='storage_touch'),
   re_path(r'^storage/create/directory/?$', api_public.storage_mkdir, name='storage_mkdir'),
+  re_path(r'^storage/save/?$', api_public.storage_save_file, name="storage_save_file"),
   re_path(r'^storage/rename/?$', api_public.storage_rename, name='storage_rename'),
   re_path(r'^storage/move/?$', api_public.storage_move, name='storage_move'),
   re_path(r'^storage/copy/?$', api_public.storage_copy, name='storage_copy'),
