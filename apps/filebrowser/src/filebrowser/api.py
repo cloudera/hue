@@ -64,6 +64,7 @@ from filebrowser.views import (
 )
 from hadoop.core_site import get_trash_interval
 from hadoop.fs.exceptions import WebHdfsException
+from hadoop.fs.fsutils import do_overwrite_save
 from useradmin.models import Group, User
 
 LOG = logging.getLogger()
@@ -521,7 +522,7 @@ def _upload_file(request):
     return HttpResponse(request.META.get('upload_failed'), status=500)  # TODO: Check error message and status code
 
   uploaded_file = request.FILES['file']
-  dest_path = request.GET['destination_path']
+  dest_path = request.GET.get('destination_path')
 
   filepath = request.fs.join(dest_path, uploaded_file.name)
 
@@ -577,6 +578,34 @@ def touch(request):
 
   request.fs.create(request.fs.join(path, name))
   return HttpResponse(status=201)
+
+
+@api_error_handler
+def save_file(request):
+  """
+  The POST endpoint to save a file in the file editor.
+
+  Does the save and then redirects back to the edit page.
+  """
+  path = request.POST.get('path')
+  path = _normalize_path(path)
+
+  encoding = request.POST.get('encoding')
+  data = request.POST.get('contents').encode(encoding)
+
+  if not path:
+    return HttpResponse("Path parameter is required for saving the file.", status=400)
+
+  try:
+    if request.fs.exists(path):
+      do_overwrite_save(request.fs, path, data)
+    else:
+      request.fs.create(path, overwrite=False, data=data)
+  except Exception as e:
+    return HttpResponse(f"The file could not be saved: {str(e)}", status=500)  # TODO: Status code?
+
+  # TODO: Any response field required?
+  return HttpResponse(status=200)
 
 
 @api_error_handler
