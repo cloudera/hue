@@ -1,90 +1,31 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-commands:
-  build-py-38-common:
-    parameters:
-      go_arch:
-        # amd64 or arm64
-        type: string
-      hugo_arch:
-        # 64bit (AMD64) or ARM64
-        type: string
-    steps:
-      - checkout
-
-      - run:
-          name: compile
-          command: |
-            sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
-            export DEBIAN_FRONTEND=noninteractive
-            sudo apt-get update
-            sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
-            curl -sL https://deb.nodesource.com/setup_20.x | sudo bash - && sudo apt-get install -y nodejs
-            curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
-            sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
-
-            export PYTHON_VER=python3.8
-            export ROOT=$PWD
-            make apps
-
-      - run:
-          name: run documentation lints
-          command: |
-            cd ~/repo
-
-            # Installs to move to image building
-            curl -O https://dl.google.com/go/go1.17.linux-<< parameters.go_arch >>.tar.gz
-            tar -xvf go1.17.linux-<< parameters.go_arch >>.tar.gz
-            export GO111MODULE=on
-            go/bin/go get -u github.com/raviqqe/muffet@v1.5.7
-
-            curl --output hugo_0.69.0_Linux.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-<< parameters.hugo_arch >>.tar.gz
-            tar -xvf hugo_0.69.0_Linux.tar.gz
-
-            export PATH=$PWD:$HOME/go/bin:$PATH
-
-            # Trigger linting if documentation changes
-            ./tools/ci/check_for_website_dead_links.sh docs/docs-site
-            # ./tools/ci/check_for_website_dead_links.sh docs/gethue
-
-      - run:
-          name: run python lints
-          command: |
-            PYTHONWARNINGS=always ./build/env/bin/hue runruff check
-
-      - run:
-          name: run tests
-          command: |
-            PYTHONWARNINGS=always ./build/env/bin/pytest 
-
-      - store_artifacts:
-          path: test-reports
-          destination: test-reports
-
-
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/jobs-steps/#jobs-overview & https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  build-py-38-arm64:
-    machine:
-      image: ubuntu-2004:2023.07.1
-    resource_class: arm.medium
+  say-hello:
+    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/executor-intro/ & https://circleci.com/docs/configuration-reference/#executor-job
+    docker:
+      # Specify the version you desire here
+      # See: https://circleci.com/developer/images/image/cimg/base
+      - image: cimg/base:current
 
-    working_directory: ~/repo
-
+    # Add steps to the job
+    # See: https://circleci.com/docs/jobs-steps/#steps-overview & https://circleci.com/docs/configuration-reference/#steps
     steps:
-      - build-py-38-common:
-          go_arch: "arm64"
-          hugo_arch: "ARM64"
+      # Checkout the code as the first step.
+      - checkout
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
 
+# Orchestrate jobs using workflows
+# See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
 workflows:
-  version: 2
-  build-python3:
+  say-hello-workflow: # This is the name of the workflow, feel free to change it to better match your workflow.
+    # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - build-py-38-arm64:
-          filters:
-            branches:
-              ignore:
-                - master
+      - say-hello
