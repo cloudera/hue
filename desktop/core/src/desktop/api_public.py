@@ -256,6 +256,16 @@ def storage_upload_file(request):
   django_request = get_django_request(request)
   return filebrowser_api.upload_file(django_request)
 
+@api_view(["POST"])
+def storage_upload_chunks(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.upload_chunks(django_request)
+
+@api_view(["POST"])
+def storage_upload_complete(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.upload_complete(django_request)
+
 
 @api_view(["PUT"])
 def storage_mkdir(request):
@@ -322,16 +332,35 @@ def storage_trash_purge(request):
   django_request = get_django_request(request)
   return filebrowser_api.trash_purge(django_request)
 
+
 @api_view(["POST"])
 def storage_compress_files_using_batch_job(request):
   django_request = get_django_request(request)
   return filebrowser_api.compress_files_using_batch_job(django_request)
+
 
 @api_view(["POST"])
 def storage_extract_archive_using_batch_job(request):
   django_request = get_django_request(request)
   return filebrowser_api.extract_archive_using_batch_job(django_request)
 
+
+# Task Server
+
+@api_view(["GET"])
+def taskserver_get_available_space_for_upload(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.get_available_space_for_upload(django_request)
+
+@api_view(["POST"])
+def taskserver_reserve_space_for_upload(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.reserve_space_for_upload(django_request)
+
+@api_view(["POST"])
+def taskserver_release_reserved_space_for_upload(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.release_reserved_space_for_upload(django_request)
 
 # Importer
 
