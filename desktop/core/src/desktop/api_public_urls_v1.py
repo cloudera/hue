@@ -15,16 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
+from django.urls import re_path
 
 from desktop import api_public
 from desktop.lib.botserver import api as botserver_api
-
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
-
 
 # "New" query API (i.e. connector based, lean arguments).
 # e.g. https://demo.gethue.com/api/query/execute/hive
@@ -87,14 +81,27 @@ urlpatterns += [
     name='editor_sample_data_column',
   ),
   re_path(
-      r"^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
-      api_public.get_sample_data,
-      name="editor_sample_data_nested",
+    r"^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
+    api_public.get_sample_data,
+    name="editor_sample_data_nested",
   ),
 ]
 
 urlpatterns += [
   re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='storage_view'),
+  re_path(
+    r'^taskserver/upload/available_space/?$',
+    api_public.taskserver_get_available_space_for_upload,
+    name='taskserver_get_available_space_for_upload',
+  ),
+  re_path(
+    r'^taskserver/upload/reserve_space/?$', api_public.taskserver_reserve_space_for_upload, name='taskserver_reserve_space_for_upload'
+  ),
+  re_path(
+    r'^taskserver/upload/release_reserved_space/?$',
+    api_public.taskserver_release_reserved_space_for_upload,
+    name='taskserver_release_reserved_space_for_upload',
+  ),
 ]
 
 urlpatterns += [
@@ -107,7 +114,8 @@ urlpatterns += [
   re_path(r'^storage/move/?$', api_public.storage_move, name='storage_move'),
   re_path(r'^storage/copy/?$', api_public.storage_copy, name='storage_copy'),
   re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),
-
+  re_path(r'^storage/upload/chunks/?$', api_public.storage_upload_chunks, name='storage_upload_chunks'),
+  re_path(r'^storage/upload/complete/?$', api_public.storage_upload_complete, name='storage_upload_complete'),
   re_path(r'^storage/stat/?$', api_public.storage_stat, name='storage_stat'),
   re_path(r'^storage/display/?$', api_public.storage_display, name='storage_display'),
   re_path(r'^storage/download/?$', api_public.storage_download, name='storage_download'),
@@ -117,8 +125,10 @@ urlpatterns += [
   re_path(r'^storage/trash/path/?$', api_public.storage_get_trash_path, name='storage_get_trash_path'),
   re_path(r'^storage/trash/restore/?$', api_public.storage_trash_restore, name='storage_trash_restore'),
   re_path(r'^storage/trash/purge/?$', api_public.storage_trash_purge, name='storage_trash_purge'),
-  re_path(r'^storage/extract_archive/?', api_public.storage_extract_archive_using_batch_job, name='storage_extract_archive_using_batch_job'),
-  re_path(r'^storage/compress_files/?', api_public.storage_compress_files_using_batch_job, name='storage_compress_files_using_batch_job'),
+  re_path(
+    r'^storage/extract_archive/?$', api_public.storage_extract_archive_using_batch_job, name='storage_extract_archive_using_batch_job'
+  ),
+  re_path(r'^storage/compress_files/?$', api_public.storage_compress_files_using_batch_job, name='storage_compress_files_using_batch_job'),
 ]
 
 urlpatterns += [

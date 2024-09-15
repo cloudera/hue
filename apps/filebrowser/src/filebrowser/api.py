@@ -50,6 +50,7 @@ from filebrowser.conf import (
   SHOW_UPLOAD_BUTTON,
 )
 from filebrowser.lib import xxd
+from filebrowser.utils import parse_broker_url
 from filebrowser.views import (
   BYTES_PER_LINE,
   BYTES_PER_SENTENCE,
@@ -487,6 +488,14 @@ def stat(request):
 
   return JsonResponse(_massage_stats(request, stat_absolute_path(path, stats)))
 
+@api_error_handler
+def upload_chunks(request):
+  pass
+
+@api_error_handler
+def upload_complete(request):
+  pass
+
 
 @api_error_handler
 def upload_file(request):
@@ -783,3 +792,29 @@ def compress_files_using_batch_job(request):
     return HttpResponse('Output directory is not set.', status=500)  # TODO: status code?
 
   return JsonResponse(response)
+
+
+@api_error_handler
+def get_available_space_for_upload(request):
+  redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
+  try:
+    upload_available_space = int(redis_client.get('upload_available_space'))
+    if upload_available_space is None:
+      return HttpResponse("upload_available_space key is not set in Redis.", status=500)  # TODO: status code?
+
+    return JsonResponse({'upload_available_space': upload_available_space})
+  except Exception as e:
+    message = f"Failed to get available space from Redis: {str(e)}"
+    LOG.exception(message)
+    return HttpResponse(message, status=500)  # TODO: status code?
+  finally:
+    redis_client.close()
+
+
+@api_error_handler
+def reserve_space_for_upload(request):
+  pass
+
+@api_error_handler
+def release_reserved_space_for_upload(request):
+  pass
