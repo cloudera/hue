@@ -68,6 +68,7 @@ from desktop.models import Settings, hue_version, _get_apps, UserPreferences
 from libsaml.conf import REQUIRED_GROUPS, REQUIRED_GROUPS_ATTRIBUTE
 from useradmin.models import get_profile
 from useradmin.models import User
+from django.utils.html import format_html
 
 if sys.version_info[0] > 2:
   from io import StringIO as string_io
@@ -655,7 +656,7 @@ def commonfooter_m(request, messages=None):
   return commonfooter(request, messages, True)
 
 
-def commonfooter(request, messages=None, is_mobile=False, csp_nonce=None):
+def commonfooter(request, messages=None, is_mobile=False):
   """
   Returns the rendered common footer
   """
@@ -669,7 +670,6 @@ def commonfooter(request, messages=None, is_mobile=False, csp_nonce=None):
     template = 'common_footer_m.mako'
   return django_mako.render_to_string(template, {
     'request': request,
-    'csp_nonce': csp_nonce,
     'messages': messages,
     'version': hue_version(),
     'collect_usage': collect_usage(),

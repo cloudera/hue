@@ -29,6 +29,7 @@ if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
+from desktop.lib.django_util import nonce_attribute
 %>
 
 
@@ -74,7 +75,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript" nonce="${request.csp_nonce}">
+  <script type="text/javascript"  ${nonce_attribute(request)}>
     (function () {
       var WHEEL_RADIUS = 75;
       var PLUS_ICON_RADIUS = 27.859; // FA-5X
@@ -353,7 +354,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript" nonce="${request.csp_nonce}">
+  <script type="text/javascript" ${nonce_attribute(request)} >
     (function () {
 
       function DownloadResultsViewModel (params, element) {
@@ -778,7 +779,7 @@ else:
     </div>
   </script>
 
-  <script type="text/javascript" nonce="${request.csp_nonce}">
+  <script type="text/javascript"  ${nonce_attribute(request)} >
     (function () {
 
       function AceKeyboardShortcutsViewModel () {

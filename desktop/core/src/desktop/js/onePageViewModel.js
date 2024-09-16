@@ -256,7 +256,12 @@ class OnePageViewModel {
           const nextScriptPromise = scriptPromises.shift();
           nextScriptPromise.done(scriptDetails => {
             if (scriptDetails.contents) {
-              $.globalEval(scriptDetails.contents);
+              // $.globalEval(scriptDetails.contents);
+              const nonce = window.nonce || '';  // Fallback to an empty string if nonce is not defined
+              const script = document.createElement('script');
+              script.setAttribute('nonce', nonce);  // Set the nonce attribute more explicitly
+              script.text = scriptDetails.contents;
+              document.head.appendChild(script).parentNode.removeChild(script);
             }
             evalScriptSync();
           });
@@ -386,6 +391,11 @@ class OnePageViewModel {
               self.extraEmbeddableURLParams('');
 
               self.processHeaders(response).done($rawHtml => {
+                const nonce = window.nonce || ''; 
+                const scripts = $rawHtml.find('script');
+                scripts.each(function() {
+                  this.setAttribute('nonce', nonce);
+                });
                 if (window.SKIP_CACHE.indexOf(app) === -1) {
                   self.embeddable_cache[app] = $rawHtml;
                 }

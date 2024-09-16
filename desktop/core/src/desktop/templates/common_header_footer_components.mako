@@ -30,10 +30,11 @@ if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
+from desktop.lib.django_util import nonce_attribute
 %>
 
 <%def name="header_pollers(user, is_s3_enabled, apps)">
-  <script nonce="${request.csp_nonce}" type="text/javascript">
+  <script ${nonce_attribute(request)} type="text/javascript">
     Dropzone.autoDiscover = false;
     moment.locale(window.navigator.userLanguage || window.navigator.language);
     localeFormat = function (time) {
@@ -230,7 +231,7 @@ else:
 
 </%def>
 
-<%def name="footer(messages, csp_nonce)">
+<%def name="footer(messages, nonce)">
 
 <div id="progressStatus" class="uploadstatus well hide">
   <h4>${ _('Upload progress') }</h4>
@@ -267,7 +268,7 @@ else:
 
 <div class="clipboard-content"></div>
 
-<script nonce="${request.csp_nonce if request else csp_nonce}" type="text/javascript">
+<script ${nonce_attribute(request)} type="text/javascript">
 
   $(document).ready(function () {
 

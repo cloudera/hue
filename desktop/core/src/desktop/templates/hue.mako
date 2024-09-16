@@ -24,6 +24,7 @@
   from desktop.models import hue_version
   from desktop.views import _ko, commonshare, login_modal
   from desktop.webpack_utils import get_hue_bundles
+  from desktop.lib.django_util import nonce_attribute
 
   from webpack_loader.templatetags.webpack_loader import render_bundle
 
@@ -43,9 +44,10 @@
 
   % if conf.COLLECT_USAGE.get():
     <!-- Google tag (gtag.js) -->
-    <script nonce="${request.csp_nonce}" async src="https://www.googletagmanager.com/gtag/js?id=${conf.GTAG_ID.get()}"></script>
-    <script nonce="${request.csp_nonce}" >
+    <script ${nonce_attribute(request)} async src="https://www.googletagmanager.com/gtag/js?id=${conf.GTAG_ID.get()}"></script>
+    <script ${nonce_attribute(request)} >
       window.dataLayer = window.dataLayer || [];
+      window.nonce="${request.csp_nonce}";
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
@@ -93,10 +95,10 @@
   <%
     global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
   %>
-  <script nonce="${request.csp_nonce}"  src="${global_constants_url}"></script>
+  <script ${nonce_attribute(request)}   src="${global_constants_url}"></script>
 
   % if not conf.DEV.get():
-  <script nonce="${request.csp_nonce}"  src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
+  <script ${nonce_attribute(request)}   src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
 </head>
 
@@ -110,8 +112,8 @@
   </ul>
 
   <!-- UserVoice JavaScript SDK -->
-  <script nonce="${request.csp_nonce}" >(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
-  <script nonce="${request.csp_nonce}" >
+  <script ${nonce_attribute(request)}  >(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+  <script ${nonce_attribute(request)}  >
   UserVoice = window.UserVoice || [];
   function showClassicWidget() {
     UserVoice.push(['showLightbox', 'classic_widget', {
@@ -296,25 +298,24 @@ ${ hueIcons.symbols() }
 ${ commonshare() | n,unicode }
 
 % for bundle in get_hue_bundles('login' if section == 'login' else 'hue', 'LOGIN' if section == 'login' else 'DEFAULT'):
-  <% text = render_bundle(bundle, config='LOGIN' if section == 'login' else 'DEFAULT').replace('<script ', '<script nonce="' + request.csp_nonce + '" ') %>
+  <% text = render_bundle(bundle, config='LOGIN' if section == 'login' else 'DEFAULT').replace('<script ', '<script' + nonce_attribute(request) + ' ') %>
   ${ text | n}
 % endfor
 
+<script ${nonce_attribute(request)}  src="${ static('desktop/js/polyfills.js') }"></script>
+<script ${nonce_attribute(request)}  src="${ static('desktop/ext/js/tether.js') }"></script>
+<script ${nonce_attribute(request)}  src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
+<script ${nonce_attribute(request)}  src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }"></script>
+<script ${nonce_attribute(request)}  src="${ static('desktop/ext/js/tzdetect.js') }"></script>
 
-<script nonce="${request.csp_nonce}" src="${ static('desktop/js/polyfills.js') }"></script>
-<script nonce="${request.csp_nonce}" src="${ static('desktop/ext/js/tether.js') }"></script>
-<script nonce="${request.csp_nonce}" src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
-<script nonce="${request.csp_nonce}" src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }"></script>
-<script nonce="${request.csp_nonce}" src="${ static('desktop/ext/js/tzdetect.js') }"></script>
+<script ${nonce_attribute(request)}  src="${ static('desktop/ext/js/bootstrap-fileupload.js') }"></script>
+<script ${nonce_attribute(request)}  src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
+<script ${nonce_attribute(request)}  src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
+<script ${nonce_attribute(request)}  src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 
-<script nonce="${request.csp_nonce}" src="${ static('desktop/ext/js/bootstrap-fileupload.js') }"></script>
-<script nonce="${request.csp_nonce}" src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
-<script nonce="${request.csp_nonce}" src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
-<script nonce="${request.csp_nonce}" src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
+<script ${nonce_attribute(request)}  src="${ static('desktop/js/share2.vm.js') }"></script>
 
-<script nonce="${request.csp_nonce}" src="${ static('desktop/js/share2.vm.js') }"></script>
-
-<script nonce="${request.csp_nonce}" >
+<script ${nonce_attribute(request)}  >
   var shareViewModel = initSharing("#documentShareModal");
 </script>
 
@@ -336,7 +337,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
-${ commonHeaderFooterComponents.footer(messages, csp_nonce) }
+${ commonHeaderFooterComponents.footer(messages, nonce) }
 
 ## This includes common knockout templates that are shared with the Job Browser page and the mini job browser panel
 ## available in the upper right corner throughout Hue

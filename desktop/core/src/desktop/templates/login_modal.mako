@@ -22,7 +22,7 @@
     from django.utils.translation import gettext as _
   else:
     from django.utils.translation import ugettext as _
-
+  from desktop.lib.django_util import nonce_attribute
   from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
 %>
 
@@ -49,7 +49,7 @@
   </div>
 </div>
 
-<script nonce="${request.csp_nonce}">
+<script ${nonce_attribute(request)} >
   $(document).ready(function () {
     $('.reload').on('click', function () {
       location.reload();

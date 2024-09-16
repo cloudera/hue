@@ -25,6 +25,7 @@
     from django.utils.translation import gettext as _
   else:
     from django.utils.translation import ugettext as _
+  from desktop.lib.django_util import nonce_attribute
 %>
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
@@ -1069,7 +1070,7 @@ There is no bridge to KO for components using this integration. Example using in
   </div>
 </div>
 
-<script type="text/javascript">
+<script ${nonce_attribute(request)} type="text/javascript">
   window.EDITOR_BINDABLE_ELEMENT = '#editorComponents';
 
   window.EDITOR_SUFFIX = 'editor';

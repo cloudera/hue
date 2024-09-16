@@ -167,7 +167,6 @@ MIDDLEWARE = [
     # 'axes.middleware.FailedLoginMiddleware',
     'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
     'crequest.middleware.CrequestMiddleware',
-    'desktop.middleware.CSPMiddleware',
 ]
 
 # if os.environ.get(ENV_DESKTOP_DEBUG):
@@ -241,7 +240,7 @@ GTEMPLATE_CONTEXT_PROCESSORS = (
   'django.template.context_processors.request',
   'django.contrib.messages.context_processors.messages',
    # Not default
-  'desktop.context_processors.app_name',
+  'desktop.context_processors.app_name'
 )
 
 TEMPLATES = [

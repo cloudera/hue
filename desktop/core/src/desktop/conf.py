@@ -395,6 +395,13 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
           "child-src 'self' data: *.vimeo.com;" +
           "object-src 'none'")
 
+
+CSP_NONCE = Config(
+  key="csp_nonce",
+  help=_('CSP NONCE can be true or false'),
+  type=coerce_bool,
+  default=False)
+
 SECURE_SSL_REDIRECT = Config(
   key="secure_ssl_redirect",
   help=_('If all non-SSL requests should be permanently redirected to SSL.'),

@@ -30,7 +30,7 @@ if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
-
+from desktop.lib.django_util import nonce_attribute
 home_url = url('desktop_views_home')
 if USE_NEW_EDITOR.get():
   home_url = url('desktop_views_home2')
@@ -89,7 +89,7 @@ if USE_NEW_EDITOR.get():
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3-extra.css') }" rel="stylesheet">
 
-  <style type="text/css">
+  <style ${nonce_attribute(request)} type="text/css">
     % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
       body {
         display: none;
@@ -142,26 +142,24 @@ if USE_NEW_EDITOR.get():
   <%
     global_constants_url = '/desktop/globalJsConstants.js?v=' + hue_version()
   %>
-  <script nonce="${ request.csp_nonce }" src="${global_constants_url}"></script>
+  <script ${nonce_attribute(request)} src="${global_constants_url}"></script>
   % endif
 
   % if not conf.DEV.get():
-  <script nonce="${ request.csp_nonce }" src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
+  <script ${nonce_attribute(request)} src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
 
   % for bundle in get_hue_bundles('login' if section == 'login' else 'hue', 'LOGIN' if section == 'login' else 'DEFAULT'):
-      ## Instead of trying to assign to a variable, directly operate within expressions.
-      ${render_bundle(bundle, config='LOGIN' if section == 'login' else 'DEFAULT').replace('<script ', '<script nonce="' + request.csp_nonce + '" ') | n}
+    ${ render_bundle(bundle, config='LOGIN' if section == 'login' else 'DEFAULT') | n,unicode }
   % endfor
 
-
-  <script nonce="${ request.csp_nonce }" src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
-  <script nonce="${ request.csp_nonce }" src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
-  <script nonce="${ request.csp_nonce }" src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
-  <script nonce="${ request.csp_nonce }" src="${ static('desktop/js/popover-extra-placements.js') }"></script>
-  <script nonce="${ request.csp_nonce }" src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
-  <script nonce="${ request.csp_nonce }" src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
-  <script nonce="${ request.csp_nonce }" src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
+  <script ${nonce_attribute(request)} src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
+  <script ${nonce_attribute(request)}  src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
+  <script ${nonce_attribute(request)}  src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
+  <script ${nonce_attribute(request)}  src="${ static('desktop/js/popover-extra-placements.js') }"></script>
+  <script ${nonce_attribute(request)}  src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
+  <script ${nonce_attribute(request)}  src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script ${nonce_attribute(request)}  src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
 % if user.is_authenticated:
   ${ hueAceAutocompleter.hueAceAutocompleter() }
@@ -170,9 +168,9 @@ if USE_NEW_EDITOR.get():
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
 % if user.is_authenticated:
-  <script  nonce="${ request.csp_nonce }" src="${ static('desktop/ext/js/localforage.min.js') }"></script>
+  <script ${nonce_attribute(request)} src="${ static('desktop/ext/js/localforage.min.js') }"></script>
 
-  <script  nonce="${ request.csp_nonce }" type="text/javascript">
+  <script ${nonce_attribute(request)} type="text/javascript">
     $(document).ready(function () {
       localforage.config({
         version: 1.0,
@@ -202,7 +200,7 @@ ${ hueIcons.symbols() }
 
 
 % if hasattr(request, 'environ') and request.environ.get("PATH_INFO").find("/hue/") < 0:
-  <script  nonce="${ request.csp_nonce }">
+  <script  ${nonce_attribute(request)}>
     window.location.replace(window.HUE_BASE_URL || "/");
   </script>
 % endif
@@ -558,8 +556,8 @@ ${ hueIcons.symbols() }
   </ul>
 
   <!-- UserVoice JavaScript SDK -->
-  <script nonce="${ request.csp_nonce }" >(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
-  <script nonce="${ request.csp_nonce }">
+  <script ${nonce_attribute(request)}>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+  <script ${nonce_attribute(request)}>
   UserVoice = window.UserVoice || [];
   function showClassicWidget() {
     UserVoice.push(['showLightbox', 'classic_widget', {

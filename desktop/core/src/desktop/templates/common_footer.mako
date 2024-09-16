@@ -24,6 +24,8 @@ if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
+
+from desktop.lib.django_util import nonce_attribute
 %>
 
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
@@ -34,7 +36,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
-${ commonHeaderFooterComponents.footer(messages, csp_nonce) }
+${ commonHeaderFooterComponents.footer(messages, nonce_attribute(request) ) }
 
   </body>
 </html>

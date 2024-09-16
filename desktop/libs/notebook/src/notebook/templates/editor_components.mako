@@ -24,7 +24,7 @@ from desktop.auth.backend import is_admin
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko, antixss
 from desktop.webpack_utils import get_hue_bundles
-
+from desktop.lib.django_util import nonce_attribute
 from metadata.conf import has_optimizer, OPTIMIZER
 
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
@@ -2054,7 +2054,7 @@ else:
 
 <%def name="commonJS(is_embeddable=False, bindableElement='editorComponents', suffix='')">
 
-<script type="text/javascript">
+<script ${nonce_attribute(request)} type="text/javascript">
   window.EDITOR_BINDABLE_ELEMENT = '#${ bindableElement }';
 
   window.EDITOR_SUFFIX = '${ suffix }';
