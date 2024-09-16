@@ -17,18 +17,11 @@
 @use 'mixins';
 
 .antd.cuix {
-  .ant-spin-nested-loading,
-  .ant-spin-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-
   .hue-storage-browser-tab-content {
     display: flex;
     flex: 1;
     flex-direction: column;
-    margin: vars.$fluidx-spacing-s;
+    height: 100%;
   }
 
   .hue-storage-browser__title-bar {

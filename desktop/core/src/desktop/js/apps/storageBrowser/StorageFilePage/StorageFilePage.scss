@@ -22,6 +22,7 @@
     flex: 1;
     flex-direction: column;
     gap: vars.$fluidx-spacing-s;
+    padding: vars.$fluidx-spacing-s 0;
 
     .meta-data {
       display: flex;
