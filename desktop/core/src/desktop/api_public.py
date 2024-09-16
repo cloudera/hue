@@ -347,20 +347,12 @@ def storage_extract_archive_using_batch_job(request):
 
 # Task Server
 
+
 @api_view(["GET"])
 def taskserver_get_available_space_for_upload(request):
   django_request = get_django_request(request)
   return filebrowser_api.get_available_space_for_upload(django_request)
 
-@api_view(["POST"])
-def taskserver_reserve_space_for_upload(request):
-  django_request = get_django_request(request)
-  return filebrowser_api.reserve_space_for_upload(django_request)
-
-@api_view(["POST"])
-def taskserver_release_reserved_space_for_upload(request):
-  django_request = get_django_request(request)
-  return filebrowser_api.release_reserved_space_for_upload(django_request)
 
 # Importer
 
