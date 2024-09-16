@@ -1009,16 +1009,24 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         nonce = getattr(request, 'csp_nonce', None)
         csp_split = header['csp'].split(';')
         new_csp = []
-        
         nonce_directive = f"'nonce-{nonce}'" if nonce else ''
+
         for p in csp_split:
             directive = p.lstrip().split(' ')[0]
-            if directive in ('script-src') and nonce:
-                p += f" {nonce_directive}"
-            new_csp.append(p)
+            if nonce:
+                # Remove unsafe-inline from scripts
+                # TODO remove unsafe-inline from styles
+                if directive in ('script-src'):
+                    new_directive_parts = [part for part in p.split(' ') if part and part != "'unsafe-inline'"]
+                    new_directive_parts.append(nonce_directive)
+                    new_csp.append(' '.join(new_directive_parts))
+                else:
+                    new_csp.append(p)
+            else:
+                new_csp.append(p)
 
-        # Set the CSP header with the new policy including the nonce
-        response[header['name']] = "; ".join(new_csp)  # Added space for consistency after ";"
+        response[header['name']] = "; ".join(new_csp).strip() + ';'
+
         return response
 
 class MimeTypeJSFileFixStreamingMiddleware(MiddlewareMixin):
