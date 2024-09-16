@@ -22,6 +22,8 @@ export type IOptions<T, U> = {
   params?: U;
   fetchOptions?: ApiFetchOptions<T>;
   skip?: boolean;
+  onSuccess?: (data: T) => void;
+  onError?: (error: Error) => void;
 };
 
 type IUseLoadData<T> = {
@@ -61,8 +63,16 @@ const useLoadData = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IU
         const fetchUrl = localOptions?.urlPrefix ? `${localOptions.urlPrefix}${url}` : url;
         const response = await get<T, U>(fetchUrl, localOptions?.params, fetchOptions);
         setData(response);
+        setError(undefined);
+        if (localOptions?.onSuccess) {
+          localOptions.onSuccess(response);
+        }
       } catch (error) {
         setError(error instanceof Error ? error : new Error(error));
+        setData(undefined);
+        if (localOptions?.onError) {
+          localOptions.onError(error);
+        }
       } finally {
         setLoading(false);
       }
