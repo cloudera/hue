@@ -809,12 +809,3 @@ def get_available_space_for_upload(request):
     return HttpResponse(message, status=500)  # TODO: status code?
   finally:
     redis_client.close()
-
-
-@api_error_handler
-def reserve_space_for_upload(request):
-  pass
-
-@api_error_handler
-def release_reserved_space_for_upload(request):
-  pass
