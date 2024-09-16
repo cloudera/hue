@@ -96,14 +96,6 @@ urlpatterns += [
     api_public.taskserver_get_available_space_for_upload,
     name='taskserver_get_available_space_for_upload',
   ),
-  re_path(
-    r'^taskserver/upload/reserve_space/?$', api_public.taskserver_reserve_space_for_upload, name='taskserver_reserve_space_for_upload'
-  ),
-  re_path(
-    r'^taskserver/upload/release_reserved_space/?$',
-    api_public.taskserver_release_reserved_space_for_upload,
-    name='taskserver_release_reserved_space_for_upload',
-  ),
 ]
 
 urlpatterns += [
