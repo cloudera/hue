@@ -292,9 +292,21 @@ def storage_content_summary(request):
 
 
 @api_view(["POST"])
+def storage_bulk_move(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.move(django_request)
+
+
+@api_view(["POST"])
 def storage_move(request):
   django_request = get_django_request(request)
   return filebrowser_api.move(django_request)
+
+
+@api_view(["POST"])
+def storage_bulk_copy(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.copy(django_request)
 
 
 @api_view(["POST"])
@@ -315,6 +327,12 @@ def storage_rmtree(request):
   return filebrowser_api.rmtree(django_request)
 
 
+@api_view(["DELETE"])
+def storage_bulk_rmtree(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.rmtree(django_request)
+
+
 @api_view(["GET"])
 def storage_get_trash_path(request):
   django_request = get_django_request(request)
@@ -323,6 +341,12 @@ def storage_get_trash_path(request):
 
 @api_view(["POST"])
 def storage_trash_restore(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.trash_restore(django_request)
+
+
+@api_view(["POST"])
+def storage_trash_bulk_restore(request):
   django_request = get_django_request(request)
   return filebrowser_api.trash_restore(django_request)
 
