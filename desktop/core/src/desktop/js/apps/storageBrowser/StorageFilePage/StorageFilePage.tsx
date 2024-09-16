@@ -45,13 +45,13 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
     <div className="hue-storage-file-page">
       <div className="meta-data">
         {fileMetaData.map((row, index) => (
-          <div key={'meta-data-group' + index} className="group">
+          <div key={'meta-data-group' + index} className="meta-data__group">
             {row.map(item => (
-              <div key={item.name} className="column" data-testid="meta-data-attribute">
-                <div className="meta-label" data-testid={'label_' + item.name}>
+              <div key={item.name} className="meta-data__column">
+                <div className="meta-data__column-label" data-testid={'label_' + item.name}>
                   {item.label}
                 </div>
-                <div className="meta-value" data-testid={'value_' + item.name}>
+                <div className="meta-data__column-value" data-testid={'value_' + item.name}>
                   {item.value}
                 </div>
               </div>
@@ -61,9 +61,9 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
       </div>
 
       <div className="preview">
-        <div className="title-bar">
+        <div className="preview__title-bar">
           {t('Content')}
-          <div className="action-group">
+          <div className="preview__action-group">
             <PrimaryButton
               data-testid="edit-button"
               data-event=""
@@ -98,6 +98,7 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
           value={fileContent}
           onChange={e => setFileContent(e.target.value)}
           readOnly={!isEditing}
+          className="preview__textarea"
         />
       </div>
     </div>
