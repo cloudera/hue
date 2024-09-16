@@ -48,12 +48,8 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
           <div key={'meta-data-group' + index} className="meta-data__group">
             {row.map(item => (
               <div key={item.name} className="meta-data__column">
-                <div className="meta-data__column-label" data-testid={'label_' + item.name}>
-                  {item.label}
-                </div>
-                <div className="meta-data__column-value" data-testid={'value_' + item.name}>
-                  {item.value}
-                </div>
+                <div className="meta-data__column-label">{item.label}</div>
+                <div className="meta-data__column-value">{item.value}</div>
               </div>
             ))}
           </div>
@@ -65,7 +61,7 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
           {t('Content')}
           <div className="preview__action-group">
             <PrimaryButton
-              data-testid="edit-button"
+              data-testid="preview--edit--button"
               data-event=""
               onClick={handleEdit}
               hidden={isEditing}
@@ -73,7 +69,7 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
               {t('Edit')}
             </PrimaryButton>
             <PrimaryButton
-              data-testid="save-button"
+              data-testid="preview--save--button"
               data-event=""
               onClick={handleSave}
               disabled={fileContent === fileData.view?.contents}
@@ -83,7 +79,7 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
             </PrimaryButton>
             <Button
               role="button"
-              data-testid="cancel-button"
+              data-testid="preview--cancel--button"
               data-event=""
               onClick={handleCancel}
               hidden={!isEditing}
