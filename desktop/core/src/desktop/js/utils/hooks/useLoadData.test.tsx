@@ -66,7 +66,7 @@ describe('useLoadData', () => {
     expect(result.current.error).toBeUndefined();
     expect(result.current.loading).toBe(true);
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, mockOptions.params, expect.any(Object));
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
@@ -84,7 +84,7 @@ describe('useLoadData', () => {
     expect(result.current.error).toBeUndefined();
     expect(result.current.loading).toBe(true);
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
       expect(result.current.data).toBeUndefined();
       expect(result.current.error).toEqual(mockError);
@@ -108,7 +108,7 @@ describe('useLoadData', () => {
     expect(result.current.error).toBeUndefined();
     expect(result.current.loading).toBe(true);
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
@@ -121,7 +121,7 @@ describe('useLoadData', () => {
       result.current.reloadData();
     });
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(mockGet).toHaveBeenCalledTimes(2);
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
       expect(result.current.data).toEqual({ ...mockData, product: 'Hue 2' });
@@ -137,7 +137,7 @@ describe('useLoadData', () => {
     expect(result.current.error).toBeUndefined();
     expect(result.current.loading).toBe(true);
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
@@ -157,7 +157,7 @@ describe('useLoadData', () => {
     expect(result.current.error).toBeUndefined();
     expect(result.current.loading).toBe(true);
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, mockOptions.params, expect.any(Object));
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
@@ -172,11 +172,62 @@ describe('useLoadData', () => {
 
     rerender({ url: mockUrl, options: newOptions });
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, newOptions.params, expect.any(Object));
       expect(result.current.data).toEqual(newMockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should call onSuccess callback', async () => {
+    const mockOnSuccess = jest.fn();
+    const mockOnError = jest.fn();
+    const { result } = renderHook(() =>
+      useLoadData(mockUrl, {
+        onSuccess: mockOnSuccess,
+        onError: mockOnError
+      })
+    );
+
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(true);
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
+      expect(mockOnSuccess).toHaveBeenCalledWith(mockData);
+      expect(mockOnError).not.toHaveBeenCalled();
+    });
+  });
+
+  it('should call onError callback', async () => {
+    const mockError = new Error('Fetch error');
+    mockGet.mockRejectedValue(mockError);
+
+    const mockOnSuccess = jest.fn();
+    const mockOnError = jest.fn();
+    const { result } = renderHook(() =>
+      useLoadData(mockUrl, {
+        onSuccess: mockOnSuccess,
+        onError: mockOnError
+      })
+    );
+
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(true);
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(result.current.data).toBeUndefined();
+      expect(result.current.error).toEqual(mockError);
+      expect(result.current.loading).toBe(false);
+      expect(mockOnSuccess).not.toHaveBeenCalled();
+      expect(mockOnError).toHaveBeenCalledWith(mockError);
     });
   });
 });
