@@ -64,38 +64,34 @@ variables.
 # The Config object unfortunately has a kwarg called "type", and everybody is
 # using it. So instead of breaking compatibility, we make a "pytype" alias.
 
-from __future__ import print_function
-from six import string_types
-from builtins import object
-pytype = type
-
+import os
+import re
+import sys
 import json
 import logging
 import numbers
-import os
 import textwrap
-import re
 import subprocess
-import sys
+from builtins import object
 
-from django.utils.encoding import smart_str
 from configobj import ConfigObj, ConfigObjError
+from django.utils.encoding import smart_str
+from django.utils.translation import gettext_lazy as _t
+from six import string_types
 
-from desktop.lib.paths import get_desktop_root, get_build_dir
+from desktop.lib.paths import get_build_dir, get_desktop_root
 
 try:
   from collections import OrderedDict
 except ImportError:
-  from ordereddict import OrderedDict # Python 2.6
+  from ordereddict import OrderedDict  # Python 2.6
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
+
+pytype = type
 
 
 # Magical object for use as a "symbol"
-_ANONYMOUS = ("_ANONYMOUS")
+_ANONYMOUS = "_ANONYMOUS"
 
 # Supported thrift transports
 SUPPORTED_THRIFT_TRANSPORTS = ('buffered', 'framed')
@@ -106,6 +102,7 @@ GLOBAL_CONFIG = None
 LOG = logging.getLogger()
 
 __all__ = ["UnspecifiedConfigSection", "ConfigSection", "Config", "load_confs", "coerce_bool", "coerce_csv", "coerce_json_dict"]
+
 
 class BoundConfig(object):
   def __init__(self, config, bind_to, grab_key=_ANONYMOUS, prefix=''):
@@ -177,16 +174,18 @@ class BoundConfig(object):
     Note that self is a new object at every access,
     but self.bind_to is shared, so we can modify that.
     """
+
     def set_data_presence(data, presence):
       self.bind_to[self.grab_key] = data
       if not presence:
         del self.bind_to[self.grab_key]
-    assert self.grab_key is not _ANONYMOUS # TODO(todd) really?
+
+    assert self.grab_key is not _ANONYMOUS  # TODO(todd) really?
     old_data = self.bind_to.get(self.grab_key)
     old_presence = self.grab_key in self.bind_to
 
     set_data_presence(data, present)
-    return (lambda: set_data_presence(old_data, old_presence))
+    return lambda: set_data_presence(old_data, old_presence)
 
   def validate(self):
     self.config.validate(self.bind_to)
@@ -195,12 +194,11 @@ class BoundConfig(object):
     self.config.print_help(*args, **kwargs)
 
   def __repr__(self):
-    return repr("%s(config=%s, bind_to=%s, grab_key=%s)" % (str(self.__class__),  repr(self.config), repr(self.bind_to), repr(self.grab_key)))
+    return f"{self.__class__.__name__}(config={self.config!r}, bind_to={self.bind_to!r}, grab_key={self.grab_key!r})"
 
 
 class Config(object):
-  def __init__(self, key=_ANONYMOUS, default=None, dynamic_default=None,
-               required=False, help=None, type=str, private=False):
+  def __init__(self, key=_ANONYMOUS, default=None, dynamic_default=None, required=False, help=None, type=str, private=False, secret=False):
     """
     Initialize a new Configurable variable.
 
@@ -213,6 +211,7 @@ class Config(object):
                     str is the default. Should raise an exception in the case
                     that it cannot be coerced.
     @param private  if True, does not emit help text
+    @param secret   if True, masks the config value
     """
     if not callable(type):
       raise ValueError("%s: The type argument '%s()' is not callable" % (key, type))
@@ -223,14 +222,11 @@ class Config(object):
     if dynamic_default is not None and not dynamic_default.__doc__ and not private:
       raise ValueError("Dynamic default '%s' must have __doc__ defined!" % (key,))
 
-    if (isinstance(default, numbers.Number) or pytype(default) is bool) and \
-          not isinstance(type(default), pytype(default)):
-      raise ValueError("%s: '%s' does not match that of the default value %r (%s)"
-                      % (key, type, default, pytype(default)))
+    if (isinstance(default, numbers.Number) or pytype(default) is bool) and not isinstance(type(default), pytype(default)):
+      raise ValueError("%s: '%s' does not match that of the default value %r (%s)" % (key, type, default, pytype(default)))
 
-    if type == bool:
-      LOG.warning("%s is of type bool. Resetting it as type 'coerce_bool'."
-               " Please fix it permanently" % (key,))
+    if type is bool:
+      LOG.warning("%s is of type bool. Resetting it as type 'coerce_bool'." " Please fix it permanently" % (key,))
       type = coerce_bool
 
     self.key = key
@@ -240,11 +236,11 @@ class Config(object):
     self.help = help
     self.type = type
     self.private = private
+    self.secret = secret
 
     # It makes no sense to be required if you have a default,
     # since you'll never throw the "not set" error.
-    assert not (self.required and self.default), \
-           "Config cannot be required if it has a default."
+    assert not (self.required and self.default), "Config cannot be required if it has a default."
 
   def bind(self, conf, prefix):
     """Rather than doing the lookup now and assigning self.value or something,
@@ -323,14 +319,12 @@ class Config(object):
   def get_presentable_help_text(self, indent=0):
     indent_str = " " * indent
     help = self.help or "[no help text provided]"
-    help = textwrap.fill(help,
-                         initial_indent=(indent_str + "  "),
-                         subsequent_indent=(indent_str + "    "))
+    help = textwrap.fill(help, initial_indent=(indent_str + "  "), subsequent_indent=(indent_str + "    "))
     return help
 
   def get_presentable_key(self):
     if self.key is _ANONYMOUS:
-      return "<user specified name>" # TODO(todd) add "metavar" like optparse
+      return "<user specified name>"  # TODO(todd) add "metavar" like optparse
     else:
       return self.key
 
@@ -339,6 +333,7 @@ class Config(object):
     if self.dynamic_default is not None:
       return self.dynamic_default()
     return self.default_value
+
 
 class BoundContainer(BoundConfig):
   """Binds a ConfigSection to actual data."""
@@ -363,6 +358,7 @@ class BoundContainer(BoundConfig):
   def keys(self):
     return list(self.get_data_dict().keys())
 
+
 class BoundContainerWithGetAttr(BoundContainer):
   """
   A configuration bound to a data container where we expect
@@ -371,8 +367,10 @@ class BoundContainerWithGetAttr(BoundContainer):
 
   This is used by ConfigSection
   """
+
   def __getattr__(self, attr):
     return self.config.get_member(self.get_data_dict(), attr, self.prefix)
+
 
 class BoundContainerWithGetItem(BoundContainer):
   """
@@ -381,6 +379,7 @@ class BoundContainerWithGetItem(BoundContainer):
 
   This is used for UnspecifiedConfigSection
   """
+
   def __getitem__(self, attr):
     if attr in self.__dict__:
       return self.__dict__[attr]
@@ -393,6 +392,7 @@ class ConfigSection(Config):
   a priori. For example, this can be used to group configuration
   for a cluster.
   """
+
   def __init__(self, key=_ANONYMOUS, members=None, **kwargs):
     """Initializes a ConfigSection
 
@@ -406,7 +406,6 @@ class ConfigSection(Config):
     self.members = members or {}
     for member in members.values():
       assert member.key is not _ANONYMOUS
-
 
   def update_members(self, new_members, overwrite=True):
     """
@@ -424,7 +423,6 @@ class ConfigSection(Config):
           del new_members[k]
     self.members.update(new_members)
 
-
   def bind(self, config, prefix):
     return BoundContainerWithGetAttr(self, bind_to=config, grab_key=self.key, prefix=prefix)
 
@@ -435,8 +433,7 @@ class ConfigSection(Config):
     The keys are those specified in the members dict, and the values
     are bound configuration parameters.
     """
-    return dict([(key, self.get_member(raw, key, prefix))
-                 for key in self.members.keys()])
+    return dict([(key, self.get_member(raw, key, prefix)) for key in self.members.keys()])
 
   def get_member(self, data, attr, prefix):
     if self.key is not _ANONYMOUS:
@@ -458,6 +455,7 @@ class ConfigSection(Config):
     for programmer_key, config in sorted(iter(self.members.items()), key=lambda x: x[1].key):
       config.print_help(out=out, indent=new_indent)
 
+
 class UnspecifiedConfigSection(Config):
   """
   A special Config that maps a section name to a list of anonymous subsections.
@@ -473,10 +471,11 @@ class UnspecifiedConfigSection(Config):
   (2) an anonymous grab_key, and
   (3) a `prefix' containing the prefix plus the actual key name.
   """
+
   def __init__(self, key=_ANONYMOUS, each=None, **kwargs):
     super(UnspecifiedConfigSection, self).__init__(key, default={}, **kwargs)
     assert each.key is _ANONYMOUS
-    self.each = each    # `each' is a ConfigSection
+    self.each = each  # `each' is a ConfigSection
 
   def bind(self, config, prefix):
     return BoundContainerWithGetItem(self, bind_to=config, grab_key=self.key, prefix=prefix)
@@ -487,8 +486,7 @@ class UnspecifiedConfigSection(Config):
 
     The keys are the keys specified by the user in the config file.
     """
-    return OrderedDict([(key, self.get_member(raw, key, prefix))
-                 for key in raw.keys()])
+    return OrderedDict([(key, self.get_member(raw, key, prefix)) for key in raw.keys()])
 
   def get_member(self, data, attr, prefix=''):
     tail = self.key + '.' + attr
@@ -503,7 +501,8 @@ class UnspecifiedConfigSection(Config):
     print(self.get_presentable_help_text(indent=indent), file=out)
     print(file=out)
     print(indent_str + "  Consists of some number of sections like:", file=out)
-    self.each.print_help(out=out, indent=indent+2)
+    self.each.print_help(out=out, indent=indent + 2)
+
 
 def _configs_from_dir(conf_dir):
   """
@@ -522,6 +521,7 @@ def _configs_from_dir(conf_dir):
     conf['DEFAULT'] = dict(desktop_root=get_desktop_root(), build_dir=get_build_dir())
     yield conf
 
+
 def load_confs(conf_source=None):
   """Loads and merges all of the configurations passed in,
   returning a ConfigObj for the result.
@@ -537,6 +537,7 @@ def load_confs(conf_source=None):
   for in_conf in conf_source:
     conf.merge(in_conf)
   return conf
+
 
 def _bind_module_members(module, data, section):
   """
@@ -580,7 +581,7 @@ def bind_module_config(mod, conf_data, config_key):
   if hasattr(mod, "CONFIGURATION_SECTION"):
     section = mod.CONFIGURATION_SECTION
   elif mod.__name__.endswith(".conf"):
-    section = mod.__name__[:-len(".conf")]
+    section = mod.__name__[: -len(".conf")]
   else:
     section = mod.__name__
 
@@ -592,6 +593,7 @@ def bind_module_config(mod, conf_data, config_key):
 
   members = _bind_module_members(mod, bind_data, section)
   return ConfigSection(section, members=members, help=mod.__doc__)
+
 
 def initialize(modules, config_dir):
   """
@@ -618,6 +620,7 @@ def initialize(modules, config_dir):
     GLOBAL_CONFIG = new_config.bind(conf_data, prefix='')
   return
 
+
 def is_anonymous(key):
   return key == _ANONYMOUS
 
@@ -641,11 +644,13 @@ def coerce_bool(value):
     return True
   raise Exception("Could not coerce %r to boolean value" % (value,))
 
+
 def coerce_string(value):
-  if type(value) == list:
+  if type(value) is list:
     return ','.join(value)
   else:
     return value
+
 
 def coerce_csv(value):
   if isinstance(value, str):
@@ -654,6 +659,7 @@ def coerce_csv(value):
     return value
   raise Exception("Could not coerce %r to csv array." % value)
 
+
 def coerce_json_dict(value):
   if isinstance(value, string_types):
     return json.loads(value)
@@ -661,13 +667,16 @@ def coerce_json_dict(value):
     return value
   raise Exception("Could not coerce %r to json dictionary." % value)
 
+
 def list_of_compiled_res(skip_empty=False):
   def fn(list_of_strings):
     if isinstance(list_of_strings, string_types):
       list_of_strings = list_of_strings.split(',')
     list_of_strings = [string if skip_empty else True for string in list_of_strings]
     return list(re.compile(x) for x in list_of_strings)
+
   return fn
+
 
 def validate_path(confvar, is_dir=None, fs=os.path, message='Path does not exist on the filesystem.'):
   """
@@ -687,7 +696,8 @@ def validate_path(confvar, is_dir=None, fs=os.path, message='Path does not exist
         return [(confvar, 'Not a directory.')]
     elif not fs.isfile(path):
       return [(confvar, 'Not a file.')]
-  return [ ]
+  return []
+
 
 def validate_port(confvar):
   """
@@ -702,7 +712,8 @@ def validate_port(confvar):
       return error_res
   except ValueError:
     return error_res
-  return [ ]
+  return []
+
 
 def validate_thrift_transport(confvar):
   """
@@ -710,12 +721,15 @@ def validate_thrift_transport(confvar):
   Returns [(confvar, error_msg)] or []
   """
   transport = confvar.get()
-  error_res = [(confvar, 'Thrift transport %s not supported. Please choose a supported transport: %s' % (transport, ', '.join(SUPPORTED_THRIFT_TRANSPORTS)))]
+  error_res = [
+    (confvar, f"Thrift transport {transport} not supported. Please choose a supported transport: {', '.join(SUPPORTED_THRIFT_TRANSPORTS)}")
+  ]
 
   if transport not in SUPPORTED_THRIFT_TRANSPORTS:
     return error_res
 
   return []
+
 
 def coerce_password_from_script(script):
   p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
