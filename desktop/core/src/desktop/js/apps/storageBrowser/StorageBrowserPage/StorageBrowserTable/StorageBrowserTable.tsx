@@ -341,7 +341,7 @@ const StorageBrowserTable = ({
         <Table
           className={className}
           columns={getColumns(tableData[0] ?? {})}
-          dataSource={tableData.slice(2) ?? []}
+          dataSource={tableData?.slice(2)}
           onRow={onRowClicked}
           pagination={false}
           rowClassName={rowClassName}
