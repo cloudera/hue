@@ -33,7 +33,10 @@ interface UseLoadDataProps<T> {
   reloadData: () => void;
 }
 
-const useLoadData = <T, U = unknown>(url?: string, options?: Options<T, U>): UseLoadDataProps<T> => {
+const useLoadData = <T, U = unknown>(
+  url?: string,
+  options?: Options<T, U>
+): UseLoadDataProps<T> => {
   const [localOptions, setLocalOptions] = useState<Options<T, U> | undefined>(options);
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
