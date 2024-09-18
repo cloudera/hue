@@ -27,7 +27,7 @@ from django.utils.encoding import smart_str
 
 from beeswax.common import find_compute, is_compute
 from desktop.auth.backend import is_admin
-from desktop.conf import TASK_SERVER, has_connectors
+from desktop.conf import TASK_SERVER, has_connectors, is_cdw_compute_enabled
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
@@ -439,10 +439,10 @@ def get_api(request, snippet):
   if has_connectors() and snippet.get('type') == 'hello' and is_admin(request.user):
     LOG.debug('Using the interpreter from snippet')
     interpreter = snippet.get('interpreter')
-  elif is_compute(snippet):
+  elif is_cdw_compute_enabled():
     LOG.debug("Finding the compute from db using snippet: %s" % snippet)
     interpreter = find_compute(cluster=snippet, user=request.user)
-  else:
+  if interpreter is None:
     LOG.debug("Picking up the connectors from the configs using connector_name: %s" % connector_name)
     interpreter = get_interpreter(connector_type=connector_name, user=request.user)
 

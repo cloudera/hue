@@ -16,21 +16,22 @@
 # limitations under the License.
 
 from __future__ import division
-from builtins import str
-import logging
-import math
-import os.path
+
 import sys
+import math
+import logging
+import os.path
+from builtins import str
 
-from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,\
-  AUTH_USERNAME as DEFAULT_AUTH_USERNAME
-from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
-
+from desktop.conf import (
+  AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,
+  AUTH_USERNAME as DEFAULT_AUTH_USERNAME,
+  default_ssl_cacerts,
+  default_ssl_validate,
+)
+from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_csv, coerce_password_from_script
 
 LOG = logging.getLogger()
 
@@ -103,10 +104,12 @@ HIVE_SERVER_HOST = Config(
          "the fully-qualified domain name (FQDN) is required"),
   default="localhost")
 
+
 def get_hive_thrift_binary_port():
   """Devise port from core-site Thrift / execution mode & Http port"""
-  from beeswax.hive_site import hiveserver2_thrift_binary_port, get_hive_execution_mode   # Cyclic dependency
+  from beeswax.hive_site import get_hive_execution_mode, hiveserver2_thrift_binary_port  # Cyclic dependency
   return hiveserver2_thrift_binary_port() or (10500 if (get_hive_execution_mode() or '').lower() == 'llap' else 10000)
+
 
 HIVE_SERVER_PORT = Config(
   key="hive_server_port",
@@ -114,10 +117,12 @@ HIVE_SERVER_PORT = Config(
   dynamic_default=get_hive_thrift_binary_port,
   type=int)
 
+
 def get_hive_thrift_http_port():
   """Devise port from core-site Thrift / execution mode & Http port"""
-  from beeswax.hive_site import hiveserver2_thrift_http_port, get_hive_execution_mode   # Cyclic dependency
-  return hiveserver2_thrift_http_port() or (10501 if (get_hive_execution_mode() or '').lower() == 'llap'  else 10001)
+  from beeswax.hive_site import get_hive_execution_mode, hiveserver2_thrift_http_port  # Cyclic dependency
+  return hiveserver2_thrift_http_port() or (10501 if (get_hive_execution_mode() or '').lower() == 'llap' else 10001)
+
 
 HIVE_HTTP_THRIFT_PORT = Config(
   key="hive_server_http_port",
@@ -165,7 +170,7 @@ ZOOKEEPER_CONN_TIMEOUT = Config(
   type=int,
   help=_t('Timeout in seconds for zookeeper connection.'))
 
-USE_GET_LOG_API = Config( # To remove in Hue 4
+USE_GET_LOG_API = Config(  # To remove in Hue 4
   key='use_get_log_api',
   default=False,
   type=coerce_bool,
@@ -173,7 +178,7 @@ USE_GET_LOG_API = Config( # To remove in Hue 4
           'If false, use the FetchResults() Thrift call from Hive 1.0 or more instead.')
 )
 
-BROWSE_PARTITIONED_TABLE_LIMIT = Config( # Deprecated, to remove in Hue 4
+BROWSE_PARTITIONED_TABLE_LIMIT = Config(  # Deprecated, to remove in Hue 4
   key='browse_partitioned_table_limit',
   default=1000,
   type=int,
@@ -187,9 +192,11 @@ QUERY_PARTITIONS_LIMIT = Config(
   type=int,
   help=_t('The maximum number of partitions that will be included in the SELECT * LIMIT sample query for partitioned tables.'))
 
+
 def get_browse_partitioned_table_limit():
   """Get the old default"""
   return BROWSE_PARTITIONED_TABLE_LIMIT.get()
+
 
 LIST_PARTITIONS_LIMIT = Config(
   key='list_partitions_limit',
@@ -206,9 +213,11 @@ DOWNLOAD_CELL_LIMIT = Config(
           '(e.g. - 10K rows * 1K columns = 10M cells.) '
           'A value of -1 means there will be no limit.'))
 
+
 def get_deprecated_download_cell_limit():
   """Get the old default"""
   return math.floor(DOWNLOAD_CELL_LIMIT.get() / 100) if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
+
 
 DOWNLOAD_ROW_LIMIT = Config(
   key='download_row_limit',
@@ -297,14 +306,17 @@ SSL = ConfigSection(
   )
 )
 
+
 def get_auth_username():
   """Get from top level default from desktop"""
   return DEFAULT_AUTH_USERNAME.get()
+
 
 AUTH_USERNAME = Config(
   key="auth_username",
   help=_t("Auth username of the hue user used for authentications."),
   dynamic_default=get_auth_username)
+
 
 def get_auth_password():
   """Get from script or backward compatibility"""
@@ -313,6 +325,7 @@ def get_auth_password():
     return password
 
   return DEFAULT_AUTH_PASSWORD.get()
+
 
 AUTH_PASSWORD = Config(
   key="auth_password",
@@ -327,13 +340,15 @@ AUTH_PASSWORD_SCRIPT = Config(
   type=coerce_password_from_script,
   default=None)
 
+
 def get_use_sasl_default():
   """Get from hive_site or backward compatibility"""
   from beeswax.hive_site import get_hiveserver2_authentication, get_use_sasl  # Cyclic dependency
   use_sasl = get_use_sasl()
   if use_sasl is not None:
     return use_sasl.upper() == 'TRUE'
-  return get_hiveserver2_authentication() in ('KERBEROS', 'NONE', 'LDAP', 'PAM') # list for backward compatibility
+  return get_hiveserver2_authentication() in ('KERBEROS', 'NONE', 'LDAP', 'PAM')  # list for backward compatibility
+
 
 USE_SASL = Config(
   key="use_sasl",
@@ -342,9 +357,11 @@ USE_SASL = Config(
   type=coerce_bool,
   dynamic_default=get_use_sasl_default)
 
+
 def has_multiple_sessions():
   """When true will create multiple sessions for user queries"""
   return MAX_NUMBER_OF_SESSIONS.get() != 1
+
 
 CLOSE_SESSIONS = Config(
   key="close_sessions",
@@ -356,8 +373,10 @@ CLOSE_SESSIONS = Config(
   dynamic_default=has_multiple_sessions
 )
 
+
 def has_session_pool():
   return has_multiple_sessions() and not CLOSE_SESSIONS.get()
+
 
 MAX_CATALOG_SQL_ENTRIES = Config(
   key="max_catalog_sql_entries",

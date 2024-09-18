@@ -752,7 +752,7 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   cluster = json.loads(request.POST.get('cluster', '{}'))
-  if cluster and cluster.get('type') in ('hive-compute', 'impala-compute'):
+  if cluster and cluster.get('type') in ('hive-compute', 'impala-compute', 'trino-compute'):
     snippet = cluster
   else:
     snippet = json.loads(request.POST.get('snippet', '{}'))

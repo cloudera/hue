@@ -20,15 +20,15 @@ Common utils for beeswax.
 """
 from __future__ import print_function
 
-import numbers
 import re
 import time
+import numbers
 
 from django import forms
 
-from beeswax.models import Namespace, Compute
+from beeswax.models import Compute, Namespace
 
-HIVE_IDENTIFER_REGEX = re.compile("(^[a-zA-Z0-9]\w*\.)?[a-zA-Z0-9]\w*$")
+HIVE_IDENTIFER_REGEX = re.compile(r"(^[a-zA-Z0-9]\w*\.)?[a-zA-Z0-9]\w*$")
 
 DL_FORMATS = ['csv', 'xls']
 
@@ -44,7 +44,7 @@ RELATION_OPS_UNARY = ['IS NULL', 'IS NOT NULL', 'NOT']
 
 RELATION_OPS = ['=', '<>', '<', '<=', '>', '>='] + RELATION_OPS_UNARY
 
-COMPUTE_TYPES = ['hive-compute', 'impala-compute']
+COMPUTE_TYPES = ['hive-compute', 'impala-compute', 'trino-compute']
 
 TERMINATORS = [
   # (hive representation, description, ascii value)
@@ -56,12 +56,13 @@ TERMINATORS = [
   (' ', "Space", 32),
 ]
 
+
 def timing(fn):
   def decorator(*args, **kwargs):
     time1 = time.time()
     ret = fn(*args, **kwargs)
     time2 = time.time()
-    print('%s elapsed time: %0.3f ms' % (fn.__name__, (time2-time1)*1000.0))
+    print('%s elapsed time: %0.3f ms' % (fn.__name__, (time2 - time1) * 1000.0))
     return ret
   return decorator
 
@@ -79,7 +80,8 @@ def apply_natural_sort(collection, key=None):
   Applies a natural sort (http://rosettacode.org/wiki/Natural_sorting) to a list or dictionary
   Dictionary types require a sort key to be specified
   """
-  to_digit = lambda i: int(i) if i.isdigit() else i
+  def to_digit(i):
+    return int(i) if i.isdigit() else i
 
   def tokenize_and_convert(item, key=None):
     if key:
@@ -94,7 +96,9 @@ def is_compute(cluster):
     return False
   connector = cluster.get('connector')
   compute = cluster.get('compute')
-  compute_check = lambda x: x and x.get('type') in COMPUTE_TYPES
+
+  def compute_check(x):
+    return x and x.get('type') in COMPUTE_TYPES
   return compute_check(cluster) or compute_check(connector) or compute_check(compute)
 
 
@@ -107,12 +111,16 @@ Following is the priority order
 3. Lookup namespace based on dialect from cluster or prpvided dialect
    and return the first compute filtered by user-access. Needs valid user
 '''
+
+
 def find_compute(cluster=None, user=None, dialect=None, namespace_id=None):
   if cluster:
     # If we find a full/partial cluster object, we will attempt to load a compute
     connector = cluster.get('connector')
     compute = cluster.get('compute')
-    compute_check = lambda x: x and x.get('type') in COMPUTE_TYPES
+
+    def compute_check(x):
+      return x and x.get('type') in COMPUTE_TYPES
 
     # Pick the most probable compute object
     selected_compute = (cluster if compute_check(cluster)
@@ -135,7 +143,9 @@ def find_compute(cluster=None, user=None, dialect=None, namespace_id=None):
       dialect = selected_compute['dialect'] if selected_compute.get('dialect') else dialect
       if not dialect and cluster.get('type'):
         t = cluster['type']
-        dialect = 'hive' if t.startswith('hive') else 'impala' if t.startswith('impala') else None
+        dialect = 'hive' if t.startswith('hive') else\
+          'impala' if t.startswith('impala') else\
+            'trino' if t.startswith('trino') else None
 
   # We will attempt to find a default compute based on other criteria
   ns = None

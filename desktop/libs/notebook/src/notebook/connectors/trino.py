@@ -57,7 +57,7 @@ class TrinoApi(Api):
   def __init__(self, user, interpreter=None):
     Api.__init__(self, user, interpreter=interpreter)
     self.options = interpreter['options']
-    self.server_host, self.server_port, self.http_scheme = self.parse_api_url(self.options['url'])
+    self.server_host, self.server_port, self.http_scheme = self.parse_api_url(self.options.get('url'))
     self.auth = None
 
     auth_username = self.options.get('auth_username', DEFAULT_AUTH_USERNAME.get())

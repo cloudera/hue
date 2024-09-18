@@ -102,7 +102,7 @@ def get_ordered_interpreters(user=None):
     for interpreter in INTERPRETERS_CACHE:
       if check_has_missing_permission(user, interpreter, user_apps=user_apps):
         pass  # Not allowed
-      elif has_computes and interpreter in ('hive', 'impala') and not computes_for_dialect(interpreter, user):
+      elif has_computes and interpreter in ('hive', 'impala', 'trino') and not computes_for_dialect(interpreter, user):
         pass  # No available computes for the dialect so skip
       else:
         user_interpreters.append(interpreter)

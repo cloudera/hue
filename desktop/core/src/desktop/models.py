@@ -1909,7 +1909,7 @@ class ClusterConfig(object):
           'optimizer': get_optimizer_mode(),
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
-          'is_batchable': interpreter['dialect'] in ['hive', 'impala'] or interpreter['interface'] in ['oozie', 'sqlalchemy'],
+          'is_batchable': interpreter['dialect'] in ['hive', 'impala', 'trino'] or interpreter['interface'] in ['oozie', 'sqlalchemy'],
           'dialect': interpreter['dialect'],
           'dialect_properties': interpreter.get('dialect_properties'),
         })

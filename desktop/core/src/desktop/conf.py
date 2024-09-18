@@ -2258,6 +2258,12 @@ def has_connectors():
   return ENABLE_CONNECTORS.get()
 
 
+def is_cdw_compute_enabled():
+  '''When the computes feature is turned on'''
+  clusters = CLUSTERS.get()
+  return bool(clusters and [c for c in clusters.values() if c.TYPE.get() == 'cdw'])
+
+
 CLUSTERS = UnspecifiedConfigSection(
   "clusters",
   help="One entry for each additional remote cluster Hue can interact with.",
