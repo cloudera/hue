@@ -24,7 +24,7 @@ $icon-margin: 5px;
 .antd.cuix {
   .hue-storage-browser__actions-bar {
     display: flex;
-    margin: vars.$fluidx-spacing-s;
+    margin: vars.$fluidx-spacing-s 0;
     justify-content: space-between;
   }
 
@@ -46,8 +46,6 @@ $icon-margin: 5px;
   }
 
   .hue-storage-browser__table {
-    margin: 0 vars.$fluidx-spacing-s;
-
     .ant-table-placeholder {
       height: $table-placeholder-height;
       text-align: center;
@@ -65,6 +63,10 @@ $icon-margin: 5px;
   }
 
   .hue-storage-browser__table-row {
+    :hover {
+      cursor: pointer;
+    }
+
     td.ant-table-cell {
       height: $cell-height;
       @include mixins.nowrap-ellipsis;

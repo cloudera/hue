@@ -72,6 +72,10 @@ export interface BreadcrumbData {
   url: string;
 }
 
+interface FileView {
+  contents: string;
+}
+
 export interface PathAndFileData {
   path: string;
   breadcrumbs: BreadcrumbData[];
@@ -79,6 +83,9 @@ export interface PathAndFileData {
   page: PageStats;
   pagesize: number;
   type?: string;
+  stats: Stats;
+  rwx: string;
+  view: FileView;
 }
 
 export interface ContentSummary {
