@@ -19,16 +19,25 @@ import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
 import './StorageFilePage.scss';
 import { i18nReact } from '../../../utils/i18nReact';
 import Button, { PrimaryButton } from 'cuix/dist/components/Button';
-import { getFileMetaData } from './StorageFilePage.util';
+import { downloadFile, getFileMetaData } from './StorageFilePage.util';
+import { DOWNLOAD_API_URL } from '../../../reactComponents/FileChooser/api';
 
 const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [isEditing, setIsEditing] = React.useState(false);
+  const [isDownloading, setIsDownloading] = React.useState(false);
   const [fileContent, setFileContent] = React.useState(fileData.view?.contents);
   const fileMetaData = useMemo(() => getFileMetaData(t, fileData), [t, fileData]);
 
   const handleEdit = () => {
     setIsEditing(true);
+  };
+
+  const handleDownload = async () => {
+    const url = `${DOWNLOAD_API_URL}${fileData.path}`;
+    setIsDownloading(true);
+    await downloadFile(url);
+    setIsDownloading(false);
   };
 
   const handleSave = () => {
@@ -86,11 +95,19 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
             >
               {t('Cancel')}
             </Button>
+            <PrimaryButton
+              data-testid="preview--download--button"
+              data-event=""
+              onClick={handleDownload}
+              disabled={isDownloading}
+              hidden={!fileData.show_download_button}
+            >
+              {isDownloading ? t('Downloading...') : t('Download')}
+            </PrimaryButton>
           </div>
         </div>
 
         <textarea
-          data-testid="file-content"
           value={fileContent}
           onChange={e => setFileContent(e.target.value)}
           readOnly={!isEditing}
