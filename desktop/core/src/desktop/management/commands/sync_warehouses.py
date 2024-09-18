@@ -42,6 +42,7 @@ else:
 
 core_v1 = client.CoreV1Api()
 apps_v1 = client.AppsV1Api()
+networking_v1 = client.NetworkingV1Api()
 
 SERVER_HELP = r"""
   Sync up the desktop_connectors with the available hive and impala warehouses
@@ -64,6 +65,7 @@ def sync_warehouses(args, options):
 
   hives = [c for c in computes if c['dialect'] == 'hive']
   impalas = [c for c in computes if c['dialect'] == 'impala']
+  trinos = [c for c in computes if c['dialect'] == 'trino']
 
   (hive_warehouse, created) = models.Namespace.objects.get_or_create(
     external_id="CDW_HIVE_WAREHOUSE",
@@ -74,6 +76,11 @@ def sync_warehouses(args, options):
     external_id="CDW_IMPALA_WAREHOUSE",
     defaults={'name': 'CDW Impala', 'description': 'CDW Impala Warehouse', 'dialect': 'impala', 'interface': 'hiveserver2'})
   add_computes_to_warehouse(impala_warehouse, impalas)
+
+  (trino_warehouse, created) = models.Namespace.objects.get_or_create(
+    external_id="CDW_TRINO_WAREHOUSE",
+    defaults={'name': 'CDW Trino', 'description': 'CDW Trino Warehouse', 'dialect': 'trino', 'interface': 'trino'})
+  add_computes_to_warehouse(trino_warehouse, trinos)
 
   LOG.info("Synced computes")
   LOG.debug("Current computes %s" % models.Compute.objects.all())
@@ -104,7 +111,7 @@ def get_computes_from_k8s():
       namespace = n.metadata.name
       LOG.info('Getting details for ns: %s' % namespace)
       item = {
-        'name': n.metadata.labels.get('displayname'),
+        'name': n.metadata.labels.get('displayname', namespace),
         'description': '%s (%s)' % (n.metadata.labels.get('displayname'), n.metadata.name),
         'external_id': namespace,
         # 'creation_timestamp': n.metadata.labels.get('creation_timestamp'),
@@ -118,8 +125,11 @@ def get_computes_from_k8s():
       elif namespace.startswith('impala-'):
         populate_impala(namespace, item)
         computes.append(item)
+      elif namespace.startswith('trino-'):
+        update_trino_configs(namespace, item)
+        computes.append(item)
     except Exception as e:
-      LOG.exception('Could not get details for ns: %s' % n)
+      LOG.exception('Could not get details for ns: %s' % (n.metadata.name if n.metadata is not None else n))
 
   return computes
 
@@ -222,5 +232,45 @@ def update_impala_configs(namespace, impala, host):
     'dialect': 'impala',
     'interface': 'hiveserver2',
     'ldap_groups': ldap_groups.split(",") if ldap_groups else None,
+    'settings': json.dumps(settings)
+  })
+
+
+def update_trino_configs(namespace, trino):
+  deployments = apps_v1.list_namespaced_deployment(namespace).items
+  stfs = apps_v1.list_namespaced_stateful_set(namespace).items
+  ingresses = networking_v1.list_namespaced_ingress(namespace).items
+  trino_worker_dep = next((d for d in deployments
+                           if d.metadata.labels['app'] == 'trino' and d.metadata.labels['component'] == 'trino-worker'),
+                          None)
+  trino_coordinator_stfs = next((s for s in stfs if s.metadata.labels['app'] == 'trino-coordinator'), None)
+  trino_coordinator_ingress = next((i for i in ingresses if i.metadata.name == 'trino-coordinator-ingress'), None)
+
+  trino['is_ready'] = bool(trino_worker_dep and trino_worker_dep.status.ready_replicas
+                       and trino_coordinator_stfs and trino_coordinator_stfs.status.ready_replicas)
+
+  if not trino['is_ready']:
+    LOG.info("Trino %s not ready" % namespace)
+
+  coordinator_url = 'http://trino-coordinator.%s.svc.cluster.local:8080' % namespace
+  settings = []
+
+  trino_coordinator_configs = core_v1.read_namespaced_config_map('trino-coordinator-config', namespace)
+  core_site_data = confparse.ConfParse(trino_coordinator_configs.data['core-site.xml'])
+  ldap_bin_user = core_site_data.get('hadoop.security.group.mapping.ldap.bind.user')
+  if ldap_bin_user:
+    ldap_user_regex = '.*uid=([^,]+).*'
+    match = re.search(ldap_user_regex, ldap_bin_user)
+    ldap_user_id = match.group(1) if match and match.group(1) else None
+    settings.append({"name": "auth_username", "value": ldap_user_id})
+    settings.append({"name": "auth_password_script", "value": "/etc/hue/conf/altscript.sh hue.binduser.password"})
+    if trino_coordinator_ingress and trino_coordinator_ingress.spec.rules:
+      coordinator_url = 'https://%s:443' % trino_coordinator_ingress.spec.rules[0].host
+
+  settings.append({"name": "url", "value": coordinator_url})
+
+  trino.update({
+    'dialect': 'trino',
+    'interface': 'trino',
     'settings': json.dumps(settings)
   })
