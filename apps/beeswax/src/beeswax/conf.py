@@ -367,3 +367,10 @@ MAX_CATALOG_SQL_ENTRIES = Config(
   default=5000,
   type=int
 )
+
+IS_HIVE_ICEBERG_ENABLED = Config(
+  key="is_hive_iceberg_enabled",
+  help=_t("Enable if Hive supports Iceberg table format."),
+  default=True,
+  type=coerce_bool
+)

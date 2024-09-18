@@ -25,7 +25,7 @@
       ENABLE_UNIFIED_ANALYTICS, RAZ
   from desktop.models import hue_version, _get_apps, get_cluster_config, _handle_user_dir_raz
 
-  from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS
+  from beeswax.conf import DOWNLOAD_BYTES_LIMIT, DOWNLOAD_ROW_LIMIT, LIST_PARTITIONS_LIMIT, CLOSE_SESSIONS, IS_HIVE_ICEBERG_ENABLED
   from dashboard.conf import HAS_SQL_ENABLED
   from hadoop.conf import UPLOAD_CHUNK_SIZE
   from indexer.conf import ENABLE_NEW_INDEXER
@@ -227,6 +227,7 @@
   window.JB_SINGLE_CHECK_INTERVAL_IN_MILLIS = 5000;
   window.JB_MULTI_CHECK_INTERVAL_IN_MILLIS = 20000;
   window.CLOSE_SESSIONS = {'hive': '${ CLOSE_SESSIONS.get() }' === 'True'};
+  window.IS_HIVE_ICEBERG_ENABLED = '${ IS_HIVE_ICEBERG_ENABLED.get() }' === 'True';
 
   window.HUE_URLS = {
     IMPORTER_CREATE_TABLE: '${ 'indexer' in apps and url('indexer:importer_prefill', source_type = 'all', target_type = 'table')}',
