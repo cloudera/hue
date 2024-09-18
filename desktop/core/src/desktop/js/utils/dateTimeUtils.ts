@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { DateTimeFormatOptions } from 'luxon';
+
 /**
  * Calculates the duration between two dates.
  * @param start The start date.
@@ -57,7 +59,7 @@ export const calculateDuration = (start: Date | string, end: Date | string): str
  * @returns The formatted timestamp as a string.
  */
 export const formatTimestamp = (timestamp: Date | string): string => {
-  const options = {
+  const options: DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
