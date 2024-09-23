@@ -23,7 +23,7 @@ import { ExtendedColumn } from '../catalog/DataCatalogEntry';
 import { HistoryItem } from '../apps/editor/components/AiAssist/AiAssistToolbar/AiAssistToolbarHistory';
 import HueError from './HueError';
 
-const TABLES_API_URL = '/api/v1/editor/ai/tables';
+const METADATA_API_URL = '/api/v1/editor/ai/metadata';
 const SQL_API_URL = '/api/v1/editor/ai/sql';
 
 export interface TableColumnsMetadataItem {
@@ -180,58 +180,82 @@ const getTablesAndMetadata = async (
   executor: Executor,
   onStatusChange: (arg: string) => void
 ) => {
-  const relevantTables = await getRelevantTables(input, { databaseName, executor }, onStatusChange);
-  let tableMetadata;
-  try {
-    onStatusChange('Retrieving table metadata');
-    tableMetadata = await getRelevantTableDetails(databaseName, relevantTables['tables'], executor);
-  } catch (e) {
-    throw new HueError('Could not load relevant table metadata');
-  }
-  return { relevantTables, tableMetadata };
-};
+  // TODO: Pass multi databases
+  const dbMetadatas = await getRelevantMetadata({
+    input,
+    databaseNames: [databaseName],
+    executor,
+    onStatusChange
+  });
+  const tablesList = dbMetadatas[0].table_names;
 
-interface RelevantTablesResponse {
-  tables: string[];
-}
-const getRelevantTables = async (
-  input: string,
-  tableParams: getTableListParams,
-  onStatusChange: (arg: string) => void
-): Promise<RelevantTablesResponse> => {
-  onStatusChange('Retrieving all table names');
-  let allTables;
-  try {
-    allTables = (await getTableList(tableParams)) as Array<string>;
-  } catch (e) {
-    throw augmentError(e, 'Failed loading table names');
-  }
-
-  if (!Array.isArray(allTables) || allTables.length === 0) {
-    throw new HueError('No tables found. Please verify DB name used.');
-  }
-
-  onStatusChange('Filtering relevant tables');
-  let relevantTables;
-  try {
-    relevantTables = await fetchFromLlm<RelevantTablesResponse>({
-      url: TABLES_API_URL,
-      data: {
-        input: input,
-        metadata: allTables,
-        database: tableParams.databaseName
-      }
-    });
-  } catch (e) {
-    throw augmentError(e, 'Error filtering relevant tables.');
-  }
-
-  const tablesList = relevantTables?.tables;
   if (!Array.isArray(tablesList) || tablesList.length === 0) {
     throw new HueError('Could not find any relevant tables.');
   }
 
-  return relevantTables;
+  let tableMetadata;
+  try {
+    onStatusChange('Retrieving table metadata');
+    tableMetadata = await getRelevantTableDetails(databaseName, tablesList, executor);
+  } catch (e) {
+    throw new HueError('Could not load relevant table metadata');
+  }
+  return { tableMetadata };
+};
+
+interface DbMetadata {
+  db_name: string;
+  table_names: string[];
+}
+interface GetRelevantMetadataParams {
+  input: string;
+  databaseNames: string[];
+  executor: Executor;
+  onStatusChange: (arg: string) => void;
+}
+const getRelevantMetadata = async ({
+  input,
+  databaseNames,
+  executor,
+  onStatusChange
+}: GetRelevantMetadataParams): Promise<DbMetadata[]> => {
+  onStatusChange('Retrieving all table names');
+  const metadata = [];
+
+  for (const dbName of databaseNames) {
+    let allTables;
+    try {
+      allTables = (await getTableList(dbName, executor)) as Array<string>;
+    } catch (e) {
+      throw augmentError(e, 'Failed loading table names');
+    }
+
+    if (!Array.isArray(allTables) || allTables.length === 0) {
+      throw new HueError('No tables found. Please verify DB name used.');
+    }
+
+    metadata.push({
+      db_name: dbName,
+      table_names: allTables
+    });
+  }
+
+  onStatusChange('Filtering relevant tables');
+  try {
+    const response = await fetchFromLlm<{
+      metadata: DbMetadata[];
+    }>({
+      url: METADATA_API_URL,
+      data: {
+        input: input,
+        metadata: metadata
+      }
+    });
+
+    return response.metadata;
+  } catch (e) {
+    throw augmentError(e, 'Error filtering relevant tables.');
+  }
 };
 
 const fetchTableDetails = async (databaseName: string, tableName: string, executor: Executor) => {
@@ -291,11 +315,7 @@ export const getRelevantTableDetails = async (
   return relevantTables;
 };
 
-interface getTableListParams {
-  databaseName: string;
-  executor: Executor;
-}
-const getTableList = async ({ databaseName, executor }: getTableListParams) => {
+const getTableList = async (databaseName: string, executor: Executor) => {
   if (!databaseName) {
     throw new HueError('Failed to load tables. Missing database selection.');
   }

@@ -167,7 +167,7 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^editor/ai/tables', api_public.tables, name='tables'),
+  re_path(r'^editor/ai/metadata', api_public.metadata, name='metadata'),
   re_path(r'^editor/ai/sql', api_public.sql, name='sql'),
 ]
 
