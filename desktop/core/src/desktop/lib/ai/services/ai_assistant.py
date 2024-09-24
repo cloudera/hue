@@ -19,13 +19,16 @@ import json
 
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-from desktop.lib.ai.lib.task import TaskParams, TaskType
+
 from desktop.lib.ai.lib.base_model import BaseModel
+from desktop.lib.ai.models.llama import LlamaModel
+
 from desktop.lib.ai.lib.base_service import BaseService
 from desktop.lib.ai.models.sqlcoder import SQLCoderModel
 
-from desktop.conf import AI_INTERFACE
+from desktop.conf import AI_INTERFACE, get_ai_service_token
 
+_api_key = get_ai_service_token() or "EMPTY"
 _base_url = AI_INTERFACE.BASE_URL.get()
 _path = "/api/infer"
 
@@ -33,7 +36,8 @@ def _get_client():
   client = HttpClient(_base_url)
   client.set_verify(False)
   client.set_headers({
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Authorization': f'Bearer {_api_key}'
   })
   return client
 
@@ -43,6 +47,8 @@ class AiService(BaseService):
     super().__init__(self.get_model(model_key))
 
   def get_model(self, model_key: str) -> BaseModel:
+    if model_key == "llama":
+      return LlamaModel()
     return SQLCoderModel()
 
   def call_model(self, data: dict) -> str:
