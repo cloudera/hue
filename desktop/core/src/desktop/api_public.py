@@ -267,13 +267,13 @@ def storage_upload_complete(request):
   return filebrowser_api.upload_complete(django_request)
 
 
-@api_view(["PUT"])
+@api_view(["POST"])
 def storage_mkdir(request):
   django_request = get_django_request(request)
   return filebrowser_api.mkdir(django_request)
 
 
-@api_view(["PUT"])
+@api_view(["POST"])
 def storage_touch(request):
   django_request = get_django_request(request)
   return filebrowser_api.touch(django_request)
@@ -315,7 +315,7 @@ def storage_copy(request):
   return filebrowser_api.copy(django_request)
 
 
-@api_view(["PUT"])
+@api_view(["POST"])
 def storage_set_replication(request):
   django_request = get_django_request(request)
   return filebrowser_api.set_replication(django_request)
@@ -367,6 +367,18 @@ def storage_compress_files_using_batch_job(request):
 def storage_extract_archive_using_batch_job(request):
   django_request = get_django_request(request)
   return filebrowser_api.extract_archive_using_batch_job(django_request)
+
+
+@api_view(["POST"])
+def storage_chown(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.chown(django_request)
+
+
+@api_view(["POST"])
+def storage_chmod(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.chmod(django_request)
 
 
 # Task Server
