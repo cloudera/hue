@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import os
+import json
 import logging
 import operator
 import mimetypes
@@ -49,6 +50,7 @@ from filebrowser.conf import (
   SHOW_UPLOAD_BUTTON,
 )
 from filebrowser.lib import xxd
+from filebrowser.lib.rwx import compress_mode
 from filebrowser.utils import parse_broker_url
 from filebrowser.views import (
   BYTES_PER_LINE,
@@ -487,9 +489,11 @@ def stat(request):
 
   return JsonResponse(_massage_stats(request, stat_absolute_path(path, stats)))
 
+
 @api_error_handler
 def upload_chunks(request):
   pass
+
 
 @api_error_handler
 def upload_complete(request):
@@ -769,22 +773,32 @@ def chown(request):
 
 @api_error_handler
 def chmod(request):
-  pass
-  # # TODO: Check if this needs to be a PUT request
-  # path = request.POST.get('path')
-  # permission = request.POST.get("permission")
-  # group = request.POST.get("group")
-  # recursive = request.POST.get('recursive', False)
+  # TODO: Check if this needs to be a PUT request
+  # Order matters for calculating mode below
+  perm_names = (
+    "user_read",
+    "user_write",
+    "user_execute",
+    "group_read",
+    "group_write",
+    "group_execute",
+    "other_read",
+    "other_write",
+    "other_execute",
+    "sticky",
+  )
+  path = request.POST.get('path')
+  permission = json.loads(request.POST.get("permission", '{}'))
 
-  # # TODO: Check if we need to explicitly handle encoding anywhere
-  # request.fs.chmod(path, user, group, recursive=recursive)
+  mode = compress_mode([coerce_bool(permission.get(p)) for p in perm_names])
 
-  # return HttpResponse(status=200)
+  request.fs.chmod(path, mode, recursive=permission.get('recursive', False))
+
+  return HttpResponse(status=200)
 
 
 @api_error_handler
 def extract_archive_using_batch_job(request):
-
   if not ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
     return HttpResponse("Extract archive operation is disabled by configuration.", status=500)  # TODO: status code?
 
@@ -805,7 +819,6 @@ def extract_archive_using_batch_job(request):
 
 @api_error_handler
 def compress_files_using_batch_job(request):
-
   if not ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
     return HttpResponse("Compress files operation is disabled by configuration.", status=500)  # TODO: status code?
 
