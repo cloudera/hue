@@ -569,8 +569,9 @@ def _upload_file(request):
 
 @api_error_handler
 def mkdir(request):
-  path = request.PUT.get('path')
-  name = request.PUT.get('name')
+  # TODO: Check if this needs to be a PUT request
+  path = request.POST.get('path')
+  name = request.POST.get('name')
 
   if name and (posixpath.sep in name or "#" in name):
     return HttpResponse(f"Error creating {name} directory. Slashes or hashes are not allowed in directory name.", status=400)
@@ -581,8 +582,8 @@ def mkdir(request):
 
 @api_error_handler
 def touch(request):
-  path = request.PUT.get('path')
-  name = request.PUT.get('name')
+  path = request.POST.get('path')
+  name = request.POST.get('name')
 
   if name and (posixpath.sep in name):
     return HttpResponse(f"Error creating {name} file: Slashes are not allowed in filename.", status=400)
@@ -698,8 +699,9 @@ def content_summary(request):
 
 @api_error_handler
 def set_replication(request):
-  path = request.PUT.get('path')
-  replication_factor = request.PUT.get('replication_factor')
+  # TODO: Check if this needs to be a PUT request
+  path = request.POST.get('path')
+  replication_factor = request.POST.get('replication_factor')
 
   result = request.fs.set_replication(path, replication_factor)
   if not result:
@@ -750,6 +752,35 @@ def trash_purge(request):
   request.fs.purge_trash()
 
   return HttpResponse(status=200)
+
+
+@api_error_handler
+def chown(request):
+  # TODO: Check if this needs to be a PUT request
+  path = request.POST.get('path')
+  user = request.POST.get("user")
+  group = request.POST.get("group")
+  recursive = request.POST.get('recursive', False)
+
+  # TODO: Check if we need to explicitly handle encoding anywhere
+  request.fs.chown(path, user, group, recursive=recursive)
+
+  return HttpResponse(status=200)
+
+
+@api_error_handler
+def chmod(request):
+  pass
+  # # TODO: Check if this needs to be a PUT request
+  # path = request.POST.get('path')
+  # permission = request.POST.get("permission")
+  # group = request.POST.get("group")
+  # recursive = request.POST.get('recursive', False)
+
+  # # TODO: Check if we need to explicitly handle encoding anywhere
+  # request.fs.chmod(path, user, group, recursive=recursive)
+
+  # return HttpResponse(status=200)
 
 
 @api_error_handler
