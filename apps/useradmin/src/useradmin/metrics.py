@@ -15,14 +15,17 @@
 # limitations under the License.
 
 import logging
-
 from datetime import datetime, timedelta
+
+from django.db import connection
+from django.db.utils import OperationalError
 from prometheus_client import Gauge
 
 from desktop.lib.metrics import global_registry
 from desktop.lib.security_util import get_localhost_name
 
 LOG = logging.getLogger()
+
 
 def active_users():
   from useradmin.models import UserProfile
@@ -32,10 +35,20 @@ def active_users():
         first_login=False,
         hostname__isnull=False
     ).count()
-  except:
+  except OperationalError as oe:
+    LOG.debug('active_users recovering from %s' % str(oe))
+    connection.close()
+    connection.connect()
+    count = UserProfile.objects.filter(
+        last_activity__gt=datetime.now() - timedelta(hours=1),
+        first_login=False,
+        hostname__isnull=False
+    ).count()
+  except Exception as e:
     LOG.exception('Could not get active_users')
     count = 0
   return count
+
 
 global_registry().gauge_callback(
     name='users.active.total',
@@ -48,14 +61,23 @@ global_registry().gauge_callback(
 prometheus_active_users = Gauge('hue_active_users', 'Hue Active Users in All Instances')
 prometheus_active_users.set_function(active_users)
 
+
 def active_users_per_instance():
   from useradmin.models import UserProfile
   try:
-    count = UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1), hostname=get_localhost_name()).count()
-  except:
+    count = UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1),
+                                       hostname=get_localhost_name()).count()
+  except OperationalError as oe:
+    LOG.debug('active_users_per_instance recovering from %s' % str(oe))
+    connection.close()
+    connection.connect()
+    count = UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1),
+                                       hostname=get_localhost_name()).count()
+  except Exception as e:
     LOG.exception('Could not get active_users per instance')
     count = 0
   return count
+
 
 global_registry().gauge_callback(
     name='users.active',
