@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ubi as base-ubi-8
+FROM docker-sandbox.infra.cloudera.com/chainguard/cloudera-python-jdk:py39-jdk8 AS py39-jdk8
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
@@ -24,15 +24,14 @@ ENV NAME="hue" \
     PATH=$PATH:${HUE_BIN} \
     SUPERVISOR_VERSION=4.0.2
 
-RUN set -eux && \
-      yum install -y \
-        hostname \
-        java-1.8.0-openjdk \
-        gettext \
-        nmap-ncat \
-        sudo && \
-      yum clean all && \
-      rm -rf /var/cache/yum
+USER root
+RUN apk --no-cache add \
+    gettext \
+    nmap \
+    maven \
+    sudo \
+    nmap netcat-openbsd iftop procps net-tools bind-tools \
+    && rm -rf /var/cache/apk/*
 
 # create hue user
 RUN groupadd -g 1000 ${HUEUSER} && useradd -g 1000 -d ${HUE_QP_HOME} -s /bin/bash -u 1000 ${HUEUSER}
@@ -55,7 +54,7 @@ RUN mkdir -p ${HUE_QP_LOG_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_QP_LOG_DI
 
 COPY --chown=${HUEUSER}:${HUEUSER} hueqp-notice.txt ${HUE_QP_HOME}/NOTICE.txt
 
-EXPOSE 8080 9090 9091
+EXPOSE 8080 9090 9091 30700
 WORKDIR ${HUE_QP_HOME}
 
 USER ${HUEUSER}
