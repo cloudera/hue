@@ -23,6 +23,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import oct
 from builtins import object
+from datetime import datetime, timedelta
 import errno
 import logging
 import posixpath
@@ -32,12 +33,13 @@ import threading
 import time
 import urllib.request, urllib.error
 
+from django.core.cache import caches
 from django.utils.encoding import smart_str
 
 import hadoop.conf
-import desktop.conf
 
 from desktop.lib.rest import http_client, resource
+from desktop.settings import CACHES_WEBHDFS_DELEGATION_TOKEN_KEY
 from past.builtins import long
 from hadoop.fs import normpath as fs_normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import Hdfs
@@ -60,6 +62,8 @@ DEFAULT_HDFS_SUPERUSER = desktop.conf.DEFAULT_HDFS_SUPERUSER.get()
 DEFAULT_READ_SIZE = 1024 * 1024 # 1MB
 
 LOG = logging.getLogger()
+
+cache = caches[CACHES_WEBHDFS_DELEGATION_TOKEN_KEY]
 
 
 class WebHdfs(Hdfs):
@@ -212,10 +216,25 @@ class WebHdfs(Hdfs):
     return self.join(trash_path, self.TRASH_CURRENT)
 
   def _getparams(self):
+    if self._security_enabled:
+      token = cache.get(self.user, None)
+      if not token:
+        token = self.get_delegation_token(self.user)
+        cache.set(self.user, token)
+      return {'delegation': token}
     return {
       "user.name": WebHdfs.DEFAULT_USER,
       "doas": self.user
     }
+
+  def get_delegation_token(self, user):
+    params = {}
+    params['op'] = 'GETDELEGATIONTOKEN'
+    params['doas'] = user
+    params['renewer'] = user
+    headers = self._getheaders()
+    res = self._root.get(params=params, headers=headers)
+    return res['Token'] and res['Token']['urlString']
 
   def _getheaders(self):
     return None
@@ -561,16 +580,6 @@ class WebHdfs(Hdfs):
       params['length'] = long(length)
     if bufsize is not None:
       params['bufsize'] = bufsize
-    if self._security_enabled:
-      token = self.get_delegation_token(self.user)
-      if token:
-        params['delegation'] = token
-        # doas should not be present with delegation token as the token includes the username
-        # https://hadoop.apache.org/docs/r1.0.4/webhdfs.html
-        if 'doas' in params:
-          del params['doas']
-        if 'user.name' in params:
-          del params['user.name']
     unquoted_path = urllib_unquote(smart_str(path))
     return self._client._make_url(unquoted_path, params)
 
@@ -895,19 +904,6 @@ class WebHdfs(Hdfs):
     except Exception as ex:
       LOG.exception("Failed to read redirect from response: %s (%s)" % (webhdfs_ex, ex))
       raise webhdfs_ex
-
-  def get_delegation_token(self, renewer):
-    """get_delegation_token(user) -> Delegation token"""
-    # Workaround for HDFS-3988
-    if self._security_enabled:
-      self.get_home_dir()
-
-    params = self._getparams()
-    params['op'] = 'GETDELEGATIONTOKEN'
-    params['renewer'] = renewer
-    headers = self._getheaders()
-    res = self._root.get(params=params, headers=headers)
-    return res['Token'] and res['Token']['urlString']
 
 
   def do_as_user(self, username, fn, *args, **kwargs):
