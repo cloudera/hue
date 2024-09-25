@@ -37,9 +37,9 @@ docker_qp_compile() {
   export CONTAINER=$(uuidgen | cut -d"-" -f5)
 
   mkdir -p $QPBUILD_DIR
-  docker run -dt --name $CONTAINER $HUEQPBASE_VERSION /bin/bash
+  docker run -dt --name $CONTAINER --entrypoint /bin/bash $HUEQPBASE_VERSION 
   docker container cp $HUE_SRC $CONTAINER:$CONTAINER_HUE_SRC
-  docker container exec $CONTAINER $CONTAINER_HUE_SRC/query-store/tools/container/build.sh compile_qp
+  docker container exec --user root $CONTAINER $CONTAINER_HUE_SRC/query-store/tools/container/build.sh compile_qp
   docker container cp $CONTAINER:$CONTAINER_HUE_SRC/query-store $QPBUILD_DIR/query-store
   docker container stop $CONTAINER
 }
