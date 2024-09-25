@@ -296,7 +296,7 @@ def storage_content_summary(request):
 @api_view(["POST"])
 def storage_bulk_move(request):
   django_request = get_django_request(request)
-  return filebrowser_api.move(django_request)
+  return filebrowser_api.bulk_op(django_request, 'move')
 
 
 @api_view(["POST"])
@@ -308,7 +308,7 @@ def storage_move(request):
 @api_view(["POST"])
 def storage_bulk_copy(request):
   django_request = get_django_request(request)
-  return filebrowser_api.copy(django_request)
+  return filebrowser_api.bulk_op(django_request, 'copy')
 
 
 @api_view(["POST"])
@@ -323,16 +323,16 @@ def storage_set_replication(request):
   return filebrowser_api.set_replication(django_request)
 
 
-@api_view(["DELETE"])
+@api_view(["POST"])
 def storage_rmtree(request):
   django_request = get_django_request(request)
   return filebrowser_api.rmtree(django_request)
 
 
-@api_view(["DELETE"])
+@api_view(["POST"])
 def storage_bulk_rmtree(request):
   django_request = get_django_request(request)
-  return filebrowser_api.rmtree(django_request)
+  return filebrowser_api.bulk_op(django_request, 'rmtree')
 
 
 @api_view(["GET"])
@@ -350,7 +350,7 @@ def storage_trash_restore(request):
 @api_view(["POST"])
 def storage_trash_bulk_restore(request):
   django_request = get_django_request(request)
-  return filebrowser_api.trash_restore(django_request)
+  return filebrowser_api.bulk_op(django_request, 'trash_restore')
 
 
 @api_view(["DELETE"])
@@ -381,6 +381,18 @@ def storage_chown(request):
 def storage_chmod(request):
   django_request = get_django_request(request)
   return filebrowser_api.chmod(django_request)
+
+
+@api_view(["POST"])
+def storage_bulk_chown(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, 'chown')
+
+
+@api_view(["POST"])
+def storage_bulk_chmod(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, 'chmod')
 
 
 # Task Server

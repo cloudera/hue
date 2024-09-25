@@ -669,7 +669,7 @@ def copy(request):
   if source_path.startswith('ofs://'):
     ofs_skip_files = request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
     if ofs_skip_files:
-      return JsonResponse(ofs_skip_files, status=200)
+      return JsonResponse(ofs_skip_files, status=500)  # TODO: Status code?
   else:
     request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
 
@@ -715,8 +715,9 @@ def set_replication(request):
 
 @api_error_handler
 def rmtree(request):
-  path = request.DELETE.get('path')
-  skip_trash = request.DELETE.get('skip_trash', False)
+  # TODO: Check if this needs to be a DELETE request
+  path = request.POST.get('path')
+  skip_trash = request.POST.get('skip_trash', False)
 
   request.fs.rmtree(path, skip_trash)
 
@@ -852,3 +853,32 @@ def get_available_space_for_upload(request):
     return HttpResponse(message, status=500)  # TODO: status code?
   finally:
     redis_client.close()
+
+
+@api_error_handler
+def bulk_op(request, op):
+  # TODO: Check if this is correct way to fetch path_list value.
+  # TODO: Also try making a generic request data fetching helper method
+  path_list = request.POST.getlist('dest_path_list') if op in ('copy', 'move') else request.POST.getlist('path_list')
+  bulk_dict = request.POST.copy()
+
+  for p in path_list:
+    tmp_dict = bulk_dict
+    if op in ('copy', 'move'):  # TODO: Check if chmod is also special case for permissions to calculate mode
+      tmp_dict['destination_path'] = p
+    else:
+      tmp_dict['path'] = p
+
+    request.POST = tmp_dict
+    response = op(request)
+
+    error_dict = {}
+    if response.status_code != 200:
+      error_dict[p] = {'error': response.content}
+      if op == 'copy' and p.startswith('ofs://'):
+        error_dict[p].update({'ofs_skip_files': response.content})
+
+  if error_dict:
+    return JsonResponse(error_dict, status_code=500)  # TODO: Check if we need diff status code or diff json structure?
+
+  return HttpResponse(status=200)  # TODO: Check if we need to send some message or diff status code?
