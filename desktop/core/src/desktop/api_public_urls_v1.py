@@ -127,6 +127,8 @@ urlpatterns += [
   re_path(r'^storage/copy/bulk/?$', api_public.storage_bulk_copy, name='storage_bulk_copy'),
   re_path(r'^storage/delete/bulk/?$', api_public.storage_bulk_rmtree, name='storage_bulk_rmtree'),
   re_path(r'^storage/trash/restore/bulk/?$', api_public.storage_trash_bulk_restore, name='storage_trash_bulk_restore'),
+  re_path(r'^storage/chown/bulk/?$', api_public.storage_bulk_chown, name='storage_bulk_chown'),
+  re_path(r'^storage/chmod/bulk/?$', api_public.storage_bulk_chmod, name='storage_bulk_chmod'),
 ]
 
 urlpatterns += [
