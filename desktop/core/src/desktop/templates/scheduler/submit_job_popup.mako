@@ -170,9 +170,9 @@ else:
       $(document).on("click.hideDatepicker", function (event) {
         if (!$(event.target).closest(".datepicker, .calendar-link, input[type='text']").length) {
           _el.datepicker('hide');
+          $(document).off("click.hideDatepicker");
         }
       });
-      $(document).off("click.hideDatepicker");
     });
     
     _el.datepicker('show');
