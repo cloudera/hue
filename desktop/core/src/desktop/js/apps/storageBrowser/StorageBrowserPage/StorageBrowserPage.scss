@@ -32,8 +32,22 @@
   }
 
   .hue-storage-browser__tab {
+    display: flex;
+    height: 100%;
     background-color: vars.$fluidx-gray-100;
     padding: 0 16px;
-    height: 100%;
+
+    .ant-tabs-content-holder {
+      display: flex;
+      flex: 1;
+      overflow: auto;
+
+      .ant-tabs-content,
+      .ant-tabs-tabpane-active {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+    }
   }
 }
