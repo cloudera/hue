@@ -33,6 +33,7 @@ from desktop.lib.ai.services.bedrock import BedrockService
 from desktop.lib.ai.services.azure import AzureService
 from desktop.lib.ai.services.ai_assistant import AiService
 from desktop.lib.ai.services.vllm import VLLMService
+from desktop.lib.ai.services.cml import CMLService
 from desktop.lib.utils.cache import LRUCache
 
 from notebook.api import TableReader
@@ -51,6 +52,7 @@ def _get_service() -> BaseService:
   service_name = AI_INTERFACE.SERVICE.get()
   model_key: str = AI_INTERFACE.MODEL.get()
 
+  # match case was introduced only in Python 3.10, hence have to go with if-else ladder
   if service_name == "openai":
     return OpenAiService(model_key)
   elif service_name == "azure":
@@ -59,8 +61,10 @@ def _get_service() -> BaseService:
     return BedrockService(model_key)
   elif service_name == "ai_assistant":
     return AiService(model_key)
-  elif service_name == "vllm":
+  elif service_name == "vllm" or service_name == "caii":
     return VLLMService(model_key)
+  elif service_name == "cml":
+    return CMLService(model_key)
   else:
     LOG.error("Service configured is invalid")
     raise Exception(f"Invalid service name - {service_name}")
