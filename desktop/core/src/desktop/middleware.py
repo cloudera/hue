@@ -30,6 +30,7 @@ import sys
 import tempfile
 import time
 import traceback
+import secrets
 
 import kerberos
 import django.db
@@ -69,17 +70,7 @@ from desktop.auth.backend import knox_login_headers
 
 from libsaml.conf import CDP_LOGOUT_URL
 from urllib.parse import urlparse
-
-import base64
 import os
-
-# Number of random bytes in the nonce:
-NONCE_BYTES = 24
-
-def generate_nonce():
-    """ Return a unique base64 encoded nonce hash."""
-    nonce = os.urandom(NONCE_BYTES)
-    return base64.b64encode(nonce).decode()
 
 
 def nonce_exists(response):
@@ -90,12 +81,11 @@ def nonce_exists(response):
 
      Returns:
          nonce_found (dict): Dictionary of nonces found
-         has_nonce (bool): True if any nonce has been found
      """
     try:
         csp = response['Content-Security-Policy']
     except KeyError:
-        csp = response['Content-Security-Policy-Report-Only']
+        csp = response.get('Content-Security-Policy-Report-Only', '')
 
     nonce_found = {}
 
@@ -109,10 +99,7 @@ def nonce_exists(response):
             if 'style-src' in directive:
                 nonce_found['style'] = directive
 
-    has_nonce = any(nonce_found)
-
-    return nonce_found, has_nonce
-
+    return nonce_found
 
 def get_header(response):
     """Get the CSP header type.
@@ -986,22 +973,23 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
             raise exceptions.MiddlewareNotUsed
 
     def process_request(self, request):
-        nonce = generate_nonce()
+        nonce = secrets.token_urlsafe()
         request.csp_nonce = nonce
 
     def process_response(self, request, response):
-        # Add the secure CSP if it doesn't exist
+        if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
+            response["Content-Security-Policy"] = self.secure_content_security_policy
+        
         if not CSP_NONCE.get():
           return response
 
-        if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
-            response["Content-Security-Policy"] = self.secure_content_security_policy
 
         header = get_header(response)
         if not header or not hasattr(request, 'csp_nonce'):
             return response
 
-        nonce_found, has_nonce = nonce_exists(response)
+        nonce_found = nonce_exists(response)
+        has_nonce = bool(nonce_found)
         if has_nonce:
             logger.error("Nonce already exists: {}".format(nonce_found))
             return response
