@@ -214,6 +214,14 @@ function changeDocumentSharePerm(perm) {
   shareViewModel.selectedPerm(perm);
 }
 
+function readPermission() {
+  changeDocumentSharePerm('read');
+}
+
+function writePermission() {
+  changeDocumentSharePerm('write');
+}
+
 function handleTypeaheadSelection() {
   if (selectedUserOrGroup != null) {
     if (selectedUserOrGroup.hasOwnProperty("username")) {

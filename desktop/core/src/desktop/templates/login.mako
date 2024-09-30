@@ -41,6 +41,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     <form method="POST" action="${action}" autocomplete="off">
       ${ csrf_token(request) | n,unicode }
 
+      <div data-bind="text: someProperty"></div>
       <div class="logo">
         <a href="https://gethue.com">
           <svg style="height: 80px; width: 200px;"><use href="#hi-logo"></use></svg>

@@ -31,6 +31,27 @@ import hueAnalytics from 'utils/hueAnalytics';
 import I18n from 'utils/i18n';
 import { withLocalStorage } from 'utils/storageUtils';
 
+function onCompleteHandler(path) {
+  huePubSub.publish('assist.dropzone.complete', path);
+}
+
+function visiblePanel() {
+  this.visiblePanel(this.$data); // Assuming 'this' is bound to $parent
+}
+
+function computeStyle() {
+  return {
+      'float': this.rightAlignIcon ? 'right' : 'left'
+  };
+}
+
+function testDataId() {
+  return 'assist--' + this.type() + '--button';
+}
+
+
+
+
 const TEMPLATE = `
   <script type="text/html" id="assist-panel-inner-header">
     <div class="assist-header assist-fixed-height" data-bind="visibleOnHover: { selector: '.assist-header-actions' }, css: { 'assist-resizer': $index() > 0 }" style="display:none;">
@@ -41,11 +62,11 @@ const TEMPLATE = `
     </div>
   </script>
   
-  <div class="assist-panel" data-bind="dropzone: { url: '/indexer/api/indexer/upload_local_file_drag_and_drop', clickable: false, paramName: 'file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: !window.SHOW_UPLOAD_BUTTON }">
+  <div class="assist-panel" data-bind="dropzone: { url: '/indexer/api/indexer/upload_local_file_drag_and_drop', clickable: false, paramName: 'file', onComplete: onCompleteHandler, disabled: !window.SHOW_UPLOAD_BUTTON }">
     <!-- ko if: availablePanels().length > 1 -->
     <div class="assist-panel-switches">
       <!-- ko foreach: availablePanels -->
-      <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, style: { 'float': rightAlignIcon ? 'right' : 'left' },  attr: { 'title': name, 'data-testid': 'assist--' + type + '--button' }">
+      <div class="inactive-action assist-type-switch" data-bind="click: visiblePanel, css: { 'blue': $parent.visiblePanel() === $data }, style: computeStyle, attr: { 'title': name, 'data-testid': testDataId }">
         <!-- ko if: iconSvg --><span style="font-size:22px;"><svg class="hi"><use data-bind="attr: {'href': iconSvg }" href=''></use></svg></span><!-- /ko -->
         <!-- ko if: !iconSvg --><i class="fa fa-fw valign-middle" data-bind="css: icon"></i><!-- /ko -->
       </div>

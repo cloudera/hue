@@ -70,15 +70,15 @@ else:
     <div style="margin-top: 20px">
       <div class="input-append">
         <div id="menu" style="font-size: 14px;"></div>
-        <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source, itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match',valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: handleTypeaheadSelection, appendTo: $('#menu') }, clearable: { value: searchInput }, textInput: searchInput" class="ui-autocomplete-input" autocomplete="off" style="width: 460px">
+        <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source, itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match', valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: handleTypeaheadSelection, appendTo: 'menu' }, clearable: { value: searchInput }, textInput: searchInput" class="ui-autocomplete-input" autocomplete="off" style="width: 460px">
         <div class="btn-group">
           <a id="documentShareAddBtn" class="btn"><span data-bind="text: selectedPermLabel"></span></a>
           <a id="documentShareCaret" class="btn dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu pull-right">
-            <li><a data-bind="click: changeDocumentSharePerm.bind(null, 'read')" href="javascript:void(0)">${ _('Read') }</a></li>
-            <li><a data-bind="click: changeDocumentSharePerm.bind(null, 'write')" href="javascript:void(0)">${ _('Read and Modify') }</a></li>
+            <li><a data-bind="click: readPermission" href="javascript:void(0)">${ _('Read') }</a></li>
+            <li><a data-bind="click: writePermission" href="javascript:void(0)">${ _('Read and Modify') }</a></li>
           </ul>
         </div>
       </div>

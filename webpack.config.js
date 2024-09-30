@@ -24,7 +24,7 @@ const {
 } = require('./desktop/core/src/desktop/js/webpack/configUtils');
 
 const config = {
-  devtool: 'cheap-source-map',
+  devtool: 'cheap-module-source-map',
   entry: {
     hue: { import: './desktop/core/src/desktop/js/hue.js' },
     editor: { import: './desktop/core/src/desktop/js/apps/editor/app.js', dependOn: 'hue' },
