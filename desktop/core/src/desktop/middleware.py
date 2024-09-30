@@ -993,6 +993,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         # Add the secure CSP if it doesn't exist
         if not CSP_NONCE.get():
           return response
+
         if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
             response["Content-Security-Policy"] = self.secure_content_security_policy
 
@@ -1013,26 +1014,18 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         for p in csp_split:
             directive = p.lstrip().split(' ')[0]
             if nonce:
-                # Check if the directive is for 'script-src' or 'style-src'
+                # Remove unsafe-inline from scripts
+                # TODO remove unsafe-inline from styles
                 if directive in ('script-src'):
-                    # Filter out 'unsafe-inline' and 'unsafe-eval' from the directive
-                    new_directive_parts = [
-                        part for part in p.split(' ')
-                        if part and part not in ("'unsafe-inline'", "'unsafe-eval'")
-                    ]
-                    # Append the nonce directive
+                    new_directive_parts = [part for part in p.split(' ') if part and part != "'unsafe-inline'"]
                     new_directive_parts.append(nonce_directive)
                     new_csp.append(' '.join(new_directive_parts))
                 else:
-                    # For other directives, keep them unchanged
                     new_csp.append(p)
             else:
-                # If there's no nonce, keep the original directive unchanged
                 new_csp.append(p)
 
-        # Set the CSP header with the new policy, excluding 'unsafe-inline' and 'unsafe-eval' and including the nonce
-        response[header['name']] = "; ".join(new_csp).strip() + ";"
-
+        response[header['name']] = "; ".join(new_csp).strip() + ';'
 
         return response
 

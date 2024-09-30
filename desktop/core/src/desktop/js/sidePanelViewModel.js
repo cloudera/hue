@@ -35,10 +35,6 @@ class SidePanelViewModel {
     self.leftAssistVisible = ko.observable(
       getFromLocalStorage('assist.left_assist_panel_visible', true)
     );
-
-    const splitDrag = () => {
-      huePubSub.publish('split.draggable.position') 
-    }
     self.leftAssistVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
         setInLocalStorage('assist.left_assist_panel_visible', val);

@@ -198,12 +198,12 @@ ${ hueIcons.symbols() }
         <!-- /ko -->
       </div>
 
-      <div id="leftResizer" class="resizer" data-bind="visible: leftAssistVisible, splitFlexDraggable : {
+      <div id="leftResizer" class="resizer" data-bind="visible: leftAssistVisible(), splitFlexDraggable : {
         containerSelector: '.content-wrapper',
         sidePanelSelector: '.left-panel',
         sidePanelVisible: leftAssistVisible,
         orientation: 'left',
-        onPosition: splitDrag
+        onPosition: function() { huePubSub.publish('split.draggable.position') }
       }"><div class="resize-bar"></div></div>
 
       <div class="page-content">

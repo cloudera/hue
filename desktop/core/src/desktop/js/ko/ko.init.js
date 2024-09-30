@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import * as ko from 'knockout';
-import ksb from 'knockout-secure-binding';
 
 const proxiedKoRegister = ko.components.register;
 const registeredComponents = [];
@@ -28,11 +27,3 @@ ko.components.register = function () {
     return proxiedKoRegister.apply(this, arguments);
   }
 };
-
-var options = {
-  attribute: "data-bind",        // default is "data-sbind", using "data-bind" to match regular Knockout bindings
-  globals: window,               // makes global window object available to bindings
-  bindings: ko.bindingHandlers,  // the Knockout binding handlers to use
-  noVirtualElements: true       // allows the use of Knockout virtual elements
-};
-ko.bindingProvider.instance = new ksb(options); // Use the imported 'ksb' as the constructor
