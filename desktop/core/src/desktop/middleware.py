@@ -977,6 +977,10 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         request.csp_nonce = nonce
 
     def process_response(self, request, response):
+        # Add the secure CSP if it doesn't exist
+        if not CSP_NONCE.get():
+          return response
+
         if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
             response["Content-Security-Policy"] = self.secure_content_security_policy
         
