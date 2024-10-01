@@ -1714,9 +1714,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.compute = wizard.compute;
       self.selectedComputeId = ko.observable();
 
-      self.selectedComputeId.subscribe(function (abc) {
+      self.selectedComputeId.subscribe(function (computeId) {
         var selectedCompute = self.namespace().computes.find(function (currCompute) {
-          return currCompute.name == self.selectedComputeId();
+          return currCompute.name == computeId;
         })
         self.compute(selectedCompute);
       });
