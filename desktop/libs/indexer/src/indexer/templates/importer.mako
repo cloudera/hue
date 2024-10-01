@@ -626,6 +626,14 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Does not exist') } <span data-bind="text: outputFormat"></span>
             </span>
           </div>
+
+          <!-- ko if: namespace().computes.length > 1 -->
+          <div class="control-group">
+            <label for="computeName" class="control-label"><div>${ _('Compute') }</div>
+              <select id="computeName" data-bind="selectize: namespace().computes, value: $parent.createWizard.source.selectedComputeId, optionsValue: 'name', optionsText: 'name'"></select>
+            </label>
+          </div>
+          <!-- /ko -->
         </div>
       </div>
 
@@ -1704,6 +1712,14 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
       self.sampleCols = ko.observableArray();
       self.namespace = wizard.namespace;
       self.compute = wizard.compute;
+      self.selectedComputeId = ko.observable();
+
+      self.selectedComputeId.subscribe(function (computeId) {
+        var selectedCompute = self.namespace().computes.find(function (currCompute) {
+          return currCompute.name == computeId;
+        })
+        self.compute(selectedCompute);
+      });
 
       var refreshThrottle = -1;
       var sampleColSubDisposals = [];
