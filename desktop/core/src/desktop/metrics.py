@@ -16,22 +16,23 @@
 
 from __future__ import absolute_import
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range
 import gc
 import logging
-import multiprocessing
 import threading
-
+import multiprocessing
+from builtins import range
 from datetime import datetime, timedelta
-from prometheus_client import Gauge, REGISTRY
 
-from useradmin.models import User
+from django.db import connection
+from django.db.utils import OperationalError
+from future import standard_library
+from prometheus_client import REGISTRY, Gauge
 
 from desktop.conf import ENABLE_PROMETHEUS
 from desktop.lib.metrics import global_registry
+from useradmin.models import User
 
+standard_library.install_aliases()
 
 LOG = logging.getLogger()
 
@@ -49,7 +50,9 @@ if ENABLE_PROMETHEUS.get():
   django_collectors = set()
   django_metrics_names = [
       name
-      for name in REGISTRY._names_to_collectors.keys() if name.startswith('django_') and not name.startswith(ALLOWED_DJANGO_PROMETHEUS_METRICS)
+      for name in REGISTRY._names_to_collectors.keys()
+        if name.startswith('django_')
+           and not name.startswith(ALLOWED_DJANGO_PROMETHEUS_METRICS)
   ]
 
   for metric_name in django_metrics_names:
@@ -141,13 +144,20 @@ response_time = global_registry().timer(
 
 # ------------------------------------------------------------------------------
 
+
 def user_count():
   users = 0
   try:
     users = User.objects.count()
-  except:
+  except OperationalError as oe:
+    LOG.debug('user_count recovering from %s' % str(oe))
+    connection.close()
+    connection.connect()
+    users = User.objects.count()
+  except Exception as e:
     LOG.exception('Metrics: Failed to get number of user accounts')
   return users
+
 
 user_count = global_registry().gauge_callback(
     name='users',
@@ -188,18 +198,29 @@ spnego_authentication_time = global_registry().timer(
 
 # ------------------------------------------------------------------------------
 
+
 def num_of_queries():
-  from desktop.models import Document2 # Avoid circular dependency
+  from desktop.models import Document2  # Avoid circular dependency
   try:
     count = Document2.objects.filter(
       type__istartswith='query-',
       is_history=True,
       last_modified__gt=datetime.now() - timedelta(minutes=10)
     ).count()
-  except:
+  except OperationalError as oe:
+    LOG.debug('num_of_queries recovering from %s' % str(oe))
+    connection.close()
+    connection.connect()
+    count = Document2.objects.filter(
+      type__istartswith='query-',
+      is_history=True,
+      last_modified__gt=datetime.now() - timedelta(minutes=10)
+    ).count()
+  except Exception as e:
     LOG.exception('Could not get num_of_queries')
     count = 0
   return count
+
 
 global_registry().gauge_callback(
     name='queries.number',
