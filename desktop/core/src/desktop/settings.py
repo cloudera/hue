@@ -162,6 +162,7 @@ MIDDLEWARE = [
     'desktop.middleware.ExceptionMiddleware',
     'desktop.middleware.ClusterMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'desktop.middleware.CustomUploadHandlerMiddleware',
     'desktop.middleware.CacheControlMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
     # 'axes.middleware.FailedLoginMiddleware',
@@ -682,7 +683,7 @@ else:
   if is_ofs_enabled():
     file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
 
-FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
+FILE_UPLOAD_HANDLERS = file_upload_handlers
 
 ############################################################
 

@@ -17,65 +17,76 @@
 
 from __future__ import absolute_import
 
-from builtins import object
-import inspect
-import json
-import logging
-import mimetypes
-import os.path
 import re
-import socket
 import sys
-import tempfile
+import json
 import time
+import socket
+import inspect
+import logging
+import os.path
+import tempfile
+import mimetypes
 import traceback
+from builtins import object
+from urllib.parse import urlparse
 
 import kerberos
 import django.db
-import django.views.static
 import django_prometheus
-
+import django.views.static
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authenticate, load_backend, login
+from django.contrib.auth import BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, authenticate, load_backend, login
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.core import exceptions
-from django.http import HttpResponseNotAllowed, HttpResponseForbidden
+from django.core.files.uploadhandler import MemoryFileUploadHandler, TemporaryFileUploadHandler
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseRedirect
 from django.urls import resolve
-from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 
-from hadoop import cluster
-from dashboard.conf import IS_ENABLED as DASHBOARD_ENABLED
-from useradmin.models import User
-
 import desktop.views
+from dashboard.conf import IS_ENABLED as DASHBOARD_ENABLED
 from desktop import appmanager, metrics
-from desktop.auth.backend import is_admin, find_or_create_user, ensure_has_a_group, rewrite_user
-from desktop.conf import AUTH, HTTP_ALLOWED_METHODS, ENABLE_PROMETHEUS, KNOX, DJANGO_DEBUG_MODE, AUDIT_EVENT_LOG_DIR, \
-    METRICS, SERVER_USER, REDIRECT_WHITELIST, SECURE_CONTENT_SECURITY_POLICY, has_connectors, is_gunicorn_report_enabled, \
-    CUSTOM_CACHE_CONTROL, HUE_LOAD_BALANCER
+from desktop.auth.backend import ensure_has_a_group, find_or_create_user, is_admin, knox_login_headers, rewrite_user
+from desktop.conf import (
+  AUDIT_EVENT_LOG_DIR,
+  AUTH,
+  CUSTOM_CACHE_CONTROL,
+  DJANGO_DEBUG_MODE,
+  ENABLE_PROMETHEUS,
+  HTTP_ALLOWED_METHODS,
+  HUE_LOAD_BALANCER,
+  KNOX,
+  METRICS,
+  REDIRECT_WHITELIST,
+  SECURE_CONTENT_SECURITY_POLICY,
+  SERVER_USER,
+  has_connectors,
+  is_gunicorn_report_enabled,
+)
 from desktop.context_processors import get_app_name
-from desktop.lib import apputil, i18n, fsmanager
+from desktop.lib import apputil, fsmanager, i18n
 from desktop.lib.django_util import JsonResponse, render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.metrics import global_registry
 from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
-from desktop.log.access import access_log, log_page_hit, access_warn
-from desktop.auth.backend import knox_login_headers
-
+from desktop.log.access import access_log, access_warn, log_page_hit
+from hadoop import cluster
+from hadoop.fs.upload import HDFSfileUploadHandler
 from libsaml.conf import CDP_LOGOUT_URL
-from urllib.parse import urlparse
+from useradmin.models import User
 
 if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from django.utils.http import url_has_allowed_host_and_scheme
   from urllib.parse import quote
+
+  from django.utils.http import url_has_allowed_host_and_scheme
+  from django.utils.translation import gettext as _
 else:
-  from django.utils.translation import ugettext as _
   from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme, urlquote as quote
+  from django.utils.translation import ugettext as _
 
 
 LOG = logging.getLogger()
@@ -93,6 +104,7 @@ if ENABLE_PROMETHEUS.get():
   DJANGO_VIEW_AUTH_WHITELIST.append(django_prometheus.exports.ExportToDjangoView)
 
 HUE_LB_HOSTS = [urlparse(hue_lb).netloc for hue_lb in HUE_LOAD_BALANCER.get()] if HUE_LOAD_BALANCER.get() else []
+
 
 class AjaxMiddleware(MiddlewareMixin):
   """
@@ -217,7 +229,8 @@ class AppSpecificMiddleware(object):
     ret = None
     for middleware in self._get_middlewares(request._desktop_app, 'view'):
       ret = middleware(request, view_func, view_args, view_kwargs)
-      if ret: return ret  # Short circuit
+      if ret:
+        return ret  # Short circuit
     return ret
 
   def process_response(self, request, response):
@@ -240,7 +253,8 @@ class AppSpecificMiddleware(object):
     ret = None
     for middleware in self._get_middlewares(request._desktop_app, 'exception'):
       ret = middleware(request, exception)
-      if ret: return ret # short circuit
+      if ret:
+        return ret  # short circuit
     return ret
 
   def _load_app_middleware(cls, app):
@@ -256,7 +270,7 @@ class AppSpecificMiddleware(object):
         dot = middleware_path.rindex('.')
       except ValueError:
         raise exceptions.ImproperlyConfigured(_('%(module)s isn\'t a middleware module.') % {'module': middleware_path})
-      mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
+      mw_module, mw_classname = middleware_path[:dot], middleware_path[dot + 1:]
       try:
         mod = __import__(mw_module, {}, {}, [''])
       except ImportError as e:
@@ -279,7 +293,7 @@ class AppSpecificMiddleware(object):
       # We need to make sure we don't have a process_request function because we don't know what
       # application will handle the request at the point process_request is called
       if hasattr(mw_instance, 'process_request'):
-        raise exceptions.ImproperlyConfigured(_('AppSpecificMiddleware module "%(module)s" has a process_request function' + \
+        raise exceptions.ImproperlyConfigured(_('AppSpecificMiddleware module "%(module)s" has a process_request function' +
               ' which is impossible.') % {'module': middleware_path})
       if hasattr(mw_instance, 'process_view'):
         result['view'].append(mw_instance.process_view)
@@ -316,7 +330,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
       return None
 
     if AUTH.AUTO_LOGIN_ENABLED.get() and request.path.startswith('/api/v1/token/auth'):
-      pass # allow /api/token/auth can create user or make it active
+      pass  # allow /api/token/auth can create user or make it active
     elif request.path.startswith('/api/'):
       return None
 
@@ -410,7 +424,7 @@ class LoginAndPermissionMiddleware(MiddlewareMixin):
               REDIRECT_FIELD_NAME,
               quote('/hue' + request.get_full_path().replace('is_embeddable=true', '').replace('&&', '&'))
           )
-        }) # Remove embeddable so redirect from & to login works. Login page is not embeddable
+        })  # Remove embeddable so redirect from & to login works. Login page is not embeddable
       else:
         return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, quote(request.get_full_path())))
 
@@ -557,8 +571,8 @@ class HtmlValidationMiddleware(MiddlewareMixin):
     try:
       fn = resolve(request.path)[0]
       fn_name = '%s.%s' % (fn.__module__, fn.__name__)
-    except:
-      LOG.exception('failed to resolve url')
+    except Exception as e:
+      LOG.exception('Failed to resolve URL: %s', str(e))
       fn_name = '<unresolved_url>'
 
     # Write the two versions of html out for offline debugging
@@ -598,7 +612,7 @@ class ProxyMiddleware(MiddlewareMixin):
 
   def __init__(self, get_response):
     self.get_response = get_response
-    if not 'desktop.auth.backend.AllowAllBackend' in AUTH.BACKEND.get():
+    if 'desktop.auth.backend.AllowAllBackend' not in AUTH.BACKEND.get():
       LOG.info('Unloading ProxyMiddleware')
       raise exceptions.MiddlewareNotUsed
 
@@ -635,8 +649,8 @@ class ProxyMiddleware(MiddlewareMixin):
           'operationText': msg
         }
         return
-      except:
-        LOG.exception('Unexpected error when authenticating')
+      except Exception as e:
+        LOG.exception('Unexpected error when authenticating: %s', str(e))
         return
 
   def clean_username(self, username, request):
@@ -764,8 +778,8 @@ class SpnegoMiddleware(MiddlewareMixin):
           }
           access_warn(request, msg)
           return
-        except:
-          LOG.exception('Unexpected error when authenticating against KDC')
+        except Exception as e:
+          LOG.exception('Unexpected error when authenticating against KDC: %s', str(e))
           return
       else:
         request.META['Return-401'] = ''
@@ -831,7 +845,7 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
   in use.
   """
   def __init__(self, get_response):
-    if not 'desktop.auth.backend.RemoteUserDjangoBackend' in AUTH.BACKEND.get():
+    if 'desktop.auth.backend.RemoteUserDjangoBackend' not in AUTH.BACKEND.get():
       LOG.info('Unloading HueRemoteUserMiddleware')
       raise exceptions.MiddlewareNotUsed
     super().__init__(get_response)
@@ -874,6 +888,7 @@ class EnsureSafeRedirectURLMiddleware(MiddlewareMixin):
     else:
       return response
 
+
 class MetricsMiddleware(MiddlewareMixin):
   """
   Middleware to track the number of active requests.
@@ -908,7 +923,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
       raise exceptions.MiddlewareNotUsed
 
   def process_response(self, request, response):
-    if self.secure_content_security_policy and not 'Content-Security-Policy' in response:
+    if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
       response["Content-Security-Policy"] = self.secure_content_security_policy
 
     return response
@@ -932,6 +947,7 @@ class MimeTypeJSFileFixStreamingMiddleware(MiddlewareMixin):
       response['Content-Type'] = "application/javascript"
 
     return response
+
 
 class MultipleProxyMiddleware:
   FORWARDED_FOR_FIELDS = [
@@ -959,7 +975,7 @@ class MultipleProxyMiddleware:
             location += 1
           else:
             request.META['HTTP_X_FORWARDED_FOR'] = item.strip()
-            break;
+            break
 
     for field in self.FORWARDED_FOR_FIELDS:
       if field in request.META:
@@ -986,3 +1002,36 @@ class CacheControlMiddleware(MiddlewareMixin):
       response['Pragma'] = 'no-cache'
       response['Expires'] = '0'
     return response
+
+
+class CustomUploadHandlerMiddleware(MiddlewareMixin):
+  def process_request(self, request):
+    if request.path.endswith('/desktop/api2/doc/import'):
+      # Use HDFSfileUploadHandler for document uploads
+      request.upload_handlers = [
+        self.get_hdfs_upload_handler(request),
+        MemoryFileUploadHandler(),
+        TemporaryFileUploadHandler(),
+      ]
+    else:
+      # Use the global configuration for other uploads
+      request.upload_handlers = self.get_upload_handlers(request)
+
+  def get_hdfs_upload_handler(self, request):
+    return HDFSfileUploadHandler(request)
+
+  def get_upload_handlers(self, request):
+    handlers = []
+    for handler_path in settings.FILE_UPLOAD_HANDLERS:
+      module_name, class_name = handler_path.rsplit('.', 1)
+      module = __import__(module_name, fromlist=[class_name])
+      handler_class = getattr(module, class_name)
+      if handler_class.__name__ == 'HDFSfileUploadHandler':
+        handlers.append(self.get_hdfs_upload_handler(request))
+      elif handler_class.__name__ == 'FineUploaderChunkedUploadHandler':
+        handlers.append(handler_class(request))
+      elif handler_class.__name__ in ['MemoryFileUploadHandler', 'TemporaryFileUploadHandler']:
+        handlers.append(handler_class())
+      else:
+        handlers.append(handler_class())
+    return handlers
