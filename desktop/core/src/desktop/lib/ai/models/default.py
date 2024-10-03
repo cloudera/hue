@@ -15,12 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.ai.lib.task import Task, TaskType, get_task
-from desktop.lib.ai.lib.base_model import BaseModel
-from desktop.lib.ai.utils.xml import extract_tag_content
-from desktop.lib.ai.types import SQLResponse
-
 import logging
+
+from desktop.lib.ai.lib.base_model import BaseModel
+from desktop.lib.ai.lib.task import Task, TaskType, get_task
+from desktop.lib.ai.types import SQLResponse
+from desktop.lib.ai.utils.xml import extract_tag_content
+
 LOG = logging.getLogger()
 
 _GENERATE = """Act as an {dialect} SQL expert.
@@ -55,7 +56,8 @@ Use the following metadata: {metadata}.
 
 SQL: {sql}
 
-Always explain the optimization or suggest alternative options if any. The explanation should be wrapped in an <explain> tag but should not contain SQL.
+Always explain the optimization or suggest alternative options if any.
+The explanation should be wrapped in an <explain> tag but should not contain SQL.
 If the SQL can be optimized it should be placed in the code tag.
 
 Return the result in the following format:
@@ -84,6 +86,7 @@ Explain this SQL by adding /* comments */ with as much details as possible.
 Return the commented SQL wrapped in a <code> tag.
  """
 
+
 def _code_assumptions_parser(response: str) -> SQLResponse:
   return SQLResponse(
     sql=extract_tag_content('code', response),
@@ -108,10 +111,12 @@ def _summary_parser(response: str) -> SQLResponse:
     explain=extract_tag_content('explain', response),
   )
 
+
 def _code_comment(response: str) -> SQLResponse:
   return SQLResponse(
     sql=extract_tag_content('code', response),
   )
+
 
 _TASKS = {
   TaskType.GENERATE: Task(_GENERATE, _code_assumptions_parser),

@@ -17,18 +17,16 @@
 
 import json
 
+from desktop.conf import AI_INTERFACE, get_ai_service_token
+from desktop.lib.ai.lib.base_model import BaseModel
+from desktop.lib.ai.lib.base_service import BaseService
+from desktop.lib.ai.models.default import DefaultModel
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
-from desktop.lib.ai.lib.base_model import BaseModel
-from desktop.lib.ai.models.default import DefaultModel
-
-from desktop.lib.ai.lib.base_service import BaseService
-
-from desktop.conf import AI_INTERFACE, get_ai_service_token
-
 token = get_ai_service_token()
 _base_url = AI_INTERFACE.BASE_URL.get()
+
 
 def _get_client():
   client = HttpClient(_base_url)
@@ -42,6 +40,7 @@ def _get_client():
   client.set_headers(headers)
 
   return client
+
 
 class CMLService(BaseService):
   def __init__(self, model_key: str):
