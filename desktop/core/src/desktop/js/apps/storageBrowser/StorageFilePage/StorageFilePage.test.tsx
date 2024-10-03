@@ -21,7 +21,7 @@ import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { DOWNLOAD_API_URL } from '../../../reactComponents/FileChooser/api';
-import { downloadFile } from './StorageFilePage.util';
+import huePubSub from '../../../utils/huePubSub';
 
 jest.mock('../../../utils/dateTimeUtils', () => ({
   ...jest.requireActual('../../../utils/dateTimeUtils'),
@@ -33,6 +33,10 @@ jest.mock('../../../utils/dateTimeUtils', () => ({
 jest.mock('./StorageFilePage.util', () => ({
   ...jest.requireActual('./StorageFilePage.util'),
   downloadFile: jest.fn()
+}));
+
+jest.mock('../../../utils/huePubSub', () => ({
+  publish: jest.fn()
 }));
 
 // Mock data for fileData
@@ -154,16 +158,37 @@ describe('StorageFilePage', () => {
   });
 
   it('downloads file when download button is clicked', async () => {
-    const user = userEvent.setup();
     render(<StorageFilePage fileData={mockFileData} />);
 
+    const expectedDownloadPath = `${DOWNLOAD_API_URL}${mockFileData.path}`;
+    const mockDownloadLink = document.createElement('a');
+
+    const createElementSpy = jest.spyOn(document, 'createElement').mockImplementation(tagName => {
+      if (tagName === 'a') {
+        return mockDownloadLink;
+      }
+      return Reflect.get(Document.prototype, 'createElement').call(document, tagName);
+    });
+
+    const appendChildMock = jest.spyOn(document.body, 'appendChild');
+    const removeChildMock = jest.spyOn(document.body, 'removeChild');
+    const clickMock = jest.spyOn(mockDownloadLink, 'click').mockImplementation(() => {});
+
     const downloadButton = screen.getByRole('button', { name: 'Download' });
-    expect(downloadButton).toBeVisible();
 
-    await user.click(downloadButton);
+    await userEvent.click(downloadButton);
 
-    const expectedUrl = `${DOWNLOAD_API_URL}${mockFileData.path}`;
-    expect(downloadFile).toHaveBeenCalledWith(expectedUrl);
-    expect(downloadFile).toHaveBeenCalledTimes(1);
+    const actualUrl = new URL(mockDownloadLink.href);
+
+    expect(huePubSub.publish).toHaveBeenCalledWith('hue.global.info', {
+      message: 'Downloading your file, Please wait...'
+    });
+    expect(appendChildMock).toHaveBeenCalledWith(mockDownloadLink);
+    expect(mockDownloadLink.href).toContain(expectedDownloadPath);
+    expect(actualUrl.pathname).toBe(expectedDownloadPath);
+    expect(clickMock).toHaveBeenCalled(); // Make sure you have mocked the click if needed
+    expect(removeChildMock).toHaveBeenCalledWith(mockDownloadLink);
+
+    createElementSpy.mockRestore();
   });
 });

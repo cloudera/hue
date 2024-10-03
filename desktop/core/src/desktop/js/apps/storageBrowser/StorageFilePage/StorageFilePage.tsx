@@ -19,13 +19,13 @@ import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
 import './StorageFilePage.scss';
 import { i18nReact } from '../../../utils/i18nReact';
 import Button, { PrimaryButton } from 'cuix/dist/components/Button';
-import { downloadFile, getFileMetaData } from './StorageFilePage.util';
+import { getFileMetaData } from './StorageFilePage.util';
 import { DOWNLOAD_API_URL } from '../../../reactComponents/FileChooser/api';
+import huePubSub from '../../../utils/huePubSub';
 
 const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [isEditing, setIsEditing] = React.useState(false);
-  const [isDownloading, setIsDownloading] = React.useState(false);
   const [fileContent, setFileContent] = React.useState(fileData.view?.contents);
   const fileMetaData = useMemo(() => getFileMetaData(t, fileData), [t, fileData]);
 
@@ -33,11 +33,15 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
     setIsEditing(true);
   };
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
+    huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
+
     const url = `${DOWNLOAD_API_URL}${fileData.path}`;
-    setIsDownloading(true);
-    await downloadFile(url);
-    setIsDownloading(false);
+    const link = document.createElement('a');
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleSave = () => {
@@ -99,10 +103,9 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
               data-testid="preview--download--button"
               data-event=""
               onClick={handleDownload}
-              disabled={isDownloading}
               hidden={!fileData.show_download_button}
             >
-              {isDownloading ? t('Downloading...') : t('Download')}
+              {t('Download')}
             </PrimaryButton>
           </div>
         </div>

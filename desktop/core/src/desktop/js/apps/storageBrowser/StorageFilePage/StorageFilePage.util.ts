@@ -18,7 +18,6 @@ import { TFunction } from 'i18next';
 import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import formatBytes from '../../../utils/formatBytes';
-import { get } from '../../../api/utils';
 
 export type MetaData = {
   name: string;
@@ -60,23 +59,4 @@ export const getFileMetaData = (t: TFunction, fileData: PathAndFileData): MetaDa
       }
     ]
   ];
-};
-
-export const downloadFile = async (url: string): Promise<void> => {
-  try {
-    const response = await get<File>(url, { responseType: 'blob' });
-
-    if (response) {
-      const blob = new Blob([response], { type: response.type });
-
-      const downloadUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = url.split('/').pop() || 'download';
-      a.click();
-      URL.revokeObjectURL(downloadUrl);
-    }
-  } catch (error) {
-    console.error('Error downloading file:', error);
-  }
 };
