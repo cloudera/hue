@@ -19,6 +19,8 @@ import _ from 'lodash';
 import * as ko from 'knockout';
 import page from 'page';
 
+import { createElement } from 'react';
+import { createRoot } from 'react-dom/client';
 import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
@@ -285,7 +287,7 @@ class OnePageViewModel {
       }, 0);
     };
 
-    self.loadAppThrottled = (app, loadDeep) => {
+    self.loadAppThrottled = (app, loadDeep, options) => {
       if (self.currentApp() === 'editor' && $('#editorComponents').length) {
         const vm = ko.dataFor($('#editorComponents')[0]);
         if (vm.isPresentationMode()) {
@@ -327,7 +329,7 @@ class OnePageViewModel {
         $('#embeddable_security_hive2').html('');
         $('#embeddable_security_solr').html('');
       }
-      if (typeof self.embeddable_cache[app] === 'undefined') {
+      if (!options?.isFullyFrontend && typeof self.embeddable_cache[app] === 'undefined') {
         if (loadedApps.indexOf(app) === -1) {
           loadedApps.push(app);
         }
@@ -424,7 +426,8 @@ class OnePageViewModel {
       } else {
         self.isLoadingEmbeddable(false);
       }
-      window.document.title = 'Hue - ' + window.EMBEDDABLE_PAGE_URLS[app].title;
+      const title = options?.title || window.EMBEDDABLE_PAGE_URLS[app].title;
+      window.document.title = 'Hue - ' + title;
       window.resumeAppIntervals(app);
       huePubSub.resumeAppSubscribers(app);
       $('.embeddable').hide();
@@ -506,6 +509,60 @@ class OnePageViewModel {
     const getUrlParameter = name => getParameter(name) || '';
 
     self.lastContext = null;
+
+    const camelToDash = camelCaseString => {
+      return camelCaseString.replace(/[A-Z]/g, match => '-' + match.toLowerCase());
+    };
+    const createNewReactEmbeddable = (containerName, Component) => {
+      const containerDiv = document.createElement('div');
+      containerDiv.classList.add('embeddable', containerName, 'cuix', 'antd');
+      document.querySelector('.page-content').appendChild(containerDiv);
+      const root = createRoot(containerDiv);
+      root.render(createElement(Component, {}));
+      return containerDiv;
+    };
+
+    /* 
+    Use this function if you want to show a React based application page 
+    for a specific url without the need to use legacy mako templates.
+    1. Add a new appsItem in HueSidebar.vue that links to the new url
+    2. Import the new React component at the top of this file.
+    3. Add a new object to the pageMapping array below as examplified here:    
+
+      {
+        url: '/my-new-url', 
+        app: function () {
+          showReactAppPage({
+            appName: 'myNewAppName',
+            component: MyNewReactComponent,
+            title: 'My new APP title'
+          });
+        }
+      }
+    */
+    // eslint-disable-next-line
+    const showReactAppPage = ({
+      appName,
+      title,
+      component,
+      hideLeftAssist = true,
+      hideRightAssist = true
+    }) => {
+      if (hideLeftAssist) {
+        huePubSub.publish('left.assist.hide', true);
+      }
+      if (hideRightAssist) {
+        huePubSub.publish('right.assist.hide', true);
+      }
+      const containerName = `${camelToDash(appName)}-container`;
+
+      const appContainer =
+        document.querySelector(`.page-content .${containerName}`) ||
+        createNewReactEmbeddable(containerName, component);
+
+      self.loadAppThrottled(appName, false, { isFullyFrontend: true, title });
+      appContainer.style.display = 'block';
+    };
 
     const pageMapping = [
       { url: '/403', app: '403' },
