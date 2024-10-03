@@ -1,19 +1,17 @@
-FROM registry.access.redhat.com/ubi8/ubi as base-ubi-8
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-base:v1.0.0-minimal AS cldr-v1mini
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
 # Set the environment variable
 ENV NAME="basehue"
 
-RUN set -eux; \
-      yum install -y \
-        hostname \
-        httpd \
-        httpd-tools \
-        gettext \
-        nmap-ncat && \
-      yum clean all -y && \
-      rm -rf /var/cache/yum
+USER root
+
+RUN apk --no-cache add \
+    apache2 \
+    apache2-utils \
+    gettext \
+    nmap netcat-openbsd iftop procps net-tools bind-tools systemd
 
 # kubernetes pod health check
 COPY healthz.sh /
@@ -21,4 +19,4 @@ RUN chmod +x /healthz.sh
 
 EXPOSE 80
 
-CMD ["/usr/sbin/apachectl"]
+CMD ["/bin/bash"]

@@ -1,69 +1,84 @@
-FROM registry.access.redhat.com/ubi8/ubi as base-ubi-8
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-python:3.8 AS cldr-py38
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
 # Set the environment variable
 ENV NAME="basehue"
 
-# Required libraries for running Hue
-RUN set -eux; \
-      yum install -y \
-        bzip2-devel \
-        curl \
-        cyrus-sasl \
-        cyrus-sasl-devel \
-        cyrus-sasl-gssapi \
-        cyrus-sasl-plain \
-        gettext \
-        gmp \
-        java-1.8.0-openjdk-devel \
-        krb5-devel \
-        krb5-libs \
-        krb5-workstation \
-        libffi-devel \
-        libxml2-devel \
-        libxslt-devel \
-        ncurses-devel \
-        nmap-ncat \
-        procps-ng \
-        python38 \
-        python38-devel \
-        rsync \
-        openldap-devel \
-        openssl \
-        openssl-devel \
-        sqlite-devel \
-        sudo \
-        which \
-        xmlsec1 \
-        xmlsec1-openssl \
-        zlib-devel
+USER root
 
-# Install redis
 RUN set -eux; \
-    dnf install -y gcc make && \
+    apk --no-cache add \
+    autoconf \
+    automake \
+    build-base \
+    bzip2-dev \
+    curl \
+    cyrus-sasl-dev \
+    gettext \
+    git \
+    krb5 \
+    krb5-dev \
+    krb5-libs \
+    libffi-dev \
+    libxml2-dev \
+    libxslt-dev \
+    make \
+    maven \
+    ncurses-dev \
+    nmap \
+    nodejs \
+    npm \
+    openjdk-8 \
+    openldap-dev \
+    openssl \
+    openssl-dev \
+    rsync \
+    sqlite-dev \
+    sudo \
+    zlib-dev \
+    nmap netcat-openbsd iftop procps net-tools bind-tools shadow
+
+# Install libtool without conflicts
+RUN apk --no-cache --force-overwrite add libtool
+
+# Set JAVA_HOME environment variable
+ENV JAVA_HOME="/usr/lib/jvm/java-1.8-openjdk"
+ENV PATH="$JAVA_HOME/bin:$PATH"
+
+# Install xmlsec
+RUN set -eux; \
+    curl -O -L https://github.com/lsh123/xmlsec/releases/download/1.2.41/xmlsec1-1.2.41.tar.gz && \
+    tar -xzf xmlsec1-1.2.41.tar.gz && \
+    cd xmlsec1-1.2.41 && \
+    ./configure --prefix=/usr && \
+    make && \
+    make install
+
+RUN set -eux; \
     curl -O http://download.redis.io/redis-stable.tar.gz && \
     tar xzf redis-stable.tar.gz && \
     cd redis-stable && \
     make && \
     make install && \
     cd .. && \
-    rm -rf redis-stable redis-stable.tar.gz && \
-    dnf clean all && \
-    rm -rf /var/cache/yum
+    rm -rf redis-stable redis-stable.tar.gz
 
-RUN set -eux; \
-      /usr/bin/pip3.8 install supervisor \
-      && curl -s https://files.pythonhosted.org/packages/45/78/4621eb7085162bc4d2252ad92af1cc5ccacbd417a50e2ee74426331aad18/psycopg2_binary-2.9.3-cp38-cp38-musllinux_1_1_x86_64.whl -o /tmp/psycopg2_binary-2.9.3-cp38-cp38-musllinux_1_1_x86_64.whl \
-      && dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm \
-      && yum install -y postgresql15 \
-      && curl -sL https://rpm.nodesource.com/setup_14.x | bash - \
-        && yum install -y nodejs \
-        && yum clean all -y  \
-        && rm -rf /var/cache/yum
+# Install required tools and dependencies
+RUN pip3.8 install supervisor psycopg2-binary --no-cache-dir
+
+# Install PostgreSQL client tools which include pg_dump and pg_restore
+RUN apk --no-cache add postgresql-client
+WORKDIR /workspace
+EXPOSE 5432
 
 # kubernetes pod health check
 COPY healthz.sh /
 RUN chmod +x /healthz.sh
+
+# Setup openssl.cnf
+RUN mkdir -p /etc/ssl
+COPY openssl.cnf /etc/ssl
+RUN chmod 755 /etc/ssl/openssl.cnf
 
 CMD ["/bin/bash"]

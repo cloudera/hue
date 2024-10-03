@@ -11,4 +11,4 @@ if [ "${JCEKS_PATH}" = "" ]; then
     JCEKS_PATH="/jceks/secrets.jceks"
 fi
 
-exec /usr/bin/java -cp /etc/hue/conf/security-7.2.3.jar com.cloudera.enterprise.crypto.JceksPasswordExtractor "${JCEKS_PATH}" "${ALIAS}"
+exec ${JAVA_HOME}/bin/java -cp /etc/hue/conf/security-7.2.3.jar com.cloudera.enterprise.crypto.JceksPasswordExtractor "${JCEKS_PATH}" "${ALIAS}"

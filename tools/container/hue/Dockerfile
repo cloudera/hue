@@ -24,10 +24,10 @@ ENV NAME="hue" \
     PATH=$PATH:${HUE_BIN} \
     SUPERVISOR_VERSION=4.0.2
 
+USER root
+
 # Switch to non-root default user
-RUN yum install -y microdnf && \
-    microdnf install -y shadow-utils findutils && \
-    groupadd -g 1000 ${HUEUSER} && \
+RUN groupadd -g 1000 ${HUEUSER} && \
     useradd -g 1000 -d ${HUE_HOME} -s /bin/bash -u 1000 ${HUEUSER}
 
 COPY --chown=${HUEUSER}:${HUEUSER} ${HUEUSER} ${HUE_HOME}
@@ -71,4 +71,4 @@ EXPOSE 8888 9111 6379
 USER hive
 ENV USER hive
 WORKDIR ${HUE_HOME}
-CMD ["/usr/local/bin/supervisord","-c","/etc/supervisord.conf"]
+CMD ["/usr/bin/supervisord","-c","/etc/supervisord.conf"]

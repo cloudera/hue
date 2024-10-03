@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ubi as base-ubi-8
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-python:3.8 AS cldr-py38
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
@@ -6,61 +6,69 @@ LABEL description="Hue Project https://github.com/cloudera/hue"
 ENV NAME="basehue"
 ENV PYTHON_VER=python3.8
 
-# Required for building Hue
+USER root
+
 RUN set -eux; \
-    yum install -y \
-      bzip2-devel  \
-      curl \
-      cyrus-sasl \
-      cyrus-sasl-devel \
-      cyrus-sasl-gssapi \
-      cyrus-sasl-plain \
-      gcc \
-      gcc-c++ \
-      gettext \
-      git \
-      java-11-openjdk-devel \
-      krb5-devel \
-      krb5-libs \
-      krb5-workstation \
-      libffi-devel \
-      libxml2-devel \
-      libxslt-devel \
-      make \
-      maven \
-      nc \
-      ncurses-devel \
-      nmap-ncat \
-      openldap-devel \
-      openssl \
-      openssl-devel \
-      python38 \
-      python38-devel \
-      rsync \
-      sqlite-devel \
-      sudo \
-      tar \
-      which \
-      xmlsec1 \
-      xmlsec1-openssl \
-      zlib-devel
+    apk --no-cache add \
+    autoconf \
+    automake \
+    build-base \
+    bzip2-dev \
+    curl \
+    cyrus-sasl-dev \
+    gettext \
+    git \
+    krb5 \
+    krb5-dev \
+    krb5-libs \
+    libffi-dev \
+    libxml2-dev \
+    libxslt-dev \
+    make \
+    maven \
+    ncurses-dev \
+    nmap \
+    nodejs \
+    npm \
+    openjdk-8 \
+    openldap-dev \
+    openssl \
+    openssl-dev \
+    rsync \
+    sqlite-dev \
+    sudo \
+    zlib-dev \
+    nmap netcat-openbsd iftop procps net-tools bind-tools shadow
+
+# Install libtool without conflicts
+RUN apk --no-cache --force-overwrite add libtool
+
+# Setup openssl.cnf
+RUN mkdir -p /etc/ssl
+COPY openssl.cnf /etc/ssl
+RUN chmod 755 /etc/ssl/openssl.cnf
+
+# Set JAVA_HOME environment variable
+ENV JAVA_HOME="/usr/lib/jvm/java-1.8-openjdk"
+ENV PATH="$JAVA_HOME/bin:$PATH"
+
+# Install xmlsec
+RUN set -eux; \
+    curl -O -L https://github.com/lsh123/xmlsec/releases/download/1.2.41/xmlsec1-1.2.41.tar.gz && \
+    tar -xzf xmlsec1-1.2.41.tar.gz && \
+    cd xmlsec1-1.2.41 && \
+    ./configure --prefix=/usr && \
+    make && \
+    make install
 
 # Install redis
 RUN set -eux; \
-    dnf install -y gcc make && \
     curl -O http://download.redis.io/redis-stable.tar.gz && \
     tar xzf redis-stable.tar.gz && \
     cd redis-stable && \
     make && \
     make install && \
     cd .. && \
-    rm -rf redis-stable redis-stable.tar.gz && \
-    dnf clean all && \
-    rm -rf /var/cache/yum
-
-RUN set -eux; \
-      curl -sL https://rpm.nodesource.com/setup_14.x | bash - \
-        && yum install -y nodejs \
-        && yum clean all -y
+    rm -rf redis-stable redis-stable.tar.gz
 
 CMD ["/bin/bash"]
