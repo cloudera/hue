@@ -15,30 +15,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-LOG = logging.getLogger()
-
 import json
-
-from desktop.lib.ai.types import SQLResponse
-
-from desktop.lib.ai.lib.base_model import BaseModel
-from desktop.lib.ai.models.gpt import GPTModel
-from desktop.lib.ai.models.titan import TitanModel
-from desktop.lib.ai.lib.task import TaskType, TaskParams
-
-from desktop.lib.ai.lib.base_service import BaseService
-from desktop.lib.ai.services.openai import OpenAiService
-from desktop.lib.ai.services.bedrock import BedrockService
-from desktop.lib.ai.services.azure import AzureService
-from desktop.lib.ai.services.ai_assistant import AiService
-from desktop.lib.ai.services.vllm import VLLMService
-from desktop.lib.ai.services.cml import CMLService
-from desktop.lib.utils.cache import LRUCache
-
-from notebook.api import TableReader
+import logging
 
 from desktop.conf import AI_INTERFACE
+from desktop.lib.ai.lib.base_model import BaseModel
+from desktop.lib.ai.lib.base_service import BaseService
+from desktop.lib.ai.lib.task import TaskParams, TaskType
+from desktop.lib.ai.models.gpt import GPTModel
+from desktop.lib.ai.models.titan import TitanModel
+from desktop.lib.ai.services.ai_assistant import AiService
+from desktop.lib.ai.services.azure import AzureService
+from desktop.lib.ai.services.bedrock import BedrockService
+from desktop.lib.ai.services.cml import CMLService
+from desktop.lib.ai.services.openai import OpenAiService
+from desktop.lib.ai.services.vllm import VLLMService
+from desktop.lib.ai.types import SQLResponse
+from desktop.lib.utils.cache import LRUCache
+from notebook.api import TableReader
+
+LOG = logging.getLogger()
 
 # Following best practices sugested in https://arxiv.org/abs/2204.00498
 SAMPLE_ROWS = 3
@@ -47,6 +43,7 @@ DATA_DELIMITER = ","
 
 table_meta_cache = LRUCache(AI_INTERFACE.TABLE_DATA_CACHE_SIZE.get())
 ADD_TABLE_DATA = AI_INTERFACE.ADD_TABLE_DATA.get()
+
 
 def _get_service() -> BaseService:
   service_name = AI_INTERFACE.SERVICE.get()
@@ -68,6 +65,7 @@ def _get_service() -> BaseService:
   else:
     LOG.error("Service configured is invalid")
     raise Exception(f"Invalid service name - {service_name}")
+
 
 def build_create_table_ddl(table: dict) -> str:
   table_name = table["name"]
@@ -91,10 +89,11 @@ def build_create_table_ddl(table: dict) -> str:
   ddl = f'CREATE TABLE {table_name} ({details_str})'
 
   table_comment = table.get("comment")
-  if table_comment != None:
+  if table_comment is not None:
     ddl = f"{ddl} COMMENT '{table_comment}'"
 
   return ddl + ';'
+
 
 def get_val_str(value) -> str:
   value = str(value).strip()
@@ -102,7 +101,10 @@ def get_val_str(value) -> str:
     value = value[:MAX_VALUE_LENGTH].strip() + "..."
   return value
 
+
 NOT_AVAILABLE_MSG = "/*\nExample rows not available.\n*/"
+
+
 def build_sample_data(reader: TableReader, table) -> str:
   table_name = table["name"]
   db_name = table.get("dbName", "")
@@ -125,8 +127,10 @@ def build_sample_data(reader: TableReader, table) -> str:
 
   return NOT_AVAILABLE_MSG
 
+
 def get_table_key(table) -> str:
   return json.dumps(table)
+
 
 def format_metadata(metadata, reader) -> str:
   table_metadatas = []
@@ -134,7 +138,7 @@ def format_metadata(metadata, reader) -> str:
   for table in metadata["tables"]:
     table_key = get_table_key(table)
     table_meta = table_meta_cache.get(table_key)
-    if table_meta == None:
+    if table_meta is None:
       table_meta = build_create_table_ddl(table)
       if ADD_TABLE_DATA:
         sample_data = build_sample_data(reader, table)
@@ -143,6 +147,7 @@ def format_metadata(metadata, reader) -> str:
     table_metadatas.append(table_meta)
 
   return '\n\n'.join(table_metadatas)
+
 
 def perform_sql_task(request, task: TaskType, input: str, sql: str, dialect: str, metadata: dict) -> SQLResponse:
   reader = TableReader(request, dialect)

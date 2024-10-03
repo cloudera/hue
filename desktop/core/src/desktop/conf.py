@@ -245,37 +245,37 @@ AI_INTERFACE = ConfigSection(
   key='ai_interface',
   help=_("AI interface configurations"),
   members=dict(
-    SERVICE = Config(
+    SERVICE=Config(
       key='service',
       help=_('API service to be used for AI tasks. AI is disabled when a service is not configured. Eg: openai, bedrock, ai_assistant'),
       type=str),
-    SERVICE_VERSION = Config(
+    SERVICE_VERSION=Config(
       key='service_version',
       help=_('API service version to be used for AI tasks'),
       type=str,
       default=None),
-    TRUSTED_SERVICE = Config(
+    TRUSTED_SERVICE=Config(
       key="trusted_service",
       help=_('Indicates if the LLM is trusted or not. Turn on to disable warning. Default True.'),
       type=coerce_bool,
       default=True),
-    MODEL = Config(
+    MODEL=Config(
       key='model',
       help=_('Model to be used for AI tasks. Eg: gpt, llama'),
       type=str),
-    MODEL_NAME = Config(
+    MODEL_NAME=Config(
       key='model_name',
       help=_('Fully qualified name of the model to be used. Eg: gpt-3.5-turbo-16k'),
       type=str),
-    MODEL_REF = Config(
+    MODEL_REF=Config(
       key='model_ref',
       help=_('Model deployment reference'),
       type=str),
-    BASE_URL = Config(
+    BASE_URL=Config(
       key='base_url',
       help=_('Service API base URL'),
       type=str),
-    ADD_TABLE_DATA = Config(
+    ADD_TABLE_DATA=Config(
       key="add_table_data",
       help=_('When enabled, sample rows from the table are added to the prompt. Default True.'),
       type=coerce_bool,
@@ -290,24 +290,25 @@ AI_INTERFACE = ConfigSection(
       help=_('Number of Tables to load from a database initially'),
       default=20,
       type=int),
-    TOKEN = Config(
+    TOKEN=Config(
       key='token',
       help=_('Service API token'),
       secret=True,
       type=str),
-    TOKEN_SCRIPT = Config(
+    TOKEN_SCRIPT=Config(
       key="token_script",
       help=_("Run this script to produce the service API token."),
       type=coerce_password_from_script,
       default=None),
-    ENABLED_SQL_TASKS = Config(
+    ENABLED_SQL_TASKS=Config(
       key='enabled_sql_tasks',
       help=_('A comma-separated list of SQL related AI tasks available in the Editor'),
       type=coerce_csv,
-      default=['generate','edit','explain','optimize','fix','comment']
+      default=['generate', 'edit', 'explain', 'optimize', 'fix', 'comment']
       ),
   )
 )
+
 
 def get_ai_service_token():
   token = os.environ.get('HUE_AI_INTERFACE_TOKEN')
@@ -317,6 +318,7 @@ def get_ai_service_token():
     token = AI_INTERFACE.TOKEN_SCRIPT.get()
 
   return token
+
 
 SEMANTIC_SEARCH = ConfigSection(
   key='semantic_search',
@@ -345,19 +347,24 @@ SEMANTIC_SEARCH = ConfigSection(
   )
 )
 
+
 def is_ai_interface_enabled():
   service = AI_INTERFACE.SERVICE.get()
   return bool(service and service.strip())
 
+
 def is_ai_trusted_service():
   return AI_INTERFACE.TRUSTED_SERVICE.get()
 
+
 def is_vector_db_enabled():
   RELEVENCY = SEMANTIC_SEARCH.RELEVENCY.get()
-  return RELEVENCY=="vector_db"
+  return RELEVENCY == "vector_db"
+
 
 def ai_service_name():
   return AI_INTERFACE.SERVICE.get()
+
 
 HUE_IMAGE_VERSION = Config(
   key="hue_image_version",
