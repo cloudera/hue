@@ -45,7 +45,7 @@ docker_hue_compile() {
   export CONTAINER=$(uuidgen | cut -d"-" -f5)
 
   mkdir -p $BUILD_DIR
-  docker run -dt --name $CONTAINER $COMPILEHUE_VERSION /bin/bash
+  docker run -dt --name $CONTAINER --entrypoint /bin/bash $COMPILEHUE_VERSION
   docker container cp $HUE_SRC $CONTAINER:$CONTAINER_HUE_SRC
   docker container exec $CONTAINER $CONTAINER_HUE_SRC/tools/container/build.sh compile_py3hue
   docker container cp $CONTAINER:$CONTAINER_HUE_OPT/${HUEUSER} $BUILD_DIR
@@ -154,7 +154,7 @@ pull_base_images() {
 }
 
 rebuild_base_images() {
-  docker pull registry.access.redhat.com/ubi8/ubi:latest
+  docker pull docker-sandbox.infra.cloudera.com/chainguard/cloudera-python-jdk:py39-jdk8
   build_huebase
   build_huelbbase
   build_huecompilebase

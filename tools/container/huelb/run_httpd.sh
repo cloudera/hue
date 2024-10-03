@@ -1,6 +1,5 @@
-#!/bin/sh
-set -e
-mkdir -p ${HUE_LOG_DIR}
-ip_address=$(hostname -i)
+#!/bin/bash
 
-exec /usr/sbin/httpd -DFOREGROUND "$@"
+set -e
+
+exec /usr/sbin/httpd -D FOREGROUND -k start -C "ServerName $(hostname -i)"
