@@ -30,11 +30,6 @@ jest.mock('../../../utils/dateTimeUtils', () => ({
   }
 }));
 
-jest.mock('./StorageFilePage.util', () => ({
-  ...jest.requireActual('./StorageFilePage.util'),
-  downloadFile: jest.fn()
-}));
-
 jest.mock('../../../utils/huePubSub', () => ({
   publish: jest.fn()
 }));
