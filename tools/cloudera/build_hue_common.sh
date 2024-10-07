@@ -41,6 +41,15 @@ function check_python310_path() {
   export pip310_bin="$PYTHON310_PATH/bin/pip3.10"
 }
 
+function check_python311_path() {
+  export python311_bin="$PYTHON311_PATH/bin/python3.11"
+  if [ ! -e "$python311_bin" ]; then
+    echo "Python311 bin does not exists at " $python311_bin
+    exit 1
+  fi
+  export pip311_bin="$PYTHON311_PATH/bin/pip3.11"
+}
+
 function check_sqlite3() {
   export sqlit3_bin="$SQLITE3_PATH"
   if [ ! -e "$sqlit3_bin" ]; then
@@ -222,12 +231,12 @@ function sles15_install() {
     # NODEJS 18 install
     sudo -- sh -c 'zypper install -y nodejs18 npm20'
     # Pip modules install
-    sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip310_bin=${pip310_bin} -- sh -c 'ln -fs ${pip310_bin} $(dirname ${pip310_bin})/pip'
+    sudo pip311_bin=${pip311_bin} -- sh -c '${pip311_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip311_bin=${pip311_bin} -- sh -c 'ln -fs ${pip311_bin} $(dirname ${pip311_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
-        tar zxvf sqlite-autoconf-3350500.tar.gz && \
-        cd sqlite-autoconf-3350500 && \
+    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3460000.tar.gz https://www.sqlite.org/2024/sqlite-autoconf-3460000.tar.gz && \
+        tar zxvf sqlite-autoconf-3460000.tar.gz && \
+        cd sqlite-autoconf-3460000 && \
         ./configure --prefix=/usr/local/ && make && make install'
     export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
   fi
