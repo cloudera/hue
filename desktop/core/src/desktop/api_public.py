@@ -216,9 +216,9 @@ def storage_get_filesystems(request):
 
 
 @api_view(["GET"])
-def storage_view(request):
+def storage_view(request, path):
   django_request = get_django_request(request)
-  return filebrowser_views.view(django_request)
+  return filebrowser_views.view(django_request, path)
 
 
 @api_view(["GET"])

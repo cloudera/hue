@@ -292,14 +292,16 @@ def listdir_paged(request):
   # shown_stats.insert(0, current_stat)
 
   # Include parent dir always as second option, unless at filesystem root or when RAZ is enabled.
-  if not (request.fs.isroot(path) or RAZ.IS_ENABLED.get()):
-    parent_path = request.fs.parent_path(path)
-    parent_stat = request.fs.stats(parent_path)
-    # The 'path' field would be absolute, but we want its basename to be
-    # actually '..' for display purposes. Encode it since _massage_stats expects byte strings.
-    parent_stat['path'] = parent_path
-    parent_stat['name'] = ".."
-    shown_stats.insert(0, parent_stat)
+  # TODO: Do stats call from UI side if required
+
+  # if not (request.fs.isroot(path) or RAZ.IS_ENABLED.get()):
+  #   parent_path = request.fs.parent_path(path)
+  #   parent_stat = request.fs.stats(parent_path)
+  #   # The 'path' field would be absolute, but we want its basename to be
+  #   # actually '..' for display purposes. Encode it since _massage_stats expects byte strings.
+  #   parent_stat['path'] = parent_path
+  #   parent_stat['name'] = ".."
+  #   shown_stats.insert(0, parent_stat)
 
   if page:
     # TODO: Check if we need to clean response of _massage_stats
