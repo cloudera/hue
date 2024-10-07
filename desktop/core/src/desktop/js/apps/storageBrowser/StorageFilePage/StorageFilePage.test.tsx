@@ -153,37 +153,42 @@ describe('StorageFilePage', () => {
   });
 
   it('downloads file when download button is clicked', async () => {
+    const user = userEvent.setup();
     render(<StorageFilePage fileData={mockFileData} />);
 
-    const expectedDownloadPath = `${DOWNLOAD_API_URL}${mockFileData.path}`;
-    const mockDownloadLink = document.createElement('a');
-
-    const createElementSpy = jest.spyOn(document, 'createElement').mockImplementation(tagName => {
-      if (tagName === 'a') {
-        return mockDownloadLink;
-      }
-      return Reflect.get(Document.prototype, 'createElement').call(document, tagName);
-    });
-
-    const appendChildMock = jest.spyOn(document.body, 'appendChild');
-    const removeChildMock = jest.spyOn(document.body, 'removeChild');
-    const clickMock = jest.spyOn(mockDownloadLink, 'click').mockImplementation(() => {});
-
-    const downloadButton = screen.getByRole('button', { name: 'Download' });
-
-    await userEvent.click(downloadButton);
-
-    const actualUrl = new URL(mockDownloadLink.href);
+    await user.click(screen.getByRole('button', { name: 'Download' }));
 
     expect(huePubSub.publish).toHaveBeenCalledWith('hue.global.info', {
       message: 'Downloading your file, Please wait...'
     });
-    expect(appendChildMock).toHaveBeenCalledWith(mockDownloadLink);
-    expect(mockDownloadLink.href).toContain(expectedDownloadPath);
-    expect(actualUrl.pathname).toBe(expectedDownloadPath);
-    expect(clickMock).toHaveBeenCalled(); // Make sure you have mocked the click if needed
-    expect(removeChildMock).toHaveBeenCalledWith(mockDownloadLink);
 
-    createElementSpy.mockRestore();
+    const downloadLink = screen.getByRole('link', { name: 'Download' });
+    expect(downloadLink).toHaveAttribute('href', `${DOWNLOAD_API_URL}${mockFileData.path}`);
+  });
+
+  it('downloads file when download button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<StorageFilePage fileData={mockFileData} />);
+
+    await user.click(screen.getByRole('button', { name: 'Download' }));
+
+    expect(huePubSub.publish).toHaveBeenCalledWith('hue.global.info', {
+      message: 'Downloading your file, Please wait...'
+    });
+
+    const downloadLink = screen.getByRole('link', { name: 'Download' });
+    expect(downloadLink).toHaveAttribute('href', `${DOWNLOAD_API_URL}${mockFileData.path}`);
+  });
+
+  it('does not render the download button when show_download_button is false', () => {
+    const mockFileDataWithoutDownload = {
+      ...mockFileData,
+      show_download_button: false
+    };
+
+    render(<StorageFilePage fileData={mockFileDataWithoutDownload} />);
+
+    expect(screen.queryByRole('button', { name: 'Download' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Download' })).toBeNull();
   });
 });

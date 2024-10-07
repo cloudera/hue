@@ -35,13 +35,6 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
 
   const handleDownload = () => {
     huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
-
-    const url = `${DOWNLOAD_API_URL}${fileData.path}`;
-    const link = document.createElement('a');
-    link.href = url;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   const handleSave = () => {
@@ -99,14 +92,15 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
             >
               {t('Cancel')}
             </Button>
-            <PrimaryButton
-              data-testid="preview--download--button"
-              data-event=""
-              onClick={handleDownload}
-              hidden={!fileData.show_download_button}
-            >
-              {t('Download')}
-            </PrimaryButton>
+            <a href={`${DOWNLOAD_API_URL}${fileData.path}`} hidden={!fileData.show_download_button}>
+              <PrimaryButton
+                data-testid="preview--download--button"
+                data-event=""
+                onClick={handleDownload}
+              >
+                {t('Download')}
+              </PrimaryButton>
+            </a>
           </div>
         </div>
 
