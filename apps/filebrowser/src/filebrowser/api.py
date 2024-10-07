@@ -395,8 +395,8 @@ def display(request):
   mode = request.GET.get("mode")
   compression = request.GET.get("compression")
 
-  if mode and mode not in ["binary", "text"]:
-    return HttpResponse("Mode must be one of 'binary' or 'text'.", status=400)
+  if mode and mode != 'text':
+    return HttpResponse("Mode value must be 'text'.", status=400)
   if offset < 0:
     return HttpResponse("Offset may not be less than zero.", status=400)
   if length < 0:
@@ -405,34 +405,32 @@ def display(request):
     return HttpResponse(f'Cannot request chunks greater than {MAX_CHUNK_SIZE_BYTES} bytes.', status=400)
 
   # Do not decompress in binary mode.
-  if mode == 'binary':
-    compression = 'none'
+  # if mode == 'binary':
+  #   compression = 'none'
 
   # Read out based on meta.
   compression, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
 
   # Get contents as string for text mode, or at least try
   file_contents = None
-  if mode is None or mode == 'text':
-    if isinstance(contents, str):
-      file_contents = contents
-      is_binary = False
+  if isinstance(contents, str):
+    file_contents = contents
+    # is_binary = False
+    mode = 'text'
+  else:
+    # TODO: Check if the content is used in OLD CODE, when is_binary was true and replacement character was found.
+    # TODO: Then finally check how is binary content sent, is old UI reading from uni_content or the below xxd_out??
+    try:
+      file_contents = contents.decode(encoding)
+      # is_binary = False
       mode = 'text'
-    else:
-      # TODO: Check if the content is used in OLD CODE, when is_binary was true and replacement character was found.
-      # TODO: Then finally check how is binary content sent, is old UI reading from uni_content or the below xxd_out??
-      try:
-        file_contents = contents.decode(encoding)
-        is_binary = False
-        mode = 'text'
-      except UnicodeDecodeError:
-        file_contents = contents
-        is_binary = True
-        mode = 'binary' if mode is None else mode
+    except UnicodeDecodeError:
+      file_contents = contents
+      # is_binary = True
 
   # Get contents as bytes
-  if mode == "binary":
-    xxd_out = list(xxd.xxd(offset, contents, BYTES_PER_LINE, BYTES_PER_SENTENCE))
+  # if mode == "binary":
+  #   xxd_out = list(xxd.xxd(offset, contents, BYTES_PER_LINE, BYTES_PER_SENTENCE))
 
   # TODO: Check what all UI needs and clean the field below, currently commenting out few duplicates which needs to be verified.
 
@@ -459,16 +457,18 @@ def display(request):
   data["editable"] = stats.size < MAX_FILEEDITOR_SIZE  # TODO: To improve this limit and sent it as /get_config? Needs discussion.
 
   # TODO: Understand the comment. Check why are we logging file content? Also check how is masked_binary_data used? Finally improve code.
-  if mode == "binary":
-    # This might be the wrong thing for ?format=json; doing the
-    # xxd'ing in javascript might be more compact, or sending a less
-    # intermediate representation...
-    LOG.debug("xxd: " + str(xxd_out))
-    data['view']['xxd'] = xxd_out
-    data['view']['masked_binary_data'] = False
-  else:
-    data['view']['contents'] = file_contents
-    data['view']['masked_binary_data'] = is_binary
+  data['view']['contents'] = file_contents
+
+  # if mode == "binary":
+  #   # This might be the wrong thing for ?format=json; doing the
+  #   # xxd'ing in javascript might be more compact, or sending a less
+  #   # intermediate representation...
+  #   LOG.debug("xxd: " + str(xxd_out))
+  #   data['view']['xxd'] = xxd_out
+  #   data['view']['masked_binary_data'] = False
+  # else:
+  #   data['view']['contents'] = file_contents
+  #   data['view']['masked_binary_data'] = is_binary
 
   # data['breadcrumbs'] = parse_breadcrumbs(path)
   # data['show_download_button'] = SHOW_DOWNLOAD_BUTTON.get()  # TODO: Add as /get_config?
