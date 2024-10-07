@@ -41,7 +41,7 @@ from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook, _get_editor_type, get_api, _get_dialect_example
-
+import secrets
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
@@ -85,6 +85,7 @@ def notebook_embeddable(request):
 @check_editor_access_permission()
 @check_document_access_permission
 def editor(request, is_mobile=False, is_embeddable=False):
+
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
   gist_id = request.GET.get('gist')

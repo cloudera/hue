@@ -1001,7 +1001,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         nonce = getattr(request, 'csp_nonce', None)
         csp_split = header['csp'].split(';')
         new_csp = []
-        nonce_directive = f"'nonce-{nonce}'" if nonce else ''
+        nonce_directive = f"'nonce-{nonce}' 'self'" if nonce else "'self'"
 
         for p in csp_split:
             directive = p.lstrip().split(' ')[0]
@@ -1011,6 +1011,8 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
                 if directive in ('script-src'):
                     new_directive_parts = [part for part in p.split(' ') if part and part != "'unsafe-inline'"]
                     new_directive_parts.append(nonce_directive)
+                    # new_directive_parts.append("self")  # Add strict-dynamic along with the nonce
+
                     new_csp.append(' '.join(new_directive_parts))
                 else:
                     new_csp.append(p)
