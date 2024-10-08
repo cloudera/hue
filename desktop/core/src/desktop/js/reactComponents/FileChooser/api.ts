@@ -19,6 +19,7 @@ import { ContentSummary } from './types';
 
 export const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 export const VIEWFILES_API_URl = '/api/v1/storage/view=';
+export const DOWNLOAD_API_URL = '/filebrowser/download=';
 const MAKE_DIRECTORY_API_URL = '/api/v1/storage/mkdir';
 const TOUCH_API_URL = '/api/v1/storage/touch';
 const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary=';
