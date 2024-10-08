@@ -86,6 +86,7 @@ export interface PathAndFileData {
   stats: Stats;
   rwx: string;
   view: FileView;
+  show_download_button: boolean;
 }
 
 export interface ContentSummary {
