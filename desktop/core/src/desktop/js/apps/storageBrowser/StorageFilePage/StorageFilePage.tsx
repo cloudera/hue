@@ -20,6 +20,8 @@ import './StorageFilePage.scss';
 import { i18nReact } from '../../../utils/i18nReact';
 import Button, { PrimaryButton } from 'cuix/dist/components/Button';
 import { getFileMetaData } from './StorageFilePage.util';
+import { DOWNLOAD_API_URL } from '../../../reactComponents/FileChooser/api';
+import huePubSub from '../../../utils/huePubSub';
 
 const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Element => {
   const { t } = i18nReact.useTranslation();
@@ -29,6 +31,10 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
 
   const handleEdit = () => {
     setIsEditing(true);
+  };
+
+  const handleDownload = () => {
+    huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
   };
 
   const handleSave = () => {
@@ -86,11 +92,19 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
             >
               {t('Cancel')}
             </Button>
+            <a href={`${DOWNLOAD_API_URL}${fileData.path}`} hidden={!fileData.show_download_button}>
+              <PrimaryButton
+                data-testid="preview--download--button"
+                data-event=""
+                onClick={handleDownload}
+              >
+                {t('Download')}
+              </PrimaryButton>
+            </a>
           </div>
         </div>
 
         <textarea
-          data-testid="file-content"
           value={fileContent}
           onChange={e => setFileContent(e.target.value)}
           readOnly={!isEditing}
