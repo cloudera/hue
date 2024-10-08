@@ -864,6 +864,7 @@ def bulk_op(request, op):
   path_list = request.POST.getlist('dest_path_list') if op in ('copy', 'move') else request.POST.getlist('path_list')
   bulk_dict = request.POST.copy()
 
+  error_dict = {}
   for p in path_list:
     tmp_dict = bulk_dict
     if op in ('copy', 'move'):  # TODO: Check if chmod is also special case for permissions to calculate mode
@@ -874,7 +875,6 @@ def bulk_op(request, op):
     request.POST = tmp_dict
     response = op(request)
 
-    error_dict = {}
     if response.status_code != 200:
       error_dict[p] = {'error': response.content}
       if op == 'copy' and p.startswith('ofs://'):
