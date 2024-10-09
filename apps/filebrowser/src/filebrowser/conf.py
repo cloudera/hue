@@ -73,7 +73,7 @@ SHOW_UPLOAD_BUTTON = Config(
 ENABLE_EXTRACT_UPLOADED_ARCHIVE = Config(
   key="enable_extract_uploaded_archive",
   help=_("Flag to enable the extraction of a uploaded archive in HDFS."),
-  type=bool,
+  type=coerce_bool,
   dynamic_default=is_oozie_enabled
 )
 
