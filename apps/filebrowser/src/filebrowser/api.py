@@ -102,7 +102,7 @@ def get_filesystems(request):
   return JsonResponse(response)
 
 
-# TODO: Improve error response further with better context -- Error UX Phase 1 item
+# TODO: Improve error response further with better context -- Error UX Phase 2
 def api_error_handler(view_fn):
   """
   Decorator to handle exceptions and return a JSON response with an error message.
@@ -173,44 +173,42 @@ def download(request):
   if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), stats['mtime'], stats['size']):
     return HttpResponseNotModified()
 
+  fh = request.fs.open(path)
+
+  # First, verify read permissions on the file.
   try:
-    with request.fs.open(path) as fh:
-      # First, verify read permissions on the file.
-      try:
-        request.fs.read(path, offset=0, length=1)
-      except WebHdfsException as e:
-        if e.code == 403:
-          return HttpResponse(f'User {request.user.username} is not authorized to download file at path: {path}', status=403)
-        elif request.fs._get_scheme(path).lower() == 'abfs' and e.code == 416:
-          # Safe to skip ABFS exception of code 416 for zero length objects, file will get downloaded anyway.
-          LOG.debug('Skipping exception from ABFS:' + str(e))
-        else:
-          return HttpResponse(f'Failed to download file at path {path}: {str(e)}', status=500)  # TODO: status code?
+    request.fs.read(path, offset=0, length=1)
+  except WebHdfsException as e:
+    if e.code == 403:
+      return HttpResponse(f'User {request.user.username} is not authorized to download file at path: {path}', status=403)
+    elif request.fs._get_scheme(path).lower() == 'abfs' and e.code == 416:
+      # Safe to skip ABFS exception of code 416 for zero length objects, file will get downloaded anyway.
+      LOG.debug('Skipping exception from ABFS:' + str(e))
+    else:
+      return HttpResponse(f'Failed to download file at path {path}: {str(e)}', status=500)  # TODO: status code?
 
-      if REDIRECT_DOWNLOAD.get() and hasattr(fh, 'read_url'):
-        response = HttpResponseRedirect(fh.read_url())
-        setattr(response, 'redirect_override', True)
-      else:
-        response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
+  if REDIRECT_DOWNLOAD.get() and hasattr(fh, 'read_url'):
+    response = HttpResponseRedirect(fh.read_url())
+    setattr(response, 'redirect_override', True)
+  else:
+    response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
 
-        response["Last-Modified"] = http_date(stats['mtime'])
-        response["Content-Length"] = stats['size']
-        response['Content-Disposition'] = (
-          request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') if _can_inline_display(path) else 'attachment'
-        )
+    response["Last-Modified"] = http_date(stats['mtime'])
+    response["Content-Length"] = stats['size']
+    response['Content-Disposition'] = (
+      request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') if _can_inline_display(path) else 'attachment'
+    )
 
-        if FILE_DOWNLOAD_CACHE_CONTROL.get():
-          response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
+    if FILE_DOWNLOAD_CACHE_CONTROL.get():
+      response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
 
-      request.audit = {
-        'operation': 'DOWNLOAD',
-        'operationText': 'User %s downloaded file at path "%s"' % (request.user.username, path),
-        'allowed': True,
-      }
+  request.audit = {
+    'operation': 'DOWNLOAD',
+    'operationText': 'User %s downloaded file at path "%s"' % (request.user.username, path),
+    'allowed': True,
+  }
 
-      return response
-  except Exception as e:
-    return HttpResponse(f'Failed to download file at path {path}: {str(e)}', status=500)  # TODO: status code?
+  return response
 
 
 @api_error_handler
