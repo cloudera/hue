@@ -409,11 +409,35 @@ class OnePageViewModel {
               self.extraEmbeddableURLParams('');
 
               self.processHeaders(response).done($rawHtml => {
-                const nonce = window.nonce || ''; 
+                // const nonce = window.nonce || ''; 
                 const scripts = $rawHtml.find('script');
-                scripts.each(function() {
-                  console.log(scripts)
-                  this.setAttribute('nonce', nonce);
+                scripts.each(function(k,v) {
+                  const scriptType = this.getAttribute('type');
+                  if (scriptType !== 'text/html') {
+                    console.log("script", k, v);
+                    // Create a new script element
+                    const script = document.createElement('script');
+                    script.type = 'text/javascript'; // Set the type or copy it from the original script
+                    // If the original script has a 'src' attribute, set it on the new script
+                    if (this.src) {
+                      script.src = this.src;
+                    } else {
+                      // Otherwise, set the text content
+                      script.textContent = this.textContent;
+                    }
+              
+                    // Only set nonce if it's present
+                    // Append the new script to the document head
+                    document.head.appendChild(script);
+                    
+                    // If you need to remove original script from its current location, do it here
+                    $(this).remove();
+              
+                  } else {
+                    console.log("text/html script", k, v);
+                    // Handle text/html scripts if needed
+                  }
+                  
                 });
                 if (window.SKIP_CACHE.indexOf(app) === -1) {
                   self.embeddable_cache[app] = $rawHtml;
