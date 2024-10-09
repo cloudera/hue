@@ -1030,7 +1030,7 @@ def compute_md5(fp, buf_size=8192, size=None):
 
 
 def compute_hash(fp, buf_size=8192, size=None, hash_algorithm=md5):
-    hash_obj = hash_algorithm()
+    hash_obj = hash_algorithm(usedforsecurity=False) if hash_algorithm == md5 else hash_algorithm()
     spos = fp.tell()
     if size and size < buf_size:
         s = fp.read(size)
