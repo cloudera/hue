@@ -278,28 +278,6 @@ def listdir_paged(request):
     LOG.warn(message)
     return HttpResponse(message, status=404)  # TODO: status code?
 
-  # TODO: Current same dir stats below?
-
-  # # Include same dir always as first option to see stats of the current folder.
-  # current_stat = request.fs.stats(path)
-  # # The 'path' field would be absolute, but we want its basename to be
-  # # actually '.' for display purposes. Encode it since _massage_stats expects byte strings.
-  # current_stat.path = path
-  # current_stat.name = "."
-  # shown_stats.insert(0, current_stat)
-
-  # Include parent dir always as second option, unless at filesystem root or when RAZ is enabled.
-  # TODO: Do stats call from UI side if required
-
-  # if not (request.fs.isroot(path) or RAZ.IS_ENABLED.get()):
-  #   parent_path = request.fs.parent_path(path)
-  #   parent_stat = request.fs.stats(parent_path)
-  #   # The 'path' field would be absolute, but we want its basename to be
-  #   # actually '..' for display purposes. Encode it since _massage_stats expects byte strings.
-  #   parent_stat['path'] = parent_path
-  #   parent_stat['name'] = ".."
-  #   shown_stats.insert(0, parent_stat)
-
   if page:
     # TODO: Check if we need to clean response of _massage_stats
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
@@ -365,10 +343,6 @@ def display(request):
   stats = request.fs.stats(path)
   encoding = request.GET.get('encoding') or i18n.get_site_encoding()
 
-  # I'm mixing URL-based parameters and traditional
-  # HTTP GET parameters, since URL-based parameters
-  # can't naturally be optional.
-
   # Need to deal with possibility that length is not present
   # because the offset came in via the toolbar manual byte entry.
   end = request.GET.get("end")
@@ -402,10 +376,6 @@ def display(request):
   if length > MAX_CHUNK_SIZE_BYTES:
     return HttpResponse(f'Cannot request chunks greater than {MAX_CHUNK_SIZE_BYTES} bytes.', status=400)
 
-  # Do not decompress in binary mode.
-  # if mode == 'binary':
-  #   compression = 'none'
-
   # Read out based on meta.
   compression, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
 
@@ -413,22 +383,13 @@ def display(request):
   file_contents = None
   if isinstance(contents, str):
     file_contents = contents
-    # is_binary = False
     mode = 'text'
   else:
-    # TODO: Check if the content is used in OLD CODE, when is_binary was true and replacement character was found.
-    # TODO: Then finally check how is binary content sent, is old UI reading from uni_content or the below xxd_out??
     try:
       file_contents = contents.decode(encoding)
-      # is_binary = False
       mode = 'text'
     except UnicodeDecodeError:
       file_contents = contents
-      # is_binary = True
-
-  # Get contents as bytes
-  # if mode == "binary":
-  #   xxd_out = list(xxd.xxd(offset, contents, BYTES_PER_LINE, BYTES_PER_SENTENCE))
 
   # TODO: Check what all UI needs and clean the field below, currently commenting out few duplicates which needs to be verified.
 
@@ -453,20 +414,7 @@ def display(request):
   }
   # data["filename"] = os.path.basename(path)
   data["editable"] = stats.size < MAX_FILEEDITOR_SIZE  # TODO: To improve this limit and sent it as /get_config? Needs discussion.
-
-  # TODO: Understand the comment. Check why are we logging file content? Also check how is masked_binary_data used? Finally improve code.
   data['view']['contents'] = file_contents
-
-  # if mode == "binary":
-  #   # This might be the wrong thing for ?format=json; doing the
-  #   # xxd'ing in javascript might be more compact, or sending a less
-  #   # intermediate representation...
-  #   LOG.debug("xxd: " + str(xxd_out))
-  #   data['view']['xxd'] = xxd_out
-  #   data['view']['masked_binary_data'] = False
-  # else:
-  #   data['view']['contents'] = file_contents
-  #   data['view']['masked_binary_data'] = is_binary
 
   # data['breadcrumbs'] = parse_breadcrumbs(path)
   # data['show_download_button'] = SHOW_DOWNLOAD_BUTTON.get()  # TODO: Add as /get_config?
