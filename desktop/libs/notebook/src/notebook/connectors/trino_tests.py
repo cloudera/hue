@@ -354,3 +354,19 @@ class TestTrinoApi(TestCase):
     with patch('notebook.connectors.trino.coerce_password_from_script', return_value='custom_password_script'):
       trino_api = TrinoApi(self.user, interpreter=interpreter)
       assert trino_api.auth_password == 'custom_password_script'
+
+  def test_get_log(self):
+    notebook = {}
+    snippet = {
+      'result': {
+        'handle': {
+          'guid': '1234-abcd-5678-efgh'
+        }
+      }
+    }
+
+    # Expected result
+    expected_log = "query_id: 1234-abcd-5678-efgh"
+    result = self.trino_api.get_log(notebook, snippet)
+
+    assert result == expected_log
