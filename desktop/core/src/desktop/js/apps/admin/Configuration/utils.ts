@@ -14,42 +14,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../components/styles/variables';
-
-.metrics-component.antd.cuix {
-  background-color: $fluidx-gray-100;
-  padding: 0 24px 24px 24px;
-
-  .metrics-heading {
-    font-size: $font-size-base;
-    font-weight: 500;
-    color: $fluidx-gray-900;
-  }
-
-  // .metrics-filter {
-  //   margin: $font-size-sm;
-  //   width: 30%;
-
-  //   input {
-  //     box-shadow: none;
-  //     -webkit-box-shadow: none;
-  //   }
-  // }
-
-  .metrics-table {
-    th {
-      width: 30%;
-      background-color: $fluidx-gray-040;
-    }
-
-    margin-bottom: $font-size-base;
-  }
-
-  // .metrics-select {
-  //   border: 1px solid $fluidx-gray-600;
-  //   border-radius: $border-radius-base;
-  //   background-color: $fluidx-white;
-  //   min-width: 200px;
-  //   height: 32px;
-  // }
-}
+export const GET_CONFIG_API = '/desktop/api2/get_hue_config';
+export const DEFAULT_SELECTED_APP = 'desktop';

@@ -14,42 +14,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../components/styles/variables';
+@import '../../components/styles/_variables';
 
-.metrics-component.antd.cuix {
-  background-color: $fluidx-gray-100;
-  padding: 0 24px 24px 24px;
+.admin-header-actions.antd.cuix{
+  display: flex;
+  align-items: center;
 
-  .metrics-heading {
-    font-size: $font-size-base;
-    font-weight: 500;
-    color: $fluidx-gray-900;
+  .select-dropDown{
+    border: 1px solid $fluidx-gray-600;
+    border-radius: $border-radius-base;
+    background-color: $fluidx-white;
+    width: 25%;
+    height: $cdl-input-height-default;
   }
 
-  // .metrics-filter {
-  //   margin: $font-size-sm;
-  //   width: 30%;
+   .input-filter{
+    margin: $font-size-sm;
+    width: 25%;
 
-  //   input {
-  //     box-shadow: none;
-  //     -webkit-box-shadow: none;
-  //   }
-  // }
-
-  .metrics-table {
-    th {
-      width: 30%;
-      background-color: $fluidx-gray-040;
+    input {
+      box-shadow: none;
+      -webkit-box-shadow: none;
     }
-
-    margin-bottom: $font-size-base;
   }
 
-  // .metrics-select {
-  //   border: 1px solid $fluidx-gray-600;
-  //   border-radius: $border-radius-base;
-  //   background-color: $fluidx-white;
-  //   min-width: 200px;
-  //   height: 32px;
-  // }
+  .config-file-address-value {
+    color: $cdl-blue-600;
+    display: block;
+  }
 }

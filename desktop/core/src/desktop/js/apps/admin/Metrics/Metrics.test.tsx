@@ -17,7 +17,7 @@
 import React from 'react';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Metrics from './Metrics';
+import Metrics from './MetricsTab';
 
 // Mock the API call to return sample metrics data
 jest.mock('api/utils', () => ({

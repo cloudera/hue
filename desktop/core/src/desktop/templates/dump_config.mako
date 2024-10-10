@@ -28,6 +28,17 @@ LOG = logging.getLogger()
 
 ${ layout.menubar(section='dump_config') }
 
+
+<script type="text/javascript">
+  (function () {
+    window.createReactComponents('#Configuration');
+  })();
+</script>
+
+<div id="Configuration">
+<Configuration data-reactcomponent='Configuration'></Configuration>
+</div>
+
 <style type="text/css">
   .card-heading .pull-right {
     font-size: 12px;
@@ -38,6 +49,8 @@ ${ layout.menubar(section='dump_config') }
 <div id="aboutConfiguration">
   <!-- ko component: { name: 'hue-config-tree' } --><!-- /ko -->
 </div>
+
+
 
 <script type="text/javascript">
   $(document).ready(function () {
