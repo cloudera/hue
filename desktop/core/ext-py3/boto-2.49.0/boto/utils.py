@@ -61,7 +61,7 @@ from boto.compat import six, StringIO, urllib, encodebytes
 
 from contextlib import contextmanager
 
-from hashlib import md5, sha512
+from hashlib import md5, sha512, new as hashlib_new
 _hashfn = sha512
 
 from boto.compat import json
@@ -1030,7 +1030,8 @@ def compute_md5(fp, buf_size=8192, size=None):
 
 
 def compute_hash(fp, buf_size=8192, size=None, hash_algorithm=md5):
-    hash_obj = hash_algorithm(usedforsecurity=False) if hash_algorithm == md5 else hash_algorithm()
+    # Add usedforsecurity as False for MD5 hash algorithm to support FIPS
+    hash_obj = hashlib_new('md5', usedforsecurity=False) if hash_algorithm == md5 else hash_algorithm()
     spos = fp.tell()
     if size and size < buf_size:
         s = fp.read(size)
