@@ -343,6 +343,11 @@ class TrinoApi(Api):
       for col in columns
     ]
 
+  def get_log(self, notebook, snippet, startFrom=None, size=None):
+    guid = snippet['result']['handle']['guid'] if snippet.get('result') and snippet['result'].get('handle') and \
+      snippet['result']['handle'].get('guid') else None
+    return f"query_id: {guid}"
+
   @query_error_handler
   def explain(self, notebook, snippet):
     statement = snippet['statement'].rstrip(';')
