@@ -1030,7 +1030,7 @@ def compute_md5(fp, buf_size=8192, size=None):
 
 
 def compute_hash(fp, buf_size=8192, size=None, hash_algorithm=md5):
-    # Add usedforsecurity as False for MD5 hash algorithm for FIPS support
+    # Add usedforsecurity as False for MD5 hash algorithm to support FIPS
     hash_obj = hashlib_new('md5', usedforsecurity=False) if hash_algorithm == md5 else hash_algorithm()
     spos = fp.tell()
     if size and size < buf_size:
