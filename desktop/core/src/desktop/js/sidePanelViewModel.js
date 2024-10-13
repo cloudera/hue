@@ -35,6 +35,20 @@ class SidePanelViewModel {
     self.leftAssistVisible = ko.observable(
       getFromLocalStorage('assist.left_assist_panel_visible', true)
     );
+
+    // Define getLeftResizerOptions as a function that uses leftAssistVisible
+    self.getLeftResizerOptions = function() {
+        return {
+            containerSelector: '.content-wrapper',
+            sidePanelSelector: '.left-panel',
+            sidePanelVisible: self.leftAssistVisible, // Now leftAssistVisible is defined
+            orientation: 'left',
+            onPosition: function() {
+                huePubSub.publish('split.draggable.position');
+            },
+            // other settings...
+        };
+    };
     self.leftAssistVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
         setInLocalStorage('assist.left_assist_panel_visible', val);
@@ -102,6 +116,10 @@ class SidePanelViewModel {
     });
 
     self.sessionsAvailable = ko.observable(false);
+  
+    self.hidePanel = function() {
+      huePubSub.publish('context.panel.visible', false);
+    };
 
     self.activeAppViewModel.subscribe(viewModel => {
       self.sessionsAvailable(typeof viewModel.selectedNotebook !== 'undefined');

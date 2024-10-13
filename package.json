@@ -55,6 +55,7 @@
     "jquery-ui": "1.13.2",
     "jquery.cookie": "1.4.1",
     "knockout": "3.5.1",
+    "knockout-secure-binding": "^0.5.5",
     "knockout-sortable": "1.2.0",
     "knockout-switch-case": "2.1.0",
     "knockout.mapping": "2.4.3",

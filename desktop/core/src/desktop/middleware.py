@@ -1009,9 +1009,10 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
                 # Remove unsafe-inline from scripts
                 # TODO remove unsafe-inline from styles
                 if directive in ('script-src'):
-                    new_directive_parts = [part for part in p.split(' ') if part and part != "'unsafe-inline'"]
+                    # Original parts without 'unsafe-inline' or 'unsafe-eval'
+                    new_directive_parts = [part for part in p.split(' ') if part and part not in ("'unsafe-inline'")]
                     new_directive_parts.append(nonce_directive)
-                    # new_directive_parts.append("self")  # Add strict-dynamic along with the nonce
+                    # new_directive_parts.append("'self'")  # Uncomment and adjust as needed, possibly with 'strict-dynamic'
 
                     new_csp.append(' '.join(new_directive_parts))
                 else:

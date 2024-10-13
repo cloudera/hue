@@ -15,6 +15,173 @@
 // limitations under the License.
 
 import * as ko from 'knockout';
+import ksb from 'knockout-secure-binding';
+
+var options = {
+  attribute: "data-bind",        // default is "data-sbind", using "data-bind" to match regular Knockout bindings
+  globals: window,               // makes global window object available to bindings
+  bindings: ko.bindingHandlers,  // the Knockout binding handlers to use
+  noVirtualElements: false       // allows the use of Knockout virtual elements
+};
+
+var is_ksb_enabled = true
+console.log("is_ksb_enabled     :"+is_ksb_enabled )
+if(is_ksb_enabled) {
+  ko.bindingProvider.instance = new ksb(options); // Use the imported 'ksb' as the constructor
+}
+
+ko.bindingHandlers.clickWithParams = {
+  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    var handlerFunction = valueAccessor();
+    var newHandler = function() {
+      var params = Array.prototype.slice.call(arguments);
+      handlerFunction.apply(viewModel, params);
+    };
+    ko.bindingHandlers.click.init(element, function() { return newHandler; }, allBindings, viewModel, bindingContext);
+  }
+};
+
+
+// Define a custom binding for jQuery UI's autocomplete
+ko.bindingHandlers.customAutocomplete = {
+init: function (element, valueAccessor, allBindingsAccessor) {
+      var options = ko.unwrap(valueAccessor());
+
+      // Check if the appendTo option is provided as an element ID
+      var appendToElement;
+      if (options.appendTo) {
+          appendToElement = document.getElementById(options.appendTo);
+      }
+
+      // Initialize the jQuery UI autocomplete widget
+      $(element).autocomplete({
+          source: options.source,
+          select: options.select,
+          change: options.change,
+          appendTo: appendToElement || undefined,
+          // Other options as needed
+      });
+
+      // Handle cleanup
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+          $(element).autocomplete("destroy");
+      });
+
+      // Handle updating the observable with the selected value
+      var valueObservable = allBindingsAccessor().textInput;
+      if (ko.isObservable(valueObservable)) {
+          $(element).on("autocompleteselect", function (event, ui) {
+              valueObservable(ui.item.value);
+          });
+      }
+  },
+  update: function (element, valueAccessor) {
+      var options = ko.unwrap(valueAccessor());
+
+      // Update the jQuery UI autocomplete source if it's an observable
+      if (ko.isObservable(options.source)) {
+          $(element).autocomplete("option", "source", options.source());
+      }
+  }
+};
+
+// Custom binding handler for click with parameters
+// ko.bindingHandlers.clickWithParams = {
+//   init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+//     var handlerFunction = valueAccessor();
+//     if (typeof handlerFunction !== 'function') {
+//       throw new Error('clickWithParams binding value must be a function');
+//     }
+
+//     var newClickHandler = function(model, event) {
+//       handlerFunction.apply(viewModel, [model, event]);
+//     };
+
+//     ko.bindingHandlers.click.init(element, function() { return newClickHandler; }, allBindings, viewModel, bindingContext);
+//   }
+// };
+
+// Custom binding handler for 'dropzone'
+ko.bindingHandlers.dropzone = {
+  init: function(element, valueAccessor) {
+      var options = valueAccessor();
+      
+      // Initialize Dropzone options object
+      var dropzoneOptions = {
+          url: options.url,
+          clickable: options.clickable,
+          paramName: options.paramName,
+          // Additional Dropzone options...
+
+          // The `init` option allows binding custom event handlers on Dropzone initialization
+          init: function() {
+              this.on('complete', function(file) {
+                  // Call `huePubSub.publish` with the path
+                  huePubSub.publish('assist.dropzone.complete', file.fullPath || file.name);
+              });
+          }
+      };
+      
+      // Apply the disabled state if needed
+      if (options.disabled) {
+          dropzoneOptions.maxFiles = 0;
+      }
+
+      // Ensure proper cleanup if element is removed (Dropzone's destroy method does this automatically)
+      
+      // Create an instance of Dropzone on the element with the given options
+      var myDropzone = new Dropzone(element, dropzoneOptions);
+
+      // Store the Dropzone instance for later access (e.g., for updates or disposal)
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+          myDropzone.destroy();
+      });
+  },
+  update: function(element, valueAccessor) {
+      // Update logic, if necessary (e.g., if options are observables and you need to react to changes)
+      var options = valueAccessor();
+      var myDropzone = Dropzone.forElement(element);
+
+      // Dynamically update the disabled state based on a condition or observable
+      if (options.disabled) {
+          myDropzone.disable();
+      } else {
+          myDropzone.enable();
+      }
+  }
+};
+
+function applyConditional(element, data, applyCallback) {
+  Object.keys(data).forEach(function (key) {
+    var conditionInfo = data[key];
+    var condition = ko.unwrap(conditionInfo[0]);
+    var trueValue = ko.unwrap(conditionInfo[1]);
+    var falseValue = ko.unwrap(conditionInfo[2]);
+    
+    var valueToApply = condition ? trueValue : falseValue;
+    applyCallback(element, key, valueToApply);
+  });
+}
+
+ko.bindingHandlers.conditionalAttr = {
+  update: function(element, valueAccessor) {
+    var conditionalAttributes = valueAccessor();
+    applyConditional(element, conditionalAttributes, function(elem, attrName, value) {
+      elem.setAttribute(attrName, value);
+    });
+  }
+};
+
+ko.bindingHandlers.conditionalStyle = {
+  update: function (element, valueAccessor) {
+    var styleConditions = valueAccessor();
+    applyConditional(element, styleConditions, function(elem, styleName, value) {
+      elem.style[styleName] = value;
+    });
+  }
+};
+
+
 
 const proxiedKoRegister = ko.components.register;
 const registeredComponents = [];

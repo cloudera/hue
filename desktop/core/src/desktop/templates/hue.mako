@@ -198,13 +198,8 @@ ${ hueIcons.symbols() }
         <!-- /ko -->
       </div>
 
-      <div id="leftResizer" class="resizer" data-bind="visible: leftAssistVisible(), splitFlexDraggable : {
-        containerSelector: '.content-wrapper',
-        sidePanelSelector: '.left-panel',
-        sidePanelVisible: leftAssistVisible,
-        orientation: 'left',
-        onPosition: function() { huePubSub.publish('split.draggable.position') }
-      }"><div class="resize-bar"></div></div>
+      <div id="leftResizer" class="resizer" data-bind="visible: leftAssistVisible(), splitFlexDraggable : getLeftResizerOptions()"><div class="resize-bar"></div></div>
+      
 
       <div class="page-content">
         <!-- ko if: window.ENABLE_HUE_5 -->
@@ -289,7 +284,9 @@ ${ hueIcons.symbols() }
             <!-- /ko -->
           </div>
         </div>
-        <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0" data-bind="click: function () { huePubSub.publish('context.panel.visible', false); }"><i class="fa fa-chevron-up"></i></a>
+        <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0" 
+        data-bind="clickWithParams: function () { huePubSub.publish('context.panel.visible', false); }">
+        <i class="fa fa-chevron-up"></i></a>
       </div>
       %endif
     </div>

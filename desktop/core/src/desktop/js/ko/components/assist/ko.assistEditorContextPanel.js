@@ -128,7 +128,7 @@ const TEMPLATE =
         <div class="margin-top-20">
           <!-- ko hueSpinner: { spin: uploadingTableStats, inline: true} --><!-- /ko -->
           <!-- ko ifnot: uploadingTableStats -->
-          <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { uploadTableStats(true) }, attr: { 'title': ('${I18n(
+          <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, clickWithParams: { click: uploadTableStats, params: [true] }, attr: { 'title': ('${I18n(
             'Add table'
           )} '  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${I18n(
             'and'
@@ -250,7 +250,24 @@ class AssistEditorContextPanel {
         table => table.loading() || (!table.hasEntries() && !table.hasErrors())
       )
     );
-
+    // this.activeTables = ko.observableArray(/* Your table data here */);
+    // this.isMissingDDL = ko.observable(/* Your condition here */);
+    // this.isMissingStats = ko.observable(/* Your condition here */);
+    
+  
+    // Internationalization functions would typically be global or part of some utility object,
+    // make sure `I18n` is accessible here in your ViewModel
+    
+    // Computed observable for the dynamic title string with internationalization
+    this.dynamicTitle = ko.pureComputed(function() {
+      return I18n('Add table') + ' ' +
+        (this.isMissingDDL() ? I18n('DDL') : '') +
+        (this.isMissingDDL() && this.isMissingStats() ? ' ' + I18n('and') + ' ' : '') +
+        (this.isMissingStats() ? I18n('stats') : '');
+    }, this);
+    
+    // Observable for the localized button text
+    this.improveAnalysisText = ko.observable(I18n('Improve Analysis'));
     const createQualifiedIdentifier = (identifierChain, defaultDatabase) => {
       if (identifierChain.length === 1) {
         return defaultDatabase + '.' + identifierChain[0].name;
