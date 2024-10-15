@@ -24,10 +24,8 @@ import I18n from 'utils/i18n';
 export const NAME = 'hue-favorite-app';
 
 const TEMPLATE = `
-  <div class="inline pointer favorite-app" data-bind="click: setAsFavoriteApp.bind($data), tooltip: { placement: 'bottom', title: isFavorite() ? '${I18n(
-    'Unset from default application'
-  )}' : '${I18n('Set as default application')}' }">
-    <i class="fa inactive-action" data-bind="css: { 'fa-star-o': !isFavorite(), 'fa-star': isFavorite }"></i>
+  <div class="inline pointer favorite-app" data-sbind="click: setAsFavoriteApp, tooltip: { placement: 'bottom', title: tooltipTitle }">
+    <i class="fa inactive-action" data-sbind="css: { 'fa-star-o': !isFavorite(), 'fa-star': isFavorite }"></i>
   </div>
 `;
 
@@ -36,7 +34,16 @@ class FavoriteApp {
     this.isFavorite = ko.observable(false);
     this.app = params.app;
     this.interpreter = params.interpreter;
+    this.tooltipTitle = ko.pureComputed(() => {
+      return this.isFavorite() ? I18n('Unset from default application') : I18n('Set as default application');
+    });
 
+    self.setAsFavoriteApp = function() {
+      // Toggle the `isFavorite` observable value
+      self.isFavorite(!self.isFavorite());
+  
+      updateFromApiResponse({})
+    };
     ApiHelper.fetchFavoriteApp().then(this.updateFromApiResponse.bind(this));
   }
 
@@ -58,6 +65,9 @@ class FavoriteApp {
       }
     }
   }
+
+
+
 
   async setAsFavoriteApp(vm, e) {
     e.originalEvent.stopPropagation();

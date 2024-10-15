@@ -321,7 +321,10 @@ class AutocompleteResults {
     });
 
     this.activeCategory = ko.observable(CATEGORIES.ALL);
-
+    self.setActiveCategory = function(category) {
+      self.activeCategory(category);
+    };
+  
     const updateCategories = suggestions => {
       const newCategories = {};
       suggestions.forEach(suggestion => {

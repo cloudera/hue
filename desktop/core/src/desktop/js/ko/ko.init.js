@@ -16,15 +16,16 @@
 
 import * as ko from 'knockout';
 import ksb from 'knockout-secure-binding';
+import huePubSub from 'utils/huePubSub';
 
 var options = {
   attribute: "data-bind",        // default is "data-sbind", using "data-bind" to match regular Knockout bindings
-  globals: window,               // makes global window object available to bindings
+  globals: window,
   bindings: ko.bindingHandlers,  // the Knockout binding handlers to use
   noVirtualElements: false       // allows the use of Knockout virtual elements
 };
 
-var is_ksb_enabled = false
+var is_ksb_enabled = true
 console.log("is_ksb_enabled     :"+is_ksb_enabled )
 if(is_ksb_enabled) {
   ko.bindingProvider.instance = new ksb(options); // Use the imported 'ksb' as the constructor
@@ -79,7 +80,6 @@ ko.bindingHandlers.clickWithArgs = {
     var options = valueAccessor();
     var handler = options.handler; // The handler now stores a function reference or a string to look up on the ViewModel
     var params = options.params;
-    debugger;
     var newHandler = function() {
       
       // If the handler is a string, check if it's a function on the ViewModel
@@ -100,6 +100,52 @@ ko.bindingHandlers.clickWithArgs = {
 };
 
 
+ko.bindingHandlers.clickFunctionWithNested = {
+  init: function(element, valueAccessor, allBindings, viewModel) {
+    var path = valueAccessor().split('.');
+    var handler = viewModel;
+    
+    // Traverse the path to get to the function
+    for (var i = 0; i < path.length; i++) {
+      if (handler[path[i]] !== undefined) {
+        handler = handler[path[i]];
+      } else {
+        throw new Error("clickFunctionWithNested: Unable to resolve path: " + path.join('.'));
+      }
+    }
+
+    if (typeof handler !== 'function') {
+      throw new Error("clickFunctionWithNested: Handler at path is not a function.");
+    }
+    
+    ko.utils.registerEventHandler(element, "click", function() {
+      handler.call(viewModel);
+    });
+  }
+};
+
+ko.bindingHandlers.clickFunctionWithPath = {
+  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    var path = valueAccessor().split('.');
+    var context = bindingContext.$root; // Start at the $root
+
+    // Traverse the path to get to the target observable or function
+    while (path.length > 1) {
+      context = ko.unwrap(context[path.shift()]);
+    }
+
+    var methodName = path.shift();
+
+    ko.utils.registerEventHandler(element, "click", function() {
+      var targetFunction = context[methodName];
+      if (typeof targetFunction === 'function') {
+        targetFunction.apply(context);
+      } else {
+        throw new Error("clickFunctionWithPath: Method not found at path.");
+      }
+    });
+  }
+};
 
 // Custom binding handler for 'dropzone'
 ko.bindingHandlers.dropzone = {

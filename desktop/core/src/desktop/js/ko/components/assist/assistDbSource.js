@@ -62,6 +62,10 @@ class AssistDbSource {
       querySpec: ko.observable({}).extend({ rateLimit: 300 })
     };
 
+    self.selectNamespace = () => {
+      self.selectedNamespace(self.namespace);
+    };
+
     self.filteredNamespaces = ko.pureComputed(() => {
       if (
         !self.filter.querySpec() ||

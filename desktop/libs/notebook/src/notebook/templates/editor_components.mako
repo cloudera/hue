@@ -408,7 +408,7 @@ else:
   <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, rightPanelAvailable: isRightPanelAvailable, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
   % endif
 
-  <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $(MAIN_SCROLLABLE).data('lastScroll'); if (ls && ls != $(MAIN_SCROLLABLE).scrollTop()){ $(document).trigger('hideAutocomplete'); }; $(MAIN_SCROLLABLE).data('lastScroll', $(MAIN_SCROLLABLE).scrollTop()) } }, with: selectedNotebook">
+  <div class="content-panel" data-bind="event: { scroll: handleScrollEvent }, with: selectedNotebook">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing, 'margin-left-10': $root.isPresentationMode},
         sortable: {
@@ -1902,7 +1902,7 @@ else:
 
 <div class="ace-filechooser" style="display:none;">
   <div class="ace-filechooser-close">
-    <a class="pointer" data-bind="click: function(){ $('.ace-filechooser').hide(); }"><i class="fa fa-times"></i></a>
+    <a class="pointer" data-bind="click: hideAceEditor"><i class="fa fa-times"></i></a>
   </div>
   <div class="ace-filechooser-content">
   </div>
@@ -1976,7 +1976,7 @@ else:
 
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: function() { huePubSub.publish('save.snippet.to.file'); }"/>
+    <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="clickWithArgs: { handler: huePubSub.publish, params: 'save.snippet.to.file'}"/>
   </div>
 </div>
 
@@ -2011,7 +2011,7 @@ else:
   </div>
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: function() { $root.selectedNotebook().authSession(); }">${_('Connect')}</a>
+    <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: connect_auth_session">${_('Connect')}</a>
   </div>
 </div>
 
@@ -2026,7 +2026,7 @@ else:
   </div>
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-danger disable-feedback" data-bind="click: function() { $root.selectedNotebook().clearHistory(); }">${_('Yes')}</a>
+    <a class="btn btn-danger disable-feedback" data-bind="click: clearNotebookHistory">${_('Yes')}</a>
   </div>
 </div>
 

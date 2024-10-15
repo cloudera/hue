@@ -174,6 +174,8 @@ export default class EditorViewModel {
       return this.canSave() ? _ko('Save') : _ko('Save As');
     });
 
+
+    
     this.ChartTransformers = ChartTransformers;
 
     this.isEditing = ko.observable(false);
@@ -302,6 +304,15 @@ export default class EditorViewModel {
       this.combinedContent(statements);
     }
     $('#editorCombinedContentModal').modal('show');
+  }
+  
+  hideAceEditor() {
+    $('.ace-filechooser').hide();
+  }
+
+  connect_auth_session() {
+    debugger;
+    $root.selectedNotebook().authSession();
   }
 
   getSnippetName(snippetType) {

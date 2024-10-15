@@ -53,7 +53,7 @@ const TEMPLATE =
             params: {
               querySpec: filter.querySpec,
               facets: ['type'],
-              knownFacetValues: isSolr() ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES,
+              knownFacetValues: knownFacetValues, // Directly use the computed observable here
               autocompleteFromEntries: $component.autocompleteFromEntries
             }
           } --><!-- /ko -->
@@ -258,6 +258,11 @@ class AssistEditorContextPanel {
   
     // Internationalization functions would typically be global or part of some utility object,
     // make sure `I18n` is accessible here in your ViewModel
+
+    this.knownFacetValues = ko.pureComputed(() => {
+      return this.isSolr() ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES;
+    });
+
     
     // Computed observable for the dynamic title string with internationalization
     this.dynamicTitle = ko.pureComputed(function() {

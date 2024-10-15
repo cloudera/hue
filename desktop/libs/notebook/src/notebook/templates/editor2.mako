@@ -784,7 +784,7 @@ There is no bridge to KO for components using this integration. Example using in
 
   <div class="ace-filechooser" style="display:none;">
     <div class="ace-filechooser-close">
-      <a class="pointer" data-bind="click: function(){ $('.ace-filechooser').hide(); }"><i class="fa fa-times"></i></a>
+      <a class="pointer" data-bind="click: hideAceEditor"><i class="fa fa-times"></i></a>
     </div>
     <div class="ace-filechooser-content">
     </div>

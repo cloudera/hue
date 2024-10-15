@@ -267,6 +267,19 @@ export default class NotebookViewModel {
       $('#combinedContentModal' + self.suffix).modal('show');
     };
 
+    self.hideAceEditor = function () {
+      debugger;
+      $('.ace-filechooser').hide();
+    }
+
+    self.connect_auth_session = function() {
+      self.selectedNotebook().authSession();
+    }
+
+    self.clearNotebookHistory = function() {
+      self.selectedNotebook().clearHistory();
+    }
+
     self.isEditing = ko.observable(false);
     self.isEditing.subscribe(() => {
       $(document).trigger('editingToggled');
