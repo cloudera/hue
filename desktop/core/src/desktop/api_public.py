@@ -296,7 +296,7 @@ def storage_content_summary(request):
 @api_view(["POST"])
 def storage_bulk_move(request):
   django_request = get_django_request(request)
-  return filebrowser_api.bulk_op(django_request, 'move')
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.move)
 
 
 @api_view(["POST"])
@@ -308,7 +308,7 @@ def storage_move(request):
 @api_view(["POST"])
 def storage_bulk_copy(request):
   django_request = get_django_request(request)
-  return filebrowser_api.bulk_op(django_request, 'copy')
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.copy)
 
 
 @api_view(["POST"])
@@ -332,7 +332,7 @@ def storage_rmtree(request):
 @api_view(["POST"])
 def storage_bulk_rmtree(request):
   django_request = get_django_request(request)
-  return filebrowser_api.bulk_op(django_request, 'rmtree')
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.rmtree)
 
 
 @api_view(["GET"])
@@ -350,7 +350,7 @@ def storage_trash_restore(request):
 @api_view(["POST"])
 def storage_trash_bulk_restore(request):
   django_request = get_django_request(request)
-  return filebrowser_api.bulk_op(django_request, 'trash_restore')
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.trash_restore)
 
 
 @api_view(["DELETE"])
@@ -386,13 +386,13 @@ def storage_chmod(request):
 @api_view(["POST"])
 def storage_bulk_chown(request):
   django_request = get_django_request(request)
-  return filebrowser_api.bulk_op(django_request, 'chown')
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.chown)
 
 
 @api_view(["POST"])
 def storage_bulk_chmod(request):
   django_request = get_django_request(request)
-  return filebrowser_api.bulk_op(django_request, 'chmod')
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.chmod)
 
 
 # Task Server
