@@ -581,8 +581,8 @@ def save_file(request):
 
 @api_error_handler
 def rename(request):
-  source_path = request.POST.get('source_path')
-  destination_path = request.POST.get('destination_path')
+  source_path = request.POST.get('source_path', '')
+  destination_path = request.POST.get('destination_path', '')
 
   if "#" in destination_path:
     return HttpResponse(
@@ -603,8 +603,8 @@ def rename(request):
 
 @api_error_handler
 def move(request):
-  source_path = request.POST.get('source_path')
-  destination_path = request.POST.get('destination_path')
+  source_path = request.POST.get('source_path', '')
+  destination_path = request.POST.get('destination_path', '')
 
   if source_path == destination_path:
     return HttpResponse('Source and destination path cannot be same.', status=400)
@@ -615,8 +615,8 @@ def move(request):
 
 @api_error_handler
 def copy(request):
-  source_path = request.POST.get('source_path')
-  destination_path = request.POST.get('destination_path')
+  source_path = request.POST.get('source_path', '')
+  destination_path = request.POST.get('destination_path', '')
 
   if source_path == destination_path:
     return HttpResponse('Source and destination path cannot be same.', status=400)
