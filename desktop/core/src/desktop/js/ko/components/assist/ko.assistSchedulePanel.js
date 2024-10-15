@@ -23,7 +23,7 @@ import I18n from 'utils/i18n';
 const TEMPLATE = `
   <div class="assist-inner-panel">
     <div class="assist-flex-panel">
-      <!-- ko if: selectedNotebook() && selectedNotebook().isBatchable() -->
+      <!-- ko if: showBatchableSection -->
       <!-- ko with: selectedNotebook() -->
       <div class="tab-pane" id="scheduleTab">
         <!-- ko ifnot: isSaved() && ! isHistory() -->
@@ -79,6 +79,12 @@ class AssistSchedulePanel {
           huePubSub.publish('check.schedules.browser');
         }
       }
+    });
+
+    this.showBatchableSection = ko.pureComputed(() => {
+      return this.selectedNotebook() && 
+             ko.unwrap(this.selectedNotebook().isBatchable) && 
+             this.selectedNotebook().isBatchable();
     });
 
     huePubSub.subscribe('jobbrowser.schedule.data', jobs => {

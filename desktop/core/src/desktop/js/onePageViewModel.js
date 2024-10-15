@@ -412,31 +412,22 @@ class OnePageViewModel {
                 // const nonce = window.nonce || ''; 
                 const scripts = $rawHtml.find('script');
                 scripts.each(function(k,v) {
+                  // console.log(scripts);
                   const scriptType = this.getAttribute('type');
                   if (scriptType !== 'text/html') {
-                    console.log("script", k, v);
                     // Create a new script element
                     const script = document.createElement('script');
                     script.type = 'text/javascript'; // Set the type or copy it from the original script
-                    // If the original script has a 'src' attribute, set it on the new script
+                    // If the original script has a 'src' attribute and is considered to be external
                     if (this.src) {
-                      script.src = this.src;
-                    } else {
-                      // Otherwise, set the text content
-                      script.textContent = this.textContent;
+                      script.src = this.src;  // Set it on the new script element
+                      document.head.appendChild(script);  // Append the new script to the document head
                     }
-              
-                    // Only set nonce if it's present
-                    // Append the new script to the document head
-                    document.head.appendChild(script);
                     
                     // If you need to remove original script from its current location, do it here
                     $(this).remove();
-              
-                  } else {
-                    console.log("text/html script", k, v);
-                    // Handle text/html scripts if needed
                   }
+                  
                   
                 });
                 if (window.SKIP_CACHE.indexOf(app) === -1) {

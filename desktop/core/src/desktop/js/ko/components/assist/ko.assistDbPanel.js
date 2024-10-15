@@ -326,7 +326,7 @@ const TEMPLATE =
   </script>
 
   <script type="text/html" id="assist-sql-inner-panel">
-    <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
+    <!-- ko template: { if: shouldDisplayTemplate, name: 'assist-db-breadcrumb' } --><!-- /ko -->
     <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
     <!-- ko with: selectedSource -->
       <!-- ko template: { ifnot: selectedNamespace, name: 'assist-namespaces-template' } --><!-- /ko -->
@@ -605,6 +605,12 @@ class AssistDbPanel {
       }
       return null;
     });
+    
+    
+    this.shouldDisplayTemplate = () => {
+      // Your logic to determine whether the template should be displayed
+      return this.breadcrumb() != null;
+    };
 
     huePubSub.subscribe(ASSIST_DB_HIGHLIGHT_EVENT, catalogEntry => {
       huePubSub.publish(SHOW_LEFT_ASSIST_EVENT);

@@ -34,11 +34,11 @@ const TEMPLATE = `
   </button>
 
   <div class="jobs-panel history-panel" data-bind="visible: historyPanelVisible, style: { 'top' : top, 'left': left }" style="display: none;">
-    <a class="pointer inactive-action pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
-    <!-- ko ifnot: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
+    <a class="pointer inactive-action pull-right" data-bind="clickWithArgs: { handler: 'historyPanelVisible', params: [false] }"><i class="fa fa-fw fa-times"></i></a>
+    <!-- ko ifnot: editorViewModel.hasHistory -->
       <span style="font-style: italic">${I18n('No task history.')}</span>
     <!-- /ko -->
-    <!-- ko if: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
+    <!-- ko if: editorViewModel.hasHistory -->
     <!-- ko with: editorViewModel.selectedNotebook() -->
     <div class="notification-history margin-bottom-10">
       <!-- ko if: onSuccessUrl() -->
@@ -144,7 +144,7 @@ const TEMPLATE = `
     </div>
     <div class="modal-footer">
       <a class="btn" data-dismiss="modal">${I18n('No')}</a>
-      <a class="btn btn-danger disable-feedback" data-bind="click: function() { editorViewModel.selectedNotebook().clearHistory(); editorViewModel.selectedNotebook(null); }">${I18n(
+      <a class="btn btn-danger disable-feedback" data-bind="click: editorViewModel.clearSelectedNotebookHistory">${I18n(
         'Yes'
       )}</a>
     </div>
@@ -164,6 +164,13 @@ class HistoryPanel {
         huePubSub.publish('hide.jobs.panel');
       }
     });
+
+    self.clearSelectedNotebookHistory = function() {
+      if (self.selectedNotebook()) {
+        self.selectedNotebook().clearHistory();
+        self.selectedNotebook(null);
+      }
+    };
 
     huePubSub.subscribe('hide.history.panel', () => {
       self.historyPanelVisible(false);

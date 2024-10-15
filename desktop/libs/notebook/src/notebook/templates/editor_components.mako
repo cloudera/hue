@@ -221,7 +221,7 @@ else:
   % endif
 
     <div class="btn-group">
-      <a class="btn" data-testid="editor--save--button" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
+      <a class="btn" data-testid="editor--save--button" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: handleSaveButtonClick">
         <i class="fa fa-save"></i>
       </a>
 
@@ -247,7 +247,7 @@ else:
       <ul class="dropdown-menu pull-right">
         <li>
         <!-- ko if: editorMode -->
-          <a href="javascript:void(0)" data-testid="editor--new-document--button" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+          <a href="javascript:void(0)" data-testid="editor--new-document--button" data-bind="click: createNewDocument">
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
         <!-- /ko -->
@@ -258,8 +258,8 @@ else:
         <!-- /ko -->
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
-            <svg class="hi hi-fw hi-bigger"><use href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
+          <a href="javascript:void(0)" data-bind="click:  handlePublish">
+            <svg class="hi hi-fw hi-bigger"><use href="#hi-documents"></use></svg> <span data-bind="text: editorDisplayText"></span>
           </a>
         </li>
         <li class="divider"></li>
@@ -375,7 +375,7 @@ else:
 
 
 <div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode()}">
-  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() || $root.isPresentationMode() || $root.isResultFullScreenMode() ? '0' : '20px' }" >
+  <div class="vertical-full container-fluid" data-bind="conditionalStyle: { 'padding-left': [$root.isLeftPanelVisible() || $root.isPresentationMode() || $root.isResultFullScreenMode(), '0', '20px'] }">
     <div class="vertical-full">
       <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook${ suffix }'}">
       </div>
@@ -2055,6 +2055,7 @@ else:
 <%def name="commonJS(is_embeddable=False, bindableElement='editorComponents', suffix='')">
 
 
+<script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
 <script ${nonce_attribute(request)} src="${ static('desktop/js/editor-component.js') }"></script>
 
 </%def>

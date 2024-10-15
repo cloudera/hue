@@ -24,22 +24,11 @@ var options = {
   noVirtualElements: false       // allows the use of Knockout virtual elements
 };
 
-var is_ksb_enabled = true
+var is_ksb_enabled = false
 console.log("is_ksb_enabled     :"+is_ksb_enabled )
 if(is_ksb_enabled) {
   ko.bindingProvider.instance = new ksb(options); // Use the imported 'ksb' as the constructor
 }
-
-ko.bindingHandlers.clickWithParams = {
-  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-    var handlerFunction = valueAccessor();
-    var newHandler = function() {
-      var params = Array.prototype.slice.call(arguments);
-      handlerFunction.apply(viewModel, params);
-    };
-    ko.bindingHandlers.click.init(element, function() { return newHandler; }, allBindings, viewModel, bindingContext);
-  }
-};
 
 
 // Define a custom binding for jQuery UI's autocomplete
@@ -85,21 +74,32 @@ init: function (element, valueAccessor, allBindingsAccessor) {
   }
 };
 
-// Custom binding handler for click with parameters
-// ko.bindingHandlers.clickWithParams = {
-//   init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-//     var handlerFunction = valueAccessor();
-//     if (typeof handlerFunction !== 'function') {
-//       throw new Error('clickWithParams binding value must be a function');
-//     }
+ko.bindingHandlers.clickWithArgs = {
+  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    var options = valueAccessor();
+    var handler = options.handler; // The handler now stores a function reference or a string to look up on the ViewModel
+    var params = options.params;
+    debugger;
+    var newHandler = function() {
+      
+      // If the handler is a string, check if it's a function on the ViewModel
+      if (typeof handler === 'string' && typeof viewModel[handler] === 'function') {
+        viewModel[handler].apply(viewModel, params);
+      }
+      // If the handler is already a function (which we expect for global functions), just call it
+      else if (typeof handler === 'function') {
+        handler.apply(viewModel, params);
+      }
+      else {
+        throw new Error("clickWithArgs: Handler is not a function.");
+      }
+    };
 
-//     var newClickHandler = function(model, event) {
-//       handlerFunction.apply(viewModel, [model, event]);
-//     };
+    ko.utils.registerEventHandler(element, "click", newHandler);
+  }
+};
 
-//     ko.bindingHandlers.click.init(element, function() { return newClickHandler; }, allBindings, viewModel, bindingContext);
-//   }
-// };
+
 
 // Custom binding handler for 'dropzone'
 ko.bindingHandlers.dropzone = {

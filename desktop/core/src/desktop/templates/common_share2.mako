@@ -62,8 +62,8 @@ else:
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu pull-right">
-            <li><a data-bind="clickWithParams: { click: changeDocumentSharePerm, params: ['read'] }"  href="javascript:void(0)">${ _('Read') }</a></li>
-            <li><a data-bind="clickWithParams: { click: changeDocumentSharePerm, params: ['write'] }"  href="javascript:void(0)">${ _('Read and Modify') }</a></li>
+            <li><a data-bind="clickWithArgs: { handler: changeDocumentSharePerm, params: 'read' }" href="javascript:void(0)"></a></li>
+            <li><a data-bind="clickWithArgs: { handler: changeDocumentSharePerm, params: 'write' }" href="javascript:void(0)"></a></li>
           </ul>
         </div>
       </div>

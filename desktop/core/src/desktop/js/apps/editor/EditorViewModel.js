@@ -56,6 +56,14 @@ export default class EditorViewModel {
       () => this.selectedNotebook() && this.selectedNotebook().snippets()[0]
     );
 
+    this.hasHistory = ko.pureComputed(() => {
+        let notebook = this.selectedNotebook();
+        // Ensure both 'notebook' and 'notebook.history()' are not undefined before checking the length
+        return notebook && notebook.history && notebook.history().length > 0;
+      }
+
+    );
+
     this.editorMode = ko.observable(options.mode === 'editor');
     this.config = ko.observable();
 
@@ -160,6 +168,11 @@ export default class EditorViewModel {
         (this.selectedNotebook().isSaved() ||
           (this.selectedNotebook().isHistory() && this.selectedNotebook().parentSavedQueryUuid()))
     );
+
+
+    this.saveButtonTitle = ko.pureComputed(function() {
+      return this.canSave() ? _ko('Save') : _ko('Save As');
+    });
 
     this.ChartTransformers = ChartTransformers;
 

@@ -212,7 +212,7 @@ from desktop.lib.django_util import nonce_attribute
         </li>
         % if ENABLE_SQL_INDEXER.get():
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('dashboard'); if (notebook.canSave() ) { notebook.save() } else { $('#saveAsModaleditor').modal('show');} }" title="${ _('Visually explore the result') }">
+          <a class="download" href="javascript:void(0)" data-bind="click: saveDashboard" title="${ _('Visually explore the result') }">
             <!-- ko template: { name: 'app-icon-template', data: { icon: 'report' } } --><!-- /ko --> ${ _('Report') }
           </a>
         </li>
@@ -396,6 +396,16 @@ from desktop.lib.django_util import nonce_attribute
         self.clipboardClass = ko.pureComputed(function () {
           return 'download pointer clipboard' + self.snippet.id().split('-')[0];
         });
+
+        self.saveDashboard = function() {
+            saveTarget('dashboard'); // Assuming saveTarget is a function available in this context
+            if (self.canSave()) {
+                self.save(); // Assuming save is a method defined in this ViewModel
+            } else {
+                $('#saveAsModaleditor').modal('show');
+            }
+        };
+
 
         var clipboard = new Clipboard('.clipboard' + self.snippet.id().split('-')[0], {
           target: function (trigger) {

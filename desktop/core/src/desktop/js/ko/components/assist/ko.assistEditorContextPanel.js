@@ -128,7 +128,8 @@ const TEMPLATE =
         <div class="margin-top-20">
           <!-- ko hueSpinner: { spin: uploadingTableStats, inline: true} --><!-- /ko -->
           <!-- ko ifnot: uploadingTableStats -->
-          <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, clickWithParams: { click: uploadTableStats, params: [true] }, attr: { 'title': ('${I18n(
+          <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, clickWithArgs: { handler: uploadTableStats, params: true },
+           attr: { 'title': ('${I18n(
             'Add table'
           )} '  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${I18n(
             'and'

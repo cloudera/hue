@@ -284,8 +284,8 @@ ${ hueIcons.symbols() }
             <!-- /ko -->
           </div>
         </div>
-        <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0" 
-        data-bind="clickWithParams: function () { huePubSub.publish('context.panel.visible', false); }">
+        <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0"
+           data-bind="clickWithArgs: { handler: huePubSub.publish, params: ['context.panel.visible'] }">
         <i class="fa fa-chevron-up"></i></a>
       </div>
       %endif

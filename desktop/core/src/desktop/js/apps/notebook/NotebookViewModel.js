@@ -195,6 +195,18 @@ export default class NotebookViewModel {
     self.CoordinatorEditorViewModel = CoordinatorEditorViewModel;
     self.RunningCoordinatorModel = RunningCoordinatorModel;
 
+    self.handleScrollEvent = () => {
+      const $mainScrollable = $(MAIN_SCROLLABLE); // Replace MAIN_SCROLLABLE with the actual selector
+      const lastScrollTop = $mainScrollable.data('lastScroll');
+      const currentScrollTop = $mainScrollable.scrollTop();
+  
+      if (lastScrollTop && lastScrollTop !== currentScrollTop) {
+        $(document).trigger('hideAutocomplete');
+      }
+      
+      $mainScrollable.data('lastScroll', currentScrollTop);
+    }
+
     self.canSave = ko.computed(() => {
       // Saved query or history but history coming from a saved query
       return (
@@ -669,6 +681,47 @@ export default class NotebookViewModel {
           }
         }
       );
+    };
+
+        // New method created to handle the click event
+    self.createNewDocument = function() {
+          hueUtils.removeURLParameter('editor');
+  
+          // Assuming newNotebook is a function available in self context
+          // and selectedNotebook and editorType are observables in the ViewModel
+          var currentQueryTab = self.selectedNotebook() ? 
+              self.selectedNotebook().snippets()[0].currentQueryTab() : 
+              null;
+              
+          newNotebook(self.editorType(), null, currentQueryTab);
+      };
+  
+      self.handlePublish = function() {
+        var mode = self.editorMode();
+        var topic = mode ? 'query-' + self.editorType() : self.editorType();
+        huePubSub.publish('assist.show.documents', topic);
+    };
+
+    self.editorDisplayText = ko.computed(function() {
+      return self.editorMode() ? I18n('Queries') : I18n('Notebooks');
+  });
+  self.handleSaveButtonClick = ko.pureComputed(() => {
+    // self.handleSaveButtonClick = () => {
+      if (self.canSave()) {
+          this.saveNotebook();
+      } else {
+          $('#saveAsModal' + suffix).modal('show');
+      }
+    });
+
+
+
+    self.handleDocumentShow = function() {
+      // The logic to execute when the event is triggered.
+      var mode = self.editorMode() ? 'query-' + self.editorType() : self.editorType();
+      huePubSub.publish("assist.show.documents", mode)
+      // Perform actions with mode
+        console.log('Document show with mode:', mode);
     };
 
     self.saveNotebook = function () {
