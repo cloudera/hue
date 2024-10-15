@@ -137,6 +137,9 @@ class UploadFileForm(forms.Form):
   dest = PathField(label=_("Destination Path"), help_text=_("Filename or directory to upload to."), required=False)  # Used actually?
   extract_archive = BooleanField(required=False)
 
+class UploadAPIFileForm(forms.Form):
+  op = "upload"
+  file = FileField(label=_("File to Upload"))
 
 class UploadLocalFileForm(forms.Form):
   op = "upload"
