@@ -671,9 +671,6 @@ else:
   if is_ofs_enabled():
     file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
 
-  if is_ofs_enabled():
-    file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
-
 FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 
 ############################################################

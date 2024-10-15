@@ -353,7 +353,7 @@ class S3FileSystem(object):
   @auth_error_handler
   def rmtree(self, path, skipTrash=True):
     if not skipTrash:
-      raise NotImplementedError(_('Moving to trash is not implemented for S3'))
+      raise NotImplementedError('Moving to trash is not implemented for S3')
 
     bucket_name, key_name = s3.parse_uri(path)[:2]
     if bucket_name and not key_name:
