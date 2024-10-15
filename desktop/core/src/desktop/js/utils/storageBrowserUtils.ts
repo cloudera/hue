@@ -62,3 +62,7 @@ export const isOFSVol = (path: string): boolean => {
 export const inTrash = (path: string): boolean => {
   return path.match(/^\/user\/.+?\/\.Trash/) !== null;
 };
+
+export const inRestorableTrash = (path: string): boolean => {
+  return path.match(/^\/user\/.+?\/\.Trash\/.+?/) !== null;
+};

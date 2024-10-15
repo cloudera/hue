@@ -27,14 +27,14 @@ import ImportIcon from '@cloudera/cuix-core/icons/react/ImportIcon';
 //TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
 import { FileOutlined } from '@ant-design/icons';
 
-import { PrimaryButton } from 'cuix/dist/components/Button';
+import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import Table from 'cuix/dist/components/Table';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import useDebounce from '../../../../utils/useDebounce';
 
-import { mkdir, touch } from '../../../../reactComponents/FileChooser/api';
+import { mkdir, rmtree, touch } from '../../../../reactComponents/FileChooser/api';
 import {
   StorageBrowserTableData,
   SortOrder,
@@ -47,6 +47,8 @@ import formatBytes from '../../../../utils/formatBytes';
 
 import './StorageBrowserTable.scss';
 import { formatTimestamp } from '../../../../utils/dateTimeUtils';
+import { inTrash, isHDFS } from '../../../../utils/storageBrowserUtils';
+import ConfirmationModal from '../../ConfirmationModal/ConfirmationModal';
 
 interface StorageBrowserTableProps {
   className?: string;
@@ -95,6 +97,9 @@ const StorageBrowserTable = ({
   const [selectedFiles, setSelectedFiles] = useState<StorageBrowserTableData[]>([]);
   const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
   const [showNewFileModal, setShowNewFileModal] = useState<boolean>(false);
+  const [showPurgeConfirmationModal, setShowPurgeConfirmationModal] = useState<boolean>(false);
+  const [showRestoreConfirmationModal, setShowRestoreConfirmationModal] = useState<boolean>(false);
+  const [selectedFile, setSelectedFile] = useState<string>('');
 
   const { t } = i18nReact.useTranslation();
 
@@ -152,6 +157,24 @@ const StorageBrowserTable = ({
       ]
     }
   ];
+
+  const getPurgeConfirmationModalBody = (): JSX.Element => {
+    const body: JSX.Element = (
+      <div>
+        <p>Are you sure you want to permanently delete all your trash?</p>
+      </div>
+    );
+    return body;
+  };
+
+  const getRestoreConfirmationModalBody = (): JSX.Element => {
+    const body: JSX.Element = (
+      <div>
+        <p>Are you sure you want to restore these files?</p>
+      </div>
+    );
+    return body;
+  };
 
   const onColumnTitleClicked = (columnClicked: string) => {
     if (columnClicked === sortByColumn) {
@@ -277,6 +300,21 @@ const StorageBrowserTable = ({
     [onSearch]
   );
 
+  const handleRestore = () => {
+    setLoadingFiles(true);
+    rmtree(selectedFile, true)
+      .then(() => {
+        refetchData();
+      })
+      .catch(error => {
+        huePubSub.publish('hue.error', error);
+        setShowRestoreConfirmationModal(false);
+      })
+      .finally(() => {
+        setLoadingFiles(false);
+      });
+  };
+
   useEffect(() => {
     //TODO: handle table resize
     const calculateTableHeight = () => {
@@ -315,26 +353,52 @@ const StorageBrowserTable = ({
             handleSearch(event.target.value);
           }}
         />
-        <div className="hue-storage-browser__actions-bar-right">
-          <StorageBrowserActions
-            selectedFiles={selectedFiles}
-            setLoadingFiles={setLoadingFiles}
-            onSuccessfulAction={refetchData}
-          />
-          <Dropdown
-            overlayClassName="hue-storage-browser__actions-dropdown"
-            menu={{
-              items: newActionsMenuItems,
-              className: 'hue-storage-browser__action-menu'
-            }}
-            trigger={['hover', 'click']}
-          >
-            <PrimaryButton data-event="">
-              {t('New')}
-              <DropDownIcon />
-            </PrimaryButton>
-          </Dropdown>
-        </div>
+        {!inTrash(filePath) ? (
+          <div className="hue-storage-browser__actions-bar-right">
+            <StorageBrowserActions
+              selectedFiles={selectedFiles}
+              setLoadingFiles={setLoadingFiles}
+              onSuccessfulAction={refetchData}
+              isTrashEnabled={isHDFS(filePath)}
+              isFsSuperuser={false}
+              currentPath={filePath}
+            />
+            <Dropdown
+              overlayClassName="hue-storage-browser__actions-dropdown"
+              menu={{
+                items: newActionsMenuItems,
+                className: 'hue-storage-browser__action-menu'
+              }}
+              trigger={['hover', 'click']}
+            >
+              <PrimaryButton data-event="">
+                {t('New')}
+                <DropDownIcon />
+              </PrimaryButton>
+            </Dropdown>
+          </div>
+        ) : (
+          <div className="hue-storage-browser__actions-bar-right">
+            <BorderlessButton
+              data-event={''}
+              disabled={selectedFiles.length === 0 ? true : false}
+              onClick={() => {
+                setSelectedFile(selectedFiles[0].path);
+                setShowRestoreConfirmationModal(true);
+              }}
+            >
+              Restore
+            </BorderlessButton>
+            <BorderlessButton
+              data-event={''}
+              onClick={() => {
+                setShowPurgeConfirmationModal(true);
+              }}
+            >
+              Empty Trash
+            </BorderlessButton>
+          </div>
+        )}
       </div>
 
       <Spin spinning={loadingFiles}>
@@ -367,7 +431,7 @@ const StorageBrowserTable = ({
           />
         )}
       </Spin>
-
+      {/* //TODO: Add missing conditions form listsir_components.mako */}
       <InputModal
         title={t('Create New Folder')}
         inputLabel={t('Enter Folder name here')}
@@ -383,6 +447,24 @@ const StorageBrowserTable = ({
         showModal={showNewFileModal}
         onSubmit={handleCreateNewFile}
         onClose={() => setShowNewFileModal(false)}
+      />
+      <ConfirmationModal
+        onClose={() => setShowPurgeConfirmationModal(false)}
+        onSubmit={() => {}}
+        showModal={showPurgeConfirmationModal}
+        title="Confirm empty trash"
+        modalBody={getPurgeConfirmationModalBody()}
+        okText={t('Delete all')}
+        cancelText={t('Cancel')}
+      />
+      <ConfirmationModal
+        onClose={() => setShowRestoreConfirmationModal(false)}
+        onSubmit={handleRestore}
+        showModal={showRestoreConfirmationModal}
+        title="Confirm Restore"
+        modalBody={getRestoreConfirmationModalBody()}
+        okText={t('Yes')}
+        cancelText={t('No')}
       />
     </>
   );

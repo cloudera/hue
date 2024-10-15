@@ -202,3 +202,5 @@ describe('inTrash function', () => {
     expect(inTrash('ofs://path/to/file')).toBe(false);
   });
 });
+
+//TODO: add test for restorableTrash

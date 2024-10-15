@@ -11,7 +11,6 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
 // limitations under the License.
 import React, { useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
@@ -19,58 +18,53 @@ import { Input } from 'antd';
 
 import { i18nReact } from '../../../utils/i18nReact';
 
-import './InputModal.scss';
+import './SetReplicationModal.scss';
 
-interface InputModalProps {
-  cancelText?: string;
-  inputLabel: string;
-  submitText?: string;
+interface SetReplicationModalProps {
   onClose: () => void;
-  onSubmit: (value: string) => void;
+  onSubmit: (value: number) => void;
   showModal: boolean;
   title: string;
+  currentReplicationFactor: number;
 }
 
-const InputModal = ({
-  inputLabel,
+const SetReplicationModal = ({
+  showModal,
   onClose,
   onSubmit,
-  showModal,
   title,
-  ...i18n
-}: InputModalProps): JSX.Element => {
-  const [value, setValue] = useState<string>('');
+  currentReplicationFactor
+}: SetReplicationModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const { cancelText = t('Cancel'), submitText = t('Submit') } = i18n;
+  const [value, setValue] = useState<number>(currentReplicationFactor);
 
   return (
     <Modal
-      cancelText={cancelText}
-      className="hue-input-modal cuix antd"
-      okText={submitText}
+      cancelText={t('Cancel')}
+      className="hue-set-replication-modal cuix antd"
+      okText={t('Submit')}
+      title={title}
+      open={showModal}
       onCancel={() => {
-        setValue('');
         onClose();
       }}
       onOk={() => {
         onSubmit(value);
-        setValue('');
         onClose();
       }}
-      open={showModal}
-      title={title}
       destroyOnClose
     >
-      <div className="hue-input-modal__input-label">{inputLabel}</div>
+      <div className="hue-replication-modal__input-label">Replication factor: </div>
       <Input
-        className="hue-input-modal__input"
+        className="hue-replication-modal__input"
         value={value}
-        onInput={e => {
-          setValue((e.target as HTMLInputElement).value);
+        type="number"
+        onChange={e => {
+          setValue(Number(e.target.value));
         }}
       />
     </Modal>
   );
 };
 
-export default InputModal;
+export default SetReplicationModal;

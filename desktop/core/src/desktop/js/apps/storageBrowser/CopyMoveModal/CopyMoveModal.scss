@@ -16,81 +16,63 @@
 @use 'variables' as vars;
 @use 'mixins';
 
-$cell-height: 40px;
+$cell-height: 20px;
 $table-placeholder-height: 100px;
-$action-dropdown-width: 214px;
+// $action-dropdown-width: 214px;
 $icon-margin: 5px;
 
 .antd.cuix {
-  .hue-storage-browser__actions-bar {
-    display: flex;
-    margin: vars.$fluidx-spacing-s 0;
-    justify-content: space-between;
-  }
-
-  .hue-storage-browser__search {
-    width: 30%;
-
-    .ant-input {
-      box-shadow: none;
+    .hue-copy-modal__body{
+        height:350px;
     }
-  }
 
-  .hue-storage-browser__actions-bar-right {
-    display: flex;
-    gap: vars.$fluidx-spacing-xs;
-
-    .cdp-icon-dropdown {
-      margin-left: $icon-margin;
-    }
-  }
-
-  .hue-storage-browser__table {
+    .hue-copy__path-browser-panel {
+        display: flex;
+        align-items: center;
+        gap: vars.$fluidx-spacing-xs;
+      }
+      .hue-copy__destPath {
+        flex: 0 0 auto;
+        font-weight: 600;
+      }
+  .copyModaltable {
     .ant-table-placeholder {
       height: $table-placeholder-height;
-      text-align: center;
+    //   text-align: center;
     }
 
     th.ant-table-cell {
       height: $cell-height;
-      background-color: vars.$fluidx-gray-040;
+      border: none;
+    //   background-color: vars.$fluidx-gray-040;
     }
   }
 
-  .ant-table-selection-column {
-    padding: 8px;
-  }
-
-  .hue-storage-browser__table-cell-icon {
+  .hue-copy__table-cell-icon {
     color: vars.$fluidx-blue-700;
     margin-right: 6px;
   }
 
-  .hue-storage-browser__table-row {
+  .hue-copy__table-row {
     :hover {
       cursor: pointer;
     }
 
     td.ant-table-cell {
       height: $cell-height;
+      padding: 2px;
       @include mixins.nowrap-ellipsis;
     }
+    
+      
   }
 
-  .hue-storage-browser__table-cell-name {
+  .ant-table-tbody > tr > td {
+    border: none
+  }
+
+  .hue-copy__table-cell-name {
     color: vars.$fluidx-blue-700;
   }
 
-  .hue-storage-browser__table-column-header {
-    display: flex;
-  }
-
-  .hue-storage-browser__table-column-title {
-    text-transform: capitalize;
-  }
-}
-
-.hue-storage-browser__actions-dropdown {
-  width: $action-dropdown-width;
-  @include mixins.hue-svg-icon__d3-conflict;
 }

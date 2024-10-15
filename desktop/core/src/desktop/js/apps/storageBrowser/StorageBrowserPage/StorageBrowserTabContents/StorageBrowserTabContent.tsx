@@ -22,7 +22,7 @@ import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
 import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
-import { VIEWFILES_API_URl } from '../../../../reactComponents/FileChooser/api';
+import { VIEWFILES_API_URl, trashPath } from '../../../../reactComponents/FileChooser/api';
 import {
   BrowserViewType,
   PathAndFileData,
@@ -33,6 +33,9 @@ import useLoadData from '../../../../utils/hooks/useLoadData';
 
 import './StorageBrowserTabContent.scss';
 import StorageFilePage from '../../StorageFilePage/StorageFilePage';
+import { BorderlessButton } from 'cuix/dist/components/Button';
+import { inTrash, isHDFS } from '../../../../utils/storageBrowserUtils';
+import huePubSub from '../../../../utils/huePubSub';
 
 interface StorageBrowserTabContentProps {
   user_home_dir: string;
@@ -72,6 +75,19 @@ const StorageBrowserTabContent = ({
     skip: filePath === '' || filePath === undefined
   });
 
+  const getTrashPath = () => {
+    // trashPath(filePath)
+    //   .then(response => {
+    //     // eslint-disable-next-line no-restricted-syntax
+    //     console.log(response);
+    //   })
+    //   .catch(error => {
+    //     huePubSub.publish('hue.error', error);
+    //   })
+    //   .finally(() => {});
+    setFilePath('/user/demo/.Trash/241008080000/user/demo');
+  };
+
   return (
     <Spin spinning={loading}>
       <div className="hue-storage-browser-tab-content" data-testid={testId}>
@@ -92,6 +108,13 @@ const StorageBrowserTabContent = ({
             seperator={'/'}
             showIcon={false}
           />
+          {isHDFS(filePath) && !inTrash(filePath) ? (
+            <BorderlessButton data-event={''} onClick={() => {
+              getTrashPath();
+            }}>VIEW TRASH FOLDER</BorderlessButton>
+          ) : (
+            <div></div>
+          )}
         </div>
         {filesData?.type === BrowserViewType.file ? (
           <StorageFilePage fileData={filesData} />

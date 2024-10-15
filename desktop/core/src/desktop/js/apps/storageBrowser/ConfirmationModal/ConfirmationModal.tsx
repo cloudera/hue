@@ -15,62 +15,49 @@
 // limitations under the License.
 import React, { useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
-import { Input } from 'antd';
 
 import { i18nReact } from '../../../utils/i18nReact';
 
-import './InputModal.scss';
+import './ConfirmationModal.scss';
 
-interface InputModalProps {
-  cancelText?: string;
-  inputLabel: string;
-  submitText?: string;
+interface ConfirmationModalProps {
   onClose: () => void;
-  onSubmit: (value: string) => void;
+  onSubmit: () => void;
   showModal: boolean;
   title: string;
+  modalBody: JSX.Element;
+  okText: string;
+  cancelText: string;
 }
 
-const InputModal = ({
-  inputLabel,
+const ConfirmationModal = ({
+  modalBody,
   onClose,
   onSubmit,
   showModal,
   title,
-  ...i18n
-}: InputModalProps): JSX.Element => {
-  const [value, setValue] = useState<string>('');
-  const { t } = i18nReact.useTranslation();
-  const { cancelText = t('Cancel'), submitText = t('Submit') } = i18n;
+  okText,
+  cancelText
+}: ConfirmationModalProps): JSX.Element => {
+  // const { t } = i18nReact.useTranslation();
 
   return (
     <Modal
       cancelText={cancelText}
-      className="hue-input-modal cuix antd"
-      okText={submitText}
-      onCancel={() => {
-        setValue('');
-        onClose();
-      }}
-      onOk={() => {
-        onSubmit(value);
-        setValue('');
-        onClose();
-      }}
+      className="hue-confirmation-modal cuix antd"
+      okText={okText}
       open={showModal}
       title={title}
-      destroyOnClose
+      onCancel={() => onClose()}
+      onOk={() => {
+        onSubmit();
+        onClose();
+      }}
+      okButtonProps={{ style: { backgroundColor: 'red' } }}
     >
-      <div className="hue-input-modal__input-label">{inputLabel}</div>
-      <Input
-        className="hue-input-modal__input"
-        value={value}
-        onInput={e => {
-          setValue((e.target as HTMLInputElement).value);
-        }}
-      />
+      <div className="hue-confirmation-modal__body">{modalBody}</div>
     </Modal>
   );
 };
 
-export default InputModal;
+export default ConfirmationModal;
