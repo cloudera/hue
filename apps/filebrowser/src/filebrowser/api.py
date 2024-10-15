@@ -826,7 +826,7 @@ def bulk_op(request, op):
   for p in path_list:
 
     tmp_dict = bulk_dict
-    if op in (copy, move):  # TODO: Check if chmod is also special case for permissions to calculate mode
+    if op in (copy, move):
       tmp_dict['source_path'] = p
     else:
       tmp_dict['path'] = p
