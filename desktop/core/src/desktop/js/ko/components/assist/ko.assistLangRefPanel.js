@@ -33,7 +33,7 @@ const TEMPLATE = `
     <!-- ko if: $data.length -->
     <ul class="assist-docs-topic-tree " data-bind="foreach: $data">
       <li>
-        <a class="black-link" href="javascript: void(0);" data-bind="click: function () { $component.selectedTopic($data); }, toggle: open">
+        <a class="black-link" href="javascript: void(0);" data-bind="click: $component.selectTopic, toggle: open">
           <i class="fa fa-fw" style="font-size: 12px;" data-bind="css: { 'fa-chevron-right': children.length && !open(), 'fa-chevron-down': children.length && open() }"></i>
           <span class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $component.selectedTopic() === $data }, text: title"></span>
         </a>
@@ -69,7 +69,7 @@ const TEMPLATE = `
         <!-- ko if: filteredTopics().length > 0 -->
         <ul class="assist-docs-topic-tree" data-bind="foreach: filteredTopics">
           <li>
-            <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $component.selectedTopic() === $data }, click: function () { $component.selectedTopic($data); }, html: titleMatch() || title"></a>
+            <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $component.selectedTopic() === $data }, click: $component.selectTopic, html: titleMatch() || title"></a>
           </li>
         </ul>
         <!-- /ko -->
@@ -108,6 +108,8 @@ class LanguageReferenceTopic {
     this.titleMatch = ko.observable();
   }
 
+
+
   load() {
     if (this.body() || this.loading()) {
       return this.loadDeferred.promise();
@@ -131,7 +133,7 @@ class AssistLangRefPanel {
 
     this.availableDialects = ko.observableArray();
     this.activeDialect = ko.observable();
-
+    this.selectTopic = this.selectTopic.bind(this);
     this.allTopics = {
       impala: [],
       hive: []
@@ -155,6 +157,8 @@ class AssistLangRefPanel {
         updateDialect(connector.dialect);
       }
     });
+
+
 
     const configUpdated = () => {
       const lastActiveDialect = this.activeDialect();
@@ -330,6 +334,13 @@ class AssistLangRefPanel {
       }
     });
   }
+
+  selectTopic(topic) {
+    console.log("selectTopic", topic);
+    this.selectedTopic(topic);
+  }
+
+
 }
 
 componentUtils.registerStaticComponent(
