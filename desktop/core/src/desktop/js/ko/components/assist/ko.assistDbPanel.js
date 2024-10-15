@@ -444,7 +444,7 @@ const TEMPLATE =
           <!-- /ko -->
           <!-- ko if: status() !== 'STARTING' -->
           <!-- ko if: namespace.computes.length -->
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: $parent.selectNamespace"><i class="fa fa-fw fa-snowflake-o muted valign-middle"></i> <span data-bind="text: name"></span></a>
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedNamespace($data); }"><i class="fa fa-fw fa-snowflake-o muted valign-middle"></i> <span data-bind="text: name"></span></a>
           <!-- /ko -->
           <!-- ko ifnot: namespace.computes.length -->
           <span class="assist-table-link" title="${I18n(

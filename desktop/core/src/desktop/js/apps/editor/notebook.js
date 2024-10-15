@@ -65,6 +65,11 @@ export default class Notebook {
     this.dependentsCoordinator = ko.pureComputed(() =>
       this.dependents().filter(doc => doc.type() === 'oozie-coordinator2' && doc.is_managed())
     );
+
+    this.canShowContent = ko.computed(function() {
+      return this.isSaved() && !this.isHistory();
+    });
+    
     if (this.dependentsCoordinator().length > 0 && !this.coordinatorUuid()) {
       this.coordinatorUuid(this.dependentsCoordinator()[0].uuid());
     }

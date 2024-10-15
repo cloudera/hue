@@ -34,6 +34,7 @@ import UUID from 'utils/string/UUID';
 import changeURL from 'utils/url/changeURL';
 import changeURLParameter from 'utils/url/changeURLParameter';
 import getParameter from 'utils/url/getParameter';
+import I18n from 'utils/i18n';
 
 export default class EditorViewModel {
   constructor(options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
@@ -75,6 +76,10 @@ export default class EditorViewModel {
 
     huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, this.config);
     huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, this.config);
+
+    this.canSaveNotebook = ko.computed(function() {
+      return this.selectedNotebook().name().length > 0;
+    });
 
     this.activeConnector = ko.pureComputed(() => {
       if (this.editorMode()) {
@@ -150,6 +155,18 @@ export default class EditorViewModel {
     this.isPresentationMode = ko.pureComputed(
       () => this.selectedNotebook() && this.selectedNotebook().isPresentationMode()
     );
+
+    this.togglePresentationMode = function() {
+      this.isPresentationMode(!this.isPresentationMode());
+      hueAnalytics.log('editor', 'view-as-presentation');
+    };
+  
+    this.presentationModeTitle = ko.computed(function() {
+      return {
+        title: this.isPresentationMode() ? I18n('Exit presentation') : I18n('View as a presentation')
+      };
+    });
+
     this.isHidingCode = ko.pureComputed(
       () => this.selectedNotebook() && this.selectedNotebook().isHidingCode()
     );

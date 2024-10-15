@@ -25,7 +25,7 @@ var options = {
   noVirtualElements: false       // allows the use of Knockout virtual elements
 };
 
-var is_ksb_enabled = true
+var is_ksb_enabled = false
 console.log("is_ksb_enabled     :"+is_ksb_enabled )
 if(is_ksb_enabled) {
   ko.bindingProvider.instance = new ksb(options); // Use the imported 'ksb' as the constructor

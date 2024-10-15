@@ -53,7 +53,7 @@ const TEMPLATE =
             params: {
               querySpec: filter.querySpec,
               facets: ['type'],
-              knownFacetValues: knownFacetValues, // Directly use the computed observable here
+              knownFacetValues: knownFacetValues,
               autocompleteFromEntries: $component.autocompleteFromEntries
             }
           } --><!-- /ko -->

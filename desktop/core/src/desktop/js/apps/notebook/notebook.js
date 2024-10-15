@@ -107,6 +107,7 @@ class Notebook {
     self.isSaved = ko.observable(
       typeof notebook.isSaved != 'undefined' && notebook.isSaved != null ? notebook.isSaved : false
     );
+
     self.canWrite = ko.observable(
       typeof notebook.can_write != 'undefined' && notebook.can_write != null
         ? notebook.can_write

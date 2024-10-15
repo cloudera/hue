@@ -31,7 +31,7 @@ const TEMPLATE = `
     toggle: dropDownVisible,
     css: { 'blue': dropDownVisible }">
     <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
-    <!-- ko if: isLabelAndValueDefined -->
+    <!-- ko if: !noLabel && value -->
     <span class="hue-drop-down-selected" data-bind="text: value() && typeof value()[labelAttribute] !== 'undefined' ? value()[labelAttribute] : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': titleTooltip }" ></span>
     <!-- /ko -->
     <i class="fa fa-caret-down"></i>
@@ -179,12 +179,6 @@ class HueDropDown {
         ? self.value()[self.labelAttribute]
         : self.value();
     });
-
-
-    self.isLabelAndValueDefined = () => {
-      return !self.noLabel() && !!self.value();
-    };
-
 
     self.titleTooltip = ko.pureComputed(() => {
       const title =
