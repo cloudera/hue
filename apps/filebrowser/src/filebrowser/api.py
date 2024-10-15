@@ -49,6 +49,7 @@ from filebrowser.conf import (
   SHOW_DOWNLOAD_BUTTON,
   SHOW_UPLOAD_BUTTON,
 )
+from filebrowser.forms import UploadAPIFileForm
 from filebrowser.lib import xxd
 from filebrowser.lib.rwx import compress_mode
 from filebrowser.utils import parse_broker_url
@@ -480,16 +481,23 @@ def _upload_file(request):
   """
   response = {}
 
+  # Use form for now to triger the upload handler process by Django.
+  # Might be a better solution now to try directly using handler in request.fs.upload() for all FS.
+  form = UploadAPIFileForm(request.POST, request.FILES)
+
   if request.META.get('upload_failed'):
-    return HttpResponse(request.META.get('upload_failed'), status=500)  # TODO: Check error message and status code
+    raise Exception(request.META.get('upload_failed'))  # TODO: Check error message and status code
+
+  if not form.is_valid():
+    raise Exception(f"Error in upload form: {form.errors}")
 
   uploaded_file = request.FILES['file']
-  dest_path = request.GET.get('destination_path')
+  dest_path = request.GET.get('dest')
 
   filepath = request.fs.join(dest_path, uploaded_file.name)
 
   if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
-    return HttpResponse(f'Upload failed: {posixpath.sep} is not allowed in the filename {uploaded_file.name}.', status=500)  # TODO: code?
+    raise Exception(f'Upload failed: {posixpath.sep} is not allowed in the filename {uploaded_file.name}.')  # TODO: status code
 
   try:
     request.fs.upload(file=uploaded_file, path=dest_path, username=request.user.username)
@@ -504,7 +512,7 @@ def _upload_file(request):
       messsage = f'Upload failed: Destination {filepath} already exists.'
     else:
       messsage = f'Upload error: Copy to {filepath} failed: {str(ex)}'
-    return HttpResponse(messsage, status=500)  # TODO: Check error messages above and status code
+    raise Exception(messsage)  # TODO: Check error messages above and status code
 
   # TODO: Check response fields below
   response.update(
@@ -515,7 +523,7 @@ def _upload_file(request):
     }
   )
 
-  return JsonResponse(response)
+  return response
 
 
 @api_error_handler
