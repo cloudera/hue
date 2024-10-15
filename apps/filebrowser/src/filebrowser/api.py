@@ -44,12 +44,14 @@ from filebrowser.conf import (
   ARCHIVE_UPLOAD_TEMPDIR,
   ENABLE_EXTRACT_UPLOADED_ARCHIVE,
   FILE_DOWNLOAD_CACHE_CONTROL,
+  MAX_FILE_SIZE_UPLOAD_LIMIT,
   MAX_SNAPPY_DECOMPRESSION_SIZE,
   REDIRECT_DOWNLOAD,
   SHOW_DOWNLOAD_BUTTON,
   SHOW_UPLOAD_BUTTON,
 )
-from filebrowser.forms import UploadAPIFileForm
+
+# from filebrowser.forms import UploadAPIFileForm
 from filebrowser.lib import xxd
 from filebrowser.lib.rwx import compress_mode
 from filebrowser.utils import parse_broker_url
@@ -456,20 +458,21 @@ def upload_file(request):
 
   Returns JSON.
   """
-  response = {}
+  pass
+  # response = {}
 
-  try:
-    response = _upload_file(request)
-  except Exception as e:
-    LOG.exception('Upload operation failed.')
+  # try:
+  #   response = _upload_file(request)
+  # except Exception as e:
+  #   LOG.exception('Upload operation failed.')
 
-    file = request.FILES.get('file')
-    if file and hasattr(file, 'remove'):  # TODO: Call from proxyFS -- Check feasibility of this old comment
-      file.remove()
+  #   file = request.FILES.get('file')
+  #   if file and hasattr(file, 'remove'):  # TODO: Call from proxyFS -- Check feasibility of this old comment
+  #     file.remove()
 
-    return HttpResponse(str(e).split('\n', 1)[0], status=500)  # TODO: Check error message and status code
+  #   return HttpResponse(str(e).split('\n', 1)[0], status=500)  # TODO: Check error message and status code
 
-  return JsonResponse(response)
+  # return JsonResponse(response)
 
 
 def _upload_file(request):
@@ -479,20 +482,22 @@ def _upload_file(request):
   The uploaded file is stored in HDFS at its destination with a .tmp suffix.
   We just need to rename it to the destination path.
   """
+  uploaded_file = request.FILES['file']
+  dest_path = request.GET.get('dest')
   response = {}
+
+  if MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 and uploaded_file.size > MAX_FILE_SIZE_UPLOAD_LIMIT.get():
+    return HttpResponse(f'File exceeds maximum allowed size of {MAX_FILE_SIZE_UPLOAD_LIMIT.get()} bytes.', status=500)
 
   # Use form for now to triger the upload handler process by Django.
   # Might be a better solution now to try directly using handler in request.fs.upload() for all FS.
-  form = UploadAPIFileForm(request.POST, request.FILES)
+  # form = UploadAPIFileForm(request.POST, request.FILES)
 
   if request.META.get('upload_failed'):
     raise Exception(request.META.get('upload_failed'))  # TODO: Check error message and status code
 
-  if not form.is_valid():
-    raise Exception(f"Error in upload form: {form.errors}")
-
-  uploaded_file = request.FILES['file']
-  dest_path = request.GET.get('dest')
+  # if not form.is_valid():
+  #   raise Exception(f"Error in upload form: {form.errors}")
 
   filepath = request.fs.join(dest_path, uploaded_file.name)
 
@@ -813,16 +818,16 @@ def get_available_space_for_upload(request):
 
 @api_error_handler
 def bulk_op(request, op):
-  # TODO: Check if this is correct way to fetch path_list value.
   # TODO: Also try making a generic request data fetching helper method
-  path_list = request.POST.getlist('dest_path_list') if op in ('copy', 'move') else request.POST.getlist('path_list')
   bulk_dict = request.POST.copy()
+  path_list = request.POST.getlist('source_path') if op in (copy, move) else request.POST.getlist('path')
 
   error_dict = {}
   for p in path_list:
+
     tmp_dict = bulk_dict
-    if op in ('copy', 'move'):  # TODO: Check if chmod is also special case for permissions to calculate mode
-      tmp_dict['destination_path'] = p
+    if op in (copy, move):  # TODO: Check if chmod is also special case for permissions to calculate mode
+      tmp_dict['source_path'] = p
     else:
       tmp_dict['path'] = p
 
@@ -831,7 +836,7 @@ def bulk_op(request, op):
 
     if response.status_code != 200:
       error_dict[p] = {'error': response.content}
-      if op == 'copy' and p.startswith('ofs://'):
+      if op == copy and p.startswith('ofs://'):
         error_dict[p].update({'ofs_skip_files': response.content})
 
   if error_dict:
