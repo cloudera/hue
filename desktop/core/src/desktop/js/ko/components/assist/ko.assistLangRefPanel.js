@@ -33,7 +33,7 @@ const TEMPLATE = `
     <!-- ko if: $data.length -->
     <ul class="assist-docs-topic-tree " data-bind="foreach: $data">
       <li>
-        <a class="black-link" href="javascript: void(0);" data-bind="click: $component.selectTopic, toggle: open">
+        <a class="black-link" href="javascript: void(0);" data-bind="click:  $component.selectTopic, toggle: open">
           <i class="fa fa-fw" style="font-size: 12px;" data-bind="css: { 'fa-chevron-right': children.length && !open(), 'fa-chevron-down': children.length && open() }"></i>
           <span class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $component.selectedTopic() === $data }, text: title"></span>
         </a>
@@ -82,7 +82,7 @@ const TEMPLATE = `
       </div>
       <!-- ko if: selectedTopic -->
       <div class="assist-flex-60 assist-docs-details" data-bind="with: selectedTopic">
-        <div class="assist-panel-close"><button class="close" data-bind="click: function() { $component.selectedTopic(undefined); }">&times;</button></div>
+        <div class="assist-panel-close"><button class="close" data-bind="click: $component.closeTopic">&times;</button></div>
         <div data-bind="htmlUnsecure: bodyMatch() || body()"></div>
       </div>
       <!-- /ko -->
@@ -107,9 +107,7 @@ class LanguageReferenceTopic {
     this.open = ko.observable(false);
     this.titleMatch = ko.observable();
   }
-
-
-
+  
   load() {
     if (this.body() || this.loading()) {
       return this.loadDeferred.promise();
@@ -139,6 +137,7 @@ class AssistLangRefPanel {
       hive: []
     };
 
+    this.closeTopic = this.closeTopic.bind(this);
     window.IMPALA_DOC_TOP_LEVEL.forEach(topLevelItem => {
       this.allTopics.impala.push(new LanguageReferenceTopic(topLevelItem, window.IMPALA_DOC_INDEX));
     });
@@ -336,10 +335,13 @@ class AssistLangRefPanel {
   }
 
   selectTopic(topic) {
-    console.log("selectTopic", topic);
     this.selectedTopic(topic);
   }
 
+  closeTopic() {
+    // Clear the selected topic to close the details view
+    this.selectedTopic(null);
+  }
 
 }
 
