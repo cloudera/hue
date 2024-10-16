@@ -156,6 +156,7 @@ const PathBrowser = ({
                     data-testid={`${testId}-dropdown`}
                   >
                     <BorderlessButton
+                      data-event=""
                       className="hue-path-browser__dropdown-button"
                       data-testid={`${testId}-dropdown-btn`}
                     >
@@ -190,6 +191,7 @@ const PathBrowser = ({
               )}
             </div>
             <BorderlessButton
+              data-event=""
               className="hue-path-browser__toggle-breadcrumb-input-btn"
               aria-label="hue-path-browser__toggle-breadcrumb-input-btn"
               title="Edit path"
@@ -216,6 +218,8 @@ const PathBrowser = ({
       </>
     );
   }
+
+  return <></>;
 };
 
 PathBrowser.defaultProps = defaultProps;

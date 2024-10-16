@@ -200,6 +200,9 @@ class ProxyFS(object):
   def get_content_summary(self, path):
     return self._get_fs(path).get_content_summary(path)
 
+  def trash_path(self, path):
+    return self._get_fs(path).trash_path(path)
+
   def create_home_dir(self, home_path=None):
     """
     Initially home_path will have path value for HDFS, try creating the user home dir for it first.

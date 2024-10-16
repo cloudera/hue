@@ -87,7 +87,6 @@ dynamic_patterns += [
   re_path(r'^desktop/status_bar/?$', desktop_views.status_bar),
   re_path(r'^desktop/debug/is_alive$', desktop_views.is_alive),
   re_path(r'^desktop/debug/is_idle$', desktop_views.is_idle),
-  re_path(r'^desktop/debug/threads$', desktop_views.threads, name="desktop.views.threads"),
   re_path(r'^desktop/debug/memory$', desktop_views.memory),
   re_path(r'^desktop/debug/check_config$', desktop_views.check_config, name="desktop.views.check_config"),
   re_path(r'^desktop/debug/check_config_ajax$', desktop_views.check_config_ajax),

@@ -1,0 +1,103 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+@use 'variables' as vars;
+
+.antd.cuix {
+  .hue-storage-file-page {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: vars.$fluidx-spacing-s;
+    padding: vars.$fluidx-spacing-s 0;
+
+    .meta-data {
+      display: flex;
+      gap: vars.$fluidx-spacing-s;
+      padding: vars.$fluidx-spacing-s;
+      background-color: vars.$fluidx-gray-040;
+      border-radius: vars.$border-radius-base;
+    }
+
+    .meta-data__group {
+      display: flex;
+      gap: vars.$fluidx-spacing-s;
+      border-right: 1px solid vars.$fluidx-gray-300;
+      padding-right: vars.$fluidx-spacing-s;
+
+      &:last-child {
+        border-right: none;
+      }
+    }
+
+    .meta-data__column {
+      display: flex;
+      flex-direction: column;
+
+    }
+
+    .meta-data__column-label {
+      font-size: vars.$font-size-sm;
+      color: vars.$fluidx-gray-700;
+      text-transform: uppercase;
+    }
+
+    .meta-data__column-value {
+      font-size: vars.$font-size-base;
+      color: vars.$fluidx-gray-900;
+    }
+
+    .preview {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .preview__title-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: vars.$fluidx-spacing-s;
+      padding: vars.$fluidx-spacing-s;
+      font-size: vars.$font-size-lg;
+      background-color: vars.$fluidx-gray-040;
+      color: vars.$fluidx-gray-700;
+      font-weight: vars.$fluidx-heading-h4-weight;
+      align-items: center;
+      border-bottom: 1px solid vars.$fluidx-gray-300;
+    }
+
+    .preview__action-group {
+      display: flex;
+      gap: vars.$fluidx-spacing-s;
+    }
+
+    .preview__textarea {
+      resize: none;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 0;
+      padding: vars.$fluidx-spacing-s;
+      box-shadow: none;
+    }
+
+    .preview__textarea[readonly] {
+      cursor: text;
+      color: vars.$fluidx-black;
+      background-color: vars.$fluidx-white;
+    }
+  }
+}

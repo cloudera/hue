@@ -14,11 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { ColumnProps } from 'antd/lib/table';
-import { Dropdown, Input } from 'antd';
+import { Dropdown, Input, Spin, Tooltip } from 'antd';
 import { MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
-import Tooltip from 'antd/es/tooltip';
 
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import SortAscending from '@cloudera/cuix-core/icons/react/SortAscendingIcon';
@@ -39,14 +38,15 @@ import { mkdir, touch } from '../../../../reactComponents/FileChooser/api';
 import {
   StorageBrowserTableData,
   SortOrder,
-  PathAndFileData,
-  BrowserViewType
+  PathAndFileData
 } from '../../../../reactComponents/FileChooser/types';
 import Pagination from '../../../../reactComponents/Pagination/Pagination';
 import StorageBrowserActions from '../StorageBrowserActions/StorageBrowserActions';
 import InputModal from '../../InputModal/InputModal';
+import formatBytes from '../../../../utils/formatBytes';
 
 import './StorageBrowserTable.scss';
+import { formatTimestamp } from '../../../../utils/dateTimeUtils';
 
 interface StorageBrowserTableProps {
   className?: string;
@@ -63,7 +63,6 @@ interface StorageBrowserTableProps {
   sortOrder: SortOrder;
   rowClassName?: string;
   refetchData: () => void;
-  setLoadingFiles: (value: boolean) => void;
   testId?: string;
 }
 
@@ -88,33 +87,32 @@ const StorageBrowserTable = ({
   pageSize,
   rowClassName,
   refetchData,
-  setLoadingFiles,
   testId,
   ...restProps
 }: StorageBrowserTableProps): JSX.Element => {
-  const [tableHeight, setTableHeight] = useState<number>();
+  const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
+  const [tableHeight, setTableHeight] = useState<number>(100);
   const [selectedFiles, setSelectedFiles] = useState<StorageBrowserTableData[]>([]);
   const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
   const [showNewFileModal, setShowNewFileModal] = useState<boolean>(false);
-  const [viewType, setViewType] = useState<BrowserViewType>(BrowserViewType.dir);
 
   const { t } = i18nReact.useTranslation();
 
   const tableData: StorageBrowserTableData[] = useMemo(() => {
-    return (
-      filesData?.files
-        ?.filter(file => !['.', '..'].includes(file.name)) // removes ..(previous folder) and .(current folder)
-        .map(file => ({
-          name: file.name,
-          size: file.humansize,
-          user: file.stats.user,
-          group: file.stats.group,
-          permission: file.rwx,
-          mtime: file.mtime,
-          type: file.type,
-          path: file.path
-        })) ?? []
-    );
+    if (!filesData?.files) {
+      return [];
+    }
+
+    return filesData?.files?.map(file => ({
+      name: file.name,
+      size: formatBytes(file.stats?.size),
+      user: file.stats.user,
+      group: file.stats.group,
+      permission: file.rwx,
+      mtime: file.stats?.mtime ? formatTimestamp(new Date(Number(file.stats.mtime) * 1000)) : '-',
+      type: file.type,
+      path: file.path
+    }));
   }, [filesData]);
 
   const newActionsMenuItems: MenuItemGroupType[] = [
@@ -172,7 +170,7 @@ const StorageBrowserTable = ({
 
   const getColumns = (file: StorageBrowserTableData) => {
     const columns: ColumnProps<StorageBrowserTableData>[] = [];
-    for (const [key] of Object.entries(file)) {
+    for (const key of Object.keys(file)) {
       const column: ColumnProps<StorageBrowserTableData> = {
         dataIndex: key,
         title: (
@@ -195,10 +193,9 @@ const StorageBrowserTable = ({
         key: `${key}`
       };
       if (key === 'name') {
-        column.width = '45%';
-        //TODO: Apply tooltip only for truncated values
+        column.width = '40%';
         column.render = (_, record: StorageBrowserTableData) => (
-          <Tooltip title={record.name}>
+          <Tooltip title={record.name} mouseEnterDelay={1.5}>
             <span className="hue-storage-browser__table-cell-icon">
               {record.type === 'dir' ? <FolderIcon /> : <FileOutlined />}
             </span>
@@ -206,7 +203,9 @@ const StorageBrowserTable = ({
           </Tooltip>
         );
       } else if (key === 'mtime') {
-        column.width = '15%';
+        column.width = '20%';
+      } else if (key === 'permission') {
+        column.width = '12%';
       }
       columns.push(column);
     }
@@ -301,14 +300,6 @@ const StorageBrowserTable = ({
     };
   }, []);
 
-  useEffect(() => {
-    if (filesData?.type === 'file') {
-      setViewType(BrowserViewType.file);
-    } else {
-      setViewType(BrowserViewType.dir);
-    }
-  }, [filesData]);
-
   const locale = {
     emptyText: t('Folder is empty')
   };
@@ -325,36 +316,32 @@ const StorageBrowserTable = ({
           }}
         />
         <div className="hue-storage-browser__actions-bar-right">
-          {viewType === BrowserViewType.dir && (
-            <>
-              <StorageBrowserActions
-                selectedFiles={selectedFiles}
-                setLoadingFiles={setLoadingFiles}
-                onSuccessfulAction={refetchData}
-              />
-              <Dropdown
-                overlayClassName="hue-storage-browser__actions-dropdown"
-                menu={{
-                  items: newActionsMenuItems,
-                  className: 'hue-storage-browser__action-menu'
-                }}
-                trigger={['hover', 'click']}
-              >
-                <PrimaryButton data-event={''}>
-                  {t('New')}
-                  <DropDownIcon />
-                </PrimaryButton>
-              </Dropdown>
-            </>
-          )}
+          <StorageBrowserActions
+            selectedFiles={selectedFiles}
+            setLoadingFiles={setLoadingFiles}
+            onSuccessfulAction={refetchData}
+          />
+          <Dropdown
+            overlayClassName="hue-storage-browser__actions-dropdown"
+            menu={{
+              items: newActionsMenuItems,
+              className: 'hue-storage-browser__action-menu'
+            }}
+            trigger={['hover', 'click']}
+          >
+            <PrimaryButton data-event="">
+              {t('New')}
+              <DropDownIcon />
+            </PrimaryButton>
+          </Dropdown>
         </div>
       </div>
 
-      {viewType === BrowserViewType.dir && (
+      <Spin spinning={loadingFiles}>
         <Table
           className={className}
-          columns={getColumns(tableData[0] ?? [])}
-          dataSource={tableData}
+          columns={getColumns(tableData[0] ?? {})}
+          dataSource={tableData?.slice(2)}
           onRow={onRowClicked}
           pagination={false}
           rowClassName={rowClassName}
@@ -368,23 +355,18 @@ const StorageBrowserTable = ({
           locale={locale}
           {...restProps}
         />
-      )}
 
-      {viewType === BrowserViewType.file && (
-        // TODO: code for file view
-        <div> File view</div>
-      )}
-
-      {filesData?.page && (
-        <Pagination
-          onNextPageButtonClicked={onNextPageButtonClicked}
-          onPageNumberChange={onPageNumberChange}
-          onPageSizeChange={onPageSizeChange}
-          onPreviousPageButtonClicked={onPreviousPageButtonClicked}
-          pageSize={pageSize}
-          pageStats={filesData?.page}
-        />
-      )}
+        {filesData?.page && (
+          <Pagination
+            onNextPageButtonClicked={onNextPageButtonClicked}
+            onPageNumberChange={onPageNumberChange}
+            onPageSizeChange={onPageSizeChange}
+            onPreviousPageButtonClicked={onPreviousPageButtonClicked}
+            pageSize={pageSize}
+            pageStats={filesData?.page}
+          />
+        )}
+      </Spin>
 
       <InputModal
         title={t('Create New Folder')}
