@@ -973,3 +973,117 @@ class TestEditor(object):
         assert 200 == response.status_code
     finally:
       doc.delete()
+
+
+@pytest.mark.django_db
+class TestPrivateURLPatterns():
+
+  def setup_method(self):
+    self.client = make_logged_in_client(username="api_user", recreate=True, is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="not_api_user", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="api_user")
+    self.user_not_me = User.objects.get(username="not_api_user")
+
+  def test_autocomplete_databases(self):
+    """
+    Test the autocomplete URL for databases
+    """
+    response = self.client.post('/notebook/api/autocomplete/')
+    assert response.status_code == 200
+
+  def test_autocomplete_tables(self):
+    """
+    Test the autocomplete URL for tables in a specific database
+    """
+    # Test with a valid database name
+    response = self.client.post('/notebook/api/autocomplete/test_db')
+    assert response.status_code == 200
+
+    # Test with a special character in the database name
+    response = self.client.post('/notebook/api/autocomplete/test_db:-;test')
+    assert response.status_code == 200
+
+  def test_autocomplete_columns(self):
+    """
+    Test the autocomplete URL for columns in a specific table within a database
+    """
+    # Test with valid database and table names
+    response = self.client.post('/notebook/api/autocomplete/test_db/test_table')
+    assert response.status_code == 200
+
+    # Test with special characters in the database and table names
+    response = self.client.post('/notebook/api/autocomplete/test_db:-$@test/test_table:-$@test')
+    assert response.status_code == 200
+
+  def test_describe_database(self):
+    """
+    Test the describe URL for a specific database
+    """
+    # Test with a valid database name
+    response = self.client.post('/notebook/api/describe/test_db/')
+    assert response.status_code == 200
+
+    # Test with a special character in the database name
+    response = self.client.post('/notebook/api/describe/test_db:-$@test/')
+    assert response.status_code == 200
+
+  def test_describe_table(self):
+    """
+    Test the describe URL for a specific table in a database
+    """
+    # Test with valid database and table names
+    response = self.client.post('/notebook/api/describe/test_db/test_table/')
+    assert response.status_code == 200
+
+    # Test with special characters in the database and table names
+    response = self.client.post('/notebook/api/describe/test_db:-$@test/test_table:-$@test/')
+    assert response.status_code == 200
+
+  def test_describe_column(self):
+    """
+    Test the describe URL for a specific column in a table within a database
+    """
+    # Test with valid database, table, and column names
+    response = self.client.post('/notebook/api/describe/test_db/test_table/stats/test_column/')
+    assert response.status_code == 200
+
+    # Test with special characters in the database, table, and column names
+    response = self.client.post('/notebook/api/describe/test_db:-$@test/test_table:-$@test/stats/test_column:-$@test/')
+    assert response.status_code == 200
+
+  def test_sample_data_for_table(self):
+    """
+    Test the sample data URL for a specific table in a database
+    """
+    # Test with valid database and table names
+    response = self.client.post('/notebook/api/sample/test_db/test_table/')
+    assert response.status_code == 200
+
+    # Test with special characters in the database and table names
+    response = self.client.post('/notebook/api/sample/test_db:-$@test/test_table:-$@test/')
+    assert response.status_code == 200
+
+  def test_sample_data_for_column(self):
+    """
+    Test the sample data URL for a specific column in a table within a database
+    """
+    # Test with valid database, table, and column names
+    response = self.client.post('/notebook/api/sample/test_db/test_table/test_column/')
+    assert response.status_code == 200
+
+    # Test with special characters in the database, table, and column names
+    response = self.client.post('/notebook/api/sample/test_db:-$@test/test_table:-$@test/test_column:-$@test/')
+    assert response.status_code == 200
+
+  def test_sample_data_for_nested(self):
+    """
+    Test the sample data URL for a specific nested field in a column of a table within a database
+    """
+    # Test with valid database, table, column, and nested field
+    response = self.client.post('/notebook/api/sample/test_db/test_table/test_column/test_nested/')
+    assert response.status_code == 200
+
+    # Test with special characters in the database, table, column, and nested field names
+    response = self.client.post('/notebook/api/sample/test_db:-$@test/test_table:-$@test/test_column:-$@test/test_nested:-$@test/')
+    assert response.status_code == 200
