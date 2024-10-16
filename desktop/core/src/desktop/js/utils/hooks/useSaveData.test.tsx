@@ -98,26 +98,6 @@ describe('useSaveData', () => {
     expect(mockPost).not.toHaveBeenCalled();
   });
 
-  it('should handle URL prefix correctly', async () => {
-    const { result } = renderHook(() => useSaveData(mockEndpoint, { urlPrefix: mockUrlPrefix }));
-
-    expect(result.current.data).toBeUndefined();
-    expect(result.current.error).toBeUndefined();
-    expect(result.current.loading).toBe(false);
-
-    act(() => {
-      result.current.save(mockBody);
-    });
-    expect(result.current.loading).toBe(true);
-
-    await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
-      expect(result.current.data).toEqual(mockData);
-      expect(result.current.error).toBeUndefined();
-      expect(result.current.loading).toBe(false);
-    });
-  });
-
   it('should update options correctly', async () => {
     const { result, rerender } = renderHook((props: { url: string }) => useSaveData(props.url), {
       initialProps: { url: mockUrl }

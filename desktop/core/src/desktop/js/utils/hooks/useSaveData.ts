@@ -18,7 +18,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiFetchOptions, post } from '../../api/utils';
 
 export interface Options<T> {
-  urlPrefix?: string;
   postOptions?: ApiFetchOptions<T>;
   skip?: boolean;
   onSuccess?: (data: T) => void;
@@ -59,8 +58,7 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
       setError(undefined);
 
       try {
-        const PostUrl = localOptions?.urlPrefix ? `${localOptions.urlPrefix}${url}` : url;
-        const response = await post<T, U>(PostUrl, body, postOptions);
+        const response = await post<T, U>(url, body, postOptions);
         setData(response);
         if (localOptions?.onSuccess) {
           localOptions.onSuccess(response);
