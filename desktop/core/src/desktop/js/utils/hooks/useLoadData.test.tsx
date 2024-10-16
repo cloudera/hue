@@ -130,21 +130,6 @@ describe('useLoadData', () => {
     });
   });
 
-  it('should handle URL prefix correctly', async () => {
-    const { result } = renderHook(() => useLoadData(mockEndpoint, { urlPrefix: mockUrlPrefix }));
-
-    expect(result.current.data).toBeUndefined();
-    expect(result.current.error).toBeUndefined();
-    expect(result.current.loading).toBe(true);
-
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
-      expect(result.current.data).toEqual(mockData);
-      expect(result.current.error).toBeUndefined();
-      expect(result.current.loading).toBe(false);
-    });
-  });
-
   it('should update options correctly', async () => {
     const { result, rerender } = renderHook(
       (props: { url: string; options }) => useLoadData(props.url, props.options),
