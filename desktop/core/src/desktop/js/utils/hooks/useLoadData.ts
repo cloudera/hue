@@ -18,7 +18,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiFetchOptions, get } from '../../api/utils';
 
 export interface Options<T, U> {
-  urlPrefix?: string;
   params?: U;
   fetchOptions?: ApiFetchOptions<T>;
   skip?: boolean;
@@ -63,8 +62,7 @@ const useLoadData = <T, U = unknown>(
       setError(undefined);
 
       try {
-        const fetchUrl = localOptions?.urlPrefix ? `${localOptions.urlPrefix}${url}` : url;
-        const response = await get<T, U>(fetchUrl, localOptions?.params, fetchOptions);
+        const response = await get<T, U>(url, localOptions?.params, fetchOptions);
         setData(response);
         if (localOptions?.onSuccess) {
           localOptions.onSuccess(response);

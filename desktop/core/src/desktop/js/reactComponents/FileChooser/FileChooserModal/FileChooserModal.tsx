@@ -72,10 +72,12 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
     }
   }, [fileSystemsData]);
 
-  const { data: filesData, loading: loadingFiles } = useLoadData<PathAndFileData>(filePath, {
-    urlPrefix: VIEWFILES_API_URl,
-    skip: !!filePath
-  });
+  const { data: filesData, loading: loadingFiles } = useLoadData<PathAndFileData>(
+    `${VIEWFILES_API_URl}${filePath}`,
+    {
+      skip: !!filePath
+    }
+  );
 
   return (
     <Modal

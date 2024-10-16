@@ -60,8 +60,7 @@ const StorageBrowserTabContent = ({
     data: filesData,
     loading,
     reloadData
-  } = useLoadData<PathAndFileData>(filePath, {
-    urlPrefix: VIEWFILES_API_URl,
+  } = useLoadData<PathAndFileData>(`${VIEWFILES_API_URl}${filePath}`, {
     params: {
       pagesize: pageSize.toString(),
       pagenum: pageNumber.toString(),
