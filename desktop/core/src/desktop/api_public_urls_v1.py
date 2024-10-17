@@ -54,10 +54,12 @@ urlpatterns += [
   re_path(r'^editor/close_statement/?$', api_public.close_statement, name='editor_close_statement'),
   re_path(r'^editor/get_logs/?$', api_public.get_logs, name='editor_get_logs'),
   re_path(r'^editor/get_history/?', api_public.get_history, name='editor_get_history'),
-  re_path(r'^editor/describe/(?P<database>[^/]*)/?$', api_public.describe, name='editor_describe_database'),
-  re_path(r'^editor/describe/(?P<database>[^/]*)/(?P<table>[\w_\-]+)/?$', api_public.describe, name='editor_describe_table'),
+  re_path(r'^editor/describe/(?P<database>[^/?]*)/?$', api_public.describe, name='editor_describe_database'),
+  re_path(r'^editor/describe/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$', api_public.describe, name='editor_describe_table'),
   re_path(
-    r'^editor/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', api_public.describe, name='editor_describe_column'
+    r'^editor/describe/(?P<database>[^/?]*)/(?P<table>[^/?]+)/stats(?:/(?P<column>[^/?]+))?/?$',
+    api_public.describe,
+    name='editor_describe_column'
   ),
   re_path(r'^editor/autocomplete/?$', api_public.autocomplete, name='editor_autocomplete_databases'),
   re_path(
@@ -66,28 +68,28 @@ urlpatterns += [
     name="editor_autocomplete_tables",
   ),
   re_path(
-    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$",
+    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$",
     api_public.autocomplete,
     name="editor_autocomplete_columns",
   ),
   re_path(
-    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$",
+    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/?$",
     api_public.autocomplete,
     name="editor_autocomplete_column",
   ),
   re_path(
-    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
+    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/(?P<nested>.+)/?$",
     api_public.autocomplete,
     name="editor_autocomplete_nested",
   ),
-  re_path(r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', api_public.get_sample_data, name='editor_sample_data'),
+  re_path(r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$', api_public.get_sample_data, name='editor_sample_data'),
   re_path(
-    r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
+    r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/?$',
     api_public.get_sample_data,
     name='editor_sample_data_column',
   ),
   re_path(
-      r"^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
+      r"^editor/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/(?P<nested>.+)/?$",
       api_public.get_sample_data,
       name="editor_sample_data_nested",
   ),
