@@ -14,42 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../components/styles/variables';
+import React from 'react';
+import { ConfigValue as ParentConfigValue} from './ConfigurationTab';
+import './Configuration.scss';
+import { ConfigurationKey } from './ConfigurationKey';
 
-.metrics-component.antd.cuix {
-  background-color: $fluidx-gray-100;
-  padding: 0 24px 24px 24px;
-
-  .metrics-heading {
-    font-size: $font-size-base;
-    font-weight: 500;
-    color: $fluidx-gray-900;
+export const ConfigurationValue: React.FC<{ record: ParentConfigValue }> = ({ record }) => {
+  if (record.values && record.values.length > 0) {
+    return (
+      <>
+        {record.values.map((value, index) => (
+          <div key={index} className={value.is_anonymous?"default-section-text":"child-config-item"}>
+            <ConfigurationKey record={value} />
+            <ConfigurationValue record={value} />
+          </div>
+        ))}
+      </>
+    );
   }
+  return (
+    <></>
+  );
+};
 
-  // .metrics-filter {
-  //   margin: $font-size-sm;
-  //   width: 30%;
-
-  //   input {
-  //     box-shadow: none;
-  //     -webkit-box-shadow: none;
-  //   }
-  // }
-
-  .metrics-table {
-    th {
-      width: 30%;
-      background-color: $fluidx-gray-040;
-    }
-
-    margin-bottom: $font-size-base;
-  }
-
-  // .metrics-select {
-  //   border: 1px solid $fluidx-gray-600;
-  //   border-radius: $border-radius-base;
-  //   background-color: $fluidx-white;
-  //   min-width: 200px;
-  //   height: 32px;
-  // }
-}
