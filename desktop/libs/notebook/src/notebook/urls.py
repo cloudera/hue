@@ -75,25 +75,25 @@ urlpatterns += [
   # HS2, RDBMS, JDBC
   re_path(r'^api/autocomplete/?$', notebook_api.autocomplete, name='api_autocomplete_databases'),
   re_path(r'^api/autocomplete/(?P<database>[^/?]*)/?$', notebook_api.autocomplete, name='api_autocomplete_tables'),
-  re_path(r'^api/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', notebook_api.autocomplete, name='api_autocomplete_columns'),
+  re_path(r'^api/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$', notebook_api.autocomplete, name='api_autocomplete_columns'),
   re_path(
-    r'^api/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
+    r'^api/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/?$',
     notebook_api.autocomplete,
     name='api_autocomplete_column'
   ),
   re_path(
-    r'^api/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$',
+    r'^api/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/(?P<nested>.+)/?$',
     notebook_api.autocomplete,
     name='api_autocomplete_nested'
   ),
-  re_path(r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
+  re_path(r'^api/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$', notebook_api.get_sample_data, name='api_sample_data'),
   re_path(
-    r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
+    r'^api/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/?$',
     notebook_api.get_sample_data,
     name='api_sample_data_column'
   ),
   re_path(
-    r'^api/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$',
+    r'^api/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/(?P<nested>.+)/?$',
     notebook_api.get_sample_data,
     name='api_sample_data_nested'
   ),
@@ -122,9 +122,11 @@ urlpatterns += [
 
 # Table API
 urlpatterns += [
-  re_path(r'^api/describe/(?P<database>[^/]*)/?$', notebook_api.describe, name='api_describe_database'),
-  re_path(r'^api/describe/(?P<database>[^/]*)/(?P<table>[\w_\-]+)/?$', notebook_api.describe, name='api_describe_table'),
+  re_path(r'^api/describe/(?P<database>[^/?]*)/?$', notebook_api.describe, name='api_describe_database'),
+  re_path(r'^api/describe/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$', notebook_api.describe, name='api_describe_table'),
   re_path(
-    r'^api/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', notebook_api.describe, name='api_describe_column'
+    r'^api/describe/(?P<database>[^/?]*)/(?P<table>[^/?]+)/stats(?:/(?P<column>[^/?]+))?/?$',
+    notebook_api.describe,
+    name='api_describe_column'
   ),
 ]

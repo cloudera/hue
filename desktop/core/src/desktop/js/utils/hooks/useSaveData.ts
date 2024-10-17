@@ -15,60 +15,56 @@
 // limitations under the License.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ApiFetchOptions, get } from '../../api/utils';
+import { ApiFetchOptions, post } from '../../api/utils';
 
-export interface Options<T, U> {
-  params?: U;
-  fetchOptions?: ApiFetchOptions<T>;
+export interface Options<T> {
+  postOptions?: ApiFetchOptions<T>;
   skip?: boolean;
   onSuccess?: (data: T) => void;
   onError?: (error: Error) => void;
 }
 
-interface UseLoadDataProps<T> {
+interface UseSaveData<T, U> {
   data?: T;
   loading: boolean;
   error?: Error;
-  reloadData: () => void;
+  save: (body: U) => void;
 }
 
-const useLoadData = <T, U = unknown>(
-  url?: string,
-  options?: Options<T, U>
-): UseLoadDataProps<T> => {
-  const [localOptions, setLocalOptions] = useState<Options<T, U> | undefined>(options);
+const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSaveData<T, U> => {
+  const [localOptions, setLocalOptions] = useState<Options<T> | undefined>(options);
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | undefined>();
 
-  const fetchOptionsDefault: ApiFetchOptions<T> = {
+  const postOptionsDefault: ApiFetchOptions<T> = {
     silenceErrors: false,
     ignoreSuccessErrors: true
   };
 
-  const fetchOptions = useMemo(
-    () => ({ ...fetchOptionsDefault, ...localOptions?.fetchOptions }),
+  const postOptions = useMemo(
+    () => ({ ...postOptionsDefault, ...localOptions?.postOptions }),
     [localOptions]
   );
 
-  const loadData = useCallback(
-    async (isForced: boolean = false) => {
-      // Avoid fetching data if the skip option is true
+  const saveData = useCallback(
+    async (body: U) => {
+      // Avoid Posting data if the skip option is true
       // or if the URL is not provided
-      if ((options?.skip && !isForced) || !url) {
+      if (options?.skip || !url) {
         return;
       }
       setLoading(true);
       setError(undefined);
 
       try {
-        const response = await get<T, U>(url, localOptions?.params, fetchOptions);
+        const response = await post<T, U>(url, body, postOptions);
         setData(response);
         if (localOptions?.onSuccess) {
           localOptions.onSuccess(response);
         }
       } catch (error) {
-        setError(error instanceof Error ? error : new Error(error));
+        setError(error);
         if (localOptions?.onError) {
           localOptions.onError(error);
         }
@@ -76,12 +72,8 @@ const useLoadData = <T, U = unknown>(
         setLoading(false);
       }
     },
-    [url, localOptions, fetchOptions]
+    [url, localOptions, postOptions]
   );
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
 
   useEffect(() => {
     // set new options if they are different (deep comparison)
@@ -90,7 +82,7 @@ const useLoadData = <T, U = unknown>(
     }
   }, [options]);
 
-  return { data, loading, error, reloadData: () => loadData(true) };
+  return { data, loading, error, save: saveData };
 };
 
-export default useLoadData;
+export default useSaveData;
