@@ -42,13 +42,23 @@ class TestTrinoApi(TestCase):
     cls.trino_api = TrinoApi(cls.user, interpreter=cls.interpreter)
 
   def test_format_identifier(self):
+    # db name test
     test_cases = [
       ("my_db", '"my_db"'),
-      ("my_db.table", '"my_db"."table"'),
+      ("my_catalog.my_db", '"my_catalog"."my_db"'),
     ]
 
     for database, expected_output in test_cases:
-      assert self.trino_api._format_identifier(database) == expected_output
+      assert self.trino_api._format_identifier(database, is_db=True) == expected_output
+
+    # table name test
+    test_cases = [
+      ("io.airlift.discovery.store:name=dynamic,type=distributedstore", '"io.airlift.discovery.store:name=dynamic,type=distributedstore"'),
+      ("table", '"table"'),
+    ]
+
+    for table, expected_output in test_cases:
+      assert self.trino_api._format_identifier(table) == expected_output
 
   def test_parse_api_url(self):
     # Test parse_api_url method
