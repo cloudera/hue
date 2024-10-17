@@ -313,7 +313,6 @@ def display(request):
   if not request.fs.isfile(path):
     return HttpResponse(f'{path} is not a file.', status=400)
 
-  stats = request.fs.stats(path)
   encoding = request.GET.get('encoding') or i18n.get_site_encoding()
 
   # Need to deal with possibility that length is not present
