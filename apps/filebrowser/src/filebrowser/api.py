@@ -22,16 +22,16 @@ import operator
 import mimetypes
 import posixpath
 
-from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
+from django.core.paginator import EmptyPage, Paginator
 from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
 from django.utils.http import http_date
 from django.utils.translation import gettext as _
 from django.views.static import was_modified_since
 
-from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
+from aws.s3.s3fs import S3ListAllBucketsException, get_s3_home_directory
 from azure.abfs.__init__ import get_abfs_home_directory
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, RAZ, TASK_SERVER_V2
+from desktop.conf import TASK_SERVER_V2
 from desktop.lib import fsmanager, i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import JsonResponse
@@ -41,11 +41,9 @@ from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from filebrowser.conf import (
-  ARCHIVE_UPLOAD_TEMPDIR,
   ENABLE_EXTRACT_UPLOADED_ARCHIVE,
   FILE_DOWNLOAD_CACHE_CONTROL,
   MAX_FILE_SIZE_UPLOAD_LIMIT,
-  MAX_SNAPPY_DECOMPRESSION_SIZE,
   REDIRECT_DOWNLOAD,
   SHOW_DOWNLOAD_BUTTON,
   SHOW_UPLOAD_BUTTON,
@@ -56,8 +54,6 @@ from filebrowser.lib import xxd
 from filebrowser.lib.rwx import compress_mode
 from filebrowser.utils import parse_broker_url
 from filebrowser.views import (
-  BYTES_PER_LINE,
-  BYTES_PER_SENTENCE,
   DEFAULT_CHUNK_SIZE_BYTES,
   MAX_CHUNK_SIZE_BYTES,
   MAX_FILEEDITOR_SIZE,
@@ -241,13 +237,6 @@ def listdir_paged(request):
   if hasattr(request, 'doas'):
     do_as = request.doas
 
-  # if request.fs._get_scheme(path) == 'hdfs':
-  #   home_dir_path = request.user.get_home_directory()
-  # else:
-  #   home_dir_path = None
-
-  # breadcrumbs = parse_breadcrumbs(path)
-
   try:
     if do_as:
       all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
@@ -278,7 +267,7 @@ def listdir_paged(request):
     shown_stats = page.object_list
   except EmptyPage:
     message = "No results found for the requested page."
-    LOG.warn(message)
+    LOG.warning(message)
     return HttpResponse(message, status=404)  # TODO: status code?
 
   if page:
@@ -291,31 +280,18 @@ def listdir_paged(request):
   is_fs_superuser = is_hdfs and _is_hdfs_superuser(request)
 
   response = {
-    # 'path': path,
-    # 'breadcrumbs': breadcrumbs,
-    # 'current_request_path': '/filebrowser/view=' + urllib_quote(path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
     'is_trash_enabled': is_trash_enabled,
     'files': page.object_list if page else [],
     'page': _massage_page(page, paginator) if page else {},  # TODO: Check if we need to clean response of _massage_page
-    'pagesize': pagesize,
-    # 'home_directory': home_dir_path if home_dir_path and request.fs.isdir(home_dir_path) else None,
-    # 'descending': descending_param,
     # The following should probably be deprecated
     # TODO: Check what to keep or what to remove? or move some fields to /get_config?
     'cwd_set': True,
     'file_filter': 'any',
-    # 'current_dir_path': path,
     'is_fs_superuser': is_fs_superuser,
     'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
     'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
     'superuser': request.fs.superuser,
     'supergroup': request.fs.supergroup,
-    # 'is_sentry_managed': request.fs.is_sentry_managed(path),
-    # 'apps': list(appmanager.get_apps_dict(request.user).keys()),
-    'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
-    'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
-    # 'is_embeddable': request.GET.get('is_embeddable', False),
-    # 's3_listing_not_allowed': s3_listing_not_allowed
   }
 
   return JsonResponse(response)
@@ -336,12 +312,6 @@ def display(request):
 
   if not request.fs.isfile(path):
     return HttpResponse(f'{path} is not a file.', status=400)
-
-  # TODO: Check if we still need this or not
-  # # display inline files just if it's not an ajax request
-  # if not is_ajax(request):
-  #   if _can_inline_display(path):
-  #     return redirect(reverse('filebrowser:filebrowser_views_download', args=[path]) + '?disposition=inline')
 
   stats = request.fs.stats(path)
   encoding = request.GET.get('encoding') or i18n.get_site_encoding()
@@ -396,31 +366,22 @@ def display(request):
 
   # TODO: Check what all UI needs and clean the field below, currently commenting out few duplicates which needs to be verified.
 
-  # dirname = posixpath.dirname(path)
-  # Start with index-like data:
-
   stats = request.fs.stats(path)
   data = _massage_stats(request, stat_absolute_path(path, stats))  # TODO: Stats required again?
-  # data["is_embeddable"] = request.GET.get('is_embeddable', False)
 
   # And add a view structure:
-  # data["success"] = True
   data["view"] = {
     'offset': offset,
     'length': length,
     'end': offset + len(contents),
-    # 'dirname': dirname,
     'mode': mode,
     'compression': compression,
     # 'size': stats.size,
     'max_chunk_size': str(MAX_CHUNK_SIZE_BYTES),
   }
-  # data["filename"] = os.path.basename(path)
+
   data["editable"] = stats.size < MAX_FILEEDITOR_SIZE  # TODO: To improve this limit and sent it as /get_config? Needs discussion.
   data['view']['contents'] = file_contents
-
-  # data['breadcrumbs'] = parse_breadcrumbs(path)
-  # data['show_download_button'] = SHOW_DOWNLOAD_BUTTON.get()  # TODO: Add as /get_config?
 
   return JsonResponse(data)
 
@@ -524,7 +485,6 @@ def _upload_file(request):
     {
       'path': filepath,
       'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
-      # 'next': request.GET.get("next")
     }
   )
 
