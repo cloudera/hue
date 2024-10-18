@@ -19,20 +19,16 @@
 The HQLdesign class can (de)serialize a design to/from a QueryDict.
 """
 
-from builtins import object
+import sys
 import json
 import logging
-import sys
+from builtins import object
 
 import django.http
+from django.utils.translation import gettext as _
 
-from beeswax.design import normalize_form_dict, denormalize_form_dict, split_statements
+from beeswax.design import denormalize_form_dict, normalize_form_dict, split_statements
 from notebook.sql_utils import strip_trailing_semicolon
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger()
 
@@ -43,12 +39,12 @@ class SQLdesign(object):
   """
   Represents an SQL design, with methods to perform (de)serialization.
   """
-  _QUERY_ATTRS = [ 'query', 'type', 'database', 'server' ]
+  _QUERY_ATTRS = ['query', 'type', 'database', 'server']
 
   def __init__(self, form=None, query_type=None):
     """Initialize the design from a valid form data."""
     if form is not None:
-      self._data_dict = dict(query = normalize_form_dict(form, SQLdesign._QUERY_ATTRS))
+      self._data_dict = dict(query=normalize_form_dict(form, SQLdesign._QUERY_ATTRS))
       if query_type is not None:
         self._data_dict['query']['type'] = query_type
 
@@ -98,7 +94,8 @@ class SQLdesign(object):
   @property
   def statements(self):
     sql_query = strip_trailing_semicolon(self.sql_query)
-    return [strip_trailing_semicolon(statement.strip()) for (start_row, start_col), (end_row, end_col), statement in split_statements(sql_query)]
+    return [
+      strip_trailing_semicolon(statement.strip()) for (start_row, start_col), (end_row, end_col), statement in split_statements(sql_query)]
 
   @staticmethod
   def loads(data):

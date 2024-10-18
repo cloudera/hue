@@ -15,19 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-import logging
-import socket
 import sys
+import socket
+import logging
 import threading
 import traceback
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import StringIO as string_io
 
 LOG = logging.getLogger()
 

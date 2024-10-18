@@ -19,19 +19,14 @@
 Library methods to deal with non-ascii data
 """
 
-import codecs
-import logging
 import os
 import re
-import sys
+import codecs
+import logging
 
-import desktop.conf
 import django.utils.encoding
 
-if sys.version_info[0] > 2:
-  from django.utils.encoding import smart_str as django_smart_unicode
-else:
-  from django.utils.encoding import smart_text as django_smart_unicode
+import desktop.conf
 
 SITE_ENCODING = None
 REPLACEMENT_CHAR = u'\ufffd'
@@ -52,6 +47,7 @@ def get_site_encoding():
     SITE_ENCODING = encoding
   return SITE_ENCODING
 
+
 def validate_encoding(encoding):
   """Return True/False on whether the system understands this encoding"""
   try:
@@ -60,36 +56,25 @@ def validate_encoding(encoding):
   except LookupError:
     return False
 
-def smart_unicode(s, strings_only=False, errors='strict', encoding=None):
-  """
-  Wrapper around Django's version, while supplying our configured encoding.
-  Decode char array to unicode.
-  For py3 -> this is becoming a 'string' now (no more 'unicode' in py3).
-  """
-
-  return django_smart_unicode(
-    s, encoding if encoding is not None else get_site_encoding(), strings_only, errors)
 
 def force_unicode(s, strings_only=False, errors='strict'):
   """
   Wrapper around Django's version, while supplying our configured encoding.
   Decode char array to unicode.
   """
-  if sys.version_info[0] > 2:
-    return django.utils.encoding.force_str(s, get_site_encoding(), strings_only, errors)
-  else:
-    return django.utils.encoding.force_unicode(s, get_site_encoding(), strings_only, errors)
+  return django.utils.encoding.force_str(s, get_site_encoding(), strings_only, errors)
 
-def smart_str(s, strings_only=False, errors='strict'):
+
+def smart_str(s, strings_only=False, errors='strict', encoding=None):
   """
   Wrapper around Django's version, while supplying our configured encoding.
   Encode unicode into char array.
   """
-  return django.utils.encoding.smart_str(
-        s, get_site_encoding(), strings_only, errors)
+  return django.utils.encoding.smart_str(s, encoding if encoding is not None else get_site_encoding(), strings_only, errors)
 
 
 _CACHED_ENV = None
+
 
 def make_utf8_env():
   """
@@ -99,7 +84,7 @@ def make_utf8_env():
   if not _CACHED_ENV:
     # LANG are in the form of <language>[.<encoding>[@<modifier>]]
     # We want to replace the "encoding" part with UTF-8
-    lang_re = re.compile('\.([^@]*)')
+    lang_re = re.compile(r'\.([^@]*)')
 
     env = os.environ.copy()
     lang = env.get('LANG', DEFAULT_LANG)

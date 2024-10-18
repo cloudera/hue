@@ -17,15 +17,11 @@
 
 import sys
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
 from desktop.appmanager import get_apps_dict
-
+from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool
 from notebook.conf import get_ordered_interpreters
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 
 def is_enabled():
@@ -91,6 +87,7 @@ ALLOW_UNSECURE_HTML = Config(
   default=False
 )
 
+
 def get_properties():
   if ENGINES.get():
     engines = ENGINES.get()
@@ -111,6 +108,7 @@ def get_properties():
         'nesting': False,
       },
     }
+
 
 def get_engines(user):
   engines = []
@@ -137,7 +135,6 @@ def get_engines(user):
     ]
 
   return engines
-
 
 
 ENGINES = UnspecifiedConfigSection(

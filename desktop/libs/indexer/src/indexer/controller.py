@@ -16,34 +16,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
+import os
+import sys
 import json
+import shutil
 import logging
 import numbers
-import os
-import shutil
-import sys
+from builtins import object
 
 import tablib
+from django.utils.translation import gettext as _
 
-from desktop.lib.exceptions_renderable import PopupException
 from dashboard.models import Collection2
+from desktop.lib.exceptions_renderable import PopupException
+from indexer.conf import CORE_INSTANCE_DIR
+from indexer.solr_client import SolrClient
+from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
 from libsolr.api import SolrApi
 from libzookeeper.models import ZookeeperClient
-from search.conf import SOLR_URL, SECURITY_ENABLED
-
-from indexer.conf import CORE_INSTANCE_DIR
-from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
-from indexer.solr_client import SolrClient
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from search.conf import SECURITY_ENABLED, SOLR_URL
 
 LOG = logging.getLogger()
-MAX_UPLOAD_SIZE = 100 * 1024 * 1024 # 100 MB
+MAX_UPLOAD_SIZE = 100 * 1024 * 1024  # 100 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored')]
 ZK_SOLR_CONFIG_NAMESPACE = 'configs'
@@ -124,13 +118,13 @@ class CollectionManagerController(object):
       try:
         fields = api.schema_fields(collection_or_core_name)
         fields = Collection2._make_luke_from_schema_fields(fields)
-      except:
+      except Exception:
         LOG.exception(_('Could not fetch fields for collection %s.') % collection_or_core_name)
         raise PopupException(_('Could not fetch fields for collection %s. See logs for more info.') % collection_or_core_name)
 
     try:
       uniquekey = api.uniquekey(collection_or_core_name)
-    except:
+    except Exception:
       LOG.exception(_('Could not fetch unique key for collection %s.') % collection_or_core_name)
       raise PopupException(_('Could not fetch unique key for collection %s. See logs for more info.') % collection_or_core_name)
 
@@ -200,7 +194,6 @@ class CollectionManagerController(object):
       shutil.rmtree(instancedir)
       raise PopupException(_('Could not create collection. Check error logs for more info.'))
 
-
   def delete_collection(self, name, core):
     """
     Delete solr collection/core and instance dir
@@ -263,7 +256,13 @@ class CollectionManagerController(object):
           data = json.dumps([value for value in field_values_from_log(fh, fields)])
           content_type = 'json'
         elif data_type == 'separated':
-          data = json.dumps([value for value in field_values_from_separated_file(fh, kwargs.get('separator', ','), kwargs.get('quote_character', '"'), fields)], indent=2)
+          data = json.dumps(
+            [
+              value
+              for value in field_values_from_separated_file(fh, kwargs.get('separator', ','), kwargs.get('quote_character', '"'), fields)
+            ],
+            indent=2,
+          )
           content_type = 'json'
         else:
           raise PopupException(_('Could not update index. Unknown type %s') % data_type)

@@ -9,10 +9,7 @@ from django.db import models
 from oozie.importlib.jobdesigner import convert_jobsub_design
 from oozie.models import Workflow, Kill, Start, End
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 class Migration(DataMigration):

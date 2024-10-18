@@ -15,35 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import sys
 import json
 import logging
-import os
-from lxml import etree
-import sys
 
 from django.core import management
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils.translation import gettext as _
+from lxml import etree
 
 from desktop.conf import USE_NEW_EDITOR
 from desktop.models import Directory, Document, Document2, Document2Permission
 from hadoop import cluster
 from liboozie.submittion import create_directories
 from notebook.models import make_notebook
-
-from useradmin.models import get_default_user_group, install_sample_user
-
-from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR, ENABLE_V2
-from oozie.models import Workflow, Coordinator, Bundle
-from oozie.importlib.workflows import import_workflow_root
-from oozie.importlib.coordinators import import_coordinator_root
+from oozie.conf import ENABLE_V2, LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
 from oozie.importlib.bundles import import_bundle_root
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from oozie.importlib.coordinators import import_coordinator_root
+from oozie.importlib.workflows import import_workflow_root
+from oozie.models import Bundle, Coordinator, Workflow
+from useradmin.models import get_default_user_group, install_sample_user
 
 LOG = logging.getLogger()
 
@@ -71,8 +64,7 @@ class Command(BaseCommand):
           workflow.save()
           Workflow.objects.initialize(workflow)
           import_workflow_root(workflow=workflow, workflow_definition_root=workflow_root, metadata=metadata, fs=self.fs)
-          workflow.doc.all().delete() # Delete doc as it messes up the example sharing
-
+          workflow.doc.all().delete()  # Delete doc as it messes up the example sharing
 
   def _import_coordinators(self, directory):
 
@@ -93,7 +85,6 @@ class Command(BaseCommand):
           coordinator.save()
           import_coordinator_root(coordinator=coordinator, coordinator_definition_root=coordinator_root, metadata=metadata)
 
-
   def _import_bundles(self, directory):
 
     for example_directory_name in os.listdir(directory):
@@ -113,7 +104,6 @@ class Command(BaseCommand):
           bundle.name = bundle_root.get('name')
           bundle.save()
           import_bundle_root(bundle=bundle, bundle_definition_root=bundle_root, metadata=metadata)
-
 
   def _install_mapreduce_example(self):
     doc2 = None
@@ -275,7 +265,6 @@ class Command(BaseCommand):
 
     return doc2
 
-
   def _install_pyspark_example(self):
     doc2 = None
     name = _('PySpark Pi Estimator Job')
@@ -332,7 +321,6 @@ class Command(BaseCommand):
     unmanaged_dir = os.path.join(data_dir, 'unmanaged')
     self._import_workflows(unmanaged_dir, managed=False)
 
-
   def handle(self, *args, **options):
     self.user = install_sample_user()
     self.fs = cluster.get_hdfs()
@@ -369,10 +357,7 @@ class Command(BaseCommand):
 
     if ENABLE_V2.get():
       with transaction.atomic():
-        if sys.version_info[0] > 2:
-          management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
-        else:
-          management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2, commit=False)
+        management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
 
     # Install editor oozie examples without doc1 link
     LOG.info("Using Hue 4, will install oozie editor samples.")

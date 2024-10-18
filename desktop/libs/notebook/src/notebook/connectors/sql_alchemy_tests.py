@@ -16,27 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
-import pytest
 import sys
+import logging
+from builtins import object
+from unittest.mock import MagicMock, Mock, patch
 
+import pytest
 from sqlalchemy.exc import UnsupportedCompilationError
-from sqlalchemy.types import NullType, ARRAY, JSON, VARCHAR
+from sqlalchemy.types import ARRAY, JSON, VARCHAR, NullType
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
-from useradmin.models import User
-
 from notebook.connectors.base import AuthenticationRequired
-from notebook.connectors.sql_alchemy import SqlAlchemyApi, Assist
-
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
+from notebook.connectors.sql_alchemy import Assist, SqlAlchemyApi
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
@@ -55,7 +48,6 @@ class TestApi(object):
       },
     }
 
-
   def test_column_backticks_escaping(self):
     interpreter = {
       'name': 'hive',
@@ -73,7 +65,6 @@ class TestApi(object):
     }
     assert SqlAlchemyApi(self.user, interpreter).backticks == '"'
 
-
   def test_create_athena_engine(self):
     interpreter = {
       'name': 'hive',
@@ -86,7 +77,6 @@ class TestApi(object):
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       SqlAlchemyApi(self.user, interpreter)._create_engine()
 
-
   def test_fetch_result_empty(self):
     notebook = Mock()
     snippet = {'result': {'handle': {'guid': 'guid-1'}}}
@@ -97,7 +87,7 @@ class TestApi(object):
       CONNECTIONS.get = Mock(
         return_value={
           'result': Mock(
-            fetchmany=Mock(return_value=[]) # We have 0 rows
+            fetchmany=Mock(return_value=[])  # We have 0 rows
           ),
           'meta': MagicMock(
             __getitem__=Mock(return_value={'type': 'BIGINT_TYPE'}),
@@ -110,11 +100,10 @@ class TestApi(object):
 
       assert not data['has_more']
       assert data['has_more'] != []
-      assert data['has_more'] == False
+      assert data['has_more'] is False
 
       assert data['data'] == []
       assert data['meta']() == [{'type': 'BIGINT_TYPE'}]
-
 
   def test_fetch_result_rows(self):
     notebook = Mock()
@@ -126,7 +115,7 @@ class TestApi(object):
       CONNECTIONS.get = Mock(
         return_value={
           'result': Mock(
-            fetchmany=Mock(return_value=[['row1'], ['row2']]) # We have 2 rows
+            fetchmany=Mock(return_value=[['row1'], ['row2']])  # We have 2 rows
           ),
           'meta': MagicMock(
             __getitem__=Mock(return_value={'type': 'BIGINT_TYPE'}),
@@ -139,11 +128,10 @@ class TestApi(object):
 
       assert not data['has_more']
       assert data['has_more'] != []
-      assert data['has_more'] == False
+      assert data['has_more'] is False
 
       assert data['data'] == [['row1'], ['row2']]
       assert data['meta']() == [{'type': 'BIGINT_TYPE'}]
-
 
   def test_create_engine_auth_error(self):
     interpreter = {
@@ -156,7 +144,6 @@ class TestApi(object):
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       with pytest.raises(AuthenticationRequired):
         SqlAlchemyApi(self.user, interpreter)._create_engine()
-
 
   def test_create_engine_auth(self):
     interpreter = {
@@ -181,7 +168,6 @@ class TestApi(object):
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       SqlAlchemyApi(self.user, interpreter)._create_engine()
 
-
   def test_create_connection_error(self):
     interpreter = {
       'name': 'hive',
@@ -194,7 +180,6 @@ class TestApi(object):
       with pytest.raises(AuthenticationRequired):
         engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
         SqlAlchemyApi(self.user, interpreter)._create_connection(engine)
-
 
   def test_create_connection(self):
     interpreter = {
@@ -220,7 +205,6 @@ class TestApi(object):
       engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
       SqlAlchemyApi(self.user, interpreter)._create_connection(engine)
 
-
   def test_create_engine_with_impersonation(self):
     interpreter = {
       'name': 'hive',
@@ -235,7 +219,6 @@ class TestApi(object):
       engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
 
       create_engine.assert_called_with('presto://hue:8080/hue', pool_pre_ping=True)
-
 
     interpreter['options']['has_impersonation'] = True  # On
 
@@ -261,14 +244,12 @@ class TestApi(object):
 
       create_engine.assert_called_with('phoenix://hue:8080/hue', pool_pre_ping=False)
 
-
     interpreter['options']['has_impersonation'] = True  # On
 
     with patch('notebook.connectors.sql_alchemy.create_engine') as create_engine:
       engine = SqlAlchemyApi(self.user, interpreter)._create_engine()
 
       create_engine.assert_called_with('phoenix://test@hue:8080/hue', pool_pre_ping=False)
-
 
   def test_explain(self):
 
@@ -291,7 +272,6 @@ class TestApi(object):
 
         assert explanation == response['explanation']
 
-
   def test_check_status(self):
     notebook = Mock()
 
@@ -304,7 +284,6 @@ class TestApi(object):
       snippet = {'result': {'handle': {'guid': 'guid-1', 'has_result_set': True}}}
       response = SqlAlchemyApi(self.user, self.interpreter).check_status(notebook, snippet)
       assert response['status'] == 'available'
-
 
   def test_get_sample_data(self):
     snippet = Mock()
@@ -320,7 +299,6 @@ class TestApi(object):
           assert (
             response['full_headers'] ==
             [{'name': 'col1', 'type': 'STRING_TYPE', 'comment': ''}])
-
 
   def test_get_tables(self):
     snippet = MagicMock()
@@ -338,7 +316,6 @@ class TestApi(object):
             assert response['tables_meta'][0]['type'] == 'Table'
             assert response['tables_meta'][1]['type'] == 'View'
 
-
   def test_get_sample_data_table(self):
     snippet = Mock()
 
@@ -350,7 +327,6 @@ class TestApi(object):
           response = SqlAlchemyApi(self.user, self.interpreter).get_sample_data(snippet, database='database1', table='table1')
 
           assert response['rows'] == [[1], [2]]
-
 
   def test_dialect_trim_statement_semicolon(self):
     interpreter = {
@@ -385,7 +361,6 @@ class TestApi(object):
 
           execute.assert_called_with('SELECT 1')
 
-
   def test_get_log(self):
     notebook = Mock()
     snippet = MagicMock()
@@ -411,26 +386,22 @@ class TestDialects(object):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
 
-
   def test_backticks_with_connectors(self):
     interpreter = {'name': 'hive', 'options': {'url': 'dialect://'}, 'dialect_properties': {'sql_identifier_quote': '`'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
     assert data == 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n'
 
-
     interpreter = {'options': {'url': 'dialect://'}, 'dialect_properties': {'sql_identifier_quote': '"'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
     assert data == 'SELECT *\nFROM "db1"."table1"\nLIMIT 1000\n'
-
 
   def test_backticks_without_connectors(self):
     interpreter = {'name': 'hive', 'options': {'url': 'hive://'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
 
     assert data == 'SELECT *\nFROM `db1`.`table1`\nLIMIT 1000\n'
-
 
     interpreter = {'name': 'postgresql', 'options': {'url': 'postgresql://'}}
     data = SqlAlchemyApi(self.user, interpreter).get_browse_query(snippet=Mock(), database='db1', table='table1')
@@ -444,7 +415,6 @@ class TestAutocomplete(object):
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
-
 
   def test_empty_database_names(self):
     interpreter = {
@@ -480,6 +450,7 @@ class TestAutocomplete(object):
           col1 = MagicMock()
           col1.__getitem__.side_effect = col1_dict
           col1.get = col1_dict
+
           def col2_dict(key):
             return {
               'name': 'col2',
@@ -542,7 +513,6 @@ class TestUtils():
       assert api._get_column_type_name({'type': NullType}) == 'null'
       assert api._get_column_type_name({'type': ARRAY}) == 'array'
       assert api._get_column_type_name({'type': JSON}) == 'json'
-
 
   def test_fix_bigquery_db_prefixes(self):
     interpreter = {

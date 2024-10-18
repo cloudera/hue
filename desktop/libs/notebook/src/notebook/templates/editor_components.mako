@@ -21,7 +21,6 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
 
 from desktop import conf
 from desktop.auth.backend import is_admin
-from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko, antixss
 from desktop.webpack_utils import get_hue_bundles
 

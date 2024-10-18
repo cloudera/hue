@@ -16,26 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import logging
-import pytest
 import sys
+import logging
+from unittest.mock import Mock, patch
 
+import pytest
 from django.test import TestCase
 from requests.exceptions import ReadTimeout
 
+from beeswax.api import _autocomplete, get_functions
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from useradmin.models import User
-
-from beeswax.api import _autocomplete, get_functions
-
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
-
 
 LOG = logging.getLogger()
 
@@ -47,9 +39,8 @@ class TestApi():
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
-
   def test_autocomplete_time_out(self):
-    get_tables_meta=Mock(
+    get_tables_meta = Mock(
       side_effect=ReadTimeout("HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)")
     )
     db = Mock(
@@ -64,7 +55,6 @@ class TestApi():
         'code': 500,
         'error': "HTTPSConnectionPool(host='gethue.com', port=10001): Read timed out. (read timeout=120)"
       })
-
 
   def test_get_functions(self):
     db = Mock(
@@ -83,7 +73,6 @@ class TestApi():
       resp ==
       [{'name': 'f1'}, {'name': 'f2'}])
 
-
   def test_get_functions(self):
     with patch('beeswax.api._get_functions') as _get_functions:
       db = Mock()
@@ -97,12 +86,11 @@ class TestApi():
         resp['functions'] ==
         [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}])
 
-
   def test_get_function(self):
     db = Mock()
-    db.client = Mock(query_server = {'dialect': 'hive'})
+    db.client = Mock(query_server={'dialect': 'hive'})
     db.get_function = Mock(
-      return_value = [
+      return_value=[
         ['floor_month(param) - Returns the timestamp at a month granularity'],
         ['param needs to be a timestamp value'],
         ['Example:'],
@@ -123,8 +111,7 @@ class TestApi():
             '> SELECT floor_month(CAST(\'yyyy-MM-dd HH:mm:ss\' AS TIMESTAMP)) FROM src;\nyyyy-MM-01 00:00:00'
       })
 
-
-    db.client = Mock(query_server = {'dialect': 'impala'})
+    db.client = Mock(query_server={'dialect': 'impala'})
     data = _autocomplete(db, operation='function')
 
     assert data['function'] == {}

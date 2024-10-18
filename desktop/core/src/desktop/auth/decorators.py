@@ -1,5 +1,5 @@
 
-#!/usr/bin/env python
+# !/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,21 +16,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
-import sys
 
 from django.utils.functional import wraps
+from django.utils.translation import gettext as _
 
 from desktop.auth.backend import is_admin, is_hue_admin
 from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.exceptions_renderable import PopupException
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 

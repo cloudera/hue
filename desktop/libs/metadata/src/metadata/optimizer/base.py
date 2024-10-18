@@ -18,13 +18,10 @@
 import sys
 from builtins import object
 
-from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
+from django.utils.translation import gettext as _
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
 
 
 def get_api(user, interface):
@@ -49,7 +46,7 @@ class OptimizerApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 def check_privileges(view_func):

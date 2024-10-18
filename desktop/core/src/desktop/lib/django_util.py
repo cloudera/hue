@@ -17,40 +17,33 @@
 #
 # Utilities for django operations.
 
-from builtins import object
-import logging
 import re
 import json
 import socket
+import logging
 import datetime
-import sys
 
 from django.conf import settings
 from django.core import serializers
 from django.core.exceptions import FieldDoesNotExist
-from django.template import context as django_template_context
-from django.template.context_processors import csrf
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.http import QueryDict, HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.shortcuts import render as django_render
+from django.template import context as django_template_context
 from django.template.context import RequestContext
+from django.template.context_processors import csrf
 from django.template.loader import render_to_string as django_render_to_string
 from django.urls import reverse
-from django.utils.http import urlencode # this version is unicode-friendly
+from django.utils.http import urlencode  # this version is unicode-friendly
 from django.utils.timezone import get_current_timezone
+from django.utils.translation import gettext as _, ngettext as _t
 
 import desktop.conf
 import desktop.lib.thrift_util
 from desktop.lib import django_mako
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.monkey_patches import monkey_patch_request_context_init
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import ngettext as _t, gettext as _
-else:
-  from django.utils.translation import ungettext as _t, ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -59,14 +52,15 @@ DJANGO = 'django'
 MAKO = 'mako'
 
 # This is what Debian allows. See chkname.c in shadow.
-USERNAME_RE_RULE = "[^-:\s][^:\s]*"
+USERNAME_RE_RULE = r"[^-:\s][^:\s]*"
 GROUPNAME_RE_RULE = ".{,80}"
 
 django_template_context.RequestContext.__init__ = monkey_patch_request_context_init
 
 
 # For backward compatibility for upgrades to Hue 2.2
-class PopupException(object): pass
+class PopupException(object):
+  pass
 
 
 class Encoder(json.JSONEncoder):
@@ -88,18 +82,24 @@ class Encoder(json.JSONEncoder):
 
     return json.JSONEncoder.default(self, o)
 
+
 def get_username_re_rule():
   return USERNAME_RE_RULE
 
+
 def get_groupname_re_rule():
   return GROUPNAME_RE_RULE
+
 
 def login_notrequired(func):
   """A decorator for view functions to allow access without login"""
   func.login_notrequired = True
   return func
 
+
 _uri_prefix = None
+
+
 def get_desktop_uri_prefix():
   """
   Return the uri prefix where desktop is generally accessible.
@@ -138,13 +138,14 @@ def make_absolute(request, view_name, kwargs=None):
   """
   return request.build_absolute_uri(reverse(view_name, kwargs=kwargs))
 
+
 def _get_template_lib(template, kwargs):
   template_lib = kwargs.get('template_lib')
   if 'template_lib' in kwargs:
     del kwargs['template_lib']
 
   # Default based on file extension
-  if template_lib == None:
+  if template_lib is None:
     if template.endswith('.mako'):
       return MAKO
     else:
@@ -162,6 +163,7 @@ def _render_to_response(template, request, *args, **kwargs):
   else:
     raise Exception("Bad template lib: %s" % template_lib)
 
+
 def render_to_string(template, *args, **kwargs):
   """Wrapper around django.template.loader.render_to_string which supports
   different template libraries."""
@@ -172,6 +174,7 @@ def render_to_string(template, *args, **kwargs):
     return django_mako.render_to_string(template, *args, **kwargs)
   else:
     raise Exception("Bad template lib: %s" % template_lib)
+
 
 def format_preserving_redirect(request, target, get_dict=None):
   """
@@ -189,7 +192,7 @@ def format_preserving_redirect(request, target, get_dict=None):
     my_get_dict['is_embeddable'] = True
 
   if is_jframe_request(request):
-    logging.info("JFrame redirection" +  target)
+    logging.info("JFrame redirection" + target)
     my_get_dict['format'] = 'embed'
   elif request.ajax:
     my_get_dict['format'] = 'json'
@@ -203,6 +206,7 @@ def format_preserving_redirect(request, target, get_dict=None):
 
   return HttpResponseRedirect(target + param)
 
+
 def is_jframe_request(request):
   """
   The JFrame container uses ?format=embed to request
@@ -213,6 +217,7 @@ def is_jframe_request(request):
   """
   return request.META.get('HTTP_X_HUE_JFRAME') or \
       request.GET.get("format") == "embed"
+
 
 def render(template, request, data, json=None, template_lib=None, force_template=False, status=200, **kwargs):
   """
@@ -290,6 +295,7 @@ def encode_json(data, indent=None):
   """
   return json.dumps(data, indent=indent, cls=Encoder)
 
+
 def encode_json_for_js(data, indent=None):
   """
   Converts data into a JSON string.
@@ -299,10 +305,13 @@ def encode_json_for_js(data, indent=None):
   """
   return json.dumps(data, indent=indent, cls=JSONEncoderForHTML)
 
+
 VALID_JSON_IDENTIFIER = re.compile("^[a-zA-Z_$][a-zA-Z0-9_$]*$")
+
 
 class IllegalJsonpCallbackNameException(Exception):
   pass
+
 
 def render_json(data, jsonp_callback=None, js_safe=False, status=200):
   """
@@ -325,6 +334,7 @@ def render_json(data, jsonp_callback=None, js_safe=False, status=200):
 
   return HttpResponse(json, content_type='text/javascript', status=status)
 
+
 def update_if_dirty(model_instance, **kwargs):
   """
   Updates an instance of a model with kwargs.
@@ -339,6 +349,7 @@ def update_if_dirty(model_instance, **kwargs):
   if dirty:
     model_instance.save()
 
+
 def extract_field_data(field):
   """
   given a form field, return its value
@@ -351,12 +362,14 @@ def extract_field_data(field):
   else:
     return field.data
 
+
 def get_app_nice_name(app_name):
   try:
     return desktop.appmanager.get_desktop_module(app_name).settings.NICE_NAME
-  except:
+  except Exception:
     LOG.exception('failed to get nice name for app %s' % app_name)
     return app_name
+
 
 class TruncatingModel(models.Model):
   """
@@ -369,12 +382,13 @@ class TruncatingModel(models.Model):
   def __setattr__(self, name, value):
     try:
       field = self._meta.get_field(name)
-      if type(field) in [models.CharField, models.TextField] and type(value) == str:
+      if type(field) in [models.CharField, models.TextField] and type(value) is str:
         value = value[:field.max_length]
     except FieldDoesNotExist:
-      pass # This happens with foreign keys.
+      pass  # This happens with foreign keys.
 
     super.__setattr__(self, name, value)
+
 
 def reverse_with_get(view, args=None, kwargs=None, get=None):
   """
@@ -393,10 +407,12 @@ def reverse_with_get(view, args=None, kwargs=None, get=None):
     url = url + "?" + params
   return url
 
+
 def humanize_duration(seconds, abbreviate=False, separator=','):
   d = datetime.datetime.fromtimestamp(0)
   now = datetime.datetime.fromtimestamp(seconds)
   return timesince(d, now, abbreviate, separator)
+
 
 def timesince(d=None, now=None, abbreviate=False, separator=','):
   """

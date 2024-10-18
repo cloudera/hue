@@ -15,26 +15,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import logging
 import re
-import django.test.client
+import json
 from unittest.mock import Mock
 
+import django.test.client
+
 from desktop.conf import ENABLE_ORGANIZATIONS
-from useradmin.models import User, Group, Organization
+from useradmin.models import Group, User
 
 
 class Client(django.test.client.Client):
   """
   Extends client to have a get_json method.
   """
+
   def get_json(self, *args, **kwargs):
     response = self.get(*args, **kwargs)
     return json.JSONDecoder().decode(response.content)
 
 
-def make_logged_in_client(username="test", password="test", is_superuser=True, recreate=False, groupname=None, is_admin=False, request=None):
+def make_logged_in_client(
+  username="test", password="test", is_superuser=True, recreate=False, groupname=None, is_admin=False, request=None
+):
   """
   Create a client with a user already logged in.
 
@@ -78,7 +81,8 @@ def make_logged_in_client(username="test", password="test", is_superuser=True, r
   return c
 
 
-_MULTI_WHITESPACE = re.compile("\s+", flags=re.MULTILINE)
+_MULTI_WHITESPACE = re.compile(r"\s+", flags=re.MULTILINE)
+
 
 def compact_whitespace(s):
   """
@@ -86,6 +90,7 @@ def compact_whitespace(s):
   Also removes leading and trailing whitespace.
   """
   return _MULTI_WHITESPACE.sub(" ", s).strip()
+
 
 def assert_equal_mod_whitespace(first, second, msg=None):
   """
@@ -108,7 +113,7 @@ def configure_django_for_test():
 
 
 def create_tables(model):
-  """ Create all tables for the given model.
+  """Create all tables for the given model.
 
   This is a subset of django.core.management.commands.migrate
   """

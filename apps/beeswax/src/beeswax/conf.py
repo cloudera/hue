@@ -15,13 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import division
-
-import sys
 import math
 import logging
 import os.path
-from builtins import str
 
 from django.utils.translation import gettext as _, gettext_lazy as _t
 

@@ -343,9 +343,9 @@ def download_log_view(request):
       # in case it is rather big. So we write it to a file line by line
       # and pass that file to zipfile, which might follow a more efficient path.
       tmp = tempfile.NamedTemporaryFile()
-      log_tmp = tempfile.NamedTemporaryFile("w+t") if sys.version_info[0] == 2 else tempfile.NamedTemporaryFile("w+t", encoding='utf-8')
+      log_tmp = tempfile.NamedTemporaryFile("w+t", encoding='utf-8')
       for line in buffer:
-        log_tmp.write(smart_str(l, errors='replace'))
+        log_tmp.write(smart_str(line, errors='replace'))
       # This is not just for show - w/out flush, we often get truncated logs
       log_tmp.flush()
       t = time.time()
@@ -530,7 +530,7 @@ def serve_500_error(request, *args, **kwargs):
       else:
         tb = traceback.extract_tb(exc_info[2])
         if is_ajax(request):
-          tb = '\n'.join(tb.format() if sys.version_info[0] > 2 else [str(t) for t in tb])
+          tb = '\n'.join(tb.format())
         return render("500.mako", request, {'traceback': tb})
     else:
       # exc_info could be empty

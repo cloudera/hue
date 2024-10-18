@@ -15,19 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
-import posixpath
 import re
 import sys
+import logging
+import posixpath
+from builtins import object
 
-from hadoop.fs.hadoopfs import Hdfs
+from django.utils.translation import gettext as _
+
 from desktop.lib.exceptions_renderable import PopupException
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from hadoop.fs.hadoopfs import Hdfs
 
 LOG = logging.getLogger()
 
@@ -96,13 +93,13 @@ class Api(object):
 
   def apps(self, filters): return {'apps': [], 'total': 0}
 
-  def app(self, appid): return {} # Also contains progress (0-100) and status [RUNNING, SUCCEEDED, PAUSED, FAILED]
+  def app(self, appid): return {}  # Also contains progress (0-100) and status [RUNNING, SUCCEEDED, PAUSED, FAILED]
 
   def action(self, app_ids, operation): return {}
 
   def logs(self, appid, app_type, log_name, is_embeddable=False): return {'progress': 0, 'logs': ''}
 
-  def profile(self, appid, app_type, app_property, app_filters): return {} # Tasks, XML, counters...
+  def profile(self, appid, app_type, app_property, app_filters): return {}  # Tasks, XML, counters...
 
   def _set_request(self, request):
     self.request = request

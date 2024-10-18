@@ -15,23 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-import json
 import sys
-import urllib.request, urllib.parse, urllib.error
+import json
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from desktop.conf import DEFAULT_USER
-from desktop.lib.paths import get_desktop_root, SAFE_CHARACTERS_URI_COMPONENTS
-
+from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS, get_desktop_root
 from notebook.connectors.base import Notebook
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 def extract_archive_in_hdfs(request, upload_path, file_name):
   _upload_extract_archive_script_to_hdfs(request.fs)
@@ -40,18 +36,21 @@ def extract_archive_in_hdfs(request, upload_path, file_name):
   start_time = json.loads(request.POST.get('start_time', '-1'))
 
   shell_notebook = Notebook(
-      name=_('HDFS Extraction of %(upload_path)s/%(file_name)s') % {'upload_path': upload_path, 'file_name': file_name},
-      isManaged=True,
-      onSuccessUrl='/filebrowser/view=' + urllib.parse.quote(output_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS)
+    name=_('HDFS Extraction of %(upload_path)s/%(file_name)s') % {'upload_path': upload_path, 'file_name': file_name},
+    isManaged=True,
+    onSuccessUrl='/filebrowser/view=' + urllib.parse.quote(output_path.encode('utf-8'), safe=SAFE_CHARACTERS_URI_COMPONENTS),
   )
 
   shell_notebook.add_shell_snippet(
-      shell_command='extract_archive_in_hdfs.sh',
-      arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + file_name}, {'value': '-o=' + output_path}],
-      archives=[],
-      files=[{'value': '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'}, {"value": upload_path + '/' + urllib.parse.quote(file_name)}],
-      env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}],
-      last_executed=start_time
+    shell_command='extract_archive_in_hdfs.sh',
+    arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + file_name}, {'value': '-o=' + output_path}],
+    archives=[],
+    files=[
+      {'value': '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'},
+      {"value": upload_path + '/' + urllib.parse.quote(file_name)},
+    ],
+    env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}],
+    last_executed=start_time,
   )
 
   return shell_notebook.execute(request, batch=True)
@@ -63,6 +62,10 @@ def _upload_extract_archive_script_to_hdfs(fs):
     fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0o755)
 
   if not fs.do_as_user(DEFAULT_USER.get(), fs.exists, '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'):
-    fs.do_as_user(DEFAULT_USER.get(), fs.copyFromLocal, get_desktop_root() + '/core/src/desktop/lib/tasks/extract_archive/extract_in_hdfs.sh',
-                          '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh')
+    fs.do_as_user(
+      DEFAULT_USER.get(),
+      fs.copyFromLocal,
+      get_desktop_root() + '/core/src/desktop/lib/tasks/extract_archive/extract_in_hdfs.sh',
+      '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh',
+    )
     fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0o755)

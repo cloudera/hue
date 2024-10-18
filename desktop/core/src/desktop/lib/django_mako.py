@@ -24,8 +24,8 @@ import django.template
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import HttpResponse
-
-from mako.lookup import TemplateLookup, TemplateCollection
+from django.template.context_processors import csrf
+from mako.lookup import TemplateCollection, TemplateLookup
 
 from desktop.lib import apputil, i18n
 
@@ -34,12 +34,13 @@ register = django.template.Library()
 ENCODING_ERRORS = 'replace'
 
 # Things to automatically import into all template namespaces
-IMPORTS=[
+IMPORTS = [
   "from django.utils.html import escape",
   "from desktop.lib.django_mako import url",
   "from desktop.lib.django_mako import csrf_token",
   "from desktop.lib.django_mako import static",
 ]
+
 
 class DesktopLookup(TemplateCollection):
   """
@@ -63,7 +64,7 @@ class DesktopLookup(TemplateCollection):
     # and thus the temp dir would be owned as root, not the
     # unpriveleged user!
     if self.module_dir is None:
-      self.module_dir = tempfile.mkdtemp() # TODO(todd) configurable?
+      self.module_dir = tempfile.mkdtemp()  # TODO(todd) configurable?
     app_module = __import__(app)
     app_dir = os.path.dirname(app_module.__file__)
     app_template_dir = os.path.join(app_dir, 'templates')
@@ -88,7 +89,9 @@ class DesktopLookup(TemplateCollection):
     real_loader = self._get_loader(app)
     return real_loader.get_template(uri)
 
+
 lookup = DesktopLookup()
+
 
 def render_to_string_test(template_name, django_context):
   """
@@ -100,6 +103,7 @@ def render_to_string_test(template_name, django_context):
   from django.test import signals
   signals.template_rendered.send(sender=None, template=template_name, context=django_context)
   return render_to_string_normal(template_name, django_context)
+
 
 def render_to_string_normal(template_name, django_context):
   data_dict = dict()
@@ -114,10 +118,13 @@ def render_to_string_normal(template_name, django_context):
   template = lookup.get_template(template_name)
   data_dict = dict([(str(k), data_dict.get(k)) for k in list(data_dict.keys())])
   result = template.render(**data_dict)
-  return i18n.smart_unicode(result)
+  return i18n.smart_str(result)
 
 # This variable is overridden in test code.
+
+
 render_to_string = render_to_string_normal
+
 
 def render_to_response(template_name, data_dictionary, **kwargs):
   """
@@ -132,7 +139,6 @@ def url(view_name, *args, **view_args):
   from django.urls import reverse
   return reverse(view_name, args=args, kwargs=view_args)
 
-from django.template.context_processors import csrf
 
 def csrf_token(request):
   """
@@ -140,6 +146,7 @@ def csrf_token(request):
   """
   csrf_token = str(csrf(request)["csrf_token"])
   return str.format("<input type='hidden' name='csrfmiddlewaretoken' value='{0}' />", csrf_token)
+
 
 def static(path):
   """

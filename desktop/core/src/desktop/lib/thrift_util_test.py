@@ -14,41 +14,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from builtins import range
-from builtins import object
-import logging
 import os
-import pytest
-import socket
 import sys
-import threading
 import time
+import socket
+import logging
 import unittest
+import threading
+from unittest.mock import Mock, patch
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+import pytest
 
 gen_py_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gen-py"))
-if not gen_py_path in sys.path:
+if gen_py_path not in sys.path:
   sys.path.insert(1, gen_py_path)
 
-from djangothrift_test_gen import TestService
-from djangothrift_test_gen.ttypes import TestStruct, TestNesting, TestEnum, TestManyTypes
 from django.test import TestCase
+from djangothrift_test_gen import TestService
+from djangothrift_test_gen.ttypes import TestEnum, TestManyTypes, TestNesting, TestStruct
 from thrift.protocol.TBinaryProtocol import TBinaryProtocolFactory
 from thrift.server import TServer
 from thrift.transport import TSocket
 from thrift.transport.TTransport import TBufferedTransportFactory, TTransportException
 
-from desktop.lib import python_util, thrift_util
-from desktop.lib.thrift_util import jsonable2thrift, thrift2json, _unpack_guid_secret_in_handle
+from desktop.auth.backend import create_user, ensure_has_a_group, find_or_create_user, rewrite_user
 from desktop.conf import USE_THRIFT_HTTP_JWT
+from desktop.lib import python_util, thrift_util
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.auth.backend import rewrite_user, find_or_create_user, ensure_has_a_group, create_user
-
+from desktop.lib.thrift_util import _unpack_guid_secret_in_handle, jsonable2thrift, thrift2json
 from useradmin.models import User
 
 LOG = logging.getLogger()
@@ -90,7 +83,7 @@ class SimpleThriftServer(object):
                                        TBufferedTransportFactory(),
                                        TBinaryProtocolFactory())
       server.serve()
-    except:
+    except Exception:
       LOG.exception('failed to start thrift server')
       sys.exit(1)
 
@@ -105,7 +98,7 @@ class SimpleThriftServer(object):
         ping_s.connect(('localhost', self.port))
         ping_s.close()
         return
-      except:
+      except Exception:
         LOG.exception('failed to connect to child server')
         _, status = os.waitpid(self.pid, os.WNOHANG)
         if status != 0:
@@ -173,6 +166,7 @@ class TestWithThriftServer(object):
       racer.join()
       assert 0 == len(racer.errors)
 
+
 class ThriftUtilTest(TestCase):
   def test_simpler_string(self):
     struct = TestStruct()
@@ -224,38 +218,21 @@ class ThriftUtilTest(TestCase):
     assert struct1.myenumAsString == 'ENUM_ONE'
 
   def test_unpack_guid_secret_in_handle(self):
-    if sys.version_info[0] > 2:
-      hive_handle = ("(TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), catalogName=None,"
-      " schemaName='default', tableName='customers', tableTypes=None),"
-      ")") % (str(b'N\xc5\xed\x14k\xbeI\xda\xb9\x14\xe7\xf2\x9a\xb7\xf0\xa5'), str(b']s(\xb5\xf6ZO\x03\x99\x955\xacl\xb4\x98\xae'))
+    hive_handle = ("(TGetTablesReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), catalogName=None,"
+    " schemaName='default', tableName='customers', tableTypes=None),"
+    ")") % (str(b'N\xc5\xed\x14k\xbeI\xda\xb9\x14\xe7\xf2\x9a\xb7\xf0\xa5'), str(b']s(\xb5\xf6ZO\x03\x99\x955\xacl\xb4\x98\xae'))
 
-      assert (_unpack_guid_secret_in_handle(hive_handle) == ("(TGetTablesReq(sessionHandle=TSessionHandle(sessionId="
-      "THandleIdentifier(guid=da49be6b14edc54e:a5f0b79af2e714b9, secret=034f5af6b528735d:ae98b46cac359599)), catalogName=None, "
-      "schemaName=\'default\', tableName=\'customers\', tableTypes=None),)"))
+    assert (_unpack_guid_secret_in_handle(hive_handle) == ("(TGetTablesReq(sessionHandle=TSessionHandle(sessionId="
+    "THandleIdentifier(guid=da49be6b14edc54e:a5f0b79af2e714b9, secret=034f5af6b528735d:ae98b46cac359599)), catalogName=None, "
+    "schemaName=\'default\', tableName=\'customers\', tableTypes=None),)"))
 
-      impala_handle = ("(TExecuteStatementReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), "
-      "statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False)"
-      ",)") % (str(b'\xc4\xccnI\xf1\xbdJ\xc3\xb2\n\xd5[9\xe1Mr'), str(b'\xb0\x9d\xfd\x82\x94%L\xae\x9ch$f=\xfa{\xd0'))
+    impala_handle = ("(TExecuteStatementReq(sessionHandle=TSessionHandle(sessionId=THandleIdentifier(guid=%s, secret=%s)), "
+    "statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False)"
+    ",)") % (str(b'\xc4\xccnI\xf1\xbdJ\xc3\xb2\n\xd5[9\xe1Mr'), str(b'\xb0\x9d\xfd\x82\x94%L\xae\x9ch$f=\xfa{\xd0'))
 
-      assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TExecuteStatementReq(sessionHandle=TSessionHandle("
-      "sessionId=THandleIdentifier(guid=c34abdf1496eccc4:724de1395bd50ab2, secret=ae4c259482fd9db0:d07bfa3d6624689c)), "
-      "statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False),)"))
-    else:
-      hive_handle = ("(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle(sessionId=THandleIdentifier("
-      "secret=\'\x1aOYj\xf3\x86M\x95\xbb\xc8\xe9/;\xb0{9\', guid=\'\x86\xa6$\xb2\xb8\xdaF\xbd\xbd\xf5\xc5\xf4\xcb\x96\x03<\')), "
-      'runAsync=True, statement="SELECT \'Hello World!\'"),)')
-
-      assert (_unpack_guid_secret_in_handle(hive_handle) == ("(TExecuteStatementReq(confOverlay={}, sessionHandle=TSessionHandle("
-      "sessionId=THandleIdentifier(secret=954d86f36a594f1a:397bb03b2fe9c8bb, guid=bd46dab8b224a686:3c0396cbf4c5f5bd)), runAsync=True, "
-      'statement="SELECT \'Hello World!\'"),)'))
-
-      impala_handle = ("(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret="
-      "\'\x7f\x98\x97s\xe1\xa8G\xf4\x8a\x8a\\r\x0e6\xc2\xee\xf0\', guid=\'\xfa\xb0/\x04 \xfeDX\x99\xfcq\xff2\x07\x02\xfe\')), "
-      "tableName=u\'customers\', tableTypes=None, catalogName=None),)")
-
-      assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TGetTablesReq(schemaName=u\'default\', sessionHandle="
-      "TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, guid=5844fe20042fb0fa:fe020732ff71fc99)),"
-      " tableName=u\'customers\', tableTypes=None, catalogName=None),)"))
+    assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TExecuteStatementReq(sessionHandle=TSessionHandle("
+    "sessionId=THandleIdentifier(guid=c34abdf1496eccc4:724de1395bd50ab2, secret=ae4c259482fd9db0:d07bfa3d6624689c)), "
+    "statement=b\'USE `default`\', confOverlay={\'QUERY_TIMEOUT_S\': \'300\'}, runAsync=False),)"))
 
     # Following should be added to test, but fails because eval doesn't handle null bytes
     # impala_handle = ("(TGetTablesReq(schemaName=u\'default\', sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret="
@@ -265,6 +242,7 @@ class ThriftUtilTest(TestCase):
     # assert (_unpack_guid_secret_in_handle(impala_handle) == ("(TGetTablesReq(schemaName=u\'default\', "
     # "sessionHandle=TSessionHandle(sessionId=THandleIdentifier(secret=f447a8e17397987f:f0eec2360e0d8a8a, "
     # "guid=9144f53015fa33d2:0091efd700000000)), tableName=u\'customers\', tableTypes=None, catalogName=None),)"))
+
 
 class TestJsonable2Thrift(TestCase):
   """
@@ -353,7 +331,6 @@ class TestSuperClient(TestCase):
       client.my_call()
       # Could check output for "Not retrying thrift call my_call due to socket timeout"
 
-
   def test_wrapper_with_retry(self):
     wrapped_client, transport = Mock(), Mock()
     wrapped_client.my_call = Mock(
@@ -374,7 +351,6 @@ class TestThriftJWT():
 
     self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test_user"))
-
 
   def test_jwt_thrift(self):
     with patch('desktop.lib.thrift_util.TBinaryProtocol'):
@@ -401,7 +377,6 @@ class TestThriftJWT():
               set_bearer_auth.assert_called_with('some_jwt_token')
             finally:
               reset()
-
 
   def test_jwt_thrift_exceptions(self):
     with patch('desktop.lib.thrift_util.TBinaryProtocol'):

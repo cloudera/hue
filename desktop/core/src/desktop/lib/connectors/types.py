@@ -15,18 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
-import sys
+
+from django.utils.translation import gettext as _
 
 from desktop.conf import CONNECTORS_BLACKLIST, CONNECTORS_WHITELIST
 from desktop.lib.exceptions_renderable import PopupException
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -886,8 +882,10 @@ CATEGORIES = [
 def get_connectors_types():
   return CONNECTOR_TYPES
 
+
 def get_connector_categories():
   return CATEGORIES
+
 
 def get_connector_by_type(dialect, interface):
   instance = [

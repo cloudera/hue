@@ -18,13 +18,10 @@
 import sys
 from builtins import object
 
-from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
+from django.utils.translation import gettext as _
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
 
 
 def get_api(request, interface):
@@ -50,7 +47,7 @@ class CatalogApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 class CatalogEntityDoesNotExistException(Exception):
@@ -61,7 +58,7 @@ class CatalogEntityDoesNotExistException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 class CatalogAuthException(Exception):
@@ -72,7 +69,7 @@ class CatalogAuthException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 # Base API
@@ -88,27 +85,21 @@ class Api(object):
     """For the top search"""
     return {}
 
-
   def find_entity(self, source_type, type, name, **filters):
     """e.g. From a database and table name, retrieve the enity id"""
     return {}
 
-
   def get_entity(self, entity_id):
     return {}
-
 
   def update_entity(self, entity, **metadata):
     return {}
 
-
   def add_tags(self, entity_id, tags):
     return {}
 
-
   def delete_tags(self, entity_id, tags):
     return {}
-
 
   def update_properties(self, entity_id, properties, modified_custom_metadata=None, deleted_custom_metadata_keys=None):
     """For updating entity comments or other attributes"""
@@ -119,25 +110,20 @@ class Api(object):
   def get_database(self, name):
     return self.find_entity(source_type='HIVE', type='DATABASE', name=name)
 
-
   def get_table(self, database_name, table_name, is_view=False):
-    parent_path = '\/%s' % database_name
+    parent_path = r'\/%s' % database_name
     return self.find_entity(source_type='HIVE', type='VIEW' if is_view else 'TABLE', name=table_name, parentPath=parent_path)
 
-
   def get_field(self, database_name, table_name, field_name):
-    parent_path = '\/%s\/%s' % (database_name, table_name)
+    parent_path = r'\/%s\/%s' % (database_name, table_name)
     return self.find_entity(source_type='HIVE', type='FIELD', name=field_name, parentPath=parent_path)
-
 
   def get_partition(self, database_name, table_name, partition_spec):
     raise NotImplementedError
 
-
   def get_directory(self, path):
     dir_name, dir_path = self._clean_path(path)
     return self.find_entity(source_type='HDFS', type='DIRECTORY', name=dir_name, fileSystemPath=dir_path)
-
 
   def get_file(self, path):
     file_name, file_path = self._clean_path(path)

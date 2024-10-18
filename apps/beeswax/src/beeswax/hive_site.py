@@ -19,24 +19,16 @@
 Helper for reading hive-site.xml
 """
 
-from builtins import str
+import re
 import errno
+import socket
 import logging
 import os.path
-import re
-import socket
-import sys
 
+import beeswax.conf
 from desktop.lib import security_util
 from hadoop import confparse
 from hadoop.ssl_client_site import get_trustore_location, get_trustore_password
-
-import beeswax.conf
-
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
 
 LOG = logging.getLogger()
 
@@ -72,12 +64,13 @@ _CNF_HIVE_EXECUTION_ENGINE = 'hive.execution.engine'
 
 
 # Host is whatever up to the colon. Allow and ignore a trailing slash.
-_THRIFT_URI_RE = re.compile("^thrift://([^:]+):(\d+)[/]?$")
+_THRIFT_URI_RE = re.compile(r"^thrift://([^:]+):(\d+)[/]?$")
 
 
 class MalformedHiveSiteException(Exception):
   """Parsing error class used internally"""
   pass
+
 
 def reset():
   """Reset the cached conf"""
@@ -105,7 +98,7 @@ def get_metastore():
 
     if not is_local:
       use_sasl = str(get_conf().get(_CNF_METASTORE_SASL, 'false')).lower() == 'true'
-      thrift_uri = thrift_uris.split(",")[0] # First URI
+      thrift_uri = thrift_uris.split(",")[0]  # First URI
       host = socket.getfqdn()
       match = _THRIFT_URI_RE.match(thrift_uri)
       if not match:
@@ -138,17 +131,22 @@ def get_hiveserver2_kerberos_principal(hostname_or_ip):
   else:
     return None
 
+
 def get_metastore_warehouse_dir():
   return get_conf().get(_CNF_METASTORE_WAREHOUSE_DIR, '/user/hive/warehouse')
 
+
 def get_hiveserver2_authentication():
-  return get_conf().get(_CNF_HIVESERVER2_AUTHENTICATION, 'NONE').upper() # NONE == PLAIN SASL
+  return get_conf().get(_CNF_HIVESERVER2_AUTHENTICATION, 'NONE').upper()  # NONE == PLAIN SASL
+
 
 def get_hiveserver2_thrift_sasl_qop():
   return get_conf().get(_CNF_HIVESERVER2_THRIFT_SASL_QOP, 'NONE').lower()
 
+
 def hiveserver2_impersonation_enabled():
   return get_conf().get(_CNF_HIVESERVER2_IMPERSONATION, 'TRUE').upper() == 'TRUE'
+
 
 def hiveserver2_jdbc_url():
   is_transport_mode_http = hiveserver2_transport_mode() == 'HTTP'
@@ -180,14 +178,18 @@ def hiveserver2_jdbc_url():
 def hiveserver2_use_ssl():
   return get_conf().get(_CNF_HIVESERVER2_USE_SSL, 'FALSE').upper() == 'TRUE'
 
+
 def hiveserver2_transport_mode():
   return get_conf().get(_CNF_HIVESERVER2_TRANSPORT_MODE, 'TCP').upper()
+
 
 def hiveserver2_thrift_binary_port():
   return get_conf().get(_CNF_HIVESERVER2_THRIFT_BINARY_PORT)
 
+
 def hiveserver2_thrift_http_port():
   return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PORT)
+
 
 def hiveserver2_thrift_http_path():
   return get_conf().get(_CNF_HIVESERVER2_THRIFT_HTTP_PATH, 'cliservice')
@@ -202,14 +204,18 @@ def has_concurrency_support():
   ''''Possibly use set -v in future to obtain properties hive.create.as.acid=true & hive.create.as.insert.only=true'''
   return get_conf().get(_CNF_HIVE_SUPPORT_CONCURRENCY, 'TRUE').upper() == 'TRUE'
 
+
 def get_hive_hook_proto_base_directory():
   return get_conf().get(_CNF_HIVE_HOOK_PROTO_BASE_DIR)
+
 
 def get_hive_execution_mode():
   return get_conf().get(_CNF_HIVE_EXECUTION_MODE)
 
+
 def get_hive_execution_engine():
   return get_conf().get(_CNF_HIVE_EXECUTION_ENGINE)
+
 
 def _parse_hive_site():
   """
@@ -220,7 +226,7 @@ def _parse_hive_site():
 
   _HIVE_SITE_PATH = os.path.join(beeswax.conf.HIVE_CONF_DIR.get(), 'hive-site.xml')
   try:
-    data = open_file(_HIVE_SITE_PATH, 'r').read()
+    data = open(_HIVE_SITE_PATH, 'r').read()
   except IOError as err:
     if err.errno != errno.ENOENT:
       LOG.error('Cannot read from "%s": %s' % (_HIVE_SITE_PATH, err))
@@ -230,9 +236,10 @@ def _parse_hive_site():
 
   _HIVE_SITE_DICT = confparse.ConfParse(data)
 
+
 def get_hive_site_content():
   hive_site_path = os.path.join(beeswax.conf.HIVE_CONF_DIR.get(), 'hive-site.xml')
   if not os.path.exists(hive_site_path):
     return ''
   else:
-    return open_file(hive_site_path, 'r').read()
+    return open(hive_site_path, 'r').read()

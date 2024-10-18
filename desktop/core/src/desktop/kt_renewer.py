@@ -15,23 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import subprocess
 import sys
 import time
-from desktop.supervisor import DjangoCommandSupervisee
+import logging
+import subprocess
+
 from desktop.conf import KERBEROS as CONF
+from desktop.supervisor import DjangoCommandSupervisee
 
 LOG = logging.getLogger()
 SPEC = DjangoCommandSupervisee("kt_renewer")
 
 NEED_KRB181_WORKAROUND = None
 
+
 def renew_from_kt():
   cmdv = [CONF.KINIT_PATH.get(),
-          "-k", # host ticket
-          "-t", CONF.HUE_KEYTAB.get(), # specify keytab
-          "-c", CONF.CCACHE_PATH.get(), # specify credentials cache
+          "-k",  # host ticket
+          "-t", CONF.HUE_KEYTAB.get(),  # specify keytab
+          "-c", CONF.CCACHE_PATH.get(),  # specify credentials cache
           CONF.HUE_PRINCIPAL.get()]
   retries = 0
   max_retries = 3
@@ -48,9 +50,8 @@ def renew_from_kt():
       subp_stdout = subp.stdout.readlines()
       subp_stderr = subp.stderr.readlines()
 
-      if sys.version_info[0] > 2:
-        subp_stdout = [line.decode() for line in subp.stdout.readlines()]
-        subp_stderr = [line.decode() for line in subp.stderr.readlines()]
+      subp_stdout = [line.decode() for line in subp.stdout.readlines()]
+      subp_stderr = [line.decode() for line in subp.stderr.readlines()]
 
       LOG.error("Couldn't reinit from keytab! `kinit' exited with %s.\n%s\n%s" % (
                 subp.returncode, "\n".join(subp_stdout), "\n".join(subp_stderr)))
@@ -69,6 +70,7 @@ def renew_from_kt():
     # renew the ticket after the initial valid time.
     time.sleep(1.5)
     perform_krb181_workaround()
+
 
 def perform_krb181_workaround():
   cmdv = [CONF.KINIT_PATH.get(),
@@ -90,6 +92,7 @@ def perform_krb181_workaround():
               "for the '%(princ)s' and `krbtgt' principals." % fmt_dict)
     sys.exit(ret)
 
+
 def detect_conf_var():
   """Return true if the ticket cache contains "conf" information as is found
   in ticket caches of Kerboers 1.8.1 or later. This is incompatible with the
@@ -99,16 +102,12 @@ def detect_conf_var():
   try:
     # TODO: the binary check for X-CACHECONF seems fragile, it should be replaced
     # with something more robust.
-    if sys.version_info[0] > 2:
-      f = open(CONF.CCACHE_PATH.get(), "rb")
-      data = f.read()
-      return b"X-CACHECONF:" in data
-    else:
-      f = file(CONF.CCACHE_PATH.get(), "rb")
-      data = f.read()
-      return "X-CACHECONF:" in data
+    f = open(CONF.CCACHE_PATH.get(), "rb")
+    data = f.read()
+    return b"X-CACHECONF:" in data
   finally:
     f.close()
+
 
 def run():
   if CONF.HUE_KEYTAB.get() is None:

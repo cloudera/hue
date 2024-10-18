@@ -14,30 +14,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from builtins import filter
-
-import logging
-from logging import exception
 import sys
-
+import logging
+from builtins import filter
 from datetime import datetime
+from logging import exception
+
+from django.utils.translation import gettext as _
 
 from beeswax.models import QueryHistory
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import current_ms_from_utc
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-from notebook.models import _get_notebook_api, make_notebook, MockRequest
-
 from jobbrowser.apis.base_api import Api
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from notebook.models import MockRequest, _get_notebook_api, make_notebook
 
 LOG = logging.getLogger()
+
 
 class HiveQueryApi(Api):
   HEADERS = {'X-Requested-By': 'das'}

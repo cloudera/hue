@@ -16,23 +16,14 @@
 
 import csv
 import logging
-import sys
-import uuid
+from io import StringIO as string_io
+from urllib.parse import unquote as urllib_unquote, urlparse
+
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from notebook.conf import get_ordered_interpreters
 from notebook.models import make_notebook
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from urllib.parse import urlparse, unquote as urllib_unquote
-  from django.utils.translation import gettext as _
-else:
-  from cStringIO import StringIO as string_io
-  from django.utils.translation import ugettext as _
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlparse
-
 
 LOG = logging.getLogger()
 
@@ -87,7 +78,7 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s)
         if (source['format']['hasHeader'] and count == 0) or not csv_row:
             continue
         else:
-          _sql = ', '.join([ "'{0}'".format(col_val) if columns[count]['type'] in ('varchar', 'timestamp') \
+          _sql = ', '.join(["'{0}'".format(col_val) if columns[count]['type'] in ('varchar', 'timestamp')
             else '{0}'.format(col_val) for count, col_val in enumerate(csv_row)])
 
           sql += '''\nUPSERT INTO %(table_name)s VALUES (%(csv_row)s);\n''' % {
@@ -95,7 +86,7 @@ CONSTRAINT my_pk PRIMARY KEY (%(primary_keys)s)
             'table_name': table_name,
             'csv_row': _sql
           }
-   
+
     if dry_run:
       return sql
     else:

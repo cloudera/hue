@@ -15,24 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import pytest
 import sys
+import json
+from unittest.mock import MagicMock, Mock, patch
 
-from desktop.auth.backend import rewrite_user
-from desktop.auth.api_authentications import JwtAuthentication
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.conf import AUTH
-
+import pytest
 from rest_framework import exceptions
 
+from desktop.auth.api_authentications import JwtAuthentication
+from desktop.auth.backend import rewrite_user
+from desktop.conf import AUTH
+from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
-
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
 
 
 @pytest.mark.django_db
@@ -56,7 +50,6 @@ class TestJwtAuthentication():
       }
     )
 
-
   def test_authenticate_existing_user(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
       with patch('desktop.auth.api_authentications.requests.get'):
@@ -77,7 +70,6 @@ class TestJwtAuthentication():
         finally:
           for reset in resets:
             reset()
-
 
   def test_authenticate_new_user(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
@@ -103,7 +95,6 @@ class TestJwtAuthentication():
           for reset in resets:
             reset()
 
-
   def test_failed_authentication(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
       with patch('desktop.auth.api_authentications.requests.get'):
@@ -118,7 +109,6 @@ class TestJwtAuthentication():
           jwt_decode.side_effect = exceptions.AuthenticationFailed('JwtAuthentication: Token expired')
           with pytest.raises(exceptions.AuthenticationFailed):
             JwtAuthentication().authenticate(self.request)
-
 
   def test_check_user_token_storage(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
@@ -138,7 +128,6 @@ class TestJwtAuthentication():
         finally:
           for reset in resets:
             reset()
-
 
   def test_check_token_verification_flag(self):
     with patch('desktop.auth.api_authentications.requests.get'):
@@ -169,7 +158,6 @@ class TestJwtAuthentication():
           finally:
             for reset in resets:
               reset()
-
 
   def test_handle_public_key(self):
     with patch('desktop.auth.api_authentications.requests.get') as key_server_request:
@@ -212,7 +200,7 @@ class TestJwtAuthentication():
             algorithms=['RS256'],
             audience='audience',
             issuer='issuer',
-            jwt=self.sample_token, 
+            jwt=self.sample_token,
             key=b'-----BEGIN PUBLIC KEY-----\n'
             b'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwe9gTbRxHl4Ye9mY9abY\n'
             b'l/WHgx5QYZTwnHO5G5MX9gOiCbbxBqcOifVywX1/ienElksDIvjuQFL7zOSoXipu\n'
@@ -227,7 +215,6 @@ class TestJwtAuthentication():
         finally:
           for reset in resets:
             reset()
-
 
   def test_handle_jku_ha(self):
     with patch('desktop.auth.api_authentications.requests.get') as requests_get:
@@ -257,6 +244,6 @@ class TestJwtAuthentication():
 
       try:
         jku = JwtAuthentication()._handle_jku_ha()
-        assert jku == None
+        assert jku is None
       finally:
         reset()

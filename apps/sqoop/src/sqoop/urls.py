@@ -17,13 +17,9 @@
 
 import sys
 
-from sqoop import views as sqoop_views
-from sqoop import api as sqoop_api
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from sqoop import api as sqoop_api, views as sqoop_views
 
 urlpatterns = [
   re_path(r'^$', sqoop_views.app, name='index')

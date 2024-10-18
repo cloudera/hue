@@ -22,9 +22,8 @@ from django.core import management
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from desktop.models import Directory, Document, Document2, Document2Permission, SAMPLE_USER_OWNERS
+from desktop.models import SAMPLE_USER_OWNERS, Directory, Document, Document2, Document2Permission
 from useradmin.models import get_default_user_group, install_sample_user
-
 
 LOG = logging.getLogger()
 
@@ -44,10 +43,7 @@ class Command(BaseCommand):
 
     if not Document2.objects.filter(type='search-dashboard', owner__username__in=SAMPLE_USER_OWNERS).exists():
       with transaction.atomic():
-        if sys.version_info[0] > 2:
-          management.call_command('loaddata', 'initial_search_examples.json', verbosity=2)
-        else:
-          management.call_command('loaddata', 'initial_search_examples.json', verbosity=2, commit=False)
+        management.call_command('loaddata', 'initial_search_examples.json', verbosity=2)
         Document.objects.sync()
 
       Document2.objects.filter(type='search-dashboard', owner__username__in=SAMPLE_USER_OWNERS).update(parent_directory=examples_dir)
