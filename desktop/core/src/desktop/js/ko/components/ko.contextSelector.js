@@ -86,10 +86,8 @@ const TEMPLATE = `
       'Active database'
     )}' } }" style="display: inline-block"></div>
     <!-- /ko -->
-    <!-- ko if: availableDatabases().length === 0  && !hideDatabases -->
-    <span class="editor-header-title"><i class="fa fa-warning"></i> ${I18n(
-      'No databases found'
-    )}</span>
+    <!-- ko if: noDatabasesFound -->
+    <span class="editor-header-title"><i class="fa fa-warning"></i> ${I18n('No databases found')}</span>
     <!-- /ko -->
   </div>
 `;
@@ -234,9 +232,13 @@ const HueContextSelector = function (params) {
   self.loadingDatabases = ko.observable(false);
   self.availableDatabases = params.availableDatabases || ko.observableArray();
   self.database = params.database;
-  self.hideDatabases = params.hideDatabases || !self.database;
+  self.hideDatabases = ko.observable(params.hideDatabases || !self.database);
 
   self.reloadDatabaseThrottle = -1;
+
+  self.noDatabasesFound = ko.pureComputed(() => {
+    return self.availableDatabases().length === 0 && !self.hideDatabases();
+  });
 
   self.reloadDatabases();
 

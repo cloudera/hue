@@ -59,6 +59,99 @@ export default class Notebook {
     this.isHidingCode = ko.observable(!!notebookRaw.isHidingCode);
 
     this.snippets = ko.observableArray();
+    this.snippetName = ko.pureComputed(() => {
+      const snippet = this.snippets().find(s => s.type === this.type());
+      return snippet ? snippet.name : ''; // Adjust according to your snippet structure
+    });
+
+
+    this.hoverActionsMarginRight = ko.pureComputed(() => {
+      return this.isPresentationMode() || this.isResultFullScreenMode() ? '40px' : '0';
+    });
+
+    this.showCodeEditorSnippetBody = ko.pureComputed(() => {
+      const nonCodeTypes = ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'];
+      return nonCodeTypes.indexOf(this.type()) === -1;
+    });
+  
+    this.showExecutableSnippetBody = ko.pureComputed(() => {
+      const executableTypes = ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'];
+      return executableTypes.indexOf(this.type()) !== -1;
+    });
+
+    this.shouldShowSnippetExecutionControls = ko.pureComputed(() => {
+      return ['text', 'markdown'].indexOf(this.type()) === -1 && !this.isResultFullScreenMode();
+    });
+
+    this.shouldShowSnippetExecutionStatus = ko.pureComputed(() => {
+      return ['text', 'markdown'].indexOf(this.type()) === -1;
+    });
+
+        // Define the stop function
+        this.handleStop = function (event, ui) {
+          const $element = $(event.target);
+          console.log("handleStop");
+          $element.find('.snippet-body').slideDown('fast', function () {
+            console.log("handleStop slideDown");
+            $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition);
+          });
+        }
+        this.snippetContainerCssClasses = ko.pureComputed(() => {
+          return {
+            'is-editing': this.isEditing(),
+            'margin-left-10': this.isPresentationMode()
+          };
+        });
+    
+        this.sortableOptions = {
+          template: 'snippet', // Ensure this is a valid template name
+          data: this.snippets,
+          isEnabled: true,
+          options: {
+            handle: '.move-widget',
+            axis: 'y',
+            opacity: 0.8,
+            placeholder: 'snippet-move-placeholder',
+            greedy: true,
+            stop: this.handleStop,
+            helper: this.handleHelper
+          },
+          dragged: self.onSnippetDragged
+        };
+    
+        self.onSnippetDragged = function(widget) {
+          $('.snippet-body').slideDown('fast', function () {
+            $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition);
+          });
+        };
+        // Define the helper function
+        self.handleHelper = function (event) {
+          lastWindowScrollPosition = $(MAIN_SCROLLABLE).scrollTop();
+          const $element = $(event.target);
+          console.log("handleHelper");
+          $element.find('.snippet-body').slideUp('fast', function () {
+            console.log("handleHelper slideUp");
+            $('.sortable-snippets').sortable('refreshPositions');
+          });
+          const _par = $('<div>')
+            .css('overflow', 'hidden')
+            .addClass('card-widget snippet-move-helper')
+            .width($element.parents('.snippet').width());
+          $('<h2>')
+            .addClass('card-heading')
+            .html($element.parents('h2').html())
+            .appendTo(_par)
+            .find('.hover-actions, .snippet-actions')
+            .removeClass('hover-actions')
+            .removeClass('snippet-actions');
+          $('<pre>')
+            .addClass('dragging-pre muted')
+            .html(ko.dataFor($element.parents('.card-widget')[0]).statement())
+            .appendTo(_par);
+          _par.css('height', '100px');
+          return _par;
+        }
+
     this.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
     this.directoryUuid = ko.observable(notebookRaw.directoryUuid);
     this.dependents = komapping.fromJS(notebookRaw.dependents || []);
@@ -80,6 +173,7 @@ export default class Notebook {
         ? vm.selectedNotebook().history()
         : []
     );
+    
 
     this.schedulerViewModel = null;
     this.schedulerViewModelIsLoaded = ko.observable(false);
@@ -426,6 +520,15 @@ export default class Notebook {
       type: this.type(),
       uuid: this.uuid()
     });
+  }
+
+  openNotebook() {
+    const parentUuid = this.parentSavedQueryUuid();
+    if (parentUuid) {
+      this.openNotebook(parentUuid);
+    } else {
+      console.warn('No parent saved query UUID found.');
+    }
   }
 
   async toJs() {

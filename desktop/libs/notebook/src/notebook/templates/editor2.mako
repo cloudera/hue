@@ -75,8 +75,11 @@ There is no bridge to KO for components using this integration. Example using in
 % if ENABLE_PRESENTATION.get():
     <!-- ko with: selectedNotebook() -->
     <div class="btn-group">
-      <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); hueAnalytics.log('editor', 'view-as-presentation');},
-      css: {'btn-inverse': $root.isPresentationMode()}, attr: {title: isPresentationMode() ? '${ _ko('Exit presentation') }' : '${ _ko('View as a presentation') }'}">
+      <a class="btn" data-bind="
+          click: togglePresentationMode,
+          css: { 'btn-inverse': $root.isPresentationMode() },
+          conditionalAttr: { title: presentationModeTitle }
+      ">
         <i class="fa fa-line-chart"></i>
       </a>
 
@@ -826,7 +829,7 @@ There is no bridge to KO for components using this integration. Example using in
               </a>
             </li>
             <li data-bind="visible: parentSavedQueryUuid" style="display: none" class="no-horiz-padding muted">
-              <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
+              <a title="${ _('Click to open original saved query') }" data-bind="click: openNewNotebook" class="pointer inactive-action">
                 <i class="fa fa-fw fa-file-o"></i>
               </a>
             </li>
@@ -834,7 +837,7 @@ There is no bridge to KO for components using this integration. Example using in
               <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
             </li>
             <li data-bind="visible: isSchedulerJobRunning" style="display: none" class="no-horiz-padding muted">
-              <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
+              <a title="${ _('Click to open original saved query') }" data-bind="click: openNewNotebook" class="pointer inactive-action">
                 ${ _("Scheduling on") }
               </a>
             </li>

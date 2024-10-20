@@ -166,7 +166,10 @@ else:
             </a>
           </li>
           <li data-bind="visible: parentSavedQueryUuid" style="display: none" class="no-horiz-padding muted">
-            <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
+            <!-- editor_components.mako -->
+            <a title="${ _('Click to open original saved query') }" 
+              data-bind="clickWithArgs: { handler: '$root.openNotebook', params: [parentSavedQueryUuid()] }" 
+              class="pointer inactive-action">
               <i class="fa fa-fw fa-file-o"></i>
             </a>
           </li>
@@ -174,7 +177,7 @@ else:
             <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
           </li>
           <li data-bind="visible: isSchedulerJobRunning" style="display: none" class="no-horiz-padding muted">
-            <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
+            <a title="${ _('Click to open original saved query') }" data-bind="clickWithArgs: { handler: '$root.openNotebook', params: [parentSavedQueryUuid()] }" class="pointer inactive-action">
               ${ _("Scheduling on") }
             </a>
           </li>
@@ -201,8 +204,10 @@ else:
   % if ENABLE_PRESENTATION.get():
     <!-- ko with: selectedNotebook() -->
       <div class="btn-group">
-        <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); },
-        css: {'btn-inverse': $root.isPresentationMode()}, attr: {title: isPresentationMode() ? '${ _ko('Exit presentation') }' : '${ _ko('View as a presentation') }'}">
+        <a class="btn" 
+          data-bind="click: $root.togglePresentationMode,
+                      css: $root.presentationModeCss, 
+                      attr: { title: $root.presentationModeTitle }">
           <i class="fa fa-line-chart"></i>
         </a>
 
@@ -421,38 +426,10 @@ else:
             'opacity': 0.8,
             'placeholder': 'snippet-move-placeholder',
             'greedy': true,
-            'stop': function(event, ui) {
-              var $element = $(event.target);
-              $element.find('.snippet-body').slideDown('fast', function () { $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition); });
-            },
-            'helper': function(event) {
-              lastWindowScrollPosition = $(MAIN_SCROLLABLE).scrollTop();
-              var $element = $(event.target);
-              $element.find('.snippet-body').slideUp('fast', function () {
-                $('.sortable-snippets').sortable('refreshPositions')
-              });
-              var _par = $('<div>')
-                .css('overflow', 'hidden')
-                .addClass('card-widget snippet-move-helper')
-                .width($element.parents('.snippet').width());
-              $('<h2>')
-                .addClass('card-heading')
-                .html($element.parents('h2').html())
-                .appendTo(_par)
-                .find('.hover-actions, .snippet-actions')
-                .removeClass('hover-actions')
-                .removeClass('snippet-actions');
-              $('<pre>')
-                .addClass('dragging-pre muted')
-                .html(ko.dataFor($element.parents('.card-widget')[0]).statement())
-                .appendTo(_par);
-              _par.css('height', '100px');
-              return _par;
-            }
+            'stop': $root.handleStop,
+            'helper': $root.handleHelper
           },
-          dragged: function (widget) {
-            $('.snippet-body').slideDown('fast', function () { $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition); });
-          }
+          dragged: $root.onSnippetDragged
         }">
       </div>
       % if hasattr(caller, "addSnippetHTML"):
@@ -490,7 +467,7 @@ else:
 
       <!-- ko foreach: sessions -->
         <h4 style="clear:left; display: inline-block">
-          <span data-bind="text: $parents[1].getSnippetName(type())"></span>
+          <span data-bind="textWithArgs: { handler: '$parents[1].getSnippetName', params: [type()] }"></span>
           <!-- ko if: typeof session_id != 'undefined' && session_id -->
             <span data-bind="text: session_id"></span>
           <!-- /ko -->

@@ -52,6 +52,11 @@ class AssistDashboardPanel {
       });
     });
 
+    self.shouldSpinHueSpinner = ko.pureComputed(() => {
+      const querySpec = self.filter.querySpec();
+      return querySpec && querySpec.query !== '' && self.someLoading();
+    });
+
     const navigationSettings = {
       showStats: true,
       rightAssist: true

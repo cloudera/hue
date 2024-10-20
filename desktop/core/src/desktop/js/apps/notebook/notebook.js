@@ -249,6 +249,15 @@ class Notebook {
 
     self.canSave = vm.canSave;
 
+
+    self.openNotebook = function () {
+      const parentUuid = this.parentSavedQueryUuid();
+      if (parentUuid) {
+        this.openNotebook(parentUuid);
+      } else {
+        console.warn('No parent saved query UUID found.');
+      }
+    }
     self.getSession = function (session_type) {
       let _s = null;
       $.each(self.sessions(), (index, s) => {
@@ -441,6 +450,12 @@ class Notebook {
 
       hueAnalytics.log('notebook', 'add_snippet/' + (type ? type : self.selectedSnippet()));
       return snippet;
+    };
+
+    self.addSnippetAboveOnDoubleClick = function() {
+      if (!self.editorMode() && !self.isPresentationMode()) {
+        self.newSnippetAbove(self.id());
+      }
     };
 
     self.newSnippetAbove = function (id) {

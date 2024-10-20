@@ -152,19 +152,16 @@ export default class EditorViewModel {
       }
     });
 
-    this.isPresentationMode = ko.pureComputed(
-      () => this.selectedNotebook() && this.selectedNotebook().isPresentationMode()
-    );
-
     this.togglePresentationMode = function() {
       this.isPresentationMode(!this.isPresentationMode());
-      hueAnalytics.log('editor', 'view-as-presentation');
     };
   
-    this.presentationModeTitle = ko.computed(function() {
-      return {
-        title: this.isPresentationMode() ? I18n('Exit presentation') : I18n('View as a presentation')
-      };
+    this.presentationModeTitle = ko.pureComputed(() => {
+      return this.isPresentationMode() ? _ko('Exit presentation') : _ko('View as a presentation');
+    });
+  
+    this.presentationModeCss = ko.pureComputed(() => {
+      return this.isPresentationMode() ? 'btn-inverse' : '';
     });
 
     this.isHidingCode = ko.pureComputed(
@@ -196,6 +193,78 @@ export default class EditorViewModel {
     this.ChartTransformers = ChartTransformers;
 
     this.isEditing = ko.observable(false);
+    this.snippetContainerCssClasses = ko.pureComputed(() => {
+      return {
+        'is-editing': this.isEditing(),
+        'margin-left-10': this.isPresentationMode()
+      };
+    });
+
+        // Define the stop function
+        this.handleStop = function (event, ui) {
+          const $element = $(event.target);
+          console.log("handleStop");
+          $element.find('.snippet-body').slideDown('fast', function () {
+            console.log("handleStop slideDown");
+            $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition);
+          });
+        }
+        this.snippetContainerCssClasses = ko.pureComputed(() => {
+          return {
+            'is-editing': this.isEditing(),
+            'margin-left-10': this.isPresentationMode()
+          };
+        });
+    
+        this.sortableOptions = {
+          template: 'snippet', // Ensure this is a valid template name
+          data: this.snippets,
+          isEnabled: true,
+          options: {
+            handle: '.move-widget',
+            axis: 'y',
+            opacity: 0.8,
+            placeholder: 'snippet-move-placeholder',
+            greedy: true,
+            stop: this.handleStop,
+            helper: this.handleHelper
+          },
+          dragged: this.onSnippetDragged
+        };
+    
+        this.onSnippetDragged = function(widget) {
+          $('.snippet-body').slideDown('fast', function () {
+            $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition);
+          });
+        };
+        // Define the helper function
+        this.handleHelper = function (event) {
+          lastWindowScrollPosition = $(MAIN_SCROLLABLE).scrollTop();
+          const $element = $(event.target);
+          console.log("handleHelper");
+          $element.find('.snippet-body').slideUp('fast', function () {
+            console.log("handleHelper slideUp");
+            $('.sortable-snippets').sortable('refreshPositions');
+          });
+          const _par = $('<div>')
+            .css('overflow', 'hidden')
+            .addClass('card-widget snippet-move-helper')
+            .width($element.parents('.snippet').width());
+          $('<h2>')
+            .addClass('card-heading')
+            .html($element.parents('h2').html())
+            .appendTo(_par)
+            .find('.hover-actions, .snippet-actions')
+            .removeClass('hover-actions')
+            .removeClass('snippet-actions');
+          $('<pre>')
+            .addClass('dragging-pre muted')
+            .html(ko.dataFor($element.parents('.card-widget')[0]).statement())
+            .appendTo(_par);
+          _par.css('height', '100px');
+          return _par;
+        }
+
     this.isEditing.subscribe(() => {
       $(document).trigger('editingToggled');
     });
@@ -328,7 +397,6 @@ export default class EditorViewModel {
   }
 
   connect_auth_session() {
-    debugger;
     $root.selectedNotebook().authSession();
   }
 
@@ -499,6 +567,10 @@ export default class EditorViewModel {
 
   async saveNotebook() {
     await this.selectedNotebook().save();
+  }
+
+  openNewNotebook() {
+    this.openNotebook(this.selectedNotebook().parentSavedQueryUuid());
   }
 
   showContextPopover(field, event) {

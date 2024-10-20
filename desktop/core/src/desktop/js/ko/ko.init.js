@@ -31,6 +31,55 @@ if(is_ksb_enabled) {
   ko.bindingProvider.instance = new ksb(options); // Use the imported 'ksb' as the constructor
 }
 
+// const sortableFunctionRegistry = {
+//   stopHandler: function(event, ui) {
+//     const $element = $(event.target);
+//     $element.find('.snippet-body').slideDown('fast', function () {
+//       $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition);
+//     });
+//   },
+//   helperHandler: function(event) {
+//     lastWindowScrollPosition = $(MAIN_SCROLLABLE).scrollTop();
+//     const $element = $(event.target);
+//     $element.find('.snippet-body').slideUp('fast', function () {
+//       $('.sortable-snippets').sortable('refreshPositions');
+//     });
+//     const _par = $('<div>')
+//       .css('overflow', 'hidden')
+//       .addClass('card-widget snippet-move-helper')
+//       .width($element.parents('.snippet').width());
+//     $('<h2>')
+//       .addClass('card-heading')
+//       .html($element.parents('h2').html())
+//       .appendTo(_par)
+//       .find('.hover-actions, .snippet-actions')
+//       .removeClass('hover-actions')
+//       .removeClass('snippet-actions');
+//     $('<pre>')
+//       .addClass('dragging-pre muted')
+//       .html(ko.dataFor($element.parents('.card-widget')[0]).statement())
+//       .appendTo(_par);
+//     _par.css('height', '100px');
+//     return _par;
+//   }
+// };
+
+// // Custom binding handler for sortable
+// ko.bindingHandlers.sortableConfig = {
+//   init: function(element, valueAccessor) {
+//     debugger;
+//     const options = ko.unwrap(valueAccessor());
+//     $(element).sortable({
+//       handle: options.handle,
+//       axis: options.axis,
+//       opacity: options.opacity,
+//       placeholder: options.placeholder,
+//       greedy: options.greedy,
+//       stop: sortableFunctionRegistry[options.stop],
+//       helper: sortableFunctionRegistry[options.helper]
+//     });
+//   }
+// };
 
 // Define a custom binding for jQuery UI's autocomplete
 ko.bindingHandlers.customAutocomplete = {
@@ -77,21 +126,19 @@ init: function (element, valueAccessor, allBindingsAccessor) {
 
 ko.bindingHandlers.clickWithArgs = {
   init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-    var options = valueAccessor();
-    var handler = options.handler; // The handler now stores a function reference or a string to look up on the ViewModel
-    var params = options.params;
-    var newHandler = function() {
-      
-      // If the handler is a string, check if it's a function on the ViewModel
-      if (typeof handler === 'string' && typeof viewModel[handler] === 'function') {
-        viewModel[handler].apply(viewModel, params);
-      }
-      // If the handler is already a function (which we expect for global functions), just call it
-      else if (typeof handler === 'function') {
-        handler.apply(viewModel, params);
-      }
-      else {
-        throw new Error("clickWithArgs: Handler is not a function.");
+    const options = valueAccessor();
+    const handlerPath = options.handler; // Path to the handler function, e.g., '$root.someFunction'
+    const params = options.params || []; // Parameters to pass to the function
+
+    const newHandler = function() {
+      // Resolve the handler function from the path
+      const handler = resolveHandler(bindingContext, handlerPath);
+      const resolvedParams = params.map(param => resolveParameter(bindingContext, param));
+
+      if (typeof handler === 'function') {
+        handler.apply(bindingContext.$data, resolvedParams);
+      } else {
+        throw new Error("advancedClick: Handler is not a function.");
       }
     };
 
@@ -99,6 +146,106 @@ ko.bindingHandlers.clickWithArgs = {
   }
 };
 
+function resolveHandler(bindingContext, path) {
+  const pathParts = path.split('.');
+  let context = bindingContext;
+
+  pathParts.forEach(part => {
+    const arrayIndexMatch = part.match(/(.+)\[(\d+)\]$/);
+    if (arrayIndexMatch) {
+      // Handle array-like access
+      const basePart = arrayIndexMatch[1];
+      const index = parseInt(arrayIndexMatch[2], 10);
+
+      if (basePart === '$parents') {
+        context = context.$parents[index];
+      } else if (basePart === '$components') {
+        context = context.$components[index];
+      } else if (basePart === '$data') {
+        context = context.$data[index];
+      } else {
+        context = ko.unwrap(context[basePart])[index];
+      }
+    } else {
+      // Handle regular parts
+      if (part === '$root') {
+        context = context.$root;
+      } else if (part === '$parent') {
+        context = context.$parent;
+      } else if (part === '$parents') {
+        context = context.$parents;
+      } else if (part === '$data') {
+        context = context.$data;
+      } else {
+        context = ko.unwrap(context[part]);
+      }
+    }
+  });
+
+  return context;
+}
+
+ko.bindingHandlers.textWithArgs = {
+  update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const options = valueAccessor();
+    const handlerPath = options.handler; // Path to the handler function, e.g., '$root.someFunction'
+    const params = options.params || []; // Parameters to pass to the function
+
+    // Resolve the handler function from the path
+    const handler = resolveHandler(bindingContext, handlerPath);
+    const resolvedParams = params.map(param => resolveParameter(bindingContext, param));
+
+    if (typeof handler === 'function') {
+      const result = handler.apply(bindingContext.$data, resolvedParams);
+      ko.utils.setTextContent(element, result);
+    } else {
+      throw new Error("textWithArgs: Handler is not a function.");
+    }
+  }
+};
+
+
+
+ko.bindingHandlers.dblclickWithArgs = {
+  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const options = valueAccessor();
+    const handlerPath = options.handlerPath; // Path to the handler function, e.g., '$root.someFunction'
+    const params = options.params || []; // Parameters to pass to the function
+
+    const newHandler = function() {
+      // Resolve the handler function from the path
+      const handler = resolveHandler(bindingContext, handlerPath);
+
+      // Resolve each parameter dynamically
+      const resolvedParams = params.map(param => resolveParameter(bindingContext, param));
+
+      if (typeof handler === 'function') {
+        handler.apply(bindingContext.$data, resolvedParams);
+      } else {
+        throw new Error("dblclickWithArgs: Handler is not a function.");
+      }
+    };
+
+    ko.utils.registerEventHandler(element, "dblclick", newHandler);
+  }
+};
+
+
+// Enhanced helper function to resolve parameters dynamically
+function resolveParameter(bindingContext, param) {
+  if (typeof param === 'string' && param.startsWith('$')) {
+    // Handle array index notation, e.g., $parents[1]
+    const arrayIndexMatch = param.match(/(.+)\[(\d+)\]$/);
+    if (arrayIndexMatch) {
+      const basePath = arrayIndexMatch[1];
+      const index = parseInt(arrayIndexMatch[2], 10);
+      const baseContext = resolveHandler(bindingContext, basePath);
+      return Array.isArray(baseContext) ? baseContext[index] : undefined;
+    }
+    return resolveHandler(bindingContext, param);
+  }
+  return param; // Return the parameter as is if it's not a context reference
+}
 
 ko.bindingHandlers.clickFunctionWithNested = {
   init: function(element, valueAccessor, allBindings, viewModel) {

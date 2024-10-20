@@ -158,6 +158,11 @@ class AssistDbEntry {
     self.columnName = null;
     self.type = null;
     self.databaseName = self.getHierarchy()[0];
+
+    self.isDatabaseNameDefined = ko.pureComputed(() => {
+      return typeof self.databaseName !== 'undefined';
+    });
+
     if (self.catalogEntry.isTableOrView()) {
       self.tableName = self.catalogEntry.name;
       self.columnName = null;

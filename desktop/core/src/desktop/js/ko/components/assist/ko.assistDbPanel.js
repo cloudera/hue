@@ -364,14 +364,14 @@ const TEMPLATE =
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <!-- ko if: sourceType !== 'solr' && $component.showImporter() -->
-      <!-- ko if: typeof databaseName !== 'undefined' -->
+      <!-- ko if: $component.isDatabaseNameDefined -->
         <a class="inactive-action" data-bind="hueLink: importer_url + databaseName + '/?sourceType=' + sourceType + '&namespace=' + assistDbNamespace.namespace.id" title="${I18n(
           'Create table'
         )}" href="javascript:void(0)">
           <i class="pointer fa fa-plus" title="${I18n('Create table')}"></i>
         </a>
       <!-- /ko -->
-      <!-- ko if: typeof databases !== 'undefined' -->
+      <!-- ko if: $component.isDatabaseNameDefined -->
         <a class="inactive-action" data-bind="hueLink: window.HUE_URLS.IMPORTER_CREATE_DATABASE + '/?sourceType=' + sourceType + '&namespace=' + namespace.id" href="javascript:void(0)">
           <i class="pointer fa fa-plus" title="${I18n('Create database')}"></i>
         </a>
@@ -444,7 +444,11 @@ const TEMPLATE =
           <!-- /ko -->
           <!-- ko if: status() !== 'STARTING' -->
           <!-- ko if: namespace.computes.length -->
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedNamespace($data); }"><i class="fa fa-fw fa-snowflake-o muted valign-middle"></i> <span data-bind="text: name"></span></a>
+          <a class="assist-table-link" href="javascript: void(0);" 
+            data-bind="dblclickWithArgs: { handler: '$parent.selectedNamespace', params: [$data] }">
+            <i class="fa fa-fw fa-snowflake-o muted valign-middle"></i> 
+            <span data-bind="text: name"></span>
+          </a>
           <!-- /ko -->
           <!-- ko ifnot: namespace.computes.length -->
           <span class="assist-table-link" title="${I18n(
@@ -485,13 +489,11 @@ const TEMPLATE =
             params: {
               querySpec: filter.querySpec,
               facets: [],
-              placeHolder: sourceType === 'solr' || sourceType === 'kafka' ? '${I18n(
-                'Filter sources...'
-              )}' : '${I18n('Filter databases...')}',
+              placeHolder: $component.placeHolder,
               knownFacetValues: {},
               autocompleteFromEntries: autocompleteFromEntries
             }
-          } --><!-- /ko -->
+        } --><!-- /ko -->
       </div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && hasEntries(), delayedOverflow">

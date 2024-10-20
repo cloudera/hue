@@ -60,7 +60,7 @@ const TEMPLATE =
         </div>
       </div>
       <div class="assist-flex-fill assist-db-scrollable" data-bind="delayedOverflow">
-        <!-- ko if: filteredTables().length === 0 && (!filter.querySpec() || filter.querySpec().query === '') -->
+        <!-- ko if: shouldShowNoFilteredTablesMessage -->
         <div class="assist-no-entries">
           <!-- ko if: isSolr -->
           ${I18n('No indexes selected.')}
@@ -70,7 +70,7 @@ const TEMPLATE =
           <!-- /ko -->
         </div>
         <!-- /ko -->
-        <!-- ko if: filteredTables().length === 0 && filter.querySpec() && filter.querySpec().query !== '' && !someLoading() -->
+        <!-- ko if: shouldShowNoTablesMessage -->
         <div class="assist-no-entries">${I18n('No entries found')}</div>
         <!-- /ko -->
         <!-- ko if: filteredTables().length > 0 -->
@@ -95,7 +95,7 @@ const TEMPLATE =
           <!-- /ko -->
         </ul>
         <!-- /ko -->
-        <!-- ko hueSpinner: { spin: filter.querySpec() && filter.querySpec().query !== '' && someLoading(), inline: true,  center: true} --><!-- /ko -->
+        <!-- ko hueSpinner: { spin: $component.shouldSpinHueSpinner, inline: true, center: true } --><!-- /ko -->
       </div>
 
       <!-- ko if: showRisks -->
@@ -293,6 +293,29 @@ class AssistEditorContextPanel {
         })
         .extend({ rateLimit: 300 })
     };
+    self.shouldSpinHueSpinner = ko.pureComputed(() => {
+      const querySpec = self.filter.querySpec();
+      return querySpec && querySpec.query !== '' && self.someLoading();
+    });
+
+    this.placeHolder = ko.pureComputed(() => {
+      return this.sourceType() === 'solr' || this.sourceType() === 'kafka'
+        ? I18n('Filter sources...')
+        : I18n('Filter databases...');
+    });
+
+    this.shouldShowNoTablesMessage = ko.pureComputed(() => {
+      return (
+        this.filteredTables().length === 0 &&
+        this.filter.querySpec() &&
+        this.filter.querySpec().query !== '' &&
+        !this.someLoading()
+      );
+    });
+
+    this.shouldShowNoEntriesMessage = ko.pureComputed(() => {
+      return !this.loading() && this.filteredEntries().length === 0;
+    });
 
     this.filteredTables = AssistantUtils.getFilteredTablesPureComputed(this);
 
@@ -332,6 +355,13 @@ class AssistEditorContextPanel {
         }, 2000);
       }
     };
+
+    this.shouldShowNoFilteredTablesMessage = ko.pureComputed(() => {
+      debugger;
+      console.log("test")
+      const querySpec = this.filter.querySpec();
+      return this.filteredTables().length === 0 && (!querySpec || querySpec.query === '');
+    });
 
     this.autocompleteFromEntries = (nonPartial, partial) => {
       const added = {};

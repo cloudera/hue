@@ -182,6 +182,8 @@ export default class NotebookViewModel {
       );
     });
     self.isResultFullScreenMode = ko.observable(false);
+
+
     self.isPresentationMode = ko.computed(() => {
       return self.selectedNotebook() && self.selectedNotebook().isPresentationMode();
     });
@@ -268,7 +270,6 @@ export default class NotebookViewModel {
     };
 
     self.hideAceEditor = function () {
-      debugger;
       $('.ace-filechooser').hide();
     }
 
@@ -288,6 +289,65 @@ export default class NotebookViewModel {
       self.isEditing(!self.isEditing());
     };
 
+    // Define the stop function
+    self.handleStop = function (event, ui) {
+      const $element = $(event.target);
+      console.log("handleStop");
+      $element.find('.snippet-body').slideDown('fast', function () {
+        console.log("handleStop slideDown");
+        $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition);
+      });
+    }
+
+
+    self.sortableOptions = {
+      template: 'snippet', // Ensure this is a valid template name
+      data: self.snippets,
+      isEnabled: true,
+      options: {
+        handle: '.move-widget',
+        axis: 'y',
+        opacity: 0.8,
+        placeholder: 'snippet-move-placeholder',
+        greedy: true,
+        stop: self.handleStop,
+        helper: self.handleHelper
+      },
+      dragged: self.onSnippetDragged
+    };
+
+    self.onSnippetDragged = function(widget) {
+      $('.snippet-body').slideDown('fast', function () {
+        $(MAIN_SCROLLABLE).scrollTop(lastWindowScrollPosition);
+      });
+    };
+    // Define the helper function
+    self.handleHelper = function (event) {
+      lastWindowScrollPosition = $(MAIN_SCROLLABLE).scrollTop();
+      const $element = $(event.target);
+      console.log("handleHelper");
+      $element.find('.snippet-body').slideUp('fast', function () {
+        console.log("handleHelper slideUp");
+        $('.sortable-snippets').sortable('refreshPositions');
+      });
+      const _par = $('<div>')
+        .css('overflow', 'hidden')
+        .addClass('card-widget snippet-move-helper')
+        .width($element.parents('.snippet').width());
+      $('<h2>')
+        .addClass('card-heading')
+        .html($element.parents('h2').html())
+        .appendTo(_par)
+        .find('.hover-actions, .snippet-actions')
+        .removeClass('hover-actions')
+        .removeClass('snippet-actions');
+      $('<pre>')
+        .addClass('dragging-pre muted')
+        .html(ko.dataFor($element.parents('.card-widget')[0]).statement())
+        .appendTo(_par);
+      _par.css('height', '100px');
+      return _par;
+    }
     self.authSessionUsername = ko.observable(); // UI popup
     self.authSessionPassword = ko.observable();
     self.authSessionMessage = ko.observable();
@@ -728,6 +788,9 @@ export default class NotebookViewModel {
     });
 
 
+    self.openNewNotebook = function() {
+      self.openNotebook(self.selectedNotebook().parentSavedQueryUuid());
+    };
 
     self.handleDocumentShow = function() {
       // The logic to execute when the event is triggered.
@@ -776,6 +839,13 @@ export default class NotebookViewModel {
       });
     };
   }
+
+  snippetContainerCssClasses() {
+    return {
+      'is-editing': self.isEditing(),
+      'margin-left-10': self.isPresentationMode()
+    };
+  };
 
   prepareShareModal() {
     const selectedNotebookUuid = this.selectedNotebook() && this.selectedNotebook().uuid();
