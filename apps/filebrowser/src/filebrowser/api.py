@@ -720,6 +720,7 @@ def chmod(request):
 
 @api_error_handler
 def extract_archive_using_batch_job(request):
+  # TODO: Check core logic with E2E tests -- dont use it until then
   if not ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
     return HttpResponse("Extract archive operation is disabled by configuration.", status=500)  # TODO: status code?
 
@@ -740,6 +741,7 @@ def extract_archive_using_batch_job(request):
 
 @api_error_handler
 def compress_files_using_batch_job(request):
+  # TODO: Check core logic with E2E tests -- dont use it until then
   if not ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
     return HttpResponse("Compress files operation is disabled by configuration.", status=500)  # TODO: status code?
 
