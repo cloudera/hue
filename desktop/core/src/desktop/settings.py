@@ -165,9 +165,6 @@ MIDDLEWARE = [
     'crequest.middleware.CrequestMiddleware',
 ]
 
-# if os.environ.get(ENV_DESKTOP_DEBUG):
-#   MIDDLEWARE.append('desktop.middleware.HtmlValidationMiddleware')
-#   logging.debug("Will try to validate generated HTML.")
 
 ROOT_URLCONF = 'desktop.urls'
 
