@@ -16,19 +16,14 @@
 # limitations under the License.
 
 import re
-import sys
 import logging
 from builtins import object
+from io import StringIO as string_io
 
 import pytest
 import configobj
 
 from desktop.lib.conf import *
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from cStringIO import StringIO as string_io
 
 
 def my_dynamic_default():

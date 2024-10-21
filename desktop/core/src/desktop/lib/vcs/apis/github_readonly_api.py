@@ -15,32 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-from future import standard_library
-standard_library.install_aliases()
-import binascii
-import logging
 import re
-import sys
+import logging
+import binascii
+import urllib.error
+import urllib.request
+from urllib.parse import unquote as urllib_unquote, urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
 
 from django.http import HttpResponseBadRequest
-
-from desktop.lib.django_util import JsonResponse
-from desktop.lib.rest.http_client import HttpClient, RestException
-from desktop.lib.rest import resource
+from django.utils.translation import gettext as _
 
 from desktop.conf import VCS
-from desktop.lib.vcs.apis.base_api import Api, GIT_READ_ONLY
+from desktop.lib.django_util import JsonResponse
+from desktop.lib.rest import resource
+from desktop.lib.rest.http_client import HttpClient, RestException
+from desktop.lib.vcs.apis.base_api import GIT_READ_ONLY, Api
 from desktop.lib.vcs.github_client import GithubClientException
-
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import unquote as urllib_unquote, urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
-  from django.utils.translation import gettext as _
-else:
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlsplit as lib_urlsplit, urlunsplit as lib_urlunsplit
-  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger()
 
@@ -51,8 +41,8 @@ class GithubReadOnlyApi(Api):
   """
 
   OWNER_RE = "(?P<owner>[A-Za-z0-9](?:-?[A-Za-z0-9]){0,38})"
-  REPO_RE = "(?P<repo>[\w\.@\:\-~]+)"
-  BRANCH_RE = "(?P<branch>[\w\.@\:\-~]+)"
+  REPO_RE = r"(?P<repo>[\w\.@\:\-~]+)"
+  BRANCH_RE = r"(?P<branch>[\w\.@\:\-~]+)"
 
   DEFAULT_SCOPES = ['repo', 'user']
 

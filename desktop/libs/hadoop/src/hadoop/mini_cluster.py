@@ -17,15 +17,15 @@
 
 
 #######################################################
-##               WARNING!!!                          ##
-##   This file is stale. Hadoop 0.23 and CDH4        ##
-##   do not support minicluster. This is replaced    ##
-##   by webhdfs.py, to set up a running cluster.     ##
+# WARNING!!!                          ##
+# This file is stale. Hadoop 0.23 and CDH4        ##
+# do not support minicluster. This is replaced    ##
+# by webhdfs.py, to set up a running cluster.     ##
 #######################################################
 
 
 # A Python-side driver for MiniHadoopClusterManager
-# 
+#
 # See README.testing for hints on how to use this,
 # and also look for other examples.
 #
@@ -37,64 +37,51 @@
 #   echo "GET /" | nc -w 1 localhost $p
 # done
 
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import atexit
-import subprocess
 import os
 import pwd
-import logging
 import sys
-import signal
-import shutil
-import time
-import tempfile
 import json
+import time
+import atexit
+import shutil
+import signal
+import logging
+import tempfile
+import subprocess
+from urllib.error import URLError as lib_URLError
+from urllib.request import Request as lib_Request, urlopen as lib_urlopen
+
 import lxml.etree
 
+import hadoop.cluster
 from desktop.lib import python_util
 from desktop.lib.test_utils import clear_sys_caches, restore_sys_caches
 
-import hadoop.cluster
-
-if sys.version_info[0] > 2:
-  from urllib.request import Request as lib_Request
-  from urllib.error import URLError as lib_URLError
-  from urllib.request import urlopen as lib_urlopen
-  open_file = open
-else:
-  from urllib2 import Request as lib_Request
-  from urllib2 import URLError as lib_URLError
-  from urllib2 import urlopen as lib_urlopen
-  open_file = file
-
 # Starts mini cluster suspended until a debugger attaches to it.
-DEBUG_HADOOP=False
+DEBUG_HADOOP = False
 # Redirects mini cluster stderr to stderr.  (Default is to put it in a file.)
-USE_STDERR=os.environ.get("MINI_CLUSTER_USE_STDERR", False)
+USE_STDERR = os.environ.get("MINI_CLUSTER_USE_STDERR", False)
 # Whether to clean up temp dir at exit
-CLEANUP_TMP_DIR=os.environ.get("MINI_CLUSTER_CLEANUP", True)
+CLEANUP_TMP_DIR = os.environ.get("MINI_CLUSTER_CLEANUP", True)
 # How long to wait for cluster to start up.  (seconds)
 MAX_CLUSTER_STARTUP_TIME = 120.0
 # List of classes to be used as plugins for the JT of the cluster.
 CLUSTER_JT_PLUGINS = 'org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin'
 # MR Task Scheduler. By default use the FIFO scheduler
-CLUSTER_TASK_SCHEDULER='org.apache.hadoop.mapred.JobQueueTaskScheduler'
+CLUSTER_TASK_SCHEDULER = 'org.apache.hadoop.mapred.JobQueueTaskScheduler'
 # MR queue names
-CLUSTER_QUEUE_NAMES='default'
+CLUSTER_QUEUE_NAMES = 'default'
 
-STARTUP_CONFIGS={}
+STARTUP_CONFIGS = {}
 
 # users and their groups which are used in Hue tests.
 TEST_USER_GROUP_MAPPING = {
-   'test': ['test','users','supergroup'], 'chown_test': ['chown_test'],
+   'test': ['test', 'users', 'supergroup'], 'chown_test': ['chown_test'],
    'notsuperuser': ['notsuperuser'], 'gamma': ['gamma'],
    'webui': ['webui'], 'hue': ['supergroup']
 }
 
-LOGGER=logging.getLogger()
+LOGGER = logging.getLogger()
 
 
 class MiniHadoopCluster(object):
@@ -126,7 +113,7 @@ class MiniHadoopCluster(object):
     os.mkdir(in_conf_dir)
     self.log_dir = tmppath("logs")
     os.mkdir(self.log_dir)
-    f = open_file(os.path.join(in_conf_dir, "hadoop-metrics.properties"), "w")
+    f = open(os.path.join(in_conf_dir, "hadoop-metrics.properties"), "w")
     try:
       f.write("""
 dfs.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
@@ -155,15 +142,26 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
                   'mapred.queue.names': CLUSTER_QUEUE_NAMES},
                  tmppath('in-conf/mapred-site.xml'))
 
-    hadoop_policy_keys = ['client', 'client.datanode', 'datanode', 'inter.datanode', 'namenode', 'inter.tracker', 'job.submission', 'task.umbilical', 'refresh.policy', 'admin.operations']
+    hadoop_policy_keys = [
+      'client',
+      'client.datanode',
+      'datanode',
+      'inter.datanode',
+      'namenode',
+      'inter.tracker',
+      'job.submission',
+      'task.umbilical',
+      'refresh.policy',
+      'admin.operations',
+    ]
     hadoop_policy_config = {}
     for policy in hadoop_policy_keys:
       hadoop_policy_config['security.' + policy + '.protocol.acl'] = '*'
     write_config(hadoop_policy_config, tmppath('in-conf/hadoop-policy.xml'))
 
-    details_file = open_file(tmppath("details.json"), "w+")
+    details_file = open(tmppath("details.json"), "w+")
     try:
-      args = [ os.path.join(hadoop.conf.HADOOP_MR1_HOME.get(), 'bin', 'hadoop'),
+      args = [os.path.join(hadoop.conf.HADOOP_MR1_HOME.get(), 'bin', 'hadoop'),
         "jar",
         hadoop.conf.HADOOP_TEST_JAR.get(),
         "minicluster",
@@ -193,7 +191,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         "-D", "hadoop.policy.file=%s/hadoop-policy.xml" % in_conf_dir,
       ]
 
-      for key,value in extra_configs.items():
+      for key, value in extra_configs.items():
         args.append("-D")
         args.append(key + "=" + value)
 
@@ -229,13 +227,13 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         env["HADOOP_OPTS"] = env.get("HADOOP_OPTS", "") + " -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9999"
 
       if USE_STDERR:
-        stderr=sys.stderr
+        stderr = sys.stderr
       else:
-        stderr=open_file(tmppath("stderr"), "w")
+        stderr = open(tmppath("stderr"), "w")
       LOGGER.debug("Starting minicluster: %s env: %s" % (repr(args), repr(env)))
       self.clusterproc = subprocess.Popen(
         args=args,
-        stdout=open_file(tmppath("stdout"), "w"),
+        stdout=open(tmppath("stdout"), "w"),
         stderr=stderr,
         env=env)
 
@@ -251,9 +249,9 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
         except ValueError:
           pass
         if self.clusterproc.poll() is not None or (not DEBUG_HADOOP and (time.time() - start) > MAX_CLUSTER_STARTUP_TIME):
-          LOGGER.debug("stdout:" + open_file(tmppath("stdout")).read())
+          LOGGER.debug("stdout:" + open(tmppath("stdout")).read())
           if not USE_STDERR:
-            LOGGER.debug("stderr:" + open_file(tmppath("stderr")).read())
+            LOGGER.debug("stderr:" + open(tmppath("stderr")).read())
           self.stop()
           raise Exception("Cluster process quit or is taking too long to start.  Aborting.")
     finally:
@@ -267,10 +265,10 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
     # Parse the configuration using XPath and place into self.config.
     config = lxml.etree.parse(tmppath("config.xml"))
-    self.config = dict( (property.find("./name").text, property.find("./value").text)
+    self.config = dict((property.find("./name").text, property.find("./value").text)
       for property in config.xpath("/configuration/property"))
 
-    # Write out Hadoop-style configuration directory, 
+    # Write out Hadoop-style configuration directory,
     # which can, in turn, be used for /bin/hadoop.
     self.config_dir = tmppath("conf")
     os.mkdir(self.config_dir)
@@ -280,11 +278,13 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
     write_config(self.config, tmppath("conf/core-site.xml"),
       ["fs.defaultFS", "jobclient.completion.poll.interval",
        "dfs.namenode.checkpoint.period", "dfs.namenode.checkpoint.dir",
-       'hadoop.proxyuser.'+self.superuser+'.groups', 'hadoop.proxyuser.'+self.superuser+'.hosts'])
-    write_config(self.config, tmppath("conf/hdfs-site.xml"), ["fs.defaultFS", "dfs.namenode.http-address", "dfs.namenode.secondary.http-address"])
+       'hadoop.proxyuser.' + self.superuser + '.groups', 'hadoop.proxyuser.' + self.superuser + '.hosts'])
+    write_config(
+      self.config, tmppath("conf/hdfs-site.xml"), ["fs.defaultFS", "dfs.namenode.http-address", "dfs.namenode.secondary.http-address"]
+    )
     # mapred.job.tracker isn't written out into self.config, so we fill
     # that one out more manually.
-    write_config({ 'mapred.job.tracker': 'localhost:%d' % self.jobtracker_port },
+    write_config({'mapred.job.tracker': 'localhost:%d' % self.jobtracker_port},
                  tmppath("conf/mapred-site.xml"))
     write_config(hadoop_policy_config, tmppath('conf/hadoop-policy.xml'))
 
@@ -299,8 +299,8 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
     self.secondary_proc = subprocess.Popen(
       args=args,
-      stdout=open_file(tmppath("stdout.2nn"), "w"),
-      stderr=open_file(tmppath("stderr.2nn"), "w"),
+      stdout=open(tmppath("stdout.2nn"), "w"),
+      stderr=open(tmppath("stderr.2nn"), "w"),
       env=env)
 
     while True:
@@ -310,9 +310,9 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       except lib_URLError:
         # If we should abort startup.
         if self.secondary_proc.poll() is not None or (not DEBUG_HADOOP and (time.time() - start) > MAX_CLUSTER_STARTUP_TIME):
-          LOGGER.debug("stdout:" + open_file(tmppath("stdout")).read())
+          LOGGER.debug("stdout:" + open(tmppath("stdout")).read())
           if not USE_STDERR:
-            LOGGER.debug("stderr:" + open_file(tmppath("stderr")).read())
+            LOGGER.debug("stderr:" + open(tmppath("stderr")).read())
           self.stop()
           raise Exception("2nn process quit or is taking too long to start. Aborting.")
           break
@@ -325,7 +325,6 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
       break
 
     LOGGER.debug("Successfully started 2NN")
-
 
   def stop(self):
     """
@@ -356,8 +355,8 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
   @property
   def superuser(self):
     """
-    Returns the "superuser" of this cluster.  
-    
+    Returns the "superuser" of this cluster.
+
     This is essentially the user that the cluster was started
     with.
     """
@@ -400,6 +399,7 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 # Shared global cluster returned by shared_cluster context manager.
 _shared_cluster = None
 
+
 def shared_cluster(conf=False):
   """
   Use a shared cluster that is initialized on demand,
@@ -412,7 +412,7 @@ def shared_cluster(conf=False):
   done with the shared cluster.
   """
   cluster = shared_cluster_internal()
-  closers = [ ]
+  closers = []
   if conf:
     closers.extend([
       hadoop.conf.HDFS_CLUSTERS["default"].NN_HOST.set_for_testing("localhost"),
@@ -433,10 +433,11 @@ def shared_cluster(conf=False):
       x()
 
   # We don't run the cluster's real stop method,
-  # because a shared cluster should be shutdown at 
+  # because a shared cluster should be shutdown at
   # exit.
   cluster.shutdown = finish
   return cluster
+
 
 def write_config(config, path, variables=None):
   """
@@ -444,7 +445,7 @@ def write_config(config, path, variables=None):
   from a configuration map (config), into a new file
   called path.
   """
-  f = open_file(path, "w")
+  f = open(path, "w")
   try:
     f.write("""<?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
@@ -461,17 +462,19 @@ def write_config(config, path, variables=None):
   finally:
     f.close()
 
+
 def _write_static_group_mapping(user_group_mapping, path):
   """
   Create a Java-style .properties file to contain the static user -> group
   mapping used by tests.
   """
-  f = open_file(path, 'w')
+  f = open(path, 'w')
   try:
     for user, groups in user_group_mapping.items():
       f.write('%s = %s\n' % (user, ','.join(groups)))
   finally:
     f.close()
+
 
 def shared_cluster_internal():
   """
@@ -483,6 +486,7 @@ def shared_cluster_internal():
     _shared_cluster.start()
     atexit.register(_shared_cluster.stop)
   return _shared_cluster
+
 
 if __name__ == '__main__':
   """

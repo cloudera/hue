@@ -49,46 +49,35 @@ Each URL is mapped to one engine and should be created once per process.
 Each query statement grabs a connection from the engine and will return it after its close().
 Disposing the engine closes all its connections.
 '''
-from future import standard_library
-standard_library.install_aliases()
 
-from builtins import next, object
-import datetime
-import json
-import logging
-import uuid
 import re
 import sys
+import json
+import uuid
+import logging
+import datetime
 import textwrap
-
 from string import Template
+from urllib.parse import parse_qs as urllib_parse_qs, quote_plus as urllib_quote_plus, urlparse as urllib_urlparse
 
 from django.core.cache import caches
-from sqlalchemy import create_engine, inspect, Table, MetaData
-from sqlalchemy.exc import OperationalError, UnsupportedCompilationError, CompileError, ProgrammingError, NoSuchTableError
+from django.utils.translation import gettext as _
+from past.builtins import long
+from sqlalchemy import MetaData, Table, create_engine, inspect
+from sqlalchemy.exc import CompileError, NoSuchTableError, OperationalError, ProgrammingError, UnsupportedCompilationError
 
+from beeswax import data_export
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
-from beeswax import data_export
 from librdbms.server import dbms
-
-from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name, AuthenticationRequired
+from notebook.connectors.base import Api, AuthenticationRequired, QueryError, QueryExpired, _get_snippet_name
 from notebook.models import escape_rows
-
-if sys.version_info[0] > 2:
-  from urllib.parse import quote_plus as urllib_quote_plus, urlparse as urllib_urlparse, parse_qs as urllib_parse_qs
-  from past.builtins import long
-  from io import StringIO
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import quote_plus as urllib_quote_plus, urlparse as urllib_urlparse, parse_qs as urllib_parse_qs
-  from cStringIO import StringIO
 
 ENGINES = {}
 CONNECTIONS = {}
 ENGINE_KEY = '%(username)s-%(connector_name)s'
 URL_PATTERN = '(?P<driver_name>.+?://)(?P<host>[^:/ ]+):(?P<port>[0-9]*).*'
+
 
 LOG = logging.getLogger()
 
@@ -99,7 +88,7 @@ def query_error_handler(func):
       return func(*args, **kwargs)
     except OperationalError as e:
       message = str(e)
-      if '1045' in message: # 'Access denied' # MySQL
+      if '1045' in message:  # 'Access denied' # MySQL
         raise AuthenticationRequired(message=message)
       else:
         raise e
@@ -215,14 +204,12 @@ class SqlAlchemyApi(Api):
 
     return create_engine(url, **options)
 
-
   def _get_session(self, notebook, snippet):
     for session in notebook['sessions']:
       if session['type'] == snippet['type']:
         return session
 
     return None
-
 
   def _create_connection(self, engine):
     connection = None
@@ -235,7 +222,6 @@ class SqlAlchemyApi(Api):
       raise AuthenticationRequired(message='Could not establish connection to datasource: %s' % e)
 
     return connection
-
 
   @query_error_handler
   def execute(self, notebook, snippet):
@@ -278,11 +264,11 @@ class SqlAlchemyApi(Api):
 
     response = {
       'sync': False,
-      'has_result_set': result.cursor != None,
+      'has_result_set': result.cursor is not None,
       'modified_row_count': 0,
       'guid': guid,
       'result': {
-        'has_more': result.cursor != None,
+        'has_more': result.cursor is not None,
         'data': [],
         'meta': cache['meta'],
         'type': 'table'
@@ -291,7 +277,6 @@ class SqlAlchemyApi(Api):
     response.update(current_statement)
 
     return response
-
 
   @query_error_handler
   def explain(self, notebook, snippet):
@@ -310,7 +295,7 @@ class SqlAlchemyApi(Api):
         explanation = ''
       else:
         try:
-          result = connection.execute('EXPLAIN '+ statement)
+          result = connection.execute('EXPLAIN ' + statement)
           explanation = "\n".join("{}: {},".format(k, v) for row in result for k, v in row.items())
         except ProgrammingError:
           pass
@@ -322,7 +307,6 @@ class SqlAlchemyApi(Api):
       'explanation': explanation,
       'statement': statement
     }
-
 
   @query_error_handler
   def check_status(self, notebook, snippet):
@@ -344,7 +328,6 @@ class SqlAlchemyApi(Api):
 
     return response
 
-
   @query_error_handler
   def progress(self, notebook, snippet, logs=''):
     progress = 50
@@ -362,7 +345,6 @@ class SqlAlchemyApi(Api):
         stats = stats.get('stats', {})
         progress = stats.get('completedSplits', 0) * 100 // stats.get('totalSplits', 1)
     return progress
-
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
@@ -383,7 +365,6 @@ class SqlAlchemyApi(Api):
       'type': 'table'
     }
 
-
   def _assign_types(self, results, meta):
     result = results and results[0]
     if result:
@@ -401,16 +382,13 @@ class SqlAlchemyApi(Api):
         else:
           meta[index]['type'] = 'STRING_TYPE'
 
-
   @query_error_handler
   def fetch_result_metadata(self):
     pass
 
-
   @query_error_handler
   def cancel(self, notebook, snippet):
     return self.close_statement(notebook, snippet)
-
 
   @query_error_handler
   def get_log(self, notebook, snippet, startFrom=None, size=None):
@@ -433,11 +411,9 @@ class SqlAlchemyApi(Api):
     finally:
       return result
 
-
   def close_session(self, session):
     engine = self._get_engine()
     engine.dispose()  # ENGINE_KEY currently includes the current user
-
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
@@ -486,7 +462,6 @@ class SqlAlchemyApi(Api):
     response['status'] = 0
     return response
 
-
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
     engine = self._get_engine()
@@ -530,7 +505,6 @@ class SqlAlchemyApi(Api):
         'backticks': self.backticks
     })
 
-
   def _get_column_type_name(self, col):
     try:
       name = str(col.get('type'))
@@ -538,7 +512,6 @@ class SqlAlchemyApi(Api):
       name = col.get('type').__visit_name__.lower()
 
     return name
-
 
   def _fix_bigquery_db_prefixes(self, table_or_column):
     if self.options['url'].startswith('bigquery://'):

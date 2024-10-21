@@ -15,12 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
-import sys
 
-from django.urls import reverse
 from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from beeswax.data_export import DOWNLOAD_COOKIE_AGE
@@ -29,25 +30,20 @@ from desktop.auth.decorators import admin_required
 from desktop.conf import ENABLE_DOWNLOAD, ENABLE_HUE_5, USE_NEW_EDITOR
 from desktop.lib import export_csvxls
 from desktop.lib.connectors.models import Connector
-from desktop.lib.django_util import render, JsonResponse
+from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2, Document, FilesystemException, _get_gist_document
+from desktop.models import Document, Document2, FilesystemException, _get_gist_document
 from desktop.views import serve_403_error
-from metadata.conf import has_optimizer, has_catalog, has_workload_analytics
-
-from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS, EXAMPLES
+from metadata.conf import has_catalog, has_optimizer, has_workload_analytics
+from notebook.conf import EXAMPLES, SHOW_NOTEBOOKS, get_ordered_interpreters
 from notebook.connectors.base import Notebook, _get_snippet_name, get_interpreter
 from notebook.connectors.spark_shell import SparkApi
-from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
+from notebook.decorators import check_document_access_permission, check_document_modify_permission, check_editor_access_permission
 from notebook.management.commands.notebook_setup import Command
-from notebook.models import make_notebook, _get_editor_type, get_api, _get_dialect_example
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from notebook.models import _get_dialect_example, _get_editor_type, get_api, make_notebook
 
 LOG = logging.getLogger()
+
 
 @check_document_access_permission
 def notebook(request, is_embeddable=False):
@@ -60,7 +56,7 @@ def notebook(request, is_embeddable=False):
   try:
     from spark.conf import LIVY_SERVER_SESSION_KIND
     is_yarn_mode = LIVY_SERVER_SESSION_KIND.get()
-  except:
+  except Exception:
     LOG.exception('Spark is not enabled')
 
   return render('notebook.mako', request, {
@@ -225,9 +221,9 @@ def execute_and_watch(request):
 
     sample = get_api(request, snippet).fetch_result(notebook, snippet, 0, start_over=True)
 
-    from indexer.api3 import _index # Will ve moved to the lib
-    from indexer.file_format import HiveFormat
+    from indexer.api3 import _index  # Will ve moved to the lib
     from indexer.fields import Field
+    from indexer.file_format import HiveFormat
 
     file_format = {
         'name': 'col',

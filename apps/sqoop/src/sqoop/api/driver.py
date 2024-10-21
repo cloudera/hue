@@ -16,27 +16,26 @@
 # limitations under the License.
 
 from __future__ import absolute_import
-import json
-import logging
-import socket
-import sys
 
-from sqoop import client, conf
+import sys
+import json
+import socket
+import logging
+
+from django.utils.translation import gettext as _
+from django.views.decorators.cache import never_cache
+
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
+from sqoop import client, conf
 from sqoop.api.exception import handle_rest_exception
-from django.views.decorators.cache import never_cache
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 __all__ = ['driver']
 
 
 LOG = logging.getLogger()
+
 
 @never_cache
 def driver(request):
@@ -47,7 +46,9 @@ def driver(request):
   }
   if request.method == 'GET':
     try:
-      c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
+      c = client.SqoopClient(
+        conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get()
+      )
       response['driver'] = c.get_driver().to_dict()
     except RestException as e:
       response.update(handle_rest_exception(e, _('Could not get driver.')))

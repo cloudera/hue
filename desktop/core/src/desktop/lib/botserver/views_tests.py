@@ -15,31 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
 import unittest
-import pytest
-import sys
+from unittest.mock import Mock, patch
 
+import pytest
 from django.test import TestCase
 
-from desktop.lib.botserver.views import *
 from desktop import conf
-from desktop.models import Document2, _get_gist_document
+from desktop.lib.botserver.views import *
 from desktop.lib.django_test_util import make_logged_in_client
-
+from desktop.models import Document2, _get_gist_document
 from useradmin.models import User
-
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
 LOG = logging.getLogger()
 
+
 class TestBotServer(TestCase):
-  
   @classmethod
   def setup_class(cls):
     if not conf.SLACK.IS_ENABLED.get():
@@ -55,7 +49,7 @@ class TestBotServer(TestCase):
 
   def setup_method(self):
     self.host_domain = 'testserver.gethue.com'
-    self.is_http_secure = True # https if true else http
+    self.is_http_secure = True  # https if true else http
 
     self.email_domain = '.'.join(self.host_domain.split('.')[-2:])
 
@@ -66,16 +60,13 @@ class TestBotServer(TestCase):
   def test_handle_on_message(self):
     with patch('desktop.lib.botserver.views._send_message') as _send_message:
       with patch('desktop.lib.botserver.views.handle_select_statement') as handle_select_statement:
-
         bot_id = "bot_id"
-        message_element = [{
-          'elements': [{
-            'text': 'hello hue test'
-          }]
-        }]
+        message_element = [{'elements': [{'text': 'hello hue test'}]}]
 
         # Bot sending message
-        response = handle_on_message(self.host_domain, self.is_http_secure, self.channel_id, bot_id, message_element, self.user_id, self.message_ts)
+        response = handle_on_message(
+          self.host_domain, self.is_http_secure, self.channel_id, bot_id, message_element, self.user_id, self.message_ts
+        )
         assert response.status_code == 200
         assert not _send_message.called
 
@@ -84,42 +75,39 @@ class TestBotServer(TestCase):
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": ("Hey <@user_id>, I'm your SQL Assistant! "
-              "I'm here to assist users with their SQL queries and *<https://docs.gethue.com/user/concept/#slack|much more.>*\n"
-              "Here are the few things I can help you with:")
-            }
+              "text": (
+                "Hey <@user_id>, I'm your SQL Assistant! "
+                "I'm here to assist users with their SQL queries and *<https://docs.gethue.com/user/concept/#slack|much more.>*\n"
+                "Here are the few things I can help you with:"
+              ),
+            },
           },
+          {"type": "divider"},
           {
-            "type": "divider"
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "*Share query/gist links* in channel which unfurls in a rich preview, showing query details and result in message thread if available.",  # noqa: E501
+            },
           },
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": "*Share query/gist links* in channel which unfurls in a rich preview, showing query details and result in message thread if available."
-            }
+              "text": "Create a gist for your query, select the channel and *share directly from the Hue Editor* window.",
+            },
           },
           {
             "type": "section",
             "text": {
               "type": "mrkdwn",
-              "text": "Create a gist for your query, select the channel and *share directly from the Hue Editor* window."
-            }
+              "text": "*Detect SQL SELECT statements* in the channel and suggests a gist link for improved query discussions.",
+            },
           },
           {
             "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "*Detect SQL SELECT statements* in the channel and suggests a gist link for improved query discussions."
-            }
+            "text": {"type": "mrkdwn", "text": "Type `@Hue queries` to explore a list of important queries from the latest *query bank*."},
           },
-          {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "Type `@Hue queries` to explore a list of important queries from the latest *query bank*."
-            }
-          }
         ]
 
         # Help message
@@ -129,28 +117,35 @@ class TestBotServer(TestCase):
         # Detect SQL
         message_element = [
           {
-            'elements': [{
-              'text': 'Hi Team, need help with query',
-            }],
+            'elements': [
+              {
+                'text': 'Hi Team, need help with query',
+              }
+            ],
           },
           {
-            'elements': [{
-              'text': 'SELECT 1',
-            }],
+            'elements': [
+              {
+                'text': 'SELECT 1',
+              }
+            ],
           },
         ]
 
         handle_on_message(self.host_domain, self.is_http_secure, self.channel_id, None, message_element, self.user_id, self.message_ts)
-        handle_select_statement.assert_called_with(self.host_domain, self.is_http_secure, self.channel_id, self.user_id, 'select 1', self.message_ts)
+        handle_select_statement.assert_called_with(
+          self.host_domain, self.is_http_secure, self.channel_id, self.user_id, 'select 1', self.message_ts
+        )
 
   def test_handle_select_statement(self):
     with patch('desktop.lib.botserver.views.check_slack_user_permission') as check_slack_user_permission:
       with patch('desktop.lib.botserver.views._make_select_statement_gist') as _make_select_statement_gist:
         with patch('desktop.lib.botserver.views._send_message') as _send_message:
           with patch('desktop.lib.botserver.views.get_user') as get_user:
-
             statement = 'select 1'
-            detect_msg = 'Hi <@user_id> \n Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'
+            detect_msg = (
+              'Hi <@user_id> \n Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'
+            )
 
             # For Slack user not Hue user
             get_user.side_effect = SlackBotException('Slack user does not have access to the query')
@@ -176,13 +171,14 @@ class TestBotServer(TestCase):
             with patch('desktop.lib.botserver.views._query_result') as query_result:
               with patch('desktop.lib.botserver.views._make_result_table') as result_table:
                 with patch('desktop.lib.botserver.views._send_message') as _send_message:
-
                   doc_data = {
                     "dialect": "mysql",
-                    "snippets": [{
-                      "statement_raw": "SELECT 5000",
-                    }],
-                    'uuid': 'doc uuid'
+                    "snippets": [
+                      {
+                        "statement_raw": "SELECT 5000",
+                      }
+                    ],
+                    'uuid': 'doc uuid',
                   }
                   doc = Document2.objects.create(data=json.dumps(doc_data), owner=self.user)
                   links = [{"url": "https://{host_domain}/hue/editor?editor=".format(host_domain=self.host_domain) + str(doc.id)}]
@@ -190,12 +186,7 @@ class TestBotServer(TestCase):
                   # Slack user is Hue user but without read access sends link
                   users_info.return_value = {
                     "ok": True,
-                    "user": {
-                      "is_bot": False,
-                      "profile": {
-                        "email": "test_not_me@{domain}".format(domain=self.email_domain)
-                      }
-                    }
+                    "user": {"is_bot": False, "profile": {"email": "test_not_me@{domain}".format(domain=self.email_domain)}},
                   }
                   with pytest.raises(PopupException):
                     handle_on_link_shared(self.host_domain, "channel", "12.1", links, "<@user_id>")
@@ -214,33 +205,33 @@ class TestBotServer(TestCase):
 
                   query_preview = {
                     links[0]['url']: {
-                    "color": "#025BA6",
-                    "blocks": [
-                      {
-                        "type": "section",
-                        "text": {
-                          "type": "mrkdwn",
-                          "text": "\n*<{url}|Open  query of mysql dialect created by test in Hue>*".format(url=links[0]['url']),
-                          }
-                      },
-                      {
-                        "type": "divider",
-                      },
-                      {
-                        "type": "section",
-                        "text": {
-                          "type": "mrkdwn",
-                          "text": "*Statement:*\n```SELECT 5000```",
-                          }
+                      "color": "#025BA6",
+                      "blocks": [
+                        {
+                          "type": "section",
+                          "text": {
+                            "type": "mrkdwn",
+                            "text": "\n*<{url}|Open  query of mysql dialect created by test in Hue>*".format(url=links[0]['url']),
+                          },
+                        },
+                        {
+                          "type": "divider",
+                        },
+                        {
+                          "type": "section",
+                          "text": {
+                            "type": "mrkdwn",
+                            "text": "*Statement:*\n```SELECT 5000```",
+                          },
                         },
                         {
                           'type': 'section',
                           'text': {
                             'type': 'mrkdwn',
                             'text': "*Query result:*\n```  Columns(1)\n------------  ----\n        5000  5000```",
-                          }
-                        }
-                      ]
+                          },
+                        },
+                      ],
                     }
                   }
 
@@ -257,58 +248,48 @@ class TestBotServer(TestCase):
                   inv_qhistory_url = "https://{host_domain}/hue/editor/?type=4".format(host_domain=self.host_domain)
                   with pytest.raises(SlackBotException):
                     handle_on_link_shared(self.host_domain, "channel", "12.1", [{"url": inv_qhistory_url}], "<@user_id>")
-                  _send_message.assert_called_with('channel', message='Could not access the query, please check the link again.', message_ts='12.1')
+                  _send_message.assert_called_with(
+                    'channel', message='Could not access the query, please check the link again.', message_ts='12.1'
+                  )
 
   def test_handle_gist_link(self):
     with patch('desktop.lib.botserver.views.slack_client.chat_unfurl') as chat_unfurl:
       with patch('desktop.lib.botserver.views.slack_client.users_info') as users_info:
         with patch('desktop.lib.botserver.views.send_result_file') as send_result_file:
           with patch('desktop.lib.botserver.views._send_message') as _send_message:
-
             doc_data = {"statement_raw": "SELECT 98765"}
-            gist_doc = Document2.objects.create(
-              name='Mysql Query',
-              type='gist',
-              owner=self.user,
-              data=json.dumps(doc_data),
-              extra='mysql'
-            )
+            gist_doc = Document2.objects.create(name='Mysql Query', type='gist', owner=self.user, data=json.dumps(doc_data), extra='mysql')
             links = [{"url": "https://{host_domain}/hue/gist?uuid=".format(host_domain=self.host_domain) + gist_doc.uuid}]
 
             # Slack user who is Hue user sends link
             users_info.return_value = {
               "ok": True,
-              "user": {
-                "is_bot": False,
-                "profile": {
-                  "email": "test@{domain}".format(domain=self.email_domain)
-                }
-              }
+              "user": {"is_bot": False, "profile": {"email": "test@{domain}".format(domain=self.email_domain)}},
             }
             handle_on_link_shared(self.host_domain, self.channel_id, self.message_ts, links, self.user_id)
 
             gist_preview = {
               links[0]['url']: {
-              "color": "#025BA6",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "\n*<{url}|Open Mysql Query gist of mysql dialect created by test in Hue>*".format(url=links[0]['url']),
-                    }
-                },
-                {
-                  "type": "divider",
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Statement:*\n```SELECT 98765```",
-                    }
+                "color": "#025BA6",
+                "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "\n*<{url}|Open Mysql Query gist of mysql dialect created by test in Hue>*".format(url=links[0]['url']),
+                    },
                   },
-                ]
+                  {
+                    "type": "divider",
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Statement:*\n```SELECT 98765```",
+                    },
+                  },
+                ],
               }
             }
 
@@ -320,7 +301,7 @@ class TestBotServer(TestCase):
               "ok": True,
               "user": {
                 "is_bot": True,
-              }
+              },
             }
             handle_on_link_shared(self.host_domain, self.channel_id, self.message_ts, links, self.user_id)
 
@@ -337,21 +318,17 @@ class TestBotServer(TestCase):
             inv_gist_url = "https://{host_domain}/hue/gist?uuids/=invalid_link".format(host_domain=self.host_domain)
             with pytest.raises(SlackBotException):
               handle_on_link_shared(self.host_domain, "channel", "12.1", [{"url": inv_gist_url}], "<@user_id>")
-            _send_message.assert_called_with('channel', message='Could not access the query, please check the link again.', message_ts='12.1')
+            _send_message.assert_called_with(
+              'channel', message='Could not access the query, please check the link again.', message_ts='12.1'
+            )
 
   def test_slack_user_not_hue_user(self):
     with patch('desktop.lib.botserver.views.slack_client.users_info') as users_info:
       with patch('desktop.lib.botserver.views._send_message') as _send_message:
-
         # Same domain but diff email prefix
         users_info.return_value = {
           "ok": True,
-          "user": {
-            "is_bot": False,
-            "profile": {
-              "email": "test_user_not_exist@{domain}".format(domain=self.email_domain)
-            }
-          }
+          "user": {"is_bot": False, "profile": {"email": "test_user_not_exist@{domain}".format(domain=self.email_domain)}},
         }
         slack_user = check_slack_user_permission(self.host_domain, self.user_id)
 
@@ -360,26 +337,17 @@ class TestBotServer(TestCase):
         _send_message.assert_called_with('channel', message='Corresponding Hue user not found or does not have access.', message_ts='12.1')
 
         # Different domain but same email prefix
-        users_info.return_value = {
-          "ok": True,
-          "user": {
-            "is_bot": False,
-            "profile": {
-              "email": "test@example.com"
-            }
-          }
-        }
+        users_info.return_value = {"ok": True, "user": {"is_bot": False, "profile": {"email": "test@example.com"}}}
         slack_user = check_slack_user_permission(self.host_domain, self.user_id)
 
         with pytest.raises(SlackBotException):
           get_user("channel", slack_user, "12.1")
         _send_message.assert_called_with('channel', message='Corresponding Hue user not found or does not have access.', message_ts='12.1')
-  
+
   def test_handle_on_app_mention(self):
     with patch('desktop.lib.botserver.views.check_slack_user_permission') as check_slack_user_permission:
       with patch('desktop.lib.botserver.views.get_user') as get_user:
         with patch('desktop.lib.botserver.views.handle_query_bank') as handle_query_bank:
-
           text = '@hue some message'
           handle_on_app_mention(self.host_domain, self.channel_id, self.user_id, text, self.message_ts)
 
@@ -393,43 +361,17 @@ class TestBotServer(TestCase):
   def test_handle_query_bank(self):
     with patch('desktop.lib.botserver.views.get_all_queries') as get_all_queries:
       with patch('desktop.lib.botserver.views._send_message') as _send_message:
-
         get_all_queries.return_value = [
-          {
-            "name": "Test Query 1",
-            "data": {
-              "query": {
-                "statement": "SELECT 1"
-              }
-            }
-          },
-          {
-            "name": "Test Query 2",
-            "data": {
-              "query": {
-                "statement": "SELECT 2"
-              }
-            }
-          }
+          {"name": "Test Query 1", "data": {"query": {"statement": "SELECT 1"}}},
+          {"name": "Test Query 2", "data": {"query": {"statement": "SELECT 2"}}},
         ]
 
         test_query_block = [
-          {
-            'type': 'section',
-            'text': {'type': 'mrkdwn', 'text': 'Hi <@user_id>, here is the list of all saved queries!'}
-          }, 
-          {
-            'type': 'divider'
-          }, 
-          {
-            'type': 'section',
-            'text': {'type': 'mrkdwn', 'text': '*Name:* Test Query 1 \n *Statement:*\n ```SELECT 1```'}
-          },
-          {
-            'type': 'section',
-            'text': {'type': 'mrkdwn', 'text': '*Name:* Test Query 2 \n *Statement:*\n ```SELECT 2```'}
-          }
+          {'type': 'section', 'text': {'type': 'mrkdwn', 'text': 'Hi <@user_id>, here is the list of all saved queries!'}},
+          {'type': 'divider'},
+          {'type': 'section', 'text': {'type': 'mrkdwn', 'text': '*Name:* Test Query 1 \n *Statement:*\n ```SELECT 1```'}},
+          {'type': 'section', 'text': {'type': 'mrkdwn', 'text': '*Name:* Test Query 2 \n *Statement:*\n ```SELECT 2```'}},
         ]
-        
+
         handle_query_bank(self.channel_id, self.user_id)
         _send_message.assert_called_with(self.channel_id, block_element=test_query_block)

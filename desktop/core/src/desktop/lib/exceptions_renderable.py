@@ -19,17 +19,13 @@ These methods should never be placed in 'desktop.lib.exceptions'.
 This file exists to remove circular reference caused by importing django_util.
 """
 
-import logging
 import sys
+import logging
 import traceback
 
-if sys.version_info[0] > 2:
-  from django.utils.encoding import force_str
-else:
-  from django.utils.encoding import force_unicode as force_str
+from django.utils.encoding import force_str
 
 import desktop.lib.django_util
-
 
 LOG = logging.getLogger()
 
@@ -37,6 +33,7 @@ LOG = logging.getLogger()
 def raise_popup_exception(message, title="Error", detail=None, error_code=500):
   tb = sys.exc_info()
   raise PopupException(message, title=title, detail=detail, error_code=error_code, tb=traceback.extract_tb(tb[2]))
+
 
 class PopupException(Exception):
   """
@@ -54,7 +51,7 @@ class PopupException(Exception):
 
     if tb:
       self.traceback = tb
-    else: # At this point the previous trace is already lost
+    else:  # At this point the previous trace is already lost
       # Traceback is only relevant if an exception was thrown, caught, and we reraise with this exception.
       tb = sys.exc_info()
       self.traceback = traceback.extract_tb(tb[2])
@@ -77,7 +74,7 @@ class PopupException(Exception):
       data['traceback'] = traceback.format_list(data['traceback'])
 
     response = desktop.lib.django_util.render("popup_error.mako", request, data)
-    if self.error_code == 500 and data['is_embeddable']: # Hue 4
+    if self.error_code == 500 and data['is_embeddable']:  # Hue 4
       response.status_code = 200
     else:
       response.status_code = self.error_code

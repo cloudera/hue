@@ -35,6 +35,7 @@ import unicodedata
 from builtins import object
 
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
+from django.utils.translation import gettext as _
 
 import hadoop.cluster
 from desktop.lib import fsmanager
@@ -43,11 +44,6 @@ from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
 from filebrowser.utils import calculate_total_size, generate_chunks
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger()
 

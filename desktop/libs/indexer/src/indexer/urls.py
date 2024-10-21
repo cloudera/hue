@@ -17,18 +17,11 @@
 
 import sys
 
-from indexer import views as indexer_views
-from indexer import solr_api as indexer_solr_api
-from indexer import api3 as indexer_api3
-from indexer.indexers import rdbms as indexer_indexers_rdbms
-from indexer import api as indexer_api
+from django.urls import re_path
 
+from indexer import api as indexer_api, api3 as indexer_api3, solr_api as indexer_solr_api, views as indexer_views
 from indexer.conf import ENABLE_NEW_INDEXER
-
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from indexer.indexers import rdbms as indexer_indexers_rdbms
 
 urlpatterns = [
   re_path(r'^install_examples$', indexer_views.install_examples, name='install_examples'),
@@ -46,7 +39,7 @@ if ENABLE_NEW_INDEXER.get():
     re_path(r'^$', indexer_views.indexes, name='indexes'),
     re_path(r'^indexes/?$', indexer_views.indexes, name='indexes'),
     re_path(r'^indexes/(?P<index>[^/]+)/?$', indexer_views.indexes, name='indexes'),
-    re_path(r'^collections$', indexer_views.collections, name='collections'), # Old page
+    re_path(r'^collections$', indexer_views.collections, name='collections'),  # Old page
   ]
 else:
   urlpatterns += [
@@ -78,12 +71,12 @@ urlpatterns += [
   re_path(r'^api/indexer/guess_format/?$', indexer_api3.guess_format, name='guess_format'),
   re_path(r'^api/indexer/guess_field_types/?$', indexer_api3.guess_field_types, name='guess_field_types'),
   re_path(r'^api/indexer/index/?$', indexer_api3.index, name='index'),
-
   re_path(r'^api/importer/submit', indexer_api3.importer_submit, name='importer_submit'),
   re_path(r'^api/importer/save/?$', indexer_api3.save_pipeline, name='save_pipeline'),
-  
   re_path(r'^api/indexer/upload_local_file/?$', indexer_api3.upload_local_file, name='upload_local_file'),
-  re_path(r'^api/indexer/upload_local_file_drag_and_drop/?$', indexer_api3.upload_local_file_drag_and_drop, name='upload_local_file_drag_and_drop'),
+  re_path(
+    r'^api/indexer/upload_local_file_drag_and_drop/?$', indexer_api3.upload_local_file_drag_and_drop, name='upload_local_file_drag_and_drop'
+  ),
 ]
 
 urlpatterns += [

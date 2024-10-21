@@ -16,20 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
 
-from django.core.management.base import CommandError, BaseCommand
-
-from useradmin.models import User
+from django.core.management.base import BaseCommand, CommandError
+from django.utils.translation import gettext_lazy as _
 
 from desktop.models import Document2
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
-
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
@@ -44,6 +38,7 @@ class Command(BaseCommand):
   If --username is specified, it will only perform the operation for the specific user.
   """
   help = _("Creates home and Trash directories for users as needed, or specific user if username is provided.")
+
   def add_arguments(self, parser):
     parser.add_argument('--username', help=_("Username of user to create directories for."), action='store', default=None)
 

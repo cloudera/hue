@@ -18,7 +18,7 @@ import re
 import sys
 
 from desktop.lib.conf import BoundConfig
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.views import commonheader, commonfooter
 
 if sys.version_info[0] > 2:
@@ -101,7 +101,7 @@ ${ layout.menubar(section='log_view') }
 
     <div id="hue-logs">
       % for l in log:
-        <pre>${ smart_unicode(l, errors='ignore') }</pre>
+        <pre>${ smart_str(l, errors='ignore') }</pre>
       % endfor
     </div>
 

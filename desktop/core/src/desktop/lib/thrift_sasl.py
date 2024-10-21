@@ -17,23 +17,19 @@
 # under the License.
 #
 """ SASL transports for Thrift. """
-from __future__ import absolute_import
 
-from future import standard_library
-standard_library.install_aliases()
-from thrift.transport import TTransport
-from thrift.transport.TTransport import *
-from thrift.protocol import TBinaryProtocol
-import struct
 import sys
+import struct
 
 # TODO: Check whether the following distinction is necessary. Does not appear to
 # break anything when `io.BytesIO` is used everywhere, but there may be some edge
 # cases where things break down.
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import BytesIO as string_io
+
+from thrift.protocol import TBinaryProtocol
+from thrift.transport import TTransport
+from thrift.transport.TTransport import *
+
 
 class TSaslClientTransport(TTransportBase, CReadableTransport):
   START = 1
@@ -119,12 +115,12 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
     # If the length doesn't change, then we must be using a QOP
     # of auth and we should no longer call sasl.encode(), otherwise
     # we encode every time.
-    if self.encode == None:
+    if self.encode is None:
       success, encoded = self.sasl.encode(buffer)
       if not success:
         raise TTransportException(type=TTransportException.UNKNOWN,
                                   message=self.sasl.getError())
-      if (len(encoded)==len(buffer)):
+      if (len(encoded) == len(buffer)):
         self.encode = False
         self._flushPlain(buffer)
       else:

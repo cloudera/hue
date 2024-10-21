@@ -15,27 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
 import os
-import pytest
-import sys
+from io import BytesIO as string_io
 
+import pytest
 
 import desktop.conf as desktop_conf
-
-from desktop.lib.test_utils import clear_sys_caches, restore_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import clear_sys_caches, restore_sys_caches
+from hadoop import cluster, conf, confparse, pseudo_hdfs4
 
-from hadoop import cluster
-from hadoop import conf
-from hadoop import confparse
-from hadoop import pseudo_hdfs4
-
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-else:
-  from cStringIO import StringIO as string_io
 
 def test_confparse():
   data = """
@@ -69,9 +58,9 @@ def test_confparse():
     assert cp['fs.default.name'] == 'hdfs://localhost:8020'
     assert cp.get('with_description') == 'bar'
     assert cp.get('not_in_xml', 'abc') == 'abc'
-    assert cp.getbool('boolean_true') == True
-    assert cp.getbool('boolean_false') == False
-    assert cp.getbool('not_in_xml', True) == True
+    assert cp.getbool('boolean_true') is True
+    assert cp.getbool('boolean_false') is False
+    assert cp.getbool('not_in_xml', True) is True
 
     try:
       cp['bogus']
@@ -82,14 +71,13 @@ def test_confparse():
   cp_empty = confparse.ConfParse("")
   assert cp_empty.get('whatever', 'yes') == 'yes'
 
+
 def test_tricky_confparse():
   """
   We found (experimentally) that dealing with a file
   sometimes triggered the wrong results here.
   """
-  cp_data = confparse.ConfParse(open(os.path.join(os.path.dirname(__file__),
-                                                  "test_data",
-                                                  "sample_conf.xml"), 'rb'))
+  cp_data = confparse.ConfParse(open(os.path.join(os.path.dirname(__file__), "test_data", "sample_conf.xml"), 'rb'))
   assert "org.apache.hadoop.examples.SleepJob" == cp_data["mapred.mapper.class"]
 
 
@@ -128,10 +116,10 @@ def test_config_validator_more():
   try:
     resp = cli.get('/debug/check_config')
 
-    assert not 'Failed to access filesystem root' in resp.content
-    assert not 'Failed to create' in resp.content
-    assert not 'Failed to chown' in resp.content
-    assert not 'Failed to delete' in resp.content
+    assert 'Failed to access filesystem root' not in resp.content
+    assert 'Failed to create' not in resp.content
+    assert 'Failed to chown' not in resp.content
+    assert 'Failed to delete' not in resp.content
   finally:
     restore_sys_caches(old_caches)
 
@@ -141,8 +129,8 @@ def test_non_default_cluster():
   NON_DEFAULT_NAME = 'non_default'
   old_caches = clear_sys_caches()
   reset = (
-    conf.HDFS_CLUSTERS.set_for_testing({ NON_DEFAULT_NAME: { } }),
-    conf.MR_CLUSTERS.set_for_testing({ NON_DEFAULT_NAME: { } }),
+    conf.HDFS_CLUSTERS.set_for_testing({NON_DEFAULT_NAME: {}}),
+    conf.MR_CLUSTERS.set_for_testing({NON_DEFAULT_NAME: {}}),
   )
   try:
     # This is indeed the only hdfs/mr cluster
@@ -160,25 +148,28 @@ def test_non_default_cluster():
 
 def test_hdfs_ssl_validate():
   for desktop_kwargs, conf_kwargs, expected in [
-      ({'present': False}, {'present': False}, True),
-      ({'present': False}, {'data': False}, False),
-      ({'present': False}, {'data': True}, True),
-
-      ({'data': False}, {'present': False}, False),
-      ({'data': False}, {'data': False}, False),
-      ({'data': False}, {'data': True}, True),
-
-      ({'data': True}, {'present': False}, True),
-      ({'data': True}, {'data': False}, False),
-      ({'data': True}, {'data': True}, True),
-      ]:
+    ({'present': False}, {'present': False}, True),
+    ({'present': False}, {'data': False}, False),
+    ({'present': False}, {'data': True}, True),
+    ({'data': False}, {'present': False}, False),
+    ({'data': False}, {'data': False}, False),
+    ({'data': False}, {'data': True}, True),
+    ({'data': True}, {'present': False}, True),
+    ({'data': True}, {'data': False}, False),
+    ({'data': True}, {'data': True}, True),
+  ]:
     resets = [
       desktop_conf.SSL_VALIDATE.set_for_testing(**desktop_kwargs),
       conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.set_for_testing(**conf_kwargs),
     ]
 
     try:
-      assert conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get())
+      assert conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (
+        desktop_kwargs,
+        conf_kwargs,
+        expected,
+        conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get(),
+      )
     finally:
       for reset in resets:
         reset()
@@ -186,18 +177,16 @@ def test_hdfs_ssl_validate():
 
 def test_yarn_ssl_validate():
   for desktop_kwargs, conf_kwargs, expected in [
-      ({'present': False}, {'present': False}, True),
-      ({'present': False}, {'data': False}, False),
-      ({'present': False}, {'data': True}, True),
-
-      ({'data': False}, {'present': False}, False),
-      ({'data': False}, {'data': False}, False),
-      ({'data': False}, {'data': True}, True),
-
-      ({'data': True}, {'present': False}, True),
-      ({'data': True}, {'data': False}, False),
-      ({'data': True}, {'data': True}, True),
-      ]:
+    ({'present': False}, {'present': False}, True),
+    ({'present': False}, {'data': False}, False),
+    ({'present': False}, {'data': True}, True),
+    ({'data': False}, {'present': False}, False),
+    ({'data': False}, {'data': False}, False),
+    ({'data': False}, {'data': True}, True),
+    ({'data': True}, {'present': False}, True),
+    ({'data': True}, {'data': False}, False),
+    ({'data': True}, {'data': True}, True),
+  ]:
     resets = [
       conf.YARN_CLUSTERS.set_for_testing({'default': {}}),
       desktop_conf.SSL_VALIDATE.set_for_testing(**desktop_kwargs),
@@ -205,7 +194,12 @@ def test_yarn_ssl_validate():
     ]
 
     try:
-      assert conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get())
+      assert conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (
+        desktop_kwargs,
+        conf_kwargs,
+        expected,
+        conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get(),
+      )
     finally:
       for reset in resets:
         reset()

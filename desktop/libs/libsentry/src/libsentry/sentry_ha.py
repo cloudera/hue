@@ -15,21 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
 import time
+import logging
+
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.exceptions_renderable import PopupException
-
 from libsentry.client2 import SentryClient
 from libsentry.sentry_site import get_sentry_server
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -67,7 +62,8 @@ def get_next_available_server(client_class, username, failed_host=None, componen
       client = create_client_fn(client_class, username, next_server, component)
       client.list_sentry_roles_by_group(groupName='*')
       # If above operation succeeds, return client
-      LOG.info('Successfully connected to Sentry server %s, after attempting [%s], returning client.' % (client.host, ', '.join(attempted_hosts)))
+      LOG.info(
+        'Successfully connected to Sentry server %s, after attempting [%s], returning client.' % (client.host, ', '.join(attempted_hosts)))
       return next_server, attempted_hosts
     except StructuredThriftTransportException as e:
       # If we have come back around to the original failed client, exit

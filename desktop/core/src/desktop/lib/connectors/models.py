@@ -15,26 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
-import sys
 
 from django.db import connection, models, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
-
-from useradmin.organization import _fitered_queryset, get_user_request_organization
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 from desktop.conf import CONNECTORS, ENABLE_ORGANIZATIONS
 from desktop.lib.connectors.types import get_connectors_types
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
+from desktop.lib.i18n import smart_str
+from useradmin.organization import _fitered_queryset, get_user_request_organization
 
 LOG = logging.getLogger()
 
@@ -248,4 +242,4 @@ class ConnectorNotFoundException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)

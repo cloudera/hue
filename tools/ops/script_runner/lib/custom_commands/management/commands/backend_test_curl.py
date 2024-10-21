@@ -35,10 +35,7 @@ from hadoop import cluster
 
 from hue_curl import Curl
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 DEFAULT_LOG_DIR = 'logs'
 log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)

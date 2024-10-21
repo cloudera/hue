@@ -16,20 +16,14 @@
 
 import os
 import re
-import sys
 import logging
 
 import requests
+from django.utils.translation import gettext as _t, gettext_lazy as _
 
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.idbroker import conf as conf_idbroker
 from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket, get_s3a_access_key, get_s3a_secret_key, get_s3a_session_token
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _t, gettext_lazy as _
-else:
-  from django.utils.translation import ugettext as _t, ugettext_lazy as _
-
 
 LOG = logging.getLogger()
 

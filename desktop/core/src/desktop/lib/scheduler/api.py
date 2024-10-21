@@ -104,4 +104,4 @@ def submit_schedule(request, doc_id):
       force_template=True
   ).content
 
-  return JsonResponse(popup.decode("utf-8") if sys.version_info[0] > 2 else popup, safe=False)
+  return JsonResponse(popup.decode("utf-8"), safe=False)

@@ -18,10 +18,15 @@
 This module provides access to LDAP servers, along with some basic functionality required for Hue and
 User Admin to work seamlessly with LDAP.
 """
-from builtins import str, object
 
+import re
 import logging
-import sys
+
+from django.utils.encoding import smart_str
+
+import desktop.conf
+from desktop.lib.python_util import CaseInsensitiveDict
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
@@ -32,17 +37,6 @@ try:
 except ImportError:
   LOG.warning('ldap module not found')
   SCOPE_SUBTREE = None
-import re
-
-import desktop.conf
-from desktop.lib.python_util import CaseInsensitiveDict
-
-from useradmin.models import User
-
-if sys.version_info[0] > 2:
-  from django.utils.encoding import smart_str
-else:
-  from django.utils.encoding import smart_text as smart_str
 
 CACHED_LDAP_CONN = None
 
@@ -66,6 +60,7 @@ def get_connection_from_server(server=None):
 
   return get_connection(ldap_config)
 
+
 def get_connection(ldap_config):
   global CACHED_LDAP_CONN
   if CACHED_LDAP_CONN is not None:
@@ -85,6 +80,7 @@ def get_connection(ldap_config):
   else:
     return LdapConnection(ldap_config, ldap_url, get_ldap_username(username, ldap_config.NT_DOMAIN.get()), password, ldap_cert)
 
+
 def get_auth(ldap_config):
   ldap_url = ldap_config.LDAP_URL.get()
   if ldap_url is None:
@@ -102,6 +98,7 @@ def get_auth(ldap_config):
     ldap_conf = (ldap_url, get_ldap_username(username, ldap_config.NT_DOMAIN.get()), password, ldap_cert)
 
   return ldap_conf
+
 
 def get_ldap_username(username, nt_domain):
   if nt_domain:
@@ -272,7 +269,6 @@ class LdapConnection(object):
 
           user_info.append(ldap_info)
     return user_info
-
 
   def _transform_find_group_results(self, result_data, group_name_attr, group_member_attr):
     group_info = []

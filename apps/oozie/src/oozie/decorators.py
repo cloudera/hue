@@ -15,25 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
-import sys
 
 from django.utils.functional import wraps
+from django.utils.translation import gettext as _
 
+from desktop.auth.backend import is_admin
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, Document2
-
-from oozie.models import Job, Node, Dataset
-
-from desktop.auth.backend import is_admin
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from oozie.models import Dataset, Job, Node
 
 LOG = logging.getLogger()
 
@@ -121,7 +114,7 @@ def check_editor_access_permission(view_func):
   return wraps(view_func)(decorate)
 
 
-## Oozie v1 below
+# Oozie v1 below
 
 
 def check_job_access_permission(exception_class=PopupException):

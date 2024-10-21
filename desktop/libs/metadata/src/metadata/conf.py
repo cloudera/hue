@@ -15,24 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 import sys
-
+import logging
 from subprocess import CalledProcessError
+
+from django.utils.translation import gettext_lazy as _t
 
 from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, CLUSTER_ID as DEFAULT_CLUSTER_ID
 from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.paths import get_config_root, get_desktop_root
-
-from metadata.settings import DJANGO_APPS
 from metadata.catalog import atlas_flags
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
-
+from metadata.settings import DJANGO_APPS
 
 OPTIMIZER_AUTH_PASSWORD = None
 NAVIGATOR_AUTH_PASSWORD = None
@@ -44,13 +38,16 @@ def get_auth_username():
   """Get from top level default from desktop"""
   return DEFAULT_AUTH_USERNAME.get()
 
+
 def default_catalog_url():
   """Get from main Hue config directory if present"""
   return atlas_flags.get_api_url() if atlas_flags.get_api_url() else None
 
+
 def default_catalog_config_dir():
   """Get from usual main Hue config directory"""
   return os.environ.get("HUE_CONF_DIR", get_desktop_root("conf")) + '/hive-conf'
+
 
 def default_catalog_interface():
   """Detect if the configured catalog is Navigator or default to Atlas"""
@@ -62,9 +59,11 @@ def default_catalog_interface():
     catalog_interface = 'navigator'
   return catalog_interface
 
+
 def default_navigator_config_dir():
   """Get from usual main Hue config directory"""
   return get_config_root()
+
 
 def default_navigator_url():
   """Get from usual main Hue config directory"""
@@ -75,11 +74,14 @@ def default_navigator_url():
 def get_optimizer_url():
   return OPTIMIZER.HOSTNAME.get() and OPTIMIZER.HOSTNAME.get().strip('/')
 
+
 def has_optimizer():
   return OPTIMIZER.INTERFACE.get() != 'navopt' or bool(OPTIMIZER.AUTH_KEY_ID.get())
 
+
 def get_optimizer_mode():
   return has_optimizer() and OPTIMIZER.MODE.get() or 'off'
+
 
 def has_workload_analytics():
   # Note: unused
@@ -265,8 +267,10 @@ DEFAULT_PUBLIC_KEY = Config(
 
 # Data Catalog
 
+
 def get_catalog_url():
   return (CATALOG.API_URL.get() and CATALOG.API_URL.get().strip('/')) or (CATALOG.INTERFACE.get() == 'navigator' and get_navigator_url())
+
 
 def has_catalog(user):
   from desktop.auth.backend import is_admin
@@ -276,15 +280,19 @@ def has_catalog(user):
     is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0])
   )
 
+
 def has_readonly_catalog(user):
   return has_catalog(user) and not has_navigator(user)
+
 
 def get_catalog_search_cluster():
   return CATALOG.SEARCH_CLUSTER.get()
 
+
 def get_kerberos_enabled_default():
   '''Use atlas.authentication.method.kerberos if catalog interface is atlas else False '''
   return atlas_flags.is_kerberos_enabled() if CATALOG.INTERFACE.get() == 'atlas' else False
+
 
 def get_catalog_server_password_script():
   '''Execute script at path'''
@@ -356,16 +364,20 @@ CATALOG = ConfigSection(
 
 # Navigator is deprecated over generic Catalog above
 
+
 def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
+
 
 def has_navigator(user):
   from desktop.auth.backend import is_admin
   return bool(get_navigator_url() and get_navigator_auth_password()) \
       and (is_admin(user) or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
+
 def get_navigator_auth_type():
   return NAVIGATOR.AUTH_TYPE.get().lower()
+
 
 def get_navigator_auth_username():
   '''Get the username to authenticate with.'''
@@ -376,6 +388,7 @@ def get_navigator_auth_username():
     return NAVIGATOR.AUTH_SAML_USERNAME.get()
   else:
     return NAVIGATOR.AUTH_CM_USERNAME.get()
+
 
 def get_navigator_auth_password():
   '''Get the password to authenticate with.'''
@@ -394,17 +407,21 @@ def get_navigator_auth_password():
 
   return NAVIGATOR_AUTH_PASSWORD
 
+
 def get_navigator_cm_password():
   '''Get default password from secured file'''
   return NAVIGATOR.AUTH_CM_PASSWORD_SCRIPT.get()
+
 
 def get_navigator_ldap_password():
   '''Get default password from secured file'''
   return NAVIGATOR.AUTH_LDAP_PASSWORD_SCRIPT.get()
 
+
 def get_navigator_saml_password():
   '''Get default password from secured file'''
   return NAVIGATOR.AUTH_SAML_PASSWORD_SCRIPT.get()
+
 
 def has_catalog_file_search(user):
   return has_catalog(user) and NAVIGATOR.ENABLE_FILE_SEARCH.get()

@@ -15,20 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
 
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from notebook.connectors.altus import AnalyticDbApi, DataWarehouse2Api
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 

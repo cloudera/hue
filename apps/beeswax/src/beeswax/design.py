@@ -18,30 +18,18 @@
 """
 The HQLdesign class can (de)serialize a design to/from a QueryDict.
 """
-
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 import json
 import logging
-import os
-import re
-import sys
 import urllib.parse
 
 import django.http
 from django import forms
 from django.forms import ValidationError
+from django.utils.translation import gettext as _
 
-from notebook.sql_utils import split_statements, strip_trailing_semicolon
 from desktop.lib.django_forms import BaseSimpleFormSet, MultiForm
 from hadoop.cluster import get_hdfs
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from notebook.sql_utils import split_statements, strip_trailing_semicolon
 
 LOG = logging.getLogger()
 
@@ -296,6 +284,3 @@ def denormalize_formset_dict(data_dict_list, formset, attr_list):
 
   res[str(formset.management_form.add_prefix('next_form_id'))] = str(len(data_dict_list))
   return res
-
-  def __str__(self):
-    return '%s: %s' % (self.__class__, self.query)

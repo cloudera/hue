@@ -16,12 +16,11 @@
 # limitations under the License.
 
 import re
-import sys
 import json
 import logging
-from builtins import filter, map, next, object
 from operator import itemgetter
 
+from django.utils.translation import gettext as _
 from TCLIService import TCLIService
 from TCLIService.ttypes import (
   TCancelOperationReq,
@@ -54,12 +53,6 @@ from beeswax.server.dbms import DataTable, InvalidSessionQueryServerException, Q
 from desktop.conf import DEFAULT_USER, ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA, ENABLE_XFF_FOR_HIVE_IMPALA, USE_THRIFT_HTTP_JWT
 from desktop.lib import python_util, thrift_util
 from notebook.connectors.base import get_interpreter
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 IMPALA_RESULTSET_CACHE_SIZE = 'impala.resultset.cache.size'
@@ -358,7 +351,7 @@ class HiveServerTColumnValue2(object):
 
   @classmethod
   def mark_nulls(cls, values, bytestring):
-    if sys.version_info[0] < 3 or isinstance(bytestring, bytes):
+    if isinstance(bytestring, bytes):
       mask = bytearray(bytestring)
     else:
       bitstring = python_util.from_string_to_bits(bytestring)
@@ -379,7 +372,7 @@ class HiveServerTColumnValue2(object):
   def set_nulls(cls, values, nulls):
     can_decode = True
     bytestring = nulls
-    if sys.version_info[0] == 3 and isinstance(bytestring, bytes):
+    if isinstance(bytestring, bytes):
       try:
         bytestring = bytestring.decode('utf-8')
       except Exception:
@@ -421,10 +414,7 @@ class HiveServerDataTable(DataTable):
       try:
         yield row.fields()
       except StopIteration as e:
-        if sys.version_info[0] > 2:
-          return  # pep-0479: expected Py3.8 generator raised StopIteration
-        else:
-          raise e
+        return  # pep-0479: expected Py3.8 generator raised StopIteration
 
 
 class HiveServerTTableSchema(object):
@@ -1041,9 +1031,6 @@ class HiveServerClient(object):
     if self.query_server.get('dialect') == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
       configuration['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
-    if sys.version_info[0] == 2:
-      statement = statement.encode('utf-8')
-
     req = TExecuteStatementReq(statement=statement, confOverlay=configuration)
     (res, session) = self.call(self._client.ExecuteStatement, req, session=session)
 
@@ -1060,9 +1047,6 @@ class HiveServerClient(object):
 
     if self.query_server.get('dialect') == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
       conf_overlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
-
-    if sys.version_info[0] == 2:
-      statement = statement.encode('utf-8')
 
     (res, session) = self.call_return_result_and_session(thrift_function, thrift_request, session=session)
 

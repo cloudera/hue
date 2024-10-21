@@ -15,23 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
 import sys
+import logging
 import threading
+from builtins import object
+
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.exceptions_renderable import PopupException
-
 from libsentry.client import SentryClient
-from libsentry.sentry_ha import get_next_available_server, create_client
+from libsentry.sentry_ha import create_client, get_next_available_server
 from libsentry.sentry_site import get_sentry_server, is_ha_enabled
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -233,7 +228,6 @@ class SentryApi(object):
     else:
       raise SentryException(response)
 
-
   def _massage_privilege(self, privilege):
     return {
         'scope': privilege.privilegeScope,
@@ -246,7 +240,6 @@ class SentryApi(object):
         'grantOption': privilege.grantOption == 1,
         'column': privilege.columnName,
     }
-
 
   def _massage_authorizable(self, authorizable):
     return {

@@ -17,33 +17,25 @@
 
 from __future__ import division
 
-from builtins import next
-from builtins import str
-from builtins import zip
-from builtins import object
-import collections
-import datetime
-import dateutil
-import itertools
+import re
+import sys
 import json
 import logging
 import numbers
-import re
-import sys
+import datetime
+import itertools
+import collections
+from builtins import next, object, str, zip
 
+import dateutil
 from django.urls import reverse
 from django.utils.html import escape
-
-from desktop.lib.i18n import smart_unicode, smart_str, force_unicode
-from desktop.models import get_data_link, Document2
-from notebook.connectors.base import Notebook, _get_snippet_name
+from django.utils.translation import gettext as _
 
 from dashboard.dashboard_api import get_engine
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from desktop.lib.i18n import force_unicode, smart_str
+from desktop.models import Document2, get_data_link
+from notebook.connectors.base import Notebook, _get_snippet_name
 
 LOG = logging.getLogger()
 
@@ -142,11 +134,11 @@ class Collection2(object):
 
     for facet in props['collection']['facets']:
       properties = facet['properties']
-      if 'gap' in properties and not 'initial_gap' in properties:
+      if 'gap' in properties and 'initial_gap' not in properties:
         properties['initial_gap'] = properties['gap']
-      if 'start' in properties and not 'initial_start' in properties:
+      if 'start' in properties and 'initial_start' not in properties:
         properties['initial_start'] = properties['start']
-      if 'end' in properties and not 'initial_end' in properties:
+      if 'end' in properties and 'initial_end' not in properties:
         properties['initial_end'] = properties['end']
       if 'domain' not in properties:
         properties['domain'] = {'blockParent': [], 'blockChildren': []}
@@ -192,7 +184,7 @@ class Collection2(object):
     if id_field:
       id_field = id_field[0]
     else:
-      id_field = '' # Schemaless might not have an id
+      id_field = ''  # Schemaless might not have an id
 
     if source == 'query':
       nb_doc = Document2.objects.document(user=user, doc_id=name)
@@ -332,6 +324,7 @@ class Collection2(object):
     else:
       return ['*']
 
+
 def get_facet_field(category, field, facets):
   if category in ('nested', 'function'):
     id_pattern = '%(id)s'
@@ -344,6 +337,7 @@ def get_facet_field(category, field, facets):
     return facets[0]
   else:
     return None
+
 
 def pairwise2(field, fq_filter, iterable):
   pairs = []
@@ -359,11 +353,12 @@ def pairwise2(field, fq_filter, iterable):
     })
   return pairs
 
+
 def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
   # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
   pairs = []
   selected_values = [f['value'] for f in fq_filter]
-  is_single_unit_gap = re.match('^[\+\-]?1[A-Za-z]*$', str(collection_facet['properties']['gap'])) is not None
+  is_single_unit_gap = re.match(r'^[\+\-]?1[A-Za-z]*$', str(collection_facet['properties']['gap'])) is not None
   is_up = collection_facet['properties']['sort'] == 'asc'
 
   if collection_facet['properties']['sort'] == 'asc' and (
@@ -422,7 +417,7 @@ def range_pair2(facet_field, cat, fq_filter, iterable, end, facet, collection_fa
   # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
   pairs = []
   selected_values = [f['value'] for f in fq_filter]
-  is_single_unit_gap = re.match('^[\+\-]?1[A-Za-z]*$', str(facet['gap'])) is not None
+  is_single_unit_gap = re.match(r'^[\+\-]?1[A-Za-z]*$', str(facet['gap'])) is not None
   is_up = facet['sort'] == 'asc'
 
   if facet['sort'] == 'asc' and facet['type'] == 'range-up':
@@ -541,7 +536,7 @@ def augment_solr_response(response, collection, query):
   if response and response.get('facets'):
     for facet in collection['facets']:
       category = facet['type']
-      name = facet['id'] # Nested facets can only have one name
+      name = facet['id']  # Nested facets can only have one name
 
       if category == 'function' and name in response['facets']:
         collection_facet = get_facet_field(category, name, collection['facets'])
@@ -614,7 +609,7 @@ def augment_solr_response(response, collection, query):
               legend = agg_keys[0].split(':', 2)[1]
               column = agg_keys[0]
             else:
-              legend = facet['field'] # 'count(%s)' % legend
+              legend = facet['field']  # 'count(%s)' % legend
               agg_keys = [column]
 
             _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
@@ -670,9 +665,9 @@ def augment_solr_response(response, collection, query):
             agg_keys.insert(0, 'count')
           counts = _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
 
-          #_convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values, dimension=2)
+          # _convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values, dimension=2)
           dimension = len(facet_fields)
-        elif len(collection_facet['properties']['facets']) == 1 or (len(collection_facet['properties']['facets']) == 2 and \
+        elif len(collection_facet['properties']['facets']) == 1 or (len(collection_facet['properties']['facets']) == 2 and
             collection_facet['properties']['facets'][1]['aggregate']['function'] != 'count'):
           # Dimension 1 with 1 count or agg
           dimension = 1
@@ -713,7 +708,7 @@ def augment_solr_response(response, collection, query):
           'counts': counts,
           'extraSeries': extraSeries,
           'dimension': dimension,
-          'response': {'response': {'start': 0, 'numFound': num_bucket}}, # Todo * nested buckets + offsets
+          'response': {'response': {'start': 0, 'numFound': num_bucket}},  # Todo * nested buckets + offsets
           'docs': [dict(list(zip(cols, row))) for row in rows],
           'fieldsAttributes': [
             Collection2._make_gridlayout_header_field(
@@ -738,12 +733,14 @@ def augment_solr_response(response, collection, query):
 
   return augmented
 
+
 def _get_agg_keys(counts):
   for count in counts:
     keys = [key for key, value in list(count.items()) if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
     if keys:
       return keys
   return []
+
 
 def augment_response(collection, query, response):
   # HTML escaping
@@ -762,18 +759,18 @@ def augment_response(collection, query, response):
       for field, value in doc.items():
         if isinstance(value, numbers.Number):
           escaped_value = value
-        elif field == '_childDocuments_': # Nested documents
+        elif field == '_childDocuments_':  # Nested documents
           escaped_value = value
-        elif isinstance(value, list): # Multivalue field
-          escaped_value = [smart_unicode(escape(val), errors='replace') for val in value]
+        elif isinstance(value, list):  # Multivalue field
+          escaped_value = [smart_str(escape(val), errors='replace') for val in value]
         else:
-          value = smart_unicode(value, errors='replace')
+          value = smart_str(value, errors='replace')
           escaped_value = escape(value)
         doc[field] = escaped_value
 
       doc['externalLink'] = link
       doc['details'] = []
-      doc['hueId'] = smart_unicode(doc.get(id_field, ''))
+      doc['hueId'] = smart_str(doc.get(id_field, ''))
       if 'moreLikeThis' in response and response['moreLikeThis'][doc['hueId']].get('numFound'):
         _doc = response['moreLikeThis'][doc['hueId']]
         doc['_childDocuments_'] = _doc['docs']
@@ -785,14 +782,14 @@ def augment_response(collection, query, response):
     id_field = collection.get('idField')
     if id_field:
       for doc in response['response']['docs']:
-        if id_field in doc and smart_unicode(doc[id_field]) in highlighted_fields:
-          highlighting = response['highlighting'][smart_unicode(doc[id_field])]
+        if id_field in doc and smart_str(doc[id_field]) in highlighted_fields:
+          highlighting = response['highlighting'][smart_str(doc[id_field])]
 
           if highlighting:
             escaped_highlighting = {}
             for field, hls in highlighting.items():
               _hls = [
-                escape(smart_unicode(hl, errors='replace')).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
+                escape(smart_str(hl, errors='replace')).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>')
                 for hl in hls
               ]
               escaped_highlighting[field] = _hls[0] if len(_hls) == 1 else _hls
@@ -857,7 +854,7 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
     count = bucket['count']
     dim_row = [val]
 
-    _fq_fields = fq_fields + _fields[0:1] # Pick dim field if there is one
+    _fq_fields = fq_fields + _fields[0:1]  # Pick dim field if there is one
     _fq_values = fq_values + [val]
 
     for agg_key in agg_keys:
@@ -866,18 +863,18 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
         augmented.append(_get_augmented(count, val, label, _fq_values, _fq_fields, fq_filter, _selected_values))
       elif agg_key.startswith('agg_'):
         label = fq_values[0] if len(_fq_fields) >= 2 else agg_key.split(':', 2)[1]
-        if agg_keys.index(agg_key) == 0: # One count by dimension
+        if agg_keys.index(agg_key) == 0:  # One count by dimension
           dim_row.append(count)
-        if not agg_key in bucket: # No key if value is 0
+        if agg_key not in bucket:  # No key if value is 0
           bucket[agg_key] = 0
         dim_row.append(bucket[agg_key])
         augmented.append(_get_augmented(bucket[agg_key], val, label, _fq_values, _fq_fields, fq_filter, _selected_values))
       else:
-        augmented.append(_get_augmented(count, val, label, _fq_values, _fq_fields, fq_filter, _selected_values)) # Needed?
+        augmented.append(_get_augmented(count, val, label, _fq_values, _fq_fields, fq_filter, _selected_values))  # Needed?
 
         # List nested fields
         _agg_keys = []
-        if agg_key in bucket and bucket[agg_key]['buckets']: # Protect against empty buckets
+        if agg_key in bucket and bucket[agg_key]['buckets']:  # Protect against empty buckets
           for key, value in list(bucket[agg_key]['buckets'][0].items()):
             if key.lower().startswith('agg_') or key.lower().startswith('dim_'):
               _agg_keys.append(key)
@@ -904,7 +901,7 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
           new_rows.append(dim_row + row)
         dim_row = new_rows
 
-    if dim_row and type(dim_row[0]) == list:
+    if dim_row and type(dim_row[0]) is list:
       rows.extend(dim_row)
     else:
       rows.append(dim_row)
@@ -995,7 +992,6 @@ def augment_solr_exception(response, collection):
       ]
     }
   })
-
 
 
 def extract_solr_exception_message(e):

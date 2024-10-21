@@ -16,40 +16,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next
-from builtins import range
-from builtins import object
-import csv
-import logging
 import os
-import pytz
 import re
-import shutil
-import sys
-import tempfile
+import csv
 import uuid
+import shutil
+import logging
+import tempfile
+from io import StringIO as string_io
 
+import pytz
 from dateutil.parser import parse
-
 from django.conf import settings
+from django.utils.translation import gettext as _
 
 from desktop.lib.i18n import force_unicode, smart_str
-
 from indexer import conf
-from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES, DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from StringIO import StringIO as string_io
+from indexer.models import BOOLEAN_FIELD_TYPES, DATE_FIELD_TYPES, DECIMAL_FIELD_TYPES, INTEGER_FIELD_TYPES, TEXT_FIELD_TYPES
 
 LOG = logging.getLogger()
-TIMESTAMP_PATTERN = '\[([\w\d\s\-\/\:\+]*?)\]'
-FIELD_XML_TEMPLATE = '<field name="%(name)s" type="%(type)s" indexed="%(indexed)s" stored="%(stored)s" required="%(required)s" multiValued="%(multiValued)s" />'
+TIMESTAMP_PATTERN = r'\[([\w\d\s\-\/\:\+]*?)\]'
+FIELD_XML_TEMPLATE = '<field name="%(name)s" type="%(type)s" indexed="%(indexed)s" stored="%(stored)s" required="%(required)s" multiValued="%(multiValued)s" />'  # noqa: E501
 DEFAULT_FIELD = {
   'name': None,
   'type': 'text',
@@ -94,10 +81,14 @@ class SolrConfigXml(object):
     self.xml = xml
 
   def defaultField(self, df=None):
-    self.xml = force_unicode(force_unicode(self.xml).replace(u'<str name="df">text</str>', u'<str name="df">%s</str>' % force_unicode(df) if df is not None else ''))
+    self.xml = force_unicode(
+      force_unicode(self.xml).replace('<str name="df">text</str>', '<str name="df">%s</str>' % force_unicode(df) if df is not None else '')
+    )
 
 
-def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True, is_solr_six_or_more=False, is_solr_hdfs_mode=True, is_sentry_protected=False):
+def copy_configs(
+  fields, unique_key_field, df, solr_cloud_mode=True, is_solr_six_or_more=False, is_solr_hdfs_mode=True, is_sentry_protected=False
+):
   # Create temporary copy of solr configs
   tmp_path = tempfile.mkdtemp()
 
@@ -286,7 +277,8 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
 
     remove_keys = None
     for row in reader:
-      row = dict([(force_unicode(k), force_unicode(v, errors='ignore')) for k, v in row.items()]) # Get rid of invalid binary chars and convert to unicode from DictReader
+      # Get rid of invalid binary chars and convert to unicode from DictReader
+      row = dict([(force_unicode(k), force_unicode(v, errors='ignore')) for k, v in row.items()])
 
       # Remove keys that aren't in collection
       if remove_keys is None:
@@ -333,7 +325,7 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
       yield row
 
 
-def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general'}, {'name': 'tdate', 'type': 'timestamp'} ]):
+def field_values_from_log(fh, fields=[{'name': 'message', 'type': 'text_general'}, {'name': 'tdate', 'type': 'timestamp'}]):
   """
   Only timestamp and message
   """
@@ -345,12 +337,12 @@ def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general
   else:
     try:
       timestamp_key = next(iter([field for field in fields if field['type'] in DATE_FIELD_TYPES]))['name']
-    except:
+    except Exception:
       LOG.exception('failed to get timestamp key')
       timestamp_key = None
     try:
       message_key = next(iter([field for field in fields if field['type'] in TEXT_FIELD_TYPES]))['name']
-    except:
+    except Exception:
       LOG.exception('failed to get message key')
       message_key = None
 
@@ -370,7 +362,7 @@ def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general
     last_newline = content.rfind('\n')
     if last_newline > -1:
       buf = content[:last_newline]
-      content = content[last_newline+1:]
+      content = content[last_newline + 1:]
       for row in value_generator(buf):
         yield row
     prev = fh.read()
