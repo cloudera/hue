@@ -18,16 +18,11 @@
 import os
 import sys
 
+from django.utils.translation import gettext_lazy as _t
+
 from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool
-
 from sqoop.settings import NICE_NAME
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
-
 
 SERVER_URL = Config(
   key="server_url",
@@ -53,10 +48,11 @@ IS_ENABLED = Config(
     default=False
 )
 
+
 def config_validator(user):
   res = []
 
-  from hadoop import cluster # Avoid dependencies conflicts
+  from hadoop import cluster  # Avoid dependencies conflicts
   yarn_cluster = cluster.get_cluster_conf_for_job_submission()
 
   if yarn_cluster.SECURITY_ENABLED.get() and not os.path.exists(SQOOP_CONF_DIR.get()):

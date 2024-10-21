@@ -17,12 +17,9 @@
 
 import sys
 
-from desktop.lib.metrics import views
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from desktop.lib.metrics import views
 
 urlpatterns = [
   re_path(r'^$', views.index, name='desktop.lib.metrics.views.index'),

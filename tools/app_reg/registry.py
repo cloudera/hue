@@ -19,18 +19,14 @@
 Registry for the applications
 """
 
-import glob
-import logging
 import os
 import sys
+import glob
 import json
+import logging
 
 import common
 from common import cmp
-
-if sys.version_info[0] > 2:
-  from builtins import object
-
 
 LOG = logging.getLogger(__name__)
 
@@ -43,16 +39,14 @@ class AppRegistry(object):
     """Open the existing registry"""
     self._reg_path = os.path.join(common.HUE_APP_REG_DIR, 'app.reg')
     self._initialized = False
-    self._apps = { }    # Map of name -> HueApp
+    self._apps = {}    # Map of name -> HueApp
     self._open()
 
   def _open(self):
     """Open the registry file. May raise OSError"""
     if os.path.exists(self._reg_path):
-      if sys.version_info[0] > 2:
-        reg_file = open(self._reg_path)
-      else:
-        reg_file = file(self._reg_path)
+      reg_file = open(self._reg_path)
+
       app_list = json.load(reg_file)
       reg_file.close()
 
@@ -65,10 +59,8 @@ class AppRegistry(object):
 
   def _write(self, path):
     """Write out the registry to the given path"""
-    if sys.version_info[0] > 2:
-      outfile = open(path, 'w')
-    else:
-      outfile = file(path, 'w')
+    outfile = open(path, 'w')
+
     json.dump(list(self._apps.values()), outfile, cls=AppJsonEncoder, indent=2)
     outfile.close()
 
@@ -178,14 +170,13 @@ class HueApp(object):
     """get_conffiles() -> A list of config (.ini) files"""
     return glob.glob(os.path.join(self.abs_path, 'conf', '*.ini'))
 
-
   def install_conf(self):
     """
     install_conf() -> True/False
 
     Symlink the app's conf/*.ini files into the conf directory.
     """
-    installed = [ ]
+    installed = []
 
     for target in self.get_conffiles():
       link_name = os.path.join(common.HUE_CONF_DIR, os.path.basename(target))
@@ -219,7 +210,6 @@ class HueApp(object):
             LOG.error("Failed to cleanup link %s: %s" % (link_name, ex2))
         return False
     return True
-
 
   def uninstall_conf(self):
     """uninstall_conf() -> True/False"""

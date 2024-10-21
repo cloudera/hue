@@ -18,14 +18,11 @@ from __future__ import absolute_import
 import sys
 import logging
 
+from django.utils.translation import gettext_lazy as _t
+
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.idbroker import conf as conf_idbroker
 from hadoop import core_site
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
 
 LOG = logging.getLogger()
 

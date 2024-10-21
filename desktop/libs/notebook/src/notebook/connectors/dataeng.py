@@ -15,23 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import re
 import sys
+import logging
 
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
+from jobbrowser.apis.data_eng_api import RUNNING_STATES
 from metadata.workload_analytics_client import WorkfloadAnalyticsClient
-
 from notebook.connectors.altus import DataEngApi as AltusDataEngApi
 from notebook.connectors.base import Api, QueryError
-from jobbrowser.apis.data_eng_api import RUNNING_STATES
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -41,7 +35,6 @@ class DataEngApi(Api):
   def __init__(self, user, cluster_name, interpreter=None, request=None):
     Api.__init__(self, user, interpreter=interpreter, request=request)
     self.cluster_name = cluster_name
-
 
   def execute(self, notebook, snippet):
 
@@ -72,7 +65,6 @@ class DataEngApi(Api):
       'has_result_set': False,
     }
 
-
   def check_status(self, notebook, snippet):
     response = {'status': 'running'}
 
@@ -90,7 +82,6 @@ class DataEngApi(Api):
 
     return response
 
-
   def fetch_result(self, notebook, snippet, rows, start_over):
     return {
         'data': [[_('Job successfully completed.')]],
@@ -98,7 +89,6 @@ class DataEngApi(Api):
         'type': 'table',
         'has_more': False,
     }
-
 
   def cancel(self, notebook, snippet):
     if snippet['result']['handle'].get('id'):
@@ -109,7 +99,6 @@ class DataEngApi(Api):
       response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submission.')}
 
     return response
-
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
     # Currently no way to get the logs properly easily
@@ -122,22 +111,19 @@ class DataEngApi(Api):
     # (.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL))
     return ''
 
-
   def get_jobs(self, notebook, snippet, logs):
-    ## 50cf0e00-746b-4d86-b8e3-f2722296df71
+    # 50cf0e00-746b-4d86-b8e3-f2722296df71
     job_id = snippet['result']['handle']['id']
     return [{
         'name': job_id,
         'url': reverse('jobbrowser:jobbrowser.views.apps') + '#!' + job_id,
         'started': True,
-        'finished': False # Would need call to check_status
+        'finished': False  # Would need call to check_status
       }
     ]
 
-
   def close_statement(self, notebook, snippet):
     pass
-
 
   def close_session(self, session):
     pass

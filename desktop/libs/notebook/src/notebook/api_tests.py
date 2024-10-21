@@ -815,6 +815,7 @@ def test_get_interpreters_to_show():
 
     resets.append(INTERPRETERS_SHOWN_ON_WHEEL.set_for_testing('java,pig'))
 
+    # 'get_interpreters_to_show did not return interpreters in the correct order expected'
     assert (
       list(expected_interpreters.values()) == get_ordered_interpreters()
     ), 'get_interpreters_to_show did not return interpreters in the correct order expected'

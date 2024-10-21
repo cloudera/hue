@@ -17,24 +17,19 @@
 #
 # Utilities for dealing with file modes.
 
-from past.builtins import basestring
-from builtins import object
-import bz2
 import os
-import posixpath
-import sys
+import bz2
 import tarfile
 import tempfile
+import posixpath
+from builtins import object
+from zipfile import ZipFile
+
+from django.utils.translation import gettext as _
+from past.builtins import basestring
 
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
-from zipfile import ZipFile
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 __all__ = ['archive_factory']
 
@@ -65,6 +60,7 @@ class Archive(object):
       except OSError:
         pass
 
+
 class ZipArchive(Archive):
   """
   Acts on a zip file in memory or in a temporary location.
@@ -72,10 +68,8 @@ class ZipArchive(Archive):
   """
 
   def __init__(self, file):
-    if sys.version_info[0] > 2:
-      self.file = isinstance(file, basestring) and file
-    else:
-      self.file = isinstance(file, basestring) and open(file) or file
+    self.file = isinstance(file, basestring) and file
+
     self.zfh = ZipFile(self.file)
 
   def extract(self):
@@ -247,6 +241,7 @@ def archive_factory(path, archive_type='zip'):
     return TarballArchive(path)
   elif archive_type == 'bz2' or archive_type == 'bzip2':
     return BZ2Archive(path)
+
 
 class IllegalPathException(PopupException):
 

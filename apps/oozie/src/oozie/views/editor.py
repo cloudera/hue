@@ -15,55 +15,61 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
-import json
-import logging
-import shutil
 import sys
+import json
 import time
+import shutil
+import logging
+from builtins import str
+from functools import partial
 
-from django.urls import reverse
 from django.db.models import Q
 from django.forms.formsets import formset_factory
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template.defaultfilters import strip_tags
-from functools import partial
+from django.urls import reverse
 from django.utils.http import http_date
+from django.utils.translation import activate as activate_translation, gettext as _
 
-from desktop.lib.django_util import JsonResponse, render, extract_field_data
+from desktop.auth.backend import is_admin
+from desktop.lib.django_util import JsonResponse, extract_field_data, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document
-
+from filebrowser.lib.archives import archive_factory
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
 from liboozie.submittion import Submission
-
-from filebrowser.lib.archives import archive_factory
-from oozie.decorators import check_job_access_permission, check_job_edition_permission,\
-                             check_dataset_access_permission, check_dataset_edition_permission
 from oozie.conf import ENABLE_CRON_SCHEDULING, ENABLE_V2
-from oozie.importlib.workflows import import_workflow as _import_workflow
+from oozie.decorators import (
+  check_dataset_access_permission,
+  check_dataset_edition_permission,
+  check_job_access_permission,
+  check_job_edition_permission,
+)
+from oozie.forms import (
+  BundledCoordinatorForm,
+  BundleForm,
+  CoordinatorForm,
+  DataInputForm,
+  DataOutputForm,
+  DatasetForm,
+  DefaultLinkForm,
+  ImportCoordinatorForm,
+  ImportWorkflowForm,
+  LinkForm,
+  NodeForm,
+  ParameterForm,
+  WorkflowForm,
+  design_form_by_type,
+)
 from oozie.importlib.coordinators import import_coordinator as _import_coordinator
+from oozie.importlib.workflows import import_workflow as _import_workflow
 from oozie.management.commands import oozie_setup
-from oozie.models import Workflow, History, Coordinator,\
-                         Dataset, DataInput, DataOutput,\
-                         ACTION_TYPES, Bundle, BundledCoordinator, Job
-from oozie.forms import WorkflowForm, CoordinatorForm, DatasetForm,\
-                        DataInputForm, DataOutputForm, LinkForm,\
-                        DefaultLinkForm, ParameterForm, NodeForm,\
-                        BundleForm, BundledCoordinatorForm, design_form_by_type,\
-                        ImportWorkflowForm, ImportCoordinatorForm
-
-from desktop.auth.backend import is_admin
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, activate as activate_translation
-else:
-  from django.utils.translation import ugettext as _, activate as activate_translation
+from oozie.models import ACTION_TYPES, Bundle, BundledCoordinator, Coordinator, DataInput, DataOutput, Dataset, History, Job, Workflow
 
 LOG = logging.getLogger()
 
@@ -344,7 +350,6 @@ def clone_workflow(request, workflow):
   return JsonResponse(response)
 
 
-
 @check_job_access_permission()
 def submit_workflow(request, workflow):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
@@ -562,7 +567,7 @@ def create_coordinator_dataset(request, coordinator):
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id}) + "#listDataset"
       request.info(_('Dataset created'))
   else:
-    ## Bad
+    # Bad
     response['data'] = _('A POST request is required.')
 
   if response['status'] != 0:
@@ -629,7 +634,7 @@ def create_coordinator_data(request, coordinator, data_type):
       data_form.save()
       response['status'] = 0
       response['data'] = reverse('oozie:edit_coordinator', kwargs={'coordinator': coordinator.id})
-      request.info(_('Coordinator data created'));
+      request.info(_('Coordinator data created'))
     else:
       response['data'] = data_form.errors
   else:
@@ -716,7 +721,6 @@ def create_bundle(request):
     'bundle': bundle,
     'bundle_form': bundle_form,
   })
-
 
 
 def delete_bundle(request):
@@ -828,7 +832,7 @@ def get_create_bundled_coordinator_html(request, bundle, bundled_coordinator_for
 @check_job_access_permission()
 @check_job_edition_permission(True)
 def edit_bundled_coordinator(request, bundle, bundled_coordinator):
-  bundled_coordinator_instance = BundledCoordinator.objects.get(id=bundled_coordinator) # todo secu
+  bundled_coordinator_instance = BundledCoordinator.objects.get(id=bundled_coordinator)  # todo secu
 
   response = {'status': -1, 'data': 'None'}
 

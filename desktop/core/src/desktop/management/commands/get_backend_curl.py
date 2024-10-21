@@ -16,23 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
-import subprocess
 import sys
 import time
-from desktop.conf import TIME_ZONE
-from django.core.management.base import BaseCommand
-from hadoop import cluster
-from hadoop import conf as hdfs_conf
-from desktop.hue_curl import Curl
-from liboozie.conf import OOZIE_URL, SECURITY_ENABLED as OOZIE_SECURITY_ENABLED
-from search.conf import SOLR_URL, SECURITY_ENABLED as SOLR_SECURITY_ENABLED
+import logging
+import subprocess
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.core.management.base import BaseCommand
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
+from desktop.conf import TIME_ZONE
+from desktop.hue_curl import Curl
+from hadoop import cluster, conf as hdfs_conf
+from liboozie.conf import OOZIE_URL, SECURITY_ENABLED as OOZIE_SECURITY_ENABLED
+from search.conf import SECURITY_ENABLED as SOLR_SECURITY_ENABLED, SOLR_URL
 
 LOG = logging.getLogger()
 
@@ -81,7 +78,7 @@ def get_service_info(service):
 def add_service_test(available_services, options='all', service_name=None, testname=None, suburl=None, method='GET',
                      teststring=None, test_options=None):
   if options['service'] == "all" or options['service'] == service_name.lower():
-    if not service_name in available_services:
+    if service_name not in available_services:
       service_info = get_service_info(service_name)
       url = service_info['url']
       security_enabled = service_info['security_enabled']
@@ -89,9 +86,9 @@ def add_service_test(available_services, options='all', service_name=None, testn
       available_services[service_name]['url'] = url
       available_services[service_name]['security_enabled'] = security_enabled
     # Tests
-    if not 'tests' in available_services[service_name]:
+    if 'tests' not in available_services[service_name]:
       available_services[service_name]['tests'] = {}
-    if not testname in available_services[service_name]['tests']:
+    if testname not in available_services[service_name]['tests']:
       for test_option in test_options.keys():
         suburl = suburl.replace(test_option, str(test_options[test_option]))
       available_services[service_name]['tests'][testname] = {}
@@ -306,16 +303,16 @@ class Command(BaseCommand):
           LOG.info("TEST: %s %s: Failed in %dms: Response: %s" % (service, service_test, returned_in, response))
 
     log_file = log_dir + '/backend_test_curl.log'
-    print ("")
-    print ("Tests completed, view logs here: %s") % log_file
-    print ("Report:")
+    print("")
+    print("Tests completed, view logs here: %s") % log_file
+    print("Report:")
     cmd = 'grep -A1000 "%s" %s | grep "TEST:" | sed "s/.*INFO.*TEST:/  TEST:/g"' % (str(test_options['NOW']), log_file)
     grep_process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     grep_response = grep_process.communicate()[0]
-    print ("%s") % grep_response
-    print ("")
-    print ("OS Repro Commands are:")
+    print("%s") % grep_response
+    print("")
+    print("OS Repro Commands are:")
     cmd = 'grep -A1000 "%s" %s | grep "OSRUN:" | sed "s/.*INFO.*OSRUN:/  /g"' % (str(test_options['NOW']), log_file)
     grep_process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     grep_response = grep_process.communicate()[0]
-    print ("%s") % grep_response
+    print("%s") % grep_response

@@ -17,12 +17,9 @@
 
 import sys
 
-from kafka import kafka_api as kafka_kafka_api
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from kafka import kafka_api as kafka_kafka_api
 
 urlpatterns = [
   re_path(r'^api/topics/list/$', kafka_kafka_api.list_topics, name='list_topics'),

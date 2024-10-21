@@ -17,14 +17,10 @@
 
 import sys
 
+from django.urls import re_path
+
 from desktop import api_public
 from desktop.lib.botserver import api as botserver_api
-
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
-
 
 # "New" query API (i.e. connector based, lean arguments).
 # e.g. https://demo.gethue.com/api/query/execute/hive

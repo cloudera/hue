@@ -13,32 +13,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range
-from past.builtins import basestring
-from builtins import object
+
 import csv
 import gzip
+import logging
 import operator
 import itertools
-import logging
-import sys
+from builtins import object, range
+from io import StringIO as string_io
+
+from django.utils.translation import gettext as _
+from past.builtins import basestring, long
 
 from desktop.lib import i18n
-
 from indexer.argument import CheckboxArgument, TextDelimiterArgument
 from indexer.conf import ENABLE_SCALABLE_INDEXER
 from indexer.fields import Field, guess_field_type_from_samples
 from indexer.indexers.morphline_operations import get_operator
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from past.builtins import long
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from StringIO import StringIO as string_io
 
 LOG = logging.getLogger()
 
@@ -59,8 +50,8 @@ def get_format_types():
       ApacheCombinedFormat,
       SyslogFormat,
       HueLogFormat,
-      #RubyLogFormat,
-      #ParquetFormat
+      # RubyLogFormat,
+      # ParquetFormat
     ])
 
   return formats
@@ -69,12 +60,15 @@ def get_format_types():
 def get_file_indexable_format_types():
   return [format_ for format_ in get_format_types() if format_.is_file_indexable]
 
+
 def _get_format_mapping():
   return dict([(format_.get_name(), format_) for format_ in get_format_types()])
+
 
 def get_file_format_class(type_):
   mapping = _get_format_mapping()
   return mapping[type_] if type_ in mapping else None
+
 
 def get_file_format_instance(file, format_=None):
   file_stream = file['stream']
@@ -368,7 +362,8 @@ class CSVFormat(FileFormat):
 
     columns = len(header)
     columnTypes = {}
-    for i in range(columns): columnTypes[i] = None
+    for i in range(columns):
+      columnTypes[i] = None
 
     checked = 0
     for row in rdr:
@@ -408,7 +403,7 @@ class CSVFormat(FileFormat):
     # on whether it's a header
     hasHeader = 0
     for col, colType in list(columnTypes.items()):
-      if type(colType) == type(0):  # it's a length
+      if type(colType) is type(0):  # it's a length
         if len(header[col]) != colType:
           hasHeader += 1
         else:
@@ -678,7 +673,7 @@ class HiveFormat(CSVFormat):
     "string": "string",
     "timestamp": "date",
     "binary": "string",
-    "decimal": "double", # Won't match decimal(16,6)
+    "decimal": "double",  # Won't match decimal(16,6)
     "date": "date",
   }
 

@@ -15,34 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
-import pytest
-import sys
+from unittest.mock import Mock, patch
 
+import pytest
 from django.urls import reverse
 
 import desktop.conf as desktop_conf
 from desktop.lib.django_test_util import make_logged_in_client
+from impala.dbms import get_query_server_config
 from useradmin.models import User
 
-
-from impala.dbms import get_query_server_config
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
-
-
 LOG = logging.getLogger()
+
 
 @pytest.mark.django_db
 class TestDbms():
 
   def setup_method(self):
     self.client = make_logged_in_client()
-
 
   def test_get_connector_config(self):
     connector = {

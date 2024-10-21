@@ -15,20 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os.path
 import sys
+import os.path
 
-from desktop.lib.conf import Config, coerce_bool
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
 from desktop.lib import paths
+from desktop.lib.conf import Config, coerce_bool
 from liboozie.conf import get_oozie_status
-
 from oozie.settings import NICE_NAME
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
 
 DEFINITION_XSLT_DIR = Config(
   key="definition_xslt_dir",
@@ -61,13 +56,16 @@ LOCAL_SAMPLE_DATA_DIR = Config(
 REMOTE_SAMPLE_DIR = Config(
   key="remote_data_dir",
   default="/user/hue/oozie/workspaces",
-  help=_t("Location on HDFS where the Oozie workflows are stored. Parameters are $TIME and $USER, e.g. /user/$USER/hue/workspaces/workflow-$TIME")
+  help=_t(
+    "Location on HDFS where the Oozie workflows are stored. Parameters are $TIME and $USER, e.g. /user/$USER/hue/workspaces/workflow-$TIME"
+  ),
 )
 
 
 def get_oozie_job_count():
   '''Returns the maximum of jobs fetched by the API depending on the Hue version'''
   return 100
+
 
 OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',
@@ -76,14 +74,14 @@ OOZIE_JOBS_COUNT = Config(
   help=_t('Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call.')
 )
 
-ENABLE_V2 = Config( # Until Hue 4
+ENABLE_V2 = Config(  # Until Hue 4
   key='enable_v2',
   default=True,
   type=coerce_bool,
   help=_t('Use version 2 of Editor.')
 )
 
-ENABLE_CRON_SCHEDULING = Config( # Until Hue 3.8
+ENABLE_CRON_SCHEDULING = Config(  # Until Hue 3.8
   key='enable_cron_scheduling',
   default=True,
   type=coerce_bool,
