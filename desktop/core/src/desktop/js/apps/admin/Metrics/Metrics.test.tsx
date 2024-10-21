@@ -17,7 +17,7 @@
 import React from 'react';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Metrics from './Metrics';
+import Metrics from './MetricsTab';
 
 // Mock the API call to return sample metrics data
 jest.mock('api/utils', () => ({
@@ -89,7 +89,6 @@ describe('Metrics', () => {
     if (secondOption) {
       fireEvent.click(secondOption);
       await waitFor(() => {
-        // const headings = screen.queryAllByRole('heading', { level: 4 });
         const headings = screen.queryAllByText(
           (_, element) =>
             element?.tagName.toLowerCase() === 'span' && element?.className === 'metrics-heading'
