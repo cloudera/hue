@@ -15,22 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
 import sys
+import logging
+from builtins import object
+
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from indexer.solr_client import SolrClient
-
 from notebook.connectors.base import Api, QueryError
 from notebook.models import escape_rows
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -71,7 +66,7 @@ class SolrApi(Api):
 
     response = api.sql(collection, snippet['statement'])
 
-    info = response['result-set']['docs'].pop(-1) # EOF, RESPONSE_TIME, EXCEPTION
+    info = response['result-set']['docs'].pop(-1)  # EOF, RESPONSE_TIME, EXCEPTION
     if info.get('EXCEPTION'):
       raise QueryError(info['EXCEPTION'])
 
@@ -103,11 +98,9 @@ class SolrApi(Api):
       'statements_count': 1
     }
 
-
   @query_error_handler
   def check_status(self, notebook, snippet):
     return {'status': 'available'}
-
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
@@ -118,16 +111,13 @@ class SolrApi(Api):
       'type': 'table'
     }
 
-
   @query_error_handler
   def fetch_result_metadata(self):
     pass
 
-
   @query_error_handler
   def cancel(self, notebook, snippet):
     return {'status': 0}
-
 
   @query_error_handler
   def get_log(self, notebook, snippet, startFrom=None, size=None):
@@ -136,7 +126,6 @@ class SolrApi(Api):
   @query_error_handler
   def close_statement(self, notebook, snippet):
     return {'status': -1}
-
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
@@ -156,7 +145,6 @@ class SolrApi(Api):
 
     response['status'] = 0
     return response
-
 
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
@@ -203,7 +191,13 @@ class Assist(object):
     ]
 
   def get_columns(self, database, table):
-    return [{'name': field['name'], 'type': field['type'], 'comment': '', 'primary_key': field.get('primary_key')} for field in self.db.schema_fields(table)['fields']]
+    return [{
+      'name': field['name'],
+      'type': field['type'],
+      'comment': '',
+      'primary_key': field.get('primary_key')
+      } for field in self.db.schema_fields(table)['fields']
+    ]
 
   def get_sample_data(self, database, table, column=None):
     # Note: currently ignores dynamic fields

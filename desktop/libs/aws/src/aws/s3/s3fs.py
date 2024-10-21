@@ -14,22 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
-from builtins import str
-from builtins import object
-import itertools
-import logging
 import os
 import posixpath
 import re
-import sys
 import time
+import logging
+import itertools
+import posixpath
+import urllib.error
+import urllib.request
+from builtins import object, str
+from urllib.parse import urlparse as lib_urlparse
 
 from boto.exception import BotoClientError, S3ResponseError
 from boto.s3.connection import Location
 from boto.s3.key import Key
 from boto.s3.prefix import Prefix
+from django.utils.translation import gettext as _
 
 from aws import s3
 from aws.conf import get_default_region, get_locations, PERMISSION_ACTION_S3, is_raz_s3
@@ -37,15 +38,6 @@ from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
 from filebrowser.conf import REMOTE_STORAGE_HOME
-
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
-  from django.utils.translation import gettext as _
-else:
-  from urllib import quote as urllib_quote
-  from urlparse import urlparse as lib_urlparse
-  from django.utils.translation import ugettext as _
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 BUCKET_NAME_PATTERN = re.compile(

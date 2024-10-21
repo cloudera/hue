@@ -15,17 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Utilities for views (text and number formatting, etc)"""
-from __future__ import division
 
-import datetime
-import logging
 import math
-import sys
+import logging
+import datetime
 
 from django.urls import reverse
 
 from hadoop.fs.hadoopfs import Hdfs
-
 
 LOG = logging.getLogger()
 
@@ -44,7 +41,8 @@ def big_filesizeformat(bytes):
   index = int(math.floor(math.log(bytes, 1024)))
   index = min(len(units) - 1, index)
 
-  return("%.1f %s" % ((bytes / math.pow(1024, index)), units[index]))
+  return ("%.1f %s" % ((bytes / math.pow(1024, index)), units[index]))
+
 
 def format_time_diff(start=None, end=None):
   """
@@ -69,6 +67,7 @@ def format_time_diff(start=None, end=None):
   output.append("%ds" % seconds)
   return ":".join(output)
 
+
 def format_duration_in_millis(duration=0):
   """
     formats the difference between two times in millis as Xd:Xh:Xm:Xs
@@ -90,13 +89,11 @@ def format_duration_in_millis(duration=0):
   output.append("%ds" % seconds)
   return ":".join(output)
 
-def is_ajax(request):
-  if sys.version_info[0] > 2:
-    _is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.path.startswith('/api/')
-  else:
-    _is_ajax = request.is_ajax()
 
+def is_ajax(request):
+  _is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.path.startswith('/api/')
   return _is_ajax
+
 
 def location_to_url(location, strict=True, is_embeddable=False):
   """

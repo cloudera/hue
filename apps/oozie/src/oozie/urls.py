@@ -17,15 +17,14 @@
 
 import sys
 
-from oozie.views import editor as oozie_views_editor
-from oozie.views import editor2 as oozie_views_editor2
-from oozie.views import api as oozie_views_api
-from oozie.views import dashboard as oozie_views_dashboard
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from oozie.views import (
+    api as oozie_views_api,
+    dashboard as oozie_views_dashboard,
+    editor as oozie_views_editor,
+    editor2 as oozie_views_editor2,
+)
 
 IS_URL_NAMESPACED = True
 
@@ -82,7 +81,7 @@ urlpatterns = [
     name='edit_bundled_coordinator'
   ),
 
-  re_path(r'^list_history$', oozie_views_editor.list_history, name='list_history'), # Unused
+  re_path(r'^list_history$', oozie_views_editor.list_history, name='list_history'),  # Unused
   re_path(r'^list_history/(?P<record_id>[-\w]+)$', oozie_views_editor.list_history_record, name='list_history_record'),
   re_path(r'^install_examples/?$', oozie_views_editor.install_examples, name='install_examples'),
 ]

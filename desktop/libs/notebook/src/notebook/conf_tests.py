@@ -15,25 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import pytest
-import unittest
 import sys
+import json
+import unittest
+from unittest.mock import Mock, patch
 
+import pytest
 from django.test import TestCase
+
 from desktop.auth.backend import rewrite_user
 from desktop.conf import ENABLE_CONNECTORS
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.django_test_util import make_logged_in_client
-from useradmin.models import User, update_app_permissions, get_default_user_group
-
-from notebook.conf import config_validator, get_ordered_interpreters, _excute_test_query
-
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from notebook.conf import _excute_test_query, config_validator, get_ordered_interpreters
+from useradmin.models import User, get_default_user_group, update_app_permissions
 
 
 class TestInterpreterConfig(TestCase):
@@ -58,7 +53,6 @@ class TestInterpreterConfig(TestCase):
   def teardown_class(cls):
     for reset in cls._class_resets:
       reset()
-
 
   def test_get_ordered_interpreters(self):
     with patch('desktop.lib.connectors.api._get_installed_connectors') as _get_installed_connectors:
@@ -127,7 +121,6 @@ class TestCheckConfig():
         warnings = config_validator(user=self.user)
 
         assert not warnings, warnings
-
 
         _excute_test_query.side_effect = Exception('')
 

@@ -24,13 +24,13 @@ from django.utils.translation import gettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib import fsmanager
-from desktop.lib.i18n import smart_unicode
-from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
-from desktop.lib.fs.gc.gs import get_gs_home_directory
 
 from azure.abfs.__init__ import get_home_dir_for_abfs
 from aws.s3.s3fs import get_s3_home_directory
 
+from desktop.lib.fs.gc.gs import get_gs_home_directory
+from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+from desktop.lib.i18n import smart_str
 from filebrowser.views import _normalize_path
 
 LOG = logging.getLogger()
@@ -44,7 +44,7 @@ def error_handler(view_fn):
     except Exception as e:
       LOG.exception('Error running %s' % view_fn)
       response['status'] = -1
-      response['message'] = smart_unicode(e)
+      response['message'] = smart_str(e)
     return JsonResponse(response)
 
   return decorator

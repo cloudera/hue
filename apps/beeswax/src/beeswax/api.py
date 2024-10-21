@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import re
-import sys
 import json
 import logging
 from builtins import zip

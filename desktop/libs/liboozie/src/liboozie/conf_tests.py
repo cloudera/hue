@@ -15,19 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 import sys
+from unittest.mock import Mock, patch
 
-from useradmin.models import User
+import pytest
+
 from desktop.lib.django_test_util import make_logged_in_client
-
 from liboozie.conf import config_validator
-
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from useradmin.models import User
 
 
 @pytest.mark.django_db

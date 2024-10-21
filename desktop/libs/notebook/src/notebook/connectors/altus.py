@@ -15,24 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
-import json
 import sys
-
+import json
+import logging
+from builtins import object
 from datetime import datetime, timedelta
 
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 from metadata.conf import ALTUS, K8S
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger()
 
@@ -72,7 +67,8 @@ def _exec(service, command, parameters=None):
     raise PopupException(e, title=_('Error accessing'))
 
 
-class IAMApi(object): pass
+class IAMApi(object):
+  pass
 # altus iam list-user-assigned-roles --user=crn:altus:ia
 
 
@@ -142,9 +138,9 @@ class DataEngApi(object):
     job = {'script': script}
 
     if params:
-      job['params'] =  params
+      job['params'] = params
     if job_xml:
-      job['jobXml'] =  job_xml
+      job['jobXml'] = job_xml
 
     return self.submit_jobs(cluster_name, [{'hiveJob': job}])
 
@@ -152,7 +148,7 @@ class DataEngApi(object):
     job = {
       "jars": jars if jars else [],
       "applicationArguments": arguments if arguments else [],
-      #"propertiesFile": "string"
+      # "propertiesFile": "string"
     }
     if spark_arguments:
       job['sparkArguments'] = ' '.join(spark_arguments)
@@ -186,14 +182,14 @@ class DataEngApi(object):
     # [--cloudera-manager-username <value>]
     # [--cloudera-manager-password <value>]
 
-    params = { # cloud_provider: AWS, Azure...
+    params = {  # cloud_provider: AWS, Azure...
       'clusterName': cluster_name,
       'cdhVersion': cdh_version,
       'publicKey': public_key,
       'instanceType': instance_type,
       'environmentName': environment_name,
       'workersGroupSize': workers_group_size,
-      #'automaticTerminationCondition': "EMPTY_JOB_QUEUE"
+      # 'automaticTerminationCondition': "EMPTY_JOB_QUEUE"
     }
 
     if namespace_name:
@@ -294,7 +290,6 @@ class DataWarehouse2Api(object):
     self._client.set_verify(False)
     self._root = Resource(self._client)
 
-
   def list_k8_clusters(self):
     clusters = self._root.post('listClusters', contenttype="application/json")
     for cluster in clusters['clusters']:
@@ -304,7 +299,6 @@ class DataWarehouse2Api(object):
       cluster['progress'] = '%(workerReplicasOnline)s / %(workerReplicas)s' % cluster
       cluster['creationDate'] = str(datetime.now())
     return clusters
-
 
   def create_cluster(self, cloud_provider, cluster_name, cdh_version, public_key, instance_type, environment_name, workers_group_size=3, namespace_name=None,
         cloudera_manager_username='hue', cloudera_manager_password='hue'):
@@ -319,17 +313,15 @@ class DataWarehouse2Api(object):
 
     return self._root.post('createCluster', data=json.dumps(data), contenttype="application/json")
 
-
   def list_clusters(self):
     clusters = self._root.post('listClusters', contenttype="application/json")
     for cluster in clusters['clusters']:
       cluster['clusterName'] = cluster['name']
       cluster['workersGroupSize'] = cluster['workerReplicas']
-      cluster['instanceType'] = 'Data Warehouse'# '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
+      cluster['instanceType'] = 'Data Warehouse'  # '%(workerCpuCores)s CPU %(workerMemoryInGib)s Memory' % cluster
       cluster['progress'] = '%(workerReplicasOnline)s / %(workerReplicas)s' % cluster
       cluster['creationDate'] = str(datetime.now())
     return clusters
-
 
   def delete_cluster(self, cluster_id):
     data = json.dumps({'clusterName': cluster_id})
@@ -337,14 +329,12 @@ class DataWarehouse2Api(object):
       'result': self._root.post('deleteCluster', data=data, contenttype="application/json")
     }
 
-
   def describe_cluster(self, cluster_id):
     data = json.dumps({'clusterName': cluster_id})
     data = self._root.post('describeCluster', data=data, contenttype="application/json")
     data['cluster']['clusterName'] = data['cluster']['name']
     data['cluster']['cdhVersion'] = 'Data Warehouse'
     return data
-
 
   def update_cluster(self, **params):
     return self._root.post('updateCluster', data=json.dumps(params), contenttype="application/json")

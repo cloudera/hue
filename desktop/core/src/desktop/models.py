@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 import os
-import sys
 import json
 import uuid
 import logging
@@ -26,7 +23,9 @@ import calendar
 from builtins import next, object
 from collections import OrderedDict
 from itertools import chain
+from urllib.parse import quote as urllib_quote
 
+from django.contrib.auth.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
@@ -34,23 +33,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db import connection, models, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.db import models
 from django.urls import NoReverseMatch, reverse
-from django.contrib.auth.models import User
-
-
-from dashboard.conf import get_engines, HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED
-from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket
-from kafka.conf import has_kafka
-from indexer.conf import ENABLE_DIRECT_UPLOAD
-from metadata.conf import get_optimizer_mode
-from notebook.conf import DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters, DEFAULT_INTERPRETER
-from useradmin.models import User, Group, get_organization
-from useradmin.organization import _fitered_queryset
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 from dashboard.conf import HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED, get_engines
 from desktop import appmanager
@@ -88,16 +72,6 @@ from metadata.conf import get_optimizer_mode
 from notebook.conf import DEFAULT_INTERPRETER, DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
 from useradmin.models import Group, User, get_organization
 from useradmin.organization import _fitered_queryset
-
-if sys.version_info[0] > 2:
-  from urllib.parse import quote as urllib_quote
-
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from urllib import quote as urllib_quote
-
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
 
 LOG = logging.getLogger()
 
@@ -2384,6 +2358,7 @@ def __paginate(page, limit, queryset):
     'page': page,
     'limit': limit
   }
+
 
 class LlmPrompt(models.Model):
     prompt = models.TextField()

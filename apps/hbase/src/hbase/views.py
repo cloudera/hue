@@ -15,33 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-import base64
-import json
-import logging
 import re
-import sys
-import urllib.request, urllib.parse, urllib.error
+import json
+import base64
+import logging
+import urllib.error
+import urllib.parse
+import urllib.request
+from io import StringIO as string_io
+
+from django.utils.translation import gettext as _
 
 from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse, render
-
 from hbase import conf
-from hbase.hbase_site import is_impersonation_enabled
-from hbase.settings import DJANGO_APPS
 from hbase.api import HbaseApi
+from hbase.hbase_site import is_impersonation_enabled
 from hbase.management.commands import hbase_setup
 from hbase.server.hbase_lib import get_thrift_type
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  from django.utils.translation import gettext as _
-else:
-  from cStringIO import StringIO as string_io
-  from avro import datafile, io
-  from django.utils.translation import ugettext as _
-
+from hbase.settings import DJANGO_APPS
 
 LOG = logging.getLogger()
 
@@ -49,41 +41,44 @@ LOG = logging.getLogger()
 def has_write_access(user):
   return is_admin(user) or user.has_hue_permission(action="write", app=DJANGO_APPS[0]) or is_impersonation_enabled()
 
+
 def app(request):
   return render('app.mako', request, {
     'can_write': has_write_access(request.user),
     'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
+
 # action/cluster/arg1/arg2/arg3...
-def api_router(request, url): # On split, deserialize anything
+def api_router(request, url):  # On split, deserialize anything
 
   def safe_json_load(raw):
     try:
       return json.loads(re.sub(r'(?:\")([0-9]+)(?:\")', r'\1', str(raw)))
-    except:
+    except Exception:
       LOG.debug('Failed to parse input as JSON, falling back to raw input.')
       return raw
 
   def deserialize(data):
-    if type(data) == dict:
+    if type(data) is dict:
       special_type = get_thrift_type(data.pop('hue-thrift-type', ''))
       if special_type:
         return special_type(data)
 
     if hasattr(data, "__iter__"):
       for i, item in enumerate(data):
-        data[i] = deserialize(item) # Sets local binding, needs to set in data
+        data[i] = deserialize(item)  # Sets local binding, needs to set in data
     return data
 
   decoded_url_params = [urllib.parse.unquote(arg) for arg in re.split(r'(?<!\\)/', url.strip('/'))]
   url_params = [safe_json_load((arg, request.POST.get(arg[0:16], arg))[arg[0:15] == 'hbase-post-key-'])
-                for arg in decoded_url_params] # Deserialize later
+                for arg in decoded_url_params]  # Deserialize later
 
   if request.POST.get('dest', False):
     url_params += [request.FILES.get(request.GET.get('dest'))]
 
   return api_dump(HbaseApi(request.user).query(*url_params))
+
 
 def api_dump(response):
   ignored_fields = ('thrift_spec', '__.+__')
@@ -93,21 +88,21 @@ def api_dump(response):
     try:
       json.dumps(data)
       return data
-    except:
+    except Exception:
       LOG.debug('Failed to dump data as JSON, falling back to raw data.')
       cleaned = {}
       lim = [0]
-      if isinstance(data, str): # Not JSON dumpable, meaning some sort of bytestring or byte data
-        #detect if avro file
-        if(data[:3] == '\x4F\x62\x6A'):
-          #write data to file in memory
+      if isinstance(data, str):  # Not JSON dumpable, meaning some sort of bytestring or byte data
+        # detect if avro file
+        if (data[:3] == '\x4F\x62\x6A'):
+          # write data to file in memory
           try:
             output = io.StringIO()
-          except:
+          except Exception:
             output = string_io()
           output.write(data)
 
-          #read and parse avro
+          # read and parse avro
           rec_reader = io.DatumReader()
           df_reader = datafile.DataFileReader(output, rec_reader)
           return json.dumps(clean([record for record in df_reader]))

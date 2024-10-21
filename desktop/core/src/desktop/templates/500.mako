@@ -16,7 +16,7 @@
 
 <%!
 import sys
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.views import commonheader, commonfooter
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -66,9 +66,9 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
             <tbody>
               % for (file_name, line_number, function_name, text) in traceback:
                 <tr>
-                  <td>${smart_unicode(file_name) or ""}</td>
-                  <td>${smart_unicode(line_number) or ""}</td>
-                  <td>${smart_unicode(function_name) or ""}</td>
+                  <td>${smart_str(file_name) or ""}</td>
+                  <td>${smart_str(line_number) or ""}</td>
+                  <td>${smart_str(function_name) or ""}</td>
                 </tr>
               % endfor
             </tbody>

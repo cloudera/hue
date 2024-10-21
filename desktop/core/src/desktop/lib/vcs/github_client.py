@@ -16,26 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import binascii
+import re
 import json
 import logging
-import re
-import sys
-
-from desktop.lib.rest.http_client import HttpClient, RestException
-from desktop.lib.rest import resource
+import binascii
+import urllib.error
+import urllib.request
+from urllib.parse import unquote as urllib_unquote
 
 from desktop.conf import VCS
+from desktop.lib.rest import resource
+from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.vcs.apis.base_api import GITHUB_OFFICIAL
-
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import unquote as urllib_unquote
-else:
-  from urllib import unquote as urllib_unquote
 
 LOG = logging.getLogger()
 
@@ -50,12 +42,11 @@ class GithubClient(object):
   """
 
   OWNER_RE = "(?P<owner>[A-Za-z0-9](?:-?[A-Za-z0-9]){0,38})"
-  REPO_RE = "(?P<repo>[\w\.@\:\-~]+)"
-  BRANCH_RE = "(?P<branch>[\w\.@\:\-~]+)"
+  REPO_RE = r"(?P<repo>[\w\.@\:\-~]+)"
+  BRANCH_RE = r"(?P<branch>[\w\.@\:\-~]+)"
   FILEPATH_RE = "(?P<filepath>.+)"
 
   DEFAULT_SCOPES = ['repo', 'user']
-
 
   def __init__(self, **options):
     self._github_base_url = options.get('remote_url', VCS[GITHUB_OFFICIAL].REMOTE_URL.get()).strip('/')
@@ -71,7 +62,6 @@ class GithubClient(object):
       # TODO: Redact access_token from logs
     self.__params = ()
 
-
   @classmethod
   def get_authorization_url(cls, **options):
     """
@@ -82,7 +72,6 @@ class GithubClient(object):
     scopes_list = options.get('scopes_list', cls.DEFAULT_SCOPES)
     scopes = ','.join(scopes_list)
     return '%s/login/oauth/authorize?scope=%s&client_id=%s' % (remote_url, scopes, client_id)
-
 
   @classmethod
   def get_access_token(cls, session_code, **options):
@@ -99,7 +88,7 @@ class GithubClient(object):
         'code': session_code
       }
       headers = {
-        'content-type':'application/json',
+        'content-type': 'application/json',
         'Accept': 'application/json'
       }
       response = root.post('login/oauth/access_token', headers=headers, data=json.dumps(data))
@@ -109,7 +98,6 @@ class GithubClient(object):
       raise GithubClientException('Failed to request access token from GitHub: %s' % e)
     except KeyError:
       raise GithubClientException('Failed to find access_token in GitHub oAuth response')
-
 
   @classmethod
   def is_authenticated(cls, access_token, **options):
@@ -126,27 +114,23 @@ class GithubClient(object):
     except RestException:
       return False
 
-
   @classmethod
   def _get_json(cls, response):
-    if type(response) != dict:
+    if type(response) is not dict:
       try:
         response = json.loads(response)
       except ValueError:
         raise GithubClientException('GitHub API did not return JSON response')
     return response
 
-
   @property
   def github_url_regex(self):
     return re.compile('%s/%s/%s/blob/%s/%s' % (self._github_base_url, self.OWNER_RE, self.REPO_RE, self.BRANCH_RE, self.FILEPATH_RE))
-
 
   def _clean_path(self, filepath):
     cleaned_path = filepath.strip('/')
     cleaned_path = urllib_unquote(cleaned_path)
     return cleaned_path
-
 
   def parse_github_url(self, url):
     """
@@ -160,7 +144,6 @@ class GithubClient(object):
     else:
       raise ValueError('GitHub URL is not formatted correctly: %s' % url)
 
-
   def get_file_contents(self, owner, repo, filepath, branch='master'):
     filepath = self._clean_path(filepath)
     try:
@@ -172,7 +155,6 @@ class GithubClient(object):
       raise GithubClientException('Failed to decode file contents, check if file content is properly base64-encoded: %s' % e)
     except KeyError as e:
       raise GithubClientException('Failed to find expected content object in blob object: %s' % e)
-
 
   def get_sha(self, owner, repo, filepath, branch='master'):
     """
@@ -193,7 +175,6 @@ class GithubClient(object):
 
     return sha
 
-
   def get_tree(self, owner, repo, sha='master', recursive=True):
     """
     GET /repos/:owner/:repo/git/trees/:sha
@@ -209,7 +190,6 @@ class GithubClient(object):
       return self._get_json(response)
     except RestException as e:
       raise GithubClientException('Could not find GitHub object, check owner, repo and filepath or permissions: %s' % e)
-
 
   def get_blob(self, owner, repo, sha):
     """

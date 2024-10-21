@@ -15,22 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import sys
+import json
 
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
 
 from desktop.lib.django_util import JsonResponse
-
-from desktop.lib.vcs.github_client import GithubClient
 from desktop.lib.vcs.apis.base_api import Api
+from desktop.lib.vcs.github_client import GithubClient
 from desktop.lib.view_util import is_ajax
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 
 class GithubApi(Api):
@@ -74,7 +69,7 @@ class GithubApi(Api):
       request.session['github_callback_fetch'] = request.GET.get('fetchURL')
       response = {
         'status': -1,
-        'auth_url':auth_url
+        'auth_url': auth_url
       }
       if is_ajax(request):
         return JsonResponse(response)

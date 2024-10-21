@@ -16,29 +16,28 @@
 # limitations under the License.
 
 from __future__ import absolute_import
-import json
-import logging
-import socket
-import sys
 
-from sqoop import client, conf
-from sqoop.api.decorators import get_submission_or_exception
+import sys
+import json
+import socket
+import logging
+
+from django.utils.translation import gettext as _
+from django.views.decorators.cache import never_cache
+
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
+from sqoop import client, conf
+from sqoop.api.decorators import get_submission_or_exception
 from sqoop.api.exception import handle_rest_exception
 from sqoop.api.utils import list_to_dict
-from django.views.decorators.cache import never_cache
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 __all__ = ['get_submissions', 'submissions']
 
 
 LOG = logging.getLogger()
+
 
 @never_cache
 def get_submissions(request):
@@ -49,12 +48,15 @@ def get_submissions(request):
   }
   status = request.GET.get('status', 'submissions').split(',')
   try:
-    c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get())
+    c = client.SqoopClient(
+      conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE, ssl_cert_ca_verify=conf.SSL_CERT_CA_VERIFY.get()
+    )
     submissions = c.get_submissions()
     response['submissions'] = list_to_dict(submissions)
   except RestException as e:
     response.update(handle_rest_exception(e, _('Could not get submissions.')))
   return JsonResponse(response)
+
 
 @never_cache
 def submissions(request):

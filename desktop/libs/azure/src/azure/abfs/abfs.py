@@ -18,37 +18,28 @@
 """
 Interfaces for ABFS
 """
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import logging
-import os
-import sys
-import threading
-import re
 
+import os
+import logging
+import threading
+import urllib.error
+import urllib.request
+from builtins import object
 from math import ceil
 from posixpath import join
+from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
 
-from hadoop.hdfs_site import get_umask_mode
-from hadoop.fs.exceptions import WebHdfsException
-
-from desktop.conf import RAZ
-from desktop.lib.rest import http_client, resource
-from desktop.lib.rest.raz_http_client import RazHttpClient
+from django.http.multipartparser import MultiPartParser
 
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
 from azure.conf import PERMISSION_ACTION_ABFS, is_raz_abfs
-
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import quote as urllib_quote
-  from urllib.parse import urlparse as lib_urlparse
-else:
-  from urlparse import urlparse as lib_urlparse
-  from urllib import quote as urllib_quote
+from desktop.conf import RAZ
+from desktop.lib.rest import http_client, resource
+from desktop.lib.rest.raz_http_client import RazHttpClient
+from hadoop.fs.exceptions import WebHdfsException
+from hadoop.hdfs_site import get_umask_mode
 
 LOG = logging.getLogger()
 
@@ -594,9 +585,6 @@ class ABFS(object):
     Renames a file
     """
     rename_source = Init_ABFS.strip_scheme(old)
-    if sys.version_info[0] < 3 and isinstance(rename_source, unicode):
-      rename_source = rename_source.encode('utf-8')
-
     headers = {'x-ms-rename-source': '/' + urllib_quote(rename_source)}
 
     try:
@@ -669,7 +657,7 @@ class ABFS(object):
             offset += size
             chunk = src.read(chunk_size)
           self.flush(remote_dst, params={'position': offset})
-        except:
+        except Exception:
           LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
           raise
       finally:

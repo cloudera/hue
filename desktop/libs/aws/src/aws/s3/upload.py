@@ -21,13 +21,13 @@ Classes for a custom upload handler to stream into S3.
 See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
-import io
-import sys
 import logging
 import unicodedata
+from io import BytesIO as stream_io
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
+from django.utils.translation import gettext as _
 
 from aws.s3 import parse_uri
 from aws.s3.s3fs import S3FileSystemException
@@ -35,16 +35,6 @@ from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
 from filebrowser.utils import calculate_total_size, generate_chunks
-
-if sys.version_info[0] > 2:
-  from io import BytesIO as stream_io
-else:
-  from cStringIO import StringIO as stream_io
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 128  # TODO: set in configuration (currently 128 MiB)
 

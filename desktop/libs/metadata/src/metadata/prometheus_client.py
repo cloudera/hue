@@ -16,23 +16,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
 import sys
+import logging
+from builtins import object
 
 from django.core.cache import cache
+from django.utils.translation import gettext as _
 
-from desktop.lib.rest.http_client import RestException, HttpClient
+from desktop.lib.i18n import smart_str
+from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
-from desktop.lib.i18n import smart_unicode
-
 from metadata.conf import PROMETHEUS
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 VERSION = 'v1'
@@ -46,7 +40,7 @@ class PrometheusApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)
 
 
 class PrometheusApi(object):
@@ -59,7 +53,6 @@ class PrometheusApi(object):
 
     self._client.set_verify(ssl_cert_ca_verify)
     self._root = Resource(self._client)
-
 
   def query(self, query):
     try:

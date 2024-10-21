@@ -15,18 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import sys
 import json
 import logging
-import os
 import subprocess
-import sys
+
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 from desktop.lib.conf import Config, coerce_bool, coerce_csv, coerce_password_from_script
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 LOG = logging.getLogger()
 
@@ -212,6 +209,7 @@ CDP_LOGOUT_URL = Config(
   default="",
   help=_t("To log users out of magic-sso, CDP control panel use Logout URL"))
 
+
 def get_key_file_password():
   password = os.environ.get('HUE_SAML_KEY_FILE_PASSWORD')
   if password is not None:
@@ -229,6 +227,7 @@ def config_validator(user):
   if USERNAME_SOURCE.get() not in USERNAME_SOURCES:
     res.append(("libsaml.username_source", _("username_source not configured properly. SAML integration may not work.")))
   return res
+
 
 def get_logout_redirect_url():
   # This logic was derived from KNOX.

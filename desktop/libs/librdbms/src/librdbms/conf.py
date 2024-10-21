@@ -17,16 +17,10 @@
 
 import sys
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection,\
-                             ConfigSection, coerce_json_dict,\
-                             coerce_password_from_script
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
 from desktop.conf import coerce_database
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
-
+from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_json_dict, coerce_password_from_script
 
 DATABASES = UnspecifiedConfigSection(
   key="databases",
@@ -102,7 +96,8 @@ def config_validator(user):
       if engine in ('sqlite', 'sqlite3'):
         res.append((DATABASES[server].NAME, _("Database name should not be empty for the SQLite backend.")))
       if engine == 'oracle':
-        res.append((DATABASES[server].NAME, _("Database name should not be empty for the Oracle backend. It should be the SID of your database.")))
+        res.append((
+          DATABASES[server].NAME, _("Database name should not be empty for the Oracle backend. It should be the SID of your database.")))
       if engine in ('postgresql_psycopg2', 'postgresql'):
         res.append((DATABASES[server].NAME, _("Database name should not be empty for the PostgreSQL backend.")))
 

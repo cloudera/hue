@@ -14,25 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 
-from builtins import object
-import logging
 import os
 import sys
+import logging
+from builtins import object
 
 from django.urls import reverse
-
-from libzookeeper.conf import zkensemble
-from indexer.conf import config_morphline_path
-from metadata.manager_client import ManagerApi
-from useradmin.models import User
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from indexer.conf import config_morphline_path
+from libzookeeper.conf import zkensemble
+from metadata.manager_client import ManagerApi
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
@@ -41,7 +35,6 @@ class FlumeIndexer(object):
 
   def __init__(self, user):
     self.user = user
-
 
   def start(self, destination_name, file_format, destination):
     responses = {'status': 0}
@@ -58,7 +51,6 @@ class FlumeIndexer(object):
       responses['on_success_url'] = reverse('search:browse', kwargs={'name': destination_name})
 
     return responses
-
 
   def generate_config(self, source, destination):
     configs = []
@@ -159,7 +151,6 @@ tier1.sinks.sink1.batchSize = 20''' % {
     configs.append(('agent_config_file', flume_config))
 
     return configs
-
 
   def generate_morphline_config(self, destination):
     # TODO manage generic config, cf. MorphlineIndexer

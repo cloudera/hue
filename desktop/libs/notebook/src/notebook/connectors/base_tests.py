@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,22 +16,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import json
-import pytest
 import sys
+import json
+from builtins import object
+from unittest.mock import MagicMock, Mock, patch
 
+import pytest
 from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
-from useradmin.models import User
-
 from notebook.connectors.base import Notebook, get_api
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
+from useradmin.models import User
 
 
 @pytest.mark.django_db
@@ -41,7 +36,6 @@ class TestNotebook(object):
     self.client = make_logged_in_client(username="test", groupname="empty", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
-
   def test_get_api(self):
     request = Mock()
     snippet = {
@@ -50,7 +44,6 @@ class TestNotebook(object):
     }
 
     get_api(request=request, snippet=snippet)
-
 
   def test_execute_and_wait(self):
     query = Notebook()
@@ -72,7 +65,6 @@ class TestNotebook(object):
 
     assert 2 == query.check_status.call_count
 
-
   def test_check_status(self):
     query = Notebook()
 
@@ -89,7 +81,6 @@ class TestNotebook(object):
 
           assert 0 == resp['status']
           assert 0 == resp['query_status']['status']
-
 
   def test_statement_with_variables(self):
     snippet = {
@@ -112,6 +103,8 @@ class TestNotebook(object):
 
 
 iteration = 0
+
+
 def check_status_side_effect(request, operation_id):
   """First time query is still running, second time the execution is finished."""
   global iteration

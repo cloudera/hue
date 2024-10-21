@@ -15,17 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
 import sys
+import logging
+from builtins import object
+
+from django.utils.translation import gettext as _
 
 from notebook.connectors.altus import _exec
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -51,7 +47,6 @@ class WorkfloadAnalyticsClient(object):
     return WorkloadAnalytics(self.user).get_mr_task_attempt_log(operation_execution_id=operation_execution_id, attempt_id=attempt_id)
 
 
-
 class WorkloadAnalytics(object):
 
   def __init__(self, user): pass
@@ -61,14 +56,11 @@ class WorkloadAnalytics(object):
 
     return _exec('wa', 'getImpalaQuery', parameters=parameters)
 
-
   def list_uploads(self):
     return _exec('wa', 'listUploads')
 
-
   def list_environments(self):
     return _exec('wa', 'listEnvironments')
-
 
   def get_operation_execution_details(self, operation_id, include_tree=False):
     parameters = {'id': operation_id}
@@ -77,7 +69,6 @@ class WorkloadAnalytics(object):
       parameters['includeTree'] = ''
 
     return _exec('wa', 'getOperationExecutionDetails', parameters=parameters)
-
 
   def get_mr_task_attempt_log(self, operation_execution_id, attempt_id):
     parameters = {'operationExecutionId': operation_execution_id, 'attemptId': attempt_id}

@@ -61,9 +61,6 @@ application's conf.py. During startup, Desktop binds configuration files to your
 variables.
 """
 
-# The Config object unfortunately has a kwarg called "type", and everybody is
-# using it. So instead of breaking compatibility, we make a "pytype" alias.
-
 import os
 import re
 import sys
@@ -98,6 +95,10 @@ SUPPORTED_THRIFT_TRANSPORTS = ('buffered', 'framed')
 
 # a BoundContainer(BoundConfig) object which has all of the application's configs as members
 GLOBAL_CONFIG = None
+
+# The Config object unfortunately has a kwarg called "type", and everybody is
+# using it. So instead of breaking compatibility, we make a "pytype" alias.
+pytype = type
 
 LOG = logging.getLogger()
 
@@ -735,9 +736,9 @@ def coerce_password_from_script(script):
   p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
   stdout, stderr = p.communicate()
 
-  if sys.version_info[0] > 2 and isinstance(stdout, bytes):
+  if isinstance(stdout, bytes):
     stdout = stdout.decode('utf-8')
-  if sys.version_info[0] > 2 and isinstance(stderr, bytes):
+  if isinstance(stderr, bytes):
     stderr = stderr.decode('utf-8')
 
   if p.returncode != 0:

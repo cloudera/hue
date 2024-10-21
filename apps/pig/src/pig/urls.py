@@ -17,12 +17,9 @@
 
 import sys
 
-from pig import views as pig_views
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from pig import views as pig_views
 
 urlpatterns = [
   re_path(r'^$', pig_views.app, name='index'),
