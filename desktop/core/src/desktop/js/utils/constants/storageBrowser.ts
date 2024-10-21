@@ -15,3 +15,40 @@
 // limitations under the License.
 
 export const DEFAULT_PAGE_SIZE = 50;
+
+export enum SupportedFileTypes {
+  IMAGE = 'image',
+  TEXT = 'text',
+  DOCUMENT = 'document',
+  AUDIO = 'audio',
+  VIDEO = 'video',
+  OTHER = 'other'
+}
+
+export const SUPPORTED_FILE_EXTENSIONS = {
+  png: SupportedFileTypes.IMAGE,
+  jpg: SupportedFileTypes.IMAGE,
+  jpeg: SupportedFileTypes.IMAGE,
+
+  txt: SupportedFileTypes.TEXT,
+  log: SupportedFileTypes.TEXT,
+  json: SupportedFileTypes.TEXT,
+  csv: SupportedFileTypes.TEXT,
+  sql: SupportedFileTypes.TEXT,
+  tsv: SupportedFileTypes.TEXT,
+
+  // TODO: add feature to edit these files
+  // parquet: SupportedFileTypes.TEXT,
+  // orc: SupportedFileTypes.TEXT,
+  // avro: SupportedFileTypes.TEXT,
+
+  pdf: SupportedFileTypes.DOCUMENT,
+
+  mp3: SupportedFileTypes.AUDIO,
+
+  mp4: SupportedFileTypes.VIDEO
+};
+
+export const EDITABLE_FILE_FORMATS = {
+  [SupportedFileTypes.TEXT]: 1
+};
