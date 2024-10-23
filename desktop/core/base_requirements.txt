@@ -48,6 +48,7 @@ py==1.11.0
 pyformance==0.3.2
 pytest==8.1.1
 pytest-django==4.8.0
+pytest-html==4.1.1
 python-dateutil==2.8.2
 python-daemon==2.2.4
 python-ldap==3.4.3
