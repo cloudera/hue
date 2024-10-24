@@ -63,6 +63,45 @@ jobs:
       run: |
         PYTHONWARNINGS=always ./build/env/bin/pytest
 
+    - name: Check and comment if no unit test files are modified
+      if: matrix.python-version == '3.8'
+      run: |
+        git fetch origin master
+        changed_files=$(git diff --name-only origin/master)
+        
+        if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
+          echo "✅ Unit test files were modified."
+        else
+          echo "⚠️ No unit test files modified."
+          
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{"body":"⚠️ No unit test files modified. Please ensure that changes are properly tested. ⚠️"}' \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+        fi
+
+    # - name: Get list of changed Python files
+    #   id: changes
+    #   run: |
+    #     git fetch origin master
+    #     echo "::set-output name=changed_files::$(git diff --name-only origin/master | grep '\.py$' | tr '\n' ' ')"
+
+    # - name: Run tests with coverage for changed files
+    #   run: |
+    #     if [ "${{ steps.changes.outputs.changed_files }}" != "" ]; then
+    #       ./build/env/bin/pytest --cov --cov-report=xml --cov-report=term-missing ${{ steps.changes.outputs.changed_files }}
+    #     else
+    #       echo "No Python files were changed, skipping tests."
+    #     fi
+
+    - name: Upload coverage report as artifact
+      if: ${{ steps.changes.outputs.changed_files != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage.xml
+
     - name: run python lints
       run: |
         PYTHONWARNINGS=always ./build/env/bin/hue runruff check

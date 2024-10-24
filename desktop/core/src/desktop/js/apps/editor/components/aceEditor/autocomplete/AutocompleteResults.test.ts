@@ -73,6 +73,7 @@ describe('AutocompleteResults.ts', () => {
     });
 
   const createSubject = (): AutocompleteResults => {
+    console.log("ajnakfjabkjfa");
     const mockEditor = () => ({
       getTextBeforeCursor: () => 'foo',
       getTextAfterCursor: () => 'bar'
