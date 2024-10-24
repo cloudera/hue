@@ -34,8 +34,14 @@ jest.mock('../../../utils/huePubSub', () => ({
   publish: jest.fn()
 }));
 
+const mockSave = jest.fn();
+jest.mock('../../../api/utils', () => ({
+  post: () => mockSave()
+}));
+
 // Mock data for fileData
 const mockFileData: PathAndFileData = {
+  editable: true,
   path: '/path/to/file.txt',
   stats: {
     size: 123456,
@@ -50,7 +56,8 @@ const mockFileData: PathAndFileData = {
   rwx: 'rwxr-xr-x',
   breadcrumbs: [],
   view: {
-    contents: 'Initial file content'
+    contents: 'Initial file content',
+    compression: 'none'
   },
   files: [],
   page: {
@@ -90,6 +97,22 @@ describe('StorageFilePage', () => {
     expect(screen.getByRole('button', { name: 'Edit' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull();
+  });
+
+  it('hide edit button when editable is false', () => {
+    render(<StorageFilePage fileData={{ ...mockFileData, editable: false }} />);
+
+    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
+  });
+
+  it('hide edit button when editable is false', () => {
+    render(
+      <StorageFilePage
+        fileData={{ ...mockFileData, view: { ...mockFileData.view, compression: 'zip' } }}
+      />
+    );
+
+    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
   });
 
   it('shows save and cancel buttons when editing', async () => {
@@ -190,5 +213,77 @@ describe('StorageFilePage', () => {
 
     expect(screen.queryByRole('button', { name: 'Download' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Download' })).toBeNull();
+  });
+
+  it('renders a textarea for text files', () => {
+    render(
+      <StorageFilePage
+        fileData={{
+          ...mockFileData,
+          view: { contents: 'Text file content' },
+          path: '/path/to/textfile.txt'
+        }}
+      />
+    );
+
+    const textarea = screen.getByRole('textbox');
+    expect(textarea).toBeInTheDocument();
+    expect(textarea).toHaveValue('Text file content');
+  });
+
+  it('renders an image for image files', () => {
+    render(
+      <StorageFilePage
+        fileData={{ ...mockFileData, path: '/path/to/imagefile.png', view: { contents: '' } }}
+      />
+    );
+
+    const img = screen.getByRole('img');
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute('src', expect.stringContaining('imagefile.png'));
+  });
+
+  it('renders a preview button for document files', () => {
+    render(
+      <StorageFilePage
+        fileData={{ ...mockFileData, path: '/path/to/documentfile.pdf', view: { contents: '' } }}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: /preview document/i })).toBeInTheDocument();
+  });
+
+  it('renders an audio player for audio files', () => {
+    render(
+      <StorageFilePage
+        fileData={{ ...mockFileData, path: '/path/to/audiofile.mp3', view: { contents: '' } }}
+      />
+    );
+
+    const audio = screen.getByTestId('preview__content__audio'); // audio tag can't be access using getByRole
+    expect(audio).toBeInTheDocument();
+    expect(audio.children[0]).toHaveAttribute('src', expect.stringContaining('audiofile.mp3'));
+  });
+
+  it('renders a video player for video files', () => {
+    render(
+      <StorageFilePage
+        fileData={{ ...mockFileData, path: '/path/to/videofile.mp4', view: { contents: '' } }}
+      />
+    );
+
+    const video = screen.getByTestId('preview__content__video'); // video tag can't be access using getByRole
+    expect(video).toBeInTheDocument();
+    expect(video.children[0]).toHaveAttribute('src', expect.stringContaining('videofile.mp4'));
+  });
+
+  it('displays a message for unsupported file types', () => {
+    render(
+      <StorageFilePage
+        fileData={{ ...mockFileData, path: '/path/to/unsupportedfile.xyz', view: { contents: '' } }}
+      />
+    );
+
+    expect(screen.getByText(/preview not available for this file/i)).toBeInTheDocument();
   });
 });
