@@ -1455,7 +1455,7 @@ def test_db_migrations_sqlite():
       'PASSWORD': '',
       'HOST': '',
       'PORT': '',
-      'OPTIONS': {} if sys.version_info[0] > 2 else '',
+      'OPTIONS': {},
       'ATOMIC_REQUESTS': True,
       'CONN_MAX_AGE': 0,
     }

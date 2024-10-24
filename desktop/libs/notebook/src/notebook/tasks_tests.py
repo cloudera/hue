@@ -16,26 +16,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import pytest
 import sys
+import logging
+from unittest.mock import MagicMock, Mock, patch
 
+import pytest
 from celery import states
 
 from desktop.lib.django_test_util import make_logged_in_client
+from notebook.connectors.sql_alchemy import SqlAlchemyApi
+from notebook.tasks import close_statement, download_to_file, get_log, run_sync_query
 from useradmin.models import User
 
-from notebook.connectors.sql_alchemy import SqlAlchemyApi
-from notebook.tasks import run_sync_query, download_to_file, close_statement, get_log
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
-
 LOG = logging.getLogger()
-
 
 
 @pytest.mark.django_db
@@ -44,7 +37,6 @@ class TestRunAsyncQueryTask():
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_run_query_only(self):
     with patch('notebook.tasks._get_request') as _get_request:
@@ -73,7 +65,6 @@ class TestRunAsyncQueryTask():
 
               assert meta['row_counter'] == 2, meta
 
-
   def test_close_statement(self):
     with patch('notebook.tasks._get_request') as _get_request:
       with patch('notebook.tasks.download_to_file') as download_to_file:
@@ -96,7 +87,6 @@ class TestRunAsyncQueryTask():
 
             assert response == {'status': 0}
 
-
   def test_get_log(self):
     with patch('notebook.tasks._get_request') as _get_request:
       with patch('notebook.tasks.download_to_file') as download_to_file:
@@ -118,14 +108,12 @@ class TestRunAsyncQueryTask():
         assert response == ''
 
 
-
 @pytest.mark.django_db
 class TestRunSyncQueryTask():
 
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_run_query(self):
     snippet = {'type': 'mysql', 'statement_raw': 'SHOW TABLES', 'variables': []}

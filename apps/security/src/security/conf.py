@@ -17,15 +17,10 @@
 
 import sys
 
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
 from desktop.lib.conf import Config, coerce_bool
-
 from security.settings import NICE_NAME
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
 
 HIVE_V1 = Config(
   key="hive_v1",

@@ -15,29 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import logging
 import sys
+import json
 import uuid
+import logging
 
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
-from librdbms.conf import DATABASES, get_database_password, get_server_choices, get_connector_name
+from desktop.lib.django_util import JsonResponse
+from desktop.lib.i18n import smart_str
+from librdbms.conf import DATABASES, get_connector_name, get_database_password, get_server_choices
 from librdbms.jdbc import Jdbc
 from librdbms.server import dbms as rdbms
 from notebook.conf import get_ordered_interpreters
 from notebook.connectors.base import get_api
 from notebook.models import make_notebook
 from useradmin.models import User
-
-from desktop.lib.django_util import JsonResponse
-from desktop.lib.i18n import smart_str
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -65,6 +59,7 @@ def get_db_component(request):
 
   return JsonResponse(format_)
 
+
 def _get_api(request):
   file_format = json.loads(request.POST.get('source', request.POST.get('fileFormat', '{}')))
   options = None
@@ -72,7 +67,7 @@ def _get_api(request):
   if file_format['rdbmsMode'] == 'customRdbms':
     type = 'custom'
     if file_format['rdbmsType'] == 'jdbc':
-      name = file_format['rdbmsHostname'] # We make sure it's unique as name is the cache key
+      name = file_format['rdbmsHostname']  # We make sure it's unique as name is the cache key
       interface = file_format['rdbmsType']
       options = {'driver': file_format['rdbmsJdbcDriver'],
                  'url': file_format['rdbmsHostname'],
@@ -90,7 +85,7 @@ def _get_api(request):
         'options': {},
         'alias': file_format['rdbmsType']
       }
-      name = 'rdbms:%(server_name)s://%(server_host)s:%(server_port)s' % query_server # We make sure it's unique as name is the cache key
+      name = 'rdbms:%(server_name)s://%(server_host)s:%(server_port)s' % query_server  # We make sure it's unique as name is the cache key
   else:
     if file_format['rdbmsType'] == 'jdbc':
       type = file_format['rdbmsJdbcDriverName'] and file_format['rdbmsJdbcDriverName'].lower()
@@ -102,6 +97,7 @@ def _get_api(request):
 
   return get_api(request, {'type': type, 'interface': interface, 'options': options, 'query_server': query_server, 'name': name})
 
+
 def jdbc_db_list(request):
   format_ = {'data': [], 'status': 1}
   interpreters = get_ordered_interpreters(request.user)
@@ -109,6 +105,7 @@ def jdbc_db_list(request):
   format_['status'] = 0
 
   return JsonResponse(format_)
+
 
 def get_drivers(request):
   format_ = {'data': [], 'status': 1}
@@ -119,6 +116,7 @@ def get_drivers(request):
   format_['status'] = 0
 
   return JsonResponse(format_)
+
 
 def run_sqoop(request, source, destination, start_time):
   rdbms_mode = source['rdbmsMode']
@@ -184,7 +182,7 @@ def run_sqoop(request, source, destination, start_time):
           'url': url,
           'rdbmsPort': rdbms_port
         }
-      
+
     password_file_path = request.fs.join(request.fs.get_home_dir() + '/sqoop/', uuid.uuid4().hex + '.password')
     request.fs.do_as_user(
       request.user,

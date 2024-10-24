@@ -16,16 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
-from desktop.models import Document2
+import logging
+
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from desktop.models import Document2
 
 LOG = logging.getLogger()
 
@@ -44,7 +42,7 @@ class Command(BaseCommand):
                   action="store"),
     )
 
-  except AttributeError, e:
+  except AttributeError as e:
     baseoption_test = 'BaseCommand' in str(e) and 'option_list' in str(e)
     if baseoption_test:
       def add_arguments(self, parser):

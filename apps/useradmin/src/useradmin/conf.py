@@ -20,12 +20,9 @@ Configuration options for the "user admin" application
 
 import sys
 
-from desktop.lib.conf import Config, ConfigSection, coerce_bool
+from django.utils.translation import gettext_lazy as _
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
+from desktop.lib.conf import Config, ConfigSection, coerce_bool
 
 HOME_DIR_PERMISSIONS = Config(
     key="home_dir_permissions",
@@ -63,14 +60,14 @@ PASSWORD_POLICY = ConfigSection(
              "uppercase and lowercase letters, at least one number, and at least one "
              "special character."),
       type=str,
-      default="^(?=.*?[A-Z])(?=(.*[a-z]){1,})(?=(.*[\d]){1,})(?=(.*[\W_]){1,}).{8,}$"),
+      default=r"^(?=.*?[A-Z])(?=(.*[a-z]){1,})(?=(.*[\d]){1,})(?=(.*[\W_]){1,}).{8,}$"),
 
     PWD_HINT=Config(
       key="pwd_hint",
       help=_("Message about the password rule defined in pwd_regex"),
       type=str,
-      default="The password must be at least 8 characters long, and must contain both " + \
-              "uppercase and lowercase letters, at least one number, and at least " + \
+      default="The password must be at least 8 characters long, and must contain both " +
+              "uppercase and lowercase letters, at least one number, and at least " +
               "one special character."),
 
     PWD_ERROR_MESSAGE=Config(
@@ -78,8 +75,8 @@ PASSWORD_POLICY = ConfigSection(
       help=_("The error message displayed if the provided password does not "
              "meet the enhanced password rule"),
       type=str,
-      default="The password must be at least 8 characters long, and must contain both " + \
-               "uppercase and lowercase letters, at least one number, and at least " + \
+      default="The password must be at least 8 characters long, and must contain both " +
+               "uppercase and lowercase letters, at least one number, and at least " +
                "one special character.")
     )
   )

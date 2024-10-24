@@ -21,19 +21,14 @@ import unicodedata
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload, UploadFileException
-
-from desktop.lib.fsmanager import get_client
-from hadoop.conf import UPLOAD_CHUNK_SIZE
-from hadoop.fs.exceptions import WebHdfsException
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.fsmanager import get_client
 from filebrowser.utils import calculate_total_size, generate_chunks
+from hadoop.conf import UPLOAD_CHUNK_SIZE
+from hadoop.fs.exceptions import WebHdfsException
 
 LOG = logging.getLogger()
 

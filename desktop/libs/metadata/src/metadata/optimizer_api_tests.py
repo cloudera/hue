@@ -15,31 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import zip
+import sys
 import json
 import logging
-import pytest
-import sys
+from builtins import zip
+from unittest.mock import Mock, patch
 
-from django.urls import reverse
+import pytest
 from django.test import TestCase
+from django.urls import reverse
 
 from desktop.auth.backend import rewrite_user
 from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
+from metadata.optimizer_api import _convert_queries
 from useradmin.models import User
 
-from metadata.optimizer_api import _convert_queries
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
-
-
 LOG = logging.getLogger()
-
 
 
 @pytest.mark.django_db
@@ -53,7 +46,6 @@ class TestApi():
     if not ENABLE_ORGANIZATIONS.get():
       add_to_group('test')
       grant_access("test", "test", "metadata")
-
 
   def test_risk_ui_api(self):
     snippet = {
@@ -112,12 +104,10 @@ class TestOptimizerApi(TestCase):
     grant_access("test", "test", "metadata")
     grant_access("test", "test", "optimizer")
 
-
   @classmethod
   def teardown_class(cls):
     cls.user.is_superuser = False
     cls.user.save()
-
 
   # Should run first
   def test_upload(self):

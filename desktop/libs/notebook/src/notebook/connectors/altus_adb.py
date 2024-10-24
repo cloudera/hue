@@ -15,25 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import logging
 import json
-import sys
+import logging
+import urllib.error
+import urllib.request
+from urllib.parse import quote as urllib_quote, quote_plus as urllib_quote_plus
 
-from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from notebook.connectors.altus import AnalyticDbApi
 from notebook.connectors.base import Api, QueryError
-
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import quote as urllib_quote, quote_plus as urllib_quote_plus
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from urllib import quote as urllib_quote, quote_plus as urllib_quote_plus
 
 LOG = logging.getLogger()
 
@@ -47,40 +38,32 @@ class AltusAdbApi(Api):
     Api.__init__(self, user, interpreter=interpreter, request=request)
     self.cluster_name = cluster_name
 
-
   def execute(self, notebook, snippet):
     statement = snippet['statement']
 
     return HueQuery(self.user, cluster_crn=self.cluster_name).do_execute(statement)
-
 
   def check_status(self, notebook, snippet):
     handle = snippet['result']['handle']
 
     return HueQuery(self.user, cluster_crn=self.cluster_name).do_check_status(handle)
 
-
   def fetch_result(self, notebook, snippet, rows, start_over):
     handle = snippet['result']['handle']
 
     return HueQuery(self.user, cluster_crn=self.cluster_name).do_fetch_result(handle)
 
-
   def close_statement(self, notebook, snippet):
     return {'status': -1}
-
 
   def cancel(self, notebook, snippet):
     return {'status': -1, 'message': _('Could not cancel.')}
 
-
   def get_log(self, notebook, snippet, startFrom=0, size=None):
     return '...'
 
-
   def get_jobs(self, notebook, snippet, logs):
     return []
-
 
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None, operation=None):
     url_path = '/notebook/api/autocomplete'
@@ -104,7 +87,7 @@ class HueQuery(object):
     self.api = AnalyticDbApi(self.user)
 
   def do_post(self, url_path):
-    payload = '''{"method":"POST","url":"https://localhost:8888''' + url_path +'''","httpVersion":"HTTP/1.1","headers":[{"name":"Accept-Encoding","value":"gzip, deflate, br"},{"name":"Content-Type","value":"application/x-www-form-urlencoded; charset=UTF-8"},{"name":"Accept","value":"*/*"},{"name":"X-Requested-With","value":"XMLHttpRequest"},{"name":"Connection","value":"keep-alive"}],"queryString":[],"postData": {
+    payload = '''{"method":"POST","url":"https://localhost:8888''' + url_path + '''","httpVersion":"HTTP/1.1","headers":[{"name":"Accept-Encoding","value":"gzip, deflate, br"},{"name":"Content-Type","value":"application/x-www-form-urlencoded; charset=UTF-8"},{"name":"Accept","value":"*/*"},{"name":"X-Requested-With","value":"XMLHttpRequest"},{"name":"Connection","value":"keep-alive"}],"queryString":[],"postData": {
         "mimeType": "application/x-www-form-urlencoded; charset=UTF-8",
         "text": "snippet=%7B%22type%22%3A%22impala%22%2C%22source%22%3A%22data%22%7D",
         "params": [
@@ -178,10 +161,9 @@ class HueQuery(object):
     else:
       raise QueryError(resp.get('message'))
 
-
   def do_check_status(self, handle):
-    notebook = {"type":"impala", "name": "query", "isSaved": False, "sessions": [], "snippets": [{"id": "1234", "type":"impala","statement_raw": "SHOW DATABASES", "result": {"handle": {} }}]}
-    snippet = {"id": "1234", "type": "impala", "statement":"SHOW DATABASES", "status": "running", "result": {'handle': {"log_context":None,"statements_count":1,"end":{"column":13,"row":0},"statement_id":0,"has_more_statements":False,"start":{"column":0,"row":0},"secret":"3h9WBnLbTUYAAAAAPQjxlQ==\n","has_result_set":True,"session_guid":"qcrpEBmCTGacxfhM+CxbkQ==\n","statement":"SHOW DATABASES","operation_type":0,"modified_row_count":None,"guid":"3h9WBnLbTUYAAAAAPQjxlQ==\n","previous_statement_hash":"5b1f14102d749be7b41da376bcdbb64f993ce00bc46e3aab0b8008c4"}}, "properties": {}}
+    notebook = {"type": "impala", "name": "query", "isSaved": False, "sessions": [], "snippets": [{"id": "1234", "type": "impala", "statement_raw": "SHOW DATABASES", "result": {"handle": {}}}]}
+    snippet = {"id": "1234", "type": "impala", "statement": "SHOW DATABASES", "status": "running", "result": {'handle': {"log_context": None, "statements_count": 1, "end": {"column": 13, "row": 0}, "statement_id": 0, "has_more_statements": False, "start": {"column": 0, "row": 0}, "secret": "3h9WBnLbTUYAAAAAPQjxlQ==\n", "has_result_set": True, "session_guid": "qcrpEBmCTGacxfhM+CxbkQ==\n", "statement": "SHOW DATABASES", "operation_type": 0, "modified_row_count": None, "guid": "3h9WBnLbTUYAAAAAPQjxlQ==\n", "previous_statement_hash": "5b1f14102d749be7b41da376bcdbb64f993ce00bc46e3aab0b8008c4"}}, "properties": {}}
 
     snippet['result']['handle'] = handle
 
@@ -242,10 +224,9 @@ class HueQuery(object):
     else:
       return resp_payload
 
-
   def do_fetch_result(self, handle):
-    notebook = {"type":"impala", "name": "query", "isSaved": False, "sessions": [], "snippets": [{"id": "1234", "type":"impala","statement_raw": "SHOW DATABASES", "result": {"handle": {} }}]}
-    snippet = {"id": "1234", "type": "impala", "statement":"SHOW DATABASES", "status": "running", "result": {'handle': {"log_context":None,"statements_count":1,"end":{"column":13,"row":0},"statement_id":0,"has_more_statements":False,"start":{"column":0,"row":0},"secret":"3h9WBnLbTUYAAAAAPQjxlQ==\n","has_result_set":True,"session_guid":"qcrpEBmCTGacxfhM+CxbkQ==\n","statement":"SHOW DATABASES","operation_type":0,"modified_row_count":None,"guid":"3h9WBnLbTUYAAAAAPQjxlQ==\n","previous_statement_hash":"5b1f14102d749be7b41da376bcdbb64f993ce00bc46e3aab0b8008c4"}}, "properties": {}}
+    notebook = {"type": "impala", "name": "query", "isSaved": False, "sessions": [], "snippets": [{"id": "1234", "type": "impala", "statement_raw": "SHOW DATABASES", "result": {"handle": {}}}]}
+    snippet = {"id": "1234", "type": "impala", "statement": "SHOW DATABASES", "status": "running", "result": {'handle': {"log_context": None, "statements_count": 1, "end": {"column": 13, "row": 0}, "statement_id": 0, "has_more_statements": False, "start": {"column": 0, "row": 0}, "secret": "3h9WBnLbTUYAAAAAPQjxlQ==\n", "has_result_set": True, "session_guid": "qcrpEBmCTGacxfhM+CxbkQ==\n", "statement": "SHOW DATABASES", "operation_type": 0, "modified_row_count": None, "guid": "3h9WBnLbTUYAAAAAPQjxlQ==\n", "previous_statement_hash": "5b1f14102d749be7b41da376bcdbb64f993ce00bc46e3aab0b8008c4"}}, "properties": {}}
 
     rows = 100
     start_over = True

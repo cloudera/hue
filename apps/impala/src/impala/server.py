@@ -15,27 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from past.builtins import basestring
-from builtins import object
+import sys
 import json
 import logging
 import threading
-import sys
+from builtins import object
 
+from django.utils.translation import gettext as _
+from ImpalaService import ImpalaHiveServer2Service
+from past.builtins import basestring
+
+from beeswax.server.dbms import QueryServerException
+from beeswax.server.hive_server2_lib import HiveServerClient
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-from beeswax.server.dbms import QueryServerException
-from beeswax.server.hive_server2_lib import HiveServerClient
-
-from ImpalaService import ImpalaHiveServer2Service
-from impala.impala_flags import get_webserver_certificate_file, is_webserver_spnego_enabled, is_kerberos_enabled
-from impala.conf import DAEMON_API_USERNAME, DAEMON_API_PASSWORD, DAEMON_API_PASSWORD_SCRIPT, DAEMON_API_AUTH_SCHEME, COORDINATOR_URL
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from impala.conf import COORDINATOR_URL, DAEMON_API_AUTH_SCHEME, DAEMON_API_PASSWORD, DAEMON_API_PASSWORD_SCRIPT, DAEMON_API_USERNAME
+from impala.impala_flags import get_webserver_certificate_file, is_kerberos_enabled, is_webserver_spnego_enabled
 
 LOG = logging.getLogger()
 
@@ -87,7 +83,6 @@ class ImpalaServerClient(HiveServerClient):
 
     return self._serialize_exec_summary(resp.summary)
 
-
   def get_runtime_profile(self, operation_handle, session_handle):
     """
     Calls Impala HS2 API's GetRuntimeProfile method on the given query handle
@@ -104,7 +99,6 @@ class ImpalaServerClient(HiveServerClient):
     resp = self.call(self._client.GetRuntimeProfile, req)
 
     return resp.profile
-
 
   def _serialize_exec_summary(self, summary):
     try:
@@ -169,28 +163,23 @@ class ImpalaDaemonApi(object):
   def __str__(self):
     return "ImpalaDaemonApi at %s" % self._url
 
-
   @property
   def url(self):
     return self._url
-
 
   @property
   def security_enabled(self):
     return self._security_enabled
 
-
   @property
   def user(self):
     return self._thread_local.user
-
 
   def set_user(self, user):
     if hasattr(user, 'username'):
       self._thread_local.user = user.username
     else:
       self._thread_local.user = user
-
 
   def get_queries(self):
     params = {
@@ -206,7 +195,6 @@ class ImpalaDaemonApi(object):
     except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
 
-
   def get_query(self, query_id):
     params = {
       'query_id': query_id,
@@ -221,7 +209,6 @@ class ImpalaDaemonApi(object):
         return resp
     except ValueError as e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
-
 
   def get_query_profile(self, query_id):
     params = {

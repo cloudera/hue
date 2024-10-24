@@ -16,31 +16,25 @@
 # limitations under the License.
 
 from __future__ import division
-from builtins import str
-from builtins import object
-import datetime
-import logging
-import math
-import functools
+
 import re
 import sys
+import math
+import logging
+import datetime
+import functools
+from builtins import object, str
 
 from django.db import connection, models
 from django.urls import reverse
 from django.utils.html import escape
+from django.utils.translation import gettext as _
 
 from desktop.auth.backend import is_admin
 from desktop.conf import REST_CONN_TIMEOUT
 from desktop.lib import i18n
 from desktop.lib.view_util import format_duration_in_millis, location_to_url
-
 from jobbrowser.conf import DISABLE_KILLING_JOBS
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -49,20 +43,23 @@ def can_view_job(username, job):
   acl = get_acls(job).get('mapreduce.job.acl-view-job', '')
   return acl == '*' or username in acl.split(',')
 
+
 def can_modify_job(username, job):
   acl = get_acls(job).get('mapreduce.job.acl-modify-job', '')
   return acl == '*' or username in acl.split(',')
+
 
 def get_acls(job):
   if job.is_mr2:
     try:
       acls = job.acls
-    except:
+    except Exception:
       LOG.exception('failed to get acls')
       acls = {}
     return acls
   else:
     return job.full_job_conf
+
 
 def can_kill_job(self, user):
   if DISABLE_KILLING_JOBS.get():
@@ -102,7 +99,7 @@ class LinkJobLogs(object):
   def _replace_hdfs_link(self, is_embeddable=False, match=None):
     try:
       return '<a href="%s">%s</a>' % (location_to_url(match.group(0), strict=False, is_embeddable=is_embeddable), match.group(0))
-    except:
+    except Exception:
       LOG.exception('failed to replace hdfs links: %s' % (match.groups(),))
       return match.group(0)
 
@@ -110,7 +107,7 @@ class LinkJobLogs(object):
   def _replace_mr_link(self, match):
     try:
       return '<a href="/hue%s">%s</a>' % (reverse('jobbrowser:jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
-    except:
+    except Exception:
       LOG.exception('failed to replace mr links: %s' % (match.groups(),))
       return match.group(0)
 

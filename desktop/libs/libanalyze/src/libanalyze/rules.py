@@ -14,41 +14,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import division
-from builtins import zip
-from builtins import range
-from builtins import object
-from functools import reduce
+
+import os
+import re
 import copy
 import glob
 import json
-import logging
 import math
-import os
-import re
-import types
-import sys
 import struct
-
-from dateutil.parser import parse as dtparse
+import logging
+from functools import reduce
 from itertools import groupby
 
-from libanalyze import models
-from libanalyze import exprs
-from libanalyze import utils
+from dateutil.parser import parse as dtparse
+
+from libanalyze import exprs, models, utils
 from libanalyze.utils import Timer
-
-if sys.version_info[0] > 2:
-  string_types = str
-else:
-  string_types = types.StringTypes
-
 
 LOG = logging.getLogger()
 
 
 def to_double(metric_value):
     return struct.unpack('d', struct.pack('q', metric_value))[0]
+
 
 class ProfileContext(object):
     """This is the main wrapper around the runtime profile tree. Main accessor
@@ -70,7 +58,7 @@ class SQLOperatorReason(object):
     def __init__(self, node_name, metric_names,
                  rule, exprs=[], to_json=True, **kwargs):
         self.node_name = node_name
-        if isinstance(metric_names, string_types):
+        if isinstance(metric_names, str):
             self.metric_names = [metric_names]
         else:
             self.metric_names = metric_names
@@ -117,8 +105,8 @@ class SQLOperatorReason(object):
         if nodeType == 'HdfsTableSink':
             return node.find_metric_by_name('RowsInserted')[0]['value']
 
-        metrics = reduce(lambda x,y: x + y.find_metric_by_name('RowsReturned'), node.children, [])
-        return reduce(lambda x,y: x + y['value'], metrics, 0)
+        metrics = reduce(lambda x, y: x + y.find_metric_by_name('RowsReturned'), node.children, [])
+        return reduce(lambda x, y: x + y['value'], metrics, 0)
 
     def evaluate(self, profile, plan_node_id):
         """
@@ -198,6 +186,7 @@ class SQLOperatorReason(object):
                 [g.value for g in group]))
         return result
 
+
 class SummaryReason(SQLOperatorReason):
 
     def evaluate(self, profile, plan_node_id):
@@ -257,9 +246,10 @@ class SummaryReason(SQLOperatorReason):
             "label": self.rule["label"]
         }
 
+
 class JoinOrderStrategyCheck(SQLOperatorReason):
     def __init__(self):
-      self.kwargs = {'fix': { 'fixable': False }, 'unit': 5}
+      self.kwargs = {'fix': {'fixable': False}, 'unit': 5}
 
     def evaluate(self, profile, plan_node_id):
         """
@@ -308,9 +298,10 @@ class JoinOrderStrategyCheck(SQLOperatorReason):
             "label": "Wrong join strategy"
         }
 
+
 class ExplodingJoinCheck(SQLOperatorReason):
     def __init__(self):
-      self.kwargs = {'fix': { 'fixable': False }, 'unit': 5}
+      self.kwargs = {'fix': {'fixable': False}, 'unit': 5}
 
     def evaluate(self, profile, plan_node_id):
         """
@@ -338,9 +329,10 @@ class ExplodingJoinCheck(SQLOperatorReason):
             "label": "Exploding join"
         }
 
+
 class NNRpcCheck(SQLOperatorReason):
     def __init__(self):
-      self.kwargs = {'fix': { 'fixable': False }, 'unit': 5}
+      self.kwargs = {'fix': {'fixable': False}, 'unit': 5}
 
     def evaluate(self, profile, plan_node_id):
         """
@@ -363,6 +355,7 @@ class NNRpcCheck(SQLOperatorReason):
             "label": "HDFS NN RPC"
         }
 
+
 class TopDownAnalysis(object):
 
     def __init__(self):
@@ -381,10 +374,10 @@ class TopDownAnalysis(object):
                     nodes = [node_names]
                 if type == 'SQLOperator':
                   for node in nodes:
-                    self.sqlOperatorReasons.setdefault(node,[])\
+                    self.sqlOperatorReasons.setdefault(node, [])\
                         .append(SQLOperatorReason(**json_object))
                 else:
-                  self.sqlOperatorReasons.setdefault(type,[])\
+                  self.sqlOperatorReasons.setdefault(type, [])\
                     .append(SummaryReason(**json_object))
 
         # Manually append specially coded reaason
@@ -428,7 +421,6 @@ class TopDownAnalysis(object):
         """
         return sorted(contributor.reason, key=lambda x: x.impact, reverse=True) if contributor.reason else contributor.reason
 
-
     def createContributors(self, profile):
         """ Return the models.Contributor objects. Contributor can be planning time,
         admission control wait time, query fragment distribution time, SQL operator, DML
@@ -438,10 +430,10 @@ class TopDownAnalysis(object):
         persisted in the database.
         """
         execution_profile = profile.find_by_name('Execution Profile')
-        #summary = _profile.find_by_name("Summary")
+        # summary = _profile.find_by_name("Summary")
         counter_map = profile.find_by_name('Summary').counter_map()
         counter_map.update(profile.find_by_name("ImpalaServer").counter_map())
-        #counter_map = summary.counter_map()
+        # counter_map = summary.counter_map()
 
         # list of non-SQL operator contributor
         # TODO: add admission control, DML Metastore update; profile does not have it yet.
@@ -453,14 +445,14 @@ class TopDownAnalysis(object):
             contributor = models.Contributor(type=metric,
                                              wall_clock_time=counter_map[metric].value,
                                              plan_node_id=-1, plan_node_name="N/A")
-            #models.db.session.add(contributor)
+            # models.db.session.add(contributor)
             contributors += [contributor]
 
         if self.isDebugBuilt(profile):
             contributor = models.Contributor(type="Debug Built",
                                              wall_clock_time=9999999999999999,
                                              plan_node_id=-1, plan_node_name="N/A")
-            #models.db.session.add(contributor)
+            # models.db.session.add(contributor)
             contributors += [contributor]
 
         # Get the top N contributor from query execution
@@ -468,9 +460,9 @@ class TopDownAnalysis(object):
         # Get the plan node execution time
         # Note: ignore DataStreamSender because its metrics is useless
         nodes = execution_profile.find_all_non_fragment_nodes()
-        nodes = [x for x in nodes if x.fragment and x.fragment.is_averaged() == False]
+        nodes = [x for x in nodes if x.fragment and x.fragment.is_averaged() is False]
         nodes = [x for x in nodes if x.name() != 'DataStreamSender']
-        metrics = reduce(lambda x,y: x + y.find_metric_by_name('LocalTime'), nodes, [])
+        metrics = reduce(lambda x, y: x + y.find_metric_by_name('LocalTime'), nodes, [])
         metrics = sorted(metrics, key=lambda x: (x['node'].id(), x['node'].name()))
         for k, g in groupby(metrics, lambda x: (x['node'].id(), x['node'].name())):
             grouped = list(g)
@@ -480,7 +472,6 @@ class TopDownAnalysis(object):
                                  wall_clock_time=metric,
                                  plan_node_id=grouped[0]['node'].id(), plan_node_name=grouped[0]['node'].name())
             contributors += [contributor]
-
 
         # Sort execTime based on wall_clock_time and cut it off at limit
         contributors = sorted(contributors, key=lambda x: x.wall_clock_time, reverse=True)
@@ -493,7 +484,7 @@ class TopDownAnalysis(object):
         The result will be in the form of
         """
         reasons = []
-        self.sqlOperatorReasons.setdefault(contributor.plan_node_name,[])
+        self.sqlOperatorReasons.setdefault(contributor.plan_node_name, [])
         for cause in self.sqlOperatorReasons[contributor.plan_node_name] + self.sqlOperatorReasons["ANY"]:
             evaluation = cause.evaluate(profile, contributor.plan_node_id)
             impact = evaluation["impact"]
@@ -515,7 +506,7 @@ class TopDownAnalysis(object):
         The result will be in the form of
         """
         reasons = []
-        self.sqlOperatorReasons.setdefault(contributor.type,[])
+        self.sqlOperatorReasons.setdefault(contributor.type, [])
         for cause in self.sqlOperatorReasons[contributor.type]:
             evaluation = cause.evaluate(profile, contributor.plan_node_id)
             impact = evaluation["impact"]
@@ -606,7 +597,7 @@ class TopDownAnalysis(object):
           is_plan_node = node.is_plan_node()
           node_id = node.id()
           nid = int(node_id) if node_id and node.is_regular() else -1
-           # Setup Hosts & Broadcast
+          # Setup Hosts & Broadcast
           if node_id and node.is_regular() and nid in exec_summary_json:
             exec_summary_node = exec_summary_json.get(nid, {})
             node.val.counters.append(models.TCounter(name='Hosts', value=exec_summary_node.get('hosts', ''), unit=0))
@@ -665,7 +656,7 @@ class TopDownAnalysis(object):
               grouping_aggregator = node.find_by_name('GroupingAggregator')
               if grouping_aggregator and grouping_aggregator.counter_map().get('SpilledPartitions', models.TCounter(value=0)).value > 0:
                 has_spilled = True
-            elif is_plan_node and node_name == 'HASH_JOIN_NODE': # For Hash Join, if the "LocalTime" metrics
+            elif is_plan_node and node_name == 'HASH_JOIN_NODE':  # For Hash Join, if the "LocalTime" metrics
               hash_join_builder = node.find_by_name('Hash Join Builder')
               if hash_join_builder and hash_join_builder.counter_map().get('SpilledPartitions', models.TCounter(value=0)).value > 0:
                 has_spilled = True
@@ -688,6 +679,7 @@ class TopDownAnalysis(object):
             node.val.counters.append(models.TCounter(name='ChildTime', value=child_time, unit=5))
 
         nodes = {}
+
         def create_map(node, nodes=nodes):
           nid = node.id()
           if nid:
@@ -708,21 +700,21 @@ class TopDownAnalysis(object):
 
         if self.isDebugBuilt(profile):
             topContributions += [{
-                "result_id" : result_id,
-                "contribution_factor_str" : "Using Debug Built",
-                "wall_clock_time" : 9999,
-                "reason" : []
+                "result_id": result_id,
+                "contribution_factor_str": "Using Debug Built",
+                "wall_clock_time": 9999,
+                "reason": []
             }]
 
         for contributor in topContributors:
             reasons = self.getTopReasons(contributor)
             topContributions += [{
-                    "result_id" : contributor.plan_node_id if contributor.plan_node_id != -1 else -1,
-                    "contribution_factor_str" : contributor.type + " " +
+                    "result_id": contributor.plan_node_id if contributor.plan_node_id != -1 else -1,
+                    "contribution_factor_str": contributor.type + " " +
                                                 str(contributor.plan_node_id).zfill(2) +
                                                 ":" + contributor.plan_node_name,
-                    "wall_clock_time" : contributor.wall_clock_time,
-                    "reason" : [reason.__dict__ for reason in reasons]
+                    "wall_clock_time": contributor.wall_clock_time,
+                    "reason": [reason.__dict__ for reason in reasons]
                 }]
 
         result = []

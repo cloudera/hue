@@ -18,13 +18,9 @@
 import os
 import sys
 
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
 from desktop.lib.conf import Config, coerce_bool, coerce_csv, coerce_json_dict
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
-
 
 CONSUMER_KEY_TWITTER = Config(
       key="consumer_key_twitter",
@@ -168,4 +164,3 @@ USERNAME_MAP = Config(
     type=coerce_json_dict,
     default='{}'
 )
-

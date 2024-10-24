@@ -25,30 +25,24 @@ to the cluster.  A parameterized, submitted job design
 is a "job submission".  Submissions can be "watched".
 """
 
-from builtins import str
-import logging
 import sys
 import time as py_time
+import logging
+from builtins import str
+
+from django.utils.translation import gettext as _
 
 from desktop import appmanager
+from desktop.auth.backend import is_admin
 from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.view_util import is_ajax
 from desktop.log.access import access_warn
 from desktop.models import Document
-
-from oozie.models import Workflow
 from oozie.forms import design_form_by_type
-from oozie.utils import model_to_dict, format_dict_field_values,\
-                        sanitize_node_dict
-
-from desktop.auth.backend import is_admin
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from oozie.models import Workflow
+from oozie.utils import format_dict_field_values, model_to_dict, sanitize_node_dict
 
 LOG = logging.getLogger()
 MAX_DESIGNS = 250
@@ -115,8 +109,10 @@ def list_designs(request):
       'apps': appmanager.get_apps_dict()
     })
 
+
 def not_available(request):
   return render("not_available.mako", request, {})
+
 
 def _get_design(user, design_id):
   """Raise PopupException if design doesn't exist"""
@@ -206,7 +202,7 @@ def save_design(request, design_id):
   data = format_dict_field_values(request.POST.copy())
   _save_design(request.user, design_id, data)
 
-  return get_design(request, design_id);
+  return get_design(request, design_id)
 
 
 def _save_design(user, design_id, data):

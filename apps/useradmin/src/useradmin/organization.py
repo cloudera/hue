@@ -15,22 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
 import uuid
+import logging
 
 from crequest.middleware import CrequestMiddleware
-
-from django.contrib.auth.models import models, AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager, models
 from django.utils.functional import SimpleLazyObject
+from django.utils.translation import gettext_lazy as _t
 
 from desktop.conf import ENABLE_ORGANIZATIONS
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
-
 
 LOG = logging.getLogger()
 
@@ -68,7 +62,8 @@ def get_organization(email, is_multi_user=False):
       organization, created = Organization.objects.get_or_create(name=domain, domain=domain, is_multi_user=is_multi_user)
       LOG.info("Materializing organization %s in the database, is_multi_user=%s" % (domain, is_multi_user))
     else:
-      LOG.warning('No organization domain found for email %s' % email)  # For Backends without emails or when organization enabled by default
+      # For Backends without emails or when organization enabled by default
+      LOG.warning('No organization domain found for email %s' % email)
       organization = None
 
   return organization
@@ -76,7 +71,6 @@ def get_organization(email, is_multi_user=False):
 
 def uuid_default():
   return str(uuid.uuid4())
-
 
 
 class OrganizationManager(models.Manager):

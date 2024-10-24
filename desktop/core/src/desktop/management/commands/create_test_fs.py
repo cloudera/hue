@@ -15,18 +15,16 @@
 # limitations under the License.
 
 from __future__ import print_function
+
 import os
 import sys
 
 from django.core.management.base import BaseCommand
+from django.utils.translation import gettext as _
 
 from desktop.lib.paths import get_build_dir
 from hadoop.fs import fs_for_testing
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 class Command(BaseCommand):
   """Creates file system for testing."""

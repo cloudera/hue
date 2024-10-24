@@ -17,13 +17,9 @@
 
 import sys
 
-from dashboard import views as dashboard_views
-from dashboard import api as dashboard_api
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from dashboard import api as dashboard_api, views as dashboard_views
 
 urlpatterns = [
   re_path(r'^$', dashboard_views.index, name='index'),
