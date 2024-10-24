@@ -111,7 +111,8 @@ const StorageBrowserTable = ({
       permission: file.rwx,
       mtime: file.stats?.mtime ? formatTimestamp(new Date(Number(file.stats.mtime) * 1000)) : '-',
       type: file.type,
-      path: file.path
+      path: file.path,
+      replication: file.stats?.replication
     }));
   }, [filesData]);
 
@@ -209,7 +210,9 @@ const StorageBrowserTable = ({
       }
       columns.push(column);
     }
-    return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
+    return columns.filter(
+      col => col.dataIndex !== 'type' && col.dataIndex !== 'path' && col.dataIndex !== 'replication'
+    );
   };
 
   const onRowClicked = (record: StorageBrowserTableData) => {
@@ -240,35 +243,57 @@ const StorageBrowserTable = ({
     onPageNumberChange(nextPageNumber === 0 ? numPages : nextPageNumber);
   };
 
-  const handleCreateNewFolder = (folderName: string) => {
-    setLoadingFiles(true);
-    mkdir(folderName, filePath)
-      .then(() => {
-        refetchData();
-      })
-      .catch(error => {
-        huePubSub.publish('hue.error', error);
-        setShowNewFolderModal(false);
-      })
-      .finally(() => {
-        setLoadingFiles(false);
-      });
+  const { error: renameError, save: saveRename } = useSaveData(RENAME_API_URL, {
+    onSuccess: () => onSuccessfulAction(),
+    onError: () => {
+      huePubSub.publish('hue.error', renameError);
+    }
+  });
+
+  const { error: renameError, save: saveRename } = useSaveData(RENAME_API_URL, {
+    onSuccess: () => onSuccessfulAction(),
+    onError: () => {
+      huePubSub.publish('hue.error', renameError);
+    }
+  });
+
+  const handleCreateNewFolder = (value: string) => {
+    saveRename({ src_path: selectedFile, dest_path: value });
   };
 
-  const handleCreateNewFile = (fileName: string) => {
-    setLoadingFiles(true);
-    touch(fileName, filePath)
-      .then(() => {
-        refetchData();
-      })
-      .catch(error => {
-        huePubSub.publish('hue.error', error);
-        setShowNewFileModal(false);
-      })
-      .finally(() => {
-        setLoadingFiles(false);
-      });
+  const handleCreateNewFile = (value: string) => {
+    saveRename({ src_path: selectedFile, dest_path: value });
   };
+
+  // const handleCreateNewFolder = (folderName: string) => {
+  //   setLoadingFiles(true);
+  //   mkdir(folderName, filePath)
+  //     .then(() => {
+  //       refetchData();
+  //     })
+  //     .catch(error => {
+  //       huePubSub.publish('hue.error', error);
+  //       setShowNewFolderModal(false);
+  //     })
+  //     .finally(() => {
+  //       setLoadingFiles(false);
+  //     });
+  // };
+
+  // const handleCreateNewFile = (fileName: string) => {
+  //   setLoadingFiles(true);
+  //   touch(fileName, filePath)
+  //     .then(() => {
+  //       refetchData();
+  //     })
+  //     .catch(error => {
+  //       huePubSub.publish('hue.error', error);
+  //       setShowNewFileModal(false);
+  //     })
+  //     .finally(() => {
+  //       setLoadingFiles(false);
+  //     });
+  // };
 
   const handleSearch = useCallback(
     useDebounce(searchTerm => {
@@ -375,6 +400,8 @@ const StorageBrowserTable = ({
         showModal={showNewFolderModal}
         onSubmit={handleCreateNewFolder}
         onClose={() => setShowNewFolderModal(false)}
+        initialValue=""
+        inputType="text"
       />
       <InputModal
         title={t('Create New File')}
@@ -383,6 +410,8 @@ const StorageBrowserTable = ({
         showModal={showNewFileModal}
         onSubmit={handleCreateNewFile}
         onClose={() => setShowNewFileModal(false)}
+        initialValue=""
+        inputType="text"
       />
     </>
   );

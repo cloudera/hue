@@ -168,14 +168,14 @@ def copy(request):
 
 @error_handler
 def content_summary(request, path):
-  path = _normalize_path(path)
+  path = request.GET.get('path')
   response = {}
 
   if not path:
-    raise Exception(_('Path parameter is required to fetch content summary.'))
+    return HttpResponse("Path parameter is required to fetch content summary.", status=400)
 
   if not request.fs.exists(path):
-    return JsonResponse(response, status=404)
+    return HttpResponse(f'Path does not exist: {path}', status=404)
 
   try:
     content_summary = request.fs.get_content_summary(path)
@@ -183,8 +183,8 @@ def content_summary(request, path):
 
     content_summary.summary.update({'replication': replication_factor})
     response['summary'] = content_summary.summary
-  except Exception as e:
-    raise Exception(_('Failed to fetch content summary for "%s". ') % path)
+  except Exception:
+    return HttpResponse(f'Failed to fetch content summary for path: {path}', status=500)
 
   return JsonResponse(response)
 
