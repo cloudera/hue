@@ -36,11 +36,7 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
   const [fileContent, setFileContent] = React.useState(fileData.view?.contents);
   const fileMetaData = useMemo(() => getFileMetaData(t, fileData), [t, fileData]);
 
-  const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL, {
-    onSuccess: () => {
-      setIsEditing(false);
-    }
-  });
+  const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -51,12 +47,24 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
     setFileContent(fileData.view?.contents);
   };
 
-  const handleSave = () =>
-    save({
-      path: fileData.path,
-      encoding: 'utf-8',
-      contents: fileContent
-    });
+  const handleSave = () => {
+    setIsEditing(false);
+    save(
+      {
+        path: fileData.path,
+        encoding: 'utf-8',
+        contents: fileContent
+      },
+      {
+        onError: () => {
+          setIsEditing(true);
+        },
+        onSuccess: () => {
+          huePubSub.publish('hue.global.info', { message: t('Changes saved!') });
+        }
+      }
+    );
+  };
 
   const handleDownload = () => {
     huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
@@ -72,6 +80,12 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
     }
     return SUPPORTED_FILE_EXTENSIONS[fileExtension] ?? SupportedFileTypes.OTHER;
   }, [fileName]);
+
+  const isEditingEnabled =
+    !isEditing &&
+    fileData.editable &&
+    EDITABLE_FILE_FORMATS[fileType] &&
+    fileData?.view?.compression?.toLocaleLowerCase() === 'none';
 
   return (
     <Spin spinning={isSaving}>
@@ -93,7 +107,7 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
           <div className="preview__title-bar">
             {t('Content')}
             <div className="preview__action-group">
-              {!isEditing && EDITABLE_FILE_FORMATS[fileType] && (
+              {isEditingEnabled && (
                 <PrimaryButton
                   data-testid="preview--edit--button"
                   data-event=""

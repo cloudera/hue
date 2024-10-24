@@ -41,6 +41,7 @@ jest.mock('../../../api/utils', () => ({
 
 // Mock data for fileData
 const mockFileData: PathAndFileData = {
+  editable: true,
   path: '/path/to/file.txt',
   stats: {
     size: 123456,
@@ -55,7 +56,8 @@ const mockFileData: PathAndFileData = {
   rwx: 'rwxr-xr-x',
   breadcrumbs: [],
   view: {
-    contents: 'Initial file content'
+    contents: 'Initial file content',
+    compression: 'none'
   },
   files: [],
   page: {
@@ -95,6 +97,22 @@ describe('StorageFilePage', () => {
     expect(screen.getByRole('button', { name: 'Edit' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull();
+  });
+
+  it('hide edit button when editable is false', () => {
+    render(<StorageFilePage fileData={{ ...mockFileData, editable: false }} />);
+
+    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
+  });
+
+  it('hide edit button when editable is false', () => {
+    render(
+      <StorageFilePage
+        fileData={{ ...mockFileData, view: { ...mockFileData.view, compression: 'zip' } }}
+      />
+    );
+
+    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
   });
 
   it('shows save and cancel buttons when editing', async () => {
