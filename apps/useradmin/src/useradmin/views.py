@@ -15,58 +15,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from builtins import map
-import pwd
 import grp
+import pwd
+import json
 import logging
 import subprocess
-import sys
-import json
-
-LOG = logging.getLogger()
 
 from axes.conf import settings
 from axes.models import AccessAttempt
 from axes.utils import reset
-try:
-  import ldap
-except ImportError:
-  LOG.warning('ldap module not found')
-
-from django.urls import reverse
 from django.forms import ValidationError
 from django.forms.utils import ErrorList
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.encoding import smart_str
+from django.utils.translation import get_language, gettext as _
 
 import desktop.conf
 from desktop.auth.backend import is_admin
-from desktop.conf import LDAP, ENABLE_ORGANIZATIONS, ENABLE_CONNECTORS, ENABLE_SHARING
+from desktop.conf import ENABLE_CONNECTORS, ENABLE_ORGANIZATIONS, ENABLE_SHARING, LDAP
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import _get_apps
 from desktop.views import antixss, serve_403_error
 from hadoop.fs.exceptions import WebHdfsException
-
 from useradmin import ldap_access
-from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapUsersForm, \
-  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, validate_username, validate_first_name, \
-  validate_last_name, PasswordChangeForm
+from useradmin.forms import (
+  AddLdapGroupsForm,
+  AddLdapUsersForm,
+  GroupEditForm,
+  PasswordChangeForm,
+  PermissionsEditForm,
+  SuperUserChangeForm,
+  SyncLdapUsersGroupsForm,
+  validate_first_name,
+  validate_last_name,
+  validate_username,
+)
 from useradmin.ldap_access import LdapBindException, LdapSearchException
-from useradmin.models import HuePermission, UserProfile, LdapGroup, get_profile, get_default_user_group, User, Group, Organization
+from useradmin.models import Group, HuePermission, LdapGroup, Organization, User, UserProfile, get_default_user_group, get_profile
 
-if sys.version_info[0] > 2:
-  unicode = str
-  from django.utils.translation import get_language, gettext as _
-else:
-  from django.utils.translation import get_language, ugettext as _
+LOG = logging.getLogger()
+try:
+  import ldap
+except ImportError:
+  LOG.warning('ldap module not found')
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.forms import OrganizationUserChangeForm as UserChangeForm, OrganizationSuperUserChangeForm as SuperUserChangeForm
+  from useradmin.forms import OrganizationSuperUserChangeForm as SuperUserChangeForm, OrganizationUserChangeForm as UserChangeForm
 else:
-  from useradmin.forms import UserChangeForm, SuperUserChangeForm
+  from useradmin.forms import SuperUserChangeForm, UserChangeForm
 
 
 def is_ldap_setup():
@@ -861,11 +860,12 @@ def ensure_home_directory(fs, user):
     home_directory = userprofile.home_directory.split('@')[0]
 
   if userprofile is not None and userprofile.home_directory:
-    if not isinstance(home_directory, unicode):
+    if not isinstance(home_directory, str):
       home_directory = home_directory.decode("utf-8")
     fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:
     LOG.warning("Not creating home directory of %s as his profile is empty" % user)
+
 
 def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   """
@@ -873,7 +873,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   groups from 'getent passwd' and 'getent groups'. This should also pull in
   users who are accessible via NSS.
   """
-  hadoop_groups = dict((group.gr_name, group) for group in grp.getgrall() \
+  hadoop_groups = dict((group.gr_name, group) for group in grp.getgrall()
       if (group.gr_gid >= min_gid and group.gr_gid < max_gid) or group.gr_name == 'hadoop')
   user_groups = dict()
 
@@ -896,7 +896,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
         user_groups[member].append(hue_group)
 
   # Now let's import the users
-  hadoop_users = dict((user.pw_name, user) for user in pwd.getpwall() \
+  hadoop_users = dict((user.pw_name, user) for user in pwd.getpwall()
       if (user.pw_uid >= min_uid and user.pw_uid < max_uid) or user.pw_name in grp.getgrnam('hadoop').gr_mem)
   for username, user in hadoop_users.items():
     try:
@@ -973,7 +973,6 @@ def _get_find_groups_filter(ldap_info, server=None):
   sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
   sanitized_dn = sanitized_dn.replace(r'\5c,', r'\5c\2c')
 
-
   if (group_member_attr.lower() == 'memberuid'):
     find_groups_filter = "(&" + group_filter + "(" + group_member_attr + "=" + ldap_info['username'] + "))"
   elif (group_member_attr.lower() == 'member' or group_member_attr.lower() == 'uniquemember'):
@@ -1034,7 +1033,7 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
         group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
         for group_info in group_ldap_info:
           if Group.objects.filter(name=group_info['name']).exists():
-          # Add only if user isn't part of group.
+            # Add only if user isn't part of group.
             current_ldap_groups.add(Group.objects.get(name=group_info['name']))
             if not user.groups.filter(name=group_info['name']).exists():
               groups = import_ldap_groups(
@@ -1093,7 +1092,7 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1, fai
       LOG.warning('Found multiple groups for member %s.' % smart_str(group_info['dn']))
     else:
       for group in groups:
-        _import_ldap_members(connection, group, group_info, count+1, max_count, failed_users=failed_users)
+        _import_ldap_members(connection, group, group_info, count + 1, max_count, failed_users=failed_users)
 
   for posix_member in posix_members:
     LOG.debug("Importing posix user %s into group %s" % (smart_str(posix_member), smart_str(group.name)))
@@ -1145,7 +1144,7 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
 
     try:
       group = Group.objects.get(name=group_info['name'])
-      _sync_ldap_members(connection, group, group_info, count+1, max_count, failed_users=failed_users)
+      _sync_ldap_members(connection, group, group_info, count + 1, max_count, failed_users=failed_users)
     except Group.DoesNotExist:
       LOG.warning("Synchronizing group %s failed. Group does not exist." % smart_str(group.name))
 

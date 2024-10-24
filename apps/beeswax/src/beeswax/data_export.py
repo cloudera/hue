@@ -15,28 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
-from builtins import object
 import json
-import logging
 import math
-import sys
-import types
+import logging
 
-from desktop.lib import export_csvxls
+from django.utils.translation import gettext as _
+
 from beeswax import common, conf
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from desktop.lib import export_csvxls
 
 LOG = logging.getLogger()
 
 
 FETCH_SIZE = 1000
-DOWNLOAD_COOKIE_AGE = 1800 # 30 minutes
+DOWNLOAD_COOKIE_AGE = 1800  # 30 minutes
 
 
 def download(handle, format, db, id=None, file_name='query_result', user_agent=None):
@@ -115,22 +107,22 @@ class DataAdapter(object):
   # Avoid serialization to string where possible
   def _getsizeofascii(self, row):
     size = 0
-    size += max(len(row) - 1, 0) # CSV commas between columns
-    size += 2 # CSV \r\n at the end of row
+    size += max(len(row) - 1, 0)  # CSV commas between columns
+    size += 2  # CSV \r\n at the end of row
     for col in row:
       col_type = type(col)
-      if col_type == int:
+      if col_type is int:
         if col == 0:
           size += 1
         elif col < 0:
           size += int(math.log10(-1 * col)) + 2
         else:
           size += int(math.log10(col)) + 1
-      elif col_type == bytes:
+      elif col_type is bytes:
         size += len(col)
-      elif col_type == float:
+      elif col_type is float:
         size += len(str(col))
-      elif col_type == bool:
+      elif col_type is bool:
         size += 4
       elif col_type == type(None):
         size += 4

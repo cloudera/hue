@@ -15,18 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-import sys
-import threading
 import time
+import threading
+from io import StringIO as string_io
 
 from desktop.lib.thread_util import dump_traceback
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from cStringIO import StringIO as string_io
 
 def test_dump_traceback():
   started = threading.Event()

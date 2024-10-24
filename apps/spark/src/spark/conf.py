@@ -15,20 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 import sys
+import logging
 
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
+from beeswax.conf import get_use_sasl_default
 from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool
 from spark.settings import NICE_NAME
-from beeswax.conf import get_use_sasl_default
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -68,7 +64,7 @@ LIVY_SERVER_PORT = Config(
   default="8998")
 
 # Deprecated
-LIVY_SERVER_SESSION_KIND = Config( # Note: this one is ignored by Livy, this should match the current Spark mode
+LIVY_SERVER_SESSION_KIND = Config(  # Note: this one is ignored by Livy, this should match the current Spark mode
    key="livy_server_session_kind",
    help=_t("Configure livy to start in local 'process' mode, or 'yarn' workers."),
    default="yarn"
@@ -114,10 +110,10 @@ def get_spark_status(user):
   status = None
 
   try:
-    if not 'test' in sys.argv: # Avoid tests hanging
+    if 'test' not in sys.argv:  # Avoid tests hanging
       get_api(user).get_status()
       status = 'OK'
-  except:
+  except Exception:
     LOG.exception('failed to get spark status')
 
   return status

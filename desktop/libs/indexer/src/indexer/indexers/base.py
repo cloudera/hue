@@ -17,15 +17,12 @@
 
 import sys
 
+from django.utils.translation import gettext as _
+
 from desktop.conf import has_connectors
 from desktop.lib.connectors.models import _get_installed_connectors
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from desktop.lib.i18n import smart_str
 
 
 def get_api(user, connector_id):
@@ -52,7 +49,6 @@ class Base():
   def index(self, source, destination, options=None): pass
 
 
-
 class IndexerApiException(Exception):
   def __init__(self, message=None):
     self.message = message or _('No error message, please check the logs.')
@@ -61,4 +57,4 @@ class IndexerApiException(Exception):
     return str(self.message)
 
   def __unicode__(self):
-    return smart_unicode(self.message)
+    return smart_str(self.message)

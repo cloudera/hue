@@ -16,30 +16,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import next
-import json
-import logging
 import re
 import sys
-
+import json
+import logging
+from builtins import next
 from collections import OrderedDict
 
 from django.http import Http404
 from django.utils.html import escape
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode, smart_str
-
 from metadata.catalog.base import get_api
-from metadata.catalog.navigator_client import CatalogApiException, CatalogEntityDoesNotExistException, CatalogAuthException
-from metadata.conf import has_catalog, CATALOG, has_catalog_file_search, NAVIGATOR
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from metadata.catalog.navigator_client import CatalogApiException, CatalogAuthException, CatalogEntityDoesNotExistException
+from metadata.conf import CATALOG, NAVIGATOR, has_catalog, has_catalog_file_search
 
 LOG = logging.getLogger()
 
@@ -111,7 +104,7 @@ def search_entities_interactive(request):
       sources=sources
   )
 
-  if response.get('facets'): # Remove empty facets
+  if response.get('facets'):  # Remove empty facets
     for fname, fvalues in list(response['facets'].items()):
       # Should be a CATALOG option at some point for hidding table with no access / asking for access.
       if interface == 'navigator' and NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
@@ -121,7 +114,6 @@ def search_entities_interactive(request):
       response['facets'][fname] = OrderedDict(fvalues)
       if ':' in query_s and not response['facets'][fname]:
         del response['facets'][fname]
-
 
   _augment_highlighting(query_s, response.get('results'))
 
@@ -189,14 +181,14 @@ def _augment_highlighting(query_s, records):
     if record['hue_name'] and record.get('sourceType', '') != 'S3':
       record['hue_name'] = (record['hue_name'].replace('/', '.') + '.').lstrip('.')
 
-    record['originalName'] = record['hue_name'] + name # Inserted when selected in autocomplete, full path
-    record['selectionName'] = name # Use when hovering / selecting a search result
+    record['originalName'] = record['hue_name'] + name  # Inserted when selected in autocomplete, full path
+    record['selectionName'] = name  # Use when hovering / selecting a search result
 
     for term in ts:
       name = _highlight(term, name)
       if record.get('tags'):
         _highlight_tags(record, term)
-    for fname, fval in fs.items(): # e.g. owner:<em>hu</em>e
+    for fname, fval in fs.items():  # e.g. owner:<em>hu</em>e
       if record.get(fname, ''):
         if fname == 'tags':
           _highlight_tags(record, fval)
@@ -386,8 +378,8 @@ def delete_tags(request):
 def update_properties(request):
   interface = request.POST.get('interface', CATALOG.INTERFACE.get())
   entity_id = json.loads(request.POST.get('id', '""'))
-  properties = json.loads(request.POST.get('properties', '{}')) # Entity properties
-  modified_custom_metadata = json.loads(request.POST.get('modifiedCustomMetadata', '{}')) # Aka "Custom Metadata"
+  properties = json.loads(request.POST.get('properties', '{}'))  # Entity properties
+  modified_custom_metadata = json.loads(request.POST.get('modifiedCustomMetadata', '{}'))  # Aka "Custom Metadata"
   deleted_custom_metadata_keys = json.loads(request.POST.get('deletedCustomMetadataKeys', '[]'))
 
   api = get_api(request=request, interface=interface)
@@ -397,7 +389,8 @@ def update_properties(request):
   request.audit = {
     'allowed': is_allowed,
     'operation': '%s_UPDATE_PROPERTIES' % interface.upper(),
-    'operationText': 'Updating custom metadata %s, deleted custom metadata keys %s and properties %s of entity %s' % (modified_custom_metadata, deleted_custom_metadata_keys, properties, entity_id)
+    'operationText': 'Updating custom metadata %s, deleted custom metadata keys %s and properties %s of entity %s' % (
+      modified_custom_metadata, deleted_custom_metadata_keys, properties, entity_id)
   }
 
   if not entity_id:

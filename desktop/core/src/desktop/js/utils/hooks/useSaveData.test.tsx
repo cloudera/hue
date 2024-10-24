@@ -13,79 +13,72 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 import { renderHook, act, waitFor } from '@testing-library/react';
-import useLoadData from './useLoadData';
-import { get } from '../../api/utils';
+import useSaveData from './useSaveData';
+import { post } from '../../api/utils';
 
-// Mock the `get` function
 jest.mock('../../api/utils', () => ({
-  get: jest.fn()
+  post: jest.fn()
 }));
 
-const mockGet = get as jest.MockedFunction<typeof get>;
+const mockPost = post as jest.MockedFunction<typeof post>;
 const mockUrlPrefix = 'https://api.example.com';
-const mockEndpoint = '/endpoint';
+const mockEndpoint = '/save-endpoint';
 const mockUrl = `${mockUrlPrefix}${mockEndpoint}`;
 const mockData = { id: 1, product: 'Hue' };
-const mockOptions = {
-  params: { id: 1 }
-};
+const mockBody = { id: 1 };
 
-describe('useLoadData', () => {
+describe('useSaveData', () => {
   beforeAll(() => {
     jest.clearAllMocks();
   });
 
   beforeEach(() => {
-    mockGet.mockResolvedValue(mockData);
+    mockPost.mockResolvedValue(mockData);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should fetch data successfully', async () => {
-    const { result } = renderHook(() => useLoadData(mockUrl));
+  it('should save data with body successfully', async () => {
+    const { result } = renderHook(() => useSaveData(mockUrl));
+
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(false);
+
+    act(() => {
+      result.current.save(mockBody);
+    });
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(mockPost).toHaveBeenCalledTimes(1);
+      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
     });
   });
 
-  it('should fetch data with params successfully', async () => {
-    const { result } = renderHook(() => useLoadData(mockUrl, mockOptions));
+  it('should handle save errors', async () => {
+    const mockError = new Error('Save error');
+    mockPost.mockRejectedValue(mockError);
+
+    const { result } = renderHook(() => useSaveData(mockUrl));
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
-    expect(result.current.loading).toBe(true);
+    expect(result.current.loading).toBe(false);
 
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, mockOptions.params, expect.any(Object));
-      expect(result.current.data).toEqual(mockData);
-      expect(result.current.error).toBeUndefined();
-      expect(result.current.loading).toBe(false);
+    act(() => {
+      result.current.save(mockBody);
     });
-  });
-
-  it('should handle fetch errors', async () => {
-    const mockError = new Error('Fetch error');
-    mockGet.mockRejectedValue(mockError);
-
-    const { result } = renderHook(() => useLoadData(mockUrl));
-
-    expect(result.current.data).toBeUndefined();
-    expect(result.current.error).toBeUndefined();
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
       expect(result.current.data).toBeUndefined();
       expect(result.current.error).toEqual(mockError);
       expect(result.current.loading).toBe(false);
@@ -93,72 +86,52 @@ describe('useLoadData', () => {
   });
 
   it('should respect the skip option', () => {
-    const { result } = renderHook(() => useLoadData(mockUrl, { skip: true }));
+    const { result } = renderHook(() => useSaveData(mockUrl, { skip: true }));
+
+    act(() => {
+      result.current.save(mockBody);
+    });
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
     expect(result.current.loading).toBe(false);
-    expect(mockGet).not.toHaveBeenCalled();
-  });
-
-  it('should call refetch function', async () => {
-    const { result } = renderHook(() => useLoadData(mockUrl));
-
-    expect(result.current.data).toBeUndefined();
-    expect(result.current.error).toBeUndefined();
-    expect(result.current.loading).toBe(true);
-
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
-      expect(result.current.data).toEqual(mockData);
-      expect(result.current.error).toBeUndefined();
-      expect(result.current.loading).toBe(false);
-    });
-
-    mockGet.mockResolvedValueOnce({ ...mockData, product: 'Hue 2' });
-
-    act(() => {
-      result.current.reloadData();
-    });
-
-    await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledTimes(2);
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
-      expect(result.current.data).toEqual({ ...mockData, product: 'Hue 2' });
-      expect(result.current.error).toBeUndefined();
-      expect(result.current.loading).toBe(false);
-    });
+    expect(mockPost).not.toHaveBeenCalled();
   });
 
   it('should update options correctly', async () => {
-    const { result, rerender } = renderHook(
-      (props: { url: string; options }) => useLoadData(props.url, props.options),
-      {
-        initialProps: { url: mockUrl, options: mockOptions }
-      }
-    );
+    const { result, rerender } = renderHook((props: { url: string }) => useSaveData(props.url), {
+      initialProps: { url: mockUrl }
+    });
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(false);
+
+    act(() => {
+      result.current.save(mockBody);
+    });
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, mockOptions.params, expect.any(Object));
+      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
     });
 
-    const newOptions = {
-      params: { id: 2 }
-    };
+    const newBody = { id: 2 };
     const newMockData = { ...mockData, id: 2 };
-    mockGet.mockResolvedValueOnce(newMockData);
+    mockPost.mockResolvedValueOnce(newMockData);
 
-    rerender({ url: mockUrl, options: newOptions });
+    rerender({ url: mockUrl });
+
+    act(() => {
+      result.current.save(newBody);
+    });
+    expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, newOptions.params, expect.any(Object));
+      expect(mockPost).toHaveBeenCalledWith(mockUrl, newBody, expect.any(Object));
       expect(result.current.data).toEqual(newMockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
@@ -169,7 +142,7 @@ describe('useLoadData', () => {
     const mockOnSuccess = jest.fn();
     const mockOnError = jest.fn();
     const { result } = renderHook(() =>
-      useLoadData(mockUrl, {
+      useSaveData(mockUrl, {
         onSuccess: mockOnSuccess,
         onError: mockOnError
       })
@@ -177,10 +150,15 @@ describe('useLoadData', () => {
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(false);
+
+    act(() => {
+      result.current.save(mockBody);
+    });
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
@@ -190,13 +168,13 @@ describe('useLoadData', () => {
   });
 
   it('should call onError callback', async () => {
-    const mockError = new Error('Fetch error');
-    mockGet.mockRejectedValue(mockError);
+    const mockError = new Error('Save error');
+    mockPost.mockRejectedValue(mockError);
 
     const mockOnSuccess = jest.fn();
     const mockOnError = jest.fn();
     const { result } = renderHook(() =>
-      useLoadData(mockUrl, {
+      useSaveData(mockUrl, {
         onSuccess: mockOnSuccess,
         onError: mockOnError
       })
@@ -204,10 +182,15 @@ describe('useLoadData', () => {
 
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(false);
+
+    act(() => {
+      result.current.save(mockBody);
+    });
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
       expect(result.current.data).toBeUndefined();
       expect(result.current.error).toEqual(mockError);
       expect(result.current.loading).toBe(false);

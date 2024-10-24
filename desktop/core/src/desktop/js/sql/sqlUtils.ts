@@ -267,24 +267,51 @@ export default {
     sqlReferenceProvider?: SqlReferenceProvider,
     forceAppendBacktick?: boolean
   ): Promise<string> => {
-    if (forceAppendBacktick) {
-      return identifier + '`';
-    }
-    const quoteChar =
+    // Determine the quote character based on the connector dialect
+    let quoteChar =
       (connector.dialect_properties && connector.dialect_properties.sql_identifier_quote) || '`';
-    if (identifier.indexOf(quoteChar) === 0) {
+
+    // Use double quotes for Trino
+    if (connector.dialect === 'trino') {
+      quoteChar = '"';
+    }
+
+    if (forceAppendBacktick) {
+      return identifier + quoteChar;
+    }
+
+    // Check if identifier is already quoted
+    if (identifier.startsWith(quoteChar) && identifier.endsWith(quoteChar)) {
       return identifier;
     }
+    // Check for multi-part identifiers (e.g., catalog.schema)
+    if (identifier.includes('.')) {
+      // Split the identifier into parts and quote each part separately
+      return identifier
+        .split('.')
+        .map(part => {
+          // Quote each part if it is not already quoted
+          if (part.startsWith(quoteChar) && part.endsWith(quoteChar)) {
+            return part;
+          } else {
+            return `${quoteChar}${part}${quoteChar}`;
+          }
+        })
+        .join('.');
+    }
+
     const reservedKeywords = await (
       sqlReferenceProvider || sqlReferenceRepository
     ).getReservedKeywords(connector.dialect || 'generic');
-    if (reservedKeywords.has(identifier.toUpperCase())) {
+
+    // Quote the identifier if it is a reserved keyword or not a valid SQL identifier
+    if (
+      reservedKeywords.has(identifier.toUpperCase()) ||
+      !/^[A-Za-z][A-Za-z0-9_]*$/.test(identifier)
+    ) {
       return quoteChar + identifier + quoteChar;
     }
 
-    if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(identifier)) {
-      return quoteChar + identifier + quoteChar;
-    }
     return identifier;
   },
   locationEquals: (a?: ParsedLocation, b?: ParsedLocation): boolean =>

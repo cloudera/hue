@@ -42,13 +42,23 @@ class TestTrinoApi(TestCase):
     cls.trino_api = TrinoApi(cls.user, interpreter=cls.interpreter)
 
   def test_format_identifier(self):
+    # db name test
     test_cases = [
       ("my_db", '"my_db"'),
-      ("my_db.table", '"my_db"."table"'),
+      ("my_catalog.my_db", '"my_catalog"."my_db"'),
     ]
 
     for database, expected_output in test_cases:
-      assert self.trino_api._format_identifier(database) == expected_output
+      assert self.trino_api._format_identifier(database, is_db=True) == expected_output
+
+    # table name test
+    test_cases = [
+      ("io.airlift.discovery.store:name=dynamic,type=distributedstore", '"io.airlift.discovery.store:name=dynamic,type=distributedstore"'),
+      ("table", '"table"'),
+    ]
+
+    for table, expected_output in test_cases:
+      assert self.trino_api._format_identifier(table) == expected_output
 
   def test_parse_api_url(self):
     # Test parse_api_url method
@@ -354,3 +364,19 @@ class TestTrinoApi(TestCase):
     with patch('notebook.connectors.trino.coerce_password_from_script', return_value='custom_password_script'):
       trino_api = TrinoApi(self.user, interpreter=interpreter)
       assert trino_api.auth_password == 'custom_password_script'
+
+  def test_get_log(self):
+    notebook = {}
+    snippet = {
+      'result': {
+        'handle': {
+          'guid': '1234-abcd-5678-efgh'
+        }
+      }
+    }
+
+    # Expected result
+    expected_log = "query_id: 1234-abcd-5678-efgh"
+    result = self.trino_api.get_log(notebook, snippet)
+
+    assert result == expected_log

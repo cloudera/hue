@@ -15,14 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import base64
 import json
-import logging
 import struct
-import sys
+import logging
+from base64 import decodebytes
 
 from django.http import Http404
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.auth.backend import is_admin
@@ -30,20 +29,12 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
 from libsentry.privilege_checker import MissingSentryPrivilegeException
+from metadata.conf import OPTIMIZER
+from metadata.optimizer.base import get_api
+from metadata.optimizer.optimizer_client import NavOptException, _clean_query, _get_table_name
 from notebook.api import _get_statement
 from notebook.models import Notebook
 from notebook.sql_utils import get_current_statement
-
-from metadata.optimizer.base import get_api
-from metadata.optimizer.optimizer_client import NavOptException, _get_table_name, _clean_query
-from metadata.conf import OPTIMIZER
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from base64 import decodebytes
-else:
-  from django.utils.translation import ugettext as _
-  from base64 import decodestring as decodebytes
 
 LOG = logging.getLogger()
 
@@ -51,7 +42,6 @@ LOG = logging.getLogger()
 try:
   from beeswax.api import get_table_stats
   from beeswax.design import hql_query
-
   from metastore.views import _get_db
 except ImportError as e:
   LOG.warning("Hive lib not enabled")
@@ -280,7 +270,7 @@ def top_filters(request):
   interface = request.POST.get('interface', OPTIMIZER.INTERFACE.get())
   connector = json.loads(request.POST.get('connector', '{}'))
   db_tables = json.loads(request.POST.get('dbTables', '[]'))
-  column_name = request.POST.get('columnName') # Unused
+  column_name = request.POST.get('columnName')  # Unused
 
   api = get_api(request.user, interface)
 
@@ -394,7 +384,7 @@ def _convert_queries(queries_data):
   for query_data in queries_data:
     try:
       snippet = query_data['snippets'][0]
-      if 'guid' in snippet['result']['handle']: # Not failed query
+      if 'guid' in snippet['result']['handle']:  # Not failed query
         guid = snippet['result']['handle']['guid']
         if isinstance(guid, str):
           guid = guid.encode('utf-8')
@@ -499,7 +489,6 @@ def upload_table_stats(request):
   if not OPTIMIZER.AUTO_UPLOAD_STATS.get():
     with_table_stats = with_columns_stats = False
 
-
   for db_table in db_tables:
     path = _get_table_name(db_table)
 
@@ -520,7 +509,7 @@ def upload_table_stats(request):
         stats = dict((stat['data_type'], stat['comment']) for stat in full_table_stats['stats'])
 
         table_stats.append({
-          'table_name': '%(database)s.%(table)s' % path, # DB Prefix
+          'table_name': '%(database)s.%(table)s' % path,  # DB Prefix
           'num_rows': stats.get('numRows', -1),
           'last_modified_time': stats.get('transient_lastDdlTime', -1),
           'total_size': stats.get('totalSize', -1),
@@ -554,7 +543,7 @@ def upload_table_stats(request):
 
         for col_stats in raw_column_stats:
           column_stats.append({
-            'table_name': '%(database)s.%(table)s' % path, # DB Prefix
+            'table_name': '%(database)s.%(table)s' % path,  # DB Prefix
             'column_name': col_stats['col_name'],
             'data_type': col_stats['data_type'],
             "num_distinct": int(col_stats.get('distinct_count')) if col_stats.get('distinct_count') != '' else -1,

@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import re
-import sys
 import json
 import time
 import logging
@@ -72,7 +71,6 @@ from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
 from desktop.lib.view_util import location_to_url
-from desktop.models import Cluster
 from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 from indexer.file_format import HiveFormat
 from libzookeeper import conf as libzookeeper_conf
@@ -355,6 +353,13 @@ def get_query_server_config_via_connector(connector):
   else:
     impersonation_enabled = hiveserver2_impersonation_enabled()
 
+  if compute['dialect'] == 'impala':
+    from impala import conf as dbms_conf
+  else:
+    from beeswax import conf as dbms_conf
+  auth_username = dbms_conf.AUTH_USERNAME.get()
+  auth_password = dbms_conf.AUTH_PASSWORD.get()
+
   return {
       'is_compute': True,
       'dialect': compute['dialect'],
@@ -364,8 +369,8 @@ def get_query_server_config_via_connector(connector):
       # For connectors/computes, the auth details are not available
       # from configs and needs patching before submitting requests
       'principal': 'TODO',
-      'auth_username': compute['options'].get('auth_username'),
-      'auth_password': compute['options'].get('auth_password', 'hue'),
+      'auth_username': compute['options'].get('auth_username', auth_username),
+      'auth_password': compute['options'].get('auth_password', auth_password),
 
       'impersonation_enabled': impersonation_enabled,
       'use_sasl': str(compute['options'].get('use_sasl', True)).upper() == 'TRUE',

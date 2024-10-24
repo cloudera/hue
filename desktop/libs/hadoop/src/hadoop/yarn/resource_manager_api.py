@@ -15,26 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
+import sys
 import json
 import logging
 import posixpath
-import sys
 import threading
+from builtins import object
+
+from django.utils.translation import gettext as _
 
 from desktop.conf import DEFAULT_USER
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-
 from hadoop import cluster
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -55,11 +50,13 @@ def get_resource_manager(username=None):
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
         if yarn_cluster is None:
           raise PopupException(_('No Resource Manager are available.'))
-        API_CACHE = ResourceManagerApi(yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        API_CACHE = ResourceManagerApi(
+          yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get()
+        )
     finally:
       API_CACHE_LOCK.release()
 
-  API_CACHE.setuser(username) # Set the correct user
+  API_CACHE.setuser(username)  # Set the correct user
 
   return API_CACHE
 
@@ -71,7 +68,7 @@ class ResourceManagerApi(object):
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
     self._security_enabled = security_enabled
-    self._thread_local = threading.local() # To store user info
+    self._thread_local = threading.local()  # To store user info
     self.from_failover = False
 
     if self._security_enabled:
@@ -82,7 +79,7 @@ class ResourceManagerApi(object):
   def _get_params(self):
     params = {}
 
-    if self.username != DEFAULT_USER.get(): # We impersonate if needed
+    if self.username != DEFAULT_USER.get():  # We impersonate if needed
       params['doAs'] = self.username
       if not self.security_enabled:
         params['user.name'] = DEFAULT_USER.get()
@@ -99,7 +96,7 @@ class ResourceManagerApi(object):
 
   @property
   def user(self):
-    return self.username # Backward compatibility
+    return self.username  # Backward compatibility
 
   @property
   def username(self):
@@ -127,11 +124,15 @@ class ResourceManagerApi(object):
 
   def app(self, app_id):
     params = self._get_params()
-    return self._execute(self._root.get, 'cluster/apps/%(app_id)s' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._execute(
+      self._root.get, 'cluster/apps/%(app_id)s' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE}
+    )
 
   def appattempts(self, app_id):
     params = self._get_params()
-    return self._execute(self._root.get, 'cluster/apps/%(app_id)s/appattempts' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._execute(
+      self._root.get, 'cluster/apps/%(app_id)s/appattempts' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE}
+    )
 
   def appattempts_attempt(self, app_id, attempt_id):
     attempts = self.appattempts(app_id)
@@ -154,7 +155,13 @@ class ResourceManagerApi(object):
 
     try:
       params = self._get_params()
-      return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+      return self._execute(
+        self._root.put,
+        'cluster/apps/%(app_id)s/state' % {'app_id': app_id},
+        params=params,
+        data=json.dumps(data),
+        contenttype=_JSON_CONTENT_TYPE,
+      )
     finally:
       if token:
         self.cancel_token(token)

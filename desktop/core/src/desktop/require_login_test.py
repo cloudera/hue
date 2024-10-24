@@ -19,15 +19,11 @@
 
 
 import sys
-import pytest
+from unittest.mock import Mock
 
-from django.test.client import Client
 import django
-
-if sys.version_info[0] > 2:
-  from unittest.mock import Mock
-else:
-  from mock import Mock
+import pytest
+from django.test.client import Client
 
 
 @pytest.mark.django_db

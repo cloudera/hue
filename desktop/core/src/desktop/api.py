@@ -15,26 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
 import sys
+import json
 import time
-
+import logging
 from collections import defaultdict
 
 from django.utils import html
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 import desktop.conf
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
-from desktop.models import Document, DocumentTag, Document2, Directory
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from desktop.models import Directory, Document, Document2, DocumentTag
 
 LOG = logging.getLogger()
 
@@ -89,14 +83,16 @@ def massaged_tags_for_json(docs, user):
   trash_tag = DocumentTag.objects.get_trash_tag(user)
   history_tag = DocumentTag.objects.get_history_tag(user)
 
-  tag_doc_mapping = defaultdict(set) # List of documents available in each tag
+  tag_doc_mapping = defaultdict(set)  # List of documents available in each tag
   for doc in docs:
     for tag in doc.tags.all():
       tag_doc_mapping[tag].add(doc)
 
   ts['trash'] = massaged_tags(trash_tag, tag_doc_mapping)
   ts['history'] = massaged_tags(history_tag, tag_doc_mapping)
-  tags = list(set(list(tag_doc_mapping.keys()) + [tag for tag in DocumentTag.objects.get_tags(user=user)])) # List of all personal and shared tags
+
+  # List of all personal and shared tags
+  tags = list(set(list(tag_doc_mapping.keys()) + [tag for tag in DocumentTag.objects.get_tags(user=user)]))
 
   for tag in tags:
     massaged_tag = massaged_tags(tag, tag_doc_mapping)
@@ -123,8 +119,9 @@ def massaged_tags(tag, tag_doc_mapping):
     'id': tag.id,
     'name': html.conditional_escape(tag.tag),
     'owner': tag.owner.username,
-    'docs': [doc.id for doc in tag_doc_mapping[tag]] # Could get with one request groupy
+    'docs': [doc.id for doc in tag_doc_mapping[tag]]  # Could get with one request groupy
   }
+
 
 def massage_permissions(document):
   """
@@ -135,15 +132,15 @@ def massage_permissions(document):
   return {
     'perms': {
         'read': {
-          'users': [{'id': perm_user.id, 'username': perm_user.username} \
+          'users': [{'id': perm_user.id, 'username': perm_user.username}
                      for perm_user in read_perms.users.all()],
-          'groups': [{'id': perm_group.id, 'name': perm_group.name} \
+          'groups': [{'id': perm_group.id, 'name': perm_group.name}
                      for perm_group in read_perms.groups.all()]
         },
         'write': {
-          'users': [{'id': perm_user.id, 'username': perm_user.username} \
+          'users': [{'id': perm_user.id, 'username': perm_user.username}
                      for perm_user in write_perms.users.all()],
-          'groups': [{'id': perm_group.id, 'name': perm_group.name} \
+          'groups': [{'id': perm_group.id, 'name': perm_group.name}
                      for perm_group in write_perms.groups.all()]
         }
       }
@@ -179,13 +176,18 @@ def massaged_documents_for_json(documents, user):
       'lastModified': '03/11/14 16:06:49', 'owner': 'admin', 'lastModifiedInMillis': 1394579209.0, 'isMine': true
      }
   };
-  """
+  """  # noqa: E501
   docs = {}
 
   for document in documents:
     try:
-      url = document.content_object and hasattr(document.content_object, 'get_absolute_url') and document.content_object.get_absolute_url() or ''
-    except:
+      url = (
+        document.content_object
+        and hasattr(document.content_object, 'get_absolute_url')
+        and document.content_object.get_absolute_url()
+        or ''
+      )
+    except Exception:
       LOG.exception('failed to get absolute url')
       # If app of document is disabled
       url = ''
@@ -225,7 +227,7 @@ def massage_doc_for_json(document, user, url=''):
     'name': html.conditional_escape(document.name),
     'url': html.conditional_escape(url),
     'description': html.conditional_escape(document.description),
-    'tags': [{'id': tag.id, 'name': html.conditional_escape(tag.tag)} \
+    'tags': [{'id': tag.id, 'name': html.conditional_escape(tag.tag)}
              for tag in document.tags.all()],
     'owner': document.owner.username,
     'isMine': document.owner == user,

@@ -15,41 +15,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import filter
-import hashlib
 import json
-import logging
-import sys
 import uuid
+import hashlib
+import logging
 
+from django.utils.encoding import force_str
+from django.utils.translation import gettext as _
+
+from dashboard.conf import USE_GRIDSTER, get_engines
+from dashboard.controller import can_edit_index
+from dashboard.dashboard_api import get_engine
+from dashboard.data_export import download as export_download
+from dashboard.decorators import allow_viewer_only
+from dashboard.facet_builder import _guess_gap, _new_range_facet, _zoom_range_facet
+from dashboard.models import (
+  COMPARE_FACET,
+  NESTED_FACET_FORM,
+  QUERY_FACET,
+  Collection2,
+  augment_solr_exception,
+  augment_solr_response,
+  extract_solr_exception_message,
+  pairwise2,
+)
 from desktop.conf import ENABLE_DOWNLOAD
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2
 from desktop.views import serve_403_error
-
 from libsolr.api import SolrApi
-
-from notebook.connectors.base import get_api
-from notebook.dashboard_api import MockRequest
 from search.conf import SOLR_URL
-
-from dashboard.conf import get_engines, USE_GRIDSTER
-from dashboard.controller import can_edit_index
-from dashboard.dashboard_api import get_engine
-from dashboard.data_export import download as export_download
-from dashboard.decorators import allow_viewer_only
-from dashboard.facet_builder import _guess_gap, _zoom_range_facet, _new_range_facet
-from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception,\
-  NESTED_FACET_FORM, COMPARE_FACET, QUERY_FACET, extract_solr_exception_message
-
-if sys.version_info[0] > 2:
-  from django.utils.encoding import force_str
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.encoding import force_unicode as force_str
-  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger()
 
@@ -122,12 +119,12 @@ def index_fields_dynamic(request):
 
     result['message'] = ''
     result['fields'] = [
-        Collection2._make_field(name, properties)
-        for name, properties in dynamic_fields['fields'].items() if 'dynamicBase' in properties
+      Collection2._make_field(name, properties) for name, properties in dynamic_fields['fields'].items() if 'dynamicBase' in properties
     ]
     result['gridlayout_header_fields'] = [
-        Collection2._make_gridlayout_header_field({'name': name, 'type': properties.get('type')}, True)
-        for name, properties in dynamic_fields['fields'].items() if 'dynamicBase' in properties
+      Collection2._make_gridlayout_header_field({'name': name, 'type': properties.get('type')}, True)
+      for name, properties in dynamic_fields['fields'].items()
+      if 'dynamicBase' in properties
     ]
     result['status'] = 0
   except Exception as e:
@@ -197,9 +194,9 @@ def update_document(request):
 
     if document['hasChanged']:
       edits = {
-          "id": doc_id,
+        "id": doc_id,
       }
-      version = None # If there is a version, use it to avoid potential concurrent update conflicts
+      version = None  # If there is a version, use it to avoid potential concurrent update conflicts
 
       for field in document['details']:
         if field['hasChanged'] and field['key'] != '_version_':
@@ -207,7 +204,9 @@ def update_document(request):
         if field['key'] == '_version_':
           version = field['value']
 
-      result['update'] = SolrApi(SOLR_URL.get(), request.user).update(collection['name'], json.dumps([edits]), content_type='json', version=version)
+      result['update'] = SolrApi(SOLR_URL.get(), request.user).update(
+        collection['name'], json.dumps([edits]), content_type='json', version=version
+      )
       result['message'] = _('Document successfully updated.')
       result['status'] = 0
     else:
@@ -216,7 +215,7 @@ def update_document(request):
   except RestException as e:
     try:
       result['message'] = json.loads(e.message)['error']['msg']
-    except:
+    except Exception:
       LOG.exception('Failed to parse json response')
       result['message'] = force_str(e)
   except Exception as e:
@@ -271,7 +270,7 @@ def get_terms(request):
       # maxcount
     }
     if analysis['terms']['prefix']:
-      properties['terms.regex'] = '.*%(prefix)s.*' % analysis['terms'] # Use regexp instead of case sensitive 'terms.prefix'
+      properties['terms.regex'] = '.*%(prefix)s.*' % analysis['terms']  # Use regexp instead of case sensitive 'terms.prefix'
       properties['terms.regex.flag'] = 'case_insensitive'
 
     result['terms'] = SolrApi(SOLR_URL.get(), request.user).terms(collection['name'], field, properties)
@@ -380,7 +379,6 @@ def new_facet(request):
     widget_type = request.POST.get('widget_type')
     window_size = request.POST.get('window_size')
 
-
     result['message'] = ''
     result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type, window_size)
     result['status'] = 0
@@ -400,35 +398,37 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'missing': False,
     'isDate': False,
     'slot': 0,
-    'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentile': 50}
+    'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentile': 50},
   }
   template = {
-      "showFieldList": True,
-      "showGrid": False,
-      "showChart": True,
-      "chartSettings" : {
-        'chartType': 'pie' if widget_type == 'pie2-widget' else ('timeline' if widget_type == 'timeline-widget' else ('gradientmap' if widget_type == 'gradient-map-widget' else 'bars')),
-        'chartSorting': 'none',
-        'chartScatterGroup': None,
-        'chartScatterSize': None,
-        'chartScope': 'world',
-        'chartX': None,
-        'chartYSingle': None,
-        'chartYMulti': [],
-        'chartData': [],
-        'chartMapLabel': None,
-        'chartSelectorType': 'bar'
-      },
-      "fieldsAttributes": [],
-      "fieldsAttributesFilter": "",
-      "filteredAttributeFieldsAll": True,
-      "fields": [],
-      "fieldsSelected": [],
-      "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None}, # Use own?
-      'leafletmapOn': False,
-      'isGridLayout': False,
-      "hasDataForChart": True,
-      "rows": 25,
+    "showFieldList": True,
+    "showGrid": False,
+    "showChart": True,
+    "chartSettings": {
+      'chartType': 'pie'
+      if widget_type == 'pie2-widget'
+      else ('timeline' if widget_type == 'timeline-widget' else ('gradientmap' if widget_type == 'gradient-map-widget' else 'bars')),
+      'chartSorting': 'none',
+      'chartScatterGroup': None,
+      'chartScatterSize': None,
+      'chartScope': 'world',
+      'chartX': None,
+      'chartYSingle': None,
+      'chartYMulti': [],
+      'chartData': [],
+      'chartMapLabel': None,
+      'chartSelectorType': 'bar',
+    },
+    "fieldsAttributes": [],
+    "fieldsAttributesFilter": "",
+    "filteredAttributeFieldsAll": True,
+    "fields": [],
+    "fieldsSelected": [],
+    "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None},  # Use own?
+    'leafletmapOn': False,
+    'isGridLayout': False,
+    "hasDataForChart": True,
+    "rows": 25,
   }
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
@@ -438,14 +438,27 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['statementUuid'] = collection['selectedDocument'].get('uuid')
       doc = Document2.objects.get_by_uuid(user=user, uuid=collection['selectedDocument']['uuid'], perm_type='read')
       snippets = doc.data_dict.get('snippets', [])
-      properties['result'] = {'handle': {'statement_id': 0, 'statements_count': 1, 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}}
+      properties['result'] = {
+        'handle': {'statement_id': 0, 'statements_count': 1, 'previous_statement_hash': hashlib.sha224(str(uuid.uuid4())).hexdigest()}
+      }
       if snippets:
         properties['engine'] = snippets[0]['type']
     else:
       properties['statementUuid'] = ''
     properties['statement'] = ''
     properties['uuid'] = facet_field
-    properties['facets'] = [{'canRange': False, 'field': 'blank', 'limit': 10, 'mincount': 0, 'sort': 'desc', 'aggregate': {'function': 'count'}, 'isDate': False, 'type': 'field'}]
+    properties['facets'] = [
+      {
+        'canRange': False,
+        'field': 'blank',
+        'limit': 10,
+        'mincount': 0,
+        'sort': 'desc',
+        'aggregate': {'function': 'count'},
+        'isDate': False,
+        'type': 'field',
+      }
+    ]
     facet_type = 'statement'
   else:
     api = get_engine(user, collection)
@@ -460,7 +473,15 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     else:
       facet_type = 'field'
 
-    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget', 'gradient-map-widget'):
+    if widget_type in (
+      'bucket-widget',
+      'pie2-widget',
+      'timeline-widget',
+      'tree2-widget',
+      'text-facet-widget',
+      'hit-widget',
+      'gradient-map-widget',
+    ):
       # properties = {'canRange': False, 'stacked': False, 'limit': 10} # TODO: Lighter weight top nested facet
 
       properties['facets_form'] = NESTED_FACET_FORM
@@ -546,7 +567,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'properties': properties,
     # Hue 4+
     'template': template,
-    'queryResult': {}
+    'queryResult': {},
   }
 
 
@@ -564,7 +585,7 @@ def get_range_facet(request):
     if action == 'select':
       properties = _guess_gap(solr_api, collection, facet, facet['properties']['start'], facet['properties']['end'])
     else:
-      properties = _zoom_range_facet(solr_api, collection, facet) # Zoom out
+      properties = _zoom_range_facet(solr_api, collection, facet)  # Zoom out
 
     result['properties'] = properties
     result['status'] = 0

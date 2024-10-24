@@ -15,18 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
-import logging
-import socket
 import sys
+import socket
+import logging
+from builtins import str
 
 from django.utils.encoding import smart_str
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from django.utils.translation import gettext as _
 
 LOG = logging.getLogger()
 

@@ -15,14 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import json
 import logging
+from urllib.parse import unquote as urllib_unquote
 
 import sqlparse
 import opentracing.tracer
 from django.db.models import Q
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 from azure.abfs.__init__ import abfspath
@@ -36,19 +37,8 @@ from indexer.file_format import HiveFormat
 from metadata.conf import OPTIMIZER
 from notebook.conf import EXAMPLES
 from notebook.connectors.base import Notebook, QueryError, QueryExpired, SessionExpired, _get_snippet_name, patch_snippet_for_connector
-from notebook.connectors.hiveserver2 import HS2Api
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import _get_dialect_example, escape_rows, get_api, make_notebook, upgrade_session_properties
-
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote
-
-  from django.utils.translation import gettext as _
-else:
-  from urllib import unquote as urllib_unquote
-
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 

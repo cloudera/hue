@@ -18,7 +18,7 @@
 import sys
 
 from desktop.views import commonheader, commonfooter
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.auth.backend import is_admin
 
 if sys.version_info[0] > 2:
@@ -38,9 +38,9 @@ ${ commonheader(title, "", user, request, "40px") | n,unicode }
         <h1 class="card-heading simple">${ _('Error!') }</h1>
         <div class="card-body">
           <div class="alert">
-            <strong>${ smart_unicode(message) }</strong>
+            <strong>${ smart_str(message) }</strong>
             % if detail:
-              <p>${ smart_unicode(detail) }</p>
+              <p>${ smart_str(detail) }</p>
             % endif
           </div>
 
@@ -65,9 +65,9 @@ ${ commonheader(title, "", user, request, "40px") | n,unicode }
                   <tbody>
                     % for (file_name, line_number, function_name, text) in traceback:
                       <tr>
-                        <td>${smart_unicode(file_name) or ""}</td>
-                        <td>${smart_unicode(line_number) or ""}</td>
-                        <td>${smart_unicode(function_name) or ""}</td>
+                        <td>${smart_str(file_name) or ""}</td>
+                        <td>${smart_str(line_number) or ""}</td>
+                        <td>${smart_str(function_name) or ""}</td>
                       </tr>
                     % endfor
                   </tbody>

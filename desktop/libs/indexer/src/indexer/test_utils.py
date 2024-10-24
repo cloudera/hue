@@ -16,19 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-import sys
+from io import StringIO as string_io
 
 from desktop.lib.i18n import force_unicode
-
 from indexer.utils import field_values_from_separated_file
-
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from StringIO import StringIO as string_io
 
 
 def test_get_ensemble():
@@ -43,9 +34,7 @@ def test_get_ensemble():
 
   # Bad binary
   test_str = b'fieldA\naaa\x80\x02\x03'
-  if sys.version_info[0] > 2:
-    data = string_io(force_unicode(test_str, errors='ignore'))
-  else:
-    data = string_io(test_str)
+  data = string_io(force_unicode(test_str, errors='ignore'))
+
   result = list(field_values_from_separated_file(data, delimiter='\t', quote_character='"'))
   assert u'aaa\x02\x03' == result[0]['fieldA']

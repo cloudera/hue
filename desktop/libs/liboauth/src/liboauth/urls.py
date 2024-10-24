@@ -17,12 +17,9 @@
 
 import sys
 
-from liboauth import views as liboauth_views
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from liboauth import views as liboauth_views
 
 urlpatterns = [
        re_path(r'^accounts/login/$', liboauth_views.show_login_page, name='show_oauth_login'),
