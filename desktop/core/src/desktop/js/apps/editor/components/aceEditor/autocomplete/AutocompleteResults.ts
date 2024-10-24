@@ -193,6 +193,7 @@ class AutocompleteResults {
     }
     this.activeDatabase = parseResult.useDatabase || this.executor.database();
     this.parseResult = parseResult;
+    console.log("dndskjfbskj");
 
     if (this.parseResult.udfArgument) {
       await this.adjustForUdfArgument();
