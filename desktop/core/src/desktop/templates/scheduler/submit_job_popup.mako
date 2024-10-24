@@ -128,6 +128,7 @@ else:
   }
   #param-container .btn-group {
     margin-left: 10px;
+    position: absolute;
   }
 </style>
 
@@ -163,7 +164,17 @@ else:
       else if (_el.val().indexOf("T") == "-1") {
         _el.val(_el.val() + "T" + _val.split("T")[1]);
       }
+
+      $(document).off("click.hideDatepicker");
+    }).on("show", function() {
+      $(document).on("click.hideDatepicker", function (event) {
+        if (!$(event.target).closest(".datepicker, .calendar-link, input[type='text']").length) {
+          _el.datepicker('hide');
+          $(document).off("click.hideDatepicker");
+        }
+      });
     });
+    
     _el.datepicker('show');
     huePubSub.subscribeOnce('hide.datepicker', function () {
       _el.datepicker('hide');
