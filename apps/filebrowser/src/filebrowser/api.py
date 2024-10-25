@@ -38,6 +38,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.export_csvxls import file_reader
 from desktop.lib.fs.gc.gs import GSListAllBucketsException, get_gs_home_directory
 from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+from desktop.lib.i18n import smart_str
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from filebrowser.conf import (
@@ -46,21 +47,16 @@ from filebrowser.conf import (
   MAX_FILE_SIZE_UPLOAD_LIMIT,
   REDIRECT_DOWNLOAD,
   SHOW_DOWNLOAD_BUTTON,
-  SHOW_UPLOAD_BUTTON,
 )
-
-# from filebrowser.forms import UploadAPIFileForm
 from filebrowser.lib import xxd
-from filebrowser.lib.rwx import compress_mode
+from filebrowser.lib.rwx import compress_mode, filetype, rwx
 from filebrowser.utils import parse_broker_url
 from filebrowser.views import (
   DEFAULT_CHUNK_SIZE_BYTES,
   MAX_CHUNK_SIZE_BYTES,
-  MAX_FILEEDITOR_SIZE,
   _can_inline_display,
   _is_hdfs_superuser,
   _massage_page,
-  _massage_stats,
   _normalize_path,
   read_contents,
   stat_absolute_path,
@@ -157,7 +153,6 @@ def download(request):
   path = request.GET.get('path')
   path = _normalize_path(path)
 
-  # TODO: Improve config name?
   if not SHOW_DOWNLOAD_BUTTON.get():
     return HttpResponse('Download operation is not allowed.', status=403)
 
@@ -217,7 +212,7 @@ def listdir_paged(request):
 
   Query parameters:
     pagenum           - The page number to show. Defaults to 1.
-    pagesize          - How many to show on a page. Defaults to 15.
+    pagesize          - How many to show on a page. Defaults to 30.
     sortby=?          - Specify attribute to sort by. Accepts: (type, name, atime, mtime, size, user, group). Defaults to name.
     descending        - Specify a descending sort order. Default to false.
     filter=?          - Specify a substring filter to search for in the filename field.
@@ -271,7 +266,6 @@ def listdir_paged(request):
     return HttpResponse(message, status=404)  # TODO: status code?
 
   if page:
-    # TODO: Check if we need to clean response of _massage_stats
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
 
   # TODO: Shift below fields to /get_config?
@@ -283,10 +277,7 @@ def listdir_paged(request):
     'is_trash_enabled': is_trash_enabled,
     'files': page.object_list if page else [],
     'page': _massage_page(page, paginator) if page else {},  # TODO: Check if we need to clean response of _massage_page
-    # The following should probably be deprecated
     # TODO: Check what to keep or what to remove? or move some fields to /get_config?
-    'cwd_set': True,
-    'file_filter': 'any',
     'is_fs_superuser': is_fs_superuser,
     'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
     'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
@@ -363,24 +354,14 @@ def display(request):
     except UnicodeDecodeError:
       file_contents = contents
 
-  # TODO: Check what all UI needs and clean the field below, currently commenting out few duplicates which needs to be verified.
-
-  stats = request.fs.stats(path)
-  data = _massage_stats(request, stat_absolute_path(path, stats))  # TODO: Stats required again?
-
-  # And add a view structure:
-  data["view"] = {
+  data = {
+    'contents': file_contents,
     'offset': offset,
     'length': length,
     'end': offset + len(contents),
     'mode': mode,
     'compression': compression,
-    # 'size': stats.size,
-    'max_chunk_size': str(MAX_CHUNK_SIZE_BYTES),
   }
-
-  data["editable"] = stats.size < MAX_FILEEDITOR_SIZE  # TODO: To improve this limit and sent it as /get_config? Needs discussion.
-  data['view']['contents'] = file_contents
 
   return JsonResponse(data)
 
@@ -804,3 +785,20 @@ def bulk_op(request, op):
     return JsonResponse(error_dict, status_code=500)  # TODO: Check if we need diff status code or diff json structure?
 
   return HttpResponse(status=200)  # TODO: Check if we need to send some message or diff status code?
+
+
+def _massage_stats(request, stats):
+  """
+  Massage a stats record as returned by the filesystem implementation
+  into the format that the views would like it in.
+  """
+  stats_dict = stats.to_json_dict()
+  normalized_path = request.fs.normpath(stats_dict.get('path'))
+
+  stats_dict.update({
+    'path': normalized_path,
+    'type': filetype(stats.mode),
+    'rwx': rwx(stats.mode, stats.aclBit),
+  })
+
+  return stats_dict

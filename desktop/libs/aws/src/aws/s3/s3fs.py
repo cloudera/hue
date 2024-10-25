@@ -29,6 +29,7 @@ from boto.exception import BotoClientError, S3ResponseError
 from boto.s3.connection import Location
 from boto.s3.key import Key
 from boto.s3.prefix import Prefix
+from django.http.multipartparser import MultiPartParser
 from django.utils.translation import gettext as _
 
 from aws import s3
@@ -572,6 +573,8 @@ class S3FileSystem(object):
 
   @translate_s3_error
   def upload(self, file, path, *args, **kwargs):
+    # parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
+    # return parser.parse()
     pass  # upload is handled by S3FileUploadHandler
 
   @translate_s3_error
