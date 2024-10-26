@@ -468,12 +468,12 @@ else:
       <!-- ko foreach: sessions -->
         <h4 style="clear:left; display: inline-block">
           <span data-bind="textWithArgs: { handler: '$parents[1].getSnippetName', params: [type()] }"></span>
-          <!-- ko if: typeof session_id != 'undefined' && session_id -->
+          <!-- ko if: hasValidSessionId -->
             <span data-bind="text: session_id"></span>
           <!-- /ko -->
         </h4>
         <div class="session-actions">
-          <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $parent.restartSession($data) }">
+          <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="clickWithArgs: { handler: '$parent.restartSession', params: [$data] }">
             <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
           </a>
           <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $parent.closeAndRemoveSession($data) }">
@@ -521,7 +521,8 @@ else:
 <script type="text/html" id="snippet-log${ suffix }">
   <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs">
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
-      <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
+      <a href="javascript: void(0)" class="inactive-action close-logs-overlay" 
+        data-bind="clickWithArgs: { handler: showLogs, params: [false] }">&times;</a>
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li data-bind="attr: {'id': $data.name.substr(4)}">
           % if is_embeddable:
@@ -542,12 +543,12 @@ else:
         <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated"></pre>
       </span>
     </div>
-    <div class="snippet-log-resizer" data-bind="visible: result.logs().length > 0, logResizer: {parent: '.snippet-log-container', target: '.logs-populated', mainScrollable: MAIN_SCROLLABLE, onStart: hideFixedHeaders, onResize: function(){ hideFixedHeaders(); redrawFixedHeaders(500); }, minHeight: 50}">
+    <div class="snippet-log-resizer" data-bind="visible: result.logs().length > 0, logResizer: {parent: '.snippet-log-container', target: '.logs-populated', mainScrollable: MAIN_SCROLLABLE, onStart: hideFixedHeaders, onResize: onLogResizerResize, minHeight: 50}">
       <i class="fa fa-ellipsis-h"></i>
     </div>
   </div>
   <div class="snippet-log-container margin-bottom-10">
-    <div data-bind="visible: ! result.hasResultset() && status() == 'available' && result.fetchedOnce(), css: resultsKlass, click: function(){  }" style="display:none;">
+    
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
     </div>
 
@@ -837,7 +838,10 @@ else:
   <div class="hover-actions inline pull-right" style="font-size: 15px;">
     <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
     <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
-    <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
+    <span class="execution-timer" data-bind="visible: type<span class="execution-timer" 
+      data-bind="visible: isExecutionTimerVisible, 
+                 text: executionTimeFormatted" 
+      title="${ _('Execution time') }"></span>
 
     <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
     <!-- ko template: { name: 'snippet-header-statement-type${ suffix }' } --><!-- /ko -->
@@ -850,10 +854,14 @@ else:
 </script>
 
 <script type="text/html" id="editor-snippet-header${ suffix }">
-  <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;" data-bind="style: { 'marginRight': $root.isPresentationMode() || $root.isResultFullScreenMode() ? '40px' : '0' }">
+    <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;" 
+     data-bind="style: { 'marginRight': $root.hoverActionsMarginRight }">
     <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
     <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
-    <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
+    <span class="execution-timer" 
+      data-bind="visible: isExecutionTimerVisible, 
+                 text: executionTimeFormatted" 
+      title="${ _('Execution time') }"></span>
 
     <!-- ko template: { name: 'snippet-header-database-selection' } --><!-- /ko -->
     <!-- ko template: { name: 'snippet-header-statement-type${ suffix }' } --><!-- /ko -->
@@ -895,26 +903,29 @@ else:
           <div class="snippet-row" style="position: relative;">
             <div class="snippet-left-bar">
               <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
-              <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1 && ! $root.isResultFullScreenMode(), name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: $root.shouldShowSnippetExecutionControls, name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
             </div>
             <div class="snippet-body" data-bind="clickForAceFocus: ace, visible: ! $root.isResultFullScreenMode()">
               <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-              <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode() && !$root.isPresentationMode()) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
+              <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: $parent.addSnippetAboveOnDoubleClick, clickForAceFocus: ace">
                 <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header${ suffix }' } --><!-- /ko -->
                 <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header${ suffix }' } --><!-- /ko -->
               </h2>
-              <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body${ suffix }' } --><!-- /ko -->
+
+              <!-- ko template: { if: showCodeEditorSnippetBody(), name: 'code-editor-snippet-body${ suffix }' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'text', name: 'text-snippet-body${ suffix }' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body${ suffix }' } --><!-- /ko -->
-              <!-- ko template: { if: ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'].indexOf(type()) != -1, name: 'executable-snippet-body${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: showExecutableSnippetBody(), name: 'executable-snippet-body${ suffix }' } --><!-- /ko -->
             </div>
             <div style="position: absolute; top:25px; margin-left:35px; width: calc(100% - 35px)" data-bind="style: { 'z-index': 400 - $index() }">
               <!-- ko template: 'snippet-settings${ suffix }' --><!-- /ko -->
             </div>
           </div>
-          <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status${ suffix }' } --><!-- /ko -->
-          <!-- ko template: { if: $root.editorMode() && ! $root.isResultFullScreenMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py'].indexOf(type()) == -1, name: 'snippet-code-resizer${ suffix }' } --><!-- /ko -->
+          <!-- ko template: { if: shouldShowSnippetExecutionStatus, name: 'snippet-execution-status${ suffix }' } --><!-- /ko -->
+          <!-- ko if: $root.shouldShowSnippetCodeResizer -->
+            <!-- ko template: { name: 'snippet-code-resizer' + suffix() } --><!-- /ko -->
+          <!-- /ko -->
           <!-- ko if: !$root.isResultFullScreenMode() -->
             <!-- ko template: 'snippet-log${ suffix }' --><!-- /ko -->
           <!-- /ko -->
@@ -939,25 +950,48 @@ else:
     </div>
     <div class="snippet-settings-body">
       <form class="form-horizontal">
-        <!-- ko template: { if: typeof properties().driverCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _ko('Driver Cores') }', value: properties().driverCores, title: '${ _ko('Number of cores used by the driver, only in cluster mode (Default: 1)') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().executorCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _ko('Executor Cores') }', value: properties().executorCores, title: '${ _ko('Number of cores per executor (Default: 1)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().numExecutors != 'undefined', name: 'property', data: { type: 'number', label: '${ _ko('Executors') }', value: properties().numExecutors, title: '${ _ko('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().queue != 'undefined', name: 'property', data: { type: 'string', label: '${ _ko('Queue') }', value: properties().queue, title: '${ _ko('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().archives != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Archives') }', value: properties().archives, title: '${ _ko('Archives to be extracted into the working directory of each executor (YARN only)') }', placeholder: '${ _ko('e.g. file.zip') }'}} --><!-- /ko -->
-
-        <!-- ko template: { if: typeof properties().files != 'undefined', name: 'property', data: { type: 'hdfs-files', label: '${ _ko('Files') }', value: properties().files, visibleObservable: settingsVisible, title: '${ _ko('Files to be placed in the working directory of each executor.') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().functions != 'undefined', name: 'property', data: { type: 'functions', label: '${ _ko('Functions') }', value: properties().functions, visibleObservable: settingsVisible, title: '${ _ko('UDFs name and class') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().settings != 'undefined', name: 'property', data: { type: 'settings', label: '${ _ko('Settings') }', value: properties().settings, visibleObservable: settingsVisible, title: '${ _ko('Properties') }'}} --><!-- /ko -->
-
-        <!-- ko template: { if: typeof properties().spark_opts != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Spark Arguments') }', value: properties().spark_opts, title: '${ _ko('Names and values of Spark parameters') }', placeholder: '${ _ko('e.g. --executor-memory 20G --num-executors 50') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().parameters != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Parameters') }', value: properties().parameters, title: '${ _ko('Names and values of Pig parameters and options') }', placeholder: '${ _ko('e.g. input /user/data, -param input=/user/data, -optimizer_off SplitFilter, -verbose') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().hadoopProperties != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Hadoop properties') }', value: properties().hadoopProperties, title: '${ _ko('Name and values of Hadoop properties') }', placeholder: '${ _ko('e.g. mapred.job.queue.name=production, mapred.map.tasks.speculative.execution=false') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().resources != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Resources') }', value: properties().resources, title: '${ _ko('HDFS Files or compressed files') }', placeholder: '${ _ko('e.g. /tmp/file, /tmp.file.zip') }'}} --><!-- /ko -->
-
-        <!-- ko template: { if: typeof properties().capture_output != 'undefined', name: 'property', data: { type: 'boolean', label: '${ _ko('Capture output') }', value: properties().capture_output, title: '${ _ko('If capturing the output of the shell script') }' }} --><!-- /ko -->
+        <!-- ko if: hasDriverCores -->
+          <!-- ko template: { name: 'property', data: { type: 'number', label: '${ _ko('Driver Cores') }', value: properties().driverCores, title: '${ _ko('Number of cores used by the driver, only in cluster mode (Default: 1)') }'}} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasExecutorCores -->
+          <!-- ko template: { name: 'property', data: { type: 'number', label: '${ _ko('Executor Cores') }', value: properties().executorCores, title: '${ _ko('Number of cores per executor (Default: 1)') }' }} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasNumExecutors -->
+          <!-- ko template: { name: 'property', data: { type: 'number', label: '${ _ko('Executors') }', value: properties().numExecutors, title: '${ _ko('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasQueue -->
+          <!-- ko template: { name: 'property', data: { type: 'string', label: '${ _ko('Queue') }', value: properties().queue, title: '${ _ko('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasArchives -->
+          <!-- ko template: { name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Archives') }', value: properties().archives, title: '${ _ko('Archives to be extracted into the working directory of each executor (YARN only)') }', placeholder: '${ _ko('e.g. file.zip') }'}} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasFiles -->
+          <!-- ko template: { name: 'property', data: { type: 'hdfs-files', label: '${ _ko('Files') }', value: properties().files, visibleObservable: settingsVisible, title: '${ _ko('Files to be placed in the working directory of each executor.') }'}} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasFunctions -->
+          <!-- ko template: { name: 'property', data: { type: 'functions', label: '${ _ko('Functions') }', value: properties().functions, visibleObservable: settingsVisible, title: '${ _ko('UDFs name and class') }'}} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasSettings -->
+          <!-- ko template: { name: 'property', data: { type: 'settings', label: '${ _ko('Settings') }', value: properties().settings, visibleObservable: settingsVisible, title: '${ _ko('Properties') }'}} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasSparkOpts -->
+          <!-- ko template: { name: 'property', data: { type: 'csv', label: '${ _ko('Spark Arguments') }', value: properties().spark_opts, title: '${ _ko('Names and values of Spark parameters') }', placeholder: '${ _ko('e.g. --executor-memory 20G --num-executors 50') }'}} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasParameters -->
+          <!-- ko template: { name: 'property', data: { type: 'csv', label: '${ _ko('Parameters') }', value: properties().parameters, title: '${ _ko('Names and values of Pig parameters and options') }', placeholder: '${ _ko('e.g. input /user/data, -param input=/user/data, -optimizer_off SplitFilter, -verbose') }'}} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasHadoopProperties -->
+          <!-- ko template: { name: 'property', data: { type: 'csv', label: '${ _ko('Hadoop properties') }', value: properties().hadoopProperties, title: '${ _ko('Name and values of Hadoop properties') }', placeholder: '${ _ko('e.g. mapred.job.queue.name=production, mapred.map.tasks.speculative.execution=false') }'}} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasResources -->
+          <!-- ko template: { name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Resources') }', value: properties().resources, title: '${ _ko('HDFS Files or compressed files') }', placeholder: '${ _ko('e.g. /tmp/file, /tmp.file.zip') }'}} --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: hasCaptureOutput -->
+          <!-- ko template: { name: 'property', data: { type: 'boolean', label: '${ _ko('Capture output') }', value: properties().capture_output, title: '${ _ko('If capturing the output of the shell script') }' }} --><!-- /ko -->
+        <!-- /ko -->
       </form>
     </div>
-    <a class="pointer demi-modal-chevron" data-bind="click: function() { settingsVisible(! settingsVisible()) }"><i class="fa fa-chevron-up"></i></a>
+    <a class="pointer demi-modal-chevron" data-bind="click: toggleSettingsVisible"><i class="fa fa-chevron-up"></i></a>
   </div>
 </script>
 
@@ -1042,7 +1076,16 @@ else:
 
   <div class="row-fluid" style="margin-bottom: 5px">
 
-    <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace, visible: ! $root.isResultFullScreenMode() && ! ($root.isPresentationMode() && $root.isHidingCode())">
+    <div class="editor span12" 
+     data-bind="cssWithFunction: { 
+                  functionPath: '$root.getEditorCssClasses', 
+                  params: [] 
+                }, 
+                clickForAceFocus: ace, 
+                visibleWithFunction: { 
+                  functionPath: '$root.isEditorVisible', 
+                  params: [] 
+                }">
       <!-- ko if: statementType() == 'file' -->
         <div class="margin-top-10">
           <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Query File')}</label>
@@ -1080,21 +1123,16 @@ else:
         <div class="clearfix margin-bottom-20"></div>
       <!-- /ko -->
 
-      <div class="ace-editor" data-bind="visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(), css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow: 'slow', aceEditor: {
-        snippet: $data,
-        contextTooltip: '${ _ko("Right-click for details") }',
-        expandStar: '${ _ko("Right-click to expand with columns") }',
-        highlightedRange: result.statement_range,
-        readOnly: $root.isPresentationMode(),
-        aceOptions: {
-          showLineNumbers: $root.editorMode(),
-          showGutter: $root.editorMode(),
-          maxLines: $root.editorMode() ? null : 25,
-          minLines: $root.editorMode() ? null : 3
-        }
-      }, style: {opacity: statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1', 'min-height': $root.editorMode() ? '0' : '48px', 'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'}"></div>
-      <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace.bind($data), snippet: $data } } --><!-- /ko -->
-      <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace.bind($data), parentDropTarget: '.editor' } } --><!-- /ko -->
+      <div class="ace-editor" data-bind="visible: $root.isEditorVisible, 
+      
+      css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, 
+      attr: { id: id() }, 
+      delayedOverflow: 'slow', 
+      aceBinding: {},
+      style: $root.getEditorStyles"></div>
+
+      <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace, snippet: $data } } --><!-- /ko -->
+      <!-- ko component: { name: 'hue-editor-droppable-menu', params: { editor: ace, parentDropTarget: '.editor' } } --><!-- /ko -->
     </div>
 
     <div class="clearfix"></div>
@@ -1626,14 +1664,18 @@ else:
 
 <script type="text/html" id="snippet-execution-status${ suffix }">
   <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
-    <a class="inactive-action pull-left snippet-logs-btn" href="javascript:void(0)" data-bind="visible: status() === 'running' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Toggle Logs') }"><i class="fa fa-fw" data-bind="css: { 'fa-caret-right': !$data.showLogs(), 'fa-caret-down': $data.showLogs() }"></i></a>
+    <a class="inactive-action pull-left snippet-logs-btn" href="javascript:void(0)"
+      data-bind="visible: isLogsButtonVisible, click: toggleLogs, css: {'blue': showLogs}"
+      title="${ _('Toggle Logs') }">
+      <i class="fa fa-fw" data-bind="css: { 'fa-caret-right': !showLogs(), 'fa-caret-down': showLogs() }"></i>
+    </a>
     <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-sql-analyzer-report'">
       <div class="progress-snippet progress" data-bind="css: {
         'progress-starting': progress() == 0 && (status() == 'running' || status() == 'starting'),
         'progress-warning': progress() > 0 && progress() < 100,
         'progress-success': progress() == 100,
         'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
-        <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2, progress())) + '%'}"></div>
+        style: {'width': progressBarWidth}
       </div>
     </div>
     <div class="snippet-error-container alert alert-error" style="margin-bottom: 0" data-bind="visible: errors().length > 0">
@@ -1660,7 +1702,10 @@ else:
         <li data-bind="text: message"></li>
       </ul>
     </div>
-    <div class="snippet-error-container alert alert-error" style="margin-bottom: 0" data-bind="visible: status() == 'canceled', click: function() { status('ready'); }" title="${ _('Click to hide') }">
+    <div class="snippet-error-container alert alert-error" 
+     style="margin-bottom: 0" 
+     data-bind="visible: isErrorVisible, click: resetStatus" 
+     title="${ _('Click to hide') }">
       <ul class="unstyled">
         <li>${ _("The statement was canceled.") }</li>
       </ul>
