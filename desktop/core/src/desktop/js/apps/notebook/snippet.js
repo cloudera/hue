@@ -198,6 +198,23 @@ class Snippet {
 
     self.connector = ko.observable();
 
+    self.showExecutableSnippetBody = ko.pureComputed(() => {
+      const executableTypes = ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'];
+      return executableTypes.indexOf(self.type()) !== -1;
+    });
+
+    self.shouldShowSnippetExecutionControls = ko.pureComputed(() => {
+      return ['text', 'markdown'].indexOf(self.type()) === -1 && !self.isResultFullScreenMode();
+    });
+
+    self.shouldShowSnippetExecutionStatus = ko.pureComputed(() => {
+      return ['text', 'markdown'].indexOf(self.type()) === -1;
+    });
+    self.showCodeEditorSnippetBody = ko.pureComputed(() => {
+      const nonCodeTypes = ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'];
+      return nonCodeTypes.indexOf(self.type()) === -1;
+    });
+
     const updateConnector = id => {
       if (id) {
         self.connector(findEditorConnector(connector => connector.id === id));
@@ -272,6 +289,14 @@ class Snippet {
     });
 
     self.editorMode = vm.editorMode;
+
+    this.maxLines = ko.pureComputed(() => {
+      return this.editorMode() ? null : 25;
+    });
+  
+    this.minLines = ko.pureComputed(() => {
+      return this.editorMode() ? null : 3;
+    });
 
     self.getAceMode = function () {
       return vm.getSnippetViewSettings(self.type()).aceMode;
@@ -483,6 +508,8 @@ class Snippet {
         ? snippet.statementType
         : 'text'
     );
+
+
     self.statementTypes = ko.observableArray(['text', 'file']); // Maybe computed later for Spark
     if (!vm.editorMode()) {
       self.statementTypes.push('document');

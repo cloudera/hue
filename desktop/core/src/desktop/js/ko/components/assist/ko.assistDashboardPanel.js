@@ -46,6 +46,10 @@ class AssistDashboardPanel {
 
     this.filteredTables = AssistantUtils.getFilteredTablesPureComputed(this);
 
+    this.hasFilteredTables = ko.computed(function() {
+      return this.filteredTables.length > 0;
+    });
+    
     this.someLoading = ko.pureComputed(() => {
       return this.activeTables().some(table => {
         return table.loading() || (!table.hasEntries() && !table.hasErrors());

@@ -269,6 +269,24 @@ export default class Snippet {
 
     this.editorMode = this.parentVm.editorMode;
 
+    this.initializeAce = () => {
+      this.ace.bind(this);
+    };
+    this.showCodeEditorSnippetBody = ko.pureComputed(() => {
+      const nonCodeTypes = ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'];
+      return nonCodeTypes.indexOf(this.type()) === -1;
+    });
+    
+    this.executionTimeFormatted = ko.computed(function() {
+      return this.result.executionTime().toHHMMSS();
+    });
+  
+    // Method to determine visibility
+    this.isExecutionTimerVisible = ko.computed(function() {
+      return this.type() !== 'text' && this.status() !== 'ready' && this.status() !== 'loading';
+    });
+
+
     this.explanation = ko.observable();
 
     this.getAceMode = () => this.parentVm.getSnippetViewSettings(this.dialect()).aceMode;
@@ -355,6 +373,27 @@ export default class Snippet {
         this.ace().setValue('', 1);
       }
     });
+
+
+  this.getEditorStyles = function() {
+    const styles = {};
+    if (this.statementType() !== 'text' || this.isPresentationMode()) {
+      styles.opacity = '0.75';
+    } else {
+      styles.opacity = '1';
+    }
+    if (this.editorMode()) {
+      styles['min-height'] = '0';
+    } else {
+      styles['min-height'] = '48px';
+    }
+    if (this.editorMode() && this.statementType() !== 'text') {
+      styles.top = '60px';
+    } else {
+      styles.top = '0';
+    }
+    return styles;
+  };
     this.statement_raw = ko.observable(snippetRaw.statement_raw || '');
     this.selectedStatement = ko.observable('');
     this.positionStatement = ko.observable(null);
@@ -421,6 +460,20 @@ export default class Snippet {
       () => Object.keys(komapping.toJS(this.properties())).length > 0
     );
 
+    this.hasDriverCores = ko.computed(() => typeof this.properties().driverCores !== 'undefined');
+    this.hasExecutorCores = ko.computed(() => typeof this.properties().executorCores !== 'undefined');
+    this.hasNumExecutors = ko.computed(() => typeof this.properties().numExecutors !== 'undefined');
+    this.hasQueue = ko.computed(() => typeof this.properties().queue !== 'undefined');
+    this.hasArchives = ko.computed(() => typeof this.properties().archives !== 'undefined');
+    this.hasFiles = ko.computed(() => typeof this.properties().files !== 'undefined');
+    this.hasFunctions = ko.computed(() => typeof this.properties().functions !== 'undefined');
+    this.hasSettings = ko.computed(() => typeof this.properties().settings !== 'undefined');
+    this.hasSparkOpts = ko.computed(() => typeof this.properties().spark_opts !== 'undefined');
+    this.hasParameters = ko.computed(() => typeof this.properties().parameters !== 'undefined');
+    this.hasHadoopProperties = ko.computed(() => typeof this.properties().hadoopProperties !== 'undefined');
+    this.hasResources = ko.computed(() => typeof this.properties().resources !== 'undefined');
+    this.hasCaptureOutput = ko.computed(() => typeof this.properties().capture_output !== 'undefined');
+  
     this.viewSettings = ko.pureComputed(() => this.parentVm.getSnippetViewSettings(this.dialect()));
 
     const previousProperties = {};
@@ -469,6 +522,20 @@ export default class Snippet {
     this.showLogs = ko.observable(snippetRaw.showLogs || defaultShowLogs);
     this.jobs = ko.observableArray(snippetRaw.jobs || []);
 
+    // Method to toggle logs
+    this.toggleLogs = () => {
+      hideFixedHeaders();
+      this.showLogs(!this.showLogs());
+    };
+
+    this.isLogsButtonVisible = ko.computed(() => {
+      return this.status() === 'running' && this.errors().length === 0;
+    });
+
+    this.progressBarWidth = ko.computed(() => {
+      return (this.errors().length > 0 ? 100 : Math.max(2, this.progress())) + '%';
+    });
+
     this.executeNextTimeout = -1;
     this.refreshTimeouts = {};
 
@@ -489,6 +556,25 @@ export default class Snippet {
 
     this.settingsVisible = ko.observable(!!snippetRaw.settingsVisible);
     this.saveResultsModalVisible = ko.observable(false);
+
+    this.toggleSettingsVisible = () => {
+      this.settingsVisible(!this.settingsVisible());
+    };
+
+    // Computed observable to determine if the error container should be visible
+    this.isErrorVisible = ko.computed(() => {
+      return this.status() === 'canceled';
+    });
+
+    // Method to reset the status
+    this.resetStatus = () => {
+      this.status('ready');
+    };
+    
+    this.shouldShowSnippetExecutionStatus = ko.computed(() => {
+      console.log('this.type()', this.type());
+      return ['text', 'markdown'].indexOf(this.type()) === -1;
+    });
 
     this.complexity = ko.observable();
     this.hasComplexity = ko.pureComputed(

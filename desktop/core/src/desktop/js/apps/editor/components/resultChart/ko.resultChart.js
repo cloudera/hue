@@ -528,6 +528,14 @@ class ResultChart extends DisposableComponent {
 
     this.editorMode = params.editorMode;
     this.isPresentationMode = params.isPresentationMode;
+    this.maxLines = ko.pureComputed(() => {
+      return self.editorMode() ? null : 25;
+    });
+  
+    this.minLines = ko.pureComputed(() => {
+      return self.editorMode() ? null : 3;
+    });
+    
     this.bottomExpanded = params.bottomExpanded;
     this.resultsKlass = params.resultsKlass;
     this.id = params.id; // TODO: Get rid of

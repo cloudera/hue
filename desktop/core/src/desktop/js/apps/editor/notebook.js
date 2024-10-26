@@ -69,24 +69,24 @@ export default class Notebook {
       return this.isPresentationMode() || this.isResultFullScreenMode() ? '40px' : '0';
     });
 
-    this.showCodeEditorSnippetBody = ko.pureComputed(() => {
-      const nonCodeTypes = ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'];
-      return nonCodeTypes.indexOf(this.type()) === -1;
+
+    this.aceOptions = ko.pureComputed(() => {
+      const options = {
+        showLineNumbers: this.editorMode(),
+        showGutter: this.editorMode()
+      };
+  
+      if (this.editorMode()) {
+        options.maxLines = null;
+        options.minLines = null;
+      } else {
+        options.maxLines = 25;
+        options.minLines = 3;
+      }
+  
+      return options;
     });
   
-    this.showExecutableSnippetBody = ko.pureComputed(() => {
-      const executableTypes = ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'];
-      return executableTypes.indexOf(this.type()) !== -1;
-    });
-
-    this.shouldShowSnippetExecutionControls = ko.pureComputed(() => {
-      return ['text', 'markdown'].indexOf(this.type()) === -1 && !this.isResultFullScreenMode();
-    });
-
-    this.shouldShowSnippetExecutionStatus = ko.pureComputed(() => {
-      return ['text', 'markdown'].indexOf(this.type()) === -1;
-    });
-
         // Define the stop function
         this.handleStop = function (event, ui) {
           const $element = $(event.target);
@@ -152,6 +152,7 @@ export default class Notebook {
           return _par;
         }
 
+
     this.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
     this.directoryUuid = ko.observable(notebookRaw.directoryUuid);
     this.dependents = komapping.fromJS(notebookRaw.dependents || []);
@@ -174,6 +175,32 @@ export default class Notebook {
         : []
     );
     
+
+  this.getEditorStyles = function() {
+    const styles = {};
+    if (this.statementType() !== 'text' || this.isPresentationMode()) {
+      styles.opacity = '0.75';
+    } else {
+      styles.opacity = '1';
+    }
+    if (this.editorMode()) {
+      styles['min-height'] = '0';
+    } else {
+      styles['min-height'] = '48px';
+    }
+    if (this.editorMode() && this.statementType() !== 'text') {
+      styles.top = '60px';
+    } else {
+      styles.top = '0';
+    }
+    return styles;
+  };
+  
+
+  this.i18ns = {
+    contextTooltip: I18n("Right-click for details"),
+    expandStar: I18n("Right-click to expand with columns")
+  };
 
     this.schedulerViewModel = null;
     this.schedulerViewModelIsLoaded = ko.observable(false);
@@ -199,6 +226,18 @@ export default class Notebook {
     this.viewSchedulerId.subscribe(() => {
       this.save();
     });
+    
+    // Computed observable for the ifnot condition
+    this.needsSaving = ko.computed(function() {
+      return !this.isSaved() && !this.isHistory();
+    });
+
+    // Computed observable for the if condition
+    this.isSavedAndNotHistory = ko.computed(function() {
+      return this.isSaved() && !this.isHistory();
+    });
+
+          
     this.isSchedulerJobRunning = ko.observable();
     this.loadingScheduler = ko.observable(false);
 

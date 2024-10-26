@@ -26,7 +26,9 @@ class Session {
     self.selectedSessionProperty = ko.observable('');
 
     self.restarting = ko.observable(false);
-
+    self.hasValidSessionId = ko.computed(() => {
+      return self.session_id !== undefined && self.session_id !== null;
+    });
     if (!ko.isObservable(self.properties)) {
       self.properties = ko.observableArray();
     }

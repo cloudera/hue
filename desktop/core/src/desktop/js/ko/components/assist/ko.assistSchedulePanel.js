@@ -26,10 +26,10 @@ const TEMPLATE = `
       <!-- ko if: showBatchableSection -->
       <!-- ko with: selectedNotebook() -->
       <div class="tab-pane" id="scheduleTab">
-        <!-- ko ifnot: isSaved() && ! isHistory() -->
+        <!-- ko if: needsSaving -->
         ${I18n('Query needs to be saved.')}
         <!-- /ko -->
-        <!-- ko if: isSaved() && ! isHistory() -->
+        <!-- ko if: isSavedAndNotHistory -->
           <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
           <a data-bind="click: saveScheduler" href="javascript: void(0);">${I18n(
             'Save changes'

@@ -274,8 +274,10 @@ ${ hueIcons.symbols() }
           <h4 class="margin-bottom-30"><i class="fa fa-cogs"></i> ${_('Session')}</h4>
           <div class="context-panel-content">
             <!-- ko if: sessionsAvailable() && templateApp() -->
+            <button data-bind="click: logActiveAppViewModel">Log Active App ViewModel</button>
             <div class="row-fluid">
-              <div class="span11" data-bind="template: { name: 'notebook-session-config-template' + templateApp(), data: activeAppViewModel }"></div>
+              <div class="span11" 
+                data-bind="template: { name: notebookSessionConfigTemplateName, data: activeAppViewModel }"></div>
             </div>
             <!-- /ko -->
 

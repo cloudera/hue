@@ -50,13 +50,6 @@ const TEMPLATE = `
     </div>
   </div>
 
-  <div class="hue-drop-down-container hue-drop-down-fixed" data-bind="event: { 'mousedown': facetDropDownMouseDown }, css: { 'open' : facetDropDownVisible() }, dropDownKeyUp: { onEsc: facetDropDownOnEsc, onEnter: facetDropDownOnEnter, onSelected: facetDropDownOnSelected, dropDownVisible: facetDropDownVisible }">
-    <div class="dropdown-menu" style="overflow-y: auto;" data-bind="visible: facetSuggestions().length > 0">
-      <ul class="hue-inner-drop-down" data-bind="foreach: facetSuggestions">
-        <li><a href="javascript:void(0)" data-bind="html: label, click: function () { $parent.facetClicked($data); }, clickBubble: false"></a></li>
-      </ul>
-    </div>
-  </div>
 `;
 
 const getSortedFacets = facetIndex => {

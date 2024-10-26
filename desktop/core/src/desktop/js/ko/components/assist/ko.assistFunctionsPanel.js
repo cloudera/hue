@@ -78,13 +78,7 @@ const TEMPLATE = `
                   <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
                   <ul class="assist-functions" data-bind="slideVisible: open, foreach: functions">
                     <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
-                      <a class="assist-field-link" href="javascript: void(0);"
-                        data-bind="
-                          draggableText: { text: draggable, meta: { type: 'function' } },
-                          css: { 'blue': $parents[1].selectedFunction()=== $data },
-                          clickWithArgs: { handler: '$component.selectFunction', params: ['$parents[1]', '$data'] },
-                          text: signature">
-                      </a>
+
                     </li>
                   </ul>
                 </li>
@@ -341,7 +335,6 @@ class AssistFunctionsPanel {
     huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
   }
     selectFunction(parent, data) {
-      debugger;
       parent.selectedFunction(data);
     }
 }

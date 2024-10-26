@@ -106,6 +106,11 @@ class SidePanelViewModel {
       }
     });
 
+    self.notebookSessionConfigTemplateName = ko.computed(function() {
+      console.log('self.templateApp()', self.templateApp());
+      return 'notebook-session-config-template' + self.templateApp();
+    });
+
     self.contextPanelVisible = ko.observable(false);
     self.contextPanelVisible.subscribe(() => {
       let $el = $('.snippet .ace-editor:visible');

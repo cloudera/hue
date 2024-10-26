@@ -60,7 +60,7 @@ const TEMPLATE =
         </div>
       </div>
       <div class="assist-flex-fill assist-db-scrollable" data-bind="delayedOverflow">
-        <!-- ko if: shouldShowNoFilteredTablesMessage -->
+        <!-- ko if: $root.shouldShowNoFilteredTablesMessage -->
         <div class="assist-no-entries">
           <!-- ko if: isSolr -->
           ${I18n('No indexes selected.')}
@@ -73,7 +73,7 @@ const TEMPLATE =
         <!-- ko if: shouldShowNoTablesMessage -->
         <div class="assist-no-entries">${I18n('No entries found')}</div>
         <!-- /ko -->
-        <!-- ko if: filteredTables().length > 0 -->
+        <!-- ko if: hasFilteredTables -->
         <ul class="database-tree assist-tables" data-bind="foreachVisible: { data: filteredTables, minHeight: 22, container: '.assist-db-scrollable', skipScrollEvent: true }">
           <!-- ko if: hasErrors -->
           <li class="assist-table hue-warning" data-bind="attr: { 'title': $parent.isSolr() ? '${I18n(
@@ -293,9 +293,10 @@ class AssistEditorContextPanel {
         })
         .extend({ rateLimit: 300 })
     };
-    self.shouldSpinHueSpinner = ko.pureComputed(() => {
-      const querySpec = self.filter.querySpec();
-      return querySpec && querySpec.query !== '' && self.someLoading();
+
+    this.shouldSpinHueSpinner = ko.pureComputed(() => {
+      const querySpec = this.filter.querySpec();
+      return querySpec && querySpec.query !== '' && this.someLoading();
     });
 
     this.placeHolder = ko.pureComputed(() => {
@@ -318,6 +319,10 @@ class AssistEditorContextPanel {
     });
 
     this.filteredTables = AssistantUtils.getFilteredTablesPureComputed(this);
+
+    this.hasFilteredTables = ko.computed(() => {
+      return this.filteredTables().length > 0;
+    });
 
     const navigationSettings = {
       showStats: true,
@@ -357,7 +362,7 @@ class AssistEditorContextPanel {
     };
 
     this.shouldShowNoFilteredTablesMessage = ko.pureComputed(() => {
-      debugger;
+
       console.log("test")
       const querySpec = this.filter.querySpec();
       return this.filteredTables().length === 0 && (!querySpec || querySpec.query === '');

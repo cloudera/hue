@@ -63,6 +63,15 @@ export default class NotebookViewModel {
         : self.editorType();
     });
     self.activeConnector = ko.observable();
+    // Observable to hold the editor instance
+    self.editorInstance = ko.observable();
+
+    // Method to initialize the editor
+    self.initializeEditor = function(element) {
+      const editor = ace.edit(element);
+      console.log("initializeEditor", editor);
+      self.editorInstance(editor);
+    };
 
     const updateConnector = id => {
       if (id) {
@@ -173,6 +182,84 @@ export default class NotebookViewModel {
     });
     self.selectedNotebook = ko.observable();
 
+    
+    this.maxLines = ko.pureComputed(() => {
+      return self.editorMode() ? null : 25;
+    });
+  
+    this.minLines = ko.pureComputed(() => {
+      return self.editorMode() ? null : 3;
+    });
+        // Initialize currentSnippetData as a Knockout observable
+        this.currentSnippetData = ko.observable();
+
+        // Method to update the current snippet data
+        this.updateSnippetData = function(data) {
+          this.currentSnippetData(data);
+        };
+
+        
+
+    this.getAceEditorConfigs = ko.pureComputed(() => {
+      console.log(data)
+      return {
+        contextTooltip: I18n('Right-click for details'),
+        expandStar: I18n('Right-click to expand with columns'),
+
+      }
+      // return {
+      //   snippet: data,
+      //   contextTooltip: self.i18ns.contextTooltip,
+      //   expandStar: self.i18ns.expandStar,
+      //   highlightedRange: result.statement_range,
+      //   readOnly: self.isPresentationMode(),
+      //   aceOptions: self.getAceOptions()
+      // };
+    });
+
+
+    this.aceEditorConfig = ko.computed(() => {
+      const data = this.currentSnippetData();
+      if (!data) {
+        return {};
+      }
+
+      const aceOptions = {
+        showLineNumbers: true, // Example option
+        showGutter: true,      // Example option
+        maxLines: 25,          // Example option
+        minLines: 3            // Example option
+      };
+
+      return {
+        aceEditor: {
+          snippet: data,
+          aceOptions: aceOptions
+        },
+        contextTooltip: I18n('Right-click for details'),
+        expandStar: I18n('Right-click to expand with columns'),
+        highlightedRange: data.result.statement_range,
+        readOnly: self.isPresentationMode()
+      };
+    });
+
+    this.getAceOptions = ko.pureComputed(() => {
+      const options = {
+        showLineNumbers: self.editorMode(),
+        showGutter: self.editorMode()
+      };
+  
+      if (self.editorMode()) {
+        options.maxLines = null;
+        options.minLines = null;
+      } else {
+        options.maxLines = 25;
+        options.minLines = 3;
+      }
+  
+      return options;
+    });
+
     self.combinedContent = ko.observable();
     self.isPresentationModeEnabled = ko.pureComputed(() => {
       return (
@@ -182,6 +269,7 @@ export default class NotebookViewModel {
       );
     });
     self.isResultFullScreenMode = ko.observable(false);
+
 
 
     self.isPresentationMode = ko.computed(() => {
@@ -501,6 +589,38 @@ export default class NotebookViewModel {
       }
       return options.snippetViewSettings.default;
     };
+
+
+    self.getEditorCssClasses = function() {
+      return {
+        'single-snippet-editor ace-container-resizable': self.editorMode()
+      };
+    };
+
+    self.getEditorStyles = function() {
+      const styles = {};
+      if (self.selectedNotebook().statementType() !== 'text' || self.selectedNotebook().isPresentationMode()) {
+        styles.opacity = '0.75';
+      } else {
+        styles.opacity = '1';
+      }
+      if (self.selectedNotebook().editorMode()) {
+        styles['min-height'] = '0';
+      } else {
+        styles['min-height'] = '48px';
+      }
+      if (self.selectedNotebook().editorMode() && self.selectedNotebook().statementType() !== 'text') {
+        styles.top = '60px';
+      } else {
+        styles.top = '0';
+      }
+      return styles;
+    };
+    
+    self.isEditorVisible = function() {
+      return !self.isResultFullScreenMode() && !(self.isPresentationMode() && self.isHidingCode());
+    };
+
 
     self.availableSessionProperties = ko.computed(() => {
       // Only Spark

@@ -335,7 +335,13 @@ huePubSub.subscribe('app.dom.loaded', app => {
         renderer();
       }
     };
+
+    const onLogResizerResize = function() {
+      hideFixedHeaders();
+      redrawFixedHeaders(500);
+    };
     window.redrawFixedHeaders = redrawFixedHeaders;
+    window.onLogResizerResize = onLogResizerResize;
 
     const replaceAce = content => {
       const snip = viewModel.selectedNotebook().snippets()[0];

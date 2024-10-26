@@ -31,10 +31,10 @@ export const NAME = 'aceEditor';
 export const INSERT_AT_CURSOR_EVENT = 'editor.insert.at.cursor';
 
 registerBinding(NAME, {
-  init: function (element, valueAccessor) {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     const $el = $(element);
     const options = ko.unwrap(valueAccessor());
-    const snippet = options.snippet;
+    const snippet = options.snippet || bindingContext.$data;
     const aceOptions = options.aceOptions || {};
 
     const disposeFunctions = [];

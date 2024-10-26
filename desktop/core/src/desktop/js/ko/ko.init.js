@@ -25,12 +25,104 @@ var options = {
   noVirtualElements: false       // allows the use of Knockout virtual elements
 };
 
-var is_ksb_enabled = false
+var is_ksb_enabled = true
 console.log("is_ksb_enabled     :"+is_ksb_enabled )
 if(is_ksb_enabled) {
   ko.bindingProvider.instance = new ksb(options); // Use the imported 'ksb' as the constructor
 }
 
+ko.bindingHandlers.logRoot = {
+  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    console.log('Root context:', bindingContext.$root);
+
+    // Log all the bound values
+    const bindings = allBindings();
+    console.log('All bindings for element:', element);
+    for (const binding in bindings) {
+      if (bindings.hasOwnProperty(binding)) {
+        console.log(`${binding}:`, ko.unwrap(bindings[binding]));
+      }
+    }
+  }
+};
+
+ko.bindingHandlers.aceEditorInit = {
+  init: function (element, valueAccessor) {
+    // Initialize the Ace editor
+    const editor = ace.edit(element);
+    // Get the observable to store the editor instance
+    const options = valueAccessor();
+    if (ko.isObservable(options)) {
+      options(editor);
+    }
+
+    // Clean up the editor instance when the element is removed
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+      editor.destroy();
+    });
+  }
+};
+
+ko.bindingHandlers.aceBinding = {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    // Prepare the configuration for aceEditor
+    const config = {
+      snippet: bindingContext.$data,
+      contextTooltip: I18n('Right-click for details'),
+      expandStar: I18n('Right-click to expand with columns'),
+      highlightedRange: bindingContext.$data.result.statement_range,
+      readOnly: bindingContext.$root.isPresentationMode(),
+      aceOptions: bindingContext.$root.getAceOptions()
+    };
+
+    // Call the aceEditor binding's init function with the prepared config
+    ko.bindingHandlers.aceEditor.init(element, () => config, allBindings, viewModel, bindingContext);
+  },
+  update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    // Prepare the configuration for aceEditor
+    const config = {
+      snippet: bindingContext.$data,
+      contextTooltip: I18n('Right-click for details'),
+      expandStar: I18n('Right-click to expand with columns'),
+      highlightedRange: bindingContext.$data.result.statement_range,
+      readOnly: bindingContext.$root.isPresentationMode(),
+      aceOptions: bindingContext.$root.getAceOptions()
+    };
+
+    // Call the aceEditor binding's update function with the prepared config
+    ko.bindingHandlers.aceEditor.update(element, () => config, allBindings, viewModel, bindingContext);
+  }
+};
+
+// ko.init.js
+// ko.init.js
+ko.bindingHandlers.aceEditorConfig = {
+  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const data = bindingContext.$data; // Access the current data context
+    const config = valueAccessor(); // Get the value passed to the binding
+
+    // Define the aceOptions based on your requirements
+    const aceOptions = {
+      showLineNumbers: true, // Example option
+      showGutter: true,      // Example option
+      maxLines: 25,          // Example option
+      minLines: 3            // Example option
+    };
+    let configs = {
+      aceEditor: {
+        snippet: data,
+        aceOptions: aceOptions,
+
+        contextTooltip: I18n('Right-click for details'),
+        expandStar: I18n('Right-click to expand with columns'),
+        highlightedRange: data.result.statement_range,
+        readOnly: bindingContext.$parent.isPresentationMode()
+      },
+    };
+    // Return the configuration object including aceEditor with snippet and aceOptions
+    return configs;
+  }
+};
 // const sortableFunctionRegistry = {
 //   stopHandler: function(event, ui) {
 //     const $element = $(event.target);
@@ -124,6 +216,47 @@ init: function (element, valueAccessor, allBindingsAccessor) {
   }
 };
 
+ko.bindingHandlers.componentWithParams = {
+  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const options = valueAccessor();
+    const componentName = options.name; // Name of the component
+    const params = options.params || {}; // Parameters to pass to the component
+
+    // Resolve parameters from the binding context
+    const resolvedParams = {};
+    for (const key in params) {
+      resolvedParams[key] = resolveParameter(bindingContext, params[key]);
+    }
+
+    // Use afterRender to ensure the DOM is ready
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+      // Clean up if needed
+    });
+
+    // Apply the component binding
+    ko.applyBindingsToNode(element, {
+      component: {
+        name: componentName,
+        params: resolvedParams
+      }
+    }, bindingContext);
+
+    // Delay the initialization of the Ace editor
+    setTimeout(() => {
+      if (!resolvedParams.editor) {
+        const editorElement = $('.ace-editor');
+        if (editorElement) {
+          const editor = ace.edit(editorElement);
+          resolvedParams.editor = editor;
+        }
+      }
+    }, 100); // Delay for 100ms or adjust as needed
+
+    return { controlsDescendantBindings: true };
+  }
+};
+
+
 ko.bindingHandlers.clickWithArgs = {
   init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
     const options = valueAccessor();
@@ -143,6 +276,57 @@ ko.bindingHandlers.clickWithArgs = {
     };
 
     ko.utils.registerEventHandler(element, "click", newHandler);
+  }
+};
+
+ko.bindingHandlers.cssWithFunction = {
+  update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const options = valueAccessor();
+    const functionPath = options.functionPath;
+    const params = options.params || [];
+
+    // Resolve the function from the path
+    const cssFunction = resolveHandler(bindingContext, functionPath);
+    const resolvedParams = params.map(param => resolveParameter(bindingContext, param));
+
+    // Evaluate the function to get the CSS classes
+    const cssClasses = ko.unwrap(cssFunction.apply(bindingContext.$data, resolvedParams));
+
+    ko.bindingHandlers.css.update(element, () => cssClasses, allBindings, viewModel, bindingContext);
+  }
+};
+
+ko.bindingHandlers.styleWithFunction = {
+  update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const options = valueAccessor();
+    const functionPath = options.functionPath;
+    const params = options.params || [];
+
+    // Resolve the function from the path
+    const styleFunction = resolveHandler(bindingContext, functionPath);
+    const resolvedParams = params.map(param => resolveParameter(bindingContext, param));
+
+    // Evaluate the function to get the style attributes
+    const styles = ko.unwrap(styleFunction.apply(bindingContext.$data, resolvedParams));
+
+    ko.bindingHandlers.style.update(element, () => styles, allBindings, viewModel, bindingContext);
+  }
+};
+
+ko.bindingHandlers.visibleWithFunction = {
+  update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const options = valueAccessor();
+    const functionPath = options.functionPath;
+    const params = options.params || [];
+
+    // Resolve the function from the path
+    const visibleFunction = resolveHandler(bindingContext, functionPath);
+    const resolvedParams = params.map(param => resolveParameter(bindingContext, param));
+
+    // Evaluate the function to determine visibility
+    const isVisible = ko.unwrap(visibleFunction.apply(bindingContext.$data, resolvedParams));
+
+    ko.bindingHandlers.visible.update(element, () => isVisible, allBindings, viewModel, bindingContext);
   }
 };
 
@@ -184,6 +368,36 @@ function resolveHandler(bindingContext, path) {
 
   return context;
 }
+
+ko.bindingHandlers.conditionalTemplates = {
+  init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const options = valueAccessor();
+    const type = ko.unwrap(bindingContext.$data.type);
+    const suffix = ko.unwrap(bindingContext.$data.suffix);
+
+    const templates = options.templates;
+    let selectedTemplate = null;
+
+    // Evaluate each condition and select the appropriate template
+    for (const template of templates) {
+      if (template.condition(type)) {
+        selectedTemplate = template.name + suffix;
+        break;
+      }
+    }
+
+    if (selectedTemplate) {
+      ko.applyBindingsToNode(element, {
+        template: {
+          name: selectedTemplate,
+          data: bindingContext.$data
+        }
+      }, bindingContext);
+    }
+
+    return { controlsDescendantBindings: true };
+  }
+};
 
 ko.bindingHandlers.textWithArgs = {
   update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {

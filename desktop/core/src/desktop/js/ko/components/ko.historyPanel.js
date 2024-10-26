@@ -62,7 +62,7 @@ const TEMPLATE = `
                   'progress-warning': progress() > 0 && progress() < 100 && status() != 'failed',
                   'progress-success': progress() == 100
                   }" style="background-color: #FFF; width: 100%">
-          <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2, progress())) + '%'}"></div>
+          <div class="bar" data-bind="style: { width: progressBarWidth }"></div>
         </div>
       </div>
       <!-- /ko -->

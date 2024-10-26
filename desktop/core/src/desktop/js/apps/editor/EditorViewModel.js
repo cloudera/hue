@@ -52,6 +52,15 @@ export default class EditorViewModel {
     this.suffix = options.suffix;
     this.isNotificationManager = ko.observable(!!options.is_notification_manager);
     this.selectedNotebook = ko.observable();
+    this.tesss = ko.observable();
+
+    this.maxLines = ko.pureComputed(() => {
+      return self.editorMode() ? null : 25;
+    });
+  
+    this.minLines = ko.pureComputed(() => {
+      return self.editorMode() ? null : 3;
+    });
 
     this.firstSnippet = ko.pureComputed(
       () => this.selectedNotebook() && this.selectedNotebook().snippets()[0]
@@ -66,6 +75,7 @@ export default class EditorViewModel {
     );
 
     this.editorMode = ko.observable(options.mode === 'editor');
+
     this.config = ko.observable();
 
     this.sharingEnabled = ko.pureComputed(
@@ -80,6 +90,12 @@ export default class EditorViewModel {
     this.canSaveNotebook = ko.computed(function() {
       return this.selectedNotebook().name().length > 0;
     });
+
+    this.shouldShowSnippetCodeResizer = ko.computed(function() {
+      const excludedTypes = ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py'];
+      return this.editorMode() && !this.isResultFullScreenMode() && excludedTypes.indexOf(this.type()) === -1;
+    });
+    
 
     this.activeConnector = ko.pureComputed(() => {
       if (this.editorMode()) {
@@ -156,8 +172,73 @@ export default class EditorViewModel {
       this.isPresentationMode(!this.isPresentationMode());
     };
   
+    this.isCodeEditorSnippet = function(type) {
+      const nonCodeTypes = ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'];
+      return nonCodeTypes.indexOf(type) === -1;
+    };
+  
+    this.isTextSnippet = function(type) {
+      return type === 'text';
+    };
+  
+    this.isMarkdownSnippet = function(type) {
+      return type === 'markdown';
+    };
+  
+    this.isExecutableSnippet = function(type) {
+      const executableTypes = ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'];
+      return executableTypes.indexOf(type) !== -1;
+    };
+    this.i18nscontextTooltip = function() {
+      return  I18n("Right-click for details");
+    };
+  
+    this.getEditorCssClasses = function() {
+      const classes = {};
+      if (self.editorMode()) {
+        classes['single-snippet-editor ace-editor-resizable'] = true;
+      }
+      if (self.inFocus()) {
+        classes['active-editor'] = true;
+      }
+      return classes;
+    };
+
+    this.getEditorStyles = function() {
+      const styles = {};
+      if (self.statementType() !== 'text' || self.isPresentationMode()) {
+        styles.opacity = '0.75';
+      } else {
+        styles.opacity = '1';
+      }
+      if (self.editorMode()) {
+        styles['min-height'] = '0';
+      } else {
+        styles['min-height'] = '48px';
+      }
+      if (self.editorMode() && self.statementType() !== 'text') {
+        styles.top = '60px';
+      } else {
+        styles.top = '0';
+      }
+      return styles;
+    };
+  
+    this.isEditorVisible = function() {
+      if (self.statementType() === 'text') {
+        return true;
+      }
+      if (self.statementType() !== 'text' && self.externalStatementLoaded()) {
+        return true;
+      }
+      return false;
+    };
+  
+
+  
+
     this.presentationModeTitle = ko.pureComputed(() => {
-      return this.isPresentationMode() ? _ko('Exit presentation') : _ko('View as a presentation');
+      return this.isPresentationMode() ? I18n('Exit presentation') : I18n('View as a presentation');
     });
   
     this.presentationModeCss = ko.pureComputed(() => {
@@ -185,7 +266,7 @@ export default class EditorViewModel {
 
 
     this.saveButtonTitle = ko.pureComputed(function() {
-      return this.canSave() ? _ko('Save') : _ko('Save As');
+      return this.canSave() ? I18n('Save') : I18n('Save As');
     });
 
 

@@ -130,6 +130,26 @@ class Notebook {
         : false
     );
     self.isPresentationMode = ko.observable(false);
+
+    
+    // self.aceOptions = ko.pureComputed(() => {
+    //   const options = {
+    //     showLineNumbers: self.editorMode(),
+    //     showGutter: self.editorMode()
+    //   };
+  
+    //   if (self.editorMode()) {
+    //     options.maxLines = null;
+    //     options.minLines = null;
+    //   } else {
+    //     options.maxLines = 25;
+    //     options.minLines = 3;
+    //   }
+  
+    //   return options;
+    // });
+  
+    
     self.isPresentationModeInitialized = ko.observable(false);
     self.isPresentationMode.subscribe(newValue => {
       if (!newValue) {

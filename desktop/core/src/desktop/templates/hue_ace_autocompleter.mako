@@ -396,7 +396,7 @@ from desktop.lib.django_util import nonce_attribute
       function HueAceAutocompleter (params, element) {
         var self = this;
         self.disposeFunctions = [];
-        self.editor = params.editor;
+        self.editor = params.editor || params.editors;
         self.snippet = params.snippet || {};
         self.foreachVisible = ko.observable();
 
@@ -683,6 +683,10 @@ from desktop.lib.django_util import nonce_attribute
 
       ko.components.register('hueAceAutocompleter', {
         viewModel: { createViewModel: function (params, componentInfo) {
+          if (params.editor_ace ) {
+            params.editor = params.editor_ace(componentInfo);
+          }
+          
           return new HueAceAutocompleter(params, componentInfo.element);
         }},
         template: { element: 'hue-ace-autocompleter' }
