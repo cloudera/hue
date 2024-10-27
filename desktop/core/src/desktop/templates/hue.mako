@@ -24,6 +24,7 @@
   from desktop.models import hue_version
   from desktop.views import _ko, commonshare, login_modal
   from desktop.webpack_utils import get_hue_bundles
+  from desktop.lib.django_util import nonce_attribute
 
   from webpack_loader.templatetags.webpack_loader import render_bundle
 
@@ -44,7 +45,7 @@
   % if conf.COLLECT_USAGE.get():
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=${conf.GTAG_ID.get()}"></script>
-    <script>
+    <script ${nonce_attribute(request)}>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
@@ -110,8 +111,8 @@
   </ul>
 
   <!-- UserVoice JavaScript SDK -->
-  <script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
-  <script>
+  <script ${nonce_attribute(request)}>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+  <script ${nonce_attribute(request)}>
   UserVoice = window.UserVoice || [];
   function showClassicWidget() {
     UserVoice.push(['showLightbox', 'classic_widget', {
@@ -295,24 +296,25 @@ ${ hueIcons.symbols() }
 </div>
 ${ commonshare() | n,unicode }
 
-% for bundle in get_hue_bundles('hue'):
-  ${ render_bundle(bundle) | n,unicode }
+% for bundle in get_hue_bundles('login' if section == 'login' else 'hue', 'LOGIN' if section == 'login' else 'DEFAULT'):
+  <% text = render_bundle(bundle, config='LOGIN' if section == 'login' else 'DEFAULT').replace('<script ', '<script' + nonce_attribute(request) + ' ') %>
+  ${ text | n}
 % endfor
 
-<script src="${ static('desktop/js/polyfills.js') }"></script>
-<script src="${ static('desktop/ext/js/tether.js') }"></script>
-<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
-<script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }"></script>
-<script src="${ static('desktop/ext/js/tzdetect.js') }"></script>
+<scrip src="${ static('desktop/js/polyfills.js') }"></script>
+<scrip src="${ static('desktop/ext/js/tether.js') }"></script>
+<scrip src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
+<scrip src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }"></script>
+<scrip src="${ static('desktop/ext/js/tzdetect.js') }"></script>
 
-<script src="${ static('desktop/ext/js/bootstrap-fileupload.js') }"></script>
-<script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
-<script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
+<scrip src="${ static('desktop/ext/js/bootstrap-fileupload.js') }"></script>
+<scrip src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
+<scrip src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
+<scrip src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 
-<script src="${ static('desktop/js/share2.vm.js') }"></script>
+<scrip src="${ static('desktop/js/share2.vm.js') }"></script>
 
-<script>
+<scrip ${nonce_attribute(request)}>
   var shareViewModel = initSharing("#documentShareModal");
 </script>
 
@@ -334,7 +336,7 @@ ${ smart_str(login_modal(request).content) | n,unicode }
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
-${ commonHeaderFooterComponents.footer(messages) }
+${ commonHeaderFooterComponents.footer(messages, nonce) }
 
 ## This includes common knockout templates that are shared with the Job Browser page and the mini job browser panel
 ## available in the upper right corner throughout Hue
