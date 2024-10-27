@@ -409,12 +409,21 @@ class OnePageViewModel {
               self.extraEmbeddableURLParams('');
 
               self.processHeaders(response).done($rawHtml => {
-                // const nonce = window.nonce || ''; 
                 const scripts = $rawHtml.find('script');
-                scripts.each(function(k,v) {
-                  // console.log(scripts);
+                
+                // First, append all JSON scripts
+                scripts.each(function() {
                   const scriptType = this.getAttribute('type');
-                  if (scriptType !== 'text/html') {
+                  if (scriptType === 'application/json') {
+                    document.head.appendChild(this); // Append the JSON script to the document head
+                    initializeEditorComponent();
+                  }
+                });
+
+                // Then, append all other scripts
+                scripts.each(function() {
+                  const scriptType = this.getAttribute('type');
+                  if (scriptType !== 'application/json' && scriptType !== 'text/html') {
                     // Create a new script element
                     const script = document.createElement('script');
                     script.type = 'text/javascript'; // Set the type or copy it from the original script
@@ -427,8 +436,6 @@ class OnePageViewModel {
                     // If you need to remove original script from its current location, do it here
                     $(this).remove();
                   }
-                  
-                  
                 });
                 if (window.SKIP_CACHE.indexOf(app) === -1) {
                   self.embeddable_cache[app] = $rawHtml;

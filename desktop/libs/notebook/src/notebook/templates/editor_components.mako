@@ -27,7 +27,7 @@ from desktop.webpack_utils import get_hue_bundles
 from metadata.conf import has_optimizer, OPTIMIZER
 
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
-
+from desktop.lib.django_util import nonce_attribute
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
@@ -1899,6 +1899,7 @@ else:
   </div>
 </script>
 
+
 <div class="ace-filechooser" style="display:none;">
   <div class="ace-filechooser-close">
     <a class="pointer" data-bind="click: function(){ $('.ace-filechooser').hide(); }"><i class="fa fa-times"></i></a>
@@ -2052,215 +2053,11 @@ else:
 
 
 <%def name="commonJS(is_embeddable=False, bindableElement='editorComponents', suffix='')">
-
-<script type="text/javascript">
-  window.EDITOR_BINDABLE_ELEMENT = '#${ bindableElement }';
-
-  window.EDITOR_SUFFIX = '${ suffix }';
-
-  var HUE_PUB_SUB_EDITOR_ID = (window.location.pathname.indexOf('notebook') > -1) ? 'notebook' : 'editor';
-
-  window.EDITOR_VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode,antixss }, {
-    huePubSubId: HUE_PUB_SUB_EDITOR_ID,
-    user: '${ user.username }',
-    userId: ${ user.id },
-    suffix: '${ suffix }',
-    assistAvailable: true,
-    snippetViewSettings: {
-      default: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/sql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      code: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        snippetIcon: 'fa-code'
-      },
-      hive: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/hive',
-        snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
-        sqlDialect: true
-      },
-      hplsql: {
-        placeHolder: '${ _("Example: CREATE PROCEDURE name AS SELECT * FROM tablename limit 10 GO") }',
-        aceMode: 'ace/mode/hplsql',
-        snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
-        sqlDialect: true
-      },
-      impala: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/impala',
-        snippetImage: '${ static("impala/art/icon_impala_48.png") }',
-        sqlDialect: true
-      },
-      presto: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/presto',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      dasksql: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/dasksql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      elasticsearch: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/elasticsearch',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      druid: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/druid',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      bigquery: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/bigquery',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      phoenix: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/phoenix',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      ksql: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/ksql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      flink: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/flink',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      jar : {
-        snippetIcon: 'fa-file-archive-o '
-      },
-      mysql: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/mysql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      mysqljdbc: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/mysql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      oracle: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/oracle',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      pig: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        aceMode: 'ace/mode/pig',
-        snippetImage: '${ static("pig/art/icon_pig_48.png") }'
-      },
-      postgresql: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/pgsql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      solr: {
-        placeHolder: '${ _("Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space") }',
-        aceMode: 'ace/mode/mysql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      kafkasql: {
-        placeHolder: '${ _("Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space") }',
-        aceMode: 'ace/mode/mysql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      java : {
-        snippetIcon: 'fa-file-code-o'
-      },
-      py : {
-        snippetIcon: 'fa-file-code-o'
-      },
-      pyspark: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        aceMode: 'ace/mode/python',
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-      },
-      r: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        aceMode: 'ace/mode/r',
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-      },
-      scala: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        aceMode: 'ace/mode/scala',
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-      },
-      spark: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        aceMode: 'ace/mode/scala',
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-      },
-      spark2: {
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-      },
-      sparksql: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/sparksql',
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }',
-        sqlDialect: true
-      },
-      mapreduce: {
-        snippetIcon: 'fa-file-archive-o'
-      },
-      shell: {
-        snippetIcon: 'fa-terminal'
-      },
-      sqoop1: {
-        placeHolder: '${ _("Example: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1") }',
-        snippetImage: '${ static("sqoop/art/icon_sqoop_48.png") }'
-      },
-      distcp: {
-        snippetIcon: 'fa-files-o'
-      },
-      sqlite: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/sql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      text: {
-        placeHolder: '${ _('Type your text here') }',
-        aceMode: 'ace/mode/text',
-        snippetIcon: 'fa-header'
-      },
-      markdown: {
-        placeHolder: '${ _('Type your markdown here') }',
-        aceMode: 'ace/mode/markdown',
-        snippetIcon: 'fa-header'
-      }
-    }
-  });
-
-  window.EDITOR_ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
-
-  window.SQL_ANALYZER_AUTO_UPLOAD_QUERIES = '${ OPTIMIZER.AUTO_UPLOAD_QUERIES.get() }' === 'True';
-
-  window.SQL_ANALYZER_AUTO_UPLOAD_DDL = '${ OPTIMIZER.AUTO_UPLOAD_DDL.get() }' === 'True';
-
-  window.SQL_ANALYZER_QUERY_HISTORY_UPLOAD_LIMIT = ${ OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() };
-</script>
-
+  <script type="application/json" id="editorOptionsJson">
+    ${ options_json | n,unicode,antixss }
+  </script>
+  <script ${nonce_attribute(request)} src="${ static('desktop/js/editor-component.js') }"></script>
 </%def>
+
+
+  
