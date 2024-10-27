@@ -255,17 +255,40 @@ class OnePageViewModel {
           // Evaluate the scripts in the order they were defined in the page
           const nextScriptPromise = scriptPromises.shift();
           nextScriptPromise.done(scriptDetails => {
-            if (scriptDetails.contents) {
-              $.globalEval(scriptDetails.contents);
+            if (scriptDetails.url) {
+              // Assume the script URL is provided in scriptDetails.url
+              const script = document.createElement('script');
+              script.src = scriptDetails.url; // Set the source to the script URL
+      
+              // Callback when the script is loaded
+              script.onload = function() {
+                console.log(`Script with URL ${scriptDetails.url} loaded successfully.`);
+                evalScriptSync(); // Load the next script after this one has finished
+              };
+      
+              // Callback on loading error
+              script.onerror = function() {
+                console.error(`Error loading script with URL ${scriptDetails.url}`);
+                // Continue with next script even if the current one fails
+                evalScriptSync();
+              };
+      
+              document.head.appendChild(script);
+            } else {
+              // If there is no URL, just log the details and move on to the next script
+              console.log(scriptDetails);
+              evalScriptSync();
             }
-            evalScriptSync();
           });
         } else {
-          // All evaluated
+          // All scripts have been evaluated, resolve the original promise
           promise.resolve($rawHtml.children());
         }
       };
-
+      
+      // Assuming that `promise` is a Deferred object created elsewhere
+      // and `$rawHtml` references jQuery-wrapped DOM nodes that need to be processed.
+      
       evalScriptSync();
       return promise;
     };
@@ -386,6 +409,27 @@ class OnePageViewModel {
               self.extraEmbeddableURLParams('');
 
               self.processHeaders(response).done($rawHtml => {
+                // const nonce = window.nonce || ''; 
+                const scripts = $rawHtml.find('script');
+                scripts.each(function(k,v) {
+                  // console.log(scripts);
+                  const scriptType = this.getAttribute('type');
+                  if (scriptType !== 'text/html') {
+                    // Create a new script element
+                    const script = document.createElement('script');
+                    script.type = 'text/javascript'; // Set the type or copy it from the original script
+                    // If the original script has a 'src' attribute and is considered to be external
+                    if (this.src) {
+                      script.src = this.src;  // Set it on the new script element
+                      document.head.appendChild(script);  // Append the new script to the document head
+                    }
+                    
+                    // If you need to remove original script from its current location, do it here
+                    $(this).remove();
+                  }
+                  
+                  
+                });
                 if (window.SKIP_CACHE.indexOf(app) === -1) {
                   self.embeddable_cache[app] = $rawHtml;
                 }
