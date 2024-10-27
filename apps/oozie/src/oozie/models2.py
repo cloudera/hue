@@ -16,54 +16,43 @@
 # limitations under the License.
 
 from __future__ import division
-from builtins import str
-from past.builtins import basestring
-from builtins import object
-import json
-import logging
-import math
+
 import os
 import re
 import sys
+import json
+import math
 import time
 import uuid
-
+import logging
+from builtins import object, str
 from datetime import datetime, timedelta
-from dateutil.parser import parse
 from string import Template
 from xml.sax.saxutils import escape
 
-from django.urls import reverse
+from dateutil.parser import parse
 from django.db.models import Q
+from django.urls import reverse
+from django.utils.encoding import force_str
+from django.utils.translation import gettext as _
+from past.builtins import basestring
 
 from azure.abfs.__init__ import abfspath
-
 from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.json_utils import JSONEncoderForHTML
-from desktop.models import DefaultConfiguration, Document2, Document
-
-from hadoop.fs.hadoopfs import Hdfs
+from desktop.models import DefaultConfiguration, Document, Document2
 from hadoop.fs.exceptions import WebHdfsException
-
+from hadoop.fs.hadoopfs import Hdfs
 from liboozie.conf import SECURITY_ENABLED
 from liboozie.oozie_api import get_oozie
-from liboozie.submission2 import Submission
-from liboozie.submission2 import create_directories
+from liboozie.submission2 import Submission, create_directories
 from notebook.models import Notebook
-
 from oozie.conf import REMOTE_SAMPLE_DIR
-from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_timezone
-from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
-
-if sys.version_info[0] > 2:
-  from django.utils.encoding import force_str
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.encoding import force_unicode as force_str
-  from django.utils.translation import ugettext as _
+from oozie.importlib.workflows import InvalidTagWithNamespaceException, MalformedWfDefException, generate_v2_graph_nodes
+from oozie.utils import UTC_TIME_FORMAT, convert_to_server_timezone, utc_datetime_format
 
 WORKFLOW_DEPTH_LIMIT = 24
 LOG = logging.getLogger()
@@ -80,7 +69,7 @@ class Job(object):
     if params.get('nominal_time') == '':
       params['nominal_time'] = datetime.today().strftime(UTC_TIME_FORMAT)
 
-    return  [{'name': name, 'value': value} for name, value in params.items() if with_lib_path or name != 'oozie.use.system.libpath']
+    return [{'name': name, 'value': value} for name, value in params.items() if with_lib_path or name != 'oozie.use.system.libpath']
 
   @classmethod
   def get_workspace(cls, user):
@@ -296,7 +285,7 @@ class Workflow(Job):
     try:
       _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
     except WorkflowDepthReached:
-      LOG.warning("The Workflow: %s with id: %s, has reached the maximum allowed depth for Graph display " \
+      LOG.warning("The Workflow: %s with id: %s, has reached the maximum allowed depth for Graph display "
         % (oozie_workflow.appName, oozie_workflow.id))
       # Hide graph same as when total nodes > 30
       return {}
@@ -492,7 +481,7 @@ class Workflow(Job):
         [(workflow.uuid, Workflow(document=workflow, user=self.user)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)]
     )
 
-    xml = re.sub(re.compile('>\s*\n+', re.MULTILINE), '>\n', django_mako.render_to_string(tmpl, {
+    xml = re.sub(re.compile('>\\s*\n+', re.MULTILINE), '>\n', django_mako.render_to_string(tmpl, {
       'wf': self,
       'workflow': data['workflow'],
       'nodes': nodes,
@@ -554,7 +543,6 @@ class Workflow(Job):
               return node
         elif row['widgets'][0]['id'] == node_id:
           return row
-
 
     # Create wf data with above nodes
     return json.dumps({
@@ -626,7 +614,7 @@ def _update_adj_list(adj_list):
 
 def _dig_nodes(nodes, adj_list, user, wf_nodes, nodes_uuid_set):
   for node in nodes:
-    if type(node) != list:
+    if type(node) is not list:
       node = adj_list[node]
       if node['uuid'] not in nodes_uuid_set:
         properties = {}
@@ -698,9 +686,9 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes, nodes_uuid_set):
 def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
   wf_rows = []
   for node in nodes:
-    if type(node) == list and len(node) == 1:
+    if type(node) is list and len(node) == 1:
       node = node[0]
-    if type(node) != list:
+    if type(node) is not list:
       _append_to_wf_rows(
         wf_rows, nodes_uuid_set, row_id=adj_list[node]['uuid'],
         row={
@@ -813,6 +801,7 @@ def _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy, wor
     node_hierarchy.append(curr_node)
     return _get_hierarchy_from_adj_list_helper(adj_list, adj_list[curr_node]['ok_to'], node_hierarchy, workflow_depth - 1)
 
+
 def _create_graph_adjaceny_list(nodes):
   start_node = [node for node in nodes if node.get('node_type') == 'start'][0]
   adj_list = {'start': start_node}
@@ -846,11 +835,13 @@ class Node(object):
     if self.data['type'] == 'fork':
       links = [link for link in self.data['children'] if link['to'] in node_mapping]
       if len(links) != len(self.data['children']):
-        LOG.warning('Fork has some children links that do not exist, ignoring them: links %s, existing links %s, links %s, existing links %s' \
-                 % (len(links), len(self.data['children']), links, self.data['children']))
+        LOG.warning(
+          'Fork has some children links that do not exist, ignoring them: links %s, existing links %s, links %s, existing links %s'
+          % (len(links), len(self.data['children']), links, self.data['children'])
+        )
         self.data['children'] = links
 
-    if self.data['type'] == AltusAction.TYPE or (('altus' in mapping.get('cluster', '') and (self.data['type'] == SparkDocumentAction.TYPE \
+    if self.data['type'] == AltusAction.TYPE or (('altus' in mapping.get('cluster', '') and (self.data['type'] == SparkDocumentAction.TYPE
     or self.data['type'] == 'spark-document'))) or mapping.get('auto-cluster'):
       shell_command_name = self.data['name'] + '.sh'
       self.data['properties']['shell_command'] = shell_command_name
@@ -866,14 +857,14 @@ class Node(object):
       properties = notebook.get_data()['snippets'][0]['properties']
 
       self.data['properties']['main_class'] = properties['class']
-      self.data['properties']['app_jar'] = properties['app_jar'] # Not used here
+      self.data['properties']['app_jar'] = properties['app_jar']  # Not used here
       self.data['properties']['files'] = [{'value': f['path']} for f in properties['files']]
       self.data['properties']['arguments'] = [{'value': prop} for prop in properties['arguments']]
     elif self.data['type'] == SparkDocumentAction.TYPE or self.data['type'] == 'spark-document':
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
       properties = notebook.get_data()['snippets'][0]['properties']
 
-      if self.data['type'] == 'spark-document': # Oozie Document Action
+      if self.data['type'] == 'spark-document':  # Oozie Document Action
         self.data['properties']['app_name'] = properties['app_name']
 
       self.data['properties']['class'] = properties['class']
@@ -893,7 +884,7 @@ class Node(object):
         self.data['properties']['parameters'] = []
       for param in action['variables']:
         self.data['properties']['parameters'].insert(0, {'value': '%(name)s=%(value)s' % param})
-      self.data['properties']['arguments'] = [] # Not Picked yet
+      self.data['properties']['arguments'] = []  # Not Picked yet
 
       job_properties = []
       for prop in action['properties']['hadoopProperties']:
@@ -943,7 +934,6 @@ class Node(object):
       if '/' in shell_command and not [f for f in self.data['properties']['files'] if shell_command in f['value']]:
         self.data['properties']['files'].append({'value': shell_command})
         self.data['properties']['shell_command'] = Hdfs.basename(shell_command)
-
 
     elif self.data['type'] == MapReduceDocumentAction.TYPE:
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
@@ -1090,9 +1080,9 @@ class Node(object):
       node_type = ShellAction.TYPE
     elif self.data['type'] == AltusAction.TYPE:
       node_type = ShellAction.TYPE
-    elif mapping.get('cluster') and 'document' in node_type: # Workflow
+    elif mapping.get('cluster') and 'document' in node_type:  # Workflow
       node_type = ShellAction.TYPE
-    elif mapping.get('auto-cluster') and 'document' in node_type: # Scheduled workflow
+    elif mapping.get('auto-cluster') and 'document' in node_type:  # Scheduled workflow
       node_type = ShellAction.TYPE
 
     return 'editor2/gen/workflow-%s.xml.mako' % node_type
@@ -1347,7 +1337,7 @@ class HiveAction(Action):
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}') % {'type': TYPE.title()},
           'type': ''
      },
      # Common
@@ -1432,7 +1422,7 @@ class HiveServer2Action(Action):
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}') % {'type': TYPE.title()},
           'type': ''
      },
      'arguments': {
@@ -1529,7 +1519,7 @@ def _get_impala_url():
 class ImpalaAction(HiveServer2Action):
   # Executed as shell action until Oozie supports an Impala Action
   TYPE = 'impala'
-  DEFAULT_CREDENTIALS = '' # None at this time, need to upload user keytab
+  DEFAULT_CREDENTIALS = ''  # None at this time, need to upload user keytab
 
   FIELDS = HiveServer2Action.FIELDS.copy()
   del FIELDS['jdbc_url']
@@ -2258,7 +2248,6 @@ class SparkAction(Action):
     return [cls.FIELDS['files'], cls.FIELDS['jars']]
 
 
-
 class AltusAction(Action):
   TYPE = 'altus'
   FIELDS = {
@@ -2441,7 +2430,7 @@ class HiveDocumentAction(Action):
 
 class ImpalaDocumentAction(HiveDocumentAction):
   TYPE = 'impala-document'
-  DEFAULT_CREDENTIALS = '' # None at this time, need to upload user keytab
+  DEFAULT_CREDENTIALS = ''  # None at this time, need to upload user keytab
 
   FIELDS = HiveServer2Action.FIELDS.copy()
   del FIELDS['jdbc_url']
@@ -2606,11 +2595,11 @@ class SparkDocumentAction(Action):
           'value': [],
           'help_text': _('Arguments, one by one, e.g. 1000, /path/a.')
      },
-     'parameters': { # For Oozie Action Document
+     'parameters': {  # For Oozie Action Document
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}') % {'type': TYPE.title()},
           'type': ''
      },
      # Common
@@ -2668,7 +2657,7 @@ class PigDocumentAction(Action):
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}') % {'type': TYPE.title()},
           'type': ''
      },
      # Common
@@ -2742,7 +2731,7 @@ class SqoopDocumentAction(Action):
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}') % {'type': TYPE.title()},
           'type': ''
      },
      # Common
@@ -2816,7 +2805,7 @@ class DistCpDocumentAction(Action):
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}') % {'type': TYPE.title()},
           'type': ''
      },
       # Common
@@ -2873,7 +2862,7 @@ class ShellDocumentAction(Action):
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}') % {'type': TYPE.title()},
           'type': ''
      },
      # Common
@@ -2947,7 +2936,7 @@ class MapReduceDocumentAction(Action):
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}') % {'type': TYPE.title()},
           'type': ''
      },
      # Common
@@ -3057,7 +3046,6 @@ for node in NODES.values():
   WORKFLOW_NODE_PROPERTIES.update(node.FIELDS)
 
 
-
 def find_parameters(instance, fields=None):
   """Find parameters in the given fields"""
   if fields is None:
@@ -3078,6 +3066,7 @@ def find_parameters(instance, fields=None):
 
   return params
 
+
 def find_json_parameters(fields):
   # Input is list of json dict
   params = []
@@ -3092,13 +3081,15 @@ def find_json_parameters(fields):
 
   return params
 
+
 def find_dollar_variables(text):
-  return re.findall('[^\n\\\\]\$([^\{ \'\"\-;\(\)]+)', text, re.MULTILINE)
+  return re.findall('[^\n\\\\]\\$([^\\{ \'\"\\-;\\(\\)]+)', text, re.MULTILINE)
+
 
 def find_dollar_braced_variables(text):
   vars = set()
 
-  for var in re.findall('\$\{([A-Za-z0-9:_-]+)\}', text, re.MULTILINE):
+  for var in re.findall(r'\$\{([A-Za-z0-9:_-]+)\}', text, re.MULTILINE):
     if ':' in var:
       var = var.split(':', 1)[1]
     vars.add(var)
@@ -3162,9 +3153,9 @@ def import_workflow_from_hue_3_7(old_wf):
     wf_rows = []
 
     for node in nodes:
-      if type(node) == list and len(node) == 1:
+      if type(node) is list and len(node) == 1:
         node = node[0]
-      if type(node) != list:
+      if type(node) is not list:
         wf_rows.append({
           "widgets": [{
             "size": size, "name": node.name.title(), "id": uuids[node.id], "widgetType": "%s-widget" % node.node_type,
@@ -3193,7 +3184,7 @@ def import_workflow_from_hue_3_7(old_wf):
                         "widgets": c['widgets'],
                         "columns": []
                       }
-                    for c in col] if type(col) == list else [{
+                    for c in col] if type(col) is list else [{
                         "id": str(uuid.uuid4()),
                         "widgets": col['widgets'],
                         "columns": []
@@ -3222,11 +3213,10 @@ def import_workflow_from_hue_3_7(old_wf):
   if wf_rows:
     data['layout'][0]['rows'] = [data['layout'][0]['rows'][0]] + wf_rows + [data['layout'][0]['rows'][-1]]
 
-
   # Content
   def _dig_nodes(nodes):
     for node in nodes:
-      if type(node) != list:
+      if type(node) is not list:
         properties = {}
         if '%s-widget' % node.node_type in NODES:
           properties = dict(NODES['%s-widget' % node.node_type].get_fields())
@@ -3368,7 +3358,6 @@ def import_workflow_from_hue_3_7(old_wf):
   return Workflow(data=json.dumps(data))
 
 
-
 class Coordinator(Job):
   XML_FILE_NAME = 'coordinator.xml'
   PROPERTY_APP_PATH = 'oozie.coord.application.path'
@@ -3388,7 +3377,7 @@ class Coordinator(Job):
           'id': None,
           'uuid': None,
           'name': 'My Schedule',
-          'variables': [], # Aka workflow parameters
+          'variables': [],  # Aka workflow parameters
           'properties': {
               'description': '',
               'deployment_dir': '',
@@ -3429,11 +3418,11 @@ class Coordinator(Job):
     _data = self.data.copy()
 
     start_date = [a for a in self._data['properties']['parameters'] if a['name'] == 'start_date']
-    if start_date and type(start_date[0]['value']) == datetime:
+    if start_date and type(start_date[0]['value']) is datetime:
       start_date[0]['value'] = start_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%S')
 
     end_date = [a for a in self._data['properties']['parameters'] if a['name'] == 'end_date']
-    if end_date and type(end_date[0]['value']) == datetime:
+    if end_date and type(end_date[0]['value']) is datetime:
       end_date[0]['value'] = end_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%S')
 
     return _data
@@ -3446,10 +3435,10 @@ class Coordinator(Job):
 
   @property
   def data(self):
-    if type(self._data['properties']['start']) != datetime and not '$' in self._data['properties']['start']:
+    if type(self._data['properties']['start']) is not datetime and '$' not in self._data['properties']['start']:
       self._data['properties']['start'] = parse(self._data['properties']['start'])
 
-    if type(self._data['properties']['end']) != datetime and not '$' in self._data['properties']['end']:
+    if type(self._data['properties']['end']) is not datetime and '$' not in self._data['properties']['end']:
       self._data['properties']['end'] = parse(self._data['properties']['end'])
 
     if self.document is not None:
@@ -3462,7 +3451,7 @@ class Coordinator(Job):
 
   @property
   def name(self):
-    from notebook.connectors.oozie_batch import OozieApi # Import dependency
+    from notebook.connectors.oozie_batch import OozieApi  # Import dependency
 
     if self.data['properties']['document']:
       return _("%s for %s") % (OozieApi.SCHEDULE_JOB_PREFIX, self.data['name'] or self.data['type'])
@@ -3495,7 +3484,7 @@ class Coordinator(Job):
 
     # Get missed params from workflow
     for prop in self.workflow.find_parameters():
-      if not prop in params:
+      if prop not in params:
         params.add(prop)
 
     # Remove the ones filled up by coordinator
@@ -3566,7 +3555,7 @@ class Coordinator(Job):
 
     tmpl = "editor2/gen/coordinator.xml.mako"
     return re.sub(
-      re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})
+      re.compile('\\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})
     ).encode('utf-8', 'xmlcharrefreplace')
 
   def clear_workflow_params(self):
@@ -3575,7 +3564,7 @@ class Coordinator(Job):
 
   @property
   def properties(self):
-    props = [{'name': dataset['workflow_variable'], 'value': dataset['dataset_variable']} \
+    props = [{'name': dataset['workflow_variable'], 'value': dataset['dataset_variable']}
       for dataset in self.data['variables'] if dataset['dataset_type'] == 'parameter']
     props += self.data['properties']['parameters']
     return props
@@ -3681,7 +3670,6 @@ class Dataset(object):
     return not self.is_int(self.data['advanced_end_instance'])
 
 
-
 class Bundle(Job):
   XML_FILE_NAME = 'bundle.xml'
   PROPERTY_APP_PATH = 'oozie.bundle.application.path'
@@ -3735,7 +3723,7 @@ class Bundle(Job):
 
   @property
   def data(self):
-    if type(self._data['properties']['kickoff']) == str and sys.version_info[2] == 2:
+    if type(self._data['properties']['kickoff']) is str and sys.version_info[2] == 2:
       self._data['properties']['kickoff'] = parse(self._data['properties']['kickoff'])
 
     if self.document is not None:
@@ -3750,7 +3738,7 @@ class Bundle(Job):
     mapping.update(dict(list(self.get_coordinator_docs().values('uuid', 'name'))))
     tmpl = "editor2/gen/bundle.xml.mako"
     return force_str(
-              re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
+              re.sub(re.compile('\\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
                 'bundle': self,
                 'mapping': mapping
            })))
@@ -3794,7 +3782,7 @@ class Bundle(Job):
       params.add(param)
 
     # Remove the ones filled up by bundle
-    removable_names = [p['name']  for coord in self.data['coordinators'] for p in coord['properties']]
+    removable_names = [p['name'] for coord in self.data['coordinators'] for p in coord['properties']]
 
     return dict([(param, '') for param in list(params) if param not in removable_names])
 
@@ -3864,7 +3852,7 @@ def _save_workflow(workflow, layout, user, fs=None):
     dependency_docs = Document2.objects.filter(uuid__in=dependencies)
     workflow_doc.dependencies.add(*dependency_docs)
 
-  if workflow['properties'].get('imported'): # We convert from and old workflow format (3.8 <) to the latest
+  if workflow['properties'].get('imported'):  # We convert from and old workflow format (3.8 <) to the latest
     workflow['properties']['imported'] = False
     workflow_instance = Workflow(workflow=workflow, user=user)
     _import_workspace(fs, user, workflow_instance)
@@ -3922,7 +3910,6 @@ class WorkflowBuilder(object):
 
     return workflow_doc
 
-
   def create_notebook_workflow(self, user, notebook=None, name=None, managed=False):
     nodes = []
 
@@ -3945,7 +3932,7 @@ class WorkflowBuilder(object):
 
       nodes.append(node)
 
-    workflow_doc = self.get_workflow(nodes, name, notebook['uuid'], user, managed=managed) # TODO optionally save
+    workflow_doc = self.get_workflow(nodes, name, notebook['uuid'], user, managed=managed)  # TODO optionally save
 
     return workflow_doc
 
@@ -3963,7 +3950,7 @@ class WorkflowBuilder(object):
     return {
         u'id': node_id,
         u'name': u'hive-%s' % node_id[:4],
-        u"type": u"hive-document-widget", # if is_document_node else u"hive2-widget",
+        u"type": u"hive-document-widget",  # if is_document_node else u"hive2-widget",
         u'properties': {
             u'files': [],
             u'job_xml': u'',
@@ -4113,7 +4100,7 @@ class WorkflowBuilder(object):
 
     node = self._get_spark_node(node_id, user)
     node['properties']['class'] = snippet['properties']['class']
-    node['properties']['jars'] = snippet['properties']['app_jar'] # Not used, submission add it to oozie.libpath instead
+    node['properties']['jars'] = snippet['properties']['app_jar']  # Not used, submission add it to oozie.libpath instead
     node['properties']['files'] = [{'value': f['path']} for f in snippet['properties']['files']]
     node['properties']['spark_opts'] = snippet['properties']['spark_opts']
     node['properties']['spark_arguments'] = [{'value': f} for f in snippet['properties']['arguments']]
@@ -4427,7 +4414,7 @@ class WorkflowBuilder(object):
 
     node = self._get_java_node(node_id, credentials)
     node['properties']['main_class'] = snippet['properties']['class']
-    node['properties']['app_jar'] = snippet['properties']['app_jar'] # Not used, submission add it to oozie.libpath instead
+    node['properties']['app_jar'] = snippet['properties']['app_jar']  # Not used, submission add it to oozie.libpath instead
     node['properties']['files'] = [{'value': f['path']} for f in snippet['properties']['files']]
     node['properties']['arguments'] = [{'value': f} for f in snippet['properties']['arguments']]
 
@@ -4520,7 +4507,7 @@ class WorkflowBuilder(object):
     for node in nodes:
       data['workflow']['nodes'].append(node)
 
-      _prev_node['children'][0]['to'] = node['id'] # We link nodes
+      _prev_node['children'][0]['to'] = node['id']  # We link nodes
       _prev_node = node
 
     workflow_doc = _save_workflow(data['workflow'], {}, user)

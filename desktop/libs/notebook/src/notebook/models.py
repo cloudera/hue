@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import json
 import math
 import uuid
@@ -24,30 +23,22 @@ import numbers
 import datetime
 from builtins import object, str
 from datetime import timedelta
+from urllib.parse import quote as urllib_quote
 
 from django.contrib.sessions.models import Session
 from django.db.models import Count
 from django.db.models.functions import Trunc
 from django.utils.html import escape
+from django.utils.translation import gettext as _
 
 from desktop.conf import has_connectors
 from desktop.lib.connectors.models import _get_installed_connectors
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.lib.paths import SAFE_CHARACTERS_URI
 from desktop.models import Directory, Document2
 from notebook.conf import EXAMPLES, get_ordered_interpreters
 from notebook.connectors.base import Notebook, get_api as _get_api, get_interpreter
 from useradmin.models import User, install_sample_user
-
-if sys.version_info[0] > 2:
-  from urllib.parse import quote as urllib_quote
-
-  from django.utils.translation import gettext as _
-else:
-  from urllib import quote as urllib_quote
-
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -70,7 +61,7 @@ def escape_rows(rows, nulls_only=False, encoding=None):
           escaped_field = 'NULL'
         else:
           # Prevent error when getting back non utf8 like charset=iso-8859-1
-          escaped_field = smart_unicode(field, errors='replace', encoding=encoding)
+          escaped_field = smart_str(field, errors='replace', encoding=encoding)
           if not nulls_only:
             escaped_field = escape(escaped_field).replace(' ', '&nbsp;')
         escaped_row.append(escaped_field)

@@ -15,24 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import logging
 import sys
+import logging
+from builtins import object
 
 from django import forms
+from django.utils.translation import gettext as _
 
 from desktop.lib.django_forms import MultiForm
 from jobsub import models
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 LOG = logging.getLogger()
 
 # This aligns with what Oozie accepts as a workflow name
-_OOZIE_WORKFLOW_NAME_REGEX = '^([a-zA-Z_]([\-_a-zA-Z0-9])*){1,39}$'
+_OOZIE_WORKFLOW_NAME_REGEX = r'^([a-zA-Z_]([\-_a-zA-Z0-9])*){1,39}$'
+
 
 class WorkflowDesignForm(forms.ModelForm):
   """Used for specifying a design"""
@@ -111,6 +108,7 @@ _ACTION_TYPE_TO_FORM_CLS = {
 def design_form_by_type(action_type):
   cls = _ACTION_TYPE_TO_FORM_CLS[action_type]
   return MultiForm(wf=WorkflowDesignForm, action=cls)
+
 
 def design_form_by_instance(design_obj, data=None):
   action_obj = design_obj.get_root_action()

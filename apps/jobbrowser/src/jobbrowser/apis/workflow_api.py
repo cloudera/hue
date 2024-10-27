@@ -15,26 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
 import sys
+import json
+import logging
 
-from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params, is_linkable, hdfs_link_js
+from django.utils.translation import gettext as _
+
+from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params, hdfs_link_js, is_linkable
 from liboozie.oozie_api import get_oozie
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger()
 
 
 try:
+  from oozie.conf import ENABLE_OOZIE_BACKEND_FILTERING, OOZIE_JOBS_COUNT
   from oozie.forms import ParameterForm
-  from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_OOZIE_BACKEND_FILTERING
-  from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs, \
-      has_dashboard_jobs_access, massaged_oozie_jobs_for_json, has_job_edition_permission
+  from oozie.views.dashboard import (
+    bulk_manage_oozie_jobs,
+    get_oozie_job_log,
+    has_dashboard_jobs_access,
+    has_job_edition_permission,
+    list_oozie_workflow,
+    manage_oozie_jobs,
+    massaged_oozie_jobs_for_json,
+  )
   has_oozie_installed = True
   OOZIE_JOBS_COUNT_LIMIT = OOZIE_JOBS_COUNT.get()
 except Exception as e:
@@ -54,7 +58,7 @@ class WorkflowApi(Api):
     wf_list = oozie_api.get_workflows(**kwargs)
 
     return {
-      'apps':[{
+      'apps': [{
         'id': app['id'],
         'name': app['appName'],
         'status': app['status'],
@@ -69,7 +73,6 @@ class WorkflowApi(Api):
       } for app in massaged_oozie_jobs_for_json(wf_list.jobs, self.user)['jobs']],
       'total': wf_list.total
     }
-
 
   def app(self, appid):
     if '@' in appid:
@@ -103,10 +106,8 @@ class WorkflowApi(Api):
 
     return common
 
-
   def action(self, app_ids, action):
     return _manage_oozie_job(self.user, action, app_ids)
-
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     if '@' in appid:
@@ -116,7 +117,6 @@ class WorkflowApi(Api):
     data = get_oozie_job_log(request, job_id=appid)
 
     return {'logs': json.loads(data.content)['log']}
-
 
   def profile(self, appid, app_type, app_property, app_filters):
     if '@' in appid:
@@ -133,7 +133,9 @@ class WorkflowApi(Api):
       workflow = oozie_api.get_job(jobid=appid)
       return {
         'properties': workflow.conf_dict,
-        'properties_display': [{'name': key, 'value': val, 'link': is_linkable(key, val) and hdfs_link_js(val)} for key, val in workflow.conf_dict.items()],
+        'properties_display': [
+          {'name': key, 'value': val, 'link': is_linkable(key, val) and hdfs_link_js(val)} for key, val in workflow.conf_dict.items()
+        ],
       }
 
     return {}
@@ -146,7 +148,7 @@ class WorkflowApi(Api):
     elif status == 'SUCCEEDED':
       return 'SUCCEEDED'
     else:
-      return 'FAILED' # KILLED and FAILED
+      return 'FAILED'  # KILLED and FAILED
 
   def _get_variables(self, workflow):
     parameters = []
@@ -184,7 +186,6 @@ class WorkflowActionApi(Api):
     common['properties']['workflow_id'] = appid.split('@', 1)[0]
 
     return common
-
 
   def logs(self, appid, app_type, log_name=None):
     return {'progress': 0, 'logs': ''}
@@ -229,7 +230,7 @@ def _filter_oozie_jobs(user, filters, kwargs):
       kwargs['cnt'] = min(filters['pagination']['limit'], OOZIE_JOBS_COUNT_LIMIT)
 
     if filters.get('states'):
-      states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
+      states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'], }
       for _state in filters.get('states'):
         for _status in states_filters[_state]:
           kwargs['filters'].extend([('status', _status)])

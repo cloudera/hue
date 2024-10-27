@@ -16,23 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
-import sys
+
+from django.utils.translation import gettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
-from metadata.manager_client import ManagerApi
-from notebook.models import _get_notebook_api
-
 from kafka.conf import has_kafka_api
 from kafka.kafka_client import KafkaApi, KafkaApiException, SchemaRegistryApi
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from metadata.manager_client import ManagerApi
+from notebook.models import _get_notebook_api
 
 LOG = logging.getLogger()
 

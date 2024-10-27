@@ -14,23 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
-import logging
 import sys
+import logging
+from builtins import str
 
+from django.utils.translation import gettext as _
+
+from desktop.auth.backend import is_admin
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from indexer.management.commands import indexer_setup
-
 from search.management.commands import search_setup
-
-from desktop.auth.backend import is_admin
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -47,7 +41,7 @@ def install_examples(request):
     try:
       data = request.POST.get('data')
       indexer_setup.Command().handle(data=data)
-      if 'log_analytics_demo' == data: # Hue documents installed only one time
+      if 'log_analytics_demo' == data:  # Hue documents installed only one time
         search_setup.Command().handle()
       result['status'] = 0
     except Exception as e:

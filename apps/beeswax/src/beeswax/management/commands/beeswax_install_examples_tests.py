@@ -16,22 +16,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import pytest
 import sys
+import logging
+from unittest.mock import patch
 
+import pytest
+
+from beeswax.management.commands.beeswax_install_examples import Command, SampleQuery, SampleTable
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.models import Document2
-from useradmin.models import User, install_sample_user
-
-from beeswax.management.commands.beeswax_install_examples import SampleTable, Command, SampleQuery
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
@@ -42,7 +37,6 @@ class TestStandardTables():
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_install_queries_mysql(self):
     design_dict = {
@@ -115,7 +109,6 @@ class TestHiveServer2():
       query = Document2.objects.filter(name='TestBeswaxHiveTables Query').get()
       assert 'query-hive' == query.type
 
-
   def test_create_table_load_data_but_no_fs(self):
     table_data = {
       "data_file": "sample_07.csv",
@@ -134,14 +127,12 @@ class TestHiveServer2():
         make_notebook.assert_not_called()
 
 
-
 @pytest.mark.django_db
 class TestTransactionalTables():
 
   def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
-
 
   def test_load_sample_07_with_concurrency_support(self):
     table_data = {
@@ -160,7 +151,6 @@ class TestTransactionalTables():
         SampleTable(table_data, 'hive', 'default').install(self.user)
 
         make_notebook.assert_called()
-
 
   def test_load_web_logs_with_concurrency_support(self):
     table_data = {
@@ -203,7 +193,6 @@ class TestTransactionalTables():
         SampleTable(table_data, 'hive', 'default').install(self.user)
 
         make_notebook.assert_called()
-
 
   def test_create_phoenix_table(self):
     table_data = {

@@ -136,14 +136,10 @@ except ImportError:
 import errno
 import logging
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  import urllib.request, urllib.error
-  from urllib.parse import unquote as urllib_unquote, urlparse as lib_urlparse
-else:
-  from cStringIO import StringIO as string_io
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlparse as lib_urlparse
+from io import StringIO as string_io
+import urllib.request, urllib.error
+from urllib.parse import unquote as urllib_unquote, urlparse as lib_urlparse
+
 
 
 LOG = logging.getLogger()

@@ -17,22 +17,26 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiFetchOptions, get } from '../../api/utils';
 
-export type IOptions<T, U> = {
-  urlPrefix?: string;
+export interface Options<T, U> {
   params?: U;
   fetchOptions?: ApiFetchOptions<T>;
   skip?: boolean;
-};
+  onSuccess?: (data: T) => void;
+  onError?: (error: Error) => void;
+}
 
-type IUseLoadData<T> = {
+interface UseLoadDataProps<T> {
   data?: T;
   loading: boolean;
   error?: Error;
   reloadData: () => void;
-};
+}
 
-const useLoadData = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IUseLoadData<T> => {
-  const [localOptions, setLocalOptions] = useState<IOptions<T, U> | undefined>(options);
+const useLoadData = <T, U = unknown>(
+  url?: string,
+  options?: Options<T, U>
+): UseLoadDataProps<T> => {
+  const [localOptions, setLocalOptions] = useState<Options<T, U> | undefined>(options);
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | undefined>();
@@ -58,11 +62,16 @@ const useLoadData = <T, U = unknown>(url?: string, options?: IOptions<T, U>): IU
       setError(undefined);
 
       try {
-        const fetchUrl = localOptions?.urlPrefix ? `${localOptions.urlPrefix}${url}` : url;
-        const response = await get<T, U>(fetchUrl, localOptions?.params, fetchOptions);
+        const response = await get<T, U>(url, localOptions?.params, fetchOptions);
         setData(response);
+        if (localOptions?.onSuccess) {
+          localOptions.onSuccess(response);
+        }
       } catch (error) {
         setError(error instanceof Error ? error : new Error(error));
+        if (localOptions?.onError) {
+          localOptions.onError(error);
+        }
       } finally {
         setLoading(false);
       }

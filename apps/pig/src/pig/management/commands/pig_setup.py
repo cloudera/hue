@@ -15,14 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import logging
 import os
 import sys
+import json
+import logging
 
 from django.core import management
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils.translation import gettext as _
 
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib import paths
@@ -30,16 +31,8 @@ from desktop.models import Directory, Document, Document2, Document2Permission
 from hadoop import cluster
 from liboozie.submittion import create_directories
 from notebook.models import make_notebook
-
-from useradmin.models import get_default_user_group, install_sample_user
-
 from pig.conf import LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from useradmin.models import get_default_user_group, install_sample_user
 
 LOG = logging.getLogger()
 
@@ -101,7 +94,6 @@ STORE upper_case INTO '$output';
           doc2.delete()
 
     return doc2
-
 
   def handle(self, *args, **options):
     fs = cluster.get_hdfs()

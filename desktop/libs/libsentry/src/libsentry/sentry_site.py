@@ -15,24 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import errno
+import random
 import logging
 import os.path
-import random
-import sys
 
-from hadoop import confparse
+from django.utils.translation import gettext as _
 
 from desktop.lib import security_util
 from desktop.lib.exceptions_renderable import PopupException
-
-from libsentry.conf import SENTRY_CONF_DIR, HOSTNAME, PORT
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from hadoop import confparse
+from libsentry.conf import HOSTNAME, PORT, SENTRY_CONF_DIR
 
 LOG = logging.getLogger()
 
@@ -114,7 +108,7 @@ def get_sentry_server(current_host=None):
     servers = get_sentry_servers()
     hosts = [s['hostname'] for s in servers]
 
-    next_idx = random.randint(0, len(servers)-1)
+    next_idx = random.randint(0, len(servers) - 1)
     if current_host is not None and hosts:
       try:
         current_idx = hosts.index(current_host)
@@ -161,7 +155,7 @@ def get_sentry_servers():
 
 def _parse_sites():
   global _SITE_DICT
-  _SITE_DICT ={}
+  _SITE_DICT = {}
 
   paths = [
     ('sentry', os.path.join(SENTRY_CONF_DIR.get(), 'sentry-site.xml')),

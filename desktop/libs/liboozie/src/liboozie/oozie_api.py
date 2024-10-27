@@ -14,25 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
+import sys
 import logging
 import posixpath
-import sys
+from builtins import object
 
-from desktop.conf import TIME_ZONE
-from desktop.conf import DEFAULT_USER
+from desktop.conf import DEFAULT_USER, TIME_ZONE
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
-
-from liboozie.conf import SECURITY_ENABLED, OOZIE_URL, SSL_CERT_CA_VERIFY
-from liboozie.types import WorkflowList, CoordinatorList, Coordinator, Workflow,\
-  CoordinatorAction, WorkflowAction, BundleList, Bundle, BundleAction
+from liboozie.conf import OOZIE_URL, SECURITY_ENABLED, SSL_CERT_CA_VERIFY
+from liboozie.types import (
+  Bundle,
+  BundleAction,
+  BundleList,
+  Coordinator,
+  CoordinatorAction,
+  CoordinatorList,
+  Workflow,
+  WorkflowAction,
+  WorkflowList,
+)
 from liboozie.utils import config_gen
-
 
 LOG = logging.getLogger()
 DEFAULT_USER = DEFAULT_USER.get()
-API_VERSION = 'v1' # Overridden to v2 for SLA
+API_VERSION = 'v1'  # Overridden to v2 for SLA
 
 
 _XML_CONTENT_TYPE = 'application/xml;charset=UTF-8'
@@ -178,10 +184,9 @@ class OozieApi(object):
     params = self._get_params()
     params['show'] = 'definition'
     job_def = self._root.get('job/%s' % (jobid,), params)
-    if sys.version_info[0] > 2:
-      job_def = job_def.decode()
-    return job_def
+    job_def = job_def.decode()
 
+    return job_def
 
   def get_job_log(self, jobid, logfilter=None):
     """
@@ -199,10 +204,9 @@ class OozieApi(object):
       filter_list.append('%s=%s' % (key, val))
     params['logfilter'] = ';'.join(filter_list)
     log = self._root.get('job/%s' % (jobid,), params)
-    if sys.version_info[0] > 2:
-      log = log.decode()
-    return log
+    log = log.decode()
 
+    return log
 
   def get_job_graph(self, jobid, format='svg'):
     params = self._get_params()
@@ -211,7 +215,6 @@ class OozieApi(object):
     params['format'] = format
     svg_data = self._root.get('job/%s' % (jobid,), params)
     return svg_data
-
 
   def get_job_status(self, jobid):
     params = self._get_params()
@@ -247,8 +250,7 @@ class OozieApi(object):
       params.update(parameters)
 
     resp = self._root.put('job/%s' % jobid, params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
-    if sys.version_info[0] > 2:
-      resp = resp.decode()
+    resp = resp.decode()
 
     return resp
 

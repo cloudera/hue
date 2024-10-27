@@ -15,35 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from past.builtins import basestring
-import json
-import logging
 import re
 import sys
+import json
+import logging
 import urllib.parse
+from builtins import str
 from datetime import datetime
-from dateutil import tz
-from dateutil import parser
 
+from dateutil import parser, tz
 from django.utils.formats import localize_input
+from django.utils.translation import gettext as _
+from past.builtins import basestring
+
 from desktop.lib.parameterization import find_variables
-from liboozie.oozie_api import get_oozie, DEFAULT_USER
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from liboozie.oozie_api import DEFAULT_USER, get_oozie
 
 LOG = logging.getLogger()
 
 
 JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
                'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')
-BOOLEAN_FIELDS = ('propagate_configuration','capture_output')
+BOOLEAN_FIELDS = ('propagate_configuration', 'capture_output')
 NUMBER_FIELDS_OR_NULL = ('sub_workflow',)
 GMT_TIME_FORMAT = "%Y-%m-%dT%H:%MGMT%z"
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
@@ -137,9 +130,11 @@ def smart_path(path, mapping=None, is_coordinator=False):
 
   return path
 
+
 def contains_symlink(path, mapping):
   vars = find_variables(path)
   return any([var in mapping and '#' in mapping[var] for var in vars]) or '#' in path
+
 
 def utc_datetime_format(utc_time):
   if utc_time and type(utc_time) is datetime:
@@ -183,6 +178,7 @@ def oozie_to_hue_frequency(frequency_string):
     return matches.group('frequency_unit'), matches.group('frequency_number')
   else:
     raise InvalidFrequency(_('invalid frequency: %s') % frequency_string)
+
 
 def convert_to_server_timezone(date, local_tz='UTC', server_tz=None, user=DEFAULT_USER):
   api = get_oozie(user)

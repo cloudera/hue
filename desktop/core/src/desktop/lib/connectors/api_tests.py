@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,25 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import pytest
 import sys
+import json
 import unittest
+from unittest.mock import Mock, patch
 
+import pytest
 from django.urls import reverse
 
-from desktop.auth.backend import rewrite_user, is_admin
+from desktop.auth.backend import is_admin, rewrite_user
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_ORGANIZATIONS
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.django_test_util import make_logged_in_client
-
-from useradmin.models import User, update_app_permissions, get_default_user_group, Connector
-from useradmin.permissions import HuePermission, GroupPermission
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from useradmin.models import Connector, User, get_default_user_group, update_app_permissions
+from useradmin.permissions import GroupPermission, HuePermission
 
 
 @pytest.mark.django_db
@@ -54,7 +49,6 @@ class TestApi(object):
   def teardown_class(cls):
     for reset in cls._class_resets:
       reset()
-
 
   def test_install_connector_examples(self):
 

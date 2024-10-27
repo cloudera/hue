@@ -18,13 +18,9 @@
 import sys
 
 from django.core.management.base import BaseCommand
+from django.utils.translation import gettext_lazy as _
 
 from useradmin.views import sync_unix_users_and_groups
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
 
 
 class Command(BaseCommand):

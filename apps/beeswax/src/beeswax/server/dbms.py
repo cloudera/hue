@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import re
-import sys
 import json
 import time
 import logging
@@ -72,7 +71,6 @@ from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
 from desktop.lib.view_util import location_to_url
-from desktop.models import Cluster
 from desktop.settings import CACHES_HIVE_DISCOVERY_KEY
 from indexer.file_format import HiveFormat
 from libzookeeper import conf as libzookeeper_conf
@@ -105,6 +103,8 @@ def get_zk_hs2():
   if zk.exists(znode):
     LOG.debug("Selecting up Hive server via the following node {0}".format(znode))
     hiveservers = zk.get_children(znode)
+    if hiveservers and 'sequence' in hiveservers[0]:
+      hiveservers.sort(key=lambda x: re.findall(r'sequence=\d+', x)[0])
   zk.stop()
   return hiveservers
 
@@ -238,10 +238,11 @@ def get_query_server_config(name='beeswax', connector=None):
             })
           )
         else:
-          cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
+          cache.set("hiveserver2", json.dumps({
+            "host": HIVE_SERVER_HOST.get(),
+            "port": HIVE_HTTP_THRIFT_PORT.get() if hiveserver2_transport_mode() == 'HTTP' else HIVE_SERVER_PORT.get()
+          }))
       else:
-        # Setting hs2 cache in-case there is no HS2 discovery
-        cache.set("hiveserver2", json.dumps({"host": HIVE_SERVER_HOST.get(), "port": HIVE_HTTP_THRIFT_PORT.get()}))
         if HIVE_DISCOVERY_HS2.get():
           # Replace ActiveEndpoint if the current HS2 is down
           hiveservers = get_zk_hs2()
@@ -266,6 +267,12 @@ def get_query_server_config(name='beeswax', connector=None):
           else:
             LOG.error('Currently there are no HiveServer2 running')
             raise PopupException(_('Currently there are no HiveServer2 running'))
+        else:
+          # Setting hs2 cache in-case there is no HS2 discovery
+          cache.set("hiveserver2", json.dumps({
+            "host": HIVE_SERVER_HOST.get(),
+            "port": HIVE_HTTP_THRIFT_PORT.get() if hiveserver2_transport_mode() == 'HTTP' else HIVE_SERVER_PORT.get()
+          }))
 
       activeEndpoint = json.loads(cache.get("hiveserver2"))
 
@@ -285,11 +292,11 @@ def get_query_server_config(name='beeswax', connector=None):
           'use_sasl': HIVE_USE_SASL.get()
       }
     else:
-      kerberos_principal = get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
+      kerberos_principal = get_hiveserver2_kerberos_principal(activeEndpoint["host"])
       query_server = {
           'server_name': 'beeswax' if name != 'hplsql' else 'hplsql',
           'server_host': activeEndpoint["host"],
-          'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else HIVE_SERVER_PORT.get(),
+          'server_port': LLAP_SERVER_PORT.get() if name == 'llap' else int(activeEndpoint["port"]),
           'principal': kerberos_principal,
           'http_url': '%(protocol)s://%(host)s:%(port)s/%(end_point)s' % {
               'protocol': 'https' if hiveserver2_use_ssl() else 'http',
@@ -346,6 +353,13 @@ def get_query_server_config_via_connector(connector):
   else:
     impersonation_enabled = hiveserver2_impersonation_enabled()
 
+  if compute['dialect'] == 'impala':
+    from impala import conf as dbms_conf
+  else:
+    from beeswax import conf as dbms_conf
+  auth_username = dbms_conf.AUTH_USERNAME.get()
+  auth_password = dbms_conf.AUTH_PASSWORD.get()
+
   return {
       'is_compute': True,
       'dialect': compute['dialect'],
@@ -355,8 +369,8 @@ def get_query_server_config_via_connector(connector):
       # For connectors/computes, the auth details are not available
       # from configs and needs patching before submitting requests
       'principal': 'TODO',
-      'auth_username': compute['options'].get('auth_username'),
-      'auth_password': compute['options'].get('auth_password', 'hue'),
+      'auth_username': compute['options'].get('auth_username', auth_username),
+      'auth_password': compute['options'].get('auth_password', auth_password),
 
       'impersonation_enabled': impersonation_enabled,
       'use_sasl': str(compute['options'].get('use_sasl', True)).upper() == 'TRUE',

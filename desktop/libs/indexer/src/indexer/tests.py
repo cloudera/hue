@@ -15,27 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import json
-import pytest
 import sys
+import json
+from builtins import object
+from unittest.mock import Mock, patch
 
+import pytest
 from django.urls import reverse
-
-from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
-from libsolr import conf as libsolr_conf
-from libzookeeper import conf as libzookeeper_conf
-from indexer.conf import get_solr_ensemble
-from indexer.controller import CollectionManagerController
-from useradmin.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
+from indexer.conf import get_solr_ensemble
+from indexer.controller import CollectionManagerController
+from libsolr import conf as libsolr_conf
+from libzookeeper import conf as libzookeeper_conf
+from useradmin.models import User
 
 
 def test_get_ensemble():
@@ -75,7 +70,7 @@ class TestImporter(object):
       get_filesystem.return_value = None
 
       resp = self.client.get(reverse('indexer:importer'))
-      assert not b"{'value': 'file', 'name': 'Remote File'}" in resp.content
+      assert b"{'value': 'file', 'name': 'Remote File'}" not in resp.content
 
 
 class TestIndexerWithSolr(object):

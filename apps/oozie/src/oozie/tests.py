@@ -60,10 +60,7 @@ from oozie.utils import workflow_to_dict, model_to_dict, smart_path, contains_sy
 from oozie.importlib.workflows import import_workflow
 from oozie.importlib.jobdesigner import convert_jobsub_design
 
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import BytesIO as string_io
 
 
 LOG = logging.getLogger()
