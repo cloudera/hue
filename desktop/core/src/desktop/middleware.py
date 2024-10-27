@@ -27,6 +27,7 @@ import os.path
 import tempfile
 import mimetypes
 import traceback
+import secrets
 from builtins import object
 from urllib.parse import quote, urlparse
 
@@ -64,6 +65,7 @@ from desktop.conf import (
   SERVER_USER,
   has_connectors,
   is_gunicorn_report_enabled,
+  CSP_NONCE,
 )
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, fsmanager, i18n
@@ -76,7 +78,81 @@ from desktop.log import get_audit_logger
 from desktop.log.access import access_log, access_warn, log_page_hit
 from hadoop import cluster
 from libsaml.conf import CDP_LOGOUT_URL
+from urllib.parse import urlparse
 from useradmin.models import User
+import os
+
+
+
+def nonce_exists(response):
+    """Check for preexisting nonce in style and script.
+
+     Args:
+         response (:obj:): Django response object
+
+     Returns:
+         nonce_found (dict): Dictionary of nonces found
+     """
+    try:
+        csp = response['Content-Security-Policy']
+    except KeyError:
+        csp = response.get('Content-Security-Policy-Report-Only', '')
+
+    nonce_found = {}
+
+    if csp:
+        csp_split = csp.split(';')
+        for directive in csp_split:
+            if 'nonce-' not in directive:
+                continue
+            if 'script-src' in directive:
+                nonce_found['script'] = directive
+            if 'style-src' in directive:
+                nonce_found['style'] = directive
+
+    return nonce_found
+
+def get_header(response):
+    """Get the CSP header type.
+
+    This is basically a check for:
+        Content-Security-Policy or Content-Security-Policy-Report-Only
+
+    Args:
+        response (:obj:): Django response object
+
+    Returns:
+         dict:
+            name: CPS header policy. i.e. Report-Only or not
+            csp: CSP directives associated with the header
+            bool: False if neither policy header is found
+    """
+    policies = [
+        "Content-Security-Policy",
+        "Content-Security-Policy-Report-Only"
+    ]
+
+    try:
+        name = policies[0]
+        csp = response[policies[0]]
+    except KeyError:
+        try:
+            name = policies[1]
+            csp = response[policies[1]]
+        except KeyError:
+            return False
+
+    return {'name': name, 'csp': csp}
+
+
+if sys.version_info[0] > 2:
+  from django.utils.translation import gettext as _
+  from django.utils.http import url_has_allowed_host_and_scheme
+  from urllib.parse import quote
+else:
+  from django.utils.translation import ugettext as _
+  from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme, urlquote as quote
+
 
 LOG = logging.getLogger()
 
@@ -798,19 +874,64 @@ class MetricsMiddleware(MiddlewareMixin):
 
 
 class ContentSecurityPolicyMiddleware(MiddlewareMixin):
-  def __init__(self, get_response):
-    self.get_response = get_response
-    self.secure_content_security_policy = SECURE_CONTENT_SECURITY_POLICY.get()
-    if not self.secure_content_security_policy:
-      LOG.info('Unloading ContentSecurityPolicyMiddleware')
-      raise exceptions.MiddlewareNotUsed
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.secure_content_security_policy = SECURE_CONTENT_SECURITY_POLICY.get()
+        if not self.secure_content_security_policy:
+            logger.info('Unloading ContentSecurityPolicyMiddleware')
+            raise exceptions.MiddlewareNotUsed
 
-  def process_response(self, request, response):
-    if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
-      response["Content-Security-Policy"] = self.secure_content_security_policy
+    def process_request(self, request):
+        nonce = secrets.token_urlsafe()
+        request.csp_nonce = nonce
 
-    return response
+    def process_response(self, request, response):
+        # Add the secure CSP if it doesn't exist
+        if not CSP_NONCE.get():
+          return response
 
+        if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
+            response["Content-Security-Policy"] = self.secure_content_security_policy
+        
+        if not CSP_NONCE.get():
+          return response
+
+
+        header = get_header(response)
+        if not header or not hasattr(request, 'csp_nonce'):
+            return response
+
+        nonce_found = nonce_exists(response)
+        has_nonce = bool(nonce_found)
+        if has_nonce:
+            logger.error("Nonce already exists: {}".format(nonce_found))
+            return response
+
+        nonce = getattr(request, 'csp_nonce', None)
+        csp_split = header['csp'].split(';')
+        new_csp = []
+        nonce_directive = f"'nonce-{nonce}' 'self'" if nonce else "'self'"
+
+        for p in csp_split:
+            directive = p.lstrip().split(' ')[0]
+            if nonce:
+                # Remove unsafe-inline from scripts
+                # TODO remove unsafe-inline from styles
+                if directive in ('script-src'):
+                    # Original parts without 'unsafe-inline' or 'unsafe-eval'
+                    new_directive_parts = [part for part in p.split(' ') if part and part not in ("'unsafe-inline'")]
+                    new_directive_parts.append(nonce_directive)
+                    # new_directive_parts.append("'self'")  # Uncomment and adjust as needed, possibly with 'strict-dynamic'
+
+                    new_csp.append(' '.join(new_directive_parts))
+                else:
+                    new_csp.append(p)
+            else:
+                new_csp.append(p)
+
+        response[header['name']] = "; ".join(new_csp).strip() + ';'
+
+        return response
 
 class MimeTypeJSFileFixStreamingMiddleware(MiddlewareMixin):
   """
