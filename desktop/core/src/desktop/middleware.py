@@ -78,11 +78,8 @@ from desktop.log import get_audit_logger
 from desktop.log.access import access_log, access_warn, log_page_hit
 from hadoop import cluster
 from libsaml.conf import CDP_LOGOUT_URL
-from urllib.parse import urlparse
 from useradmin.models import User
 import os
-
-
 
 def nonce_exists(response):
     """Check for preexisting nonce in style and script.
@@ -143,16 +140,6 @@ def get_header(response):
             return False
 
     return {'name': name, 'csp': csp}
-
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from django.utils.http import url_has_allowed_host_and_scheme
-  from urllib.parse import quote
-else:
-  from django.utils.translation import ugettext as _
-  from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme, urlquote as quote
-
 
 LOG = logging.getLogger()
 
@@ -878,7 +865,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         self.get_response = get_response
         self.secure_content_security_policy = SECURE_CONTENT_SECURITY_POLICY.get()
         if not self.secure_content_security_policy:
-            logger.info('Unloading ContentSecurityPolicyMiddleware')
+            LOG.info('Unloading ContentSecurityPolicyMiddleware')
             raise exceptions.MiddlewareNotUsed
 
     def process_request(self, request):
@@ -886,49 +873,45 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         request.csp_nonce = nonce
 
     def process_response(self, request, response):
-        # Add the secure CSP if it doesn't exist
+        # If CSP_NONCE is not set, return the response without modification
         if not CSP_NONCE.get():
-          return response
+            return response
 
+        # Add the secure CSP if it doesn't exist, provided that we have a CSP to set
         if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
             response["Content-Security-Policy"] = self.secure_content_security_policy
-        
-        if not CSP_NONCE.get():
-          return response
 
-
+        # If the CSP header is not set or the request does not have a nonce, return the response
         header = get_header(response)
         if not header or not hasattr(request, 'csp_nonce'):
             return response
 
+        # If a nonce already exists in the CSP header, log an error and return the response
         nonce_found = nonce_exists(response)
-        has_nonce = bool(nonce_found)
-        if has_nonce:
-            logger.error("Nonce already exists: {}".format(nonce_found))
+        if nonce_found:
+            LOG.error("Nonce already exists: {}".format(nonce_found))
             return response
 
+        # Retrieve the nonce from the request and prepare the new CSP directive
         nonce = getattr(request, 'csp_nonce', None)
         csp_split = header['csp'].split(';')
         new_csp = []
-        nonce_directive = f"'nonce-{nonce}' 'self'" if nonce else "'self'"
+        nonce_directive = f"'nonce-{nonce}'"
 
         for p in csp_split:
             directive = p.lstrip().split(' ')[0]
-            if nonce:
-                # Remove unsafe-inline from scripts
-                # TODO remove unsafe-inline from styles
-                if directive in ('script-src'):
-                    # Original parts without 'unsafe-inline' or 'unsafe-eval'
-                    new_directive_parts = [part for part in p.split(' ') if part and part not in ("'unsafe-inline'")]
-                    new_directive_parts.append(nonce_directive)
-                    # new_directive_parts.append("'self'")  # Uncomment and adjust as needed, possibly with 'strict-dynamic'
-
-                    new_csp.append(' '.join(new_directive_parts))
-                else:
-                    new_csp.append(p)
+            if directive in ('script-src'):
+                # Remove 'unsafe-inline' if present
+                new_directive_parts = [
+                    part for part in p.split(' ')
+                    if part and part not in ("'unsafe-inline'")
+                ]
+                new_directive_parts.append(nonce_directive)
+                new_csp.append(' '.join(new_directive_parts))
             else:
                 new_csp.append(p)
 
+        # Update the Content-Security-Policy header with the new CSP string
         response[header['name']] = "; ".join(new_csp).strip() + ';'
 
         return response

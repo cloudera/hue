@@ -19,6 +19,7 @@ from django.http import HttpRequest
 
 from desktop.lib.i18n import smart_str
 from desktop.views import login_modal
+from desktop.lib.django_util import nonce_attribute
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -34,7 +35,7 @@ ${ smart_str(login_modal(request).content) | n,unicode }
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
-${ commonHeaderFooterComponents.footer(messages) }
+${ commonHeaderFooterComponents.footer(messages, nonce_attribute(request) ) }
 
   </body>
 </html>
