@@ -142,6 +142,10 @@
   # X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.
   ## secure_content_security_policy="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;style-src 'self' 'unsafe-inline' fonts.googleapis.com;connect-src 'self' *.google-analytics.com;frame-src *;child-src 'self' data: *.vimeo.com;object-src 'none'"
 
+  # Enable nonce attribute to remove unsafe-inline and auto remove unsafe-inline from csp 
+  ## csp_nonce=True
+
+
   # Strict-Transport-Security HTTP Strict Transport Security(HSTS) is a policy which is communicated by the server to the user agent via HTTP response header field name "Strict-Transport-Security". HSTS policy specifies a period of time during which the user agent(browser) should only access the server in a secure fashion(https).
   ## secure_ssl_redirect=False
   ## secure_redirect_host=0.0.0.0

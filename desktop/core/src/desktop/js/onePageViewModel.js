@@ -182,114 +182,89 @@ class OnePageViewModel {
       $.ajax({
         url: scriptUrl,
         converters: {
-          'text script': function (text) {
-            return text;
-          }
+          'text script': text => text
         }
       })
         .done(contents => {
           loadedJs.push(scriptUrl);
-          deferred.resolve({ url: scriptUrl, contents: contents });
+          deferred.resolve({ url: scriptUrl, contents });
         })
         .fail(() => {
           deferred.resolve('');
         });
       return deferred.promise();
     };
-
+    
     const loadScripts = function (scriptUrls) {
       const promises = [];
       while (scriptUrls.length) {
         const scriptUrl = scriptUrls.shift();
-        if (loadedJs.indexOf(scriptUrl) !== -1) {
-          continue;
+        if (!loadedJs.includes(scriptUrl)) {
+          promises.push(loadScript(scriptUrl));
         }
-        promises.push(loadScript(scriptUrl));
       }
       return promises;
     };
-
+    
     const addGlobalCss = function ($el) {
       const cssFile = $el.attr('href').split('?')[0];
-      if (loadedCss.indexOf(cssFile) === -1) {
+      if (!loadedCss.includes(cssFile)) {
         loadedCss.push(cssFile);
         $.ajaxSetup({ cache: true });
         if (window.DEV) {
-          $el.attr('href', $el.attr('href') + '?dev=' + Math.random());
+          $el.attr('href', `${$el.attr('href')}?dev=${Math.random()}`);
         }
         $el.clone().appendTo($('head'));
         $.ajaxSetup({ cache: false });
       }
       $el.remove();
     };
-
-    // Only load CSS and JS files that are not loaded before
+    
+    // Process headers to load CSS and JS files
     self.processHeaders = function (response) {
       const promise = $.Deferred();
       const $rawHtml = $('<span>').html(response);
-
+    
       const $allScripts = $rawHtml.find('script[src]');
-      const scriptsToLoad = $allScripts
-        .map(function () {
-          return $(this).attr('src');
-        })
-        .toArray();
+      const scriptsToLoad = $allScripts.map(function () {
+        return $(this).attr('src');
+      }).toArray();
       $allScripts.remove();
-
+    
       $rawHtml.find('link[href]').each(function () {
-        addGlobalCss($(this)); // Also removes the elements;
+        addGlobalCss($(this));
       });
-
+    
       $rawHtml.find('a[href]').each(function () {
         let link = $(this).attr('href');
         if (link.startsWith('/') && !link.startsWith('/hue')) {
-          link = window.HUE_BASE_URL + '/hue' + link;
+          link = `${window.HUE_BASE_URL}/hue${link}`;
         }
         $(this).attr('href', link);
       });
-
+    
       const scriptPromises = loadScripts(scriptsToLoad);
-
-      const evalScriptSync = function () {
+    
+      const loadScriptSync = function () {
         if (scriptPromises.length) {
-          // Evaluate the scripts in the order they were defined in the page
           const nextScriptPromise = scriptPromises.shift();
           nextScriptPromise.done(scriptDetails => {
             if (scriptDetails.url) {
-              // Assume the script URL is provided in scriptDetails.url
               const script = document.createElement('script');
-              script.src = scriptDetails.url; // Set the source to the script URL
-      
-              // Callback when the script is loaded
-              script.onload = function() {
-                console.log(`Script with URL ${scriptDetails.url} loaded successfully.`);
-                evalScriptSync(); // Load the next script after this one has finished
-              };
-      
-              // Callback on loading error
-              script.onerror = function() {
-                console.error(`Error loading script with URL ${scriptDetails.url}`);
-                // Continue with next script even if the current one fails
-                evalScriptSync();
-              };
-      
+              script.src = scriptDetails.url;
+              script.onload = loadScriptSync;
+              script.onerror = loadScriptSync;
               document.head.appendChild(script);
             } else {
-              // If there is no URL, just log the details and move on to the next script
-              console.log(scriptDetails);
-              evalScriptSync();
+              loadScriptSync();
             }
           });
         } else {
-          // All scripts have been evaluated, resolve the original promise
           promise.resolve($rawHtml.children());
         }
       };
-      
-      // Assuming that `promise` is a Deferred object created elsewhere
-      // and `$rawHtml` references jQuery-wrapped DOM nodes that need to be processed.
-      
-      evalScriptSync();
+    
+      loadScriptSync();
       return promise;
     };
 
@@ -392,82 +367,66 @@ class OnePageViewModel {
         }
 
         $.ajax({
-          url:
-            baseURL +
-            (baseURL.indexOf('?') > -1 ? '&' : '?') +
-            'is_embeddable=true' +
-            self.extraEmbeddableURLParams(),
-          beforeSend: function (xhr) {
-            xhr.setRequestHeader('X-Requested-With', 'Hue');
-          },
+          url: `${baseURL}${baseURL.includes('?') ? '&' : '?'}is_embeddable=true${self.extraEmbeddableURLParams()}`,
+          beforeSend: xhr => xhr.setRequestHeader('X-Requested-With', 'Hue'),
           dataType: 'html',
-          success: function (response, status, xhr) {
+          success: (response, status, xhr) => {
             const type = xhr.getResponseHeader('Content-Type');
-            if (type.indexOf('text/') > -1) {
+            if (type.includes('text/')) {
               window.clearAppIntervals(app);
               huePubSub.clearAppSubscribers(app);
               self.extraEmbeddableURLParams('');
-
+        
               self.processHeaders(response).done($rawHtml => {
                 const scripts = $rawHtml.find('script');
-                
-                // First, append all JSON scripts
+        
+                // Append JSON scripts
                 scripts.each(function() {
-                  const scriptType = this.getAttribute('type');
-                  if (scriptType === 'application/json') {
-                    document.head.appendChild(this); // Append the JSON script to the document head
+                  if (this.getAttribute('type') === 'application/json') {
+                    document.head.appendChild(this);
                     initializeEditorComponent();
                   }
                 });
-
-                // Then, append all other scripts
+        
+                // Append other scripts
                 scripts.each(function() {
-                  const scriptType = this.getAttribute('type');
-                  if (scriptType !== 'application/json' && scriptType !== 'text/html') {
-                    // Create a new script element
+                  if (!['application/json', 'text/html'].includes(this.getAttribute('type'))) {
                     const script = document.createElement('script');
-                    script.type = 'text/javascript'; // Set the type or copy it from the original script
-                    // If the original script has a 'src' attribute and is considered to be external
+                    script.type = 'text/javascript';
                     if (this.src) {
-                      script.src = this.src;  // Set it on the new script element
-                      document.head.appendChild(script);  // Append the new script to the document head
+                      script.src = this.src;
+                      document.head.appendChild(script);
                     }
-                    
-                    // If you need to remove original script from its current location, do it here
                     $(this).remove();
                   }
                 });
-                if (window.SKIP_CACHE.indexOf(app) === -1) {
+        
+                if (!window.SKIP_CACHE.includes(app)) {
                   self.embeddable_cache[app] = $rawHtml;
                 }
-                $('#embeddable_' + app).html($rawHtml);
+                $(`#embeddable_${app}`).html($rawHtml);
                 huePubSub.publish('app.dom.loaded', app);
-                window.setTimeout(() => {
-                  self.isLoadingEmbeddable(false);
-                }, 0);
+                window.setTimeout(() => self.isLoadingEmbeddable(false), 0);
               });
-            } else {
-              if (type.indexOf('json') > -1) {
-                const presponse = JSON.parse(response);
-                if (presponse && presponse.url) {
-                  window.location.href = window.HUE_BASE_URL + presponse.url;
-                  return;
-                }
+            } else if (type.includes('json')) {
+              const presponse = JSON.parse(response);
+              if (presponse && presponse.url) {
+                window.location.href = `${window.HUE_BASE_URL}${presponse.url}`;
+                return;
               }
-              window.location.href = window.HUE_BASE_URL + baseURL;
+            } else {
+              window.location.href = `${window.HUE_BASE_URL}${baseURL}`;
             }
           },
-          error: function (xhr) {
+          error: xhr => {
             console.error('Route loading problem', xhr);
-            if ((xhr.status === 401 || xhr.status === 403) && app !== '403') {
+            if ([401, 403].includes(xhr.status) && app !== '403') {
               self.loadApp('403');
             } else if (app !== '500') {
               self.loadApp('500');
             } else {
               huePubSub.publish(GLOBAL_ERROR_TOPIC, {
-                message: I18n(
-                  'It looks like you are offline or an unknown error happened. Please refresh the page.'
-                )
+                message: I18n('It looks like you are offline or an unknown error happened. Please refresh the page.')
               });
             }
           }
