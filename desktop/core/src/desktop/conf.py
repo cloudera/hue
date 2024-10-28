@@ -389,7 +389,7 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
 
 CSP_NONCE = Config(
     key="csp_nonce",
-    help=_('Generates a unique nonce for each request to strengthen CSP by disallowing ' 
+    help=_('Generates a unique nonce for each request to strengthen CSP by disallowing '
            '‘unsafe-inline’ scripts and styles.'),
     type=coerce_bool,
     default=False)

@@ -17,6 +17,7 @@
 
 from __future__ import absolute_import
 
+import os
 import re
 import json
 import time
@@ -24,10 +25,10 @@ import socket
 import inspect
 import logging
 import os.path
+import secrets
 import tempfile
 import mimetypes
 import traceback
-import secrets
 from builtins import object
 from urllib.parse import quote, urlparse
 
@@ -51,21 +52,21 @@ from dashboard.conf import IS_ENABLED as DASHBOARD_ENABLED
 from desktop import appmanager, metrics
 from desktop.auth.backend import ensure_has_a_group, find_or_create_user, is_admin, knox_login_headers, rewrite_user
 from desktop.conf import (
-  AUDIT_EVENT_LOG_DIR,
-  AUTH,
-  CUSTOM_CACHE_CONTROL,
-  DJANGO_DEBUG_MODE,
-  ENABLE_PROMETHEUS,
-  HTTP_ALLOWED_METHODS,
-  HUE_LOAD_BALANCER,
-  KNOX,
-  METRICS,
-  REDIRECT_WHITELIST,
-  SECURE_CONTENT_SECURITY_POLICY,
-  SERVER_USER,
-  has_connectors,
-  is_gunicorn_report_enabled,
-  CSP_NONCE,
+    AUDIT_EVENT_LOG_DIR,
+    AUTH,
+    CSP_NONCE,
+    CUSTOM_CACHE_CONTROL,
+    DJANGO_DEBUG_MODE,
+    ENABLE_PROMETHEUS,
+    HTTP_ALLOWED_METHODS,
+    HUE_LOAD_BALANCER,
+    KNOX,
+    METRICS,
+    REDIRECT_WHITELIST,
+    SECURE_CONTENT_SECURITY_POLICY,
+    SERVER_USER,
+    has_connectors,
+    is_gunicorn_report_enabled,
 )
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, fsmanager, i18n
@@ -79,7 +80,7 @@ from desktop.log.access import access_log, access_warn, log_page_hit
 from hadoop import cluster
 from libsaml.conf import CDP_LOGOUT_URL
 from useradmin.models import User
-import os
+
 
 def nonce_exists(response):
     """Check for preexisting nonce in style and script.
@@ -108,6 +109,7 @@ def nonce_exists(response):
                 nonce_found['style'] = directive
 
     return nonce_found
+
 
 def get_header(response):
     """Get the CSP header type.
@@ -140,6 +142,7 @@ def get_header(response):
             return False
 
     return {'name': name, 'csp': csp}
+
 
 LOG = logging.getLogger()
 
@@ -915,6 +918,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
         response[header['name']] = "; ".join(new_csp).strip() + ';'
 
         return response
+
 
 class MimeTypeJSFileFixStreamingMiddleware(MiddlewareMixin):
   """
