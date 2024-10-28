@@ -171,9 +171,13 @@ def _decode_slashes(path):
   # This is a fix for some installations where the path is still having the slash (/) encoded
   # as %2F while the rest of the path is actually decoded.
   encoded_slash = '%2F'
-  if path and path.startswith(encoded_slash) or path.startswith('abfs:' + encoded_slash) or \
-    path.startswith('s3a:' + encoded_slash) or path.startswith('gs:' + encoded_slash) or \
-    path.startswith('ofs:' + encoded_slash):
+  if path and (
+    path.startswith(encoded_slash)
+    or path.startswith('abfs:' + encoded_slash)
+    or path.startswith('s3a:' + encoded_slash)
+    or path.startswith('gs:' + encoded_slash)
+    or path.startswith('ofs:' + encoded_slash)
+  ):
     path = path.replace(encoded_slash, '/')
 
   return path

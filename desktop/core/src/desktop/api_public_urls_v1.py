@@ -15,8 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-
 from django.urls import re_path
 
 from desktop import api_public
@@ -92,21 +90,47 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^storage/filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
   re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='storage_view'),
-  re_path(r'^storage/download=(?P<path>.*)$', api_public.storage_download, name='storage_download'),
+  re_path(
+    r'^taskserver/upload/available_space/?$',
+    api_public.taskserver_get_available_space_for_upload,
+    name='taskserver_get_available_space_for_upload',
+  ),
+]
+
+urlpatterns += [
+  re_path(r'^storage/filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
+  re_path(r'^storage/list/?$', api_public.storage_listdir_paged, name='storage_listdir_paged'),
+  re_path(r'^storage/create/file/?$', api_public.storage_touch, name='storage_touch'),
+  re_path(r'^storage/create/directory/?$', api_public.storage_mkdir, name='storage_mkdir'),
+  re_path(r'^storage/save/?$', api_public.storage_save_file, name="storage_save_file"),
+  re_path(r'^storage/rename/?$', api_public.storage_rename, name='storage_rename'),
+  re_path(r'^storage/move/?$', api_public.storage_move, name='storage_move'),
+  re_path(r'^storage/copy/?$', api_public.storage_copy, name='storage_copy'),
   re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),
-  re_path(r'^storage/mkdir$', api_public.storage_mkdir, name='storage_mkdir'),
-  re_path(r'^storage/touch$', api_public.storage_touch, name='storage_touch'),
-  re_path(r'^storage/rename$', api_public.storage_rename, name='storage_rename'),
-  re_path(r'^storage/content_summary=(?P<path>.*)$', api_public.storage_content_summary, name='storage_content_summary'),
-  re_path(r'^storage/move$', api_public.storage_move, name='storage_move'),
-  re_path(r'^storage/copy$', api_public.storage_copy, name='storage_copy'),
-  re_path(r'^storage/set_replication$', api_public.storage_set_replication, name='storage_set_replication'),
-  re_path(r'^storage/rmtree$', api_public.storage_rmtree, name='storage_rmtree'),
-  re_path(r'^storage/trash/get_trash_path$', api_public.storage_get_trash_path, name='storage_get_trash_path'),
-  re_path(r'^storage/trash/restore$', api_public.storage_trash_restore, name='storage_trash_restore'),
-  re_path(r'^storage/trash/purge$', api_public.storage_trash_purge, name='storage_trash_purge'),
+  re_path(r'^storage/upload/chunks/?$', api_public.storage_upload_chunks, name='storage_upload_chunks'),
+  re_path(r'^storage/upload/complete/?$', api_public.storage_upload_complete, name='storage_upload_complete'),
+  re_path(r'^storage/stat/?$', api_public.storage_stat, name='storage_stat'),
+  re_path(r'^storage/display/?$', api_public.storage_display, name='storage_display'),
+  re_path(r'^storage/download/?$', api_public.storage_download, name='storage_download'),
+  re_path(r'^storage/delete/?$', api_public.storage_rmtree, name='storage_rmtree'),
+  re_path(r'^storage/content_summary/?$', api_public.storage_content_summary, name='storage_content_summary'),
+  re_path(r'^storage/replication/?$', api_public.storage_set_replication, name='storage_set_replication'),
+  re_path(r'^storage/trash/path/?$', api_public.storage_get_trash_path, name='storage_get_trash_path'),
+  re_path(r'^storage/trash/restore/?$', api_public.storage_trash_restore, name='storage_trash_restore'),
+  re_path(r'^storage/trash/purge/?$', api_public.storage_trash_purge, name='storage_trash_purge'),
+  re_path(r'^storage/chown/?$', api_public.storage_chown, name='storage_chown'),
+  re_path(r'^storage/chmod/?$', api_public.storage_chmod, name='storage_chmod'),
+  re_path(
+    r'^storage/extract_archive/?$', api_public.storage_extract_archive_using_batch_job, name='storage_extract_archive_using_batch_job'
+  ),
+  re_path(r'^storage/compress_files/?$', api_public.storage_compress_files_using_batch_job, name='storage_compress_files_using_batch_job'),
+  re_path(r'^storage/move/bulk/?$', api_public.storage_bulk_move, name='storage_bulk_move'),
+  re_path(r'^storage/copy/bulk/?$', api_public.storage_bulk_copy, name='storage_bulk_copy'),
+  re_path(r'^storage/delete/bulk/?$', api_public.storage_bulk_rmtree, name='storage_bulk_rmtree'),
+  re_path(r'^storage/trash/restore/bulk/?$', api_public.storage_trash_bulk_restore, name='storage_trash_bulk_restore'),
+  re_path(r'^storage/chown/bulk/?$', api_public.storage_bulk_chown, name='storage_bulk_chown'),
+  re_path(r'^storage/chmod/bulk/?$', api_public.storage_bulk_chmod, name='storage_bulk_chmod'),
 ]
 
 urlpatterns += [
