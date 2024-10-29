@@ -17,18 +17,21 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiFetchOptions, post } from '../../api/utils';
 
-export interface Options<T> {
-  postOptions?: ApiFetchOptions<T>;
-  skip?: boolean;
+interface saveOptions<T> {
   onSuccess?: (data: T) => void;
   onError?: (error: Error) => void;
+}
+
+export interface Options<T> extends saveOptions<T> {
+  postOptions?: ApiFetchOptions<T>;
+  skip?: boolean;
 }
 
 interface UseSaveData<T, U> {
   data?: T;
   loading: boolean;
   error?: Error;
-  save: (body: U) => void;
+  save: (body: U, saveOption: saveOptions<T>) => void;
 }
 
 const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSaveData<T, U> => {
@@ -48,7 +51,7 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
   );
 
   const saveData = useCallback(
-    async (body: U) => {
+    async (body: U, saveOptions: saveOptions<T>) => {
       // Avoid Posting data if the skip option is true
       // or if the URL is not provided
       if (options?.skip || !url) {
@@ -60,11 +63,17 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
       try {
         const response = await post<T, U>(url, body, postOptions);
         setData(response);
+        if (saveOptions?.onSuccess) {
+          saveOptions.onSuccess(response);
+        }
         if (localOptions?.onSuccess) {
           localOptions.onSuccess(response);
         }
       } catch (error) {
         setError(error);
+        if (saveOptions?.onError) {
+          saveOptions.onError(error);
+        }
         if (localOptions?.onError) {
           localOptions.onError(error);
         }

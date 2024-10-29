@@ -74,9 +74,11 @@ export interface BreadcrumbData {
 
 interface FileView {
   contents: string;
+  compression?: string;
 }
 
 export interface PathAndFileData {
+  editable?: boolean;
   path: string;
   breadcrumbs: BreadcrumbData[];
   files: File[];

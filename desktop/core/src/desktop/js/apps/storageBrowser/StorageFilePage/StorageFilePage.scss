@@ -20,6 +20,7 @@
   .hue-storage-file-page {
     display: flex;
     flex: 1;
+    height: 100%;
     flex-direction: column;
     gap: vars.$fluidx-spacing-s;
     padding: vars.$fluidx-spacing-s 0;
@@ -84,20 +85,47 @@
       gap: vars.$fluidx-spacing-s;
     }
 
-    .preview__textarea {
-      resize: none;
-      width: 100%;
-      height: 100%;
-      border: none;
-      border-radius: 0;
-      padding: vars.$fluidx-spacing-s;
-      box-shadow: none;
-    }
+    .preview__content {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+      background-color: vars.$fluidx-gray-040;
 
-    .preview__textarea[readonly] {
-      cursor: text;
-      color: vars.$fluidx-black;
-      background-color: vars.$fluidx-white;
+      .preview__textarea {
+        resize: none;
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 0;
+        padding: vars.$fluidx-spacing-s;
+        box-shadow: none;
+      }
+
+      .preview__textarea[readonly] {
+        cursor: text;
+        color: vars.$fluidx-black;
+        background-color: vars.$fluidx-white;
+      }
+
+      .preview__document {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      audio {
+        width: 90%;
+      }
+
+      video {
+        height: 90%;
+      }
+
+      .preview__unsupported {
+        font-size: vars.$font-size-lg;
+      }
     }
   }
 }
