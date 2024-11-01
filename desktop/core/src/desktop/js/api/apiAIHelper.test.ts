@@ -27,6 +27,7 @@ jest.mock('../api/utils', () => ({
 jest.mock('../apps/editor/execution/executor');
 
 // Mock to get all the tables
+const dbName = 'mockDB';
 const ALL_TABLES = ['mockTable1', 'mockTable2', 'mockTable3'];
 jest.mock('../catalog/dataCatalog', () => ({
   getEntry: jest.fn().mockReturnValue({
@@ -60,9 +61,10 @@ const checkThatTablesAreFiltered = ({
     expect(apiCallData.input.trim()).toEqual(expectedFilterInput.trim());
   }
 
-  expect(firstApiCallUrl).toContain('ai/tables');
-  expect(apiCallData.metadata).toEqual(ALL_TABLES);
-  expect(apiCallData.metadata.length).toEqual(3);
+  expect(firstApiCallUrl).toContain('ai/metadata');
+  const tableNames = apiCallData.metadata[0].table_names;
+  expect(tableNames).toEqual(ALL_TABLES);
+  expect(tableNames.length).toEqual(3);
 
   const secondApiCall = postMock.mock.calls[1];
   const secondApiCallUrl = secondApiCall[0];
@@ -92,9 +94,14 @@ describe('GenerativeFunctionFactory', () => {
     jest.clearAllMocks();
 
     postMock.mockImplementation((url: string) => {
-      if (url.includes('ai/tables')) {
+      if (url.includes('ai/metadata')) {
         return Promise.resolve({
-          tables: ALL_TABLES.slice(0, 2)
+          metadata: [
+            {
+              db_name: dbName,
+              table_names: ALL_TABLES.slice(0, 2)
+            }
+          ]
         });
       } else if (url.includes('ai/sql')) {
         return Promise.resolve({
@@ -171,9 +178,14 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/tables')) {
+        if (url.includes('ai/metadata')) {
           return Promise.resolve({
-            tables: ALL_TABLES.slice(0, 2)
+            metadata: [
+              {
+                db_name: dbName,
+                table_names: ALL_TABLES.slice(0, 2)
+              }
+            ]
           });
         } else if (url.includes('ai/sql')) {
           throw Error('error');
@@ -278,9 +290,14 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/tables')) {
+        if (url.includes('ai/metadata')) {
           return Promise.resolve({
-            tables: ALL_TABLES.slice(0, 2)
+            metadata: [
+              {
+                db_name: dbName,
+                table_names: ALL_TABLES.slice(0, 2)
+              }
+            ]
           });
         } else if (url.includes('ai/sql')) {
           throw Error('error');
@@ -389,9 +406,14 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/tables')) {
+        if (url.includes('ai/metadata')) {
           return Promise.resolve({
-            tables: ALL_TABLES.slice(0, 2)
+            metadata: [
+              {
+                db_name: dbName,
+                table_names: ALL_TABLES.slice(0, 2)
+              }
+            ]
           });
         } else if (url.includes('ai/sql')) {
           throw Error('error');
@@ -483,9 +505,14 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/tables')) {
+        if (url.includes('ai/metadata')) {
           return Promise.resolve({
-            tables: ALL_TABLES.slice(0, 2)
+            metadata: [
+              {
+                db_name: dbName,
+                table_names: ALL_TABLES.slice(0, 2)
+              }
+            ]
           });
         } else if (url.includes('ai/sql')) {
           throw Error('error');
@@ -576,9 +603,14 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/tables')) {
+        if (url.includes('ai/metadata')) {
           return Promise.resolve({
-            tables: ALL_TABLES.slice(0, 2)
+            metadata: [
+              {
+                db_name: dbName,
+                table_names: ALL_TABLES.slice(0, 2)
+              }
+            ]
           });
         } else if (url.includes('ai/sql')) {
           throw Error('error');
@@ -646,9 +678,14 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/tables')) {
+        if (url.includes('ai/metadata')) {
           return Promise.resolve({
-            tables: ALL_TABLES.slice(0, 2)
+            metadata: [
+              {
+                db_name: dbName,
+                table_names: ALL_TABLES.slice(0, 2)
+              }
+            ]
           });
         } else if (url.includes('ai/sql')) {
           throw Error('error');
