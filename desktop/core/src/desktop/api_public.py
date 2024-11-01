@@ -16,30 +16,31 @@
 # limitations under the License.
 
 import json
-import dataclasses
-from rest_framework.response import Response
-from desktop.lib.django_util import JsonResponse
-from desktop.conf import is_ai_interface_enabled, is_vector_db_enabled
-from desktop.models import LlmPrompt
 import logging
+import dataclasses
 
 from django.http import HttpResponse, QueryDict
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
+from beeswax import api as beeswax_api
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
+from desktop.conf import is_ai_interface_enabled, is_vector_db_enabled
 from desktop.lib import fsmanager
-from desktop.lib.connectors import api as connector_api
-from .serializer import LlmPromptSerializer
-from beeswax import api as beeswax_api
 from desktop.lib.ai.sql import perform_sql_task
+from desktop.lib.connectors import api as connector_api
+from desktop.lib.django_util import JsonResponse
+from desktop.models import LlmPrompt
 from filebrowser import api as filebrowser_api, views as filebrowser_views
 from indexer import api3 as indexer_api3
 from metadata import optimizer_api
 from notebook import api as notebook_api
 from notebook.conf import get_ordered_interpreters
 from useradmin import api as useradmin_api, views as useradmin_views
+
+from .serializer import LlmPromptSerializer
 
 LOG = logging.getLogger()
 
@@ -325,9 +326,11 @@ def importer_submit(request):
   django_request = get_django_request(request)
   return indexer_api3.importer_submit(django_request)
 
+
 llm_sql_disabled_response = JsonResponse({
   "message": "LLM SQL is not enabled on this server"
 }, status=403)
+
 
 @api_view(["POST"])
 def metadata(request):
@@ -360,6 +363,7 @@ def metadata(request):
   else:
     return llm_sql_disabled_response
 
+
 @api_view(["POST"])
 def sql(request):
   django_request = get_django_request(request)
@@ -374,6 +378,7 @@ def sql(request):
     return JsonResponse(dataclasses.asdict(response))
   else:
     return llm_sql_disabled_response
+
 
 def parse_database(request, database=None):
   django_request = get_django_request(request)
@@ -399,7 +404,7 @@ def parse_database(request, database=None):
     table_details = notebook_api.autocomplete1(django_request, None, database, table['name'], None, None)
     database_details[table['name']] = table_details['columns']
 
-  cache.set(database_cache_key, database_details, 30*60)
+  cache.set(database_cache_key, database_details, 30 * 60)
   return database_details
   databases = notebook_api.autocomplete1(django_request, None, database, None, None, None)
 
@@ -408,14 +413,11 @@ def parse_database(request, database=None):
     table_details = notebook_api.autocomplete1(django_request, None, database, table['name'], None, None)
     database_details[table['name']] = table_details['columns']
 
-  cache.set(database_cache_key, database_details, 30*60)
+  cache.set(database_cache_key, database_details, 30 * 60)
   return database_details
 
 
-
 # Connector
-
-
 @api_view(["GET"])
 def get_connector_types(request):
   django_request = get_django_request(request)
@@ -532,6 +534,7 @@ def search_entities_interactive(request):
   django_request = get_django_request(request)
   return desktop_api.search_entities_interactive(django_request)
 
+
 @api_view(["POST"])
 def create_prompt(request):
     prompt_text = request.data.get("prompt")
@@ -591,7 +594,6 @@ def update_prompt(request):
     prompt.save()
     serializer = LlmPromptSerializer(prompt, many=False)
     return Response(serializer.data)
-
 
 
 @api_view(["GET"])
