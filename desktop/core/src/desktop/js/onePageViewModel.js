@@ -194,7 +194,7 @@ class OnePageViewModel {
         });
       return deferred.promise();
     };
-    
+
     const loadScripts = function (scriptUrls) {
       const promises = [];
       while (scriptUrls.length) {
@@ -205,7 +205,7 @@ class OnePageViewModel {
       }
       return promises;
     };
-    
+
     const addGlobalCss = function ($el) {
       const cssFile = $el.attr('href').split('?')[0];
       if (!loadedCss.includes(cssFile)) {
@@ -219,22 +219,24 @@ class OnePageViewModel {
       }
       $el.remove();
     };
-    
+
     // Process headers to load CSS and JS files
     self.processHeaders = function (response) {
       const promise = $.Deferred();
       const $rawHtml = $('<span>').html(response);
-    
+
       const $allScripts = $rawHtml.find('script[src]');
-      const scriptsToLoad = $allScripts.map(function () {
-        return $(this).attr('src');
-      }).toArray();
+      const scriptsToLoad = $allScripts
+        .map(function () {
+          return $(this).attr('src');
+        })
+        .toArray();
       $allScripts.remove();
-    
+
       $rawHtml.find('link[href]').each(function () {
         addGlobalCss($(this));
       });
-    
+
       $rawHtml.find('a[href]').each(function () {
         let link = $(this).attr('href');
         if (link.startsWith('/') && !link.startsWith('/hue')) {
@@ -242,9 +244,9 @@ class OnePageViewModel {
         }
         $(this).attr('href', link);
       });
-    
+
       const scriptPromises = loadScripts(scriptsToLoad);
-    
+
       const loadScriptSync = function () {
         if (scriptPromises.length) {
           const nextScriptPromise = scriptPromises.shift();
@@ -263,7 +265,7 @@ class OnePageViewModel {
           promise.resolve($rawHtml.children());
         }
       };
-    
+
       loadScriptSync();
       return promise;
     };
@@ -376,20 +378,23 @@ class OnePageViewModel {
               window.clearAppIntervals(app);
               huePubSub.clearAppSubscribers(app);
               self.extraEmbeddableURLParams('');
-        
+
               self.processHeaders(response).done($rawHtml => {
                 const scripts = $rawHtml.find('script');
-        
+
                 // Append JSON scripts
-                scripts.each(function() {
+                scripts.each(function () {
                   if (this.getAttribute('type') === 'application/json') {
                     document.head.appendChild(this);
+                    // Disabling linting because initializeEditorComponent is defined in static folder
+                    // as this needs to be defined here
+                    // eslint-disable-next-line no-undef
                     initializeEditorComponent();
                   }
                 });
-        
+
                 // Append other scripts
-                scripts.each(function() {
+                scripts.each(function () {
                   if (!['application/json', 'text/html'].includes(this.getAttribute('type'))) {
                     const script = document.createElement('script');
                     script.type = 'text/javascript';
@@ -400,7 +405,7 @@ class OnePageViewModel {
                     $(this).remove();
                   }
                 });
-        
+
                 if (!window.SKIP_CACHE.includes(app)) {
                   self.embeddable_cache[app] = $rawHtml;
                 }
@@ -426,7 +431,9 @@ class OnePageViewModel {
               self.loadApp('500');
             } else {
               huePubSub.publish(GLOBAL_ERROR_TOPIC, {
-                message: I18n('It looks like you are offline or an unknown error happened. Please refresh the page.')
+                message: I18n(
+                  'It looks like you are offline or an unknown error happened. Please refresh the page.'
+                )
               });
             }
           }
