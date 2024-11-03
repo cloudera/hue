@@ -23,7 +23,7 @@ import { ExtendedColumn } from '../catalog/DataCatalogEntry';
 import { HistoryItem } from '../apps/editor/components/AiAssist/AiAssistToolbar/AiAssistToolbarHistory';
 import HueError from './HueError';
 
-const METADATA_API_URL = '/api/v1/editor/ai/metadata';
+const DBS_API_URL = '/api/v1/editor/ai/dbs';
 const SQL_API_URL = '/api/v1/editor/ai/sql';
 
 export interface TableColumnsMetadataItem {
@@ -187,7 +187,7 @@ const getTablesAndMetadata = async (
     executor,
     onStatusChange
   });
-  const tablesList = dbMetadatas[0].table_names;
+  const tablesList = dbMetadatas[0].tables;
 
   if (!Array.isArray(tablesList) || tablesList.length === 0) {
     throw new HueError('Could not find any relevant tables.');
@@ -203,9 +203,9 @@ const getTablesAndMetadata = async (
   return { tableMetadata };
 };
 
-interface DbMetadata {
-  db_name: string;
-  table_names: string[];
+interface DbTableNames {
+  name: string;
+  tables: string[];
 }
 interface GetRelevantMetadataParams {
   input: string;
@@ -218,7 +218,7 @@ const getRelevantMetadata = async ({
   databaseNames,
   executor,
   onStatusChange
-}: GetRelevantMetadataParams): Promise<DbMetadata[]> => {
+}: GetRelevantMetadataParams): Promise<DbTableNames[]> => {
   onStatusChange('Retrieving all table names');
   const metadata = [];
 
@@ -235,24 +235,24 @@ const getRelevantMetadata = async ({
     }
 
     metadata.push({
-      db_name: dbName,
-      table_names: allTables
+      name: dbName,
+      tables: allTables
     });
   }
 
   onStatusChange('Filtering relevant tables');
   try {
     const response = await fetchFromLlm<{
-      metadata: DbMetadata[];
+      dbs: DbTableNames[];
     }>({
-      url: METADATA_API_URL,
+      url: DBS_API_URL,
       data: {
         input: input,
-        metadata: metadata
+        dbs: metadata
       }
     });
 
-    return response.metadata;
+    return response.dbs;
   } catch (e) {
     throw augmentError(e, 'Error filtering relevant tables.');
   }

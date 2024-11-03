@@ -61,8 +61,8 @@ const checkThatTablesAreFiltered = ({
     expect(apiCallData.input.trim()).toEqual(expectedFilterInput.trim());
   }
 
-  expect(firstApiCallUrl).toContain('ai/metadata');
-  const tableNames = apiCallData.metadata[0].table_names;
+  expect(firstApiCallUrl).toContain('ai/dbs');
+  const tableNames = apiCallData.dbs[0].tables;
   expect(tableNames).toEqual(ALL_TABLES);
   expect(tableNames.length).toEqual(3);
 
@@ -94,12 +94,12 @@ describe('GenerativeFunctionFactory', () => {
     jest.clearAllMocks();
 
     postMock.mockImplementation((url: string) => {
-      if (url.includes('ai/metadata')) {
+      if (url.includes('ai/dbs')) {
         return Promise.resolve({
-          metadata: [
+          dbs: [
             {
-              db_name: dbName,
-              table_names: ALL_TABLES.slice(0, 2)
+              name: dbName,
+              tables: ALL_TABLES.slice(0, 2)
             }
           ]
         });
@@ -178,12 +178,12 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/metadata')) {
+        if (url.includes('ai/dbs')) {
           return Promise.resolve({
-            metadata: [
+            dbs: [
               {
-                db_name: dbName,
-                table_names: ALL_TABLES.slice(0, 2)
+                name: dbName,
+                tables: ALL_TABLES.slice(0, 2)
               }
             ]
           });
@@ -290,12 +290,12 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/metadata')) {
+        if (url.includes('ai/dbs')) {
           return Promise.resolve({
-            metadata: [
+            dbs: [
               {
-                db_name: dbName,
-                table_names: ALL_TABLES.slice(0, 2)
+                name: dbName,
+                tables: ALL_TABLES.slice(0, 2)
               }
             ]
           });
@@ -406,12 +406,12 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/metadata')) {
+        if (url.includes('ai/dbs')) {
           return Promise.resolve({
-            metadata: [
+            dbs: [
               {
-                db_name: dbName,
-                table_names: ALL_TABLES.slice(0, 2)
+                name: dbName,
+                tables: ALL_TABLES.slice(0, 2)
               }
             ]
           });
@@ -505,12 +505,12 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/metadata')) {
+        if (url.includes('ai/dbs')) {
           return Promise.resolve({
-            metadata: [
+            dbs: [
               {
-                db_name: dbName,
-                table_names: ALL_TABLES.slice(0, 2)
+                name: dbName,
+                tables: ALL_TABLES.slice(0, 2)
               }
             ]
           });
@@ -603,12 +603,12 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/metadata')) {
+        if (url.includes('ai/dbs')) {
           return Promise.resolve({
-            metadata: [
+            dbs: [
               {
-                db_name: dbName,
-                table_names: ALL_TABLES.slice(0, 2)
+                name: dbName,
+                tables: ALL_TABLES.slice(0, 2)
               }
             ]
           });
@@ -678,12 +678,12 @@ describe('GenerativeFunctionFactory', () => {
       console.error = jest.fn();
 
       postMock.mockImplementation((url: string) => {
-        if (url.includes('ai/metadata')) {
+        if (url.includes('ai/dbs')) {
           return Promise.resolve({
-            metadata: [
+            dbs: [
               {
-                db_name: dbName,
-                table_names: ALL_TABLES.slice(0, 2)
+                name: dbName,
+                tables: ALL_TABLES.slice(0, 2)
               }
             ]
           });

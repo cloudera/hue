@@ -333,16 +333,16 @@ llm_sql_disabled_response = JsonResponse({
 
 
 @api_view(["POST"])
-def metadata(request):
+def dbs(request):
   input = request.data.get("input")
-  metadata = request.data.get("metadata")
+  dbs = request.data.get("dbs")
 
   if is_ai_interface_enabled():
-    related_metadata = []
+    relevant_dbs = []
 
-    for data in metadata:
-      db_name = data["db_name"]
-      table_names = data["table_names"]
+    for data in dbs:
+      db_name = data["name"]
+      table_names = data["tables"]
 
       if is_vector_db_enabled():
         from desktop.lib.ai.vector_db import filter_vector_db
@@ -351,14 +351,14 @@ def metadata(request):
         from desktop.lib.ai.metadata import semantic_search
         table_names = semantic_search(table_names, input)
 
-      related_metadata.append({
-        "db_name": db_name,
-        "table_names": table_names
+      relevant_dbs.append({
+        "name": db_name,
+        "tables": table_names
       })
 
     # TODO: Use LLM and filter tables even further
     return JsonResponse({
-      "metadata": related_metadata
+      "dbs": relevant_dbs
     })
   else:
     return llm_sql_disabled_response
