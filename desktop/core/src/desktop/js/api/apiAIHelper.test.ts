@@ -27,7 +27,6 @@ jest.mock('../api/utils', () => ({
 jest.mock('../apps/editor/execution/executor');
 
 // Mock to get all the tables
-const dbName = 'mockDB';
 const ALL_TABLES = ['mockTable1', 'mockTable2', 'mockTable3'];
 jest.mock('../catalog/dataCatalog', () => ({
   getEntry: jest.fn().mockReturnValue({
@@ -68,13 +67,13 @@ const checkThatTablesAreFiltered = ({
 
   const secondApiCall = postMock.mock.calls[1];
   const secondApiCallUrl = secondApiCall[0];
-  const tablesPassedToLLM = secondApiCall[1].metadata.tables;
+  const tablesPassedToLLM = secondApiCall[1].metadata.dbs[0].tables;
   expect(secondApiCallUrl).toContain('ai/sql');
   expect(tablesPassedToLLM.length).toBe(2);
 
   expect(onStatusChange).toHaveBeenCalledWith('Retrieving all table names');
   expect(onStatusChange).toHaveBeenCalledWith('Filtering relevant tables');
-  expect(onStatusChange).toHaveBeenCalledWith('Retrieving table metadata');
+  expect(onStatusChange).toHaveBeenCalledWith('Retrieving table details');
 };
 
 describe('GenerativeFunctionFactory', () => {
@@ -98,7 +97,7 @@ describe('GenerativeFunctionFactory', () => {
         return Promise.resolve({
           dbs: [
             {
-              name: dbName,
+              name: 'db',
               tables: ALL_TABLES.slice(0, 2)
             }
           ]
@@ -182,7 +181,7 @@ describe('GenerativeFunctionFactory', () => {
           return Promise.resolve({
             dbs: [
               {
-                name: dbName,
+                name: 'db',
                 tables: ALL_TABLES.slice(0, 2)
               }
             ]
@@ -294,7 +293,7 @@ describe('GenerativeFunctionFactory', () => {
           return Promise.resolve({
             dbs: [
               {
-                name: dbName,
+                name: 'db',
                 tables: ALL_TABLES.slice(0, 2)
               }
             ]
@@ -410,7 +409,7 @@ describe('GenerativeFunctionFactory', () => {
           return Promise.resolve({
             dbs: [
               {
-                name: dbName,
+                name: 'db',
                 tables: ALL_TABLES.slice(0, 2)
               }
             ]
@@ -509,7 +508,7 @@ describe('GenerativeFunctionFactory', () => {
           return Promise.resolve({
             dbs: [
               {
-                name: dbName,
+                name: 'db',
                 tables: ALL_TABLES.slice(0, 2)
               }
             ]
@@ -607,7 +606,7 @@ describe('GenerativeFunctionFactory', () => {
           return Promise.resolve({
             dbs: [
               {
-                name: dbName,
+                name: 'db',
                 tables: ALL_TABLES.slice(0, 2)
               }
             ]
@@ -682,7 +681,7 @@ describe('GenerativeFunctionFactory', () => {
           return Promise.resolve({
             dbs: [
               {
-                name: dbName,
+                name: 'db',
                 tables: ALL_TABLES.slice(0, 2)
               }
             ]

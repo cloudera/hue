@@ -4,7 +4,7 @@ import { ExtendedColumn } from 'catalog/DataCatalogEntry';
 // Types & Interfaces
 import { LOCATION_TYPES } from 'parse/sql/sqlParseUtils';
 import { IdentifierLocation, AutocompleteParser } from 'parse/types';
-import { TableColumnsMetadata, TableColumnsMetadataItem } from 'api/apiAIHelper';
+import { TableColumnsMetadata, TableDetails } from 'api/apiAIHelper';
 
 // CTE column aliases are viewed as columns by the parser when referenced
 // outside the CTE, so we need to exclude them from the list of columns
@@ -47,7 +47,7 @@ const extractTablesFromSql = (autocompleteParser: AutocompleteParser, sql: strin
 };
 
 const extractColumnsFromTableMetadata = (tableColumnsMetadata: TableColumnsMetadata) => {
-  const columnNames = tableColumnsMetadata.map((table: TableColumnsMetadataItem) =>
+  const columnNames = tableColumnsMetadata.map((table: TableDetails) =>
     table.columns.map((column: ExtendedColumn) => column.name)
   );
   const uniqueColumnNames = [...new Set(columnNames.flat())];

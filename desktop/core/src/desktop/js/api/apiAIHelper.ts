@@ -26,13 +26,18 @@ import HueError from './HueError';
 const DBS_API_URL = '/api/v1/editor/ai/dbs';
 const SQL_API_URL = '/api/v1/editor/ai/sql';
 
-export interface TableColumnsMetadataItem {
+export interface TableDetails {
   columns: Array<ExtendedColumn>;
   dbName: string;
   name: string;
 }
 
-export type TableColumnsMetadata = Array<TableColumnsMetadataItem>;
+export interface DbTableDetails {
+  name: string;
+  tables: TableDetails[];
+}
+
+export type TableColumnsMetadata = Array<TableDetails>;
 
 interface ExplainSqlResponse {
   explain: string;
@@ -174,33 +179,40 @@ const augmentError = (e: unknown, defaultMsg: string): HueError => {
   return error;
 };
 
-const getTablesAndMetadata = async (
-  input: string,
-  databaseName: string,
-  executor: Executor,
-  onStatusChange: (arg: string) => void
-) => {
-  // TODO: Pass multi databases
-  const dbMetadatas = await getRelevantMetadata({
-    input,
-    databaseNames: [databaseName],
-    executor,
-    onStatusChange
-  });
-  const tablesList = dbMetadatas[0].tables;
-
-  if (!Array.isArray(tablesList) || tablesList.length === 0) {
-    throw new HueError('Could not find any relevant tables.');
-  }
-
-  let tableMetadata;
+interface DbTableDetailsParams {
+  input: string;
+  databaseNames: string[];
+  executor: Executor;
+  onStatusChange: (arg: string) => void;
+}
+const getDbTableDetails = async ({
+  input,
+  databaseNames,
+  executor,
+  onStatusChange
+}: DbTableDetailsParams): Promise<DbTableDetails[]> => {
   try {
-    onStatusChange('Retrieving table metadata');
-    tableMetadata = await getRelevantTableDetails(databaseName, tablesList, executor);
+    const dbTables = await getRelevantDbTables({
+      input,
+      databaseNames,
+      executor,
+      onStatusChange
+    });
+
+    onStatusChange('Retrieving table details');
+    const dbTableDetails: DbTableDetails[] = [];
+    for (const db of dbTables) {
+      const tableDetails = await getTableDetails(db.name, db.tables, executor);
+      dbTableDetails.push({
+        name: db.name,
+        tables: tableDetails
+      });
+    }
+
+    return dbTableDetails;
   } catch (e) {
-    throw new HueError('Could not load relevant table metadata');
+    throw augmentError(e, 'Could not find relevant tables');
   }
-  return { tableMetadata };
 };
 
 interface DbTableNames {
@@ -213,7 +225,7 @@ interface GetRelevantMetadataParams {
   executor: Executor;
   onStatusChange: (arg: string) => void;
 }
-const getRelevantMetadata = async ({
+const getRelevantDbTables = async ({
   input,
   databaseNames,
   executor,
@@ -228,10 +240,6 @@ const getRelevantMetadata = async ({
       allTables = (await getTableList(dbName, executor)) as Array<string>;
     } catch (e) {
       throw augmentError(e, 'Failed loading table names');
-    }
-
-    if (!Array.isArray(allTables) || allTables.length === 0) {
-      throw new HueError('No tables found. Please verify DB name used.');
     }
 
     metadata.push({
@@ -294,25 +302,26 @@ const fetchTableDetails = async (databaseName: string, tableName: string, execut
   };
 };
 
-export const getRelevantTableDetails = async (
+export const getTableDetails = async (
   databaseName: string,
   tableNames: string[],
   executor: Executor,
   onStatusChange?: (arg: string) => void
-): Promise<Array<TableColumnsMetadataItem>> => {
-  onStatusChange && onStatusChange('Finding relevant table metadata');
-  const relevantTables = [];
+): Promise<TableDetails[]> => {
+  onStatusChange && onStatusChange('Fetching relevant table details');
+
+  const tableDetails = [];
   for (const tableName of tableNames) {
     try {
-      const tableDetails = await fetchTableDetails(databaseName, tableName, executor);
-      relevantTables.push(tableDetails);
+      tableDetails.push(await fetchTableDetails(databaseName, tableName, executor));
     } catch (error) {
-      console.error(`Could not fetch columns data for table: ${tableName}`, error);
-      continue;
+      const msg = `Could not fetch columns data for table: ${tableName}`;
+      console.error(msg, error);
+      throw new HueError(msg);
     }
   }
 
-  return relevantTables;
+  return tableDetails;
 };
 
 const getTableList = async (databaseName: string, executor: Executor) => {
@@ -337,17 +346,12 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
   dialect,
   onStatusChange
 }) => {
-  let tableMetadata;
-  try {
-    ({ tableMetadata } = await getTablesAndMetadata(
-      statement,
-      databaseName,
-      executor,
-      onStatusChange
-    ));
-  } catch (e) {
-    throw augmentError(e, 'Could not find relevant tables');
-  }
+  const dbTableDetails = await getDbTableDetails({
+    input: statement,
+    databaseNames: [databaseName],
+    executor,
+    onStatusChange
+  });
 
   onStatusChange('Optimizing SQL query');
 
@@ -359,7 +363,7 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
         sql: statement,
         dialect,
         metadata: {
-          tables: tableMetadata
+          dbs: dbTableDetails
         }
       }
     });
@@ -375,12 +379,12 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
   dialect,
   onStatusChange
 }) => {
-  let tableMetadata;
-  try {
-    ({ tableMetadata } = await getTablesAndMetadata(nql, databaseName, executor, onStatusChange));
-  } catch (e) {
-    throw augmentError(e, 'Could not find relevant tables');
-  }
+  const dbTableDetails = await getDbTableDetails({
+    input: nql,
+    databaseNames: [databaseName],
+    executor,
+    onStatusChange
+  });
 
   onStatusChange('Generating SQL query');
   try {
@@ -391,11 +395,12 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
         input: nql,
         dialect,
         metadata: {
-          tables: tableMetadata
+          dbs: dbTableDetails
         }
       }
     });
-    return { ...result, tableColumnsMetadata: tableMetadata };
+    // TODO: Make tableColumnsMetadata work for all DBs
+    return { ...result, tableColumnsMetadata: dbTableDetails[0].tables };
   } catch (e) {
     throw augmentError(e, 'Call to AI to generate SQL query failed ');
   }
@@ -411,19 +416,14 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
   dialect,
   onStatusChange
 }) => {
-  let tableMetadata;
-  try {
-    const tables = tableNamesUsed?.join(' ') || '';
-    const inputForTableList = `${tables} ${previousNql || ''} ${nql}`;
-    ({ tableMetadata } = await getTablesAndMetadata(
-      inputForTableList,
-      databaseName,
-      executor,
-      onStatusChange
-    ));
-  } catch (e) {
-    throw augmentError(e, 'Could not find relevant tables');
-  }
+  const tables = tableNamesUsed?.join(' ') || '';
+  const inputForTableList = `${tables} ${previousNql || ''} ${nql}`;
+  const dbTableDetails = await getDbTableDetails({
+    input: inputForTableList,
+    databaseNames: [databaseName],
+    executor,
+    onStatusChange
+  });
 
   onStatusChange('Generating SQL query');
   try {
@@ -435,11 +435,13 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
         input: nql,
         dialect,
         metadata: {
-          tables: tableMetadata
+          dbs: dbTableDetails
         }
       }
     });
-    return { ...result, tableColumnsMetadata: tableMetadata };
+
+    // TODO: Make tableColumnsMetadata work for all DBs
+    return { ...result, tableColumnsMetadata: dbTableDetails[0].tables };
   } catch (e) {
     throw augmentError(e, 'Call to AI to edit SQL query failed');
   }
@@ -453,17 +455,12 @@ const generateExplanation: GenerateExplanation = async ({
   onStatusChange
 }) => {
   try {
-    let tableMetadata;
-    try {
-      ({ tableMetadata } = await getTablesAndMetadata(
-        statement,
-        databaseName,
-        executor,
-        onStatusChange
-      ));
-    } catch (e) {
-      throw augmentError(e, 'Could not find relevant tables');
-    }
+    const dbTableDetails = await getDbTableDetails({
+      input: statement,
+      databaseNames: [databaseName],
+      executor,
+      onStatusChange
+    });
 
     onStatusChange('Generating explanation');
     return await fetchFromLlm<ExplainSqlResponse>({
@@ -473,7 +470,7 @@ const generateExplanation: GenerateExplanation = async ({
         sql: statement,
         dialect,
         metadata: {
-          tables: tableMetadata
+          dbs: dbTableDetails
         }
       }
     });
@@ -489,17 +486,12 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({
   executor,
   onStatusChange
 }) => {
-  let tableMetadata;
-  try {
-    ({ tableMetadata } = await getTablesAndMetadata(
-      statement,
-      databaseName,
-      executor,
-      onStatusChange
-    ));
-  } catch (e) {
-    throw augmentError(e, 'Could not find relevant tables');
-  }
+  const dbTableDetails = await getDbTableDetails({
+    input: statement,
+    databaseNames: [databaseName],
+    executor,
+    onStatusChange
+  });
 
   onStatusChange('Generating corrected SQL query');
   try {
@@ -510,7 +502,7 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({
         sql: statement,
         dialect,
         metadata: {
-          tables: tableMetadata
+          dbs: dbTableDetails
         }
       }
     });

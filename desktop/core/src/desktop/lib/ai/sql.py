@@ -67,7 +67,7 @@ def _get_service() -> BaseService:
     raise Exception(f"Invalid service name - {service_name}")
 
 
-def build_create_table_ddl(table: dict) -> str:
+def build_create_table_ddl(db_name: str, table: dict) -> str:
   table_name = table["name"]
 
   details = []
@@ -86,7 +86,7 @@ def build_create_table_ddl(table: dict) -> str:
     details.append(f"FOREIGN KEY ({key['fromColumn']}) REFERENCES {key['toTable']} ({key['toColumn']})")
 
   details_str = ', '.join(details)
-  ddl = f'CREATE TABLE {table_name} ({details_str})'
+  ddl = f'CREATE TABLE {db_name}.{table_name} ({details_str})'
 
   table_comment = table.get("comment")
   if table_comment is not None:
@@ -132,14 +132,14 @@ def get_table_key(table) -> str:
   return json.dumps(table)
 
 
-def format_metadata(metadata, reader) -> str:
+def format_tables(db_name, tables, reader) -> str:
   table_metadatas = []
 
-  for table in metadata["tables"]:
+  for table in tables:
     table_key = get_table_key(table)
     table_meta = table_meta_cache.get(table_key)
     if table_meta is None:
-      table_meta = build_create_table_ddl(table)
+      table_meta = build_create_table_ddl(db_name, table)
       if ADD_TABLE_DATA:
         sample_data = build_sample_data(reader, table)
         table_meta = f"{table_meta}\n{sample_data}"
@@ -147,6 +147,19 @@ def format_metadata(metadata, reader) -> str:
     table_metadatas.append(table_meta)
 
   return '\n\n'.join(table_metadatas)
+
+
+def format_metadata(metadata, reader) -> str:
+  db_metadatas = []
+
+  for index, db in enumerate(metadata["dbs"]):
+    db_name = db["name"]
+    table_metadata = format_tables(db_name, db["tables"], reader)
+
+    db_metadata = f"Database {index + 1}: {db_name}\n\n{table_metadata}"
+    db_metadatas.append(db_metadata)
+
+  return '\n\n----------\n\n'.join(db_metadatas)
 
 
 def perform_sql_task(request, task: TaskType, input: str, sql: str, dialect: str, metadata: dict) -> SQLResponse:
