@@ -13,8 +13,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { post } from '../../api/utils';
-
 export const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary';
 export const DOWNLOAD_API_URL = '/filebrowser/download=';
 export const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
@@ -23,13 +21,9 @@ export const VIEWFILES_API_URl = '/api/v1/storage/view=';
 
 export const CREATE_FILE_API_URL = '/api/v1/storage/create/file/';
 export const CREATE_DIRECTORY_API_URL = '/api/v1/storage/create/directory/';
-const RENAME_API_URL = '/api/v1/storage/rename';
+export const RENAME_API_URL = '/api/v1/storage/rename';
 
 export interface ApiFileSystem {
   file_system: string;
   user_home_directory: string;
 }
-
-export const rename = async (src_path: string, dest_path: string): Promise<void> => {
-  await post(RENAME_API_URL, { src_path: src_path, dest_path: dest_path });
-};

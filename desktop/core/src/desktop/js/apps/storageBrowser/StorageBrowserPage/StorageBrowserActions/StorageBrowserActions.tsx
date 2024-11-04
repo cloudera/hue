@@ -38,8 +38,9 @@ import {
   isS3,
   isOFSRoot
 } from '../../../../utils/storageBrowserUtils';
-import { rename } from '../../../../reactComponents/FileChooser/api';
+import { RENAME_API_URL } from '../../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../../utils/huePubSub';
+import useSaveData from '../../../../utils/hooks/useSaveData';
 
 import SummaryModal from '../../SummaryModal/SummaryModal';
 import InputModal from '../../InputModal/InputModal';
@@ -54,7 +55,6 @@ interface StorageBrowserRowActionsProps {
 
 const StorageBrowserActions = ({
   selectedFiles,
-  setLoadingFiles,
   onSuccessfulAction
 }: StorageBrowserRowActionsProps): JSX.Element => {
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
@@ -63,19 +63,18 @@ const StorageBrowserActions = ({
 
   const { t } = i18nReact.useTranslation();
 
-  const handleRename = (newName: string) => {
-    setLoadingFiles(true);
-    rename(selectedFile, newName)
-      .then(() => {
-        onSuccessfulAction();
-      })
-      .catch(error => {
-        huePubSub.publish('hue.error', error);
-        setShowRenameModal(false);
-      })
-      .finally(() => {
-        setLoadingFiles(false);
-      });
+  const { error: renameError, save: saveRename } = useSaveData(RENAME_API_URL);
+
+  const handleRename = (value: string) => {
+    saveRename(
+      { source_path: selectedFile, destination_path: value },
+      {
+        onSuccess: () => onSuccessfulAction(),
+        onError: () => {
+          huePubSub.publish('hue.error', renameError);
+        }
+      }
+    );
   };
 
   const isSummaryEnabled = () => {

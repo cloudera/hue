@@ -65,7 +65,7 @@ const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Elem
     onError: () => {
       huePubSub.publish('hue.error', error);
     },
-    skip: path === '' || path === undefined
+    skip: path === '' || path === undefined || !showModal
   });
 
   const summary = useMemo(() => {
