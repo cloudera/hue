@@ -21,7 +21,8 @@ export const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 export const SAVE_FILE_API_URL = '/filebrowser/save';
 export const VIEWFILES_API_URl = '/api/v1/storage/view=';
 const MAKE_DIRECTORY_API_URL = '/api/v1/storage/mkdir';
-const TOUCH_API_URL = '/api/v1/storage/touch';
+
+export const CREATE_FILE_API_URL = '/api/v1/storage/create/file/';
 const RENAME_API_URL = '/api/v1/storage/rename';
 
 export interface ApiFileSystem {
@@ -31,10 +32,6 @@ export interface ApiFileSystem {
 
 export const mkdir = async (folderName: string, path: string): Promise<void> => {
   await post(MAKE_DIRECTORY_API_URL, { name: folderName, path: path });
-};
-
-export const touch = async (fileName: string, path: string): Promise<void> => {
-  await post(TOUCH_API_URL, { name: fileName, path: path });
 };
 
 export const rename = async (src_path: string, dest_path: string): Promise<void> => {

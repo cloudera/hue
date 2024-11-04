@@ -34,7 +34,7 @@ import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import useDebounce from '../../../../utils/useDebounce';
 
-import { mkdir, touch } from '../../../../reactComponents/FileChooser/api';
+import { mkdir, CREATE_FILE_API_URL } from '../../../../reactComponents/FileChooser/api';
 import {
   StorageBrowserTableData,
   SortOrder,
@@ -44,6 +44,7 @@ import Pagination from '../../../../reactComponents/Pagination/Pagination';
 import StorageBrowserActions from '../StorageBrowserActions/StorageBrowserActions';
 import InputModal from '../../InputModal/InputModal';
 import formatBytes from '../../../../utils/formatBytes';
+import useSaveData from '../../../../utils/hooks/useSaveData';
 
 import './StorageBrowserTable.scss';
 import { formatTimestamp } from '../../../../utils/dateTimeUtils';
@@ -255,19 +256,18 @@ const StorageBrowserTable = ({
       });
   };
 
+  const { error: createFileError, save: saveCreateFile } = useSaveData(CREATE_FILE_API_URL);
+
   const handleCreateNewFile = (fileName: string) => {
-    setLoadingFiles(true);
-    touch(fileName, filePath)
-      .then(() => {
-        refetchData();
-      })
-      .catch(error => {
-        huePubSub.publish('hue.error', error);
-        setShowNewFileModal(false);
-      })
-      .finally(() => {
-        setLoadingFiles(false);
-      });
+    saveCreateFile(
+      { path: filePath, name: fileName },
+      {
+        onSuccess: () => refetchData(),
+        onError: () => {
+          huePubSub.publish('hue.error', createFileError);
+        }
+      }
+    );
   };
 
   const handleSearch = useCallback(
