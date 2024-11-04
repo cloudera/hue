@@ -31,12 +31,16 @@ RUN set -eux; \
     npm \
     openjdk-8 \
     openldap-dev \
-    openssl \
-    openssl-dev \
     rsync \
     sqlite-dev \
     sudo \
     zlib-dev \
+    busybox \
+    ca-certificates-bundle \
+    jitterentropy-library-dev=3.5.0-r0 \
+    jitterentropy-library=3.5.0-r0 \
+    openssf-compiler-options \
+    perl \
     nmap netcat-openbsd iftop procps net-tools bind-tools shadow
 
 # Install libtool without conflicts
@@ -45,6 +49,40 @@ RUN apk --no-cache --force-overwrite add libtool
 # Set JAVA_HOME environment variable
 ENV JAVA_HOME="/usr/lib/jvm/java-1.8-openjdk"
 ENV PATH="$JAVA_HOME/bin:$PATH"
+
+# Install openssl 3.4.0
+RUN set -eux; \
+    mkdir -p /tmp/ssl_download && cd /tmp/ssl_download && \
+    curl -O -L https://github.com/openssl/openssl/releases/download/openssl-3.4.0/openssl-3.4.0.tar.gz && \
+    tar -xzf openssl-3.4.0.tar.gz && \
+    cd openssl-3.4.0 && \
+    perl ./Configure \
+         linux-$(uname -m) \
+         --prefix=/usr \
+         --libdir=lib \
+         --openssldir=/etc/ssl \
+         enable-ktls \
+         enable-jitter \
+         shared \
+         enable-pie \
+         no-zlib \
+         no-async \
+         no-comp \
+         no-idea \
+         no-mdc2 \
+         no-rc5 \
+         no-ec2m \
+         no-sm2 \
+         no-sm4 \
+         no-ssl3 \
+         no-seed \
+         no-docs \
+         no-weak-ssl-ciphers \
+         -Wa,--noexecstack && \
+      perl configdata.pm --dump && \
+      make -j$(nproc) && \
+      make install && \
+      rm -f /etc/ssl/openssl.cnf /etc/ssl/openssl.cnf.dist /etc/ssl/ct_log_list.cnf /etc/ssl/ct_log_list.cnf.dist
 
 # Install xmlsec
 RUN set -eux; \
