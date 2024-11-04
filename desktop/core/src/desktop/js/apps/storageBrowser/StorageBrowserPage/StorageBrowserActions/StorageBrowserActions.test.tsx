@@ -19,13 +19,14 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 import StorageBrowserActions from './StorageBrowserActions';
-import {
-  StorageBrowserTableData,
-  ContentSummary
-} from '../../../../reactComponents/FileChooser/types';
-import * as StorageBrowserApi from '../../../../reactComponents/FileChooser/api';
-import { CancellablePromise } from '../../../../api/cancellablePromise';
+import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
+import { get } from '../../../../api/utils';
 
+jest.mock('../../../../api/utils', () => ({
+  get: jest.fn()
+}));
+
+const mockGet = get as jest.MockedFunction<typeof get>;
 describe('StorageBrowserRowActions', () => {
   //View summary option is enabled and added to the actions menu when the row data is either hdfs/ofs and a single file
   const mockRecord: StorageBrowserTableData = {
@@ -87,9 +88,19 @@ describe('StorageBrowserRowActions', () => {
   };
 
   describe('Summary option', () => {
-    let summaryApiMock;
+    beforeAll(() => {
+      jest.clearAllMocks();
+    });
 
-    const mockSummaryData = {
+    beforeEach(() => {
+      mockGet.mockResolvedValue(mockSummary);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    const mockSummary = {
       summary: {
         directoryCount: 0,
         ecPolicy: 'Replicated',
@@ -102,17 +113,6 @@ describe('StorageBrowserRowActions', () => {
         replication: 3
       }
     };
-
-    const setUpMock = () => {
-      summaryApiMock = jest
-        .spyOn(StorageBrowserApi, 'fetchContentSummary')
-        .mockReturnValue(CancellablePromise.resolve<ContentSummary>(mockSummaryData));
-    };
-
-    afterEach(() => {
-      summaryApiMock?.mockClear();
-    });
-
     test('does not render view summary option when there are multiple records selected', async () => {
       await setUpActionMenu(mockTwoRecords);
       expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
@@ -140,9 +140,8 @@ describe('StorageBrowserRowActions', () => {
 
     test('renders summary modal when view summary option is clicked', async () => {
       const user = userEvent.setup();
-      setUpMock();
       await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
-      await user.click(screen.queryByRole('menuitem', { name: 'View Summary' }));
+      await user.click(screen.queryByRole('menuitem', { name: 'View Summary' })!);
       expect(await screen.findByText('Summary for /user/demo/test')).toBeInTheDocument();
     });
   });
