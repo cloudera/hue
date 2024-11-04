@@ -34,7 +34,10 @@ import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import useDebounce from '../../../../utils/useDebounce';
 
-import { mkdir, CREATE_FILE_API_URL } from '../../../../reactComponents/FileChooser/api';
+import {
+  CREATE_DIRECTORY_API_URL,
+  CREATE_FILE_API_URL
+} from '../../../../reactComponents/FileChooser/api';
 import {
   StorageBrowserTableData,
   SortOrder,
@@ -241,19 +244,19 @@ const StorageBrowserTable = ({
     onPageNumberChange(nextPageNumber === 0 ? numPages : nextPageNumber);
   };
 
+  const { error: createFolderError, save: saveCreateFolder } =
+    useSaveData(CREATE_DIRECTORY_API_URL);
+
   const handleCreateNewFolder = (folderName: string) => {
-    setLoadingFiles(true);
-    mkdir(folderName, filePath)
-      .then(() => {
-        refetchData();
-      })
-      .catch(error => {
-        huePubSub.publish('hue.error', error);
-        setShowNewFolderModal(false);
-      })
-      .finally(() => {
-        setLoadingFiles(false);
-      });
+    saveCreateFolder(
+      { path: filePath, name: folderName },
+      {
+        onSuccess: () => refetchData(),
+        onError: () => {
+          huePubSub.publish('hue.error', createFolderError);
+        }
+      }
+    );
   };
 
   const { error: createFileError, save: saveCreateFile } = useSaveData(CREATE_FILE_API_URL);
