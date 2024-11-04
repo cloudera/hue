@@ -40,10 +40,38 @@ $max-height: 300px;
 
 .hue-ai-assist-toolbar-history__top {
   display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
+  justify-content: space-between;
   color: vars.$fluidx-blue-400;
   padding: 0 8px 8px 8px;
+}
+
+.hue-ai-assist-toolbar-history__db-panel {
+  flex: 1;
+
+  .ant-select-selection-search input {
+    display: none;
+  }
+
+  .ant-select-selection-overflow {
+    >:first-child .ant-select-selection-item-remove {
+      display: none;
+    }
+
+    &::after {
+      content: "+";
+      font-size: 1.4em;
+      color: vars.$fluidx-blue-400;
+    }
+  }
+}
+
+.hue-ai-assist-toolbar-history__toggle {
+  width: 25px;
+}
+
+.hue-ai-assist-toolbar-history__msg {
+  padding-left: 15px;
+  opacity: 0.5;
 }
 
 .hue-ai-assist-toolbar-history__menu-container {

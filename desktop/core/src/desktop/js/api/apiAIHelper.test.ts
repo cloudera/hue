@@ -116,7 +116,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateOptimizedSql } = generativeFunctionFactory();
       await generateOptimizedSql({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -133,7 +133,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateOptimizedSql } = generativeFunctionFactory();
       await generateOptimizedSql({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -151,7 +151,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateOptimizedSql } = generativeFunctionFactory();
       const result = await generateOptimizedSql({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -164,7 +164,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateOptimizedSql } = generativeFunctionFactory();
       await generateOptimizedSql({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -195,7 +195,7 @@ describe('GenerativeFunctionFactory', () => {
       try {
         await generateOptimizedSql({
           statement: 'SELECT * FROM table',
-          databaseName: 'db',
+          databaseNames: ['db'],
           executor: mockExecutor,
           dialect: 'hive',
           onStatusChange
@@ -214,7 +214,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateSQLfromNQL } = generativeFunctionFactory();
       await generateSQLfromNQL({
         nql: 'nl prompt mock',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -231,7 +231,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateSQLfromNQL } = generativeFunctionFactory();
       await generateSQLfromNQL({
         nql: 'nl mock prompt',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -245,11 +245,11 @@ describe('GenerativeFunctionFactory', () => {
       expect(llmApiCallData.task).toEqual('generate');
     });
 
-    it('should return the new sql, explanation and tableColumnsMetadata', async () => {
+    it('should return the new sql, explanation and dbTableDetails', async () => {
       const { generateSQLfromNQL } = generativeFunctionFactory();
       const result = await generateSQLfromNQL({
         nql: 'nl mock prompt',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -258,10 +258,11 @@ describe('GenerativeFunctionFactory', () => {
       expect(result).toEqual({
         explanation: 'mocked explanation',
         sql: 'mocked SQL query',
-        tableColumnsMetadata: expect.any(Array)
+        dbTableDetails: expect.any(Array)
       });
-      expect(result.tableColumnsMetadata?.length).toBe(2);
-      const exampleTableObj = result.tableColumnsMetadata && result.tableColumnsMetadata[0];
+      expect(result.dbTableDetails?.length).toBe(1);
+      expect(result.dbTableDetails[0].tables.length).toBe(2);
+      const exampleTableObj = result.dbTableDetails[0].tables && result.dbTableDetails[0].tables[0];
       expect(exampleTableObj).toEqual(
         expect.objectContaining({
           columns: expect.any(Array),
@@ -276,7 +277,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateSQLfromNQL } = generativeFunctionFactory();
       await generateSQLfromNQL({
         nql: 'nl mock prompt',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -307,7 +308,7 @@ describe('GenerativeFunctionFactory', () => {
       try {
         await generateSQLfromNQL({
           nql: 'nl mock prompt',
-          databaseName: 'db',
+          databaseNames: ['db'],
           executor: mockExecutor,
           dialect: 'hive',
           onStatusChange
@@ -327,7 +328,7 @@ describe('GenerativeFunctionFactory', () => {
       await generateEditedSQLfromNQL({
         nql: 'nl prompt mock',
         sql: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -345,7 +346,7 @@ describe('GenerativeFunctionFactory', () => {
       await generateEditedSQLfromNQL({
         nql: 'nl prompt mock',
         sql: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -359,12 +360,12 @@ describe('GenerativeFunctionFactory', () => {
       expect(llmApiCallData.task).toEqual('edit');
     });
 
-    it('should return the new sql, explanation and tableColumnsMetadata', async () => {
+    it('should return the new sql, explanation and dbTableDetails', async () => {
       const { generateEditedSQLfromNQL } = generativeFunctionFactory();
       const result = await generateEditedSQLfromNQL({
         nql: 'nl prompt mock',
         sql: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -373,10 +374,11 @@ describe('GenerativeFunctionFactory', () => {
       expect(result).toEqual({
         explanation: 'mocked explanation',
         sql: 'mocked SQL query',
-        tableColumnsMetadata: expect.any(Array)
+        dbTableDetails: expect.any(Array)
       });
-      expect(result.tableColumnsMetadata?.length).toBe(2);
-      const exampleTableObj = result.tableColumnsMetadata && result.tableColumnsMetadata[0];
+      expect(result.dbTableDetails?.length).toBe(1);
+      expect(result.dbTableDetails[0].tables.length).toBe(2);
+      const exampleTableObj = result.dbTableDetails[0].tables && result.dbTableDetails[0].tables[0];
       expect(exampleTableObj).toEqual(
         expect.objectContaining({
           columns: expect.any(Array),
@@ -392,7 +394,7 @@ describe('GenerativeFunctionFactory', () => {
       await generateEditedSQLfromNQL({
         nql: 'nl prompt mock',
         sql: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -424,7 +426,7 @@ describe('GenerativeFunctionFactory', () => {
         await generateEditedSQLfromNQL({
           nql: 'nl prompt mock',
           sql: 'SELECT * FROM table',
-          databaseName: 'db',
+          databaseNames: ['db'],
           executor: mockExecutor,
           dialect: 'hive',
           onStatusChange
@@ -443,7 +445,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateCorrectedSql } = generativeFunctionFactory();
       await generateCorrectedSql({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -460,7 +462,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateCorrectedSql } = generativeFunctionFactory();
       await generateCorrectedSql({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -478,7 +480,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateCorrectedSql } = generativeFunctionFactory();
       const result = await generateCorrectedSql({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -491,7 +493,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateCorrectedSql } = generativeFunctionFactory();
       await generateCorrectedSql({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -522,7 +524,7 @@ describe('GenerativeFunctionFactory', () => {
       try {
         await generateCorrectedSql({
           statement: 'SELECT * FROM table',
-          databaseName: 'db',
+          databaseNames: ['db'],
           executor: mockExecutor,
           dialect: 'hive',
           onStatusChange
@@ -541,7 +543,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateExplanation } = generativeFunctionFactory();
       await generateExplanation({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -558,7 +560,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateExplanation } = generativeFunctionFactory();
       await generateExplanation({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -576,7 +578,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateExplanation } = generativeFunctionFactory();
       const result = await generateExplanation({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -589,7 +591,7 @@ describe('GenerativeFunctionFactory', () => {
       const { generateExplanation } = generativeFunctionFactory();
       await generateExplanation({
         statement: 'SELECT * FROM table',
-        databaseName: 'db',
+        databaseNames: ['db'],
         executor: mockExecutor,
         dialect: 'hive',
         onStatusChange
@@ -620,7 +622,7 @@ describe('GenerativeFunctionFactory', () => {
       try {
         await generateExplanation({
           statement: 'SELECT * FROM table',
-          databaseName: 'db',
+          databaseNames: ['db'],
           executor: mockExecutor,
           dialect: 'hive',
           onStatusChange

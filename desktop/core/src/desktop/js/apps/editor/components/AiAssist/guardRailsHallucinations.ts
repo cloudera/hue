@@ -1,10 +1,9 @@
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
-import { ExtendedColumn } from 'catalog/DataCatalogEntry';
 
 // Types & Interfaces
 import { LOCATION_TYPES } from 'parse/sql/sqlParseUtils';
 import { IdentifierLocation, AutocompleteParser } from 'parse/types';
-import { TableColumnsMetadata, TableDetails } from 'api/apiAIHelper';
+import { DbTableDetails } from 'api/apiAIHelper';
 
 // CTE column aliases are viewed as columns by the parser when referenced
 // outside the CTE, so we need to exclude them from the list of columns
@@ -46,29 +45,39 @@ const extractTablesFromSql = (autocompleteParser: AutocompleteParser, sql: strin
   return uniqueTableNames;
 };
 
-const extractColumnsFromTableMetadata = (tableColumnsMetadata: TableColumnsMetadata) => {
-  const columnNames = tableColumnsMetadata.map((table: TableDetails) =>
-    table.columns.map((column: ExtendedColumn) => column.name)
+const extractIdentifiersFromDbTableDetails = (dbTableDetails: DbTableDetails[]) => {
+  const uniqueTableNames = new Set<string>();
+  const uniqueColumnNames = new Set<string>();
+
+  dbTableDetails.forEach(db =>
+    db.tables.forEach(table => {
+      uniqueTableNames.add(table.name);
+      table.columns.forEach(col => uniqueColumnNames.add(col.name));
+    })
   );
-  const uniqueColumnNames = [...new Set(columnNames.flat())];
-  return uniqueColumnNames;
+
+  return [[...uniqueTableNames], [...uniqueColumnNames]];
 };
 
 export const findHallucinations = async ({
   sql,
   dialect,
-  tableColumnsMetadata
+  dbTableDetails
 }: {
   sql: string;
   dialect: string;
-  tableColumnsMetadata: TableColumnsMetadata;
+  dbTableDetails: DbTableDetails[];
 }): Promise<{ columns: Array<string>; tables: Array<string> }> => {
   const autocompleteParser = await sqlParserRepository.getAutocompleteParser(dialect);
+
+  // TODO: Consider db -> table -> column relation instead of a flat check
+
+  const [availableTables, availableColumns] = extractIdentifiersFromDbTableDetails(dbTableDetails);
+
   const referencedColumns = extractColumnsFromSql(autocompleteParser, sql);
-  const availableColumns = extractColumnsFromTableMetadata(tableColumnsMetadata);
   const missingColumns = referencedColumns.filter(column => !availableColumns.includes(column));
+
   const referencedTables = extractTablesFromSql(autocompleteParser, sql);
-  const availableTables = tableColumnsMetadata.map(table => table.name);
   const missingTables = referencedTables.filter(column => !availableTables.includes(column));
 
   return { columns: missingColumns, tables: missingTables };

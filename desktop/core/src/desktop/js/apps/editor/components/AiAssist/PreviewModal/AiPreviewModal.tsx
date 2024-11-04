@@ -71,7 +71,7 @@ interface PreviewModalProps {
   lineNumberStart: number;
   dialect: string;
   keywordCase: KeywordCase | undefined;
-  databaseName: string;
+  databaseNames: string[];
 }
 
 const PreviewModal = ({
@@ -90,14 +90,14 @@ const PreviewModal = ({
   lineNumberStart = 1,
   dialect,
   keywordCase,
-  databaseName
+  databaseNames
 }: PreviewModalProps): JSX.Element => {
   const titles = {
-    [AiActionModes.GENERATE]: `Generated SQL for ${databaseName} - suggestion`,
-    [AiActionModes.EDIT]: `Edited SQL for ${databaseName} - suggestion`,
-    [AiActionModes.OPTIMIZE]: `Optimized SQL for ${databaseName} - suggestion`,
-    [AiActionModes.EXPLAIN]: `Explained SQL for ${databaseName}`,
-    [AiActionModes.FIX]: `Fixed SQL for ${databaseName} - suggestion`
+    [AiActionModes.GENERATE]: `Generated SQL for ${databaseNames} - suggestion`,
+    [AiActionModes.EDIT]: `Edited SQL for ${databaseNames} - suggestion`,
+    [AiActionModes.OPTIMIZE]: `Optimized SQL for ${databaseNames} - suggestion`,
+    [AiActionModes.EXPLAIN]: `Explained SQL for ${databaseNames}`,
+    [AiActionModes.FIX]: `Fixed SQL for ${databaseNames} - suggestion`
   };
   const titlesOnNoDiff = {
     [AiActionModes.OPTIMIZE]: 'Optimized SQL - no suggestion',
@@ -106,7 +106,7 @@ const PreviewModal = ({
   };
   const mesagesOnNoDiff = {
     [AiActionModes.OPTIMIZE]: 'No optimization to the SQL statement could be suggested.',
-    [AiActionModes.EDIT]: `The SQL statement could not be edited based on the input given. 
+    [AiActionModes.EDIT]: `The SQL statement could not be edited based on the input given.
     The AI has returned an unmodified SQL statement.`,
     [AiActionModes.FIX]: 'No fix for the SQL statement could be suggested.'
   };

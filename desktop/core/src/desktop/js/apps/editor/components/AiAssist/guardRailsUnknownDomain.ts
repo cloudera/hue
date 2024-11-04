@@ -18,7 +18,7 @@
 
 import sqlParserRepository from 'parse/sql/sqlParserRepository';
 import { LOCATION_TYPES } from 'parse/sql/sqlParseUtils';
-import { TableColumnsMetadata } from 'api/apiAIHelper';
+import { DbTableDetails, TableDetails } from 'api/apiAIHelper';
 import { IdentifierLocation } from 'parse/types';
 
 interface ReplaceItem {
@@ -39,9 +39,9 @@ const applyReplacements = (sql: string, replacements: Array<ReplaceItem>) => {
 const isColumnStringBased = (
   tableName: string,
   columnName: string,
-  tableColumnsMetadata: TableColumnsMetadata
+  tableDetails: TableDetails[]
 ): boolean => {
-  const table = tableColumnsMetadata.find(table => table.name === tableName);
+  const table = tableDetails.find(table => table.name === tableName);
   const column = table?.columns.find(column => column.name === columnName);
   return (
     column?.name === columnName &&
@@ -76,11 +76,11 @@ const makeZeroBased = (num: number) => num - 1;
 export const transformToCaseInsensitivePatternMatching = async ({
   sql,
   dialect,
-  tableColumnsMetadata
+  dbTableDetails
 }: {
   sql: string;
   dialect: string;
-  tableColumnsMetadata: TableColumnsMetadata;
+  dbTableDetails: DbTableDetails[];
 }): Promise<{
   modifiedSql: string | undefined;
 }> => {
@@ -90,11 +90,16 @@ export const transformToCaseInsensitivePatternMatching = async ({
   const lines = sql.split('\n');
   const columns = result.locations.filter(loc => loc.type === LOCATION_TYPES.COLUMN);
 
+  const allTableDetails = dbTableDetails.map(db => db.tables).flat();
+
   columns.forEach(col => {
     const columnName = (col.identifierChain && col.identifierChain[0].name) || '';
-    const tableName = Array.isArray(col.tables) ? col.tables[0].identifierChain[0].name : '';
+    const identifierChain = Array.isArray(col.tables) ? col.tables[0].identifierChain : [];
+    const tableName = identifierChain.length
+      ? identifierChain[identifierChain.length - 1].name
+      : '';
 
-    if (isColumnStringBased(tableName, columnName, tableColumnsMetadata)) {
+    if (isColumnStringBased(tableName, columnName, allTableDetails)) {
       const lineNumber = col.location.first_line - 1;
       const line = lines[lineNumber];
       const restAfterColName = line.slice(col.location.last_column - 1).trim();

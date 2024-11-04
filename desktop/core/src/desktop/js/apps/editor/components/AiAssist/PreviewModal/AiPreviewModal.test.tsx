@@ -36,7 +36,7 @@ describe('PreviewModal', () => {
     lineNumberStart: 1,
     dialect: 'hive',
     keywordCase: undefined,
-    databaseName: 'testDatabase'
+    databaseNames: ['testDatabase']
   };
 
   test.each([

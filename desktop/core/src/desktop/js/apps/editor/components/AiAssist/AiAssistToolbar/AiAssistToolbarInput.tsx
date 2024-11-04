@@ -142,6 +142,9 @@ function AiAssistToolbarInput({
   isExpanded,
   prefill = '',
   promptValue,
+  allDbNames,
+  databaseNames,
+  setDatabaseNames,
   historyItems
 }: {
   isAnimating: boolean;
@@ -154,6 +157,9 @@ function AiAssistToolbarInput({
   onInputChanged: (params: string) => void;
   onAnimationEnded: () => void;
   promptValue: string;
+  allDbNames: string[];
+  databaseNames: string[];
+  setDatabaseNames: (params: string[]) => void;
   historyItems: HistoryItem[];
 }): JSX.Element {
   const autoShow = getFromLocalStorage(AUTO_SHOW_STORAGE_KEY, true);
@@ -327,6 +333,9 @@ function AiAssistToolbarInput({
             }}
             onSelect={handleHistorySelect}
             searchValue={inputPromptValue}
+            allDbNames={allDbNames}
+            databaseNames={databaseNames}
+            setDatabaseNames={setDatabaseNames}
             items={historyItems}
           />
           {hasReasonableInputLength(inputPromptValue) && (

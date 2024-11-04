@@ -135,6 +135,7 @@ jest.mock('api/apiAIHelper', () => ({
       dialect: 'hive'
     }
   ]),
+  fetchAllDatabases: jest.fn().mockResolvedValue([]),
   createHistoryItem: jest.fn().mockResolvedValue({ prompt: 'created', id: 1 }),
   updateHistoryItem: jest.fn().mockResolvedValue({ prompt: 'created', id: 1 })
 }));

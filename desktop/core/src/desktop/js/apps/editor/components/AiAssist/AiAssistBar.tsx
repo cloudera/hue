@@ -21,7 +21,7 @@ import classNames from 'classnames';
 import huePubSub from 'utils/huePubSub';
 import { AutocompleteParser } from 'parse/types';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
-import { generativeFunctionFactory } from 'api/apiAIHelper';
+import { generativeFunctionFactory, fetchAllDatabases } from 'api/apiAIHelper';
 import SqlExecutable from '../../execution/sqlExecutable';
 import {
   getRowInterval,
@@ -134,7 +134,17 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   const inputExpanded = actionMode === AiActionModes.EDIT || actionMode === AiActionModes.GENERATE;
   const inputPrefill = inputExpanded ? extractLeadingNqlComments(selectedStatement) : '';
 
-  const databaseName = getDbName(activeExecutable);
+  const [allDbNames, setAllDbNames] = useState([]);
+  useEffect(() => {
+    (async () => {
+      const allDbs = await fetchAllDatabases(activeExecutable.executor);
+      setAllDbNames(allDbs);
+    })();
+  }, [activeExecutable]);
+
+  const activeDbName = getDbName(activeExecutable);
+  const [databaseNames, setDatabaseNames] = useState([activeDbName]);
+  useEffect(() => setDatabaseNames([activeDbName]), [activeDbName]);
 
   const handleStatusUpdate = (status: string) => {
     setLoadingStatusText(status);
@@ -147,14 +157,13 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   const loadExplanation = async (statement: string) => {
     setIsLoading(true);
     const executor = activeExecutable?.executor;
-    const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
     try {
       const { explain, summary } = await generateExplanation({
         statement,
         dialect,
         executor,
-        databaseName,
+        databaseNames,
         onStatusChange: handleStatusUpdate
       });
 
@@ -175,13 +184,12 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     setGuardrailAlert(undefined);
     setErrorStatusText('');
     const executor = activeExecutable?.executor;
-    const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
     let sql, assumptions, guardrailAlert;
     try {
       ({ sql, assumptions, guardrailAlert } = await withGuardrails(generateSQLfromNQL)({
         nql,
-        databaseName,
+        databaseNames,
         executor,
         dialect,
         onStatusChange: handleStatusUpdate
@@ -210,7 +218,6 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     setIsLoading(true);
     setGuardrailAlert(undefined);
     const executor = activeExecutable?.executor;
-    const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
     const tableNamesUsed = extractTablesAndViews(sqlToModify, autocompleteParser);
 
@@ -221,7 +228,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
         previousNql: inputPrefill,
         tableNamesUsed,
         sql: sqlToModify,
-        databaseName,
+        databaseNames,
         executor,
         dialect,
         onStatusChange: handleStatusUpdate
@@ -246,13 +253,12 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     setActionMode(AiActionModes.OPTIMIZE);
     setGuardrailAlert(undefined);
     const executor = activeExecutable?.executor;
-    const databaseName = getDbName(activeExecutable);
     const dialect = sqlDialect;
     let sql, explain, guardrailAlert;
     try {
       ({ sql, explain, guardrailAlert } = await withGuardrails(generateOptimizedSql)({
         statement,
-        databaseName,
+        databaseNames,
         executor,
         dialect,
         onStatusChange: handleStatusUpdate
@@ -276,12 +282,11 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     setGuardrailAlert(undefined);
     const dialect = sqlDialect;
     const executor = activeExecutable?.executor;
-    const databaseName = getDbName(activeExecutable);
     let sql, explain, guardrailAlert;
     try {
       ({ sql, explain, guardrailAlert } = await withGuardrails(generateCorrectedSql)({
         statement,
-        databaseName,
+        databaseNames,
         executor,
         dialect,
         onStatusChange: handleStatusUpdate
@@ -489,7 +494,9 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
             loadComments={loadComments}
             isSqlError={hasIncorrectSql}
             inputPrefill={inputPrefill}
-            databaseName={databaseName}
+            allDbNames={allDbNames}
+            databaseNames={databaseNames}
+            setDatabaseNames={setDatabaseNames}
             dialect={sqlDialect}
           />
         </div>
@@ -533,7 +540,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
           dialect={sqlDialect}
           keywordCase={keywordCase}
           guardrailAlert={guardrailAlert}
-          databaseName={getDbName(activeExecutable)}
+          databaseNames={databaseNames}
         />
       )}
     </>

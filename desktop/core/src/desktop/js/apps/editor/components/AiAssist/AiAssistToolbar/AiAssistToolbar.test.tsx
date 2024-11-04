@@ -53,7 +53,7 @@ describe('AssistToolbar', () => {
     isSqlError: false,
     onInputSubmit: mockOnInputSubmit,
     onInputChanged: mockOnInputChanged,
-    databaseName: '',
+    databaseNames: [''],
     dialect: ''
   };
 
@@ -155,7 +155,7 @@ describe('AssistToolbar', () => {
     const { getByTitle, getByText } = render(
       <AssistToolbar
         {...defaultProps}
-        databaseName="testDatabase"
+        databaseNames={['testDatabase']}
         parsedStatement={{ statement: '' }}
       />
     );

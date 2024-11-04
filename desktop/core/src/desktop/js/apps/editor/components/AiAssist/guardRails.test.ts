@@ -16,6 +16,7 @@
   limitations under the License.
 */
 
+import { DbTableDetails } from 'api/apiAIHelper';
 import {
   withGuardrails,
   GuardrailAlertType,
@@ -34,13 +35,22 @@ import {
   exploreActionMsg
 } from './guardRails';
 
+function buildDetails(tables: unknown): DbTableDetails[] {
+  return [
+    {
+      name: 'db_name',
+      tables: tables
+    }
+  ];
+}
+
 describe('withGuardrails', () => {
-  it('returns complete API response except "tableColumnsMetadata" for successful calls', async () => {
+  it('returns complete API response except "dbTableDetails" for successful calls', async () => {
     // SQL + ASSUMPTIONS
     const mockApiResponse = {
       sql: 'SELECT col1 FROM table1',
       assumptions: 'here is my assumption',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }] }]
+      dbTableDetails: buildDetails([{ name: 'table1', columns: [{ name: 'col1' }] }])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
     const result = await withGuardrails(mockFunctionToGuard)({
@@ -53,7 +63,7 @@ describe('withGuardrails', () => {
     const mockApiResponse2 = {
       sql: 'SELECT col1 FROM table1',
       explain: 'here is my explain',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }] }]
+      dbTableDetails: buildDetails([{ name: 'table1', columns: [{ name: 'col1' }] }])
     };
     const mockFunctionToGuard2 = jest.fn().mockReturnValue(mockApiResponse2);
     const result2 = await withGuardrails(mockFunctionToGuard2)({
@@ -103,7 +113,9 @@ describe('withGuardrails', () => {
     const mockApiResponse = {
       sql: 'SELECT col1 FROM table1 LATERAL VIEW explode(col2) exploded_table AS address;',
       assumptions: 'here is my assumption',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }, { name: 'col2' }] }]
+      dbTableDetails: buildDetails([
+        { name: 'table1', columns: [{ name: 'col1' }, { name: 'col2' }] }
+      ])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -126,7 +138,9 @@ describe('withGuardrails', () => {
     const mockApiResponse = {
       sql: 'SHOW TABLE STATS table1;',
       assumptions: 'here is my assumption',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }, { name: 'col2' }] }]
+      dbTableDetails: buildDetails([
+        { name: 'table1', columns: [{ name: 'col1' }, { name: 'col2' }] }
+      ])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -149,7 +163,7 @@ describe('withGuardrails', () => {
     const mockApiResponse = {
       sql: '',
       assumptions: '',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }] }]
+      dbTableDetails: buildDetails([{ name: 'table1', columns: [{ name: 'col1' }] }])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
     const result = await withGuardrails(mockFunctionToGuard)({
@@ -165,7 +179,9 @@ describe('withGuardrails', () => {
     const mockApiResponse = {
       sql: 'SELET * from table1;',
       assumptions: 'here is my assumption',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }, { name: 'col2' }] }]
+      dbTableDetails: buildDetails([
+        { name: 'table1', columns: [{ name: 'col1' }, { name: 'col2' }] }
+      ])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -182,7 +198,9 @@ describe('withGuardrails', () => {
     const mockApiResponse = {
       sql: 'DELETE FROM table1 WHERE col1 = 5;',
       assumptions: 'here is my assumption',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }, { name: 'col2' }] }]
+      dbTableDetails: buildDetails([
+        { name: 'table1', columns: [{ name: 'col1' }, { name: 'col2' }] }
+      ])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -197,7 +215,7 @@ describe('withGuardrails', () => {
     expect(result.guardrailAlert.nql).toEqual('Do forbidden stuff');
 
     // CHECKING FOR UNSAFE SQL HAS PRECEDENCE OVER HALLUCIANATION CHECK
-    // SO WE DON'T HAVE TO ADD tableColumnsMetadata WHEN WE TEST THE OTHER KEYWORDS
+    // SO WE DON'T HAVE TO ADD dbTableDetails WHEN WE TEST THE OTHER KEYWORDS
     const truncate = await withGuardrails(async () => ({ sql: 'TRUNCATE TABLE tablename;' }))({
       dialect: 'hive'
     });
@@ -215,7 +233,9 @@ describe('withGuardrails', () => {
     const mockApiResponse = {
       sql: 'ALTER TABLE table1 ADD COLUMNS (birth_date DATE);',
       assumptions: 'here is my assumption',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }, { name: 'col2' }] }]
+      dbTableDetails: buildDetails([
+        { name: 'table1', columns: [{ name: 'col1' }, { name: 'col2' }] }
+      ])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -229,7 +249,7 @@ describe('withGuardrails', () => {
     expect(result.guardrailAlert.confirmationText).toEqual(alterWarning('ALTER'));
 
     // CHECKING FOR UNSAFE SQL HAS PRECEDENCE OVER HALLUCIANATION CHECK
-    // SO WE DON'T HAVE TO ADD tableColumnsMetadata WHEN WE TEST THE OTHER KEYWORDS
+    // SO WE DON'T HAVE TO ADD dbTableDetails WHEN WE TEST THE OTHER KEYWORDS
     const insert = await withGuardrails(async () => ({
       sql: `INSERT INTO TABLE table1 VALUES ('my new value');`
     }))({
@@ -308,7 +328,7 @@ describe('withGuardrails', () => {
     const mockApiResponse = {
       sql: 'Select * from table2',
       assumptions: 'here is my assumption',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }] }]
+      dbTableDetails: buildDetails([{ name: 'table1', columns: [{ name: 'col1' }] }])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -327,7 +347,7 @@ describe('withGuardrails', () => {
     const mockApiResponse = {
       sql: 'Select * from mydb.table2',
       assumptions: 'here is my assumption',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }] }]
+      dbTableDetails: buildDetails([{ name: 'table1', columns: [{ name: 'col1' }] }])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -346,7 +366,7 @@ describe('withGuardrails', () => {
     const mockApiResponse = {
       sql: 'Select col2 from table1',
       assumptions: 'here is my assumption',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }] }]
+      dbTableDetails: buildDetails([{ name: 'table1', columns: [{ name: 'col1' }] }])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -365,7 +385,7 @@ describe('withGuardrails', () => {
     const mockApiResponse = {
       sql: 'Select * from table2',
       assumptions: 'here is my assumption',
-      tableColumnsMetadata: [{ name: 'table1', columns: [{ name: 'col1' }] }]
+      dbTableDetails: buildDetails([{ name: 'table1', columns: [{ name: 'col1' }] }])
     };
     const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -382,7 +402,7 @@ describe('withGuardrails', () => {
       const mockApiResponse = {
         sql: `Select * from table1 where col1 = 'value';`,
         assumptions: 'here is my assumption',
-        tableColumnsMetadata: [
+        dbTableDetails: buildDetails([
           {
             name: 'table1',
             columns: [
@@ -390,7 +410,7 @@ describe('withGuardrails', () => {
               { name: 'col2', type: 'varchar(40)' }
             ]
           }
-        ]
+        ])
       };
       const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -409,7 +429,7 @@ describe('withGuardrails', () => {
       const mockApiResponse = {
         sql: `Select * from table1 where col1 = "value";`,
         assumptions: 'here is my assumption',
-        tableColumnsMetadata: [
+        dbTableDetails: buildDetails([
           {
             name: 'table1',
             columns: [
@@ -417,7 +437,7 @@ describe('withGuardrails', () => {
               { name: 'col2', type: 'varchar(40)' }
             ]
           }
-        ]
+        ])
       };
       const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -436,7 +456,7 @@ describe('withGuardrails', () => {
       const mockApiResponse = {
         sql: `Select * \nfrom table1\n where col1 = 'value' and \n col2 = 'value2';`,
         assumptions: 'here is my assumption',
-        tableColumnsMetadata: [
+        dbTableDetails: buildDetails([
           {
             name: 'table1',
             columns: [
@@ -444,7 +464,7 @@ describe('withGuardrails', () => {
               { name: 'col2', type: 'varchar(40)' }
             ]
           }
-        ]
+        ])
       };
       const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -460,7 +480,7 @@ describe('withGuardrails', () => {
     it('transforms conditions with multiple and nested conditions correctly', async () => {
       const mockApiResponse = {
         sql: `SELECT * FROM users WHERE name = 'John Doe' AND (age = 30 OR name = 'Bruce S');`,
-        tableColumnsMetadata: [
+        dbTableDetails: buildDetails([
           {
             name: 'users',
             columns: [
@@ -468,7 +488,7 @@ describe('withGuardrails', () => {
               { name: 'age', type: 'int' }
             ]
           }
-        ]
+        ])
       };
       const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -484,7 +504,7 @@ describe('withGuardrails', () => {
     it('transforms conditions on joined tables with aliases', async () => {
       const mockApiResponse = {
         sql: `SELECT u.id, p.name FROM users u JOIN profiles p ON u.id = p.user_id WHERE p.country = 'USA';`,
-        tableColumnsMetadata: [
+        dbTableDetails: buildDetails([
           {
             name: 'users',
             columns: [{ name: 'id', type: 'int' }]
@@ -497,7 +517,7 @@ describe('withGuardrails', () => {
               { name: 'user_id', type: 'int' }
             ]
           }
-        ]
+        ])
       };
       const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -513,7 +533,7 @@ describe('withGuardrails', () => {
     it('transforms conditions on joined tables without aliases', async () => {
       const mockApiResponse = {
         sql: `SELECT users.id, profiles.name FROM users JOIN profiles ON users.id = profiles.user_id WHERE profiles.country = 'USA';`,
-        tableColumnsMetadata: [
+        dbTableDetails: buildDetails([
           {
             name: 'users',
             columns: [{ name: 'id', type: 'int' }]
@@ -526,7 +546,7 @@ describe('withGuardrails', () => {
               { name: 'user_id', type: 'int' }
             ]
           }
-        ]
+        ])
       };
       const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -542,7 +562,7 @@ describe('withGuardrails', () => {
     it('transforms conditions within subqueries', async () => {
       const mockApiResponse = {
         sql: `SELECT * FROM orders WHERE customer_id IN (SELECT id FROM customers WHERE city = 'New York');`,
-        tableColumnsMetadata: [
+        dbTableDetails: buildDetails([
           {
             name: 'orders',
             columns: [{ name: 'customer_id', type: 'int' }]
@@ -554,7 +574,7 @@ describe('withGuardrails', () => {
               { name: 'city', type: 'varchar(50)' }
             ]
           }
-        ]
+        ])
       };
       const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -570,7 +590,7 @@ describe('withGuardrails', () => {
     it('transforms complex query with JOIN and subquery correctly', async () => {
       const mockApiResponse = {
         sql: `SELECT employees.name, departments.name FROM employees JOIN departments ON employees.department_id = departments.id WHERE EXISTS (SELECT * FROM projects WHERE projects.department_id = departments.id AND projects.status = 'Active');`,
-        tableColumnsMetadata: [
+        dbTableDetails: buildDetails([
           {
             name: 'employees',
             columns: [
@@ -592,7 +612,7 @@ describe('withGuardrails', () => {
               { name: 'status', type: 'varchar(50)' }
             ]
           }
-        ]
+        ])
       };
       const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -608,7 +628,7 @@ describe('withGuardrails', () => {
     it('transforms query with condition, order, and limit correctly', async () => {
       const mockApiResponse = {
         sql: `SELECT * FROM products WHERE category = 'Furniture' ORDER BY price DESC LIMIT 10;`,
-        tableColumnsMetadata: [
+        dbTableDetails: buildDetails([
           {
             name: 'products',
             columns: [
@@ -616,7 +636,7 @@ describe('withGuardrails', () => {
               { name: 'price', type: 'decimal(10,2)' }
             ]
           }
-        ]
+        ])
       };
       const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 
@@ -632,12 +652,12 @@ describe('withGuardrails', () => {
     it('ignores non-string columns and preserves identifiers', async () => {
       const mockApiResponse = {
         sql: `SELECT COUNT(*) AS userCount FROM users WHERE signup_date = '2023-01-01';`,
-        tableColumnsMetadata: [
+        dbTableDetails: buildDetails([
           {
             name: 'users',
             columns: [{ name: 'signup_date', type: 'date' }]
           }
-        ]
+        ])
       };
       const mockFunctionToGuard = jest.fn().mockReturnValue(mockApiResponse);
 

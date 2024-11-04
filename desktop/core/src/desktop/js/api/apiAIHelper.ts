@@ -37,8 +37,6 @@ export interface DbTableDetails {
   tables: TableDetails[];
 }
 
-export type TableColumnsMetadata = Array<TableDetails>;
-
 interface ExplainSqlResponse {
   explain: string;
   summary: string;
@@ -46,7 +44,7 @@ interface ExplainSqlResponse {
 interface GenerateExplanation {
   (params: {
     statement: string;
-    databaseName: string;
+    databaseNames: string[];
     executor: Executor;
     dialect: string;
     onStatusChange: (arg: string) => void;
@@ -60,7 +58,7 @@ interface CorrectSqlResponse {
 interface GenerateCorrectedSql {
   (params: {
     statement: string;
-    databaseName: string;
+    databaseNames: string[];
     executor: Executor;
     dialect: string;
     onStatusChange: (arg: string) => void;
@@ -85,7 +83,7 @@ interface OptimizeSqlResponse {
 interface GenerateOptimizedSql {
   (params: {
     statement: string;
-    databaseName: string;
+    databaseNames: string[];
     executor: Executor;
     dialect: string;
     onStatusChange: (arg: string) => void;
@@ -95,12 +93,12 @@ interface GenerateOptimizedSql {
 interface GenerateSqlResponse {
   sql: string;
   assumptions: string;
-  tableColumnsMetadata?: TableColumnsMetadata;
+  dbTableDetails: DbTableDetails[];
 }
 interface GenerateSQLfromNQL {
   (params: {
     nql: string;
-    databaseName: string;
+    databaseNames: string[];
     executor: Executor;
     dialect: string;
     onStatusChange: (arg: string) => void;
@@ -110,7 +108,7 @@ interface GenerateSQLfromNQL {
 interface EditSQLResponse {
   sql: string;
   assumptions: string;
-  tableColumnsMetadata?: TableColumnsMetadata;
+  dbTableDetails: DbTableDetails[];
 }
 interface GenerateEditedSQLfromNQL {
   (params: {
@@ -118,7 +116,7 @@ interface GenerateEditedSQLfromNQL {
     previousNql?: string;
     tableNamesUsed?: string[];
     sql: string;
-    databaseName: string;
+    databaseNames: string[];
     executor: Executor;
     dialect: string;
     onStatusChange: (arg: string) => void;
@@ -232,7 +230,7 @@ const getRelevantDbTables = async ({
   onStatusChange
 }: GetRelevantMetadataParams): Promise<DbTableNames[]> => {
   onStatusChange('Retrieving all table names');
-  const metadata = [];
+  const metadata: Array<object> = [];
 
   for (const dbName of databaseNames) {
     let allTables;
@@ -264,6 +262,17 @@ const getRelevantDbTables = async ({
   } catch (e) {
     throw augmentError(e, 'Error filtering relevant tables.');
   }
+};
+
+export const fetchAllDatabases = async (executor: Executor): Promise<string[]> => {
+  const dbEntry = await dataCatalog.getEntry({
+    path: [],
+    connector: executor.connector(),
+    namespace: executor.namespace(),
+    compute: executor.compute()
+  });
+
+  return dbEntry.sourceMeta?.databases || [];
 };
 
 const fetchTableDetails = async (databaseName: string, tableName: string, executor: Executor) => {
@@ -341,14 +350,14 @@ const getTableList = async (databaseName: string, executor: Executor) => {
 
 const generateOptimizedSql: GenerateOptimizedSql = async ({
   statement,
-  databaseName,
+  databaseNames,
   executor,
   dialect,
   onStatusChange
 }) => {
   const dbTableDetails = await getDbTableDetails({
     input: statement,
-    databaseNames: [databaseName],
+    databaseNames,
     executor,
     onStatusChange
   });
@@ -374,14 +383,14 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
 
 const generateSQLfromNQL: GenerateSQLfromNQL = async ({
   nql,
-  databaseName,
+  databaseNames,
   executor,
   dialect,
   onStatusChange
 }) => {
   const dbTableDetails = await getDbTableDetails({
     input: nql,
-    databaseNames: [databaseName],
+    databaseNames,
     executor,
     onStatusChange
   });
@@ -399,8 +408,8 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
         }
       }
     });
-    // TODO: Make tableColumnsMetadata work for all DBs
-    return { ...result, tableColumnsMetadata: dbTableDetails[0].tables };
+
+    return { ...result, dbTableDetails };
   } catch (e) {
     throw augmentError(e, 'Call to AI to generate SQL query failed ');
   }
@@ -411,7 +420,7 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
   nql,
   previousNql,
   tableNamesUsed,
-  databaseName,
+  databaseNames,
   executor,
   dialect,
   onStatusChange
@@ -420,7 +429,7 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
   const inputForTableList = `${tables} ${previousNql || ''} ${nql}`;
   const dbTableDetails = await getDbTableDetails({
     input: inputForTableList,
-    databaseNames: [databaseName],
+    databaseNames,
     executor,
     onStatusChange
   });
@@ -440,8 +449,7 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
       }
     });
 
-    // TODO: Make tableColumnsMetadata work for all DBs
-    return { ...result, tableColumnsMetadata: dbTableDetails[0].tables };
+    return { ...result, dbTableDetails };
   } catch (e) {
     throw augmentError(e, 'Call to AI to edit SQL query failed');
   }
@@ -450,14 +458,14 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
 const generateExplanation: GenerateExplanation = async ({
   statement,
   dialect,
-  databaseName,
+  databaseNames,
   executor,
   onStatusChange
 }) => {
   try {
     const dbTableDetails = await getDbTableDetails({
       input: statement,
-      databaseNames: [databaseName],
+      databaseNames,
       executor,
       onStatusChange
     });
@@ -482,13 +490,13 @@ const generateExplanation: GenerateExplanation = async ({
 const generateCorrectedSql: GenerateCorrectedSql = async ({
   statement,
   dialect,
-  databaseName,
+  databaseNames,
   executor,
   onStatusChange
 }) => {
   const dbTableDetails = await getDbTableDetails({
     input: statement,
-    databaseNames: [databaseName],
+    databaseNames,
     executor,
     onStatusChange
   });
@@ -531,14 +539,16 @@ const generateCommentedSql: GenerateCommentedSql = async ({
   }
 };
 
+const getDb = (databaseNames: string[]): string => databaseNames && databaseNames.sort().join(',');
+
 // Function to fetch history items from the API
 export const getHistoryItems = async (
-  databaseName: string,
+  databaseNames: string[],
   dialect: string
 ): Promise<HistoryItem[]> => {
   try {
     const response = await get('/api/v1/editor/ai/prompts', {
-      databaseName: databaseName,
+      databaseName: getDb(databaseNames),
       dialect: dialect
     });
     return response as HistoryItem[];
@@ -548,9 +558,17 @@ export const getHistoryItems = async (
   }
 };
 
-export const createHistoryItem = async (promptItem: HistoryItem): Promise<HistoryItem> => {
+export const createHistoryItem = async (
+  prompt: string,
+  dialect: string,
+  databaseNames: string[]
+): Promise<HistoryItem> => {
   try {
-    const response = await post('/api/v1/editor/ai/prompt/create', promptItem);
+    const response = await post('/api/v1/editor/ai/prompt/create', {
+      prompt,
+      dialect,
+      db: getDb(databaseNames)
+    });
     return response as HistoryItem;
   } catch (error) {
     console.error('Error creating history items:', error);

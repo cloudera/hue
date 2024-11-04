@@ -54,7 +54,9 @@ interface AssistToolbarProps {
   className?: string;
   onInputSubmit: (value: string) => void;
   onInputChanged: (value: string) => void;
-  databaseName: string;
+  allDbNames: string[];
+  databaseNames: string[];
+  setDatabaseNames: (value: string[]) => void;
   dialect: string;
 }
 
@@ -75,7 +77,9 @@ function AssistToolbar({
   isSqlError,
   onInputSubmit,
   onInputChanged,
-  databaseName,
+  allDbNames,
+  databaseNames,
+  setDatabaseNames,
   dialect
 }: AssistToolbarProps): JSX.Element {
   const [isAnimatingInput, setIsAnimatingInput] = useState(false);
@@ -83,12 +87,12 @@ function AssistToolbar({
 
   useEffect(() => {
     const fetchAndAddHistory = async () => {
-      const history = await getHistoryItems(databaseName, dialect);
+      const history = await getHistoryItems(databaseNames, dialect);
       setHistoryItems(history);
     };
 
     fetchAndAddHistory();
-  }, [databaseName, dialect]);
+  }, [databaseNames, dialect]);
 
   const handleCancelInput = () => {
     setActionMode(undefined);
@@ -139,7 +143,7 @@ function AssistToolbar({
           console.error('Could not update history item:', error);
         });
     } else {
-      createHistoryItem({ prompt, dialect, db: databaseName })
+      createHistoryItem(prompt, dialect, databaseNames)
         .then(item => {
           setHistoryItems(prevItems => [item, ...prevItems]);
         })
@@ -178,13 +182,16 @@ function AssistToolbar({
                 isAnimating={isAnimatingInput}
                 isLoading={isLoading}
                 isExpanded={actionMode === AiActionModes.GENERATE && inputExpanded}
-                placeholder={`Query database ${databaseName} using natural language`}
+                placeholder={`Query database ${databaseNames.join(', ')} using natural language`}
                 onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
                 onInputChanged={prompt => onInputChanged(prompt)}
                 promptValue={inputValue}
                 onAnimationEnded={() => setIsAnimatingInput(false)}
                 prefill={inputPrefill}
+                allDbNames={allDbNames}
+                databaseNames={databaseNames}
+                setDatabaseNames={setDatabaseNames}
                 historyItems={historyItems}
               />
             </>
@@ -205,12 +212,15 @@ function AssistToolbar({
                 isExpanded={actionMode === AiActionModes.EDIT && inputExpanded}
                 isLoading={isLoading}
                 promptValue={inputValue}
-                placeholder={`Edit your query for database ${databaseName}`}
+                placeholder={`Edit your query for database ${databaseNames.join(', ')}`}
                 onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
                 onInputChanged={prompt => onInputChanged(prompt)}
                 onAnimationEnded={() => setIsAnimatingInput(false)}
                 prefill={inputPrefill}
+                allDbNames={allDbNames}
+                databaseNames={databaseNames}
+                setDatabaseNames={setDatabaseNames}
                 historyItems={historyItems}
               />
             </>
