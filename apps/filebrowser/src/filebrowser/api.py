@@ -21,6 +21,7 @@ import logging
 import operator
 import mimetypes
 import posixpath
+from io import BytesIO as string_io
 
 from django.core.paginator import EmptyPage, Paginator
 from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
@@ -399,21 +400,20 @@ def upload_file(request):
 
   Returns JSON.
   """
-  pass
-  # response = {}
+  response = {}
 
-  # try:
-  #   response = _upload_file(request)
-  # except Exception as e:
-  #   LOG.exception('Upload operation failed.')
+  try:
+    response = _upload_file(request)
+  except Exception as e:
+    LOG.exception('Upload operation failed.')
 
-  #   file = request.FILES.get('file')
-  #   if file and hasattr(file, 'remove'):  # TODO: Call from proxyFS -- Check feasibility of this old comment
-  #     file.remove()
+    file = request.FILES.get('file')
+    if file and hasattr(file, 'remove'):  # TODO: Call from proxyFS -- Check feasibility of this old comment
+      file.remove()
 
-  #   return HttpResponse(str(e).split('\n', 1)[0], status=500)  # TODO: Check error message and status code
+    return HttpResponse(str(e).split('\n', 1)[0], status=500)  # TODO: Check error message and status code
 
-  # return JsonResponse(response)
+  return JsonResponse(response)
 
 
 def _upload_file(request):
@@ -423,50 +423,38 @@ def _upload_file(request):
   The uploaded file is stored in HDFS at its destination with a .tmp suffix.
   We just need to rename it to the destination path.
   """
+  # Read request body first to prevent RawPostDataException later on
+  body_data_bytes = string_io(request.body)
+
   uploaded_file = request.FILES['file']
-  dest_path = request.GET.get('dest')
-  response = {}
+  dest_path = request.POST.get('destination_path')
 
-  if MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 and uploaded_file.size > MAX_FILE_SIZE_UPLOAD_LIMIT.get():
-    return HttpResponse(f'File exceeds maximum allowed size of {MAX_FILE_SIZE_UPLOAD_LIMIT.get()} bytes.', status=500)
+  if MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 and uploaded_file.size >= MAX_FILE_SIZE_UPLOAD_LIMIT.get():
+    raise Exception(f'File exceeds maximum allowed size of {MAX_FILE_SIZE_UPLOAD_LIMIT.get()} bytes for upload operation.')
 
-  # Use form for now to triger the upload handler process by Django.
-  # Might be a better solution now to try directly using handler in request.fs.upload() for all FS.
-  # form = UploadAPIFileForm(request.POST, request.FILES)
-
-  if request.META.get('upload_failed'):
-    raise Exception(request.META.get('upload_failed'))  # TODO: Check error message and status code
-
-  # if not form.is_valid():
-  #   raise Exception(f"Error in upload form: {form.errors}")
+  if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
+    raise Exception(f'Upload failed: {posixpath.sep} is not allowed in the filename {uploaded_file.name}.')
 
   filepath = request.fs.join(dest_path, uploaded_file.name)
 
-  if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
-    raise Exception(f'Upload failed: {posixpath.sep} is not allowed in the filename {uploaded_file.name}.')  # TODO: status code
-
   try:
-    request.fs.upload(file=uploaded_file, path=dest_path, username=request.user.username)
-  except IOError as ex:
+    request.fs.upload(request.META, input_data=body_data_bytes, destination=dest_path, username=request.user.username)
+  except Exception as ex:
     already_exists = False
     try:
-      already_exists = request.fs.exists(dest_path)
+      already_exists = request.fs.exists(filepath)
     except Exception:
       pass
 
     if already_exists:
       messsage = f'Upload failed: Destination {filepath} already exists.'
     else:
-      messsage = f'Upload error: Copy to {filepath} failed: {str(ex)}'
+      messsage = f'Upload to {filepath} failed: {str(ex)}'
     raise Exception(messsage)  # TODO: Check error messages above and status code
 
-  # TODO: Check response fields below
-  response.update(
-    {
-      'path': filepath,
-      'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
-    }
-  )
+  response = {
+    'uploaded_file_stats': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
+  }
 
   return response
 
@@ -766,7 +754,6 @@ def bulk_op(request, op):
 
   error_dict = {}
   for p in path_list:
-
     tmp_dict = bulk_dict
     if op in (copy, move):
       tmp_dict['source_path'] = p
@@ -795,10 +782,12 @@ def _massage_stats(request, stats):
   stats_dict = stats.to_json_dict()
   normalized_path = request.fs.normpath(stats_dict.get('path'))
 
-  stats_dict.update({
-    'path': normalized_path,
-    'type': filetype(stats.mode),
-    'rwx': rwx(stats.mode, stats.aclBit),
-  })
+  stats_dict.update(
+    {
+      'path': normalized_path,
+      'type': filetype(stats.mode),
+      'rwx': rwx(stats.mode, stats.aclBit),
+    }
+  )
 
   return stats_dict

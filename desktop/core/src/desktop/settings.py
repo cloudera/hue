@@ -112,7 +112,7 @@ USE_TZ = False
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # Setting this variable to 5MB as sometime request size > 2.5MB (default value)
+DATA_UPLOAD_MAX_MEMORY_SIZE = None
 
 ############################################################
 # Part 3: Django configuration
@@ -645,14 +645,18 @@ LOAD_BALANCER_COOKIE = 'ROUTEID'
 # This section must go after the desktop lib modules are loaded
 ################################################################
 
+# Import after configs are set
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER  # noqa: E402
+
 # Insert our custom upload handlers
+file_upload_handlers = []
 if is_chunked_fileuploader_enabled():
   file_upload_handlers = [
     'hadoop.fs.upload.FineUploaderChunkedUploadHandler',
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
   ]
-else:
+elif not ENABLE_NEW_STORAGE_BROWSER.get():
   file_upload_handlers = [
     'hadoop.fs.upload.HDFSfileUploadHandler',
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
@@ -671,7 +675,8 @@ else:
   if is_ofs_enabled():
     file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
 
-FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
+if file_upload_handlers:
+  FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 
 ############################################################
 
