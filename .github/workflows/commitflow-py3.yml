@@ -61,7 +61,14 @@ jobs:
 
     - name: run tests
       run: |
-        PYTHONWARNINGS=always ./build/env/bin/pytest
+        mkdir -p test-reports  # Ensure the directory exists
+        PYTHONWARNINGS=always ./build/env/bin/pytest --html=test-reports/report_${{ matrix.python-version }}.html --self-contained-html
+ 
+    - name: upload pytest report
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-reports-${{ matrix.python-version }}
+        path: test-reports
 
     - name: run python lints
       run: |

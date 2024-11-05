@@ -1,6 +1,7 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "desktop.settings"
-addopts = "-v -m 'not integration' --strict-markers --durations=10"
+console_output_style = "count"
+addopts = "-v -m 'not integration' --strict-markers --disable-warnings --html=report.html --self-contained-html"
 norecursedirs = "desktop/core/ext-py3"
 python_files = "tests.py test_*.py *_tests.py tests_* *_test.py"
 markers = [
