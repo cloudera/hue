@@ -16,7 +16,7 @@
 
 import logging
 import unicodedata
-from io import StringIO as string_io
+from io import BytesIO
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
@@ -75,8 +75,10 @@ class ABFSFineUploaderChunkedUpload(object):
       raise PopupException("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s failed %s" % (self.target_path, e))
 
     if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
-      raise PopupException(_('ABFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s') %
-                            {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize})
+      raise PopupException(
+        _('ABFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s')
+        % {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize}
+      )
 
   def upload_chunks(self):
     if TASK_SERVER_V2.ENABLED.get():
@@ -93,8 +95,10 @@ class ABFSFineUploaderChunkedUpload(object):
       current_position = 0  # keeps track of position and uploaded_size
       for i, (chunk, total) in enumerate(generate_chunks(self.qquuid, self.qqtotalparts, default_write_size=DEFAULT_WRITE_SIZE), 1):
         chunk_size = len(chunk.getvalue())
-        LOG.debug("ABFSFineUploaderChunkedUpload: uploading file %s, part %d, size %d, dest: %s, current_position: %d" %
-                  (self.file_name, i, chunk_size, self.destination, current_position))
+        LOG.debug(
+          "ABFSFineUploaderChunkedUpload: uploading file %s, part %d, size %d, dest: %s, current_position: %d"
+          % (self.file_name, i, chunk_size, self.destination, current_position)
+        )
         params = {'position': current_position}
         self._fs._append(self.target_path, chunk, size=chunk_size, offset=0, params=params)
         current_position += chunk_size
@@ -140,12 +144,14 @@ class ABFSFileUploadError(UploadFileException):
   pass
 
 
+# Deprecated and core logic to be replaced with ABFSNewFileUploadHandler
 class ABFSFileUploadHandler(FileUploadHandler):
   """
   This handler is triggered by any upload field whose destination path starts with "ABFS" (case insensitive).
 
   Streams data chunks directly to ABFS
   """
+
   def __init__(self, request):
     super(ABFSFileUploadHandler, self).__init__(request)
     self.chunk_size = DEFAULT_WRITE_SIZE
@@ -227,3 +233,53 @@ class ABFSFileUploadHandler(FileUploadHandler):
         raise ABFSFileSystemException('Destination does not start with a valid scheme.')
     else:
       return None
+
+
+class ABFSNewFileUploadHandler(ABFSFileUploadHandler):
+  """
+  This handler uploads the file to ABFS if the destination path starts with "ABFS" (case insensitive).
+  Streams data chunks directly to ABFS.
+  """
+
+  def __init__(self, dest_path, username):
+    self.chunk_size = DEFAULT_WRITE_SIZE
+    self.target_path = None
+    self.file = None
+    self._part_size = DEFAULT_WRITE_SIZE
+
+    self.destination = dest_path
+    self.username = username
+
+    if self._is_abfs_upload():
+      self._fs = self._get_abfs(self.username)
+      self.filesystem, self.directory = parse_uri(self.destination)[:2]
+
+      # Verify that the path exists
+      self._fs.stats(self.destination)
+
+    LOG.debug("Chunk size = %d" % DEFAULT_WRITE_SIZE)
+
+  def new_file(self, field_name, file_name, *args, **kwargs):
+    if self._is_abfs_upload():
+      super(ABFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
+
+      LOG.info('Using ABFSFileUploadHandler to handle file upload wit temp file%s.' % file_name)
+      self.target_path = self._fs.join(self.destination, file_name)
+
+      try:
+        # Check access permissions before attempting upload
+        # self._check_access() #implement later
+        LOG.debug("Initiating ABFS upload to target path: %s" % self.target_path)
+        self._fs.create(self.target_path)
+        self.file = SimpleUploadedFile(name=file_name, content='')
+        raise StopFutureHandlers()
+      except (ABFSFileUploadError, ABFSFileSystemException) as e:
+        LOG.error("Encountered error in ABFSUploadHandler check_access: %s" % e)
+        raise StopUpload()
+
+  def _get_abfs(self, username):
+    fs = get_client(fs='abfs', user=username)
+    if not fs:
+      raise ABFSFileUploadError(_("No ABFS filesystem found"))
+
+    return fs

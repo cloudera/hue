@@ -26,7 +26,6 @@ See http://docs.djangoproject.com/en/1.2/topics/http/file-uploads/
 """
 
 import os
-import sys
 import time
 import errno
 import logging

@@ -66,8 +66,10 @@ class OFSFineUploaderChunkedUpload(object):
       self.filepath = self.target_path
 
     if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
-      raise PopupException(_('OFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s') %
-                            {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize})
+      raise PopupException(
+        _('OFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s')
+        % {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize}
+      )
 
   def upload_chunks(self):
     LOG.debug("OFSFineUploaderChunkedUpload: upload_chunks")
@@ -89,15 +91,17 @@ class OFSFineUploaderChunkedUpload(object):
 
       if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
         raise PopupException(
-          _('OFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s') %
-          {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize})
+          _('OFSFineUploaderChunkedUpload: Sorry, the file size is not correct. %(name)s %(qquuid)s %(size)s')
+          % {'name': self.file_name, 'qquuid': self.qquuid, 'size': self.totalfilesize}
+        )
 
     try:
       LOG.debug("OFSFineUploaderChunkedUpload: uploading file part with size: %s" % self._part_size)
       fp = io.BytesIO()
       for i, (chunk, total) in enumerate(generate_chunks(self.qquuid, self.qqtotalparts, default_write_size=self.chunk_size), 1):
-        logging.debug("OFSFineUploaderChunkedUpload: uploading file %s, part %d, size %d, dest: %s" %
-                      (self.file_name, i, total, self.destination))
+        logging.debug(
+          "OFSFineUploaderChunkedUpload: uploading file %s, part %d, size %d, dest: %s" % (self.file_name, i, total, self.destination)
+        )
         fp.write(chunk.getvalue())
       fp.seek(0)
       self._fs.create(self.target_path, data=fp.getvalue())
@@ -168,12 +172,14 @@ class OFSFileUploadError(UploadFileException):
   pass
 
 
+# Deprecated and core logic to be replaced with OFSNewFileUploadHandler
 class OFSFileUploadHandler(FileUploadHandler):
   """
   This handler is triggered by any upload field whose destination path starts with "OFS" (case insensitive).
 
   Streams data chunk directly to OFS.
   """
+
   def __init__(self, request):
     super(OFSFileUploadHandler, self).__init__(request)
     self.chunk_size = UPLOAD_CHUNK_SIZE.get()
@@ -253,3 +259,53 @@ class OFSFileUploadHandler(FileUploadHandler):
         raise OFSFileUploadError('Destination does not start with a valid scheme.')
     else:
       return None
+
+
+class OFSNewFileUploadHandler(OFSFileUploadHandler):
+  """
+  This handler uploads the file to Apache Ozone if the destination path starts with "OFS" (case insensitive).
+  Streams data chunks directly to OFS.
+  """
+
+  def __init__(self, dest_path, username):
+    self.chunk_size = UPLOAD_CHUNK_SIZE.get()
+    self.destination = dest_path
+    self.username = username
+    self.target_path = None
+    self.file = None
+    self._part_size = UPLOAD_CHUNK_SIZE.get()
+
+    if self._is_ofs_upload():
+      self._fs = self._get_ofs(self.username)
+
+      # Verify that the path exists
+      try:
+        self._fs.stats(self.destination)
+      except Exception as e:
+        raise OFSFileUploadError(_('Destination path does not exist: %s' % self.destination))
+
+    LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
+
+  def new_file(self, field_name, file_name, *args, **kwargs):
+    if self._is_ofs_upload():
+      super(OFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
+
+      LOG.info('Using OFSFileUploadHandler to handle file upload.')
+      self.target_path = self._fs.join(self.destination, file_name)
+
+      try:
+        # Check access permissions before attempting upload
+        # self._check_access() # Not implemented
+        LOG.debug("Initiating OFS upload to target path: %s" % self.target_path)
+        self.file = SimpleUploadedFile(name=file_name, content='')
+        raise StopFutureHandlers()
+      except (OFSFileUploadError, WebHdfsException) as e:
+        LOG.error("Encountered error in OFSUploadHandler check_access: %s" % e)
+        raise StopUpload()
+
+  def _get_ofs(self, username):
+    fs = get_client(fs='ofs', user=username)
+    if not fs:
+      raise OFSFileUploadError(_("No OFS filesystem found."))
+
+    return fs
