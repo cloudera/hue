@@ -47,6 +47,7 @@ from filebrowser.conf import (
   FILE_DOWNLOAD_CACHE_CONTROL,
   MAX_FILE_SIZE_UPLOAD_LIMIT,
   REDIRECT_DOWNLOAD,
+  RESTRICT_UPLOAD_FILE_EXTENSIONS,
   SHOW_DOWNLOAD_BUTTON,
 )
 from filebrowser.lib import xxd
@@ -423,15 +424,23 @@ def _upload_file(request):
   The uploaded file is stored in HDFS at its destination with a .tmp suffix.
   We just need to rename it to the destination path.
   """
-  # Read request body first to prevent RawPostDataException later on
+  # Read request body first to prevent RawPostDataException later on which occurs when trying to access body after it has already been read
   body_data_bytes = string_io(request.body)
 
   uploaded_file = request.FILES['file']
   dest_path = request.POST.get('destination_path')
 
+  # Check if the file extension is restricted
+  _, file_extension = os.path.splitext(uploaded_file.name)
+  if RESTRICT_UPLOAD_FILE_EXTENSIONS.get() and file_extension.lower() in [ext.lower() for ext in RESTRICT_UPLOAD_FILE_EXTENSIONS.get()]:
+    raise Exception(f'File extension "{file_extension}" is not allowed for upload. Please choose a file with a different extension.')
+
+  # Check if the file size exceeds the maximum allowed size
   if MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 and uploaded_file.size >= MAX_FILE_SIZE_UPLOAD_LIMIT.get():
     raise Exception(f'File exceeds maximum allowed size of {MAX_FILE_SIZE_UPLOAD_LIMIT.get()} bytes for upload operation.')
 
+  # Check if the destination path is a directory and the file name contains a path separator
+  # This prevents directory traversal attacks
   if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
     raise Exception(f'Upload failed: {posixpath.sep} is not allowed in the filename {uploaded_file.name}.')
 
