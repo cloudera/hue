@@ -48,7 +48,8 @@ describe('StorageBrowserRowActions', () => {
       permission: 'drwxr-xr-x',
       mtime: 'May 12, 2024 10:37 PM',
       type: 'file',
-      path: ''
+      path: '',
+      replication: 0
     },
     {
       name: 'testFolder',
@@ -58,7 +59,8 @@ describe('StorageBrowserRowActions', () => {
       permission: 'drwxr-xr-x',
       mtime: 'May 12, 2024 10:37 PM',
       type: 'dir',
-      path: ''
+      path: '',
+      replication: 0
     }
   ];
 

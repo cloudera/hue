@@ -14,13 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Dropdown } from 'antd';
 import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
 import Button from 'cuix/dist/components/Button';
 import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 import InfoIcon from '@cloudera/cuix-core/icons/react/InfoIcon';
+import DuplicateIcon from '@cloudera/cuix-core/icons/react/DuplicateIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
@@ -38,7 +39,10 @@ import {
   isS3,
   isOFSRoot
 } from '../../../../utils/storageBrowserUtils';
-import { RENAME_API_URL } from '../../../../reactComponents/FileChooser/api';
+import {
+  RENAME_API_URL,
+  SET_REPLICATION_API_URL
+} from '../../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../../utils/huePubSub';
 import useSaveData from '../../../../utils/hooks/useSaveData';
 
@@ -60,6 +64,7 @@ const StorageBrowserActions = ({
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
   const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<string>('');
+  const [showReplicationModal, setShowReplicationModal] = useState<boolean>(false);
 
   const { t } = i18nReact.useTranslation();
 
@@ -72,6 +77,19 @@ const StorageBrowserActions = ({
         onSuccess: () => onSuccessfulAction(),
         onError: () => {
           huePubSub.publish('hue.error', renameError);
+        }
+      }
+    );
+  };
+
+  const { error: replicationError, save: saveReplication } = useSaveData(SET_REPLICATION_API_URL);
+  const handleReplication = (replicationFactor: number) => {
+    saveReplication(
+      { path: selectedFile, replication_factor: replicationFactor },
+      {
+        onSuccess: () => onSuccessfulAction(),
+        onError: () => {
+          huePubSub.publish('hue.error', replicationError);
         }
       }
     );
@@ -102,6 +120,14 @@ const StorageBrowserActions = ({
     );
   };
 
+  const isReplicationEnabled = useMemo(() => {
+    if (selectedFiles.length !== 1) {
+      return false;
+    }
+    const selectedFile = selectedFiles[0];
+    return isHDFS(selectedFile.path) && selectedFile.type === 'file';
+  }, [selectedFiles]);
+
   const getActions = () => {
     const actions: MenuItemType[] = [];
     if (selectedFiles && selectedFiles.length > 0 && !inTrash(selectedFiles[0].path)) {
@@ -124,6 +150,17 @@ const StorageBrowserActions = ({
           onClick: () => {
             setSelectedFile(selectedFiles[0].path);
             setShowRenameModal(true);
+          }
+        });
+      }
+      if (isReplicationEnabled) {
+        actions.push({
+          key: 'setReplication',
+          icon: <DuplicateIcon />,
+          label: t('Set Replication'),
+          onClick: () => {
+            setSelectedFile(selectedFiles[0].path);
+            setShowReplicationModal(true);
           }
         });
       }
@@ -158,6 +195,18 @@ const StorageBrowserActions = ({
         showModal={showRenameModal}
         onSubmit={handleRename}
         onClose={() => setShowRenameModal(false)}
+        inputType="text"
+        initialValue={selectedFiles[0]?.name}
+      />
+      <InputModal
+        title={'Setting Replication factor for: ' + selectedFile}
+        inputLabel={t('Replication factor:')}
+        submitText={t('Submit')}
+        showModal={showReplicationModal}
+        onSubmit={handleReplication}
+        onClose={() => setShowReplicationModal(false)}
+        inputType="number"
+        initialValue={selectedFiles[0]?.replication}
       />
     </>
   );

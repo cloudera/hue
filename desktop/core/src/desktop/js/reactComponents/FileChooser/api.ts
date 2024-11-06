@@ -21,7 +21,8 @@ export const VIEWFILES_API_URl = '/api/v1/storage/view=';
 
 export const CREATE_FILE_API_URL = '/api/v1/storage/create/file/';
 export const CREATE_DIRECTORY_API_URL = '/api/v1/storage/create/directory/';
-export const RENAME_API_URL = '/api/v1/storage/rename';
+export const RENAME_API_URL = '/api/v1/storage/rename/';
+export const SET_REPLICATION_API_URL = '/api/v1/storage/replication/';
 
 export interface ApiFileSystem {
   file_system: string;
