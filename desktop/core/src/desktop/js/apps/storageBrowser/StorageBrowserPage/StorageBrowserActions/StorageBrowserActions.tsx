@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Dropdown } from 'antd';
 import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
@@ -95,15 +95,15 @@ const StorageBrowserActions = ({
     );
   };
 
-  const isSummaryEnabled = () => {
+  const isSummaryEnabled = useMemo(() => {
     if (selectedFiles.length !== 1) {
       return false;
     }
     const selectedFile = selectedFiles[0];
     return (isHDFS(selectedFile.path) || isOFS(selectedFile.path)) && selectedFile.type === 'file';
-  };
+  }, [selectedFiles]);
 
-  const isRenameEnabled = () => {
+  const isRenameEnabled = useMemo(() => {
     if (selectedFiles.length !== 1) {
       return false;
     }
@@ -118,7 +118,7 @@ const StorageBrowserActions = ({
         !isOFSServiceID(selectedFilePath) &&
         !isOFSVol(selectedFilePath))
     );
-  };
+  }, [selectedFiles]);
 
   const isReplicationEnabled = useMemo(() => {
     if (selectedFiles.length !== 1) {
@@ -128,10 +128,10 @@ const StorageBrowserActions = ({
     return isHDFS(selectedFile.path) && selectedFile.type === 'file';
   }, [selectedFiles]);
 
-  const getActions = () => {
+  const getActions = useCallback(() => {
     const actions: MenuItemType[] = [];
     if (selectedFiles && selectedFiles.length > 0 && !inTrash(selectedFiles[0].path)) {
-      if (isSummaryEnabled()) {
+      if (isSummaryEnabled) {
         actions.push({
           key: 'content_summary',
           icon: <InfoIcon />,
@@ -142,7 +142,7 @@ const StorageBrowserActions = ({
           }
         });
       }
-      if (isRenameEnabled()) {
+      if (isRenameEnabled) {
         actions.push({
           key: 'rename',
           icon: <InfoIcon />,
@@ -166,7 +166,7 @@ const StorageBrowserActions = ({
       }
     }
     return actions;
-  };
+  }, [selectedFiles, isSummaryEnabled, isRenameEnabled, isReplicationEnabled]);
 
   return (
     <>
