@@ -37,7 +37,8 @@ describe('StorageBrowserRowActions', () => {
     permission: 'drwxr-xr-x',
     mtime: 'May 12, 2024 10:37 PM',
     type: '',
-    path: ''
+    path: '',
+    replication: 0
   };
   const mockTwoRecords: StorageBrowserTableData[] = [
     {
@@ -149,7 +150,7 @@ describe('StorageBrowserRowActions', () => {
   });
 
   describe('Rename option', () => {
-    test('does not render view summary option when there are multiple records selected', async () => {
+    test('does not render rename option when there are multiple records selected', async () => {
       await setUpActionMenu(mockTwoRecords);
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
@@ -193,6 +194,45 @@ describe('StorageBrowserRowActions', () => {
       await setUpActionMenu([mockRecord], 'abfs://test', 'dir');
       await user.click(screen.queryByRole('menuitem', { name: 'Rename' }));
       expect(await screen.findByText('Enter new name here')).toBeInTheDocument();
+    });
+  });
+
+  describe('Set replication option', () => {
+    test('does not render set replication option when there are multiple records selected', async () => {
+      await setUpActionMenu(mockTwoRecords);
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
+    });
+
+    test('renders set replication option when selected record is a hdfs file', async () => {
+      await setUpActionMenu([mockRecord], 'hdfs://test', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).not.toBeNull();
+    });
+
+    test('does not render set replication option when selected record is a hdfs folder', async () => {
+      await setUpActionMenu([mockRecord], 'hdfs://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
+    });
+
+    test('does not render set replication option when selected record is a gs file/folder', async () => {
+      await setUpActionMenu([mockRecord], 'gs://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
+    });
+
+    test('does not render set replication option when selected record is a s3 file/folder', async () => {
+      await setUpActionMenu([mockRecord], 's3a://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
+    });
+
+    test('does not render set replication option when selected record is a ofs file/folder', async () => {
+      await setUpActionMenu([mockRecord], 'ofs://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
+    });
+
+    test('renders set replication modal when set replication option is clicked', async () => {
+      const user = userEvent.setup();
+      await setUpActionMenu([mockRecord], 'hdfs://test', 'file');
+      await user.click(screen.queryByRole('menuitem', { name: 'Set Replication' }));
+      expect(await screen.findByText(/Setting Replication factor/i)).toBeInTheDocument();
     });
   });
 });
