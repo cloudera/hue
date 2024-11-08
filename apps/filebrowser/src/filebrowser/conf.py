@@ -103,12 +103,11 @@ FILE_DOWNLOAD_CACHE_CONTROL = Config(
   key="file_download_cache_control", type=str, default=None, help="Optionally set this to control the caching strategy for files download"
 )
 
-RESTRICT_UPLOAD_FILE_EXTENSIONS = Config(
-  key='restrict_upload_file_extensions',
+RESTRICT_FILE_EXTENSIONS = Config(
+  key='restrict_file_extensions',
   default='',
   type=coerce_csv,
   help=_(
-    'Specify file extensions that are not allowed for upload, separated by commas. For example: .exe, .zip, .rar, .tar, .gz'
-    'It can help prevent malicious file uploads.'
+    'Specify file extensions that are not allowed, separated by commas. For example: .exe, .zip, .rar, .tar, .gz'
   ),
 )

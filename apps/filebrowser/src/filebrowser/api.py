@@ -47,7 +47,7 @@ from filebrowser.conf import (
   FILE_DOWNLOAD_CACHE_CONTROL,
   MAX_FILE_SIZE_UPLOAD_LIMIT,
   REDIRECT_DOWNLOAD,
-  RESTRICT_UPLOAD_FILE_EXTENSIONS,
+  RESTRICT_FILE_EXTENSIONS,
   SHOW_DOWNLOAD_BUTTON,
 )
 from filebrowser.lib import xxd
@@ -432,7 +432,7 @@ def _upload_file(request):
 
   # Check if the file extension is restricted
   _, file_extension = os.path.splitext(uploaded_file.name)
-  if RESTRICT_UPLOAD_FILE_EXTENSIONS.get() and file_extension.lower() in [ext.lower() for ext in RESTRICT_UPLOAD_FILE_EXTENSIONS.get()]:
+  if RESTRICT_FILE_EXTENSIONS.get() and file_extension.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
     raise Exception(f'File extension "{file_extension}" is not allowed for upload. Please choose a file with a different extension.')
 
   # Check if the file size exceeds the maximum allowed size
