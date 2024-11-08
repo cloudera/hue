@@ -34,25 +34,13 @@ RUN apk --no-cache add \
     && rm -rf /var/cache/apk/*
 
 # create hue user
-RUN groupadd -g 1000 ${HUEUSER} && useradd -g 1000 -d ${HUE_QP_HOME} -s /bin/bash -u 1000 ${HUEUSER}
+RUN groupadd -g 1000 ${HUEUSER} && useradd -g 1000 -s /bin/bash -u 1000 ${HUEUSER}
 
-COPY --chown=${HUEUSER}:${HUEUSER} target ${HUE_QP_HOME}
-COPY --chown=${HUEUSER}:${HUEUSER} target/conf ${HUE_QP_CONF_DIR}
-
+COPY target ${HUE_QP_HOME}
+COPY target/conf ${HUE_QP_CONF_DIR}
+COPY hueqp-notice.txt ${HUE_QP_HOME}/NOTICE.txt
 # kubernetes pod health check
 COPY healthz.sh /
-RUN chmod +x /healthz.sh
-
-# Setup directory structure
-# sudo privilege
-RUN mkdir -p ${HUE_QP_LOG_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_QP_LOG_DIR} && \
-    mkdir -p ${HUE_QP_PID_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_QP_PID_DIR} && \
-    mkdir -p ${HUE_CONF} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_CONF} && \
-    echo "${HUEUSER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${HUEUSER} && \
-    chmod 0440 /etc/sudoers.d/${HUEUSER} && \
-    chmod +x /healthz.sh
-
-COPY --chown=${HUEUSER}:${HUEUSER} hueqp-notice.txt ${HUE_QP_HOME}/NOTICE.txt
 
 EXPOSE 8080 9090 9091 30700
 WORKDIR ${HUE_QP_HOME}

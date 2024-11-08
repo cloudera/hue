@@ -11,6 +11,8 @@ LoadModule mime_module /usr/lib/apache2/modules/mod_mime.so
 ErrorLog "${HUE_LOG_DIR}/httpd_error_log"
 LogLevel warn
 
+PidFile /var/run/hue/httpd.pid
+
 <IfModule log_config_module>
   LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
   LogFormat "%h %l %u %t \"%r\" %>s %b" common
@@ -45,6 +47,4 @@ SetEnv proxy-initial-not-pooled 1
 ProxyTimeout 900
 
 AllowEncodedSlashes NoDecode
-User ${HUEUSER}
-Group ${HUEUSER}
 Include /etc/httpd/conf.d/hue.conf

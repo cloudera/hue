@@ -28,39 +28,27 @@ USER root
 
 # Switch to non-root default user
 RUN groupadd -g 1000 ${HUEUSER} && \
-    useradd -g 1000 -d ${HUE_HOME} -s /bin/bash -u 1000 ${HUEUSER}
+    useradd -g 1000 -s /bin/bash -u 1000 ${HUEUSER}
 
-COPY --chown=${HUEUSER}:${HUEUSER} ${HUEUSER} ${HUE_HOME}
-COPY --chown=${HUEUSER}:${HUEUSER} hue.sh ${HUE_HOME}/hue.sh
+COPY ${HUEUSER} ${HUE_HOME}
+COPY hue.sh ${HUE_HOME}/hue.sh
 
 # Install psycopg2-binary
-RUN $HUE_BIN/python3.8 -m pip install --upgrade pip --force && $HUE_BIN/pip install psycopg2-binary
+RUN $HUE_BIN/python3.8 -m pip install --upgrade pip --force &&  $HUE_BIN/pip install psycopg2-binary
 
-# Setup directory structure
-RUN mkdir -p ${HUE_LOG_DIR} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_LOG_DIR}
-RUN mkdir -p ${HUE_CONF} && chown -R ${HUEUSER}:${HUEUSER} ${HUE_CONF}
-
-# sudo privilege
-RUN echo "${HUEUSER} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${HUEUSER} && \
-    chmod 0440 /etc/sudoers.d/${HUEUSER}
-
-COPY --chown=${HUEUSER}:${HUEUSER} hueconf ${HUE_CONF}/conf
-
-RUN ln -s ${HUE_CONF}/conf/log.conf ${HUE_HOME}/desktop/conf/log.conf; \
-    ln -s ${HUE_CONF}/conf/gunicorn_log.conf ${HUE_HOME}/desktop/conf/gunicorn_log.conf; \
-    ln -s ${HUE_CONF}/conf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
-
+COPY hueconf ${HUE_CONF}/conf
+COPY hueconf/log.conf ${HUE_HOME}/desktop/conf/log.conf
+COPY hueconf/gunicorn_log.conf ${HUE_HOME}/desktop/conf/gunicorn_log.conf
+COPY hueconf/log4j.properties ${HUE_HOME}/desktop/conf/log4j.properties
 COPY hue-notice.txt ${HUE_HOME}/NOTICE.txt
 
 # supervisor stuff
-RUN mkdir -p /etc/supervisor.d/ && chmod +w /etc/supervisor.d && mkdir -p /var/log/root && chown -R ${HUEUSER}:${HUEUSER} /var/log/root
-ADD supervisor-files/etc/supervisord.conf /etc/supervisord.conf
-ADD supervisor-files/hue_server.conf /etc/supervisor.d/
-ADD supervisor-files/hue_ktrenewer.conf /etc/supervisor.d/
-ADD supervisor-files/hue_loglistener.conf /etc/supervisor.d/
-ADD supervisor-files/hue_celery.conf /etc/supervisor.d/
-ADD supervisor-files/hue_redis.conf /etc/supervisor.d/
-RUN chown -R ${HUEUSER}:${HUEUSER} /etc/supervisord.conf && chown -R ${HUEUSER}:${HUEUSER} /etc/supervisor.d
+COPY supervisor-files/etc/supervisord.conf /etc/supervisord.conf
+COPY supervisor-files/hue_server.conf /etc/supervisor.d/
+COPY supervisor-files/hue_ktrenewer.conf /etc/supervisor.d/
+COPY supervisor-files/hue_loglistener.conf /etc/supervisor.d/
+COPY supervisor-files/hue_celery.conf /etc/supervisor.d/
+COPY supervisor-files/hue_redis.conf /etc/supervisor.d/
 
 # Remove chardet package
 RUN rm -rf ${HUE_HOME}/build/env/lib/python3.8/site-packages/pip/_vendor/chardet

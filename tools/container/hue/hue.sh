@@ -6,8 +6,14 @@ set -x
 # Time marker for both stderr and stdout
 date; date 1>&2
 
+# HUE_RUN_DIR needs to be a mounted directory with write access granted to the running user
+export HUE_RUN_DIR="/var/run/hue/"
+# Gunicorn needs chown privileges if the OS user/group does not match Gunicorn's user/group.
+# This can happen when the OS user is not in our control to set (OpenShift).
+export GUNICORN_USE_OS_USER="true"
+
 export DESKTOP_LOG_DIR="/var/log/hive"
-export PYTHON_EGG_CACHE=$HUE_CONF_DIR/.python-eggs
+export PYTHON_EGG_CACHE=$HUE_RUN_DIR/.python-eggs
 export SERVER_SOFTWARE="apache"
 
 function prepare_huedb() {
@@ -16,7 +22,7 @@ function prepare_huedb() {
   $HUE_BIN/hue syncdb --noinput
   $HUE_BIN/hue makemigrations --noinput --merge
   $HUE_BIN/hue migrate
-  ) 124>$HUE_CONF_DIR/hue.lock
+  ) 124>$HUE_RUN_DIR/hue.lock
 }
 
 function db_connectivity_check() {
@@ -80,9 +86,9 @@ function fix_column_issue() {
 }
 
 function set_samlcert() {
-  mkdir -pm 755 $HUE_CONF_DIR/samlcert
-  cd $HUE_CONF_DIR/samlcert
-  export RANDFILE=$HUE_CONF_DIR/samlcert/.rnd
+  mkdir $HUE_RUN_DIR/samlcert
+  cd $HUE_RUN_DIR/samlcert
+  export RANDFILE=$HUE_RUN_DIR/samlcert/.rnd
   CNAME=""
   if [[ "$EXTERNAL_HOST" =~ .*"localhost".* ]]; then
     CNAME=$EXTERNAL_HOST
@@ -101,9 +107,8 @@ function set_samlcert() {
     openssl req -new -key server.key -out server.csr -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$CNAME"
     openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
   else
-    echo "#!/bin/bash" > $HUE_CONF_DIR/samlcert/pass.key
-    echo "echo \$PASSPHRASE" >> $HUE_CONF_DIR/samlcert/pass.key
-    chmod a+x $HUE_CONF_DIR/samlcert/pass.key
+    echo "#!/bin/bash" > $HUE_RUN_DIR/samlcert/pass.key
+    echo "echo \$PASSPHRASE" >> $HUE_RUN_DIR/samlcert/pass.key
     openssl genrsa -des3 -passout pass:$PASSPHRASE -out server.key 2048
     openssl req -new -key server.key -out server.csr -passin pass:$PASSPHRASE -subj "/C=US/ST=California/L=Palo Alto/O=Cloudera/OU=Hue/CN=$CNAME"
     openssl x509 -req -days 365 -in server.csr -passin pass:$PASSPHRASE -signkey server.key -out server.crt
@@ -130,9 +135,8 @@ function task_server_enabled() {
 function start_celery() {
   echo "Starting Celery worker..."
   # The schedule of periodic tasks performed by celery-beat is stored in the celerybeat-schedule file.
-  touch $HUE_HOME/celerybeat-schedule
-  chmod 644 $HUE_HOME/celerybeat-schedule
-  $HUE_BIN/hue runcelery worker --app desktop.celery --loglevel=INFO --schedule_file $HUE_HOME/celerybeat-schedule
+  touch $HUE_RUN_DIR/celerybeat-schedule
+  $HUE_BIN/hue runcelery worker --app desktop.celery --loglevel=INFO --schedule_file $HUE_RUN_DIR/celerybeat-schedule
 }
 
 function start_redis() {

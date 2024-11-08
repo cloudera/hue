@@ -1,17 +1,17 @@
 [unix_http_server]
-file=/var/log/${HUEUSER}/supervisord.sock
+file=/var/run/hue/supervisord.sock
 username=${UUID_GEN}
 password=${UUID_GEN}
 
 [supervisord]
-pidfile=/var/log/${HUEUSER}/supervisord.pid
+pidfile=/var/run/hue/supervisord.pid
+logfile=/var/log/supervisord.log
 stdout_logfile=/dev/stdout
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 loglevel=info
 nodaemon=true
-identifier=agent-${UUID_GEN}
 
 # These two (unix_http_server, rpcinterface) are needed for supervisorctl to work
 [inet_http_server]

@@ -15,7 +15,6 @@ RUN apk --no-cache add \
 
 # kubernetes pod health check
 COPY healthz.sh /
-RUN chmod +x /healthz.sh
 
 EXPOSE 80
 

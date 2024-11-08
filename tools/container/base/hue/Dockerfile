@@ -112,7 +112,6 @@ EXPOSE 5432
 
 # kubernetes pod health check
 COPY healthz.sh /
-RUN chmod +x /healthz.sh
 
 # Setup openssl.cnf
 RUN mkdir -p /etc/ssl

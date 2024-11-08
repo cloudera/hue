@@ -7,9 +7,7 @@ stdout_logfile=/dev/stdout
 stdout_logfile_maxbytes=0
 stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
-environment=DESKTOP_LOG_DIR="/var/log/${HUEUSER}",PYTHON_EGG_CACHE="$HUE_CONF_DIR/.python-eggs"
-user=${HUEUSER}
-group=${HUEUSER}
+environment=DESKTOP_LOG_DIR="/var/log/${HUEUSER}",PYTHON_EGG_CACHE="/var/run/hue/.python-eggs"
 exitcodes=0,2
 autorestart=false
 startsecs=20
