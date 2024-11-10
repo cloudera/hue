@@ -80,6 +80,8 @@
   <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
+  <link href="${ static('desktop/js/ace/css/ace.css') }" rel="stylesheet">
+  
   <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 
@@ -128,11 +130,11 @@
 ${ hueIcons.symbols() }
 
 <!-- fake fields are a workaround for chrome autofill getting the wrong fields, readonly needed for 1password -->
-<input style="display:none" readonly autocomplete="false" type="text" name="fakeusernameremembered"/>
-<input style="display:none" readonly autocomplete="false" type="password" name="fakepasswordremembered"/>
+<input class="hidden" readonly autocomplete="false" type="text" name="fakeusernameremembered"/>
+<input class="hidden" readonly autocomplete="false" type="password" name="fakepasswordremembered"/>
 
 <div class="hue-page">
-  <hue-sidebar-web-component style="flex: 1 1 auto"></hue-sidebar-web-component>
+  <hue-sidebar-web-component class="flex-auto"></hue-sidebar-web-component>
 
   <div class="main-page">
     <AppBanner data-reactcomponent='AppBanner'></AppBanner>
@@ -288,7 +290,7 @@ ${ hueIcons.symbols() }
             <!-- /ko -->
           </div>
         </div>
-        <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0" data-bind="click: function () { huePubSub.publish('context.panel.visible', false); }"><i class="fa fa-chevron-up"></i></a>
+        <a class="pointer demi-modal-chevron context-panel-toggle-inline" data-bind="click: function () { huePubSub.publish('context.panel.visible', false); }"><i class="fa fa-chevron-up"></i></a>
       </div>
       %endif
     </div>
