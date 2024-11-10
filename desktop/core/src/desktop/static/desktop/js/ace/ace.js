@@ -1039,7 +1039,6 @@ exports.importCssString = function importCssString(cssText, id, doc) {
     if (id)
         cssText += "\n/*# sourceURL=ace/css/" + id + " */";
     
-    debugger;
     if (doc.createStyleSheet) {
         style = doc.createStyleSheet();
         style.cssText = cssText;
@@ -3634,9 +3633,7 @@ var options = {
     themePath: null,
     basePath: "",
     suffix: ".js",
-    $moduleUrls: {},
-    sharedPopups: false,
-    useStrictCSP: false
+    $moduleUrls: {}
 };
 
 exports.get = function(key) {
@@ -3651,9 +3648,6 @@ exports.set = function(key, value) {
         throw new Error("Unknown config key: " + key);
 
     options[key] = value;
-
-    if (key == "useStrictCSP")
-        dom.useStrictCSP(value);
 };
 
 exports.all = function() {
@@ -13564,8 +13558,6 @@ var Marker = function(parentEl) {
             if (range.isEmpty()) continue;
 
             range = range.toScreenRange(this.session);
-            var markerElement = document.createElement('div'); // Create a new div for the marker
-
             if (marker.renderer) {
                 var top = this.$getTop(range.start.row, config);
                 var left = this.$padding + range.start.column * config.characterWidth;
@@ -13583,18 +13575,12 @@ var Marker = function(parentEl) {
                 this.drawSingleLineMarker(html, range, marker.clazz + " ace_start" + " ace_br15", config);
             }
         }
-                
-        // Example of applying styles using CSSOM
-        if (markerElement) {
-            markerElement.style.position = 'absolute'; // Set position
-            markerElement.style.top = `${top}px`; // Set top position
-            markerElement.style.left = `${left}px`; // Set left position
-            markerElement.style.color = 'blue'; // Example style
-            markerElement.className = marker.clazz; // Apply any classes if needed
-
-            // Append the created marker element to the parent element
-            this.element.appendChild(markerElement);
-        }
+        markerElement.style.position = 'absolute'; // Set position
+        markerElement.style.top = `${top}px`; // Set top position
+        markerElement.style.left = `${left}px`; // Set left position
+        markerElement.style.color = 'blue'; // Example style
+        markerElement.className = marker.clazz; // Apply any classes if needed
+        this.element.appendChild(markerElement);
     };
 
     this.$getTop = function(row, layerConfig) {
