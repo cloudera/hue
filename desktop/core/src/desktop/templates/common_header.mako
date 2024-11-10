@@ -25,7 +25,7 @@ from desktop.conf import USE_NEW_EDITOR
 from desktop.models import hue_version
 from desktop.lib.i18n import smart_str
 from desktop.webpack_utils import get_hue_bundles
-
+from desktop.lib.django_util import nonce_attribute
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
@@ -89,7 +89,7 @@ if USE_NEW_EDITOR.get():
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3-extra.css') }" rel="stylesheet">
 
-  <style type="text/css">
+  <style type="text/css" ${nonce_attribute(request)}>>
     % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
       body {
         display: none;

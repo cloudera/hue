@@ -38,6 +38,7 @@ from django.urls import reverse
 from django.utils.http import urlencode  # this version is unicode-friendly
 from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext as _, ngettext as _t
+from django.utils.safestring import mark_safe
 
 import desktop.conf
 import desktop.lib.thrift_util

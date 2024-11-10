@@ -33,7 +33,7 @@ else:
 ${ smart_str(login_modal(request).content) | n,unicode }
 % endif
 
-<iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
+<iframe id="zoomDetectFrame" class="hide"></iframe>
 
 ${ commonHeaderFooterComponents.footer(messages, nonce_attribute(request) ) }
 
