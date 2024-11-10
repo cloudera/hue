@@ -17,7 +17,6 @@
 const fs = require('fs');
 const webpack = require('webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const {
   BUNDLES,
   getPluginConfig,
@@ -69,7 +68,7 @@ const config = {
         test: /\.scss$/,
         exclude: /node_modules/,
         use: [
-          MiniCssExtractPlugin.loader,
+          'style-loader',
           'css-loader',
           {
             loader: 'sass-loader',
@@ -83,17 +82,18 @@ const config = {
       },
       {
         test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        use: [{ loader: 'style-loader' }, { loader: 'css-loader' }]
       },
       {
         test: /\.less$/i,
         use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
           {
             loader: 'less-loader',
             options: {
               lessOptions: {
+                // This is not ideal but required by antd library
                 javascriptEnabled: true
               }
             }
@@ -137,10 +137,6 @@ const config = {
       cleanOnceBeforeBuildPatterns: [
         `${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/hue`
       ]
-    }),
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css',
     })
   ]),
   resolve: {

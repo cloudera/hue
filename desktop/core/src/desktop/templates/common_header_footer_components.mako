@@ -242,7 +242,7 @@ else:
   </div>
 </div>
 
-<div id="chooseFile" class="modal hide fade" tabindex="-1">
+<div id="chooseFile" class="modal hide fade" style="z-index: 10000;" tabindex="-1">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Choose a file')}</h2>
@@ -253,7 +253,7 @@ else:
   <div class="modal-footer"></div>
 </div>
 
-<div id="rowDetailsModal" class="modal transparent-modal hide" data-backdrop="true">
+<div id="rowDetailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:90%;margin-left:-45%!important;z-index:1071">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <input class="input-medium hue-modal-search" type="text" placeholder="${ _('Search...') }">

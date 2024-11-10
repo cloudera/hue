@@ -15,7 +15,6 @@
 // limitations under the License.
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const {
   BUNDLES,
   getPluginConfig,
@@ -47,10 +46,6 @@ module.exports = {
       cleanOnceBeforeBuildPatterns: [
         `${__dirname}/desktop/core/src/desktop/static/desktop/js/bundles/login`
       ]
-    }),
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css',
     })
   ]),
   resolve: shared.resolve
