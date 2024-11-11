@@ -352,7 +352,7 @@ const StorageBrowserTable = ({
           onRow={onRowClicked}
           pagination={false}
           rowClassName={rowClassName}
-          rowKey={record => record.path}
+          rowKey={(record, index) => record.path + index}
           rowSelection={{
             type: 'checkbox',
             ...rowSelection

@@ -25,6 +25,8 @@ export const RENAME_API_URL = '/api/v1/storage/rename/';
 export const SET_REPLICATION_API_URL = '/api/v1/storage/replication/';
 export const COPY_API_URL = '/api/v1/storage/copy/';
 export const BULK_COPY_API_URL = '/api/v1/storage/copy/bulk/';
+export const MOVE_API_URL = '/api/v1/storage/move/';
+export const BULK_MOVE_API_URL = '/api/v1/storage/move/bulk/';
 
 export interface ApiFileSystem {
   file_system: string;

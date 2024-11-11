@@ -43,7 +43,8 @@ import {
 import {
   RENAME_API_URL,
   SET_REPLICATION_API_URL,
-  BULK_COPY_API_URL
+  BULK_COPY_API_URL,
+  BULK_MOVE_API_URL
 } from '../../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../../utils/huePubSub';
 import useSaveData from '../../../../utils/hooks/useSaveData';
@@ -72,6 +73,7 @@ const StorageBrowserActions = ({
   const [selectedFile, setSelectedFile] = useState<string>('');
   const [showReplicationModal, setShowReplicationModal] = useState<boolean>(false);
   const [showCopyModal, setShowCopyModal] = useState<boolean>(false);
+  const [showMoveModal, setShowMoveModal] = useState<boolean>(false);
 
   const { t } = i18nReact.useTranslation();
 
@@ -88,6 +90,7 @@ const StorageBrowserActions = ({
         },
         onError: () => {
           huePubSub.publish('hue.error', renameError);
+          setLoadingFiles(false);
         }
       }
     );
@@ -129,6 +132,35 @@ const StorageBrowserActions = ({
       },
       onError: () => {
         huePubSub.publish('hue.error', bulkCopyError);
+        setLoadingFiles(false);
+      }
+    });
+  };
+
+  const { error: bulkMoveError, save: saveBulkMove } = useSaveData(BULK_MOVE_API_URL, {
+    postOptions: {
+      qsEncodeData: false,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  });
+
+  const handleMove = (destination_path: string) => {
+    setLoadingFiles(true);
+    const formData = new FormData();
+    selectedFiles.map(selectedFile => {
+      formData.append('source_path', selectedFile.path);
+    });
+    formData.append('destination_path', destination_path);
+    saveBulkMove(formData, {
+      onSuccess: () => {
+        setLoadingFiles(false);
+        onSuccessfulAction();
+      },
+      onError: () => {
+        huePubSub.publish('hue.error', bulkMoveError);
+        setLoadingFiles(false);
       }
     });
   };
@@ -178,6 +210,14 @@ const StorageBrowserActions = ({
     return false;
   }, [selectedFiles]);
 
+  const isMoveEnabled = useMemo(() => {
+    if (selectedFiles.length > 0) {
+      const selectedFilePath = selectedFiles[0].path;
+      return isValidFileOrFolder(selectedFilePath);
+    }
+    return false;
+  }, [selectedFiles]);
+
   const getActions = useCallback(() => {
     const actions: MenuItemType[] = [];
     if (selectedFiles && selectedFiles.length > 0 && !inTrash(selectedFiles[0].path)) {
@@ -189,6 +229,17 @@ const StorageBrowserActions = ({
           onClick: () => {
             setSelectedFile(selectedFiles[0].path);
             setShowCopyModal(true);
+          }
+        });
+      }
+      if (isMoveEnabled) {
+        actions.push({
+          key: 'move',
+          icon: <CopyClipboardIcon />,
+          label: t('Move'),
+          onClick: () => {
+            setSelectedFile(selectedFiles[0].path);
+            setShowMoveModal(true);
           }
         });
       }
@@ -284,6 +335,14 @@ const StorageBrowserActions = ({
         title="Copy to"
         sourcePath={currentPath}
         submitText={t('Copy')}
+      />
+      <FileChooserModal
+        onClose={() => setShowMoveModal(false)}
+        onSubmit={handleMove}
+        showModal={showMoveModal}
+        title="Move to"
+        sourcePath={currentPath}
+        submitText={t('Move')}
       />
     </>
   );

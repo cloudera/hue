@@ -171,7 +171,7 @@ const FileChooserModal = ({
             dataSource={tableData?.slice(2)}
             pagination={false}
             columns={getColumns(tableData[0] ?? {})}
-            rowKey={record => record.path}
+            rowKey={(record, index) => record.path + index}
             scroll={{ y: '250px' }}
             rowClassName={record =>
               record.type === 'file'
