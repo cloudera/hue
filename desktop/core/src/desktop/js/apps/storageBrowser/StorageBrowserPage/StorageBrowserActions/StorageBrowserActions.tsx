@@ -22,6 +22,7 @@ import Button from 'cuix/dist/components/Button';
 import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 import InfoIcon from '@cloudera/cuix-core/icons/react/InfoIcon';
 import DuplicateIcon from '@cloudera/cuix-core/icons/react/DuplicateIcon';
+import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
@@ -41,40 +42,50 @@ import {
 } from '../../../../utils/storageBrowserUtils';
 import {
   RENAME_API_URL,
-  SET_REPLICATION_API_URL
+  SET_REPLICATION_API_URL,
+  BULK_COPY_API_URL
 } from '../../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../../utils/huePubSub';
 import useSaveData from '../../../../utils/hooks/useSaveData';
 
 import SummaryModal from '../../SummaryModal/SummaryModal';
 import InputModal from '../../InputModal/InputModal';
+import FileChooserModal from '../../FileChooserModal/FileChooserModal';
 
 import './StorageBrowserActions.scss';
 
 interface StorageBrowserRowActionsProps {
+  currentPath: string;
   selectedFiles: StorageBrowserTableData[];
   onSuccessfulAction: () => void;
   setLoadingFiles: (value: boolean) => void;
 }
 
 const StorageBrowserActions = ({
+  currentPath,
   selectedFiles,
-  onSuccessfulAction
+  onSuccessfulAction,
+  setLoadingFiles
 }: StorageBrowserRowActionsProps): JSX.Element => {
   const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
   const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<string>('');
   const [showReplicationModal, setShowReplicationModal] = useState<boolean>(false);
+  const [showCopyModal, setShowCopyModal] = useState<boolean>(false);
 
   const { t } = i18nReact.useTranslation();
 
   const { error: renameError, save: saveRename } = useSaveData(RENAME_API_URL);
 
   const handleRename = (value: string) => {
+    setLoadingFiles(true);
     saveRename(
       { source_path: selectedFile, destination_path: value },
       {
-        onSuccess: () => onSuccessfulAction(),
+        onSuccess: () => {
+          setLoadingFiles(false);
+          onSuccessfulAction();
+        },
         onError: () => {
           huePubSub.publish('hue.error', renameError);
         }
@@ -95,6 +106,46 @@ const StorageBrowserActions = ({
     );
   };
 
+  const { error: bulkCopyError, save: saveBulkCopy } = useSaveData(BULK_COPY_API_URL, {
+    postOptions: {
+      qsEncodeData: false,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  });
+
+  const handleCopy = (destination_path: string) => {
+    setLoadingFiles(true);
+    const formData = new FormData();
+    selectedFiles.map(selectedFile => {
+      formData.append('source_path', selectedFile.path);
+    });
+    formData.append('destination_path', destination_path);
+    saveBulkCopy(formData, {
+      onSuccess: () => {
+        setLoadingFiles(false);
+        onSuccessfulAction();
+      },
+      onError: () => {
+        huePubSub.publish('hue.error', bulkCopyError);
+      }
+    });
+  };
+
+  const isValidFileOrFolder = (selectedFilePath: string) => {
+    return (
+      isHDFS(selectedFilePath) ||
+      (isS3(selectedFilePath) && !isS3Root(selectedFilePath)) ||
+      (isGS(selectedFilePath) && !isGSRoot(selectedFilePath)) ||
+      (isABFS(selectedFilePath) && !isABFSRoot(selectedFilePath)) ||
+      (isOFS(selectedFilePath) &&
+        !isOFSRoot(selectedFilePath) &&
+        !isOFSServiceID(selectedFilePath) &&
+        !isOFSVol(selectedFilePath))
+    );
+  };
+
   const isSummaryEnabled = useMemo(() => {
     if (selectedFiles.length !== 1) {
       return false;
@@ -108,16 +159,7 @@ const StorageBrowserActions = ({
       return false;
     }
     const selectedFilePath = selectedFiles[0].path;
-    return (
-      isHDFS(selectedFilePath) ||
-      (isS3(selectedFilePath) && !isS3Root(selectedFilePath)) ||
-      (isGS(selectedFilePath) && !isGSRoot(selectedFilePath)) ||
-      (isABFS(selectedFilePath) && !isABFSRoot(selectedFilePath)) ||
-      (isOFS(selectedFilePath) &&
-        !isOFSRoot(selectedFilePath) &&
-        !isOFSServiceID(selectedFilePath) &&
-        !isOFSVol(selectedFilePath))
-    );
+    return isValidFileOrFolder(selectedFilePath);
   }, [selectedFiles]);
 
   const isReplicationEnabled = useMemo(() => {
@@ -128,9 +170,28 @@ const StorageBrowserActions = ({
     return isHDFS(selectedFile.path) && selectedFile.type === 'file';
   }, [selectedFiles]);
 
+  const isCopyEnabled = useMemo(() => {
+    if (selectedFiles.length > 0) {
+      const selectedFilePath = selectedFiles[0].path;
+      return isValidFileOrFolder(selectedFilePath);
+    }
+    return false;
+  }, [selectedFiles]);
+
   const getActions = useCallback(() => {
     const actions: MenuItemType[] = [];
     if (selectedFiles && selectedFiles.length > 0 && !inTrash(selectedFiles[0].path)) {
+      if (isCopyEnabled) {
+        actions.push({
+          key: 'copy',
+          icon: <CopyClipboardIcon />,
+          label: t('Copy'),
+          onClick: () => {
+            setSelectedFile(selectedFiles[0].path);
+            setShowCopyModal(true);
+          }
+        });
+      }
       if (isSummaryEnabled) {
         actions.push({
           key: 'content_summary',
@@ -166,7 +227,14 @@ const StorageBrowserActions = ({
       }
     }
     return actions;
-  }, [selectedFiles, isSummaryEnabled, isRenameEnabled, isReplicationEnabled]);
+  }, [
+    selectedFiles,
+    isSummaryEnabled,
+    isRenameEnabled,
+    isReplicationEnabled,
+    isCopyEnabled,
+    currentPath
+  ]);
 
   return (
     <>
@@ -176,7 +244,8 @@ const StorageBrowserActions = ({
           items: getActions(),
           className: 'hue-storage-browser__table-actions-menu'
         }}
-        trigger={['click', 'hover']}
+        trigger={['click']}
+        disabled={getActions().length === 0 ? true : false}
       >
         <Button data-event="">
           {t('Actions')}
@@ -207,6 +276,14 @@ const StorageBrowserActions = ({
         onClose={() => setShowReplicationModal(false)}
         inputType="number"
         initialValue={selectedFiles[0]?.replication}
+      />
+      <FileChooserModal
+        onClose={() => setShowCopyModal(false)}
+        onSubmit={handleCopy}
+        showModal={showCopyModal}
+        title="Copy to"
+        sourcePath={currentPath}
+        submitText={t('Copy')}
       />
     </>
   );

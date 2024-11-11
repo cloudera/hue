@@ -323,6 +323,7 @@ const StorageBrowserTable = ({
         />
         <div className="hue-storage-browser__actions-bar-right">
           <StorageBrowserActions
+            currentPath={filePath}
             selectedFiles={selectedFiles}
             setLoadingFiles={setLoadingFiles}
             onSuccessfulAction={refetchData}
@@ -333,7 +334,7 @@ const StorageBrowserTable = ({
               items: newActionsMenuItems,
               className: 'hue-storage-browser__action-menu'
             }}
-            trigger={['hover', 'click']}
+            trigger={['click']}
           >
             <PrimaryButton data-event="">
               {t('New')}
@@ -351,7 +352,7 @@ const StorageBrowserTable = ({
           onRow={onRowClicked}
           pagination={false}
           rowClassName={rowClassName}
-          rowKey={(record, index) => record.path + '' + index}
+          rowKey={record => record.path}
           rowSelection={{
             type: 'checkbox',
             ...rowSelection
