@@ -70,6 +70,24 @@ jobs:
         name: test-reports-${{ matrix.python-version }}
         path: test-reports
 
+    - name: Check and comment if no unit test files are modified
+      if: matrix.python-version == '3.11'
+      run: |
+        git fetch origin master
+        changed_files=$(git diff --name-only origin/master)
+        
+        if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
+          echo "✅ Unit test files were modified."
+        else
+          echo "⚠️ No unit test files modified."
+          
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{"body":"⚠️ No unit test files modified. Please ensure that changes are properly tested. ⚠️"}' \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+        fi
+
     - name: run python lints
       run: |
         PYTHONWARNINGS=always ./build/env/bin/hue runruff check
