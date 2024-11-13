@@ -188,6 +188,8 @@ class HDFStemporaryUploadedFile(object):
     if self._do_cleanup:
       # Do not do cleanup here. It's hopeless. The self._fs threadlocal states
       # are going to be all wrong.
+
+      # TODO: Check if this is required with new upload handler flow
       LOG.debug(f"Check for left-over upload file for cleanup if the upload op was unsuccessful: {self._path}")
 
   def get_temp_path(self):
@@ -378,6 +380,7 @@ class HDFSNewFileUploadHandler(FileUploadHandler):
       self._starttime = time.time()
     except Exception as ex:
       LOG.error("Not using HDFS upload handler: %s" % (ex))
+      raise ex
 
     raise StopFutureHandlers()
 
@@ -405,7 +408,7 @@ class HDFSNewFileUploadHandler(FileUploadHandler):
 
   def upload_complete(self):
     LOG.debug("HDFSFileUploadHandler: Running after upload complete task")
-    original_file_path = self.join(self._destination, self._file.name)
+    original_file_path = self._fs.join(self._destination, self._file.name)
     tmp_file = self._file.get_temp_path()
 
     self._fs.do_as_user(self.username, self._fs.rename, tmp_file, original_file_path)
