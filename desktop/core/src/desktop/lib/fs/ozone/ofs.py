@@ -178,7 +178,14 @@ class OzoneFS(WebHdfs):
   def filebrowser_action(self):
     return self._filebrowser_action
 
-  def upload(self, META, input_data, destination, username):
+  # Deprecated
+  def upload(self, file, path, *args, **kwargs):
+    """
+    Upload is done by the OFSFileUploadHandler
+    """
+    pass
+
+  def upload_v1(self, META, input_data, destination, username):
     from desktop.lib.fs.ozone.upload import OFSNewFileUploadHandler  # Circular dependency
 
     ofs_upload_handler = OFSNewFileUploadHandler(destination, username)

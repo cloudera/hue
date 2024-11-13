@@ -396,76 +396,42 @@ def upload_complete(request):
 
 @api_error_handler
 def upload_file(request):
-  """
-  A wrapper around the actual upload view function to clean up the temporary file afterwards if it fails.
-
-  Returns JSON.
-  """
-  response = {}
-
-  try:
-    response = _upload_file(request)
-  except Exception as e:
-    LOG.exception('Upload operation failed.')
-
-    file = request.FILES.get('file')
-    if file and hasattr(file, 'remove'):  # TODO: Call from proxyFS -- Check feasibility of this old comment
-      file.remove()
-
-    return HttpResponse(str(e).split('\n', 1)[0], status=500)  # TODO: Check error message and status code
-
-  return JsonResponse(response)
-
-
-def _upload_file(request):
-  """
-  Handles file uploaded by HDFSfileUploadHandler.
-
-  The uploaded file is stored in HDFS at its destination with a .tmp suffix.
-  We just need to rename it to the destination path.
-  """
   # Read request body first to prevent RawPostDataException later on which occurs when trying to access body after it has already been read
   body_data_bytes = string_io(request.body)
 
   uploaded_file = request.FILES['file']
   dest_path = request.POST.get('destination_path')
 
-  # Check if the file extension is restricted
-  _, file_extension = os.path.splitext(uploaded_file.name)
-  if RESTRICT_FILE_EXTENSIONS.get() and file_extension.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-    raise Exception(f'File extension "{file_extension}" is not allowed for upload. Please choose a file with a different extension.')
+  # Check if the file type is restricted
+  _, file_type = os.path.splitext(uploaded_file.name)
+  if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
+    return HttpResponse(f'File type "{file_type}" is not allowed. Please choose a file with a different extetypension.', status=400)
 
   # Check if the file size exceeds the maximum allowed size
-  if MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 and uploaded_file.size >= MAX_FILE_SIZE_UPLOAD_LIMIT.get():
-    raise Exception(f'File exceeds maximum allowed size of {MAX_FILE_SIZE_UPLOAD_LIMIT.get()} bytes for upload operation.')
+  max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
+  if max_size >= 0 and uploaded_file.size >= max_size:
+    return HttpResponse(f'File exceeds maximum allowed size of {max_size} bytes. Please upload a smaller file.', status=413)
 
   # Check if the destination path is a directory and the file name contains a path separator
   # This prevents directory traversal attacks
   if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
-    raise Exception(f'Upload failed: {posixpath.sep} is not allowed in the filename {uploaded_file.name}.')
+    return HttpResponse(f'Invalid filename. Path separators are not allowed.', status=400)
 
+  # Check if the file already exists at the destination path
   filepath = request.fs.join(dest_path, uploaded_file.name)
+  if request.fs.exists(filepath):
+    return HttpResponse(f'The file path {filepath} already exists.', status=409)
 
   try:
-    request.fs.upload(request.META, input_data=body_data_bytes, destination=dest_path, username=request.user.username)
+    request.fs.upload_v1(request.META, input_data=body_data_bytes, destination=dest_path, username=request.user.username)
   except Exception as ex:
-    already_exists = False
-    try:
-      already_exists = request.fs.exists(filepath)
-    except Exception:
-      pass
-
-    if already_exists:
-      messsage = f'Upload failed: Destination {filepath} already exists.'
-    else:
-      messsage = f'Upload to {filepath} failed: {str(ex)}'
-    raise Exception(messsage)  # TODO: Check error messages above and status code
+    return HttpResponse(f'Upload to {filepath} failed: {str(ex)}', status=500)
 
   response = {
     'uploaded_file_stats': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
   }
 
-  return response
+  return JsonResponse(response)
 
 
 @api_error_handler

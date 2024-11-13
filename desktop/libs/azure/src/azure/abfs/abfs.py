@@ -600,7 +600,14 @@ class ABFS(object):
     """
     self.rename(old_dir, new_dir)
 
-  def upload(self, META, input_data, destination, username):
+  # Deprecated
+  def upload(self, file, path, *args, **kwargs):
+    """
+    Upload is done by the client
+    """
+    pass
+
+  def upload_v1(self, META, input_data, destination, username):
     from azure.abfs.upload import ABFSNewFileUploadHandler  # Circular dependency
 
     abfs_upload_handler = ABFSNewFileUploadHandler(destination, username)

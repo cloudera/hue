@@ -250,6 +250,7 @@ class ABFSNewFileUploadHandler(ABFSFileUploadHandler):
     self.destination = dest_path
     self.username = username
 
+    # TODO: _is_abfs_upload really required?
     if self._is_abfs_upload():
       self._fs = self._get_abfs(self.username)
       self.filesystem, self.directory = parse_uri(self.destination)[:2]

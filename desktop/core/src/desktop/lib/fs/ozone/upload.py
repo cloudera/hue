@@ -275,6 +275,7 @@ class OFSNewFileUploadHandler(OFSFileUploadHandler):
     self.file = None
     self._part_size = UPLOAD_CHUNK_SIZE.get()
 
+    # TODO: _is_ofs_upload really required?
     if self._is_ofs_upload():
       self._fs = self._get_ofs(self.username)
 

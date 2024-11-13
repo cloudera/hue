@@ -481,7 +481,7 @@ class GSFileSystem(S3FileSystem):
 
   @translate_gs_error
   @auth_error_handler
-  def upload(self, META, input_data, destination, username):
+  def upload_v1(self, META, input_data, destination, username):
     from desktop.lib.fs.gc.upload import GSNewFileUploadHandler  # Circular dependency
 
     gs_upload_handler = GSNewFileUploadHandler(destination, username)

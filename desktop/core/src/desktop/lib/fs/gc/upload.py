@@ -185,6 +185,7 @@ class GSNewFileUploadHandler(GSFileUploadHandler):
     self._mp = None
     self._part_num = 1
 
+    # TODO: _is_gs_upload really required?
     if self._is_gs_upload():
       self._fs = get_client(fs='gs', user=self.username)
       self.bucket_name, self.key_name = parse_uri(self.destination)[:2]

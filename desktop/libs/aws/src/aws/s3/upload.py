@@ -237,6 +237,7 @@ class S3NewFileUploadHandler(S3FileUploadHandler):
     self._mp = None
     self._part_num = 1
 
+    # TODO: _is_s3_upload really required?
     if self._is_s3_upload():
       self._fs = get_client(fs='s3a', user=self.username)
       self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
