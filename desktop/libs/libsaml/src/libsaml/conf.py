@@ -232,7 +232,15 @@ def config_validator(user):
 def get_logout_redirect_url():
   # This logic was derived from KNOX.
   prod_url = "consoleauth.altus.cloudera.com"
+  logout_url = CDP_LOGOUT_URL.get()
   redirect_url = "https://sso.cloudera.com/bin/services/support/api/public/logout"
   if prod_url not in CDP_LOGOUT_URL.get():
     redirect_url = "https://sso.staging-upgrade.aem.cloudera.com/bin/services/support/api/public/logout"
+  elif ("cdp.cloudera.com/" not in logout_url and "cloudera.com/" in logout_url and "consoleauth/logout" in logout_url):
+    # Dev/Staging environment
+    redirect_url = "https://sso.staging-upgrade.aem.cloudera.com/bin/services/support/api/public/logout"
+  elif ("cdp.cloudera.com/" in logout_url and "/consoleauth/logout" in logout_url):
+    # Production environment
+    redirect_url = "https://sso.cloudera.com/bin/services/support/api/public/logout"
+
   return redirect_url
