@@ -60,9 +60,14 @@ const Metrics: React.FC = (): JSX.Element => {
       return;
     }
 
-    const filteredData = parseMetricsData(metrics).filter(tableData =>
-      tableData.dataSource.some(data => data.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    const filteredData = parseMetricsData(metrics)
+      .map(tableData => ({
+        ...tableData,
+        dataSource: tableData.dataSource.filter(data =>
+          data.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      }))
+      .filter(tableData => tableData.dataSource.length > 0);
 
     setFilteredMetricsData(filteredData);
   }, [searchQuery, metrics]);
