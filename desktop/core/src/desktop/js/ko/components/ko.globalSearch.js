@@ -32,7 +32,7 @@ const TEMPLATE = `
       <div>
         <div><i class="fa fa-fw" data-bind="css: icon"></i></div>
         <div>
-          <div data-bind="html: label, style: { 'padding-top': description ? 0 : '9px' }"></div>
+          <div data-bind="html: label, css: { 'padding-top-0': description, 'padding-top-9px': !description }"></div>
           <!-- ko if: description -->
           <div data-bind="html: description"></div>
           <!-- /ko -->
@@ -42,7 +42,7 @@ const TEMPLATE = `
   </script>
 
   <script type="text/html" id="top-search-autocomp-no-match">
-    <div style="height: 30px;">
+    <div class="top_search_inline">
       <div>${I18n('No match found')}</div>
     </div>
   </script>
@@ -56,7 +56,7 @@ const TEMPLATE = `
   <!-- /ko -->
   <!-- ko if: searchResultCategories().length > 0 -->
   <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, style: { 'height' : heightWhenDragging }">
-    <div class="global-search-alternatives" data-bind="css: { 'global-search-full-width': !selectedResult() }, delayedOverflow" style="position: relative">
+    <div class="global-search-alternatives" data-bind="css: { 'global-search-full-width': !selectedResult() }, delayedOverflow">
       <!-- ko foreach: searchResultCategories -->
       <div class="global-search-category">
         <div class="global-search-category-header" data-bind="text: label"></div>
@@ -76,7 +76,7 @@ const TEMPLATE = `
       <!-- ko hueSpinner: { spin: loading() && searchResultCategories().length > 0, inline: true } --><!-- /ko -->
     </div>
     <!-- ko with: selectedResult -->
-    <div class="global-search-preview" style="overflow: auto;">
+    <div class="global-search-preview">
         <div class="global-search-close-preview"><a class="pointer inactive-action" data-bind="click: function () { $parent.selectedIndex(undefined); }"><i class="fa fa-fw fa-times"></i></a></div>
         <!-- ko switch: type -->
           <!-- ko case: ['database', 'document', 'field', 'table', 'view', 'partition']  -->

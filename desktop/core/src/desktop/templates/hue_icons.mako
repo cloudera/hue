@@ -16,36 +16,37 @@
 <%!
   from desktop import conf
   from desktop.lib.django_util import nonce_attribute
+
 %>
 
 <%def name="symbols()">
-  <svg version="1.1" xmlns="http://www.w3.org/2000/svg">
-  <style ${nonce_attribute(request)}>
-    .svg-hidden {
-      height: 0;
-      margin: 0;
-      border: none;
-      width: 0;
-    }
-    .fill-white {
-      fill: #FFF;
-    }
-    .fill-green {
-      fill: #3A870E;
-    }
-    .fill-red {
-      fill: #D9150C;
-    }
-    .fill-orange {
-      fill: #FFA319;
-    }
-    .fill-dark {
-      fill: #260D00;
-    }
-    .fill-dbe8f1 {
-      fill: #DBE8F1;
-    }
-  </style>
+  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg-hidden">
+    <style ${nonce_attribute(request)}>
+      svg.svg-hidden {
+        height: 0;
+        margin: 0;
+        border: none;
+        width: 0;
+      }
+      symbol .fill-white {
+        fill: #FFF;
+      }
+      symbol .fill-green {
+        fill: #3A870E;
+      }
+      symbol .fill-red {
+        fill: #D9150C;
+      }
+      symbol .fill-orange {
+        fill: #FFA319;
+      }
+      symbol .fill-dark {
+        fill: #260D00;
+      }
+      symbol .fill-dbe8f1 {
+        fill: #DBE8F1;
+      }
+    </style>
     <symbol id="hi-empty" viewBox="0 0 640 640">
     </symbol>
 
@@ -285,11 +286,6 @@
     </symbol>
 
     <symbol id="hi-plus-addon" viewBox="0 0 640 640">
-      <style ${nonce_attribute(request)}>
-        .fill-white {
-          fill: #FFF;
-        }
-      </style>
       <circle class="fill-white" cx="483.82" cy="484.82" r="170.68"></circle>
       <circle cx="483.82" cy="484.82" r="155.31"></circle>
       <rect class="fill-white" x="456.92" y="374.09" width="43.79" height="209.46"></rect>
@@ -533,22 +529,22 @@
     </symbol>
 
     <symbol id="hi-status-error" viewBox="0 0 24 24">
-      <path fill="#D9150C" d="M10 0C4.478 0 0 4.478 0 10s4.478 10 10 10 10-4.478 10-10S15.522 0 10 0z" transform="translate(-143 -246) translate(77 121) translate(2) translate(0 120) translate(64 5) translate(2 2)"></path>
+      <path class="fill-red" d="M10 0C4.478 0 0 4.478 0 10s4.478 10 10 10 10-4.478 10-10S15.522 0 10 0z" transform="translate(-143 -246) translate(77 121) translate(2) translate(0 120) translate(64 5) translate(2 2)"></path>
       <path class="fill-white" d="M10 13.75c.69 0 1.25.56 1.25 1.25s-.56 1.25-1.25 1.25-1.25-.56-1.25-1.25.56-1.25 1.25-1.25zM11 4v8H9V4h2z" transform="translate(-143 -246) translate(77 121) translate(2) translate(0 120) translate(64 5) translate(2 2)"></path>
     </symbol>
 
     <symbol id="hi-status-success" viewBox="0 0 24 24">
-      <path fill="#3A870E" d="M9.675 15.899L5.413 11.637 4 13.052 9.656 18.709 20.974 7.399 19.574 6z" transform="translate(-143 -164) translate(77 121) translate(2) translate(0 38) translate(64 5)"></path>
+      <path class="fill-green" d="M9.675 15.899L5.413 11.637 4 13.052 9.656 18.709 20.974 7.399 19.574 6z" transform="translate(-143 -164) translate(77 121) translate(2) translate(0 38) translate(64 5)"></path>
     </symbol>
 
     <symbol id="hi-status-stopped" viewBox="0 0 24 24">
-      <path fill="#D9150C" d="M8.272 3L3 8.272 3 15.728 8.272 21 15.728 21 21 15.728 21 8.272 15.728 3z" transform="translate(-143 -410) translate(77 121) translate(2) translate(0 284) translate(64 5)"></path>
+      <path class="fill-red" d="M8.272 3L3 8.272 3 15.728 8.272 21 15.728 21 21 15.728 21 8.272 15.728 3z" transform="translate(-143 -410) translate(77 121) translate(2) translate(0 284) translate(64 5)"></path>
       <path class="fill-white" d="M15.707 9.707L14.293 8.293 12 10.586 9.707 8.293 8.293 9.707 10.586 12 8.293 14.293 9.707 15.707 12 13.414 14.293 15.707 15.707 14.293 13.414 12z" transform="translate(-143 -410) translate(77 121) translate(2) translate(0 284) translate(64 5)"></path>
     </symbol>
 
     <symbol id="hi-status-warning" viewBox="0 0 24 24">
-      <path fill="#FFA319" d="M10 0L0 20 20 20z" transform="translate(-143 -492) translate(77 121) translate(2) translate(0 366) translate(64 5) translate(2 2)"></path>
-      <path fill="#260D00" d="M10 13.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM9 12h2V7H9v5z" transform="translate(-143 -492) translate(77 121) translate(2) translate(0 366) translate(64 5) translate(2 2)"></path>
+      <path class="fill-orange" d="M10 0L0 20 20 20z" transform="translate(-143 -492) translate(77 121) translate(2) translate(0 366) translate(64 5) translate(2 2)"></path>
+      <path class="fill-dark" d="M10 13.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM9 12h2V7H9v5z" transform="translate(-143 -492) translate(77 121) translate(2) translate(0 366) translate(64 5) translate(2 2)"></path>
     </symbol>
 
     <defs>
@@ -605,6 +601,11 @@
   </script>
 
   <script type="text/html" id="app-icon-template">
+    <style ${nonce_attribute(request)}>
+      .altus-icon.altus-adb-cluster {
+        margin: 0 1px 0 3px
+      }
+    </style>
     <!-- ko switch: icon -->
     <!-- ko case: 'dashboard' --><svg class="hi hi-fw"><use href="#hi-dashboard"></use></svg><!-- /ko -->
     <!-- ko case: 'data-browser' --><svg class="hi hi-fw"><use href="#hi-data-browser"></use></svg><!-- /ko -->
@@ -647,7 +648,7 @@
     <!-- ko case: 'database' --><i class="fa fa-fw fa-database"></i><!-- /ko -->
     <!-- ko case: 'text' --><i class="fa fa-fw fa-i-cursor"></i><!-- /ko -->
     <!-- ko case: 'yarn' --><i class="fa fa-fw fa-tasks"></i><!-- /ko -->
-    <!-- ko case: 'warehouses' --><i class="altus-icon altus-adb-cluster" style="margin: 0 1px 0 3px"></i><!-- /ko -->
+    <!-- ko case: 'warehouses' --><i class="altus-icon altus-adb-cluster"></i><!-- /ko -->
     <!-- ko case: 'workflows' --><svg class="hi hi-fw"><use href="#hi-oozie"></use></svg><!-- /ko -->
     <!-- ko case: $else --><i class="fa fa-fw fa-database"></i><!-- /ko -->
     <!-- /ko -->

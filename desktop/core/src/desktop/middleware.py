@@ -907,7 +907,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
 
         for p in csp_split:
             directive = p.lstrip().split(' ')[0]
-            if directive in ('script-src'):
+            if directive in ('script-src', 'style-src'):
                 # Remove 'unsafe-inline' if present
                 new_directive_parts = [
                     part for part in p.split(' ')

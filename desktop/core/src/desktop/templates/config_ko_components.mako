@@ -18,7 +18,7 @@
 import sys
 from desktop import conf
 from desktop.views import _ko
-
+from desktop.lib.django_util import nonce_attribute
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
@@ -28,7 +28,7 @@ from desktop.lib.django_util import nonce_attribute
 
 <%def name="config()">
 
-  <style>
+  <style ${nonce_attribute(request)}>
     .config-property {
       display: block;
       vertical-align: top;

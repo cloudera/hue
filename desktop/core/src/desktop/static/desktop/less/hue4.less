@@ -28,21 +28,65 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
+
+  #jobsPanel .jobs-panel-inline {
+    position: absolute;
+    right: 0px;
+    padding: 5px 10px;
+  }
+  .context-panel-toggle-inline {
+    position: absolute;
+    bottom: 0;
+  }
+
+  .show-panel-inline {
+    display: none;
+  }
+
+  .hide-assist-inline {
+    opacity: 0;
+  }
+  .hide {
+    display: none;
+  }
+  
+}
+
+#zoomDetectFrame {
+  width: 250px;
+}
+
+#documentShareModal {
+
+  .modal-body-inline {
+    overflow: visible;
+    height: 240px;
+    
+    .modal-body-row-inline {
+      max-height: 114px;
+      .muted {
+        margin-top: 0px;
+      }
+    }
+
+    .autocomplete-container-inline { 
+      margin-top: 20px;
+
+      #menu {
+        font-size: 14px;
+      }
+
+      #userSearchAutocomp {
+        width: 460px;
+      }
+    }
+
+  }
+  
 }
 
 .flex-auto {
   flex: 1 1 auto
-}
-
-.jobs-panel-inline {
-  position: absolute;
-  right: 0px;
-  padding: 5px 10px;
-}
-
-.context-panel-toggle-inline {
-  position: absolute;
-  bottom: 0;
 }
 
 .main-page {
@@ -149,6 +193,9 @@
   overflow-y: auto;
   max-height: 270px;
 }
+.notification-history-inline {
+  font-style: italic;
+}
 
 .notification-history-title {
   background-color: @cui-gray-100;
@@ -233,6 +280,10 @@
   margin-left: 2px;
   font-size: 12px;
   .hue-ease-transition(~"background-color, color");
+}
+
+.btn-group .btn.btn-browser-inline {
+  padding-right: 4px;
 }
 
 .navbar-dropdown-flat .btn:hover .jobs-badge {
@@ -349,6 +400,18 @@
   > div {
     right: 40px !important;
   }
+}
+
+.top_search_inline {
+  height: 30px;
+}
+
+.padding-top-0 {
+  padding-top: 0;
+}
+
+.padding-top-9px {
+  padding-top: 9px;
 }
 
 .search-container-top-old > a,
@@ -998,6 +1061,7 @@ ul.risk-list {
   .hue-box-shadow-bottom();
 
   .global-search-alternatives {
+    position: relative;
     .flex(0 0 35%);
 
     position: relative;
@@ -1052,6 +1116,7 @@ ul.risk-list {
   }
 
   .global-search-preview {
+    overflow: auto;
     .display-flex();
     .flex(1);
 
@@ -1094,6 +1159,7 @@ ul.risk-list {
   height: 0;
   width: 0;
   overflow: hidden;
+  opacity: 0;
 }
 
 .editable-inline-action {

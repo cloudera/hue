@@ -163,8 +163,8 @@ ${ hueIcons.symbols() }
       </div>
     </nav>
 
-    <div id="jobsPanel" class="jobs-panel" style="display: none;">
-      <div style="position: absolute; right: 0px; padding: 5px 10px;">
+    <div id="jobsPanel" class="jobs-panel hide">
+      <div class="jobs-panel-inline">
         <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
         <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')" title="${ _('Open in Job Browser') }">
           <i class="fa fa-fw fa-expand"></i>
@@ -175,8 +175,8 @@ ${ hueIcons.symbols() }
 
     <div class="content-wrapper">
       <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }, visibleOnHover: { selector: '.hide-left-side-panel' }">
-        <a href="javascript:void(0);" style="z-index: 1002; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: !leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
-        <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
+        <a href="javascript:void(0);" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel show-panel-inline hide" data-bind="visible: !leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
+        <a href="javascript:void(0);" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel hide-assist-inline hide" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
         <!-- ko if: window.USE_NEW_ASSIST_PANEL -->
 % if conf.USE_NEW_ASSIST_PANEL.get():
           <assist-panel-web-component></assist-panel-web-component>
@@ -195,7 +195,7 @@ ${ hueIcons.symbols() }
               },
               visibleAssistPanels: ['sql']
             }
-          }, visible: leftAssistVisible" style="display:none;"></div>
+          }, visible: leftAssistVisible"></div>
         <!-- /ko -->
       </div>
 
@@ -272,7 +272,7 @@ ${ hueIcons.symbols() }
           params: {
             visible: rightAssistVisible
           }
-        }" style="display: none;"></div>
+        }"></div>
 
       %if not ENABLE_HUE_5.get():
       <div class="context-panel" data-bind="slideVisible: contextPanelVisible">
@@ -335,7 +335,7 @@ ${ smart_str(login_modal(request).content) | n,unicode }
 % endif
 
 
-<iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
+<iframe class="hide" id="zoomDetectFrame"></iframe>
 
 ${ commonHeaderFooterComponents.footer(messages, nonce) }
 
@@ -345,7 +345,7 @@ ${ commonHeaderFooterComponents.footer(messages, nonce) }
 ${ jbCommon.include() }
 %endif
 
-<div class="monospace-preload" style="opacity: 0; height: 0; width: 0;">
+<div class="monospace-preload" >
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
   <b>Query. Explore. Repeat.</b>
 </div>

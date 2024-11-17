@@ -33,10 +33,10 @@ const TEMPLATE = `
     <div class="jobs-badge" data-bind="text: historyRunningJobs().length, visible: historyRunningJobs().length > 0"></div>
   </button>
 
-  <div class="jobs-panel history-panel" data-bind="visible: historyPanelVisible, style: { 'top' : top, 'left': left }" style="display: none;">
+  <div class="jobs-panel history-panel hide" data-bind="visible: historyPanelVisible, style: { 'top' : top, 'left': left }">
     <a class="pointer inactive-action pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
     <!-- ko ifnot: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
-      <span style="font-style: italic">${I18n('No task history.')}</span>
+      <span class="no-task-inline">${I18n('No task history.')}</span>
     <!-- /ko -->
     <!-- ko if: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
     <!-- ko with: editorViewModel.selectedNotebook() -->
@@ -56,12 +56,12 @@ const TEMPLATE = `
       <!-- ko with: snippets()[0] -->
       <!-- ko if: progress -->
       <div class="snippet-progress-container">
-        <div class="progress-snippet progress" data-bind="css: {
+        <div class="progress-snippet progress progress-inline" data-bind="css: {
                   'progress-danger': progress() == 0 && errors().length > 0 || status() == 'failed',
                   'progress-starting': progress() == 0 && status() == 'running',
                   'progress-warning': progress() > 0 && progress() < 100 && status() != 'failed',
                   'progress-success': progress() == 100
-                  }" style="background-color: #FFF; width: 100%">
+                  }">
           <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2, progress())) + '%'}"></div>
         </div>
       </div>
@@ -70,7 +70,7 @@ const TEMPLATE = `
       <pre data-bind="visible: result.logs() && result.logs().length == 0" class="logs logs-bigger">${I18n(
         'No logs available at this moment.'
       )}</pre>
-      <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated" style="height: 120px; overflow-y: auto;"></pre>
+      <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated"></pre>
       <!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->
@@ -79,7 +79,7 @@ const TEMPLATE = `
     <hr>
     <div class="notification-history margin-bottom-10">
       <!-- ko if: history().length == 0 -->
-      <span style="font-style: italic">${I18n('No task history.')}</span>
+      <span class="no-task-inline">${I18n('No task history.')}</span>
       <!-- /ko -->
       <!-- ko if: history().length > 0 -->
       <div class="notification-history-title">
