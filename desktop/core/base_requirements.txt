@@ -45,6 +45,7 @@ phoenixdb==1.2.1
 prompt-toolkit==3.0.39
 protobuf==3.20.3
 py==1.11.0
+pyarrow==17.0.0
 pyformance==0.3.2
 pytest==8.1.1
 pytest-django==4.8.0
