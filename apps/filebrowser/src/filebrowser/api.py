@@ -405,7 +405,7 @@ def upload_file(request):
   # Check if the file type is restricted
   _, file_type = os.path.splitext(uploaded_file.name)
   if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-    return HttpResponse(f'File type "{file_type}" is not allowed. Please choose a file with a different extetypension.', status=400)
+    return HttpResponse(f'File type "{file_type}" is not allowed. Please choose a file with a different type.', status=400)
 
   # Check if the file size exceeds the maximum allowed size
   max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
