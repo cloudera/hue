@@ -24,11 +24,15 @@ import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
+from io import BytesIO
 from time import sleep, time
 from unittest.mock import Mock, patch
 from urllib.parse import unquote as urllib_unquote
 
+import pandas as pd
 import pytest
+import pyarrow as pa
+import pyarrow.parquet as pq
 from avro import datafile, io, schema
 from django.http import HttpResponse
 from django.test import TestCase
@@ -45,7 +49,7 @@ from desktop.lib.test_utils import add_permission, add_to_group, grant_access, r
 from desktop.lib.view_util import location_to_url
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE, MAX_SNAPPY_DECOMPRESSION_SIZE, REMOTE_STORAGE_HOME
 from filebrowser.lib.rwx import expand_mode
-from filebrowser.views import _normalize_path, snappy_installed
+from filebrowser.views import _normalize_path, _read_parquet, snappy_installed
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.webhdfs import WebHdfs
@@ -1825,3 +1829,40 @@ class TestNormalizePath(object):
 
     normalized = _normalize_path(path)
     assert path == normalized
+
+
+class TestReadParquet:
+  def setup_method(self):
+    # Setup a common DataFrame and create a Parquet file in memory
+    self.test_df = pd.DataFrame({
+        'column1': [1, 2, 3, 4, 5],
+        'column2': ['a', 'b', 'c', 'd', 'e']
+    })
+    self.file_data = self.create_parquet_file(self.test_df)
+    self.path = "/mock/path/to/file.parquet"
+    self.offset = 0
+    self.length = 3
+    self.stats = None
+
+  def create_parquet_file(self, dataframe):
+    # Helper method to create a Parquet file in memory
+    buffer = BytesIO()
+    table = pa.Table.from_pandas(dataframe)
+    pq.write_table(table, buffer)
+    buffer.seek(0)  # Reset the file handle position
+    return buffer
+
+  def test_read_parquet_success(self):
+    # Call the function with valid Parquet data
+    result = _read_parquet(self.file_data, self.path, self.offset, self.length, self.stats)
+
+    expected_chunk = self.test_df.iloc[self.offset:self.offset + self.length].to_string()
+
+    assert result == expected_chunk
+
+  def test_read_parquet_invalid_file(self):
+    # Create an invalid file (not a Parquet file)
+    invalid_file_data = BytesIO(b"Not a valid Parquet file")
+
+    with pytest.raises(Exception, match="Failed to read Parquet file"):
+      _read_parquet(invalid_file_data, self.path, self.offset, self.length, self.stats)
