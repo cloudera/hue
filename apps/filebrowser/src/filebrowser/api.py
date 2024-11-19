@@ -422,6 +422,10 @@ def upload_file(request):
   if request.fs.exists(filepath):
     return HttpResponse(f'The file path {filepath} already exists.', status=409)
 
+  # Check if the destination path already exists or not
+  if not request.fs.exists(dest_path):
+    return HttpResponse(f'The destination path {dest_path} does not exist.', status=404)
+
   try:
     request.fs.upload_v1(request.META, input_data=body_data_bytes, destination=dest_path, username=request.user.username)
   except Exception as ex:
