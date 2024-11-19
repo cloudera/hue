@@ -40,6 +40,8 @@ RUN set -eux; \
     python3-dev \
     build-base \
     postgresql-dev && \
+    export PG_CONFIG=$(which pg_config); \
+    echo "PG_CONFIG is set to $PG_CONFIG"; \
     $HUE_BIN/python3.8 -m pip install --upgrade pip --force && \
     $HUE_BIN/pip install psycopg2 --no-cache-dir
 

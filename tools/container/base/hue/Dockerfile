@@ -103,7 +103,7 @@ RUN set -eux; \
     rm -rf redis-stable redis-stable.tar.gz
 
 # Install required tools and dependencies
-RUN pip3.8 install supervisor psycopg2-binary --no-cache-dir
+RUN pip3.8 install supervisor --no-cache-dir
 
 # Install PostgreSQL client tools which include pg_dump and pg_restore
 RUN apk --no-cache add postgresql-client
