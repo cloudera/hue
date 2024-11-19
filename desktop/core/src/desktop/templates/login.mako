@@ -21,11 +21,11 @@
 
   from desktop.conf import CUSTOM, ENABLE_ORGANIZATIONS
   from desktop.views import commonheader, commonfooter
-
   if sys.version_info[0] > 2:
     from django.utils.translation import gettext as _
   else:
     from django.utils.translation import ugettext as _
+  from desktop.lib.django_util import nonce_attribute
 %>
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />
@@ -161,7 +161,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
    % endif
 </div>
 
-<script>
+<script ${nonce_attribute(request)}>
   $(document).ready(function () {
     $("form").on("submit", function () {
       window.setTimeout(function () {
@@ -195,4 +195,4 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   });
 </script>
 
-${ commonfooter(None, messages) | n,unicode }
+${ commonfooter(request, messages, nonce ) | n,unicode }

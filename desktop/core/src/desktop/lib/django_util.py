@@ -518,3 +518,10 @@ class JsonResponse(HttpResponse):
     kwargs.setdefault('content_type', 'application/json')
     data = json.dumps(data, cls=encoder, **json_dumps_params)
     super(JsonResponse, self).__init__(content=data, **kwargs)
+
+
+def nonce_attribute(request):
+  if hasattr(request, 'csp_nonce') and desktop.conf.CSP_NONCE.get():
+    csp_nonce = getattr(request, 'csp_nonce', None)
+    return f' nonce={csp_nonce}' if csp_nonce else ''
+  return ''
