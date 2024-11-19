@@ -255,9 +255,6 @@ class ABFSNewFileUploadHandler(ABFSFileUploadHandler):
       self._fs = self._get_abfs(self.username)
       self.filesystem, self.directory = parse_uri(self.destination)[:2]
 
-      # Verify that the path exists
-      self._fs.stats(self.destination)
-
     LOG.debug("Chunk size = %d" % DEFAULT_WRITE_SIZE)
 
   def new_file(self, field_name, file_name, *args, **kwargs):

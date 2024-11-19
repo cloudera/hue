@@ -361,12 +361,6 @@ class HDFSNewFileUploadHandler(FileUploadHandler):
 
     self._fs = self._get_hdfs(self.username)
 
-    # Verify that the path exists
-    try:
-      self._fs.stats(self._destination)
-    except Exception as e:
-      raise HDFSerror(_('Destination path does not exist: %s' % self._destination))
-
     LOG.debug("Chunk size = %d" % self.chunk_size)
 
   def new_file(self, field_name, file_name, *args, **kwargs):

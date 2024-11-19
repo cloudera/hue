@@ -190,8 +190,6 @@ class GSNewFileUploadHandler(GSFileUploadHandler):
       self._fs = get_client(fs='gs', user=self.username)
       self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
 
-      # Verify that the path exists
-      self._fs._stats(self.destination)
       self._bucket = self._fs._get_bucket(self.bucket_name)
 
   def new_file(self, field_name, file_name, *args, **kwargs):

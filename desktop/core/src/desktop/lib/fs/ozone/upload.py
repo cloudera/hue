@@ -279,12 +279,6 @@ class OFSNewFileUploadHandler(OFSFileUploadHandler):
     if self._is_ofs_upload():
       self._fs = self._get_ofs(self.username)
 
-      # Verify that the path exists
-      try:
-        self._fs.stats(self.destination)
-      except Exception as e:
-        raise OFSFileUploadError(_('Destination path does not exist: %s' % self.destination))
-
     LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
 
   def new_file(self, field_name, file_name, *args, **kwargs):
