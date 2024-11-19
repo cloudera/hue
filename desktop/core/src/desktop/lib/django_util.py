@@ -522,8 +522,7 @@ class JsonResponse(HttpResponse):
 
 def nonce_attribute(request):
     # Assuming 'csp_nonce' is set in the request and CSP_NONCE controls its usage
-    if desktop.conf.CSP_NONCE.get():
+    if hasattr(desktop.conf, 'CSP_NONCE') and desktop.conf.CSP_NONCE.get():
         csp_nonce = request.csp_nonce
-        if csp_nonce:
-            return f' nonce={csp_nonce}'
+        return f' nonce={csp_nonce}' if csp_nonce else ''
     return ''

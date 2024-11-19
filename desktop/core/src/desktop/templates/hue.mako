@@ -296,9 +296,8 @@ ${ hueIcons.symbols() }
 </div>
 ${ commonshare() | n,unicode }
 
-% for bundle in get_hue_bundles('login' if section == 'login' else 'hue', 'LOGIN' if section == 'login' else 'DEFAULT'):
-  <% text = render_bundle(bundle, config='LOGIN' if section == 'login' else 'DEFAULT').replace('<script ', '<script' + nonce_attribute(request) + ' ') %>
-  ${ text | n}
+% for bundle in get_hue_bundles('hue'):
+  ${ render_bundle(bundle) | n,unicode }
 % endfor
 
 <script src="${ static('desktop/js/polyfills.js') }"></script>
