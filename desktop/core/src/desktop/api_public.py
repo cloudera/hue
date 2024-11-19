@@ -222,15 +222,51 @@ def storage_view(request, path):
 
 
 @api_view(["GET"])
-def storage_download(request, path):
+def storage_stat(request):
   django_request = get_django_request(request)
-  return filebrowser_views.download(django_request, path)
+  return filebrowser_api.stat(django_request)
+
+
+@api_view(["GET"])
+def storage_listdir_paged(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.listdir_paged(django_request)
+
+
+@api_view(["GET"])
+def storage_display(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.display(django_request)
+
+
+@api_view(["GET"])
+def storage_download(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.download(django_request)
+
+
+@api_view(["POST"])
+def storage_save_file(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.save_file(django_request)
 
 
 @api_view(["POST"])
 def storage_upload_file(request):
   django_request = get_django_request(request)
-  return filebrowser_views.upload_file(django_request)
+  return filebrowser_views.upload_file(django_request)  # TODO: Fix new api method and switch here
+
+
+@api_view(["POST"])
+def storage_upload_chunks(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.upload_chunks(django_request)
+
+
+@api_view(["POST"])
+def storage_upload_complete(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.upload_complete(django_request)
 
 
 @api_view(["POST"])
@@ -252,15 +288,27 @@ def storage_rename(request):
 
 
 @api_view(["GET"])
-def storage_content_summary(request, path):
+def storage_content_summary(request):
   django_request = get_django_request(request)
-  return filebrowser_api.content_summary(django_request, path)
+  return filebrowser_api.content_summary(django_request)
+
+
+@api_view(["POST"])
+def storage_bulk_move(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.move)
 
 
 @api_view(["POST"])
 def storage_move(request):
   django_request = get_django_request(request)
   return filebrowser_api.move(django_request)
+
+
+@api_view(["POST"])
+def storage_bulk_copy(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.copy)
 
 
 @api_view(["POST"])
@@ -281,6 +329,12 @@ def storage_rmtree(request):
   return filebrowser_api.rmtree(django_request)
 
 
+@api_view(["POST"])
+def storage_bulk_rmtree(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.rmtree)
+
+
 @api_view(["GET"])
 def storage_get_trash_path(request):
   django_request = get_django_request(request)
@@ -294,9 +348,60 @@ def storage_trash_restore(request):
 
 
 @api_view(["POST"])
+def storage_trash_bulk_restore(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.trash_restore)
+
+
+@api_view(["DELETE"])
 def storage_trash_purge(request):
   django_request = get_django_request(request)
   return filebrowser_api.trash_purge(django_request)
+
+
+@api_view(["POST"])
+def storage_compress_files_using_batch_job(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.compress_files_using_batch_job(django_request)
+
+
+@api_view(["POST"])
+def storage_extract_archive_using_batch_job(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.extract_archive_using_batch_job(django_request)
+
+
+@api_view(["POST"])
+def storage_chown(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.chown(django_request)
+
+
+@api_view(["POST"])
+def storage_chmod(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.chmod(django_request)
+
+
+@api_view(["POST"])
+def storage_bulk_chown(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.chown)
+
+
+@api_view(["POST"])
+def storage_bulk_chmod(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.chmod)
+
+
+# Task Server
+
+
+@api_view(["GET"])
+def taskserver_get_available_space_for_upload(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.get_available_space_for_upload(django_request)
 
 
 # Importer
