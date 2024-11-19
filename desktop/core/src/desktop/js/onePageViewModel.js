@@ -182,14 +182,12 @@ class OnePageViewModel {
       $.ajax({
         url: scriptUrl,
         converters: {
-          'text script': function (text) {
-            return text;
-          }
+          'text script': text => text
         }
       })
         .done(contents => {
           loadedJs.push(scriptUrl);
-          deferred.resolve({ url: scriptUrl, contents: contents });
+          deferred.resolve({ url: scriptUrl, contents });
         })
         .fail(() => {
           deferred.resolve('');
@@ -201,21 +199,20 @@ class OnePageViewModel {
       const promises = [];
       while (scriptUrls.length) {
         const scriptUrl = scriptUrls.shift();
-        if (loadedJs.indexOf(scriptUrl) !== -1) {
-          continue;
+        if (!loadedJs.includes(scriptUrl)) {
+          promises.push(loadScript(scriptUrl));
         }
-        promises.push(loadScript(scriptUrl));
       }
       return promises;
     };
 
     const addGlobalCss = function ($el) {
       const cssFile = $el.attr('href').split('?')[0];
-      if (loadedCss.indexOf(cssFile) === -1) {
+      if (!loadedCss.includes(cssFile)) {
         loadedCss.push(cssFile);
         $.ajaxSetup({ cache: true });
         if (window.DEV) {
-          $el.attr('href', $el.attr('href') + '?dev=' + Math.random());
+          $el.attr('href', `${$el.attr('href')}?dev=${Math.random()}`);
         }
         $el.clone().appendTo($('head'));
         $.ajaxSetup({ cache: false });
@@ -223,7 +220,7 @@ class OnePageViewModel {
       $el.remove();
     };
 
-    // Only load CSS and JS files that are not loaded before
+    // Process headers to load CSS and JS files
     self.processHeaders = function (response) {
       const promise = $.Deferred();
       const $rawHtml = $('<span>').html(response);
@@ -237,36 +234,39 @@ class OnePageViewModel {
       $allScripts.remove();
 
       $rawHtml.find('link[href]').each(function () {
-        addGlobalCss($(this)); // Also removes the elements;
+        addGlobalCss($(this));
       });
 
       $rawHtml.find('a[href]').each(function () {
         let link = $(this).attr('href');
         if (link.startsWith('/') && !link.startsWith('/hue')) {
-          link = window.HUE_BASE_URL + '/hue' + link;
+          link = `${window.HUE_BASE_URL}/hue${link}`;
         }
         $(this).attr('href', link);
       });
 
       const scriptPromises = loadScripts(scriptsToLoad);
 
-      const evalScriptSync = function () {
+      const loadScriptSync = function () {
         if (scriptPromises.length) {
-          // Evaluate the scripts in the order they were defined in the page
           const nextScriptPromise = scriptPromises.shift();
           nextScriptPromise.done(scriptDetails => {
-            if (scriptDetails.contents) {
-              $.globalEval(scriptDetails.contents);
+            if (scriptDetails.url) {
+              const script = document.createElement('script');
+              script.src = scriptDetails.url;
+              script.onload = loadScriptSync;
+              script.onerror = loadScriptSync;
+              document.head.appendChild(script);
+            } else {
+              loadScriptSync();
             }
-            evalScriptSync();
           });
         } else {
-          // All evaluated
           promise.resolve($rawHtml.children());
         }
       };
 
-      evalScriptSync();
+      loadScriptSync();
       return promise;
     };
 
@@ -369,46 +369,63 @@ class OnePageViewModel {
         }
 
         $.ajax({
-          url:
-            baseURL +
-            (baseURL.indexOf('?') > -1 ? '&' : '?') +
-            'is_embeddable=true' +
-            self.extraEmbeddableURLParams(),
-          beforeSend: function (xhr) {
-            xhr.setRequestHeader('X-Requested-With', 'Hue');
-          },
+          url: `${baseURL}${baseURL.includes('?') ? '&' : '?'}is_embeddable=true${self.extraEmbeddableURLParams()}`,
+          beforeSend: xhr => xhr.setRequestHeader('X-Requested-With', 'Hue'),
           dataType: 'html',
-          success: function (response, status, xhr) {
+          success: (response, status, xhr) => {
             const type = xhr.getResponseHeader('Content-Type');
-            if (type.indexOf('text/') > -1) {
+            if (type.includes('text/')) {
               window.clearAppIntervals(app);
               huePubSub.clearAppSubscribers(app);
               self.extraEmbeddableURLParams('');
 
               self.processHeaders(response).done($rawHtml => {
-                if (window.SKIP_CACHE.indexOf(app) === -1) {
+                const scripts = $rawHtml.find('script');
+
+                // Append JSON scripts
+                scripts.each(function () {
+                  if (this.getAttribute('type') === 'application/json') {
+                    document.head.appendChild(this);
+                    // Disabling linting because initializeEditorComponent is defined in static folder
+                    // as this needs to be defined here
+                    // eslint-disable-next-line no-undef
+                    initializeEditorComponent();
+                  }
+                });
+
+                // Append other scripts
+                scripts.each(function () {
+                  if (!['application/json', 'text/html'].includes(this.getAttribute('type'))) {
+                    const script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    if (this.src) {
+                      script.src = this.src;
+                      document.head.appendChild(script);
+                    }
+                    $(this).remove();
+                  }
+                });
+
+                if (!window.SKIP_CACHE.includes(app)) {
                   self.embeddable_cache[app] = $rawHtml;
                 }
-                $('#embeddable_' + app).html($rawHtml);
+                $(`#embeddable_${app}`).html($rawHtml);
                 huePubSub.publish('app.dom.loaded', app);
-                window.setTimeout(() => {
-                  self.isLoadingEmbeddable(false);
-                }, 0);
+                window.setTimeout(() => self.isLoadingEmbeddable(false), 0);
               });
-            } else {
-              if (type.indexOf('json') > -1) {
-                const presponse = JSON.parse(response);
-                if (presponse && presponse.url) {
-                  window.location.href = window.HUE_BASE_URL + presponse.url;
-                  return;
-                }
+            } else if (type.includes('json')) {
+              const presponse = JSON.parse(response);
+              if (presponse && presponse.url) {
+                window.location.href = `${window.HUE_BASE_URL}${presponse.url}`;
+                return;
               }
-              window.location.href = window.HUE_BASE_URL + baseURL;
+            } else {
+              window.location.href = `${window.HUE_BASE_URL}${baseURL}`;
             }
           },
-          error: function (xhr) {
+          error: xhr => {
             console.error('Route loading problem', xhr);
-            if ((xhr.status === 401 || xhr.status === 403) && app !== '403') {
+            if ([401, 403].includes(xhr.status) && app !== '403') {
               self.loadApp('403');
             } else if (app !== '500') {
               self.loadApp('500');
