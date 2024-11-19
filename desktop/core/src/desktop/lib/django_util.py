@@ -521,8 +521,7 @@ class JsonResponse(HttpResponse):
 
 
 def nonce_attribute(request):
-    if hasattr(request, 'csp_nonce') and desktop.conf.CSP_NONCE.get():
-        csp_nonce = getattr(request, 'csp_nonce', None)
-        # Use a conditional expression to return the appropriate nonce attribute or an empty string
-        return f' nonce={csp_nonce}' if csp_nonce else ''
-    return ''
+  if hasattr(request, 'csp_nonce') and desktop.conf.CSP_NONCE.get():
+    csp_nonce = getattr(request, 'csp_nonce', None)
+    return f' nonce={csp_nonce}' if csp_nonce else ''
+  return ''
