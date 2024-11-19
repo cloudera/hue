@@ -158,7 +158,7 @@ const ASSIST_TABLE_TEMPLATES = `
 
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { override: statsVisible() || navigationSettings.rightAssist, selector: '.table-actions' }">
-      <div class="assist-actions table-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
+      <div class="assist-actions table-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
           'Show details'
         )}"></i></a>
@@ -177,7 +177,7 @@ const ASSIST_TABLE_TEMPLATES = `
 
   <script type="text/html" id="assist-column-entry">
     <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: catalogEntry.isView() ? '.table-actions' : '.column-actions' }, css: { 'assist-table': catalogEntry.isView(), 'assist-column': catalogEntry.isField() }">
-      <div class="assist-actions column-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
+      <div class="assist-actions column-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
           'Show details'
         )}"></i></a>
@@ -199,7 +199,7 @@ const ASSIST_TABLE_TEMPLATES = `
 
   <script type="text/html" id="assist-column-entry-assistant">
     <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: catalogEntry.isView() ? '.table-actions' : '.column-actions' }, css: { 'assist-table': catalogEntry.isView(), 'assist-column': catalogEntry.isField() }">
-      <div class="assist-actions column-actions assist-actions-left" style="opacity: 0">
+      <div class="assist-actions column-actions assist-actions-left">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
           'Show details'
         )}"></i></a>
@@ -261,7 +261,7 @@ const TEMPLATE =
   ASSIST_TABLE_TEMPLATES +
   `
   <script type="text/html" id="assist-database-actions">
-    <div class="assist-actions database-actions" style="opacity: 0">
+    <div class="assist-actions database-actions">
       <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, popoverOnHover: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${I18n(
         'Show details'

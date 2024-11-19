@@ -488,7 +488,7 @@ else:
       <!-- /ko -->
 
       <!-- ko foreach: sessions -->
-        <h4 class="session-text-inline">
+        <h4 style="clear:left; display: inline-block">
           <span data-bind="text: $parents[1].getSnippetName(type())"></span>
           <!-- ko if: typeof session_id != 'undefined' && session_id -->
             <span data-bind="text: session_id"></span>
@@ -511,16 +511,16 @@ else:
           <!-- /ko -->
         </div>
         % if conf.USE_DEFAULT_CONFIGURATION.get():
-        <div class="property-selector-inline">
+        <div style="width:100%;">
           <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
         </div>
         % endif
-        <div class="list-properties-inline">
+        <div style="clear:both; padding-left: 120px;">
           <!-- ko if: availableNewProperties().length -->
-          <a class="pointer" data-bind="click: selectedSessionProperty() && function() {
+          <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
                       properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
                       selectedSessionProperty('');
-                     }">
+                     }" style="margin-left:10px;vertical-align: text-top;">
           </a>
           <!-- /ko -->
         </div>
@@ -542,7 +542,7 @@ else:
 
 <script type="text/html" id="snippet-log${ suffix }">
   <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs">
-    <div data-bind="delayedOverflow: 'slow', css: resultsKlass">
+    <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
       <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li data-bind="attr: {'id': $data.name.substr(4)}">
@@ -552,7 +552,7 @@ else:
             <a data-bind="text: $.trim($data.name), hueLink: $data.url"></a>
           % endif
           <!-- ko if: typeof percentJob === 'function' && percentJob() > -1 -->
-          <div class="progress-job progress pull-left progress-job-inline" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
+          <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
             <div class="bar" data-bind="style: {'width': percentJob() + '%'}"></div>
           </div>
           <!-- /ko -->
@@ -569,11 +569,11 @@ else:
     </div>
   </div>
   <div class="snippet-log-container margin-bottom-10">
-    <div data-bind="visible: ! result.hasResultset() && status() == 'available' && result.fetchedOnce(), css: resultsKlass, click: function(){  }" class="hide">
+    <div data-bind="visible: ! result.hasResultset() && status() == 'available' && result.fetchedOnce(), css: resultsKlass, click: function(){  }" style="display:none;">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
     </div>
 
-    <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce() && result.explanation().length <= 0, css: resultsKlass" class="hide">
+    <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce() && result.explanation().length <= 0, css: resultsKlass" style="display:none;">
       <!-- ko if: result.hasMore -->
         <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
       <!-- /ko -->
@@ -582,7 +582,7 @@ else:
       <!-- /ko -->
     </div>
 
-    <div data-bind="visible: status() == 'expired', css: resultsKlass" class="hide">
+    <div data-bind="visible: status() == 'expired', css: resultsKlass" style="display:none;">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Results have expired, rerun the query if needed.") }</pre>
     </div>
 
@@ -599,7 +599,7 @@ else:
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass">
       <ul class="nav nav-tabs nav-tabs-editor">
         <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}, onClickOutside: function () { if ($parent.historyFilterVisible() && $parent.historyFilter() === '') { $parent.historyFilterVisible(false) } }">
-          <a class="inactive-action inline-block " data-testid="editor--query-history--tab" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
+          <a class="inactive-action" data-testid="editor--query-history--tab" class="editor--query-history--tab-inline" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
           <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
           <input class="input-small inline-tab-filter" data-testid="editor--query-history-search--input" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
           <div class="dropdown inline-block inactive-action pointer visible-on-hover">
@@ -621,23 +621,23 @@ else:
           </div>
         </li>
         <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
-          <a class="inactive-action inline-block " data-testid="editor--saved-queries--tab" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
-          <div class="inline-block inactive-action pointer visible-on-hover margin-left--15" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
+          <a class="inactive-action" data-testid="editor--saved-queries--tab" class="editor--saved-queries--tab-inline" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
+          <div class="${_('search-the-saved-queries')}-inline" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
           <input class="input-small inline-tab-filter" data-testid="editor--query-history-search--input" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
         </li>
         % if ENABLE_QUERY_BUILDER.get():
         <!-- ko if: isSqlDialect -->
-        <li class="query-builder-inline" data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
+        <li style="margin-right: 25px;" data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
         <!-- /ko -->
         % endif
         <!-- ko if: result.hasSomeResults -->
         <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
-          <a class="inactive-action inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
+          <a class="inactive-action" style="display:inline-block" href="#queryResults" data-toggle="tab">${_('Results')}
             <!-- ko if: result.rows() != null  -->
               (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
             <!-- /ko -->
           </a>
-          <div class="inline-block margin-left--15">
+          <div style="margin-left: -15px;" class="inline-block">
             <!-- ko if: showGrid -->
             <div class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }">
               <i class="snippet-icon fa fa-search"></i>
@@ -671,8 +671,8 @@ else:
         <!-- /ko -->
       </ul>
 
-      <div class="tab-content tab-content-inline">
-        <div class="tab-pane" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
+      <div class="tab-content" style="border: none; overflow-x: hidden">
+        <div class="tab-pane" class="queryHistory-inline" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() > 0 ? Math.max($parent.historyInitialHeight(), 40) + 'px' : '' }">
           <!-- ko if: $parent.loadingHistory -->
           <div class="margin-top-10 margin-left-10">
             <i class="fa fa-spinner fa-spin muted"></i>
@@ -681,10 +681,10 @@ else:
 
           <!-- ko ifnot: $parent.loadingHistory -->
             <!-- ko if: $parent.history().length === 0 && $parent.historyFilter() === '' -->
-            <div class="margin-top-10 margin-left-10 font-italic-inline">${ _("No queries to be shown.") }</div>
+            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
             <!-- /ko -->
             <!-- ko if: $parent.history().length === 0 && $parent.historyFilter() !== '' -->
-            <div class="margin-top-10 margin-left-10 font-italic-inline">${ _('No queries found for') } <strong data-bind="text: $parent.historyFilter"></strong>.</div>
+            <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: $parent.historyFilter"></strong>.</div>
             <!-- /ko -->
 
 
@@ -692,10 +692,10 @@ else:
             <table class="table table-condensed margin-top-10 history-table">
               <tbody data-bind="foreach: { data: $parent.history, afterRender: function(){ huePubSub.publish('editor.calculate.history.height'); } }">
                 <tr data-bind="click: function() { if (uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid()); } }, css: { 'highlight': uuid() == $root.selectedNotebook().uuid(), 'pointer': uuid() != $root.selectedNotebook().uuid() }">
-                  <td class="muted query-date-inline" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
+                  <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
                     <span data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></span>
                   </td>
-                  <td class="muted query-status-icon-inline" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
+                  <td style="width: 25px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
                     <!-- ko switch: status -->
                     <!-- ko case: 'running' -->
                     <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
@@ -711,7 +711,7 @@ else:
                     <!-- /ko -->
                     <!-- /ko -->
                   </td>
-                  <td class="muted query-inline" data-bind="ellipsis: {data: name(), length: 30}, style: {'border-top-width': $index() == 0 ? '0' : ''}"></td>
+                  <td style="width: 25px" class="muted" data-bind="ellipsis: {data: name(), length: 30}, style: {'border-top-width': $index() == 0 ? '0' : ''}"></td>
                   <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}, click: function(){ if (window.getSelection().toString() === '' && uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid()) }  }, clickBubble: false"><div data-bind="highlight: { value: query, dialect: $parent.type }"></div></td>
                 </tr>
               </tbody>
@@ -729,41 +729,41 @@ else:
           <!-- /ko -->
         </div>
 
-        <div class="tab-pane saved-queries-inline" id="savedQueries" data-bind="css: {'active': currentQueryTab() == 'savedQueries'}">
+        <div class="tab-pane" id="savedQueries" data-bind="css: {'active': currentQueryTab() == 'savedQueries'}" class="savedQueries-inline">
           <!-- ko if: loadingQueries -->
           <div class="margin-top-10 margin-left-10">
             <i class="fa fa-spinner fa-spin muted"></i>
           </div>
           <!-- /ko -->
           <!-- ko if: queriesHasErrors() -->
-          <div class="margin-top-10 margin-left-10 font-italic-inline">${ _("Error loading my queries") }</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() === '' -->
-          <div class="margin-top-10 margin-left-10 font-italic-inline">${ _("You don't have any saved queries.") }</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("You don't have any saved queries.") }</div>
           <!-- /ko -->
           <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length === 0 && queriesFilter() !== '' -->
-          <div class="margin-top-10 margin-left-10  font-italic-inline">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _('No queries found for') } <strong data-bind="text: queriesFilter"></strong>.</div>
           <!-- /ko -->
-        
+          <!-- ko if: !queriesHasErrors() && !loadingQueries() && queries().length > 0 -->
           <table class="table table-condensed margin-top-10 history-table">
             <thead>
               <tr>
-                <th class="th-name">${ _("Name") }</th>
-                <th class="th-description">${ _("Description") }</th>
-                <th class="th-owner">${ _("Owner") }</th>
-                <th class="th-last-modified">${ _("Last Modified") }</th>
+                <th style="width: 16%">${ _("Name") }</th>
+                <th style="width: 50%">${ _("Description") }</th>
+                <th style="width: 18%">${ _("Owner") }</th>
+                <th style="width: 16%">${ _("Last Modified") }</th>
               </tr>
             </thead>
             <tbody data-bind="foreach: queries">
             <tr data-bind="click: function() { if (uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid(), 'savedQueries'); } }, css: { 'highlight': uuid() == $root.selectedNotebook().uuid(), 'pointer': uuid() != $root.selectedNotebook().uuid() }">
-              <td class="th-name"><span data-bind="ellipsis: {data: name(), length: 50}"></span></td>
-              <td class="th-description"><span data-bind="text: description"></span></td>
-              <td class="th-owner"><span data-bind="text: owner"></span></td>
-              <td class="th-last-modified"><span data-bind="text: localeFormat(last_modified())"></span></td>
+              <td style="width: 16%"><span data-bind="ellipsis: {data: name(), length: 50}"></span></td>
+              <td style="width: 50%; white-space: normal"><span data-bind="text: description"></span></td>
+              <td style="width: 18%"><span data-bind="text: owner"></span></td>
+              <td style="width: 16%"><span data-bind="text: localeFormat(last_modified())"></span></td>
             </tr>
             </tbody>
           </table>
-
+          <!-- /ko -->
           <div class="pagination" data-bind="visible: queriesTotalPages() > 1">
             <ul>
               <li data-bind="css: { 'disabled' : queriesCurrentPage() === 1 }"><a href="javascript: void(0);" data-bind="click: prevQueriesPage">${ _("Prev") }</a></li>
@@ -804,14 +804,14 @@ else:
         <!-- /ko -->
 
         <!-- ko if: HAS_WORKLOAD_ANALYTICS && type() === 'impala' -->
-        <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}">
+        <div class="tab-pane" id="executionAnalysis" data-bind="css: {'active': currentQueryTab() == 'executionAnalysis'}" class="executionAnalysis-inline">
           <!-- ko component: { name: 'hue-execution-analysis' } --><!-- /ko -->
         </div>
         <!-- /ko -->
 
         <!-- ko foreach: pinnedContextTabs -->
-        <div class="tab-pane tab-pane-inline" data-bind="attr: { 'id': tabId }, css: {'active': $parent.currentQueryTab() === tabId }">
-          <div class="content-popover-inline" data-bind="template: 'context-popover-contents'"></div>
+        <div class="tab-pane" style="height: 300px; position: relative; overflow: hidden;" data-bind="attr: { 'id': tabId }, css: {'active': $parent.currentQueryTab() === tabId }">
+          <div style="display: flex; flex-direction: column; margin-top: 10px; overflow: hidden; height: 100%; position: relative;" data-bind="template: 'context-popover-contents'"></div>
         </div>
         <!-- /ko -->
       </div>
@@ -822,12 +822,11 @@ else:
 <script type="text/html" id="doc-search-autocomp-item">
   <a>
     <div>
-      <strong class="search-autocomplete-name" data-bind="html: name"></strong>
-      <div class="search-autocomplete-description muted" data-bind="text: description"></div>
+      <strong style="font-size: 14px;" data-bind="html: name"></strong>
+      <div style="width: 190px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" class="muted" data-bind="text: description"></div>
     </div>
   </a>
 </script>
-
 
 <script type="text/html" id="longer-operation${ suffix }">
   <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: showLongOperationWarning" title="${ _('The query is hanging and taking longer than expected.') }" class="inline-block margin-right-10">
@@ -1140,7 +1139,7 @@ else:
       </a>
       <!-- /ko -->
       <!-- ko if: snippets()[executingAllIndex()] && snippets()[executingAllIndex()].isCanceling() -->
-      <a class="btn" style="cursor: default;" title="${ _('Canceling operation...') }">
+      <a class="btn" class="canceling-operation-inline" title="${ _('Canceling operation...') }">
         <i class="fa fa-fw fa-spinner snippet-side-single fa-spin"></i>
       </a>
       <!-- /ko -->
@@ -1398,7 +1397,7 @@ else:
                   autocompleteFromEntries: result.autocompleteFromEntries
                 }
               } --><!-- /ko -->
-              ##<input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" title="${ _('Type column:xxx or type:yyy for specific filters.') }" style="width: 257px" />
+              ##<input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" title="${ _('Type column:xxx or type:yyy for specific filters.') }" class="type-column:xxx-or-type:yyy-for-specific-filters.-inline" />
             </div>
           </td>
         </tr>
@@ -1651,11 +1650,11 @@ else:
   <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
     <a class="inactive-action pull-left snippet-logs-btn" href="javascript:void(0)" data-bind="visible: status() === 'running' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Toggle Logs') }"><i class="fa fa-fw" data-bind="css: { 'fa-caret-right': !$data.showLogs(), 'fa-caret-down': $data.showLogs() }"></i></a>
     <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-sql-analyzer-report'">
-      <div class="progress-snippet progress progress-inline" data-bind="css: {
+      <div class="progress-snippet progress" data-bind="css: {
         'progress-starting': progress() == 0 && (status() == 'running' || status() == 'starting'),
         'progress-warning': progress() > 0 && progress() < 100,
         'progress-success': progress() == 100,
-        'progress-danger': progress() == 0 && errors().length > 0}">
+        'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
         <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2, progress())) + '%'}"></div>
       </div>
     </div>
@@ -1715,7 +1714,7 @@ else:
 <script type ="text/html" id="snippet-execution-controls${ suffix }">
   <div class="snippet-actions" style="position: absolute; bottom: 0">
     <!-- ko if: status() == 'loading' -->
-    <a class="snippet-side-btn blue" data-testid="editor--execute--button" style="cursor: default;" title="${ _('Creating session') }">
+    <a class="snippet-side-btn blue" data-testid="editor--execute--button" class="editor--execute--button-inline" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
     <!-- /ko -->
@@ -1731,13 +1730,13 @@ else:
     </a>
     <!-- /ko -->
     <!-- ko if: isCanceling() -->
-    <a class="snippet-side-btn" style="cursor: default;" title="${ _('Canceling operation...') }">
+    <a class="snippet-side-btn" class="canceling-operation-inline" title="${ _('Canceling operation...') }">
       <i class="fa fa-fw fa-spinner snippet-side-single fa-spin"></i>
     </a>
     <!-- /ko -->
     <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
       <!-- ko if: isBatchable() && wasBatchExecuted() -->
-      <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px" href="javascript: void(0)" title="${ _('Submit all the queries as a background batch job.') }" data-bind="click: function() { wasBatchExecuted(true); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }">
+      <a class="snippet-side-btn" class="submit-all-the-queries-as-a-background-batch-job.-inline" href="javascript: void(0)" title="${ _('Submit all the queries as a background batch job.') }" data-bind="click: function() { wasBatchExecuted(true); execute(); }, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }">
         <i class="fa fa-fw fa-send"></i>
       </a>
       <!-- /ko -->
@@ -1769,7 +1768,7 @@ else:
 
     <!-- ko if: isSqlDialect && ! $root.isPresentationMode() -->
     <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
-      <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px;" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading', 'blue': currentQueryTab() == 'queryExplain' }" title="${ _('Explain the current SQL query') }">
+      <a class="snippet-side-btn" class="explain-the-current-sql-query-inline" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading', 'blue': currentQueryTab() == 'queryExplain' }" title="${ _('Explain the current SQL query') }">
         <i class="fa fa-fw fa-map-o"></i>
       </a>
       <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': ! isReady(), 'blue': currentQueryTab() == 'queryExplain' }">
@@ -1895,13 +1894,13 @@ else:
     </div>
 
     % if conf.ENABLE_DOWNLOAD.get():
-    <div data-bind="component: { name: 'downloadSnippetResults', params: { gridSideBtn: false, snippet: $data, notebook: $parent } }" class="inline-block"></div>
+    <div data-bind="component: { name: 'downloadSnippetResults', params: { gridSideBtn: false, snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
     % endif
   </div>
 </script>
 
 
-<div class="ace-filechooser hide">
+<div class="ace-filechooser" style="display:none;">
   <div class="ace-filechooser-close">
     <a class="pointer" data-bind="click: function(){ $('.ace-filechooser').hide(); }"><i class="fa fa-times"></i></a>
   </div>

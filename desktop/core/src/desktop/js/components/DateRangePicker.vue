@@ -84,11 +84,12 @@
 
   import { Range } from './DateRangePicker';
   import { DateTime } from 'luxon';
-  import Datepicker from 'vue3-datepicker';
+  import Datepicker from '../ext/datepicker/vue3-datepicker.mjs';
   import HueLink from './HueLink.vue';
   import HueButton from './HueButton.vue';
   import I18n from '../utils/i18n';
   import DropdownPanel from './dropdown/DropdownPanel.vue';
+  import '../ext/datepicker/Datepicker.css';
 
   const SECOND = 1000;
   const MINUTE = 60 * SECOND;

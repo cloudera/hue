@@ -304,6 +304,58 @@
     text-align: left;
   }
 
+  
+  .tab-content-inline {
+    border: none;
+    overflow-x: hidden;
+
+    #queryHistory {
+      min-height:80px;
+    }
+    .saved-queries-inline {
+      overflow: hidden;
+    }
+    #executionAnalysis {
+      padding: 10px;
+    }
+
+    .tab-pane-inline {
+      height: 300px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .content-popover-inline {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+      overflow: hidden;
+      height: 100%;
+      position: relative;
+    }
+  }
+  table.history-table {
+    .th-name {
+      width: 16%;
+    }
+    
+    .th-description {
+      width: 50%;
+      white-space: normal; /* Assuming this should also be extrapolated into a class */
+    }
+    
+    .th-owner {
+      width: 18%;
+    }
+    
+    .th-last-modified {
+      width: 16%;
+    }
+  }
+  .font-italic-inline {
+    font-style: italic;
+  }
+
   .tab-content {
     background-color: @cui-white;
     border-left: 1px solid @cui-default-border-color;
@@ -430,6 +482,20 @@
     min-height: 128px !important;
   }
 
+  .editor-row-inline {
+    margin-bottom: 5px;
+  }
+  
+  .query-label-inline {
+    margin-top: 6px;
+    margin-right: 10px;
+  }
+
+  .open-link-inline {
+    margin-top: 4px;
+  }
+  
+
   .ace-editor-resizable {
     position: absolute;
     top: 0;
@@ -476,6 +542,14 @@
   .snippet-log-container, .query-history-container {
     margin-left: 35px;
     margin-right: 20px;
+    
+    .results.hive {
+      margin-top: 5px;
+      position: relative;
+    }
+    .query-builder-inline {
+      margin-right: 25px;
+    }
   }
 
   .snippet-footer-actions-bar {
@@ -616,6 +690,11 @@
   .progress-snippet {
     background-image: none;
     box-shadow: none;
+  }
+
+  .progress.progress-inline {
+    background-color: #FFF;
+    width: 100%;
   }
 
   .progress-snippet .bar {
@@ -888,6 +967,24 @@
     max-width: 600px;
   }
 
+  .navbar .navbar-inner ul.nav li a.hue-link-inline {
+    cursor: pointer;
+  }
+
+  .navbar.app-icon.notebook-icon-inline {
+    vertical-align: middle
+  }
+  
+  .modal.help-modal-inline {
+    width: 980px;
+    margin-left: -510px !important;
+  }
+
+  .custom-modal-inline {
+    width: 780px;
+    margin-left: -410px !important;
+  }
+
   .navbar .editor-nav > li > a, .navbar .editor-nav > li > a:hover {
     color: @cui-gray-700;
     cursor: default;
@@ -925,6 +1022,16 @@
 
     td {
       vertical-align: top;
+      width: 100px;
+      border-top-width: 0px;
+    }
+
+    .query-status-icon-inline {
+      width: 25px;
+    }
+
+    .query-inline {
+      width: 25px;
     }
   }
 
@@ -1280,6 +1387,11 @@
       margin-bottom: 0;
     }
 
+    .progress-job-inline {
+      background-color: #FFF; width: 100%
+    }
+    
+
     li {
       background-color: @cui-white;
       padding: 5px;
@@ -1362,4 +1474,17 @@
        opacity: 1;
     }
   }
+
+  .search-autocomplete-name {
+    font-size: 14px;
+  }
+
+  .search-autocomplete-description {
+    width: 190px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 12px;
+  }
+
 }

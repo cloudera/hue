@@ -877,6 +877,7 @@
     box-shadow: none;
   }
 
+
   .progress-snippet .bar {
     background-image: none;
   }
@@ -888,7 +889,22 @@
   .progress, .progress-neutral .bar {
     background-color: @cui-gray-300;
   }
+  
+  .progress.progress-inline {
+    background-color: #FFF;
+    width: 100%;
+  }
 
+  .logs-inline {
+    height: 120px;
+    overflow-y: auto;
+  }
+
+  .btn-browser-inline {
+    padding-right: 4px;
+  }
+
+  
   .progress .bar {
     background-color: @cui-white;
   }
@@ -1132,6 +1148,11 @@
     max-width: 600px;
   }
 
+  .navbar .navbar-inner ul.nav li a.hue-link-inline {
+    cursor: pointer;
+  }
+
+
   .navbar .editor-nav > li > a, .navbar .editor-nav > li > a:hover {
     color: @cui-gray-700;
     cursor: default;
@@ -1169,6 +1190,24 @@
 
     td {
       vertical-align: top;
+      width: 100px;
+    }
+    
+    .th-name {
+      width: 16%;
+    }
+    
+    .th-description {
+      width: 50%;
+      white-space: normal; /* Assuming this should also be extrapolated into a class */
+    }
+    
+    .th-owner {
+      width: 18%;
+    }
+    
+    .th-last-modified {
+      width: 16%;
     }
   }
 
@@ -1544,6 +1583,10 @@
     .progress-job {
       height: 2px;
       margin-bottom: 0;
+    }
+
+    .progress-job-inline {
+      background-color: #FFF; width: 100%
     }
 
     li {
