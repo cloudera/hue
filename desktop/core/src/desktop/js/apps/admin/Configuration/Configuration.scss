@@ -23,22 +23,22 @@
 
     .config__section-header {
       color: $fluidx-gray-700;
-  }
+    }
 
     .config__main-item {
+      padding: 16px 0 8px 16px;
+      border-bottom: solid 1px $fluidx-gray-300;
+      background-color: $fluidx-white;
+
       .config--last-heading,
       .config__main-item--heading {
-          font-size: $font-size-xl;
-          font-weight: 300;
+        font-size: $font-size-xl;
+        font-weight: 300;
       }
 
       .config--last-heading {
         padding: 4px 0 8px 0;
       }
-
-        padding: 16px 0 8px 16px;
-        border-bottom: solid 1px $fluidx-gray-300;
-        background-color: $fluidx-white;
     }
 
     .config__main-item .config__child-item .config--last-heading {
@@ -64,7 +64,7 @@
       color: $fluidx-black;
       font-weight: 400;
     }
-    
+
     .config__default-value {
       color: $fluidx-gray-500;
       font-style: italic;
@@ -81,10 +81,10 @@
     }
 
     .config__help-tooltip {
-        margin-left: 8px;
-        cursor: pointer;
-        color: $fluidx-blue-600;
-        font-size: $font-size-base;
+      margin-left: 8px;
+      cursor: pointer;
+      color: $fluidx-blue-600;
+      font-size: $font-size-base;
     }
   }
 }
