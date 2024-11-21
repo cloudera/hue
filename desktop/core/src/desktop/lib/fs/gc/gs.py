@@ -25,6 +25,7 @@ from boto.gs.connection import Location
 from boto.gs.key import Key
 
 from boto.s3.prefix import Prefix
+from django.http.multipartparser import MultiPartParser
 from django.utils.translation import gettext as _
 
 from desktop.conf import PERMISSION_ACTION_GS, is_raz_gs
@@ -473,3 +474,13 @@ class GSFileSystem(S3FileSystem):
       return True
     else:
       return False
+
+  @translate_gs_error
+  @auth_error_handler
+  def upload_v1(self, META, input_data, destination, username):
+    from desktop.lib.fs.gc.upload import GSNewFileUploadHandler  # Circular dependency
+
+    gs_upload_handler = GSNewFileUploadHandler(destination, username)
+
+    parser = MultiPartParser(META, input_data, [gs_upload_handler])
+    return parser.parse()

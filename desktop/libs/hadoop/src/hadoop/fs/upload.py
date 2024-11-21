@@ -17,16 +17,9 @@
 
 """
 Classes for a custom upload handler to stream into HDFS.
-
-Note that since our middlewares inspect request.POST, we cannot inject a custom
-handler into a specific view. Therefore we always use the HDFSfileUploadHandler,
-which is triggered by a magic prefix ("HDFS") in the field name.
-
-See http://docs.djangoproject.com/en/1.2/topics/http/file-uploads/
 """
 
 import os
-import sys
 import time
 import errno
 import logging
@@ -40,6 +33,7 @@ from django.utils.translation import gettext as _
 import hadoop.cluster
 from desktop.lib import fsmanager
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.fsmanager import get_client
 from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
 from filebrowser.utils import calculate_total_size, generate_chunks
 from hadoop.conf import UPLOAD_CHUNK_SIZE
@@ -194,6 +188,8 @@ class HDFStemporaryUploadedFile(object):
     if self._do_cleanup:
       # Do not do cleanup here. It's hopeless. The self._fs threadlocal states
       # are going to be all wrong.
+
+      # TODO: Check if this is required with new upload handler flow
       LOG.debug(f"Check for left-over upload file for cleanup if the upload op was unsuccessful: {self._path}")
 
   def get_temp_path(self):
@@ -272,6 +268,7 @@ class FineUploaderChunkedUploadHandler(FileUploadHandler):
     LOG.debug('Uploaded %s bytes %s to in %s seconds' % (file_size, self.chunk_file_path, elapsed))
 
 
+# Deprecated and core logic to be replaced with HDFSNewFileUploadHandler
 class HDFSfileUploadHandler(FileUploadHandler):
   """
   Handle file upload by storing data in a temp HDFS file.
@@ -349,3 +346,136 @@ class HDFSfileUploadHandler(FileUploadHandler):
     elapsed = time.time() - self._starttime
     LOG.info('Uploaded %s bytes to HDFS in %s seconds' % (file_size, elapsed))
     return self._file
+
+
+class HDFSNewFileUploadHandler(FileUploadHandler):
+  """
+  Handle file upload by storing data in a temp HDFS file.
+  """
+  def __init__(self, dest_path, username):
+    self.chunk_size = UPLOAD_CHUNK_SIZE.get()
+    self._file = None
+    self._starttime = 0
+    self._destination = dest_path
+    self.username = username
+
+    self._fs = self._get_hdfs(self.username)
+
+    LOG.debug("Chunk size = %d" % self.chunk_size)
+
+  def new_file(self, field_name, file_name, *args, **kwargs):
+    super(HDFSNewFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
+
+    LOG.info('Using HDFSfileUploadHandler to handle file upload.')
+    try:
+      self._file = HDFSNewTemporaryUploadedFile(self._fs, file_name, self._destination, self.username)
+      LOG.debug('Upload attempt to %s' % (self._file.get_temp_path()))
+
+      self._starttime = time.time()
+    except Exception as ex:
+      LOG.error("Not using HDFS upload handler: %s" % (ex))
+      raise ex
+
+    raise StopFutureHandlers()
+
+  def receive_data_chunk(self, raw_data, start):
+    LOG.debug("HDFSfileUploadHandler receive_data_chunk")
+
+    try:
+      self._file.write(raw_data)
+      self._file.flush()
+      return None
+    except IOError:
+      LOG.exception('Error storing upload data in temporary file "%s"' % (self._file.get_temp_path()))
+      raise StopUpload()
+
+  def file_complete(self, file_size):
+    try:
+      self._file.finish_upload(file_size)
+    except IOError:
+      LOG.exception('Error closing uploaded temporary file "%s"' % (self._file.get_temp_path()))
+      raise
+
+    elapsed = time.time() - self._starttime
+    LOG.info('Uploaded %s bytes to HDFS in %s seconds' % (file_size, elapsed))
+    return self._file
+
+  def upload_complete(self):
+    LOG.debug("HDFSFileUploadHandler: Running after upload complete task")
+    original_file_path = self._fs.join(self._destination, self._file.name)
+    tmp_file = self._file.get_temp_path()
+
+    self._fs.do_as_user(self.username, self._fs.rename, tmp_file, original_file_path)
+
+  def upload_interrupted(self):
+    LOG.debug("HDFSFileUploadHandler: Attempting cleanup after upload interruption")
+    if self._file and hasattr(self._file, 'remove'):
+      self._file.remove()
+
+  def _get_hdfs(self, username):
+    fs = get_client(fs='hdfs', user=username)
+    if not fs:
+      raise HDFSerror(_("No HDFS found for upload operation."))
+
+    return fs
+
+
+class HDFSNewTemporaryUploadedFile(object):
+  """
+  A temporary HDFS file to store upload data.
+  This class does not have any file read methods.
+  """
+  def __init__(self, fs, name, destination, username):
+    self.name = name
+    self.size = None
+    self._do_cleanup = False
+    self._fs = fs
+
+    self._path = self._fs.mkswap(name, suffix='tmp', basedir=destination)
+
+    # Check access permissions before attempting upload
+    try:
+      self._fs.check_access(destination, 'rw-')
+    except WebHdfsException as e:
+      raise HDFSerror(_('User %s does not have permissions to write to path "%s".') % (username, destination))
+
+    if self._fs.exists(self._path):
+      self._fs._delete(self._path)
+
+    self._file = self._fs.open(self._path, 'w')
+
+    self._do_cleanup = True
+
+  def __del__(self):
+    if self._do_cleanup:
+      # Do not do cleanup here. It's hopeless. The self._fs threadlocal states
+      # are going to be all wrong.
+      LOG.debug(f"Check for left-over upload file for cleanup if the upload op was unsuccessful: {self._path}")
+
+  def get_temp_path(self):
+    return self._path
+
+  def finish_upload(self, size):
+    try:
+      self.size = size
+      self.close()
+    except Exception as ex:
+      LOG.exception('Error uploading file to %s' % (self._path))
+      raise
+
+  def remove(self):
+    try:
+      self._fs.remove(self._path, skip_trash=True)
+      self._do_cleanup = False
+    except IOError as ex:
+      if ex.errno != errno.ENOENT:
+        LOG.exception('Failed to remove temporary upload file "%s". Please cleanup manually: %s' % (self._path, ex))
+
+  def write(self, data):
+    self._file.write(data)
+
+  def flush(self):
+    self._file.flush()
+
+  def close(self):
+    self._file.close()
