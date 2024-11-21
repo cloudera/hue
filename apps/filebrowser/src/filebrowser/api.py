@@ -496,6 +496,15 @@ def rename(request):
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
+  # Extract file extensions from paths
+  _, source_path_ext = os.path.splitext(source_path)
+  _, dest_path_ext = os.path.splitext(destination_path)
+
+  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]
+  # Check if destination path has a restricted file type and it doesn't match the source file type
+  if dest_path_ext.lower() in restricted_file_types and (source_path_ext.lower() != dest_path_ext.lower()):
+    return HttpResponse(f'Cannot rename file to a restricted file type: "{dest_path_ext}"', status=403)
+
   if "#" in destination_path:
     return HttpResponse(
       f"Error creating {os.path.basename(source_path)} to {destination_path}: Hashes are not allowed in file or directory names", status=400
