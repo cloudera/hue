@@ -78,6 +78,7 @@ from desktop.models import (
   uuid_default,
 )
 from desktop.views import get_banner_message, serve_403_error
+from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
 from filebrowser.tasks import check_disk_usage_and_clean_task, document_cleanup_task
 from hadoop.cluster import is_yarn
 from metadata.catalog_api import (
@@ -126,6 +127,7 @@ def get_config(request):
   config['hue_config']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
   config['hue_config']['enable_chunked_file_uploader'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
   config['hue_config']['enable_task_server'] = TASK_SERVER_V2.ENABLED.get()
+  config['hue_config']['restrict_file_extensions'] = RESTRICT_FILE_EXTENSIONS.get()
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
