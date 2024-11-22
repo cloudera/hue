@@ -1,0 +1,90 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// 'License'); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an 'AS IS' BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+@import '../../../components/styles/variables';
+
+.antd.cuix {
+  .config-component {
+    background-color: $fluidx-gray-100;
+    padding: 24px;
+
+    .config__section-header {
+      color: $fluidx-gray-700;
+    }
+
+    .config__main-item {
+      padding: 16px 0 8px 16px;
+      border-bottom: solid 1px $fluidx-gray-300;
+      background-color: $fluidx-white;
+
+      .config--last-heading,
+      .config__main-item--heading {
+        font-size: $font-size-xl;
+        font-weight: 300;
+      }
+
+      .config--last-heading {
+        padding: 4px 0 8px 0;
+      }
+    }
+
+    .config__main-item .config__child-item .config--last-heading {
+      font-size: $font-size-base;
+    }
+
+    .config__child-item {
+      font-size: $font-size-base;
+      color: $fluidx-black;
+      font-weight: 400;
+      margin-left: 40px;
+    }
+
+    .config__last-item--help-text {
+      color: $fluidx-gray-700;
+      padding: 4px 8px 12px 21px;
+    }
+
+    .config__default-section--help-text {
+      padding: 8px 0 16px 0;
+      display: block;
+      font-size: $font-size-base;
+      color: $fluidx-black;
+      font-weight: 400;
+    }
+
+    .config__default-value {
+      color: $fluidx-gray-500;
+      font-style: italic;
+    }
+
+    .config__set-value {
+      color: $fluidx-gray-900;
+      padding: 0 4px;
+      font-size: $font-size-sm;
+      border-radius: 20px;
+      background-color: $fluidx-gray-200;
+      border: 1px solid $hue-border-color;
+      margin-left: 8px;
+    }
+
+    .config__help-tooltip {
+      margin-left: 8px;
+      cursor: pointer;
+      color: $fluidx-blue-600;
+      font-size: $font-size-base;
+    }
+  }
+}

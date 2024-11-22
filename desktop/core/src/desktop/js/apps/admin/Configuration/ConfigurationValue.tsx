@@ -14,24 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../components/styles/variables';
+import React from 'react';
+import { AdminConfigValue as ParentConfigValue } from './ConfigurationTab';
+import './Configuration.scss';
+import { ConfigurationKey } from './ConfigurationKey';
 
-.metrics-component.antd.cuix {
-  background-color: $fluidx-gray-100;
-  padding: 24px;
-
-  .metrics-heading {
-    font-size: $font-size-base;
-    font-weight: 500;
-    color: $fluidx-gray-900;
+export const ConfigurationValue: React.FC<{ record: ParentConfigValue }> = ({ record }) => {
+  if (record.values && record.values.length > 0) {
+    return (
+      <>
+        {record.values.map((value, index) => (
+          <div
+            key={index}
+            className={
+              value.is_anonymous ? 'config__default-section--help-text' : 'config__child-item'
+            }
+          >
+            <ConfigurationKey record={value} />
+            <ConfigurationValue record={value} />
+          </div>
+        ))}
+      </>
+    );
   }
-
-  .metrics-table {
-    th {
-      width: 30%;
-      background-color: $fluidx-gray-040;
-    }
-
-    margin-bottom: $font-size-base;
-  }
-}
+  return <></>;
+};
