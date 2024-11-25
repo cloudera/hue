@@ -110,7 +110,7 @@ def get_computes_from_k8s():
     try:
       namespace = n.metadata.name
       LOG.info('Getting details for ns: %s' % namespace)
-      display_name = n.metadata.labels.get('displayName')
+      display_name = n.metadata.labels.get('displayname')
       item = {
         'name': display_name if display_name else namespace,
         'description': '%s (%s)' % (display_name, namespace) if display_name else namespace,
