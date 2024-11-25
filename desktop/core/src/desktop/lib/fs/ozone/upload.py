@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import io
-import sys
+import os
 import logging
 import unicodedata
 
@@ -26,6 +26,7 @@ from django.utils.translation import gettext as _
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
+from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
 from filebrowser.utils import calculate_total_size, generate_chunks
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
@@ -202,9 +203,16 @@ class OFSFileUploadHandler(FileUploadHandler):
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_ofs_upload():
+      LOG.info('Using OFSFileUploadHandler to handle file upload.')
+
+      _, file_type = os.path.splitext(file_name)
+      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
+        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+        LOG.error(err_message)
+        raise Exception(err_message)
+
       super(OFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
-      LOG.info('Using OFSFileUploadHandler to handle file upload.')
       self.target_path = self._fs.join(self.destination, file_name)
 
       try:
