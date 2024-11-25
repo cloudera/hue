@@ -110,9 +110,10 @@ class TestSimpleFileUploadAPI:
       ]
       try:
         response = upload_file(request)
+        res_content = response.content.decode('utf-8')
 
         assert response.status_code == 400
-        assert response.content.decode('utf-8') == 'File type ".txt" is not allowed. Please choose a file with a different type.'
+        assert res_content == 'Uploading files with type ".txt" is not allowed. Hue is configured to restrict this type.'
       finally:
         for reset in resets:
           reset()
@@ -139,9 +140,10 @@ class TestSimpleFileUploadAPI:
       ]
       try:
         response = upload_file(request)
+        res_content = response.content.decode('utf-8')
 
         assert response.status_code == 413
-        assert response.content.decode('utf-8') == 'File exceeds maximum allowed size of 5 bytes. Please upload a smaller file.'
+        assert res_content == 'File exceeds maximum allowed size of 5 bytes. Hue is configured to restrict uploads larger than this limit.'
       finally:
         for reset in resets:
           reset()
