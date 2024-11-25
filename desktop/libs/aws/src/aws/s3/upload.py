@@ -158,15 +158,16 @@ class S3FileUploadHandler(FileUploadHandler):
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_s3_upload():
+      LOG.info('Using S3FileUploadHandler to handle file upload.')
+
       _, file_type = os.path.splitext(file_name)
       if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-        err_message = f'S3 upload error: File type "{file_type}" is not allowed. Please choose a file with a different type.'
+        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
         LOG.error(err_message)
         raise Exception(err_message)
 
       super(S3FileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
-      LOG.info('Using S3FileUploadHandler to handle file upload.')
       self.target_path = self._fs.join(self.key_name, file_name)
 
       try:

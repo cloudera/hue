@@ -305,7 +305,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
 
       _, file_type = os.path.splitext(file_name)
       if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-        err_message = f'HDFS upload error: File type "{file_type}" is not allowed. Please choose a file with a different type.'
+        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
         LOG.error(err_message)
         raise Exception(err_message)
 
