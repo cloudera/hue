@@ -34,7 +34,7 @@ import hadoop.cluster
 from desktop.lib import fsmanager
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
-from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR, RESTRICT_FILE_EXTENSIONS
 from filebrowser.utils import calculate_total_size, generate_chunks
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
@@ -302,6 +302,13 @@ class HDFSfileUploadHandler(FileUploadHandler):
     # Detect "HDFS" in the field name.
     if field_name.upper().startswith('HDFS'):
       LOG.info('Using HDFSfileUploadHandler to handle file upload.')
+
+      _, file_type = os.path.splitext(file_name)
+      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
+        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+        LOG.error(err_message)
+        raise Exception(err_message)
+
       try:
         fs_ref = self.request.GET.get('fs', 'default')
         self.request.fs = fsmanager.get_filesystem(fs_ref)
