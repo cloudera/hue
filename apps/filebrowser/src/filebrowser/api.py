@@ -496,18 +496,31 @@ def rename(request):
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
-  if "#" in destination_path:
-    return HttpResponse(
-      f"Error creating {os.path.basename(source_path)} to {destination_path}: Hashes are not allowed in file or directory names", status=400
-    )
+  # Check if source and destination paths are provided
+  if not source_path or not destination_path:
+    return HttpResponse("Missing required parameters: source_path and destination_path", status=400)
 
-  # If dest_path doesn't have a directory specified, use same directory.
+  # Extract file extensions from paths
+  _, source_path_ext = os.path.splitext(source_path)
+  _, dest_path_ext = os.path.splitext(destination_path)
+
+  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]
+  # Check if destination path has a restricted file type and it doesn't match the source file type
+  if dest_path_ext.lower() in restricted_file_types and (source_path_ext.lower() != dest_path_ext.lower()):
+    return HttpResponse(f'Cannot rename file to a restricted file type: "{dest_path_ext}"', status=403)
+
+   # Check if destination path contains a hash character
+  if "#" in destination_path:
+    return HttpResponse("Hashes are not allowed in file or directory names. Please choose a different name.", status=400)
+
+  # If destination path doesn't have a directory specified, use the same directory as the source path
   if "/" not in destination_path:
     source_dir = os.path.dirname(source_path)
     destination_path = request.fs.join(source_dir, destination_path)
 
+  # Check if destination path already exists
   if request.fs.exists(destination_path):
-    return HttpResponse(f"The destination path {destination_path} already exists.", status=500)  # TODO: Status code?
+    return HttpResponse(f"The destination path {destination_path} already exists.", status=409)
 
   request.fs.rename(source_path, destination_path)
   return HttpResponse(status=200)

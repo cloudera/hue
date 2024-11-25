@@ -20,14 +20,14 @@ from unittest.mock import Mock, patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from filebrowser.api import upload_file
+from filebrowser.api import rename, upload_file
 from filebrowser.conf import (
   MAX_FILE_SIZE_UPLOAD_LIMIT,
   RESTRICT_FILE_EXTENSIONS,
 )
 
 
-class TestNormalFileUpload:
+class TestSimpleFileUploadAPI:
   def test_file_upload_success(self):
     with patch('filebrowser.api.string_io') as string_io:
       with patch('filebrowser.api.stat_absolute_path') as stat_absolute_path:
@@ -232,3 +232,117 @@ class TestNormalFileUpload:
       finally:
         for reset in resets:
           reset()
+
+
+class TestRenameAPI:
+  def test_rename_success(self):
+    request = Mock(
+      method='POST',
+      POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new_name.txt'},
+      body=Mock(),
+      fs=Mock(
+        exists=Mock(return_value=False),
+        join=Mock(return_value='s3a://test-bucket/test-user/new_name.txt'),
+        rename=Mock(),
+      ),
+    )
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('')
+    try:
+      response = rename(request)
+
+      assert response.status_code == 200
+      request.fs.rename.assert_called_once_with('s3a://test-bucket/test-user/source.txt', 's3a://test-bucket/test-user/new_name.txt')
+    finally:
+      reset()
+
+  def test_rename_restricted_file_type(self):
+    request = Mock(
+      method='POST',
+      POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new_name.exe'},
+      body=Mock(),
+      fs=Mock(
+        rename=Mock(),
+      ),
+    )
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('.exe,.txt')
+    try:
+      response = rename(request)
+
+      assert response.status_code == 403
+      assert response.content.decode('utf-8') == 'Cannot rename file to a restricted file type: ".exe"'
+    finally:
+      reset()
+
+  def test_rename_hash_in_path(self):
+    request = Mock(
+      method='POST',
+      POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new#name.txt'},
+      body=Mock(),
+      fs=Mock(
+        rename=Mock(),
+      ),
+    )
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('')
+    try:
+      response = rename(request)
+
+      assert response.status_code == 400
+      assert response.content.decode('utf-8') == 'Hashes are not allowed in file or directory names. Please choose a different name.'
+    finally:
+      reset()
+
+  def test_rename_destination_exists(self):
+    request = Mock(
+      method='POST',
+      POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new_name.txt'},
+      body=Mock(),
+      fs=Mock(
+        rename=Mock(),
+        exists=Mock(return_value=True),
+        join=Mock(return_value='s3a://test-bucket/test-user/new_name.txt'),
+      ),
+    )
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('')
+    try:
+      response = rename(request)
+
+      assert response.status_code == 409
+      assert response.content.decode('utf-8') == 'The destination path s3a://test-bucket/test-user/new_name.txt already exists.'
+    finally:
+      reset()
+
+  def test_rename_no_source_path(self):
+    request = Mock(
+      method='POST',
+      POST={'destination_path': 'new_name.txt'},
+      body=Mock(),
+      fs=Mock(
+        rename=Mock(),
+      ),
+    )
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('')
+    try:
+      response = rename(request)
+
+      assert response.status_code == 400
+      assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path'
+    finally:
+      reset()
+
+  def test_rename_no_destination_path(self):
+    request = Mock(
+      method='POST',
+      POST={'source_path': 's3a://test-bucket/test-user/source.txt'},
+      body=Mock(),
+      fs=Mock(
+        rename=Mock(),
+      ),
+    )
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('')
+    try:
+      response = rename(request)
+
+      assert response.status_code == 400
+      assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path'
+    finally:
+      reset()
