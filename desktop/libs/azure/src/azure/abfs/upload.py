@@ -13,8 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from future import standard_library
-standard_library.install_aliases()
+
+import os
 import logging
 import sys
 
@@ -29,6 +29,7 @@ from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFut
 from desktop.lib.fsmanager import get_client
 from azure.abfs.__init__ import parse_uri
 from azure.abfs.abfs import ABFSFileSystemException
+from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -70,9 +71,16 @@ class ABFSFileUploadHandler(FileUploadHandler):
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_abfs_upload():
+      LOG.info('Using ABFSFileUploadHandler to handle file upload wit temp file%s.' % file_name)
+
+      _, file_type = os.path.splitext(file_name)
+      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
+        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+        LOG.error(err_message)
+        raise Exception(err_message)
+
       super(ABFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
-      LOG.info('Using ABFSFileUploadHandler to handle file upload wit temp file%s.' % file_name)
       self.target_path = self._fs.join(self.destination, file_name)
 
       try:

@@ -18,7 +18,7 @@
 import sys
 
 from desktop.conf import ENABLE_DOWNLOAD
-from desktop.lib.conf import Config, coerce_bool
+from desktop.lib.conf import Config, coerce_bool, coerce_csv
 from desktop.conf import is_oozie_enabled
 
 if sys.version_info[0] > 2:
@@ -89,3 +89,12 @@ FILE_DOWNLOAD_CACHE_CONTROL = Config(
   type=str,
   default=None,
   help="Optionally set this to control the caching strategy for files download")
+
+RESTRICT_FILE_EXTENSIONS = Config(
+  key='restrict_file_extensions',
+  default='',
+  type=coerce_csv,
+  help=_(
+    'Specify file extensions that are not allowed, separated by commas. For example: .exe, .zip, .rar, .tar, .gz'
+  ),
+)

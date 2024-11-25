@@ -21,8 +21,7 @@ Classes for a custom upload handler to stream into S3.
 See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
-from future import standard_library
-standard_library.install_aliases()
+import os
 import logging
 import sys
 
@@ -37,6 +36,7 @@ from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFut
 from desktop.lib.fsmanager import get_client
 from aws.s3 import parse_uri
 from aws.s3.s3fs import S3FileSystemException
+from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -78,9 +78,16 @@ class S3FileUploadHandler(FileUploadHandler):
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_s3_upload():
+      LOG.info('Using S3FileUploadHandler to handle file upload.')
+
+      _, file_type = os.path.splitext(file_name)
+      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
+        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+        LOG.error(err_message)
+        raise Exception(err_message)
+
       super(S3FileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
-      LOG.info('Using S3FileUploadHandler to handle file upload.')
       self.target_path = self._fs.join(self.key_name, file_name)
 
       try:
