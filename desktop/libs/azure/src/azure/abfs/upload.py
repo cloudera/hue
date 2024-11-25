@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import logging
 import unicodedata
 from io import BytesIO
@@ -27,6 +28,7 @@ from azure.abfs.abfs import ABFSFileSystemException
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
+from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
 from filebrowser.utils import calculate_total_size, generate_chunks
 
 DEFAULT_WRITE_SIZE = 100 * 1024 * 1024  # As per Azure doc, maximum blob size is 100MB
@@ -171,6 +173,12 @@ class ABFSFileUploadHandler(FileUploadHandler):
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_abfs_upload():
+      _, file_type = os.path.splitext(file_name)
+      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
+        err_message = f'ABFS upload error: File type "{file_type}" is not allowed. Please choose a file with a different type.'
+        LOG.error(err_message)
+        raise Exception(err_message)
+
       super(ABFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
       LOG.info('Using ABFSFileUploadHandler to handle file upload wit temp file%s.' % file_name)

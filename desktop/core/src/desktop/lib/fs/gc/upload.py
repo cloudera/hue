@@ -21,6 +21,7 @@ Classes for a custom upload handler to stream into GS.
 See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
+import os
 import logging
 from io import BytesIO as stream_io
 
@@ -30,6 +31,7 @@ from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandler
 from desktop.lib.fs.gc import parse_uri
 from desktop.lib.fs.gc.gs import GSFileSystemException
 from desktop.lib.fsmanager import get_client
+from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
 
 LOG = logging.getLogger()
 
@@ -72,6 +74,12 @@ class GSFileUploadHandler(FileUploadHandler):
     This method is called when a new file is encountered during the upload process.
     """
     if self._is_gs_upload():
+      _, file_type = os.path.splitext(file_name)
+      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
+        err_message = f'GS upload error: File type "{file_type}" is not allowed. Please choose a file with a different type.'
+        LOG.error(err_message)
+        raise Exception(err_message)
+
       super().new_file(field_name, file_name, *args, **kwargs)
 
       LOG.info('Using GSFileUploadHandler to handle file upload.')
