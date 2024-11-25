@@ -405,12 +405,14 @@ def upload_file(request):
   # Check if the file type is restricted
   _, file_type = os.path.splitext(uploaded_file.name)
   if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-    return HttpResponse(f'File type "{file_type}" is not allowed. Please choose a file with a different type.', status=400)
+    return HttpResponse(f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.', status=400)
 
   # Check if the file size exceeds the maximum allowed size
   max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
   if max_size >= 0 and uploaded_file.size >= max_size:
-    return HttpResponse(f'File exceeds maximum allowed size of {max_size} bytes. Please upload a smaller file.', status=413)
+    return HttpResponse(
+      f'File exceeds maximum allowed size of {max_size} bytes. Hue is configured to restrict uploads larger than this limit.', status=413
+    )
 
   # Check if the destination path is a directory and the file name contains a path separator
   # This prevents directory traversal attacks
@@ -509,7 +511,7 @@ def rename(request):
   if dest_path_ext.lower() in restricted_file_types and (source_path_ext.lower() != dest_path_ext.lower()):
     return HttpResponse(f'Cannot rename file to a restricted file type: "{dest_path_ext}"', status=403)
 
-   # Check if destination path contains a hash character
+  # Check if destination path contains a hash character
   if "#" in destination_path:
     return HttpResponse("Hashes are not allowed in file or directory names. Please choose a different name.", status=400)
 
