@@ -253,6 +253,7 @@ class SQLIndexer(object):
             extra_create_properties = "STORED BY ICEBERG\n"
           elif source_type == 'impala':
             file_format = 'ICEBERG'
+            external = False
         extra_create_properties += 'STORED AS %(file_format)s' % {'file_format': file_format}
         if is_transactional:
           extra_create_properties += "\nTBLPROPERTIES('transactional'='true', 'transactional_properties'='%s')" % \
