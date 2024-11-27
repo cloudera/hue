@@ -158,9 +158,9 @@ module.exports = {
     },
     {
       files: ['*.ts', '*.tsx'],
-      extends: ['plugin:@typescript-eslint/recommended'],
+      extends: ['plugin:@typescript-eslint/recommended', 'plugin:jsx-a11y/recommended'],
       parser: '@typescript-eslint/parser',
-      plugins: ['jest', '@typescript-eslint'],
+      plugins: ['jest', '@typescript-eslint', 'jsx-a11y'],
       rules: jsTsVueRules
     }
   ],

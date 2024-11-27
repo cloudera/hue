@@ -44,6 +44,7 @@ checker.init(
           lowerLicenses.indexOf('cc') === -1 &&
           lowerLicenses.indexOf('python-2.0') === -1 &&
           lowerLicenses.indexOf('blueoak-1.0.0') === -1 &&
+          lowerLicenses.indexOf('mpl-2.0') === -1 && // Valid as long as we don't modify the source code
           // lz-string is marked as WTFPL license on NPM but the valid license is MIT from the github repo
           // https://github.com/pieroxy/lz-string/issues/147
           !packageName.startsWith('lz-string@') &&
