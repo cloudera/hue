@@ -74,6 +74,7 @@ else:
 
 dynamic_patterns += [
   re_path(r'^logs$', desktop_views.log_view, name="desktop.views.log_view"),
+  re_path(r'^logs\.json$', desktop_views.log_json_view, name="desktop.views.log_json_view"),
   re_path(r'^task_server$', desktop_views.task_server_view, name='desktop.views.task_server_view'),
   re_path(r'^desktop/log_analytics$', desktop_views.log_analytics),
   re_path(r'^desktop/log_js_error$', desktop_views.log_js_error),

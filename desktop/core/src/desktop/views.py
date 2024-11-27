@@ -288,6 +288,42 @@ def log_view(request):
   )
 
 
+def log_json_view(request):
+  hostname = socket.gethostname()
+  BUF_SIZE = 32 * 1024
+
+  buffer = []
+  log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
+  log_file = "%s/rungunicornserver.log" % (log_dir)
+  prev_log_file = "%s/rungunicornserver.log.1" % (log_dir)
+
+  if log_dir and os.path.exists(log_file):
+    log_file_size = os.path.getsize(log_file)
+
+    # log file might get rotated or fresh start of server
+    if log_file_size < BUF_SIZE:
+      # search the previous file
+      if os.path.exists(prev_log_file):
+        prev_log_file_size = os.path.getsize(prev_log_file)
+        with open(prev_log_file, 'rb') as fh1:
+          fh1.seek(prev_log_file_size - BUF_SIZE - log_file_size)
+          for line in fh1.readlines():
+            buffer.append(line.decode('utf-8'))
+      # read the current log file
+      with open(log_file, 'rb') as fh:
+        fh.seek(0)
+        for line in fh.readlines():
+          buffer.append(line.decode('utf-8'))
+    else:
+      with open(log_file, 'rb') as fh:
+        fh.seek(log_file_size - BUF_SIZE)
+        for line in fh.readlines():
+          buffer.append(line.decode('utf-8'))
+
+  log = "".join(buffer)
+  return JsonResponse({'logs': log})
+
+
 def task_server_view(request):
   """
   This view renders the Task Server page with basic functionality.
