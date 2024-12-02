@@ -8,8 +8,8 @@ ENV NAME="basehue"
 USER root
 
 RUN apk --no-cache add \
-    apache2 \
-    apache2-utils \
+    apache2=2.4.62-r4 \
+    apache2-utils=2.4.62-r4 \
     gettext \
     nmap netcat-openbsd iftop procps net-tools bind-tools systemd
 
