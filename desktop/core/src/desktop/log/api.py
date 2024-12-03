@@ -126,7 +126,7 @@ def download_hue_logs(request):
   if not is_admin(request.user):
     return HttpResponse("You must be a Hue admin to access this endpoint.", status=403)
 
-  # Buffer size for reading log files for (1 MiB)
+  # Buffer size for reading log files for download (1 MiB)
   LOG_DOWNLOAD_BUFFER_SIZE = 1024 * 1024
 
   log_directory = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
