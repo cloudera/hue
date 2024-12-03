@@ -186,6 +186,8 @@ function sles12_install() {
       libpcap \
       ncurses-devel \
       nmap \
+      python3-devel \
+      postgresql-server-devel \
       xmlsec1 xmlsec1-devel  xmlsec1-openssl-devel'
     # MySQLdb install
     sudo -- sh -c 'zypper install -y libmysqlclient-devel libmysqlclient18 libmysqld18 libmysqld-devel'
@@ -218,6 +220,7 @@ function sles15_install() {
       libpcap1 \
       ncurses-devel \
       nmap \
+      postgresql-server-devel \
       xmlsec1 xmlsec1-devel  xmlsec1-openssl-devel'
     # MySQLdb install
     sudo -- sh -c 'zypper install -y libmariadb-devel mariadb-client python3-mysqlclient'
@@ -249,7 +252,9 @@ function centos7_install() {
       nmap-ncat \
       xmlsec1 \
       xmlsec1-openssl \
-      unzip'
+      unzip \
+      python3-devel \
+      postgresql-devel'
     # MySQLdb install
     sudo -- sh -c 'curl -sSLO https://cloudera-build-us-west-1.vpc.cloudera.com/s3/ARTIFACTS/mysql80-community-release-el7-11.noarch.rpm && \
         rpm -ivh mysql80-community-release-el7-11.noarch.rpm && \
@@ -291,7 +296,9 @@ function redhat8_install() {
       xmlsec1 \
       xmlsec1-openssl \
       libss \
-      ncurses-c++-libs'
+      ncurses-c++-libs \
+      python3-devel \
+      postgresql-devel'
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
     # NODEJS 20 install
@@ -367,6 +374,8 @@ function ubuntu18_install() {
         python3-setuptools \
         python3-wheel \
         python3.8-venv \
+        python3-dev \
+        libpq-dev \
         zlibc'
     # MySQLdb install
     # It is pre-installed
@@ -402,6 +411,7 @@ function ubuntu20_install() {
         libpython3.8-stdlib \
         libxmlsec1 \
         libxmlsec1-openssl \
+        libpq-dev \
         netcat \
         nmap \
         python-asn1crypto \
@@ -450,6 +460,7 @@ function ubuntu22_install() {
         libpython3.10-stdlib \
         libxmlsec1 \
         libxmlsec1-openssl \
+        libpq-dev \
         netcat \
         nmap \
         python3-asn1crypto \
@@ -494,7 +505,8 @@ function redhat9_install() {
       xmlsec1 \
       xmlsec1-openssl \
       libss \
-      ncurses-c++-libs'
+      ncurses-c++-libs \
+      postgresql-devel'
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
     # NODEJS 20 install
