@@ -23,8 +23,8 @@
     <javac.version>1.8</javac.version>
     <guice.version>4.2.3</guice.version>
     <slf4j.version>1.7.30</slf4j.version>
-    <dropwizard.version>2.0.34</dropwizard.version>
-    <guava.version>28.1-jre</guava.version>
+    <dropwizard.version>2.1.12</dropwizard.version>
+    <guava.version>32.0.1-jre</guava.version>
     <junit.version>4.13</junit.version>
     <jackson.version>2.13.4.2</jackson.version>
     <jackson.modules.version>2.15.0</jackson.modules.version>
