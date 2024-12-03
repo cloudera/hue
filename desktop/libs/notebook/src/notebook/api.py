@@ -42,6 +42,7 @@ from notebook.conf import EXAMPLES
 from notebook.connectors.base import Notebook, QueryError, QueryExpired, SessionExpired, _get_snippet_name, patch_snippet_for_connector
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import _get_dialect_example, escape_rows, get_api, make_notebook, upgrade_session_properties
+from notebook.connectors.hiveserver2 import HS2Api
 
 LOG = logging.getLogger()
 
