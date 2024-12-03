@@ -383,7 +383,7 @@
       <dependency>
         <groupId>org.apache.tomcat</groupId>
         <artifactId>tomcat-jdbc</artifactId>
-        <version>9.0.69</version>
+        <version>9.0.83</version>
       </dependency>
 
       <!--jdbi3 deps-->
