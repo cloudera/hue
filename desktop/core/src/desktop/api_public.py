@@ -32,6 +32,7 @@ from desktop.lib import fsmanager
 from desktop.lib.ai.sql import perform_sql_task
 from desktop.lib.connectors import api as connector_api
 from desktop.lib.django_util import JsonResponse
+from desktop.log import api as logs_api
 from desktop.models import LlmPrompt
 from filebrowser import api as filebrowser_api, views as filebrowser_views
 from indexer import api3 as indexer_api3
@@ -63,6 +64,18 @@ def get_context_namespaces(request, interface):
 @permission_classes([AllowAny])
 def get_banners(request):
   return desktop_api.get_banners(request)
+
+
+@api_view(["GET"])
+def get_hue_logs(request):
+  django_request = get_django_request(request)
+  return logs_api.get_hue_logs(django_request)
+
+
+@api_view(["GET"])
+def download_hue_logs(request):
+  django_request = get_django_request(request)
+  return logs_api.download_hue_logs(django_request)
 
 
 # Editor

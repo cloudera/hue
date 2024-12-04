@@ -68,7 +68,6 @@ class TestSimpleFileUploadAPI:
           ]
           try:
             response = upload_file(request)
-            print(response.content)
             response_data = json.loads(response.content)
 
             request.fs.rmtree.assert_not_called()
