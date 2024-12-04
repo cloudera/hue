@@ -67,7 +67,6 @@ class TestSimpleFileUploadAPI:
           ]
           try:
             response = upload_file(request)
-            print(response.content)
             response_data = json.loads(response.content)
 
             assert response.status_code == 200
