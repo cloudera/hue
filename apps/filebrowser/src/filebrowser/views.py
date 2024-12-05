@@ -17,6 +17,9 @@
 
 import io
 import os
+import json
+from django.utils.html import mark_safe
+from django.urls import reverse
 import re
 import sys
 import stat as stat_module
@@ -509,7 +512,11 @@ def listdir(request, path):
       'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
       'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
       'is_embeddable': request.GET.get('is_embeddable', False),
+      'filebrowserViewUrl': reverse('filebrowser:filebrowser.views.view', kwargs={'path': ''}),
+      'contentSummaryUrl': reverse('filebrowser:content_summary', kwargs={'path': ''}),
+      'pathPrefix': '/filebrowser/view'
   }
+  
 
   stats = request.fs.listdir_stats(path)
 
@@ -523,6 +530,8 @@ def listdir(request, path):
     stats.insert(0, parent_stat)
 
   data['files'] = [_massage_stats(request, stat_absolute_path(path, stat)) for stat in stats]
+  options_json = json.dumps(data)
+  data['options_json'] = options_json
   return render('listdir.mako', request, data)
 
 
@@ -669,7 +678,9 @@ def listdir_paged(request, path):
       'is_embeddable': request.GET.get('is_embeddable', False),
       's3_listing_not_allowed': s3_listing_not_allowed
   }
-
+  options_json = mark_safe(json.dumps(data))
+  data['options_json'] = options_json
+  
   if ENABLE_NEW_STORAGE_BROWSER.get():
     return render('storage_browser.mako', request, data)
   return render('listdir.mako', request, data)

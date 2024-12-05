@@ -1,4 +1,4 @@
-function initializeEditorComponent() {
+(function initializeEditorComponent() {
     // Fetches data as text content from a document inserted by onePageViewModel.
     // This approach supports 'unsafe-inline' by embedding the content in the <head>,
     // as specified in editor_component.mako.
@@ -230,4 +230,4 @@ function initializeEditorComponent() {
     window.SQL_ANALYZER_AUTO_UPLOAD_DDL = OPTIMIZER.AUTO_UPLOAD_DDL;
 
     window.SQL_ANALYZER_QUERY_HISTORY_UPLOAD_LIMIT = OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT;
-}
+})();

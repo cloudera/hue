@@ -2056,7 +2056,7 @@ else:
   <script type="application/json" id="editorOptionsJson">
     ${ options_json | n,unicode,antixss }
   </script>
-  <script ${nonce_attribute(request)} src="${ static('desktop/js/editor-component.js') }"></script>
+  <script  type="text/javascript" ${nonce_attribute(request)} src="${ static('desktop/js/editor-component.js') }"></script>
 </%def>
 
 

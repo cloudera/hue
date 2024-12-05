@@ -221,52 +221,58 @@ class OnePageViewModel {
     };
 
     // Process headers to load CSS and JS files
-    self.processHeaders = function (response) {
+    self.processHeaders = function(response) {
       const promise = $.Deferred();
       const $rawHtml = $('<span>').html(response);
-
-      const $allScripts = $rawHtml.find('script[src]');
-      const scriptsToLoad = $allScripts
-        .map(function () {
-          return $(this).attr('src');
-        })
-        .toArray();
-      $allScripts.remove();
-
-      $rawHtml.find('link[href]').each(function () {
+      
+      const scriptsToLoad = [];
+      const templateToLoad = [];
+    
+      $rawHtml.find('script').each(function() {
+        const $script = $(this);
+        const scriptType = $script.attr('type');
+      
+        // Only process script tags that are not recognized as templates or JSON data
+        if (scriptType !== 'text/template' && scriptType !== 'text/html' && scriptType !== 'application/json') {
+          if ($script.attr('src')) {
+            // External scripts will have a src attribute
+            scriptsToLoad.push({
+              src: $script.attr('src')
+            });
+          } else {
+            // Inline scripts will not have a src attribute
+            scriptsToLoad.push({
+              content: $script.html()
+            });
+          }
+        } else {
+          // Store templates and JSON scripts for later appending without execution
+          templateToLoad.push(this);
+        }
+      
+        // Always remove the original script element from the raw HTML to avoid double execution
+        this.remove();
+      });
+    
+      // Update links and styles similarly as before
+      $rawHtml.find('link[href]').each(function() {
         addGlobalCss($(this));
       });
-
-      $rawHtml.find('a[href]').each(function () {
+    
+      $rawHtml.find('a[href]').each(function() {
         let link = $(this).attr('href');
         if (link.startsWith('/') && !link.startsWith('/hue')) {
           link = `${window.HUE_BASE_URL}/hue${link}`;
         }
         $(this).attr('href', link);
       });
-
-      const scriptPromises = loadScripts(scriptsToLoad);
-
-      const loadScriptSync = function () {
-        if (scriptPromises.length) {
-          const nextScriptPromise = scriptPromises.shift();
-          nextScriptPromise.done(scriptDetails => {
-            if (scriptDetails.url) {
-              const script = document.createElement('script');
-              script.src = scriptDetails.url;
-              script.onload = loadScriptSync;
-              script.onerror = loadScriptSync;
-              document.head.appendChild(script);
-            } else {
-              loadScriptSync();
-            }
-          });
-        } else {
-          promise.resolve($rawHtml.children());
-        }
-      };
-
-      loadScriptSync();
+    
+      // Final HTML without script and template elements (they have been removed)
+      const processedHtml = $rawHtml.html();
+    
+      // Resolve with the processed HTML and scripts and templates that need to be loaded
+      promise.resolve({ html: processedHtml, scripts: scriptsToLoad, templates: templateToLoad });
+    
       return promise;
     };
 
@@ -368,6 +374,41 @@ class OnePageViewModel {
           self.currentQueryString(null);
         }
 
+        self.loadScriptsSequentially = function(scripts, callback) {
+          const loadNextScript = function() {
+            if (scripts.length === 0) {
+              callback(); // All scripts have been processed, run the callback
+              return;
+            }
+            
+            const scriptDetails = scripts.shift();
+            const script = document.createElement('script');
+        
+            const onloadHandler = () => self.loadScriptsSequentially(scripts, callback);
+            script.onload = onloadHandler;
+            script.onerror = onloadHandler;
+        
+            if (scriptDetails.src) { // External script
+              script.src = scriptDetails.src;
+            } else if (scriptDetails.content) { // Inline script
+              script.type = 'text/javascript';
+              script.textContent = scriptDetails.content;
+            }
+        
+            // Use setTimeout to avoid stack overflow with synchronous operations
+            setTimeout(() => {
+              if (scriptDetails.src) {
+                // Append the external script tag to the head - it will load asynchronously
+                document.head.appendChild(script);
+              } else {
+                // Execute the inline script immediately
+                onloadHandler();
+              }
+            }, 0);
+          };
+        
+          loadNextScript();
+        };
         $.ajax({
           url: `${baseURL}${baseURL.includes('?') ? '&' : '?'}is_embeddable=true${self.extraEmbeddableURLParams()}`,
           beforeSend: xhr => xhr.setRequestHeader('X-Requested-With', 'Hue'),
@@ -379,39 +420,23 @@ class OnePageViewModel {
               huePubSub.clearAppSubscribers(app);
               self.extraEmbeddableURLParams('');
 
-              self.processHeaders(response).done($rawHtml => {
-                const scripts = $rawHtml.find('script');
-
-                // Append JSON scripts
-                scripts.each(function () {
-                  if (this.getAttribute('type') === 'application/json') {
-                    document.head.appendChild(this);
-                    // Disabling linting because initializeEditorComponent is defined in static folder
-                    // as this needs to be defined here
-                    // eslint-disable-next-line no-undef
-                    initializeEditorComponent();
-                  }
+              self.processHeaders(response).done(result => {
+                const { html, scripts, templates } = result;
+                $(`#embeddable_${app}`).html(html);
+              
+                templates.forEach(template => {
+                  document.head.appendChild(template);
                 });
-
-                // Append other scripts
-                scripts.each(function () {
-                  if (!['application/json', 'text/html'].includes(this.getAttribute('type'))) {
-                    const script = document.createElement('script');
-                    script.type = 'text/javascript';
-                    if (this.src) {
-                      script.src = this.src;
-                      document.head.appendChild(script);
-                    }
-                    $(this).remove();
+              
+                // Load the scripts sequentially in the order they were collected
+                self.loadScriptsSequentially(scripts, () => {
+                  // All scripts have been loaded and processed at this point
+                  if (!window.SKIP_CACHE.includes(app)) {
+                    self.embeddable_cache[app] = html;
                   }
+                  huePubSub.publish('app.dom.loaded', app);
+                  window.setTimeout(() => self.isLoadingEmbeddable(false), 0);
                 });
-
-                if (!window.SKIP_CACHE.includes(app)) {
-                  self.embeddable_cache[app] = $rawHtml;
-                }
-                $(`#embeddable_${app}`).html($rawHtml);
-                huePubSub.publish('app.dom.loaded', app);
-                window.setTimeout(() => self.isLoadingEmbeddable(false), 0);
               });
             } else if (type.includes('json')) {
               const presponse = JSON.parse(response);
@@ -905,6 +930,7 @@ class OnePageViewModel {
     huePubSub.subscribe(
       'open.filebrowserlink',
       ({ pathPrefix, decodedPath, fileBrowserModel, browserTarget }) => {
+        console.log(pathPrefix, decodedPath, fileBrowserModel, browserTarget)
         if (pathPrefix.includes('download=')) {
           // The download view on the backend requires the slashes not to
           // be encoded in order for the file to be correctly named.
