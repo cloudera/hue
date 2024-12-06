@@ -24,7 +24,6 @@
     from django.utils.translation import ugettext as _
 
   from useradmin.hue_password_policy import is_password_policy_enabled, get_password_hint
-  from desktop.lib.django_util import nonce_attribute
 %>
 
 
@@ -50,7 +49,7 @@
   </div>
 </div>
 
-<script ${nonce_attribute(request)}>
+<script>
   $(document).ready(function () {
     $('.reload').on('click', function () {
       location.reload();
