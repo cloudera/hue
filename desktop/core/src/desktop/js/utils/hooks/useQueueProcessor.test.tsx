@@ -21,108 +21,106 @@ describe('useQueueProcessor', () => {
   const mockProcessItem = jest.fn(() => new Promise<void>(resolve => setTimeout(resolve, 100)));
 
   it('should process items concurrently with a maximum of 1 item', async () => {
-    const { result } = renderHook(() => useQueueProcessor(mockProcessItem));
+    const { result } = renderHook(() =>
+      useQueueProcessor(mockProcessItem, { concurrentProcess: 1 })
+    );
 
-    expect(result.current.pendingQueue).toEqual([]);
-    expect(result.current.processingQueue).toEqual([]);
-    expect(result.current.completedQueue).toEqual([]);
+    expect(result.current.queue).toEqual([]);
+    expect(result.current.isLoading).toBe(false);
 
     act(() => {
       result.current.enqueue(['item1', 'item2', 'item3']);
     });
 
-    expect(result.current.processingQueue).toEqual(['item1']);
-    expect(result.current.pendingQueue).toEqual(['item2', 'item3']);
-    expect(result.current.completedQueue).toEqual([]);
+    expect(result.current.queue).toEqual(['item2', 'item3']);
+    expect(result.current.isLoading).toBe(true);
 
-    await waitFor(() => expect(result.current.completedQueue).toEqual(['item1']));
+    await waitFor(() => expect(result.current.queue).toEqual(['item3']));
+    expect(result.current.isLoading).toBe(true);
 
-    expect(result.current.processingQueue).toEqual(['item2']);
-    expect(result.current.pendingQueue).toEqual(['item3']);
-    expect(result.current.completedQueue).toEqual(['item1']);
+    await waitFor(() => expect(result.current.queue).toEqual([]));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
   });
 
   it('should handle processing multiple items concurrently', async () => {
     const CONCURRENT_PROCESS = 2;
-    const { result } = renderHook(() => useQueueProcessor(mockProcessItem, CONCURRENT_PROCESS));
+    const { result } = renderHook(() =>
+      useQueueProcessor(mockProcessItem, { concurrentProcess: CONCURRENT_PROCESS })
+    );
 
+    expect(result.current.queue).toEqual([]);
     act(() => {
       result.current.enqueue(['item1', 'item2', 'item3', 'item4']);
     });
 
-    expect(result.current.pendingQueue).toEqual(['item3', 'item4']);
-    expect(result.current.processingQueue.length).toEqual(CONCURRENT_PROCESS);
-    expect(result.current.processingQueue).toEqual(['item1', 'item2']);
-    expect(result.current.completedQueue).toEqual([]);
+    expect(result.current.queue).toEqual(['item3', 'item4']);
+    expect(result.current.isLoading).toBe(true);
 
-    await waitFor(() => expect(result.current.completedQueue).toEqual(['item1', 'item2']));
-
-    expect(result.current.pendingQueue).toEqual([]);
-    expect(result.current.processingQueue.length).toEqual(CONCURRENT_PROCESS);
-    expect(result.current.processingQueue).toEqual(['item3', 'item4']);
-    expect(result.current.completedQueue).toEqual(['item1', 'item2']);
+    await waitFor(() => expect(result.current.queue).toEqual([]));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
   });
 
-  it('should remove items from pending queue when dequeued', async () => {
-    const { result } = renderHook(() => useQueueProcessor(mockProcessItem));
+  it('should add items to the queue when enqueued', () => {
+    const { result } = renderHook(() =>
+      useQueueProcessor(mockProcessItem, { concurrentProcess: 1 })
+    );
+
+    expect(result.current.queue).toEqual([]);
+
+    act(() => {
+      result.current.enqueue(['item1', 'item2']);
+    });
+
+    expect(result.current.queue).toEqual(['item2']);
+
+    act(() => {
+      result.current.enqueue(['item3']);
+    });
+
+    expect(result.current.queue).toEqual(['item2', 'item3']);
+  });
+
+  it('should remove items from the queue when dequeued', async () => {
+    const { result } = renderHook(() =>
+      useQueueProcessor(mockProcessItem, { concurrentProcess: 1 })
+    );
 
     act(() => {
       result.current.enqueue(['item1', 'item2', 'item3']);
     });
 
-    expect(result.current.processingQueue).toEqual(['item1']);
-    expect(result.current.pendingQueue).toEqual(['item2', 'item3']);
+    expect(result.current.queue).toEqual(['item2', 'item3']);
+    expect(result.current.isLoading).toBe(true);
 
     act(() => {
-      result.current.dequeue('item3');
+      result.current.dequeue('item2');
     });
 
-    expect(result.current.pendingQueue).toEqual(['item2']);
-    expect(result.current.processingQueue).toEqual(['item1']);
+    expect(result.current.queue).toEqual(['item3']);
   });
 
-  it('should remove items from pending queue when dequeued', async () => {
-    const { result } = renderHook(() => useQueueProcessor(mockProcessItem));
+  it('should update isLoading when items are being processed', async () => {
+    const { result } = renderHook(() =>
+      useQueueProcessor(mockProcessItem, { concurrentProcess: 1 })
+    );
 
-    act(() => {
-      result.current.enqueue(['item1', 'item2', 'item3']);
-    });
-
-    expect(result.current.processingQueue).toEqual(['item1']);
-    expect(result.current.pendingQueue).toEqual(['item2', 'item3']);
-
-    act(() => {
-      result.current.dequeue('item3');
-    });
-
-    expect(result.current.pendingQueue).toEqual(['item2']);
-    expect(result.current.processingQueue).toEqual(['item1']);
-    expect(result.current.completedQueue).toEqual([]);
-  });
-
-  it('should update isProcessing when items are being processed', async () => {
-    const { result } = renderHook(() => useQueueProcessor(mockProcessItem, 1));
-
-    expect(result.current.isProcessing).toBe(false);
+    expect(result.current.isLoading).toBe(false);
 
     act(() => {
       result.current.enqueue(['item1', 'item2']);
     });
 
     await waitFor(() => {
-      expect(result.current.isProcessing).toBe(true);
+      expect(result.current.isLoading).toBe(true);
     });
 
     await waitFor(() => {
-      expect(result.current.completedQueue).toEqual(['item1']);
+      expect(result.current.queue).toEqual(['item2']);
     });
-
-    expect(result.current.isProcessing).toBe(true);
 
     await waitFor(() => {
-      expect(result.current.completedQueue).toEqual(['item1', 'item2']);
+      expect(result.current.queue).toEqual([]);
+      expect(result.current.isLoading).toBe(false);
     });
-
-    expect(result.current.isProcessing).toBe(false);
   });
 });

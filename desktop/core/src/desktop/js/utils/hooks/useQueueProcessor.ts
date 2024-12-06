@@ -16,63 +16,61 @@
 
 import { useState, useEffect } from 'react';
 
-type QueueProcessorState<T> = {
-  pendingQueue: T[];
-  processingQueue: T[];
-  completedQueue: T[];
-};
-
-type UseQueueProcessorResult<T> = QueueProcessorState<T> & {
+interface UseQueueProcessorResult<T> {
+  queue: T[];
   enqueue: (newItems: T[]) => void;
   dequeue: (item: T) => void;
-  isProcessing: boolean;
-};
+  isLoading: boolean;
+}
+
+interface UseQueueProcessorOptions {
+  concurrentProcess: number;
+  onSuccess?: () => void;
+}
 
 const useQueueProcessor = <T>(
   onItemProcess: (item: T) => Promise<void>,
-  concurrentProcess: number = 1
+  options: UseQueueProcessorOptions
 ): UseQueueProcessorResult<T> => {
-  const [pendingQueue, setPendingQueue] = useState<QueueProcessorState<T>['pendingQueue']>([]);
-  const [processingQueue, setProcessingQueue] = useState<QueueProcessorState<T>['processingQueue']>(
-    []
-  );
-  const [completedQueue, setCompletedQueue] = useState<QueueProcessorState<T>['completedQueue']>(
-    []
-  );
-
-  const processQueueItem = async () => {
-    const nextItem = pendingQueue.shift();
-
-    if (nextItem) {
-      setProcessingQueue(prev => [...prev, nextItem]);
-      await onItemProcess(nextItem);
-      setProcessingQueue(prev => prev.filter(i => i !== nextItem));
-      setCompletedQueue(prev => [...prev, nextItem]);
-      processQueueItem();
-    }
-  };
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [queue, setQueue] = useState<T[]>([]);
+  const [processingQueue, setProcessingQueue] = useState<T[]>([]);
 
   const enqueue = (newItems: T[]) => {
-    setPendingQueue(prevQueue => [...prevQueue, ...newItems]);
+    setQueue(prevQueue => [...prevQueue, ...newItems]);
   };
 
   const dequeue = (item: T) => {
-    setPendingQueue(prev => prev.filter(i => i !== item));
+    setQueue(prev => prev.filter(i => i !== item));
+  };
+
+  const processQueueItem = async (item: T) => {
+    if (!isLoading) {
+      setIsLoading(true);
+    }
+
+    setProcessingQueue(prev => [...prev, item]);
+    await onItemProcess(item);
+    setProcessingQueue(prev => prev.filter(i => i !== item));
   };
 
   useEffect(() => {
-    let i = processingQueue.length;
-    while (i < Math.min(concurrentProcess, pendingQueue.length)) {
-      processQueueItem();
-      i++;
+    if (processingQueue.length < options.concurrentProcess && queue.length) {
+      const item = queue[0];
+      setQueue(prev => prev.slice(1));
+      processQueueItem(item);
     }
-  }, [pendingQueue, processingQueue]);
+
+    // if all items are processed then call the onSuccess callback
+    if (isLoading && processingQueue.length === 0 && queue.length === 0) {
+      setIsLoading(false);
+      options.onSuccess && options.onSuccess();
+    }
+  }, [queue, processingQueue, options.concurrentProcess, options.onSuccess, isLoading]);
 
   return {
-    pendingQueue,
-    completedQueue,
-    processingQueue,
-    isProcessing: !!processingQueue.length,
+    queue,
+    isLoading,
     enqueue,
     dequeue
   };
