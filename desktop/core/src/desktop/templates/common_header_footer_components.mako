@@ -24,6 +24,7 @@ from desktop.views import _ko
 from beeswax.conf import LIST_PARTITIONS_LIMIT
 from indexer.conf import ENABLE_NEW_INDEXER
 from metadata.conf import has_optimizer, OPTIMIZER
+from desktop.lib.django_util import nonce_attribute
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -32,7 +33,7 @@ else:
 %>
 
 <%def name="header_pollers(user, is_s3_enabled, apps)">
-  <script type="text/javascript">
+  <script type="text/javascript" ${nonce_attribute(request)}>
     Dropzone.autoDiscover = false;
     moment.locale(window.navigator.userLanguage || window.navigator.language);
     localeFormat = function (time) {
@@ -229,7 +230,7 @@ else:
 
 </%def>
 
-<%def name="footer(messages)">
+<%def name="footer(messages, nonce)">
 
 <div id="progressStatus" class="uploadstatus well hide">
   <h4>${ _('Upload progress') }</h4>
@@ -266,7 +267,7 @@ else:
 
 <div class="clipboard-content"></div>
 
-<script type="text/javascript">
+<script type="text/javascript" ${nonce_attribute(request)}>
 
   $(document).ready(function () {
 

@@ -24,6 +24,7 @@
   from desktop.models import hue_version
   from desktop.views import _ko, commonshare, login_modal
   from desktop.webpack_utils import get_hue_bundles
+  from desktop.lib.django_util import nonce_attribute
 
   from webpack_loader.templatetags.webpack_loader import render_bundle
 
@@ -44,7 +45,7 @@
   % if conf.COLLECT_USAGE.get():
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=${conf.GTAG_ID.get()}"></script>
-    <script>
+    <script ${nonce_attribute(request)}>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
@@ -110,8 +111,8 @@
   </ul>
 
   <!-- UserVoice JavaScript SDK -->
-  <script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
-  <script>
+  <script ${nonce_attribute(request)}>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+  <script ${nonce_attribute(request)}>
   UserVoice = window.UserVoice || [];
   function showClassicWidget() {
     UserVoice.push(['showLightbox', 'classic_widget', {
@@ -312,7 +313,7 @@ ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 
-<script>
+<script ${nonce_attribute(request)}  >
   var shareViewModel = initSharing("#documentShareModal");
 </script>
 
@@ -334,7 +335,7 @@ ${ smart_str(login_modal(request).content) | n,unicode }
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
-${ commonHeaderFooterComponents.footer(messages) }
+${ commonHeaderFooterComponents.footer(messages, nonce) }
 
 ## This includes common knockout templates that are shared with the Job Browser page and the mini job browser panel
 ## available in the upper right corner throughout Hue
