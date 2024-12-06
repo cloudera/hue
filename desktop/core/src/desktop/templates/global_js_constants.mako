@@ -16,7 +16,7 @@
 
 <%!
   import sys
-
+  import json
   from desktop import conf
   from desktop.auth.backend import is_admin, is_hue_admin
   from desktop.conf import APP_SWITCHER_ALTUS_BASE_URL, APP_SWITCHER_MOW_BASE_URL, CUSTOM_DASHBOARD_URL, \
@@ -793,6 +793,9 @@
   window.USER_IS_ADMIN = '${ is_admin(user) }' === 'True';
   window.USER_IS_HUE_ADMIN = '${ is_hue_admin(user) }' === 'True';
   window.DJANGO_DEBUG_MODE = '${ conf.DJANGO_DEBUG_MODE.get() }' === 'True';
+  window.ENABLED_NONCE_PATHS = ${ json.dumps(conf.CSP_NONCE_ENABLED_PAGES.get()) | n };
+  window.NONCE_ENABLED = ${ 'true' if conf.CSP_NONCE.get() else 'false' };
+
   window.IS_LDAP_SETUP = '${ 'desktop.auth.backend.LdapBackend' in conf.AUTH.BACKEND.get() }' === 'True';
   window.LOGGED_USERNAME = '${ user.username }';
   window.LOGGED_USER_ID = ${ user.id };
