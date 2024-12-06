@@ -44,6 +44,7 @@ class TestSimpleFileUploadAPI:
               isdir=Mock(return_value=False),
               upload_v1=Mock(return_value=None),
               stats=Mock(),
+              rmtree=Mock(),
             ),
           )
 
@@ -69,6 +70,7 @@ class TestSimpleFileUploadAPI:
             response = upload_file(request)
             response_data = json.loads(response.content)
 
+            request.fs.rmtree.assert_not_called()
             assert response.status_code == 200
             assert response_data['uploaded_file_stats'] == {
               "path": "s3a://test-bucket/test-user/test_file.txt",
@@ -171,7 +173,100 @@ class TestSimpleFileUploadAPI:
         response = upload_file(request)
 
         assert response.status_code == 409
-        assert response.content.decode('utf-8') == 'The file path s3a://test-bucket/test-user/test_file.txt already exists.'
+        assert response.content.decode('utf-8') == 'The file test_file.txt already exists at the destination path.'
+      finally:
+        for reset in resets:
+          reset()
+
+  def test_overwrite_existing_file_success(self):
+    with patch('filebrowser.api.string_io') as string_io:
+      with patch('filebrowser.api.stat_absolute_path') as stat_absolute_path:
+        with patch('filebrowser.api._massage_stats') as _massage_stats:
+          request = Mock(
+            method='POST',
+            META=Mock(),
+            POST={'destination_path': 's3a://test-bucket/test-user/', 'overwrite': True},
+            FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
+            body=Mock(),
+            fs=Mock(
+              join=Mock(return_value='s3a://test-bucket/test-user/test_file.txt'),
+              exists=Mock(side_effect=[True, True]),
+              isdir=Mock(return_value=False),
+              upload_v1=Mock(return_value=None),
+              stats=Mock(),
+              rmtree=Mock(),
+            ),
+          )
+
+          _massage_stats.return_value = {
+            "path": "s3a://test-bucket/test-user/test_file.txt",
+            "size": 12,
+            "atime": 1731527617,
+            "mtime": 1731527620,
+            "mode": 33188,
+            "user": "test-user",
+            "group": "test-user",
+            "blockSize": 134217728,
+            "replication": 3,
+            "type": "file",
+            "rwx": "-rw-r--r--",
+          }
+
+          resets = [
+            RESTRICT_FILE_EXTENSIONS.set_for_testing(''),
+            MAX_FILE_SIZE_UPLOAD_LIMIT.set_for_testing(-1),
+          ]
+          try:
+            response = upload_file(request)
+            response_data = json.loads(response.content)
+
+            request.fs.rmtree.assert_called_once_with('s3a://test-bucket/test-user/test_file.txt')
+            assert response.status_code == 200
+            assert response_data['uploaded_file_stats'] == {
+              "path": "s3a://test-bucket/test-user/test_file.txt",
+              "size": 12,
+              "atime": 1731527617,
+              "mtime": 1731527620,
+              "mode": 33188,
+              "user": "test-user",
+              "group": "test-user",
+              "blockSize": 134217728,
+              "replication": 3,
+              "type": "file",
+              "rwx": "-rw-r--r--",
+            }
+          finally:
+            for reset in resets:
+              reset()
+
+  def test_overwrite_existing_file_exception(self):
+    with patch('filebrowser.api.string_io') as string_io:
+      request = Mock(
+        method='POST',
+        META=Mock(),
+        POST={'destination_path': 's3a://test-bucket/test-user/', 'overwrite': True},
+        FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
+        body=Mock(),
+        fs=Mock(
+          join=Mock(return_value='s3a://test-bucket/test-user/test_file.txt'),
+          exists=Mock(side_effect=[True, True]),
+          isdir=Mock(return_value=False),
+          upload_v1=Mock(return_value=None),
+          stats=Mock(),
+          rmtree=Mock(side_effect=Exception('Filesystem rmtree exception')),
+        ),
+      )
+
+      resets = [
+        RESTRICT_FILE_EXTENSIONS.set_for_testing(''),
+        MAX_FILE_SIZE_UPLOAD_LIMIT.set_for_testing(-1),
+      ]
+      try:
+        response = upload_file(request)
+
+        request.fs.rmtree.assert_called_once_with('s3a://test-bucket/test-user/test_file.txt')
+        assert response.status_code == 500
+        assert response.content.decode('utf-8') == 'Failed to remove already existing file.'
       finally:
         for reset in resets:
           reset()
