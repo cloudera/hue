@@ -55,6 +55,7 @@ from desktop.conf import (
   AUDIT_EVENT_LOG_DIR,
   AUTH,
   CSP_NONCE,
+  CSP_NONCE_ENABLED_PAGES,
   CUSTOM_CACHE_CONTROL,
   DJANGO_DEBUG_MODE,
   ENABLE_PROMETHEUS,
@@ -877,7 +878,9 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
 
   def process_response(self, request, response):
     # If CSP_NONCE is not set, return the response without modification
-    paths_that_require_nonce = ['/hue/editor/', '/hue/accounts/login']
+    paths_that_require_nonce = CSP_NONCE_ENABLED_PAGES.get()
+    # paths_that_require_nonce = ['/hue/editor/', '/hue/accounts/login']
+    print("tabraiz ----", paths_that_require_nonce)
     if not request.path in paths_that_require_nonce:
       return response  # Do nothing more if the path does not require a nonce
 
@@ -909,7 +912,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
 
     for p in csp_split:
       directive = p.lstrip().split(' ')[0]
-      if directive in ('script-src'):
+      if directive in ('script-src', 'style-src'):
         # Remove 'unsafe-inline' if present
         new_directive_parts = [
             part for part in p.split(' ')

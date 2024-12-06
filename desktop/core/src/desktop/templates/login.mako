@@ -43,7 +43,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 
       <div class="logo">
         <a href="https://gethue.com">
-          <svg style="height: 80px; width: 200px;"><use href="#hi-logo"></use></svg>
+          <svg class="hi-logo"><use href="#hi-logo"></use></svg>
         </a>
       </div>
 

@@ -33,14 +33,14 @@
 <div id="login-modal" class="modal fade hide">
   <div class="login-container">
     <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70" alt="${ _('Hue logo') }"></div>
-    <h4 class="muted" style="margin-bottom: 50px; padding: 30px">
-      <span class="logged-out link-message" style="display: none">
+    <h4 class="muted" class="login-modal-message">
+      <span class="logged-out link-message hide">
         ${ _('Your session expired and your current action requires to') }
         <a class="reload pointer">
           ${ _('reload this page') }
         </a>
       </span>
-      <span class="auto-logged-out link-message" style="display: none">
+      <span class="auto-logged-out link-message hide">
         ${ _('We did not hear from you for about') } <strong class="time">${ conf.AUTH.IDLE_SESSION_TIMEOUT.get() }</strong> ${ _('and for security reasons Hue logged you out') }
         <a class="reload pointer margin-top-30">
           ${ _('Please reload this page to continue') }
