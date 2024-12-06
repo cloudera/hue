@@ -401,7 +401,7 @@ def upload_file(request):
 
   uploaded_file = request.FILES['file']
   dest_path = request.POST.get('destination_path')
-  remove_existing_file = coerce_bool(request.POST.get('remove_existing_file', False))
+  overwrite = coerce_bool(request.POST.get('overwrite', False))
 
   # Check if the file type is restricted
   _, file_type = os.path.splitext(uploaded_file.name)
@@ -423,8 +423,8 @@ def upload_file(request):
   # Check if the file already exists at the destination path
   filepath = request.fs.join(dest_path, uploaded_file.name)
   if request.fs.exists(filepath):
-     # If remove_existing_file is true, attempt to remove the existing file
-    if remove_existing_file:
+     # If overwrite is true, attempt to remove the existing file
+    if overwrite:
       try:
         request.fs.rmtree(filepath)
       except Exception as e:

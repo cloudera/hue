@@ -178,14 +178,14 @@ class TestSimpleFileUploadAPI:
         for reset in resets:
           reset()
 
-  def test_remove_existing_file_success(self):
+  def test_overwrite_existing_file_success(self):
     with patch('filebrowser.api.string_io') as string_io:
       with patch('filebrowser.api.stat_absolute_path') as stat_absolute_path:
         with patch('filebrowser.api._massage_stats') as _massage_stats:
           request = Mock(
             method='POST',
             META=Mock(),
-            POST={'destination_path': 's3a://test-bucket/test-user/', 'remove_existing_file': True},
+            POST={'destination_path': 's3a://test-bucket/test-user/', 'overwrite': True},
             FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
             body=Mock(),
             fs=Mock(
@@ -239,12 +239,12 @@ class TestSimpleFileUploadAPI:
             for reset in resets:
               reset()
 
-  def test_remove_existing_file_exception(self):
+  def test_overwrite_existing_file_exception(self):
     with patch('filebrowser.api.string_io') as string_io:
       request = Mock(
         method='POST',
         META=Mock(),
-        POST={'destination_path': 's3a://test-bucket/test-user/', 'remove_existing_file': True},
+        POST={'destination_path': 's3a://test-bucket/test-user/', 'overwrite': True},
         FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
         body=Mock(),
         fs=Mock(
