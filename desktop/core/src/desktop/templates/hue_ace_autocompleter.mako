@@ -23,7 +23,6 @@ if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
-from desktop.lib.django_util import nonce_attribute
 %>
 
 <%def name="hueAceAutocompleter()">
@@ -357,7 +356,7 @@ from desktop.lib.django_util import nonce_attribute
   </script>
 
 
-  <script type="text/javascript" ${nonce_attribute(request)}>
+  <script type="text/javascript">
     (function () {
 
       var aceUtil = ace.require('ace/autocomplete/util');
@@ -723,7 +722,7 @@ from desktop.lib.django_util import nonce_attribute
     <!-- /ko -->
   </script>
 
-  <script type="text/javascript" ${nonce_attribute(request)}>
+  <script type="text/javascript">
     (function () {
 
       var COMMENT_LOAD_DELAY = 1500;

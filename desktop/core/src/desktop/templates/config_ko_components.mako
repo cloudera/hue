@@ -23,7 +23,6 @@ if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
   from django.utils.translation import ugettext as _
-from desktop.lib.django_util import nonce_attribute
 %>
 
 <%def name="config()">
@@ -124,7 +123,7 @@ from desktop.lib.django_util import nonce_attribute
     </div>
   </script>
 
-  <script ${nonce_attribute(request)} type="text/javascript">
+  <script type="text/javascript">
     (function () {
       function MultiGroupAlternative(alt, params, initiallyChecked) {
         var self = this;
@@ -215,7 +214,7 @@ from desktop.lib.django_util import nonce_attribute
     })();
   </script>
 
-  <script  ${nonce_attribute(request)} type="text/javascript">
+  <script type="text/javascript">
     (function () {
 
       function PropertySelectorViewModel(params) {
@@ -297,7 +296,7 @@ from desktop.lib.django_util import nonce_attribute
     })();
   </script>
 
-  <script  ${nonce_attribute(request)} type="text/html" id="property">
+  <script type="text/html" id="property">
     <div class="config-property" data-bind="visibleOnHover: { selector: '.hover-actions' }">
       <label class="config-label" data-bind="click: function(data, event){ $(event.target).siblings('.config-controls').find('.config-property-add-value a').click(); }">
         <!-- ko text: label --><!-- /ko --><!-- ko if: typeof helpText !== 'undefined' --><div class="property-help" data-bind="tooltip: { title: helpText(), placement: 'bottom' }"><i class="fa fa-question-circle-o"></i></div><!-- /ko -->
@@ -365,7 +364,7 @@ from desktop.lib.django_util import nonce_attribute
     <input type="text" class="input-small" data-bind="numericTextInput: { value: value, precision: 0, allowEmpty: true }" /> <select class="input-mini" data-bind="options: units, value: selectedUnit"></select>
   </script>
 
-  <script  ${nonce_attribute(request)}  type="text/javascript">
+  <script type="text/javascript">
     (function () {
       var JVM_MEM_PATTERN = /([0-9]+)([MG])$/;
       var UNITS = {'MB': 'M', 'GB': 'G'};
@@ -427,7 +426,7 @@ from desktop.lib.django_util import nonce_attribute
     <div class="clearfix"></div>
   </script>
 
-  <script  ${nonce_attribute(request)} type="text/javascript">
+  <script type="text/javascript">
     (function () {
 
       function KeyValueListInputViewModel(params) {
@@ -530,7 +529,7 @@ from desktop.lib.django_util import nonce_attribute
     </div>
   </script>
 
-  <script  ${nonce_attribute(request)} type="text/javascript">
+  <script type="text/javascript">
     (function () {
 
       function NameValueListInputViewModel(params) {
@@ -595,7 +594,7 @@ from desktop.lib.django_util import nonce_attribute
     </div>
   </script>
 
-  <script  ${nonce_attribute(request)} type="text/javascript">
+  <script type="text/javascript">
     (function () {
 
       function FunctionListInputViewModel(params) {
@@ -649,7 +648,7 @@ from desktop.lib.django_util import nonce_attribute
     </div>
   </script>
 
-  <script  ${nonce_attribute(request)}  type="text/javascript">
+  <script type="text/javascript">
     (function () {
 
       var identifyType = function (path) {
@@ -729,7 +728,7 @@ from desktop.lib.django_util import nonce_attribute
     </div>
   </script>
 
-  <script  ${nonce_attribute(request)} type="text/javascript">
+  <script type="text/javascript">
     (function () {
       function CsvListInputViewModel(params) {
         this.valueObservable = params.value;
