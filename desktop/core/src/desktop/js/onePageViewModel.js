@@ -229,6 +229,14 @@ class OnePageViewModel {
       const $rawHtml = $('<span>').html(response);
 
       const $allScripts = $rawHtml.find('script[src]');
+
+      const $allScriptss = $rawHtml.find('script');
+      $allScriptss.each(function () {
+        if (this.getAttribute('type') === 'application/json') {
+          document.head.appendChild(this);
+        }
+      });
+      
       const scriptsToLoad = $allScripts
         .map(function () {
           return $(this).attr('src');
@@ -248,27 +256,104 @@ class OnePageViewModel {
         $(this).attr('href', link);
       });
 
-      const scriptPromises = loadScripts(scriptsToLoad);
+      const loadScript_nonce = function (scriptSrc) {
+        return $.Deferred(function(defer) {
+          const script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = scriptSrc;
+          script.onload = script.onerror = function() {
+            // Clean up
+            document.body.removeChild(script);
+            defer.resolve();
+          };
+          document.body.appendChild(script);
+        }).promise();
+      };
+    
+      const loadScripts_nonce = function(scriptUrls) {
+        const promises = [];
+        scriptUrls.forEach(scriptUrl => {
+          if (loadedJs.indexOf(scriptUrl) === -1) {
+            promises.push(loadScript_nonce(scriptUrl));
+            loadedJs.push(scriptUrl);
+          }
+        });
+        return promises;
+      };
+
+      const loadScript = function (scriptUrl) {
+        const deferred = $.Deferred();
+        $.ajax({
+          url: scriptUrl,
+          converters: {
+            'text script': function (text) {
+              return text;
+            }
+          }
+        })
+          .done(contents => {
+            loadedJs.push(scriptUrl);
+            deferred.resolve({ url: scriptUrl, contents: contents });
+          })
+          .fail(() => {
+            deferred.resolve('');
+          });
+        return deferred.promise();
+      };
+  
+      const loadScripts = function (scriptUrls) {
+        const promises = [];
+        while (scriptUrls.length) {
+          const scriptUrl = scriptUrls.shift();
+          if (loadedJs.indexOf(scriptUrl) !== -1) {
+            continue;
+          }
+          promises.push(loadScript(scriptUrl));
+        }
+        return promises;
+      };
+  
+      let scriptPromises;
+      if(isNonceEnabledForCurrentPath()) {
+        scriptPromises = loadScripts_nonce(scriptsToLoad);
+      } else {
+        scriptPromises = loadScripts(scriptsToLoad);
+      }
 
       const evalScriptSync = function () {
         if (scriptPromises.length) {
           // Evaluate the scripts in the order they were defined in the page
           const nextScriptPromise = scriptPromises.shift();
-          nextScriptPromise.done(scriptDetails => {
-            if (scriptDetails.contents) {
-              $.globalEval(scriptDetails.contents);
-            }
-            evalScriptSync();
-          });
+          if(isNonceEnabledForCurrentPath()) {
+            nextScriptPromise.done(() => {
+              evalScriptSync(); // Continue with the next script
+            });
+          } else {
+              nextScriptPromise.done(scriptDetails => {
+              if (scriptDetails.contents) {
+                $.globalEval(scriptDetails.contents);
+              }
+              evalScriptSync();
+            });
+          }
+
         } else {
-          // All evaluated
           promise.resolve($rawHtml.children());
         }
       };
-
+    
       evalScriptSync();
       return promise;
     };
+
+    function isNonceEnabledForCurrentPath(path = window.location.pathname) {
+      if (!window.NONCE_ENABLED) {
+        return false;
+      }
+      var nonce_enabled = window.ENABLED_NONCE_PATHS.includes(path);
+      console.log(nonce_enabled)
+      return nonce_enabled
+    }
 
     huePubSub.subscribe('hue4.process.headers', opts => {
       self.processHeaders(opts.response).done(rawHtml => {
@@ -865,16 +950,21 @@ class OnePageViewModel {
 
     huePubSub.subscribe('open.link', href => {
       if (href) {
-        const prefix = '/hue';
-        if (href.startsWith('/')) {
-          if (window.HUE_BASE_URL.length && href.startsWith(window.HUE_BASE_URL)) {
-            page(href);
-          } else if (href.startsWith(prefix)) {
+        const currentNonceEnabled = isNonceEnabledForCurrentPath();
+        const targetNonceEnabled = isNonceEnabledForCurrentPath(href);
+        
+        // Check if the href requires the '/hue' prefix and base_url
+        const fullHref = href.startsWith('/') && !href.startsWith('/hue') ? window.HUE_BASE_URL + '/hue' + href : href;
+    
+        if (currentNonceEnabled !== targetNonceEnabled) {
+          window.location.href = fullHref; // Force full page reload with the correct prefix and base_url
+        } else if (href.startsWith('/')) {
+          if (window.HUE_BASE_URL && !href.startsWith(window.HUE_BASE_URL)) {
             page(window.HUE_BASE_URL + href);
           } else {
-            page(window.HUE_BASE_URL + prefix + href);
+            page(href); // Already includes the base_url
           }
-        } else if (href.indexOf('#') == 0) {
+        } else if (href.indexOf('#') === 0) {
           // Only place that seem to use this is hbase onclick row
           window.location.hash = href;
         } else {
