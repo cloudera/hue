@@ -401,6 +401,7 @@ def upload_file(request):
 
   uploaded_file = request.FILES['file']
   dest_path = request.POST.get('destination_path')
+  overwrite = coerce_bool(request.POST.get('overwrite', False))
 
   # Check if the file type is restricted
   _, file_type = os.path.splitext(uploaded_file.name)
@@ -422,7 +423,18 @@ def upload_file(request):
   # Check if the file already exists at the destination path
   filepath = request.fs.join(dest_path, uploaded_file.name)
   if request.fs.exists(filepath):
-    return HttpResponse(f'The file path {filepath} already exists.', status=409)
+     # If overwrite is true, attempt to remove the existing file
+    if overwrite:
+      try:
+        request.fs.rmtree(filepath)
+      except Exception as e:
+        err_message = 'Failed to remove already existing file.'
+        LOG.exception(f'{err_message} {str(e)}')
+        return HttpResponse(err_message, status=500)
+    else:
+      err_message = f'The file {uploaded_file.name} already exists at the destination path.'
+      LOG.error(err_message)
+      return HttpResponse(err_message, status=409)
 
   # Check if the destination path already exists or not
   if not request.fs.exists(dest_path):
