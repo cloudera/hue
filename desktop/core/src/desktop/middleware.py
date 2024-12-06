@@ -877,7 +877,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
 
   def process_response(self, request, response):
     # If CSP_NONCE is not set, return the response without modification
-    paths_that_require_nonce = ['/hue/accounts/login']
+    paths_that_require_nonce = ['/hue/editor/', '/hue/accounts/login']
     if not request.path in paths_that_require_nonce:
       return response  # Do nothing more if the path does not require a nonce
 
