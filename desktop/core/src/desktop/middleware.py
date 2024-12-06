@@ -17,6 +17,7 @@
 
 from __future__ import absolute_import
 
+import os
 import re
 import json
 import time
@@ -24,6 +25,7 @@ import socket
 import inspect
 import logging
 import os.path
+import secrets
 import tempfile
 import mimetypes
 import traceback
@@ -52,6 +54,7 @@ from desktop.auth.backend import ensure_has_a_group, find_or_create_user, is_adm
 from desktop.conf import (
   AUDIT_EVENT_LOG_DIR,
   AUTH,
+  CSP_NONCE,
   CUSTOM_CACHE_CONTROL,
   DJANGO_DEBUG_MODE,
   ENABLE_PROMETHEUS,
@@ -77,6 +80,69 @@ from desktop.log.access import access_log, access_warn, log_page_hit
 from hadoop import cluster
 from libsaml.conf import CDP_LOGOUT_URL
 from useradmin.models import User
+
+
+def nonce_exists(response):
+  """Check for preexisting nonce in style and script.
+
+    Args:
+      response (:obj:): Django response object
+
+    Returns:
+      nonce_found (dict): Dictionary of nonces found
+    """
+  try:
+    csp = response['Content-Security-Policy']
+  except KeyError:
+    csp = response.get('Content-Security-Policy-Report-Only', '')
+
+  nonce_found = {}
+
+  if csp:
+    csp_split = csp.split(';')
+    for directive in csp_split:
+      if 'nonce-' not in directive:
+        continue
+      if 'script-src' in directive:
+        nonce_found['script'] = directive
+      if 'style-src' in directive:
+        nonce_found['style'] = directive
+
+  return nonce_found
+
+
+def get_header(response):
+  """Get the CSP header type.
+
+  This is basically a check for:
+    Content-Security-Policy or Content-Security-Policy-Report-Only
+
+  Args:
+    response (:obj:): Django response object
+
+  Returns:
+    dict:
+      name: CPS header policy. i.e. Report-Only or not
+      csp: CSP directives associated with the header
+      bool: False if neither policy header is found
+  """
+  policies = [
+    "Content-Security-Policy",
+    "Content-Security-Policy-Report-Only"
+  ]
+
+  try:
+    name = policies[0]
+    csp = response[policies[0]]
+  except KeyError:
+    try:
+      name = policies[1]
+      csp = response[policies[1]]
+    except KeyError:
+      return False
+
+  return {'name': name, 'csp': csp}
+
 
 LOG = logging.getLogger()
 
@@ -805,9 +871,51 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
       LOG.info('Unloading ContentSecurityPolicyMiddleware')
       raise exceptions.MiddlewareNotUsed
 
+  def process_request(self, request):
+    nonce = secrets.token_urlsafe()
+    request.csp_nonce = nonce
+
   def process_response(self, request, response):
+    # If CSP_NONCE is not set, return the response without modification
+    if not CSP_NONCE.get():
+      return response
+
+    # Add the secure CSP if it doesn't exist, provided that we have a CSP to set
     if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
       response["Content-Security-Policy"] = self.secure_content_security_policy
+
+    # If the CSP header is not set or the request does not have a nonce, return the response
+    header = get_header(response)
+    if not header or not hasattr(request, 'csp_nonce'):
+      return response
+
+    # If a nonce already exists in the CSP header, log an error and return the response
+    nonce_found = nonce_exists(response)
+    if nonce_found:
+      LOG.error("Nonce already exists: {}".format(nonce_found))
+      return response
+
+    # Retrieve the nonce from the request and prepare the new CSP directive
+    nonce = getattr(request, 'csp_nonce', None)
+    csp_split = header['csp'].split(';')
+    new_csp = []
+    nonce_directive = f"'nonce-{nonce}'"
+
+    for p in csp_split:
+      directive = p.lstrip().split(' ')[0]
+      if directive in ('script-src'):
+        # Remove 'unsafe-inline' if present
+        new_directive_parts = [
+            part for part in p.split(' ')
+            if part and part not in ("'unsafe-inline'")
+        ]
+        new_directive_parts.append(nonce_directive)
+        new_csp.append(' '.join(new_directive_parts))
+      else:
+        new_csp.append(p)
+
+    # Update the Content-Security-Policy header with the new CSP string
+    response[header['name']] = "; ".join(new_csp).strip() + ';'
 
     return response
 
