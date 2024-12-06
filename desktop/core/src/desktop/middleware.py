@@ -877,12 +877,18 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
 
   def process_response(self, request, response):
     # If CSP_NONCE is not set, return the response without modification
+    paths_that_require_nonce = ['/hue/accounts/login']
+    if not request.path in paths_that_require_nonce:
+      return response  # Do nothing more if the path does not require a nonce
+
     if not CSP_NONCE.get():
       return response
 
     # Add the secure CSP if it doesn't exist, provided that we have a CSP to set
     if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
       response["Content-Security-Policy"] = self.secure_content_security_policy
+
+
 
     # If the CSP header is not set or the request does not have a nonce, return the response
     header = get_header(response)
