@@ -1029,6 +1029,7 @@ exports.hasCssString = function(id, doc) {
 };
 
 exports.importCssString = function importCssString(cssText, id, doc) {
+    return;
     doc = doc || document;
     if (id && exports.hasCssString(id, doc))
         return null;

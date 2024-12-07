@@ -1,12 +1,31 @@
-ace.define("ace/mode/sparksql_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function (require, exports, module) {
-  "use strict";
+ace.define("ace/mode/sparksql_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function(require, exports, module) {
+var $build_deps$ = {require: require, exports: exports, module: module};
+exports = undefined; module = undefined;
+function define(name, deps, m) {
+    if (typeof name == "function") {
+        m = name; deps = ["require", "exports", "module"]; name = $build_deps$.module.id
+    }
+    if (typeof name !== "string") {
+        m = deps; deps = name; name = $build_deps$.module.id
+    }
+    if (!m) {
+        m = deps; deps = [];
+    }
+   var ret = typeof m == "function" ?
+       m.apply($build_deps$.module, deps.map(function(n){return $build_deps$[n] || require(n)})) : m
+   if (ret != undefined) $build_deps$.module.exports = ret;
+}
+define.amd = true;
 
-  var oop = require("../lib/oop");
-  var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+ace.define((require, exports, module) => {
+  'use strict';
 
-  var SparksqlHighlightRules = function () {
+  const oop = require('../lib/oop');
+  const TextHighlightRules = require('./text_highlight_rules').TextHighlightRules;
 
-    var keywords =
+  const SparksqlHighlightRules = function () {
+
+    const keywords =
       'ADD|AFTER|ALL|ALTER|ANALYZE|AND|ANTI|ANY|ARCHIVE|AS|ASC|AT|AUTHORIZATION|BETWEEN|BOTH|BUCKET|BUCKETS|BY|CACHE|' +
       'CASCADE|CASE|CAST|CATALOG|CATALOGS|CHANGE|CHECK|CLEAR|CLUSTER|CLUSTERED|CODEGEN|COLLATE|COLLECTION|COLUMN|' +
       'COLUMNS|COMMENT|COMMIT|COMPACT|COMPACTIONS|COMPUTE|CONCATENATE|CONSTRAINT|COST|CREATE|CROSS|CUBE|CURRENT|' +
@@ -27,10 +46,10 @@ ace.define("ace/mode/sparksql_highlight_rules",["require","exports","module","ac
       'TRANSACTION|TRANSACTIONS|TRANSFORM|TRIM|TRUNCATE|TRY_CAST|TYPE|UNARCHIVE|UNBOUNDED|UNCACHE|UNION|UNIQUE|' +
       'UNKNOWN|UNLOCK|UNSET|UPDATE|USE|USER|USING|VALUES|VERSION|VIEW|VIEWS|WEEK|WHEN|WHERE|WINDOW|WITH|WITHIN|ZONE';
 
-    var builtinConstants =
+    const builtinConstants =
       'AVRO|DAY|FALSE|HOUR|KUDU|MINUTE|MONTH|NULL|ORC|PARQUET|RCFILE|SECOND|SEQUENCEFILE|TEXTFILE|TRUE|YEAR';
 
-    var builtinFunctions =
+    const builtinFunctions =
       'ABS|ACOS|ACOSH|ADD_MONTHS|AES_DECRYPT|AES_ENCRYPT|ANY|APPROX_COUNT_DISTINCT|APPROX_PERCENTILE|ARRAY|ARRAY_AGG|' +
       'ARRAY_CONTAINS|ARRAY_DISTINCT|ARRAY_EXCEPT|ARRAY_INTERSECT|ARRAY_JOIN|ARRAY_MAX|ARRAY_MIN|ARRAY_POSITION|' +
       'ARRAY_REMOVE|ARRAY_REPEAT|ARRAY_UNION|ARRAYS_OVERLAP|ARRAYS_ZIP|ASCII|ASIN|ASINH|ASSERT_TRUE|ATAN|ATAN2|ATANH|' +
@@ -61,50 +80,63 @@ ace.define("ace/mode/sparksql_highlight_rules",["require","exports","module","ac
       'UNIX_DATE|UNIX_MICROS|UNIX_MILLIS|UNIX_SECONDS|UNIX_TIMESTAMP|UPPER|UUID|VAR_POP|VAR_SAMP|VARIANCE|VERSION|' +
       'WEEKDAY|WEEKOFYEAR|WIDTH_BUCKET|WINDOW|YEAR';
 
-    var dataTypes =
+    const dataTypes =
       'ARRAY|BIGINT|BINARY|BOOLEAN|BYTE|DATE|DEC|DECIMAL|DOUBLE|FLOAT|INT|INTEGER|LONG|MAP|NUMERIC|REAL|SHORT|' +
       'SMALLINT|STRING|STRUCT|TIMESTAMP|TINYINT';
 
-    var keywordMapper = this.createKeywordMapper({
-        "support.function": builtinFunctions,
-        "keyword": keywords,
-        "constant.language": builtinConstants,
-        "storage.type": dataTypes
-    }, "identifier", true);
+    const keywordMapper = this.createKeywordMapper(
+      {
+        'support.function': builtinFunctions,
+        keyword: keywords,
+        'constant.language': builtinConstants,
+        'storage.type': dataTypes
+      },
+      'identifier',
+      true
+    );
 
     this.$rules = {
       start: [
         {
-            token : "comment",
-            regex : "--.*$"
-        },  {
-            token : "comment",
-            start : "/\\*",
-            end : "\\*/"
-        }, {
-            token : "string",           // " string
-            regex : '".*?"'
-        }, {
-            token : "string",           // ' string
-            regex : "'.*?'"
-        }, {
-            token : "constant.numeric", // float
-            regex : "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
-        }, {
-            token : keywordMapper,
-            regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
-        }, {
-            token : "keyword.operator",
-            regex : "\\+|\\-|\\/|\\/\\/|%|<@>|@>|<@|&|\\^|~|<|>|<=|=>|==|!=|<>|="
-        }, {
-            token : "paren.lparen",
-            regex : "[\\(]"
-        }, {
-            token : "paren.rparen",
-            regex : "[\\)]"
-        }, {
-            token : "text",
-            regex : "\\s+"
+          token: 'comment',
+          regex: '--.*$'
+        },
+        {
+          token: 'comment',
+          start: '/\\*',
+          end: '\\*/'
+        },
+        {
+          token: 'string', // " string
+          regex: '".*?"'
+        },
+        {
+          token: 'string', // ' string
+          regex: "'.*?'"
+        },
+        {
+          token: 'constant.numeric', // float
+          regex: '[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b'
+        },
+        {
+          token: keywordMapper,
+          regex: '[a-zA-Z_$][a-zA-Z0-9_$]*\\b'
+        },
+        {
+          token: 'keyword.operator',
+          regex: '\\+|\\-|\\/|\\/\\/|%|<@>|@>|<@|&|\\^|~|<|>|<=|=>|==|!=|<>|='
+        },
+        {
+          token: 'paren.lparen',
+          regex: '[\\(]'
+        },
+        {
+          token: 'paren.rparen',
+          regex: '[\\)]'
+        },
+        {
+          token: 'text',
+          regex: '\\s+'
         }
       ]
     };
@@ -113,14 +145,15 @@ ace.define("ace/mode/sparksql_highlight_rules",["require","exports","module","ac
   };
 
   SparksqlHighlightRules.metaData = {
-    fileTypes: ["hql", "q", "ql"],
-    name: "Sparksql",
-    scopeName: "source.sparksql"
+    fileTypes: ['hql', 'q', 'ql'],
+    name: 'sparksql',
+    scopeName: 'source.sparksql'
   };
 
   oop.inherits(SparksqlHighlightRules, TextHighlightRules);
 
   exports.SparksqlHighlightRules = SparksqlHighlightRules;
+});
 });
 
 ace.define("ace/mode/folding/cstyle",["require","exports","module","ace/lib/oop","ace/range","ace/mode/folding/fold_mode"], function(require, exports, module) {

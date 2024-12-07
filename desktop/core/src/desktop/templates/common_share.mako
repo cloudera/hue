@@ -43,10 +43,10 @@ else:
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Sharing settings')}</h2>
   </div>
-  <div class="modal-body" style="overflow: visible; height: 240px">
-    <div class="row-fluid" style="max-height: 114px">
+  <div class="modal-body modal-body-inline">
+    <div class="row-fluid modal-body-row-inline"">
       <div class="span6">
-        <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
+        <h4 class="muted">${_('Read')}</h4>
         <div data-bind="visible: (selectedDoc().perms.read.users.length == 0 && selectedDoc().perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
         <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.read.users">
           <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsernameById(id), attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserReadShare"> <i class="fa fa-times"></i></span></li>
@@ -56,7 +56,7 @@ else:
         </ul>
       </div>
       <div class="span6">
-        <h4 class="muted" style="margin-top:0px">${_('Read and Modify')}</h4>
+        <h4 class="muted">${_('Read and Modify')}</h4>
         <div data-bind="visible: (selectedDoc().perms.write.users.length == 0 && selectedDoc().perms.write.groups.length == 0)">${_('The document is not shared for read and modify.')}</div>
         <ul class="unstyled airy" data-bind="foreach: selectedDoc().perms.write.users">
           <li><span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettifyUsernameById(id), attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="click: removeUserWriteShare"> <i class="fa fa-times"></i></span></li>
@@ -67,10 +67,10 @@ else:
       </div>
     </div>
     <div class="clearfix"></div>
-    <div style="margin-top: 20px">
+    <div class="autocomplete-container-inline">
       <div class="input-append">
-        <div id="menu" style="font-size: 14px;"></div>
-        <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source, itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match',valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: handleTypeaheadSelection, appendTo: $('#menu') }, clearable: { value: searchInput }, textInput: searchInput" class="ui-autocomplete-input" autocomplete="off" style="width: 460px">
+        <div id="menu"></div>
+        <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source, itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match',valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: handleTypeaheadSelection, appendTo: $('#menu') }, clearable: { value: searchInput }, textInput: searchInput" class="ui-autocomplete-input" autocomplete="off">
         <div class="btn-group">
           <a id="documentShareAddBtn" class="btn"><span data-bind="text: selectedPermLabel"></span></a>
           <a id="documentShareCaret" class="btn dropdown-toggle" data-toggle="dropdown">
