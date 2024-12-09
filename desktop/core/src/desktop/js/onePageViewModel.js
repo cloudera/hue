@@ -177,38 +177,6 @@ class OnePageViewModel {
       loadedCss.push($(this).attr('href'));
     });
 
-    const loadScript = function (scriptUrl) {
-      const deferred = $.Deferred();
-      $.ajax({
-        url: scriptUrl,
-        converters: {
-          'text script': function (text) {
-            return text;
-          }
-        }
-      })
-        .done(contents => {
-          loadedJs.push(scriptUrl);
-          deferred.resolve({ url: scriptUrl, contents: contents });
-        })
-        .fail(() => {
-          deferred.resolve('');
-        });
-      return deferred.promise();
-    };
-
-    const loadScripts = function (scriptUrls) {
-      const promises = [];
-      while (scriptUrls.length) {
-        const scriptUrl = scriptUrls.shift();
-        if (loadedJs.indexOf(scriptUrl) !== -1) {
-          continue;
-        }
-        promises.push(loadScript(scriptUrl));
-      }
-      return promises;
-    };
-
     const addGlobalCss = function ($el) {
       const cssFile = $el.attr('href').split('?')[0];
       if (loadedCss.indexOf(cssFile) === -1) {
@@ -230,13 +198,11 @@ class OnePageViewModel {
 
       const $allScripts = $rawHtml.find('script[src]');
 
-      const $allScriptss = $rawHtml.find('script');
-      $allScriptss.each(function () {
-        if (this.getAttribute('type') === 'application/json') {
-          document.head.appendChild(this);
-        }
+      const $jsonScript = $rawHtml.find("script[type='application/json']");
+      $jsonScript.each(function () {
+        document.head.appendChild(this);
       });
-      
+
       const scriptsToLoad = $allScripts
         .map(function () {
           return $(this).attr('src');
@@ -257,11 +223,11 @@ class OnePageViewModel {
       });
 
       const loadScript_nonce = function (scriptSrc) {
-        return $.Deferred(function(defer) {
+        return $.Deferred(defer => {
           const script = document.createElement('script');
           script.type = 'text/javascript';
           script.src = scriptSrc;
-          script.onload = script.onerror = function() {
+          script.onload = script.onerror = function () {
             // Clean up
             document.body.removeChild(script);
             defer.resolve();
@@ -269,8 +235,8 @@ class OnePageViewModel {
           document.body.appendChild(script);
         }).promise();
       };
-    
-      const loadScripts_nonce = function(scriptUrls) {
+
+      const loadScripts_nonce = function (scriptUrls) {
         const promises = [];
         scriptUrls.forEach(scriptUrl => {
           if (loadedJs.indexOf(scriptUrl) === -1) {
@@ -286,21 +252,19 @@ class OnePageViewModel {
         $.ajax({
           url: scriptUrl,
           converters: {
-            'text script': function (text) {
-              return text;
-            }
+            'text script': text => text
           }
         })
           .done(contents => {
             loadedJs.push(scriptUrl);
-            deferred.resolve({ url: scriptUrl, contents: contents });
+            deferred.resolve({ url: scriptUrl, contents });
           })
           .fail(() => {
             deferred.resolve('');
           });
         return deferred.promise();
       };
-  
+
       const loadScripts = function (scriptUrls) {
         const promises = [];
         while (scriptUrls.length) {
@@ -312,9 +276,9 @@ class OnePageViewModel {
         }
         return promises;
       };
-  
+
       let scriptPromises;
-      if(isNonceEnabledForCurrentPath()) {
+      if (isSecurePageEnabled()) {
         scriptPromises = loadScripts_nonce(scriptsToLoad);
       } else {
         scriptPromises = loadScripts(scriptsToLoad);
@@ -324,35 +288,33 @@ class OnePageViewModel {
         if (scriptPromises.length) {
           // Evaluate the scripts in the order they were defined in the page
           const nextScriptPromise = scriptPromises.shift();
-          if(isNonceEnabledForCurrentPath()) {
+          if (isSecurePageEnabled()) {
             nextScriptPromise.done(() => {
               evalScriptSync(); // Continue with the next script
             });
           } else {
-              nextScriptPromise.done(scriptDetails => {
+            nextScriptPromise.done(scriptDetails => {
               if (scriptDetails.contents) {
                 $.globalEval(scriptDetails.contents);
               }
               evalScriptSync();
             });
           }
-
         } else {
           promise.resolve($rawHtml.children());
         }
       };
-    
+
       evalScriptSync();
       return promise;
     };
 
-    function isNonceEnabledForCurrentPath(path = window.location.pathname) {
+    function isSecurePageEnabled(path = window.location.pathname) {
       if (!window.NONCE_ENABLED) {
         return false;
       }
-      var nonce_enabled = window.ENABLED_NONCE_PATHS.includes(path);
-      console.log(nonce_enabled)
-      return nonce_enabled
+      const nonce_enabled = ['editor'].some(text => path.includes(text));
+      return nonce_enabled;
     }
 
     huePubSub.subscribe('hue4.process.headers', opts => {
@@ -917,6 +879,9 @@ class OnePageViewModel {
       return filePathParam.replaceAll('%25', '%');
     };
 
+    // Register the nonce check middleware globally
+    page('*', nonceCheckMiddleware);
+
     pageMapping.forEach(mapping => {
       page(
         mapping.url,
@@ -948,18 +913,20 @@ class OnePageViewModel {
     huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, configUpdated);
     huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
 
+    function nonceCheckMiddleware(ctx, next) {
+      const currentNonceEnabled = isSecurePageEnabled();
+      const targetNonceEnabled = isSecurePageEnabled(ctx.params[0]);
+      if (currentNonceEnabled !== targetNonceEnabled) {
+        // If the nonce states differ, force a full page reload
+        window.location.href = ctx.canonicalPath;
+      } else {
+        next(); // Continue with the routing if nonces are consistent
+      }
+    }
+
     huePubSub.subscribe('open.link', href => {
       if (href) {
-        const currentNonceEnabled = isNonceEnabledForCurrentPath();
-        const targetNonceEnabled = isNonceEnabledForCurrentPath(href);
-        
-        // Check if the href requires the '/hue' prefix and base_url
-        const fullHref = href.startsWith('/') && !href.startsWith('/hue') ? window.HUE_BASE_URL + '/hue' + href : href;
-    
-        if (currentNonceEnabled !== targetNonceEnabled) {
-          // Force full page reload if the current page is csp is differnt from new page csp
-          window.location.href = fullHref; 
-        } else if (href.startsWith('/')) {
+        if (href.startsWith('/')) {
           if (window.HUE_BASE_URL && !href.startsWith(window.HUE_BASE_URL)) {
             page(window.HUE_BASE_URL + href);
           } else {

@@ -394,13 +394,6 @@ CSP_NONCE = Config(
   type=coerce_bool,
   default=False)
 
-CSP_NONCE_ENABLED_PAGES = Config(
-    key="csp_nonce_enabled_pages",
-    help=_("List of paths where CSP nonce should be enabled"),
-    type=coerce_csv,
-    default=[]
-)
-
 SECURE_SSL_REDIRECT = Config(
   key="secure_ssl_redirect",
   help=_('If all non-SSL requests should be permanently redirected to SSL.'),

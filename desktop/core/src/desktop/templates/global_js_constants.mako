@@ -793,7 +793,6 @@
   window.USER_IS_ADMIN = '${ is_admin(user) }' === 'True';
   window.USER_IS_HUE_ADMIN = '${ is_hue_admin(user) }' === 'True';
   window.DJANGO_DEBUG_MODE = '${ conf.DJANGO_DEBUG_MODE.get() }' === 'True';
-  window.ENABLED_NONCE_PATHS = ${ json.dumps(conf.CSP_NONCE_ENABLED_PAGES.get()) | n };
   window.NONCE_ENABLED = ${ 'true' if conf.CSP_NONCE.get() else 'false' };
 
   window.IS_LDAP_SETUP = '${ 'desktop.auth.backend.LdapBackend' in conf.AUTH.BACKEND.get() }' === 'True';
