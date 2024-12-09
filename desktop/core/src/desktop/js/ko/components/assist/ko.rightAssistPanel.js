@@ -42,19 +42,19 @@ const TEMPLATE = `
       orientation: 'right',
       onPosition: function() { huePubSub.publish('split.draggable.position') }
     }">
-    <div class="right-assist-tab" data-bind="visible: editorAssistantTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
+    <div class="right-assist-tab hide" data-bind="visible: editorAssistantTabAvailable"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
       'Assistant'
     )}" data-bind="css: { 'blue' : activeTab() === 'editorAssistant' }, tooltip: { placement: 'left' }, click: editorAssistantTabClick"><i class="fa fa-fw fa-compass"></i></a></div>
-    <div class="right-assist-tab" data-bind="visible: dashboardAssistantTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
+    <div class="right-assist-tab hide" data-bind="visible: dashboardAssistantTabAvailable"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
       'Assistant'
     )}" data-bind="css: { 'blue' : activeTab() === 'dashboardAssistant' }, tooltip: { placement: 'left' }, click: dashboardAssistantTabClick"><i class="fa fa-fw fa-compass"></i></a></div>
-    <div class="right-assist-tab" data-bind="visible: functionsTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
+    <div class="right-assist-tab hide" data-bind="visible: functionsTabAvailable"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
       'Functions'
     )}" data-bind="css: { 'blue' : activeTab() === 'functions' }, tooltip: { placement: 'left' }, click: functionsTabClick"><i class="fa fa-fw fa-superscript"></i></a></div>
-    <div class="right-assist-tab" data-bind="visible: langRefTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
+    <div class="right-assist-tab hide" data-bind="visible: langRefTabAvailable"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
       'Language Reference'
     )}" data-bind="css: { 'blue' : activeTab() === 'langRef' }, tooltip: { placement: 'left' }, click: langRefTabClick"><i class="fa fa-fw fa-book"></i></a></div>
-    <div class="right-assist-tab" data-bind="visible: schedulesTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
+    <div class="right-assist-tab hide" data-bind="visible: schedulesTabAvailable"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
       'Schedule'
     )}" data-bind="css: { 'blue' : activeTab() === 'schedules' }, tooltip: { placement: 'left' }, click: schedulesTabClick"><i class="fa fa-fw fa-calendar"></i></a></div>
   </div>
@@ -102,7 +102,7 @@ const TEMPLATE = `
     <div data-bind="component: { name: 'assist-dashboard-panel' }, visible: activeTab() === 'dashboardAssistant'"></div>
     <!-- /ko -->
 
-    <div data-bind="component: { name: 'assist-schedule-panel' }, visible: activeTab() === 'schedules'" style="display:none;"></div>
+    <div data-bind="component: { name: 'assist-schedule-panel' }, visible: activeTab() === 'schedules'" class="hide"></div>
   </div>
   <!-- /ko -->
 `;

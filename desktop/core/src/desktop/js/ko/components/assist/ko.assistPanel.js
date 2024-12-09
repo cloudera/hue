@@ -33,7 +33,7 @@ import { withLocalStorage } from 'utils/storageUtils';
 
 const TEMPLATE = `
   <script type="text/html" id="assist-panel-inner-header">
-    <div class="assist-header assist-fixed-height" data-bind="visibleOnHover: { selector: '.assist-header-actions' }, css: { 'assist-resizer': $index() > 0 }" style="display:none;">
+    <div class="assist-header assist-fixed-height hide" data-bind="visibleOnHover: { selector: '.assist-header-actions' }, css: { 'assist-resizer': $index() > 0 }">
       <span data-bind="text: $parent.name"></span>
       <div class="assist-header-actions">
         <div class="inactive-action" data-bind="click: function () { $parent.visible(false) }"><i class="fa fa-times"></i></div>
@@ -45,15 +45,16 @@ const TEMPLATE = `
     <!-- ko if: availablePanels().length > 1 -->
     <div class="assist-panel-switches">
       <!-- ko foreach: availablePanels -->
-      <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, style: { 'float': rightAlignIcon ? 'right' : 'left' },  attr: { 'title': name, 'data-testid': 'assist--' + type + '--button' }">
-        <!-- ko if: iconSvg --><span style="font-size:22px;"><svg class="hi"><use data-bind="attr: {'href': iconSvg }" href=''></use></svg></span><!-- /ko -->
+      <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data },  attr: { 'title': name, 'data-testid': 'assist--' + type + '--button' }">
+        <!-- ko if: iconSvg --><span class="assist-type-switch-icon"><svg class="hi"><use data-bind="attr: {'href': iconSvg }" href=''></use></svg></span><!-- /ko -->
         <!-- ko if: !iconSvg --><i class="fa fa-fw valign-middle" data-bind="css: icon"></i><!-- /ko -->
       </div>
       <!-- /ko -->
     </div>
     <!-- /ko -->
     <!-- ko with: visiblePanel -->
-    <div class="assist-panel-contents" data-bind="style: { 'padding-top': $parent.availablePanels().length > 1 ? '10px' : '5px' }">
+    <div class="assist-panel-contents" 
+     data-bind="css: {'assist-panel-contents--single-panel': $parent.availablePanels().length <= 1 }">
       <div class="assist-inner-panel">
         <div class="assist-flex-panel">
           <!-- ko component: panelData --><!-- /ko -->
