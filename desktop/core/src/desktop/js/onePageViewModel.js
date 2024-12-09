@@ -245,7 +245,7 @@ class OnePageViewModel {
       $allScripts.remove();
 
       $rawHtml.find('link[href]').each(function () {
-        addGlobalCss($(this)); // Also removes the elements;
+        addGlobalCss($(this));
       });
 
       $rawHtml.find('a[href]').each(function () {
@@ -957,7 +957,8 @@ class OnePageViewModel {
         const fullHref = href.startsWith('/') && !href.startsWith('/hue') ? window.HUE_BASE_URL + '/hue' + href : href;
     
         if (currentNonceEnabled !== targetNonceEnabled) {
-          window.location.href = fullHref; // Force full page reload with the correct prefix and base_url
+          // Force full page reload if the current page is csp is differnt from new page csp
+          window.location.href = fullHref; 
         } else if (href.startsWith('/')) {
           if (window.HUE_BASE_URL && !href.startsWith(window.HUE_BASE_URL)) {
             page(window.HUE_BASE_URL + href);
