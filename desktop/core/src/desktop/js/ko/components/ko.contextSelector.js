@@ -33,15 +33,15 @@ const TEMPLATE = `
   <i class="fa fa-spinner fa-spin muted"></i>
   <!-- /ko -->
 
-  <div class="inline-block" style="display: none;" data-bind="visible: !loadingContext()">
+  <div class="inline-block" data-bind="visible: !loadingContext()">
     <!-- ko if: window.HAS_MULTI_CLUSTER -->
     <!-- ko if: availableClusters().length > 0 && !hideClusters -->
     <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
       'Cluster'
     )}</span><!-- /ko -->
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: cluster, onSelect: onClusterSelect, entries: availableClusters, labelAttribute: 'name', searchable: true, linkTitle: '${I18n(
+    <div data-bind="style: { display: 'inline-block' }, component: { name: 'hue-drop-down', params: { value: cluster, onSelect: onClusterSelect, entries: availableClusters, labelAttribute: 'name', searchable: true, linkTitle: '${I18n(
       'Active cluster'
-    )}' } }" style="display: inline-block"></div>
+    )}' } }"></div>
     <!-- /ko -->
     <!-- ko if: availableClusters().length === 0 && !hideClusters -->
     <span class="editor-header-title"><i class="fa fa-warning"></i> ${I18n(
@@ -53,9 +53,9 @@ const TEMPLATE = `
     <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
       'Compute'
     )}</span><!-- /ko -->
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: compute, onSelect: onComputeSelect, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${I18n(
+    <div data-bind="style: { display: 'inline-block' }, component: { name: 'hue-drop-down', params: { value: compute, onSelect: onComputeSelect, entries: availableComputes, labelAttribute: 'name', searchable: true, linkTitle: '${I18n(
       'Active compute'
-    )}' } }" style="display: inline-block"></div>
+    )}' } }"></div>
     <!-- /ko -->
     <!-- ko if: availableComputes().length === 0 && !hideComputes -->
     <span class="editor-header-title"><i class="fa fa-warning"></i> ${I18n(
@@ -67,9 +67,9 @@ const TEMPLATE = `
     <!-- ko ifnot: hideLabels --><span class="editor-header-title">${I18n(
       'Namespace'
     )}</span><!-- /ko -->
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: namespace, onSelect: onNamespaceSelect, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${I18n(
+    <div data-bind="style: { display: 'inline-block' }, component: { name: 'hue-drop-down', params: { value: namespace, onSelect: onNamespaceSelect, entries: availableNamespaces, labelAttribute: 'name', searchable: true, linkTitle: '${I18n(
       'Active namespace'
-    )}' } }" style="display: inline-block"></div>
+    )}' } }"></div>
     <!-- /ko -->
     <!-- ko if: availableNamespaces().length === 0 && !hideNamespaces -->
     <span class="editor-header-title"><i class="fa fa-warning"></i> ${I18n(
@@ -82,9 +82,9 @@ const TEMPLATE = `
     <!-- ko if: window.getLastKnownConfig().has_computes && !hideLabels --><span class="editor-header-title">${I18n(
       'Active database'
     )}</span><!-- /ko -->
-    <div data-bind="component: { name: 'hue-drop-down', params: { dataTestId: 'editor--database-selection--dropdown', titleName: 'Database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${I18n(
+    <div data-bind="style: { display: 'inline-block' }, component: { name: 'hue-drop-down', params: { dataTestId: 'editor--database-selection--dropdown', titleName: 'Database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${I18n(
       'Active database'
-    )}' } }" style="display: inline-block"></div>
+    )}' } }"></div>
     <!-- /ko -->
     <!-- ko if: availableDatabases().length === 0  && !hideDatabases -->
     <span class="editor-header-title"><i class="fa fa-warning"></i> ${I18n(

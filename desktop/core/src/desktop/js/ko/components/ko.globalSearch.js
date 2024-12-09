@@ -42,7 +42,7 @@ const TEMPLATE = `
   </script>
 
   <script type="text/html" id="top-search-autocomp-no-match">
-    <div style="height: 30px;">
+    <div data-bind="style: { height: '30px' }">
       <div>${I18n('No match found')}</div>
     </div>
   </script>
@@ -56,7 +56,7 @@ const TEMPLATE = `
   <!-- /ko -->
   <!-- ko if: searchResultCategories().length > 0 -->
   <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, style: { 'height' : heightWhenDragging }">
-    <div class="global-search-alternatives" data-bind="css: { 'global-search-full-width': !selectedResult() }, delayedOverflow" style="position: relative">
+    <div class="global-search-alternatives" data-bind="css: { 'global-search-full-width': !selectedResult() }, delayedOverflow, style: { position: 'relative' }">
       <!-- ko foreach: searchResultCategories -->
       <div class="global-search-category">
         <div class="global-search-category-header" data-bind="text: label"></div>
@@ -76,7 +76,7 @@ const TEMPLATE = `
       <!-- ko hueSpinner: { spin: loading() && searchResultCategories().length > 0, inline: true } --><!-- /ko -->
     </div>
     <!-- ko with: selectedResult -->
-    <div class="global-search-preview" style="overflow: auto;">
+    <div class="global-search-preview" data-bind="style: { overflow: 'auto' }">
         <div class="global-search-close-preview"><a class="pointer inactive-action" data-bind="click: function () { $parent.selectedIndex(undefined); }"><i class="fa fa-fw fa-times"></i></a></div>
         <!-- ko switch: type -->
           <!-- ko case: ['database', 'document', 'field', 'table', 'view', 'partition']  -->

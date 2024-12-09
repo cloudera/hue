@@ -38,7 +38,8 @@ const TEMPLATE = `
     <div class="assist-flex-panel">
       <div class="assist-flex-header">
         <div class="assist-inner-header">
-          <div class="function-dialect-dropdown" style="display: inline-block" data-bind="
+          <div class="function-dialect-dropdown" data-bind="
+              style: { display: 'inline-block' },
               component: {
                 name: '${ HUE_DROP_DOWN_COMPONENT }',
                 params: {
@@ -49,7 +50,7 @@ const TEMPLATE = `
                  }
               }
             "></div>
-            <div class="pull-right" style="margin-right: 15px;" data-bind="with: activeConnectorUdfs">
+            <div class="pull-right" data-bind="style: { marginRight: '15px' }, with: activeConnectorUdfs">
                <!-- ko ifnot: loading -->
                  <a class="inactive-action" href="javascript:void(0)" data-bind="click: refresh" title="${I18n('Refresh')}">
                    <i class="pointer fa fa-refresh"></i>

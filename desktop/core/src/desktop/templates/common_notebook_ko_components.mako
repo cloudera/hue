@@ -34,11 +34,11 @@ from desktop.lib.django_util import nonce_attribute
 
 <%def name="addSnippetMenu()">
   <script type="text/html" id="add-snippet-menu-template">
-    <div class="add-snippet-button" style="position:relative; width:65px; text-align: center;">
+    <div class="add-snippet-button" data-bind="style: { position: 'relative', width: '65px', textAlign: 'center' }">
       <i class="pointer fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }" data-bind="click: addLastUsedSnippet, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }"></i>
       <div class="select-snippet-button" title="${ _('Select snippet') }" data-bind="fadeVisible: { value: hasAdditionalSnippets && showingSelectSnippet(), fadeOut: true }, click: showSnippetModal, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }">...</div>
       <div class="all-alternatives" data-bind="foreach: snippetHistory">
-        <div class="add-snippet-alt pointer" style="display:none;" data-bind="
+        <div class="add-snippet-alt pointer" data-bind="style: { display: 'none' },
             event: { 'mouseenter': $parent.showHistory, 'mouseleave': $parent.hideHistory },
             fadeVisible: { value: $parent.showingHistory(), fadeOut: true, speed: 'slow' },
             style: { 'left': $parent.positions[$index()].left, 'top': $parent.positions[$index()].top },
@@ -53,15 +53,15 @@ from desktop.lib.django_util import nonce_attribute
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${ _('Add Snippet') }</h2>
       </div>
-      <div class="modal-body" style="min-height: 100px">
+      <div class="modal-body" data-bind="style: { minHeight: '100px' }">
         <ul class="snippet-list-alts" data-bind="foreach: availableSnippets">
           <li data-bind="click: function() { $parent.addNewSnippet($data) }">
-            <div style="width: 30px; display:inline-block;">
+            <div data-bind="style: { width: '30px', display: 'inline-block' }">
             <!-- ko if: $root.getSnippetViewSettings(type()).snippetImage -->
             <img class="snippet-icon" data-bind="attr: { 'src': $root.getSnippetViewSettings(type()).snippetImage }"  alt="${ _('Snippet icon') }">
             <!-- /ko -->
             <!-- ko if: $root.getSnippetViewSettings(type()).snippetIcon -->
-            <i style="margin-left: 2px; color: #0B7FAD;" class="fa snippet-icon" data-bind="css: $root.getSnippetViewSettings(type()).snippetIcon"></i>
+            <i data-bind="style: { marginLeft: '2px', color: '#0B7FAD' }, css: $root.getSnippetViewSettings(type()).snippetIcon" class="fa snippet-icon">
             <!-- /ko -->
             </div>
             <span data-bind="text: name"></span>
@@ -160,15 +160,15 @@ from desktop.lib.django_util import nonce_attribute
 
 <%def name="downloadSnippetResults()">
   <script type="text/html" id="download-results-template">
-    <form method="POST" class="download-form" style="display: inline" data-bind="attr: { action: window.HUE_BASE_URL + '${ url('notebook:download') }' }">
+    <form method="POST" class="download-form" data-bind="style: { display: 'inline' }, attr: { action: window.HUE_BASE_URL + '${ url('notebook:download') }' }">
       ${ csrf_token(request) | n,unicode }
       <input type="hidden" name="notebook"/>
       <input type="hidden" name="snippet"/>
       <input type="hidden" name="format"/>
     </form>
 
-    <div class="hover-dropdown" data-bind="visible: snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
-      <a class="inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown" title="${ _('Export results') }" data-bind="css: {'grid-side-btn': gridSideBtn, 'snippet-side-btn': !gridSideBtn()}">
+    <div class="hover-dropdown" data-bind="visible: snippet.result.hasSomeResults() && snippet.result.type() == 'table', style: { display: 'none' }">
+      <a class="inactive-action dropdown-toggle pointer" data-toggle="dropdown" title="${ _('Export results') }" data-bind="style: { paddingRight: '0' }, css: {'grid-side-btn': gridSideBtn, 'snippet-side-btn': !gridSideBtn()}">
         <!-- ko ifnot: isDownloading -->
         <i class="fa fa-fw fa-download"></i>
         <!-- /ko -->
@@ -177,7 +177,7 @@ from desktop.lib.django_util import nonce_attribute
         <i class="fa fa-fw fa-spinner fa-spin"></i>
         <!-- /ko -->
       </a>
-      <ul class="dropdown-menu less-padding" style="z-index: 1040">
+      <ul class="dropdown-menu less-padding" data-bind="style: { zIndex: 1040 }">
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }"
           % if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 and hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
@@ -241,7 +241,7 @@ from desktop.lib.django_util import nonce_attribute
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Export the query result in a')} </h2>
       </div>
-      <div class="modal-body" style="padding-left: 30px">
+      <div class="modal-body" data-bind="style: { paddingLeft: '30px' }">
         <form method="POST" class="form form-inline">
           ${ csrf_token(request) | n,unicode }
           <fieldset>
@@ -251,7 +251,7 @@ from desktop.lib.django_util import nonce_attribute
               <div class="controls">
                  <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
-                  <span style="width: 190px; overflow: hidden; text-overflow: ellipsis; display: inline-block; white-space: nowrap;">
+                  <span data-bind="style: { width: '190px', overflow: 'hidden', textOverflow: 'ellipsis', display: 'inline-block', whiteSpace: 'nowrap' }">
                   &nbsp;
                   % if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 and hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
                     ${ _('First %s rows or %s MB') % ( DOWNLOAD_ROW_LIMIT.get(), (DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024) ) }
@@ -280,7 +280,7 @@ from desktop.lib.django_util import nonce_attribute
                 <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10 input-xlarge">
                 </div>
-                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save the complete result as TSV") }', placement: 'top' }" style="padding: 8px">
+                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save the complete result as TSV") }', placement: 'top' }, style: { padding: '8px' }">
                   <i class="fa fa-fw fa-question-circle muted"></i>
                 </div>
               </div>
@@ -574,7 +574,7 @@ from desktop.lib.django_util import nonce_attribute
         </ul>
       </div>
       <div class="tab-content">
-        <div class="tab-pane" id="help-editor-shortcut" style="min-height: 500px">
+        <div class="tab-pane" id="help-editor-shortcut" data-bind="style: { minHeight: '500px' }">
           <input class="clearable pull-right margin-right-5" type="text" placeholder="${ _('Search...')}" data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
           <div class="clearfix"></div>
           <!-- ko ifnot: query -->
@@ -593,9 +593,9 @@ from desktop.lib.django_util import nonce_attribute
                 </thead>
                 <tbody data-bind="foreach: shortcuts">
                   <tr>
-                    <td data-bind="text: shortcut" style="width: 25%;"></td>
-                    <td data-bind="text: macShortcut" style="width: 25%;"></td>
-                    <td data-bind="text: description" style="width: 50%;"></td>
+                    <td data-bind="text: shortcut, style: { width: '25%' }"></td>
+                    <td data-bind="text: macShortcut, style: { width: '25%' }"></td>
+                    <td data-bind="text: description, style: { width: '50%' }"></td>
                   </tr>
                 </tbody>
               </table>
@@ -619,9 +619,9 @@ from desktop.lib.django_util import nonce_attribute
                 </thead>
                 <tbody data-bind="foreach: filteredShortcuts">
                 <tr>
-                  <td data-bind="text: shortcut" style="width: 25%;"></td>
-                  <td data-bind="text: macShortcut" style="width: 25%;"></td>
-                  <td data-bind="text: description" style="width: 50%;"></td>
+                  <td data-bind="text: shortcut, style: { width: '25%' }"></td>
+                  <td data-bind="text: macShortcut, style: { width: '25%' }"></td>
+                  <td data-bind="text: description, style: { width: '50%' }"></td>
                 </tr>
                 </tbody>
               </table>

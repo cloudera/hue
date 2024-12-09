@@ -13615,7 +13615,7 @@ var Marker = function(parentEl) {
         extraStyle = extraStyle || "";
 
         stringBuilder.push(
-            "<div class='", clazz, " ace_br1 ace_start' style='",
+            "<div class='", clazz, " ace_br1 ace_start' data-style='",
             "height:", height, "px;",
             "right:0;",
             "top:", top, "px;",
@@ -13625,7 +13625,7 @@ var Marker = function(parentEl) {
         var width = range.end.column * config.characterWidth;
 
         stringBuilder.push(
-            "<div class='", clazz, " ace_br12' style='",
+            "<div class='", clazz, " ace_br12' data-style='",
             "height:", height, "px;",
             "width:", width, "px;",
             "top:", top, "px;",
@@ -13639,7 +13639,7 @@ var Marker = function(parentEl) {
         var radiusClass = (range.start.column ? 1 : 0) | (range.end.column ? 0 : 8);
 
         stringBuilder.push(
-            "<div class='", clazz, (radiusClass ? " ace_br" + radiusClass : ""), "' style='",
+            "<div class='", clazz, (radiusClass ? " ace_br" + radiusClass : ""), "' data-style='",
             "height:", height, "px;",
             "right:0;",
             "top:", top, "px;",
@@ -13654,7 +13654,7 @@ var Marker = function(parentEl) {
         var left = this.$padding + range.start.column * config.characterWidth;
 
         stringBuilder.push(
-            "<div class='", clazz, "' style='",
+            "<div class='", clazz, "' data-style='",
             "height:", height, "px;",
             "width:", width, "px;",
             "top:", top, "px;",
@@ -13669,7 +13669,7 @@ var Marker = function(parentEl) {
             height += this.$getTop(range.end.row, config) - top;
 
         stringBuilder.push(
-            "<div class='", clazz, "' style='",
+            "<div class='", clazz, "' data-style='",
             "height:", height, "px;",
             "top:", top, "px;",
             "left:0;right:0;", extraStyle || "", "'></div>"
@@ -13681,7 +13681,7 @@ var Marker = function(parentEl) {
         var height = config.lineHeight;
 
         stringBuilder.push(
-            "<div class='", clazz, "' style='",
+            "<div class='", clazz, "' data-style='",
             "height:", height, "px;",
             "top:", top, "px;",
             "left:0;right:0;", extraStyle || "", "'></div>"
@@ -13961,7 +13961,7 @@ var Text = function(parentEl) {
                 break;
 
             if (this.$useLineGroups())
-                html.push("<div class='ace_line_group' style='height:", config.lineHeight*this.session.getRowLength(row), "px'>")
+                html.push("<div class='ace_line_group' data-style='height:", config.lineHeight*this.session.getRowLength(row), "px'>")
 
             this.$renderLine(html, row, false, row == foldStart ? foldLine : false);
 
@@ -14004,14 +14004,14 @@ var Text = function(parentEl) {
                 var classToUse = self.showInvisibles ? "ace_cjk ace_invisible ace_invisible_space" : "ace_cjk";
                 var space = self.showInvisibles ? self.SPACE_CHAR : "";
                 screenColumn += 1;
-                return "<span class='" + classToUse + "' style='width:" +
+                return "<span class='" + classToUse + "' data-style='width:" +
                     (self.config.characterWidth * 2) +
                     "px'>" + space + "</span>";
             } else if (b) {
                 return "<span class='ace_invisible ace_invisible_space ace_invalid'>" + self.SPACE_CHAR + "</span>";
             } else {
                 screenColumn += 1;
-                return "<span class='ace_cjk' style='width:" +
+                return "<span class='ace_cjk' data-style='width:" +
                     (self.config.characterWidth * 2) +
                     "px'>" + c + "</span>";
             }
@@ -14023,7 +14023,7 @@ var Text = function(parentEl) {
             var classes = "ace_" + token.type.replace(/\./g, " ace_");
             var style = "";
             if (token.type == "fold")
-                style = " style='width:" + (token.value.length * this.config.characterWidth) + "px;' ";
+                style = " data-style='width:" + (token.value.length * this.config.characterWidth) + "px;' ";
             stringBuilder.push("<span class='", classes, "'", style, ">", output, "</span>");
         }
         else {
@@ -14078,7 +14078,7 @@ var Text = function(parentEl) {
 
                     if (!onlyContents) {
                         stringBuilder.push("</div>",
-                            "<div class='ace_line' style='height:",
+                            "<div class='ace_line' data-style='height:",
                             this.config.lineHeight, "px'>"
                         );
                     }
@@ -14125,7 +14125,7 @@ var Text = function(parentEl) {
 
         if (!onlyContents) {
             stringBuilder.push(
-                "<div class='ace_line' style='height:", 
+                "<div class='ace_line' data-style='height:", 
                     this.config.lineHeight * (
                         this.$useLineGroups() ? 1 :this.session.getRowLength(row)
                     ), "px'>"

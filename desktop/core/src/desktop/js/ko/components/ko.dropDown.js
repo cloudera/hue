@@ -42,7 +42,7 @@ const TEMPLATE = `
   <i class="fa fa-caret-down"></i>
   <!-- /ko -->
   <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition, 'hue-drop-down-container-searchable': searchable }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }">
-    <div style="overflow-y: auto;" class="dropdown-menu" data-bind="visible: filteredEntries().length > 0">
+  <div class="dropdown-menu" data-bind="style: { overflowY: 'auto' }, visible: filteredEntries().length > 0">  
       <!-- ko if: foreachVisible -->
       <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
         <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider -->

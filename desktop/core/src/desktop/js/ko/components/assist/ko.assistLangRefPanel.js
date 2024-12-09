@@ -34,7 +34,7 @@ const TEMPLATE = `
     <ul class="assist-docs-topic-tree " data-bind="foreach: $data">
       <li>
         <a class="black-link" href="javascript: void(0);" data-bind="click: function () { $component.selectedTopic($data); }, toggle: open">
-          <i class="fa fa-fw" style="font-size: 12px;" data-bind="css: { 'fa-chevron-right': children.length && !open(), 'fa-chevron-down': children.length && open() }"></i>
+        <i class="fa fa-fw" data-bind="style: { fontSize: '12px' }, css: { 'fa-chevron-right': children.length && !open(), 'fa-chevron-down': children.length && open() }"></i>
           <span class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $component.selectedTopic() === $data }, text: title"></span>
         </a>
         <!-- ko if: open -->
@@ -49,9 +49,9 @@ const TEMPLATE = `
     <div class="assist-flex-panel">
       <div class="assist-flex-header">
         <div class="assist-inner-header">
-          <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: activeDialect, entries: availableDialects, linkTitle: '${I18n(
+          <div class="function-dialect-dropdown" data-bind="style: { display: 'inline-block' }, component: { name: 'hue-drop-down', params: { fixedPosition: true, value: activeDialect, entries: availableDialects, linkTitle: '${I18n(
             'Selected dialect'
-          )}' } }" style="display: inline-block"></div>
+          )}' } }"></div>
         </div>
       </div>
       <div class="assist-flex-search">

@@ -127,16 +127,16 @@ ko.bindingHandlers.highlight = {
           });
 
           element.innerHTML =
-            '<div class="ace_editor ace-hue"' +
-            (options.enableOverflow ? ' style="overflow: initial !important;"' : '') +
-            '><div class="ace_layer" style="position: static;' +
-            (options.enableOverflow ? ' overflow: initial !important;' : '') +
-            '">' +
-            res.join('') +
-            '</div></div>';
-          if (options.enableOverflow) {
-            $(element).css({ overflow: 'auto' });
-          }
+          '<div class="ace_editor ace-hue' + 
+          (options.enableOverflow ? ' ace-hue-overflow' : '') +
+          '"><div class="ace_layer ace-layer-static' +
+          (options.enableOverflow ? ' ace-hue-overflow' : '') +
+          '">' +
+          res.join('') +
+          '</div></div>';
+        if (options.enableOverflow) {
+          $(element).addClass('ace-hue-overflow');
+        }
           $(element).find('.ace_invisible_space').remove();
         }
       );

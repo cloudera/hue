@@ -368,6 +368,21 @@ class OnePageViewModel {
       loadAppTimeout = window.setTimeout(() => {
         self.loadAppThrottled(app, loadDeep);
       }, 0);
+
+      window.setTimeout(() => {
+        var elementsWithDataStyle = document.querySelectorAll('[data-style]');
+        console.log(elementsWithDataStyle);
+        elementsWithDataStyle.forEach(function(element) {
+            var styleAttributes = element.getAttribute('data-style');
+            var styles = styleAttributes.split(';').filter(function(style) { return style.trim() !== ''; });
+            styles.forEach(function(style) {
+                var styleProperty = style.split(':')[0].trim();
+                var styleValue = style.split(':')[1].trim();
+                element.style[styleProperty] = styleValue;
+            });
+        });
+      }, 300)
+
     };
 
     self.loadAppThrottled = (app, loadDeep) => {

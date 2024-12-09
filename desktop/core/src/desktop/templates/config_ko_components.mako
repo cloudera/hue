@@ -28,7 +28,7 @@ from desktop.lib.django_util import nonce_attribute
 
 <%def name="config()">
 
-  <style>
+  <style ${nonce_attribute(request)}>
     .config-property {
       display: block;
       vertical-align: top;
@@ -97,7 +97,7 @@ from desktop.lib.django_util import nonce_attribute
     <!-- /ko -->
     <div class="config-property-available margin-left-10" data-bind="visible: availableProperties().length > 0">
       <select data-bind="options: availableProperties, optionsText: 'nice_name', optionsCaption: '${_ko('Add a property...')}', value: propertyToAdd"></select>
-      <div style="display: inline-block; vertical-align: top; margin-top: 6px; margin-left: 6px;">
+      <div data-bind="style: { display: 'inline-block', verticalAlign: 'top', marginTop: '6px', marginLeft: '6px' }">
         <a class="inactive-action pointer" data-bind="click: addProperty, visible: propertyToAdd() != null">
           <i class="fa fa-plus"></i>
         </a>
@@ -106,9 +106,9 @@ from desktop.lib.django_util import nonce_attribute
   </script>
 
   <script type="text/html" id="multi-group-selector-template">
-    <div class="jHueSelector" style="position: relative;" data-bind="style: { 'width': width + 'px' }">
+    <div class="jHueSelector" data-bind="style: { position: 'relative', width: width + 'px' }">
       <div class="jHueSelectorHeader" data-bind="style: { 'width': (width-8) + 'px' }">
-        <input style="float:right;position: relative; margin: 0;" type="text" placeholder="${_('Search')}" data-bind="textInput: searchQuery">
+        <input type="text" placeholder="${_('Search')}" data-bind="style: { float: 'right', position: 'relative', margin: 0 }, textInput: searchQuery">
         <label><input type="checkbox" data-bind="checked: allSelected">${_('Select all')}</label>
       </div>
       <div class="jHueSelectorBody" data-bind="style: { 'height': (height - 33) + 'px' }">
@@ -318,7 +318,7 @@ from desktop.lib.django_util import nonce_attribute
 
   <script type="text/html" id="property-string">
     <!-- ko if: typeof property !== 'undefined' && typeof property.options !== 'undefined' && property.options().length > 0 -->
-    <div class="selectize-wrapper" style="min-width: 200px;">
+    <div class="selectize-wrapper" data-bind="style: { minWidth: '200px' }">
       <select placeholder="${ _('Key') }" data-bind="selectize: $.map($parent.options(), function (option) { return { value: option } }), value: value, options: $.map($parent.options(), function (option) { return { value: option } }), optionsText: 'value', optionsValue: 'value'"></select>
     </div>
     <!-- /ko -->
@@ -353,7 +353,7 @@ from desktop.lib.django_util import nonce_attribute
 
   <script type="text/html" id="property-hdfs-file">
     <div class="input-append">
-      <input type="text" style="min-width: 300px" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true}, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue') }"/>
+      <input type="text" class="filechooser-input" data-bind="style: { minWidth: '300px' }, value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true}, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue') }"/>
     </div>
   </script>
 
@@ -403,24 +403,24 @@ from desktop.lib.django_util import nonce_attribute
 
   <script type="text/html" id="key-value-list-input-template">
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
-      <li style="clear:both;">
+      <li data-bind="style: { clear: 'both' }">
         <!-- ko if: $parent.options.length > 0 -->
-        <div class="selectize-wrapper" style="width: 200px;">
+        <div class="selectize-wrapper" data-bind="style: { width: '200px' }">
           <select placeholder="${ _('Key') }" data-bind="selectize: $parent.options, selectizeOptions: {create: true}, value: key, options: $parent.options, optionsText: 'value', optionsValue: 'value'"></select>
         </div>
         <!-- /ko -->
-        <div class="input-append" style="margin-bottom: 4px">
+        <div class="input-append" data-bind="style: { marginBottom: '4px' }">
           <!-- ko if: $parent.options.length === 0 -->
-          <input type="text" class="config-property-input-small" style="width: 182px; margin-right: 4px;" placeholder="${ _('Key') }" data-bind="textInput: key, valueUpdate: 'afterkeydown'"/>
+          <input type="text" class="config-property-input-small" placeholder="${ _('Key') }" data-bind="style: { width: '182px', marginRight: '4px' }, textInput: key, valueUpdate: 'afterkeydown'"/>
           <!-- /ko -->
-          <input type="text" class="config-property-input-mini" style="width: 182px;" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
+          <input type="text" class="config-property-input-mini" placeholder="${ _('Value') }" data-bind="style: { width: '182px' }, textInput: value, valueUpdate: 'afterkeydown'"/>
           <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
     </ul>
-    <div class="config-property-add-value" style="margin-top: 5px; float: left">
-      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+    <div class="config-property-add-value" data-bind="style: { marginTop: '5px', float: 'left' }">
+      <a class="inactive-action pointer" data-bind="style: { padding: '3px 10px 3px 3px' }, click: addValue">
         <i class="fa fa-plus"></i>
       </a>
     </div>
@@ -507,24 +507,24 @@ from desktop.lib.django_util import nonce_attribute
 
   <script type="text/html" id="name-value-list-input-template">
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
-      <li style="clear:both;">
+      <li data-bind="style: { clear: 'both' }">
         <!-- ko if: $parent.options.length > 0 -->
-        <div class="selectize-wrapper" style="min-width: 200px;">
+        <div class="selectize-wrapper" data-bind="style: { minWidth: '200px' }">
           <select placeholder="${ _('Name') }" data-bind="selectize: $parent.options, value: name, options: $parent.options, optionsText: 'value', optionsValue: 'value'"></select>
         </div>
         <!-- /ko -->
-        <div class="input-append" style="margin-bottom: 4px">
+        <div class="input-append" data-bind="style: { marginBottom: '4px' }">
           <!-- ko if: $parent.options.length === 0 -->
-          <input type="text" class="config-property-input-small" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
+          <input type="text" class="config-property-input-small" placeholder="${ _('Name') }" data-bind="style: { width: '182px', marginRight: '4px' }, textInput: name, valueUpdate: 'afterkeydown'"/>
           <!-- /ko -->
-          <input type="text" class="config-property-input-small" style="width: 182px;" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
+          <input type="text" class="config-property-input-small" placeholder="${ _('Value') }" data-bind="style: { width: '182px' }, textInput: value, valueUpdate: 'afterkeydown'"/>
           <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
     </ul>
-    <div class="config-property-add-value" style="margin-top: 5px;">
-      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+    <div class="config-property-add-value" data-bind="style: { marginTop: '5px' }">
+    <a class="inactive-action pointer" data-bind="style: { padding: '3px 10px 3px 3px' }, click: addValue">
         <i class="fa fa-plus"></i>
       </a>
     </div>
@@ -580,16 +580,16 @@ from desktop.lib.django_util import nonce_attribute
   <script type="text/html" id="function-list-input-template">
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li>
-        <div class="input-append" style="margin-bottom: 4px">
-          <input type="text" class="config-property-input-small" style="width: 182px; margin-right: 4px;" placeholder="${ _('Name, e.g. foo') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
-          <input type="text" class="config-property-input-small" style="width: 150px" placeholder="${ _('Class, e.g. org.hue.Bar') }" data-bind="textInput: class_name, valueUpdate: 'afterkeydown'"/>
+        <div class="input-append" data-bind="style: { marginBottom: '4px' }">
+          <input type="text" class="config-property-input-small" placeholder="${ _('Name, e.g. foo') }" data-bind="style: { width: '182px', marginRight: '4px' }, textInput: name, valueUpdate: 'afterkeydown'"/>
+          <input type="text" class="config-property-input-small" placeholder="${ _('Class, e.g. org.hue.Bar') }" data-bind="style: { width: '150px' }, textInput: class_name, valueUpdate: 'afterkeydown'"/>
           <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
     </ul>
-    <div class="config-property-add-value" style="margin-top: 5px;">
-      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+    <div class="config-property-add-value" data-bind="style: { marginTop: '5px' }">
+      <a class="inactive-action pointer" data-bind="style: { padding: '3px 10px 3px 3px' }, click: addValue">
         <i class="fa fa-plus"></i>
       </a>
     </div>
@@ -635,15 +635,15 @@ from desktop.lib.django_util import nonce_attribute
   <script type="text/html" id="hdfs-file-list-input-template">
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li>
-        <div class="input-append" style="margin-bottom: 4px">
+        <div class="input-append" data-bind="style: { marginBottom: '4px' }">
           <input type="text" class="filechooser-input input-xxlarge" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
           <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
       </li>
     </ul>
-    <div class="config-property-add-value" style="margin-top: 5px;">
-      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+    <div class="config-property-add-value" data-bind="style: { marginTop: '5px' }">
+      <a class="inactive-action pointer" data-bind="style: { padding: '3px 10px 3px 3px' }, click: addValue">
         <i class="fa fa-plus"></i>
       </a>
     </div>
@@ -711,7 +711,7 @@ from desktop.lib.django_util import nonce_attribute
 
   <script type="text/html" id="csv-list-input-template">
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
-      <li style="margin-bottom: 4px">
+      <li data-bind="style: { marginBottom: '4px' }">
         <div class="input-append">
           <!-- ko ifnot: $parent.inputTemplate -->
           <input type="text" data-bind="textInput: value, valueUpdate: 'afterkeydown', attr: { placeholder: $parent.placeholder }"/>
@@ -722,8 +722,8 @@ from desktop.lib.django_util import nonce_attribute
         </div>
       </li>
     </ul>
-    <div class="config-property-add-value" style="margin-top: 5px;">
-      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+    <div class="config-property-add-value" data-bind="style: { marginTop: '5px' }">
+      <a class="inactive-action pointer" data-bind="style: { padding: '3px 10px 3px 3px' }, click: addValue">
         <i class="fa fa-plus"></i>
       </a>
     </div>
