@@ -29,8 +29,8 @@ djangorestframework-simplejwt==5.2.0
 djangorestframework==3.12.2
 future==0.18.3
 gcs-oauth2-boto-plugin==3.0
-greenlet==2.0.2
-gunicorn==19.9.0
+greenlet==3.1.1
+gunicorn==23.0.0
 ipython==8.12.2  # Python >= 3.8
 jaeger-client==4.3.0
 jdcal==1.0.1
@@ -80,7 +80,5 @@ drf-spectacular[sidecar]==0.27.2
 -e file://${ROOT}/desktop/core/ext-py3/boto-2.49.0
 -e file://${ROOT}/desktop/core/ext-py3/django-axes-5.13.0
 -e file://${ROOT}/desktop/core/ext-py3/djangosaml2-0.18.0
--e file://${ROOT}/desktop/core/ext-py3/dnspython-1.16.0  # Required for eventlet==0.30.2 and python3.10
--e file://${ROOT}/desktop/core/ext-py3/eventlet-0.30.2
 -e file://${ROOT}/desktop/core/ext-py3/pysaml2-7.3.1
 -e file://${ROOT}/desktop/core/ext-py3/python-sasl-0.3.1
