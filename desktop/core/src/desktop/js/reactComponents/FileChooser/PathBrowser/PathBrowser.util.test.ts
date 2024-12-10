@@ -23,7 +23,7 @@ describe('PathBrowser utils', () => {
       const result = getFileSystemAndPath(path);
 
       expect(result).toEqual({
-        fileSystem: '',
+        fileSystem: 'hdfs',
         path: '/test/folder'
       });
     });
@@ -53,7 +53,7 @@ describe('PathBrowser utils', () => {
       const result = getFileSystemAndPath(path);
 
       expect(result).toEqual({
-        fileSystem: '',
+        fileSystem: 'hdfs',
         path: ''
       });
     });
@@ -62,7 +62,7 @@ describe('PathBrowser utils', () => {
   describe('getBreadcrumbs', () => {
     it('should construct breadcrumbs for an HDFS path', () => {
       const hdfsPath = '/test/folder';
-      const result = getBreadcrumbs('', hdfsPath);
+      const result = getBreadcrumbs('hdfs', hdfsPath);
 
       expect(result).toEqual([
         { url: '/', label: '/' },
@@ -84,7 +84,7 @@ describe('PathBrowser utils', () => {
 
     it('should handle paths with a trailing slash correctly', () => {
       const pathWithTrailingSlash = '/folder/with/trailing/slash/';
-      const result = getBreadcrumbs('', pathWithTrailingSlash);
+      const result = getBreadcrumbs('hdfs', pathWithTrailingSlash);
 
       expect(result).toEqual([
         { url: '/', label: '/' },
@@ -97,7 +97,7 @@ describe('PathBrowser utils', () => {
 
     it('should handle paths that start with a leading slash with HDFS file system', () => {
       const pathWithLeadingSlash = '/path/to/file';
-      const result = getBreadcrumbs('', pathWithLeadingSlash);
+      const result = getBreadcrumbs('hdfs', pathWithLeadingSlash);
 
       expect(result).toEqual([
         { url: '/', label: '/' },

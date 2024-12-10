@@ -30,7 +30,7 @@ export const getFileSystemAndPath = (
     };
   }
   return {
-    fileSystem: '',
+    fileSystem: 'hdfs',
     path: filePath
   };
 };
@@ -39,8 +39,8 @@ export const getBreadcrumbs = (fileSystem: string, path: string): BreadcrumbData
   const urlFromPath = new URL(`file:///${path}`);
   const pathParts = urlFromPath.pathname.split('/').filter(Boolean);
 
-  const rootUrl = fileSystem === '' ? '/' : `${fileSystem}://`;
-  const rootlabel = fileSystem === '' ? '/' : fileSystem;
+  const rootUrl = fileSystem === 'hdfs' ? '/' : `${fileSystem}://`;
+  const rootlabel = fileSystem === 'hdfs' ? '/' : fileSystem;
   const rootNode = {
     url: rootUrl,
     label: rootlabel

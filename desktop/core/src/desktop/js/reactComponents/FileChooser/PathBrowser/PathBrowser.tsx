@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef, useEffect, useState, RefObject, useMemo } from 'react';
+import React, { useRef, useEffect, useState, RefObject } from 'react';
 import { Input, Dropdown } from 'antd';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
@@ -50,14 +50,13 @@ const PathBrowser = ({
   const [isEditMode, setIsEditMode] = useState(false);
 
   const icons = {
-    //hdfs file system begins with the first breadcrumb as "/" (ex: /user/demo)
-    '/': <HdfsIcon />,
+    hdfs: <HdfsIcon />,
     abfs: <AdlsIcon />,
     s3: <S3Icon />
   };
 
-  const { fileSystem, path } = useMemo(() => getFileSystemAndPath(filePath), [filePath]);
-  const breadcrumbs = useMemo(() => getBreadcrumbs(fileSystem, path), [fileSystem, path]);
+  const { fileSystem, path } = getFileSystemAndPath(filePath);
+  const breadcrumbs = getBreadcrumbs(fileSystem, path);
 
   const useOutsideAlerter = (ref: RefObject<HTMLDivElement>) => {
     useEffect(() => {
@@ -77,8 +76,8 @@ const PathBrowser = ({
     }, []);
   };
 
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  useOutsideAlerter(wrapperRef);
+  const breadcrumbInputRef = useRef<HTMLDivElement>(null);
+  useOutsideAlerter(breadcrumbInputRef);
 
   const extractMenuItems = (breadcrumbMenu: BreadcrumbData[]) => {
     const menu: MenuItemType[] = breadcrumbMenu.map(breadcrumb => {
@@ -94,10 +93,10 @@ const PathBrowser = ({
   if (breadcrumbs) {
     if (isEditMode) {
       return (
-        <div ref={wrapperRef}>
+        <div ref={breadcrumbInputRef}>
           <Input
             prefix={showIcon ? icons[fileSystem] : <span />}
-            defaultValue={decodeURIComponent(breadcrumbs[breadcrumbs.length - 1].url)}
+            defaultValue={filePath}
             onPressEnter={customPath => {
               onFilepathChange((customPath.target as HTMLInputElement).value);
             }}
@@ -126,7 +125,7 @@ const PathBrowser = ({
                 <React.Fragment key={item.url + index}>
                   <Breadcrumb
                     key={item.url}
-                    label={index === 0 ? fileSystem : item.label}
+                    label={item.label}
                     url={item.url}
                     onFilepathChange={onFilepathChange}
                   />
