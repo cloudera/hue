@@ -180,7 +180,7 @@ GUNICORN_WORKER_CLASS = Config(
   key="gunicorn_work_class",
   help=_("Gunicorn work class: gevent or evenlet, gthread or sync."),
   type=str,
-  default="eventlet")
+  default="gthread")
 
 GUNICORN_NUMBER_OF_WORKERS = Config(
   key="gunicorn_number_of_workers",
