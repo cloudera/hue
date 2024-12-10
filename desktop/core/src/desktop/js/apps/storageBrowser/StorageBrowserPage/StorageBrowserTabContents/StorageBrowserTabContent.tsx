@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Spin } from 'antd';
 
 import { i18nReact } from '../../../../utils/i18nReact';
@@ -43,7 +43,7 @@ const StorageBrowserTabContent = ({
   testId
 }: StorageBrowserTabContentProps): JSX.Element => {
   const [filePath, setFilePath] = useState<string>(homeDir);
-  const fileName = useMemo(() => filePath?.split('/').pop() ?? '', [filePath]);
+  const fileName = filePath?.split('/')?.pop() ?? '';
 
   const { t } = i18nReact.useTranslation();
 

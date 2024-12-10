@@ -118,7 +118,7 @@ const StorageBrowserTable = ({
       user: file.user,
       group: file.group,
       permission: file.rwx,
-      mtime: file?.mtime ? formatTimestamp(new Date(Number(file.mtime) * 1000)) : '-',
+      mtime: file?.mtime ? formatTimestamp(new Date(file.mtime * 1000)) : '-',
       type: file.type,
       path: file.path
     }));
