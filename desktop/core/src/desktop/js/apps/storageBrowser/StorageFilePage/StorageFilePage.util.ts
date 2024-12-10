@@ -53,7 +53,7 @@ export const getFileMetaData = (t: TFunction, fileStats: FileStats): MetaData[][
       {
         name: 'mtime',
         label: t('Last Modified'),
-        value: fileStats.mtime ? formatTimestamp(new Date(Number(fileStats.mtime) * 1000)) : '-'
+        value: fileStats.mtime ? formatTimestamp(new Date(fileStats.mtime * 1000)) : '-'
       }
     ]
   ];
