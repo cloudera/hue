@@ -94,11 +94,9 @@ jobs:
 
     - name: run documentation lints
       run: |
-        # Installs to move to image building
-        curl -O https://dl.google.com/go/go1.17.linux-amd64.tar.gz
-        tar -xvf go1.17.linux-amd64.tar.gz
-        export GO111MODULE=on
-        go/bin/go get -u github.com/raviqqe/muffet@v1.5.7
+        curl -O https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz
+        tar -xvf go1.23.4.linux-amd64.tar.gz
+        go/bin/go install github.com/raviqqe/muffet/v2@latest
 
         curl --output hugo_0.69.0_Linux.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-64bit.tar.gz
         tar -xvf hugo_0.69.0_Linux.tar.gz
