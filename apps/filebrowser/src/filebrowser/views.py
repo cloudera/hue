@@ -17,6 +17,9 @@
 
 import io
 import os
+import json
+from django.utils.html import mark_safe
+from django.urls import reverse
 import re
 import sys
 import stat as stat_module
@@ -673,6 +676,10 @@ def listdir_paged(request, path):
       's3_listing_not_allowed': s3_listing_not_allowed
   }
 
+  if ENABLE_NEW_STORAGE_BROWSER.get():
+    return render('storage_browser.mako', request, data)
+  options_json = json.dumps(data)
+  data['options_json'] = options_json
   return render('listdir.mako', request, data)
 
 
