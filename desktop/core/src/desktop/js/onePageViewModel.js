@@ -191,6 +191,21 @@ class OnePageViewModel {
       $el.remove();
     };
 
+    const loadScript_nonce = function (scriptSrc) {
+      return $.Deferred(defer => {
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = scriptSrc;
+        script.onload = script.onerror = function () {
+          // Clean up
+          document.body.removeChild(script);
+          defer.resolve();
+        };
+        document.body.appendChild(script);
+      }).promise();
+    };
+
+
     // Only load CSS and JS files that are not loaded before
     self.processHeaders = function (response) {
       const promise = $.Deferred();
@@ -309,12 +324,42 @@ class OnePageViewModel {
       return promise;
     };
 
+
+    self.processHeadersSecure = function (response) {
+      const promise = $.Deferred();
+      const $rawHtml = $('<span>').html(response);
+    
+      // Since we're not executing scripts here, we simply collect them
+      const $allScripts = $rawHtml.find('script[src]');
+      const scriptsToLoad = $allScripts.map(function () {
+        return $(this).attr('src');
+      }).toArray();
+      
+      // Remove the script elements to avoid duplicating them when $rawHtml is inserted into the document
+      $allScripts.remove();
+    
+      // Process other elements (link, a, etc.)
+      $rawHtml.find('link[href]').each(function () {
+        addGlobalCss($(this)); // Also removes the element
+      });
+      
+      $rawHtml.find('a[href]').each(function () {
+        let link = $(this).attr('href');
+        if (link.startsWith('/') && !link.startsWith('/hue')) {
+          link = window.HUE_BASE_URL + '/hue' + link;
+        }
+        $(this).attr('href', link);
+      });
+    
+      // Pass the array of script sources along with $rawHtml to the calling code
+      promise.resolve({ $rawHtml: $rawHtml, scriptsToLoad: scriptsToLoad });
+    
+      return promise;
+    };
+
+
     function isSecurePageEnabled(path = window.location.pathname) {
-      if (!window.NONCE_ENABLED) {
-        return false;
-      }
-      const nonce_enabled = ['editor'].some(text => path.includes(text));
-      return nonce_enabled;
+      return window.NONCE_ENABLED
     }
 
     huePubSub.subscribe('hue4.process.headers', opts => {
@@ -431,17 +476,37 @@ class OnePageViewModel {
               window.clearAppIntervals(app);
               huePubSub.clearAppSubscribers(app);
               self.extraEmbeddableURLParams('');
+              const currentPath = window.location.pathname; // Retrieve the current path from the window location
 
-              self.processHeaders(response).done($rawHtml => {
-                if (window.SKIP_CACHE.indexOf(app) === -1) {
-                  self.embeddable_cache[app] = $rawHtml;
-                }
-                $('#embeddable_' + app).html($rawHtml);
-                huePubSub.publish('app.dom.loaded', app);
-                window.setTimeout(() => {
-                  self.isLoadingEmbeddable(false);
-                }, 0);
-              });
+              const inlineScriptsUrls = ['oozie/editor', 'hbase', 'security/hive', 'logs', 'admin_wizard', 'useradmin/users/', 'about'].some(segment => currentPath.includes(segment));
+
+              if (inlineScriptsUrls) {
+                self.processHeaders(response).done($rawHtml => {
+                  if (window.SKIP_CACHE.indexOf(app) === -1) {
+                    self.embeddable_cache[app] = $rawHtml;
+                  }
+                  $('#embeddable_' + app).html($rawHtml);
+                  huePubSub.publish('app.dom.loaded', app);
+                  window.setTimeout(() => {
+                    self.isLoadingEmbeddable(false);
+                  }, 0);
+                });
+              } else {
+                self.processHeadersSecure(response).done(({ $rawHtml, scriptsToLoad }) => {
+                  if (window.SKIP_CACHE.indexOf(app) === -1) {
+                    self.embeddable_cache[app] = $rawHtml;
+                  }
+                  $('#embeddable_' + app).html($rawHtml);
+                  // Now load the scripts
+                  const loadScripts = scriptsToLoad.map(src => loadScript_nonce(src)); // Assumes loadScript_nonce is defined somewhere
+                  Promise.all(loadScripts).then(() => {
+                    huePubSub.publish('app.dom.loaded', app);
+                    window.setTimeout(() => {
+                      self.isLoadingEmbeddable(false);
+                    }, 0);
+                  });
+                });
+              }
             } else {
               if (type.indexOf('json') > -1) {
                 const presponse = JSON.parse(response);
