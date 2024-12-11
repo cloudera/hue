@@ -117,6 +117,13 @@ function redhat8_ppc_install() {
       xmlsec1-openssl \
       libss \
       ncurses-devel'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
     # NODEJS install
@@ -127,6 +134,7 @@ function redhat8_ppc_install() {
     source ~/.bashrc
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
@@ -151,6 +159,13 @@ function redhat9_ppc_install() {
       xmlsec1-openssl \
       libss \
       ncurses-devel'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
     # NODEJS install
@@ -161,6 +176,7 @@ function redhat9_ppc_install() {
     source ~/.bashrc
     # Pip modules install
     sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
@@ -188,6 +204,13 @@ function sles12_install() {
       python3-devel \
       postgresql-server-devel \
       xmlsec1 xmlsec1-devel  xmlsec1-openssl-devel'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
     sudo -- sh -c 'zypper install -y libmysqlclient-devel libmysqlclient18 libmysqld18 libmysqld-devel'
     # NODEJS 16 install
@@ -196,6 +219,7 @@ function sles12_install() {
     sudo -- sh -c 'zypper install -y npm14 nodejs16'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -220,12 +244,20 @@ function sles15_install() {
       nmap \
       postgresql-server-devel \
       xmlsec1 xmlsec1-devel  xmlsec1-openssl-devel'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
     sudo -- sh -c 'zypper install -y libmariadb-devel mariadb-client python3-mysqlclient'
     # NODEJS 18 install
     sudo -- sh -c 'zypper install -y nodejs18 npm20'
     # Pip modules install
     sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip310_bin=${pip310_bin} -- sh -c 'ln -fs ${pip310_bin} $(dirname ${pip310_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -253,6 +285,13 @@ function centos7_install() {
       unzip \
       python3-devel \
       postgresql-devel'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
     sudo -- sh -c 'curl -sSLO https://dev.mysql.com/get/mysql80-community-release-el7-11.noarch.rpm && \
         rpm -ivh mysql80-community-release-el7-11.noarch.rpm && \
@@ -277,6 +316,7 @@ function centos7_install() {
       make install'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
   fi
 }
@@ -297,6 +337,13 @@ function redhat8_install() {
       ncurses-c++-libs \
       python3-devel \
       postgresql-devel'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
     # NODEJS 20 install
@@ -304,6 +351,7 @@ function redhat8_install() {
       yum install -y nodejs'
     # Pip modules install
     sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -335,6 +383,7 @@ function redhat8_arm64_install() {
       yum install -y nodejs'
     # Pip modules install
     sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install psycopg2-binary==2.9.6'
     sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -374,6 +423,13 @@ function ubuntu18_install() {
         python3-dev \
         libpq-dev \
         zlibc'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
     # It is pre-installed
     # NODEJS 16 install
@@ -383,6 +439,7 @@ function ubuntu18_install() {
       apt -y install nodejs'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -424,6 +481,13 @@ function ubuntu20_install() {
         sudo \
         tar \
         util-linux'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
     # It is pre-installed
     # NODEJS 20 install
@@ -432,6 +496,7 @@ function ubuntu20_install() {
       apt-get install -y nodejs'
     # Pip modules install
     sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -471,6 +536,13 @@ function ubuntu22_install() {
         sudo \
         tar \
         util-linux'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
     # It is pre-installed
     # NODEJS 20 install
@@ -479,6 +551,7 @@ function ubuntu22_install() {
       apt-get install -y nodejs'
     # Pip modules install
     sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip310_bin=${pip310_bin} -- sh -c 'ln -fs ${pip310_bin} $(dirname ${pip310_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -504,6 +577,13 @@ function redhat9_install() {
       libss \
       ncurses-c++-libs \
       postgresql-devel'
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
     sudo -- sh -c 'yum install -y python3-mysqlclient'
     # NODEJS 20 install
@@ -511,6 +591,7 @@ function redhat9_install() {
       yum install -y nodejs'
     # Pip modules install
     sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
