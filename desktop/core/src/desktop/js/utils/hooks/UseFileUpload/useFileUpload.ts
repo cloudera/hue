@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import useRegularUpload from './useRegularUpload';
 import useChunkUpload from './useChunkUpload';
 import { getNewFileItems, UploadItem } from './util';
@@ -27,14 +27,13 @@ interface UseUploadQueueResponse {
 }
 
 interface UploadQueueOptions {
+  isChunkUpload?: boolean;
   onComplete: () => UploadItem[] | void;
 }
 
-const isChunkUploadEnable = true;
-
 const useFileUpload = (
   filesQueue: UploadItem[],
-  { onComplete }: UploadQueueOptions
+  { isChunkUpload = false, onComplete }: UploadQueueOptions
 ): UseUploadQueueResponse => {
   const [uploadQueue, setUploadQueue] = useState<UploadItem[]>([]);
 
@@ -66,18 +65,21 @@ const useFileUpload = (
     onComplete
   });
 
-  const onCancel = (item: UploadItem) => {
-    const queueItem = findQueueItem(item);
-    if (queueItem.status === FileUploadStatus.Pending) {
-      onStatusUpdate(item, FileUploadStatus.Canceled);
+  const onCancel = useCallback(
+    (item: UploadItem) => {
+      const queueItem = findQueueItem(item);
+      if (queueItem.status === FileUploadStatus.Pending) {
+        onStatusUpdate(item, FileUploadStatus.Canceled);
 
-      if (isChunkUploadEnable) {
-        removeFromChunkUpload(item);
-      } else {
-        removeFromRegularUpload(item);
+        if (isChunkUpload) {
+          removeFromChunkUpload(item);
+        } else {
+          removeFromRegularUpload(item);
+        }
       }
-    }
-  };
+    },
+    [isChunkUpload, onStatusUpdate, removeFromChunkUpload, removeFromRegularUpload]
+  );
 
   useEffect(() => {
     const newQueueItems = getNewFileItems(filesQueue, uploadQueue);
@@ -85,13 +87,13 @@ const useFileUpload = (
     if (newQueueItems.length > 0) {
       setUploadQueue(prev => [...prev, ...newQueueItems]);
 
-      if (isChunkUploadEnable) {
+      if (isChunkUpload) {
         addToChunkUpload(newQueueItems);
       } else {
         addToRegularUpload(newQueueItems);
       }
     }
-  }, [filesQueue, uploadQueue]);
+  }, [filesQueue, uploadQueue, isChunkUpload]);
 
   return { uploadQueue, onCancel, isLoading: isChunkLoading || isNonChunkLoading };
 };
