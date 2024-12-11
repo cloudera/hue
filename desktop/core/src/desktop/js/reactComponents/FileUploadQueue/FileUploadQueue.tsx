@@ -25,8 +25,8 @@ import StatusInProgressIcon from '@cloudera/cuix-core/icons/react/StatusInProgre
 import StatusSuccessIcon from '@cloudera/cuix-core/icons/react/StatusSuccessIcon';
 import StatusStoppedIcon from '@cloudera/cuix-core/icons/react/StatusStoppedIcon';
 import StatusErrorIcon from '@cloudera/cuix-core/icons/react/StatusErrorIcon';
-import { UploadItem } from '../../utils/hooks/UseFileUpload/util';
-import useFileUpload from '../../utils/hooks/UseFileUpload/useFileUpload';
+import { UploadItem } from '../../utils/hooks/useFileUpload/util';
+import useFileUpload from '../../utils/hooks/useFileUpload/useFileUpload';
 import { FileUploadStatus } from '../../utils/constants/storageBrowser';
 
 interface FileUploadQueueProps {

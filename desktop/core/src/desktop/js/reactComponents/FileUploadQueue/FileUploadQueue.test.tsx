@@ -19,7 +19,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import FileUploadQueue from './FileUploadQueue';
 import { FileUploadStatus } from '../../utils/constants/storageBrowser';
-import { UploadItem } from '../../utils/hooks/UseFileUpload/util';
+import { UploadItem } from '../../utils/hooks/useFileUpload/util';
 
 const mockFilesQueue: UploadItem[] = [
   {
