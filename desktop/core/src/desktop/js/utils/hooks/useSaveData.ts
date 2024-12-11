@@ -32,7 +32,7 @@ interface UseSaveData<T, U> {
   data?: T;
   loading: boolean;
   error?: Error;
-  save: (body: U, saveOption: saveOptions<T>) => void;
+  save: (body: U, saveOption?: saveOptions<T>) => void;
 }
 
 const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSaveData<T, U> => {
@@ -52,10 +52,10 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
   );
 
   const saveData = useCallback(
-    async (body: U, saveOptions: saveOptions<T>) => {
+    async (body: U, saveOptions?: saveOptions<T>) => {
       // Avoid Posting data if the skip option is true
       // or if the URL is not provided
-      const apiUrl = saveOptions.url ?? url;
+      const apiUrl = saveOptions?.url ?? url;
       if (options?.skip || !apiUrl) {
         return;
       }

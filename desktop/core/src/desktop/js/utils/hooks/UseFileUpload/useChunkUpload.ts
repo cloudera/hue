@@ -67,7 +67,8 @@ const useChunkUpload = ({
     const remainingItems = pendingItems.filter(item => {
       const status = statusMap[item.uuid];
       if (status === TaskStatus.Success || status === TaskStatus.Failure) {
-        const ItemStatus = TaskStatus.Success ? FileUploadStatus.Uploaded : FileUploadStatus.Failed;
+        const ItemStatus =
+          status === TaskStatus.Success ? FileUploadStatus.Uploaded : FileUploadStatus.Failed;
         onStatusUpdate(item, ItemStatus);
         return false;
       }
