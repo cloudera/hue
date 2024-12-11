@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import { get, post } from '../../api/utils';
 import { CancellablePromise } from '../../api/cancellablePromise';
 import { ContentSummary } from './types';
@@ -21,6 +22,9 @@ export const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 export const VIEWFILES_API_URl = '/api/v1/storage/view=';
 export const DOWNLOAD_API_URL = '/filebrowser/download=';
 export const SAVE_FILE_API_URL = '/filebrowser/save';
+export const UPLOAD_FILE_URL = '/filebrowser/upload/file';
+export const CHUNK_UPLOAD_URL = '/filebrowser/upload/chunks/file';
+export const CHUNK_UPLOAD_URL_COMPLETE = '/filebrowser/upload/complete';
 const MAKE_DIRECTORY_API_URL = '/api/v1/storage/mkdir';
 const TOUCH_API_URL = '/api/v1/storage/touch';
 const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary=';
