@@ -25,6 +25,7 @@
     width: calc(100% - 170px); // Compensate for the close button and AI icon + title in the bar
     margin-left: 120px;  // Compensate for the AI icon + title in the bar
 
+    position: relative;
 
     // Override the default toolbar button styles
     .hue-toolbar-button {
@@ -51,6 +52,17 @@
 
       &:not([disabled]):hover {
         color: vars.$fluidx-blue-600;
+      }
+    }
+
+    .hue-ai-assist-settings-button {
+      position: absolute;
+      right: -40px;
+      top: 5px;
+      height: 30px;
+
+      button {
+        font-size: large;
       }
     }
   }

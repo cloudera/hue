@@ -24,7 +24,6 @@ import HideIcon from '@cloudera/cuix-core/icons/react/HideIcon';
 import ViewIcon from '@cloudera/cuix-core/icons/react/ViewIcon';
 import IconButton from 'cuix/dist/components/Button/IconButton';
 import HistoryIcon from '@cloudera/cuix-core/icons/react/HistoryIcon';
-import { Select } from 'antd';
 import I18n from 'utils/i18n';
 
 import './AiAssistToolbarHistory.scss';
@@ -61,9 +60,6 @@ interface AiAssistToolbarHistoryProps {
   onToggleAutoShow: (autoShow: boolean) => void;
   show: boolean;
   ref;
-  allDbNames: string[] | undefined;
-  databaseNames: string[];
-  setDatabaseNames: (params: string[]) => void;
   width: number | undefined;
 }
 
@@ -83,9 +79,6 @@ const AiAssistToolbarHistory = forwardRef(
       show,
       autoShow,
       width,
-      allDbNames,
-      databaseNames,
-      setDatabaseNames,
       items
     }: AiAssistToolbarHistoryProps,
     ref
@@ -194,23 +187,6 @@ const AiAssistToolbarHistory = forwardRef(
             className="hue-ai-assist-toolbar-history"
           >
             <div className="hue-ai-assist-toolbar-history__top">
-              <div className="hue-ai-assist-toolbar-history__db-panel">
-                <div className="antd">
-                  <Select
-                    mode="multiple"
-                    title="Databases for generation"
-                    showSearch={false}
-                    getPopupContainer={triggerNode => triggerNode.parentElement}
-                    style={{ width: '100%' }}
-                    placeholder="Select Databases"
-                    value={databaseNames}
-                    onChange={value => value.length && setDatabaseNames(value)}
-                    options={
-                      allDbNames && allDbNames.map(option => ({ label: option, value: option }))
-                    }
-                  />
-                </div>
-              </div>
               <div className="hue-ai-assist-toolbar-history__toggle">
                 <IconButton
                   className="hue-ai-assist-toolbar-history__toggle-auto-show"
@@ -235,7 +211,7 @@ const AiAssistToolbarHistory = forwardRef(
             </div>
             {!renderableItems.length && (
               <div className="hue-ai-assist-toolbar-history__msg">
-                {I18n('Prompt history empty!')}
+                {I18n('Prompt history is empty')}
               </div>
             )}
             <ul className="hue-ai-assist-toolbar-history__menu-container">

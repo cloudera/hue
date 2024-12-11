@@ -83,7 +83,6 @@ $adjusted-left-margin: 93px;
   .hue-ai-assist-bar__animated-launcher-btn--active,
   .hue-ai-assist-bar__animated-launcher-btn--active[disabled]:hover {
     color: vars.$fluidx-blue-800;
-    cursor: default;
   }
 
   .hue-ai-assist-bar__animated-launcher-loading-status {
@@ -162,6 +161,15 @@ $adjusted-left-margin: 93px;
     overflow: hidden;
     white-space: nowrap;
     color: vars.$fluidx-red-500;
+  }
+
+  .hue-ai-assist-bar__animated-launcher-error-close-icon,
+  .hue-ai-assist-bar__animated-launcher-warning-close-icon {
+    color: vars.$fluidx-red-500;
+
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 
   .hue-ai-assist-bar__animated-launcher-warning-link {

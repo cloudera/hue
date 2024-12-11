@@ -23,6 +23,7 @@ import {
   ThunderboltOutlined,
   BulbOutlined,
   EditOutlined,
+  MoreOutlined,
   CommentOutlined
 } from '@ant-design/icons';
 import TourIcon from '@cloudera/cuix-core/icons/react/TourIcon';
@@ -31,6 +32,7 @@ import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/T
 import AiAssistToolbarInput from './AiAssistToolbarInput';
 import { extractLeadingNqlComments, removeComments } from '../PreviewModal/formattingUtils';
 import { AiActionModes } from '../sharedTypes';
+import I18n from 'utils/i18n';
 
 import './AiAssistToolbar.scss';
 import { HistoryItem } from './AiAssistToolbarHistory';
@@ -54,9 +56,9 @@ interface AssistToolbarProps {
   className?: string;
   onInputSubmit: (value: string) => void;
   onInputChanged: (value: string) => void;
-  allDbNames: string[];
+  activeDbName: string;
   databaseNames: string[];
-  setDatabaseNames: (value: string[]) => void;
+  setShowSettingsModal: () => void;
   dialect: string;
 }
 
@@ -77,9 +79,9 @@ function AssistToolbar({
   isSqlError,
   onInputSubmit,
   onInputChanged,
-  allDbNames,
+  activeDbName,
   databaseNames,
-  setDatabaseNames,
+  setShowSettingsModal,
   dialect
 }: AssistToolbarProps): JSX.Element {
   const [isAnimatingInput, setIsAnimatingInput] = useState(false);
@@ -87,12 +89,12 @@ function AssistToolbar({
 
   useEffect(() => {
     const fetchAndAddHistory = async () => {
-      const history = await getHistoryItems(databaseNames, dialect);
+      const history = await getHistoryItems(activeDbName, dialect);
       setHistoryItems(history);
     };
 
     fetchAndAddHistory();
-  }, [databaseNames, dialect]);
+  }, [activeDbName, dialect]);
 
   const handleCancelInput = () => {
     setActionMode(undefined);
@@ -143,7 +145,7 @@ function AssistToolbar({
           console.error('Could not update history item:', error);
         });
     } else {
-      createHistoryItem(prompt, dialect, databaseNames)
+      createHistoryItem(prompt, dialect, activeDbName)
         .then(item => {
           setHistoryItems(prevItems => [item, ...prevItems]);
         })
@@ -189,9 +191,6 @@ function AssistToolbar({
                 promptValue={inputValue}
                 onAnimationEnded={() => setIsAnimatingInput(false)}
                 prefill={inputPrefill}
-                allDbNames={allDbNames}
-                databaseNames={databaseNames}
-                setDatabaseNames={setDatabaseNames}
                 historyItems={historyItems}
               />
             </>
@@ -218,9 +217,6 @@ function AssistToolbar({
                 onInputChanged={prompt => onInputChanged(prompt)}
                 onAnimationEnded={() => setIsAnimatingInput(false)}
                 prefill={inputPrefill}
-                allDbNames={allDbNames}
-                databaseNames={databaseNames}
-                setDatabaseNames={setDatabaseNames}
                 historyItems={historyItems}
               />
             </>
@@ -267,6 +263,13 @@ function AssistToolbar({
               {!inputExpanded ? 'Comment' : ''}
             </ToolbarButton>
           )}
+
+          <ToolbarButton
+            title={I18n('AI Assistant Settings')}
+            className="hue-ai-assist-settings-button"
+            onClick={setShowSettingsModal}
+            icon={<MoreOutlined />}
+          />
         </>
       )}
     />

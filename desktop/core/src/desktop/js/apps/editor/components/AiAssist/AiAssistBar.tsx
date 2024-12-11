@@ -16,7 +16,7 @@
   limitations under the License.
 */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import classNames from 'classnames';
 import huePubSub from 'utils/huePubSub';
 import { AutocompleteParser } from 'parse/types';
@@ -34,7 +34,6 @@ import GuardrailsModal from './GuardrailsModal/GuardrailsModal';
 import { useKeywordCase } from './hooks';
 import { useParser } from './ParserHook';
 import AnimatedLauncher from './AnimatedLauncher/AnimatedLauncher';
-import AnimatedCloseButton from './AnimatedCloseButton/AnimatedCloseButton';
 import AssistToolbar from './AiAssistToolbar/AiAssistToolbar';
 import UntrustedAiModal from './UntrustedAiModal/UntrustedAiModal';
 import { withGuardrails, GuardrailAlert, GuardrailAlertType } from './guardRails';
@@ -48,6 +47,7 @@ import { CURSOR_POSITION_CHANGED_EVENT } from '../../../../ko/bindings/ace/aceLo
 import { getLastKnownConfig } from '../../../../config/hueConfig';
 
 import './AiAssistBar.scss';
+import AiSettingsModal from './AiSettingsModal';
 
 const {
   generateExplanation,
@@ -115,6 +115,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   const [actionMode, setActionMode] = useState<AiActionModes | undefined>();
   const [showSuggestedSqlModal, setShowSuggestedSqlModal] = useState(false);
   const [showGuardrailsModal, setShowGuardrailsModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [explanation, setExplanation] = useState('');
   const [summary, setSummary] = useState('');
   const [suggestion, setSuggestion] = useState('');
@@ -143,8 +144,14 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
   }, [activeExecutable]);
 
   const activeDbName = getDbName(activeExecutable);
-  const [databaseNames, setDatabaseNames] = useState([activeDbName]);
-  useEffect(() => setDatabaseNames([activeDbName]), [activeDbName]);
+  const [additionalDbNames, setAdditionalDbNames] = useState<string[]>([]);
+  const activeDatabaseNames = useMemo(
+    () =>
+      additionalDbNames.indexOf(activeDbName) != -1
+        ? additionalDbNames
+        : [activeDbName, ...additionalDbNames],
+    [activeDbName, additionalDbNames]
+  );
 
   const handleStatusUpdate = (status: string) => {
     setLoadingStatusText(status);
@@ -163,7 +170,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
         statement,
         dialect,
         executor,
-        databaseNames,
+        databaseNames: activeDatabaseNames,
         onStatusChange: handleStatusUpdate
       });
 
@@ -189,7 +196,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     try {
       ({ sql, assumptions, guardrailAlert } = await withGuardrails(generateSQLfromNQL)({
         nql,
-        databaseNames,
+        databaseNames: activeDatabaseNames,
         executor,
         dialect,
         onStatusChange: handleStatusUpdate
@@ -228,7 +235,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
         previousNql: inputPrefill,
         tableNamesUsed,
         sql: sqlToModify,
-        databaseNames,
+        databaseNames: activeDatabaseNames,
         executor,
         dialect,
         onStatusChange: handleStatusUpdate
@@ -258,7 +265,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     try {
       ({ sql, explain, guardrailAlert } = await withGuardrails(generateOptimizedSql)({
         statement,
-        databaseNames,
+        databaseNames: activeDatabaseNames,
         executor,
         dialect,
         onStatusChange: handleStatusUpdate
@@ -286,7 +293,7 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
     try {
       ({ sql, explain, guardrailAlert } = await withGuardrails(generateCorrectedSql)({
         statement,
-        databaseNames,
+        databaseNames: activeDatabaseNames,
         executor,
         dialect,
         onStatusChange: handleStatusUpdate
@@ -494,20 +501,12 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
             loadComments={loadComments}
             isSqlError={hasIncorrectSql}
             inputPrefill={inputPrefill}
-            allDbNames={allDbNames}
-            databaseNames={databaseNames}
-            setDatabaseNames={setDatabaseNames}
+            activeDbName={activeDbName}
+            databaseNames={activeDatabaseNames}
+            setShowSettingsModal={() => setShowSettingsModal(true)}
             dialect={sqlDialect}
           />
         </div>
-        <AnimatedCloseButton
-          title="Close AI assistbar"
-          className={classNames('hue-ai-assistbar__close-btn', {
-            'hue-ai-assistbar__close-btn--showing': isExpanded,
-            'hue-ai-assistbar__close-btn--hiding': isAnimating === 'contract'
-          })}
-          onClick={toggleOpen}
-        />
       </div>
       <UntrustedAiModal
         aiAssistBarExpanded={isExpanded}
@@ -540,7 +539,16 @@ const AiAssistBar = ({ activeExecutable }: AiAssistBarProps): JSX.Element => {
           dialect={sqlDialect}
           keywordCase={keywordCase}
           guardrailAlert={guardrailAlert}
-          databaseNames={databaseNames}
+          databaseNames={activeDatabaseNames}
+        />
+      )}
+      {showSettingsModal && (
+        <AiSettingsModal
+          open={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
+          allDbNames={allDbNames}
+          additionalDbNames={additionalDbNames}
+          setAdditionalDbNames={setAdditionalDbNames}
         />
       )}
     </>

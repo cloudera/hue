@@ -539,16 +539,14 @@ const generateCommentedSql: GenerateCommentedSql = async ({
   }
 };
 
-const getDb = (databaseNames: string[]): string => databaseNames && databaseNames.sort().join(',');
-
 // Function to fetch history items from the API
 export const getHistoryItems = async (
-  databaseNames: string[],
+  databaseName: string,
   dialect: string
 ): Promise<HistoryItem[]> => {
   try {
     const response = await get('/api/v1/editor/ai/prompts', {
-      databaseName: getDb(databaseNames),
+      databaseName,
       dialect: dialect
     });
     return response as HistoryItem[];
@@ -561,13 +559,13 @@ export const getHistoryItems = async (
 export const createHistoryItem = async (
   prompt: string,
   dialect: string,
-  databaseNames: string[]
+  databaseName: string
 ): Promise<HistoryItem> => {
   try {
     const response = await post('/api/v1/editor/ai/prompt/create', {
       prompt,
       dialect,
-      db: getDb(databaseNames)
+      db: databaseName
     });
     return response as HistoryItem;
   } catch (error) {

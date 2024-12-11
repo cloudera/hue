@@ -21,8 +21,9 @@ import classNames from 'classnames';
 import LinkButton from 'cuix/dist/components/Button/LinkButton';
 
 import AiAssistantIcon from '../../../../../components/icons/AiAssistantIcon';
-import AnimatedCloseButton from '../AnimatedCloseButton/AnimatedCloseButton';
 import CirclesLoader from '../CirclesLoader/CirclesLoader';
+
+import { CloseCircleOutlined } from '@ant-design/icons';
 
 import './AnimatedLauncher.scss';
 
@@ -57,8 +58,7 @@ function AnimatedLauncher({
   const showWarningMessage = !!warningStatusText;
 
   const handleClickOnCircleOrInfobar = () => {
-    const loaderIsShowingMessage =
-      isExpanded && (loadingStatusText || showErrorMessage || showWarningMessage);
+    const loaderIsShowingMessage = loadingStatusText || showErrorMessage || showWarningMessage;
     if (!loaderIsShowingMessage) {
       onExpandClick();
     }
@@ -86,7 +86,6 @@ function AnimatedLauncher({
               className={twinkleOnce.current ? 'ai-assist-icon--twinkle-once' : ''}
             />
           }
-          disabled={barIsActive}
           onClick={() => onExpandClick()}
         >
           Assistant
@@ -116,23 +115,16 @@ function AnimatedLauncher({
         )}
         {isExpanded && showErrorMessage && (
           <>
-            <AnimatedCloseButton
+            <div className="hue-ai-assist-bar__animated-launcher-error-text">{errorStatusText}</div>
+            <CloseCircleOutlined
               title="Close Error Message"
-              className="hue-ai-assist-bar__animated-launcher-error-close-btn"
-              size="small"
+              className="hue-ai-assist-bar__animated-launcher-error-close-icon"
               onClick={onCloseErrorClick}
             />
-            <div className="hue-ai-assist-bar__animated-launcher-error-text">{errorStatusText}</div>
           </>
         )}
         {isExpanded && showWarningMessage && (
           <>
-            <AnimatedCloseButton
-              title="Close Warning Message"
-              className="hue-ai-assist-bar__animated-launcher-warning-close-btn"
-              size="small"
-              onClick={onCloseWarningClick}
-            />
             <div className="hue-ai-assist-bar__animated-launcher-warning-text">
               {warningStatusText}
               <LinkButton
@@ -142,6 +134,11 @@ function AnimatedLauncher({
               >
                 More info...
               </LinkButton>
+              <CloseCircleOutlined
+                title="Close Warning Message"
+                className="hue-ai-assist-bar__animated-launcher-warning-close-icon"
+                onClick={onCloseWarningClick}
+              />
             </div>
           </>
         )}
