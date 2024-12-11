@@ -16,7 +16,7 @@
 
 import { DEFAULT_CHUNK_SIZE, FileUploadStatus } from 'utils/constants/storageBrowser';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
-import { CHUNK_UPLOAD_URL, CHUNK_UPLOAD_URL_COMPLETE } from 'reactComponents/FileChooser/api';
+import { CHUNK_UPLOAD_URL, CHUNK_UPLOAD_COMPLETE_URL } from 'reactComponents/FileChooser/api';
 
 export interface UploadItem {
   uuid: string;
@@ -111,7 +111,7 @@ export const getChunksCompletePayload = (processingItem: UploadItem): ChunkPaylo
   Object.entries(fileMetaData).forEach(([key, value]) => {
     payload.append(key, value);
   });
-  return { url: CHUNK_UPLOAD_URL_COMPLETE, payload };
+  return { url: CHUNK_UPLOAD_COMPLETE_URL, payload };
 };
 
 export const getChunkSinglePayload = (item: UploadItem): ChunkPayload => {
