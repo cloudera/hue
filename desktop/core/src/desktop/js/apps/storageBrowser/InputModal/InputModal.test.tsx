@@ -31,6 +31,8 @@ describe('InputModal', () => {
         showModal={true}
         onSubmit={jest.fn()}
         onClose={jest.fn()}
+        initialValue={''}
+        inputType={'text'}
       />
     );
     expect(inputModal.getByText('Custom title')).toBeVisible();
@@ -45,6 +47,8 @@ describe('InputModal', () => {
         showModal={true}
         onSubmit={jest.fn()}
         onClose={jest.fn()}
+        initialValue={''}
+        inputType={'text'}
       />
     );
     expect(inputModal.getByText('Custom input label')).toBeVisible();
@@ -62,6 +66,8 @@ describe('InputModal', () => {
         showModal={true}
         onSubmit={onSubmitMock}
         onClose={onCloseMock}
+        initialValue={''}
+        inputType={'text'}
       />
     );
     const submitButton = screen.getByRole('button', { name: 'Create' });
@@ -83,6 +89,8 @@ describe('InputModal', () => {
         showModal={true}
         onSubmit={onSubmitMock}
         onClose={onCloseMock}
+        initialValue={''}
+        inputType={'text'}
       />
     );
     const submitButton = screen.getByRole('button', { name: 'Create' });
@@ -104,6 +112,8 @@ describe('InputModal', () => {
         showModal={true}
         onSubmit={onSubmitMock}
         onClose={onCloseMock}
+        initialValue={''}
+        inputType={'text'}
       />
     );
     const closeButton = screen.getByRole('button', { name: 'Cancel' });
@@ -122,6 +132,8 @@ describe('InputModal', () => {
         showModal={true}
         onSubmit={jest.fn()}
         onClose={jest.fn()}
+        initialValue={''}
+        inputType={'text'}
       />
     );
     const input = screen.getByRole('textbox');
@@ -129,7 +141,25 @@ describe('InputModal', () => {
     expect(input).toBeVisible();
   });
 
-  test('renders modal with empty input value', () => {
+  test('renders modal with number input when input type is number', () => {
+    render(
+      <InputModal
+        title={'Set replication'}
+        inputLabel={'Custom input label'}
+        submitText={'Submit'}
+        showModal={true}
+        onSubmit={jest.fn()}
+        onClose={jest.fn()}
+        initialValue={2}
+        inputType={'number'}
+      />
+    );
+    const input = screen.getByRole('spinbutton');
+    expect(input).toHaveClass('hue-input-modal__input');
+    expect(input).toBeVisible();
+  });
+
+  test('renders modal with empty input value when intial value is empty', () => {
     render(
       <InputModal
         title={'Create New File'}
@@ -138,9 +168,43 @@ describe('InputModal', () => {
         showModal={true}
         onSubmit={jest.fn()}
         onClose={jest.fn()}
+        initialValue={''}
+        inputType={'text'}
       />
     );
     expect(screen.getByRole('textbox')).toHaveValue('');
+  });
+
+  test('renders modal with intial value in input while input type is text', () => {
+    render(
+      <InputModal
+        title={'Create New File'}
+        inputLabel={'Custom input label'}
+        submitText={'Create'}
+        showModal={true}
+        onSubmit={jest.fn()}
+        onClose={jest.fn()}
+        initialValue={'hello'}
+        inputType={'text'}
+      />
+    );
+    expect(screen.getByRole('textbox')).toHaveValue('hello');
+  });
+
+  test('renders modal with intial value in input while input type is number', () => {
+    render(
+      <InputModal
+        title={'Create New File'}
+        inputLabel={'Custom input label'}
+        submitText={'Create'}
+        showModal={true}
+        onSubmit={jest.fn()}
+        onClose={jest.fn()}
+        initialValue={2}
+        inputType={'number'}
+      />
+    );
+    expect(screen.getByRole('spinbutton')).toHaveValue(2);
   });
 
   test('accepts tab focus on input elements placed in the drawer', async () => {
@@ -153,6 +217,8 @@ describe('InputModal', () => {
         showModal={true}
         onSubmit={jest.fn()}
         onClose={jest.fn()}
+        initialValue={''}
+        inputType={'text'}
       />
     );
     const inputModal = screen.getByRole('dialog', { name: 'Create New File' });
