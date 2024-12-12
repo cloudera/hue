@@ -13,17 +13,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Row, Col, Spin } from 'antd';
 
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 import formatBytes from '../../../utils/formatBytes';
-import { fetchContentSummary } from '../../../reactComponents/FileChooser/api';
-import './SummaryModal.scss';
+import useLoadData from '../../../utils/hooks/useLoadData';
+import { CONTENT_SUMMARY_API_URL } from '../../../reactComponents/FileChooser/api';
 import { ContentSummary } from '../../../reactComponents/FileChooser/types';
 
+import './SummaryModal.scss';
 interface SummaryModalProps {
   path: string;
   showModal: boolean;
@@ -32,8 +33,6 @@ interface SummaryModalProps {
 
 const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [loadingSummary, setLoadingSummary] = useState(true);
-  const [summary, setSummary] = useState([]);
 
   const getSummary = () => {
     const cols = summary.map((item, index) => (
@@ -43,7 +42,7 @@ const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Elem
       </Col>
     ));
 
-    const rows = [];
+    const rows: JSX.Element[] = [];
     for (let i = 0; i < cols.length - 1; i = i + 2) {
       rows.push(
         <Row key={'summaryRow' + i} className="hue-summary-modal__row">
@@ -55,36 +54,32 @@ const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Elem
     return rows;
   };
 
-  const updateSummaryData = (responseSummary: ContentSummary) => {
-    const summaryData = [
-      ['DISKSPACE CONSUMED', formatBytes(responseSummary.summary.spaceConsumed)],
-      ['BYTES USED', formatBytes(responseSummary.summary.length)],
-      ['NAMESPACE QUOTA', formatBytes(responseSummary.summary.quota)],
-      ['DISKSPACE QUOTA', formatBytes(responseSummary.summary.spaceQuota)],
-      ['REPLICATION FACTOR', responseSummary.summary.replication],
-      [,],
-      ['NUMBER OF DIRECTORIES', responseSummary.summary.directoryCount],
-      ['NUMBER OF FILES', responseSummary.summary.fileCount]
-    ];
-    setSummary(summaryData);
-  };
+  const {
+    data: responseSummary,
+    loading: loadingSummary,
+    error
+  } = useLoadData<ContentSummary>(CONTENT_SUMMARY_API_URL, {
+    params: {
+      path: path
+    },
+    onError: () => {
+      huePubSub.publish('hue.error', error);
+    },
+    skip: path === '' || path === undefined || !showModal
+  });
 
-  useEffect(() => {
-    if (showModal) {
-      setLoadingSummary(true);
-      fetchContentSummary(path)
-        .then(responseSummary => {
-          updateSummaryData(responseSummary);
-        })
-        .catch(error => {
-          huePubSub.publish('hue.error', error);
-          onClose();
-        })
-        .finally(() => {
-          setLoadingSummary(false);
-        });
-    }
-  }, [path, showModal]);
+  const summary = useMemo(() => {
+    return [
+      ['DISKSPACE CONSUMED', formatBytes(responseSummary?.summary.spaceConsumed)],
+      ['BYTES USED', formatBytes(responseSummary?.summary.length)],
+      ['NAMESPACE QUOTA', formatBytes(responseSummary?.summary.quota)],
+      ['DISKSPACE QUOTA', formatBytes(responseSummary?.summary.spaceQuota)],
+      ['REPLICATION FACTOR', responseSummary?.summary.replication],
+      [,],
+      ['NUMBER OF DIRECTORIES', responseSummary?.summary.directoryCount],
+      ['NUMBER OF FILES', responseSummary?.summary.fileCount]
+    ];
+  }, [responseSummary]);
 
   //TODO:Handle long modal title
   return (

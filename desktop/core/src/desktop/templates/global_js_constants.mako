@@ -212,7 +212,7 @@
   window.SHOW_NOTEBOOKS = '${ SHOW_NOTEBOOKS.get() }' === 'True'
   window.SHOW_UPLOAD_BUTTON = '${ hasattr(SHOW_UPLOAD_BUTTON, 'get') and SHOW_UPLOAD_BUTTON.get() }' === 'True'
   window.SHOW_DOWNLOAD_BUTTON = '${ hasattr(SHOW_DOWNLOAD_BUTTON, 'get') and SHOW_DOWNLOAD_BUTTON.get() }' === 'True'
-  window.MAX_FILEEDITOR_SIZE = '${ MAX_FILEEDITOR_SIZE }';
+  window.MAX_FILEEDITOR_SIZE = ${ MAX_FILEEDITOR_SIZE };
 
   window.UPLOAD_CHUNK_SIZE = ${ UPLOAD_CHUNK_SIZE.get() };
   window.MAX_FILE_SIZE_UPLOAD_LIMIT = ${ MAX_FILE_SIZE_UPLOAD_LIMIT.get() if hasattr(MAX_FILE_SIZE_UPLOAD_LIMIT, 'get') and MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 else 'undefined' };

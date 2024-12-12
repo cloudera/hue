@@ -34,7 +34,11 @@ import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import useDebounce from '../../../../utils/useDebounce';
 
-import { LIST_DIRECTORY_API_URL, mkdir, touch } from '../../../../reactComponents/FileChooser/api';
+import {
+  LIST_DIRECTORY_API_URL,
+  CREATE_DIRECTORY_API_URL,
+  CREATE_FILE_API_URL
+} from '../../../../reactComponents/FileChooser/api';
 import {
   StorageBrowserTableData,
   SortOrder,
@@ -46,6 +50,7 @@ import Pagination from '../../../../reactComponents/Pagination/Pagination';
 import StorageBrowserActions from '../StorageBrowserActions/StorageBrowserActions';
 import InputModal from '../../InputModal/InputModal';
 import formatBytes from '../../../../utils/formatBytes';
+import useSaveData from '../../../../utils/hooks/useSaveData';
 
 import './StorageBrowserTable.scss';
 import { formatTimestamp } from '../../../../utils/dateTimeUtils';
@@ -113,14 +118,15 @@ const StorageBrowserTable = ({
     }
 
     return filesData?.files?.map(file => ({
-      name: file.path.replace(`${fileStats.path ?? ''}/`, ''),
+      name: file.path.split('/').pop() ?? '',
       size: formatBytes(file.size),
       user: file.user,
       group: file.group,
       permission: file.rwx,
       mtime: file?.mtime ? formatTimestamp(new Date(file.mtime * 1000)) : '-',
       type: file.type,
-      path: file.path
+      path: file.path,
+      replication: file?.replication
     }));
   }, [filesData]);
 
@@ -218,7 +224,9 @@ const StorageBrowserTable = ({
       }
       columns.push(column);
     }
-    return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
+    return columns.filter(
+      col => col.dataIndex !== 'type' && col.dataIndex !== 'path' && col.dataIndex !== 'replication'
+    );
   };
 
   const onRowClicked = (record: StorageBrowserTableData) => {
@@ -249,34 +257,32 @@ const StorageBrowserTable = ({
     setPageNumber(nextPageNumber === 0 ? numPages : nextPageNumber);
   };
 
+  const { save: saveCreateFolder } = useSaveData(CREATE_DIRECTORY_API_URL);
+
   const handleCreateNewFolder = (folderName: string) => {
-    setLoadingFiles(true);
-    mkdir(folderName, fileStats.path)
-      .then(() => {
-        reloadData();
-      })
-      .catch(error => {
-        huePubSub.publish('hue.error', error);
-        setShowNewFolderModal(false);
-      })
-      .finally(() => {
-        setLoadingFiles(false);
-      });
+    saveCreateFolder(
+      { path: fileStats.path, name: folderName },
+      {
+        onSuccess: reloadData,
+        onError: createFolderError => {
+          huePubSub.publish('hue.error', createFolderError);
+        }
+      }
+    );
   };
 
+  const { save: saveCreateFile } = useSaveData(CREATE_FILE_API_URL);
+
   const handleCreateNewFile = (fileName: string) => {
-    setLoadingFiles(true);
-    touch(fileName, fileStats.path)
-      .then(() => {
-        reloadData();
-      })
-      .catch(error => {
-        huePubSub.publish('hue.error', error);
-        setShowNewFileModal(false);
-      })
-      .finally(() => {
-        setLoadingFiles(false);
-      });
+    saveCreateFile(
+      { path: fileStats.path, name: fileName },
+      {
+        onSuccess: reloadData,
+        onError: createFileError => {
+          huePubSub.publish('hue.error', createFileError);
+        }
+      }
+    );
   };
 
   const handleSearch = useCallback(
@@ -326,6 +332,7 @@ const StorageBrowserTable = ({
         />
         <div className="hue-storage-browser__actions-bar-right">
           <StorageBrowserActions
+            currentPath={fileStats.path}
             selectedFiles={selectedFiles}
             setLoadingFiles={setLoadingFiles}
             onSuccessfulAction={reloadData}
@@ -336,7 +343,7 @@ const StorageBrowserTable = ({
               items: newActionsMenuItems,
               className: 'hue-storage-browser__action-menu'
             }}
-            trigger={['hover', 'click']}
+            trigger={['click']}
           >
             <PrimaryButton data-event="">
               {t('New')}

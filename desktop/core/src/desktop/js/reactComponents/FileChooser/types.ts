@@ -45,6 +45,7 @@ export interface StorageBrowserTableData {
   mtime: string;
   type: string;
   path: string;
+  replication: number;
 }
 
 export interface PageStats {
