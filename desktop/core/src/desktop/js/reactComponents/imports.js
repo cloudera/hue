@@ -11,7 +11,10 @@ export async function loadComponent(name) {
       return (await import('../apps/storageBrowser/StorageBrowserPage/StorageBrowserPage')).default;
 
     case 'Metrics':
-      return (await import('../apps/admin/Metrics/Metrics')).default;
+      return (await import('../apps/admin/Metrics/MetricsTab')).default;
+
+    case 'Configuration':
+      return (await import('../apps/admin/Configuration/ConfigurationTab')).default;
 
     // Application global components here
     case 'AppBanner':

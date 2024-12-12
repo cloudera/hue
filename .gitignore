@@ -98,7 +98,7 @@ desktop/desktop-test.db
 ext/hadoop/
 ext/hive/
 ext/oozie/
-nosetests.xml
+report.html
 oozie.sql
 tools/jenkins/ext/
 tools/jenkins/oozie.sql

@@ -17,7 +17,7 @@
 import React from 'react';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Metrics from './Metrics';
+import Metrics from './MetricsTab';
 
 // Mock the API call to return sample metrics data
 jest.mock('api/utils', () => ({
@@ -73,12 +73,12 @@ describe('Metrics', () => {
     });
   });
 
-  test('selecting a specific metric from the dropdown filters the data using click events', async () => {
+  test('Selecting a specific metric from the dropdown filters the data using click events', async () => {
     render(<Metrics />);
 
     await waitFor(() => screen.getByText('queries.number'));
 
-    const select = screen.getByTestId('metric-select').firstElementChild;
+    const select = screen.getByTestId('admin-header--select').firstElementChild;
     if (select) {
       fireEvent.mouseDown(select);
     }
@@ -89,7 +89,6 @@ describe('Metrics', () => {
     if (secondOption) {
       fireEvent.click(secondOption);
       await waitFor(() => {
-        // const headings = screen.queryAllByRole('heading', { level: 4 });
         const headings = screen.queryAllByText(
           (_, element) =>
             element?.tagName.toLowerCase() === 'span' && element?.className === 'metrics-heading'
@@ -99,7 +98,7 @@ describe('Metrics', () => {
     }
   });
 
-  test('ensuring metrics starting with auth, multiprocessing and python.gc are not displayed', async () => {
+  test('Ensuring metrics starting with auth, multiprocessing and python.gc are not displayed', async () => {
     jest.clearAllMocks();
     jest.mock('api/utils', () => ({
       get: jest.fn(() =>

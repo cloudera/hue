@@ -27,6 +27,7 @@ from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
+from desktop.log import api as logs_api
 from filebrowser import api as filebrowser_api, views as filebrowser_views
 from indexer import api3 as indexer_api3
 from metadata import optimizer_api
@@ -56,6 +57,18 @@ def get_context_namespaces(request, interface):
 @permission_classes([AllowAny])
 def get_banners(request):
   return desktop_api.get_banners(request)
+
+
+@api_view(["GET"])
+def get_hue_logs(request):
+  django_request = get_django_request(request)
+  return logs_api.get_hue_logs(django_request)
+
+
+@api_view(["GET"])
+def download_hue_logs(request):
+  django_request = get_django_request(request)
+  return logs_api.download_hue_logs(django_request)
 
 
 # Editor
@@ -254,7 +267,7 @@ def storage_save_file(request):
 @api_view(["POST"])
 def storage_upload_file(request):
   django_request = get_django_request(request)
-  return filebrowser_views.upload_file(django_request)  # TODO: Fix new api method and switch here
+  return filebrowser_api.upload_file(django_request)
 
 
 @api_view(["POST"])

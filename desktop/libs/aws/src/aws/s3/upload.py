@@ -21,6 +21,7 @@ Classes for a custom upload handler to stream into S3.
 See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
+import os
 import logging
 import unicodedata
 from io import BytesIO as stream_io
@@ -34,6 +35,7 @@ from aws.s3.s3fs import S3FileSystemException
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
+from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
 from filebrowser.utils import calculate_total_size, generate_chunks
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 128  # TODO: set in configuration (currently 128 MiB)
@@ -130,6 +132,7 @@ class S3FileUploadError(UploadFileException):
   pass
 
 
+# Deprecated and core logic to be replaced with S3NewFileUploadHandler
 class S3FileUploadHandler(FileUploadHandler):
   """
   This handler is triggered by any upload field whose destination path starts with "S3" (case insensitive).
@@ -155,9 +158,16 @@ class S3FileUploadHandler(FileUploadHandler):
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     if self._is_s3_upload():
+      LOG.info('Using S3FileUploadHandler to handle file upload.')
+
+      _, file_type = os.path.splitext(file_name)
+      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
+        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+        LOG.error(err_message)
+        raise Exception(err_message)
+
       super(S3FileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
-      LOG.info('Using S3FileUploadHandler to handle file upload.')
       self.target_path = self._fs.join(self.key_name, file_name)
 
       try:
@@ -198,15 +208,6 @@ class S3FileUploadHandler(FileUploadHandler):
     else:
       return None
 
-  def _get_s3fs(self, request):
-    # Pre 6.0 request.fs did not exist, now it does. The logic for assigning request.fs is not correct for FileUploadHandler.
-    fs = get_client(user=request.user.username)
-
-    if not fs:
-      raise S3FileUploadError(_("No S3 filesystem found."))
-
-    return fs
-
   def _is_s3_upload(self):
     return self._get_scheme() and self._get_scheme().startswith('S3')
 
@@ -229,3 +230,46 @@ class S3FileUploadHandler(FileUploadHandler):
     fp.write(raw_data)
     fp.seek(0)
     return fp
+
+
+class S3NewFileUploadHandler(S3FileUploadHandler):
+  """
+  This handler uploads the file to AWS S3 if the destination path starts with "S3" (case insensitive).
+  Streams data chunks directly to S3.
+  """
+  def __init__(self, dest_path, username):
+    self.chunk_size = DEFAULT_WRITE_SIZE
+    self.destination = dest_path
+    self.username = username
+    self.target_path = None
+    self.file = None
+    self._mp = None
+    self._part_num = 1
+
+    # TODO: _is_s3_upload really required?
+    if self._is_s3_upload():
+      self._fs = get_client(fs='s3a', user=self.username)
+      self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
+
+      self._bucket = self._fs._get_bucket(self.bucket_name)
+
+  def new_file(self, field_name, file_name, *args, **kwargs):
+    if self._is_s3_upload():
+      super(S3FileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
+
+      LOG.info('Using S3FileUploadHandler to handle file upload.')
+      self.target_path = self._fs.join(self.key_name, file_name)
+
+      try:
+        # Check access permissions before attempting upload
+        self._check_access()
+
+        # Create a multipart upload request
+        LOG.debug("Initiating S3 multipart upload to target path: %s" % self.target_path)
+        self._mp = self._bucket.initiate_multipart_upload(self.target_path)
+        self.file = SimpleUploadedFile(name=file_name, content='')
+
+        raise StopFutureHandlers()
+      except (S3FileUploadError, S3FileSystemException) as e:
+        LOG.error("Encountered error in S3UploadHandler check_access: %s" % e)
+        raise StopUpload()

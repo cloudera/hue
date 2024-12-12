@@ -30,7 +30,9 @@ urlpatterns = [
 # Compatibility with "old" private API.
 # e.g. https://demo.gethue.com/notebook/api/execute/hive
 urlpatterns += [
-  re_path(r'^banners/?$', api_public.get_banners, name='core_banners'),
+  re_path(r'^banners/?$', api_public.get_banners, name='core_get_banners'),
+  re_path(r'^logs/?$', api_public.get_hue_logs, name='core_get_hue_logs'),
+  re_path(r'^logs/download/?$', api_public.download_hue_logs, name='core_download_hue_logs'),
   re_path(r'^get_config/?$', api_public.get_config),
   re_path(r'^get_namespaces/(?P<interface>[\w\-]+)/?$', api_public.get_context_namespaces),  # To remove
 ]
@@ -53,7 +55,7 @@ urlpatterns += [
   re_path(
     r'^editor/describe/(?P<database>[^/?]*)/(?P<table>[^/?]+)/stats(?:/(?P<column>[^/?]+))?/?$',
     api_public.describe,
-    name='editor_describe_column'
+    name='editor_describe_column',
   ),
   re_path(r'^editor/autocomplete/?$', api_public.autocomplete, name='editor_autocomplete_databases'),
   re_path(
@@ -83,9 +85,9 @@ urlpatterns += [
     name='editor_sample_data_column',
   ),
   re_path(
-      r"^editor/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/(?P<nested>.+)/?$",
-      api_public.get_sample_data,
-      name="editor_sample_data_nested",
+    r"^editor/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/(?P<nested>.+)/?$",
+    api_public.get_sample_data,
+    name="editor_sample_data_nested",
   ),
 ]
 

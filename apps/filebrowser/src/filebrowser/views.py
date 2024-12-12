@@ -32,9 +32,10 @@ from bz2 import decompress
 from datetime import datetime
 from functools import partial
 from gzip import decompress as decompress_gzip
-from io import StringIO as string_io
+from io import BytesIO, StringIO as string_io
 from urllib.parse import quote as urllib_quote, unquote as urllib_unquote, urlparse as lib_urlparse
 
+import pandas as pd
 from avro import datafile, io
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
 from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
@@ -117,6 +118,9 @@ BYTES_PER_SENTENCE = 2
 # The maximum size the file editor will allow you to edit
 MAX_FILEEDITOR_SIZE = 256 * 1024
 
+# Parquet files start with a specific 4-byte magic number: 'PAR1'
+PARQUET_MAGIC_NUMBER = b'PAR1'
+
 INLINE_DISPLAY_MIMETYPE = re.compile(
     r'video/|image/|audio/|application/pdf|application/msword|application/excel|application/vnd\.ms|application/vnd\.openxmlformats'
 )
@@ -144,14 +148,6 @@ if hasattr(ARCHIVE_UPLOAD_TEMPDIR, 'get') and not os.path.exists(ARCHIVE_UPLOAD_
   os.makedirs(ARCHIVE_UPLOAD_TEMPDIR.get())
 
 logger = logging.getLogger()
-
-
-class ParquetOptions(object):
-  def __init__(self, col=None, format='json', no_headers=True, limit=-1):
-    self.col = col
-    self.format = format
-    self.no_headers = no_headers
-    self.limit = limit
 
 
 def index(request):
@@ -983,13 +979,16 @@ def _read_avro(fhandle, path, offset, length, stats):
 
 def _read_parquet(fhandle, path, offset, length, stats):
   try:
-    size = 1 * 128 * 1024 * 1024  # Buffer file stream to 128 MB chunks
-    data = string_io(fhandle.read(size))
+    size = 1 * 128 * 1024 * 1024  # Buffer file stream to 128 MiB chunks
 
-    dumped_data = string_io()
-    parquet._dump(data, ParquetOptions(limit=1000), out=dumped_data)
-    dumped_data.seek(offset)
-    return dumped_data.read()
+    fhandle.seek(offset)
+    file_data = BytesIO(fhandle.read(size))
+
+    data_frame = pd.read_parquet(file_data, engine='pyarrow')
+
+    data_chunk = data_frame.iloc[offset:offset + length].to_string()
+
+    return data_chunk
   except Exception as e:
     logging.exception('Could not read parquet file at "%s": %s' % (path, e))
     raise PopupException(_("Failed to read Parquet file."))
@@ -1061,9 +1060,12 @@ def detect_snappy(contents):
 def detect_parquet(fhandle):
   """
   Detect parquet from magic header bytes.
-  Python 2 only currently.
   """
-  return False if sys.version_info[0] > 2 else parquet._check_header_magic_bytes(fhandle)
+
+  fhandle.seek(0)
+  magic_number = fhandle.read(4)
+
+  return magic_number == PARQUET_MAGIC_NUMBER
 
 
 def snappy_installed():

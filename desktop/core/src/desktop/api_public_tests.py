@@ -43,7 +43,7 @@ class TestCoreApi():
         done = CUSTOM.BANNER_TOP_HTML.set_for_testing(configured_banner)
         get_banner_message.return_value = system_banner
 
-        response = self.unauthorized_client.get(reverse('api:core_banners'))
+        response = self.unauthorized_client.get(reverse('api:core_get_banners'))
 
         get_banner_message.assert_called()
         json_resp = json.loads(response.content)

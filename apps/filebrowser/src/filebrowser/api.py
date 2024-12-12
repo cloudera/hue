@@ -21,6 +21,7 @@ import logging
 import operator
 import mimetypes
 import posixpath
+from io import BytesIO as string_io
 
 from django.core.paginator import EmptyPage, Paginator
 from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
@@ -46,6 +47,7 @@ from filebrowser.conf import (
   FILE_DOWNLOAD_CACHE_CONTROL,
   MAX_FILE_SIZE_UPLOAD_LIMIT,
   REDIRECT_DOWNLOAD,
+  RESTRICT_FILE_EXTENSIONS,
   SHOW_DOWNLOAD_BUTTON,
 )
 from filebrowser.lib import xxd
@@ -394,81 +396,60 @@ def upload_complete(request):
 
 @api_error_handler
 def upload_file(request):
-  """
-  A wrapper around the actual upload view function to clean up the temporary file afterwards if it fails.
+  # Read request body first to prevent RawPostDataException later on which occurs when trying to access body after it has already been read
+  body_data_bytes = string_io(request.body)
 
-  Returns JSON.
-  """
-  pass
-  # response = {}
-
-  # try:
-  #   response = _upload_file(request)
-  # except Exception as e:
-  #   LOG.exception('Upload operation failed.')
-
-  #   file = request.FILES.get('file')
-  #   if file and hasattr(file, 'remove'):  # TODO: Call from proxyFS -- Check feasibility of this old comment
-  #     file.remove()
-
-  #   return HttpResponse(str(e).split('\n', 1)[0], status=500)  # TODO: Check error message and status code
-
-  # return JsonResponse(response)
-
-
-def _upload_file(request):
-  """
-  Handles file uploaded by HDFSfileUploadHandler.
-
-  The uploaded file is stored in HDFS at its destination with a .tmp suffix.
-  We just need to rename it to the destination path.
-  """
   uploaded_file = request.FILES['file']
-  dest_path = request.GET.get('dest')
-  response = {}
+  dest_path = request.POST.get('destination_path')
+  overwrite = coerce_bool(request.POST.get('overwrite', False))
 
-  if MAX_FILE_SIZE_UPLOAD_LIMIT.get() >= 0 and uploaded_file.size > MAX_FILE_SIZE_UPLOAD_LIMIT.get():
-    return HttpResponse(f'File exceeds maximum allowed size of {MAX_FILE_SIZE_UPLOAD_LIMIT.get()} bytes.', status=500)
+  # Check if the file type is restricted
+  _, file_type = os.path.splitext(uploaded_file.name)
+  if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
+    return HttpResponse(f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.', status=400)
 
-  # Use form for now to triger the upload handler process by Django.
-  # Might be a better solution now to try directly using handler in request.fs.upload() for all FS.
-  # form = UploadAPIFileForm(request.POST, request.FILES)
+  # Check if the file size exceeds the maximum allowed size
+  max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
+  if max_size >= 0 and uploaded_file.size >= max_size:
+    return HttpResponse(
+      f'File exceeds maximum allowed size of {max_size} bytes. Hue is configured to restrict uploads larger than this limit.', status=413
+    )
 
-  if request.META.get('upload_failed'):
-    raise Exception(request.META.get('upload_failed'))  # TODO: Check error message and status code
-
-  # if not form.is_valid():
-  #   raise Exception(f"Error in upload form: {form.errors}")
-
-  filepath = request.fs.join(dest_path, uploaded_file.name)
-
+  # Check if the destination path is a directory and the file name contains a path separator
+  # This prevents directory traversal attacks
   if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
-    raise Exception(f'Upload failed: {posixpath.sep} is not allowed in the filename {uploaded_file.name}.')  # TODO: status code
+    return HttpResponse(f'Invalid filename. Path separators are not allowed.', status=400)
+
+  # Check if the file already exists at the destination path
+  filepath = request.fs.join(dest_path, uploaded_file.name)
+  if request.fs.exists(filepath):
+     # If overwrite is true, attempt to remove the existing file
+    if overwrite:
+      try:
+        request.fs.rmtree(filepath)
+      except Exception as e:
+        err_message = 'Failed to remove already existing file.'
+        LOG.exception(f'{err_message} {str(e)}')
+        return HttpResponse(err_message, status=500)
+    else:
+      err_message = f'The file {uploaded_file.name} already exists at the destination path.'
+      LOG.error(err_message)
+      return HttpResponse(err_message, status=409)
+
+  # Check if the destination path already exists or not
+  if not request.fs.exists(dest_path):
+    return HttpResponse(f'The destination path {dest_path} does not exist.', status=404)
 
   try:
-    request.fs.upload(file=uploaded_file, path=dest_path, username=request.user.username)
-  except IOError as ex:
-    already_exists = False
-    try:
-      already_exists = request.fs.exists(dest_path)
-    except Exception:
-      pass
+    request.fs.upload_v1(request.META, input_data=body_data_bytes, destination=dest_path, username=request.user.username)
+  except Exception as ex:
+    return HttpResponse(f'Upload to {filepath} failed: {str(ex)}', status=500)
 
-    if already_exists:
-      messsage = f'Upload failed: Destination {filepath} already exists.'
-    else:
-      messsage = f'Upload error: Copy to {filepath} failed: {str(ex)}'
-    raise Exception(messsage)  # TODO: Check error messages above and status code
+  response = {
+    'uploaded_file_stats': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
+  }
 
-  # TODO: Check response fields below
-  response.update(
-    {
-      'path': filepath,
-      'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
-    }
-  )
-
-  return response
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -529,18 +510,31 @@ def rename(request):
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
-  if "#" in destination_path:
-    return HttpResponse(
-      f"Error creating {os.path.basename(source_path)} to {destination_path}: Hashes are not allowed in file or directory names", status=400
-    )
+  # Check if source and destination paths are provided
+  if not source_path or not destination_path:
+    return HttpResponse("Missing required parameters: source_path and destination_path", status=400)
 
-  # If dest_path doesn't have a directory specified, use same directory.
+  # Extract file extensions from paths
+  _, source_path_ext = os.path.splitext(source_path)
+  _, dest_path_ext = os.path.splitext(destination_path)
+
+  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]
+  # Check if destination path has a restricted file type and it doesn't match the source file type
+  if dest_path_ext.lower() in restricted_file_types and (source_path_ext.lower() != dest_path_ext.lower()):
+    return HttpResponse(f'Cannot rename file to a restricted file type: "{dest_path_ext}"', status=403)
+
+  # Check if destination path contains a hash character
+  if "#" in destination_path:
+    return HttpResponse("Hashes are not allowed in file or directory names. Please choose a different name.", status=400)
+
+  # If destination path doesn't have a directory specified, use the same directory as the source path
   if "/" not in destination_path:
     source_dir = os.path.dirname(source_path)
     destination_path = request.fs.join(source_dir, destination_path)
 
+  # Check if destination path already exists
   if request.fs.exists(destination_path):
-    return HttpResponse(f"The destination path {destination_path} already exists.", status=500)  # TODO: Status code?
+    return HttpResponse(f"The destination path {destination_path} already exists.", status=409)
 
   request.fs.rename(source_path, destination_path)
   return HttpResponse(status=200)
@@ -766,7 +760,6 @@ def bulk_op(request, op):
 
   error_dict = {}
   for p in path_list:
-
     tmp_dict = bulk_dict
     if op in (copy, move):
       tmp_dict['source_path'] = p
@@ -795,10 +788,12 @@ def _massage_stats(request, stats):
   stats_dict = stats.to_json_dict()
   normalized_path = request.fs.normpath(stats_dict.get('path'))
 
-  stats_dict.update({
-    'path': normalized_path,
-    'type': filetype(stats.mode),
-    'rwx': rwx(stats.mode, stats.aclBit),
-  })
+  stats_dict.update(
+    {
+      'path': normalized_path,
+      'type': filetype(stats.mode),
+      'rwx': rwx(stats.mode, stats.aclBit),
+    }
+  )
 
   return stats_dict

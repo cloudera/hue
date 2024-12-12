@@ -571,11 +571,20 @@ class S3FileSystem(object):
         remote_file = remote_dst
       _copy_file(local_src, remote_file)
 
+  # Deprecated
   @translate_s3_error
   def upload(self, file, path, *args, **kwargs):
-    # parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
-    # return parser.parse()
     pass  # upload is handled by S3FileUploadHandler
+
+  @translate_s3_error
+  @auth_error_handler
+  def upload_v1(self, META, input_data, destination, username):
+    from aws.s3.upload import S3NewFileUploadHandler  # Circular dependency
+
+    s3_upload_handler = S3NewFileUploadHandler(destination, username)
+
+    parser = MultiPartParser(META, input_data, [s3_upload_handler])
+    return parser.parse()
 
   @translate_s3_error
   @auth_error_handler

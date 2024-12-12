@@ -61,7 +61,32 @@ jobs:
 
     - name: run tests
       run: |
-        PYTHONWARNINGS=always ./build/env/bin/pytest
+        mkdir -p test-reports  # Ensure the directory exists
+        PYTHONWARNINGS=always ./build/env/bin/pytest --html=test-reports/report_${{ matrix.python-version }}.html --self-contained-html
+ 
+    - name: upload pytest report
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-reports-${{ matrix.python-version }}
+        path: test-reports
+
+    - name: Check and comment if no unit test files are modified
+      if: matrix.python-version == '3.11'
+      run: |
+        git fetch origin master
+        changed_files=$(git diff --name-only origin/master)
+        
+        if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
+          echo "✅ Unit test files were modified."
+        else
+          echo "⚠️ No unit test files modified."
+          
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{"body":"⚠️ No unit test files modified. Please ensure that changes are properly tested. ⚠️"}' \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+        fi
 
     - name: run python lints
       run: |
@@ -69,11 +94,9 @@ jobs:
 
     - name: run documentation lints
       run: |
-        # Installs to move to image building
-        curl -O https://dl.google.com/go/go1.17.linux-amd64.tar.gz
-        tar -xvf go1.17.linux-amd64.tar.gz
-        export GO111MODULE=on
-        go/bin/go get -u github.com/raviqqe/muffet@v1.5.7
+        curl -O https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz
+        tar -xvf go1.23.4.linux-amd64.tar.gz
+        go/bin/go install github.com/raviqqe/muffet/v2@latest
 
         curl --output hugo_0.69.0_Linux.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-64bit.tar.gz
         tar -xvf hugo_0.69.0_Linux.tar.gz
