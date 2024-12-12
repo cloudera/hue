@@ -21,65 +21,20 @@ import '@testing-library/jest-dom';
 
 import PathBrowser from './PathBrowser';
 
-const onFilepathChangeMock = jest.fn();
-
-const breadcrumbsTestConfig1 = [
-  {
-    url: 'abfs://',
-    label: 'abfs://'
-  },
-  {
-    url: 'abfs://test',
-    label: 'test'
-  },
-  {
-    url: 'abfs://test/test1',
-    label: 'test1'
-  }
-];
-
-const breadcrumbsTestConfig2 = [
-  {
-    url: 'abfs://',
-    label: 'abfs://'
-  },
-  {
-    url: 'abfs://test',
-    label: 'test'
-  },
-  {
-    url: 'abfs://test/test1',
-    label: 'test1'
-  },
-  {
-    url: 'abfs://test/test1/test2',
-    label: 'test2'
-  },
-  {
-    url: 'abfs://test/test1/test2/a very very very long test label',
-    label: 'a very very very long test label'
-  },
-  {
-    url: 'abfs://test/test1/test2/a very very very long test label/a very very very long test label 1',
-    label: 'a very very very long test label 1'
-  },
-  {
-    url: 'abfs://test/test1/test2/a very very very long test label/a very very very long test label 1/a very very very long test label 2',
-    label: 'a very very very long test label 2'
-  }
-];
-
 afterEach(() => {
   jest.clearAllMocks();
 });
 
 describe('Pathbrowser', () => {
+  const onFilepathChangeMock = jest.fn();
+  const mockFilePath = 'abfs://test/folder';
+  const mockLongFilePath = 'abfs://path/to/nested1/nested2/nested3/folder';
   describe('Pathbrowser breadcrumbs', () => {
-    test('renders the specified seperator to seperate the breadcrumbs', () => {
+    it('should render the specified seperator to seperate the breadcrumbs', () => {
       render(
         <PathBrowser
+          filePath={mockFilePath}
           onFilepathChange={onFilepathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig1}
           seperator={'%'}
           showIcon
         />
@@ -88,23 +43,27 @@ describe('Pathbrowser', () => {
       expect(seperator).not.toBeNull();
     });
 
-    test('does not render a different seperator than specified to seperate the breadcrumbs', () => {
+    it('should not render a different seperator than specified to seperate the breadcrumbs', () => {
       render(
         <PathBrowser
+          testId="pathbroswer"
+          filePath={mockFilePath}
           onFilepathChange={onFilepathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig1}
           seperator={'%'}
           showIcon
         />
       );
-      expect(screen.queryByText('/')).toBeNull();
+      screen.getAllByTestId('pathbroswer-breadcrumb-seperator').forEach(element => {
+        expect(element).toBeVisible();
+        expect(element).toHaveTextContent('%');
+      });
     });
 
-    test('renders breadcrumbs without dropdown button if there are less than or equal to 3 breadcrumbs', () => {
+    it('should render breadcrumbs without dropdown button if there are less than or equal to 3 breadcrumbs', () => {
       const rendered = render(
         <PathBrowser
+          filePath={mockFilePath}
           onFilepathChange={onFilepathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig1}
           seperator={'/'}
           showIcon
         />
@@ -112,11 +71,11 @@ describe('Pathbrowser', () => {
       expect(rendered.queryByRole('button', { name: '..' })).toBeNull();
     });
 
-    test('renders breadcrumbs with dropdown button if there are more than 3 breadcrumbs', () => {
+    it('should render breadcrumbs with dropdown button if there are more than 3 breadcrumbs', () => {
       const rendered = render(
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig2}
+          filePath={mockLongFilePath}
           seperator={'/'}
           showIcon
         />
@@ -124,29 +83,29 @@ describe('Pathbrowser', () => {
       expect(rendered.getByRole('button', { name: '..' })).toBeVisible();
     });
 
-    test('renders dropdown on click of dropdown button', async () => {
+    it('should render dropdown on click of dropdown button', async () => {
       const user = userEvent.setup();
       render(
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig2}
+          filePath={mockLongFilePath}
           seperator={'/'}
           showIcon
         />
       );
       //From the given testconfig: The dropdown menu would consist of menu button with label test2. 'test2' should not be visible until the dropdown button is clicked.
-      expect(screen.queryByRole('menuitem', { name: 'test2' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'nested3' })).not.toBeInTheDocument();
       const dropdownButton = await screen.getByRole('button', { name: '..' });
       await user.click(dropdownButton);
-      expect(screen.getByRole('menuitem', { name: 'test2' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'nested2' })).toBeInTheDocument();
     });
 
-    test('calls onFilepathChange on click of breadcrumb', async () => {
+    it('should calls onFilepathChange on click of breadcrumb', async () => {
       const user = userEvent.setup();
       render(
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig1}
+          filePath={mockFilePath}
           seperator={'/'}
           showIcon={false}
         />
@@ -157,11 +116,11 @@ describe('Pathbrowser', () => {
       expect(onFilepathChangeMock).toHaveBeenCalled();
     });
 
-    test('renders icon in breadcrumbs only if specified', () => {
+    it('should render icon in breadcrumbs only if specified', () => {
       render(
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig1}
+          filePath={mockFilePath}
           seperator={'/'}
           showIcon
         />
@@ -170,11 +129,11 @@ describe('Pathbrowser', () => {
       expect(icon).toBeVisible();
     });
 
-    test('does not render icon in breadcrumbs if showIcon is false', () => {
+    it('should not render icon in breadcrumbs if showIcon is false', () => {
       render(
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig1}
+          filePath={mockFilePath}
           seperator={'/'}
           showIcon={false}
         />
@@ -185,11 +144,11 @@ describe('Pathbrowser', () => {
   });
 
   describe('Pathbrowser Input', () => {
-    test('input is hidden before toggle button is clicked', () => {
+    it('should input is hidden before toggle button is clicked', () => {
       render(
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
-          breadcrumbs={breadcrumbsTestConfig1}
+          filePath={mockFilePath}
           seperator={'/'}
           showIcon
         />

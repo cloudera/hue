@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Input, Spin, Tooltip } from 'antd';
@@ -26,8 +27,8 @@ import { i18nReact } from '../../../utils/i18nReact';
 import useDebounce from '../../../utils/useDebounce';
 import useLoadData from '../../../utils/hooks/useLoadData';
 
-import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
-import { VIEWFILES_API_URl } from '../../../reactComponents/FileChooser/api';
+import { ListDirectory } from '../../../reactComponents/FileChooser/types';
+import { LIST_DIRECTORY_API_URL } from '../../../reactComponents/FileChooser/api';
 import PathBrowser from '../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
 
 import './FileChooserModal.scss';
@@ -65,16 +66,14 @@ const FileChooserModal = ({
     setDestPath(sourcePath);
   }, [sourcePath]);
 
-  const { data: filesData, loading } = useLoadData<PathAndFileData>(
-    `${VIEWFILES_API_URl}${destPath}`,
-    {
-      params: {
-        pagesize: '1000',
-        filter: searchTerm
-      },
-      skip: destPath === '' || destPath === undefined
-    }
-  );
+  const { data: filesData, loading } = useLoadData<ListDirectory>(LIST_DIRECTORY_API_URL, {
+    params: {
+      path: destPath,
+      pagesize: '1000',
+      filter: searchTerm
+    },
+    skip: destPath === '' || destPath === undefined
+  });
 
   const tableData: FileChooserTableData[] = useMemo(() => {
     if (!filesData?.files) {
@@ -82,7 +81,7 @@ const FileChooserModal = ({
     }
 
     return filesData?.files?.map(file => ({
-      name: file.name,
+      name: file.path.split('/').pop() ?? '',
       path: file.path,
       type: file.type
     }));
@@ -151,7 +150,7 @@ const FileChooserModal = ({
         <div className="hue-filechooser-modal__path-browser-panel">
           <span className="hue-filechooser-modal__destPath">{t('Destination Path:')}</span>
           <PathBrowser
-            breadcrumbs={filesData?.breadcrumbs}
+            filePath={destPath}
             onFilepathChange={setDestPath}
             seperator={'/'}
             showIcon={false}

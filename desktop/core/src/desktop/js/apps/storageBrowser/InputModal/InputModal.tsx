@@ -56,9 +56,7 @@ const InputModal = ({
       cancelText={cancelText}
       className="hue-input-modal cuix antd"
       okText={submitText}
-      onCancel={() => {
-        onClose();
-      }}
+      onCancel={onClose}
       onOk={() => {
         onSubmit(value);
         onClose();
