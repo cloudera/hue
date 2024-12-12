@@ -13,35 +13,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { get, post } from '../../api/utils';
-import { CancellablePromise } from '../../api/cancellablePromise';
-import { ContentSummary } from './types';
-
-export const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
-export const VIEWFILES_API_URl = '/api/v1/storage/view=';
+export const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary';
 export const DOWNLOAD_API_URL = '/filebrowser/download=';
+export const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 export const SAVE_FILE_API_URL = '/filebrowser/save';
-const MAKE_DIRECTORY_API_URL = '/api/v1/storage/mkdir';
-const TOUCH_API_URL = '/api/v1/storage/touch';
-const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary=';
-const RENAME_API_URL = '/api/v1/storage/rename';
+export const VIEWFILES_API_URl = '/api/v1/storage/view=';
+
+export const CREATE_FILE_API_URL = '/api/v1/storage/create/file/';
+export const CREATE_DIRECTORY_API_URL = '/api/v1/storage/create/directory/';
+export const RENAME_API_URL = '/api/v1/storage/rename/';
+export const SET_REPLICATION_API_URL = '/api/v1/storage/replication/';
+export const COPY_API_URL = '/api/v1/storage/copy/';
+export const BULK_COPY_API_URL = '/api/v1/storage/copy/bulk/';
+export const MOVE_API_URL = '/api/v1/storage/move/';
+export const BULK_MOVE_API_URL = '/api/v1/storage/move/bulk/';
 
 export interface ApiFileSystem {
   file_system: string;
   user_home_directory: string;
 }
-
-export const mkdir = async (folderName: string, path: string): Promise<void> => {
-  await post(MAKE_DIRECTORY_API_URL, { name: folderName, path: path });
-};
-
-export const touch = async (fileName: string, path: string): Promise<void> => {
-  await post(TOUCH_API_URL, { name: fileName, path: path });
-};
-
-export const fetchContentSummary = (path: string): CancellablePromise<ContentSummary> =>
-  get(CONTENT_SUMMARY_API_URL + path);
-
-export const rename = async (src_path: string, dest_path: string): Promise<void> => {
-  await post(RENAME_API_URL, { src_path: src_path, dest_path: dest_path });
-};
