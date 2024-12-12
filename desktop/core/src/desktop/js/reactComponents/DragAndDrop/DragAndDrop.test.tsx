@@ -29,9 +29,7 @@ describe('DragAndDrop', () => {
   it('should render the initial message when not dragging and children not present', () => {
     const { getByText } = render(<DragAndDrop onDrop={mockOnFilesDrop} />);
 
-    expect(
-      getByText("Drag 'n' drop some files here, or click to select files")
-    ).toBeInTheDocument();
+    expect(getByText('Drag and Drop files or browse')).toBeInTheDocument();
   });
 
   it('should render children when provided and not dragging', () => {
@@ -51,9 +49,7 @@ describe('DragAndDrop', () => {
       </DragAndDrop>
     );
 
-    expect(
-      queryByText("Drag 'n' drop some files here, or click to select files")
-    ).not.toBeInTheDocument();
+    expect(queryByText('Drag and Drop files or browse')).not.toBeInTheDocument();
     expect(getByText('Custom Child Element')).toBeInTheDocument();
   });
 
@@ -63,7 +59,7 @@ describe('DragAndDrop', () => {
     await act(async () => fireEvent.dragEnter(getByTestId('drag-drop__input')));
 
     await waitFor(() => {
-      expect(getByText('Drop files here to upload')).toBeInTheDocument();
+      expect(getByText('Drop files here')).toBeInTheDocument();
     });
   });
 

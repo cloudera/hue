@@ -85,8 +85,3 @@ $icon-margin: 5px;
     text-transform: capitalize;
   }
 }
-
-.hue-storage-browser__actions-dropdown {
-  width: $action-dropdown-width;
-  @include mixins.hue-svg-icon__d3-conflict;
-}

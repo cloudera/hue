@@ -40,11 +40,14 @@ import InputModal from '../../InputModal/InputModal';
 import FileChooserModal from '../../FileChooserModal/FileChooserModal';
 
 import './StorageBrowserActions.scss';
-import { StorageDirectoryTableData } from '../../../../reactComponents/FileChooser/types';
+import {
+  FileStats,
+  StorageDirectoryTableData
+} from '../../../../reactComponents/FileChooser/types';
 import { ActionType, getActionsConfig } from './StorageBrowserActions.util';
 
 interface StorageBrowserRowActionsProps {
-  currentPath: string;
+  currentPath: FileStats['path'];
   selectedFiles: StorageDirectoryTableData[];
   onSuccessfulAction: () => void;
   setLoadingFiles: (value: boolean) => void;
@@ -61,7 +64,20 @@ const StorageBrowserActions = ({
 
   const { t } = i18nReact.useTranslation();
 
-  const { save } = useSaveData(undefined);
+  const onApiSuccess = () => {
+    setLoadingFiles(false);
+    onSuccessfulAction();
+  };
+
+  const onApiError = (error: Error) => {
+    setLoadingFiles(false);
+    huePubSub.publish('hue.error', error);
+  };
+
+  const { save } = useSaveData(undefined, {
+    onSuccess: onApiSuccess,
+    onError: onApiError
+  });
 
   const { save: saveForm } = useSaveData(undefined, {
     postOptions: {
@@ -69,40 +85,20 @@ const StorageBrowserActions = ({
       headers: {
         'Content-Type': 'multipart/form-data'
       }
-    }
+    },
+    onSuccess: onApiSuccess,
+    onError: onApiError
   });
-
-  const onApiSuccess = () => {
-    setLoadingFiles(false);
-    onSuccessfulAction();
-  };
-
-  const onApiError = (error: Error) => {
-    huePubSub.publish('hue.error', error);
-    setLoadingFiles(false);
-  };
 
   const handleRename = (value: string) => {
     setLoadingFiles(true);
-    save(
-      { source_path: selectedFilePath, destination_path: value },
-      {
-        url: RENAME_API_URL,
-        onSuccess: onApiSuccess,
-        onError: onApiError
-      }
-    );
+    const payload = { source_path: selectedFilePath, destination_path: value };
+    save(payload, { url: RENAME_API_URL });
   };
 
   const handleReplication = (replicationFactor: number) => {
-    save(
-      { path: selectedFilePath, replication_factor: replicationFactor },
-      {
-        url: SET_REPLICATION_API_URL,
-        onSuccess: onApiSuccess,
-        onError: onApiError
-      }
-    );
+    const payload = { path: selectedFilePath, replication_factor: replicationFactor };
+    save(payload, { url: SET_REPLICATION_API_URL });
   };
 
   const handleCopyOrMove = (destination_path: string) => {
@@ -122,11 +118,7 @@ const StorageBrowserActions = ({
     formData.append('destination_path', destination_path);
 
     setLoadingFiles(true);
-    saveForm(formData, {
-      url,
-      onSuccess: onApiSuccess,
-      onError: onApiError
-    });
+    saveForm(formData, { url });
   };
 
   const actionConfig = getActionsConfig(selectedFiles);
