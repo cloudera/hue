@@ -36,9 +36,7 @@ const DragAndDrop = ({ children, onDrop }: DragAndDropProps): JSX.Element => {
     <div className="drag-drop">
       <div {...getRootProps()} className="drag-drop__dropzone">
         <input {...getInputProps()} className="drag-drop__input" data-testid="drag-drop__input" />
-        {isDragActive && (
-          <div className="drag-drop__message">{t('Drop files here to upload')}</div>
-        )}
+        {isDragActive && <div className="drag-drop__message">{t('Drop files here to upload')}</div>}
         {!isDragActive && !children && (
           <div className="drag-drop__message">
             {t("Drag 'n' drop some files here, or click to select files")}
