@@ -18,14 +18,15 @@ import React from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Spin } from 'antd';
 
-import huePubSub from '../../../utils/huePubSub';
-import { i18nReact } from '../../../utils/i18nReact';
-import formatBytes from '../../../utils/formatBytes';
-import useLoadData from '../../../utils/hooks/useLoadData';
-import { CONTENT_SUMMARY_API_URL } from '../../../reactComponents/FileChooser/api';
-import { ContentSummary } from '../../../reactComponents/FileChooser/types';
+import huePubSub from '../../../../utils/huePubSub';
+import { i18nReact } from '../../../../utils/i18nReact';
+import formatBytes from '../../../../utils/formatBytes';
+import useLoadData from '../../../../utils/hooks/useLoadData';
+import { CONTENT_SUMMARY_API_URL } from '../../../../reactComponents/FileChooser/api';
+import { ContentSummary } from '../../../../reactComponents/FileChooser/types';
 
 import './SummaryModal.scss';
+
 interface SummaryModalProps {
   path: string;
   showModal: boolean;
@@ -89,8 +90,8 @@ const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Elem
         <div className="hue-summary-modal__grid">
           {summary?.map(item => (
             <div key={item.key} className="hue-summary-modal__grid__summary-item">
-              <div className="hue-summary-modal__summary-item__label">{item.label}</div>
-              <div className="hue-summary-modal__summary-item__value">{item.value}</div>
+              <div className="hue-summary-modal__grid__summary-item__label">{item.label}</div>
+              <div className="hue-summary-modal__grid__summary-item__value">{item.value}</div>
             </div>
           ))}
         </div>

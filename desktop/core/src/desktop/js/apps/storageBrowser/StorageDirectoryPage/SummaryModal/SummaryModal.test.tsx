@@ -17,12 +17,12 @@ import React from 'react';
 import { waitFor, screen, fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import { get } from '../../../api/utils';
-import formatBytes from '../../../utils/formatBytes';
+import { get } from '../../../../api/utils';
+import formatBytes from '../../../../utils/formatBytes';
 import SummaryModal from './SummaryModal';
 
 // Mock the `get` function
-jest.mock('../../../api/utils', () => ({
+jest.mock('../../../../api/utils', () => ({
   get: jest.fn()
 }));
 
@@ -54,7 +54,7 @@ describe('SummaryModal', () => {
   };
   it('should render path of file in title', async () => {
     const { getByText } = render(
-      <SummaryModal showModal={true} onClose={() => {}} path="some/path" />
+      <SummaryModal showModal={true} onClose={() => { }} path="some/path" />
     );
     await waitFor(async () => {
       expect(getByText('Summary for some/path')).toBeInTheDocument();
@@ -63,7 +63,7 @@ describe('SummaryModal', () => {
 
   it('should render summary content after successful data fetching', async () => {
     const { getByText, getAllByText } = render(
-      <SummaryModal showModal={true} onClose={() => {}} path="some/path" />
+      <SummaryModal showModal={true} onClose={() => { }} path="some/path" />
     );
     await waitFor(async () => {
       expect(getByText('Diskspace Consumed')).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe('SummaryModal', () => {
   });
 
   it('should render space consumed in Bytes after the values are formatted', async () => {
-    render(<SummaryModal path={'/user/demo'} showModal={true} onClose={() => {}} />);
+    render(<SummaryModal path={'/user/demo'} showModal={true} onClose={() => { }} />);
     const spaceConsumed = await screen.findAllByText('0 Byte');
     await waitFor(() => {
       expect(spaceConsumed[0]).toBeInTheDocument();
