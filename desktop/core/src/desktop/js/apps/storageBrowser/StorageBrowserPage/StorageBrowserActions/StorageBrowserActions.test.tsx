@@ -19,13 +19,14 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 import StorageBrowserActions from './StorageBrowserActions';
-import {
-  StorageBrowserTableData,
-  ContentSummary
-} from '../../../../reactComponents/FileChooser/types';
-import * as StorageBrowserApi from '../../../../reactComponents/FileChooser/api';
-import { CancellablePromise } from '../../../../api/cancellablePromise';
+import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
+import { get } from '../../../../api/utils';
 
+jest.mock('../../../../api/utils', () => ({
+  get: jest.fn()
+}));
+
+const mockGet = get as jest.MockedFunction<typeof get>;
 describe('StorageBrowserRowActions', () => {
   //View summary option is enabled and added to the actions menu when the row data is either hdfs/ofs and a single file
   const mockRecord: StorageBrowserTableData = {
@@ -36,7 +37,8 @@ describe('StorageBrowserRowActions', () => {
     permission: 'drwxr-xr-x',
     mtime: 'May 12, 2024 10:37 PM',
     type: '',
-    path: ''
+    path: '',
+    replication: 0
   };
   const mockTwoRecords: StorageBrowserTableData[] = [
     {
@@ -47,7 +49,8 @@ describe('StorageBrowserRowActions', () => {
       permission: 'drwxr-xr-x',
       mtime: 'May 12, 2024 10:37 PM',
       type: 'file',
-      path: ''
+      path: '',
+      replication: 0
     },
     {
       name: 'testFolder',
@@ -57,7 +60,8 @@ describe('StorageBrowserRowActions', () => {
       permission: 'drwxr-xr-x',
       mtime: 'May 12, 2024 10:37 PM',
       type: 'dir',
-      path: ''
+      path: '',
+      replication: 0
     }
   ];
 
@@ -87,9 +91,19 @@ describe('StorageBrowserRowActions', () => {
   };
 
   describe('Summary option', () => {
-    let summaryApiMock;
+    beforeAll(() => {
+      jest.clearAllMocks();
+    });
 
-    const mockSummaryData = {
+    beforeEach(() => {
+      mockGet.mockResolvedValue(mockSummary);
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    const mockSummary = {
       summary: {
         directoryCount: 0,
         ecPolicy: 'Replicated',
@@ -102,17 +116,6 @@ describe('StorageBrowserRowActions', () => {
         replication: 3
       }
     };
-
-    const setUpMock = () => {
-      summaryApiMock = jest
-        .spyOn(StorageBrowserApi, 'fetchContentSummary')
-        .mockReturnValue(CancellablePromise.resolve<ContentSummary>(mockSummaryData));
-    };
-
-    afterEach(() => {
-      summaryApiMock?.mockClear();
-    });
-
     test('does not render view summary option when there are multiple records selected', async () => {
       await setUpActionMenu(mockTwoRecords);
       expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
@@ -140,15 +143,14 @@ describe('StorageBrowserRowActions', () => {
 
     test('renders summary modal when view summary option is clicked', async () => {
       const user = userEvent.setup();
-      setUpMock();
       await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
-      await user.click(screen.queryByRole('menuitem', { name: 'View Summary' }));
+      await user.click(screen.queryByRole('menuitem', { name: 'View Summary' })!);
       expect(await screen.findByText('Summary for /user/demo/test')).toBeInTheDocument();
     });
   });
 
   describe('Rename option', () => {
-    test('does not render view summary option when there are multiple records selected', async () => {
+    test('does not render rename option when there are multiple records selected', async () => {
       await setUpActionMenu(mockTwoRecords);
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
@@ -192,6 +194,45 @@ describe('StorageBrowserRowActions', () => {
       await setUpActionMenu([mockRecord], 'abfs://test', 'dir');
       await user.click(screen.queryByRole('menuitem', { name: 'Rename' }));
       expect(await screen.findByText('Enter new name here')).toBeInTheDocument();
+    });
+  });
+
+  describe('Set replication option', () => {
+    test('does not render set replication option when there are multiple records selected', async () => {
+      await setUpActionMenu(mockTwoRecords);
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
+    });
+
+    test('renders set replication option when selected record is a hdfs file', async () => {
+      await setUpActionMenu([mockRecord], 'hdfs://test', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).not.toBeNull();
+    });
+
+    test('does not render set replication option when selected record is a hdfs folder', async () => {
+      await setUpActionMenu([mockRecord], 'hdfs://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
+    });
+
+    test('does not render set replication option when selected record is a gs file/folder', async () => {
+      await setUpActionMenu([mockRecord], 'gs://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
+    });
+
+    test('does not render set replication option when selected record is a s3 file/folder', async () => {
+      await setUpActionMenu([mockRecord], 's3a://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
+    });
+
+    test('does not render set replication option when selected record is a ofs file/folder', async () => {
+      await setUpActionMenu([mockRecord], 'ofs://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
+    });
+
+    test('renders set replication modal when set replication option is clicked', async () => {
+      const user = userEvent.setup();
+      await setUpActionMenu([mockRecord], 'hdfs://test', 'file');
+      await user.click(screen.queryByRole('menuitem', { name: 'Set Replication' }));
+      expect(await screen.findByText(/Setting Replication factor/i)).toBeInTheDocument();
     });
   });
 });

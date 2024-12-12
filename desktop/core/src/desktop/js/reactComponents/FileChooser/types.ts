@@ -31,6 +31,7 @@ interface Stats {
   path: string;
   size: number;
   user: string;
+  replication: number;
 }
 
 export interface File {
@@ -55,6 +56,7 @@ export interface StorageBrowserTableData {
   mtime: string;
   type: string;
   path: string;
+  replication: number;
 }
 
 export interface PageStats {
