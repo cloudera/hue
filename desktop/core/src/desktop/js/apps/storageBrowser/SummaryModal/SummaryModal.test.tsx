@@ -14,19 +14,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { waitFor, screen, fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+import { get } from '../../../api/utils';
+import formatBytes from '../../../utils/formatBytes';
 import SummaryModal from './SummaryModal';
-import * as StorageBrowserApi from '../../../reactComponents/FileChooser/api';
-import { ContentSummary } from '../../../reactComponents/FileChooser/types';
-import { CancellablePromise } from '../../../api/cancellablePromise';
+
+// Mock the `get` function
+jest.mock('../../../api/utils', () => ({
+  get: jest.fn()
+}));
+
+const mockGet = get as jest.MockedFunction<typeof get>;
 
 describe('SummaryModal', () => {
-  let summaryApiMock;
+  beforeAll(() => {
+    jest.clearAllMocks();
+  });
 
-  const mockSummaryData = {
+  beforeEach(() => {
+    mockGet.mockResolvedValue(mockSummary);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const mockSummary = {
     summary: {
       directoryCount: 0,
       ecPolicy: 'Replicated',
@@ -39,45 +54,44 @@ describe('SummaryModal', () => {
       replication: 3
     }
   };
-
-  const setUpMock = () => {
-    summaryApiMock = jest
-      .spyOn(StorageBrowserApi, 'fetchContentSummary')
-      .mockReturnValue(CancellablePromise.resolve<ContentSummary>(mockSummaryData));
-  };
-
-  afterEach(() => {
-    summaryApiMock?.mockClear();
+  test('renders path of file in title', async () => {
+    const { getByText } = render(
+      <SummaryModal showModal={true} onClose={() => {}} path="some/path" />
+    );
+    await waitFor(async () => {
+      expect(getByText('Summary for some/path')).toBeInTheDocument();
+    });
   });
 
-  test('renders path of file in title', async () => {
-    const onCloseMock = jest.fn();
-    setUpMock();
-    render(<SummaryModal path={'/user/demo'} showModal={true} onClose={onCloseMock} />);
-    const title = await screen.findByText('Summary for /user/demo');
-    await waitFor(() => {
-      expect(title).toBeInTheDocument();
+  test('renders summary content after successful data fetching', async () => {
+    const { getByText, getAllByText } = render(
+      <SummaryModal showModal={true} onClose={() => {}} path="some/path" />
+    );
+    await waitFor(async () => {
+      expect(getByText('DISKSPACE CONSUMED')).toBeInTheDocument();
+      expect(getAllByText(formatBytes(mockSummary.summary.spaceConsumed))[0]).toBeInTheDocument();
     });
   });
 
   test('renders space consumed in Bytes after the values are formatted', async () => {
-    const onCloseMock = jest.fn();
-    setUpMock();
-    render(<SummaryModal path={'/user/demo'} showModal={true} onClose={onCloseMock} />);
+    render(<SummaryModal path={'/user/demo'} showModal={true} onClose={() => {}} />);
     const spaceConsumed = await screen.findAllByText('0 Byte');
     await waitFor(() => {
       expect(spaceConsumed[0]).toBeInTheDocument();
     });
   });
 
-  test('calls onClose when close button is clicked', async () => {
-    const onCloseMock = jest.fn();
-    setUpMock();
-    const user = userEvent.setup();
-    render(<SummaryModal path={'/user/demo'} showModal={true} onClose={onCloseMock} />);
-    const closeButton = await screen.findByText('Close');
-    expect(onCloseMock).not.toHaveBeenCalled();
-    await user.click(closeButton);
-    expect(onCloseMock).toHaveBeenCalled();
+  test('should call onClose function when close button is clicked', async () => {
+    const mockOnClose = jest.fn();
+    const { getByText } = render(
+      <SummaryModal showModal={true} onClose={mockOnClose} path="some/path" />
+    );
+
+    const closeButton = getByText('Close');
+    expect(mockOnClose).not.toHaveBeenCalled();
+    fireEvent.click(closeButton);
+    await waitFor(() => {
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
   });
 });
