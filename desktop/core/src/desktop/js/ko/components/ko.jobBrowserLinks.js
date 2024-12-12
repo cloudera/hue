@@ -208,8 +208,12 @@ class JobBrowserPanel extends DisposableComponent {
       },
       dataType: 'html',
       success: function (response) {
-        params.onePageViewModel.processHeaders(response).done(rawHtml => {
+        params.onePageViewModel.processHeadersSecure(response).done(({ rawHtml, scriptsToLoad }) => {
           $('#mini_jobbrowser').html(rawHtml);
+          const loadScripts = scriptsToLoad.map(src => params.onePageViewModel.loadScript_nonce(src)); // Assumes loadScript_nonce is defined somewhere
+          Promise.all(loadScripts).then(() => {
+            console.log("loaded all scripts")
+          });
           //ko.bindingHandlers.delayedOverflow.init($('#mini_jobbrowser')[0]);
         });
       }

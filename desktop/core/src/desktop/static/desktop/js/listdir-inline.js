@@ -1,18 +1,5 @@
-var listDirOptions;
-document.addEventListener('DOMContentLoaded', function() {  
-  var listDirOptionsElement = document.getElementById('listDirOptions');
-  if (listDirOptionsElement) {
-    
-    listDirOptions = JSON.parse(listDirOptionsElement.textContent);
-
-    // Now you have a JavaScript object with your data
-    console.log(listDirOptions.path); // Use these variables in your JavaScript code
-  }
-});
-
 var listDirOptionsElement = document.getElementById('listDirOptions');
 listDirOptions = JSON.parse(listDirOptionsElement.textContent);
-console.log(listDirOptions)
 var _dragged;
 var _dropzone;
 

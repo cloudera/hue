@@ -191,18 +191,42 @@ class OnePageViewModel {
       $el.remove();
     };
 
-    const loadScript_nonce = function (scriptSrc) {
-      return $.Deferred(defer => {
+    self.scriptQueue = [];
+    self.currentlyLoadingScript = false;
+    
+    self.loadScript_nonce = function (scriptSrc) {
+      const deferred = $.Deferred();
+    
+      self.scriptQueue.push({ scriptSrc, deferred });
+    
+      const loadNextScript = function () {
+        if (self.currentlyLoadingScript || self.scriptQueue.length === 0) {
+          // Either a script is currently being loaded or no scripts are left to load
+          return;
+        }
+    
+        // Get and remove the first script from the queue
+        const { scriptSrc, deferred } = self.scriptQueue.shift();
+        self.currentlyLoadingScript = true;
+    
         const script = document.createElement('script');
         script.type = 'text/javascript';
         script.src = scriptSrc;
         script.onload = script.onerror = function () {
           // Clean up
           document.body.removeChild(script);
-          defer.resolve();
+          // Resolve the promise for this script
+          deferred.resolve();
+          // Mark as no longer loading so the next script can load
+          self.currentlyLoadingScript = false;
+          // Attempt to load the next script
+          loadNextScript();
         };
         document.body.appendChild(script);
-      }).promise();
+      };
+    
+      loadNextScript(); // Start loading if no other scripts are currently being loaded
+      return deferred.promise();
     };
 
 
@@ -237,31 +261,6 @@ class OnePageViewModel {
         $(this).attr('href', link);
       });
 
-      const loadScript_nonce = function (scriptSrc) {
-        return $.Deferred(defer => {
-          const script = document.createElement('script');
-          script.type = 'text/javascript';
-          script.src = scriptSrc;
-          script.onload = script.onerror = function () {
-            // Clean up
-            document.body.removeChild(script);
-            defer.resolve();
-          };
-          document.body.appendChild(script);
-        }).promise();
-      };
-
-      const loadScripts_nonce = function (scriptUrls) {
-        const promises = [];
-        scriptUrls.forEach(scriptUrl => {
-          if (loadedJs.indexOf(scriptUrl) === -1) {
-            promises.push(loadScript_nonce(scriptUrl));
-            loadedJs.push(scriptUrl);
-          }
-        });
-        return promises;
-      };
-
       const loadScript = function (scriptUrl) {
         const deferred = $.Deferred();
         $.ajax({
@@ -292,29 +291,18 @@ class OnePageViewModel {
         return promises;
       };
 
-      let scriptPromises;
-      if (isSecurePageEnabled()) {
-        scriptPromises = loadScripts_nonce(scriptsToLoad);
-      } else {
-        scriptPromises = loadScripts(scriptsToLoad);
-      }
+      let scriptPromises = loadScripts(scriptsToLoad);
 
       const evalScriptSync = function () {
         if (scriptPromises.length) {
           // Evaluate the scripts in the order they were defined in the page
           const nextScriptPromise = scriptPromises.shift();
-          if (isSecurePageEnabled()) {
-            nextScriptPromise.done(() => {
-              evalScriptSync(); // Continue with the next script
-            });
-          } else {
             nextScriptPromise.done(scriptDetails => {
               if (scriptDetails.contents) {
                 $.globalEval(scriptDetails.contents);
               }
               evalScriptSync();
             });
-          }
         } else {
           promise.resolve($rawHtml.children());
         }
@@ -478,8 +466,7 @@ class OnePageViewModel {
               self.extraEmbeddableURLParams('');
               const currentPath = window.location.pathname; // Retrieve the current path from the window location
 
-              const inlineScriptsUrls = ['oozie/editor', 'hbase', 'security/hive', 'logs', 'admin_wizard', 'useradmin/users/', 'about'].some(segment => currentPath.includes(segment));
-
+              const inlineScriptsUrls = ['oozie'].some(segment => currentPath.includes(segment));
               if (inlineScriptsUrls) {
                 self.processHeaders(response).done($rawHtml => {
                   if (window.SKIP_CACHE.indexOf(app) === -1) {
@@ -498,7 +485,7 @@ class OnePageViewModel {
                   }
                   $('#embeddable_' + app).html($rawHtml);
                   // Now load the scripts
-                  const loadScripts = scriptsToLoad.map(src => loadScript_nonce(src)); // Assumes loadScript_nonce is defined somewhere
+                  const loadScripts = scriptsToLoad.map(src => self.loadScript_nonce(src)); // Assumes loadScript_nonce is defined somewhere
                   Promise.all(loadScripts).then(() => {
                     huePubSub.publish('app.dom.loaded', app);
                     window.setTimeout(() => {
@@ -945,7 +932,7 @@ class OnePageViewModel {
     };
 
     // Register the nonce check middleware globally
-    page('*', nonceCheckMiddleware);
+    // page('*', nonceCheckMiddleware);
 
     pageMapping.forEach(mapping => {
       page(
@@ -978,16 +965,16 @@ class OnePageViewModel {
     huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, configUpdated);
     huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
 
-    function nonceCheckMiddleware(ctx, next) {
-      const currentNonceEnabled = isSecurePageEnabled();
-      const targetNonceEnabled = isSecurePageEnabled(ctx.params[0]);
-      if (currentNonceEnabled !== targetNonceEnabled) {
-        // If the nonce states differ, force a full page reload
-        window.location.href = ctx.canonicalPath;
-      } else {
-        next(); // Continue with the routing if nonces are consistent
-      }
-    }
+    // function nonceCheckMiddleware(ctx, next) {
+    //   const currentNonceEnabled = isSecurePageEnabled();
+    //   const targetNonceEnabled = isSecurePageEnabled(ctx.params[0]);
+    //   if (currentNonceEnabled !== targetNonceEnabled) {
+    //     // If the nonce states differ, force a full page reload
+    //     window.location.href = ctx.canonicalPath;
+    //   } else {
+    //     next(); // Continue with the routing if nonces are consistent
+    //   }
+    // }
 
     huePubSub.subscribe('open.link', href => {
       if (href) {

@@ -73,13 +73,18 @@ def is_ldap_setup():
 
 
 def list_users(request):
-  return render("list_users.mako", request, {
-      'users': User.objects.all(),
+  data = {
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
-      'request': request,
       'is_embeddable': request.GET.get('is_embeddable', False),
       'is_ldap_setup': is_ldap_setup()
-  })
+  }
+
+  # options_json is used in the UI
+  data['options_json'] = json.dumps(data)
+  data['request'] = request
+  data['users'] = User.objects.all()  
+  
+  return render("list_users.mako", request, data)
 
 
 def list_groups(request):

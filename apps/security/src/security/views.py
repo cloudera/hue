@@ -25,7 +25,7 @@ from desktop.auth.backend import is_admin
 
 def hive(request):
 
-  return render("hive.mako", request, {
+  data = {
       'initial': json.dumps({
           'user': request.user.username,
           'sentry_provider': get_hive_sentry_provider(),
@@ -33,7 +33,11 @@ def hive(request):
       }),
       'is_embeddable': request.GET.get('is_embeddable', False),
       'has_impersonation_perm': _has_impersonation_perm(request.user),
-  })
+  }
+  # options_json used in js
+  data['options_json'] = data['initial']
+  
+  return render("hive.mako", request, data)
 
 
 def hive2(request):
