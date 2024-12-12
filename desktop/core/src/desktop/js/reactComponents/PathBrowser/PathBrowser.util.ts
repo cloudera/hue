@@ -14,7 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { BreadcrumbData } from '../types';
+export interface BreadcrumbData {
+  label: string;
+  url: string;
+}
 
 export const getFileSystemAndPath = (
   filePath: string
@@ -48,8 +51,9 @@ export const getBreadcrumbs = (fileSystem: string, path: string): BreadcrumbData
 
   return pathParts.reduce(
     (acc, part, index) => {
-      const currentUrl = `${acc[index].url}${part}/`;
-      acc.push({ url: currentUrl, label: part });
+      const decodedPart = decodeURIComponent(part);
+      const currentUrl = `${acc[index].url}${decodedPart}/`;
+      acc.push({ url: currentUrl, label: decodedPart });
       return acc;
     },
     [rootNode]

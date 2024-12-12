@@ -42,19 +42,17 @@ describe('SummaryModal', () => {
   });
 
   const mockSummary = {
-    summary: {
-      directoryCount: 0,
-      ecPolicy: 'Replicated',
-      fileCount: 1,
-      length: 0,
-      quota: -1,
-      spaceConsumed: 0,
-      spaceQuota: -1,
-      typeQuota: -1,
-      replication: 3
-    }
+    directoryCount: 0,
+    ecPolicy: 'Replicated',
+    fileCount: 1,
+    length: 0,
+    quota: -1,
+    spaceConsumed: 0,
+    spaceQuota: -1,
+    typeQuota: -1,
+    replication: 3
   };
-  test('renders path of file in title', async () => {
+  it('should render path of file in title', async () => {
     const { getByText } = render(
       <SummaryModal showModal={true} onClose={() => {}} path="some/path" />
     );
@@ -63,17 +61,17 @@ describe('SummaryModal', () => {
     });
   });
 
-  test('renders summary content after successful data fetching', async () => {
+  it('should render summary content after successful data fetching', async () => {
     const { getByText, getAllByText } = render(
       <SummaryModal showModal={true} onClose={() => {}} path="some/path" />
     );
     await waitFor(async () => {
-      expect(getByText('DISKSPACE CONSUMED')).toBeInTheDocument();
-      expect(getAllByText(formatBytes(mockSummary.summary.spaceConsumed))[0]).toBeInTheDocument();
+      expect(getByText('Diskspace Consumed')).toBeInTheDocument();
+      expect(getAllByText(formatBytes(mockSummary.spaceConsumed))[0]).toBeInTheDocument();
     });
   });
 
-  test('renders space consumed in Bytes after the values are formatted', async () => {
+  it('should render space consumed in Bytes after the values are formatted', async () => {
     render(<SummaryModal path={'/user/demo'} showModal={true} onClose={() => {}} />);
     const spaceConsumed = await screen.findAllByText('0 Byte');
     await waitFor(() => {
@@ -81,7 +79,7 @@ describe('SummaryModal', () => {
     });
   });
 
-  test('should call onClose function when close button is clicked', async () => {
+  it('should call onClose function when close button is clicked', async () => {
     const mockOnClose = jest.fn();
     const { getByText } = render(
       <SummaryModal showModal={true} onClose={mockOnClose} path="some/path" />

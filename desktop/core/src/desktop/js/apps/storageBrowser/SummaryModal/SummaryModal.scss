@@ -16,11 +16,27 @@
 @use 'variables' as vars;
 
 .antd.cuix {
-  .hue-summary-modal__row {
-    margin-bottom: vars.$fluidx-spacing-s;
+  .hue-summary-modal__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
 
-    &:last-child {
-      margin-bottom: 0;
+    &__summary-item {
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+
+      &__label {
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: vars.$fluidx-gray-700;
+      }
+
+      &__value {
+        height: 12px;
+        align-self: stretch;
+        color: vars.$fluidx-gray-900;
+      }
     }
   }
 }

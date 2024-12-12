@@ -29,7 +29,7 @@ import useLoadData from '../../../utils/hooks/useLoadData';
 
 import { ListDirectory } from '../../../reactComponents/FileChooser/types';
 import { LIST_DIRECTORY_API_URL } from '../../../reactComponents/FileChooser/api';
-import PathBrowser from '../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
+import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 
 import './FileChooserModal.scss';
 

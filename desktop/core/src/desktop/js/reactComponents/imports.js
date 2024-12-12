@@ -8,7 +8,7 @@ export async function loadComponent(name) {
       return (await import('../apps/editor/components/result/reactExample/ReactExample')).default;
 
     case 'StorageBrowserPage':
-      return (await import('../apps/storageBrowser/StorageBrowserPage/StorageBrowserPage')).default;
+      return (await import('../apps/storageBrowser/StorageBrowserPage')).default;
 
     case 'Metrics':
       return (await import('../apps/admin/Metrics/MetricsTab')).default;

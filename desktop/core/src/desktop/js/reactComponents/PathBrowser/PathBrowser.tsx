@@ -19,14 +19,13 @@ import { Input, Dropdown } from 'antd';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
-import HdfsIcon from '../../../components/icons/HdfsIcon';
-import S3Icon from '../../../components/icons/S3Icon';
-import AdlsIcon from '../../../components/icons/AdlsIcon';
+import HdfsIcon from '../../components/icons/HdfsIcon';
+import S3Icon from '../../components/icons/S3Icon';
+import AdlsIcon from '../../components/icons/AdlsIcon';
 
-import { BreadcrumbData } from '../types';
 import Breadcrumb from './Breadcrumb/Breadcrumb';
 import './PathBrowser.scss';
-import { getBreadcrumbs, getFileSystemAndPath } from './PathBrowser.util';
+import { getBreadcrumbs, getFileSystemAndPath, BreadcrumbData } from './PathBrowser.util';
 
 interface PathBrowserProps {
   filePath: string;

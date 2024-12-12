@@ -20,7 +20,7 @@ export const LIST_DIRECTORY_API_URL = '/api/v1/storage/list';
 export const FILE_PREVIEW_API_URL = '/api/v1/storage/display';
 export const DOWNLOAD_API_URL = '/filebrowser/download=';
 export const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary';
-export const SAVE_FILE_API_URL = '/filebrowser/save';
+export const SAVE_FILE_API_URL = '/api/v1/storage/save';
 export const UPLOAD_FILE_URL = '/filebrowser/upload/file';
 export const CHUNK_UPLOAD_URL = '/filebrowser/upload/chunks/file';
 export const CHUNK_UPLOAD_COMPLETE_URL = '/filebrowser/upload/complete';

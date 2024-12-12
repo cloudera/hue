@@ -13,42 +13,41 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 @use 'variables' as vars;
 @use 'mixins';
 
-.antd.cuix {
-  .hue-storage-browser-tab-content {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
+.hue-storage-browser.antd.cuix {
+  @include mixins.fillAbsolute;
+  @include mixins.flexRowLayout;
+
+  height: 100%;
+
+  .ant-spin-nested-loading {
     height: 100%;
+
+    .ant-spin-container {
+      height: 100%;
+    }
   }
 
-  .hue-storage-browser__title-bar {
+  .hue-storage-browser__tab {
     display: flex;
-    gap: vars.$fluidx-spacing-xs;
-  }
+    height: 100%;
+    background-color: vars.$fluidx-gray-100;
+    padding: 0 16px;
 
-  .hue-storage-browser__icon {
-    flex: 0 0 auto;
-    height: vars.$fluidx-heading-h3-line-height;
-  }
+    .ant-tabs-content-holder {
+      display: flex;
+      flex: 1;
+      overflow: auto;
 
-  .hue-storage-browser__folder-name {
-    flex: 0 0 auto;
-    font-size: vars.$fluidx-heading-h3-size;
-    line-height: vars.$fluidx-heading-h3-line-height;
-    font-weight: vars.$fluidx-heading-h3-weight;
-  }
-
-  .hue-storage-browser__path-browser-panel {
-    display: flex;
-    align-items: center;
-    gap: vars.$fluidx-spacing-xs;
-  }
-
-  .hue-storage-browser__filePath {
-    flex: 0 0 auto;
-    font-weight: 600;
+      .ant-tabs-content,
+      .ant-tabs-tabpane-active {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+    }
   }
 }

@@ -13,9 +13,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { useMemo } from 'react';
+
+import React from 'react';
 import Modal from 'cuix/dist/components/Modal';
-import { Row, Col, Spin } from 'antd';
+import { Spin } from 'antd';
 
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
@@ -34,52 +35,44 @@ interface SummaryModalProps {
 const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const getSummary = () => {
-    const cols = summary.map((item, index) => (
-      <Col key={'summaryItem' + index} span={12}>
-        <Row key={'summaryItem' + index + 'key'}>{item[0]}</Row>
-        <Row key={'summaryItem' + index + 'value'}>{item[1]}</Row>
-      </Col>
-    ));
-
-    const rows: JSX.Element[] = [];
-    for (let i = 0; i < cols.length - 1; i = i + 2) {
-      rows.push(
-        <Row key={'summaryRow' + i} className="hue-summary-modal__row">
-          {cols[i]}
-          {cols[i + 1]}
-        </Row>
-      );
-    }
-    return rows;
-  };
-
-  const {
-    data: responseSummary,
-    loading: loadingSummary,
-    error
-  } = useLoadData<ContentSummary>(CONTENT_SUMMARY_API_URL, {
-    params: {
-      path: path
-    },
-    onError: () => {
+  const { data: responseSummary, loading } = useLoadData<ContentSummary>(CONTENT_SUMMARY_API_URL, {
+    params: { path },
+    onError: error => {
       huePubSub.publish('hue.error', error);
     },
     skip: path === '' || path === undefined || !showModal
   });
 
-  const summary = useMemo(() => {
-    return [
-      ['DISKSPACE CONSUMED', formatBytes(responseSummary?.summary.spaceConsumed)],
-      ['BYTES USED', formatBytes(responseSummary?.summary.length)],
-      ['NAMESPACE QUOTA', formatBytes(responseSummary?.summary.quota)],
-      ['DISKSPACE QUOTA', formatBytes(responseSummary?.summary.spaceQuota)],
-      ['REPLICATION FACTOR', responseSummary?.summary.replication],
-      [,],
-      ['NUMBER OF DIRECTORIES', responseSummary?.summary.directoryCount],
-      ['NUMBER OF FILES', responseSummary?.summary.fileCount]
-    ];
-  }, [responseSummary]);
+  const summary = [
+    {
+      key: 'diskspaceConsumed',
+      label: t('Diskspace Consumed'),
+      value: formatBytes(responseSummary?.spaceConsumed)
+    },
+    { key: 'bytesUsed', label: t('Bytes Used'), value: formatBytes(responseSummary?.length) },
+    {
+      key: 'namespaceQuota',
+      label: t('Namespace Quota'),
+      value: formatBytes(responseSummary?.quota)
+    },
+    {
+      key: 'diskspaceQuota',
+      label: t('Diskspace Quota'),
+      value: formatBytes(responseSummary?.spaceQuota)
+    },
+    {
+      key: 'replicationFactor',
+      label: t('Replication Factor'),
+      value: responseSummary?.replication
+    },
+    { key: 'blank', label: '', value: '' },
+    {
+      key: 'numberOfDirectories',
+      label: t('Number of Directories'),
+      value: responseSummary?.directoryCount
+    },
+    { key: 'numberOfFiles', label: t('Number of Files'), value: responseSummary?.fileCount }
+  ];
 
   //TODO:Handle long modal title
   return (
@@ -92,7 +85,16 @@ const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Elem
       cancellable={false}
       onCancel={onClose}
     >
-      <Spin spinning={loadingSummary}>{summary && getSummary()}</Spin>
+      <Spin spinning={loading}>
+        <div className="hue-summary-modal__grid">
+          {summary?.map(item => (
+            <div key={item.key} className="hue-summary-modal__grid__summary-item">
+              <div className="hue-summary-modal__summary-item__label">{item.label}</div>
+              <div className="hue-summary-modal__summary-item__value">{item.value}</div>
+            </div>
+          ))}
+        </div>
+      </Spin>
     </Modal>
   );
 };
