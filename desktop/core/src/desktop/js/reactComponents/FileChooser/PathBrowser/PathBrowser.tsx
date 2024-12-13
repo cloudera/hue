@@ -143,7 +143,7 @@ const PathBrowser = ({
           ) : (
             <>
               <Breadcrumb
-                label={fileSystem}
+                label={breadcrumbs[0].label}
                 url={breadcrumbs[0].url}
                 onFilepathChange={onFilepathChange}
                 key={breadcrumbs[0].url}
