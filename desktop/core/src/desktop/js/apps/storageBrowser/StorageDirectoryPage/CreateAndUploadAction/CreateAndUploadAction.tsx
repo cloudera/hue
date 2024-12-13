@@ -40,6 +40,7 @@ interface CreateAndUploadActionProps {
   currentPath: FileStats['path'];
   onSuccessfulAction: () => void;
   setLoadingFiles: (value: boolean) => void;
+  onFilesUpload: (files: File[]) => void;
 }
 
 enum ActionType {
@@ -51,7 +52,8 @@ enum ActionType {
 const CreateAndUploadAction = ({
   currentPath,
   onSuccessfulAction,
-  setLoadingFiles
+  setLoadingFiles,
+  onFilesUpload
 }: CreateAndUploadActionProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
@@ -78,6 +80,11 @@ const CreateAndUploadAction = ({
 
   const onModalClose = () => {
     setSelectedAction(undefined);
+  };
+
+  const onUpload = (files: File[]) => {
+    onModalClose();
+    onFilesUpload(files);
   };
 
   const newActionsMenuItems: MenuItemGroupType[] = [
@@ -166,7 +173,7 @@ const CreateAndUploadAction = ({
         title={t('Upload A File')}
       >
         <div className="hue-file-upload-modal">
-          <DragAndDrop onDrop={() => {}} />
+          <DragAndDrop onDrop={onUpload} />
         </div>
       </Modal>
     </>
