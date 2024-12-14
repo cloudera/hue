@@ -46,7 +46,11 @@ const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Ele
 
   const { t } = i18nReact.useTranslation();
 
-  const { data: fileStats, loading } = useLoadData<FileStats>(FILE_STATS_API_URL, {
+  const {
+    data: fileStats,
+    loading,
+    reloadData
+  } = useLoadData<FileStats>(FILE_STATS_API_URL, {
     params: {
       path: filePath
     },
@@ -89,7 +93,7 @@ const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Ele
           <StorageDirectoryPage fileStats={fileStats} onFilePathChange={setFilePath} />
         )}
         {fileStats?.type === BrowserViewType.file && (
-          <StorageFilePage fileName={fileName} fileStats={fileStats} />
+          <StorageFilePage fileName={fileName} fileStats={fileStats} onReload={reloadData} />
         )}
       </div>
     </Spin>
