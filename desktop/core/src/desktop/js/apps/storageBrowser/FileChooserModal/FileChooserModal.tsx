@@ -72,7 +72,7 @@ const FileChooserModal = ({
       pagesize: '1000',
       filter: searchTerm
     },
-    skip: destPath === '' || destPath === undefined
+    skip: destPath === '' || destPath === undefined || !showModal
   });
 
   const tableData: FileChooserTableData[] = useMemo(() => {
@@ -137,9 +137,7 @@ const FileChooserModal = ({
       okText={submitText}
       title={title}
       open={showModal}
-      onCancel={() => {
-        onClose();
-      }}
+      onCancel={onClose}
       onOk={() => {
         onSubmit(destPath);
         onClose();
@@ -167,7 +165,7 @@ const FileChooserModal = ({
         <Spin spinning={loading}>
           <Table
             className="hue-filechooser-modal__table"
-            dataSource={tableData?.slice(2)}
+            dataSource={tableData}
             pagination={false}
             columns={getColumns(tableData[0] ?? {})}
             rowKey={(record, index) => record.path + index}
