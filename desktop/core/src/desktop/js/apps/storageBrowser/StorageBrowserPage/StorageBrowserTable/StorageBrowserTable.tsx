@@ -34,7 +34,10 @@ import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import useDebounce from '../../../../utils/useDebounce';
 
-import { mkdir, touch } from '../../../../reactComponents/FileChooser/api';
+import {
+  CREATE_DIRECTORY_API_URL,
+  CREATE_FILE_API_URL
+} from '../../../../reactComponents/FileChooser/api';
 import {
   StorageBrowserTableData,
   SortOrder,
@@ -44,6 +47,7 @@ import Pagination from '../../../../reactComponents/Pagination/Pagination';
 import StorageBrowserActions from '../StorageBrowserActions/StorageBrowserActions';
 import InputModal from '../../InputModal/InputModal';
 import formatBytes from '../../../../utils/formatBytes';
+import useSaveData from '../../../../utils/hooks/useSaveData';
 
 import './StorageBrowserTable.scss';
 import { formatTimestamp } from '../../../../utils/dateTimeUtils';
@@ -111,7 +115,8 @@ const StorageBrowserTable = ({
       permission: file.rwx,
       mtime: file.stats?.mtime ? formatTimestamp(new Date(Number(file.stats.mtime) * 1000)) : '-',
       type: file.type,
-      path: file.path
+      path: file.path,
+      replication: file.stats?.replication
     }));
   }, [filesData]);
 
@@ -209,7 +214,9 @@ const StorageBrowserTable = ({
       }
       columns.push(column);
     }
-    return columns.filter(col => col.dataIndex !== 'type' && col.dataIndex !== 'path');
+    return columns.filter(
+      col => col.dataIndex !== 'type' && col.dataIndex !== 'path' && col.dataIndex !== 'replication'
+    );
   };
 
   const onRowClicked = (record: StorageBrowserTableData) => {
@@ -240,34 +247,33 @@ const StorageBrowserTable = ({
     onPageNumberChange(nextPageNumber === 0 ? numPages : nextPageNumber);
   };
 
+  const { error: createFolderError, save: saveCreateFolder } =
+    useSaveData(CREATE_DIRECTORY_API_URL);
+
   const handleCreateNewFolder = (folderName: string) => {
-    setLoadingFiles(true);
-    mkdir(folderName, filePath)
-      .then(() => {
-        refetchData();
-      })
-      .catch(error => {
-        huePubSub.publish('hue.error', error);
-        setShowNewFolderModal(false);
-      })
-      .finally(() => {
-        setLoadingFiles(false);
-      });
+    saveCreateFolder(
+      { path: filePath, name: folderName },
+      {
+        onSuccess: () => refetchData(),
+        onError: () => {
+          huePubSub.publish('hue.error', createFolderError);
+        }
+      }
+    );
   };
 
+  const { error: createFileError, save: saveCreateFile } = useSaveData(CREATE_FILE_API_URL);
+
   const handleCreateNewFile = (fileName: string) => {
-    setLoadingFiles(true);
-    touch(fileName, filePath)
-      .then(() => {
-        refetchData();
-      })
-      .catch(error => {
-        huePubSub.publish('hue.error', error);
-        setShowNewFileModal(false);
-      })
-      .finally(() => {
-        setLoadingFiles(false);
-      });
+    saveCreateFile(
+      { path: filePath, name: fileName },
+      {
+        onSuccess: () => refetchData(),
+        onError: () => {
+          huePubSub.publish('hue.error', createFileError);
+        }
+      }
+    );
   };
 
   const handleSearch = useCallback(
@@ -317,6 +323,7 @@ const StorageBrowserTable = ({
         />
         <div className="hue-storage-browser__actions-bar-right">
           <StorageBrowserActions
+            currentPath={filePath}
             selectedFiles={selectedFiles}
             setLoadingFiles={setLoadingFiles}
             onSuccessfulAction={refetchData}
@@ -327,7 +334,7 @@ const StorageBrowserTable = ({
               items: newActionsMenuItems,
               className: 'hue-storage-browser__action-menu'
             }}
-            trigger={['hover', 'click']}
+            trigger={['click']}
           >
             <PrimaryButton data-event="">
               {t('New')}
@@ -345,7 +352,7 @@ const StorageBrowserTable = ({
           onRow={onRowClicked}
           pagination={false}
           rowClassName={rowClassName}
-          rowKey={(record, index) => record.path + '' + index}
+          rowKey={(record, index) => record.path + index}
           rowSelection={{
             type: 'checkbox',
             ...rowSelection

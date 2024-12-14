@@ -13,7 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Input } from 'antd';
 
@@ -21,28 +21,35 @@ import { i18nReact } from '../../../utils/i18nReact';
 
 import './InputModal.scss';
 
-//TODO: Add unit tests
 interface InputModalProps {
   cancelText?: string;
+  initialValue: string | number;
   inputLabel: string;
-  submitText?: string;
+  inputType: 'text' | 'number';
   onClose: () => void;
-  onSubmit: (value: string) => void;
+  onSubmit: (value: string | number) => void;
+  submitText?: string;
   showModal: boolean;
   title: string;
 }
 
 const InputModal = ({
   inputLabel,
+  inputType,
+  initialValue,
   onClose,
   onSubmit,
   showModal,
   title,
   ...i18n
 }: InputModalProps): JSX.Element => {
-  const [value, setValue] = useState<string>('');
+  const [value, setValue] = useState<string | number>(initialValue);
   const { t } = i18nReact.useTranslation();
   const { cancelText = t('Cancel'), submitText = t('Submit') } = i18n;
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
 
   return (
     <Modal
@@ -50,12 +57,10 @@ const InputModal = ({
       className="hue-input-modal cuix antd"
       okText={submitText}
       onCancel={() => {
-        setValue('');
         onClose();
       }}
       onOk={() => {
         onSubmit(value);
-        setValue('');
         onClose();
       }}
       open={showModal}
@@ -65,8 +70,9 @@ const InputModal = ({
       <Input
         className="hue-input-modal__input"
         value={value}
-        onInput={e => {
-          setValue((e.target as HTMLInputElement).value);
+        type={inputType}
+        onChange={e => {
+          setValue(e.target.value);
         }}
       />
     </Modal>

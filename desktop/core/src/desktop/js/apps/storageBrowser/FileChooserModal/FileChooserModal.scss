@@ -1,0 +1,88 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+@use 'variables' as vars;
+@use 'mixins';
+
+$cell-height: 20px;
+$table-placeholder-height: 100px;
+$icon-margin: 5px;
+
+.antd.cuix {
+  .hue-filechooser-modal__body{
+    height:350px;
+  }
+
+  .hue-filechooser-modal__path-browser-panel {
+    display: flex;
+    align-items: center;
+    gap: vars.$fluidx-spacing-xs;
+  }
+
+  .hue-filechooser-modal__destPath {
+    flex: 0 0 auto;
+     font-weight: 600;
+  }
+
+  .hue-filechooser-modal__search {
+    margin: vars.$fluidx-spacing-xs 0;
+    width: 50%;
+
+    .ant-input {
+      box-shadow: none;
+    }
+  }
+
+  .hue-filechooser-modal__table {
+    .ant-table-placeholder {
+      height: $table-placeholder-height;
+      text-align: center;
+    }
+
+    th.ant-table-cell {
+      height: $cell-height;
+      border: none;
+    }
+  }
+
+  .hue-filechooser-modal__table-cell-icon {
+    color: vars.$fluidx-blue-700;
+    margin-right: 6px;
+  }
+
+  .hue-filechooser-modal__table-row {
+    :hover {
+      cursor: pointer;
+    }
+
+    td.ant-table-cell {
+      height: $cell-height;
+      padding: 2px;
+      @include mixins.nowrap-ellipsis;
+    }  
+  }
+
+  .disabled-row {
+    pointer-events: none;
+  }  
+
+  .ant-table-tbody > tr > td {
+    border: none
+  }
+
+  .hue-filechooser-modal__table-cell-name {
+    color: vars.$fluidx-blue-700;
+  }
+}
