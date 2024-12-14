@@ -16,19 +16,17 @@
 
 import { hueWindow } from 'types/types';
 
-const changeURL = (newURL: string, params?: Record<string, string | number | boolean>): void => {
+const changeURL = (
+  newURL: string,
+  params?: Record<string, string | number | boolean>,
+  isReplace?: boolean
+): void => {
   let extraSearch = '';
   if (params) {
-    const newSearchKeys = Object.keys(params);
-    if (newSearchKeys.length) {
-      while (newSearchKeys.length) {
-        const newKey = newSearchKeys.pop() || '';
-        extraSearch += newKey + '=' + params[newKey];
-        if (newSearchKeys.length) {
-          extraSearch += '&';
-        }
-      }
-    }
+    const paramsToString = Object.fromEntries(
+      Object.entries(params).map(([key, value]) => [key, String(value)])
+    );
+    extraSearch += new URLSearchParams(paramsToString).toString();
   }
 
   const hashSplit = newURL.split('#');
@@ -45,7 +43,11 @@ const changeURL = (newURL: string, params?: Record<string, string | number | boo
   } else if (window.location.hash) {
     url += window.location.hash;
   }
-  window.history.pushState(null, '', url);
+  if (isReplace) {
+    window.history.replaceState(null, '', url);
+  } else {
+    window.history.pushState(null, '', url);
+  }
 };
 
 export default changeURL;
