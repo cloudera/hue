@@ -511,7 +511,6 @@
             }
 
             browserInterpreters.forEach(browser => {
-              debugger;
               if (browser.type === 'tables') {
                 browserItems.push({
                   type: 'navigation',
