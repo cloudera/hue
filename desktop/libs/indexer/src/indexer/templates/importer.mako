@@ -627,11 +627,17 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
             </span>
           </div>
 
-          <!-- ko if: namespace().computes.length > 1 -->
+          <!-- ko if: namespace().computes.length > 1 || window.getLastKnownConfig().has_computes -->
           <div class="control-group">
             <label for="computeName" class="control-label"><div>${ _('Compute') }</div>
-              <select id="computeName" data-bind="selectize: namespace().computes, value: $parent.createWizard.source.selectedComputeId, optionsValue: 'name', optionsText: 'name'"></select>
+              <select id="computeName" data-bind="selectize: namespace().computes, value: $parent.createWizard.source.selectedComputeId, optionsValue: 'name', optionsText: 'name'" placeHolder="Select Compute"></select>
             </label>
+            <!-- ko if: !$parent.createWizard.source.selectedComputeId() -->
+              <span class="help-inline muted">
+                <i class="fa fa-warning" style="color: #c09853"></i>
+                  ${ _('Empty compute') }
+              </span>
+            <!-- /ko -->
           </div>
           <!-- /ko -->
         </div>
@@ -1720,6 +1726,12 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
         })
         self.compute(selectedCompute);
       });
+
+      self.namespace.subscribe(function (namespace) {
+        if(namespace.computes.length > 0 && self.selectedComputeId() === undefined) {
+          self.selectedComputeId(namespace.computes[0].name)
+        }
+      })
 
       var refreshThrottle = -1;
       var sampleColSubDisposals = [];
@@ -2890,7 +2902,9 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
           }).length === 0
         ) || self.destination.indexerConfigSet();
 
-        return self.isValidDestination() && validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable && isValidColumnNames;
+        var isComputeSelected = self.namespace().computes.length === 0 || self.source.selectedComputeId().length > 0
+
+        return self.isValidDestination() && validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable && isValidColumnNames && isComputeSelected;
       });
 
       self.formatTypeSubscribed = false;
