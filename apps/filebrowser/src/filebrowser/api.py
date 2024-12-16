@@ -442,7 +442,24 @@ def upload_chunks(request):
 
 @api_error_handler
 def upload_complete(request):
-  pass
+  """
+  Handles the completion of a file upload.
+
+  Args:
+    request (HttpRequest): The HTTP request object.
+
+  Returns:
+    JsonResponse: A JSON response containing the result of the upload.
+  """
+  try:
+    chunks = extract_upload_data(request, "POST")
+    response = perform_upload_task(request, **chunks)
+
+    return JsonResponse(response)
+  except Exception as e:
+    error_message = 'Error occurred during chunk file upload completion.'
+    LOG.error(f'{error_message} {str(e)}')
+    return HttpResponse(error_message, status=500)
 
 
 @api_error_handler
