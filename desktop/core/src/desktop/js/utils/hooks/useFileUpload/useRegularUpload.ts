@@ -16,7 +16,7 @@
 
 import useQueueProcessor from '../useQueueProcessor';
 import { UPLOAD_FILE_URL } from '../../../reactComponents/FileChooser/api';
-import { DEFAULT_CONCURRENT_UPLOAD, FileUploadStatus } from '../../constants/storageBrowser';
+import { FileUploadStatus } from '../../constants/storageBrowser';
 import useSaveData from '../useSaveData';
 import { UploadItem } from './util';
 
@@ -27,11 +27,13 @@ interface UseUploadQueueResponse {
 }
 
 interface UploadQueueOptions {
+  concurrentProcess?: number;
   onStatusUpdate: (item: UploadItem, newStatus: FileUploadStatus) => void;
   onComplete: () => void;
 }
 
 const useRegularUpload = ({
+  concurrentProcess = 1,
   onStatusUpdate,
   onComplete
 }: UploadQueueOptions): UseUploadQueueResponse => {
@@ -68,7 +70,7 @@ const useRegularUpload = ({
     dequeue: removeFile,
     isLoading
   } = useQueueProcessor<UploadItem>(processUploadItem, {
-    concurrentProcess: DEFAULT_CONCURRENT_UPLOAD,
+    concurrentProcess,
     onSuccess: onComplete
   });
 

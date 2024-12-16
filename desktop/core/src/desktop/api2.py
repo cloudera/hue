@@ -78,7 +78,7 @@ from desktop.models import (
   uuid_default,
 )
 from desktop.views import get_banner_message, serve_403_error
-from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
+from filebrowser.conf import RESTRICT_FILE_EXTENSIONS, CONCURRENT_MAX_CONNECTIONS, FILE_UPLOAD_CHUNK_SIZE, SHOW_DOWNLOAD_BUTTON
 from filebrowser.tasks import check_disk_usage_and_clean_task, document_cleanup_task
 from hadoop.cluster import is_yarn
 from metadata.catalog_api import (
@@ -89,6 +89,7 @@ from metadata.catalog_api import (
 from metadata.conf import has_catalog
 from notebook.connectors.base import Notebook
 from useradmin.models import Group, User
+from filebrowser.views import MAX_FILEEDITOR_SIZE
 
 LOG = logging.getLogger()
 
@@ -128,6 +129,10 @@ def get_config(request):
   config['hue_config']['enable_chunked_file_uploader'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
   config['hue_config']['enable_task_server'] = TASK_SERVER_V2.ENABLED.get()
   config['hue_config']['restrict_file_extensions'] = RESTRICT_FILE_EXTENSIONS.get()
+  config['hue_config']['concurrent_max_connection'] = CONCURRENT_MAX_CONNECTIONS.get()
+  config['hue_config']['file_upload_chunk_size'] = FILE_UPLOAD_CHUNK_SIZE.get()
+  config['hue_config']['enable_file_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
+  config['hue_config']['max_file_editor_size'] = MAX_FILEEDITOR_SIZE
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
