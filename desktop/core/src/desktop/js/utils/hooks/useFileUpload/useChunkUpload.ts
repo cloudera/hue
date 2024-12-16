@@ -50,7 +50,7 @@ const useChunkUpload = ({
   onComplete
 }: ChunkUploadOptions): UseUploadQueueResponse => {
   const config = getLastKnownConfig();
-  const chunkSize = config?.hue_config?.file_upload_chunk_size ?? DEFAULT_CHUNK_SIZE;
+  const chunkSize = config?.storage_browser?.file_upload_chunk_size ?? DEFAULT_CHUNK_SIZE;
   const [pendingItems, setPendingItems] = useState<UploadItem[]>([]);
 
   const { save } = useSaveData(undefined, {

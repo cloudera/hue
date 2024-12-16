@@ -125,14 +125,14 @@ def get_config(request):
   config = get_cluster_config(request.user)
   config['hue_config']['is_admin'] = is_admin(request.user)
   config['hue_config']['is_yarn_enabled'] = is_yarn()
-  config['hue_config']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
-  config['hue_config']['enable_chunked_file_uploader'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
   config['hue_config']['enable_task_server'] = TASK_SERVER_V2.ENABLED.get()
-  config['hue_config']['restrict_file_extensions'] = RESTRICT_FILE_EXTENSIONS.get()
-  config['hue_config']['concurrent_max_connection'] = CONCURRENT_MAX_CONNECTIONS.get()
-  config['hue_config']['file_upload_chunk_size'] = FILE_UPLOAD_CHUNK_SIZE.get()
-  config['hue_config']['enable_file_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
-  config['hue_config']['max_file_editor_size'] = MAX_FILEEDITOR_SIZE
+  config['storage_browser']['enable_chunked_file_upload'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
+  config['storage_browser']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
+  config['storage_browser']['restrict_file_extensions'] = RESTRICT_FILE_EXTENSIONS.get()
+  config['storage_browser']['concurrent_max_connection'] = CONCURRENT_MAX_CONNECTIONS.get()
+  config['storage_browser']['file_upload_chunk_size'] = FILE_UPLOAD_CHUNK_SIZE.get()
+  config['storage_browser']['enable_file_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
+  config['storage_browser']['max_file_editor_size'] = MAX_FILEEDITOR_SIZE
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())

@@ -115,8 +115,8 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
 
   const isEditingEnabled =
     !isEditing &&
-    config?.hue_config.max_file_editor_size &&
-    config?.hue_config.max_file_editor_size > fileStats.size &&
+    config?.storage_browser.max_file_editor_size &&
+    config?.storage_browser.max_file_editor_size > fileStats.size &&
     EDITABLE_FILE_FORMATS[fileType] &&
     fileData?.compression?.toLocaleLowerCase() === 'none';
 
@@ -169,7 +169,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                   </Button>
                 </>
               )}
-              {config?.hue_config.enable_file_download_button && (
+              {config?.storage_browser.enable_file_download_button && (
                 <a href={`${DOWNLOAD_API_URL}${fileStats.path}`}>
                   <PrimaryButton
                     data-testid="preview--download--button"

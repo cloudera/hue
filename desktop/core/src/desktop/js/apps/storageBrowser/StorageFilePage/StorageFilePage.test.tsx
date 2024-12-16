@@ -50,7 +50,7 @@ jest.mock('../../../utils/hooks/useLoadData', () => {
 });
 
 const mockConfig = {
-  hue_config: {
+  storage_browser: {
     enable_file_download_button: true,
     max_file_editor_size: 1000000000
   }
@@ -220,7 +220,7 @@ describe('StorageFilePage', () => {
   });
 
   it('should not render the download button when show_download_button is false', () => {
-    mockConfig.hue_config.enable_file_download_button = false;
+    mockConfig.storage_browser.enable_file_download_button = false;
 
     render(
       <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />

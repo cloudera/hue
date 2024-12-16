@@ -41,7 +41,7 @@ const useFileUpload = (
 ): UseUploadQueueResponse => {
   const config = getLastKnownConfig();
   const concurrentProcess =
-    config?.hue_config.concurrent_max_connection ?? DEFAULT_CONCURRENT_MAX_CONNECTIONS;
+    config?.storage_browser.concurrent_max_connection ?? DEFAULT_CONCURRENT_MAX_CONNECTIONS;
 
   const [uploadQueue, setUploadQueue] = useState<UploadItem[]>([]);
 
