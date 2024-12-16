@@ -1808,6 +1808,7 @@ class ClusterConfig(object):
         'enable_sharing': ENABLE_SHARING.get(),
         'collect_usage': COLLECT_USAGE.get()
       },
+      'storage_browser': {},
       'vw_name': hue_host_name,
       'img_version': img_version,
       'hue_version': version_of_hue
