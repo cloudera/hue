@@ -151,7 +151,7 @@ const FileChooserModal = ({
         <div className="hue-filechooser-modal__path-browser-panel">
           <span className="hue-filechooser-modal__destPath">{t('Destination Path:')}</span>
           <PathBrowser
-            breadcrumbs={filesData?.breadcrumbs}
+            filePath={destPath}
             onFilepathChange={setDestPath}
             seperator={'/'}
             showIcon={false}
