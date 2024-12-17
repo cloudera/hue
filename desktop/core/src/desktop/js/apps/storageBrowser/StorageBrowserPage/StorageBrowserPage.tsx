@@ -14,9 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Tabs, Spin } from 'antd';
-import type { TabsProps } from 'antd';
 
 import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 
@@ -33,23 +32,19 @@ const StorageBrowserPage = (): JSX.Element => {
 
   const { data: fileSystems, loading } = useLoadData<ApiFileSystem[]>(FILESYSTEMS_API_URL);
 
-  const fileSystemTabs: TabsProps['items'] | undefined = useMemo(
-    () =>
-      fileSystems?.map(system => {
-        return {
-          label: system.file_system.toUpperCase(),
-          key: system.file_system + '_tab',
-          children: <StorageBrowserTabContent user_home_dir={system.user_home_directory} />
-        };
-      }),
-    [fileSystems]
-  );
-
   return (
     <div className="hue-storage-browser cuix antd">
       <CommonHeader title={t('Storage Browser')} icon={<DataBrowserIcon />} />
       <Spin spinning={loading}>
-        <Tabs className="hue-storage-browser__tab" defaultActiveKey="0" items={fileSystemTabs} />
+        <Tabs
+          className="hue-storage-browser__tab"
+          defaultActiveKey="0"
+          items={fileSystems?.map(system => ({
+            label: system.file_system.toUpperCase(),
+            key: system.file_system + '_tab',
+            children: <StorageBrowserTabContent homeDir={system.user_home_directory} />
+          }))}
+        />
       </Spin>
     </div>
   );

@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Input, Spin, Tooltip } from 'antd';
@@ -26,7 +27,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 import useDebounce from '../../../utils/useDebounce';
 import useLoadData from '../../../utils/hooks/useLoadData';
 
-import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
+import { ListDirectory } from '../../../reactComponents/FileChooser/types';
 import { VIEWFILES_API_URl } from '../../../reactComponents/FileChooser/api';
 import PathBrowser from '../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
 
@@ -65,7 +66,7 @@ const FileChooserModal = ({
     setDestPath(sourcePath);
   }, [sourcePath]);
 
-  const { data: filesData, loading } = useLoadData<PathAndFileData>(
+  const { data: filesData, loading } = useLoadData<ListDirectory>(
     `${VIEWFILES_API_URl}${destPath}`,
     {
       params: {
@@ -82,7 +83,7 @@ const FileChooserModal = ({
     }
 
     return filesData?.files?.map(file => ({
-      name: file.name,
+      name: file.path.split('/').pop() ?? '',
       path: file.path,
       type: file.type
     }));

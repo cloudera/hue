@@ -14,13 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo } from 'react';
-import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
+import React, { useMemo, useState } from 'react';
+import { hueWindow } from 'types/types';
+import {
+  BrowserViewType,
+  FilePreview,
+  FileStats
+} from '../../../reactComponents/FileChooser/types';
 import './StorageFilePage.scss';
 import { i18nReact } from '../../../utils/i18nReact';
 import Button, { PrimaryButton } from 'cuix/dist/components/Button';
 import { getFileMetaData } from './StorageFilePage.util';
-import { DOWNLOAD_API_URL, SAVE_FILE_API_URL } from '../../../reactComponents/FileChooser/api';
+import {
+  DOWNLOAD_API_URL,
+  FILE_PREVIEW_API_URL,
+  SAVE_FILE_API_URL
+} from '../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../utils/huePubSub';
 import useSaveData from '../../../utils/hooks/useSaveData';
 import {
@@ -29,14 +38,35 @@ import {
   SupportedFileTypes
 } from '../../../utils/constants/storageBrowser';
 import { Spin } from 'antd';
+import useLoadData from '../../../utils/hooks/useLoadData';
 
-const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Element => {
+interface StorageFilePageProps {
+  fileName: string;
+  fileStats: FileStats;
+}
+
+const StorageFilePage = ({ fileName, fileStats }: StorageFilePageProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [fileContent, setFileContent] = React.useState(fileData.view?.contents);
-  const fileMetaData = useMemo(() => getFileMetaData(t, fileData), [t, fileData]);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [fileContent, setFileContent] = useState<FilePreview['contents']>();
 
   const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL);
+
+  const { data: fileData, loading: loadingPreview } = useLoadData<FilePreview>(
+    FILE_PREVIEW_API_URL,
+    {
+      params: {
+        path: fileStats.path
+      },
+      onSuccess: d => setFileContent(d.contents),
+      skip:
+        fileStats.path === '' ||
+        fileStats.path === undefined ||
+        fileStats?.type !== BrowserViewType.file
+    }
+  );
+
+  const fileMetaData = useMemo(() => getFileMetaData(t, fileStats), [t, fileStats]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -44,14 +74,14 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
 
   const handleCancel = () => {
     setIsEditing(false);
-    setFileContent(fileData.view?.contents);
+    setFileContent(fileData?.contents);
   };
 
   const handleSave = () => {
     setIsEditing(false);
     save(
       {
-        path: fileData.path,
+        path: fileStats.path,
         encoding: 'utf-8',
         contents: fileContent
       },
@@ -70,9 +100,8 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
     huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
   };
 
-  const filePreviewUrl = `${DOWNLOAD_API_URL}${fileData.path}?disposition=inline`;
+  const filePreviewUrl = `${DOWNLOAD_API_URL}${fileStats.path}?disposition=inline`;
 
-  const fileName = fileData?.path?.split('/')?.pop();
   const fileType = useMemo(() => {
     const fileExtension = fileName?.split('.')?.pop()?.toLocaleLowerCase();
     if (!fileExtension) {
@@ -83,12 +112,12 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
 
   const isEditingEnabled =
     !isEditing &&
-    fileData.editable &&
+    (window as hueWindow).MAX_FILEEDITOR_SIZE > fileStats.size &&
     EDITABLE_FILE_FORMATS[fileType] &&
-    fileData?.view?.compression?.toLocaleLowerCase() === 'none';
+    fileData?.compression?.toLocaleLowerCase() === 'none';
 
   return (
-    <Spin spinning={isSaving}>
+    <Spin spinning={loadingPreview || isSaving}>
       <div className="hue-storage-file-page">
         <div className="meta-data">
           {fileMetaData.map((row, index) => (
@@ -122,7 +151,7 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
                     data-testid="preview--save--button"
                     data-event=""
                     onClick={handleSave}
-                    disabled={fileContent === fileData.view?.contents}
+                    disabled={fileContent === fileData?.contents}
                   >
                     {t('Save')}
                   </PrimaryButton>
@@ -136,8 +165,8 @@ const StorageFilePage = ({ fileData }: { fileData: PathAndFileData }): JSX.Eleme
                   </Button>
                 </>
               )}
-              {fileData.show_download_button && (
-                <a href={`${DOWNLOAD_API_URL}${fileData.path}`}>
+              {(window as hueWindow).SHOW_DOWNLOAD_BUTTON && (
+                <a href={`${DOWNLOAD_API_URL}${fileStats.path}`}>
                   <PrimaryButton
                     data-testid="preview--download--button"
                     data-event=""
