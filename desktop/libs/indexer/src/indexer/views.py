@@ -18,7 +18,6 @@
 import sys
 import json
 import logging
-import pdb
 import beeswax
 from django.utils.translation import gettext as _
 from desktop.lib.django_util import JsonResponse, render
