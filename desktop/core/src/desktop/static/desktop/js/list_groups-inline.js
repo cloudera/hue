@@ -1,9 +1,12 @@
 $(document).ready(function () {
+    var listGroupsOptionsElement = document.getElementById('listGroupsOptions');
+    var listGroupsOptions = JSON.parse(listGroupsOptionsElement.textContent);
+
     var $groupsComponents = $('#groupsComponents');
     $(document).off('click', '#groupsComponents .groupCheck');
 
     var viewModel = {
-        availableGroups: ko.observableArray(["default"]),
+        availableGroups: ko.observableArray(JSON.parse(listGroupsOptions.groups_json)),
         chosenGroups: ko.observableArray([])
     };
 

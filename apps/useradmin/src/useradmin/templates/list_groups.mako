@@ -142,6 +142,9 @@ ${layout.menubar(section='groups')}
 
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" charset="utf-8"></script>
+<script type="application/json" id="listGroupsOptions">
+  ${ options_json | n,unicode }
+</script>
 
 <script src="${ static('desktop/js/list_groups-inline.js') }" type="text/javascript"></script>
 ${layout.commons()}

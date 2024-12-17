@@ -88,12 +88,14 @@ def list_users(request):
 
 
 def list_groups(request):
-  return render("list_groups.mako", request, {
-      'groups': Group.objects.all(),
+  data = {
       'groups_json': json.dumps(list(Group.objects.values_list('name', flat=True))),
       'is_embeddable': request.GET.get('is_embeddable', False),
       'is_ldap_setup': is_ldap_setup()
-  })
+  }
+  data['options_json'] = json.dumps(data)
+  data['groups'] = Group.objects.all()
+  return render("list_groups.mako", request, data)
 
 
 def list_permissions(request):

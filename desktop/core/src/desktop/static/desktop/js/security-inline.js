@@ -1,6 +1,6 @@
 (function () {
     var secureOptionsElement = document.getElementById('secureOptions');
-    secureOptions = JSON.parse(secureOptionsElement.textContent);
+    var secureOptions = JSON.parse(secureOptionsElement.textContent);
     if (ko.options) {
         ko.options.deferUpdates = true;
     }
@@ -8,7 +8,7 @@
     huePubSub.subscribe('show.delete.privilege.modal', function () {
         $('#deletePrivilegeModal').modal('show');
     });
-    
+
     var viewModel = new HiveViewModel(secureOptions);
     ko.cleanNode($('#securityHiveComponents')[0]);
     ko.applyBindings(viewModel, $('#securityHiveComponents')[0]);
