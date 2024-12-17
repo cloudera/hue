@@ -23,6 +23,7 @@ import mimetypes
 import posixpath
 from io import BytesIO as string_io
 
+from django.core.files.uploadhandler import StopUpload
 from django.core.paginator import EmptyPage, Paginator
 from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
 from django.utils.http import http_date
@@ -50,7 +51,6 @@ from filebrowser.conf import (
   RESTRICT_FILE_EXTENSIONS,
   SHOW_DOWNLOAD_BUTTON,
 )
-from filebrowser.lib import xxd
 from filebrowser.lib.rwx import compress_mode, filetype, rwx
 from filebrowser.utils import parse_broker_url
 from filebrowser.views import (
@@ -60,6 +60,8 @@ from filebrowser.views import (
   _is_hdfs_superuser,
   _massage_page,
   _normalize_path,
+  extract_upload_data,
+  perform_upload_task,
   read_contents,
   stat_absolute_path,
 )
@@ -386,12 +388,78 @@ def stat(request):
 
 @api_error_handler
 def upload_chunks(request):
-  pass
+  """
+  Handles chunked file uploads using FineUploaderChunkedUploadHandler.
+
+  This method processes the chunked file uploads and checks if the file is larger
+  than the single chunk size. If the file is larger, it returns a JSON response
+  with the UUID of the file. If the file is smaller, it extracts the upload data
+  and performs the upload task.
+
+  Args:
+    request (HttpRequest): The HTTP request object containing the chunked file.
+
+  Returns:
+    HttpResponse: A JSON response with the UUID of the file if the file is larger
+      than the single chunk size, or a JSON response with the result of the
+      upload task if the file is smaller. If an error occurs, returns an HTTP
+      response with a 500 status code and an error message.
+
+  Raises:
+    StopUpload: If an error occurs during chunk file upload.
+
+  Notes:
+    This method expects the following parameters in the request:
+      - `qqtotalparts` (int): The total number of parts in the chunked file.
+      - `qquuid` (str): The UUID of the file.
+  """
+  try:
+    # Process the chunked file uploads using FineUploaderChunkedUploadHandler
+    for _ in request.FILES.values():
+      pass
+  except StopUpload as e:
+    error_message = 'Error occurred during chunk file upload.'
+    LOG.error(f'{error_message} {str(e)}')
+    return HttpResponse(error_message, status=500)
+
+  # Check if the file is larger than the single chunk size
+  total_parts = int(request.GET.get("qqtotalparts", 0))
+  if total_parts > 0:
+    return JsonResponse({'uuid': request.GET.get('qquuid')})
+
+  # Check if the file is smaller than the chunk size
+  elif total_parts == 0:
+    try:
+      chunks = extract_upload_data(request, "GET")
+      response = perform_upload_task(request, **chunks)
+      return JsonResponse(response)
+
+    except Exception as e:
+      error_message = 'Error occurred during chunk file upload.'
+      LOG.error(f'{error_message} {str(e)}')
+      return HttpResponse(error_message, status=500)
 
 
 @api_error_handler
 def upload_complete(request):
-  pass
+  """
+  Handles the completion of a file upload.
+
+  Args:
+    request (HttpRequest): The HTTP request object.
+
+  Returns:
+    JsonResponse: A JSON response containing the result of the upload.
+  """
+  try:
+    chunks = extract_upload_data(request, "POST")
+    response = perform_upload_task(request, **chunks)
+
+    return JsonResponse(response)
+  except Exception as e:
+    error_message = 'Error occurred during chunk file upload completion.'
+    LOG.error(f'{error_message} {str(e)}')
+    return HttpResponse(error_message, status=500)
 
 
 @api_error_handler
@@ -423,7 +491,7 @@ def upload_file(request):
   # Check if the file already exists at the destination path
   filepath = request.fs.join(dest_path, uploaded_file.name)
   if request.fs.exists(filepath):
-     # If overwrite is true, attempt to remove the existing file
+    # If overwrite is true, attempt to remove the existing file
     if overwrite:
       try:
         request.fs.rmtree(filepath)
