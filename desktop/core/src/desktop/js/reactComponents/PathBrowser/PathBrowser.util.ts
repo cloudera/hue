@@ -52,7 +52,7 @@ export const getBreadcrumbs = (fileSystem: string, path: string): BreadcrumbData
   return pathParts.reduce(
     (acc, part, index) => {
       const decodedPart = decodeURIComponent(part);
-      const currentUrl = `${acc[index].url}${decodedPart}/`;
+      const currentUrl = `${acc[index].url}${index === 0 ? '' : '/'}${decodedPart}`;
       acc.push({ url: currentUrl, label: decodedPart });
       return acc;
     },
