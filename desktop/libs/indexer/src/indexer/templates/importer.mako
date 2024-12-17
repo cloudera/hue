@@ -16,7 +16,7 @@
 
 <%!
   import sys
-
+  import json
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
   from filebrowser.conf import SHOW_UPLOAD_BUTTON
@@ -1515,6 +1515,10 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
     <a href="javascript: void(0)" class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
+
+<script type="application/json" id="importerOptionsJson">
+  ${ options_json | n,unicode }
+</script>
 
 <script src="${ static('desktop/js/importer-inline.js') }" type="text/javascript"></script>
 </span>

@@ -1,5 +1,5 @@
 var MAIN_SCROLLABLE = '.page-content';
-let importerOptionsElement = document.getElementById('importerOptionsJson');
+const importerOptionsElement = document.getElementById('importerOptionsJson');
 let importerOptions = JSON.parse(importerOptionsElement.textContent);
 (function () {
     if (ko.options) {

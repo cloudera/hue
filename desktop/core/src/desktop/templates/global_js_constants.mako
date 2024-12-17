@@ -33,7 +33,8 @@
       QUERY_STORE
   from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME, MAX_FILE_SIZE_UPLOAD_LIMIT, SHOW_DOWNLOAD_BUTTON
   from filebrowser.views import MAX_FILEEDITOR_SIZE
-  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_DIRECT_UPLOAD, ENABLE_SQOOP, ENABLE_KAFKA, ENABLE_ALTUS, ENABLE_ENVELOPE
+  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_DIRECT_UPLOAD, ENABLE_SQOOP, ENABLE_KAFKA, ENABLE_ALTUS, \
+  ENABLE_ENVELOPE, ENABLE_FIELD_EDITOR, CONFIG_INDEXER_LIBS_PATH
   from libsaml.conf import get_logout_redirect_url, CDP_LOGOUT_URL
   from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, \
       get_catalog_url, get_optimizer_mode
@@ -189,6 +190,8 @@
   window.ENABLE_SQOOP = '${ ENABLE_SQOOP.get() }' === 'True';
   window.ENABLE_KAFKA = '${ ENABLE_KAFKA.get() }' === 'True';
   window.ENABLE_ALTUS = '${ ENABLE_ALTUS.get() }' === 'True';
+  window.ENABLE_FIELD_EDITOR = '${ ENABLE_FIELD_EDITOR.get() }' === 'True';
+  window.CONFIG_INDEXER_LIBS_PATH = '${ CONFIG_INDEXER_LIBS_PATH.get()}'
   window.ENABLE_SQL_INDEXER = '${ ENABLE_SQL_INDEXER.get() }' === 'True';
   window.ENABLE_ENVELOPE = '${ ENABLE_ENVELOPE.get() }' === 'True';
   window.REQUEST_FS = '${hasattr(request, "fs")}' === 'True';
