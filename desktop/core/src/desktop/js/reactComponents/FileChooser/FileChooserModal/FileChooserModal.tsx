@@ -22,8 +22,8 @@ import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
 import AdlsIcon from '../../../components/icons/AdlsIcon';
 
-import { ApiFileSystem, FILESYSTEMS_API_URL, VIEWFILES_API_URl } from '../api';
-import { FileSystem, PathAndFileData } from '../types';
+import { ApiFileSystem, FILESYSTEMS_API_URL } from '../api';
+import { FileSystem } from '../types';
 import './FileChooserModal.scss';
 import PathBrowser from '../PathBrowser/PathBrowser';
 import useLoadData from '../../../utils/hooks/useLoadData';
@@ -72,13 +72,6 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
     }
   }, [fileSystemsData]);
 
-  const { data: filesData, loading: loadingFiles } = useLoadData<PathAndFileData>(
-    `${VIEWFILES_API_URl}${filePath}`,
-    {
-      skip: !!filePath
-    }
-  );
-
   return (
     <Modal
       title={title}
@@ -89,7 +82,7 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
       width={930}
       className="hue-file-chooser__modal"
     >
-      <Spin spinning={loadingFilesSystem || loadingFiles}>
+      <Spin spinning={loadingFilesSystem}>
         <Row>
           <Col span={5}>
             <Menu
@@ -101,24 +94,24 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
             ></Menu>
           </Col>
           <Col span={19}>
-            <Spin spinning={loadingFiles}>
-              <Row className="hue-path-browser-panel" onClick={e => e.stopPropagation()}>
-                <Col span={18}>
+            <Row className="hue-path-browser-panel" onClick={e => e.stopPropagation()}>
+              <Col span={18}>
+                {filePath && (
                   <PathBrowser
-                    breadcrumbs={filesData?.breadcrumbs}
+                    filePath={filePath}
                     onFilepathChange={setFilePath}
                     seperator={'>'}
                     showIcon={true}
-                  ></PathBrowser>
-                </Col>
-                <Col span={3}>
-                  <Button className="hue-path-browser-panel__button">New Folder</Button>
-                </Col>
-                <Col span={3}>
-                  <Button className="hue-path-browser-panel__button">Upload</Button>
-                </Col>
-              </Row>
-            </Spin>
+                  />
+                )}
+              </Col>
+              <Col span={3}>
+                <Button className="hue-path-browser-panel__button">New Folder</Button>
+              </Col>
+              <Col span={3}>
+                <Button className="hue-path-browser-panel__button">Upload</Button>
+              </Col>
+            </Row>
           </Col>
         </Row>
       </Spin>

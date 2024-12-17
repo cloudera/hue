@@ -86,7 +86,7 @@ const StorageBrowserTabContent = ({
         >
           <span className="hue-storage-browser__filePath">{t('File Path:')}</span>
           <PathBrowser
-            breadcrumbs={filesData?.breadcrumbs}
+            filePath={filePath}
             onFilepathChange={setFilePath}
             seperator={'/'}
             showIcon={false}
