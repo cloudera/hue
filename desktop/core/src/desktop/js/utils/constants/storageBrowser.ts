@@ -15,6 +15,9 @@
 // limitations under the License.
 
 export const DEFAULT_PAGE_SIZE = 50;
+export const DEFAULT_CHUNK_SIZE = 5 * 1024 * 1024; // 5 MiB
+export const DEFAULT_CONCURRENT_UPLOAD = 3;
+export const DEFAULT_CONCURRENT_CHUNK_UPLOAD = 3;
 
 export enum SupportedFileTypes {
   IMAGE = 'image',
@@ -23,6 +26,14 @@ export enum SupportedFileTypes {
   AUDIO = 'audio',
   VIDEO = 'video',
   OTHER = 'other'
+}
+
+export enum FileUploadStatus {
+  Pending = 'Pending',
+  Uploading = 'Uploading',
+  Uploaded = 'Uploaded',
+  Canceled = 'Canceled',
+  Failed = 'Failed'
 }
 
 export const SUPPORTED_FILE_EXTENSIONS = {
