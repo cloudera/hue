@@ -196,11 +196,26 @@ interface TaskBrowserTableProps {
   handleSchedulePopup: () => void;
 }
 
+export enum TaskStatus {
+  Success = 'SUCCESS',
+  Failure = 'FAILURE',
+  Running = 'RUNNING'
+}
+
+export interface TaskServerResponse {
+  result?: {
+    task_name: string;
+    username: string;
+  };
+  task_id: string;
+  status: TaskStatus;
+}
+
 export const TaskBrowserTable: React.FC<TaskBrowserTableProps> = ({
   ShowTaskLogsHandler,
   handleSchedulePopup
 }) => {
-  const [tasks, setTasks] = useState<Task_Status[]>([]);
+  const [tasks, setTasks] = useState<TaskServerResponse[]>([]);
   const [searchTerm, setSearchTerm] = useState(''); // state for the search term
   const [statusFilter, setStatusFilter] = useState({
     success: false,
@@ -378,21 +393,6 @@ export const TaskBrowserTable: React.FC<TaskBrowserTableProps> = ({
       return newStatusFilter;
     });
   };
-
-  enum TaskStatus {
-    Success = 'SUCCESS',
-    Failure = 'FAILURE',
-    Running = 'RUNNING'
-  }
-
-  interface Task_Status {
-    result?: {
-      task_name: string;
-      username: string;
-    };
-    task_id: string;
-    status: TaskStatus;
-  }
 
   const filteredTasks = tasks.filter(task => {
     const taskNameMatch = task.result?.task_name?.toLowerCase().includes(searchTerm);

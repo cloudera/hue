@@ -13,12 +13,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 export const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary';
 export const DOWNLOAD_API_URL = '/filebrowser/download=';
 export const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
 export const SAVE_FILE_API_URL = '/filebrowser/save';
 export const VIEWFILES_API_URl = '/api/v1/storage/view=';
-
+export const UPLOAD_FILE_URL = '/filebrowser/upload/file';
+export const CHUNK_UPLOAD_URL = '/filebrowser/upload/chunks/file';
+export const CHUNK_UPLOAD_COMPLETE_URL = '/filebrowser/upload/complete';
 export const CREATE_FILE_API_URL = '/api/v1/storage/create/file/';
 export const CREATE_DIRECTORY_API_URL = '/api/v1/storage/create/directory/';
 export const RENAME_API_URL = '/api/v1/storage/rename/';
