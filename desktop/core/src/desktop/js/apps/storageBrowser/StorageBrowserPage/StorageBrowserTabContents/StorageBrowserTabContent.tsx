@@ -22,20 +22,15 @@ import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 
 import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
 import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
-import { VIEWFILES_API_URl } from '../../../../reactComponents/FileChooser/api';
-import {
-  BrowserViewType,
-  PathAndFileData,
-  SortOrder
-} from '../../../../reactComponents/FileChooser/types';
-import { DEFAULT_PAGE_SIZE } from '../../../../utils/constants/storageBrowser';
+import { FILE_STATS_API_URL } from '../../../../reactComponents/FileChooser/api';
+import { BrowserViewType, FileStats } from '../../../../reactComponents/FileChooser/types';
 import useLoadData from '../../../../utils/hooks/useLoadData';
 
 import './StorageBrowserTabContent.scss';
 import StorageFilePage from '../../StorageFilePage/StorageFilePage';
 
 interface StorageBrowserTabContentProps {
-  user_home_dir: string;
+  homeDir: string;
   testId?: string;
 }
 
@@ -44,31 +39,19 @@ const defaultProps = {
 };
 
 const StorageBrowserTabContent = ({
-  user_home_dir,
+  homeDir,
   testId
 }: StorageBrowserTabContentProps): JSX.Element => {
-  const [filePath, setFilePath] = useState<string>(user_home_dir);
-  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [sortByColumn, setSortByColumn] = useState<string>('');
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filePath, setFilePath] = useState<string>(homeDir);
+  const fileName = filePath?.split('/')?.pop() ?? '';
 
   const { t } = i18nReact.useTranslation();
 
-  const {
-    data: filesData,
-    loading,
-    reloadData
-  } = useLoadData<PathAndFileData>(`${VIEWFILES_API_URl}${filePath}`, {
+  const { data: fileStats, loading } = useLoadData<FileStats>(FILE_STATS_API_URL, {
     params: {
-      pagesize: pageSize.toString(),
-      pagenum: pageNumber.toString(),
-      filter: searchTerm,
-      sortby: sortByColumn,
-      descending: sortOrder === SortOrder.DSC ? 'true' : 'false'
+      path: filePath
     },
-    skip: filePath === '' || filePath === undefined
+    skip: !filePath
   });
 
   return (
@@ -77,7 +60,7 @@ const StorageBrowserTabContent = ({
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
           <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
           <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
-            {filesData?.path?.split('/').pop()}
+            {fileName}
           </h3>
         </div>
         <div
@@ -92,23 +75,11 @@ const StorageBrowserTabContent = ({
             showIcon={false}
           />
         </div>
-        {filesData?.type === BrowserViewType.file ? (
-          <StorageFilePage fileData={filesData} />
-        ) : (
-          <StorageBrowserTable
-            filesData={filesData}
-            pageSize={pageSize}
-            onFilepathChange={setFilePath}
-            onPageSizeChange={setPageSize}
-            onPageNumberChange={setPageNumber}
-            onSortByColumnChange={setSortByColumn}
-            onSortOrderChange={setSortOrder}
-            onSearch={setSearchTerm}
-            sortByColumn={sortByColumn}
-            sortOrder={sortOrder}
-            refetchData={reloadData}
-            filePath={filePath}
-          />
+        {fileStats?.type === BrowserViewType.dir && (
+          <StorageBrowserTable fileStats={fileStats} onFilePathChange={setFilePath} />
+        )}
+        {fileStats?.type === BrowserViewType.file && (
+          <StorageFilePage fileName={fileName} fileStats={fileStats} />
         )}
       </div>
     </Spin>
