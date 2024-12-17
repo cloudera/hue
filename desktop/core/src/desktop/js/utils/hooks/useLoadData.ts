@@ -23,6 +23,7 @@ export interface Options<T, U> {
   skip?: boolean;
   onSuccess?: (data: T) => void;
   onError?: (error: Error) => void;
+  pollInterval?: number;
 }
 
 interface UseLoadDataProps<T> {
@@ -78,6 +79,23 @@ const useLoadData = <T, U = unknown>(
     },
     [url, localOptions, fetchOptions]
   );
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
+
+    if (localOptions?.pollInterval) {
+      interval = setInterval(() => {
+        loadData();
+      }, localOptions.pollInterval);
+    }
+
+    // Cleanup interval if pollInterval is undefined or when the component unmounts
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [localOptions?.pollInterval, loadData]);
 
   useEffect(() => {
     loadData();

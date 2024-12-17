@@ -48,8 +48,9 @@ export const getBreadcrumbs = (fileSystem: string, path: string): BreadcrumbData
 
   return pathParts.reduce(
     (acc, part, index) => {
-      const currentUrl = `${acc[index].url}${part}/`;
-      acc.push({ url: currentUrl, label: part });
+      const decodedPart = decodeURIComponent(part);
+      const currentUrl = `${acc[index].url}${index === 0 ? '' : '/'}${decodedPart}`;
+      acc.push({ url: currentUrl, label: decodedPart });
       return acc;
     },
     [rootNode]
