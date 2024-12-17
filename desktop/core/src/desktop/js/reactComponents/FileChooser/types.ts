@@ -22,29 +22,18 @@ export interface FileSystem {
   user_home_dir: string;
 }
 
-interface Stats {
-  aclBit: boolean;
-  atime: string;
+export interface FileStats {
+  atime: number;
+  blockSize: number;
   group: string;
   mode: number;
-  mtime: string;
+  mtime: number;
   path: string;
-  size: number;
-  user: string;
   replication: number;
-}
-
-export interface File {
-  humansize: string;
-  is_sentry_managed: boolean;
-  mode: string;
-  mtime: string;
-  name: string;
-  path: string;
   rwx: string;
-  stats: Stats;
+  size: number;
   type: string;
-  url: string;
+  user: string;
 }
 
 export interface StorageBrowserTableData {
@@ -74,23 +63,24 @@ export interface BreadcrumbData {
   url: string;
 }
 
-interface FileView {
+export interface FilePreview {
   contents: string;
   compression?: string;
+  end: number;
+  length: number;
+  mode: string;
+  offset: number;
 }
 
-export interface PathAndFileData {
-  editable?: boolean;
-  path: string;
-  breadcrumbs: BreadcrumbData[];
-  files: File[];
+export interface ListDirectory {
+  files: FileStats[];
   page: PageStats;
-  pagesize: number;
-  type?: string;
-  stats: Stats;
-  rwx: string;
-  view: FileView;
-  show_download_button: boolean;
+  groups: string[];
+  users: string[];
+  supergroup: string;
+  superuser: string;
+  is_fs_superuser: boolean;
+  is_trash_enabled: boolean;
 }
 
 export interface ContentSummary {
