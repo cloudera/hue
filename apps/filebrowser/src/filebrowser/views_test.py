@@ -82,7 +82,9 @@ class TestFileBrowser:
     grant_access(self.user.username, 'test_filebrowser', 'filebrowser')
     add_to_group(self.user.username, 'test_filebrowser')
 
-  def test_listdir_paged(self):
+  @patch('json.dumps')
+  def test_listdir_paged(self, mock_json_dumps):
+    mock_json_dumps.return_value = '{}'
     with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
       with patch('filebrowser.views.snappy_installed') as snappy_installed:
         snappy_installed.return_value = False

@@ -99,48 +99,7 @@ ${ layout.menubar(section='groups') }
   </div>
 </div>
 
-<script type="text/javascript">
-  $(document).ready(function () {
-    var $editGroupComponents = $('#editGroupComponents');
-
-    $("#id_members").jHueSelector({
-      selectAllLabel: "${_('Select all')}",
-      searchPlaceholder: "${_('Search')}",
-      noChoicesFound: "${_('No users found.')} <a href='${url('useradmin:useradmin.views.edit_user')}'>${_('Create a new user now')} &raquo;</a>",
-      width: 600,
-      height: 240
-    });
-    $("#id_permissions").jHueSelector({
-      selectAllLabel: "${_('Select all')}",
-      searchPlaceholder: "${_('Search')}",
-      noChoicesFound: "${_('No permissions found.')}",
-      width: 600,
-      height: 240
-    });
-    % if is_embeddable:
-    $editGroupComponents.find('#editForm').ajaxForm({
-      dataType:  'json',
-      success: function(data) {
-        if (data && data.status == -1) {
-          renderUseradminErrors(data.errors);
-        }
-        else if (data && data.url) {
-          huePubSub.publish('open.link', data.url);
-          huePubSub.publish('hue.global.info', {
-            message: "${ _('Group information updated correctly') }"
-          });
-        }
-      },
-      error: function (data) {
-        huePubSub.publish('hue.global.error', {
-          message: data.responseJSON['message']
-        });
-      }
-    });
-    % endif
-  });
-</script>
-
+<script src="${ static('desktop/js/edit_group-inline.js') }" type="text/javascript"></script>
 ${ layout.commons() }
 
 % if not is_embeddable:

@@ -18,11 +18,7 @@
 
 ${ layout.menubar(section='dump_config') }
 
-<script type="text/javascript">
-  (function () {
-    window.createReactComponents('#Configuration');
-  })();
-</script>
+<script src="${ static('desktop/js/dumpconfig-inline.js') }" type="text/javascript"></script>
 
 <div id="Configuration">
 <Configuration class='antd cuix' data-reactcomponent='Configuration'></Configuration>

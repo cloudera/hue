@@ -17,15 +17,14 @@
 
 import json
 
-from desktop.lib.django_util import render
-
-from libsentry.sentry_site import get_hive_sentry_provider, get_sentry_server_admin_groups, get_solr_sentry_provider
 from desktop.auth.backend import is_admin
+from desktop.lib.django_util import render
+from libsentry.sentry_site import get_hive_sentry_provider, get_sentry_server_admin_groups, get_solr_sentry_provider
 
 
 def hive(request):
 
-  return render("hive.mako", request, {
+  data = {
       'initial': json.dumps({
           'user': request.user.username,
           'sentry_provider': get_hive_sentry_provider(),
@@ -33,7 +32,11 @@ def hive(request):
       }),
       'is_embeddable': request.GET.get('is_embeddable', False),
       'has_impersonation_perm': _has_impersonation_perm(request.user),
-  })
+  }
+  # options_json used in js
+  data['options_json'] = data['initial']
+
+  return render("hive.mako", request, data)
 
 
 def hive2(request):
@@ -45,7 +48,7 @@ def solr(request):
 
 
 def _sentry(request, component):
-  return render("sentry.mako", request, {
+  data = {
       'initial': json.dumps({
           'component': component,
           'user': request.user.username,
@@ -55,7 +58,9 @@ def _sentry(request, component):
       'is_embeddable': request.GET.get('is_embeddable', False),
       'has_impersonation_perm': _has_impersonation_perm(request.user) and component == 'hive',
       'component': component
-  })
+  }
+  data['options_json'] = data['initial']
+  return render("sentry.mako", request, data)
 
 
 def hdfs(request):
