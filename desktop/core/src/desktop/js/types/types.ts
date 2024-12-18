@@ -59,8 +59,6 @@ export interface hueWindow {
   HUE_LANG?: string;
   HUE_VERSION?: string;
   LOGGED_USERNAME?: string;
-  MAX_FILEEDITOR_SIZE?: number;
-  SHOW_DOWNLOAD_BUTTON?: boolean;
   SQL_ANALYZER_MODE?: string;
   USER_IS_ADMIN?: boolean;
   USER_IS_HUE_ADMIN?: boolean;

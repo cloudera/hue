@@ -78,8 +78,9 @@ from desktop.models import (
   uuid_default,
 )
 from desktop.views import get_banner_message, serve_403_error
-from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
+from filebrowser.conf import CONCURRENT_MAX_CONNECTIONS, FILE_UPLOAD_CHUNK_SIZE, RESTRICT_FILE_EXTENSIONS, SHOW_DOWNLOAD_BUTTON
 from filebrowser.tasks import check_disk_usage_and_clean_task, document_cleanup_task
+from filebrowser.views import MAX_FILEEDITOR_SIZE
 from hadoop.cluster import is_yarn
 from metadata.catalog_api import (
   _highlight,
@@ -124,10 +125,14 @@ def get_config(request):
   config = get_cluster_config(request.user)
   config['hue_config']['is_admin'] = is_admin(request.user)
   config['hue_config']['is_yarn_enabled'] = is_yarn()
-  config['hue_config']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
-  config['hue_config']['enable_chunked_file_uploader'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
   config['hue_config']['enable_task_server'] = TASK_SERVER_V2.ENABLED.get()
-  config['hue_config']['restrict_file_extensions'] = RESTRICT_FILE_EXTENSIONS.get()
+  config['storage_browser']['enable_chunked_file_upload'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
+  config['storage_browser']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
+  config['storage_browser']['restrict_file_extensions'] = RESTRICT_FILE_EXTENSIONS.get()
+  config['storage_browser']['concurrent_max_connection'] = CONCURRENT_MAX_CONNECTIONS.get()
+  config['storage_browser']['file_upload_chunk_size'] = FILE_UPLOAD_CHUNK_SIZE.get()
+  config['storage_browser']['enable_file_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
+  config['storage_browser']['max_file_editor_size'] = MAX_FILEEDITOR_SIZE
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {
     'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())

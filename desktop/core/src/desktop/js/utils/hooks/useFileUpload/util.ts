@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { DEFAULT_CHUNK_SIZE, FileUploadStatus } from 'utils/constants/storageBrowser';
+import { FileUploadStatus } from 'utils/constants/storageBrowser';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
 import { CHUNK_UPLOAD_URL, CHUNK_UPLOAD_COMPLETE_URL } from 'reactComponents/FileChooser/api';
 
@@ -87,11 +87,14 @@ export const getStatusHashMap = (
     {}
   );
 
-export const getChunkItemPayload = (chunkItem: UploadChunkItem): ChunkPayload => {
-  const chunkStart = (chunkItem.chunkIndex ?? 0) * DEFAULT_CHUNK_SIZE;
-  const chunkEnd = Math.min(chunkStart + DEFAULT_CHUNK_SIZE, chunkItem!.file.size);
+export const getChunkItemPayload = (
+  chunkItem: UploadChunkItem,
+  chunkSize: number
+): ChunkPayload => {
+  const chunkStart = (chunkItem.chunkIndex ?? 0) * chunkSize;
+  const chunkEnd = Math.min(chunkStart + chunkSize, chunkItem!.file.size);
 
-  const metaData = getMetaData(chunkItem, DEFAULT_CHUNK_SIZE);
+  const metaData = getMetaData(chunkItem, chunkSize);
   const chunkQueryParams = new URLSearchParams({
     ...metaData,
     qqpartindex: String(chunkItem.chunkIndex),
@@ -105,8 +108,11 @@ export const getChunkItemPayload = (chunkItem: UploadChunkItem): ChunkPayload =>
   return { url, payload };
 };
 
-export const getChunksCompletePayload = (processingItem: UploadItem): ChunkPayload => {
-  const fileMetaData = getMetaData(processingItem, DEFAULT_CHUNK_SIZE);
+export const getChunksCompletePayload = (
+  processingItem: UploadItem,
+  chunkSize: number
+): ChunkPayload => {
+  const fileMetaData = getMetaData(processingItem, chunkSize);
   const payload = new FormData();
   Object.entries(fileMetaData).forEach(([key, value]) => {
     payload.append(key, value);
@@ -114,8 +120,8 @@ export const getChunksCompletePayload = (processingItem: UploadItem): ChunkPaylo
   return { url: CHUNK_UPLOAD_COMPLETE_URL, payload };
 };
 
-export const getChunkSinglePayload = (item: UploadItem): ChunkPayload => {
-  const metaData = getMetaData(item, DEFAULT_CHUNK_SIZE);
+export const getChunkSinglePayload = (item: UploadItem, chunkSize: number): ChunkPayload => {
+  const metaData = getMetaData(item, chunkSize);
 
   const singleChunkParams = Object.fromEntries(
     Object.entries(metaData).filter(([key]) => key !== 'qqtotalparts')
