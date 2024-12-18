@@ -91,11 +91,7 @@ ${ commonheader(title, "", user, request, "40px") | n,unicode }
   </div>
 </div>
 
-<script type="text/javascript">
-  function toggleDisplay(selector) {
-    $(selector).slideToggle(500);
-  }
-</script>
+<script src="${ static('desktop/js/500-inline.js') }" type="text/javascript"></script>
 
 %if not is_embeddable:
 ${ commonfooter(None, messages) | n,unicode }
