@@ -27,7 +27,11 @@ import StatusStoppedIcon from '@cloudera/cuix-core/icons/react/StatusStoppedIcon
 import StatusErrorIcon from '@cloudera/cuix-core/icons/react/StatusErrorIcon';
 import { UploadItem } from '../../utils/hooks/useFileUpload/util';
 import useFileUpload from '../../utils/hooks/useFileUpload/useFileUpload';
-import { FileUploadStatus } from '../../utils/constants/storageBrowser';
+import {
+  DEFAULT_ENABLE_CHUNK_UPLOAD,
+  FileUploadStatus
+} from '../../utils/constants/storageBrowser';
+import { getLastKnownConfig } from '../../config/hueConfig';
 
 interface FileUploadQueueProps {
   filesQueue: UploadItem[];
@@ -47,11 +51,14 @@ const sortOrder = [
 }, {});
 
 const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, onComplete }) => {
+  const config = getLastKnownConfig();
+  const isChunkUpload =
+    config?.storage_browser.enable_chunked_file_uploader ?? DEFAULT_ENABLE_CHUNK_UPLOAD;
   const { t } = i18nReact.useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
 
   const { uploadQueue, onCancel } = useFileUpload(filesQueue, {
-    isChunkUpload: true,
+    isChunkUpload,
     onComplete
   });
 

@@ -22,7 +22,6 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { DOWNLOAD_API_URL } from '../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../utils/huePubSub';
-import { hueWindow } from '../../../types/types';
 
 jest.mock('../../../utils/dateTimeUtils', () => ({
   ...jest.requireActual('../../../utils/dateTimeUtils'),
@@ -50,6 +49,16 @@ jest.mock('../../../utils/hooks/useLoadData', () => {
   }));
 });
 
+const mockConfig = {
+  storage_browser: {
+    enable_file_download_button: true,
+    max_file_editor_size: 1000000000
+  }
+};
+jest.mock('../../../config/hueConfig', () => ({
+  getLastKnownConfig: () => mockConfig
+}));
+
 const mockFileStats: FileStats = {
   path: '/path/to/file.txt',
   size: 123456,
@@ -67,19 +76,6 @@ const mockFileName = 'file.txt';
 const mockReload = jest.fn();
 
 describe('StorageFilePage', () => {
-  let oldShowDownloadButton: boolean;
-  let oldMaxFileEditorSize: number;
-  beforeEach(() => {
-    oldShowDownloadButton = (window as hueWindow).SHOW_DOWNLOAD_BUTTON as boolean;
-    oldMaxFileEditorSize = (window as hueWindow).MAX_FILEEDITOR_SIZE as number;
-    (window as hueWindow).SHOW_DOWNLOAD_BUTTON = true;
-    (window as hueWindow).MAX_FILEEDITOR_SIZE = 1000000000;
-  });
-  afterAll(() => {
-    (window as hueWindow).SHOW_DOWNLOAD_BUTTON = oldShowDownloadButton;
-    (window as hueWindow).MAX_FILEEDITOR_SIZE = oldMaxFileEditorSize;
-  });
-
   it('should render file metadata and content', () => {
     render(
       <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
@@ -224,7 +220,7 @@ describe('StorageFilePage', () => {
   });
 
   it('should not render the download button when show_download_button is false', () => {
-    (window as hueWindow).SHOW_DOWNLOAD_BUTTON = false;
+    mockConfig.storage_browser.enable_file_download_button = false;
 
     render(
       <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />

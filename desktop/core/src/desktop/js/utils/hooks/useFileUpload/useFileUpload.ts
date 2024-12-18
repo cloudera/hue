@@ -18,7 +18,11 @@ import { useCallback, useEffect, useState } from 'react';
 import useRegularUpload from './useRegularUpload';
 import useChunkUpload from './useChunkUpload';
 import { getNewFileItems, UploadItem } from './util';
-import { FileUploadStatus } from '../../constants/storageBrowser';
+import {
+  DEFAULT_CONCURRENT_MAX_CONNECTIONS,
+  FileUploadStatus
+} from '../../constants/storageBrowser';
+import { getLastKnownConfig } from '../../../config/hueConfig';
 
 interface UseUploadQueueResponse {
   uploadQueue: UploadItem[];
@@ -35,6 +39,10 @@ const useFileUpload = (
   filesQueue: UploadItem[],
   { isChunkUpload = false, onComplete }: UploadQueueOptions
 ): UseUploadQueueResponse => {
+  const config = getLastKnownConfig();
+  const concurrentProcess =
+    config?.storage_browser.concurrent_max_connection ?? DEFAULT_CONCURRENT_MAX_CONNECTIONS;
+
   const [uploadQueue, setUploadQueue] = useState<UploadItem[]>([]);
 
   const onStatusUpdate = (item: UploadItem, newStatus: FileUploadStatus) =>
@@ -52,6 +60,7 @@ const useFileUpload = (
     removeFile: removeFromChunkUpload,
     isLoading: isChunkLoading
   } = useChunkUpload({
+    concurrentProcess,
     onStatusUpdate,
     onComplete
   });
@@ -61,6 +70,7 @@ const useFileUpload = (
     removeFile: removeFromRegularUpload,
     isLoading: isNonChunkLoading
   } = useRegularUpload({
+    concurrentProcess,
     onStatusUpdate,
     onComplete
   });
