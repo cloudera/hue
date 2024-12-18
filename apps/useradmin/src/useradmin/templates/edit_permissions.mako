@@ -81,34 +81,7 @@ ${ layout.menubar(section='permissions') }
   </div>
 </div>
 
-<script type="text/javascript">
-  $(document).ready(function () {
-    var $editPermissionsComponents = $('#editPermissionsComponents');
-    $("#id_groups").jHueSelector({
-      selectAllLabel: "${_('Select all')}",
-      searchPlaceholder: "${_('Search')}",
-      noChoicesFound: "${_('No groups found.')}",
-      width: 600,
-      height: 500
-    });
-    % if is_embeddable:
-    $editPermissionsComponents.find('#editForm').ajaxForm({
-      dataType:  'json',
-      success: function(data) {
-        if (data && data.status == -1) {
-          renderUseradminErrors(data.errors);
-        }
-        else if (data && data.url) {
-          huePubSub.publish('open.link', data.url);
-          huePubSub.publish('hue.global.info', {
-            message: "${ _('Permission information updated correctly') }"
-          });
-        }
-      }
-    });
-    % endif
-  });
-</script>
+<script src="${ static('desktop/js/edit_permissions-inline.js') }" type="text/javascript"></script>
 
 ${layout.commons()}
 
