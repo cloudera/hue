@@ -19,13 +19,13 @@ import { Tabs, Spin } from 'antd';
 
 import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 
-import { i18nReact } from '../../../utils/i18nReact';
-import CommonHeader from '../../../reactComponents/CommonHeader/CommonHeader';
-import StorageBrowserTabContent from './StorageBrowserTabContents/StorageBrowserTabContent';
-import { ApiFileSystem, FILESYSTEMS_API_URL } from '../../../reactComponents/FileChooser/api';
+import { i18nReact } from '../../utils/i18nReact';
+import CommonHeader from '../../reactComponents/CommonHeader/CommonHeader';
+import StorageBrowserTab from './StorageBrowserTab/StorageBrowserTab';
+import { ApiFileSystem, FILESYSTEMS_API_URL } from '../../reactComponents/FileChooser/api';
 
 import './StorageBrowserPage.scss';
-import useLoadData from '../../../utils/hooks/useLoadData';
+import useLoadData from '../../utils/hooks/useLoadData';
 
 const StorageBrowserPage = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
@@ -42,7 +42,7 @@ const StorageBrowserPage = (): JSX.Element => {
           items={fileSystems?.map(system => ({
             label: system.file_system.toUpperCase(),
             key: system.file_system + '_tab',
-            children: <StorageBrowserTabContent homeDir={system.user_home_directory} />
+            children: <StorageBrowserTab homeDir={system.user_home_directory} />
           }))}
         />
       </Spin>

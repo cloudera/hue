@@ -36,16 +36,12 @@ export interface FileStats {
   user: string;
 }
 
-export interface StorageBrowserTableData {
+export interface StorageDirectoryTableData
+  extends Pick<FileStats, 'path' | 'user' | 'group' | 'type' | 'replication'> {
   name: string;
   size: string;
-  user: string;
-  group: string;
   permission: string;
   mtime: string;
-  type: string;
-  path: string;
-  replication: number;
 }
 
 export interface PageStats {
@@ -56,11 +52,6 @@ export interface PageStats {
   start_index: number;
   end_index: number;
   total_count: number;
-}
-
-export interface BreadcrumbData {
-  label: string;
-  url: string;
 }
 
 export interface FilePreview {
@@ -84,17 +75,15 @@ export interface ListDirectory {
 }
 
 export interface ContentSummary {
-  summary: {
-    directoryCount: number;
-    ecPolicy: string;
-    fileCount: number;
-    length: number;
-    quota: number;
-    spaceConsumed: number;
-    spaceQuota: number;
-    typeQuota: number;
-    replication: number;
-  };
+  directoryCount: number;
+  ecPolicy: string;
+  fileCount: number;
+  length: number;
+  quota: number;
+  spaceConsumed: number;
+  spaceQuota: number;
+  typeQuota: number;
+  replication: number;
 }
 
 export enum SortOrder {

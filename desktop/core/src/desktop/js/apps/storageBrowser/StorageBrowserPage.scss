@@ -13,14 +13,41 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 @use 'variables' as vars;
+@use 'mixins';
 
-.antd.cuix {
-  .hue-summary-modal__row {
-    margin-bottom: vars.$fluidx-spacing-s;
+.hue-storage-browser.antd.cuix {
+  @include mixins.fillAbsolute;
+  @include mixins.flexRowLayout;
 
-    &:last-child {
-      margin-bottom: 0;
+  height: 100%;
+
+  .ant-spin-nested-loading {
+    height: 100%;
+
+    .ant-spin-container {
+      height: 100%;
+    }
+  }
+
+  .hue-storage-browser__tab {
+    display: flex;
+    height: 100%;
+    background-color: vars.$fluidx-gray-100;
+    padding: 0 16px;
+
+    .ant-tabs-content-holder {
+      display: flex;
+      flex: 1;
+      overflow: auto;
+
+      .ant-tabs-content,
+      .ant-tabs-tabpane-active {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
     }
   }
 }

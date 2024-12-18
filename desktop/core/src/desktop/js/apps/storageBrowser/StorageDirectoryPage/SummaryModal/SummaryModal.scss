@@ -14,41 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 @use 'variables' as vars;
-@use 'mixins';
 
 .antd.cuix {
-  .hue-storage-browser-tab-content {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    height: 100%;
-  }
+  .hue-summary-modal__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
 
-  .hue-storage-browser__title-bar {
-    display: flex;
-    gap: vars.$fluidx-spacing-xs;
-  }
+    &__summary-item {
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
 
-  .hue-storage-browser__icon {
-    flex: 0 0 auto;
-    height: vars.$fluidx-heading-h3-line-height;
-  }
+      &__label {
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: vars.$fluidx-gray-700;
+      }
 
-  .hue-storage-browser__folder-name {
-    flex: 0 0 auto;
-    font-size: vars.$fluidx-heading-h3-size;
-    line-height: vars.$fluidx-heading-h3-line-height;
-    font-weight: vars.$fluidx-heading-h3-weight;
-  }
-
-  .hue-storage-browser__path-browser-panel {
-    display: flex;
-    align-items: center;
-    gap: vars.$fluidx-spacing-xs;
-  }
-
-  .hue-storage-browser__filePath {
-    flex: 0 0 auto;
-    font-weight: 600;
+      &__value {
+        height: 12px;
+        align-self: stretch;
+        color: vars.$fluidx-gray-900;
+      }
+    }
   }
 }
