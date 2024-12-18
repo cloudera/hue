@@ -915,7 +915,7 @@ var HiveViewModel = (function () {
 
     self.privilege = new Privilege(self, {});
 
-    self.doAs = ko.observable(initial.user);
+    self.doAs = ko.observable(window.LOGGED_USERNAME);
     self.doAs.subscribe(function () {
       self.assist.refreshTree();
     });

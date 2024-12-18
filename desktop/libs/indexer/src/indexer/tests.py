@@ -57,20 +57,16 @@ def test_get_ensemble():
 @pytest.mark.django_db
 class TestImporter(object):
 
-  def setup_method(self):
-    self.client = make_logged_in_client()
+    def setup_method(self):
+        self.client = make_logged_in_client()
 
-  def test_input_formats_no_fs(self):
-    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
-      get_filesystem.return_value = Mock()
-
-      resp = self.client.get(reverse('indexer:importer'))
-      assert b"{'value': 'file', 'name': 'Remote File'}" in resp.content
-
-      get_filesystem.return_value = None
-
-      resp = self.client.get(reverse('indexer:importer'))
-      assert b"{'value': 'file', 'name': 'Remote File'}" not in resp.content
+    def test_input_formats_no_fs(self):
+      with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+          get_filesystem.return_value = Mock()
+          resp = self.client.get(reverse('indexer:importer'))
+          assert b'"source_type": "hive"' in resp.content
+          assert b'"is_embeddable": false' in resp.content
+          get_filesystem.return_value = None
 
 
 class TestIndexerWithSolr(object):

@@ -42,11 +42,7 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
 
 ${layout.menubar(section='metrics')}
 
-<script type="text/javascript">
-  (function () {
-    window.createReactComponents('#Metrics');
-  })();
-</script>
+<script src="${ static('desktop/js/metrics-inline.js') }" type="text/javascript"></script>
 
 <div id="Metrics">
 <Metrics data-reactcomponent='Metrics'></Metrics>

@@ -19,6 +19,7 @@ import io
 import os
 import re
 import sys
+import json
 import stat as stat_module
 import errno
 import logging
@@ -673,6 +674,8 @@ def listdir_paged(request, path):
       's3_listing_not_allowed': s3_listing_not_allowed
   }
 
+  options_json = json.dumps(data)
+  data['options_json'] = options_json
   return render('listdir.mako', request, data)
 
 
@@ -858,7 +861,7 @@ def display(request, path):
 
   data['breadcrumbs'] = parse_breadcrumbs(path)
   data['show_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
-
+  data['options_json'] = json.dumps(data)
   return render("display.mako", request, data)
 
 
