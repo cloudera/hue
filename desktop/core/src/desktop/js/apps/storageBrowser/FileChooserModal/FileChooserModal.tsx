@@ -28,8 +28,8 @@ import useDebounce from '../../../utils/useDebounce';
 import useLoadData from '../../../utils/hooks/useLoadData';
 
 import { ListDirectory } from '../../../reactComponents/FileChooser/types';
-import { VIEWFILES_API_URl } from '../../../reactComponents/FileChooser/api';
-import PathBrowser from '../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
+import { LIST_DIRECTORY_API_URL } from '../../../reactComponents/FileChooser/api';
+import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 
 import './FileChooserModal.scss';
 
@@ -66,16 +66,14 @@ const FileChooserModal = ({
     setDestPath(sourcePath);
   }, [sourcePath]);
 
-  const { data: filesData, loading } = useLoadData<ListDirectory>(
-    `${VIEWFILES_API_URl}${destPath}`,
-    {
-      params: {
-        pagesize: '1000',
-        filter: searchTerm
-      },
-      skip: destPath === '' || destPath === undefined
-    }
-  );
+  const { data: filesData, loading } = useLoadData<ListDirectory>(LIST_DIRECTORY_API_URL, {
+    params: {
+      path: destPath,
+      pagesize: '1000',
+      filter: searchTerm
+    },
+    skip: destPath === '' || destPath === undefined || !showModal
+  });
 
   const tableData: FileChooserTableData[] = useMemo(() => {
     if (!filesData?.files) {
@@ -139,9 +137,7 @@ const FileChooserModal = ({
       okText={submitText}
       title={title}
       open={showModal}
-      onCancel={() => {
-        onClose();
-      }}
+      onCancel={onClose}
       onOk={() => {
         onSubmit(destPath);
         onClose();
@@ -169,7 +165,7 @@ const FileChooserModal = ({
         <Spin spinning={loading}>
           <Table
             className="hue-filechooser-modal__table"
-            dataSource={tableData?.slice(2)}
+            dataSource={tableData}
             pagination={false}
             columns={getColumns(tableData[0] ?? {})}
             rowKey={(record, index) => record.path + index}

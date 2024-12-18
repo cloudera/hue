@@ -656,7 +656,7 @@ def content_summary(request):
     replication_factor = request.fs.stats(path)['replication']
 
     content_summary.summary.update({'replication': replication_factor})
-    response['summary'] = content_summary.summary
+    response = content_summary.summary
   except Exception:
     return HttpResponse(f'Failed to fetch content summary for path: {path}', status=500)
 

@@ -25,7 +25,6 @@ import DuplicateIcon from '@cloudera/cuix-core/icons/react/DuplicateIcon';
 import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
-import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
 import {
   isHDFS,
   isOFS,
@@ -49,15 +48,16 @@ import {
 import huePubSub from '../../../../utils/huePubSub';
 import useSaveData from '../../../../utils/hooks/useSaveData';
 
-import SummaryModal from '../../SummaryModal/SummaryModal';
+import SummaryModal from '../SummaryModal/SummaryModal';
 import InputModal from '../../InputModal/InputModal';
 import FileChooserModal from '../../FileChooserModal/FileChooserModal';
 
 import './StorageBrowserActions.scss';
+import { StorageDirectoryTableData } from '../../../../reactComponents/FileChooser/types';
 
 interface StorageBrowserRowActionsProps {
   currentPath: string;
-  selectedFiles: StorageBrowserTableData[];
+  selectedFiles: StorageDirectoryTableData[];
   onSuccessfulAction: () => void;
   setLoadingFiles: (value: boolean) => void;
 }

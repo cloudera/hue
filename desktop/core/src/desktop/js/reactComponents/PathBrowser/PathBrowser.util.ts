@@ -14,7 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { BreadcrumbData } from '../types';
+export interface BreadcrumbData {
+  label: string;
+  url: string;
+}
 
 export const getFileSystemAndPath = (
   filePath: string

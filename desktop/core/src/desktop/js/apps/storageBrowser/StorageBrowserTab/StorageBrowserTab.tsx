@@ -17,19 +17,19 @@
 import React, { useState } from 'react';
 import { Spin } from 'antd';
 
-import { i18nReact } from '../../../../utils/i18nReact';
+import { i18nReact } from '../../../utils/i18nReact';
 import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 
-import PathBrowser from '../../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
-import StorageBrowserTable from '../StorageBrowserTable/StorageBrowserTable';
-import { FILE_STATS_API_URL } from '../../../../reactComponents/FileChooser/api';
-import { BrowserViewType, FileStats } from '../../../../reactComponents/FileChooser/types';
-import useLoadData from '../../../../utils/hooks/useLoadData';
+import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
+import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
+import { FILE_STATS_API_URL } from '../../../reactComponents/FileChooser/api';
+import { BrowserViewType, FileStats } from '../../../reactComponents/FileChooser/types';
+import useLoadData from '../../../utils/hooks/useLoadData';
 
-import './StorageBrowserTabContent.scss';
-import StorageFilePage from '../../StorageFilePage/StorageFilePage';
+import './StorageBrowserTab.scss';
+import StorageFilePage from '../StorageFilePage/StorageFilePage';
 
-interface StorageBrowserTabContentProps {
+interface StorageBrowserTabProps {
   homeDir: string;
   testId?: string;
 }
@@ -38,10 +38,7 @@ const defaultProps = {
   testId: 'hue-storage-browser-tab-content'
 };
 
-const StorageBrowserTabContent = ({
-  homeDir,
-  testId
-}: StorageBrowserTabContentProps): JSX.Element => {
+const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Element => {
   const [filePath, setFilePath] = useState<string>(homeDir);
   const fileName = filePath?.split('/')?.pop() ?? '';
 
@@ -76,7 +73,7 @@ const StorageBrowserTabContent = ({
           />
         </div>
         {fileStats?.type === BrowserViewType.dir && (
-          <StorageBrowserTable fileStats={fileStats} onFilePathChange={setFilePath} />
+          <StorageDirectoryPage fileStats={fileStats} onFilePathChange={setFilePath} />
         )}
         {fileStats?.type === BrowserViewType.file && (
           <StorageFilePage fileName={fileName} fileStats={fileStats} />
@@ -86,6 +83,6 @@ const StorageBrowserTabContent = ({
   );
 };
 
-StorageBrowserTabContent.defaultProps = defaultProps;
+StorageBrowserTab.defaultProps = defaultProps;
 
-export default StorageBrowserTabContent;
+export default StorageBrowserTab;
