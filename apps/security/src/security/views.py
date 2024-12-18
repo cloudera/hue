@@ -49,7 +49,7 @@ def solr(request):
 
 
 def _sentry(request, component):
-  return render("sentry.mako", request, {
+  data = {
       'initial': json.dumps({
           'component': component,
           'user': request.user.username,
@@ -59,7 +59,9 @@ def _sentry(request, component):
       'is_embeddable': request.GET.get('is_embeddable', False),
       'has_impersonation_perm': _has_impersonation_perm(request.user) and component == 'hive',
       'component': component
-  })
+  }
+  data['options_json'] = data['initial']
+  return render("sentry.mako", request, data)
 
 
 def hdfs(request):

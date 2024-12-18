@@ -461,8 +461,8 @@ class OnePageViewModel {
               huePubSub.clearAppSubscribers(app);
               self.extraEmbeddableURLParams('');
               const currentPath = window.location.pathname; // Retrieve the current path from the window location
-
-              const inlineScriptsUrls = ['oozie', 'beeswax', 'jobbrowser', 'jobsub', 'logs'].some(segment => currentPath.includes(segment));
+              const basePath = currentPath.split('=')[0];
+              const inlineScriptsUrls = ['oozie', 'beeswax', 'jobbrowser', 'jobsub', 'logs'].some(segment => basePath.includes(segment));
               if (inlineScriptsUrls) {
                 self.processHeaders(response).done($rawHtml => {
                   if (window.SKIP_CACHE.indexOf(app) === -1) {
