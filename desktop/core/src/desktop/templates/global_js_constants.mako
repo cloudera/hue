@@ -33,7 +33,7 @@
       QUERY_STORE
   from filebrowser.conf import SHOW_UPLOAD_BUTTON, REMOTE_STORAGE_HOME, MAX_FILE_SIZE_UPLOAD_LIMIT, SHOW_DOWNLOAD_BUTTON
   from filebrowser.views import MAX_FILEEDITOR_SIZE
-  from indexer.conf import ENABLE_NEW_INDEXER
+  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_DIRECT_UPLOAD, ENABLE_SQOOP, ENABLE_KAFKA, ENABLE_ALTUS, ENABLE_ENVELOPE
   from libsaml.conf import get_logout_redirect_url, CDP_LOGOUT_URL
   from metadata.conf import has_catalog, has_readonly_catalog, has_optimizer, has_workload_analytics, OPTIMIZER, get_optimizer_url, \
       get_catalog_url, get_optimizer_mode
@@ -185,6 +185,13 @@
   window.ENABLE_QUERY_BUILDER = '${ ENABLE_QUERY_BUILDER.get() }' === 'True';
   window.ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
   window.ENABLE_UNIFIED_ANALYTICS = '${ ENABLE_UNIFIED_ANALYTICS.get() }' === 'True';
+  window.ENABLE_DIRECT_UPLOAD = '${ ENABLE_DIRECT_UPLOAD.get() }' === 'True';
+  window.ENABLE_SQOOP = '${ ENABLE_SQOOP.get() }' === 'True';
+  window.ENABLE_KAFKA = '${ ENABLE_KAFKA.get() }' === 'True';
+  window.ENABLE_ALTUS = '${ ENABLE_ALTUS.get() }' === 'True';
+  window.ENABLE_SQL_INDEXER = '${ ENABLE_SQL_INDEXER.get() }' === 'True';
+  window.ENABLE_ENVELOPE = '${ ENABLE_ENVELOPE.get() }' === 'True';
+  window.REQUEST_FS = '${hasattr(request, "fs")}' === 'True';
   window.RAZ_IS_ENABLED = '${ RAZ.IS_ENABLED.get() }' === 'True';
 
   window.ENABLE_HISTORY_V2 = '${ hasattr(ENABLE_HISTORY_V2, 'get') and ENABLE_HISTORY_V2.get() }' === 'True';

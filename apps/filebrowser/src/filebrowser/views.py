@@ -866,6 +866,7 @@ def display(request, path):
   data['breadcrumbs'] = parse_breadcrumbs(path)
   data['show_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
 
+  data['options_json'] =  json.dumps(data)
   return render("display.mako", request, data)
 
 

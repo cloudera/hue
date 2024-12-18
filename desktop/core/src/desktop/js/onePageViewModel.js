@@ -346,10 +346,6 @@ class OnePageViewModel {
     };
 
 
-    function isSecurePageEnabled(path = window.location.pathname) {
-      return window.NONCE_ENABLED
-    }
-
     huePubSub.subscribe('hue4.process.headers', opts => {
       self.processHeaders(opts.response).done(rawHtml => {
         opts.callback(rawHtml);
@@ -466,7 +462,7 @@ class OnePageViewModel {
               self.extraEmbeddableURLParams('');
               const currentPath = window.location.pathname; // Retrieve the current path from the window location
 
-              const inlineScriptsUrls = ['oozie'].some(segment => currentPath.includes(segment));
+              const inlineScriptsUrls = ['oozie', 'beeswax', 'jobbrowser', 'jobsub', 'logs'].some(segment => currentPath.includes(segment));
               if (inlineScriptsUrls) {
                 self.processHeaders(response).done($rawHtml => {
                   if (window.SKIP_CACHE.indexOf(app) === -1) {
@@ -964,17 +960,6 @@ class OnePageViewModel {
 
     huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, configUpdated);
     huePubSub.subscribe(CONFIG_REFRESHED_TOPIC, configUpdated);
-
-    // function nonceCheckMiddleware(ctx, next) {
-    //   const currentNonceEnabled = isSecurePageEnabled();
-    //   const targetNonceEnabled = isSecurePageEnabled(ctx.params[0]);
-    //   if (currentNonceEnabled !== targetNonceEnabled) {
-    //     // If the nonce states differ, force a full page reload
-    //     window.location.href = ctx.canonicalPath;
-    //   } else {
-    //     next(); // Continue with the routing if nonces are consistent
-    //   }
-    // }
 
     huePubSub.subscribe('open.link', href => {
       if (href) {

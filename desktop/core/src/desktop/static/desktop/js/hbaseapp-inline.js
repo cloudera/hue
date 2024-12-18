@@ -37,9 +37,7 @@ $(document).ready(function () {
     };
 
     // update
-    debugger;
     canWrite = hbaseOptions.can_write;
-
 
     var BaseModel = function () {
     }

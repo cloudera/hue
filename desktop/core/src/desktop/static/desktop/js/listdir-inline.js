@@ -529,7 +529,6 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
     self.isLoading(true);
     const encodedSearchFilter = encodeURIComponent(self.searchQuery());
     $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + encodedSearchFilter + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
-      console.log(data, self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + encodedSearchFilter + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json")
       if (data.error){
         huePubSub.publish('hue.global.error', {message: data.error});
         self.isLoading(false);
@@ -585,7 +584,6 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
     }
 
     self.breadcrumbs(ko.utils.arrayMap(breadcrumbs, function (breadcrumb) {
-      console.log(breadcrumb)
       return new Breadcrumb(breadcrumb);
     }));
 
