@@ -118,7 +118,7 @@ export const getChunkSinglePayload = (item: UploadItem): ChunkPayload => {
   const metaData = getMetaData(item, DEFAULT_CHUNK_SIZE);
 
   const singleChunkParams = Object.fromEntries(
-    Object.entries(metaData).filter(([key]) => key !== 'qqttotalparts')
+    Object.entries(metaData).filter(([key]) => key !== 'qqtotalparts')
   );
 
   const queryParams = new URLSearchParams(singleChunkParams).toString();
