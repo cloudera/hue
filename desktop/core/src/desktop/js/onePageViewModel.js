@@ -193,22 +193,22 @@ class OnePageViewModel {
 
     self.scriptQueue = [];
     self.currentlyLoadingScript = false;
-    
+
     self.loadScript_nonce = function (scriptSrc) {
       const deferred = $.Deferred();
-    
+
       self.scriptQueue.push({ scriptSrc, deferred });
-    
+
       const loadNextScript = function () {
         if (self.currentlyLoadingScript || self.scriptQueue.length === 0) {
           // Either a script is currently being loaded or no scripts are left to load
           return;
         }
-    
+
         // Get and remove the first script from the queue
         const { scriptSrc, deferred } = self.scriptQueue.shift();
         self.currentlyLoadingScript = true;
-    
+
         const script = document.createElement('script');
         script.type = 'text/javascript';
         script.src = scriptSrc;
@@ -224,11 +224,10 @@ class OnePageViewModel {
         };
         document.body.appendChild(script);
       };
-    
+
       loadNextScript(); // Start loading if no other scripts are currently being loaded
       return deferred.promise();
     };
-
 
     // Only load CSS and JS files that are not loaded before
     self.processHeaders = function (response) {
@@ -291,18 +290,18 @@ class OnePageViewModel {
         return promises;
       };
 
-      let scriptPromises = loadScripts(scriptsToLoad);
+      const scriptPromises = loadScripts(scriptsToLoad);
 
       const evalScriptSync = function () {
         if (scriptPromises.length) {
           // Evaluate the scripts in the order they were defined in the page
           const nextScriptPromise = scriptPromises.shift();
-            nextScriptPromise.done(scriptDetails => {
-              if (scriptDetails.contents) {
-                $.globalEval(scriptDetails.contents);
-              }
-              evalScriptSync();
-            });
+          nextScriptPromise.done(scriptDetails => {
+            if (scriptDetails.contents) {
+              $.globalEval(scriptDetails.contents);
+            }
+            evalScriptSync();
+          });
         } else {
           promise.resolve($rawHtml.children());
         }
@@ -312,25 +311,26 @@ class OnePageViewModel {
       return promise;
     };
 
-
     self.processHeadersSecure = function (response) {
       const promise = $.Deferred();
       const $rawHtml = $('<span>').html(response);
-    
+
       // Since we're not executing scripts here, we simply collect them
       const $allScripts = $rawHtml.find('script[src]');
-      const scriptsToLoad = $allScripts.map(function () {
-        return $(this).attr('src');
-      }).toArray();
-      
+      const scriptsToLoad = $allScripts
+        .map(function () {
+          return $(this).attr('src');
+        })
+        .toArray();
+
       // Remove the script elements to avoid duplicating them when $rawHtml is inserted into the document
       $allScripts.remove();
-    
+
       // Process other elements (link, a, etc.)
       $rawHtml.find('link[href]').each(function () {
         addGlobalCss($(this)); // Also removes the element
       });
-      
+
       $rawHtml.find('a[href]').each(function () {
         let link = $(this).attr('href');
         if (link.startsWith('/') && !link.startsWith('/hue')) {
@@ -338,13 +338,12 @@ class OnePageViewModel {
         }
         $(this).attr('href', link);
       });
-    
+
       // Pass the array of script sources along with $rawHtml to the calling code
       promise.resolve({ $rawHtml: $rawHtml, scriptsToLoad: scriptsToLoad });
-    
+
       return promise;
     };
-
 
     huePubSub.subscribe('hue4.process.headers', opts => {
       self.processHeaders(opts.response).done(rawHtml => {
@@ -462,7 +461,9 @@ class OnePageViewModel {
               self.extraEmbeddableURLParams('');
               const currentPath = window.location.pathname; // Retrieve the current path from the window location
               const basePath = currentPath.split('=')[0];
-              const inlineScriptsUrls = ['oozie', 'beeswax', 'jobbrowser', 'jobsub', 'logs'].some(segment => basePath.includes(segment));
+              const inlineScriptsUrls = ['oozie', 'beeswax', 'jobbrowser', 'jobsub', 'logs'].some(
+                segment => basePath.includes(segment)
+              );
               if (inlineScriptsUrls) {
                 self.processHeaders(response).done($rawHtml => {
                   if (window.SKIP_CACHE.indexOf(app) === -1) {
