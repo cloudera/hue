@@ -16,7 +16,10 @@
 
 import useQueueProcessor from '../useQueueProcessor';
 import { UPLOAD_FILE_URL } from '../../../reactComponents/FileChooser/api';
-import { DEFAULT_CONCURRENT_MAX_CONNECTIONS, FileUploadStatus } from '../../constants/storageBrowser';
+import {
+  DEFAULT_CONCURRENT_MAX_CONNECTIONS,
+  FileUploadStatus
+} from '../../constants/storageBrowser';
 import useSaveData from '../useSaveData';
 import { UploadItem } from './util';
 
