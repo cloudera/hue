@@ -64,6 +64,7 @@ const mockFileStats: FileStats = {
   type: BrowserViewType.file
 };
 const mockFileName = 'file.txt';
+const mockReload = jest.fn();
 
 describe('StorageFilePage', () => {
   let oldShowDownloadButton: boolean;
@@ -80,7 +81,9 @@ describe('StorageFilePage', () => {
   });
 
   it('should render file metadata and content', () => {
-    render(<StorageFilePage fileName={mockFileName} fileStats={mockFileStats} />);
+    render(
+      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
+    );
 
     expect(screen.getByText('Size')).toBeInTheDocument();
     expect(screen.getByText('120.56 KB')).toBeInTheDocument();
@@ -100,7 +103,9 @@ describe('StorageFilePage', () => {
 
   // TODO: fix this test when mocking of useLoadData onSuccess callback is mproperly mocked
   it.skip('should show edit button and hides save/cancel buttons initially', () => {
-    render(<StorageFilePage fileName={mockFileName} fileStats={mockFileStats} />);
+    render(
+      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
+    );
 
     expect(screen.getByRole('button', { name: 'Edit' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
@@ -113,14 +118,18 @@ describe('StorageFilePage', () => {
       contents: 'Initial file content',
       compression: 'zip'
     }));
-    render(<StorageFilePage fileName={mockFileName} fileStats={mockFileStats} />);
+    render(
+      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
+    );
 
     expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
   });
 
   it('should show save and cancel buttons when editing', async () => {
     const user = userEvent.setup();
-    render(<StorageFilePage fileName={mockFileName} fileStats={mockFileStats} />);
+    render(
+      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
+    );
 
     expect(screen.getByRole('button', { name: 'Edit' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
@@ -138,7 +147,9 @@ describe('StorageFilePage', () => {
 
   it('should update textarea value and calls handleSave', async () => {
     const user = userEvent.setup();
-    render(<StorageFilePage fileName={mockFileName} fileStats={mockFileStats} />);
+    render(
+      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
+    );
 
     await user.click(screen.getByRole('button', { name: 'Edit' }));
 
@@ -160,7 +171,9 @@ describe('StorageFilePage', () => {
 
   it('should cancel editing and reverts textarea value', async () => {
     const user = userEvent.setup();
-    render(<StorageFilePage fileName={mockFileName} fileStats={mockFileStats} />);
+    render(
+      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
+    );
 
     await user.click(screen.getByRole('button', { name: 'Edit' }));
 
@@ -180,7 +193,9 @@ describe('StorageFilePage', () => {
 
   it('should download a file when download button is clicked', async () => {
     const user = userEvent.setup();
-    render(<StorageFilePage fileName={mockFileName} fileStats={mockFileStats} />);
+    render(
+      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
+    );
 
     await user.click(screen.getByRole('button', { name: 'Download' }));
 
@@ -194,7 +209,9 @@ describe('StorageFilePage', () => {
 
   it('should download a file when download button is clicked', async () => {
     const user = userEvent.setup();
-    render(<StorageFilePage fileName={mockFileName} fileStats={mockFileStats} />);
+    render(
+      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
+    );
 
     await user.click(screen.getByRole('button', { name: 'Download' }));
 
@@ -209,7 +226,9 @@ describe('StorageFilePage', () => {
   it('should not render the download button when show_download_button is false', () => {
     (window as hueWindow).SHOW_DOWNLOAD_BUTTON = false;
 
-    render(<StorageFilePage fileName={mockFileName} fileStats={mockFileStats} />);
+    render(
+      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
+    );
 
     expect(screen.queryByRole('button', { name: 'Download' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Download' })).toBeNull();
@@ -217,7 +236,9 @@ describe('StorageFilePage', () => {
 
   // TODO: fix this test when mocking of useLoadData onSuccess callback is mproperly mocked
   it.skip('should render a textarea for text files', () => {
-    render(<StorageFilePage fileName={mockFileName} fileStats={mockFileStats} />);
+    render(
+      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
+    );
 
     const textarea = screen.getByRole('textbox');
     expect(textarea).toBeInTheDocument();
@@ -229,6 +250,7 @@ describe('StorageFilePage', () => {
       <StorageFilePage
         fileName="imagefile.png"
         fileStats={{ ...mockFileStats, path: '/path/to/imagefile.png' }}
+        onReload={mockReload}
       />
     );
 
@@ -242,6 +264,7 @@ describe('StorageFilePage', () => {
       <StorageFilePage
         fileName="documentfile.pdf"
         fileStats={{ ...mockFileStats, path: '/path/to/documentfile.pdf' }}
+        onReload={mockReload}
       />
     );
 
@@ -253,6 +276,7 @@ describe('StorageFilePage', () => {
       <StorageFilePage
         fileName="audiofile.mp3"
         fileStats={{ ...mockFileStats, path: '/path/to/audiofile.mp3' }}
+        onReload={mockReload}
       />
     );
 
@@ -266,6 +290,7 @@ describe('StorageFilePage', () => {
       <StorageFilePage
         fileName="videofile.mp4"
         fileStats={{ ...mockFileStats, path: '/path/to/videofile.mp4' }}
+        onReload={mockReload}
       />
     );
 
@@ -282,6 +307,7 @@ describe('StorageFilePage', () => {
           path: '/path/to/unsupportedfile.xyz'
         }}
         fileName="unsupportedfile.xyz"
+        onReload={mockReload}
       />
     );
 

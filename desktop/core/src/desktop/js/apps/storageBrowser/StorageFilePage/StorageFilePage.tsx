@@ -41,11 +41,12 @@ import { Spin } from 'antd';
 import useLoadData from '../../../utils/hooks/useLoadData';
 
 interface StorageFilePageProps {
+  onReload: () => void;
   fileName: string;
   fileStats: FileStats;
 }
 
-const StorageFilePage = ({ fileName, fileStats }: StorageFilePageProps): JSX.Element => {
+const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [fileContent, setFileContent] = useState<FilePreview['contents']>();
@@ -90,6 +91,7 @@ const StorageFilePage = ({ fileName, fileStats }: StorageFilePageProps): JSX.Ele
           setIsEditing(true);
         },
         onSuccess: () => {
+          onReload();
           huePubSub.publish('hue.global.info', { message: t('Changes saved!') });
         }
       }
