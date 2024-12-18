@@ -186,9 +186,11 @@ const StorageDirectoryPage = ({
   const onRowClicked = (record: StorageDirectoryTableData) => {
     return {
       onClick: () => {
-        onFilePathChange(record.path);
-        if (record.type === 'dir') {
-          setPageNumber(1);
+        if (selectedFiles.length === 0) {
+          onFilePathChange(record.path);
+          if (record.type === 'dir') {
+            setPageNumber(1);
+          }
         }
       }
     };
