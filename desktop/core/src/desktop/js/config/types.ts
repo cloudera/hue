@@ -60,6 +60,15 @@ export enum AppType {
   sdkapps = 'sdkapps'
 }
 
+interface StorageBrowserConfig {
+  concurrent_max_connection: number;
+  enable_chunked_file_uploader: boolean;
+  enable_file_download_button: boolean;
+  enable_new_storage_browser: boolean;
+  file_upload_chunk_size: number;
+  max_file_editor_size: number;
+}
+
 export interface HueConfig extends GenericApiResponse {
   app_config: {
     [AppType.browser]?: AppConfig<BrowserInterpreter>;
@@ -89,7 +98,11 @@ export interface HueConfig extends GenericApiResponse {
     is_vector_db_enabled: boolean;
     auto_fetch_table_meta_limit: number;
     ai_enabled_SQL_tasks: string[];
+    enable_task_server: boolean;
+    is_admin: boolean;
+    is_yarn_enabled: boolean;
   };
+  storage_browser: StorageBrowserConfig;
   hue_version?: string;
   img_version?: string;
   vw_name?: string;

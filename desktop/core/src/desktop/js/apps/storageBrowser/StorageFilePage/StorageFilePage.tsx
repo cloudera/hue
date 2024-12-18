@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import React, { useMemo, useState } from 'react';
-import { hueWindow } from 'types/types';
 import {
   BrowserViewType,
   FilePreview,
@@ -39,6 +38,7 @@ import {
 } from '../../../utils/constants/storageBrowser';
 import { Spin } from 'antd';
 import useLoadData from '../../../utils/hooks/useLoadData';
+import { getLastKnownConfig } from '../../../config/hueConfig';
 
 interface StorageFilePageProps {
   onReload: () => void;
@@ -47,7 +47,9 @@ interface StorageFilePageProps {
 }
 
 const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps): JSX.Element => {
+  const config = getLastKnownConfig();
   const { t } = i18nReact.useTranslation();
+
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [fileContent, setFileContent] = useState<FilePreview['contents']>();
 
@@ -114,7 +116,8 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
 
   const isEditingEnabled =
     !isEditing &&
-    (window as hueWindow).MAX_FILEEDITOR_SIZE > fileStats.size &&
+    config?.storage_browser.max_file_editor_size &&
+    config?.storage_browser.max_file_editor_size > fileStats.size &&
     EDITABLE_FILE_FORMATS[fileType] &&
     fileData?.compression?.toLocaleLowerCase() === 'none';
 
@@ -167,7 +170,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                   </Button>
                 </>
               )}
-              {(window as hueWindow).SHOW_DOWNLOAD_BUTTON && (
+              {config?.storage_browser.enable_file_download_button && (
                 <a href={`${DOWNLOAD_API_URL}${fileStats.path}`}>
                   <PrimaryButton
                     data-testid="preview--download--button"

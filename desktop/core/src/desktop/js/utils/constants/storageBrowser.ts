@@ -16,8 +16,8 @@
 
 export const DEFAULT_PAGE_SIZE = 50;
 export const DEFAULT_CHUNK_SIZE = 5 * 1024 * 1024; // 5 MiB
-export const DEFAULT_CONCURRENT_UPLOAD = 3;
-export const DEFAULT_CONCURRENT_CHUNK_UPLOAD = 3;
+export const DEFAULT_CONCURRENT_MAX_CONNECTIONS = 3;
+export const DEFAULT_ENABLE_CHUNK_UPLOAD = false;
 
 export enum SupportedFileTypes {
   IMAGE = 'image',
