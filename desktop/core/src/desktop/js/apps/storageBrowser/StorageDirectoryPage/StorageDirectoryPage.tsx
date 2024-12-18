@@ -43,8 +43,12 @@ import formatBytes from '../../../utils/formatBytes';
 import './StorageDirectoryPage.scss';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import useLoadData from '../../../utils/hooks/useLoadData';
-import { DEFAULT_PAGE_SIZE } from '../../../utils/constants/storageBrowser';
+import { DEFAULT_PAGE_SIZE, FileUploadStatus } from '../../../utils/constants/storageBrowser';
 import CreateAndUploadAction from './CreateAndUploadAction/CreateAndUploadAction';
+import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
+import UUID from '../../../utils/string/UUID';
+import { UploadItem } from '../../../utils/hooks/useFileUpload/util';
+import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
@@ -71,6 +75,7 @@ const StorageDirectoryPage = ({
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
   const [tableHeight, setTableHeight] = useState<number>(100);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
+  const [filesToUpload, setFilesToUpload] = useState<UploadItem[]>([]);
 
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -213,6 +218,18 @@ const StorageDirectoryPage = ({
     [setSearchTerm]
   );
 
+  const onFilesDrop = (newFiles: File[]) => {
+    const newUploadItems = newFiles.map(file => {
+      return {
+        file,
+        filePath: fileStats.path,
+        uuid: UUID(),
+        status: FileUploadStatus.Pending
+      };
+    });
+    setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
+  };
+
   useEffect(() => {
     //TODO: handle table resize
     const calculateTableHeight = () => {
@@ -262,40 +279,50 @@ const StorageDirectoryPage = ({
             currentPath={fileStats.path}
             setLoadingFiles={setLoadingFiles}
             onSuccessfulAction={reloadData}
+            onFilesUpload={onFilesDrop}
           />
         </div>
       </div>
 
-      <Spin spinning={loadingFiles || listDirectoryLoading}>
-        <Table
-          className={className}
-          columns={getColumns(tableData[0] ?? {})}
-          dataSource={tableData}
-          onRow={onRowClicked}
-          pagination={false}
-          rowClassName={rowClassName}
-          rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
-          rowSelection={{
-            type: 'checkbox',
-            ...rowSelection
-          }}
-          scroll={{ y: tableHeight }}
-          data-testid={`${testId}`}
-          locale={locale}
-          {...restProps}
-        />
-
-        {filesData?.page && filesData?.page?.total_count > 0 && (
-          <Pagination
-            onNextPageButtonClicked={onNextPageButtonClicked}
-            onPageNumberChange={setPageNumber}
-            onPageSizeChange={setPageSize}
-            onPreviousPageButtonClicked={onPreviousPageButtonClicked}
-            pageSize={pageSize}
-            pageStats={filesData?.page}
+      <DragAndDrop onDrop={onFilesDrop}>
+        <Spin spinning={loadingFiles || listDirectoryLoading}>
+          <Table
+            className={className}
+            columns={getColumns(tableData[0] ?? {})}
+            dataSource={tableData}
+            onRow={onRowClicked}
+            pagination={false}
+            rowClassName={rowClassName}
+            rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
+            rowSelection={{
+              type: 'checkbox',
+              ...rowSelection
+            }}
+            scroll={{ y: tableHeight }}
+            data-testid={`${testId}`}
+            locale={locale}
+            {...restProps}
           />
-        )}
-      </Spin>
+
+          {filesData?.page && filesData?.page?.total_count > 0 && (
+            <Pagination
+              onNextPageButtonClicked={onNextPageButtonClicked}
+              onPageNumberChange={setPageNumber}
+              onPageSizeChange={setPageSize}
+              onPreviousPageButtonClicked={onPreviousPageButtonClicked}
+              pageSize={pageSize}
+              pageStats={filesData?.page}
+            />
+          )}
+        </Spin>
+      </DragAndDrop>
+      {filesToUpload.length > 0 && (
+        <FileUploadQueue
+          filesQueue={filesToUpload}
+          onClose={() => setFilesToUpload([])}
+          onComplete={reloadData}
+        />
+      )}
     </>
   );
 };
