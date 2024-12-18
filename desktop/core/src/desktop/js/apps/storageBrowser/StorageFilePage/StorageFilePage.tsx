@@ -49,6 +49,7 @@ interface StorageFilePageProps {
 const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps): JSX.Element => {
   const config = getLastKnownConfig();
   const { t } = i18nReact.useTranslation();
+
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [fileContent, setFileContent] = useState<FilePreview['contents']>();
 
