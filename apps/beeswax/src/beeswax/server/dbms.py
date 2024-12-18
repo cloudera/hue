@@ -29,7 +29,7 @@ from django.utils.translation import gettext as _
 from kazoo.client import KazooClient
 
 from azure.abfs import abfspath
-from beeswax.common import apply_natural_sort, is_compute
+from beeswax.common import apply_natural_sort, find_compute_in_cluster
 from beeswax.conf import (
   APPLY_NATURAL_SORT_MAX,
   AUTH_PASSWORD,
@@ -164,7 +164,7 @@ def get(user, query_server=None, cluster=None):
 
 
 def get_query_server_config(name='beeswax', connector=None):
-  if connector and (has_connectors() or is_compute(connector)):
+  if connector and (has_connectors() or find_compute_in_cluster(connector)):
     LOG.debug("Query via connector %s (%s)" % (name, connector.get('type')))
     query_server = get_query_server_config_via_connector(connector)
   else:
@@ -1042,14 +1042,14 @@ class HiveServer2Dbms(object):
     query = hql_query('USE `%s`' % database)
     return self.client.use(query, session=session)
 
-  def get_log(self, query_handle, start_over=True):
-    return self.client.get_log(query_handle, start_over)
+  def get_log(self, query_handle, start_over=True, session=None):
+    return self.client.get_log(query_handle, start_over, session=session)
 
   def get_state(self, handle):
     return self.client.get_state(handle)
 
-  def get_operation_status(self, handle):
-    return self.client.get_operation_status(handle)
+  def get_operation_status(self, handle, session=None):
+    return self.client.get_operation_status(handle, session=session)
 
   def execute_and_wait(self, query, timeout_sec=30.0, sleep_interval=0.5):
     """
