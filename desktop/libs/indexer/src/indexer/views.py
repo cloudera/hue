@@ -18,18 +18,20 @@
 import sys
 import json
 import logging
+
 from django.utils.translation import gettext as _
+
+from beeswax import hive_site
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import get_cluster_config
+from impala import impala_flags
 from indexer.fields import FIELD_TYPES, Field
 from indexer.file_format import get_file_indexable_format_types
 from indexer.indexers.morphline_operations import OPERATORS
 from indexer.management.commands import indexer_setup
 from indexer.solr_client import SolrClient
-from beeswax import hive_site
-from impala import impala_flags
-  
+
 LOG = logging.getLogger()
 
 
@@ -124,7 +126,7 @@ def _importer(request, prefill):
       'has_concurrency_support': hive_site.has_concurrency_support(),
       'default_transactional_type': impala_flags.default_transactional_type(),
   }
-  
+
   data['options_json'] = json.dumps(data)
 
   return render('importer.mako', request, data)

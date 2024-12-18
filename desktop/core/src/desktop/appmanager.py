@@ -261,7 +261,7 @@ def load_apps(app_blacklist):
   DESKTOP_APPS = []
 
   for sdk_app in pkg_resources.iter_entry_points("desktop.sdk.application"):
-    
+
     if desktop.conf.CSP_NONCE.get():
       # This Apps are not supported CSP Nonce is enabled.
       app_blacklist.extend(['oozie', 'jobbrowser', 'rdbms', 'search', 'zookeeper'])

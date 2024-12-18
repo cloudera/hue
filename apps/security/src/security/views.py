@@ -17,10 +17,9 @@
 
 import json
 
-from desktop.lib.django_util import render
-
-from libsentry.sentry_site import get_hive_sentry_provider, get_sentry_server_admin_groups, get_solr_sentry_provider
 from desktop.auth.backend import is_admin
+from desktop.lib.django_util import render
+from libsentry.sentry_site import get_hive_sentry_provider, get_sentry_server_admin_groups, get_solr_sentry_provider
 
 
 def hive(request):
@@ -36,7 +35,7 @@ def hive(request):
   }
   # options_json used in js
   data['options_json'] = data['initial']
-  
+
   return render("hive.mako", request, data)
 
 

@@ -17,9 +17,9 @@
 
 import io
 import os
-import json
 import re
 import sys
+import json
 import stat as stat_module
 import errno
 import logging
@@ -673,7 +673,7 @@ def listdir_paged(request, path):
       'is_embeddable': request.GET.get('is_embeddable', False),
       's3_listing_not_allowed': s3_listing_not_allowed
   }
-  
+
   options_json = json.dumps(data)
   data['options_json'] = options_json
   return render('listdir.mako', request, data)

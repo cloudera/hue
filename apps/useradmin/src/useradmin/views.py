@@ -82,8 +82,8 @@ def list_users(request):
   # options_json is used in the UI
   data['options_json'] = json.dumps(data)
   data['request'] = request
-  data['users'] = User.objects.all()  
-  
+  data['users'] = User.objects.all()
+
   return render("list_users.mako", request, data)
 
 

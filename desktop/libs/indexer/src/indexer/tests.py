@@ -68,6 +68,7 @@ class TestImporter(object):
           assert b'"is_embeddable": false' in resp.content
           get_filesystem.return_value = None
 
+
 class TestIndexerWithSolr(object):
 
   @classmethod
