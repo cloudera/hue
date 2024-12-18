@@ -78,8 +78,9 @@ from desktop.models import (
   uuid_default,
 )
 from desktop.views import get_banner_message, serve_403_error
-from filebrowser.conf import RESTRICT_FILE_EXTENSIONS, CONCURRENT_MAX_CONNECTIONS, FILE_UPLOAD_CHUNK_SIZE, SHOW_DOWNLOAD_BUTTON
+from filebrowser.conf import CONCURRENT_MAX_CONNECTIONS, FILE_UPLOAD_CHUNK_SIZE, RESTRICT_FILE_EXTENSIONS, SHOW_DOWNLOAD_BUTTON
 from filebrowser.tasks import check_disk_usage_and_clean_task, document_cleanup_task
+from filebrowser.views import MAX_FILEEDITOR_SIZE
 from hadoop.cluster import is_yarn
 from metadata.catalog_api import (
   _highlight,
@@ -89,7 +90,6 @@ from metadata.catalog_api import (
 from metadata.conf import has_catalog
 from notebook.connectors.base import Notebook
 from useradmin.models import Group, User
-from filebrowser.views import MAX_FILEEDITOR_SIZE
 
 LOG = logging.getLogger()
 
