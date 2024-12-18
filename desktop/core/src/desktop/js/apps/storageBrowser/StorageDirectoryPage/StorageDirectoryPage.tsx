@@ -16,29 +16,19 @@
 
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { ColumnProps } from 'antd/lib/table';
-import { Dropdown, Input, Spin, Tooltip } from 'antd';
-import { MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
+import { Input, Spin, Tooltip } from 'antd';
 
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
+import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import SortAscending from '@cloudera/cuix-core/icons/react/SortAscendingIcon';
 import SortDescending from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
-import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
-import ImportIcon from '@cloudera/cuix-core/icons/react/ImportIcon';
-//TODO: Use cuix icon (Currently fileIcon does not exist in cuix)
-import { FileOutlined } from '@ant-design/icons';
 
-import { PrimaryButton } from 'cuix/dist/components/Button';
 import Table from 'cuix/dist/components/Table';
 
 import { i18nReact } from '../../../utils/i18nReact';
-import huePubSub from '../../../utils/huePubSub';
 import useDebounce from '../../../utils/useDebounce';
 
-import {
-  LIST_DIRECTORY_API_URL,
-  CREATE_DIRECTORY_API_URL,
-  CREATE_FILE_API_URL
-} from '../../../reactComponents/FileChooser/api';
+import { LIST_DIRECTORY_API_URL } from '../../../reactComponents/FileChooser/api';
 import {
   SortOrder,
   ListDirectory,
@@ -48,14 +38,13 @@ import {
 } from '../../../reactComponents/FileChooser/types';
 import Pagination from '../../../reactComponents/Pagination/Pagination';
 import StorageBrowserActions from './StorageBrowserActions/StorageBrowserActions';
-import InputModal from '../InputModal/InputModal';
 import formatBytes from '../../../utils/formatBytes';
-import useSaveData from '../../../utils/hooks/useSaveData';
 
 import './StorageDirectoryPage.scss';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import useLoadData from '../../../utils/hooks/useLoadData';
 import { DEFAULT_PAGE_SIZE } from '../../../utils/constants/storageBrowser';
+import CreateAndUploadAction from './CreateAndUploadAction/CreateAndUploadAction';
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
@@ -82,8 +71,6 @@ const StorageDirectoryPage = ({
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
   const [tableHeight, setTableHeight] = useState<number>(100);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
-  const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
-  const [showNewFileModal, setShowNewFileModal] = useState<boolean>(false);
 
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -130,44 +117,6 @@ const StorageDirectoryPage = ({
     }));
   }, [filesData]);
 
-  const newActionsMenuItems: MenuItemGroupType[] = [
-    {
-      key: 'create',
-      type: 'group',
-      label: t('CREATE'),
-      children: [
-        {
-          icon: <FileOutlined />,
-          key: 'new_file',
-          label: t('New File'),
-          onClick: () => {
-            setShowNewFileModal(true);
-          }
-        },
-        {
-          icon: <FolderIcon />,
-          key: 'new_folder',
-          label: t('New Folder'),
-          onClick: () => {
-            setShowNewFolderModal(true);
-          }
-        }
-      ]
-    },
-    {
-      key: 'upload',
-      type: 'group',
-      label: t('UPLOAD'),
-      children: [
-        {
-          icon: <ImportIcon />,
-          key: 'upload',
-          label: t('New Upload')
-        }
-      ]
-    }
-  ];
-
   const onColumnTitleClicked = (columnClicked: string) => {
     if (columnClicked === sortByColumn) {
       if (sortOrder === SortOrder.NONE) {
@@ -212,7 +161,7 @@ const StorageDirectoryPage = ({
         column.render = (_, record: StorageDirectoryTableData) => (
           <Tooltip title={record.name} mouseEnterDelay={1.5}>
             <span className="hue-storage-browser__table-cell-icon">
-              {record.type === 'dir' ? <FolderIcon /> : <FileOutlined />}
+              {record.type === 'dir' ? <FolderIcon /> : <FileIcon />}
             </span>
             <span className="hue-storage-browser__table-cell-name">{record.name}</span>
           </Tooltip>
@@ -255,34 +204,6 @@ const StorageDirectoryPage = ({
   const onNextPageButtonClicked = (nextPageNumber: number, numPages: number) => {
     //If next page does not exists api returns 0
     setPageNumber(nextPageNumber === 0 ? numPages : nextPageNumber);
-  };
-
-  const { save: saveCreateFolder } = useSaveData(CREATE_DIRECTORY_API_URL);
-
-  const handleCreateNewFolder = (folderName: string) => {
-    saveCreateFolder(
-      { path: fileStats.path, name: folderName },
-      {
-        onSuccess: reloadData,
-        onError: createFolderError => {
-          huePubSub.publish('hue.error', createFolderError);
-        }
-      }
-    );
-  };
-
-  const { save: saveCreateFile } = useSaveData(CREATE_FILE_API_URL);
-
-  const handleCreateNewFile = (fileName: string) => {
-    saveCreateFile(
-      { path: fileStats.path, name: fileName },
-      {
-        onSuccess: reloadData,
-        onError: createFileError => {
-          huePubSub.publish('hue.error', createFileError);
-        }
-      }
-    );
   };
 
   const handleSearch = useCallback(
@@ -337,19 +258,11 @@ const StorageDirectoryPage = ({
             setLoadingFiles={setLoadingFiles}
             onSuccessfulAction={reloadData}
           />
-          <Dropdown
-            overlayClassName="hue-storage-browser__actions-dropdown"
-            menu={{
-              items: newActionsMenuItems,
-              className: 'hue-storage-browser__action-menu'
-            }}
-            trigger={['click']}
-          >
-            <PrimaryButton data-event="">
-              {t('New')}
-              <DropDownIcon />
-            </PrimaryButton>
-          </Dropdown>
+          <CreateAndUploadAction
+            currentPath={fileStats.path}
+            setLoadingFiles={setLoadingFiles}
+            onSuccessfulAction={reloadData}
+          />
         </div>
       </div>
 
@@ -383,23 +296,6 @@ const StorageDirectoryPage = ({
           />
         )}
       </Spin>
-
-      <InputModal
-        title={t('Create New Folder')}
-        inputLabel={t('Enter Folder name here')}
-        submitText={t('Create')}
-        showModal={showNewFolderModal}
-        onSubmit={handleCreateNewFolder}
-        onClose={() => setShowNewFolderModal(false)}
-      />
-      <InputModal
-        title={t('Create New File')}
-        inputLabel={t('Enter File name here')}
-        submitText={t('Create')}
-        showModal={showNewFileModal}
-        onSubmit={handleCreateNewFile}
-        onClose={() => setShowNewFileModal(false)}
-      />
     </>
   );
 };

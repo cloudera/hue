@@ -21,7 +21,7 @@ import Table, { ColumnProps } from 'cuix/dist/components/Table';
 import classNames from 'classnames';
 
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
-import { FileOutlined } from '@ant-design/icons';
+import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 
 import { i18nReact } from '../../../utils/i18nReact';
 import useDebounce from '../../../utils/useDebounce';
@@ -105,7 +105,7 @@ const FileChooserModal = ({
         column.render = (_, record: FileChooserTableData) => (
           <Tooltip title={record.name} mouseEnterDelay={1.5}>
             <span className="hue-filechooser-modal__table-cell-icon">
-              {record.type === 'dir' ? <FolderIcon /> : <FileOutlined />}
+              {record.type === 'dir' ? <FolderIcon /> : <FileIcon />}
             </span>
             <span className="hue-filechooser-modal__table-cell-name">{record.name}</span>
           </Tooltip>

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Dropdown } from 'antd';
 import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
@@ -25,20 +25,7 @@ import DuplicateIcon from '@cloudera/cuix-core/icons/react/DuplicateIcon';
 import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
-import {
-  isHDFS,
-  isOFS,
-  isABFSRoot,
-  isGSRoot,
-  isOFSServiceID,
-  isOFSVol,
-  isS3Root,
-  inTrash,
-  isABFS,
-  isGS,
-  isS3,
-  isOFSRoot
-} from '../../../../utils/storageBrowserUtils';
+import { inTrash } from '../../../../utils/storageBrowserUtils';
 import {
   RENAME_API_URL,
   SET_REPLICATION_API_URL,
@@ -53,10 +40,14 @@ import InputModal from '../../InputModal/InputModal';
 import FileChooserModal from '../../FileChooserModal/FileChooserModal';
 
 import './StorageBrowserActions.scss';
-import { StorageDirectoryTableData } from '../../../../reactComponents/FileChooser/types';
+import {
+  FileStats,
+  StorageDirectoryTableData
+} from '../../../../reactComponents/FileChooser/types';
+import { ActionType, getActionsConfig } from './StorageBrowserActions.util';
 
 interface StorageBrowserRowActionsProps {
-  currentPath: string;
+  currentPath: FileStats['path'];
   selectedFiles: StorageDirectoryTableData[];
   onSuccessfulAction: () => void;
   setLoadingFiles: (value: boolean) => void;
@@ -68,235 +59,137 @@ const StorageBrowserActions = ({
   onSuccessfulAction,
   setLoadingFiles
 }: StorageBrowserRowActionsProps): JSX.Element => {
-  const [showSummaryModal, setShowSummaryModal] = useState<boolean>(false);
-  const [showRenameModal, setShowRenameModal] = useState<boolean>(false);
-  const [selectedFile, setSelectedFile] = useState<string>('');
-  const [showReplicationModal, setShowReplicationModal] = useState<boolean>(false);
-  const [showCopyModal, setShowCopyModal] = useState<boolean>(false);
-  const [showMoveModal, setShowMoveModal] = useState<boolean>(false);
+  const [selectedFilePath, setSelectedFilePath] = useState<string>('');
+  const [selectedAction, setSelectedAction] = useState<ActionType>();
 
   const { t } = i18nReact.useTranslation();
 
-  const { error: renameError, save: saveRename } = useSaveData(RENAME_API_URL);
+  const onApiSuccess = () => {
+    setLoadingFiles(false);
+    onSuccessfulAction();
+  };
+
+  const onApiError = (error: Error) => {
+    setLoadingFiles(false);
+    huePubSub.publish('hue.error', error);
+  };
+
+  const { save } = useSaveData(undefined, {
+    onSuccess: onApiSuccess,
+    onError: onApiError
+  });
+
+  const { save: saveForm } = useSaveData(undefined, {
+    postOptions: {
+      qsEncodeData: false,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    },
+    onSuccess: onApiSuccess,
+    onError: onApiError
+  });
 
   const handleRename = (value: string) => {
     setLoadingFiles(true);
-    saveRename(
-      { source_path: selectedFile, destination_path: value },
-      {
-        onSuccess: () => {
-          setLoadingFiles(false);
-          onSuccessfulAction();
-        },
-        onError: () => {
-          huePubSub.publish('hue.error', renameError);
-          setLoadingFiles(false);
-        }
-      }
-    );
+    const payload = { source_path: selectedFilePath, destination_path: value };
+    save(payload, { url: RENAME_API_URL });
   };
 
-  const { error: replicationError, save: saveReplication } = useSaveData(SET_REPLICATION_API_URL);
   const handleReplication = (replicationFactor: number) => {
-    saveReplication(
-      { path: selectedFile, replication_factor: replicationFactor },
+    const payload = { path: selectedFilePath, replication_factor: replicationFactor };
+    save(payload, { url: SET_REPLICATION_API_URL });
+  };
+
+  const handleCopyOrMove = (destination_path: string) => {
+    const url = {
+      [ActionType.Copy]: BULK_COPY_API_URL,
+      [ActionType.Move]: BULK_MOVE_API_URL
+    }[selectedAction ?? ''];
+
+    if (!url) {
+      return;
+    }
+
+    const formData = new FormData();
+    selectedFiles.map(selectedFile => {
+      formData.append('source_path', selectedFile.path);
+    });
+    formData.append('destination_path', destination_path);
+
+    setLoadingFiles(true);
+    saveForm(formData, { url });
+  };
+
+  const actionConfig = getActionsConfig(selectedFiles);
+
+  const onActionClick = (action: ActionType, path: string) => () => {
+    setSelectedFilePath(path);
+    setSelectedAction(action);
+  };
+
+  const onModalClose = () => {
+    setSelectedFilePath('');
+    setSelectedAction(undefined);
+  };
+
+  const actionItems: MenuItemType[] = useMemo(() => {
+    const isActionEnabled =
+      selectedFiles && selectedFiles.length > 0 && !inTrash(selectedFiles[0].path);
+    if (!isActionEnabled) {
+      return [];
+    }
+
+    const actions: MenuItemType[] = [
       {
-        onSuccess: () => onSuccessfulAction(),
-        onError: () => {
-          huePubSub.publish('hue.error', replicationError);
-        }
-      }
-    );
-  };
-
-  const { error: bulkCopyError, save: saveBulkCopy } = useSaveData(BULK_COPY_API_URL, {
-    postOptions: {
-      qsEncodeData: false,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }
-  });
-
-  const handleCopy = (destination_path: string) => {
-    setLoadingFiles(true);
-    const formData = new FormData();
-    selectedFiles.map(selectedFile => {
-      formData.append('source_path', selectedFile.path);
-    });
-    formData.append('destination_path', destination_path);
-    saveBulkCopy(formData, {
-      onSuccess: () => {
-        setLoadingFiles(false);
-        onSuccessfulAction();
+        disabled: !actionConfig.isCopyEnabled,
+        key: ActionType.Copy,
+        icon: <CopyClipboardIcon />,
+        label: t('Copy'),
+        onClick: onActionClick(ActionType.Copy, selectedFiles[0].path)
       },
-      onError: () => {
-        huePubSub.publish('hue.error', bulkCopyError);
-        setLoadingFiles(false);
-      }
-    });
-  };
-
-  const { error: bulkMoveError, save: saveBulkMove } = useSaveData(BULK_MOVE_API_URL, {
-    postOptions: {
-      qsEncodeData: false,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }
-  });
-
-  const handleMove = (destination_path: string) => {
-    setLoadingFiles(true);
-    const formData = new FormData();
-    selectedFiles.map(selectedFile => {
-      formData.append('source_path', selectedFile.path);
-    });
-    formData.append('destination_path', destination_path);
-    saveBulkMove(formData, {
-      onSuccess: () => {
-        setLoadingFiles(false);
-        onSuccessfulAction();
+      {
+        disabled: !actionConfig.isMoveEnabled,
+        key: ActionType.Move,
+        icon: <CopyClipboardIcon />,
+        label: t('Move'),
+        onClick: onActionClick(ActionType.Move, selectedFiles[0].path)
       },
-      onError: () => {
-        huePubSub.publish('hue.error', bulkMoveError);
-        setLoadingFiles(false);
+      {
+        disabled: !actionConfig.isSummaryEnabled,
+        key: ActionType.Summary,
+        icon: <InfoIcon />,
+        label: t('View Summary'),
+        onClick: onActionClick(ActionType.Summary, selectedFiles[0].path)
+      },
+      {
+        disabled: !actionConfig.isRenameEnabled,
+        key: ActionType.Rename,
+        icon: <InfoIcon />,
+        label: t('Rename'),
+        onClick: onActionClick(ActionType.Rename, selectedFiles[0].path)
+      },
+      {
+        disabled: !actionConfig.isReplicationEnabled,
+        key: ActionType.Repilcation,
+        icon: <DuplicateIcon />,
+        label: t('Set Replication'),
+        onClick: onActionClick(ActionType.Repilcation, selectedFiles[0].path)
       }
-    });
-  };
-
-  const isValidFileOrFolder = (selectedFilePath: string) => {
-    return (
-      isHDFS(selectedFilePath) ||
-      (isS3(selectedFilePath) && !isS3Root(selectedFilePath)) ||
-      (isGS(selectedFilePath) && !isGSRoot(selectedFilePath)) ||
-      (isABFS(selectedFilePath) && !isABFSRoot(selectedFilePath)) ||
-      (isOFS(selectedFilePath) &&
-        !isOFSRoot(selectedFilePath) &&
-        !isOFSServiceID(selectedFilePath) &&
-        !isOFSVol(selectedFilePath))
-    );
-  };
-
-  const isSummaryEnabled = useMemo(() => {
-    if (selectedFiles.length !== 1) {
-      return false;
-    }
-    const selectedFile = selectedFiles[0];
-    return (isHDFS(selectedFile.path) || isOFS(selectedFile.path)) && selectedFile.type === 'file';
-  }, [selectedFiles]);
-
-  const isRenameEnabled = useMemo(() => {
-    if (selectedFiles.length !== 1) {
-      return false;
-    }
-    const selectedFilePath = selectedFiles[0].path;
-    return isValidFileOrFolder(selectedFilePath);
-  }, [selectedFiles]);
-
-  const isReplicationEnabled = useMemo(() => {
-    if (selectedFiles.length !== 1) {
-      return false;
-    }
-    const selectedFile = selectedFiles[0];
-    return isHDFS(selectedFile.path) && selectedFile.type === 'file';
-  }, [selectedFiles]);
-
-  const isCopyEnabled = useMemo(() => {
-    if (selectedFiles.length > 0) {
-      const selectedFilePath = selectedFiles[0].path;
-      return isValidFileOrFolder(selectedFilePath);
-    }
-    return false;
-  }, [selectedFiles]);
-
-  const isMoveEnabled = useMemo(() => {
-    if (selectedFiles.length > 0) {
-      const selectedFilePath = selectedFiles[0].path;
-      return isValidFileOrFolder(selectedFilePath);
-    }
-    return false;
-  }, [selectedFiles]);
-
-  const getActions = useCallback(() => {
-    const actions: MenuItemType[] = [];
-    if (selectedFiles && selectedFiles.length > 0 && !inTrash(selectedFiles[0].path)) {
-      if (isCopyEnabled) {
-        actions.push({
-          key: 'copy',
-          icon: <CopyClipboardIcon />,
-          label: t('Copy'),
-          onClick: () => {
-            setSelectedFile(selectedFiles[0].path);
-            setShowCopyModal(true);
-          }
-        });
-      }
-      if (isMoveEnabled) {
-        actions.push({
-          key: 'move',
-          icon: <CopyClipboardIcon />,
-          label: t('Move'),
-          onClick: () => {
-            setSelectedFile(selectedFiles[0].path);
-            setShowMoveModal(true);
-          }
-        });
-      }
-      if (isSummaryEnabled) {
-        actions.push({
-          key: 'content_summary',
-          icon: <InfoIcon />,
-          label: t('View Summary'),
-          onClick: () => {
-            setSelectedFile(selectedFiles[0].path);
-            setShowSummaryModal(true);
-          }
-        });
-      }
-      if (isRenameEnabled) {
-        actions.push({
-          key: 'rename',
-          icon: <InfoIcon />,
-          label: t('Rename'),
-          onClick: () => {
-            setSelectedFile(selectedFiles[0].path);
-            setShowRenameModal(true);
-          }
-        });
-      }
-      if (isReplicationEnabled) {
-        actions.push({
-          key: 'setReplication',
-          icon: <DuplicateIcon />,
-          label: t('Set Replication'),
-          onClick: () => {
-            setSelectedFile(selectedFiles[0].path);
-            setShowReplicationModal(true);
-          }
-        });
-      }
-    }
+    ].filter(e => !e.disabled);
     return actions;
-  }, [
-    selectedFiles,
-    isSummaryEnabled,
-    isRenameEnabled,
-    isReplicationEnabled,
-    isCopyEnabled,
-    currentPath
-  ]);
+  }, [selectedFiles, actionConfig]);
 
   return (
     <>
       <Dropdown
         overlayClassName="hue-storage-browser__table-actions-dropdown"
         menu={{
-          items: getActions(),
+          items: actionItems,
           className: 'hue-storage-browser__table-actions-menu'
         }}
         trigger={['click']}
-        disabled={getActions().length === 0 ? true : false}
+        disabled={actionItems.length === 0 ? true : false}
       >
         <Button data-event="">
           {t('Actions')}
@@ -304,45 +197,37 @@ const StorageBrowserActions = ({
         </Button>
       </Dropdown>
       <SummaryModal
-        showModal={showSummaryModal}
-        path={selectedFile}
-        onClose={() => setShowSummaryModal(false)}
+        showModal={selectedAction === ActionType.Summary}
+        path={selectedFilePath}
+        onClose={onModalClose}
       />
       <InputModal
         title={t('Rename')}
-        inputLabel={t('Enter new name here')}
+        inputLabel={t('Enter new name')}
         submitText={t('Rename')}
-        showModal={showRenameModal}
+        showModal={selectedAction === ActionType.Rename}
         onSubmit={handleRename}
-        onClose={() => setShowRenameModal(false)}
+        onClose={onModalClose}
         inputType="text"
         initialValue={selectedFiles[0]?.name}
       />
       <InputModal
-        title={'Setting Replication factor for: ' + selectedFile}
+        title={t('Setting Replication factor for: ') + selectedFilePath}
         inputLabel={t('Replication factor:')}
         submitText={t('Submit')}
-        showModal={showReplicationModal}
+        showModal={selectedAction === ActionType.Repilcation}
         onSubmit={handleReplication}
-        onClose={() => setShowReplicationModal(false)}
+        onClose={onModalClose}
         inputType="number"
         initialValue={selectedFiles[0]?.replication}
       />
       <FileChooserModal
-        onClose={() => setShowCopyModal(false)}
-        onSubmit={handleCopy}
-        showModal={showCopyModal}
-        title="Copy to"
+        onClose={onModalClose}
+        onSubmit={handleCopyOrMove}
+        showModal={selectedAction === ActionType.Move || selectedAction === ActionType.Copy}
+        title={selectedAction === ActionType.Move ? t('Move to') : t('Copy to')}
         sourcePath={currentPath}
-        submitText={t('Copy')}
-      />
-      <FileChooserModal
-        onClose={() => setShowMoveModal(false)}
-        onSubmit={handleMove}
-        showModal={showMoveModal}
-        title="Move to"
-        sourcePath={currentPath}
-        submitText={t('Move')}
+        submitText={selectedAction === ActionType.Move ? t('Move') : t('Copy')}
       />
     </>
   );
