@@ -33,20 +33,26 @@ const changeURL = (
   const hueBaseUrl = (<hueWindow>window).HUE_BASE_URL;
   const base =
     hueBaseUrl && hashSplit[0].length && hashSplit[0].indexOf(hueBaseUrl) !== 0 ? hueBaseUrl : '';
-  let url = base + hashSplit[0];
+  let newUrl = base + hashSplit[0];
   if (extraSearch) {
-    url += (url.indexOf('?') === -1 ? '?' : '&') + extraSearch;
+    newUrl += (newUrl.indexOf('?') === -1 ? '?' : '&') + extraSearch;
   }
   if (hashSplit.length > 1) {
     //the foldername may contain # , so create substring ignoring first #
-    url += '#' + newURL.substring(newURL.indexOf('#') + 1);
+    newUrl += '#' + newURL.substring(newURL.indexOf('#') + 1);
   } else if (window.location.hash) {
-    url += window.location.hash;
+    newUrl += window.location.hash;
   }
+
+  if (window.location.href === newUrl) {
+    // If the URLs are the same, do nothing
+    return;
+  }
+
   if (isReplace) {
-    window.history.replaceState(null, '', url);
+    window.history.replaceState(null, '', newUrl);
   } else {
-    window.history.pushState(null, '', url);
+    window.history.pushState(null, '', newUrl);
   }
 };
 

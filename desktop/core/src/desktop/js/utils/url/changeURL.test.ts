@@ -18,7 +18,7 @@ import changeURL from './changeURL';
 import { hueWindow } from 'types/types';
 
 describe('changeURL', () => {
-  const baseUrl = 'http://gethue.com';
+  const baseUrl = 'https://www.gethue.com/hue';
   const mockPushState = jest.fn();
   const mockReplaceState = jest.fn();
 
@@ -78,5 +78,12 @@ describe('changeURL', () => {
 
     expect(mockReplaceState).not.toHaveBeenCalled();
     expect(mockPushState).toHaveBeenCalledWith(null, '', `${baseUrl}/new/path#section`);
+  });
+
+  it('should not change the URL if the new URL is the same as the current URL with hash', () => {
+    changeURL(baseUrl, {});
+
+    expect(mockReplaceState).not.toHaveBeenCalled();
+    expect(mockPushState).not.toHaveBeenCalled();
   });
 });

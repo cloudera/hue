@@ -1237,7 +1237,7 @@ else:
         $("#contentSummaryModal").modal("show");
         $.getJSON("${url('filebrowser:content_summary', path='')}" + encodeURIComponent(self.selectedFile().path), function (data) {
           if (data.status == 0) {
-            self.contentSummary(ko.mapping.fromJS(data));
+            self.contentSummary(ko.mapping.fromJS(data.summary));
             self.isLoadingSummary(false);
           } else {
             huePubSub.publish('hue.global.error', {message: data.message});
