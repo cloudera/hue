@@ -30,34 +30,34 @@ import { FileOutlined } from '@ant-design/icons';
 import { PrimaryButton } from 'cuix/dist/components/Button';
 import Table from 'cuix/dist/components/Table';
 
-import { i18nReact } from '../../../../utils/i18nReact';
-import huePubSub from '../../../../utils/huePubSub';
-import useDebounce from '../../../../utils/useDebounce';
+import { i18nReact } from '../../../utils/i18nReact';
+import huePubSub from '../../../utils/huePubSub';
+import useDebounce from '../../../utils/useDebounce';
 
 import {
   LIST_DIRECTORY_API_URL,
   CREATE_DIRECTORY_API_URL,
   CREATE_FILE_API_URL
-} from '../../../../reactComponents/FileChooser/api';
+} from '../../../reactComponents/FileChooser/api';
 import {
-  StorageBrowserTableData,
   SortOrder,
   ListDirectory,
   FileStats,
-  BrowserViewType
-} from '../../../../reactComponents/FileChooser/types';
-import Pagination from '../../../../reactComponents/Pagination/Pagination';
-import StorageBrowserActions from '../StorageBrowserActions/StorageBrowserActions';
-import InputModal from '../../InputModal/InputModal';
-import formatBytes from '../../../../utils/formatBytes';
-import useSaveData from '../../../../utils/hooks/useSaveData';
+  BrowserViewType,
+  StorageDirectoryTableData
+} from '../../../reactComponents/FileChooser/types';
+import Pagination from '../../../reactComponents/Pagination/Pagination';
+import StorageBrowserActions from './StorageBrowserActions/StorageBrowserActions';
+import InputModal from '../InputModal/InputModal';
+import formatBytes from '../../../utils/formatBytes';
+import useSaveData from '../../../utils/hooks/useSaveData';
 
-import './StorageBrowserTable.scss';
-import { formatTimestamp } from '../../../../utils/dateTimeUtils';
-import useLoadData from '../../../../utils/hooks/useLoadData';
-import { DEFAULT_PAGE_SIZE } from '../../../../utils/constants/storageBrowser';
+import './StorageDirectoryPage.scss';
+import { formatTimestamp } from '../../../utils/dateTimeUtils';
+import useLoadData from '../../../utils/hooks/useLoadData';
+import { DEFAULT_PAGE_SIZE } from '../../../utils/constants/storageBrowser';
 
-interface StorageBrowserTableProps {
+interface StorageDirectoryPageProps {
   fileStats: FileStats;
   onFilePathChange: (path: string) => void;
   className?: string;
@@ -71,17 +71,17 @@ const defaultProps = {
   testId: 'hue-storage-browser__table'
 };
 
-const StorageBrowserTable = ({
+const StorageDirectoryPage = ({
   fileStats,
   onFilePathChange,
   className,
   rowClassName,
   testId,
   ...restProps
-}: StorageBrowserTableProps): JSX.Element => {
+}: StorageDirectoryPageProps): JSX.Element => {
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
   const [tableHeight, setTableHeight] = useState<number>(100);
-  const [selectedFiles, setSelectedFiles] = useState<StorageBrowserTableData[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
   const [showNewFolderModal, setShowNewFolderModal] = useState<boolean>(false);
   const [showNewFileModal, setShowNewFileModal] = useState<boolean>(false);
 
@@ -112,14 +112,14 @@ const StorageBrowserTable = ({
       fileStats.type !== BrowserViewType.dir
   });
 
-  const tableData: StorageBrowserTableData[] = useMemo(() => {
+  const tableData: StorageDirectoryTableData[] = useMemo(() => {
     if (!filesData?.files) {
       return [];
     }
 
     return filesData?.files?.map(file => ({
       name: file.path.split('/').pop() ?? '',
-      size: formatBytes(file.size),
+      size: file.type === BrowserViewType.file ? formatBytes(file.size) : '',
       user: file.user,
       group: file.group,
       permission: file.rwx,
@@ -183,10 +183,10 @@ const StorageBrowserTable = ({
     }
   };
 
-  const getColumns = (file: StorageBrowserTableData) => {
-    const columns: ColumnProps<StorageBrowserTableData>[] = [];
+  const getColumns = (file: StorageDirectoryTableData) => {
+    const columns: ColumnProps<StorageDirectoryTableData>[] = [];
     for (const key of Object.keys(file)) {
-      const column: ColumnProps<StorageBrowserTableData> = {
+      const column: ColumnProps<StorageDirectoryTableData> = {
         dataIndex: key,
         title: (
           <div
@@ -209,7 +209,7 @@ const StorageBrowserTable = ({
       };
       if (key === 'name') {
         column.width = '40%';
-        column.render = (_, record: StorageBrowserTableData) => (
+        column.render = (_, record: StorageDirectoryTableData) => (
           <Tooltip title={record.name} mouseEnterDelay={1.5}>
             <span className="hue-storage-browser__table-cell-icon">
               {record.type === 'dir' ? <FolderIcon /> : <FileOutlined />}
@@ -229,7 +229,7 @@ const StorageBrowserTable = ({
     );
   };
 
-  const onRowClicked = (record: StorageBrowserTableData) => {
+  const onRowClicked = (record: StorageDirectoryTableData) => {
     return {
       onClick: () => {
         onFilePathChange(record.path);
@@ -241,7 +241,7 @@ const StorageBrowserTable = ({
   };
 
   const rowSelection = {
-    onChange: (_: React.Key[], selectedRows: StorageBrowserTableData[]) => {
+    onChange: (_: React.Key[], selectedRows: StorageDirectoryTableData[]) => {
       setSelectedFiles(selectedRows);
     }
   };
@@ -357,7 +357,7 @@ const StorageBrowserTable = ({
         <Table
           className={className}
           columns={getColumns(tableData[0] ?? {})}
-          dataSource={tableData?.slice(2)}
+          dataSource={tableData}
           onRow={onRowClicked}
           pagination={false}
           rowClassName={rowClassName}
@@ -404,5 +404,5 @@ const StorageBrowserTable = ({
   );
 };
 
-StorageBrowserTable.defaultProps = defaultProps;
-export default StorageBrowserTable;
+StorageDirectoryPage.defaultProps = defaultProps;
+export default StorageDirectoryPage;

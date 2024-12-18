@@ -25,7 +25,7 @@ import AdlsIcon from '../../../components/icons/AdlsIcon';
 import { ApiFileSystem, FILESYSTEMS_API_URL } from '../api';
 import { FileSystem } from '../types';
 import './FileChooserModal.scss';
-import PathBrowser from '../PathBrowser/PathBrowser';
+import PathBrowser from '../../PathBrowser/PathBrowser';
 import useLoadData from '../../../utils/hooks/useLoadData';
 
 interface FileProps {

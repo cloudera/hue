@@ -15,7 +15,6 @@
 // limitations under the License.
 
 export const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
-export const VIEWFILES_API_URl = '/api/v1/storage/view=';
 export const FILE_STATS_API_URL = '/api/v1/storage/stat';
 export const LIST_DIRECTORY_API_URL = '/api/v1/storage/list';
 export const FILE_PREVIEW_API_URL = '/api/v1/storage/display';
