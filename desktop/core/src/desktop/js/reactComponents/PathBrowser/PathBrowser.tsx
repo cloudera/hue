@@ -96,8 +96,8 @@ const PathBrowser = ({
           <Input
             prefix={showIcon ? icons[fileSystem] : <span />}
             defaultValue={filePath}
-            onPressEnter={customPath => {
-              onFilepathChange((customPath.target as HTMLInputElement).value);
+            onPressEnter={event => {
+              onFilepathChange((event.target as HTMLInputElement).value);
             }}
             className="hue-path-browser__input"
             autoFocus
@@ -142,7 +142,7 @@ const PathBrowser = ({
           ) : (
             <>
               <Breadcrumb
-                label={fileSystem}
+                label={breadcrumbs[0].label}
                 url={breadcrumbs[0].url}
                 onFilepathChange={onFilepathChange}
                 key={breadcrumbs[0].url}

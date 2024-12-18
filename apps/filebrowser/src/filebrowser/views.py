@@ -261,6 +261,9 @@ def download(request, path):
 def view(request, path):
   """Dispatches viewing of a path to either index() or fileview(), depending on type."""
 
+  if ENABLE_NEW_STORAGE_BROWSER.get():
+    return render('storage_browser.mako', request, None)
+
   # index directory have to be default.
   if not path:
     path = '/'
@@ -670,8 +673,6 @@ def listdir_paged(request, path):
       's3_listing_not_allowed': s3_listing_not_allowed
   }
 
-  if ENABLE_NEW_STORAGE_BROWSER.get():
-    return render('storage_browser.mako', request, data)
   return render('listdir.mako', request, data)
 
 
