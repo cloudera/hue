@@ -66,8 +66,8 @@ describe('PathBrowser utils', () => {
 
       expect(result).toEqual([
         { url: '/', label: '/' },
-        { url: '/test/', label: 'test' },
-        { url: '/test/folder/', label: 'folder' }
+        { url: '/test', label: 'test' },
+        { url: '/test/folder', label: 'folder' }
       ]);
     });
 
@@ -77,8 +77,8 @@ describe('PathBrowser utils', () => {
 
       expect(result).toEqual([
         { url: 'abfs://', label: 'abfs' },
-        { url: 'abfs://test/', label: 'test' },
-        { url: 'abfs://test/folder/', label: 'folder' }
+        { url: 'abfs://test', label: 'test' },
+        { url: 'abfs://test/folder', label: 'folder' }
       ]);
     });
 
@@ -88,10 +88,10 @@ describe('PathBrowser utils', () => {
 
       expect(result).toEqual([
         { url: '/', label: '/' },
-        { url: '/folder/', label: 'folder' },
-        { url: '/folder/with/', label: 'with' },
-        { url: '/folder/with/trailing/', label: 'trailing' },
-        { url: '/folder/with/trailing/slash/', label: 'slash' }
+        { url: '/folder', label: 'folder' },
+        { url: '/folder/with', label: 'with' },
+        { url: '/folder/with/trailing', label: 'trailing' },
+        { url: '/folder/with/trailing/slash', label: 'slash' }
       ]);
     });
 
@@ -101,9 +101,9 @@ describe('PathBrowser utils', () => {
 
       expect(result).toEqual([
         { url: '/', label: '/' },
-        { url: '/path/', label: 'path' },
-        { url: '/path/to/', label: 'to' },
-        { url: '/path/to/file/', label: 'file' }
+        { url: '/path', label: 'path' },
+        { url: '/path/to', label: 'to' },
+        { url: '/path/to/file', label: 'file' }
       ]);
     });
 
@@ -113,9 +113,9 @@ describe('PathBrowser utils', () => {
 
       expect(result).toEqual([
         { url: 'abfs://', label: 'abfs' },
-        { url: 'abfs://folder/', label: 'folder' },
-        { url: 'abfs://folder/PathWith123/', label: 'PathWith123' },
-        { url: 'abfs://folder/PathWith123/anotherOne/', label: 'anotherOne' }
+        { url: 'abfs://folder', label: 'folder' },
+        { url: 'abfs://folder/PathWith123', label: 'PathWith123' },
+        { url: 'abfs://folder/PathWith123/anotherOne', label: 'anotherOne' }
       ]);
     });
 
@@ -125,7 +125,7 @@ describe('PathBrowser utils', () => {
 
       expect(result).toEqual([
         { url: 'abfs://', label: 'abfs' },
-        { url: 'abfs://file.txt/', label: 'file.txt' }
+        { url: 'abfs://file.txt', label: 'file.txt' }
       ]);
     });
   });
