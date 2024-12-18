@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Spin } from 'antd';
 
 import { i18nReact } from '../../../utils/i18nReact';
@@ -28,6 +28,7 @@ import useLoadData from '../../../utils/hooks/useLoadData';
 
 import './StorageBrowserTab.scss';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
+import changeURL from '../../../utils/url/changeURL';
 
 interface StorageBrowserTabProps {
   homeDir: string;
@@ -39,8 +40,9 @@ const defaultProps = {
 };
 
 const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Element => {
-  const [filePath, setFilePath] = useState<string>(homeDir);
-  const fileName = filePath?.split('/')?.pop() ?? '';
+  const [urlPathname, urlFilePath] = decodeURIComponent(window.location.pathname).split('view=');
+  const [filePath, setFilePath] = useState<string>(urlFilePath || homeDir);
+  const fileName = filePath.split('/').pop() ?? '';
 
   const { t } = i18nReact.useTranslation();
 
@@ -50,6 +52,17 @@ const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Ele
     },
     skip: !filePath
   });
+
+  useEffect(() => {
+    const encodedPath = `${urlPathname}view=${encodeURIComponent(filePath)}`;
+    if (filePath && urlFilePath && filePath !== urlFilePath) {
+      changeURL(encodedPath);
+    }
+    // if url path is correct but not encoded properly
+    else if (encodedPath !== window.location.pathname) {
+      changeURL(encodedPath, {}, true);
+    }
+  }, [filePath, urlPathname, urlFilePath, window.location.pathname]);
 
   return (
     <Spin spinning={loading}>
