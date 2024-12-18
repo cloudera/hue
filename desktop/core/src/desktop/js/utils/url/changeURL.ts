@@ -44,8 +44,6 @@ const changeURL = (
     newUrl += window.location.hash;
   }
 
-  console.log('window.location.href === newUrl :>> ', window.location.href, newUrl);
-
   if (window.location.href === newUrl) {
     // If the URLs are the same, do nothing
     return;
