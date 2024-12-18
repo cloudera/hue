@@ -18,7 +18,6 @@
 import sys
 import json
 import logging
-import beeswax
 from django.utils.translation import gettext as _
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException

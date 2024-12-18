@@ -18,8 +18,6 @@
 import io
 import os
 import json
-from django.utils.html import mark_safe
-from django.urls import reverse
 import re
 import sys
 import stat as stat_module

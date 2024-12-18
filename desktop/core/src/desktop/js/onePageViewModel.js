@@ -927,9 +927,6 @@ class OnePageViewModel {
       return filePathParam.replaceAll('%25', '%');
     };
 
-    // Register the nonce check middleware globally
-    // page('*', nonceCheckMiddleware);
-
     pageMapping.forEach(mapping => {
       page(
         mapping.url,

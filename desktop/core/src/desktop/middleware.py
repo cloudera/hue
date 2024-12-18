@@ -884,8 +884,6 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
     if self.secure_content_security_policy and 'Content-Security-Policy' not in response:
       response["Content-Security-Policy"] = self.secure_content_security_policy
 
-
-
     # If the CSP header is not set or the request does not have a nonce, return the response
     header = get_header(response)
     if not header or not hasattr(request, 'csp_nonce'):

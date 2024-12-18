@@ -263,6 +263,7 @@ def load_apps(app_blacklist):
   for sdk_app in pkg_resources.iter_entry_points("desktop.sdk.application"):
     
     if desktop.conf.CSP_NONCE.get():
+      # This Apps are not supported CSP Nonce is enabled.
       app_blacklist.extend(['oozie', 'jobbrowser', 'rdbms', 'search', 'zookeeper'])
     if sdk_app.name not in app_blacklist:
       # TODO: Remove once pig and jobsub have been migrated to editor
