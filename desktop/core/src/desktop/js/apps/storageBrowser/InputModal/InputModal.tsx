@@ -23,9 +23,9 @@ import './InputModal.scss';
 
 interface InputModalProps {
   cancelText?: string;
-  initialValue: string | number;
+  initialValue?: string | number;
   inputLabel: string;
-  inputType: 'text' | 'number';
+  inputType?: 'text' | 'number';
   onClose: () => void;
   onSubmit: (value: string | number) => void;
   submitText?: string;
@@ -35,8 +35,8 @@ interface InputModalProps {
 
 const InputModal = ({
   inputLabel,
-  inputType,
-  initialValue,
+  inputType = 'text',
+  initialValue = '',
   onClose,
   onSubmit,
   showModal,

@@ -20,6 +20,7 @@
   .drag-drop {
     display: flex;
     flex-direction: column;
+    height: 100%;
     flex: 1;
 
     &__dropzone {
@@ -32,14 +33,23 @@
     &__message {
       display: flex;
       flex-direction: column;
+      gap: 16px;
       flex: 1;
       margin: 0;
-      font-size: 16px;
       justify-content: center;
       align-items: center;
       border: 3px dashed vars.$fluidx-gray-300;
       border-radius: 3px;
       background-color: vars.$fluidx-gray-040;
+      color: vars.$fluidx-gray-900;
+
+      &__select-file {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        color: vars.$fluidx-blue-600;
+      }
     }
 
     &__input {

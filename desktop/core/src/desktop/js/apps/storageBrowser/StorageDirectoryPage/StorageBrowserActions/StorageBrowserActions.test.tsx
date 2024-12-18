@@ -19,7 +19,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 import StorageBrowserActions from './StorageBrowserActions';
-import { StorageBrowserTableData } from '../../../../reactComponents/FileChooser/types';
+import { StorageDirectoryTableData } from '../../../../reactComponents/FileChooser/types';
 import { get } from '../../../../api/utils';
 
 jest.mock('../../../../api/utils', () => ({
@@ -29,7 +29,7 @@ jest.mock('../../../../api/utils', () => ({
 const mockGet = get as jest.MockedFunction<typeof get>;
 describe('StorageBrowserRowActions', () => {
   //View summary option is enabled and added to the actions menu when the row data is either hdfs/ofs and a single file
-  const mockRecord: StorageBrowserTableData = {
+  const mockRecord: StorageDirectoryTableData = {
     name: 'test',
     size: '0\u00a0bytes',
     user: 'demo',
@@ -40,7 +40,7 @@ describe('StorageBrowserRowActions', () => {
     path: '',
     replication: 0
   };
-  const mockTwoRecords: StorageBrowserTableData[] = [
+  const mockTwoRecords: StorageDirectoryTableData[] = [
     {
       name: 'test',
       size: '0\u00a0bytes',
@@ -69,7 +69,7 @@ describe('StorageBrowserRowActions', () => {
   const onSuccessfulAction = jest.fn();
 
   const setUpActionMenu = async (
-    records: StorageBrowserTableData[],
+    records: StorageDirectoryTableData[],
     recordPath?: string,
     recordType?: string
   ) => {
@@ -85,6 +85,7 @@ describe('StorageBrowserRowActions', () => {
         setLoadingFiles={setLoadingFiles}
         onSuccessfulAction={onSuccessfulAction}
         selectedFiles={records}
+        currentPath="/path/to/folder"
       />
     );
     await user.click(getByRole('button'));
@@ -193,7 +194,7 @@ describe('StorageBrowserRowActions', () => {
       const user = userEvent.setup();
       await setUpActionMenu([mockRecord], 'abfs://test', 'dir');
       await user.click(screen.queryByRole('menuitem', { name: 'Rename' }));
-      expect(await screen.findByText('Enter new name here')).toBeInTheDocument();
+      expect(await screen.findByText('Enter new name')).toBeInTheDocument();
     });
   });
 
