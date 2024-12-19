@@ -142,7 +142,7 @@
   # X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.
   ## secure_content_security_policy="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;style-src 'self' 'unsafe-inline' fonts.googleapis.com;connect-src 'self' *.google-analytics.com;frame-src *;child-src 'self' data: *.vimeo.com;object-src 'none'"
 
-  # Enable nonce attribute to remove unsafe-inline and auto remove unsafe-inline from csp 
+  # Enable nonce attribute to remove unsafe-inline and auto remove unsafe-inline from csp
   ## csp_nonce=true
 
 
@@ -408,10 +408,6 @@
     ## enabled_sql_tasks=generate,edit,explain,optimize,fix,comment
 
   [[semantic_search]]
-    # Tech used for semantic search.
-    # Type: string. Default: vector_search. Possible values: vector_search or vector_db.
-    ## relevancy=vector_search
-
     # Model used for data embedding. Must be compatible with SentenceTransformer.
     # Type: string. Default: all-MiniLM-L6-v2.
     ## embedding_model=all-MiniLM-L6-v2

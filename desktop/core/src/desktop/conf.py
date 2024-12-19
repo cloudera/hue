@@ -316,11 +316,6 @@ SEMANTIC_SEARCH = ConfigSection(
   key='semantic_search',
   help=_("Semantic search configurations"),
   members=dict(
-    RELEVENCY=Config(
-      key='relevancy',
-      help=_('Tech used for semantic search. Possible values - vector_search or vector_db'),
-      default='vector_search',
-      type=str),
     EMBEDDING_MODEL=Config(
       key='embedding_model',
       help=_('Model used for data embedding. Must be compatible with SentenceTransformer'),
@@ -347,11 +342,6 @@ def is_ai_interface_enabled():
 
 def is_ai_trusted_service():
   return AI_INTERFACE.TRUSTED_SERVICE.get()
-
-
-def is_vector_db_enabled():
-  RELEVENCY = SEMANTIC_SEARCH.RELEVENCY.get()
-  return RELEVENCY == "vector_db"
 
 
 def ai_service_name():

@@ -27,7 +27,7 @@ from rest_framework.response import Response
 from beeswax import api as beeswax_api
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
-from desktop.conf import is_ai_interface_enabled, is_vector_db_enabled
+from desktop.conf import is_ai_interface_enabled
 from desktop.lib import fsmanager
 from desktop.lib.ai.sql import perform_sql_task
 from desktop.lib.connectors import api as connector_api
@@ -40,6 +40,8 @@ from metadata import optimizer_api
 from notebook import api as notebook_api
 from notebook.conf import get_ordered_interpreters
 from useradmin import api as useradmin_api, views as useradmin_views
+
+from desktop.lib.ai.metadata import semantic_search
 
 from .serializer import LlmPromptSerializer
 
@@ -456,16 +458,11 @@ def dbs(request):
       db_name = data["name"]
       table_names = data["tables"]
 
-      if is_vector_db_enabled():
-        from desktop.lib.ai.vector_db import filter_vector_db
-        table_names = filter_vector_db(table_names, input, db_name)
-      else:
-        from desktop.lib.ai.metadata import semantic_search
-        table_names = semantic_search(table_names, input)
+      filtered_table_names = semantic_search(table_names, input)
 
       relevant_dbs.append({
         "name": db_name,
-        "tables": table_names
+        "tables": filtered_table_names
       })
 
     # TODO: Use LLM and filter tables even further

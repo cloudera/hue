@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import List
+
 from sentence_transformers import SentenceTransformer, util
 import torch
 import re
@@ -22,33 +24,46 @@ import re
 from desktop.lib.utils.cache import LRUCache
 from desktop.conf import SEMANTIC_SEARCH
 
-DEFAULT_TOP_K = SEMANTIC_SEARCH.TOP_K.get()
-_embedding_model = SEMANTIC_SEARCH.EMBEDDING_MODEL.get()
-corpus_cache = LRUCache(SEMANTIC_SEARCH.CACHE_SIZE.get())
-# Could create a similar cache for query, but might be an overkill
 
-def _get_cached_embeddings(embedder, corpus):
+TOP_K = SEMANTIC_SEARCH.TOP_K.get()
+CACHE_SIZE = SEMANTIC_SEARCH.CACHE_SIZE.get()
+EMBEDDING_MODEL = SEMANTIC_SEARCH.EMBEDDING_MODEL.get()
+
+
+_embedder: SentenceTransformer = None
+def encode(sentences: List[str]):
+  global _embedder
+  if not _embedder:
+    _embedder = SentenceTransformer(EMBEDDING_MODEL)
+
+  return _embedder.encode(sentences, convert_to_tensor=True)
+
+
+# Could create a similar cache for query, but might be an overkill
+_corpus_cache = LRUCache(CACHE_SIZE)
+def _get_cached_embeddings(corpus):
   embedding_dict = {}
   new_sentences = []
   for sentence in corpus:
-    embedding = corpus_cache.get(sentence)
+    embedding = _corpus_cache.get(sentence)
     if embedding != None:
       embedding_dict[sentence] = embedding
     else:
       new_sentences.append(sentence)
 
   if new_sentences:
-    sentence_embeddings = embedder.encode(new_sentences, convert_to_tensor=True)
+    sentence_embeddings = encode(new_sentences)
     for idx, embedding in enumerate(sentence_embeddings):
       sentence = new_sentences[idx]
       embedding_dict[sentence] = embedding
-      corpus_cache.put(sentence, embedding)
+      _corpus_cache.put(sentence, embedding)
 
   embeddings = []
   for sentence in corpus:
     embeddings.append(embedding_dict[sentence])
 
   return torch.stack(embeddings)
+
 
 def _get_words(text) -> list:
   words = re.findall(r'\b\w+\b', text)
@@ -57,18 +72,17 @@ def _get_words(text) -> list:
   return list(set(words))
 
 # Perform semantic search on the corpus using the provided query
-def semantic_search(corpus, query, limit = DEFAULT_TOP_K):
+def semantic_search(corpus, query, limit = TOP_K):
   if len(corpus) < limit:
     return corpus
 
   corpus = list(set(corpus))
   k = min(len(corpus), limit)
-  embedder = SentenceTransformer(_embedding_model)
 
-  corpus_embeddings = _get_cached_embeddings(embedder, corpus)
+  corpus_embeddings = _get_cached_embeddings(corpus)
 
   # Calculating embeddings for queries and each words, as embeddings can get lost in
-  query_embeddings = embedder.encode([query] + _get_words(query), convert_to_tensor=True)
+  query_embeddings = encode([query] + _get_words(query))
   cos_scores = util.cos_sim(query_embeddings, corpus_embeddings)
 
   scores_dict = {}
