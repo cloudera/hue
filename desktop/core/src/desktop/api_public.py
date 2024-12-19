@@ -29,6 +29,7 @@ from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.conf import is_ai_interface_enabled
 from desktop.lib import fsmanager
+from desktop.lib.ai.metadata import semantic_search
 from desktop.lib.ai.sql import perform_sql_task
 from desktop.lib.connectors import api as connector_api
 from desktop.lib.django_util import JsonResponse
@@ -40,8 +41,6 @@ from metadata import optimizer_api
 from notebook import api as notebook_api
 from notebook.conf import get_ordered_interpreters
 from useradmin import api as useradmin_api, views as useradmin_views
-
-from desktop.lib.ai.metadata import semantic_search
 
 from .serializer import LlmPromptSerializer
 

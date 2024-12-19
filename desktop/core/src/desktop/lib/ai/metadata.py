@@ -15,38 +15,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 from typing import List
 
-from sentence_transformers import SentenceTransformer, util
 import torch
-import re
+from sentence_transformers import SentenceTransformer, util
 
-from desktop.lib.utils.cache import LRUCache
 from desktop.conf import SEMANTIC_SEARCH
-
+from desktop.lib.utils.cache import LRUCache
 
 TOP_K = SEMANTIC_SEARCH.TOP_K.get()
 CACHE_SIZE = SEMANTIC_SEARCH.CACHE_SIZE.get()
 EMBEDDING_MODEL = SEMANTIC_SEARCH.EMBEDDING_MODEL.get()
+MODEL_CACHE_DIR = SEMANTIC_SEARCH.MODEL_CACHE_DIR.get()
 
 
 _embedder: SentenceTransformer = None
+
+
 def encode(sentences: List[str]):
   global _embedder
   if not _embedder:
-    _embedder = SentenceTransformer(EMBEDDING_MODEL)
+    _embedder = SentenceTransformer(EMBEDDING_MODEL, cache_folder=MODEL_CACHE_DIR)
 
   return _embedder.encode(sentences, convert_to_tensor=True)
 
 
 # Could create a similar cache for query, but might be an overkill
 _corpus_cache = LRUCache(CACHE_SIZE)
+
+
 def _get_cached_embeddings(corpus):
   embedding_dict = {}
   new_sentences = []
   for sentence in corpus:
     embedding = _corpus_cache.get(sentence)
-    if embedding != None:
+    if embedding is not None:
       embedding_dict[sentence] = embedding
     else:
       new_sentences.append(sentence)
@@ -68,11 +72,12 @@ def _get_cached_embeddings(corpus):
 def _get_words(text) -> list:
   words = re.findall(r'\b\w+\b', text)
   # Remove 1 or 2 letter words
-  words = list(filter(lambda w : len(w) >= 3, words))
+  words = list(filter(lambda w: len(w) >= 3, words))
   return list(set(words))
 
+
 # Perform semantic search on the corpus using the provided query
-def semantic_search(corpus, query, limit = TOP_K):
+def semantic_search(corpus, query, limit=TOP_K):
   if len(corpus) < limit:
     return corpus
 
