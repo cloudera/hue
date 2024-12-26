@@ -76,7 +76,9 @@ const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Ele
     },
     {
       enabled: !!error && error?.response?.status !== 404,
-      message: t('An error occurred while fetching the filesystem'),
+      message: t('An error occurred while fetching meta data for path "{{path}}".', {
+        path: filePath
+      }),
       action: t('Retry'),
       onClick: reloadData
     }

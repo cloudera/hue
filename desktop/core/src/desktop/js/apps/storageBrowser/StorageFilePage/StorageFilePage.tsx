@@ -123,7 +123,9 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
   const errorConfig = [
     {
       enabled: !!errorPreview,
-      message: t('Failed to load file preview'),
+      message: t('An error occurred while fetching file content for path "{{path}}".', {
+        path: fileStats.path
+      }),
       action: t('Retry'),
       onClick: onReload
     }
