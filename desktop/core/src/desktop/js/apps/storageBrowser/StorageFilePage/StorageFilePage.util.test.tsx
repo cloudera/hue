@@ -1,6 +1,11 @@
 import { SupportedFileTypes } from '../../../utils/constants/storageBrowser';
 import { getFileMetaData, getFileType } from './StorageFilePage.util';
 
+jest.mock('../../../utils/dateTimeUtils', () => ({
+  ...jest.requireActual('../../../utils/dateTimeUtils'),
+  formatTimestamp: () => 'November 25, 2021 at 00:00 AM'
+}));
+
 describe('getFileMetaData', () => {
   const defaultFileStats = {
     atime: 1637859451,
@@ -44,7 +49,7 @@ describe('getFileMetaData', () => {
     expect(result[1][2]).toEqual({
       name: 'mtime',
       label: 'Last Modified',
-      value: 'November 25, 2021 at 10:27 PM'
+      value: 'November 25, 2021 at 00:00 AM'
     });
   });
 });
