@@ -31,12 +31,7 @@ import LoadingErrorWrapper from '../../reactComponents/LoadingErrorWrapper/Loadi
 const StorageBrowserPage = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const {
-    data: fileSystems,
-    loading,
-    error,
-    reloadData
-  } = useLoadData<ApiFileSystem[]>(FILESYSTEMS_API_URL);
+  const { data, loading, error, reloadData } = useLoadData<ApiFileSystem[]>(FILESYSTEMS_API_URL);
 
   const errorConfig = [
     {
@@ -53,11 +48,13 @@ const StorageBrowserPage = (): JSX.Element => {
       <LoadingErrorWrapper loading={loading} errors={errorConfig}>
         <Tabs
           className="hue-storage-browser__tab"
-          defaultActiveKey="0"
-          items={fileSystems?.map(fs => ({
+          defaultActiveKey={data?.[0]?.file_system}
+          items={data?.map(fs => ({
             label: fs.file_system.toUpperCase(),
-            key: fs.file_system + '_tab',
-            children: <StorageBrowserTab homeDir={fs.user_home_directory} fileSystem={fs.file_system} />
+            key: fs.file_system,
+            children: (
+              <StorageBrowserTab homeDir={fs.user_home_directory} fileSystem={fs.file_system} />
+            )
           }))}
         />
       </LoadingErrorWrapper>

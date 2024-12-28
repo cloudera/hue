@@ -40,7 +40,11 @@ const defaultProps = {
   testId: 'hue-storage-browser-tab-content'
 };
 
-const StorageBrowserTab = ({ homeDir, fileSystem, testId }: StorageBrowserTabProps): JSX.Element => {
+const StorageBrowserTab = ({
+  homeDir,
+  fileSystem,
+  testId
+}: StorageBrowserTabProps): JSX.Element => {
   const [urlPathname, urlFilePath] = decodeURIComponent(window.location.pathname).split('view=');
   const [filePath, setFilePath] = useState<string>(urlFilePath || homeDir);
   const fileName = filePath.split('/').pop() ?? '';
