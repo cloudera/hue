@@ -44,7 +44,7 @@ const useLoadData = <T, U = unknown>(
   const [error, setError] = useState<AxiosError>();
 
   const fetchOptionsDefault: ApiFetchOptions<T> = {
-    silenceErrors: false,
+    silenceErrors: true,
     ignoreSuccessErrors: true,
     isRawError: true
   };

@@ -32,6 +32,7 @@ import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/Lo
 
 interface StorageBrowserTabProps {
   homeDir: string;
+  fileSystem: string;
   testId?: string;
 }
 
@@ -39,7 +40,7 @@ const defaultProps = {
   testId: 'hue-storage-browser-tab-content'
 };
 
-const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Element => {
+const StorageBrowserTab = ({ homeDir, fileSystem, testId }: StorageBrowserTabProps): JSX.Element => {
   const [urlPathname, urlFilePath] = decodeURIComponent(window.location.pathname).split('view=');
   const [filePath, setFilePath] = useState<string>(urlFilePath || homeDir);
   const fileName = filePath.split('/').pop() ?? '';
@@ -76,8 +77,8 @@ const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Ele
     },
     {
       enabled: !!error && error?.response?.status !== 404,
-      message: t('An error occurred while fetching meta data for path "{{path}}".', {
-        path: filePath
+      message: t('An error occurred while fetching filesystem "{{fileSystem}}".', {
+        fileSystem: fileSystem.toUpperCase()
       }),
       action: t('Retry'),
       onClick: reloadData

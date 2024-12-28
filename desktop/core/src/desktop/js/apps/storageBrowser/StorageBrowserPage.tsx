@@ -54,10 +54,10 @@ const StorageBrowserPage = (): JSX.Element => {
         <Tabs
           className="hue-storage-browser__tab"
           defaultActiveKey="0"
-          items={fileSystems?.map(system => ({
-            label: system.file_system.toUpperCase(),
-            key: system.file_system + '_tab',
-            children: <StorageBrowserTab homeDir={system.user_home_directory} />
+          items={fileSystems?.map(fs => ({
+            label: fs.file_system.toUpperCase(),
+            key: fs.file_system + '_tab',
+            children: <StorageBrowserTab homeDir={fs.user_home_directory} fileSystem={fs.file_system} />
           }))}
         />
       </LoadingErrorWrapper>
