@@ -23,35 +23,30 @@ import I18n from 'utils/i18n';
 const TEMPLATE = `
   <div class="assist-inner-panel">
     <div class="assist-flex-panel">
-      <!-- ko if: selectedNotebook() -->
-      <!-- ko if: selectedNotebook().isBatchable() -->
+      <!-- ko if: selectedNotebook() && selectedNotebook().isBatchable() -->
       <!-- ko with: selectedNotebook() -->
       <div class="tab-pane" id="scheduleTab">
-          <!-- ko ifnot: isSaved -->
-          <!-- ko if: isHistory -->
-          ${I18n('Query needs to be saved.')}
+        <!-- ko ifnot: isSaved() && ! isHistory() -->
+        ${I18n('Query needs to be saved.')}
+        <!-- /ko -->
+        <!-- ko if: isSaved() && ! isHistory() -->
+          <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
+          <a data-bind="click: saveScheduler" href="javascript: void(0);">${I18n(
+            'Save changes'
+          )}</a>
           <!-- /ko -->
+          <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() && (! viewSchedulerId() || isSchedulerJobRunning() == false )-->
+          <a data-bind="click: showSubmitPopup" href="javascript: void(0);">${I18n('Start')}</a>
           <!-- /ko -->
-        <!-- ko if: isSaved() -->
-          <!-- ko if: isHistory -->
-            <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
-            <a data-bind="click: saveScheduler" href="javascript: void(0);">${I18n(
-              'Save changes'
-            )}</a>
-            <!-- /ko -->
-            <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() && (! viewSchedulerId() || isSchedulerJobRunning() == false )-->
-            <a data-bind="click: showSubmitPopup" href="javascript: void(0);">${I18n('Start')}</a>
-            <!-- /ko -->
-            <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
-            <a data-bind="click: function() { huePubSub.publish('show.jobs.panel', {id: viewSchedulerId(), interface: 'schedules'}) }, clickBubble: false" href="javascript: void(0);">
-              ${I18n('View')}
-            </a>
-            <!-- ko if: isSchedulerJobRunning() -->
-              ${I18n('Running')}
-            <!-- /ko -->
-            <!-- ko if: isSchedulerJobRunning() == false -->
-              ${I18n('Stopped')}
-            <!-- /ko -->
+          <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
+          <a data-bind="click: function() { huePubSub.publish('show.jobs.panel', {id: viewSchedulerId(), interface: 'schedules'}) }, clickBubble: false" href="javascript: void(0);">
+            ${I18n('View')}
+          </a>
+          <!-- ko if: isSchedulerJobRunning() -->
+            ${I18n('Running')}
+          <!-- /ko -->
+          <!-- ko if: isSchedulerJobRunning() == false -->
+            ${I18n('Stopped')}
           <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
@@ -59,7 +54,6 @@ const TEMPLATE = `
         <br>
         <div id="schedulerEditor"></div>
       </div>
-      <!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->
     </div>

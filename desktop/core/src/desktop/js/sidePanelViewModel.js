@@ -35,7 +35,6 @@ class SidePanelViewModel {
     self.leftAssistVisible = ko.observable(
       getFromLocalStorage('assist.left_assist_panel_visible', true)
     );
-
     self.leftAssistVisible.subscribe(val => {
       if (!self.assistWithoutStorage()) {
         setInLocalStorage('assist.left_assist_panel_visible', val);
@@ -47,20 +46,6 @@ class SidePanelViewModel {
         $(window).trigger('resize');
       }, 0);
     });
-
-    // Define getLeftResizerOptions as a function that uses leftAssistVisible
-    self.getLeftResizerOptions = function() {
-      return {
-        containerSelector: '.content-wrapper',
-        sidePanelSelector: '.left-panel',
-        sidePanelVisible: self.leftAssistVisible, // Now leftAssistVisible is defined
-        orientation: 'left',
-        onPosition: function() {
-          huePubSub.publish('split.draggable.position');
-        },
-        // other settings...
-      };
-    };
 
     self.rightAssistVisible = ko.observable(
       getFromLocalStorage('assist.right_assist_panel_visible', true)
@@ -116,7 +101,6 @@ class SidePanelViewModel {
       $('.context-panel').width($el.width()).css('left', $el.offset().left);
     });
 
-      
     self.sessionsAvailable = ko.observable(false);
 
     self.activeAppViewModel.subscribe(viewModel => {

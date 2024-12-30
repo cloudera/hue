@@ -326,28 +326,16 @@ const TEMPLATE =
   </script>
 
   <script type="text/html" id="assist-sql-inner-panel">
-    <!-- ko templateIf: {
-        condition: { lhs: $parent.availablePanels().length, op: '>', rhs: 1 },
-        name: 'assist-db-breadcrumb'
-    } --><!-- /ko -->
-    <!-- ko templateIf: {
-        condition: { lhs: selectedSource, op: '==', rhs: null },
-        name: 'assist-sources-template'
-    } --><!-- /ko -->
+    <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
+    <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
     <!-- ko with: selectedSource -->
-        <!-- ko templateIf: {
-            condition: { lhs: selectedNamespace, op: '==', rhs: null },
-            name: 'assist-namespaces-template'
-        } --><!-- /ko -->
-        <!-- ko with: selectedNamespace -->
-            <!-- ko templateIf: {
-                condition: { lhs: selectedDatabase, op: '==', rhs: null },
-                name: 'assist-databases-template'
-            } --><!-- /ko -->
-            <!-- ko with: selectedDatabase -->
-                <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
-            <!-- /ko -->
+      <!-- ko template: { ifnot: selectedNamespace, name: 'assist-namespaces-template' } --><!-- /ko -->
+      <!-- ko with: selectedNamespace -->
+        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' } --><!-- /ko -->
+        <!-- ko with: selectedDatabase -->
+          <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
         <!-- /ko -->
+      <!-- /ko -->
     <!-- /ko -->
   </script>
 

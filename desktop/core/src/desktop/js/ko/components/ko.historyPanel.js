@@ -27,18 +27,18 @@ export const NAME = 'hue-history-panel';
 
 const TEMPLATE = `
   <button class="btn btn-flat pull-right btn-toggle-jobs-panel" title="${I18n(
-  'Task History'
-)}" data-bind="click: toggleVisibility">
+    'Task History'
+  )}" data-bind="click: toggleVisibility">
     <i class="fa fa-history"></i>
     <div class="jobs-badge" data-bind="text: historyRunningJobs().length, visible: historyRunningJobs().length > 0"></div>
   </button>
 
   <div class="jobs-panel history-panel" data-bind="visible: historyPanelVisible, style: { 'top' : top, 'left': left }" style="display: none;">
-    <a class="pointer inactive-action pull-right" data-bind="click: hideHistoryPanel"><i class="fa fa-fw fa-times"></i></a>
-    <!-- ko ifnot: editorViewModel.hasHistory -->
+    <a class="pointer inactive-action pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
+    <!-- ko ifnot: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
       <span style="font-style: italic">${I18n('No task history.')}</span>
     <!-- /ko -->
-    <!-- ko if: editorViewModel.hasHistory -->
+    <!-- ko if: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
     <!-- ko with: editorViewModel.selectedNotebook() -->
     <div class="notification-history margin-bottom-10">
       <!-- ko if: onSuccessUrl() -->
@@ -68,8 +68,8 @@ const TEMPLATE = `
       <!-- /ko -->
       <!-- ko if: result -->
       <pre data-bind="visible: result.logs() && result.logs().length == 0" class="logs logs-bigger">${I18n(
-  'No logs available at this moment.'
-)}</pre>
+        'No logs available at this moment.'
+      )}</pre>
       <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated" style="height: 120px; overflow-y: auto;"></pre>
       <!-- /ko -->
       <!-- /ko -->
@@ -85,8 +85,8 @@ const TEMPLATE = `
       <div class="notification-history-title">
         <strong class="margin-left-5">${I18n('Task History')}</strong>
         <div class="inactive-action pointer pull-right" title="${I18n(
-  'Clear the query history'
-)}" data-target="#clearNotificationHistoryModal" data-toggle="modal" rel="tooltip">
+          'Clear the query history'
+        )}" data-target="#clearNotificationHistoryModal" data-toggle="modal" rel="tooltip">
           <i class="fa fa-calendar-times-o"></i>
         </div>
         <div class="clearfix"></div>
@@ -99,23 +99,23 @@ const TEMPLATE = `
             <!-- ko switch: status -->
             <!-- ko case: 'running' -->
             <div class="history-status" data-bind="tooltip: { title: '${I18n(
-  'Query running'
-)}', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
+              'Query running'
+            )}', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
             <!-- /ko -->
             <!-- ko case: 'failed' -->
             <div class="history-status" data-bind="tooltip: { title: '${I18n(
-  'Query failed'
-)}', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
+              'Query failed'
+            )}', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
             <!-- /ko -->
             <!-- ko case: 'available' -->
             <div class="history-status" data-bind="tooltip: { title: '${I18n(
-  'Result available'
-)}', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
+              'Result available'
+            )}', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
             <!-- /ko -->
             <!-- ko case: 'expired' -->
             <div class="history-status" data-bind="tooltip: { title: '${I18n(
-  'Result expired'
-)}', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
+              'Result expired'
+            )}', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
             <!-- /ko -->
             <!-- /ko -->
           </div>
@@ -135,8 +135,8 @@ const TEMPLATE = `
   <div id="clearNotificationHistoryModal" class="modal hide fade" data-backdrop="false">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="${I18n(
-  'Close'
-)}"><span aria-hidden="true">&times;</span></button>
+        'Close'
+      )}"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${I18n('Confirm History Clearing')}</h2>
     </div>
     <div class="modal-body">
@@ -144,9 +144,9 @@ const TEMPLATE = `
     </div>
     <div class="modal-footer">
       <a class="btn" data-dismiss="modal">${I18n('No')}</a>
-      <a class="btn btn-danger disable-feedback" data-bind="click: editorViewModel.clearSelectedNotebookHistory">${I18n(
-  'Yes'
-)}</a>
+      <a class="btn btn-danger disable-feedback" data-bind="click: function() { editorViewModel.selectedNotebook().clearHistory(); editorViewModel.selectedNotebook(null); }">${I18n(
+        'Yes'
+      )}</a>
     </div>
   </div>
 `;
@@ -164,11 +164,6 @@ class HistoryPanel {
         huePubSub.publish('hide.jobs.panel');
       }
     });
-
-    self.hideHistoryPanel = () => {
-      self.historyPanelVisible(false);
-    };
-
 
     huePubSub.subscribe('hide.history.panel', () => {
       self.historyPanelVisible(false);

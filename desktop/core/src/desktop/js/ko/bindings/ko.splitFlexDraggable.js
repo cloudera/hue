@@ -22,8 +22,6 @@ import { hueLocalStorage } from 'utils/storageUtils';
 
 ko.bindingHandlers.splitFlexDraggable = {
   init: function (element, valueAccessor) {
-    // Add a log to inspect the valueAccessor content:
-    console.log('valueAccessor output:', valueAccessor());
     const options = ko.unwrap(valueAccessor());
     let sidePanelWidth =
       hueLocalStorage(options.appName + '_' + options.orientation + '_panel_width') != null

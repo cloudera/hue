@@ -877,10 +877,6 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
 
   def process_response(self, request, response):
     # If CSP_NONCE is not set, return the response without modification
-    
-    # if 'logs' not in request.path:
-    #   return response
-
     if not CSP_NONCE.get():
       return response
 

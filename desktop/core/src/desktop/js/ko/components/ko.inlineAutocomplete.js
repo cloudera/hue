@@ -38,7 +38,7 @@ const TEMPLATE = `
       <!-- /ko-->
       <form autocomplete="off">
         <input class="inline-autocomp-input" ${ window.PREVENT_AUTOFILL_INPUT_ATTRS } type="text" data-bind="
-          conditionalAttr: {'placeholder': [hasFocus(), '', placeHolder]},
+          attr: { 'placeHolder' : hasFocus() ? '' : placeHolder },
           textInput: searchInput,
           hasFocus: hasFocus,
           clearable: { value: searchInput, onClear: onClear },

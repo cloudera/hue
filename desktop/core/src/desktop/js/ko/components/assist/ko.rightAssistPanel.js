@@ -35,7 +35,13 @@ const SCHEDULES_TAB = 'schedules';
 const LANG_REF_TAB = 'langRef';
 
 const TEMPLATE = `
-  <div class="right-assist-tabs" data-bind="splitFlexDraggable: getRightAssistOptions()">
+  <div class="right-assist-tabs" data-bind="splitFlexDraggable : {
+      containerSelector: '.content-wrapper',
+      sidePanelSelector: '.right-panel',
+      sidePanelVisible: visible,
+      orientation: 'right',
+      onPosition: function() { huePubSub.publish('split.draggable.position') }
+    }">
     <div class="right-assist-tab" data-bind="visible: editorAssistantTabAvailable" style="display:none;"><a class="inactive-action" href="javascript: void(0);" title="${I18n(
       'Assistant'
     )}" data-bind="css: { 'blue' : activeTab() === 'editorAssistant' }, tooltip: { placement: 'left' }, click: editorAssistantTabClick"><i class="fa fa-fw fa-compass"></i></a></div>
@@ -128,19 +134,6 @@ class RightAssistPanel {
         (this.connector().dialect === 'hive' || this.connector().dialect === 'impala')
     );
     this.schedulesTabAvailable = ko.observable(false);
-
-    // The function to return the configuration object for the right panel
-    this.getRightAssistOptions = () => {
-      return {
-        containerSelector: '.content-wrapper',
-        sidePanelSelector: '.right-panel',
-        sidePanelVisible: this.visible,
-        orientation: 'right',
-        onPosition: function() {
-          huePubSub.publish('split.draggable.position');
-        }
-      };
-    };
 
     this.lastActiveTabEditor = ko.observable();
     withLocalStorage(

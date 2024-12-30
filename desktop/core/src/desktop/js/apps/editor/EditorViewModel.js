@@ -59,23 +59,6 @@ export default class EditorViewModel {
     this.editorMode = ko.observable(options.mode === 'editor');
     this.config = ko.observable();
 
-    this.hasHistory = ko.pureComputed(() => {
-      let notebook = this.selectedNotebook();
-      // Ensure both 'notebook' and 'notebook.history()' are not undefined before checking the length
-      return notebook && notebook.history && notebook.history().length > 0;
-    }
-
-    );
-
-
-    self.clearSelectedNotebookHistory = function() {
-      if (self.selectedNotebook()) {
-        self.selectedNotebook().clearHistory();
-        self.selectedNotebook(null);
-      }
-    };
-
-    
     this.sharingEnabled = ko.pureComputed(
       () =>
         this.config() &&
