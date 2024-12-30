@@ -41,7 +41,12 @@ const TEMPLATE = `
     </div>
   </script>
   
-  <div class="assist-panel" data-bind="dropzone: { url: '/indexer/api/indexer/upload_local_file_drag_and_drop', clickable: false, paramName: 'file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: !window.SHOW_UPLOAD_BUTTON }">
+  <div class="assist-panel" data-bind="dropzone: {
+      url: '/indexer/api/indexer/upload_local_file_drag_and_drop',
+      clickable: false,
+      paramName: 'file',
+      disabled: !window.SHOW_UPLOAD_BUTTON
+    }">
     <!-- ko if: availablePanels().length > 1 -->
     <div class="assist-panel-switches">
       <!-- ko foreach: availablePanels -->
@@ -53,7 +58,13 @@ const TEMPLATE = `
     </div>
     <!-- /ko -->
     <!-- ko with: visiblePanel -->
-    <div class="assist-panel-contents" data-bind="style: { 'padding-top': $parent.availablePanels().length > 1 ? '10px' : '5px' }">
+      <div class="assist-panel-contents" data-bind="conditionalStyle: {
+          'padding-top': [
+              { lhs: $parent.availablePanels().length, op: '>', rhs: 1 },
+              '10px',
+              '5px'
+          ]
+      }">
       <div class="assist-inner-panel">
         <div class="assist-flex-panel">
           <!-- ko component: panelData --><!-- /ko -->
@@ -92,6 +103,11 @@ class AssistPanel {
 
     self.lastOpenPanelType = ko.observable();
     withLocalStorage('assist.last.open.panel', self.lastOpenPanelType);
+
+    self.handleDropzoneComplete = function(path) {
+      debugger;
+      huePubSub.publish('assist.dropzone.complete', path);
+  };
 
     // TODO: Support dynamic config changes
     huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, clusterConfig => {
