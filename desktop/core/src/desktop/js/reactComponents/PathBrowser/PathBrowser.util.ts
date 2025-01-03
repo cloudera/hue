@@ -29,7 +29,7 @@ export const getFileSystemAndPath = (
     return {
       fileSystem: '',
       path: ''
-    }
+    };
   }
   if (filePath.includes('://')) {
     const [fileSystem, path] = filePath.split('://');
