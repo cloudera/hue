@@ -380,3 +380,26 @@ class TestTrinoApi(TestCase):
     result = self.trino_api.get_log(notebook, snippet)
 
     assert result == expected_log
+
+  def test_show_databases(self):
+    with patch('notebook.connectors.trino.LOG.error') as Log_error:
+      with patch('notebook.connectors.trino.TrinoQuery') as TrinoQuery:
+        with patch('notebook.connectors.trino.TrinoApi._show_catalogs') as _show_catalogs:
+          _show_catalogs.return_value = [
+            'catalog1', 'catalog2'
+          ]
+          query_instance = TrinoQuery.return_value
+          query_instance.execute.side_effect = [
+            MagicMock(rows=[["schema1"], ["schema2"]]),  # First catalog response
+            Exception("Some error")  # Second catalog raises an exception
+          ]
+          result = self.trino_api._show_databases()
+
+          # Assert the expected output
+          expected_result = ['catalog1.schema1', 'catalog1.schema2']
+          self.assertEqual(result, expected_result)
+
+          # Assert error logging was called for the exception
+          Log_error.assert_called_once_with(
+            "Failed to fetch schemas from catalog catalog2: Some error"
+          )
