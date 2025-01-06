@@ -41,7 +41,7 @@ export enum ActionType {
   Rename = 'rename',
   Repilcation = 'repilcation',
   Delete = 'delete',
-  Compress = 'Compress'
+  Compress = 'compress'
 }
 
 const isValidFileOrFolder = (filePath: string): boolean => {
