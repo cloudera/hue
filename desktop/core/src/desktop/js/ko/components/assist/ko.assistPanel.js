@@ -41,11 +41,20 @@ const TEMPLATE = `
     </div>
   </script>
   
-  <div class="assist-panel" data-bind="dropzone: { url: '/indexer/api/indexer/upload_local_file_drag_and_drop', clickable: false, paramName: 'file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); }, disabled: !window.SHOW_UPLOAD_BUTTON }">
+  <div class="assist-panel" data-bind="customdropzone: {
+      url: '/indexer/api/indexer/upload_local_file_drag_and_drop',
+      clickable: false,
+      paramName: 'file',
+      disabled: !window.SHOW_UPLOAD_BUTTON
+    }">
     <!-- ko if: availablePanels().length > 1 -->
     <div class="assist-panel-switches">
       <!-- ko foreach: availablePanels -->
-      <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, style: { 'float': rightAlignIcon ? 'right' : 'left' },  attr: { 'title': name, 'data-testid': 'assist--' + type + '--button' }">
+      <div class="inactive-action assist-type-switch" data-bind="
+        click: $parent.setVisiblePanel,
+        css: { 'blue': $parent.isBlue },
+        attr: { 'title': name, 'data-testid': 'assist--' + type + '--button' }
+      ">
         <!-- ko if: iconSvg --><span style="font-size:22px;"><svg class="hi"><use data-bind="attr: {'href': iconSvg }" href=''></use></svg></span><!-- /ko -->
         <!-- ko if: !iconSvg --><i class="fa fa-fw valign-middle" data-bind="css: icon"></i><!-- /ko -->
       </div>
@@ -53,7 +62,13 @@ const TEMPLATE = `
     </div>
     <!-- /ko -->
     <!-- ko with: visiblePanel -->
-    <div class="assist-panel-contents" data-bind="style: { 'padding-top': $parent.availablePanels().length > 1 ? '10px' : '5px' }">
+      <div class="assist-panel-contents" data-bind="conditionalStyle: {
+          'padding-top': [
+              { lhs: $parent.availablePanels().length, op: '>', rhs: 1 },
+              '10px',
+              '5px'
+          ]
+      }">
       <div class="assist-inner-panel">
         <div class="assist-flex-panel">
           <!-- ko component: panelData --><!-- /ko -->
@@ -90,8 +105,23 @@ class AssistPanel {
     self.availablePanels = ko.observableArray();
     self.visiblePanel = ko.observable();
 
+    self.setVisiblePanel = function(item) {
+      self.visiblePanel(item); // Your existing logic to show/hide panels
+    };
+
+    // Computed observable to handle CSS logic
+    self.isBlue = ko.computed(function() {
+      return self.visiblePanel() === self.someData; // Replace 'someData' with the correct reference
+    });
+
+
     self.lastOpenPanelType = ko.observable();
     withLocalStorage('assist.last.open.panel', self.lastOpenPanelType);
+
+    self.handleDropzoneComplete = function(path) {
+      debugger;
+      huePubSub.publish('assist.dropzone.complete', path);
+  };
 
     // TODO: Support dynamic config changes
     huePubSub.publish(GET_KNOWN_CONFIG_TOPIC, clusterConfig => {
@@ -286,6 +316,7 @@ class AssistPanel {
       });
 
       self.visiblePanel.subscribe(newValue => {
+        debugger;
         if (self.lastOpenPanelType() !== newValue?.type) {
           hueAnalytics.log('left-assist-panel', 'panel-selection/' + newValue?.type);
         }

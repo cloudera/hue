@@ -180,8 +180,7 @@ import 'ko/extenders/ko.numeric';
 import 'ko/extenders/ko.toJson';
 
 import 'ko/observables/ko.observableArrayDefault';
-import 'ko/observables/ko.observableDefault';
-
+import 'ko/ksb';
 window.ko = ko;
 window.ko.mapping = komapping;
 
