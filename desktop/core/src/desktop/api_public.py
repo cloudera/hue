@@ -28,7 +28,7 @@ from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
 from desktop.log import api as logs_api
-from filebrowser import api as filebrowser_api, views as filebrowser_views
+from filebrowser import api as filebrowser_api
 from indexer import api3 as indexer_api3
 from metadata import optimizer_api
 from notebook import api as notebook_api
@@ -226,12 +226,6 @@ def analyze_table(request, dialect, database, table, columns=None):
 def storage_get_filesystems(request):
   django_request = get_django_request(request)
   return filebrowser_api.get_filesystems_with_home_dirs(django_request)
-
-
-@api_view(["GET"])
-def storage_view(request, path):
-  django_request = get_django_request(request)
-  return filebrowser_views.view(django_request, path)
 
 
 @api_view(["GET"])
