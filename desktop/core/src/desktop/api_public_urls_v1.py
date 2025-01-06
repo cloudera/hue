@@ -92,7 +92,6 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='storage_view'),
   re_path(
     r'^taskserver/upload/available_space/?$',
     api_public.taskserver_get_available_space_for_upload,
