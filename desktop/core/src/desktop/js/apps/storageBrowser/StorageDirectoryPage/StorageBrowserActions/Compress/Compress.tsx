@@ -72,7 +72,6 @@ const CompressAction = ({
     saveForm(formData, { url: COMPRESS_API_URL });
   };
 
-
   return (
     <Modal
       cancelText={t('Cancel')}
@@ -95,9 +94,9 @@ const CompressAction = ({
         }}
       />
 
-      <div className='compress-action'>
+      <div className="compress-action">
         {t('Following files and folders will be compressed:')}
-        <ul className='compress-action__list'>
+        <ul className="compress-action__list">
           {files.map(file => (
             <li key={file.path}>{file.name}</li>
           ))}

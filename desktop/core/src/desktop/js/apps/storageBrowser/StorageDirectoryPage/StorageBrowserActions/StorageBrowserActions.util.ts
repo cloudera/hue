@@ -133,7 +133,9 @@ export const getEnabledActions = (
       label: 'Set Replication'
     },
     {
-      enabled: !!config?.storage_browser.enable_extract_uploaded_archive && isMultipleFileActionEnabled(files, ActionType.Compress),
+      enabled:
+        !!config?.storage_browser.enable_extract_uploaded_archive &&
+        isMultipleFileActionEnabled(files, ActionType.Compress),
       type: ActionType.Compress,
       label: 'Compress'
     }
