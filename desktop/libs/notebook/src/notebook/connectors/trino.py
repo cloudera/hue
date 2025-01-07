@@ -17,6 +17,7 @@
 
 import json
 import time
+import logging
 import textwrap
 from urllib.parse import urlparse
 
@@ -34,6 +35,8 @@ from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
 from notebook.connectors.base import Api, ExecutionWrapper, QueryError, ResultWrapper
+
+LOG = logging.getLogger()
 
 
 def query_error_handler(func):
@@ -297,12 +300,18 @@ class TrinoApi(Api):
     databases = []
 
     for catalog in catalogs:
-      query_client = TrinoQuery(self.trino_request, 'SHOW SCHEMAS FROM ' + catalog)
-      response = query_client.execute()
-      databases += [f'{catalog}.{item}' for sublist in response.rows for item in sublist]
+      try:
+        query_client = TrinoQuery(self.trino_request, 'SHOW SCHEMAS FROM ' + catalog)
+        response = query_client.execute()
+        databases += [f'{catalog}.{item}' for sublist in response.rows for item in sublist]
+      except Exception as e:
+        # Log the exception and continue with the next catalog
+        LOG.error(f"Failed to fetch schemas from catalog {catalog}: {str(e)}")
+        continue
 
     return databases
 
+  @query_error_handler
   def _show_catalogs(self):
     query_client = TrinoQuery(self.trino_request, 'SHOW CATALOGS')
     response = query_client.execute()
@@ -311,6 +320,7 @@ class TrinoApi(Api):
 
     return catalogs
 
+  @query_error_handler
   def _show_tables(self, database):
     database = self._format_identifier(database, is_db=True)
     query_client = TrinoQuery(self.trino_request, 'USE ' + database)
@@ -326,6 +336,7 @@ class TrinoApi(Api):
       for table in tables
     ]
 
+  @query_error_handler
   def _get_columns(self, database, table):
     database = self._format_identifier(database, is_db=True)
     query_client = TrinoQuery(self.trino_request, 'USE ' + database)
