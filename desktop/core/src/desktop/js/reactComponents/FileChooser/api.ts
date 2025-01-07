@@ -30,6 +30,7 @@ export const RENAME_API_URL = '/api/v1/storage/rename/';
 export const SET_REPLICATION_API_URL = '/api/v1/storage/replication/';
 export const DELETION_API_URL = '/api/v1/storage/delete/';
 export const BULK_DELETION_API_URL = '/api/v1/storage/delete/bulk';
+export const COMPRESS_API_URL = '/api/v1/storage/compress';
 export const COPY_API_URL = '/api/v1/storage/copy/';
 export const BULK_COPY_API_URL = '/api/v1/storage/copy/bulk/';
 export const MOVE_API_URL = '/api/v1/storage/move/';
