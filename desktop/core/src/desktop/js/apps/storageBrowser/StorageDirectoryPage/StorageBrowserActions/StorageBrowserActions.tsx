@@ -39,8 +39,10 @@ import MoveCopyAction from './MoveCopy/MoveCopy';
 import RenameAction from './Rename/Rename';
 import ReplicationAction from './Replication/Replication';
 import ViewSummary from './ViewSummary/ViewSummary';
+import DeleteAction from './Delete/Delete';
 
 interface StorageBrowserRowActionsProps {
+  isTrashEnabled?: boolean;
   currentPath: FileStats['path'];
   selectedFiles: StorageDirectoryTableData[];
   onSuccessfulAction: () => void;
@@ -57,6 +59,7 @@ const iconsMap: Record<ActionType, JSX.Element> = {
 };
 
 const StorageBrowserActions = ({
+  isTrashEnabled,
   currentPath,
   selectedFiles,
   onSuccessfulAction,
@@ -135,6 +138,16 @@ const StorageBrowserActions = ({
           onError={onApiError}
           onClose={closeModal}
           setLoadingFiles={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.Delete && (
+        <DeleteAction
+          isTrashEnabled={isTrashEnabled}
+          files={selectedFiles}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
         />
       )}
     </>
