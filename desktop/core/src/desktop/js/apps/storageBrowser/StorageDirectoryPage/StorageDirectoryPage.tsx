@@ -101,7 +101,10 @@ const StorageDirectoryPage = ({
     skip:
       fileStats.path === '' ||
       fileStats.path === undefined ||
-      fileStats.type !== BrowserViewType.dir
+      fileStats.type !== BrowserViewType.dir,
+    onSuccess: () => {
+      setSelectedFiles([]);
+    }
   });
 
   const tableData: StorageDirectoryTableData[] = useMemo(() => {
@@ -273,6 +276,7 @@ const StorageDirectoryPage = ({
         <div className="hue-storage-browser__actions-bar-right">
           <StorageBrowserActions
             currentPath={fileStats.path}
+            isTrashEnabled={filesData?.is_trash_enabled}
             selectedFiles={selectedFiles}
             setLoadingFiles={setLoadingFiles}
             onSuccessfulAction={reloadData}
