@@ -51,7 +51,7 @@ const iconsMap: Record<ActionType, JSX.Element> = {
   [ActionType.Copy]: <CopyClipboardIcon />,
   [ActionType.Move]: <DataMovementIcon />,
   [ActionType.Rename]: <EditIcon />,
-  [ActionType.Repilcation]: <DuplicateIcon />,
+  [ActionType.Replication]: <DuplicateIcon />,
   [ActionType.Delete]: <DeleteIcon />,
   [ActionType.Summary]: <InfoIcon />
 };
@@ -118,7 +118,7 @@ const StorageBrowserActions = ({
           onClose={closeModal}
         />
       )}
-      {selectedAction === ActionType.Repilcation && (
+      {selectedAction === ActionType.Replication && (
         <ReplicationAction
           file={selectedFiles[0]}
           onSuccess={onApiSuccess}
