@@ -32,7 +32,7 @@ const ServerLogs: React.FC = (): JSX.Element => {
   const {
     data: logsData,
     loading,
-    error,
+    error
     //reloadData
   } = useLoadData<ServerLogsData>('/api/v1/logs');
 
@@ -89,14 +89,14 @@ const ServerLogs: React.FC = (): JSX.Element => {
               hostName={logsData?.hue_hostname ?? ''}
             />
             {logsData && (logsData.logs.length === 0 || logsData.logs[0] === '') && (
-                <pre className="server__no-logs-found">No logs found!</pre>
-              )}
+              <pre className="server__no-logs-found">No logs found!</pre>
+            )}
 
             {logsData && logsData.logs.length > 0 && logsData.logs[0] !== '' && (
               <div className="server__display-logs">
                 {logsData.logs.map((line, index) => (
                   <div
-                    className={`server__log-line ${wrapLogs ? 'server_nowrap' : ''}`}
+                    className={`server__log-line ${wrapLogs ? 'server_wrap' : ''}`}
                     key={'logs_' + index}
                   >
                     {highlightText(line, filter)}
