@@ -62,7 +62,7 @@ export enum AppType {
 
 interface StorageBrowserConfig {
   concurrent_max_connection: number;
-  enable_chunked_file_uploader: boolean;
+  enable_chunked_file_upload: boolean;
   enable_file_download_button: boolean;
   enable_new_storage_browser: boolean;
   file_upload_chunk_size: number;
