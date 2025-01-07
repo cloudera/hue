@@ -20,12 +20,13 @@ import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
 import Button from 'cuix/dist/components/Button';
 import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
-import InfoIcon from '@cloudera/cuix-core/icons/react/InfoIcon';
+import SummaryIcon from '@cloudera/cuix-core/icons/react/SummaryIcon';
 import EditIcon from '@cloudera/cuix-core/icons/react/EditIcon';
 import DuplicateIcon from '@cloudera/cuix-core/icons/react/DuplicateIcon';
 import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
 import DataMovementIcon from '@cloudera/cuix-core/icons/react/DataMovementIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
+import CollapseIcon from '@cloudera/cuix-core/icons/react/CollapseViewIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
@@ -40,6 +41,7 @@ import RenameAction from './Rename/Rename';
 import ReplicationAction from './Replication/Replication';
 import ViewSummary from './ViewSummary/ViewSummary';
 import DeleteAction from './Delete/Delete';
+import CompressAction from './Compress/Compress';
 
 interface StorageBrowserRowActionsProps {
   isTrashEnabled?: boolean;
@@ -55,7 +57,8 @@ const iconsMap: Record<ActionType, JSX.Element> = {
   [ActionType.Rename]: <EditIcon />,
   [ActionType.Replication]: <DuplicateIcon />,
   [ActionType.Delete]: <DeleteIcon />,
-  [ActionType.Summary]: <InfoIcon />
+  [ActionType.Summary]: <SummaryIcon />,
+  [ActionType.Compress]: <CollapseIcon />
 };
 
 const StorageBrowserActions = ({
@@ -143,6 +146,16 @@ const StorageBrowserActions = ({
       {selectedAction === ActionType.Delete && (
         <DeleteAction
           isTrashEnabled={isTrashEnabled}
+          files={selectedFiles}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.Compress && (
+        <CompressAction
+          currentPath={currentPath}
           files={selectedFiles}
           onSuccess={onApiSuccess}
           onError={onApiError}
