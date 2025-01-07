@@ -193,7 +193,7 @@ describe('StorageBrowserRowActions', () => {
     test('renders rename modal when rename option is clicked', async () => {
       const user = userEvent.setup();
       await setUpActionMenu([mockRecord], 'abfs://test', 'dir');
-      await user.click(screen.queryByRole('menuitem', { name: 'Rename' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
       expect(await screen.findByText('Enter new name')).toBeInTheDocument();
     });
   });
@@ -232,7 +232,7 @@ describe('StorageBrowserRowActions', () => {
     test('renders set replication modal when set replication option is clicked', async () => {
       const user = userEvent.setup();
       await setUpActionMenu([mockRecord], 'hdfs://test', 'file');
-      await user.click(screen.queryByRole('menuitem', { name: 'Set Replication' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Set Replication' }));
       expect(await screen.findByText(/Setting Replication factor/i)).toBeInTheDocument();
     });
   });
