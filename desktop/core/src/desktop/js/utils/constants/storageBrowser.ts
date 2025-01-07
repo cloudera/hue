@@ -36,7 +36,7 @@ export enum FileUploadStatus {
   Failed = 'Failed'
 }
 
-export const SUPPORTED_FILE_EXTENSIONS = {
+export const SUPPORTED_FILE_EXTENSIONS: Record<string, SupportedFileTypes> = {
   png: SupportedFileTypes.IMAGE,
   jpg: SupportedFileTypes.IMAGE,
   jpeg: SupportedFileTypes.IMAGE,
