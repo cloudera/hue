@@ -22,7 +22,7 @@ export enum ActionType {
   Move = 'move',
   Summary = 'summary',
   Rename = 'rename',
-  Repilcation = 'repilcation',
+  Replication = 'replication',
   Delete = 'delete'
 }
 
@@ -40,7 +40,7 @@ const isActionEnabled = (file: StorageDirectoryTableData, action: ActionType): b
   switch (action) {
     case ActionType.Summary:
       return (isHDFS(file.path) || isOFS(file.path)) && file.type === BrowserViewType.file;
-    case ActionType.Repilcation:
+    case ActionType.Replication:
       return isHDFS(file.path) && file.type === BrowserViewType.file;
     case ActionType.Rename:
     case ActionType.Copy:
@@ -107,8 +107,8 @@ export const getEnabledActions = (
       label: 'Delete'
     },
     {
-      enabled: isSingleFileActionEnabled(files, ActionType.Repilcation),
-      type: ActionType.Repilcation,
+      enabled: isSingleFileActionEnabled(files, ActionType.Replication),
+      type: ActionType.Replication,
       label: 'Set Replication'
     }
   ].filter(e => e.enabled);

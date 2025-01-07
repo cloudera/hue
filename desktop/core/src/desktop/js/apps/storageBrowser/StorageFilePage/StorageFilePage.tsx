@@ -23,7 +23,7 @@ import {
 import './StorageFilePage.scss';
 import { i18nReact } from '../../../utils/i18nReact';
 import Button, { PrimaryButton } from 'cuix/dist/components/Button';
-import { getFileMetaData } from './StorageFilePage.util';
+import { getFileMetaData, getFileType } from './StorageFilePage.util';
 import {
   DOWNLOAD_API_URL,
   FILE_PREVIEW_API_URL,
@@ -48,6 +48,8 @@ interface StorageFilePageProps {
 
 const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps): JSX.Element => {
   const config = getLastKnownConfig();
+  const fileType = getFileType(fileName);
+
   const { t } = i18nReact.useTranslation();
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -65,7 +67,8 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
       skip:
         fileStats.path === '' ||
         fileStats.path === undefined ||
-        fileStats?.type !== BrowserViewType.file
+        fileStats?.type !== BrowserViewType.file ||
+        EDITABLE_FILE_FORMATS[fileType] === undefined
     }
   );
 
@@ -105,14 +108,6 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
   };
 
   const filePreviewUrl = `${DOWNLOAD_API_URL}${fileStats.path}?disposition=inline`;
-
-  const fileType = useMemo(() => {
-    const fileExtension = fileName?.split('.')?.pop()?.toLocaleLowerCase();
-    if (!fileExtension) {
-      return SupportedFileTypes.OTHER;
-    }
-    return SUPPORTED_FILE_EXTENSIONS[fileExtension] ?? SupportedFileTypes.OTHER;
-  }, [fileName]);
 
   const isEditingEnabled =
     !isEditing &&
