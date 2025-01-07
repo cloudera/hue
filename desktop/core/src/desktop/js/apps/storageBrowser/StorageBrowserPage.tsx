@@ -42,7 +42,12 @@ const StorageBrowserPage = (): JSX.Element => {
           items={fileSystems?.map(system => ({
             label: system.file_system.toUpperCase(),
             key: system.file_system + '_tab',
-            children: <StorageBrowserTab homeDir={system.user_home_directory} />
+            children: (
+              <StorageBrowserTab
+                homeDir={system.user_home_directory}
+                fileSystem={system.file_system}
+              />
+            )
           }))}
         />
       </Spin>
