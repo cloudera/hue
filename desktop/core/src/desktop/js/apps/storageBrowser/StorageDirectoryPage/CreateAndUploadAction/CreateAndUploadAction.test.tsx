@@ -24,6 +24,7 @@ describe('CreateAndUploadAction', () => {
   const currentPath = '/some/path';
   const onSuccessfulAction = jest.fn();
   const setLoadingFiles = jest.fn();
+  const mockFilesUpload = jest.fn();
 
   beforeEach(() => {
     render(
@@ -31,6 +32,7 @@ describe('CreateAndUploadAction', () => {
         currentPath={currentPath}
         onSuccessfulAction={onSuccessfulAction}
         setLoadingFiles={setLoadingFiles}
+        onFilesUpload={mockFilesUpload}
       />
     );
   });
@@ -74,7 +76,7 @@ describe('CreateAndUploadAction', () => {
     fireEvent.click(newUploadButton);
 
     // Check if the upload modal is opened
-    expect(screen.getByText('Upload A File')).toBeInTheDocument();
+    expect(screen.getByText('Upload a File')).toBeInTheDocument();
   });
 
   it('should call the correct API for creating a folder', async () => {

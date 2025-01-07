@@ -31,6 +31,7 @@ interface InputModalProps {
   submitText?: string;
   showModal: boolean;
   title: string;
+  buttonDisabled?: boolean;
 }
 
 const InputModal = ({
@@ -41,11 +42,16 @@ const InputModal = ({
   onSubmit,
   showModal,
   title,
+  buttonDisabled,
   ...i18n
 }: InputModalProps): JSX.Element => {
   const [value, setValue] = useState<string | number>(initialValue);
   const { t } = i18nReact.useTranslation();
   const { cancelText = t('Cancel'), submitText = t('Submit') } = i18n;
+
+  const handleSubmit = () => {
+    onSubmit(value);
+  };
 
   useEffect(() => {
     setValue(initialValue);
@@ -57,18 +63,19 @@ const InputModal = ({
       className="hue-input-modal cuix antd"
       okText={submitText}
       onCancel={onClose}
-      onOk={() => {
-        onSubmit(value);
-        onClose();
-      }}
+      onOk={handleSubmit}
       open={showModal}
       title={title}
+      secondaryButtonProps={{ disabled: buttonDisabled }}
+      okButtonProps={{ disabled: buttonDisabled }}
+      cancelButtonProps={{ disabled: buttonDisabled }}
     >
       <div className="hue-input-modal__input-label">{inputLabel}</div>
       <Input
         className="hue-input-modal__input"
         value={value}
         type={inputType}
+        onPressEnter={handleSubmit}
         onChange={e => {
           setValue(e.target.value);
         }}
