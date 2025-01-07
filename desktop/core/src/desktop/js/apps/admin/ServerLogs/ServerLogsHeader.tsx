@@ -70,8 +70,12 @@ const ServerLogsHeader: React.FC<ServerLogsHeaderProps> = ({
           }}
           checked={wrapLogs}
           className="server__checkbox-icon"
+          id="wrapLogsToggle"
         />
-        <span className="server__wrap-logs">Wrap logs</span>
+        <label className="server__wrap-logs" htmlFor="wrapLogsToggle">
+          Wrap logs
+        </label>
+
         <Button
           className="server__download-button"
           data-event="download-button"

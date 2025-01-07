@@ -15,48 +15,89 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import ServerLogs from './ServerLogsTab';
+import { mocked } from 'jest-mock';
+import useLoadData from '../../../utils/hooks/useLoadData';
 
 const mockData = jest.fn().mockReturnValue({
   logs: ['Log entry 1', 'Log entry 2'],
   hue_hostname: 'test-hostname'
 });
 
-jest.mock('../../../utils/hooks/useLoadData', () => {
-  return jest.fn(() => ({
-    data: mockData(),
-    loading: false
-  }));
+const emptyMockData = jest.fn().mockReturnValue({
+  logs: [],
+  hue_hostname: 'test-hostname'
 });
 
+jest.mock('../../../utils/hooks/useLoadData');
 
 afterEach(() => {
-  jest.clearAllMocks(); 
+  jest.clearAllMocks();
 });
 
 describe('ServerLogs Component', () => {
   test('Render ServerLogs component with fetched logs', () => {
+    mocked(useLoadData).mockImplementation(() => ({
+      data: mockData(),
+      loading: false,
+      reloadData: jest.fn()
+    }));
+
     render(<ServerLogs />);
 
-      expect(screen.getByText('Log entry 1')).toBeInTheDocument();
-      expect(screen.getByText('Log entry 2')).toBeInTheDocument();
+    expect(screen.getByText('Log entry 1')).toBeInTheDocument();
+    expect(screen.getByText('Log entry 2')).toBeInTheDocument();
   });
 
   test('Handles no logs found scenario', () => {
-    
-    jest.mock('../../../utils/hooks/useLoadData', () => {
-      return jest.fn(() => ({
-        data: {
-          logs: [],
-          hue_hostname: 'test-hostname'
-        },
-        loading: false
-      }));
-    });
-  
+    mocked(useLoadData).mockImplementation(() => ({
+      data: emptyMockData(),
+      loading: false,
+      reloadData: jest.fn()
+    }));
+
     render(<ServerLogs />);
+
     expect(screen.getByText('No logs found!')).toBeInTheDocument();
+  });
+
+  test('Finds and highlights the searched value', async () => {
+    mocked(useLoadData).mockImplementation(() => ({
+      data: mockData(),
+      loading: false,
+      reloadData: jest.fn()
+    }));
+
+    render(<ServerLogs />);
+
+    const searchValue = 'entry 1';
+    const searchInput = screen.getByPlaceholderText('Search in the logs');
+
+    await userEvent.type(searchInput, searchValue);
+
+    const highlightedElements = screen.getAllByText(searchValue, { selector: 'mark' });
+    expect(highlightedElements.length).toBeGreaterThan(0);
+    highlightedElements.forEach(element => {
+      expect(element).toHaveClass('server--highlight-word');
+    });
+  });
+
+  test('Toggling wrap logs changes the functionality and thus class of log lines', async () => {
+    mocked(useLoadData).mockImplementation(() => ({
+      data: mockData(),
+      loading: false,
+      reloadData: jest.fn()
+    }));
+
+    render(<ServerLogs />);
+
+    expect(screen.getByText('Log entry 1')).toHaveClass('server_wrap');
+
+    fireEvent.click(screen.getByLabelText('Wrap logs'));
+
+    expect(screen.getByText('Log entry 1')).not.toHaveClass('server_wrap');
   });
 });
