@@ -36,9 +36,9 @@ import {
   SUPPORTED_FILE_EXTENSIONS,
   SupportedFileTypes
 } from '../../../utils/constants/storageBrowser';
-import { Spin } from 'antd';
 import useLoadData from '../../../utils/hooks/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface StorageFilePageProps {
   onReload: () => void;
@@ -57,20 +57,19 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
 
   const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL);
 
-  const { data: fileData, loading: loadingPreview } = useLoadData<FilePreview>(
-    FILE_PREVIEW_API_URL,
-    {
-      params: {
-        path: fileStats.path
-      },
-      onSuccess: d => setFileContent(d.contents),
-      skip:
-        fileStats.path === '' ||
-        fileStats.path === undefined ||
-        fileStats?.type !== BrowserViewType.file ||
-        EDITABLE_FILE_FORMATS[fileType] === undefined
-    }
-  );
+  const {
+    data: fileData,
+    loading: loadingPreview,
+    error: errorPreview
+  } = useLoadData<FilePreview>(FILE_PREVIEW_API_URL, {
+    params: { path: fileStats.path },
+    onSuccess: d => setFileContent(d.contents),
+    skip:
+      fileStats.path === '' ||
+      fileStats.path === undefined ||
+      fileStats?.type !== BrowserViewType.file ||
+      EDITABLE_FILE_FORMATS[fileType] === undefined
+  });
 
   const fileMetaData = useMemo(() => getFileMetaData(t, fileStats), [t, fileStats]);
 
@@ -116,8 +115,19 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
     EDITABLE_FILE_FORMATS[fileType] &&
     fileData?.compression?.toLocaleLowerCase() === 'none';
 
+  const errorConfig = [
+    {
+      enabled: !!errorPreview,
+      message: t('An error occurred while fetching file content for path "{{path}}".', {
+        path: fileStats.path
+      }),
+      action: t('Retry'),
+      onClick: onReload
+    }
+  ];
+
   return (
-    <Spin spinning={loadingPreview || isSaving}>
+    <>
       <div className="hue-storage-file-page">
         <div className="meta-data">
           {fileMetaData.map((row, index) => (
@@ -132,106 +142,108 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
           ))}
         </div>
 
-        <div className="preview">
-          <div className="preview__title-bar">
-            {t('Content')}
-            <div className="preview__action-group">
-              {isEditingEnabled && (
-                <PrimaryButton
-                  data-testid="preview--edit--button"
-                  data-event=""
-                  onClick={handleEdit}
-                >
-                  {t('Edit')}
-                </PrimaryButton>
-              )}
-              {isEditing && (
-                <>
+        <LoadingErrorWrapper loading={loadingPreview || isSaving} errors={errorConfig}>
+          <div className="preview">
+            <div className="preview__title-bar">
+              {t('Content')}
+              <div className="preview__action-group">
+                {isEditingEnabled && (
                   <PrimaryButton
-                    data-testid="preview--save--button"
+                    data-testid="preview--edit--button"
                     data-event=""
-                    onClick={handleSave}
-                    disabled={fileContent === fileData?.contents}
+                    onClick={handleEdit}
                   >
-                    {t('Save')}
+                    {t('Edit')}
                   </PrimaryButton>
-                  <Button
-                    role="button"
-                    data-testid="preview--cancel--button"
-                    data-event=""
-                    onClick={handleCancel}
-                  >
-                    {t('Cancel')}
-                  </Button>
-                </>
+                )}
+                {isEditing && (
+                  <>
+                    <PrimaryButton
+                      data-testid="preview--save--button"
+                      data-event=""
+                      onClick={handleSave}
+                      disabled={fileContent === fileData?.contents}
+                    >
+                      {t('Save')}
+                    </PrimaryButton>
+                    <Button
+                      role="button"
+                      data-testid="preview--cancel--button"
+                      data-event=""
+                      onClick={handleCancel}
+                    >
+                      {t('Cancel')}
+                    </Button>
+                  </>
+                )}
+                {config?.storage_browser.enable_file_download_button && (
+                  <a href={`${DOWNLOAD_API_URL}${fileStats.path}`}>
+                    <PrimaryButton
+                      data-testid="preview--download--button"
+                      data-event=""
+                      onClick={handleDownload}
+                    >
+                      {t('Download')}
+                    </PrimaryButton>
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <div className="preview__content">
+              {fileType === SupportedFileTypes.TEXT && (
+                <textarea
+                  value={fileContent}
+                  onChange={e => setFileContent(e.target.value)}
+                  readOnly={!isEditing}
+                  className="preview__textarea"
+                />
               )}
-              {config?.storage_browser.enable_file_download_button && (
-                <a href={`${DOWNLOAD_API_URL}${fileStats.path}`}>
-                  <PrimaryButton
-                    data-testid="preview--download--button"
-                    data-event=""
-                    onClick={handleDownload}
-                  >
-                    {t('Download')}
-                  </PrimaryButton>
-                </a>
+
+              {fileType === SupportedFileTypes.IMAGE && <img src={filePreviewUrl} alt={fileName} />}
+
+              {fileType === SupportedFileTypes.DOCUMENT && (
+                <div className="preview__document">
+                  <div>
+                    <PrimaryButton
+                      data-testid=""
+                      data-event=""
+                      onClick={() => window.open(filePreviewUrl)}
+                    >
+                      {t('Preview document')}
+                    </PrimaryButton>
+                  </div>
+                  <div>{t('The Document will open in a new tab.')}</div>
+                </div>
+              )}
+
+              {fileType === SupportedFileTypes.AUDIO && (
+                <audio controls preload="auto" data-testid="preview__content__audio">
+                  <source src={filePreviewUrl} />
+                  {t('Your browser does not support the audio element.')}
+                </audio>
+              )}
+
+              {fileType === SupportedFileTypes.VIDEO && (
+                <video controls preload="auto" data-testid="preview__content__video">
+                  <source src={filePreviewUrl} />
+                  {t('Your browser does not support the video element.')}
+                </video>
+              )}
+
+              {fileType === SupportedFileTypes.OTHER && (
+                <div className="preview__unsupported">
+                  {t('Preview not available for this file. Please download the file to view.')}
+                  <br />
+                  {t(`Supported file extensions: 
+                ${Object.keys(SUPPORTED_FILE_EXTENSIONS).join(', ')}`)}
+                </div>
               )}
             </div>
           </div>
-
-          <div className="preview__content">
-            {fileType === SupportedFileTypes.TEXT && (
-              <textarea
-                value={fileContent}
-                onChange={e => setFileContent(e.target.value)}
-                readOnly={!isEditing}
-                className="preview__textarea"
-              />
-            )}
-
-            {fileType === SupportedFileTypes.IMAGE && <img src={filePreviewUrl} alt={fileName} />}
-
-            {fileType === SupportedFileTypes.DOCUMENT && (
-              <div className="preview__document">
-                <div>
-                  <PrimaryButton
-                    data-testid=""
-                    data-event=""
-                    onClick={() => window.open(filePreviewUrl)}
-                  >
-                    {t('Preview document')}
-                  </PrimaryButton>
-                </div>
-                <div>{t('The Document will open in a new tab.')}</div>
-              </div>
-            )}
-
-            {fileType === SupportedFileTypes.AUDIO && (
-              <audio controls preload="auto" data-testid="preview__content__audio">
-                <source src={filePreviewUrl} />
-                {t('Your browser does not support the audio element.')}
-              </audio>
-            )}
-
-            {fileType === SupportedFileTypes.VIDEO && (
-              <video controls preload="auto" data-testid="preview__content__video">
-                <source src={filePreviewUrl} />
-                {t('Your browser does not support the video element.')}
-              </video>
-            )}
-
-            {fileType === SupportedFileTypes.OTHER && (
-              <div className="preview__unsupported">
-                {t('Preview not available for this file. Please download the file to view.')}
-                <br />
-                {t(`Supported file extensions: 
-                ${Object.keys(SUPPORTED_FILE_EXTENSIONS).join(', ')}`)}
-              </div>
-            )}
-          </div>
-        </div>
+        </LoadingErrorWrapper>
       </div>
-    </Spin>
+    </>
   );
 };
 

@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import React, { useEffect, useState } from 'react';
-import { Spin } from 'antd';
 
 import { i18nReact } from '../../../utils/i18nReact';
 import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
@@ -29,6 +28,7 @@ import useLoadData from '../../../utils/hooks/useLoadData';
 import './StorageBrowserTab.scss';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageBrowserTabProps {
@@ -58,6 +58,7 @@ const StorageBrowserTab = ({
   const {
     data: fileStats,
     loading,
+    error,
     reloadData
   } = useLoadData<FileStats>(FILE_STATS_API_URL, {
     params: { path: filePath },
@@ -75,8 +76,25 @@ const StorageBrowserTab = ({
     }
   }, [filePath, urlPathname, urlFilePath, window.location.pathname]);
 
+  const errorConfig = [
+    {
+      enabled: error?.response?.status === 404,
+      message: t('Error: Path "{{path}}" not found.', { path: filePath }),
+      action: t('Go to home directory'),
+      onClick: () => setFilePath(homeDir)
+    },
+    {
+      enabled: !!error && error?.response?.status !== 404,
+      message: t('An error occurred while fetching filesystem "{{fileSystem}}".', {
+        fileSystem: fileSystem.toUpperCase()
+      }),
+      action: t('Retry'),
+      onClick: reloadData
+    }
+  ];
+
   return (
-    <Spin spinning={loading}>
+    <LoadingErrorWrapper loading={loading} errors={errorConfig}>
       <div className="hue-storage-browser-tab-content" data-testid={testId}>
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
           <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
@@ -96,14 +114,14 @@ const StorageBrowserTab = ({
             showIcon={false}
           />
         </div>
-        {fileStats?.type === BrowserViewType.dir && (
+        {fileStats?.type === BrowserViewType.dir && !loading && (
           <StorageDirectoryPage fileStats={fileStats} onFilePathChange={setFilePath} />
         )}
-        {fileStats?.type === BrowserViewType.file && (
+        {fileStats?.type === BrowserViewType.file && !loading && (
           <StorageFilePage fileName={fileName} fileStats={fileStats} onReload={reloadData} />
         )}
       </div>
-    </Spin>
+    </LoadingErrorWrapper>
   );
 };
 

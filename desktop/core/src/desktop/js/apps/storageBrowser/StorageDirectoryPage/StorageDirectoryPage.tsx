@@ -16,7 +16,7 @@
 
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { ColumnProps } from 'antd/lib/table';
-import { Input, Spin, Tooltip } from 'antd';
+import { Input, Tooltip } from 'antd';
 
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
@@ -49,6 +49,7 @@ import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
 import { UploadItem } from '../../../utils/hooks/useFileUpload/util';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
@@ -88,6 +89,7 @@ const StorageDirectoryPage = ({
   const {
     data: filesData,
     loading: listDirectoryLoading,
+    error: listDirectoryError,
     reloadData
   } = useLoadData<ListDirectory>(LIST_DIRECTORY_API_URL, {
     params: {
@@ -262,6 +264,15 @@ const StorageDirectoryPage = ({
     emptyText: t('Folder is empty')
   };
 
+  const errorConfig = [
+    {
+      enabled: !!listDirectoryError,
+      message: t('An error occurred while fetching the data'),
+      action: t('Retry'),
+      onClick: reloadData
+    }
+  ];
+
   return (
     <>
       <div className="hue-storage-browser__actions-bar">
@@ -291,7 +302,7 @@ const StorageDirectoryPage = ({
       </div>
 
       <DragAndDrop onDrop={onFilesDrop}>
-        <Spin spinning={loadingFiles || listDirectoryLoading}>
+        <LoadingErrorWrapper loading={loadingFiles || listDirectoryLoading} errors={errorConfig}>
           <Table
             className={className}
             columns={getColumns(tableData[0] ?? {})}
@@ -320,7 +331,7 @@ const StorageDirectoryPage = ({
               pageStats={filesData?.page}
             />
           )}
-        </Spin>
+        </LoadingErrorWrapper>
       </DragAndDrop>
       {filesToUpload.length > 0 && (
         <FileUploadQueue
