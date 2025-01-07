@@ -16,20 +16,21 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiFetchOptions, get } from '../../api/utils';
+import { AxiosError } from 'axios';
 
 export interface Options<T, U> {
   params?: U;
   fetchOptions?: ApiFetchOptions<T>;
   skip?: boolean;
   onSuccess?: (data: T) => void;
-  onError?: (error: Error) => void;
+  onError?: (error: AxiosError) => void;
   pollInterval?: number;
 }
 
 interface UseLoadDataProps<T> {
   data?: T;
   loading: boolean;
-  error?: Error;
+  error?: AxiosError;
   reloadData: () => void;
 }
 
@@ -38,13 +39,14 @@ const useLoadData = <T, U = unknown>(
   options?: Options<T, U>
 ): UseLoadDataProps<T> => {
   const [localOptions, setLocalOptions] = useState<Options<T, U> | undefined>(options);
-  const [data, setData] = useState<T | undefined>();
+  const [data, setData] = useState<T>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | undefined>();
+  const [error, setError] = useState<AxiosError>();
 
   const fetchOptionsDefault: ApiFetchOptions<T> = {
-    silenceErrors: false,
-    ignoreSuccessErrors: true
+    silenceErrors: true,
+    ignoreSuccessErrors: true,
+    isRawError: true
   };
 
   const fetchOptions = useMemo(
@@ -69,9 +71,9 @@ const useLoadData = <T, U = unknown>(
           localOptions.onSuccess(response);
         }
       } catch (error) {
-        setError(error instanceof Error ? error : new Error(error));
+        setError(error as AxiosError);
         if (localOptions?.onError) {
-          localOptions.onError(error);
+          localOptions.onError(error as AxiosError);
         }
       } finally {
         setLoading(false);
