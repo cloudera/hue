@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 @use 'mixins';
 
 $action-dropdown-width: 214px;
@@ -23,5 +24,12 @@ $action-dropdown-width: 214px;
 }
 
 .hue-file-upload-modal {
-  height: 200px;
+  .ant-modal-body {
+    cursor: pointer;
+    height: 150px;
+  }
+
+  .ant-modal-footer {
+    display: none;
+  }
 }

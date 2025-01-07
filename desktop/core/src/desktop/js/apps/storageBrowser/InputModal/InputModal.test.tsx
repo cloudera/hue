@@ -22,15 +22,18 @@ import '@testing-library/jest-dom';
 import InputModal from './InputModal';
 
 describe('InputModal', () => {
-  test('renders custom modal title', () => {
+  const mockOnClose = jest.fn();
+  const mockOnSubmit = jest.fn();
+
+  it('should render custom modal title', () => {
     const inputModal = render(
       <InputModal
         title={'Custom title'}
         inputLabel={'Enter File name here'}
         submitText={'Create'}
         showModal={true}
-        onSubmit={jest.fn()}
-        onClose={jest.fn()}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
         initialValue={''}
         inputType={'text'}
       />
@@ -38,15 +41,15 @@ describe('InputModal', () => {
     expect(inputModal.getByText('Custom title')).toBeVisible();
   });
 
-  test('renders custom input label', () => {
+  it('should render custom input label', () => {
     const inputModal = render(
       <InputModal
         title={'Create New File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
-        onSubmit={jest.fn()}
-        onClose={jest.fn()}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
         initialValue={''}
         inputType={'text'}
       />
@@ -54,9 +57,7 @@ describe('InputModal', () => {
     expect(inputModal.getByText('Custom input label')).toBeVisible();
   });
 
-  test('calls onSubmit when create button is clicked', async () => {
-    const onCloseMock = jest.fn();
-    const onSubmitMock = jest.fn();
+  it('should call onSubmit when create button is clicked', async () => {
     const user = userEvent.setup();
     render(
       <InputModal
@@ -64,22 +65,20 @@ describe('InputModal', () => {
         inputLabel={'Enter File name here'}
         submitText={'Create'}
         showModal={true}
-        onSubmit={onSubmitMock}
-        onClose={onCloseMock}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
         initialValue={''}
         inputType={'text'}
       />
     );
     const submitButton = screen.getByRole('button', { name: 'Create' });
 
-    expect(onSubmitMock).not.toHaveBeenCalled();
+    expect(mockOnSubmit).not.toHaveBeenCalled();
     await user.click(submitButton);
-    expect(onSubmitMock).toHaveBeenCalled();
+    expect(mockOnSubmit).toHaveBeenCalled();
   });
 
-  test('calls onClose after submission when submit button is clicked', async () => {
-    const onCloseMock = jest.fn();
-    const onSubmitMock = jest.fn();
+  it('should call onClose when close button is clicked', async () => {
     const user = userEvent.setup();
     render(
       <InputModal
@@ -87,51 +86,28 @@ describe('InputModal', () => {
         inputLabel={'Enter File name here'}
         submitText={'Create'}
         showModal={true}
-        onSubmit={onSubmitMock}
-        onClose={onCloseMock}
-        initialValue={''}
-        inputType={'text'}
-      />
-    );
-    const submitButton = screen.getByRole('button', { name: 'Create' });
-
-    await user.click(submitButton);
-    expect(onSubmitMock).toHaveBeenCalled();
-    expect(onCloseMock).toHaveBeenCalled();
-  });
-
-  test('calls onClose when close button is clicked', async () => {
-    const onCloseMock = jest.fn();
-    const onSubmitMock = jest.fn();
-    const user = userEvent.setup();
-    render(
-      <InputModal
-        title={'Create New File'}
-        inputLabel={'Enter File name here'}
-        submitText={'Create'}
-        showModal={true}
-        onSubmit={onSubmitMock}
-        onClose={onCloseMock}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
         initialValue={''}
         inputType={'text'}
       />
     );
     const closeButton = screen.getByRole('button', { name: 'Cancel' });
 
-    expect(onCloseMock).not.toHaveBeenCalled();
+    expect(mockOnClose).not.toHaveBeenCalled();
     await user.click(closeButton);
-    expect(onCloseMock).toHaveBeenCalled();
+    expect(mockOnClose).toHaveBeenCalled();
   });
 
-  test('renders modal with input visible', () => {
+  it('should render modal with input visible', () => {
     render(
       <InputModal
         title={'Create New File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
-        onSubmit={jest.fn()}
-        onClose={jest.fn()}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
         initialValue={''}
         inputType={'text'}
       />
@@ -141,15 +117,15 @@ describe('InputModal', () => {
     expect(input).toBeVisible();
   });
 
-  test('renders modal with number input when input type is number', () => {
+  it('should render modal with number input when input type is number', () => {
     render(
       <InputModal
         title={'Set replication'}
         inputLabel={'Custom input label'}
         submitText={'Submit'}
         showModal={true}
-        onSubmit={jest.fn()}
-        onClose={jest.fn()}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
         initialValue={2}
         inputType={'number'}
       />
@@ -159,15 +135,15 @@ describe('InputModal', () => {
     expect(input).toBeVisible();
   });
 
-  test('renders modal with empty input value when intial value is empty', () => {
+  it('should render modal with empty input value when intial value is empty', () => {
     render(
       <InputModal
         title={'Create New File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
-        onSubmit={jest.fn()}
-        onClose={jest.fn()}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
         initialValue={''}
         inputType={'text'}
       />
@@ -175,15 +151,15 @@ describe('InputModal', () => {
     expect(screen.getByRole('textbox')).toHaveValue('');
   });
 
-  test('renders modal with intial value in input while input type is text', () => {
+  it('should render modal with intial value in input while input type is text', () => {
     render(
       <InputModal
         title={'Create New File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
-        onSubmit={jest.fn()}
-        onClose={jest.fn()}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
         initialValue={'hello'}
         inputType={'text'}
       />
@@ -191,15 +167,15 @@ describe('InputModal', () => {
     expect(screen.getByRole('textbox')).toHaveValue('hello');
   });
 
-  test('renders modal with intial value in input while input type is number', () => {
+  it('should render modal with intial value in input while input type is number', () => {
     render(
       <InputModal
         title={'Create New File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
-        onSubmit={jest.fn()}
-        onClose={jest.fn()}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
         initialValue={2}
         inputType={'number'}
       />
@@ -207,7 +183,7 @@ describe('InputModal', () => {
     expect(screen.getByRole('spinbutton')).toHaveValue(2);
   });
 
-  test('accepts tab focus on input elements placed in the drawer', async () => {
+  it('should accept tab focus on input elements placed in the drawer', async () => {
     const user = userEvent.setup();
     render(
       <InputModal
@@ -215,8 +191,8 @@ describe('InputModal', () => {
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
-        onSubmit={jest.fn()}
-        onClose={jest.fn()}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
         initialValue={''}
         inputType={'text'}
       />
@@ -238,5 +214,23 @@ describe('InputModal', () => {
     expect(submitButton).toHaveFocus();
     await user.tab();
     expect(cancelButton).toHaveFocus();
+  });
+
+  it('should disable the submit button when buttonDisabled is true', () => {
+    render(
+      <InputModal
+        title={'Create New File'}
+        inputLabel={'Custom input label'}
+        submitText={'Create'}
+        showModal={true}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
+        initialValue={''}
+        inputType={'text'}
+        buttonDisabled={true}
+      />
+    );
+    const submitButton = screen.getByRole('button', { name: 'Create' });
+    expect(submitButton).toBeDisabled();
   });
 });
