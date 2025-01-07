@@ -29,6 +29,7 @@ import './StorageBrowserTab.scss';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageBrowserTabProps {
   homeDir: string;
@@ -46,7 +47,10 @@ const StorageBrowserTab = ({
   testId
 }: StorageBrowserTabProps): JSX.Element => {
   const [urlPathname, urlFilePath] = decodeURIComponent(window.location.pathname).split('view=');
-  const [filePath, setFilePath] = useState<string>(urlFilePath || homeDir);
+  const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
+  const initialFilePath = urlFileSystem === fileSystem ? urlFilePath : homeDir;
+
+  const [filePath, setFilePath] = useState<string>(initialFilePath);
   const fileName = filePath.split('/').pop() ?? '';
 
   const { t } = i18nReact.useTranslation();
