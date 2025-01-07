@@ -790,7 +790,7 @@ def compress_files_using_batch_job(request):
 
   upload_path = request.fs.netnormpath(request.POST.get('upload_path'))
   archive_name = request.POST.get('archive_name')
-  file_names = request.POST.getlist('files[]')  # TODO: Check if this param is correct? Need to improve it?
+  file_names = request.POST.getlist('file_name')
 
   if upload_path and file_names and archive_name:
     try:
