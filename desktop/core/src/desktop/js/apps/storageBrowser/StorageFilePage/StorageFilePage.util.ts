@@ -18,6 +18,10 @@ import { TFunction } from 'i18next';
 import { FileStats } from '../../../reactComponents/FileChooser/types';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import formatBytes from '../../../utils/formatBytes';
+import {
+  SUPPORTED_FILE_EXTENSIONS,
+  SupportedFileTypes
+} from '../../../utils/constants/storageBrowser';
 
 export type MetaData = {
   name: string;
@@ -53,8 +57,16 @@ export const getFileMetaData = (t: TFunction, fileStats: FileStats): MetaData[][
       {
         name: 'mtime',
         label: t('Last Modified'),
-        value: fileStats.mtime ? formatTimestamp(new Date(fileStats.mtime * 1000)) : '-'
+        value: formatTimestamp(new Date(fileStats.mtime * 1000))
       }
     ]
   ];
+};
+
+export const getFileType = (fileName: string): SupportedFileTypes => {
+  const fileExtension = fileName?.split('.')?.pop()?.toLowerCase();
+  if (!fileExtension) {
+    return SupportedFileTypes.OTHER;
+  }
+  return SUPPORTED_FILE_EXTENSIONS[fileExtension] ?? SupportedFileTypes.OTHER;
 };
