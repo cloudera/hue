@@ -586,7 +586,7 @@ Then give Hue the information about the database source:
 
 Alternative:
 
-Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](http://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
+Be sure to download the Vertica’s JDBC client driver for the right version and OS.
 
     [[[vertica]]]
     name=Vertica JDBC
@@ -988,7 +988,7 @@ Hue's filebrowser can now allow users to explore, manage, and upload data in an 
 
 Read more about it in the [S3 User Documentation](/user/browsing#s3).
 
-In order to add an S3 account to Hue, you'll need to configure Hue with valid S3 credentials, including the access key ID and secret access key: [AWSCredentials](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html)
+In order to add an S3 account to Hue, you'll need to configure Hue with valid S3 credentials, including the access key ID and secret access key.
 
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
 
