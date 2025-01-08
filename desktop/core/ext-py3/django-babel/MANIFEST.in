@@ -1,0 +1,6 @@
+include CHANGELOG.rst README.rst COPYING
+recursive-include tests *
+recursive-include docs *
+global-exclude *.pyc
+global-exclude *.pyo
+prune docs/_build
