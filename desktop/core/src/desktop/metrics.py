@@ -24,7 +24,7 @@ from builtins import range
 from datetime import datetime, timedelta
 
 from django.db import connection
-from django.db.utils import OperationalError
+from django.db.utils import DatabaseError, OperationalError
 from future import standard_library
 from prometheus_client import REGISTRY, Gauge
 
@@ -149,7 +149,7 @@ def user_count():
   users = 0
   try:
     users = User.objects.count()
-  except OperationalError as oe:
+  except (OperationalError, DatabaseError) as oe:
     LOG.debug('user_count recovering from %s' % str(oe))
     connection.close()
     connection.connect()
@@ -207,7 +207,7 @@ def num_of_queries():
       is_history=True,
       last_modified__gt=datetime.now() - timedelta(minutes=10)
     ).count()
-  except OperationalError as oe:
+  except (OperationalError, DatabaseError) as oe:
     LOG.debug('num_of_queries recovering from %s' % str(oe))
     connection.close()
     connection.connect()
