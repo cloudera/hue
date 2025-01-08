@@ -36,7 +36,8 @@ class TestTrinoApi(TestCase):
     cls.interpreter = {
       'options': {
         'url': 'https://example.com:8080'
-      }
+      },
+      'name': 'trino'
     }
     # Initialize TrinoApi with mock user and interpreter
     cls.trino_api = TrinoApi(cls.user, interpreter=cls.interpreter)
@@ -358,7 +359,8 @@ class TestTrinoApi(TestCase):
       'options': {
         'url': 'https://example.com:8080',
         'auth_password_script': 'custom_script'
-      }
+      },
+      'name': 'trino'
     }
 
     with patch('notebook.connectors.trino.coerce_password_from_script', return_value='custom_password_script'):
