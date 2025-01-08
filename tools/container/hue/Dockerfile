@@ -42,7 +42,7 @@ RUN set -eux; \
     postgresql-dev && \
     export PG_CONFIG=$(which pg_config); \
     echo "PG_CONFIG is set to $PG_CONFIG"; \
-    $HUE_BIN/python3.8 -m pip install --upgrade pip --force && \
+    $HUE_BIN/python3.9 -m pip install --upgrade pip --force && \
     $HUE_BIN/pip install psycopg2 --no-cache-dir
 
 COPY hueconf ${HUE_CONF}/conf
@@ -60,7 +60,7 @@ COPY supervisor-files/hue_celery.conf /etc/supervisor.d/
 COPY supervisor-files/hue_redis.conf /etc/supervisor.d/
 
 # Remove chardet package
-RUN rm -rf ${HUE_HOME}/build/env/lib/python3.8/site-packages/pip/_vendor/chardet
+RUN rm -rf ${HUE_HOME}/build/env/lib/python3.9/site-packages/pip/_vendor/chardet
 
 EXPOSE 8888 9111 6379
 

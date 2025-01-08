@@ -1,10 +1,10 @@
-FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-python:3.8 AS cldr-py38
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-python:3.9 AS cldr-py39
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
 # Set the environment variable
 ENV NAME="basehue"
-ENV PYTHON_VER=python3.8
+ENV PYTHON_VER=python3.9
 
 USER root
 
@@ -22,6 +22,7 @@ RUN set -eux; \
     krb5-dev \
     krb5-libs \
     libffi-dev \
+    libtool \
     libxml2-dev \
     libxslt-dev \
     make \
@@ -32,6 +33,8 @@ RUN set -eux; \
     npm \
     openjdk-8 \
     openldap-dev \
+    openssl=3.4.0-r3 \
+    openssl-dev=3.4.0-r4 \
     rsync \
     sqlite-dev \
     sudo \
@@ -44,8 +47,10 @@ RUN set -eux; \
     perl \
     nmap netcat-openbsd iftop procps net-tools bind-tools shadow
 
-# Install libtool without conflicts
-RUN apk --no-cache --force-overwrite add libtool
+# remove FIPS settings
+RUN apk del openssl-config-fipshardened
+RUN apk add openssl openssl-config
+RUN apk cache clean
 
 # Setup openssl.cnf
 RUN mkdir -p /etc/ssl
@@ -55,40 +60,6 @@ RUN chmod 755 /etc/ssl/openssl.cnf
 # Set JAVA_HOME environment variable
 ENV JAVA_HOME="/usr/lib/jvm/java-1.8-openjdk"
 ENV PATH="$JAVA_HOME/bin:$PATH"
-
-# Install openssl 3.4.0
-RUN set -eux; \
-    mkdir -p /tmp/ssl_download && cd /tmp/ssl_download && \
-    curl -O -L https://github.com/openssl/openssl/releases/download/openssl-3.4.0/openssl-3.4.0.tar.gz && \
-    tar -xzf openssl-3.4.0.tar.gz && \
-    cd openssl-3.4.0 && \
-    perl ./Configure \
-         linux-$(uname -m) \
-         --prefix=/usr \
-         --libdir=lib \
-         --openssldir=/etc/ssl \
-         enable-ktls \
-         enable-jitter \
-         shared \
-         enable-pie \
-         no-zlib \
-         no-async \
-         no-comp \
-         no-idea \
-         no-mdc2 \
-         no-rc5 \
-         no-ec2m \
-         no-sm2 \
-         no-sm4 \
-         no-ssl3 \
-         no-seed \
-         no-docs \
-         no-weak-ssl-ciphers \
-         -Wa,--noexecstack && \
-      perl configdata.pm --dump && \
-      make -j$(nproc) && \
-      make install && \
-      rm -f /etc/ssl/openssl.cnf /etc/ssl/openssl.cnf.dist /etc/ssl/ct_log_list.cnf /etc/ssl/ct_log_list.cnf.dist
 
 # Install xmlsec
 RUN set -eux; \
