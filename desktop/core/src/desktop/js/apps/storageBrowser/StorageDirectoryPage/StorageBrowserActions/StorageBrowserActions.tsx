@@ -27,6 +27,7 @@ import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon
 import DataMovementIcon from '@cloudera/cuix-core/icons/react/DataMovementIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 import CollapseIcon from '@cloudera/cuix-core/icons/react/CollapseViewIcon';
+import ExpandIcon from '@cloudera/cuix-core/icons/react/ExpandViewIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
@@ -42,6 +43,7 @@ import ReplicationAction from './Replication/Replication';
 import ViewSummary from './ViewSummary/ViewSummary';
 import DeleteAction from './Delete/Delete';
 import CompressAction from './Compress/Compress';
+import ExtractAction from './Extract/Extract';
 
 interface StorageBrowserRowActionsProps {
   isTrashEnabled?: boolean;
@@ -58,7 +60,8 @@ const iconsMap: Record<ActionType, JSX.Element> = {
   [ActionType.Replication]: <DuplicateIcon />,
   [ActionType.Delete]: <DeleteIcon />,
   [ActionType.Summary]: <SummaryIcon />,
-  [ActionType.Compress]: <CollapseIcon />
+  [ActionType.Compress]: <CollapseIcon />,
+  [ActionType.Extract]: <ExpandIcon />
 };
 
 const StorageBrowserActions = ({
@@ -157,6 +160,16 @@ const StorageBrowserActions = ({
         <CompressAction
           currentPath={currentPath}
           files={selectedFiles}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.Extract && (
+        <ExtractAction
+          currentPath={currentPath}
+          file={selectedFiles[0]}
           onSuccess={onApiSuccess}
           onError={onApiError}
           onClose={closeModal}
