@@ -696,7 +696,7 @@ List of 900+ Commits
 * dc2febd HUE-3287 [core] Django 1.11 upgrade  - To upgrade Django 1.11, following changes are needed:
 * 7e419c2 HUE-3287 [core] Django 1.11 upgrade  - Adding PyYAML-3.12 colorama-0.3.2 docutils-0.14 nose-1.3.7 openpyxl-2.5.3 repoze.who-2.3 wheel-0.31.0 zope.interface-4.5.0 python modules
 * 386b2b7 HUE-3287 [core] Django 1.11 upgrade  - Fixing navigator error
-* a96e334 HUE-3287 [core] Django 1.11 upgrade  - fixing django-openid-auth-0.14/django_openid_auth/models.py from registering BLOB (Large object) with 2048 char length see https://stackoverflow.com/questions/44358506/sql-error-1170
+* a96e334 HUE-3287 [core] Django 1.11 upgrade  - fixing django-openid-auth-0.14/django_openid_auth/models.py from registering BLOB (Large object) with 2048 char length
 * 64ff0d2 HUE-3287 [core] Django 1.11 upgrade  - Reverting to requests-kerberos-0.6.1
 * 5ad587f HUE-3287 [core] Django 1.11 upgrade  - Upgrading following modules: - avro-1.8.2 - backports.csv-1.0.5 - configobj-5.0.6 - cryptography-2.1.4 - defusedxml-0.5.0 - django-openid-auth-0.14 - djangosaml2-0.16.11 - elementtree-1.2.6-20050316 - enum34-1.1.6
 * 3186126 HUE-3287 [core] Django 1.11 upgrade  - Fixing Hue Port :8888 and :8889 access issue
