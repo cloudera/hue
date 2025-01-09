@@ -20,7 +20,7 @@ Continue to the [next sections](/administrator/installation/dependencies/) for d
 You can also find distributions of Hue via these companies:
 
 * [Cloudera Data Platform - Hue](https://www.cloudera.com/products/cloudera-data-platform.html)
-* [Amazon AWS EMR - Hue](https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-hue.html)
+* Amazon AWS EMR - Hue
 * [Google Cloud Dataproc - Hue](https://github.com/GoogleCloudPlatform/dataproc-initialization-actions/tree/master/hue)
 * [Azure HDInsight - Hue](https://docs.microsoft.com/en-us/azure/hdinsight/hdinsight-hadoop-hue-linux)
 * Open Data Hub - Data Catalog
