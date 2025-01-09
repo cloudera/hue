@@ -651,7 +651,7 @@ class Compute(models.Model):
       default='sqlalchemy'
   )
   namespace = models.ForeignKey(Namespace, on_delete=models.CASCADE, null=True)
-  is_ready = models.BooleanField(default=True)
+  is_ready = models.BooleanField(default=True, null=True)
   external_id = models.CharField(max_length=255, null=True, db_index=True)
   ldap_groups_json = models.TextField(default='[]')
   settings = models.TextField(default='{}')
