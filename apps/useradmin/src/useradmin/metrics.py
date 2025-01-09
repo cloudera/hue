@@ -18,7 +18,7 @@ import logging
 from datetime import datetime, timedelta
 
 from django.db import connection
-from django.db.utils import OperationalError
+from django.db.utils import DatabaseError, OperationalError
 from prometheus_client import Gauge
 
 from desktop.lib.metrics import global_registry
@@ -35,7 +35,7 @@ def active_users():
         first_login=False,
         hostname__isnull=False
     ).count()
-  except OperationalError as oe:
+  except (OperationalError, DatabaseError) as oe:
     LOG.debug('active_users recovering from %s' % str(oe))
     connection.close()
     connection.connect()
@@ -67,7 +67,7 @@ def active_users_per_instance():
   try:
     count = UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1),
                                        hostname=get_localhost_name()).count()
-  except OperationalError as oe:
+  except (OperationalError, DatabaseError) as oe:
     LOG.debug('active_users_per_instance recovering from %s' % str(oe))
     connection.close()
     connection.connect()
