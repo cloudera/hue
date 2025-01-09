@@ -175,8 +175,6 @@ Currently just substitute 'presto' with 'trino' or vice versa.
 
 ### Trino
 
-Fork of PrestoSQL (hence still having 'presto' name in several parameters).
-
 Install at least the 0.6.2 version of pyhive from https://github.com/gethue/PyHive or https://github.com/dropbox/PyHive
 
     ./build/env/bin/pip install pyhive
@@ -1008,7 +1006,7 @@ Hue's filebrowser can now allow users to explore, manage, and upload data in an 
 
 Read more about it in the [S3 User Documentation](/user/browsing#s3).
 
-In order to add an S3 account to Hue, you'll need to configure Hue with valid S3 credentials, including the access key ID and secret access key: [AWSCredentials](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html)
+In order to add an S3 account to Hue, you'll need to configure Hue with valid S3 credentials, including the access key ID and secret access key: [AWSCredentials](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html)
 
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
 

@@ -43,11 +43,13 @@ if [ "$?" -eq "0" ];
 
     muffet http://localhost:1313/ \
         --exclude "https://issues.cloudera.org*|http://localhost:8005|http://localhost:5555*|https://issues.apache.org/jira*|https://github.com*\
-          |http://demo.gethue.com*|https://twitter.com/gethue|https://github.com*|https://cdn.gethue.com/downloads/*|https://pypi.org*" \
+          |http://demo.gethue.com*|https://twitter.com/gethue|https://github.com*|https://cdn.gethue.com/downloads/*|https://pypi.org*\
+          |https://stackoverflow.com/questions/*|https://cdn.gethue.com/uploads/2021/02/peek-log-streams.gif\
+          |http://my.vertica.com/download/*|https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html\
+          |https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-hue.html" \
         --ignore-fragments \
         --timeout 15 \
-        --buffer-size 8192 \
-        --concurrency 10
+        --buffer-size 8192
     LINT_EXIT_CODE=$?
 
     kill $HUGO_PID
