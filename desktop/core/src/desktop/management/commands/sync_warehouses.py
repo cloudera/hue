@@ -170,12 +170,10 @@ def populate_impala(namespace, impala):
   catalogd_dep = next((d for d in deployments if d.metadata.labels['app'] == 'catalogd'), None)
   catalogd_stfs = next((s for s in stfs if s.metadata.labels['app'] == 'catalogd'), None)
   statestore_dep = next((d for d in deployments if d.metadata.labels['app'] == 'statestored'), None)
-  admissiond_dep = next((d for d in deployments if d.metadata.labels['app'] == 'admissiond'), None)
 
   impala['is_ready'] = bool(((catalogd_dep and catalogd_dep.status.ready_replicas) or (
         catalogd_stfs and catalogd_stfs.status.ready_replicas))
-                     and (statestore_dep and statestore_dep.status.ready_replicas)
-                     and (admissiond_dep and admissiond_dep.status.ready_replicas))
+                     and (statestore_dep and statestore_dep.status.ready_replicas))
 
   if not impala['is_ready']:
     LOG.info("Impala %s not ready" % namespace)
@@ -187,12 +185,12 @@ def populate_impala(namespace, impala):
     update_impala_configs(namespace, impala, 'impala-proxy.%s.svc.cluster.local' % namespace)
   else:
     coordinator = next((s for s in stfs if s.metadata.labels['app'] == 'coordinator'), None)
-    impala['is_ready'] = impala['is_ready'] and (coordinator and coordinator.status.ready_replicas)
+    impala['is_ready'] = bool(impala['is_ready'] and (coordinator and coordinator.status.ready_replicas))
 
     hs2_stfs = next((s for s in stfs if s.metadata.labels['app'] == 'hiveserver2'), None)
     if hs2_stfs:
       # Impala is running with UA
-      impala['is_ready'] = impala['is_ready'] and hs2_stfs.status.ready_replicas
+      impala['is_ready'] = bool(impala['is_ready'] and hs2_stfs.status.ready_replicas)
       update_hive_configs(namespace, impala, 'hiveserver2-service.%s.svc.cluster.local' % namespace)
     else:
       # Impala is not running with UA
