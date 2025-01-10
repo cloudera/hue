@@ -272,7 +272,7 @@ const StorageDirectoryPage = ({
           onChange={event => {
             handleSearch(event.target.value);
           }}
-          disabled={!tableData.length}
+          disabled={!tableData.length && !searchTerm.length}
         />
         <div className="hue-storage-browser__actions-bar-right">
           <StorageBrowserActions
