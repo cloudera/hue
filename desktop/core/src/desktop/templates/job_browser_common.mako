@@ -2401,7 +2401,7 @@
             <tbody data-bind="foreach: properties['actions']">
             <tr>
               <td>
-                <a data-bind="hueLink: '/jobbrowser/jobs/' + ko.unwrap(externalId), clickBubble: false">
+                <a data-bind="hueLink: '/jobbrowser/jobs/#!id=' + ko.unwrap(externalId), clickBubble: false">
                   <i class="fa fa-tasks"></i>
                 </a>
               </td>
