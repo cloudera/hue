@@ -207,6 +207,7 @@ def download(request):
 
   return response
 
+
 def _massage_page(page, paginator):
   return {
       'page_number': page.number,
@@ -214,6 +215,7 @@ def _massage_page(page, paginator):
       'total_pages': paginator.num_pages,
       'total_size': paginator.count
   }
+
 
 @api_error_handler
 def listdir_paged(request):
