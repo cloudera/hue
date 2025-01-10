@@ -35,6 +35,8 @@ import {
   UploadChunkItem,
   UploadItem
 } from './util';
+import { get } from '../../../api/utils';
+import { UPLOAD_AVAILABLE_SPACE_URL } from '../../../reactComponents/FileChooser/api';
 
 interface UseUploadQueueResponse {
   addFiles: (item: UploadItem[]) => void;
@@ -134,7 +136,20 @@ const useChunkUpload = ({
     });
   };
 
+  const checkAvailableSpace = async (fileSize: number) => {
+    const { upload_available_space: availableSpace } = await get<{
+      upload_available_space: number;
+    }>(UPLOAD_AVAILABLE_SPACE_URL);
+    return availableSpace >= fileSize;
+  };
+
   const uploadItem = async (item: UploadItem) => {
+    const isSpaceAvailable = await checkAvailableSpace(item.file.size);
+    if (!isSpaceAvailable) {
+      onStatusUpdate(item, FileUploadStatus.Failed);
+      return Promise.resolve();
+    }
+
     onStatusUpdate(item, FileUploadStatus.Uploading);
     const chunks = getTotalChunk(item.file.size, chunkSize);
     if (chunks === 1) {
