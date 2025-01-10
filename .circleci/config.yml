@@ -29,7 +29,7 @@ commands:
 
             export PYTHON_VER=python3.8
             export ROOT=$PWD
-            make apps
+            make test_prep
 
       - run:
           name: run documentation lints
