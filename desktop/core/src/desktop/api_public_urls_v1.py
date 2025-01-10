@@ -92,7 +92,6 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='storage_view'),
   re_path(
     r'^taskserver/upload/available_space/?$',
     api_public.taskserver_get_available_space_for_upload,
@@ -126,7 +125,7 @@ urlpatterns += [
   re_path(
     r'^storage/extract_archive/?$', api_public.storage_extract_archive_using_batch_job, name='storage_extract_archive_using_batch_job'
   ),
-  re_path(r'^storage/compress_files/?$', api_public.storage_compress_files_using_batch_job, name='storage_compress_files_using_batch_job'),
+  re_path(r'^storage/compress/?$', api_public.storage_compress_files_using_batch_job, name='storage_compress_files_using_batch_job'),
   re_path(r'^storage/move/bulk/?$', api_public.storage_bulk_move, name='storage_bulk_move'),
   re_path(r'^storage/copy/bulk/?$', api_public.storage_bulk_copy, name='storage_bulk_copy'),
   re_path(r'^storage/delete/bulk/?$', api_public.storage_bulk_rmtree, name='storage_bulk_rmtree'),

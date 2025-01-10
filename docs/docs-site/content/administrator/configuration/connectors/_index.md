@@ -175,49 +175,29 @@ Currently just substitute 'presto' with 'trino' or vice versa.
 
 ### Trino
 
-Fork of PrestoSQL (hence still having 'presto' name in several parameters).
+To support Trino in Hue, we're leveraging the official [Trino Python client](https://github.com/trinodb/trino-python-client)
 
-Install at least the 0.6.2 version of pyhive from https://github.com/gethue/PyHive or https://github.com/dropbox/PyHive
+Install at least the 0.329.0 version of trino from https://github.com/trinodb/trino-python-client or https://pypi.org/project/trino/
 
-    ./build/env/bin/pip install pyhive
+    ./build/env/bin/pip install trino
 
-Then give Hue the information about the database source following the `trino://{trino-coordinator}:{port}/{catalog}/{schema}` format:
+Then give Hue the information about the trino cluster:
 
-    [[[presto]]]
-    name = Trino
-    interface=sqlalchemy
-    options='{"url": "trino://localhost:8080/tpch/default"}'
-
-**Note**: keep `[[[presto]]]` if not using the [connectors](/administrator/configuration/connectors/#connectors).
-
-With impersonation:
-
-    options='{"url": "trino://localhost:8080/tpch/default", "has_impersonation": true}'
-
-With Kerberos:
-
-    options='{"url": "trino://localhost:8080/tpch/default?KerberosKeytabPath=/path/to/keytab&KerberosPrincipal=principal&KerberosRemoteServiceName=service&protocol=https"'
+    [[[trino]]]
+    name=Trino
+    interface=trino
+    options='{"url": "http://localhost:8080"}'
 
 With credentials:
 
-    options='{"url": "trino://username:password@localhost:8080/tpch/default"}'
+    options='{"url": "http://localhost:8080",  "auth_username": "", "auth_password":""}'
 
-With LDAPS enabled over HTTPS:
+With password script:
 
-    options='{"url": "trino://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\"}"}'
-
-Pass Trino Session properties along with HTTPS:
-
-    options='{"url": "trino://username:password@localhost:8443/tpch/default","connect_args":"{\"protocol\": \"https\", \"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
-
-Pass Trino Session Properties without HTTPS enabled:
-
-    options='{"url": "trino://username:password@localhost:8080/tpch/default","connect_args":"{\"session_props\": {\"query_max_run_time\": \"1m\"}}"}'
+    options='{"url": "http://localhost:8080",  "auth_username": "", "auth_password_script":""}'
 
 **Note**
-In the past Hue did not use trino specific dialect of SQLAlchemy which may lead to a *catalog must be specified* error. This can be solved by setting `protocol.v1.alternate-header-name=Presto` in the Trino's configuration. More details about his can be found at [Migrating from PrestoSQL to Trino](https://trino.io/blog/2021/01/04/migrating-from-prestosql-to-trino.html)
-
-Also give a try to  https://github.com/dungdm93/sqlalchemy-trino for the 'trino://' and avoiding the [old protocol issue](https://github.com/dropbox/PyHive/issues/378).
+Currently, only [basic LDAP authentication](https://github.com/trinodb/trino-python-client?tab=readme-ov-file#basic-authentication) using username and password or password script is supported. Alternatively, you can establish unsecured Trino connections.
 
 
 ### Oracle
@@ -606,7 +586,7 @@ Then give Hue the information about the database source:
 
 Alternative:
 
-Vertica’s JDBC client drivers can be downloaded here: [Vertica JDBC Client Drivers](http://my.vertica.com/download/vertica/client-drivers/). Be sure to download the driver for the right version and OS.
+Be sure to download the Vertica’s JDBC client driver for the right version and OS.
 
     [[[vertica]]]
     name=Vertica JDBC
@@ -1008,7 +988,7 @@ Hue's filebrowser can now allow users to explore, manage, and upload data in an 
 
 Read more about it in the [S3 User Documentation](/user/browsing#s3).
 
-In order to add an S3 account to Hue, you'll need to configure Hue with valid S3 credentials, including the access key ID and secret access key: [AWSCredentials](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html)
+In order to add an S3 account to Hue, you'll need to configure Hue with valid S3 credentials, including the access key ID and secret access key.
 
 These keys can securely stored in a script that outputs the actual access key and secret key to stdout to be read by Hue (this is similar to how Hue reads password scripts). In order to use script files, add the following section to your hue.ini configuration file:
 

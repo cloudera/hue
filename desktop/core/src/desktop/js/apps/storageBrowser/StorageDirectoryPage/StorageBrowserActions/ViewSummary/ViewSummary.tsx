@@ -18,30 +18,33 @@ import React from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Spin } from 'antd';
 
-import huePubSub from '../../../../utils/huePubSub';
-import { i18nReact } from '../../../../utils/i18nReact';
-import formatBytes from '../../../../utils/formatBytes';
-import useLoadData from '../../../../utils/hooks/useLoadData';
-import { CONTENT_SUMMARY_API_URL } from '../../../../reactComponents/FileChooser/api';
-import { ContentSummary } from '../../../../reactComponents/FileChooser/types';
+import huePubSub from '../../../../../utils/huePubSub';
+import { i18nReact } from '../../../../../utils/i18nReact';
+import formatBytes from '../../../../../utils/formatBytes';
+import useLoadData from '../../../../../utils/hooks/useLoadData';
+import { CONTENT_SUMMARY_API_URL } from '../../../../../reactComponents/FileChooser/api';
+import {
+  ContentSummary,
+  StorageDirectoryTableData
+} from '../../../../../reactComponents/FileChooser/types';
 
-import './SummaryModal.scss';
+import './ViewSummary.scss';
 
-interface SummaryModalProps {
-  path: string;
-  showModal: boolean;
+interface ViewSummaryProps {
+  path: StorageDirectoryTableData['path'];
+  isOpen?: boolean;
   onClose: () => void;
 }
 
-const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Element => {
+const ViewSummary = ({ isOpen = true, onClose, path }: ViewSummaryProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const { data: responseSummary, loading } = useLoadData<ContentSummary>(CONTENT_SUMMARY_API_URL, {
-    params: { path },
+    params: { path: path },
     onError: error => {
       huePubSub.publish('hue.error', error);
     },
-    skip: path === '' || path === undefined || !showModal
+    skip: path === '' || path === undefined
   });
 
   const summary = [
@@ -75,14 +78,16 @@ const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Elem
     { key: 'numberOfFiles', label: t('Number of Files'), value: responseSummary?.fileCount }
   ];
 
-  //TODO:Handle long modal title
+  const shortendPath =
+    path.split('/').length > 4 ? '...' + path.split('/').slice(-4).join('/') : path;
+
   return (
     <Modal
       className="hue-summary-modal cuix antd"
       okText={t('Close')}
       onOk={onClose}
-      open={showModal}
-      title={t('Summary for ') + path}
+      open={isOpen}
+      title={t('Summary for ') + shortendPath}
       cancellable={false}
       onCancel={onClose}
     >
@@ -100,4 +105,4 @@ const SummaryModal = ({ showModal, onClose, path }: SummaryModalProps): JSX.Elem
   );
 };
 
-export default SummaryModal;
+export default ViewSummary;

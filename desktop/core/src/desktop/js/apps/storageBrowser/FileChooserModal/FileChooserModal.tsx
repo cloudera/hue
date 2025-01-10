@@ -27,7 +27,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 import useDebounce from '../../../utils/useDebounce';
 import useLoadData from '../../../utils/hooks/useLoadData';
 
-import { ListDirectory } from '../../../reactComponents/FileChooser/types';
+import { BrowserViewType, ListDirectory } from '../../../reactComponents/FileChooser/types';
 import { LIST_DIRECTORY_API_URL } from '../../../reactComponents/FileChooser/api';
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 
@@ -105,7 +105,7 @@ const FileChooserModal = ({
         column.render = (_, record: FileChooserTableData) => (
           <Tooltip title={record.name} mouseEnterDelay={1.5}>
             <span className="hue-filechooser-modal__table-cell-icon">
-              {record.type === 'dir' ? <FolderIcon /> : <FileIcon />}
+              {record.type === BrowserViewType.dir ? <FolderIcon /> : <FileIcon />}
             </span>
             <span className="hue-filechooser-modal__table-cell-name">{record.name}</span>
           </Tooltip>
@@ -119,7 +119,7 @@ const FileChooserModal = ({
   const onRowClicked = (record: FileChooserTableData) => {
     return {
       onClick: () => {
-        if (record.type === 'dir') {
+        if (record.type === BrowserViewType.dir) {
           setDestPath(record.path);
         }
       }
@@ -168,10 +168,10 @@ const FileChooserModal = ({
             dataSource={tableData}
             pagination={false}
             columns={getColumns(tableData[0] ?? {})}
-            rowKey={(record, index) => record.path + index}
+            rowKey={r => `${r.path}__${r.type}__${r.name}`}
             scroll={{ y: '250px' }}
             rowClassName={record =>
-              record.type === 'file'
+              record.type === BrowserViewType.file
                 ? classNames('hue-filechooser-modal__table-row', 'disabled-row')
                 : 'hue-filechooser-modal__table-row'
             }
