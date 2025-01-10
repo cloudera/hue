@@ -43,7 +43,11 @@ import formatBytes from '../../../utils/formatBytes';
 import './StorageDirectoryPage.scss';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import useLoadData from '../../../utils/hooks/useLoadData';
-import { DEFAULT_PAGE_SIZE, FileUploadStatus } from '../../../utils/constants/storageBrowser';
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_POOLING_TIME,
+  FileUploadStatus
+} from '../../../utils/constants/storageBrowser';
 import CreateAndUploadAction from './CreateAndUploadAction/CreateAndUploadAction';
 import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
@@ -77,6 +81,7 @@ const StorageDirectoryPage = ({
   const [tableHeight, setTableHeight] = useState<number>(100);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
   const [filesToUpload, setFilesToUpload] = useState<UploadItem[]>([]);
+  const [pooling, setPooling] = useState<boolean>(false);
 
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -106,7 +111,8 @@ const StorageDirectoryPage = ({
       fileStats.type !== BrowserViewType.dir,
     onSuccess: () => {
       setSelectedFiles([]);
-    }
+    },
+    pollInterval: pooling ? DEFAULT_POOLING_TIME : undefined
   });
 
   const tableData: StorageDirectoryTableData[] = useMemo(() => {
@@ -234,6 +240,7 @@ const StorageDirectoryPage = ({
         status: FileUploadStatus.Pending
       };
     });
+    setPooling(true);
     setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
   };
 
@@ -302,7 +309,10 @@ const StorageDirectoryPage = ({
       </div>
 
       <DragAndDrop onDrop={onFilesDrop}>
-        <LoadingErrorWrapper loading={loadingFiles || listDirectoryLoading} errors={errorConfig}>
+        <LoadingErrorWrapper
+          loading={(loadingFiles || listDirectoryLoading) && !pooling}
+          errors={errorConfig}
+        >
           <Table
             className={className}
             columns={getColumns(tableData[0] ?? {})}
@@ -312,11 +322,13 @@ const StorageDirectoryPage = ({
             rowClassName={rowClassName}
             rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
             rowSelection={{
+              hideSelectAll: !tableData.length,
+              columnWidth: 36,
               type: 'checkbox',
               ...rowSelection
             }}
             scroll={{ y: tableHeight }}
-            data-testid={`${testId}`}
+            data-testid={testId}
             locale={locale}
             {...restProps}
           />
@@ -337,7 +349,10 @@ const StorageDirectoryPage = ({
         <FileUploadQueue
           filesQueue={filesToUpload}
           onClose={() => setFilesToUpload([])}
-          onComplete={reloadData}
+          onComplete={() => {
+            reloadData();
+            setPooling(false);
+          }}
         />
       )}
     </>
