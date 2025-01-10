@@ -96,7 +96,7 @@ default:
 	@echo '  clean       : Remove desktop build products'
 	@echo '  distclean   : Remove desktop and thirdparty build products'
 # <<<< DEV ONLY
-	@echo '  doc 	       : Build documentation'
+	@echo '  doc 	      : Build documentation'
 	@echo '  prod        : Generate a tar file for production distribution'
 	@echo '  locales     : Extract strings and update dictionary of each locale'
 	@echo '  ace         : Builds the Ace Editor tool'
@@ -107,6 +107,13 @@ all: default
 
 # <<<< DEV ONLY
 include Makefile.tarball
+
+###################################
+# Build docs (unused)
+###################################
+.PHONY: test_prep
+test_prep: apps
+	@$(ENV_PIP) install -r $(REQUIREMENT_TEST_FILE)
 
 ###################################
 # Build docs (unused)
