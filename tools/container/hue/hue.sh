@@ -141,7 +141,10 @@ function start_celery() {
 
 function start_redis() {
   echo "Starting Redis server..."
-  redis-server --port 6379 --daemonize no
+  redis-server \
+    --port 6379 \
+    --daemonize no \
+    --dir $HUE_RUN_DIR
 }
 
 # If database connectivity is not set then fail
