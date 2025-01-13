@@ -344,7 +344,7 @@ def display(request):
     return HttpResponse(f'Cannot request chunks greater than {MAX_CHUNK_SIZE_BYTES} bytes.', status=400)
 
   # Read out based on meta.
-  compression, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
+  _, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
 
   # Get contents as string for text mode, or at least try
   file_contents = None
@@ -364,7 +364,6 @@ def display(request):
     'length': length,
     'end': offset + len(contents),
     'mode': mode,
-    'compression': compression,
   }
 
   return JsonResponse(data)
