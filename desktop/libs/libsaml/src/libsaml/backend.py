@@ -27,6 +27,7 @@ from django.contrib.auth import logout as auth_logout
 from django.http import HttpResponse
 from djangosaml2.backends import Saml2Backend as _Saml2Backend
 from djangosaml2.views import logout as saml_logout
+from desktop.lib.django_util import nonce_attribute
 from libsaml import conf
 from libsaml import metrics
 
@@ -124,9 +125,12 @@ class SAML2Backend(_Saml2Backend):
     elif conf.CDP_LOGOUT_URL.get():
       auth_logout(request)
       redirect_url = conf.get_logout_redirect_url()
-      html = '<html><body onload="document.forms[0].submit()">' \
-             '<form action="%s" method="POST"><input name="logoutRedirect" type="hidden" value="%s"/></form>' \
-             '</body></html>' % (conf.CDP_LOGOUT_URL.get(), redirect_url)
+
+      html = '<html><body>' \
+            '<form action="%s" method="POST">' \
+            '<input name="logoutRedirect" type="hidden" value="%s">%s</form>' \
+            '<script%s>document.addEventListener("DOMContentLoaded", function() { document.forms[0].submit(); });</script>' \
+            '</body></html>' % (conf.CDP_LOGOUT_URL.get(), redirect_url, nonce_attribute(request))
       return HttpResponse(html)
     else:
       return None
