@@ -17,9 +17,8 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ExtractAction from './Extract';
+import ExtractAction from './ExtractionModal';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
-import { EXTRACT_API_URL } from '../../../../../reactComponents/FileChooser/api';
 
 const mockFile: StorageDirectoryTableData = {
   name: 'archive.zip',
@@ -72,7 +71,7 @@ describe('ExtractAction Component', () => {
     expect(getByRole('button', { name: 'Extract' })).toBeInTheDocument();
   });
 
-  it('should call handleExtract with the correct data when "Extract" is clicked', async () => {
+  it('should call handleExtract with the correct path and name when "Extract" is clicked', async () => {
     const { getByText } = render(
       <ExtractAction
         isOpen={true}
@@ -85,13 +84,12 @@ describe('ExtractAction Component', () => {
       />
     );
 
-    const formData = new FormData();
-    formData.append('upload_path', 'test/path');
-    formData.append('archive_name', mockFile.name);
-
     fireEvent.click(getByText('Extract'));
 
-    expect(mockSave).toHaveBeenCalledWith(formData, { url: EXTRACT_API_URL });
+    expect(mockSave).toHaveBeenCalledWith({
+      upload_path: 'test/path',
+      archive_name: mockFile.name
+    });
   });
 
   it('should call onSuccess when the extract request is successful', async () => {

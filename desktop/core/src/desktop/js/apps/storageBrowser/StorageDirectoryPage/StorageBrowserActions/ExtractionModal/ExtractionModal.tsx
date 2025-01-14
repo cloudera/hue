@@ -31,7 +31,7 @@ interface ExtractActionProps {
   onClose: () => void;
 }
 
-const ExtractAction = ({
+const ExtractionModal = ({
   currentPath,
   isOpen = true,
   file,
@@ -42,13 +42,7 @@ const ExtractAction = ({
 }: ExtractActionProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { save: saveForm, loading } = useSaveData(undefined, {
-    postOptions: {
-      qsEncodeData: false,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    },
+  const { save, loading } = useSaveData(EXTRACT_API_URL, {
     skip: !file,
     onSuccess,
     onError
@@ -57,11 +51,10 @@ const ExtractAction = ({
   const handleExtract = () => {
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append('upload_path', currentPath);
-    formData.append('archive_name', file.name);
-
-    saveForm(formData, { url: EXTRACT_API_URL });
+    save({
+      upload_path: currentPath,
+      archive_name: file.name
+    });
   };
 
   return (
@@ -70,7 +63,7 @@ const ExtractAction = ({
       className="cuix antd"
       okText={t('Extract')}
       onCancel={onClose}
-      onOk={() => handleExtract()}
+      onOk={handleExtract}
       open={isOpen}
       title={t('Extract Archive')}
       okButtonProps={{ disabled: loading }}
@@ -81,4 +74,4 @@ const ExtractAction = ({
   );
 };
 
-export default ExtractAction;
+export default ExtractionModal;
