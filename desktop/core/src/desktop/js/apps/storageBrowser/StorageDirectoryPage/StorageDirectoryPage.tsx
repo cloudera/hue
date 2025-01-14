@@ -45,7 +45,7 @@ import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import useLoadData from '../../../utils/hooks/useLoadData';
 import {
   DEFAULT_PAGE_SIZE,
-  DEFAULT_POOLING_TIME,
+  DEFAULT_POLLING_TIME,
   FileUploadStatus
 } from '../../../utils/constants/storageBrowser';
 import CreateAndUploadAction from './CreateAndUploadAction/CreateAndUploadAction';
@@ -81,7 +81,7 @@ const StorageDirectoryPage = ({
   const [tableHeight, setTableHeight] = useState<number>(100);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
   const [filesToUpload, setFilesToUpload] = useState<UploadItem[]>([]);
-  const [pooling, setPooling] = useState<boolean>(false);
+  const [polling, setPolling] = useState<boolean>(false);
 
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -112,7 +112,7 @@ const StorageDirectoryPage = ({
     onSuccess: () => {
       setSelectedFiles([]);
     },
-    pollInterval: pooling ? DEFAULT_POOLING_TIME : undefined
+    pollInterval: polling ? DEFAULT_POLLING_TIME : undefined
   });
 
   const tableData: StorageDirectoryTableData[] = useMemo(() => {
@@ -240,7 +240,7 @@ const StorageDirectoryPage = ({
         status: FileUploadStatus.Pending
       };
     });
-    setPooling(true);
+    setPolling(true);
     setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
   };
 
@@ -310,7 +310,7 @@ const StorageDirectoryPage = ({
 
       <DragAndDrop onDrop={onFilesDrop}>
         <LoadingErrorWrapper
-          loading={(loadingFiles || listDirectoryLoading) && !pooling}
+          loading={(loadingFiles || listDirectoryLoading) && !polling}
           errors={errorConfig}
         >
           <Table
@@ -351,7 +351,7 @@ const StorageDirectoryPage = ({
           onClose={() => setFilesToUpload([])}
           onComplete={() => {
             reloadData();
-            setPooling(false);
+            setPolling(false);
           }}
         />
       )}
