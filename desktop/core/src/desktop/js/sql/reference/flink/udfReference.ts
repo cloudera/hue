@@ -17,6 +17,8 @@
 import { UdfCategory, UdfCategoryFunctions } from 'sql/reference/types';
 import I18n from 'utils/i18n';
 
+// TODO: add more UDFs
+
 const AGGREGATE_FUNCTIONS: UdfCategoryFunctions = {
   avg: {
     name: 'avg',
@@ -102,7 +104,35 @@ const AGGREGATE_FUNCTIONS: UdfCategoryFunctions = {
     description: 'Returns the unbiased sample variance of a numeric column in the group.'
   }
 };
+
 const STRING_FUNCTIONS: UdfCategoryFunctions = {
+  char_length: {
+    name: 'char_length',
+    returnTypes: ['INTEGER'],
+    arguments: [[{ type: 'STRING' }]],
+    signature: 'char_length(STRING value)',
+    draggable: 'char_length()',
+    description:
+      "Returns the number of characters in STRING."
+  },
+  character_length: {
+    name: 'character_length',
+    returnTypes: ['INTEGER'],
+    arguments: [[{ type: 'STRING' }]],
+    signature: 'character_length(STRING value)',
+    draggable: 'character_length()',
+    description:
+      "Returns the number of characters in STRING."
+  },
+  lower: {
+    name: 'lower',
+    returnTypes: ['STRING'],
+    arguments: [[{ type: 'STRING' }]],
+    signature: 'lower(STRING value)',
+    draggable: 'lower()',
+    description:
+      "Returns string in lowercase."
+  },
   regexp_extract: {
     name: 'regexp_extract',
     returnTypes: ['STRING'],
@@ -111,8 +141,18 @@ const STRING_FUNCTIONS: UdfCategoryFunctions = {
     draggable: 'regexp_extract()',
     description:
       "Returns the string extracted using the pattern. For example, regexp_extract('foothebar', 'foo(.*?)(bar)', 2) returns 'bar.' Note that some care is necessary in using predefined character classes: using '\\s' as the second argument will match the letter s; '\\\\s' is necessary to match whitespace, etc. The 'index' parameter is the Java regex Matcher group() method index."
+  },
+  upper: {
+    name: 'upper',
+    returnTypes: ['STRING'],
+    arguments: [[{ type: 'STRING' }]],
+    signature: 'upper(STRING value)',
+    draggable: 'upper()',
+    description:
+      "Returns string in uppercase."
   }
 };
+
 const DATE_FUNCTIONS: UdfCategoryFunctions = {
   current_date: {
     name: 'current_date',
@@ -389,6 +429,7 @@ const GROUP_WINDOW_FUNCTIONS: UdfCategoryFunctions = {
       'Returns a proctime attribute that can be used in subsequent time-based operations such as interval joins and group window or over window aggregations.'
   }
 };
+
 const ANALYTIC_FUNCTIONS: UdfCategoryFunctions = {
   dense_rank: {
     name: 'dense_rank',
@@ -472,9 +513,82 @@ const ANALYTIC_FUNCTIONS: UdfCategoryFunctions = {
   }
 };
 
+const ARITHMETIC_FUNCTIONS: UdfCategoryFunctions = {
+  abs: {
+    name: 'abs',
+    returnTypes: ['NUMERIC'],
+    arguments: [[{ type: 'numeric'}]],
+    signature: 'abs(numeric)',
+    draggable: 'abs(numeric)',
+    description:
+      'Returns the absolute value of numeric.'
+  },
+  ln: {
+    name: 'ln',
+    returnTypes: ['NUMERIC'],
+    arguments: [[{ type: 'numeric'}]],
+    signature: 'ln(numeric)',
+    draggable: 'ln(numeric)',
+    description:
+      'Returns the natural logarithm (base e) of numeric.'
+  },
+  log: {
+    name: 'log',
+    returnTypes: ['NUMERIC'],
+    arguments: [
+      [{ type: 'numeric'}],
+      [{ type: 'numeric', optional: true }],
+    ],
+    signature: 'log(NUMERIC numeric1[, NUMERIC numeric2])',
+    draggable: 'log()',
+    description:
+      'When called with one argument, returns the natural logarithm of numeric2. When called with two arguments, this function returns the logarithm of numeric2 to the base numeric1. Currently, numeric2 must be greater than 0 and numeric1 must be greater than 1.'
+  },
+  log10: {
+    name: 'log10',
+    returnTypes: ['NUMERIC'],
+    arguments: [[{ type: 'numeric'}]],
+    signature: 'log10(NUMERIC numeric)',
+    draggable: 'log10()',
+    description:
+      'Returns the base 10 logarithm of numeric.'
+  },
+  log2: {
+    name: 'log2',
+    returnTypes: ['NUMERIC'],
+    arguments: [[{ type: 'numeric'}]],
+    signature: 'log2(NUMERIC numeric)',
+    draggable: 'log2()',
+    description:
+      'Returns the base 2 logarithm of numeric.'
+  },
+  power: {
+    name: 'power',
+    returnTypes: ['NUMERIC'],
+    arguments: [
+      [{ type: 'NUMERIC' }],
+      [{ type: 'NUMERIC' }],
+    ],
+    signature: 'power(NUMERIC numeric1, NUMERIC numeric2)',
+    draggable: 'power()',
+    description:
+      'Returns numeric1 raised to the power of numeric2 (numeric1^numeric2).'
+  },
+  sqrt: {
+    name: 'sqrt',
+    returnTypes: ['NUMERIC'],
+    arguments: [[{ type: 'numeric'}]],
+    signature: 'sqrt(NUMERIC numeric)',
+    draggable: 'sqrt()',
+    description:
+      'Returns the square root of numeric.'
+  },
+};
+
 export const UDF_CATEGORIES: UdfCategory[] = [
   { name: I18n('Aggregate'), isAggregate: true, functions: AGGREGATE_FUNCTIONS },
   { name: I18n('Analytic'), isAnalytic: true, functions: ANALYTIC_FUNCTIONS },
+  { name: I18n('Arithmetic'), functions: ARITHMETIC_FUNCTIONS },
   { name: I18n('Date'), functions: DATE_FUNCTIONS },
   { name: I18n('Group Window Functions'), functions: GROUP_WINDOW_FUNCTIONS },
   { name: I18n('String'), functions: STRING_FUNCTIONS }

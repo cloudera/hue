@@ -68,24 +68,24 @@ urlpatterns += [
       name="editor_autocomplete_tables",
   ),
   re_path(
-      r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$",
+      r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$",
       api_public.autocomplete,
       name="editor_autocomplete_columns",
   ),
   re_path(
-      r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$",
+      r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/?$",
       api_public.autocomplete,
       name="editor_autocomplete_column",
   ),
   re_path(
-      r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
+      r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/(?P<nested>.+)/?$",
       api_public.autocomplete,
       name="editor_autocomplete_nested",
   ),
 
-  re_path(r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', api_public.get_sample_data, name='editor_sample_data'),
+  re_path(r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$', api_public.get_sample_data, name='editor_sample_data'),
   re_path(
-    r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
+    r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/?$',
     api_public.get_sample_data,
     name='editor_sample_data_column'
   ),
