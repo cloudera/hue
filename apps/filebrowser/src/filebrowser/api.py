@@ -352,7 +352,7 @@ def display(request):
     return HttpResponse(f'Cannot request chunks greater than {MAX_CHUNK_SIZE_BYTES} bytes.', status=400)
 
   # Read out based on meta.
-  compression, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
+  _, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
 
   # Get contents as string for text mode, or at least try
   file_contents = None
@@ -372,7 +372,6 @@ def display(request):
     'length': length,
     'end': offset + len(contents),
     'mode': mode,
-    'compression': compression,
   }
 
   return JsonResponse(data)
@@ -688,7 +687,7 @@ def set_replication(request):
 def rmtree(request):
   # TODO: Check if this needs to be a DELETE request
   path = request.POST.get('path')
-  skip_trash = request.POST.get('skip_trash', False)
+  skip_trash = coerce_bool(request.POST.get('skip_trash', False))
 
   request.fs.rmtree(path, skip_trash)
 
