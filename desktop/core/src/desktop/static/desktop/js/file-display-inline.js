@@ -64,7 +64,8 @@
     // In this case we don't want to sanitize the path for XSS as we want exact match on the actual file name,
     // so to prevent breaking the page on substitution we enforce a js compatible string by only encoding the backtick
     // char (`) with a js decode to restore it in case file actually has backtick in the name.
-    const decodedPath = `/user/admin/ai_case.txt`.replaceAll('&#96;', '`');
+    
+    const decodedPath = FileViewOptions.path.replaceAll('`', '&#96;');
     const encodedPath = encodeURIComponent(decodedPath);
     const pathPrefix = "/filebrowser/view=";
     const contentPath = pathPrefix+encodedPath;
