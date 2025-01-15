@@ -71,6 +71,10 @@ $icon-margin: 5px;
       height: $cell-height;
       @include mixins.nowrap-ellipsis;
     }
+
+    td.ant-table-cell:first-child {
+      text-overflow: initial;
+    }
   }
 
   .hue-storage-browser__table-cell-name {
