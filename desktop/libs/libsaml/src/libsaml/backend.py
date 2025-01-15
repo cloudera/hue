@@ -109,7 +109,6 @@ class SAML2Backend(_Saml2Backend):
 
     return None
 
-
   def logout(self, request, next_page=None):
     if conf.LOGOUT_ENABLED.get():
       response = saml_logout(request)
