@@ -679,7 +679,7 @@ def set_replication(request):
 def rmtree(request):
   # TODO: Check if this needs to be a DELETE request
   path = request.POST.get('path')
-  skip_trash = request.POST.get('skip_trash', False)
+  skip_trash = coerce_bool(request.POST.get('skip_trash', False))
 
   request.fs.rmtree(path, skip_trash)
 
