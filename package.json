@@ -146,6 +146,7 @@
     "sass-loader": "11.1.1",
     "snarkdown": "2.0.0",
     "source-map-loader": "5.0.0",
+    "strip-sourcemap-loader": "0.0.1",
     "style-loader": "2.0.0",
     "styled-components": "6.0.8",
     "stylelint": "16.7.0",
