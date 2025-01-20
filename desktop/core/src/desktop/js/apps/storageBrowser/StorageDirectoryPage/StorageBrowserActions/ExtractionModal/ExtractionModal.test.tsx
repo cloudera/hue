@@ -66,7 +66,7 @@ describe('ExtractAction Component', () => {
     );
 
     expect(getByText('Extract Archive')).toBeInTheDocument();
-    expect(getByText(`Are you sure you want to extract "{{fileName}}" file`)).toBeInTheDocument();
+    expect(getByText(`Are you sure you want to extract "{{fileName}}" file?`)).toBeInTheDocument();
     expect(getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     expect(getByRole('button', { name: 'Extract' })).toBeInTheDocument();
   });

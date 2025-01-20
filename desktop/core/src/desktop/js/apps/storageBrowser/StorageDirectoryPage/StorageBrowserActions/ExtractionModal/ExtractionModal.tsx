@@ -69,7 +69,7 @@ const ExtractionModal = ({
       okButtonProps={{ disabled: loading }}
       cancelButtonProps={{ disabled: loading }}
     >
-      {t('Are you sure you want to extract "{{fileName}}" file', { fileName: file.name })}
+      {t('Are you sure you want to extract "{{fileName}}" file?', { fileName: file.name })}
     </Modal>
   );
 };
