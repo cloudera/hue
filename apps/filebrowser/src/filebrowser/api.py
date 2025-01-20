@@ -58,7 +58,6 @@ from filebrowser.views import (
   MAX_CHUNK_SIZE_BYTES,
   _can_inline_display,
   _is_hdfs_superuser,
-  _massage_page,
   _normalize_path,
   extract_upload_data,
   perform_upload_task,
@@ -209,6 +208,15 @@ def download(request):
   return response
 
 
+def _massage_page(page, paginator):
+  return {
+      'page_number': page.number,
+      'page_size': paginator.per_page,
+      'total_pages': paginator.num_pages,
+      'total_size': paginator.count
+  }
+
+
 @api_error_handler
 def listdir_paged(request):
   """
@@ -280,7 +288,7 @@ def listdir_paged(request):
   response = {
     'is_trash_enabled': is_trash_enabled,
     'files': page.object_list if page else [],
-    'page': _massage_page(page, paginator) if page else {},  # TODO: Check if we need to clean response of _massage_page
+    'page': _massage_page(page, paginator) if page else {},
     # TODO: Check what to keep or what to remove? or move some fields to /get_config?
     'is_fs_superuser': is_fs_superuser,
     'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
