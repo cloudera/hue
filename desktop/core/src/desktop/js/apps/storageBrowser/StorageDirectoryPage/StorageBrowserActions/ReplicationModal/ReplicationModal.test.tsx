@@ -17,9 +17,8 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import RenameAction from './Rename';
+import ReplicationModal from './ReplicationModal';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
-import { RENAME_API_URL } from '../../../../../reactComponents/FileChooser/api';
 
 const mockSave = jest.fn();
 jest.mock('../../../../../utils/hooks/useSaveData', () => ({
@@ -30,7 +29,7 @@ jest.mock('../../../../../utils/hooks/useSaveData', () => ({
   }))
 }));
 
-describe('RenameAction Component', () => {
+describe('ReplicationModal Component', () => {
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
   const mockOnClose = jest.fn();
@@ -51,9 +50,9 @@ describe('RenameAction Component', () => {
     jest.clearAllMocks();
   });
 
-  it('should render the Rename modal with the correct title and initial input', () => {
+  it('should render the Replication modal with the correct title and initial input', () => {
     const { getByText, getByRole } = render(
-      <RenameAction
+      <ReplicationModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -62,16 +61,16 @@ describe('RenameAction Component', () => {
       />
     );
 
-    expect(getByText('Rename', { selector: 'div' })).toBeInTheDocument();
+    expect(getByText('Setting Replication factor for: /path/to/file1.txt')).toBeInTheDocument();
 
-    const input = getByRole('textbox');
+    const input = getByRole('spinbutton');
     expect(input).toBeInTheDocument();
-    expect(input).toHaveValue('file1.txt');
+    expect(input).toHaveValue(1);
   });
 
-  it('should call handleRename with the correct data when the form is submitted', async () => {
+  it('should call handleReplication with the correct data when the form is submitted', async () => {
     const { getByRole } = render(
-      <RenameAction
+      <ReplicationModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -80,24 +79,21 @@ describe('RenameAction Component', () => {
       />
     );
 
-    const input = getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'file2.txt' } });
+    const input = getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: 2 } });
 
-    const renameButton = getByRole('button', { name: 'Rename' });
-    fireEvent.click(renameButton);
+    const replicationButton = getByRole('button', { name: 'Submit' });
+    fireEvent.click(replicationButton);
 
     expect(mockSave).toHaveBeenCalledTimes(1);
 
-    expect(mockSave).toHaveBeenCalledWith(
-      { source_path: '/path/to/file1.txt', destination_path: 'file2.txt' },
-      { url: RENAME_API_URL }
-    );
+    expect(mockSave).toHaveBeenCalledWith({ path: '/path/to/file1.txt', replication_factor: '2' });
   });
 
   it('should call onSuccess when the rename request succeeds', async () => {
     mockSave.mockImplementationOnce(mockOnSuccess);
     const { getByRole } = render(
-      <RenameAction
+      <ReplicationModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -106,11 +102,11 @@ describe('RenameAction Component', () => {
       />
     );
 
-    const input = getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'file2.txt' } });
+    const input = getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: 2 } });
 
-    const renameButton = getByRole('button', { name: 'Rename' });
-    fireEvent.click(renameButton);
+    const replicationButton = getByRole('button', { name: 'Submit' });
+    fireEvent.click(replicationButton);
 
     expect(mockOnSuccess).toHaveBeenCalledTimes(1);
   });
@@ -120,7 +116,7 @@ describe('RenameAction Component', () => {
       mockOnError(new Error());
     });
     const { getByRole } = render(
-      <RenameAction
+      <ReplicationModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -129,18 +125,18 @@ describe('RenameAction Component', () => {
       />
     );
 
-    const input = getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'file2.txt' } });
+    const input = getByRole('spinbutton');
+    fireEvent.change(input, { target: { value: 2 } });
 
-    const renameButton = getByRole('button', { name: 'Rename' });
-    fireEvent.click(renameButton);
+    const replicationButton = getByRole('button', { name: 'Submit' });
+    fireEvent.click(replicationButton);
 
     expect(mockOnError).toHaveBeenCalledTimes(1);
   });
 
   it('should call onClose when the modal is closed', () => {
     const { getByRole } = render(
-      <RenameAction
+      <ReplicationModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
