@@ -63,3 +63,5 @@ export const SUPPORTED_FILE_EXTENSIONS: Record<string, SupportedFileTypes> = {
 };
 
 export const EDITABLE_FILE_FORMATS = new Set([SupportedFileTypes.TEXT]);
+
+export const SUPPORTED_COMPRESSED_FILE_EXTENTION = ['zip', 'tar.gz', 'tgz', 'bz2', 'bzip'];
