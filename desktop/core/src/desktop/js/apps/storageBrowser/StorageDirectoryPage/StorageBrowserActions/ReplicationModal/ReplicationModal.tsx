@@ -21,7 +21,7 @@ import useSaveData from '../../../../../utils/hooks/useSaveData';
 import { SET_REPLICATION_API_URL } from '../../../../../reactComponents/FileChooser/api';
 import InputModal from '../../../InputModal/InputModal';
 
-interface ReplicationActionProps {
+interface ReplicationModalProps {
   isOpen?: boolean;
   file: StorageDirectoryTableData;
   onSuccess: () => void;
@@ -29,24 +29,23 @@ interface ReplicationActionProps {
   onClose: () => void;
 }
 
-const ReplicationAction = ({
+const ReplicationModal = ({
   isOpen = true,
   file,
   onSuccess,
   onError,
   onClose
-}: ReplicationActionProps): JSX.Element => {
+}: ReplicationModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { save, loading } = useSaveData(undefined, {
+  const { save, loading } = useSaveData(SET_REPLICATION_API_URL, {
     skip: !file.path,
     onSuccess,
     onError
   });
 
   const handleReplication = (replicationFactor: number) => {
-    const payload = { path: file.path, replication_factor: replicationFactor };
-    save(payload, { url: SET_REPLICATION_API_URL });
+    save({ path: file.path, replication_factor: replicationFactor });
   };
 
   return (
@@ -64,4 +63,4 @@ const ReplicationAction = ({
   );
 };
 
-export default ReplicationAction;
+export default ReplicationModal;

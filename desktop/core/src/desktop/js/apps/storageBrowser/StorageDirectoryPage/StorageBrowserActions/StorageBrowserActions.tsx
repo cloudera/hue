@@ -37,13 +37,13 @@ import {
   StorageDirectoryTableData
 } from '../../../../reactComponents/FileChooser/types';
 import { ActionType, getEnabledActions } from './StorageBrowserActions.util';
-import MoveCopyAction from './MoveCopy/MoveCopy';
-import RenameAction from './Rename/Rename';
-import ReplicationAction from './Replication/Replication';
-import ViewSummary from './ViewSummary/ViewSummary';
-import DeleteAction from './Delete/Delete';
-import CompressAction from './Compress/Compress';
-import ExtractAction from './ExtractionModal/ExtractionModal';
+import MoveCopyModal from './MoveCopyModal/MoveCopyModal';
+import RenameModal from './RenameModal/RenameModal';
+import ReplicationModal from './ReplicationModal/ReplicationModal';
+import SummaryModal from './SummaryModal/SummaryModal';
+import DeletionModal from './DeletionModal/DeletionModal';
+import CompressionModal from './CompressionModal/CompressionModal';
+import ExtractionModal from './ExtractionModal/ExtractionModal';
 
 interface StorageBrowserRowActionsProps {
   isTrashEnabled?: boolean;
@@ -117,10 +117,10 @@ const StorageBrowserActions = ({
         </Button>
       </Dropdown>
       {selectedAction === ActionType.Summary && (
-        <ViewSummary path={selectedFiles[0].path} onClose={closeModal} />
+        <SummaryModal path={selectedFiles[0].path} onClose={closeModal} />
       )}
       {selectedAction === ActionType.Rename && (
-        <RenameAction
+        <RenameModal
           file={selectedFiles[0]}
           onSuccess={onApiSuccess}
           onError={onApiError}
@@ -128,7 +128,7 @@ const StorageBrowserActions = ({
         />
       )}
       {selectedAction === ActionType.Replication && (
-        <ReplicationAction
+        <ReplicationModal
           file={selectedFiles[0]}
           onSuccess={onApiSuccess}
           onError={onApiError}
@@ -136,7 +136,7 @@ const StorageBrowserActions = ({
         />
       )}
       {(selectedAction === ActionType.Move || selectedAction === ActionType.Copy) && (
-        <MoveCopyAction
+        <MoveCopyModal
           action={selectedAction}
           files={selectedFiles}
           currentPath={currentPath}
@@ -147,7 +147,7 @@ const StorageBrowserActions = ({
         />
       )}
       {selectedAction === ActionType.Delete && (
-        <DeleteAction
+        <DeletionModal
           isTrashEnabled={isTrashEnabled}
           files={selectedFiles}
           onSuccess={onApiSuccess}
@@ -157,7 +157,7 @@ const StorageBrowserActions = ({
         />
       )}
       {selectedAction === ActionType.Compress && (
-        <CompressAction
+        <CompressionModal
           currentPath={currentPath}
           files={selectedFiles}
           onSuccess={onApiSuccess}
@@ -167,7 +167,7 @@ const StorageBrowserActions = ({
         />
       )}
       {selectedAction === ActionType.Extract && (
-        <ExtractAction
+        <ExtractionModal
           currentPath={currentPath}
           file={selectedFiles[0]}
           onSuccess={onApiSuccess}

@@ -17,9 +17,8 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import CompressAction from './Compress';
+import CompressionModal from './CompressionModal';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
-import { COMPRESS_API_URL } from '../../../../../reactComponents/FileChooser/api';
 
 const mockFiles: StorageDirectoryTableData[] = [
   {
@@ -55,7 +54,7 @@ jest.mock('../../../../../utils/hooks/useSaveData', () => ({
   }))
 }));
 
-describe('CompressAction Component', () => {
+describe('CompressionModal Component', () => {
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
   const mockOnClose = jest.fn();
@@ -67,7 +66,7 @@ describe('CompressAction Component', () => {
 
   it('should render the Compress modal with the correct title and buttons', () => {
     const { getByText, getByRole } = render(
-      <CompressAction
+      <CompressionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}
@@ -86,7 +85,7 @@ describe('CompressAction Component', () => {
 
   it('should display the correct list of files to be compressed', () => {
     const { getByText } = render(
-      <CompressAction
+      <CompressionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}
@@ -104,7 +103,7 @@ describe('CompressAction Component', () => {
 
   it('should call handleCompress with the correct data when "Compress" is clicked', async () => {
     const { getByText } = render(
-      <CompressAction
+      <CompressionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}
@@ -124,12 +123,12 @@ describe('CompressAction Component', () => {
 
     fireEvent.click(getByText('Compress'));
 
-    expect(mockSave).toHaveBeenCalledWith(formData, { url: COMPRESS_API_URL });
+    expect(mockSave).toHaveBeenCalledWith(formData);
   });
 
   it('should update the compressed file name when input value changes', () => {
     const { getByRole } = render(
-      <CompressAction
+      <CompressionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}
@@ -148,7 +147,7 @@ describe('CompressAction Component', () => {
 
   it('should call onClose when the modal is closed', () => {
     const { getByText } = render(
-      <CompressAction
+      <CompressionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}
@@ -169,7 +168,7 @@ describe('CompressAction Component', () => {
     });
 
     const { getByText } = render(
-      <CompressAction
+      <CompressionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}

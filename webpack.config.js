@@ -64,6 +64,14 @@ const config = {
         enforce: 'pre',
         use: ['source-map-loader']
       },
+      // Remove hardcoded references to source map files in third party mjs-files
+      // since those files will be missing in our builds.
+      {
+        test: /\.mjs$/,
+        include: /node_modules/,
+        enforce: 'post',
+        loader: 'strip-sourcemap-loader'
+      },
       {
         test: /\.scss$/,
         exclude: /node_modules/,
