@@ -15,53 +15,63 @@
 // limitations under the License.
 
 import React from 'react';
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
+import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import useSaveData from '../../../../../utils/hooks/useSaveData';
-import { SET_REPLICATION_API_URL } from '../../../../../reactComponents/FileChooser/api';
-import InputModal from '../../../InputModal/InputModal';
+import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
+import { EXTRACT_API_URL } from '../../../../../reactComponents/FileChooser/api';
 
-interface ReplicationActionProps {
+interface ExtractActionProps {
+  currentPath: string;
   isOpen?: boolean;
   file: StorageDirectoryTableData;
+  setLoading: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
 }
 
-const ReplicationAction = ({
+const ExtractionModal = ({
+  currentPath,
   isOpen = true,
   file,
+  setLoading,
   onSuccess,
   onError,
   onClose
-}: ReplicationActionProps): JSX.Element => {
+}: ExtractActionProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { save, loading } = useSaveData(undefined, {
-    skip: !file.path,
+  const { save, loading } = useSaveData(EXTRACT_API_URL, {
+    skip: !file,
     onSuccess,
     onError
   });
 
-  const handleReplication = (replicationFactor: number) => {
-    const payload = { path: file.path, replication_factor: replicationFactor };
-    save(payload, { url: SET_REPLICATION_API_URL });
+  const handleExtract = () => {
+    setLoading(true);
+
+    save({
+      upload_path: currentPath,
+      archive_name: file.name
+    });
   };
 
   return (
-    <InputModal
-      title={t('Setting Replication factor for: ') + file.path}
-      inputLabel={t('Replication factor:')}
-      submitText={t('Submit')}
-      showModal={isOpen}
-      onSubmit={handleReplication}
-      onClose={onClose}
-      inputType="number"
-      initialValue={file.replication}
-      buttonDisabled={loading}
-    />
+    <Modal
+      cancelText={t('Cancel')}
+      className="cuix antd"
+      okText={t('Extract')}
+      onCancel={onClose}
+      onOk={handleExtract}
+      open={isOpen}
+      title={t('Extract Archive')}
+      okButtonProps={{ disabled: loading }}
+      cancelButtonProps={{ disabled: loading }}
+    >
+      {t('Are you sure you want to extract "{{fileName}}" file?', { fileName: file.name })}
+    </Modal>
   );
 };
 
-export default ReplicationAction;
+export default ExtractionModal;

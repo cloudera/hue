@@ -28,15 +28,15 @@ import {
   StorageDirectoryTableData
 } from '../../../../../reactComponents/FileChooser/types';
 
-import './ViewSummary.scss';
+import './SummaryModal.scss';
 
-interface ViewSummaryProps {
+interface SummaryModalProps {
   path: StorageDirectoryTableData['path'];
   isOpen?: boolean;
   onClose: () => void;
 }
 
-const ViewSummary = ({ isOpen = true, onClose, path }: ViewSummaryProps): JSX.Element => {
+const SummaryModal = ({ isOpen = true, onClose, path }: SummaryModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const { data: responseSummary, loading } = useLoadData<ContentSummary>(CONTENT_SUMMARY_API_URL, {
@@ -105,4 +105,4 @@ const ViewSummary = ({ isOpen = true, onClose, path }: ViewSummaryProps): JSX.El
   );
 };
 
-export default ViewSummary;
+export default SummaryModal;

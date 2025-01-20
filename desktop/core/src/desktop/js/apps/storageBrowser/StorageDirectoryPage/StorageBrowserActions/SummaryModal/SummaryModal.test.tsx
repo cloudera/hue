@@ -20,7 +20,7 @@ import '@testing-library/jest-dom';
 
 import { get } from '../../../../../api/utils';
 import formatBytes from '../../../../../utils/formatBytes';
-import ViewSummary from './ViewSummary';
+import SummaryModal from './SummaryModal';
 
 jest.mock('../../../../../api/utils', () => ({
   get: jest.fn()
@@ -28,7 +28,7 @@ jest.mock('../../../../../api/utils', () => ({
 
 const mockGet = get as jest.MockedFunction<typeof get>;
 
-describe('ViewSummary', () => {
+describe('SummaryModal', () => {
   beforeAll(() => {
     jest.clearAllMocks();
   });
@@ -54,14 +54,16 @@ describe('ViewSummary', () => {
   };
 
   it('should render path of file in title', async () => {
-    const { getByText } = render(<ViewSummary onClose={() => {}} path="some/path" />);
+    const { getByText } = render(<SummaryModal onClose={() => {}} path="some/path" />);
     await waitFor(async () => {
       expect(getByText('Summary for some/path')).toBeInTheDocument();
     });
   });
 
   it('should render summary content after successful data fetching', async () => {
-    const { getByText, getAllByText } = render(<ViewSummary onClose={() => {}} path="some/path" />);
+    const { getByText, getAllByText } = render(
+      <SummaryModal onClose={() => {}} path="some/path" />
+    );
     await waitFor(async () => {
       expect(getByText('Diskspace Consumed')).toBeInTheDocument();
       expect(getAllByText(formatBytes(mockSummary.spaceConsumed))[0]).toBeInTheDocument();
@@ -69,7 +71,7 @@ describe('ViewSummary', () => {
   });
 
   it('should render space consumed in Bytes after the values are formatted', async () => {
-    render(<ViewSummary path={'/user/demo'} onClose={() => {}} />);
+    render(<SummaryModal path={'/user/demo'} onClose={() => {}} />);
     const spaceConsumed = await screen.findAllByText('0 Byte');
     await waitFor(() => {
       expect(spaceConsumed[0]).toBeInTheDocument();
@@ -78,7 +80,7 @@ describe('ViewSummary', () => {
 
   it('should call onClose function when close button is clicked', async () => {
     const mockOnClose = jest.fn();
-    const { getByText } = render(<ViewSummary onClose={mockOnClose} path="some/path" />);
+    const { getByText } = render(<SummaryModal onClose={mockOnClose} path="some/path" />);
 
     const closeButton = getByText('Close');
     expect(mockOnClose).not.toHaveBeenCalled();
