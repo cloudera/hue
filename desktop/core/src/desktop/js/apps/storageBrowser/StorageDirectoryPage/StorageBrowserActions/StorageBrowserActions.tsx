@@ -43,7 +43,7 @@ import ReplicationAction from './Replication/Replication';
 import ViewSummary from './ViewSummary/ViewSummary';
 import DeleteAction from './Delete/Delete';
 import CompressAction from './Compress/Compress';
-import ExtractAction from './Extract/Extract';
+import ExtractAction from './ExtractionModal/ExtractionModal';
 
 interface StorageBrowserRowActionsProps {
   isTrashEnabled?: boolean;
