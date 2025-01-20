@@ -45,18 +45,14 @@ export interface StorageDirectoryTableData
 }
 
 export interface PageStats {
-  number: number;
-  num_pages: number;
-  previous_page_number: number;
-  next_page_number: number;
-  start_index: number;
-  end_index: number;
-  total_count: number;
+  page_number: number;
+  total_pages: number;
+  page_size: number;
+  total_size: number;
 }
 
 export interface FilePreview {
   contents: string;
-  compression?: string;
   end: number;
   length: number;
   mode: string;
