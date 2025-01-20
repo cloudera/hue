@@ -28,7 +28,7 @@ import DataMovementIcon from '@cloudera/cuix-core/icons/react/DataMovementIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 import CollapseIcon from '@cloudera/cuix-core/icons/react/CollapseViewIcon';
 import ExpandIcon from '@cloudera/cuix-core/icons/react/ExpandViewIcon';
-import DownloadIcon from '@cloudera/cuix-core/icons/react/downloadIcon';
+import DownloadIcon from '@cloudera/cuix-core/icons/react/DownloadIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
