@@ -85,12 +85,12 @@ describe('StorageBrowserRowActions', () => {
     const selectedFiles =
       records.length === 1
         ? [
-          {
-            ...records[0],
-            path: recordPath ?? records[0].path,
-            type: recordType ?? records[0].type
-          }
-        ]
+            {
+              ...records[0],
+              path: recordPath ?? records[0].path,
+              type: recordType ?? records[0].type
+            }
+          ]
         : records;
     const { getByRole } = render(
       <StorageBrowserActions
