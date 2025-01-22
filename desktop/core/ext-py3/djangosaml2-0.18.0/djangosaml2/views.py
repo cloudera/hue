@@ -15,12 +15,10 @@
 
 import base64
 import logging
-from functools import wraps
+
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from .utils import get_csp_handler
-
 try:
     from django.contrib.auth.views import LogoutView
     django_logout = LogoutView.as_view()
@@ -64,7 +62,6 @@ from djangosaml2.conf import get_config
 from djangosaml2.overrides import Saml2Client
 from djangosaml2.signals import post_authenticated
 from djangosaml2.utils import (
-    get_csp_handler,
     available_idps, fail_acs_response, get_custom_setting,
     get_idp_sso_supported_bindings, get_location, is_safe_url_compat,
 )
@@ -72,14 +69,6 @@ from djangosaml2.utils import (
 
 logger = logging.getLogger('djangosaml2')
 
-def saml2_csp_update(view):
-    csp_handler = get_csp_handler()
-
-    @wraps(view)
-    def wrapper(*args, **kwargs):
-        return csp_handler(view)(*args, **kwargs)
-
-    return wrapper
 
 def _set_subject_id(session, subject_id):
     session['_saml2_subject_id'] = code(subject_id)
