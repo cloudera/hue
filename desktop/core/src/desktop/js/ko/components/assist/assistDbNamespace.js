@@ -268,13 +268,12 @@ class AssistDbNamespace {
               }
             })
             .catch(() => {
-              const currentComputeIndex = self.namespace?.computes
-                ?.findIndex((namespaceCompute) => namespaceCompute.name === self.compute().name)
+              const currentComputeIndex = self.namespace?.computes?.findIndex(
+                namespaceCompute => namespaceCompute.name === self.compute().name
+              );
 
               if (currentComputeIndex < self.namespace.computes.length - 1) {
-                self.compute(
-                  self.namespace.computes[currentComputeIndex + 1]
-                )
+                self.compute(self.namespace.computes[currentComputeIndex + 1]);
                 self.initDatabases();
               } else {
                 self.hasErrors(true);

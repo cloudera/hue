@@ -127,8 +127,8 @@ export interface SqlAnalyzerPopularitySubType {
 
 export interface SqlAnalyzerPopularity
   extends TimestampedData,
-  SqlAnalyzerResponsePopularity,
-  SqlAnalyzerPopularitySubType {
+    SqlAnalyzerResponsePopularity,
+    SqlAnalyzerPopularitySubType {
   column_count?: number;
   popularity?: number;
   relativePopularity?: number;
@@ -146,7 +146,7 @@ const generateEntryCacheId = (options: {
   path?: string | string[];
   paths?: string[][];
   namespace: Namespace;
-  compute: Compute
+  compute: Compute;
 }): string => {
   let id = `${options.namespace.id}_${options.compute.name}`;
   if (options.path) {
