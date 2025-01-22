@@ -1,4 +1,0 @@
-pytest
-pytest-django
-pytest-cov
-codecov
