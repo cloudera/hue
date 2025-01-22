@@ -28,6 +28,7 @@ import DataMovementIcon from '@cloudera/cuix-core/icons/react/DataMovementIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 import CollapseIcon from '@cloudera/cuix-core/icons/react/CollapseViewIcon';
 import ExpandIcon from '@cloudera/cuix-core/icons/react/ExpandViewIcon';
+import DownloadIcon from '@cloudera/cuix-core/icons/react/DownloadIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
@@ -44,6 +45,7 @@ import SummaryModal from './SummaryModal/SummaryModal';
 import DeletionModal from './DeletionModal/DeletionModal';
 import CompressionModal from './CompressionModal/CompressionModal';
 import ExtractionModal from './ExtractionModal/ExtractionModal';
+import { DOWNLOAD_API_URL } from '../../../../reactComponents/FileChooser/api';
 
 interface StorageBrowserRowActionsProps {
   isTrashEnabled?: boolean;
@@ -61,7 +63,8 @@ const iconsMap: Record<ActionType, JSX.Element> = {
   [ActionType.Delete]: <DeleteIcon />,
   [ActionType.Summary]: <SummaryIcon />,
   [ActionType.Compress]: <CollapseIcon />,
-  [ActionType.Extract]: <ExpandIcon />
+  [ActionType.Extract]: <ExpandIcon />,
+  [ActionType.Download]: <DownloadIcon />
 };
 
 const StorageBrowserActions = ({
@@ -108,7 +111,7 @@ const StorageBrowserActions = ({
       key: String(action.type),
       label: t(action.label),
       icon: iconsMap[action.type],
-      onClick: () => setSelectedAction(action.type)
+      onClick: onActionClick(action.type)
     }));
   }, [selectedFiles]);
 
