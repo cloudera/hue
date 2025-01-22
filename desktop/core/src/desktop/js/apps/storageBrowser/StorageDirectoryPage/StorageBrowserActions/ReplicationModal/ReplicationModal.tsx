@@ -18,10 +18,10 @@ import React from 'react';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import useSaveData from '../../../../../utils/hooks/useSaveData';
-import { RENAME_API_URL } from '../../../../../reactComponents/FileChooser/api';
+import { SET_REPLICATION_API_URL } from '../../../../../reactComponents/FileChooser/api';
 import InputModal from '../../../InputModal/InputModal';
 
-interface RenameActionProps {
+interface ReplicationModalProps {
   isOpen?: boolean;
   file: StorageDirectoryTableData;
   onSuccess: () => void;
@@ -29,39 +29,38 @@ interface RenameActionProps {
   onClose: () => void;
 }
 
-const RenameAction = ({
+const ReplicationModal = ({
   isOpen = true,
   file,
   onSuccess,
   onError,
   onClose
-}: RenameActionProps): JSX.Element => {
+}: ReplicationModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { save, loading } = useSaveData(undefined, {
+  const { save, loading } = useSaveData(SET_REPLICATION_API_URL, {
     skip: !file.path,
     onSuccess,
     onError
   });
 
-  const handleRename = (value: string) => {
-    const payload = { source_path: file.path, destination_path: value };
-    save(payload, { url: RENAME_API_URL });
+  const handleReplication = (replicationFactor: number) => {
+    save({ path: file.path, replication_factor: replicationFactor });
   };
 
   return (
     <InputModal
-      title={t('Rename')}
-      inputLabel={t('Enter new name')}
-      submitText={t('Rename')}
+      title={t('Setting Replication factor for: ') + file.path}
+      inputLabel={t('Replication factor:')}
+      submitText={t('Submit')}
       showModal={isOpen}
-      onSubmit={handleRename}
+      onSubmit={handleReplication}
       onClose={onClose}
-      inputType="text"
-      initialValue={file.name}
+      inputType="number"
+      initialValue={file.replication}
       buttonDisabled={loading}
     />
   );
 };
 
-export default RenameAction;
+export default ReplicationModal;

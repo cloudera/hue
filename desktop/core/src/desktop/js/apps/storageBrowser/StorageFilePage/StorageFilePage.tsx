@@ -31,7 +31,9 @@ import {
 } from '../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../utils/huePubSub';
 import useSaveData from '../../../utils/hooks/useSaveData';
+import Pagination from '../../../reactComponents/Pagination/Pagination';
 import {
+  DEFAULT_PREVIEW_PAGE_SIZE,
   EDITABLE_FILE_FORMATS,
   SUPPORTED_FILE_EXTENSIONS,
   SupportedFileTypes
@@ -54,6 +56,9 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [fileContent, setFileContent] = useState<FilePreview['contents']>();
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const pageSize = DEFAULT_PREVIEW_PAGE_SIZE;
+  const pageOffset = (pageNumber - 1) * pageSize;
 
   const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL);
 
@@ -62,13 +67,17 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
     loading: loadingPreview,
     error: errorPreview
   } = useLoadData<FilePreview>(FILE_PREVIEW_API_URL, {
-    params: { path: fileStats.path },
+    params: {
+      path: fileStats.path,
+      offset: pageOffset,
+      length: pageSize
+    },
     onSuccess: d => setFileContent(d.contents),
     skip:
       fileStats.path === '' ||
       fileStats.path === undefined ||
       fileStats?.type !== BrowserViewType.file ||
-      EDITABLE_FILE_FORMATS[fileType] === undefined
+      !EDITABLE_FILE_FORMATS.has(fileType)
   });
 
   const fileMetaData = useMemo(() => getFileMetaData(t, fileStats), [t, fileStats]);
@@ -112,8 +121,14 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
     !isEditing &&
     config?.storage_browser.max_file_editor_size &&
     config?.storage_browser.max_file_editor_size > fileStats.size &&
-    EDITABLE_FILE_FORMATS[fileType] &&
-    fileData?.compression?.toLocaleLowerCase() === 'none';
+    EDITABLE_FILE_FORMATS.has(fileType);
+
+  const pageStats = {
+    page_number: pageNumber,
+    total_pages: Math.ceil(fileStats.size / pageSize),
+    page_size: 0,
+    total_size: 0
+  };
 
   const errorConfig = [
     {
@@ -192,12 +207,17 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
 
             <div className="preview__content">
               {fileType === SupportedFileTypes.TEXT && (
-                <textarea
-                  value={fileContent}
-                  onChange={e => setFileContent(e.target.value)}
-                  readOnly={!isEditing}
-                  className="preview__textarea"
-                />
+                <div className="preview__editable-file">
+                  <textarea
+                    value={fileContent}
+                    onChange={e => setFileContent(e.target.value)}
+                    readOnly={!isEditing}
+                    className="preview__textarea"
+                  />
+                  {!loadingPreview && pageStats.total_pages > 1 && (
+                    <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
+                  )}
+                </div>
               )}
 
               {fileType === SupportedFileTypes.IMAGE && <img src={filePreviewUrl} alt={fileName} />}

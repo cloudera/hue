@@ -210,8 +210,8 @@ class JobBrowserPanel extends DisposableComponent {
       success: function (response) {
         params.onePageViewModel
           .processHeadersSecure(response)
-          .done(({ rawHtml, scriptsToLoad }) => {
-            $('#mini_jobbrowser').html(rawHtml);
+          .done(({ $rawHtml, scriptsToLoad }) => {
+            $('#mini_jobbrowser').html($rawHtml);
             const loadScripts = scriptsToLoad.map(src =>
               params.onePageViewModel.loadScript_nonce(src)
             );

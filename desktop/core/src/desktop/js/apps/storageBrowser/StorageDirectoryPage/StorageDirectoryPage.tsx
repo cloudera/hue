@@ -213,17 +213,6 @@ const StorageDirectoryPage = ({
     }
   };
 
-  //pagination related functions handled by parent
-  const onPreviousPageButtonClicked = (previousPageNumber: number) => {
-    //If previous page does not exists api returns 0
-    setPageNumber(previousPageNumber === 0 ? 1 : previousPageNumber);
-  };
-
-  const onNextPageButtonClicked = (nextPageNumber: number, numPages: number) => {
-    //If next page does not exists api returns 0
-    setPageNumber(nextPageNumber === 0 ? numPages : nextPageNumber);
-  };
-
   const handleSearch = useCallback(
     useDebounce(searchTerm => {
       setSearchTerm(encodeURIComponent(searchTerm));
@@ -290,6 +279,7 @@ const StorageDirectoryPage = ({
           onChange={event => {
             handleSearch(event.target.value);
           }}
+          disabled={!tableData.length && !searchTerm.length}
         />
         <div className="hue-storage-browser__actions-bar-right">
           <StorageBrowserActions
@@ -333,13 +323,11 @@ const StorageDirectoryPage = ({
             {...restProps}
           />
 
-          {filesData?.page && filesData?.page?.total_count > 0 && (
+          {filesData?.page && filesData?.page?.total_pages > 0 && (
             <Pagination
-              onNextPageButtonClicked={onNextPageButtonClicked}
-              onPageNumberChange={setPageNumber}
-              onPageSizeChange={setPageSize}
-              onPreviousPageButtonClicked={onPreviousPageButtonClicked}
+              setPageSize={setPageSize}
               pageSize={pageSize}
+              setPageNumber={setPageNumber}
               pageStats={filesData?.page}
             />
           )}
