@@ -61,6 +61,13 @@ REMOTE_SAMPLE_DIR = Config(
   ),
 )
 
+OOZIE_HS2_JDBC_URL = Config(
+    key="oozie_hs2_jdbc_url",
+    help="The JDBC URL for HiveServer2 action",
+    type=str,
+    default=""
+)
+
 
 def get_oozie_job_count():
   '''Returns the maximum of jobs fetched by the API depending on the Hue version'''
