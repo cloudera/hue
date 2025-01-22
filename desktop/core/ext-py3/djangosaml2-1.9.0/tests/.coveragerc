@@ -1,0 +1,3 @@
+# .coveragerc to control coverage.py
+[run]
+source = djangosaml2

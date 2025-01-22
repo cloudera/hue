@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:EntityDescriptor xmlns:ns0="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ns1="http://www.w3.org/2000/09/xmldsig#" xmlns:mdrpi="urn:oasis:names:tc:SAML:metadata:rpi" entityID="https://pseudonymous.example.edu/saml2/metadata/">
+  <ns0:Extensions>
+      <mdrpi:RegistrationInfo registrationAuthority="http://geant.example.eu/" registrationInstant="2018-05-10T09:45:00Z" />
+      <mdattr:EntityAttributes xmlns:mdattr="urn:oasis:names:tc:SAML:metadata:attribute">
+          <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Name="http://macedir.org/entity-category" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+              <saml:AttributeValue>https://refeds.org/category/pseudonymous</saml:AttributeValue>
+              <saml:AttributeValue>https://refeds.org/category/personalized</saml:AttributeValue>
+          </saml:Attribute>
+      </mdattr:EntityAttributes></ns0:Extensions>
+  <ns0:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <ns0:KeyDescriptor use="encryption">
+      <ns1:KeyInfo>
+        <ns1:X509Data>
+          <ns1:X509Certificate>MIIDvDCCAqQCCQDXVjecpE8ibTANBgkqhkiG9w0BAQUFADCBnzELMAkGA1UEBhMC
+U0UxEjAQBgNVBAgMCVN0b2NraG9sbTESMBAGA1UEBwwJU3RvY2tob2xtMQ4wDAYD
+VQQKDAVFRFVJRDEaMBgGA1UECwwRZWR1aWQuZXhhbXBsZS5jb20xGjAYBgNVBAMM
+EWVkdWlkLmV4YW1wbGUuY29tMSAwHgYJKoZIhvcNAQkBFhFlZHVpZEBleGFtcGxl
+LmNvbTAeFw0xMzA2MTIxMTU5NTdaFw0yMzA2MTAxMTU5NTdaMIGfMQswCQYDVQQG
+EwJTRTESMBAGA1UECAwJU3RvY2tob2xtMRIwEAYDVQQHDAlTdG9ja2hvbG0xDjAM
+BgNVBAoMBUVEVUlEMRowGAYDVQQLDBFlZHVpZC5leGFtcGxlLmNvbTEaMBgGA1UE
+AwwRZWR1aWQuZXhhbXBsZS5jb20xIDAeBgkqhkiG9w0BCQEWEWVkdWlkQGV4YW1w
+bGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwHzXvBlv+DN1
+0tV9z6M79RFKJEE1HoBpo/vuQzcIP8SZZNhzwQpYxTVTQ9ocagX1onfJn2ZjoWsi
+p45tSMnwLM9a9+UETYAV8O/AUq3gNDp+Mu6sS3smNhdykVR4STscIiP/hWMkZbJ4
+4dmJ2ccT3H6VosXR/OIVTjyalanmvMpDb6ZkKqmuQCDvRMii/R0HhbYUCytToDiy
+Bxw1tQG946g8pe5RhZxxzmxVwAGwOyDn1dwi+j4wH2eCDyLu8hLanPHNFNiy5hiN
+5B40N24V5YixlksgdT0pF46DfkJRrOCsNWHWnMSN+Xvo1oXLRFXEnfsCB1cw0EAp
+SMMGX4dhSwIDAQABMA0GCSqGSIb3DQEBBQUAA4IBAQA8+faeCQVTadTrXpB8jzfE
+MJq6+V4oajnWb0LJ5ZZcKSlQZ5sfYJ1385CaXGh60Tg4uhtwTOgpRi1R1cZMLTz9
+ST6WPF+2vDJv7dGPuglzyQLvA2fd6BLnyGV6kLUc2XNOyCmD/tWuMvKvW62j4Y3B
+XZvRFZZdHNgay4Wgvs8D6wyozWpkWpawXkQ3LqbXO6GChYC4VLru+uJuMKvvKCd/
+I125dzkP2nf9zkGV0cil3oIVSBPBtSRTF/M+oZhkHTwoM6hhonRvdOLuvobKfZ2Q
+wHyaxzYldWmVC5omkgZeAdCGpJ316GQF8Zwg/yDOUzm4cvGeIESf1Q6ZxBwI6zGE
+</ns1:X509Certificate>
+        </ns1:X509Data>
+      </ns1:KeyInfo>
+    </ns0:KeyDescriptor>
+    <ns0:KeyDescriptor use="signing">
+      <ns1:KeyInfo>
+        <ns1:X509Data>
+          <ns1:X509Certificate>MIIDvDCCAqQCCQDXVjecpE8ibTANBgkqhkiG9w0BAQUFADCBnzELMAkGA1UEBhMC
+U0UxEjAQBgNVBAgMCVN0b2NraG9sbTESMBAGA1UEBwwJU3RvY2tob2xtMQ4wDAYD
+VQQKDAVFRFVJRDEaMBgGA1UECwwRZWR1aWQuZXhhbXBsZS5jb20xGjAYBgNVBAMM
+EWVkdWlkLmV4YW1wbGUuY29tMSAwHgYJKoZIhvcNAQkBFhFlZHVpZEBleGFtcGxl
+LmNvbTAeFw0xMzA2MTIxMTU5NTdaFw0yMzA2MTAxMTU5NTdaMIGfMQswCQYDVQQG
+EwJTRTESMBAGA1UECAwJU3RvY2tob2xtMRIwEAYDVQQHDAlTdG9ja2hvbG0xDjAM
+BgNVBAoMBUVEVUlEMRowGAYDVQQLDBFlZHVpZC5leGFtcGxlLmNvbTEaMBgGA1UE
+AwwRZWR1aWQuZXhhbXBsZS5jb20xIDAeBgkqhkiG9w0BCQEWEWVkdWlkQGV4YW1w
+bGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwHzXvBlv+DN1
+0tV9z6M79RFKJEE1HoBpo/vuQzcIP8SZZNhzwQpYxTVTQ9ocagX1onfJn2ZjoWsi
+p45tSMnwLM9a9+UETYAV8O/AUq3gNDp+Mu6sS3smNhdykVR4STscIiP/hWMkZbJ4
+4dmJ2ccT3H6VosXR/OIVTjyalanmvMpDb6ZkKqmuQCDvRMii/R0HhbYUCytToDiy
+Bxw1tQG946g8pe5RhZxxzmxVwAGwOyDn1dwi+j4wH2eCDyLu8hLanPHNFNiy5hiN
+5B40N24V5YixlksgdT0pF46DfkJRrOCsNWHWnMSN+Xvo1oXLRFXEnfsCB1cw0EAp
+SMMGX4dhSwIDAQABMA0GCSqGSIb3DQEBBQUAA4IBAQA8+faeCQVTadTrXpB8jzfE
+MJq6+V4oajnWb0LJ5ZZcKSlQZ5sfYJ1385CaXGh60Tg4uhtwTOgpRi1R1cZMLTz9
+ST6WPF+2vDJv7dGPuglzyQLvA2fd6BLnyGV6kLUc2XNOyCmD/tWuMvKvW62j4Y3B
+XZvRFZZdHNgay4Wgvs8D6wyozWpkWpawXkQ3LqbXO6GChYC4VLru+uJuMKvvKCd/
+I125dzkP2nf9zkGV0cil3oIVSBPBtSRTF/M+oZhkHTwoM6hhonRvdOLuvobKfZ2Q
+wHyaxzYldWmVC5omkgZeAdCGpJ316GQF8Zwg/yDOUzm4cvGeIESf1Q6ZxBwI6zGE
+</ns1:X509Certificate>
+        </ns1:X509Data>
+      </ns1:KeyInfo>
+    </ns0:KeyDescriptor>
+    <ns0:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://pseudonymous.example.edu/saml2/ls/"/>
+    <ns0:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://pseudonymous.example.edu/saml2/acs/" index="1"/>
+    <ns0:AttributeConsumingService index="0">
+        <ns0:ServiceName xml:lang="en">pseudonymous-SP</ns0:ServiceName>
+        <ns0:ServiceDescription xml:lang="en">refeds pseudonymous access SP</ns0:ServiceDescription>
+    </ns0:AttributeConsumingService>
+  </ns0:SPSSODescriptor>
+  <ns0:Organization>
+    <ns0:OrganizationName xml:lang="es">Example CO</ns0:OrganizationName>
+    <ns0:OrganizationName xml:lang="en">Example CO</ns0:OrganizationName>
+    <ns0:OrganizationDisplayName xml:lang="es">Example</ns0:OrganizationDisplayName>
+    <ns0:OrganizationDisplayName xml:lang="en">Example</ns0:OrganizationDisplayName>
+    <ns0:OrganizationURL xml:lang="es">http://www.example.edu</ns0:OrganizationURL>
+    <ns0:OrganizationURL xml:lang="en">http://www.example.com</ns0:OrganizationURL>
+  </ns0:Organization>
+  <ns0:ContactPerson contactType="technical">
+    <ns0:Company>Example CO</ns0:Company>
+    <ns0:GivenName>Sysadmin</ns0:GivenName>
+    <ns0:SurName/>
+    <ns0:EmailAddress>sysadmin@example.com</ns0:EmailAddress>
+  </ns0:ContactPerson>
+  <ns0:ContactPerson contactType="administrative">
+    <ns0:Company>Example CO</ns0:Company>
+    <ns0:GivenName>Admin</ns0:GivenName>
+    <ns0:SurName>CEO</ns0:SurName>
+    <ns0:EmailAddress>admin@example.com</ns0:EmailAddress>
+  </ns0:ContactPerson>
+</ns0:EntityDescriptor>

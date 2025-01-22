@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:eidas="http://eidas.europa.eu/saml-extensions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://eidas.europa.eu/saml-extensions" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+  <xsd:element name="SPType" type="eidas:SPTypeType"/>
+  <xsd:simpleType name="SPTypeType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="public"/>
+      <xsd:enumeration value="private"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:element name="NodeCountry" type="eidas:NodeCountryType"/>
+  <xsd:simpleType name="NodeCountryType">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="[A-Z][A-Z]"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:element name="RequestedAttributes" type="eidas:RequestedAttributesType"/>
+  <xsd:complexType name="RequestedAttributesType">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" ref="eidas:RequestedAttribute"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="RequestedAttribute" type="eidas:RequestedAttributeType"/>
+  <xsd:complexType name="RequestedAttributeType">
+    <xsd:sequence>
+      <xsd:element name="AttributeValue" type="xsd:anyType" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="Name" type="xsd:string" use="required"/>
+    <xsd:attribute name="NameFormat" type="xsd:anyURI" use="required"/>
+    <xsd:attribute name="isRequired" type="xsd:boolean" use="required"/>
+    <xsd:attribute name="FriendlyName" type="xsd:string" use="optional"/>
+    <xsd:anyAttribute namespace="##other" processContents="lax"/>
+  </xsd:complexType>
+</xsd:schema>

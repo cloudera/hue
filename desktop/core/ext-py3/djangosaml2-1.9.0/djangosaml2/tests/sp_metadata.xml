@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<md:EntitiesDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata">
+  <md:EntityDescriptor entityID="http://sp.example.com/saml2/metadata/">
+    <md:SPSSODescriptor AuthnRequestsSigned="False" WantAssertionsSigned="True" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+      <md:KeyDescriptor>
+	<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+	  <ds:X509Data>
+	    <ds:X509Certificate>MIIDFjCCAf4CCQCzHO9MprkomDANBgkqhkiG9w0BAQUFADBNMQswCQYDVQQGEwJl
+czEQMA4GA1UECAwHU2V2aWxsYTENMAsGA1UECgwEWWFjbzEQMA4GA1UEBwwHU2V2
+aWxsYTELMAkGA1UEAwwCU1AwHhcNMTIwMzE1MjA1MjA1WhcNMTMwMzE1MjA1MjA1
+WjBNMQswCQYDVQQGEwJlczEQMA4GA1UECAwHU2V2aWxsYTENMAsGA1UECgwEWWFj
+bzEQMA4GA1UEBwwHU2V2aWxsYTELMAkGA1UEAwwCU1AwggEiMA0GCSqGSIb3DQEB
+AQUAA4IBDwAwggEKAoIBAQCeOJEVPpGZMDm3nZsJkl/jH8lEmhA4OWgILP3XzdYL
+rc/fuKR66XYapGied+Pe+PldqyfLpkojUuRDwAXHTprr1HKlUkKvt4Lk0mqH9Z3/
+mZgj1NkKQBkGRLU0miFK93+m1B/Zlg4K1ycRV7111l5NvT9EVDAnyRU0RVjTrifp
+duy85vz9BnRusaR1YKc3NfwC1BiRUAAqhbuSYa0ALwVVri7mNob+/lYmbqrWScpA
+QFHy4VjSricjR8WvFjC3eBJbV7LIzdtd19cD+yDX2cDgXXR+QFxLUhHEhVrF+wvT
+QGcaZPYFiujcY/3FveRoRwdp6e03sUH/eqJksgR5ylJfAgMBAAEwDQYJKoZIhvcN
+AQEFBQADggEBAAu0rKFYHr6pi3yqIIc8EE6NnngqyZEnnDRPWuUK3WKcDI5rOmy9
+8pPE+6sj2NBJyyPu/bsiaCOZBOPywh/AZymO6q3iJRB3pmllH7zYp0LW10HI3NRw
+0T5BJ1ecudM5oitzE7EeMAT6+PogB9i+wxbf/p2YUYsbyiD/JPcrbt5h22sLGxTZ
+ovbOVacQF9es/YenvgmFGY42yea6fO33jZyBTiY69Tmjt+sv1nQJTUIyGeb1bVvF
+JMCJ3g73lNb3DTDS0UO+zLTlTHb1M/uJJnGY/CCb4kmoPRpxgMbybOh2TVfx9RHm
+45W7GtDf4fZ+LqdZC0JVAZQ7a28L5df0TwQ=
+</ds:X509Certificate>
+	  </ds:X509Data>
+	</ds:KeyInfo>
+      </md:KeyDescriptor>
+      <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://sp.example.com/saml2/acs/" index="0" />
+      <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://sp.example.com/saml2/ls/"/>
+    </md:SPSSODescriptor>
+    <md:Organization>
+      <md:OrganizationURL xml:lang="en">http://sp.example.com/</md:OrganizationURL>
+      <md:OrganizationName xml:lang="en">Lorenzo's test SP</md:OrganizationName>
+      <md:OrganizationDisplayName xml:lang="en">sp.example.com</md:OrganizationDisplayName>
+    </md:Organization>
+    <md:ContactPerson contactType="technical">
+      <md:SurName>Administrator</md:SurName>
+      <md:EmailAddress>lorenzo.gil.sanchez@gmail.com</md:EmailAddress>
+    </md:ContactPerson>
+  </md:EntityDescriptor>
+</md:EntitiesDescriptor>

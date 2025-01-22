@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://eidas.europa.eu/attributes/legalperson" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://eidas.europa.eu/attributes/legalperson" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+  <xsd:attribute name="LatinScript" type="xsd:boolean" default="true"/>
+  <!-- Mandatory attribute types for a legal person. -->
+  <xsd:simpleType name="LegalPersonIdentifierType">
+    <xsd:annotation>
+      <xsd:documentation>Unique identifier for the legal person as defined by the eIDAS Regulation.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:complexType name="LegalNameType">
+    <xsd:annotation>
+      <xsd:documentation>Current legal name for the legal person or organisation.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute ref="LatinScript"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!-- Optional attribute types for a legal person. -->
+  <xsd:complexType name="LegalPersonAddressStructuredType">
+    <xsd:annotation>
+      <xsd:documentation>The address the legal person has registered with the MS authority or operating address if not registered. For a company this should be the registered address within the MS issuing the eID.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="PoBox" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="LocatorDesignator" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="LocatorName" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="CvaddressArea" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="Thoroughfare" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="PostName" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="AdminunitFirstline" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="AdminunitSecondline" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="PostCode" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="LegalPersonAddressType">
+    <xsd:annotation>
+      <xsd:documentation>The address the legal person has registered with the MS authority or operating address if not registered. For a company this should be the registered address within the MS issuing the eID as a base64 encoded string.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="VATRegistrationNumberType">
+    <xsd:annotation>
+      <xsd:documentation>VAT - VAT registration number</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="TaxReferenceType">
+    <xsd:annotation>
+      <xsd:documentation>TAX-Ref - tax reference number</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="D-2012-17-EUIdentifierType">
+    <xsd:annotation>
+      <xsd:documentation>D-2012/17/EU - the identifier used under Directive 2012/17/EU</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="LEIType">
+    <xsd:annotation>
+      <xsd:documentation>LEI - Legal Entity Identifier</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="EORIType">
+    <xsd:annotation>
+      <xsd:documentation>EORI - Economic Operator Registration and Identification</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="SEEDType">
+    <xsd:annotation>
+      <xsd:documentation>SEED - System for Exchange of Excise Data </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="SICType">
+    <xsd:annotation>
+      <xsd:documentation>SIC - Standard Industrial Classification</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+</xsd:schema>

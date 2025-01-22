@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0" ID="the-response-id" IssueInstant="2020-12-04T07:48:09.700Z" InResponseTo="id-abc" Destination="https://51.15.251.81.xip.io/acs/post">
+    <saml:Issuer>urn:mace:example.com:saml:roland:idp</saml:Issuer>
+    <samlp:Status>
+        <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+    </samlp:Status>
+    <saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0" ID="the-assertion-id" IssueInstant="2020-12-04T07:48:09.600Z">
+        <saml:Issuer>urn:mace:example.com:saml:roland:idp</saml:Issuer>
+        <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+            <ds:SignedInfo>
+                <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                <ds:Reference URI="#the-assertion-id">
+                    <ds:Transforms>
+                        <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                        <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                    </ds:Transforms>
+                    <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+                    <ds:DigestValue>NHB0WhPWj5OyRz9N52fZrEBWK3dXT2pVVT54f4kg1tM=</ds:DigestValue>
+                </ds:Reference>
+            </ds:SignedInfo>
+            <ds:SignatureValue>Mo4ZheAEDvdPQwWvT5SOYZZ2IBELwtmBpdsn+Th+IvsanychWQ6JHYKTI8hl+3DigbqQwdsqet8n9sfdvr+D+Q7XozjVaFPdzUGC9d96Mn/vrc+JIP/ESoDjDUQEsoSBhUFlrbu7tPJDJehPgd/maIwd/GqEHWXFlm1ZWVCmaH8=</ds:SignatureValue>
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>MIIFLDCCBBSgAwIBAgISA3UxXAgBWRS1D74GOLiAjky6MA0GCSqGSIb3DQEBCwUAMDIxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQswCQYDVQQDEwJSMzAeFw0yMTAxMTcyMDIxNTNaFw0yMTA0MTcyMDIxNTNaMB4xHDAaBgNVBAMTEzUxLjE1LjI1MS44MS54aXAuaW8wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDkjSN9vZDOwE1m7g1vyiwBsKBKNItyy05BcHUkM8fabBcsavugT8uE4wYz5aeZrnKb5dbDLHaZe6Dl5GHgRO8s7REwSJ/BHT3/eMaEakLwIGE5/6QSWuBjOawPfmYarW5IqoITjSt/o/jxu3haouqbr7XYf1WOuZmc6iwGnEgm0+cVB4CA0VGnnLYfsjp9iMt3pFI8a8ipdwp5lfzZU+j8JMVEn6SZhNjjTAjcakBQmZv4Q5/yU6yqfGjG47DO62xB/PPbDy78hDorER2v8UkoDTGV4aZrZaNltHBUxNohIiQnkhuakMmbf0NhA2ExBJw6KTCCxfYkyUX3CgYzaAnxAgMBAAGjggJOMIICSjAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFHD7gcF0sNITPqhwcUlFyOBrkxRFMB8GA1UdIwQYMBaAFBQusxe3WFbLrlAJQOYfr52LFMLGMFUGCCsGAQUFBwEBBEkwRzAhBggrBgEFBQcwAYYVaHR0cDovL3IzLm8ubGVuY3Iub3JnMCIGCCsGAQUFBzAChhZodHRwOi8vcjMuaS5sZW5jci5vcmcvMB4GA1UdEQQXMBWCEzUxLjE1LjI1MS44MS54aXAuaW8wTAYDVR0gBEUwQzAIBgZngQwBAgEwNwYLKwYBBAGC3xMBAQEwKDAmBggrBgEFBQcCARYaaHR0cDovL2Nwcy5sZXRzZW5jcnlwdC5vcmcwggEEBgorBgEEAdZ5AgQCBIH1BIHyAPAAdQBc3EOS/uarRUSxXprUVuYQN/vV+kfcoXOUsl7m9scOygAAAXcSOcqvAAAEAwBGMEQCIFhvPWYY+2VO55bHO1Sa9zJQk7B1kvCi7sfDCxAYp7mEAiBTKx6XD0GkfNGhji0LGuelvfD7gZOUSzURlJW1ahYcgQB3APZclC/RdzAiFFQYCDCUVo7jTRMZM7/fDC8gC8xO8WTjAAABdxI5yq4AAAQDAEgwRgIhAONNwcNZ66IxsWcUNDS0B9KV8Kk4VS9b/wUFNBHAQl3SAiEAxO5GwgaK3glL/6L/J7qpiedJBAs3h5406MWC0v4uYZ8wDQYJKoZIhvcNAQELBQADggEBAAZgbgfOb4+uI9kMGF4fMiompHeUFDXGyIND6y4FsfWHJG4Fn3aG+VQN/UtHeO8UusjS13/2yw3O+PeNTstBl+q6Ssega8zTYx2j3h3RFqM9JR8SWa83B0UTgyaxX3PTmfegV4/RZxC7KQ8pqjcLwKJSTgZF6W40Jo16tKVoi0VQY/2Gre6E9D1tPVw//mDGJST/5IcbFvtr79uft76IA+T674qNgAriBKxWncSbGzE42w2QsYsGMHHJn3vKbNl7alll9eJBqvdi1Q7ay86oI7NDQ0PPwjnB0/i4BOO0qQBcBSUIPPEChcrooEqN9PwM20aoyIjje0rtDGSxnEQRrg0=</ds:X509Certificate>
+                    <ds:X509Certificate>MIIEZTCCA02gAwIBAgIQQAF1BIMUpMghjISpDBbN3zANBgkqhkiG9w0BAQsFADA/MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMTDkRTVCBSb290IENBIFgzMB4XDTIwMTAwNzE5MjE0MFoXDTIxMDkyOTE5MjE0MFowMjELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUxldCdzIEVuY3J5cHQxCzAJBgNVBAMTAlIzMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuwIVKMz2oJTTDxLsjVWSw/iC8ZmmekKIp10mqrUrucVMsa+Oa/l1yKPXD0eUFFU1V4yeqKI5GfWCPEKpTm71O8Mu243AsFzzWTjn7c9p8FoLG77AlCQlh/o3cbMT5xys4Zvv2+Q7RVJFlqnBU840yFLuta7tj95gcOKlVKu2bQ6XpUA0ayvTvGbrZjR8+muLj1cpmfgwF126cm/7gcWt0oZYPRfH5wm78Sv3htzB2nFd1EbjzK0lwYi8YGd1ZrPxGPeiXOZT/zqItkel/xMY6pgJdz+dU/nPAeX1pnAXFK9jpP+Zs5Od3FOnBv5IhR2haa4ldbsTzFID9e1RoYvbFQIDAQABo4IBaDCCAWQwEgYDVR0TAQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAYYwSwYIKwYBBQUHAQEEPzA9MDsGCCsGAQUFBzAChi9odHRwOi8vYXBwcy5pZGVudHJ1c3QuY29tL3Jvb3RzL2RzdHJvb3RjYXgzLnA3YzAfBgNVHSMEGDAWgBTEp7Gkeyxx+tvhS5B1/8QVYIWJEDBUBgNVHSAETTBLMAgGBmeBDAECATA/BgsrBgEEAYLfEwEBATAwMC4GCCsGAQUFBwIBFiJodHRwOi8vY3BzLnJvb3QteDEubGV0c2VuY3J5cHQub3JnMDwGA1UdHwQ1MDMwMaAvoC2GK2h0dHA6Ly9jcmwuaWRlbnRydXN0LmNvbS9EU1RST09UQ0FYM0NSTC5jcmwwHQYDVR0OBBYEFBQusxe3WFbLrlAJQOYfr52LFMLGMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjANBgkqhkiG9w0BAQsFAAOCAQEA2UzgyfWEiDcx27sT4rP8i2tiEmxYt0l+PAK3qB8oYevO4C5z70kHejWEHx2taPDY/laBL21/WKZuNTYQHHPD5b1tXgHXbnL7KqC401dk5VvCadTQsvd8S8MXjohyc9z9/G2948kLjmE6Flh9dDYrVYA9x2O+hEPGOaEOa1eePynBgPayvUfLqjBstzLhWVQLGAkXXmNs+5ZnPBxzDJOLxhF2JIbeQAcH5H0tZrUlo5ZYyOqA7s9pO5b85o3AM/OJ+CktFBQtfvBhcJVd9wvlwPsk+uyOy2HI7mNxKKgsBTt375teA2TwUdHkhVNcsAKX1H7GNNLOEADksd86wuoXvg==</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </ds:Signature>
+        <saml:Subject>
+            <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">attack-name-id</saml:NameID>
+            <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+                <saml:SubjectConfirmationData NotOnOrAfter="2020-12-04T07:58:09.600Z" Recipient="https://51.15.251.81.xip.io/acs/post" InResponseTo="id-abc"/>
+            </saml:SubjectConfirmation>
+        </saml:Subject>
+        <saml:Conditions NotBefore="2020-12-04T07:48:09.600Z" NotOnOrAfter="2020-12-04T07:58:09.600Z">
+            <saml:AudienceRestriction>
+                <saml:Audience>urn:mace:example.com:saml:roland:sp</saml:Audience>
+            </saml:AudienceRestriction>
+        </saml:Conditions>
+        <saml:AuthnStatement AuthnInstant="2020-12-04T07:48:09.600Z" SessionNotOnOrAfter="2020-12-04T07:58:09.600Z" SessionIndex="_samling_8227405_474676521">
+            <saml:AuthnContext>
+                <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified</saml:AuthnContextClassRef>
+            </saml:AuthnContext>
+        </saml:AuthnStatement>
+    </saml:Assertion>
+</samlp:Response>

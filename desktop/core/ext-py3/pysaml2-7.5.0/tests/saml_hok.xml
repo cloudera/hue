@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- SAML response with multiple 'holder-of-key' subject confirmations. -->
+<ns0:Response xmlns:ns0="urn:oasis:names:tc:SAML:2.0:protocol" 
+    xmlns:ns1="urn:oasis:names:tc:SAML:2.0:assertion" 
+    xmlns:ns2="http://www.w3.org/2000/09/xmldsig#" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Destination="https://sp:443/.auth/saml/login" ID="_df9a1eadc90519252694519504a13dfb8dd67a1bb4" InResponseTo="id-KHlas49TtW2VdC8WN" IssueInstant="2019-05-14T20:35:13Z" Version="2.0">
+    <ns1:Issuer>https://idp:8443</ns1:Issuer>
+    <ns0:Status>
+        <ns0:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />
+    </ns0:Status>
+    <ns1:Assertion ID="_12d211a5015f71eba8f837d2aa8b95b28bbdc4599b" IssueInstant="2019-05-14T20:35:13Z" Version="2.0">
+        <ns1:Issuer>https://idp:8443</ns1:Issuer>
+        <ns1:Subject>
+            <ns1:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">57a0a35eefdb29ca8b4ab78d5a118117</ns1:NameID>
+            <ns1:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:holder-of-key">
+                <ns1:SubjectConfirmationData InResponseTo="id-KHlas49TtW2VdC8WN" NotOnOrAfter="2019-05-14T20:36:13Z" Recipient="https://sp:443/.auth/saml/login">
+                    <ns2:KeyInfo>
+                        <ns2:X509Data>
+                            <ns2:X509Certificate>MIICITCCAYoCAQEwDQYJKoZIhvcNAQELBQAwWDELMAkGA1UEBhMCenoxCzAJBgNVBAgMAnp6MQ0wCwYDVQQHDAR6enp6MQ4wDAYDVQQKDAVaenp6ejEOMAwGA1UECwwFWnp6enoxDTALBgNVBAMMBHRlc3QwIBcNMTkwNDEyMTk1MDM0WhgPMzAxODA4MTMxOTUwMzRaMFgxCzAJBgNVBAYTAnp6MQswCQYDVQQIDAJ6ejENMAsGA1UEBwwEenp6ejEOMAwGA1UECgwFWnp6enoxDjAMBgNVBAsMBVp6enp6MQ0wCwYDVQQDDAR0ZXN0MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHcj80WU/XBsd9FlyQmfjPUdfmedhCFDd6TEQmZNNqP/UG+VkGa+BXjRIHMfic/WxPTbGhCjv68ci0UDNomUXagFexLGNpkwa7+CRVtoc/1xgq+ySE6M4nhcCutScoxNvWNn5eSQ66i3U0sTv91MgsXxqEdTaiZg0BIufEc3dueQIDAQABMA0GCSqGSIb3DQEBCwUAA4GBAGUV5B+USHvaRa8kgCNJSuNpo6ARlv0ekrk8bbdNRBiEUdCMyoGJFfuM9K0zybX6Vr25wai3nvaog294Vx/jWjX2g5SDbjItH6VGy6C9GCGf1A07VxFRCfJn5tA9HuJjPKiE+g/BmrV5N4CealzFxPHWYkNOzoRU8qI7OqUai1kL</ns2:X509Certificate>
+                        </ns2:X509Data>
+                    </ns2:KeyInfo>
+                </ns1:SubjectConfirmationData>
+            </ns1:SubjectConfirmation>
+            <ns1:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:holder-of-key">
+                <ns1:SubjectConfirmationData InResponseTo="id-KHlas49TtW2VdC8WN" NotOnOrAfter="2019-05-14T20:36:13Z" Recipient="https://sp:443/.auth/saml/login">
+                    <ns2:KeyInfo>
+                        <ns2:X509Data>
+                            <ns2:X509Certificate>MIICITCCAYoCAQEwDQYJKoZIhvcNAQELBQAwWDELMAkGA1UEBhMCenoxCzAJBgNVBAgMAnp6MQ0wCwYDVQQHDAR6enp6MQ4wDAYDVQQKDAVaenp6ejEOMAwGA1UECwwFWnp6enoxDTALBgNVBAMMBHRlc3QwIBcNMTkwNDEyMTk1MDM0WhgPMzAxODA4MTMxOTUwMzRaMFgxCzAJBgNVBAYTAnp6MQswCQYDVQQIDAJ6ejENMAsGA1UEBwwEenp6ejEOMAwGA1UECgwFWnp6enoxDjAMBgNVBAsMBVp6enp6MQ0wCwYDVQQDDAR0ZXN0MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDjW0kJM+4baWKtvO24ZsGXNvNKKkwTMz7OW5Z6BRqhSOq2WA0c5NCpMk6rD8Z2OTFEolPojEjf8dVyd/Ds/hrjFKQv8wQgbdXLN51YTIsgd6h+hBJO+vzhl0PT4aT7M0JKo5ALtS6qk4tsworW2BnwyvsGSAinwfeWt4t/b1J3kwIDAQABMA0GCSqGSIb3DQEBCwUAA4GBAFtj7WArQQBugmh/KQjjlfTQ5A052QeXfgTyO9vv1S6MRIi7qgiaEv49cGXnJv/TWbySkMKObPMUApjg6z8PqcxuShew5FCTkNvwhABFPiyu0fUj3e2FEPHfsBu76jz4ugtmhUqjqhzwFY9ctnWRkkl6J0AjM3LnHOSgjNIclDZG</ns2:X509Certificate>
+                        </ns2:X509Data>
+                    </ns2:KeyInfo>
+                </ns1:SubjectConfirmationData>
+            </ns1:SubjectConfirmation>
+        </ns1:Subject>
+        <ns1:AuthnStatement AuthnInstant="2019-05-14T20:35:13Z" SessionIndex="1">
+            <ns1:AuthnContext>
+                <ns1:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</ns1:AuthnContextClassRef>
+            </ns1:AuthnContext>
+        </ns1:AuthnStatement>
+        <ns1:AttributeStatement>
+            <ns1:Attribute Name="uid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                <ns1:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">testuser</ns1:AttributeValue>
+            </ns1:Attribute>
+        </ns1:AttributeStatement>
+    </ns1:Assertion>
+</ns0:Response>

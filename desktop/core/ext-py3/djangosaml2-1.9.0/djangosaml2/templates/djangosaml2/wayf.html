@@ -1,0 +1,16 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  </head>
+  <body>
+    <h1>Where are you from?</h1>
+    <p>Please select your <strong>Identity Provider</strong> from the following list:</p>
+    <ul>
+      {% for url, name in available_idps %}
+      <li><a href="{% url 'saml2_login' %}?idp={{ url }}{% if came_from %}&next={{ came_from }}{% endif %}">{{ name|default_if_none:url }}</a></li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

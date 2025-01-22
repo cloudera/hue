@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- SAML response with invalid 'holder-of-key' SubjectConfirmation: missing KeyInfo element. -->
+<ns0:Response xmlns:ns0="urn:oasis:names:tc:SAML:2.0:protocol" 
+    xmlns:ns1="urn:oasis:names:tc:SAML:2.0:assertion" 
+    xmlns:ns2="http://www.w3.org/2000/09/xmldsig#" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Destination="https://sp:443/.auth/saml/login" ID="_df9a1eadc90519252694519504a13dfb8dd67a1bb4" InResponseTo="id-KHlas49TtW2VdC8WN" IssueInstant="2019-05-14T20:35:13Z" Version="2.0">
+    <ns1:Issuer>https://idp:8443</ns1:Issuer>
+    <ns0:Status>
+        <ns0:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />
+    </ns0:Status>
+    <ns1:Assertion ID="_12d211a5015f71eba8f837d2aa8b95b28bbdc4599b" IssueInstant="2019-05-14T20:35:13Z" Version="2.0">
+        <ns1:Issuer>https://idp:8443</ns1:Issuer>
+        <ns1:Subject>
+            <ns1:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">57a0a35eefdb29ca8b4ab78d5a118117</ns1:NameID>
+            <ns1:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:holder-of-key">
+                <ns1:SubjectConfirmationData InResponseTo="id-KHlas49TtW2VdC8WN" NotOnOrAfter="2019-05-14T20:36:13Z" Recipient="https://sp:443/.auth/saml/login" />
+            </ns1:SubjectConfirmation>
+        </ns1:Subject>
+        <ns1:AuthnStatement AuthnInstant="2019-05-14T20:35:13Z" SessionIndex="1">
+            <ns1:AuthnContext>
+                <ns1:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</ns1:AuthnContextClassRef>
+            </ns1:AuthnContext>
+        </ns1:AuthnStatement>
+        <ns1:AttributeStatement>
+            <ns1:Attribute Name="uid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+                <ns1:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">testuser</ns1:AttributeValue>
+            </ns1:Attribute>
+        </ns1:AttributeStatement>
+    </ns1:Assertion>
+</ns0:Response>

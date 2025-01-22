@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     SAML V2.0 Subject Identifier Attributes Profile Version 1.0
+     Committee Specification 01
+     16 January 2019
+     Copyright (c) OASIS Open 2019. All Rights Reserved.
+     Source: https://docs.oasis-open.org/security/saml-subject-id-attr/v1.0/cs01/schema/saml-subject-id-attr-v1.0.xsd
+     Latest version of narrative specification: https://docs.oasis-open.org/security/saml-subject-id-attr/v1.0/saml-subject-id-attr-v1.0.html
+     TC IPR Statement: https://www.oasis-open.org/committees/security/ipr.php 
+     Initial version contributed to OASIS, (c) The Ohio State University
+-->
+<schema 
+  targetNamespace="urn:mace:shibboleth:metadata:1.0"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:shibmd="urn:mace:shibboleth:metadata:1.0"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified"
+  blockDefault="substitution"
+  version="1.0">
+
+  <annotation>
+    <documentation>
+      Document title: Metadata Extension Schema for
+		SAML V2.0 Subject Identifier Attributes Profile Version 1.0
+      Document identifier: saml-subject-id-attr-v1.0.xsd
+      Location: http://docs.oasis-open.org/security/saml-subject-id-attr/v1.0/
+      Revision history:
+      September 2018:
+        Initial version contributed to OASIS, (c) The Ohio State University
+    </documentation>
+  </annotation>
+
+  <element name="Scope">
+    <annotation>
+      <documentation>
+        SAML metadata extension used to regulate allowable attribute scopes.
+      </documentation>
+    </annotation>
+    <complexType>
+      <simpleContent>
+        <extension base="string">
+          <attribute name="regexp" type="boolean" use="optional" default="false"/>
+        </extension>
+      </simpleContent>
+    </complexType>
+  </element>
+
+</schema>
