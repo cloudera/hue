@@ -43,7 +43,8 @@ export enum ActionType {
   Replication = 'replication',
   Delete = 'delete',
   Compress = 'compress',
-  Extract = 'extract'
+  Extract = 'extract',
+  Download = 'download'
 }
 
 const isValidFileOrFolder = (filePath: string): boolean => {
@@ -61,7 +62,7 @@ const isFileCompressed = (filePath: string): boolean => {
 };
 
 const isActionEnabled = (file: StorageDirectoryTableData, action: ActionType): boolean => {
-  const config = getLastKnownConfig();
+  const config = getLastKnownConfig()?.storage_browser;
   switch (action) {
     case ActionType.Summary:
       return (isHDFS(file.path) || isOFS(file.path)) && file.type === BrowserViewType.file;
@@ -74,12 +75,14 @@ const isActionEnabled = (file: StorageDirectoryTableData, action: ActionType): b
       return isValidFileOrFolder(file.path);
     case ActionType.Extract:
       return (
-        !!config?.storage_browser.enable_extract_uploaded_archive &&
+        !!config?.enable_extract_uploaded_archive &&
         isHDFS(file.path) &&
         isFileCompressed(file.path)
       );
     case ActionType.Compress:
-      return !!config?.storage_browser.enable_extract_uploaded_archive && isHDFS(file.path);
+      return !!config?.enable_extract_uploaded_archive && isHDFS(file.path);
+    case ActionType.Download:
+      return !!config?.enable_file_download_button && file.type === BrowserViewType.file;
     default:
       return false;
   }
@@ -153,6 +156,11 @@ export const getEnabledActions = (
       enabled: isSingleFileActionEnabled(files, ActionType.Extract),
       type: ActionType.Extract,
       label: 'Extract'
+    },
+    {
+      enabled: isSingleFileActionEnabled(files, ActionType.Download),
+      type: ActionType.Download,
+      label: 'Download'
     }
   ].filter(e => e.enabled);
 
