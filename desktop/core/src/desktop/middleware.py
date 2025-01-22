@@ -846,6 +846,9 @@ class MetricsMiddleware(MiddlewareMixin):
   def process_request(self, request):
     # import threading
     # LOG.debug("===> MetricsMiddleware pid: %d thread: %d" % (os.getpid(), threading.get_ident()))
+    print('++++++++++++')
+    print(request.body)
+    print('++++++++++++')
     self._response_timer = metrics.response_time.time()
     metrics.active_requests.inc()
     if is_gunicorn_report_enabled():
