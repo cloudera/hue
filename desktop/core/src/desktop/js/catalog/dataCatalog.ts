@@ -127,8 +127,8 @@ export interface SqlAnalyzerPopularitySubType {
 
 export interface SqlAnalyzerPopularity
   extends TimestampedData,
-    SqlAnalyzerResponsePopularity,
-    SqlAnalyzerPopularitySubType {
+  SqlAnalyzerResponsePopularity,
+  SqlAnalyzerPopularitySubType {
   column_count?: number;
   popularity?: number;
   relativePopularity?: number;
@@ -146,8 +146,9 @@ const generateEntryCacheId = (options: {
   path?: string | string[];
   paths?: string[][];
   namespace: Namespace;
+  compute: Compute
 }): string => {
-  let id = options.namespace.id;
+  let id = `${options.namespace.id}_${options.compute.name}`;
   if (options.path) {
     if (typeof options.path === 'string') {
       id += '_' + options.path;
@@ -327,7 +328,7 @@ export class DataCatalog {
       return;
     }
 
-    const keyPrefix = generateEntryCacheId({ namespace: namespace, path: pathToClear });
+    const keyPrefix = generateEntryCacheId({ namespace: namespace, path: pathToClear, compute });
     Object.keys(this.entries).forEach(key => {
       if (key.indexOf(keyPrefix) === 0) {
         delete this.entries[key];
@@ -537,7 +538,8 @@ export class DataCatalog {
 
     const sourceIdentifier = generateEntryCacheId({
       namespace: options.namespace,
-      path: []
+      path: [],
+      compute: options.compute
     });
 
     // Create the source entry if not already present
@@ -564,7 +566,8 @@ export class DataCatalog {
       const existingTemporaryDatabases = await sourceEntry.getChildren();
       const databaseIdentifier = generateEntryCacheId({
         namespace: options.namespace,
-        path: [database]
+        path: [database],
+        compute: options.compute
       });
 
       // Create the database entry if not already present
@@ -593,7 +596,8 @@ export class DataCatalog {
 
       const tableIdentifier = generateEntryCacheId({
         namespace: options.namespace,
-        path: path
+        path: path,
+        compute: options.compute
       });
 
       // Unlink any existing table with the same identifier
@@ -677,7 +681,8 @@ export class DataCatalog {
 
         const columnIdentifier = generateEntryCacheId({
           namespace: options.namespace,
-          path: columnPath
+          path: columnPath,
+          compute: options.compute
         });
         identifiersToClean.push(columnIdentifier);
         this.temporaryEntries[columnIdentifier] = CancellablePromise.resolve(columnEntry);
