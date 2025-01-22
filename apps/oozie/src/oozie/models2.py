@@ -50,7 +50,7 @@ from liboozie.conf import SECURITY_ENABLED
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission, create_directories
 from notebook.models import Notebook
-from oozie.conf import REMOTE_SAMPLE_DIR
+from oozie.conf import OOZIE_HS2_JDBC_URL, REMOTE_SAMPLE_DIR
 from oozie.importlib.workflows import InvalidTagWithNamespaceException, MalformedWfDefException, generate_v2_graph_nodes
 from oozie.utils import UTC_TIME_FORMAT, convert_to_server_timezone, utc_datetime_format
 
@@ -830,7 +830,7 @@ class Node(object):
       workflow_mapping = {}
 
     if self.data['type'] in ('hive2', 'hive-document') and not self.data['properties']['jdbc_url']:
-      self.data['properties']['jdbc_url'] = _get_hiveserver2_url()
+      self.data['properties']['jdbc_url'] = OOZIE_HS2_JDBC_URL.get() if OOZIE_HS2_JDBC_URL.get() else _get_hiveserver2_url()
 
     if self.data['type'] == 'fork':
       links = [link for link in self.data['children'] if link['to'] in node_mapping]
