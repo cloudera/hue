@@ -1,5 +1,5 @@
-<script type="text/javascript">
-	window.onload = function(){
+<script type="text/javascript"{% if request.csp_nonce %} nonce="{{ request.csp_nonce }}"{% endif %}>
+	window.onload = function() {
 		document.SSO_Login.submit();
 	};
 </script>
@@ -9,7 +9,7 @@ Please click the button below if you're not redirected automatically within a fe
 </p>
 <form method="post" action="{{ target_url }}" name="SSO_Login">
 	{% for key, value in params.items %}
-	    <input type="hidden" name="{{ key|safe }}" value="{{ value|safe }}" />
+	    <input type="hidden" name="{{ key }}" value="{{ value }}" />
 	{% endfor %}
     <input type="submit" value="Log in" />
 </form>
