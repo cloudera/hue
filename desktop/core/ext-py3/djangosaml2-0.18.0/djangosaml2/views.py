@@ -232,6 +232,7 @@ def login(request,
                     saml_request = base64.b64encode(binary_type(request_xml))
 
                 http_response = render(request, post_binding_form_template, {
+                    'request': request,
                     'target_url': location,
                     'params': {
                         'SAMLRequest': saml_request,
