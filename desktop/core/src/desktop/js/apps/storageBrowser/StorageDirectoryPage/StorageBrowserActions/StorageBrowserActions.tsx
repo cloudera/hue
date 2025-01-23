@@ -76,6 +76,18 @@ const StorageBrowserActions = ({
     setSelectedAction(undefined);
   };
 
+  const downloadFile = () => {
+    huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
+    location.href = `${DOWNLOAD_API_URL}?path=${selectedFiles[0]?.path}`;
+  };
+
+  const onActionClick = (actionType: ActionType) => () => {
+    if (actionType === ActionType.Download) {
+      return downloadFile();
+    }
+    setSelectedAction(actionType);
+  };
+
   const onApiSuccess = () => {
     setLoadingFiles(false);
     closeModal();
