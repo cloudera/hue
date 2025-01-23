@@ -26,6 +26,7 @@ from wsgiref.util import FileWrapper
 from django.http import HttpResponse
 
 from desktop.auth.backend import is_admin
+from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import smart_str
 from desktop.log import DEFAULT_LOG_DIR
@@ -53,6 +54,7 @@ def api_error_handler(view_fn):
 def get_hue_logs(request):
   """
   Retrieves the last X characters of log messages from the log file.
+  Optionally, the log messages can be returned in reverse order.
 
   Args:
     request: The HTTP request object.
@@ -68,10 +70,13 @@ def get_hue_logs(request):
   Notes:
     This endpoint retrieves the last X characters of log messages from the log file.
     The log file is read up to the buffer size, and if it's smaller than the buffer size,
-    the previous log file is read to complete the buffer.
+    the previous log file is read to complete the buffer. If the 'reverse' query parameter
+    is set to True, the log messages are returned in reverse order.
   """
   if not is_admin(request.user):
     return HttpResponse("You must be a Hue admin to access this endpoint.", status=403)
+
+  reverse_logs = coerce_bool(request.GET.get('reverse', False))
 
   # Buffer size for reading log files
   LOG_BUFFER_SIZE = 32 * 1024
@@ -98,7 +103,7 @@ def get_hue_logs(request):
       # Read the previous log file contents
       buffer = _read_previous_log_file(LOG_BUFFER_SIZE, previous_log_file, prev_log_file_size, log_file_size) + buffer
 
-  response = {'hue_hostname': socket.gethostname(), 'logs': ''.join(buffer)}
+  response = {'hue_hostname': socket.gethostname(), 'logs': buffer[::-1] if reverse_logs else buffer}
   return JsonResponse(response)
 
 
