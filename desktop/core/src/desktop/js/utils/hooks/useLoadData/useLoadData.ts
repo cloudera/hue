@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ApiFetchOptions, get } from '../../api/utils';
+import { ApiFetchOptions, get } from '../../../api/utils';
 import { AxiosError } from 'axios';
 
 export interface Options<T, U> {

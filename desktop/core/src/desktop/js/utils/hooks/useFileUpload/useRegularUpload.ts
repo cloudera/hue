@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import useQueueProcessor from '../useQueueProcessor';
+import useQueueProcessor from '../useQueueProcessor/useQueueProcessor';
 import { UPLOAD_FILE_URL } from '../../../reactComponents/FileChooser/api';
 import {
   DEFAULT_CONCURRENT_MAX_CONNECTIONS,
   FileUploadStatus
 } from '../../constants/storageBrowser';
-import useSaveData from '../useSaveData';
+import useSaveData from '../useSaveData/useSaveData';
 import { UploadItem } from './util';
 
 interface UseUploadQueueResponse {

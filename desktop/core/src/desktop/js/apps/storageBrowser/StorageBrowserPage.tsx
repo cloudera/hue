@@ -25,7 +25,7 @@ import StorageBrowserTab from './StorageBrowserTab/StorageBrowserTab';
 import { ApiFileSystem, FILESYSTEMS_API_URL } from '../../reactComponents/FileChooser/api';
 
 import './StorageBrowserPage.scss';
-import useLoadData from '../../utils/hooks/useLoadData';
+import useLoadData from '../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 const StorageBrowserPage = (): JSX.Element => {

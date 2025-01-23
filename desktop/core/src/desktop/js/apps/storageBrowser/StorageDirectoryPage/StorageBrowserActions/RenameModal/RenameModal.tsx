@@ -17,7 +17,7 @@
 import React from 'react';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
 import { i18nReact } from '../../../../../utils/i18nReact';
-import useSaveData from '../../../../../utils/hooks/useSaveData';
+import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { RENAME_API_URL } from '../../../../../reactComponents/FileChooser/api';
 import InputModal from '../../../InputModal/InputModal';
 

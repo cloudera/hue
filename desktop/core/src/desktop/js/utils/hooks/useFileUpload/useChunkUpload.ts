@@ -16,14 +16,14 @@
 
 import { useEffect, useState } from 'react';
 import { getLastKnownConfig } from '../../../config/hueConfig';
-import useSaveData from '../useSaveData';
-import useQueueProcessor from '../useQueueProcessor';
+import useSaveData from '../useSaveData/useSaveData';
+import useQueueProcessor from '../useQueueProcessor/useQueueProcessor';
 import {
   DEFAULT_CHUNK_SIZE,
   DEFAULT_CONCURRENT_MAX_CONNECTIONS,
   FileUploadStatus
 } from '../../constants/storageBrowser';
-import useLoadData from '../useLoadData';
+import useLoadData from '../useLoadData/useLoadData';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
 import {
   createChunks,
