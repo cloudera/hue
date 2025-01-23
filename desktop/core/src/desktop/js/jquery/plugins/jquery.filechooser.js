@@ -807,7 +807,7 @@ let num_of_pending_uploads = 0;
 
 function initUploader(path, _parent, el, labels) {
   let uploader;
-  if (window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) {
+  if (window.getLastKnownConfig().storage_browser.enable_chunked_file_upload) {
     const action = '/filebrowser/upload/chunks/';
     const qqTemplate = document.createElement('div');
     qqTemplate.id = 'qq-template';
