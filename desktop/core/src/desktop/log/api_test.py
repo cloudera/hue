@@ -36,7 +36,7 @@ class TestHueLogs:
     self.user_not_admin = User.objects.get(username="test_not_admin")
 
   def test_get_hue_logs_unauthorized(self):
-    request = Mock(method='GET', user=self.user_not_admin)
+    request = Mock(method='GET', GET={}, user=self.user_not_admin)
 
     response = get_hue_logs(request)
     res_content = response.content.decode('utf-8')
@@ -46,7 +46,7 @@ class TestHueLogs:
 
   def test_log_directory_not_set(self):
     with patch('desktop.log.api.os.getenv') as os_getenv:
-      request = Mock(method='GET', user=self.user_admin)
+      request = Mock(method='GET', GET={}, user=self.user_admin)
       os_getenv.return_value = None
 
       response = get_hue_logs(request)
@@ -58,7 +58,7 @@ class TestHueLogs:
   def test_log_file_not_found(self):
     with patch('desktop.log.api.os.getenv') as os_getenv:
       with patch('desktop.log.api.os.path.exists') as os_path_exist:
-        request = Mock(method='GET', user=self.user_admin)
+        request = Mock(method='GET', GET={}, user=self.user_admin)
         os_getenv.return_value = '/var/log/hue/'
         os_path_exist.return_value = False
 
@@ -71,8 +71,8 @@ class TestHueLogs:
   def test_get_hue_logs_success(self):
     with patch('desktop.log.api.os') as mock_os:
       with patch('desktop.log.api._read_log_file') as _read_log_file:
-        request = Mock(method='GET', user=self.user_admin)
-        _read_log_file.return_value = 'test log content'
+        request = Mock(method='GET', GET={}, user=self.user_admin)
+        _read_log_file.return_value = ['Line 1: test log content', 'Line 2: more log lines']
 
         mock_os.os_getenv.return_value = '/var/log/hue/'
         mock_os.path.exists.return_value = True
@@ -82,4 +82,20 @@ class TestHueLogs:
         response_data = json.loads(response.content)
 
         assert response.status_code == 200
-        assert response_data == {'hue_hostname': socket.gethostname(), 'logs': 'test log content'}
+        assert response_data == {'hue_hostname': socket.gethostname(), 'logs': ['Line 1: test log content', 'Line 2: more log lines']}
+
+  def test_get_hue_logs_reverse_success(self):
+    with patch('desktop.log.api.os') as mock_os:
+      with patch('desktop.log.api._read_log_file') as _read_log_file:
+        request = Mock(method='GET', GET={'reverse': 'true'}, user=self.user_admin)
+        _read_log_file.return_value = ['Line 1: test log content', 'Line 2: more log lines']
+
+        mock_os.os_getenv.return_value = '/var/log/hue/'
+        mock_os.path.exists.return_value = True
+        mock_os.path.getsize.return_value = 32 * 1024 * 2  # Greater than log buffer size
+
+        response = get_hue_logs(request)
+        response_data = json.loads(response.content)
+
+        assert response.status_code == 200
+        assert response_data == {'hue_hostname': socket.gethostname(), 'logs': ['Line 2: more log lines', 'Line 1: test log content']}
