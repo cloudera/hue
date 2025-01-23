@@ -15,9 +15,9 @@
 // limitations under the License.
 import { renderHook, act, waitFor } from '@testing-library/react';
 import useSaveData from './useSaveData';
-import { post } from '../../api/utils';
+import { post } from '../../../api/utils';
 
-jest.mock('../../api/utils', () => ({
+jest.mock('../../../api/utils', () => ({
   post: jest.fn()
 }));
 

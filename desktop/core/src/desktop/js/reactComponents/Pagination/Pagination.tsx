@@ -58,7 +58,7 @@ const Pagination = ({
       label: (
         <BorderlessButton
           onClick={() => {
-            setPageSize && setPageSize(option);
+            setPageSize?.(option);
             setPageNumber(1);
           }}
           className="hue-pagination__page-size-menu-item-btn"

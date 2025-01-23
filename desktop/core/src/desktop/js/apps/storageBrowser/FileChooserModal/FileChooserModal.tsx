@@ -25,7 +25,7 @@ import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 
 import { i18nReact } from '../../../utils/i18nReact';
 import useDebounce from '../../../utils/useDebounce';
-import useLoadData from '../../../utils/hooks/useLoadData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 import { BrowserViewType, ListDirectory } from '../../../reactComponents/FileChooser/types';
 import { LIST_DIRECTORY_API_URL } from '../../../reactComponents/FileChooser/api';

@@ -16,10 +16,10 @@
 
 import { renderHook, act, waitFor } from '@testing-library/react';
 import useLoadData from './useLoadData';
-import { get } from '../../api/utils';
+import { get } from '../../../api/utils';
 
 // Mock the `get` function
-jest.mock('../../api/utils', () => ({
+jest.mock('../../../api/utils', () => ({
   get: jest.fn()
 }));
 
