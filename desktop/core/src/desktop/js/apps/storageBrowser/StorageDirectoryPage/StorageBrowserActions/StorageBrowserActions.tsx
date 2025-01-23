@@ -84,7 +84,7 @@ const StorageBrowserActions = ({
 
   const downloadFile = () => {
     huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
-    location.href = `${DOWNLOAD_API_URL}${selectedFiles[0]?.path}`;
+    location.href = `${DOWNLOAD_API_URL}?path=${selectedFiles[0]?.path}`;
   };
 
   const onActionClick = (actionType: ActionType) => () => {
