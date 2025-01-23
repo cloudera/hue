@@ -115,7 +115,8 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
     huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
   };
 
-  const filePreviewUrl = `${DOWNLOAD_API_URL}${fileStats.path}?disposition=inline`;
+  const fileDownloadUrl = `${DOWNLOAD_API_URL}?path=${fileStats.path}`;
+  const filePreviewUrl = `${fileDownloadUrl}&&disposition=inline`;
 
   const isEditingEnabled =
     !isEditing &&
@@ -192,7 +193,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                   </>
                 )}
                 {config?.storage_browser.enable_file_download_button && (
-                  <a href={`${DOWNLOAD_API_URL}${fileStats.path}`}>
+                  <a href={fileDownloadUrl}>
                     <PrimaryButton
                       data-testid="preview--download--button"
                       data-event=""

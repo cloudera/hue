@@ -383,7 +383,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
   });
 
   self.isTaskServerEnabled = ko.computed(function() {
-    return window.getLastKnownConfig().hue_config.enable_chunked_file_uploader && window.getLastKnownConfig().hue_config.enable_task_server;
+    return window.getLastKnownConfig().storage_browser.enable_chunked_file_upload && window.getLastKnownConfig().hue_config.enable_task_server;
   });
 
   self.scheme = ko.pureComputed(function () {
@@ -1393,7 +1393,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
       var uploader; 
       var scheduleUpload;
       
-      if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && (window.getLastKnownConfig().hue_config.enable_task_server))  {
+      if ((window.getLastKnownConfig().storage_browser.enable_chunked_file_upload) && (window.getLastKnownConfig().hue_config.enable_task_server))  {
         
         self.pendingUploads(0);
         var action = "/filebrowser/upload/chunks/";
@@ -1517,7 +1517,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
         });
       }
       // Chunked Fileuploader without Taskserver
-      else if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && !(window.getLastKnownConfig().hue_config.enable_task_server)) {
+      else if ((window.getLastKnownConfig().storage_browser.enable_chunked_file_upload) && !(window.getLastKnownConfig().hue_config.enable_task_server)) {
         self.pendingUploads(0);
         var action = "/filebrowser/upload/chunks/";
         uploader = new qq.FileUploader({
