@@ -39,7 +39,7 @@ afterEach(() => {
 });
 
 describe('ServerLogs Component', () => {
-  test('Render ServerLogs component with fetched logs', () => {
+  it('should render ServerLogs component with fetched logs', () => {
     mocked(useLoadData).mockImplementation(() => ({
       data: mockData(),
       loading: false,
@@ -52,7 +52,7 @@ describe('ServerLogs Component', () => {
     expect(screen.getByText('Log entry 2')).toBeInTheDocument();
   });
 
-  test('Handles no logs found scenario', () => {
+  test('it should handle the scenario when no logs are found', () => {
     mocked(useLoadData).mockImplementation(() => ({
       data: emptyMockData(),
       loading: false,
@@ -64,7 +64,7 @@ describe('ServerLogs Component', () => {
     expect(screen.getByText('No logs found!')).toBeInTheDocument();
   });
 
-  test('Finds and highlights the searched value', async () => {
+  test('it should find and highlights the searched value', async () => {
     mocked(useLoadData).mockImplementation(() => ({
       data: mockData(),
       loading: false,
@@ -85,7 +85,7 @@ describe('ServerLogs Component', () => {
     });
   });
 
-  test('Toggling wrap logs changes the functionality and thus class of log lines', async () => {
+  test('it should wrap the logs when the user checks "Wrap logs"', async () => {
     mocked(useLoadData).mockImplementation(() => ({
       data: mockData(),
       loading: false,
