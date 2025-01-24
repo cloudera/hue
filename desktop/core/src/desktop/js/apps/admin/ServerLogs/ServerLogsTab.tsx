@@ -17,6 +17,7 @@
 import React, { useState, useEffect } from 'react';
 import { Spin, Alert } from 'antd';
 import ServerLogsHeader from './ServerLogsHeader';
+import { i18nReact } from '../../../utils/i18nReact';
 import useLoadData from '../../../utils/hooks/useLoadData';
 import './ServerLogsTab.scss';
 
@@ -28,6 +29,7 @@ interface ServerLogsData {
 const ServerLogs: React.FC = (): JSX.Element => {
   const [filter, setFilter] = useState<string>('');
   const [wrapLogs, setWrapLogs] = useState(true);
+  const { t } = i18nReact.useTranslation();
 
   const {
     data: logsData,
@@ -70,7 +72,7 @@ const ServerLogs: React.FC = (): JSX.Element => {
     return (
       <div className="server-logs-component">
         <Alert
-          message={`Error: ${error}`}
+          message={t(`Error: ${error}`)}
           description="An error occurred while fetching server logs."
           type="error"
         />
