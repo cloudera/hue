@@ -14,12 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Spin, Alert } from 'antd';
 import ServerLogsHeader from './ServerLogsHeader';
 import { i18nReact } from '../../../utils/i18nReact';
 import useLoadData from '../../../utils/hooks/useLoadData';
 import './ServerLogsTab.scss';
+import { SERVER_LOGS_API_URL } from '../utils';
 
 interface ServerLogsData {
   logs: string[];
@@ -36,20 +37,8 @@ const ServerLogs: React.FC = (): JSX.Element => {
     loading,
     error
     //reloadData
-  } = useLoadData<ServerLogsData>('/api/v1/logs');
+  } = useLoadData<ServerLogsData>(SERVER_LOGS_API_URL);
 
-  useEffect(() => {
-    const updateSize = () => {
-      const newHeight = document.documentElement.clientHeight - 250;
-      const logsComponent = document.querySelector('.server__display-logs') as HTMLElement;
-      if (logsComponent) {
-        logsComponent.style.height = `${newHeight}px`;
-      }
-    };
-    updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
-  }, []);
 
   const highlightText = (text: string, searchValue: string) => {
     if (!searchValue) {
@@ -73,7 +62,7 @@ const ServerLogs: React.FC = (): JSX.Element => {
       <div className="server-logs-component">
         <Alert
           message={t(`Error: ${error}`)}
-          description="An error occurred while fetching server logs."
+          description={t("An error occurred while fetching server logs.")}
           type="error"
         />
       </div>
