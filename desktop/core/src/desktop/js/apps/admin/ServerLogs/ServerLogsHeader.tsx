@@ -73,7 +73,7 @@ const ServerLogsHeader: React.FC<ServerLogsHeaderProps> = ({
           id="wrapLogsToggle"
         />
         <label className="server__wrap-logs" htmlFor="wrapLogsToggle">
-          Wrap logs
+          {t('Wrap logs')}
         </label>
 
         <Button
