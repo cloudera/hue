@@ -25,7 +25,7 @@ from builtins import object
 from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
 
-from beeswax.common import find_compute, is_compute
+from beeswax.common import find_compute, find_compute_in_cluster
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER, has_connectors, is_cdw_compute_enabled
 from desktop.lib import export_csvxls
@@ -402,7 +402,7 @@ def patch_snippet_for_connector(snippet, user=None):
   Connector backward compatibility switcher.
   # TODO Connector unification
   """
-  if is_compute(snippet):
+  if find_compute_in_cluster(snippet):
     snippet['connector'] = find_compute(cluster=snippet, user=user)
     if snippet['connector'] and snippet['connector'].get('dialect'):
       snippet['dialect'] = snippet['connector']['dialect']
@@ -433,7 +433,7 @@ def get_api(request, snippet):
   if has_connectors() and snippet.get('type') == 'hello' and is_admin(request.user):
     LOG.debug('Using the interpreter from snippet')
     interpreter = snippet.get('interpreter')
-  elif is_cdw_compute_enabled():
+  elif find_compute_in_cluster(snippet):
     LOG.debug("Finding the compute from db using snippet: %s" % snippet)
     interpreter = find_compute(cluster=snippet, user=request.user)
   if interpreter is None:

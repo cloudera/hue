@@ -142,7 +142,7 @@ class HiveMetastoreClient(object):
   def close(self, handle):
     pass
 
-  def get_operation_status(self, handle):
+  def get_operation_status(self, handle, session=None):
     return MockFinishedOperation()
 
   def get_default_configuration(self, *args, **kwargs):

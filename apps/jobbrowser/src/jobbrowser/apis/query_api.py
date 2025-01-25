@@ -29,6 +29,7 @@ import pytz
 from babel import localtime
 from django.utils.translation import gettext as _
 
+from beeswax.common import extract_session_type
 from desktop.lib import export_csvxls
 from impala.conf import COORDINATOR_UI_SPNEGO
 from jobbrowser.apis.base_api import Api
@@ -54,7 +55,7 @@ def _get_api(user, cluster=None):
       server_url = compute['options'].get('api_url')
   else:
     # TODO: multi computes if snippet.get('compute') or snippet['type'] has computes
-    application = cluster['compute']['type'] if cluster.get('compute') else cluster.get('interface', 'impala')
+    application = extract_session_type(cluster) or 'impala'
     session = Session.objects.get_session(user, application=application)
     server_url = _get_impala_server_url(session)
   return get_impalad_api(user=user, url=server_url)

@@ -91,15 +91,26 @@ def apply_natural_sort(collection, key=None):
   return sorted(collection, key=lambda i: tokenize_and_convert(i, key=key))
 
 
-def is_compute(cluster):
+def find_compute_in_cluster(cluster):
   if not cluster:
-    return False
+    return None
   connector = cluster.get('connector')
   compute = cluster.get('compute')
 
-  def compute_check(x):
+  def _compute_check(x):
     return x and x.get('type') in COMPUTE_TYPES
-  return compute_check(cluster) or compute_check(connector) or compute_check(compute)
+
+  return (
+    cluster if _compute_check(cluster)
+    else compute if _compute_check(compute)
+    else connector if _compute_check(connector) else None)
+
+
+def extract_session_type(snippet):
+  compute = find_compute_in_cluster(snippet)
+  if compute and compute.get('name'):
+    return compute['name']
+  return snippet.get('type') if snippet else None
 
 
 '''
@@ -119,13 +130,8 @@ def find_compute(cluster=None, user=None, dialect=None, namespace_id=None):
     connector = cluster.get('connector')
     compute = cluster.get('compute')
 
-    def compute_check(x):
-      return x and x.get('type') in COMPUTE_TYPES
-
     # Pick the most probable compute object
-    selected_compute = (cluster if compute_check(cluster)
-                        else compute if compute_check(compute)
-                        else connector if compute_check(connector) else None)
+    selected_compute = find_compute_in_cluster(cluster)
 
     # If found, we will attempt to reload it, first by id then by name
     if selected_compute:

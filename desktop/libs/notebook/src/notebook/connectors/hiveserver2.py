@@ -28,7 +28,7 @@ from urllib.parse import quote as urllib_quote, unquote as urllib_unquote
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from beeswax.common import is_compute
+from beeswax.common import extract_session_type
 from desktop.auth.backend import is_admin
 from desktop.conf import USE_DEFAULT_CONFIGURATION, has_connectors
 from desktop.lib.conf import BoundConfig
@@ -321,8 +321,7 @@ class HS2Api(Api):
     db = self._get_db(snippet, interpreter=self.interpreter)
 
     statement = self._get_current_statement(notebook, snippet)
-    compute = snippet.get('compute', {})
-    session_type = compute['name'] if is_compute(snippet) and compute.get('name') else snippet['type']
+    session_type = extract_session_type(snippet)
     session = self._get_session(notebook, session_type)
 
     query = self._prepare_hql_query(snippet, statement['statement'], session)
