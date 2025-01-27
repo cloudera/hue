@@ -14,4 +14,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const SERVER_LOGS_API_URL = '/api/v1/logs';
+import React from 'react';
+
+interface HighlightTextProps {
+  text: string;
+  searchValue: string;
+  highlightClassName?: string;
+}
+
+const HighlightText: React.FC<HighlightTextProps> = ({
+  text,
+  searchValue,
+  highlightClassName = 'highlight-word'
+}) => {
+  if (!searchValue) {
+    return <>{text}</>;
+  }
+  const regex = new RegExp(`(${searchValue})`, 'gi');
+  const parts = text.split(regex);
+  return (
+    <>
+      {parts.map((part, index) =>
+        regex.test(part) ? (
+          <mark key={index} className={highlightClassName}>
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+};
+
+export default HighlightText;

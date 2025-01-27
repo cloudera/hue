@@ -48,7 +48,7 @@ const ServerLogsHeader: React.FC<ServerLogsHeaderProps> = ({
   };
 
   return (
-    <div className="server-admin-header admin-header">
+    <div className="hue-server-admin-header admin-header">
       <Input
         className="server__input-filter"
         placeholder={t('Search in the logs')}

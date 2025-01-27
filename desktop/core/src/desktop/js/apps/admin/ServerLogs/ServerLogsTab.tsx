@@ -19,8 +19,9 @@ import { Spin, Alert } from 'antd';
 import ServerLogsHeader from './ServerLogsHeader';
 import { i18nReact } from '../../../utils/i18nReact';
 import useLoadData from '../../../utils/hooks/useLoadData';
+import HighlightText from '../Components/HighlightText';
+import { SERVER_LOGS_API_URL } from '../Components/utils';
 import './ServerLogsTab.scss';
-import { SERVER_LOGS_API_URL } from '../utils';
 
 interface ServerLogsData {
   logs: string[];
@@ -32,37 +33,14 @@ const ServerLogs: React.FC = (): JSX.Element => {
   const [wrapLogs, setWrapLogs] = useState(true);
   const { t } = i18nReact.useTranslation();
 
-  const {
-    data: logsData,
-    loading,
-    error
-    //reloadData
-  } = useLoadData<ServerLogsData>(SERVER_LOGS_API_URL);
-
-
-  const highlightText = (text: string, searchValue: string) => {
-    if (!searchValue) {
-      return text;
-    }
-    const regex = new RegExp(`(${searchValue})`, 'gi');
-    const parts = text.split(regex);
-    return parts.map((part, index) =>
-      regex.test(part) ? (
-        <mark key={'parts_' + index} className="server--highlight-word">
-          {part}
-        </mark>
-      ) : (
-        part
-      )
-    );
-  };
+  const { data: logsData, loading, error } = useLoadData<ServerLogsData>(SERVER_LOGS_API_URL);
 
   if (error) {
     return (
       <div className="server-logs-component">
         <Alert
           message={t(`Error: ${error}`)}
-          description={t("An error occurred while fetching server logs.")}
+          description={t('An error occurred while fetching server logs.')}
           type="error"
         />
       </div>
@@ -70,7 +48,7 @@ const ServerLogs: React.FC = (): JSX.Element => {
   }
 
   return (
-    <div className="server-logs-component">
+    <div className="hue-server-logs-component">
       <Spin spinning={loading}>
         {!loading && (
           <>
@@ -90,7 +68,7 @@ const ServerLogs: React.FC = (): JSX.Element => {
                     className={`server__log-line ${wrapLogs ? 'server_wrap' : ''}`}
                     key={'logs_' + index}
                   >
-                    {highlightText(line, filter)}
+                    <HighlightText text={line} searchValue={filter} />
                   </div>
                 ))}
               </div>
