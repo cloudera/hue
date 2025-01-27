@@ -84,11 +84,7 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
   </div>
 </div>
 
-<script type="text/javascript">
-  function toggleDisplay(selector) {
-    $(selector).slideToggle(500);
-  }
-</script>
+<script  src="${ static('desktop/js/500-inline.js') }" type="text/javascript"></script>
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }

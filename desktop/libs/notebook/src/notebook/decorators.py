@@ -27,7 +27,6 @@ from django.utils.functional import wraps
 from django.utils.translation import gettext as _
 from past.builtins import basestring
 
-from dashboard.models import extract_solr_exception_message
 from desktop.conf import ENABLE_HUE_5
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -162,9 +161,8 @@ def api_error_handler(f):
       response['status'] = 5
       response['message'] = e.message
     except RestException as e:
-      message = extract_solr_exception_message(e)
       response['status'] = 1
-      response['message'] = message.get('error')
+      response['message'] = e.message  # TODO: Improve error UX further with better context
     except Exception as e:
       LOG.exception('Error running %s' % f.__name__)
       response['status'] = -1

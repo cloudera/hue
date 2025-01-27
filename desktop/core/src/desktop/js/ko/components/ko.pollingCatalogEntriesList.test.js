@@ -29,7 +29,8 @@ describe('ko.pollingCatalogEntriesList.js', () => {
 
     const element = await setup.renderComponent(NAME, {
       sourceType: 'impala',
-      namespace: { id: 'namespaceId' }
+      namespace: { id: 'namespaceId' },
+      compute: { name: 'sample-compute' }
     });
 
     expect(element.innerHTML).toMatchSnapshot();

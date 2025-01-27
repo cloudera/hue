@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Input, Spin, Tooltip } from 'antd';
@@ -20,15 +21,15 @@ import Table, { ColumnProps } from 'cuix/dist/components/Table';
 import classNames from 'classnames';
 
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
-import { FileOutlined } from '@ant-design/icons';
+import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 
 import { i18nReact } from '../../../utils/i18nReact';
 import useDebounce from '../../../utils/useDebounce';
 import useLoadData from '../../../utils/hooks/useLoadData';
 
-import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
-import { VIEWFILES_API_URl } from '../../../reactComponents/FileChooser/api';
-import PathBrowser from '../../../reactComponents/FileChooser/PathBrowser/PathBrowser';
+import { BrowserViewType, ListDirectory } from '../../../reactComponents/FileChooser/types';
+import { LIST_DIRECTORY_API_URL } from '../../../reactComponents/FileChooser/api';
+import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 
 import './FileChooserModal.scss';
 
@@ -65,16 +66,14 @@ const FileChooserModal = ({
     setDestPath(sourcePath);
   }, [sourcePath]);
 
-  const { data: filesData, loading } = useLoadData<PathAndFileData>(
-    `${VIEWFILES_API_URl}${destPath}`,
-    {
-      params: {
-        pagesize: '1000',
-        filter: searchTerm
-      },
-      skip: destPath === '' || destPath === undefined
-    }
-  );
+  const { data: filesData, loading } = useLoadData<ListDirectory>(LIST_DIRECTORY_API_URL, {
+    params: {
+      path: destPath,
+      pagesize: '1000',
+      filter: searchTerm
+    },
+    skip: destPath === '' || destPath === undefined || !showModal
+  });
 
   const tableData: FileChooserTableData[] = useMemo(() => {
     if (!filesData?.files) {
@@ -82,7 +81,7 @@ const FileChooserModal = ({
     }
 
     return filesData?.files?.map(file => ({
-      name: file.name,
+      name: file.path.split('/').pop() ?? '',
       path: file.path,
       type: file.type
     }));
@@ -106,7 +105,7 @@ const FileChooserModal = ({
         column.render = (_, record: FileChooserTableData) => (
           <Tooltip title={record.name} mouseEnterDelay={1.5}>
             <span className="hue-filechooser-modal__table-cell-icon">
-              {record.type === 'dir' ? <FolderIcon /> : <FileOutlined />}
+              {record.type === BrowserViewType.dir ? <FolderIcon /> : <FileIcon />}
             </span>
             <span className="hue-filechooser-modal__table-cell-name">{record.name}</span>
           </Tooltip>
@@ -120,7 +119,7 @@ const FileChooserModal = ({
   const onRowClicked = (record: FileChooserTableData) => {
     return {
       onClick: () => {
-        if (record.type === 'dir') {
+        if (record.type === BrowserViewType.dir) {
           setDestPath(record.path);
         }
       }
@@ -138,9 +137,7 @@ const FileChooserModal = ({
       okText={submitText}
       title={title}
       open={showModal}
-      onCancel={() => {
-        onClose();
-      }}
+      onCancel={onClose}
       onOk={() => {
         onSubmit(destPath);
         onClose();
@@ -151,7 +148,7 @@ const FileChooserModal = ({
         <div className="hue-filechooser-modal__path-browser-panel">
           <span className="hue-filechooser-modal__destPath">{t('Destination Path:')}</span>
           <PathBrowser
-            breadcrumbs={filesData?.breadcrumbs}
+            filePath={destPath}
             onFilepathChange={setDestPath}
             seperator={'/'}
             showIcon={false}
@@ -168,13 +165,13 @@ const FileChooserModal = ({
         <Spin spinning={loading}>
           <Table
             className="hue-filechooser-modal__table"
-            dataSource={tableData?.slice(2)}
+            dataSource={tableData}
             pagination={false}
             columns={getColumns(tableData[0] ?? {})}
-            rowKey={(record, index) => record.path + index}
+            rowKey={r => `${r.path}__${r.type}__${r.name}`}
             scroll={{ y: '250px' }}
             rowClassName={record =>
-              record.type === 'file'
+              record.type === BrowserViewType.file
                 ? classNames('hue-filechooser-modal__table-row', 'disabled-row')
                 : 'hue-filechooser-modal__table-row'
             }

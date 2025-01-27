@@ -47,6 +47,7 @@ export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
   ignoreSuccessErrors?: boolean;
   transformResponse?: AxiosResponseTransformer;
   qsEncodeData?: boolean;
+  isRawError?: boolean;
   handleSuccess?: (
     response: T & DefaultApiResponse,
     resolve: (val: T) => void,
@@ -156,10 +157,14 @@ const notifyError = <T>(
 const handleErrorResponse = <T>(
   err: AxiosError<DefaultApiResponse>,
   reject: (reason?: unknown) => void,
-  options?: Pick<ApiFetchOptions<T>, 'silenceErrors'>
+  options?: Pick<ApiFetchOptions<T>, 'silenceErrors' | 'isRawError'>
 ): void => {
   const errorMessage = extractErrorMessage(err.response && err.response.data);
-  reject(errorMessage);
+  if (options?.isRawError) {
+    reject(err);
+  } else {
+    reject(errorMessage);
+  }
   notifyError(errorMessage, (err && err.response) || err, options);
 };
 

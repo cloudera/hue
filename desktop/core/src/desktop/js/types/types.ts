@@ -49,6 +49,7 @@ export interface hueWindow {
   CUSTOM_DASHBOARD_URL?: string;
   DEV?: boolean;
   DISABLE_LOCAL_STORAGE?: boolean;
+  ENABLE_HELP_MENU?: boolean;
   ENABLE_PREDICT?: boolean;
   ENABLE_SQL_SYNTAX_CHECK?: boolean;
   HAS_CATALOG?: boolean;
@@ -67,5 +68,4 @@ export interface hueWindow {
   hueDebug?: HueDebug;
   hueDebugAnalytics?: boolean;
   gtag?: (type: string, name: string, parameters: { action: string; version: string }) => void;
-  ENABLE_HELP_MENU?: boolean;
 }

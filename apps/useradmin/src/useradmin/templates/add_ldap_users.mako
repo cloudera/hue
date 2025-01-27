@@ -61,40 +61,7 @@ ${ layout.menubar(section='users') }
     </form>
   </div>
 </div>
-
-<script type="text/javascript">
-  $(document).ready(function () {
-    var $addLdapUsersComponents = $('#addLdapUsersComponents');
-    $addLdapUsersComponents.find("#id_groups").jHueSelector({
-      selectAllLabel: "${_('Select all')}",
-      searchPlaceholder: "${_('Search')}",
-      noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin:useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
-      width: 618,
-      height: 240
-    });
-    %if is_embeddable:
-    $addLdapUsersComponents.find('#syncForm').ajaxForm({
-      dataType:  'json',
-      success: function(data) {
-        if (data && data.status == -1) {
-          renderUseradminErrors(data.errors);
-        }
-        else if (data && data.status === 0) {
-          huePubSub.publish('open.link', '${ url('useradmin:useradmin.views.list_users') }');
-          huePubSub.publish('hue.global.info', {
-            message: "${ _('User added/synced correctly') }"
-          });
-        }
-      },
-      error: function (data) {
-        huePubSub.publish('hue.global.error', {
-          message: data.responseJSON['message']
-        });
-      }
-    });
-    %endif
-  });
-</script>
+<script src="${ static('desktop/js/add_ldap-inline.js') }" type="text/javascript"></script>
 
 ${layout.commons()}
 

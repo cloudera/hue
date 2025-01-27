@@ -23,8 +23,6 @@ First, the support of many SQL dialects has been improved, with in particular Ap
 * [Query live HBase data with Phoenix SQL](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/)
 * [Getting started with the Spark SQL Editor](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
 
-!["Flink SQL - SELECT and INSERT data into Kafka Topics"](https://cdn.gethue.com/uploads/2021/02/peek-log-streams.gif)
-
 The Editor is also getting split up into components, so that they are cleaner and easier to reuse (e.g. SQL parsers, SQL Scratchpad...). This will bring a new version of the Editor, which is currently in beta. Another improvement in the introduction of the Connectors (in beta too) so that SQL dialects can be easily added without any server restart.
 
 Secondly, special thanks to the community who contributed a brand new Dask SQL autocomplete (ISSUE-1480) and also Prometheus Alerting for Kubernetes (PR-1648).

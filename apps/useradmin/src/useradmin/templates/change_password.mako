@@ -71,29 +71,7 @@ ${ layout.menubar(section='users') }
     </form>
   </div>
 </div>
-<script type="text/javascript">
-$(document).ready(function(){
- var currentStep = "step1";
-  var $editUserComponents = $('#editUserComponents');
-  % if is_embeddable:
-  $editUserComponents.find('#editForm').attr('action', window.location.pathname.substr((window.HUE_BASE_URL + '/hue').length).replace(/\/$/, ''));
-  $editUserComponents.find('#editForm').ajaxForm({
-    dataType:  'json',
-    success: function(data) {
-      if (data && data.status == -1) {
-        renderUseradminErrors(data.errors);
-      }
-      else if (data && data.url) {
-        huePubSub.publish('open.link', data.url);
-        huePubSub.publish('hue.global.info', {
-          message: "${ _('User information updated correctly') }"
-        });
-      }
-    }
-  });
-  % endif
-});
-</script>
+<script src="${ static('desktop/js/change_password-inline.js') }" type="text/javascript"></script>
 
 ${layout.commons()}
 

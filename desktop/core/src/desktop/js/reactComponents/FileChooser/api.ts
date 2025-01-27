@@ -13,20 +13,30 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-export const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary';
-export const DOWNLOAD_API_URL = '/filebrowser/download=';
-export const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
-export const SAVE_FILE_API_URL = '/filebrowser/save';
-export const VIEWFILES_API_URl = '/api/v1/storage/view=';
 
-export const CREATE_FILE_API_URL = '/api/v1/storage/create/file/';
-export const CREATE_DIRECTORY_API_URL = '/api/v1/storage/create/directory/';
-export const RENAME_API_URL = '/api/v1/storage/rename/';
-export const SET_REPLICATION_API_URL = '/api/v1/storage/replication/';
-export const COPY_API_URL = '/api/v1/storage/copy/';
-export const BULK_COPY_API_URL = '/api/v1/storage/copy/bulk/';
-export const MOVE_API_URL = '/api/v1/storage/move/';
-export const BULK_MOVE_API_URL = '/api/v1/storage/move/bulk/';
+export const FILESYSTEMS_API_URL = '/api/v1/storage/filesystems';
+export const FILE_STATS_API_URL = '/api/v1/storage/stat';
+export const LIST_DIRECTORY_API_URL = '/api/v1/storage/list';
+export const FILE_PREVIEW_API_URL = '/api/v1/storage/display';
+export const DOWNLOAD_API_URL = '/api/v1/storage/download';
+export const CONTENT_SUMMARY_API_URL = '/api/v1/storage/content_summary';
+export const SAVE_FILE_API_URL = '/api/v1/storage/save';
+export const UPLOAD_FILE_URL = '/api/v1/storage/upload/file';
+export const CHUNK_UPLOAD_URL = '/api/v1/storage/upload/chunks';
+export const CHUNK_UPLOAD_COMPLETE_URL = '/api/v1/storage/upload/complete';
+export const CREATE_FILE_API_URL = '/api/v1/storage/create/file';
+export const CREATE_DIRECTORY_API_URL = '/api/v1/storage/create/directory';
+export const RENAME_API_URL = '/api/v1/storage/rename';
+export const SET_REPLICATION_API_URL = '/api/v1/storage/replication';
+export const DELETION_API_URL = '/api/v1/storage/delete';
+export const BULK_DELETION_API_URL = '/api/v1/storage/delete/bulk';
+export const COMPRESS_API_URL = '/api/v1/storage/compress';
+export const EXTRACT_API_URL = '/api/v1/storage/extract_archive';
+export const COPY_API_URL = '/api/v1/storage/copy';
+export const BULK_COPY_API_URL = '/api/v1/storage/copy/bulk';
+export const MOVE_API_URL = '/api/v1/storage/move';
+export const BULK_MOVE_API_URL = '/api/v1/storage/move/bulk';
+export const UPLOAD_AVAILABLE_SPACE_URL = '/api/v1/taskserver/upload/available_space';
 
 export interface ApiFileSystem {
   file_system: string;

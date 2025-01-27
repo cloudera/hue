@@ -485,7 +485,7 @@
           if (appConfig.browser && appConfig.browser.interpreters) {
             // Replace old file browser entries with the new storage browser if the feature flag is enabled.
             let browserInterpreters: BrowserInterpreter[] = [];
-            if (clusterConfig.hue_config.enable_new_storage_browser) {
+            if (clusterConfig.storage_browser.enable_new_storage_browser) {
               let firstFileBrowserFound = false;
               appConfig.browser.interpreters.forEach(browser => {
                 const isFileBrowser = /\/filebrowser/.test(browser.page);

@@ -15,9 +15,13 @@
 // limitations under the License.
 
 import { TFunction } from 'i18next';
-import { PathAndFileData } from '../../../reactComponents/FileChooser/types';
+import { FileStats } from '../../../reactComponents/FileChooser/types';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import formatBytes from '../../../utils/formatBytes';
+import {
+  SUPPORTED_FILE_EXTENSIONS,
+  SupportedFileTypes
+} from '../../../utils/constants/storageBrowser';
 
 export type MetaData = {
   name: string;
@@ -25,38 +29,44 @@ export type MetaData = {
   value: string;
 };
 
-export const getFileMetaData = (t: TFunction, fileData: PathAndFileData): MetaData[][] => {
+export const getFileMetaData = (t: TFunction, fileStats: FileStats): MetaData[][] => {
   return [
     [
       {
         name: 'size',
         label: t('Size'),
-        value: formatBytes(fileData.stats?.size)
+        value: formatBytes(fileStats.size)
       },
       {
         name: 'user',
         label: t('Created By'),
-        value: fileData.stats?.user
+        value: fileStats.user
       }
     ],
     [
       {
         name: 'group',
         label: t('Group'),
-        value: fileData.stats?.group
+        value: fileStats.group
       },
       {
         name: 'permissions',
         label: t('Permissions'),
-        value: fileData.rwx
+        value: fileStats.rwx
       },
       {
         name: 'mtime',
         label: t('Last Modified'),
-        value: fileData.stats?.mtime
-          ? formatTimestamp(new Date(Number(fileData.stats.mtime) * 1000))
-          : '-'
+        value: formatTimestamp(new Date(fileStats.mtime * 1000))
       }
     ]
   ];
+};
+
+export const getFileType = (fileName: string): SupportedFileTypes => {
+  const fileExtension = fileName?.split('.')?.pop()?.toLowerCase();
+  if (!fileExtension) {
+    return SupportedFileTypes.OTHER;
+  }
+  return SUPPORTED_FILE_EXTENSIONS[fileExtension] ?? SupportedFileTypes.OTHER;
 };
