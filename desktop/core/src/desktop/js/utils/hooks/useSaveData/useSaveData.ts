@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ApiFetchOptions, post } from '../../api/utils';
+import { ApiFetchOptions, post } from '../../../api/utils';
 
 interface saveOptions<T> {
   url?: string;

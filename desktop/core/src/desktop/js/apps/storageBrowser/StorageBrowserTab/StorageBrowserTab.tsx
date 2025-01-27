@@ -23,7 +23,7 @@ import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
 import { FILE_STATS_API_URL } from '../../../reactComponents/FileChooser/api';
 import { BrowserViewType, FileStats } from '../../../reactComponents/FileChooser/types';
-import useLoadData from '../../../utils/hooks/useLoadData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 import './StorageBrowserTab.scss';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';

@@ -16,7 +16,7 @@
 
 import React from 'react';
 import { i18nReact } from '../../../../../utils/i18nReact';
-import useSaveData from '../../../../../utils/hooks/useSaveData';
+import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { ActionType } from '../StorageBrowserActions.util';
 import {
   BULK_COPY_API_URL,
