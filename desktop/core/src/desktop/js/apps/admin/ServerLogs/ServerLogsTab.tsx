@@ -37,7 +37,7 @@ const ServerLogs: React.FC = (): JSX.Element => {
 
   if (error) {
     return (
-      <div className="server-logs-component">
+      <div className="hue-server-logs-component">
         <Alert
           message={t(`Error: ${error}`)}
           description={t('An error occurred while fetching server logs.')}

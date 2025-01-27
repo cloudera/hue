@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
+import '../ServerLogs/ServerLogsTab.scss';
 
 interface HighlightTextProps {
   text: string;
@@ -25,7 +26,7 @@ interface HighlightTextProps {
 const HighlightText: React.FC<HighlightTextProps> = ({
   text,
   searchValue,
-  highlightClassName = 'highlight-word'
+  highlightClassName = 'server--highlight-word'
 }) => {
   if (!searchValue) {
     return <>{text}</>;
