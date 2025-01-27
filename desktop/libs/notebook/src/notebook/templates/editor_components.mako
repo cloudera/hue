@@ -287,13 +287,15 @@ else:
 
 
 <!-- ko if: $root.isResultFullScreenMode() -->
-<a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
+<a class="hueAnchor collapse-results hidden" href="javascript:void(0)" title="${ _('Collapse results') }"
+   data-bind="click: function(){ $root.isResultFullScreenMode(false); }, css: { hidden: !$root.isResultFullScreenMode() }">
   <i class="fa fa-times fa-fw"></i>
 </a>
 <!-- /ko -->
 
 <!-- ko if: $root.isPresentationMode() -->
-<a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }">
+<a class="hueAnchor collapse-results hidden" href="javascript:void(0)" title="${ _('Exit presentation') }"
+   data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }, css: { hidden: !$root.isPresentationMode() }">
   <i class="fa fa-times fa-fw"></i>
 </a>
 <!-- /ko -->
