@@ -42,7 +42,7 @@ import formatBytes from '../../../utils/formatBytes';
 
 import './StorageDirectoryPage.scss';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
-import useLoadData from '../../../utils/hooks/useLoadData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_POLLING_TIME,

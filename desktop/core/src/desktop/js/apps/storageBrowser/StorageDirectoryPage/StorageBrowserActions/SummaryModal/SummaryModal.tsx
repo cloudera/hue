@@ -21,7 +21,7 @@ import { Spin } from 'antd';
 import huePubSub from '../../../../../utils/huePubSub';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import formatBytes from '../../../../../utils/formatBytes';
-import useLoadData from '../../../../../utils/hooks/useLoadData';
+import useLoadData from '../../../../../utils/hooks/useLoadData/useLoadData';
 import { CONTENT_SUMMARY_API_URL } from '../../../../../reactComponents/FileChooser/api';
 import {
   ContentSummary,
