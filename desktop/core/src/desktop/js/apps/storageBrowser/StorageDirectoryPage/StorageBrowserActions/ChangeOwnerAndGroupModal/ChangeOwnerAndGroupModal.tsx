@@ -120,9 +120,9 @@ const ChangeOwnerAndGroupModal = ({
   const isSubmitEnabled = useMemo(() => {
     return Boolean(
       selectedUser &&
-        selectedGroup &&
-        !(selectedUser === OTHERS_KEY && !userOther) &&
-        !(selectedGroup === OTHERS_KEY && !groupOther)
+      selectedGroup &&
+      !(selectedUser === OTHERS_KEY && !userOther) &&
+      !(selectedGroup === OTHERS_KEY && !groupOther)
     );
   }, [selectedUser, selectedGroup, userOther, groupOther]);
 
@@ -138,8 +138,8 @@ const ChangeOwnerAndGroupModal = ({
       okButtonProps={{ disabled: loading || !isSubmitEnabled }}
       cancelButtonProps={{ disabled: loading }}
     >
-      <div className="change-owner-group">
-        <span className="change-owner-group__header-note">
+      <div className="hue-change-owner-group">
+        <span className="hue-change-owner-group__header-note">
           {t(
             'Note: Only the Hadoop superuser, "{{superuser}}" or the HDFS supergroup, "{{supergroup}}" on this file system, may change the owner of a file.',
             {
@@ -149,10 +149,10 @@ const ChangeOwnerAndGroupModal = ({
           )}
         </span>
 
-        <div className="change-owner-group__form">
-          <div className="change-owner-group__entity">
-            <div className="change-owner-group__label">{t('User')}</div>
-            <div className="change-owner-group__dropdown">
+        <div className="hue-change-owner-group__form">
+          <div className="hue-change-owner-group__entity">
+            <div className="hue-change-owner-group__label">{t('User')}</div>
+            <div className="hue-change-owner-group__dropdown">
               <Select options={usersOptions} onChange={setSelectedUser} value={selectedUser} />
               {selectedUser === OTHERS_KEY && (
                 <Input
@@ -165,9 +165,9 @@ const ChangeOwnerAndGroupModal = ({
             </div>
           </div>
 
-          <div className="change-owner-group__entity">
-            <div className="change-owner-group__label">{t('Group')}</div>
-            <div className="change-owner-group__dropdown">
+          <div className="hue-change-owner-group__entity">
+            <div className="hue-change-owner-group__label">{t('Group')}</div>
+            <div className="hue-change-owner-group__dropdown">
               <Select options={groupOptions} onChange={setSelectedGroup} value={selectedGroup} />
               {selectedGroup === OTHERS_KEY && (
                 <Input
@@ -180,8 +180,8 @@ const ChangeOwnerAndGroupModal = ({
             </div>
           </div>
 
-          <div className="change-owner-group__checkbox">
-            <span className="change-owner-group__label">{t('Recursive')}</span>
+          <div className="hue-change-owner-group__checkbox">
+            <span className="hue-change-owner-group__label">{t('Recursive')}</span>
             <Checkbox
               checked={isRecursive}
               onChange={() => setIsRecursive(prev => !prev)}
