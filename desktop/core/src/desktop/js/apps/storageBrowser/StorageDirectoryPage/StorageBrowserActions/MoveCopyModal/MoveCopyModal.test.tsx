@@ -60,7 +60,7 @@ const mockFiles: StorageDirectoryTableData[] = [
     replication: 1
   }
 ];
-jest.mock('../../../../../utils/hooks/useLoadData', () => ({
+jest.mock('../../../../../utils/hooks/useLoadData/useLoadData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     data: {
@@ -71,7 +71,7 @@ jest.mock('../../../../../utils/hooks/useLoadData', () => ({
 }));
 
 const mockSave = jest.fn();
-jest.mock('../../../../../utils/hooks/useSaveData', () => ({
+jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     save: mockSave

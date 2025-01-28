@@ -26,7 +26,7 @@ import { ApiFileSystem, FILESYSTEMS_API_URL } from '../api';
 import { FileSystem } from '../types';
 import './FileChooserModal.scss';
 import PathBrowser from '../../PathBrowser/PathBrowser';
-import useLoadData from '../../../utils/hooks/useLoadData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 interface FileProps {
   show: boolean;

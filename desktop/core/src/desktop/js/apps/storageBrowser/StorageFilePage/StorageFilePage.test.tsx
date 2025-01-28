@@ -42,7 +42,7 @@ const mockData = jest.fn().mockReturnValue({
   compression: 'none'
 });
 
-jest.mock('../../../utils/hooks/useLoadData', () => {
+jest.mock('../../../utils/hooks/useLoadData/useLoadData', () => {
   return jest.fn(() => ({
     data: mockData(),
     loading: false

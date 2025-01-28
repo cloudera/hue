@@ -30,7 +30,7 @@ import {
   SAVE_FILE_API_URL
 } from '../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../utils/huePubSub';
-import useSaveData from '../../../utils/hooks/useSaveData';
+import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import Pagination from '../../../reactComponents/Pagination/Pagination';
 import {
   DEFAULT_PREVIEW_PAGE_SIZE,
@@ -38,7 +38,7 @@ import {
   SUPPORTED_FILE_EXTENSIONS,
   SupportedFileTypes
 } from '../../../utils/constants/storageBrowser';
-import useLoadData from '../../../utils/hooks/useLoadData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
