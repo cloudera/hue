@@ -120,9 +120,9 @@ const ChangeOwnerAndGroupModal = ({
   const isSubmitEnabled = useMemo(() => {
     return Boolean(
       selectedUser &&
-      selectedGroup &&
-      !(selectedUser === OTHERS_KEY && !userOther) &&
-      !(selectedGroup === OTHERS_KEY && !groupOther)
+        selectedGroup &&
+        !(selectedUser === OTHERS_KEY && !userOther) &&
+        !(selectedGroup === OTHERS_KEY && !groupOther)
     );
   }, [selectedUser, selectedGroup, userOther, groupOther]);
 
