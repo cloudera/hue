@@ -36,6 +36,7 @@ export const COPY_API_URL = '/api/v1/storage/copy';
 export const BULK_COPY_API_URL = '/api/v1/storage/copy/bulk';
 export const MOVE_API_URL = '/api/v1/storage/move';
 export const BULK_MOVE_API_URL = '/api/v1/storage/move/bulk';
+export const BULK_CHANGE_OWNER_API_URL = '/api/v1/storage/chown/bulk';
 export const UPLOAD_AVAILABLE_SPACE_URL = '/api/v1/taskserver/upload/available_space';
 
 export interface ApiFileSystem {

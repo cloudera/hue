@@ -44,7 +44,8 @@ export enum ActionType {
   Delete = 'delete',
   Compress = 'compress',
   Extract = 'extract',
-  Download = 'download'
+  Download = 'download',
+  ChangeOwnerAndGroup = 'changeOwnerAndGroup'
 }
 
 const isValidFileOrFolder = (filePath: string): boolean => {
@@ -83,6 +84,8 @@ const isActionEnabled = (file: StorageDirectoryTableData, action: ActionType): b
       return !!config?.enable_extract_uploaded_archive && isHDFS(file.path);
     case ActionType.Download:
       return !!config?.enable_file_download_button && file.type === BrowserViewType.file;
+    case ActionType.ChangeOwnerAndGroup:
+      return isValidFileOrFolder(file.path);
     default:
       return false;
   }
@@ -103,7 +106,8 @@ const isMultipleFileActionEnabled = (
 };
 
 export const getEnabledActions = (
-  files: StorageDirectoryTableData[]
+  files: StorageDirectoryTableData[],
+  isFsSuperUser?: boolean
 ): {
   enabled: boolean;
   type: ActionType;
@@ -161,6 +165,12 @@ export const getEnabledActions = (
       enabled: isSingleFileActionEnabled(files, ActionType.Download),
       type: ActionType.Download,
       label: 'Download'
+    },
+    {
+      enabled:
+        !!isFsSuperUser && isMultipleFileActionEnabled(files, ActionType.ChangeOwnerAndGroup),
+      type: ActionType.ChangeOwnerAndGroup,
+      label: 'Change Owner / Group'
     }
   ].filter(e => e.enabled);
 

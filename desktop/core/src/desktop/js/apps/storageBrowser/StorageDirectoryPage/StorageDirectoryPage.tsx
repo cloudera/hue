@@ -285,6 +285,11 @@ const StorageDirectoryPage = ({
           <StorageBrowserActions
             currentPath={fileStats.path}
             isTrashEnabled={filesData?.is_trash_enabled}
+            isFsSuperUser={filesData?.is_fs_superuser}
+            superUser={filesData?.superuser}
+            superGroup={filesData?.supergroup}
+            users={filesData?.users}
+            groups={filesData?.groups}
             selectedFiles={selectedFiles}
             setLoadingFiles={setLoadingFiles}
             onSuccessfulAction={reloadData}

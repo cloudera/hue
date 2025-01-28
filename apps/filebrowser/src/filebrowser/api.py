@@ -734,7 +734,7 @@ def chown(request):
   path = request.POST.get('path')
   user = request.POST.get("user")
   group = request.POST.get("group")
-  recursive = request.POST.get('recursive', False)
+  recursive = coerce_bool(request.POST.get('recursive', False))
 
   # TODO: Check if we need to explicitly handle encoding anywhere
   request.fs.chown(path, user, group, recursive=recursive)
