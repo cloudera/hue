@@ -45,7 +45,8 @@ export enum ActionType {
   Compress = 'compress',
   Extract = 'extract',
   Download = 'download',
-  ChangeOwnerAndGroup = 'changeOwnerAndGroup'
+  ChangeOwnerAndGroup = 'changeOwnerAndGroup',
+  ChangePermission = 'changePermission'
 }
 
 const isValidFileOrFolder = (filePath: string): boolean => {
@@ -73,6 +74,8 @@ const isActionEnabled = (file: StorageDirectoryTableData, action: ActionType): b
     case ActionType.Copy:
     case ActionType.Delete:
     case ActionType.Move:
+    case ActionType.ChangeOwnerAndGroup:
+    case ActionType.ChangePermission:
       return isValidFileOrFolder(file.path);
     case ActionType.Extract:
       return (
@@ -84,8 +87,6 @@ const isActionEnabled = (file: StorageDirectoryTableData, action: ActionType): b
       return !!config?.enable_extract_uploaded_archive && isHDFS(file.path);
     case ActionType.Download:
       return !!config?.enable_file_download_button && file.type === BrowserViewType.file;
-    case ActionType.ChangeOwnerAndGroup:
-      return isValidFileOrFolder(file.path);
     default:
       return false;
   }
@@ -122,9 +123,9 @@ export const getEnabledActions = (
   // order of the elements will be the order of the action menu
   const actions = [
     {
-      enabled: isMultipleFileActionEnabled(files, ActionType.Copy),
-      type: ActionType.Copy,
-      label: 'Copy'
+      enabled: isSingleFileActionEnabled(files, ActionType.Rename),
+      type: ActionType.Rename,
+      label: 'Rename'
     },
     {
       enabled: isMultipleFileActionEnabled(files, ActionType.Move),
@@ -132,34 +133,9 @@ export const getEnabledActions = (
       label: 'Move'
     },
     {
-      enabled: isSingleFileActionEnabled(files, ActionType.Summary),
-      type: ActionType.Summary,
-      label: 'View Summary'
-    },
-    {
-      enabled: isSingleFileActionEnabled(files, ActionType.Rename),
-      type: ActionType.Rename,
-      label: 'Rename'
-    },
-    {
-      enabled: isMultipleFileActionEnabled(files, ActionType.Delete),
-      type: ActionType.Delete,
-      label: 'Delete'
-    },
-    {
-      enabled: isSingleFileActionEnabled(files, ActionType.Replication),
-      type: ActionType.Replication,
-      label: 'Set Replication'
-    },
-    {
-      enabled: isMultipleFileActionEnabled(files, ActionType.Compress),
-      type: ActionType.Compress,
-      label: 'Compress'
-    },
-    {
-      enabled: isSingleFileActionEnabled(files, ActionType.Extract),
-      type: ActionType.Extract,
-      label: 'Extract'
+      enabled: isMultipleFileActionEnabled(files, ActionType.Copy),
+      type: ActionType.Copy,
+      label: 'Copy'
     },
     {
       enabled: isSingleFileActionEnabled(files, ActionType.Download),
@@ -171,6 +147,36 @@ export const getEnabledActions = (
         !!isFsSuperUser && isMultipleFileActionEnabled(files, ActionType.ChangeOwnerAndGroup),
       type: ActionType.ChangeOwnerAndGroup,
       label: 'Change Owner / Group'
+    },
+    {
+      enabled: !!isFsSuperUser && isMultipleFileActionEnabled(files, ActionType.ChangePermission),
+      type: ActionType.ChangePermission,
+      label: 'Change Permission'
+    },
+    {
+      enabled: isSingleFileActionEnabled(files, ActionType.Summary),
+      type: ActionType.Summary,
+      label: 'Summary'
+    },
+    {
+      enabled: isSingleFileActionEnabled(files, ActionType.Replication),
+      type: ActionType.Replication,
+      label: 'Set Replication'
+    },
+    {
+      enabled: isMultipleFileActionEnabled(files, ActionType.Delete),
+      type: ActionType.Delete,
+      label: 'Delete'
+    },
+    {
+      enabled: isMultipleFileActionEnabled(files, ActionType.Compress),
+      type: ActionType.Compress,
+      label: 'Compress'
+    },
+    {
+      enabled: isSingleFileActionEnabled(files, ActionType.Extract),
+      type: ActionType.Extract,
+      label: 'Extract'
     }
   ].filter(e => e.enabled);
 

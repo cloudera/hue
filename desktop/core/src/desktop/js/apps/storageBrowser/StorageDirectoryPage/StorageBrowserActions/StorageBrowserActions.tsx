@@ -30,6 +30,7 @@ import CollapseIcon from '@cloudera/cuix-core/icons/react/CollapseViewIcon';
 import ExpandIcon from '@cloudera/cuix-core/icons/react/ExpandViewIcon';
 import DownloadIcon from '@cloudera/cuix-core/icons/react/DownloadIcon';
 import GroupsIcon from '@cloudera/cuix-core/icons/react/GroupsIcon';
+import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
@@ -49,6 +50,7 @@ import CompressionModal from './CompressionModal/CompressionModal';
 import ExtractionModal from './ExtractionModal/ExtractionModal';
 import { DOWNLOAD_API_URL } from '../../../../reactComponents/FileChooser/api';
 import ChangeOwnerAndGroupModal from './ChangeOwnerAndGroupModal/ChangeOwnerAndGroupModal';
+import ChangePermissionModal from './ChangePermissionModal/ChangePermissionModal';
 
 interface StorageBrowserRowActionsProps {
   // TODO: move relevant keys to hue_config
@@ -74,7 +76,8 @@ const iconsMap: Record<ActionType, JSX.Element> = {
   [ActionType.Compress]: <CollapseIcon />,
   [ActionType.Extract]: <ExpandIcon />,
   [ActionType.Download]: <DownloadIcon />,
-  [ActionType.ChangeOwnerAndGroup]: <GroupsIcon />
+  [ActionType.ChangeOwnerAndGroup]: <GroupsIcon />,
+  [ActionType.ChangePermission]: <ConfigureIcon />
 };
 
 const StorageBrowserActions = ({
@@ -213,6 +216,15 @@ const StorageBrowserActions = ({
           superGroup={superGroup}
           users={users}
           groups={groups}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.ChangePermission && (
+        <ChangePermissionModal
+          files={selectedFiles}
           onSuccess={onApiSuccess}
           onError={onApiError}
           onClose={closeModal}
