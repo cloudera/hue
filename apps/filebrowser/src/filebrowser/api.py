@@ -518,7 +518,6 @@ def upload_file(request):
   try:
     request.fs.upload_v1(request.META, input_data=body_data_bytes, destination=dest_path, username=request.user.username)
   except Exception as ex:
-    LOG.exception(ex)
     return HttpResponse(f'Upload to {filepath} failed: {str(ex)}', status=500)
 
   response = {
