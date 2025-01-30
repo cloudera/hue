@@ -472,25 +472,9 @@ def upload_complete(request):
 @api_error_handler
 def upload_file(request):
   # Read request body first to prevent RawPostDataException later on which occurs when trying to access body after it has already been read
-  print('---------------------------')
-  print(request)
-  print(request.content_type)
-  print(request.content_params)
-  # print(request.data)
-  print('---------------------------')
-
   body_data_bytes = string_io(request.body)
 
-  print('--------------------------->>>>>>>>>>>>>>>>>>>>')
-  print(request.body)
-  print('---------------------------')
-
   uploaded_file = request.FILES['file']
-
-  print('---------------------------')
-  print(uploaded_file.read())
-  print('---------------------------')
-
   dest_path = request.POST.get('destination_path')
   overwrite = coerce_bool(request.POST.get('overwrite', False))
 

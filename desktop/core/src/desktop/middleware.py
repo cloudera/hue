@@ -206,6 +206,12 @@ class ClusterMiddleware(MiddlewareMixin):
   """
   Manages setting request.fs and request.jt
   """
+  def process_request(self, request):
+    # Workaround to prevent RawPostDataException: Store the request body for later access
+    # This is necessary because certain API calls (like file uploads) require the raw request body
+    # to be available. Without this, subsequent accesses to request.body might raise RawPostDataException.
+    request._body = request.body
+
   def process_view(self, request, view_func, view_args, view_kwargs):
     """
     Sets request.fs and request.jt on every request to point to the configured filesystem.
@@ -846,9 +852,6 @@ class MetricsMiddleware(MiddlewareMixin):
   def process_request(self, request):
     # import threading
     # LOG.debug("===> MetricsMiddleware pid: %d thread: %d" % (os.getpid(), threading.get_ident()))
-    print('++++++++++++')
-    print(request.body)
-    print('++++++++++++')
     self._response_timer = metrics.response_time.time()
     metrics.active_requests.inc()
     if is_gunicorn_report_enabled():
