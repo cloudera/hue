@@ -116,7 +116,7 @@ const CreateAndUploadAction = ({
         {
           icon: <ImportIcon />,
           key: ActionType.uploadFile,
-          label: t('New Upload'),
+          label: t('Upload File'),
           onClick: onActionClick(ActionType.uploadFile)
         }
       ]
