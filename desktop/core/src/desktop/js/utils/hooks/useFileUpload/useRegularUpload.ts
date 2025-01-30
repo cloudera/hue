@@ -58,6 +58,7 @@ const useRegularUpload = ({
     payload.append('hdfs_file', item.file);
 
     return save(payload, {
+      url,
       onSuccess: () => {
         onStatusUpdate(item, FileUploadStatus.Uploaded);
       },
