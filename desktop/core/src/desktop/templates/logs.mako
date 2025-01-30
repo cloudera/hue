@@ -21,10 +21,6 @@ from desktop.views import commonheader, commonfooter
 
 <%namespace name="layout" file="about_layout.mako" />
 
-% if not is_embeddable:
-${ commonheader(_('Server Logs'), "about", user, request) | n,unicode }
-% endif
-
 ${ layout.menubar(section='log_view') }
 
 <script src="${ static('desktop/js/logs-inline.js') }" type="text/javascript"></script>
@@ -32,7 +28,3 @@ ${ layout.menubar(section='log_view') }
 <div id="ServerLogs">
 <ServerLogsTab class='antd cuix' data-reactcomponent='ServerLogs'></ServerLogsTab>
 </div>
-
-% if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-% endif
