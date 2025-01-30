@@ -202,17 +202,29 @@
     self.editFile = function() {
       self.isViewing(false);
       self.isLoading(true);
-
       const encodedPath = encodeURIComponent(FileViewOptions['path']);
       $.ajax({
         url: '/filebrowser/edit=' + encodedPath + '?is_embeddable=true',
-        beforeSend:function (xhr) {
+        beforeSend: function(xhr) {
           xhr.setRequestHeader('X-Requested-With', 'Hue');
         },
-        dataType:'html',
-        success:function (response) {
-          $('#fileeditor').html(response);
-          self.isLoading(false);
+        dataType: 'html',
+        success: function(response) {
+          const $response = $('<div>').html(response);
+          const scripts = $response.find('script').remove().toArray();
+          $('#fileeditor').html($response.html());
+          scripts.forEach(function(scriptTag) {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = scriptTag.src;
+            document.head.appendChild(script);
+          });
+        },
+        error: function(xhr, status, error) {
+          console.error("Error loading file editor:", error);
+        },
+        complete: function() {
+          self.isLoading(false); 
         }
       });
     }
