@@ -258,8 +258,13 @@ def download(request, path):
 
   return response
 
+
 def view_new(request):
-  return render('storage_browser.mako', request, None)
+  if ENABLE_NEW_STORAGE_BROWSER.get():
+    return render('storage_browser.mako', request, None)
+  else:
+    raise PopupException(_("New file browser is not enabled"))
+
 
 def view(request, path):
   """Dispatches viewing of a path to either index() or fileview(), depending on type."""
