@@ -40,7 +40,7 @@ const useRegularUpload = ({
   onStatusUpdate,
   onComplete
 }: UploadQueueOptions): UseUploadQueueResponse => {
-  const { save } = useSaveData(UPLOAD_FILE_URL, {
+  const { save } = useSaveData(undefined, {
     postOptions: {
       qsEncodeData: false,
       headers: {
@@ -52,12 +52,10 @@ const useRegularUpload = ({
   const processUploadItem = async (item: UploadItem) => {
     onStatusUpdate(item, FileUploadStatus.Uploading);
 
-    // const url = `${UPLOAD_FILE_URL}?dest=${item.filePath}`;
+    const url = `${UPLOAD_FILE_URL}?dest=${item.filePath}`;
 
     const payload = new FormData();
-    payload.append('file', item.file);
-    payload.append('destination_path', item.filePath);
-    // payload.append('hdfs_file', item.file);
+    payload.append('hdfs_file', item.file);
 
     return save(payload, {
       onSuccess: () => {
