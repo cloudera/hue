@@ -27,8 +27,13 @@ import { ApiFileSystem, FILESYSTEMS_API_URL } from '../../reactComponents/FileCh
 import './StorageBrowserPage.scss';
 import useLoadData from '../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import { getFileSystemAndPath } from '../../reactComponents/PathBrowser/PathBrowser.util';
 
 const StorageBrowserPage = (): JSX.Element => {
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
+  const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
+
   const { t } = i18nReact.useTranslation();
 
   const { data, loading, error, reloadData } = useLoadData<ApiFileSystem[]>(FILESYSTEMS_API_URL);
@@ -48,7 +53,8 @@ const StorageBrowserPage = (): JSX.Element => {
       <LoadingErrorWrapper loading={loading} errors={errorConfig}>
         <Tabs
           className="hue-storage-browser__tab"
-          defaultActiveKey={data?.[0]?.file_system}
+          destroyInactiveTabPane
+          defaultActiveKey={urlFileSystem ?? data?.[0]?.file_system}
           items={data?.map(fs => ({
             label: fs.file_system.toUpperCase(),
             key: fs.file_system,

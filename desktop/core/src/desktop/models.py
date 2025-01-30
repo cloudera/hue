@@ -43,6 +43,7 @@ from desktop.conf import (
   COLLECT_USAGE,
   DISABLE_SOURCE_AUTOCOMPLETE,
   ENABLE_CONNECTORS,
+  ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_ORGANIZATIONS,
   ENABLE_PROMETHEUS,
   ENABLE_SHARING,
@@ -2010,6 +2011,15 @@ class ClusterConfig(object):
       hdfs_connectors.append(_('Files'))
 
     remote_home_storage = get_remote_home_storage(self.user)
+
+    if ENABLE_NEW_STORAGE_BROWSER.get():
+      interpreters.append({
+        'type': 'newfilebrowser',
+        'displayName': _('New File Browser'),
+        'buttonName': _('New File Browser'),
+        'tooltip': _('New File Browser'),
+        'page': '/filebrowser/new'
+      })
 
     for hdfs_connector in hdfs_connectors:
       force_home = remote_home_storage and not remote_home_storage.startswith('/')
