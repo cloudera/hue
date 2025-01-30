@@ -202,7 +202,6 @@
     self.editFile = function() {
       self.isViewing(false);
       self.isLoading(true);
-    
       const encodedPath = encodeURIComponent(FileViewOptions['path']);
       $.ajax({
         url: '/filebrowser/edit=' + encodedPath + '?is_embeddable=true',
@@ -225,7 +224,7 @@
           console.error("Error loading file editor:", error);
         },
         complete: function() {
-          self.isLoading(false); // Set loading to false after the request is complete
+          self.isLoading(false); 
         }
       });
     }
