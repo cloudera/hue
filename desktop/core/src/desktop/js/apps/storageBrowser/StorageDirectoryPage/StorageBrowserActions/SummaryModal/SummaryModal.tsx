@@ -21,22 +21,22 @@ import { Spin } from 'antd';
 import huePubSub from '../../../../../utils/huePubSub';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import formatBytes from '../../../../../utils/formatBytes';
-import useLoadData from '../../../../../utils/hooks/useLoadData';
+import useLoadData from '../../../../../utils/hooks/useLoadData/useLoadData';
 import { CONTENT_SUMMARY_API_URL } from '../../../../../reactComponents/FileChooser/api';
 import {
   ContentSummary,
   StorageDirectoryTableData
 } from '../../../../../reactComponents/FileChooser/types';
 
-import './ViewSummary.scss';
+import './SummaryModal.scss';
 
-interface ViewSummaryProps {
+interface SummaryModalProps {
   path: StorageDirectoryTableData['path'];
   isOpen?: boolean;
   onClose: () => void;
 }
 
-const ViewSummary = ({ isOpen = true, onClose, path }: ViewSummaryProps): JSX.Element => {
+const SummaryModal = ({ isOpen = true, onClose, path }: SummaryModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const { data: responseSummary, loading } = useLoadData<ContentSummary>(CONTENT_SUMMARY_API_URL, {
@@ -105,4 +105,4 @@ const ViewSummary = ({ isOpen = true, onClose, path }: ViewSummaryProps): JSX.El
   );
 };
 
-export default ViewSummary;
+export default SummaryModal;

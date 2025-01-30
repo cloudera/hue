@@ -17,14 +17,14 @@
 import React from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../utils/i18nReact';
-import useSaveData from '../../../../../utils/hooks/useSaveData';
+import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
 import {
   BULK_DELETION_API_URL,
   DELETION_API_URL
 } from '../../../../../reactComponents/FileChooser/api';
 
-interface DeleteActionProps {
+interface DeletionModalProps {
   isOpen?: boolean;
   isTrashEnabled?: boolean;
   files: StorageDirectoryTableData[];
@@ -34,7 +34,7 @@ interface DeleteActionProps {
   onClose: () => void;
 }
 
-const DeleteAction = ({
+const DeletionModal = ({
   isOpen = true,
   isTrashEnabled = false,
   files,
@@ -42,21 +42,12 @@ const DeleteAction = ({
   onSuccess,
   onError,
   onClose
-}: DeleteActionProps): JSX.Element => {
+}: DeletionModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { save, loading: saveLoading } = useSaveData(undefined, {
-    skip: !files.length,
-    onSuccess,
-    onError
-  });
-
-  const { save: saveForm, loading: saveFormLoading } = useSaveData(undefined, {
+  const { save, loading } = useSaveData(undefined, {
     postOptions: {
-      qsEncodeData: false,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+      qsEncodeData: false
     },
     skip: !files.length,
     onSuccess,
@@ -64,27 +55,23 @@ const DeleteAction = ({
   });
 
   const handleDeletion = (isForedSkipTrash: boolean = false) => {
-    const isSkipTrash = !isTrashEnabled || isForedSkipTrash;
     setLoading(true);
+    const isSkipTrash = !isTrashEnabled || isForedSkipTrash;
 
-    const isBulkDelete = files.length > 1;
-    if (isBulkDelete) {
-      const formData = new FormData();
-      files.forEach(selectedFile => {
-        formData.append('path', selectedFile.path);
-      });
-      if (isSkipTrash) {
-        formData.append('skip_trash', String(isSkipTrash));
-      }
+    const formData = new FormData();
+    files.forEach(selectedFile => {
+      formData.append('path', selectedFile.path);
+    });
+    if (isSkipTrash) {
+      formData.append('skip_trash', String(isSkipTrash));
+    }
 
-      saveForm(formData, { url: BULK_DELETION_API_URL });
+    if (files.length > 1) {
+      save(formData, { url: BULK_DELETION_API_URL });
     } else {
-      const payload = { path: files[0].path, skip_trash: isSkipTrash ? true : undefined };
-      save(payload, { url: DELETION_API_URL });
+      save(formData, { url: DELETION_API_URL });
     }
   };
-
-  const loading = saveFormLoading || saveLoading;
 
   return (
     <Modal
@@ -112,4 +99,4 @@ const DeleteAction = ({
   );
 };
 
-export default DeleteAction;
+export default DeletionModal;

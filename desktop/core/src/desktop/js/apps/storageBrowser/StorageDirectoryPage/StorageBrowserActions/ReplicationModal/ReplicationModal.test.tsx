@@ -17,12 +17,11 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ReplicationAction from './Replication';
+import ReplicationModal from './ReplicationModal';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
-import { SET_REPLICATION_API_URL } from '../../../../../reactComponents/FileChooser/api';
 
 const mockSave = jest.fn();
-jest.mock('../../../../../utils/hooks/useSaveData', () => ({
+jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     save: mockSave,
@@ -30,7 +29,7 @@ jest.mock('../../../../../utils/hooks/useSaveData', () => ({
   }))
 }));
 
-describe('ReplicationAction Component', () => {
+describe('ReplicationModal Component', () => {
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
   const mockOnClose = jest.fn();
@@ -53,7 +52,7 @@ describe('ReplicationAction Component', () => {
 
   it('should render the Replication modal with the correct title and initial input', () => {
     const { getByText, getByRole } = render(
-      <ReplicationAction
+      <ReplicationModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -71,7 +70,7 @@ describe('ReplicationAction Component', () => {
 
   it('should call handleReplication with the correct data when the form is submitted', async () => {
     const { getByRole } = render(
-      <ReplicationAction
+      <ReplicationModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -88,16 +87,13 @@ describe('ReplicationAction Component', () => {
 
     expect(mockSave).toHaveBeenCalledTimes(1);
 
-    expect(mockSave).toHaveBeenCalledWith(
-      { path: '/path/to/file1.txt', replication_factor: '2' },
-      { url: SET_REPLICATION_API_URL }
-    );
+    expect(mockSave).toHaveBeenCalledWith({ path: '/path/to/file1.txt', replication_factor: '2' });
   });
 
   it('should call onSuccess when the rename request succeeds', async () => {
     mockSave.mockImplementationOnce(mockOnSuccess);
     const { getByRole } = render(
-      <ReplicationAction
+      <ReplicationModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -120,7 +116,7 @@ describe('ReplicationAction Component', () => {
       mockOnError(new Error());
     });
     const { getByRole } = render(
-      <ReplicationAction
+      <ReplicationModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -140,7 +136,7 @@ describe('ReplicationAction Component', () => {
 
   it('should call onClose when the modal is closed', () => {
     const { getByRole } = render(
-      <ReplicationAction
+      <ReplicationModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}

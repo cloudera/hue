@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import DeleteAction from './Delete';
+import DeletionModal from './DeletionModal';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
 import {
   BULK_DELETION_API_URL,
@@ -34,7 +34,7 @@ const mockFiles: StorageDirectoryTableData[] = [
 ];
 
 const mockSave = jest.fn();
-jest.mock('../../../../../utils/hooks/useSaveData', () => ({
+jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     save: mockSave,
@@ -42,7 +42,7 @@ jest.mock('../../../../../utils/hooks/useSaveData', () => ({
   }))
 }));
 
-describe('DeleteAction Component', () => {
+describe('DeletionModal Component', () => {
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
   const mockOnClose = jest.fn();
@@ -54,7 +54,7 @@ describe('DeleteAction Component', () => {
 
   it('should render the Delete modal with the correct title and buttons', () => {
     const { getByText, getByRole } = render(
-      <DeleteAction
+      <DeletionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}
@@ -73,7 +73,7 @@ describe('DeleteAction Component', () => {
 
   it('should render the Delete modal with the correct title and buttons when trash is not enabled', () => {
     const { getByText, queryByText, getByRole } = render(
-      <DeleteAction
+      <DeletionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}
@@ -92,7 +92,7 @@ describe('DeleteAction Component', () => {
 
   it('should call handleDeletion with the correct data for single delete when "Delete Permanently" is clicked', async () => {
     const { getByText } = render(
-      <DeleteAction
+      <DeletionModal
         isOpen={true}
         files={[mockFiles[0]]}
         setLoading={setLoading}
@@ -105,13 +105,16 @@ describe('DeleteAction Component', () => {
 
     fireEvent.click(getByText('Delete Permanently'));
 
-    const payload = { path: mockFiles[0].path, skip_trash: true };
-    expect(mockSave).toHaveBeenCalledWith(payload, { url: DELETION_API_URL });
+    const formData = new FormData();
+    formData.append('path', mockFiles[0].path);
+    formData.append('skip_trash', 'true');
+
+    expect(mockSave).toHaveBeenCalledWith(formData, { url: DELETION_API_URL });
   });
 
   it('should call handleDeletion with the correct data for bulk delete when "Delete Permanently" is clicked', async () => {
     const { getByText } = render(
-      <DeleteAction
+      <DeletionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}
@@ -135,7 +138,7 @@ describe('DeleteAction Component', () => {
 
   it('should call handleDeletion with the correct data for trash delete when "Move to Trash" is clicked', async () => {
     const { getByText } = render(
-      <DeleteAction
+      <DeletionModal
         isOpen={true}
         files={[mockFiles[0]]}
         setLoading={setLoading}
@@ -148,13 +151,15 @@ describe('DeleteAction Component', () => {
 
     fireEvent.click(getByText('Move to Trash'));
 
-    const payload = { path: mockFiles[0].path };
-    expect(mockSave).toHaveBeenCalledWith(payload, { url: DELETION_API_URL });
+    const formData = new FormData();
+    formData.append('path', mockFiles[0].path);
+
+    expect(mockSave).toHaveBeenCalledWith(formData, { url: DELETION_API_URL });
   });
 
   it('should call handleDeletion with the correct data for bulk trash delete when "Move to Trash" is clicked', async () => {
     const { getByText } = render(
-      <DeleteAction
+      <DeletionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}
@@ -180,7 +185,7 @@ describe('DeleteAction Component', () => {
       mockOnError(new Error());
     });
     const { getByText } = render(
-      <DeleteAction
+      <DeletionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}
@@ -198,7 +203,7 @@ describe('DeleteAction Component', () => {
 
   it('should call onClose when the modal is closed', () => {
     const { getByText } = render(
-      <DeleteAction
+      <DeletionModal
         isOpen={true}
         files={mockFiles}
         setLoading={setLoading}

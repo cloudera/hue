@@ -17,12 +17,11 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import RenameAction from './Rename';
+import RenameModal from './RenameModal';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
-import { RENAME_API_URL } from '../../../../../reactComponents/FileChooser/api';
 
 const mockSave = jest.fn();
-jest.mock('../../../../../utils/hooks/useSaveData', () => ({
+jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     save: mockSave,
@@ -30,7 +29,7 @@ jest.mock('../../../../../utils/hooks/useSaveData', () => ({
   }))
 }));
 
-describe('RenameAction Component', () => {
+describe('RenameModal Component', () => {
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
   const mockOnClose = jest.fn();
@@ -53,7 +52,7 @@ describe('RenameAction Component', () => {
 
   it('should render the Rename modal with the correct title and initial input', () => {
     const { getByText, getByRole } = render(
-      <RenameAction
+      <RenameModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -71,7 +70,7 @@ describe('RenameAction Component', () => {
 
   it('should call handleRename with the correct data when the form is submitted', async () => {
     const { getByRole } = render(
-      <RenameAction
+      <RenameModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -88,16 +87,16 @@ describe('RenameAction Component', () => {
 
     expect(mockSave).toHaveBeenCalledTimes(1);
 
-    expect(mockSave).toHaveBeenCalledWith(
-      { source_path: '/path/to/file1.txt', destination_path: 'file2.txt' },
-      { url: RENAME_API_URL }
-    );
+    expect(mockSave).toHaveBeenCalledWith({
+      source_path: '/path/to/file1.txt',
+      destination_path: 'file2.txt'
+    });
   });
 
   it('should call onSuccess when the rename request succeeds', async () => {
     mockSave.mockImplementationOnce(mockOnSuccess);
     const { getByRole } = render(
-      <RenameAction
+      <RenameModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -120,7 +119,7 @@ describe('RenameAction Component', () => {
       mockOnError(new Error());
     });
     const { getByRole } = render(
-      <RenameAction
+      <RenameModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}
@@ -140,7 +139,7 @@ describe('RenameAction Component', () => {
 
   it('should call onClose when the modal is closed', () => {
     const { getByRole } = render(
-      <RenameAction
+      <RenameModal
         isOpen={true}
         file={file}
         onSuccess={mockOnSuccess}

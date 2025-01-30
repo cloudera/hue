@@ -28,7 +28,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import MoveCopyAction from './MoveCopy';
+import MoveCopyModal from './MoveCopyModal';
 import { ActionType } from '../StorageBrowserActions.util';
 import {
   BULK_COPY_API_URL,
@@ -60,7 +60,7 @@ const mockFiles: StorageDirectoryTableData[] = [
     replication: 1
   }
 ];
-jest.mock('../../../../../utils/hooks/useLoadData', () => ({
+jest.mock('../../../../../utils/hooks/useLoadData/useLoadData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     data: {
@@ -71,7 +71,7 @@ jest.mock('../../../../../utils/hooks/useLoadData', () => ({
 }));
 
 const mockSave = jest.fn();
-jest.mock('../../../../../utils/hooks/useSaveData', () => ({
+jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     save: mockSave
@@ -92,7 +92,7 @@ describe('MoveCopy Action Component', () => {
   describe('Copy Actions', () => {
     it('should render correctly and open the modal', () => {
       const { getByText } = render(
-        <MoveCopyAction
+        <MoveCopyModal
           isOpen={true}
           action={ActionType.Copy}
           currentPath={currentPath}
@@ -112,7 +112,7 @@ describe('MoveCopy Action Component', () => {
       const newDestPath = 'test/path/folder1';
 
       const { getByText } = render(
-        <MoveCopyAction
+        <MoveCopyModal
           isOpen={true}
           action={ActionType.Copy}
           currentPath={currentPath}
@@ -143,7 +143,7 @@ describe('MoveCopy Action Component', () => {
     it('should call onSuccess when the request succeeds', async () => {
       mockSave.mockImplementationOnce(mockOnSuccess);
       const { getByText } = render(
-        <MoveCopyAction
+        <MoveCopyModal
           isOpen={true}
           action={ActionType.Copy}
           currentPath={currentPath}
@@ -167,7 +167,7 @@ describe('MoveCopy Action Component', () => {
         mockOnError(new Error());
       });
       const { getByText } = render(
-        <MoveCopyAction
+        <MoveCopyModal
           isOpen={true}
           action={ActionType.Copy}
           currentPath={currentPath}
@@ -188,7 +188,7 @@ describe('MoveCopy Action Component', () => {
 
     it('should call onClose when the modal is closed', () => {
       const { getByText } = render(
-        <MoveCopyAction
+        <MoveCopyModal
           isOpen={true}
           action={ActionType.Copy}
           currentPath={currentPath}
@@ -209,7 +209,7 @@ describe('MoveCopy Action Component', () => {
   describe('Move Actions', () => {
     it('should render correctly and open the modal', () => {
       const { getByText } = render(
-        <MoveCopyAction
+        <MoveCopyModal
           isOpen={true}
           action={ActionType.Move}
           currentPath={currentPath}
@@ -229,7 +229,7 @@ describe('MoveCopy Action Component', () => {
       const newDestPath = 'test/path/folder1';
 
       const { getByText } = render(
-        <MoveCopyAction
+        <MoveCopyModal
           isOpen={true}
           action={ActionType.Move}
           currentPath={currentPath}

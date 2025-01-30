@@ -33,6 +33,7 @@ import {
   isOFSRoot,
   inTrash
 } from '../../../../utils/storageBrowserUtils';
+import { SUPPORTED_COMPRESSED_FILE_EXTENTION } from '../../../../utils/constants/storageBrowser';
 
 export enum ActionType {
   Copy = 'copy',
@@ -41,7 +42,10 @@ export enum ActionType {
   Rename = 'rename',
   Replication = 'replication',
   Delete = 'delete',
-  Compress = 'compress'
+  Compress = 'compress',
+  Extract = 'extract',
+  Download = 'download',
+  ChangeOwnerAndGroup = 'changeOwnerAndGroup'
 }
 
 const isValidFileOrFolder = (filePath: string): boolean => {
@@ -54,7 +58,12 @@ const isValidFileOrFolder = (filePath: string): boolean => {
   );
 };
 
+const isFileCompressed = (filePath: string): boolean => {
+  return SUPPORTED_COMPRESSED_FILE_EXTENTION.some(ext => filePath.endsWith(ext));
+};
+
 const isActionEnabled = (file: StorageDirectoryTableData, action: ActionType): boolean => {
+  const config = getLastKnownConfig()?.storage_browser;
   switch (action) {
     case ActionType.Summary:
       return (isHDFS(file.path) || isOFS(file.path)) && file.type === BrowserViewType.file;
@@ -65,8 +74,18 @@ const isActionEnabled = (file: StorageDirectoryTableData, action: ActionType): b
     case ActionType.Delete:
     case ActionType.Move:
       return isValidFileOrFolder(file.path);
+    case ActionType.Extract:
+      return (
+        !!config?.enable_extract_uploaded_archive &&
+        isHDFS(file.path) &&
+        isFileCompressed(file.path)
+      );
     case ActionType.Compress:
-      return isHDFS(file.path) && isValidFileOrFolder(file.path);
+      return !!config?.enable_extract_uploaded_archive && isHDFS(file.path);
+    case ActionType.Download:
+      return !!config?.enable_file_download_button && file.type === BrowserViewType.file;
+    case ActionType.ChangeOwnerAndGroup:
+      return isValidFileOrFolder(file.path);
     default:
       return false;
   }
@@ -87,13 +106,13 @@ const isMultipleFileActionEnabled = (
 };
 
 export const getEnabledActions = (
-  files: StorageDirectoryTableData[]
+  files: StorageDirectoryTableData[],
+  isFsSuperUser?: boolean
 ): {
   enabled: boolean;
   type: ActionType;
   label: string;
 }[] => {
-  const config = getLastKnownConfig();
   const isAnyFileInTrash = files.some(file => inTrash(file.path));
   const isNoFileSelected = files && files.length === 0;
   if (isAnyFileInTrash || isNoFileSelected) {
@@ -133,11 +152,25 @@ export const getEnabledActions = (
       label: 'Set Replication'
     },
     {
-      enabled:
-        !!config?.storage_browser.enable_extract_uploaded_archive &&
-        isMultipleFileActionEnabled(files, ActionType.Compress),
+      enabled: isMultipleFileActionEnabled(files, ActionType.Compress),
       type: ActionType.Compress,
       label: 'Compress'
+    },
+    {
+      enabled: isSingleFileActionEnabled(files, ActionType.Extract),
+      type: ActionType.Extract,
+      label: 'Extract'
+    },
+    {
+      enabled: isSingleFileActionEnabled(files, ActionType.Download),
+      type: ActionType.Download,
+      label: 'Download'
+    },
+    {
+      enabled:
+        !!isFsSuperUser && isMultipleFileActionEnabled(files, ActionType.ChangeOwnerAndGroup),
+      type: ActionType.ChangeOwnerAndGroup,
+      label: 'Change Owner / Group'
     }
   ].filter(e => e.enabled);
 

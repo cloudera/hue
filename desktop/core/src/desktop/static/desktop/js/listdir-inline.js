@@ -383,7 +383,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
   });
 
   self.isTaskServerEnabled = ko.computed(function() {
-    return window.getLastKnownConfig().hue_config.enable_chunked_file_uploader && window.getLastKnownConfig().hue_config.enable_task_server;
+    return window.getLastKnownConfig().storage_browser.enable_chunked_file_upload && window.getLastKnownConfig().hue_config.enable_task_server;
   });
 
   self.scheme = ko.pureComputed(function () {
@@ -1382,7 +1382,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
             $('.free-space-info').text('- Max file size upload limit: ' + formatBytes(freeSpace));
         },
         error: function(xhr, status, error) {
-            huePubSub.publish('hue.global.error', { message: '${ _("Error checking available space: ") }' + error});
+            huePubSub.publish('hue.global.error', { message: window.I18n('Error checking available space: ') + error});
             $('.free-space-info').text('Error checking available space');
         }
     });
@@ -1393,7 +1393,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
       var uploader; 
       var scheduleUpload;
       
-      if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && (window.getLastKnownConfig().hue_config.enable_task_server))  {
+      if ((window.getLastKnownConfig().storage_browser.enable_chunked_file_upload) && (window.getLastKnownConfig().hue_config.enable_task_server))  {
         
         self.pendingUploads(0);
         var action = "/filebrowser/upload/chunks/";
@@ -1459,7 +1459,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
                   self.listItems.push(listItem);
                     if (scheduleUpload && self.pendingUploads() === 0) {
                       $('#uploadFileModal').modal('hide');
-                      huePubSub.publish('hue.global.info', { message: '${ _("File upload scheduled. Please check the task server page for progress.") }'});
+                      huePubSub.publish('hue.global.info', { message: window.I18n('File upload scheduled. Please check the task server page for progress.') });
                     }
                     // Add a delay of 2 seconds before calling pollForTaskProgress, to ensure the upload task is received by the task_server before checking its status. 
                     setTimeout(function() {
@@ -1489,10 +1489,10 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
                       // Update the free space display
                       $('.free-space-info').text('- Max file size upload limit: ' + formatBytes(freeSpace));
                       if ((file.size > freeSpace) || (file.size > window.MAX_FILE_SIZE_UPLOAD_LIMIT)) {
-                        huePubSub.publish('hue.global.error', { message: '${ _("Not enough space available to upload this file.") }'});
+                        huePubSub.publish('hue.global.error', { message: window.I18n('Not enough space available to upload this file.') });
                         deferred.failure(); // Reject the promise to cancel the upload
                       } else if (file.size > window.MAX_FILE_SIZE_UPLOAD_LIMIT) {
-                        huePubSub.publish('hue.global.error', { message: '${ _("File size is bigger than MAX_FILE_SIZE_UPLOAD_LIMIT.") }'});
+                        huePubSub.publish('hue.global.error', { message: window.I18n('File size is bigger than MAX_FILE_SIZE_UPLOAD_LIMIT.') });
                         deferred.failure(); // Reject the promise to cancel the upload
                       } else {
                         var newPath = "/filebrowser/upload/chunks/file?dest=" + encodeURIComponent(self.currentPath().normalize('NFC'));
@@ -1502,7 +1502,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
                       }
                     },
                     error: function(xhr, status, error) {
-                      huePubSub.publish('hue.global.error', { message: '${ _("Error checking available space: ") }' + error});
+                      huePubSub.publish('hue.global.error', { message: window.I18n('Error checking available space: ') + error});
                       deferred.failure(); // Reject the promise to cancel the upload
                     }
                   });
@@ -1517,7 +1517,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
         });
       }
       // Chunked Fileuploader without Taskserver
-      else if ((window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) && !(window.getLastKnownConfig().hue_config.enable_task_server)) {
+      else if ((window.getLastKnownConfig().storage_browser.enable_chunked_file_upload) && !(window.getLastKnownConfig().hue_config.enable_task_server)) {
         self.pendingUploads(0);
         var action = "/filebrowser/upload/chunks/";
         uploader = new qq.FileUploader({

@@ -17,14 +17,14 @@
 import React, { useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../utils/i18nReact';
-import useSaveData from '../../../../../utils/hooks/useSaveData';
+import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
 import { COMPRESS_API_URL } from '../../../../../reactComponents/FileChooser/api';
 import { Input } from 'antd';
 
-import './Compress.scss';
+import './CompressionModal.scss';
 
-interface CompressActionProps {
+interface CompressionModalProps {
   currentPath: string;
   isOpen?: boolean;
   files: StorageDirectoryTableData[];
@@ -34,7 +34,7 @@ interface CompressActionProps {
   onClose: () => void;
 }
 
-const CompressAction = ({
+const CompressionModal = ({
   currentPath,
   isOpen = true,
   files,
@@ -42,17 +42,14 @@ const CompressAction = ({
   onSuccess,
   onError,
   onClose
-}: CompressActionProps): JSX.Element => {
+}: CompressionModalProps): JSX.Element => {
   const initialName = currentPath.split('/').pop() + '.zip';
   const [value, setValue] = useState<string>(initialName);
   const { t } = i18nReact.useTranslation();
 
-  const { save: saveForm, loading } = useSaveData(undefined, {
+  const { save: saveForm, loading } = useSaveData(COMPRESS_API_URL, {
     postOptions: {
-      qsEncodeData: false,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+      qsEncodeData: false
     },
     skip: !files.length,
     onSuccess,
@@ -69,7 +66,7 @@ const CompressAction = ({
     formData.append('upload_path', currentPath);
     formData.append('archive_name', value);
 
-    saveForm(formData, { url: COMPRESS_API_URL });
+    saveForm(formData);
   };
 
   return (
@@ -106,4 +103,4 @@ const CompressAction = ({
   );
 };
 
-export default CompressAction;
+export default CompressionModal;

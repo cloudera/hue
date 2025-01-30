@@ -14,25 +14,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { koSetup } from 'jest/koTestUtils';
-import { CancellablePromise } from '../../api/cancellablePromise';
-import { NAME } from './ko.pollingCatalogEntriesList';
-import * as CatalogApi from 'catalog/api';
+@use 'variables' as vars;
 
-describe('ko.pollingCatalogEntriesList.js', () => {
-  const setup = koSetup();
+.antd.cuix {
+  .hue-change-owner-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
 
-  it('should render component', async () => {
-    jest
-      .spyOn(CatalogApi, 'fetchSourceMetadata')
-      .mockImplementation(() => CancellablePromise.reject());
+    &__header-note {
+      padding: 8px;
+      background-color: vars.$fluidx-gray-200;
+      margin-bottom: 8px;
+    }
 
-    const element = await setup.renderComponent(NAME, {
-      sourceType: 'impala',
-      namespace: { id: 'namespaceId' },
-      compute: { name: 'sample-compute' }
-    });
+    &__form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 16px;
+    }
 
-    expect(element.innerHTML).toMatchSnapshot();
-  });
-});
+    &__entity {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__dropdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 8px;
+    }
+
+    &__checkbox {
+      display: flex;
+      gap: 8px;
+    }
+
+    &__label {
+      color: vars.$fluidx-gray-700;
+    }
+  }
+}

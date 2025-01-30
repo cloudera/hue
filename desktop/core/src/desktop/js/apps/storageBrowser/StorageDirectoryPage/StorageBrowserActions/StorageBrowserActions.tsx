@@ -27,23 +27,36 @@ import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon
 import DataMovementIcon from '@cloudera/cuix-core/icons/react/DataMovementIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 import CollapseIcon from '@cloudera/cuix-core/icons/react/CollapseViewIcon';
+import ExpandIcon from '@cloudera/cuix-core/icons/react/ExpandViewIcon';
+import DownloadIcon from '@cloudera/cuix-core/icons/react/DownloadIcon';
+import GroupsIcon from '@cloudera/cuix-core/icons/react/GroupsIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import './StorageBrowserActions.scss';
 import {
   FileStats,
+  ListDirectory,
   StorageDirectoryTableData
 } from '../../../../reactComponents/FileChooser/types';
 import { ActionType, getEnabledActions } from './StorageBrowserActions.util';
-import MoveCopyAction from './MoveCopy/MoveCopy';
-import RenameAction from './Rename/Rename';
-import ReplicationAction from './Replication/Replication';
-import ViewSummary from './ViewSummary/ViewSummary';
-import DeleteAction from './Delete/Delete';
-import CompressAction from './Compress/Compress';
+import MoveCopyModal from './MoveCopyModal/MoveCopyModal';
+import RenameModal from './RenameModal/RenameModal';
+import ReplicationModal from './ReplicationModal/ReplicationModal';
+import SummaryModal from './SummaryModal/SummaryModal';
+import DeletionModal from './DeletionModal/DeletionModal';
+import CompressionModal from './CompressionModal/CompressionModal';
+import ExtractionModal from './ExtractionModal/ExtractionModal';
+import { DOWNLOAD_API_URL } from '../../../../reactComponents/FileChooser/api';
+import ChangeOwnerAndGroupModal from './ChangeOwnerAndGroupModal/ChangeOwnerAndGroupModal';
 
 interface StorageBrowserRowActionsProps {
+  // TODO: move relevant keys to hue_config
+  superUser?: ListDirectory['superuser'];
+  superGroup?: ListDirectory['supergroup'];
+  users?: ListDirectory['users'];
+  groups?: ListDirectory['groups'];
+  isFsSuperUser?: ListDirectory['is_fs_superuser'];
   isTrashEnabled?: boolean;
   currentPath: FileStats['path'];
   selectedFiles: StorageDirectoryTableData[];
@@ -58,10 +71,18 @@ const iconsMap: Record<ActionType, JSX.Element> = {
   [ActionType.Replication]: <DuplicateIcon />,
   [ActionType.Delete]: <DeleteIcon />,
   [ActionType.Summary]: <SummaryIcon />,
-  [ActionType.Compress]: <CollapseIcon />
+  [ActionType.Compress]: <CollapseIcon />,
+  [ActionType.Extract]: <ExpandIcon />,
+  [ActionType.Download]: <DownloadIcon />,
+  [ActionType.ChangeOwnerAndGroup]: <GroupsIcon />
 };
 
 const StorageBrowserActions = ({
+  superUser,
+  superGroup,
+  users,
+  groups,
+  isFsSuperUser,
   isTrashEnabled,
   currentPath,
   selectedFiles,
@@ -76,6 +97,18 @@ const StorageBrowserActions = ({
     setSelectedAction(undefined);
   };
 
+  const downloadFile = () => {
+    huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
+    location.href = `${DOWNLOAD_API_URL}?path=${selectedFiles[0]?.path}`;
+  };
+
+  const onActionClick = (actionType: ActionType) => () => {
+    if (actionType === ActionType.Download) {
+      return downloadFile();
+    }
+    setSelectedAction(actionType);
+  };
+
   const onApiSuccess = () => {
     setLoadingFiles(false);
     closeModal();
@@ -88,12 +121,12 @@ const StorageBrowserActions = ({
   };
 
   const actionItems: MenuItemType[] = useMemo(() => {
-    const enabledActions = getEnabledActions(selectedFiles);
+    const enabledActions = getEnabledActions(selectedFiles, isFsSuperUser);
     return enabledActions.map(action => ({
       key: String(action.type),
       label: t(action.label),
       icon: iconsMap[action.type],
-      onClick: () => setSelectedAction(action.type)
+      onClick: onActionClick(action.type)
     }));
   }, [selectedFiles]);
 
@@ -114,10 +147,10 @@ const StorageBrowserActions = ({
         </Button>
       </Dropdown>
       {selectedAction === ActionType.Summary && (
-        <ViewSummary path={selectedFiles[0].path} onClose={closeModal} />
+        <SummaryModal path={selectedFiles[0].path} onClose={closeModal} />
       )}
       {selectedAction === ActionType.Rename && (
-        <RenameAction
+        <RenameModal
           file={selectedFiles[0]}
           onSuccess={onApiSuccess}
           onError={onApiError}
@@ -125,7 +158,7 @@ const StorageBrowserActions = ({
         />
       )}
       {selectedAction === ActionType.Replication && (
-        <ReplicationAction
+        <ReplicationModal
           file={selectedFiles[0]}
           onSuccess={onApiSuccess}
           onError={onApiError}
@@ -133,7 +166,7 @@ const StorageBrowserActions = ({
         />
       )}
       {(selectedAction === ActionType.Move || selectedAction === ActionType.Copy) && (
-        <MoveCopyAction
+        <MoveCopyModal
           action={selectedAction}
           files={selectedFiles}
           currentPath={currentPath}
@@ -144,7 +177,7 @@ const StorageBrowserActions = ({
         />
       )}
       {selectedAction === ActionType.Delete && (
-        <DeleteAction
+        <DeletionModal
           isTrashEnabled={isTrashEnabled}
           files={selectedFiles}
           onSuccess={onApiSuccess}
@@ -154,9 +187,32 @@ const StorageBrowserActions = ({
         />
       )}
       {selectedAction === ActionType.Compress && (
-        <CompressAction
+        <CompressionModal
           currentPath={currentPath}
           files={selectedFiles}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.Extract && (
+        <ExtractionModal
+          currentPath={currentPath}
+          file={selectedFiles[0]}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.ChangeOwnerAndGroup && (
+        <ChangeOwnerAndGroupModal
+          files={selectedFiles}
+          superUser={superUser}
+          superGroup={superGroup}
+          users={users}
+          groups={groups}
           onSuccess={onApiSuccess}
           onError={onApiError}
           onClose={closeModal}

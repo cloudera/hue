@@ -17,45 +17,32 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import CompressAction from './Compress';
+import ExtractAction from './ExtractionModal';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
-import { COMPRESS_API_URL } from '../../../../../reactComponents/FileChooser/api';
 
-const mockFiles: StorageDirectoryTableData[] = [
-  {
-    name: 'file1.txt',
-    size: '0 Byte',
-    type: 'file',
-    permission: 'rwxrwxrwx',
-    mtime: '2021-01-01 00:00:00',
-    path: 'test/path/file1.txt',
-    user: 'test',
-    group: 'test',
-    replication: 1
-  },
-  {
-    name: 'file2.txt',
-    size: '0 Byte',
-    type: 'file',
-    permission: 'rwxrwxrwx',
-    mtime: '2021-01-01 00:00:00',
-    path: 'test/path/file2.txt',
-    user: 'test',
-    group: 'test',
-    replication: 1
-  }
-];
+const mockFile: StorageDirectoryTableData = {
+  name: 'archive.zip',
+  size: '50 MB',
+  type: 'file',
+  permission: 'rwxrwxrwx',
+  mtime: '2021-01-01 00:00:00',
+  path: 'test/path/archive.zip',
+  user: 'test',
+  group: 'test',
+  replication: 1
+};
 
 const mockSave = jest.fn();
-jest.mock('../../../../../utils/hooks/useSaveData', () => ({
+let mockLoading = false;
+jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     save: mockSave,
-    loading: false
+    loading: mockLoading
   }))
 }));
 
-describe('CompressAction Component', () => {
+describe('ExtractAction Component', () => {
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
   const mockOnClose = jest.fn();
@@ -65,11 +52,11 @@ describe('CompressAction Component', () => {
     jest.clearAllMocks();
   });
 
-  it('should render the Compress modal with the correct title and buttons', () => {
+  it('should render the Extract modal with the correct title and buttons', () => {
     const { getByText, getByRole } = render(
-      <CompressAction
+      <ExtractAction
         isOpen={true}
-        files={mockFiles}
+        file={mockFile}
         setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
@@ -78,17 +65,17 @@ describe('CompressAction Component', () => {
       />
     );
 
-    expect(getByText('Compress files and folders')).toBeInTheDocument();
-    expect(getByText('Compressed file name')).toBeInTheDocument();
+    expect(getByText('Extract Archive')).toBeInTheDocument();
+    expect(getByText(`Are you sure you want to extract "{{fileName}}" file?`)).toBeInTheDocument();
     expect(getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-    expect(getByRole('button', { name: 'Compress' })).toBeInTheDocument();
+    expect(getByRole('button', { name: 'Extract' })).toBeInTheDocument();
   });
 
-  it('should display the correct list of files to be compressed', () => {
+  it('should call handleExtract with the correct path and name when "Extract" is clicked', async () => {
     const { getByText } = render(
-      <CompressAction
+      <ExtractAction
         isOpen={true}
-        files={mockFiles}
+        file={mockFile}
         setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
@@ -97,41 +84,23 @@ describe('CompressAction Component', () => {
       />
     );
 
-    expect(getByText('Following files and folders will be compressed:')).toBeInTheDocument();
-    expect(getByText('file1.txt')).toBeInTheDocument();
-    expect(getByText('file2.txt')).toBeInTheDocument();
-  });
+    fireEvent.click(getByText('Extract'));
 
-  it('should call handleCompress with the correct data when "Compress" is clicked', async () => {
-    const { getByText } = render(
-      <CompressAction
-        isOpen={true}
-        files={mockFiles}
-        setLoading={setLoading}
-        onSuccess={mockOnSuccess}
-        onError={mockOnError}
-        onClose={mockOnClose}
-        currentPath="test/path"
-      />
-    );
-
-    const formData = new FormData();
-    mockFiles.forEach(file => {
-      formData.append('file_name', file.name);
+    expect(mockSave).toHaveBeenCalledWith({
+      upload_path: 'test/path',
+      archive_name: mockFile.name
     });
-    formData.append('upload_path', 'test/path');
-    formData.append('archive_name', 'path.zip');
-
-    fireEvent.click(getByText('Compress'));
-
-    expect(mockSave).toHaveBeenCalledWith(formData, { url: COMPRESS_API_URL });
   });
 
-  it('should update the compressed file name when input value changes', () => {
-    const { getByRole } = render(
-      <CompressAction
+  it('should call onSuccess when the extract request is successful', async () => {
+    mockSave.mockImplementationOnce(() => {
+      mockOnSuccess();
+    });
+
+    const { getByText } = render(
+      <ExtractAction
         isOpen={true}
-        files={mockFiles}
+        file={mockFile}
         setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
@@ -140,17 +109,36 @@ describe('CompressAction Component', () => {
       />
     );
 
-    const input = getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'new-compressed-file.zip' } });
+    fireEvent.click(getByText('Extract'));
+    await waitFor(() => expect(mockOnSuccess).toHaveBeenCalledTimes(1));
+  });
 
-    expect(input).toHaveValue('new-compressed-file.zip');
+  it('should call onError when the extract request fails', async () => {
+    mockSave.mockImplementationOnce(() => {
+      mockOnError(new Error('Extraction failed'));
+    });
+
+    const { getByText } = render(
+      <ExtractAction
+        isOpen={true}
+        file={mockFile}
+        setLoading={setLoading}
+        onSuccess={mockOnSuccess}
+        onError={mockOnError}
+        onClose={mockOnClose}
+        currentPath="test/path"
+      />
+    );
+
+    fireEvent.click(getByText('Extract'));
+    await waitFor(() => expect(mockOnError).toHaveBeenCalledWith(new Error('Extraction failed')));
   });
 
   it('should call onClose when the modal is closed', () => {
     const { getByText } = render(
-      <CompressAction
+      <ExtractAction
         isOpen={true}
-        files={mockFiles}
+        file={mockFile}
         setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
@@ -163,15 +151,13 @@ describe('CompressAction Component', () => {
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
-  it('should call onError when the compress request fails', async () => {
-    mockSave.mockImplementationOnce(() => {
-      mockOnError(new Error('Compression failed'));
-    });
+  it('should disable the "Extract" button while loading', () => {
+    mockLoading = true;
 
-    const { getByText } = render(
-      <CompressAction
+    const { getByRole } = render(
+      <ExtractAction
         isOpen={true}
-        files={mockFiles}
+        file={mockFile}
         setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
@@ -180,7 +166,6 @@ describe('CompressAction Component', () => {
       />
     );
 
-    fireEvent.click(getByText('Compress'));
-    await waitFor(() => expect(mockOnError).toHaveBeenCalledWith(new Error('Compression failed')));
+    expect(getByRole('button', { name: 'Extract' })).toBeDisabled();
   });
 });

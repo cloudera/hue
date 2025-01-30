@@ -16,7 +16,7 @@
 
 import React from 'react';
 import { i18nReact } from '../../../../../utils/i18nReact';
-import useSaveData from '../../../../../utils/hooks/useSaveData';
+import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { ActionType } from '../StorageBrowserActions.util';
 import {
   BULK_COPY_API_URL,
@@ -28,7 +28,7 @@ import {
   StorageDirectoryTableData
 } from '../../../../../reactComponents/FileChooser/types';
 
-interface MoveCopyActionProps {
+interface MoveCopyModalProps {
   isOpen?: boolean;
   action: ActionType.Copy | ActionType.Move;
   currentPath: FileStats['path'];
@@ -39,7 +39,7 @@ interface MoveCopyActionProps {
   onClose: () => void;
 }
 
-const MoveCopyAction = ({
+const MoveCopyModal = ({
   isOpen = true,
   action,
   currentPath,
@@ -48,15 +48,12 @@ const MoveCopyAction = ({
   onSuccess,
   onError,
   onClose
-}: MoveCopyActionProps): JSX.Element => {
+}: MoveCopyModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { save: saveForm } = useSaveData(undefined, {
+  const { save } = useSaveData(undefined, {
     postOptions: {
-      qsEncodeData: false,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+      qsEncodeData: false
     },
     skip: !files.length,
     onSuccess: onSuccess,
@@ -80,7 +77,7 @@ const MoveCopyAction = ({
     formData.append('destination_path', destination_path);
 
     setLoadingFiles(true);
-    saveForm(formData, { url });
+    save(formData, { url });
   };
 
   return (
@@ -95,4 +92,4 @@ const MoveCopyAction = ({
   );
 };
 
-export default MoveCopyAction;
+export default MoveCopyModal;

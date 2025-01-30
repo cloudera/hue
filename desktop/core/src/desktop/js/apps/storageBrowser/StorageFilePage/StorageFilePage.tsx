@@ -30,7 +30,7 @@ import {
   SAVE_FILE_API_URL
 } from '../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../utils/huePubSub';
-import useSaveData from '../../../utils/hooks/useSaveData';
+import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import Pagination from '../../../reactComponents/Pagination/Pagination';
 import {
   DEFAULT_PREVIEW_PAGE_SIZE,
@@ -38,7 +38,7 @@ import {
   SUPPORTED_FILE_EXTENSIONS,
   SupportedFileTypes
 } from '../../../utils/constants/storageBrowser';
-import useLoadData from '../../../utils/hooks/useLoadData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
@@ -115,7 +115,8 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
     huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
   };
 
-  const filePreviewUrl = `${DOWNLOAD_API_URL}${fileStats.path}?disposition=inline`;
+  const fileDownloadUrl = `${DOWNLOAD_API_URL}?path=${fileStats.path}`;
+  const filePreviewUrl = `${fileDownloadUrl}&&disposition=inline`;
 
   const isEditingEnabled =
     !isEditing &&
@@ -192,7 +193,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                   </>
                 )}
                 {config?.storage_browser.enable_file_download_button && (
-                  <a href={`${DOWNLOAD_API_URL}${fileStats.path}`}>
+                  <a href={fileDownloadUrl}>
                     <PrimaryButton
                       data-testid="preview--download--button"
                       data-event=""
