@@ -262,7 +262,8 @@ def download(request, path):
 def view(request, path):
   """Dispatches viewing of a path to either index() or fileview(), depending on type."""
 
-  if ENABLE_NEW_STORAGE_BROWSER.get():
+  is_embeddable = coerce_bool(request.GET.get('is_embeddable', False))
+  if ENABLE_NEW_STORAGE_BROWSER.get() and is_embeddable:
     return render('storage_browser.mako', request, None)
 
   # index directory have to be default.
