@@ -2023,9 +2023,9 @@ class ClusterConfig(object):
     if ENABLE_NEW_STORAGE_BROWSER.get():
       interpreters.append({
         'type': 'newfilebrowser',
-        'displayName': _('New File Browser'),
-        'buttonName': _('New File Browser'),
-        'tooltip': _('New File Browser'),
+        'displayName': _('Storage Browser'),
+        'buttonName': _('Storage Browser'),
+        'tooltip': _('Storage Browser'),
         'page': '/filebrowser/new'
       })
     else:

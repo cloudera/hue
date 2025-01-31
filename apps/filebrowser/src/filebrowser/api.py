@@ -763,7 +763,7 @@ def chmod(request):
 
   mode = compress_mode([coerce_bool(permission.get(p)) for p in perm_names])
 
-  request.fs.chmod(path, mode, recursive=permission.get('recursive', False))
+  request.fs.chmod(path, mode, recursive=coerce_bool(permission.get('recursive', False)))
 
   return HttpResponse(status=200)
 

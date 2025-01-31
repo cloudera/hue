@@ -130,29 +130,29 @@ describe('StorageBrowserRowActions', () => {
       }
     };
 
-    it('should not render view summary option when there are multiple records selected', async () => {
+    it('should not render summary option when there are multiple records selected', async () => {
       await setUpActionMenu(mockTwoRecords);
-      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+      expect(screen.queryByRole('menuitem', { name: 'Summary' })).toBeNull();
     });
 
-    it('should render view summary option when record is a hdfs file', async () => {
+    it('should render summary option when record is a hdfs file', async () => {
       await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
-      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
+      expect(screen.queryByRole('menuitem', { name: 'Summary' })).not.toBeNull();
     });
 
-    it('should render view summary option when record is a ofs file', async () => {
+    it('should render summary option when record is a ofs file', async () => {
       await setUpActionMenu([mockRecord], 'ofs://demo/test', 'file');
-      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
+      expect(screen.queryByRole('menuitem', { name: 'Summary' })).not.toBeNull();
     });
 
-    it('should not render view summary option when record is a hdfs folder', async () => {
+    it('should not render summary option when record is a hdfs folder', async () => {
       await setUpActionMenu([mockRecord], '/user/demo/test', 'dir');
-      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+      expect(screen.queryByRole('menuitem', { name: 'Summary' })).toBeNull();
     });
 
-    it('should not render view summary option when record is a an abfs file', async () => {
+    it('should not render summary option when record is a an abfs file', async () => {
       await setUpActionMenu([mockRecord], 'abfs://demo/test', 'file');
-      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+      expect(screen.queryByRole('menuitem', { name: 'Summary' })).toBeNull();
     });
   });
 

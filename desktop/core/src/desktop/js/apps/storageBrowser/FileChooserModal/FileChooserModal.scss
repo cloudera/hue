@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 @use 'variables' as vars;
 @use 'mixins';
 
@@ -21,8 +22,8 @@ $table-placeholder-height: 100px;
 $icon-margin: 5px;
 
 .antd.cuix {
-  .hue-filechooser-modal__body{
-    height:350px;
+  .hue-filechooser-modal__body {
+    height: 350px;
   }
 
   .hue-filechooser-modal__path-browser-panel {
@@ -33,7 +34,7 @@ $icon-margin: 5px;
 
   .hue-filechooser-modal__destPath {
     flex: 0 0 auto;
-     font-weight: 600;
+    font-weight: 600;
   }
 
   .hue-filechooser-modal__search {
@@ -55,6 +56,10 @@ $icon-margin: 5px;
       height: $cell-height;
       border: none;
     }
+
+    .ant-table-tbody>tr>td {
+      border: none
+    }
   }
 
   .hue-filechooser-modal__table-cell-icon {
@@ -71,15 +76,11 @@ $icon-margin: 5px;
       height: $cell-height;
       padding: 2px;
       @include mixins.nowrap-ellipsis;
-    }  
+    }
   }
 
   .disabled-row {
     pointer-events: none;
-  }  
-
-  .ant-table-tbody > tr > td {
-    border: none
   }
 
   .hue-filechooser-modal__table-cell-name {
