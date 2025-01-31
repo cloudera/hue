@@ -170,6 +170,7 @@ class TrinoApi(Api):
 
     response = {
       'row_count': 0,
+      'rows_remaining': 0,
       'next_uri': status.next_uri,
       'sync': None,
       'has_result_set': status.next_uri is not None,
@@ -219,10 +220,11 @@ class TrinoApi(Api):
     data = []
     columns = []
     next_uri = snippet['result']['handle']['next_uri']
-    processed_rows = snippet['result']['handle'].get('row_count', 0)
+    row_count = snippet['result']['handle'].get('row_count', 0)
+    rows_remaining = snippet['result']['handle'].get('rows_remaining', 0)
     status = False
 
-    if processed_rows == 0:
+    if row_count == 0:
       data = snippet['result']['handle']['result']['data']
 
     while next_uri:
@@ -235,25 +237,25 @@ class TrinoApi(Api):
       data += status.rows
       columns = status.columns
 
-      if len(data) >= processed_rows + 100:
-        if processed_rows < 0:
-          data = data[:100]
-        else:
-          data = data[processed_rows:processed_rows + 100]
+      if rows_remaining:
+        data = data[-rows_remaining:]  # Trim the data to only include the remaining rows
+        rows_remaining = 0  # Reset rows_remaining since we've handled the trimming
+
+      if len(data) > 100:
+        rows_remaining = len(data) - 100  # no of rows remaining to fetch in the present uri
         break
+      rows_remaining = 0
 
       next_uri = status.next_uri
-      current_length = len(data)
-      if processed_rows < 0:
-        processed_rows = 0
-      data = data[processed_rows:processed_rows + 100]
-      processed_rows -= current_length
+
+    data = data[:100]
 
     properties = self.trino_session.properties
     self._set_session_info_to_user(properties)
 
     return {
-      'row_count': 100 + processed_rows,
+      'row_count': len(data) + row_count,
+      'rows_remaining': rows_remaining,
       'next_uri': next_uri,
       'has_more': bool(status.next_uri) if status else False,
       'data': data or [],
@@ -456,6 +458,7 @@ class TrinoExecutionWrapper(ExecutionWrapper):
     else:
       result = self.api.fetch_result(self.notebook, self.snippet, rows, start_over)
       self.snippet['result']['handle']['row_count'] = result['row_count']
+      self.snippet['result']['handle']['rows_remaining'] = result['rows_remaining']
       self.snippet['result']['handle']['next_uri'] = result['next_uri']
 
     return ResultWrapper(result.get('meta'), result.get('data'), result.get('has_more'))
