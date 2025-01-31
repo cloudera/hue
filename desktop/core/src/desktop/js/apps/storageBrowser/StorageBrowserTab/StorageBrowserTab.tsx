@@ -46,7 +46,9 @@ const StorageBrowserTab = ({
   fileSystem,
   testId
 }: StorageBrowserTabProps): JSX.Element => {
-  const [urlPathname, urlFilePath] = decodeURIComponent(window.location.pathname).split('view=');
+  const urlPathname = window.location.pathname;
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
   const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
   const initialFilePath = urlFileSystem === fileSystem ? urlFilePath : homeDir;
 
@@ -66,15 +68,16 @@ const StorageBrowserTab = ({
   });
 
   useEffect(() => {
-    const encodedPath = `${urlPathname}view=${encodeURIComponent(filePath)}`;
+    const urlQueryParams = { path: filePath };
+    const encodedSearchParams = new URLSearchParams(urlQueryParams).toString();
     if (filePath && urlFilePath && filePath !== urlFilePath) {
-      changeURL(encodedPath);
+      changeURL(urlPathname, urlQueryParams);
     }
     // if url path is correct but not encoded properly
-    else if (encodedPath !== window.location.pathname) {
-      changeURL(encodedPath, {}, true);
+    else if (encodedSearchParams !== window.location.search) {
+      changeURL(urlPathname, urlQueryParams, true);
     }
-  }, [filePath, urlPathname, urlFilePath, window.location.pathname]);
+  }, [filePath, urlPathname, urlFilePath, window.location]);
 
   const errorConfig = [
     {
