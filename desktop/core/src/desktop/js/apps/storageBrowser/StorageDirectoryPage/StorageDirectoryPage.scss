@@ -63,6 +63,8 @@ $icon-margin: 5px;
   }
 
   .hue-storage-browser__table-row {
+    border-bottom: 1px solid vars.$fluidx-gray-040;
+
     :hover {
       cursor: pointer;
     }
