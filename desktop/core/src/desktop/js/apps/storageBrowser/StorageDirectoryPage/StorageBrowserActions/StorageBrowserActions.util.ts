@@ -34,6 +34,7 @@ import {
   inTrash
 } from '../../../../utils/storageBrowserUtils';
 import { SUPPORTED_COMPRESSED_FILE_EXTENTION } from '../../../../utils/constants/storageBrowser';
+import { TFunction } from 'i18next';
 
 export enum ActionType {
   Copy = 'copy',
@@ -107,6 +108,7 @@ const isMultipleFileActionEnabled = (
 };
 
 export const getEnabledActions = (
+  t: TFunction,
   files: StorageDirectoryTableData[],
   isFsSuperUser?: boolean
 ): {
@@ -125,58 +127,58 @@ export const getEnabledActions = (
     {
       enabled: isSingleFileActionEnabled(files, ActionType.Rename),
       type: ActionType.Rename,
-      label: 'Rename'
+      label: t('Rename')
     },
     {
       enabled: isMultipleFileActionEnabled(files, ActionType.Move),
       type: ActionType.Move,
-      label: 'Move'
+      label: t('Move')
     },
     {
       enabled: isMultipleFileActionEnabled(files, ActionType.Copy),
       type: ActionType.Copy,
-      label: 'Copy'
+      label: t('Copy')
     },
     {
       enabled: isSingleFileActionEnabled(files, ActionType.Download),
       type: ActionType.Download,
-      label: 'Download'
+      label: t('Download')
     },
     {
       enabled:
         !!isFsSuperUser && isMultipleFileActionEnabled(files, ActionType.ChangeOwnerAndGroup),
       type: ActionType.ChangeOwnerAndGroup,
-      label: 'Change Owner / Group'
+      label: t('Change Owner / Group')
     },
     {
       enabled: !!isFsSuperUser && isMultipleFileActionEnabled(files, ActionType.ChangePermission),
       type: ActionType.ChangePermission,
-      label: 'Change Permission'
+      label: t('Change Permission')
     },
     {
       enabled: isSingleFileActionEnabled(files, ActionType.Summary),
       type: ActionType.Summary,
-      label: 'Summary'
+      label: t('Summary')
     },
     {
       enabled: isSingleFileActionEnabled(files, ActionType.Replication),
       type: ActionType.Replication,
-      label: 'Set Replication'
+      label: t('Set Replication')
     },
     {
       enabled: isMultipleFileActionEnabled(files, ActionType.Delete),
       type: ActionType.Delete,
-      label: 'Delete'
+      label: t('Delete')
     },
     {
       enabled: isMultipleFileActionEnabled(files, ActionType.Compress),
       type: ActionType.Compress,
-      label: 'Compress'
+      label: t('Compress')
     },
     {
       enabled: isSingleFileActionEnabled(files, ActionType.Extract),
       type: ActionType.Extract,
-      label: 'Extract'
+      label: t('Extract')
     }
   ].filter(e => e.enabled);
 

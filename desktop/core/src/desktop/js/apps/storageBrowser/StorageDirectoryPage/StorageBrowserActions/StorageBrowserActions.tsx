@@ -124,7 +124,7 @@ const StorageBrowserActions = ({
   };
 
   const actionItems: MenuItemType[] = useMemo(() => {
-    const enabledActions = getEnabledActions(selectedFiles, isFsSuperUser);
+    const enabledActions = getEnabledActions(t, selectedFiles, isFsSuperUser);
     return enabledActions.map(action => ({
       key: String(action.type),
       label: t(action.label),

@@ -21,8 +21,9 @@ import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { Checkbox, Table } from 'antd';
 import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
 import { BULK_CHANGE_PERMISSION_API_URL } from '../../../../../reactComponents/FileChooser/api';
-import './ChangePermissionModal.scss';
 import { getInitialPermissions, Permission } from './ChangePermissionModal.util';
+
+import './ChangePermissionModal.scss';
 
 interface ChangePermissionModalProps {
   isOpen?: boolean;
