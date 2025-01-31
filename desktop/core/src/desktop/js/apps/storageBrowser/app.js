@@ -16,6 +16,10 @@
 import huePubSub from '../../utils/huePubSub';
 
 huePubSub.subscribe('app.dom.loaded', app => {
+  if (app === 'newfilebrowser') {
+    window.createReactComponents('#embeddable_newfilebrowser');
+    return;
+  }
   if (app !== 'filebrowser') {
     return;
   }
