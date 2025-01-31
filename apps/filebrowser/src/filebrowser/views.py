@@ -260,10 +260,7 @@ def download(request, path):
 
 
 def view_new(request):
-  if ENABLE_NEW_STORAGE_BROWSER.get():
-    return render('storage_browser.mako', request, None)
-  else:
-    raise PopupException(_("New file browser is not enabled"))
+  return render('storage_browser.mako', request, None)
 
 
 def view(request, path):
