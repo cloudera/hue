@@ -72,7 +72,7 @@ describe('CreateAndUploadAction', () => {
     const newButton = screen.getByText('New');
     await act(async () => fireEvent.click(newButton));
 
-    const newUploadButton = screen.getByText('New Upload');
+    const newUploadButton = screen.getByText('Upload File');
     fireEvent.click(newUploadButton);
 
     // Check if the upload modal is opened
