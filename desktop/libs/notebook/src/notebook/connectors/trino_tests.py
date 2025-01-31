@@ -178,6 +178,7 @@ class TestTrinoApi(TestCase):
 
       expected_result = {
         'row_count': 0,
+        'rows_remaining': 0,
         'next_uri': 'http://url',
         'sync': None,
         'has_result_set': True,
@@ -204,6 +205,7 @@ class TestTrinoApi(TestCase):
 
       expected_result = {
         'row_count': 0,
+        'rows_remaining': 0,
         'next_uri': 'http://url',
         'sync': None,
         'has_result_set': True,
@@ -220,7 +222,7 @@ class TestTrinoApi(TestCase):
       }
       assert result == expected_result
 
-  def test_fetch_result(self):
+  def test_fetch_result_more_than_100(self):
     # Mock TrinoRequest object and its methods
     mock_trino_request = MagicMock()
     self.trino_api.trino_request = mock_trino_request
@@ -229,18 +231,21 @@ class TestTrinoApi(TestCase):
     mock_trino_request.get.return_value = MagicMock()
     _columns = [{'comment': '', 'name': 'test_column1', 'type': 'str'}, {'comment': '', 'name': 'test_column2', 'type': 'str'}]
 
+    # Generate more than 100 rows of mock data
+    mock_data = [[f'value{i}', f'value{i + 1}'] for i in range(1, 201, 1)]
+
     mock_trino_request.process.side_effect = [
       MagicMock(
-        stats={'state': 'FINISHED'}, next_uri='http://url', id=123,
-        rows=[['value1', 'value2'], ['value3', 'value4']], columns=_columns
+        stats={'state': 'FINISHED'}, next_uri='http://url1', id=123,
+        rows=mock_data[:57], columns=_columns
       ),
       MagicMock(
-        stats={'state': 'FINISHED'}, next_uri='http://url1', id=124,
-        rows=[['value5', 'value6'], ['value7', 'value8']], columns=_columns
+        stats={'state': 'FINISHED'}, next_uri='http://url2', id=124,
+        rows=mock_data[57:105], columns=_columns
       ),
       MagicMock(
         stats={'state': 'FINISHED'}, next_uri=None, id=125,
-        rows=[['value9', 'value10'], ['value11', 'value12']], columns=_columns
+        rows=mock_data[105:], columns=_columns
       )
     ]
 
@@ -250,13 +255,11 @@ class TestTrinoApi(TestCase):
     )
 
     expected_result = {
-      'row_count': 94,
-      'next_uri': None,
-      'has_more': False,
-      'data': [
-        ['value1', 'value2'], ['value3', 'value4'], ['value5', 'value6'],
-        ['value7', 'value8'], ['value9', 'value10'], ['value11', 'value12']
-      ],
+      'row_count': 100,
+      'rows_remaining': 5,
+      'next_uri': 'http://url1',
+      'has_more': True,
+      'data': mock_data[:100],
       'meta': [{
         'name': column['name'],
         'type': column['type'],
@@ -266,7 +269,53 @@ class TestTrinoApi(TestCase):
     }
 
     assert result == expected_result
-    assert len(result['data']) == 6
+    assert len(result['data']) == 100
+    assert len(result['meta']) == 2
+
+  def test_fetch_result_less_than_100(self):
+    # Mock TrinoRequest object and its methods
+    mock_trino_request = MagicMock()
+    self.trino_api.trino_request = mock_trino_request
+
+    # Configure the MagicMock object to return expected responses
+    mock_trino_request.get.return_value = MagicMock()
+    _columns = [{'comment': '', 'name': 'test_column1', 'type': 'str'}, {'comment': '', 'name': 'test_column2', 'type': 'str'}]
+
+    # Generate 100 rows of mock data
+    mock_data = [[f'value{i}', f'value{i + 1}'] for i in range(1, 90, 1)]
+
+    mock_trino_request.process.side_effect = [
+      MagicMock(
+        stats={'state': 'FINISHED'}, next_uri='http://url1', id=123,
+        rows=mock_data[:57], columns=_columns
+      ),
+      MagicMock(
+        stats={'state': 'FINISHED'}, next_uri=None, id=124,
+        rows=mock_data[57:], columns=_columns
+      )
+    ]
+
+    # Call the fetch_result method
+    result = self.trino_api.fetch_result(
+      notebook={}, snippet={'result': {'handle': {'next_uri': 'http://url', 'result': {'data': []}}}}, rows=0, start_over=False
+    )
+
+    expected_result = {
+      'row_count': 89,
+      'rows_remaining': 0,
+      'next_uri': None,
+      'has_more': False,
+      'data': mock_data[:90],
+      'meta': [{
+        'name': column['name'],
+        'type': column['type'],
+        'comment': ''
+        } for column in _columns],
+      'type': 'table'
+    }
+
+    assert result == expected_result
+    assert len(result['data']) == 89
     assert len(result['meta']) == 2
 
   def test_get_select_query(self):
