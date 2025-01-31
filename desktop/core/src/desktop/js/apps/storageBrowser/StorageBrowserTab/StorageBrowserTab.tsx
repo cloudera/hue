@@ -69,7 +69,7 @@ const StorageBrowserTab = ({
 
   useEffect(() => {
     const urlQueryParams = { path: filePath };
-    const encodedSearchParams = `${urlPathname}?${new URLSearchParams(urlQueryParams).toString()}`;
+    const encodedSearchParams = new URLSearchParams(urlQueryParams).toString();
     if (filePath && urlFilePath && filePath !== urlFilePath) {
       changeURL(urlPathname, urlQueryParams);
     }
