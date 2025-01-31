@@ -43,6 +43,7 @@ from desktop.conf import (
   COLLECT_USAGE,
   DISABLE_SOURCE_AUTOCOMPLETE,
   ENABLE_CONNECTORS,
+  ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_ORGANIZATIONS,
   ENABLE_PROMETHEUS,
   ENABLE_SHARING,
@@ -2011,74 +2012,83 @@ class ClusterConfig(object):
 
     remote_home_storage = get_remote_home_storage(self.user)
 
-    for hdfs_connector in hdfs_connectors:
-      force_home = remote_home_storage and not remote_home_storage.startswith('/')
-      home_path = self.user.get_home_directory(force_home=force_home)
+    if ENABLE_NEW_STORAGE_BROWSER.get():
       interpreters.append({
-        'type': 'hdfs',
-        'displayName': hdfs_connector,
-        'buttonName': _('Browse'),
-        'tooltip': hdfs_connector,
-        'page': '/filebrowser/' + (
-          not self.user.is_anonymous and
-          'view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
-        )
+        'type': 'newfilebrowser',
+        'displayName': _('New File Browser'),
+        'buttonName': _('New File Browser'),
+        'tooltip': _('New File Browser'),
+        'page': '/filebrowser/new'
       })
+    else:
+      for hdfs_connector in hdfs_connectors:
+        force_home = remote_home_storage and not remote_home_storage.startswith('/')
+        home_path = self.user.get_home_directory(force_home=force_home)
+        interpreters.append({
+          'type': 'hdfs',
+          'displayName': hdfs_connector,
+          'buttonName': _('Browse'),
+          'tooltip': hdfs_connector,
+          'page': '/filebrowser/' + (
+            not self.user.is_anonymous and
+            'view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
+          )
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
-      from aws.s3.s3fs import get_s3_home_directory
-      home_path = get_s3_home_directory(self.user)
-      interpreters.append({
-        'type': 's3',
-        'displayName': _('S3'),
-        'buttonName': _('Browse'),
-        'tooltip': _('S3'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
+        from aws.s3.s3fs import get_s3_home_directory
+        home_path = get_s3_home_directory(self.user)
+        interpreters.append({
+          'type': 's3',
+          'displayName': _('S3'),
+          'buttonName': _('Browse'),
+          'tooltip': _('S3'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('gs', self.user):
-      from desktop.lib.fs.gc.gs import get_gs_home_directory
-      home_path = get_gs_home_directory(self.user)
-      interpreters.append({
-        'type': 'gs',
-        'displayName': _('GS'),
-        'buttonName': _('Browse'),
-        'tooltip': _('Google Storage'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('gs', self.user):
+        from desktop.lib.fs.gc.gs import get_gs_home_directory
+        home_path = get_gs_home_directory(self.user)
+        interpreters.append({
+          'type': 'gs',
+          'displayName': _('GS'),
+          'buttonName': _('Browse'),
+          'tooltip': _('Google Storage'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
-      # ADLS does not have a dedicated get_home_directory method
-      home_path = remote_home_storage if remote_home_storage else 'adl:/'
-      interpreters.append({
-        'type': 'adls',
-        'displayName': _('ADLS'),
-        'buttonName': _('Browse'),
-        'tooltip': _('ADLS'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
+        # ADLS does not have a dedicated get_home_directory method
+        home_path = remote_home_storage if remote_home_storage else 'adl:/'
+        interpreters.append({
+          'type': 'adls',
+          'displayName': _('ADLS'),
+          'buttonName': _('Browse'),
+          'tooltip': _('ADLS'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
-      from azure.abfs.__init__ import get_abfs_home_directory
-      home_path = get_abfs_home_directory(self.user)
-      interpreters.append({
-        'type': 'abfs',
-        'displayName': _('ABFS'),
-        'buttonName': _('Browse'),
-        'tooltip': _('ABFS'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
+        from azure.abfs.__init__ import get_abfs_home_directory
+        home_path = get_abfs_home_directory(self.user)
+        interpreters.append({
+          'type': 'abfs',
+          'displayName': _('ABFS'),
+          'buttonName': _('Browse'),
+          'tooltip': _('ABFS'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('ofs', self.user):
-      from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
-      home_path = get_ofs_home_directory()
-      interpreters.append({
-        'type': 'ofs',
-        'displayName': _('Ozone'),
-        'buttonName': _('Browse'),
-        'tooltip': _('Ozone'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('ofs', self.user):
+        from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+        home_path = get_ofs_home_directory()
+        interpreters.append({
+          'type': 'ofs',
+          'displayName': _('Ozone'),
+          'buttonName': _('Browse'),
+          'tooltip': _('Ozone'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
     if 'metastore' in self.apps:
       interpreters.append({

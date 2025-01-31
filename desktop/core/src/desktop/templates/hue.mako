@@ -220,6 +220,7 @@ ${ hueIcons.symbols() }
         <div id="embeddable_oozie_info" class="embeddable"></div>
         <div id="embeddable_jobbrowser" class="embeddable"></div>
         <div id="embeddable_filebrowser" class="embeddable"></div>
+        <div id="embeddable_newfilebrowser" class="embeddable"></div>
         <div id="embeddable_home" class="embeddable"></div>
         <div id="embeddable_catalog" class="embeddable"></div>
         <div id="embeddable_indexer" class="embeddable"></div>
