@@ -32,8 +32,11 @@ const ServerLogs: React.FC = (): JSX.Element => {
   const [filter, setFilter] = useState<string>('');
   const [wrapLogs, setWrapLogs] = useState(true);
   const { t } = i18nReact.useTranslation();
-
-  const { data: logsData, loading, error } = useLoadData<ServerLogsData>(SERVER_LOGS_API_URL);
+  const { data: logsData, loading, error } = useLoadData<ServerLogsData>(SERVER_LOGS_API_URL, {
+    params: {
+      reverse: true
+    }
+  });
 
   if (error) {
     return (
