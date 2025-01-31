@@ -709,6 +709,7 @@ class OnePageViewModel {
         }
       },
       { url: '/filebrowser/view=*', app: 'filebrowser' },
+      { url: '/filebrowser/new', app: 'newfilebrowser' },
       {
         url: '/filebrowser/*',
         app: function () {
