@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import ServerLogs from './ServerLogsTab';
 import { mocked } from 'jest-mock';
-import useLoadData from '../../../utils/hooks/useLoadData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 const mockData = jest.fn().mockReturnValue({
   logs: ['Log entry 1', 'Log entry 2'],

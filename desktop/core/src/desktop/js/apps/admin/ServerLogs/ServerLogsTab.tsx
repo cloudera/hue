@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 import { Spin, Alert } from 'antd';
 import ServerLogsHeader from './ServerLogsHeader';
 import { i18nReact } from '../../../utils/i18nReact';
-import useLoadData from '../../../utils/hooks/useLoadData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import HighlightText from '../Components/HighlightText';
 import { SERVER_LOGS_API_URL } from '../Components/utils';
 import './ServerLogsTab.scss';
