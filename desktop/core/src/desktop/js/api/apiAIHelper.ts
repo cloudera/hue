@@ -574,6 +574,15 @@ export const createHistoryItem = async (
   }
 };
 
+export const deleteHistoryItem = async (): Promise<void> => {
+  try {
+    await post('/api/v1/editor/ai/prompt/delete');
+  } catch (error) {
+    console.error('Error deleting all history items:', error);
+    throw error;
+  }
+};
+
 export const updateHistoryItem = async (promptItem: HistoryItem): Promise<HistoryItem> => {
   try {
     const response = await post('/api/v1/editor/ai/prompt/update', promptItem);

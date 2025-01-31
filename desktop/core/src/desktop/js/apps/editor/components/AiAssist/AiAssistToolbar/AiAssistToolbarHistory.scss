@@ -128,3 +128,21 @@ svg.hue-ai-assist-toolbar-history__item-icon {
   flex-grow: 1;
 }
 
+.hue-ai-assist-toolbar-history__delete {
+  background-color: transparent;
+  border: none;
+  margin-right: 6px;
+  cursor: pointer;
+  color: vars.$fluidx-blue-400;
+}
+
+.hue-ai-assist-toolbar-history__delete-container {
+  display: flex;
+  align-items: center;
+  margin-left: 4px;
+}
+
+.hue-ai-assist-toggle-visibility {
+  display: flex;
+  align-items: center;
+}

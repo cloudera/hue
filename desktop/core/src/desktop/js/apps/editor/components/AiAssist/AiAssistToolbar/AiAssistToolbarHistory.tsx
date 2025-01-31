@@ -22,6 +22,7 @@ import ReactDOM from 'react-dom';
 import classNames from 'classnames';
 import HideIcon from '@cloudera/cuix-core/icons/react/HideIcon';
 import ViewIcon from '@cloudera/cuix-core/icons/react/ViewIcon';
+import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 import IconButton from 'cuix/dist/components/Button/IconButton';
 import HistoryIcon from '@cloudera/cuix-core/icons/react/HistoryIcon';
 import I18n from 'utils/i18n';
@@ -61,6 +62,7 @@ interface AiAssistToolbarHistoryProps {
   show: boolean;
   ref;
   width: number | undefined;
+  onDelete: () => void;
 }
 
 const ENTER_KEY = 'Enter';
@@ -79,7 +81,8 @@ const AiAssistToolbarHistory = forwardRef(
       show,
       autoShow,
       width,
-      items
+      items,
+      onDelete
     }: AiAssistToolbarHistoryProps,
     ref
   ) => {
@@ -195,18 +198,25 @@ const AiAssistToolbarHistory = forwardRef(
                   title={toggleTitle}
                   data-event=""
                   icon={
-                    autoShow ? (
-                      <div style={{ width: '24px', height: '24px' }}>
-                        <ViewIcon />
-                      </div>
-                    ) : (
-                      <div style={{ width: '24px', height: '24px' }}>
-                        <HideIcon />
-                      </div>
-                    )
+                    <div className="hue-ai-assist-toggle-visibility">
+                      {autoShow ? <ViewIcon /> : <HideIcon />}
+                    </div>
                   }
                   onFocusCapture={e => e.stopPropagation()}
                 />
+              </div>
+              <div className="hue-ai-assist-toolbar-history__delete-container">
+                <button
+                  className="hue-ai-assist-toolbar-history__delete"
+                  aria-label="Clear history"
+                  title="Click to clear prompt history"
+                  onClick={e => {
+                    e.stopPropagation(); // Prevent the event from bubbling to parent elements
+                    onDelete();
+                  }}
+                >
+                  <DeleteIcon />
+                </button>
               </div>
             </div>
             {!renderableItems.length && (

@@ -136,6 +136,7 @@ function AiAssistToolbarInput({
   placeholder,
   onSubmit,
   onCancel,
+  onDelete,
   onAnimationEnded,
   onInputChanged,
   isLoading,
@@ -151,6 +152,7 @@ function AiAssistToolbarInput({
   prefill?: string;
   onSubmit: (params: string) => void;
   onCancel: () => void;
+  onDelete: () => void;
   onInputChanged: (params: string) => void;
   onAnimationEnded: () => void;
   promptValue: string;
@@ -328,6 +330,7 @@ function AiAssistToolbarInput({
             onSelect={handleHistorySelect}
             searchValue={inputPromptValue}
             items={historyItems}
+            onDelete={onDelete}
           />
           {hasReasonableInputLength(inputPromptValue) && (
             <Button

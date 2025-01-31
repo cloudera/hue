@@ -17,7 +17,12 @@
 */
 
 import React, { useState, useEffect } from 'react';
-import { getHistoryItems, createHistoryItem, updateHistoryItem } from 'api/apiAIHelper';
+import {
+  getHistoryItems,
+  createHistoryItem,
+  updateHistoryItem,
+  deleteHistoryItem
+} from 'api/apiAIHelper';
 import {
   BugOutlined,
   ThunderboltOutlined,
@@ -131,6 +136,15 @@ function AssistToolbar({
     updateHistory(promptValue);
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteHistoryItem();
+      setHistoryItems([]);
+    } catch (error) {
+      console.error('Could not delete history item:', error);
+    }
+  };
+
   const updateHistory = prompt => {
     const existingHistoryItem = historyItems.find(item => item.prompt === prompt);
     if (existingHistoryItem) {
@@ -187,6 +201,7 @@ function AssistToolbar({
                 placeholder={`Query database ${databaseNames.join(', ')} using natural language`}
                 onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
+                onDelete={handleDelete}
                 onInputChanged={prompt => onInputChanged(prompt)}
                 promptValue={inputValue}
                 onAnimationEnded={() => setIsAnimatingInput(false)}

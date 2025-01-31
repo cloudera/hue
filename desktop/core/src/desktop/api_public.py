@@ -688,6 +688,22 @@ def get_prompts_by_user(request):
 
 
 @api_view(["POST"])
+def delete_prompts_by_user(request):
+    try:
+        prompts_queryset = LlmPrompt.objects.filter(creator=request.user)
+        if not prompts_queryset.exists():
+            return Response({'message': 'No prompts to delete.'}, status=200)
+        deleted_count, _ = prompts_queryset.delete()
+        return Response(
+            {'message': f'{deleted_count} prompt(s) deleted successfully.'},
+            status=200
+        )
+    except Exception as e:
+        error_message = f"Failed to delete prompts: {str(e)}"
+        return Response({'error': error_message}, status=500)
+
+
+@api_view(["POST"])
 def update_prompt(request):
     prompt_id = request.data.get("id")
 

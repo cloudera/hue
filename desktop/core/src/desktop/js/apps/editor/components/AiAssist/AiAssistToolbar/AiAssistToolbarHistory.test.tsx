@@ -206,4 +206,32 @@ describe('AiAssistToolbarHistory', () => {
     const highlightedText = getByText('First');
     expect(highlightedText).toHaveClass('hue-ai-assist-toolbar-history__item-highlight');
   });
+
+  test('delete button clears prompt history', async () => {
+    const user = userEvent.setup();
+    const mockApiDelete = jest
+      .fn()
+      .mockResolvedValue({ message: '4 prompt(s) deleted successfully' });
+    const { getByText, getByTitle } = render(
+      <AiAssistToolbarHistory
+        items={historyItems}
+        searchValue=""
+        onSelect={jest.fn()}
+        onHide={jest.fn()}
+        onToggleAutoShow={jest.fn()}
+        show={true}
+        autoShow={false}
+        position={{ top: 0, left: 0 }}
+        width={300}
+        onDelete={mockApiDelete}
+      />
+    );
+    expect(getByText('First Entry')).toBeInTheDocument();
+    expect(getByText('second entry')).toBeInTheDocument();
+    expect(getByText('MixedCASE Entry')).toBeInTheDocument();
+    expect(getByText('Last item')).toBeInTheDocument();
+    const deleteBtn = getByTitle('Click to clear prompt history');
+    await user.click(deleteBtn);
+    expect(mockApiDelete).toHaveBeenCalled();
+  });
 });
