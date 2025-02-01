@@ -53,7 +53,7 @@ import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
 import { UploadItem } from '../../../utils/hooks/useFileUpload/util';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
-import { useWindowSize } from '../../../utils/hooks/useWindowSize';
+import { useWindowSize } from '../../../utils/hooks/useWindowSize/useWindowSize';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface StorageDirectoryPageProps {
