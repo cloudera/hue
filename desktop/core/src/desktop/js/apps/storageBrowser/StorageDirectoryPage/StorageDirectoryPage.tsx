@@ -322,18 +322,16 @@ const StorageDirectoryPage = ({
           )}
         </LoadingErrorWrapper>
       </DragAndDrop>
-      {
-        filesToUpload.length > 0 && (
-          <FileUploadQueue
-            filesQueue={filesToUpload}
-            onClose={() => setFilesToUpload([])}
-            onComplete={() => {
-              reloadData();
-              setPolling(false);
-            }}
-          />
-        )
-      }
+      {filesToUpload.length > 0 && (
+        <FileUploadQueue
+          filesQueue={filesToUpload}
+          onClose={() => setFilesToUpload([])}
+          onComplete={() => {
+            reloadData();
+            setPolling(false);
+          }}
+        />
+      )}
     </>
   );
 };
