@@ -33,8 +33,9 @@ import {
   isOFSRoot,
   inTrash
 } from '../../../../utils/storageBrowserUtils';
-import { SUPPORTED_COMPRESSED_FILE_EXTENTION } from '../../../../utils/constants/storageBrowser';
+import { SupportedFileTypes } from '../../../../utils/constants/storageBrowser';
 import { TFunction } from 'i18next';
+import { getFileType } from '../../StorageFilePage/StorageFilePage.util';
 
 export enum ActionType {
   Copy = 'copy',
@@ -61,7 +62,7 @@ const isValidFileOrFolder = (filePath: string): boolean => {
 };
 
 const isFileCompressed = (filePath: string): boolean => {
-  return SUPPORTED_COMPRESSED_FILE_EXTENTION.some(ext => filePath.endsWith(ext));
+  return getFileType(filePath) === SupportedFileTypes.COMPRESSED;
 };
 
 const isActionEnabled = (file: StorageDirectoryTableData, action: ActionType): boolean => {
