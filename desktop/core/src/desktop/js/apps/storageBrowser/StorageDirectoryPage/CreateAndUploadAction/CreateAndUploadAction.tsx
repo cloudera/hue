@@ -31,7 +31,7 @@ import {
   CREATE_FILE_API_URL
 } from '../../../../reactComponents/FileChooser/api';
 import { FileStats } from '../../../../reactComponents/FileChooser/types';
-import useSaveData from '../../../../utils/hooks/useSaveData';
+import useSaveData from '../../../../utils/hooks/useSaveData/useSaveData';
 import InputModal from '../../InputModal/InputModal';
 import './CreateAndUploadAction.scss';
 import DragAndDrop from '../../../../reactComponents/DragAndDrop/DragAndDrop';
@@ -59,8 +59,18 @@ const CreateAndUploadAction = ({
 
   const [selectedAction, setSelectedAction] = useState<ActionType>();
 
+  const onModalClose = () => {
+    setSelectedAction(undefined);
+  };
+
+  const onUpload = (files: File[]) => {
+    onModalClose();
+    onFilesUpload(files);
+  };
+
   const onApiSuccess = () => {
     setLoadingFiles(false);
+    onModalClose();
     onSuccessfulAction();
   };
 
@@ -69,22 +79,13 @@ const CreateAndUploadAction = ({
     huePubSub.publish('hue.error', error);
   };
 
-  const { save } = useSaveData(undefined, {
+  const { save, loading } = useSaveData(undefined, {
     onSuccess: onApiSuccess,
     onError: onApiError
   });
 
   const onActionClick = (action: ActionType) => () => {
     setSelectedAction(action);
-  };
-
-  const onModalClose = () => {
-    setSelectedAction(undefined);
-  };
-
-  const onUpload = (files: File[]) => {
-    onModalClose();
-    onFilesUpload(files);
   };
 
   const newActionsMenuItems: MenuItemGroupType[] = [
@@ -115,7 +116,7 @@ const CreateAndUploadAction = ({
         {
           icon: <ImportIcon />,
           key: ActionType.uploadFile,
-          label: t('New Upload'),
+          label: t('Upload File'),
           onClick: onActionClick(ActionType.uploadFile)
         }
       ]
@@ -157,6 +158,7 @@ const CreateAndUploadAction = ({
         showModal={selectedAction === ActionType.createFolder}
         onSubmit={handleCreate}
         onClose={onModalClose}
+        buttonDisabled={loading}
       />
       <InputModal
         title={t('Create New File')}
@@ -165,16 +167,15 @@ const CreateAndUploadAction = ({
         showModal={selectedAction === ActionType.createFile}
         onSubmit={handleCreate}
         onClose={onModalClose}
+        buttonDisabled={loading}
       />
       <Modal
         onCancel={onModalClose}
-        className="cuix antd"
+        className="hue-file-upload-modal cuix antd"
         open={selectedAction === ActionType.uploadFile}
-        title={t('Upload A File')}
+        title={t('Upload a File')}
       >
-        <div className="hue-file-upload-modal">
-          <DragAndDrop onDrop={onUpload} />
-        </div>
+        <DragAndDrop onDrop={onUpload} />
       </Modal>
     </>
   );

@@ -8,7 +8,7 @@ import {
 } from '../../../../reactComponents/FileChooser/api';
 
 const mockSave = jest.fn();
-jest.mock('../../../../utils/hooks/useSaveData', () => ({
+jest.mock('../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     save: mockSave
@@ -24,6 +24,7 @@ describe('CreateAndUploadAction', () => {
   const currentPath = '/some/path';
   const onSuccessfulAction = jest.fn();
   const setLoadingFiles = jest.fn();
+  const mockFilesUpload = jest.fn();
 
   beforeEach(() => {
     render(
@@ -31,6 +32,7 @@ describe('CreateAndUploadAction', () => {
         currentPath={currentPath}
         onSuccessfulAction={onSuccessfulAction}
         setLoadingFiles={setLoadingFiles}
+        onFilesUpload={mockFilesUpload}
       />
     );
   });
@@ -70,11 +72,11 @@ describe('CreateAndUploadAction', () => {
     const newButton = screen.getByText('New');
     await act(async () => fireEvent.click(newButton));
 
-    const newUploadButton = screen.getByText('New Upload');
+    const newUploadButton = screen.getByText('Upload File');
     fireEvent.click(newUploadButton);
 
     // Check if the upload modal is opened
-    expect(screen.getByText('Upload A File')).toBeInTheDocument();
+    expect(screen.getByText('Upload a File')).toBeInTheDocument();
   });
 
   it('should call the correct API for creating a folder', async () => {

@@ -53,7 +53,7 @@ describe('PathBrowser utils', () => {
       const result = getFileSystemAndPath(path);
 
       expect(result).toEqual({
-        fileSystem: 'hdfs',
+        fileSystem: '',
         path: ''
       });
     });

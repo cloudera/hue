@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { Tabs, Spin } from 'antd';
+import { Tabs } from 'antd';
 
 import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 
@@ -25,27 +25,45 @@ import StorageBrowserTab from './StorageBrowserTab/StorageBrowserTab';
 import { ApiFileSystem, FILESYSTEMS_API_URL } from '../../reactComponents/FileChooser/api';
 
 import './StorageBrowserPage.scss';
-import useLoadData from '../../utils/hooks/useLoadData';
+import useLoadData from '../../utils/hooks/useLoadData/useLoadData';
+import LoadingErrorWrapper from '../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import { getFileSystemAndPath } from '../../reactComponents/PathBrowser/PathBrowser.util';
 
 const StorageBrowserPage = (): JSX.Element => {
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
+  const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
+
   const { t } = i18nReact.useTranslation();
 
-  const { data: fileSystems, loading } = useLoadData<ApiFileSystem[]>(FILESYSTEMS_API_URL);
+  const { data, loading, error, reloadData } = useLoadData<ApiFileSystem[]>(FILESYSTEMS_API_URL);
+
+  const errorConfig = [
+    {
+      enabled: !!error,
+      message: t('An error occurred while fetching the filesystem'),
+      action: t('Retry'),
+      onClick: reloadData
+    }
+  ];
 
   return (
     <div className="hue-storage-browser cuix antd">
       <CommonHeader title={t('Storage Browser')} icon={<DataBrowserIcon />} />
-      <Spin spinning={loading}>
+      <LoadingErrorWrapper loading={loading} errors={errorConfig}>
         <Tabs
           className="hue-storage-browser__tab"
-          defaultActiveKey="0"
-          items={fileSystems?.map(system => ({
-            label: system.file_system.toUpperCase(),
-            key: system.file_system + '_tab',
-            children: <StorageBrowserTab homeDir={system.user_home_directory} />
+          destroyInactiveTabPane
+          defaultActiveKey={urlFileSystem ?? data?.[0]?.file_system}
+          items={data?.map(fs => ({
+            label: fs.file_system.toUpperCase(),
+            key: fs.file_system,
+            children: (
+              <StorageBrowserTab homeDir={fs.user_home_directory} fileSystem={fs.file_system} />
+            )
           }))}
         />
-      </Spin>
+      </LoadingErrorWrapper>
     </div>
   );
 };

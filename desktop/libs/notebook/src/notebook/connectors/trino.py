@@ -17,6 +17,7 @@
 
 import json
 import time
+import logging
 import textwrap
 from urllib.parse import urlparse
 
@@ -27,6 +28,7 @@ from trino.client import ClientSession, TrinoQuery, TrinoRequest
 from trino.exceptions import TrinoConnectionError
 
 from beeswax import conf, data_export
+from desktop.auth.backend import rewrite_user
 from desktop.conf import AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, AUTH_USERNAME as DEFAULT_AUTH_USERNAME
 from desktop.lib import export_csvxls
 from desktop.lib.conf import coerce_password_from_script
@@ -34,6 +36,9 @@ from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest.resource import Resource
 from notebook.connectors.base import Api, ExecutionWrapper, QueryError, ResultWrapper
+
+LOG = logging.getLogger()
+SESSION_KEY = '%(username)s-%(interpreter_name)s'
 
 
 def query_error_handler(func):
@@ -68,11 +73,12 @@ class TrinoApi(Api):
       self.auth_password = auth_password
       self.auth = BasicAuthentication(self.auth_username, self.auth_password)
 
-    trino_session = ClientSession(user.username)
+    self.session_info = self.create_session()
+    self.trino_session = ClientSession(self.user.username, properties=self.session_info['properties'])
     self.trino_request = TrinoRequest(
       host=self.server_host,
       port=self.server_port,
-      client_session=trino_session,
+      client_session=self.trino_session,
       http_scheme=self.http_scheme,
       auth=self.auth
     )
@@ -106,9 +112,48 @@ class TrinoApi(Api):
     parsed_url = urlparse(api_url)
     return parsed_url.hostname, parsed_url.port, parsed_url.scheme
 
+  def _get_session_key(self):
+    return SESSION_KEY % {
+      'username': self.user.username if hasattr(self.user, 'username') else self.user,
+      'interpreter_name': self.interpreter['name']
+    }
+
+  def _get_session_info_from_user(self):
+    self.user = rewrite_user(self.user)
+    session_key = self._get_session_key()
+
+    if self.user.profile.data.get(session_key):
+      return self.user.profile.data[session_key]
+
+  def _set_session_info_to_user(self, session_info):
+    self.user = rewrite_user(self.user)
+    session_key = self._get_session_key()
+
+    self.user.profile.update_data({session_key: session_info})
+    self.user.profile.save()
+
+  def _remove_session_info_from_user(self):
+    self.user = rewrite_user(self.user)
+    session_key = self._get_session_key()
+
+    if self.user.profile.data.get(session_key):
+      json_data = self.user.profile.data
+      json_data.pop(session_key)
+      self.user.profile.json_data = json.dumps(json_data)
+
+    self.user.profile.save()
+
   @query_error_handler
   def create_session(self, lang=None, properties=None):
-    pass
+    properties = properties or self._get_session_info_from_user()
+
+    new_session_info = {
+        'type': lang,
+        'id': None,
+        'properties': properties if not None else []
+    }
+
+    return new_session_info
 
   @query_error_handler
   def execute(self, notebook, snippet):
@@ -125,6 +170,7 @@ class TrinoApi(Api):
 
     response = {
       'row_count': 0,
+      'rows_remaining': 0,
       'next_uri': status.next_uri,
       'sync': None,
       'has_result_set': status.next_uri is not None,
@@ -174,10 +220,11 @@ class TrinoApi(Api):
     data = []
     columns = []
     next_uri = snippet['result']['handle']['next_uri']
-    processed_rows = snippet['result']['handle'].get('row_count', 0)
+    row_count = snippet['result']['handle'].get('row_count', 0)
+    rows_remaining = snippet['result']['handle'].get('rows_remaining', 0)
     status = False
 
-    if processed_rows == 0:
+    if row_count == 0:
       data = snippet['result']['handle']['result']['data']
 
     while next_uri:
@@ -190,22 +237,25 @@ class TrinoApi(Api):
       data += status.rows
       columns = status.columns
 
-      if len(data) >= processed_rows + 100:
-        if processed_rows < 0:
-          data = data[:100]
-        else:
-          data = data[processed_rows:processed_rows + 100]
+      if rows_remaining:
+        data = data[-rows_remaining:]  # Trim the data to only include the remaining rows
+        rows_remaining = 0  # Reset rows_remaining since we've handled the trimming
+
+      if len(data) > 100:
+        rows_remaining = len(data) - 100  # no of rows remaining to fetch in the present uri
         break
+      rows_remaining = 0
 
       next_uri = status.next_uri
-      current_length = len(data)
-      if processed_rows < 0:
-        processed_rows = 0
-      data = data[processed_rows:processed_rows + 100]
-      processed_rows -= current_length
+
+    data = data[:100]
+
+    properties = self.trino_session.properties
+    self._set_session_info_to_user(properties)
 
     return {
-      'row_count': 100 + processed_rows,
+      'row_count': len(data) + row_count,
+      'rows_remaining': rows_remaining,
       'next_uri': next_uri,
       'has_more': bool(status.next_uri) if status else False,
       'data': data or [],
@@ -289,20 +339,25 @@ class TrinoApi(Api):
     return {'status': 0}
 
   def close_session(self, session):
-    # Avoid closing session on page refresh or editor close for now
-    pass
+    self._remove_session_info_from_user()
 
   def _show_databases(self):
     catalogs = self._show_catalogs()
     databases = []
 
     for catalog in catalogs:
-      query_client = TrinoQuery(self.trino_request, 'SHOW SCHEMAS FROM ' + catalog)
-      response = query_client.execute()
-      databases += [f'{catalog}.{item}' for sublist in response.rows for item in sublist]
+      try:
+        query_client = TrinoQuery(self.trino_request, 'SHOW SCHEMAS FROM ' + catalog)
+        response = query_client.execute()
+        databases += [f'{catalog}.{item}' for sublist in response.rows for item in sublist]
+      except Exception as e:
+        # Log the exception and continue with the next catalog
+        LOG.error(f"Failed to fetch schemas from catalog {catalog}: {str(e)}")
+        continue
 
     return databases
 
+  @query_error_handler
   def _show_catalogs(self):
     query_client = TrinoQuery(self.trino_request, 'SHOW CATALOGS')
     response = query_client.execute()
@@ -311,6 +366,7 @@ class TrinoApi(Api):
 
     return catalogs
 
+  @query_error_handler
   def _show_tables(self, database):
     database = self._format_identifier(database, is_db=True)
     query_client = TrinoQuery(self.trino_request, 'USE ' + database)
@@ -326,6 +382,7 @@ class TrinoApi(Api):
       for table in tables
     ]
 
+  @query_error_handler
   def _get_columns(self, database, table):
     database = self._format_identifier(database, is_db=True)
     query_client = TrinoQuery(self.trino_request, 'USE ' + database)
@@ -401,6 +458,7 @@ class TrinoExecutionWrapper(ExecutionWrapper):
     else:
       result = self.api.fetch_result(self.notebook, self.snippet, rows, start_over)
       self.snippet['result']['handle']['row_count'] = result['row_count']
+      self.snippet['result']['handle']['rows_remaining'] = result['rows_remaining']
       self.snippet['result']['handle']['next_uri'] = result['next_uri']
 
     return ResultWrapper(result.get('meta'), result.get('data'), result.get('has_more'))

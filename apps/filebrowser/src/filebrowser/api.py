@@ -58,7 +58,6 @@ from filebrowser.views import (
   MAX_CHUNK_SIZE_BYTES,
   _can_inline_display,
   _is_hdfs_superuser,
-  _massage_page,
   _normalize_path,
   extract_upload_data,
   perform_upload_task,
@@ -209,6 +208,15 @@ def download(request):
   return response
 
 
+def _massage_page(page, paginator):
+  return {
+      'page_number': page.number,
+      'page_size': paginator.per_page,
+      'total_pages': paginator.num_pages,
+      'total_size': paginator.count
+  }
+
+
 @api_error_handler
 def listdir_paged(request):
   """
@@ -280,7 +288,7 @@ def listdir_paged(request):
   response = {
     'is_trash_enabled': is_trash_enabled,
     'files': page.object_list if page else [],
-    'page': _massage_page(page, paginator) if page else {},  # TODO: Check if we need to clean response of _massage_page
+    'page': _massage_page(page, paginator) if page else {},
     # TODO: Check what to keep or what to remove? or move some fields to /get_config?
     'is_fs_superuser': is_fs_superuser,
     'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
@@ -344,7 +352,7 @@ def display(request):
     return HttpResponse(f'Cannot request chunks greater than {MAX_CHUNK_SIZE_BYTES} bytes.', status=400)
 
   # Read out based on meta.
-  compression, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
+  _, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
 
   # Get contents as string for text mode, or at least try
   file_contents = None
@@ -364,7 +372,6 @@ def display(request):
     'length': length,
     'end': offset + len(contents),
     'mode': mode,
-    'compression': compression,
   }
 
   return JsonResponse(data)
@@ -680,7 +687,7 @@ def set_replication(request):
 def rmtree(request):
   # TODO: Check if this needs to be a DELETE request
   path = request.POST.get('path')
-  skip_trash = request.POST.get('skip_trash', False)
+  skip_trash = coerce_bool(request.POST.get('skip_trash', False))
 
   request.fs.rmtree(path, skip_trash)
 
@@ -727,7 +734,7 @@ def chown(request):
   path = request.POST.get('path')
   user = request.POST.get("user")
   group = request.POST.get("group")
-  recursive = request.POST.get('recursive', False)
+  recursive = coerce_bool(request.POST.get('recursive', False))
 
   # TODO: Check if we need to explicitly handle encoding anywhere
   request.fs.chown(path, user, group, recursive=recursive)
@@ -756,7 +763,7 @@ def chmod(request):
 
   mode = compress_mode([coerce_bool(permission.get(p)) for p in perm_names])
 
-  request.fs.chmod(path, mode, recursive=permission.get('recursive', False))
+  request.fs.chmod(path, mode, recursive=coerce_bool(permission.get('recursive', False)))
 
   return HttpResponse(status=200)
 
@@ -790,7 +797,7 @@ def compress_files_using_batch_job(request):
 
   upload_path = request.fs.netnormpath(request.POST.get('upload_path'))
   archive_name = request.POST.get('archive_name')
-  file_names = request.POST.getlist('files[]')  # TODO: Check if this param is correct? Need to improve it?
+  file_names = request.POST.getlist('file_name')
 
   if upload_path and file_names and archive_name:
     try:

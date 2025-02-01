@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -21,49 +22,56 @@ import '@testing-library/jest-dom';
 import StorageBrowserActions from './StorageBrowserActions';
 import { StorageDirectoryTableData } from '../../../../reactComponents/FileChooser/types';
 import { get } from '../../../../api/utils';
+import huePubSub from '../../../../utils/huePubSub';
 
 jest.mock('../../../../api/utils', () => ({
   get: jest.fn()
 }));
 
+jest.mock('../../../../utils/huePubSub', () => ({
+  publish: jest.fn()
+}));
+
+const mockLastConfig = {
+  storage_browser: {
+    enable_file_download_button: true,
+    enable_extract_uploaded_archive: true
+  }
+};
+jest.mock('config/hueConfig', () => ({
+  getLastKnownConfig: jest.fn(() => mockLastConfig)
+}));
+
 const mockGet = get as jest.MockedFunction<typeof get>;
+
 describe('StorageBrowserRowActions', () => {
   //View summary option is enabled and added to the actions menu when the row data is either hdfs/ofs and a single file
-  const mockRecord: StorageDirectoryTableData = {
-    name: 'test',
-    size: '0\u00a0bytes',
-    user: 'demo',
-    group: 'demo',
-    permission: 'drwxr-xr-x',
-    mtime: 'May 12, 2024 10:37 PM',
-    type: '',
-    path: '',
-    replication: 0
-  };
   const mockTwoRecords: StorageDirectoryTableData[] = [
     {
-      name: 'test',
-      size: '0\u00a0bytes',
+      name: 'test.txt',
+      size: '0 Bytes',
       user: 'demo',
       group: 'demo',
       permission: 'drwxr-xr-x',
       mtime: 'May 12, 2024 10:37 PM',
       type: 'file',
-      path: '',
+      path: '/path/to/folder/test.txt',
       replication: 0
     },
     {
       name: 'testFolder',
-      size: '0\u00a0bytes',
+      size: '0 Bytes',
       user: 'demo',
       group: 'demo',
       permission: 'drwxr-xr-x',
       mtime: 'May 12, 2024 10:37 PM',
       type: 'dir',
-      path: '',
+      path: '/path/to/folder/testFolder',
       replication: 0
     }
   ];
+
+  const mockRecord: StorageDirectoryTableData = mockTwoRecords[0];
 
   const setLoadingFiles = jest.fn();
   const onSuccessfulAction = jest.fn();
@@ -74,17 +82,21 @@ describe('StorageBrowserRowActions', () => {
     recordType?: string
   ) => {
     const user = userEvent.setup();
-    if (recordPath) {
-      records[0].path = recordPath;
-    }
-    if (recordType) {
-      records[0].type = recordType;
-    }
+    const selectedFiles =
+      records.length === 1
+        ? [
+            {
+              ...records[0],
+              path: recordPath ?? records[0].path,
+              type: recordType ?? records[0].type
+            }
+          ]
+        : records;
     const { getByRole } = render(
       <StorageBrowserActions
         setLoadingFiles={setLoadingFiles}
         onSuccessfulAction={onSuccessfulAction}
-        selectedFiles={records}
+        selectedFiles={selectedFiles}
         currentPath="/path/to/folder"
       />
     );
@@ -117,123 +129,231 @@ describe('StorageBrowserRowActions', () => {
         replication: 3
       }
     };
-    test('does not render view summary option when there are multiple records selected', async () => {
+
+    it('should not render summary option when there are multiple records selected', async () => {
       await setUpActionMenu(mockTwoRecords);
-      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+      expect(screen.queryByRole('menuitem', { name: 'Summary' })).toBeNull();
     });
 
-    test('renders view summary option when record is a hdfs file', async () => {
+    it('should render summary option when record is a hdfs file', async () => {
       await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
-      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
+      expect(screen.queryByRole('menuitem', { name: 'Summary' })).not.toBeNull();
     });
 
-    test('renders view summary option when record is a ofs file', async () => {
+    it('should render summary option when record is a ofs file', async () => {
       await setUpActionMenu([mockRecord], 'ofs://demo/test', 'file');
-      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).not.toBeNull();
+      expect(screen.queryByRole('menuitem', { name: 'Summary' })).not.toBeNull();
     });
 
-    test('does not render view summary option when record is a hdfs folder', async () => {
+    it('should not render summary option when record is a hdfs folder', async () => {
       await setUpActionMenu([mockRecord], '/user/demo/test', 'dir');
-      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
+      expect(screen.queryByRole('menuitem', { name: 'Summary' })).toBeNull();
     });
 
-    test('does not render view summary option when record is a an abfs file', async () => {
+    it('should not render summary option when record is a an abfs file', async () => {
       await setUpActionMenu([mockRecord], 'abfs://demo/test', 'file');
-      expect(screen.queryByRole('menuitem', { name: 'View Summary' })).toBeNull();
-    });
-
-    test('renders summary modal when view summary option is clicked', async () => {
-      const user = userEvent.setup();
-      await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
-      await user.click(screen.queryByRole('menuitem', { name: 'View Summary' })!);
-      expect(await screen.findByText('Summary for /user/demo/test')).toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Summary' })).toBeNull();
     });
   });
 
   describe('Rename option', () => {
-    test('does not render rename option when there are multiple records selected', async () => {
+    it('should not render rename option when there are multiple records selected', async () => {
       await setUpActionMenu(mockTwoRecords);
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
-    test('does not render rename option when selected record is a abfs root folder', async () => {
+    it('should not render rename option when selected record is a abfs root folder', async () => {
       await setUpActionMenu([mockRecord], 'abfs://', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
-    test('does not render rename option when selected record is a gs root folder', async () => {
+    it('should not render rename option when selected record is a gs root folder', async () => {
       await setUpActionMenu([mockRecord], 'gs://', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
-    test('does not render rename option when selected record is a s3 root folder', async () => {
+    it('should not render rename option when selected record is a s3 root folder', async () => {
       await setUpActionMenu([mockRecord], 's3a://', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
-    test('does not render rename option when selected record is a ofs root folder', async () => {
+    it('should not render rename option when selected record is a ofs root folder', async () => {
       await setUpActionMenu([mockRecord], 'ofs://', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
-    test('does not render rename option when selected record is a ofs service ID folder', async () => {
+    it('should not render rename option when selected record is a ofs service ID folder', async () => {
       await setUpActionMenu([mockRecord], 'ofs://serviceID', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
-    test('does not render rename option when selected record is a ofs volume folder', async () => {
+    it('should not render rename option when selected record is a ofs volume folder', async () => {
       await setUpActionMenu([mockRecord], 'ofs://serviceID/volume', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).toBeNull();
     });
 
-    test('renders rename option when selected record is a file or a folder', async () => {
+    it('should render rename option when selected record is a file or a folder', async () => {
       await setUpActionMenu([mockRecord], 'abfs://test', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Rename' })).not.toBeNull();
-    });
-
-    test('renders rename modal when rename option is clicked', async () => {
-      const user = userEvent.setup();
-      await setUpActionMenu([mockRecord], 'abfs://test', 'dir');
-      await user.click(screen.queryByRole('menuitem', { name: 'Rename' }));
-      expect(await screen.findByText('Enter new name')).toBeInTheDocument();
     });
   });
 
   describe('Set replication option', () => {
-    test('does not render set replication option when there are multiple records selected', async () => {
+    it('should not render set replication option when there are multiple records selected', async () => {
       await setUpActionMenu(mockTwoRecords);
       expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
     });
 
-    test('renders set replication option when selected record is a hdfs file', async () => {
+    it('should render set replication option when selected record is a hdfs file', async () => {
       await setUpActionMenu([mockRecord], 'hdfs://test', 'file');
       expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).not.toBeNull();
     });
 
-    test('does not render set replication option when selected record is a hdfs folder', async () => {
+    it('should not render set replication option when selected record is a hdfs folder', async () => {
       await setUpActionMenu([mockRecord], 'hdfs://', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
     });
 
-    test('does not render set replication option when selected record is a gs file/folder', async () => {
+    it('should not render set replication option when selected record is a gs file/folder', async () => {
       await setUpActionMenu([mockRecord], 'gs://', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
     });
 
-    test('does not render set replication option when selected record is a s3 file/folder', async () => {
+    it('should not render set replication option when selected record is a s3 file/folder', async () => {
       await setUpActionMenu([mockRecord], 's3a://', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
     });
 
-    test('does not render set replication option when selected record is a ofs file/folder', async () => {
+    it('should not render set replication option when selected record is a ofs file/folder', async () => {
       await setUpActionMenu([mockRecord], 'ofs://', 'dir');
       expect(screen.queryByRole('menuitem', { name: 'Set Replication' })).toBeNull();
     });
+  });
 
-    test('renders set replication modal when set replication option is clicked', async () => {
+  describe('Delete option', () => {
+    it('should render delete option for multiple selected records', async () => {
+      await setUpActionMenu(mockTwoRecords, mockRecord.path);
+      expect(screen.queryByRole('menuitem', { name: 'Delete' })).not.toBeNull();
+    });
+
+    it('should render delete option for a single selected file/folder', async () => {
+      await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'Delete' })).not.toBeNull();
+    });
+  });
+
+  describe('Download option', () => {
+    it('should not render download option for multiple selected records', async () => {
+      await setUpActionMenu(mockTwoRecords);
+      expect(screen.queryByRole('menuitem', { name: 'Download' })).toBeNull();
+    });
+
+    it('should render download option for a single selected file', async () => {
+      await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'Download' })).not.toBeNull();
+    });
+
+    it('should not render download option for a folder', async () => {
+      const mockFolder = { ...mockRecord, type: 'dir' };
+      await setUpActionMenu([mockFolder], '/user/demo/test', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Download' })).toBeNull();
+    });
+
+    it('should not render download option when enable_file_download_button is false', async () => {
+      mockLastConfig.storage_browser.enable_file_download_button = false;
+      await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'Download' })).toBeNull();
+      mockLastConfig.storage_browser.enable_file_download_button = true;
+    });
+
+    it('should trigger file download when download option is clicked for a file', async () => {
       const user = userEvent.setup();
-      await setUpActionMenu([mockRecord], 'hdfs://test', 'file');
-      await user.click(screen.queryByRole('menuitem', { name: 'Set Replication' }));
-      expect(await screen.findByText(/Setting Replication factor/i)).toBeInTheDocument();
+      await setUpActionMenu([mockRecord], mockRecord.path, 'file');
+      await user.click(screen.getByRole('menuitem', { name: 'Download' }));
+      expect(huePubSub.publish).toHaveBeenCalled();
+    });
+  });
+
+  describe('Copy Action', () => {
+    it('should render copy option when record is a file', async () => {
+      await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'Copy' })).not.toBeNull();
+    });
+
+    it('should render copy option when record is a folder', async () => {
+      await setUpActionMenu([mockRecord], '/user/demo/test', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Copy' })).not.toBeNull();
+    });
+
+    it('should render copy option when multiple records are selected', async () => {
+      await setUpActionMenu(mockTwoRecords);
+      expect(screen.queryByRole('menuitem', { name: 'Copy' })).not.toBeNull();
+    });
+  });
+
+  describe('Move Action', () => {
+    it('should render move option when record is a file', async () => {
+      await setUpActionMenu([mockRecord], '/user/demo/test', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'Move' })).not.toBeNull();
+    });
+
+    it('should render move option when record is a folder', async () => {
+      await setUpActionMenu([mockRecord], '/user/demo/test', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Move' })).not.toBeNull();
+    });
+
+    it('should render move option when multiple records are selected', async () => {
+      await setUpActionMenu(mockTwoRecords);
+      expect(screen.queryByRole('menuitem', { name: 'Move' })).not.toBeNull();
+    });
+  });
+
+  describe('Compress Action', () => {
+    it('should render compress option when record is a hdfs file', async () => {
+      await setUpActionMenu([mockRecord], mockRecord.path, mockRecord.type);
+      expect(screen.queryByRole('menuitem', { name: 'Compress' })).not.toBeNull();
+    });
+
+    it('should render compress option when multiple records are hdfs file', async () => {
+      await setUpActionMenu(mockTwoRecords);
+      expect(screen.queryByRole('menuitem', { name: 'Compress' })).not.toBeNull();
+    });
+
+    it('should render compress option when record is not hdfs file', async () => {
+      await setUpActionMenu([mockRecord], 's3a://', 'dir');
+      expect(screen.queryByRole('menuitem', { name: 'Compress' })).toBeNull();
+    });
+
+    it('should not render compress option when enable_extract_uploaded_archive is false', async () => {
+      mockLastConfig.storage_browser.enable_extract_uploaded_archive = false;
+      await setUpActionMenu(mockTwoRecords);
+      expect(screen.queryByRole('menuitem', { name: 'Compress' })).toBeNull();
+      mockLastConfig.storage_browser.enable_extract_uploaded_archive = true;
+    });
+  });
+
+  describe('Extract Action', () => {
+    it('should render extract option when record is a compressed file', async () => {
+      mockRecord.path = '/user/demo/test.zip';
+      await setUpActionMenu([mockRecord], '/user/demo/test.zip', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'Extract' })).not.toBeNull();
+    });
+
+    it('should not render extract option when multiple records are files', async () => {
+      await setUpActionMenu(mockTwoRecords);
+      expect(screen.queryByRole('menuitem', { name: 'Extract' })).toBeNull();
+    });
+
+    it('should not render extract option when file type is not supported', async () => {
+      mockRecord.path = '/user/demo/test.zip1';
+      await setUpActionMenu([mockRecord], '/user/demo/test.zip1', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'Extract' })).toBeNull();
+    });
+
+    it('should not render extract option when enable_extract_uploaded_archive is false', async () => {
+      mockLastConfig.storage_browser.enable_extract_uploaded_archive = false;
+      await setUpActionMenu([mockRecord], '/user/demo/test.zip', 'file');
+      expect(screen.queryByRole('menuitem', { name: 'Extract' })).toBeNull();
+      mockLastConfig.storage_browser.enable_extract_uploaded_archive = true;
     });
   });
 });

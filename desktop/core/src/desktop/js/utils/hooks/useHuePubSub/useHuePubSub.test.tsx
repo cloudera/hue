@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { useHuePubSub } from './useHuePubSub';
-import huePubSub from '../huePubSub';
-import noop from '../timing/noop';
+import huePubSub from '../../huePubSub';
+import noop from '../../timing/noop';
 
 describe('useHuePubSub', () => {
   const originalSubscribe = huePubSub.subscribe;

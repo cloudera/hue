@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import useQueueProcessor from '../useQueueProcessor';
+import useQueueProcessor from '../useQueueProcessor/useQueueProcessor';
 import { UPLOAD_FILE_URL } from '../../../reactComponents/FileChooser/api';
 import {
   DEFAULT_CONCURRENT_MAX_CONNECTIONS,
   FileUploadStatus
 } from '../../constants/storageBrowser';
-import useSaveData from '../useSaveData';
+import useSaveData from '../useSaveData/useSaveData';
 import { UploadItem } from './util';
 
 interface UseUploadQueueResponse {
@@ -40,7 +40,7 @@ const useRegularUpload = ({
   onStatusUpdate,
   onComplete
 }: UploadQueueOptions): UseUploadQueueResponse => {
-  const { save } = useSaveData(undefined, {
+  const { save } = useSaveData(UPLOAD_FILE_URL, {
     postOptions: {
       qsEncodeData: false,
       headers: {
@@ -52,13 +52,11 @@ const useRegularUpload = ({
   const processUploadItem = async (item: UploadItem) => {
     onStatusUpdate(item, FileUploadStatus.Uploading);
 
-    const url = `${UPLOAD_FILE_URL}?dest=${item.filePath}`;
-
     const payload = new FormData();
-    payload.append('hdfs_file', item.file);
+    payload.append('file', item.file);
+    payload.append('destination_path', item.filePath);
 
     return save(payload, {
-      url,
       onSuccess: () => {
         onStatusUpdate(item, FileUploadStatus.Uploaded);
       },

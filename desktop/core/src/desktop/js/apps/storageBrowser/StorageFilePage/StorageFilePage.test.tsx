@@ -42,7 +42,7 @@ const mockData = jest.fn().mockReturnValue({
   compression: 'none'
 });
 
-jest.mock('../../../utils/hooks/useLoadData', () => {
+jest.mock('../../../utils/hooks/useLoadData/useLoadData', () => {
   return jest.fn(() => ({
     data: mockData(),
     loading: false
@@ -200,7 +200,7 @@ describe('StorageFilePage', () => {
     });
 
     const downloadLink = screen.getByRole('link', { name: 'Download' });
-    expect(downloadLink).toHaveAttribute('href', `${DOWNLOAD_API_URL}${mockFileStats.path}`);
+    expect(downloadLink).toHaveAttribute('href', `${DOWNLOAD_API_URL}?path=${mockFileStats.path}`);
   });
 
   it('should download a file when download button is clicked', async () => {
@@ -216,7 +216,7 @@ describe('StorageFilePage', () => {
     });
 
     const downloadLink = screen.getByRole('link', { name: 'Download' });
-    expect(downloadLink).toHaveAttribute('href', `${DOWNLOAD_API_URL}${mockFileStats.path}`);
+    expect(downloadLink).toHaveAttribute('href', `${DOWNLOAD_API_URL}?path=${mockFileStats.path}`);
   });
 
   it('should not render the download button when show_download_button is false', () => {

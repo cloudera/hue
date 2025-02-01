@@ -53,7 +53,9 @@ const sortOrder = [
 const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, onComplete }) => {
   const config = getLastKnownConfig();
   const isChunkUpload =
-    config?.storage_browser.enable_chunked_file_uploader ?? DEFAULT_ENABLE_CHUNK_UPLOAD;
+    (config?.storage_browser.enable_chunked_file_upload ?? DEFAULT_ENABLE_CHUNK_UPLOAD) &&
+    !!config?.hue_config.enable_task_server;
+
   const { t } = i18nReact.useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
 

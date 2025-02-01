@@ -64,7 +64,8 @@
     // In this case we don't want to sanitize the path for XSS as we want exact match on the actual file name,
     // so to prevent breaking the page on substitution we enforce a js compatible string by only encoding the backtick
     // char (`) with a js decode to restore it in case file actually has backtick in the name.
-    const decodedPath = `/user/admin/ai_case.txt`.replaceAll('&#96;', '`');
+    
+    const decodedPath = FileViewOptions.path.replaceAll('`', '&#96;');
     const encodedPath = encodeURIComponent(decodedPath);
     const pathPrefix = "/filebrowser/view=";
     const contentPath = pathPrefix+encodedPath;
@@ -201,17 +202,29 @@
     self.editFile = function() {
       self.isViewing(false);
       self.isLoading(true);
-
       const encodedPath = encodeURIComponent(FileViewOptions['path']);
       $.ajax({
         url: '/filebrowser/edit=' + encodedPath + '?is_embeddable=true',
-        beforeSend:function (xhr) {
+        beforeSend: function(xhr) {
           xhr.setRequestHeader('X-Requested-With', 'Hue');
         },
-        dataType:'html',
-        success:function (response) {
-          $('#fileeditor').html(response);
-          self.isLoading(false);
+        dataType: 'html',
+        success: function(response) {
+          const $response = $('<div>').html(response);
+          const scripts = $response.find('script').remove().toArray();
+          $('#fileeditor').html($response.html());
+          scripts.forEach(function(scriptTag) {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = scriptTag.src;
+            document.head.appendChild(script);
+          });
+        },
+        error: function(xhr, status, error) {
+          console.error("Error loading file editor:", error);
+        },
+        complete: function() {
+          self.isLoading(false); 
         }
       });
     }

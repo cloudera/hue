@@ -46,8 +46,7 @@ if [ "$?" -eq "0" ];
           |http://demo.gethue.com*|https://twitter.com/gethue|https://github.com*|https://cdn.gethue.com/downloads/*|https://pypi.org*" \
         --ignore-fragments \
         --timeout 15 \
-        --buffer-size 8192 \
-        --concurrency 10
+        --buffer-size 8192
     LINT_EXIT_CODE=$?
 
     kill $HUGO_PID

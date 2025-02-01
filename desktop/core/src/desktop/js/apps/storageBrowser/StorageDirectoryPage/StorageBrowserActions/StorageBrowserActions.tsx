@@ -20,52 +20,101 @@ import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
 import Button from 'cuix/dist/components/Button';
 import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
-import InfoIcon from '@cloudera/cuix-core/icons/react/InfoIcon';
+import SummaryIcon from '@cloudera/cuix-core/icons/react/SummaryIcon';
+import EditIcon from '@cloudera/cuix-core/icons/react/EditIcon';
 import DuplicateIcon from '@cloudera/cuix-core/icons/react/DuplicateIcon';
 import CopyClipboardIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
+import DataMovementIcon from '@cloudera/cuix-core/icons/react/DataMovementIcon';
+import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
+import CollapseIcon from '@cloudera/cuix-core/icons/react/CollapseViewIcon';
+import ExpandIcon from '@cloudera/cuix-core/icons/react/ExpandViewIcon';
+import DownloadIcon from '@cloudera/cuix-core/icons/react/DownloadIcon';
+import GroupsIcon from '@cloudera/cuix-core/icons/react/GroupsIcon';
+import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
 
 import { i18nReact } from '../../../../utils/i18nReact';
-import { inTrash } from '../../../../utils/storageBrowserUtils';
-import {
-  RENAME_API_URL,
-  SET_REPLICATION_API_URL,
-  BULK_COPY_API_URL,
-  BULK_MOVE_API_URL
-} from '../../../../reactComponents/FileChooser/api';
 import huePubSub from '../../../../utils/huePubSub';
-import useSaveData from '../../../../utils/hooks/useSaveData';
-
-import SummaryModal from '../SummaryModal/SummaryModal';
-import InputModal from '../../InputModal/InputModal';
-import FileChooserModal from '../../FileChooserModal/FileChooserModal';
-
 import './StorageBrowserActions.scss';
 import {
   FileStats,
+  ListDirectory,
   StorageDirectoryTableData
 } from '../../../../reactComponents/FileChooser/types';
-import { ActionType, getActionsConfig } from './StorageBrowserActions.util';
+import { ActionType, getEnabledActions } from './StorageBrowserActions.util';
+import MoveCopyModal from './MoveCopyModal/MoveCopyModal';
+import RenameModal from './RenameModal/RenameModal';
+import ReplicationModal from './ReplicationModal/ReplicationModal';
+import SummaryModal from './SummaryModal/SummaryModal';
+import DeletionModal from './DeletionModal/DeletionModal';
+import CompressionModal from './CompressionModal/CompressionModal';
+import ExtractionModal from './ExtractionModal/ExtractionModal';
+import { DOWNLOAD_API_URL } from '../../../../reactComponents/FileChooser/api';
+import ChangeOwnerAndGroupModal from './ChangeOwnerAndGroupModal/ChangeOwnerAndGroupModal';
+import ChangePermissionModal from './ChangePermissionModal/ChangePermissionModal';
 
 interface StorageBrowserRowActionsProps {
+  // TODO: move relevant keys to hue_config
+  superUser?: ListDirectory['superuser'];
+  superGroup?: ListDirectory['supergroup'];
+  users?: ListDirectory['users'];
+  groups?: ListDirectory['groups'];
+  isFsSuperUser?: ListDirectory['is_fs_superuser'];
+  isTrashEnabled?: boolean;
   currentPath: FileStats['path'];
   selectedFiles: StorageDirectoryTableData[];
   onSuccessfulAction: () => void;
   setLoadingFiles: (value: boolean) => void;
 }
 
+const iconsMap: Record<ActionType, JSX.Element> = {
+  [ActionType.Copy]: <CopyClipboardIcon />,
+  [ActionType.Move]: <DataMovementIcon />,
+  [ActionType.Rename]: <EditIcon />,
+  [ActionType.Replication]: <DuplicateIcon />,
+  [ActionType.Delete]: <DeleteIcon />,
+  [ActionType.Summary]: <SummaryIcon />,
+  [ActionType.Compress]: <CollapseIcon />,
+  [ActionType.Extract]: <ExpandIcon />,
+  [ActionType.Download]: <DownloadIcon />,
+  [ActionType.ChangeOwnerAndGroup]: <GroupsIcon />,
+  [ActionType.ChangePermission]: <ConfigureIcon />
+};
+
 const StorageBrowserActions = ({
+  superUser,
+  superGroup,
+  users,
+  groups,
+  isFsSuperUser,
+  isTrashEnabled,
   currentPath,
   selectedFiles,
   onSuccessfulAction,
   setLoadingFiles
 }: StorageBrowserRowActionsProps): JSX.Element => {
-  const [selectedFilePath, setSelectedFilePath] = useState<string>('');
   const [selectedAction, setSelectedAction] = useState<ActionType>();
 
   const { t } = i18nReact.useTranslation();
 
+  const closeModal = () => {
+    setSelectedAction(undefined);
+  };
+
+  const downloadFile = () => {
+    huePubSub.publish('hue.global.info', { message: t('Downloading your file, Please wait...') });
+    location.href = `${DOWNLOAD_API_URL}?path=${selectedFiles[0]?.path}`;
+  };
+
+  const onActionClick = (actionType: ActionType) => () => {
+    if (actionType === ActionType.Download) {
+      return downloadFile();
+    }
+    setSelectedAction(actionType);
+  };
+
   const onApiSuccess = () => {
     setLoadingFiles(false);
+    closeModal();
     onSuccessfulAction();
   };
 
@@ -74,111 +123,15 @@ const StorageBrowserActions = ({
     huePubSub.publish('hue.error', error);
   };
 
-  const { save } = useSaveData(undefined, {
-    onSuccess: onApiSuccess,
-    onError: onApiError
-  });
-
-  const { save: saveForm } = useSaveData(undefined, {
-    postOptions: {
-      qsEncodeData: false,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    },
-    onSuccess: onApiSuccess,
-    onError: onApiError
-  });
-
-  const handleRename = (value: string) => {
-    setLoadingFiles(true);
-    const payload = { source_path: selectedFilePath, destination_path: value };
-    save(payload, { url: RENAME_API_URL });
-  };
-
-  const handleReplication = (replicationFactor: number) => {
-    const payload = { path: selectedFilePath, replication_factor: replicationFactor };
-    save(payload, { url: SET_REPLICATION_API_URL });
-  };
-
-  const handleCopyOrMove = (destination_path: string) => {
-    const url = {
-      [ActionType.Copy]: BULK_COPY_API_URL,
-      [ActionType.Move]: BULK_MOVE_API_URL
-    }[selectedAction ?? ''];
-
-    if (!url) {
-      return;
-    }
-
-    const formData = new FormData();
-    selectedFiles.map(selectedFile => {
-      formData.append('source_path', selectedFile.path);
-    });
-    formData.append('destination_path', destination_path);
-
-    setLoadingFiles(true);
-    saveForm(formData, { url });
-  };
-
-  const actionConfig = getActionsConfig(selectedFiles);
-
-  const onActionClick = (action: ActionType, path: string) => () => {
-    setSelectedFilePath(path);
-    setSelectedAction(action);
-  };
-
-  const onModalClose = () => {
-    setSelectedFilePath('');
-    setSelectedAction(undefined);
-  };
-
   const actionItems: MenuItemType[] = useMemo(() => {
-    const isActionEnabled =
-      selectedFiles && selectedFiles.length > 0 && !inTrash(selectedFiles[0].path);
-    if (!isActionEnabled) {
-      return [];
-    }
-
-    const actions: MenuItemType[] = [
-      {
-        disabled: !actionConfig.isCopyEnabled,
-        key: ActionType.Copy,
-        icon: <CopyClipboardIcon />,
-        label: t('Copy'),
-        onClick: onActionClick(ActionType.Copy, selectedFiles[0].path)
-      },
-      {
-        disabled: !actionConfig.isMoveEnabled,
-        key: ActionType.Move,
-        icon: <CopyClipboardIcon />,
-        label: t('Move'),
-        onClick: onActionClick(ActionType.Move, selectedFiles[0].path)
-      },
-      {
-        disabled: !actionConfig.isSummaryEnabled,
-        key: ActionType.Summary,
-        icon: <InfoIcon />,
-        label: t('View Summary'),
-        onClick: onActionClick(ActionType.Summary, selectedFiles[0].path)
-      },
-      {
-        disabled: !actionConfig.isRenameEnabled,
-        key: ActionType.Rename,
-        icon: <InfoIcon />,
-        label: t('Rename'),
-        onClick: onActionClick(ActionType.Rename, selectedFiles[0].path)
-      },
-      {
-        disabled: !actionConfig.isReplicationEnabled,
-        key: ActionType.Repilcation,
-        icon: <DuplicateIcon />,
-        label: t('Set Replication'),
-        onClick: onActionClick(ActionType.Repilcation, selectedFiles[0].path)
-      }
-    ].filter(e => !e.disabled);
-    return actions;
-  }, [selectedFiles, actionConfig]);
+    const enabledActions = getEnabledActions(t, selectedFiles, isFsSuperUser);
+    return enabledActions.map(action => ({
+      key: String(action.type),
+      label: t(action.label),
+      icon: iconsMap[action.type],
+      onClick: onActionClick(action.type)
+    }));
+  }, [selectedFiles]);
 
   return (
     <>
@@ -189,46 +142,95 @@ const StorageBrowserActions = ({
           className: 'hue-storage-browser__table-actions-menu'
         }}
         trigger={['click']}
-        disabled={actionItems.length === 0 ? true : false}
+        disabled={!actionItems.length}
       >
         <Button data-event="">
           {t('Actions')}
           <DropDownIcon />
         </Button>
       </Dropdown>
-      <SummaryModal
-        showModal={selectedAction === ActionType.Summary}
-        path={selectedFilePath}
-        onClose={onModalClose}
-      />
-      <InputModal
-        title={t('Rename')}
-        inputLabel={t('Enter new name')}
-        submitText={t('Rename')}
-        showModal={selectedAction === ActionType.Rename}
-        onSubmit={handleRename}
-        onClose={onModalClose}
-        inputType="text"
-        initialValue={selectedFiles[0]?.name}
-      />
-      <InputModal
-        title={t('Setting Replication factor for: ') + selectedFilePath}
-        inputLabel={t('Replication factor:')}
-        submitText={t('Submit')}
-        showModal={selectedAction === ActionType.Repilcation}
-        onSubmit={handleReplication}
-        onClose={onModalClose}
-        inputType="number"
-        initialValue={selectedFiles[0]?.replication}
-      />
-      <FileChooserModal
-        onClose={onModalClose}
-        onSubmit={handleCopyOrMove}
-        showModal={selectedAction === ActionType.Move || selectedAction === ActionType.Copy}
-        title={selectedAction === ActionType.Move ? t('Move to') : t('Copy to')}
-        sourcePath={currentPath}
-        submitText={selectedAction === ActionType.Move ? t('Move') : t('Copy')}
-      />
+      {selectedAction === ActionType.Summary && (
+        <SummaryModal path={selectedFiles[0].path} onClose={closeModal} />
+      )}
+      {selectedAction === ActionType.Rename && (
+        <RenameModal
+          file={selectedFiles[0]}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+        />
+      )}
+      {selectedAction === ActionType.Replication && (
+        <ReplicationModal
+          file={selectedFiles[0]}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+        />
+      )}
+      {(selectedAction === ActionType.Move || selectedAction === ActionType.Copy) && (
+        <MoveCopyModal
+          action={selectedAction}
+          files={selectedFiles}
+          currentPath={currentPath}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoadingFiles={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.Delete && (
+        <DeletionModal
+          isTrashEnabled={isTrashEnabled}
+          files={selectedFiles}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.Compress && (
+        <CompressionModal
+          currentPath={currentPath}
+          files={selectedFiles}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.Extract && (
+        <ExtractionModal
+          currentPath={currentPath}
+          file={selectedFiles[0]}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.ChangeOwnerAndGroup && (
+        <ChangeOwnerAndGroupModal
+          files={selectedFiles}
+          superUser={superUser}
+          superGroup={superGroup}
+          users={users}
+          groups={groups}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
+        />
+      )}
+      {selectedAction === ActionType.ChangePermission && (
+        <ChangePermissionModal
+          files={selectedFiles}
+          onSuccess={onApiSuccess}
+          onError={onApiError}
+          onClose={closeModal}
+          setLoading={setLoadingFiles}
+        />
+      )}
     </>
   );
 };

@@ -63,6 +63,8 @@ $icon-margin: 5px;
   }
 
   .hue-storage-browser__table-row {
+    border-bottom: 1px solid vars.$fluidx-gray-040;
+
     :hover {
       cursor: pointer;
     }
@@ -70,6 +72,10 @@ $icon-margin: 5px;
     td.ant-table-cell {
       height: $cell-height;
       @include mixins.nowrap-ellipsis;
+    }
+
+    td.ant-table-cell:first-child {
+      text-overflow: initial;
     }
   }
 

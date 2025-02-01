@@ -16,14 +16,14 @@
 
 import { useEffect, useState } from 'react';
 import { getLastKnownConfig } from '../../../config/hueConfig';
-import useSaveData from '../useSaveData';
-import useQueueProcessor from '../useQueueProcessor';
+import useSaveData from '../useSaveData/useSaveData';
+import useQueueProcessor from '../useQueueProcessor/useQueueProcessor';
 import {
   DEFAULT_CHUNK_SIZE,
   DEFAULT_CONCURRENT_MAX_CONNECTIONS,
   FileUploadStatus
 } from '../../constants/storageBrowser';
-import useLoadData from '../useLoadData';
+import useLoadData from '../useLoadData/useLoadData';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
 import {
   createChunks,
@@ -35,6 +35,8 @@ import {
   UploadChunkItem,
   UploadItem
 } from './util';
+import { get } from '../../../api/utils';
+import { UPLOAD_AVAILABLE_SPACE_URL } from '../../../reactComponents/FileChooser/api';
 
 interface UseUploadQueueResponse {
   addFiles: (item: UploadItem[]) => void;
@@ -55,21 +57,34 @@ const useChunkUpload = ({
 }: ChunkUploadOptions): UseUploadQueueResponse => {
   const config = getLastKnownConfig();
   const chunkSize = config?.storage_browser?.file_upload_chunk_size ?? DEFAULT_CHUNK_SIZE;
-  const [pendingItems, setPendingItems] = useState<UploadItem[]>([]);
+  const [processingItem, setProcessingItem] = useState<UploadItem>();
+  const [pendingUploadItems, setPendingUploadItems] = useState<UploadItem[]>([]);
+  const [awaitingStatusItems, setAwaitingStatusItems] = useState<UploadItem[]>([]);
+
+  const onError = () => {
+    if (processingItem) {
+      onStatusUpdate(processingItem, FileUploadStatus.Failed);
+      setProcessingItem(undefined);
+    }
+  };
+
+  const onSuccess = (item: UploadItem) => () => {
+    setAwaitingStatusItems(prev => [...prev, item]);
+    setProcessingItem(undefined);
+  };
 
   const { save } = useSaveData(undefined, {
     postOptions: {
       qsEncodeData: false,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }
+      headers: { 'Content-Type': 'multipart/form-data' }
+    },
+    onError
   });
 
   const updateItemStatus = (serverResponse: TaskServerResponse[]) => {
     const statusMap = getStatusHashMap(serverResponse);
 
-    const remainingItems = pendingItems.filter(item => {
+    const remainingItems = awaitingStatusItems.filter(item => {
       const status = statusMap[item.uuid];
       if (status === TaskStatus.Success || status === TaskStatus.Failure) {
         const ItemStatus =
@@ -82,14 +97,14 @@ const useChunkUpload = ({
     if (remainingItems.length === 0) {
       onComplete();
     }
-    setPendingItems(remainingItems);
+    setAwaitingStatusItems(remainingItems);
   };
 
   const { data: tasksStatus } = useLoadData<TaskServerResponse[]>(
     '/desktop/api2/taskserver/get_taskserver_tasks/',
     {
-      pollInterval: pendingItems.length ? 5000 : undefined,
-      skip: !pendingItems.length
+      pollInterval: awaitingStatusItems.length ? 5000 : undefined,
+      skip: !awaitingStatusItems.length
     }
   );
 
@@ -99,16 +114,14 @@ const useChunkUpload = ({
     }
   }, [tasksStatus]);
 
-  const addItemToPending = (item: UploadItem) => {
-    setPendingItems(prev => [...prev, item]);
-  };
-
-  const onChunksUploadComplete = async (item: UploadItem) => {
-    const { url, payload } = getChunksCompletePayload(item, chunkSize);
-    return save(payload, {
-      url,
-      onSuccess: () => addItemToPending(item)
-    });
+  const onChunksUploadComplete = async () => {
+    if (processingItem) {
+      const { url, payload } = getChunksCompletePayload(processingItem, chunkSize);
+      return save(payload, {
+        url,
+        onSuccess: onSuccess(processingItem)
+      });
+    }
   };
 
   const uploadChunk = async (chunkItem: UploadChunkItem) => {
@@ -116,25 +129,38 @@ const useChunkUpload = ({
     return save(payload, { url });
   };
 
-  const { enqueueAsync } = useQueueProcessor<UploadChunkItem>(uploadChunk, {
-    concurrentProcess
+  const { enqueue } = useQueueProcessor<UploadChunkItem>(uploadChunk, {
+    concurrentProcess,
+    onSuccess: onChunksUploadComplete
   });
 
-  const uploadItemInChunks = async (item: UploadItem) => {
+  const uploadItemInChunks = (item: UploadItem) => {
     const chunks = createChunks(item, chunkSize);
-    await enqueueAsync(chunks);
-    return onChunksUploadComplete(item);
+    return enqueue(chunks);
   };
 
-  const uploadItemInSingleChunk = (item: UploadItem) => {
+  const uploadItemInSingleChunk = async (item: UploadItem) => {
     const { url, payload } = getChunkSinglePayload(item, chunkSize);
     return save(payload, {
       url,
-      onSuccess: () => addItemToPending(item)
+      onSuccess: onSuccess(item)
     });
   };
 
+  const checkAvailableSpace = async (fileSize: number) => {
+    const { upload_available_space: availableSpace } = await get<{
+      upload_available_space: number;
+    }>(UPLOAD_AVAILABLE_SPACE_URL);
+    return availableSpace >= fileSize;
+  };
+
   const uploadItem = async (item: UploadItem) => {
+    const isSpaceAvailable = await checkAvailableSpace(item.file.size);
+    if (!isSpaceAvailable) {
+      onStatusUpdate(item, FileUploadStatus.Failed);
+      return Promise.resolve();
+    }
+
     onStatusUpdate(item, FileUploadStatus.Uploading);
     const chunks = getTotalChunk(item.file.size, chunkSize);
     if (chunks === 1) {
@@ -143,15 +169,25 @@ const useChunkUpload = ({
     return uploadItemInChunks(item);
   };
 
-  const {
-    enqueue: addFiles,
-    dequeue: removeFile,
-    isLoading
-  } = useQueueProcessor<UploadItem>(uploadItem, {
-    concurrentProcess: 1 // This value must be 1 always
-  });
+  const addFiles = (newItems: UploadItem[]) => {
+    setPendingUploadItems(prev => [...prev, ...newItems]);
+  };
 
-  return { addFiles, removeFile, isLoading };
+  const removeFile = (item: UploadItem) => {
+    setPendingUploadItems(prev => prev.filter(i => i.uuid !== item.uuid));
+  };
+
+  useEffect(() => {
+    // Ensures one file is broken down in chunks and uploaded to the server
+    if (!processingItem && pendingUploadItems.length) {
+      const item = pendingUploadItems[0];
+      setProcessingItem(item);
+      setPendingUploadItems(prev => prev.slice(1));
+      uploadItem(item);
+    }
+  }, [pendingUploadItems, processingItem]);
+
+  return { addFiles, removeFile, isLoading: !!processingItem || !!pendingUploadItems.length };
 };
 
 export default useChunkUpload;

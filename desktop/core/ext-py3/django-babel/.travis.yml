@@ -1,0 +1,42 @@
+language: python
+python: 3.5
+sudo: false
+env:
+  - TOX_ENV=docs
+  - TOX_ENV=lint
+  - TOX_ENV=py27-django18
+  - TOX_ENV=py27-django111
+  - TOX_ENV=py34-django18
+  - TOX_ENV=py34-django111
+  - TOX_ENV=py34-django20
+  - TOX_ENV=py35-django18
+  - TOX_ENV=py35-django111
+  - TOX_ENV=py35-django20
+  - TOX_ENV=py35-django21
+  - TOX_ENV=py35-django22
+  - TOX_ENV=py35-django30
+  - TOX_ENV=py35-django31
+  - TOX_ENV=py35-django32
+matrix:
+  include:
+    - env: TOX_ENV=py36-django18
+      python: "3.6"
+    - env: TOX_ENV=py36-django111
+      python: "3.6"
+    - env: TOX_ENV=py36-django20
+      python: "3.6"
+    - env: TOX_ENV=py36-django21
+      python: "3.6"
+    - env: TOX_ENV=py36-django22
+      python: "3.6"
+    - env: TOX_ENV=py36-django30
+      python: "3.6"
+    - env: TOX_ENV=py36-django31
+      python: "3.6"
+    - env: TOX_ENV=py36-django32
+      python: "3.6"
+    - env: TOX_ENV=py36-djangomaster
+      python: "3.6"
+install: pip install tox
+script: tox -e $TOX_ENV
+cache: pip

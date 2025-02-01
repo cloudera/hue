@@ -16,7 +16,7 @@
 
 import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { ColumnProps } from 'antd/lib/table';
-import { Input, Spin, Tooltip } from 'antd';
+import { Input, Tooltip } from 'antd';
 
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
@@ -42,14 +42,19 @@ import formatBytes from '../../../utils/formatBytes';
 
 import './StorageDirectoryPage.scss';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
-import useLoadData from '../../../utils/hooks/useLoadData';
-import { DEFAULT_PAGE_SIZE, FileUploadStatus } from '../../../utils/constants/storageBrowser';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_POLLING_TIME,
+  FileUploadStatus
+} from '../../../utils/constants/storageBrowser';
 import CreateAndUploadAction from './CreateAndUploadAction/CreateAndUploadAction';
 import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
 import { UploadItem } from '../../../utils/hooks/useFileUpload/util';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
 import { useWindowSize } from '../../../utils/hooks/useWindowSize';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
@@ -76,6 +81,7 @@ const StorageDirectoryPage = ({
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
   const [filesToUpload, setFilesToUpload] = useState<UploadItem[]>([]);
+  const [polling, setPolling] = useState<boolean>(false);
 
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -88,6 +94,7 @@ const StorageDirectoryPage = ({
   const {
     data: filesData,
     loading: listDirectoryLoading,
+    error: listDirectoryError,
     reloadData
   } = useLoadData<ListDirectory>(LIST_DIRECTORY_API_URL, {
     params: {
@@ -101,7 +108,11 @@ const StorageDirectoryPage = ({
     skip:
       fileStats.path === '' ||
       fileStats.path === undefined ||
-      fileStats.type !== BrowserViewType.dir
+      fileStats.type !== BrowserViewType.dir,
+    onSuccess: () => {
+      setSelectedFiles([]);
+    },
+    pollInterval: polling ? DEFAULT_POLLING_TIME : undefined
   });
 
   const tableData: StorageDirectoryTableData[] = useMemo(() => {
@@ -202,17 +213,6 @@ const StorageDirectoryPage = ({
     }
   };
 
-  //pagination related functions handled by parent
-  const onPreviousPageButtonClicked = (previousPageNumber: number) => {
-    //If previous page does not exists api returns 0
-    setPageNumber(previousPageNumber === 0 ? 1 : previousPageNumber);
-  };
-
-  const onNextPageButtonClicked = (nextPageNumber: number, numPages: number) => {
-    //If next page does not exists api returns 0
-    setPageNumber(nextPageNumber === 0 ? numPages : nextPageNumber);
-  };
-
   const handleSearch = useCallback(
     useDebounce(searchTerm => {
       setSearchTerm(encodeURIComponent(searchTerm));
@@ -229,6 +229,7 @@ const StorageDirectoryPage = ({
         status: FileUploadStatus.Pending
       };
     });
+    setPolling(true);
     setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
   };
 
@@ -241,6 +242,15 @@ const StorageDirectoryPage = ({
     emptyText: t('Folder is empty')
   };
 
+  const errorConfig = [
+    {
+      enabled: !!listDirectoryError,
+      message: t('An error occurred while fetching the data'),
+      action: t('Retry'),
+      onClick: reloadData
+    }
+  ];
+
   return (
     <>
       <div className="hue-storage-browser__actions-bar">
@@ -251,10 +261,17 @@ const StorageDirectoryPage = ({
           onChange={event => {
             handleSearch(event.target.value);
           }}
+          disabled={!tableData.length && !searchTerm.length}
         />
         <div className="hue-storage-browser__actions-bar-right">
           <StorageBrowserActions
             currentPath={fileStats.path}
+            isTrashEnabled={filesData?.is_trash_enabled}
+            isFsSuperUser={filesData?.is_fs_superuser}
+            superUser={filesData?.superuser}
+            superGroup={filesData?.supergroup}
+            users={filesData?.users}
+            groups={filesData?.groups}
             selectedFiles={selectedFiles}
             setLoadingFiles={setLoadingFiles}
             onSuccessfulAction={reloadData}
@@ -269,7 +286,10 @@ const StorageDirectoryPage = ({
       </div>
 
       <DragAndDrop onDrop={onFilesDrop}>
-        <Spin spinning={loadingFiles || listDirectoryLoading}>
+        <LoadingErrorWrapper
+          loading={(loadingFiles || listDirectoryLoading) && !polling}
+          errors={errorConfig}
+        >
           <div ref={tableRef}>
             <Table
               className={className}
@@ -280,6 +300,8 @@ const StorageDirectoryPage = ({
               rowClassName={rowClassName}
               rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
               rowSelection={{
+                hideSelectAll: !tableData.length,
+                columnWidth: 36,
                 type: 'checkbox',
                 ...rowSelection
               }}
@@ -290,25 +312,28 @@ const StorageDirectoryPage = ({
             />
           </div>
 
-          {filesData?.page && filesData?.page?.total_count > 0 && (
+          {filesData?.page && filesData?.page?.total_pages > 0 && (
             <Pagination
-              onNextPageButtonClicked={onNextPageButtonClicked}
-              onPageNumberChange={setPageNumber}
-              onPageSizeChange={setPageSize}
-              onPreviousPageButtonClicked={onPreviousPageButtonClicked}
+              setPageSize={setPageSize}
               pageSize={pageSize}
+              setPageNumber={setPageNumber}
               pageStats={filesData?.page}
             />
           )}
-        </Spin>
+        </LoadingErrorWrapper>
       </DragAndDrop>
-      {filesToUpload.length > 0 && (
-        <FileUploadQueue
-          filesQueue={filesToUpload}
-          onClose={() => setFilesToUpload([])}
-          onComplete={reloadData}
-        />
-      )}
+      {
+        filesToUpload.length > 0 && (
+          <FileUploadQueue
+            filesQueue={filesToUpload}
+            onClose={() => setFilesToUpload([])}
+            onComplete={() => {
+              reloadData();
+              setPolling(false);
+            }}
+          />
+        )
+      }
     </>
   );
 };

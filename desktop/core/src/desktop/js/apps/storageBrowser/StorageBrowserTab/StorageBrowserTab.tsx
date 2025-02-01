@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import React, { useEffect, useState } from 'react';
-import { Spin } from 'antd';
 
 import { i18nReact } from '../../../utils/i18nReact';
 import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
@@ -24,14 +23,17 @@ import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
 import { FILE_STATS_API_URL } from '../../../reactComponents/FileChooser/api';
 import { BrowserViewType, FileStats } from '../../../reactComponents/FileChooser/types';
-import useLoadData from '../../../utils/hooks/useLoadData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 import './StorageBrowserTab.scss';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageBrowserTabProps {
   homeDir: string;
+  fileSystem: string;
   testId?: string;
 }
 
@@ -39,9 +41,18 @@ const defaultProps = {
   testId: 'hue-storage-browser-tab-content'
 };
 
-const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Element => {
-  const [urlPathname, urlFilePath] = decodeURIComponent(window.location.pathname).split('view=');
-  const [filePath, setFilePath] = useState<string>(urlFilePath || homeDir);
+const StorageBrowserTab = ({
+  homeDir,
+  fileSystem,
+  testId
+}: StorageBrowserTabProps): JSX.Element => {
+  const urlPathname = window.location.pathname;
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
+  const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
+  const initialFilePath = urlFileSystem === fileSystem ? urlFilePath : homeDir;
+
+  const [filePath, setFilePath] = useState<string>(initialFilePath);
   const fileName = filePath.split('/').pop() ?? '';
 
   const { t } = i18nReact.useTranslation();
@@ -49,27 +60,44 @@ const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Ele
   const {
     data: fileStats,
     loading,
+    error,
     reloadData
   } = useLoadData<FileStats>(FILE_STATS_API_URL, {
-    params: {
-      path: filePath
-    },
+    params: { path: filePath },
     skip: !filePath
   });
 
   useEffect(() => {
-    const encodedPath = `${urlPathname}view=${encodeURIComponent(filePath)}`;
+    const urlQueryParams = { path: filePath };
+    const encodedSearchParams = new URLSearchParams(urlQueryParams).toString();
     if (filePath && urlFilePath && filePath !== urlFilePath) {
-      changeURL(encodedPath);
+      changeURL(urlPathname, urlQueryParams);
     }
     // if url path is correct but not encoded properly
-    else if (encodedPath !== window.location.pathname) {
-      changeURL(encodedPath, {}, true);
+    else if (encodedSearchParams !== window.location.search) {
+      changeURL(urlPathname, urlQueryParams, true);
     }
-  }, [filePath, urlPathname, urlFilePath, window.location.pathname]);
+  }, [filePath, urlPathname, urlFilePath, window.location]);
+
+  const errorConfig = [
+    {
+      enabled: error?.response?.status === 404,
+      message: t('Error: Path "{{path}}" not found.', { path: filePath }),
+      action: t('Go to home directory'),
+      onClick: () => setFilePath(homeDir)
+    },
+    {
+      enabled: !!error && error?.response?.status !== 404,
+      message: t('An error occurred while fetching filesystem "{{fileSystem}}".', {
+        fileSystem: fileSystem.toUpperCase()
+      }),
+      action: t('Retry'),
+      onClick: reloadData
+    }
+  ];
 
   return (
-    <Spin spinning={loading}>
+    <LoadingErrorWrapper loading={loading} errors={errorConfig}>
       <div className="hue-storage-browser-tab-content" data-testid={testId}>
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
           <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
@@ -89,14 +117,14 @@ const StorageBrowserTab = ({ homeDir, testId }: StorageBrowserTabProps): JSX.Ele
             showIcon={false}
           />
         </div>
-        {fileStats?.type === BrowserViewType.dir && (
+        {fileStats?.type === BrowserViewType.dir && !loading && (
           <StorageDirectoryPage fileStats={fileStats} onFilePathChange={setFilePath} />
         )}
-        {fileStats?.type === BrowserViewType.file && (
+        {fileStats?.type === BrowserViewType.file && !loading && (
           <StorageFilePage fileName={fileName} fileStats={fileStats} onReload={reloadData} />
         )}
       </div>
-    </Spin>
+    </LoadingErrorWrapper>
   );
 };
 
