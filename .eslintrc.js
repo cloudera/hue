@@ -124,7 +124,9 @@ const jestRules = {
   'require-jsdoc': 'off',
   strict: 'off',
   'valid-jsdoc': 'off',
-  curly: ['error', 'all']
+  curly: ['error', 'all'],
+  'simple-import-sort/imports': 'error',
+  'simple-import-sort/exports': 'error'
 };
 
 module.exports = {
@@ -175,7 +177,7 @@ module.exports = {
       legacyDecorators: true
     }
   },
-  plugins: ['jest'],
+  plugins: ['jest', 'simple-import-sort'],
   rules: jestRules,
   settings: {}
 };
