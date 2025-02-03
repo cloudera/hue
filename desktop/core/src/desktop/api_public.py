@@ -401,6 +401,7 @@ def storage_bulk_chmod(request):
   django_request = get_django_request(request)
   return filebrowser_api.bulk_op(django_request, filebrowser_api.chmod)
 
+
 @api_view(["GET"])
 def storage_get_hdfs_config(request):
   django_request = get_django_request(request)
