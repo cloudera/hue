@@ -66,7 +66,9 @@ def get_hadoop_conf_dir_default():
 
 
 def is_hdfs_trash_enabled():
-  return any([hdfs_cluster.TRASH_INTERVAL.get() > 0 for hdfs_cluster in list(HDFS_CLUSTERS.values())])
+  return (
+    'default' in list(HDFS_CLUSTERS.keys()) and HDFS_CLUSTERS['default'].get_raw() and (HDFS_CLUSTERS['default'].TRASH_INTERVAL.get() > 0)
+  )
 
 
 HDFS_CLUSTERS = UnspecifiedConfigSection(
