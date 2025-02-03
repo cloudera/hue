@@ -267,7 +267,6 @@
     'A new top bar!': '${ _('A new top bar!') }',
     'Active cluster': '${ _('Active cluster') }',
     'Active compute': '${ _('Active compute') }',
-    'Active database': '${ _('Active database') }',
     'Active namespace': '${ _('Active namespace') }',
     'Add a description...': '${ _('Add a description...') }',
     'Add filter': '${ _('Add filter') }',
