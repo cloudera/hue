@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import os
-import sys
 import fnmatch
 import logging
 
@@ -24,6 +23,7 @@ from django.utils.translation import gettext_lazy as _t
 
 from desktop.conf import default_ssl_validate, has_connectors
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool
+from hadoop.core_site import get_trash_interval
 
 LOG = logging.getLogger()
 DEFAULT_NN_HTTP_PORT = 50070
@@ -35,10 +35,10 @@ def find_file_recursive(desired_glob, root):
       matches = fnmatch.filter(filenames, desired_glob)
       if matches:
         if len(matches) != 1:
-          logging.warning("Found multiple jars matching %s: %s" % (desired_glob, matches))
+          LOG.warning("Found multiple jars matching %s: %s" % (desired_glob, matches))
         return os.path.join(dirpath, matches[0])
 
-    logging.error("Trouble finding jars matching %s" % (desired_glob,))
+    LOG.error("Trouble finding jars matching %s" % (desired_glob,))
     return None
 
   f.__doc__ = "Finds %s/%s" % (root, desired_glob)
@@ -63,6 +63,10 @@ def has_hdfs_enabled():
 def get_hadoop_conf_dir_default():
   """ get from environment variable HADOOP_CONF_DIR or "/etc/hadoop/conf" """
   return os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf")
+
+
+def is_hdfs_trash_enabled():
+  return any([hdfs_cluster.TRASH_INTERVAL.get() > 0 for hdfs_cluster in list(HDFS_CLUSTERS.values())])
 
 
 HDFS_CLUSTERS = UnspecifiedConfigSection(
@@ -129,6 +133,12 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
           help="Whether Hue should list this HDFS cluster. For historical reason there is no way to disable HDFS.",
           default=True,  # True here for backward compatibility
           type=coerce_bool
+      ),
+      TRASH_INTERVAL=Config(
+          'trash_interval',
+          help="Set the interval for trash collection in HDFS. Set to 0 to disable trash.",
+          dynamic_default=get_trash_interval,
+          type=int
       ),
     )
   )

@@ -132,6 +132,7 @@ urlpatterns += [
   re_path(r'^storage/trash/restore/bulk/?$', api_public.storage_trash_bulk_restore, name='storage_trash_bulk_restore'),
   re_path(r'^storage/chown/bulk/?$', api_public.storage_bulk_chown, name='storage_bulk_chown'),
   re_path(r'^storage/chmod/bulk/?$', api_public.storage_bulk_chmod, name='storage_bulk_chmod'),
+  re_path(r'^storage/config/hdfs/?$', api_public.storage_get_hdfs_config, name='storage_get_hdfs_config'),
 ]
 
 urlpatterns += [

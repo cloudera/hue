@@ -64,6 +64,7 @@ from filebrowser.views import (
   read_contents,
   stat_absolute_path,
 )
+from hadoop.conf import has_hdfs_enabled, is_hdfs_trash_enabled
 from hadoop.core_site import get_trash_interval
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
@@ -141,6 +142,26 @@ def get_filesystems_with_home_dirs(request):
     )
 
   return JsonResponse(filesystems, safe=False)
+
+
+@api_error_handler
+def get_hdfs_config(request):
+  """Returns the extra HDFS configuration."""
+  if not has_hdfs_enabled():
+    return HttpResponse('HDFS is not enabled.', status=503)
+
+  is_hdfs_superuser = _is_hdfs_superuser(request)
+
+  response = {
+    'is_trash_enabled': is_hdfs_trash_enabled(),
+    'is_hdfs_superuser': is_hdfs_superuser,
+    'groups': [str(x) for x in Group.objects.values_list('name', flat=True)] if is_hdfs_superuser else [],
+    'users': [str(x) for x in User.objects.values_list('username', flat=True)] if is_hdfs_superuser else [],
+    'superuser': request.fs.superuser,
+    'supergroup': request.fs.supergroup,
+  }
+
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -280,21 +301,9 @@ def listdir_paged(request):
   if page:
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
 
-  # TODO: Shift below fields to /get_config?
-  is_hdfs = request.fs._get_scheme(path) == 'hdfs'
-  is_trash_enabled = is_hdfs and int(get_trash_interval()) > 0
-  is_fs_superuser = is_hdfs and _is_hdfs_superuser(request)
-
   response = {
-    'is_trash_enabled': is_trash_enabled,
     'files': page.object_list if page else [],
-    'page': _massage_page(page, paginator) if page else {},
-    # TODO: Check what to keep or what to remove? or move some fields to /get_config?
-    'is_fs_superuser': is_fs_superuser,
-    'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
-    'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
-    'superuser': request.fs.superuser,
-    'supergroup': request.fs.supergroup,
+    'page': _massage_page(page, paginator) if page else {}
   }
 
   return JsonResponse(response)
