@@ -80,10 +80,10 @@ const TEMPLATE = `
 
     <!-- ko if: availableDatabases().length > 0 && !hideDatabases-->
     <!-- ko if: window.getLastKnownConfig().has_computes && !hideLabels --><span class="editor-header-title">${I18n(
-      'Active database'
+      'Database'
     )}</span><!-- /ko -->
     <div data-bind="component: { name: 'hue-drop-down', params: { dataTestId: 'editor--database-selection--dropdown', titleName: 'Database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${I18n(
-      'Active database'
+      'Database'
     )}' } }" style="display: inline-block"></div>
     <!-- /ko -->
     <!-- ko if: availableDatabases().length === 0  && !hideDatabases -->
