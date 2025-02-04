@@ -1423,6 +1423,9 @@ def test_db_migrations_sqlite():
       'OPTIONS': {},
       'ATOMIC_REQUESTS': True,
       'CONN_MAX_AGE': 0,
+      'AUTOCOMMIT': True,
+      'CONN_HEALTH_CHECKS': False,
+      'TIME_ZONE': None,
     }
     try:
       call_command('migrate', '--fake-initial', '--database=' + name)
