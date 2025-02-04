@@ -25,6 +25,7 @@ urlpatterns = [
 
   # Catch-all for viewing a file (display) or a directory (listdir)
   re_path(r'^view=(?P<path>.*)$', filebrowser_views.view, name='filebrowser.views.view'),
+  re_path(r'^new$', filebrowser_views.view_new, name='filebrowser.views.new_view'),
 
   re_path(r'^listdir=(?P<path>.*)$', filebrowser_views.listdir, name='listdir'),
   re_path(r'^display=(?P<path>.*)$', filebrowser_views.display, name='display'),

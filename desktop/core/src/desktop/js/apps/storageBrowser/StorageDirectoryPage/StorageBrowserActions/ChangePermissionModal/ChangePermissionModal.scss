@@ -13,15 +13,32 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import huePubSub from '../../utils/huePubSub';
 
-huePubSub.subscribe('app.dom.loaded', app => {
-  if (app === 'newfilebrowser') {
-    window.createReactComponents('#embeddable_newfilebrowser');
-    return;
+@use 'variables' as vars;
+
+.antd.cuix {
+  .hue-change-permission {
+    &__table {
+      border: 1px solid vars.$fluidx-gray-200;
+      border-bottom: none;
+
+      .ant-table-placeholder {
+        text-align: center;
+      }
+
+      th.ant-table-cell {
+        background-color: vars.$fluidx-gray-040;
+      }
+
+      .ant-table-cell {
+        text-align: center;
+      }
+
+      .ant-table-cell:first-child {
+        font-weight: bold;
+        text-align: left;
+        text-transform: capitalize;
+      }
+    }
   }
-  if (app !== 'filebrowser') {
-    return;
-  }
-  window.createReactComponents('#embeddable_filebrowser');
-});
+}
