@@ -128,6 +128,7 @@ def _get_extra_configs(fs, request):
     is_hdfs_superuser = _is_hdfs_superuser(request)
     extra_configs = {
       'is_trash_enabled': is_hdfs_trash_enabled(),
+      # TODO: Check if any of the below fields should be part of new Hue user and group management APIs
       'is_hdfs_superuser': is_hdfs_superuser,
       'groups': [str(x) for x in Group.objects.values_list('name', flat=True)] if is_hdfs_superuser else [],
       'users': [str(x) for x in User.objects.values_list('username', flat=True)] if is_hdfs_superuser else [],
