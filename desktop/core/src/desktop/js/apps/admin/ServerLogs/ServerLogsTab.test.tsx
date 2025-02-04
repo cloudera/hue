@@ -32,7 +32,7 @@ const emptyMockData = jest.fn().mockReturnValue({
   hue_hostname: 'test-hostname'
 });
 
-jest.mock('../../../utils/hooks/useLoadData');
+jest.mock('../../../utils/hooks/useLoadData/useLoadData');
 
 afterEach(() => {
   jest.clearAllMocks();
