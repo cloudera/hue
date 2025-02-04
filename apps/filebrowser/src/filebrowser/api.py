@@ -87,6 +87,7 @@ def error_handler(view_fn):
   return decorator
 
 
+# Deprecated in favor of get_all_filesystems method for new filebrowser
 @error_handler
 def get_filesystems(request):
   response = {}
@@ -117,51 +118,51 @@ def api_error_handler(view_fn):
   return decorator
 
 
+def _get_hdfs_home_directory(user):
+  return user.get_home_directory()
+
+
 @api_error_handler
-def get_filesystems_with_home_dirs(request):
+def get_all_filesystems(request):
+  """
+  Retrieves all configured filesystems along with user-specific configurations.
+
+  This endpoint collects information about available filesystems (e.g., HDFS, S3, GS, etc.),
+  user home directories, and additional configurations specific to each filesystem type.
+
+  Args:
+    request (HttpRequest): The incoming HTTP request object.
+
+  Returns:
+    JsonResponse: A JSON response containing a list of filesystems with their configurations.
+  """
   filesystems = []
-  user_home_dir = ''
-
-  for fs in fsmanager.get_filesystems(request.user):
-    if fs == 'hdfs':
-      user_home_dir = request.user.get_home_directory()
-    elif fs == 's3a':
-      user_home_dir = get_s3_home_directory(request.user)
-    elif fs == 'gs':
-      user_home_dir = get_gs_home_directory(request.user)
-    elif fs == 'abfs':
-      user_home_dir = get_abfs_home_directory(request.user)
-    elif fs == 'ofs':
-      user_home_dir = get_ofs_home_directory()
-
-    filesystems.append(
-      {
-        'file_system': fs,
-        'user_home_directory': user_home_dir,
-      }
-    )
-
-  return JsonResponse(filesystems, safe=False)
-
-
-@api_error_handler
-def get_hdfs_config(request):
-  """Returns the extra HDFS configuration."""
-  if not has_hdfs_enabled():
-    return HttpResponse('HDFS is not enabled.', status=503)
-
-  is_hdfs_superuser = _is_hdfs_superuser(request)
-
-  response = {
-    'is_trash_enabled': is_hdfs_trash_enabled(),
-    'is_hdfs_superuser': is_hdfs_superuser,
-    'groups': [str(x) for x in Group.objects.values_list('name', flat=True)] if is_hdfs_superuser else [],
-    'users': [str(x) for x in User.objects.values_list('username', flat=True)] if is_hdfs_superuser else [],
-    'superuser': request.fs.superuser,
-    'supergroup': request.fs.supergroup,
+  fs_home_dir_mapping = {
+    'hdfs': _get_hdfs_home_directory,
+    's3a': get_s3_home_directory,
+    'gs': get_gs_home_directory,
+    'abfs': get_abfs_home_directory,
+    'ofs': get_ofs_home_directory,
   }
 
-  return JsonResponse(response)
+  for fs in fsmanager.get_filesystems(request.user):
+    extra_configs = {}
+    user_home_dir = fs_home_dir_mapping[fs](request.user)
+
+    if fs == 'hdfs':
+      is_hdfs_superuser = _is_hdfs_superuser(request)
+      extra_configs = {
+        'is_trash_enabled': is_hdfs_trash_enabled(),
+        'is_hdfs_superuser': is_hdfs_superuser,
+        'groups': [str(x) for x in Group.objects.values_list('name', flat=True)] if is_hdfs_superuser else [],
+        'users': [str(x) for x in User.objects.values_list('username', flat=True)] if is_hdfs_superuser else [],
+        'superuser': request.fs.superuser,
+        'supergroup': request.fs.supergroup,
+      }
+
+    filesystems.append({'file_system': fs, 'user_home_directory': user_home_dir, 'extra_configs': extra_configs})
+
+  return JsonResponse(filesystems, safe=False)
 
 
 @api_error_handler
@@ -230,12 +231,7 @@ def download(request):
 
 
 def _massage_page(page, paginator):
-  return {
-      'page_number': page.number,
-      'page_size': paginator.per_page,
-      'total_pages': paginator.num_pages,
-      'total_size': paginator.count
-  }
+  return {'page_number': page.number, 'page_size': paginator.per_page, 'total_pages': paginator.num_pages, 'total_size': paginator.count}
 
 
 @api_error_handler
@@ -301,10 +297,7 @@ def listdir_paged(request):
   if page:
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
 
-  response = {
-    'files': page.object_list if page else [],
-    'page': _massage_page(page, paginator) if page else {}
-  }
+  response = {'files': page.object_list if page else [], 'page': _massage_page(page, paginator) if page else {}}
 
   return JsonResponse(response)
 

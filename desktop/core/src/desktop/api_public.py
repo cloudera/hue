@@ -225,7 +225,7 @@ def analyze_table(request, dialect, database, table, columns=None):
 @api_view(["GET"])
 def storage_get_filesystems(request):
   django_request = get_django_request(request)
-  return filebrowser_api.get_filesystems_with_home_dirs(django_request)
+  return filebrowser_api.get_all_filesystems(django_request)
 
 
 @api_view(["GET"])
@@ -400,12 +400,6 @@ def storage_bulk_chown(request):
 def storage_bulk_chmod(request):
   django_request = get_django_request(request)
   return filebrowser_api.bulk_op(django_request, filebrowser_api.chmod)
-
-
-@api_view(["GET"])
-def storage_get_hdfs_config(request):
-  django_request = get_django_request(request)
-  return filebrowser_api.get_hdfs_config(django_request)
 
 
 # Task Server
