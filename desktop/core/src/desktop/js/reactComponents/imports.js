@@ -18,6 +18,9 @@ export async function loadComponent(name) {
     case 'Configuration':
       return (await import('../apps/admin/Configuration/ConfigurationTab')).default;
 
+    case 'ServerLogs':
+      return (await import('../apps/admin/ServerLogs/ServerLogsTab')).default;
+
     // Application global components here
     case 'AppBanner':
       return (await import('./AppBanner/AppBanner')).default;
