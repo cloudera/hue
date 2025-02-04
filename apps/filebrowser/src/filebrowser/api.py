@@ -122,6 +122,21 @@ def _get_hdfs_home_directory(user):
   return user.get_home_directory()
 
 
+def _get_extra_configs(fs, request):
+  extra_configs = {}
+  if fs == 'hdfs':
+    is_hdfs_superuser = _is_hdfs_superuser(request)
+    extra_configs = {
+      'is_trash_enabled': is_hdfs_trash_enabled(),
+      'is_hdfs_superuser': is_hdfs_superuser,
+      'groups': [str(x) for x in Group.objects.values_list('name', flat=True)] if is_hdfs_superuser else [],
+      'users': [str(x) for x in User.objects.values_list('username', flat=True)] if is_hdfs_superuser else [],
+      'superuser': request.fs.superuser,
+      'supergroup': request.fs.supergroup,
+    }
+  return extra_configs
+
+
 @api_error_handler
 def get_all_filesystems(request):
   """
@@ -136,7 +151,6 @@ def get_all_filesystems(request):
   Returns:
     JsonResponse: A JSON response containing a list of filesystems with their configurations.
   """
-  filesystems = []
   fs_home_dir_mapping = {
     'hdfs': _get_hdfs_home_directory,
     's3a': get_s3_home_directory,
@@ -145,20 +159,10 @@ def get_all_filesystems(request):
     'ofs': get_ofs_home_directory,
   }
 
+  filesystems = []
   for fs in fsmanager.get_filesystems(request.user):
-    extra_configs = {}
     user_home_dir = fs_home_dir_mapping[fs](request.user)
-
-    if fs == 'hdfs':
-      is_hdfs_superuser = _is_hdfs_superuser(request)
-      extra_configs = {
-        'is_trash_enabled': is_hdfs_trash_enabled(),
-        'is_hdfs_superuser': is_hdfs_superuser,
-        'groups': [str(x) for x in Group.objects.values_list('name', flat=True)] if is_hdfs_superuser else [],
-        'users': [str(x) for x in User.objects.values_list('username', flat=True)] if is_hdfs_superuser else [],
-        'superuser': request.fs.superuser,
-        'supergroup': request.fs.supergroup,
-      }
+    extra_configs = _get_extra_configs(fs, request)
 
     filesystems.append({'file_system': fs, 'user_home_directory': user_home_dir, 'extra_configs': extra_configs})
 
