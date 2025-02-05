@@ -536,14 +536,34 @@ def upload_file(request):
 
 @api_error_handler
 def mkdir(request):
+  """
+  Create a new directory at the specified path with the given name.
+
+  Args:
+    request (HttpRequest): The HTTP request object containing the data.
+
+  Returns:
+    A HttpResponse with a status code and message indicating the success or failure of the directory creation.
+  """
   # TODO: Check if this needs to be a PUT request
   path = request.POST.get('path')
   name = request.POST.get('name')
 
-  if name and (posixpath.sep in name or "#" in name):
-    return HttpResponse(f"Error creating {name} directory. Slashes or hashes are not allowed in directory name.", status=400)
+  # Check if source and destination paths are provided
+  if not path or not name:
+    return HttpResponse("Missing required parameters: path and name are required.", status=400)
 
-  request.fs.mkdir(request.fs.join(path, name))
+  # Validate the 'name' parameter for invalid characters
+  if posixpath.sep in name or "#" in name:
+    return HttpResponse(f"Slashes or hashes are not allowed in directory name. Please choose a different name.", status=400)
+
+  dir_path = request.fs.join(path, name)
+
+  # Check if the directory already exists
+  if request.fs.isdir(dir_path):
+    return HttpResponse(f"Error creating {name} directory: Directory already exists.", status=409)
+
+  request.fs.mkdir(dir_path)
   return HttpResponse(status=201)
 
 
