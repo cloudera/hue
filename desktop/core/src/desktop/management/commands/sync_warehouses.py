@@ -220,7 +220,7 @@ def update_impala_configs(namespace, impala, host):
     {"name": "transport_mode", "value": 'http'},
     {"name": "http_url", "value": 'http://%s:%s/cliservice' % (host, impala['server_port'])},
     {"name": "api_url", "value": 'http://%s:%s' % (host, impala['api_port'])},
-    {"name": "impersonation_enabled", "value": False},
+    {"name": "impersonation_enabled", "value": True},
     {"name": "use_sasl", "value": False},
     {"name": "hive_metastore_uris", "value": hive_metastore_uris},
   ]
