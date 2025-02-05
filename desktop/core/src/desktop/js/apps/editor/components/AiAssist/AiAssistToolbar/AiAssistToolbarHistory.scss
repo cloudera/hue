@@ -136,6 +136,14 @@ svg.hue-ai-assist-toolbar-history__item-icon {
   color: vars.$fluidx-blue-400;
 }
 
+button.hue-ai-assist-toolbar-history__delete--disabled {
+  color: vars.$fluidx-blue-100;
+  background-color: transparent;
+  border: none;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .hue-ai-assist-toolbar-history__delete-container {
   display: flex;
   align-items: center;

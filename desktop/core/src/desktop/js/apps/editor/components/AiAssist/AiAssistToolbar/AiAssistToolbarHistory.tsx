@@ -26,7 +26,6 @@ import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 import IconButton from 'cuix/dist/components/Button/IconButton';
 import HistoryIcon from '@cloudera/cuix-core/icons/react/HistoryIcon';
 import I18n from 'utils/i18n';
-
 import './AiAssistToolbarHistory.scss';
 import TimeAgo from '../../../../../reactComponents/TimeAgo/TimeAgo';
 
@@ -207,13 +206,22 @@ const AiAssistToolbarHistory = forwardRef(
               </div>
               <div className="hue-ai-assist-toolbar-history__delete-container">
                 <button
-                  className="hue-ai-assist-toolbar-history__delete"
+                  className={
+                    items.length === 0
+                      ? 'hue-ai-assist-toolbar-history__delete--disabled'
+                      : 'hue-ai-assist-toolbar-history__delete'
+                  }
                   aria-label="Clear history"
-                  title="Click to clear prompt history"
+                  title={
+                    items.length > 0
+                      ? I18n('Click to clear prompt history')
+                      : I18n('No history to clear')
+                  }
                   onClick={e => {
                     e.stopPropagation(); // Prevent the event from bubbling to parent elements
                     onDelete();
                   }}
+                  disabled={items.length === 0}
                 >
                   <DeleteIcon />
                 </button>

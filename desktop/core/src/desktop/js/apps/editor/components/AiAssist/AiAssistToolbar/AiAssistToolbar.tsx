@@ -17,6 +17,7 @@
 */
 
 import React, { useState, useEffect } from 'react';
+import Modal from 'cuix/dist/components/Modal';
 import {
   getHistoryItems,
   createHistoryItem,
@@ -33,7 +34,6 @@ import {
 } from '@ant-design/icons';
 import TourIcon from '@cloudera/cuix-core/icons/react/TourIcon';
 import Toolbar, { ToolbarButton } from '../../../../../reactComponents/Toolbar/Toolbar';
-
 import AiAssistToolbarInput from './AiAssistToolbarInput';
 import { extractLeadingNqlComments, removeComments } from '../PreviewModal/formattingUtils';
 import { AiActionModes } from '../sharedTypes';
@@ -91,6 +91,7 @@ function AssistToolbar({
 }: AssistToolbarProps): JSX.Element {
   const [isAnimatingInput, setIsAnimatingInput] = useState(false);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [isDeletionModalOpen, setIsDeletionModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchAndAddHistory = async () => {
@@ -143,6 +144,17 @@ function AssistToolbar({
     } catch (error) {
       console.error('Could not delete history item:', error);
     }
+    setIsDeletionModalOpen(false);
+  };
+
+  const openDeletionModal = () => {
+    if (historyItems.length > 0) {
+      setIsDeletionModalOpen(true);
+    }
+  };
+
+  const closeDeletionModal = () => {
+    setIsDeletionModalOpen(false);
   };
 
   const updateHistory = prompt => {
@@ -201,13 +213,26 @@ function AssistToolbar({
                 placeholder={`Query database ${databaseNames.join(', ')} using natural language`}
                 onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
-                onDelete={handleDelete}
+                onDelete={openDeletionModal}
                 onInputChanged={prompt => onInputChanged(prompt)}
                 promptValue={inputValue}
                 onAnimationEnded={() => setIsAnimatingInput(false)}
                 prefill={inputPrefill}
                 historyItems={historyItems}
               />
+              {isDeletionModalOpen && (
+                <Modal
+                  cancelText="Cancel"
+                  className="hue-input-modal cuix antd"
+                  okText="Ok"
+                  onCancel={closeDeletionModal}
+                  onOk={handleDelete}
+                  open={isDeletionModalOpen}
+                  title={I18n('Delete Prompt History')}
+                >
+                  {I18n('Are you sure you want to delete the prompt history?')}
+                </Modal>
+              )}
             </>
           )}
           {showActions?.includes(AiActionModes.EDIT) && (
@@ -229,6 +254,7 @@ function AssistToolbar({
                 placeholder={`Edit your query for database ${databaseNames.join(', ')}`}
                 onSubmit={handleInputSubmit}
                 onCancel={handleCancelInput}
+                onDelete={openDeletionModal}
                 onInputChanged={prompt => onInputChanged(prompt)}
                 onAnimationEnded={() => setIsAnimatingInput(false)}
                 prefill={inputPrefill}
