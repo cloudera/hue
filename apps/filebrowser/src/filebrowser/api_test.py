@@ -462,8 +462,8 @@ class TestGetFilesystemsAPI:
 
           assert response.status_code == 200
           assert response_data == [
-            {'file_system': 's3a', 'user_home_directory': 's3a://test-bucket/test-user-home-dir/', 'extra_configs': {}},
-            {'file_system': 'ofs', 'user_home_directory': 'ofs://', 'extra_configs': {}},
+            {'file_system': 's3a', 'user_home_directory': 's3a://test-bucket/test-user-home-dir/', 'config': {}},
+            {'file_system': 'ofs', 'user_home_directory': 'ofs://', 'config': {}},
           ]
 
   def test_get_all_filesystems_success(self):
@@ -492,7 +492,7 @@ class TestGetFilesystemsAPI:
                 {
                   'file_system': 'hdfs',
                   'user_home_directory': '/user/test-user',
-                  'extra_configs': {
+                  'config': {
                     'is_trash_enabled': False,
                     'is_hdfs_superuser': False,
                     'groups': [],
@@ -501,6 +501,6 @@ class TestGetFilesystemsAPI:
                     'supergroup': 'test-supergroup',
                   },
                 },
-                {'file_system': 's3a', 'user_home_directory': 's3a://test-bucket/test-user-home-dir/', 'extra_configs': {}},
-                {'file_system': 'ofs', 'user_home_directory': 'ofs://', 'extra_configs': {}},
+                {'file_system': 's3a', 'user_home_directory': 's3a://test-bucket/test-user-home-dir/', 'config': {}},
+                {'file_system': 'ofs', 'user_home_directory': 'ofs://', 'config': {}},
               ]
