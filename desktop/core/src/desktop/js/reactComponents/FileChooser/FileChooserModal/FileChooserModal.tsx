@@ -35,6 +35,13 @@ interface FileProps {
   okText?: string;
 }
 
+interface FileChooserMenu {
+  label: string;
+  key: number;
+  icon: React.ReactNode;
+  user_home_dir: string;
+}
+
 const defaultProps = { title: 'Choose a file', okText: 'Select' };
 
 const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }) => {
@@ -52,7 +59,7 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
 
   const { data, loading } = useLoadData<FileSystem[]>(FILESYSTEMS_API_URL);
 
-  const fileSystemList = useMemo(
+  const fileSystemList: FileChooserMenu[] | undefined = useMemo(
     () =>
       data?.map((system, index) => ({
         label: system.file_system,
