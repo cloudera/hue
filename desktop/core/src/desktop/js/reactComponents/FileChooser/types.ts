@@ -14,12 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//TODO: the interface will change based on the new api to accomodate errors
 export interface FileSystem {
-  label: string;
-  key: number;
-  icon: JSX.Element;
-  user_home_dir: string;
+  file_system: string;
+  user_home_directory: string;
+  config?: {
+    is_trash_enabled: boolean;
+    is_hdfs_superuser: boolean;
+    groups: string[];
+    users: string[];
+    superuser: string;
+    supergroup: string;
+  };
 }
 
 export interface FileStats {
