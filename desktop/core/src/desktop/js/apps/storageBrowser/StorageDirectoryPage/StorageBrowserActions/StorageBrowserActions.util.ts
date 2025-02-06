@@ -15,10 +15,7 @@
 // limitations under the License.
 
 import { getLastKnownConfig } from 'config/hueConfig';
-import {
-  BrowserViewType,
-  StorageDirectoryTableData
-} from '../../../../reactComponents/FileChooser/types';
+import { BrowserViewType, StorageDirectoryTableData } from '../../types';
 import {
   isHDFS,
   isOFS,

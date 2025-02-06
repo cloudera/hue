@@ -22,8 +22,8 @@ import HdfsIcon from '../../../components/icons/HdfsIcon';
 import S3Icon from '../../../components/icons/S3Icon';
 import AdlsIcon from '../../../components/icons/AdlsIcon';
 
-import { FILESYSTEMS_API_URL } from '../api';
-import { FileSystem } from '../types';
+import { FILESYSTEMS_API_URL } from '../../../apps/storageBrowser/api';
+import { FileSystem } from '../../../apps/storageBrowser/types';
 import './FileChooserModal.scss';
 import PathBrowser from '../../PathBrowser/PathBrowser';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';

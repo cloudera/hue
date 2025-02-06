@@ -2,10 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CreateAndUploadAction from './CreateAndUploadAction';
-import {
-  CREATE_DIRECTORY_API_URL,
-  CREATE_FILE_API_URL
-} from '../../../../reactComponents/FileChooser/api';
+import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../api';
 
 const mockSave = jest.fn();
 jest.mock('../../../../utils/hooks/useSaveData/useSaveData', () => ({

@@ -19,11 +19,8 @@ import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { Checkbox, Input, Select } from 'antd';
-import {
-  ListDirectory,
-  StorageDirectoryTableData
-} from '../../../../../reactComponents/FileChooser/types';
-import { BULK_CHANGE_OWNER_API_URL } from '../../../../../reactComponents/FileChooser/api';
+import { ListDirectory, StorageDirectoryTableData } from '../../../types';
+import { BULK_CHANGE_OWNER_API_URL } from '../../../api';
 import './ChangeOwnerAndGroupModal.scss';
 
 interface ChangeOwnerAndGroupModalProps {

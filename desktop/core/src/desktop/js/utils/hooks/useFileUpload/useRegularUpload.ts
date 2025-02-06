@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import useQueueProcessor from '../useQueueProcessor/useQueueProcessor';
-import { UPLOAD_FILE_URL } from '../../../reactComponents/FileChooser/api';
+import { UPLOAD_FILE_URL } from '../../../apps/storageBrowser/api';
 import {
   DEFAULT_CONCURRENT_MAX_CONNECTIONS,
   FileUploadStatus
