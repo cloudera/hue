@@ -13,7 +13,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { useEffect, useState } from 'react';
+
+import React, { useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Input } from 'antd';
 
@@ -53,10 +54,6 @@ const InputModal = ({
     onSubmit(value);
   };
 
-  useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
-
   return (
     <Modal
       cancelText={cancelText}
@@ -73,7 +70,7 @@ const InputModal = ({
       <div className="hue-input-modal__input-label">{inputLabel}</div>
       <Input
         className="hue-input-modal__input"
-        value={value}
+        defaultValue={value}
         type={inputType}
         onPressEnter={handleSubmit}
         onChange={e => {

@@ -151,24 +151,28 @@ const CreateAndUploadAction = ({
           <DropDownIcon />
         </PrimaryButton>
       </Dropdown>
-      <InputModal
-        title={t('Create New Folder')}
-        inputLabel={t('Enter New Folder Name')}
-        submitText={t('Create')}
-        showModal={selectedAction === ActionType.createFolder}
-        onSubmit={handleCreate}
-        onClose={onModalClose}
-        buttonDisabled={loading}
-      />
-      <InputModal
-        title={t('Create New File')}
-        inputLabel={t('Enter New File Name')}
-        submitText={t('Create')}
-        showModal={selectedAction === ActionType.createFile}
-        onSubmit={handleCreate}
-        onClose={onModalClose}
-        buttonDisabled={loading}
-      />
+      {selectedAction === ActionType.createFolder && (
+        <InputModal
+          title={t('Create New Folder')}
+          inputLabel={t('Folder name')}
+          submitText={t('Create')}
+          showModal={true}
+          onSubmit={handleCreate}
+          onClose={onModalClose}
+          buttonDisabled={loading}
+        />
+      )}
+      {selectedAction === ActionType.createFile && (
+        <InputModal
+          title={t('Create New File')}
+          inputLabel={t('File name')}
+          submitText={t('Create')}
+          showModal={true}
+          onSubmit={handleCreate}
+          onClose={onModalClose}
+          buttonDisabled={loading}
+        />
+      )}
       <Modal
         onCancel={onModalClose}
         className="hue-file-upload-modal cuix antd"
