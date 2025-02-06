@@ -61,6 +61,12 @@ describe('getFileType', () => {
     expect(result).toBe(SupportedFileTypes.IMAGE);
   });
 
+  it('should return the correct file type for supported extensions with case-sensitive', () => {
+    const fileName = 'image.JPG';
+    const result = getFileType(fileName);
+    expect(result).toBe(SupportedFileTypes.IMAGE);
+  });
+
   it('should return the correct file type for text extensions', () => {
     const fileName = 'text.txt';
     const result = getFileType(fileName);
@@ -93,6 +99,12 @@ describe('getFileType', () => {
 
   it('should return OTHER if file has no extension', () => {
     const fileName = 'fileWithoutExtension';
+    const result = getFileType(fileName);
+    expect(result).toBe(SupportedFileTypes.OTHER);
+  });
+
+  it('should return OTHER if file has mis-spelled extension', () => {
+    const fileName = 'filepng';
     const result = getFileType(fileName);
     expect(result).toBe(SupportedFileTypes.OTHER);
   });

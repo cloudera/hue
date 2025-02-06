@@ -65,7 +65,7 @@ export const getFileMetaData = (t: TFunction, fileStats: FileStats): MetaData[][
 
 export const getFileType = (fileName: string): SupportedFileTypes => {
   for (const fileExtension in SUPPORTED_FILE_EXTENSIONS) {
-    if (fileName.endsWith(fileExtension)) {
+    if (fileName.toLowerCase().endsWith(`.${fileExtension}`)) {
       return SUPPORTED_FILE_EXTENSIONS[fileExtension];
     }
   }

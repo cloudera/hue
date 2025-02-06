@@ -305,7 +305,7 @@ describe('StorageFilePage', () => {
     expect(video.children[0]).toHaveAttribute('src', expect.stringContaining('videofile.mp4'));
   });
 
-  it('should display a message for compresed file types', () => {
+  it('should display a message for compressed file types', () => {
     render(
       <StorageFilePage
         fileStats={{
