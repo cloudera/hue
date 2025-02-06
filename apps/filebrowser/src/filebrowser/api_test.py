@@ -20,7 +20,7 @@ from unittest.mock import Mock, patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from filebrowser.api import get_all_filesystems, rename, upload_file
+from filebrowser.api import get_all_filesystems, mkdir, rename, upload_file
 from filebrowser.conf import (
   MAX_FILE_SIZE_UPLOAD_LIMIT,
   RESTRICT_FILE_EXTENSIONS,
@@ -328,6 +328,83 @@ class TestSimpleFileUploadAPI:
       finally:
         for reset in resets:
           reset()
+
+
+class TestMkdirAPI:
+  def test_mkdir_success(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/', 'name': 'new_dir'},
+      fs=Mock(
+        mkdir=Mock(),
+        isdir=Mock(return_value=False),
+        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+      ),
+    )
+    response = mkdir(request)
+
+    assert response.status_code == 201
+    request.fs.mkdir.assert_called_once_with('s3a://test-bucket/test-user/new_dir')
+
+  def test_mkdir_directory_exists(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/', 'name': 'new_dir'},
+      fs=Mock(
+        mkdir=Mock(),
+        isdir=Mock(return_value=True),
+        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+      ),
+    )
+    response = mkdir(request)
+
+    assert response.status_code == 409
+    assert response.content.decode('utf-8') == 'Error creating new_dir directory: Directory already exists.'
+
+  def test_mkdir_invalid_name(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/', 'name': 'new#dir'},
+      fs=Mock(
+        mkdir=Mock(),
+        isdir=Mock(return_value=False),
+        join=Mock(return_value='s3a://test-bucket/test-user/new#dir'),
+      ),
+    )
+    response = mkdir(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Slashes or hashes are not allowed in directory name. Please choose a different name.'
+
+  def test_mkdir_no_path(self):
+    request = Mock(
+      method='POST',
+      POST={'name': 'new_dir'},
+      fs=Mock(
+        mkdir=Mock(),
+        isdir=Mock(return_value=False),
+        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+      ),
+    )
+    response = mkdir(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Missing required parameters: path and name are required.'
+
+  def test_mkdir_no_name(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/'},
+      fs=Mock(
+        mkdir=Mock(),
+        isdir=Mock(return_value=False),
+        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+      ),
+    )
+    response = mkdir(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Missing required parameters: path and name are required.'
 
 
 class TestRenameAPI:
