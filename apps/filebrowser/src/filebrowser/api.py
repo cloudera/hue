@@ -554,7 +554,7 @@ def mkdir(request):
   path = request.POST.get('path')
   name = request.POST.get('name')
 
-  # Check if source and destination paths are provided
+  # Check if path and name are provided
   if not path or not name:
     return HttpResponse("Missing required parameters: path and name are required.", status=400)
 
@@ -647,13 +647,48 @@ def rename(request):
   return HttpResponse(status=200)
 
 
+def _is_destination_parent_of_source(request, source_path, destination_path):
+  """Check if the destination path is the parent directory of the source path."""
+  return request.fs.parent_path(source_path) == destination_path
+
+
 @api_error_handler
 def move(request):
+  """
+  Move a file or folder from source path to destination path.
+
+  Args:
+    request: The request object containing source and destination paths
+
+  Returns:
+    Success or error response with appropriate status codes
+  """
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
+  # Check if source and destination paths are provided
+  if not source_path or not destination_path:
+    return HttpResponse("Missing required parameters: source_path and destination_path are required.", status=400)
+
+  # Check if paths are identical
   if source_path == destination_path:
-    return HttpResponse('Source and destination path cannot be same.', status=400)
+    return HttpResponse('Source and destination paths must be different.', status=400)
+
+  # Verify source path exists
+  if not request.fs.exists(source_path):
+    return HttpResponse('Source file or folder does not exist.', status=404)
+
+  # Check if the destination path is a directory
+  if not request.fs.isdir(destination_path):
+    return HttpResponse('Destination path must be a directory.', status=400)
+
+  # Check if destination path is parent of source path
+  if _is_destination_parent_of_source(request, source_path, destination_path):
+    return HttpResponse('Destination cannot be the parent directory of source.', status=400)
+
+  # Check if file or folder already exists at destination path
+  if request.fs.exists(request.fs.join(destination_path, os.path.basename(source_path))):
+    return HttpResponse('File or folder already exists at destination path.', status=409)
 
   request.fs.rename(source_path, destination_path)
   return HttpResponse(status=200)

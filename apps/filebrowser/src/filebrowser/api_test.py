@@ -20,7 +20,7 @@ from unittest.mock import Mock, patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from filebrowser.api import get_all_filesystems, mkdir, rename, upload_file
+from filebrowser.api import get_all_filesystems, mkdir, move, rename, upload_file
 from filebrowser.conf import (
   MAX_FILE_SIZE_UPLOAD_LIMIT,
   RESTRICT_FILE_EXTENSIONS,
@@ -513,6 +513,131 @@ class TestRenameAPI:
       assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path'
     finally:
       reset()
+
+
+class TestMoveAPI:
+  def test_move_success(self):
+    request = Mock(
+      method='POST',
+      POST={'source_path': 's3a://test-bucket/test-user/src_dir/source.txt', 'destination_path': 's3a://test-bucket/test-user/dst_dir'},
+      fs=Mock(
+        exists=Mock(side_effect=[True, False]),
+        isdir=Mock(return_value=True),
+        parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
+        join=Mock(return_value='s3a://test-bucket/test-user/dst_dir/source.txt'),
+        rename=Mock(),
+      ),
+    )
+    response = move(request)
+
+    assert response.status_code == 200
+    request.fs.rename.assert_called_once_with('s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/dst_dir')
+
+  def test_move_no_source_path(self):
+    request = Mock(
+      method='POST',
+      POST={'destination_path': 's3a://test-bucket/test-user/dst_dir'},
+      fs=Mock(),
+    )
+    response = move(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path are required.'
+
+  def test_move_no_destination_path(self):
+    request = Mock(
+      method='POST',
+      POST={'source_path': 's3a://test-bucket/test-user/src_dir/source.txt'},
+      fs=Mock(),
+    )
+    response = move(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path are required.'
+
+  def test_move_identical_paths(self):
+    request = Mock(
+      method='POST',
+      POST={
+        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
+        'destination_path': 's3a://test-bucket/test-user/src_dir/source.txt',
+      },
+      fs=Mock(),
+    )
+    response = move(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Source and destination paths must be different.'
+
+  def test_move_source_path_does_not_exist(self):
+    request = Mock(
+      method='POST',
+      POST={
+        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
+        'destination_path': 's3a://test-bucket/test-user/dst_dir',
+      },
+      fs=Mock(
+        exists=Mock(return_value=False),
+      ),
+    )
+    response = move(request)
+
+    assert response.status_code == 404
+    assert response.content.decode('utf-8') == 'Source file or folder does not exist.'
+
+  def test_move_destination_not_a_directory(self):
+    request = Mock(
+      method='POST',
+      POST={
+        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
+        'destination_path': 's3a://test-bucket/test-user/dst_dir',
+      },
+      fs=Mock(
+        exists=Mock(return_value=True),
+        isdir=Mock(return_value=False),
+      ),
+    )
+    response = move(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Destination path must be a directory.'
+
+  def test_move_destination_is_parent_of_source(self):
+    request = Mock(
+      method='POST',
+      POST={
+        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
+        'destination_path': 's3a://test-bucket/test-user/src_dir',
+      },
+      fs=Mock(
+        exists=Mock(return_value=True),
+        isdir=Mock(return_value=True),
+        parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
+      ),
+    )
+    response = move(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Destination cannot be the parent directory of source.'
+
+  def test_move_file_already_exists_at_destination(self):
+    request = Mock(
+      method='POST',
+      POST={
+        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
+        'destination_path': 's3a://test-bucket/test-user/dst_dir',
+      },
+      fs=Mock(
+        exists=Mock(side_effect=[True, True]),
+        isdir=Mock(return_value=True),
+        parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
+        join=Mock(return_value='s3a://test-bucket/test-user/dst_dir/source.txt'),
+      ),
+    )
+    response = move(request)
+
+    assert response.status_code == 409
+    assert response.content.decode('utf-8') == 'File or folder already exists at destination path.'
 
 
 class TestGetFilesystemsAPI:
