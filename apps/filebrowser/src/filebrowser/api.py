@@ -872,12 +872,20 @@ def bulk_op(request, op):
     response = op(request)
 
     if response.status_code != 200:
-      error_dict[p] = {'error': response.content}
+      # TODO: Improve the error handling with new error UX
+      # Currently, we are storing the error in the error_dict based on response type for each path
+      res_content = response.content.decode('utf-8')
+      if isinstance(response, JsonResponse):
+        error_dict[p] = json.loads(res_content)  # Simply assign to not have dupicate error fields
+      else:
+        error_dict[p] = {'error': res_content}
+
+      # Also store the skipped files for each path in case OzoneFS copy operation fails
       if op == copy and p.startswith('ofs://'):
-        error_dict[p].update({'ofs_skip_files': response.content})
+        error_dict[p] = {'ofs_skip_files': res_content}
 
   if error_dict:
-    return JsonResponse(error_dict, status_code=500)  # TODO: Check if we need diff status code or diff json structure?
+    return JsonResponse(error_dict, status=500)  # TODO: Check if we need diff status code or diff json structure?
 
   return HttpResponse(status=200)  # TODO: Check if we need to send some message or diff status code?
 
