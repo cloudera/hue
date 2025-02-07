@@ -64,6 +64,7 @@ from filebrowser.views import (
   read_contents,
   stat_absolute_path,
 )
+from hadoop.conf import has_hdfs_enabled, is_hdfs_trash_enabled
 from hadoop.core_site import get_trash_interval
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
@@ -86,6 +87,7 @@ def error_handler(view_fn):
   return decorator
 
 
+# Deprecated in favor of get_all_filesystems method for new filebrowser
 @error_handler
 def get_filesystems(request):
   response = {}
@@ -116,29 +118,54 @@ def api_error_handler(view_fn):
   return decorator
 
 
+def _get_hdfs_home_directory(user):
+  return user.get_home_directory()
+
+
+def _get_config(fs, request):
+  config = {}
+  if fs == 'hdfs':
+    is_hdfs_superuser = _is_hdfs_superuser(request)
+    config = {
+      'is_trash_enabled': is_hdfs_trash_enabled(),
+      # TODO: Check if any of the below fields should be part of new Hue user and group management APIs
+      'is_hdfs_superuser': is_hdfs_superuser,
+      'groups': [str(x) for x in Group.objects.values_list('name', flat=True)] if is_hdfs_superuser else [],
+      'users': [str(x) for x in User.objects.values_list('username', flat=True)] if is_hdfs_superuser else [],
+      'superuser': request.fs.superuser,
+      'supergroup': request.fs.supergroup,
+    }
+  return config
+
+
 @api_error_handler
-def get_filesystems_with_home_dirs(request):
+def get_all_filesystems(request):
+  """
+  Retrieves all configured filesystems along with user-specific configurations.
+
+  This endpoint collects information about available filesystems (e.g., HDFS, S3, GS, etc.),
+  user home directories, and additional configurations specific to each filesystem type.
+
+  Args:
+    request (HttpRequest): The incoming HTTP request object.
+
+  Returns:
+    JsonResponse: A JSON response containing a list of filesystems with their configurations.
+  """
+  fs_home_dir_mapping = {
+    'hdfs': _get_hdfs_home_directory,
+    's3a': get_s3_home_directory,
+    'gs': get_gs_home_directory,
+    'abfs': get_abfs_home_directory,
+    'ofs': get_ofs_home_directory,
+  }
+
   filesystems = []
-  user_home_dir = ''
-
   for fs in fsmanager.get_filesystems(request.user):
-    if fs == 'hdfs':
-      user_home_dir = request.user.get_home_directory()
-    elif fs == 's3a':
-      user_home_dir = get_s3_home_directory(request.user)
-    elif fs == 'gs':
-      user_home_dir = get_gs_home_directory(request.user)
-    elif fs == 'abfs':
-      user_home_dir = get_abfs_home_directory(request.user)
-    elif fs == 'ofs':
-      user_home_dir = get_ofs_home_directory()
+    user_home_dir = fs_home_dir_mapping[fs](request.user)
+    config = _get_config(fs, request)
 
-    filesystems.append(
-      {
-        'file_system': fs,
-        'user_home_directory': user_home_dir,
-      }
-    )
+    filesystems.append({'file_system': fs, 'user_home_directory': user_home_dir, 'config': config})
 
   return JsonResponse(filesystems, safe=False)
 
@@ -209,12 +236,7 @@ def download(request):
 
 
 def _massage_page(page, paginator):
-  return {
-      'page_number': page.number,
-      'page_size': paginator.per_page,
-      'total_pages': paginator.num_pages,
-      'total_size': paginator.count
-  }
+  return {'page_number': page.number, 'page_size': paginator.per_page, 'total_pages': paginator.num_pages, 'total_size': paginator.count}
 
 
 @api_error_handler
@@ -280,22 +302,7 @@ def listdir_paged(request):
   if page:
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
 
-  # TODO: Shift below fields to /get_config?
-  is_hdfs = request.fs._get_scheme(path) == 'hdfs'
-  is_trash_enabled = is_hdfs and int(get_trash_interval()) > 0
-  is_fs_superuser = is_hdfs and _is_hdfs_superuser(request)
-
-  response = {
-    'is_trash_enabled': is_trash_enabled,
-    'files': page.object_list if page else [],
-    'page': _massage_page(page, paginator) if page else {},
-    # TODO: Check what to keep or what to remove? or move some fields to /get_config?
-    'is_fs_superuser': is_fs_superuser,
-    'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
-    'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
-    'superuser': request.fs.superuser,
-    'supergroup': request.fs.supergroup,
-  }
+  response = {'files': page.object_list if page else [], 'page': _massage_page(page, paginator) if page else {}}
 
   return JsonResponse(response)
 
@@ -529,14 +536,34 @@ def upload_file(request):
 
 @api_error_handler
 def mkdir(request):
+  """
+  Create a new directory at the specified path with the given name.
+
+  Args:
+    request (HttpRequest): The HTTP request object containing the data.
+
+  Returns:
+    A HttpResponse with a status code and message indicating the success or failure of the directory creation.
+  """
   # TODO: Check if this needs to be a PUT request
   path = request.POST.get('path')
   name = request.POST.get('name')
 
-  if name and (posixpath.sep in name or "#" in name):
-    return HttpResponse(f"Error creating {name} directory. Slashes or hashes are not allowed in directory name.", status=400)
+  # Check if source and destination paths are provided
+  if not path or not name:
+    return HttpResponse("Missing required parameters: path and name are required.", status=400)
 
-  request.fs.mkdir(request.fs.join(path, name))
+  # Validate the 'name' parameter for invalid characters
+  if posixpath.sep in name or "#" in name:
+    return HttpResponse(f"Slashes or hashes are not allowed in directory name. Please choose a different name.", status=400)
+
+  dir_path = request.fs.join(path, name)
+
+  # Check if the directory already exists
+  if request.fs.isdir(dir_path):
+    return HttpResponse(f"Error creating {name} directory: Directory already exists.", status=409)
+
+  request.fs.mkdir(dir_path)
   return HttpResponse(status=201)
 
 

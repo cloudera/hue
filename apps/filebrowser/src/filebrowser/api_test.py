@@ -20,7 +20,7 @@ from unittest.mock import Mock, patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from filebrowser.api import rename, upload_file
+from filebrowser.api import get_all_filesystems, mkdir, rename, upload_file
 from filebrowser.conf import (
   MAX_FILE_SIZE_UPLOAD_LIMIT,
   RESTRICT_FILE_EXTENSIONS,
@@ -330,6 +330,83 @@ class TestSimpleFileUploadAPI:
           reset()
 
 
+class TestMkdirAPI:
+  def test_mkdir_success(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/', 'name': 'new_dir'},
+      fs=Mock(
+        mkdir=Mock(),
+        isdir=Mock(return_value=False),
+        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+      ),
+    )
+    response = mkdir(request)
+
+    assert response.status_code == 201
+    request.fs.mkdir.assert_called_once_with('s3a://test-bucket/test-user/new_dir')
+
+  def test_mkdir_directory_exists(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/', 'name': 'new_dir'},
+      fs=Mock(
+        mkdir=Mock(),
+        isdir=Mock(return_value=True),
+        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+      ),
+    )
+    response = mkdir(request)
+
+    assert response.status_code == 409
+    assert response.content.decode('utf-8') == 'Error creating new_dir directory: Directory already exists.'
+
+  def test_mkdir_invalid_name(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/', 'name': 'new#dir'},
+      fs=Mock(
+        mkdir=Mock(),
+        isdir=Mock(return_value=False),
+        join=Mock(return_value='s3a://test-bucket/test-user/new#dir'),
+      ),
+    )
+    response = mkdir(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Slashes or hashes are not allowed in directory name. Please choose a different name.'
+
+  def test_mkdir_no_path(self):
+    request = Mock(
+      method='POST',
+      POST={'name': 'new_dir'},
+      fs=Mock(
+        mkdir=Mock(),
+        isdir=Mock(return_value=False),
+        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+      ),
+    )
+    response = mkdir(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Missing required parameters: path and name are required.'
+
+  def test_mkdir_no_name(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/'},
+      fs=Mock(
+        mkdir=Mock(),
+        isdir=Mock(return_value=False),
+        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+      ),
+    )
+    response = mkdir(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Missing required parameters: path and name are required.'
+
+
 class TestRenameAPI:
   def test_rename_success(self):
     request = Mock(
@@ -442,3 +519,65 @@ class TestRenameAPI:
       assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path'
     finally:
       reset()
+
+
+class TestGetFilesystemsAPI:
+  def test_get_all_filesystems_without_hdfs(self):
+    with patch('filebrowser.api.fsmanager.get_filesystems') as get_filesystems:
+      with patch('filebrowser.api.get_s3_home_directory') as get_s3_home_directory:
+        with patch('filebrowser.api._is_hdfs_superuser') as _is_hdfs_superuser:
+          get_filesystems.return_value = ['s3a', 'ofs']
+          get_s3_home_directory.return_value = 's3a://test-bucket/test-user-home-dir/'
+          _is_hdfs_superuser.return_value = False
+          request = Mock(
+            method='GET',
+            user=Mock(),
+          )
+
+          response = get_all_filesystems(request)
+          response_data = json.loads(response.content)
+
+          assert response.status_code == 200
+          assert response_data == [
+            {'file_system': 's3a', 'user_home_directory': 's3a://test-bucket/test-user-home-dir/', 'config': {}},
+            {'file_system': 'ofs', 'user_home_directory': 'ofs://', 'config': {}},
+          ]
+
+  def test_get_all_filesystems_success(self):
+    with patch('filebrowser.api.fsmanager.get_filesystems') as get_filesystems:
+      with patch('filebrowser.api.get_s3_home_directory') as get_s3_home_directory:
+        with patch('filebrowser.api._is_hdfs_superuser') as _is_hdfs_superuser:
+          with patch('filebrowser.api.User') as User:
+            with patch('filebrowser.api.Group') as Group:
+              get_filesystems.return_value = ['hdfs', 's3a', 'ofs']
+              get_s3_home_directory.return_value = 's3a://test-bucket/test-user-home-dir/'
+              _is_hdfs_superuser.return_value = False
+              request = Mock(
+                method='GET',
+                user=Mock(get_home_directory=Mock(return_value='/user/test-user')),
+                fs=Mock(
+                  superuser='test-user',
+                  supergroup='test-supergroup',
+                ),
+              )
+
+              response = get_all_filesystems(request)
+              response_data = json.loads(response.content)
+
+              assert response.status_code == 200
+              assert response_data == [
+                {
+                  'file_system': 'hdfs',
+                  'user_home_directory': '/user/test-user',
+                  'config': {
+                    'is_trash_enabled': False,
+                    'is_hdfs_superuser': False,
+                    'groups': [],
+                    'users': [],
+                    'superuser': 'test-user',
+                    'supergroup': 'test-supergroup',
+                  },
+                },
+                {'file_system': 's3a', 'user_home_directory': 's3a://test-bucket/test-user-home-dir/', 'config': {}},
+                {'file_system': 'ofs', 'user_home_directory': 'ofs://', 'config': {}},
+              ]
