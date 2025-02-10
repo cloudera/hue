@@ -151,23 +151,18 @@ const CreateAndUploadAction = ({
           <DropDownIcon />
         </PrimaryButton>
       </Dropdown>
-      {selectedAction === ActionType.createFolder && (
+      {(selectedAction === ActionType.createFolder || selectedAction === ActionType.createFile) && (
         <InputModal
-          title={t('Create New Folder')}
-          inputLabel={t('Folder name')}
-          submitText={t('Create')}
           showModal={true}
-          onSubmit={handleCreate}
-          onClose={onModalClose}
-          buttonDisabled={loading}
-        />
-      )}
-      {selectedAction === ActionType.createFile && (
-        <InputModal
-          title={t('Create New File')}
-          inputLabel={t('File name')}
+          title={
+            selectedAction === ActionType.createFolder
+              ? t('Create Folder')
+              : t('Create File')
+          }
+          inputLabel={
+            selectedAction === ActionType.createFolder ? t('Folder name') : t('File name')
+          }
           submitText={t('Create')}
-          showModal={true}
           onSubmit={handleCreate}
           onClose={onModalClose}
           buttonDisabled={loading}
