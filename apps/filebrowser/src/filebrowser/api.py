@@ -649,7 +649,7 @@ def rename(request):
 
 def _is_destination_parent_of_source(request, source_path, destination_path):
   """Check if the destination path is the parent directory of the source path."""
-  return request.fs.parent_path(source_path) == destination_path
+  return request.fs.parent_path(source_path) == request.fs.normpath(destination_path)
 
 
 @api_error_handler
@@ -671,7 +671,7 @@ def move(request):
     return HttpResponse("Missing required parameters: source_path and destination_path are required.", status=400)
 
   # Check if paths are identical
-  if source_path == destination_path:
+  if request.fs.normpath(source_path) == request.fs.normpath(destination_path):
     return HttpResponse('Source and destination paths must be different.', status=400)
 
   # Verify source path exists

@@ -525,6 +525,13 @@ class TestMoveAPI:
         isdir=Mock(return_value=True),
         parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
         join=Mock(return_value='s3a://test-bucket/test-user/dst_dir/source.txt'),
+        normpath=Mock(
+          side_effect=[
+            's3a://test-bucket/test-user/src_dir/source.txt',
+            's3a://test-bucket/test-user/dst_dir',
+            's3a://test-bucket/test-user/dst_dir',
+          ]
+        ),
         rename=Mock(),
       ),
     )
@@ -562,7 +569,9 @@ class TestMoveAPI:
         'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
         'destination_path': 's3a://test-bucket/test-user/src_dir/source.txt',
       },
-      fs=Mock(),
+      fs=Mock(
+        normpath=Mock(side_effect=['s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/src_dir/source.txt']),
+      ),
     )
     response = move(request)
 
@@ -578,6 +587,7 @@ class TestMoveAPI:
       },
       fs=Mock(
         exists=Mock(return_value=False),
+        normpath=Mock(side_effect=['s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/dst_dir']),
       ),
     )
     response = move(request)
@@ -595,6 +605,7 @@ class TestMoveAPI:
       fs=Mock(
         exists=Mock(return_value=True),
         isdir=Mock(return_value=False),
+        normpath=Mock(side_effect=['s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/dst_dir']),
       ),
     )
     response = move(request)
@@ -613,6 +624,13 @@ class TestMoveAPI:
         exists=Mock(return_value=True),
         isdir=Mock(return_value=True),
         parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
+        normpath=Mock(
+          side_effect=[
+            's3a://test-bucket/test-user/src_dir/source.txt',
+            's3a://test-bucket/test-user/src_dir',
+            's3a://test-bucket/test-user/src_dir',
+          ]
+        ),
       ),
     )
     response = move(request)
@@ -632,6 +650,13 @@ class TestMoveAPI:
         isdir=Mock(return_value=True),
         parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
         join=Mock(return_value='s3a://test-bucket/test-user/dst_dir/source.txt'),
+        normpath=Mock(
+          side_effect=[
+            's3a://test-bucket/test-user/src_dir/source.txt',
+            's3a://test-bucket/test-user/dst_dir',
+            's3a://test-bucket/test-user/dst_dir',
+          ]
+        ),
       ),
     )
     response = move(request)
