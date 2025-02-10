@@ -43,7 +43,7 @@ const DragAndDrop = ({ children, onDrop }: DragAndDropProps): JSX.Element => {
             <div className="drag-drop__message__select-file">
               <ImportIcon /> {t('Select file')}
             </div>
-            <div>{t('Browser files or drag and drop files')}</div>
+            <div>{t('Browse files or drag and drop files')}</div>
           </div>
         )}
         {!isDragActive && children}
