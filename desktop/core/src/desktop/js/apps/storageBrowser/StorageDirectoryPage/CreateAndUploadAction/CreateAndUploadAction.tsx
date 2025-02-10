@@ -154,11 +154,7 @@ const CreateAndUploadAction = ({
       {(selectedAction === ActionType.createFolder || selectedAction === ActionType.createFile) && (
         <InputModal
           showModal={true}
-          title={
-            selectedAction === ActionType.createFolder
-              ? t('Create Folder')
-              : t('Create File')
-          }
+          title={selectedAction === ActionType.createFolder ? t('Create Folder') : t('Create File')}
           inputLabel={
             selectedAction === ActionType.createFolder ? t('Folder name') : t('File name')
           }
