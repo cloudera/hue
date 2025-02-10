@@ -699,8 +699,29 @@ def copy(request):
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
-  if source_path == destination_path:
-    return HttpResponse('Source and destination path cannot be same.', status=400)
+  # Check if source and destination paths are provided
+  if not source_path or not destination_path:
+    return HttpResponse("Missing required parameters: source_path and destination_path are required.", status=400)
+
+  # Check if paths are identical
+  if request.fs.normpath(source_path) == request.fs.normpath(destination_path):
+    return HttpResponse('Source and destination paths must be different.', status=400)
+
+  # Verify source path exists
+  if not request.fs.exists(source_path):
+    return HttpResponse('Source file or folder does not exist.', status=404)
+
+  # Check if the destination path is a directory
+  if not request.fs.isdir(destination_path):
+    return HttpResponse('Destination path must be a directory.', status=400)
+
+  # Check if destination path is parent of source path
+  if _is_destination_parent_of_source(request, source_path, destination_path):
+    return HttpResponse('Destination cannot be the parent directory of source.', status=400)
+
+  # Check if file or folder already exists at destination path
+  if request.fs.exists(request.fs.join(destination_path, os.path.basename(source_path))):
+    return HttpResponse('File or folder already exists at destination path.', status=409)
 
   # Copy method for Ozone FS returns a string of skipped files if their size is greater than configured chunk size.
   if source_path.startswith('ofs://'):
