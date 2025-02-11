@@ -620,7 +620,7 @@ def rename(request):
   _, source_path_ext = os.path.splitext(source_path)
   _, dest_path_ext = os.path.splitext(destination_path)
 
-  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]
+  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()] if RESTRICT_FILE_EXTENSIONS.get() else []
   # Check if destination path has a restricted file type and it doesn't match the source file type
   if dest_path_ext.lower() in restricted_file_types and (source_path_ext.lower() != dest_path_ext.lower()):
     return HttpResponse(f'Cannot rename file to a restricted file type: "{dest_path_ext}"', status=403)
