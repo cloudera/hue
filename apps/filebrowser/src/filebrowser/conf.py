@@ -105,7 +105,7 @@ FILE_DOWNLOAD_CACHE_CONTROL = Config(
 
 RESTRICT_FILE_EXTENSIONS = Config(
   key='restrict_file_extensions',
-  default='',
+  default=None,
   type=coerce_csv,
   help=_(
     'Specify file extensions that are not allowed, separated by commas. For example: .exe, .zip, .rar, .tar, .gz'
