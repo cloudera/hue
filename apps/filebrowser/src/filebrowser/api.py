@@ -727,7 +727,7 @@ def copy(request):
   if source_path.startswith('ofs://'):
     ofs_skip_files = request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
     if ofs_skip_files:
-      return JsonResponse(ofs_skip_files, status=500)  # TODO: Status code?
+      return JsonResponse({'ofs_skip_files': ofs_skip_files}, status=500)  # TODO: Status code?
   else:
     request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
 
