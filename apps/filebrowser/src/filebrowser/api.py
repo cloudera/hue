@@ -696,6 +696,15 @@ def move(request):
 
 @api_error_handler
 def copy(request):
+  """
+  Copy a file or folder from the source path to the destination path.
+
+  Args:
+    request: The request object containing source and destination path
+
+  Returns:
+    Success or error response with appropriate status codes
+  """
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
