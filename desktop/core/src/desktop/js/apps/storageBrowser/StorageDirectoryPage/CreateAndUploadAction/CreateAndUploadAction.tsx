@@ -32,7 +32,7 @@ import {
 } from '../../../../reactComponents/FileChooser/api';
 import { FileStats } from '../../../../reactComponents/FileChooser/types';
 import useSaveData from '../../../../utils/hooks/useSaveData/useSaveData';
-import InputModal from '../../InputModal/InputModal';
+import InputModal from '../../../../reactComponents/InputModal/InputModal';
 import './CreateAndUploadAction.scss';
 import DragAndDrop from '../../../../reactComponents/DragAndDrop/DragAndDrop';
 

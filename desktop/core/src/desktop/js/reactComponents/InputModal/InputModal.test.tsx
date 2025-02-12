@@ -44,7 +44,7 @@ describe('InputModal', () => {
   it('should render custom input label', () => {
     const inputModal = render(
       <InputModal
-        title={'Create New File'}
+        title={'Create File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
@@ -61,7 +61,7 @@ describe('InputModal', () => {
     const user = userEvent.setup();
     render(
       <InputModal
-        title={'Create New File'}
+        title={'Create File'}
         inputLabel={'Enter File name here'}
         submitText={'Create'}
         showModal={true}
@@ -74,6 +74,10 @@ describe('InputModal', () => {
     const submitButton = screen.getByRole('button', { name: 'Create' });
 
     expect(mockOnSubmit).not.toHaveBeenCalled();
+
+    const inputField = screen.getByRole('textbox');
+    await user.type(inputField, 'test-file.txt');
+
     await user.click(submitButton);
     expect(mockOnSubmit).toHaveBeenCalled();
   });
@@ -82,7 +86,7 @@ describe('InputModal', () => {
     const user = userEvent.setup();
     render(
       <InputModal
-        title={'Create New File'}
+        title={'Create File'}
         inputLabel={'Enter File name here'}
         submitText={'Create'}
         showModal={true}
@@ -102,7 +106,7 @@ describe('InputModal', () => {
   it('should render modal with input visible', () => {
     render(
       <InputModal
-        title={'Create New File'}
+        title={'Create File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
@@ -138,7 +142,7 @@ describe('InputModal', () => {
   it('should render modal with empty input value when intial value is empty', () => {
     render(
       <InputModal
-        title={'Create New File'}
+        title={'Create File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
@@ -154,7 +158,7 @@ describe('InputModal', () => {
   it('should render modal with intial value in input while input type is text', () => {
     render(
       <InputModal
-        title={'Create New File'}
+        title={'Create File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
@@ -170,7 +174,7 @@ describe('InputModal', () => {
   it('should render modal with intial value in input while input type is number', () => {
     render(
       <InputModal
-        title={'Create New File'}
+        title={'Create File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
@@ -187,7 +191,7 @@ describe('InputModal', () => {
     const user = userEvent.setup();
     render(
       <InputModal
-        title={'Create New File'}
+        title={'Create File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}
@@ -197,18 +201,14 @@ describe('InputModal', () => {
         inputType={'text'}
       />
     );
-    const inputModal = screen.getByRole('dialog', { name: 'Create New File' });
-    const closeIconButton = within(inputModal).getByRole('button', { name: 'Close' });
+    const inputModal = screen.getByRole('dialog', { name: 'Create File' });
     const inputTextBox = within(inputModal).getByRole('textbox');
     const submitButton = within(inputModal).getByRole('button', { name: 'Create' });
     const cancelButton = within(inputModal).getByRole('button', { name: 'Cancel' });
 
-    await user.tab();
-    if (!closeIconButton.matches(':focus')) {
-      await user.tab(); // Tab again if the focus is on the sentinel
-    }
-    expect(closeIconButton).toHaveFocus();
-    await user.tab();
+    const inputField = screen.getByRole('textbox');
+    await user.type(inputField, 'test-file.txt');
+
     expect(inputTextBox).toHaveFocus();
     await user.tab();
     expect(submitButton).toHaveFocus();
@@ -219,7 +219,7 @@ describe('InputModal', () => {
   it('should disable the submit button when buttonDisabled is true', () => {
     render(
       <InputModal
-        title={'Create New File'}
+        title={'Create File'}
         inputLabel={'Custom input label'}
         submitText={'Create'}
         showModal={true}

@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
-import { Input } from 'antd';
+import { Input, InputRef } from 'antd';
 
-import { i18nReact } from '../../../utils/i18nReact';
+import { i18nReact } from '../../utils/i18nReact';
 
 import './InputModal.scss';
 
@@ -46,6 +46,8 @@ const InputModal = ({
   buttonDisabled,
   ...i18n
 }: InputModalProps): JSX.Element => {
+  const inputRef = useRef<InputRef>(null);
+
   const [value, setValue] = useState<string | number>(initialValue);
   const { t } = i18nReact.useTranslation();
   const { cancelText = t('Cancel'), submitText = t('Submit') } = i18n;
@@ -53,6 +55,10 @@ const InputModal = ({
   const handleSubmit = () => {
     onSubmit(value);
   };
+
+  useEffect(() => {
+    inputRef?.current?.focus();
+  }, [inputRef.current]);
 
   return (
     <Modal
@@ -64,7 +70,7 @@ const InputModal = ({
       open={showModal}
       title={title}
       secondaryButtonProps={{ disabled: buttonDisabled }}
-      okButtonProps={{ disabled: buttonDisabled }}
+      okButtonProps={{ disabled: buttonDisabled || initialValue === value }}
       cancelButtonProps={{ disabled: buttonDisabled }}
     >
       <div className="hue-input-modal__input-label">{inputLabel}</div>
@@ -72,7 +78,9 @@ const InputModal = ({
         className="hue-input-modal__input"
         defaultValue={value}
         type={inputType}
+        disabled={buttonDisabled}
         onPressEnter={handleSubmit}
+        ref={inputRef}
         onChange={e => {
           setValue(e.target.value);
         }}
