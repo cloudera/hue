@@ -24,7 +24,7 @@ $icon-margin: 5px;
 .antd.cuix {
   .hue-storage-browser__actions-bar {
     display: flex;
-    margin: vars.$fluidx-spacing-s 0;
+    margin: vars.$fluidx-spacing-s 0 vars.$fluidx-spacing-s vars.$fluidx-spacing-xs;
     justify-content: space-between;
   }
 
