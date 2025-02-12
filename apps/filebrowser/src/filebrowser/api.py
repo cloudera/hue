@@ -882,7 +882,7 @@ def bulk_op(request, op):
 
       # Also store the skipped files for each path in case OzoneFS copy operation fails
       if op == copy and p.startswith('ofs://'):
-        error_dict[p].update({'ofs_skip_files': res_content})
+        error_dict[p].update({'skipped_files': res_content})
 
   if error_dict:
     return JsonResponse(error_dict, status=500)  # TODO: Check if we need diff status code or diff json structure?
