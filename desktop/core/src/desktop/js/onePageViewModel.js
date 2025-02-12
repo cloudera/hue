@@ -376,6 +376,10 @@ class OnePageViewModel {
         self.embeddable_cache['editor'] = undefined;
       }
 
+      if (pageMapping.find(page => page.isReactApp && page.app === app)) {
+        self.embeddable_cache[app] = undefined;
+      }
+
       self.currentApp(app);
       if (!app.startsWith('security')) {
         self.lastContext = null;
@@ -706,7 +710,7 @@ class OnePageViewModel {
         }
       },
       { url: '/filebrowser/view=*', app: 'filebrowser' },
-      { url: '/filebrowser/new', app: 'newfilebrowser' },
+      { url: '/filebrowser/new', app: 'newfilebrowser', isReactApp: true },
       {
         url: '/filebrowser/*',
         app: function () {
