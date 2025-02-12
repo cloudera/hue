@@ -814,7 +814,7 @@ class TestCopyAPI:
     response = copy(request)
 
     assert response.status_code == 500
-    assert json.loads(response.content) == {'ofs_skip_files': 'ofs://test_vol/test-bucket/test-user/src_dir/source.txt'}
+    assert json.loads(response.content) == {'skipped_files': 'ofs://test_vol/test-bucket/test-user/src_dir/source.txt'}
     request.fs.copy.assert_called_once_with(
       'ofs://test_vol/test-bucket/test-user/src_dir/source.txt',
       'ofs://test_vol/test-bucket/test-user/dst_dir',
