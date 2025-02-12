@@ -554,7 +554,7 @@ def mkdir(request):
   path = request.POST.get('path')
   name = request.POST.get('name')
 
-  # Check if source and destination paths are provided
+  # Check if path and name are provided
   if not path or not name:
     return HttpResponse("Missing required parameters: path and name are required.", status=400)
 
@@ -647,13 +647,57 @@ def rename(request):
   return HttpResponse(status=200)
 
 
+def _is_destination_parent_of_source(request, source_path, destination_path):
+  """Check if the destination path is the parent directory of the source path."""
+  return request.fs.parent_path(source_path) == request.fs.normpath(destination_path)
+
+
+def _validate_copy_move_operation(request, source_path, destination_path):
+  """Validate the input parameters for copy and move operations for different scenarios."""
+
+  # Check if source and destination paths are provided
+  if not source_path or not destination_path:
+    return HttpResponse("Missing required parameters: source_path and destination_path are required.", status=400)
+
+  # Check if paths are identical
+  if request.fs.normpath(source_path) == request.fs.normpath(destination_path):
+    return HttpResponse('Source and destination paths must be different.', status=400)
+
+  # Verify source path exists
+  if not request.fs.exists(source_path):
+    return HttpResponse('Source file or folder does not exist.', status=404)
+
+  # Check if the destination path is a directory
+  if not request.fs.isdir(destination_path):
+    return HttpResponse('Destination path must be a directory.', status=400)
+
+  # Check if destination path is parent of source path
+  if _is_destination_parent_of_source(request, source_path, destination_path):
+    return HttpResponse('Destination cannot be the parent directory of source.', status=400)
+
+  # Check if file or folder already exists at destination path
+  if request.fs.exists(request.fs.join(destination_path, os.path.basename(source_path))):
+    return HttpResponse('File or folder already exists at destination path.', status=409)
+
+
 @api_error_handler
 def move(request):
+  """
+  Move a file or folder from source path to destination path.
+
+  Args:
+    request: The request object containing source and destination paths
+
+  Returns:
+    Success or error response with appropriate status codes
+  """
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
-  if source_path == destination_path:
-    return HttpResponse('Source and destination path cannot be same.', status=400)
+  # Validate the operation and return error response if any scenario fails
+  validation_response = _validate_copy_move_operation(request, source_path, destination_path)
+  if validation_response:
+    return validation_response
 
   request.fs.rename(source_path, destination_path)
   return HttpResponse(status=200)
@@ -661,17 +705,28 @@ def move(request):
 
 @api_error_handler
 def copy(request):
+  """
+  Copy a file or folder from the source path to the destination path.
+
+  Args:
+    request: The request object containing source and destination path
+
+  Returns:
+    Success or error response with appropriate status codes
+  """
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
-  if source_path == destination_path:
-    return HttpResponse('Source and destination path cannot be same.', status=400)
+  # Validate the operation and return error response if any scenario fails
+  validation_response = _validate_copy_move_operation(request, source_path, destination_path)
+  if validation_response:
+    return validation_response
 
   # Copy method for Ozone FS returns a string of skipped files if their size is greater than configured chunk size.
   if source_path.startswith('ofs://'):
     ofs_skip_files = request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
     if ofs_skip_files:
-      return JsonResponse(ofs_skip_files, status=500)  # TODO: Status code?
+      return JsonResponse({'skipped_files': ofs_skip_files}, status=500)  # TODO: Status code?
   else:
     request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
 
@@ -884,10 +939,6 @@ def bulk_op(request, op):
         error_dict[p] = json.loads(res_content)  # Simply assign to not have dupicate error fields
       else:
         error_dict[p] = {'error': res_content}
-
-      # Also store the skipped files for each path in case OzoneFS copy operation fails
-      if op == copy and p.startswith('ofs://'):
-        error_dict[p].update({'skipped_files': res_content})
 
   if error_dict:
     return JsonResponse(error_dict, status=500)  # TODO: Check if we need diff status code or diff json structure?
