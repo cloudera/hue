@@ -177,8 +177,11 @@ def download(request):
 
   This is inspired by django.views.static.serve (?disposition={attachment, inline})
 
-  :param request: The current request object
-  :return: A response object with the file contents or an error message
+  Args:
+    request: The current request object
+
+  Returns:
+    A response object with the file contents or an error message
   """
   path = request.GET.get('path')
   path = _normalize_path(path)
@@ -217,11 +220,13 @@ def download(request):
   else:
     response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
 
+    content_disposition = (
+      request.GET.get('disposition') if request.GET.get('disposition') == 'inline' and _can_inline_display(path) else 'attachment'
+    )
+
+    response['Content-Disposition'] = f'{content_disposition}; filename="{stats["name"]}"'
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
-    response['Content-Disposition'] = (
-      request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') if _can_inline_display(path) else 'attachment'
-    )
 
     if FILE_DOWNLOAD_CACHE_CONTROL.get():
       response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
