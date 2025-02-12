@@ -24,12 +24,15 @@ import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
 import { FILE_STATS_API_URL } from '../api';
 import { BrowserViewType, FileStats, FileSystem } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import { BorderlessButton } from 'cuix/dist/components/Button';
 
 import './StorageBrowserTab.scss';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
+import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
 
 interface StorageBrowserTabProps {
   fileSystem: FileSystem;
@@ -96,10 +99,34 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     <LoadingErrorWrapper loading={loading} errors={errorConfig}>
       <div className="hue-storage-browser-tab-content" data-testid={testId}>
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
-          <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
-          <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
-            {fileName}
-          </h3>
+          <div className="hue-storage-browser__title">
+            <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
+            <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
+              {fileName}
+            </h3>
+          </div>
+          <div className="hue-storage-browser__home-bar-right">
+            <BorderlessButton
+              onClick={() => {
+                setFilePath(homeDir);
+              }}
+              className="hue-path-browser__home-btn"
+              data-event={''}
+              title={'home'}
+              icon={<HomeIcon />}
+            >
+              Home
+            </BorderlessButton>
+            <BorderlessButton
+              onClick={() => reloadData()}
+              className="hue-path-browser__refresh-btn"
+              data-event={''}
+              title={'Refresh'}
+              icon={<RefreshIcon />}
+            >
+              Refresh
+            </BorderlessButton>
+          </div>
         </div>
         <div
           className="hue-storage-browser__path-browser-panel"
