@@ -177,8 +177,11 @@ def download(request):
 
   This is inspired by django.views.static.serve (?disposition={attachment, inline})
 
-  :param request: The current request object
-  :return: A response object with the file contents or an error message
+  Args:
+    request: The current request object
+
+  Returns:
+    A response object with the file contents or an error message
   """
   path = request.GET.get('path')
   path = _normalize_path(path)
@@ -217,11 +220,13 @@ def download(request):
   else:
     response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
 
+    content_disposition = (
+      request.GET.get('disposition') if request.GET.get('disposition') == 'inline' and _can_inline_display(path) else 'attachment'
+    )
+
+    response['Content-Disposition'] = f'{content_disposition}; filename="{stats["name"]}"'
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
-    response['Content-Disposition'] = (
-      request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') if _can_inline_display(path) else 'attachment'
-    )
 
     if FILE_DOWNLOAD_CACHE_CONTROL.get():
       response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
@@ -620,7 +625,7 @@ def rename(request):
   _, source_path_ext = os.path.splitext(source_path)
   _, dest_path_ext = os.path.splitext(destination_path)
 
-  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]
+  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()] if RESTRICT_FILE_EXTENSIONS.get() else []
   # Check if destination path has a restricted file type and it doesn't match the source file type
   if dest_path_ext.lower() in restricted_file_types and (source_path_ext.lower() != dest_path_ext.lower()):
     return HttpResponse(f'Cannot rename file to a restricted file type: "{dest_path_ext}"', status=403)
@@ -872,12 +877,20 @@ def bulk_op(request, op):
     response = op(request)
 
     if response.status_code != 200:
-      error_dict[p] = {'error': response.content}
+      # TODO: Improve the error handling with new error UX
+      # Currently, we are storing the error in the error_dict based on response type for each path
+      res_content = response.content.decode('utf-8')
+      if isinstance(response, JsonResponse):
+        error_dict[p] = json.loads(res_content)  # Simply assign to not have dupicate error fields
+      else:
+        error_dict[p] = {'error': res_content}
+
+      # Also store the skipped files for each path in case OzoneFS copy operation fails
       if op == copy and p.startswith('ofs://'):
-        error_dict[p].update({'ofs_skip_files': response.content})
+        error_dict[p].update({'skipped_files': res_content})
 
   if error_dict:
-    return JsonResponse(error_dict, status_code=500)  # TODO: Check if we need diff status code or diff json structure?
+    return JsonResponse(error_dict, status=500)  # TODO: Check if we need diff status code or diff json structure?
 
   return HttpResponse(status=200)  # TODO: Check if we need to send some message or diff status code?
 

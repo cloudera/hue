@@ -412,14 +412,13 @@ class TestRenameAPI:
     request = Mock(
       method='POST',
       POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new_name.txt'},
-      body=Mock(),
       fs=Mock(
         exists=Mock(return_value=False),
         join=Mock(return_value='s3a://test-bucket/test-user/new_name.txt'),
         rename=Mock(),
       ),
     )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('')
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
     try:
       response = rename(request)
 
@@ -432,7 +431,6 @@ class TestRenameAPI:
     request = Mock(
       method='POST',
       POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new_name.exe'},
-      body=Mock(),
       fs=Mock(
         rename=Mock(),
       ),
@@ -450,12 +448,11 @@ class TestRenameAPI:
     request = Mock(
       method='POST',
       POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new#name.txt'},
-      body=Mock(),
       fs=Mock(
         rename=Mock(),
       ),
     )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('')
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
     try:
       response = rename(request)
 
@@ -468,14 +465,13 @@ class TestRenameAPI:
     request = Mock(
       method='POST',
       POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new_name.txt'},
-      body=Mock(),
       fs=Mock(
         rename=Mock(),
         exists=Mock(return_value=True),
         join=Mock(return_value='s3a://test-bucket/test-user/new_name.txt'),
       ),
     )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('')
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
     try:
       response = rename(request)
 
@@ -488,12 +484,11 @@ class TestRenameAPI:
     request = Mock(
       method='POST',
       POST={'destination_path': 'new_name.txt'},
-      body=Mock(),
       fs=Mock(
         rename=Mock(),
       ),
     )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('')
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
     try:
       response = rename(request)
 
@@ -506,12 +501,11 @@ class TestRenameAPI:
     request = Mock(
       method='POST',
       POST={'source_path': 's3a://test-bucket/test-user/source.txt'},
-      body=Mock(),
       fs=Mock(
         rename=Mock(),
       ),
     )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('')
+    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
     try:
       response = rename(request)
 
