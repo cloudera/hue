@@ -234,4 +234,26 @@ describe('AiAssistToolbarHistory', () => {
     await user.click(deleteBtn);
     expect(mockApiDelete).toHaveBeenCalled();
   });
+
+  test('open deletion modal on clicking delete button', async () => {
+    const user = userEvent.setup();
+    const openDeletionModalMock = jest.fn();
+    const { getByTitle } = render(
+      <AiAssistToolbarHistory
+        items={historyItems}
+        searchValue=""
+        onSelect={jest.fn()}
+        onHide={jest.fn()}
+        onToggleAutoShow={jest.fn()}
+        show={true}
+        autoShow={false}
+        position={{ top: 0, left: 0 }}
+        width={300}
+        onDelete={openDeletionModalMock}
+      />
+    );
+    const deleteBtn = getByTitle('Click to clear prompt history');
+    await user.click(deleteBtn);
+    expect(openDeletionModalMock).toHaveBeenCalled();
+  });
 });
