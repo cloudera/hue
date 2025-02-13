@@ -34,7 +34,8 @@ import {
   ListDirectory,
   FileStats,
   BrowserViewType,
-  StorageDirectoryTableData
+  StorageDirectoryTableData,
+  FileSystem
 } from '../../../reactComponents/FileChooser/types';
 import Pagination from '../../../reactComponents/Pagination/Pagination';
 import StorageBrowserActions from './StorageBrowserActions/StorageBrowserActions';
@@ -57,6 +58,7 @@ import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/Lo
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
+  config: FileSystem['config'];
   onFilePathChange: (path: string) => void;
   className?: string;
   rowClassName?: string;
@@ -71,6 +73,7 @@ const defaultProps = {
 
 const StorageDirectoryPage = ({
   fileStats,
+  config,
   onFilePathChange,
   className,
   rowClassName,
@@ -283,13 +286,8 @@ const StorageDirectoryPage = ({
         />
         <div className="hue-storage-browser__actions-bar-right">
           <StorageBrowserActions
+            config={config}
             currentPath={fileStats.path}
-            isTrashEnabled={filesData?.is_trash_enabled}
-            isFsSuperUser={filesData?.is_fs_superuser}
-            superUser={filesData?.superuser}
-            superGroup={filesData?.supergroup}
-            users={filesData?.users}
-            groups={filesData?.groups}
             selectedFiles={selectedFiles}
             setLoadingFiles={setLoadingFiles}
             onSuccessfulAction={reloadData}
