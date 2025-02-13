@@ -37,7 +37,7 @@ import huePubSub from '../../../../utils/huePubSub';
 import './StorageBrowserActions.scss';
 import {
   FileStats,
-  ListDirectory,
+  FileSystem,
   StorageDirectoryTableData
 } from '../../../../reactComponents/FileChooser/types';
 import { ActionType, getEnabledActions } from './StorageBrowserActions.util';
@@ -53,13 +53,7 @@ import ChangeOwnerAndGroupModal from './ChangeOwnerAndGroupModal/ChangeOwnerAndG
 import ChangePermissionModal from './ChangePermissionModal/ChangePermissionModal';
 
 interface StorageBrowserRowActionsProps {
-  // TODO: move relevant keys to hue_config
-  superUser?: ListDirectory['superuser'];
-  superGroup?: ListDirectory['supergroup'];
-  users?: ListDirectory['users'];
-  groups?: ListDirectory['groups'];
-  isFsSuperUser?: ListDirectory['is_fs_superuser'];
-  isTrashEnabled?: boolean;
+  config: FileSystem['config'];
   currentPath: FileStats['path'];
   selectedFiles: StorageDirectoryTableData[];
   onSuccessfulAction: () => void;
@@ -81,12 +75,7 @@ const iconsMap: Record<ActionType, JSX.Element> = {
 };
 
 const StorageBrowserActions = ({
-  superUser,
-  superGroup,
-  users,
-  groups,
-  isFsSuperUser,
-  isTrashEnabled,
+  config,
   currentPath,
   selectedFiles,
   onSuccessfulAction,
@@ -124,7 +113,7 @@ const StorageBrowserActions = ({
   };
 
   const actionItems: MenuItemType[] = useMemo(() => {
-    const enabledActions = getEnabledActions(t, selectedFiles, isFsSuperUser);
+    const enabledActions = getEnabledActions(t, selectedFiles, config?.is_hdfs_superuser);
     return enabledActions.map(action => ({
       key: String(action.type),
       label: t(action.label),
@@ -181,7 +170,7 @@ const StorageBrowserActions = ({
       )}
       {selectedAction === ActionType.Delete && (
         <DeletionModal
-          isTrashEnabled={isTrashEnabled}
+          isTrashEnabled={config?.is_trash_enabled}
           files={selectedFiles}
           onSuccess={onApiSuccess}
           onError={onApiError}
@@ -212,10 +201,10 @@ const StorageBrowserActions = ({
       {selectedAction === ActionType.ChangeOwnerAndGroup && (
         <ChangeOwnerAndGroupModal
           files={selectedFiles}
-          superUser={superUser}
-          superGroup={superGroup}
-          users={users}
-          groups={groups}
+          superUser={config?.superuser}
+          superGroup={config?.supergroup}
+          users={config?.users}
+          groups={config?.groups}
           onSuccess={onApiSuccess}
           onError={onApiError}
           onClose={closeModal}
