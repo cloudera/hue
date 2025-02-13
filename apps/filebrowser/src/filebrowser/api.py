@@ -253,7 +253,7 @@ def listdir_paged(request):
     pagenum (int): The page number to show. Defaults to 1.
     pagesize (int): How many items to show on a page. Defaults to 30.
     sortby (str): The attribute to sort by. Valid options: 'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'.
-                  Defaults to 'name'.
+                  Defaults to 'type'.
     descending (bool): Sort in descending order when true. Defaults to false.
     filter (str): Substring to filter filenames. Optional.
 
@@ -295,31 +295,30 @@ def listdir_paged(request):
     all_stats = [sb for sb in all_stats if filter_string in sb['name']]
 
   # Next, sort with proper handling of None values
-  sortby = request.GET.get('sortby')
+  sortby = request.GET.get('sortby', 'type')
   descending = coerce_bool(request.GET.get('descending', False))
-  if sortby:
-    valid_sort_fields = {'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'}
+  valid_sort_fields = {'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'}
 
-    if sortby not in valid_sort_fields:
-      LOG.info(f"Ignoring invalid sort attribute '{sortby}' for list directory operation.")
-    else:
-      numeric_fields = {'size', 'atime', 'mtime'}
+  if sortby not in valid_sort_fields:
+    LOG.info(f"Ignoring invalid sort attribute '{sortby}' for list directory operation.")
+  else:
+    numeric_fields = {'size', 'atime', 'mtime'}
 
-      def sorting_key(item):
-        """Generate a sorting key that handles None values for different field types."""
-        value = getattr(item, sortby)
-        if sortby in numeric_fields:
-          # Treat None as 0 for numeric fields for comparison
-          return 0 if value is None else value
-        else:
-          # Treat None as an empty string for non-numeric fields
-          return '' if value is None else value
+    def sorting_key(item):
+      """Generate a sorting key that handles None values for different field types."""
+      value = getattr(item, sortby)
+      if sortby in numeric_fields:
+        # Treat None as 0 for numeric fields for comparison
+        return 0 if value is None else value
+      else:
+        # Treat None as an empty string for non-numeric fields
+        return '' if value is None else value
 
-      try:
-        all_stats = sorted(all_stats, key=sorting_key, reverse=descending)
-      except Exception as sort_error:
-        LOG.error(f"Error during sorting with attribute '{sortby}': {sort_error}")
-        return HttpResponse("An error occurred while sorting the directory contents.", status=500)
+    try:
+      all_stats = sorted(all_stats, key=sorting_key, reverse=descending)
+    except Exception as sort_error:
+      LOG.error(f"Error during sorting with attribute '{sortby}': {sort_error}")
+      return HttpResponse("An error occurred while sorting the directory contents.", status=500)
 
   # Do pagination
   try:
@@ -329,7 +328,7 @@ def listdir_paged(request):
   except EmptyPage:
     message = "No results found for the requested page."
     LOG.warning(message)
-    return HttpResponse(message, status=404)  # TODO: status code?
+    return HttpResponse(message, status=404)
 
   if page:
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
