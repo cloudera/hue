@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { TFunction } from 'i18next';
-import { FileStats } from '../../../reactComponents/FileChooser/types';
+import { FileStats } from '../types';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import formatBytes from '../../../utils/formatBytes';
 import {

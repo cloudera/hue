@@ -19,7 +19,7 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import ChangeOwnerAndGroupModal from './ChangeOwnerAndGroupModal';
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
+import { StorageDirectoryTableData } from '../../../types';
 
 const mockFiles: StorageDirectoryTableData[] = [
   {

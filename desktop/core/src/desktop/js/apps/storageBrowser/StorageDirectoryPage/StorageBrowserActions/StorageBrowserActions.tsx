@@ -35,11 +35,7 @@ import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import './StorageBrowserActions.scss';
-import {
-  FileStats,
-  FileSystem,
-  StorageDirectoryTableData
-} from '../../../../reactComponents/FileChooser/types';
+import { FileStats, FileSystem, StorageDirectoryTableData } from '../../types';
 import { ActionType, getEnabledActions } from './StorageBrowserActions.util';
 import MoveCopyModal from './MoveCopyModal/MoveCopyModal';
 import RenameModal from './RenameModal/RenameModal';
@@ -48,7 +44,7 @@ import SummaryModal from './SummaryModal/SummaryModal';
 import DeletionModal from './DeletionModal/DeletionModal';
 import CompressionModal from './CompressionModal/CompressionModal';
 import ExtractionModal from './ExtractionModal/ExtractionModal';
-import { DOWNLOAD_API_URL } from '../../../../reactComponents/FileChooser/api';
+import { DOWNLOAD_API_URL } from '../../api';
 import ChangeOwnerAndGroupModal from './ChangeOwnerAndGroupModal/ChangeOwnerAndGroupModal';
 import ChangePermissionModal from './ChangePermissionModal/ChangePermissionModal';
 

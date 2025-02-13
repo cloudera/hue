@@ -22,11 +22,8 @@ import huePubSub from '../../../../../utils/huePubSub';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import formatBytes from '../../../../../utils/formatBytes';
 import useLoadData from '../../../../../utils/hooks/useLoadData/useLoadData';
-import { CONTENT_SUMMARY_API_URL } from '../../../../../reactComponents/FileChooser/api';
-import {
-  ContentSummary,
-  StorageDirectoryTableData
-} from '../../../../../reactComponents/FileChooser/types';
+import { CONTENT_SUMMARY_API_URL } from '../../../api';
+import { ContentSummary, StorageDirectoryTableData } from '../../../types';
 
 import './SummaryModal.scss';
 

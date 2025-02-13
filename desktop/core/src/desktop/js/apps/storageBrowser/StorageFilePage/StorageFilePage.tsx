@@ -15,20 +15,12 @@
 // limitations under the License.
 
 import React, { useMemo, useState } from 'react';
-import {
-  BrowserViewType,
-  FilePreview,
-  FileStats
-} from '../../../reactComponents/FileChooser/types';
+import { BrowserViewType, FilePreview, FileStats } from '../types';
 import './StorageFilePage.scss';
 import { i18nReact } from '../../../utils/i18nReact';
 import Button, { PrimaryButton } from 'cuix/dist/components/Button';
 import { getFileMetaData, getFileType } from './StorageFilePage.util';
-import {
-  DOWNLOAD_API_URL,
-  FILE_PREVIEW_API_URL,
-  SAVE_FILE_API_URL
-} from '../../../reactComponents/FileChooser/api';
+import { DOWNLOAD_API_URL, FILE_PREVIEW_API_URL, SAVE_FILE_API_URL } from '../api';
 import huePubSub from '../../../utils/huePubSub';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import Pagination from '../../../reactComponents/Pagination/Pagination';

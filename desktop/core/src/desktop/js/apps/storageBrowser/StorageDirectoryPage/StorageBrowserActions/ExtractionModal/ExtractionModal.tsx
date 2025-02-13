@@ -18,8 +18,8 @@ import React from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
-import { EXTRACT_API_URL } from '../../../../../reactComponents/FileChooser/api';
+import { StorageDirectoryTableData } from '../../../types';
+import { EXTRACT_API_URL } from '../../../api';
 
 interface ExtractActionProps {
   currentPath: string;

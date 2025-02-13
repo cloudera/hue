@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { getInitialPermissions } from './ChangePermissionModal.util';
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
+import { StorageDirectoryTableData } from '../../../types';
 
 describe('getInitialPermissions', () => {
   const mockFiles: StorageDirectoryTableData[] = [

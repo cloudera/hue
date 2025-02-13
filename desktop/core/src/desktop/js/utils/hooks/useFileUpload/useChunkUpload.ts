@@ -36,7 +36,7 @@ import {
   UploadItem
 } from './util';
 import { get } from '../../../api/utils';
-import { UPLOAD_AVAILABLE_SPACE_URL } from '../../../reactComponents/FileChooser/api';
+import { UPLOAD_AVAILABLE_SPACE_URL } from '../../../apps/storageBrowser/api';
 
 interface UseUploadQueueResponse {
   addFiles: (item: UploadItem[]) => void;

@@ -19,8 +19,8 @@ import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { Checkbox, Table } from 'antd';
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
-import { BULK_CHANGE_PERMISSION_API_URL } from '../../../../../reactComponents/FileChooser/api';
+import { StorageDirectoryTableData } from '../../../types';
+import { BULK_CHANGE_PERMISSION_API_URL } from '../../../api';
 import { getInitialPermissions, Permission } from './ChangePermissionModal.util';
 
 import './ChangePermissionModal.scss';

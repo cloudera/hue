@@ -22,13 +22,13 @@ import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 import { i18nReact } from '../../utils/i18nReact';
 import CommonHeader from '../../reactComponents/CommonHeader/CommonHeader';
 import StorageBrowserTab from './StorageBrowserTab/StorageBrowserTab';
-import { FILESYSTEMS_API_URL } from '../../reactComponents/FileChooser/api';
+import { FILESYSTEMS_API_URL } from './api';
 
 import './StorageBrowserPage.scss';
 import useLoadData from '../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import { getFileSystemAndPath } from '../../reactComponents/PathBrowser/PathBrowser.util';
-import { FileSystem } from '../../reactComponents/FileChooser/types';
+import { FileSystem } from './types';
 
 const StorageBrowserPage = (): JSX.Element => {
   const urlSearchParams = new URLSearchParams(window.location.search);

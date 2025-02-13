@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 import StorageBrowserActions from './StorageBrowserActions';
-import { StorageDirectoryTableData } from '../../../../reactComponents/FileChooser/types';
+import { StorageDirectoryTableData } from '../../types';
 import { get } from '../../../../api/utils';
 import huePubSub from '../../../../utils/huePubSub';
 
