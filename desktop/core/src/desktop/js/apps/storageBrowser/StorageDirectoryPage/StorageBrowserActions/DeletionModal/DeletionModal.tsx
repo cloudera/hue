@@ -81,7 +81,7 @@ const DeletionModal = ({
       onCancel={onClose}
       onOk={() => handleDeletion()}
       open={isOpen}
-      title={t('Delete file')}
+      title={t('Confirm Delete')}
       secondaryButtonText={isTrashEnabled ? t('Delete Permanently') : undefined}
       onSecondary={() => handleDeletion(true)}
       secondaryButtonProps={{ disabled: loading }}

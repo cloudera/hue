@@ -65,7 +65,7 @@ describe('DeletionModal Component', () => {
       />
     );
 
-    expect(getByText('Delete file')).toBeInTheDocument();
+    expect(getByText('Confirm Delete')).toBeInTheDocument();
     expect(getByText('Move to Trash')).toBeInTheDocument();
     expect(getByText('Delete Permanently')).toBeInTheDocument();
     expect(getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe('DeletionModal Component', () => {
       />
     );
 
-    expect(getByText('Delete file')).toBeInTheDocument();
+    expect(getByText('Confirm Delete')).toBeInTheDocument();
     expect(queryByText('Move to Trash')).not.toBeInTheDocument();
     expect(getByText('Delete Permanently')).toBeInTheDocument();
     expect(getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
