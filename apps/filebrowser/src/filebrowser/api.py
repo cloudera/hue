@@ -253,7 +253,7 @@ def listdir_paged(request):
     pagenum (int): The page number to show. Defaults to 1.
     pagesize (int): How many items to show on a page. Defaults to 30.
     sortby (str): The attribute to sort by. Valid options: 'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'.
-                  Defaults to 'type'.
+                  Defaults to 'name'.
     descending (bool): Sort in descending order when true. Defaults to false.
     filter (str): Substring to filter filenames. Optional.
 
@@ -295,7 +295,7 @@ def listdir_paged(request):
     all_stats = [sb for sb in all_stats if filter_string in sb['name']]
 
   # Next, sort with proper handling of None values
-  sortby = request.GET.get('sortby', 'type')
+  sortby = request.GET.get('sortby', 'name')
   descending = coerce_bool(request.GET.get('descending', False))
   valid_sort_fields = {'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'}
 
