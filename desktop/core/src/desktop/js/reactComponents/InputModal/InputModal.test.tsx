@@ -28,14 +28,14 @@ describe('InputModal', () => {
   it('should render custom modal title', () => {
     const inputModal = render(
       <InputModal
-        title={'Custom title'}
-        inputLabel={'Enter File name here'}
-        submitText={'Create'}
+        title="Custom title"
+        inputLabel="Enter File name here"
+        submitText="Create"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
-        initialValue={''}
-        inputType={'text'}
+        initialValue=""
+        inputType="text"
       />
     );
     expect(inputModal.getByText('Custom title')).toBeVisible();
@@ -44,14 +44,14 @@ describe('InputModal', () => {
   it('should render custom input label', () => {
     const inputModal = render(
       <InputModal
-        title={'Create File'}
-        inputLabel={'Custom input label'}
-        submitText={'Create'}
+        title="Create File"
+        inputLabel="Custom input label"
+        submitText="Create"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
-        initialValue={''}
-        inputType={'text'}
+        initialValue=""
+        inputType="text"
       />
     );
     expect(inputModal.getByText('Custom input label')).toBeVisible();
@@ -61,14 +61,14 @@ describe('InputModal', () => {
     const user = userEvent.setup();
     render(
       <InputModal
-        title={'Create File'}
-        inputLabel={'Enter File name here'}
-        submitText={'Create'}
+        title="Create File"
+        inputLabel="Enter File name here"
+        submitText="Create"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
-        initialValue={''}
-        inputType={'text'}
+        initialValue=""
+        inputType="text"
       />
     );
     const submitButton = screen.getByRole('button', { name: 'Create' });
@@ -86,14 +86,14 @@ describe('InputModal', () => {
     const user = userEvent.setup();
     render(
       <InputModal
-        title={'Create File'}
-        inputLabel={'Enter File name here'}
-        submitText={'Create'}
+        title="Create File"
+        inputLabel="Enter File name here"
+        submitText="Create"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
-        initialValue={''}
-        inputType={'text'}
+        initialValue=""
+        inputType="text"
       />
     );
     const closeButton = screen.getByRole('button', { name: 'Cancel' });
@@ -106,14 +106,14 @@ describe('InputModal', () => {
   it('should render modal with input visible', () => {
     render(
       <InputModal
-        title={'Create File'}
-        inputLabel={'Custom input label'}
-        submitText={'Create'}
+        title="Create File"
+        inputLabel="Custom input label"
+        submitText="Create"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
-        initialValue={''}
-        inputType={'text'}
+        initialValue=""
+        inputType="text"
       />
     );
     const input = screen.getByRole('textbox');
@@ -124,14 +124,14 @@ describe('InputModal', () => {
   it('should render modal with number input when input type is number', () => {
     render(
       <InputModal
-        title={'Set replication'}
-        inputLabel={'Custom input label'}
-        submitText={'Submit'}
+        title="Set replication"
+        inputLabel="Custom input label"
+        submitText="Submit"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
         initialValue={2}
-        inputType={'number'}
+        inputType="number"
       />
     );
     const input = screen.getByRole('spinbutton');
@@ -142,14 +142,14 @@ describe('InputModal', () => {
   it('should render modal with empty input value when intial value is empty', () => {
     render(
       <InputModal
-        title={'Create File'}
-        inputLabel={'Custom input label'}
-        submitText={'Create'}
+        title="Create File"
+        inputLabel="Custom input label"
+        submitText="Create"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
-        initialValue={''}
-        inputType={'text'}
+        initialValue=""
+        inputType="text"
       />
     );
     expect(screen.getByRole('textbox')).toHaveValue('');
@@ -158,14 +158,14 @@ describe('InputModal', () => {
   it('should render modal with intial value in input while input type is text', () => {
     render(
       <InputModal
-        title={'Create File'}
-        inputLabel={'Custom input label'}
-        submitText={'Create'}
+        title="Create File"
+        inputLabel="Custom input label"
+        submitText="Create"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
-        initialValue={'hello'}
-        inputType={'text'}
+        initialValue="hello"
+        inputType="text"
       />
     );
     expect(screen.getByRole('textbox')).toHaveValue('hello');
@@ -174,14 +174,14 @@ describe('InputModal', () => {
   it('should render modal with intial value in input while input type is number', () => {
     render(
       <InputModal
-        title={'Create File'}
-        inputLabel={'Custom input label'}
-        submitText={'Create'}
+        title="Create File"
+        inputLabel="Custom input label"
+        submitText="Create"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
         initialValue={2}
-        inputType={'number'}
+        inputType="number"
       />
     );
     expect(screen.getByRole('spinbutton')).toHaveValue(2);
@@ -191,14 +191,14 @@ describe('InputModal', () => {
     const user = userEvent.setup();
     render(
       <InputModal
-        title={'Create File'}
-        inputLabel={'Custom input label'}
-        submitText={'Create'}
+        title="Create File"
+        inputLabel="Custom input label"
+        submitText="Create"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
-        initialValue={''}
-        inputType={'text'}
+        initialValue=""
+        inputType="text"
       />
     );
     const inputModal = screen.getByRole('dialog', { name: 'Create File' });
@@ -219,18 +219,42 @@ describe('InputModal', () => {
   it('should disable the submit button when buttonDisabled is true', () => {
     render(
       <InputModal
-        title={'Create File'}
-        inputLabel={'Custom input label'}
-        submitText={'Create'}
+        title="Create File"
+        inputLabel="Custom input label"
+        submitText="Create"
         showModal={true}
         onSubmit={mockOnSubmit}
         onClose={mockOnClose}
-        initialValue={''}
-        inputType={'text'}
+        initialValue=""
+        inputType="text"
         buttonDisabled={true}
       />
     );
     const submitButton = screen.getByRole('button', { name: 'Create' });
     expect(submitButton).toBeDisabled();
+  });
+
+  it('should disable the submit button when input value is same as initial value', async () => {
+    const user = userEvent.setup();
+    render(
+      <InputModal
+        title="Create File"
+        inputLabel="Custom input label"
+        submitText="Create"
+        showModal={true}
+        onSubmit={mockOnSubmit}
+        onClose={mockOnClose}
+        initialValue="sample_file.txt"
+        inputType="text"
+      />
+    );
+
+    const submitButton = screen.getByRole('button', { name: 'Create' });
+    expect(submitButton).toBeDisabled();
+
+    const inputField = screen.getByRole('textbox');
+    await user.type(inputField, 'test-file.txt');
+
+    expect(submitButton).not.toBeDisabled();
   });
 });
