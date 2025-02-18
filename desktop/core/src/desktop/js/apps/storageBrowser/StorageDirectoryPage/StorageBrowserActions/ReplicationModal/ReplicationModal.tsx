@@ -15,11 +15,11 @@
 // limitations under the License.
 
 import React from 'react';
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
+import { StorageDirectoryTableData } from '../../../types';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
-import { SET_REPLICATION_API_URL } from '../../../../../reactComponents/FileChooser/api';
-import InputModal from '../../../InputModal/InputModal';
+import { SET_REPLICATION_API_URL } from '../../../api';
+import InputModal from '../../../../../reactComponents/InputModal/InputModal';
 
 interface ReplicationModalProps {
   isOpen?: boolean;

@@ -21,8 +21,8 @@ import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
-import { FILE_STATS_API_URL } from '../../../reactComponents/FileChooser/api';
-import { BrowserViewType, FileStats } from '../../../reactComponents/FileChooser/types';
+import { FILE_STATS_API_URL } from '../api';
+import { BrowserViewType, FileStats, FileSystem } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 import './StorageBrowserTab.scss';
@@ -32,8 +32,7 @@ import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/Lo
 import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageBrowserTabProps {
-  homeDir: string;
-  fileSystem: string;
+  fileSystem: FileSystem;
   testId?: string;
 }
 
@@ -41,16 +40,13 @@ const defaultProps = {
   testId: 'hue-storage-browser-tab-content'
 };
 
-const StorageBrowserTab = ({
-  homeDir,
-  fileSystem,
-  testId
-}: StorageBrowserTabProps): JSX.Element => {
+const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.Element => {
   const urlPathname = window.location.pathname;
   const urlSearchParams = new URLSearchParams(window.location.search);
   const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
   const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
-  const initialFilePath = urlFileSystem === fileSystem ? urlFilePath : homeDir;
+  const initialFilePath =
+    urlFileSystem === fileSystem.file_system ? urlFilePath : fileSystem.user_home_directory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
   const fileName = filePath.split('/').pop() ?? '';
@@ -84,12 +80,12 @@ const StorageBrowserTab = ({
       enabled: error?.response?.status === 404,
       message: t('Error: Path "{{path}}" not found.', { path: filePath }),
       action: t('Go to home directory'),
-      onClick: () => setFilePath(homeDir)
+      onClick: () => setFilePath(fileSystem.user_home_directory)
     },
     {
       enabled: !!error && error?.response?.status !== 404,
       message: t('An error occurred while fetching filesystem "{{fileSystem}}".', {
-        fileSystem: fileSystem.toUpperCase()
+        fileSystem: fileSystem.file_system.toUpperCase()
       }),
       action: t('Retry'),
       onClick: reloadData
@@ -118,7 +114,11 @@ const StorageBrowserTab = ({
           />
         </div>
         {fileStats?.type === BrowserViewType.dir && !loading && (
-          <StorageDirectoryPage fileStats={fileStats} onFilePathChange={setFilePath} />
+          <StorageDirectoryPage
+            fileStats={fileStats}
+            onFilePathChange={setFilePath}
+            config={fileSystem.config}
+          />
         )}
         {fileStats?.type === BrowserViewType.file && !loading && (
           <StorageFilePage fileName={fileName} fileStats={fileStats} onReload={reloadData} />

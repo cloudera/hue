@@ -18,11 +18,8 @@ import React from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
-import {
-  BULK_DELETION_API_URL,
-  DELETION_API_URL
-} from '../../../../../reactComponents/FileChooser/api';
+import { StorageDirectoryTableData } from '../../../types';
+import { BULK_DELETION_API_URL, DELETION_API_URL } from '../../../api';
 
 interface DeletionModalProps {
   isOpen?: boolean;
@@ -81,7 +78,7 @@ const DeletionModal = ({
       onCancel={onClose}
       onOk={() => handleDeletion()}
       open={isOpen}
-      title={t('Delete file')}
+      title={t('Confirm Delete')}
       secondaryButtonText={isTrashEnabled ? t('Delete Permanently') : undefined}
       onSecondary={() => handleDeletion(true)}
       secondaryButtonProps={{ disabled: loading }}

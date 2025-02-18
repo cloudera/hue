@@ -28,14 +28,15 @@ import Table from 'cuix/dist/components/Table';
 import { i18nReact } from '../../../utils/i18nReact';
 import useDebounce from '../../../utils/useDebounce';
 
-import { LIST_DIRECTORY_API_URL } from '../../../reactComponents/FileChooser/api';
+import { LIST_DIRECTORY_API_URL } from '../api';
 import {
   SortOrder,
   ListDirectory,
   FileStats,
   BrowserViewType,
-  StorageDirectoryTableData
-} from '../../../reactComponents/FileChooser/types';
+  StorageDirectoryTableData,
+  FileSystem
+} from '../types';
 import Pagination from '../../../reactComponents/Pagination/Pagination';
 import StorageBrowserActions from './StorageBrowserActions/StorageBrowserActions';
 import formatBytes from '../../../utils/formatBytes';
@@ -57,6 +58,7 @@ import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/Lo
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
+  config: FileSystem['config'];
   onFilePathChange: (path: string) => void;
   className?: string;
   rowClassName?: string;
@@ -71,6 +73,7 @@ const defaultProps = {
 
 const StorageDirectoryPage = ({
   fileStats,
+  config,
   onFilePathChange,
   className,
   rowClassName,
@@ -283,13 +286,8 @@ const StorageDirectoryPage = ({
         />
         <div className="hue-storage-browser__actions-bar-right">
           <StorageBrowserActions
+            config={config}
             currentPath={fileStats.path}
-            isTrashEnabled={filesData?.is_trash_enabled}
-            isFsSuperUser={filesData?.is_fs_superuser}
-            superUser={filesData?.superuser}
-            superGroup={filesData?.supergroup}
-            users={filesData?.users}
-            groups={filesData?.groups}
             selectedFiles={selectedFiles}
             setLoadingFiles={setLoadingFiles}
             onSuccessfulAction={reloadData}

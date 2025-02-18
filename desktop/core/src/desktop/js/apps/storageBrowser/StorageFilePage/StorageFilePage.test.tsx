@@ -17,10 +17,10 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import StorageFilePage from './StorageFilePage';
-import { BrowserViewType, FileStats } from '../../../reactComponents/FileChooser/types';
+import { BrowserViewType, FileStats } from '../types';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-import { DOWNLOAD_API_URL } from '../../../reactComponents/FileChooser/api';
+import { DOWNLOAD_API_URL } from '../api';
 import huePubSub from '../../../utils/huePubSub';
 
 jest.mock('../../../utils/dateTimeUtils', () => ({

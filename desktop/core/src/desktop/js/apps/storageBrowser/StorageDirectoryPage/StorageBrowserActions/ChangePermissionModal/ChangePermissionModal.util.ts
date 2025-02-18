@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
+import { StorageDirectoryTableData } from '../../../types';
 
 interface entityPermission {
   read: boolean;

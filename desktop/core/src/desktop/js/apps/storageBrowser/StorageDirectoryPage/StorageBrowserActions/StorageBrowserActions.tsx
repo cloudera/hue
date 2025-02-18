@@ -35,11 +35,7 @@ import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import './StorageBrowserActions.scss';
-import {
-  FileStats,
-  ListDirectory,
-  StorageDirectoryTableData
-} from '../../../../reactComponents/FileChooser/types';
+import { FileStats, FileSystem, StorageDirectoryTableData } from '../../types';
 import { ActionType, getEnabledActions } from './StorageBrowserActions.util';
 import MoveCopyModal from './MoveCopyModal/MoveCopyModal';
 import RenameModal from './RenameModal/RenameModal';
@@ -48,18 +44,12 @@ import SummaryModal from './SummaryModal/SummaryModal';
 import DeletionModal from './DeletionModal/DeletionModal';
 import CompressionModal from './CompressionModal/CompressionModal';
 import ExtractionModal from './ExtractionModal/ExtractionModal';
-import { DOWNLOAD_API_URL } from '../../../../reactComponents/FileChooser/api';
+import { DOWNLOAD_API_URL } from '../../api';
 import ChangeOwnerAndGroupModal from './ChangeOwnerAndGroupModal/ChangeOwnerAndGroupModal';
 import ChangePermissionModal from './ChangePermissionModal/ChangePermissionModal';
 
 interface StorageBrowserRowActionsProps {
-  // TODO: move relevant keys to hue_config
-  superUser?: ListDirectory['superuser'];
-  superGroup?: ListDirectory['supergroup'];
-  users?: ListDirectory['users'];
-  groups?: ListDirectory['groups'];
-  isFsSuperUser?: ListDirectory['is_fs_superuser'];
-  isTrashEnabled?: boolean;
+  config: FileSystem['config'];
   currentPath: FileStats['path'];
   selectedFiles: StorageDirectoryTableData[];
   onSuccessfulAction: () => void;
@@ -81,12 +71,7 @@ const iconsMap: Record<ActionType, JSX.Element> = {
 };
 
 const StorageBrowserActions = ({
-  superUser,
-  superGroup,
-  users,
-  groups,
-  isFsSuperUser,
-  isTrashEnabled,
+  config,
   currentPath,
   selectedFiles,
   onSuccessfulAction,
@@ -124,7 +109,7 @@ const StorageBrowserActions = ({
   };
 
   const actionItems: MenuItemType[] = useMemo(() => {
-    const enabledActions = getEnabledActions(t, selectedFiles, isFsSuperUser);
+    const enabledActions = getEnabledActions(t, selectedFiles, config?.is_hdfs_superuser);
     return enabledActions.map(action => ({
       key: String(action.type),
       label: t(action.label),
@@ -181,7 +166,7 @@ const StorageBrowserActions = ({
       )}
       {selectedAction === ActionType.Delete && (
         <DeletionModal
-          isTrashEnabled={isTrashEnabled}
+          isTrashEnabled={config?.is_trash_enabled}
           files={selectedFiles}
           onSuccess={onApiSuccess}
           onError={onApiError}
@@ -212,10 +197,10 @@ const StorageBrowserActions = ({
       {selectedAction === ActionType.ChangeOwnerAndGroup && (
         <ChangeOwnerAndGroupModal
           files={selectedFiles}
-          superUser={superUser}
-          superGroup={superGroup}
-          users={users}
-          groups={groups}
+          superUser={config?.superuser}
+          superGroup={config?.supergroup}
+          users={config?.users}
+          groups={config?.groups}
           onSuccess={onApiSuccess}
           onError={onApiError}
           onClose={closeModal}

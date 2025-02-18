@@ -26,13 +26,10 @@ import { PrimaryButton } from 'cuix/dist/components/Button';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
-import {
-  CREATE_DIRECTORY_API_URL,
-  CREATE_FILE_API_URL
-} from '../../../../reactComponents/FileChooser/api';
-import { FileStats } from '../../../../reactComponents/FileChooser/types';
+import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../api';
+import { FileStats } from '../../types';
 import useSaveData from '../../../../utils/hooks/useSaveData/useSaveData';
-import InputModal from '../../InputModal/InputModal';
+import InputModal from '../../../../reactComponents/InputModal/InputModal';
 import './CreateAndUploadAction.scss';
 import DragAndDrop from '../../../../reactComponents/DragAndDrop/DragAndDrop';
 
@@ -151,24 +148,19 @@ const CreateAndUploadAction = ({
           <DropDownIcon />
         </PrimaryButton>
       </Dropdown>
-      <InputModal
-        title={t('Create New Folder')}
-        inputLabel={t('Enter New Folder Name')}
-        submitText={t('Create')}
-        showModal={selectedAction === ActionType.createFolder}
-        onSubmit={handleCreate}
-        onClose={onModalClose}
-        buttonDisabled={loading}
-      />
-      <InputModal
-        title={t('Create New File')}
-        inputLabel={t('Enter New File Name')}
-        submitText={t('Create')}
-        showModal={selectedAction === ActionType.createFile}
-        onSubmit={handleCreate}
-        onClose={onModalClose}
-        buttonDisabled={loading}
-      />
+      {(selectedAction === ActionType.createFolder || selectedAction === ActionType.createFile) && (
+        <InputModal
+          showModal={true}
+          title={selectedAction === ActionType.createFolder ? t('Create Folder') : t('Create File')}
+          inputLabel={
+            selectedAction === ActionType.createFolder ? t('Folder name') : t('File name')
+          }
+          submitText={t('Create')}
+          onSubmit={handleCreate}
+          onClose={onModalClose}
+          buttonDisabled={loading}
+        />
+      )}
       <Modal
         onCancel={onModalClose}
         className="hue-file-upload-modal cuix antd"

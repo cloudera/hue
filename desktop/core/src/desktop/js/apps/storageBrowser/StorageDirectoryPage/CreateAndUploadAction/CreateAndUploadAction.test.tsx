@@ -2,10 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CreateAndUploadAction from './CreateAndUploadAction';
-import {
-  CREATE_DIRECTORY_API_URL,
-  CREATE_FILE_API_URL
-} from '../../../../reactComponents/FileChooser/api';
+import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../api';
 
 const mockSave = jest.fn();
 jest.mock('../../../../utils/hooks/useSaveData/useSaveData', () => ({
@@ -55,7 +52,7 @@ describe('CreateAndUploadAction', () => {
     const newFolderButton = screen.getByText('New Folder');
     await act(async () => fireEvent.click(newFolderButton));
 
-    expect(screen.getByText('Create New Folder')).toBeInTheDocument();
+    expect(screen.getByText('Create Folder')).toBeInTheDocument();
   });
 
   it('should open the file creation modal when "New File" is clicked', async () => {
@@ -65,7 +62,7 @@ describe('CreateAndUploadAction', () => {
     const newFileButton = screen.getByText('New File');
     await act(async () => fireEvent.click(newFileButton));
 
-    expect(screen.getByText('Create New File')).toBeInTheDocument();
+    expect(screen.getByText('Create File')).toBeInTheDocument();
   });
 
   it('should open the upload file modal when "New Upload" is clicked', async () => {

@@ -2,11 +2,8 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import DeletionModal from './DeletionModal';
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
-import {
-  BULK_DELETION_API_URL,
-  DELETION_API_URL
-} from '../../../../../reactComponents/FileChooser/api';
+import { StorageDirectoryTableData } from '../../../types';
+import { BULK_DELETION_API_URL, DELETION_API_URL } from '../../../api';
 
 const mockFiles: StorageDirectoryTableData[] = [
   {
@@ -65,7 +62,7 @@ describe('DeletionModal Component', () => {
       />
     );
 
-    expect(getByText('Delete file')).toBeInTheDocument();
+    expect(getByText('Confirm Delete')).toBeInTheDocument();
     expect(getByText('Move to Trash')).toBeInTheDocument();
     expect(getByText('Delete Permanently')).toBeInTheDocument();
     expect(getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
@@ -84,7 +81,7 @@ describe('DeletionModal Component', () => {
       />
     );
 
-    expect(getByText('Delete file')).toBeInTheDocument();
+    expect(getByText('Confirm Delete')).toBeInTheDocument();
     expect(queryByText('Move to Trash')).not.toBeInTheDocument();
     expect(getByText('Delete Permanently')).toBeInTheDocument();
     expect(getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
