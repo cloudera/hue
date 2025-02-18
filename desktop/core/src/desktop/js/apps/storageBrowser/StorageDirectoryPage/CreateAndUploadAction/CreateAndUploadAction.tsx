@@ -26,11 +26,8 @@ import { PrimaryButton } from 'cuix/dist/components/Button';
 
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
-import {
-  CREATE_DIRECTORY_API_URL,
-  CREATE_FILE_API_URL
-} from '../../../../reactComponents/FileChooser/api';
-import { FileStats } from '../../../../reactComponents/FileChooser/types';
+import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../api';
+import { FileStats } from '../../types';
 import useSaveData from '../../../../utils/hooks/useSaveData/useSaveData';
 import InputModal from '../../../../reactComponents/InputModal/InputModal';
 import './CreateAndUploadAction.scss';

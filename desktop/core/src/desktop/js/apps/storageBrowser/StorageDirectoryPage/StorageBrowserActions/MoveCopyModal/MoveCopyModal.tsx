@@ -18,15 +18,9 @@ import React from 'react';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { ActionType } from '../StorageBrowserActions.util';
-import {
-  BULK_COPY_API_URL,
-  BULK_MOVE_API_URL
-} from '../../../../../reactComponents/FileChooser/api';
+import { BULK_COPY_API_URL, BULK_MOVE_API_URL } from '../../../api';
 import FileChooserModal from '../../../FileChooserModal/FileChooserModal';
-import {
-  FileStats,
-  StorageDirectoryTableData
-} from '../../../../../reactComponents/FileChooser/types';
+import { FileStats, StorageDirectoryTableData } from '../../../types';
 
 interface MoveCopyModalProps {
   isOpen?: boolean;
