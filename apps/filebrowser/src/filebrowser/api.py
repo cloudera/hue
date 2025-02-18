@@ -177,8 +177,11 @@ def download(request):
 
   This is inspired by django.views.static.serve (?disposition={attachment, inline})
 
-  :param request: The current request object
-  :return: A response object with the file contents or an error message
+  Args:
+    request: The current request object
+
+  Returns:
+    A response object with the file contents or an error message
   """
   path = request.GET.get('path')
   path = _normalize_path(path)
@@ -217,11 +220,13 @@ def download(request):
   else:
     response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
 
+    content_disposition = (
+      request.GET.get('disposition') if request.GET.get('disposition') == 'inline' and _can_inline_display(path) else 'attachment'
+    )
+
+    response['Content-Disposition'] = f'{content_disposition}; filename="{stats["name"]}"'
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
-    response['Content-Disposition'] = (
-      request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') if _can_inline_display(path) else 'attachment'
-    )
 
     if FILE_DOWNLOAD_CACHE_CONTROL.get():
       response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
@@ -549,7 +554,7 @@ def mkdir(request):
   path = request.POST.get('path')
   name = request.POST.get('name')
 
-  # Check if source and destination paths are provided
+  # Check if path and name are provided
   if not path or not name:
     return HttpResponse("Missing required parameters: path and name are required.", status=400)
 
@@ -620,7 +625,7 @@ def rename(request):
   _, source_path_ext = os.path.splitext(source_path)
   _, dest_path_ext = os.path.splitext(destination_path)
 
-  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]
+  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()] if RESTRICT_FILE_EXTENSIONS.get() else []
   # Check if destination path has a restricted file type and it doesn't match the source file type
   if dest_path_ext.lower() in restricted_file_types and (source_path_ext.lower() != dest_path_ext.lower()):
     return HttpResponse(f'Cannot rename file to a restricted file type: "{dest_path_ext}"', status=403)
@@ -642,13 +647,57 @@ def rename(request):
   return HttpResponse(status=200)
 
 
+def _is_destination_parent_of_source(request, source_path, destination_path):
+  """Check if the destination path is the parent directory of the source path."""
+  return request.fs.parent_path(source_path) == request.fs.normpath(destination_path)
+
+
+def _validate_copy_move_operation(request, source_path, destination_path):
+  """Validate the input parameters for copy and move operations for different scenarios."""
+
+  # Check if source and destination paths are provided
+  if not source_path or not destination_path:
+    return HttpResponse("Missing required parameters: source_path and destination_path are required.", status=400)
+
+  # Check if paths are identical
+  if request.fs.normpath(source_path) == request.fs.normpath(destination_path):
+    return HttpResponse('Source and destination paths must be different.', status=400)
+
+  # Verify source path exists
+  if not request.fs.exists(source_path):
+    return HttpResponse('Source file or folder does not exist.', status=404)
+
+  # Check if the destination path is a directory
+  if not request.fs.isdir(destination_path):
+    return HttpResponse('Destination path must be a directory.', status=400)
+
+  # Check if destination path is parent of source path
+  if _is_destination_parent_of_source(request, source_path, destination_path):
+    return HttpResponse('Destination cannot be the parent directory of source.', status=400)
+
+  # Check if file or folder already exists at destination path
+  if request.fs.exists(request.fs.join(destination_path, os.path.basename(source_path))):
+    return HttpResponse('File or folder already exists at destination path.', status=409)
+
+
 @api_error_handler
 def move(request):
+  """
+  Move a file or folder from source path to destination path.
+
+  Args:
+    request: The request object containing source and destination paths
+
+  Returns:
+    Success or error response with appropriate status codes
+  """
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
-  if source_path == destination_path:
-    return HttpResponse('Source and destination path cannot be same.', status=400)
+  # Validate the operation and return error response if any scenario fails
+  validation_response = _validate_copy_move_operation(request, source_path, destination_path)
+  if validation_response:
+    return validation_response
 
   request.fs.rename(source_path, destination_path)
   return HttpResponse(status=200)
@@ -656,17 +705,28 @@ def move(request):
 
 @api_error_handler
 def copy(request):
+  """
+  Copy a file or folder from the source path to the destination path.
+
+  Args:
+    request: The request object containing source and destination path
+
+  Returns:
+    Success or error response with appropriate status codes
+  """
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
-  if source_path == destination_path:
-    return HttpResponse('Source and destination path cannot be same.', status=400)
+  # Validate the operation and return error response if any scenario fails
+  validation_response = _validate_copy_move_operation(request, source_path, destination_path)
+  if validation_response:
+    return validation_response
 
   # Copy method for Ozone FS returns a string of skipped files if their size is greater than configured chunk size.
   if source_path.startswith('ofs://'):
     ofs_skip_files = request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
     if ofs_skip_files:
-      return JsonResponse(ofs_skip_files, status=500)  # TODO: Status code?
+      return JsonResponse({'skipped_files': ofs_skip_files}, status=500)  # TODO: Status code?
   else:
     request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
 
@@ -872,12 +932,16 @@ def bulk_op(request, op):
     response = op(request)
 
     if response.status_code != 200:
-      error_dict[p] = {'error': response.content}
-      if op == copy and p.startswith('ofs://'):
-        error_dict[p].update({'ofs_skip_files': response.content})
+      # TODO: Improve the error handling with new error UX
+      # Currently, we are storing the error in the error_dict based on response type for each path
+      res_content = response.content.decode('utf-8')
+      if isinstance(response, JsonResponse):
+        error_dict[p] = json.loads(res_content)  # Simply assign to not have dupicate error fields
+      else:
+        error_dict[p] = {'error': res_content}
 
   if error_dict:
-    return JsonResponse(error_dict, status_code=500)  # TODO: Check if we need diff status code or diff json structure?
+    return JsonResponse(error_dict, status=500)  # TODO: Check if we need diff status code or diff json structure?
 
   return HttpResponse(status=200)  # TODO: Check if we need to send some message or diff status code?
 

@@ -27,7 +27,6 @@ import Pagination from '../../../reactComponents/Pagination/Pagination';
 import {
   DEFAULT_PREVIEW_PAGE_SIZE,
   EDITABLE_FILE_FORMATS,
-  SUPPORTED_FILE_EXTENSIONS,
   SupportedFileTypes
 } from '../../../utils/constants/storageBrowser';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
@@ -199,7 +198,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
             </div>
 
             <div className="preview__content">
-              {fileType === SupportedFileTypes.TEXT && (
+              {[SupportedFileTypes.TEXT, SupportedFileTypes.OTHER].includes(fileType) && (
                 <div className="preview__editable-file">
                   <textarea
                     value={fileContent}
@@ -244,12 +243,11 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                 </video>
               )}
 
-              {fileType === SupportedFileTypes.OTHER && (
-                <div className="preview__unsupported">
-                  {t('Preview not available for this file. Please download the file to view.')}
-                  <br />
-                  {t(`Supported file extensions: 
-                ${Object.keys(SUPPORTED_FILE_EXTENSIONS).join(', ')}`)}
+              {fileType === SupportedFileTypes.COMPRESSED && (
+                <div className="preview__compresed">
+                  {t(
+                    'Preview not available for compressed file. Please download the file to view.'
+                  )}
                 </div>
               )}
             </div>
