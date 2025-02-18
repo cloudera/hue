@@ -20,11 +20,13 @@ $cell-height: 40px;
 $table-placeholder-height: 100px;
 $action-dropdown-width: 214px;
 $icon-margin: 5px;
+// $icon-height: 24px;
+// $icon-width: 24px;
 
 .antd.cuix {
   .hue-storage-browser__actions-bar {
     display: flex;
-    margin: vars.$fluidx-spacing-s 0 vars.$fluidx-spacing-s vars.$fluidx-spacing-xs;
+    margin: vars.$fluidx-spacing-s 0 vars.$fluidx-spacing-s vars.$fluidx-spacing-xxs;
     justify-content: space-between;
   }
 
@@ -60,6 +62,7 @@ $icon-margin: 5px;
   .hue-storage-browser__table-cell-icon {
     color: vars.$fluidx-blue-700;
     margin-right: 6px;
+    vertical-align: middle;
   }
 
   .hue-storage-browser__table-row {

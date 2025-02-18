@@ -52,10 +52,10 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     urlFileSystem === fileSystem.file_system ? urlFilePath : fileSystem.user_home_directory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
-  const fileName = filePath.split('/').pop() ?? '';
+  const fileName =
+    filePath.split('/').pop() !== '' ? filePath.split('/').pop() : filePath.split('://')[0];
 
   const { t } = i18nReact.useTranslation();
-
   const {
     data: fileStats,
     loading,
@@ -132,7 +132,6 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           className="hue-storage-browser__path-browser-panel"
           data-testid={`${testId}-path-browser-panel`}
         >
-          <span className="hue-storage-browser__filePath">{t('File Path:')}</span>
           <PathBrowser
             filePath={filePath}
             onFilepathChange={setFilePath}
