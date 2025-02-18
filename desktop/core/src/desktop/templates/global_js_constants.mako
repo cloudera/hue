@@ -72,7 +72,7 @@
     oozie_info: { url: '/oozie/list_oozie_info', title: '${_('Oozie')}' },
     jobbrowser: { url: '/jobbrowser/apps', title: '${_('Job Browser')}' },
     filebrowser: { url: '/filebrowser/view=*', title: '${_('File Browser')}' },
-    newfilebrowser: { url: '/filebrowser/new', title: '${_('New File Browser')}' },
+    newfilebrowser: { url: '/filebrowser/new', title: '${_('Storage Browser')}' },
     home: { url: '/home*', title: '${_('Home')}' },
     catalog: { url: '/catalog', title: '${_('Catalog')}' },
     indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
