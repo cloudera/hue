@@ -156,8 +156,23 @@ describe('Pathbrowser', () => {
           showIcon
         />
       );
-      const input = screen.queryByDisplayValue('abfs://test/test1');
+      const input = screen.queryByDisplayValue(mockFilePath);
       expect(input).toBeNull();
+    });
+
+    it('should show input when edit path button is clicked', async () => {
+      render(
+        <PathBrowser
+          onFilepathChange={onFilepathChangeMock}
+          filePath={mockFilePath}
+          seperator={'/'}
+          showIcon
+        />
+      );
+      const editPathButton = screen.getByTestId('hue-path-browser__edit-path-btn');
+      await userEvent.click(editPathButton);
+      const input = screen.getByDisplayValue(mockFilePath);
+      expect(input).not.toBeNull();
     });
   });
 });

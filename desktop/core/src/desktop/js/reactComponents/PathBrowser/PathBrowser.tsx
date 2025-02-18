@@ -203,6 +203,7 @@ const PathBrowser = ({
         <BorderlessButton
           onClick={() => setIsEditMode(true)}
           className="hue-path-browser__edit-path-btn"
+          data-testid="hue-path-browser__edit-path-btn"
           data-event={''}
           title={'Edit Path'}
           icon={<EditIcon />}
