@@ -16,7 +16,7 @@
 
 import { FileUploadStatus } from 'utils/constants/storageBrowser';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
-import { CHUNK_UPLOAD_URL, CHUNK_UPLOAD_COMPLETE_URL } from 'reactComponents/FileChooser/api';
+import { CHUNK_UPLOAD_URL, CHUNK_UPLOAD_COMPLETE_URL } from '../../../apps/storageBrowser/api';
 
 export interface UploadItem {
   uuid: string;

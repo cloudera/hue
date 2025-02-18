@@ -18,7 +18,7 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import RenameModal from './RenameModal';
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
+import { StorageDirectoryTableData } from '../../../types';
 
 const mockSave = jest.fn();
 jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
