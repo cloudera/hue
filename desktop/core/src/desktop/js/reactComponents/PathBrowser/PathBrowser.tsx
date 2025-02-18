@@ -135,7 +135,7 @@ const PathBrowser = ({
                       className="hue-path-browser__breadcrumb-seperator"
                       data-testid={`${testId}-breadcrumb-seperator`}
                     >
-                      {seperator}
+                      {index === 0 && fileSystem !== 'hdfs' ? '://' : seperator}
                     </div>
                   )}
                 </React.Fragment>
@@ -153,7 +153,7 @@ const PathBrowser = ({
                 className="hue-path-browser__breadcrumb-seperator"
                 data-testid={`${testId}-breadcrumb-seperator`}
               >
-                {seperator}
+                {'://'}
               </div>
               <Dropdown
                 overlayClassName="hue-path-browser__dropdown cuix antd"

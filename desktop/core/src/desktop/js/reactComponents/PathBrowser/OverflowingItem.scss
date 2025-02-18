@@ -29,6 +29,7 @@
       @include mixins.nowrap-ellipsis;
 
       display: inline !important;
+      font-size: vars.$font-size-lg;
       line-height: 32px;
     }
   }

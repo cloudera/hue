@@ -53,10 +53,13 @@ describe('Pathbrowser', () => {
           showIcon
         />
       );
-      screen.getAllByTestId('pathbroswer-breadcrumb-seperator').forEach(element => {
-        expect(element).toBeVisible();
-        expect(element).toHaveTextContent('%');
-      });
+      screen
+        .getAllByTestId('pathbroswer-breadcrumb-seperator')
+        .slice(1)
+        .forEach(element => {
+          expect(element).toBeVisible();
+          expect(element).toHaveTextContent('%');
+        });
     });
 
     it('should render breadcrumbs without dropdown button if there are less than or equal to 3 breadcrumbs', () => {
