@@ -58,6 +58,7 @@ const PathBrowser = ({
 
   const { fileSystem, path } = getFileSystemAndPath(filePath);
   const breadcrumbs = getBreadcrumbs(fileSystem, path);
+  const URISchemeSeparator = fileSystem === 'hdfs' ? seperator : '://';
 
   const useOutsideAlerter = (ref: RefObject<HTMLDivElement>) => {
     useEffect(() => {
@@ -135,7 +136,7 @@ const PathBrowser = ({
                       className="hue-path-browser__breadcrumb-seperator"
                       data-testid={`${testId}-breadcrumb-seperator`}
                     >
-                      {index === 0 && fileSystem !== 'hdfs' ? '://' : seperator}
+                      {index === 0 ? URISchemeSeparator : seperator}
                     </div>
                   )}
                 </React.Fragment>
@@ -153,7 +154,7 @@ const PathBrowser = ({
                 className="hue-path-browser__breadcrumb-seperator"
                 data-testid={`${testId}-breadcrumb-seperator`}
               >
-                {'://'}
+                {URISchemeSeparator}
               </div>
               <Dropdown
                 overlayClassName="hue-path-browser__dropdown cuix antd"

@@ -169,9 +169,11 @@ describe('Pathbrowser', () => {
           showIcon
         />
       );
+      let input = screen.queryByDisplayValue(mockFilePath);
+      expect(input).toBeNull();
       const editPathButton = screen.getByTestId('hue-path-browser__edit-path-btn');
       await userEvent.click(editPathButton);
-      const input = screen.getByDisplayValue(mockFilePath);
+      input = screen.getByDisplayValue(mockFilePath);
       expect(input).not.toBeNull();
     });
   });
