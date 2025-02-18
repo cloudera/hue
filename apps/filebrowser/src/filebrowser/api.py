@@ -250,11 +250,18 @@ def listdir_paged(request):
   A paginated version of listdir.
 
   Query parameters:
-    pagenum           - The page number to show. Defaults to 1.
-    pagesize          - How many to show on a page. Defaults to 30.
-    sortby=?          - Specify attribute to sort by. Accepts: (type, name, atime, mtime, size, user, group). Defaults to name.
-    descending        - Specify a descending sort order. Default to false.
-    filter=?          - Specify a substring filter to search for in the filename field.
+    pagenum (int): The page number to show. Defaults to 1.
+    pagesize (int): How many items to show on a page. Defaults to 30.
+    sortby (str): The attribute to sort by. Valid options: 'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'.
+                  Defaults to 'name'.
+    descending (bool): Sort in descending order when true. Defaults to false.
+    filter (str): Substring to filter filenames. Optional.
+
+  Returns:
+    JsonResponse: Contains 'files' and 'page' info.
+
+  Raises:
+    HttpResponse: With appropriate status codes for errors.
   """
   path = request.GET.get('path', '/')  # Set default path for index directory
   path = _normalize_path(path)
@@ -262,37 +269,56 @@ def listdir_paged(request):
   if not request.fs.isdir(path):
     return HttpResponse(f'{path} is not a directory.', status=400)
 
+  # Extract pagination parameters
   pagenum = int(request.GET.get('pagenum', 1))
   pagesize = int(request.GET.get('pagesize', 30))
 
+  # Determine if operation should be performed as another user
   do_as = None
   if is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security"):
     do_as = request.GET.get('doas', request.user.username)
   if hasattr(request, 'doas'):
     do_as = request.doas
 
+  # Get stats for all files in the directory
   try:
     if do_as:
       all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
     else:
       all_stats = request.fs.listdir_stats(path)
   except (S3ListAllBucketsException, GSListAllBucketsException) as e:
-    return HttpResponse(f'Bucket listing is not allowed: {str(e)}', status=403)
+    return HttpResponse(f'Bucket listing is not allowed: {e}', status=403)
 
-  # Filter first
+  # Apply filter first if specified
   filter_string = request.GET.get('filter')
   if filter_string:
-    filtered_stats = [sb for sb in all_stats if filter_string in sb['name']]
-    all_stats = filtered_stats
+    all_stats = [sb for sb in all_stats if filter_string in sb['name']]
 
-  # Sort next
-  sortby = request.GET.get('sortby')
-  descending_param = request.GET.get('descending')
-  if sortby:
-    if sortby not in ('type', 'name', 'atime', 'mtime', 'user', 'group', 'size'):
-      LOG.info(f'Invalid sort attribute {sortby} for list directory operation. Skipping it.')
-    else:
-      all_stats = sorted(all_stats, key=operator.attrgetter(sortby), reverse=coerce_bool(descending_param))
+  # Next, sort with proper handling of None values
+  sortby = request.GET.get('sortby', 'name')
+  descending = coerce_bool(request.GET.get('descending', False))
+  valid_sort_fields = {'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'}
+
+  if sortby not in valid_sort_fields:
+    LOG.info(f"Ignoring invalid sort attribute '{sortby}' for list directory operation.")
+  else:
+    numeric_fields = {'size', 'atime', 'mtime'}
+
+    def sorting_key(item):
+      """Generate a sorting key that handles None values for different field types."""
+      value = getattr(item, sortby)
+      if sortby in numeric_fields:
+        # Treat None as 0 for numeric fields for comparison
+        return 0 if value is None else value
+      else:
+        # Treat None as an empty string for non-numeric fields
+        return '' if value is None else value
+
+    try:
+      all_stats = sorted(all_stats, key=sorting_key, reverse=descending)
+    except Exception as sort_error:
+      LOG.error(f"Error during sorting with attribute '{sortby}': {sort_error}")
+      return HttpResponse("An error occurred while sorting the directory contents.", status=500)
 
   # Do pagination
   try:
@@ -302,7 +328,7 @@ def listdir_paged(request):
   except EmptyPage:
     message = "No results found for the requested page."
     LOG.warning(message)
-    return HttpResponse(message, status=404)  # TODO: status code?
+    return HttpResponse(message, status=404)
 
   if page:
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
