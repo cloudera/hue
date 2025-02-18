@@ -28,7 +28,7 @@ import Table from 'cuix/dist/components/Table';
 import { i18nReact } from '../../../utils/i18nReact';
 import useDebounce from '../../../utils/useDebounce';
 
-import { LIST_DIRECTORY_API_URL } from '../../../reactComponents/FileChooser/api';
+import { LIST_DIRECTORY_API_URL } from '../api';
 import {
   SortOrder,
   ListDirectory,
@@ -36,7 +36,7 @@ import {
   BrowserViewType,
   StorageDirectoryTableData,
   FileSystem
-} from '../../../reactComponents/FileChooser/types';
+} from '../types';
 import Pagination from '../../../reactComponents/Pagination/Pagination';
 import StorageBrowserActions from './StorageBrowserActions/StorageBrowserActions';
 import formatBytes from '../../../utils/formatBytes';

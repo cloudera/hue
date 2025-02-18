@@ -21,8 +21,8 @@ import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
-import { FILE_STATS_API_URL } from '../../../reactComponents/FileChooser/api';
-import { BrowserViewType, FileStats, FileSystem } from '../../../reactComponents/FileChooser/types';
+import { FILE_STATS_API_URL } from '../api';
+import { BrowserViewType, FileStats, FileSystem } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 import './StorageBrowserTab.scss';

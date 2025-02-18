@@ -30,11 +30,8 @@ import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MoveCopyModal from './MoveCopyModal';
 import { ActionType } from '../StorageBrowserActions.util';
-import {
-  BULK_COPY_API_URL,
-  BULK_MOVE_API_URL
-} from '../../../../../reactComponents/FileChooser/api';
-import { StorageDirectoryTableData } from '../../../../../reactComponents/FileChooser/types';
+import { BULK_COPY_API_URL, BULK_MOVE_API_URL } from '../../../api';
+import { StorageDirectoryTableData } from '../../../types';
 
 const mockFiles: StorageDirectoryTableData[] = [
   {
