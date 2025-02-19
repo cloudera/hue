@@ -613,7 +613,7 @@ def touch(request):
 
   file_path = request.fs.join(path, name)
 
-  # Check if the fils already exists
+  # Check if the file already exists
   if request.fs.isfile(file_path):
     return HttpResponse(f"Error creating {name} file: File already exists.", status=409)
 
