@@ -143,11 +143,15 @@ class ABFS(object):
   # Parse info about filesystems, directories, and files
   # --------------------------------
   def isdir(self, path):
-    """
-    Checks if the path is a directory (note diabled because filebrowser/views is bugged)
-    """
-    resp = self.stats(path)
-    return resp.isDir
+    """Check if the given path is a directory or not."""
+    try:
+      stats = self.stats(path)
+      return stats.isDir
+    except Exception as e:
+      # If checking stats for path here gives a 404 error, it means the path does not exist and therefore is not a directory.
+      if e.code == 404:
+        return False
+      raise e
 
   def isfile(self, path):
     """
