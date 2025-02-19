@@ -21,7 +21,7 @@ from unittest.mock import MagicMock, Mock, patch
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from aws.s3.s3fs import S3ListAllBucketsException
-from filebrowser.api import copy, get_all_filesystems, listdir_paged, mkdir, move, rename, upload_file
+from filebrowser.api import copy, get_all_filesystems, listdir_paged, mkdir, move, rename, touch, upload_file
 from filebrowser.conf import (
   MAX_FILE_SIZE_UPLOAD_LIMIT,
   RESTRICT_FILE_EXTENSIONS,
@@ -329,6 +329,70 @@ class TestSimpleFileUploadAPI:
       finally:
         for reset in resets:
           reset()
+
+
+class TestTouchAPI:
+  def test_touch_success(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/', 'name': 'test_file.txt'},
+      fs=Mock(
+        isfile=Mock(return_value=False),
+        join=Mock(return_value='s3a://test-bucket/test-user/test_file.txt'),
+        create=Mock(),
+      ),
+    )
+    response = touch(request)
+
+    assert response.status_code == 201
+    request.fs.create.assert_called_once_with('s3a://test-bucket/test-user/test_file.txt')
+
+  def test_touch_file_exists(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/', 'name': 'test_file.txt'},
+      fs=Mock(
+        isfile=Mock(return_value=True),
+        join=Mock(return_value='s3a://test-bucket/test-user/test_file.txt'),
+      ),
+    )
+    response = touch(request)
+
+    assert response.status_code == 409
+    assert response.content.decode('utf-8') == 'Error creating test_file.txt file: File already exists.'
+
+  def test_touch_invalid_name(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/', 'name': 'test/file.txt'},
+      fs=Mock(),
+    )
+    response = touch(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Slashes are not allowed in filename. Please choose a different name.'
+
+  def test_touch_no_path(self):
+    request = Mock(
+      method='POST',
+      POST={'name': 'test_file.txt'},
+      fs=Mock(),
+    )
+    response = touch(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Missing parameters: path and name are required.'
+
+  def test_touch_no_name(self):
+    request = Mock(
+      method='POST',
+      POST={'path': 's3a://test-bucket/test-user/'},
+      fs=Mock(),
+    )
+    response = touch(request)
+
+    assert response.status_code == 400
+    assert response.content.decode('utf-8') == 'Missing parameters: path and name are required.'
 
 
 class TestMkdirAPI:

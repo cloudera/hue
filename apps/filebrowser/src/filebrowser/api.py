@@ -603,10 +603,21 @@ def touch(request):
   path = request.POST.get('path')
   name = request.POST.get('name')
 
-  if name and (posixpath.sep in name):
-    return HttpResponse(f"Error creating {name} file: Slashes are not allowed in filename.", status=400)
+  # Check if path and name are provided
+  if not path or not name:
+    return HttpResponse("Missing parameters: path and name are required.", status=400)
 
-  request.fs.create(request.fs.join(path, name))
+  # Validate the 'name' parameter for invalid characters
+  if name and (posixpath.sep in name):
+    return HttpResponse(f"Slashes are not allowed in filename. Please choose a different name.", status=400)
+
+  file_path = request.fs.join(path, name)
+
+  # Check if the file already exists
+  if request.fs.isfile(file_path):
+    return HttpResponse(f"Error creating {name} file: File already exists.", status=409)
+
+  request.fs.create(file_path)
   return HttpResponse(status=201)
 
 
