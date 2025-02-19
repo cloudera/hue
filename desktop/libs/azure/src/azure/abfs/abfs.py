@@ -148,16 +148,21 @@ class ABFS(object):
       stats = self.stats(path)
       return stats.isDir
     except Exception as e:
-      # If checking stats for path here gives a 404 error, it means the path does not exist and therefore is not a directory.
+      # If checking stats for path here gives 404 error, it means the path does not exist and therefore is not a directory.
       if e.code == 404:
         return False
       raise e
 
   def isfile(self, path):
-    """
-    Checks if the path is a file
-    """
-    return not self.isdir(path)
+    """Check if the given path is a file or not."""
+    try:
+      stats = self.stats(path)
+      return not stats.isDir
+    except Exception as e:
+      # If checking stats for path here gives 404 error, it means the path does not exist and therefore is not a file.
+      if e.code == 404:
+        return False
+      raise e
 
   def exists(self, path):
     """
