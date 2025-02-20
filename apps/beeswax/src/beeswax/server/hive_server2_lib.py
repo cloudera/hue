@@ -1103,18 +1103,18 @@ class HiveServerClient(object):
 
     return '\n'.join(lines)
 
-  def get_operation_status(self, operation_handle):
+  def get_operation_status(self, operation_handle, session=None):
     req = TGetOperationStatusReq(operationHandle=operation_handle)
-    (res, session) = self.call(self._client.GetOperationStatus, req)
+    (res, session) = self.call(self._client.GetOperationStatus, req, session=session)
     return res
 
-  def get_log(self, operation_handle):
+  def get_log(self, operation_handle, session=None):
     try:
       req = TGetLogReq(operationHandle=operation_handle)
-      (res, session) = self.call(self._client.GetLog, req)
+      (res, session) = self.call(self._client.GetLog, req, session=session)
       return res.log
     except Exception as e:
-      if 'Invalid query handle' in str(e):
+      if 'Invalid query handle' in str(e) or 'Invalid or unknown query handle' in str(e):
         message = 'Invalid query handle'
         LOG.error('%s: %s' % (message, e))
       else:
@@ -1436,9 +1436,9 @@ class HiveServerClientCompatible(object):
     res = self._client.get_operation_status(operationHandle)
     return HiveServerQueryHistory.STATE_MAP[res.operationState]
 
-  def get_operation_status(self, handle):
+  def get_operation_status(self, handle, session=None):
     operationHandle = handle.get_rpc_handle()
-    return self._client.get_operation_status(operationHandle)
+    return self._client.get_operation_status(operationHandle, session=session)
 
   def use(self, query, session=None):
     data = self._client.execute_query(query, session=session)
@@ -1482,11 +1482,11 @@ class HiveServerClientCompatible(object):
   def dump_config(self):
     return 'Does not exist in HS2'
 
-  def get_log(self, handle, start_over=True):
+  def get_log(self, handle, start_over=True, session=None):
     operationHandle = handle.get_rpc_handle()
 
     if beeswax_conf.USE_GET_LOG_API.get() or self.query_server.get('dialect') == 'impala':
-      return self._client.get_log(operationHandle)
+      return self._client.get_log(operationHandle, session=session)
     else:
       if start_over:
         orientation = TFetchOrientation.FETCH_FIRST
