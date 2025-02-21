@@ -62,13 +62,20 @@ jobs:
     - name: run tests
       run: |
         mkdir -p test-reports  # Ensure the directory exists
-        PYTHONWARNINGS=always ./build/env/bin/pytest --html=test-reports/report_${{ matrix.python-version }}.html --self-contained-html
+        mkdir -p code-coverage-reports  # Ensure the directory exists
+        PYTHONWARNINGS=always ./build/env/bin/pytest --cov=about,beeswax,filebrowser,hbase,help,hive,impala,jobbrowser,jobsub,metastore,oozie,pig,proxy,rdbms,search,security,spark,sqoop,useradmin,zookeeper,desktop,aws,azure,dashboard,hadoop,indexer,kafka,libanalyze,liboauth,liboozie,librdbms,libsaml,libsentry,libsolr,libzookeeper,metadata,notebook --no-cov-on-fail --cov-report=html:code-coverage-report --html=test-reports/report_${{ matrix.python-version }}.html --self-contained-html
  
     - name: upload pytest report
       uses: actions/upload-artifact@v4
       with:
         name: test-reports-${{ matrix.python-version }}
         path: test-reports
+    
+    - name: upload code coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-coverage-reports-${{ matrix.python-version }}
+        path: code-coverage-reports
 
     - name: Check and comment if no unit test files are modified
       if: matrix.python-version == '3.11'
