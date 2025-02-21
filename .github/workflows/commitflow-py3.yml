@@ -63,7 +63,7 @@ jobs:
       run: |
         mkdir -p test-reports  # Ensure the directory exists
         mkdir -p code-coverage-reports  # Ensure the directory exists
-        PYTHONWARNINGS=always ./build/env/bin/pytest --cov=about,beeswax,filebrowser,hbase,help,hive,impala,jobbrowser,jobsub,metastore,oozie,pig,proxy,rdbms,search,security,spark,sqoop,useradmin,zookeeper,desktop,aws,azure,dashboard,hadoop,indexer,kafka,libanalyze,liboauth,liboozie,librdbms,libsaml,libsentry,libsolr,libzookeeper,metadata,notebook --no-cov-on-fail --cov-report=html:code-coverage-report --html=test-reports/report_${{ matrix.python-version }}.html --self-contained-html
+        ./build/env/bin/pytest --cov=about --cov=beeswax --cov=filebrowser --cov=hbase --cov=help --cov=hive --cov=impala --cov=jobbrowser --cov=jobsub --cov=metastore --cov=oozie --cov=pig --cov=proxy --cov=rdbms --cov=search --cov=security --cov=spark --cov=sqoop --cov=useradmin --cov=zookeeper --cov=desktop --cov=aws --cov=azure --cov=dashboard --cov=hadoop --cov=indexer --cov=kafka --cov=libanalyze --cov=liboauth --cov=liboozie --cov=librdbms --cov=libsaml --cov=libsentry --cov=libsolr --cov=libzookeeper --cov=metadata --cov=notebook --cov-report=html:code-coverage-report --html=test-reports/report_${{ matrix.python-version }}.html --self-contained-html
  
     - name: upload pytest report
       uses: actions/upload-artifact@v4
