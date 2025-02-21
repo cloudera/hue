@@ -33,7 +33,7 @@ def query_error_handler(func):
       return func(*args, **kwargs)
     except Exception as e:
       message = force_unicode(e)
-      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
+      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message or 'Invalid or unknown query handle' in message:
         raise QueryExpired(e)
       else:
         raise QueryError(message).with_traceback(sys.exc_info()[2])
