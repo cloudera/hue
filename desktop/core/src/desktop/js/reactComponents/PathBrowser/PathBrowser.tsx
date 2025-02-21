@@ -22,6 +22,8 @@ import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 import HdfsIcon from '../../components/icons/HdfsIcon';
 import S3Icon from '../../components/icons/S3Icon';
 import AdlsIcon from '../../components/icons/AdlsIcon';
+import EditIcon from '@cloudera/cuix-core/icons/react/EditIcon';
+import CopyPathIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
 
 import Breadcrumb from './Breadcrumb/Breadcrumb';
 import './PathBrowser.scss';
@@ -56,6 +58,7 @@ const PathBrowser = ({
 
   const { fileSystem, path } = getFileSystemAndPath(filePath);
   const breadcrumbs = getBreadcrumbs(fileSystem, path);
+  const URISchemeSeparator = fileSystem === 'hdfs' ? seperator : '://';
 
   const useOutsideAlerter = (ref: RefObject<HTMLDivElement>) => {
     useEffect(() => {
@@ -133,7 +136,7 @@ const PathBrowser = ({
                       className="hue-path-browser__breadcrumb-seperator"
                       data-testid={`${testId}-breadcrumb-seperator`}
                     >
-                      {seperator}
+                      {index === 0 ? URISchemeSeparator : seperator}
                     </div>
                   )}
                 </React.Fragment>
@@ -151,7 +154,7 @@ const PathBrowser = ({
                 className="hue-path-browser__breadcrumb-seperator"
                 data-testid={`${testId}-breadcrumb-seperator`}
               >
-                {seperator}
+                {URISchemeSeparator}
               </div>
               <Dropdown
                 overlayClassName="hue-path-browser__dropdown cuix antd"
@@ -199,15 +202,20 @@ const PathBrowser = ({
           )}
         </div>
         <BorderlessButton
-          data-event=""
-          className="hue-path-browser__toggle-breadcrumb-input-btn"
-          aria-label="hue-path-browser__toggle-breadcrumb-input-btn"
-          title="Edit path"
-          onClick={() => {
-            setIsEditMode(true);
-          }}
-          data-testid={`${testId}-toggle-input-btn`}
-        ></BorderlessButton>
+          onClick={() => setIsEditMode(true)}
+          className="hue-path-browser__edit-path-btn"
+          data-testid="hue-path-browser__edit-path-btn"
+          data-event={''}
+          title={'Edit Path'}
+          icon={<EditIcon />}
+        />
+        <BorderlessButton
+          onClick={() => navigator.clipboard.writeText(filePath)}
+          className="hue-path-browser__copy-path-btn"
+          data-event={''}
+          title={'Copy Path'}
+          icon={<CopyPathIcon />}
+        />
       </div>
     );
   }

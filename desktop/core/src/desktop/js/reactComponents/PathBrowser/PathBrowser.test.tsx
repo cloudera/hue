@@ -53,10 +53,13 @@ describe('Pathbrowser', () => {
           showIcon
         />
       );
-      screen.getAllByTestId('pathbroswer-breadcrumb-seperator').forEach(element => {
-        expect(element).toBeVisible();
-        expect(element).toHaveTextContent('%');
-      });
+      screen
+        .getAllByTestId('pathbroswer-breadcrumb-seperator')
+        .slice(1)
+        .forEach(element => {
+          expect(element).toBeVisible();
+          expect(element).toHaveTextContent('%');
+        });
     });
 
     it('should render breadcrumbs without dropdown button if there are less than or equal to 3 breadcrumbs', () => {
@@ -153,8 +156,25 @@ describe('Pathbrowser', () => {
           showIcon
         />
       );
-      const input = screen.queryByDisplayValue('abfs://test/test1');
+      const input = screen.queryByDisplayValue(mockFilePath);
       expect(input).toBeNull();
+    });
+
+    it('should show input when edit path button is clicked', async () => {
+      render(
+        <PathBrowser
+          onFilepathChange={onFilepathChangeMock}
+          filePath={mockFilePath}
+          seperator={'/'}
+          showIcon
+        />
+      );
+      let input = screen.queryByDisplayValue(mockFilePath);
+      expect(input).toBeNull();
+      const editPathButton = screen.getByTestId('hue-path-browser__edit-path-btn');
+      await userEvent.click(editPathButton);
+      input = screen.getByDisplayValue(mockFilePath);
+      expect(input).not.toBeNull();
     });
   });
 });
