@@ -74,8 +74,8 @@ jobs:
     - name: upload code coverage report
       uses: actions/upload-artifact@v4
       with:
-        name: code-coverage-reports-${{ matrix.python-version }}
-        path: code-coverage-reports
+        name: code-coverage-report-${{ matrix.python-version }}
+        path: code-coverage-report
 
     - name: Check and comment if no unit test files are modified
       if: matrix.python-version == '3.11'
