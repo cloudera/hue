@@ -112,8 +112,7 @@ const STRING_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'STRING' }]],
     signature: 'char_length(STRING value)',
     draggable: 'char_length()',
-    description:
-      "Returns the number of characters in STRING."
+    description: 'Returns the number of characters in STRING.'
   },
   character_length: {
     name: 'character_length',
@@ -121,8 +120,7 @@ const STRING_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'STRING' }]],
     signature: 'character_length(STRING value)',
     draggable: 'character_length()',
-    description:
-      "Returns the number of characters in STRING."
+    description: 'Returns the number of characters in STRING.'
   },
   lower: {
     name: 'lower',
@@ -130,8 +128,7 @@ const STRING_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'STRING' }]],
     signature: 'lower(STRING value)',
     draggable: 'lower()',
-    description:
-      "Returns string in lowercase."
+    description: 'Returns string in lowercase.'
   },
   regexp_extract: {
     name: 'regexp_extract',
@@ -148,8 +145,7 @@ const STRING_FUNCTIONS: UdfCategoryFunctions = {
     arguments: [[{ type: 'STRING' }]],
     signature: 'upper(STRING value)',
     draggable: 'upper()',
-    description:
-      "Returns string in uppercase."
+    description: 'Returns string in uppercase.'
   }
 };
 
@@ -517,28 +513,23 @@ const ARITHMETIC_FUNCTIONS: UdfCategoryFunctions = {
   abs: {
     name: 'abs',
     returnTypes: ['NUMERIC'],
-    arguments: [[{ type: 'numeric'}]],
+    arguments: [[{ type: 'numeric' }]],
     signature: 'abs(numeric)',
     draggable: 'abs(numeric)',
-    description:
-      'Returns the absolute value of numeric.'
+    description: 'Returns the absolute value of numeric.'
   },
   ln: {
     name: 'ln',
     returnTypes: ['NUMERIC'],
-    arguments: [[{ type: 'numeric'}]],
+    arguments: [[{ type: 'numeric' }]],
     signature: 'ln(numeric)',
     draggable: 'ln(numeric)',
-    description:
-      'Returns the natural logarithm (base e) of numeric.'
+    description: 'Returns the natural logarithm (base e) of numeric.'
   },
   log: {
     name: 'log',
     returnTypes: ['NUMERIC'],
-    arguments: [
-      [{ type: 'numeric'}],
-      [{ type: 'numeric', optional: true }],
-    ],
+    arguments: [[{ type: 'numeric' }], [{ type: 'numeric', optional: true }]],
     signature: 'log(NUMERIC numeric1[, NUMERIC numeric2])',
     draggable: 'log()',
     description:
@@ -547,42 +538,35 @@ const ARITHMETIC_FUNCTIONS: UdfCategoryFunctions = {
   log10: {
     name: 'log10',
     returnTypes: ['NUMERIC'],
-    arguments: [[{ type: 'numeric'}]],
+    arguments: [[{ type: 'numeric' }]],
     signature: 'log10(NUMERIC numeric)',
     draggable: 'log10()',
-    description:
-      'Returns the base 10 logarithm of numeric.'
+    description: 'Returns the base 10 logarithm of numeric.'
   },
   log2: {
     name: 'log2',
     returnTypes: ['NUMERIC'],
-    arguments: [[{ type: 'numeric'}]],
+    arguments: [[{ type: 'numeric' }]],
     signature: 'log2(NUMERIC numeric)',
     draggable: 'log2()',
-    description:
-      'Returns the base 2 logarithm of numeric.'
+    description: 'Returns the base 2 logarithm of numeric.'
   },
   power: {
     name: 'power',
     returnTypes: ['NUMERIC'],
-    arguments: [
-      [{ type: 'NUMERIC' }],
-      [{ type: 'NUMERIC' }],
-    ],
+    arguments: [[{ type: 'NUMERIC' }], [{ type: 'NUMERIC' }]],
     signature: 'power(NUMERIC numeric1, NUMERIC numeric2)',
     draggable: 'power()',
-    description:
-      'Returns numeric1 raised to the power of numeric2 (numeric1^numeric2).'
+    description: 'Returns numeric1 raised to the power of numeric2 (numeric1^numeric2).'
   },
   sqrt: {
     name: 'sqrt',
     returnTypes: ['NUMERIC'],
-    arguments: [[{ type: 'numeric'}]],
+    arguments: [[{ type: 'numeric' }]],
     signature: 'sqrt(NUMERIC numeric)',
     draggable: 'sqrt()',
-    description:
-      'Returns the square root of numeric.'
-  },
+    description: 'Returns the square root of numeric.'
+  }
 };
 
 export const UDF_CATEGORIES: UdfCategory[] = [
