@@ -15,13 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
+import re
 import json
+import time
 import logging
 import posixpath
-import re
-import time
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.i18n import force_unicode
