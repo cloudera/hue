@@ -24,12 +24,12 @@ import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 const mockData = jest.fn().mockReturnValue({
   logs: ['Log entry 1', 'Log entry 2'],
-  hue_hostname: 'test-hostname'
+  hueHostname: 'test-hostname'
 });
 
 const emptyMockData = jest.fn().mockReturnValue({
   logs: [],
-  hue_hostname: 'test-hostname'
+  hueHostname: 'test-hostname'
 });
 
 jest.mock('../../../utils/hooks/useLoadData/useLoadData');

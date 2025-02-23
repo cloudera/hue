@@ -104,7 +104,8 @@ const useChunkUpload = ({
     '/desktop/api2/taskserver/get_taskserver_tasks/',
     {
       pollInterval: awaitingStatusItems.length ? 5000 : undefined,
-      skip: !awaitingStatusItems.length
+      skip: !awaitingStatusItems.length,
+      transformKeys: 'none'
     }
   );
 

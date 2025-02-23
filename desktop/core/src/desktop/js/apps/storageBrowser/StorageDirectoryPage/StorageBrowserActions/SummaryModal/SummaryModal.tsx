@@ -36,7 +36,7 @@ interface SummaryModalProps {
 const SummaryModal = ({ isOpen = true, onClose, path }: SummaryModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { data: responseSummary, loading } = useLoadData<ContentSummary>(CONTENT_SUMMARY_API_URL, {
+  const { data, loading } = useLoadData<ContentSummary>(CONTENT_SUMMARY_API_URL, {
     params: { path: path },
     onError: error => {
       huePubSub.publish('hue.error', error);
@@ -48,31 +48,31 @@ const SummaryModal = ({ isOpen = true, onClose, path }: SummaryModalProps): JSX.
     {
       key: 'diskspaceConsumed',
       label: t('Diskspace Consumed'),
-      value: formatBytes(responseSummary?.spaceConsumed)
+      value: formatBytes(data?.spaceConsumed)
     },
-    { key: 'bytesUsed', label: t('Bytes Used'), value: formatBytes(responseSummary?.length) },
+    { key: 'bytesUsed', label: t('Bytes Used'), value: formatBytes(data?.length) },
     {
       key: 'namespaceQuota',
       label: t('Namespace Quota'),
-      value: formatBytes(responseSummary?.quota)
+      value: formatBytes(data?.quota)
     },
     {
       key: 'diskspaceQuota',
       label: t('Diskspace Quota'),
-      value: formatBytes(responseSummary?.spaceQuota)
+      value: formatBytes(data?.spaceQuota)
     },
     {
       key: 'replicationFactor',
       label: t('Replication Factor'),
-      value: responseSummary?.replication
+      value: data?.replication
     },
     { key: 'blank', label: '', value: '' },
     {
       key: 'numberOfDirectories',
       label: t('Number of Directories'),
-      value: responseSummary?.directoryCount
+      value: data?.directoryCount
     },
-    { key: 'numberOfFiles', label: t('Number of Files'), value: responseSummary?.fileCount }
+    { key: 'numberOfFiles', label: t('Number of Files'), value: data?.fileCount }
   ];
 
   const shortendPath =

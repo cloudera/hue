@@ -25,18 +25,14 @@ import './ServerLogsTab.scss';
 
 interface ServerLogsData {
   logs: string[];
-  hue_hostname: string;
+  hueHostname: string;
 }
 
 const ServerLogs: React.FC = (): JSX.Element => {
   const [filter, setFilter] = useState<string>('');
   const [wrapLogs, setWrapLogs] = useState(true);
   const { t } = i18nReact.useTranslation();
-  const {
-    data: logsData,
-    loading,
-    error
-  } = useLoadData<ServerLogsData>(SERVER_LOGS_API_URL, {
+  const { data, loading, error } = useLoadData<ServerLogsData>(SERVER_LOGS_API_URL, {
     params: {
       reverse: true
     }
@@ -62,15 +58,15 @@ const ServerLogs: React.FC = (): JSX.Element => {
             <ServerLogsHeader
               onFilterChange={setFilter}
               onWrapLogsChange={setWrapLogs}
-              hostName={logsData?.hue_hostname ?? ''}
+              hostName={data?.hueHostname ?? ''}
             />
-            {logsData && (logsData.logs.length === 0 || logsData.logs[0] === '') && (
+            {data && (data.logs.length === 0 || data.logs[0] === '') && (
               <pre className="server__no-logs-found">No logs found!</pre>
             )}
 
-            {logsData && logsData.logs.length > 0 && logsData.logs[0] !== '' && (
+            {data && data.logs.length > 0 && data.logs[0] !== '' && (
               <div className="server__display-logs">
-                {logsData.logs.map((line, index) => (
+                {data.logs.map((line, index) => (
                   <div
                     className={`server__log-line ${wrapLogs ? 'server_wrap' : ''}`}
                     key={'logs_' + index}

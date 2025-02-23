@@ -46,7 +46,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
   const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
   const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
   const initialFilePath =
-    urlFileSystem === fileSystem.file_system ? urlFilePath : fileSystem.user_home_directory;
+    urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
   const fileName = filePath.split('/').pop() ?? '';
@@ -80,12 +80,12 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
       enabled: error?.response?.status === 404,
       message: t('Error: Path "{{path}}" not found.', { path: filePath }),
       action: t('Go to home directory'),
-      onClick: () => setFilePath(fileSystem.user_home_directory)
+      onClick: () => setFilePath(fileSystem.userHomeDirectory)
     },
     {
       enabled: !!error && error?.response?.status !== 404,
       message: t('An error occurred while fetching filesystem "{{fileSystem}}".', {
-        fileSystem: fileSystem.file_system.toUpperCase()
+        fileSystem: fileSystem.name.toUpperCase()
       }),
       action: t('Retry'),
       onClick: reloadData

@@ -35,7 +35,7 @@ import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
 import { i18nReact } from '../../../../utils/i18nReact';
 import huePubSub from '../../../../utils/huePubSub';
 import './StorageBrowserActions.scss';
-import { FileStats, FileSystem, StorageDirectoryTableData } from '../../types';
+import { FileStats, HDFSFileSystemConfig, StorageDirectoryTableData } from '../../types';
 import { ActionType, getEnabledActions } from './StorageBrowserActions.util';
 import MoveCopyModal from './MoveCopyModal/MoveCopyModal';
 import RenameModal from './RenameModal/RenameModal';
@@ -48,8 +48,16 @@ import { DOWNLOAD_API_URL } from '../../api';
 import ChangeOwnerAndGroupModal from './ChangeOwnerAndGroupModal/ChangeOwnerAndGroupModal';
 import ChangePermissionModal from './ChangePermissionModal/ChangePermissionModal';
 
+interface ActionConfig {
+  isTrashEnabled: HDFSFileSystemConfig['isTrashEnabled'];
+  isHdfsSuperuser: HDFSFileSystemConfig['isHdfsSuperuser'];
+  groups: HDFSFileSystemConfig['groups'];
+  supergroup: HDFSFileSystemConfig['supergroup'];
+  users: HDFSFileSystemConfig['users'];
+  superuser: HDFSFileSystemConfig['superuser'];
+}
 interface StorageBrowserRowActionsProps {
-  config: FileSystem['config'];
+  config: ActionConfig;
   currentPath: FileStats['path'];
   selectedFiles: StorageDirectoryTableData[];
   onSuccessfulAction: () => void;
@@ -109,7 +117,7 @@ const StorageBrowserActions = ({
   };
 
   const actionItems: MenuItemType[] = useMemo(() => {
-    const enabledActions = getEnabledActions(t, selectedFiles, config?.is_hdfs_superuser);
+    const enabledActions = getEnabledActions(t, selectedFiles, config?.isHdfsSuperuser);
     return enabledActions.map(action => ({
       key: String(action.type),
       label: t(action.label),
@@ -166,7 +174,7 @@ const StorageBrowserActions = ({
       )}
       {selectedAction === ActionType.Delete && (
         <DeletionModal
-          isTrashEnabled={config?.is_trash_enabled}
+          isTrashEnabled={config?.isTrashEnabled}
           files={selectedFiles}
           onSuccess={onApiSuccess}
           onError={onApiError}
