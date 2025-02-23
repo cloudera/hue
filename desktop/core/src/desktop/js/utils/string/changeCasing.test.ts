@@ -167,7 +167,7 @@ describe('convertKeysToCamelCase', () => {
   });
 
   it('should return an empty array if the input is an empty array', () => {
-    const input: any[] = [];
+    const input = [];
     const result = convertKeysToCamelCase(input);
     expect(result).toEqual([]);
   });
