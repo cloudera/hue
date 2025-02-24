@@ -29,12 +29,7 @@ $icon-margin: 5px;
   .hue-filechooser-modal__path-browser-panel {
     display: flex;
     align-items: center;
-    gap: vars.$fluidx-spacing-xs;
-  }
-
-  .hue-filechooser-modal__destPath {
-    flex: 0 0 auto;
-    font-weight: 600;
+    gap: 2px;
   }
 
   .hue-filechooser-modal__search {
@@ -65,6 +60,7 @@ $icon-margin: 5px;
   .hue-filechooser-modal__table-cell-icon {
     color: vars.$fluidx-blue-700;
     margin-right: 6px;
+    vertical-align: middle;
   }
 
   .hue-filechooser-modal__table-row {

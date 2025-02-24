@@ -146,7 +146,6 @@ const FileChooserModal = ({
     >
       <div className="hue-filechooser-modal__body">
         <div className="hue-filechooser-modal__path-browser-panel">
-          <span className="hue-filechooser-modal__destPath">{t('Destination Path:')}</span>
           <PathBrowser
             filePath={destPath}
             onFilepathChange={setDestPath}

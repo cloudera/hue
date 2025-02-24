@@ -32,6 +32,7 @@ import {
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import { inTrash } from '../../../utils/storageBrowserUtils';
 
 interface StorageFilePageProps {
   onReload: () => void;
@@ -113,7 +114,8 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
     !isEditing &&
     config?.storage_browser.max_file_editor_size &&
     config?.storage_browser.max_file_editor_size > fileStats.size &&
-    EDITABLE_FILE_FORMATS.has(fileType);
+    EDITABLE_FILE_FORMATS.has(fileType) &&
+    !inTrash(fileStats.path);
 
   const pageStats = {
     page_number: pageNumber,
