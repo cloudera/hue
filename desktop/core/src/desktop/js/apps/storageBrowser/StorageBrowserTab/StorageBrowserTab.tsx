@@ -21,8 +21,8 @@ import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
-import { FILE_STATS_API_URL } from '../api';
-import { BrowserViewType, FileStats, FileSystem } from '../types';
+import { FILE_STATS_API_URL, TRASH_PATH } from '../api';
+import { BrowserViewType, FileStats, FileSystem, TrashPath } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 
@@ -33,6 +33,7 @@ import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/Lo
 import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
 import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
+import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 
 interface StorageBrowserTabProps {
   fileSystem: FileSystem;
@@ -56,6 +57,12 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     filePath.split('/').pop() !== '' ? filePath.split('/').pop() : filePath.split('://')[0];
 
   const { t } = i18nReact.useTranslation();
+
+  const { data: trash, reloadData: reloadTrashData } = useLoadData<TrashPath>(TRASH_PATH, {
+    params: { path: fileSystem.user_home_directory },
+    skip: !fileSystem.config?.is_trash_enabled || !fileSystem.user_home_directory
+  });
+
   const {
     data: fileStats,
     loading,
@@ -112,16 +119,28 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
               }}
               className="hue-path-browser__home-btn"
               data-event={''}
-              title={'home'}
+              title={t('Home')}
               icon={<HomeIcon />}
             >
               {t('Home')}
             </BorderlessButton>
+            {fileSystem.config?.is_trash_enabled && (
+              <BorderlessButton
+                onClick={() => setFilePath(trash?.trash_path ?? '')}
+                className="hue-path-browser__home-btn"
+                data-event={''}
+                title={t('Trash')}
+                icon={<DeleteIcon />}
+                disabled={!trash?.trash_path}
+              >
+                {t('Trash')}
+              </BorderlessButton>
+            )}
             <BorderlessButton
               onClick={() => reloadData()}
               className="hue-path-browser__refresh-btn"
               data-event={''}
-              title={'Refresh'}
+              title={t('Refresh')}
               icon={<RefreshIcon />}
             >
               {t('Refresh')}
@@ -143,7 +162,8 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           <StorageDirectoryPage
             fileStats={fileStats}
             onFilePathChange={setFilePath}
-            config={fileSystem.config}
+            fileSystem={fileSystem}
+            reloadTrashData={reloadTrashData}
           />
         )}
         {fileStats?.type === BrowserViewType.file && !loading && (
