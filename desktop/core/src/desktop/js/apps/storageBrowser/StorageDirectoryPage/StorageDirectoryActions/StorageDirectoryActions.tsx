@@ -64,7 +64,7 @@ const StorageDirectoryActions = ({
         setLoadingFiles={setLoadingFiles}
         onActionSuccess={onApiSuccess}
         onActionError={onApiError}
-        onTrashEmptySuccess={() => onFilePathChange(fileSystem.user_home_directory)}
+        onTrashEmptySuccess={() => onFilePathChange(fileSystem.userHomeDirectory)}
       />
     );
   }
@@ -72,7 +72,14 @@ const StorageDirectoryActions = ({
   return (
     <>
       <StorageBrowserActions
-        config={fileSystem.config}
+        config={{
+          isTrashEnabled: fileSystem.config?.isTrashEnabled,
+          isHdfsSuperuser: fileSystem.config?.isHdfsSuperuser,
+          groups: fileSystem.config?.groups,
+          supergroup: fileSystem.config?.supergroup,
+          users: fileSystem.config?.users,
+          superuser: fileSystem.config?.superuser
+        }}
         currentPath={fileStats.path}
         selectedFiles={selectedFiles}
         setLoadingFiles={setLoadingFiles}

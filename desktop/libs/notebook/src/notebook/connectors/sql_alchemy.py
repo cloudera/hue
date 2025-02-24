@@ -98,7 +98,7 @@ def query_error_handler(func):
       raise
     except Exception as e:
       message = force_unicode(e)
-      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
+      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message or 'Invalid or unknown query handle' in message:
         raise QueryExpired(e)
       else:
         LOG.exception('Query Error')

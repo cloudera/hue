@@ -1114,8 +1114,8 @@ class HiveServerClient(object):
       (res, session) = self.call(self._client.GetLog, req)
       return res.log
     except Exception as e:
-      if 'Invalid query handle' in str(e):
-        message = 'Invalid query handle'
+      if 'Invalid query handle' in str(e) or 'Invalid or unknown query handle' in str(e):
+        message = 'Invalid or unknown query handle'
         LOG.error('%s: %s' % (message, e))
       else:
         message = 'Error when fetching the logs of the operation.'

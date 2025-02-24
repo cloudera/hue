@@ -439,9 +439,9 @@ def execute_query(request, design_id=None, query_history_id=None):
       else:
         action = 'editor-results'
     except QueryServerException as e:
-      if 'Invalid query handle' in e.message or 'Invalid OperationHandle' in e.message:
+      if 'Invalid query handle' in e.message or 'Invalid OperationHandle' in e.message or 'Invalid or unknown query handle' in e.message:
         query_history.save_state(QueryHistory.STATE.expired)
-        LOG.warning("Invalid query handle", exc_info=sys.exc_info())
+        LOG.warning("Invalid or unknown query handle", exc_info=sys.exc_info())
         action = 'editor-expired-results'
       else:
         raise e

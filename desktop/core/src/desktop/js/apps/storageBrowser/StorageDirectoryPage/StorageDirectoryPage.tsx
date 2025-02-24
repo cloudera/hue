@@ -325,7 +325,7 @@ const StorageDirectoryPage = ({
             {...restProps}
           />
 
-          {filesData?.page && filesData?.page?.total_pages > 0 && (
+          {filesData?.page && filesData?.page?.totalPages > 0 && (
             <Pagination
               setPageSize={setPageSize}
               pageSize={pageSize}

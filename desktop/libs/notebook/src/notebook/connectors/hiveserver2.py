@@ -115,7 +115,7 @@ def query_error_handler(func):
         raise QueryError(message)
     except QueryServerException as e:
       message = force_unicode(str(e))
-      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
+      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message or 'Invalid or unknown query handle' in message:
         raise QueryExpired(e)
       else:
         raise QueryError(message)
@@ -394,7 +394,7 @@ class HS2Api(Api):
     try:
       results = db.fetch(handle, start_over=start_over, rows=rows)
     except QueryServerException as ex:
-      if re.search('(client inactivity)|(Invalid query handle)', str(ex)) and ex.message:
+      if re.search('(client inactivity)|(Invalid query handle)|(Invalid or unknown query handle)', str(ex)) and ex.message:
         raise QueryExpired(message=ex.message)
       else:
         raise QueryError(ex)

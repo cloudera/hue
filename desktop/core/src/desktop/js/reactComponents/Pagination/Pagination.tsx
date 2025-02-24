@@ -24,7 +24,7 @@ import PageNextIcon from '@cloudera/cuix-core/icons/react/PageNextIcon';
 import PageLastIcon from '@cloudera/cuix-core/icons/react/PageLastIcon';
 import DropdownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 
-import { PageStats } from '../FileChooser/types';
+import { PageStats } from '../../apps/storageBrowser/types';
 import './Pagination.scss';
 
 interface PaginationProps {
@@ -49,8 +49,8 @@ const Pagination = ({
 }: PaginationProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const startIndex = pageStats.page_size * (pageStats.page_number - 1) + 1;
-  const endIndex = Math.min(pageStats.page_size * pageStats.page_number, pageStats.total_size);
+  const startIndex = pageStats.pageSize * (pageStats.pageNumber - 1) + 1;
+  const endIndex = Math.min(pageStats.pageSize * pageStats.pageNumber, pageStats.totalSize);
 
   const pageSizeOptionsMenu: MenuProps['items'] = pageSizeOptions.map(option => {
     return {
@@ -72,7 +72,7 @@ const Pagination = ({
 
   return (
     <div className="hue-pagination">
-      {pageStats.page_size > 0 && (
+      {pageStats.pageSize > 0 && (
         <div className="hue-pagination__page-size-control">
           {t('Rows per page: ')}
           <Dropdown menu={{ items: pageSizeOptionsMenu }}>
@@ -82,46 +82,46 @@ const Pagination = ({
               icon={<DropdownIcon />}
               iconPosition="right"
             >
-              {pageStats.page_size}
+              {pageStats.pageSize}
             </BorderlessButton>
           </Dropdown>
         </div>
       )}
       <div className="hue-pagination__rows-stats-display">
         {showIndexes
-          ? `${startIndex} - ${endIndex} of ${pageStats.total_size}`
-          : `${pageStats.page_number} of ${pageStats.total_pages}`}
+          ? `${startIndex} - ${endIndex} of ${pageStats.totalSize}`
+          : `${pageStats.pageNumber} of ${pageStats.totalPages}`}
       </div>
       <div className="hue-pagination__control-buttons-panel">
         <BorderlessButton
           onClick={() => setPageNumber(1)}
           className="hue-pagination__control-button"
           data-event={''}
-          disabled={pageStats.page_number === 1}
+          disabled={pageStats.pageNumber === 1}
           title={t('First Page')}
           icon={<PageFirstIcon />}
         />
         <BorderlessButton
-          onClick={() => setPageNumber(pageStats.page_number - 1)}
+          onClick={() => setPageNumber(pageStats.pageNumber - 1)}
           className="hue-pagination__control-button"
           data-event={''}
-          disabled={pageStats.page_number === 1}
+          disabled={pageStats.pageNumber === 1}
           title={t('First Page')}
           icon={<PagePreviousIcon />}
         />
         <BorderlessButton
-          onClick={() => setPageNumber(pageStats.page_number + 1)}
+          onClick={() => setPageNumber(pageStats.pageNumber + 1)}
           className="hue-pagination__control-button"
           data-event={''}
-          disabled={pageStats.page_number === pageStats.total_pages}
+          disabled={pageStats.pageNumber === pageStats.totalPages}
           title={t('Next Page')}
           icon={<PageNextIcon />}
         />
         <BorderlessButton
-          onClick={() => setPageNumber(pageStats.total_pages)}
+          onClick={() => setPageNumber(pageStats.totalPages)}
           className="hue-pagination__control-button"
           data-event={''}
-          disabled={pageStats.page_number === pageStats.total_pages}
+          disabled={pageStats.pageNumber === pageStats.totalPages}
           title={t('Last Page')}
           icon={<PageLastIcon />}
         />

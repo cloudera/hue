@@ -50,7 +50,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
   const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
   const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
   const initialFilePath =
-    urlFileSystem === fileSystem.file_system ? urlFilePath : fileSystem.user_home_directory;
+    urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
   const fileName =
@@ -59,8 +59,8 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
   const { t } = i18nReact.useTranslation();
 
   const { data: trash, reloadData: reloadTrashData } = useLoadData<TrashPath>(TRASH_PATH, {
-    params: { path: fileSystem.user_home_directory },
-    skip: !fileSystem.config?.is_trash_enabled || !fileSystem.user_home_directory
+    params: { path: fileSystem.userHomeDirectory },
+    skip: !fileSystem.config?.isTrashEnabled || !fileSystem.userHomeDirectory
   });
 
   const {
@@ -90,12 +90,12 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
       enabled: error?.response?.status === 404,
       message: t('Error: Path "{{path}}" not found.', { path: filePath }),
       action: t('Go to home directory'),
-      onClick: () => setFilePath(fileSystem.user_home_directory)
+      onClick: () => setFilePath(fileSystem.userHomeDirectory)
     },
     {
       enabled: !!error && error?.response?.status !== 404,
       message: t('An error occurred while fetching filesystem "{{fileSystem}}".', {
-        fileSystem: fileSystem.file_system.toUpperCase()
+        fileSystem: fileSystem.name.toUpperCase()
       }),
       action: t('Retry'),
       onClick: reloadData
@@ -115,7 +115,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           <div className="hue-storage-browser__home-bar-right">
             <BorderlessButton
               onClick={() => {
-                setFilePath(fileSystem.user_home_directory);
+                setFilePath(fileSystem.userHomeDirectory);
               }}
               className="hue-path-browser__home-btn"
               data-event={''}
@@ -124,14 +124,14 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
             >
               {t('Home')}
             </BorderlessButton>
-            {fileSystem.config?.is_trash_enabled && (
+            {fileSystem.config?.isTrashEnabled && (
               <BorderlessButton
-                onClick={() => setFilePath(trash?.trash_path ?? '')}
+                onClick={() => setFilePath(trash?.trashPath ?? '')}
                 className="hue-path-browser__home-btn"
                 data-event={''}
                 title={t('Trash')}
                 icon={<DeleteIcon />}
-                disabled={!trash?.trash_path}
+                disabled={!trash?.trashPath}
               >
                 {t('Trash')}
               </BorderlessButton>

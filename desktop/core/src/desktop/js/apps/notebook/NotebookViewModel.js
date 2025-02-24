@@ -109,6 +109,7 @@ export default class NotebookViewModel {
         // Split statements
         notebook.type('notebook');
         const database = sourceSnippet.database();
+        const compute = sourceSnippet.compute();
         sourceSnippet.statementsList().forEach(sql_statement => {
           let presentationSnippet;
           const statementKey = sql_statement.hashCode() + database;
@@ -131,6 +132,7 @@ export default class NotebookViewModel {
             presentationSnippet = new Snippet(self, notebook, {
               type: notebook.initialType,
               database: database,
+              compute: compute,
               statement_raw: statementLines.join('\n'),
               result: {},
               name: titleLines.join('\n'),
