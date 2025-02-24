@@ -17,6 +17,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import useLoadData from './useLoadData';
 import { get } from '../../../api/utils';
+import { convertKeysToCamelCase } from '../../string/changeCasing';
 
 // Mock the `get` function
 jest.mock('../../../api/utils', () => ({
@@ -27,7 +28,8 @@ const mockGet = get as jest.MockedFunction<typeof get>;
 const mockUrlPrefix = 'https://api.example.com';
 const mockEndpoint = '/endpoint';
 const mockUrl = `${mockUrlPrefix}${mockEndpoint}`;
-const mockData = { id: 1, product: 'Hue' };
+const mockData = { product_id: 1, product_name: 'Hue' };
+const mockDataResponse = convertKeysToCamelCase(mockData);
 const mockOptions = {
   params: { id: 1 }
 };
@@ -53,7 +55,7 @@ describe('useLoadData', () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
-      expect(result.current.data).toEqual(mockData);
+      expect(result.current.data).toEqual(mockDataResponse);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
     });
@@ -68,7 +70,7 @@ describe('useLoadData', () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, mockOptions.params, expect.any(Object));
-      expect(result.current.data).toEqual(mockData);
+      expect(result.current.data).toEqual(mockDataResponse);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
     });
@@ -110,12 +112,12 @@ describe('useLoadData', () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
-      expect(result.current.data).toEqual(mockData);
+      expect(result.current.data).toEqual(mockDataResponse);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
     });
 
-    mockGet.mockResolvedValueOnce({ ...mockData, product: 'Hue 2' });
+    mockGet.mockResolvedValueOnce({ ...mockDataResponse, product_name: 'Hue 2' });
 
     act(() => {
       result.current.reloadData();
@@ -124,7 +126,7 @@ describe('useLoadData', () => {
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledTimes(2);
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
-      expect(result.current.data).toEqual({ ...mockData, product: 'Hue 2' });
+      expect(result.current.data).toEqual({ ...mockDataResponse, productName: 'Hue 2' });
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
     });
@@ -144,7 +146,7 @@ describe('useLoadData', () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, mockOptions.params, expect.any(Object));
-      expect(result.current.data).toEqual(mockData);
+      expect(result.current.data).toEqual(mockDataResponse);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
     });
@@ -152,7 +154,7 @@ describe('useLoadData', () => {
     const newOptions = {
       params: { id: 2 }
     };
-    const newMockData = { ...mockData, id: 2 };
+    const newMockData = { ...mockDataResponse, productId: 2 };
     mockGet.mockResolvedValueOnce(newMockData);
 
     rerender({ url: mockUrl, options: newOptions });
@@ -181,10 +183,10 @@ describe('useLoadData', () => {
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
-      expect(result.current.data).toEqual(mockData);
+      expect(result.current.data).toEqual(mockDataResponse);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
-      expect(mockOnSuccess).toHaveBeenCalledWith(mockData);
+      expect(mockOnSuccess).toHaveBeenCalledWith(mockDataResponse);
       expect(mockOnError).not.toHaveBeenCalled();
     });
   });
@@ -213,6 +215,118 @@ describe('useLoadData', () => {
       expect(result.current.loading).toBe(false);
       expect(mockOnSuccess).not.toHaveBeenCalled();
       expect(mockOnError).toHaveBeenCalledWith(mockError);
+    });
+  });
+
+  describe('transformKeys option', () => {
+    it('should fetch data and transform keys to camelCase when transformKeys is "camelCase"', async () => {
+      const { result } = renderHook(() =>
+        useLoadData(mockUrl, {
+          transformKeys: 'camelCase'
+        })
+      );
+
+      expect(result.current.data).toBeUndefined();
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(true);
+
+      await waitFor(() => {
+        expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+        expect(result.current.data).toEqual({ productId: 1, productName: 'Hue' });
+        expect(result.current.error).toBeUndefined();
+        expect(result.current.loading).toBe(false);
+      });
+    });
+
+    it('should fetch data without transforming keys when transformKeys is "none"', async () => {
+      const { result } = renderHook(() =>
+        useLoadData(mockUrl, {
+          transformKeys: 'none'
+        })
+      );
+
+      expect(result.current.data).toBeUndefined();
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(true);
+
+      await waitFor(() => {
+        expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+        expect(result.current.data).toEqual(mockData);
+        expect(result.current.error).toBeUndefined();
+        expect(result.current.loading).toBe(false);
+      });
+    });
+
+    it('should fetch data and transform keys to camelCase when transformKeys is undefined', async () => {
+      const { result } = renderHook(() => useLoadData(mockUrl));
+
+      expect(result.current.data).toBeUndefined();
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(true);
+
+      await waitFor(() => {
+        expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+        expect(result.current.data).toEqual({ productId: 1, productName: 'Hue' });
+        expect(result.current.error).toBeUndefined();
+        expect(result.current.loading).toBe(false);
+      });
+    });
+
+    it('should handle camelCase transformation for nested objects', async () => {
+      const mockData = {
+        product_details: {
+          product_id: 1,
+          product_name: 'Hue'
+        }
+      };
+      mockGet.mockResolvedValue(mockData);
+      const { result } = renderHook(() =>
+        useLoadData(mockUrl, {
+          transformKeys: 'camelCase'
+        })
+      );
+
+      expect(result.current.data).toBeUndefined();
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(true);
+
+      await waitFor(() => {
+        expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+        expect(result.current.data).toEqual({
+          productDetails: {
+            productId: 1,
+            productName: 'Hue'
+          }
+        });
+        expect(result.current.error).toBeUndefined();
+        expect(result.current.loading).toBe(false);
+      });
+    });
+
+    it('should not transform keys when transformKeys is "none" for nested objects', async () => {
+      const mockData = {
+        product_details: {
+          product_id: 1,
+          product_name: 'Hue'
+        }
+      };
+      mockGet.mockResolvedValue(mockData);
+      const { result } = renderHook(() =>
+        useLoadData(mockUrl, {
+          transformKeys: 'none'
+        })
+      );
+
+      expect(result.current.data).toBeUndefined();
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(true);
+
+      await waitFor(() => {
+        expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+        expect(result.current.data).toEqual(mockData);
+        expect(result.current.error).toBeUndefined();
+        expect(result.current.loading).toBe(false);
+      });
     });
   });
 });
