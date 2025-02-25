@@ -298,6 +298,11 @@ AI_INTERFACE = ConfigSection(
       type=coerce_csv,
       default=['generate', 'edit', 'explain', 'optimize', 'fix', 'comment']
       ),
+    USER_INPUT_MAX_LENGTH=Config(
+      key='user_input_max_length',
+      help=_('Ensure the configured user input length is not exceeded.'),
+      default=1000,
+      type=int)
   )
 )
 

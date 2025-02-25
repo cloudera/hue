@@ -27,9 +27,10 @@ from rest_framework.response import Response
 from beeswax import api as beeswax_api
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
-from desktop.conf import is_ai_interface_enabled
+from desktop.conf import AI_INTERFACE, is_ai_interface_enabled
 from desktop.lib import fsmanager
 from desktop.lib.ai.metadata import semantic_search
+from desktop.lib.ai.sanitize_input import validate_input
 from desktop.lib.ai.sql import perform_sql_task
 from desktop.lib.connectors import api as connector_api
 from desktop.lib.django_util import JsonResponse
@@ -492,7 +493,15 @@ def sql(request):
   sql = request.data.get("sql")
   dialect = request.data.get("dialect")
   metadata = request.data.get("metadata")
+  input_max_length = AI_INTERFACE.USER_INPUT_MAX_LENGTH.get()
+
   if is_ai_interface_enabled():
+    # input validation
+    try:
+      validate_input(input, input_max_length)
+    except Exception as e:
+      return JsonResponse({"error": str(e)}, status=400)
+
     response = perform_sql_task(django_request, task, input, sql, dialect, metadata)
     return JsonResponse(dataclasses.asdict(response))
   else:

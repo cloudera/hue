@@ -410,6 +410,10 @@
     # Possible values: Any combination of the following.
     ## enabled_sql_tasks=generate,edit,explain,optimize,fix,comment
 
+    # Ensure the configured user input length is not exceeded.
+    # Type: int. Default: 1000.
+    ## user_input_max_length=1000
+
   [[semantic_search]]
     # Model used for data embedding. Must be compatible with SentenceTransformer.
     # Type: string. Default: all-MiniLM-L6-v2.
