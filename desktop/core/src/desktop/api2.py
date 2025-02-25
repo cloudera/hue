@@ -22,18 +22,10 @@ import logging
 import zipfile
 import tempfile
 from builtins import map
-
-from celery.app.control import Control
-
-from desktop.conf import TASK_SERVER_V2
-
-if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
-  from desktop.celery import app as celery_app
-  from filebrowser.utils import parse_broker_url
-from collections import defaultdict
 from datetime import datetime
 from io import StringIO as string_io
 
+from celery.app.control import Control
 from django.core import management
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
@@ -43,6 +35,8 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
+from beeswax import common
+from beeswax.management.commands import beeswax_install_examples
 from beeswax.models import Namespace
 from desktop import appmanager
 from desktop.auth.backend import is_admin
@@ -53,11 +47,11 @@ from desktop.conf import (
   ENABLE_GIST_PREVIEW,
   ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_SHARING,
-  IS_K8S_ONLY,
   TASK_SERVER_V2,
   get_clusters,
 )
 from desktop.lib.conf import GLOBAL_CONFIG, BoundContainer, is_anonymous
+from desktop.lib.connectors.models import Connector
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
@@ -88,14 +82,24 @@ from filebrowser.conf import (
 from filebrowser.tasks import check_disk_usage_and_clean_task, document_cleanup_task
 from filebrowser.views import MAX_FILEEDITOR_SIZE
 from hadoop.cluster import is_yarn
+from hbase.management.commands import hbase_setup
+from indexer.management.commands import indexer_setup
 from metadata.catalog_api import (
   _highlight,
   search_entities as metadata_search_entities,
   search_entities_interactive as metadata_search_entities_interactive,
 )
 from metadata.conf import has_catalog
-from notebook.connectors.base import Notebook
+from notebook.connectors.base import Notebook, get_interpreter
+from notebook.management.commands import notebook_setup
+from oozie.management.commands import oozie_setup
+from pig.management.commands import pig_setup
+from search.management.commands import search_setup
 from useradmin.models import Group, User
+
+if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
+  from desktop.celery import app as celery_app
+  from filebrowser.utils import parse_broker_url
 
 LOG = logging.getLogger()
 
@@ -1392,3 +1396,85 @@ def _paginate(request, queryset):
   limit = int(request.GET.get('limit', 0))
 
   return __paginate(page, limit, queryset)
+
+
+@api_error_handler
+def install_app_examples(request):
+  app_name = request.POST.get('app_name')
+  if not app_name:
+    return HttpResponse("Missing parameter: app_name is required.", status=400)
+
+  if not is_admin(request.user):
+    return HttpResponse("You must be a Hue admin to access this endpoint.", status=403)
+
+  # Define supported apps and their setup functions
+  setup_functions = {
+    'hive': _setup_hive_impala_examples,
+    'impala': _setup_hive_impala_examples,
+    'hbase': _setup_hbase_examples,
+    'pig': _setup_pig_examples,
+    'oozie': _setup_oozie_examples,
+    'notebook': _setup_notebook_examples,
+    'search': _setup_search_examples,
+  }
+
+  if app_name not in setup_functions:
+    return HttpResponse(f"Unsupported app name: {app_name}", status=400)
+
+  response = setup_functions[app_name](request)
+  return response if response else HttpResponse(f"Successfully installed examples for {app_name}.", status=200)
+
+
+def _setup_hive_impala_examples(request):
+  dialect = request.POST.get('dialect', 'hive')
+  db_name = request.POST.get('database_name', 'default')
+
+  if dialect not in ('hive', 'impala'):
+    return HttpResponse("Invalid dialect: Must be 'hive' or 'impala'", status=400)
+
+  interpreter = common.find_compute(dialect=dialect, user=request.user)
+
+  # Execute Hive/Impala examples installation
+  beeswax_install_examples.Command().handle(dialect=dialect, db_name=db_name, user=request.user, request=request, interpreter=interpreter)
+
+
+def _setup_hbase_examples(request):
+  hbase_setup.Command().handle(user=request.user)
+
+
+def _setup_pig_examples(request):
+  pig_setup.Command().handle()
+
+
+def _setup_oozie_examples(request):
+  oozie_setup.Command().handle()
+
+
+def _setup_notebook_examples(request):
+  connector_id = request.POST.get('connector_id')
+  if not connector_id:
+    return HttpResponse("Missing parameter: connector_id is required.", status=400)
+
+  connector = Connector.objects.get(id=connector_id)
+  if connector:
+    dialect = connector.dialect
+    db_name = request.POST.get('database_name', 'default')
+
+    # Execute Notebook examples installation using the specified connector
+    beeswax_install_examples.Command().handle(
+      dialect=dialect,
+      db_name=db_name,
+      user=request.user,
+      interpreter=get_interpreter(connector_type=connector.to_dict()['type'], user=request.user),
+      request=request,
+    )
+  else:
+    notebook_setup.Command().handle(user=request.user, dialect=request.POST.get('dialect', 'hive'))
+
+
+def _setup_search_examples(request):
+  data = request.POST.get('data')
+  indexer_setup.Command().handle(data=data)
+
+  if data == 'log_analytics_demo':
+    search_setup.Command().handle()
