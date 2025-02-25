@@ -33,6 +33,8 @@ _JSON_CONTENT_TYPE = 'application/json'
 _API_VERSION = 'v3'
 SESSION_KEY = '%(username)s-%(connector_name)s'
 OPERATION_TOKEN = '%(username)s-%(connector_name)s' + '-operation-token'
+DEFAULT_CATALOG_PARAM = "default_catalog"
+DEFAULT_DATABASE_PARAM = "default_database"
 
 
 def query_error_handler(func):
@@ -70,12 +72,19 @@ class FlinkSqlApi(Api):
 
     self.options = interpreter['options']
     api_url = self.options['url']
+    self.default_catalog = self.options[DEFAULT_CATALOG_PARAM] if DEFAULT_CATALOG_PARAM in self.options else None
+    self.default_database = self.options[DEFAULT_DATABASE_PARAM] if DEFAULT_DATABASE_PARAM in self.options else None
 
     self.db = FlinkSqlClient(user=user, api_url=api_url)
 
   @query_error_handler
   def create_session(self, lang=None, properties=None):
     session = self._get_session()
+
+    if self.default_database:
+      self._use_database(self.default_catalog, self.default_database)
+    elif self.default_catalog:
+      self._use_catalog(self.default_catalog)
 
     response = {
       'type': lang,
@@ -452,6 +461,20 @@ class FlinkSqlApi(Api):
     function_list = self._check_status_and_fetch_result(session_handle, operation_handle['operationHandle'])
 
     return [{'name': function[0]} for function in function_list]
+
+  def _use_catalog(self, catalog):
+    session = self._get_session()
+    self.db.configure_session(session_handle=(session['id']), statement="USE CATALOG `%s`" % catalog)
+
+  def _use_database(self, catalog, database):
+    session = self._get_session()
+    if catalog and database:
+      self.db.configure_session(session_handle=(session['id']),
+                                statement="USE `%(catalog)s`.`%(database)s`" % {'catalog': catalog,
+                                                                                'database': database})
+    else:
+      self.db.configure_session(session_handle=(session['id']),
+                                statement="USE `%(database)s`" % {'database': database})
 
 
 class FlinkSqlClient:
