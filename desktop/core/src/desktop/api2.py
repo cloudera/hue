@@ -1421,8 +1421,8 @@ def install_app_examples(request):
   if app_name not in setup_functions:
     return HttpResponse(f"Unsupported app name: {app_name}", status=400)
 
-  setup_functions[app_name](request)
-  return HttpResponse(f"Successfully installed examples for {app_name}.", status=200)
+  response = setup_functions[app_name](request)
+  return response if response else HttpResponse(f"Successfully installed examples for {app_name}.", status=200)
 
 
 def _setup_hive_impala_examples(request):
@@ -1430,7 +1430,7 @@ def _setup_hive_impala_examples(request):
   db_name = request.POST.get('database_name', 'default')
 
   if dialect not in ('hive', 'impala'):
-    raise HttpResponse("Invalid dialect: Must be 'hive' or 'impala'.", status=400)
+    return HttpResponse("Invalid dialect: Must be 'hive' or 'impala'", status=400)
 
   interpreter = common.find_compute(dialect=dialect, user=request.user)
 
@@ -1453,7 +1453,7 @@ def _setup_oozie_examples(request):
 def _setup_notebook_examples(request):
   connector_id = request.POST.get('connector_id')
   if not connector_id:
-    raise HttpResponse('Required parameter "connector_id" is missing', status=400)
+    return HttpResponse("Missing parameter: connector_id is required.", status=400)
 
   connector = Connector.objects.get(id=connector_id)
   if connector:
