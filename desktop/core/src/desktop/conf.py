@@ -1662,6 +1662,13 @@ OIDC = ConfigSection(
       default=False
     ),
 
+    OIDC_AUTH_REQUEST_EXTRA_PARAMS=Config(
+      key="oidc_auth_request_extra_params",
+      help=_("OIDC authentication request extra params."),
+      type=coerce_json_dict,
+      default='{}'
+    ),
+
     LOGIN_REDIRECT_URL=Config(
       key="login_redirect_url",
       help=_("As relay party Hue URL path to redirect to after login."),
