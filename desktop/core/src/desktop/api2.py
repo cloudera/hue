@@ -1419,7 +1419,7 @@ def install_app_examples(request):
   }
 
   if app_name not in setup_functions:
-    raise HttpResponse(f"Unsupported app name: {app_name}", status=400)
+    return HttpResponse(f"Unsupported app name: {app_name}", status=400)
 
   setup_functions[app_name](request)
   return HttpResponse(f"Successfully installed examples for {app_name}.", status=200)
