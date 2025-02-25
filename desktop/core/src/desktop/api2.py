@@ -77,7 +77,7 @@ from desktop.models import (
   set_user_preferences,
   uuid_default,
 )
-from desktop.views import get_banner_message, serve_403_error
+from desktop.views import get_banner_message, serve_403_error, _get_config_errors
 from filebrowser.conf import (
   CONCURRENT_MAX_CONNECTIONS,
   ENABLE_EXTRACT_UPLOADED_ARCHIVE,
@@ -1392,3 +1392,14 @@ def _paginate(request, queryset):
   limit = int(request.GET.get('limit', 0))
 
   return __paginate(page, limit, queryset)
+
+
+@api_error_handler
+def check_config(request):
+  """Returns the configuration directory and the list of validation errors."""
+  response = {
+    'hue_config_dir': os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))),
+    'config_error_list': _get_config_errors(request, cache=False),
+  }
+
+  return JsonResponse(response)
