@@ -147,6 +147,9 @@ def get_config(request):
   config['storage_browser']['enable_extract_uploaded_archive'] = ENABLE_EXTRACT_UPLOADED_ARCHIVE.get()
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())}
+  apps = appmanager.get_apps(request.user)
+  app_names = [app.name for app in sorted(apps, key=lambda app: app.menu_index)]
+  config['app_names'] = app_names
   config['status'] = 0
 
   return JsonResponse(config)

@@ -13,6 +13,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-export const SERVER_LOGS_API_URL = '/api/v1/logs';
-export const INSTALL_APP_EXAMPLES_API_URL = '/api/v1/check_config';
