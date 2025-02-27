@@ -14,5 +14,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const SERVER_LOGS_API_URL = '/api/v1/logs';
-export const INSTALL_APP_EXAMPLES_API_URL = '/api/v1/check_config';
+@import '../../../components/styles/variables';
+
+.antd.cuix {
+  .hue-overview-component {
+    background-color: $fluidx-gray-100;
+    padding: 24px;
+
+    .config__address-value {
+      color: $fluidx-blue-600;
+      padding: 2px 4px;
+      background-color: #f7f7f9;
+      border: 1px solid #e1e1e8;
+    }
+
+    .config-link {
+      color: $fluidx-blue-600;
+      cursor: pointer;
+    }
+
+    .config__alert-margin {
+      margin: 10px;
+    }
+
+    .config-table-name {
+      color: #1b2329;
+      font-size: 12px;
+      border-radius: 5px;
+      margin-left: 8px;
+      padding: 2px 4px;
+      background-color: #f7f7f9;
+      border: 1px solid #e1e1e8;
+    }
+
+    .config__trademark-text{
+      text-align: right;
+      padding: 10px;
+    }
+  }
+}
