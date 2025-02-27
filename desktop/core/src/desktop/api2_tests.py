@@ -19,12 +19,12 @@
 import re
 import json
 from builtins import object
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
 from beeswax.conf import HIVE_SERVER_HOST
-from desktop.api2 import _setup_hive_impala_examples, _setup_notebook_examples, _setup_search_examples, install_app_examples
+from desktop.api2 import _setup_hive_impala_examples, _setup_notebook_examples, _setup_search_examples, check_config, install_app_examples
 from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.models import Directory, Document2
@@ -848,3 +848,29 @@ class TestInstallAppExampleAPI:
 
         mock_indexer_setup_command.assert_called_once_with(data='twitter_demo')
         assert not mock_search_setup_command.called
+
+
+class TestCheckConfigAPI:
+  def test_check_config_success(self):
+    with patch('desktop.api2.os.path.realpath') as mock_hue_conf_dir:
+      with patch('desktop.api2._get_config_errors') as mock_get_config_errors:
+        request = Mock(method='POST')
+        mock_hue_conf_dir.return_value = '/test/hue/conf'
+        mock_get_config_errors.return_value = [
+          {"name": "Hive", "message": "The application won't work without a running HiveServer2."},
+          {"name": "Impala", "message": "No available Impalad to send queries to."},
+          {"name": "Spark", "message": "The app won't work without a running Livy Spark Server"},
+        ]
+
+        response = check_config(request)
+        response_data = json.loads(response.content)
+
+        assert response.status_code == 200
+        assert response_data == {
+          "hue_config_dir": "/test/hue/conf",
+          "config_error_list": [
+            {"name": "Hive", "message": "The application won't work without a running HiveServer2."},
+            {"name": "Impala", "message": "No available Impalad to send queries to."},
+            {"name": "Spark", "message": "The app won't work without a running Livy Spark Server"},
+          ],
+        }
