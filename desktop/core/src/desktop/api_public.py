@@ -80,6 +80,12 @@ def download_hue_logs(request):
 
 
 @api_view(["POST"])
+def check_config(request):
+  django_request = get_django_request(request)
+  return desktop_api.check_config(django_request)
+
+
+@api_view(["POST"])
 def install_app_examples(request):
   django_request = get_django_request(request)
   return desktop_api.install_app_examples(django_request)
