@@ -10,6 +10,9 @@ export async function loadComponent(name) {
     case 'StorageBrowserPage':
       return (await import('../apps/storageBrowser/StorageBrowserPage')).default;
 
+    case 'Overview':
+      return (await import('../apps/admin/Overview/OverviewTab')).default;
+
     case 'Metrics':
       return (await import('../apps/admin/Metrics/MetricsTab')).default;
 
