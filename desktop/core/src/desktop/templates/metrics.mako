@@ -13,17 +13,8 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
-<%!
-import sys
-from desktop.views import commonheader, commonfooter
-from desktop import conf
-%>
 
 <%namespace name="layout" file="about_layout.mako" />
-
-%if not is_embeddable:
-${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
-%endif
 
 ${layout.menubar(section='metrics')}
 
@@ -32,7 +23,4 @@ ${layout.menubar(section='metrics')}
 <div id="Metrics">
 <Metrics data-reactcomponent='Metrics'></Metrics>
 </div>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif
+  
