@@ -58,17 +58,17 @@ const TEMPLATE = `
             value: $parent.selectedConnectorCategory,
             labelAttribute: 'name',
             entries: $parent.filterCategories,
-            linkTitle: '${ I18n('Category') }'
+            linkTitle: '${I18n('Category')}'
           }
         }
       "></div>
-      <input type="text" class="input-large" style="padding: 3px 4px; border-radius: 2px; margin-top: 8px; margin-right: 10px;" placeholder="${ I18n('Filter...') }" data-bind="
+      <input type="text" class="input-large" style="padding: 3px 4px; border-radius: 2px; margin-top: 8px; margin-right: 10px;" placeholder="${I18n('Filter...')}" data-bind="
           clearable: $parent.connectorsFilter,
           valueUpdate: 'afterkeydown'
       ">
       <span>
         <a href="https://docs.gethue.com/administrator/configuration/connectors/" target="_blank">
-          <i class="fa fa-question-circle"></i> ${ I18n('Help') }
+          <i class="fa fa-question-circle"></i> ${I18n('Help')}
         </a>
       </span>
     </div>
@@ -84,8 +84,8 @@ const TEMPLATE = `
             <table class="table table-condensed">
               <thead>
                 <tr>
-                  <th width="30%">${ I18n('Name') }</th>
-                  <th>${ I18n('Description') }</th>
+                  <th width="30%">${I18n('Name')}</th>
+                  <th>${I18n('Description')}</th>
                 </tr>
               </thead>
               <!-- ko if: $data.values.length > 0 -->
@@ -100,10 +100,10 @@ const TEMPLATE = `
               <tfoot>
                 <tr>
                   <td colspan="2">
-                    ${ I18n('No connectors') }
+                    ${I18n('No connectors')}
                     <!-- ko if: $parents[1].section() === 'installed-connectors-page' -->
                       <a href="javascript:void(0)" data-bind="click: function() { $parents[1].selectedConnectorCategory($data.category); $parents[1].addNewConnector(); }">
-                        ${ I18n('Add one ?') }
+                        ${I18n('Add one ?')}
                       </a>
                     <!-- /ko -->
                   </td>
@@ -117,17 +117,17 @@ const TEMPLATE = `
           <table class="table table-condensed">
             <thead>
               <tr>
-                <th width="30%">${ I18n('Name') }</th>
-                <th>${ I18n('Instances') }</th>
+                <th width="30%">${I18n('Name')}</th>
+                <th>${I18n('Instances')}</th>
               </tr>
             </thead>
             <tfoot>
               <tr>
                 <td colspan="2">
-                  ${ I18n('No connectors') }
+                  ${I18n('No connectors')}
                   <!-- ko if: $parent.section() == 'installed-connectors-page' -->
                     <a href="javascript:void(0)" data-bind="click: function() { $parent.selectedConnectorCategory($data.category); $parent.addNewConnector(); }">
-                      ${ I18n('Add one ?') }
+                      ${I18n('Add one ?')}
                     </a>
                   <!-- /ko -->
                 </td>
@@ -150,23 +150,23 @@ const TEMPLATE = `
       <!-- ko if: id -->
         (<span data-bind="text: name"></span>)
         <a href="javascript:void(0)" data-bind="click: $parent.updateConnector.bind($parent)">
-          ${ I18n('Update') }
+          ${I18n('Update')}
         </a>
         <a href="javascript:void(0)" data-bind="click: $parent.deleteConnector.bind($parent)">
-          ${ I18n('Delete') }
+          ${I18n('Delete')}
         </a>
       <!-- /ko -->
       <!-- ko ifnot: id -->
         <a href="javascript:void(0)" data-bind="click: $parent.updateConnector.bind($parent)">
-          ${ I18n('Save') }
+          ${I18n('Save')}
         </a>
         <a href="javascript:void(0)" data-bind="click: function() { $parent.section('add-connector-page'); }">
-          ${ I18n('Cancel') }
+          ${I18n('Cancel')}
         </a>
       <!-- /ko -->
     <!-- /ko -->
     <a href="javascript:void(0)" data-bind="click: $parent.testConnector.bind($parent)">
-      ${ I18n('Test connection') }
+      ${I18n('Test connection')}
     </a>
     <span>
       <i class="fa fa-spinner fa-spin" data-bind="visible: $parent.testConnectionExecuting()"></i>
@@ -179,8 +179,8 @@ const TEMPLATE = `
     <table class="table table-condensed">
       <thead>
         <tr>
-          <th width="30%">${ I18n('Name') }</th>
-          <th>${ I18n('Value') }</th>
+          <th width="30%">${I18n('Name')}</th>
+          <th>${I18n('Value')}</th>
         </tr>
       </thead>
       <tbody data-bind="foreach: settings">
@@ -195,7 +195,7 @@ const TEMPLATE = `
 
 <div class="container-fluid">
   <a href="javascript:void(0)" data-bind="click: function() { section('installed-connectors-page'); }">
-    ${ I18n('Connectors') }
+    ${I18n('Connectors')}
   </a>
 
   <!-- ko if: section() === 'installed-connectors-page' -->
