@@ -71,7 +71,7 @@ from desktop.models import (
   set_user_preferences,
   uuid_default,
 )
-from desktop.views import get_banner_message, serve_403_error, _get_config_errors
+from desktop.views import _get_config_errors, get_banner_message, serve_403_error
 from filebrowser.conf import (
   CONCURRENT_MAX_CONNECTIONS,
   ENABLE_EXTRACT_UPLOADED_ARCHIVE,
