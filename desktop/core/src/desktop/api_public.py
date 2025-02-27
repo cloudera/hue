@@ -71,7 +71,7 @@ def download_hue_logs(request):
   return logs_api.download_hue_logs(django_request)
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 def check_config(request):
   django_request = get_django_request(request)
   return desktop_api.check_config(django_request)
