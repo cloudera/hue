@@ -1485,7 +1485,7 @@ def check_config(request):
   """Returns the configuration directory and the list of validation errors."""
   response = {
     'hue_config_dir': os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))),
-    'config_error_list': _get_config_errors(request, cache=False),
+    'config_errors': _get_config_errors(request, cache=False),
   }
 
   return JsonResponse(response)
