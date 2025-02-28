@@ -868,7 +868,7 @@ class TestCheckConfigAPI:
         assert response.status_code == 200
         assert response_data == {
           "hue_config_dir": "/test/hue/conf",
-          "config_error_list": [
+          "config_errors": [
             {"name": "Hive", "message": "The application won't work without a running HiveServer2."},
             {"name": "Impala", "message": "No available Impalad to send queries to."},
             {"name": "Spark", "message": "The app won't work without a running Livy Spark Server"},
