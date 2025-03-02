@@ -26,8 +26,7 @@ interface StorageDirectoryActionsProps {
   fileStats: FileStats;
   fileSystem: FileSystem;
   onFilePathChange: (path: string) => void;
-  reloadFilesData: () => void;
-  reloadTrashData: () => void;
+  onActionSuccess: () => void;
   setLoadingFiles: (value: boolean) => void;
   selectedFiles: StorageDirectoryTableData[];
   onFilesDrop: (files: File[]) => void;
@@ -38,8 +37,7 @@ const StorageDirectoryActions = ({
   fileStats,
   fileSystem,
   onFilePathChange,
-  reloadFilesData,
-  reloadTrashData,
+  onActionSuccess,
   setLoadingFiles,
   selectedFiles,
   onFilesDrop,
@@ -47,8 +45,7 @@ const StorageDirectoryActions = ({
 }: StorageDirectoryActionsProps): JSX.Element => {
   const onApiSuccess = () => {
     setLoadingFiles(false);
-    reloadFilesData();
-    reloadTrashData();
+    onActionSuccess();
   };
 
   const onApiError = (error: Error) => {
@@ -60,6 +57,7 @@ const StorageDirectoryActions = ({
     return (
       <TrashActions
         selectedFiles={selectedFiles}
+        currentPath={fileStats.path}
         isTrashEmpty={isFolderEmpty}
         setLoadingFiles={setLoadingFiles}
         onActionSuccess={onApiSuccess}
@@ -82,7 +80,7 @@ const StorageDirectoryActions = ({
       <CreateAndUploadAction
         currentPath={fileStats.path}
         setLoadingFiles={setLoadingFiles}
-        onActionSuccess={reloadFilesData}
+        onActionSuccess={onApiSuccess}
         onActionError={onApiError}
         onFilesUpload={onFilesDrop}
       />

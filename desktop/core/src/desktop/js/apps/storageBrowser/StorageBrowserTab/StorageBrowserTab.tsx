@@ -34,6 +34,8 @@ import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathB
 import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
 import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
+import { inTrash } from '../../../utils/storageBrowserUtils';
+import { Alert } from 'antd';
 
 interface StorageBrowserTabProps {
   fileSystem: FileSystem;
@@ -58,10 +60,24 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
 
   const { t } = i18nReact.useTranslation();
 
-  const { data: trash, reloadData: reloadTrashData } = useLoadData<TrashPath>(TRASH_PATH, {
+  const {
+    data: trashPath,
+    loading: trashLoading,
+    reloadData: onTrashPathReload
+  } = useLoadData<TrashPath>(TRASH_PATH, {
     params: { path: fileSystem.user_home_directory },
     skip: !fileSystem.config?.is_trash_enabled || !fileSystem.user_home_directory
   });
+
+  const onTrashClick = async () => {
+    const latestTrashData = await onTrashPathReload();
+    setFilePath(latestTrashData?.trash_path ?? '');
+  };
+
+  const reloadTrashPath = () => {
+    if (trashPath) return;
+    onTrashPathReload();
+  };
 
   const {
     data: fileStats,
@@ -102,8 +118,10 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     }
   ];
 
+  const isLoading = loading || trashLoading;
+
   return (
-    <LoadingErrorWrapper loading={loading} errors={errorConfig}>
+    <LoadingErrorWrapper loading={isLoading} errors={errorConfig}>
       <div className="hue-storage-browser-tab-content" data-testid={testId}>
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
           <div className="hue-storage-browser__title">
@@ -126,12 +144,12 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
             </BorderlessButton>
             {fileSystem.config?.is_trash_enabled && (
               <BorderlessButton
-                onClick={() => setFilePath(trash?.trash_path ?? '')}
+                onClick={onTrashClick}
                 className="hue-path-browser__home-btn"
                 data-event={''}
                 title={t('Trash')}
                 icon={<DeleteIcon />}
-                disabled={!trash?.trash_path}
+                disabled={!trashPath?.trash_path}
               >
                 {t('Trash')}
               </BorderlessButton>
@@ -147,6 +165,14 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
             </BorderlessButton>
           </div>
         </div>
+        {!!inTrash(filePath) && fileSystem.file_system === 'hdfs' && (
+          <Alert
+            type="warning"
+            message={t(
+              'This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory.'
+            )}
+          />
+        )}
         <div
           className="hue-storage-browser__path-browser-panel"
           data-testid={`${testId}-path-browser-panel`}
@@ -158,15 +184,15 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
             showIcon={false}
           />
         </div>
-        {fileStats?.type === BrowserViewType.dir && !loading && (
+        {fileStats?.type === BrowserViewType.dir && !isLoading && (
           <StorageDirectoryPage
             fileStats={fileStats}
             onFilePathChange={setFilePath}
             fileSystem={fileSystem}
-            reloadTrashData={reloadTrashData}
+            reloadTrashPath={reloadTrashPath}
           />
         )}
-        {fileStats?.type === BrowserViewType.file && !loading && (
+        {fileStats?.type === BrowserViewType.file && !isLoading && (
           <StorageFilePage fileName={fileName} fileStats={fileStats} onReload={reloadData} />
         )}
       </div>

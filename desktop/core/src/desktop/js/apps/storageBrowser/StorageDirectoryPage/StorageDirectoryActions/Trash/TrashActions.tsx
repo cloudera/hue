@@ -19,12 +19,14 @@ import React from 'react';
 import { i18nReact } from '../../../../../utils/i18nReact';
 
 import { BorderlessButton } from 'cuix/dist/components/Button';
-import { StorageDirectoryTableData } from '../../../types';
+import { FileStats, StorageDirectoryTableData } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { TRASH_PURGE, TRASH_RESTORE_BULK } from '../../../api';
+import { inRestorableTrash } from '../../../../../utils/storageBrowserUtils';
 
 interface TrashActionsProps {
   selectedFiles: StorageDirectoryTableData[];
+  currentPath: FileStats['path'];
   isTrashEmpty: boolean;
   onActionSuccess: () => void;
   onActionError: (error: Error) => void;
@@ -34,6 +36,7 @@ interface TrashActionsProps {
 
 const TrashActions = ({
   selectedFiles,
+  currentPath,
   isTrashEmpty,
   onActionSuccess,
   onActionError,
@@ -71,7 +74,11 @@ const TrashActions = ({
 
   return (
     <>
-      <BorderlessButton data-event="" disabled={!selectedFiles.length} onClick={onRestoreFiles}>
+      <BorderlessButton
+        data-event=""
+        disabled={!selectedFiles.length || !inRestorableTrash(currentPath)}
+        onClick={onRestoreFiles}
+      >
         {t('Restore')}
       </BorderlessButton>
       <BorderlessButton data-event="" disabled={isTrashEmpty} onClick={onTrashEmpty}>
