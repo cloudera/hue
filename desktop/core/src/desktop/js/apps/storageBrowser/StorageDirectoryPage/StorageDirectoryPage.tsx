@@ -286,7 +286,14 @@ const StorageDirectoryPage = ({
         />
         <div className="hue-storage-browser__actions-bar-right">
           <StorageBrowserActions
-            config={config}
+            config={{
+              isTrashEnabled: config?.isTrashEnabled,
+              isHdfsSuperuser: config?.isHdfsSuperuser,
+              groups: config?.groups,
+              supergroup: config?.supergroup,
+              users: config?.users,
+              superuser: config?.superuser
+            }}
             currentPath={fileStats.path}
             selectedFiles={selectedFiles}
             setLoadingFiles={setLoadingFiles}
@@ -326,7 +333,7 @@ const StorageDirectoryPage = ({
             {...restProps}
           />
 
-          {filesData?.page && filesData?.page?.total_pages > 0 && (
+          {filesData?.page && filesData?.page?.totalPages > 0 && (
             <Pagination
               setPageSize={setPageSize}
               pageSize={pageSize}
