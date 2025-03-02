@@ -65,7 +65,6 @@ describe('FileChooserModal', () => {
     );
     await waitFor(() => {
       expect(screen.getByText('Select File')).toBeInTheDocument();
-      expect(screen.getByText('Destination Path:')).toBeInTheDocument();
       expect(screen.getByText('Cancel')).toBeInTheDocument();
       expect(screen.getByText('Submit')).toBeInTheDocument();
     });

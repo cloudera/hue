@@ -23,12 +23,14 @@
     flex: 0 1 auto;
     background-color: transparent;
     border: none;
+    max-width: 30%;
 
     >span {
       @include mixins.nowrap-ellipsis;
 
-      max-width: 150ch;
       display: inline !important;
+      font-size: vars.$font-size-lg;
+      line-height: 32px;
     }
   }
 }
