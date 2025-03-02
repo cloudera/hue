@@ -2,24 +2,25 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CreateAndUploadAction from './CreateAndUploadAction';
-import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../api';
+import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../../api';
 
 const mockSave = jest.fn();
-jest.mock('../../../../utils/hooks/useSaveData/useSaveData', () => ({
+jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     save: mockSave
   }))
 }));
 
-jest.mock('../../../../utils/huePubSub', () => ({
+jest.mock('../../../../../utils/huePubSub', () => ({
   __esModule: true,
   publish: jest.fn()
 }));
 
 describe('CreateAndUploadAction', () => {
   const currentPath = '/some/path';
-  const onSuccessfulAction = jest.fn();
+  const onActionSuccess = jest.fn();
+  const onActionError = jest.fn();
   const setLoadingFiles = jest.fn();
   const mockFilesUpload = jest.fn();
 
@@ -27,9 +28,10 @@ describe('CreateAndUploadAction', () => {
     render(
       <CreateAndUploadAction
         currentPath={currentPath}
-        onSuccessfulAction={onSuccessfulAction}
+        onActionSuccess={onActionSuccess}
         setLoadingFiles={setLoadingFiles}
         onFilesUpload={mockFilesUpload}
+        onActionError={onActionError}
       />
     );
   });

@@ -22,7 +22,7 @@ import { get } from '../../../../../../api/utils';
 import formatBytes from '../../../../../../utils/formatBytes';
 import SummaryModal from './SummaryModal';
 
-jest.mock('../../../../../api/utils', () => ({
+jest.mock('../../../../../../api/utils', () => ({
   get: jest.fn()
 }));
 

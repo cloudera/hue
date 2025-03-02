@@ -46,7 +46,7 @@ const mockFiles: StorageDirectoryTableData[] = [
 ];
 
 const mockSave = jest.fn();
-jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
+jest.mock('../../../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     save: mockSave,

@@ -24,11 +24,11 @@ import { StorageDirectoryTableData } from '../../../types';
 import { get } from '../../../../../api/utils';
 import huePubSub from '../../../../../utils/huePubSub';
 
-jest.mock('../../../../api/utils', () => ({
+jest.mock('../../../../../api/utils', () => ({
   get: jest.fn()
 }));
 
-jest.mock('../../../../utils/huePubSub', () => ({
+jest.mock('../../../../../utils/huePubSub', () => ({
   publish: jest.fn()
 }));
 
