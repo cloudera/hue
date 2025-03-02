@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useState } from 'react';
+import { BorderlessButton } from 'cuix/dist/components/Button';
+import Modal from 'cuix/dist/components/Modal';
 
 import { i18nReact } from '../../../../../utils/i18nReact';
-
-import { BorderlessButton } from 'cuix/dist/components/Button';
 import { FileStats, StorageDirectoryTableData } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { TRASH_PURGE, TRASH_RESTORE_BULK } from '../../../api';
@@ -34,6 +34,11 @@ interface TrashActionsProps {
   onTrashEmptySuccess: () => void;
 }
 
+enum Actions {
+  restore = 'restore',
+  trashEmpty = 'trashEmpty'
+}
+
 const TrashActions = ({
   selectedFiles,
   currentPath,
@@ -44,12 +49,17 @@ const TrashActions = ({
   onTrashEmptySuccess
 }: TrashActionsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedAction, setSelectedAction] = useState<Actions | undefined>();
 
-  const { save } = useSaveData(undefined, {
+  const { save, loading } = useSaveData(undefined, {
     postOptions: {
       qsEncodeData: false
     },
-    onSuccess: onActionSuccess,
+    onSuccess: () => {
+      setIsModalOpen(false);
+      onActionSuccess();
+    },
     onError: onActionError
   });
 
@@ -72,18 +82,56 @@ const TrashActions = ({
     });
   };
 
+  const handleActionClick = (clickedAction: Actions) => {
+    setIsModalOpen(true);
+    setSelectedAction(clickedAction);
+  };
+
+  const handleModalConfirm = () => {
+    if (selectedAction === Actions.restore) {
+      return onRestoreFiles();
+    }
+    if (selectedAction === Actions.trashEmpty) {
+      return onTrashEmpty();
+    }
+  };
+
+  const handleModalCancel = () => {
+    setIsModalOpen(false);
+    setSelectedAction(undefined);
+  };
+
   return (
     <>
       <BorderlessButton
         data-event=""
         disabled={!selectedFiles.length || !inRestorableTrash(currentPath)}
-        onClick={onRestoreFiles}
+        onClick={() => handleActionClick(Actions.restore)}
       >
         {t('Restore')}
       </BorderlessButton>
-      <BorderlessButton data-event="" disabled={isTrashEmpty} onClick={onTrashEmpty}>
+      <BorderlessButton
+        data-event=""
+        disabled={isTrashEmpty}
+        onClick={() => handleActionClick(Actions.trashEmpty)}
+      >
         {t('Empty trash')}
       </BorderlessButton>
+      <Modal
+        cancelText={t('No')}
+        className="cuix antd"
+        okText={t('Yes')}
+        onCancel={handleModalCancel}
+        onOk={handleModalConfirm}
+        open={isModalOpen}
+        title={selectedAction === Actions.restore ? t('Restore') : t('Empty trash')}
+        okButtonProps={{ disabled: loading }}
+        cancelButtonProps={{ disabled: loading }}
+      >
+        {selectedAction === Actions.restore
+          ? t('Are you sure you want to restore these files?')
+          : t('Are you sure you want to permanently delete all your trash?')}
+      </Modal>
     </>
   );
 };

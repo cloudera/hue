@@ -55,7 +55,7 @@ describe('TrashActions Component', () => {
   const mockIsTrashEmpty = !mockSelectedFiles.length;
 
   it('should render the Restore and Empty trash buttons', () => {
-    const { getByText } = render(
+    const { getByRole, queryByRole } = render(
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
@@ -67,12 +67,13 @@ describe('TrashActions Component', () => {
       />
     );
 
-    expect(getByText('Restore')).toBeInTheDocument();
-    expect(getByText('Empty trash')).toBeInTheDocument();
+    expect(getByRole('button', { name: 'Restore' })).toBeInTheDocument();
+    expect(getByRole('button', { name: 'Empty trash' })).toBeInTheDocument();
+    expect(queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('should call onRestoreFiles when "Restore" button is clicked', async () => {
-    const { getByRole } = render(
+  it('should open modal when "Restore" button is clicked', () => {
+    const { getByText, getByRole } = render(
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
@@ -86,12 +87,14 @@ describe('TrashActions Component', () => {
 
     fireEvent.click(getByRole('button', { name: 'Restore' }));
 
-    expect(mockSetLoadingFiles).toHaveBeenCalledWith(true);
-    expect(mockSave).toHaveBeenCalled();
+    expect(getByRole('dialog')).toBeInTheDocument();
+    expect(getByText('Are you sure you want to restore these files?')).toBeInTheDocument();
+    expect(getByRole('button', { name: 'Yes' })).toBeInTheDocument();
+    expect(getByRole('button', { name: 'No' })).toBeInTheDocument();
   });
 
-  it('should call onTrashEmpty when "Empty trash" button is clicked', async () => {
-    const { getByRole } = render(
+  it('should open modal when "Empty trash" button is clicked', () => {
+    const { getByText, getByRole } = render(
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
@@ -105,8 +108,71 @@ describe('TrashActions Component', () => {
 
     fireEvent.click(getByRole('button', { name: 'Empty trash' }));
 
+    expect(getByRole('dialog')).toBeInTheDocument();
+    expect(
+      getByText('Are you sure you want to permanently delete all your trash?')
+    ).toBeInTheDocument();
+    expect(getByRole('button', { name: 'Yes' })).toBeInTheDocument();
+    expect(getByRole('button', { name: 'No' })).toBeInTheDocument();
+  });
+
+  it('should restore files when "Yes" is clicked in the modal for restore', () => {
+    const { getByRole } = render(
+      <TrashActions
+        selectedFiles={mockSelectedFiles}
+        currentPath={mockCurrentPath}
+        isTrashEmpty={mockIsTrashEmpty}
+        onActionSuccess={mockOnActionSuccess}
+        onActionError={mockOnActionError}
+        setLoadingFiles={mockSetLoadingFiles}
+        onTrashEmptySuccess={mockOnTrashEmptySuccess}
+      />
+    );
+
+    fireEvent.click(getByRole('button', { name: 'Restore' }));
+    fireEvent.click(getByRole('button', { name: 'Yes' }));
+
     expect(mockSetLoadingFiles).toHaveBeenCalledWith(true);
     expect(mockSave).toHaveBeenCalled();
+  });
+
+  it('should call onTrashEmpty when "Yes" is clicked in the modal for empty trash', () => {
+    const { getByRole } = render(
+      <TrashActions
+        selectedFiles={mockSelectedFiles}
+        currentPath={mockCurrentPath}
+        isTrashEmpty={mockIsTrashEmpty}
+        onActionSuccess={mockOnActionSuccess}
+        onActionError={mockOnActionError}
+        setLoadingFiles={mockSetLoadingFiles}
+        onTrashEmptySuccess={mockOnTrashEmptySuccess}
+      />
+    );
+
+    fireEvent.click(getByRole('button', { name: 'Empty trash' }));
+    fireEvent.click(getByRole('button', { name: 'Yes' }));
+
+    expect(mockSetLoadingFiles).toHaveBeenCalledWith(true);
+    expect(mockSave).toHaveBeenCalled();
+  });
+
+  it('should close modal when "No" is clicked', () => {
+    const { getByRole, queryByRole } = render(
+      <TrashActions
+        selectedFiles={mockSelectedFiles}
+        currentPath={mockCurrentPath}
+        isTrashEmpty={mockIsTrashEmpty}
+        onActionSuccess={mockOnActionSuccess}
+        onActionError={mockOnActionError}
+        setLoadingFiles={mockSetLoadingFiles}
+        onTrashEmptySuccess={mockOnTrashEmptySuccess}
+      />
+    );
+
+    fireEvent.click(getByRole('button', { name: 'Restore' }));
+    fireEvent.click(getByRole('button', { name: 'No' }));
+
+    expect(queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('should disable "Restore" button if no files are selected', () => {
@@ -157,12 +223,12 @@ describe('TrashActions Component', () => {
     expect(getByRole('button', { name: 'Empty trash' })).toBeDisabled();
   });
 
-  it('should call onActionError when restore fails', async () => {
+  it('should call onActionError when restore fails', () => {
     mockSave.mockImplementationOnce(() => {
       mockOnActionError(new Error('Restore failed'));
     });
 
-    const { getByText } = render(
+    const { getByRole } = render(
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
@@ -174,17 +240,18 @@ describe('TrashActions Component', () => {
       />
     );
 
-    fireEvent.click(getByText('Restore'));
+    fireEvent.click(getByRole('button', { name: 'Restore' }));
+    fireEvent.click(getByRole('button', { name: 'Yes' }));
 
     expect(mockOnActionError).toHaveBeenCalledWith(new Error('Restore failed'));
   });
 
-  it('should call onTrashEmptySuccess when trash is emptied successfully', async () => {
+  it('should call onTrashEmptySuccess when trash is emptied successfully', () => {
     mockSave.mockImplementationOnce(() => {
       mockOnTrashEmptySuccess();
     });
 
-    const { getByText } = render(
+    const { getByRole } = render(
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
@@ -196,7 +263,8 @@ describe('TrashActions Component', () => {
       />
     );
 
-    fireEvent.click(getByText('Empty trash'));
+    fireEvent.click(getByRole('button', { name: 'Empty trash' }));
+    fireEvent.click(getByRole('button', { name: 'Yes' }));
 
     expect(mockOnTrashEmptySuccess).toHaveBeenCalledTimes(1);
   });
