@@ -24,12 +24,15 @@ import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
 import { FILE_STATS_API_URL } from '../api';
 import { BrowserViewType, FileStats, FileSystem } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import { BorderlessButton } from 'cuix/dist/components/Button';
 
 import './StorageBrowserTab.scss';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
+import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
 
 interface StorageBrowserTabProps {
   fileSystem: FileSystem;
@@ -49,10 +52,10 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     urlFileSystem === fileSystem.file_system ? urlFilePath : fileSystem.user_home_directory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
-  const fileName = filePath.split('/').pop() ?? '';
+  const fileName =
+    filePath.split('/').pop() !== '' ? (filePath.split('/').pop() ?? '') : filePath.split('://')[0];
 
   const { t } = i18nReact.useTranslation();
-
   const {
     data: fileStats,
     loading,
@@ -96,16 +99,39 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     <LoadingErrorWrapper loading={loading} errors={errorConfig}>
       <div className="hue-storage-browser-tab-content" data-testid={testId}>
         <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
-          <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
-          <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
-            {fileName}
-          </h3>
+          <div className="hue-storage-browser__title">
+            <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
+            <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
+              {fileName}
+            </h3>
+          </div>
+          <div className="hue-storage-browser__home-bar-right">
+            <BorderlessButton
+              onClick={() => {
+                setFilePath(fileSystem.user_home_directory);
+              }}
+              className="hue-storage-browser__home-bar-btns"
+              data-event={''}
+              title={'home'}
+              icon={<HomeIcon />}
+            >
+              {t('Home')}
+            </BorderlessButton>
+            <BorderlessButton
+              onClick={() => reloadData()}
+              className="hue-storage-browser__home-bar-btns"
+              data-event={''}
+              title={'Refresh'}
+              icon={<RefreshIcon />}
+            >
+              {t('Refresh')}
+            </BorderlessButton>
+          </div>
         </div>
         <div
           className="hue-storage-browser__path-browser-panel"
           data-testid={`${testId}-path-browser-panel`}
         >
-          <span className="hue-storage-browser__filePath">{t('File Path:')}</span>
           <PathBrowser
             filePath={filePath}
             onFilepathChange={setFilePath}
