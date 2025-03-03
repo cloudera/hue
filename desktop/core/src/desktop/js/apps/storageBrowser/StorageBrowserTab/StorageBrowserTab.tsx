@@ -53,7 +53,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
   const fileName =
-    filePath.split('/').pop() !== '' ? filePath.split('/').pop() : filePath.split('://')[0];
+    filePath.split('/').pop() !== '' ? (filePath.split('/').pop() ?? '') : filePath.split('://')[0];
 
   const { t } = i18nReact.useTranslation();
   const {
@@ -110,7 +110,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
               onClick={() => {
                 setFilePath(fileSystem.user_home_directory);
               }}
-              className="hue-path-browser__home-btn"
+              className="hue-storage-browser__home-bar-btns"
               data-event={''}
               title={'home'}
               icon={<HomeIcon />}
@@ -119,7 +119,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
             </BorderlessButton>
             <BorderlessButton
               onClick={() => reloadData()}
-              className="hue-path-browser__refresh-btn"
+              className="hue-storage-browser__home-bar-btns"
               data-event={''}
               title={'Refresh'}
               icon={<RefreshIcon />}

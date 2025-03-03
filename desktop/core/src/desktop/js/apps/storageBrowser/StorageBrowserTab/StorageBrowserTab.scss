@@ -32,31 +32,12 @@
   .hue-storage-browser__title {
     display: flex;
     gap: vars.$fluidx-spacing-xs;
-    max-width: 70%;
+    max-width: 60%;
+    margin-right: vars.$fluidx-spacing-xl
   }
 
-  .hue-path-browser__refresh-btn {
-    padding: vars.$fluidx-spacing-xxs;;
-
-    &:hover {
-      background-color: transparent;
-    }
-
-    &:focus {
-      background-color: transparent;
-    }
-  }
-
-  .hue-path-browser__home-btn {
+  .hue-storage-browser__home-bar-btns {
     padding: vars.$fluidx-spacing-xxs;
-
-    &:hover {
-      background-color: transparent;
-    }
-
-    &:focus {
-      background-color: transparent;
-    }
   }
 
   .hue-storage-browser__home-bar-right {
