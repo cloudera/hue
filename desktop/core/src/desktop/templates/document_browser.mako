@@ -19,6 +19,7 @@ import sys
 
 from desktop import conf
 from desktop.views import _ko
+from desktop.conf import ENABLE_WORKFLOW_CREATION_ACTION
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -134,12 +135,14 @@ else:
                           </a>
                         </li>
                       % endif
-                      % if 'oozie' in apps:
-                        <li>
-                          <a title="${_('Oozie Workflow')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_workflow') }')">
-                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-workflow' } } --><!-- /ko --> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
-                          </a>
-                        </li>
+                      % if ('oozie' in apps):
+                        % if ENABLE_WORKFLOW_CREATION_ACTION.get():
+                          <li>
+                            <a title="${_('Oozie Workflow')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_workflow') }')">
+                              <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-workflow' } } --><!-- /ko --> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
+                            </a>
+                          </li>
+                        % endif
                         <li>
                           <a title="${_('Oozie Schedule')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
                             <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-coordinator' } } --><!-- /ko --> ${_('Schedule') if is_embeddable else _('Oozie Coordinator')}
