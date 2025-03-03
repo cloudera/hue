@@ -1926,6 +1926,13 @@ ENABLE_SHARING = Config(
   type=coerce_bool,
   default=True)
 
+ENABLE_WORKFLOW_CREATION_ACTION = Config(
+  key="enable_workflow_creation_action",
+  help=_('Global setting to enable or disable new workflow creation in Hue documents.'),
+  type=coerce_bool,
+  default=True,
+)
+
 USE_NEW_ASSIST_PANEL = Config(
   key='use_new_assist_panel',
   default=False,
