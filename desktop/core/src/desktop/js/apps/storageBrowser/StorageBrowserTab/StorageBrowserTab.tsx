@@ -148,7 +148,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
               <BorderlessButton
                 onClick={onTrashClick}
                 className="hue-path-browser__home-btn"
-                data-event={''}
+                data-event=""
                 title={t('Trash')}
                 icon={<DeleteIcon />}
                 disabled={!trashPath?.trash_path}
