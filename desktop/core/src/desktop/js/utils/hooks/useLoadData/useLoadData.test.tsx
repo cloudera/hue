@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import useLoadData from './useLoadData';
 import { get } from '../../../api/utils';
 
@@ -115,16 +115,16 @@ describe('useLoadData', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    const updatedMockResult = { ...mockData, product: 'Hue 2' };
-    mockGet.mockResolvedValueOnce(updatedMockResult);
+    mockGet.mockResolvedValueOnce({ ...mockData, product: 'Hue 2' });
 
-    const reloadResult = await result.current.reloadData();
+    act(() => {
+      result.current.reloadData();
+    });
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledTimes(2);
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
-      expect(result.current.data).toEqual(updatedMockResult);
-      expect(reloadResult).toEqual(updatedMockResult);
+      expect(result.current.data).toEqual({ ...mockData, product: 'Hue 2' });
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
     });

@@ -371,7 +371,7 @@ def storage_trash_bulk_restore(request):
   return filebrowser_api.bulk_op(django_request, filebrowser_api.trash_restore)
 
 
-@api_view(["POST"])
+@api_view(["DELETE"])
 def storage_trash_purge(request):
   django_request = get_django_request(request)
   return filebrowser_api.trash_purge(django_request)

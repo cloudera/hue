@@ -39,6 +39,3 @@ export const BULK_MOVE_API_URL = '/api/v1/storage/move/bulk';
 export const BULK_CHANGE_OWNER_API_URL = '/api/v1/storage/chown/bulk';
 export const BULK_CHANGE_PERMISSION_API_URL = '/api/v1/storage/chmod/bulk';
 export const UPLOAD_AVAILABLE_SPACE_URL = '/api/v1/taskserver/upload/available_space';
-export const TRASH_PATH = '/api/v1/storage/trash/path';
-export const TRASH_RESTORE_BULK = '/api/v1/storage/trash/restore/bulk';
-export const TRASH_PURGE = '/api/v1/storage/trash/purge';
