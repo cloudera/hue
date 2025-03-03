@@ -67,12 +67,6 @@ export interface FilePreview {
 export interface ListDirectory {
   files: FileStats[];
   page: PageStats;
-  groups: string[];
-  users: string[];
-  supergroup: string;
-  superuser: string;
-  is_fs_superuser: boolean;
-  is_trash_enabled: boolean;
 }
 
 export interface ContentSummary {
