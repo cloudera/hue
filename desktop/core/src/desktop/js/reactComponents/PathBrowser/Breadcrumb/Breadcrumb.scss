@@ -17,9 +17,5 @@
 .antd.cuix {
   .hue-path-browser__breadcrumb {
     display: contents;
-
-    .hue-path-browser__overflowing-label {
-      min-width: var(--min-width);
-    }
   }
 }

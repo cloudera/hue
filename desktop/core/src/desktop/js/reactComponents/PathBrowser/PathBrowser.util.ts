@@ -45,9 +45,7 @@ export const getFileSystemAndPath = (
 };
 
 export const getBreadcrumbs = (fileSystem: string, path: string): BreadcrumbData[] => {
-  const urlFromPath = new URL(`file:///${path}`);
-  const pathParts = urlFromPath.pathname.split('/').filter(Boolean);
-
+  const pathParts = path.split('/').filter(Boolean);
   const rootUrl = fileSystem === 'hdfs' ? '/' : `${fileSystem}://`;
   const rootlabel = fileSystem === 'hdfs' ? '/' : fileSystem;
   const rootNode = {
@@ -57,9 +55,8 @@ export const getBreadcrumbs = (fileSystem: string, path: string): BreadcrumbData
 
   return pathParts.reduce(
     (acc, part, index) => {
-      const decodedPart = decodeURIComponent(part);
-      const currentUrl = `${acc[index].url}${index === 0 ? '' : '/'}${decodedPart}`;
-      acc.push({ url: currentUrl, label: decodedPart });
+      const currentUrl = `${acc[index].url}${index === 0 ? '' : '/'}${part}`;
+      acc.push({ url: currentUrl, label: part });
       return acc;
     },
     [rootNode]
