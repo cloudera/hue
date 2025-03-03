@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 @use 'variables' as vars;
+@use 'mixins';
 
 .antd.cuix {
   .hue-storage-browser-tab-content {
@@ -25,7 +26,23 @@
 
   .hue-storage-browser__title-bar {
     display: flex;
+    justify-content: space-between;
+  }
+
+  .hue-storage-browser__title {
+    display: flex;
     gap: vars.$fluidx-spacing-xs;
+    max-width: 60%;
+    margin-right: vars.$fluidx-spacing-xl
+  }
+
+  .hue-storage-browser__home-bar-btns {
+    padding: vars.$fluidx-spacing-xxs;
+  }
+
+  .hue-storage-browser__home-bar-right {
+    display: flex;
+    gap: vars.$fluidx-spacing-s;
   }
 
   .hue-storage-browser__icon {
@@ -38,16 +55,16 @@
     font-size: vars.$fluidx-heading-h3-size;
     line-height: vars.$fluidx-heading-h3-line-height;
     font-weight: vars.$fluidx-heading-h3-weight;
+    width: 100%;
+    @include mixins.nowrap-ellipsis;
+
+    display: inline;
   }
 
   .hue-storage-browser__path-browser-panel {
     display: flex;
     align-items: center;
-    gap: vars.$fluidx-spacing-xs;
-  }
-
-  .hue-storage-browser__filePath {
-    flex: 0 0 auto;
-    font-weight: 600;
+    gap: 2px;
+    margin-left: vars.$fluidx-spacing-xxs;
   }
 }
