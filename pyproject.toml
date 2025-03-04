@@ -1,13 +1,23 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "desktop.settings"
 console_output_style = "count"
-addopts = "-v -m 'not integration' --strict-markers --disable-warnings --html=report.html --self-contained-html"
+addopts = "-v -m 'not integration' --strict-markers --disable-warnings --html=report.html --self-contained-html --cov"
 norecursedirs = "desktop/core/ext-py3"
 python_files = "tests.py test_*.py *_tests.py tests_* *_test.py"
 markers = [
     "integration: live server based tests",
     "requires_hadoop: live hadoop cluster based tests"
 ]
+
+[tool.coverage.run]
+branch = true
+omit = ["*conf.py","*settings.py","*urls.py","*metrics.py","*migrations*","*/hadoop/api/*","*/beeswaxd/*"]
+
+[tool.pytest-cov]
+coverages = ["about", "beeswax", "filebrowser", "hbase", "help", "hive", "impala", "jobbrowser", "jobsub", "metastore", "oozie", "pig", "proxy", "rdbms", "search", "security", "spark", "sqoop", "useradmin", "zookeeper", "desktop", "aws", "azure", "dashboard", "hadoop", "indexer", "kafka", "libanalyze", "liboauth", "liboozie", "librdbms", "libsaml", "libsentry", "libsolr", "libzookeeper", "metadata", "notebook"]
+report_path = "code-coverage-report"
+html = true
+
 
 [tool.ruff]
 target-version = "py38"
