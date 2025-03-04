@@ -1,3 +1,7 @@
+(function () {
+  window.createReactComponents('#Overview');
+})();
+
 routie.setPathname('/about');
 var AdminWizardViewModel = function () {
   var self = this;
