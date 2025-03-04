@@ -34,9 +34,9 @@ import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
 
 import { i18nReact } from '../../../../../utils/i18nReact';
 import huePubSub from '../../../../../utils/huePubSub';
-import './StorageBrowserActions.scss';
+import './FileAndFolderActions.scss';
 import { FileStats, FileSystem, StorageDirectoryTableData } from '../../../types';
-import { ActionType, getEnabledActions } from './StorageBrowserActions.util';
+import { ActionType, getEnabledActions } from './FileAndFolderActions.util';
 import MoveCopyModal from './MoveCopyModal/MoveCopyModal';
 import RenameModal from './RenameModal/RenameModal';
 import ReplicationModal from './ReplicationModal/ReplicationModal';
@@ -71,7 +71,7 @@ const iconsMap: Record<ActionType, JSX.Element> = {
   [ActionType.ChangePermission]: <ConfigureIcon />
 };
 
-const StorageBrowserActions = ({
+const FileAndFolderActions = ({
   config,
   currentPath,
   selectedFiles,
@@ -217,4 +217,4 @@ const StorageBrowserActions = ({
   );
 };
 
-export default StorageBrowserActions;
+export default FileAndFolderActions;

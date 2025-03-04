@@ -19,7 +19,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
-import StorageBrowserActions from './StorageBrowserActions';
+import FileAndFolderActions from './FileAndFolderActions';
 import { StorageDirectoryTableData } from '../../../types';
 import { get } from '../../../../../api/utils';
 import huePubSub from '../../../../../utils/huePubSub';
@@ -44,7 +44,7 @@ jest.mock('config/hueConfig', () => ({
 
 const mockGet = get as jest.MockedFunction<typeof get>;
 
-describe('StorageBrowserRowActions', () => {
+describe('FileAndFolderActions', () => {
   //View summary option is enabled and added to the actions menu when the row data is either hdfs/ofs and a single file
   const mockTwoRecords: StorageDirectoryTableData[] = [
     {
@@ -74,7 +74,16 @@ describe('StorageBrowserRowActions', () => {
   const mockRecord: StorageDirectoryTableData = mockTwoRecords[0];
 
   const setLoadingFiles = jest.fn();
-  const onSuccessfulAction = jest.fn();
+  const mockOnActionSuccess = jest.fn();
+  const mockOnActionError = jest.fn();
+  const mockConfig = {
+    is_trash_enabled: true,
+    is_hdfs_superuser: true,
+    groups: ['hue'],
+    users: ['hue'],
+    superuser: 'hue',
+    supergroup: 'hue'
+  };
 
   const setUpActionMenu = async (
     records: StorageDirectoryTableData[],
@@ -93,9 +102,11 @@ describe('StorageBrowserRowActions', () => {
           ]
         : records;
     const { getByRole } = render(
-      <StorageBrowserActions
+      <FileAndFolderActions
+        config={mockConfig}
+        onActionError={mockOnActionError}
         setLoadingFiles={setLoadingFiles}
-        onSuccessfulAction={onSuccessfulAction}
+        onActionSuccess={mockOnActionSuccess}
         selectedFiles={selectedFiles}
         currentPath="/path/to/folder"
       />

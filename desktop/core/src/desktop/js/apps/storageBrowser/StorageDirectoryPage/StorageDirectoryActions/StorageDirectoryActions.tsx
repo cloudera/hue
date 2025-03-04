@@ -18,7 +18,7 @@ import React from 'react';
 import { inTrash } from '../../../../utils/storageBrowserUtils';
 import CreateAndUploadAction from './CreateAndUpload/CreateAndUploadAction';
 import TrashActions from './Trash/TrashActions';
-import StorageBrowserActions from './FileAndFolder/StorageBrowserActions';
+import FileAndFolderActions from './FileAndFolder/FileAndFolderActions';
 import { FileStats, FileSystem, StorageDirectoryTableData } from '../../types';
 import huePubSub from '../../../../utils/huePubSub';
 
@@ -69,7 +69,7 @@ const StorageDirectoryActions = ({
 
   return (
     <>
-      <StorageBrowserActions
+      <FileAndFolderActions
         config={fileSystem.config}
         currentPath={fileStats.path}
         selectedFiles={selectedFiles}
