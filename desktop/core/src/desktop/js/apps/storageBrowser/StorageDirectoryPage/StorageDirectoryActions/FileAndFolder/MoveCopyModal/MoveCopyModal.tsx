@@ -17,7 +17,7 @@
 import React from 'react';
 import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
-import { ActionType } from '../StorageBrowserActions.util';
+import { ActionType } from '../FileAndFolderActions.util';
 import { BULK_COPY_API_URL, BULK_MOVE_API_URL } from '../../../../api';
 import FileChooserModal from '../../../../FileChooserModal/FileChooserModal';
 import { FileStats, StorageDirectoryTableData } from '../../../../types';

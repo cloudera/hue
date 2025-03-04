@@ -14,41 +14,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const fileSysteRoot = {
+  hdfs: ['/', 'hdfs'],
+  ofs: ['ofs://'],
+  s3: ['s3a://'],
+  gs: ['gs://'],
+  abfs: ['abfs://']
+};
+
+const checkFileSystem = (path: string, allowedRoots: string[]): boolean => {
+  const formattedPath = path.toLowerCase();
+  return allowedRoots.some(root => formattedPath.startsWith(root));
+};
+
+const checkFileSystemRoot = (path: string, allowedRoots: string[]): boolean => {
+  const formattedPath = path.toLowerCase();
+  return allowedRoots.some(root => formattedPath === root);
+};
+
 export const isHDFS = (path: string): boolean => {
-  const currentPath = path.toLowerCase();
-  return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0;
+  return checkFileSystem(path, fileSysteRoot.hdfs);
 };
 
 export const isOFS = (path: string): boolean => {
-  return path.toLowerCase().indexOf('ofs://') === 0;
+  return checkFileSystem(path, fileSysteRoot.ofs);
 };
 
 export const isS3 = (path: string): boolean => {
-  return path.toLowerCase().indexOf('s3a://') === 0;
+  return checkFileSystem(path, fileSysteRoot.s3);
 };
 
 export const isGS = (path: string): boolean => {
-  return path.toLowerCase().indexOf('gs://') === 0;
+  return checkFileSystem(path, fileSysteRoot.gs);
 };
 
 export const isABFS = (path: string): boolean => {
-  return path.toLowerCase().indexOf('abfs://') === 0;
+  return checkFileSystem(path, fileSysteRoot.abfs);
 };
 
 export const isS3Root = (path: string): boolean => {
-  return isS3(path) && path.toLowerCase() === 's3a://';
+  return checkFileSystemRoot(path, fileSysteRoot.s3);
 };
 
 export const isGSRoot = (path: string): boolean => {
-  return isGS(path) && path.toLowerCase() === 'gs://';
+  return checkFileSystemRoot(path, fileSysteRoot.gs);
 };
 
 export const isABFSRoot = (path: string): boolean => {
-  return isABFS(path) && path.toLowerCase() === 'abfs://';
+  return checkFileSystemRoot(path, fileSysteRoot.abfs);
 };
 
 export const isOFSRoot = (path: string): boolean => {
-  return isOFS(path) && path.toLowerCase() === 'ofs://';
+  return checkFileSystemRoot(path, fileSysteRoot.ofs);
 };
 
 export const isOFSServiceID = (path: string): boolean => {
@@ -61,4 +78,8 @@ export const isOFSVol = (path: string): boolean => {
 
 export const inTrash = (path: string): boolean => {
   return path.match(/^\/user\/.+?\/\.Trash/) !== null;
+};
+
+export const inRestorableTrash = (path: string): boolean => {
+  return path.match(/^\/user\/.+?\/\.Trash\/.+?/) !== null;
 };

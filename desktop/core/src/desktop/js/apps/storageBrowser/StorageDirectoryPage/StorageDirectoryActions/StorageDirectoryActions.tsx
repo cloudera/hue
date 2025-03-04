@@ -15,27 +15,33 @@
 // limitations under the License.
 
 import React from 'react';
+import { inTrash } from '../../../../utils/storageBrowserUtils';
 import CreateAndUploadAction from './CreateAndUpload/CreateAndUploadAction';
-import StorageBrowserActions from './FileAndFolder/StorageBrowserActions';
+import TrashActions from './Trash/TrashActions';
+import FileAndFolderActions from './FileAndFolder/FileAndFolderActions';
 import { FileStats, FileSystem, StorageDirectoryTableData } from '../../types';
 import huePubSub from '../../../../utils/huePubSub';
 
 interface StorageDirectoryActionsProps {
   fileStats: FileStats;
   fileSystem: FileSystem;
+  onFilePathChange: (path: string) => void;
   onActionSuccess: () => void;
   setLoadingFiles: (value: boolean) => void;
   selectedFiles: StorageDirectoryTableData[];
   onFilesDrop: (files: File[]) => void;
+  isFolderEmpty: boolean;
 }
 
 const StorageDirectoryActions = ({
   fileStats,
   fileSystem,
+  onFilePathChange,
   onActionSuccess,
   setLoadingFiles,
   selectedFiles,
-  onFilesDrop
+  onFilesDrop,
+  isFolderEmpty
 }: StorageDirectoryActionsProps): JSX.Element => {
   const onApiSuccess = () => {
     setLoadingFiles(false);
@@ -47,9 +53,23 @@ const StorageDirectoryActions = ({
     huePubSub.publish('hue.error', error);
   };
 
+  if (inTrash(fileStats.path)) {
+    return (
+      <TrashActions
+        selectedFiles={selectedFiles}
+        currentPath={fileStats.path}
+        isTrashEmpty={isFolderEmpty}
+        setLoadingFiles={setLoadingFiles}
+        onActionSuccess={onApiSuccess}
+        onActionError={onApiError}
+        onTrashEmptySuccess={() => onFilePathChange(fileSystem.user_home_directory)}
+      />
+    );
+  }
+
   return (
     <>
-      <StorageBrowserActions
+      <FileAndFolderActions
         config={fileSystem.config}
         currentPath={fileStats.path}
         selectedFiles={selectedFiles}
