@@ -498,7 +498,7 @@ def sql(request):
   if is_ai_interface_enabled():
     # input validation
     try:
-      validate_input(input, input_max_length)
+      input = validate_input(input, input_max_length)
     except Exception as e:
       return JsonResponse({"error": str(e)}, status=400)
 
