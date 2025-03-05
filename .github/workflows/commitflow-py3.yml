@@ -61,20 +61,19 @@ jobs:
 
     - name: run tests
       run: |
-        mkdir -p test-reports code-coverage-reports  # Ensure the directories exists
         ./build/env/bin/pytest
  
     - name: upload pytest report
       uses: actions/upload-artifact@v4
       with:
-        name: test-reports-${{ matrix.python-version }}
-        path: test-reports
+        name: hue-pytest-report-${{ matrix.python-version }}
+        path: reports/pytest
     
     - name: upload code coverage report
       uses: actions/upload-artifact@v4
       with:
-        name: code-coverage-report-${{ matrix.python-version }}
-        path: code-coverage-report
+        name: hue-code-cov-report-${{ matrix.python-version }}
+        path: reports/code-cov
 
     - name: Check and comment if no unit test files are modified
       if: matrix.python-version == '3.11'
