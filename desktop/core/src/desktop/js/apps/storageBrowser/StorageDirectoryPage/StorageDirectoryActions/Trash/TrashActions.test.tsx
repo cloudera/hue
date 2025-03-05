@@ -52,14 +52,12 @@ describe('TrashActions Component', () => {
   ];
 
   const mockCurrentPath = '/user/path/.Trash/Current';
-  const mockIsTrashEmpty = !mockSelectedFiles.length;
 
   it('should render the Restore and Empty trash buttons', () => {
     const { getByRole, queryByRole } = render(
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
-        isTrashEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
         setLoadingFiles={mockSetLoadingFiles}
@@ -77,7 +75,6 @@ describe('TrashActions Component', () => {
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
-        isTrashEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
         setLoadingFiles={mockSetLoadingFiles}
@@ -98,7 +95,6 @@ describe('TrashActions Component', () => {
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
-        isTrashEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
         setLoadingFiles={mockSetLoadingFiles}
@@ -121,7 +117,6 @@ describe('TrashActions Component', () => {
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
-        isTrashEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
         setLoadingFiles={mockSetLoadingFiles}
@@ -141,7 +136,6 @@ describe('TrashActions Component', () => {
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
-        isTrashEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
         setLoadingFiles={mockSetLoadingFiles}
@@ -161,7 +155,6 @@ describe('TrashActions Component', () => {
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
-        isTrashEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
         setLoadingFiles={mockSetLoadingFiles}
@@ -180,7 +173,6 @@ describe('TrashActions Component', () => {
       <TrashActions
         selectedFiles={[]}
         currentPath={mockCurrentPath}
-        isTrashEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
         setLoadingFiles={mockSetLoadingFiles}
@@ -196,7 +188,6 @@ describe('TrashActions Component', () => {
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={'path/not/restorable'}
-        isTrashEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
         setLoadingFiles={mockSetLoadingFiles}
@@ -205,22 +196,6 @@ describe('TrashActions Component', () => {
     );
 
     expect(getByRole('button', { name: 'Restore' })).toBeDisabled();
-  });
-
-  it('should disable "Empty trash" button if trash is empty', () => {
-    const { getByRole } = render(
-      <TrashActions
-        selectedFiles={mockSelectedFiles}
-        currentPath={mockCurrentPath}
-        isTrashEmpty={true}
-        onActionSuccess={mockOnActionSuccess}
-        onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
-        onTrashEmptySuccess={mockOnTrashEmptySuccess}
-      />
-    );
-
-    expect(getByRole('button', { name: 'Empty trash' })).toBeDisabled();
   });
 
   it('should call onActionError when restore fails', () => {
@@ -232,7 +207,6 @@ describe('TrashActions Component', () => {
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
-        isTrashEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
         setLoadingFiles={mockSetLoadingFiles}
@@ -255,7 +229,6 @@ describe('TrashActions Component', () => {
       <TrashActions
         selectedFiles={mockSelectedFiles}
         currentPath={mockCurrentPath}
-        isTrashEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
         setLoadingFiles={mockSetLoadingFiles}

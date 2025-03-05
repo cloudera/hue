@@ -75,7 +75,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
   };
 
   const reloadTrashPath = () => {
-    if (trashPath) {
+    if (trashPath?.trash_path) {
       return;
     }
     onTrashPathReload();

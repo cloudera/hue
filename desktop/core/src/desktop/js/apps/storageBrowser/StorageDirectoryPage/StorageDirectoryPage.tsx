@@ -290,7 +290,6 @@ const StorageDirectoryPage = ({
             fileStats={fileStats}
             fileSystem={fileSystem}
             selectedFiles={selectedFiles}
-            isFolderEmpty={filesData?.files.length === 0}
             onFilePathChange={onFilePathChange}
             onActionSuccess={() => {
               reloadFilesData();

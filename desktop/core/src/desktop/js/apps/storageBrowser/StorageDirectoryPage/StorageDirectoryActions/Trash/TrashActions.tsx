@@ -27,7 +27,6 @@ import { inRestorableTrash } from '../../../../../utils/storageBrowserUtils';
 interface TrashActionsProps {
   selectedFiles: StorageDirectoryTableData[];
   currentPath: FileStats['path'];
-  isTrashEmpty: boolean;
   onActionSuccess: () => void;
   onActionError: (error: Error) => void;
   setLoadingFiles: (value: boolean) => void;
@@ -42,7 +41,6 @@ enum Actions {
 const TrashActions = ({
   selectedFiles,
   currentPath,
-  isTrashEmpty,
   onActionSuccess,
   onActionError,
   setLoadingFiles,
@@ -58,7 +56,6 @@ const TrashActions = ({
     },
     onSuccess: () => {
       setIsModalOpen(false);
-      onActionSuccess();
     },
     onError: onActionError
   });
@@ -70,7 +67,7 @@ const TrashActions = ({
     });
     setLoadingFiles(true);
 
-    save(formData, { url: TRASH_RESTORE_BULK });
+    save(formData, { url: TRASH_RESTORE_BULK, onSuccess: onActionSuccess });
   };
 
   const onTrashEmpty = () => {
@@ -110,11 +107,7 @@ const TrashActions = ({
       >
         {t('Restore')}
       </BorderlessButton>
-      <BorderlessButton
-        data-event=""
-        disabled={isTrashEmpty}
-        onClick={() => handleActionClick(Actions.trashEmpty)}
-      >
+      <BorderlessButton data-event="" onClick={() => handleActionClick(Actions.trashEmpty)}>
         {t('Empty trash')}
       </BorderlessButton>
       <Modal

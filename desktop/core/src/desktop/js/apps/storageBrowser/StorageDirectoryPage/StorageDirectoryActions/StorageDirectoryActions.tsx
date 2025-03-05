@@ -30,7 +30,6 @@ interface StorageDirectoryActionsProps {
   setLoadingFiles: (value: boolean) => void;
   selectedFiles: StorageDirectoryTableData[];
   onFilesDrop: (files: File[]) => void;
-  isFolderEmpty: boolean;
 }
 
 const StorageDirectoryActions = ({
@@ -40,8 +39,7 @@ const StorageDirectoryActions = ({
   onActionSuccess,
   setLoadingFiles,
   selectedFiles,
-  onFilesDrop,
-  isFolderEmpty
+  onFilesDrop
 }: StorageDirectoryActionsProps): JSX.Element => {
   const onApiSuccess = () => {
     setLoadingFiles(false);
@@ -58,7 +56,6 @@ const StorageDirectoryActions = ({
       <TrashActions
         selectedFiles={selectedFiles}
         currentPath={fileStats.path}
-        isTrashEmpty={isFolderEmpty}
         setLoadingFiles={setLoadingFiles}
         onActionSuccess={onApiSuccess}
         onActionError={onApiError}
