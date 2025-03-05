@@ -22,8 +22,6 @@ markers = [
 
 [tool.coverage.run]
 branch = true
-relative_files = true
-context = '${CONTEXT}'
 omit = [
     "*/ext-py3/*",
     "desktop/core/src/desktop/lib/wsgiserver.py",
@@ -78,8 +76,8 @@ source = [
     "notebook",
 ]
 
-[tool.coverage.html]
-show_contexts = true
+[tool.coverage.report]
+precision = 2
 
 [tool.ruff]
 target-version = "py38"
