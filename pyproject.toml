@@ -22,14 +22,14 @@ markers = [
 
 [tool.coverage.run]
 branch = true
+relative_files = true
+context = '${CONTEXT}'
 omit = [
     "*/ext-py3/*",
     "desktop/core/src/desktop/lib/wsgiserver.py",
     "*/migrations/*",
     "*/org_migrations/*",
     "*/old_migrations/*",
-    "apps/oozie/src/oozie/tests.py",
-    "tools/ops/",
     "*/gen-py/*",
     "desktop/core/src/desktop/app_template/src/app_name/*",
     "desktop/core/src/desktop/app_template_proxy/src/app_name/*",
@@ -37,9 +37,6 @@ omit = [
     "*settings.py",
     "*urls.py",
     "*metrics.py",
-    "*migrations*",
-    "*/hadoop/api/*",
-    "*/beeswaxd/*",
 ]
 source = [
     "about",
@@ -81,10 +78,8 @@ source = [
     "notebook",
 ]
 
-[tool.pytest-cov]
-report_path = "code-coverage-report"
-html = true
-
+[tool.coverage.html]
+show_contexts = true
 
 [tool.ruff]
 target-version = "py38"
