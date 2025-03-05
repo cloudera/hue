@@ -35,6 +35,11 @@ omit = [
     "*settings.py",
     "*urls.py",
     "*metrics.py",
+    "*tests.py*",
+    "test_*.py",
+    "*_tests.py",
+    "tests_*.py",
+    "*_test.py",
 ]
 source = [
     "about",
