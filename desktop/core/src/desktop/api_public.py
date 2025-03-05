@@ -494,11 +494,12 @@ def sql(request):
   dialect = request.data.get("dialect")
   metadata = request.data.get("metadata")
   input_max_length = AI_INTERFACE.USER_INPUT_MAX_LENGTH.get()
+  chars_to_remove_from_input = AI_INTERFACE.USER_INPUT_REMOVE_CHARACTERS.get()
 
   if is_ai_interface_enabled():
     # input validation
     try:
-      input = validate_input(input, input_max_length)
+      input = validate_input(input, input_max_length, chars_to_remove_from_input)
     except Exception as e:
       return JsonResponse({"error": str(e)}, status=400)
 

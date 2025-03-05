@@ -302,7 +302,14 @@ AI_INTERFACE = ConfigSection(
       key='user_input_max_length',
       help=_('Ensure the configured user input length is not exceeded.'),
       default=1000,
-      type=int)
+      type=int
+      ),
+    USER_INPUT_REMOVE_CHARACTERS=Config(
+      key='user_input_remove_characters',
+      help=_('Remove certain characters from the user input.'),
+      default='"&\n\r\t',
+      type=str
+    )
   )
 )
 

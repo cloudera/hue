@@ -32,3 +32,25 @@ def test_validate_user_input_max_length_exceeds():
 ])
 def test_user_input_trim_whitespaces(input_text, expected_output):
     assert user_input_trim_whitespaces(input_text) == expected_output
+
+
+@pytest.mark.parametrize("input_text, chars_to_remove, expected_output", [
+    ("hello world", "l", "heo word"),
+    ("abcdef", "bdf", "ace"),
+
+    ("hello", "xyz", "hello"),
+    ("unchanged text", "", "unchanged text"),
+
+    ("", "abc", ""),
+    ("abcdef", "", "abcdef"),
+    ("aaaa", "a", ""),
+
+    ("hello, \n\rworld!", "\n,!", "hello \rworld"),
+    ("(123) 456-7890", "()-", "123 4567890"),
+
+    ("123 456 789", " ", "123456789"),
+    ("2024-03-05", "-03", "2245"),
+
+])
+def test_user_input_character_remover(input_text, chars_to_remove, expected_output):
+    assert user_input_character_remover(input_text, chars_to_remove) == expected_output
