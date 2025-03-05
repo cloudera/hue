@@ -18,7 +18,7 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MoveCopyModal from './MoveCopyModal';
-import { ActionType } from '../StorageBrowserActions.util';
+import { ActionType } from '../FileAndFolderActions.util';
 import { BULK_COPY_API_URL, BULK_MOVE_API_URL } from '../../../../api';
 import { StorageDirectoryTableData } from '../../../../types';
 

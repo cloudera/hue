@@ -62,6 +62,7 @@ interface StorageDirectoryPageProps {
   className?: string;
   rowClassName?: string;
   testId?: string;
+  reloadTrashPath: () => void;
 }
 
 const defaultProps = {
@@ -77,6 +78,7 @@ const StorageDirectoryPage = ({
   className,
   rowClassName,
   testId,
+  reloadTrashPath,
   ...restProps
 }: StorageDirectoryPageProps): JSX.Element => {
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
@@ -288,8 +290,10 @@ const StorageDirectoryPage = ({
             fileStats={fileStats}
             fileSystem={fileSystem}
             selectedFiles={selectedFiles}
+            onFilePathChange={onFilePathChange}
             onActionSuccess={() => {
               reloadFilesData();
+              reloadTrashPath();
             }}
             setLoadingFiles={setLoadingFiles}
             onFilesDrop={onFilesDrop}
