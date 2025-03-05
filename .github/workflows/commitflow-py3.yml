@@ -61,21 +61,19 @@ jobs:
 
     - name: run tests
       run: |
-        mkdir -p test-reports  # Ensure the directory exists
-        mkdir -p code-coverage-reports  # Ensure the directory exists
-        ./build/env/bin/pytest --cov=about --cov=beeswax --cov=filebrowser --cov=hbase --cov=help --cov=hive --cov=impala --cov=jobbrowser --cov=jobsub --cov=metastore --cov=oozie --cov=pig --cov=proxy --cov=rdbms --cov=search --cov=security --cov=spark --cov=sqoop --cov=useradmin --cov=zookeeper --cov=desktop --cov=aws --cov=azure --cov=dashboard --cov=hadoop --cov=indexer --cov=kafka --cov=libanalyze --cov=liboauth --cov=liboozie --cov=librdbms --cov=libsaml --cov=libsentry --cov=libsolr --cov=libzookeeper --cov=metadata --cov=notebook --cov-report=html:code-coverage-report --html=test-reports/report_${{ matrix.python-version }}.html --self-contained-html
+        ./build/env/bin/pytest
  
     - name: upload pytest report
       uses: actions/upload-artifact@v4
       with:
-        name: test-reports-${{ matrix.python-version }}
-        path: test-reports
+        name: hue-pytest-report-${{ matrix.python-version }}
+        path: reports/pytest
     
     - name: upload code coverage report
       uses: actions/upload-artifact@v4
       with:
-        name: code-coverage-report-${{ matrix.python-version }}
-        path: code-coverage-report
+        name: hue-code-cov-report-${{ matrix.python-version }}
+        path: reports/code-cov
 
     - name: Check and comment if no unit test files are modified
       if: matrix.python-version == '3.11'
