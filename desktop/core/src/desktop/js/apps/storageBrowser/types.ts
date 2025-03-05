@@ -81,6 +81,10 @@ export interface ContentSummary {
   replication: number;
 }
 
+export interface TrashPath {
+  trash_path: string;
+}
+
 export enum SortOrder {
   ASC = 'ascending',
   DSC = 'descending',
