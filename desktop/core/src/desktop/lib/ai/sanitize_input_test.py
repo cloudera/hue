@@ -54,3 +54,34 @@ def test_user_input_trim_whitespaces(input_text, expected_output):
 ])
 def test_user_input_character_remover(input_text, chars_to_remove, expected_output):
     assert user_input_character_remover(input_text, chars_to_remove) == expected_output
+
+
+@pytest.mark.parametrize(
+"input_text, banned_keyphrases, expected",
+[
+    ("This is a safe input", ["banned"],
+     "Valid Input"),
+    ("This contains a banned word", ["banned"],
+      pytest.raises(ValueError, match="Invalid input: Found banned keyphrase 'banned' in 'This contains a banned word'")),
+    ("Another forbidden no space, term", ["space"],
+      pytest.raises(ValueError, match="Invalid input: Found banned keyphrase 'space' in 'Another forbidden no space, term'")),
+    ("Case Insensitive BAN", ["ban"],
+      pytest.raises(ValueError, match="Invalid input: Found banned keyphrase 'ban' in 'Case Insensitive BAN'")),
+    ("No banned words here", [],
+      "Valid Input"),
+    ("Special characters #@!", ["special"],
+      pytest.raises(ValueError, match="Invalid input: Found banned keyphrase 'special' in 'Special characters #@!'")),
+    ("PartialMatch", ["match"],
+      pytest.raises(ValueError, match="Invalid input: Found banned keyphrase 'match' in 'PartialMatch'")),
+    ("Multiple banned words here", ["banned", "words"],
+      pytest.raises(ValueError, match="Invalid input: Found banned keyphrase (?:'banned'|'words') in 'Multiple banned words here'")),
+    ("Space seperated banned words", ["banned words"],
+    pytest.raises(ValueError, match="Invalid input: Found banned keyphrase ('banned words') in 'Space seperated banned words'")),
+]
+)
+def test_user_input_banned_keywords_checker(input_text, banned_keyphrases, expected):
+    if isinstance(expected, str):
+        assert user_input_banned_keyphrase_checker(input_text, banned_keyphrases) == expected
+    else:
+        with expected:
+            user_input_banned_keyphrase_checker(input_text, banned_keyphrases)

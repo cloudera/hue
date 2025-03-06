@@ -309,6 +309,12 @@ AI_INTERFACE = ConfigSection(
       help=_('Remove certain characters from the user input.'),
       default='"&\n\r\t',
       type=str
+    ),
+    USER_INPUT_BANNED_KEYPHRASES=Config(
+      key='user_input_banned_keyphrases',
+      help=_('Block user input with certain configured keyphrases.'),
+      default="",
+      type=coerce_csv
     )
   )
 )
