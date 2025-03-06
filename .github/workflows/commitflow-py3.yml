@@ -77,10 +77,9 @@ jobs:
         pytest-xml-coverage-path: ./reports/code-cov/coverage.xml
         junitxml-path: ./reports/pytest/test_report.xml
         junitxml-title: Pytest Report
-        title: Backend Coverage Report
-        badge-title: Backend Coverage
+        title: Backend Code Coverage Report
+        badge-title: Backend Codecov
         report-only-changed-files: true
-        hide-comment: false
         xml-skip-covered: true
         remove-link-from-badge: true
         default-branch: master
