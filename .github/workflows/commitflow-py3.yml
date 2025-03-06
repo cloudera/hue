@@ -70,7 +70,7 @@ jobs:
         name: hue-test-reports
         path: ./reports
 
-    - name: Add coverage comment
+    - name: Add pytest and code coverage PR comment
       if: matrix.python-version == '3.11'
       uses: MishaKav/pytest-coverage-comment@v1
       with:
