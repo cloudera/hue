@@ -64,14 +64,14 @@ jobs:
         ./build/env/bin/pytest
  
     - name: Upload pytest and code coverage reports
-      if: matrix.python-version == '3.9'
+      if: matrix.python-version == '3.11'
       uses: actions/upload-artifact@v4
       with:
         name: hue-test-reports
         path: ./reports
 
     - name: Add coverage comment
-      if: matrix.python-version == '3.9'
+      if: matrix.python-version == '3.11'
       uses: MishaKav/pytest-coverage-comment@v1
       with:
         pytest-xml-coverage-path: ./reports/code-cov/coverage.xml
@@ -86,7 +86,7 @@ jobs:
         default-branch: master
 
     - name: Check and comment if no unit test files modified
-      if: matrix.python-version == '3.9'
+      if: matrix.python-version == '3.11'
       run: |
         git fetch origin master
         changed_files=$(git diff --name-only origin/master)
