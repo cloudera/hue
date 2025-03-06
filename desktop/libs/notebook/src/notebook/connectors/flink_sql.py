@@ -121,6 +121,7 @@ class FlinkSqlApi(Api):
       'username': self.user.username if hasattr(self.user, 'username') else self.user,
       'connector_name': self.interpreter['name']
     }
+  
 
   def _get_operation_token_info_from_user(self, operation_handle):
     self.user = rewrite_user(self.user)
