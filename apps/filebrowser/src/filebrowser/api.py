@@ -770,7 +770,6 @@ def copy(request):
   return HttpResponse(status=200)
 
 
-
 @api_error_handler
 def content_summary(request):
   path = request.GET.get('path')
