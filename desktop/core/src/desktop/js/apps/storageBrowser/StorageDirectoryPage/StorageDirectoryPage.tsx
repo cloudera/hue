@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { ColumnProps } from 'antd/lib/table';
 import { Input, Tooltip } from 'antd';
 
@@ -52,6 +52,7 @@ import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
 import { UploadItem } from '../../../utils/hooks/useFileUpload/util';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
+import { useWindowSize } from '../../../utils/hooks/useWindowSize/useWindowSize';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import StorageDirectoryActions from './StorageDirectoryActions/StorageDirectoryActions';
 
@@ -82,7 +83,6 @@ const StorageDirectoryPage = ({
   ...restProps
 }: StorageDirectoryPageProps): JSX.Element => {
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
-  const [tableHeight, setTableHeight] = useState<number>(100);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
   const [filesToUpload, setFilesToUpload] = useState<UploadItem[]>([]);
   const [polling, setPolling] = useState<boolean>(false);
@@ -237,28 +237,10 @@ const StorageDirectoryPage = ({
     setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
   };
 
-  useEffect(() => {
-    //TODO: handle table resize
-    const calculateTableHeight = () => {
-      const windowHeight = window.innerHeight;
-      // TODO: move 450 to dynamic based on  table header height, tab nav and some header.
-      const tableHeightFix = windowHeight - 450;
-      return tableHeightFix;
-    };
-
-    const handleWindowResize = () => {
-      const tableHeight = calculateTableHeight();
-      setTableHeight(tableHeight);
-    };
-
-    handleWindowResize(); // Calculate initial scroll height
-
-    window.addEventListener('resize', handleWindowResize);
-
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    };
-  }, []);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const { size, offset } = useWindowSize(tableRef);
+  // 40px for table header, 64px for pagination
+  const tableBodyHeight = Math.max(size.height - (offset.top + 64 + 40), 100);
 
   const locale = {
     emptyText: t('Folder is empty')
@@ -306,25 +288,27 @@ const StorageDirectoryPage = ({
           loading={(loadingFiles || listDirectoryLoading) && !polling}
           errors={errorConfig}
         >
-          <Table
-            className={className}
-            columns={getColumns(tableData[0] ?? {})}
-            dataSource={tableData}
-            onRow={onRowClicked}
-            pagination={false}
-            rowClassName={rowClassName}
-            rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
-            rowSelection={{
-              hideSelectAll: !tableData.length,
-              columnWidth: 36,
-              type: 'checkbox',
-              ...rowSelection
-            }}
-            scroll={{ y: tableHeight }}
-            data-testid={testId}
-            locale={locale}
-            {...restProps}
-          />
+          <div ref={tableRef}>
+            <Table
+              className={className}
+              columns={getColumns(tableData[0] ?? {})}
+              dataSource={tableData}
+              onRow={onRowClicked}
+              pagination={false}
+              rowClassName={rowClassName}
+              rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
+              rowSelection={{
+                hideSelectAll: !tableData.length,
+                columnWidth: 36,
+                type: 'checkbox',
+                ...rowSelection
+              }}
+              scroll={{ y: tableBodyHeight }}
+              data-testid={`${testId}`}
+              locale={locale}
+              {...restProps}
+            />
+          </div>
 
           {filesData?.page && filesData?.page?.total_pages > 0 && (
             <Pagination
