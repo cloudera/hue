@@ -78,7 +78,7 @@ jobs:
     - name: Add coverage comment
       uses: MishaKav/pytest-coverage-comment@v1
       with:
-        pytest-xml-coverage-path: ./reports/code-cov/hue-code-cov-report-${{ matrix.python-version }}/coverage.xml
+        pytest-xml-coverage-path: ./reports/code-cov/coverage.xml
         report-only-changed-files: false
         hide-comment: false
         remove-link-from-badge: false
