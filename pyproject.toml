@@ -7,6 +7,7 @@ addopts = """
 'not integration' \
 --strict-markers \
 --disable-warnings \
+--junit-xml=reports/pytest/test_report.xml \
 --html=reports/pytest/report.html \
 --self-contained-html \
 --cov=./ \

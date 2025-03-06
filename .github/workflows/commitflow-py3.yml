@@ -22,7 +22,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: run commit title format check
+    - name: Check commit title format
       run: |
         ./tools/ci/check_for_commit_message.sh
 
@@ -47,7 +47,7 @@ jobs:
         node-version: 20
         cache: 'npm'
 
-    - name: compile
+    - name: Build Hue
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc g++ build-essential python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-venv python${{ matrix.python-version }}-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
@@ -59,23 +59,32 @@ jobs:
         export ROOT=$PWD
         make test_prep
 
-    - name: run tests
+    - name: Run python unit tests
       run: |
         ./build/env/bin/pytest
  
-    - name: upload pytest report
+    - name: Upload pytest and code coverage reports
+      if: matrix.python-version == '3.11'
       uses: actions/upload-artifact@v4
       with:
-        name: hue-pytest-report-${{ matrix.python-version }}
-        path: reports/pytest
-    
-    - name: upload code coverage report
-      uses: actions/upload-artifact@v4
-      with:
-        name: hue-code-cov-report-${{ matrix.python-version }}
-        path: reports/code-cov
+        name: hue-test-reports
+        path: ./reports
 
-    - name: Check and comment if no unit test files are modified
+    - name: Add pytest and code coverage PR comment
+      if: matrix.python-version == '3.11'
+      uses: MishaKav/pytest-coverage-comment@v1
+      with:
+        pytest-xml-coverage-path: ./reports/code-cov/coverage.xml
+        junitxml-path: ./reports/pytest/test_report.xml
+        junitxml-title: Pytest Report
+        title: Backend Code Coverage Report
+        badge-title: Backend Codecov
+        report-only-changed-files: true
+        xml-skip-covered: true
+        remove-link-from-badge: true
+        default-branch: master
+
+    - name: Check and comment if no unit test files modified
       if: matrix.python-version == '3.11'
       run: |
         git fetch origin master
@@ -93,11 +102,11 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
         fi
 
-    - name: run python lints
+    - name: Run python lints
       run: |
         PYTHONWARNINGS=always ./build/env/bin/hue runruff check
 
-    - name: run documentation lints
+    - name: Run documentation lints
       run: |
         curl -O https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz
         tar -xvf go1.23.4.linux-amd64.tar.gz
