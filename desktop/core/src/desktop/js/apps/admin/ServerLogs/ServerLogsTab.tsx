@@ -72,7 +72,7 @@ const ServerLogs: React.FC = (): JSX.Element => {
               <div className="server__display-logs">
                 {logsData.logs.map((line, index) => (
                   <div
-                    className={`server__log-line ${wrapLogs ? 'server_wrap' : ''}`}
+                    className={`server__log-line ${wrapLogs ? 'server__log-line--wrap' : ''}`}
                     key={'logs_' + index}
                   >
                     <HighlightText text={line} searchValue={filter} />
