@@ -63,6 +63,7 @@ variables.
 
 import os
 import re
+import ast
 import sys
 import json
 import logging
@@ -229,6 +230,10 @@ class Config(object):
     if type is bool:
       LOG.warning("%s is of type bool. Resetting it as type 'coerce_bool'." " Please fix it permanently" % (key,))
       type = coerce_bool
+
+    if type is list:
+      LOG.warning("%s is of type list. Resetting it as type 'coerce_list'." " Please fix it permanently" % (key,))
+      type = coerce_list
 
     self.key = key
     self.default_value = default
@@ -659,6 +664,19 @@ def coerce_csv(value):
   elif isinstance(value, list):
     return value
   raise Exception("Could not coerce %r to csv array." % value)
+
+
+def coerce_list(value) -> list:
+  if isinstance(value, str):
+    try:
+      result = ast.literal_eval(value)
+      if isinstance(result, list):
+        return result
+    except (SyntaxError, ValueError):
+      return [value]
+  elif isinstance(value, list):
+    return value
+  raise Exception("Could not coerce %r to list." % value)
 
 
 def coerce_json_dict(value):
