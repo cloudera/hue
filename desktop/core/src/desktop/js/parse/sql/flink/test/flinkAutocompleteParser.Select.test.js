@@ -5594,6 +5594,17 @@ describe('flinkAutocompleteParser.js SELECT statements', () => {
         }
       });
     });
+
+    it('should suggest SYSTEM TIME AS OF for "SELECT t1.testTableColumn1, t2.testTableColumn3 FROM testTable1 FOR "', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT t1.testTableColumn1, t2.testTableColumn3 FROM testTable1 FOR ',
+        afterCursor: '',
+        expectedResult: {
+          lowerCase: false,
+          suggestKeywords: ['SYSTEM_TIME AS OF']
+        }
+      });
+    });
   });
 
   describe('SubQueries in WHERE Clause', () => {
