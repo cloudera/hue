@@ -58,6 +58,7 @@
 'EXISTS'                                   { parser.yy.correlatedSubQuery = true; return 'EXISTS'; }
 'FALSE'                                    { return 'FALSE'; }
 'FLOAT'                                    { return 'FLOAT'; }
+'FOR'                                      { return 'FOR'; }
 'FOLLOWING'                                { return 'FOLLOWING'; }
 'FROM'                                     { parser.determineCase(yytext); return 'FROM'; }
 'FULL'                                     { return 'FULL'; }
@@ -76,6 +77,7 @@
 'LIMIT'                                    { return 'LIMIT'; }
 'NOT'                                      { return 'NOT'; }
 'NULL'                                     { return 'NULL'; }
+'OF'                                       { return 'OF'; }
 'ON'                                       { return 'ON'; }
 'OPTION'                                   { return 'OPTION'; }
 'OR'                                       { return 'OR'; }
@@ -98,6 +100,7 @@
 'SHOW'                                     { parser.determineCase(yytext); parser.addStatementTypeLocation('SHOW', yylloc); return 'SHOW'; }
 'SMALLINT'                                 { return 'SMALLINT'; }
 'STRING'                                   { return 'STRING'; }
+'SYSTEM_TIME'                              { return 'SYSTEM_TIME'; }
 'TABLE'                                    { return 'TABLE'; }
 'THEN'                                     { return 'THEN'; }
 'TIMESTAMP'                                { return 'TIMESTAMP'; }

@@ -965,43 +965,43 @@ JoinedTable_EDIT
  ;
 
 TablePrimary
- : TableOrQueryName OptionalCorrelationName
+ : TableOrQueryName OptionalAsOf OptionalCorrelationName
    {
      $$ = {
        primary: $1
      }
      if ($1.identifierChain) {
-       if ($2) {
-         $1.alias = $2.alias
-         parser.addTableAliasLocation($2.location, $2.alias, $1.identifierChain);
+       if ($3) {
+         $1.alias = $3.alias
+         parser.addTableAliasLocation($3.location, $3.alias, $1.identifierChain);
        }
        parser.addTablePrimary($1);
      }
 
      var keywords = [];
-     if (!$2) {
+     if (!$3) {
        keywords = ['AS'];
-     } else if ($2.suggestKeywords) {
-       keywords = $2.suggestKeywords;
+     } else if ($3.suggestKeywords) {
+       keywords = $3.suggestKeywords;
      }
      if (keywords.length > 0) {
        $$.suggestKeywords = keywords;
      }
    }
- | DerivedTable OptionalCorrelationName
+ | DerivedTable OptionalAsOf OptionalCorrelationName
    {
      $$ = {
        primary: $1
      };
 
-     if ($2) {
-       $$.primary.alias = $2.alias;
-       parser.addTablePrimary({ subQueryAlias: $2.alias });
-       parser.addSubqueryAliasLocation($2.location, $2.alias, $1.identifierChain);
+     if ($3) {
+       $$.primary.alias = $3.alias;
+       parser.addTablePrimary({ subQueryAlias: $3.alias });
+       parser.addSubqueryAliasLocation($3.location, $3.alias, $1.identifierChain);
      }
 
      var keywords = [];
-     if (!$2) {
+     if (!$3) {
        keywords = ['AS'];
      }
      if (keywords.length > 0) {
@@ -1011,20 +1011,26 @@ TablePrimary
  ;
 
 TablePrimary_EDIT
- : TableOrQueryName_EDIT OptionalCorrelationName
+ : TableOrQueryName_EDIT OptionalAsOf OptionalCorrelationName
    {
-     if ($2) {
-       parser.addTableAliasLocation($2.location, $2.alias, $1.identifierChain);
+     if ($3) {
+       parser.addTableAliasLocation($3.location, $3.alias, $1.identifierChain);
      }
    }
- | DerivedTable_EDIT OptionalCorrelationName
+ | TableOrQueryName AsOf_EDIT OptionalCorrelationName
    {
-     if ($2) {
-       parser.addTablePrimary({ subQueryAlias: $2.alias });
-       parser.addSubqueryAliasLocation($2.location, $2.alias);
+     if ($3) {
+       parser.addTableAliasLocation($3.location, $3.alias, $1.identifierChain);
      }
    }
- | DerivedTable OptionalCorrelationName_EDIT
+ | DerivedTable_EDIT OptionalAsOf OptionalCorrelationName
+   {
+     if ($3) {
+       parser.addTablePrimary({ subQueryAlias: $3.alias });
+       parser.addSubqueryAliasLocation($3.location, $3.alias);
+     }
+   }
+ | DerivedTable OptionalAsOf OptionalCorrelationName_EDIT
  ;
 
 TableOrQueryName
@@ -1041,6 +1047,34 @@ DerivedTable
 
 DerivedTable_EDIT
  : TableSubQuery_EDIT
+ ;
+
+OptionalAsOf
+ :
+ | AsOf
+ ;
+
+AsOf
+ : 'FOR' 'SYSTEM_TIME' 'AS' 'OF' ValueExpression
+ ;
+
+AsOf_EDIT
+ : 'FOR' 'CURSOR'
+   {
+     parser.suggestKeywords(['SYSTEM_TIME AS OF']);
+   }
+ | 'FOR' 'SYSTEM_TIME' 'CURSOR'
+   {
+     parser.suggestKeywords(['AS OF']);
+   }
+ | 'FOR' 'SYSTEM_TIME' 'AS' 'CURSOR'
+   {
+     parser.suggestKeywords(['OF']);
+   }
+ | 'FOR' 'SYSTEM_TIME' 'AS' 'OF' 'CURSOR'
+   {
+     parser.valueExpressionSuggest();
+   }
  ;
 
 OptionalOnColumn
