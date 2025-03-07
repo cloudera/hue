@@ -128,3 +128,6 @@ docs/docs-site/public/
 
 # VSCode settings
 .vscode
+
+# Test data
+desktop/core/src/desktop/test_data/*
