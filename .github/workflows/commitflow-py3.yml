@@ -89,7 +89,6 @@ jobs:
       run: |
         git fetch origin master
         changed_files=$(git diff --name-only origin/master)
-        echo "Changed files: $changed_files"
         
         if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
           echo "✅ Unit test files were modified."

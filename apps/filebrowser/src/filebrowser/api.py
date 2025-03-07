@@ -772,7 +772,7 @@ def copy(request):
 
 @api_error_handler
 def content_summary(request):
-  path = request.GET.get('path', '/')
+  path = request.GET.get('path')
   path = _normalize_path(path)
 
   if not path:
