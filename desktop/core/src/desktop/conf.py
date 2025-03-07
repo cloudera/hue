@@ -312,9 +312,15 @@ AI_INTERFACE = ConfigSection(
     ),
     USER_INPUT_BANNED_KEYPHRASES=Config(
       key='user_input_banned_keyphrases',
-      help=_('Block user input with certain configured keyphrases.'),
+      help=_('Block user input if certain configured keyphrases found.'),
       default="",
       type=coerce_csv
+    ),
+    USER_INPUT_BANNED_REGEX=Config(
+      key='user_input_banned_regex',
+      help=_('Block user input with if configured regex pattern match found.'),
+      default="",
+      type=str
     )
   )
 )

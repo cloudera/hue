@@ -29,10 +29,22 @@ def user_input_banned_keyphrase_checker(input, banned_keyphrases):
     return "Valid Input"
 
 
-def validate_input(input, user_input_max_length, chars_to_remove, banned_keyphrases):
+def user_input_banned_regex_checker(input, banned_regex):
+    # will have to iterate through banned_regex if we make it a list using coerce_list
+    #   - right now it's going to be a single string that seperated by regex OR(|)
+    match = re.search(banned_regex, input)
+    if match:
+        matched_substring = match.group(0)
+        raise ValueError(f"Invalid input: Found banned pattern substring '{matched_substring}' in '{input}'")
+    return "Valid input"
+
+
+def validate_input(input, user_input_max_length, chars_to_remove, banned_keyphrases, banned_regex):
     validate_user_input_max_length(input, user_input_max_length)
     cleaned_input = user_input_trim_whitespaces(input)
     cleaned_input = user_input_character_remover(cleaned_input, chars_to_remove)
     if banned_keyphrases[0]:
         user_input_banned_keyphrase_checker(input, banned_keyphrases)
+    if banned_regex:
+        user_input_banned_regex_checker(input, banned_regex)
     return cleaned_input

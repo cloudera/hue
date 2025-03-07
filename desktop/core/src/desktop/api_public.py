@@ -496,10 +496,12 @@ def sql(request):
   input_max_length = AI_INTERFACE.USER_INPUT_MAX_LENGTH.get()
   chars_to_remove_from_input = AI_INTERFACE.USER_INPUT_REMOVE_CHARACTERS.get()
   banned_keyphrases = AI_INTERFACE.USER_INPUT_BANNED_KEYPHRASES.get()
+  banned_regex = AI_INTERFACE.USER_INPUT_BANNED_REGEX.get()
+
   if is_ai_interface_enabled():
     # input validation
     try:
-      input = validate_input(input, input_max_length, chars_to_remove_from_input, banned_keyphrases)
+      input = validate_input(input, input_max_length, chars_to_remove_from_input, banned_keyphrases, banned_regex)
     except Exception as e:
       return JsonResponse({"error": str(e)}, status=400)
 

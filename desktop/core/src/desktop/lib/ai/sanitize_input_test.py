@@ -85,3 +85,24 @@ def test_user_input_banned_keywords_checker(input_text, banned_keyphrases, expec
     else:
         with expected:
             user_input_banned_keyphrase_checker(input_text, banned_keyphrases)
+
+
+@pytest.mark.parametrize(
+    "input, banned_regex, expected_output, expected_exception",
+    [
+        ("invalid_input", r"invalid", None, ValueError),
+
+        ("valid_input", r"invalid", "Valid input", None),
+
+        ("123abc", r"123|xyz", None, ValueError),
+
+        ("bad_input#", r"#", None, ValueError),
+    ]
+)
+def test_user_input_banned_regex_checker(input, banned_regex, expected_output, expected_exception):
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            user_input_banned_regex_checker(input, banned_regex)
+    else:
+        result = user_input_banned_regex_checker(input, banned_regex)
+        assert result == expected_output
