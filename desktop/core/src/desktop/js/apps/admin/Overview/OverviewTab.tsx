@@ -47,7 +47,9 @@ const Overview: React.FC = (): JSX.Element => {
     //if admin(user)
     <div className="hue-overview-component">
       <Tabs tabPosition="left" items={items} />
-      <div className='config__trademark-text'>Hue and the Hue logo are trademarks of Cloudera, Inc.</div>
+      <div className="config__trademark-text">
+        Hue and the Hue logo are trademarks of Cloudera, Inc.
+      </div>
     </div>
   );
 };
