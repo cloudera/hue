@@ -23,9 +23,18 @@ import { INSTALL_APP_EXAMPLES_API_URL } from '../Components/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import './Overview.scss';
 
+interface ConfigError {
+  name: string;
+  message: string;
+}
+interface CheckConfigResponse {
+  hue_config_dir: string;
+  config_errors: ConfigError[];
+}
+
 function ConfigStatus(): JSX.Element {
   const { t } = i18nReact.useTranslation();
-  const { data: installData, loading, error } = useLoadData(INSTALL_APP_EXAMPLES_API_URL);
+  const { data, loading, error } = useLoadData<CheckConfigResponse>(INSTALL_APP_EXAMPLES_API_URL);
 
   const columns = [
     {
@@ -60,28 +69,27 @@ function ConfigStatus(): JSX.Element {
   }
 
   if (loading) {
-    return <Spin spinning={loading}>{t('Installing app examples...')}</Spin>;
+    return <Spin spinning={loading} />;
   }
 
   const openConfigDocs = () => {
     window.open('https://docs.gethue.com/administrator/configuration/', '_blank');
   };
 
-  const configErrorsExist =
-    installData && installData['config_errors'] && installData['config_errors'].length > 0;
+  const configErrorsExist = data && data['config_errors'] && data['config_errors'].length > 0;
 
   return (
     <>
       <div className="config-status">
         <h1>{t('Checking current configuration')}</h1>
-        {installData && installData['hue_config_dir'] && (
+        {data && data['hue_config_dir'] && (
           <div>
             {t('Configuration files located in:')}
-            <span className="config__address-value">{installData['hue_config_dir']}</span>
+            <span className="config__address-value">{data['hue_config_dir']}</span>
           </div>
         )}
 
-        {configErrorsExist ? (
+        {!configErrorsExist && data ? (
           <>
             <Alert
               message={
@@ -97,15 +105,19 @@ function ConfigStatus(): JSX.Element {
             />
 
             <Table
-              dataSource={installData['config_errors']}
+              dataSource={data['config_errors']}
               columns={columns}
-              rowKey={(record) => `${record.name}-${record.message.slice(1,50)}`}
+              rowKey={record => `${record.name}-${record.message.slice(1, 50)}`}
               pagination={false}
               showHeader={false}
             />
           </>
         ) : (
-          <span>{t('All OK. Configuration check passed.')}</span>
+          <Alert
+            message={t('All OK. Configuration check passed.')}
+            type="success"
+            className="config__alert-margin"
+          />
         )}
       </div>
     </>
