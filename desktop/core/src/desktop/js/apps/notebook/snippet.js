@@ -217,7 +217,7 @@ class Snippet {
       return vm.getSnippetViewSettings(self.dialect()).sqlDialect;
     });
 
-    self.dialect = ko.pureComputed(() => this.connector().dialect);
+    self.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
 
     self.isBatchable = ko.computed(() => {
       return (
