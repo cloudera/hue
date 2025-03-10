@@ -1,13 +1,11 @@
 name: PR Comments
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - master
 
 permissions:
-  contents: write
-  checks: write
   pull-requests: write
 
 jobs:
