@@ -65,7 +65,7 @@ jobs:
           remove-link-from-badge: true
           default-branch: master
   
-  ut-files-comment:
+  python-ut-files-comment:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
