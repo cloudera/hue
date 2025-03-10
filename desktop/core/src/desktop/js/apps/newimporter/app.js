@@ -13,36 +13,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+import huePubSub from '../../utils/huePubSub';
 
-@use 'variables' as vars;
-$icon-height: 30px;
-$icon-width: 30px;
-
-.antd.cuix {
-  .hue-common-header {
-    background-color: vars.$fluidx-gray-100;
-    padding: vars.$fluidx-spacing-s 0 vars.$fluidx-spacing-xs vars.$fluidx-spacing-m;
-    display: flex;
+huePubSub.subscribe('app.dom.loaded', app => {
+  if (app === 'newimporter') {
+    window.createReactComponents('#embeddable_newimporter');
+    return;
   }
-
-  .hue-header-icon {
-    line-height: vars.$fluidx-heading-h2-line-height;
-    margin-right: 10px;
-    flex: 0 0 auto;
-
-    > svg {
-      vertical-align: middle;
-      height: $icon-height;
-      width: $icon-width;
-    }
+  if (app !== 'importer') {
+    return;
   }
-
-  .hue-header-title {
-    flex: 0 0 auto;
-    font-size: vars.$fluidx-heading-h2-size;
-    margin: 0;
-    line-height: vars.$fluidx-heading-h2-line-height;
-    font-weight: vars.$fluidx-heading-h2-weight;
-    color: vars.$text-color;
-  }
-}
+  window.createReactComponents('#embeddable_importer');
+});
