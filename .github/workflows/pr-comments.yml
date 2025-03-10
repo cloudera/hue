@@ -1,13 +1,11 @@
 name: PR Comments
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - master
 
 permissions:
-  contents: write
-  checks: write
   pull-requests: write
 
 jobs:
@@ -67,7 +65,7 @@ jobs:
           remove-link-from-badge: true
           default-branch: master
   
-  ut-files-comment:
+  python-ut-files-comment:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
