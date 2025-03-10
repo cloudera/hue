@@ -15,10 +15,11 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
-import { Alert, Spin } from 'antd';
+import { Alert } from 'antd';
 import ServerLogsHeader from './ServerLogsHeader';
 import { i18nReact } from '../../../utils/i18nReact';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import HighlightText from '../Components/HighlightText';
 import { SERVER_LOGS_API_URL } from '../Components/utils';
 import './ServerLogsTab.scss';
@@ -50,33 +51,31 @@ const ServerLogs: React.FC = (): JSX.Element => {
     );
   }
 
+  const isEmptyLogs = !data?.logs || !data?.logs?.some(log => log.length);
+
   return (
     <div className="hue-server-logs-component">
-      <Spin spinning={loading}>
-        {!loading && (
-          <>
-            <ServerLogsHeader
-              onFilterChange={setFilter}
-              onWrapLogsChange={setWrapLogs}
-              hostName={data?.hueHostname ?? ''}
-            />
-            {!data || !data?.logs || data.logs.filter(log => log.length).length === 0 ? (
-              <pre className="server__no-logs-found">No logs found!</pre>
-            ): (data && data.logs.length > 0 && data.logs[0] !== '' && (
-              <div className="server__display-logs">
-                {data.logs.map((line, index) => (
-                  <div
-                    className={`server__log-line ${wrapLogs ? 'server__log-line--wrap' : ''}`}
-                    key={'logs_' + index}
-                  >
-                    <HighlightText text={line} searchValue={filter} />
-                  </div>
-                ))}
+      <LoadingErrorWrapper loading={loading} errors={[]}>
+        <ServerLogsHeader
+          onFilterChange={setFilter}
+          onWrapLogsChange={setWrapLogs}
+          hostName={data?.hueHostname ?? ''}
+        />
+        {isEmptyLogs ? (
+          <pre className="server__no-logs-found">No logs found!</pre>
+        ) : (
+          <div className="server__display-logs">
+            {data.logs.map((line, index) => (
+              <div
+                className={`server__log-line ${wrapLogs ? 'server__log-line--wrap' : ''}`}
+                key={'logs_' + index}
+              >
+                <HighlightText text={line} searchValue={filter} />
               </div>
             ))}
-          </>
+          </div>
         )}
-      </Spin>
+      </LoadingErrorWrapper>
     </div>
   );
 };
