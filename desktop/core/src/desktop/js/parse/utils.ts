@@ -20,7 +20,7 @@ import sqlStatementsParser from 'parse/sqlStatementsParser';
 import { SqlStatementsParser } from './types';
 
 export const getStatementsParser = (connector: Connector): SqlStatementsParser => {
-  if (connector.dialect === 'hplsql') {
+  if (connector && connector.dialect === 'hplsql') {
     return hplsqlStatementsParser as unknown as SqlStatementsParser;
   } else {
     return sqlStatementsParser;
