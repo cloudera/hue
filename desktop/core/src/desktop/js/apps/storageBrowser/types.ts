@@ -83,8 +83,8 @@ export interface ContentSummary {
   replication: number;
 }
 
-export interface TrashPath {
-  trash_path: string;
+export interface TrashData {
+  trashPath: string;
 }
 
 export enum SortOrder {
