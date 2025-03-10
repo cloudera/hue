@@ -121,7 +121,6 @@ describe('Configuration Component', () => {
     });
   });
 
-
   test('Renders Configuration component mathcing search', async () => {
     render(<Configuration />);
 
@@ -152,11 +151,10 @@ describe('Configuration Component', () => {
       expect(screen.getAllByText(/test/i)).toHaveLength(3);
       expect(screen.getByText(/test\.config2/i)).toBeInTheDocument();
       expect(screen.getByText(/Hello World/i)).toBeInTheDocument();
-      
+
       expect(screen.queryByText(/example\.config/i)).not.toBeInTheDocument();
     });
   });
-
 
   test('Filters configuration based on input text', async () => {
     render(<Configuration />);
