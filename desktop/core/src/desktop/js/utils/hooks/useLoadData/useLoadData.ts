@@ -33,7 +33,7 @@ interface UseLoadDataProps<T> {
   data?: T;
   loading: boolean;
   error?: AxiosError;
-  reloadData: () => void;
+  reloadData: () => Promise<T | undefined>;
 }
 
 const useLoadData = <T, U = unknown>(
@@ -85,6 +85,7 @@ const useLoadData = <T, U = unknown>(
         if (localOptions?.onSuccess) {
           localOptions.onSuccess(transformedResponse);
         }
+        return response;
       } catch (error) {
         setError(error as AxiosError);
         if (localOptions?.onError) {

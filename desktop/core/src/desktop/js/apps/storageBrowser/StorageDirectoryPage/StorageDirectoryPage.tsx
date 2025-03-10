@@ -38,7 +38,6 @@ import {
   FileSystem
 } from '../types';
 import Pagination from '../../../reactComponents/Pagination/Pagination';
-import StorageBrowserActions from './StorageBrowserActions/StorageBrowserActions';
 import formatBytes from '../../../utils/formatBytes';
 
 import './StorageDirectoryPage.scss';
@@ -49,20 +48,21 @@ import {
   DEFAULT_POLLING_TIME,
   FileUploadStatus
 } from '../../../utils/constants/storageBrowser';
-import CreateAndUploadAction from './CreateAndUploadAction/CreateAndUploadAction';
 import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
 import { UploadItem } from '../../../utils/hooks/useFileUpload/util';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import StorageDirectoryActions from './StorageDirectoryActions/StorageDirectoryActions';
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
-  config: FileSystem['config'];
+  fileSystem: FileSystem;
   onFilePathChange: (path: string) => void;
   className?: string;
   rowClassName?: string;
   testId?: string;
+  reloadTrashPath: () => void;
 }
 
 const defaultProps = {
@@ -73,11 +73,12 @@ const defaultProps = {
 
 const StorageDirectoryPage = ({
   fileStats,
-  config,
+  fileSystem,
   onFilePathChange,
   className,
   rowClassName,
   testId,
+  reloadTrashPath,
   ...restProps
 }: StorageDirectoryPageProps): JSX.Element => {
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
@@ -98,7 +99,7 @@ const StorageDirectoryPage = ({
     data: filesData,
     loading: listDirectoryLoading,
     error: listDirectoryError,
-    reloadData
+    reloadData: reloadFilesData
   } = useLoadData<ListDirectory>(LIST_DIRECTORY_API_URL, {
     params: {
       path: fileStats.path,
@@ -268,7 +269,7 @@ const StorageDirectoryPage = ({
       enabled: !!listDirectoryError,
       message: t('An error occurred while fetching the data'),
       action: t('Retry'),
-      onClick: reloadData
+      onClick: reloadFilesData
     }
   ];
 
@@ -285,25 +286,17 @@ const StorageDirectoryPage = ({
           disabled={!tableData.length && !searchTerm.length}
         />
         <div className="hue-storage-browser__actions-bar-right">
-          <StorageBrowserActions
-            config={{
-              isTrashEnabled: config?.isTrashEnabled,
-              isHdfsSuperuser: config?.isHdfsSuperuser,
-              groups: config?.groups,
-              supergroup: config?.supergroup,
-              users: config?.users,
-              superuser: config?.superuser
-            }}
-            currentPath={fileStats.path}
+          <StorageDirectoryActions
+            fileStats={fileStats}
+            fileSystem={fileSystem}
             selectedFiles={selectedFiles}
+            onFilePathChange={onFilePathChange}
+            onActionSuccess={() => {
+              reloadFilesData();
+              reloadTrashPath();
+            }}
             setLoadingFiles={setLoadingFiles}
-            onSuccessfulAction={reloadData}
-          />
-          <CreateAndUploadAction
-            currentPath={fileStats.path}
-            setLoadingFiles={setLoadingFiles}
-            onSuccessfulAction={reloadData}
-            onFilesUpload={onFilesDrop}
+            onFilesDrop={onFilesDrop}
           />
         </div>
       </div>
@@ -348,7 +341,7 @@ const StorageDirectoryPage = ({
           filesQueue={filesToUpload}
           onClose={() => setFilesToUpload([])}
           onComplete={() => {
-            reloadData();
+            reloadFilesData();
             setPolling(false);
           }}
         />

@@ -47,6 +47,7 @@ from desktop.conf import (
   ENABLE_GIST_PREVIEW,
   ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_SHARING,
+  ENABLE_WORKFLOW_CREATION_ACTION,
   TASK_SERVER_V2,
   get_clusters,
 )
@@ -136,6 +137,7 @@ def get_config(request):
   config['hue_config']['is_admin'] = is_admin(request.user)
   config['hue_config']['is_yarn_enabled'] = is_yarn()
   config['hue_config']['enable_task_server'] = TASK_SERVER_V2.ENABLED.get()
+  config['hue_config']['enable_workflow_creation_action'] = ENABLE_WORKFLOW_CREATION_ACTION.get()
   config['storage_browser']['enable_chunked_file_upload'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
   config['storage_browser']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
   config['storage_browser']['restrict_file_extensions'] = RESTRICT_FILE_EXTENSIONS.get()
@@ -145,9 +147,7 @@ def get_config(request):
   config['storage_browser']['max_file_editor_size'] = MAX_FILEEDITOR_SIZE
   config['storage_browser']['enable_extract_uploaded_archive'] = ENABLE_EXTRACT_UPLOADED_ARCHIVE.get()
   config['clusters'] = list(get_clusters(request.user).values())
-  config['documents'] = {
-    'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
-  }
+  config['documents'] = {'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())}
   config['status'] = 0
 
   return JsonResponse(config)
@@ -1485,7 +1485,7 @@ def check_config(request):
   """Returns the configuration directory and the list of validation errors."""
   response = {
     'hue_config_dir': os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))),
-    'config_error_list': _get_config_errors(request, cache=False),
+    'config_errors': _get_config_errors(request, cache=False),
   }
 
   return JsonResponse(response)
