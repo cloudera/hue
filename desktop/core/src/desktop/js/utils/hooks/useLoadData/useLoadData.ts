@@ -85,7 +85,7 @@ const useLoadData = <T, U = unknown>(
         if (localOptions?.onSuccess) {
           localOptions.onSuccess(transformedResponse);
         }
-        return response;
+        return transformedResponse;
       } catch (error) {
         setError(error as AxiosError);
         if (localOptions?.onError) {

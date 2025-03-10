@@ -60,22 +60,20 @@ const ServerLogs: React.FC = (): JSX.Element => {
               onWrapLogsChange={setWrapLogs}
               hostName={data?.hueHostname ?? ''}
             />
-            {data && (data.logs.length === 0 || data.logs[0] === '') && (
+            {!data || !data?.logs || data.logs.filter(log => log.length).length === 0 ? (
               <pre className="server__no-logs-found">No logs found!</pre>
-            )}
-
-            {data && data.logs.length > 0 && data.logs[0] !== '' && (
+            ): (data && data.logs.length > 0 && data.logs[0] !== '' && (
               <div className="server__display-logs">
                 {data.logs.map((line, index) => (
                   <div
-                    className={`server__log-line ${wrapLogs ? 'server_wrap' : ''}`}
+                    className={`server__log-line ${wrapLogs ? 'server__log-line--wrap' : ''}`}
                     key={'logs_' + index}
                   >
                     <HighlightText text={line} searchValue={filter} />
                   </div>
                 ))}
               </div>
-            )}
+            ))}
           </>
         )}
       </Spin>
