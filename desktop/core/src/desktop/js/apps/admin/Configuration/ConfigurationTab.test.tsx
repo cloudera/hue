@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Configuration from './ConfigurationTab';
 import { ConfigurationKey } from './ConfigurationKey';
@@ -31,7 +32,10 @@ beforeEach(() => {
   jest.clearAllMocks();
   ApiHelper.fetchHueConfigAsync = jest.fn(() =>
     Promise.resolve({
-      apps: [{ name: 'desktop', has_ui: true, display_name: 'Desktop' }],
+      apps: [
+        { name: 'desktop', has_ui: true, display_name: 'Desktop' },
+        { name: 'test', has_ui: true, display_name: 'test' }
+      ],
       config: [
         {
           help: 'Main configuration section',
@@ -51,6 +55,19 @@ beforeEach(() => {
               value: 'Another value'
             }
           ]
+        },
+        {
+          help: '',
+          key: 'test',
+          is_anonymous: false,
+          values: [
+            {
+              help: 'Example config help text2',
+              key: 'test.config2',
+              is_anonymous: false,
+              value: 'Hello World'
+            }
+          ]
         }
       ],
       conf_dir: '/conf/directory'
@@ -63,7 +80,7 @@ describe('Configuration Component', () => {
     jest.clearAllMocks();
   });
 
-  test('Renders Configuration component with fetched data', async () => {
+  test('Renders Configuration component with fetched data for default desktop section', async () => {
     render(<Configuration />);
 
     await waitFor(() => {
@@ -74,6 +91,72 @@ describe('Configuration Component', () => {
       expect(ApiHelper.fetchHueConfigAsync).toHaveBeenCalled();
     });
   });
+
+  test('Renders Configuration component with fetched data for all sections', async () => {
+    render(<Configuration />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Sections/i)).toBeInTheDocument();
+      expect(screen.getByText(/Desktop/i)).toBeInTheDocument();
+      expect(screen.getByText(/example\.config/i)).toBeInTheDocument();
+      expect(screen.getByText(/Example value/i)).toBeInTheDocument();
+      expect(screen.queryAllByText(/test/i)).toHaveLength(0);
+    });
+
+    const user = userEvent.setup();
+
+    // Open dropdown
+    const select = screen.getByRole('combobox');
+    await user.click(select);
+
+    // Wait for and select "ALL" option
+    const allOption = await screen.findByTitle('ALL');
+    await user.click(allOption);
+
+    // Verify the updated content
+    await waitFor(() => {
+      expect(screen.getAllByText(/test/i)).toHaveLength(3);
+      expect(screen.getByText(/test\.config2/i)).toBeInTheDocument();
+      expect(screen.getByText(/Hello World/i)).toBeInTheDocument();
+    });
+  });
+
+
+  test('Renders Configuration component mathcing search', async () => {
+    render(<Configuration />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Sections/i)).toBeInTheDocument();
+      expect(screen.getByText(/Desktop/i)).toBeInTheDocument();
+      expect(screen.getByText(/example\.config/i)).toBeInTheDocument();
+      expect(screen.getByText(/Example value/i)).toBeInTheDocument();
+      expect(screen.queryAllByText(/test/i)).toHaveLength(0);
+    });
+
+    const user = userEvent.setup();
+
+    // Open dropdown
+    const select = screen.getByRole('combobox');
+    await user.click(select);
+
+    // Wait for and select "ALL" option
+    const allOption = await screen.findByTitle('ALL');
+    await user.click(allOption);
+
+    const filterinput = screen.getByPlaceholderText('Filter...');
+    await user.click(filterinput);
+    await user.type(filterinput, 'config2');
+
+    // Verify the updated content
+    await waitFor(() => {
+      expect(screen.getAllByText(/test/i)).toHaveLength(3);
+      expect(screen.getByText(/test\.config2/i)).toBeInTheDocument();
+      expect(screen.getByText(/Hello World/i)).toBeInTheDocument();
+      
+      expect(screen.queryByText(/example\.config/i)).not.toBeInTheDocument();
+    });
+  });
+
 
   test('Filters configuration based on input text', async () => {
     render(<Configuration />);
