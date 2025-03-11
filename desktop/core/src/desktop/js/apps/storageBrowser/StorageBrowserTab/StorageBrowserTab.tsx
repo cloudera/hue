@@ -124,20 +124,26 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
 
   return (
     <LoadingErrorWrapper loading={isLoading} errors={errorConfig}>
-      <div className="hue-storage-browser-tab-content" data-testid={testId}>
-        <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
-          <div className="hue-storage-browser__title">
-            <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
-            <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
+      <div className="hue-storage-browser-tab" data-testid={testId}>
+        <div className="hue-storage-browser-tab__title-bar" data-testid={`${testId}-title-bar`}>
+          <div className="hue-storage-browser-tab__title-bar__title">
+            <BucketIcon
+              className="hue-storage-browser-tab__title-bar__title__icon"
+              data-testid={`${testId}-icon`}
+            />
+            <h3
+              className="hue-storage-browser-tab__title-bar__title__name"
+              data-testid={`${testId}-folder-namer`}
+            >
               {fileName}
             </h3>
           </div>
-          <div className="hue-storage-browser__home-bar-right">
+          <div className="hue-storage-browser-tab__title-bar__button-group">
             <BorderlessButton
               onClick={() => {
                 setFilePath(fileSystem.user_home_directory);
               }}
-              className="hue-storage-browser__home-bar-btns"
+              className="hue-storage-browser-tab__title-bar__button-group__button"
               data-event=""
               title={t('Home')}
               icon={<HomeIcon />}
@@ -147,7 +153,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
             {fileSystem.config?.is_trash_enabled && (
               <BorderlessButton
                 onClick={onTrashClick}
-                className="hue-path-browser__home-btn"
+                className="hue-storage-browser-tab__title-bar__button-group__button"
                 data-event=""
                 title={t('Trash')}
                 icon={<DeleteIcon />}
@@ -157,8 +163,8 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
               </BorderlessButton>
             )}
             <BorderlessButton
-              onClick={() => reloadData()}
-              className="hue-storage-browser__home-bar-btns"
+              onClick={reloadData}
+              className="hue-storage-browser-tab__title-bar__button-group__button"
               data-event=""
               title={t('Refresh')}
               icon={<RefreshIcon />}
@@ -176,7 +182,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           />
         )}
         <div
-          className="hue-storage-browser__path-browser-panel"
+          className="hue-storage-browser-tab__path-browser-panel"
           data-testid={`${testId}-path-browser-panel`}
         >
           <PathBrowser
