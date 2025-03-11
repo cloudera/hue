@@ -14,57 +14,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
-interface WindowSize {
-  width: number;
-  height: number;
-}
+type ObserverRect = Omit<DOMRectReadOnly, 'toJSON'>;
 
-interface WindowOffset {
-  top: number;
-  left: number;
-}
-
-export const useWindowSize = (
-  ref?: React.RefObject<HTMLElement>
-): {
-  size: WindowSize;
-  offset: WindowOffset;
-} => {
-  const [size, setSize] = useState<WindowSize>({
-    width: window.innerWidth,
-    height: window.innerHeight
-  });
-
-  const [offset, setOffset] = useState<WindowOffset>({
+export const useWindowSize = (): [React.RefObject<HTMLDivElement>, ObserverRect] => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [rect, setRect] = useState<ObserverRect>({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
     top: 0,
+    right: 0,
+    bottom: 0,
     left: 0
   });
 
-  const handleResize = () => {
-    setSize({
-      width: window.innerWidth,
-      height: window.innerHeight
-    });
-
-    if (ref?.current) {
-      const rect = ref.current.getBoundingClientRect();
-      setOffset({
-        top: rect.top + window.scrollY,
-        left: rect.left + window.scrollX
-      });
-    }
+  const handleResize = (entries: ResizeObserverEntry[]) => {
+    const boundingRect = entries[0].contentRect;
+    setRect(boundingRect);
   };
 
   useLayoutEffect(() => {
-    handleResize();
+    const observer = new ResizeObserver(handleResize);
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
 
-    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener('resize', handleResize);
+      observer.disconnect();
     };
   }, [ref]);
 
-  return { size, offset };
+  return [ref, rect];
 };

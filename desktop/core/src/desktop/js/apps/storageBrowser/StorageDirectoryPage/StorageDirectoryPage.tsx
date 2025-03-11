@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo, useState, useCallback, useRef } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { ColumnProps } from 'antd/lib/table';
 import { Input, Tooltip } from 'antd';
 
@@ -237,10 +237,9 @@ const StorageDirectoryPage = ({
     setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
   };
 
-  const tableRef = useRef<HTMLDivElement>(null);
-  const { size, offset } = useWindowSize(tableRef);
-  // 40px for table header, 64px for pagination
-  const tableBodyHeight = Math.max(size.height - (offset.top + 64 + 40), 100);
+  const [tableRef, rect] = useWindowSize();
+  // 40px for table header, 50px for pagination
+  const tableBodyHeight = Math.max(rect.height - 90, 100);
 
   const locale = {
     emptyText: t('Folder is empty')
@@ -256,10 +255,10 @@ const StorageDirectoryPage = ({
   ];
 
   return (
-    <>
-      <div className="hue-storage-browser__actions-bar">
+    <div className="hue-storage-browser-directory">
+      <div className="hue-storage-browser-directory__actions-bar">
         <Input
-          className="hue-storage-browser__search"
+          className="hue-storage-browser-directory__actions-bar__search"
           placeholder={t('Search')}
           allowClear={true}
           onChange={event => {
@@ -267,7 +266,7 @@ const StorageDirectoryPage = ({
           }}
           disabled={!tableData.length && !searchTerm.length}
         />
-        <div className="hue-storage-browser__actions-bar-right">
+        <div className="hue-storage-browser-directory__actions-bar__actions">
           <StorageDirectoryActions
             fileStats={fileStats}
             fileSystem={fileSystem}
@@ -283,12 +282,12 @@ const StorageDirectoryPage = ({
         </div>
       </div>
 
-      <DragAndDrop onDrop={onFilesDrop}>
-        <LoadingErrorWrapper
-          loading={(loadingFiles || listDirectoryLoading) && !polling}
-          errors={errorConfig}
-        >
-          <div ref={tableRef}>
+      <div ref={tableRef} className="hue-storage-browser-directory__table-container">
+        <DragAndDrop onDrop={onFilesDrop}>
+          <LoadingErrorWrapper
+            loading={(loadingFiles || listDirectoryLoading) && !polling}
+            errors={errorConfig}
+          >
             <Table
               className={className}
               columns={getColumns(tableData[0] ?? {})}
@@ -308,18 +307,18 @@ const StorageDirectoryPage = ({
               locale={locale}
               {...restProps}
             />
-          </div>
 
-          {filesData?.page && filesData?.page?.total_pages > 0 && (
-            <Pagination
-              setPageSize={setPageSize}
-              pageSize={pageSize}
-              setPageNumber={setPageNumber}
-              pageStats={filesData?.page}
-            />
-          )}
-        </LoadingErrorWrapper>
-      </DragAndDrop>
+            {filesData?.page && filesData?.page?.total_pages > 0 && (
+              <Pagination
+                setPageSize={setPageSize}
+                pageSize={pageSize}
+                setPageNumber={setPageNumber}
+                pageStats={filesData?.page}
+              />
+            )}
+          </LoadingErrorWrapper>
+        </DragAndDrop>
+      </div>
       {filesToUpload.length > 0 && (
         <FileUploadQueue
           filesQueue={filesToUpload}
@@ -330,7 +329,7 @@ const StorageDirectoryPage = ({
           }}
         />
       )}
-    </>
+    </div>
   );
 };
 
