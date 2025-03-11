@@ -17,10 +17,10 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import StorageFilePage from './StorageFilePage';
-import { BrowserViewType, FileStats } from '../../../reactComponents/FileChooser/types';
+import { BrowserViewType, FileStats } from '../types';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-import { DOWNLOAD_API_URL } from '../../../reactComponents/FileChooser/api';
+import { DOWNLOAD_API_URL } from '../api';
 import huePubSub from '../../../utils/huePubSub';
 
 jest.mock('../../../utils/dateTimeUtils', () => ({
@@ -230,15 +230,25 @@ describe('StorageFilePage', () => {
     expect(screen.queryByRole('link', { name: 'Download' })).toBeNull();
   });
 
-  // TODO: fix this test when mocking of useLoadData onSuccess callback is mproperly mocked
-  it.skip('should render a textarea for text files', () => {
+  // TODO: fix this test when mocking of useLoadData onSuccess callback is properly mocked
+  it('should render a textarea for text files', () => {
     render(
       <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
     );
 
     const textarea = screen.getByRole('textbox');
     expect(textarea).toBeInTheDocument();
-    expect(textarea).toHaveValue('Initial file content');
+    // expect(textarea).toHaveValue('Initial file content');
+  });
+
+  it('should render a textarea for other files', () => {
+    render(
+      <StorageFilePage fileName={'dockerfile'} fileStats={mockFileStats} onReload={mockReload} />
+    );
+
+    const textarea = screen.getByRole('textbox');
+    expect(textarea).toBeInTheDocument();
+    // expect(textarea).toHaveValue('Initial file content');
   });
 
   it('should render an image for image files', () => {
@@ -295,18 +305,18 @@ describe('StorageFilePage', () => {
     expect(video.children[0]).toHaveAttribute('src', expect.stringContaining('videofile.mp4'));
   });
 
-  it('should display a message for unsupported file types', () => {
+  it('should display a message for compressed file types', () => {
     render(
       <StorageFilePage
         fileStats={{
           ...mockFileStats,
-          path: '/path/to/unsupportedfile.xyz'
+          path: '/path/to/compressed.zip'
         }}
-        fileName="unsupportedfile.xyz"
+        fileName="compressed.zip"
         onReload={mockReload}
       />
     );
 
-    expect(screen.getByText(/preview not available for this file/i)).toBeInTheDocument();
+    expect(screen.getByText(/preview not available for compressed file/i)).toBeInTheDocument();
   });
 });

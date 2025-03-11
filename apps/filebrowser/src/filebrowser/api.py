@@ -177,8 +177,11 @@ def download(request):
 
   This is inspired by django.views.static.serve (?disposition={attachment, inline})
 
-  :param request: The current request object
-  :return: A response object with the file contents or an error message
+  Args:
+    request: The current request object
+
+  Returns:
+    A response object with the file contents or an error message
   """
   path = request.GET.get('path')
   path = _normalize_path(path)
@@ -217,11 +220,13 @@ def download(request):
   else:
     response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
 
+    content_disposition = (
+      request.GET.get('disposition') if request.GET.get('disposition') == 'inline' and _can_inline_display(path) else 'attachment'
+    )
+
+    response['Content-Disposition'] = f'{content_disposition}; filename="{stats["name"]}"'
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
-    response['Content-Disposition'] = (
-      request.GET.get('disposition', 'attachment; filename="' + stats['name'] + '"') if _can_inline_display(path) else 'attachment'
-    )
 
     if FILE_DOWNLOAD_CACHE_CONTROL.get():
       response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
@@ -245,11 +250,18 @@ def listdir_paged(request):
   A paginated version of listdir.
 
   Query parameters:
-    pagenum           - The page number to show. Defaults to 1.
-    pagesize          - How many to show on a page. Defaults to 30.
-    sortby=?          - Specify attribute to sort by. Accepts: (type, name, atime, mtime, size, user, group). Defaults to name.
-    descending        - Specify a descending sort order. Default to false.
-    filter=?          - Specify a substring filter to search for in the filename field.
+    pagenum (int): The page number to show. Defaults to 1.
+    pagesize (int): How many items to show on a page. Defaults to 30.
+    sortby (str): The attribute to sort by. Valid options: 'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'.
+                  Defaults to 'name'.
+    descending (bool): Sort in descending order when true. Defaults to false.
+    filter (str): Substring to filter filenames. Optional.
+
+  Returns:
+    JsonResponse: Contains 'files' and 'page' info.
+
+  Raises:
+    HttpResponse: With appropriate status codes for errors.
   """
   path = request.GET.get('path', '/')  # Set default path for index directory
   path = _normalize_path(path)
@@ -257,37 +269,56 @@ def listdir_paged(request):
   if not request.fs.isdir(path):
     return HttpResponse(f'{path} is not a directory.', status=400)
 
+  # Extract pagination parameters
   pagenum = int(request.GET.get('pagenum', 1))
   pagesize = int(request.GET.get('pagesize', 30))
 
+  # Determine if operation should be performed as another user
   do_as = None
   if is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security"):
     do_as = request.GET.get('doas', request.user.username)
   if hasattr(request, 'doas'):
     do_as = request.doas
 
+  # Get stats for all files in the directory
   try:
     if do_as:
       all_stats = request.fs.do_as_user(do_as, request.fs.listdir_stats, path)
     else:
       all_stats = request.fs.listdir_stats(path)
   except (S3ListAllBucketsException, GSListAllBucketsException) as e:
-    return HttpResponse(f'Bucket listing is not allowed: {str(e)}', status=403)
+    return HttpResponse(f'Bucket listing is not allowed: {e}', status=403)
 
-  # Filter first
+  # Apply filter first if specified
   filter_string = request.GET.get('filter')
   if filter_string:
-    filtered_stats = [sb for sb in all_stats if filter_string in sb['name']]
-    all_stats = filtered_stats
+    all_stats = [sb for sb in all_stats if filter_string in sb['name']]
 
-  # Sort next
-  sortby = request.GET.get('sortby')
-  descending_param = request.GET.get('descending')
-  if sortby:
-    if sortby not in ('type', 'name', 'atime', 'mtime', 'user', 'group', 'size'):
-      LOG.info(f'Invalid sort attribute {sortby} for list directory operation. Skipping it.')
-    else:
-      all_stats = sorted(all_stats, key=operator.attrgetter(sortby), reverse=coerce_bool(descending_param))
+  # Next, sort with proper handling of None values
+  sortby = request.GET.get('sortby', 'name')
+  descending = coerce_bool(request.GET.get('descending', False))
+  valid_sort_fields = {'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'}
+
+  if sortby not in valid_sort_fields:
+    LOG.info(f"Ignoring invalid sort attribute '{sortby}' for list directory operation.")
+  else:
+    numeric_fields = {'size', 'atime', 'mtime'}
+
+    def sorting_key(item):
+      """Generate a sorting key that handles None values for different field types."""
+      value = getattr(item, sortby)
+      if sortby in numeric_fields:
+        # Treat None as 0 for numeric fields for comparison
+        return 0 if value is None else value
+      else:
+        # Treat None as an empty string for non-numeric fields
+        return '' if value is None else value
+
+    try:
+      all_stats = sorted(all_stats, key=sorting_key, reverse=descending)
+    except Exception as sort_error:
+      LOG.error(f"Error during sorting with attribute '{sortby}': {sort_error}")
+      return HttpResponse("An error occurred while sorting the directory contents.", status=500)
 
   # Do pagination
   try:
@@ -297,7 +328,7 @@ def listdir_paged(request):
   except EmptyPage:
     message = "No results found for the requested page."
     LOG.warning(message)
-    return HttpResponse(message, status=404)  # TODO: status code?
+    return HttpResponse(message, status=404)
 
   if page:
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
@@ -549,7 +580,7 @@ def mkdir(request):
   path = request.POST.get('path')
   name = request.POST.get('name')
 
-  # Check if source and destination paths are provided
+  # Check if path and name are provided
   if not path or not name:
     return HttpResponse("Missing required parameters: path and name are required.", status=400)
 
@@ -572,10 +603,21 @@ def touch(request):
   path = request.POST.get('path')
   name = request.POST.get('name')
 
-  if name and (posixpath.sep in name):
-    return HttpResponse(f"Error creating {name} file: Slashes are not allowed in filename.", status=400)
+  # Check if path and name are provided
+  if not path or not name:
+    return HttpResponse("Missing parameters: path and name are required.", status=400)
 
-  request.fs.create(request.fs.join(path, name))
+  # Validate the 'name' parameter for invalid characters
+  if name and (posixpath.sep in name):
+    return HttpResponse(f"Slashes are not allowed in filename. Please choose a different name.", status=400)
+
+  file_path = request.fs.join(path, name)
+
+  # Check if the file already exists
+  if request.fs.isfile(file_path):
+    return HttpResponse(f"Error creating {name} file: File already exists.", status=409)
+
+  request.fs.create(file_path)
   return HttpResponse(status=201)
 
 
@@ -620,7 +662,7 @@ def rename(request):
   _, source_path_ext = os.path.splitext(source_path)
   _, dest_path_ext = os.path.splitext(destination_path)
 
-  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]
+  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()] if RESTRICT_FILE_EXTENSIONS.get() else []
   # Check if destination path has a restricted file type and it doesn't match the source file type
   if dest_path_ext.lower() in restricted_file_types and (source_path_ext.lower() != dest_path_ext.lower()):
     return HttpResponse(f'Cannot rename file to a restricted file type: "{dest_path_ext}"', status=403)
@@ -642,13 +684,57 @@ def rename(request):
   return HttpResponse(status=200)
 
 
+def _is_destination_parent_of_source(request, source_path, destination_path):
+  """Check if the destination path is the parent directory of the source path."""
+  return request.fs.parent_path(source_path) == request.fs.normpath(destination_path)
+
+
+def _validate_copy_move_operation(request, source_path, destination_path):
+  """Validate the input parameters for copy and move operations for different scenarios."""
+
+  # Check if source and destination paths are provided
+  if not source_path or not destination_path:
+    return HttpResponse("Missing required parameters: source_path and destination_path are required.", status=400)
+
+  # Check if paths are identical
+  if request.fs.normpath(source_path) == request.fs.normpath(destination_path):
+    return HttpResponse('Source and destination paths must be different.', status=400)
+
+  # Verify source path exists
+  if not request.fs.exists(source_path):
+    return HttpResponse('Source file or folder does not exist.', status=404)
+
+  # Check if the destination path is a directory
+  if not request.fs.isdir(destination_path):
+    return HttpResponse('Destination path must be a directory.', status=400)
+
+  # Check if destination path is parent of source path
+  if _is_destination_parent_of_source(request, source_path, destination_path):
+    return HttpResponse('Destination cannot be the parent directory of source.', status=400)
+
+  # Check if file or folder already exists at destination path
+  if request.fs.exists(request.fs.join(destination_path, os.path.basename(source_path))):
+    return HttpResponse('File or folder already exists at destination path.', status=409)
+
+
 @api_error_handler
 def move(request):
+  """
+  Move a file or folder from source path to destination path.
+
+  Args:
+    request: The request object containing source and destination paths
+
+  Returns:
+    Success or error response with appropriate status codes
+  """
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
-  if source_path == destination_path:
-    return HttpResponse('Source and destination path cannot be same.', status=400)
+  # Validate the operation and return error response if any scenario fails
+  validation_response = _validate_copy_move_operation(request, source_path, destination_path)
+  if validation_response:
+    return validation_response
 
   request.fs.rename(source_path, destination_path)
   return HttpResponse(status=200)
@@ -656,17 +742,28 @@ def move(request):
 
 @api_error_handler
 def copy(request):
+  """
+  Copy a file or folder from the source path to the destination path.
+
+  Args:
+    request: The request object containing source and destination path
+
+  Returns:
+    Success or error response with appropriate status codes
+  """
   source_path = request.POST.get('source_path', '')
   destination_path = request.POST.get('destination_path', '')
 
-  if source_path == destination_path:
-    return HttpResponse('Source and destination path cannot be same.', status=400)
+  # Validate the operation and return error response if any scenario fails
+  validation_response = _validate_copy_move_operation(request, source_path, destination_path)
+  if validation_response:
+    return validation_response
 
   # Copy method for Ozone FS returns a string of skipped files if their size is greater than configured chunk size.
   if source_path.startswith('ofs://'):
     ofs_skip_files = request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
     if ofs_skip_files:
-      return JsonResponse(ofs_skip_files, status=500)  # TODO: Status code?
+      return JsonResponse({'skipped_files': ofs_skip_files}, status=500)  # TODO: Status code?
   else:
     request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
 
@@ -872,12 +969,16 @@ def bulk_op(request, op):
     response = op(request)
 
     if response.status_code != 200:
-      error_dict[p] = {'error': response.content}
-      if op == copy and p.startswith('ofs://'):
-        error_dict[p].update({'ofs_skip_files': response.content})
+      # TODO: Improve the error handling with new error UX
+      # Currently, we are storing the error in the error_dict based on response type for each path
+      res_content = response.content.decode('utf-8')
+      if isinstance(response, JsonResponse):
+        error_dict[p] = json.loads(res_content)  # Simply assign to not have dupicate error fields
+      else:
+        error_dict[p] = {'error': res_content}
 
   if error_dict:
-    return JsonResponse(error_dict, status_code=500)  # TODO: Check if we need diff status code or diff json structure?
+    return JsonResponse(error_dict, status=500)  # TODO: Check if we need diff status code or diff json structure?
 
   return HttpResponse(status=200)  # TODO: Check if we need to send some message or diff status code?
 

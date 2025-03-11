@@ -15,32 +15,24 @@
 // limitations under the License.
 
 import React, { useMemo, useState } from 'react';
-import {
-  BrowserViewType,
-  FilePreview,
-  FileStats
-} from '../../../reactComponents/FileChooser/types';
+import { BrowserViewType, FilePreview, FileStats } from '../types';
 import './StorageFilePage.scss';
 import { i18nReact } from '../../../utils/i18nReact';
 import Button, { PrimaryButton } from 'cuix/dist/components/Button';
 import { getFileMetaData, getFileType } from './StorageFilePage.util';
-import {
-  DOWNLOAD_API_URL,
-  FILE_PREVIEW_API_URL,
-  SAVE_FILE_API_URL
-} from '../../../reactComponents/FileChooser/api';
+import { DOWNLOAD_API_URL, FILE_PREVIEW_API_URL, SAVE_FILE_API_URL } from '../api';
 import huePubSub from '../../../utils/huePubSub';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import Pagination from '../../../reactComponents/Pagination/Pagination';
 import {
   DEFAULT_PREVIEW_PAGE_SIZE,
   EDITABLE_FILE_FORMATS,
-  SUPPORTED_FILE_EXTENSIONS,
   SupportedFileTypes
 } from '../../../utils/constants/storageBrowser';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import { inTrash } from '../../../utils/storageBrowserUtils';
 
 interface StorageFilePageProps {
   onReload: () => void;
@@ -122,7 +114,8 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
     !isEditing &&
     config?.storage_browser.max_file_editor_size &&
     config?.storage_browser.max_file_editor_size > fileStats.size &&
-    EDITABLE_FILE_FORMATS.has(fileType);
+    EDITABLE_FILE_FORMATS.has(fileType) &&
+    !inTrash(fileStats.path);
 
   const pageStats = {
     page_number: pageNumber,
@@ -207,7 +200,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
             </div>
 
             <div className="preview__content">
-              {fileType === SupportedFileTypes.TEXT && (
+              {[SupportedFileTypes.TEXT, SupportedFileTypes.OTHER].includes(fileType) && (
                 <div className="preview__editable-file">
                   <textarea
                     value={fileContent}
@@ -252,12 +245,11 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                 </video>
               )}
 
-              {fileType === SupportedFileTypes.OTHER && (
-                <div className="preview__unsupported">
-                  {t('Preview not available for this file. Please download the file to view.')}
-                  <br />
-                  {t(`Supported file extensions: 
-                ${Object.keys(SUPPORTED_FILE_EXTENSIONS).join(', ')}`)}
+              {fileType === SupportedFileTypes.COMPRESSED && (
+                <div className="preview__compresed">
+                  {t(
+                    'Preview not available for compressed file. Please download the file to view.'
+                  )}
                 </div>
               )}
             </div>

@@ -115,7 +115,7 @@ def query_error_handler(func):
         raise QueryError(message)
     except QueryServerException as e:
       message = force_unicode(str(e))
-      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
+      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message or 'Invalid or unknown query handle' in message:
         raise QueryExpired(e)
       else:
         raise QueryError(message)
@@ -260,10 +260,11 @@ class HS2Api(Api):
 
     if not session_id:
       session = Session.objects.get_session(self.user, application=app_name)
-      decoded_guid = session.get_handle().sessionId.guid
-      session_decoded_id = unpack_guid(decoded_guid)
-      if source_method == "dt_logout":
-        LOG.debug("Closing Impala session id %s on logout for user %s" % (session_decoded_id, self.user.username))
+      if session:
+        decoded_guid = session.get_handle().sessionId.guid
+        session_decoded_id = unpack_guid(decoded_guid)
+        if source_method == "dt_logout":
+          LOG.debug("Closing Impala session id %s on logout for user %s" % (session_decoded_id, self.user.username))
 
     query_server = get_query_server_config(name=app_name)
 
@@ -394,7 +395,7 @@ class HS2Api(Api):
     try:
       results = db.fetch(handle, start_over=start_over, rows=rows)
     except QueryServerException as ex:
-      if re.search('(client inactivity)|(Invalid query handle)', str(ex)) and ex.message:
+      if re.search('(client inactivity)|(Invalid query handle)|(Invalid or unknown query handle)', str(ex)) and ex.message:
         raise QueryExpired(message=ex.message)
       else:
         raise QueryError(ex)

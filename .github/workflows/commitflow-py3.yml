@@ -22,7 +22,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: run commit title format check
+    - name: Check commit title format
       run: |
         ./tools/ci/check_for_commit_message.sh
 
@@ -47,7 +47,7 @@ jobs:
         node-version: 20
         cache: 'npm'
 
-    - name: compile
+    - name: Build Hue
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc g++ build-essential python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-venv python${{ matrix.python-version }}-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
@@ -59,40 +59,15 @@ jobs:
         export ROOT=$PWD
         make test_prep
 
-    - name: run tests
+    - name: Run python unit tests
       run: |
-        mkdir -p test-reports  # Ensure the directory exists
-        PYTHONWARNINGS=always ./build/env/bin/pytest --html=test-reports/report_${{ matrix.python-version }}.html --self-contained-html
- 
-    - name: upload pytest report
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-reports-${{ matrix.python-version }}
-        path: test-reports
+        ./build/env/bin/pytest
 
-    - name: Check and comment if no unit test files are modified
-      if: matrix.python-version == '3.11'
-      run: |
-        git fetch origin master
-        changed_files=$(git diff --name-only origin/master)
-        
-        if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
-          echo "✅ Unit test files were modified."
-        else
-          echo "⚠️ No unit test files modified."
-          
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            -d '{"body":"⚠️ No unit test files modified. Please ensure that changes are properly tested. ⚠️"}' \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
-        fi
-
-    - name: run python lints
+    - name: Run python lints
       run: |
         PYTHONWARNINGS=always ./build/env/bin/hue runruff check
 
-    - name: run documentation lints
+    - name: Run documentation lints
       run: |
         curl -O https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz
         tar -xvf go1.23.4.linux-amd64.tar.gz
@@ -106,4 +81,11 @@ jobs:
         # Trigger linting if documentation changes
         ./tools/ci/check_for_website_dead_links.sh docs/docs-site
         # ./tools/ci/check_for_website_dead_links.sh docs/gethue
+
+    - name: Upload reports
+      if: matrix.python-version == '3.11'
+      uses: actions/upload-artifact@v4
+      with:
+        name: hue-reports
+        path: ./reports
 

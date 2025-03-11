@@ -1,0 +1,89 @@
+name: PR Comments
+
+on:
+  pull_request_target:
+    branches:
+      - master
+
+permissions:
+  pull-requests: write
+
+jobs:
+  pytest-codecov-comment:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+      
+      - name: Setup node 20 and cache npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      
+      - name: Build Hue
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc g++ build-essential python3.11-dev python3.11-venv python3.11-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
+          sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.11
+          sudo apt-get install -y python3-setuptools
+          sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
+
+          export PYTHON_VER=python3.11
+          export ROOT=$PWD
+          make test_prep
+
+      - name: Run python unit tests
+        run: |
+          ./build/env/bin/pytest
+      
+      - name: Add pytest and code coverage PR comment
+        uses: MishaKav/pytest-coverage-comment@v1
+        with:
+          pytest-xml-coverage-path: ./reports/code-cov/coverage.xml
+          junitxml-path: ./reports/pytest/test_report.xml
+          junitxml-title: Pytest Report
+          title: Backend Code Coverage Report
+          badge-title: Backend Codecov
+          report-only-changed-files: true
+          xml-skip-covered: true
+          remove-link-from-badge: true
+          default-branch: master
+  
+  python-ut-files-comment:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check and comment if no unit test files modified
+        run: |
+          git fetch origin master
+          changed_files=$(git diff --name-only origin/master)
+          
+          if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
+            echo "✅ Unit test files were modified."
+          else
+            echo "⚠️ No unit test files modified."
+            
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -d '{"body":"⚠️ No unit test files modified. Please ensure that changes are properly tested. ⚠️"}' \
+              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+          fi

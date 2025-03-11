@@ -71,6 +71,17 @@ def download_hue_logs(request):
   return logs_api.download_hue_logs(django_request)
 
 
+@api_view(["POST"])
+def check_config(request):
+  django_request = get_django_request(request)
+  return desktop_api.check_config(django_request)
+
+
+@api_view(["POST"])
+def install_app_examples(request):
+  django_request = get_django_request(request)
+  return desktop_api.install_app_examples(django_request)
+
 # Editor
 
 
@@ -360,7 +371,7 @@ def storage_trash_bulk_restore(request):
   return filebrowser_api.bulk_op(django_request, filebrowser_api.trash_restore)
 
 
-@api_view(["DELETE"])
+@api_view(["POST"])
 def storage_trash_purge(request):
   django_request = get_django_request(request)
   return filebrowser_api.trash_purge(django_request)
