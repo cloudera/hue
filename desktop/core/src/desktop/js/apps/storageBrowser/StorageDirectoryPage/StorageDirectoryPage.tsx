@@ -303,12 +303,12 @@ const StorageDirectoryPage = ({
                 ...rowSelection
               }}
               scroll={{ y: tableBodyHeight }}
-              data-testid={`${testId}`}
+              data-testid={testId}
               locale={locale}
               {...restProps}
             />
 
-            {filesData?.page && filesData?.page?.total_pages > 0 && (
+            {filesData?.page && filesData?.page?.totalPages > 0 && (
               <Pagination
                 setPageSize={setPageSize}
                 pageSize={pageSize}
