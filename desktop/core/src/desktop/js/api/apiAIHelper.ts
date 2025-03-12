@@ -22,6 +22,7 @@ import dataCatalog from '../catalog/dataCatalog';
 import { ExtendedColumn } from '../catalog/DataCatalogEntry';
 import { HistoryItem } from '../apps/editor/components/AiAssist/AiAssistToolbar/AiAssistToolbarHistory';
 import HueError from './HueError';
+import huePubSub from '../utils/huePubSub';
 
 const DBS_API_URL = '/api/v1/editor/ai/dbs';
 const SQL_API_URL = '/api/v1/editor/ai/sql';
@@ -348,6 +349,12 @@ const getTableList = async (databaseName: string, executor: Executor) => {
   return tableNames;
 };
 
+const sqlAIError = (error: HueError): void => {
+  if (error.cause) {
+    huePubSub.publish('hue.global.error', { message: error.cause, noStick: false });
+  }
+};
+
 const generateOptimizedSql: GenerateOptimizedSql = async ({
   statement,
   databaseNames,
@@ -377,6 +384,7 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
       }
     });
   } catch (e) {
+    sqlAIError(e);
     throw augmentError(e, 'Call to AI to optimize SQL query failed');
   }
 };
@@ -411,6 +419,7 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
 
     return { ...result, dbTableDetails };
   } catch (e) {
+    sqlAIError(e);
     throw augmentError(e, 'Call to AI to generate SQL query failed ');
   }
 };
@@ -451,6 +460,7 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
 
     return { ...result, dbTableDetails };
   } catch (e) {
+    sqlAIError(e);
     throw augmentError(e, 'Call to AI to edit SQL query failed');
   }
 };
@@ -483,6 +493,7 @@ const generateExplanation: GenerateExplanation = async ({
       }
     });
   } catch (e) {
+    sqlAIError(e);
     throw augmentError(e, 'Call to AI to explain SQL query failed');
   }
 };
@@ -515,6 +526,7 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({
       }
     });
   } catch (e) {
+    sqlAIError(e);
     throw augmentError(e, 'Call to AI to fix SQL query failed');
   }
 };
@@ -535,6 +547,7 @@ const generateCommentedSql: GenerateCommentedSql = async ({
       }
     });
   } catch (e) {
+    sqlAIError(e);
     throw augmentError(e, 'Call to AI to comment SQL query failed');
   }
 };
