@@ -933,7 +933,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     # Column stats are not available for views in both Hive and Impala
     if tb.is_view:
       msg = f'Cannot describe column for view: {table}'
-      LOG.error(msg)
+      LOG.debug(msg)
       return {'message': msg}
 
     return db.get_table_columns_stats(database, table, column)

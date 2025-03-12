@@ -436,7 +436,7 @@ class TestApi():
 
         result = api.describe_column({}, {}, 'test_db', 'test_view', 'test_col')
 
-        LOG.error.assert_called_with('Cannot describe column for view: test_view')
+        LOG.debug.assert_called_with('Cannot describe column for view: test_view')
         assert result['message'] == 'Cannot describe column for view: test_view'
         _get_db.get_table_columns_stats.assert_not_called()
 
