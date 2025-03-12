@@ -165,7 +165,7 @@ def get_all_filesystems(request):
     user_home_dir = fs_home_dir_mapping[fs](request.user)
     config = _get_config(fs, request)
 
-    filesystems.append({'file_system': fs, 'user_home_directory': user_home_dir, 'config': config})
+    filesystems.append({'name': fs, 'user_home_directory': user_home_dir, 'config': config})
 
   return JsonResponse(filesystems, safe=False)
 
