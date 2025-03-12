@@ -28,6 +28,7 @@ import unicodedata
 from builtins import object
 
 from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 import hadoop.cluster
@@ -219,6 +220,43 @@ class HDFStemporaryUploadedFile(object):
 
   def close(self):
     self._file.close()
+
+
+class CustomDocumentsUploadHandler(FileUploadHandler):
+  """
+  Delegates the upload handling based on the request URL.
+
+  When the request URL starts with "/desktop/api2/doc/import" (indicating a document
+  import), delegate all processing to HDFSfileUploadHandler.
+  Otherwise, delegate to FineUploaderChunkedUploadHandler.
+  """
+
+  def __init__(self, request, *args, **kwargs):
+    super().__init__(request, *args, **kwargs)
+    import_path = reverse('import_documents')
+
+    if request.path.startswith(import_path):
+      self.delegate = HDFSfileUploadHandler(request)
+    else:
+      self.delegate = FineUploaderChunkedUploadHandler(request, *args, **kwargs)
+
+  def new_file(self, field_name, file_name, *args, **kwargs):
+    try:
+      if hasattr(self.delegate, 'new_file'):
+        result = self.delegate.new_file(field_name, file_name, *args, **kwargs)
+    except StopFutureHandlers:
+      result = None
+    return result
+
+  def receive_data_chunk(self, raw_data, start):
+    if hasattr(self.delegate, 'receive_data_chunk'):
+      return self.delegate.receive_data_chunk(raw_data, start)
+    return raw_data
+
+  def file_complete(self, file_size):
+    if hasattr(self.delegate, 'file_complete'):
+      return self.delegate.file_complete(file_size)
+    return None
 
 
 class FineUploaderChunkedUploadHandler(FileUploadHandler):

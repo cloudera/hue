@@ -660,7 +660,7 @@ from desktop.conf import ENABLE_NEW_STORAGE_BROWSER  # noqa: E402
 file_upload_handlers = []
 if is_chunked_fileuploader_enabled():
   file_upload_handlers = [
-    'hadoop.fs.upload.FineUploaderChunkedUploadHandler',
+    'hadoop.fs.upload.CustomDocumentsUploadHandler',
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
   ]

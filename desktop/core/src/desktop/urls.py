@@ -165,7 +165,7 @@ dynamic_patterns += [
   re_path(r'^desktop/api2/user_preferences(?:/(?P<key>\w+))?/?$', desktop_api2.user_preferences, name="desktop.api2.user_preferences"),
 
   re_path(r'^desktop/api2/doc/export/?$', desktop_api2.export_documents),
-  re_path(r'^desktop/api2/doc/import/?$', desktop_api2.import_documents),
+  re_path(r'^desktop/api2/doc/import/?$', desktop_api2.import_documents, name='import_documents'),
 
   re_path(r'^desktop/api2/gist/create/?$', desktop_api2.gist_create),
   re_path(r'^desktop/api2/gist/open/?$', desktop_api2.gist_get),
