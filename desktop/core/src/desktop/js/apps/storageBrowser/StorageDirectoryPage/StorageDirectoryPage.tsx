@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { ColumnProps } from 'antd/lib/table';
 import { Input, Tooltip } from 'antd';
 
@@ -52,6 +52,7 @@ import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
 import { UploadItem } from '../../../utils/hooks/useFileUpload/util';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
+import { useWindowSize } from '../../../utils/hooks/useWindowSize/useWindowSize';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import StorageDirectoryActions from './StorageDirectoryActions/StorageDirectoryActions';
 
@@ -82,7 +83,6 @@ const StorageDirectoryPage = ({
   ...restProps
 }: StorageDirectoryPageProps): JSX.Element => {
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
-  const [tableHeight, setTableHeight] = useState<number>(100);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
   const [filesToUpload, setFilesToUpload] = useState<UploadItem[]>([]);
   const [polling, setPolling] = useState<boolean>(false);
@@ -237,28 +237,9 @@ const StorageDirectoryPage = ({
     setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
   };
 
-  useEffect(() => {
-    //TODO: handle table resize
-    const calculateTableHeight = () => {
-      const windowHeight = window.innerHeight;
-      // TODO: move 450 to dynamic based on  table header height, tab nav and some header.
-      const tableHeightFix = windowHeight - 450;
-      return tableHeightFix;
-    };
-
-    const handleWindowResize = () => {
-      const tableHeight = calculateTableHeight();
-      setTableHeight(tableHeight);
-    };
-
-    handleWindowResize(); // Calculate initial scroll height
-
-    window.addEventListener('resize', handleWindowResize);
-
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    };
-  }, []);
+  const [tableRef, rect] = useWindowSize();
+  // 40px for table header, 50px for pagination
+  const tableBodyHeight = Math.max(rect.height - 90, 100);
 
   const locale = {
     emptyText: t('Folder is empty')
@@ -274,10 +255,10 @@ const StorageDirectoryPage = ({
   ];
 
   return (
-    <>
-      <div className="hue-storage-browser__actions-bar">
+    <div className="hue-storage-browser-directory">
+      <div className="hue-storage-browser-directory__actions-bar">
         <Input
-          className="hue-storage-browser__search"
+          className="hue-storage-browser-directory__actions-bar__search"
           placeholder={t('Search')}
           allowClear={true}
           onChange={event => {
@@ -285,7 +266,7 @@ const StorageDirectoryPage = ({
           }}
           disabled={!tableData.length && !searchTerm.length}
         />
-        <div className="hue-storage-browser__actions-bar-right">
+        <div className="hue-storage-browser-directory__actions-bar__actions">
           <StorageDirectoryActions
             fileStats={fileStats}
             fileSystem={fileSystem}
@@ -301,41 +282,43 @@ const StorageDirectoryPage = ({
         </div>
       </div>
 
-      <DragAndDrop onDrop={onFilesDrop}>
-        <LoadingErrorWrapper
-          loading={(loadingFiles || listDirectoryLoading) && !polling}
-          errors={errorConfig}
-        >
-          <Table
-            className={className}
-            columns={getColumns(tableData[0] ?? {})}
-            dataSource={tableData}
-            onRow={onRowClicked}
-            pagination={false}
-            rowClassName={rowClassName}
-            rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
-            rowSelection={{
-              hideSelectAll: !tableData.length,
-              columnWidth: 36,
-              type: 'checkbox',
-              ...rowSelection
-            }}
-            scroll={{ y: tableHeight }}
-            data-testid={testId}
-            locale={locale}
-            {...restProps}
-          />
-
-          {filesData?.page && filesData?.page?.total_pages > 0 && (
-            <Pagination
-              setPageSize={setPageSize}
-              pageSize={pageSize}
-              setPageNumber={setPageNumber}
-              pageStats={filesData?.page}
+      <div ref={tableRef} className="hue-storage-browser-directory__table-container">
+        <DragAndDrop onDrop={onFilesDrop}>
+          <LoadingErrorWrapper
+            loading={(loadingFiles || listDirectoryLoading) && !polling}
+            errors={errorConfig}
+          >
+            <Table
+              className={className}
+              columns={getColumns(tableData[0] ?? {})}
+              dataSource={tableData}
+              onRow={onRowClicked}
+              pagination={false}
+              rowClassName={rowClassName}
+              rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
+              rowSelection={{
+                hideSelectAll: !tableData.length,
+                columnWidth: 36,
+                type: 'checkbox',
+                ...rowSelection
+              }}
+              scroll={{ y: tableBodyHeight }}
+              data-testid={`${testId}`}
+              locale={locale}
+              {...restProps}
             />
-          )}
-        </LoadingErrorWrapper>
-      </DragAndDrop>
+
+            {filesData?.page && filesData?.page?.total_pages > 0 && (
+              <Pagination
+                setPageSize={setPageSize}
+                pageSize={pageSize}
+                setPageNumber={setPageNumber}
+                pageStats={filesData?.page}
+              />
+            )}
+          </LoadingErrorWrapper>
+        </DragAndDrop>
+      </div>
       {filesToUpload.length > 0 && (
         <FileUploadQueue
           filesQueue={filesToUpload}
@@ -346,7 +329,7 @@ const StorageDirectoryPage = ({
           }}
         />
       )}
-    </>
+    </div>
   );
 };
 
