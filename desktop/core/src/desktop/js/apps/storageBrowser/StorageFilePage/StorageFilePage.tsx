@@ -118,10 +118,10 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
     !inTrash(fileStats.path);
 
   const pageStats = {
-    page_number: pageNumber,
-    total_pages: Math.ceil(fileStats.size / pageSize),
-    page_size: 0,
-    total_size: 0
+    pageNumber: pageNumber,
+    totalPages: Math.ceil(fileStats.size / pageSize),
+    pageSize: 0,
+    totalSize: 0
   };
 
   const errorConfig = [
@@ -208,7 +208,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                     readOnly={!isEditing}
                     className="preview__textarea"
                   />
-                  {!loadingPreview && pageStats.total_pages > 1 && (
+                  {pageStats.totalPages > 1 && (
                     <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
                   )}
                 </div>
