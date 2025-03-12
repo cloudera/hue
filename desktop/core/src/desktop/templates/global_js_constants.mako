@@ -148,6 +148,9 @@
 
   window.SAML_LOGOUT_URL = '${ CDP_LOGOUT_URL.get() }';
   window.SAML_REDIRECT_URL = '${ get_logout_redirect_url() }';
+
+  window.ALLOW_HUE_LOGOUT = window.KNOX_BASE_URL === '';
+
   window.SKIP_CACHE = [
     'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore', 'filebrowser',
     'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
