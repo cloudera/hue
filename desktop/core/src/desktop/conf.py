@@ -321,6 +321,12 @@ AI_INTERFACE = ConfigSection(
       help=_('Block user input with if configured regex pattern match found.'),
       default="",
       type=str
+    ),
+    USER_INPUT_BLOCK_HTML=Config(
+      key='user_input_block_html',
+      help=_('Replace html tags to preventing malicious activities.'),
+      default=False,
+      type=coerce_bool
     )
   )
 )

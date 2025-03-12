@@ -1,11 +1,13 @@
 import re
 
+from bs4 import BeautifulSoup
+
 
 def validate_user_input_max_length(input, max_length):
     if len(input) > max_length:
-        raise ValueError(f"Prompt length exceeds limit : Maximum allowed length is {max_length} characters, but got {len(input)}.")
+        raise ValueError(f"Invalid input : Maximum allowed length of user input is {max_length} characters, but got {len(input)}.")
 
-    return "Valid prompt"
+    return "Valid input"
 
 
 def user_input_trim_whitespaces(input):
@@ -30,8 +32,6 @@ def user_input_banned_keyphrase_checker(input, banned_keyphrases):
 
 
 def user_input_banned_regex_checker(input, banned_regex):
-    # will have to iterate through banned_regex if we make it a list using coerce_list
-    #   - right now it's going to be a single string that seperated by regex OR(|)
     match = re.search(banned_regex, input)
     if match:
         matched_substring = match.group(0)
@@ -39,12 +39,18 @@ def user_input_banned_regex_checker(input, banned_regex):
     return "Valid input"
 
 
-def validate_input(input, user_input_max_length, chars_to_remove, banned_keyphrases, banned_regex):
+def user_input_check_html(input):
+    return re.sub(r'<(.*?)>', r'&lt;\1&gt;', input)
+
+
+def validate_input(input, user_input_max_length, chars_to_remove, banned_keyphrases, banned_regex, html_block):
     validate_user_input_max_length(input, user_input_max_length)
     cleaned_input = user_input_trim_whitespaces(input)
     cleaned_input = user_input_character_remover(cleaned_input, chars_to_remove)
     if banned_keyphrases[0]:
-        user_input_banned_keyphrase_checker(input, banned_keyphrases)
+        user_input_banned_keyphrase_checker(cleaned_input, banned_keyphrases)
     if banned_regex:
-        user_input_banned_regex_checker(input, banned_regex)
+        user_input_banned_regex_checker(cleaned_input, banned_regex)
+    if html_block:
+        cleaned_input = user_input_check_html(cleaned_input)
     return cleaned_input

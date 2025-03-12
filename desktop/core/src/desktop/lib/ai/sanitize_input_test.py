@@ -5,11 +5,11 @@ from desktop.lib.ai.sanitize_input import *
 
 def test_validate_user_input_max_length_valid():
 
-    assert validate_user_input_max_length("short input", 20) == "Valid prompt"
+    assert validate_user_input_max_length("short input", 20) == "Valid input"
 
 
 def test_validate_user_input_max_length_exceeds():
-    with pytest.raises(ValueError, match=r"Prompt length exceeds limit : Maximum allowed length is 10 characters, but got 14."):
+    with pytest.raises(ValueError, match=r"Invalid input : Maximum allowed length of user input is 10 characters, but got 14."):
         validate_user_input_max_length("exceeds length", 10)
 
 
@@ -106,3 +106,18 @@ def test_user_input_banned_regex_checker(input, banned_regex, expected_output, e
     else:
         result = user_input_banned_regex_checker(input, banned_regex)
         assert result == expected_output
+
+
+@pytest.mark.parametrize(
+    "input_str, expected_output", [
+        ("<div>Hello</div>", "&lt;div&gt;Hello&lt;/div&gt;"),
+        ("Hello", "Hello"),
+        ("<div><p>Hello</p></div>", "&lt;div&gt;&lt;p&gt;Hello&lt;/p&gt;&lt;/div&gt;"),
+        ("", ""),
+        ("a<b", "a<b"),
+        ("<div>a<b and c>d</div>", "&lt;div&gt;a&lt;b and c&gt;d&lt;/div&gt;"),
+        ("<a href='test.html'>a<b;</a>", "&lt;a href='test.html'&gt;a&lt;b;</a&gt;")
+    ]
+)
+def test_user_input_check_html(input_str, expected_output):
+    assert user_input_check_html(input_str) == expected_output

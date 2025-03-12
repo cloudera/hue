@@ -416,15 +416,19 @@
 
     # Remove certain characters from the user input.
     # Type: str. Default: '"&\n\r\t'.
-    ## user_input_max_length='"&\n\r\t'
+    ## user_input_remove_characters='"&\n\r\t'
 
     # Block user input with if certain configured keyphrases found.
-    # Type: str. Default: ""
+    # Type: str. Default: "".
     ## user_input_banned_keywords=""
 
     # Block user input with if configured regex pattern match found.
-    # Type: str. Default: ""
+    # Type: str. Default: "".
     ## user_input_banned_regex=""
+
+    # Replace html tags to preventing malicious activities.
+    # Type: bool. Default: False.
+    ## user_input_block_html=False
 
   [[semantic_search]]
     # Model used for data embedding. Must be compatible with SentenceTransformer.
