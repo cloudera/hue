@@ -928,6 +928,14 @@ DROP TABLE IF EXISTS `%(table)s`;
 
   def describe_column(self, notebook, snippet, database=None, table=None, column=None):
     db = self._get_db(snippet, interpreter=self.interpreter)
+    tb = db.get_table(database, table)
+
+    # Column stats are not available for views in both Hive and Impala
+    if tb.is_view:
+      msg = f'Cannot describe column for view: {table}'
+      LOG.debug(msg)
+      return {'message': msg}
+
     return db.get_table_columns_stats(database, table, column)
 
   def describe_table(self, notebook, snippet, database=None, table=None):

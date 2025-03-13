@@ -428,6 +428,30 @@ class TestApi():
           data['functions'] ==
           [{'name': 'f1'}, {'name': 'f2'}, {'name': 'f3'}])
 
+  def test_describe_column_view(self):
+    mock_get_db = Mock(get_table=Mock(return_value=Mock(is_view=True)), get_table_columns_stats=Mock())
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_db', return_value=mock_get_db) as _get_db:
+      with patch('notebook.connectors.hiveserver2.LOG') as LOG:
+        api = HS2Api(self.user)
+
+        result = api.describe_column({}, {}, 'test_db', 'test_view', 'test_col')
+
+        LOG.debug.assert_called_with('Cannot describe column for view: test_view')
+        assert result['message'] == 'Cannot describe column for view: test_view'
+        _get_db.get_table_columns_stats.assert_not_called()
+
+  def test_describe_column_table(self):
+    mock_get_db = Mock(
+      get_table=Mock(return_value=Mock(is_view=False)),
+      get_table_columns_stats=Mock(return_value=[{'test_field1': 'value1', 'test_field2': 'value2'}]),
+    )
+    with patch('notebook.connectors.hiveserver2.HS2Api._get_db', return_value=mock_get_db) as _get_db:
+      api = HS2Api(self.user)
+
+      result = api.describe_column({}, {}, 'test_db', 'test_table', 'test_col')
+
+      assert result == [{'test_field1': 'value1', 'test_field2': 'value2'}]
+
 
 @pytest.mark.django_db
 class TestHiveserver2ApiNonMock(object):
