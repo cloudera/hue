@@ -1,6 +1,6 @@
 import re
 
-from bs4 import BeautifulSoup
+from desktop.conf import AI_INTERFACE
 
 
 def validate_user_input_max_length(input, max_length):
@@ -11,14 +11,17 @@ def validate_user_input_max_length(input, max_length):
 
 
 def user_input_trim_whitespaces(input):
-    input = re.sub(r'[ ]+', ' ', input)
-    input = re.sub(r'\n\s*\n+', '\n', input)
+    input = re.sub(r'[ ]+', ' ', input)      # Replace multiple consecutive spaces with a single space
+    input = re.sub(r'\n\s*\n+', '\n', input)  # Replace multiple blank lines with a single newline to avoid blank lines
+
     return input.strip()
 
 
 # doesn't work for unicode lanugages - chinese , spanish etc.
 def user_input_character_remover(input, chars_to_remove):
-    return input.translate(str.maketrans('', '', chars_to_remove.encode().decode('unicode_escape')))
+    # to ensure espace sequences (like "\n","\r"."\t" etc.) when passed through .ini get processed rightly.
+    chars_decoded = chars_to_remove.encode().decode('unicode_escape')
+    return input.translate(str.maketrans('', '', chars_decoded))
 
 
 def user_input_banned_keyphrase_checker(input, banned_keyphrases):
@@ -43,11 +46,16 @@ def user_input_check_html(input):
     return re.sub(r'<(.*?)>', r'&lt;\1&gt;', input)
 
 
-def validate_input(input, user_input_max_length, chars_to_remove, banned_keyphrases, banned_regex, html_block):
-    validate_user_input_max_length(input, user_input_max_length)
+def validate_input(input):
+    input_max_length = AI_INTERFACE.USER_INPUT_MAX_LENGTH.get()
+    chars_to_remove_from_input = AI_INTERFACE.USER_INPUT_REMOVE_CHARACTERS.get()
+    banned_keyphrases = AI_INTERFACE.USER_INPUT_BANNED_KEYPHRASES.get()
+    banned_regex = AI_INTERFACE.USER_INPUT_BANNED_REGEX.get()
+    html_block = AI_INTERFACE.USER_INPUT_BLOCK_HTML.get()
+    validate_user_input_max_length(input, input_max_length)
     cleaned_input = user_input_trim_whitespaces(input)
-    cleaned_input = user_input_character_remover(cleaned_input, chars_to_remove)
-    if banned_keyphrases[0]:
+    cleaned_input = user_input_character_remover(cleaned_input, chars_to_remove_from_input)
+    if banned_keyphrases and banned_keyphrases[0]:
         user_input_banned_keyphrase_checker(cleaned_input, banned_keyphrases)
     if banned_regex:
         user_input_banned_regex_checker(cleaned_input, banned_regex)

@@ -324,7 +324,7 @@ AI_INTERFACE = ConfigSection(
     ),
     USER_INPUT_BLOCK_HTML=Config(
       key='user_input_block_html',
-      help=_('Replace html tags to preventing malicious activities.'),
+      help=_('Escape html tags to prevent malicious activities.'),
       default=False,
       type=coerce_bool
     )

@@ -349,7 +349,7 @@ const getTableList = async (databaseName: string, executor: Executor) => {
   return tableNames;
 };
 
-const sqlAIError = (error: HueError): void => {
+const publishError = (error: HueError): void => {
   if (error.cause) {
     huePubSub.publish('hue.global.error', { message: error.cause, noStick: false });
   }
@@ -384,7 +384,7 @@ const generateOptimizedSql: GenerateOptimizedSql = async ({
       }
     });
   } catch (e) {
-    sqlAIError(e);
+    publishError(e);
     throw augmentError(e, 'Call to AI to optimize SQL query failed');
   }
 };
@@ -419,7 +419,7 @@ const generateSQLfromNQL: GenerateSQLfromNQL = async ({
 
     return { ...result, dbTableDetails };
   } catch (e) {
-    sqlAIError(e);
+    publishError(e);
     throw augmentError(e, 'Call to AI to generate SQL query failed ');
   }
 };
@@ -460,7 +460,7 @@ const generateEditedSQLfromNQL: GenerateEditedSQLfromNQL = async ({
 
     return { ...result, dbTableDetails };
   } catch (e) {
-    sqlAIError(e);
+    publishError(e);
     throw augmentError(e, 'Call to AI to edit SQL query failed');
   }
 };
@@ -493,7 +493,7 @@ const generateExplanation: GenerateExplanation = async ({
       }
     });
   } catch (e) {
-    sqlAIError(e);
+    publishError(e);
     throw augmentError(e, 'Call to AI to explain SQL query failed');
   }
 };
@@ -526,7 +526,7 @@ const generateCorrectedSql: GenerateCorrectedSql = async ({
       }
     });
   } catch (e) {
-    sqlAIError(e);
+    publishError(e);
     throw augmentError(e, 'Call to AI to fix SQL query failed');
   }
 };
@@ -547,7 +547,7 @@ const generateCommentedSql: GenerateCommentedSql = async ({
       }
     });
   } catch (e) {
-    sqlAIError(e);
+    publishError(e);
     throw augmentError(e, 'Call to AI to comment SQL query failed');
   }
 };

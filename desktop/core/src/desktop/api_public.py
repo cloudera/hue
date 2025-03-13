@@ -27,7 +27,7 @@ from rest_framework.response import Response
 from beeswax import api as beeswax_api
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
-from desktop.conf import AI_INTERFACE, is_ai_interface_enabled
+from desktop.conf import is_ai_interface_enabled
 from desktop.lib import fsmanager
 from desktop.lib.ai.metadata import semantic_search
 from desktop.lib.ai.sanitize_input import validate_input
@@ -493,17 +493,12 @@ def sql(request):
   sql = request.data.get("sql")
   dialect = request.data.get("dialect")
   metadata = request.data.get("metadata")
-  input_max_length = AI_INTERFACE.USER_INPUT_MAX_LENGTH.get()
-  chars_to_remove_from_input = AI_INTERFACE.USER_INPUT_REMOVE_CHARACTERS.get()
-  banned_keyphrases = AI_INTERFACE.USER_INPUT_BANNED_KEYPHRASES.get()
-  banned_regex = AI_INTERFACE.USER_INPUT_BANNED_REGEX.get()
-  html_block = AI_INTERFACE.USER_INPUT_BLOCK_HTML.get()
 
   if is_ai_interface_enabled():
     # input validation
     try:
       if input:
-        input = validate_input(input, input_max_length, chars_to_remove_from_input, banned_keyphrases, banned_regex, html_block)
+        input = validate_input(input)
     except Exception as e:
       return JsonResponse({"error": str(e)}, status=400)
 
