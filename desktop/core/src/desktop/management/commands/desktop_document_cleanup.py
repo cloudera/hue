@@ -25,16 +25,12 @@ from importlib import import_module
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.utils import DatabaseError
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 import desktop.conf
 from beeswax.models import SavedQuery, Session
 from desktop.models import Document2
-from desktop.settings import INSTALLED_APPS
-
-if 'oozie' in INSTALLED_APPS:
-  from oozie.models import Workflow
-
-from django.utils.translation import gettext as _, gettext_lazy as _t
+from oozie.models import Workflow
 
 LOG = logging.getLogger()
 
@@ -129,18 +125,17 @@ class Command(BaseCommand):
     # Clear out old Hive/Impala sessions
     self.objectCleanup(Session, 'status_code__gte', -10000, 'last_used')
 
-    if 'oozie' in INSTALLED_APPS:  # check if oozie is enabled
-      # Clean out Trashed Workflows
-      try:
-        self.objectCleanup(Workflow, 'is_trashed', True, 'last_modified')
-      except NameError as NE:
-        LOG.info('Oozie app is not configured to clean out trashed workflows')
+    # Clean out Trashed Workflows
+    try:
+      self.objectCleanup(Workflow, 'is_trashed', True, 'last_modified')
+    except NameError as NE:
+      LOG.info('Oozie app is not configured to clean out trashed workflows')
 
-      # Clean out Workflows without a name
-      try:
-        self.objectCleanup(Workflow, 'name', '', 'last_modified')
-      except NameError as NE:
-        LOG.info('Oozie app is not configured to clean out workflows without a name')
+    # Clean out Workflows without a name
+    try:
+      self.objectCleanup(Workflow, 'name', '', 'last_modified')
+    except NameError as NE:
+      LOG.info('Oozie app is not configured to clean out workflows without a name')
 
     # Clean out history Doc2 objects
     self.objectCleanup(Document2, 'is_history', True, 'last_modified')

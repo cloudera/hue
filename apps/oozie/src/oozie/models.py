@@ -135,6 +135,9 @@ class Job(models.Model):
 
   objects = JobManager()
 
+  class Meta:
+    app_label = 'oozie'
+
   def delete(self, skip_trash=False, *args, **kwargs):
     if skip_trash:
       self.doc.all().delete()
@@ -345,6 +348,9 @@ class Workflow(Job):
   managed = models.BooleanField(default=True)
 
   objects = WorkflowManager()
+
+  class Meta:
+    app_label = 'oozie'
 
   HUE_ID = 'hue-id-w'
   ICON = 'oozie/art/icon_oozie_workflow_48.png'
