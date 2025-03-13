@@ -18,54 +18,63 @@
 @use 'mixins';
 
 .antd.cuix {
-  .hue-storage-browser-tab-content {
+  .hue-storage-browser-tab {
     display: flex;
     flex: 1;
     flex-direction: column;
     height: 100%;
-  }
 
-  .hue-storage-browser__title-bar {
-    display: flex;
-    justify-content: space-between;
-  }
+    &__title-bar {
+      display: flex;
+      justify-content: space-between;
 
-  .hue-storage-browser__title {
-    display: flex;
-    gap: vars.$fluidx-spacing-xs;
-    max-width: 60%;
-    margin-right: vars.$fluidx-spacing-xl
-  }
+      &__title {
+        display: flex;
+        gap: vars.$fluidx-spacing-xs;
+        min-width: 100px;
+        width: calc(100% - 265px);
 
-  .hue-storage-browser__home-bar-btns {
-    padding: vars.$fluidx-spacing-xxs;
-  }
+        @media screen and (width <=600px) {
+          width: calc(100% - 130px);
+        }
 
-  .hue-storage-browser__home-bar-right {
-    display: flex;
-    gap: vars.$fluidx-spacing-s;
-  }
+        &__icon {
+          flex: 0 0 auto;
+          height: vars.$fluidx-heading-h3-line-height;
+        }
 
-  .hue-storage-browser__icon {
-    flex: 0 0 auto;
-    height: vars.$fluidx-heading-h3-line-height;
-  }
+        &__name {
+          @include mixins.nowrap-ellipsis;
 
-  .hue-storage-browser__folder-name {
-    flex: 0 0 auto;
-    font-size: vars.$fluidx-heading-h3-size;
-    line-height: vars.$fluidx-heading-h3-line-height;
-    font-weight: vars.$fluidx-heading-h3-weight;
-    width: 100%;
-    @include mixins.nowrap-ellipsis;
+          font-size: vars.$fluidx-heading-h3-size;
+          font-weight: vars.$fluidx-heading-h3-weight;
+          margin-bottom: 0;
+        }
+      }
 
-    display: inline;
-  }
+      &__button-group {
+        display: flex;
+        gap: vars.$fluidx-spacing-xs;
 
-  .hue-storage-browser__path-browser-panel {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    margin-left: vars.$fluidx-spacing-xxs;
+        @media screen and (width <=600px) {
+          gap: 0;
+        }
+
+        &__button {
+          @media screen and (width <=600px) {
+            span span:last-child {
+              display: none !important;
+            }
+          }
+        }
+      }
+    }
+
+    &__path-browser-panel {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-left: vars.$fluidx-spacing-xxs;
+    }
   }
 }
