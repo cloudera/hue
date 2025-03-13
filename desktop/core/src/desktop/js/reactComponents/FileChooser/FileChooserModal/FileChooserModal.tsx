@@ -61,18 +61,18 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
 
   const fileSystemList: FileChooserMenu[] | undefined = useMemo(
     () =>
-      data?.map((system, index) => ({
-        label: system.file_system,
+      data?.map((fileSystem, index) => ({
+        label: fileSystem.name,
         key: index,
-        icon: icons[system.file_system],
-        user_home_dir: system.user_home_directory
+        icon: icons[fileSystem.name],
+        user_home_dir: fileSystem.userHomeDirectory
       })),
     [data]
   );
 
   useEffect(() => {
     if (data && data?.length !== 0) {
-      setFilePath(data[0].user_home_directory);
+      setFilePath(data[0].userHomeDirectory);
     }
   }, [data]);
 

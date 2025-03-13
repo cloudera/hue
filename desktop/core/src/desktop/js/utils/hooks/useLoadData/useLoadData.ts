@@ -17,6 +17,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ApiFetchOptions, get } from '../../../api/utils';
 import { AxiosError } from 'axios';
+import { convertKeysToCamelCase } from '../../../utils/string/changeCasing';
 
 export interface Options<T, U> {
   params?: U;
@@ -25,6 +26,7 @@ export interface Options<T, U> {
   onSuccess?: (data: T) => void;
   onError?: (error: AxiosError) => void;
   pollInterval?: number;
+  transformKeys?: 'camelCase' | 'none';
 }
 
 interface UseLoadDataProps<T> {
@@ -54,6 +56,18 @@ const useLoadData = <T, U = unknown>(
     [localOptions]
   );
 
+  const transformResponse = (data: T): T => {
+    if (options?.transformKeys === 'none') {
+      return data;
+    }
+
+    if (data && (options?.transformKeys === undefined || options?.transformKeys === 'camelCase')) {
+      return convertKeysToCamelCase<T>(data);
+    }
+
+    return data;
+  };
+
   const loadData = useCallback(
     async (isForced: boolean = false) => {
       // Avoid fetching data if the skip option is true
@@ -66,11 +80,12 @@ const useLoadData = <T, U = unknown>(
 
       try {
         const response = await get<T, U>(url, localOptions?.params, fetchOptions);
-        setData(response);
+        const transformedResponse = transformResponse(response);
+        setData(transformedResponse);
         if (localOptions?.onSuccess) {
-          localOptions.onSuccess(response);
+          localOptions.onSuccess(transformedResponse);
         }
-        return response;
+        return transformedResponse;
       } catch (error) {
         setError(error as AxiosError);
         if (localOptions?.onError) {

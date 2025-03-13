@@ -87,11 +87,11 @@ def sync_warehouses(args, options):
 
 
 def add_computes_to_warehouse(warehouse, computes):
+  external_ids = [c['external_id'] for c in computes]
+  models.Compute.objects.filter(namespace=warehouse).exclude(external_id__in=external_ids).delete()
   for c in computes:
     c['namespace'] = warehouse
     models.Compute.objects.update_or_create(external_id=c['external_id'], defaults=c)
-  external_ids = [c['external_id'] for c in computes]
-  models.Compute.objects.filter(namespace=warehouse).exclude(external_id__in=external_ids).delete()
 
 
 if __name__ == '__main__':

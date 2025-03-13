@@ -161,7 +161,32 @@ if ENABLE_PROMETHEUS.get():
 HUE_LB_HOSTS = [urlparse(hue_lb).netloc for hue_lb in HUE_LOAD_BALANCER.get()] if HUE_LOAD_BALANCER.get() else []
 
 
-class AjaxMiddleware(MiddlewareMixin):
+class Django4MiddlewareAdapterMixin(MiddlewareMixin):
+  """
+  A mixin to adapt Django 3-style middleware to be compatible with Django 4.
+  This is intended as a transitional solution and should not be used for
+  new middleware implementations.
+  """
+  def __call__(self, request):
+    """Sync version of the middleware"""
+    if hasattr(self, 'process_request'):
+      self.process_request(request)
+
+    response = self.get_response(request)
+
+    if hasattr(self, 'process_response'):
+      response = self.process_response(request, response)
+
+    return response
+
+  async def __aenter__(self):
+    pass  # Provide async behavior if needed
+
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    pass  # Handle async cleanup
+
+
+class AjaxMiddleware(Django4MiddlewareAdapterMixin):
   """
   Middleware that augments request to set request.ajax
   for either is_ajax() (looks at HTTP headers) or ?format=json
@@ -172,7 +197,7 @@ class AjaxMiddleware(MiddlewareMixin):
     return None
 
 
-class ExceptionMiddleware(MiddlewareMixin):
+class ExceptionMiddleware(Django4MiddlewareAdapterMixin):
   """
   If exceptions know how to render themselves, use that.
   """
@@ -202,7 +227,7 @@ class ExceptionMiddleware(MiddlewareMixin):
     return None
 
 
-class ClusterMiddleware(MiddlewareMixin):
+class ClusterMiddleware(Django4MiddlewareAdapterMixin):
   """
   Manages setting request.fs and request.jt
   """
@@ -236,7 +261,7 @@ class ClusterMiddleware(MiddlewareMixin):
     request.jt = None
 
 
-class NotificationMiddleware(MiddlewareMixin):
+class NotificationMiddleware(Django4MiddlewareAdapterMixin):
   """
   Manages setting request.info and request.error
   """
@@ -365,7 +390,7 @@ class AppSpecificMiddleware(object):
     return result
 
 
-class LoginAndPermissionMiddleware(MiddlewareMixin):
+class LoginAndPermissionMiddleware(Django4MiddlewareAdapterMixin):
   """
   Middleware that forces all views (except those that opt out) through authentication.
   """
@@ -503,7 +528,7 @@ class JsonMessage(object):
     return json.dumps(self.kwargs)
 
 
-class AuditLoggingMiddleware(MiddlewareMixin):
+class AuditLoggingMiddleware(Django4MiddlewareAdapterMixin):
 
   def __init__(self, get_response):
     self.get_response = get_response
@@ -563,7 +588,7 @@ class AuditLoggingMiddleware(MiddlewareMixin):
     return allowed
 
 
-class ProxyMiddleware(MiddlewareMixin):
+class ProxyMiddleware(Django4MiddlewareAdapterMixin):
 
   def __init__(self, get_response):
     self.get_response = get_response
@@ -622,7 +647,7 @@ class ProxyMiddleware(MiddlewareMixin):
     return username
 
 
-class SpnegoMiddleware(MiddlewareMixin):
+class SpnegoMiddleware(Django4MiddlewareAdapterMixin):
   """
   Based on the WSGI SPNEGO middlware class posted here:
   http://code.activestate.com/recipes/576992/
@@ -790,7 +815,7 @@ class SpnegoMiddleware(MiddlewareMixin):
     return username
 
 
-class HueRemoteUserMiddleware(RemoteUserMiddleware):
+class HueRemoteUserMiddleware(Django4MiddlewareAdapterMixin, RemoteUserMiddleware):
   """
   Middleware to delegate authentication to a proxy server. The proxy server
   will set an HTTP header (defaults to Remote-User) with the name of the
@@ -816,7 +841,7 @@ class EnsureSafeMethodMiddleware(MiddlewareMixin):
       return HttpResponseNotAllowed(HTTP_ALLOWED_METHODS.get())
 
 
-class EnsureSafeRedirectURLMiddleware(MiddlewareMixin):
+class EnsureSafeRedirectURLMiddleware(Django4MiddlewareAdapterMixin):
   """
   Middleware to white list configured redirect URLs.
   """
@@ -844,7 +869,7 @@ class EnsureSafeRedirectURLMiddleware(MiddlewareMixin):
       return response
 
 
-class MetricsMiddleware(MiddlewareMixin):
+class MetricsMiddleware(Django4MiddlewareAdapterMixin):
   """
   Middleware to track the number of active requests.
   """
@@ -869,7 +894,7 @@ class MetricsMiddleware(MiddlewareMixin):
     return response
 
 
-class ContentSecurityPolicyMiddleware(MiddlewareMixin):
+class ContentSecurityPolicyMiddleware(Django4MiddlewareAdapterMixin):
   def __init__(self, get_response):
     self.get_response = get_response
     self.secure_content_security_policy = SECURE_CONTENT_SECURITY_POLICY.get()
@@ -926,7 +951,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
     return response
 
 
-class MimeTypeJSFileFixStreamingMiddleware(MiddlewareMixin):
+class MimeTypeJSFileFixStreamingMiddleware(Django4MiddlewareAdapterMixin):
   """
   Middleware to detect and fix ".js" mimetype. SLES 11SP4 as example OS which detect js file
   as "text/x-js" and if strict X-Content-Type-Options=nosniff is set then browser fails to
@@ -985,7 +1010,7 @@ class MultipleProxyMiddleware:
     return self.get_response(request)
 
 
-class CacheControlMiddleware(MiddlewareMixin):
+class CacheControlMiddleware(Django4MiddlewareAdapterMixin):
   def __init__(self, get_response):
     self.get_response = get_response
     self.custom_cache_control = CUSTOM_CACHE_CONTROL.get()

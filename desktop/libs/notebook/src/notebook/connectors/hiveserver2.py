@@ -260,10 +260,11 @@ class HS2Api(Api):
 
     if not session_id:
       session = Session.objects.get_session(self.user, application=app_name)
-      decoded_guid = session.get_handle().sessionId.guid
-      session_decoded_id = unpack_guid(decoded_guid)
-      if source_method == "dt_logout":
-        LOG.debug("Closing Impala session id %s on logout for user %s" % (session_decoded_id, self.user.username))
+      if session:
+        decoded_guid = session.get_handle().sessionId.guid
+        session_decoded_id = unpack_guid(decoded_guid)
+        if source_method == "dt_logout":
+          LOG.debug("Closing Impala session id %s on logout for user %s" % (session_decoded_id, self.user.username))
 
     query_server = get_query_server_config(name=app_name)
 
@@ -927,6 +928,14 @@ DROP TABLE IF EXISTS `%(table)s`;
 
   def describe_column(self, notebook, snippet, database=None, table=None, column=None):
     db = self._get_db(snippet, interpreter=self.interpreter)
+    tb = db.get_table(database, table)
+
+    # Column stats are not available for views in both Hive and Impala
+    if tb.is_view:
+      msg = f'Cannot describe column for view: {table}'
+      LOG.debug(msg)
+      return {'message': msg}
+
     return db.get_table_columns_stats(database, table, column)
 
   def describe_table(self, notebook, snippet, database=None, table=None):
