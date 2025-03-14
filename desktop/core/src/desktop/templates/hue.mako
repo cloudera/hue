@@ -98,6 +98,7 @@
 
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
+  <script src="${ static('desktop/js/js.cookie.js') }"></script>
   % endif
 </head>
 
