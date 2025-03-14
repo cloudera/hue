@@ -45,7 +45,6 @@ from desktop.lib.conf import (
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root, get_run_root
 from desktop.redaction.engine import parse_redaction_policy_from_file
-from desktop.settings import INSTALLED_APPS
 from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
 
 LOG = logging.getLogger()
@@ -2679,6 +2678,7 @@ def config_validator(user):
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, sq_count)))))
 
   # Check if oozie is enabled and present in INSTALLED_APPS
+  from desktop.settings import INSTALLED_APPS  # Avoid circular import
   if 'oozie' in INSTALLED_APPS:
     from oozie.models import Job
     job_count = Job.objects.count()
