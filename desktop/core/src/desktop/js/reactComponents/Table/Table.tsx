@@ -20,9 +20,9 @@ import { TableLocale, RowSelectionType } from 'antd/lib/table/interface';
 import { PanelRender } from 'rc-table/lib/interface';
 import SortDescendingIcon from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
 import SortAscendingIcon from '@cloudera/cuix-core/icons/react/SortAscendingIcon';
+import Pagination, { PaginationProps } from '../Pagination/Pagination';
 
 import './Table.scss';
-import Pagination, { PaginationProps } from '../Pagination/Pagination';
 
 enum SortOrder {
   ASC = 'ascending',
@@ -74,7 +74,7 @@ function Table<T extends object>({
       }
     : undefined;
 
-  const onTitleClick = (columnClicked: ColumnProps<T>['dataIndex']) => {
+  const onColumnClick = (columnClicked: ColumnProps<T>['dataIndex']) => {
     const isSortable = columns.find(col => col.dataIndex === columnClicked)?.sorter;
     if (!isSortable || !setSortByColumn || !setSortOrder) {
       return;
@@ -102,10 +102,10 @@ function Table<T extends object>({
       sorter: false, // we have custom sorter
       title: (
         <div
-          className="hue-table__header"
+          className={`hue-table__header ${col.sorter ? 'hue-table__header--cursor-pointer' : ''}`}
           onClick={() => {
             if (col.sorter) {
-              onTitleClick(col.dataIndex);
+              onColumnClick(col.dataIndex);
             }
           }}
         >
