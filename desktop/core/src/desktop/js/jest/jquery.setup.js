@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import $ from 'jquery';
-import 'jquery.cookie';
 
 global.$ = $;
 global.jQuery = $;
