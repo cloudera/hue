@@ -24,7 +24,7 @@ import {
   FileUploadStatus
 } from '../../constants/storageBrowser';
 import useLoadData from '../useLoadData/useLoadData';
-import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
+import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/types';
 import {
   createChunks,
   getChunksCompletePayload,

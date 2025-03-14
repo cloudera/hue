@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { i18nReact } from '../../../js/utils/i18nReact';
 import axios from 'axios';
-import { post, get, extractErrorMessage } from '../../../js/api/utils.ts';
-import { calculateDuration, formatTimestamp } from '../../../js/utils/dateTimeUtils.ts';
+import { post, get, extractErrorMessage } from '../../../js/api/utils';
+import { calculateDuration, formatTimestamp } from '../../../js/utils/dateTimeUtils';
 import './TaskBrowser.scss';
 import huePubSub from '../../../js/utils/huePubSub';
 import Modal from 'antd/lib/modal/Modal';
@@ -11,6 +11,7 @@ import 'antd/dist/antd.css';
 import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
 import DangerButton from 'cuix/dist/components/Button/DangerButton';
 import Table from 'cuix/dist/components/Table';
+import { TaskServerResponse, TaskStatus } from './types';
 
 const { Option } = Select;
 
@@ -194,21 +195,6 @@ const TaskBrowser: React.FC = (): React.ReactElement => {
 interface TaskBrowserTableProps {
   ShowTaskLogsHandler: (taskId: string) => void;
   handleSchedulePopup: () => void;
-}
-
-export enum TaskStatus {
-  Success = 'SUCCESS',
-  Failure = 'FAILURE',
-  Running = 'RUNNING'
-}
-
-export interface TaskServerResponse {
-  result?: {
-    task_name: string;
-    username: string;
-  };
-  task_id: string;
-  status: TaskStatus;
 }
 
 export const TaskBrowserTable: React.FC<TaskBrowserTableProps> = ({
