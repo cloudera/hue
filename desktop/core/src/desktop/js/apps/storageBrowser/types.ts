@@ -87,12 +87,6 @@ export interface TrashData {
   trashPath: string;
 }
 
-export enum SortOrder {
-  ASC = 'ascending',
-  DSC = 'descending',
-  NONE = 'none'
-}
-
 export enum BrowserViewType {
   dir = 'dir',
   file = 'file'

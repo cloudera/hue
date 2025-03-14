@@ -15,10 +15,11 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
+import { Checkbox } from 'antd';
 import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
-import { Checkbox, Table } from 'antd';
+import Table, { ColumnProps } from '../../../../../../reactComponents/Table/Table';
 import { StorageDirectoryTableData } from '../../../../types';
 import { BULK_CHANGE_PERMISSION_API_URL } from '../../../../api';
 import { getInitialPermissions, Permission } from './ChangePermissionModal.util';
@@ -97,26 +98,26 @@ const ChangePermissionModal = ({
     }
   };
 
-  const columns = [
+  const columns: ColumnProps<Permission>[] = [
     {
       title: '',
       dataIndex: 'key',
       key: 'key'
     },
     {
-      title: 'User',
+      title: t('User'),
       dataIndex: 'user',
       key: 'user',
       render: renderTableCheckbox('user')
     },
     {
-      title: 'Group',
+      title: t('Group'),
       dataIndex: 'group',
       key: 'group',
       render: renderTableCheckbox('group')
     },
     {
-      title: 'Other',
+      title: t('Other'),
       dataIndex: 'other',
       key: 'other',
       render: renderTableCheckbox('other')
@@ -141,12 +142,7 @@ const ChangePermissionModal = ({
       okButtonProps={{ disabled: loading }}
       cancelButtonProps={{ disabled: loading }}
     >
-      <Table
-        dataSource={permissions}
-        columns={columns}
-        pagination={false}
-        className="hue-change-permission__table"
-      />
+      <Table<Permission> data={permissions} columns={columns} rowKey="key" />
     </Modal>
   );
 };

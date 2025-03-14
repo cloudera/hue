@@ -26,12 +26,9 @@
     color: $fluidx-gray-900;
   }
 
-  .metrics-table {
-    th {
-      width: 30%;
-      background-color: $fluidx-gray-040;
-    }
-
-    margin-bottom: $font-size-base;
+  .metrics-component__table-group {
+    display: flex;
+    flex-direction: column;
+    gap: $font-size-base;
   }
 }
