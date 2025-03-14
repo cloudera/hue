@@ -25,7 +25,6 @@ from importlib import import_module
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.utils import DatabaseError
-from django.utils.translation import gettext as _, gettext_lazy as _t
 
 import desktop.conf
 from beeswax.models import SavedQuery, Session
@@ -34,6 +33,8 @@ from desktop.settings import INSTALLED_APPS
 
 if 'oozie' in INSTALLED_APPS:
   from oozie.models import Workflow
+
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 LOG = logging.getLogger()
 
