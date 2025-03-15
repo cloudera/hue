@@ -14,40 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
-@use 'mixins';
+export enum TaskStatus {
+  Success = 'SUCCESS',
+  Failure = 'FAILURE',
+  Running = 'RUNNING'
+}
 
-.hue-table {
-  th {
-    background-color: vars.$fluidx-gray-040 !important;
-  }
+export interface TaskServerResult {
+  taskName: string;
+  username: string;
+  taskStart: string;
+  taskEnd: string;
+  progress: string;
+  qqfilename: string;
+  parameters: string;
+}
+export interface TaskServerResponse {
+  result?: TaskServerResult;
+  dateDone: string;
+  taskId: string;
+  status: TaskStatus;
+  children?: TaskServerResponse[];
+}
 
-  &__header {
-    display: flex;
-    align-items: center;
-
-    &--cursor-pointer {
-      cursor: pointer;
-    }
-  }
-
-  tr {
-    :hover {
-      cursor: pointer;
-    }
-  }
-
-  .ant-table-cell {
-    @include mixins.nowrap-ellipsis;
-  }
-
-  .ant-table-selection-column {
-    // This prevents the eplipses from being applied to the selection column
-    text-overflow: initial !important;
-  }
-
-  .ant-table-placeholder {
-    height: 100px;
-    text-align: center;
-  }
+export interface KillTaskResponse {
+  status: 'success' | 'info' | 'error';
+  message: string;
 }

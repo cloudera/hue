@@ -14,40 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
-@use 'mixins';
+.hue-task-server-logs {
+  max-height: 60vh;
+  overflow: auto;
+  margin-right: -16px;
+  padding-right: 16px;
 
-.hue-table {
-  th {
-    background-color: vars.$fluidx-gray-040 !important;
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-
-    &--cursor-pointer {
-      cursor: pointer;
-    }
-  }
-
-  tr {
-    :hover {
-      cursor: pointer;
-    }
-  }
-
-  .ant-table-cell {
-    @include mixins.nowrap-ellipsis;
-  }
-
-  .ant-table-selection-column {
-    // This prevents the eplipses from being applied to the selection column
-    text-overflow: initial !important;
-  }
-
-  .ant-table-placeholder {
-    height: 100px;
-    text-align: center;
+  pre {
+    padding: 16px;
   }
 }

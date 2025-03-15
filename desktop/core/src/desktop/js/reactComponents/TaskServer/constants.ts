@@ -14,40 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
-@use 'mixins';
-
-.hue-table {
-  th {
-    background-color: vars.$fluidx-gray-040 !important;
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-
-    &--cursor-pointer {
-      cursor: pointer;
-    }
-  }
-
-  tr {
-    :hover {
-      cursor: pointer;
-    }
-  }
-
-  .ant-table-cell {
-    @include mixins.nowrap-ellipsis;
-  }
-
-  .ant-table-selection-column {
-    // This prevents the eplipses from being applied to the selection column
-    text-overflow: initial !important;
-  }
-
-  .ant-table-placeholder {
-    height: 100px;
-    text-align: center;
-  }
-}
+export const HANDLE_SUBMIT_URL = '/desktop/api2/taskserver/handle_submit';
+export const KILL_TASK_URL = '/desktop/api2/taskserver/kill_task';
+export const GET_TASKS_URL = '/desktop/api2/taskserver/get_taskserver_tasks';
+export const GET_TASK_LOG_URL = '/desktop/api2/taskserver/get_task_logs';

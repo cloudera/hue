@@ -24,7 +24,7 @@ import {
   FileUploadStatus
 } from '../../constants/storageBrowser';
 import useLoadData from '../useLoadData/useLoadData';
-import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
+import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskServer/types';
 import {
   createChunks,
   getChunksCompletePayload,
@@ -37,6 +37,7 @@ import {
 } from './util';
 import { get } from '../../../api/utils';
 import { UPLOAD_AVAILABLE_SPACE_URL } from '../../../apps/storageBrowser/api';
+import { GET_TASKS_URL } from '../../../reactComponents/TaskServer/constants';
 
 interface UseUploadQueueResponse {
   addFiles: (item: UploadItem[]) => void;
@@ -100,14 +101,10 @@ const useChunkUpload = ({
     setAwaitingStatusItems(remainingItems);
   };
 
-  const { data: tasksStatus } = useLoadData<TaskServerResponse[]>(
-    '/desktop/api2/taskserver/get_taskserver_tasks/',
-    {
-      pollInterval: awaitingStatusItems.length ? 5000 : undefined,
-      skip: !awaitingStatusItems.length,
-      transformKeys: 'none'
-    }
-  );
+  const { data: tasksStatus } = useLoadData<TaskServerResponse[]>(GET_TASKS_URL, {
+    pollInterval: awaitingStatusItems.length ? 5000 : undefined,
+    skip: !awaitingStatusItems.length
+  });
 
   useEffect(() => {
     if (tasksStatus) {

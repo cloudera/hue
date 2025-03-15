@@ -78,6 +78,7 @@
       background-color: $fluidx-gray-200;
       border: 1px solid $hue-border-color;
       margin-left: 8px;
+      word-break: break-all;
     }
 
     .config__help-tooltip {

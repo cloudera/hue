@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FileUploadStatus } from 'utils/constants/storageBrowser';
-import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
+import { FileUploadStatus } from '../../../utils/constants/storageBrowser';
+import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskServer/types';
 import { CHUNK_UPLOAD_URL, CHUNK_UPLOAD_COMPLETE_URL } from '../../../apps/storageBrowser/api';
 
 export interface UploadItem {
@@ -82,7 +82,7 @@ export const getStatusHashMap = (
   serverResponse.reduce(
     (acc, row: TaskServerResponse) => ({
       ...acc,
-      [row.task_id]: row.status
+      [row.taskId]: row.status
     }),
     {}
   );
