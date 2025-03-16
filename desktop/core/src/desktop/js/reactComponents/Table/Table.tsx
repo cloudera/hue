@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React, { HTMLAttributes } from 'react';
-import AntdTable, { ColumnProps } from 'cuix/dist/components/Table';
+import AntdTable, { type ColumnProps } from 'cuix/dist/components/Table';
 import { TableLocale, RowSelectionType } from 'antd/lib/table/interface';
 import { PanelRender } from 'rc-table/lib/interface';
 import SortDescendingIcon from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
@@ -45,6 +45,7 @@ export interface TableProps<T> {
   testId?: string;
   rowKey: ((record: T) => string) | string;
   pagination?: PaginationProps;
+  rowClassName?: ((record: T) => string) | string;
 }
 
 function Table<T extends object>({
@@ -61,7 +62,8 @@ function Table<T extends object>({
   pagination,
   testId,
   locale,
-  rowKey
+  rowKey,
+  rowClassName
 }: TableProps<T>): JSX.Element {
   const rowSelection = onRowSelect
     ? {
@@ -130,12 +132,13 @@ function Table<T extends object>({
         dataSource={data}
         onRow={onRowClick}
         pagination={false}
-        rowClassName="hue-table__row"
+        rowClassName={rowClassName}
         rowKey={rowKey}
         rowSelection={rowSelection}
-        scroll={{ y: bodyHeight }}
+        scroll={{ y: bodyHeight ?? '100%' }}
         data-testid={testId}
         locale={locale}
+        sticky
       />
       {pagination?.pageStats && pagination?.pageStats?.totalPages > 0 && (
         <Pagination
