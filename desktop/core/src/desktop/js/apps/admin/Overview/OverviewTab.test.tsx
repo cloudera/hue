@@ -21,16 +21,16 @@ import userEvent from '@testing-library/user-event';
 import Overview from './OverviewTab';
 import Analytics from './Analytics';
 // import ApiHelper from '../../../api/apiHelper';
-// import saveCollectUsagePreference from 
+// import saveCollectUsagePreference from
 
 jest.mock('./ConfigStatus', () => () => <div>MockedConfigStatusComponent</div>);
 jest.mock('./Examples', () => () => <div>MockedExamplesComponent</div>);
 jest.mock('./Analytics', () => () => <div>MockedAnalyticsComponent</div>);
 
-  jest.mock('../../../api/apiHelper', () => ({
-    ...jest.requireActual('../../../api/apiHelper'),
-    updatePreferences: jest.fn(() => Promise.resolve({ status: 0, data: 'Success message' }))
-  }));
+jest.mock('../../../api/apiHelper', () => ({
+  ...jest.requireActual('../../../api/apiHelper'),
+  updatePreferences: jest.fn(() => Promise.resolve({ status: 0, data: 'Success message' }))
+}));
 describe('OverviewTab', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -51,7 +51,8 @@ describe('OverviewTab', () => {
 
   test('shows the trademark text', () => {
     render(<Overview />);
-    expect(screen.getByText('Hue and the Hue logo are trademarks of Cloudera, Inc.')
+    expect(
+      screen.getByText('Hue and the Hue logo are trademarks of Cloudera, Inc.')
     ).toBeInTheDocument();
   });
 
@@ -66,26 +67,25 @@ describe('OverviewTab', () => {
     expect(overviewComponent).toBeNull();
   });
 
-
   //verify table contents
 
-    // describe('Analytics Component', () => {
-    //   test('renders Analytics tab and can interact with the checkbox', async () => {
-    //     render(<Overview />);
-    //     const analyticsTabButton = screen.getByText('Analytics');
-    //     userEvent.click(analyticsTabButton); 
+  // describe('Analytics Component', () => {
+  //   test('renders Analytics tab and can interact with the checkbox', async () => {
+  //     render(<Overview />);
+  //     const analyticsTabButton = screen.getByText('Analytics');
+  //     userEvent.click(analyticsTabButton);
 
-    //     const checkbox = await screen.findByTitle('Check to enable usage analytics');
+  //     const checkbox = await screen.findByTitle('Check to enable usage analytics');
 
-    //     expect(checkbox).not.toBeChecked(); 
-    //     userEvent.click(checkbox);
-    //     await waitFor(() => expect(checkbox).toBeChecked());
-    //     expect(ApiHelper.updatePreferences).toHaveBeenCalledWith({ collect_usage: 'on' });
-    //     userEvent.click(checkbox);
-    //     await waitFor(() => expect(checkbox).not.toBeChecked()); 
-    //     expect(ApiHelper.updatePreferences).toHaveBeenCalledWith({ collect_usage: null });
-    //   });
-    // });
+  //     expect(checkbox).not.toBeChecked();
+  //     userEvent.click(checkbox);
+  //     await waitFor(() => expect(checkbox).toBeChecked());
+  //     expect(ApiHelper.updatePreferences).toHaveBeenCalledWith({ collect_usage: 'on' });
+  //     userEvent.click(checkbox);
+  //     await waitFor(() => expect(checkbox).not.toBeChecked());
+  //     expect(ApiHelper.updatePreferences).toHaveBeenCalledWith({ collect_usage: null });
+  //   });
+  // });
 });
 
 //click on hive app and api of hive is called (toHaveBeenCalled())

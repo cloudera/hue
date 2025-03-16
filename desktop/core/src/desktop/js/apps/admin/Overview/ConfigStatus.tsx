@@ -69,10 +69,10 @@ function ConfigStatus(): JSX.Element {
   }
 
   if (loading) {
-    return <Spin spinning={loading} className='config--spin'/>;
+    return <Spin spinning={loading} className="config--spin" />;
   }
 
-const configErrorsExist = Boolean(data?.config_errors?.length);
+  const configErrorsExist = Boolean(data?.config_errors?.length);
 
   return (
     <div className="config-status">
