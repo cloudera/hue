@@ -47,34 +47,50 @@
 
       &__row {
         display: flex;
-        align-items: center;
-        padding: 8px;
-        font-size: 14px;
-        gap: 8px;
+        flex-direction: column;
         border: solid 1px vars.$fluidx-gray-300;
 
-        &__status {
+        &__content {
           display: flex;
-          width: 20px;
+          align-items: center;
+          font-size: 14px;
+          padding: 8px;
+          gap: 8px;
+
+          &__status {
+            display: flex;
+            width: 20px;
+          }
+
+          &__name {
+            display: flex;
+            flex: 1;
+            text-overflow: ellipsis;
+          }
+
+          &__size {
+            display: flex;
+            text-align: right;
+            color: vars.$fluidx-gray-700;
+          }
+
+          &__close-icon {
+            cursor: pointer;
+          }
         }
 
-        &__name {
-          display: flex;
-          flex: 1;
-          text-overflow: ellipsis;
-        }
+        &__progress {
+          height: 2px;
 
-        &__size {
-          display: flex;
-          text-align: right;
-          color: vars.$fluidx-gray-700;
-        }
+          &__failed {
+            background-color: vars.$fluidx-red-500;
+          }
 
-        &__close {
-          display: flex;
+          &__success {
+            background-color: vars.$fluidx-green-500;
+          }
         }
       }
     }
-
   }
 }

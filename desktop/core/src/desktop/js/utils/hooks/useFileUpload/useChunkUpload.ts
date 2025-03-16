@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import useSaveData from '../useSaveData/useSaveData';
 import useQueueProcessor from '../useQueueProcessor/useQueueProcessor';
@@ -26,169 +26,190 @@ import {
 import useLoadData from '../useLoadData/useLoadData';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
 import {
-  createChunks,
+  type UploadChunkItem,
+  type UploadItem,
+  type UploadItemVariables,
+  type InProgresChunk,
   getChunksCompletePayload,
+  getItemProgress,
+  getItemsTotalProgress,
   getChunkItemPayload,
   getChunkSinglePayload,
-  getStatusHashMap,
-  getTotalChunk,
-  UploadChunkItem,
-  UploadItem
+  isSpaceAvailableInServer,
+  createChunks,
+  getStatusHashMap
 } from './util';
-import { get } from '../../../api/utils';
-import { UPLOAD_AVAILABLE_SPACE_URL } from '../../../apps/storageBrowser/api';
 
 interface UseUploadQueueResponse {
   addFiles: (item: UploadItem[]) => void;
-  removeFile: (item: UploadItem) => void;
+  removeFile: (item: UploadItem['uuid']) => void;
   isLoading: boolean;
 }
 
 interface ChunkUploadOptions {
   concurrentProcess?: number;
-  onStatusUpdate: (item: UploadItem, newStatus: FileUploadStatus) => void;
+  onItemUpdate: (itemId: UploadItem['uuid'], variables: UploadItemVariables) => void;
   onComplete: () => void;
 }
 
 const useChunkUpload = ({
   concurrentProcess = DEFAULT_CONCURRENT_MAX_CONNECTIONS,
-  onStatusUpdate,
+  onItemUpdate,
   onComplete
 }: ChunkUploadOptions): UseUploadQueueResponse => {
   const config = getLastKnownConfig();
   const chunkSize = config?.storage_browser?.file_upload_chunk_size ?? DEFAULT_CHUNK_SIZE;
-  const [processingItem, setProcessingItem] = useState<UploadItem>();
-  const [pendingUploadItems, setPendingUploadItems] = useState<UploadItem[]>([]);
-  const [awaitingStatusItems, setAwaitingStatusItems] = useState<UploadItem[]>([]);
-
-  const onError = () => {
-    if (processingItem) {
-      onStatusUpdate(processingItem, FileUploadStatus.Failed);
-      setProcessingItem(undefined);
-    }
-  };
-
-  const onSuccess = (item: UploadItem) => () => {
-    setAwaitingStatusItems(prev => [...prev, item]);
-    setProcessingItem(undefined);
-  };
+  const [taskServerItems, setTaskServerItems] = useState<Record<UploadItem['uuid'], number>>({});
+  const [chunksInProgress, setChunksInProgress] = useState<Record<string, InProgresChunk[]>>({});
 
   const { save } = useSaveData(undefined, {
     postOptions: {
       qsEncodeData: false,
       headers: { 'Content-Type': 'multipart/form-data' }
-    },
-    onError
+    }
   });
 
-  const updateItemStatus = (serverResponse: TaskServerResponse[]) => {
-    const statusMap = getStatusHashMap(serverResponse);
-
-    const remainingItems = awaitingStatusItems.filter(item => {
-      const status = statusMap[item.uuid];
-      if (status === TaskStatus.Success || status === TaskStatus.Failure) {
-        const ItemStatus =
-          status === TaskStatus.Success ? FileUploadStatus.Uploaded : FileUploadStatus.Failed;
-        onStatusUpdate(item, ItemStatus);
-        return false;
-      }
-      return true;
-    });
-    if (remainingItems.length === 0) {
-      onComplete();
-    }
-    setAwaitingStatusItems(remainingItems);
+  const onError = (chunkItem: UploadChunkItem) => (error: Error) => {
+    onItemUpdate(chunkItem.uuid, { status: FileUploadStatus.Failed, error });
   };
 
-  const { data: tasksStatus } = useLoadData<TaskServerResponse[]>(
-    '/desktop/api2/taskserver/get_taskserver_tasks/',
-    {
-      pollInterval: awaitingStatusItems.length ? 5000 : undefined,
-      skip: !awaitingStatusItems.length,
-      transformKeys: 'none'
-    }
-  );
-
-  useEffect(() => {
-    if (tasksStatus) {
-      updateItemStatus(tasksStatus);
-    }
-  }, [tasksStatus]);
-
-  const onChunksUploadComplete = async () => {
-    if (processingItem) {
-      const { url, payload } = getChunksCompletePayload(processingItem, chunkSize);
-      return save(payload, {
-        url,
-        onSuccess: onSuccess(processingItem)
+  const processChunkUploadStatus = (tasksStatus?: TaskServerResponse[]) => {
+    if (tasksStatus?.length) {
+      const statusMap = getStatusHashMap(tasksStatus);
+      setTaskServerItems(prev => {
+        Object.keys(prev).forEach(uuid => {
+          const status = statusMap[uuid];
+          if (status === TaskStatus.Success || status === TaskStatus.Failure) {
+            const ItemStatus =
+              status === TaskStatus.Success ? FileUploadStatus.Uploaded : FileUploadStatus.Failed;
+            onItemUpdate(uuid, { status: ItemStatus });
+            delete prev[uuid];
+          }
+        });
+        if (Object.keys(prev).length === 0) {
+          onComplete();
+        }
+        return prev;
       });
     }
   };
 
-  const uploadChunk = async (chunkItem: UploadChunkItem) => {
-    const { url, payload } = getChunkItemPayload(chunkItem, chunkSize);
-    return save(payload, { url });
-  };
-
-  const { enqueue } = useQueueProcessor<UploadChunkItem>(uploadChunk, {
-    concurrentProcess,
-    onSuccess: onChunksUploadComplete
+  useLoadData<TaskServerResponse[]>('/desktop/api2/taskserver/get_taskserver_tasks/', {
+    pollInterval: 5000,
+    skip: !Object.keys(taskServerItems).length,
+    onSuccess: processChunkUploadStatus,
+    transformKeys: 'none'
   });
 
-  const uploadItemInChunks = (item: UploadItem) => {
-    const chunks = createChunks(item, chunkSize);
-    return enqueue(chunks);
-  };
-
-  const uploadItemInSingleChunk = async (item: UploadItem) => {
-    const { url, payload } = getChunkSinglePayload(item, chunkSize);
+  const onChunksUploadComplete = async (chunkItem: UploadChunkItem) => {
+    const { url, payload } = getChunksCompletePayload(chunkItem);
     return save(payload, {
       url,
-      onSuccess: onSuccess(item)
+      onSuccess: () => {
+        setTaskServerItems(prev => ({ ...prev, [chunkItem.uuid]: 1 }));
+      },
+      onError: onError(chunkItem)
     });
   };
 
-  const checkAvailableSpace = async (fileSize: number) => {
-    const { upload_available_space: availableSpace } = await get<{
-      upload_available_space: number;
-    }>(UPLOAD_AVAILABLE_SPACE_URL);
-    return availableSpace >= fileSize;
+  const onChunkUploadSuccess = (chunkItem: UploadChunkItem) => () => {
+    setChunksInProgress(prev => {
+      const chunks = prev[chunkItem.uuid] || [];
+      const allChunksUploaded = chunks.every(chunk => chunk.progress === 100);
+      if (allChunksUploaded && chunks.length === chunkItem.totalChunks) {
+        if (chunkItem.totalChunks > 1) {
+          onChunksUploadComplete(chunkItem);
+        }
+
+        delete prev[chunkItem.uuid];
+      }
+
+      return prev;
+    });
   };
 
-  const uploadItem = async (item: UploadItem) => {
-    const isSpaceAvailable = await checkAvailableSpace(item.file.size);
-    if (!isSpaceAvailable) {
-      onStatusUpdate(item, FileUploadStatus.Failed);
-      return Promise.resolve();
+  const onUploadProgress = (chunkItem: UploadChunkItem) => (progress: ProgressEvent) => {
+    setChunksInProgress(prev => {
+      const chunks = prev[chunkItem.uuid] || [];
+      const chunk = chunks.find(c => c.chunkIndex === chunkItem.chunkIndex);
+      if (!chunk) {
+        return prev;
+      }
+      chunk.progress = getItemProgress(progress);
+
+      const totalProgress = getItemsTotalProgress(chunkItem, chunks);
+      onItemUpdate(chunkItem.uuid, { progress: totalProgress });
+      return { ...prev, [chunkItem.uuid]: chunks };
+    });
+  };
+
+  const uploadChunkItem = async (chunkItem: UploadChunkItem) => {
+    const { url, payload } = getChunkItemPayload(chunkItem);
+    return save(payload, {
+      url,
+      onSuccess: onChunkUploadSuccess(chunkItem),
+      onError: onError(chunkItem),
+      postOptions: { onUploadProgress: onUploadProgress(chunkItem) }
+    });
+  };
+
+  const uploadChunkInSingle = async (chunkItem: UploadChunkItem) => {
+    const { url, payload } = getChunkSinglePayload(chunkItem);
+    return save(payload, {
+      url,
+      onSuccess: () => setTaskServerItems(prev => ({ ...prev, [chunkItem.uuid]: 1 })),
+      onError: onError(chunkItem),
+      postOptions: { onUploadProgress: onUploadProgress(chunkItem) }
+    });
+  };
+
+  const uploadChunk = async (chunkItem: UploadChunkItem): Promise<void> => {
+    setChunksInProgress(prev => ({
+      ...prev,
+      [chunkItem.uuid]: [
+        ...(prev[chunkItem.uuid] ?? []),
+        {
+          chunkIndex: chunkItem.chunkIndex,
+          progress: 0,
+          chunkSize: chunkItem.file.size
+        }
+      ]
+    }));
+
+    const isFirstChunk = !chunksInProgress[chunkItem.uuid];
+
+    if (isFirstChunk) {
+      onItemUpdate(chunkItem.uuid, { status: FileUploadStatus.Uploading });
+      const availableSpace = await isSpaceAvailableInServer(chunkItem.file.size);
+      if (!availableSpace) {
+        const error = new Error('Upload server ran out of space. Try again later.');
+        onError(chunkItem)(error);
+        return Promise.resolve();
+      }
     }
 
-    onStatusUpdate(item, FileUploadStatus.Uploading);
-    const chunks = getTotalChunk(item.file.size, chunkSize);
-    if (chunks === 1) {
-      return uploadItemInSingleChunk(item);
+    if (chunkItem.totalChunks === 1) {
+      return uploadChunkInSingle(chunkItem);
     }
-    return uploadItemInChunks(item);
+    return uploadChunkItem(chunkItem);
   };
+
+  const { enqueue, dequeue } = useQueueProcessor<UploadChunkItem>(uploadChunk, {
+    concurrentProcess
+  });
 
   const addFiles = (newItems: UploadItem[]) => {
-    setPendingUploadItems(prev => [...prev, ...newItems]);
+    newItems.forEach(item => {
+      const chunks = createChunks(item, chunkSize);
+      enqueue(chunks);
+    });
   };
 
-  const removeFile = (item: UploadItem) => {
-    setPendingUploadItems(prev => prev.filter(i => i.uuid !== item.uuid));
+  const removeFile = (itemId: UploadItem['uuid']) => {
+    dequeue(itemId, 'uuid');
   };
 
-  useEffect(() => {
-    // Ensures one file is broken down in chunks and uploaded to the server
-    if (!processingItem && pendingUploadItems.length) {
-      const item = pendingUploadItems[0];
-      setProcessingItem(item);
-      setPendingUploadItems(prev => prev.slice(1));
-      uploadItem(item);
-    }
-  }, [pendingUploadItems, processingItem]);
-
-  return { addFiles, removeFile, isLoading: !!processingItem || !!pendingUploadItems.length };
+  return { addFiles, removeFile, isLoading: !!taskServerItems.length };
 };
 
 export default useChunkUpload;

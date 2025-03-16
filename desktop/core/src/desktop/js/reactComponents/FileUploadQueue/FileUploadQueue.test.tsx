@@ -60,7 +60,7 @@ describe('FileUploadQueue', () => {
       <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
     );
 
-    const cancelButton = getAllByTestId('upload-queue__list__row__close-icon')[0];
+    const cancelButton = getAllByTestId('upload-queue__list__row__content__close-icon')[0];
     fireEvent.click(cancelButton);
 
     await waitFor(() => {
@@ -91,7 +91,7 @@ describe('FileUploadQueue', () => {
       <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
     );
 
-    const cancelButtons = getAllByTestId('upload-queue__list__row__close-icon');
+    const cancelButtons = getAllByTestId('upload-queue__list__row__content__close-icon');
     expect(cancelButtons).toHaveLength(mockFilesQueue.length);
 
     expect(cancelButtons[0]).toBeInTheDocument();

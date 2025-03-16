@@ -79,6 +79,13 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
     [FileUploadStatus.Failed]: <StatusErrorIcon />
   };
 
+  const getProgressBarCssClass = (item: UploadItem) => {
+    if (item.status === FileUploadStatus.Canceled || item.status === FileUploadStatus.Failed) {
+      return 'upload-queue__list__row__progress__failed';
+    }
+    return 'upload-queue__list__row__progress__success';
+  };
+
   return (
     <div className="upload-queue cuix antd">
       <div
@@ -101,29 +108,39 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
             .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
             .map((row: UploadItem) => (
               <div key={`${row.filePath}__${row.file.name}`} className="upload-queue__list__row">
-                <Tooltip
-                  title={row.status}
-                  mouseEnterDelay={1.5}
-                  className="upload-queue__list__row__status"
-                >
-                  {statusIcon[row.status]}
-                </Tooltip>
-                <div className="upload-queue__list__row__name">{row.file.name}</div>
-                <div className="upload-queue__list__row__size">{formatBytes(row.file.size)}</div>
-                {row.status === FileUploadStatus.Pending && (
+                <div className="upload-queue__list__row__content">
                   <Tooltip
-                    title={t('Cancel')}
+                    title={row.status}
                     mouseEnterDelay={1.5}
-                    className="upload-queue__list__row__close"
+                    className="upload-queue__list__row__content__status"
                   >
-                    <CloseIcon
-                      data-testid="upload-queue__list__row__close-icon"
-                      onClick={() => onCancel(row)}
-                      height={16}
-                      width={16}
-                    />
+                    {statusIcon[row.status]}
                   </Tooltip>
-                )}
+                  <div className="upload-queue__list__row__content__name">{row.file.name}</div>
+                  <div className="upload-queue__list__row__content__size">
+                    {formatBytes(row.file.size)}
+                  </div>
+                  {row.status === FileUploadStatus.Pending && (
+                    <Tooltip
+                      title={t('Cancel')}
+                      mouseEnterDelay={1.5}
+                      className="upload-queue__list__row__content__close"
+                    >
+                      <CloseIcon
+                        data-testid="upload-queue__list__row__content__close-icon"
+                        onClick={() => onCancel(row)}
+                        height={16}
+                        width={16}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
+                <div
+                  className={`upload-queue__list__row__progress ${getProgressBarCssClass(row)}`}
+                  style={{
+                    width: `${row.status === FileUploadStatus.Uploading ? row.progress : 0}%`
+                  }}
+                />
               </div>
             ))}
         </div>

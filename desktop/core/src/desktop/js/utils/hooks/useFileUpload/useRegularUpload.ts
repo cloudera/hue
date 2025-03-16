@@ -21,23 +21,23 @@ import {
   FileUploadStatus
 } from '../../constants/storageBrowser';
 import useSaveData from '../useSaveData/useSaveData';
-import { UploadItem } from './util';
+import { getItemProgress, UploadItem, UploadItemVariables } from './util';
 
 interface UseUploadQueueResponse {
   addFiles: (item: UploadItem[]) => void;
-  removeFile: (item: UploadItem) => void;
+  removeFile: (uuid: UploadItem['uuid']) => void;
   isLoading: boolean;
 }
 
 interface UploadQueueOptions {
   concurrentProcess?: number;
-  onStatusUpdate: (item: UploadItem, newStatus: FileUploadStatus) => void;
+  onItemUpdate: (item: UploadItem['uuid'], variables: UploadItemVariables) => void;
   onComplete: () => void;
 }
 
 const useRegularUpload = ({
   concurrentProcess = DEFAULT_CONCURRENT_MAX_CONNECTIONS,
-  onStatusUpdate,
+  onItemUpdate,
   onComplete
 }: UploadQueueOptions): UseUploadQueueResponse => {
   const { save } = useSaveData(UPLOAD_FILE_URL, {
@@ -50,7 +50,7 @@ const useRegularUpload = ({
   });
 
   const processUploadItem = async (item: UploadItem) => {
-    onStatusUpdate(item, FileUploadStatus.Uploading);
+    onItemUpdate(item.uuid, { status: FileUploadStatus.Uploading });
 
     const payload = new FormData();
     payload.append('file', item.file);
@@ -58,22 +58,30 @@ const useRegularUpload = ({
 
     return save(payload, {
       onSuccess: () => {
-        onStatusUpdate(item, FileUploadStatus.Uploaded);
+        onItemUpdate(item.uuid, { status: FileUploadStatus.Uploaded });
       },
-      onError: () => {
-        onStatusUpdate(item, FileUploadStatus.Failed);
+      onError: error => {
+        onItemUpdate(item.uuid, { status: FileUploadStatus.Failed, error });
+      },
+      postOptions: {
+        onUploadProgress: progress => {
+          const itemProgress = getItemProgress(progress);
+          onItemUpdate(item.uuid, { progress: itemProgress });
+        }
       }
     });
   };
 
   const {
     enqueue: addFiles,
-    dequeue: removeFile,
+    dequeue,
     isLoading
   } = useQueueProcessor<UploadItem>(processUploadItem, {
     concurrentProcess,
     onSuccess: onComplete
   });
+
+  const removeFile = (itemId: UploadItem['uuid']) => dequeue(itemId, 'uuid');
 
   return { addFiles, removeFile, isLoading };
 };
