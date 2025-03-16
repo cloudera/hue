@@ -30,12 +30,16 @@ import './StorageBrowserTab.scss';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
-import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import {
+  getFileNameFromPath,
+  getFileSystemAndPath
+} from '../../../reactComponents/PathBrowser/PathBrowser.util';
 import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
 import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 import { inTrash } from '../../../utils/storageBrowserUtils';
 import { Alert } from 'antd';
+import useUrlListener from '../../../utils/hooks/useUrlListener/useUrlListener';
 
 interface StorageBrowserTabProps {
   fileSystem: FileSystem;
@@ -47,18 +51,17 @@ const defaultProps = {
 };
 
 const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.Element => {
-  const urlPathname = window.location.pathname;
-  const urlSearchParams = new URLSearchParams(window.location.search);
+  const { t } = i18nReact.useTranslation();
+  const { pathname, search } = useUrlListener();
+
+  const urlSearchParams = new URLSearchParams(search);
   const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
   const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
   const initialFilePath =
     urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
-  const fileName =
-    filePath.split('/').pop() !== '' ? (filePath.split('/').pop() ?? '') : filePath.split('://')[0];
-
-  const { t } = i18nReact.useTranslation();
+  const fileName = getFileNameFromPath(filePath);
 
   const {
     data: trashData,
@@ -91,17 +94,19 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     skip: !filePath
   });
 
+  const onFilePathChange = (newFilePath: string, replace?: boolean) => {
+    setFilePath(newFilePath);
+    changeURL(pathname, { path: newFilePath }, replace);
+  };
+
   useEffect(() => {
-    const urlQueryParams = { path: filePath };
-    const encodedSearchParams = new URLSearchParams(urlQueryParams).toString();
-    if (filePath && urlFilePath && filePath !== urlFilePath) {
-      changeURL(urlPathname, urlQueryParams);
+    const searchPath = urlSearchParams.get('path');
+    if (!searchPath) {
+      onFilePathChange(filePath, true);
+    } else if (searchPath !== filePath) {
+      onFilePathChange(searchPath, true);
     }
-    // if url path is correct but not encoded properly
-    else if (encodedSearchParams !== window.location.search) {
-      changeURL(urlPathname, urlQueryParams, true);
-    }
-  }, [filePath, urlPathname, urlFilePath, window.location]);
+  }, [filePath, urlSearchParams]);
 
   const errorConfig = [
     {
@@ -135,7 +140,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           <div className="hue-storage-browser__home-bar-right">
             <BorderlessButton
               onClick={() => {
-                setFilePath(fileSystem.userHomeDirectory);
+                onFilePathChange(fileSystem.userHomeDirectory);
               }}
               className="hue-storage-browser__home-bar-btns"
               data-event=""
@@ -181,7 +186,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
         >
           <PathBrowser
             filePath={filePath}
-            onFilepathChange={setFilePath}
+            onFilepathChange={onFilePathChange}
             seperator={'/'}
             showIcon={false}
           />
@@ -189,7 +194,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
         {fileStats?.type === BrowserViewType.dir && !isLoading && (
           <StorageDirectoryPage
             fileStats={fileStats}
-            onFilePathChange={setFilePath}
+            onFilePathChange={onFilePathChange}
             fileSystem={fileSystem}
             reloadTrashPath={reloadTrashPath}
           />

@@ -62,3 +62,9 @@ export const getBreadcrumbs = (fileSystem: string, path: string): BreadcrumbData
     [rootNode]
   );
 };
+
+export const getFileNameFromPath = (filePath: string): string => {
+  return filePath.split('/').pop() !== ''
+    ? (filePath.split('/').pop() ?? '')
+    : filePath.split('://')[0];
+};
