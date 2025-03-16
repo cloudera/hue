@@ -67,7 +67,7 @@ export const sortTasksByDate = (tasks?: TaskServerResponse[]): TaskServerRespons
     if (dateA === dateB || isNaN(dateA) || isNaN(dateB)) {
       return 0;
     }
-    return dateA - dateB;
+    return dateB - dateA;
   });
 };
 

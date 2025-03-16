@@ -138,6 +138,7 @@ function Table<T extends object>({
         scroll={{ y: bodyHeight ?? '100%' }}
         data-testid={testId}
         locale={locale}
+        sticky
       />
       {pagination?.pageStats && pagination?.pageStats?.totalPages > 0 && (
         <Pagination
