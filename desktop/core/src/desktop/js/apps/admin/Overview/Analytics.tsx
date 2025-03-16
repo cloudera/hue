@@ -39,23 +39,23 @@ const Analytics = (): JSX.Element => {
   //   });
   // };
 
-const saveCollectUsagePreference = async (collectUsage: boolean) => {
-  try {
-    const response = await post<PostResponse>('/about/update_preferences', {
-      collect_usage: collectUsage ? 'on' : null
-    });
-
-    if (response.status === 0) {
-      huePubSub.publish('hue.global.info', { message: t('Configuration updated') });
-    } else {
-      huePubSub.publish('hue.global.error', {
-        message: t(response.message || 'Error updating configuration')
+  const saveCollectUsagePreference = async (collectUsage: boolean) => {
+    try {
+      const response = await post<PostResponse>('/about/update_preferences', {
+        collect_usage: collectUsage ? 'on' : null
       });
+
+      if (response.status === 0) {
+        huePubSub.publish('hue.global.info', { message: t('Configuration updated') });
+      } else {
+        huePubSub.publish('hue.global.error', {
+          message: t(response.message || 'Error updating configuration')
+        });
+      }
+    } catch (err) {
+      huePubSub.publish('hue.global.error', { message: t(String(err)) });
     }
-  } catch (err) {
-    huePubSub.publish('hue.global.error', { message: t(String(err)) });
-  }
-};
+  };
 
   const handleCheckboxChange = async event => {
     const newPreference = event.target.checked;
