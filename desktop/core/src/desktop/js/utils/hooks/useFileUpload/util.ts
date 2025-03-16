@@ -15,12 +15,7 @@
 // limitations under the License.
 
 import { FileUploadStatus } from '../../../utils/constants/storageBrowser';
-import {
-  CHUNK_UPLOAD_URL,
-  CHUNK_UPLOAD_COMPLETE_URL,
-  UPLOAD_AVAILABLE_SPACE_URL
-} from '../../../apps/storageBrowser/api';
-import { get } from '../../../api/utils';
+import { CHUNK_UPLOAD_URL, CHUNK_UPLOAD_COMPLETE_URL } from '../../../apps/storageBrowser/api';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
 
 export interface UploadItem {
