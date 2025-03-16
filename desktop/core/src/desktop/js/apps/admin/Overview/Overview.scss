@@ -21,11 +21,19 @@
     background-color: $fluidx-gray-100;
     padding: 24px;
 
+    .config--spin{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
     .config__address-value {
       color: $fluidx-blue-600;
       padding: 2px 4px;
-      background-color: #f7f7f9;
-      border: 1px solid #e1e1e8;
+      background-color: $fluidx-gray-040;
+      border: 1px solid $fluidx-gray-400;
+      border-radius: 2px;
     }
 
     .config-link {
@@ -38,13 +46,22 @@
     }
 
     .config-table-name {
-      color: #1b2329;
+      color: $fluidx-gray-900;
       font-size: 12px;
       border-radius: 5px;
       margin-left: 8px;
       padding: 2px 4px;
-      background-color: #f7f7f9;
-      border: 1px solid #e1e1e8;
+      background-color: $fluidx-gray-040;
+      border: 1px solid $fluidx-gray-400;
+    }
+
+    .overview-examples, .overview-analytics{
+      height: 100vh;
+    }
+
+    .usage_analytics{
+      display: inline-block;
+      padding: 5px;
     }
 
     .config__trademark-text {

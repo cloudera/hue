@@ -16,19 +16,46 @@
 
 import React, { useState } from 'react';
 import huePubSub from '../../../utils/huePubSub';
+import { i18nReact } from '../../../utils/i18nReact';
+import { post } from '../../../api/utils';
+import './Overview.scss';
 
-const saveCollectUsagePreference = async collectUsage => {
-  $.post('/about/update_preferences', { collect_usage: collectUsage ? 'on' : null }, data => {
-    if (data.status == 0) {
-      huePubSub.publish('hue.global.info', { message: 'Configuration updated' });
-    } else {
-      huePubSub.publish('hue.global.error', { message: data.data });
-    }
-  });
-};
+interface PostResponse {
+  status: number;
+  message?: string;
+}
 
 const Analytics = (): JSX.Element => {
   const [collectUsage, setCollectUsage] = useState(false);
+  const { t } = i18nReact.useTranslation();
+
+  // const saveCollectUsagePreference = async collectUsage => {
+  //   $.post('/about/update_preferences', { collect_usage: collectUsage ? 'on' : null }, data => {
+  //     if (data.status == 0) {
+  //       huePubSub.publish('hue.global.info', { message: t('Configuration updated') });
+  //     } else {
+  //       huePubSub.publish('hue.global.error', { message: t(data.data) });
+  //     }
+  //   });
+  // };
+
+const saveCollectUsagePreference = async (collectUsage: boolean) => {
+  try {
+    const response = await post<PostResponse>('/about/update_preferences', {
+      collect_usage: collectUsage ? 'on' : null
+    });
+
+    if (response.status === 0) {
+      huePubSub.publish('hue.global.info', { message: t('Configuration updated') });
+    } else {
+      huePubSub.publish('hue.global.error', {
+        message: t(response.message || 'Error updating configuration')
+      });
+    }
+  } catch (err) {
+    huePubSub.publish('hue.global.error', { message: t(String(err)) });
+  }
+};
 
   const handleCheckboxChange = async event => {
     const newPreference = event.target.checked;
@@ -37,17 +64,17 @@ const Analytics = (): JSX.Element => {
   };
 
   return (
-    <div>
-      <h3>Anonymous usage analytics</h3>
-      <label className="checkbox">
-        <input
-          type="checkbox"
-          name="collect_usage"
-          title="Check to enable usage analytics"
-          checked={collectUsage}
-          onChange={handleCheckboxChange}
-        />
-        Help improve Hue with anonymous usage analytics.
+    <div className="overview-analytics">
+      <h3>{t('Anonymous usage analytics')}</h3>
+      <input
+        type="checkbox"
+        id="usage_analytics"
+        title={t('Check to enable usage analytics')}
+        checked={collectUsage}
+        onChange={handleCheckboxChange}
+      />
+      <label htmlFor="usage_analytics" className="usage_analytics">
+        {t('Help improve Hue with anonymous usage analytics.')}
       </label>
     </div>
   );

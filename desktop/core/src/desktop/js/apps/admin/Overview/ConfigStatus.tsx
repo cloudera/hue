@@ -69,58 +69,56 @@ function ConfigStatus(): JSX.Element {
   }
 
   if (loading) {
-    return <Spin spinning={loading} />;
+    return <Spin spinning={loading} className='config--spin'/>;
   }
 
-  const openConfigDocs = () => {
-    window.open('https://docs.gethue.com/administrator/configuration/', '_blank');
-  };
-
-  const configErrorsExist = data && data['config_errors'] && data['config_errors'].length > 0;
+const configErrorsExist = Boolean(data?.config_errors?.length);
 
   return (
-    <>
-      <div className="config-status">
-        <h1>{t('Checking current configuration')}</h1>
-        {data && data['hue_config_dir'] && (
-          <div>
-            {t('Configuration files located in:')}
-            <span className="config__address-value">{data['hue_config_dir']}</span>
-          </div>
-        )}
+    <div className="config-status">
+      <h1>{t('Checking current configuration')}</h1>
+      {data?.hue_config_dir && (
+        <div>
+          {t('Configuration files located in: ')}
+          <span className="config__address-value">{data['hue_config_dir']}</span>
+        </div>
+      )}
 
-        {!configErrorsExist && data ? (
-          <>
-            <Alert
-              message={
-                <span>
-                  <a className="config-link" onClick={openConfigDocs}>
-                    {t('Potential misconfiguration detected.')}
-                  </a>{' '}
-                  {t('Fix and restart Hue.')}
-                </span>
-              }
-              type="warning"
-              className="config__alert-margin"
-            />
-
-            <Table
-              dataSource={data['config_errors']}
-              columns={columns}
-              rowKey={record => `${record.name}-${record.message.slice(1, 50)}`}
-              pagination={false}
-              showHeader={false}
-            />
-          </>
-        ) : (
+      {configErrorsExist && data ? (
+        <>
           <Alert
-            message={t('All OK. Configuration check passed.')}
-            type="success"
+            message={
+              <span>
+                <a
+                  href="https://docs.gethue.com/administrator/configuration/"
+                  target="_blank"
+                  className="config-link"
+                >
+                  {t('Potential misconfiguration detected.')}
+                </a>{' '}
+                {t('Fix and restart Hue.')}
+              </span>
+            }
+            type="warning"
             className="config__alert-margin"
           />
-        )}
-      </div>
-    </>
+
+          <Table
+            dataSource={data['config_errors']}
+            columns={columns}
+            rowKey={record => `${record.name}-${record.message.slice(1, 50)}`}
+            pagination={false}
+            showHeader={false}
+          />
+        </>
+      ) : (
+        <Alert
+          message={t('All OK. Configuration check passed.')}
+          type="success"
+          className="config__alert-margin"
+        />
+      )}
+    </div>
   );
 }
 
