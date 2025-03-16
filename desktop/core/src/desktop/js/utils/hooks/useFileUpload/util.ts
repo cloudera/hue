@@ -54,10 +54,14 @@ export interface UploadChunkItem extends Omit<UploadItem, 'file'> {
   chunkEnd: number;
 }
 
-export interface InProgresChunk {
+export interface InProgressChunk {
   chunkIndex: number;
   progress: number;
   chunkSize: number;
+}
+
+export interface AvailableServerSpaceResponse {
+  uploadAvailableSpace: number;
 }
 
 interface ChunkPayload {
@@ -160,13 +164,6 @@ export const getChunkSinglePayload = (item: UploadChunkItem): ChunkPayload => {
   return { url, payload };
 };
 
-export const isSpaceAvailableInServer = async (fileSize: number): Promise<boolean> => {
-  const { upload_available_space: availableSpace } = await get<{
-    upload_available_space: number;
-  }>(UPLOAD_AVAILABLE_SPACE_URL);
-  return availableSpace >= fileSize;
-};
-
 export const getItemProgress = (progress?: ProgressEvent): number => {
   if (!progress?.total || !progress?.loaded || progress?.total === 0) {
     return 0;
@@ -176,7 +173,7 @@ export const getItemProgress = (progress?: ProgressEvent): number => {
 
 export const getItemsTotalProgress = (
   chunkItem?: UploadChunkItem,
-  chunks?: InProgresChunk[]
+  chunks?: InProgressChunk[]
 ): number => {
   if (!chunkItem || !chunks) {
     return 0;

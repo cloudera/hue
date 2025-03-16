@@ -79,13 +79,6 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
     [FileUploadStatus.Failed]: <StatusErrorIcon />
   };
 
-  const getProgressBarCssClass = (item: UploadItem) => {
-    if (item.status === FileUploadStatus.Canceled || item.status === FileUploadStatus.Failed) {
-      return 'upload-queue__list__row__progress__failed';
-    }
-    return 'upload-queue__list__row__progress__success';
-  };
-
   return (
     <div className="upload-queue cuix antd">
       <div
@@ -136,7 +129,7 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
                   )}
                 </div>
                 <div
-                  className={`upload-queue__list__row__progress ${getProgressBarCssClass(row)}`}
+                  className="upload-queue__list__row__progress"
                   style={{
                     width: `${row.status === FileUploadStatus.Uploading ? row.progress : 0}%`
                   }}

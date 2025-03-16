@@ -29,16 +29,17 @@ import {
   type UploadChunkItem,
   type UploadItem,
   type UploadItemVariables,
-  type InProgresChunk,
+  type InProgressChunk,
   getChunksCompletePayload,
   getItemProgress,
   getItemsTotalProgress,
   getChunkItemPayload,
   getChunkSinglePayload,
-  isSpaceAvailableInServer,
   createChunks,
-  getStatusHashMap
+  getStatusHashMap,
+  AvailableServerSpaceResponse
 } from './util';
+import { UPLOAD_AVAILABLE_SPACE_URL } from '../../../apps/storageBrowser/api';
 
 interface UseUploadQueueResponse {
   addFiles: (item: UploadItem[]) => void;
@@ -60,7 +61,7 @@ const useChunkUpload = ({
   const config = getLastKnownConfig();
   const chunkSize = config?.storage_browser?.file_upload_chunk_size ?? DEFAULT_CHUNK_SIZE;
   const [taskServerItems, setTaskServerItems] = useState<Record<UploadItem['uuid'], number>>({});
-  const [chunksInProgress, setChunksInProgress] = useState<Record<string, InProgresChunk[]>>({});
+  const [chunksInProgress, setChunksInProgress] = useState<Record<string, InProgressChunk[]>>({});
 
   const { save } = useSaveData(undefined, {
     postOptions: {
@@ -68,6 +69,11 @@ const useChunkUpload = ({
       headers: { 'Content-Type': 'multipart/form-data' }
     }
   });
+
+  const { reloadData: getAvailableSpace } = useLoadData<AvailableServerSpaceResponse>(
+    UPLOAD_AVAILABLE_SPACE_URL,
+    { skip: true } // Call will be triggered via reloadData function on need basis
+  );
 
   const onError = (chunkItem: UploadChunkItem) => (error: Error) => {
     onItemUpdate(chunkItem.uuid, { status: FileUploadStatus.Failed, error });
@@ -96,7 +102,7 @@ const useChunkUpload = ({
 
   useLoadData<TaskServerResponse[]>('/desktop/api2/taskserver/get_taskserver_tasks/', {
     pollInterval: 5000,
-    skip: !Object.keys(taskServerItems).length,
+    skip: Object.keys(taskServerItems).length === 0,
     onSuccess: processChunkUploadStatus,
     transformKeys: 'none'
   });
@@ -180,8 +186,8 @@ const useChunkUpload = ({
 
     if (isFirstChunk) {
       onItemUpdate(chunkItem.uuid, { status: FileUploadStatus.Uploading });
-      const availableSpace = await isSpaceAvailableInServer(chunkItem.file.size);
-      if (!availableSpace) {
+      const availableSpace = await getAvailableSpace();
+      if (!availableSpace || availableSpace?.uploadAvailableSpace < chunkItem.totalSize) {
         const error = new Error('Upload server ran out of space. Try again later.');
         onError(chunkItem)(error);
         return Promise.resolve();
@@ -199,15 +205,13 @@ const useChunkUpload = ({
   });
 
   const addFiles = (newItems: UploadItem[]) => {
-    newItems.forEach(item => {
+    return newItems.forEach(item => {
       const chunks = createChunks(item, chunkSize);
       enqueue(chunks);
     });
   };
 
-  const removeFile = (itemId: UploadItem['uuid']) => {
-    dequeue(itemId, 'uuid');
-  };
+  const removeFile = (itemId: UploadItem['uuid']) => dequeue(itemId, 'uuid');
 
   return { addFiles, removeFile, isLoading: !!taskServerItems.length };
 };

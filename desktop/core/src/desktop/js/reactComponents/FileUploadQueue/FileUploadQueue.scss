@@ -81,14 +81,7 @@
 
         &__progress {
           height: 2px;
-
-          &__failed {
-            background-color: vars.$fluidx-red-500;
-          }
-
-          &__success {
-            background-color: vars.$fluidx-green-500;
-          }
+          background-color: vars.$fluidx-blue-500;
         }
       }
     }
