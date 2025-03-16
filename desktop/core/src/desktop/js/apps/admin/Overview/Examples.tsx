@@ -17,8 +17,11 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
-import { fetchWithCsrf } from '../../../reactComponents/utils';
+// import { fetchWithCsrf } from '../../../reactComponents/utils';
+import { get } from '../../../api/utils';
 import huePubSub from '../../../utils/huePubSub';
+import { i18nReact } from '../../../utils/i18nReact';
+import './Overview.scss'
 
 const exampleApps = [
   { id: 'hive', name: 'Hive', old_name: 'beeswax' },
@@ -30,46 +33,86 @@ const exampleApps = [
   { id: 'pig', name: 'Pig Editor' }
 ];
 
+type InstallExamplesResponse = {
+  status: number;
+  message?: string;
+};
+
 const Examples = (): JSX.Element => {
+    const { t } = i18nReact.useTranslation();
   const [installingAppId, setInstallingAppId] = useState(null);
 
   const handleInstall = async appData => {
-    try {
-      setInstallingAppId(appData.id);
-      const appIdOrOldName = appData.old_name || appData.id;
-      const url = `/${appIdOrOldName}/install_examples`;
+    setInstallingAppId(appData.id);
+    const appIdOrOldName = appData.old_name || appData.id;
+    const url = `/${appIdOrOldName}/install_examples`;
+    const data = appData.data ? { data: appData.data } : null;
 
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-
-      if (appData.data) {
-        options.body = JSON.stringify({ data: appData.data });
-      }
-
-      const response = await fetchWithCsrf(url, options);
-
-      const responseBody = await response.json();
-      if (responseBody.status == 0) {
-        if (responseBody.message) {
-          huePubSub.publish('hue.global.info', { message: responseBody.message });
+    get<InstallExamplesResponse>(url, data, {
+      method: 'POST',
+      silenceErrors: true
+    })
+      .then(response => {
+        if (response.status === 0) {
+          const message = response.message ? t(response.message) : t('Examples refreshed');
+          huePubSub.publish('hue.global.info', { message });
         } else {
-          huePubSub.publish('hue.global.info', { message: 'Examples refreshed' });
+          const errorMessage = response.message
+            ? t(response.message)
+            : t('An error occurred while installing examples.');
+          huePubSub.publish('hue.global.error', { message: errorMessage });
         }
-      } else {
-        huePubSub.publish('hue.global.error', { message: responseBody.message });
-      }
-    } finally {
-      setInstallingAppId(null);
-    }
+      })
+      .catch(error => {
+        const errorMessage =
+          error && typeof error === 'object' && error.message
+            ? t(error.message)
+            : t('An unexpected error occurred');
+        huePubSub.publish('hue.global.error', { message: errorMessage });
+      })
+      .finally(() => {
+        setInstallingAppId(null);
+      });
   };
 
+
+  // const handleInstall = async (appData) => {
+  //   try {
+  //     setInstallingAppId(appData.id);
+  //     const appIdOrOldName = appData.old_name || appData.id;
+  //     const url = `/${appIdOrOldName}/install_examples`;
+
+  //     const data = appData.data ? { data: appData.data } : {};
+
+      // const options = {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   }
+      // };
+      // if (appData.data) {
+      //   options.body = JSON.stringify({ data: appData.data });
+      // }
+      // const response = await fetchWithCsrf(url, options);
+
+      //     const responseBody = await response.json();
+      //     if (responseBody.status == 0) {
+      //       if (responseBody.message) {
+      //         huePubSub.publish('hue.global.info', { message: t(responseBody.message) });
+      //       } else {
+      //         huePubSub.publish('hue.global.info', { message: t('Examples refreshed') });
+      //       }
+      //     } else {
+      //       huePubSub.publish('hue.global.error', { message: t(responseBody.message) });
+      //     }
+      //   } finally {
+      //     setInstallingAppId(null);
+      //   }
+      // };
+
   return (
-    <div>
-      <h3>Install some data examples</h3>
+    <div className='overview-examples'>
+      <h3>{t('Install some data examples')}</h3>
       {exampleApps.map(appData => (
         <div key={appData.id}>
           <Button

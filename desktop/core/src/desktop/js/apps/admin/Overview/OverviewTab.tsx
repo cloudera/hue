@@ -14,16 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs } from 'antd';
 import Examples from './Examples';
 import ConfigStatus from './ConfigStatus';
 import Analytics from './Analytics';
 import { i18nReact } from '../../../utils/i18nReact';
+// import { getLastKnownConfig } from '../../../config/hueConfig';
 import './Overview.scss';
 
-const Overview: React.FC = (): JSX.Element => {
+const Overview = (): JSX.Element | null => {
   const { t } = i18nReact.useTranslation();
+  // const [isAdmin, setIsAdmin] = useState(false);
+
+  // useEffect(() => {
+  // const config = getLastKnownConfig();
+  // setIsAdmin(config?.hue_config.is_admin ?? false);
+  // }, []);
 
   const items = [
     {
@@ -43,8 +50,12 @@ const Overview: React.FC = (): JSX.Element => {
     }
   ];
 
+  // if (!isAdmin) {
+  //     // console.log('User is not admin, rendering null.');
+  //   return null;
+  // }
+
   return (
-    //if admin(user)
     <div className="hue-overview-component">
       <Tabs tabPosition="left" items={items} />
       <div className="config__trademark-text">
