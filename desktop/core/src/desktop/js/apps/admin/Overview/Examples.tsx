@@ -21,7 +21,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import { get } from '../../../api/utils';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
-import './Overview.scss'
+import './Overview.scss';
 
 const exampleApps = [
   { id: 'hive', name: 'Hive', old_name: 'beeswax' },
@@ -39,7 +39,7 @@ type InstallExamplesResponse = {
 };
 
 const Examples = (): JSX.Element => {
-    const { t } = i18nReact.useTranslation();
+  const { t } = i18nReact.useTranslation();
   const [installingAppId, setInstallingAppId] = useState(null);
 
   const handleInstall = async appData => {
@@ -75,7 +75,6 @@ const Examples = (): JSX.Element => {
       });
   };
 
-
   // const handleInstall = async (appData) => {
   //   try {
   //     setInstallingAppId(appData.id);
@@ -84,34 +83,34 @@ const Examples = (): JSX.Element => {
 
   //     const data = appData.data ? { data: appData.data } : {};
 
-      // const options = {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json'
-      //   }
-      // };
-      // if (appData.data) {
-      //   options.body = JSON.stringify({ data: appData.data });
-      // }
-      // const response = await fetchWithCsrf(url, options);
+  // const options = {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json'
+  //   }
+  // };
+  // if (appData.data) {
+  //   options.body = JSON.stringify({ data: appData.data });
+  // }
+  // const response = await fetchWithCsrf(url, options);
 
-      //     const responseBody = await response.json();
-      //     if (responseBody.status == 0) {
-      //       if (responseBody.message) {
-      //         huePubSub.publish('hue.global.info', { message: t(responseBody.message) });
-      //       } else {
-      //         huePubSub.publish('hue.global.info', { message: t('Examples refreshed') });
-      //       }
-      //     } else {
-      //       huePubSub.publish('hue.global.error', { message: t(responseBody.message) });
-      //     }
-      //   } finally {
-      //     setInstallingAppId(null);
-      //   }
-      // };
+  //     const responseBody = await response.json();
+  //     if (responseBody.status == 0) {
+  //       if (responseBody.message) {
+  //         huePubSub.publish('hue.global.info', { message: t(responseBody.message) });
+  //       } else {
+  //         huePubSub.publish('hue.global.info', { message: t('Examples refreshed') });
+  //       }
+  //     } else {
+  //       huePubSub.publish('hue.global.error', { message: t(responseBody.message) });
+  //     }
+  //   } finally {
+  //     setInstallingAppId(null);
+  //   }
+  // };
 
   return (
-    <div className='overview-examples'>
+    <div className="overview-examples">
       <h3>{t('Install some data examples')}</h3>
       {exampleApps.map(appData => (
         <div key={appData.id}>

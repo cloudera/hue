@@ -21,6 +21,4 @@
 
 // export { fetchWithCsrf };
 
-
-
 // remove file
