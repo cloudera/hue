@@ -14,17 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export interface HDFSFileSystemConfig {
+  isTrashEnabled: boolean;
+  isHdfsSuperuser: boolean;
+  groups: string[];
+  users: string[];
+  superuser: string;
+  supergroup: string;
+}
+
 export interface FileSystem {
-  file_system: string;
-  user_home_directory: string;
-  config?: {
-    is_trash_enabled: boolean;
-    is_hdfs_superuser: boolean;
-    groups: string[];
-    users: string[];
-    superuser: string;
-    supergroup: string;
-  };
+  name: string;
+  userHomeDirectory: string;
+  config: HDFSFileSystemConfig;
 }
 
 export interface FileStats {
@@ -50,10 +52,10 @@ export interface StorageDirectoryTableData
 }
 
 export interface PageStats {
-  page_number: number;
-  total_pages: number;
-  page_size: number;
-  total_size: number;
+  pageNumber: number;
+  totalPages: number;
+  pageSize: number;
+  totalSize: number;
 }
 
 export interface FilePreview {
@@ -67,12 +69,6 @@ export interface FilePreview {
 export interface ListDirectory {
   files: FileStats[];
   page: PageStats;
-  groups: string[];
-  users: string[];
-  supergroup: string;
-  superuser: string;
-  is_fs_superuser: boolean;
-  is_trash_enabled: boolean;
 }
 
 export interface ContentSummary {
@@ -85,6 +81,10 @@ export interface ContentSummary {
   spaceQuota: number;
   typeQuota: number;
   replication: number;
+}
+
+export interface TrashData {
+  trashPath: string;
 }
 
 export enum SortOrder {

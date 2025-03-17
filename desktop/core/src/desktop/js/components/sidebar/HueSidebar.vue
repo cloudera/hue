@@ -156,12 +156,14 @@
     });
   }
 
-  USER_DRAWER_CHILDREN.push({
-    type: 'navigation',
-    name: 'logOut',
-    displayName: I18n('Log Out'),
-    handler: (event: Event) => onHueLinkClick(event, '/accounts/logout')
-  });
+  if (window.ALLOW_HUE_LOGOUT) {
+    USER_DRAWER_CHILDREN.push({
+      type: 'navigation',
+      name: 'logOut',
+      displayName: I18n('Log Out'),
+      handler: (event: Event) => onHueLinkClick(event, '/accounts/logout')
+    });
+  }
 
   const HELP_DRAWER_CHILDREN: Omit<SidebarNavigationItem, 'iconHtml'>[] = [
     {

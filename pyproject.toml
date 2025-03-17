@@ -1,13 +1,89 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "desktop.settings"
 console_output_style = "count"
-addopts = "-v -m 'not integration' --strict-markers --disable-warnings --html=report.html --self-contained-html"
+addopts = """
+-v \
+-m \
+'not integration' \
+--strict-markers \
+--disable-warnings \
+--junit-xml=reports/pytest/test_report.xml \
+--html=reports/pytest/report.html \
+--self-contained-html \
+--cov=./ \
+--cov-report html:reports/code-cov/coverage-html \
+--cov-report xml:reports/code-cov/coverage.xml \
+"""
 norecursedirs = "desktop/core/ext-py3"
 python_files = "tests.py test_*.py *_tests.py tests_* *_test.py"
 markers = [
     "integration: live server based tests",
-    "requires_hadoop: live hadoop cluster based tests"
+    "requires_hadoop: live hadoop cluster based tests",
 ]
+
+[tool.coverage.run]
+branch = true
+omit = [
+    "*/ext-py3/*",
+    "desktop/core/src/desktop/lib/wsgiserver.py",
+    "*/migrations/*",
+    "*/org_migrations/*",
+    "*/old_migrations/*",
+    "*/gen-py/*",
+    "desktop/core/src/desktop/app_template/src/app_name/*",
+    "desktop/core/src/desktop/app_template_proxy/src/app_name/*",
+    "*conf.py",
+    "*settings.py",
+    "*urls.py",
+    "*metrics.py",
+    "*tests.py*",
+    "test_*.py",
+    "*_tests.py",
+    "tests_*.py",
+    "*_test.py",
+]
+source = [
+    "about",
+    "beeswax",
+    "filebrowser",
+    "hbase",
+    "help",
+    "hive",
+    "impala",
+    "jobbrowser",
+    "jobsub",
+    "metastore",
+    "oozie",
+    "pig",
+    "proxy",
+    "rdbms",
+    "search",
+    "security",
+    "spark",
+    "sqoop",
+    "useradmin",
+    "zookeeper",
+    "desktop",
+    "aws",
+    "azure",
+    "dashboard",
+    "hadoop",
+    "indexer",
+    "kafka",
+    "libanalyze",
+    "liboauth",
+    "liboozie",
+    "librdbms",
+    "libsaml",
+    "libsentry",
+    "libsolr",
+    "libzookeeper",
+    "metadata",
+    "notebook",
+]
+
+[tool.coverage.report]
+precision = 2
 
 [tool.ruff]
 target-version = "py38"
@@ -15,17 +91,17 @@ line-length = 140
 indent-width = 2
 force-exclude = true
 extend-exclude = [
-  "*/ext-py3/*",
-  "desktop/core/src/desktop/lib/wsgiserver.py",
-  "*/migrations/*",
-  "apps/oozie/src/oozie/tests.py",
-  "tools/ops/",
-  "tools/ace-editor/",
-  "*/gen-py/*",
-  "*/org_migrations/*",
-  "*/old_migrations/*",
-  "desktop/core/src/desktop/app_template/src/app_name/*",
-  "desktop/core/src/desktop/app_template_proxy/src/app_name/*"
+    "*/ext-py3/*",
+    "desktop/core/src/desktop/lib/wsgiserver.py",
+    "*/migrations/*",
+    "apps/oozie/src/oozie/tests.py",
+    "tools/ops/",
+    "tools/ace-editor/",
+    "*/gen-py/*",
+    "*/org_migrations/*",
+    "*/old_migrations/*",
+    "desktop/core/src/desktop/app_template/src/app_name/*",
+    "desktop/core/src/desktop/app_template_proxy/src/app_name/*",
 ]
 
 [tool.ruff.lint]
@@ -35,13 +111,7 @@ select = [
     "W", # pycodestyle warnings
     "I", # isort
 ]
-ignore = [
-    "E111",
-    "E114",
-    "E117",
-    "W191",
-    "E731"
-]
+ignore = ["E111", "E114", "E117", "W191", "E731"]
 
 [tool.ruff.lint.per-file-ignores]
 "desktop/libs/notebook/src/notebook/connectors/altus.py" = ["E501"]
@@ -101,5 +171,5 @@ known-first-party = [
     "libsolr",
     "libzookeeper",
     "metadata",
-    "notebook"
+    "notebook",
 ]

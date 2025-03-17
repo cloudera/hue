@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import {
   isHDFS,
   isS3,
@@ -25,7 +26,8 @@ import {
   isOFSRoot,
   isOFSServiceID,
   isOFSVol,
-  inTrash
+  inTrash,
+  inRestorableTrash
 } from './storageBrowserUtils';
 
 describe('isHDFS function', () => {
@@ -200,5 +202,24 @@ describe('inTrash function', () => {
     expect(inTrash('/path/to/.Trash')).toBe(false);
     expect(inTrash('hdfs://path/to/file')).toBe(false);
     expect(inTrash('ofs://path/to/file')).toBe(false);
+  });
+});
+
+describe('inRestorableTrash function', () => {
+  test('returns false if path is not in trash"', () => {
+    expect(inRestorableTrash('hdfs://path/to/file')).toBe(false);
+    expect(inRestorableTrash('hdfs://path/to/file')).toBe(false);
+    expect(inRestorableTrash('ofs://path/to/file')).toBe(false);
+  });
+
+  test('returns false if path is trash root folder"', () => {
+    expect(inRestorableTrash('/user/path/.Trash')).toBe(false);
+    expect(inRestorableTrash('/user/path/.Trash/')).toBe(false);
+  });
+
+  test('returns true if path is trash but not trash root folder', () => {
+    expect(inRestorableTrash('/user/path/.Trash/Current')).toBe(true);
+    expect(inRestorableTrash('/user/path/.Trash/Current/user')).toBe(true);
+    expect(inRestorableTrash('/user/path/.Trash/Current/user/path')).toBe(true);
   });
 });

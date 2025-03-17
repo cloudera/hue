@@ -498,8 +498,14 @@ if desktop.conf.KNOX.KNOX_PROXYHOSTS.get():  # The hosts provided here don't hav
   else:
     TRUSTED_ORIGINS += desktop.conf.KNOX.KNOX_PROXYHOSTS.get()
 
+CSRF_TRUSTED_ORIGINS = []
 if TRUSTED_ORIGINS:
-  CSRF_TRUSTED_ORIGINS = TRUSTED_ORIGINS
+  for origin in TRUSTED_ORIGINS:
+    if 'http://' in origin or 'https://' in origin:
+      CSRF_TRUSTED_ORIGINS.append(origin)
+    else:
+      CSRF_TRUSTED_ORIGINS.append('http://%s' % origin)
+      CSRF_TRUSTED_ORIGINS.append('https://%s' % origin)
 
 SECURE_HSTS_SECONDS = desktop.conf.SECURE_HSTS_SECONDS.get()
 SECURE_HSTS_INCLUDE_SUBDOMAINS = desktop.conf.SECURE_HSTS_INCLUDE_SUBDOMAINS.get()

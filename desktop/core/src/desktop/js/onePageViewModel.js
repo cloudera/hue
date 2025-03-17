@@ -959,13 +959,16 @@ class OnePageViewModel {
 
     huePubSub.subscribe('open.link', href => {
       if (href) {
+        const prefix = '/hue';
         if (href.startsWith('/')) {
-          if (window.HUE_BASE_URL && !href.startsWith(window.HUE_BASE_URL)) {
+          if (window.HUE_BASE_URL.length && href.startsWith(window.HUE_BASE_URL)) {
+            page(href);
+          } else if (href.startsWith(prefix)) {
             page(window.HUE_BASE_URL + href);
           } else {
-            page(href); // Already includes the base_url
+            page(window.HUE_BASE_URL + prefix + href);
           }
-        } else if (href.indexOf('#') === 0) {
+        } else if (href.indexOf('#') == 0) {
           // Only place that seem to use this is hbase onclick row
           window.location.hash = href;
         } else {

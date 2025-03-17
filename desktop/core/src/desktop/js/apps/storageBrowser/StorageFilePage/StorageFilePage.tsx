@@ -32,6 +32,7 @@ import {
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import { inTrash } from '../../../utils/storageBrowserUtils';
 
 interface StorageFilePageProps {
   onReload: () => void;
@@ -113,13 +114,14 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
     !isEditing &&
     config?.storage_browser.max_file_editor_size &&
     config?.storage_browser.max_file_editor_size > fileStats.size &&
-    EDITABLE_FILE_FORMATS.has(fileType);
+    EDITABLE_FILE_FORMATS.has(fileType) &&
+    !inTrash(fileStats.path);
 
   const pageStats = {
-    page_number: pageNumber,
-    total_pages: Math.ceil(fileStats.size / pageSize),
-    page_size: 0,
-    total_size: 0
+    pageNumber: pageNumber,
+    totalPages: Math.ceil(fileStats.size / pageSize),
+    pageSize: 0,
+    totalSize: 0
   };
 
   const errorConfig = [
@@ -206,7 +208,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                     readOnly={!isEditing}
                     className="preview__textarea"
                   />
-                  {!loadingPreview && pageStats.total_pages > 1 && (
+                  {pageStats.totalPages > 1 && (
                     <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
                   )}
                 </div>

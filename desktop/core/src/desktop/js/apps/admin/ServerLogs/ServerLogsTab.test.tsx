@@ -24,12 +24,12 @@ import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 const mockData = jest.fn().mockReturnValue({
   logs: ['Log entry 1', 'Log entry 2'],
-  hue_hostname: 'test-hostname'
+  hueHostname: 'test-hostname'
 });
 
 const emptyMockData = jest.fn().mockReturnValue({
   logs: [],
-  hue_hostname: 'test-hostname'
+  hueHostname: 'test-hostname'
 });
 
 jest.mock('../../../utils/hooks/useLoadData/useLoadData');
@@ -94,10 +94,11 @@ describe('ServerLogs Component', () => {
 
     render(<ServerLogs />);
 
-    expect(screen.getByText('Log entry 1')).toHaveClass('server_wrap');
+    expect(screen.getByLabelText('Wrap logs')).toBeChecked();
+    expect(screen.getByText('Log entry 1')).toHaveClass('server__log-line--wrap');
 
     fireEvent.click(screen.getByLabelText('Wrap logs'));
-
-    expect(screen.getByText('Log entry 1')).not.toHaveClass('server_wrap');
+    expect(screen.getByLabelText('Wrap logs')).not.toBeChecked();
+    expect(screen.getByText('Log entry 1')).not.toHaveClass('server__log-line--wrap');
   });
 });

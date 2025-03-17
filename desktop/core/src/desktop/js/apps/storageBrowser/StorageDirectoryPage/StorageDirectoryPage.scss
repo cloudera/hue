@@ -13,81 +13,94 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 @use 'variables' as vars;
 @use 'mixins';
 
 $cell-height: 40px;
 $table-placeholder-height: 100px;
-$action-dropdown-width: 214px;
 $icon-margin: 5px;
 
 .antd.cuix {
-  .hue-storage-browser__actions-bar {
+  .hue-storage-browser-directory {
     display: flex;
-    margin: vars.$fluidx-spacing-s 0;
-    justify-content: space-between;
-  }
+    flex-direction: column;
+    flex: 1;
 
-  .hue-storage-browser__search {
-    width: 30%;
+    &__actions-bar {
+      display: flex;
+      margin: vars.$fluidx-spacing-s 0 vars.$fluidx-spacing-s vars.$fluidx-spacing-xxs;
+      justify-content: space-between;
 
-    .ant-input {
-      box-shadow: none;
-    }
-  }
+      &__search {
+        width: min(300px, calc(100% - 200px));
 
-  .hue-storage-browser__actions-bar-right {
-    display: flex;
-    gap: vars.$fluidx-spacing-xs;
+        .ant-input {
+          box-shadow: none;
+        }
+      }
 
-    .cdp-icon-dropdown {
-      margin-left: $icon-margin;
-    }
-  }
+      &__actions {
+        display: flex;
+        gap: vars.$fluidx-spacing-xs;
 
-  .hue-storage-browser__table {
-    .ant-table-placeholder {
-      height: $table-placeholder-height;
-      text-align: center;
-    }
-
-    th.ant-table-cell {
-      height: $cell-height;
-      background-color: vars.$fluidx-gray-040;
-    }
-  }
-
-  .hue-storage-browser__table-cell-icon {
-    color: vars.$fluidx-blue-700;
-    margin-right: 6px;
-  }
-
-  .hue-storage-browser__table-row {
-    border-bottom: 1px solid vars.$fluidx-gray-040;
-
-    :hover {
-      cursor: pointer;
+        .cdp-icon-dropdown {
+          margin-left: $icon-margin;
+        }
+      }
     }
 
-    td.ant-table-cell {
-      height: $cell-height;
-      @include mixins.nowrap-ellipsis;
+    &__table-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
-    td.ant-table-cell:first-child {
-      text-overflow: initial;
+    .hue-storage-browser__table {
+      .ant-table-placeholder {
+        height: $table-placeholder-height;
+        text-align: center;
+      }
+
+      th.ant-table-cell {
+        height: $cell-height;
+        background-color: vars.$fluidx-gray-040;
+      }
     }
-  }
 
-  .hue-storage-browser__table-cell-name {
-    color: vars.$fluidx-blue-700;
-  }
+    .hue-storage-browser__table-cell-icon {
+      color: vars.$fluidx-blue-700;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
 
-  .hue-storage-browser__table-column-header {
-    display: flex;
-  }
+    .hue-storage-browser__table-row {
+      border-bottom: 1px solid vars.$fluidx-gray-040;
 
-  .hue-storage-browser__table-column-title {
-    text-transform: capitalize;
+      :hover {
+        cursor: pointer;
+      }
+
+      td.ant-table-cell {
+        height: $cell-height;
+        @include mixins.nowrap-ellipsis;
+      }
+
+      td.ant-table-cell:first-child {
+        text-overflow: initial;
+      }
+    }
+
+    .hue-storage-browser__table-cell-name {
+      color: vars.$fluidx-blue-700;
+    }
+
+    .hue-storage-browser__table-column-header {
+      display: flex;
+    }
+
+    .hue-storage-browser__table-column-title {
+      text-transform: capitalize;
+    }
   }
 }
