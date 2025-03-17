@@ -37,14 +37,14 @@ jest.mock('../../../api/utils', () => ({
   post: () => mockSave()
 }));
 
-const mockData = jest.fn().mockReturnValue({
-  contents: 'Initial file content',
-  compression: 'none'
-});
+let mockData = {
+  isContentReadable: true,
+  contents: 'Initial file content'
+};
 
 jest.mock('../../../utils/hooks/useLoadData/useLoadData', () => {
   return jest.fn(() => ({
-    data: mockData(),
+    data: mockData,
     loading: false
   }));
 });
@@ -106,19 +106,6 @@ describe('StorageFilePage', () => {
     expect(screen.getByRole('button', { name: 'Edit' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull();
-  });
-
-  // TODO: fix this test when mocking of useLoadData onSuccess callback is mproperly mocked
-  it.skip('should hide edit button when compression is available', async () => {
-    mockData.mockImplementation(() => ({
-      contents: 'Initial file content',
-      compression: 'zip'
-    }));
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
-
-    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
   });
 
   it('should show save and cancel buttons when editing', async () => {
@@ -305,7 +292,12 @@ describe('StorageFilePage', () => {
     expect(video.children[0]).toHaveAttribute('src', expect.stringContaining('videofile.mp4'));
   });
 
-  it('should display a message for compressed file types', () => {
+  it('should display a message for unsupported file types', () => {
+    mockData = {
+      isContentReadable: false,
+      contents: ''
+    };
+
     render(
       <StorageFilePage
         fileStats={{
@@ -317,6 +309,6 @@ describe('StorageFilePage', () => {
       />
     );
 
-    expect(screen.getByText(/preview not available for compressed file/i)).toBeInTheDocument();
+    expect(screen.getByText(/Preview is not available for this file/i)).toBeInTheDocument();
   });
 });
