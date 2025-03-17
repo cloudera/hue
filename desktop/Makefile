@@ -103,7 +103,7 @@ $(DESKTOP_DB): $(BLD_DIR_BIN)/hue
 ENV_INSTALL_TARGETS := $(APPS:%=.recursive-env-install/%)
 $(info "----------------> ENV_INSTALL_TARGETS: $(ENV_INSTALL_TARGETS)")
 .recursive-env-install/%: %
-	$(MAKE) -C $< env-install
+	PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $< env-install
 
 CLEAN_TARGETS := $(APPS:%=.recursive-clean/%)
 .recursive-clean/%: %

@@ -119,41 +119,45 @@ docs:
 ###################################
 # Install parent POM
 ###################################
+.PHONY: parent-pom
 parent-pom:
 ifneq (,$(BUILD_DB_PROXY))
 	cd $(ROOT)/maven && mvn install $(MAVEN_OPTIONS)
 endif
 
-.PHONY: parent-pom
-
+$(info "PYTHON_VER is $(PYTHON_VER)")
+$(info "SYS_PYTHON is $(SYS_PYTHON)")
+$(info "ENV_PYTHON is $(ENV_PYTHON)")
+$(info "SYS_PIP is $(SYS_PIP)")
+$(info "ENV_PIP is $(ENV_PIP)")
+$(info "PYTHON_INCLUDE_DIR is $(PYTHON_INCLUDE_DIR)")
+$(info "PYTHON_H is $(PYTHON_H)")
+$(info "PIP_VERSION is $(PIP_VERSION)")
+$(info "VIRTUAL_ENV_VERSION is $(VIRTUAL_ENV_VERSION)")
+$(info "VIRTUAL_ENV_RELOCATABLE_VERSION is $(VIRTUAL_ENV_RELOCATABLE_VERSION)")
+$(info "BLD_DIR_ENV is $(BLD_DIR_ENV)")
+$(info "REQUIREMENT_FILE is $(REQUIREMENT_FILE)")
+$(info "REQUIREMENT_DOT_FILE is $(REQUIREMENT_DOT_FILE)")
 ###################################
 # virtual-env
 ###################################
-
 .PHONY: virtual-env
-virtual-env: $(BLD_DIR_ENV)/stamp
-$(BLD_DIR_ENV)/stamp:
-	@echo "--- Creating virtual environment at $(BLD_DIR_ENV) using $(PYTHON_VER)"
+virtual-env: $(REQUIREMENT_DOT_FILE)
+$(REQUIREMENT_DOT_FILE):
+	@echo "--- Creating virtual environment for $(PYTHON_VER) ---"
+	@mkdir -p $(BLD_DIR_ENV)
 	@$(SYS_PYTHON) -m pip install --upgrade pip==$(PIP_VERSION)
-	$(SYS_PIP) install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
-	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
-	  $(SYS_PYTHON) -m venv $(BLD_DIR_ENV); \
-	 fi
+	@$(SYS_PYTHON) -m pip install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
+ifeq ($(PPC64LE),"ppc64le")
+	@$(SYS_PYTHON) -m venv $(BLD_DIR_ENV)
+else
 	@virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV)
-	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
-	@touch $@
-	@echo '--- Installing PIP_MODULES in virtual-env'
-	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
-	  echo '--- Installing $(REQUIREMENT_PPC64LE_FILE) into virtual-env via $(ENV_PIP)'; \
-	  $(ENV_PIP) install -r $(REQUIREMENT_PPC64LE_FILE); \
-	  echo '--- Finished $(REQUIREMENT_PPC64LE_FILE) into virtual-env'; \
-	 else \
-	  echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'; \
-	  $(ENV_PIP) install -r $(REQUIREMENT_FILE); \
-	  echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'; \
-         fi
+endif
+	@echo "REQUIREMENT_FILE is $(REQUIREMENT_FILE)"
+	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
+	@echo "--- Virtual environment setup complete for $(PYTHON_VER) ---"
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
-	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
+	@echo "--- Finished installing $(NAVOPTAPI_WHL) into virtual-env ---"
 	@touch $(REQUIREMENT_DOT_FILE)
 ###################################
 # Build desktop
@@ -242,7 +246,8 @@ install-env:
 ###################################
 
 .PHONY: npm-install
-npm-install:
+npm-install: .npm-install-lock
+.npm-install-lock:
 	npm --version
 	node --version
 	npm install
@@ -251,10 +256,11 @@ npm-install:
 	npm run webpack-workers
 	node_modules/.bin/removeNPMAbsolutePaths .
 	rm -rf node_modules
+	touch .npm-install-lock
 
 .PHONY: create-static
 create-static:
-	./build/env/bin/python ./build/env/bin/hue collectstatic --noinput
+	$(ENV_PYTHON) $(BLD_DIR_BIN)/hue collectstatic --noinput
 
 # <<<< DEV ONLY
 .PHONY: doc

@@ -41,7 +41,7 @@ EGG_INFO_TARGETS := $(APPS:%=.recursive-egg-info/%)
 
 .PHONY: env-install
 env-install: $(EGG_INFO_TARGETS)
-	$(APP_REG) --install $(APPS) --relative-paths
+	ENV_PYTHON=$(ENV_PYTHON) PYTHON_VER=$(PYTHON_VER) VIRTUAL_ENV=$(BLD_DIR_ENV) $(APP_REG) --install $(APPS) --relative-paths
 
 
 ################################################
