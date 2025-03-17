@@ -37,11 +37,13 @@ HUE_PTH_DIR = os.environ.get('HUE_PTH_DIR', None)
 # The Hue config directory
 HUE_CONF_DIR = os.path.join(INSTALL_ROOT, 'desktop', 'conf')
 
-# Virtual env
-VIRTUAL_ENV = os.path.join(INSTALL_ROOT, 'build', 'env')
-
 # The Python executable in virtualenv
-ENV_PYTHON = os.path.join(VIRTUAL_ENV, 'bin', 'python')
+ENV_PYTHON = os.environ.get("ENV_PYTHON")
+
+PYTHON_VER = os.environ.get("PYTHON_VER", "")
+
+# Virtual env
+VIRTUAL_ENV = os.environ.get("VIRTUAL_ENV")
 
 def cmp_version(ver1, ver2):
   """Compare two version strings in the form of 1.2.34"""
