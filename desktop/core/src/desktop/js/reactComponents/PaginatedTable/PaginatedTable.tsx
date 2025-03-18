@@ -81,13 +81,15 @@ const PaginatedTable = <T extends object>({
     __: Record<string, FilterValue | null>,
     sorter: SorterResult<T> | SorterResult<T>[]
   ) => {
-    const sorter1 = sorter && Array.isArray(sorter) ? sorter[0] : sorter;
-    if (sorter1?.order && setSortOrder && setSortByColumn) {
-      setSortOrder(sorter1.order);
-      setSortByColumn(sorter1.columnKey);
-    }
-    if (!sorter1.order && setSortByColumn) {
-      setSortByColumn(undefined);
+    if (setSortOrder && setSortByColumn) {
+      const sorterObj = sorter && Array.isArray(sorter) ? sorter[0] : sorter;
+      if (sorterObj?.order) {
+        setSortOrder(sorterObj.order);
+        setSortByColumn(sorterObj.columnKey);
+      } else {
+        setSortOrder(null);
+        setSortByColumn(undefined);
+      }
     }
   };
 

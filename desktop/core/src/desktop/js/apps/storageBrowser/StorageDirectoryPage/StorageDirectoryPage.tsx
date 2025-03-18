@@ -96,9 +96,9 @@ const StorageDirectoryPage = ({
       path: fileStats.path,
       pagesize: pageSize.toString(),
       pagenum: pageNumber.toString(),
-      filter: searchTerm,
+      filter: searchTerm !== '' ? searchTerm : undefined,
       sortby: sortByColumn,
-      descending: sortOrder === 'ascend' ? 'true' : 'false'
+      descending: sortOrder !== null ? sortOrder === 'descend' : undefined
     },
     skip:
       fileStats.path === '' ||
