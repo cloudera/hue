@@ -33,15 +33,16 @@ import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import { inTrash } from '../../../utils/storageBrowserUtils';
+import { getFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageFilePageProps {
   onReload: () => void;
-  fileName: string;
   fileStats: FileStats;
 }
 
-const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps): JSX.Element => {
+const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Element => {
   const config = getLastKnownConfig();
+  const fileName = getFileNameFromPath(fileStats.path);
   const fileType = getFileType(fileName);
 
   const { t } = i18nReact.useTranslation();
@@ -54,11 +55,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
 
   const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL);
 
-  const {
-    data: fileData,
-    loading: loadingPreview,
-    error: errorPreview
-  } = useLoadData<FilePreview>(FILE_PREVIEW_API_URL, {
+  const { data, loading, error } = useLoadData<FilePreview>(FILE_PREVIEW_API_URL, {
     params: {
       path: fileStats.path,
       offset: pageOffset,
@@ -80,7 +77,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
 
   const handleCancel = () => {
     setIsEditing(false);
-    setFileContent(fileData?.contents);
+    setFileContent(data?.contents);
   };
 
   const handleSave = () => {
@@ -115,6 +112,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
     config?.storage_browser.max_file_editor_size &&
     config?.storage_browser.max_file_editor_size > fileStats.size &&
     EDITABLE_FILE_FORMATS.has(fileType) &&
+    data?.isContentReadable &&
     !inTrash(fileStats.path);
 
   const pageStats = {
@@ -126,7 +124,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
 
   const errorConfig = [
     {
-      enabled: !!errorPreview,
+      enabled: !!error,
       message: t('An error occurred while fetching file content for path "{{path}}".', {
         path: fileStats.path
       }),
@@ -151,7 +149,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
           ))}
         </div>
 
-        <LoadingErrorWrapper loading={loadingPreview || isSaving} errors={errorConfig}>
+        <LoadingErrorWrapper loading={loading || isSaving} errors={errorConfig} hideChildren>
           <div className="preview">
             <div className="preview__title-bar">
               {t('Content')}
@@ -171,7 +169,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                       data-testid="preview--save--button"
                       data-event=""
                       onClick={handleSave}
-                      disabled={fileContent === fileData?.contents}
+                      disabled={fileContent === data?.contents}
                     >
                       {t('Save')}
                     </PrimaryButton>
@@ -200,7 +198,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
             </div>
 
             <div className="preview__content">
-              {[SupportedFileTypes.TEXT, SupportedFileTypes.OTHER].includes(fileType) && (
+              {data?.isContentReadable === true && (
                 <div className="preview__editable-file">
                   <textarea
                     value={fileContent}
@@ -211,6 +209,13 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                   {pageStats.totalPages > 1 && (
                     <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
                   )}
+                </div>
+              )}
+
+              {(data?.isContentReadable === false ||
+                fileType === SupportedFileTypes.COMPRESSED) && (
+                <div className="preview__unsupported">
+                  {t('Preview is not available for this file.')}
                 </div>
               )}
 
@@ -243,14 +248,6 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                   <source src={filePreviewUrl} />
                   {t('Your browser does not support the video element.')}
                 </video>
-              )}
-
-              {fileType === SupportedFileTypes.COMPRESSED && (
-                <div className="preview__compresed">
-                  {t(
-                    'Preview not available for compressed file. Please download the file to view.'
-                  )}
-                </div>
               )}
             </div>
           </div>
