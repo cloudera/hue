@@ -576,7 +576,7 @@ class CSVFormat(FileFormat):
     return header
 
   def _get_sample_rows(self, sample):
-    NUM_SAMPLES = 5
+    NUM_SAMPLES = 20
 
     header_offset = 1 if self._has_header else 0
     reader = itertools.islice(self._get_sample_reader(sample), header_offset, NUM_SAMPLES + 1)

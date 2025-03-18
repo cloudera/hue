@@ -15,39 +15,51 @@
 // limitations under the License.
 
 @use 'variables' as vars;
-@use 'mixins';
 
-.hue-table {
-  // th {
-  //   background-color: vars.$fluidx-gray-040 !important;
-  // }
+.antd.cuix {
+  .preview-page {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
 
-  // &__header {
-  //   display: flex;
-  //   align-items: center;
+    &__header {
+      display: flex;
+      justify-content: space-between;
 
-  //   &--cursor-pointer {
-  //     cursor: pointer;
-  //   }
-  // }
+      &__title {
+        display: flex;
+        align-items: center;
+        font-size: 20px;
+        font-weight: 300;
+        color: vars.$fluidx-gray-900;
+      }
 
-  tr {
-    :hover {
-      cursor: pointer;
+      &__actions {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+
+        .action {
+          margin-left: 10px;
+        }
+      }
     }
-  }
 
-  .ant-table-cell {
-    @include mixins.nowrap-ellipsis;
-  }
+    &__metadata {
+      background-color: white;
+      height: 68px;
+      padding: 16px;
+      font-size: 12px;
+      color: #5a656d;
+    }
 
-  .ant-table-selection-column {
-    // This prevents the eplipses from being applied to the selection column
-    text-overflow: initial !important;
-  }
-
-  .ant-table-placeholder {
-    height: 100px;
-    text-align: center;
+    &__main-section {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      background-color: white;
+      padding: 16px 0 0 0;
+    }
   }
 }

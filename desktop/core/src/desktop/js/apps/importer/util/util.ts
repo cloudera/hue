@@ -14,40 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
-@use 'mixins';
+import { type ColumnProps } from 'cuix/dist/components/Table';
 
-.hue-table {
-  // th {
-  //   background-color: vars.$fluidx-gray-040 !important;
-  // }
+export const convertToAntdColumns = (input?: any[]): ColumnProps<any>[] => {
+  if (!input) return [];
+  return input?.map(item => ({
+    title: item.name,
+    dataIndex: item.name,
+    key: item.name,
+    width: '100px'
+  }));
+};
 
-  // &__header {
-  //   display: flex;
-  //   align-items: center;
-
-  //   &--cursor-pointer {
-  //     cursor: pointer;
-  //   }
-  // }
-
-  tr {
-    :hover {
-      cursor: pointer;
-    }
-  }
-
-  .ant-table-cell {
-    @include mixins.nowrap-ellipsis;
-  }
-
-  .ant-table-selection-column {
-    // This prevents the eplipses from being applied to the selection column
-    text-overflow: initial !important;
-  }
-
-  .ant-table-placeholder {
-    height: 100px;
-    text-align: center;
-  }
-}
+export const convertToDataSource = (columns: ColumnProps<any>[], apiResponse?: string[][]) => {
+  if (!apiResponse) return [];
+  return apiResponse?.map((rowData, index) => {
+    const row = {
+      importerDataKey: `${rowData[0]}__${index}` // this ensure the key is unique
+    };
+    columns.forEach((column, index) => {
+      row[column.key] = rowData[index];
+    });
+    return row;
+  });
+};

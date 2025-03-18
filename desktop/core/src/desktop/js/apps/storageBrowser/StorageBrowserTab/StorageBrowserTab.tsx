@@ -39,6 +39,7 @@ import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 import { inTrash } from '../../../utils/storageBrowserUtils';
 import { Alert } from 'antd';
+import ImporterFilePreviewPage from '../../importer/FilePreviewPage/FilePreviewPage';
 
 interface StorageBrowserTabProps {
   fileSystem: FileSystem;
@@ -123,6 +124,13 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
   ];
 
   const isLoading = loading || trashLoading;
+
+  const isCSV = fileStats?.path.endsWith('.csv');
+  const isExcel = fileStats?.path.endsWith('.xlsx');
+
+  if (isCSV || isExcel) {
+    return <ImporterFilePreviewPage path={fileStats?.path ?? ''} />;
+  }
 
   return (
     <LoadingErrorWrapper loading={isLoading} errors={errorConfig}>

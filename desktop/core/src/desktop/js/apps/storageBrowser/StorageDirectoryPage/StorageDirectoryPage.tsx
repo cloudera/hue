@@ -280,7 +280,7 @@ const StorageDirectoryPage = ({
               sortOrder={sortOrder}
               setSortOrder={setSortOrder}
               locale={{ emptyText: t('Folder is empty') }}
-              bodyHeight={tableBodyHeight}
+              scroll={{ y: tableBodyHeight }}
               testId={testId}
               pagination={pagination}
             />
