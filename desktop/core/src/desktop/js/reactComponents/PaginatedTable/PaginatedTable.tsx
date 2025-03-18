@@ -16,22 +16,21 @@
 
 import React, { HTMLAttributes } from 'react';
 import Table, { type ColumnProps } from 'cuix/dist/components/Table';
-import { TableLocale, RowSelectionType } from 'antd/lib/table/interface';
+import {
+  TableLocale,
+  RowSelectionType,
+  FilterValue,
+  SorterResult,
+  SortOrder
+} from 'antd/lib/table/interface';
 import { PanelRender } from 'rc-table/lib/interface';
 import type { TableProps as RcTableProps } from 'rc-table/lib/Table';
-import SortDescendingIcon from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
-import SortAscendingIcon from '@cloudera/cuix-core/icons/react/SortAscendingIcon';
 import Pagination, { PaginationProps } from '../Pagination/Pagination';
 
-import './Table.scss';
+import './PaginatedTable.scss';
+import { TablePaginationConfig } from 'antd/es/table';
 
-enum SortOrder {
-  ASC = 'ascending',
-  DSC = 'descending',
-  NONE = 'none'
-}
-
-export interface TableProps<T> {
+export interface PaginatedTableProps<T> {
   title?: PanelRender<T>;
   data: T[];
   columns: ColumnProps<T>[];
@@ -45,7 +44,7 @@ export interface TableProps<T> {
   setSortOrder?: (order: SortOrder) => void;
   testId?: string;
   rowKey: ((record: T) => string) | string;
-  pagination?: PaginationProps;
+  pagination?: Partial<PaginationProps>;
   rowClassName?: ((record: T) => string) | string;
 }
 
@@ -65,7 +64,7 @@ const PaginatedTable = <T extends object>({
   locale,
   rowKey,
   rowClassName
-}: TableProps<T>): JSX.Element => {
+}: PaginatedTableProps<T>): JSX.Element => {
   const rowSelection = onRowSelect
     ? {
         hideSelectAll: !data.length,
@@ -77,50 +76,25 @@ const PaginatedTable = <T extends object>({
       }
     : undefined;
 
-  const onColumnClick = (columnClicked: ColumnProps<T>['dataIndex']) => {
-    const isSortable = columns.find(col => col.dataIndex === columnClicked)?.sorter;
-    if (!isSortable || !setSortByColumn || !setSortOrder) {
-      return;
+  const onColumnClick = (
+    _: TablePaginationConfig,
+    __: Record<string, FilterValue | null>,
+    sorter: SorterResult<T> | SorterResult<T>[]
+  ) => {
+    const sorter1 = sorter && Array.isArray(sorter) ? sorter[0] : sorter;
+    if (sorter1?.order && setSortOrder && setSortByColumn) {
+      setSortOrder(sorter1.order);
+      setSortByColumn(sorter1.columnKey);
     }
-
-    if (columnClicked === sortByColumn) {
-      const nextOrder = {
-        [SortOrder.NONE]: SortOrder.ASC,
-        [SortOrder.ASC]: SortOrder.DSC,
-        [SortOrder.DSC]: SortOrder.NONE
-      }[sortOrder as SortOrder];
-      setSortOrder(nextOrder);
-      if (nextOrder === SortOrder.NONE) {
-        setSortByColumn(undefined);
-      }
-    } else {
-      setSortByColumn(columnClicked);
-      setSortOrder(SortOrder.ASC);
+    if (!sorter1.order && setSortByColumn) {
+      setSortByColumn(undefined);
     }
   };
 
   const getColumnsFromConfig = (columnsConfig: ColumnProps<T>[]) => {
     return columnsConfig.map(col => ({
       ...col,
-      sorter: false, // we have custom sorter
-      title: (
-        <div
-          className={`hue-table__header ${col.sorter ? 'hue-table__header--cursor-pointer' : ''}`}
-          onClick={() => {
-            if (col.sorter) {
-              onColumnClick(col.dataIndex);
-            }
-          }}
-        >
-          {typeof col.title === 'function' ? col.title({}) : col.title}
-          {col.dataIndex === sortByColumn && (
-            <>
-              {sortOrder === SortOrder.DSC && <SortDescendingIcon />}
-              {sortOrder === SortOrder.ASC && <SortAscendingIcon />}
-            </>
-          )}
-        </div>
-      )
+      defaultSortOrder: sortByColumn === col.dataIndex ? sortOrder : undefined
     }));
   };
 
@@ -129,6 +103,7 @@ const PaginatedTable = <T extends object>({
       <Table
         title={title}
         className="hue-table"
+        onChange={onColumnClick}
         columns={getColumnsFromConfig(columns)}
         dataSource={data}
         onRow={onRowClick}
@@ -141,14 +116,16 @@ const PaginatedTable = <T extends object>({
         locale={locale}
         sticky
       />
-      {pagination?.pageStats && pagination?.pageStats?.totalPages > 0 && (
-        <Pagination
-          setPageSize={pagination.setPageSize}
-          pageSize={pagination.pageSize}
-          setPageNumber={pagination.setPageNumber}
-          pageStats={pagination?.pageStats}
-        />
-      )}
+      {pagination?.pageStats &&
+        pagination?.pageStats?.totalPages > 0 &&
+        pagination.setPageNumber && (
+          <Pagination
+            setPageSize={pagination.setPageSize}
+            pageSize={pagination.pageSize}
+            setPageNumber={pagination.setPageNumber}
+            pageStats={pagination?.pageStats}
+          />
+        )}
     </>
   );
 };

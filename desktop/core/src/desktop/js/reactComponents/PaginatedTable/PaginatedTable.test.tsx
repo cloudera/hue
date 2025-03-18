@@ -16,7 +16,7 @@
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import Table, { SortOrder } from './PaginatedTable';
+import Table from './PaginatedTable';
 import { ColumnProps } from 'antd/lib/table';
 import '@testing-library/jest-dom';
 
@@ -90,72 +90,6 @@ describe('Table', () => {
     expect(handleRowClick).toHaveBeenCalled();
     expect(handleRowClick.mock.calls[0][0]).toEqual(mockData[0]);
     expect(mockClick).toHaveBeenCalled();
-  });
-
-  it('should not trigger sort for non-sortable column', () => {
-    const setSortByColumn = jest.fn();
-    const setSortOrder = jest.fn();
-
-    const { getByText } = render(
-      <Table
-        {...defaultProps}
-        columns={mockColumns}
-        sortByColumn="name"
-        sortOrder={SortOrder.NONE}
-        setSortByColumn={setSortByColumn}
-        setSortOrder={setSortOrder}
-      />
-    );
-
-    const ageHeader = getByText('Age').closest('.hue-table__header');
-    fireEvent.click(ageHeader as HTMLElement);
-
-    expect(setSortByColumn).not.toHaveBeenCalled();
-    expect(setSortOrder).not.toHaveBeenCalled();
-  });
-
-  it('handles sorting cycle: none -> asc -> desc -> none', () => {
-    const setSortByColumn = jest.fn();
-    const setSortOrder = jest.fn();
-
-    const { getByText, rerender } = render(
-      <Table
-        {...defaultProps}
-        sortByColumn="name"
-        sortOrder={SortOrder.NONE}
-        setSortByColumn={setSortByColumn}
-        setSortOrder={setSortOrder}
-      />
-    );
-
-    const nameHeader = getByText('Name').closest('.hue-table__header');
-    fireEvent.click(nameHeader as HTMLElement);
-    expect(setSortOrder).toHaveBeenCalledWith(SortOrder.ASC);
-
-    rerender(
-      <Table
-        {...defaultProps}
-        sortByColumn="name"
-        sortOrder={SortOrder.ASC}
-        setSortByColumn={setSortByColumn}
-        setSortOrder={setSortOrder}
-      />
-    );
-    fireEvent.click(nameHeader as HTMLElement);
-    expect(setSortOrder).toHaveBeenCalledWith(SortOrder.DSC);
-
-    rerender(
-      <Table
-        {...defaultProps}
-        sortByColumn="name"
-        sortOrder={SortOrder.DSC}
-        setSortByColumn={setSortByColumn}
-        setSortOrder={setSortOrder}
-      />
-    );
-    fireEvent.click(nameHeader as HTMLElement);
-    expect(setSortOrder).toHaveBeenCalledWith(SortOrder.NONE);
-    expect(setSortByColumn).toHaveBeenCalledWith(undefined);
   });
 
   it('renders pagination when provided with valid stats', () => {

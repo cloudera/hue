@@ -81,7 +81,7 @@ const StorageDirectoryPage = ({
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [sortByColumn, setSortByColumn] =
     useState<ColumnProps<StorageDirectoryTableData>['dataIndex']>();
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const { t } = i18nReact.useTranslation();
@@ -98,7 +98,7 @@ const StorageDirectoryPage = ({
       pagenum: pageNumber.toString(),
       filter: searchTerm,
       sortby: sortByColumn,
-      descending: sortOrder === SortOrder.DSC ? 'true' : 'false'
+      descending: sortOrder === 'ascend' ? 'true' : 'false'
     },
     skip:
       fileStats.path === '' ||
@@ -230,15 +230,6 @@ const StorageDirectoryPage = ({
     }
   ];
 
-  const pagination = filesData?.page
-    ? {
-        pageSize,
-        setPageSize,
-        setPageNumber,
-        pageStats: filesData.page
-      }
-    : undefined;
-
   return (
     <div className="hue-storage-browser-directory">
       <div className="hue-storage-browser-directory__actions-bar">
@@ -284,7 +275,12 @@ const StorageDirectoryPage = ({
               locale={{ emptyText: t('Folder is empty') }}
               scroll={{ y: tableBodyHeight }}
               testId={testId}
-              pagination={pagination}
+              pagination={{
+                pageSize,
+                setPageSize,
+                setPageNumber,
+                pageStats: filesData?.page
+              }}
             />
           </LoadingErrorWrapper>
         </DragAndDrop>

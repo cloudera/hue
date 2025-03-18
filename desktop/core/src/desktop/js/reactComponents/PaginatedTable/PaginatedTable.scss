@@ -18,21 +18,6 @@
 @use 'mixins';
 
 .hue-table {
-  &__header {
-    display: flex;
-    align-items: center;
-
-    &--cursor-pointer {
-      cursor: pointer;
-    }
-  }
-
-  tr {
-    :hover {
-      cursor: pointer;
-    }
-  }
-
   .ant-table-cell {
     @include mixins.nowrap-ellipsis;
   }
