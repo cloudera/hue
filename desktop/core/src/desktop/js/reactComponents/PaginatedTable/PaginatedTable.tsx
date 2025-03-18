@@ -24,7 +24,7 @@ import {
   SortOrder
 } from 'antd/lib/table/interface';
 import { PanelRender } from 'rc-table/lib/interface';
-import type { TableProps as RcTableProps } from 'rc-table/lib/Table';
+import type { TableProps } from 'rc-table/lib/Table';
 import Pagination, { PaginationProps } from '../Pagination/Pagination';
 
 import './PaginatedTable.scss';
@@ -37,7 +37,7 @@ export interface PaginatedTableProps<T> {
   onRowClick?: (record: T) => HTMLAttributes<HTMLElement>;
   locale?: TableLocale;
   onRowSelect?: (selectedRows: T[]) => void;
-  scroll?: RcTableProps<T>['scroll'];
+  scroll?: TableProps<T>['scroll'];
   sortByColumn?: ColumnProps<T>['dataIndex'];
   sortOrder?: SortOrder;
   setSortByColumn?: (column: ColumnProps<T>['dataIndex']) => void;
