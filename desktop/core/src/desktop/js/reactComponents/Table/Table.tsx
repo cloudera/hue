@@ -18,6 +18,7 @@ import React, { HTMLAttributes } from 'react';
 import AntdTable, { type ColumnProps } from 'cuix/dist/components/Table';
 import { TableLocale, RowSelectionType } from 'antd/lib/table/interface';
 import { PanelRender } from 'rc-table/lib/interface';
+import type { TableProps as RcTableProps } from 'rc-table/lib/Table';
 import SortDescendingIcon from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
 import SortAscendingIcon from '@cloudera/cuix-core/icons/react/SortAscendingIcon';
 import Pagination, { PaginationProps } from '../Pagination/Pagination';
@@ -37,7 +38,7 @@ export interface TableProps<T> {
   onRowClick?: (record: T) => HTMLAttributes<HTMLElement>;
   locale?: TableLocale;
   onRowSelect?: (selectedRows: T[]) => void;
-  bodyHeight?: number;
+  scroll?: RcTableProps<T>['scroll'];
   sortByColumn?: ColumnProps<T>['dataIndex'];
   sortOrder?: SortOrder;
   setSortByColumn?: (column: ColumnProps<T>['dataIndex']) => void;
@@ -54,7 +55,7 @@ function Table<T extends object>({
   columns,
   onRowClick,
   onRowSelect,
-  bodyHeight,
+  scroll,
   sortByColumn,
   sortOrder,
   setSortByColumn,
@@ -135,7 +136,7 @@ function Table<T extends object>({
         rowClassName={rowClassName}
         rowKey={rowKey}
         rowSelection={rowSelection}
-        scroll={{ y: bodyHeight ?? '100%' }}
+        scroll={scroll}
         data-testid={testId}
         locale={locale}
         sticky
