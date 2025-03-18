@@ -18,10 +18,6 @@
 @use 'mixins';
 
 .hue-table {
-  th {
-    background-color: vars.$fluidx-gray-040 !important;
-  }
-
   &__header {
     display: flex;
     align-items: center;

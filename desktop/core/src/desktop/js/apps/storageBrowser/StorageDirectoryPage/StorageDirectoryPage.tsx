@@ -48,7 +48,10 @@ import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUpload
 import { useWindowSize } from '../../../utils/hooks/useWindowSize/useWindowSize';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import StorageDirectoryActions from './StorageDirectoryActions/StorageDirectoryActions';
-import Table, { SortOrder, ColumnProps } from '../../../reactComponents/Table/Table';
+import PaginatedTable, {
+  SortOrder,
+  ColumnProps
+} from '../../../reactComponents/PaginatedTable/PaginatedTable';
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
@@ -268,7 +271,7 @@ const StorageDirectoryPage = ({
             loading={(loadingFiles || listDirectoryLoading) && !polling}
             errors={errorConfig}
           >
-            <Table<StorageDirectoryTableData>
+            <PaginatedTable<StorageDirectoryTableData>
               data={tableData}
               columns={columnsConfig}
               rowKey={r => `${r.path}_${r.type}_${r.mtime}`}

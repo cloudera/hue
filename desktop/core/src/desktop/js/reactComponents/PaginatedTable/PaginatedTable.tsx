@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React, { HTMLAttributes } from 'react';
-import AntdTable, { type ColumnProps } from 'cuix/dist/components/Table';
+import Table, { type ColumnProps } from 'cuix/dist/components/Table';
 import { TableLocale, RowSelectionType } from 'antd/lib/table/interface';
 import { PanelRender } from 'rc-table/lib/interface';
 import type { TableProps as RcTableProps } from 'rc-table/lib/Table';
@@ -49,7 +49,7 @@ export interface TableProps<T> {
   rowClassName?: ((record: T) => string) | string;
 }
 
-function Table<T extends object>({
+const PaginatedTable = <T extends object>({
   title,
   data,
   columns,
@@ -65,7 +65,7 @@ function Table<T extends object>({
   locale,
   rowKey,
   rowClassName
-}: TableProps<T>): JSX.Element {
+}: TableProps<T>): JSX.Element => {
   const rowSelection = onRowSelect
     ? {
         hideSelectAll: !data.length,
@@ -126,7 +126,7 @@ function Table<T extends object>({
 
   return (
     <>
-      <AntdTable
+      <Table
         title={title}
         className="hue-table"
         columns={getColumnsFromConfig(columns)}
@@ -151,7 +151,7 @@ function Table<T extends object>({
       )}
     </>
   );
-}
+};
 
-export default Table;
+export default PaginatedTable;
 export { ColumnProps, TableLocale, RowSelectionType, SortOrder };

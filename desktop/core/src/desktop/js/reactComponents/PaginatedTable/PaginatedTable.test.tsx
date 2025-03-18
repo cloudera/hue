@@ -16,7 +16,7 @@
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import Table, { SortOrder } from './Table';
+import Table, { SortOrder } from './PaginatedTable';
 import { ColumnProps } from 'antd/lib/table';
 import '@testing-library/jest-dom';
 
