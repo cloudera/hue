@@ -32,7 +32,9 @@ export interface RegularFile {
   error?: Error;
 }
 
-// Interface for file upload in chunk.
+// Interface for file upload in chunks.
+// One RegularFile can be broken down into multiple ChunkedFile.
+// And each ChunkedFile can be uploaded independently and combined at backed server
 export interface ChunkedFile extends Omit<RegularFile, 'file'> {
   file: Blob; // storing only part of the file to avoid big file duplication
   fileName: string;
