@@ -17,11 +17,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import useRegularUpload from './useRegularUpload';
 import useChunkUpload from './useChunkUpload';
-import { getNewFileItems, UploadItem, UploadItemVariables } from './util';
-import {
-  DEFAULT_CONCURRENT_MAX_CONNECTIONS,
-  FileUploadStatus
-} from '../../constants/storageBrowser';
+import { getNewFileItems, UploadItem, UploadItemVariables, UploadStatus } from './util';
+import { DEFAULT_CONCURRENT_MAX_CONNECTIONS } from '../../constants/storageBrowser';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 
 interface UseUploadQueueResponse {
@@ -89,9 +86,9 @@ const useFileUpload = (
   const onCancel = useCallback(
     (item: UploadItem) => {
       const queueItem = findQueueItem(item);
-      if (queueItem.status === FileUploadStatus.Pending) {
+      if (queueItem.status === UploadStatus.Pending) {
         const error = new Error('Upload cancelled');
-        onItemUpdate(item.uuid, { status: FileUploadStatus.Canceled, error });
+        onItemUpdate(item.uuid, { status: UploadStatus.Cancelled, error });
 
         if (isChunkUpload) {
           removeFromChunkUpload(item.uuid);

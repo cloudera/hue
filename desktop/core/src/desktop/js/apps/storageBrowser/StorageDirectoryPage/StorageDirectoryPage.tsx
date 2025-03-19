@@ -36,14 +36,10 @@ import formatBytes from '../../../utils/formatBytes';
 import './StorageDirectoryPage.scss';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
-import {
-  DEFAULT_PAGE_SIZE,
-  DEFAULT_POLLING_TIME,
-  FileUploadStatus
-} from '../../../utils/constants/storageBrowser';
+import { DEFAULT_PAGE_SIZE, DEFAULT_POLLING_TIME } from '../../../utils/constants/storageBrowser';
 import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
-import { UploadItem } from '../../../utils/hooks/useFileUpload/util';
+import { UploadItem, UploadStatus } from '../../../utils/hooks/useFileUpload/util';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
 import { useWindowSize } from '../../../utils/hooks/useWindowSize/useWindowSize';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
@@ -152,7 +148,7 @@ const StorageDirectoryPage = ({
         file,
         filePath: fileStats.path,
         uuid: UUID(),
-        status: FileUploadStatus.Pending
+        status: UploadStatus.Pending
       };
     });
     setPolling(true);

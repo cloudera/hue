@@ -16,12 +16,9 @@
 
 import useQueueProcessor from '../useQueueProcessor/useQueueProcessor';
 import { UPLOAD_FILE_URL } from '../../../apps/storageBrowser/api';
-import {
-  DEFAULT_CONCURRENT_MAX_CONNECTIONS,
-  FileUploadStatus
-} from '../../constants/storageBrowser';
+import { DEFAULT_CONCURRENT_MAX_CONNECTIONS } from '../../constants/storageBrowser';
 import useSaveData from '../useSaveData/useSaveData';
-import { getItemProgress, UploadItem, UploadItemVariables } from './util';
+import { getItemProgress, UploadItem, UploadItemVariables, UploadStatus } from './util';
 
 interface UseUploadQueueResponse {
   addFiles: (item: UploadItem[]) => void;
@@ -50,7 +47,7 @@ const useRegularUpload = ({
   });
 
   const processUploadItem = async (item: UploadItem) => {
-    onItemUpdate(item.uuid, { status: FileUploadStatus.Uploading });
+    onItemUpdate(item.uuid, { status: UploadStatus.Uploading });
 
     const payload = new FormData();
     payload.append('file', item.file);
@@ -58,10 +55,10 @@ const useRegularUpload = ({
 
     return save(payload, {
       onSuccess: () => {
-        onItemUpdate(item.uuid, { status: FileUploadStatus.Uploaded });
+        onItemUpdate(item.uuid, { status: UploadStatus.Uploaded });
       },
       onError: error => {
-        onItemUpdate(item.uuid, { status: FileUploadStatus.Failed, error });
+        onItemUpdate(item.uuid, { status: UploadStatus.Failed, error });
       },
       postOptions: {
         onUploadProgress: progress => {

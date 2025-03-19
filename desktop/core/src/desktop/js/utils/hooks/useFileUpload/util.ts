@@ -14,7 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FileUploadStatus } from '../../../utils/constants/storageBrowser';
 import { CHUNK_UPLOAD_URL, CHUNK_UPLOAD_COMPLETE_URL } from '../../../apps/storageBrowser/api';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
 
@@ -22,9 +21,17 @@ export interface UploadItem {
   uuid: string;
   filePath: string;
   file: File;
-  status: FileUploadStatus;
+  status: UploadStatus;
   progress?: number;
   error?: Error;
+}
+
+export enum UploadStatus {
+  Pending = 'Pending',
+  Uploading = 'Uploading',
+  Uploaded = 'Uploaded',
+  Cancelled = 'Cancelled',
+  Failed = 'Failed'
 }
 
 export interface UploadItemVariables

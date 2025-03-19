@@ -15,23 +15,22 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import FileUploadQueue from './FileUploadQueue';
-import { FileUploadStatus } from '../../utils/constants/storageBrowser';
-import { UploadItem } from '../../utils/hooks/useFileUpload/util';
+import { UploadItem, UploadStatus } from '../../utils/hooks/useFileUpload/util';
 
 const mockFilesQueue: UploadItem[] = [
   {
     uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx1',
     filePath: '/path/to/file1.txt',
-    status: FileUploadStatus.Pending,
+    status: UploadStatus.Pending,
     file: new File([], 'file1.txt')
   },
   {
     uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx2',
     filePath: '/path/to/file2.txt',
-    status: FileUploadStatus.Pending,
+    status: UploadStatus.Pending,
     file: new File([], 'file2.txt')
   }
 ];
@@ -55,19 +54,6 @@ describe('FileUploadQueue', () => {
     expect(getByText('file2.txt')).toBeInTheDocument();
   });
 
-  it('should call onCancel when cancel button is clicked', async () => {
-    const { getAllByTestId } = render(
-      <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
-    );
-
-    const cancelButton = getAllByTestId('upload-queue__list__row__content__close-icon')[0];
-    fireEvent.click(cancelButton);
-
-    await waitFor(() => {
-      expect(mockOnCancel).toHaveBeenCalled();
-    });
-  });
-
   it('should toggle the visibility of the queue when the header is clicked', () => {
     const { getByTestId } = render(
       <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
@@ -84,17 +70,5 @@ describe('FileUploadQueue', () => {
     fireEvent.click(header!);
     expect(screen.getByText('file1.txt')).toBeInTheDocument();
     expect(screen.getByText('file2.txt')).toBeInTheDocument();
-  });
-
-  it('should render cancel button for files in Pending state', () => {
-    const { getAllByTestId } = render(
-      <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
-    );
-
-    const cancelButtons = getAllByTestId('upload-queue__list__row__content__close-icon');
-    expect(cancelButtons).toHaveLength(mockFilesQueue.length);
-
-    expect(cancelButtons[0]).toBeInTheDocument();
-    expect(cancelButtons[1]).toBeInTheDocument();
   });
 });

@@ -15,23 +15,15 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
-import './FileUploadQueue.scss';
-import { Tooltip } from 'antd';
 import CloseIcon from '../../components/icons/CloseIcon';
 import { i18nReact } from '../../utils/i18nReact';
-import formatBytes from '../../utils/formatBytes';
-import StatusPendingIcon from '@cloudera/cuix-core/icons/react/StatusPendingIcon';
-import StatusInProgressIcon from '@cloudera/cuix-core/icons/react/StatusInProgressIcon';
-import StatusSuccessIcon from '@cloudera/cuix-core/icons/react/StatusSuccessIcon';
-import StatusStoppedIcon from '@cloudera/cuix-core/icons/react/StatusStoppedIcon';
-import StatusErrorIcon from '@cloudera/cuix-core/icons/react/StatusErrorIcon';
-import { UploadItem } from '../../utils/hooks/useFileUpload/util';
+import { UploadItem, UploadStatus } from '../../utils/hooks/useFileUpload/util';
 import useFileUpload from '../../utils/hooks/useFileUpload/useFileUpload';
-import {
-  DEFAULT_ENABLE_CHUNK_UPLOAD,
-  FileUploadStatus
-} from '../../utils/constants/storageBrowser';
+import { DEFAULT_ENABLE_CHUNK_UPLOAD } from '../../utils/constants/storageBrowser';
 import { getLastKnownConfig } from '../../config/hueConfig';
+import FileUploadRow from './FileUploadRow/FileUploadRow';
+
+import './FileUploadQueue.scss';
 
 interface FileUploadQueueProps {
   filesQueue: UploadItem[];
@@ -40,12 +32,12 @@ interface FileUploadQueueProps {
 }
 
 const sortOrder = [
-  FileUploadStatus.Uploading,
-  FileUploadStatus.Failed,
-  FileUploadStatus.Pending,
-  FileUploadStatus.Canceled,
-  FileUploadStatus.Uploaded
-].reduce((acc: Record<string, number>, status: FileUploadStatus, index: number) => {
+  UploadStatus.Uploading,
+  UploadStatus.Failed,
+  UploadStatus.Pending,
+  UploadStatus.Cancelled,
+  UploadStatus.Uploaded
+].reduce((acc: Record<string, number>, status: UploadStatus, index: number) => {
   acc[status] = index + 1;
   return acc;
 }, {});
@@ -64,20 +56,10 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
     onComplete
   });
 
-  const uploadedCount = uploadQueue.filter(
-    item => item.status === FileUploadStatus.Uploaded
-  ).length;
+  const uploadedCount = uploadQueue.filter(item => item.status === UploadStatus.Uploaded).length;
   const pendingCount = uploadQueue.filter(
-    item => item.status === FileUploadStatus.Pending || item.status === FileUploadStatus.Uploading
+    item => item.status === UploadStatus.Pending || item.status === UploadStatus.Uploading
   ).length;
-
-  const statusIcon = {
-    [FileUploadStatus.Pending]: <StatusPendingIcon />,
-    [FileUploadStatus.Uploading]: <StatusInProgressIcon />,
-    [FileUploadStatus.Uploaded]: <StatusSuccessIcon />,
-    [FileUploadStatus.Canceled]: <StatusStoppedIcon />,
-    [FileUploadStatus.Failed]: <StatusErrorIcon />
-  };
 
   return (
     <div className="upload-queue cuix antd">
@@ -100,41 +82,11 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
           {uploadQueue
             .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
             .map((row: UploadItem) => (
-              <div key={`${row.filePath}__${row.file.name}`} className="upload-queue__list__row">
-                <div className="upload-queue__list__row__content">
-                  <Tooltip
-                    title={row.status}
-                    mouseEnterDelay={1.5}
-                    className="upload-queue__list__row__content__status"
-                  >
-                    {statusIcon[row.status]}
-                  </Tooltip>
-                  <div className="upload-queue__list__row__content__name">{row.file.name}</div>
-                  <div className="upload-queue__list__row__content__size">
-                    {formatBytes(row.file.size)}
-                  </div>
-                  {row.status === FileUploadStatus.Pending && (
-                    <Tooltip
-                      title={t('Cancel')}
-                      mouseEnterDelay={1.5}
-                      className="upload-queue__list__row__content__close"
-                    >
-                      <CloseIcon
-                        data-testid="upload-queue__list__row__content__close-icon"
-                        onClick={() => onCancel(row)}
-                        height={16}
-                        width={16}
-                      />
-                    </Tooltip>
-                  )}
-                </div>
-                <div
-                  className="upload-queue__list__row__progress"
-                  style={{
-                    width: `${row.status === FileUploadStatus.Uploading ? row.progress : 0}%`
-                  }}
-                />
-              </div>
+              <FileUploadRow
+                key={`${row.filePath}__${row.file.name}`}
+                data={row}
+                onCancel={() => onCancel(row)}
+              />
             ))}
         </div>
       )}

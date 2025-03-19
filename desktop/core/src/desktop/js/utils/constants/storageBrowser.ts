@@ -31,14 +31,6 @@ export enum SupportedFileTypes {
   OTHER = 'other'
 }
 
-export enum FileUploadStatus {
-  Pending = 'Pending',
-  Uploading = 'Uploading',
-  Uploaded = 'Uploaded',
-  Canceled = 'Canceled',
-  Failed = 'Failed'
-}
-
 export const SUPPORTED_FILE_EXTENSIONS: Record<string, SupportedFileTypes> = {
   png: SupportedFileTypes.IMAGE,
   jpg: SupportedFileTypes.IMAGE,

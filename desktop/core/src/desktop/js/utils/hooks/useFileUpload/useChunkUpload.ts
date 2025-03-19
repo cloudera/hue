@@ -20,8 +20,7 @@ import useSaveData from '../useSaveData/useSaveData';
 import useQueueProcessor from '../useQueueProcessor/useQueueProcessor';
 import {
   DEFAULT_CHUNK_SIZE,
-  DEFAULT_CONCURRENT_MAX_CONNECTIONS,
-  FileUploadStatus
+  DEFAULT_CONCURRENT_MAX_CONNECTIONS
 } from '../../constants/storageBrowser';
 import useLoadData from '../useLoadData/useLoadData';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
@@ -37,7 +36,8 @@ import {
   getChunkSinglePayload,
   createChunks,
   getStatusHashMap,
-  AvailableServerSpaceResponse
+  AvailableServerSpaceResponse,
+  UploadStatus
 } from './util';
 import { UPLOAD_AVAILABLE_SPACE_URL } from '../../../apps/storageBrowser/api';
 
@@ -76,7 +76,7 @@ const useChunkUpload = ({
   );
 
   const onError = (chunkItem: UploadChunkItem) => (error: Error) => {
-    onItemUpdate(chunkItem.uuid, { status: FileUploadStatus.Failed, error });
+    onItemUpdate(chunkItem.uuid, { status: UploadStatus.Failed, error });
   };
 
   const processChunkUploadStatus = (tasksStatus?: TaskServerResponse[]) => {
@@ -87,7 +87,7 @@ const useChunkUpload = ({
           const status = statusMap[uuid];
           if (status === TaskStatus.Success || status === TaskStatus.Failure) {
             const ItemStatus =
-              status === TaskStatus.Success ? FileUploadStatus.Uploaded : FileUploadStatus.Failed;
+              status === TaskStatus.Success ? UploadStatus.Uploaded : UploadStatus.Failed;
             onItemUpdate(uuid, { status: ItemStatus });
             delete prev[uuid];
           }
@@ -185,7 +185,7 @@ const useChunkUpload = ({
     const isFirstChunk = !chunksInProgress[chunkItem.uuid];
 
     if (isFirstChunk) {
-      onItemUpdate(chunkItem.uuid, { status: FileUploadStatus.Uploading });
+      onItemUpdate(chunkItem.uuid, { status: UploadStatus.Uploading });
       const availableSpace = await getAvailableSpace();
       if (!availableSpace || availableSpace?.uploadAvailableSpace < chunkItem.totalSize) {
         const error = new Error('Upload server ran out of space. Try again later.');
