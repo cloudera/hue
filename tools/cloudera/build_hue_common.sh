@@ -351,7 +351,7 @@ function redhat8_install() {
       yum install -y nodejs'
     # Pip modules install
     sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
     # sqlite3 install
     sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \

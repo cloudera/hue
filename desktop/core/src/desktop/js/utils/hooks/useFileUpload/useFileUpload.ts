@@ -17,82 +17,90 @@
 import { useCallback, useEffect, useState } from 'react';
 import useRegularUpload from './useRegularUpload';
 import useChunkUpload from './useChunkUpload';
-import { getNewFileItems, UploadItem } from './util';
-import {
-  DEFAULT_CONCURRENT_MAX_CONNECTIONS,
-  FileUploadStatus
-} from '../../constants/storageBrowser';
+import { DEFAULT_CONCURRENT_MAX_CONNECTIONS } from '../../constants/storageBrowser';
 import { getLastKnownConfig } from '../../../config/hueConfig';
+import { getNewRegularFiles } from './utils';
+import { FileStatus, RegularFile, FileVariables } from './types';
 
 interface UseUploadQueueResponse {
-  uploadQueue: UploadItem[];
-  onCancel: (item: UploadItem) => void;
+  uploadQueue: RegularFile[];
+  onCancel: (item: RegularFile) => void;
   isLoading: boolean;
 }
 
 interface UploadQueueOptions {
   isChunkUpload?: boolean;
-  onComplete: () => UploadItem[] | void;
+  onComplete: () => RegularFile[] | void;
 }
 
 const useFileUpload = (
-  filesQueue: UploadItem[],
+  filesQueue: RegularFile[],
   { isChunkUpload = false, onComplete }: UploadQueueOptions
 ): UseUploadQueueResponse => {
   const config = getLastKnownConfig();
   const concurrentProcess =
     config?.storage_browser.concurrent_max_connection ?? DEFAULT_CONCURRENT_MAX_CONNECTIONS;
 
-  const [uploadQueue, setUploadQueue] = useState<UploadItem[]>([]);
+  const [uploadQueue, setUploadQueue] = useState<RegularFile[]>([]);
 
-  const onStatusUpdate = (item: UploadItem, newStatus: FileUploadStatus) =>
-    setUploadQueue(prev =>
-      prev.map(queueItem =>
-        queueItem.uuid === item.uuid ? { ...queueItem, status: newStatus } : queueItem
-      )
-    );
-
-  const findQueueItem = (item: UploadItem) =>
-    uploadQueue.filter(queueItem => queueItem.uuid === item.uuid)?.[0];
+  const updateFileVariables = (
+    itemId: RegularFile['uuid'],
+    { status, error, progress }: FileVariables
+  ) => {
+    setUploadQueue(prev => {
+      return prev.map(queueItem => {
+        if (queueItem.uuid === itemId) {
+          return {
+            ...queueItem,
+            status: status ?? queueItem.status,
+            error: error ?? queueItem.error,
+            progress: progress ?? queueItem.progress
+          };
+        }
+        return queueItem;
+      });
+    });
+  };
 
   const {
     addFiles: addToChunkUpload,
-    removeFile: removeFromChunkUpload,
+    cancelFile: cancelFromChunkUpload,
     isLoading: isChunkLoading
   } = useChunkUpload({
     concurrentProcess,
-    onStatusUpdate,
+    updateFileVariables,
     onComplete
   });
 
   const {
     addFiles: addToRegularUpload,
-    removeFile: removeFromRegularUpload,
-    isLoading: isNonChunkLoading
+    cancelFile: cancelFromRegularUpload,
+    isLoading: isRegularLoading
   } = useRegularUpload({
     concurrentProcess,
-    onStatusUpdate,
+    updateFileVariables,
     onComplete
   });
 
   const onCancel = useCallback(
-    (item: UploadItem) => {
-      const queueItem = findQueueItem(item);
-      if (queueItem.status === FileUploadStatus.Pending) {
-        onStatusUpdate(item, FileUploadStatus.Canceled);
+    (item: RegularFile) => {
+      const queueItem = uploadQueue.find(q => q.uuid === item.uuid);
+      if (queueItem?.status === FileStatus.Pending) {
+        const error = new Error('Upload cancelled');
+        updateFileVariables(item.uuid, { status: FileStatus.Cancelled, error });
 
         if (isChunkUpload) {
-          removeFromChunkUpload(item);
+          cancelFromChunkUpload(item.uuid);
         } else {
-          removeFromRegularUpload(item);
+          cancelFromRegularUpload(item.uuid);
         }
       }
     },
-    [isChunkUpload, onStatusUpdate, removeFromChunkUpload, removeFromRegularUpload]
+    [isChunkUpload, updateFileVariables, cancelFromChunkUpload, cancelFromRegularUpload]
   );
 
   useEffect(() => {
-    const newQueueItems = getNewFileItems(filesQueue, uploadQueue);
+    const newQueueItems = getNewRegularFiles(filesQueue, uploadQueue);
 
     if (newQueueItems.length > 0) {
       setUploadQueue(prev => [...prev, ...newQueueItems]);
@@ -105,7 +113,7 @@ const useFileUpload = (
     }
   }, [filesQueue, uploadQueue, isChunkUpload]);
 
-  return { uploadQueue, onCancel, isLoading: isChunkLoading || isNonChunkLoading };
+  return { uploadQueue, onCancel, isLoading: isChunkLoading || isRegularLoading };
 };
 
 export default useFileUpload;

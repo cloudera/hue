@@ -36,19 +36,18 @@ import formatBytes from '../../../utils/formatBytes';
 import './StorageDirectoryPage.scss';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
-import {
-  DEFAULT_PAGE_SIZE,
-  DEFAULT_POLLING_TIME,
-  FileUploadStatus
-} from '../../../utils/constants/storageBrowser';
+import { DEFAULT_PAGE_SIZE, DEFAULT_POLLING_TIME } from '../../../utils/constants/storageBrowser';
 import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
-import { UploadItem } from '../../../utils/hooks/useFileUpload/util';
+import { RegularFile, FileStatus } from '../../../utils/hooks/useFileUpload/types';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
 import { useWindowSize } from '../../../utils/hooks/useWindowSize/useWindowSize';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import StorageDirectoryActions from './StorageDirectoryActions/StorageDirectoryActions';
-import Table, { SortOrder, ColumnProps } from '../../../reactComponents/Table/Table';
+import PaginatedTable, {
+  SortOrder,
+  ColumnProps
+} from '../../../reactComponents/PaginatedTable/PaginatedTable';
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
@@ -71,14 +70,14 @@ const StorageDirectoryPage = ({
 }: StorageDirectoryPageProps): JSX.Element => {
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
-  const [filesToUpload, setFilesToUpload] = useState<UploadItem[]>([]);
+  const [filesToUpload, setFilesToUpload] = useState<RegularFile[]>([]);
   const [polling, setPolling] = useState<boolean>(false);
 
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [sortByColumn, setSortByColumn] =
     useState<ColumnProps<StorageDirectoryTableData>['dataIndex']>();
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const { t } = i18nReact.useTranslation();
@@ -93,9 +92,9 @@ const StorageDirectoryPage = ({
       path: fileStats.path,
       pagesize: pageSize.toString(),
       pagenum: pageNumber.toString(),
-      filter: searchTerm,
+      filter: searchTerm !== '' ? searchTerm : undefined,
       sortby: sortByColumn,
-      descending: sortOrder === SortOrder.DSC ? 'true' : 'false'
+      descending: sortOrder !== null ? sortOrder === 'descend' : undefined
     },
     skip:
       fileStats.path === '' ||
@@ -149,7 +148,7 @@ const StorageDirectoryPage = ({
         file,
         filePath: fileStats.path,
         uuid: UUID(),
-        status: FileUploadStatus.Pending
+        status: FileStatus.Pending
       };
     });
     setPolling(true);
@@ -227,15 +226,6 @@ const StorageDirectoryPage = ({
     }
   ];
 
-  const pagination = filesData?.page
-    ? {
-        pageSize,
-        setPageSize,
-        setPageNumber,
-        pageStats: filesData.page
-      }
-    : undefined;
-
   return (
     <div className="hue-storage-browser-directory">
       <div className="hue-storage-browser-directory__actions-bar">
@@ -268,7 +258,7 @@ const StorageDirectoryPage = ({
             loading={(loadingFiles || listDirectoryLoading) && !polling}
             errors={errorConfig}
           >
-            <Table<StorageDirectoryTableData>
+            <PaginatedTable<StorageDirectoryTableData>
               data={tableData}
               columns={columnsConfig}
               rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
@@ -279,9 +269,14 @@ const StorageDirectoryPage = ({
               sortOrder={sortOrder}
               setSortOrder={setSortOrder}
               locale={{ emptyText: t('Folder is empty') }}
-              bodyHeight={tableBodyHeight}
+              scroll={{ y: tableBodyHeight }}
               testId={testId}
-              pagination={pagination}
+              pagination={{
+                pageSize,
+                setPageSize,
+                setPageNumber,
+                pageStats: filesData?.page
+              }}
             />
           </LoadingErrorWrapper>
         </DragAndDrop>

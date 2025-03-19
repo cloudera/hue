@@ -24,9 +24,15 @@ import PagePreviousIcon from '@cloudera/cuix-core/icons/react/PagePreviousIcon';
 import PageNextIcon from '@cloudera/cuix-core/icons/react/PageNextIcon';
 import PageLastIcon from '@cloudera/cuix-core/icons/react/PageLastIcon';
 import DropdownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
-import { PageStats } from '../../apps/storageBrowser/types';
 
 import './Pagination.scss';
+
+export interface PageStats {
+  pageNumber: number;
+  totalPages: number;
+  pageSize: number;
+  totalSize: number;
+}
 
 export interface PaginationProps {
   setPageNumber: (pageNumber: number) => void;

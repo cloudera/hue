@@ -15,35 +15,20 @@
 // limitations under the License.
 
 @use 'variables' as vars;
+@use 'mixins';
 
-.antd.cuix {
-  .upload-queue {
-    position: fixed;
-    bottom: 0;
-    right: 16px;
-    width: 520px;
-    background-color: vars.$fluidx-white;
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+.hue-table {
+  .ant-table-cell {
+    @include mixins.nowrap-ellipsis;
+  }
 
-    &__header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px;
-      color: vars.$fluidx-gray-900;
-      background-color: vars.$fluidx-gray-050;
-      cursor: pointer;
-      font-size: 16px;
-    }
+  .ant-table-selection-column {
+    // This prevents the eplipses from being applied to the selection column
+    text-overflow: initial !important;
+  }
 
-    &__list {
-      display: flex;
-      flex-direction: column;
-      max-height: 40vh;
-      overflow: auto;
-      padding: 16px;
-      gap: 16px;
-    }
+  .ant-table-placeholder {
+    height: 100px;
+    text-align: center;
   }
 }
