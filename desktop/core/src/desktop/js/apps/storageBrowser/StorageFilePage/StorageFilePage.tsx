@@ -232,6 +232,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
               )}
 
               {fileType === SupportedFileTypes.AUDIO && (
+                /* eslint-disable-next-line jsx-a11y/media-has-caption */
                 <audio controls preload="auto" data-testid="preview__content__audio">
                   <source src={filePreviewUrl} />
                   {t('Your browser does not support the audio element.')}
@@ -239,6 +240,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
               )}
 
               {fileType === SupportedFileTypes.VIDEO && (
+                /* eslint-disable-next-line jsx-a11y/media-has-caption */
                 <video controls preload="auto" data-testid="preview__content__video">
                   <source src={filePreviewUrl} />
                   {t('Your browser does not support the video element.')}
