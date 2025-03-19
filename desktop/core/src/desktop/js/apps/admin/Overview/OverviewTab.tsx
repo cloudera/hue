@@ -20,18 +20,14 @@ import Examples from './Examples';
 import ConfigStatus from './ConfigStatus';
 import Analytics from './Analytics';
 import { i18nReact } from '../../../utils/i18nReact';
-// import { getLastKnownConfig } from '../../../config/hueConfig';
+import { getLastKnownConfig } from '../../../config/hueConfig';
 import './Overview.scss';
 
 const Overview = (): JSX.Element | null => {
   const { t } = i18nReact.useTranslation();
-  // const [isAdmin, setIsAdmin] = useState(false);
 
-  // useEffect(() => {
-  // const config = getLastKnownConfig();
-  // setIsAdmin(config?.hue_config.is_admin ?? false);
-  // }, []);
-
+  const config = getLastKnownConfig();
+  const isAdmin = config?.hue_config.is_admin ?? false;
   const items = [
     {
       label: t('ConfigStatus'),
@@ -50,19 +46,14 @@ const Overview = (): JSX.Element | null => {
     }
   ];
 
-  // if (!isAdmin) {
-  //     // console.log('User is not admin, rendering null.');
-  //   return null;
-  // }
-
-  return (
+  return isAdmin ? (
     <div className="hue-overview-component">
       <Tabs tabPosition="left" items={items} />
       <div className="config__trademark-text">
         Hue and the Hue logo are trademarks of Cloudera, Inc.
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export default Overview;
