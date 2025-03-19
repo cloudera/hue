@@ -168,10 +168,10 @@ $(document).ready(function () {
     });
   });
 
-  $("#updateSkipWizard").prop('checked', $.cookie("hueLandingPage", { path: "/" }) == "home");
+  $("#updateSkipWizard").prop('checked', Cookies.set("hueLandingPage", { path: "/" }) == "home");
 
   $("#updateSkipWizard").change(function () {
-    $.cookie("hueLandingPage", this.checked ? "home" : "wizard", {
+    Cookies.set("hueLandingPage", this.checked ? "home" : "wizard", {
       path: "/",
       secure: window.location.protocol.indexOf('https') > -1
     });
