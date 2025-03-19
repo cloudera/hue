@@ -99,6 +99,32 @@ describe('useQueueProcessor', () => {
     expect(result.current.queue).toEqual(['item3']);
   });
 
+  it('should update the queue when an item is dequeued with itemKey', async () => {
+    const { result } = renderHook(() =>
+      useQueueProcessor<{ id: number; name: string }>(mockProcessItem, { concurrentProcess: 1 })
+    );
+
+    act(() => {
+      result.current.enqueue([
+        { id: 1, name: 'item1' },
+        { id: 2, name: 'item2' },
+        { id: 3, name: 'item3' }
+      ]);
+    });
+
+    expect(result.current.queue).toEqual([
+      { id: 2, name: 'item2' },
+      { id: 3, name: 'item3' }
+    ]);
+    expect(result.current.isLoading).toBe(true);
+
+    act(() => {
+      result.current.dequeue('item2', 'name');
+    });
+
+    expect(result.current.queue).toEqual([{ id: 3, name: 'item3' }]);
+  });
+
   it('should update isLoading when items are being processed', async () => {
     const { result } = renderHook(() =>
       useQueueProcessor(mockProcessItem, { concurrentProcess: 1 })
