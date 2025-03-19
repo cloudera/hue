@@ -17,8 +17,6 @@
 @use 'variables' as vars;
 @use 'mixins';
 
-$cell-height: 40px;
-$table-placeholder-height: 100px;
 $icon-margin: 5px;
 
 .antd.cuix {
@@ -54,53 +52,20 @@ $icon-margin: 5px;
       flex: 1;
       display: flex;
       flex-direction: column;
-    }
 
-    .hue-storage-browser__table {
-      .ant-table-placeholder {
-        height: $table-placeholder-height;
-        text-align: center;
+      &__name-column {
+        display: flex;
+        gap: 6px;
+        color: vars.$fluidx-blue-700;
+
+        &__icon {
+          display: flex;
+        }
+
+        &__label {
+          @include mixins.nowrap-ellipsis;
+        }
       }
-
-      th.ant-table-cell {
-        height: $cell-height;
-        background-color: vars.$fluidx-gray-040;
-      }
-    }
-
-    .hue-storage-browser__table-cell-icon {
-      color: vars.$fluidx-blue-700;
-      margin-right: 6px;
-      vertical-align: middle;
-    }
-
-    .hue-storage-browser__table-row {
-      border-bottom: 1px solid vars.$fluidx-gray-040;
-
-      :hover {
-        cursor: pointer;
-      }
-
-      td.ant-table-cell {
-        height: $cell-height;
-        @include mixins.nowrap-ellipsis;
-      }
-
-      td.ant-table-cell:first-child {
-        text-overflow: initial;
-      }
-    }
-
-    .hue-storage-browser__table-cell-name {
-      color: vars.$fluidx-blue-700;
-    }
-
-    .hue-storage-browser__table-column-header {
-      display: flex;
-    }
-
-    .hue-storage-browser__table-column-title {
-      text-transform: capitalize;
     }
   }
 }
