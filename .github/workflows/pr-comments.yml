@@ -65,27 +65,27 @@ jobs:
           remove-link-from-badge: true
           default-branch: master
   
-  python-ut-files-comment:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # python-ut-files-comment:
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Check and comment if no unit test files modified
-        run: |
-          git fetch origin master
-          echo "changed_files"
-          changed_files=$(git diff --name-only origin/master)
-          changed_files=$(git diff --name-only origin/master)
+  #     - name: Check and comment if no unit test files modified
+  #       run: |
+  #         git fetch origin master
+  #         echo "changed_files"
+  #         changed_files=$(git diff --name-only origin/master)
+  #         changed_files=$(git diff --name-only origin/master)
           
-          if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
-            echo "✅ Unit test files were modified."
-          else
-            echo "⚠️ No unit test files modified."
+  #         if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
+  #           echo "✅ Unit test files were modified."
+  #         else
+  #           echo "⚠️ No unit test files modified."
             
-            curl -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              -d '{"body":"⚠️ No unit test files modified. Please ensure that changes are properly tested. ⚠️"}' \
-              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
-          fi
+  #           curl -X POST \
+  #             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+  #             -H "Accept: application/vnd.github.v3+json" \
+  #             -d '{"body":"⚠️ No unit test files modified. Please ensure that changes are properly tested. ⚠️"}' \
+  #             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+  #         fi
