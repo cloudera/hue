@@ -74,6 +74,7 @@ jobs:
       - name: Check and comment if no unit test files modified
         run: |
           git fetch origin master
+          echo "changed_files" 
           changed_files=$(git diff --name-only origin/master)
           
           if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
