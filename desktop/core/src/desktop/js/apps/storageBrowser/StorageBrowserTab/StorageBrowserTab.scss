@@ -24,53 +24,53 @@
     flex-direction: column;
     height: 100%;
 
-    &__title-bar {
+    &__title-bar-container {
       display: flex;
       justify-content: space-between;
+    }
 
-      &__title {
-        display: flex;
-        gap: vars.$fluidx-spacing-xs;
-        min-width: 100px;
-        width: calc(100% - 265px);
+    &__title-bar {
+      display: flex;
+      gap: vars.$fluidx-spacing-xs;
+      min-width: 100px;
+      width: calc(100% - 265px);
 
-        @media screen and (width <=600px) {
-          width: calc(100% - 130px);
-        }
-
-        &__icon {
-          flex: 0 0 auto;
-          height: vars.$fluidx-heading-h3-line-height;
-        }
-
-        &__name {
-          @include mixins.nowrap-ellipsis;
-
-          font-size: vars.$fluidx-heading-h3-size;
-          font-weight: vars.$fluidx-heading-h3-weight;
-          margin-bottom: 0;
-        }
+      @media screen and (width <=600px) {
+        width: calc(100% - 130px);
       }
+    }
 
-      &__button-group {
-        display: flex;
-        gap: vars.$fluidx-spacing-xs;
+    &__title-bar-icon {
+      flex: 0 0 auto;
+      height: vars.$fluidx-heading-h3-line-height;
+    }
 
-        @media screen and (width <=600px) {
-          gap: 0;
-        }
+    &__title-bar-name {
+      @include mixins.nowrap-ellipsis;
 
-        &__button {
-          @media screen and (width <=600px) {
-            span span:last-child {
-              display: none !important;
-            }
-          }
+      font-size: vars.$fluidx-heading-h3-size;
+      font-weight: vars.$fluidx-heading-h3-weight;
+      margin-bottom: 0;
+    }
+
+    &__title-bar-button-group {
+      display: flex;
+      gap: vars.$fluidx-spacing-xs;
+
+      @media screen and (width <=600px) {
+        gap: 0;
+      }
+    }
+
+    &__title-bar-button {
+      @media screen and (width <=600px) {
+        span span:last-child {
+          display: none !important;
         }
       }
     }
 
-    &__path-browser-panel {
+    &__path-browser-container {
       display: flex;
       align-items: center;
       gap: 2px;
