@@ -64,7 +64,7 @@ const useFileUpload = (
 
   const {
     addFiles: addToChunkUpload,
-    removeFile: removeFromChunkUpload,
+    cancelFile: cancelFromChunkUpload,
     isLoading: isChunkLoading
   } = useChunkUpload({
     concurrentProcess,
@@ -74,7 +74,7 @@ const useFileUpload = (
 
   const {
     addFiles: addToRegularUpload,
-    removeFile: removeFromRegularUpload,
+    cancelFile: cancelFromRegularUpload,
     isLoading: isRegularLoading
   } = useRegularUpload({
     concurrentProcess,
@@ -90,13 +90,13 @@ const useFileUpload = (
         updateFileVariables(item.uuid, { status: FileStatus.Cancelled, error });
 
         if (isChunkUpload) {
-          removeFromChunkUpload(item.uuid);
+          cancelFromChunkUpload(item.uuid);
         } else {
-          removeFromRegularUpload(item.uuid);
+          cancelFromRegularUpload(item.uuid);
         }
       }
     },
-    [isChunkUpload, updateFileVariables, removeFromChunkUpload, removeFromRegularUpload]
+    [isChunkUpload, updateFileVariables, cancelFromChunkUpload, cancelFromRegularUpload]
   );
 
   useEffect(() => {

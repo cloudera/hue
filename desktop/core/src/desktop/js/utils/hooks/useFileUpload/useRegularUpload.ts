@@ -23,7 +23,7 @@ import { RegularFile, FileVariables, FileStatus } from './types';
 
 interface UseUploadQueueResponse {
   addFiles: (item: RegularFile[]) => void;
-  removeFile: (uuid: RegularFile['uuid']) => void;
+  cancelFile: (uuid: RegularFile['uuid']) => void;
   isLoading: boolean;
 }
 
@@ -79,9 +79,9 @@ const useRegularUpload = ({
     onSuccess: onComplete
   });
 
-  const removeFile = (itemId: RegularFile['uuid']) => dequeue(itemId, 'uuid');
+  const cancelFile = (itemId: RegularFile['uuid']) => dequeue(itemId, 'uuid');
 
-  return { addFiles, removeFile, isLoading };
+  return { addFiles, cancelFile, isLoading };
 };
 
 export default useRegularUpload;

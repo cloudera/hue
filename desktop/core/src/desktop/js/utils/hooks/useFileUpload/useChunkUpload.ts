@@ -45,7 +45,7 @@ import {
 
 interface UseChunkUploadResponse {
   addFiles: (item: RegularFile[]) => void;
-  removeFile: (item: RegularFile['uuid']) => void;
+  cancelFile: (item: RegularFile['uuid']) => void;
   isLoading: boolean;
 }
 
@@ -72,26 +72,24 @@ const useChunkUpload = ({
     }
   });
 
-  const processTaskServerResponse = (response?: TaskServerResponse[]) => {
-    if (response?.length) {
-      const statusMap = getStatusHashMap(response);
-      setFilesWaitingFinalStatus(prev => {
-        const remainingFiles = prev.filter(uuid => {
-          const fileStatus = statusMap[uuid];
-          if (fileStatus === TaskStatus.Success || fileStatus === TaskStatus.Failure) {
-            const mappedStatus =
-              fileStatus === TaskStatus.Success ? FileStatus.Uploaded : FileStatus.Failed;
-            updateFileVariables(uuid, { status: mappedStatus });
-            return false; // remove the file as final status is received
-          }
-          return true;
-        });
-        if (remainingFiles.length === 0) {
-          onComplete();
+  const processTaskServerResponse = (response: TaskServerResponse[]) => {
+    const statusMap = getStatusHashMap(response);
+    setFilesWaitingFinalStatus(prev => {
+      const remainingFiles = prev.filter(uuid => {
+        const fileStatus = statusMap[uuid];
+        if (fileStatus === TaskStatus.Success || fileStatus === TaskStatus.Failure) {
+          const mappedStatus =
+            fileStatus === TaskStatus.Success ? FileStatus.Uploaded : FileStatus.Failed;
+          updateFileVariables(uuid, { status: mappedStatus });
+          return false; // remove the file as final status is received
         }
-        return remainingFiles;
+        return true;
       });
-    }
+      if (remainingFiles.length === 0) {
+        onComplete();
+      }
+      return remainingFiles;
+    });
   };
 
   useLoadData<TaskServerResponse[]>('/desktop/api2/taskserver/get_taskserver_tasks/', {
@@ -154,7 +152,7 @@ const useChunkUpload = ({
       const isUploadPossible = await isSpaceAvailableInServer(chunk.totalSize);
       if (!isUploadPossible) {
         const error = new Error('Upload server ran out of space. Try again later.');
-        removeFile(chunk.uuid);
+        cancelFile(chunk.uuid);
         return updateFileVariables(chunk.uuid, { status: FileStatus.Failed, error });
       }
     }
@@ -167,18 +165,18 @@ const useChunkUpload = ({
     concurrentProcess
   });
 
-  const addFiles = (newfiles: RegularFile[]) => {
-    newfiles.forEach(file => {
+  const addFiles = (newFiles: RegularFile[]) => {
+    newFiles.forEach(file => {
       const chunks = createChunks(file, chunkSize);
       enqueue(chunks);
     });
   };
 
-  const removeFile = (fileUuid: ChunkedFile['uuid']) => dequeue(fileUuid, 'uuid');
+  const cancelFile = (fileUuid: ChunkedFile['uuid']) => dequeue(fileUuid, 'uuid');
 
   return {
     addFiles,
-    removeFile,
+    cancelFile,
     isLoading: !!(filesWaitingFinalStatus.length || filesInProgress.length)
   };
 };
