@@ -17,13 +17,13 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { UploadItem, UploadStatus } from '../../../utils/hooks/useFileUpload/util';
+import { RegularFile, FileStatus } from '../../../utils/hooks/useFileUpload/types';
 import FileUploadRow from './FileUploadRow';
 
-const mockUploadRow: UploadItem = {
+const mockUploadRow: RegularFile = {
   uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx1',
   filePath: '/path/to/file1.txt',
-  status: UploadStatus.Pending,
+  status: FileStatus.Pending,
   file: new File(['mock test file'], 'file1.txt'),
   progress: 0
 };
@@ -31,9 +31,7 @@ const mockOnCancel = jest.fn();
 
 describe('FileUploadRow', () => {
   it('should render the row with name', () => {
-    const { getByText, getByTestId } = render(
-      <FileUploadRow data={mockUploadRow} onCancel={mockOnCancel} />
-    );
+    const { getByText } = render(<FileUploadRow data={mockUploadRow} onCancel={mockOnCancel} />);
 
     expect(getByText('file1.txt')).toBeInTheDocument();
     expect(getByText('14 Bytes')).toBeInTheDocument();
@@ -51,7 +49,7 @@ describe('FileUploadRow', () => {
   });
 
   it('should hide cancel button for files is not in Pending state', () => {
-    const mockData = { ...mockUploadRow, status: UploadStatus.Failed };
+    const mockData = { ...mockUploadRow, status: FileStatus.Failed };
     const { queryByTestId } = render(<FileUploadRow data={mockData} onCancel={mockOnCancel} />);
 
     const cancelButtons = queryByTestId('hue-upload-queue-row__close-icon');
@@ -59,7 +57,7 @@ describe('FileUploadRow', () => {
   });
 
   it('should show progress bar when file is in uploading state', () => {
-    const mockData = { ...mockUploadRow, status: UploadStatus.Uploading, progress: 10 };
+    const mockData = { ...mockUploadRow, status: FileStatus.Uploading, progress: 10 };
     const { getByRole } = render(<FileUploadRow data={mockData} onCancel={mockOnCancel} />);
     const progressBar = getByRole('hue-upload-queue-row__progressbar');
     expect(progressBar).toBeInTheDocument();

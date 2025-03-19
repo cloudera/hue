@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import CloseIcon from '../../components/icons/CloseIcon';
 import { i18nReact } from '../../utils/i18nReact';
-import { UploadItem, UploadStatus } from '../../utils/hooks/useFileUpload/util';
+import { RegularFile, FileStatus } from '../../utils/hooks/useFileUpload/types';
 import useFileUpload from '../../utils/hooks/useFileUpload/useFileUpload';
 import { DEFAULT_ENABLE_CHUNK_UPLOAD } from '../../utils/constants/storageBrowser';
 import { getLastKnownConfig } from '../../config/hueConfig';
@@ -26,18 +26,18 @@ import FileUploadRow from './FileUploadRow/FileUploadRow';
 import './FileUploadQueue.scss';
 
 interface FileUploadQueueProps {
-  filesQueue: UploadItem[];
+  filesQueue: RegularFile[];
   onClose: () => void;
   onComplete: () => void;
 }
 
 const sortOrder = [
-  UploadStatus.Uploading,
-  UploadStatus.Failed,
-  UploadStatus.Pending,
-  UploadStatus.Cancelled,
-  UploadStatus.Uploaded
-].reduce((acc: Record<string, number>, status: UploadStatus, index: number) => {
+  FileStatus.Uploading,
+  FileStatus.Failed,
+  FileStatus.Pending,
+  FileStatus.Cancelled,
+  FileStatus.Uploaded
+].reduce((acc: Record<string, number>, status: FileStatus, index: number) => {
   acc[status] = index + 1;
   return acc;
 }, {});
@@ -56,9 +56,9 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
     onComplete
   });
 
-  const uploadedCount = uploadQueue.filter(item => item.status === UploadStatus.Uploaded).length;
+  const uploadedCount = uploadQueue.filter(item => item.status === FileStatus.Uploaded).length;
   const pendingCount = uploadQueue.filter(
-    item => item.status === UploadStatus.Pending || item.status === UploadStatus.Uploading
+    item => item.status === FileStatus.Pending || item.status === FileStatus.Uploading
   ).length;
 
   return (
@@ -81,7 +81,7 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
         <div className="upload-queue__list">
           {uploadQueue
             .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
-            .map((row: UploadItem) => (
+            .map((row: RegularFile) => (
               <FileUploadRow
                 key={`${row.filePath}__${row.file.name}`}
                 data={row}

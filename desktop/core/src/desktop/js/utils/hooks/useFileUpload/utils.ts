@@ -14,64 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { CHUNK_UPLOAD_URL, CHUNK_UPLOAD_COMPLETE_URL } from '../../../apps/storageBrowser/api';
+import { get } from '../../../api/utils';
+import {
+  CHUNK_UPLOAD_URL,
+  CHUNK_UPLOAD_COMPLETE_URL,
+  UPLOAD_AVAILABLE_SPACE_URL
+} from '../../../apps/storageBrowser/api';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
+import {
+  ChunkedFile,
+  ChunkedFilesInProgress,
+  FileChunkMetaData,
+  FileUploadApiPayload,
+  RegularFile
+} from './types';
 
-export interface UploadItem {
-  uuid: string;
-  filePath: string;
-  file: File;
-  status: UploadStatus;
-  progress?: number;
-  error?: Error;
-}
-
-export enum UploadStatus {
-  Pending = 'Pending',
-  Uploading = 'Uploading',
-  Uploaded = 'Uploaded',
-  Cancelled = 'Cancelled',
-  Failed = 'Failed'
-}
-
-export interface UploadItemVariables
-  extends Partial<Omit<UploadItem, 'uuid' | 'filePath' | 'file'>> {}
-
-export interface UploadMetaData {
-  qqtotalparts: string;
-  qqtotalfilesize: string;
-  qqfilename: string;
-  inputName: string;
-  dest: string;
-  qquuid: string;
-}
-
-export interface UploadChunkItem extends Omit<UploadItem, 'file'> {
-  file: Blob; // storing only part of the file to avoid big file duplication
-  fileName: string;
-  totalSize: number;
-  totalChunks: number;
-  chunkIndex: number;
-  chunkStart: number;
-  chunkEnd: number;
-}
-
-export interface InProgressChunk {
-  chunkIndex: number;
-  progress: number;
-  chunkSize: number;
-}
-
-export interface AvailableServerSpaceResponse {
-  uploadAvailableSpace: number;
-}
-
-interface ChunkPayload {
-  url: string;
-  payload: FormData;
-}
-
-export const getNewFileItems = (newQueue: UploadItem[], oldQueue: UploadItem[]): UploadItem[] => {
+export const getNewRegularFiles = (
+  newQueue: RegularFile[],
+  oldQueue: RegularFile[]
+): RegularFile[] => {
   return newQueue.filter(
     newItem =>
       !oldQueue.some(
@@ -84,7 +45,7 @@ export const getTotalChunk = (fileSize: number, DEFAULT_CHUNK_SIZE: number): num
   return Math.ceil(fileSize / DEFAULT_CHUNK_SIZE);
 };
 
-export const getMetaData = (item: UploadChunkItem): UploadMetaData => ({
+export const getMetaData = (item: ChunkedFile): FileChunkMetaData => ({
   qqtotalparts: String(item.totalChunks),
   qqtotalfilesize: String(item.totalSize),
   qqfilename: item.fileName,
@@ -93,21 +54,21 @@ export const getMetaData = (item: UploadChunkItem): UploadMetaData => ({
   qquuid: item.uuid
 });
 
-export const createChunks = (item: UploadItem, chunkSize: number): UploadChunkItem[] => {
+export const createChunks = (item: RegularFile, chunkSize: number): ChunkedFile[] => {
   const totalChunks = getTotalChunk(item.file.size, chunkSize);
 
   const chunks = Array.from({ length: totalChunks }, (_, i) => {
-    const chunkStart = i * chunkSize;
-    const chunkEnd = Math.min(chunkStart + chunkSize, item.file.size);
+    const chunkStartOffset = i * chunkSize;
+    const chunkEndOffset = Math.min(chunkStartOffset + chunkSize, item.file.size);
     return {
       ...item,
       fileName: item.file.name,
       totalSize: item.file.size,
-      file: item.file.slice(chunkStart, chunkEnd),
+      file: item.file.slice(chunkStartOffset, chunkEndOffset),
       totalChunks,
-      chunkIndex: i,
-      chunkStart,
-      chunkEnd
+      chunkNumber: i,
+      chunkStartOffset,
+      chunkEndOffset
     };
   });
 
@@ -125,13 +86,13 @@ export const getStatusHashMap = (
     {}
   );
 
-export const getChunkItemPayload = (chunkItem: UploadChunkItem): ChunkPayload => {
+export const getChunkItemPayload = (chunkItem: ChunkedFile): FileUploadApiPayload => {
   const metaData = getMetaData(chunkItem);
   const chunkQueryParams = new URLSearchParams({
     ...metaData,
-    qqpartindex: String(chunkItem.chunkIndex),
-    qqpartbyteoffset: String(chunkItem.chunkStart),
-    qqchunksize: String(chunkItem.chunkEnd - chunkItem.chunkStart)
+    qqpartindex: String(chunkItem.chunkNumber),
+    qqpartbyteoffset: String(chunkItem.chunkStartOffset),
+    qqchunksize: String(chunkItem.chunkEndOffset - chunkItem.chunkStartOffset)
   }).toString();
 
   const url = `${CHUNK_UPLOAD_URL}?${chunkQueryParams}`;
@@ -141,29 +102,13 @@ export const getChunkItemPayload = (chunkItem: UploadChunkItem): ChunkPayload =>
   return { url, payload };
 };
 
-export const getChunksCompletePayload = (processingItem: UploadChunkItem): ChunkPayload => {
+export const getChunksCompletePayload = (processingItem: ChunkedFile): FileUploadApiPayload => {
   const fileMetaData = getMetaData(processingItem);
   const payload = new FormData();
   Object.entries(fileMetaData).forEach(([key, value]) => {
     payload.append(key, value);
   });
   return { url: CHUNK_UPLOAD_COMPLETE_URL, payload };
-};
-
-export const getChunkSinglePayload = (item: UploadChunkItem): ChunkPayload => {
-  const metaData = getMetaData(item);
-
-  const singleChunkParams = Object.fromEntries(
-    Object.entries(metaData).filter(([key]) => key !== 'qqtotalparts')
-  );
-
-  const queryParams = new URLSearchParams(singleChunkParams).toString();
-  const url = `${CHUNK_UPLOAD_URL}?${queryParams}`;
-
-  const payload = new FormData();
-  payload.append('hdfs_file', item.file);
-
-  return { url, payload };
 };
 
 export const getItemProgress = (progress?: ProgressEvent): number => {
@@ -174,8 +119,8 @@ export const getItemProgress = (progress?: ProgressEvent): number => {
 };
 
 export const getItemsTotalProgress = (
-  chunkItem?: UploadChunkItem,
-  chunks?: InProgressChunk[]
+  chunkItem?: ChunkedFile,
+  chunks?: ChunkedFilesInProgress['uuid']
 ): number => {
   if (!chunkItem || !chunks) {
     return 0;
@@ -183,4 +128,39 @@ export const getItemsTotalProgress = (
   return chunks.reduce((acc, chunk) => {
     return acc + (chunk.progress * chunk.chunkSize) / chunkItem.totalSize;
   }, 0);
+};
+
+export const addChunkToInProcess = (
+  currentInProcess: ChunkedFilesInProgress,
+  chunkItem: ChunkedFile
+): ChunkedFilesInProgress => {
+  const inProcessChunkObj = {
+    chunkNumber: chunkItem.chunkNumber,
+    progress: 0,
+    chunkSize: chunkItem.file.size
+  };
+  if (currentInProcess[chunkItem.uuid] === undefined) {
+    currentInProcess[chunkItem.uuid] = [inProcessChunkObj];
+  } else {
+    currentInProcess[chunkItem.uuid].push(inProcessChunkObj);
+  }
+  return currentInProcess;
+};
+
+export const isSpaceAvailableInServer = async (fileSize: number): Promise<boolean> => {
+  const response = await get<{
+    upload_available_space: number;
+  }>(UPLOAD_AVAILABLE_SPACE_URL);
+  return !!response?.upload_available_space && response.upload_available_space >= fileSize;
+};
+
+export const isAllChunksOfFileUploaded = (
+  filesInProgress: ChunkedFilesInProgress,
+  chunk: ChunkedFile
+): boolean => {
+  const fileAllChunks = filesInProgress[chunk.uuid];
+  const isTotalChunkCountMatched = fileAllChunks.length === chunk.totalChunks;
+  const isAllChunksUploaded = filesInProgress[chunk.uuid]?.every(chunk => chunk.progress === 100);
+
+  return isTotalChunkCountMatched && isAllChunksUploaded;
 };

@@ -39,7 +39,7 @@ import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { DEFAULT_PAGE_SIZE, DEFAULT_POLLING_TIME } from '../../../utils/constants/storageBrowser';
 import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
-import { UploadItem, UploadStatus } from '../../../utils/hooks/useFileUpload/util';
+import { RegularFile, FileStatus } from '../../../utils/hooks/useFileUpload/types';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
 import { useWindowSize } from '../../../utils/hooks/useWindowSize/useWindowSize';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
@@ -70,7 +70,7 @@ const StorageDirectoryPage = ({
 }: StorageDirectoryPageProps): JSX.Element => {
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
-  const [filesToUpload, setFilesToUpload] = useState<UploadItem[]>([]);
+  const [filesToUpload, setFilesToUpload] = useState<RegularFile[]>([]);
   const [polling, setPolling] = useState<boolean>(false);
 
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
@@ -148,7 +148,7 @@ const StorageDirectoryPage = ({
         file,
         filePath: fileStats.path,
         uuid: UUID(),
-        status: UploadStatus.Pending
+        status: FileStatus.Pending
       };
     });
     setPolling(true);

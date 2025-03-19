@@ -24,20 +24,20 @@ import StatusInProgressIcon from '@cloudera/cuix-core/icons/react/StatusInProgre
 import StatusSuccessIcon from '@cloudera/cuix-core/icons/react/StatusSuccessIcon';
 import StatusStoppedIcon from '@cloudera/cuix-core/icons/react/StatusStoppedIcon';
 import StatusErrorIcon from '@cloudera/cuix-core/icons/react/StatusErrorIcon';
-import { UploadItem, UploadStatus } from '../../../utils/hooks/useFileUpload/util';
+import { RegularFile, FileStatus } from '../../../utils/hooks/useFileUpload/types';
 import { i18nReact } from '../../../utils/i18nReact';
 
 interface FileUploadRowProps {
-  data: UploadItem;
+  data: RegularFile;
   onCancel: () => void;
 }
 
 const statusIcon = {
-  [UploadStatus.Pending]: <StatusPendingIcon />,
-  [UploadStatus.Uploading]: <StatusInProgressIcon />,
-  [UploadStatus.Uploaded]: <StatusSuccessIcon />,
-  [UploadStatus.Cancelled]: <StatusStoppedIcon />,
-  [UploadStatus.Failed]: <StatusErrorIcon />
+  [FileStatus.Pending]: <StatusPendingIcon />,
+  [FileStatus.Uploading]: <StatusInProgressIcon />,
+  [FileStatus.Uploaded]: <StatusSuccessIcon />,
+  [FileStatus.Cancelled]: <StatusStoppedIcon />,
+  [FileStatus.Failed]: <StatusErrorIcon />
 };
 
 const FileUploadRow: React.FC<FileUploadRowProps> = ({ data, onCancel }) => {
@@ -51,7 +51,7 @@ const FileUploadRow: React.FC<FileUploadRowProps> = ({ data, onCancel }) => {
         </Tooltip>
         <div className="hue-upload-queue-row__name">{data.file.name}</div>
         <div className="hue-upload-queue-row__size">{formatBytes(data.file.size)}</div>
-        {data.status === UploadStatus.Pending && (
+        {data.status === FileStatus.Pending && (
           <Tooltip title={t('Cancel')} mouseEnterDelay={1.5}>
             <CloseIcon data-testid="hue-upload-queue-row__close-icon" onClick={onCancel} />
           </Tooltip>
@@ -61,7 +61,7 @@ const FileUploadRow: React.FC<FileUploadRowProps> = ({ data, onCancel }) => {
         className="hue-upload-queue-row__progressbar"
         role="hue-upload-queue-row__progressbar"
         style={{
-          width: `${data.status === UploadStatus.Uploading ? data.progress : 0}%`
+          width: `${data.status === FileStatus.Uploading ? data.progress : 0}%`
         }}
       />
     </div>

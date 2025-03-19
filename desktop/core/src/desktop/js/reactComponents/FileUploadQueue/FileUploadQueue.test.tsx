@@ -18,19 +18,19 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import FileUploadQueue from './FileUploadQueue';
-import { UploadItem, UploadStatus } from '../../utils/hooks/useFileUpload/util';
+import { FileStatus, RegularFile } from '../../utils/hooks/useFileUpload/types';
 
-const mockFilesQueue: UploadItem[] = [
+const mockFilesQueue: RegularFile[] = [
   {
     uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx1',
     filePath: '/path/to/file1.txt',
-    status: UploadStatus.Pending,
+    status: FileStatus.Pending,
     file: new File([], 'file1.txt')
   },
   {
     uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx2',
     filePath: '/path/to/file2.txt',
-    status: UploadStatus.Pending,
+    status: FileStatus.Pending,
     file: new File([], 'file2.txt')
   }
 ];
