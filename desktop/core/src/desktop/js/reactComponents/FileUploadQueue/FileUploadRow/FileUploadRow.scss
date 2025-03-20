@@ -17,33 +17,45 @@
 @use 'variables' as vars;
 
 .antd.cuix {
-  .upload-queue {
-    position: fixed;
-    bottom: 0;
-    right: 16px;
-    width: 520px;
-    background-color: vars.$fluidx-white;
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+  .hue-upload-queue-row {
+    display: flex;
+    flex-direction: column;
+    border: solid 1px vars.$fluidx-gray-300;
 
-    &__header {
+    &__container {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 16px;
-      color: vars.$fluidx-gray-900;
-      background-color: vars.$fluidx-gray-050;
-      cursor: pointer;
-      font-size: 16px;
+      font-size: 14px;
+      padding: 8px;
+      gap: 8px;
     }
 
-    &__list {
+    &__status {
       display: flex;
-      flex-direction: column;
-      max-height: 40vh;
-      overflow: auto;
-      padding: 16px;
-      gap: 16px;
+      width: 20px;
+    }
+
+    &__name {
+      display: flex;
+      flex: 1;
+      text-overflow: ellipsis;
+    }
+
+    &__size {
+      display: flex;
+      text-align: right;
+      color: vars.$fluidx-gray-700;
+    }
+
+    &__close-icon {
+      cursor: pointer;
+      height: 16px;
+      width: 16px;
+    }
+
+    &__progressbar {
+      height: 2px;
+      background-color: vars.$fluidx-blue-500;
     }
   }
 }
