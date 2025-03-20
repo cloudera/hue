@@ -181,7 +181,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           className="hue-storage-browser__path-browser-panel"
           data-testid={`${testId}-path-browser-panel`}
         >
-          <PathBrowser filePath={filePath} onFilepathChange={setFilePath} showIcon />
+          <PathBrowser filePath={filePath} onFilepathChange={setFilePath} />
         </div>
         {fileStats?.type === BrowserViewType.dir && !isLoading && (
           <StorageDirectoryPage
