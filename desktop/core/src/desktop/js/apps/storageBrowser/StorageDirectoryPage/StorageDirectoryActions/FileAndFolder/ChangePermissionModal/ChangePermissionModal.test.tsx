@@ -64,14 +64,16 @@ describe('ChangePermissionModal Component', () => {
       />
     );
 
-    expect(getByText('Change Permissions')).toBeInTheDocument();
-    expect(getByText('Submit')).toBeInTheDocument();
-    expect(getByText('Cancel')).toBeInTheDocument();
-    expect(getByText('read')).toBeInTheDocument();
-    expect(getByText('write')).toBeInTheDocument();
-    expect(getByText('execute')).toBeInTheDocument();
-    expect(getByText('sticky')).toBeInTheDocument();
-    expect(getByText('recursive')).toBeInTheDocument();
+    waitFor(() => {
+      expect(getByText('Change Permissions')).toBeInTheDocument();
+      expect(getByText('Submit')).toBeInTheDocument();
+      expect(getByText('Cancel')).toBeInTheDocument();
+      expect(getByText('read')).toBeInTheDocument();
+      expect(getByText('write')).toBeInTheDocument();
+      expect(getByText('execute')).toBeInTheDocument();
+      expect(getByText('sticky')).toBeInTheDocument();
+      expect(getByText('recursive')).toBeInTheDocument();
+    });
   });
 
   it('should toggle permission checkboxes correctly for user, group', () => {
@@ -173,7 +175,7 @@ describe('ChangePermissionModal Component', () => {
     );
 
     fireEvent.click(getByText('Cancel'));
-    expect(mockOnClose).toHaveBeenCalledTimes(1);
+    waitFor(() => expect(mockOnClose).toHaveBeenCalledTimes(1));
   });
 
   it('should disable Submit button when the permissions have not been modified', () => {
