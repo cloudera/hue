@@ -79,28 +79,6 @@ describe('OverviewTab', () => {
     expect(trademarkText).toBeNull();
   });
 
-  // describe('Analytics Component', () => {
-  //   beforeEach(() => {
-  //     jest.clearAllMocks();
-  //   });
-
-  //   test('renders Analytics tab and can interact with the checkbox', async () => {
-  //     render(<Analytics />);
-  //     const checkbox = screen.getByRole('checkbox', {
-  //       name: /help improve hue with anonymous usage analytics\./i
-  //     });
-
-  //     expect(checkbox).not.toBeChecked();
-  //     await userEvent.click(checkbox);
-  //     await waitFor(() => expect(checkbox).toBeChecked());
-
-  //     expect(post).toHaveBeenCalledWith('/about/update_preferences', { collect_usage: 'on' });
-
-  //     await userEvent.click(checkbox);
-  //     await waitFor(() => expect(checkbox).not.toBeChecked());
-  //     expect(post).toHaveBeenCalledWith('/about/update_preferences', { collect_usage: null });
-  //   });
-  // });
   describe('Analytics Component', () => {
     test('renders Analytics tab and can interact with the checkbox', async () => {
       (post as jest.Mock).mockResolvedValue({ status: 0, message: 'Success' });
@@ -120,18 +98,45 @@ describe('OverviewTab', () => {
   });
 
   describe('Examples component', () => {
-    afterEach(cleanup);
-    test('click on Hive app and the API for Hive is called', async () => {
-      (post as jest.Mock).mockResolvedValue({ status: 0, message: 'Success' });
-      render(<Examples />);
-      const hiveButton = screen.getByText('Hive');
-      userEvent.click(hiveButton);
-      await waitFor(() => {
-        expect(post).toHaveBeenCalledWith('/beeswax/install_examples', null, {
-          method: 'POST',
-          silenceErrors: true
+
+    const exampleApps = [
+      { id: 'hive', name: 'Hive', old_name: 'beeswax' },
+      { id: 'impala', name: 'Impala' },
+      {
+        id: 'search',
+        name: 'Solr Search',
+        data: ['log_analytics_demo', 'twitter_demo', 'yelp_demo']
+      },
+      { id: 'spark', name: 'Spark', old_name: 'notebook' },
+      { id: 'oozie', name: 'Oozie Editor/Dashboard' },
+      { id: 'hbase', name: 'Hbase Browser' },
+      { id: 'pig', name: 'Pig Editor' }
+    ];
+    // We no longer need the hardcoded test_urls
+
+    test.each(exampleApps)(
+      "when the '%s' button is clicked, the API call for installing examples is executed",
+      async appData => {
+        const resolvedValue = { status: 0, message: 'Success' };
+        (post as jest.Mock).mockResolvedValue(resolvedValue);
+        render(<Examples />);
+
+        const appIdOrOldName = appData.old_name || appData.id;
+        const url = `/${appIdOrOldName}/install_examples`;
+        const expectedData = appData.data ? { data: appData.data } : null;
+
+        let button = screen.getByText(appData.name);
+        fireEvent.click(button);
+
+        await waitFor(() => {
+          expect(post).toHaveBeenCalledWith(url, expectedData, {
+            method: 'POST',
+            silenceErrors: true
+          });
         });
-      });
-    });
+
+        (post as jest.Mock).mockClear();
+      }
+    );
   });
 });
