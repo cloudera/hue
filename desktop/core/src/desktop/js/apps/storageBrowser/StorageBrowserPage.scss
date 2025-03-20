@@ -16,6 +16,10 @@
 
 @use 'variables' as vars;
 
+.hue-storage-browser__root-container {
+  height: 100%;
+}
+
 .hue-storage-browser.antd.cuix {
   display: flex;
   flex-direction: column;
