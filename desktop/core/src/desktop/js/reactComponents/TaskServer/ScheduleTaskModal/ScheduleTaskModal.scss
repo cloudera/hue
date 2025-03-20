@@ -14,20 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.cuix.antd {
-  .task-selection {
-    margin-bottom: 2rem;
-  }
+.hue-schedule-task-selection {
+  margin-bottom: 2rem;
+}
 
-  .hue-schedule-task__modal {
-    .ant-form-item {
-      margin: 0 !important;
-    }
-
-    &__input-params {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+.hue-schedule-task__modal {
+  .ant-form-item {
+    margin: 0 !important;
   }
+}
+
+.hue-schedule-task__input-group {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-gap: 6px;
 }

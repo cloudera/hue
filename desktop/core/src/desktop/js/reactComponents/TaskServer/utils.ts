@@ -23,13 +23,6 @@ export const statusTagColor = (status: TaskServerResponse['status']): string =>
     [TaskStatus.Failure]: 'error'
   })[status] ?? '';
 
-export const getRowClassName = (record: TaskServerResponse): string =>
-  ({
-    [TaskStatus.Success]: 'row-success',
-    [TaskStatus.Failure]: 'row-failure',
-    [TaskStatus.Running]: 'row-running'
-  })[record.status] ?? '';
-
 export const getFilteredTasks = (
   statusFilter: Record<string, boolean>,
   searchTerm: string,

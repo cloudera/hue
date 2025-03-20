@@ -15,31 +15,17 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
-import { Form, Input, Select } from 'antd';
+import { Form, Input, Radio } from 'antd';
+import { AxiosError } from 'axios';
 import Modal from 'cuix/dist/components/Modal';
 import { TaskServerResult } from '../types';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
-import { HANDLE_SUBMIT_URL } from '../constants';
+import { SCHEDULE_NEW_TASK_URL, scheduleTasksCategory } from '../constants';
 import { extractErrorMessage } from '../../../api/utils';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 
 import './ScheduleTaskModal.scss';
-import { AxiosError } from 'axios';
-
-const { Option } = Select;
-
-const tasks = {
-  document_cleanup: {
-    params: [{ name: 'keep_days', label: 'Keep days', type: 'number' }]
-  },
-  tmp_clean_up: {
-    params: [
-      { name: 'cleanup_threshold', label: 'Cleanup threshold', type: 'number', max: 100 },
-      { name: 'disk_check_interval', label: 'Disk check interval', type: 'number', max: 100 }
-    ]
-  }
-};
 
 interface ScheduleTaskModalProps {
   onClose: () => void;
@@ -63,7 +49,7 @@ const ScheduleTaskModal: React.FC<ScheduleTaskModalProps> = ({
     }));
   };
 
-  const { save } = useSaveData(HANDLE_SUBMIT_URL, {
+  const { save } = useSaveData(SCHEDULE_NEW_TASK_URL, {
     postOptions: {
       qsEncodeData: false
     },
@@ -86,6 +72,18 @@ const ScheduleTaskModal: React.FC<ScheduleTaskModalProps> = ({
     });
   };
 
+  const dropdownOptions = scheduleTasksCategory.map(task => ({
+    label: task.label,
+    value: task.value
+  }));
+
+  const selectedTaskChildren =
+    scheduleTasksCategory.find(task => task.value === selectedTask)?.children ?? [];
+
+  const isSubmitDisabled = !(
+    selectedTask && selectedTaskChildren.every(task => params[task.value] > 0)
+  );
+
   return (
     <Modal
       title={t('Schedule Task')}
@@ -95,34 +93,29 @@ const ScheduleTaskModal: React.FC<ScheduleTaskModalProps> = ({
       okText={t('Submit')}
       width={530}
       cancellable={false}
-      // className="hue-schedule-task__modal"
+      okButtonProps={{ disabled: isSubmitDisabled }}
+      className="hue-schedule-task__modal"
     >
-      <div className="task-selection">
-        <Select
-          value={selectedTask}
-          onChange={setSelectedTask}
-          placeholder={t('Select Task')}
-          className="hue-schedule-task__select"
-          style={{ width: '100%' }}
-        >
-          {Object.keys(tasks).map(taskName => (
-            <Option key={taskName} value={taskName}>
-              {taskName}
-            </Option>
-          ))}
-        </Select>
+      <div className="hue-schedule-task-selection">
+        <Form.Item label={'Task'}>
+          <Radio.Group
+            options={dropdownOptions}
+            value={selectedTask}
+            onChange={e => setSelectedTask(e.target.value)}
+          />
+        </Form.Item>
       </div>
       {selectedTask && (
-        <div className="hue-schedule-task__modal__input-params">
-          {tasks[selectedTask].params.map(param => (
-            <div key={param.name}>
+        <div className="hue-schedule-task__input-group">
+          {selectedTaskChildren.map(param => (
+            <div key={param.value}>
               <Form.Item label={param.label}>
                 <Input
-                  name={param.name}
+                  name={param.value}
                   type={param.type}
                   placeholder={param.label}
                   onChange={handleChange}
-                  value={params[param.name] || 0}
+                  value={params[param.value]}
                 />
               </Form.Item>
             </div>

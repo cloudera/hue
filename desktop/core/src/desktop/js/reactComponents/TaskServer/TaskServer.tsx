@@ -19,12 +19,11 @@ import { i18nReact } from '../../utils/i18nReact.ts';
 import { AxiosError } from 'axios';
 import { extractErrorMessage } from '../../api/utils.ts';
 import { calculateDuration, formatTimestamp } from '../../utils/dateTimeUtils.ts';
-import './TaskServer.scss';
 import huePubSub from '../../utils/huePubSub.ts';
 import { Input, Checkbox } from 'antd';
 import { Tag } from 'antd';
 import { PrimaryButton, DangerButton } from 'cuix/dist/components/Button';
-import Table from '../Table/Table.tsx';
+import PaginatedTable from '../PaginatedTable/PaginatedTable';
 import useLoadData from '../../utils/hooks/useLoadData/useLoadData.ts';
 import useSaveData from '../../utils/hooks/useSaveData/useSaveData.ts';
 import { KillTaskResponse, TaskServerResponse, TaskServerResult } from './types.ts';
@@ -33,6 +32,8 @@ import { GET_TASKS_URL, KILL_TASK_URL } from './constants.ts';
 import ScheduleTaskModal from './ScheduleTaskModal/ScheduleTaskModal.tsx';
 import TaskLogsModal from './TaskLogsModal/TaskLogsModal.tsx';
 import { useWindowSize } from '../../utils/hooks/useWindowSize/useWindowSize';
+
+import './TaskServer.scss';
 
 export const TaskServer: React.FC = () => {
   const [selectedTaskId, setSelectedTaskId] = useState<TaskServerResponse['taskId'] | null>(null);
@@ -205,7 +206,6 @@ export const TaskServer: React.FC = () => {
           type="text"
           placeholder={t('Search by task name, user ID, or task ID...')}
           onChange={onSearchChange}
-          className="button-input-style"
           style={{ flexGrow: 1 }}
         />
         <Checkbox checked={statusFilter.success} onChange={onStatusFilterChange('success')} />
@@ -218,13 +218,12 @@ export const TaskServer: React.FC = () => {
         {t('All')}
       </div>
       <div className="hue-task-server__table" ref={ref}>
-        <Table<TaskServerResponse>
+        <PaginatedTable<TaskServerResponse>
           onRowSelect={setSelectedTasks}
           columns={columns}
           data={filteredTasks}
           rowKey="taskId"
-          bodyHeight={tableBodyHeight}
-          // rowClassName={getRowClassName}
+          scroll={{ y: tableBodyHeight }}
         />
       </div>
       {showSchedulePopup && <ScheduleTaskModal onClose={() => showScheduleTaskPopup(false)} />}
