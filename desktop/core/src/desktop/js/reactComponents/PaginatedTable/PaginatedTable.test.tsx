@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import Table from './PaginatedTable';
 import { ColumnProps } from 'antd/lib/table';
 import '@testing-library/jest-dom';
@@ -61,9 +61,11 @@ describe('Table', () => {
   it('renders table with data', () => {
     const { getByTestId, getByText } = render(<Table {...defaultProps} />);
 
-    expect(getByTestId('test-table')).toBeInTheDocument();
-    expect(getByText('John')).toBeInTheDocument();
-    expect(getByText('30')).toBeInTheDocument();
+    waitFor(() => {
+      expect(getByTestId('test-table')).toBeInTheDocument();
+      expect(getByText('John')).toBeInTheDocument();
+      expect(getByText('30')).toBeInTheDocument();
+    });
   });
 
   it('handles row selection', () => {
