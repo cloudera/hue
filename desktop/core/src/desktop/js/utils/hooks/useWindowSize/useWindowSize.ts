@@ -14,36 +14,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
+import { useLayoutEffect, useRef, useState } from 'react';
 
-.antd.cuix {
-  .upload-queue {
-    position: fixed;
-    bottom: 0;
-    right: 16px;
-    width: 520px;
-    background-color: vars.$fluidx-white;
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+type ObserverRect = Omit<DOMRectReadOnly, 'toJSON'>;
 
-    &__header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px;
-      color: vars.$fluidx-gray-900;
-      background-color: vars.$fluidx-gray-050;
-      cursor: pointer;
-      font-size: 16px;
+export const useWindowSize = (): [React.RefObject<HTMLDivElement>, ObserverRect] => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [rect, setRect] = useState<ObserverRect>({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0
+  });
+
+  const handleResize = (entries: ResizeObserverEntry[]) => {
+    const boundingRect = entries[0].contentRect;
+    setRect(boundingRect);
+  };
+
+  useLayoutEffect(() => {
+    const observer = new ResizeObserver(handleResize);
+    if (ref.current) {
+      observer.observe(ref.current);
     }
 
-    &__list {
-      display: flex;
-      flex-direction: column;
-      max-height: 40vh;
-      overflow: auto;
-      padding: 16px;
-      gap: 16px;
-    }
-  }
-}
+    return () => {
+      observer.disconnect();
+    };
+  }, [ref]);
+
+  return [ref, rect];
+};

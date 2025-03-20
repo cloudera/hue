@@ -19,8 +19,7 @@ import { useState, useEffect } from 'react';
 interface UseQueueProcessorResult<T> {
   queue: T[];
   enqueue: (newItems: T[]) => void;
-  enqueueAsync: (newItems: T[]) => Promise<void>;
-  dequeue: (item: T) => void;
+  dequeue: (itemValue: T[keyof T] | T, itemKey?: keyof T) => void;
   isLoading: boolean;
 }
 
@@ -41,20 +40,13 @@ const useQueueProcessor = <T>(
     setQueue(prevQueue => [...prevQueue, ...newItems]);
   };
 
-  const enqueueAsync = (newItems: T[]) => {
-    enqueue(newItems);
-    return new Promise<void>(resolve => {
-      const interval = setInterval(() => {
-        if (queue.length === 0 && processingQueue.length === 0) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 100);
+  const dequeue = (itemValue: T[keyof T] | T, itemKey?: keyof T) => {
+    setQueue(prev => {
+      if (itemKey) {
+        return prev.filter(i => i[itemKey] !== itemValue);
+      }
+      return prev.filter(i => i !== itemValue);
     });
-  };
-
-  const dequeue = (item: T) => {
-    setQueue(prev => prev.filter(i => i !== item));
   };
 
   const processQueueItem = async (item: T) => {
@@ -85,7 +77,6 @@ const useQueueProcessor = <T>(
     queue,
     isLoading,
     enqueue,
-    enqueueAsync,
     dequeue
   };
 };

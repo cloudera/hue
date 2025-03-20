@@ -55,11 +55,11 @@ const StorageBrowserPage = (): JSX.Element => {
         <Tabs
           className="hue-storage-browser__tab"
           destroyInactiveTabPane
-          defaultActiveKey={urlFileSystem ?? data?.[0]?.file_system}
-          items={data?.map(fs => ({
-            label: fs.file_system.toUpperCase(),
-            key: fs.file_system,
-            children: <StorageBrowserTab fileSystem={fs} />
+          defaultActiveKey={urlFileSystem ?? data?.[0]?.name}
+          items={data?.map(fileSystem => ({
+            label: fileSystem.name.toUpperCase(),
+            key: fileSystem.name,
+            children: <StorageBrowserTab fileSystem={fileSystem} />
           }))}
         />
       </LoadingErrorWrapper>

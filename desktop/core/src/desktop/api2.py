@@ -93,7 +93,6 @@ from metadata.catalog_api import (
 from metadata.conf import has_catalog
 from notebook.connectors.base import Notebook, get_interpreter
 from notebook.management.commands import notebook_setup
-from oozie.management.commands import oozie_setup
 from pig.management.commands import pig_setup
 from search.management.commands import search_setup
 from useradmin.models import Group, User
@@ -1450,6 +1449,9 @@ def _setup_pig_examples(request):
 
 
 def _setup_oozie_examples(request):
+  # Import dynamically to avoid oozie INSTALLED_APPS error
+  from oozie.management.commands import oozie_setup
+
   oozie_setup.Command().handle()
 
 

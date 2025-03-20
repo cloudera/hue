@@ -22,7 +22,7 @@ import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
 import { FILE_STATS_API_URL, TRASH_PATH } from '../api';
-import { BrowserViewType, FileStats, FileSystem, TrashPath } from '../types';
+import { BrowserViewType, FileStats, FileSystem, TrashData } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 
@@ -52,7 +52,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
   const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
   const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
   const initialFilePath =
-    urlFileSystem === fileSystem.file_system ? urlFilePath : fileSystem.user_home_directory;
+    urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
   const fileName =
@@ -61,21 +61,21 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
   const { t } = i18nReact.useTranslation();
 
   const {
-    data: trashPath,
+    data: trashData,
     loading: trashLoading,
     reloadData: onTrashPathReload
-  } = useLoadData<TrashPath>(TRASH_PATH, {
-    params: { path: fileSystem.user_home_directory },
-    skip: !fileSystem.config?.is_trash_enabled || !fileSystem.user_home_directory
+  } = useLoadData<TrashData>(TRASH_PATH, {
+    params: { path: fileSystem.userHomeDirectory },
+    skip: !fileSystem.config?.isTrashEnabled || !fileSystem.userHomeDirectory
   });
 
   const onTrashClick = async () => {
     const latestTrashData = await onTrashPathReload();
-    setFilePath(latestTrashData?.trash_path ?? '');
+    setFilePath(latestTrashData?.trashPath ?? '');
   };
 
   const reloadTrashPath = () => {
-    if (trashPath?.trash_path) {
+    if (trashData?.trashPath) {
       return;
     }
     onTrashPathReload();
@@ -108,12 +108,12 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
       enabled: error?.response?.status === 404,
       message: t('Error: Path "{{path}}" not found.', { path: filePath }),
       action: t('Go to home directory'),
-      onClick: () => setFilePath(fileSystem.user_home_directory)
+      onClick: () => setFilePath(fileSystem.userHomeDirectory)
     },
     {
       enabled: !!error && error?.response?.status !== 404,
       message: t('An error occurred while fetching filesystem "{{fileSystem}}".', {
-        fileSystem: fileSystem.file_system.toUpperCase()
+        fileSystem: fileSystem.name.toUpperCase()
       }),
       action: t('Retry'),
       onClick: reloadData
@@ -135,7 +135,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           <div className="hue-storage-browser__home-bar-right">
             <BorderlessButton
               onClick={() => {
-                setFilePath(fileSystem.user_home_directory);
+                setFilePath(fileSystem.userHomeDirectory);
               }}
               className="hue-storage-browser__home-bar-btns"
               data-event=""
@@ -144,14 +144,14 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
             >
               {t('Home')}
             </BorderlessButton>
-            {fileSystem.config?.is_trash_enabled && (
+            {fileSystem.config?.isTrashEnabled && (
               <BorderlessButton
                 onClick={onTrashClick}
                 className="hue-path-browser__home-btn"
                 data-event=""
                 title={t('Trash')}
                 icon={<DeleteIcon />}
-                disabled={!trashPath?.trash_path}
+                disabled={!trashData?.trashPath}
               >
                 {t('Trash')}
               </BorderlessButton>
@@ -167,7 +167,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
             </BorderlessButton>
           </div>
         </div>
-        {!!inTrash(filePath) && fileSystem.file_system === 'hdfs' && (
+        {!!inTrash(filePath) && fileSystem.name === 'hdfs' && (
           <Alert
             type="warning"
             message={t(
