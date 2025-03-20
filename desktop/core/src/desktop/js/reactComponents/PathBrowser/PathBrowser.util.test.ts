@@ -65,7 +65,7 @@ describe('PathBrowser utils', () => {
       const result = getBreadcrumbs('hdfs', hdfsPath);
 
       expect(result).toEqual([
-        { url: '/', label: '/hdfs' },
+        { url: '/', label: 'hdfs' },
         { url: '/test', label: 'test' },
         { url: '/test/folder', label: 'folder' }
       ]);
@@ -87,7 +87,7 @@ describe('PathBrowser utils', () => {
       const result = getBreadcrumbs('hdfs', pathWithTrailingSlash);
 
       expect(result).toEqual([
-        { url: '/', label: '/hdfs' },
+        { url: '/', label: 'hdfs' },
         { url: '/folder', label: 'folder' },
         { url: '/folder/with', label: 'with' },
         { url: '/folder/with/trailing', label: 'trailing' },
@@ -100,7 +100,7 @@ describe('PathBrowser utils', () => {
       const result = getBreadcrumbs('hdfs', pathWithLeadingSlash);
 
       expect(result).toEqual([
-        { url: '/', label: '/hdfs' },
+        { url: '/', label: 'hdfs' },
         { url: '/path', label: 'path' },
         { url: '/path/to', label: 'to' },
         { url: '/path/to/file', label: 'file' }

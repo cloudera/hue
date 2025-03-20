@@ -47,7 +47,7 @@ export const getFileSystemAndPath = (
 export const getBreadcrumbs = (fileSystem: string, path: string): BreadcrumbData[] => {
   const pathParts = path.split('/').filter(Boolean);
   const rootUrl = fileSystem === 'hdfs' ? '/' : `${fileSystem}://`;
-  const rootlabel = fileSystem === 'hdfs' ? '/hdfs' : fileSystem;
+  const rootlabel = fileSystem === 'hdfs' ? 'hdfs' : fileSystem;
   const rootNode = {
     url: rootUrl,
     label: rootlabel
