@@ -285,13 +285,17 @@ class AtlasApi(Api):
         'criterion': [{
           'condition': 'OR',
           'criterion': [{
-            'attributeName': 'name',
-            'attributeValue': query_s,
-            'operator': 'contains'
+            'attributeName': '__typeName',
+            'operator': 'eq',
+            'attributeValue': 'hive_column'
           }, {
-            'attributeName': 'description',
-            'attributeValue': query_s,
-            'operator': 'contains'
+            'attributeName': '__typeName',
+            'operator': 'eq',
+            'attributeValue': 'hive_table'
+          }, {
+            'attributeName': '__typeName',
+            'operator': 'eq',
+            'attributeValue': 'hive_db'
           }]
         }]
       },
