@@ -39,7 +39,7 @@ function ConfigStatus(): JSX.Element {
   const columns = [
     {
       dataIndex: 'name',
-      render: name => <span className="config-table-name">{name}</span>
+      render: name => <span className="config__table-name">{name}</span>
     },
     {
       key: 'details',
@@ -47,7 +47,7 @@ function ConfigStatus(): JSX.Element {
         <div>
           {record.value && (
             <p>
-              {t('Current value')}: <span className="config-table-name">{record.value}</span>
+              {t('Current value')}: <span className="config__table-name">{record.value}</span>
             </p>
           )}
           <p>{record.message}</p>
@@ -69,13 +69,13 @@ function ConfigStatus(): JSX.Element {
   }
 
   if (loading) {
-    return <Spin spinning={loading} className="config--spin" />;
+    return <Spin spinning={loading} className="config__spin" />;
   }
 
   const configErrorsExist = Boolean(data?.config_errors?.length);
 
   return (
-    <div className="config-status">
+    <div className="overview-config">
       <h1>{t('Checking current configuration')}</h1>
       {data?.hue_config_dir && (
         <div>
@@ -92,7 +92,7 @@ function ConfigStatus(): JSX.Element {
                 <a
                   href="https://docs.gethue.com/administrator/configuration/"
                   target="_blank"
-                  className="config-link"
+                  className="config__link"
                 >
                   {t('Potential misconfiguration detected.')}
                 </a>{' '}

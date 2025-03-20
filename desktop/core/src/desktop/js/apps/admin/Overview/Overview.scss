@@ -21,7 +21,7 @@
     background-color: $fluidx-gray-100;
     padding: 24px;
 
-    .config--spin{
+    .config__spin {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -36,7 +36,7 @@
       border-radius: 2px;
     }
 
-    .config-link {
+    .config__link {
       color: $fluidx-blue-600;
       cursor: pointer;
     }
@@ -45,7 +45,7 @@
       margin: 10px 0;
     }
 
-    .config-table-name {
+    .config__table-name {
       color: $fluidx-gray-900;
       font-size: 12px;
       border-radius: 5px;
@@ -55,16 +55,17 @@
       border: 1px solid $fluidx-gray-400;
     }
 
-    .overview-examples, .overview-analytics{
+    .overview-examples,
+    .overview-analytics {
       height: 100vh;
     }
 
-    .usage_analytics{
+    .usage__analytics {
       display: inline-block;
       padding: 5px;
     }
 
-    .config__trademark-text {
+    .overview__trademark-text {
       text-align: right;
       padding: 10px;
     }

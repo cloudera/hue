@@ -17,8 +17,7 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
-// import { fetchWithCsrf } from '../../../reactComponents/utils';
-import { get } from '../../../api/utils';
+import { post } from '../../../api/utils';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 import './Overview.scss';
@@ -48,7 +47,7 @@ const Examples = (): JSX.Element => {
     const url = `/${appIdOrOldName}/install_examples`;
     const data = appData.data ? { data: appData.data } : null;
 
-    get<InstallExamplesResponse>(url, data, {
+    post<InstallExamplesResponse>(url, data, {
       method: 'POST',
       silenceErrors: true
     })
@@ -74,40 +73,6 @@ const Examples = (): JSX.Element => {
         setInstallingAppId(null);
       });
   };
-
-  // const handleInstall = async (appData) => {
-  //   try {
-  //     setInstallingAppId(appData.id);
-  //     const appIdOrOldName = appData.old_name || appData.id;
-  //     const url = `/${appIdOrOldName}/install_examples`;
-
-  //     const data = appData.data ? { data: appData.data } : {};
-
-  // const options = {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   }
-  // };
-  // if (appData.data) {
-  //   options.body = JSON.stringify({ data: appData.data });
-  // }
-  // const response = await fetchWithCsrf(url, options);
-
-  //     const responseBody = await response.json();
-  //     if (responseBody.status == 0) {
-  //       if (responseBody.message) {
-  //         huePubSub.publish('hue.global.info', { message: t(responseBody.message) });
-  //       } else {
-  //         huePubSub.publish('hue.global.info', { message: t('Examples refreshed') });
-  //       }
-  //     } else {
-  //       huePubSub.publish('hue.global.error', { message: t(responseBody.message) });
-  //     }
-  //   } finally {
-  //     setInstallingAppId(null);
-  //   }
-  // };
 
   return (
     <div className="overview-examples">

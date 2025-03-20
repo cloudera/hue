@@ -31,7 +31,6 @@ def admin_wizard(request):
   else:
     apps = []
   app_names = [app.name for app in sorted(apps, key=lambda app: app.menu_index)]
-  # instead of here, move this to config
 
   return render('admin_wizard.mako', request, {
       'version': hue_version(),

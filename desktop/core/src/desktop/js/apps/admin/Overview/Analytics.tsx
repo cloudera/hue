@@ -29,16 +29,6 @@ const Analytics = (): JSX.Element => {
   const [collectUsage, setCollectUsage] = useState(false);
   const { t } = i18nReact.useTranslation();
 
-  // const saveCollectUsagePreference = async collectUsage => {
-  //   $.post('/about/update_preferences', { collect_usage: collectUsage ? 'on' : null }, data => {
-  //     if (data.status == 0) {
-  //       huePubSub.publish('hue.global.info', { message: t('Configuration updated') });
-  //     } else {
-  //       huePubSub.publish('hue.global.error', { message: t(data.data) });
-  //     }
-  //   });
-  // };
-
   const saveCollectUsagePreference = async (collectUsage: boolean) => {
     try {
       const response = await post<PostResponse>('/about/update_preferences', {
@@ -73,7 +63,7 @@ const Analytics = (): JSX.Element => {
         checked={collectUsage}
         onChange={handleCheckboxChange}
       />
-      <label htmlFor="usage_analytics" className="usage_analytics">
+      <label htmlFor="usage_analytics" className="usage__analytics">
         {t('Help improve Hue with anonymous usage analytics.')}
       </label>
     </div>
