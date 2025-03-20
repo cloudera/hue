@@ -30,7 +30,10 @@ import './StorageBrowserTab.scss';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
-import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import {
+  getFileNameFromPath,
+  getFileSystemAndPath
+} from '../../../reactComponents/PathBrowser/PathBrowser.util';
 import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
 import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
@@ -55,8 +58,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
-  const fileName =
-    filePath.split('/').pop() !== '' ? (filePath.split('/').pop() ?? '') : filePath.split('://')[0];
+  const fileName = getFileNameFromPath(filePath);
 
   const { t } = i18nReact.useTranslation();
 
@@ -195,7 +197,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           />
         )}
         {fileStats?.type === BrowserViewType.file && !isLoading && (
-          <StorageFilePage fileName={fileName} fileStats={fileStats} onReload={reloadData} />
+          <StorageFilePage fileStats={fileStats} onReload={reloadData} />
         )}
       </div>
     </LoadingErrorWrapper>
