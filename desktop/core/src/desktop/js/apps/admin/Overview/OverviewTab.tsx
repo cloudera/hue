@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Tabs } from 'antd';
 import Examples from './Examples';
 import ConfigStatus from './ConfigStatus';
@@ -49,7 +49,7 @@ const Overview = (): JSX.Element | null => {
   return isAdmin ? (
     <div className="hue-overview-component">
       <Tabs tabPosition="left" items={items} />
-      <div className="config__trademark-text">
+      <div className="overview__trademark-text">
         Hue and the Hue logo are trademarks of Cloudera, Inc.
       </div>
     </div>

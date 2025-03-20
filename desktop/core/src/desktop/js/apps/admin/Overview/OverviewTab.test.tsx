@@ -16,32 +16,37 @@
 
 import '@testing-library/jest-dom';
 import React from 'react';
-import { queryByText, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Overview from './OverviewTab';
-import Analytics from './Analytics';
-import saveCollectUsagePreference from '../Overview/Analytics';
 import * as hueConfigModule from '../../../config/hueConfig';
-
+import Examples from './Examples';
+import Analytics from './Analytics';
 import { post } from '../../../api/utils';
 
+jest.mock('../../../api/utils', () => ({
+  post: jest.fn()
+}));
+
+jest.unmock('./Analytics');
+
 jest.mock('./ConfigStatus', () => () => <div>MockedConfigStatusComponent</div>);
-jest.mock('./Examples', () => () => <div>MockedExamplesComponent</div>);
-jest.mock('./Analytics', () => () => <div>MockedAnalyticsComponent</div>);
+// jest.mock('./Examples', () => () => <div>MockedExamplesComponent</div>);
+// jest.mock('./Analytics', () => () => <div>MockedAnalyticsComponent</div>);
 
 jest.mock('../../../config/hueConfig', () => ({
   getLastKnownConfig: jest.fn()
 }));
 
 describe('OverviewTab', () => {
-beforeEach(() => {
-  (hueConfigModule.getLastKnownConfig as jest.Mock).mockReturnValue({
-    hue_config: { is_admin: true }
+  beforeEach(() => {
+    (hueConfigModule.getLastKnownConfig as jest.Mock).mockReturnValue({
+      hue_config: { is_admin: true }
+    });
   });
-});
-   afterEach(() => {
-     jest.clearAllMocks();
-   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
   test('renders the Tabs with the correct tab labels', () => {
     render(<Overview />);
@@ -64,7 +69,6 @@ beforeEach(() => {
     ).toBeInTheDocument();
   });
 
-
   test('it should not render Overview for non-admin users', () => {
     (hueConfigModule.getLastKnownConfig as jest.Mock).mockReturnValue({
       hue_config: { is_admin: false }
@@ -75,35 +79,6 @@ beforeEach(() => {
     expect(trademarkText).toBeNull();
   });
 
-
-  // jest.mock('../Overview/Analytics', () => ({
-  //   __esModule: true,
-  //   saveCollectUsagePreference: jest.fn(() => Promise.resolve({ status: 0 }))
-  // }));
-  // jest.mock('../../../api/utils', () => ({
-  //   post: jest.fn(() => Promise.resolve({ status: 0 }))
-  // }));
-
-  //   describe('Analytics Component', () => {
-  //      beforeEach(() => {
-  //        jest.clearAllMocks();
-  //      });
-  //  test('renders Analytics tab and can interact with the checkbox', async () => {
-  //     render(<Analytics />);
-  //  const checkbox = screen.getByRole('checkbox', {
-  //    name: /help improve hue with anonymous usage analytics\./i
-  //  });
-
-  //     expect(checkbox).not.toBeChecked();
-  //     await userEvent.click(checkbox);
-  //     await waitFor(() => expect(checkbox).toBeChecked());
-  //   expect(saveCollectUsagePreference).toHaveBeenCalledWith(true);
-
-  //     await userEvent.click(checkbox);
-  //     await waitFor(() => expect(checkbox).not.toBeChecked());
-  //   expect(saveCollectUsagePreference).toHaveBeenCalledWith(false);
-  //   });
-  // });
   // describe('Analytics Component', () => {
   //   beforeEach(() => {
   //     jest.clearAllMocks();
@@ -119,16 +94,44 @@ beforeEach(() => {
   //     await userEvent.click(checkbox);
   //     await waitFor(() => expect(checkbox).toBeChecked());
 
-  //     // Now that we are mocking 'post', we assert that the post API call was made
   //     expect(post).toHaveBeenCalledWith('/about/update_preferences', { collect_usage: 'on' });
 
   //     await userEvent.click(checkbox);
   //     await waitFor(() => expect(checkbox).not.toBeChecked());
-
-  //     // Again we check that the 'post' was called with the new state ('null' for off)
   //     expect(post).toHaveBeenCalledWith('/about/update_preferences', { collect_usage: null });
   //   });
   // });
-});
+  describe('Analytics Component', () => {
+    test('renders Analytics tab and can interact with the checkbox', async () => {
+      (post as jest.Mock).mockResolvedValue({ status: 0, message: 'Success' });
+      render(<Analytics />);
+      const checkbox = screen.getByTitle(/Check to enable usage analytics/i);
+      fireEvent.click(checkbox);
+      await waitFor(() => expect(checkbox).toBeChecked());
+      expect(post).toHaveBeenCalledWith('/about/update_preferences', {
+        collect_usage: 'on'
+      });
+      fireEvent.click(checkbox);
+      await waitFor(() => expect(checkbox).not.toBeChecked());
+      expect(post).toHaveBeenCalledWith('/about/update_preferences', {
+        collect_usage: null
+      });
+    });
+  });
 
-//click on hive app and api of hive is called (toHaveBeenCalled())
+  describe('Examples component', () => {
+    afterEach(cleanup);
+    test('click on Hive app and the API for Hive is called', async () => {
+      (post as jest.Mock).mockResolvedValue({ status: 0, message: 'Success' });
+      render(<Examples />);
+      const hiveButton = screen.getByText('Hive');
+      userEvent.click(hiveButton);
+      await waitFor(() => {
+        expect(post).toHaveBeenCalledWith('/beeswax/install_examples', null, {
+          method: 'POST',
+          silenceErrors: true
+        });
+      });
+    });
+  });
+});
