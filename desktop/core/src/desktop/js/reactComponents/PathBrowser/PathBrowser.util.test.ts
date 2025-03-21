@@ -135,45 +135,45 @@ describe('PathBrowser utils', () => {
   });
 
   describe('getLastDirOrFileNameFromPath', () => {
-    it('should return the correct fileName for a valid filePath', () => {
-      const filePath = '/user/documents/file.txt';
-      const result = getLastDirOrFileNameFromPath(filePath);
+    it('should return the correct fileName for a valid path', () => {
+      const path = '/user/documents/file.txt';
+      const result = getLastDirOrFileNameFromPath(path);
       expect(result).toBe('file.txt');
     });
 
-    it('should return the correct fileName for a valid filePath with double file extension', () => {
-      const filePath = '/user/documents/file.tar.gz';
-      const result = getLastDirOrFileNameFromPath(filePath);
+    it('should return the correct fileName for a valid path with double file extension', () => {
+      const path = '/user/documents/file.tar.gz';
+      const result = getLastDirOrFileNameFromPath(path);
       expect(result).toBe('file.tar.gz');
     });
 
-    it('should return an correct fileName for a filePath ending with a slash', () => {
-      const filePath = '/user/documents/';
-      const result = getLastDirOrFileNameFromPath(filePath);
-      expect(result).toBe('documents');
+    it('should return an correct fileName for a path ending with a slash', () => {
+      const path = '/user/documents/file.txt/';
+      const result = getLastDirOrFileNameFromPath(path);
+      expect(result).toBe('file.txt');
     });
 
-    it('should return correct filename for S3A path', () => {
-      const filePath = 's3a://example/hue/';
-      const result = getLastDirOrFileNameFromPath(filePath);
+    it('should return correct directoryName for S3A path', () => {
+      const path = 's3a://example/hue/';
+      const result = getLastDirOrFileNameFromPath(path);
       expect(result).toBe('hue');
     });
 
-    it('should return correct filename when filePath is root S3A', () => {
-      const filePath = 's3a://';
-      const result = getLastDirOrFileNameFromPath(filePath);
+    it('should return correct directoryName when path is root S3A', () => {
+      const path = 's3a://';
+      const result = getLastDirOrFileNameFromPath(path);
       expect(result).toBe('s3a');
     });
 
-    it('should return correct filename when filePath is root HDFS', () => {
-      const filePath = '/';
-      const result = getLastDirOrFileNameFromPath(filePath);
+    it('should return correct directoryName when path is root HDFS', () => {
+      const path = '/';
+      const result = getLastDirOrFileNameFromPath(path);
       expect(result).toBe('hdfs');
     });
 
-    it('should return empty string when filePath is empty string', () => {
-      const filePath = '';
-      const result = getLastDirOrFileNameFromPath(filePath);
+    it('should return empty string when path is empty string', () => {
+      const path = '';
+      const result = getLastDirOrFileNameFromPath(path);
       expect(result).toBe('');
     });
   });
