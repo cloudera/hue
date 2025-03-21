@@ -33,13 +33,9 @@ import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import {
-  getFileNameFromPath,
+  getLastDirOrFileNameFromPath,
   getFileSystemAndPath
 } from '../../../reactComponents/PathBrowser/PathBrowser.util';
-import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
-import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
-import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
-import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 import { inTrash } from '../../../utils/storageBrowserUtils';
 
 import './StorageBrowserTab.scss';
@@ -62,7 +58,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
-  const fileName = getFileNameFromPath(filePath);
+  const fileName = getLastDirOrFileNameFromPath(filePath);
 
   const { t } = i18nReact.useTranslation();
 

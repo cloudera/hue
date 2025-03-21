@@ -29,7 +29,7 @@ import Breadcrumb from './Breadcrumb/Breadcrumb';
 import './PathBrowser.scss';
 import { getBreadcrumbs, getFileSystemAndPath, BreadcrumbData } from './PathBrowser.util';
 
-const DEFAULT_URL_SCHEMA_SEPARATOR = '://';
+const DEFAULT_URL_SCHEMA_SEPERATOR = '://';
 const DEFAULT_PATH_SEPEATOR = '/';
 
 interface PathBrowserProps {
@@ -138,7 +138,7 @@ const PathBrowser = ({
                       className="hue-path-browser__breadcrumb-seperator"
                       data-testid={`${testId}-breadcrumb-seperator`}
                     >
-                      {index === 0 ? DEFAULT_URL_SCHEMA_SEPARATOR : seperator}
+                      {index === 0 ? DEFAULT_URL_SCHEMA_SEPERATOR : seperator}
                     </div>
                   )}
                 </React.Fragment>
@@ -156,7 +156,7 @@ const PathBrowser = ({
                 className="hue-path-browser__breadcrumb-seperator"
                 data-testid={`${testId}-breadcrumb-seperator`}
               >
-                {DEFAULT_URL_SCHEMA_SEPARATOR}
+                {DEFAULT_URL_SCHEMA_SEPERATOR}
               </div>
               <Dropdown
                 overlayClassName="hue-path-browser__dropdown cuix antd"

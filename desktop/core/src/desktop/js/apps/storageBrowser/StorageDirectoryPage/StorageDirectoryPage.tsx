@@ -48,7 +48,7 @@ import PaginatedTable, {
   SortOrder,
   ColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
-import { getFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
@@ -111,7 +111,7 @@ const StorageDirectoryPage = ({
     }
 
     return filesData?.files?.map(file => ({
-      name: getFileNameFromPath(file.path),
+      name: getLastDirOrFileNameFromPath(file.path),
       size: file.type === BrowserViewType.file ? formatBytes(file.size) : '',
       user: file.user,
       group: file.group,

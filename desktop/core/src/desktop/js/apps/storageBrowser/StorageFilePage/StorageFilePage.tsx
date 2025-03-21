@@ -33,7 +33,7 @@ import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import { inTrash } from '../../../utils/storageBrowserUtils';
-import { getFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageFilePageProps {
   onReload: () => void;
@@ -42,7 +42,7 @@ interface StorageFilePageProps {
 
 const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Element => {
   const config = getLastKnownConfig();
-  const fileName = getFileNameFromPath(fileStats.path);
+  const fileName = getLastDirOrFileNameFromPath(fileStats.path);
   const fileType = getFileType(fileName);
 
   const { t } = i18nReact.useTranslation();

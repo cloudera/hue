@@ -43,8 +43,8 @@ const LoadingErrorWrapper = ({
     return (
       <Spin
         spinning={loading}
-        data-testid="loading-error-wrapper__sppiner"
-        className="loading-error-wrapper__sppiner"
+        data-testid="loading-error-wrapper__spinner"
+        className="loading-error-wrapper__spinner"
       >
         {hideChildren === false && children}
       </Spin>
