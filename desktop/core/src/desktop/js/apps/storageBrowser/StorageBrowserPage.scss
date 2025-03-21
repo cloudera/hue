@@ -15,13 +15,17 @@
 // limitations under the License.
 
 @use 'variables' as vars;
-@use 'mixins';
+
+.hue-storage-browser__root-container {
+  height: 100%;
+}
 
 .hue-storage-browser.antd.cuix {
-  @include mixins.fillAbsolute;
-  @include mixins.flexRowLayout;
-
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   height: 100%;
+  min-width: 300px;
 
   .ant-spin-nested-loading {
     height: 100%;
@@ -40,7 +44,6 @@
     .ant-tabs-content-holder {
       display: flex;
       flex: 1;
-      overflow: auto;
 
       .ant-tabs-content,
       .ant-tabs-tabpane-active {

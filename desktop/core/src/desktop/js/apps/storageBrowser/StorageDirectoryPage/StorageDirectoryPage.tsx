@@ -41,7 +41,7 @@ import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
 import { RegularFile, FileStatus } from '../../../utils/hooks/useFileUpload/types';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
-import { useWindowSize } from '../../../utils/hooks/useWindowSize/useWindowSize';
+import useResizeObserver from '../../../utils/hooks/useResizeObserver/useResizeObserver';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import StorageDirectoryActions from './StorageDirectoryActions/StorageDirectoryActions';
 import PaginatedTable, {
@@ -156,7 +156,7 @@ const StorageDirectoryPage = ({
     setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
   };
 
-  const [tableRef, rect] = useWindowSize();
+  const [tableRef, rect] = useResizeObserver();
   // 40px for table header, 50px for pagination
   const tableBodyHeight = Math.max(rect.height - 90, 100);
 
