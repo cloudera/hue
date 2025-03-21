@@ -16,7 +16,7 @@
 
 import React from 'react';
 
-import OverflowingItem from '../OverflowingItem';
+import OverflowingItem from '../OverflowingItem/OverflowingItem';
 import './Breadcrumb.scss';
 
 interface BreadcrumbProps {

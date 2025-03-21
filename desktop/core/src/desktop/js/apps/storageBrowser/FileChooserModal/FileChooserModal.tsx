@@ -146,12 +146,7 @@ const FileChooserModal = ({
     >
       <div className="hue-filechooser-modal__body">
         <div className="hue-filechooser-modal__path-browser-panel">
-          <PathBrowser
-            filePath={destPath}
-            onFilepathChange={setDestPath}
-            seperator={'/'}
-            showIcon={false}
-          />
+          <PathBrowser filePath={destPath} onFilepathChange={setDestPath} showIcon={false} />
         </div>
         <Input
           className="hue-filechooser-modal__search"

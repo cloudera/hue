@@ -19,15 +19,15 @@ import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
 import { Checkbox, Input, Select } from 'antd';
-import { ListDirectory, StorageDirectoryTableData } from '../../../../types';
+import { HDFSFileSystemConfig, StorageDirectoryTableData } from '../../../../types';
 import { BULK_CHANGE_OWNER_API_URL } from '../../../../api';
 import './ChangeOwnerAndGroupModal.scss';
 
 interface ChangeOwnerAndGroupModalProps {
-  superUser?: ListDirectory['superuser'];
-  superGroup?: ListDirectory['supergroup'];
-  users?: ListDirectory['users'];
-  groups?: ListDirectory['groups'];
+  superUser?: HDFSFileSystemConfig['superuser'];
+  superGroup?: HDFSFileSystemConfig['supergroup'];
+  users?: HDFSFileSystemConfig['users'];
+  groups?: HDFSFileSystemConfig['groups'];
   isOpen?: boolean;
   files: StorageDirectoryTableData[];
   setLoading: (value: boolean) => void;
@@ -37,7 +37,9 @@ interface ChangeOwnerAndGroupModalProps {
 }
 
 const OTHERS_KEY = 'others';
-const getDropdownOptions = (entity: ListDirectory['users'] | ListDirectory['groups']) => {
+const getDropdownOptions = (
+  entity: HDFSFileSystemConfig['users'] | HDFSFileSystemConfig['groups']
+) => {
   return [...entity, OTHERS_KEY].map(user => ({
     value: user,
     label: user

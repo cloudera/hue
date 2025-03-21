@@ -17,7 +17,7 @@
 const fileSysteRoot = {
   hdfs: ['/', 'hdfs'],
   ofs: ['ofs://'],
-  s3: ['s3a://'],
+  s3a: ['s3a://'],
   gs: ['gs://'],
   abfs: ['abfs://']
 };
@@ -41,7 +41,7 @@ export const isOFS = (path: string): boolean => {
 };
 
 export const isS3 = (path: string): boolean => {
-  return checkFileSystem(path, fileSysteRoot.s3);
+  return checkFileSystem(path, fileSysteRoot.s3a);
 };
 
 export const isGS = (path: string): boolean => {
@@ -53,7 +53,7 @@ export const isABFS = (path: string): boolean => {
 };
 
 export const isS3Root = (path: string): boolean => {
-  return checkFileSystemRoot(path, fileSysteRoot.s3);
+  return checkFileSystemRoot(path, fileSysteRoot.s3a);
 };
 
 export const isGSRoot = (path: string): boolean => {

@@ -14,7 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getBreadcrumbs, getFileSystemAndPath } from './PathBrowser.util';
+import {
+  getBreadcrumbs,
+  getLastDirOrFileNameFromPath,
+  getFileSystemAndPath
+} from './PathBrowser.util';
 
 describe('PathBrowser utils', () => {
   describe('getFileSystemAndPath', () => {
@@ -65,7 +69,7 @@ describe('PathBrowser utils', () => {
       const result = getBreadcrumbs('hdfs', hdfsPath);
 
       expect(result).toEqual([
-        { url: '/', label: '/' },
+        { url: '/', label: 'hdfs' },
         { url: '/test', label: 'test' },
         { url: '/test/folder', label: 'folder' }
       ]);
@@ -87,7 +91,7 @@ describe('PathBrowser utils', () => {
       const result = getBreadcrumbs('hdfs', pathWithTrailingSlash);
 
       expect(result).toEqual([
-        { url: '/', label: '/' },
+        { url: '/', label: 'hdfs' },
         { url: '/folder', label: 'folder' },
         { url: '/folder/with', label: 'with' },
         { url: '/folder/with/trailing', label: 'trailing' },
@@ -100,7 +104,7 @@ describe('PathBrowser utils', () => {
       const result = getBreadcrumbs('hdfs', pathWithLeadingSlash);
 
       expect(result).toEqual([
-        { url: '/', label: '/' },
+        { url: '/', label: 'hdfs' },
         { url: '/path', label: 'path' },
         { url: '/path/to', label: 'to' },
         { url: '/path/to/file', label: 'file' }
@@ -127,6 +131,50 @@ describe('PathBrowser utils', () => {
         { url: 'abfs://', label: 'abfs' },
         { url: 'abfs://file.txt', label: 'file.txt' }
       ]);
+    });
+  });
+
+  describe('getLastDirOrFileNameFromPath', () => {
+    it('should return the correct fileName for a valid path', () => {
+      const path = '/user/documents/file.txt';
+      const result = getLastDirOrFileNameFromPath(path);
+      expect(result).toBe('file.txt');
+    });
+
+    it('should return the correct fileName for a valid path with double file extension', () => {
+      const path = '/user/documents/file.tar.gz';
+      const result = getLastDirOrFileNameFromPath(path);
+      expect(result).toBe('file.tar.gz');
+    });
+
+    it('should return an correct fileName for a path ending with a slash', () => {
+      const path = '/user/documents/file.txt/';
+      const result = getLastDirOrFileNameFromPath(path);
+      expect(result).toBe('file.txt');
+    });
+
+    it('should return correct directoryName for S3A path', () => {
+      const path = 's3a://example/hue/';
+      const result = getLastDirOrFileNameFromPath(path);
+      expect(result).toBe('hue');
+    });
+
+    it('should return correct directoryName when path is root S3A', () => {
+      const path = 's3a://';
+      const result = getLastDirOrFileNameFromPath(path);
+      expect(result).toBe('s3a');
+    });
+
+    it('should return correct directoryName when path is root HDFS', () => {
+      const path = '/';
+      const result = getLastDirOrFileNameFromPath(path);
+      expect(result).toBe('hdfs');
+    });
+
+    it('should return empty string when path is empty string', () => {
+      const path = '';
+      const result = getLastDirOrFileNameFromPath(path);
+      expect(result).toBe('');
     });
   });
 });
