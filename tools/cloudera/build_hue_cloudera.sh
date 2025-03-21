@@ -49,14 +49,7 @@ function install_prerequisite() {
   fi
 
   export SQLITE3_PATH=${SQLITE3_PATH:-"$TOOLS_HOME/sqlite/bin/sqlite3"}
-  if [[ $1 == "redhat9" || $1 == "redhat9_ppc" || $1 == "redhat8" || $1 == "redhat8-arm64" ]]; then
-    check_python39_path
-  elif [[ $1 == "ubuntu22" || $1 == "sles15" ]]; then
-    check_python310_path
-  else
-    check_python38_path
-  fi
-  check_sqlite3
+  # check_sqlite3
   if [[ $1 == "centos7" ]]; then
     export PYTHON38_PATH=/opt/cloudera/cm-agent
     export pip38_bin="$PYTHON38_PATH/bin/pip3.8"
@@ -93,39 +86,48 @@ HUE_JAR_VERSION=$3
 export VIRTUAL_ENV_VERSION="20.24.4"
 export VIRTUAL_ENV_RELOCATABLE_VERSION="0.0.1"
 
-big_console_header "Hue PreRequisite Start" "$@"
-install_prerequisite $DOCKEROS
-big_console_header "Hue PreRequisite End" "$@"
-
 export DESKTOP_VERSION=$2
 export HUE_WEBPACK_CONFIG='webpack.config.internal.js'
-export PYTHON_H=$PYTHON38_PATH/include/python3.8/Python.h
-export PYTHON_VER=python3.8
-export SYS_PYTHON=$PYTHON38_PATH/bin/python3.8
 export SQLITE3_PATH=${SQLITE3_PATH:="${TOOLS_HOME}/sqlite/bin/sqlite3"}
 export ORACLE_INSTANTCLIENT19_PATH="/opt/toolchain/instantclient_19_15"
 export LD_LIBRARY_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_PATH
 export LD_RUN_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH
-export PATH=$HOME/.local/bin:$PYTHON38_PATH/bin:${TOOLS_HOME}/sqlite/bin:/usr/bin:$PATH
 
-if [[ $DOCKEROS == "redhat9" || $DOCKEROS == "redhat9_ppc" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat8-arm64" ]]; then
-  export PYTHON_H=$PYTHON39_PATH/include/python3.9/Python.h
-  export PYTHON_VER=python3.9
-  export SYS_PYTHON=$PYTHON39_PATH/bin/python3.9
-  export PATH=$PYTHON39_PATH/bin:$PATH
-elif [[ $DOCKEROS == "ubuntu22" || $DOCKEROS == "sles15" ]]; then
-  export PYTHON_H=$PYTHON310_PATH/include/python3.10/Python.h
-  export PYTHON_VER=python3.10
-  export SYS_PYTHON=$PYTHON310_PATH/bin/python3.10
-  export PATH=$PYTHON310_PATH/bin:$PATH
-fi
+PYTHON_VERSIONS=("python3.8" "python3.9" "pythopn3.10" "python3.11")
 
-HUE_SRC=$(realpath $WORK_DIR/../..)
-export ROOT=$HUE_SRC
-cd $HUE_SRC
+for _PYTHON in "${PYTHON_VERSIONS[@]}"; do
+  if [[ $_PYTHON == "python3.8" && ( $DOCKEROS == "redhat7_ppc" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat8_ppc" || $DOCKEROS == "sles12" || $DOCKEROS == "centos7" || $DOCKEROS == "ubuntu18" || $DOCKEROS == "ubuntu20" ) ]]; then
+    check_python38_path
+    export PYTHON_VER="python3.8"
+    export PATH="$PYTHON38_PATH/bin:$PATH"
+  elif [[ $_PYTHON == "python3.9" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat9_ppc" || $DOCKEROS == "redhat8-arm64" ) ]]; then
+    check_python39_path
+    export PYTHON_VER="python3.9"
+    export PATH="$PYTHON39_PATH/bin:$PATH"
+  elif [[ $_PYTHON == "python3.10" && ( $DOCKEROS == "sles15" || $DOCKEROS == "ubuntu22" ) ]]; then
+    check_python310_path
+    export PYTHON_VER="python3.10"
+    export PATH="$PYTHON310_PATH/bin:$PATH"
+  elif [[ $_PYTHON == "python3.11" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "sles15" ) ]]; then
+    check_python311_path
+    export PYTHON_VER="python3.11"
+    export PATH="$PYTHON311_PATH/bin:$PATH"
+  else
+    continue
+  fi
 
-big_console_header "Hue Build Start" "$@"
-make apps docs
-bash -x ./tools/relocatable.sh
-make prod
-big_console_header "Hue Build End" "$@"
+  big_console_header "Hue PreRequisite Start" "$@"
+  install_prerequisite $DOCKEROS
+  big_console_header "Hue PreRequisite End" "$@"
+
+  HUE_SRC=$(realpath "$WORK_DIR/../..")
+  export ROOT="$HUE_SRC"
+  cd "$HUE_SRC" || exit 1
+
+  big_console_header "Hue Build Start" "$@"
+  make apps docs
+  bash -x ./tools/relocatable.sh $_PYTHON
+  make prod
+  big_console_header "Hue Build End" "$@"
+
+done
