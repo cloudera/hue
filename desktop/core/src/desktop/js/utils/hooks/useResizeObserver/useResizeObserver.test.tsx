@@ -15,9 +15,9 @@
 // limitations under the License.
 
 import { act, renderHook } from '@testing-library/react';
-import { useWindowSize } from './useWindowSize';
+import useResizeObserver from './useResizeObserver';
 
-describe('useWindowSize', () => {
+describe('useResizeObserver', () => {
   const mockCallback = jest.fn();
   const mockObserver = {
     observe: jest.fn(),
@@ -36,7 +36,7 @@ describe('useWindowSize', () => {
   });
 
   it('should initialize with default dimensions', () => {
-    const { result } = renderHook(() => useWindowSize());
+    const { result } = renderHook(() => useResizeObserver());
 
     expect(result.current[1]).toEqual({
       x: 0,
@@ -51,7 +51,7 @@ describe('useWindowSize', () => {
   });
 
   it('should update dimensions when ResizeObserver fires', () => {
-    const { result } = renderHook(() => useWindowSize());
+    const { result } = renderHook(() => useResizeObserver());
     const div = document.createElement('div');
     result.current[0].current = div;
 
@@ -74,7 +74,7 @@ describe('useWindowSize', () => {
   });
 
   it('should disconnect observer on unmount', () => {
-    const { unmount } = renderHook(() => useWindowSize());
+    const { unmount } = renderHook(() => useResizeObserver());
 
     unmount();
     expect(mockObserver.disconnect).toHaveBeenCalled();
