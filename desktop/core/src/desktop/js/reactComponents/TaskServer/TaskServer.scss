@@ -51,17 +51,17 @@
       align-items: center;
       gap: 10px;
     }
-  }
 
-  .success-text {
-    color: vars.$fluidx-green-500;
-  }
+    &__success-text {
+      color: vars.$fluidx-green-500;
+    }
 
-  .running-text {
-    color: vars.$fluidx-amber-500;
-  }
+    &__running-text {
+      color: vars.$fluidx-amber-500;
+    }
 
-  .failed-text {
-    color: vars.$fluidx-red-500;
+    &__failed-text {
+      color: vars.$fluidx-red-500;
+    }
   }
 }

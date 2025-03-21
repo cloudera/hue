@@ -18,12 +18,14 @@ import React, { useState } from 'react';
 import { Form, Input, Radio } from 'antd';
 import { AxiosError } from 'axios';
 import Modal from 'cuix/dist/components/Modal';
+
 import { TaskServerResult } from '../types';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import { SCHEDULE_NEW_TASK_URL, scheduleTasksCategory } from '../constants';
 import { extractErrorMessage } from '../../../api/utils';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
+import LoadingErrorWrapper from '../../LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './ScheduleTaskModal.scss';
 
@@ -32,10 +34,7 @@ interface ScheduleTaskModalProps {
   open?: boolean;
 }
 
-const ScheduleTaskModal: React.FC<ScheduleTaskModalProps> = ({
-  onClose,
-  open = true
-}): JSX.Element => {
+const ScheduleTaskModal = ({ onClose, open = true }: ScheduleTaskModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const [selectedTask, setSelectedTask] = useState<TaskServerResult['taskName']>('');
@@ -49,7 +48,7 @@ const ScheduleTaskModal: React.FC<ScheduleTaskModalProps> = ({
     }));
   };
 
-  const { save } = useSaveData(SCHEDULE_NEW_TASK_URL, {
+  const { save, loading, error } = useSaveData(SCHEDULE_NEW_TASK_URL, {
     postOptions: {
       qsEncodeData: false
     },
@@ -77,12 +76,18 @@ const ScheduleTaskModal: React.FC<ScheduleTaskModalProps> = ({
     value: task.value
   }));
 
+  const errors = [
+    {
+      enabled: !!error,
+      message: error?.message ?? 'An unknown error occurred.'
+    }
+  ];
+
   const selectedTaskChildren =
     scheduleTasksCategory.find(task => task.value === selectedTask)?.children ?? [];
 
-  const isSubmitDisabled = !(
-    selectedTask && selectedTaskChildren.every(task => params[task.value] > 0)
-  );
+  const isSubmitDisabled =
+    loading || !(selectedTask && selectedTaskChildren.every(task => params[task.value] > 0));
 
   return (
     <Modal
@@ -94,34 +99,37 @@ const ScheduleTaskModal: React.FC<ScheduleTaskModalProps> = ({
       width={530}
       cancellable={false}
       okButtonProps={{ disabled: isSubmitDisabled }}
+      cancelButtonProps={{ disabled: loading }}
       className="hue-schedule-task__modal"
     >
-      <div className="hue-schedule-task-selection">
-        <Form.Item label={'Task'}>
-          <Radio.Group
-            options={dropdownOptions}
-            value={selectedTask}
-            onChange={e => setSelectedTask(e.target.value)}
-          />
-        </Form.Item>
-      </div>
-      {selectedTask && (
-        <div className="hue-schedule-task__input-group">
-          {selectedTaskChildren.map(param => (
-            <div key={param.value}>
-              <Form.Item label={param.label}>
-                <Input
-                  name={param.value}
-                  type={param.type}
-                  placeholder={param.label}
-                  onChange={handleChange}
-                  value={params[param.value]}
-                />
-              </Form.Item>
-            </div>
-          ))}
+      <LoadingErrorWrapper loading={loading} errors={errors}>
+        <div className="hue-schedule-task-selection">
+          <Form.Item label={'Task'}>
+            <Radio.Group
+              options={dropdownOptions}
+              value={selectedTask}
+              onChange={e => setSelectedTask(e.target.value)}
+            />
+          </Form.Item>
         </div>
-      )}
+        {selectedTask && (
+          <div className="hue-schedule-task__input-group">
+            {selectedTaskChildren.map(param => (
+              <div key={param.value}>
+                <Form.Item label={param.label}>
+                  <Input
+                    name={param.value}
+                    type={param.type}
+                    placeholder={param.label}
+                    onChange={handleChange}
+                    value={params[param.value]}
+                  />
+                </Form.Item>
+              </div>
+            ))}
+          </div>
+        )}
+      </LoadingErrorWrapper>
     </Modal>
   );
 };

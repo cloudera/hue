@@ -644,7 +644,9 @@ class OnePageViewModel {
       },
       {
         url: '/task_server',
-        app: 'taskserver'
+        app: function () {
+          self.loadApp('taskserver');
+        }
       },
       {
         url: '/desktop/connectors',

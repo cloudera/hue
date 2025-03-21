@@ -31,7 +31,8 @@ import { statusTagColor, getFilteredTasks, sortTasksByDate, getUpdatedFilters } 
 import { GET_TASKS_URL, KILL_TASK_URL } from './constants.ts';
 import ScheduleTaskModal from './ScheduleTaskModal/ScheduleTaskModal.tsx';
 import TaskLogsModal from './TaskLogsModal/TaskLogsModal.tsx';
-import { useWindowSize } from '../../utils/hooks/useWindowSize/useWindowSize';
+import LoadingErrorWrapper from '../LoadingErrorWrapper/LoadingErrorWrapper.tsx';
+import useResizeObserver from '../../utils/hooks/useResizeObserver/useResizeObserver';
 
 import './TaskServer.scss';
 
@@ -126,19 +127,24 @@ export const TaskServer: React.FC = () => {
     }
   ];
 
-  const { data: tasks } = useLoadData<TaskServerResponse[]>(GET_TASKS_URL, {
-    pollInterval: 5000,
-    onError: error => {
-      huePubSub.publish('hue.global.error', { message: `Error fetching tasks: ${error}` });
-    },
-    onSuccess: data => {
-      if (!Array.isArray(data)) {
-        huePubSub.publish('hue.global.error', {
-          message: `Expected an array of tasks, but received: ${data}`
-        });
-      }
-    }
+  const {
+    data: tasks,
+    loading,
+    error
+  } = useLoadData<TaskServerResponse[]>(GET_TASKS_URL, {
+    pollInterval: 5000
   });
+
+  const errors = [
+    {
+      enabled: !!error,
+      message: t(`Error fetching tasks: ${error}`)
+    },
+    {
+      enabled: !Array.isArray(tasks),
+      message: t(`Expected an array of tasks, but received: ${tasks}`)
+    }
+  ];
 
   const sortedTasks = useMemo(() => sortTasksByDate(tasks), [tasks]);
   const filteredTasks = useMemo(
@@ -161,7 +167,7 @@ export const TaskServer: React.FC = () => {
       onSuccess: response => {
         const { status, message } = response as KillTaskResponse;
         if (status === 'success') {
-          huePubSub.publish('hue.global.error', { message: `Task: ${taskId} has been killed.` });
+          huePubSub.publish('hue.global.info', { message: `Task: ${taskId} has been killed.` });
         } else if (status === 'info') {
           huePubSub.publish('hue.global.info', {
             message: `Task: ${taskId} has already been completed or revoked.`
@@ -190,7 +196,7 @@ export const TaskServer: React.FC = () => {
     setSelectedTasks([]);
   };
 
-  const [ref, rect] = useWindowSize();
+  const [ref, rect] = useResizeObserver();
   const tableBodyHeight = Math.max(rect.height - 40, 100);
 
   return (
@@ -209,22 +215,24 @@ export const TaskServer: React.FC = () => {
           style={{ flexGrow: 1 }}
         />
         <Checkbox checked={statusFilter.success} onChange={onStatusFilterChange('success')} />
-        <span className="success-text">{t('Succeeded')}</span>
+        <span className="hue-task-server__success-text">{t('Succeeded')}</span>
         <Checkbox checked={statusFilter.running} onChange={onStatusFilterChange('running')} />
-        <span className="running-text">{t('Running')}</span>
+        <span className="hue-task-server__running-text">{t('Running')}</span>
         <Checkbox checked={statusFilter.failure} onChange={onStatusFilterChange('failure')} />
-        <span className="failed-text">{t('Failed')}</span>
+        <span className="hue-task-server__failed-text">{t('Failed')}</span>
         <Checkbox checked={statusFilter.all} onChange={onStatusFilterChange('all')} />
         {t('All')}
       </div>
       <div className="hue-task-server__table" ref={ref}>
-        <PaginatedTable<TaskServerResponse>
-          onRowSelect={setSelectedTasks}
-          columns={columns}
-          data={filteredTasks}
-          rowKey="taskId"
-          scroll={{ y: tableBodyHeight }}
-        />
+        <LoadingErrorWrapper loading={!tasks && loading} errors={errors}>
+          <PaginatedTable<TaskServerResponse>
+            onRowSelect={setSelectedTasks}
+            columns={columns}
+            data={filteredTasks}
+            rowKey="taskId"
+            scroll={{ y: tableBodyHeight }}
+          />
+        </LoadingErrorWrapper>
       </div>
       {showSchedulePopup && <ScheduleTaskModal onClose={() => showScheduleTaskPopup(false)} />}
       {!!selectedTaskId && (

@@ -19,8 +19,8 @@ import Modal from 'cuix/dist/components/Modal';
 import { TaskServerResponse } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { GET_TASK_LOG_URL } from '../constants';
-import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
+import LoadingErrorWrapper from '../../LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './TaskLogsModal.scss';
 
@@ -32,12 +32,16 @@ interface TaskLogsModalProps {
 const TaskLogsModal: React.FC<TaskLogsModalProps> = ({ taskId, onClose }): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { data } = useLoadData<string>(`${GET_TASK_LOG_URL}/${taskId}`, {
-    skip: !taskId,
-    onError: error => {
-      huePubSub.publish('hue.global.error', { message: `Error fetching task logs: ${error}` });
-    }
+  const { data, loading, error } = useLoadData<string>(`${GET_TASK_LOG_URL}/${taskId}`, {
+    skip: !taskId
   });
+
+  const errors = [
+    {
+      enabled: !!error,
+      message: error?.message ?? 'An error occurred while fetching task logs.'
+    }
+  ];
 
   return (
     <Modal
@@ -49,9 +53,11 @@ const TaskLogsModal: React.FC<TaskLogsModalProps> = ({ taskId, onClose }): JSX.E
       okText={t('Close')}
       cancellable={false}
     >
-      <div className="hue-task-server-logs">
-        <pre>{data}</pre>
-      </div>
+      <LoadingErrorWrapper loading={loading} errors={errors}>
+        <div className="hue-task-server-logs">
+          <pre>{data}</pre>
+        </div>
+      </LoadingErrorWrapper>
     </Modal>
   );
 };
