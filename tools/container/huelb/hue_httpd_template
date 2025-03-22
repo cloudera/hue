@@ -8,16 +8,9 @@ LoadModule authz_core_module /usr/lib/apache2/modules/mod_authz_core.so
 LoadModule log_config_module /usr/lib/apache2/modules/mod_log_config.so
 LoadModule mime_module /usr/lib/apache2/modules/mod_mime.so
 
-ErrorLog "${HUE_LOG_DIR}/httpd_error_log"
 LogLevel warn
 
 PidFile /var/run/hue/httpd.pid
-
-<IfModule log_config_module>
-  LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
-  LogFormat "%h %l %u %t \"%r\" %>s %b" common
-  CustomLog "${HUE_LOG_DIR}/httpd_access_log" common
-</IfModule>
 
 <IfModule mime_module>
   TypesConfig /etc/mime.types
@@ -41,10 +34,20 @@ Header add Set-Cookie "ROUTEID=.%{BALANCER_WORKER_ROUTE}e; path=/" env=BALANCER_
 ProxyPreserveHost Off
 ProxyAddHeaders On
 ProxyPass /static !
-ProxyPass / balancer://hue/ stickysession=ROUTEID
+ProxyPass / balancer://hue/ stickysession=ROUTEID nocanon
 
 SetEnv proxy-initial-not-pooled 1
 ProxyTimeout 900
 
-AllowEncodedSlashes NoDecode
+<VirtualHost *:8080>
+    AllowEncodedSlashes NoDecode
+    ErrorLog "${HUE_LOG_DIR}/hue_httpd_error.log"
+
+    <IfModule log_config_module>
+      LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+      LogFormat "%h %l %u %t \"%r\" %>s %b" common
+      CustomLog "${HUE_LOG_DIR}/hue_httpd_access.log" combined
+    </IfModule>
+</VirtualHost>
+
 Include /etc/httpd/conf.d/hue.conf

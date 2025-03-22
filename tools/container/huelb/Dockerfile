@@ -34,7 +34,7 @@ COPY static ${HUE_HOME}/build/static
 COPY hue_httpd.conf /etc/hue_httpd.conf
 COPY hue.conf /etc/httpd/conf.d/hue.conf
 COPY run_httpd.sh ${HUE_HOME}
-RUN sed -i "s|Listen 80|Listen 8080|g" /etc/httpd.conf && sed -i "s|User apache|User hive|g" /etc/httpd.conf && sed -i "s|Group apache|Group hive|g" /etc/httpd.conf
+RUN sed -i "s|Listen 80|Listen 8080|g" /etc/httpd.conf && sed -i "s|User apache|User ${HUEUSER}|g" /etc/httpd.conf && sed -i "s|Group apache|Group ${HUEUSER}|g" /etc/httpd.conf
 
 COPY huelb-notice.txt ${HUE_HOME}/NOTICE.txt
 
