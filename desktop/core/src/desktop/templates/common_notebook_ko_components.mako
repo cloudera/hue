@@ -491,7 +491,7 @@ from desktop.lib.django_util import nonce_attribute
         window.hueAnalytics.log('notebook', 'download' + format);
 
         var self = this;
-        $.cookie('download-' + self.snippet.id(), null, { expires: -1, path: '/' })
+        window.Cookies.set('download-' + self.snippet.id(), null, { expires: -1, path: '/' })
         self.$downloadForm.find('input[name=\'format\']').val(format);
         self.$downloadForm.find('input[name=\'notebook\']').val(ko.mapping.toJSON(self.notebook.getContext()));
         self.$downloadForm.find('input[name=\'snippet\']').val(ko.mapping.toJSON(self.snippet.getContext()));
@@ -502,7 +502,7 @@ from desktop.lib.django_util import nonce_attribute
 
         var timesChecked = 0;
         self.checkDownloadInterval = window.setInterval(function () {
-          if ($.cookie('download-' + self.snippet.id()) === null || typeof $.cookie('download-' + self.snippet.id()) === 'undefined') {
+          if (window.Cookies.get('download-' + self.snippet.id()) === null || typeof window.Cookies.get('download-' + self.snippet.id()) === 'undefined') {
             if (timesChecked == 10) {
               $(self.downloadProgressModalId).modal('show');
             }
@@ -510,7 +510,7 @@ from desktop.lib.django_util import nonce_attribute
           else {
             window.clearInterval(self.checkDownloadInterval);
             try {
-              var cookieContent = $.cookie('download-' + self.snippet.id());
+              var cookieContent = window.Cookies.get('download-' + self.snippet.id());
               var result = JSON.parse(cookieContent.substr(1, cookieContent.length - 2).replace(/\\"/g, '"').replace(/\\054/g, ','));
               self.downloadTruncated(result.truncated);
               self.downloadCounter(result.row_counter);
