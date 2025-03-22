@@ -18,7 +18,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 
 type ObserverRect = Omit<DOMRectReadOnly, 'toJSON'>;
 
-export const useWindowSize = (): [React.RefObject<HTMLDivElement>, ObserverRect] => {
+const useResizeObserver = (): [React.RefObject<HTMLDivElement>, ObserverRect] => {
   const ref = useRef<HTMLDivElement>(null);
   const [rect, setRect] = useState<ObserverRect>({
     x: 0,
@@ -49,3 +49,5 @@ export const useWindowSize = (): [React.RefObject<HTMLDivElement>, ObserverRect]
 
   return [ref, rect];
 };
+
+export default useResizeObserver;
