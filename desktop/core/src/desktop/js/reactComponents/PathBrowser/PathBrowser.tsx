@@ -29,13 +29,13 @@ import Breadcrumb from './Breadcrumb/Breadcrumb';
 import './PathBrowser.scss';
 import { getBreadcrumbs, getFileSystemAndPath, BreadcrumbData } from './PathBrowser.util';
 
-const DEFAULT_URL_SCHEMA_SEPERATOR = '://';
-const DEFAULT_PATH_SEPEATOR = '/';
+const DEFAULT_URL_SCHEMA_SEPARATOR = '://';
+const DEFAULT_PATH_SEPARATOR = '/';
 
 interface PathBrowserProps {
   filePath: string;
   onFilepathChange: (path: string) => void;
-  seperator?: string;
+  separator?: string;
   showIcon?: boolean;
   testId?: string;
 }
@@ -47,7 +47,7 @@ const defaultProps = {
 const PathBrowser = ({
   filePath,
   onFilepathChange,
-  seperator = DEFAULT_PATH_SEPEATOR,
+  separator = DEFAULT_PATH_SEPARATOR,
   showIcon = false,
   testId
 }: PathBrowserProps): JSX.Element => {
@@ -135,10 +135,10 @@ const PathBrowser = ({
                   />
                   {(index === 0 || index != breadcrumbs.length - 1) && (
                     <div
-                      className="hue-path-browser__breadcrumb-seperator"
-                      data-testid={`${testId}-breadcrumb-seperator`}
+                      className="hue-path-browser__breadcrumb-separator"
+                      data-testid={`${testId}-breadcrumb-separator`}
                     >
-                      {index === 0 ? DEFAULT_URL_SCHEMA_SEPERATOR : seperator}
+                      {index === 0 ? DEFAULT_URL_SCHEMA_SEPARATOR : separator}
                     </div>
                   )}
                 </React.Fragment>
@@ -153,10 +153,10 @@ const PathBrowser = ({
                 key={breadcrumbs[0].url}
               />
               <div
-                className="hue-path-browser__breadcrumb-seperator"
-                data-testid={`${testId}-breadcrumb-seperator`}
+                className="hue-path-browser__breadcrumb-separator"
+                data-testid={`${testId}-breadcrumb-separator`}
               >
-                {DEFAULT_URL_SCHEMA_SEPERATOR}
+                {DEFAULT_URL_SCHEMA_SEPARATOR}
               </div>
               <Dropdown
                 overlayClassName="hue-path-browser__dropdown cuix antd"
@@ -177,10 +177,10 @@ const PathBrowser = ({
                 </BorderlessButton>
               </Dropdown>
               <div
-                className="hue-path-browser__breadcrumb-seperator"
-                data-testid={`${testId}-breadcrumb-seperator`}
+                className="hue-path-browser__breadcrumb-separator"
+                data-testid={`${testId}-breadcrumb-separator`}
               >
-                {seperator}
+                {separator}
               </div>
               <Breadcrumb
                 key={breadcrumbs[breadcrumbs.length - 2].url}
@@ -189,10 +189,10 @@ const PathBrowser = ({
                 onFilepathChange={onFilepathChange}
               />
               <div
-                className="hue-path-browser__breadcrumb-seperator"
-                data-testid={`${testId}-breadcrumb-seperator`}
+                className="hue-path-browser__breadcrumb-separator"
+                data-testid={`${testId}-breadcrumb-separator`}
               >
-                {seperator}
+                {separator}
               </div>
               <Breadcrumb
                 key={breadcrumbs[breadcrumbs.length - 1].url}
