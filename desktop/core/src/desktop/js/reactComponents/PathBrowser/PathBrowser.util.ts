@@ -47,7 +47,7 @@ export const getFileSystemAndPath = (
 export const getBreadcrumbs = (fileSystem: string, path: string): BreadcrumbData[] => {
   const pathParts = path.split('/').filter(Boolean);
   const rootUrl = fileSystem === 'hdfs' ? '/' : `${fileSystem}://`;
-  const rootlabel = fileSystem === 'hdfs' ? '/' : fileSystem;
+  const rootlabel = fileSystem === 'hdfs' ? 'hdfs' : fileSystem;
   const rootNode = {
     url: rootUrl,
     label: rootlabel
@@ -61,4 +61,13 @@ export const getBreadcrumbs = (fileSystem: string, path: string): BreadcrumbData
     },
     [rootNode]
   );
+};
+
+export const getLastDirOrFileNameFromPath = (inputPath: string): string => {
+  if (inputPath === '') {
+    return inputPath;
+  }
+  const { fileSystem, path } = getFileSystemAndPath(inputPath);
+  const sanitizedPath = path.endsWith('/') ? path.slice(0, -1) : path;
+  return sanitizedPath.split('/').pop() || fileSystem;
 };

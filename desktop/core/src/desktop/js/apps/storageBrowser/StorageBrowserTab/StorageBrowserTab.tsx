@@ -32,7 +32,10 @@ import { BorderlessButton } from 'cuix/dist/components/Button';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
-import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import {
+  getLastDirOrFileNameFromPath,
+  getFileSystemAndPath
+} from '../../../reactComponents/PathBrowser/PathBrowser.util';
 import { inTrash } from '../../../utils/storageBrowserUtils';
 
 import './StorageBrowserTab.scss';
@@ -55,8 +58,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
-  const fileName =
-    filePath.split('/').pop() !== '' ? (filePath.split('/').pop() ?? '') : filePath.split('://')[0];
+  const fileName = getLastDirOrFileNameFromPath(filePath);
 
   const { t } = i18nReact.useTranslation();
 
@@ -188,12 +190,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           className="hue-storage-browser-tab__path-browser-container"
           data-testid={`${testId}-path-browser-panel`}
         >
-          <PathBrowser
-            filePath={filePath}
-            onFilepathChange={setFilePath}
-            seperator={'/'}
-            showIcon={false}
-          />
+          <PathBrowser filePath={filePath} onFilepathChange={setFilePath} />
         </div>
         {fileStats?.type === BrowserViewType.dir && !isLoading && (
           <StorageDirectoryPage
@@ -204,7 +201,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           />
         )}
         {fileStats?.type === BrowserViewType.file && !isLoading && (
-          <StorageFilePage fileName={fileName} fileStats={fileStats} onReload={reloadData} />
+          <StorageFilePage fileStats={fileStats} onReload={reloadData} />
         )}
       </div>
     </LoadingErrorWrapper>
