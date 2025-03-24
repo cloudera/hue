@@ -28,8 +28,8 @@ interface ConfigError {
   message: string;
 }
 interface CheckConfigResponse {
-  hue_config_dir: string;
-  config_errors: ConfigError[];
+  hueConfigDir: string;
+  configErrors: ConfigError[];
 }
 
 function ConfigStatus(): JSX.Element {
@@ -72,15 +72,15 @@ function ConfigStatus(): JSX.Element {
     return <Spin spinning={loading} className="config__spin" />;
   }
 
-  const configErrorsExist = Boolean(data?.config_errors?.length);
+  const configErrorsExist = Boolean(data?.configErrors?.length);
 
   return (
     <div className="overview-config">
       <h1>{t('Checking current configuration')}</h1>
-      {data?.hue_config_dir && (
+      {data?.hueConfigDir && (
         <div>
           {t('Configuration files located in: ')}
-          <span className="config__address-value">{data['hue_config_dir']}</span>
+          <span className="config__address-value">{data['hueConfigDir']}</span>
         </div>
       )}
 
@@ -104,7 +104,7 @@ function ConfigStatus(): JSX.Element {
           />
 
           <Table
-            dataSource={data['config_errors']}
+            dataSource={data['configErrors']}
             columns={columns}
             rowKey={record => `${record.name}-${record.message.slice(1, 50)}`}
             pagination={false}
