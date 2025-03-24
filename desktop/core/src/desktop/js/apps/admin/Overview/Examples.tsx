@@ -39,13 +39,13 @@ type InstallExamplesResponse = {
 
 const Examples = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [installingAppId, setInstallingAppId] = useState(null);
+  const [installingAppId, setInstallingAppId] = useState<string>('');
 
-  const handleInstall = async appData => {
-    setInstallingAppId(appData.id);
-    const appIdOrOldName = appData.old_name || appData.id;
+  const handleInstall = async exampleApp => {
+    setInstallingAppId(exampleApp.id);
+    const appIdOrOldName = exampleApp.old_name || exampleApp.id;
     const url = `/${appIdOrOldName}/install_examples`;
-    const data = appData.data ? { data: appData.data } : null;
+    const data = exampleApp.data ? { data: exampleApp.data } : null;
 
     post<InstallExamplesResponse>(url, data, {
       method: 'POST',
@@ -70,22 +70,22 @@ const Examples = (): JSX.Element => {
         huePubSub.publish('hue.global.error', { message: errorMessage });
       })
       .finally(() => {
-        setInstallingAppId(null);
+        setInstallingAppId('');
       });
   };
 
   return (
     <div className="overview-examples">
       <h3>{t('Install some data examples')}</h3>
-      {exampleApps.map(appData => (
-        <div key={appData.id}>
+      {exampleApps.map(exampleApp => (
+        <div key={exampleApp.id}>
           <Button
             type="link"
-            onClick={() => handleInstall(appData)}
-            disabled={installingAppId === appData.id}
+            onClick={() => handleInstall(exampleApp)}
+            disabled={installingAppId === exampleApp.id}
             icon={<DownloadOutlined />}
           >
-            {installingAppId === appData.id ? 'Installing...' : appData.name}
+            {installingAppId === exampleApp.id ? 'Installing...' : exampleApp.name}
           </Button>
         </div>
       ))}

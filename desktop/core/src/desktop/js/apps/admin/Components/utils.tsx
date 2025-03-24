@@ -16,3 +16,4 @@
 
 export const SERVER_LOGS_API_URL = '/api/v1/logs';
 export const INSTALL_APP_EXAMPLES_API_URL = '/api/v1/check_config';
+export const ANALYTICS_PREFERENCES_API_URL = '/about/update_preferences';

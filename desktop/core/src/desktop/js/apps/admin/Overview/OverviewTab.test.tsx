@@ -16,8 +16,7 @@
 
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen, waitFor, fireEvent, cleanup } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import Overview from './OverviewTab';
 import * as hueConfigModule from '../../../config/hueConfig';
 import Examples from './Examples';
@@ -83,7 +82,8 @@ describe('OverviewTab', () => {
     test('renders Analytics tab and can interact with the checkbox', async () => {
       (post as jest.Mock).mockResolvedValue({ status: 0, message: 'Success' });
       render(<Analytics />);
-      const checkbox = screen.getByTitle(/Check to enable usage analytics/i);
+      const checkbox = screen.getByLabelText(/Help improve Hue with anonymous usage analytics./i);
+
       fireEvent.click(checkbox);
       await waitFor(() => expect(checkbox).toBeChecked());
       expect(post).toHaveBeenCalledWith('/about/update_preferences', {
@@ -98,7 +98,6 @@ describe('OverviewTab', () => {
   });
 
   describe('Examples component', () => {
-
     const exampleApps = [
       { id: 'hive', name: 'Hive', old_name: 'beeswax' },
       { id: 'impala', name: 'Impala' },
@@ -112,10 +111,9 @@ describe('OverviewTab', () => {
       { id: 'hbase', name: 'Hbase Browser' },
       { id: 'pig', name: 'Pig Editor' }
     ];
-    // We no longer need the hardcoded test_urls
 
     test.each(exampleApps)(
-      "when the '%s' button is clicked, the API call for installing examples is executed",
+      'renders Examples tab and when any of the exampleApp is clicked, the API call for that particular example is executed',
       async appData => {
         const resolvedValue = { status: 0, message: 'Success' };
         (post as jest.Mock).mockResolvedValue(resolvedValue);
@@ -125,7 +123,7 @@ describe('OverviewTab', () => {
         const url = `/${appIdOrOldName}/install_examples`;
         const expectedData = appData.data ? { data: appData.data } : null;
 
-        let button = screen.getByText(appData.name);
+        const button = screen.getByText(appData.name);
         fireEvent.click(button);
 
         await waitFor(() => {
