@@ -17,21 +17,23 @@
 import React, { useState } from 'react';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
+import { Checkbox } from 'antd';
 import { post } from '../../../api/utils';
+import { ANALYTICS_PREFERENCES_API_URL } from '../Components/utils';
 import './Overview.scss';
 
-interface PostResponse {
+interface UpdatePreferences {
   status: number;
   message?: string;
 }
 
 const Analytics = (): JSX.Element => {
-  const [collectUsage, setCollectUsage] = useState(false);
+  const [collectUsage, setCollectUsage] = useState<boolean>(false);
   const { t } = i18nReact.useTranslation();
 
   const saveCollectUsagePreference = async (collectUsage: boolean) => {
     try {
-      const response = await post<PostResponse>('/about/update_preferences', {
+      const response = await post<UpdatePreferences>(ANALYTICS_PREFERENCES_API_URL, {
         collect_usage: collectUsage ? 'on' : null
       });
 
@@ -56,16 +58,12 @@ const Analytics = (): JSX.Element => {
   return (
     <div className="overview-analytics">
       <h3>{t('Anonymous usage analytics')}</h3>
-      <input
-        type="checkbox"
-        id="usage_analytics"
-        title={t('Check to enable usage analytics')}
-        checked={collectUsage}
-        onChange={handleCheckboxChange}
-      />
-      <label htmlFor="usage_analytics" className="usage__analytics">
-        {t('Help improve Hue with anonymous usage analytics.')}
-      </label>
+      <div>
+        <Checkbox id="usage_analytics" checked={collectUsage} onChange={handleCheckboxChange} />
+        <label htmlFor="usage_analytics" className="usage__analytics">
+          {t('Help improve Hue with anonymous usage analytics.')}
+        </label>
+      </div>
     </div>
   );
 };
