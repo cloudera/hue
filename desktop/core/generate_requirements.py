@@ -99,6 +99,7 @@ class RequirementsGenerator:
             "drf-spectacular[sidecar]==0.27.2",
         ]
         self.ppc64le_requirements = {
+            "default": [],
             "3.8": [
                 "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/cryptography-41.0.1-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
                 "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/numpy-1.23.1-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
@@ -114,25 +115,10 @@ class RequirementsGenerator:
                 "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/lxml-4.6.4-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
                 "PyYAML==6.0.1",
                 "sasl==0.3.1",
-            ],
-            "3.11" : [
-                "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/cryptography-41.0.1-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-                "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/numpy-1.23.1-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-                "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/pandas-1.4.3-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-                "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/lxml-4.6.4-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-                "PyYAML==6.0.1",
-                "pure-sasl==0.6.2"
-            ],
+            ]
         }
         self.x86_64_requirements = {
-            "3.8": [
-                "cryptography==41.0.1",
-                "numpy==1.23.1",
-                "pandas==1.4.2",
-                "lxml==4.9.1",
-                "sasl==0.3.1",
-            ],
-            "3.9": [
+            "default": [
                 "cryptography==41.0.1",
                 "numpy==1.23.1",
                 "pandas==1.4.2",
@@ -144,25 +130,17 @@ class RequirementsGenerator:
                 "numpy==1.23.1",
                 "pandas==1.4.2",
                 "lxml==4.9.1",
-                "pure-sasl==0.6.2"
+                "pure-sasl==0.6.2",
             ],
         }
         self.pytorch_requirements = {
-            "3.8": [
-                "--extra-index-url https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu",
-                "torch==2.2.2",
-                "torchvision==0.17.2",
-            ],
-            "3.9": [
-                "--extra-index-url https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu",
-                "torch==2.2.2",
-                "torchvision==0.17.2",
-            ],
-            "3.11": [
-                "--extra-index-url https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu",
-                "torch==2.2.2",
-                "torchvision==0.17.2",
-            ],
+            "default": [
+                "--extra-index-url https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu torch==2.2.2+cpu torchvision==0.17.2+cpu",
+            ]
+        }
+        self.arch_requirements_map = {
+            "ppc64le": self.ppc64le_requirements,
+            "x86_64": self.x86_64_requirements,
         }
         self.arch = platform.machine()
         self.python_version_string = f"{sys.version_info.major}.{sys.version_info.minor}"
@@ -175,15 +153,12 @@ class RequirementsGenerator:
         return list(map(lambda x: f"file://{local_dir}/{x}", self.local_requirements))
 
     def generate_requirements(self):
-        if self.arch == "ppc64le":
-            self.requirements.extend(self.ppc64le_requirements[self.python_version_string])
-        elif self.arch == "x86_64":
-            self.requirements.extend(self.x86_64_requirements[self.python_version_string])
-        else:
+        if self.arch not in self.arch_requirements_map:
             raise ValueError(f"Unsupported architecture: {self.arch}")
-
+        arch_reqs = self.arch_requirements_map[self.arch]
+        self.requirements.extend(arch_reqs.get(self.python_version_string, arch_reqs["default"]))
         self.requirements.extend(self.copy_local_requirements(self.python_version_string))
-        self.requirements.extend(self.pytorch_requirements[self.python_version_string])
+        self.requirements.extend(self.pytorch_requirements.get(self.python_version_string, self.pytorch_requirements["default"]))
 
         with open(f"{this_dir}/requirements-{self.arch}-{self.python_version_string}.txt", "w") as f:
             f.write("\n".join(self.requirements))
