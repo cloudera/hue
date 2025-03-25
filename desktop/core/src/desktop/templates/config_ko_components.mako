@@ -215,7 +215,7 @@ from desktop.lib.django_util import nonce_attribute
     })();
   </script>
 
-  <script  ${nonce_attribute(request)} type="text/javascript">
+  <script ${nonce_attribute(request)} type="text/javascript">
     (function () {
 
       function PropertySelectorViewModel(params) {
