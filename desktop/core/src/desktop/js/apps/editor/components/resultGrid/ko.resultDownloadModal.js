@@ -22,6 +22,7 @@ import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import UUID from 'utils/string/UUID';
 import hueAnalytics from 'utils/hueAnalytics';
+import Cookies from 'js-cookie';
 
 export const NAME = 'download-result-modal';
 
@@ -72,7 +73,7 @@ class DownloadResultModal {
 
     params.executable.toContext(id).then(jsonContext => {
       this.cookieId = 'download-' + id;
-      $.cookie(this.cookieId, null, { expires: -1, path: '/' });
+      Cookies.set(this.cookieId, null, { expires: -1, path: '/' });
 
       this.addAndSubmitDownloadForm(jsonContext, params.format);
 
@@ -84,14 +85,14 @@ class DownloadResultModal {
   trackCookie() {
     let timesChecked = 0;
     this.checkDownloadInterval = window.setInterval(() => {
-      if (!$.cookie(this.cookieId)) {
+      if (!Cookies.get(this.cookieId)) {
         if (timesChecked > 9) {
           this.$downloadProgressModal.show();
         }
       } else {
         window.clearInterval(this.checkDownloadInterval);
         try {
-          const cookieContent = $.cookie(this.cookieId);
+          const cookieContent = Cookies.get(this.cookieId);
           const result = JSON.parse(
             cookieContent
               .substr(1, cookieContent.length - 2)

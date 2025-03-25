@@ -31,6 +31,7 @@ import page from 'page';
 import qq from 'ext/fileuploader.custom.new';
 import fileuploader from 'ext/fileuploader.custom';
 import sprintf from 'sprintf-js';
+import Cookies from 'js-cookie';
 
 import ko from 'ko/ko.all';
 
@@ -117,6 +118,7 @@ window.sqlStatementsParser = sqlStatementsParser;
 window.hplsqlStatementsParser = hplsqlStatementsParser;
 window.sqlUtils = sqlUtils;
 window.createReactComponents = createReactComponents;
+window.Cookies = Cookies;
 
 $(document).ready(async () => {
   await refreshConfig(); // Make sure we have config up front
