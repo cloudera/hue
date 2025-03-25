@@ -63,7 +63,6 @@ desktop/core/ext-py/lxml/src/lxml/lxml-version.h
 
 # Coverage reports
 .coverage*
-coverage*
 coverage.xml
 reports
 
