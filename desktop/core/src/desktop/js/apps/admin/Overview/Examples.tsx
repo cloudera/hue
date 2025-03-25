@@ -25,11 +25,11 @@ import './Overview.scss';
 const exampleApps = [
   { id: 'hive', name: 'Hive', old_name: 'beeswax' },
   { id: 'impala', name: 'Impala' },
-  { id: 'search', name: 'Solr Search', data: ['log_analytics_demo', 'twitter_demo', 'yelp_demo'] },
-  { id: 'spark', name: 'Spark', old_name: 'notebook' },
-  { id: 'oozie', name: 'Oozie Editor/Dashboard' },
   { id: 'hbase', name: 'Hbase Browser' },
-  { id: 'pig', name: 'Pig Editor' }
+  { id: 'pig', name: 'Pig Editor' },
+  { id: 'oozie', name: 'Oozie Editor/Dashboard' },
+  { id: 'spark', name: 'Spark', old_name: 'notebook' },
+  { id: 'search', name: 'Solr Search', data: ['log_analytics_demo', 'twitter_demo', 'yelp_demo'] }
 ];
 
 type InstallExamplesResponse = {
@@ -43,30 +43,21 @@ const Examples = (): JSX.Element => {
 
   const handleInstall = async exampleApp => {
     setInstallingAppId(exampleApp.id);
-    const appIdOrOldName = exampleApp.old_name || exampleApp.id;
-    const url = `/${appIdOrOldName}/install_examples`;
-    const data = exampleApp.data ? { data: exampleApp.data } : null;
+    const url = '/api/v1/install_app_examples';
+    const data = { app_name: exampleApp.id };
+
+    if (exampleApp.data) {
+      data['data'] = exampleApp.data;
+    }
 
     post<InstallExamplesResponse>(url, data, {
       method: 'POST',
       silenceErrors: true
-    })
-      .then(response => {
-        if (response.status === 0) {
-          const message = response.message ? t(response.message) : t('Examples refreshed');
-          huePubSub.publish('hue.global.info', { message });
-        } else {
-          const errorMessage = response.message
-            ? t(response.message)
-            : t('An error occurred while installing examples.');
-          huePubSub.publish('hue.global.error', { message: errorMessage });
-        }
-      })
-      .catch(error => {
-        const errorMessage =
-          error && typeof error === 'object' && error.message
-            ? t(error.message)
-            : t('An unexpected error occurred');
+    }).then(response => {
+        const message = response.message ? t(response.message) : t('Examples refreshed');
+        huePubSub.publish('hue.global.info', { message });
+      }).catch(error => {
+        const errorMessage = error.message ? t(error.message): t('An error occurred while installing examples.');
         huePubSub.publish('hue.global.error', { message: errorMessage });
       })
       .finally(() => {
@@ -85,7 +76,7 @@ const Examples = (): JSX.Element => {
             disabled={installingAppId === exampleApp.id}
             icon={<DownloadOutlined />}
           >
-            {installingAppId === exampleApp.id ? 'Installing...' : exampleApp.name}
+            {installingAppId === exampleApp.id ? t('Installing...') : t(exampleApp.name)}
           </Button>
         </div>
       ))}
