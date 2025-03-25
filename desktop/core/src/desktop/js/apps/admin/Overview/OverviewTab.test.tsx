@@ -27,11 +27,7 @@ jest.mock('../../../api/utils', () => ({
   post: jest.fn()
 }));
 
-jest.unmock('./Analytics');
-
 jest.mock('./ConfigStatus', () => () => <div>MockedConfigStatusComponent</div>);
-// jest.mock('./Examples', () => () => <div>MockedExamplesComponent</div>);
-// jest.mock('./Analytics', () => () => <div>MockedAnalyticsComponent</div>);
 
 jest.mock('../../../config/hueConfig', () => ({
   getLastKnownConfig: jest.fn()
@@ -49,7 +45,7 @@ describe('OverviewTab', () => {
 
   test('renders the Tabs with the correct tab labels', () => {
     render(<Overview />);
-    expect(screen.getByText('ConfigStatus')).toBeInTheDocument();
+    expect(screen.getByText('Config Status')).toBeInTheDocument();
     expect(screen.getByText('Examples')).toBeInTheDocument();
     expect(screen.getByText('Analytics')).toBeInTheDocument();
   });
