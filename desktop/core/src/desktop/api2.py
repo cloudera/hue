@@ -33,7 +33,7 @@ from django.shortcuts import redirect
 from django.utils.html import escape
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from beeswax import common
 from beeswax.management.commands import beeswax_install_examples
@@ -734,7 +734,7 @@ def share_document(request):
 
 @api_error_handler
 @require_POST
-def handle_submit(request):
+def handle_task_submit(request):
   # Extract the task name and params from the request
   try:
     data = json.loads(request.body)
@@ -783,7 +783,8 @@ def handle_submit(request):
 
 
 @api_error_handler
-def get_taskserver_tasks(request):
+@require_GET
+def get_tasks(request):
   if not TASK_SERVER_V2.ENABLED.get():
     return JsonResponse({'error': 'Task server is not enabled'}, status=400)
 
@@ -810,7 +811,12 @@ def get_taskserver_tasks(request):
 
 
 @api_error_handler
-def check_upload_status(request, task_id):
+@require_GET
+def check_upload_task_status(request):
+  task_id = request.GET.get('task_id')
+  if not task_id:
+    return JsonResponse({'error': "Missing parameters: task_id is required"}, status=400)
+
   redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
   try:
     task_key = f'celery-task-meta-{task_id}'
@@ -834,9 +840,14 @@ def check_upload_status(request, task_id):
 
 
 @api_error_handler
-def kill_task(request, task_id):
+@require_POST
+def kill_task(request):
+  task_id = request.POST.get('task_id')
+  if not task_id:
+    return JsonResponse({'error': "Missing parameters: task_id is required"}, status=400)
+
   # Check the current status of the task
-  status_response = check_upload_status(request, task_id)
+  status_response = check_upload_task_status(request)
   status_data = json.loads(status_response.content)
 
   if status_data.get('isFinalized') or status_data.get('isRevoked') or status_data.get('isFailure'):
@@ -850,7 +861,13 @@ def kill_task(request, task_id):
     return JsonResponse({'status': 'error', 'message': f'Failed to terminate task {task_id}: {str(e)}'})
 
 
-def get_task_logs(request, task_id):
+@api_error_handler
+@require_GET
+def get_task_logs(request):
+  task_id = request.GET.get('task_id')
+  if not task_id:
+    return JsonResponse({'error': "Missing parameters: task_id is required"}, status=400)
+
   log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
   log_file = "%s/celery.log" % (log_dir)
   task_log = []
