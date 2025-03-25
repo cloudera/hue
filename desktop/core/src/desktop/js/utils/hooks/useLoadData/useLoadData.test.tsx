@@ -118,7 +118,7 @@ describe('useLoadData', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    const updatedMockResult = { ...mockDataResponse, productName: 'Hue 2' };
+    const updatedMockResult = { ...mockDataResponse, product: 'Hue 2' };
     mockGet.mockResolvedValueOnce(updatedMockResult);
 
     await act(async () => {

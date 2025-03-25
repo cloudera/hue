@@ -81,8 +81,8 @@ describe('FileAndFolderActions', () => {
   const mockOnActionSuccess = jest.fn();
   const mockOnActionError = jest.fn();
   const mockConfig = {
-    isTrashEnabled: true,
-    isHdfsSuperuser: true,
+    is_trash_enabled: true,
+    is_hdfs_superuser: true,
     groups: ['hue'],
     users: ['hue'],
     superuser: 'hue',
