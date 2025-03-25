@@ -159,6 +159,9 @@ endif
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
 	@echo "--- Finished installing $(NAVOPTAPI_WHL) into virtual-env ---"
 	@touch $(REQUIREMENT_DOT_FILE)
+	@echo "--- Cleaning up .pyc files and __pycache__ directories ---"
+	@find $(BLD_DIR_ENV) -type f -name "*.pyc" -delete
+	@find $(BLD_DIR_ENV) -type d -name "__pycache__" -exec rm -r {} +
 ###################################
 # Build desktop
 ###################################
