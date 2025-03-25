@@ -30,7 +30,7 @@ const Overview = (): JSX.Element => {
   const isAdmin = config?.hue_config.is_admin ?? false;
   const items = [
     {
-      label: t('ConfigStatus'),
+      label: t('Config Status'),
       key: '1',
       children: <ConfigStatus />
     },
