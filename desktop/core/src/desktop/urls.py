@@ -34,9 +34,9 @@ from desktop.conf import ANALYTICS, ENABLE_PROMETHEUS, METRICS, SLACK, USE_NEW_E
 from desktop.configuration import api as desktop_configuration_api
 from desktop.lib.vcs import api as desktop_lib_vcs_api
 from desktop.settings import is_oidc_configured
+from indexer import views as indexer_views
 from notebook import views as notebook_views
 from useradmin import views as useradmin_views
-from indexer import views as indexer_views
 
 desktop.lib.metrics.file_reporter.start_file_reporter()
 
@@ -179,8 +179,8 @@ dynamic_patterns += [
   re_path(r'^editor', notebook_views.editor),
 ]
 
-#New Importer 
-dynamic_patterns += [ 
+# New Importer
+dynamic_patterns += [
   re_path(r'^newimporter/?$', indexer_views.new_importer, name='newimporter')
 ]
 
