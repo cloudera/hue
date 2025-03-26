@@ -105,7 +105,6 @@ const PathBrowser = ({
               onFilepathChange((event.target as HTMLInputElement).value);
             }}
             className="hue-path-browser__input"
-            autoFocus
             data-testid={`${testId}-input`}
           />
         </div>
@@ -165,7 +164,6 @@ const PathBrowser = ({
                   className: 'hue-path-browser__dropdown-menu'
                 }}
                 trigger={['hover', 'click']}
-                autoFocus
                 data-testid={`${testId}-dropdown`}
               >
                 <BorderlessButton
