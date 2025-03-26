@@ -245,6 +245,9 @@ export const TaskServer: React.FC = () => {
             data={filteredTasks}
             rowKey="taskId"
             scroll={{ y: tableBodyHeight }}
+            locale={{
+              emptyText: t('No tasks found')
+            }}
           />
         </LoadingErrorWrapper>
       </div>
