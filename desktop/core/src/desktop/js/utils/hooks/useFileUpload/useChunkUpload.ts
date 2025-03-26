@@ -65,12 +65,7 @@ const useChunkUpload = ({
   const [filesWaitingFinalStatus, setFilesWaitingFinalStatus] = useState<ChunkedFile['uuid'][]>([]);
   const [filesInProgress, setFilesInProgress] = useState<ChunkedFilesInProgress>({});
 
-  const { save } = useSaveData(undefined, {
-    postOptions: {
-      qsEncodeData: false,
-      headers: { 'Content-Type': 'multipart/form-data' }
-    }
-  });
+  const { save } = useSaveData();
 
   const processTaskServerResponse = (response: TaskServerResponse[]) => {
     const statusMap = getStatusHashMap(response);
