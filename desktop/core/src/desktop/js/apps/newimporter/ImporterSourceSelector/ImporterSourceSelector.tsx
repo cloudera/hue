@@ -22,15 +22,20 @@ import { i18nReact } from '../../../utils/i18nReact';
 import { UPLOAD_LOCAL_FILE_API_URL } from '../api';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import huePubSub from '../../../utils/huePubSub';
+import { FileMetaData, LocalFileUploadResponse } from '../types';
 
 import './ImporterSourceSelector.scss';
 declare const window: unknown;
 
-const ImporterSourceSelector = (): JSX.Element => {
+interface ImporterSourceSelectorProps {
+  setFileMetaData: (fileMetaData: FileMetaData) => void;
+}
+
+const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const uploadRef = useRef<HTMLInputElement>(null);
 
-  const { save: upload } = useSaveData(UPLOAD_LOCAL_FILE_API_URL, {
+  const { save: upload } = useSaveData<LocalFileUploadResponse>(UPLOAD_LOCAL_FILE_API_URL, {
     postOptions: {
       qsEncodeData: false,
       headers: {
@@ -70,9 +75,12 @@ const ImporterSourceSelector = (): JSX.Element => {
       });
     } else {
       upload(payload, {
-        onSuccess: () => {
-          //TODO: Send response to preview page
-          // console.log(response);
+        onSuccess: data => {
+          setFileMetaData({
+            path: data.local_file_url,
+            type: data.file_type,
+            source: 'localfile'
+          });
         },
         onError: error => {
           huePubSub.publish('hue.error', error);

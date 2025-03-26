@@ -14,6 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const UPLOAD_LOCAL_FILE_API_URL = '/indexer/api/indexer/upload_local_file';
-export const GUESS_FORMAT_URL = '/indexer/api/indexer/guess_format';
-export const GUESS_FIELD_TYPES_URL = '/indexer/api/indexer/guess_field_types';
+import { type ColumnProps } from 'cuix/dist/components/Table';
+
+export const convertToAntdColumns = (input?: any[]): ColumnProps<any>[] => {
+  if (!input) return [];
+  return input?.map(item => ({
+    title: item.name,
+    dataIndex: item.name,
+    key: item.name,
+    width: '100px'
+  }));
+};
+
+export const convertToDataSource = (columns: ColumnProps<any>[], apiResponse?: string[][]) => {
+  if (!apiResponse) return [];
+  return apiResponse?.map((rowData, index) => {
+    const row = {
+      importerDataKey: `${rowData[0]}__${index}` // this ensure the key is unique
+    };
+    columns.forEach((column, index) => {
+      row[column.key] = rowData[index];
+    });
+    return row;
+  });
+};
