@@ -101,6 +101,7 @@ const ScheduleTaskModal = ({ onClose, open = true }: ScheduleTaskModalProps): JS
       okButtonProps={{ disabled: isSubmitDisabled }}
       cancelButtonProps={{ disabled: loading }}
       className="hue-schedule-task__modal"
+      data-testid="hue-schedule-task__modal"
     >
       <LoadingErrorWrapper loading={loading} errors={errors}>
         <div className="hue-schedule-task-selection">

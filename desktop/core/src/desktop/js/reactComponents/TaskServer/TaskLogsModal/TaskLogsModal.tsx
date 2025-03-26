@@ -32,7 +32,8 @@ interface TaskLogsModalProps {
 const TaskLogsModal: React.FC<TaskLogsModalProps> = ({ taskId, onClose }): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { data, loading, error } = useLoadData<string>(`${GET_TASK_LOG_URL}/${taskId}`, {
+  const { data, loading, error } = useLoadData<string>(GET_TASK_LOG_URL, {
+    params: { task_id: taskId },
     skip: !taskId
   });
 

@@ -50,7 +50,9 @@ export const TaskServer: React.FC = () => {
 
   const { t } = i18nReact.useTranslation();
 
-  const { save } = useSaveData(undefined);
+  const { save } = useSaveData(KILL_TASK_URL, {
+    postOptions: { qsEncodeData: false }
+  });
 
   const columns = [
     {
@@ -162,8 +164,10 @@ export const TaskServer: React.FC = () => {
   };
 
   const handleKillTask = (taskId: TaskServerResponse['taskId']) => {
-    save(null, {
-      url: `${KILL_TASK_URL}/${taskId}`,
+    const payload = new FormData();
+    payload.append('task_id', taskId);
+
+    save(payload, {
       onSuccess: response => {
         const { status, message } = response as KillTaskResponse;
         if (status === 'success') {
@@ -189,7 +193,7 @@ export const TaskServer: React.FC = () => {
 
   const onSchedulePopup = () => showScheduleTaskPopup(true);
 
-  const onKillTask = () => {
+  const onKillTasks = () => {
     selectedTasks.forEach(task => {
       handleKillTask(task.taskId);
     });
@@ -202,10 +206,8 @@ export const TaskServer: React.FC = () => {
   return (
     <div className="hue-task-server">
       <div className="hue-task-server__actions">
-        <PrimaryButton data-event="" onClick={onSchedulePopup}>
-          {t('Schedule Task')}
-        </PrimaryButton>
-        <DangerButton data-event="" onClick={onKillTask}>
+        <PrimaryButton onClick={onSchedulePopup}>{t('Schedule Task')}</PrimaryButton>
+        <DangerButton onClick={onKillTasks} disabled={selectedTasks.length === 0}>
           {t('Kill Task')}
         </DangerButton>
         <Input
@@ -214,14 +216,26 @@ export const TaskServer: React.FC = () => {
           onChange={onSearchChange}
           style={{ flexGrow: 1 }}
         />
-        <Checkbox checked={statusFilter.success} onChange={onStatusFilterChange('success')} />
-        <span className="hue-task-server__success-text">{t('Succeeded')}</span>
-        <Checkbox checked={statusFilter.running} onChange={onStatusFilterChange('running')} />
-        <span className="hue-task-server__running-text">{t('Running')}</span>
-        <Checkbox checked={statusFilter.failure} onChange={onStatusFilterChange('failure')} />
-        <span className="hue-task-server__failed-text">{t('Failed')}</span>
-        <Checkbox checked={statusFilter.all} onChange={onStatusFilterChange('all')} />
-        {t('All')}
+        <Checkbox checked={statusFilter.success} onChange={onStatusFilterChange('success')}>
+          <span className="hue-task-server__success-text">{t('Succeeded')}</span>
+        </Checkbox>
+        <Checkbox
+          checked={statusFilter.running}
+          onChange={onStatusFilterChange('running')}
+          name="running"
+        >
+          <span className="hue-task-server__running-text">{t('Running')}</span>
+        </Checkbox>
+        <Checkbox
+          checked={statusFilter.failure}
+          onChange={onStatusFilterChange('failure')}
+          name="failure"
+        >
+          <span className="hue-task-server__failed-text">{t('Failed')}</span>
+        </Checkbox>
+        <Checkbox checked={statusFilter.all} onChange={onStatusFilterChange('all')} name="all">
+          <span>{t('All')}</span>
+        </Checkbox>
       </div>
       <div className="hue-task-server__table" ref={ref}>
         <LoadingErrorWrapper loading={!tasks && loading} errors={errors}>

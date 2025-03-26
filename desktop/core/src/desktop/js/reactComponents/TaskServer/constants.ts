@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const SCHEDULE_NEW_TASK_URL = '/desktop/api2/taskserver/handle_submit';
-export const KILL_TASK_URL = '/desktop/api2/taskserver/kill_task';
-export const GET_TASKS_URL = '/desktop/api2/taskserver/get_taskserver_tasks';
-export const GET_TASK_LOG_URL = '/desktop/api2/taskserver/get_task_logs';
+export const SCHEDULE_NEW_TASK_URL = '/desktop/api2/taskserver/task/submit';
+export const KILL_TASK_URL = '/desktop/api2/taskserver/task/kill';
+export const GET_TASKS_URL = '/desktop/api2/taskserver/tasks';
+export const GET_TASK_LOG_URL = '/desktop/api2/taskserver/task/logs';
 
 export const scheduleTasksCategory = [
   {

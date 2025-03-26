@@ -26,8 +26,8 @@ export interface TaskServerResult {
   taskStart: string;
   taskEnd: string;
   progress: string;
-  qqfilename: string;
-  parameters: string;
+  qqfilename?: string;
+  parameters: number;
 }
 export interface TaskServerResponse {
   result?: TaskServerResult;
