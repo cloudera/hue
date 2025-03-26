@@ -27,8 +27,6 @@ import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 import LoadingErrorWrapper from '../../LoadingErrorWrapper/LoadingErrorWrapper';
 
-import './ScheduleTaskModal.scss';
-
 interface ScheduleTaskModalProps {
   onClose: () => void;
   open?: boolean;

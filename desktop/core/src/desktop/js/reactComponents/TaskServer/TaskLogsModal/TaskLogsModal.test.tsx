@@ -33,7 +33,7 @@ describe('TaskLogsModal', () => {
   const mockOnClose = jest.fn();
   const taskId: TaskServerResponse['taskId'] = '123';
 
-  beforeEach(() => {
+  afterEach(() => {
     jest.clearAllMocks();
   });
 

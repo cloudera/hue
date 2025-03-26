@@ -1,8 +1,25 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import TaskServer from './TaskServer';
 import { TaskServerResponse, TaskStatus } from './types.ts';
+import { KILL_TASK_URL } from './constants.ts';
 
 const mockTasks: TaskServerResponse[] = [
   {
@@ -51,13 +68,17 @@ const mockTasks: TaskServerResponse[] = [
 ];
 
 const mockHandleSave = jest.fn();
+const mockSaveURL = jest.fn();
 jest.mock('../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
-  default: jest.fn(() => ({
-    save: mockHandleSave,
-    loading: false,
-    error: null
-  }))
+  default: jest.fn(url => {
+    mockSaveURL(url);
+    return {
+      save: mockHandleSave,
+      loading: false,
+      error: null
+    };
+  })
 }));
 
 jest.mock('../../utils/hooks/useLoadData/useLoadData', () => ({
@@ -79,8 +100,10 @@ describe('TaskServer Component', () => {
 
     fireEvent.click(getByRole('button', { name: 'Schedule Task' }));
 
-    await waitFor(() => expect(getAllByText('Schedule Task')).toHaveLength(2));
-    await waitFor(() => expect(getByTestId('hue-schedule-task__modal')).toBeInTheDocument());
+    await waitFor(() => {
+      expect(getAllByText('Schedule Task')).toHaveLength(2);
+      expect(getByTestId('hue-schedule-task__modal')).toBeInTheDocument();
+    });
   });
 
   it('should call save API when clicking "Kill Task" button', async () => {
@@ -89,7 +112,17 @@ describe('TaskServer Component', () => {
     fireEvent.click(getAllByRole('checkbox', { name: '' })[0]);
     fireEvent.click(getByRole('button', { name: 'Kill Task' }));
 
-    await waitFor(() => expect(mockHandleSave).toHaveBeenCalledTimes(1));
+    const payload = new FormData();
+    payload.append('task_id', mockTasks[0].taskId);
+
+    await waitFor(() => {
+      expect(mockHandleSave).toHaveBeenCalledTimes(1);
+      expect(mockHandleSave).toHaveBeenCalledWith(payload, {
+        onError: expect.any(Function),
+        onSuccess: expect.any(Function)
+      });
+      expect(mockSaveURL).toHaveBeenCalledWith(KILL_TASK_URL);
+    });
   });
 
   it('should render task list with correct data', async () => {
@@ -109,9 +142,11 @@ describe('TaskServer Component', () => {
       target: { value: mockTasks[0].taskId }
     });
 
-    await waitFor(() => expect(getByText(mockTasks[0].taskId)).toBeInTheDocument());
-    expect(queryByText(mockTasks[1].taskId)).toBeNull();
-    expect(queryByText(mockTasks[2].taskId)).toBeNull();
+    await waitFor(() => {
+      expect(getByText(mockTasks[0].taskId)).toBeInTheDocument();
+      expect(queryByText(mockTasks[1].taskId)).toBeNull();
+      expect(queryByText(mockTasks[2].taskId)).toBeNull();
+    });
   });
 
   it('should change status filter when status checkbox is clicked', async () => {
