@@ -19,7 +19,9 @@ import { Checkbox } from 'antd';
 import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
-import Table, { ColumnProps } from '../../../../../../reactComponents/Table/Table';
+import PaginatedTable, {
+  ColumnProps
+} from '../../../../../../reactComponents/PaginatedTable/PaginatedTable';
 import { StorageDirectoryTableData } from '../../../../types';
 import { BULK_CHANGE_PERMISSION_API_URL } from '../../../../api';
 import { getInitialPermissions, Permission } from './ChangePermissionModal.util';
@@ -142,7 +144,7 @@ const ChangePermissionModal = ({
       okButtonProps={{ disabled: loading }}
       cancelButtonProps={{ disabled: loading }}
     >
-      <Table<Permission> data={permissions} columns={columns} rowKey="key" />
+      <PaginatedTable<Permission> data={permissions} columns={columns} rowKey="key" />
     </Modal>
   );
 };

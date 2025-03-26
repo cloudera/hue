@@ -30,31 +30,31 @@ describe('Pathbrowser', () => {
   const mockFilePath = 'abfs://test/folder';
   const mockLongFilePath = 'abfs://path/to/nested1/nested2/nested3/folder';
   describe('Pathbrowser breadcrumbs', () => {
-    it('should render the specified seperator to seperate the breadcrumbs', () => {
+    it('should render the specified separator to separate the breadcrumbs', () => {
       render(
         <PathBrowser
           filePath={mockFilePath}
           onFilepathChange={onFilepathChangeMock}
-          seperator={'%'}
+          separator={'%'}
           showIcon
         />
       );
-      const seperator = screen.getAllByText('%');
-      expect(seperator).not.toBeNull();
+      const separator = screen.getAllByText('%');
+      expect(separator).not.toBeNull();
     });
 
-    it('should not render a different seperator than specified to seperate the breadcrumbs', () => {
+    it('should not render a different separator than specified to separate the breadcrumbs', () => {
       render(
         <PathBrowser
           testId="pathbroswer"
           filePath={mockFilePath}
           onFilepathChange={onFilepathChangeMock}
-          seperator={'%'}
+          separator={'%'}
           showIcon
         />
       );
       screen
-        .getAllByTestId('pathbroswer-breadcrumb-seperator')
+        .getAllByTestId('pathbroswer-breadcrumb-separator')
         .slice(1)
         .forEach(element => {
           expect(element).toBeVisible();
@@ -67,7 +67,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           filePath={mockFilePath}
           onFilepathChange={onFilepathChangeMock}
-          seperator={'/'}
+          separator={'/'}
           showIcon
         />
       );
@@ -79,7 +79,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockLongFilePath}
-          seperator={'/'}
+          separator={'/'}
           showIcon
         />
       );
@@ -92,7 +92,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockLongFilePath}
-          seperator={'/'}
+          separator={'/'}
           showIcon
         />
       );
@@ -109,7 +109,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          seperator={'/'}
+          separator={'/'}
           showIcon={false}
         />
       );
@@ -124,7 +124,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          seperator={'/'}
+          separator={'/'}
           showIcon
         />
       );
@@ -137,7 +137,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          seperator={'/'}
+          separator={'/'}
           showIcon={false}
         />
       );
@@ -152,7 +152,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          seperator={'/'}
+          separator={'/'}
           showIcon
         />
       );
@@ -165,7 +165,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          seperator={'/'}
+          separator={'/'}
           showIcon
         />
       );

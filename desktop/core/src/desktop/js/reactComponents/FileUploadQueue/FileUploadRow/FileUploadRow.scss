@@ -14,27 +14,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+@use 'variables' as vars;
 
-import OverflowingItem from '../OverflowingItem/OverflowingItem';
-import './Breadcrumb.scss';
+.antd.cuix {
+  .hue-upload-queue-row {
+    display: flex;
+    flex-direction: column;
+    border: solid 1px vars.$fluidx-gray-300;
 
-interface BreadcrumbProps {
-  label: string;
-  url: string;
-  onFilepathChange: (path: string) => void;
+    &__container {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      padding: 8px;
+      gap: 8px;
+    }
+
+    &__status {
+      display: flex;
+      width: 20px;
+    }
+
+    &__name {
+      display: flex;
+      flex: 1;
+      text-overflow: ellipsis;
+    }
+
+    &__size {
+      display: flex;
+      text-align: right;
+      color: vars.$fluidx-gray-700;
+    }
+
+    &__close-icon {
+      cursor: pointer;
+      height: 16px;
+      width: 16px;
+    }
+
+    &__progressbar {
+      height: 2px;
+      background-color: vars.$fluidx-blue-500;
+    }
+  }
 }
-
-const Breadcrumb = ({ label, url, onFilepathChange }: BreadcrumbProps): JSX.Element => {
-  const handleFilepathChange = () => {
-    onFilepathChange(url);
-  };
-
-  return (
-    <div className="hue-path-browser__breadcrumb">
-      <OverflowingItem onClick={handleFilepathChange} label={label} />
-    </div>
-  );
-};
-
-export default Breadcrumb;

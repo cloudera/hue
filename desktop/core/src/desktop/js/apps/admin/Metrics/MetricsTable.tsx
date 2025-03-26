@@ -15,7 +15,9 @@
 // limitations under the License.
 
 import React, { useMemo } from 'react';
-import Table, { ColumnProps } from '../../../reactComponents/Table/Table';
+import PaginatedTable, {
+  ColumnProps
+} from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import './Metrics.scss';
 import { i18nReact } from '../../../utils/i18nReact';
 
@@ -118,7 +120,7 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
   );
 
   return (
-    <Table<DataSourceItem>
+    <PaginatedTable<DataSourceItem>
       data={transformedDataSource}
       rowKey="name"
       columns={metricsColumns}

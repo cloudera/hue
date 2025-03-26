@@ -15,7 +15,7 @@ describe('LoadingErrorWrapper', () => {
       <LoadingErrorWrapper {...defaultProps} loading={true} />
     );
 
-    expect(getAllByTestId('loading-error-wrapper__sppiner')).toHaveLength(2);
+    expect(getAllByTestId('loading-error-wrapper__spinner')).toHaveLength(2);
     expect(queryByText('Children Content')).toBeInTheDocument();
   });
 

@@ -36,15 +36,15 @@ interface LoadingErrorWrapperProps {
 const LoadingErrorWrapper = ({
   loading,
   errors,
-  hideChildren = false,
-  children
+  children,
+  hideChildren = false
 }: LoadingErrorWrapperProps): JSX.Element => {
   if (loading) {
     return (
       <Spin
         spinning={loading}
-        data-testid="loading-error-wrapper__sppiner"
-        className="loading-error-wrapper__sppiner"
+        data-testid="loading-error-wrapper__spinner"
+        className="loading-error-wrapper__spinner"
       >
         {hideChildren === false && children}
       </Spin>
