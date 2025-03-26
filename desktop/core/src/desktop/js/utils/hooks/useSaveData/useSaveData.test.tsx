@@ -206,7 +206,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should encode data as query string when body is not a FormData', async () => {
+  it('should auto set qsEncodeData to true when body is not a FormData', async () => {
     const { result } = renderHook(() => useSaveData(mockUrl));
 
     act(() => {
@@ -225,7 +225,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should not encode data as query string when body is a FormData', async () => {
+  it('should not auto set qsEncodeData to true when body is a FormData', async () => {
     const payload = new FormData();
 
     const { result } = renderHook(() => useSaveData(mockUrl));
@@ -246,7 +246,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should override qsEncodeData value from saveOptions.postOptions', async () => {
+  it('should take qsEncodeData value from saveOptions.postOptions when available', async () => {
     const payload = new FormData();
 
     const { result } = renderHook(() =>
