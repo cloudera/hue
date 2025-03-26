@@ -32,23 +32,25 @@ interface LoadingErrorWrapperProps {
   loading: boolean;
   errors: WrapperError[];
   children: React.ReactNode;
+  hideChildren?: boolean;
 }
 
 const LoadingErrorWrapper = ({
   loading,
   errors,
-  children
+  children,
+  hideChildren = false
 }: LoadingErrorWrapperProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   if (loading) {
-    // TODO: discuss in UI meeting, if we need to render children while loading
-    // Initial thoughts:
-    // -- On first render -> hide children
-    // -- On re-render -> render children
     return (
-      <Spin spinning={loading} data-testid="loading-error-wrapper__sppiner">
-        {children}
+      <Spin
+        spinning={loading}
+        data-testid="loading-error-wrapper__spinner"
+        className="loading-error-wrapper__spinner"
+      >
+        {hideChildren === false && children}
       </Spin>
     );
   }

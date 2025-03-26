@@ -1401,10 +1401,10 @@ def _paginate(request, queryset):
 def install_app_examples(request):
   app_name = request.POST.get('app_name')
   if not app_name:
-    return HttpResponse("Missing parameter: app_name is required.", status=400)
+    return JsonResponse({'message': "Missing parameter: app_name is required."}, status=400)
 
   if not is_admin(request.user):
-    return HttpResponse("You must be a Hue admin to access this endpoint.", status=403)
+    return JsonResponse({'message': "You must be a Hue admin to access this endpoint."}, status=403)
 
   # Define supported apps and their setup functions
   setup_functions = {
@@ -1418,10 +1418,10 @@ def install_app_examples(request):
   }
 
   if app_name not in setup_functions:
-    return HttpResponse(f"Unsupported app name: {app_name}", status=400)
+    return JsonResponse({'message': f"Unsupported app name: {app_name}"}, status=400)
 
   response = setup_functions[app_name](request)
-  return response if response else HttpResponse(f"Successfully installed examples for {app_name}.", status=200)
+  return response if response else JsonResponse({'message': f"Successfully installed examples for {app_name}."})
 
 
 def _setup_hive_impala_examples(request):
@@ -1429,7 +1429,7 @@ def _setup_hive_impala_examples(request):
   db_name = request.POST.get('database_name', 'default')
 
   if dialect not in ('hive', 'impala'):
-    return HttpResponse("Invalid dialect: Must be 'hive' or 'impala'", status=400)
+    return JsonResponse({'message': "Invalid dialect: Must be 'hive' or 'impala'"}, status=400)
 
   interpreter = common.find_compute(dialect=dialect, user=request.user)
 
@@ -1455,7 +1455,7 @@ def _setup_oozie_examples(request):
 def _setup_notebook_examples(request):
   connector_id = request.POST.get('connector_id')
   if not connector_id:
-    return HttpResponse("Missing parameter: connector_id is required.", status=400)
+    return JsonResponse({'message': "Missing parameter: connector_id is required."}, status=400)
 
   connector = Connector.objects.get(id=connector_id)
   if connector:
