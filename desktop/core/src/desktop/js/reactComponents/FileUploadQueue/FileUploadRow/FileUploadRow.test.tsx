@@ -58,8 +58,8 @@ describe('FileUploadRow', () => {
 
   it('should show progress bar when file is in uploading state', () => {
     const mockData = { ...mockUploadRow, status: FileStatus.Uploading, progress: 10 };
-    const { getByRole } = render(<FileUploadRow data={mockData} onCancel={mockOnCancel} />);
-    const progressBar = getByRole('hue-upload-queue-row__progressbar');
+    const { getByTestId } = render(<FileUploadRow data={mockData} onCancel={mockOnCancel} />);
+    const progressBar = getByTestId('hue-upload-queue-row__progressbar');
     expect(progressBar).toBeInTheDocument();
     expect(progressBar).toHaveStyle('width: 10%');
   });
