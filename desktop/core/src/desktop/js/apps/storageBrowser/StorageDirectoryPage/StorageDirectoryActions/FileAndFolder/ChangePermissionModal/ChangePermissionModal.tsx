@@ -51,9 +51,6 @@ const ChangePermissionModal = ({
   const [permissions, setPermissions] = useState<Permission[]>(initialPermissions);
 
   const { save, loading } = useSaveData(BULK_CHANGE_PERMISSION_API_URL, {
-    postOptions: {
-      qsEncodeData: false
-    },
     skip: !files.length,
     onSuccess,
     onError

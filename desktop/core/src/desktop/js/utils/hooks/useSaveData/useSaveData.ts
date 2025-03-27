@@ -59,6 +59,7 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
 
       const postOptions = {
         ...postOptionsDefault,
+        qsEncodeData: body instanceof FormData ? false : true,
         ...localOptions?.postOptions,
         ...saveOptions?.postOptions
       };

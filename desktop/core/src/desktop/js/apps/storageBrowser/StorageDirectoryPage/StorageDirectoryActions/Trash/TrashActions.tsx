@@ -51,9 +51,6 @@ const TrashActions = ({
   const [selectedAction, setSelectedAction] = useState<Actions | undefined>();
 
   const { save, loading } = useSaveData(undefined, {
-    postOptions: {
-      qsEncodeData: false
-    },
     onSuccess: () => {
       setIsModalOpen(false);
     },
