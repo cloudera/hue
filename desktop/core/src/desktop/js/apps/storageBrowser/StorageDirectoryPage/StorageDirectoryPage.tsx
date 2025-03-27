@@ -15,60 +15,50 @@
 // limitations under the License.
 
 import React, { useMemo, useState, useCallback } from 'react';
-import { ColumnProps } from 'antd/lib/table';
 import { Input, Tooltip } from 'antd';
 
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
-import SortAscending from '@cloudera/cuix-core/icons/react/SortAscendingIcon';
-import SortDescending from '@cloudera/cuix-core/icons/react/SortDescendingIcon';
-
-import Table from 'cuix/dist/components/Table';
 
 import { i18nReact } from '../../../utils/i18nReact';
 import useDebounce from '../../../utils/useDebounce';
 
 import { LIST_DIRECTORY_API_URL } from '../api';
 import {
-  SortOrder,
   ListDirectory,
   FileStats,
   BrowserViewType,
   StorageDirectoryTableData,
   FileSystem
 } from '../types';
-import Pagination from '../../../reactComponents/Pagination/Pagination';
 import formatBytes from '../../../utils/formatBytes';
 
 import './StorageDirectoryPage.scss';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
-import {
-  DEFAULT_PAGE_SIZE,
-  DEFAULT_POLLING_TIME,
-  FileUploadStatus
-} from '../../../utils/constants/storageBrowser';
+import { DEFAULT_PAGE_SIZE, DEFAULT_POLLING_TIME } from '../../../utils/constants/storageBrowser';
 import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
-import { UploadItem } from '../../../utils/hooks/useFileUpload/util';
+import { RegularFile, FileStatus } from '../../../utils/hooks/useFileUpload/types';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
-import { useWindowSize } from '../../../utils/hooks/useWindowSize/useWindowSize';
+import useResizeObserver from '../../../utils/hooks/useResizeObserver/useResizeObserver';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import StorageDirectoryActions from './StorageDirectoryActions/StorageDirectoryActions';
+import PaginatedTable, {
+  SortOrder,
+  ColumnProps
+} from '../../../reactComponents/PaginatedTable/PaginatedTable';
+import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
   fileSystem: FileSystem;
   onFilePathChange: (path: string) => void;
-  className?: string;
-  rowClassName?: string;
   testId?: string;
   reloadTrashPath: () => void;
 }
 
 const defaultProps = {
-  className: 'hue-storage-browser__table',
-  rowClassName: 'hue-storage-browser__table-row',
   testId: 'hue-storage-browser__table'
 };
 
@@ -76,21 +66,19 @@ const StorageDirectoryPage = ({
   fileStats,
   fileSystem,
   onFilePathChange,
-  className,
-  rowClassName,
   testId,
-  reloadTrashPath,
-  ...restProps
+  reloadTrashPath
 }: StorageDirectoryPageProps): JSX.Element => {
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
-  const [filesToUpload, setFilesToUpload] = useState<UploadItem[]>([]);
+  const [filesToUpload, setFilesToUpload] = useState<RegularFile[]>([]);
   const [polling, setPolling] = useState<boolean>(false);
 
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [pageNumber, setPageNumber] = useState<number>(1);
-  const [sortByColumn, setSortByColumn] = useState<string>('');
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.NONE);
+  const [sortByColumn, setSortByColumn] =
+    useState<ColumnProps<StorageDirectoryTableData>['dataIndex']>();
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const { t } = i18nReact.useTranslation();
@@ -105,17 +93,15 @@ const StorageDirectoryPage = ({
       path: fileStats.path,
       pagesize: pageSize.toString(),
       pagenum: pageNumber.toString(),
-      filter: searchTerm,
+      filter: searchTerm !== '' ? searchTerm : undefined,
       sortby: sortByColumn,
-      descending: sortOrder === SortOrder.DSC ? 'true' : 'false'
+      descending: sortOrder !== null ? sortOrder === 'descend' : undefined
     },
     skip:
       fileStats.path === '' ||
       fileStats.path === undefined ||
       fileStats.type !== BrowserViewType.dir,
-    onSuccess: () => {
-      setSelectedFiles([]);
-    },
+    onSuccess: () => setSelectedFiles([]),
     pollInterval: polling ? DEFAULT_POLLING_TIME : undefined
   });
 
@@ -125,7 +111,7 @@ const StorageDirectoryPage = ({
     }
 
     return filesData?.files?.map(file => ({
-      name: file.path.split('/').pop() ?? '',
+      name: getLastDirOrFileNameFromPath(file.path),
       size: file.type === BrowserViewType.file ? formatBytes(file.size) : '',
       user: file.user,
       group: file.group,
@@ -136,67 +122,6 @@ const StorageDirectoryPage = ({
       replication: file?.replication
     }));
   }, [filesData]);
-
-  const onColumnTitleClicked = (columnClicked: string) => {
-    if (columnClicked === sortByColumn) {
-      if (sortOrder === SortOrder.NONE) {
-        setSortOrder(SortOrder.ASC);
-      } else if (sortOrder === SortOrder.ASC) {
-        setSortOrder(SortOrder.DSC);
-      } else {
-        setSortOrder(SortOrder.NONE);
-      }
-    } else {
-      setSortByColumn(columnClicked);
-      setSortOrder(SortOrder.ASC);
-    }
-  };
-
-  const getColumns = (file: StorageDirectoryTableData) => {
-    const columns: ColumnProps<StorageDirectoryTableData>[] = [];
-    for (const key of Object.keys(file)) {
-      const column: ColumnProps<StorageDirectoryTableData> = {
-        dataIndex: key,
-        title: (
-          <div
-            className="hue-storage-browser__table-column-header"
-            onClick={() => onColumnTitleClicked(key)}
-          >
-            <div className="hue-storage-browser__table-column-title">
-              {key === 'mtime' ? t('Last Updated') : t(key)}
-            </div>
-            {key === sortByColumn ? (
-              sortOrder === SortOrder.DSC ? (
-                <SortDescending />
-              ) : sortOrder === SortOrder.ASC ? (
-                <SortAscending />
-              ) : null
-            ) : null}
-          </div>
-        ),
-        key: `${key}`
-      };
-      if (key === 'name') {
-        column.width = '40%';
-        column.render = (_, record: StorageDirectoryTableData) => (
-          <Tooltip title={record.name} mouseEnterDelay={1.5}>
-            <span className="hue-storage-browser__table-cell-icon">
-              {record.type === 'dir' ? <FolderIcon /> : <FileIcon />}
-            </span>
-            <span className="hue-storage-browser__table-cell-name">{record.name}</span>
-          </Tooltip>
-        );
-      } else if (key === 'mtime') {
-        column.width = '20%';
-      } else if (key === 'permission') {
-        column.width = '12%';
-      }
-      columns.push(column);
-    }
-    return columns.filter(
-      col => col.dataIndex !== 'type' && col.dataIndex !== 'path' && col.dataIndex !== 'replication'
-    );
-  };
 
   const onRowClicked = (record: StorageDirectoryTableData) => {
     return {
@@ -209,12 +134,6 @@ const StorageDirectoryPage = ({
         }
       }
     };
-  };
-
-  const rowSelection = {
-    onChange: (_: React.Key[], selectedRows: StorageDirectoryTableData[]) => {
-      setSelectedFiles(selectedRows);
-    }
   };
 
   const handleSearch = useCallback(
@@ -230,20 +149,16 @@ const StorageDirectoryPage = ({
         file,
         filePath: fileStats.path,
         uuid: UUID(),
-        status: FileUploadStatus.Pending
+        status: FileStatus.Pending
       };
     });
     setPolling(true);
     setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
   };
 
-  const [tableRef, rect] = useWindowSize();
+  const [tableRef, rect] = useResizeObserver();
   // 40px for table header, 50px for pagination
   const tableBodyHeight = Math.max(rect.height - 90, 100);
-
-  const locale = {
-    emptyText: t('Folder is empty')
-  };
 
   const errorConfig = [
     {
@@ -254,6 +169,64 @@ const StorageDirectoryPage = ({
     }
   ];
 
+  const columnsConfig: ColumnProps<StorageDirectoryTableData>[] = [
+    {
+      title: t('Name'),
+      dataIndex: 'name',
+      key: 'name',
+      sorter: true,
+      width: '40%',
+      render: (_, record) => (
+        <Tooltip title={record.name} mouseEnterDelay={1.5}>
+          <div className="hue-storage-browser-directory__table-container__name-column">
+            <div className="hue-storage-browser-directory__table-container__name-column__icon">
+              {record.type === BrowserViewType.dir ? (
+                <FolderIcon height={18} width={18} />
+              ) : (
+                <FileIcon height={18} width={18} />
+              )}
+            </div>
+            <div className="hue-storage-browser-directory__table-container__name-column__label">
+              {record.name}
+            </div>
+          </div>
+        </Tooltip>
+      )
+    },
+    {
+      title: t('Size'),
+      dataIndex: 'size',
+      key: 'size',
+      width: '10%',
+      sorter: true
+    },
+    {
+      title: t('User'),
+      dataIndex: 'user',
+      key: 'user',
+      width: '10%'
+    },
+    {
+      title: t('Group'),
+      dataIndex: 'group',
+      key: 'group',
+      width: '10%'
+    },
+    {
+      title: t('Permission'),
+      dataIndex: 'permission',
+      key: 'permission',
+      width: '10%'
+    },
+    {
+      title: t('Last Updated'),
+      dataIndex: 'mtime',
+      key: 'mtime',
+      width: '20%',
+      sorter: true
+    }
+  ];
+
   return (
     <div className="hue-storage-browser-directory">
       <div className="hue-storage-browser-directory__actions-bar">
@@ -261,9 +234,7 @@ const StorageDirectoryPage = ({
           className="hue-storage-browser-directory__actions-bar__search"
           placeholder={t('Search')}
           allowClear={true}
-          onChange={event => {
-            handleSearch(event.target.value);
-          }}
+          onChange={event => handleSearch(event.target.value)}
           disabled={!tableData.length && !searchTerm.length}
         />
         <div className="hue-storage-browser-directory__actions-bar__actions">
@@ -288,34 +259,26 @@ const StorageDirectoryPage = ({
             loading={(loadingFiles || listDirectoryLoading) && !polling}
             errors={errorConfig}
           >
-            <Table
-              className={className}
-              columns={getColumns(tableData[0] ?? {})}
-              dataSource={tableData}
-              onRow={onRowClicked}
-              pagination={false}
-              rowClassName={rowClassName}
+            <PaginatedTable<StorageDirectoryTableData>
+              data={tableData}
+              columns={columnsConfig}
               rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
-              rowSelection={{
-                hideSelectAll: !tableData.length,
-                columnWidth: 36,
-                type: 'checkbox',
-                ...rowSelection
-              }}
+              onRowClick={onRowClicked}
+              onRowSelect={setSelectedFiles}
+              sortByColumn={sortByColumn}
+              setSortByColumn={setSortByColumn}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+              locale={{ emptyText: t('Folder is empty') }}
               scroll={{ y: tableBodyHeight }}
-              data-testid={testId}
-              locale={locale}
-              {...restProps}
+              testId={testId}
+              pagination={{
+                pageSize,
+                setPageSize,
+                setPageNumber,
+                pageStats: filesData?.page
+              }}
             />
-
-            {filesData?.page && filesData?.page?.totalPages > 0 && (
-              <Pagination
-                setPageSize={setPageSize}
-                pageSize={pageSize}
-                setPageNumber={setPageNumber}
-                pageStats={filesData?.page}
-              />
-            )}
           </LoadingErrorWrapper>
         </DragAndDrop>
       </div>

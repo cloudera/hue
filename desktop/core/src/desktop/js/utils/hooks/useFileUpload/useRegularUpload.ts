@@ -16,28 +16,26 @@
 
 import useQueueProcessor from '../useQueueProcessor/useQueueProcessor';
 import { UPLOAD_FILE_URL } from '../../../apps/storageBrowser/api';
-import {
-  DEFAULT_CONCURRENT_MAX_CONNECTIONS,
-  FileUploadStatus
-} from '../../constants/storageBrowser';
+import { DEFAULT_CONCURRENT_MAX_CONNECTIONS } from '../../constants/storageBrowser';
 import useSaveData from '../useSaveData/useSaveData';
-import { UploadItem } from './util';
+import { getItemProgress } from './utils';
+import { RegularFile, FileVariables, FileStatus } from './types';
 
 interface UseUploadQueueResponse {
-  addFiles: (item: UploadItem[]) => void;
-  removeFile: (item: UploadItem) => void;
+  addFiles: (item: RegularFile[]) => void;
+  cancelFile: (uuid: RegularFile['uuid']) => void;
   isLoading: boolean;
 }
 
 interface UploadQueueOptions {
   concurrentProcess?: number;
-  onStatusUpdate: (item: UploadItem, newStatus: FileUploadStatus) => void;
+  updateFileVariables: (item: RegularFile['uuid'], variables: FileVariables) => void;
   onComplete: () => void;
 }
 
 const useRegularUpload = ({
   concurrentProcess = DEFAULT_CONCURRENT_MAX_CONNECTIONS,
-  onStatusUpdate,
+  updateFileVariables,
   onComplete
 }: UploadQueueOptions): UseUploadQueueResponse => {
   const { save } = useSaveData(UPLOAD_FILE_URL, {
@@ -49,8 +47,8 @@ const useRegularUpload = ({
     }
   });
 
-  const processUploadItem = async (item: UploadItem) => {
-    onStatusUpdate(item, FileUploadStatus.Uploading);
+  const processRegularFile = async (item: RegularFile) => {
+    updateFileVariables(item.uuid, { status: FileStatus.Uploading });
 
     const payload = new FormData();
     payload.append('file', item.file);
@@ -58,24 +56,32 @@ const useRegularUpload = ({
 
     return save(payload, {
       onSuccess: () => {
-        onStatusUpdate(item, FileUploadStatus.Uploaded);
+        updateFileVariables(item.uuid, { status: FileStatus.Uploaded });
       },
-      onError: () => {
-        onStatusUpdate(item, FileUploadStatus.Failed);
+      onError: error => {
+        updateFileVariables(item.uuid, { status: FileStatus.Failed, error });
+      },
+      postOptions: {
+        onUploadProgress: progress => {
+          const itemProgress = getItemProgress(progress);
+          updateFileVariables(item.uuid, { progress: itemProgress });
+        }
       }
     });
   };
 
   const {
     enqueue: addFiles,
-    dequeue: removeFile,
+    dequeue,
     isLoading
-  } = useQueueProcessor<UploadItem>(processUploadItem, {
+  } = useQueueProcessor<RegularFile>(processRegularFile, {
     concurrentProcess,
     onSuccess: onComplete
   });
 
-  return { addFiles, removeFile, isLoading };
+  const cancelFile = (itemId: RegularFile['uuid']) => dequeue(itemId, 'uuid');
+
+  return { addFiles, cancelFile, isLoading };
 };
 
 export default useRegularUpload;

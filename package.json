@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "5.0.1",
-    "@cloudera/cuix-core": "file:desktop/core/src/desktop/static/desktop/ext/cuix/cloudera-cuix-core-1.0.6.tgz",
+    "@cloudera/cuix-core": "file:desktop/core/src/desktop/static/desktop/ext/cuix/cloudera-cuix-core-1.1.7.tgz",
     "@gethue/sql-formatter": "4.0.3",
     "@selectize/selectize": "0.14.0",
     "antd": "4.24.5",
@@ -40,7 +40,7 @@
     "clipboard": "1.7.1",
     "copy-to-clipboard": "3.3.3",
     "core-js": "3.19.1",
-    "cuix": "file:desktop/core/src/desktop/static/desktop/ext/cuix/cuix-13.0.4.tgz",
+    "cuix": "file:desktop/core/src/desktop/static/desktop/ext/cuix/cuix-13.4.1.tgz",
     "d3v3": "1.0.3",
     "diff": "5.1.0",
     "dropzone": "5.5.1",

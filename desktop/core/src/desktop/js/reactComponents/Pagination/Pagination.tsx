@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import React from 'react';
 import { Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
@@ -24,10 +25,16 @@ import PageNextIcon from '@cloudera/cuix-core/icons/react/PageNextIcon';
 import PageLastIcon from '@cloudera/cuix-core/icons/react/PageLastIcon';
 import DropdownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 
-import { PageStats } from '../../apps/storageBrowser/types';
 import './Pagination.scss';
 
-interface PaginationProps {
+export interface PageStats {
+  pageNumber: number;
+  totalPages: number;
+  pageSize: number;
+  totalSize: number;
+}
+
+export interface PaginationProps {
   setPageNumber: (pageNumber: number) => void;
   setPageSize?: (pageSize: number) => void;
   pageSize?: number;
@@ -36,14 +43,10 @@ interface PaginationProps {
   showIndexes?: boolean;
 }
 
-const defaultProps = {
-  pageSizeOptions: [10, 50, 500, 1000]
-};
-
 const Pagination = ({
   setPageNumber,
   setPageSize,
-  pageSizeOptions = [],
+  pageSizeOptions = [10, 50, 500, 1000],
   pageStats,
   showIndexes = false
 }: PaginationProps): JSX.Element => {
@@ -130,5 +133,4 @@ const Pagination = ({
   );
 };
 
-Pagination.defaultProps = defaultProps;
 export default Pagination;

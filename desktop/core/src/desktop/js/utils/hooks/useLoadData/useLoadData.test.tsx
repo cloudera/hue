@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import useLoadData from './useLoadData';
 import { get } from '../../../api/utils';
 import { convertKeysToCamelCase } from '../../string/changeCasing';
@@ -49,6 +49,7 @@ describe('useLoadData', () => {
 
   it('should fetch data successfully', async () => {
     const { result } = renderHook(() => useLoadData(mockUrl));
+
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
     expect(result.current.loading).toBe(true);
@@ -120,13 +121,15 @@ describe('useLoadData', () => {
     const updatedMockResult = { ...mockDataResponse, product: 'Hue 2' };
     mockGet.mockResolvedValueOnce(updatedMockResult);
 
-    const reloadResult = await result.current.reloadData();
+    await act(async () => {
+      const reloadResult = await result.current.reloadData();
+      expect(reloadResult).toEqual(updatedMockResult);
+    });
 
     await waitFor(() => {
       expect(mockGet).toHaveBeenCalledTimes(2);
       expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
       expect(result.current.data).toEqual(updatedMockResult);
-      expect(reloadResult).toEqual(updatedMockResult);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
     });

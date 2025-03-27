@@ -14,27 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+@use 'variables' as vars;
+@use 'mixins';
 
-import OverflowingItem from '../OverflowingItem/OverflowingItem';
-import './Breadcrumb.scss';
+.hue-table {
+  .ant-table-cell {
+    @include mixins.nowrap-ellipsis;
+  }
 
-interface BreadcrumbProps {
-  label: string;
-  url: string;
-  onFilepathChange: (path: string) => void;
+  .ant-table-selection-column {
+    // This prevents the eplipses from being applied to the selection column
+    text-overflow: initial !important;
+  }
+
+  .ant-table-placeholder {
+    height: 100px;
+    text-align: center;
+  }
 }
-
-const Breadcrumb = ({ label, url, onFilepathChange }: BreadcrumbProps): JSX.Element => {
-  const handleFilepathChange = () => {
-    onFilepathChange(url);
-  };
-
-  return (
-    <div className="hue-path-browser__breadcrumb">
-      <OverflowingItem onClick={handleFilepathChange} label={label} />
-    </div>
-  );
-};
-
-export default Breadcrumb;
