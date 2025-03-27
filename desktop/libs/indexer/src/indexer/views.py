@@ -132,6 +132,10 @@ def _importer(request, prefill):
   return render('importer.mako', request, data)
 
 
+def new_importer(request):
+  return render('newimporter.mako', request, None)
+
+
 def install_examples(request, is_redirect=False):
   result = {'status': -1, 'message': ''}
 

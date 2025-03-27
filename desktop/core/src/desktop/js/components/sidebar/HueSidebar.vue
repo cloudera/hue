@@ -97,6 +97,7 @@
     markdown: `<svg class="hi hi-fw"><use href="#hi-markdown"></use></svg>`,
     notebook: `<svg class="hi hi-fw"><use href="#hi-file-notebook"></use></svg>`,
     newfilebrowser: `<svg class="hi hi-fw"><use href="#hi-data-browser"></use></svg>`,
+    newimporter: `<svg class="hi hi-fw"><use href="#hi-data-in"></use></svg>`,
     oozie: `<svg class="hi hi-fw"><use href="#hi-oozie"></use></svg>`,
     'oozie-bundle': `<svg class="hi hi-fw"><use href="#hi-oozie-bundle"></use></svg>`,
     'oozie-coordinator': `<svg class="hi hi-fw"><use href="#hi-oozie-coordinator"></use></svg>`,
@@ -362,6 +363,7 @@
             break;
           case 'hbase':
           case 'importer':
+          case 'newimporter':
           case 'indexes':
           case 'kafka':
             break;

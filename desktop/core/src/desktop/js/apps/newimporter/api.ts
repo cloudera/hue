@@ -14,35 +14,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
-$icon-height: 30px;
-$icon-width: 30px;
-
-.antd.cuix {
-  .hue-common-header {
-    background-color: vars.$fluidx-gray-100;
-    padding: vars.$fluidx-spacing-s 0 vars.$fluidx-spacing-xs vars.$fluidx-spacing-m;
-    display: flex;
-  }
-
-  .hue-header-icon {
-    line-height: vars.$fluidx-heading-h2-line-height;
-    margin-right: 10px;
-    flex: 0 0 auto;
-
-    > svg {
-      vertical-align: middle;
-      height: $icon-height;
-      width: $icon-width;
-    }
-  }
-
-  .hue-header-title {
-    flex: 0 0 auto;
-    font-size: vars.$fluidx-heading-h2-size;
-    margin: 0;
-    line-height: vars.$fluidx-heading-h2-line-height;
-    font-weight: vars.$fluidx-heading-h2-weight;
-    color: vars.$text-color;
-  }
-}
+export const UPLOAD_LOCAL_FILE_API_URL = '/indexer/api/indexer/upload_local_file';
