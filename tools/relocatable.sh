@@ -73,15 +73,6 @@ elif [[ $CURR_DIR == */tools ]]; then
   HUE_ROOT=$(dirname $CURR_DIR)
 fi
 
-BLD_DIR="$HUE_ROOT/build"
-BLD_ENV_REL="build"
-if [[ "$PYTHON_VER" == "python3.11" ]]; then
-  BLD_DIR_ENV="$BLD_DIR/env"
-  BLD_ENV_REL="build/env"
-else
-  BLD_DIR_ENV="$BLD_DIR/venvs/$PYTHON_VER"
-  BLD_ENV_REL="build/venvs/$PYTHON_VER"
-fi
 BLD_DIR_BIN="$BLD_DIR_ENV/bin"
 ENV_PYTHON="$BLD_DIR_BIN/python"
 
@@ -102,13 +93,14 @@ fi
 export PATH=$(dirname $ENV_PYTHON):$PATH
 
 PYVER=$($ENV_PYTHON -V 2>&1 | awk '{print $2}' | cut -d '.' -f 1,2)
+BIN_DIR=$(dirname $SYS_PYTHON)
 # Step 1. Fix virtualenv
 if [[ "$PYVER" == "3."[8-9]* || "$PYVER" == "3.11" ]]; then
   echo "Python version is 3.8 or greater"
   pushd .
   cd $HUE_ROOT
-  virtualenv-make-relocatable "$BLD_ENV_REL"
-  $ENV_PYTHON $VIRTUAL_BOOTSTRAP --relocatable_pth "$BLD_ENV_REL"
+  $SYS_PYTHON $BIN_DIR/virtualenv-make-relocatable "$BLD_DIR_ENV"
+  # $SYS_PYTHON $VIRTUAL_BOOTSTRAP --relocatable_pth "$BLD_ENV_REL"
   popd
 fi
 

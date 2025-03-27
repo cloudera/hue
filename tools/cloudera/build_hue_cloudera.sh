@@ -95,39 +95,50 @@ export LD_RUN_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH
 
 PYTHON_VERSIONS=("python3.8" "python3.9" "pythopn3.10" "python3.11")
 
-for _PYTHON in "${PYTHON_VERSIONS[@]}"; do
-  if [[ $_PYTHON == "python3.8" && ( $DOCKEROS == "redhat7_ppc" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat8_ppc" || $DOCKEROS == "sles12" || $DOCKEROS == "centos7" || $DOCKEROS == "ubuntu18" || $DOCKEROS == "ubuntu20" ) ]]; then
+for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
+  if [[ $PYTHON_VER == "python3.8" && ( $DOCKEROS == "redhat7_ppc" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat8_ppc" || $DOCKEROS == "sles12" || $DOCKEROS == "centos7" || $DOCKEROS == "ubuntu18" || $DOCKEROS == "ubuntu20" ) ]]; then
     check_python38_path
-    export PYTHON_VER="python3.8"
     export PATH="$PYTHON38_PATH/bin:$PATH"
-  elif [[ $_PYTHON == "python3.9" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat9_ppc" || $DOCKEROS == "redhat8-arm64" ) ]]; then
+    export SYS_PYTHON="$PYTHON38_PATH/bin/python3.8"
+    export SYS_PIP="$PYTHON38_PATH/bin/pip3.8"
+  elif [[ $PYTHON_VER == "python3.9" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat9_ppc" || $DOCKEROS == "redhat8-arm64" ) ]]; then
     check_python39_path
-    export PYTHON_VER="python3.9"
     export PATH="$PYTHON39_PATH/bin:$PATH"
-  elif [[ $_PYTHON == "python3.10" && ( $DOCKEROS == "sles15" || $DOCKEROS == "ubuntu22" ) ]]; then
+    export SYS_PYTHON="$PYTHON39_PATH/bin/python3.9"
+    export SYS_PIP="$PYTHON39_PATH/bin/pip3.9"
+  elif [[ $PYTHON_VER == "python3.10" && ( $DOCKEROS == "sles15" || $DOCKEROS == "ubuntu22" ) ]]; then
     check_python310_path
-    export PYTHON_VER="python3.10"
     export PATH="$PYTHON310_PATH/bin:$PATH"
-  elif [[ $_PYTHON == "python3.11" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "sles15" ) ]]; then
+    export SYS_PYTHON="$PYTHON310_PATH/bin/python3.10"
+    export SYS_PIP="$PYTHON310_PATH/bin/pip3.10"
+  elif [[ $PYTHON_VER == "python3.11" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "sles15" ) ]]; then
     check_python311_path
-    export PYTHON_VER="python3.11"
     export PATH="$PYTHON311_PATH/bin:$PATH"
+    export SYS_PYTHON="$PYTHON311_PATH/bin/python3.11"
+    export SYS_PIP="$PYTHON311_PATH/bin/pip3.11"
   else
     continue
   fi
 
-  big_console_header "Hue PreRequisite Start" "$@"
+  big_console_header "Hue PreRequisite Start for" $PYTHON_VER "$@"
   install_prerequisite $DOCKEROS
-  big_console_header "Hue PreRequisite End" "$@"
+  big_console_header "Hue PreRequisite End for" $PYTHON_VER "$@"
 
   HUE_SRC=$(realpath "$WORK_DIR/../..")
-  export ROOT="$HUE_SRC"
   cd "$HUE_SRC" || exit 1
 
-  big_console_header "Hue Build Start" "$@"
-  make apps docs
-  bash -x ./tools/relocatable.sh $_PYTHON
-  make prod
-  big_console_header "Hue Build End" "$@"
+  BLD_DIR="${BLD_DIR:-build}"             # Default build directory if not set
+  if [[ $PYTHON_VER == "python3.11" ]]; then
+    BLD_DIR_ENV="${BLD_DIR}/env"
+  else
+    BLD_DIR_ENV="${BLD_DIR}/venvs/${PYTHON_VER}"
+  fi
+  echo "BLD_DIR_ENV=${BLD_DIR_ENV}"
+
+  big_console_header "Hue Build Start for" $PYTHON_VER "$@"
+  PYTHON_VER=$PYTHON_VER make apps docs
+  PYTHON_VER=$PYTHON_VER SYS_PYTHON=$SYS_PYTHON SYS_PIP=$SYS_PIP BLD_DIR_ENV=$BLD_DIR_ENV bash -x ./tools/relocatable.sh $PYTHON_VER
+  PYTHON_VER=$PYTHON_VER make prod
+  big_console_header "Hue Build End for" $PYTHON_VER "$@"
 
 done
