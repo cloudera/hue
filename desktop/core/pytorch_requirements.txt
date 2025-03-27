@@ -1,3 +1,2 @@
 --extra-index-url https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu
-torch==2.2.2
-torchvision==0.17.2
+torch==2.4.1

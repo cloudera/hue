@@ -157,6 +157,7 @@ $(BLD_DIR_ENV)/stamp:
 	 else \
 	  echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'; \
 	  $(ENV_PIP) install -r $(REQUIREMENT_FILE); \
+	  $(ENV_PIP) install --no-deps -r $(FROZEN_REQUIREMENT_FILE); \
 	  echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'; \
          fi
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
