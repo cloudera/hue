@@ -73,12 +73,13 @@ else:
   ]
 
 dynamic_patterns += [
+  # Mount the new server logs component
   re_path(r'^logs$', desktop_views.log_view, name="desktop.views.log_view"),
+
   re_path(r'^task_server$', desktop_views.task_server_view, name='desktop.views.task_server_view'),
   re_path(r'^desktop/log_analytics$', desktop_views.log_analytics),
   re_path(r'^desktop/log_js_error$', desktop_views.log_js_error),
   re_path(r'^desktop/dump_config$', desktop_views.dump_config, name="desktop.views.dump_config"),
-  re_path(r'^desktop/download_logs$', desktop_views.download_log_view),
   re_path(r'^desktop/get_debug_level', desktop_views.get_debug_level),
   re_path(r'^desktop/set_all_debug', desktop_views.set_all_debug),
   re_path(r'^desktop/reset_all_debug', desktop_views.reset_all_debug),
