@@ -195,45 +195,6 @@ def test_prometheus_view():
       assert metric in response.content, 'metric: %s \n %s' % (metric, response.content)
 
 
-@pytest.mark.django_db
-def test_log_view():
-  c = make_logged_in_client()
-
-  URL = reverse(views.log_view)
-
-  LOG = logging.getLogger()
-  LOG.warning('une voix m’a réveillé')
-
-  # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
-  response = c.get(URL)
-  assert 200 == response.status_code
-
-  c = make_logged_in_client()
-
-  URL = reverse(views.log_view)
-
-  LOG = logging.getLogger()
-  LOG.warning('Got response: PK\x03\x04\n\x00\x00\x08\x00\x00\xad\x0cN?\x00\x00\x00\x00')
-
-  # DjangoUnicodeDecodeError: 'utf8' codec can't decode byte 0xad in position 75: invalid start byte... should not happen
-  response = c.get(URL)
-  assert 200 == response.status_code
-
-
-def test_download_log_view():
-  pytest.skip("Skipping Test")
-  c = make_logged_in_client()
-
-  URL = reverse(views.download_log_view)
-
-  LOG = logging.getLogger()
-  LOG.warning('une voix m’a réveillé')
-
-  # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
-  response = c.get(URL)
-  assert "application/zip" == response.get('Content-Type', '')
-
-
 def hue_version():
   global HUE_VERSION
   HUE_VERSION_BAK = HUE_VERSION

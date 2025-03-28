@@ -817,6 +817,10 @@ def check_upload_task_status(request):
   if not task_id:
     return JsonResponse({'error': "Missing parameters: task_id is required"}, status=400)
 
+  return _check_upload_task_status(task_id)
+
+
+def _check_upload_task_status(task_id):
   redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
   try:
     task_key = f'celery-task-meta-{task_id}'
@@ -847,7 +851,7 @@ def kill_task(request):
     return JsonResponse({'error': "Missing parameters: task_id is required"}, status=400)
 
   # Check the current status of the task
-  status_response = check_upload_task_status(request)
+  status_response = _check_upload_task_status(task_id)
   status_data = json.loads(status_response.content)
 
   if status_data.get('isFinalized') or status_data.get('isRevoked') or status_data.get('isFailure'):
