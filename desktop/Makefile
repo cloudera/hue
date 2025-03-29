@@ -107,15 +107,15 @@ $(info "----------------> ENV_INSTALL_TARGETS: $(ENV_INSTALL_TARGETS)")
 
 CLEAN_TARGETS := $(APPS:%=.recursive-clean/%)
 .recursive-clean/%: %
-	$(MAKE) -C $< clean
+	PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $< clean
 
 DISTCLEAN_TARGETS := $(APPS:%=.recursive-distclean/%)
 .recursive-distclean/%: %
-	$(MAKE) -C $< distclean
+	PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $< distclean
 
 EXT_CLEAN_TARGETS := $(APPS:%=.recursive-ext-clean/%)
 .recursive-ext-clean/%: %
-	$(MAKE) -C $< ext-clean
+	PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $< ext-clean
 
 .PHONY: env-install
 env-install: $(ENV_INSTALL_TARGETS)
@@ -151,6 +151,7 @@ INSTALL_BDIST_TARGETS := $(APPS:%=.recursive-install-bdist/%)
 .recursive-install-bdist/%: %
 	INSTALL_DIR=$(INSTALL_DIR)/desktop/$< \
 		INSTALL_CONF_DIR=$(INSTALL_DIR)/desktop/conf \
+		PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) \
 		$(MAKE) -C $< install-bdist
 
 .PHONY: install
@@ -183,5 +184,5 @@ install-source-parts:
 COMPILE_LOCALE_TARGETS := $(APPS:%=.recursive-compile-locales/%)
 compile-locales: $(COMPILE_LOCALE_TARGETS)
 .recursive-compile-locales/%:
-	-@$(MAKE) -C $* compile-locale
+	-@PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $* compile-locale
 # END DEV ONLY >>>>

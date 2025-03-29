@@ -135,15 +135,17 @@ $(info "PYTHON_H is $(PYTHON_H)")
 $(info "PIP_VERSION is $(PIP_VERSION)")
 $(info "VIRTUAL_ENV_VERSION is $(VIRTUAL_ENV_VERSION)")
 $(info "VIRTUAL_ENV_RELOCATABLE_VERSION is $(VIRTUAL_ENV_RELOCATABLE_VERSION)")
+$(info "LOCAL_PY_BIN is $(LOCAL_PY_BIN)")
 $(info "BLD_DIR_ENV is $(BLD_DIR_ENV)")
 $(info "REQUIREMENT_FILE is $(REQUIREMENT_FILE)")
-$(info "REQUIREMENT_DOT_FILE is $(REQUIREMENT_DOT_FILE)")
+$(info "INSTALL_DIR is $(INSTALL_DIR)")
+$(info "INST_DIR_ENV is $(INST_DIR_ENV)")
+$(info "PPC64LE is $(PPC64LE)")
 ###################################
 # virtual-env
 ###################################
-.PHONY: virtual-env
-virtual-env: $(REQUIREMENT_DOT_FILE)
-$(REQUIREMENT_DOT_FILE):
+virtual-env: $(BLD_DIR_ENV)/bin/python
+$(BLD_DIR_ENV)/bin/python:
 	@echo "--- Creating virtual environment for $(PYTHON_VER) ---"
 	@mkdir -p $(BLD_DIR_ENV)
 	@$(SYS_PYTHON) -m pip install --upgrade pip==$(PIP_VERSION)
@@ -151,17 +153,13 @@ $(REQUIREMENT_DOT_FILE):
 ifeq ($(PPC64LE),"ppc64le")
 	@$(SYS_PYTHON) -m venv $(BLD_DIR_ENV)
 else
-	@virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV)
+	@$(SYS_PYTHON) `which virtualenv` -p $(PYTHON_VER) $(BLD_DIR_ENV)
 endif
 	@echo "REQUIREMENT_FILE is $(REQUIREMENT_FILE)"
 	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
 	@echo "--- Virtual environment setup complete for $(PYTHON_VER) ---"
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
 	@echo "--- Finished installing $(NAVOPTAPI_WHL) into virtual-env ---"
-	@touch $(REQUIREMENT_DOT_FILE)
-	@echo "--- Cleaning up .pyc files and __pycache__ directories ---"
-	@find $(BLD_DIR_ENV) -type f -name "*.pyc" -delete
-	@find $(BLD_DIR_ENV) -type d -name "__pycache__" -exec rm -r {} +
 ###################################
 # Build desktop
 ###################################
@@ -173,6 +171,9 @@ desktop: parent-pom
 desktop: virtual-env
 	@$(MAKE) -C desktop
 
+relocatable-env:
+	@$(MAKE) virtual-env
+	@$(SYS_PYTHON) `which virtualenv-make-relocatable` $(BLD_DIR_ENV)
 
 ###################################
 # Build apps
@@ -190,8 +191,7 @@ INSTALL_CORE_FILES = \
 	Makefile* $(wildcard *.mk) \
 	ext \
 	tools/app_reg \
-	tools/virtual-bootstrap \
-	tools/relocatable.sh \
+	$(INSTALL_DIR) \
 	VERS* LICENSE* README*
 
 .PHONY: install
@@ -199,8 +199,10 @@ install: virtual-env install-check install-core-structure install-desktop instal
 
 .PHONY: install-check
 install-check:
-	@if [ -n '$(wildcard $(INSTALL_DIR)/*)' ] ; then \
-	  echo 'ERROR: $(INSTALL_DIR) not empty. Cowardly refusing to continue.' ; \
+	@if [ -n '$(wildcard $(INST_DIR_ENV)/*)' ] ; then \
+	  echo "ERROR: $(INST_DIR_ENV) is not empty. Contents:" ; \
+	  ls -la "$(INST_DIR_ENV)" ; \
+	  echo 'ERROR: $(INST_DIR_ENV) not empty. Cowardly refusing to continue.' ; \
 	  false ; \
 	fi
 

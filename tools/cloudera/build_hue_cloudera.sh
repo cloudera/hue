@@ -93,8 +93,7 @@ export ORACLE_INSTANTCLIENT19_PATH="/opt/toolchain/instantclient_19_15"
 export LD_LIBRARY_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_PATH
 export LD_RUN_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH
 
-PYTHON_VERSIONS=("python3.8" "python3.9" "pythopn3.10" "python3.11")
-
+PYTHON_VERSIONS=("python3.11" "python3.10" "python3.9" "python3.8")
 for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
   if [[ $PYTHON_VER == "python3.8" && ( $DOCKEROS == "redhat7_ppc" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat8_ppc" || $DOCKEROS == "sles12" || $DOCKEROS == "centos7" || $DOCKEROS == "ubuntu18" || $DOCKEROS == "ubuntu20" ) ]]; then
     check_python38_path
@@ -136,9 +135,9 @@ for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
   echo "BLD_DIR_ENV=${BLD_DIR_ENV}"
 
   big_console_header "Hue Build Start for" $PYTHON_VER "$@"
-  PYTHON_VER=$PYTHON_VER make apps docs
-  PYTHON_VER=$PYTHON_VER SYS_PYTHON=$SYS_PYTHON SYS_PIP=$SYS_PIP BLD_DIR_ENV=$BLD_DIR_ENV bash -x ./tools/relocatable.sh $PYTHON_VER
-  PYTHON_VER=$PYTHON_VER make prod
+  PYTHON_VER=$PYTHON_VER make apps docs relocatable-env
   big_console_header "Hue Build End for" $PYTHON_VER "$@"
-
 done
+big_console_header "Hue PROD Build Start for" $PYTHON_VER "$@"
+make release
+big_console_header "Hue PROD Build End for" $PYTHON_VER "$@"

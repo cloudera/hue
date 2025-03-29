@@ -49,7 +49,7 @@ env-install: $(EGG_INFO_TARGETS)
 ################################################
 INSTALL_BDIST_TARGETS := $(APPS:%=.recursive-install-bdist/%)
 .recursive-install-bdist/%: %
-	INSTALL_DIR=$(INSTALL_DIR)/apps/$< $(MAKE) -C $< install-bdist
+	INSTALL_DIR=$(INSTALL_DIR)/apps/$< PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $< install-bdist
 
 .PHONY: install
 install: install-source-parts $(INSTALL_BDIST_TARGETS)
@@ -75,17 +75,17 @@ EXT_CLEAN_TARGETS := $(APPS:%=.recursive-ext-clean/%)
 
 clean: $(CLEAN_TARGETS)
 .recursive-clean/%:
-	@$(MAKE) -C $* clean
+	@PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $* clean
 	@$(APP_REG) --remove $* ||:
 
 distclean: $(DISTCLEAN_TARGETS)
 .recursive-distclean/%:
-	@$(MAKE) -C $* distclean
+	@PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $* distclean
 	@$(APP_REG) --remove $* ||:
 
 ext-clean: $(EXT_CLEAN_TARGETS)
 .recursive-ext-clean/%:
-	@$(MAKE) -C $* ext-clean
+	@PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $* ext-clean
 
 
 ################################################
@@ -112,4 +112,4 @@ I18N_APPS := about \
 COMPILE_LOCALE_TARGETS := $(I18N_APPS:%=.recursive-compile-locales/%)
 compile-locales: $(COMPILE_LOCALE_TARGETS)
 .recursive-compile-locales/%:
-	-@$(MAKE) -C $* compile-locale
+	-@PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $* compile-locale
