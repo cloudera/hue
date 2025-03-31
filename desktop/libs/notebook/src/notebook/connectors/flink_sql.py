@@ -79,6 +79,7 @@ class FlinkSqlApi(Api):
 
   @query_error_handler
   def create_session(self, lang=None, properties=None):
+    LOG.info("Creating session for %s.", lang)
     session = self._get_session()
 
     response = {
@@ -164,7 +165,7 @@ class FlinkSqlApi(Api):
     if not session:
       session = self._create_session()
     try:
-      self.db.session_heartbeat(session_handle=session['sessionHandle'])
+      self.db.session_heartbeat(session_handle=session['id'])
     except Exception as e:
       if "Session '%(sessionHandle)s' does not exist" % session in str(e):
         LOG.warning('Session %(sessionHandle)s does not exist, opening a new one' % session)
@@ -466,16 +467,14 @@ class FlinkSqlApi(Api):
     return [{'name': function[0]} for function in function_list]
 
   def _use_catalog(self, session, catalog):
-    self.db.configure_session(session_handle=(session['id']), statement="USE CATALOG `%s`" % catalog)
+    self.db.configure_session(session['id'], "USE CATALOG `%s`" % catalog)
 
   def _use_database(self, session, catalog, database):
     if catalog:
-      self.db.configure_session(session_handle=(session['id']),
-                                statement="USE `%(catalog)s`.`%(database)s`" % {'catalog': catalog,
-                                                                                'database': database})
+      self.db.configure_session(session['id'], "USE `%(catalog)s`.`%(database)s`" % {'catalog': catalog,
+                                                                                     'database': database})
     else:
-      self.db.configure_session(session_handle=(session['id']),
-                                statement="USE `%(database)s`" % {'database': database})
+      self.db.configure_session(session['id'], "USE `%(database)s`" % {'database': database})
 
 
 class FlinkSqlClient:
