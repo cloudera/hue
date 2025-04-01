@@ -14,35 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
-$icon-height: 30px;
-$icon-width: 30px;
+export enum TaskStatus {
+  Success = 'SUCCESS',
+  Failure = 'FAILURE',
+  Running = 'RUNNING'
+}
 
-.antd.cuix {
-  .hue-common-header {
-    background-color: vars.$fluidx-gray-100;
-    padding: vars.$fluidx-spacing-s 0 vars.$fluidx-spacing-xs vars.$fluidx-spacing-m;
-    display: flex;
-  }
+export interface TaskServerResult {
+  taskName: string;
+  username: string;
+  taskStart: string;
+  taskEnd: string;
+  progress: string;
+  qqfilename?: string;
+  parameters: number;
+}
+export interface TaskServerResponse {
+  result?: TaskServerResult;
+  dateDone: string;
+  taskId: string;
+  status: TaskStatus;
+  children?: TaskServerResponse[];
+}
 
-  .hue-header-icon {
-    line-height: vars.$fluidx-heading-h2-line-height;
-    margin-right: 10px;
-    flex: 0 0 auto;
-
-    > svg {
-      vertical-align: middle;
-      height: $icon-height;
-      width: $icon-width;
-    }
-  }
-
-  .hue-header-title {
-    flex: 0 0 auto;
-    font-size: vars.$fluidx-heading-h2-size;
-    margin: 0;
-    line-height: vars.$fluidx-heading-h2-line-height;
-    font-weight: vars.$fluidx-heading-h2-weight;
-    color: vars.$text-color;
-  }
+export interface KillTaskResponse {
+  status: 'success' | 'info' | 'error';
+  message: string;
 }

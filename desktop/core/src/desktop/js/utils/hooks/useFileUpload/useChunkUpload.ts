@@ -23,7 +23,7 @@ import {
   DEFAULT_CONCURRENT_MAX_CONNECTIONS
 } from '../../constants/storageBrowser';
 import useLoadData from '../useLoadData/useLoadData';
-import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
+import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskServer/types';
 import {
   getChunksCompletePayload,
   getItemProgress,
@@ -42,6 +42,7 @@ import {
   FileStatus,
   ChunkedFilesInProgress
 } from './types';
+import { GET_TASKS_URL } from 'reactComponents/TaskServer/constants';
 
 interface UseChunkUploadResponse {
   addFiles: (item: RegularFile[]) => void;
@@ -87,11 +88,10 @@ const useChunkUpload = ({
     });
   };
 
-  useLoadData<TaskServerResponse[]>('/desktop/api2/taskserver/get_taskserver_tasks/', {
+  useLoadData<TaskServerResponse[]>(GET_TASKS_URL, {
     pollInterval: 5000,
     skip: filesWaitingFinalStatus.length === 0,
-    onSuccess: processTaskServerResponse,
-    transformKeys: 'none'
+    onSuccess: processTaskServerResponse
   });
 
   const handleAllChunksUploaded = (chunk: ChunkedFile) => {

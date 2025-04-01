@@ -43,6 +43,7 @@ from desktop.conf import (
   COLLECT_USAGE,
   DISABLE_SOURCE_AUTOCOMPLETE,
   ENABLE_CONNECTORS,
+  ENABLE_NEW_IMPORTER,
   ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_ORGANIZATIONS,
   ENABLE_PROMETHEUS,
@@ -2154,13 +2155,22 @@ class ClusterConfig(object):
         ENABLE_DIRECT_UPLOAD.get()
         ) \
         and 'importer' not in APP_BLACKLIST.get():
-      interpreters.append({
-        'type': 'importer',
-        'displayName': _('Importer'),
-        'buttonName': _('Import'),
-        'tooltip': _('Importer'),
-        'page': '/indexer/importer'
-      })
+        if ENABLE_NEW_IMPORTER.get():
+          interpreters.append({
+            'type': 'newimporter',
+            'displayName': _('New Importer'),
+            'buttonName': _('Import'),
+            'tooltip': _('New Importer'),
+            'page': '/newimporter'
+          })
+
+        interpreters.append({
+          'type': 'importer',
+          'displayName': _('Importer'),
+          'buttonName': _('Import'),
+          'tooltip': _('Importer'),
+          'page': '/indexer/importer'
+        })
 
     if 'sqoop' in self.apps:
       from sqoop.conf import IS_ENABLED

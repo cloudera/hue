@@ -226,6 +226,7 @@ ${ hueIcons.symbols() }
         <div id="embeddable_indexer" class="embeddable"></div>
         <div id="embeddable_kafka" class="embeddable"></div>
         <div id="embeddable_importer" class="embeddable"></div>
+        <div id="embeddable_newimporter" class="embeddable"></div>
         <div id="embeddable_collections" class="embeddable"></div>
         <div id="embeddable_indexes" class="embeddable"></div>
         <div id="embeddable_useradmin_users" class="embeddable"></div>
