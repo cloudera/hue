@@ -20,7 +20,7 @@ import {
   CHUNK_UPLOAD_COMPLETE_URL,
   UPLOAD_AVAILABLE_SPACE_URL
 } from '../../../apps/storageBrowser/api';
-import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskBrowser/TaskBrowser';
+import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskServer/types';
 import {
   ChunkedFile,
   ChunkedFilesInProgress,
@@ -81,7 +81,7 @@ export const getStatusHashMap = (
   serverResponse.reduce(
     (acc, row: TaskServerResponse) => ({
       ...acc,
-      [row.task_id]: row.status
+      [row.taskId]: row.status
     }),
     {}
   );
