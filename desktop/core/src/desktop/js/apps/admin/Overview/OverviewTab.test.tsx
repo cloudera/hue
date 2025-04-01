@@ -108,29 +108,38 @@ describe('OverviewTab', () => {
       { id: 'pig', name: 'Pig Editor' }
     ];
 
-    test.each(exampleApps)(
-      'renders Examples tab and when any of the exampleApp is clicked, the API call for that particular example is executed',
-      async appData => {
-        const resolvedValue = { status: 0, message: 'Success' };
+    const resolvedValue = { status: 0, message: 'Success' };
+
+    exampleApps.forEach(appData => {
+      test(`clicking the install button for '${appData.name}' makes an API call to '/api/v1/install_app_examples'`, async () => {
         (post as jest.Mock).mockResolvedValue(resolvedValue);
         render(<Examples />);
-
-        const appIdOrOldName = appData.old_name || appData.id;
-        const url = `/${appIdOrOldName}/install_examples`;
-        const expectedData = appData.data ? { data: appData.data } : null;
 
         const button = screen.getByText(appData.name);
         fireEvent.click(button);
 
         await waitFor(() => {
-          expect(post).toHaveBeenCalledWith(url, expectedData, {
-            method: 'POST',
-            silenceErrors: true
-          });
+          if (appData.data) {
+            expect(post).toHaveBeenCalledWith(
+              '/api/v1/install_app_examples',
+              {
+                app_name: appData.id,
+                data: appData.data
+              },
+              expect.anything()
+            );
+          } else {
+            expect(post).toHaveBeenCalledWith(
+              '/api/v1/install_app_examples',
+              {
+                app_name: appData.id
+              },
+              expect.anything()
+            );
+          }
         });
-
         (post as jest.Mock).mockClear();
-      }
-    );
+      });
+    });
   });
 });
