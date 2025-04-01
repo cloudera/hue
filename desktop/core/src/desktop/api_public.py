@@ -28,6 +28,7 @@ from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
+from desktop.lib.importer import api as importer_api
 from desktop.log import api as logs_api
 from filebrowser import api as filebrowser_api
 from indexer import api3 as indexer_api3
@@ -443,6 +444,11 @@ def taskserver_get_available_space_for_upload(request):
 
 
 # Importer
+
+@api_view(["GET"])
+def render_new_importer(request):
+  django_request = get_django_request(request)
+  return importer_api.render_new_importer(django_request)
 
 
 @api_view(["POST"])
