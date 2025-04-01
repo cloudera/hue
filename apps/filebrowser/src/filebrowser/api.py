@@ -198,7 +198,7 @@ def download(request):
 
   content_type = mimetypes.guess_type(path)[0] or 'application/octet-stream'
   stats = request.fs.stats(path)
-  if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), stats['mtime'], stats['size']):
+  if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), stats['mtime']):
     return HttpResponseNotModified()
 
   fh = request.fs.open(path)
