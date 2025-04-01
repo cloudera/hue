@@ -220,7 +220,7 @@ def download(request, path):
   stats = request.fs.stats(path)
   mtime = stats['mtime']
   size = stats['size']
-  if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), mtime, size):
+  if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), mtime):
     return HttpResponseNotModified()
     # TODO(philip): Ideally a with statement would protect from leaks, but tricky to do here.
   fh = request.fs.open(path)
