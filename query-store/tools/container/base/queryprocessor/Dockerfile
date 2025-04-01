@@ -1,4 +1,4 @@
-FROM docker-sandbox.infra.cloudera.com/chainguard/cloudera-python-jdk:py39-jdk8 AS py39-jdk8
+FROM docker-private.infra.cloudera.com/cloudera_base/hardened/cloudera-python-jdk:py39-jdk8 AS py39-jdk8
 
 LABEL description="Hue Project https://github.com/cloudera/hue"
 
