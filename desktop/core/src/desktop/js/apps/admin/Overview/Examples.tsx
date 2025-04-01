@@ -53,11 +53,15 @@ const Examples = (): JSX.Element => {
     post<InstallExamplesResponse>(url, data, {
       method: 'POST',
       silenceErrors: true
-    }).then(response => {
+    })
+      .then(response => {
         const message = response.message ? t(response.message) : t('Examples refreshed');
         huePubSub.publish('hue.global.info', { message });
-      }).catch(error => {
-        const errorMessage = error.message ? t(error.message): t('An error occurred while installing examples.');
+      })
+      .catch(error => {
+        const errorMessage = error.message
+          ? t(error.message)
+          : t('An error occurred while installing examples.');
         huePubSub.publish('hue.global.error', { message: errorMessage });
       })
       .finally(() => {
