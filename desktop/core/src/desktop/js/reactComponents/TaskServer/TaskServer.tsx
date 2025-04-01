@@ -22,7 +22,7 @@ import { calculateDuration, formatTimestamp } from '../../utils/dateTimeUtils.ts
 import huePubSub from '../../utils/huePubSub.ts';
 import { Input, Checkbox } from 'antd';
 import { Tag } from 'antd';
-import { PrimaryButton, DangerButton } from 'cuix/dist/components/Button';
+import { PrimaryButton, DangerButton, LinkButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../PaginatedTable/PaginatedTable';
 import useLoadData from '../../utils/hooks/useLoadData/useLoadData.ts';
 import useSaveData from '../../utils/hooks/useSaveData/useSaveData.ts';
@@ -57,34 +57,34 @@ export const TaskServer: React.FC = () => {
       title: t('Task ID'),
       dataIndex: 'taskId',
       key: 'taskId',
-      width: '30%',
-      render: (text: TaskServerResponse['taskId'], record: TaskServerResponse) => (
-        <a onClick={() => setSelectedTaskId(record.taskId)}>{text}</a>
+      render: (taskId: TaskServerResponse['taskId']) => (
+        <LinkButton
+          className="hue-task-server__task-id-column"
+          onClick={() => setSelectedTaskId(taskId)}
+        >
+          {taskId}
+        </LinkButton>
       )
     },
     {
       title: t('User'),
       dataIndex: ['result', 'username'],
-      key: 'user',
-      width: '10%'
+      key: 'user'
     },
     {
       title: t('Progress'),
       dataIndex: ['result', 'progress'],
-      key: 'progress',
-      width: '10%'
+      key: 'progress'
     },
     {
       title: t('Task Name'),
       dataIndex: ['result', 'taskName'],
-      key: 'taskName',
-      width: '10%'
+      key: 'taskName'
     },
     {
       title: t('Parameters'),
       dataIndex: 'parameters',
       key: 'parameters',
-      width: '10%',
       render: (_, record: TaskServerResponse) => {
         if (record.result?.taskName) {
           const paramterText = {
@@ -103,7 +103,6 @@ export const TaskServer: React.FC = () => {
       title: t('Status'),
       dataIndex: 'status',
       key: 'status',
-      width: '10%',
       render: (status: TaskServerResponse['status']) => (
         <Tag color={statusTagColor(status)}>{status.toUpperCase()}</Tag>
       )
@@ -112,13 +111,11 @@ export const TaskServer: React.FC = () => {
       title: t('Started'),
       dataIndex: ['result', 'taskStart'],
       key: 'started',
-      width: '10%',
       render: (text: TaskServerResult['taskStart']) => formatTimestamp(text)
     },
     {
       title: t('Duration'),
       key: 'duration',
-      width: '10%',
       render: (_, record: TaskServerResponse) => {
         if (record.result?.taskStart && record.result?.taskEnd) {
           return calculateDuration(record.result?.taskStart, record.result?.taskEnd);
