@@ -84,7 +84,6 @@
         indexes: { url: '/indexer/', title: '${_('Indexes')}' },
     % endif
     importer: { url: '/indexer/importer/', title: '${_('Importer')}' },
-    newimporter: { url: '/newimporter/', title: '${_('New Importer')}' },
     useradmin_users: { url: '/useradmin/users', title: '${_('User Admin - Users')}' },
     useradmin_groups: { url: '/useradmin/groups', title: '${_('User Admin - Groups')}' },
     useradmin_newgroup: { url: '/useradmin/groups/new', title: '${_('User Admin - New Group')}' },

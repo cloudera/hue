@@ -179,11 +179,6 @@ dynamic_patterns += [
   re_path(r'^editor', notebook_views.editor),
 ]
 
-# New Importer
-dynamic_patterns += [
-  re_path(r'^newimporter/?$', indexer_views.new_importer, name='newimporter')
-]
-
 # Default Configurations
 dynamic_patterns += [
   re_path(r'^desktop/api/configurations/?$', desktop_configuration_api.default_configurations),

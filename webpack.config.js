@@ -37,11 +37,7 @@ const config = {
       import: './desktop/core/src/desktop/js/apps/storageBrowser/app.js',
       dependOn: 'hue'
     },
-    jobBrowser: { import: './desktop/core/src/desktop/js/apps/jobBrowser/app.js', dependOn: 'hue' },
-    newimporter: {
-      import: './desktop/core/src/desktop/js/apps/newimporter/app.js',
-      dependOn: 'hue'
-    }
+    jobBrowser: { import: './desktop/core/src/desktop/js/apps/jobBrowser/app.js', dependOn: 'hue' }
   },
   mode: 'development',
   module: {

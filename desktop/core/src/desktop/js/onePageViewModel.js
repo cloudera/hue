@@ -787,7 +787,6 @@ class OnePageViewModel {
       { url: '/indexer/indexes/*', app: 'indexes' },
       { url: '/indexer/', app: 'indexes' },
       { url: '/indexer/importer/', app: 'importer' },
-      { url: '/newimporter/', app: 'newimporter' },
       {
         url: '/newimporter/',
         app: function () {
