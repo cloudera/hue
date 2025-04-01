@@ -19,54 +19,55 @@
 
 $option-size: 80px;
 
-.hue-importer__source-selector.antd.cuix{
-    margin: vars.$fluidx-spacing-m;
-    background-color: white;
-    padding: vars.$fluidx-spacing-m 0;
+.antd.cuix {
+    .hue-importer__source-selector{
+        margin: vars.$fluidx-spacing-m;
+        background-color: white;
+        padding: vars.$fluidx-spacing-m 0;
 
-    .hue-importer__source-selector-title {
-        display: flex;
-        justify-content: center;  
-        align-items: center;
-        font-size: vars.$fluidx-heading-h3-size;
-        line-height: vars.$fluidx-heading-h3-line-height;
-        font-weight: vars.$fluidx-heading-h3-weight;
-    }
+        &-title {
+            display: flex;
+            justify-content: center;  
+            align-items: center;
+            font-size: vars.$fluidx-heading-h3-size;
+            line-height: vars.$fluidx-heading-h3-line-height;
+            font-weight: vars.$fluidx-heading-h3-weight;
+        }
 
-    .hue-importer__source-selector-options {
-        display: flex;
-        flex-flow: row wrap;
-        justify-content: center; 
-        margin: 0 auto;
-        margin-top: 70px;
-        max-width: 80%;
-        gap: $option-size;     
-    }
+        &-options {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: center; 
+            margin: 0 auto;
+            margin-top: 70px;
+            max-width: 80%;
+            gap: $option-size;     
+        }
 
-    .hue-importer__source-option {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: $option-size;
-    }
+        &-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: $option-size;
 
-    .hue-importer__source-option-button {
-        height: $option-size;
-        width: 100%;
+            &-button {
+                height: $option-size;
+                width: 100%;
 
-        >svg {
-            height: 40px;
+                >svg {
+                    height: 40px;
+                }
+            }
+
+            &-btn-title {
+                margin-top: 14px;
+                text-align: center;
+            }
+
+            &-upload {
+                display: none;
+            }
         }
     }
-
-    .hue-importer__source-option-btn-title{
-        margin-top: 14px;
-        text-align: center;
-    }
-
-    .hue-importer__source-option-upload {
-        display: none;
-    }
-
 }

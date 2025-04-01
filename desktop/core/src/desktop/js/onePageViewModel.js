@@ -30,6 +30,7 @@ import getParameter from 'utils/url/getParameter';
 import getSearchParameter from 'utils/url/getSearchParameter';
 import { ASSIST_GET_DATABASE_EVENT, ASSIST_GET_SOURCE_EVENT } from 'ko/components/assist/events';
 import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
+import ImporterPage from '../js/apps/newimporter/ImporterPage';
 
 class OnePageViewModel {
   constructor() {
@@ -786,7 +787,16 @@ class OnePageViewModel {
       { url: '/indexer/indexes/*', app: 'indexes' },
       { url: '/indexer/', app: 'indexes' },
       { url: '/indexer/importer/', app: 'importer' },
-      { url: '/newimporter/', app: 'newimporter' },
+      {
+        url: '/newimporter/',
+        app: function () {
+          showReactAppPage({
+            appName: 'newimporter',
+            component: ImporterPage,
+            title: 'New Importer'
+          });
+        }
+      },
       {
         url: '/indexer/importer/prefill/*',
         app: function (ctx) {

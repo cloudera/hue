@@ -18,13 +18,13 @@ import React, { useRef } from 'react';
 import Button from 'cuix/dist/components/Button';
 import DocumentationIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 
+import { hueWindow } from 'types/types';
 import { i18nReact } from '../../../utils/i18nReact';
 import { UPLOAD_LOCAL_FILE_API_URL } from '../api';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import huePubSub from '../../../utils/huePubSub';
 
 import './ImporterSourceSelector.scss';
-declare const window: unknown;
 
 const ImporterSourceSelector = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
@@ -39,8 +39,7 @@ const ImporterSourceSelector = (): JSX.Element => {
     }
   });
 
-  const handleUploadClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleUploadClick = () => {
     if (!uploadRef || !uploadRef.current) {
       return;
     }
@@ -61,12 +60,13 @@ const ImporterSourceSelector = (): JSX.Element => {
     const file_size = file.size;
     if (file_size === 0) {
       huePubSub.publish('hue.global.warning', {
-        message: 'This file is empty, please select another file.'
+        message: t('This file is empty, please select another file.')
       });
-    } else if (file_size > 200 * 1024) {
+    } else if (file_size > 200 * 1000) {
       huePubSub.publish('hue.global.warning', {
-        message:
+        message: t(
           'File size exceeds the supported size (200 KB). Please use the S3, ABFS or HDFS browser to upload files.'
+        )
       });
     } else {
       upload(payload, {
@@ -83,22 +83,26 @@ const ImporterSourceSelector = (): JSX.Element => {
 
   return (
     <div className="hue-importer__source-selector cuix antd">
-      <div className="hue-importer__source-selector-title">Select a source to import from</div>
+      <div className="hue-importer__source-selector-title">
+        {t('Select a source to import from')}
+      </div>
       <div className="hue-importer__source-selector-options">
-        {window.ENABLE_DIRECT_UPLOAD && (
-          <div className="hue-importer__source-option">
+        {(window as hueWindow).ENABLE_DIRECT_UPLOAD && (
+          <div className="hue-importer__source-selector-option">
             <Button
-              className="hue-importer__source-option-button"
+              className="hue-importer__source-selector-option-button"
               size="large"
               icon={<DocumentationIcon />}
               data-event={''}
               onClick={handleUploadClick}
             ></Button>
-            <span className="hue-importer__source-option-btn-title">{t('Upload from File')}</span>
+            <span className="hue-importer__source-selector-option-btn-title">
+              {t('Upload from File')}
+            </span>
             <input
               ref={uploadRef}
               type="file"
-              className="hue-importer__source-option-upload"
+              className="hue-importer__source-selector-option-upload"
               onChange={handleFileUpload}
               accept=".csv, .xlsx, .xls"
             />
