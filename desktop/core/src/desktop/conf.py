@@ -1892,6 +1892,13 @@ ENABLE_NEW_STORAGE_BROWSER = Config(
   default=False
 )
 
+ENABLE_NEW_IMPORTER = Config(
+  key="enable_new_importer",
+  help=_("Feature flag to enable new Hue Importer."),
+  type=coerce_bool,
+  default=False
+)
+
 
 def is_chunked_fileuploader_enabled():
   return ENABLE_CHUNKED_FILE_UPLOADER.get()
