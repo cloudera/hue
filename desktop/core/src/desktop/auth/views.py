@@ -34,6 +34,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
+from django.contrib.auth.models import AnonymousUser
 
 from desktop.auth import forms as auth_forms
 from desktop.auth.backend import OIDCBackend
@@ -202,8 +203,9 @@ def dt_login(request, from_modal=False):
     request.session.set_test_cookie()
 
   if 'SAML2Backend' in backend_names:
-    request.session['samlgroup_permitted_flag'] = samlgroup_check(request)
-    saml_login_headers(request)
+    if not isinstance(request.user, AnonymousUser) and request.user.is_authenticated:
+        request.session['samlgroup_permitted_flag'] = samlgroup_check(request)
+        saml_login_headers(request)
 
   renderable_path = 'login.mako'
   if from_modal:
