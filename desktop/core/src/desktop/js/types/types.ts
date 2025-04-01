@@ -52,6 +52,7 @@ export interface hueWindow {
   ENABLE_HELP_MENU?: boolean;
   ENABLE_PREDICT?: boolean;
   ENABLE_SQL_SYNTAX_CHECK?: boolean;
+  ENABLE_DIRECT_UPLOAD?: boolean;
   HAS_CATALOG?: boolean;
   HAS_CONNECTORS?: boolean;
   HAS_SQL_ANALYZER?: boolean;
