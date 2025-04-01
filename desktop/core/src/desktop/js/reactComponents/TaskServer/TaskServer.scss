@@ -25,6 +25,11 @@
     gap: 1rem;
     padding: 1rem;
 
+    &__task-id-column {
+      white-space: break-spaces;
+      text-align: left;
+    }
+
     &__table {
       display: flex;
       flex: 1;
