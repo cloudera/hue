@@ -120,7 +120,7 @@ class SAML2Backend(_Saml2Backend):
 
       html = '<html><body>' \
             '<form action="%s" method="POST">' \
-            '<input name="logoutRedirect" type="hidden" value="%s">%s</form>' \
+            '<input name="logoutRedirect" type="hidden" value="%s"></form>' \
             '<script%s>document.addEventListener("DOMContentLoaded", function() { document.forms[0].submit(); });</script>' \
             '</body></html>' % (conf.CDP_LOGOUT_URL.get(), redirect_url, nonce_attribute(request))
       return HttpResponse(html)

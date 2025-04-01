@@ -74,12 +74,13 @@ else:
   ]
 
 dynamic_patterns += [
+  # Mount the new server logs component
   re_path(r'^logs$', desktop_views.log_view, name="desktop.views.log_view"),
+
   re_path(r'^task_server$', desktop_views.task_server_view, name='desktop.views.task_server_view'),
   re_path(r'^desktop/log_analytics$', desktop_views.log_analytics),
   re_path(r'^desktop/log_js_error$', desktop_views.log_js_error),
   re_path(r'^desktop/dump_config$', desktop_views.dump_config, name="desktop.views.dump_config"),
-  re_path(r'^desktop/download_logs$', desktop_views.download_log_view),
   re_path(r'^desktop/get_debug_level', desktop_views.get_debug_level),
   re_path(r'^desktop/set_all_debug', desktop_views.set_all_debug),
   re_path(r'^desktop/reset_all_debug', desktop_views.reset_all_debug),
@@ -149,12 +150,12 @@ dynamic_patterns += [
   re_path(r'^desktop/api2/doc/restore/?$', desktop_api2.restore_document),
   re_path(r'^desktop/api2/doc/share/link/?$', desktop_api2.share_document_link),
   re_path(r'^desktop/api2/doc/share/?$', desktop_api2.share_document),
-  re_path(r'^desktop/api2/taskserver/handle_submit/?$', desktop_api2.handle_submit, name="desktop_api2.handle_submit"),
-  re_path(r'^desktop/api2/taskserver/get_taskserver_tasks/?$', desktop_api2.get_taskserver_tasks, name="desktop_api2.get_taskserver_tasks"),
-  re_path(r'^desktop/api2/taskserver/get_task_logs/(?P<task_id>[^/]+)/?$', desktop_api2.get_task_logs, name="desktop_api2.get_task_logs"),
-  re_path(r'^desktop/api2/taskserver/check_upload_status/(?P<task_id>[^/]+)/?$', desktop_api2.check_upload_status,
-          name="desktop_api2.check_upload_status"),
-  re_path(r'^desktop/api2/taskserver/kill_task/(?P<task_id>[^/]+)/?$', desktop_api2.kill_task, name="desktop_api2.kill_task"),
+  re_path(r'^desktop/api2/taskserver/tasks/?$', desktop_api2.get_tasks, name="taskserver_get_tasks"),
+  re_path(r'^desktop/api2/taskserver/task/submit/?$', desktop_api2.handle_task_submit, name="taskserver_handle_task_submit"),
+  re_path(r'^desktop/api2/taskserver/task/logs/?$', desktop_api2.get_task_logs, name="taskserver_get_task_logs"),
+  re_path(r'^desktop/api2/taskserver/task/check_upload_status/?$', desktop_api2.check_upload_task_status,
+          name="taskserver_check_upload_task_status"),
+  re_path(r'^desktop/api2/taskserver/task/kill/?$', desktop_api2.kill_task, name="taskserver_kill_task"),
 
   re_path(r'^desktop/api2/get_config/?$', desktop_api2.get_config),
   re_path(r'^desktop/api2/get_hue_config/?$', desktop_api2.get_hue_config),
