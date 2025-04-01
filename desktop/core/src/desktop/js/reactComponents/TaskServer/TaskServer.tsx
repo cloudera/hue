@@ -50,9 +50,7 @@ export const TaskServer: React.FC = () => {
 
   const { t } = i18nReact.useTranslation();
 
-  const { save } = useSaveData(KILL_TASK_URL, {
-    postOptions: { qsEncodeData: false }
-  });
+  const { save } = useSaveData(KILL_TASK_URL);
 
   const columns = [
     {
