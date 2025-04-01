@@ -159,6 +159,10 @@ urlpatterns += [
 ]
 
 urlpatterns += [
+  re_path(r'^importer/new/?$', api_public.render_new_importer, name='importer_render_new_component'),
+]
+
+urlpatterns += [
   re_path(r'^connector/types/?$', api_public.get_connector_types, name='connector_get_types'),
   re_path(r'^connector/instances/?$', api_public.get_connectors_instances, name='connector_get_instances'),
   re_path(r'^connector/instance/new/(?P<dialect>[\w\-]+)/(?P<interface>[\w\-]+)$', api_public.new_connector, name='connector_new'),
