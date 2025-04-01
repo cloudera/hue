@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React from 'react';
 import CloseIcon from '../../components/icons/CloseIcon';
 import { i18nReact } from '../../utils/i18nReact';
 import { RegularFile, FileStatus } from '../../utils/hooks/useFileUpload/types';
