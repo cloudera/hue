@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import { FileFormatResponse, FileMetaData, GuessFieldTypesResponse } from '../types';
-import { convertToAntdColumns, convertToDataSource } from '../util/util';
+import { convertToAntdColumns, convertToDataSource } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
