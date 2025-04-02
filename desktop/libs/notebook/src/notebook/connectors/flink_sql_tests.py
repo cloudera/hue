@@ -24,9 +24,12 @@ from useradmin.models import User
 
 
 class TestFlinkApi(TestCase):
+  TEST_SESSION_HANDLE = '657c12d4-5509-477f-a460-ea6af927906d'
+  TEST_OPERATION_HANDLE = '1f6922e4-ec0c-4307-947b-7502757edf1a'
+
   def setup_method(self, test_method):
-    self.client = make_logged_in_client(username="hue_test", groupname="default", recreate=True, is_superuser=False)
-    self.user = User.objects.get(username="hue_test")
+    self.client = make_logged_in_client(username='hue_test', groupname='default', recreate=True, is_superuser=False)
+    self.user = User.objects.get(username='hue_test')
     self.interpreter = {
       'options': {
         'url': 'https://example.com:8081',
@@ -39,7 +42,7 @@ class TestFlinkApi(TestCase):
     # given: mock interactions
     mock_client_instance = MagicMock()
     client_mock.return_value = mock_client_instance
-    mock_client_instance.create_session.return_value = {'sessionHandle': '657c12d4-5509-477f-a460-ea6af927906d'}
+    mock_client_instance.create_session.return_value = {'sessionHandle': self.TEST_SESSION_HANDLE}
 
     # and: FlinkSqlApi instance
     flink_api = FlinkSqlApi(self.user, interpreter=self.interpreter)
@@ -48,7 +51,7 @@ class TestFlinkApi(TestCase):
     created_session = flink_api.create_session(lang='flink', properties=None)
 
     # then
-    assert created_session == {'id': '657c12d4-5509-477f-a460-ea6af927906d', 'type': 'flink'}
+    assert created_session == {'id': self.TEST_SESSION_HANDLE, 'type': 'flink'}
     assert mock_client_instance.session_heartbeat.call_count == 1
 
   @patch('notebook.connectors.flink_sql.FlinkSqlClient')
@@ -56,7 +59,7 @@ class TestFlinkApi(TestCase):
     # given: mock interactions
     mock_client_instance = MagicMock()
     client_mock.return_value = mock_client_instance
-    mock_client_instance.create_session.return_value = {'sessionHandle': '657c12d4-5509-477f-a460-ea6af927906d'}
+    mock_client_instance.create_session.return_value = {'sessionHandle': self.TEST_SESSION_HANDLE}
 
     # and: FlinkSqlApi instance with configuration
     self.interpreter['options']['default_catalog'] = 'default_catalog'
@@ -67,8 +70,42 @@ class TestFlinkApi(TestCase):
     created_session = flink_api.create_session(lang='flink', properties=None)
 
     # then
-    assert created_session == {'id': '657c12d4-5509-477f-a460-ea6af927906d', 'type': 'flink'}
+    assert created_session == {'id': self.TEST_SESSION_HANDLE, 'type': 'flink'}
     mock_client_instance.configure_session.assert_called_once_with(
-      '657c12d4-5509-477f-a460-ea6af927906d', "USE `default_catalog`.`default_database`"
+      self.TEST_SESSION_HANDLE, 'USE `default_catalog`.`default_database`'
     )
     assert mock_client_instance.session_heartbeat.call_count == 1
+
+  @patch('notebook.connectors.flink_sql.FlinkSqlClient')
+  def test_autocomplete_operation_functions(self, client_mock):
+    # given: mock interactions
+    mock_client_instance = MagicMock()
+    client_mock.return_value = mock_client_instance
+    mock_client_instance.create_session.return_value = {'sessionHandle': self.TEST_SESSION_HANDLE}
+    mock_client_instance.execute_statement.return_value = {'operationHandle': self.TEST_OPERATION_HANDLE}
+    mock_client_instance.fetch_results.return_value = {
+      'resultType': 'PAYLOAD',
+      'resultKind': 'SUCCESS_WITH_CONTENT',
+      'results': {
+        'columns': [{'name': 'function name', 'logicalType': {'type': 'VARCHAR', 'nullable': True, 'length': 1000}}],
+        'rowFormat': 'JSON',
+        'data': [
+          {'kind': 'INSERT', 'fields': ['lower']},
+          {'kind': 'INSERT', 'fields': ['upper']}
+        ]},
+      'nextResultUri': f'/v3/sessions/{self.TEST_SESSION_HANDLE}/operations/{self.TEST_OPERATION_HANDLE}/result/1?rowFormat=JSON'
+    }
+
+    # and: FlinkSqlApi instance with configuration
+    flink_api = FlinkSqlApi(self.user, interpreter=self.interpreter)
+
+    # and: session is created
+    flink_api.create_session(lang='flink', properties=None)
+
+    # when
+    autocomplete_result = flink_api.autocomplete(snippet='dummy', database=None, table=None, column=None, nested=None,
+                                                 operation='functions')
+
+    # then
+    mock_client_instance.execute_statement.assert_called_once_with(self.TEST_SESSION_HANDLE, 'SHOW FUNCTIONS')
+    assert autocomplete_result == {'functions': [{'name': 'lower'}, {'name': 'upper'}]}

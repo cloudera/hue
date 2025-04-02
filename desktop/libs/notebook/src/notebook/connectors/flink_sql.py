@@ -457,13 +457,9 @@ class FlinkSqlApi(Api):
 
   def _show_functions(self, database):
     session = self._get_session()
-    session_handle = session['id']
-
-    operation_handle = self.db.execute_statement(
-      session_handle=session_handle,
-      statement='SHOW FUNCTIONS IN `%(database)s`' % {'database': database})
-    function_list = self._check_status_and_fetch_result(session_handle, operation_handle['operationHandle'])
-
+    statement = 'SHOW FUNCTIONS IN `%(database)s`' % {'database': database} if database else 'SHOW FUNCTIONS'
+    operation_handle = self.db.execute_statement(session['id'], statement)
+    function_list = self._check_status_and_fetch_result(session['id'], operation_handle['operationHandle'])
     return [{'name': function[0]} for function in function_list]
 
   def _use_catalog(self, session, catalog):
