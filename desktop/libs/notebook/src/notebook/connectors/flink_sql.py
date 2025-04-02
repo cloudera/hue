@@ -180,6 +180,7 @@ class FlinkSqlApi(Api):
   def _create_session(self):
     session = self.db.create_session()
     session['id'] = session['sessionHandle']
+    session['flink_version'] = self.db.info().get('version')
 
     if self.default_database:
       self._use_database(session, self.default_catalog, self.default_database)
@@ -294,6 +295,10 @@ class FlinkSqlApi(Api):
 
     if operation == 'functions':
       response['functions'] = self._show_functions(database)
+    elif operation == 'function':
+      # When function signature is requested the following call is executed:
+      # autocomplete(db=<function_name>, table=None, col=None, nested=None, op=function)
+      response['function'] = self._show_function(database)
     elif database is None:
       response['databases'] = self._show_databases()
     elif table is None:
@@ -461,6 +466,22 @@ class FlinkSqlApi(Api):
     operation_handle = self.db.execute_statement(session['id'], statement)
     function_list = self._check_status_and_fetch_result(session['id'], operation_handle['operationHandle'])
     return [{'name': function[0]} for function in function_list]
+
+  def _show_function(self, function_name):
+    session = self._get_session()
+    if session.get('flink_version') and session['flink_version'].startswith('2.'):
+      # Describe function is available as of Flink 2.0.
+      operation_handle = self.db.execute_statement(
+        session_handle=session['id'],
+        statement='DESCRIBE FUNCTION EXTENDED %(function_name)s' % {'function_name': function_name})
+      properties = dict(self._check_status_and_fetch_result(session['id'], operation_handle['operationHandle']))
+
+      return {
+        'name': function_name,
+        'signature': properties.get('signature'),
+      }
+    else:
+      return {'name': function_name}
 
   def _use_catalog(self, session, catalog):
     self.db.configure_session(session['id'], "USE CATALOG `%s`" % catalog)
