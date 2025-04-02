@@ -16,7 +16,12 @@
 
 import React, { useEffect, useState } from 'react';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
-import { FileFormatResponse, FileMetaData, GuessFieldTypesResponse } from '../types';
+import {
+  FileFormatResponse,
+  FileMetaData,
+  GuessFieldTypesResponse,
+  ImporterTableData
+} from '../types';
 import { convertToAntdColumns, convertToDataSource } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
@@ -65,7 +70,9 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   }, [fileMetaData]);
 
   useEffect(() => {
-    if (!fileFormat) return;
+    if (!fileFormat) {
+      return;
+    }
 
     const payload = {
       path: fileMetaData.path,
@@ -83,22 +90,22 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const [ref, rect] = useResizeObserver();
 
   return (
-    <div className="preview-page">
-      <div className="preview-page__header">
-        <div className="preview-page__header__title">{t('Preview')}</div>
-        <div className="preview-page__header__actions">
-          <BorderlessButton data-testid="preview-page__header__actions__cancel" data-event="">
+    <div className="hue-importer-preview-page">
+      <div className="hue-importer-preview-page__header">
+        <div className="hue-importer-preview-page__header__title">{t('Preview')}</div>
+        <div className="hue-importer-preview-page__header__actions">
+          <BorderlessButton data-testid="hue-importer-preview-page__header__actions__cancel">
             {t('Cancel')}
           </BorderlessButton>
-          <PrimaryButton data-testid="preview-page__header__actions__finish" data-event="">
+          <PrimaryButton data-testid="hue-importer-preview-page__header__actions__finish">
             {t('Finish Import')}
           </PrimaryButton>
         </div>
       </div>
-      <div className="preview-page__metadata">DESTINATION</div>
-      <div className="preview-page__main-section" ref={ref}>
+      <div className="hue-importer-preview-page__metadata">{t('DESTINATION')}</div>
+      <div className="hue-importer-preview-page__main-section" ref={ref}>
         <LoadingErrorWrapper loading={guessingFormat || guessingFields} errors={[]} hideChildren>
-          <PaginatedTable
+          <PaginatedTable<ImporterTableData>
             data={tableData}
             columns={columns}
             rowKey="importerDataKey"

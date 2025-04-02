@@ -31,30 +31,34 @@ export interface FileFormatResponse {
 export interface FileMetaData {
   path: string;
   type?: string;
-  source?: string;
+  source: 'localfile' | 'file';
 }
 
 export type GuessFieldTypesColumn = {
+  importerDataKey?: string; // key for identifying unique data row
   name: string;
-  type: string;
-  unique: boolean;
-  keep: boolean;
-  operations: any[];
-  required: boolean;
-  multiValued: boolean;
-  showProperties: boolean;
-  nested: any[];
-  level: number;
-  length: number;
-  keyType: string;
-  isPartition: boolean;
-  partitionValue: string;
-  comment: string;
-  scale: number;
-  precision: number;
+  type?: string;
+  unique?: boolean;
+  keep?: boolean;
+  required?: boolean;
+  multiValued?: boolean;
+  showProperties?: boolean;
+  level?: number;
+  length?: number;
+  keyType?: string;
+  isPartition?: boolean;
+  partitionValue?: string;
+  comment?: string;
+  scale?: number;
+  precision?: number;
 };
 
 export interface GuessFieldTypesResponse {
   columns: GuessFieldTypesColumn[];
   sample: string[][];
+}
+
+export interface ImporterTableData {
+  importerDataKey: string;
+  [key: string]: string | number;
 }

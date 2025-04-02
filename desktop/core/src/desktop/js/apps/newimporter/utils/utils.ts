@@ -15,9 +15,14 @@
 // limitations under the License.
 
 import { type ColumnProps } from 'cuix/dist/components/Table';
+import { GuessFieldTypesColumn, ImporterTableData } from '../types';
 
-export const convertToAntdColumns = (input?: any[]): ColumnProps<any>[] => {
-  if (!input) return [];
+export const convertToAntdColumns = (
+  input?: GuessFieldTypesColumn[]
+): ColumnProps<ImporterTableData>[] => {
+  if (!input) {
+    return [];
+  }
   return input?.map(item => ({
     title: item.name,
     dataIndex: item.name,
@@ -26,14 +31,21 @@ export const convertToAntdColumns = (input?: any[]): ColumnProps<any>[] => {
   }));
 };
 
-export const convertToDataSource = (columns: ColumnProps<any>[], apiResponse?: string[][]) => {
-  if (!apiResponse) return [];
+export const convertToDataSource = (
+  columns: ColumnProps<ImporterTableData>[],
+  apiResponse?: string[][]
+): ImporterTableData[] => {
+  if (!apiResponse) {
+    return [];
+  }
   return apiResponse?.map((rowData, index) => {
     const row = {
       importerDataKey: `${rowData[0]}__${index}` // this ensure the key is unique
     };
     columns.forEach((column, index) => {
-      row[column.key] = rowData[index];
+      if (column.key) {
+        row[column.key] = rowData[index];
+      }
     });
     return row;
   });
