@@ -16,6 +16,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ApiFetchOptions, post } from '../../../api/utils';
+import { isJSON } from '../../jsonUtils';
 
 interface saveOptions<T> {
   url?: string;
@@ -59,7 +60,7 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
 
       const postOptions = {
         ...postOptionsDefault,
-        qsEncodeData: body instanceof FormData ? false : true,
+        qsEncodeData: body instanceof FormData || isJSON(body) ? false : true,
         ...localOptions?.postOptions,
         ...saveOptions?.postOptions
       };

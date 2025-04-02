@@ -206,17 +206,17 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should auto set qsEncodeData to true when body is not a FormData', async () => {
+  it('should auto set qsEncodeData to true when body is not a FormData or JSON', async () => {
     const { result } = renderHook(() => useSaveData(mockUrl));
 
     act(() => {
-      result.current.save(mockBody);
+      result.current.save('hue data');
     });
 
     await waitFor(() => {
       expect(mockPost).toHaveBeenCalledWith(
         mockUrl,
-        mockBody,
+        'hue data',
         expect.objectContaining({ qsEncodeData: true })
       );
       expect(result.current.data).toEqual(mockData);
@@ -227,6 +227,27 @@ describe('useSaveData', () => {
 
   it('should not auto set qsEncodeData to true when body is a FormData', async () => {
     const payload = new FormData();
+
+    const { result } = renderHook(() => useSaveData(mockUrl));
+
+    act(() => {
+      result.current.save(payload);
+    });
+
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledWith(
+        mockUrl,
+        payload,
+        expect.objectContaining({ qsEncodeData: false })
+      );
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should not auto set qsEncodeData to true when body is a JSON', async () => {
+    const payload = { project: 'hue' };
 
     const { result } = renderHook(() => useSaveData(mockUrl));
 
