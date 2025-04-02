@@ -60,15 +60,15 @@ describe('FileUploadQueue', () => {
     );
 
     const header = getByTestId('upload-queue__header');
-    expect(screen.getByText('file1.txt')).toBeInTheDocument();
-    expect(screen.getByText('file2.txt')).toBeInTheDocument();
+    expect(screen.getByText('file1.txt')).toBeVisible();
+    expect(screen.getByText('file2.txt')).toBeVisible();
 
     fireEvent.click(header!);
-    expect(screen.queryByText('file1.txt')).not.toBeInTheDocument();
-    expect(screen.queryByText('file2.txt')).not.toBeInTheDocument();
+    expect(screen.queryByText('file1.txt')).not.toBeVisible();
+    expect(screen.queryByText('file2.txt')).not.toBeVisible();
 
     fireEvent.click(header!);
-    expect(screen.getByText('file1.txt')).toBeInTheDocument();
-    expect(screen.getByText('file2.txt')).toBeInTheDocument();
+    expect(screen.getByText('file1.txt')).toBeVisible();
+    expect(screen.getByText('file2.txt')).toBeVisible();
   });
 });
