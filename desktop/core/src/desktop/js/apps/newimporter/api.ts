@@ -15,3 +15,5 @@
 // limitations under the License.
 
 export const UPLOAD_LOCAL_FILE_API_URL = '/indexer/api/indexer/upload_local_file';
+export const GUESS_FORMAT_URL = '/indexer/api/indexer/guess_format';
+export const GUESS_FIELD_TYPES_URL = '/indexer/api/indexer/guess_field_types';

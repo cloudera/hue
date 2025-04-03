@@ -17,8 +17,9 @@
 import React, { useRef } from 'react';
 import Button from 'cuix/dist/components/Button';
 import DocumentationIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
-
 import { hueWindow } from 'types/types';
+
+import { FileMetaData, LocalFileUploadResponse } from '../types';
 import { i18nReact } from '../../../utils/i18nReact';
 import { UPLOAD_LOCAL_FILE_API_URL } from '../api';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
@@ -26,11 +27,15 @@ import huePubSub from '../../../utils/huePubSub';
 
 import './ImporterSourceSelector.scss';
 
-const ImporterSourceSelector = (): JSX.Element => {
+interface ImporterSourceSelectorProps {
+  setFileMetaData: (fileMetaData: FileMetaData) => void;
+}
+
+const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const uploadRef = useRef<HTMLInputElement>(null);
 
-  const { save: upload } = useSaveData(UPLOAD_LOCAL_FILE_API_URL);
+  const { save: upload } = useSaveData<LocalFileUploadResponse>(UPLOAD_LOCAL_FILE_API_URL);
 
   const handleUploadClick = () => {
     if (!uploadRef || !uploadRef.current) {
@@ -63,9 +68,12 @@ const ImporterSourceSelector = (): JSX.Element => {
       });
     } else {
       upload(payload, {
-        onSuccess: () => {
-          //TODO: Send response to preview page
-          // console.log(response);
+        onSuccess: data => {
+          setFileMetaData({
+            path: data.local_file_url,
+            type: data.file_type,
+            source: 'localfile'
+          });
         },
         onError: error => {
           huePubSub.publish('hue.error', error);
