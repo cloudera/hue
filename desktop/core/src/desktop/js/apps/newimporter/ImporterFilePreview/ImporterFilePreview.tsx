@@ -43,7 +43,6 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
     GUESS_FORMAT_URL,
     {
-      postOptions: { qsEncodeData: false },
       onSuccess: data => {
         setFileFormat(data);
       }
@@ -54,9 +53,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     save: guessFields,
     data: previewData,
     loading: guessingFields
-  } = useSaveData<GuessFieldTypesResponse>(GUESS_FIELD_TYPES_URL, {
-    postOptions: { qsEncodeData: false }
-  });
+  } = useSaveData<GuessFieldTypesResponse>(GUESS_FIELD_TYPES_URL);
 
   useEffect(() => {
     const guessFormatPayload = {
