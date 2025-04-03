@@ -72,6 +72,7 @@ const CreateAndUploadAction = ({
   };
 
   const { save, loading } = useSaveData(undefined, {
+    postOptions: { qsEncodeData: true }, // TODO: Remove once API supports RAW JSON payload
     onSuccess: onApiSuccess,
     onError: onActionError
   });

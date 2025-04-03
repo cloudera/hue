@@ -14,35 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
-$icon-height: 30px;
-$icon-width: 30px;
+export const SCHEDULE_NEW_TASK_URL = '/desktop/api2/taskserver/task/submit';
+export const KILL_TASK_URL = '/desktop/api2/taskserver/task/kill';
+export const GET_TASKS_URL = '/desktop/api2/taskserver/tasks';
+export const GET_TASK_LOG_URL = '/desktop/api2/taskserver/task/logs';
 
-.antd.cuix {
-  .hue-common-header {
-    background-color: vars.$fluidx-gray-100;
-    padding: vars.$fluidx-spacing-s 0 vars.$fluidx-spacing-xs vars.$fluidx-spacing-m;
-    display: flex;
+export const scheduleTasksCategory = [
+  {
+    value: 'document_cleanup',
+    label: 'Document Cleanup',
+    children: [{ value: 'keep_days', label: 'Keep days', type: 'number' }]
+  },
+  {
+    value: 'tmp_clean_up',
+    label: 'Tmp Cleanup',
+    children: [
+      { value: 'cleanup_threshold', label: 'Cleanup threshold', type: 'number', max: 100 },
+      { value: 'disk_check_interval', label: 'Disk check interval', type: 'number', max: 100 }
+    ]
   }
-
-  .hue-header-icon {
-    line-height: vars.$fluidx-heading-h2-line-height;
-    margin-right: 10px;
-    flex: 0 0 auto;
-
-    > svg {
-      vertical-align: middle;
-      height: $icon-height;
-      width: $icon-width;
-    }
-  }
-
-  .hue-header-title {
-    flex: 0 0 auto;
-    font-size: vars.$fluidx-heading-h2-size;
-    margin: 0;
-    line-height: vars.$fluidx-heading-h2-line-height;
-    font-weight: vars.$fluidx-heading-h2-weight;
-    color: vars.$text-color;
-  }
-}
+];

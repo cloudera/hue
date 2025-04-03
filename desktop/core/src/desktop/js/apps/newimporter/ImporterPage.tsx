@@ -14,35 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
-$icon-height: 30px;
-$icon-width: 30px;
+import React from 'react';
+import DataInIcon from '@cloudera/cuix-core/icons/react/DataInIcon';
 
-.antd.cuix {
-  .hue-common-header {
-    background-color: vars.$fluidx-gray-100;
-    padding: vars.$fluidx-spacing-s 0 vars.$fluidx-spacing-xs vars.$fluidx-spacing-m;
-    display: flex;
-  }
+import { i18nReact } from '../../utils/i18nReact';
+import CommonHeader from '../../reactComponents/CommonHeader/CommonHeader';
+import ImporterSourceSelector from './ImporterSourceSelector/ImporterSourceSelector';
 
-  .hue-header-icon {
-    line-height: vars.$fluidx-heading-h2-line-height;
-    margin-right: 10px;
-    flex: 0 0 auto;
+import './ImporterPage.scss';
 
-    > svg {
-      vertical-align: middle;
-      height: $icon-height;
-      width: $icon-width;
-    }
-  }
+const ImporterPage = (): JSX.Element => {
+  const { t } = i18nReact.useTranslation();
 
-  .hue-header-title {
-    flex: 0 0 auto;
-    font-size: vars.$fluidx-heading-h2-size;
-    margin: 0;
-    line-height: vars.$fluidx-heading-h2-line-height;
-    font-weight: vars.$fluidx-heading-h2-weight;
-    color: vars.$text-color;
-  }
-}
+  return (
+    <div className="hue-importer cuix antd">
+      <CommonHeader title={t('Importer')} icon={<DataInIcon />} />
+      <div className="hue-importer__container">
+        <ImporterSourceSelector />
+      </div>
+    </div>
+  );
+};
+
+export default ImporterPage;

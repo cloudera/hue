@@ -43,6 +43,7 @@ const ExtractionModal = ({
   const { t } = i18nReact.useTranslation();
 
   const { save, loading } = useSaveData(EXTRACT_API_URL, {
+    postOptions: { qsEncodeData: true }, // TODO: Remove once API supports RAW JSON payload
     skip: !file,
     onSuccess,
     onError
