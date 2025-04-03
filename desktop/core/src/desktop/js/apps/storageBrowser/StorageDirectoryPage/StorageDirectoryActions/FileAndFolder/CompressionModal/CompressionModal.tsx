@@ -48,9 +48,6 @@ const CompressionModal = ({
   const { t } = i18nReact.useTranslation();
 
   const { save: saveForm, loading } = useSaveData(COMPRESS_API_URL, {
-    postOptions: {
-      qsEncodeData: false
-    },
     skip: !files.length,
     onSuccess,
     onError

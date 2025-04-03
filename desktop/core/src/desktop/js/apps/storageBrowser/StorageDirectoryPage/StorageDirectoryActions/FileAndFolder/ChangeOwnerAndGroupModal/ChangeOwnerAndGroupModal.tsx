@@ -67,9 +67,6 @@ const ChangeOwnerAndGroupModal = ({
   const [isRecursive, setIsRecursive] = useState<boolean>(false);
 
   const { save, loading } = useSaveData(BULK_CHANGE_OWNER_API_URL, {
-    postOptions: {
-      qsEncodeData: false
-    },
     skip: !files.length,
     onSuccess,
     onError

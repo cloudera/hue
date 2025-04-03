@@ -35,14 +35,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
   const { t } = i18nReact.useTranslation();
   const uploadRef = useRef<HTMLInputElement>(null);
 
-  const { save: upload } = useSaveData<LocalFileUploadResponse>(UPLOAD_LOCAL_FILE_API_URL, {
-    postOptions: {
-      qsEncodeData: false,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }
-  });
+  const { save: upload } = useSaveData<LocalFileUploadResponse>(UPLOAD_LOCAL_FILE_API_URL);
 
   const handleUploadClick = () => {
     if (!uploadRef || !uploadRef.current) {

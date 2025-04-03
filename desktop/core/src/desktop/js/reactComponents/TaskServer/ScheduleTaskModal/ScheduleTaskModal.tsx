@@ -47,9 +47,6 @@ const ScheduleTaskModal = ({ onClose, open = true }: ScheduleTaskModalProps): JS
   };
 
   const { save, loading, error } = useSaveData(SCHEDULE_NEW_TASK_URL, {
-    postOptions: {
-      qsEncodeData: false
-    },
     onSuccess: () => {
       huePubSub.publish('hue.global.info', { message: `Task submitted successfully` });
       onClose();

@@ -53,7 +53,9 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
   const pageSize = DEFAULT_PREVIEW_PAGE_SIZE;
   const pageOffset = (pageNumber - 1) * pageSize;
 
-  const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL);
+  const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL, {
+    postOptions: { qsEncodeData: true } // TODO: Remove once API supports RAW JSON payload
+  });
 
   const { data, loading, error } = useLoadData<FilePreview>(FILE_PREVIEW_API_URL, {
     params: {
