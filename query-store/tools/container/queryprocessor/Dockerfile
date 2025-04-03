@@ -36,6 +36,10 @@ RUN apk --no-cache add \
 # create hue user
 RUN groupadd -g 1000 ${HUEUSER} && useradd -g 1000 -s /bin/bash -u 1000 ${HUEUSER}
 
+# Add a user with UID 1000001 so startup doesn't fail when we run as user 
+# with UID 1000001 in CDW.
+RUN groupadd -g 1000001 ${HUEUSER}high && useradd -g 1000001 -s /bin/bash -u 1000001 ${HUEUSER}high
+
 COPY target ${HUE_QP_HOME}
 COPY target/conf ${HUE_QP_CONF_DIR}
 COPY hueqp-notice.txt ${HUE_QP_HOME}/NOTICE.txt
