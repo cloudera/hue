@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
-import { Alert } from 'antd';
+import Alert from 'cuix/dist/components/Alert';
 import ServerLogsHeader from './ServerLogsHeader';
 import { i18nReact } from '../../../utils/i18nReact';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';

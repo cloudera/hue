@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Assuming you have an API endpoint for `install_app_examples`
-
 import React from 'react';
-import { Spin, Alert, Table } from 'antd';
+import { Spin } from 'antd';
+import Alert from 'cuix/dist/components/Alert';
+import Table from 'cuix/dist/components/Table';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { INSTALL_APP_EXAMPLES_API_URL } from '../Components/utils';
 import { i18nReact } from '../../../utils/i18nReact';
