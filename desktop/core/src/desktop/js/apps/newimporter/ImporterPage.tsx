@@ -14,23 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useState } from 'react';
 import DataInIcon from '@cloudera/cuix-core/icons/react/DataInIcon';
 
 import { i18nReact } from '../../utils/i18nReact';
+import { FileMetaData } from './types';
 import CommonHeader from '../../reactComponents/CommonHeader/CommonHeader';
 import ImporterSourceSelector from './ImporterSourceSelector/ImporterSourceSelector';
+import ImporterFilePreview from './ImporterFilePreview/ImporterFilePreview';
 
 import './ImporterPage.scss';
 
 const ImporterPage = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+  const [fileMetaData, setFileMetaData] = useState<FileMetaData>();
 
   return (
     <div className="hue-importer cuix antd">
       <CommonHeader title={t('Importer')} icon={<DataInIcon />} />
       <div className="hue-importer__container">
-        <ImporterSourceSelector />
+        {!fileMetaData?.path ? (
+          <ImporterSourceSelector setFileMetaData={setFileMetaData} />
+        ) : (
+          <ImporterFilePreview fileMetaData={fileMetaData} />
+        )}
       </div>
     </div>
   );
