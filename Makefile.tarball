@@ -76,10 +76,13 @@ release:
 	@echo "--- Preparing general distribution tree at $@"
 	@rm -rf $(BLD_DIR_PROD)
 	@mkdir -p $(BLD_DIR_PROD)
-	tar --exclude="python" --exclude="build/release" -cf - $(PROD_INCLUDES) | tar -C $(BLD_DIR_PROD) -xf -
+	@tar --exclude="python" --exclude="build/release" -cf - $(PROD_INCLUDES) | tar -C $(BLD_DIR_PROD) -xf -
 
 	@echo "---- Removing exclusions"
 	@for i in $(PROD_EXCLUDES) ; do rm -rf $(BLD_DIR_PROD)/$$i ; done
+	@echo "---- Removing *.py[co] files"
+	@find $(BLD_DIR_PROD) -iname \*.py[co]  -exec rm -f {} \;
+	@echo "---- Performing remove_devtree_exclusions"
 	$(call remove_devtree_exclusions,$(BLD_DIR_PROD))
 
 	@echo "---- Copying misc files"
