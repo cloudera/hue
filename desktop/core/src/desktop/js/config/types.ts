@@ -90,7 +90,6 @@ export interface HueConfig extends GenericApiResponse {
   has_computes: boolean;
   main_button_action: AppConfig<Interpreter>;
   status: number;
-  app_names: string[];
   hue_config: {
     enable_sharing: boolean;
     collect_usage: boolean;

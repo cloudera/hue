@@ -41,18 +41,18 @@ const Analytics = (): JSX.Element => {
         huePubSub.publish('hue.global.info', { message: t('Configuration updated') });
       } else {
         huePubSub.publish('hue.global.error', {
-          message: t(response.message || 'Error updating configuration')
+          message: t('Error updating configuration')
         });
       }
     } catch (err) {
-      huePubSub.publish('hue.global.error', { message: t(String(err)) });
+      huePubSub.publish('hue.global.error', { message: String(err) });
     }
   };
 
-  const handleCheckboxChange = async event => {
+  const handleCheckboxChange = event => {
     const newPreference = event.target.checked;
     setCollectUsage(newPreference);
-    await saveCollectUsagePreference(newPreference);
+    saveCollectUsagePreference(newPreference);
   };
 
   return (
