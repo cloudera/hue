@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Spin, Alert } from 'antd';
+import { Spin } from 'antd';
+import Alert from 'cuix/dist/components/Alert';
 import { i18nReact } from '../../../utils/i18nReact';
 import AdminHeader from '../AdminHeader';
 import { ConfigurationValue } from './ConfigurationValue';
