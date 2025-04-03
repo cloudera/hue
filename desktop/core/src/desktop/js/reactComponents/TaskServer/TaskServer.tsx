@@ -32,7 +32,6 @@ import { GET_TASKS_URL, KILL_TASK_URL } from './constants.ts';
 import ScheduleTaskModal from './ScheduleTaskModal/ScheduleTaskModal.tsx';
 import TaskLogsModal from './TaskLogsModal/TaskLogsModal.tsx';
 import LoadingErrorWrapper from '../LoadingErrorWrapper/LoadingErrorWrapper.tsx';
-import useResizeObserver from '../../utils/hooks/useResizeObserver/useResizeObserver';
 
 import './TaskServer.scss';
 
@@ -198,9 +197,6 @@ export const TaskServer: React.FC = () => {
     setSelectedTasks([]);
   };
 
-  const [ref, rect] = useResizeObserver();
-  const tableBodyHeight = Math.max(rect.height - 40, 100);
-
   return (
     <div className="hue-task-server">
       <div className="hue-task-server__actions">
@@ -235,20 +231,17 @@ export const TaskServer: React.FC = () => {
           <span>{t('All')}</span>
         </Checkbox>
       </div>
-      <div className="hue-task-server__table" ref={ref}>
-        <LoadingErrorWrapper loading={!tasks && loading} errors={errors}>
-          <PaginatedTable<TaskServerResponse>
-            onRowSelect={setSelectedTasks}
-            columns={columns}
-            data={filteredTasks}
-            rowKey="taskId"
-            scroll={{ y: tableBodyHeight }}
-            locale={{
-              emptyText: t('No tasks found')
-            }}
-          />
-        </LoadingErrorWrapper>
-      </div>
+      <LoadingErrorWrapper loading={false} errors={errors}>
+        <PaginatedTable<TaskServerResponse>
+          loading={!tasks && loading}
+          onRowSelect={setSelectedTasks}
+          columns={columns}
+          data={filteredTasks}
+          rowKey="taskId"
+          isDynamicHeight
+          locale={{ emptyText: t('No tasks found') }}
+        />
+      </LoadingErrorWrapper>
       {showSchedulePopup && <ScheduleTaskModal onClose={() => showScheduleTaskPopup(false)} />}
       {!!selectedTaskId && (
         <TaskLogsModal taskId={selectedTaskId} onClose={() => setSelectedTaskId(null)} />

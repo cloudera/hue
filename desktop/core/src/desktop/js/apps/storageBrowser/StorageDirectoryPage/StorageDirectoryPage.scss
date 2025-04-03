@@ -48,23 +48,17 @@ $icon-margin: 5px;
       }
     }
 
-    &__table-container {
-      flex: 1;
+    &__name-column {
       display: flex;
-      flex-direction: column;
+      gap: 6px;
+      color: vars.$fluidx-blue-700;
 
-      &__name-column {
+      &__icon {
         display: flex;
-        gap: 6px;
-        color: vars.$fluidx-blue-700;
+      }
 
-        &__icon {
-          display: flex;
-        }
-
-        &__label {
-          @include mixins.nowrap-ellipsis;
-        }
+      &__label {
+        @include mixins.nowrap-ellipsis;
       }
     }
   }
