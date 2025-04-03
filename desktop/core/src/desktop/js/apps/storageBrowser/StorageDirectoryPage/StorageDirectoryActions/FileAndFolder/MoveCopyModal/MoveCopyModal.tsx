@@ -46,9 +46,6 @@ const MoveCopyModal = ({
   const { t } = i18nReact.useTranslation();
 
   const { save } = useSaveData(undefined, {
-    postOptions: {
-      qsEncodeData: false
-    },
     skip: !files.length,
     onSuccess: onSuccess,
     onError: onError
