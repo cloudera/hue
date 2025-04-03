@@ -16,7 +16,7 @@
 
 @use 'variables' as vars;
 
-.cuix.antd {
+.antd.cuix {
   .hue-task-server {
     display: flex;
     height: 100%;
@@ -25,25 +25,19 @@
     gap: 1rem;
     padding: 1rem;
 
-    &__table {
-      display: flex;
-      flex: 1;
-      height: 100%;
+    .ant-tag-success {
+      background-color: vars.$fluidx-green-500;
+      color: vars.$fluidx-gray-900;
+    }
 
-      .ant-tag-success {
-        background-color: vars.$fluidx-green-500;
-        color: vars.$fluidx-gray-900;
-      }
+    .ant-tag-error {
+      background-color: vars.$fluidx-red-500;
+      color: vars.$fluidx-gray-900;
+    }
 
-      .ant-tag-error {
-        background-color: vars.$fluidx-red-500;
-        color: vars.$fluidx-gray-900;
-      }
-
-      .ant-tag-warning {
-        background-color: vars.$fluidx-amber-500;
-        color: vars.$fluidx-gray-900;
-      }
+    .ant-tag-warning {
+      background-color: vars.$fluidx-amber-500;
+      color: vars.$fluidx-gray-900;
     }
 
     &__actions {

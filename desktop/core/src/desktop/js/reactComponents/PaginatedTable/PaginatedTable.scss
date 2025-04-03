@@ -17,18 +17,30 @@
 @use 'variables' as vars;
 @use 'mixins';
 
-.hue-table {
-  .ant-table-cell {
-    @include mixins.nowrap-ellipsis;
+.antd.cuix {
+  .hue-table-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
 
-  .ant-table-selection-column {
-    // This prevents the eplipses from being applied to the selection column
-    text-overflow: initial !important;
-  }
+  .hue-table {
 
-  .ant-table-placeholder {
-    height: 100px;
-    text-align: center;
+    .ant-table-selection-column {
+      // This prevents the eplipses from being applied to the selection column
+      text-overflow: initial !important;
+    }
+
+    .ant-table-placeholder {
+      height: 100px;
+
+      .ant-table-cell {
+        text-align: center;
+      }
+    }
+
+    .ant-table-placeholder {
+      // visibility: hidden;
+    }
   }
 }

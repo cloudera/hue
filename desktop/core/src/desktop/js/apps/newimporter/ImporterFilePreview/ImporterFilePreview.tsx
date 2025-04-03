@@ -25,8 +25,6 @@ import {
 import { convertToAntdColumns, convertToDataSource } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
-import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
-import useResizeObserver from '../../../utils/hooks/useResizeObserver/useResizeObserver';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL } from '../api';
 
@@ -84,8 +82,6 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const columns = convertToAntdColumns(previewData?.columns ?? []);
   const tableData = convertToDataSource(columns, previewData?.sample);
 
-  const [ref, rect] = useResizeObserver();
-
   return (
     <div className="hue-importer-preview-page">
       <div className="hue-importer-preview-page__header">
@@ -100,19 +96,15 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
         </div>
       </div>
       <div className="hue-importer-preview-page__metadata">{t('DESTINATION')}</div>
-      <div className="hue-importer-preview-page__main-section" ref={ref}>
-        <LoadingErrorWrapper loading={guessingFormat || guessingFields} errors={[]} hideChildren>
-          <PaginatedTable<ImporterTableData>
-            data={tableData}
-            columns={columns}
-            rowKey="importerDataKey"
-            scroll={{
-              y: Math.max(rect.height - 60, 100),
-              x: true
-            }}
-            locale={{ emptyText: t('No data available') }}
-          />
-        </LoadingErrorWrapper>
+      <div className="hue-importer-preview-page__main-section">
+        <PaginatedTable<ImporterTableData>
+          loading={guessingFormat || guessingFields}
+          data={tableData}
+          columns={columns}
+          rowKey="importerDataKey"
+          isDynamicHeight
+          locale={{ emptyText: t('No data found in the file!') }}
+        />
       </div>
     </div>
   );
