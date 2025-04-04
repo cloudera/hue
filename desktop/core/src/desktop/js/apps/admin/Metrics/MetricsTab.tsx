@@ -16,7 +16,8 @@
 
 import React, { useState, useEffect } from 'react';
 import MetricsTable, { MetricsResponse, MetricsTableProps } from './MetricsTable';
-import { Spin, Alert } from 'antd';
+import { Spin } from 'antd';
+import Alert from 'cuix/dist/components/Alert';
 import { get } from '../../../api/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import AdminHeader from '../AdminHeader';
