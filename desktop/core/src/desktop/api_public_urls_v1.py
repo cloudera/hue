@@ -34,6 +34,7 @@ urlpatterns += [
   re_path(r'^logs/?$', api_public.get_hue_logs, name='core_get_hue_logs'),
   re_path(r'^logs/download/?$', api_public.download_hue_logs, name='core_download_hue_logs'),
   re_path(r'^install_app_examples/?$', api_public.install_app_examples, name='core_install_app_examples'),
+  re_path(r'^available_app_examples/?$', api_public.available_app_examples, name='core_available_app_examples'),
   re_path(r'^get_config/?$', api_public.get_config),
   re_path(r'^check_config/?$', api_public.check_config, name='core_check_config'),
   re_path(r'^get_namespaces/(?P<interface>[\w\-]+)/?$', api_public.get_context_namespaces),  # To remove
