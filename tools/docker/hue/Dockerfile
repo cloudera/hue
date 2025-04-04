@@ -29,7 +29,7 @@ RUN apt-get update -y && apt-get install -y \
 
 ADD . /hue
 
-RUN pip3 install --upgrade --no-cache-dir setuptools virtualenv pip && \
+RUN pip3 install --upgrade --no-cache-dir setuptools==75.0.0 virtualenv pip && \
   apt-get install -y curl && \
   curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
   apt-get install -y nodejs && \
