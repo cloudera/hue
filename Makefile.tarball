@@ -76,7 +76,7 @@ release:
 	@echo "--- Preparing general distribution tree at $@"
 	@rm -rf $(BLD_DIR_PROD)
 	@mkdir -p $(BLD_DIR_PROD)
-	@tar --exclude="python" --exclude="build/release" -cf - $(PROD_INCLUDES) | tar -C $(BLD_DIR_PROD) -xf -
+	@tar --exclude="build/release" -chf - $(PROD_INCLUDES) | tar -C $(BLD_DIR_PROD) -xf -
 
 	@echo "---- Removing exclusions"
 	@for i in $(PROD_EXCLUDES) ; do rm -rf $(BLD_DIR_PROD)/$$i ; done
@@ -95,7 +95,7 @@ release:
 	@$(call STRIP_DEV, $(ROOT)/Makefile.vars.priv, $(BLD_DIR_PROD)/Makefile.vars.priv)
 	@$(call STRIP_DEV, $(APPS_DIR)/Makefile, $(BLD_DIR_PROD)/apps/Makefile)
 	@$(call STRIP_DEV, $(DESKTOP_DIR)/Makefile, $(BLD_DIR_PROD)/desktop/Makefile)
-	@tar --exclude="python" --exclude="build/release" -C $(BLD_DIR_PROD)/.. -czf $(BLD_DIR_PROD_TGZ) hue-$(DESKTOP_VERSION)
+	@tar --exclude="build/release" -C $(BLD_DIR_PROD)/.. -chzf $(BLD_DIR_PROD_TGZ) hue-$(DESKTOP_VERSION)
 
 # Make a tarball
 .PHONY: prod
