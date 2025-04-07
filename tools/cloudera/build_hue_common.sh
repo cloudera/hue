@@ -271,9 +271,9 @@ function sles15_install() {
     sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
-        tar zxvf sqlite-autoconf-3350500.tar.gz && \
-        cd sqlite-autoconf-3350500 && \
+    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3450000.tar.gz https://www.sqlite.org/2024/sqlite-autoconf-3450000.tar.gz && \
+        tar zxvf sqlite-autoconf-3450000.tar.gz && \
+        cd sqlite-autoconf-3450000 && \
         ./configure --prefix=/usr/local/ && make && make install'
     export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
   fi
@@ -521,6 +521,10 @@ function ubuntu20_install() {
 
 function ubuntu22_install() {
     if [[ $FORCEINSTALL -eq 1 ]]; then
+    sudo -- sh -c 'apt update'
+    # Add deadsnakes PPA for Python 3.8
+    sudo -- sh -c 'add-apt-repository ppa:deadsnakes/ppa -y'
+    sudo -- sh -c 'apt update'
     # pre-req install
     sudo -- sh -c 'DEBIAN_FRONTEND=noninteractive apt -qq -y install  \
         krb5-user \
@@ -529,9 +533,9 @@ function ubuntu22_install() {
         libkrb5-dev'
     sudo -- sh -c 'apt -y install \
         ldap-utils \
-        libpython3.10-dev \
-        libpython3.10-minimal \
-        libpython3.10-stdlib \
+        libpython3.8-dev \
+        libpython3.8-minimal \
+        libpython3.8-stdlib \
         libxmlsec1 \
         libxmlsec1-openssl \
         libpq-dev \
@@ -543,7 +547,7 @@ function ubuntu22_install() {
         python3-psycopg2 \
         python3-setuptools \
         python3-wheel \
-        python3.10-venv \
+        python3.8-venv \
         openssl \
         sudo \
         tar \

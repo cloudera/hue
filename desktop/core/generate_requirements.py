@@ -133,6 +133,22 @@ class RequirementsGenerator:
                 "pure-sasl==0.6.2",
             ],
         }
+        self.aarch64_requirements = {
+            "default": [
+                "cryptography==41.0.1",
+                "numpy==1.23.1",
+                "pandas==1.4.2",
+                "lxml==4.9.1",
+                "sasl==0.3.1",
+            ],
+            "3.11": [
+                "cryptography==41.0.1",
+                "numpy==1.23.1",
+                "pandas==1.4.2",
+                "lxml==4.9.1",
+                "pure-sasl==0.6.2",
+            ],
+        }
         self.pytorch_requirements = {
             "default": [
                 "--extra-index-url https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu torch==2.2.2+cpu torchvision==0.17.2+cpu",
@@ -141,6 +157,7 @@ class RequirementsGenerator:
         self.arch_requirements_map = {
             "ppc64le": self.ppc64le_requirements,
             "x86_64": self.x86_64_requirements,
+            "aarch64": self.aarch64_requirements,
         }
         self.arch = platform.machine()
         self.python_version_string = f"{sys.version_info.major}.{sys.version_info.minor}"

@@ -88,6 +88,9 @@ export VIRTUAL_ENV_RELOCATABLE_VERSION="0.0.1"
 
 export DESKTOP_VERSION=$2
 export HUE_WEBPACK_CONFIG='webpack.config.internal.js'
+export PATH="$PYTHON38_PATH/bin:$PATH"
+export SYS_PYTHON="$PYTHON38_PATH/bin/python3.8"
+export SYS_PIP="$PYTHON38_PATH/bin/pip3.8"
 export SQLITE3_PATH=${SQLITE3_PATH:="${TOOLS_HOME}/sqlite/bin/sqlite3"}
 export ORACLE_INSTANTCLIENT19_PATH="/opt/toolchain/instantclient_19_15"
 export LD_LIBRARY_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_PATH
@@ -95,26 +98,24 @@ export LD_RUN_PATH=/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH
 
 PYTHON_VERSIONS=("python3.11" "python3.9" "python3.8")
 for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
-  if [[ $PYTHON_VER == "python3.8" && ( $DOCKEROS == "redhat7_ppc" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat8_ppc" || $DOCKEROS == "sles12" || $DOCKEROS == "centos7" || $DOCKEROS == "ubuntu18" || $DOCKEROS == "ubuntu20" ) ]]; then
+  if [[ $PYTHON_VER == "python3.8" && ( $DOCKEROS == "redhat7_ppc" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat8_ppc" || $DOCKEROS == "sles12" || $DOCKEROS == "centos7" || $DOCKEROS == "ubuntu18" || $DOCKEROS == "ubuntu20" || $DOCKEROS == "ubuntu22" ) ]]; then
     check_python38_path
     export PATH="$PYTHON38_PATH/bin:$PATH"
     export SYS_PYTHON="$PYTHON38_PATH/bin/python3.8"
     export SYS_PIP="$PYTHON38_PATH/bin/pip3.8"
+    export VIRTUAL_ENV_VERSION="20.24.4"
   elif [[ $PYTHON_VER == "python3.9" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "redhat9_ppc" || $DOCKEROS == "redhat8-arm64" ) ]]; then
     check_python39_path
     export PATH="$PYTHON39_PATH/bin:$PATH"
     export SYS_PYTHON="$PYTHON39_PATH/bin/python3.9"
     export SYS_PIP="$PYTHON39_PATH/bin/pip3.9"
-  elif [[ $PYTHON_VER == "python3.10" && ( $DOCKEROS == "sles15" || $DOCKEROS == "ubuntu22" ) ]]; then
-    check_python310_path
-    export PATH="$PYTHON310_PATH/bin:$PATH"
-    export SYS_PYTHON="$PYTHON310_PATH/bin/python3.10"
-    export SYS_PIP="$PYTHON310_PATH/bin/pip3.10"
+    export VIRTUAL_ENV_VERSION="20.19.0"
   elif [[ $PYTHON_VER == "python3.11" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "sles15" ) ]]; then
     check_python311_path
     export PATH="$PYTHON311_PATH/bin:$PATH"
     export SYS_PYTHON="$PYTHON311_PATH/bin/python3.11"
     export SYS_PIP="$PYTHON311_PATH/bin/pip3.11"
+    export VIRTUAL_ENV_VERSION="20.24.4"
   else
     continue
   fi
@@ -138,6 +139,6 @@ for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
   PYTHON_VER=$PYTHON_VER make apps docs relocatable-env
   big_console_header "Hue Build End for" $PYTHON_VER "$@"
 done
-big_console_header "Hue PROD Build Start for" $PYTHON_VER "$@"
+big_console_header "Hue PROD Build Start for" "$@"
 make release
-big_console_header "Hue PROD Build End for" $PYTHON_VER "$@"
+big_console_header "Hue PROD Build End for" "$@"
