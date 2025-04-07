@@ -118,7 +118,10 @@ const PaginatedTable = <T extends object>({
   const tableScroll = isDynamicHeight ? { y: tableBodyHeight } : {};
 
   return (
-    <div ref={tableRef} className="hue-table-container">
+    <div
+      ref={tableRef}
+      className={`hue-table-container ${loading ? 'hue-table-container__placeholder--hidden' : ''}`}
+    >
       <Table
         title={title}
         className="hue-table"

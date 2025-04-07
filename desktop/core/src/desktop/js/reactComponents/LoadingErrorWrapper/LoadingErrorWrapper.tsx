@@ -17,7 +17,6 @@
 import React from 'react';
 import { Spin } from 'antd';
 import { PrimaryButton } from 'cuix/dist/components/Button';
-import SpinnerIcon from 'cuix/dist/components/SpinnerIcon';
 
 import { i18nReact } from '../../utils/i18nReact';
 import './LoadingErrorWrapper.scss';
@@ -48,7 +47,6 @@ const LoadingErrorWrapper = ({
     return (
       <Spin
         spinning={loading}
-        indicator={<SpinnerIcon size="default" />}
         data-testid="loading-error-wrapper__spinner"
         className="loading-error-wrapper__spinner"
       >

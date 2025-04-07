@@ -24,8 +24,16 @@
     flex: 1;
   }
 
-  .hue-table {
+  .hue-table-container__placeholder--hidden {
 
+    // In CUIX implementation, label.loading is rendering along with spinner
+    // this ensures the placeholder is hidden when loading is true
+    .ant-table-placeholder {
+      visibility: hidden;
+    }
+  }
+
+  .hue-table {
     .ant-table-selection-column {
       // This prevents the eplipses from being applied to the selection column
       text-overflow: initial !important;
@@ -37,10 +45,6 @@
       .ant-table-cell {
         text-align: center;
       }
-    }
-
-    .ant-table-placeholder {
-      // visibility: hidden;
     }
   }
 }
