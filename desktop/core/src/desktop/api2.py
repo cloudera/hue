@@ -1419,6 +1419,21 @@ def _paginate(request, queryset):
 
 
 @api_error_handler
+def available_app_examples(request):
+  """Returns a dictionary of available apps whose examples can be installed by the admin user."""
+
+  if not is_admin(request.user):
+    return JsonResponse({'message': "You must be a Hue admin to access this endpoint."}, status=403)
+
+  supported_app_examples = {'hive', 'impala', 'hbase', 'pig', 'oozie', 'notebook', 'search', 'spark', 'jobsub'}
+
+  # Filter apps based on supported list
+  available_examples = {app.name: app.nice_name for app in appmanager.get_apps(request.user) if app.name in supported_app_examples}
+
+  return JsonResponse({'apps': available_examples})
+
+
+@api_error_handler
 def install_app_examples(request):
   app_name = request.POST.get('app_name')
   if not app_name:

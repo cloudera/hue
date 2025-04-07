@@ -82,6 +82,13 @@ def install_app_examples(request):
   django_request = get_django_request(request)
   return desktop_api.install_app_examples(django_request)
 
+
+@api_view(["GET"])
+def available_app_examples(request):
+  django_request = get_django_request(request)
+  return desktop_api.available_app_examples(django_request)
+
+
 # Editor
 
 
