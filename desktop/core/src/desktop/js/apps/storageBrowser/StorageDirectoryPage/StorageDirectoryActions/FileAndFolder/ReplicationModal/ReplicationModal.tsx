@@ -59,7 +59,7 @@ const ReplicationModal = ({
       onClose={onClose}
       inputType="number"
       initialValue={file.replication}
-      buttonDisabled={loading}
+      loading={loading}
     />
   );
 };

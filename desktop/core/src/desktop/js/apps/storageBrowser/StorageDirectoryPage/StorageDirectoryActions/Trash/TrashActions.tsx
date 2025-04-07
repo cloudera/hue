@@ -23,13 +23,13 @@ import { FileStats, StorageDirectoryTableData } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { TRASH_PURGE, TRASH_RESTORE_BULK } from '../../../api';
 import { inRestorableTrash } from '../../../../../utils/storageBrowserUtils';
+import LoadingErrorWrapper from '../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface TrashActionsProps {
   selectedFiles: StorageDirectoryTableData[];
   currentPath: FileStats['path'];
   onActionSuccess: () => void;
   onActionError: (error: Error) => void;
-  setLoadingFiles: (value: boolean) => void;
   onTrashEmptySuccess: () => void;
 }
 
@@ -43,7 +43,6 @@ const TrashActions = ({
   currentPath,
   onActionSuccess,
   onActionError,
-  setLoadingFiles,
   onTrashEmptySuccess
 }: TrashActionsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
@@ -62,14 +61,11 @@ const TrashActions = ({
     selectedFiles.forEach(selectedFile => {
       formData.append('path', selectedFile.path);
     });
-    setLoadingFiles(true);
 
     save(formData, { url: TRASH_RESTORE_BULK, onSuccess: onActionSuccess });
   };
 
   const onTrashEmpty = () => {
-    setLoadingFiles(true);
-
     save(undefined, {
       url: TRASH_PURGE,
       onSuccess: onTrashEmptySuccess
@@ -118,9 +114,11 @@ const TrashActions = ({
         okButtonProps={{ disabled: loading }}
         cancelButtonProps={{ disabled: loading }}
       >
-        {selectedAction === Actions.restore
-          ? t('Are you sure you want to restore these files?')
-          : t('Are you sure you want to permanently delete all your trash?')}
+        <LoadingErrorWrapper loading={loading}>
+          {selectedAction === Actions.restore
+            ? t('Are you sure you want to restore these files?')
+            : t('Are you sure you want to permanently delete all your trash?')}
+        </LoadingErrorWrapper>
       </Modal>
     </>
   );

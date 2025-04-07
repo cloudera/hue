@@ -216,7 +216,7 @@ describe('InputModal', () => {
     expect(cancelButton).toHaveFocus();
   });
 
-  it('should disable the submit button when buttonDisabled is true', () => {
+  it('should disable the submit button when isLoading is true', () => {
     render(
       <InputModal
         title="Create File"
@@ -227,7 +227,7 @@ describe('InputModal', () => {
         onClose={mockOnClose}
         initialValue=""
         inputType="text"
-        buttonDisabled={true}
+        loading={true}
       />
     );
     const submitButton = screen.getByRole('button', { name: 'Create' });

@@ -22,6 +22,7 @@ import { Checkbox, Input, Select } from 'antd';
 import { HDFSFileSystemConfig, StorageDirectoryTableData } from '../../../../types';
 import { BULK_CHANGE_OWNER_API_URL } from '../../../../api';
 import './ChangeOwnerAndGroupModal.scss';
+import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface ChangeOwnerAndGroupModalProps {
   superUser?: HDFSFileSystemConfig['superuser'];
@@ -30,7 +31,6 @@ interface ChangeOwnerAndGroupModalProps {
   groups?: HDFSFileSystemConfig['groups'];
   isOpen?: boolean;
   files: StorageDirectoryTableData[];
-  setLoading: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
@@ -53,7 +53,6 @@ const ChangeOwnerAndGroupModal = ({
   groups = [],
   isOpen = true,
   files,
-  setLoading,
   onSuccess,
   onError,
   onClose
@@ -73,8 +72,6 @@ const ChangeOwnerAndGroupModal = ({
   });
 
   const handleChangeOwner = () => {
-    setLoading(true);
-
     const formData = new FormData();
     if (selectedUser === OTHERS_KEY && userOther) {
       formData.append('user', userOther);
@@ -134,58 +131,71 @@ const ChangeOwnerAndGroupModal = ({
       okButtonProps={{ disabled: loading || !isSubmitEnabled }}
       cancelButtonProps={{ disabled: loading }}
     >
-      <div className="hue-change-owner-group">
-        <span className="hue-change-owner-group__header-note">
-          {t(
-            'Note: Only the Hadoop superuser, "{{superuser}}" or the HDFS supergroup, "{{supergroup}}" on this file system, may change the owner of a file.',
-            {
-              superuser: superUser,
-              supergroup: superGroup
-            }
-          )}
-        </span>
+      <LoadingErrorWrapper loading={loading}>
+        <div className="hue-change-owner-group">
+          <span className="hue-change-owner-group__header-note">
+            {t(
+              'Note: Only the Hadoop superuser, "{{superuser}}" or the HDFS supergroup, "{{supergroup}}" on this file system, may change the owner of a file.',
+              {
+                superuser: superUser,
+                supergroup: superGroup
+              }
+            )}
+          </span>
 
-        <div className="hue-change-owner-group__form">
-          <div className="hue-change-owner-group__entity">
-            <div className="hue-change-owner-group__label">{t('User')}</div>
-            <div className="hue-change-owner-group__dropdown">
-              <Select options={usersOptions} onChange={setSelectedUser} value={selectedUser} />
-              {selectedUser === OTHERS_KEY && (
-                <Input
-                  placeholder={t('Enter user')}
-                  value={userOther}
-                  onChange={e => setUserOther(e.target.value)}
-                  required
+          <div className="hue-change-owner-group__form">
+            <div className="hue-change-owner-group__entity">
+              <div className="hue-change-owner-group__label">{t('User')}</div>
+              <div className="hue-change-owner-group__dropdown">
+                <Select
+                  options={usersOptions}
+                  onChange={setSelectedUser}
+                  value={selectedUser}
+                  getPopupContainer={triggerNode => triggerNode.parentElement}
                 />
-              )}
+                {selectedUser === OTHERS_KEY && (
+                  <Input
+                    placeholder={t('Enter user')}
+                    value={userOther}
+                    onChange={e => setUserOther(e.target.value)}
+                    required
+                  />
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="hue-change-owner-group__entity">
-            <div className="hue-change-owner-group__label">{t('Group')}</div>
-            <div className="hue-change-owner-group__dropdown">
-              <Select options={groupOptions} onChange={setSelectedGroup} value={selectedGroup} />
-              {selectedGroup === OTHERS_KEY && (
-                <Input
-                  placeholder={t('Enter group')}
-                  value={groupOther}
-                  onChange={e => setGroupOther(e.target.value)}
-                  required
+            <div className="hue-change-owner-group__entity">
+              <div className="hue-change-owner-group__label">{t('Group')}</div>
+              <div className="hue-change-owner-group__dropdown">
+                <Select
+                  bordered={true}
+                  options={groupOptions}
+                  onChange={setSelectedGroup}
+                  value={selectedGroup}
+                  getPopupContainer={triggerNode => triggerNode.parentElement}
                 />
-              )}
+                {selectedGroup === OTHERS_KEY && (
+                  <Input
+                    placeholder={t('Enter group')}
+                    value={groupOther}
+                    onChange={e => setGroupOther(e.target.value)}
+                    required
+                  />
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="hue-change-owner-group__checkbox">
-            <span className="hue-change-owner-group__label">{t('Recursive')}</span>
-            <Checkbox
-              checked={isRecursive}
-              onChange={() => setIsRecursive(prev => !prev)}
-              name="recursive"
-            />
+            <div className="hue-change-owner-group__checkbox">
+              <span className="hue-change-owner-group__label">{t('Recursive')}</span>
+              <Checkbox
+                checked={isRecursive}
+                onChange={() => setIsRecursive(prev => !prev)}
+                name="recursive"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </LoadingErrorWrapper>
     </Modal>
   );
 };

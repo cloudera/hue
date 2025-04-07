@@ -74,7 +74,7 @@ const ScheduleTaskModal = ({ onClose, open = true }: ScheduleTaskModalProps): JS
   const errors = [
     {
       enabled: !!error,
-      message: error?.message ?? 'An unknown error occurred.'
+      message: error?.message ?? t('An unknown error occurred.')
     }
   ];
 

@@ -25,13 +25,13 @@ import PaginatedTable, {
 import { StorageDirectoryTableData } from '../../../../types';
 import { BULK_CHANGE_PERMISSION_API_URL } from '../../../../api';
 import { getInitialPermissions, Permission } from './ChangePermissionModal.util';
+import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './ChangePermissionModal.scss';
 
 interface ChangePermissionModalProps {
   isOpen?: boolean;
   files: StorageDirectoryTableData[];
-  setLoading: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
@@ -40,7 +40,6 @@ interface ChangePermissionModalProps {
 const ChangePermissionModal = ({
   isOpen = true,
   files,
-  setLoading,
   onSuccess,
   onError,
   onClose
@@ -57,8 +56,6 @@ const ChangePermissionModal = ({
   });
 
   const handleChangeOwner = () => {
-    setLoading(true);
-
     const formData = new FormData();
     const perm = permissions.reduce((acc, { key, user, group, other, common }) => {
       if (user) {
@@ -141,7 +138,9 @@ const ChangePermissionModal = ({
       okButtonProps={{ disabled: loading }}
       cancelButtonProps={{ disabled: loading }}
     >
-      <PaginatedTable<Permission> data={permissions} columns={columns} rowKey="key" />
+      <LoadingErrorWrapper loading={loading}>
+        <PaginatedTable<Permission> data={permissions} columns={columns} rowKey="key" />
+      </LoadingErrorWrapper>
     </Modal>
   );
 };

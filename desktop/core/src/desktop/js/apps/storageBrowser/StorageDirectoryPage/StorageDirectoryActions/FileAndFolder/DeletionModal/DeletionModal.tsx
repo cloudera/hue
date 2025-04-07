@@ -20,12 +20,12 @@ import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
 import { StorageDirectoryTableData } from '../../../../types';
 import { BULK_DELETION_API_URL, DELETION_API_URL } from '../../../../api';
+import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface DeletionModalProps {
   isOpen?: boolean;
   isTrashEnabled?: boolean;
   files: StorageDirectoryTableData[];
-  setLoading: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
@@ -35,7 +35,6 @@ const DeletionModal = ({
   isOpen = true,
   isTrashEnabled = false,
   files,
-  setLoading,
   onSuccess,
   onError,
   onClose
@@ -49,7 +48,6 @@ const DeletionModal = ({
   });
 
   const handleDeletion = (isForedSkipTrash: boolean = false) => {
-    setLoading(true);
     const isSkipTrash = !isTrashEnabled || isForedSkipTrash;
 
     const formData = new FormData();
@@ -82,13 +80,15 @@ const DeletionModal = ({
       okButtonProps={{ disabled: loading }}
       cancelButtonProps={{ disabled: loading }}
     >
-      {isTrashEnabled
-        ? files.length > 1
-          ? t('Do you want to move {{count}} items to trash?', { count: files.length })
-          : t('Do you want to move "{{name}}" to trash?', { name: files[0]?.name })
-        : files.length > 1
-          ? t('Do you want to delete {{count}} items permanently?', { count: files.length })
-          : t('Do you want to delete "{{name}}" permanently?', { name: files[0]?.name })}
+      <LoadingErrorWrapper loading={loading}>
+        {isTrashEnabled
+          ? files.length > 1
+            ? t('Do you want to move {{count}} items to trash?', { count: files.length })
+            : t('Do you want to move "{{name}}" to trash?', { name: files[0]?.name })
+          : files.length > 1
+            ? t('Do you want to delete {{count}} items permanently?', { count: files.length })
+            : t('Do you want to delete "{{name}}" permanently?', { name: files[0]?.name })}
+      </LoadingErrorWrapper>
     </Modal>
   );
 };

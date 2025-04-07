@@ -40,7 +40,7 @@ const TaskLogsModal: React.FC<TaskLogsModalProps> = ({ taskId, onClose }): JSX.E
   const errors = [
     {
       enabled: !!error,
-      message: error?.message ?? 'An error occurred while fetching task logs.'
+      message: error?.message ?? t('An error occurred while fetching task logs.')
     }
   ];
 

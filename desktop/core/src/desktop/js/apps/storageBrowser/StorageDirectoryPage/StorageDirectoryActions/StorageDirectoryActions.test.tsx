@@ -20,7 +20,6 @@ import '@testing-library/jest-dom';
 import StorageDirectoryActions from './StorageDirectoryActions';
 
 const mockOnActionSuccess = jest.fn();
-const mockSetLoadingFiles = jest.fn();
 const mockOnFilesDrop = jest.fn();
 const mockOnFilePathChange = jest.fn();
 
@@ -60,20 +59,17 @@ describe('StorageDirectoryActions Component', () => {
   };
 
   const mockFileSystem = {
-    file_system: 'hdfs',
-    user_home_directory: '/user/hue'
+    name: 'hdfs',
+    userHomeDirectory: '/user/hue'
   };
 
   const mockTrashPath = '/user/path/.Trash/Current';
-  const mockIsTrashEmpty = !mockSelectedFiles.length;
 
   it('should render the Trash actions when path is in Trash', () => {
     const { getByRole, queryByRole } = render(
       <StorageDirectoryActions
         selectedFiles={mockSelectedFiles}
-        isFolderEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
-        setLoadingFiles={mockSetLoadingFiles}
         fileStats={{ ...mockFileStats, path: mockTrashPath }}
         fileSystem={mockFileSystem}
         onFilePathChange={mockOnFilePathChange}
@@ -91,9 +87,7 @@ describe('StorageDirectoryActions Component', () => {
     const { getByRole, queryByRole } = render(
       <StorageDirectoryActions
         selectedFiles={mockSelectedFiles}
-        isFolderEmpty={mockIsTrashEmpty}
         onActionSuccess={mockOnActionSuccess}
-        setLoadingFiles={mockSetLoadingFiles}
         fileStats={mockFileStats}
         fileSystem={mockFileSystem}
         onFilePathChange={mockOnFilePathChange}

@@ -20,12 +20,12 @@ import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
 import { StorageDirectoryTableData } from '../../../../types';
 import { EXTRACT_API_URL } from '../../../../api';
+import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface ExtractActionProps {
   currentPath: string;
   isOpen?: boolean;
   file: StorageDirectoryTableData;
-  setLoading: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
@@ -35,28 +35,36 @@ const ExtractionModal = ({
   currentPath,
   isOpen = true,
   file,
-  setLoading,
   onSuccess,
   onError,
   onClose
 }: ExtractActionProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { save, loading } = useSaveData(EXTRACT_API_URL, {
-    postOptions: { qsEncodeData: true }, // TODO: Remove once API supports RAW JSON payload
+  const { save, loading, error } = useSaveData(EXTRACT_API_URL, {
+    // TODO: Remove qsEncodeData once API supports RAW JSON payload
+    // TODO: remove silenceErrors once it is default to true in the hook
+    postOptions: { qsEncodeData: true, silenceErrors: true },
     skip: !file,
     onSuccess,
     onError
   });
 
   const handleExtract = () => {
-    setLoading(true);
-
     save({
       upload_path: currentPath,
       archive_name: file.name
     });
   };
+
+  const errors = [
+    {
+      enabled: error?.response?.status === 500,
+      message: t('An error occurred during extraction. Please check configuration.'),
+      action: t('Retry'),
+      onClick: handleExtract
+    }
+  ];
 
   return (
     <Modal
@@ -70,7 +78,9 @@ const ExtractionModal = ({
       okButtonProps={{ disabled: loading }}
       cancelButtonProps={{ disabled: loading }}
     >
-      {t('Are you sure you want to extract "{{fileName}}" file?', { fileName: file.name })}
+      <LoadingErrorWrapper loading={loading} errors={errors}>
+        {t('Are you sure you want to extract "{{fileName}}" file?', { fileName: file.name })}
+      </LoadingErrorWrapper>
     </Modal>
   );
 };

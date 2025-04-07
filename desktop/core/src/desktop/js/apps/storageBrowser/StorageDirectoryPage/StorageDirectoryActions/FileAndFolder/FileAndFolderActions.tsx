@@ -57,12 +57,11 @@ interface ActionConfig {
   superuser: HDFSFileSystemConfig['superuser'];
 }
 interface StorageBrowserRowActionsProps {
-  config: ActionConfig;
+  config?: ActionConfig;
   currentPath: FileStats['path'];
   selectedFiles: StorageDirectoryTableData[];
   onActionSuccess: () => void;
   onActionError: (error: Error) => void;
-  setLoadingFiles: (value: boolean) => void;
 }
 
 const iconsMap: Record<ActionType, JSX.Element> = {
@@ -84,8 +83,7 @@ const FileAndFolderActions = ({
   currentPath,
   selectedFiles,
   onActionSuccess,
-  onActionError,
-  setLoadingFiles
+  onActionError
 }: StorageBrowserRowActionsProps): JSX.Element => {
   const [selectedAction, setSelectedAction] = useState<ActionType>();
 
@@ -166,7 +164,6 @@ const FileAndFolderActions = ({
             onSuccess={onApiSuccess}
             onError={onActionError}
             onClose={closeModal}
-            setLoadingFiles={setLoadingFiles}
           />
         )}
       {selectedAction === ActionType.Delete && !!selectedFiles.length && (
@@ -176,7 +173,6 @@ const FileAndFolderActions = ({
           onSuccess={onApiSuccess}
           onError={onActionError}
           onClose={closeModal}
-          setLoading={setLoadingFiles}
         />
       )}
       {selectedAction === ActionType.Compress && !!selectedFiles.length && (
@@ -186,7 +182,6 @@ const FileAndFolderActions = ({
           onSuccess={onApiSuccess}
           onError={onActionError}
           onClose={closeModal}
-          setLoading={setLoadingFiles}
         />
       )}
       {selectedAction === ActionType.Extract && !!selectedFiles.length && (
@@ -196,7 +191,6 @@ const FileAndFolderActions = ({
           onSuccess={onApiSuccess}
           onError={onActionError}
           onClose={closeModal}
-          setLoading={setLoadingFiles}
         />
       )}
       {selectedAction === ActionType.ChangeOwnerAndGroup && !!selectedFiles.length && (
@@ -209,7 +203,6 @@ const FileAndFolderActions = ({
           onSuccess={onApiSuccess}
           onError={onActionError}
           onClose={closeModal}
-          setLoading={setLoadingFiles}
         />
       )}
       {selectedAction === ActionType.ChangePermission && !!selectedFiles.length && (
@@ -218,7 +211,6 @@ const FileAndFolderActions = ({
           onSuccess={onApiSuccess}
           onError={onActionError}
           onClose={closeModal}
-          setLoading={setLoadingFiles}
         />
       )}
     </>
