@@ -14,6 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+.loading-error-wrapper__error {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
 .antd.cuix {
   .loading-error-wrapper__spinner {
     // this overrides the max-height: 400px in antd library

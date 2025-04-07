@@ -247,7 +247,7 @@ const StorageDirectoryPage = ({
       </div>
 
       <DragAndDrop onDrop={onFilesDrop}>
-        <LoadingErrorWrapper loading={false} errors={errorConfig}>
+        <LoadingErrorWrapper errors={errorConfig}>
           <PaginatedTable<StorageDirectoryTableData>
             loading={(loadingFiles || listDirectoryLoading) && !polling}
             data={tableData}

@@ -115,7 +115,7 @@ const PaginatedTable = <T extends object>({
     : TABLE_HEADER_HEIGHT;
   const tableBodyHeight = Math.max(rect.height - tableOffset, 100);
 
-  const tableScroll = isDynamicHeight ? { y: tableBodyHeight } : {};
+  const tableScroll = isDynamicHeight ? { y: tableBodyHeight } : undefined;
 
   return (
     <div

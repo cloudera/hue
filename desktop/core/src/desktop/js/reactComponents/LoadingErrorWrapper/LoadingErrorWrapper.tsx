@@ -29,15 +29,15 @@ interface WrapperError {
 }
 
 interface LoadingErrorWrapperProps {
-  loading: boolean;
-  errors: WrapperError[];
+  loading?: boolean;
+  errors?: WrapperError[];
   children: React.ReactNode;
   hideChildren?: boolean;
 }
 
 const LoadingErrorWrapper = ({
-  loading,
-  errors,
+  loading = false,
+  errors = [],
   children,
   hideChildren = false
 }: LoadingErrorWrapperProps): JSX.Element => {
