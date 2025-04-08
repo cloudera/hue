@@ -41,6 +41,7 @@ Mako==1.2.3
 Markdown==3.7
 openpyxl==3.0.9
 phoenixdb==1.2.1
+polars[calamine]==1.8.2  # Python >= 3.8
 prompt-toolkit==3.0.39
 protobuf==3.20.3
 pyarrow==17.0.0

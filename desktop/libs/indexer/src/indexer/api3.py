@@ -159,77 +159,77 @@ def guess_format(request):
           "fieldSeparator": ","
         }
 
-  elif file_format['inputFormat'] == 'table':
-    db = dbms.get(request.user)
-    try:
-      table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
-    except Exception as e:
-      raise PopupException(e.message if hasattr(e, 'message') and e.message else e)
-    storage = {}
-    for delim in table_metadata.storage_details:
-      if delim['data_type']:
-        if '=' in delim['data_type']:
-          key, val = delim['data_type'].split('=', 1)
-          storage[key] = val
-        else:
-          storage[delim['data_type']] = delim['comment']
-    if table_metadata.details['properties']['format'] == 'text':
-      format_ = {
-        "quoteChar": "\"",
-        "recordSeparator": '\\n',
-        "type": "csv",
-        "hasHeader": False,
-        "fieldSeparator": storage.get('field.delim', ',')
-      }
-    elif table_metadata.details['properties']['format'] == 'parquet':
-      format_ = {"type": "parquet", "hasHeader": False, }
-    else:
-      raise PopupException('Hive table format %s is not supported.' % table_metadata.details['properties']['format'])
-  elif file_format['inputFormat'] == 'query':
-    format_ = {
-      "quoteChar": "\"",
-      "recordSeparator": "\\n",
-      "type": "csv",
-      "hasHeader": False,
-      "fieldSeparator": "\u0001"
-    }
-  elif file_format['inputFormat'] == 'rdbms':
-    format_ = {"type": "csv"}
-  elif file_format['inputFormat'] == 'stream':
-    if file_format['streamSelection'] == 'kafka':
-      format_ = {
-        "type": "json",
-        # "fieldSeparator": ",",
-        # "hasHeader": True,
-        # "quoteChar": "\"",
-        # "recordSeparator": "\\n",
-        'topics': get_topics(request.user)
-      }
-    elif file_format['streamSelection'] == 'flume':
-      format_ = {
-        "type": "csv",
-        "fieldSeparator": ",",
-        "hasHeader": True,
-        "quoteChar": "\"",
-        "recordSeparator": "\\n"
-      }
-  elif file_format['inputFormat'] == 'connector':
-    if file_format['connectorSelection'] == 'sfdc':
-      sf = Salesforce(
-          username=file_format['streamUsername'],
-          password=file_format['streamPassword'],
-          security_token=file_format['streamToken']
-      )
-      format_ = {
-        "type": "csv",
-        "fieldSeparator": ",",
-        "hasHeader": True,
-        "quoteChar": "\"",
-        "recordSeparator": "\\n",
-        'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]
-      }
-    else:
-      raise PopupException(_('Input format %(inputFormat)s connector not recognized: $(connectorSelection)s') % file_format)
+  # elif file_format['inputFormat'] == 'table':
+  #   db = dbms.get(request.user)
+  #   try:
+  #     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
+  #   except Exception as e:
+  #     raise PopupException(e.message if hasattr(e, 'message') and e.message else e)
+  #   storage = {}
+  #   for delim in table_metadata.storage_details:
+  #     if delim['data_type']:
+  #       if '=' in delim['data_type']:
+  #         key, val = delim['data_type'].split('=', 1)
+  #         storage[key] = val
+  #       else:
+  #         storage[delim['data_type']] = delim['comment']
+  #   if table_metadata.details['properties']['format'] == 'text':
+  #     format_ = {
+  #       "quoteChar": "\"",
+  #       "recordSeparator": '\\n',
+  #       "type": "csv",
+  #       "hasHeader": False,
+  #       "fieldSeparator": storage.get('field.delim', ',')
+  #     }
+  #   elif table_metadata.details['properties']['format'] == 'parquet':
+  #     format_ = {"type": "parquet", "hasHeader": False, }
+  #   else:
+  #     raise PopupException('Hive table format %s is not supported.' % table_metadata.details['properties']['format'])
+  # elif file_format['inputFormat'] == 'query':
+  #   format_ = {
+  #     "quoteChar": "\"",
+  #     "recordSeparator": "\\n",
+  #     "type": "csv",
+  #     "hasHeader": False,
+  #     "fieldSeparator": "\u0001"
+  #   }
+  # elif file_format['inputFormat'] == 'rdbms':
+  #   format_ = {"type": "csv"}
+  # elif file_format['inputFormat'] == 'stream':
+  #   if file_format['streamSelection'] == 'kafka':
+  #     format_ = {
+  #       "type": "json",
+  #       # "fieldSeparator": ",",
+  #       # "hasHeader": True,
+  #       # "quoteChar": "\"",
+  #       # "recordSeparator": "\\n",
+  #       'topics': get_topics(request.user)
+  #     }
+  #   elif file_format['streamSelection'] == 'flume':
+  #     format_ = {
+  #       "type": "csv",
+  #       "fieldSeparator": ",",
+  #       "hasHeader": True,
+  #       "quoteChar": "\"",
+  #       "recordSeparator": "\\n"
+  #     }
+  # elif file_format['inputFormat'] == 'connector':
+  #   if file_format['connectorSelection'] == 'sfdc':
+  #     sf = Salesforce(
+  #         username=file_format['streamUsername'],
+  #         password=file_format['streamPassword'],
+  #         security_token=file_format['streamToken']
+  #     )
+  #     format_ = {
+  #       "type": "csv",
+  #       "fieldSeparator": ",",
+  #       "hasHeader": True,
+  #       "quoteChar": "\"",
+  #       "recordSeparator": "\\n",
+  #       'objects': [sobject['name'] for sobject in sf.restful('sobjects/')['sobjects'] if sobject['queryable']]
+  #     }
+  #   else:
+  #     raise PopupException(_('Input format %(inputFormat)s connector not recognized: $(connectorSelection)s') % file_format)
   else:
     raise PopupException(_('Input format not recognized: %(inputFormat)s') % file_format)
 
@@ -302,129 +302,129 @@ def guess_field_types(request):
     for col in format_['columns']:
       col['name'] = smart_str(col['name'], errors='replace', encoding=encoding)
 
-  elif file_format['inputFormat'] == 'table':
-    sample = get_api(
-      request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName']
-    )
-    db = dbms.get(request.user)
-    table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
+  # elif file_format['inputFormat'] == 'table':
+  #   sample = get_api(
+  #     request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName']
+  #   )
+  #   db = dbms.get(request.user)
+  #   table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
 
-    format_ = {
-        "sample": sample['rows'][:4],
-        "columns": [
-            Field(col.name, HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')).to_dict()
-            for col in table_metadata.cols
-        ]
-    }
-  elif file_format['inputFormat'] == 'query':
-    query_id = file_format['query']['id'] if file_format['query'].get('id') else file_format['query']
+  #   format_ = {
+  #       "sample": sample['rows'][:4],
+  #       "columns": [
+  #           Field(col.name, HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')).to_dict()
+  #           for col in table_metadata.cols
+  #       ]
+  #   }
+  # elif file_format['inputFormat'] == 'query':
+  #   query_id = file_format['query']['id'] if file_format['query'].get('id') else file_format['query']
 
-    notebook = Notebook(document=Document2.objects.document(user=request.user, doc_id=query_id)).get_data()
-    snippet = notebook['snippets'][0]
-    db = get_api(request, snippet)
+  #   notebook = Notebook(document=Document2.objects.document(user=request.user, doc_id=query_id)).get_data()
+  #   snippet = notebook['snippets'][0]
+  #   db = get_api(request, snippet)
 
-    if file_format.get('sampleCols'):
-      columns = file_format.get('sampleCols')
-      sample = file_format.get('sample')
-    else:
-      snippet['query'] = snippet['statement']
-      try:
-        sample = db.fetch_result(notebook, snippet, 4, start_over=True)['rows'][:4]
-      except Exception as e:
-        LOG.warning('Skipping sample data as query handle might be expired: %s' % e)
-        sample = [[], [], [], [], []]
-      columns = db.autocomplete(snippet=snippet, database='', table='')
-      columns = [
-          Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-          for col in columns['extended_columns']
-      ]
-    format_ = {
-        "sample": sample,
-        "columns": columns,
-    }
-  elif file_format['inputFormat'] == 'rdbms':
-    api = _get_api(request)
-    sample = api.get_sample_data(None, database=file_format['rdbmsDatabaseName'], table=file_format['tableName'])
+  #   if file_format.get('sampleCols'):
+  #     columns = file_format.get('sampleCols')
+  #     sample = file_format.get('sample')
+  #   else:
+  #     snippet['query'] = snippet['statement']
+  #     try:
+  #       sample = db.fetch_result(notebook, snippet, 4, start_over=True)['rows'][:4]
+  #     except Exception as e:
+  #       LOG.warning('Skipping sample data as query handle might be expired: %s' % e)
+  #       sample = [[], [], [], [], []]
+  #     columns = db.autocomplete(snippet=snippet, database='', table='')
+  #     columns = [
+  #         Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+  #         for col in columns['extended_columns']
+  #     ]
+  #   format_ = {
+  #       "sample": sample,
+  #       "columns": columns,
+  #   }
+  # elif file_format['inputFormat'] == 'rdbms':
+  #   api = _get_api(request)
+  #   sample = api.get_sample_data(None, database=file_format['rdbmsDatabaseName'], table=file_format['tableName'])
 
-    format_ = {
-      "sample": list(sample['rows'])[:4],
-      "columns": [
-          Field(col['name'], col['type']).to_dict()
-          for col in sample['full_headers']
-      ]
-    }
-  elif file_format['inputFormat'] == 'stream':
-    if file_format['streamSelection'] == 'kafka':
-      data = get_topic_data(
-        request.user,
-        file_format.get('kafkaSelectedTopics')
-      )
+  #   format_ = {
+  #     "sample": list(sample['rows'])[:4],
+  #     "columns": [
+  #         Field(col['name'], col['type']).to_dict()
+  #         for col in sample['full_headers']
+  #     ]
+  #   }
+  # elif file_format['inputFormat'] == 'stream':
+  #   if file_format['streamSelection'] == 'kafka':
+  #     data = get_topic_data(
+  #       request.user,
+  #       file_format.get('kafkaSelectedTopics')
+  #     )
 
-      kafkaFieldNames = [col['name'] for col in data['full_headers']]
-      kafkaFieldTypes = [col['type'] for col in data['full_headers']]
-      topics_data = data['rows']
+  #     kafkaFieldNames = [col['name'] for col in data['full_headers']]
+  #     kafkaFieldTypes = [col['type'] for col in data['full_headers']]
+  #     topics_data = data['rows']
 
-      format_ = {
-          "sample": topics_data,
-          "columns": [
-              Field(col, 'string', unique=False).to_dict()
-              for col in kafkaFieldNames
-          ]
-      }
-    elif file_format['streamSelection'] == 'flume':
-      if 'hue-httpd/access_log' in file_format['channelSourcePath']:
-        columns = [
-          {'name': 'id', 'type': 'string', 'unique': True},
-          {'name': 'client_ip', 'type': 'string'},
-          {'name': 'time', 'type': 'date'},
-          {'name': 'request', 'type': 'string'},
-          {'name': 'code', 'type': 'plong'},
-          {'name': 'bytes', 'type': 'plong'},
-          {'name': 'method', 'type': 'string'},
-          {'name': 'url', 'type': 'string'},
-          {'name': 'protocol', 'type': 'string'},
-          {'name': 'app', 'type': 'string'},
-          {'name': 'subapp', 'type': 'string'}
-        ]
-      else:
-        columns = [{'name': 'message', 'type': 'string'}]
+  #     format_ = {
+  #         "sample": topics_data,
+  #         "columns": [
+  #             Field(col, 'string', unique=False).to_dict()
+  #             for col in kafkaFieldNames
+  #         ]
+  #     }
+  #   elif file_format['streamSelection'] == 'flume':
+  #     if 'hue-httpd/access_log' in file_format['channelSourcePath']:
+  #       columns = [
+  #         {'name': 'id', 'type': 'string', 'unique': True},
+  #         {'name': 'client_ip', 'type': 'string'},
+  #         {'name': 'time', 'type': 'date'},
+  #         {'name': 'request', 'type': 'string'},
+  #         {'name': 'code', 'type': 'plong'},
+  #         {'name': 'bytes', 'type': 'plong'},
+  #         {'name': 'method', 'type': 'string'},
+  #         {'name': 'url', 'type': 'string'},
+  #         {'name': 'protocol', 'type': 'string'},
+  #         {'name': 'app', 'type': 'string'},
+  #         {'name': 'subapp', 'type': 'string'}
+  #       ]
+  #     else:
+  #       columns = [{'name': 'message', 'type': 'string'}]
 
-      format_ = {
-          "sample": [['...'] * len(columns)] * 4,
-          "columns": [
-              Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string'), unique=col.get('unique')).to_dict()
-              for col in columns
-          ]
-      }
-  elif file_format['inputFormat'] == 'connector':
-    if file_format['connectorSelection'] == 'sfdc':
-      sf = Salesforce(
-          username=file_format['streamUsername'],
-          password=file_format['streamPassword'],
-          security_token=file_format['streamToken']
-      )
-      table_metadata = [{
-          'name': column['name'],
-          'type': column['type']
-        } for column in sf.restful('sobjects/%(streamObject)s/describe/' % file_format)['fields']
-      ]
-      query = 'SELECT %s FROM %s LIMIT 4' % (', '.join([col['name'] for col in table_metadata]), file_format['streamObject'])
-      print(query)
+  #     format_ = {
+  #         "sample": [['...'] * len(columns)] * 4,
+  #         "columns": [
+  #             Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string'), unique=col.get('unique')).to_dict()
+  #             for col in columns
+  #         ]
+  #     }
+  # elif file_format['inputFormat'] == 'connector':
+  #   if file_format['connectorSelection'] == 'sfdc':
+  #     sf = Salesforce(
+  #         username=file_format['streamUsername'],
+  #         password=file_format['streamPassword'],
+  #         security_token=file_format['streamToken']
+  #     )
+  #     table_metadata = [{
+  #         'name': column['name'],
+  #         'type': column['type']
+  #       } for column in sf.restful('sobjects/%(streamObject)s/describe/' % file_format)['fields']
+  #     ]
+  #     query = 'SELECT %s FROM %s LIMIT 4' % (', '.join([col['name'] for col in table_metadata]), file_format['streamObject'])
+  #     print(query)
 
-      try:
-        records = sf.query_all(query)
-      except SalesforceRefusedRequest as e:
-        raise PopupException(message=str(e))
+  #     try:
+  #       records = sf.query_all(query)
+  #     except SalesforceRefusedRequest as e:
+  #       raise PopupException(message=str(e))
 
-      format_ = {
-        "sample": [list(row.values())[1:] for row in records['records']],
-        "columns": [
-            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-            for col in table_metadata
-        ]
-      }
-    else:
-      raise PopupException(_('Connector format not recognized: %(connectorSelection)s') % file_format)
+  #     format_ = {
+  #       "sample": [list(row.values())[1:] for row in records['records']],
+  #       "columns": [
+  #           Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+  #           for col in table_metadata
+  #       ]
+  #     }
+  #   else:
+  #     raise PopupException(_('Connector format not recognized: %(connectorSelection)s') % file_format)
   else:
     raise PopupException(_('Input format not recognized: %(inputFormat)s') % file_format)
 
