@@ -28,7 +28,6 @@ from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
-from desktop.lib.importer import api as importer_api
 from desktop.log import api as logs_api
 from filebrowser import api as filebrowser_api
 from indexer import api3 as indexer_api3
