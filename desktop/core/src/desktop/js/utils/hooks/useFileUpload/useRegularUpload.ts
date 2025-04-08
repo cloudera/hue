@@ -38,14 +38,7 @@ const useRegularUpload = ({
   updateFileVariables,
   onComplete
 }: UploadQueueOptions): UseUploadQueueResponse => {
-  const { save } = useSaveData(UPLOAD_FILE_URL, {
-    postOptions: {
-      qsEncodeData: false,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }
-  });
+  const { save } = useSaveData(UPLOAD_FILE_URL);
 
   const processRegularFile = async (item: RegularFile) => {
     updateFileVariables(item.uuid, { status: FileStatus.Uploading });

@@ -16,57 +16,51 @@
 
 @use 'variables' as vars;
 
-.cuix.antd {
-  .hue-task-server {
+.antd.cuix {
+  .hue-importer-preview-page {
     display: flex;
-    height: 100%;
-    flex: 1;
     flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+    gap: 16px;
+    padding: 8px 16px 16px 24px;
+    height: 100%;
 
-    &__task-id-column {
-      white-space: break-spaces;
-      text-align: left;
+    &__header {
+      display: flex;
+      justify-content: space-between;
+
+      &__title {
+        display: flex;
+        align-items: center;
+        font-size: vars.$fluidx-heading-h3-size;
+        font-weight: vars.$fluidx-heading-h3-weight;
+        color: vars.$fluidx-gray-900;
+      }
+
+      &__actions {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+
+        .action {
+          margin-left: 10px;
+        }
+      }
     }
 
-    &__table {
+    &__metadata {
+      background-color: white;
+      height: 68px;
+      padding: 16px;
+      font-size: 12px;
+      color: #5a656d;
+    }
+
+    &__main-section {
       display: flex;
       flex: 1;
-      height: 100%;
-
-      .ant-tag-success {
-        background-color: vars.$fluidx-green-500;
-        color: vars.$fluidx-gray-900;
-      }
-
-      .ant-tag-error {
-        background-color: vars.$fluidx-red-500;
-        color: vars.$fluidx-gray-900;
-      }
-
-      .ant-tag-warning {
-        background-color: vars.$fluidx-amber-500;
-        color: vars.$fluidx-gray-900;
-      }
-    }
-
-    &__actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    &__success-text {
-      color: vars.$fluidx-green-500;
-    }
-
-    &__running-text {
-      color: vars.$fluidx-amber-500;
-    }
-
-    &__failed-text {
-      color: vars.$fluidx-red-500;
+      justify-content: center;
+      background-color: white;
+      padding: 16px 0 0 0;
     }
   }
 }

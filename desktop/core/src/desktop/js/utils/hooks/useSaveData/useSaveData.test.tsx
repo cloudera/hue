@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import { renderHook, act, waitFor } from '@testing-library/react';
 import useSaveData from './useSaveData';
 import { post } from '../../../api/utils';
@@ -51,6 +52,7 @@ describe('useSaveData', () => {
     act(() => {
       result.current.save(mockBody);
     });
+
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
@@ -75,6 +77,7 @@ describe('useSaveData', () => {
     act(() => {
       result.current.save(mockBody);
     });
+
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
@@ -110,6 +113,7 @@ describe('useSaveData', () => {
     act(() => {
       result.current.save(mockBody);
     });
+
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
@@ -128,6 +132,7 @@ describe('useSaveData', () => {
     act(() => {
       result.current.save(newBody);
     });
+
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
@@ -155,6 +160,7 @@ describe('useSaveData', () => {
     act(() => {
       result.current.save(mockBody);
     });
+
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
@@ -187,6 +193,7 @@ describe('useSaveData', () => {
     act(() => {
       result.current.save(mockBody);
     });
+
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
@@ -196,6 +203,92 @@ describe('useSaveData', () => {
       expect(result.current.loading).toBe(false);
       expect(mockOnSuccess).not.toHaveBeenCalled();
       expect(mockOnError).toHaveBeenCalledWith(mockError);
+    });
+  });
+
+  it('should auto set qsEncodeData to true when body is not a FormData or JSON', async () => {
+    const { result } = renderHook(() => useSaveData(mockUrl));
+
+    act(() => {
+      result.current.save('hue data');
+    });
+
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledWith(
+        mockUrl,
+        'hue data',
+        expect.objectContaining({ qsEncodeData: true })
+      );
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should not auto set qsEncodeData to true when body is a FormData', async () => {
+    const payload = new FormData();
+
+    const { result } = renderHook(() => useSaveData(mockUrl));
+
+    act(() => {
+      result.current.save(payload);
+    });
+
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledWith(
+        mockUrl,
+        payload,
+        expect.objectContaining({ qsEncodeData: false })
+      );
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should not auto set qsEncodeData to true when body is a JSON', async () => {
+    const payload = { project: 'hue' };
+
+    const { result } = renderHook(() => useSaveData(mockUrl));
+
+    act(() => {
+      result.current.save(payload);
+    });
+
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledWith(
+        mockUrl,
+        payload,
+        expect.objectContaining({ qsEncodeData: false })
+      );
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should take qsEncodeData value from saveOptions.postOptions when available', async () => {
+    const payload = new FormData();
+
+    const { result } = renderHook(() =>
+      useSaveData(mockUrl, {
+        postOptions: { qsEncodeData: true }
+      })
+    );
+
+    act(() => {
+      result.current.save(payload);
+    });
+
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledWith(
+        mockUrl,
+        payload,
+        expect.objectContaining({ qsEncodeData: true })
+      );
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
     });
   });
 });
