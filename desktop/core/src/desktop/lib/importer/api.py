@@ -186,7 +186,7 @@ LOG = logging.getLogger()
 #     }
 #   )
 
-
+# TODO: Add api_error_handler decorator instead of method-wide try/except
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
 def upload_local_file(request: Request) -> Response:
@@ -233,6 +233,7 @@ def process_uploaded_file(upload_file, filename: str, file_extension: str) -> Di
   Returns:
     Dict containing file metadata
   """
+  # TODO: Check if actually needed?
   file_type = 'csv' if file_extension == 'csv' else 'excel'
 
   # Create a temporary file with our generated filename
