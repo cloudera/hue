@@ -19,6 +19,7 @@ from django.urls import re_path
 
 from desktop import api_public
 from desktop.lib.botserver import api as botserver_api
+from desktop.lib.importer import api as importer_api
 
 # "New" query API (i.e. connector based, lean arguments).
 # e.g. https://demo.gethue.com/api/query/execute/hive
@@ -159,7 +160,7 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-  re_path(r'^importer/new/?$', api_public.render_new_importer, name='importer_render_new_component'),
+  re_path(r'^importer/upload/file', importer_api.upload_local_file, name='importer_upload_local_file'),
 ]
 
 urlpatterns += [
