@@ -445,11 +445,6 @@ def taskserver_get_available_space_for_upload(request):
 
 # Importer
 
-@api_view(["GET"])
-def render_new_importer(request):
-  django_request = get_django_request(request)
-  return importer_api.render_new_importer(django_request)
-
 
 @api_view(["POST"])
 def guess_format(request):
