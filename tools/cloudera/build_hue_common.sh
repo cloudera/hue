@@ -85,7 +85,7 @@ function redhat7_ppc_install() {
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
       cd ${TOOLS_HOME} && \
-      curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=${TOOLS_HOME}/sqlite && make && make install'
@@ -148,7 +148,7 @@ function redhat8_ppc_install() {
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
       cd ${TOOLS_HOME} && \
-      curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=${TOOLS_HOME}/sqlite && make && make install'
@@ -190,7 +190,7 @@ function redhat9_ppc_install() {
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
       cd ${TOOLS_HOME} && \
-      curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=${TOOLS_HOME}/sqlite && make && make install'
@@ -232,7 +232,7 @@ function sles12_install() {
     sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -271,7 +271,7 @@ function sles15_install() {
     sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3450000.tar.gz https://www.sqlite.org/2024/sqlite-autoconf-3450000.tar.gz && \
+    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3450000.tar.gz https://sqlite.org/2024/sqlite-autoconf-3450000.tar.gz && \
         tar zxvf sqlite-autoconf-3450000.tar.gz && \
         cd sqlite-autoconf-3450000 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -313,7 +313,7 @@ function centos7_install() {
     sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - && \
         yum install -y nodejs npm'
     # sqlite3 install
-    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -365,7 +365,7 @@ function redhat8_install() {
     sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=/usr/local/ && make && make install'
@@ -397,7 +397,7 @@ function redhat8_arm64_install() {
     sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2-binary==2.9.6'
     sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=/usr/local/ && make && make install'
@@ -454,7 +454,7 @@ function ubuntu18_install() {
     sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -511,7 +511,7 @@ function ubuntu20_install() {
     sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -570,7 +570,7 @@ function ubuntu22_install() {
     sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -610,7 +610,7 @@ function redhat9_install() {
     sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=/usr/local/ && make && make install'
