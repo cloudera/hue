@@ -63,7 +63,8 @@ const ServerLogsHeader: React.FC<ServerLogsHeaderProps> = ({
 
       <div className="server--right-actions">
         <span className="server__host-text">{`${t('Host:')} ${hostName}`}</span>
-        <Input type='checkbox'
+        <Input
+          type="checkbox"
           onChange={e => {
             setWrapLogs(e.target.checked);
             onWrapLogsChange(e.target.checked);
