@@ -93,3 +93,29 @@ svg:not(.leaflet-zoom-animated) {
   width: unset;
   height: unset;
 }
+
+// Class-based reset for Bootstrap conflicts
+.label,
+.btn,
+.form-control,
+.form-group,
+.input-group,
+.input-group-addon,
+.custom-select,
+.form-check,
+.form-check-input,
+.form-check-label,
+.was-validated {
+  all: unset;
+  all: revert; /* if supported */
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: revert;
+}
