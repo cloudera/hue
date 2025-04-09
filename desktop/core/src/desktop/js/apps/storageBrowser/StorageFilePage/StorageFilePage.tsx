@@ -234,6 +234,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                 <audio controls preload="auto" data-testid="preview__content__audio">
                   <source src={filePreviewUrl} />
                   {t('Your browser does not support the audio element.')}
+                  <track kind="captions" src="" srcLang="en" label="English" />
                 </audio>
               )}
 
@@ -241,6 +242,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                 <video controls preload="auto" data-testid="preview__content__video">
                   <source src={filePreviewUrl} />
                   {t('Your browser does not support the video element.')}
+                  <track kind="captions" src="" srcLang="en" label="English" />
                 </video>
               )}
 

@@ -22,7 +22,7 @@ import { calculateDuration, formatTimestamp } from '../../utils/dateTimeUtils.ts
 import huePubSub from '../../utils/huePubSub.ts';
 import { Input, Checkbox } from 'antd';
 import { Tag } from 'antd';
-import { PrimaryButton, DangerButton } from 'cuix/dist/components/Button';
+import { PrimaryButton, DangerButton, LinkButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../PaginatedTable/PaginatedTable';
 import useLoadData from '../../utils/hooks/useLoadData/useLoadData.ts';
 import useSaveData from '../../utils/hooks/useSaveData/useSaveData.ts';
@@ -56,9 +56,13 @@ export const TaskServer: React.FC = () => {
       title: t('Task ID'),
       dataIndex: 'taskId',
       key: 'taskId',
-      width: '30%',
-      render: (text: TaskServerResponse['taskId'], record: TaskServerResponse) => (
-        <a onClick={() => setSelectedTaskId(record.taskId)}>{text}</a>
+      render: (taskId: TaskServerResponse['taskId']) => (
+        <LinkButton
+          className="hue-task-server__task-id-column"
+          onClick={() => setSelectedTaskId(taskId)}
+        >
+          {taskId}
+        </LinkButton>
       )
     },
     {

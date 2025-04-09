@@ -25,6 +25,11 @@
     gap: 1rem;
     padding: 1rem;
 
+    &__task-id-column {
+      white-space: break-spaces;
+      text-align: left;
+    }
+
     .ant-tag-success {
       background-color: vars.$fluidx-green-500;
       color: vars.$fluidx-gray-900;

@@ -59,7 +59,7 @@ const FileUploadRow: React.FC<FileUploadRowProps> = ({ data, onCancel }) => {
       </div>
       <div
         className="hue-upload-queue-row__progressbar"
-        role="hue-upload-queue-row__progressbar"
+        data-testid="hue-upload-queue-row__progressbar"
         style={{
           width: `${data.status === FileStatus.Uploading ? data.progress : 0}%`
         }}

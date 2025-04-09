@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React from 'react';
 import CloseIcon from '../../components/icons/CloseIcon';
 import { i18nReact } from '../../utils/i18nReact';
 import { RegularFile, FileStatus } from '../../utils/hooks/useFileUpload/types';
@@ -49,7 +49,6 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
     !!config?.hue_config.enable_task_server;
 
   const { t } = i18nReact.useTranslation();
-  const [isExpanded, setIsExpanded] = useState(true);
 
   const { uploadQueue, onCancel } = useFileUpload(filesQueue, {
     isChunkUpload,
@@ -62,12 +61,8 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
   ).length;
 
   return (
-    <div className="upload-queue cuix antd">
-      <div
-        className="upload-queue__header"
-        data-testid="upload-queue__header"
-        onClick={() => setIsExpanded(prev => !prev)}
-      >
+    <details className="upload-queue cuix antd" open>
+      <summary className="upload-queue__header" data-testid="upload-queue__header">
         {pendingCount > 0
           ? t('{{count}} file(s) remaining', {
               count: pendingCount
@@ -76,21 +71,19 @@ const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, 
               count: uploadedCount
             })}
         <CloseIcon onClick={onClose} height={16} width={16} />
+      </summary>
+      <div className="upload-queue__list">
+        {uploadQueue
+          .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
+          .map((row: RegularFile) => (
+            <FileUploadRow
+              key={`${row.filePath}__${row.file.name}`}
+              data={row}
+              onCancel={() => onCancel(row)}
+            />
+          ))}
       </div>
-      {isExpanded && (
-        <div className="upload-queue__list">
-          {uploadQueue
-            .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
-            .map((row: RegularFile) => (
-              <FileUploadRow
-                key={`${row.filePath}__${row.file.name}`}
-                data={row}
-                onCancel={() => onCancel(row)}
-              />
-            ))}
-        </div>
-      )}
-    </div>
+    </details>
   );
 };
 
