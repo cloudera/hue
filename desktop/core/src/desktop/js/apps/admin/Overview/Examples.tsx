@@ -14,22 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
-import { INSTALL_APP_EXAMPLES_API_URL } from '../Components/utils';
-import { post } from '../../../api/utils';
+import Loading from 'cuix/dist/components/Loading';
+import {
+  INSTALL_APP_EXAMPLES_API_URL,
+  INSTALL_AVAILABLE_EXAMPLES_API_URL
+} from '../Components/utils';
+import { get, post } from '../../../api/utils';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 import './Overview.scss';
 
-const exampleApps = [
-  { id: 'hive', name: 'Hive', old_name: 'beeswax' },
-  { id: 'impala', name: 'Impala' },
-  { id: 'hbase', name: 'Hbase Browser' },
-  { id: 'pig', name: 'Pig Editor' },
-  { id: 'oozie', name: 'Oozie Editor/Dashboard' },
-  { id: 'spark', name: 'Spark', old_name: 'notebook' },
+const exampleAppsWithData = [
   { id: 'search', name: 'Solr Search', data: ['log_analytics_demo', 'twitter_demo', 'yelp_demo'] }
 ];
 
@@ -41,14 +39,33 @@ type InstallExamplesResponse = {
 const Examples = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [installingAppId, setInstallingAppId] = useState<string>('');
+  const [availableApps, setAvailableApps] = useState<[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchAvailableApps = async () => {
+      setLoading(true);
+      try {
+        const response = await get(INSTALL_AVAILABLE_EXAMPLES_API_URL, {});
+        setAvailableApps(response.apps);
+      } catch (error) {
+        console.error('Error fetching available app examples:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAvailableApps();
+  }, []);
 
   const handleInstall = async exampleApp => {
     setInstallingAppId(exampleApp.id);
     const url = INSTALL_APP_EXAMPLES_API_URL;
     const data = { app_name: exampleApp.id };
 
-    if (exampleApp.data) {
-      data['data'] = exampleApp.data;
+    const appWithExtraData = exampleAppsWithData.find(app => app.id === exampleApp.id);
+    if (appWithExtraData && appWithExtraData.data) {
+      data['data'] = appWithExtraData.data;
     }
 
     post<InstallExamplesResponse>(url, data)
@@ -70,18 +87,22 @@ const Examples = (): JSX.Element => {
   return (
     <div className="overview-examples">
       <h3>{t('Install some data examples')}</h3>
-      {exampleApps.map(exampleApp => (
-        <div key={exampleApp.id}>
-          <Button
-            type="link"
-            onClick={() => handleInstall(exampleApp)}
-            disabled={installingAppId === exampleApp.id}
-            icon={<DownloadOutlined />}
-          >
-            {installingAppId === exampleApp.id ? t('Installing...') : exampleApp.name}
-          </Button>
-        </div>
-      ))}
+      {loading ? (
+        <Loading spinning={loading} />
+      ) : (
+        Object.entries(availableApps).map(([appId, appName]) => (
+          <div key={appId}>
+            <Button
+              type="link"
+              onClick={() => handleInstall({ id: appId, name: appName })}
+              disabled={installingAppId === appId}
+              icon={<DownloadOutlined />}
+            >
+              {installingAppId === appId ? t('Installing...') : appName}
+            </Button>
+          </div>
+        ))
+      )}
     </div>
   );
 };
