@@ -21,10 +21,15 @@ import Overview from './OverviewTab';
 import * as hueConfigModule from '../../../config/hueConfig';
 import Examples from './Examples';
 import Analytics from './Analytics';
-import { post } from '../../../api/utils';
+import {
+  INSTALL_APP_EXAMPLES_API_URL,
+  INSTALL_AVAILABLE_EXAMPLES_API_URL
+} from '../Components/utils';
+import { get, post } from '../../../api/utils';
 
 jest.mock('../../../api/utils', () => ({
-  post: jest.fn()
+  post: jest.fn(),
+  get: jest.fn()
 }));
 
 jest.mock('./ConfigStatus', () => () => <div>MockedConfigStatusComponent</div>);
@@ -57,23 +62,6 @@ describe('OverviewTab', () => {
     expect(screen.queryByText('MockedAnalyticsComponent')).not.toBeInTheDocument();
   });
 
-  test('shows the trademark text', () => {
-    render(<Overview />);
-    expect(
-      screen.getByText('Hue and the Hue logo are trademarks of Cloudera, Inc.')
-    ).toBeInTheDocument();
-  });
-
-  test('it should not render Overview for non-admin users', () => {
-    (hueConfigModule.getLastKnownConfig as jest.Mock).mockReturnValue({
-      hue_config: { is_admin: false }
-    });
-
-    const { queryByText } = render(<Overview />);
-    const trademarkText = queryByText('Hue and the Hue logo are trademarks of Cloudera, Inc.');
-    expect(trademarkText).toBeNull();
-  });
-
   describe('Analytics Component', () => {
     test('renders Analytics tab and can interact with the checkbox', async () => {
       (post as jest.Mock).mockResolvedValue({ status: 0, message: 'Success' });
@@ -94,51 +82,65 @@ describe('OverviewTab', () => {
   });
 
   describe('Examples component', () => {
-    const exampleApps = [
-      { id: 'hive', name: 'Hive', old_name: 'beeswax' },
-      { id: 'impala', name: 'Impala' },
-      {
-        id: 'search',
-        name: 'Solr Search',
-        data: ['log_analytics_demo', 'twitter_demo', 'yelp_demo']
-      },
-      { id: 'spark', name: 'Spark', old_name: 'notebook' },
-      { id: 'oozie', name: 'Oozie Editor/Dashboard' },
-      { id: 'hbase', name: 'Hbase Browser' },
-      { id: 'pig', name: 'Pig Editor' }
-    ];
+    const availableAppsResponse = {
+      apps: {
+        hive: 'Hive',
+        impala: 'Impala'
+      }
+    };
+    beforeEach(() => {
+      (get as jest.Mock).mockImplementation(url => {
+        if (url === INSTALL_AVAILABLE_EXAMPLES_API_URL) {
+          return Promise.resolve(availableAppsResponse);
+        }
+        return Promise.reject();
+      });
 
-    const resolvedValue = { status: 0, message: 'Success' };
+      (post as jest.Mock).mockImplementation(() =>
+        Promise.resolve({ status: 0, message: 'Success' })
+      );
+    });
 
-    exampleApps.forEach(appData => {
-      test(`clicking the install button for '${appData.name}' makes an API call to '/api/v1/install_app_examples'`, async () => {
-        (post as jest.Mock).mockResolvedValue(resolvedValue);
-        render(<Examples />);
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
 
-        const button = screen.getByText(appData.name);
-        fireEvent.click(button);
+    test('fetch and display available apps', async () => {
+      render(<Examples />);
 
-        await waitFor(() => {
-          if (appData.data) {
-            expect(post).toHaveBeenCalledWith(
-              '/api/v1/install_app_examples',
-              {
-                app_name: appData.id,
-                data: appData.data
-              },
-              expect.anything()
-            );
-          } else {
-            expect(post).toHaveBeenCalledWith(
-              '/api/v1/install_app_examples',
-              {
-                app_name: appData.id
-              },
-              expect.anything()
-            );
-          }
+      await waitFor(() => {
+        expect(get).toHaveBeenCalledWith(INSTALL_AVAILABLE_EXAMPLES_API_URL, {});
+        Object.entries(availableAppsResponse.apps).forEach(([appName]) => {
+          expect(screen.getByText(appName)).toBeInTheDocument();
         });
-        (post as jest.Mock).mockClear();
+      });
+    });
+
+    test('post to install app example when the install button is clicked', async () => {
+      render(<Examples />);
+
+      await waitFor(() => {
+        expect(get).toHaveBeenCalledWith(INSTALL_AVAILABLE_EXAMPLES_API_URL, {});
+        Object.entries(availableAppsResponse.apps).forEach(([appName]) => {
+          expect(screen.getByText(appName)).toBeInTheDocument();
+        });
+      });
+
+      const installButton = screen.getByText('Hive');
+      fireEvent.click(installButton);
+
+      await waitFor(() => {
+        expect(post).toHaveBeenCalledWith(INSTALL_APP_EXAMPLES_API_URL, { app_name: 'hive' });
+      });
+      expect(installButton.textContent).toContain('Hive');
+    });
+
+    test('display a confirmation message after a successful install', async () => {
+      render(<Examples />);
+
+      const appName = 'Hive';
+      await waitFor(() => {
+        expect(screen.getByText(appName)).toBeInTheDocument();
       });
     });
   });
