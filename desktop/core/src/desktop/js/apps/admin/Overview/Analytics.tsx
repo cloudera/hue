@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
-import { Checkbox } from 'antd';
+import Input from 'cuix/dist/components/Input';
 import { post } from '../../../api/utils';
 import { ANALYTICS_PREFERENCES_API_URL } from '../Components/utils';
 import './Overview.scss';
@@ -32,20 +32,16 @@ const Analytics = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const saveCollectUsagePreference = async (collectUsage: boolean) => {
-    try {
-      const response = await post<UpdatePreferences>(ANALYTICS_PREFERENCES_API_URL, {
-        collect_usage: collectUsage ? 'on' : null
-      });
+    const response = await post<UpdatePreferences>(ANALYTICS_PREFERENCES_API_URL, {
+      collect_usage: collectUsage ? 'on' : null
+    });
 
-      if (response.status === 0) {
-        huePubSub.publish('hue.global.info', { message: t('Configuration updated') });
-      } else {
-        huePubSub.publish('hue.global.error', {
-          message: t('Error updating configuration')
-        });
-      }
-    } catch (err) {
-      huePubSub.publish('hue.global.error', { message: String(err) });
+    if (response.status === 0) {
+      huePubSub.publish('hue.global.info', { message: t('Configuration updated') });
+    } else {
+      huePubSub.publish('hue.global.error', {
+        message: t('Error updating configuration')
+      });
     }
   };
 
@@ -58,8 +54,14 @@ const Analytics = (): JSX.Element => {
   return (
     <div className="overview-analytics">
       <h3>{t('Anonymous usage analytics')}</h3>
-      <div>
-        <Checkbox id="usage_analytics" checked={collectUsage} onChange={handleCheckboxChange} />
+      <div className="analytics-checkbox-container">
+        <Input
+          type="checkbox"
+          className="analytics__checkbox-icon"
+          id="usage_analytics"
+          checked={collectUsage}
+          onChange={handleCheckboxChange}
+        />
         <label htmlFor="usage_analytics" className="usage__analytics">
           {t('Help improve Hue with anonymous usage analytics.')}
         </label>

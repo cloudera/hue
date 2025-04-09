@@ -16,7 +16,7 @@
 
 import React, { useState, useEffect } from 'react';
 import MetricsTable, { MetricsResponse, MetricsTableProps } from './MetricsTable';
-import { Spin } from 'antd';
+import Loading from 'cuix/dist/components/Loading';
 import Alert from 'cuix/dist/components/Alert';
 import { get } from '../../../api/utils';
 import { i18nReact } from '../../../utils/i18nReact';
@@ -95,7 +95,7 @@ const Metrics: React.FC = (): JSX.Element => {
 
   return (
     <div className="cuix antd metrics-component">
-      <Spin spinning={loading}>
+      <Loading spinning={loading}>
         {!error && (
           <AdminHeader
             options={['All', ...filteredKeys]}
@@ -125,7 +125,7 @@ const Metrics: React.FC = (): JSX.Element => {
               </div>
             ))}
         </div>
-      </Spin>
+      </Loading>
     </div>
   );
 };

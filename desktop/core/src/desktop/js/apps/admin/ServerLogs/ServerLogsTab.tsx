@@ -43,7 +43,7 @@ const ServerLogs: React.FC = (): JSX.Element => {
     return (
       <div className="hue-server-logs-component">
         <Alert
-          message={t(`Error: ${error}`)}
+          message={`${t('Error:')} ${error}`}
           description={t('An error occurred while fetching server logs.')}
           type="error"
         />

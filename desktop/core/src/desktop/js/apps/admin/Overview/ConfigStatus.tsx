@@ -15,12 +15,11 @@
 // limitations under the License.
 
 import React from 'react';
-// import { Spin } from 'antd';
 import Loading from 'cuix/dist/components/Loading';
 import Alert from 'cuix/dist/components/Alert';
 import Table from 'cuix/dist/components/Table';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
-import { INSTALL_APP_EXAMPLES_API_URL } from '../Components/utils';
+import { CHECK_CONFIG_EXAMPLES_API_URL } from '../Components/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import './Overview.scss';
 
@@ -35,7 +34,7 @@ interface CheckConfigResponse {
 
 function ConfigStatus(): JSX.Element {
   const { t } = i18nReact.useTranslation();
-  const { data, loading, error } = useLoadData<CheckConfigResponse>(INSTALL_APP_EXAMPLES_API_URL);
+  const { data, loading, error } = useLoadData<CheckConfigResponse>(CHECK_CONFIG_EXAMPLES_API_URL);
 
   const columns = [
     {
@@ -48,7 +47,7 @@ function ConfigStatus(): JSX.Element {
         <div>
           {record.value && (
             <p>
-              {t('Current value')}: <span className="config__table-name">{record.value}</span>
+              {t('Current value')}: <span className="config__table-value">{record.value}</span>
             </p>
           )}
           <p>{record.message}</p>
@@ -57,67 +56,63 @@ function ConfigStatus(): JSX.Element {
     }
   ];
 
-  if (error) {
-    return (
-      <div>
-        <Alert
-          message={t(`Error: ${error}`)}
-          description={t('An error occurred while attempting to install app examples.')}
-          type="error"
-        />
-      </div>
-    );
-  }
-
-  if (loading) {
-    return <Loading spinning={loading} className="config__spin" />;
-  }
-
   const configErrorsExist = Boolean(data?.configErrors?.length);
 
   return (
     <div className="overview-config">
-      <h1>{t('Checking current configuration')}</h1>
-      {data?.hueConfigDir && (
-        <div>
-          {t('Configuration files located in: ')}
-          <span className="config__address-value">{data['hueConfigDir']}</span>
-        </div>
-      )}
-
-      {configErrorsExist && data ? (
-        <>
-          <Alert
-            message={
-              <span>
-                <a
-                  href="https://docs.gethue.com/administrator/configuration/"
-                  target="_blank"
-                  className="config__link"
-                >
-                  {t('Potential misconfiguration detected.')}
-                </a>{' '}
-                {t('Fix and restart Hue.')}
-              </span>
-            }
-            type="warning"
-            className="config__alert-margin"
-          />
-
-          <Table
-            dataSource={data['configErrors']}
-            columns={columns}
-            rowKey={record => `${record.name}-${record.message.slice(1, 50)}`}
-            pagination={false}
-            showHeader={false}
-          />
-        </>
-      ) : (
+      {loading && <Loading spinning={loading} className="config__spin" />}
+      {error && (
         <Alert
-          message={t('All OK. Configuration check passed.')}
-          type="success"
-          className="config__alert-margin"
+          message={`${t('Error:')} ${error}`}
+          description={t('An error occurred while attempting to load the configuration status.')}
+          type="error"
         />
+      )}
+      {!loading && !error && (
+        <>
+          <h1>{t('Checking current configuration')}</h1>
+          {data?.hueConfigDir && (
+            <div>
+              {t('Configuration files located in: ')}
+              <span className="config__address-value">{data['hueConfigDir']}</span>
+            </div>
+          )}
+
+          {configErrorsExist && data ? (
+            <>
+              <Alert
+                message={
+                  <span>
+                    <a
+                      href="https://docs.gethue.com/administrator/configuration/"
+                      target="_blank"
+                      className="config__link"
+                    >
+                      {t('Potential misconfiguration detected.')}
+                    </a>{' '}
+                    {t('Fix and restart Hue.')}
+                  </span>
+                }
+                type="warning"
+                className="config__alert-margin"
+              />
+
+              <Table
+                dataSource={data['configErrors']}
+                columns={columns}
+                rowKey={record => `${record.name}-${record.message.slice(1, 50)}`}
+                pagination={false}
+                showHeader={false}
+              />
+            </>
+          ) : (
+            <Alert
+              message={t('All OK. Configuration check passed.')}
+              type="success"
+              className="config__alert-margin"
+            />
+          )}
+        </>
       )}
     </div>
   );

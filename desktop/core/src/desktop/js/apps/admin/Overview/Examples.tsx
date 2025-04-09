@@ -17,6 +17,7 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
+import { INSTALL_APP_EXAMPLES_API_URL } from '../Components/utils';
 import { post } from '../../../api/utils';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
@@ -43,24 +44,21 @@ const Examples = (): JSX.Element => {
 
   const handleInstall = async exampleApp => {
     setInstallingAppId(exampleApp.id);
-    const url = '/api/v1/install_app_examples';
+    const url = INSTALL_APP_EXAMPLES_API_URL;
     const data = { app_name: exampleApp.id };
 
     if (exampleApp.data) {
       data['data'] = exampleApp.data;
     }
 
-    post<InstallExamplesResponse>(url, data, {
-      method: 'POST',
-      silenceErrors: true
-    })
+    post<InstallExamplesResponse>(url, data)
       .then(response => {
-        const message = response.message ? t(response.message) : t('Examples refreshed');
+        const message = response.message ? response.message : t('Examples refreshed');
         huePubSub.publish('hue.global.info', { message });
       })
       .catch(error => {
         const errorMessage = error.message
-          ? t(error.message)
+          ? error.message
           : t('An error occurred while installing examples.');
         huePubSub.publish('hue.global.error', { message: errorMessage });
       })
@@ -80,7 +78,7 @@ const Examples = (): JSX.Element => {
             disabled={installingAppId === exampleApp.id}
             icon={<DownloadOutlined />}
           >
-            {installingAppId === exampleApp.id ? t('Installing...') : t(exampleApp.name)}
+            {installingAppId === exampleApp.id ? t('Installing...') : exampleApp.name}
           </Button>
         </div>
       ))}

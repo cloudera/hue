@@ -45,7 +45,7 @@
       margin: 10px 0;
     }
 
-    .config__table-name {
+    .config__table-name, .config__table-value {
       color: $fluidx-gray-900;
       font-size: 12px;
       border-radius: 5px;
@@ -60,9 +60,19 @@
       height: 100vh;
     }
 
+    .analytics-checkbox-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .analytics__checkbox-icon {
+      width: auto;
+      height: auto;
+      min-height: 0;
+    }
+
     .usage__analytics {
-      display: inline-block;
-      padding: 5px;
+      margin-left: 8px;
     }
 
     .overview__trademark-text {
