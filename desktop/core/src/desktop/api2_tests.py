@@ -19,12 +19,20 @@
 import re
 import json
 from builtins import object
+from dataclasses import dataclass
 from unittest.mock import Mock, patch
 
 import pytest
 
 from beeswax.conf import HIVE_SERVER_HOST
-from desktop.api2 import _setup_hive_impala_examples, _setup_notebook_examples, _setup_search_examples, check_config, install_app_examples
+from desktop.api2 import (
+  _setup_hive_impala_examples,
+  _setup_notebook_examples,
+  _setup_search_examples,
+  available_app_examples,
+  check_config,
+  install_app_examples,
+)
 from desktop.conf import ENABLE_GIST_PREVIEW
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.models import Directory, Document2
@@ -728,20 +736,86 @@ class TestDocumentGist(object):
       f()
 
 
+class TestAvailableAppExamplesAPI:
+
+  # Using custom MockApp instead of Mock to avoid conflicts with Mock's built in 'name' attribute.
+  @dataclass
+  class MockApp:
+    name: str
+    nice_name: str
+
+  def test_available_app_examples_success(self):
+    with patch("desktop.api2.is_admin") as mock_is_admin:
+      with patch("desktop.api2.appmanager.get_apps") as mock_get_apps:
+        request = Mock(method='GET', user=Mock())
+
+        mock_is_admin.return_value = True
+        mock_get_apps.return_value = [
+          self.MockApp(name='hive', nice_name='Hive'),
+          self.MockApp(name='impala', nice_name='Impala'),
+          self.MockApp(name='unsupported_app', nice_name='Unsupported App'),
+        ]
+
+        response = available_app_examples(request)
+
+        assert response.status_code == 200
+        assert json.loads(response.content) == {'apps': {'hive': 'Hive', 'impala': 'Impala'}}
+
+  def test_available_app_examples_non_admin(self):
+    with patch("desktop.api2.is_admin") as mock_is_admin:
+      request = Mock(method='GET', user=Mock())
+      mock_is_admin.return_value = False
+
+      response = available_app_examples(request)
+
+      assert response.status_code == 403
+      assert json.loads(response.content) == {"message": "You must be a Hue admin to access this endpoint."}
+
+  def test_available_app_examples_no_apps(self):
+    with patch("desktop.api2.is_admin") as mock_is_admin:
+      with patch("desktop.api2.appmanager.get_apps") as mock_get_apps:
+        mock_is_admin.return_value = True
+        mock_get_apps.return_value = []
+
+        request = Mock(method='GET', user=Mock())
+
+        response = available_app_examples(request)
+
+        assert response.status_code == 200
+        assert json.loads(response.content) == {"apps": {}}
+
+  def test_available_app_examples_only_unsupported_apps(self):
+    with patch("desktop.api2.is_admin") as mock_is_admin:
+      with patch("desktop.api2.appmanager.get_apps") as mock_get_apps:
+        mock_is_admin.return_value = True
+
+        mock_get_apps.return_value = [
+          self.MockApp("unsupported_app_1", "Unsupported App 1"),
+          self.MockApp("unsupported_app_2", "Unsupported App 2"),
+        ]
+
+        request = Mock(method='GET', user=Mock())
+
+        response = available_app_examples(request)
+
+        assert response.status_code == 200
+        assert json.loads(response.content) == {"apps": {}}
+
+
 class TestInstallAppExampleAPI:
   def test_install_app_examples_missing_app_name(self):
     request = Mock(method='POST', POST={}, user=Mock())
     response = install_app_examples(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Missing parameter: app_name is required.'
+    assert json.loads(response.content.decode('utf-8'))['message'] == 'Missing parameter: app_name is required.'
 
   def test_install_app_examples_unsupported_app_name(self):
     request = Mock(method='POST', POST={'app_name': 'test_app'}, user=Mock())
     response = install_app_examples(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Unsupported app name: test_app'
+    assert json.loads(response.content.decode('utf-8'))['message'] == 'Unsupported app name: test_app'
 
   def test_install_app_examples_non_admin_user(self):
     with patch('desktop.api2.is_admin') as mock_is_admin:
@@ -751,7 +825,7 @@ class TestInstallAppExampleAPI:
       response = install_app_examples(request)
 
       assert response.status_code == 403
-      assert response.content.decode('utf-8') == 'You must be a Hue admin to access this endpoint.'
+      assert json.loads(response.content.decode('utf-8'))['message'] == 'You must be a Hue admin to access this endpoint.'
 
   def test_install_app_examples_success_hive(self):
     with patch('desktop.api2.is_admin') as mock_is_admin:
@@ -763,7 +837,7 @@ class TestInstallAppExampleAPI:
         response = install_app_examples(request)
 
         assert response.status_code == 200
-        assert response.content.decode('utf-8') == 'Successfully installed examples for hive.'
+        assert json.loads(response.content.decode('utf-8'))['message'] == 'Successfully installed examples for hive.'
 
   def test_install_app_examples_success_impala(self):
     with patch('desktop.api2.is_admin') as mock_is_admin:
@@ -775,14 +849,14 @@ class TestInstallAppExampleAPI:
         response = install_app_examples(request)
 
         assert response.status_code == 200
-        assert response.content.decode('utf-8') == 'Successfully installed examples for impala.'
+        assert json.loads(response.content.decode('utf-8'))['message'] == 'Successfully installed examples for impala.'
 
   def test_setup_hive_impala_examples_invalid_dialect(self):
     request = Mock(method='POST', POST={'app_name': 'impala', 'dialect': 'test_dialect'})
     response = _setup_hive_impala_examples(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == "Invalid dialect: Must be 'hive' or 'impala'"
+    assert json.loads(response.content.decode('utf-8'))['message'] == "Invalid dialect: Must be 'hive' or 'impala'"
 
   def test_setup_hive_impala_examples_calls_command(self):
     with patch('desktop.api2.common.find_compute') as mock_find_compute:
@@ -801,7 +875,7 @@ class TestInstallAppExampleAPI:
     response = _setup_notebook_examples(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Missing parameter: connector_id is required.'
+    assert json.loads(response.content.decode('utf-8'))['message'] == 'Missing parameter: connector_id is required.'
 
   def test_setup_notebook_examples_existing_connector(self):
     with patch('desktop.api2.Connector.objects.get') as mock_get_connector:

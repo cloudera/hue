@@ -16,16 +16,16 @@
 # limitations under the License.
 
 import json
+from io import BytesIO as string_io
 from unittest.mock import MagicMock, Mock, patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.http import HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
 
 from aws.s3.s3fs import S3ListAllBucketsException
-from filebrowser.api import copy, get_all_filesystems, listdir_paged, mkdir, move, rename, touch, upload_file
-from filebrowser.conf import (
-  MAX_FILE_SIZE_UPLOAD_LIMIT,
-  RESTRICT_FILE_EXTENSIONS,
-)
+from filebrowser.api import copy, download, get_all_filesystems, listdir_paged, mkdir, move, rename, touch, upload_file
+from filebrowser.conf import MAX_FILE_SIZE_UPLOAD_LIMIT, REDIRECT_DOWNLOAD, RESTRICT_FILE_EXTENSIONS, SHOW_DOWNLOAD_BUTTON
+from hadoop.fs.exceptions import WebHdfsException
 
 
 class TestSimpleFileUploadAPI:
@@ -1212,3 +1212,429 @@ class TestListAPI:
 
       assert response.status_code == 403
       assert response.content.decode('utf-8') == 'Bucket listing is not allowed: Failed to list all buckets'
+
+
+class TestDownloadAPI:
+  def test_download_not_allowed(self):
+    request = Mock(
+      method='GET',
+      GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+      fs=Mock(),
+    )
+
+    reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(False)
+    try:
+      response = download(request)
+
+      assert response.status_code == 403
+      assert response.content.decode('utf-8') == 'Download operation is not allowed.'
+    finally:
+      reset()
+
+  def test_download_file_not_exists(self):
+    request = Mock(
+      method='GET',
+      GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+      fs=Mock(
+        exists=Mock(return_value=False),
+      ),
+    )
+
+    reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+    try:
+      response = download(request)
+
+      assert response.status_code == 404
+      assert response.content.decode('utf-8') == 'File does not exist: s3a://test-bucket/test-user/test_file.txt'
+    finally:
+      reset()
+
+  def test_download_not_a_file(self):
+    request = Mock(
+      method='GET',
+      GET={'path': 's3a://test-bucket/test-user/test_dir'},
+      fs=Mock(
+        exists=Mock(return_value=True),
+        isfile=Mock(return_value=False),
+      ),
+    )
+
+    reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+    try:
+      response = download(request)
+
+      assert response.status_code == 400
+      assert response.content.decode('utf-8') == 's3a://test-bucket/test-user/test_dir is not a file.'
+    finally:
+      reset()
+
+  def test_download_success(self):
+    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
+      with patch('filebrowser.api.was_modified_since') as was_modified_since:
+        guess_type.return_value = ('text/plain', None)
+        was_modified_since.return_value = True
+
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            read=Mock(),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+          stream_response_content = b''.join(response.streaming_content)
+
+          assert isinstance(response, StreamingHttpResponse)
+          assert response.status_code == 200
+          assert stream_response_content.decode('utf-8') == 'Hello, World!'
+          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test_file.txt"
+        finally:
+          reset()
+
+  def test_download_different_filename(self):
+    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
+      with patch('filebrowser.api.was_modified_since') as was_modified_since:
+        guess_type.return_value = ('text/plain', None)
+        was_modified_since.return_value = True
+
+        # Normal filename
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            read=Mock(),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 200
+          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test_file.txt"
+        finally:
+          reset()
+
+        # Filename with whitespaces
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test file name.txt'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            read=Mock(),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test file name.txt'}),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 200
+          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test%20file%20name.txt"
+        finally:
+          reset()
+
+        # Filename with special characters
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/Tжейкоб-åäö.csv'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            read=Mock(),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'Tжейкоб-åäö.csv'}),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 200
+          assert (
+            response['Content-Disposition'] == "attachment; filename*=UTF-8''T%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1-%C3%A5%C3%A4%C3%B6.csv"
+          )
+        finally:
+          reset()
+
+        # Filename with special characters and whitespaces
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/Tжейкоб åäö.csv'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            read=Mock(),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'Tжейкоб åäö.csv'}),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 200
+          assert (
+            response['Content-Disposition'] == "attachment; filename*=UTF-8''T%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%20%C3%A5%C3%A4%C3%B6.csv"
+          )
+        finally:
+          reset()
+
+        # Filename with % character
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test%file.txt'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            read=Mock(),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test%file.txt'}),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 200
+          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test%25file.txt"
+        finally:
+          reset()
+
+        # Filename with %20 character
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test%20file.txt'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            read=Mock(),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test%20file.txt'}),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 200
+          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test%2520file.txt"
+        finally:
+          reset()
+
+        # Filename with %20 character and whitespaces
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test%20file name.txt'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            read=Mock(),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test%20file name.txt'}),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 200
+          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test%2520file%20name.txt"
+        finally:
+          reset()
+
+  def test_download_file_redirection(self):
+    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
+      with patch('filebrowser.api.was_modified_since') as was_modified_since:
+        guess_type.return_value = ('text/plain', None)
+        was_modified_since.return_value = True
+
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            read=Mock(),
+            open=Mock(return_value=Mock(read_url=Mock(return_value='https://gethue.redirect.com/test_file.txt'))),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+          ),
+        )
+
+        resets = [SHOW_DOWNLOAD_BUTTON.set_for_testing(True), REDIRECT_DOWNLOAD.set_for_testing(True)]
+        try:
+          response = download(request)
+
+          assert response.status_code == 302
+          assert isinstance(response, HttpResponseRedirect)
+
+          assert response.redirect_override is True
+          assert response.url == 'https://gethue.redirect.com/test_file.txt'
+        finally:
+          for reset in resets:
+            reset()
+
+  def test_download_modified_since(self):
+    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
+      with patch('filebrowser.api.was_modified_since') as was_modified_since:
+        guess_type.return_value = ('text/plain', None)
+        was_modified_since.return_value = False
+
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+          ),
+          META={'HTTP_IF_MODIFIED_SINCE': 'Thu, 14 Jun 2018 10:00:00 GMT'},
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 304
+          assert isinstance(response, HttpResponseNotModified)
+        finally:
+          reset()
+
+  def test_download_read_permission_denied(self):
+    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
+      with patch('filebrowser.api.was_modified_since') as was_modified_since:
+        guess_type.return_value = ('text/plain', None)
+        was_modified_since.return_value = True
+
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          user=Mock(username='test-hue-user'),
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            read=Mock(side_effect=WebHdfsException(Mock(response=Mock(status_code=403, text='Signature Mismatch')))),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 403
+          assert (
+            response.content.decode('utf-8')
+            == 'User test-hue-user is not authorized to download file at path: s3a://test-bucket/test-user/test_file.txt'
+          )
+        finally:
+          reset()
+
+  def test_download_abfs_zero_filesize_exception(self):
+    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
+      with patch('filebrowser.api.was_modified_since') as was_modified_since:
+        guess_type.return_value = ('text/plain', None)
+        was_modified_since.return_value = True
+
+        request = Mock(
+          method='GET',
+          GET={'path': 'abfs://test-container/test-user/test_file.txt'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 0, 'name': 'test_file.txt'}),
+            open=Mock(return_value=string_io(b'')),
+            read=Mock(side_effect=WebHdfsException(Mock(response=Mock(status_code=416, text='Blob size is zero')))),
+            _get_scheme=Mock(return_value='abfs'),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+          stream_response_content = b''.join(response.streaming_content)
+
+          assert isinstance(response, StreamingHttpResponse)
+          assert response.status_code == 200
+          assert stream_response_content.decode('utf-8') == ''
+          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test_file.txt"
+        finally:
+          reset()
+
+  def test_download_unknown_exception(self):
+    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
+      with patch('filebrowser.api.was_modified_since') as was_modified_since:
+        guess_type.return_value = ('text/plain', None)
+        was_modified_since.return_value = True
+
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            read=Mock(side_effect=WebHdfsException(Mock(response=Mock(status_code=500, text='Internal Server Error')))),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 500
+        finally:
+          reset()
+
+  def test_download_audit_log(self):
+    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
+      with patch('filebrowser.api.was_modified_since') as was_modified_since:
+        guess_type.return_value = ('text/plain', None)
+        was_modified_since.return_value = True
+
+        request = Mock(
+          method='GET',
+          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          user=Mock(username='test-hue-user'),
+          fs=Mock(
+            exists=Mock(return_value=True),
+            isfile=Mock(return_value=True),
+            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+            open=Mock(return_value=string_io(b'Hello, World!')),
+            read=Mock(),
+          ),
+        )
+
+        reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
+        try:
+          response = download(request)
+
+          assert response.status_code == 200
+          assert request.audit == {
+            'operation': 'DOWNLOAD',
+            'operationText': 'User test-hue-user downloaded file at path "s3a://test-bucket/test-user/test_file.txt"',
+            'allowed': True,
+          }
+        finally:
+          reset()

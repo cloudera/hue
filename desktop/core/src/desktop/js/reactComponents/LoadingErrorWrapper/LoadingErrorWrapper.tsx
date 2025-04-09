@@ -14,9 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import React from 'react';
 import { Spin } from 'antd';
 import { PrimaryButton } from 'cuix/dist/components/Button';
-import React from 'react';
+
+import { i18nReact } from '../../utils/i18nReact';
 import './LoadingErrorWrapper.scss';
 
 interface WrapperError {
@@ -36,15 +38,17 @@ interface LoadingErrorWrapperProps {
 const LoadingErrorWrapper = ({
   loading,
   errors,
-  hideChildren = false,
-  children
+  children,
+  hideChildren = false
 }: LoadingErrorWrapperProps): JSX.Element => {
+  const { t } = i18nReact.useTranslation();
+
   if (loading) {
     return (
       <Spin
         spinning={loading}
-        data-testid="loading-error-wrapper__sppiner"
-        className="loading-error-wrapper__sppiner"
+        data-testid="loading-error-wrapper__spinner"
+        className="loading-error-wrapper__spinner"
       >
         {hideChildren === false && children}
       </Spin>
@@ -55,18 +59,16 @@ const LoadingErrorWrapper = ({
   if (enabledErrors.length > 0) {
     return (
       <>
-        {enabledErrors
-          .filter(error => error.enabled)
-          .map(error => (
-            <div className="loading-error-wrapper__error" key={error.message}>
-              <div>{error.message}</div>
-              {error.onClick && (
-                <PrimaryButton onClick={error.onClick} data-event="">
-                  {error.action}
-                </PrimaryButton>
-              )}
-            </div>
-          ))}
+        {enabledErrors.map(error => (
+          <div className="loading-error-wrapper__error" key={error.message}>
+            <div>{t(error.message)}</div>
+            {error.onClick && (
+              <PrimaryButton onClick={error.onClick} data-event="">
+                {error.action}
+              </PrimaryButton>
+            )}
+          </div>
+        ))}
       </>
     );
   }

@@ -43,9 +43,6 @@ const DeletionModal = ({
   const { t } = i18nReact.useTranslation();
 
   const { save, loading } = useSaveData(undefined, {
-    postOptions: {
-      qsEncodeData: false
-    },
     skip: !files.length,
     onSuccess,
     onError

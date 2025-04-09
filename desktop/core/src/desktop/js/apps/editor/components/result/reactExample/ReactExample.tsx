@@ -89,11 +89,11 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ activeExecutable, 
           defaultCurrent={1}
           total={500}
         />
-        <PrimaryButton icon={<PlusCircleIcon />} onClick={showModal}>
+        <PrimaryButton data-event="" icon={<PlusCircleIcon />} onClick={showModal}>
           {t('Open (cuix button)')}
         </PrimaryButton>
         <Dropdown menu={{ items }}>
-          <a>Hover me</a>
+          <a href="http://www.cloudera.com">Hover me</a>
         </Dropdown>
 
         <p className="react-example__description">

@@ -238,54 +238,8 @@ def log_analytics(request):
   return JsonResponse({'status': 0})
 
 
-@hue_admin_required
-@access_log_level(logging.WARN)
 def log_view(request):
-  """
-  We have a log handler that retains the last X characters of log messages.
-  If it is attached to the root logger, this view will display that history,
-  otherwise it will report that it can't be found.
-  """
-  hostname = socket.gethostname()
-  BUF_SIZE = 32 * 1024
-
-  buffer = []
-  log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
-  log_file = "%s/rungunicornserver.log" % (log_dir)
-  prev_log_file = "%s/rungunicornserver.log.1" % (log_dir)
-
-  if log_dir and os.path.exists(log_file):
-    log_file_size = os.path.getsize(log_file)
-
-    # log file might get rotated or fresh start of server
-    if log_file_size < BUF_SIZE:
-      # search the previous file
-      if os.path.exists(prev_log_file):
-        prev_log_file_size = os.path.getsize(prev_log_file)
-        with open(prev_log_file, 'rb') as fh1:
-          fh1.seek(prev_log_file_size - BUF_SIZE - log_file_size)
-          for line in fh1.readlines():
-            buffer.append(line)
-      # read the current log file
-      with open(log_file, 'rb') as fh:
-        fh.seek(0)
-        for line in fh.readlines():
-          buffer.append(line)
-    else:
-      with open(log_file, 'rb') as fh:
-        fh.seek(log_file_size - BUF_SIZE)
-        for line in fh.readlines():
-          buffer.append(line)
-    return render('logs.mako', request, dict(
-        log=buffer,
-        query=request.GET.get("q", ""),
-        hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)
-      )
-    )
-  return render('logs.mako', request, dict(
-      log=[_("No logs found!")], query='', hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)
-    )
-  )
+  return render('logs.mako', request, None)
 
 
 def task_server_view(request):
@@ -300,73 +254,6 @@ def task_server_view(request):
     'users': User.objects.all(),
     'users_json': json.dumps(list(User.objects.values_list('id', flat=True)))
   })
-
-
-@hue_admin_required
-@access_log_level(logging.WARN)
-def download_log_view(request):
-  """
-  Zip up the log buffer and then return as a file attachment.
-  """
-  # Download 1MB log
-  BUF_SIZE = 1024 * 1024
-
-  buffer = []
-  log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
-  log_file = "%s/rungunicornserver.log" % (log_dir)
-  prev_log_file = "%s/rungunicornserver.log.1" % (log_dir)
-
-  if log_dir and os.path.exists(log_file):
-    log_file_size = os.path.getsize(log_file)
-
-    # log file might get rotated or fresh start of server
-    if log_file_size < BUF_SIZE:
-      # search the previous file
-      if os.path.exists(prev_log_file):
-        prev_log_file_size = os.path.getsize(prev_log_file)
-        with open(prev_log_file, 'rb') as fh1:
-          fh1.seek(prev_log_file_size - BUF_SIZE - log_file_size)
-          for line in fh1.readlines():
-            buffer.append(line)
-      # read the current log file
-      with open(log_file, 'rb') as fh:
-        fh.seek(0)
-        for line in fh.readlines():
-          buffer.append(line)
-    else:
-      with open(log_file, 'rb') as fh:
-        fh.seek(log_file_size - BUF_SIZE)
-        for line in fh.readlines():
-          buffer.append(line)
-    try:
-      # We want to avoid doing a '\n'.join of the entire log in memory
-      # in case it is rather big. So we write it to a file line by line
-      # and pass that file to zipfile, which might follow a more efficient path.
-      tmp = tempfile.NamedTemporaryFile()
-      log_tmp = tempfile.NamedTemporaryFile("w+t", encoding='utf-8')
-      for line in buffer:
-        log_tmp.write(smart_str(line, errors='replace'))
-      # This is not just for show - w/out flush, we often get truncated logs
-      log_tmp.flush()
-      t = time.time()
-
-      zip = zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED)
-      zip.write(log_tmp.name, "hue-logs/hue-%s.log" % t)
-      zip.close()
-      length = tmp.tell()
-
-      # if we don't seek to start of file, no bytes will be written
-      tmp.seek(0)
-      wrapper = FileWrapper(tmp)
-      response = HttpResponse(wrapper, content_type="application/zip")
-      response['Content-Disposition'] = 'attachment; filename=hue-logs-%s.zip' % t
-      response['Content-Length'] = length
-      return response
-    except Exception:
-      LOG.exception("Couldn't construct zip file to write logs")
-      return log_view(request)
-
-  return django_render(request, "logs.mako", dict(log=[_("No logs found.")], is_embeddable=request.GET.get('is_embeddable', False)))
 
 
 def bootstrap(request):

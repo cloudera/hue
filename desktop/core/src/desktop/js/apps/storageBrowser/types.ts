@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { type PageStats } from '../../reactComponents/Pagination/Pagination';
+
 export interface HDFSFileSystemConfig {
   isTrashEnabled: boolean;
   isHdfsSuperuser: boolean;
@@ -51,13 +53,6 @@ export interface StorageDirectoryTableData
   mtime: string;
 }
 
-export interface PageStats {
-  pageNumber: number;
-  totalPages: number;
-  pageSize: number;
-  totalSize: number;
-}
-
 export interface FilePreview {
   contents: string;
   end: number;
@@ -86,12 +81,6 @@ export interface ContentSummary {
 
 export interface TrashData {
   trashPath: string;
-}
-
-export enum SortOrder {
-  ASC = 'ascending',
-  DSC = 'descending',
-  NONE = 'none'
 }
 
 export enum BrowserViewType {

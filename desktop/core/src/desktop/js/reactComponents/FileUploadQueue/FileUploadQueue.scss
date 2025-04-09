@@ -44,37 +44,6 @@
       overflow: auto;
       padding: 16px;
       gap: 16px;
-
-      &__row {
-        display: flex;
-        align-items: center;
-        padding: 8px;
-        font-size: 14px;
-        gap: 8px;
-        border: solid 1px vars.$fluidx-gray-300;
-
-        &__status {
-          display: flex;
-          width: 20px;
-        }
-
-        &__name {
-          display: flex;
-          flex: 1;
-          text-overflow: ellipsis;
-        }
-
-        &__size {
-          display: flex;
-          text-align: right;
-          color: vars.$fluidx-gray-700;
-        }
-
-        &__close {
-          display: flex;
-        }
-      }
     }
-
   }
 }

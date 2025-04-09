@@ -104,7 +104,7 @@ const FileChooserModal: React.FC<FileProps> = ({ show, onCancel, title, okText }
                   <PathBrowser
                     filePath={filePath}
                     onFilepathChange={setFilePath}
-                    seperator={'>'}
+                    separator={'>'}
                     showIcon={true}
                   />
                 )}

@@ -71,19 +71,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check and comment if no unit test files modified
+      - name: Get changed test files
+        id: changed-test-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files_yaml: |
+            test:
+              - '**/*_test{s,}.py'     # Matches files ending with `_test.py` (e.g., `some_module_test.py`, `some_module_tests.py`)
+              - '**/test{s,}_*.py'     # Matches files starting with `test_` (e.g., `test_helper.py`, `tests_helper.py`)
+              - '**/test{s,}.py'   # Matches both `test.py` and `tests.py` (e.g., `some_folder/test.py`, `some_folder/tests.py`)
+              - '**/*.test.*'      # Matches files containing `.test.` anywhere in the name (e.g., `test_file.test.py`, `module.test.js`)
+
+      - name: Check if test files were modified
+        id: check-test-files
         run: |
-          git fetch origin master
-          changed_files=$(git diff --name-only origin/master)
-          
-          if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
-            echo "✅ Unit test files were modified."
+          if [[ "${{ steps.changed-test-files.outputs.test_any_changed }}" == "true" ]]; then
+            echo "comment_message=✅ Test files were modified. Ensure that the tests cover all relevant changes" >> $GITHUB_ENV
           else
-            echo "⚠️ No unit test files modified."
-            
-            curl -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              -d '{"body":"⚠️ No unit test files modified. Please ensure that changes are properly tested. ⚠️"}' \
-              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+            echo "comment_message=⚠️ No test files modified. Please ensure that changes are properly tested. ⚠️" >> $GITHUB_ENV
           fi
+
+      - name: Update PR with test file change status
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: "${{ env.comment_message }}"
+          allow-repeats: false

@@ -79,6 +79,7 @@ class FlinkSqlApi(Api):
 
   @query_error_handler
   def create_session(self, lang=None, properties=None):
+    LOG.info("Creating session for %s.", lang)
     session = self._get_session()
 
     response = {
@@ -162,24 +163,29 @@ class FlinkSqlApi(Api):
     session = self._get_session_info_from_user()
 
     if not session:
-      session = self.db.create_session()
-      if self.default_database:
-        self._use_database(self.default_catalog, self.default_database)
-      elif self.default_catalog:
-        self._use_catalog(self.default_catalog)
-
+      session = self._create_session()
     try:
-      self.db.session_heartbeat(session_handle=session['sessionHandle'])
+      self.db.session_heartbeat(session_handle=session['id'])
     except Exception as e:
       if "Session '%(sessionHandle)s' does not exist" % session in str(e):
         LOG.warning('Session %(sessionHandle)s does not exist, opening a new one' % session)
-        session = self.db.create_session()
+        session = self._create_session()
       else:
         raise e
 
-    session['id'] = session['sessionHandle']
     self._set_session_info_to_user(session)
 
+    return session
+
+  def _create_session(self):
+    session = self.db.create_session()
+    session['id'] = session['sessionHandle']
+    session['flink_version'] = self.db.info().get('version')
+
+    if self.default_database:
+      self._use_database(session, self.default_catalog, self.default_database)
+    elif self.default_catalog:
+      self._use_catalog(session, self.default_catalog)
     return session
 
   @query_error_handler
@@ -289,6 +295,10 @@ class FlinkSqlApi(Api):
 
     if operation == 'functions':
       response['functions'] = self._show_functions(database)
+    elif operation == 'function':
+      # When function signature is requested the following call is executed:
+      # autocomplete(db=<function_name>, table=None, col=None, nested=None, op=function)
+      response['function'] = self._show_function(database)
     elif database is None:
       response['databases'] = self._show_databases()
     elif table is None:
@@ -452,28 +462,36 @@ class FlinkSqlApi(Api):
 
   def _show_functions(self, database):
     session = self._get_session()
-    session_handle = session['id']
-
-    operation_handle = self.db.execute_statement(
-      session_handle=session_handle,
-      statement='SHOW FUNCTIONS IN `%(database)s`' % {'database': database})
-    function_list = self._check_status_and_fetch_result(session_handle, operation_handle['operationHandle'])
-
+    statement = 'SHOW FUNCTIONS IN `%(database)s`' % {'database': database} if database else 'SHOW FUNCTIONS'
+    operation_handle = self.db.execute_statement(session['id'], statement)
+    function_list = self._check_status_and_fetch_result(session['id'], operation_handle['operationHandle'])
     return [{'name': function[0]} for function in function_list]
 
-  def _use_catalog(self, catalog):
+  def _show_function(self, function_name):
     session = self._get_session()
-    self.db.configure_session(session_handle=(session['id']), statement="USE CATALOG `%s`" % catalog)
+    if session.get('flink_version') and session['flink_version'].startswith('2.'):
+      # Describe function is available as of Flink 2.0.
+      operation_handle = self.db.execute_statement(
+        session_handle=session['id'],
+        statement='DESCRIBE FUNCTION EXTENDED %(function_name)s' % {'function_name': function_name})
+      properties = dict(self._check_status_and_fetch_result(session['id'], operation_handle['operationHandle']))
 
-  def _use_database(self, catalog, database):
-    session = self._get_session()
-    if catalog:
-      self.db.configure_session(session_handle=(session['id']),
-                                statement="USE `%(catalog)s`.`%(database)s`" % {'catalog': catalog,
-                                                                                'database': database})
+      return {
+        'name': function_name,
+        'signature': properties.get('signature'),
+      }
     else:
-      self.db.configure_session(session_handle=(session['id']),
-                                statement="USE `%(database)s`" % {'database': database})
+      return {'name': function_name}
+
+  def _use_catalog(self, session, catalog):
+    self.db.configure_session(session['id'], "USE CATALOG `%s`" % catalog)
+
+  def _use_database(self, session, catalog, database):
+    if catalog:
+      self.db.configure_session(session['id'], "USE `%(catalog)s`.`%(database)s`" % {'catalog': catalog,
+                                                                                     'database': database})
+    else:
+      self.db.configure_session(session['id'], "USE `%(database)s`" % {'database': database})
 
 
 class FlinkSqlClient:

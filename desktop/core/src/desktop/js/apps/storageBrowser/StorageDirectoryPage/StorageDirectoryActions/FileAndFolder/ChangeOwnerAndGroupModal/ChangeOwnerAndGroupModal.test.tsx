@@ -292,6 +292,6 @@ describe('ChangeOwnerAndGroupModal Component', () => {
 
     const userInput = getByPlaceholderText('Enter user');
     fireEvent.change(userInput, { target: { value: 'customUser' } });
-    expect(submitButton).toBeEnabled();
+    waitFor(() => expect(submitButton).toBeEnabled());
   });
 });

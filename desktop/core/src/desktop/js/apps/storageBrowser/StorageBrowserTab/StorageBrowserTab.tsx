@@ -15,9 +15,13 @@
 // limitations under the License.
 
 import React, { useEffect, useState } from 'react';
+import { Alert } from 'antd';
+import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
+import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
+import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
+import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 
 import { i18nReact } from '../../../utils/i18nReact';
-import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
@@ -25,20 +29,16 @@ import { FILE_STATS_API_URL, TRASH_PATH } from '../api';
 import { BrowserViewType, FileStats, FileSystem, TrashData } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { BorderlessButton } from 'cuix/dist/components/Button';
-
-import './StorageBrowserTab.scss';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import {
-  getFileNameFromPath,
+  getLastDirOrFileNameFromPath,
   getFileSystemAndPath
 } from '../../../reactComponents/PathBrowser/PathBrowser.util';
-import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
-import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
-import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 import { inTrash } from '../../../utils/storageBrowserUtils';
-import { Alert } from 'antd';
+
+import './StorageBrowserTab.scss';
 
 interface StorageBrowserTabProps {
   fileSystem: FileSystem;
@@ -58,7 +58,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
-  const fileName = getFileNameFromPath(filePath);
+  const fileName = getLastDirOrFileNameFromPath(filePath);
 
   const { t } = i18nReact.useTranslation();
 
@@ -126,20 +126,29 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
 
   return (
     <LoadingErrorWrapper loading={isLoading} errors={errorConfig}>
-      <div className="hue-storage-browser-tab-content" data-testid={testId}>
-        <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
-          <div className="hue-storage-browser__title">
-            <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
-            <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
+      <div className="hue-storage-browser-tab" data-testid={testId}>
+        <div
+          className="hue-storage-browser-tab__title-bar-container"
+          data-testid={`${testId}-title-bar`}
+        >
+          <div className="hue-storage-browser-tab__title-bar">
+            <BucketIcon
+              className="hue-storage-browser-tab__title-bar-icon"
+              data-testid={`${testId}-icon`}
+            />
+            <h3
+              className="hue-storage-browser-tab__title-bar-name"
+              data-testid={`${testId}-folder-namer`}
+            >
               {fileName}
             </h3>
           </div>
-          <div className="hue-storage-browser__home-bar-right">
+          <div className="hue-storage-browser-tab__title-bar-button-group">
             <BorderlessButton
               onClick={() => {
                 setFilePath(fileSystem.userHomeDirectory);
               }}
-              className="hue-storage-browser__home-bar-btns"
+              className="hue-storage-browser-tab__title-bar-button"
               data-event=""
               title={t('Home')}
               icon={<HomeIcon />}
@@ -149,7 +158,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
             {fileSystem.config?.isTrashEnabled && (
               <BorderlessButton
                 onClick={onTrashClick}
-                className="hue-path-browser__home-btn"
+                className="hue-storage-browser-tab__title-bar-button"
                 data-event=""
                 title={t('Trash')}
                 icon={<DeleteIcon />}
@@ -159,8 +168,8 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
               </BorderlessButton>
             )}
             <BorderlessButton
-              onClick={() => reloadData()}
-              className="hue-storage-browser__home-bar-btns"
+              onClick={reloadData}
+              className="hue-storage-browser-tab__title-bar-button"
               data-event=""
               title={t('Refresh')}
               icon={<RefreshIcon />}
@@ -178,15 +187,10 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
           />
         )}
         <div
-          className="hue-storage-browser__path-browser-panel"
+          className="hue-storage-browser-tab__path-browser-container"
           data-testid={`${testId}-path-browser-panel`}
         >
-          <PathBrowser
-            filePath={filePath}
-            onFilepathChange={setFilePath}
-            seperator={'/'}
-            showIcon={false}
-          />
+          <PathBrowser filePath={filePath} onFilepathChange={setFilePath} />
         </div>
         {fileStats?.type === BrowserViewType.dir && !isLoading && (
           <StorageDirectoryPage

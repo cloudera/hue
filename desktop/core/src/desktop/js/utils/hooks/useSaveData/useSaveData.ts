@@ -14,17 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ApiFetchOptions, post } from '../../../api/utils';
+import { isJSON } from '../../jsonUtils';
 
 interface saveOptions<T> {
   url?: string;
   onSuccess?: (data: T) => void;
   onError?: (error: Error) => void;
+  postOptions?: ApiFetchOptions<T>;
 }
 
 export interface Options<T> extends saveOptions<T> {
-  postOptions?: ApiFetchOptions<T>;
   skip?: boolean;
 }
 
@@ -46,11 +47,6 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
     ignoreSuccessErrors: true
   };
 
-  const postOptions = useMemo(
-    () => ({ ...postOptionsDefault, ...localOptions?.postOptions }),
-    [localOptions]
-  );
-
   const saveData = useCallback(
     async (body: U, saveOptions?: saveOptions<T>) => {
       // Avoid Posting data if the skip option is true
@@ -61,6 +57,13 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
       }
       setLoading(true);
       setError(undefined);
+
+      const postOptions = {
+        ...postOptionsDefault,
+        qsEncodeData: body instanceof FormData || isJSON(body) ? false : true,
+        ...localOptions?.postOptions,
+        ...saveOptions?.postOptions
+      };
 
       try {
         const response = await post<T, U>(apiUrl, body, postOptions);
@@ -83,7 +86,7 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
         setLoading(false);
       }
     },
-    [url, localOptions, postOptions]
+    [url, localOptions]
   );
 
   useEffect(() => {

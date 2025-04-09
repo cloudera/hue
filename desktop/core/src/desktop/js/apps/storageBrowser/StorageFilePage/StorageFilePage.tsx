@@ -33,7 +33,7 @@ import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import { inTrash } from '../../../utils/storageBrowserUtils';
-import { getFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageFilePageProps {
   onReload: () => void;
@@ -42,7 +42,7 @@ interface StorageFilePageProps {
 
 const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Element => {
   const config = getLastKnownConfig();
-  const fileName = getFileNameFromPath(fileStats.path);
+  const fileName = getLastDirOrFileNameFromPath(fileStats.path);
   const fileType = getFileType(fileName);
 
   const { t } = i18nReact.useTranslation();
@@ -53,7 +53,9 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
   const pageSize = DEFAULT_PREVIEW_PAGE_SIZE;
   const pageOffset = (pageNumber - 1) * pageSize;
 
-  const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL);
+  const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL, {
+    postOptions: { qsEncodeData: true } // TODO: Remove once API supports RAW JSON payload
+  });
 
   const { data, loading, error } = useLoadData<FilePreview>(FILE_PREVIEW_API_URL, {
     params: {
@@ -240,6 +242,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                 <audio controls preload="auto" data-testid="preview__content__audio">
                   <source src={filePreviewUrl} />
                   {t('Your browser does not support the audio element.')}
+                  <track kind="captions" src="" srcLang="en" label="English" />
                 </audio>
               )}
 
@@ -247,6 +250,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                 <video controls preload="auto" data-testid="preview__content__video">
                   <source src={filePreviewUrl} />
                   {t('Your browser does not support the video element.')}
+                  <track kind="captions" src="" srcLang="en" label="English" />
                 </video>
               )}
             </div>
