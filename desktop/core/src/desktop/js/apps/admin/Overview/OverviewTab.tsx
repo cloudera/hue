@@ -20,14 +20,11 @@ import Examples from './Examples';
 import ConfigStatus from './ConfigStatus';
 import Analytics from './Analytics';
 import { i18nReact } from '../../../utils/i18nReact';
-import { getLastKnownConfig } from '../../../config/hueConfig';
 import './Overview.scss';
 
 const Overview = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const config = getLastKnownConfig();
-  const isAdmin = config?.hue_config.is_admin ?? false;
   const items = [
     {
       label: t('Config Status'),
@@ -46,14 +43,11 @@ const Overview = (): JSX.Element => {
     }
   ];
 
-  if (!isAdmin) {
-    return <></>;
-  }
   return (
     <div className="hue-overview-component">
       <Tabs tabPosition="left" items={items} />
       <div className="overview__trademark-text">
-        Hue and the Hue logo are trademarks of Cloudera, Inc.
+        t('Hue and the Hue logo are trademarks of Cloudera, Inc.')
       </div>
     </div>
   );

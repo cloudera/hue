@@ -58,6 +58,9 @@
 
       .server__checkbox-icon {
         margin-right: 2px;
+        width: auto;
+        height: auto;
+        min-height: 0;
       }
 
       .server__download-button {
