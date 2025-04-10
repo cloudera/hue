@@ -52,8 +52,7 @@ const CompressionModal = ({
     error
   } = useSaveData(COMPRESS_API_URL, {
     // TODO: remove silenceErrors once it is default to true in the hook
-    // TODO: remove isRawError once it is default to true in the hook
-    postOptions: { isRawError: true, silenceErrors: true },
+    postOptions: { silenceErrors: true },
     skip: !files.length,
     onSuccess,
     onError

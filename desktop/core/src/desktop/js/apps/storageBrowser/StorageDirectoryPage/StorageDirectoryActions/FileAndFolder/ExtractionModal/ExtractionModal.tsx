@@ -44,8 +44,7 @@ const ExtractionModal = ({
   const { save, loading, error } = useSaveData(EXTRACT_API_URL, {
     // TODO: Remove qsEncodeData once API supports RAW JSON payload
     // TODO: remove silenceErrors once it is default to true in the hook
-    // TODO: remove isRawError once it is default to true in the hook
-    postOptions: { qsEncodeData: true, isRawError: true, silenceErrors: true },
+    postOptions: { qsEncodeData: true, silenceErrors: true },
     skip: !file,
     onSuccess,
     onError
