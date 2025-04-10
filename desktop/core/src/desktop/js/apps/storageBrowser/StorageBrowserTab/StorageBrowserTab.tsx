@@ -149,7 +149,6 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
                 setFilePath(fileSystem.userHomeDirectory);
               }}
               className="hue-storage-browser-tab__title-bar-button"
-              data-event=""
               title={t('Home')}
               icon={<HomeIcon />}
             >
@@ -159,7 +158,6 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
               <BorderlessButton
                 onClick={onTrashClick}
                 className="hue-storage-browser-tab__title-bar-button"
-                data-event=""
                 title={t('Trash')}
                 icon={<DeleteIcon />}
                 disabled={!trashData?.trashPath}
@@ -170,7 +168,6 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
             <BorderlessButton
               onClick={reloadData}
               className="hue-storage-browser-tab__title-bar-button"
-              data-event=""
               title={t('Refresh')}
               icon={<RefreshIcon />}
             >
