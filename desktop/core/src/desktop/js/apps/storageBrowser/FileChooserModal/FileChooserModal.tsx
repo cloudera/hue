@@ -141,14 +141,14 @@ const FileChooserModal = ({
 
   return (
     <Modal
-      cancelText={cancelText}
+      open={showModal}
+      title={title}
       className="hue-filechooser-modal cuix antd"
       okText={submitText}
-      title={title}
-      open={showModal}
-      onCancel={onClose}
       onOk={handleOk}
-      okButtonProps={{ disabled: sourcePath === destPath || submitLoading }}
+      okButtonProps={{ disabled: sourcePath === destPath, loading: submitLoading }}
+      cancelText={cancelText}
+      onCancel={onClose}
     >
       <div className="hue-filechooser-modal__body">
         <div className="hue-filechooser-modal__path-browser-panel">
@@ -162,7 +162,7 @@ const FileChooserModal = ({
             handleSearch(event.target.value);
           }}
         />
-        <LoadingErrorWrapper loading={loading || submitLoading}>
+        <LoadingErrorWrapper loading={loading}>
           <Table
             className="hue-filechooser-modal__table"
             dataSource={tableData}

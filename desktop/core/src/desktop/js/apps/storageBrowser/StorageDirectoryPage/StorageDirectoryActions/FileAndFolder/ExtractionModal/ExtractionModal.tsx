@@ -44,7 +44,8 @@ const ExtractionModal = ({
   const { save, loading, error } = useSaveData(EXTRACT_API_URL, {
     // TODO: Remove qsEncodeData once API supports RAW JSON payload
     // TODO: remove silenceErrors once it is default to true in the hook
-    postOptions: { qsEncodeData: true, silenceErrors: true },
+    // TODO: remove isRawError once it is default to true in the hook
+    postOptions: { qsEncodeData: true, isRawError: true, silenceErrors: true },
     skip: !file,
     onSuccess,
     onError
@@ -75,10 +76,11 @@ const ExtractionModal = ({
       onOk={handleExtract}
       open={isOpen}
       title={t('Extract Archive')}
-      okButtonProps={{ disabled: loading }}
+      okButtonProps={{ disabled: !!error, loading }}
       cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
-      <LoadingErrorWrapper loading={loading} errors={errors}>
+      <LoadingErrorWrapper errors={errors}>
         {t('Are you sure you want to extract "{{fileName}}" file?', { fileName: file.name })}
       </LoadingErrorWrapper>
     </Modal>

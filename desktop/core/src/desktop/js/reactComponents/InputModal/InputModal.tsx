@@ -21,7 +21,6 @@ import { Input, InputRef } from 'antd';
 import { i18nReact } from '../../utils/i18nReact';
 
 import './InputModal.scss';
-import LoadingErrorWrapper from '../LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface InputModalProps {
   cancelText?: string;
@@ -63,31 +62,32 @@ const InputModal = ({
 
   return (
     <Modal
-      cancelText={cancelText}
-      className="hue-input-modal cuix antd"
-      okText={submitText}
-      onCancel={onClose}
-      onOk={handleSubmit}
       open={showModal}
       title={title}
-      secondaryButtonProps={{ disabled: loading }}
-      okButtonProps={{ disabled: loading || initialValue === value }}
+      className="hue-input-modal cuix antd"
+      okText={submitText}
+      onOk={handleSubmit}
+      okButtonProps={{
+        disabled: initialValue === value,
+        loading
+      }}
+      cancelText={cancelText}
+      onCancel={onClose}
       cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
-      <LoadingErrorWrapper loading={loading}>
-        <div className="hue-input-modal__input-label">{inputLabel}</div>
-        <Input
-          className="hue-input-modal__input"
-          defaultValue={value}
-          type={inputType}
-          disabled={loading}
-          onPressEnter={handleSubmit}
-          ref={inputRef}
-          onChange={e => {
-            setValue(e.target.value);
-          }}
-        />
-      </LoadingErrorWrapper>
+      <div className="hue-input-modal__input-label">{inputLabel}</div>
+      <Input
+        className="hue-input-modal__input"
+        defaultValue={value}
+        type={inputType}
+        disabled={loading}
+        onPressEnter={handleSubmit}
+        ref={inputRef}
+        onChange={e => {
+          setValue(e.target.value);
+        }}
+      />
     </Modal>
   );
 };

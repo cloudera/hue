@@ -46,7 +46,6 @@ describe('ExtractAction Component', () => {
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
   const mockOnClose = jest.fn();
-  const setLoading = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -57,7 +56,6 @@ describe('ExtractAction Component', () => {
       <ExtractAction
         isOpen={true}
         file={mockFile}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -76,7 +74,6 @@ describe('ExtractAction Component', () => {
       <ExtractAction
         isOpen={true}
         file={mockFile}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -101,7 +98,6 @@ describe('ExtractAction Component', () => {
       <ExtractAction
         isOpen={true}
         file={mockFile}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -122,7 +118,6 @@ describe('ExtractAction Component', () => {
       <ExtractAction
         isOpen={true}
         file={mockFile}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -139,7 +134,6 @@ describe('ExtractAction Component', () => {
       <ExtractAction
         isOpen={true}
         file={mockFile}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -158,7 +152,6 @@ describe('ExtractAction Component', () => {
       <ExtractAction
         isOpen={true}
         file={mockFile}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}

@@ -131,7 +131,7 @@ const FileAndFolderActions = ({
         trigger={['click']}
         disabled={!actionItems.length}
       >
-        <Button data-event="">
+        <Button>
           {t('Actions')}
           <DropDownIcon />
         </Button>

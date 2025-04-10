@@ -14,13 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
 import { StorageDirectoryTableData } from '../../../../types';
 import { BULK_DELETION_API_URL, DELETION_API_URL } from '../../../../api';
-import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface DeletionModalProps {
   isOpen?: boolean;
@@ -41,6 +40,8 @@ const DeletionModal = ({
 }: DeletionModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
+  const [isMoveTrashClicked, setIsMoveTrashClicked] = useState<boolean>(false);
+
   const { save, loading } = useSaveData(undefined, {
     skip: !files.length,
     onSuccess,
@@ -49,6 +50,7 @@ const DeletionModal = ({
 
   const handleDeletion = (isForedSkipTrash: boolean = false) => {
     const isSkipTrash = !isTrashEnabled || isForedSkipTrash;
+    setIsMoveTrashClicked(!isSkipTrash);
 
     const formData = new FormData();
     files.forEach(selectedFile => {
@@ -67,28 +69,32 @@ const DeletionModal = ({
 
   return (
     <Modal
-      cancelText={t('Cancel')}
-      className="hue-input-modal cuix antd"
-      okText={isTrashEnabled ? t('Move to Trash') : t('Delete Permanently')}
-      onCancel={onClose}
-      onOk={() => handleDeletion()}
       open={isOpen}
       title={t('Confirm Delete')}
+      className="hue-input-modal cuix antd"
+      cancelText={t('Cancel')}
+      okText={isTrashEnabled ? t('Move to Trash') : t('Delete Permanently')}
+      onOk={() => handleDeletion()}
+      okButtonProps={{
+        disabled: loading && !isMoveTrashClicked,
+        loading: loading && isMoveTrashClicked
+      }}
       secondaryButtonText={isTrashEnabled ? t('Delete Permanently') : undefined}
       onSecondary={() => handleDeletion(true)}
-      secondaryButtonProps={{ disabled: loading }}
-      okButtonProps={{ disabled: loading }}
+      secondaryButtonProps={{
+        disabled: loading && isMoveTrashClicked,
+        loading: loading && !isMoveTrashClicked
+      }}
+      onCancel={onClose}
       cancelButtonProps={{ disabled: loading }}
     >
-      <LoadingErrorWrapper loading={loading}>
-        {isTrashEnabled
-          ? files.length > 1
-            ? t('Do you want to move {{count}} items to trash?', { count: files.length })
-            : t('Do you want to move "{{name}}" to trash?', { name: files[0]?.name })
-          : files.length > 1
-            ? t('Do you want to delete {{count}} items permanently?', { count: files.length })
-            : t('Do you want to delete "{{name}}" permanently?', { name: files[0]?.name })}
-      </LoadingErrorWrapper>
+      {isTrashEnabled
+        ? files.length > 1
+          ? t('Do you want to move {{count}} items to trash?', { count: files.length })
+          : t('Do you want to move "{{name}}" to trash?', { name: files[0]?.name })
+        : files.length > 1
+          ? t('Do you want to delete {{count}} items permanently?', { count: files.length })
+          : t('Do you want to delete "{{name}}" permanently?', { name: files[0]?.name })}
     </Modal>
   );
 };

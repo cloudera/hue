@@ -25,7 +25,6 @@ import PaginatedTable, {
 import { StorageDirectoryTableData } from '../../../../types';
 import { BULK_CHANGE_PERMISSION_API_URL } from '../../../../api';
 import { getInitialPermissions, Permission } from './ChangePermissionModal.util';
-import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './ChangePermissionModal.scss';
 
@@ -135,12 +134,14 @@ const ChangePermissionModal = ({
       onOk={handleChangeOwner}
       open={isOpen}
       title={t('Change Permissions')}
-      okButtonProps={{ disabled: loading }}
+      okButtonProps={{
+        loading,
+        disabled: JSON.stringify(initialPermissions) === JSON.stringify(permissions)
+      }}
       cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
-      <LoadingErrorWrapper loading={loading}>
-        <PaginatedTable<Permission> data={permissions} columns={columns} rowKey="key" />
-      </LoadingErrorWrapper>
+      <PaginatedTable<Permission> data={permissions} columns={columns} rowKey="key" />
     </Modal>
   );
 };

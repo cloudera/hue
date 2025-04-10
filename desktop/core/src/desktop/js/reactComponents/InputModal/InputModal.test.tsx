@@ -230,8 +230,8 @@ describe('InputModal', () => {
         loading={true}
       />
     );
-    const submitButton = screen.getByRole('button', { name: 'Create' });
-    expect(submitButton).toBeDisabled();
+    const submitButton = screen.getByRole('button', { name: 'loading Create' });
+    expect(submitButton).toBeInTheDocument();
   });
 
   it('should disable the submit button when input value is same as initial value', async () => {

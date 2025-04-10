@@ -23,7 +23,6 @@ import { FileStats, StorageDirectoryTableData } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import { TRASH_PURGE, TRASH_RESTORE_BULK } from '../../../api';
 import { inRestorableTrash } from '../../../../../utils/storageBrowserUtils';
-import LoadingErrorWrapper from '../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface TrashActionsProps {
   selectedFiles: StorageDirectoryTableData[];
@@ -94,31 +93,29 @@ const TrashActions = ({
   return (
     <>
       <BorderlessButton
-        data-event=""
         disabled={!selectedFiles.length || !inRestorableTrash(currentPath)}
         onClick={() => handleActionClick(Actions.restore)}
       >
         {t('Restore')}
       </BorderlessButton>
-      <BorderlessButton data-event="" onClick={() => handleActionClick(Actions.trashEmpty)}>
+      <BorderlessButton onClick={() => handleActionClick(Actions.trashEmpty)}>
         {t('Empty trash')}
       </BorderlessButton>
       <Modal
-        cancelText={t('No')}
-        className="cuix antd"
-        okText={t('Yes')}
-        onCancel={handleModalCancel}
-        onOk={handleModalConfirm}
         open={isModalOpen}
         title={selectedAction === Actions.restore ? t('Restore') : t('Empty trash')}
-        okButtonProps={{ disabled: loading }}
+        className="cuix antd"
+        okText={t('Yes')}
+        onOk={handleModalConfirm}
+        okButtonProps={{ loading }}
+        cancelText={t('No')}
+        onCancel={handleModalCancel}
         cancelButtonProps={{ disabled: loading }}
+        closable={!loading}
       >
-        <LoadingErrorWrapper loading={loading}>
-          {selectedAction === Actions.restore
-            ? t('Are you sure you want to restore these files?')
-            : t('Are you sure you want to permanently delete all your trash?')}
-        </LoadingErrorWrapper>
+        {selectedAction === Actions.restore
+          ? t('Are you sure you want to restore these files?')
+          : t('Are you sure you want to permanently delete all your trash?')}
       </Modal>
     </>
   );

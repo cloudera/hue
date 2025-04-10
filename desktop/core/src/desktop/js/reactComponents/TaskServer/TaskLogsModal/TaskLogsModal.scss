@@ -17,10 +17,9 @@
 .hue-task-server-logs {
   max-height: 60vh;
   overflow: auto;
-  margin-right: -16px;
-  padding-right: 16px;
 
   pre {
     padding: 16px;
+    margin: 0;
   }
 }

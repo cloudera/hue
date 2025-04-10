@@ -51,7 +51,9 @@ const CompressionModal = ({
     loading,
     error
   } = useSaveData(COMPRESS_API_URL, {
-    postOptions: { silenceErrors: true }, // TODO: remove silenceErrors once it is default to true in the hook
+    // TODO: remove silenceErrors once it is default to true in the hook
+    // TODO: remove isRawError once it is default to true in the hook
+    postOptions: { isRawError: true, silenceErrors: true },
     skip: !files.length,
     onSuccess,
     onError
@@ -83,18 +85,19 @@ const CompressionModal = ({
       className="cuix antd"
       okText={t('Compress')}
       onCancel={onClose}
-      onOk={() => handleCompress()}
+      onOk={handleCompress}
       open={isOpen}
       title={t('Compress files and folders')}
-      okButtonProps={{ disabled: loading || !!error }}
+      okButtonProps={{ disabled: !!error || !value, loading }}
       cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
-      <LoadingErrorWrapper loading={loading} errors={errors}>
+      <LoadingErrorWrapper errors={errors}>
         {t('Compressed file name')}
         <Input
           value={value}
           type="text"
-          onPressEnter={() => handleCompress()}
+          onPressEnter={handleCompress}
           onChange={e => {
             setValue(e.target.value);
           }}
