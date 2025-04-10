@@ -45,15 +45,7 @@ const TaskLogsModal: React.FC<TaskLogsModalProps> = ({ taskId, onClose }): JSX.E
   ];
 
   return (
-    <Modal
-      open={!!taskId}
-      title={t('Task Logs')}
-      width={830}
-      onCancel={onClose}
-      footer={false}
-      // cancelText={t('Close')}
-      // okButtonProps={{ hidden: true }}
-    >
+    <Modal open={!!taskId} title={t('Task Logs')} width={830} onCancel={onClose} footer={false}>
       <LoadingErrorWrapper loading={loading} errors={errors}>
         <div className="hue-task-server-logs">
           <pre>{data}</pre>

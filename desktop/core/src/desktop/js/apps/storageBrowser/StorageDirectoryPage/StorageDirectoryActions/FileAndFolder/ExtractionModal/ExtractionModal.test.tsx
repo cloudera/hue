@@ -159,6 +159,6 @@ describe('ExtractAction Component', () => {
       />
     );
 
-    expect(getByRole('button', { name: 'Extract' })).toBeDisabled();
+    expect(getByRole('button', { name: 'loading Extract' })).toBeInTheDocument();
   });
 });

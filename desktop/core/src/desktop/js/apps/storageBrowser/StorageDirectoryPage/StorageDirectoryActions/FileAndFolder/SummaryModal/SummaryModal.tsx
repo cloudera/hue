@@ -85,8 +85,6 @@ const SummaryModal = ({ isOpen = true, onClose, path }: SummaryModalProps): JSX.
       className="cuix antd"
       onCancel={onClose}
       footer={false}
-      // cancelText={t('Close')}
-      // okButtonProps={{ hidden: true }}
     >
       <LoadingErrorWrapper loading={loading}>
         <div className="hue-summary-modal__grid">
