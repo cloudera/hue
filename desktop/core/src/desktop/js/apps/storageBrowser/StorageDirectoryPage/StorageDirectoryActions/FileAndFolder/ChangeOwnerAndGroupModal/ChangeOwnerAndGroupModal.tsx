@@ -151,6 +151,7 @@ const ChangeOwnerAndGroupModal = ({
                 options={usersOptions}
                 onChange={setSelectedUser}
                 value={selectedUser}
+                disabled={loading}
                 getPopupContainer={triggerNode => triggerNode.parentElement}
               />
               {selectedUser === OTHERS_KEY && (
@@ -158,6 +159,7 @@ const ChangeOwnerAndGroupModal = ({
                   placeholder={t('Enter user')}
                   value={userOther}
                   onChange={e => setUserOther(e.target.value)}
+                  disabled={loading}
                   required
                 />
               )}
@@ -171,6 +173,7 @@ const ChangeOwnerAndGroupModal = ({
                 options={groupOptions}
                 onChange={setSelectedGroup}
                 value={selectedGroup}
+                disabled={loading}
                 getPopupContainer={triggerNode => triggerNode.parentElement}
               />
               {selectedGroup === OTHERS_KEY && (
@@ -178,6 +181,7 @@ const ChangeOwnerAndGroupModal = ({
                   placeholder={t('Enter group')}
                   value={groupOther}
                   onChange={e => setGroupOther(e.target.value)}
+                  disabled={loading}
                   required
                 />
               )}
@@ -189,6 +193,7 @@ const ChangeOwnerAndGroupModal = ({
             <Checkbox
               checked={isRecursive}
               onChange={() => setIsRecursive(prev => !prev)}
+              disabled={loading}
               name="recursive"
             />
           </div>

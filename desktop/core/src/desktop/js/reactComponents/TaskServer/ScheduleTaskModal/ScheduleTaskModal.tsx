@@ -107,6 +107,7 @@ const ScheduleTaskModal = ({ onClose, open = true }: ScheduleTaskModalProps): JS
               options={dropdownOptions}
               value={selectedTask}
               onChange={e => setSelectedTask(e.target.value)}
+              disabled={loading}
             />
           </Form.Item>
         </div>
@@ -121,6 +122,7 @@ const ScheduleTaskModal = ({ onClose, open = true }: ScheduleTaskModalProps): JS
                     placeholder={param.label}
                     onChange={handleChange}
                     value={params[param.value]}
+                    disabled={loading}
                   />
                 </Form.Item>
               </div>

@@ -98,9 +98,8 @@ const CompressionModal = ({
           value={value}
           type="text"
           onPressEnter={handleCompress}
-          onChange={e => {
-            setValue(e.target.value);
-          }}
+          onChange={e => setValue(e.target.value)}
+          disabled={loading}
         />
 
         <div className="compress-action">

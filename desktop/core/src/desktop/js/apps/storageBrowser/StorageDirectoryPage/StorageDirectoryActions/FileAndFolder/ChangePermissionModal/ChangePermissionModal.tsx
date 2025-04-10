@@ -89,7 +89,13 @@ const ChangePermissionModal = ({
 
   const renderTableCheckbox = (key: keyof Permission) => (value: boolean, record: Permission) => {
     if (value !== undefined) {
-      return <Checkbox checked={value} onChange={() => handleCheckboxChange(record.key, key)} />;
+      return (
+        <Checkbox
+          checked={value}
+          onChange={() => handleCheckboxChange(record.key, key)}
+          disabled={loading}
+        />
+      );
     }
   };
 
