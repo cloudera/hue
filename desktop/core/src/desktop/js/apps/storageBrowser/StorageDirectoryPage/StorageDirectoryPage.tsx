@@ -41,7 +41,6 @@ import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
 import { RegularFile, FileStatus } from '../../../utils/hooks/useFileUpload/types';
 import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
-import useResizeObserver from '../../../utils/hooks/useResizeObserver/useResizeObserver';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import StorageDirectoryActions from './StorageDirectoryActions/StorageDirectoryActions';
 import PaginatedTable, {
@@ -155,10 +154,6 @@ const StorageDirectoryPage = ({
     setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
   };
 
-  const [tableRef, rect] = useResizeObserver();
-  // 40px for table header, 50px for pagination
-  const tableBodyHeight = Math.max(rect.height - 90, 100);
-
   const errorConfig = [
     {
       enabled: !!listDirectoryError,
@@ -177,17 +172,15 @@ const StorageDirectoryPage = ({
       width: '40%',
       render: (_, record) => (
         <Tooltip title={record.name} mouseEnterDelay={1.5}>
-          <div className="hue-storage-browser-directory__table-container__name-column">
-            <div className="hue-storage-browser-directory__table-container__name-column__icon">
+          <div className="hue-storage-browser-directory__name-column">
+            <div className="hue-storage-browser-directory__name-column__icon">
               {record.type === BrowserViewType.dir ? (
                 <FolderIcon height={18} width={18} />
               ) : (
                 <FileIcon height={18} width={18} />
               )}
             </div>
-            <div className="hue-storage-browser-directory__table-container__name-column__label">
-              {record.name}
-            </div>
+            <div className="hue-storage-browser-directory__name-column__label">{record.name}</div>
           </div>
         </Tooltip>
       )
@@ -251,32 +244,34 @@ const StorageDirectoryPage = ({
         </div>
       </div>
 
-      <div ref={tableRef} className="hue-storage-browser-directory__table-container">
-        <DragAndDrop onDrop={onFilesDrop}>
-          <LoadingErrorWrapper loading={listDirectoryLoading && !polling} errors={errorConfig}>
-            <PaginatedTable<StorageDirectoryTableData>
-              data={tableData}
-              columns={columnsConfig}
-              rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
-              onRowClick={onRowClicked}
-              onRowSelect={setSelectedFiles}
-              sortByColumn={sortByColumn}
-              setSortByColumn={setSortByColumn}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
-              locale={{ emptyText: t('Folder is empty') }}
-              scroll={{ y: tableBodyHeight }}
-              testId={testId}
-              pagination={{
-                pageSize,
-                setPageSize,
-                setPageNumber,
-                pageStats: filesData?.page
-              }}
-            />
-          </LoadingErrorWrapper>
-        </DragAndDrop>
-      </div>
+      <DragAndDrop onDrop={onFilesDrop}>
+        <LoadingErrorWrapper errors={errorConfig}>
+          <PaginatedTable<StorageDirectoryTableData>
+            loading={listDirectoryLoading && !polling}
+            data={tableData}
+            columns={columnsConfig}
+            rowKey={r => `${r.path}_${r.type}_${r.mtime}`}
+            onRowClick={onRowClicked}
+            onRowSelect={setSelectedFiles}
+            sortByColumn={sortByColumn}
+            setSortByColumn={setSortByColumn}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
+            locale={{
+              emptyText: searchTerm.length ? t('No results found!') : t('Folder is empty')
+            }}
+            isDynamicHeight
+            testId={testId}
+            pagination={{
+              pageSize,
+              setPageSize,
+              setPageNumber,
+              pageStats: filesData?.page
+            }}
+          />
+        </LoadingErrorWrapper>
+      </DragAndDrop>
+
       {filesToUpload.length > 0 && (
         <FileUploadQueue
           filesQueue={filesToUpload}
