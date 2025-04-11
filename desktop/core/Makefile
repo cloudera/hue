@@ -38,4 +38,4 @@ default::
 env-install: $(EXT_ENV_INSTALL) compile
 	@echo '--- Installing $(APP_NAME) into virtual-env'
 	@echo '--- env-install: EXT_ENV_INSTALL: $(EXT_ENV_INSTALL)'
-	@$(ENV_PYTHON) setup.py develop -N -q
+	@$(ENV_PYTHON) -m pip install -e .

@@ -20,7 +20,7 @@ function check_python38_path() {
     echo "Python38 bin does not exists at " $python38_bin
     exit 1
   fi
-  export pip38_bin="$PYTHON38_PATH/bin/pip3.8"
+  export pip_bin="$PYTHON38_PATH/bin/pip3.8"
 }
 
 function check_python39_path() {
@@ -29,7 +29,7 @@ function check_python39_path() {
     echo "Python39 bin does not exists at " $python39_bin
     exit 1
   fi
-  export pip39_bin="$PYTHON39_PATH/bin/pip3.9"
+  export pip_bin="$PYTHON39_PATH/bin/pip3.9"
 }
 
 function check_python310_path() {
@@ -38,7 +38,16 @@ function check_python310_path() {
     echo "Python310 bin does not exists at " $python310_bin
     exit 1
   fi
-  export pip310_bin="$PYTHON310_PATH/bin/pip3.10"
+  export pip_bin="$PYTHON310_PATH/bin/pip3.10"
+}
+
+function check_python311_path() {
+  export python311_bin="$PYTHON311_PATH/bin/python3.11"
+  if [ ! -e "$python311_bin" ]; then
+    echo "Python311 bin does not exists at " $python311_bin
+    exit 1
+  fi
+  export pip_bin="$PYTHON311_PATH/bin/pip3.11"
 }
 
 function check_sqlite3() {
@@ -76,7 +85,7 @@ function redhat7_ppc_install() {
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
       cd ${TOOLS_HOME} && \
-      curl -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=${TOOLS_HOME}/sqlite && make && make install'
@@ -90,8 +99,8 @@ function redhat7_ppc_install() {
       ./configure --enable-shared --prefix=/opt/cloudera/cm-agent && \
       make install'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}''
-    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}''
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
   fi
 }
 
@@ -133,13 +142,13 @@ function redhat8_ppc_install() {
     echo 'export PATH=/usr/local/lib/nodejs/node-v20.11.0-linux-ppc64le/bin:$PATH' >> ~/.bashrc
     source ~/.bashrc
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
       cd ${TOOLS_HOME} && \
-      curl -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=${TOOLS_HOME}/sqlite && make && make install'
@@ -175,13 +184,13 @@ function redhat9_ppc_install() {
     echo 'export PATH=/usr/local/lib/nodejs/node-v20.11.0-linux-ppc64le/bin:$PATH' >> ~/.bashrc
     source ~/.bashrc
     # Pip modules install
-    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
     sudo TOOLS_HOME=${TOOLS_HOME} -- sh -c 'mkdir -p ${TOOLS_HOME} && \
       cd ${TOOLS_HOME} && \
-      curl -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+      curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=${TOOLS_HOME}/sqlite && make && make install'
@@ -192,6 +201,7 @@ function redhat9_ppc_install() {
 function sles12_install() {
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
+    sudo -- sh -c 'zypper refresh'
     sudo -- sh -c 'zypper install -y cyrus-sasl-gssapi \
       cyrus-sasl-plain \
       java-11-openjdk \
@@ -218,11 +228,11 @@ function sles12_install() {
     # Node-v20-LTS is not supported by old OS'es - Redhat7_ppc, Centos7, Ubuntu18, Sles12. So upgrading to node-v16
     sudo -- sh -c 'zypper install -y npm14 nodejs16'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl --insecure -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -233,6 +243,7 @@ function sles12_install() {
 function sles15_install() {
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
+    sudo -- sh -c 'zypper refresh'
     sudo -- sh -c 'zypper install -y cyrus-sasl-gssapi \
       cyrus-sasl-plain \
       java-11-openjdk \
@@ -256,13 +267,13 @@ function sles15_install() {
     # NODEJS 18 install
     sudo -- sh -c 'zypper install -y nodejs18 npm20'
     # Pip modules install
-    sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip310_bin=${pip310_bin} -- sh -c 'ln -fs ${pip310_bin} $(dirname ${pip310_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl --insecure -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
-        tar zxvf sqlite-autoconf-3350500.tar.gz && \
-        cd sqlite-autoconf-3350500 && \
+    sudo -- sh -c 'curl --insecure -o sqlite-autoconf-3450000.tar.gz https://sqlite.org/2024/sqlite-autoconf-3450000.tar.gz && \
+        tar zxvf sqlite-autoconf-3450000.tar.gz && \
+        cd sqlite-autoconf-3450000 && \
         ./configure --prefix=/usr/local/ && make && make install'
     export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
   fi
@@ -293,7 +304,7 @@ function centos7_install() {
     fi
     echo "PG_CONFIG is set to $PG_CONFIG"
     # MySQLdb install
-    sudo -- sh -c 'curl -sSLO https://dev.mysql.com/get/mysql80-community-release-el7-11.noarch.rpm && \
+    sudo -- sh -c 'curl -sSLO https://cloudera-build-us-west-1.vpc.cloudera.com/s3/ARTIFACTS/mysql80-community-release-el7-11.noarch.rpm && \
         rpm -ivh mysql80-community-release-el7-11.noarch.rpm && \
         yum install -y mysql-community-libs mysql-community-client-plugins mysql-community-common'
     # NODEJS 16 install
@@ -302,7 +313,7 @@ function centos7_install() {
     sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - && \
         yum install -y nodejs npm'
     # sqlite3 install
-    sudo -- sh -c 'curl -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -315,9 +326,9 @@ function centos7_install() {
       ./configure --enable-shared --prefix=/opt/cloudera/cm-agent && \
       make install'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
   fi
 }
 
@@ -350,11 +361,11 @@ function redhat8_install() {
     sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash - && \
       yum install -y nodejs'
     # Pip modules install
-    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=/usr/local/ && make && make install'
@@ -382,11 +393,11 @@ function redhat8_arm64_install() {
     sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash - && \
       yum install -y nodejs'
     # Pip modules install
-    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install psycopg2-binary==2.9.6'
-    sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2-binary==2.9.6'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=/usr/local/ && make && make install'
@@ -397,6 +408,7 @@ function redhat8_arm64_install() {
 function ubuntu18_install() {
     if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
+    sudo -- sh -c 'apt-get update'
     sudo -- sh -c 'DEBIAN_FRONTEND=noninteractive apt -qq -y install  \
         krb5-user \
         krb5-kdc \
@@ -438,11 +450,11 @@ function ubuntu18_install() {
     sudo -- sh -c 'curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - && \
       apt -y install nodejs'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -495,11 +507,11 @@ function ubuntu20_install() {
       curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
       apt-get install -y nodejs'
     # Pip modules install
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip38_bin=${pip38_bin} -- sh -c '${pip38_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip38_bin=${pip38_bin} -- sh -c 'ln -fs ${pip38_bin} $(dirname ${pip38_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -509,6 +521,10 @@ function ubuntu20_install() {
 
 function ubuntu22_install() {
     if [[ $FORCEINSTALL -eq 1 ]]; then
+    sudo -- sh -c 'apt update'
+    # Add deadsnakes PPA for Python 3.8
+    sudo -- sh -c 'add-apt-repository ppa:deadsnakes/ppa -y'
+    sudo -- sh -c 'apt update'
     # pre-req install
     sudo -- sh -c 'DEBIAN_FRONTEND=noninteractive apt -qq -y install  \
         krb5-user \
@@ -517,9 +533,9 @@ function ubuntu22_install() {
         libkrb5-dev'
     sudo -- sh -c 'apt -y install \
         ldap-utils \
-        libpython3.10-dev \
-        libpython3.10-minimal \
-        libpython3.10-stdlib \
+        libpython3.8-dev \
+        libpython3.8-minimal \
+        libpython3.8-stdlib \
         libxmlsec1 \
         libxmlsec1-openssl \
         libpq-dev \
@@ -531,7 +547,7 @@ function ubuntu22_install() {
         python3-psycopg2 \
         python3-setuptools \
         python3-wheel \
-        python3.10-venv \
+        python3.8-venv \
         openssl \
         sudo \
         tar \
@@ -550,11 +566,11 @@ function ubuntu22_install() {
       curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
       apt-get install -y nodejs'
     # Pip modules install
-    sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip310_bin=${pip310_bin} -- sh -c '${pip310_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip310_bin=${pip310_bin} -- sh -c 'ln -fs ${pip310_bin} $(dirname ${pip310_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
         tar zxvf sqlite-autoconf-3350500.tar.gz && \
         cd sqlite-autoconf-3350500 && \
         ./configure --prefix=/usr/local/ && make && make install'
@@ -590,11 +606,11 @@ function redhat9_install() {
     sudo -- sh -c 'curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash - && \
       yum install -y nodejs'
     # Pip modules install
-    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
-    sudo pip39_bin=${pip39_bin} -- sh -c '${pip39_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip39_bin=${pip39_bin} -- sh -c 'ln -fs ${pip39_bin} $(dirname ${pip39_bin})/pip'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable=='${VIRTUAL_ENV_RELOCATABLE_VERSION}' mysqlclient==2.1.1'
+    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -Lo sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
       tar zxvf sqlite-autoconf-3350500.tar.gz && \
       cd sqlite-autoconf-3350500 && \
       ./configure --prefix=/usr/local/ && make && make install'

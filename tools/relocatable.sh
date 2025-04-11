@@ -22,13 +22,20 @@ usage() {
   Make a Hue installation relocatable. Run this in the installation
   directory created by 'make install', before you relocate it.
   Usage:
-      $0
+    ./tools/relocatable.sh [python_version]
+  Example:
+    ./tools/relocatable.sh python3.9
   "
   exit 1
 }
 
-if [ $# != 0 ] ; then
+# Check for arguments
+PYTHON_VER=""
+if [ $# -gt 1 ]; then
   usage
+elif [ $# -eq 1 ]; then
+  PYTHON_VER=$1
+  echo "Using Python version: $PYTHON_VER"
 fi
 
 find_os() {
@@ -66,7 +73,9 @@ elif [[ $CURR_DIR == */tools ]]; then
   HUE_ROOT=$(dirname $CURR_DIR)
 fi
 
-ENV_PYTHON="$HUE_ROOT/build/env/bin/python"
+BLD_DIR_BIN="$BLD_DIR_ENV/bin"
+ENV_PYTHON="$BLD_DIR_BIN/python"
+
 VIRTUAL_BOOTSTRAP="$CURR_DIR/virtual-bootstrap/virtual-bootstrap.py"
 
 if [[ ! -e $ENV_PYTHON ]]; then
@@ -84,18 +93,19 @@ fi
 export PATH=$(dirname $ENV_PYTHON):$PATH
 
 PYVER=$($ENV_PYTHON -V 2>&1 | awk '{print $2}' | cut -d '.' -f 1,2)
+BIN_DIR=$(dirname $SYS_PYTHON)
 # Step 1. Fix virtualenv
-if [[ "$PYVER" == "3."[8-9]* || "$PYVER" == "3.10" ]]; then
+if [[ "$PYVER" == "3."[8-9]* || "$PYVER" == "3.11" ]]; then
   echo "Python version is 3.8 or greater"
   pushd .
   cd $HUE_ROOT
-  virtualenv-make-relocatable "build/env"
-  $ENV_PYTHON $VIRTUAL_BOOTSTRAP --relocatable_pth "build/env"
+  $SYS_PYTHON $BIN_DIR/virtualenv-make-relocatable "$BLD_DIR_ENV"
+  # $SYS_PYTHON $VIRTUAL_BOOTSTRAP --relocatable_pth "$BLD_ENV_REL"
   popd
 fi
 
 # Step 1b. Fix any broken lib64 directory
-LIB64="$HUE_ROOT/build/env/lib64"
+LIB64="$HUE_ROOT/$BLD_ENV_REL/lib64"
 if [ -L "$LIB64" -a ! -e "$LIB64" ] ; then
   rm "$LIB64"
   ln -s lib "$LIB64"

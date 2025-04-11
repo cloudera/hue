@@ -17,7 +17,7 @@
 
 
 # <<<< DEV ONLY
-
+# Extended packaging rules to support Python version-specific virtualenv outputs.
 PROD_INCLUDES := \
 	apps \
 	desktop \
@@ -26,10 +26,15 @@ PROD_INCLUDES := \
 	NOTICE.txt \
 	Makefile* \
 	maven \
+	build \
+	app.reg \
+	desktop/conf \
+	desktop/desktop.db \
 	tools/app_reg \
 	tools/virtual-bootstrap \
-	tools/relocatable.sh \
+	tools/relocatable.py \
 	tools/load-balancer \
+	tools/scripts \
 	VERSION \
 	webpack-stats*.json \
 	package.json \
@@ -39,13 +44,13 @@ PROD_INCLUDES := \
 	tsconfig.json
 
 # Check for things in BDIST_EXCLUDES in various apps
+# Excludes more dev-only content and handles packaging across architectures.
 PROD_EXCLUDES := \
 	apps/beeswax/thrift \
 	apps/hello \
 	apps/jframegallery \
-	build \
-	desktop/conf \
-	desktop/desktop.db \
+	desktop/core/regenerate_thrift.sh \
+	desktop/core/ext-py3 \
 	desktop/devtools.mk \
 	desktop/libs/hadoop/regenerate-thrift.sh \
 	ext/thirdparty/js/manifest.json \
@@ -57,13 +62,10 @@ define remove_devtree_exclusions
 		      -name '.gitignore' -o \
 		      -name '.*~' -o \
 		      -name '.#*' -o \
-		      -name 'build' -o \
+		      -name '.pylintrc' -o \
 		      -name 'logs' -o \
 		      -name 'tags' -o \
 		      -name 'target' -o \
-		      -name 'desktop.db' -o \
-		      -name 'app.reg' -o \
-		      -name '*.py[co]' -o \
 		      -name '.*.sw?' \) -not -path '*/boto/*' -prune -exec rm -rf {} \;
 endef
 
@@ -71,13 +73,39 @@ endef
 ###################################
 # Packaging for production release
 ###################################
+.PHONY: release
+release:
+	@echo "--- Preparing general distribution tree at $@"
+	@rm -rf $(BLD_DIR_PROD) $(BLD_DIR_PROD_TGZ)
+	@mkdir -p $(BLD_DIR_PROD)
+	@tar --exclude="build/release" -chf - $(PROD_INCLUDES) | tar -C $(BLD_DIR_PROD) -xf -
+
+	@echo "---- Removing exclusions"
+	@for i in $(PROD_EXCLUDES) ; do rm -rf $(BLD_DIR_PROD)/$$i ; done
+	@echo "---- Removing *.py[co] files"
+	@find $(BLD_DIR_PROD) -iname \*.py[co]  -exec rm -f {} \;
+	@echo "---- Performing remove_devtree_exclusions"
+	$(call remove_devtree_exclusions,$(BLD_DIR_PROD))
+
+	@echo "---- Copying misc files"
+	@cp $(ROOT)/dist/* $(BLD_DIR_PROD)
+	@mv $(BLD_DIR_PROD)/desktop/conf{.dist,}
+	@cp -r $(BLD_DIR_DOC) $(BLD_DIR_PROD)/docs
+
+	@echo "---- Stripping Makefiles"
+	@$(call STRIP_DEV, $(ROOT)/Makefile, $(BLD_DIR_PROD)/Makefile)
+	@$(call STRIP_DEV, $(ROOT)/Makefile.vars.priv, $(BLD_DIR_PROD)/Makefile.vars.priv)
+	@$(call STRIP_DEV, $(APPS_DIR)/Makefile, $(BLD_DIR_PROD)/apps/Makefile)
+	@$(call STRIP_DEV, $(DESKTOP_DIR)/Makefile, $(BLD_DIR_PROD)/desktop/Makefile)
+	@tar --exclude="build/release" -C $(BLD_DIR_PROD)/.. -chzf $(BLD_DIR_PROD_TGZ) hue-$(DESKTOP_VERSION)
+	@echo "---- $(BLD_DIR_PROD_TGZ)"
 
 # Make a tarball
 .PHONY: prod
 prod: $(BLD_DIR_PROD_TGZ)
 
 $(BLD_DIR_PROD_TGZ): $(BLD_DIR_PROD)
-	@tar -C $(BLD_DIR_PROD)/.. -czf $(BLD_DIR_PROD_TGZ) hue-$(DESKTOP_VERSION)
+	@tar --exclude="python" --exclude="build/release/prod" -C $(BLD_DIR_PROD)/.. -czf $(BLD_DIR_PROD_TGZ) hue-$(DESKTOP_VERSION)
 	@echo "--- Generated $(BLD_DIR_PROD_TGZ)"
 
 .PHONY: $(BLD_DIR_PROD)
@@ -85,7 +113,7 @@ $(BLD_DIR_PROD): apps docs locales
 	@echo "--- Preparing general distribution tree at $@"
 	@rm -rf $@
 	@mkdir -p $@
-	tar -cf - $(PROD_INCLUDES) | tar -C $(BLD_DIR_PROD) -xf -
+	tar --exclude="python" --exclude="build/release/prod" -cf - $(PROD_INCLUDES) | tar -C $(BLD_DIR_PROD) -xf -
 
 	@echo "---- Removing exclusions"
 	@for i in $(PROD_EXCLUDES) ; do rm -rf $(BLD_DIR_PROD)/$$i ; done
@@ -103,6 +131,6 @@ $(BLD_DIR_PROD): apps docs locales
 	@$(call STRIP_DEV, $(DESKTOP_DIR)/Makefile, $(BLD_DIR_PROD)/desktop/Makefile)
 	@echo "---- Removing build directories"
 	find $(BLD_DIR_PROD) -name build -prune -exec rm -rf {} \;
-	@$(MAKE) -C $(BLD_DIR_PROD) ext-clean
+	@PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $(BLD_DIR_PROD) ext-clean
 
 # END DEV ONLY >>>>
