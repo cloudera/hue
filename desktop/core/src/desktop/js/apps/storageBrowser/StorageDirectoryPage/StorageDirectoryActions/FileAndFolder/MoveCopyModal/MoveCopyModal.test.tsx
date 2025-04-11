@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MoveCopyModal from './MoveCopyModal';
 import { ActionType } from '../FileAndFolderActions.util';
@@ -83,7 +83,6 @@ describe('MoveCopy Action Component', () => {
           action={ActionType.Copy}
           currentPath={currentPath}
           files={mockFiles}
-          setLoadingFiles={jest.fn()}
           onSuccess={mockOnSuccess}
           onError={mockOnError}
           onClose={mockOnClose}
@@ -103,19 +102,17 @@ describe('MoveCopy Action Component', () => {
           action={ActionType.Copy}
           currentPath={currentPath}
           files={mockFiles}
-          setLoadingFiles={jest.fn()}
           onSuccess={mockOnSuccess}
           onError={mockOnError}
           onClose={mockOnClose}
         />
       );
       fireEvent.click(getByText('folder1'));
-
       const copyButton = getByText('Copy');
-      expect(copyButton).not.toBeDisabled();
+      await waitFor(() => expect(copyButton).not.toBeDisabled());
       fireEvent.click(copyButton);
 
-      expect(mockSave).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
       const formData = new FormData();
       mockFiles.forEach(file => {
@@ -134,7 +131,6 @@ describe('MoveCopy Action Component', () => {
           action={ActionType.Copy}
           currentPath={currentPath}
           files={mockFiles}
-          setLoadingFiles={jest.fn()}
           onSuccess={mockOnSuccess}
           onError={mockOnError}
           onClose={mockOnClose}
@@ -144,8 +140,10 @@ describe('MoveCopy Action Component', () => {
       fireEvent.click(getByText('folder1'));
       fireEvent.click(getByText('Copy'));
 
-      expect(mockSave).toHaveBeenCalledTimes(1);
-      expect(mockOnSuccess).toHaveBeenCalledTimes(1);
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledTimes(1);
+        expect(mockOnSuccess).toHaveBeenCalledTimes(1);
+      });
     });
 
     it('should call onError when the request fails', async () => {
@@ -158,7 +156,6 @@ describe('MoveCopy Action Component', () => {
           action={ActionType.Copy}
           currentPath={currentPath}
           files={mockFiles}
-          setLoadingFiles={jest.fn()}
           onSuccess={mockOnSuccess}
           onError={mockOnError}
           onClose={mockOnClose}
@@ -168,18 +165,19 @@ describe('MoveCopy Action Component', () => {
       fireEvent.click(getByText('folder1'));
       fireEvent.click(getByText('Copy'));
 
-      expect(mockSave).toHaveBeenCalledTimes(1);
-      expect(mockOnError).toHaveBeenCalledTimes(1);
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledTimes(1);
+        expect(mockOnError).toHaveBeenCalledTimes(1);
+      });
     });
 
-    it('should call onClose when the modal is closed', () => {
+    it('should call onClose when the modal is closed', async () => {
       const { getByText } = render(
         <MoveCopyModal
           isOpen={true}
           action={ActionType.Copy}
           currentPath={currentPath}
           files={mockFiles}
-          setLoadingFiles={jest.fn()}
           onSuccess={mockOnSuccess}
           onError={mockOnError}
           onClose={mockOnClose}
@@ -188,7 +186,7 @@ describe('MoveCopy Action Component', () => {
 
       fireEvent.click(getByText('Cancel'));
 
-      expect(mockOnClose).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(mockOnClose).toHaveBeenCalledTimes(1));
     });
   });
 
@@ -200,7 +198,6 @@ describe('MoveCopy Action Component', () => {
           action={ActionType.Move}
           currentPath={currentPath}
           files={mockFiles}
-          setLoadingFiles={jest.fn()}
           onSuccess={mockOnSuccess}
           onError={mockOnError}
           onClose={mockOnClose}
@@ -220,7 +217,6 @@ describe('MoveCopy Action Component', () => {
           action={ActionType.Move}
           currentPath={currentPath}
           files={mockFiles}
-          setLoadingFiles={jest.fn()}
           onSuccess={mockOnSuccess}
           onError={mockOnError}
           onClose={mockOnClose}
@@ -229,10 +225,10 @@ describe('MoveCopy Action Component', () => {
       fireEvent.click(getByText('folder1'));
 
       const moveButton = getByText('Move');
-      expect(moveButton).not.toBeDisabled();
+      await waitFor(() => expect(moveButton).not.toBeDisabled());
       fireEvent.click(moveButton);
 
-      expect(mockSave).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
 
       const formData = new FormData();
       mockFiles.forEach(file => {

@@ -96,7 +96,7 @@ describe('ScheduleTaskModal', () => {
     const input = screen.getByRole('spinbutton');
     fireEvent.change(input, { target: { value: '10' } });
 
-    const submitButton = screen.getByRole('button', { name: /submit/i });
+    const submitButton = screen.getByRole('button', { name: /schedule/i });
 
     fireEvent.click(submitButton);
 

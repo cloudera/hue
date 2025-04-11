@@ -40,20 +40,12 @@ const TaskLogsModal: React.FC<TaskLogsModalProps> = ({ taskId, onClose }): JSX.E
   const errors = [
     {
       enabled: !!error,
-      message: error?.message ?? 'An error occurred while fetching task logs.'
+      message: error?.message ?? t('An error occurred while fetching task logs.')
     }
   ];
 
   return (
-    <Modal
-      title={t('Task Logs')}
-      open={!!taskId}
-      onOk={onClose}
-      onCancel={onClose}
-      width={830}
-      okText={t('Close')}
-      cancellable={false}
-    >
+    <Modal open={!!taskId} title={t('Task Logs')} width={830} onCancel={onClose} footer={false}>
       <LoadingErrorWrapper loading={loading} errors={errors}>
         <div className="hue-task-server-logs">
           <pre>{data}</pre>

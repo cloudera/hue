@@ -29,7 +29,6 @@ interface TrashActionsProps {
   currentPath: FileStats['path'];
   onActionSuccess: () => void;
   onActionError: (error: Error) => void;
-  setLoadingFiles: (value: boolean) => void;
   onTrashEmptySuccess: () => void;
 }
 
@@ -43,7 +42,6 @@ const TrashActions = ({
   currentPath,
   onActionSuccess,
   onActionError,
-  setLoadingFiles,
   onTrashEmptySuccess
 }: TrashActionsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
@@ -62,14 +60,11 @@ const TrashActions = ({
     selectedFiles.forEach(selectedFile => {
       formData.append('path', selectedFile.path);
     });
-    setLoadingFiles(true);
 
     save(formData, { url: TRASH_RESTORE_BULK, onSuccess: onActionSuccess });
   };
 
   const onTrashEmpty = () => {
-    setLoadingFiles(true);
-
     save(undefined, {
       url: TRASH_PURGE,
       onSuccess: onTrashEmptySuccess
@@ -98,25 +93,25 @@ const TrashActions = ({
   return (
     <>
       <BorderlessButton
-        data-event=""
         disabled={!selectedFiles.length || !inRestorableTrash(currentPath)}
         onClick={() => handleActionClick(Actions.restore)}
       >
         {t('Restore')}
       </BorderlessButton>
-      <BorderlessButton data-event="" onClick={() => handleActionClick(Actions.trashEmpty)}>
+      <BorderlessButton onClick={() => handleActionClick(Actions.trashEmpty)}>
         {t('Empty trash')}
       </BorderlessButton>
       <Modal
-        cancelText={t('No')}
-        className="cuix antd"
-        okText={t('Yes')}
-        onCancel={handleModalCancel}
-        onOk={handleModalConfirm}
         open={isModalOpen}
         title={selectedAction === Actions.restore ? t('Restore') : t('Empty trash')}
-        okButtonProps={{ disabled: loading }}
+        className="cuix antd"
+        okText={t('Yes')}
+        onOk={handleModalConfirm}
+        okButtonProps={{ loading }}
+        cancelText={t('No')}
+        onCancel={handleModalCancel}
         cancelButtonProps={{ disabled: loading }}
+        closable={!loading}
       >
         {selectedAction === Actions.restore
           ? t('Are you sure you want to restore these files?')
