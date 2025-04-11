@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
-import { Alert } from 'antd';
+import Alert from 'cuix/dist/components/Alert';
 import ServerLogsHeader from './ServerLogsHeader';
 import { i18nReact } from '../../../utils/i18nReact';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
@@ -43,7 +43,7 @@ const ServerLogs: React.FC = (): JSX.Element => {
     return (
       <div className="hue-server-logs-component">
         <Alert
-          message={t(`Error: ${error}`)}
+          message={`${t('Error:')} ${error}`}
           description={t('An error occurred while fetching server logs.')}
           type="error"
         />
