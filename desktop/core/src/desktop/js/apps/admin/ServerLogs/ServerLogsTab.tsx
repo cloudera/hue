@@ -55,7 +55,7 @@ const ServerLogs: React.FC = (): JSX.Element => {
 
   return (
     <div className="hue-server-logs-component">
-      <LoadingErrorWrapper loading={loading} errors={[]}>
+      <LoadingErrorWrapper loading={loading}>
         <ServerLogsHeader
           onFilterChange={setFilter}
           onWrapLogsChange={setWrapLogs}
