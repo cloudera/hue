@@ -36,7 +36,7 @@
   .hue-table {
     .ant-table-selection-column {
       // This prevents the eplipses from being applied to the selection column
-      text-overflow: initial !important;
+      text-overflow: initial;
     }
 
     .ant-table-placeholder {
