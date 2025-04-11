@@ -167,7 +167,6 @@ const PathBrowser = ({
                 data-testid={`${testId}-dropdown`}
               >
                 <BorderlessButton
-                  data-event=""
                   className="hue-path-browser__dropdown-button"
                   data-testid={`${testId}-dropdown-btn`}
                 >
@@ -205,14 +204,12 @@ const PathBrowser = ({
           onClick={() => setIsEditMode(true)}
           className="hue-path-browser__edit-path-btn"
           data-testid="hue-path-browser__edit-path-btn"
-          data-event={''}
           title={'Edit Path'}
           icon={<EditIcon />}
         />
         <BorderlessButton
           onClick={() => navigator.clipboard.writeText(filePath)}
           className="hue-path-browser__copy-path-btn"
-          data-event={''}
           title={'Copy Path'}
           icon={<CopyPathIcon />}
         />

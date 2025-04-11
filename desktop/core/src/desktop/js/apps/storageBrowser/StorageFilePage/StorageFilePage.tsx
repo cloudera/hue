@@ -156,11 +156,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
               {t('Content')}
               <div className="preview__action-group">
                 {isEditingEnabled && (
-                  <PrimaryButton
-                    data-testid="preview--edit--button"
-                    data-event=""
-                    onClick={handleEdit}
-                  >
+                  <PrimaryButton data-testid="preview--edit--button" onClick={handleEdit}>
                     {t('Edit')}
                   </PrimaryButton>
                 )}
@@ -168,7 +164,6 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                   <>
                     <PrimaryButton
                       data-testid="preview--save--button"
-                      data-event=""
                       onClick={handleSave}
                       disabled={fileContent === data?.contents}
                     >
@@ -177,7 +172,6 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                     <Button
                       role="button"
                       data-testid="preview--cancel--button"
-                      data-event=""
                       onClick={handleCancel}
                     >
                       {t('Cancel')}
@@ -186,11 +180,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                 )}
                 {config?.storage_browser.enable_file_download_button && (
                   <a href={fileDownloadUrl}>
-                    <PrimaryButton
-                      data-testid="preview--download--button"
-                      data-event=""
-                      onClick={handleDownload}
-                    >
+                    <PrimaryButton data-testid="preview--download--button" onClick={handleDownload}>
                       {t('Download')}
                     </PrimaryButton>
                   </a>
@@ -218,11 +208,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
               {fileType === SupportedFileTypes.DOCUMENT && (
                 <div className="preview__document">
                   <div>
-                    <PrimaryButton
-                      data-testid=""
-                      data-event=""
-                      onClick={() => window.open(filePreviewUrl)}
-                    >
+                    <PrimaryButton data-testid="" onClick={() => window.open(filePreviewUrl)}>
                       {t('Preview document')}
                     </PrimaryButton>
                   </div>
