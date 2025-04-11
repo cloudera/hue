@@ -38,3 +38,23 @@ body.ant-scrolling-effect {
 @import url('antd/es/tooltip/style/index.less');
 @import url('antd/es/spin/style/index.less');
 @import url('antd/es/tabs/style/index.less');
+
+// Fix to align icons in buttons with text
+.ant-btn.iconLeft {
+  &:not(.ant-dropdown-trigger) {
+    > span {
+      display: flex;
+    }
+  }
+}
+
+// Fix to align modal buttons with margin-left when buttons are disabled
+.ant-modal-footer {
+  .ant-row {
+    .ant-col {
+      .ant-btn-default {
+        margin-left: 8px;
+      }
+    }
+  }
+}
