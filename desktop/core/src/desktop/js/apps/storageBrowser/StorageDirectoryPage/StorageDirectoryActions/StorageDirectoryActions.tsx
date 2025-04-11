@@ -27,7 +27,6 @@ interface StorageDirectoryActionsProps {
   fileSystem: FileSystem;
   onFilePathChange: (path: string) => void;
   onActionSuccess: () => void;
-  setLoadingFiles: (value: boolean) => void;
   selectedFiles: StorageDirectoryTableData[];
   onFilesDrop: (files: File[]) => void;
 }
@@ -37,17 +36,14 @@ const StorageDirectoryActions = ({
   fileSystem,
   onFilePathChange,
   onActionSuccess,
-  setLoadingFiles,
   selectedFiles,
   onFilesDrop
 }: StorageDirectoryActionsProps): JSX.Element => {
   const onApiSuccess = () => {
-    setLoadingFiles(false);
     onActionSuccess();
   };
 
   const onApiError = (error: Error) => {
-    setLoadingFiles(false);
     huePubSub.publish('hue.error', error);
   };
 
@@ -56,10 +52,9 @@ const StorageDirectoryActions = ({
       <TrashActions
         selectedFiles={selectedFiles}
         currentPath={fileStats.path}
-        setLoadingFiles={setLoadingFiles}
         onActionSuccess={onApiSuccess}
         onActionError={onApiError}
-        onTrashEmptySuccess={() => onFilePathChange(fileSystem.user_home_directory)}
+        onTrashEmptySuccess={() => onFilePathChange(fileSystem.userHomeDirectory)}
       />
     );
   }
@@ -70,13 +65,11 @@ const StorageDirectoryActions = ({
         config={fileSystem.config}
         currentPath={fileStats.path}
         selectedFiles={selectedFiles}
-        setLoadingFiles={setLoadingFiles}
         onActionSuccess={onApiSuccess}
         onActionError={onApiError}
       />
       <CreateAndUploadAction
         currentPath={fileStats.path}
-        setLoadingFiles={setLoadingFiles}
         onActionSuccess={onApiSuccess}
         onActionError={onApiError}
         onFilesUpload={onFilesDrop}

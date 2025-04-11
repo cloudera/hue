@@ -74,37 +74,40 @@ const ScheduleTaskModal = ({ onClose, open = true }: ScheduleTaskModalProps): JS
   const errors = [
     {
       enabled: !!error,
-      message: error?.message ?? 'An unknown error occurred.'
+      message: error?.message ?? t('An unknown error occurred.')
     }
   ];
 
   const selectedTaskChildren =
     scheduleTasksCategory.find(task => task.value === selectedTask)?.children ?? [];
 
-  const isSubmitDisabled =
-    loading || !(selectedTask && selectedTaskChildren.every(task => params[task.value] > 0));
+  const isSubmitDisabled = !(
+    selectedTask && selectedTaskChildren.every(task => params[task.value] > 0)
+  );
 
   return (
     <Modal
       title={t('Schedule Task')}
       open={open}
-      onOk={handleSubmit}
-      onCancel={onClose}
-      okText={t('Submit')}
-      width={530}
-      cancellable={false}
-      okButtonProps={{ disabled: isSubmitDisabled }}
-      cancelButtonProps={{ disabled: loading }}
       className="hue-schedule-task__modal"
       data-testid="hue-schedule-task__modal"
+      width={530}
+      okText={t('Schedule')}
+      onOk={handleSubmit}
+      okButtonProps={{ disabled: isSubmitDisabled, loading }}
+      cancelText={t('Cancel')}
+      onCancel={onClose}
+      cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
-      <LoadingErrorWrapper loading={loading} errors={errors}>
+      <LoadingErrorWrapper errors={errors}>
         <div className="hue-schedule-task-selection">
           <Form.Item label={'Task'}>
             <Radio.Group
               options={dropdownOptions}
               value={selectedTask}
               onChange={e => setSelectedTask(e.target.value)}
+              disabled={loading}
             />
           </Form.Item>
         </div>
@@ -119,6 +122,7 @@ const ScheduleTaskModal = ({ onClose, open = true }: ScheduleTaskModalProps): JS
                     placeholder={param.label}
                     onChange={handleChange}
                     value={params[param.value]}
+                    disabled={loading}
                   />
                 </Form.Item>
               </div>

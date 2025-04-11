@@ -27,7 +27,6 @@ interface MoveCopyModalProps {
   action: ActionType.Copy | ActionType.Move;
   currentPath: FileStats['path'];
   files: StorageDirectoryTableData[];
-  setLoadingFiles: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
@@ -38,7 +37,6 @@ const MoveCopyModal = ({
   action,
   currentPath,
   files,
-  setLoadingFiles,
   onSuccess,
   onError,
   onClose
@@ -51,7 +49,7 @@ const MoveCopyModal = ({
     onError: onError
   });
 
-  const handleCopyOrMove = (destination_path: string) => {
+  const handleCopyOrMove = async (destination_path: string) => {
     const url = {
       [ActionType.Copy]: BULK_COPY_API_URL,
       [ActionType.Move]: BULK_MOVE_API_URL
@@ -67,8 +65,7 @@ const MoveCopyModal = ({
     });
     formData.append('destination_path', destination_path);
 
-    setLoadingFiles(true);
-    save(formData, { url });
+    return save(formData, { url });
   };
 
   return (

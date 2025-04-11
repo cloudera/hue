@@ -68,7 +68,6 @@ const StorageDirectoryPage = ({
   testId,
   reloadTrashPath
 }: StorageDirectoryPageProps): JSX.Element => {
-  const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
   const [filesToUpload, setFilesToUpload] = useState<RegularFile[]>([]);
   const [polling, setPolling] = useState<boolean>(false);
@@ -240,7 +239,6 @@ const StorageDirectoryPage = ({
               reloadFilesData();
               reloadTrashPath();
             }}
-            setLoadingFiles={setLoadingFiles}
             onFilesDrop={onFilesDrop}
           />
         </div>
@@ -249,7 +247,7 @@ const StorageDirectoryPage = ({
       <DragAndDrop onDrop={onFilesDrop}>
         <LoadingErrorWrapper errors={errorConfig}>
           <PaginatedTable<StorageDirectoryTableData>
-            loading={(loadingFiles || listDirectoryLoading) && !polling}
+            loading={listDirectoryLoading && !polling}
             data={tableData}
             columns={columnsConfig}
             rowKey={r => `${r.path}_${r.type}_${r.mtime}`}

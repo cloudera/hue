@@ -77,12 +77,11 @@ describe('FileAndFolderActions', () => {
 
   const mockRecord: StorageDirectoryTableData = mockTwoRecords[0];
 
-  const setLoadingFiles = jest.fn();
   const mockOnActionSuccess = jest.fn();
   const mockOnActionError = jest.fn();
   const mockConfig = {
-    is_trash_enabled: true,
-    is_hdfs_superuser: true,
+    isTrashEnabled: true,
+    isHdfsSuperuser: true,
     groups: ['hue'],
     users: ['hue'],
     superuser: 'hue',
@@ -109,7 +108,6 @@ describe('FileAndFolderActions', () => {
       <FileAndFolderActions
         config={mockConfig}
         onActionError={mockOnActionError}
-        setLoadingFiles={setLoadingFiles}
         onActionSuccess={mockOnActionSuccess}
         selectedFiles={selectedFiles}
         currentPath="/path/to/folder"

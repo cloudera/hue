@@ -30,7 +30,6 @@ jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
 const mockOnActionSuccess = jest.fn();
 const mockOnActionError = jest.fn();
 const mockOnTrashEmptySuccess = jest.fn();
-const mockSetLoadingFiles = jest.fn();
 
 describe('TrashActions Component', () => {
   beforeEach(() => {
@@ -60,7 +59,6 @@ describe('TrashActions Component', () => {
         currentPath={mockCurrentPath}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
         onTrashEmptySuccess={mockOnTrashEmptySuccess}
       />
     );
@@ -77,7 +75,6 @@ describe('TrashActions Component', () => {
         currentPath={mockCurrentPath}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
         onTrashEmptySuccess={mockOnTrashEmptySuccess}
       />
     );
@@ -97,7 +94,6 @@ describe('TrashActions Component', () => {
         currentPath={mockCurrentPath}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
         onTrashEmptySuccess={mockOnTrashEmptySuccess}
       />
     );
@@ -119,7 +115,6 @@ describe('TrashActions Component', () => {
         currentPath={mockCurrentPath}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
         onTrashEmptySuccess={mockOnTrashEmptySuccess}
       />
     );
@@ -127,7 +122,6 @@ describe('TrashActions Component', () => {
     fireEvent.click(getByRole('button', { name: 'Restore' }));
     fireEvent.click(getByRole('button', { name: 'Yes' }));
 
-    expect(mockSetLoadingFiles).toHaveBeenCalledWith(true);
     expect(mockSave).toHaveBeenCalled();
   });
 
@@ -138,7 +132,6 @@ describe('TrashActions Component', () => {
         currentPath={mockCurrentPath}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
         onTrashEmptySuccess={mockOnTrashEmptySuccess}
       />
     );
@@ -146,7 +139,6 @@ describe('TrashActions Component', () => {
     fireEvent.click(getByRole('button', { name: 'Empty trash' }));
     fireEvent.click(getByRole('button', { name: 'Yes' }));
 
-    expect(mockSetLoadingFiles).toHaveBeenCalledWith(true);
     expect(mockSave).toHaveBeenCalled();
   });
 
@@ -157,7 +149,6 @@ describe('TrashActions Component', () => {
         currentPath={mockCurrentPath}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
         onTrashEmptySuccess={mockOnTrashEmptySuccess}
       />
     );
@@ -175,7 +166,6 @@ describe('TrashActions Component', () => {
         currentPath={mockCurrentPath}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
         onTrashEmptySuccess={mockOnTrashEmptySuccess}
       />
     );
@@ -190,7 +180,6 @@ describe('TrashActions Component', () => {
         currentPath={'path/not/restorable'}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
         onTrashEmptySuccess={mockOnTrashEmptySuccess}
       />
     );
@@ -209,7 +198,6 @@ describe('TrashActions Component', () => {
         currentPath={mockCurrentPath}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
         onTrashEmptySuccess={mockOnTrashEmptySuccess}
       />
     );
@@ -231,7 +219,6 @@ describe('TrashActions Component', () => {
         currentPath={mockCurrentPath}
         onActionSuccess={mockOnActionSuccess}
         onActionError={mockOnActionError}
-        setLoadingFiles={mockSetLoadingFiles}
         onTrashEmptySuccess={mockOnTrashEmptySuccess}
       />
     );

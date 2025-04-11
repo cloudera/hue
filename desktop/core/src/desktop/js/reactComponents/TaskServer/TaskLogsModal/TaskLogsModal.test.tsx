@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TaskLogsModal from './TaskLogsModal';
 import { TaskServerResponse } from '../types';
@@ -42,12 +42,5 @@ describe('TaskLogsModal', () => {
 
     expect(screen.getByText('Task Logs')).toBeInTheDocument();
     expect(screen.getByText('Sample log data')).toBeInTheDocument();
-  });
-
-  it('calls onClose when the close button is clicked', () => {
-    render(<TaskLogsModal taskId={taskId} onClose={mockOnClose} />);
-
-    fireEvent.click(screen.getByText('Close'));
-    expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 });

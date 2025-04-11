@@ -16,7 +16,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
-import { Input, Spin, Tooltip } from 'antd';
+import { Input, Tooltip } from 'antd';
 import Table, { ColumnProps } from 'cuix/dist/components/Table';
 import classNames from 'classnames';
 
@@ -30,12 +30,13 @@ import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { BrowserViewType, ListDirectory } from '../types';
 import { LIST_DIRECTORY_API_URL } from '../api';
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './FileChooserModal.scss';
 
 interface FileChooserModalProps {
   onClose: () => void;
-  onSubmit: (destination_path: string) => void;
+  onSubmit: (destination_path: string) => Promise<void>;
   showModal: boolean;
   title: string;
   sourcePath: string;
@@ -60,6 +61,7 @@ const FileChooserModal = ({
   const { t } = i18nReact.useTranslation();
   const { cancelText = t('Cancel'), submitText = t('Submit') } = i18n;
   const [destPath, setDestPath] = useState<string>(sourcePath);
+  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
@@ -130,19 +132,23 @@ const FileChooserModal = ({
     emptyText: t('Folder is empty')
   };
 
+  const handleOk = async () => {
+    setSubmitLoading(true);
+    await onSubmit(destPath);
+    setSubmitLoading(false);
+    onClose();
+  };
+
   return (
     <Modal
-      cancelText={cancelText}
+      open={showModal}
+      title={title}
       className="hue-filechooser-modal cuix antd"
       okText={submitText}
-      title={title}
-      open={showModal}
+      onOk={handleOk}
+      okButtonProps={{ disabled: sourcePath === destPath, loading: submitLoading }}
+      cancelText={cancelText}
       onCancel={onClose}
-      onOk={() => {
-        onSubmit(destPath);
-        onClose();
-      }}
-      okButtonProps={{ disabled: sourcePath === destPath }}
     >
       <div className="hue-filechooser-modal__body">
         <div className="hue-filechooser-modal__path-browser-panel">
@@ -156,7 +162,7 @@ const FileChooserModal = ({
             handleSearch(event.target.value);
           }}
         />
-        <Spin spinning={loading}>
+        <LoadingErrorWrapper loading={loading}>
           <Table
             className="hue-filechooser-modal__table"
             dataSource={tableData}
@@ -173,7 +179,7 @@ const FileChooserModal = ({
             locale={locale}
             showHeader={false}
           />
-        </Spin>
+        </LoadingErrorWrapper>
       </div>
     </Modal>
   );
