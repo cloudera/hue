@@ -24,6 +24,7 @@ import pytest
 import configobj
 
 from desktop.lib.conf import *
+from desktop.lib.conf import coerce_bool, coerce_list
 
 
 def my_dynamic_default():
@@ -186,6 +187,22 @@ class TestConfig(object):
     assert coerce_bool(True)
     with pytest.raises(Exception):
       coerce_bool(tuple("foo"))
+
+  def test_coerce_list(self):
+    assert coerce_list("[]") == []
+    assert coerce_list("Test val") == ["Test val"]
+    assert coerce_list("['Test val 1', 'Test val 2']") == ["Test val 1", "Test val 2"]
+    assert coerce_list("['Test val 1', 'Test val 2, 3']") == ["Test val 1", "Test val 2, 3"]
+    assert coerce_list("['Test val 1', 'Test val \\'2\\'']") == ["Test val 1", "Test val '2'"]
+
+    assert coerce_list(['Test val 1', 'Test val 2']) == ["Test val 1", "Test val 2"]
+
+    with pytest.raises(Exception):
+      coerce_list(tuple("foo"))
+    with pytest.raises(Exception):
+      coerce_list(1)
+    with pytest.raises(Exception):
+      coerce_list("{1:1, 2:2}")
 
   def test_print_help(self):
     out = string_io()
