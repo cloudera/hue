@@ -110,7 +110,7 @@ for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
     export SYS_PYTHON="$PYTHON39_PATH/bin/python3.9"
     export SYS_PIP="$PYTHON39_PATH/bin/pip3.9"
     export VIRTUAL_ENV_VERSION="20.19.0"
-  elif [[ $PYTHON_VER == "python3.11" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "sles15" ) ]]; then
+  elif [[ $PYTHON_VER == "python3.11" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "sles15" || $DOCKEROS == "redhat8-arm64" ) ]]; then
     check_python311_path
     export PATH="$PYTHON311_PATH/bin:$PATH"
     export SYS_PYTHON="$PYTHON311_PATH/bin/python3.11"
