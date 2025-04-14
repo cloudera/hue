@@ -114,6 +114,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
     config?.storage_browser.max_file_editor_size &&
     config?.storage_browser.max_file_editor_size > fileStats.size &&
     EDITABLE_FILE_FORMATS.has(fileType) &&
+    data?.isContentReadable &&
     !inTrash(fileStats.path);
 
   const pageStats = {
@@ -199,7 +200,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
             </div>
 
             <div className="preview__content">
-              {[SupportedFileTypes.TEXT, SupportedFileTypes.OTHER].includes(fileType) && (
+              {data?.isContentReadable === true && (
                 <div className="preview__editable-file">
                   <textarea
                     value={fileContent}
@@ -210,6 +211,13 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                   {pageStats.totalPages > 1 && (
                     <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
                   )}
+                </div>
+              )}
+
+              {(data?.isContentReadable === false ||
+                fileType === SupportedFileTypes.COMPRESSED) && (
+                <div className="preview__unsupported">
+                  {t('Preview is not available for this file.')}
                 </div>
               )}
 
@@ -244,14 +252,6 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                   {t('Your browser does not support the video element.')}
                   <track kind="captions" src="" srcLang="en" label="English" />
                 </video>
-              )}
-
-              {fileType === SupportedFileTypes.COMPRESSED && (
-                <div className="preview__compresed">
-                  {t(
-                    'Preview not available for compressed file. Please download the file to view.'
-                  )}
-                </div>
               )}
             </div>
           </div>

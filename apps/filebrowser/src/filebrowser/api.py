@@ -402,6 +402,7 @@ def display(request):
 
   # Get contents as string for text mode, or at least try
   file_contents = None
+  is_content_readable = True
   if isinstance(contents, str):
     file_contents = contents
     mode = 'text'
@@ -410,7 +411,7 @@ def display(request):
       file_contents = contents.decode(encoding)
       mode = 'text'
     except UnicodeDecodeError:
-      file_contents = contents
+      is_content_readable = False
 
   data = {
     'contents': file_contents,
@@ -418,6 +419,7 @@ def display(request):
     'length': length,
     'end': offset + len(contents),
     'mode': mode,
+    "is_content_readable": is_content_readable
   }
 
   return JsonResponse(data)
