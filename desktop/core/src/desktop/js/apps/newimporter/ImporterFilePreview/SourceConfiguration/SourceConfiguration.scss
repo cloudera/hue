@@ -20,7 +20,7 @@
   .hue-importer-configuration {
     padding: 16px;
 
-    summary {
+    &__summary {
       display: flex;
       gap: 8px;
       width: max-content;

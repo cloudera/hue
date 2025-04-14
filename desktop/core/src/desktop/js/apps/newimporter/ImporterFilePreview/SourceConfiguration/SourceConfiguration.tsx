@@ -44,7 +44,7 @@ const SourceConfiguration = ({
 
   return (
     <details className="hue-importer-configuration">
-      <summary>
+      <summary className="hue-importer-configuration__summary">
         <ConfigureIcon />
         {t('Configure source')}
       </summary>
@@ -56,7 +56,7 @@ const SourceConfiguration = ({
               bordered={true}
               className="hue-importer-configuration__dropdown"
               options={config.options}
-              onChange={v => onChange(v, config.name)}
+              onChange={value => onChange(value, config.name)}
               value={fileFormat?.[config.name]}
               getPopupContainer={triggerNode => triggerNode.parentElement}
             />
