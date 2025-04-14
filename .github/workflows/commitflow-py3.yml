@@ -57,7 +57,7 @@ jobs:
 
         export PYTHON_VER=python${{ matrix.python-version }}
         export ROOT=$PWD
-        make test_prep
+        make apps test_prep
 
     - name: Run python unit tests
       run: |
