@@ -35,7 +35,7 @@ readarray -t SUPPORTED_VERSIONS < <(
 # Create array of supported versions
 SUPPORTED_PYTHON_VERSIONS=("${SUPPORTED_VERSIONS[@]}")
 
-python_bin_path() {
+_python_bin_path() {
   # Searches for the provided python version in various locations on the node
   PYTHON_VERSION="$1"
   PYTHON_VERSION_NO_DOT="${PYTHON_VERSION//./}"
@@ -68,14 +68,20 @@ python_bin_path() {
   return 1
 }
 
-find_latest_python() {
+selected_python_version() {
   # returns the latest py version, e.g., 3.11, 3.9 or 3.8
-  for PYTHON_VERSION in "${SUPPORTED_PYTHON_VERSIONS[@]}"; do
-    if python_bin_path "$PYTHON_VERSION" > /dev/null; then
-      echo "$PYTHON_VERSION"
-      return 0
-    fi
-  done
+  # if HUE_PYTHON_VERSION is set, use it
+  if [ -n "$HUE_PYTHON_VERSION" ]; then
+    echo "$HUE_PYTHON_VERSION" | grep -oP '\d+\.\d+'
+    return 0
+  else
+    for PYTHON_VERSION in "${SUPPORTED_PYTHON_VERSIONS[@]}"; do
+      if _python_bin_path "$PYTHON_VERSION" > /dev/null; then
+        echo "$PYTHON_VERSION"
+        return 0
+      fi
+    done
+  fi
 
   echo "No supported Python versions found in expected locations."
   return 1
@@ -84,12 +90,7 @@ find_latest_python() {
 latest_venv_bin_path() {
   # returns the path to the env/bin of the latest python,
   # relative to the top-level hue directory.
-  local version
-  if [ -n "$HUE_PYTHON_VERSION" ]; then
-    version=$(echo "$HUE_PYTHON_VERSION" | grep -oP '\d+\.\d+')
-  else
-    version="$(find_latest_python)"
-  fi
+  local version="$(selected_python_version)"
 
   if [ -z "$version" ]; then
     return 1  # Return error if no version provided/found
