@@ -111,9 +111,8 @@ include Makefile.tarball
 ###################################
 # Build docs (unused)
 ###################################
-.PHONY: test_prep
-test_prep: apps
-	@$(ENV_PIP) install -r $(REQUIREMENT_TEST_FILE)
+test_prep:
+	@$(ENV_PYTHON) -m pip install -r $(REQUIREMENT_TEST_FILE)
 
 ###################################
 # Build docs (unused)
