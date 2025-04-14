@@ -32,7 +32,7 @@ interface InputModalProps {
   submitText?: string;
   showModal: boolean;
   title: string;
-  buttonDisabled?: boolean;
+  loading?: boolean;
 }
 
 const InputModal = ({
@@ -43,7 +43,7 @@ const InputModal = ({
   onSubmit,
   showModal,
   title,
-  buttonDisabled,
+  loading = false,
   ...i18n
 }: InputModalProps): JSX.Element => {
   const inputRef = useRef<InputRef>(null);
@@ -62,23 +62,26 @@ const InputModal = ({
 
   return (
     <Modal
-      cancelText={cancelText}
-      className="hue-input-modal cuix antd"
-      okText={submitText}
-      onCancel={onClose}
-      onOk={handleSubmit}
       open={showModal}
       title={title}
-      secondaryButtonProps={{ disabled: buttonDisabled }}
-      okButtonProps={{ disabled: buttonDisabled || initialValue === value }}
-      cancelButtonProps={{ disabled: buttonDisabled }}
+      className="hue-input-modal cuix antd"
+      okText={submitText}
+      onOk={handleSubmit}
+      okButtonProps={{
+        disabled: initialValue === value,
+        loading
+      }}
+      cancelText={cancelText}
+      onCancel={onClose}
+      cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
       <div className="hue-input-modal__input-label">{inputLabel}</div>
       <Input
         className="hue-input-modal__input"
         defaultValue={value}
         type={inputType}
-        disabled={buttonDisabled}
+        disabled={loading}
         onPressEnter={handleSubmit}
         ref={inputRef}
         onChange={e => {

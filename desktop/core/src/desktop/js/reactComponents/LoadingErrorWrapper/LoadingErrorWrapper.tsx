@@ -15,38 +15,39 @@
 // limitations under the License.
 
 import React from 'react';
-import { Spin } from 'antd';
-import { PrimaryButton } from 'cuix/dist/components/Button';
+import { Alert, AlertProps, Spin } from 'antd';
+import { BorderlessButton } from 'cuix/dist/components/Button';
+import SpinnerIcon from 'cuix/dist/components/SpinnerIcon';
 
-import { i18nReact } from '../../utils/i18nReact';
 import './LoadingErrorWrapper.scss';
 
 interface WrapperError {
   enabled: boolean;
-  message: string;
+  message: AlertProps['message'];
+  description?: AlertProps['description'];
   action?: string;
-  onClick?: () => void;
+  onClick?: AlertProps['onClick'];
+  closable?: AlertProps['closable'];
 }
 
 interface LoadingErrorWrapperProps {
-  loading: boolean;
-  errors: WrapperError[];
+  loading?: boolean;
+  errors?: WrapperError[];
   children: React.ReactNode;
   hideChildren?: boolean;
 }
 
 const LoadingErrorWrapper = ({
-  loading,
-  errors,
+  loading = false,
+  errors = [],
   children,
   hideChildren = false
 }: LoadingErrorWrapperProps): JSX.Element => {
-  const { t } = i18nReact.useTranslation();
-
   if (loading) {
     return (
       <Spin
         spinning={loading}
+        indicator={<SpinnerIcon size="default" />}
         data-testid="loading-error-wrapper__spinner"
         className="loading-error-wrapper__spinner"
       >
@@ -60,14 +61,15 @@ const LoadingErrorWrapper = ({
     return (
       <>
         {enabledErrors.map(error => (
-          <div className="loading-error-wrapper__error" key={error.message}>
-            <div>{t(error.message)}</div>
-            {error.onClick && (
-              <PrimaryButton onClick={error.onClick} data-event="">
-                {error.action}
-              </PrimaryButton>
-            )}
-          </div>
+          <Alert
+            key={error.message?.toString()}
+            type="error"
+            message={error.message}
+            description={error.description}
+            closable={error.closable}
+            onClick={error.onClick}
+            action={<BorderlessButton onClick={error.onClick}>{error.action}</BorderlessButton>}
+          />
         ))}
       </>
     );
