@@ -68,11 +68,7 @@ const LoadingErrorWrapper = ({
             description={error.description}
             closable={error.closable}
             onClick={error.onClick}
-            action={
-              <BorderlessButton onClick={error.onClick} data-event="">
-                {error.action}
-              </BorderlessButton>
-            }
+            action={<BorderlessButton onClick={error.onClick}>{error.action}</BorderlessButton>}
           />
         ))}
       </>

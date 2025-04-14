@@ -137,7 +137,7 @@ const CreateAndUploadAction = ({
         }}
         trigger={['click']}
       >
-        <PrimaryButton data-event="">
+        <PrimaryButton>
           {t('New')}
           <DropDownIcon />
         </PrimaryButton>
