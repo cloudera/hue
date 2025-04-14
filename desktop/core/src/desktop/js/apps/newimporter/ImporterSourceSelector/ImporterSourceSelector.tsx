@@ -94,7 +94,6 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
               className="hue-importer__source-selector-option-button"
               size="large"
               icon={<DocumentationIcon />}
-              data-event={''}
               onClick={handleUploadClick}
             ></Button>
             <span className="hue-importer__source-selector-option-btn-title">

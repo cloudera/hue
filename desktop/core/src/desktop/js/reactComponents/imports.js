@@ -29,9 +29,6 @@ export async function loadComponent(name) {
     case 'ReactExampleGlobal':
       return (await import('./ReactExampleGlobal/ReactExampleGlobal')).default;
 
-    case 'FileChooserWithButton':
-      return (await import('./FileChooser/FileChooserWithButton/FileChooserWithButton')).default;
-
     case 'WelcomeTour':
       return (await import('./WelcomeTour/WelcomeTour')).default;
 

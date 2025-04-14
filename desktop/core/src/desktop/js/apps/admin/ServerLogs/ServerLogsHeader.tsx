@@ -78,7 +78,6 @@ const ServerLogsHeader: React.FC<ServerLogsHeaderProps> = ({
 
         <Button
           className="server__download-button"
-          data-event="download-button"
           icon={<Download />}
           onClick={handleDownloadClick}
         >
