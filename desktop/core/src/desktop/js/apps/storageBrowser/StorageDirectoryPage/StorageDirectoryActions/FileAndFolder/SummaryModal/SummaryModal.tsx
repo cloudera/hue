@@ -16,7 +16,6 @@
 
 import React from 'react';
 import Modal from 'cuix/dist/components/Modal';
-import { Spin } from 'antd';
 
 import huePubSub from '../../../../../../utils/huePubSub';
 import { i18nReact } from '../../../../../../utils/i18nReact';
@@ -24,6 +23,7 @@ import formatBytes from '../../../../../../utils/formatBytes';
 import useLoadData from '../../../../../../utils/hooks/useLoadData/useLoadData';
 import { CONTENT_SUMMARY_API_URL } from '../../../../api';
 import { ContentSummary, StorageDirectoryTableData } from '../../../../types';
+import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './SummaryModal.scss';
 
@@ -80,15 +80,13 @@ const SummaryModal = ({ isOpen = true, onClose, path }: SummaryModalProps): JSX.
 
   return (
     <Modal
-      className="hue-summary-modal cuix antd"
-      okText={t('Close')}
-      onOk={onClose}
       open={isOpen}
       title={t('Summary for ') + shortendPath}
-      cancellable={false}
+      className="cuix antd"
       onCancel={onClose}
+      footer={false}
     >
-      <Spin spinning={loading}>
+      <LoadingErrorWrapper loading={loading}>
         <div className="hue-summary-modal__grid">
           {summary?.map(item => (
             <div key={item.key} className="hue-summary-modal__grid__summary-item">
@@ -97,7 +95,7 @@ const SummaryModal = ({ isOpen = true, onClose, path }: SummaryModalProps): JSX.
             </div>
           ))}
         </div>
-      </Spin>
+      </LoadingErrorWrapper>
     </Modal>
   );
 };

@@ -23,12 +23,12 @@ import { COMPRESS_API_URL } from '../../../../api';
 import { Input } from 'antd';
 
 import './CompressionModal.scss';
+import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface CompressionModalProps {
   currentPath: string;
   isOpen?: boolean;
   files: StorageDirectoryTableData[];
-  setLoading: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
@@ -38,7 +38,6 @@ const CompressionModal = ({
   currentPath,
   isOpen = true,
   files,
-  setLoading,
   onSuccess,
   onError,
   onClose
@@ -47,15 +46,19 @@ const CompressionModal = ({
   const [value, setValue] = useState<string>(initialName);
   const { t } = i18nReact.useTranslation();
 
-  const { save: saveForm, loading } = useSaveData(COMPRESS_API_URL, {
+  const {
+    save: saveForm,
+    loading,
+    error
+  } = useSaveData(COMPRESS_API_URL, {
+    // TODO: remove silenceErrors once it is default to true in the hook
+    postOptions: { silenceErrors: true },
     skip: !files.length,
     onSuccess,
     onError
   });
 
   const handleCompress = () => {
-    setLoading(true);
-
     const formData = new FormData();
     files.forEach(selectedFile => {
       formData.append('file_name', selectedFile.name);
@@ -66,36 +69,47 @@ const CompressionModal = ({
     saveForm(formData);
   };
 
+  const errors = [
+    {
+      enabled: error?.response?.status === 500,
+      message: t('An error occurred during compression. Please check configuration.'),
+      action: t('Retry'),
+      onClick: handleCompress
+    }
+  ];
+
   return (
     <Modal
       cancelText={t('Cancel')}
       className="cuix antd"
       okText={t('Compress')}
       onCancel={onClose}
-      onOk={() => handleCompress()}
+      onOk={handleCompress}
       open={isOpen}
       title={t('Compress files and folders')}
-      okButtonProps={{ disabled: loading }}
+      okButtonProps={{ disabled: !!error || !value, loading }}
       cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
-      {t('Compressed file name')}
-      <Input
-        value={value}
-        type="text"
-        onPressEnter={() => handleCompress()}
-        onChange={e => {
-          setValue(e.target.value);
-        }}
-      />
+      <LoadingErrorWrapper errors={errors}>
+        {t('Compressed file name')}
+        <Input
+          value={value}
+          type="text"
+          onPressEnter={handleCompress}
+          onChange={e => setValue(e.target.value)}
+          disabled={loading}
+        />
 
-      <div className="compress-action">
-        {t('Following files and folders will be compressed:')}
-        <ul className="compress-action__list">
-          {files.map(file => (
-            <li key={file.path}>{file.name}</li>
-          ))}
-        </ul>
-      </div>
+        <div className="compress-action">
+          {t('Following files and folders will be compressed:')}
+          <ul className="compress-action__list">
+            {files.map(file => (
+              <li key={file.path}>{file.name}</li>
+            ))}
+          </ul>
+        </div>
+      </LoadingErrorWrapper>
     </Modal>
   );
 };
