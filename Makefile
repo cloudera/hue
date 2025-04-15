@@ -159,13 +159,9 @@ $(BLD_DIR_ENV)/bin/python:
 	@mkdir -p $(BLD_DIR_ENV)
 	@$(SYS_PYTHON) -m pip install --upgrade pip==$(PIP_VERSION)
 	@$(SYS_PYTHON) -m pip install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
-ifeq ($(PPC64LE),"ppc64le")
-	@$(SYS_PYTHON) -m venv $(BLD_DIR_ENV)
-else
-	@$(SYS_PYTHON) `which virtualenv` -p $(PYTHON_VER) $(BLD_DIR_ENV) --copies
-endif
+	@$(SYS_PYTHON) -m virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV) --copies
 	@echo "REQUIREMENT_FILE is $(REQUIREMENT_FILE)"
-	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
+	@unset PIP_FIND_LINKS && unset PIP_EXTRA_INDEX_URL && $(ENV_PIP) install -r $(REQUIREMENT_FILE)
 	@echo "--- Virtual environment setup complete for $(PYTHON_VER) ---"
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
 	@echo "--- Finished installing $(NAVOPTAPI_WHL) into virtual-env ---"

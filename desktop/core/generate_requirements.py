@@ -134,6 +134,7 @@ class RequirementsGenerator:
                 "numpy==1.24.4",
                 "pandas==2.0.3",
                 "lxml==4.9.1",
+                "async-timeout==5.0.1",
                 "pure-sasl==0.6.2",
             ],
         }
@@ -150,12 +151,13 @@ class RequirementsGenerator:
                 "numpy==1.24.4",
                 "pandas==2.0.3",
                 "lxml==4.9.1",
+                "async-timeout==5.0.1",
                 "pure-sasl==0.6.2",
             ],
         }
         self.pytorch_requirements = {
             "default": [
-                "--extra-index-url https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu torch==2.2.2+cpu torchvision==0.17.2+cpu",
+                "--extra-index-url \"https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu\" torch==2.2.2+cpu torchvision==0.17.2+cpu",
             ]
         }
         self.arch_requirements_map = {
