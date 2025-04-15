@@ -46,7 +46,7 @@ jobs:
 
           export PYTHON_VER=python3.11
           export ROOT=$PWD
-          make test_prep
+          make apps test_prep
 
       - name: Run python unit tests
         run: |
