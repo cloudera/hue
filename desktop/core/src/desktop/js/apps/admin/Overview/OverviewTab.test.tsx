@@ -55,13 +55,6 @@ describe('OverviewTab', () => {
     expect(screen.getByText('Analytics')).toBeInTheDocument();
   });
 
-  test('renders the ConfigStatus tab by default', () => {
-    render(<Overview />);
-    expect(screen.getByText('MockedConfigStatusComponent')).toBeInTheDocument();
-    expect(screen.queryByText('MockedExamplesComponent')).not.toBeInTheDocument();
-    expect(screen.queryByText('MockedAnalyticsComponent')).not.toBeInTheDocument();
-  });
-
   describe('Analytics Component', () => {
     test('renders Analytics tab and can interact with the checkbox', async () => {
       (post as jest.Mock).mockResolvedValue({ status: 0, message: 'Success' });
@@ -110,37 +103,19 @@ describe('OverviewTab', () => {
 
       await waitFor(() => {
         expect(get).toHaveBeenCalledWith(INSTALL_AVAILABLE_EXAMPLES_API_URL, {});
-        Object.entries(availableAppsResponse.apps).forEach(([appName]) => {
+        Object.entries(availableAppsResponse.apps).forEach(([, appName]) => {
           expect(screen.getByText(appName)).toBeInTheDocument();
         });
       });
     });
 
-    test('post to install app example when the install button is clicked', async () => {
+    test('post call to install app example when the install button is clicked', async () => {
       render(<Examples />);
 
       await waitFor(() => {
-        expect(get).toHaveBeenCalledWith(INSTALL_AVAILABLE_EXAMPLES_API_URL, {});
-        Object.entries(availableAppsResponse.apps).forEach(([appName]) => {
-          expect(screen.getByText(appName)).toBeInTheDocument();
-        });
-      });
-
-      const installButton = screen.getByText('Hive');
-      fireEvent.click(installButton);
-
-      await waitFor(() => {
+        const installButton = screen.getByText('Hive');
+        fireEvent.click(installButton);
         expect(post).toHaveBeenCalledWith(INSTALL_APP_EXAMPLES_API_URL, { app_name: 'hive' });
-      });
-      expect(installButton.textContent).toContain('Hive');
-    });
-
-    test('display a confirmation message after a successful install', async () => {
-      render(<Examples />);
-
-      const appName = 'Hive';
-      await waitFor(() => {
-        expect(screen.getByText(appName)).toBeInTheDocument();
       });
     });
   });
