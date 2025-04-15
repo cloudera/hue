@@ -254,7 +254,6 @@ bdist: ext-eggs compile
 install-bdist: bdist
 	@echo "--- Install built distribution for $(APP_NAME) at $(INSTALL_DIR)"
 	@# Check that INSTALL_DIR is empty
-	@echo "Prakash $(BDIST_DIR)/ $(INSTALL_DIR)"
 	@if [ -n '$(wildcard $(INST_DIR_ENV)/*)' ] ; then \
 	  echo 'ERROR: $(INST_DIR_ENV) not empty. Cowardly refusing to continue.' ; \
 	  false ; \
