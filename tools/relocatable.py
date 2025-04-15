@@ -7,8 +7,9 @@ Complements `virtualenv-make-relocatable` for robust deployment support.
 
 import os
 import site
-from pathlib import Path
 import shutil
+from pathlib import Path
+
 
 def relocate_pth_with_relative_paths(site_packages: str, make_backup: bool = True) -> None:
     """
@@ -66,6 +67,7 @@ def relocate_pth_with_relative_paths(site_packages: str, make_backup: bool = Tru
             print(f"Rewritten with relative paths: {pth_file.name}")
         else:
             print(f"No changes needed: {pth_file.name}")
+
 
 if __name__ == "__main__":
     site_packages_dir = site.getsitepackages()[0]
