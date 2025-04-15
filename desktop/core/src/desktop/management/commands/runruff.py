@@ -107,7 +107,12 @@ class Command(BaseCommand):
       *args: Variable arguments.
       **options: Keyword arguments.
     """
-    ruff_package = paths.get_build_dir('env', 'bin', 'ruff')
+    PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
+
+    if PYTHON_VERSION == "3.11":
+        ruff_package = paths.get_build_dir('env', 'bin', 'ruff')
+    else:
+        ruff_package = paths.get_build_dir('venvs', f'python{PYTHON_VERSION}', 'bin', 'ruff')
 
     if not os.path.exists(ruff_package):
       msg = _(

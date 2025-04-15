@@ -27,6 +27,131 @@ export SCRIPT_DIR=`dirname $0`
 export HUE_HOME_DIR=$(dirname $(dirname "$SCRIPT_DIR"))
 
 source $SCRIPT_DIR/python/python_helper.sh
+PYTHON_BIN="${HUE_HOME_DIR}/$(latest_venv_bin_path)/python"
+HUE="${HUE_HOME_DIR}/$(latest_venv_bin_path)/hue"
+HUE_LOGLISTENER="${HUE_HOME_DIR}/desktop/core/src/desktop/loglistener.py"
+
+function set_path() {
+   etpath=$(dirname $2)
+   if [ "$1" == "PYTHONPATH" ]; then
+     if [ -z ${PYTHONPATH:+x} ]; then
+       # Set only if PYTHONPATH is not set to allow for safety valve
+       export PYTHONPATH=$etpath
+     fi
+   elif [ "$1" == "LD_LIBRARY_PATH" ]; then
+     if [ -z ${LD_LIBRARY_PATH:+x} ]; then
+       # Set only if LD_LIBRARY_PATH is not set to allow for safety valve
+       export LD_LIBRARY_PATH=$etpath
+     fi
+   elif [ "$1" == "PATH" ]; then
+     if [ -z ${PATH:+x} ]; then
+       # Set only if PATH is not set to allow for safety valve
+       export PATH=$etpath
+     else
+       export PATH=$PATH:$etpath
+     fi
+   fi
+}
+
+# This function sets the ENVIRONMENT variable, it has 3 args
+# 1. target file, 2. environment variable name
+# 3. list of possible places where target can be found
+# It iterates over list and tries matching list item and target
+# on the filesystem.
+function set_env_var() {
+  target=$1
+  shift
+  setvar=$1
+  shift
+  search=("$@")
+  targetpath=""
+
+  # Dont use "echo" in the function as last line returns value
+  for spath in ${search[@]}; do
+    tpath=""
+    if echo x"$target" | grep '*' > /dev/null || \
+       echo x"$spath"  | grep '*' > /dev/null; then
+      # sort with newone first
+      glob_path=$(ls -1td $spath/$target 2>/dev/null|head -1)
+      if [ -z ${glob_path:+x} ]; then
+        tpath=""
+      else
+        tpath=$glob_path
+      fi
+    else
+      if [ -e "$spath/$target" ]; then
+        tpath="$spath/$target"
+      fi
+    fi
+    if [ "$tpath" != "" ]; then
+      targetpath=$tpath
+      set_path $setvar $targetpath
+      break
+    fi
+  done
+  echo $targetpath
+}
+
+add_postgres_to_pythonpath_for_version() {
+  local version="$1"  # e.g. "3.8", "3.9", "3.10"
+  
+  # If postgres engine is detected in *.ini files then check for proper psycopg2 version.
+  if grep -q '^\s*engine\s*=\s*postgres\+' *.ini; then
+    if [ -z ${LD_LIBRARY_PATH:+x} ]; then
+      list=("/usr/lib*" "/usr/local/lib/python${version}/*-packages" \
+            "/usr/lib64/python${version}/*-packages" \
+            "/opt/rh/rh-postgresql*/root/usr/lib64" \
+            "/usr/pgsql-*/lib" \
+            )
+      set_env_var "libpq.so" "LD_LIBRARY_PATH" "${list[@]}"
+    else
+      echo "LD_LIBRARY_PATH is taken from safety valve, $LD_LIBRARY_PATH"
+    fi
+
+    if [ -z ${PYTHONPATH:+x} ]; then
+      # If we've included a PSYCOPG2 for this platform, override on PYTHONPATH
+      list=("/usr/bin" "/opt/rh/rh-python${version//./}/root/usr/local/lib64/python${version}/site-packages" \
+            "/usr/local/lib/python${version}/*-packages" \
+            "/usr/lib64/python${version}/*-packages" \
+            )
+      set_env_var "psycopg2" "PYTHONPATH" "${list[@]}"
+    else
+      echo "PYTHONPATH is taken from safety valve, $PYTHONPATH"
+    fi
+  fi
+}
+
+add_mysql_to_pythonpath_for_version() {
+  local version="$1"  # e.g. "3.8", "3.9", "3.10"
+  
+  # If mysql engine is detected in *.ini files then check for proper MySQL-python version.
+  if grep -q '^\s*engine\s*=\s*mysql\+' *.ini; then
+    if [ -z ${LD_LIBRARY_PATH:+x} ]; then
+      list=("/usr/lib*" "/usr/local/lib/python${version}/*-packages" \
+            "/usr/lib64/python${version}/*-packages" \
+            "/opt/rh/rh-mysql*/root/usr/lib64" \
+            "/usr/lib64/mysql" \
+            )
+      set_env_var "libmysqlclient.so" "LD_LIBRARY_PATH" "${list[@]}"
+    else
+      echo "LD_LIBRARY_PATH is taken from safety valve, $LD_LIBRARY_PATH"
+    fi
+
+    if [ -z ${PYTHONPATH:+x} ]; then
+      # If we've included a MySQL-python for this platform, override on PYTHONPATH
+      list=("/usr/bin" "/opt/rh/rh-python${version//./}/root/usr/local/lib64/python${version}/site-packages" \
+            "/usr/local/lib/python${version}/*-packages" \
+            "/usr/lib64/python${version}/*-packages" \
+            )
+      set_env_var "MySQLdb" "PYTHONPATH" "${list[@]}"
+    else
+      echo "PYTHONPATH is taken from safety valve, $PYTHONPATH"
+    fi
+  fi
+}
+
+add_postgres_to_pythonpath_for_version "$(selected_python_version)"
+add_mysql_to_pythonpath_for_version "$(selected_python_version)"
 
 function stop_previous_hueprocs() {
   for p in $(cat /tmp/hue_${HUE_PORT}.pid); do
@@ -36,9 +161,10 @@ function stop_previous_hueprocs() {
   done
 }
 
-PYTHON_BIN="${HUE_HOME_DIR}/$(latest_venv_bin_path)/python"
-HUE="${HUE_HOME_DIR}/$(latest_venv_bin_path)/hue"
-HUE_LOGLISTENER="${HUE_HOME_DIR}/desktop/core/src/desktop/loglistener.py"
+function run_syncdb_and_migrate_subcommands() {
+  "$HUE" makemigrations --noinput
+  "$HUE" migrate --fake-initial
+}
 
 if [[ "dumpdata" == "$1" ]]; then
   umask 037
@@ -48,11 +174,13 @@ elif [[ "syncdb" == "$1" ]]; then
 elif [[ "ldaptest" == "$1" ]]; then
   "$HUE" "$1"
 elif [[ "runcpserver" == "$1" ]]; then
+  run_syncdb_and_migrate_subcommands
   exec "$HUE" "runcpserver"
 elif [[ "rungunicornserver" == "$1" ]]; then
   stop_previous_hueprocs
   exec "$PYTHON_BIN" "$HUE_LOGLISTENER" &
   echo $! > /tmp/hue_${HUE_PORT}.pid
+  run_syncdb_and_migrate_subcommands
   exec "$HUE" "rungunicornserver"
 else
   exec "$HUE" "$@"
