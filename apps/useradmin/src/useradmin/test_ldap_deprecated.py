@@ -15,13 +15,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
+from unittest.mock import patch
 
-from __future__ import absolute_import
-
-import sys
-from unittest.mock import MagicMock, Mock, patch
-
-import ldap
 import pytest
 from django.conf import settings
 from django.urls import reverse
@@ -44,8 +40,16 @@ from useradmin.views import (
   sync_ldap_users_groups,
 )
 
+LOG = logging.getLogger()
+
+try:
+  import ldap
+except ImportError:
+  LOG.warning('ldap module is not available')
+
 
 @pytest.mark.django_db
+@pytest.mark.integration
 class TestUserAdminLdapDeprecated(BaseUserAdminTests):
   def test_useradmin_ldap_user_group_membership_sync(self):
     settings.MIDDLEWARE.append('useradmin.middleware.LdapSynchronizationMiddleware')

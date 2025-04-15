@@ -26,6 +26,7 @@ from useradmin.models import User
 
 
 @pytest.mark.django_db
+@pytest.mark.integration
 class TestLdapBackend():
 
   def setup_method(self):
