@@ -161,7 +161,7 @@ $(BLD_DIR_ENV)/bin/python:
 	@$(SYS_PYTHON) -m pip install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
 	@$(SYS_PYTHON) -m virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV) --copies
 	@echo "REQUIREMENT_FILE is $(REQUIREMENT_FILE)"
-	@unset PIP_FIND_LINKS && unset PIP_EXTRA_INDEX_URL && $(ENV_PIP) install -r $(REQUIREMENT_FILE)
+	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
 	@echo "--- Virtual environment setup complete for $(PYTHON_VER) ---"
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
 	@echo "--- Finished installing $(NAVOPTAPI_WHL) into virtual-env ---"
