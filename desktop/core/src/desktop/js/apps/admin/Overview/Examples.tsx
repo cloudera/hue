@@ -31,6 +31,8 @@ const exampleAppsWithData = [
   { id: 'search', name: 'Solr Search', data: ['log_analytics_demo', 'twitter_demo', 'yelp_demo'] }
 ];
 
+const excludedApps = ['notebook'];
+
 type InstallExamplesResponse = {
   status: number;
   message?: string;
@@ -39,7 +41,7 @@ type InstallExamplesResponse = {
 const Examples = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [installingAppId, setInstallingAppId] = useState<string>('');
-  const [availableApps, setAvailableApps] = useState<[]>([]);
+  const [availableApps, setAvailableApps] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -47,7 +49,13 @@ const Examples = (): JSX.Element => {
       setLoading(true);
       try {
         const response = await get(INSTALL_AVAILABLE_EXAMPLES_API_URL, {});
-        setAvailableApps(response.apps);
+        if (response.apps) {
+          const filteredApps = Object.entries(response.apps)
+            .filter(([appId]) => !excludedApps.includes(appId))
+            .reduce((apps, [appId, appName]) => ({ ...apps, [appId]: appName }), {});
+
+          setAvailableApps(filteredApps);
+        }
       } catch (error) {
         console.error('Error fetching available app examples:', error);
       } finally {
@@ -61,13 +69,34 @@ const Examples = (): JSX.Element => {
   const handleInstall = async exampleApp => {
     setInstallingAppId(exampleApp.id);
     const url = INSTALL_APP_EXAMPLES_API_URL;
-    const data = { app_name: exampleApp.id };
+
+    let actualAppName;
+    switch (exampleApp.id) {
+      case 'spark':
+        actualAppName = 'notebook';
+        break;
+      case 'jobsub':
+        actualAppName = 'oozie';
+        break;
+      default:
+        actualAppName = exampleApp.id;
+    }
+
+    const payload = { app_name: actualAppName };
 
     const appWithExtraData = exampleAppsWithData.find(app => app.id === exampleApp.id);
     if (appWithExtraData && appWithExtraData.data) {
-      data['data'] = appWithExtraData.data;
+      payload['data'] = appWithExtraData.data;
+      appWithExtraData.data.map(eachData => {
+        payload['data'] = eachData;
+        installExamplesCall(url, payload);
+      });
+    } else {
+      installExamplesCall(url, payload);
     }
+  };
 
+  function installExamplesCall(url, data) {
     post<InstallExamplesResponse>(url, data)
       .then(response => {
         const message = response.message ? response.message : t('Examples refreshed');
@@ -82,7 +111,7 @@ const Examples = (): JSX.Element => {
       .finally(() => {
         setInstallingAppId('');
       });
-  };
+  }
 
   return (
     <div className="overview-examples">
