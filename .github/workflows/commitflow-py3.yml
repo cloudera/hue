@@ -61,11 +61,19 @@ jobs:
 
     - name: Run python unit tests
       run: |
-        ./build/env/bin/pytest
+        if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+          ./build/env/bin/pytest
+        else
+          ./build/venvs/python${{ matrix.python-version }}/bin/pytest
+        fi
 
     - name: Run python lints
       run: |
-        PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+        if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+          PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+        else
+          PYTHONWARNINGS=always ./build/venvs/python${{ matrix.python-version }}/bin/hue runruff check
+        fi
 
     - name: Run documentation lints
       run: |

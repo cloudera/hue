@@ -8,12 +8,13 @@ at build time. This tool replaces static requirements.txt and supports:
   - Architecture-aware dependency lists.
 """
 
-import sys
 import os
-import platform
+import sys
 import shutil
+import platform
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
+
 
 class RequirementsGenerator:
     def __init__(self):
@@ -188,6 +189,7 @@ class RequirementsGenerator:
 
     def get_file_name(self):
         return f"{this_dir}/requirements-{self.arch}-{self.python_version_string}.txt"
+
 
 if __name__ == "__main__":
     generator = RequirementsGenerator()

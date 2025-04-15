@@ -52,12 +52,12 @@ commands:
       - run:
           name: run python lints
           command: |
-            PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+            PYTHONWARNINGS=always ./build/venvs/python3.8/bin/hue runruff check
 
       - run:
           name: run tests
           command: |
-            PYTHONWARNINGS=always ./build/env/bin/pytest 
+            PYTHONWARNINGS=always ./build/venvs/python3.8/bin/pytest 
 
       - store_artifacts:
           path: test-reports
