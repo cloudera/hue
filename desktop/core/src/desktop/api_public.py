@@ -91,15 +91,15 @@ def available_app_examples(request):
 
 
 @api_view(["GET"])
-def get_user_preferences(request):
+def get_usage_analytics(request):
   django_request = get_django_request(request)
-  return about_api.get_user_preferences(django_request)
+  return about_api.get_usage_analytics(django_request)
 
 
 @api_view(["POST"])
-def update_user_preferences(request):
+def update_usage_analytics(request):
   django_request = get_django_request(request)
-  return about_api.update_user_preferences(django_request)
+  return about_api.update_usage_analytics(django_request)
 
 
 # Editor

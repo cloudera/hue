@@ -18,85 +18,85 @@ from unittest.mock import Mock, patch
 
 from rest_framework import status
 
-from about.api import get_user_preferences, update_user_preferences
+from about.api import get_usage_analytics, update_usage_analytics
 
 
-class TestUserPreferencesAPI:
-  def test_get_preferences_success(self):
+class TestUsageAnalyticsAPI:
+  def test_get_usage_analytics_success(self):
     with patch('about.api.is_admin') as mock_is_admin:
       with patch('about.api.Settings.get_settings') as mock_get_settings:
         mock_is_admin.return_value = True
         mock_get_settings.return_value = Mock(collect_usage=True)
 
         request = Mock(method='GET', user=Mock())
-        response = get_user_preferences(request)
+        response = get_usage_analytics(request)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {'analytics_enabled': True}
 
-  def test_get_preferences_unauthorized(self):
+  def test_get_usage_analytics_unauthorized(self):
     with patch('about.api.is_admin') as mock_is_admin:
       mock_is_admin.return_value = False
 
       request = Mock(method='GET', user=Mock())
-      response = get_user_preferences(request)
+      response = get_usage_analytics(request)
 
       assert response.status_code == status.HTTP_403_FORBIDDEN
       assert response.data['message'] == "You must be a Hue admin to access this endpoint."
 
-  def test_get_preferences_error(self):
+  def test_get_usage_analytics_error(self):
     with patch('about.api.is_admin') as mock_is_admin:
       with patch('about.api.Settings.get_settings') as mock_get_settings:
         mock_is_admin.return_value = True
         mock_get_settings.side_effect = Exception("Test error")
 
         request = Mock(method='GET', user=Mock())
-        response = get_user_preferences(request)
+        response = get_usage_analytics(request)
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert "Error retrieving user preferences" in response.data['message']
+        assert "Error retrieving usage analytics" in response.data['message']
 
-  def test_update_preferences_success(self):
+  def test_update_usage_analytics_success(self):
     with patch('about.api.is_admin') as mock_is_admin:
       with patch('about.api.Settings.get_settings') as mock_get_settings:
         mock_is_admin.return_value = True
         mock_get_settings.return_value = Mock(save=Mock())
 
         request = Mock(method='POST', user=Mock(), POST={'analytics_enabled': 'true'})
-        response = update_user_preferences(request)
+        response = update_usage_analytics(request)
 
         assert response.status_code == status.HTTP_200_OK
         assert mock_get_settings.return_value.save.called
         assert response.data == {'analytics_enabled': True}
 
-  def test_update_preferences_unauthorized(self):
+  def test_update_usage_analytics_unauthorized(self):
     with patch('about.api.is_admin') as mock_is_admin:
       mock_is_admin.return_value = False
 
       request = Mock(method='POST', user=Mock(), data={'analytics_enabled': 'true'})
-      response = update_user_preferences(request)
+      response = update_usage_analytics(request)
 
       assert response.status_code == status.HTTP_403_FORBIDDEN
       assert response.data['message'] == "You must be a Hue admin to access this endpoint."
 
-  def test_update_preferences_missing_param(self):
+  def test_update_usage_analytics_missing_param(self):
     with patch('about.api.is_admin') as mock_is_admin:
       mock_is_admin.return_value = True
 
       request = Mock(method='POST', user=Mock(), POST={})
-      response = update_user_preferences(request)
+      response = update_usage_analytics(request)
 
       assert response.status_code == status.HTTP_400_BAD_REQUEST
       assert response.data['message'] == 'Missing parameter: analytics_enabled is required.'
 
-  def test_update_preferences_error(self):
+  def test_update_usage_analytics_error(self):
     with patch('about.api.is_admin') as mock_is_admin:
       with patch('about.api.Settings.get_settings') as mock_get_settings:
         mock_is_admin.return_value = True
         mock_get_settings.side_effect = Exception("Test error")
 
         request = Mock(method='POST', user=Mock(), POST={'analytics_enabled': 'true'})
-        response = update_user_preferences(request)
+        response = update_usage_analytics(request)
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert "Error updating user preferences" in response.data['message']
+        assert "Error updating usage analytics" in response.data['message']

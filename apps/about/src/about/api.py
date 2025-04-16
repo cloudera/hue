@@ -27,9 +27,9 @@ from desktop.models import Settings
 LOG = logging.getLogger()
 
 
-def get_user_preferences(request) -> Response:
+def get_usage_analytics(request) -> Response:
   """
-  Retrieve the user preferences for analytics settings.
+  Retrieve the user preference for analytics settings.
 
   Args:
     request (Request): The HTTP request object.
@@ -39,7 +39,7 @@ def get_user_preferences(request) -> Response:
 
   Raises:
     403: If the user is not a Hue admin.
-    500: If there is an error retrieving preferences.
+    500: If there is an error retrieving preference.
   """
   if not is_admin(request.user):
     return Response({'message': "You must be a Hue admin to access this endpoint."}, status=status.HTTP_403_FORBIDDEN)
@@ -49,14 +49,14 @@ def get_user_preferences(request) -> Response:
     return Response({'analytics_enabled': settings.collect_usage}, status=status.HTTP_200_OK)
 
   except Exception as e:
-    message = f"Error retrieving user preferences: {e}"
+    message = f"Error retrieving usage analytics: {e}"
     LOG.error(message)
     return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def update_user_preferences(request) -> Response:
+def update_usage_analytics(request) -> Response:
   """
-  Update the user preferences for analytics settings.
+  Update the user preference for analytics settings.
 
   Args:
     request (Request): The HTTP request object containing 'analytics_enabled' parameter.
@@ -67,7 +67,7 @@ def update_user_preferences(request) -> Response:
   Raises:
     403: If the user is not a Hue admin.
     400: If 'analytics_enabled' parameter is missing or invalid.
-    500: If there is an error updating preferences.
+    500: If there is an error updating preference.
   """
   if not is_admin(request.user):
     return Response({'message': "You must be a Hue admin to access this endpoint."}, status=status.HTTP_403_FORBIDDEN)
@@ -85,6 +85,6 @@ def update_user_preferences(request) -> Response:
     return Response({'analytics_enabled': settings.collect_usage}, status=status.HTTP_200_OK)
 
   except Exception as e:
-    message = f"Error updating user preferences: {e}"
+    message = f"Error updating usage analytics: {e}"
     LOG.error(message)
     return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
