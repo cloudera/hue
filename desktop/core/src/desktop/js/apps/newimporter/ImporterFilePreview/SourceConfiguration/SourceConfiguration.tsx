@@ -51,10 +51,11 @@ const SourceConfiguration = ({
       <div className="hue-importer-configuration-options">
         {sourceConfigs.map(config => (
           <div key={config.name}>
-            <label>{t(config.label)}</label>
+            <label htmlFor={config.name}>{t(config.label)}</label>
             <Select
               bordered={true}
               className="hue-importer-configuration__dropdown"
+              id={config.name}
               options={config.options}
               onChange={value => onChange(value, config.name)}
               value={fileFormat?.[config.name]}
