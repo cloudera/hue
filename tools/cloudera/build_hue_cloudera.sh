@@ -69,7 +69,7 @@ function install_prerequisite() {
   elif [[ $1 == "redhat9" ]]; then
     redhat9_install
   elif [[ $1 == "ubuntu22" ]]; then
-    ubuntu22_install
+    ubuntu22_install $2
   elif [[ $1 == "redhat8-arm64" ]]; then
     redhat8_arm64_install
   fi
@@ -110,7 +110,7 @@ for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
     export SYS_PYTHON="$PYTHON39_PATH/bin/python3.9"
     export SYS_PIP="$PYTHON39_PATH/bin/pip3.9"
     export VIRTUAL_ENV_VERSION="20.19.0"
-  elif [[ $PYTHON_VER == "python3.11" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "sles15" || $DOCKEROS == "redhat8-arm64" ) ]]; then
+  elif [[ $PYTHON_VER == "python3.11" && ( $DOCKEROS == "redhat9" || $DOCKEROS == "redhat8" || $DOCKEROS == "sles15" || $DOCKEROS == "redhat8-arm64" || $DOCKEROS == "ubuntu22" ) ]]; then
     check_python311_path
     export PATH="$PYTHON311_PATH/bin:$PATH"
     export SYS_PYTHON="$PYTHON311_PATH/bin/python3.11"
@@ -121,7 +121,7 @@ for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
   fi
 
   big_console_header "Hue PreRequisite Start for" $PYTHON_VER "$@"
-  install_prerequisite $DOCKEROS
+  install_prerequisite $DOCKEROS $PYTHON_VER
   big_console_header "Hue PreRequisite End for" $PYTHON_VER "$@"
 
   HUE_SRC=$(realpath "$WORK_DIR/../..")
