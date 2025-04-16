@@ -18,10 +18,10 @@
 from builtins import object
 import json
 import os
+import pytest
 import uuid
 
 from django.urls import reverse
-from nose.tools import assert_true, assert_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 
@@ -37,30 +37,31 @@ class MockRdbms(object):
     return ['table1', 'table2']
 
 
+@pytest.mark.django_db
 class TestMockedRdbms(object):
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client()
 
     # Mock DB calls as we don't need the real ones
     self.prev_dbms = dbms.get
     dbms.get = lambda a, b: MockRdbms()
 
-  def tearDown(self):
+  def teardown_method(self):
     # Remove monkey patching
     dbms.get = self.prev_dbms
 
   def test_basic_flow(self):
     response = self.client.get("/rdbms/")
-    assert_true(b'DB Query' in response.content, response.content)
+    assert b'DB Query' in response.content, response.content
 
   def test_config_error(self):
     self.finish = rdbms_conf.DATABASES.set_for_testing({})
 
     response = self.client.get("/rdbms/")
-    assert_true(b'There are currently no databases configured.' in response.content)
+    assert b'There are currently no databases configured.' in response.content
 
     response = self.client.get("/rdbms/execute/")
-    assert_true(b'There are currently no databases configured.' in response.content)
+    assert b'There are currently no databases configured.' in response.content
 
     self.finish()
 
@@ -75,7 +76,7 @@ class TestSQLiteRdbmsBase(object):
   def teardown_class(cls):
     os.remove(cls.database)
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client()
     self.finish = rdbms_conf.DATABASES.set_for_testing({
       'sqlitee': {
@@ -84,7 +85,7 @@ class TestSQLiteRdbmsBase(object):
       }
     })
 
-  def tearDown(self):
+  def teardown_method(self):
     self.finish()
 
   @classmethod
@@ -97,30 +98,31 @@ class TestSQLiteRdbmsBase(object):
     connection.close()
 
 
+@pytest.mark.django_db
 class TestAPI(TestSQLiteRdbmsBase):
   def test_get_servers(self):
     response = self.client.get(reverse('rdbms:api_servers'))
     response_dict = json.loads(response.content)
-    assert_true('sqlitee' in response_dict['servers'], response_dict)
+    assert 'sqlitee' in response_dict['servers'], response_dict
 
   def test_get_databases(self):
     response = self.client.get(reverse('rdbms:api_databases', args=['sqlitee']))
     response_dict = json.loads(response.content)
-    assert_true(self.database in response_dict['databases'], response_dict)
+    assert self.database in response_dict['databases'], response_dict
 
   def test_get_tables(self):
     response = self.client.get(reverse('rdbms:api_tables', args=['sqlitee', self.database]))
     response_dict = json.loads(response.content)
-    assert_true('test1' in response_dict['tables'], response_dict)
+    assert 'test1' in response_dict['tables'], response_dict
 
   def test_get_columns(self):
     response = self.client.get(reverse('rdbms:api_columns', args=['sqlitee', self.database, 'test1']))
     response_dict = json.loads(response.content)
-    assert_true('date' in response_dict['columns'], response_dict)
-    assert_true('trans' in response_dict['columns'], response_dict)
-    assert_true('symbol' in response_dict['columns'], response_dict)
-    assert_true('qty' in response_dict['columns'], response_dict)
-    assert_true('price' in response_dict['columns'], response_dict)
+    assert 'date' in response_dict['columns'], response_dict
+    assert 'trans' in response_dict['columns'], response_dict
+    assert 'symbol' in response_dict['columns'], response_dict
+    assert 'qty' in response_dict['columns'], response_dict
+    assert 'price' in response_dict['columns'], response_dict
 
   def test_execute_query(self):
     data = {
@@ -133,7 +135,7 @@ class TestAPI(TestSQLiteRdbmsBase):
     for tb in traceback.extract_stack():
       print(tb)
     response_dict = json.loads(response.content)
-    assert_equal(1, len(response_dict['results']['rows']), response_dict)
+    assert 1 == len(response_dict['results']['rows']), response_dict
 
   def test_explain_query(self):
     data = {
@@ -143,12 +145,12 @@ class TestAPI(TestSQLiteRdbmsBase):
     }
     response = self.client.post(reverse('rdbms:api_explain_query'), data, follow=True)
     response_dict = json.loads(response.content)
-    assert_true(len(response_dict['results']['rows']) > 0, response_dict)
+    assert len(response_dict['results']['rows']) > 0, response_dict
 
   def test_options(self):
     finish = rdbms_conf.DATABASES['sqlitee'].OPTIONS.set_for_testing({'nonsensical': None})
     try:
       self.client.get(reverse('rdbms:api_tables', args=['sqlitee', self.database]))
     except TypeError as e:
-      assert_true('nonsensical' in str(e), e)
+      assert 'nonsensical' in str(e), e
     finish()

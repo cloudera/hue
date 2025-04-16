@@ -16,16 +16,11 @@
 # limitations under the License.
 
 import os.path
-import sys
 
-from desktop.lib.conf import Config
+from django.utils.translation import gettext_lazy as _
+
 from desktop.lib import paths
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
-
+from desktop.lib.conf import Config
 
 LOCAL_DATA_DIR = Config(
   key="local_data_dir",

@@ -16,32 +16,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import json
-import sys
+import logging
+from unittest.mock import MagicMock, Mock, patch
 
+import pytest
 from django.urls import reverse
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
-from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.connectors.models import Connector
+from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
 
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestInstallExamples():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=True, is_admin=True)
     self.user = User.objects.get(username="test")
-
 
   def test_install_via_insert_mysql(self):
     with patch('notebook.views.Connector.objects') as ConnectorObjects:
@@ -70,17 +64,14 @@ class TestInstallExamples():
             resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default', 'dialect': 'mysql'})
             data = json.loads(resp.content)
 
-            assert_equal(0, data['status'], data)
-            assert_equal(
+            assert 0 == data['status'], data
+            assert (
                 'Query Sample: Salary Analysis mysql installed. '
-                'Table default.employe_sample installed.',
-                data['message'],
-                data
-            )
-            assert_equal('', data['errorMessage'], data)
+                'Table default.employe_sample installed.' ==
+                data['message']), data
+            assert '' == data['errorMessage'], data
 
             make_notebook.assert_called()
-
 
   def test_install_via_load_hive(self):
     with patch('notebook.views.Connector.objects') as ConnectorObjects:
@@ -116,8 +107,8 @@ class TestInstallExamples():
                 resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default'})
                 data = json.loads(resp.content)
 
-                assert_equal(0, data['status'], data)
-                assert_equal(
+                assert 0 == data['status'], data
+                assert (
                     'Query Sample: Top salary hive installed. '
                     'Query Sample: Salary growth hive installed. '
                     'Query Sample: Job loss hive installed. '
@@ -125,16 +116,13 @@ class TestInstallExamples():
                     'Table default.sample_07 installed. '
                     'Table default.sample_08 installed. '
                     'Table default.customers installed. '
-                    'Table default.web_logs installed.',
-                    data['message'],
-                    data
-                )
-                assert_equal('', data['errorMessage'], data)
+                    'Table default.web_logs installed.' ==
+                    data['message']), data
+                assert '' == data['errorMessage'], data
 
                 make_notebook.assert_called()
 
                 fs.do_as_user.assert_called()
-
 
   def test_install_via_insert_hive(self):
     with patch('notebook.views.Connector.objects') as ConnectorObjects:
@@ -166,8 +154,8 @@ class TestInstallExamples():
               resp = self.client.post(reverse('notebook:install_examples'), {'db_name': 'default'})
               data = json.loads(resp.content)
 
-              assert_equal(0, data['status'], data)
-              assert_equal(
+              assert 0 == data['status'], data
+              assert (
                   'Query Sample: Top salary hive installed. '
                   'Query Sample: Salary growth hive installed. '
                   'Query Sample: Job loss hive installed. '
@@ -175,10 +163,8 @@ class TestInstallExamples():
                   'Table default.sample_07 installed. '
                   'Table default.sample_08 installed. '
                   # 'Table default.customers installed. '  # Not supported via INSERT yet
-                  'Table default.web_logs installed.',
-                  data['message'],
-                  data
-              )
-              assert_equal('', data['errorMessage'], data)
+                  'Table default.web_logs installed.' ==
+                  data['message']), data
+              assert '' == data['errorMessage'], data
 
               make_notebook.assert_called()

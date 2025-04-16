@@ -15,35 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import zip
+import sys
 import json
 import logging
-import sys
+from builtins import zip
+from unittest.mock import Mock, patch
 
+import pytest
+from django.test import TestCase
 from django.urls import reverse
-from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.auth.backend import rewrite_user
 from desktop.conf import ENABLE_ORGANIZATIONS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
-from useradmin.models import User
-
 from metadata.optimizer_api import _convert_queries
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
-
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
 
-
+@pytest.mark.django_db
 class TestApi():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -51,7 +46,6 @@ class TestApi():
     if not ENABLE_ORGANIZATIONS.get():
       add_to_group('test')
       grant_access("test", "test", "metadata")
-
 
   def test_risk_ui_api(self):
     snippet = {
@@ -95,11 +89,11 @@ class TestApi():
       })
 
       data = json.loads(response.content)
-      assert_equal(0, data['status'], data)
+      assert 0 == data['status'], data
 
 
-class TestOptimizerApi(object):
-  integration = True
+@pytest.mark.integration
+class TestOptimizerApi(TestCase):
 
   @classmethod
   def setup_class(cls):
@@ -110,12 +104,10 @@ class TestOptimizerApi(object):
     grant_access("test", "test", "metadata")
     grant_access("test", "test", "optimizer")
 
-
   @classmethod
   def teardown_class(cls):
     cls.user.is_superuser = False
     cls.user.save()
-
 
   # Should run first
   def test_upload(self):
@@ -245,4 +237,4 @@ class TestOptimizerApi(object):
     ]
 
     for query, expected_query in zip(csv_queries, expected_queries):
-      assert_equal(query, expected_query)
+      assert query == expected_query

@@ -25,12 +25,13 @@ import atexit
 import json
 import logging
 import os
+import pytest
 import subprocess
 import threading
 import time
 
-from nose.tools import assert_true, assert_false
 from django.urls import reverse
+from django.test import TestCase
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
@@ -76,7 +77,10 @@ def _start_server(cluster):
 
   env = cluster._mr2_env.copy()
 
-  hadoop_cp_proc = subprocess.Popen(args=[get_run_root('ext/hadoop/hadoop') + '/bin/hadoop', 'classpath'], env=env, cwd=cluster._tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  hadoop_cp_proc = subprocess.Popen(
+    args=[get_run_root('ext/hadoop/hadoop') + '/bin/hadoop', 'classpath'],
+    env=env, cwd=cluster._tmpdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+  )
   hadoop_cp_proc.wait()
   hadoop_cp = hadoop_cp_proc.stdout.read().strip()
 
@@ -342,10 +346,16 @@ def verify_history(client, fragment, design=None, reverse=False, server_name='be
   Return the size of the history; -1 if we fail to determine it.
   """
   resp = client.get('/%(server_name)s/query_history' % {'server_name': server_name})
-  my_assert = reverse and assert_false or assert_true
-  my_assert(fragment in resp.content, resp.content)
-  if design:
-    my_assert(design in resp.content, resp.content)
+  if reverse:
+    if fragment in resp.content:
+      raise AssertionError(f"Unexpected fragment '{fragment}' found in response:\n{resp.content}")
+    if design and design in resp.content:
+      raise AssertionError(f"Unexpected design '{design}' found in response:\n{resp.content}")
+  else:
+    if fragment not in resp.content:
+      raise AssertionError(f"Fragment '{fragment}' not found in response:\n{resp.content}")
+    if design and design not in resp.content:
+      raise AssertionError(f"Design '{design}' not found in response:\n{resp.content}")
 
   if resp.context:
     try:
@@ -356,9 +366,8 @@ def verify_history(client, fragment, design=None, reverse=False, server_name='be
   LOG.warning('Cannot find history size. Response context clobbered')
   return -1
 
-
-class BeeswaxSampleProvider(object):
-  integration = True
+@pytest.mark.integration
+class BeeswaxSampleProvider(TestCase):
 
   """
   Setup the test db and install sample data
@@ -377,7 +386,7 @@ class BeeswaxSampleProvider(object):
     grant_access('test', 'test', 'metastore')
 
     # Weird redirection to avoid binding nonsense.
-    cls.shutdown = [ shutdown ]
+    cls.shutdown = [shutdown]
     cls.init_beeswax_db()
 
   @classmethod
@@ -407,7 +416,7 @@ class BeeswaxSampleProvider(object):
 
           # Check the cleanup
           databases = db.get_databases()
-          assert_false(db_name in databases)
+          assert not db_name in databases
 
       global _INITIALIZED
       _INITIALIZED = False

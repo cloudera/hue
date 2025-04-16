@@ -16,6 +16,8 @@
 
 import jQuery from 'jquery';
 
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 import scrollbarWidth from 'utils/screen/scrollbarWidth';
 
@@ -326,7 +328,9 @@ Plugin.prototype.init = function (optionalPath) {
           });
         }
       } else {
-        $.jHueNotify.error(data.error);
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+          message: data.error
+        });
       }
     });
   }

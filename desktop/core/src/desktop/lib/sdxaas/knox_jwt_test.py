@@ -14,19 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import unittest
-
-from nose.tools import assert_equal, assert_raises
+import pytest
+from unittest.mock import patch, Mock
 
 from desktop.conf import SDXAAS
 from desktop.lib.sdxaas.knox_jwt import handle_knox_ha, fetch_jwt
 from desktop.lib.exceptions_renderable import PopupException
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
 
 def test_handle_knox_ha():
@@ -37,33 +30,56 @@ def test_handle_knox_ha():
 
       # Non-HA mode
       reset = SDXAAS.TOKEN_URL.set_for_testing('https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/')
-
       try:
         knox_url = handle_knox_ha()
-        assert_equal(knox_url, 'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/')
+
+        assert knox_url == 'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/'
+        assert requests_get.call_count == 0 # Simply returning the URL string
       finally:
         reset()
+        requests_get.reset_mock()
 
-      # HA mode - where first URL sends 200 status code
+      # HA mode - When gateway0 is healthy and gateway1 is unhealthy
+      requests_get.side_effect = [Mock(status_code=200), Mock(status_code=404)]
       reset = SDXAAS.TOKEN_URL.set_for_testing(
         'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/, https://knox-gateway1.gethue.com:8443/dl-name/kt-kerberos/')
 
       try:
         knox_url = handle_knox_ha()
-        assert_equal(knox_url, 'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/')
+
+        assert knox_url == 'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/'
+        assert requests_get.call_count == 1
       finally:
         reset()
+        requests_get.reset_mock()
 
-      # When no Knox URL is healthy
+      # HA mode - When gateway0 is unhealthy and gateway1 is healthy
+      requests_get.side_effect = [Mock(status_code=404), Mock(status_code=200)]
+      reset = SDXAAS.TOKEN_URL.set_for_testing(
+        'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/, https://knox-gateway1.gethue.com:8443/dl-name/kt-kerberos/')
+
+      try:
+        knox_url = handle_knox_ha()
+
+        assert knox_url == 'https://knox-gateway1.gethue.com:8443/dl-name/kt-kerberos/'
+        assert requests_get.call_count == 2
+      finally:
+        reset()
+        requests_get.reset_mock()
+
+      # When both gateway0 and gateway1 are unhealthy
       requests_get.return_value = Mock(status_code=404)
       reset = SDXAAS.TOKEN_URL.set_for_testing(
         'https://knox-gateway0.gethue.com:8443/dl-name/kt-kerberos/, https://knox-gateway1.gethue.com:8443/dl-name/kt-kerberos/')
 
       try:
         knox_url = handle_knox_ha()
-        assert_equal(knox_url, None)
+
+        assert knox_url == None
+        assert requests_get.call_count == 2
       finally:
         reset()
+        requests_get.reset_mock()
 
 
 def test_fetch_jwt():
@@ -81,8 +97,9 @@ def test_fetch_jwt():
           auth=HTTPKerberosAuth(), 
           verify=False
         )
-        assert_equal(jwt_token, "test_jwt_token")
+        assert jwt_token == "test_jwt_token"
 
         # Raises PopupException when knox_url is not available
         handle_knox_ha.return_value = None
-        assert_raises(PopupException, fetch_jwt)
+        with pytest.raises(PopupException):
+          fetch_jwt()

@@ -181,10 +181,9 @@ class MetastoreViewModel {
     });
 
     huePubSub.subscribe('metastore.url.change', () => {
-      const prefix =
-        window.HUE_BASE_URL && window.HUE_BASE_URL.length
-          ? window.HUE_BASE_URL + '/metastore/'
-          : '/hue/metastore/';
+      const possibleKnoxUrlPathPrefix = window.HUE_BASE_URL;
+      const prefix = possibleKnoxUrlPathPrefix + '/hue/metastore/';
+
       if (this.source() && this.source().namespace()) {
         const params = {
           source_type: this.source().type

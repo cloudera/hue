@@ -17,9 +17,7 @@
 
 from builtins import object
 import logging
-
-from nose.plugins.attrib import attr
-from nose.tools import assert_equal, assert_true, assert_not_equal
+import pytest
 
 from hadoop import cluster, pseudo_hdfs4
 from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
@@ -36,8 +34,8 @@ from liboozie.submittion import Submission
 LOG = logging.getLogger()
 
 
-@attr('integration')
-@attr('requires_hadoop')
+@pytest.mark.integration
+@pytest.mark.requires_hadoop
 def test_copy_files():
   cluster = pseudo_hdfs4.shared_cluster()
 
@@ -87,10 +85,10 @@ def test_copy_files():
     submission._copy_files(external_deployment_dir, "<xml>My XML</xml>")
 
     # All sources still there
-    assert_true(cluster.fs.exists(jar_1))
-    assert_true(cluster.fs.exists(jar_2))
-    assert_true(cluster.fs.exists(jar_3))
-    assert_true(cluster.fs.exists(jar_4))
+    assert cluster.fs.exists(jar_1)
+    assert cluster.fs.exists(jar_2)
+    assert cluster.fs.exists(jar_3)
+    assert cluster.fs.exists(jar_4)
 
     deployment_dir = deployment_dir + '/lib'
     external_deployment_dir = external_deployment_dir + '/lib'
@@ -99,15 +97,15 @@ def test_copy_files():
     list_dir_deployement = cluster.fs.listdir(external_deployment_dir)
 
     # All destinations there
-    assert_true(cluster.fs.exists(deployment_dir + '/udf1.jar'), list_dir_workspace)
-    assert_true(cluster.fs.exists(deployment_dir + '/udf2.jar'), list_dir_workspace)
-    assert_true(cluster.fs.exists(deployment_dir + '/udf3.jar'), list_dir_workspace)
-    assert_true(cluster.fs.exists(deployment_dir + '/udf4.jar'), list_dir_workspace)
+    assert cluster.fs.exists(deployment_dir + '/udf1.jar'), list_dir_workspace
+    assert cluster.fs.exists(deployment_dir + '/udf2.jar'), list_dir_workspace
+    assert cluster.fs.exists(deployment_dir + '/udf3.jar'), list_dir_workspace
+    assert cluster.fs.exists(deployment_dir + '/udf4.jar'), list_dir_workspace
 
-    assert_true(cluster.fs.exists(external_deployment_dir + '/udf1.jar'), list_dir_deployement)
-    assert_true(cluster.fs.exists(external_deployment_dir + '/udf2.jar'), list_dir_deployement)
-    assert_true(cluster.fs.exists(external_deployment_dir + '/udf3.jar'), list_dir_deployement)
-    assert_true(cluster.fs.exists(external_deployment_dir + '/udf4.jar'), list_dir_deployement)
+    assert cluster.fs.exists(external_deployment_dir + '/udf1.jar'), list_dir_deployement
+    assert cluster.fs.exists(external_deployment_dir + '/udf2.jar'), list_dir_deployement
+    assert cluster.fs.exists(external_deployment_dir + '/udf3.jar'), list_dir_deployement
+    assert cluster.fs.exists(external_deployment_dir + '/udf4.jar'), list_dir_deployement
 
     stats_udf1 = cluster.fs.stats(deployment_dir + '/udf1.jar')
     stats_udf2 = cluster.fs.stats(deployment_dir + '/udf2.jar')
@@ -116,10 +114,10 @@ def test_copy_files():
 
     submission._copy_files('%s/workspace' % prefix, "<xml>My XML</xml>")
 
-    assert_not_equal(stats_udf1['fileId'], cluster.fs.stats(deployment_dir + '/udf1.jar')['fileId'])
-    assert_not_equal(stats_udf2['fileId'], cluster.fs.stats(deployment_dir + '/udf2.jar')['fileId'])
-    assert_not_equal(stats_udf3['fileId'], cluster.fs.stats(deployment_dir + '/udf3.jar')['fileId'])
-    assert_equal(stats_udf4['fileId'], cluster.fs.stats(deployment_dir + '/udf4.jar')['fileId'])
+    assert stats_udf1['fileId'] != cluster.fs.stats(deployment_dir + '/udf1.jar')['fileId']
+    assert stats_udf2['fileId'] != cluster.fs.stats(deployment_dir + '/udf2.jar')['fileId']
+    assert stats_udf3['fileId'] != cluster.fs.stats(deployment_dir + '/udf3.jar')['fileId']
+    assert stats_udf4['fileId'] == cluster.fs.stats(deployment_dir + '/udf4.jar')['fileId']
 
   finally:
     try:
@@ -146,27 +144,27 @@ class TestSubmission(OozieMockBase):
   def test_get_properties(self):
     submission = Submission(self.user, fs=MockFs())
 
-    assert_equal({}, submission.properties)
+    assert {} == submission.properties
 
     submission._update_properties('curacao:8032', '/deployment_dir')
 
-    assert_equal({
+    assert {
         'jobTracker': 'curacao:8032',
         'nameNode': 'hdfs://curacao:8020'
-      }, submission.properties)
+      } == submission.properties
 
 
   def test_get_logical_properties(self):
     submission = Submission(self.user, fs=MockFs(logical_name='fsname'), jt=MockJt(logical_name='jtname'))
 
-    assert_equal({}, submission.properties)
+    assert {} == submission.properties
 
     submission._update_properties('curacao:8032', '/deployment_dir')
 
-    assert_equal({
+    assert {
         'jobTracker': 'jtname',
         'nameNode': 'fsname'
-      }, submission.properties)
+      } == submission.properties
 
 
   def test_update_properties(self):
@@ -185,9 +183,9 @@ class TestSubmission(OozieMockBase):
 
       final_properties = properties.copy()
       submission = Submission(None, properties=properties, oozie_id='test', fs=MockFs())
-      assert_equal(properties, submission.properties)
+      assert properties == submission.properties
       submission._update_properties('jtaddress', 'deployment-directory')
-      assert_equal(final_properties, submission.properties)
+      assert final_properties == submission.properties
 
       clear_sys_caches()
       fs = cluster.get_hdfs()
@@ -197,9 +195,9 @@ class TestSubmission(OozieMockBase):
         'nameNode': fs.fs_defaultfs
       })
       submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=None)
-      assert_equal(properties, submission.properties)
+      assert properties == submission.properties
       submission._update_properties('jtaddress', 'deployment-directory')
-      assert_equal(final_properties, submission.properties)
+      assert final_properties == submission.properties
 
       finish.append(HDFS_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('namenode'))
       finish.append(MR_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('jobtracker'))
@@ -211,7 +209,7 @@ class TestSubmission(OozieMockBase):
         'nameNode': 'namenode'
       })
       submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=None)
-      assert_equal(properties, submission.properties)
+      assert properties == submission.properties
     finally:
       clear_sys_caches()
       for reset in finish:
@@ -267,7 +265,7 @@ oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
     """
     parameters = Submission(self.user)._get_external_parameters(xml, properties)
 
-    assert_equal({'oozie.use.system.libpath': 'true',
+    assert ({'oozie.use.system.libpath': 'true',
                    'input': '',
                    'jobTracker': 'localhost:8021',
                    'oozie.wf.application.path': '${nameNode}/user/${user.name}/${examplesRoot}/apps/pig',
@@ -275,5 +273,5 @@ oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
                    'output': '',
                    'nameNode': 'hdfs://localhost:8020',
                    'queueName': 'default'
-                  },
+                  } ==
                  parameters)

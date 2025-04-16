@@ -15,19 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import fnmatch
 import logging
-import os
-import sys
+
+from django.utils.translation import gettext_lazy as _t
 
 from desktop.conf import default_ssl_validate, has_connectors
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t
-else:
-  from django.utils.translation import ugettext_lazy as _t
-
+from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool
+from hadoop.core_site import get_trash_interval
 
 LOG = logging.getLogger()
 DEFAULT_NN_HTTP_PORT = 50070
@@ -39,10 +35,10 @@ def find_file_recursive(desired_glob, root):
       matches = fnmatch.filter(filenames, desired_glob)
       if matches:
         if len(matches) != 1:
-          logging.warning("Found multiple jars matching %s: %s" % (desired_glob, matches))
+          LOG.warning("Found multiple jars matching %s: %s" % (desired_glob, matches))
         return os.path.join(dirpath, matches[0])
 
-    logging.error("Trouble finding jars matching %s" % (desired_glob,))
+    LOG.error("Trouble finding jars matching %s" % (desired_glob,))
     return None
 
   f.__doc__ = "Finds %s/%s" % (root, desired_glob)
@@ -67,6 +63,12 @@ def has_hdfs_enabled():
 def get_hadoop_conf_dir_default():
   """ get from environment variable HADOOP_CONF_DIR or "/etc/hadoop/conf" """
   return os.environ.get("HADOOP_CONF_DIR", "/etc/hadoop/conf")
+
+
+def is_hdfs_trash_enabled():
+  return (
+    'default' in list(HDFS_CLUSTERS.keys()) and HDFS_CLUSTERS['default'].get_raw() and (HDFS_CLUSTERS['default'].TRASH_INTERVAL.get() > 0)
+  )
 
 
 HDFS_CLUSTERS = UnspecifiedConfigSection(
@@ -94,13 +96,13 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       ),
       NN_KERBEROS_PRINCIPAL=Config(
           "nn_kerberos_principal",
-          help="Kerberos principal for NameNode", # Unused
+          help="Kerberos principal for NameNode",  # Unused
           default="hdfs",
           type=str
       ),
       DN_KERBEROS_PRINCIPAL=Config(
           "dn_kerberos_principal",
-          help="Kerberos principal for DataNode", # Unused
+          help="Kerberos principal for DataNode",  # Unused
           default="hdfs",
           type=str
       ),
@@ -124,8 +126,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
       HADOOP_CONF_DIR=Config(
           key="hadoop_conf_dir",
           dynamic_default=get_hadoop_conf_dir_default,
-          help=
-            "Directory of the Hadoop configuration. Defaults to the environment variable HADOOP_CONF_DIR when set, "
+          help="Directory of the Hadoop configuration. Defaults to the environment variable HADOOP_CONF_DIR when set, "
             "or '/etc/hadoop/conf'.",
           type=str
       ),
@@ -134,6 +135,12 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
           help="Whether Hue should list this HDFS cluster. For historical reason there is no way to disable HDFS.",
           default=True,  # True here for backward compatibility
           type=coerce_bool
+      ),
+      TRASH_INTERVAL=Config(
+          'trash_interval',
+          help="Set the interval for trash collection in HDFS. Set to 0 to disable trash.",
+          dynamic_default=get_trash_interval,
+          type=int
       ),
     )
   )
@@ -182,7 +189,7 @@ MR_CLUSTERS = UnspecifiedConfigSection(
           help="Whether Hue should use this cluster to run jobs",
           default=True,
           type=coerce_bool
-      ), # True here for backward compatibility
+      ),  # True here for backward compatibility
     )
   )
 )
@@ -196,12 +203,14 @@ def get_spark_history_server_from_cm():
     return ManagerApi().get_spark_history_server_url()
   return None
 
+
 def get_spark_history_server_url():
   """
     Try to get Spark history server URL from Cloudera Manager API, otherwise give default URL
   """
   url = get_spark_history_server_from_cm()
   return url if url else 'http://localhost:18088'
+
 
 def get_spark_history_server_security_enabled():
   """
@@ -234,7 +243,7 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
-                       default=False, type=coerce_bool), # False here for backward compatibility
+                       default=False, type=coerce_bool),  # False here for backward compatibility
       IS_YARN=Config("is_yarn", help="Attribute set only on YARN clusters and not MR1 ones.",
                      default=True, type=coerce_bool),
       RESOURCE_MANAGER_API_URL=Config("resourcemanager_api_url",
@@ -309,7 +318,7 @@ def test_spark_configuration(user):
   try:
     spark_hs_api.get_history_server_api().applications()
     status = 'OK'
-  except:
+  except Exception:
     LOG.exception('failed to get spark history server status')
 
   return status
@@ -319,7 +328,7 @@ def test_yarn_configurations(user):
   result = []
 
   try:
-    from jobbrowser.api import get_api # Required for cluster HA testing
+    from jobbrowser.api import get_api  # Required for cluster HA testing
   except Exception as e:
     LOG.warning('Jobbrowser is disabled, skipping test_yarn_configurations')
     return result

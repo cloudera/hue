@@ -17,9 +17,10 @@
 
 from builtins import object
 import json
+import pytest
 
 from django.urls import reverse
-from nose.tools import assert_true, assert_false, assert_equal
+from django.test import TestCase
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -28,8 +29,9 @@ from oozie.tests import OozieBase
 from useradmin.models import User
 
 
+@pytest.mark.django_db
 class TestAboutBase(object):
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="about", is_superuser=False)
     grant_access("about", "about", "about")
 
@@ -37,14 +39,15 @@ class TestAboutBase(object):
     grant_access("about_admin", "about_admin", "about")
 
 
+@pytest.mark.integration
 class TestAbout(TestAboutBase, OozieBase):
 
   def test_admin_wizard_permissions(self):
     response = self.client_admin.get(reverse('about:index'))
-    assert_true('Step 1: <i class="fa fa-check"></i> Checks' in response.content, response.content)
+    assert 'Step 1: <i class="fa fa-check"></i> Checks' in response.content, response.content
 
     response = self.client.get(reverse('about:index'))
-    assert_false('Step 1: <i class="fa fa-check"></i> Checks' in response.content, response.content)
+    assert not 'Step 1: <i class="fa fa-check"></i> Checks' in response.content, response.content
 
 
 class TestAboutWithNoCluster(TestAboutBase):
@@ -59,13 +62,13 @@ class TestAboutWithNoCluster(TestAboutBase):
     try:
       response = self.client_admin.post(reverse('about:update_preferences'), {'collect_usage': False})
       data = json.loads(response.content)
-      assert_equal(data['status'], 0)
-      assert_false(data['collect_usage'])
+      assert data['status'] == 0
+      assert not data['collect_usage']
 
       response = self.client_admin.post(reverse('about:update_preferences'), {'collect_usage': True})
       data = json.loads(response.content)
-      assert_equal(data['status'], 0)
-      assert_true(data['collect_usage'])
+      assert data['status'] == 0
+      assert data['collect_usage']
     finally:
       settings = Settings.get_settings()
       settings.collect_usage = collect_usage

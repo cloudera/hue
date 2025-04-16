@@ -15,18 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
 import logging
-import sys
+from urllib.parse import urlparse
 
 from desktop.lib.conf import Config, coerce_string
-
-if sys.version_info[0] > 2:
-  from urllib.parse import urlparse
-  new_str = str
-else:
-  from urlparse import urlparse
 
 LOG = logging.getLogger()
 
@@ -45,7 +37,7 @@ def zkensemble():
       clusters = CLUSTERS.get()
       if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
         return '%s' % clusters['default'].HOST_PORTS.get()
-    except:
+    except Exception:
       LOG.warning('Could not get zookeeper ensemble from the zookeeper app')
 
   if 'search' in settings.INSTALLED_APPS:
@@ -53,20 +45,20 @@ def zkensemble():
       from search.conf import SOLR_URL
       parsed = urlparse(SOLR_URL.get())
       return "%s:2181" % (parsed.hostname or 'localhost')
-    except:
+    except Exception:
       LOG.warning('Could not get zookeeper ensemble from the search app')
 
   return "localhost:2181"
 
 
-ENSEMBLE=Config(
+ENSEMBLE = Config(
     "ensemble",
     help="ZooKeeper ensemble. Comma separated list of Host/Port, e.g. localhost:2181,localhost:2182,localhost:2183",
     dynamic_default=zkensemble,
     type=coerce_string,
 )
 
-PRINCIPAL_NAME=Config(
+PRINCIPAL_NAME = Config(
     "principal_name",
     help="Name of Kerberos principal when using security",
     default="zookeeper",

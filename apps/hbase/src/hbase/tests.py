@@ -15,30 +15,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import json
 import os
-import shutil
 import sys
+import json
+import shutil
 import tempfile
+from builtins import object
 
-from nose.tools import assert_true, assert_equal
-from nose.plugins.skip import SkipTest
+import pytest
+from django.test import TestCase
 from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access, add_to_group
+from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
-from useradmin.models import User
-
 from hbase.api import HbaseApi
 from hbase.conf import HBASE_CONF_DIR
-from hbase.hbase_site import get_server_authentication, get_server_principal, get_conf, reset, _CNF_HBASE_IMPERSONATION_ENABLED, is_impersonation_enabled
-
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
+from hbase.hbase_site import (
+  _CNF_HBASE_IMPERSONATION_ENABLED,
+  get_conf,
+  get_server_authentication,
+  get_server_principal,
+  is_impersonation_enabled,
+  reset,
+)
+from useradmin.models import User
 
 
 def test_security_plain():
@@ -47,16 +48,16 @@ def test_security_plain():
 
   try:
     xml = hbase_site_xml()
-    open_file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
+    open(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
     reset()
 
-    assert_equal('NOSASL', get_server_authentication())
-    assert_equal('test', get_server_principal())
+    assert 'NOSASL' == get_server_authentication()
+    assert 'test' == get_server_principal()
 
     security = HbaseApi._get_security()
 
-    assert_equal('test', security['kerberos_principal_short_name'])
-    assert_equal(False, security['use_sasl'])
+    assert 'test' == security['kerberos_principal_short_name']
+    assert False is security['use_sasl']
   finally:
     reset()
     finish()
@@ -69,26 +70,23 @@ def test_security_kerberos():
 
   try:
     xml = hbase_site_xml(authentication='kerberos')
-    open_file(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
+    open(os.path.join(tmpdir, 'hbase-site.xml'), 'w').write(xml)
     reset()
 
-    assert_equal('KERBEROS', get_server_authentication())
-    assert_equal('test', get_server_principal())
+    assert 'KERBEROS' == get_server_authentication()
+    assert 'test' == get_server_principal()
 
     security = HbaseApi._get_security()
 
-    assert_equal('test', security['kerberos_principal_short_name'])
-    assert_equal(True, security['use_sasl'])
+    assert 'test' == security['kerberos_principal_short_name']
+    assert True is security['use_sasl']
   finally:
     reset()
     finish()
     shutil.rmtree(tmpdir)
 
 
-def hbase_site_xml(
-    kerberos_principal='test/test.com@TEST.COM',
-    authentication='NOSASL'):
-
+def hbase_site_xml(kerberos_principal='test/test.com@TEST.COM', authentication='NOSASL'):
   return """
     <configuration>
 
@@ -114,6 +112,7 @@ def test_impersonation_is_decorator_is_there():
   from hbased.Hbase import do_as
 
 
+@pytest.mark.django_db
 def test_impersonation():
   from hbased import Hbase as thrift_hbase
 
@@ -130,24 +129,22 @@ def test_impersonation():
   try:
     client.getTableNames(doas=user.username)
   except AttributeError:
-    pass # We don't mock everything
+    pass  # We don't mock everything
   finally:
     get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = impersonation_enabled
 
-  assert_equal({}, proto.get_headers())
-
+  assert {} == proto.get_headers()
 
   get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = 'TRUE'
 
   try:
     client.getTableNames(doas=user.username)
   except AttributeError:
-    pass # We don't mock everything
+    pass  # We don't mock everything
   finally:
     get_conf()[_CNF_HBASE_IMPERSONATION_ENABLED] = impersonation_enabled
 
-  assert_equal({'doAs': u'test_hbase'}, proto.get_headers())
-
+  assert {'doAs': 'test_hbase'} == proto.get_headers()
 
 
 class MockHttpClient(object):
@@ -157,9 +154,11 @@ class MockHttpClient(object):
   def setCustomHeaders(self, headers):
     self.headers = headers
 
+
 class MockTransport(object):
   def __init__(self):
     self._TBufferedTransport__trans = MockHttpClient()
+
 
 class MockProtocol(object):
   def __init__(self):
@@ -172,27 +171,23 @@ class MockProtocol(object):
     return self.trans._TBufferedTransport__trans.headers
 
 
-
-class TestIntegrationWithHBase(object):
-  integration = True
-
+@pytest.mark.integration
+class TestIntegrationWithHBase(TestCase):
   @classmethod
   def setup_class(cls):
-
     if not is_live_cluster():
-      raise SkipTest('These tests can only run on a live cluster')
+      pytest.skip('These tests can only run on a live cluster')
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
     add_to_group('test')
     grant_access("test", "test", "indexer")
 
-
   def test_list_tables(self):
     if not is_live_cluster():
-      raise SkipTest('HUE-2910: Skipping because test is not reentrant')
+      pytest.skip('HUE-2910: Skipping because test is not reentrant')
 
     for cluster in HbaseApi(self.user).getClusters():
       resp = self.client.post('/hbase/api/getTableList/' + cluster['name'])
       content = json.loads(resp.content)
-      assert_true('data' in content, content)
+      assert 'data' in content, content

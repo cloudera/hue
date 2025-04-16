@@ -19,6 +19,8 @@ import _ from 'lodash';
 import * as ko from 'knockout';
 import page from 'page';
 
+import { createElement } from 'react';
+import { createRoot } from 'react-dom/client';
 import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
@@ -27,6 +29,8 @@ import waitForVariable from 'utils/timing/waitForVariable';
 import getParameter from 'utils/url/getParameter';
 import getSearchParameter from 'utils/url/getSearchParameter';
 import { ASSIST_GET_DATABASE_EVENT, ASSIST_GET_SOURCE_EVENT } from 'ko/components/assist/events';
+import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
+import ImporterPage from '../js/apps/newimporter/ImporterPage';
 
 class OnePageViewModel {
   constructor() {
@@ -176,38 +180,6 @@ class OnePageViewModel {
       loadedCss.push($(this).attr('href'));
     });
 
-    const loadScript = function (scriptUrl) {
-      const deferred = $.Deferred();
-      $.ajax({
-        url: scriptUrl,
-        converters: {
-          'text script': function (text) {
-            return text;
-          }
-        }
-      })
-        .done(contents => {
-          loadedJs.push(scriptUrl);
-          deferred.resolve({ url: scriptUrl, contents: contents });
-        })
-        .fail(() => {
-          deferred.resolve('');
-        });
-      return deferred.promise();
-    };
-
-    const loadScripts = function (scriptUrls) {
-      const promises = [];
-      while (scriptUrls.length) {
-        const scriptUrl = scriptUrls.shift();
-        if (loadedJs.indexOf(scriptUrl) !== -1) {
-          continue;
-        }
-        promises.push(loadScript(scriptUrl));
-      }
-      return promises;
-    };
-
     const addGlobalCss = function ($el) {
       const cssFile = $el.attr('href').split('?')[0];
       if (loadedCss.indexOf(cssFile) === -1) {
@@ -222,12 +194,56 @@ class OnePageViewModel {
       $el.remove();
     };
 
+    self.scriptQueue = [];
+    self.currentlyLoadingScript = false;
+
+    self.loadScript_nonce = function (scriptSrc) {
+      const deferred = $.Deferred();
+
+      self.scriptQueue.push({ scriptSrc, deferred });
+
+      const loadNextScript = function () {
+        if (self.currentlyLoadingScript || self.scriptQueue.length === 0) {
+          // Either a script is currently being loaded or no scripts are left to load
+          return;
+        }
+
+        // Get and remove the first script from the queue
+        const { scriptSrc, deferred } = self.scriptQueue.shift();
+        self.currentlyLoadingScript = true;
+
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = scriptSrc;
+        script.onload = script.onerror = function () {
+          // Clean up
+          document.body.removeChild(script);
+          // Resolve the promise for this script
+          deferred.resolve();
+          // Mark as no longer loading so the next script can load
+          self.currentlyLoadingScript = false;
+          // Attempt to load the next script
+          loadNextScript();
+        };
+        document.body.appendChild(script);
+      };
+
+      loadNextScript(); // Start loading if no other scripts are currently being loaded
+      return deferred.promise();
+    };
+
     // Only load CSS and JS files that are not loaded before
     self.processHeaders = function (response) {
       const promise = $.Deferred();
       const $rawHtml = $('<span>').html(response);
 
       const $allScripts = $rawHtml.find('script[src]');
+
+      const $jsonScript = $rawHtml.find("script[type='application/json']");
+      $jsonScript.each(function () {
+        document.head.appendChild(this);
+      });
+
       const scriptsToLoad = $allScripts
         .map(function () {
           return $(this).attr('src');
@@ -236,7 +252,7 @@ class OnePageViewModel {
       $allScripts.remove();
 
       $rawHtml.find('link[href]').each(function () {
-        addGlobalCss($(this)); // Also removes the elements;
+        addGlobalCss($(this));
       });
 
       $rawHtml.find('a[href]').each(function () {
@@ -246,6 +262,36 @@ class OnePageViewModel {
         }
         $(this).attr('href', link);
       });
+
+      const loadScript = function (scriptUrl) {
+        const deferred = $.Deferred();
+        $.ajax({
+          url: scriptUrl,
+          converters: {
+            'text script': text => text
+          }
+        })
+          .done(contents => {
+            loadedJs.push(scriptUrl);
+            deferred.resolve({ url: scriptUrl, contents });
+          })
+          .fail(() => {
+            deferred.resolve('');
+          });
+        return deferred.promise();
+      };
+
+      const loadScripts = function (scriptUrls) {
+        const promises = [];
+        while (scriptUrls.length) {
+          const scriptUrl = scriptUrls.shift();
+          if (loadedJs.indexOf(scriptUrl) !== -1) {
+            continue;
+          }
+          promises.push(loadScript(scriptUrl));
+        }
+        return promises;
+      };
 
       const scriptPromises = loadScripts(scriptsToLoad);
 
@@ -260,12 +306,45 @@ class OnePageViewModel {
             evalScriptSync();
           });
         } else {
-          // All evaluated
           promise.resolve($rawHtml.children());
         }
       };
 
       evalScriptSync();
+      return promise;
+    };
+
+    self.processHeadersSecure = function (response) {
+      const promise = $.Deferred();
+      const $rawHtml = $('<span>').html(response);
+
+      // Since we're not executing scripts here, we simply collect them
+      const $allScripts = $rawHtml.find('script[src]');
+      const scriptsToLoad = $allScripts
+        .map(function () {
+          return $(this).attr('src');
+        })
+        .toArray();
+
+      // Remove the script elements to avoid duplicating them when $rawHtml is inserted into the document
+      $allScripts.remove();
+
+      // Process other elements (link, a, etc.)
+      $rawHtml.find('link[href]').each(function () {
+        addGlobalCss($(this)); // Also removes the element
+      });
+
+      $rawHtml.find('a[href]').each(function () {
+        let link = $(this).attr('href');
+        if (link.startsWith('/') && !link.startsWith('/hue')) {
+          link = window.HUE_BASE_URL + '/hue' + link;
+        }
+        $(this).attr('href', link);
+      });
+
+      // Pass the array of script sources along with $rawHtml to the calling code
+      promise.resolve({ $rawHtml: $rawHtml, scriptsToLoad: scriptsToLoad });
+
       return promise;
     };
 
@@ -284,7 +363,7 @@ class OnePageViewModel {
       }, 0);
     };
 
-    self.loadAppThrottled = (app, loadDeep) => {
+    self.loadAppThrottled = (app, loadDeep, options) => {
       if (self.currentApp() === 'editor' && $('#editorComponents').length) {
         const vm = ko.dataFor($('#editorComponents')[0]);
         if (vm.isPresentationMode()) {
@@ -326,7 +405,7 @@ class OnePageViewModel {
         $('#embeddable_security_hive2').html('');
         $('#embeddable_security_solr').html('');
       }
-      if (typeof self.embeddable_cache[app] === 'undefined') {
+      if (!options?.isFullyFrontend && typeof self.embeddable_cache[app] === 'undefined') {
         if (loadedApps.indexOf(app) === -1) {
           loadedApps.push(app);
         }
@@ -383,17 +462,38 @@ class OnePageViewModel {
               window.clearAppIntervals(app);
               huePubSub.clearAppSubscribers(app);
               self.extraEmbeddableURLParams('');
-
-              self.processHeaders(response).done($rawHtml => {
-                if (window.SKIP_CACHE.indexOf(app) === -1) {
-                  self.embeddable_cache[app] = $rawHtml;
-                }
-                $('#embeddable_' + app).html($rawHtml);
-                huePubSub.publish('app.dom.loaded', app);
-                window.setTimeout(() => {
-                  self.isLoadingEmbeddable(false);
-                }, 0);
-              });
+              const currentPath = window.location.pathname; // Retrieve the current path from the window location
+              const basePath = currentPath.split('=')[0];
+              const inlineScriptsUrls = ['oozie', 'beeswax', 'jobsub'].some(segment =>
+                basePath.includes(segment)
+              );
+              if (inlineScriptsUrls) {
+                self.processHeaders(response).done($rawHtml => {
+                  if (window.SKIP_CACHE.indexOf(app) === -1) {
+                    self.embeddable_cache[app] = $rawHtml;
+                  }
+                  $('#embeddable_' + app).html($rawHtml);
+                  huePubSub.publish('app.dom.loaded', app);
+                  window.setTimeout(() => {
+                    self.isLoadingEmbeddable(false);
+                  }, 0);
+                });
+              } else {
+                self.processHeadersSecure(response).done(({ $rawHtml, scriptsToLoad }) => {
+                  if (window.SKIP_CACHE.indexOf(app) === -1) {
+                    self.embeddable_cache[app] = $rawHtml;
+                  }
+                  $('#embeddable_' + app).html($rawHtml);
+                  // Now load the scripts
+                  const loadScripts = scriptsToLoad.map(src => self.loadScript_nonce(src)); // Assumes loadScript_nonce is defined somewhere
+                  Promise.all(loadScripts).then(() => {
+                    huePubSub.publish('app.dom.loaded', app);
+                    window.setTimeout(() => {
+                      self.isLoadingEmbeddable(false);
+                    }, 0);
+                  });
+                });
+              }
             } else {
               if (type.indexOf('json') > -1) {
                 const presponse = JSON.parse(response);
@@ -412,18 +512,19 @@ class OnePageViewModel {
             } else if (app !== '500') {
               self.loadApp('500');
             } else {
-              $.jHueNotify.error(
-                I18n(
+              huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+                message: I18n(
                   'It looks like you are offline or an unknown error happened. Please refresh the page.'
                 )
-              );
+              });
             }
           }
         });
       } else {
         self.isLoadingEmbeddable(false);
       }
-      window.document.title = 'Hue - ' + window.EMBEDDABLE_PAGE_URLS[app].title;
+      const title = options?.title || window.EMBEDDABLE_PAGE_URLS[app].title;
+      window.document.title = 'Hue - ' + title;
       window.resumeAppIntervals(app);
       huePubSub.resumeAppSubscribers(app);
       $('.embeddable').hide();
@@ -506,6 +607,60 @@ class OnePageViewModel {
 
     self.lastContext = null;
 
+    const camelToDash = camelCaseString => {
+      return camelCaseString.replace(/[A-Z]/g, match => '-' + match.toLowerCase());
+    };
+    const createNewReactEmbeddable = (containerName, Component) => {
+      const containerDiv = document.createElement('div');
+      containerDiv.classList.add('embeddable', containerName, 'cuix', 'antd');
+      document.querySelector('.page-content').appendChild(containerDiv);
+      const root = createRoot(containerDiv);
+      root.render(createElement(Component, {}));
+      return containerDiv;
+    };
+
+    /* 
+    Use this function if you want to show a React based application page 
+    for a specific url without the need to use legacy mako templates.
+    1. Add a new appsItem in HueSidebar.vue that links to the new url
+    2. Import the new React component at the top of this file.
+    3. Add a new object to the pageMapping array below as examplified here:    
+
+      {
+        url: '/my-new-url', 
+        app: function () {
+          showReactAppPage({
+            appName: 'myNewAppName',
+            component: MyNewReactComponent,
+            title: 'My new APP title'
+          });
+        }
+      }
+    */
+    // eslint-disable-next-line
+    const showReactAppPage = ({
+      appName,
+      title,
+      component,
+      hideLeftAssist = true,
+      hideRightAssist = true
+    }) => {
+      if (hideLeftAssist) {
+        huePubSub.publish('left.assist.hide', true);
+      }
+      if (hideRightAssist) {
+        huePubSub.publish('right.assist.hide', true);
+      }
+      const containerName = `${camelToDash(appName)}-container`;
+
+      const appContainer =
+        document.querySelector(`.page-content .${containerName}`) ||
+        createNewReactEmbeddable(containerName, component);
+
+      self.loadAppThrottled(appName, false, { isFullyFrontend: true, title });
+      appContainer.style.display = 'block';
+    };
+
     const pageMapping = [
       { url: '/403', app: '403' },
       { url: '/500', app: '500' },
@@ -533,15 +688,6 @@ class OnePageViewModel {
       },
       { url: '/desktop/dump_config', app: 'dump_config' },
       {
-        url: '/desktop/debug/threads',
-        app: function () {
-          self.loadApp('threads');
-          self.getActiveAppViewModel(viewModel => {
-            viewModel.fetchThreads();
-          });
-        }
-      },
-      {
         url: '/gist',
         app: function () {
           const uuid = getUrlParameter('uuid');
@@ -552,9 +698,12 @@ class OnePageViewModel {
         url: '/desktop/metrics',
         app: function () {
           self.loadApp('metrics');
-          self.getActiveAppViewModel(viewModel => {
-            viewModel.fetchMetrics();
-          });
+        }
+      },
+      {
+        url: '/task_server',
+        app: function () {
+          self.loadApp('taskserver');
         }
       },
       {
@@ -615,6 +764,7 @@ class OnePageViewModel {
         }
       },
       { url: '/filebrowser/view=*', app: 'filebrowser' },
+      { url: '/filebrowser/new', app: 'newfilebrowser' },
       {
         url: '/filebrowser/*',
         app: function () {
@@ -637,6 +787,16 @@ class OnePageViewModel {
       { url: '/indexer/indexes/*', app: 'indexes' },
       { url: '/indexer/', app: 'indexes' },
       { url: '/indexer/importer/', app: 'importer' },
+      {
+        url: '/newimporter/',
+        app: function () {
+          showReactAppPage({
+            appName: 'newimporter',
+            component: ImporterPage,
+            title: 'New Importer'
+          });
+        }
+      },
       {
         url: '/indexer/importer/prefill/*',
         app: function (ctx) {

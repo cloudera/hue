@@ -15,27 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import range
-from builtins import object
-import json
-import logging
 import re
 import csv
-import sys
+import json
+import logging
 
 from django.utils.encoding import smart_str
+from django.utils.translation import gettext as _
 
 from desktop.lib import thrift_util
 from desktop.lib.exceptions_renderable import PopupException
-
 from hbase import conf
-from hbase.hbase_site import get_server_principal, get_server_authentication, is_using_thrift_ssl, is_using_thrift_http, get_thrift_transport
-from hbase.server.hbase_lib import get_thrift_type, get_client_type
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from hbase.hbase_site import (
+  get_server_authentication,
+  get_server_principal,
+  get_thrift_transport,
+  is_using_thrift_http,
+  is_using_thrift_ssl,
+)
+from hbase.server.hbase_lib import get_client_type, get_thrift_type
 
 LOG = logging.getLogger()
 
@@ -68,12 +66,12 @@ class HbaseApi(object):
     clusters = []
     try:
       full_config = json.loads(conf.HBASE_CLUSTERS.get().replace("'", "\""))
-    except:
+    except Exception:
       LOG.debug('Failed to read HBase cluster configuration as JSON, falling back to raw configuration.')
-      full_config = [conf.HBASE_CLUSTERS.get()] #hack cause get() is weird
+      full_config = [conf.HBASE_CLUSTERS.get()]  # hack cause get() is weird
 
     for config in full_config:
-      match = re.match('\((?P<name>[^\(\)\|]+)\|(?P<host>.+):(?P<port>[0-9]+)\)', config)
+      match = re.match(r'\((?P<name>[^\(\)\|]+)\|(?P<host>.+):(?P<port>[0-9]+)\)', config)
       if match:
         clusters += [{
           'name': match.group('name'),
@@ -90,7 +88,7 @@ class HbaseApi(object):
       for cluster in clusters:
         if cluster["name"] == name:
           return cluster
-    except:
+    except Exception:
       LOG.exception('failed to get the cluster %s' % name)
     raise PopupException(_("Cluster by the name of %s does not exist in configuration.") % name)
 
@@ -149,7 +147,7 @@ class HbaseApi(object):
 
   def getRows(self, cluster, tableName, columns, startRowKey, numRows, prefix=False):
     client = self.connectCluster(cluster)
-    if prefix == False:
+    if prefix is False:
       scanner = client.scannerOpen(tableName, smart_str(startRowKey), columns, None, doas=self.user.username)
     else:
       scanner = client.scannerOpenWithPrefix(tableName, smart_str(startRowKey), columns, None, doas=self.user.username)
@@ -193,7 +191,7 @@ class HbaseApi(object):
   def deleteColumns(self, cluster, tableName, row, columns):
     client = self.connectCluster(cluster)
     Mutation = get_thrift_type('Mutation')
-    mutations = [Mutation(isDelete = True, column=smart_str(column)) for column in columns]
+    mutations = [Mutation(isDelete=True, column=smart_str(column)) for column in columns]
     return client.mutateRow(tableName, smart_str(row), mutations, None, doas=self.user.username)
 
   def deleteColumn(self, cluster, tableName, row, column):
@@ -209,7 +207,7 @@ class HbaseApi(object):
     Mutation = get_thrift_type('Mutation')
     for column in list(data.keys()):
       value = smart_str(data[column]) if data[column] is not None else None
-      mutations.append(Mutation(column=smart_str(column), value=value)) # must use str for API, does thrift coerce by itself?
+      mutations.append(Mutation(column=smart_str(column), value=value))  # must use str for API, does thrift coerce by itself?
     return client.mutateRow(tableName, smart_str(row), mutations, None, doas=self.user.username)
 
   def putColumn(self, cluster, tableName, row, column, value=None):
@@ -225,8 +223,8 @@ class HbaseApi(object):
     aggregate_data = []
     limit = conf.TRUNCATE_LIMIT.get()
     if not isinstance(queries, list):
-      queries=json.loads(queries)
-    queries = sorted(queries, key=lambda query: query['scan_length']) #sort by scan length
+      queries = json.loads(queries)
+    queries = sorted(queries, key=lambda query: query['scan_length'])  # sort by scan length
     for query in queries:
       scan_length = int(query['scan_length'])
       if query['row_key'] == "null":

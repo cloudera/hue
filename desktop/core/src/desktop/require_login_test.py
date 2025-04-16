@@ -14,42 +14,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
 # Test for RequireLoginEverywhereMiddleware in middleware.py
-# 
-# This test uses "nose"-style testing (no need for a TestCase),
-# and nose-style assertions.
+
 
 import sys
-from nose.tools import *
+from unittest.mock import Mock
 
-from django.test.client import Client
 import django
-
-if sys.version_info[0] > 2:
-  from unittest.mock import Mock
-else:
-  from mock import Mock
+import pytest
+from django.test.client import Client
 
 
+@pytest.mark.django_db
 def test_require_login():
   c = Client()
   # We're not logged in, so expect a redirection.
 
   response = c.get('/profile')
-  assert_true(isinstance(response, django.http.HttpResponseRedirect), "Expected redirect")
-  assert_equal("/hue/accounts/login?next=/profile", response["Location"])
+  assert isinstance(response, django.http.HttpResponseRedirect), "Expected redirect"
+  assert "/hue/accounts/login?next=/profile" == response["Location"]
 
   # AllowAllBackend should let us in.
   c.login(request=Mock(), username="test", password="test")
   # And now we shouldn't need to be redirected.
   response = c.get('/', follow=True)
-  assert_equal(200, response.status_code)
+  assert 200 == response.status_code
 
 
 def test_ajax_require_login():
   c = Client()
   response = c.get('/profile',
                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-  assert_equal("LOGIN_REQUIRED", response["X-Hue-Middleware-Response"],
-               "Expected magic header from middleware")
+  assert "LOGIN_REQUIRED" == response["X-Hue-Middleware-Response"], "Expected magic header from middleware"

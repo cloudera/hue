@@ -16,7 +16,6 @@
 # limitations under the License.
 
 from __future__ import division
-from nose.tools import *
 
 from desktop.lib.view_util import big_filesizeformat, format_time_diff, format_duration_in_millis
 
@@ -24,22 +23,22 @@ import datetime
 import math
 
 def test_big_filesizeformat():
-  assert_equal("N/A", big_filesizeformat(None))
-  assert_equal("N/A", big_filesizeformat(""))
-  assert_equal("0 B", big_filesizeformat(0))
-  assert_equal("17 B", big_filesizeformat(17))
-  assert_equal("1.0 KB", big_filesizeformat(1024))
-  assert_equal("1.0 MB", big_filesizeformat(1024*1024))
-  assert_equal("1.1 GB", big_filesizeformat(int(1.1*1024*1024*1024)))
-  assert_equal("2.0 TB", big_filesizeformat(2*1024*1024*1024*1024))
-  assert_equal("1.5 PB", big_filesizeformat(math.floor(3*1024*1024*1024*1024*1024 / 2)))
+  assert "N/A" == big_filesizeformat(None)
+  assert "N/A" == big_filesizeformat("")
+  assert "0 B" == big_filesizeformat(0)
+  assert "17 B" == big_filesizeformat(17)
+  assert "1.0 KB" == big_filesizeformat(1024)
+  assert "1.0 MB" == big_filesizeformat(1024*1024)
+  assert "1.1 GB" == big_filesizeformat(int(1.1*1024*1024*1024))
+  assert "2.0 TB" == big_filesizeformat(2*1024*1024*1024*1024)
+  assert "1.5 PB" == big_filesizeformat(math.floor(3*1024*1024*1024*1024*1024 / 2))
 
 def test_format_time_diff():
-  assert_equal("1h:0m:0s", format_time_diff(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(60*60*1)))
-  assert_equal("0s", format_time_diff(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(0)))
-  assert_equal("1d:12h:24m:32s", format_time_diff(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(131072)))
+  assert "1h:0m:0s" == format_time_diff(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(60*60*1))
+  assert "0s" == format_time_diff(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(0))
+  assert "1d:12h:24m:32s" == format_time_diff(datetime.datetime.fromtimestamp(0), datetime.datetime.fromtimestamp(131072))
 
 def test_format_duration_in_millis():
-    assert_equal("1h:0m:0s", format_duration_in_millis(60*60*1000))
-    assert_equal("0s", format_duration_in_millis(0))
-    assert_equal("1d:12h:24m:32s", format_duration_in_millis(24*60*60*1000 + 12*60*60*1000 + 24*60*1000 + 32*1000))
+    assert "1h:0m:0s" == format_duration_in_millis(60*60*1000)
+    assert "0s" == format_duration_in_millis(0)
+    assert "1d:12h:24m:32s" == format_duration_in_millis(24*60*60*1000 + 12*60*60*1000 + 24*60*1000 + 32*1000)

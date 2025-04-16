@@ -1593,6 +1593,14 @@ describe('hiveAutocompleteParser.js SELECT statements', () => {
       });
     });
 
+    it('should suggest keywords for "SELECT day, count(cnt) from foo.bar WHERE cnt BETWEEN 1 AND 2 group by day |"', () => {
+      assertAutoComplete({
+        beforeCursor: 'SELECT day, count(cnt) from foo.bar WHERE cnt BETWEEN 1 AND 2 group by day ',
+        afterCursor: '',
+        containsKeywords: ['HAVING', 'ORDER BY', 'LIMIT']
+      });
+    });
+
     it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b |"', () => {
       assertAutoComplete({
         beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ',

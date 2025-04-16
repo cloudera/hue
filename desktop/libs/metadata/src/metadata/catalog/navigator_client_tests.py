@@ -17,11 +17,10 @@
 
 from builtins import object
 import logging
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal
+import pytest
 
 from django.core.cache import cache
+from django.test import TestCase
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
@@ -46,8 +45,8 @@ class MockedRoot(object):
       return params
 
 
-class NavigatorClientTest(object):
-  integration = True
+@pytest.mark.integration
+class NavigatorClientTest(TestCase):
 
   @classmethod
   def setup_class(cls):
@@ -76,12 +75,13 @@ class MockSentryApiHive(object):
 
 
 
+@pytest.mark.django_db
 class TestNavigatorClientSecure(NavigatorClientTest):
 
-  def setUp(self):
+  def setup_method(self):
     self.reset = NAVIGATOR.APPLY_SENTRY_PERMISSIONS.set_for_testing(True)
 
-  def tearDown(self):
+  def teardown_method(self):
     self.reset()
 
 
@@ -107,7 +107,7 @@ class TestNavigatorClientSecure(NavigatorClientTest):
       ]
 
       results = list(self.api._secure_results(records, checker=checker))
-      assert_equal(len(records), len(results), results)
+      assert len(records) == len(results), results
 
       # No privilege
       api_v1 = MockSentryApiHive()
@@ -121,7 +121,7 @@ class TestNavigatorClientSecure(NavigatorClientTest):
       ]
 
       results = list(self.api._secure_results(records, checker=checker))
-      assert_equal(0, len(results), results)
+      assert 0 == len(results), results
 
       # Only table privilege
       api_v1 = MockSentryApiHive(privileges=[
@@ -137,7 +137,7 @@ class TestNavigatorClientSecure(NavigatorClientTest):
       ]
 
       results = list(self.api._secure_results(records, checker=checker))
-      assert_equal(2, len(results), results) # Table + its Column
+      assert 2 == len(results), results # Table + its Column
 
       # Only table 2 privilege
       api_v1 = MockSentryApiHive(privileges=[
@@ -155,17 +155,18 @@ class TestNavigatorClientSecure(NavigatorClientTest):
       ]
 
       results = list(self.api._secure_results(records, checker=checker))
-      assert_equal(1, len(results), results) # Table2 only
+      assert 1 == len(results), results # Table2 only
     finally:
       cache.delete(cache_key)
 
 
+@pytest.mark.django_db
 class TestNavigatorClient(NavigatorClientTest):
 
-  def setUp(self):
+  def setup_method(self):
     self.reset = NAVIGATOR.APPLY_SENTRY_PERMISSIONS.set_for_testing(False)
 
-  def tearDown(self):
+  def teardown_method(self):
     self.reset()
 
   def test_search_entities(self):
@@ -174,20 +175,17 @@ class TestNavigatorClient(NavigatorClientTest):
     else:
       cluster_filter = '%s'
 
-    assert_equal(
-        cluster_filter % '(((originalName:cases*^3)OR(originalDescription:cases*^1)OR(name:cases*^10)OR(description:cases*^3)OR(tags:cases*^5))AND((originalName:[* TO *])OR(originalDescription:[* TO *])OR(name:[* TO *])OR(description:[* TO *])OR(tags:[* TO *]))) AND (*) AND ((type:TABLE)OR(type:VIEW)) AND (sourceType:HIVE OR sourceType:IMPALA)',
-        self.api.search_entities(query_s='cases', sources=['hive'])[0][1]
-    )
+    assert (
+        cluster_filter % '(((originalName:cases*^3)OR(originalDescription:cases*^1)OR(name:cases*^10)OR(description:cases*^3)OR(tags:cases*^5))AND((originalName:[* TO *])OR(originalDescription:[* TO *])OR(name:[* TO *])OR(description:[* TO *])OR(tags:[* TO *]))) AND (*) AND ((type:TABLE)OR(type:VIEW)) AND (sourceType:HIVE OR sourceType:IMPALA)' ==
+        self.api.search_entities(query_s='cases', sources=['hive'])[0][1])
 
-    assert_equal(
-        cluster_filter % '* AND ((type:FIELD*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD)) AND (sourceType:HIVE OR sourceType:IMPALA)',
-        self.api.search_entities(query_s='type:FIELD', sources=['hive'])[0][1]
-    )
+    assert (
+        cluster_filter % '* AND ((type:FIELD*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD)) AND (sourceType:HIVE OR sourceType:IMPALA)' ==
+        self.api.search_entities(query_s='type:FIELD', sources=['hive'])[0][1])
 
-    assert_equal(
-        cluster_filter % '* AND ((type:\\{\\}\\(\\)\\[\\]*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD)) AND (sourceType:HIVE OR sourceType:IMPALA)',
-        self.api.search_entities(query_s='type:{}()[]*', sources=['hive'])[0][1]
-    )
+    assert (
+        cluster_filter % '* AND ((type:\\{\\}\\(\\)\\[\\]*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD)) AND (sourceType:HIVE OR sourceType:IMPALA)' ==
+        self.api.search_entities(query_s='type:{}()[]*', sources=['hive'])[0][1])
 
     # type:
     # type:VIEW

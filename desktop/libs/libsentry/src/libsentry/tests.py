@@ -18,11 +18,9 @@
 from builtins import object
 import lxml.etree
 import os
+import pytest
 import shutil
 import tempfile
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_false, assert_not_equal, assert_raises
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.exceptions import StructuredThriftTransportException
@@ -62,7 +60,7 @@ class TestWithSentry(object):
   @classmethod
   def setup_class(cls):
     if not os.path.exists(os.path.join(SENTRY_CONF_DIR.get(), 'sentry-site.xml')):
-      raise SkipTest('Could not find sentry-site.xml, skipping sentry tests')
+      pytest.skip('Could not find sentry-site.xml, skipping sentry tests')
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
@@ -72,7 +70,7 @@ class TestWithSentry(object):
     cls.config_path = os.path.join(SENTRY_CONF_DIR.get(), 'sentry-site.xml')
 
 
-  def setUp(self):
+  def setup_method(self):
     self.rpc_addresses = ''
     if sentry_site.get_sentry_server_rpc_addresses() is not None:
       self.rpc_addresses = ','.join(sentry_site.get_sentry_server_rpc_addresses())
@@ -87,7 +85,7 @@ class TestWithSentry(object):
     clear_api2_cache()
 
 
-  def tearDown(self):
+  def teardown_method(self):
     sentry_site.reset()
     for reset in self.resets:
       reset()
@@ -101,8 +99,8 @@ class TestWithSentry(object):
     sentry_site.reset()
 
     server = get_sentry_server()
-    assert_true(server is not None)
-    assert_true(server['hostname'] in '%s,host-1,host-2' % self.rpc_addresses)
+    assert server is not None
+    assert server['hostname'] in '%s,host-1,host-2' % self.rpc_addresses
 
 
   def test_get_single_sentry_server(self):
@@ -112,8 +110,8 @@ class TestWithSentry(object):
     sentry_site.reset()
 
     server = get_sentry_server(current_host='host-1')
-    assert_true(server is not None)
-    assert_equal(server['hostname'], 'host-1')
+    assert server is not None
+    assert server['hostname'] == 'host-1'
 
 
   def test_get_next_sentry_server(self):
@@ -123,8 +121,8 @@ class TestWithSentry(object):
     sentry_site.reset()
 
     server = get_sentry_server(current_host='host-1')
-    assert_true(server is not None)
-    assert_equal(server['hostname'], 'host-2')
+    assert server is not None
+    assert server['hostname'] == 'host-2'
 
 
   def test_get_first_sentry_server(self):
@@ -134,8 +132,8 @@ class TestWithSentry(object):
     sentry_site.reset()
 
     server = get_sentry_server(current_host='host-2')
-    assert_true(server is not None)
-    assert_equal(server['hostname'], 'host-1')
+    assert server is not None
+    assert server['hostname'] == 'host-1'
 
 
   def test_round_robin(self):
@@ -145,8 +143,8 @@ class TestWithSentry(object):
     sentry_site.reset()
 
     server, attempts = get_next_available_server(SentryClient, self.user.username, failed_host='host-1')
-    assert_equal(None, server)
-    assert_equal(['host-2','host-3','host-4','host-5'], attempts)
+    assert None == server
+    assert ['host-2','host-3','host-4','host-5'] == attempts
 
 
   def test_get_next_good_host(self):
@@ -157,8 +155,8 @@ class TestWithSentry(object):
 
     server, attempts = get_next_available_server(SentryClient, self.user.username, failed_host='bad-host-2',
                                                  create_client_fn=create_mock_client_fn)
-    assert_equal('good-host-2', server['hostname'])
-    assert_equal([], attempts)
+    assert 'good-host-2' == server['hostname']
+    assert [] == attempts
 
 
   def test_single_good_host(self):
@@ -169,8 +167,8 @@ class TestWithSentry(object):
 
     server, attempts = get_next_available_server(SentryClient, self.user.username, failed_host=None,
                                                  create_client_fn=create_mock_client_fn)
-    assert_equal('good-host-1', server['hostname'])
-    assert_equal([], attempts)
+    assert 'good-host-1' == server['hostname']
+    assert [] == attempts
 
 
   def test_single_bad_host(self):
@@ -179,8 +177,8 @@ class TestWithSentry(object):
     file(os.path.join(self.tmpdir, 'sentry-site.xml'), 'w').write(xml)
     sentry_site.reset()
 
-    assert_raises(PopupException, get_next_available_server, SentryClient, self.user.username, failed_host=None,
-                  create_client_fn=create_mock_client_fn)
+    with pytest.raises(PopupException):
+      get_next_available_server(SentryClient, self.user.username, failed_host=None, create_client_fn=create_mock_client_fn)
 
 
   def test_bad_good_host(self):
@@ -191,8 +189,8 @@ class TestWithSentry(object):
 
     server, attempts = get_next_available_server(SentryClient, self.user.username, failed_host='bad-host-1',
                                                  create_client_fn=create_mock_client_fn)
-    assert_equal('good-host-1', server['hostname'])
-    assert_equal([], attempts)
+    assert 'good-host-1' == server['hostname']
+    assert [] == attempts
 
 
   def test_good_bad_host(self):
@@ -203,8 +201,8 @@ class TestWithSentry(object):
 
     server, attempts = get_next_available_server(SentryClient, self.user.username, failed_host='bad-host-1',
                                                  create_client_fn=create_mock_client_fn)
-    assert_equal('good-host-1', server['hostname'])
-    assert_equal([], attempts)
+    assert 'good-host-1' == server['hostname']
+    assert [] == attempts
 
 
   def test_ha_failover_all_bad(self):
@@ -214,11 +212,13 @@ class TestWithSentry(object):
     sentry_site.reset()
 
     api = get_api(self.user)
-    assert_equal('bad-host-1:8039,bad-host-2', ','.join(sentry_site.get_sentry_server_rpc_addresses()))
-    assert_raises(PopupException, api.list_sentry_roles_by_group, '*')
+    assert 'bad-host-1:8039,bad-host-2' == ','.join(sentry_site.get_sentry_server_rpc_addresses())
+    with pytest.raises(PopupException):
+      api.list_sentry_roles_by_group('*')
 
     api2 = get_api2(self.user, 'solr')
-    assert_raises(PopupException, api2.list_sentry_roles_by_group, '*')
+    with pytest.raises(PopupException):
+      api2.list_sentry_roles_by_group('*')
 
 
   def test_no_rpc_hosts(self):
@@ -228,14 +228,14 @@ class TestWithSentry(object):
     sentry_site.reset()
 
     api = get_api(self.user)
-    assert_false(sentry_site.is_ha_enabled(), sentry_site.get_sentry_server_rpc_addresses())
-    assert_true(is_enabled() and HOSTNAME.get() and HOSTNAME.get() != 'localhost')
+    assert not sentry_site.is_ha_enabled(), sentry_site.get_sentry_server_rpc_addresses()
+    assert is_enabled() and HOSTNAME.get() and HOSTNAME.get() != 'localhost'
     resp = api.list_sentry_roles_by_group(groupName='*')
-    assert_true(isinstance(resp, list))
+    assert isinstance(resp, list)
 
     api2 = get_api2(self.user, 'solr')
     resp = api2.list_sentry_roles_by_group(groupName='*')
-    assert_true(isinstance(resp, list))
+    assert isinstance(resp, list)
 
 
   def _sentry_site_xml(self, rpc_addresses, rpc_port='8038'):
@@ -253,17 +253,17 @@ class TestWithSentry(object):
     return lxml.etree.tostring(root)
 
 
+@pytest.mark.requires_hadoop
+@pytest.mark.integration
 class TestSentryWithHadoop(object):
-  requires_hadoop = True
-  integration = True
 
   @classmethod
   def setup_class(cls):
     if not is_live_cluster():
-      raise SkipTest('TestSentryWithHadoop requires a live cluster.')
+      pytest.skip('TestSentryWithHadoop requires a live cluster.')
 
     if not os.path.exists(os.path.join(SENTRY_CONF_DIR.get(), 'sentry-site.xml')):
-      raise SkipTest('Could not find sentry-site.xml, skipping sentry tests')
+      pytest.skip('Could not find sentry-site.xml, skipping sentry tests')
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
@@ -273,7 +273,7 @@ class TestSentryWithHadoop(object):
     cls.config_path = os.path.join(SENTRY_CONF_DIR.get(), 'sentry-site.xml')
 
 
-  def setUp(self):
+  def setup_method(self):
     self.rpc_addresses = ''
     if sentry_site.get_sentry_server_rpc_addresses() is not None:
       self.rpc_addresses = ','.join(sentry_site.get_sentry_server_rpc_addresses())
@@ -288,7 +288,7 @@ class TestSentryWithHadoop(object):
     clear_api2_cache()
 
 
-  def tearDown(self):
+  def teardown_method(self):
     sentry_site.reset()
     for reset in self.resets:
       reset()
@@ -298,8 +298,8 @@ class TestSentryWithHadoop(object):
   def test_get_collections(self):
     client = SentryClient(HOSTNAME.get(), PORT.get(), 'test')
     resp = client.list_sentry_roles_by_group() # Non Sentry Admin can do that
-    assert_not_equal(0, resp.status.value, resp)
-    assert_true('denied' in resp.status.message, resp)
+    assert 0 != resp.status.value, resp
+    assert 'denied' in resp.status.message, resp
 
     resp = client.list_sentry_roles_by_group(groupName='*')
-    assert_equal(0, resp.status.value, resp)
+    assert 0 == resp.status.value, resp

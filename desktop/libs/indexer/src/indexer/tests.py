@@ -15,29 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import json
 import sys
+import json
+from builtins import object
+from unittest.mock import Mock, patch
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_false
-
+import pytest
 from django.urls import reverse
-
-from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
-from libsolr import conf as libsolr_conf
-from libzookeeper import conf as libzookeeper_conf
-from indexer.conf import get_solr_ensemble
-from indexer.controller import CollectionManagerController
-from useradmin.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
+from indexer.conf import get_solr_ensemble
+from indexer.controller import CollectionManagerController
+from libsolr import conf as libsolr_conf
+from libzookeeper import conf as libzookeeper_conf
+from useradmin.models import User
 
 
 def test_get_ensemble():
@@ -46,7 +39,7 @@ def test_get_ensemble():
   clears.append(libzookeeper_conf.ENSEMBLE.set_for_testing('zoo:2181'))
   clears.append(libsolr_conf.SOLR_ZK_PATH.set_for_testing('/solr'))
   try:
-    assert_equal('zoo:2181/solr', get_solr_ensemble())
+    assert 'zoo:2181/solr' == get_solr_ensemble()
   finally:
     for clear in clears:
       clear()
@@ -55,28 +48,25 @@ def test_get_ensemble():
   clears.append(libzookeeper_conf.ENSEMBLE.set_for_testing('zoo:2181,zoo2:2181'))
   clears.append(libsolr_conf.SOLR_ZK_PATH.set_for_testing('/solr2'))
   try:
-    assert_equal('zoo:2181,zoo2:2181/solr2', get_solr_ensemble())
+    assert 'zoo:2181,zoo2:2181/solr2' == get_solr_ensemble()
   finally:
     for clear in clears:
       clear()
 
 
+@pytest.mark.django_db
 class TestImporter(object):
 
-  def setUp(self):
-    self.client = make_logged_in_client()
+    def setup_method(self):
+        self.client = make_logged_in_client()
 
-  def test_input_formats_no_fs(self):
-    with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
-      get_filesystem.return_value = Mock()
-
-      resp = self.client.get(reverse('indexer:importer'))
-      assert_true(b"{'value': 'file', 'name': 'Remote File'}" in resp.content)
-
-      get_filesystem.return_value = None
-
-      resp = self.client.get(reverse('indexer:importer'))
-      assert_false(b"{'value': 'file', 'name': 'Remote File'}" in resp.content)
+    def test_input_formats_no_fs(self):
+      with patch('desktop.middleware.fsmanager.get_filesystem') as get_filesystem:
+          get_filesystem.return_value = Mock()
+          resp = self.client.get(reverse('indexer:importer'))
+          assert b'"source_type": "hive"' in resp.content
+          assert b'"is_embeddable": false' in resp.content
+          get_filesystem.return_value = None
 
 
 class TestIndexerWithSolr(object):
@@ -85,7 +75,7 @@ class TestIndexerWithSolr(object):
   def setup_class(cls):
 
     if not is_live_cluster():
-      raise SkipTest()
+      pytest.skip("Skipping Test")
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
@@ -97,17 +87,17 @@ class TestIndexerWithSolr(object):
     resp = cls.client.post(reverse('indexer:install_examples'), {'data': 'log_analytics_demo'})
     content = json.loads(resp.content)
 
-    assert_equal(content.get('status'), 0)
+    assert content.get('status') == 0
 
   @classmethod
   def teardown_class(cls):
     pass
 
   def test_is_solr_cloud_mode(self):
-    assert_true(CollectionManagerController(self.user).is_solr_cloud_mode())
+    assert CollectionManagerController(self.user).is_solr_cloud_mode()
 
   def test_collection_exists(self):
-    assert_false(self.db.collection_exists('does_not_exist'))
+    assert not self.db.collection_exists('does_not_exist')
 
   def test_get_collections(self):
     self.db.get_collections()
@@ -124,7 +114,7 @@ class TestIndexerWithSolr(object):
 
   def test_collections_fields(self):
     uniquekey, fields = self.db.get_fields('log_analytics_demo')
-    assert_equal('id', uniquekey)
+    assert 'id' == uniquekey
 
-    assert_true('protocol' in fields, fields)
-    assert_true('country_code3' in fields, fields)
+    assert 'protocol' in fields, fields
+    assert 'country_code3' in fields, fields

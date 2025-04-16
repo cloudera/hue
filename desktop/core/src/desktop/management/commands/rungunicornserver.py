@@ -15,33 +15,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import unicode_literals
-import atexit
-import desktop.log
-import gunicorn.app.base
-import logging
-import logging.config
+
 import os
-import pkg_resources
 import ssl
 import sys
+import time
+import atexit
+import logging
 import tempfile
-
-from OpenSSL import crypto
+import logging.config
 from multiprocessing.util import _exit_function
-from desktop import conf
-from desktop.lib.paths import get_desktop_root
+
+import redis
+import psutil
+import pkg_resources
+import gunicorn.app.base
 from django.core.management.base import BaseCommand
 from django.core.wsgi import get_wsgi_application
-from django.utils.translation import gettext as _
 from django.db import connection
+from django.utils.translation import gettext as _
 from gunicorn import util
+from OpenSSL import crypto
 from six import iteritems
+
+import desktop.log
+from desktop import conf
+from desktop.lib.paths import get_desktop_root
+from filebrowser.utils import parse_broker_url
 
 GUNICORN_SERVER_HELP = r"""
   Run Hue using the Gunicorn WSGI server in asynchronous mode.
 """
 
 PID_FILE = None
+
 
 class Command(BaseCommand):
   help = _("Gunicorn Web server for Hue.")
@@ -55,6 +62,7 @@ class Command(BaseCommand):
   def usage(self, subcommand):
     return GUNICORN_SERVER_HELP
 
+
 def activate_translation():
   from django.conf import settings
   from django.utils import translation
@@ -65,23 +73,29 @@ def activate_translation():
   except AttributeError:
     pass
 
+
 def number_of_workers():
   return (multiprocessing.cpu_count() * 2) + 1
+
 
 def handler_app(environ, start_response):
   os.environ.setdefault("DJANGO_SETTINGS_MODULE", "desktop.settings")
   return get_wsgi_application()
 
+
 def post_fork(server, worker):
   global PID_FILE
   with open(PID_FILE, "a") as f:
-    f.write("%s\n"%worker.pid)
+    f.write("%s\n" % worker.pid)
+
 
 def post_worker_init(worker):
   connection.connect()
 
+
 def worker_int(worker):
   connection.close()
+
 
 def enable_logging(args, options):
   HUE_DESKTOP_VERSION = pkg_resources.get_distribution("desktop").version or "Unknown"
@@ -92,6 +106,37 @@ def enable_logging(args, options):
 
   desktop.log.basic_logging(os.environ["HUE_PROCESS_NAME"])
   logging.info("Welcome to Hue from Gunicorn server " + HUE_DESKTOP_VERSION)
+
+
+def initialize_free_disk_space_in_redis():
+  conn_success = False
+  for retries in range(5):
+    try:
+      redis_client = parse_broker_url(desktop.conf.TASK_SERVER_V2.BROKER_URL.get())
+      free_space = psutil.disk_usage('/tmp').free
+      available_space = redis_client.get('upload_available_space')
+      if available_space is None:
+        available_space = free_space
+      else:
+        available_space = int(available_space)
+      upload_keys_exist = any(redis_client.scan_iter('upload__*'))
+      redis_client.delete('upload_available_space')
+      if not upload_keys_exist:
+        redis_client.setnx('upload_available_space', free_space)
+      else:
+        redis_client.setnx('upload_available_space', min(free_space, available_space))
+      logging.info("Successfully initialized free disk space in Redis.")
+      conn_success = True
+      break
+    except redis.ConnectionError as e:
+      logging.error(f"Redis connection error: {e}")
+      time.sleep(10)
+    except Exception as e:
+      logging.error(f"Error while initializing free disk space in Redis: {e}")
+      time.sleep(10)
+  if not conn_success:
+    logging.error("Failed to initialize free disk space in Redis after 5 retries.")
+
 
 class StandaloneApplication(gunicorn.app.base.BaseApplication):
   def __init__(self, app, options=None):
@@ -121,6 +166,7 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
 
   def load(self):
     return self.load_wsgiapp()
+
 
 def argprocessing(args=[], options={}):
   global PID_FILE
@@ -155,6 +201,7 @@ def argprocessing(args=[], options={}):
       ssl_keyfile = conf.SSL_PRIVATE_KEY.get()
   options['ssl_keyfile'] = ssl_keyfile
 
+
 def rungunicornserver(args=[], options={}):
   gunicorn_options = {
       'accesslog': "-",
@@ -164,7 +211,7 @@ def rungunicornserver(args=[], options={}):
       'ca_certs': conf.SSL_CACERTS.get(),     # CA certificates file
       'capture_output': True,
       'cert_reqs': None,                      # Whether client certificate is required (see stdlib ssl module)
-      'certfile': conf.SSL_CERTIFICATE.get(), # SSL certificate file
+      'certfile': conf.SSL_CERTIFICATE.get(),  # SSL certificate file
       'chdir': None,
       'check_config': None,
       'ciphers': conf.SSL_CIPHER_LIST.get(),  # Ciphers to use (see stdlib ssl module)
@@ -174,7 +221,7 @@ def rungunicornserver(args=[], options={}):
       'enable_stdio_inheritance': None,
       'errorlog': "-",
       'forwarded_allow_ips': None,
-      'graceful_timeout': 900,                # Timeout for graceful workers restart.
+      'graceful_timeout': conf.GUNICORN_WORKER_GRACEFUL_TIMEOUT.get(),
       'group': conf.SERVER_GROUP.get(),
       'initgroups': None,
       'keepalive': 120,                       # seconds to wait for requests on a keep-alive connection.
@@ -207,7 +254,7 @@ def rungunicornserver(args=[], options={}):
       'syslog_facility': None,
       'syslog_prefix': None,
       'threads': conf.CHERRYPY_SERVER_THREADS.get(),
-      'timeout': 900,                         # Workers silent for more than this many seconds are killed and restarted.
+      'timeout': conf.GUNICORN_WORKER_TIMEOUT.get(),
       'umask': None,
       'user': conf.SERVER_USER.get(),
       'worker_class': conf.GUNICORN_WORKER_CLASS.get(),
@@ -219,6 +266,7 @@ def rungunicornserver(args=[], options={}):
       'worker_int': worker_int
   }
   StandaloneApplication(handler_app, gunicorn_options).run()
+
 
 def start_server(args, options):
   global PID_FILE
@@ -232,9 +280,12 @@ def start_server(args, options):
   activate_translation()
   enable_logging(args, options)
   atexit.unregister(_exit_function)
+  if desktop.conf.TASK_SERVER_V2.ENABLED.get():
+    initialize_free_disk_space_in_redis()
   with open(PID_FILE, "a") as f:
-    f.write("%s\n"%os.getpid())
+    f.write("%s\n" % os.getpid())
   rungunicornserver(args, options)
+
 
 if __name__ == '__main__':
   start_server(args=sys.argv[1:], options={})

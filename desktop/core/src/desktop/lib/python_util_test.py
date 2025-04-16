@@ -20,8 +20,6 @@
 from builtins import object
 import datetime
 
-from nose.tools import assert_true, assert_equal, assert_not_equal
-
 from desktop.lib.python_util import CaseInsensitiveDict, force_dict_to_strings, force_list_to_strings, check_encoding
 
 
@@ -29,36 +27,36 @@ class TestPythonUtil(object):
   def test_case_insensitive_dictionary(self):
     d = CaseInsensitiveDict()
     d["Test"] = "Test"
-    assert_true("Test" in d)
-    assert_true("test" in d)
-    assert_equal("Test", d['Test'])
-    assert_equal("Test", d['test'])
-    assert_not_equal("test", d['Test'])
-    assert_not_equal("test", d['test'])
+    assert "Test" in d
+    assert "test" in d
+    assert "Test" == d['Test']
+    assert "Test" == d['test']
+    assert "test" != d['Test']
+    assert "test" != d['test']
 
   def test_force_dict_to_strings(self):
     unicode_dict = {u'test': u'test'}
     string_dict = {'test': 'test'}
     transformed_dict = force_dict_to_strings(unicode_dict)
-    assert_equal(string_dict, transformed_dict)
+    assert string_dict == transformed_dict
 
     # Embedded
     unicode_dict = {u'test': {u'test': u'test'}}
     string_dict = {'test': {'test': 'test'}}
     transformed_dict = force_dict_to_strings(unicode_dict)
-    assert_equal(string_dict, transformed_dict)
+    assert string_dict == transformed_dict
 
     # Embedded list
     unicode_dict = {u'test': [{u'test': u'test'}]}
     string_dict = {'test': [{'test': 'test'}]}
     transformed_dict = force_dict_to_strings(unicode_dict)
-    assert_equal(string_dict, transformed_dict)
+    assert string_dict == transformed_dict
 
   def test_force_list_to_strings(self):
     unicode_list = [u'test', {u'test': u'test'}]
     string_list = ['test', {'test': 'test'}]
     transformed_list = force_list_to_strings(unicode_list)
-    assert_equal(string_list, transformed_list)
+    assert string_list == transformed_list
 
 
   def test_check_encoding(self):
@@ -279,4 +277,4 @@ Rank,City/town,Russian,Federal subject,Federal district,Population,Change
 
     for key in test_dict:
       enc_code = check_encoding(test_dict[key])
-      assert_equal(key, enc_code, "compare target encoding %s with tested encoding %s" % (key, enc_code))
+      assert key == enc_code, "compare target encoding %s with tested encoding %s" % (key, enc_code)

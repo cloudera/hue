@@ -15,15 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
+from django.urls import re_path
 
-from filebrowser import views as filebrowser_views
-from filebrowser import api as filebrowser_api
-
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from filebrowser import api as filebrowser_api, utils as filebrowser_utils, views as filebrowser_views
 
 urlpatterns = [
   # Base view
@@ -31,6 +25,7 @@ urlpatterns = [
 
   # Catch-all for viewing a file (display) or a directory (listdir)
   re_path(r'^view=(?P<path>.*)$', filebrowser_views.view, name='filebrowser.views.view'),
+  re_path(r'^new$', filebrowser_views.view_new, name='filebrowser.views.new_view'),
 
   re_path(r'^listdir=(?P<path>.*)$', filebrowser_views.listdir, name='listdir'),
   re_path(r'^display=(?P<path>.*)$', filebrowser_views.display, name='display'),
@@ -46,6 +41,12 @@ urlpatterns = [
   re_path(r'^upload/file$', filebrowser_views.upload_file, name='upload_file'),
   re_path(r'^upload/chunks', filebrowser_views.upload_chunks, name='upload_chunks'),
   re_path(r'^upload/complete', filebrowser_views.upload_complete, name='upload_complete'),
+  re_path(r'^upload/taskserver/get_available_space_for_file_uploads',
+          filebrowser_utils.get_available_space_for_file_uploads, name='get_available_space_for_file_uploads'),
+  re_path(r'^upload/taskserver/reserve_space_for_file_uploads',
+          filebrowser_utils.reserve_space_for_file_uploads, name='reserve_space_for_file_uploads'),
+  re_path(r'^upload/taskserver/release_reserved_space_for_file_uploads',
+          filebrowser_utils.release_reserved_space_for_file_uploads, name='release_reserved_space_for_file_uploads'),
   re_path(r'^extract_archive', filebrowser_views.extract_archive_using_batch_job, name='extract_archive_using_batch_job'),
   re_path(r'^compress_files', filebrowser_views.compress_files_using_batch_job, name='compress_files_using_batch_job'),
   re_path(r'^trash/restore$', filebrowser_views.trash_restore, name='trash_restore'),

@@ -16,24 +16,20 @@
 # limitations under the License.
 
 import sys
-
 from builtins import object
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises
+from unittest.mock import Mock, patch
+
+import pytest
 
 from desktop.lib.django_test_util import make_logged_in_client
+from notebook.connectors.spark_shell import SparkApi
 from useradmin.models import User
 
-from notebook.connectors.spark_shell import SparkApi
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
-
-
+@pytest.mark.django_db
 class TestSparkApi(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="hue_test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="hue_test")
 
@@ -45,15 +41,13 @@ class TestSparkApi(object):
       }
     self.api = SparkApi(self.user, self.interpreter)
 
-
   def test_get_api(self):
     lang = 'pyspark'
     properties = None
 
     # with patch('notebook.connectors.spark_shell.get_spark_api') as get_spark_api:
     spark_api = self.api.get_api()
-    assert_equal(spark_api.__class__.__name__, 'LivyClient')
-
+    assert spark_api.__class__.__name__ == 'LivyClient'
 
   def test_get_livy_props_method(self):
     test_properties = [{
@@ -61,8 +55,7 @@ class TestSparkApi(object):
         "value": 'file_a,file_b,file_c',
       }]
     props = self.api.get_livy_props('scala', test_properties)
-    assert_equal(props['files'], ['file_a', 'file_b', 'file_c'])
-
+    assert props['files'] == ['file_a', 'file_b', 'file_c']
 
   def test_create_session_with_config(self):
     lang = 'pyspark'
@@ -91,13 +84,13 @@ class TestSparkApi(object):
           USE_DEFAULT_CONFIGURATION.get.return_value = True
           session = self.api.create_session(lang=lang, properties=properties)
 
-          assert_equal(session['type'], 'pyspark')
-          assert_equal(session['id'], '1')
+          assert session['type'] == 'pyspark'
+          assert session['id'] == '1'
 
           for p in session['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
-          assert_equal(cores, 2)
+          assert cores == 2
 
           if self.api._get_session_info_from_user():
             self.api._remove_session_info_from_user()
@@ -107,26 +100,25 @@ class TestSparkApi(object):
           DefaultConfiguration.objects.get_configuration_for_user.return_value = None
           session2 = self.api.create_session(lang=lang, properties=properties)
 
-          assert_equal(session2['type'], 'pyspark')
-          assert_equal(session2['id'], '1')
+          assert session2['type'] == 'pyspark'
+          assert session2['id'] == '1'
 
           for p in session2['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
-          assert_equal(cores, 1)
+          assert cores == 1
 
           # Case with no user configuration. Expected 1 driverCores
           USE_DEFAULT_CONFIGURATION.get.return_value = False
           session3 = self.api.create_session(lang=lang, properties=properties)
 
-          assert_equal(session3['type'], 'pyspark')
-          assert_equal(session3['id'], '1')
+          assert session3['type'] == 'pyspark'
+          assert session3['id'] == '1'
 
           for p in session3['properties']:
             if p['name'] == 'driverCores':
               cores = p['value']
-          assert_equal(cores, 1)
-
+          assert cores == 1
 
   def test_create_session_plain(self):
     lang = 'pyspark'
@@ -145,13 +137,12 @@ class TestSparkApi(object):
 
       session = self.api.create_session(lang=lang, properties=properties)
 
-      assert_equal(session['type'], 'pyspark')
-      assert_equal(session['id'], '1')
+      assert session['type'] == 'pyspark'
+      assert session['id'] == '1'
 
       files_properties = [prop for prop in session['properties'] if prop['name'] == 'files']
-      assert_true(files_properties, session['properties'])
-      assert_equal(files_properties[0]['value'], [], session['properties'])
-
+      assert files_properties, session['properties']
+      assert files_properties[0]['value'] == [], session['properties']
 
   def test_execute(self):
     with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
@@ -168,13 +159,13 @@ class TestSparkApi(object):
         self.api._check_session = Mock(return_value={'id': '1'})
 
         response = self.api.execute(notebook, snippet)
-        assert_equal(response['id'], 'test_id')
+        assert response['id'] == 'test_id'
 
         get_spark_api.return_value = Mock(
           submit_statement=Mock()
         )
-        assert_raises(Exception, self.api.execute, notebook, snippet)
-
+        with pytest.raises(Exception):
+          self.api.execute(notebook, snippet)
 
   def test_handle_result_data(self):
     # When result data has no complex type.
@@ -182,7 +173,7 @@ class TestSparkApi(object):
       'data': [[1, 'Test']]
     }
     processed_data = self.api._handle_result_data(data, is_complex_type=False)
-    assert_equal(processed_data, [[1, 'Test']])
+    assert processed_data == [[1, 'Test']]
 
     # When result data has struct complex type with 'schema' and 'values'.
     data = {
@@ -204,7 +195,7 @@ class TestSparkApi(object):
                 'values': ['Toronto', 'ON']}]]}
 
     processed_data = self.api._handle_result_data(data, is_complex_type=True)
-    assert_equal(processed_data, [[1, 'Test', {'State': 'ON', 'city': 'Toronto'}]])
+    assert processed_data == [[1, 'Test', {'State': 'ON', 'city': 'Toronto'}]]
 
     # When result data has map complex type.
     data = {
@@ -212,8 +203,7 @@ class TestSparkApi(object):
     }
 
     processed_data = self.api._handle_result_data(data, is_complex_type=True)
-    assert_equal(processed_data, [['0', 535.0, {'site_id': 'BEB'}, {'c_id': 'EF'}, '2023-06-16T23:53:31Z']])
-
+    assert processed_data == [['0', 535.0, {'site_id': 'BEB'}, {'c_id': 'EF'}, '2023-06-16T23:53:31Z']]
 
   def test_check_status(self):
     with patch('notebook.connectors.spark_shell._get_snippet_session') as _get_snippet_session:
@@ -236,13 +226,13 @@ class TestSparkApi(object):
         self.api._handle_session_health_check = Mock(return_value={'id': '1'})
 
         response = self.api.check_status(notebook, snippet)
-        assert_equal(response['status'], 'test_state')
+        assert response['status'] == 'test_state'
 
         get_spark_api.return_value = Mock(
           submit_statement=Mock()
         )
-        assert_raises(Exception, self.api.check_status, notebook, snippet)
-  
+        with pytest.raises(Exception):
+          self.api.check_status(notebook, snippet)
 
   def test_get_sample_data(self):
     snippet = Mock()
@@ -273,34 +263,32 @@ class TestSparkApi(object):
     )
     response = self.api.get_sample_data(snippet, 'test_db', 'test_table', 'test_column')
 
-    assert_equal(response['rows'], [])
-    assert_equal(response['full_headers'], [])
+    assert response['rows'] == []
+    assert response['full_headers'] == []
 
     # When table is not transactional
     self.api.describe_table = Mock(
       return_value={
-        'stats': [] # No details regarding transactionality is present in describe response
+        'stats': []  # No details regarding transactionality is present in describe response
       }
     )
     response = self.api.get_sample_data(snippet, 'test_db', 'test_table', 'test_column')
 
-    assert_equal(response['rows'], 'test_data')
-    assert_equal(response['full_headers'], 'test_meta')
-  
+    assert response['rows'] == 'test_data'
+    assert response['full_headers'] == 'test_meta'
 
   def test_get_select_query(self):
     # With operation as 'hello'
     response = self.api._get_select_query('test_db', 'test_table', 'test_column', 'hello')
-    assert_equal(response, "SELECT 'Hello World!'")
+    assert response == "SELECT 'Hello World!'"
 
     # Without column name
     response = self.api._get_select_query('test_db', 'test_table')
-    assert_equal(response, 'SELECT *\nFROM test_db.test_table\nLIMIT 100\n')
+    assert response == 'SELECT *\nFROM test_db.test_table\nLIMIT 100\n'
 
     # With some column name
     response = self.api._get_select_query('test_db', 'test_table', 'test_column')
-    assert_equal(response, 'SELECT test_column\nFROM test_db.test_table\nLIMIT 100\n')
-
+    assert response == 'SELECT test_column\nFROM test_db.test_table\nLIMIT 100\n'
 
   def test_describe_database(self):
     notebook = Mock()
@@ -329,14 +317,13 @@ class TestSparkApi(object):
     )
     response = self.api.describe_database(notebook, snippet, 'employees')
 
-    assert_equal(response, {
+    assert response == {
       'comment': 'For software companies',
       'db_name': 'employees',
       'location': 'hdfs://test_url:8020/warehouse/tablespace/external/hive/employees.db',
       'owner_name': 'demo',
       'parameters': '{Create-by=Kevin, Create-date=09/01/2019}',
-      'status': 0})
-
+      'status': 0}
 
   def test_describe_table(self):
     notebook = Mock()
@@ -394,7 +381,7 @@ class TestSparkApi(object):
     )
     response = self.api.describe_table(notebook, snippet, 'default', 'test_nonacid')
 
-    assert_equal(response, {
+    assert response == {
       'cols': [{'comment': 'None', 'name': 'nname', 'type': 'string'}],
       'comment': '',
       'details': {'properties': {
@@ -496,22 +483,20 @@ class TestSparkApi(object):
                 {'col_name': '1656416152',
                   'comment': '',
                   'data_type': 'transient_lastDdlTime'}],
-      'status': 0})
-
+      'status': 0}
 
   def test_get_jobs(self):
     local_jobs = [
       {'url': u'http://172.21.1.246:4040/jobs/job/?id=0', 'name': u'0'}
     ]
     jobs = self.api._get_standalone_jobs(LIVY_STANDALONE_LOG)
-    assert_equal(jobs, local_jobs, jobs)
+    assert jobs == local_jobs, jobs
 
     yarn_jobs = [
       {'url': u'http://huetest-1.test.com:8088/proxy/application_1444070328046_0002/', 'name': u'application_1444070328046_0002'}
     ]
     jobs = self.api._get_yarn_jobs(LIVY_YARN_LOG)
-    assert_equal(jobs, yarn_jobs, jobs)
-
+    assert jobs == yarn_jobs, jobs
 
 
 LIVY_STANDALONE_LOG = """
@@ -589,7 +574,7 @@ LIVY_STANDALONE_LOG = """
   15/10/05 14:02:37 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool
   15/10/05 14:02:37 INFO DAGScheduler: ShuffleMapStage 0 (reduceByKey at <stdin>:1) finished in 0.973 s
   15/10/05 14:02:37 INFO DAGScheduler: looking for newly runnable stages
-"""
+"""  # noqa: E501
 LIVY_YARN_LOG = """
   15/10/05 13:51:21 INFO client.RMProxy: Connecting to ResourceManager at huetest-1.test.com/175.18.213.12:8032
   15/10/05 13:51:21 INFO yarn.Client: Requesting a new application from cluster with 3 NodeManagers
@@ -642,4 +627,4 @@ LIVY_YARN_LOG = """
         tracking URL: http://huetest-1.test.com:8088/proxy/application_1444070328046_0002/
         user: huetest
   15/10/05 13:52:24 INFO yarn.Client: Application report for application_1444070328046_0002 (state: RUNNING)
-"""
+"""  # noqa: E501

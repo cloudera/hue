@@ -16,19 +16,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-import sys
+from io import BytesIO as string_io
 
-from nose.tools import assert_equal
 from openpyxl import load_workbook
 
 from desktop.lib.export_csvxls import create_generator, make_response
 
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-else:
-  from cStringIO import StringIO as string_io
 
 def content_generator(header, data):
   yield header, data
@@ -36,38 +29,36 @@ def content_generator(header, data):
 
 def test_export_csv():
   headers = ["x", "y"]
-  data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None], ["http://gethue.com", "http://gethue.com"] ]
+  data = [["1", "2"], ["3", "4"], ["5,6", "7"], [None, None], ["http://gethue.com", "http://gethue.com"]]
 
   # Check CSV
   generator = create_generator(content_generator(headers, data), "csv")
   response = make_response(generator, "csv", "foo")
-  assert_equal("application/csv", response["content-type"])
+  assert "application/csv" == response["content-type"]
   content = b''.join(response.streaming_content)
-  assert_equal(b'x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\nhttp://gethue.com,http://gethue.com\r\n', content)
-  assert_equal('attachment; filename="foo.csv"', response["content-disposition"])
+  assert b'x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\nhttp://gethue.com,http://gethue.com\r\n' == content
+  assert 'attachment; filename="foo.csv"' == response["content-disposition"]
 
   # Check non-ASCII for any browser except FF or no browser info
   generator = create_generator(content_generator(headers, data), "csv")
-  response = make_response(generator, "csv", u'gんtbhんjk？￥n')
-  assert_equal("application/csv", response["content-type"])
+  response = make_response(generator, "csv", 'gんtbhんjk？￥n')
+  assert "application/csv" == response["content-type"]
   content = b''.join(response.streaming_content)
-  assert_equal(b'x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\nhttp://gethue.com,http://gethue.com\r\n', content)
-  assert_equal('attachment; filename="g%E3%82%93tbh%E3%82%93jk%EF%BC%9F%EF%BF%A5n.csv"', response["content-disposition"])
+  assert b'x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\nhttp://gethue.com,http://gethue.com\r\n' == content
+  assert 'attachment; filename="g%E3%82%93tbh%E3%82%93jk%EF%BC%9F%EF%BF%A5n.csv"' == response["content-disposition"]
 
   # Check non-ASCII for FF browser
   generator = create_generator(content_generator(headers, data), "csv")
   response = make_response(
-      generator, "csv", u'gんtbhんjk？￥n',
-      user_agent='Mozilla / 5.0(Macintosh; Intel Mac OS X 10.12;rv:59.0) Gecko / 20100101 Firefox / 59.0)'
+    generator,
+    "csv",
+    'gんtbhんjk？￥n',
+    user_agent='Mozilla / 5.0(Macintosh; Intel Mac OS X 10.12;rv:59.0) Gecko / 20100101 Firefox / 59.0)',
   )
-  assert_equal("application/csv", response["content-type"])
+  assert "application/csv" == response["content-type"]
   content = b''.join(response.streaming_content)
-  assert_equal(b'x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\nhttp://gethue.com,http://gethue.com\r\n', content)
-  assert_equal(
-      'attachment; filename*="g%E3%82%93tbh%E3%82%93jk%EF%BC%9F%EF%BF%A5n.csv"',
-      response["content-disposition"]
-  )
-
+  assert b'x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\nhttp://gethue.com,http://gethue.com\r\n' == content
+  assert 'attachment; filename*="g%E3%82%93tbh%E3%82%93jk%EF%BC%9F%EF%BF%A5n.csv"' == response["content-disposition"]
 
 
 def test_export_xls():
@@ -78,13 +69,15 @@ def test_export_xls():
   # Check XLS
   generator = create_generator(content_generator(headers, data), "xls")
   response = make_response(generator, "xls", "foo")
-  assert_equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["content-type"])
+  assert "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" == response["content-type"]
 
-  expected_data = [[cell is not None and cell.replace("http://gethue.com", '=HYPERLINK("http://gethue.com")') or "NULL" for cell in row] for row in sheet]
+  expected_data = [
+    [cell is not None and cell.replace("http://gethue.com", '=HYPERLINK("http://gethue.com")') or "NULL" for cell in row] for row in sheet
+  ]
   sheet_data = _read_xls_sheet_data(response)
 
-  assert_equal(expected_data, sheet_data)
-  assert_equal('attachment; filename="foo.xlsx"', response["content-disposition"])
+  assert expected_data == sheet_data
+  assert 'attachment; filename="foo.xlsx"' == response["content-disposition"]
 
 
 def _read_xls_sheet_data(response):

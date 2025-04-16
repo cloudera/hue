@@ -38,7 +38,6 @@ Type `script_runner help <sub-command>` for help on a specific subcommand.
 `estimate_concurrent_users`
 `hue_desktop_document_cleanup`
 `list_groups`
-`promote_to_superuser`
 `emove_doc2_without_content_object`
 `remove_duplicate_user_preferences`
 `remove_orphaned_docs`
@@ -62,9 +61,6 @@ This checks the access logs and try to estimate the number of active users over 
 
 - `script_runner list_groups`
 This shows all of the groups that exist in Hue.
-
-- `script_runner promote_to_superuser --username cconner`
-This promotes a non-superuser to a superuser.
 
 - `script_runner remove_doc2_without_content_object`
 This removes bad doc2 objects that do not have the content object.

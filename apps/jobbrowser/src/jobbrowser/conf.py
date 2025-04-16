@@ -17,13 +17,9 @@
 
 import sys
 
-from desktop.lib.conf import Config, coerce_bool, ConfigSection
+from django.utils.translation import gettext_lazy as _
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
-
+from desktop.lib.conf import Config, ConfigSection, coerce_bool
 
 SHARE_JOBS = Config(
   key='share_jobs',
@@ -84,9 +80,11 @@ ENABLE_HISTORY_V2 = Config(
   default=False
 )
 
+
 def is_query_store_url_set():
   """Check if query store url is configured"""
   return QUERY_STORE.SERVER_URL.get() != ''
+
 
 QUERY_STORE = ConfigSection(
   key="query_store",

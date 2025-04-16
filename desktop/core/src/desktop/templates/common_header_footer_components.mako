@@ -19,12 +19,12 @@ import sys
 from django.template.defaultfilters import escape, escapejs
 
 from desktop import conf
-from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
 from beeswax.conf import LIST_PARTITIONS_LIMIT
 from indexer.conf import ENABLE_NEW_INDEXER
 from metadata.conf import has_optimizer, OPTIMIZER
+from desktop.lib.django_util import nonce_attribute
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -33,7 +33,7 @@ else:
 %>
 
 <%def name="header_pollers(user, is_s3_enabled, apps)">
-  <script type="text/javascript">
+  <script type="text/javascript" ${nonce_attribute(request)}>
     Dropzone.autoDiscover = false;
     moment.locale(window.navigator.userLanguage || window.navigator.language);
     localeFormat = function (time) {
@@ -56,7 +56,9 @@ else:
     // Catches HTTP 502 errors
     function xhrOnreadystatechange() {
       if (this.readyState === 4 && this.status === 502) {
-        $.jHueNotify.error($('<span>').html(this.responseText).text());
+        huePubSub.publish('hue.global.error', {
+          message: $('<span>').html(this.responseText).text()
+        });
       }
       if (this._onreadystatechange) {
         return this._onreadystatechange.apply(this, arguments);
@@ -228,7 +230,7 @@ else:
 
 </%def>
 
-<%def name="footer(messages)">
+<%def name="footer(messages, nonce)">
 
 <div id="progressStatus" class="uploadstatus well hide">
   <h4>${ _('Upload progress') }</h4>
@@ -265,7 +267,7 @@ else:
 
 <div class="clipboard-content"></div>
 
-<script type="text/javascript">
+<script type="text/javascript" ${nonce_attribute(request)}>
 
   $(document).ready(function () {
 
@@ -347,19 +349,6 @@ else:
           '</button>';
     }
 
-    $(document).on("info", function (e, msg) {
-      $.jHueNotify.info(msg);
-    });
-    $(document).on("warn", function (e, msg) {
-      $.jHueNotify.warn(msg);
-    });
-    window.huePubSub.subscribe('hue.error', function (msg) {
-      $.jHueNotify.error(msg);
-    });
-    $(document).on("error", function (e, msg) {
-      $.jHueNotify.error(msg);
-    });
-
     $($('#zoomDetectFrame')[0].contentWindow).resize(function () {
       $(window).trigger('zoom');
     });
@@ -369,9 +358,9 @@ else:
         %if message.tags == 'error':
           huePubSub.publish('hue.global.error', {message: '${ escapejs(escape(message)) }'});
         %elif message.tags == 'warning':
-          $(document).trigger('warn', '${ escapejs(escape(message)) }');
+          huePubSub.publish('hue.global.warning', { message: '${ escapejs(escape(message)) }'});
         %else:
-          $(document).trigger('info', '${ escapejs(escape(message)) }');
+          huePubSub.publish('hue.global.info', { message: '${ escapejs(escape(message)) }'});
         %endif
       %endfor
     %endif
@@ -405,7 +394,7 @@ else:
             });
           }
           window.setTimeout(function () {
-            $('.jHueNotify').remove();
+            huePubSub.publish('hide.global.alerts');
           }, 200);
         }
       }
@@ -423,7 +412,9 @@ else:
         }
         else {
           $('#login-modal').modal('hide');
-          $.jHueNotify.info('${ _('You have signed in successfully!') }');
+          huePubSub.publish('hue.global.info', {
+            message: "${ _('You have signed in successfully!') }"
+          });
           $('#login-modal .login-error').addClass('hide');
         }
       }

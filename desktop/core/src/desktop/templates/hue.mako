@@ -20,10 +20,11 @@
   from desktop import conf
   from desktop.auth.backend import is_admin
   from desktop.conf import ENABLE_HUE_5, has_multi_clusters
-  from desktop.lib.i18n import smart_unicode
+  from desktop.lib.i18n import smart_str
   from desktop.models import hue_version
   from desktop.views import _ko, commonshare, login_modal
   from desktop.webpack_utils import get_hue_bundles
+  from desktop.lib.django_util import nonce_attribute
 
   from webpack_loader.templatetags.webpack_loader import render_bundle
 
@@ -35,6 +36,7 @@
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
+<%namespace name="jbCommon" file="/job_browser_common.mako" />
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -43,7 +45,7 @@
   % if conf.COLLECT_USAGE.get():
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=${conf.GTAG_ID.get()}"></script>
-    <script>
+    <script ${nonce_attribute(request)}>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
@@ -109,8 +111,8 @@
   </ul>
 
   <!-- UserVoice JavaScript SDK -->
-  <script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
-  <script>
+  <script ${nonce_attribute(request)}>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/8YpsDfIl1Y2sNdONoLXhrg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+  <script ${nonce_attribute(request)}>
   UserVoice = window.UserVoice || [];
   function showClassicWidget() {
     UserVoice.push(['showLightbox', 'classic_widget', {
@@ -123,12 +125,6 @@
   </script>
 % endif
 
-<div id="jHueNotify" class="alert hide">
-  <button class="close">&times;</button>
-  <div class="message"></div> 
-</div>
-
-
 ${ hueIcons.symbols() }
 
 <!-- fake fields are a workaround for chrome autofill getting the wrong fields, readonly needed for 1password -->
@@ -140,7 +136,7 @@ ${ hueIcons.symbols() }
 
   <div class="main-page">
     <AppBanner data-reactcomponent='AppBanner'></AppBanner>
-    <AlertComponent data-reactcomponent='AlertComponent'></AlertComponent>
+    <GlobalAlert data-reactcomponent='GlobalAlert'></GlobalAlert>
     <WelcomeTour data-reactcomponent='WelcomeTour'></WelcomeTour>
 
     <nav class="navbar navbar-default">
@@ -224,11 +220,13 @@ ${ hueIcons.symbols() }
         <div id="embeddable_oozie_info" class="embeddable"></div>
         <div id="embeddable_jobbrowser" class="embeddable"></div>
         <div id="embeddable_filebrowser" class="embeddable"></div>
+        <div id="embeddable_newfilebrowser" class="embeddable hue-storage-browser__root-container"></div>
         <div id="embeddable_home" class="embeddable"></div>
         <div id="embeddable_catalog" class="embeddable"></div>
         <div id="embeddable_indexer" class="embeddable"></div>
         <div id="embeddable_kafka" class="embeddable"></div>
         <div id="embeddable_importer" class="embeddable"></div>
+        <div id="embeddable_newimporter" class="embeddable"></div>
         <div id="embeddable_collections" class="embeddable"></div>
         <div id="embeddable_indexes" class="embeddable"></div>
         <div id="embeddable_useradmin_users" class="embeddable"></div>
@@ -254,6 +252,7 @@ ${ hueIcons.symbols() }
         <div id="embeddable_dump_config" class="embeddable"></div>
         <div id="embeddable_threads" class="embeddable"></div>
         <div id="embeddable_metrics" class="embeddable"></div>
+        <div id="embeddable_taskserver" class="embeddable"></div>
         <div id="embeddable_connectors" class="embeddable"></div>
         <div id="embeddable_analytics" class="embeddable"></div>
         <div id="embeddable_403" class="embeddable"></div>
@@ -316,7 +315,7 @@ ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 
-<script>
+<script ${nonce_attribute(request)}  >
   var shareViewModel = initSharing("#documentShareModal");
 </script>
 
@@ -332,13 +331,19 @@ ${ hueAceAutocompleter.hueAceAutocompleter() }
 ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
 % if request is not None:
-${ smart_unicode(login_modal(request).content) | n,unicode }
+${ smart_str(login_modal(request).content) | n,unicode }
 % endif
 
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
-${ commonHeaderFooterComponents.footer(messages) }
+${ commonHeaderFooterComponents.footer(messages, nonce) }
+
+## This includes common knockout templates that are shared with the Job Browser page and the mini job browser panel
+## available in the upper right corner throughout Hue
+%if 'jobbrowser' in apps:
+${ jbCommon.include() }
+%endif
 
 <div class="monospace-preload" style="opacity: 0; height: 0; width: 0;">
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }

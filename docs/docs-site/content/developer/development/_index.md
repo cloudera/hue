@@ -15,7 +15,7 @@ This section goes into greater detail on how to build and reuse the components o
 * The OS specific packages are listed in the [install guide](/administrator/installation/dependencies/)
 * Python 3.8/3.9 and Django 3.2
 * Vue.js 3
-* Node.js ([14.0+](https://deb.nodesource.com/setup_10.x))
+* Node.js ([20.0+](https://deb.nodesource.com/setup_20.x))
 
 ### Build & Start
 
@@ -496,15 +496,9 @@ development mode.
 
 Run the API unit tests
 
-    ./build/env/bin/hue test unit
+    ./build/env/bin/pytest
 
-Open a pull request which will automatically trigger a [CircleCi](https://circleci.com/gh/cloudera/hue) unit test run.
-
-How to run just some parts of the tests, e.g.:
-
-    build/env/bin/hue test specific impala
-    build/env/bin/hue test specific impala.tests:TestMockedImpala
-    build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
+When opening a pull request, it will automatically trigger a [Github Action](https://github.com/cloudera/hue/actions/) that includes running the unit tests.
 
 Run the user interface tests:
 
@@ -512,40 +506,42 @@ Run the user interface tests:
 
 ### Running the API tests
 
-The ``test`` management command prepares the arguments (test app names) and passes them to nose (django_nose.nose_runner). Nose will then magically find all the tests to run.
+In the pyproject.toml file, we define the configuration for pytest, including settings to enable pytest to discover and execute the unit tests.
 
-Tests themselves should be named `*_test.py`.  These will be found as long as they're in packages covered by django.  You can use the
-unittest frameworks, or you can just name your method with the word "test" at a word boundary, and nose will find it. See `apps/hello/src/hello/hello_test.py` for an example.
+For pytest to recognize test files, you should follow the naming convention `*_test.py` or `test_*.py`. Following the pytest framework convention for test discovery is recommended. Pytest will gather test items according to the following rules:
 
-To run the unit tests (should take 5-10 minutes):
+1. Test functions or methods prefixed with test_ outside of a class.
+2. Test functions or methods prefixed with test_ inside classes prefixed with Test.
 
-    build/env/bin/hue test unit --with-xunit --with-cover
+You can refer to `desktop/libs/notebook/src/notebook/connectors/trino_tests.py` for an example of how tests are organized.
 
-To run only tests of a particular app, use:
+To run the unit tests with pytest (should not take more than 5-10 minutes):
 
-    build/env/bin/hue test specific <app>
+    ./build/env/bin/pytest
 
-e.g.
+To run the tests of a particular app, use:
 
-    build/env/bin/hue test specific filebrowser
-
-To run a specific test, use:
-
-    build/env/bin/hue test specific <app><module>:<test_func>
-    build/env/bin/hue test specific <app><module>:<class>
+    ./build/env/bin/pytest test_app_path
 
 e.g.
 
-    build/env/bin/hue test specific useradmin.tests:test_user_admin
-    build/env/bin/hue test specific useradmin.tests:AdminTest
+    ./build/env/bin/pytest apps/filebrowser
+
+To run the tests of a specific class, use:
+
+    ./build/env/bin/pytest test_file_path::class
+
+e.g.
+
+    ./build/env/bin/pytest apps/useradmin/src/useradmin/tests.py::TestUserAdmin
 
 To run a specific test in a class, use:
 
-    build/env/bin/hue test specific <app><module>:<class><test_func>
+    ./build/env/bin/pytest test_file_path::class::function
 
-To run all the tests (unit and integration, will require some live clusters or services), use:
+e.g.
 
-    build/env/bin/hue test all
+    ./build/env/bin/pytest apps/useradmin/src/useradmin/tests.py::TestUserAdmin::test_user_admin
 
 Note:
 
@@ -660,20 +656,33 @@ An example of a binding test:
 
 Add the following options:
 
-    ./build/env/bin/hue test unit --with-xunit --with-cover
+    ./build/env/bin/pytest --cov=.
+
+**Note:** Before proceeding, ensure you have installed the pytest-cov package.
 
 For js run:
 
     npm run test-coverage
 
-### Continuous Integration (CI)
+### Python Linting 
 
-[CircleCi](https://circleci.com/gh/cloudera/hue) automatically run the unit tests (Python, Javascript, linting) on branch updates and pull requests. Branches containing `ci-commit-master` will try to be auto pushed to master if the run is green and the Github permissions match.
-This logic is described in the [config.yml](https://github.com/cloudera/hue/tree/master/.circleci).
+Hue uses [Ruff](https://docs.astral.sh/ruff/) for linting its backend codebase. The Ruff related configs can be found in the [pyproject.toml](https://github.com/cloudera/hue/blob/master/pyproject.toml) file present at the project root.
 
-The runs happen in an image based on [latest Hue's image](https://hub.docker.com/u/gethue/).
+The Github Action CI checks are also leveraging the Ruff linting on branch updates and pull requests.
 
-Note: until the `desktop/ext-py` dependencies are moved to a `requirement.txt`, adding new Python modules will require adding them first to the Docker image by building a Hue branch which has them.
+To manually check for linting violations **on the modified files**, run:
+
+    ./build/env/bin/hue runruff check
+
+The above command will lint all the files modified w.r.t `origin/master` by default and to change the base branch for finding all modified files, simply add the `--diff-branch=<new_base_branch>` argument like below:
+
+    ./build/env/bin/hue runruff check --diff-branch=<new_base_branch>
+
+Ruff can also autofix most of the flagged violations:
+
+    ./build/env/bin/hue/runruff check --fix
+
+Some flagged violations can't be autofixed by Ruff and requires manual fixing. Other Ruff supported commands are listed [here](https://docs.astral.sh/ruff/configuration/#full-command-line-interface)
 
 ### Integration tests
 
@@ -760,7 +769,7 @@ Push to the CDN:
 
 ### Docker
 
-Docker images are at https://hub.docker.com/u/gethue/:
+Docker images are at https://hub.docker.com/u/gethue/
 
     docker build https://github.com/cloudera/hue.git#release-4.11.0 -t gethue/hue:4.11.0 -f tools/docker/hue/Dockerfile
     docker tag gethue/hue:4.11.0 gethue/hue:latest
@@ -810,8 +819,6 @@ A Pypi token will be needed. For doing a test release https://test.pypi.org/proj
 
     rm -rf dist && python3 -m build && python3 -m twine upload --repository testpypi dist/*
     python3 -m pip install --index-url https://test.pypi.org/simple/ gethue --upgrade
-
-Read more on [Python packaging](https://packaging.python.org/tutorials/packaging-projects/#generating-distribution-archives).
 
 ### Documentation
 

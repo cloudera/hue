@@ -2426,7 +2426,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
 
     self.search = function (callback) {
-      $(".jHueNotify").remove();
+      huePubSub.publish('hide.global.alerts');
       hueAnalytics.log('dashboard', 'search');
       self.isRetrievingResults(true);
 
@@ -2966,7 +2966,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
           }
           var oldId  = self.collection.id();
           self.collection.id(data.id);
-          $(document).trigger("info", data.message);
+          huePubSub.publish('hue.global.info', { message: data.message });
           if (oldId !== data.id) {
             hueUtils.changeURL('/hue/dashboard/?collection=' + data.id);
           }

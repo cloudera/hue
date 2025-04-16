@@ -18,9 +18,7 @@
 from builtins import object
 import logging
 import json
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
+import pytest
 
 from django.urls import reverse
 
@@ -45,14 +43,14 @@ except:
   LOG.exception('Testing libsolr requires the search app to not be blacklisted')
 
 
+@pytest.mark.integration
 class TestLibSolrWithSolr(object):
-  integration = True
 
   @classmethod
   def setup_class(cls):
 
     if not is_live_cluster() or not search_enabled:
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
@@ -69,7 +67,7 @@ class TestLibSolrWithSolr(object):
     cls.user.is_superuser = False
     cls.user.save()
 
-    assert_equal(content.get('status'), 0)
+    assert content.get('status') == 0
 
   @classmethod
   def teardown_class(cls):

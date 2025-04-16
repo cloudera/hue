@@ -16,9 +16,7 @@
 
 import logging
 import json
-
-from nose.tools import assert_true, assert_equal
-from nose.plugins.skip import SkipTest
+import pytest
 from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -104,13 +102,13 @@ class TestWithSqoopServer(TestSqoopServerBase):
     resp = self.client.get(reverse('sqoop:jobs'))
     content = json.loads(resp.content)
 
-    assert_true('jobs' in content, content)
+    assert 'jobs' in content, content
 
 
 class TestSqoopClientLinks(TestSqoopServerBase):
 
-  def setUp(self):
-    raise SkipTest() # These tests are outdated
+  def setup_method(self):
+    pytest.skip("Skipping Test") # These tests are outdated
 
   def test_link(self):
     link3 = None
@@ -119,15 +117,15 @@ class TestSqoopClientLinks(TestSqoopServerBase):
       # Create
       link = self.create_link(name='link1')
       link2 = self.client.get_link(link.id)
-      assert_true(link2.id)
-      assert_equal(link.name, link2.name)
+      assert link2.id
+      assert link.name == link2.name
 
       # Update
       link2.name = 'link-new-1'
       self.client.update_link(link2)
       link3 = self.client.get_link(link2.id)
-      assert_true(link3.id)
-      assert_equal(link3.name, link3.name)
+      assert link3.id
+      assert link3.name == link3.name
     finally:
       if link3:
         self.client.delete_link(link3)
@@ -138,7 +136,7 @@ class TestSqoopClientLinks(TestSqoopServerBase):
     try:
       link = self.create_link(name='link2')
       links = self.client.get_links()
-      assert_true(len(links) > 0)
+      assert len(links) > 0
     finally:
       if link:
         self.client.delete_link(link)
@@ -146,8 +144,8 @@ class TestSqoopClientLinks(TestSqoopServerBase):
 
 class TestSqoopClientJobs(TestSqoopServerBase):
 
-  def setUp(self):
-    raise SkipTest() # These tests are outdated
+  def setup_method(self):
+    pytest.skip("Skipping Test") # These tests are outdated
 
   def test_job(self):
     removable = []
@@ -161,16 +159,16 @@ class TestSqoopClientJobs(TestSqoopServerBase):
 
       job = self.create_job("job1", from_link_id=from_link.id, to_link_id=to_link.id)
       removable.insert(0, job)
-      assert_true(job.id)
+      assert job.id
 
       job2 = self.client.get_job(job.id)
-      assert_true(job2.id)
-      assert_equal(job.id, job2.id)
+      assert job2.id
+      assert job.id == job2.id
 
       # Update
       job.name = 'job-new-1'
       job3 = self.client.update_job(job)
-      assert_equal(job.name, job3.name)
+      assert job.name == job3.name
     finally:
       self.delete_sqoop_objects(removable)
 
@@ -185,10 +183,10 @@ class TestSqoopClientJobs(TestSqoopServerBase):
 
       job = self.create_job("job2", from_link_id=from_link.id, to_link_id=to_link.id)
       removable.insert(0, job)
-      assert_true(job.id)
+      assert job.id
 
       jobs = self.client.get_jobs()
-      assert_true(len(jobs) > 0)
+      assert len(jobs) > 0
     finally:
       self.delete_sqoop_objects(removable)
 

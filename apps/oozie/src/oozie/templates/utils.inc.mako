@@ -456,10 +456,9 @@
               $("input[name='end_0']").val($("input[name='end_0']").data("original-val"));
               $("input[name='end_0']").parent().datepicker("setValue", $("input[name='end_0']").data("original-val"));
             }
-            // non-sticky error notification
-            $.jHueNotify.notify({
-              level:"ERROR",
-              message:"${ _("The end cannot be before the starting moment") }"
+            huePubSub.publish('hue.global.error', {
+              message: "${ _('The end cannot be before the starting moment') }",
+              noStick: true
             });
           }
         }
@@ -639,10 +638,14 @@ function renderCrons() {
             killErrors: "${ _('Some of the selected jobs may not have been killed correctly:') }"
           }
           if (response.totalErrors > 0){
-            $.jHueNotify.warn(_messages[what + "Errors"] + " " + response.messages);
+            huePubSub.publish('hue.global.warning', {
+              message: _messages[what + "Errors"] + " " + response.messages
+            });
           }
           else {
-            $.jHueNotify.info(_messages[what]);
+            huePubSub.publish('hue.global.info', {
+              message: _messages[what]
+            });
           }
           $(".hue-checkbox").removeClass("fa-check");
           toggleBulkButtons();

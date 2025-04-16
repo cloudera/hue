@@ -16,13 +16,14 @@
 # limitations under the License.
 
 
+import pytest
 from builtins import object
 from hadoop import pseudo_hdfs4
+from django.test import TestCase
 
-
-class PseudoHdfsTestBase(object):
-  requires_hadoop = True
-  integration = True
+@pytest.mark.requires_hadoop
+@pytest.mark.integration
+class PseudoHdfsTestBase(TestCase):
 
   @classmethod
   def setup_class(cls):

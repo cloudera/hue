@@ -20,6 +20,7 @@ import * as ko from 'knockout';
 import { SHOW_DOWNLOAD_RESULT_MODAL_EVENT } from 'apps/editor/components/resultGrid/ko.resultDownloadModal';
 import componentUtils from 'ko/components/componentUtils';
 import DisposableComponent from 'ko/components/DisposableComponent';
+import { GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import I18n from 'utils/i18n';
 import huePubSub from 'utils/huePubSub';
 import html2text from 'utils/html/html2text';
@@ -156,7 +157,9 @@ class ResultDownloadActions extends DisposableComponent {
   }
 
   onClipboardSuccess(e) {
-    $.jHueNotify.info(I18n('%s result(s) copied to the clipboard', this.data().length));
+    huePubSub.publish(GLOBAL_INFO_TOPIC, {
+      message: I18n('%s result(s) copied to the clipboard', this.data().length)
+    });
     e.clearSelection();
     $('.clipboard-content').empty();
   }

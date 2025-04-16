@@ -17,10 +17,9 @@
 import React, { ReactNode, useState } from 'react';
 import Joyride from 'react-joyride';
 
-import { post } from 'api/utils';
 import { hueWindow } from 'types/types';
 import I18n from 'utils/i18n';
-import { useHuePubSub } from '../useHuePubSub';
+import { useHuePubSub } from '../../utils/hooks/useHuePubSub/useHuePubSub';
 
 import './WelcomeTour.scss';
 import scssVariables from './WelcomeTour.module.scss';

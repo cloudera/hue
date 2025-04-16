@@ -15,24 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
-
+import logging
 from datetime import datetime
+
 from dateutil import parser
+from django.utils.translation import gettext as _
 
 from desktop.models import Document2
-from notebook.api import _get_statement
-from notebook.models import Notebook
-
 from jobbrowser.apis.base_api import Api
 from jobbrowser.conf import MAX_JOB_FETCH
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from notebook.api import _get_statement
+from notebook.models import Notebook
 
 LOG = logging.getLogger()
 
@@ -46,7 +40,7 @@ class HistoryApi(Api):
     for app in tasks:
       # Copied, Document class should have a get_history method (via method or inheritance)
       notebook = Notebook(document=app).get_data()
-      is_notification_manager = False # Supposed SQL Editor query only right now
+      is_notification_manager = False  # Supposed SQL Editor query only right now
       if 'snippets' in notebook:
         statement = notebook['description'] if is_notification_manager else _get_statement(notebook)
         history = {
@@ -86,7 +80,6 @@ class HistoryApi(Api):
       'total': len(tasks)
     }
 
-
   def app(self, appid):
     appid = appid.rsplit('-')[-1]
 
@@ -108,7 +101,6 @@ class HistoryApi(Api):
       }
     }
 
-
   def action(self, app_ids, operation):
     # Notebook API
     pass
@@ -116,12 +108,10 @@ class HistoryApi(Api):
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
 
-
   def profile(self, appid, app_type, app_property, app_filters):
     appid = appid.rsplit('-')[-1]
 
     return {}
-
 
   def _api_status(self, task):
     if task['data']['status'] in ('expired', 'failed'):

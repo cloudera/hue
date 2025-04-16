@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,31 +16,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import sys
+import json
 import unittest
+from unittest.mock import Mock, patch
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_false
+import pytest
+from django.test import TestCase
 
-from desktop.auth.backend import rewrite_user, is_admin
+from desktop.auth.backend import is_admin, rewrite_user
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_ORGANIZATIONS
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.django_test_util import make_logged_in_client
-
-from useradmin.models import User, update_app_permissions, get_default_user_group, Connector
-from useradmin.permissions import HuePermission, GroupPermission
-
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from useradmin.models import Connector, User, get_default_user_group, update_app_permissions
+from useradmin.permissions import GroupPermission, HuePermission
 
 
+@pytest.mark.django_db
 class TestConnectors(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test_connector", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test_connector")
 
@@ -48,37 +43,33 @@ class TestConnectors(object):
     self.admin_user = User.objects.get(username="admin_test_connector")
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     cls._class_resets = [
       ENABLE_CONNECTORS.set_for_testing(True),
       ENABLE_ORGANIZATIONS.set_for_testing(False),
     ]
 
   @classmethod
-  def tearDownClass(cls):
+  def teardown_class(cls):
     for reset in cls._class_resets:
       reset()
-
 
   def test_page(self):
     response = self.client.get("/desktop/connectors/")
 
-    assert_equal(200, response.status_code)
-
+    assert 200 == response.status_code
 
   def test_get_connector_types(self):
     response = self.client.post("/desktop/connectors/api/types/")
 
-    assert_equal(200, response.status_code)
-
+    assert 200 == response.status_code
 
   def test_create_connector_perm(self):
     response = self.client.post("/desktop/connectors/api/instance/update/")
-    assert_equal(401, response.status_code)
+    assert 401 == response.status_code
 
     response = self.client.post("/desktop/connectors/api/instance/delete/")
-    assert_equal(401, response.status_code)
-
+    assert 401 == response.status_code
 
   def test_test_connector(self):
     connector = {
@@ -88,26 +79,26 @@ class TestConnectors(object):
     }
 
     response = self.client.post("/desktop/connectors/api/instance/test/", connector)
-    assert_equal(401, response.status_code)
+    assert 401 == response.status_code
 
     with patch('desktop.lib.connectors.api.config_validator') as config_validator:
       config_validator.return_value = []
 
       response = self.admin_client.post("/desktop/connectors/api/instance/test/", connector)
-      assert_equal(200, response.status_code)
-      assert_false(json.loads(response.content)['warnings'])
+      assert 200 == response.status_code
+      assert not json.loads(response.content)['warnings']
 
     with patch('notebook.conf._excute_test_query') as _excute_test_query:
       _excute_test_query.side_effect = Exception('')  # Just in case as relying on connector id not existing
 
       response = self.admin_client.post("/desktop/connectors/api/instance/test/", connector)
-      assert_equal(200, response.status_code)
-      assert_true(json.loads(response.content)['warnings'])
+      assert 200 == response.status_code
+      assert json.loads(response.content)['warnings']
 
 
-class TestConnectorListing(unittest.TestCase):
+class TestConnectorListing(TestCase):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(
         username='test_connector',
         groupname=get_default_user_group(),
@@ -127,23 +118,22 @@ class TestConnectorListing(unittest.TestCase):
     self.alone_user = rewrite_user(self.alone_user)
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     if not ENABLE_CONNECTORS.get():  # Skip for now
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
     cls._class_resets = [
       ENABLE_CONNECTORS.set_for_testing(True),
     ]
 
   @classmethod
-  def tearDownClass(cls):
+  def teardown_class(cls):
     HuePermission.objects.all().delete()
 
     for reset in cls._class_resets:
       reset()
 
     update_app_permissions()
-
 
   def test_get_installed_editor_connectors(self):
 
@@ -155,9 +145,8 @@ class TestConnectorListing(unittest.TestCase):
       connectors = _get_installed_connectors()
 
       editor_category = [category for category in connectors if category['category'] == 'editor']
-      assert_true(editor_category, connectors)
-      assert_equal(1, len(editor_category), editor_category)
-
+      assert editor_category, connectors
+      assert 1 == len(editor_category), editor_category
 
   def test_get_connectors_for_user(self):
     connector = Connector.objects.create(
@@ -169,11 +158,11 @@ class TestConnectorListing(unittest.TestCase):
     GroupPermission.objects.create(group=self.user.groups.first(), hue_permission=conn_perm)
 
     try:
-      assert_true(self.user.get_permissions())
+      assert self.user.get_permissions()
       connectors = _get_installed_connectors(user=self.user)
-      assert_true(connectors, connectors)
+      assert connectors, connectors
 
       connectors = _get_installed_connectors(user=self.alone_user)
-      assert_false(connectors, connectors)
+      assert not connectors, connectors
     finally:
       connector.delete()

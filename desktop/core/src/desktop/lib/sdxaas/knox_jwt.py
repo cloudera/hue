@@ -40,6 +40,7 @@ def handle_knox_ha():
     knox_urls_list = knox_urls.split(',')
 
     for k_url in knox_urls_list:
+      k_url = k_url.strip(' ')
       try:
         res = requests.get(k_url.rstrip('/') + _KNOX_TOKEN_API, auth=auth_handler, verify=False)
       except Exception as e:

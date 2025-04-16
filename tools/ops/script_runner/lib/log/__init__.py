@@ -22,7 +22,7 @@ import os.path
 import re
 import sys
 
-from cStringIO import StringIO
+from io import StringIO
 from logging import FileHandler
 from logging.handlers import RotatingFileHandler
 
@@ -62,7 +62,7 @@ def _read_log_conf(proc_name, log_dir):
     raw = file(log_conf).read()
     sio = StringIO(CONF_RE.sub(_repl, raw))
     return sio
-  except IOError, ex:
+  except IOError as ex:
     print >> sys.stderr, "ERROR: Failed to open %s: %s" % (log_conf, ex)
     return None
 
@@ -108,7 +108,7 @@ def chown_log_dir(uid, gid):
     for entry in os.listdir(_log_dir):
       os.chown(os.path.join(_log_dir, entry), uid, gid)
     return True
-  except OSError, ex:
+  except OSError as ex:
     print >> sys.stderr, 'Failed to chown log directory %s: ex' % (_log_dir, ex)
     return False
 
@@ -136,7 +136,7 @@ def basic_logging(proc_name, log_dir=None):
   if not os.path.exists(log_dir):
     try:
       os.makedirs(log_dir)
-    except OSError, err:
+    except OSError as err:
       print >> sys.stderr, 'Failed to create log directory "%s": %s' % (log_dir, err)
       raise err
 

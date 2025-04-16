@@ -18,17 +18,17 @@
 
 from builtins import object
 import json
-
-from nose.tools import assert_equal, assert_false, assert_true
+import pytest
 
 from desktop.lib.django_test_util import make_logged_in_client
 
 from useradmin.models import User, Group
 
 
+@pytest.mark.django_db
 class TestUseradminApi(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="hue_test_admin", groupname="hue_test_admin", recreate=True, is_superuser=True)
     self.user = User.objects.get(username="hue_test_admin")
 
@@ -43,19 +43,19 @@ class TestUseradminApi(object):
     # Test get all users
     response = self.client.get('/useradmin/api/get_users/')
     data = json.loads(response.content)
-    assert_equal(0, data['status'])
-    assert_true('users' in data)
-    assert_true(self.user.username in [user['username'] for user in data['users']])
-    assert_true(self.non_superuser.username in [user['username'] for user in data['users']])
+    assert 0 == data['status']
+    assert 'users' in data
+    assert self.user.username in [user['username'] for user in data['users']]
+    assert self.non_superuser.username in [user['username'] for user in data['users']]
 
     # Test get by username
     response = self.client.get('/useradmin/api/get_users/', {'username': self.non_superuser.username})
     data = json.loads(response.content)
-    assert_equal(1, len(data['users']), data['users'])
-    assert_true(self.non_superuser.username in [user['username'] for user in data['users']])
+    assert 1 == len(data['users']), data['users']
+    assert self.non_superuser.username in [user['username'] for user in data['users']]
 
     # Test filter by group
     response = self.client.get('/useradmin/api/get_users/', {'groups': [self.test_group.name]})
     data = json.loads(response.content)
-    assert_equal(1, len(data['users']), data['users'])
-    assert_true(self.non_superuser.username in [user['username'] for user in data['users']])
+    assert 1 == len(data['users']), data['users']
+    assert self.non_superuser.username in [user['username'] for user in data['users']]

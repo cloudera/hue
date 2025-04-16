@@ -21,14 +21,13 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
 
 from desktop import conf
 from desktop.auth.backend import is_admin
-from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko, antixss
 from desktop.webpack_utils import get_hue_bundles
 
 from metadata.conf import has_optimizer, OPTIMIZER
 
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
-
+from desktop.lib.django_util import nonce_attribute
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
 else:
@@ -103,7 +102,6 @@ else:
 <![endif]-->
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
-<%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />
 
 </%def>
 
@@ -129,8 +127,6 @@ else:
   }
 % endif
 </style>
-
-${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode()">
   <div class="navbar-inner">
@@ -224,7 +220,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   % endif
 
     <div class="btn-group">
-      <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
+      <a class="btn" data-testid="editor--save--button" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
         <i class="fa fa-save"></i>
       </a>
 
@@ -243,14 +239,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko template: { ifnot: editorMode() || isPresentationMode(), name: 'notebook-actions' }--><!-- /ko -->
 
     <!-- ko ifnot: isPresentationMode() -->
-    <div class="dropdown pull-right margin-left-10">
+    <div class="dropdown pull-right margin-left-10" data-testid="editor--actions--dropdown">
       <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </a>
       <ul class="dropdown-menu pull-right">
         <li>
         <!-- ko if: editorMode -->
-          <a href="javascript:void(0)" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+          <a href="javascript:void(0)" data-testid="editor--new-document--button" data-bind="click: function() { hueUtils.removeURLParameter('editor'); newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
         <!-- /ko -->
@@ -289,13 +285,15 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 
 <!-- ko if: $root.isResultFullScreenMode() -->
-<a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
+<a class="hueAnchor collapse-results hidden" href="javascript:void(0)" title="${ _('Collapse results') }"
+   data-bind="click: function(){ $root.isResultFullScreenMode(false); }, css: { hidden: !$root.isResultFullScreenMode() }">
   <i class="fa fa-times fa-fw"></i>
 </a>
 <!-- /ko -->
 
 <!-- ko if: $root.isPresentationMode() -->
-<a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }">
+<a class="hueAnchor collapse-results hidden" href="javascript:void(0)" title="${ _('Exit presentation') }"
+   data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }, css: { hidden: !$root.isPresentationMode() }">
   <i class="fa fa-times fa-fw"></i>
 </a>
 <!-- /ko -->
@@ -603,9 +601,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div data-bind="delayedOverflow: 'slow', css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul class="nav nav-tabs nav-tabs-editor">
         <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}, onClickOutside: function () { if ($parent.historyFilterVisible() && $parent.historyFilter() === '') { $parent.historyFilterVisible(false) } }">
-          <a class="inactive-action" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
+          <a class="inactive-action" data-testid="editor--query-history--tab" style="display:inline-block" href="#queryHistory" data-toggle="tab">${_('Query History')}</a>
           <div style="margin-left: -15px;" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
-          <input class="input-small inline-tab-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+          <input class="input-small inline-tab-filter" data-testid="editor--query-history-search--input" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
           <div class="dropdown inline-block inactive-action pointer visible-on-hover">
             <a class="" data-toggle="dropdown" href="javascript: void(0)">
               <i class="fa fa-fw fa-ellipsis-v"></i>
@@ -625,9 +623,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </div>
         </li>
         <li class="margin-right-20" data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
-          <a class="inactive-action" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
+          <a class="inactive-action" data-testid="editor--saved-queries--tab" style="display:inline-block" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a>
           <div style="margin-left: -15px;" class="inline-block inactive-action pointer visible-on-hover" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
-          <input class="input-small inline-tab-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
+          <input class="input-small inline-tab-filter" data-testid="editor--query-history-search--input" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
         </li>
         % if ENABLE_QUERY_BUILDER.get():
         <!-- ko if: isSqlDialect -->
@@ -1718,7 +1716,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <script type ="text/html" id="snippet-execution-controls${ suffix }">
   <div class="snippet-actions" style="position: absolute; bottom: 0">
     <!-- ko if: status() == 'loading' -->
-    <a class="snippet-side-btn blue" style="cursor: default;" title="${ _('Creating session') }">
+    <a class="snippet-side-btn blue" data-testid="editor--execute--button" style="cursor: default;" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
     <!-- /ko -->
@@ -1729,7 +1727,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <div class="pull-left" data-bind="text: (result.statement_id() + 1)"></div><div class="pull-left">/</div><div class="pull-left" data-bind="text: result.statements_count()"></div>
     </div>
     <!-- ko if: !isCanceling() -->
-    <a class="snippet-side-btn red" data-bind="click: cancel, visible: status() == 'running' || status() == 'starting'" title="${ _('Cancel operation') }">
+    <a class="snippet-side-btn red" data-bind="click: cancel, visible: status() == 'running' || status() == 'starting' || (type() == 'flink' && status() == 'available')" title="${ _('Cancel operation') }">
       <i class="fa fa-fw fa-stop snippet-side-single"></i>
     </a>
     <!-- /ko -->
@@ -1903,6 +1901,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   </div>
 </script>
 
+
 <div class="ace-filechooser" style="display:none;">
   <div class="ace-filechooser-close">
     <a class="pointer" data-bind="click: function(){ $('.ace-filechooser').hide(); }"><i class="fa fa-times"></i></a>
@@ -2056,220 +2055,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 
 <%def name="commonJS(is_embeddable=False, bindableElement='editorComponents', suffix='')">
-
-<script type="text/javascript">
-  window.EDITOR_BINDABLE_ELEMENT = '#${ bindableElement }';
-
-  window.EDITOR_SUFFIX = '${ suffix }';
-
-  var HUE_PUB_SUB_EDITOR_ID = (window.location.pathname.indexOf('notebook') > -1) ? 'notebook' : 'editor';
-
-  window.EDITOR_VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode,antixss }, {
-    huePubSubId: HUE_PUB_SUB_EDITOR_ID,
-    user: '${ user.username }',
-    userId: ${ user.id },
-    suffix: '${ suffix }',
-    assistAvailable: true,
-    autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
-    snippetViewSettings: {
-      default: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/sql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      code: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        snippetIcon: 'fa-code'
-      },
-      hive: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/hive',
-        snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
-        sqlDialect: true
-      },
-      hplsql: {
-        placeHolder: '${ _("Example: CREATE PROCEDURE name AS SELECT * FROM tablename limit 10 GO") }',
-        aceMode: 'ace/mode/hplsql',
-        snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
-        sqlDialect: true
-      },
-      impala: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/impala',
-        snippetImage: '${ static("impala/art/icon_impala_48.png") }',
-        sqlDialect: true
-      },
-      presto: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/presto',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      dasksql: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/dasksql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      elasticsearch: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/elasticsearch',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      druid: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/druid',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      bigquery: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/bigquery',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      phoenix: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/phoenix',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      ksql: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/ksql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      flink: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/flink',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      jar : {
-        snippetIcon: 'fa-file-archive-o '
-      },
-      mysql: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/mysql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      mysqljdbc: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/mysql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      oracle: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/oracle',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      pig: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        aceMode: 'ace/mode/pig',
-        snippetImage: '${ static("pig/art/icon_pig_48.png") }'
-      },
-      postgresql: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/pgsql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      solr: {
-        placeHolder: '${ _("Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space") }',
-        aceMode: 'ace/mode/mysql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      kafkasql: {
-        placeHolder: '${ _("Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space") }',
-        aceMode: 'ace/mode/mysql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      java : {
-        snippetIcon: 'fa-file-code-o'
-      },
-      py : {
-        snippetIcon: 'fa-file-code-o'
-      },
-      pyspark: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        aceMode: 'ace/mode/python',
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-      },
-      r: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        aceMode: 'ace/mode/r',
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-      },
-      scala: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        aceMode: 'ace/mode/scala',
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-      },
-      spark: {
-        placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-        aceMode: 'ace/mode/scala',
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-      },
-      spark2: {
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-      },
-      sparksql: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/sparksql',
-        snippetImage: '${ static("spark/art/icon_spark_48.png") }',
-        sqlDialect: true
-      },
-      mapreduce: {
-        snippetIcon: 'fa-file-archive-o'
-      },
-      shell: {
-        snippetIcon: 'fa-terminal'
-      },
-      sqoop1: {
-        placeHolder: '${ _("Example: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1") }',
-        snippetImage: '${ static("sqoop/art/icon_sqoop_48.png") }'
-      },
-      distcp: {
-        snippetIcon: 'fa-files-o'
-      },
-      sqlite: {
-        placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-        aceMode: 'ace/mode/sql',
-        snippetIcon: 'fa-database',
-        sqlDialect: true
-      },
-      text: {
-        placeHolder: '${ _('Type your text here') }',
-        aceMode: 'ace/mode/text',
-        snippetIcon: 'fa-header'
-      },
-      markdown: {
-        placeHolder: '${ _('Type your markdown here') }',
-        aceMode: 'ace/mode/markdown',
-        snippetIcon: 'fa-header'
-      }
-    }
-  });
-
-  window.EDITOR_ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
-
-  window.EDITOR_ID = ${ editor_id or 'null' };
-
-  window.NOTEBOOKS_JSON = ${ notebooks_json | n,unicode };
-
-  window.SQL_ANALYZER_AUTO_UPLOAD_QUERIES = '${ OPTIMIZER.AUTO_UPLOAD_QUERIES.get() }' === 'True';
-
-  window.SQL_ANALYZER_AUTO_UPLOAD_DDL = '${ OPTIMIZER.AUTO_UPLOAD_DDL.get() }' === 'True';
-
-  window.SQL_ANALYZER_QUERY_HISTORY_UPLOAD_LIMIT = ${ OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() };
-</script>
-
+  <script type="application/json" id="editorOptionsJson">
+    ${ options_json | n,unicode,antixss }
+  </script>
+  <script ${nonce_attribute(request)} src="${ static('desktop/js/editor-component.js') }"></script>
 </%def>
+
+
+  

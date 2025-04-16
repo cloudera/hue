@@ -1,0 +1,12 @@
+{% load i18n babel %}
+text={% trans "This could be translated." %}
+language_code={{ LANGUAGE_CODE }}
+language_name={{ locale.language_name }}
+date={{ date|datefmt }}
+datetime={{ date|datetimefmt }}
+time={{ date|timefmt }}
+number={{ number|numberfmt }}
+decimal={{ number|decimalfmt }}
+currency={{ number|currencyfmt:"EUR" }}
+percent={{ number|percentfmt }}
+scientificfmt={{ number|scientificfmt }}

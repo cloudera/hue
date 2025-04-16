@@ -658,7 +658,9 @@ ${ commonshare() | n,unicode }
       $('#saveas-query-name').removeClass('error');
       $('#saveAsQueryModal').modal('hide');
     } else if (viewModel.query.name()) {
-      $.jHueNotify.error("${_('No query provided to save.')}");
+      huePubSub.publish('hue.global.error', {
+        message: "${_('No query provided to save.')}"
+      });
       $('#saveAsQueryModal').modal('hide');
     } else {
       $('#saveas-query-name').addClass('error');
@@ -822,7 +824,9 @@ ${ commonshare() | n,unicode }
 
   // Events and datatables
   $(document).on('saved.query', function() {
-    $.jHueNotify.info("${_('Query saved successfully!')}")
+    huePubSub.publish('hue.global.info', {
+      message: "${_('Query saved successfully!')}"
+    });
   });
 
   // Initial htmlEscape

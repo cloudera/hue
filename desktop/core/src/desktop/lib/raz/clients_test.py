@@ -16,33 +16,29 @@
 
 import sys
 import unittest
+from unittest.mock import Mock, patch
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_false, assert_true, assert_raises
+import pytest
+from django.test import TestCase
 
 from desktop.conf import RAZ
-from desktop.lib.raz.clients import S3RazClient, AdlsRazClient
+from desktop.lib.raz.clients import AdlsRazClient, S3RazClient
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
-class S3RazClientLiveTest(unittest.TestCase):
+class S3RazClientLiveTest(TestCase):
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     if not RAZ.IS_ENABLED.get():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
   def test_check_access_s3_list_buckets(self):
 
     url = S3RazClient().get_url()
 
-    assert_true('AWSAccessKeyId=' in url)
-    assert_true('Signature=' in url)
-    assert_true('Expires=' in url)
-
+    assert 'AWSAccessKeyId=' in url
+    assert 'Signature=' in url
+    assert 'Expires=' in url
 
   def test_check_acccess_s3_list_file(self):
     # e.g. 'https://gethue-test.s3.amazonaws.com/data/query-hive-weblogs.csv?AWSAccessKeyId=AKIA23E77ZX2HVY76YGL&'
@@ -50,26 +46,26 @@ class S3RazClientLiveTest(unittest.TestCase):
 
     url = S3RazClient().get_url(bucket='gethue-test', path='/data/query-hive-weblogs.csv')
 
-    assert_true('data/query-hive-weblogs.csv' in url)
-    assert_true('AWSAccessKeyId=' in url)
-    assert_true('Signature=' in url)
-    assert_true('Expires=' in url)
+    assert 'data/query-hive-weblogs.csv' in url
+    assert 'AWSAccessKeyId=' in url
+    assert 'Signature=' in url
+    assert 'Expires=' in url
 
     url = S3RazClient().get_url(bucket='gethue-test', path='/data/query-hive-weblogs.csv', perm='read', action='write')
 
-    assert_true('data/query-hive-weblogs.csv' in url)
-    assert_true('AWSAccessKeyId=' in url)
-    assert_true('Signature=' in url)
-    assert_true('Expires=' in url)
-
+    assert 'data/query-hive-weblogs.csv' in url
+    assert 'AWSAccessKeyId=' in url
+    assert 'Signature=' in url
+    assert 'Expires=' in url
 
   def test_check_acccess_s3_list_file_no_access(self): pass
 
-class AdlsRazClientTest(unittest.TestCase):
 
-  def setUp(self):
+class AdlsRazClientTest(TestCase):
+
+  def setup_method(self, method):
     self.username = 'csso_hueuser'
-  
+
   def test_check_rename_operation(self):
     with patch('desktop.lib.raz.raz_client.requests.post') as requests_post:
       with patch('desktop.lib.raz.raz_client.uuid.uuid4') as uuid:
@@ -88,7 +84,7 @@ class AdlsRazClientTest(unittest.TestCase):
 
             check_access.assert_called_with(
               headers={
-                'x-ms-version': '2019-12-12', 
+                'x-ms-version': '2019-12-12',
                 'x-ms-rename-source': '/data/user/csso_hueuser/rename_source_dir?some_random_sas_token'
               },
               method='PUT',

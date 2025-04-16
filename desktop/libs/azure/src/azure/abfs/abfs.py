@@ -18,67 +18,57 @@
 """
 Interfaces for ABFS
 """
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import logging
-import os
-import sys
-import threading
-import re
 
+import os
+import logging
+import threading
+import urllib.error
+import urllib.request
+from builtins import object
 from math import ceil
 from posixpath import join
+from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
 
-from hadoop.hdfs_site import get_umask_mode
-from hadoop.fs.exceptions import WebHdfsException
-
-from desktop.conf import RAZ
-from desktop.lib.rest import http_client, resource
-from desktop.lib.rest.raz_http_client import RazHttpClient
+from django.http.multipartparser import MultiPartParser
 
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
 from azure.conf import PERMISSION_ACTION_ABFS, is_raz_abfs
-
-if sys.version_info[0] > 2:
-  import urllib.request, urllib.error
-  from urllib.parse import quote as urllib_quote
-  from urllib.parse import urlparse as lib_urlparse
-else:
-  from urlparse import urlparse as lib_urlparse
-  from urllib import quote as urllib_quote
+from desktop.conf import RAZ
+from desktop.lib.rest import http_client, resource
+from desktop.lib.rest.raz_http_client import RazHttpClient
+from hadoop.fs.exceptions import WebHdfsException
+from hadoop.hdfs_site import get_umask_mode
 
 LOG = logging.getLogger()
 
 # Azure has a 30MB block limit on upload.
 UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
 
-class ABFSFileSystemException(IOError):
 
+class ABFSFileSystemException(IOError):
   def __init__(self, *args, **kwargs):
     super(ABFSFileSystemException, self).__init__(*args, **kwargs)
 
 
 class ABFS(object):
-
   def __init__(
-      self,
-      url,
-      fs_defaultfs,
-      logical_name=None,
-      hdfs_superuser=None,
-      security_enabled=False,
-      ssl_cert_ca_verify=True,
-      temp_dir="/tmp",
-      umask=0o1022,
-      hdfs_supergroup=None,
-      access_token=None,
-      token_type=None,
-      expiration=None,
-      username=None
-    ):
+    self,
+    url,
+    fs_defaultfs,
+    logical_name=None,
+    hdfs_superuser=None,
+    security_enabled=False,
+    ssl_cert_ca_verify=True,
+    temp_dir="/tmp",
+    umask=0o1022,
+    hdfs_supergroup=None,
+    access_token=None,
+    token_type=None,
+    expiration=None,
+    username=None,
+  ):
     self._url = url
     self._superuser = hdfs_superuser
     self._security_enabled = security_enabled
@@ -110,18 +100,18 @@ class ABFS(object):
   def from_config(cls, hdfs_config, auth_provider):
     credentials = auth_provider.get_credentials()
     return cls(
-        url=hdfs_config.WEBHDFS_URL.get(),
-        fs_defaultfs=hdfs_config.FS_DEFAULTFS.get(),
-        logical_name=None,
-        security_enabled=False,
-        ssl_cert_ca_verify=False,
-        temp_dir=None,
-        umask=get_umask_mode(),
-        hdfs_supergroup=None,
-        access_token=credentials.get('access_token'),
-        token_type=credentials.get('token_type'),
-        expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on') is not None else None,
-        username=credentials.get('username')
+      url=hdfs_config.WEBHDFS_URL.get(),
+      fs_defaultfs=hdfs_config.FS_DEFAULTFS.get(),
+      logical_name=None,
+      security_enabled=False,
+      ssl_cert_ca_verify=False,
+      temp_dir=None,
+      umask=get_umask_mode(),
+      hdfs_supergroup=None,
+      access_token=credentials.get('access_token'),
+      token_type=credentials.get('token_type'),
+      expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on') is not None else None,
+      username=credentials.get('username'),
     )
 
   def get_client(self, url):
@@ -134,7 +124,7 @@ class ABFS(object):
 
   def _getheaders(self):
     headers = {
-      "x-ms-version": "2019-12-12" # For latest SAS support
+      "x-ms-version": "2019-12-12"  # For latest SAS support
     }
 
     if self._token_type and self._access_token:
@@ -153,17 +143,26 @@ class ABFS(object):
   # Parse info about filesystems, directories, and files
   # --------------------------------
   def isdir(self, path):
-    """
-    Checks if the path is a directory (note diabled because filebrowser/views is bugged)
-    """
-    resp = self.stats(path)
-    return resp.isDir
+    """Check if the given path is a directory or not."""
+    try:
+      stats = self.stats(path)
+      return stats.isDir
+    except Exception as e:
+      # If checking stats for path here gives 404 error, it means the path does not exist and therefore is not a directory.
+      if e.code == 404:
+        return False
+      raise e
 
   def isfile(self, path):
-    """
-    Checks if the path is a file
-    """
-    return not self.isdir(path)
+    """Check if the given path is a file or not."""
+    try:
+      stats = self.stats(path)
+      return not stats.isDir
+    except Exception as e:
+      # If checking stats for path here gives 404 error, it means the path does not exist and therefore is not a file.
+      if e.code == 404:
+        return False
+      raise e
 
   def exists(self, path):
     """
@@ -190,7 +189,7 @@ class ABFS(object):
       return ABFSStat.for_root(path)
     try:
       file_system, dir_name = Init_ABFS.parse_uri(path)[:2]
-    except:
+    except Exception:
       raise IOError
 
     if dir_name == '':
@@ -294,7 +293,6 @@ class ABFS(object):
 
     return [x.name for x in listofDir]
 
-
   def listfilesystems(self, root=Init_ABFS.ABFS_ROOT, params=None, **kwargs):
     """
     Lists the names of the File Systems, limited arguements
@@ -307,7 +305,7 @@ class ABFS(object):
     """
     Attempts to go to the directory set by the user in the configuration file. If not defaults to abfs://
     """
-    return Init_ABFS.get_home_dir_for_abfs()
+    return Init_ABFS.get_abfs_home_directory()
 
   # Find or alter information about the URI path
   # --------------------------------
@@ -371,7 +369,7 @@ class ABFS(object):
       self._writedata(path, data, len(data))
 
   def create_home_dir(self, home_path):
-    # When ABFS raz is enabled, try to create user home dir for REMOTE_STORAGE_HOME path
+    # When ABFS raz is enabled, try to create user home directory
     if is_raz_abfs():
       LOG.debug('Attempting to create user directory for path: %s' % home_path)
       try:
@@ -594,9 +592,6 @@ class ABFS(object):
     Renames a file
     """
     rename_source = Init_ABFS.strip_scheme(old)
-    if sys.version_info[0] < 3 and isinstance(rename_source, unicode):
-      rename_source = rename_source.encode('utf-8')
-
     headers = {'x-ms-rename-source': '/' + urllib_quote(rename_source)}
 
     try:
@@ -614,11 +609,20 @@ class ABFS(object):
     """
     self.rename(old_dir, new_dir)
 
+  # Deprecated
   def upload(self, file, path, *args, **kwargs):
     """
     Upload is done by the client
     """
     pass
+
+  def upload_v1(self, META, input_data, destination, username):
+    from azure.abfs.upload import ABFSNewFileUploadHandler  # Circular dependency
+
+    abfs_upload_handler = ABFSNewFileUploadHandler(destination, username)
+
+    parser = MultiPartParser(META, input_data, [abfs_upload_handler])
+    return parser.parse()
 
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
     """
@@ -669,7 +673,7 @@ class ABFS(object):
             offset += size
             chunk = src.read(chunk_size)
           self.flush(remote_dst, params={'position': offset})
-        except:
+        except Exception:
           LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
           raise
       finally:
@@ -682,14 +686,6 @@ class ABFS(object):
     Check access of a file/directory (Work in Progress/Not Ready)
     """
     raise NotImplementedError("")
-    try:
-      status = self.stats(path)
-      if 'x-ms-permissions' not in status.keys():
-        raise b
-    except b:
-      LOG.debug("Permisions have not been set")
-    except:
-      Exception
 
   def mkswap(self, filename, subdir='', suffix='swp', basedir=None):
     """
@@ -718,9 +714,9 @@ class ABFS(object):
     return self._filebrowser_action
 
   # Other Methods to condense stuff
-  #----------------------------
+  # ----------------------------
   # Write Files on creation
-  #----------------------------
+  # ----------------------------
   def _writedata(self, path, data, size):
     """
     Adds text to a given file
@@ -733,11 +729,11 @@ class ABFS(object):
         length = chunk_size
       else:
         length = chunk
-      self._append(path, data[i*chunk_size:i*chunk_size + length], length)
+      self._append(path, data[i * chunk_size : i * chunk_size + length], length)
     self.flush(path, {'position': int(size)})
 
   # Use Patch HTTP request
-  #----------------------------
+  # ----------------------------
   def _patching_sl(self, schemeless_path, param, data=None, header=None, **kwargs):
     """
     A wraper function for patch

@@ -18,10 +18,9 @@
 
 from builtins import object
 import json
+import pytest
 
 from django.urls import reverse
-
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -38,11 +37,11 @@ QUERY = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
 
 def test_ranges():
-  assert_equal((90, 100), _round_number_range(99))
-  assert_equal((0, 100), _round_number_range(100))
-  assert_equal((0, 100), _round_number_range(101))
+  assert (90, 100) == _round_number_range(99)
+  assert (0, 100) == _round_number_range(100)
+  assert (0, 100) == _round_number_range(101)
 
-  assert_equal((8000000, 9000000), _round_number_range(9045352))
+  assert (8000000, 9000000) == _round_number_range(9045352)
 
 
 class MockResource(object):
@@ -80,9 +79,10 @@ class MockResource(object):
       return MockResource.RESPONSE
 
 
+@pytest.mark.django_db
 class TestSearchBase(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.c = make_logged_in_client(username='test_dashboard', is_superuser=False)
     self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
 
@@ -130,7 +130,7 @@ class TestSearchBase(object):
       }
       }""")
 
-  def tearDown(self):
+  def teardown_method(self):
     # Remove monkey patching
     resource.Resource = self.prev_resource
 
@@ -143,7 +143,7 @@ class TestWithMockedSolr(TestSearchBase):
 
   def test_index(self):
     response = self.c.get(reverse('dashboard:index'))
-    assert_true(b'dashboard' in response.content, response.content)
+    assert b'dashboard' in response.content, response.content
 
   def test_share_dashboard(self):
     doc = Document2.objects.create(name='test_dashboard', type='search-dashboard', owner=self.user,
@@ -152,17 +152,17 @@ class TestWithMockedSolr(TestSearchBase):
     # owner can view document
     response = self.c.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['document']['uuid'], data)
+    assert doc.uuid == data['document']['uuid'], data
 
     # other user cannot view document
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(-1, data['status'])
+    assert -1 == data['status']
 
     # There are no collections with user_not_me
     controller = DashboardController(self.user_not_me)
     hue_collections = controller.get_search_collections()
-    assert_true(len(hue_collections) == 0)
+    assert len(hue_collections) == 0
 
     # Share read perm by users
     response = self.c.post("/desktop/api2/doc/share", {
@@ -181,16 +181,16 @@ class TestWithMockedSolr(TestSearchBase):
             }
         })
     })
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-    assert_true(doc.can_read(self.user))
-    assert_true(doc.can_write(self.user))
-    assert_true(doc.can_read(self.user_not_me))
-    assert_false(doc.can_write(self.user_not_me))
+    assert 0 == json.loads(response.content)['status'], response.content
+    assert doc.can_read(self.user)
+    assert doc.can_write(self.user)
+    assert doc.can_read(self.user_not_me)
+    assert not doc.can_write(self.user_not_me)
 
     # other user can view document
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['document']['uuid'], data)
+    assert doc.uuid == data['document']['uuid'], data
 
     # other user can open dashboard
     response = self.c.post(reverse('dashboard:search'), {
@@ -199,34 +199,34 @@ class TestWithMockedSolr(TestSearchBase):
     })
 
     data = json.loads(response.content)
-    assert_true('response' in data, data)
-    assert_true('docs' in data['response'], data)
+    assert 'response' in data, data
+    assert 'docs' in data['response'], data
 
     # For self.user_not_me
     controller = DashboardController(self.user_not_me)
     hue_collections = controller.get_search_collections()
-    assert_equal(len(hue_collections), 1)
-    assert_equal(hue_collections[0].name, 'test_dashboard')
+    assert len(hue_collections) == 1
+    assert hue_collections[0].name == 'test_dashboard'
 
     hue_collections = controller.get_owner_search_collections()
-    assert_equal(len(hue_collections), 0)
+    assert len(hue_collections) == 0
 
     hue_collections = controller.get_shared_search_collections()
-    assert_equal(len(hue_collections), 0)
+    assert len(hue_collections) == 0
 
     # For self.user
     controller = DashboardController(self.user)
     hue_collections = controller.get_search_collections()
-    assert_equal(len(hue_collections), 1)
-    assert_equal(hue_collections[0].name, 'test_dashboard')
+    assert len(hue_collections) == 1
+    assert hue_collections[0].name == 'test_dashboard'
 
     hue_collections = controller.get_owner_search_collections()
-    assert_equal(len(hue_collections), 1)
-    assert_equal(hue_collections[0].name, 'test_dashboard')
+    assert len(hue_collections) == 1
+    assert hue_collections[0].name == 'test_dashboard'
 
     hue_collections = controller.get_shared_search_collections()
-    assert_equal(len(hue_collections), 1)
-    assert_equal(hue_collections[0].name, 'test_dashboard')
+    assert len(hue_collections) == 1
+    assert hue_collections[0].name == 'test_dashboard'
 
     user_not_me_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
     doc1 = Document2.objects.create(name='test_dashboard1', type='search-dashboard', owner=self.user_not_me,
@@ -234,12 +234,12 @@ class TestWithMockedSolr(TestSearchBase):
     # self.user_not_me can view document
     response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
     data = json.loads(response.content)
-    assert_equal(doc1.uuid, data['document']['uuid'], data)
+    assert doc1.uuid == data['document']['uuid'], data
 
     # self.user cannot view document
     response = self.c.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
     data = json.loads(response.content)
-    assert_equal(-1, data['status'])
+    assert -1 == data['status']
 
     # Share read perm by users
     response = self.client_not_me.post("/desktop/api2/doc/share", {
@@ -257,37 +257,37 @@ class TestWithMockedSolr(TestSearchBase):
             }
         })
     })
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-    assert_true(doc1.can_read(self.user))
-    assert_false(doc1.can_write(self.user))
-    assert_true(doc1.can_read(self.user_not_me))
-    assert_true(doc1.can_write(self.user_not_me))
+    assert 0 == json.loads(response.content)['status'], response.content
+    assert doc1.can_read(self.user)
+    assert not doc1.can_write(self.user)
+    assert doc1.can_read(self.user_not_me)
+    assert doc1.can_write(self.user_not_me)
 
     # For self.user_not_me
     controller = DashboardController(self.user_not_me)
     hue_collections = controller.get_search_collections()
-    assert_equal(len(hue_collections), 2)
+    assert len(hue_collections) == 2
 
     hue_collections = controller.get_owner_search_collections()
-    assert_equal(len(hue_collections), 1)
-    assert_equal(hue_collections[0].name, 'test_dashboard1')
+    assert len(hue_collections) == 1
+    assert hue_collections[0].name == 'test_dashboard1'
 
     hue_collections = controller.get_shared_search_collections()
-    assert_equal(len(hue_collections), 1)
-    assert_equal(hue_collections[0].name, 'test_dashboard1')
+    assert len(hue_collections) == 1
+    assert hue_collections[0].name == 'test_dashboard1'
 
     # For self.user
     controller = DashboardController(self.user)
     hue_collections = controller.get_search_collections()
-    assert_equal(len(hue_collections), 2)
+    assert len(hue_collections) == 2
 
     hue_collections = controller.get_owner_search_collections()
-    assert_equal(len(hue_collections), 1)
-    assert_equal(hue_collections[0].name, 'test_dashboard')
+    assert len(hue_collections) == 1
+    assert hue_collections[0].name == 'test_dashboard'
 
     hue_collections = controller.get_shared_search_collections()
-    assert_equal(len(hue_collections), 1)
-    assert_equal(hue_collections[0].name, 'test_dashboard')
+    assert len(hue_collections) == 1
+    assert hue_collections[0].name == 'test_dashboard'
 
 
   def test_update_document(self):
@@ -298,8 +298,8 @@ class TestWithMockedSolr(TestSearchBase):
     })
 
     data = json.loads(response.content)
-    assert_equal(0, data['status'], response.content)
-    assert_true('no modifications to change' in data['message'], response.content)
+    assert 0 == data['status'], response.content
+    assert 'no modifications to change' in data['message'], response.content
 
     # Admin
     c = make_logged_in_client(username='admin', is_superuser=True, recreate=True)
@@ -309,8 +309,8 @@ class TestWithMockedSolr(TestSearchBase):
     })
 
     data = json.loads(response.content)
-    assert_equal(0, data['status'], response.content)
-    assert_true('no modifications to change' in data['message'], response.content)
+    assert 0 == data['status'], response.content
+    assert 'no modifications to change' in data['message'], response.content
 
   def test_strip_nulls(self):
     response = '{"uid":"1111111","method":"check_user"}\x00'
@@ -340,7 +340,7 @@ class TestWithMockedSolr(TestSearchBase):
     luke = []
     for d in Collection2._make_luke_from_schema_fields(schema_fields).values():
         luke.append(dict([(k, d[k]) for k in key_order]))
-    assert_equal([
+    assert ([
         {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'long', u'copyDests': []},
         {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'string', u'copyDests': []},
         {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'string', u'copyDests': []},
@@ -357,9 +357,8 @@ class TestWithMockedSolr(TestSearchBase):
         {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tint', u'copyDests': []},
         {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tlong', u'copyDests': []},
         {'uniqueKey': True, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tlong', u'copyDests': []}
-        ],
-        sorted(luke, key=lambda k: (k['type'], str(k['uniqueKey'])))
-    )
+        ] ==
+        sorted(luke, key=lambda k: (k['type'], str(k['uniqueKey']))))
 
   def test_response_escaping_multi_value(self):
     MockResource.set_solr_response("""{
@@ -397,10 +396,9 @@ class TestWithMockedSolr(TestSearchBase):
     })
 
     result = json.loads(response.content)
-    assert_equal(
-        [{'hueId': 'change.me', 'id': 'change.me', '_version_': 1513046095083602000, 'title': ['val1', 'val2', '[&lt;script&gt;alert(123)&lt;/script&gt;]', 'val4'], 'details': [], 'externalLink': None}],
-        result['response']['docs']
-    )
+    assert (
+        [{'hueId': 'change.me', 'id': 'change.me', '_version_': 1513046095083602000, 'title': ['val1', 'val2', '[&lt;script&gt;alert(123)&lt;/script&gt;]', 'val4'], 'details': [], 'externalLink': None}] ==
+        result['response']['docs'])
 
   def test_response_with_facets(self):
     MockResource.set_solr_response("""{"responseHeader":{"status":0,"QTime":59,"params":{"facet":"true","facet.mincount":"1","facet.limit":"100","facet.date":"article_date","f.article_date.facet.date.start":"NOW-7MONTH/DAYS","wt":"json","rows":"15","user.name":"hue","start":"0","facet.sort":"count","q":"*:*","f.article_date.facet.date.end":"NOW-5MONTH","doAs":"romain","f.article_date.facet.date.gap":"+1DAYS","facet.field":["journal_title","author_facet"],"fq":["article_date:[2013-06-13T00:00:00Z TO 2013-06-13T00:00:00Z+1DAYS]","journal_title:\\"in\\""]}},"response":{"numFound":4,"start":0,"maxScore":1.0,"docs":[{"article_title":"Investigations for neonatal seizures.","journal_issn":"1878-0946","article_abstract_text":["Seizures during the neonatal period are always medical emergencies. Apart from the need for rapid anticonvulsive treatment, the underlying condition is often not immediately obvious. In the search for the correct diagnosis, a thorough history, clinical examination, laboratory work-up, neurophysiological and neuroradiological investigations are all essential. A close collaboration between neonatologists, neuropaediatricians, laboratory specialists, neurophysiologists and radiologists facilitates the adequate care of the infant."],"ontologies":["36481|1 "],"article_date":"2013-06-13T00:00:00Z","journal_title":"Seminars in fetal & neonatal medicine","date_created":"2013-08-22T00:00:00Z","journal_country":"Netherlands","journal_iso_abbreviation":"Semin Fetal Neonatal Med","id":"23680099","author":["B B Hallberg","M M Blennow"],"article_pagination":"196-201","journal_publication_date":"2013-08-22T00:00:00Z","affiliation":"Department of Neonatology, Karolinska Institutet and University Hospital, Stockholm, Sweden. boubou.hallberg@ki.se","language":"eng","_version_":1450807641462800385},{"article_title":"Enantiomeric selection properties of β-homoDNA: enhanced pairing for heterochiral complexes.","journal_issn":"1521-3773","article_date":"2013-06-13T00:00:00Z","journal_title":"Angewandte Chemie (International ed. in English)","date_created":"2013-07-20T00:00:00Z","journal_country":"Germany","journal_iso_abbreviation":"Angew. Chem. Int. Ed. Engl.","id":"23670912","author":["Daniele D D'Alonzo","Jussara J Amato","Guy G Schepers","Matheus M Froeyen","Arthur A Van Aerschot","Piet P Herdewijn","Annalisa A Guaragna"],"article_pagination":"6662-5","journal_publication_date":"2013-06-24T00:00:00Z","affiliation":"Dipartimento di Scienze Chimiche, Università degli Studi di Napoli Federico II, Via Cintia 21, 80126 Napoli, Italy. dandalonzo@unina.it","language":"eng","_version_":1450807661929955329},{"article_title":"Interference of bacterial cell-to-cell communication: a new concept of antimicrobial chemotherapy breaks antibiotic resistance.","journal_issn":"1664-302X","article_abstract_text":["Bacteria use a cell-to-cell communication activity termed \\"quorum sensing\\" to coordinate group behaviors in a cell density dependent manner. Quorum sensing influences the expression profile of diverse genes, including antibiotic tolerance and virulence determinants, via specific chemical compounds called \\"autoinducers\\". During quorum sensing, Gram-negative bacteria typically use an acylated homoserine lactone (AHL) called autoinducer 1. Since the first discovery of quorum sensing in a marine bacterium, it has been recognized that more than 100 species possess this mechanism of cell-to-cell communication. In addition to being of interest from a biological standpoint, quorum sensing is a potential target for antimicrobial chemotherapy. This unique concept of antimicrobial control relies on reducing the burden of virulence rather than killing the bacteria. It is believed that this approach will not only suppress the development of antibiotic resistance, but will also improve the treatment of refractory infections triggered by multi-drug resistant pathogens. In this paper, we review and track recent progress in studies on AHL inhibitors/modulators from a biological standpoint. It has been discovered that both natural and synthetic compounds can disrupt quorum sensing by a variety of means, such as jamming signal transduction, inhibition of signal production and break-down and trapping of signal compounds. We also focus on the regulatory elements that attenuate quorum sensing activities and discuss their unique properties. Understanding the biological roles of regulatory elements might be useful in developing inhibitor applications and understanding how quorum sensing is controlled."],"ontologies":["2402|1 ","1875|1 ","2047|3 ","36690|1 ","8120|1 ","1872|1 ","1861|1 ","1955|2 ","38027|1 ","3853|1 ","2237|3 ","37074|1 ","3043|2 ","36478|1 ","4403|1 ","2751|1 ","10751|1 ","36467|1 ","2387|1 ","7278|3 ","3826|1 "],"article_date":"2013-06-13T00:00:00Z","journal_title":"Frontiers in microbiology","date_created":"2013-06-30T00:00:00Z","journal_country":"Switzerland","journal_iso_abbreviation":"Front Microbiol","id":"23720655","author":["Hidetada H Hirakawa","Haruyoshi H Tomita"],"article_pagination":"114","journal_publication_date":"2013-09-13T00:00:00Z","affiliation":"Advanced Scientific Research Leaders Development Unit, Gunma University Maebashi, Gunma, Japan.","language":"eng","_version_":1450807662055784448},{"article_title":"The role of musical training in emergent and event-based timing.","journal_issn":"1662-5161","article_abstract_text":["Introduction: Musical performance is thought to rely predominantly on event-based timing involving a clock-like neural process and an explicit internal representation of the time interval. Some aspects of musical performance may rely on emergent timing, which is established through the optimization of movement kinematics, and can be maintained without reference to any explicit representation of the time interval. We predicted that musical training would have its largest effect on event-based timing, supporting the dissociability of these timing processes and the dominance of event-based timing in musical performance. Materials and Methods: We compared 22 musicians and 17 non-musicians on the prototypical event-based timing task of finger tapping and on the typically emergently timed task of circle drawing. For each task, participants first responded in synchrony with a metronome (Paced) and then responded at the same rate without the metronome (Unpaced). Results: Analyses of the Unpaced phase revealed that non-musicians were more variable in their inter-response intervals for finger tapping compared to circle drawing. Musicians did not differ between the two tasks. Between groups, non-musicians were more variable than musicians for tapping but not for drawing. We were able to show that the differences were due to less timer variability in musicians on the tapping task. Correlational analyses of movement jerk and inter-response interval variability revealed a negative association for tapping and a positive association for drawing in non-musicians only. Discussion: These results suggest that musical training affects temporal variability in tapping but not drawing. Additionally, musicians and non-musicians may be employing different movement strategies to maintain accurate timing in the two tasks. These findings add to our understanding of how musical training affects timing and support the dissociability of event-based and emergent timing modes."],"ontologies":["36810|1 ","49002|1 ","3132|1 ","3797|1 ","37953|1 ","36563|2 ","524|1 ","3781|1 ","2848|1 ","17163|1 ","17165|1 ","49010|1 ","36647|3 ","36529|1 ","2936|1 ","2643|1 ","714|1 ","3591|1 ","2272|1 ","3103|1 ","2265|1 ","37051|1 ","3691|1 "],"article_date":"2013-06-14T00:00:00Z","journal_title":"Frontiers in human neuroscience","date_created":"2013-06-29T00:00:00Z","journal_country":"Switzerland","journal_iso_abbreviation":"Front Hum Neurosci","id":"23717275","author":["L H LH Baer","J L N JL Thibodeau","T M TM Gralnick","K Z H KZ Li","V B VB Penhune"],"article_pagination":"191","journal_publication_date":"2013-09-13T00:00:00Z","affiliation":"Department of Psychology, Centre for Research in Human Development, Concordia University Montréal, QC, Canada.","language":"eng","_version_":1450807667479019520}]},"facet_counts":{"facet_queries":{},"facet_fields":{"journal_title":["in",4,"frontiers",2,"angewandte",1,"chemie",1,"ed",1,"english",1,"fetal",1,"human",1,"international",1,"medicine",1,"microbiology",1,"neonatal",1,"neuroscience",1,"seminars",1],"author_facet":["Annalisa A Guaragna",1,"Arthur A Van Aerschot",1,"B B Hallberg",1,"Daniele D D'Alonzo",1,"Guy G Schepers",1,"Haruyoshi H Tomita",1,"Hidetada H Hirakawa",1,"J L N JL Thibodeau",1,"Jussara J Amato",1,"K Z H KZ Li",1,"L H LH Baer",1,"M M Blennow",1,"Matheus M Froeyen",1,"Piet P Herdewijn",1,"T M TM Gralnick",1,"V B VB Penhune",1]},"facet_dates":{"article_date":{"gap":"+1DAYS","start":"2013-04-27T00:00:00Z","end":"2013-06-28T00:00:00Z"}},"facet_ranges":{}},"highlighting":{"23680099":{},"23670912":{},"23720655":{},"23717275":{}},"spellcheck":{"suggestions":["correctlySpelled",false]}}""")
@@ -412,15 +410,15 @@ class TestWithMockedSolr(TestSearchBase):
         'query': json.dumps(QUERY)
     })
 
-    assert_false(b'alert alert-error' in response.content, response.content)
+    assert not b'alert alert-error' in response.content, response.content
 
-    assert_true(b'author_facet' in response.content, response.content)
-    assert_true(b'Annalisa A Guaragna' in response.content, response.content)
+    assert b'author_facet' in response.content, response.content
+    assert b'Annalisa A Guaragna' in response.content, response.content
 
-    assert_true(b'journal_title' in response.content, response.content)
-    assert_true(b'Angewandte' in response.content, response.content)
+    assert b'journal_title' in response.content, response.content
+    assert b'Angewandte' in response.content, response.content
 
-    assert_true(b'"numFound": 4' in response.content, response.content)
+    assert b'"numFound": 4' in response.content, response.content
 
   def test_response_highlighting_with_binary_value(self):
     MockResource.set_solr_response("""{"responseHeader":{"status":0,"QTime":23,"params":{"hl.fragsize":"1000","fl":"*","hl.snippets":"5","start":"0","user.name":"hue","q":"*:*","doAs":"romain","hl.fl":"*","wt":"json","hl":"true","rows":"2"}},"response":{"numFound":494,"start":0,"docs":[{"id":"#31;�#8;w)�U#3;333320442�#2;�#27;�v","last_name":"Ogh","gpa":"3.88","first_name":"Eirjish","age":"12","_version_":1508697786597507072},{"id":"#31;�#8;w)�U#3;344�457�4�#2;r��","last_name":"Ennjth","gpa":"1.22","first_name":"Oopob","age":"14","_version_":1508697786815610880}]},"facet_counts":{"facet_queries":{},"facet_fields":{"id":["31",485,"8",485,"u",485,"2",461,"x",308,"w",145,"3",123,"4",90,"3;3",81,"0",76,"y",46,"41",15,"16",14,"42",14,"05",12,"7",12,"04",11,"15",11,"3;31",11,"44",11,"45",11,"i",11,"n",11,"s",11,"03",10,"07",10,"11",10,"28",10,"30",10,"3;34",10,"46",10,"a",10,"c",10,"j",10,"v",10,"02",9,"1",9,"26",9,"6",9,"e",9,"f",9,"p",9,"z",9,"00",8,"06",8,"14",8,"43",8,"g",8,"h",8,"r",8,"20",7,"23",7,"29",7,"3;37",7,"40",7,"k",7,"01",6,"17",6,"22",6,"24",6,"27",6,"3;35",6,"3;36",6,"b",6,"12",5,"19",5,"21",5,"3;323",5,"3;33",5,"47",5,"5",5,"o",5,"18",4,"25",4,"2;6",4,"3;32",4,"3;360",4,"3;372",4,"d",4,"q",4,"t",4,"005",3,"2;3",3,"3;311",3,"3;343",3,"3;344",3,"3;373",3,"420",3,"471",3,"9",3,"l",3,"m",3,"0147",2,"020",2,"022",2,"031",2,"065",2,"070",2,"2;0",2,"2;5",2],"first_name":["unt",3,"at",2,"aut",2,"eigh",2,"jh",2,"jir",2,"jz",2,"oim",2,"oith",2,"onn",2,"ouz",2,"um",2,"veitt",2,"16",1,"21",1,"28",1,"30",1,"achunn",1,"ad",1,"agauz",1,"agur",1,"aibenn",1,"aich",1,"aichaum",1,"aigh",1,"aim",1,"aimoob",1,"ainn",1,"aipf",1,"aipfouv",1,"aisainn",1,"aistjs",1,"aith",1,"aitoum",1,"aittool",1,"aittoupf",1,"aiw",1,"ak",1,"al",1,"apf",1,"astjist",1,"ataiv",1,"att",1,"auchav",1,"auchib",1,"auchih",1,"aud",1,"audaush",1,"auh",1,"auhour",1,"aum",1,"aunnoiss",1,"aunopf",1,"aupev",1,"aus",1,"ausaust",1,"austour",1,"ausyv",1,"auth",1,"authep",1,"auttjich",1,"auttjir",1,"av",1,"besooz",1,"bjfautt",1,"bjichaub",1,"bjittyl",1,"bjtoopf",1,"bleiss",1,"blistoot",1,"blittaub",1,"bljip",1,"bljir",1,"bloich",1,"bluhaid",1,"bluth",1,"breirjd",1,"breiter",1,"breitt",1,"breth",1,"brjishaip",1,"broil",1,"broopfoul",1,"brooputt",1,"brooroog",1,"brot",1,"brych",1,"brykaub",1,"brypfop",1,"bunn",1,"byroigh",1,"c",1,"caugh",1,"cautt",1,"chaittoif",1,"chaupour",1,"chautoonn",1,"chech",1,"cheigh",1,"chet",1],"last_name":["it",3,"ooz",3,"yss",3,"aih",2,"aim",2,"ash",2,"foum",2,"ig",2,"jch",2,"jif",2,"jis",2,"jiv",2,"jiw",2,"js",2,"oh",2,"ouf",2,"uch",2,"ud",2,"uf",2,"ul",2,"ush",2,"ys",2,"ab",1,"ach",1,"afoust",1,"aghaush",1,"aib",1,"aihjiss",1,"aimoint",1,"ain",1,"aineip",1,"ainn",1,"aint",1,"aintuf",1,"aipfes",1,"aipfjf",1,"air",1,"aish",1,"aishoott",1,"aishutt",1,"aisjnn",1,"aisseih",1,"aissutt",1,"aistaif",1,"aith",1,"aithjib",1,"aiv",1,"aiw",1,"aiz",1,"aizyb",1,"alyk",1,"ap",1,"apf",1,"apount",1,"assyv",1,"ast",1,"at",1,"atook",1,"att",1,"audal",1,"aug",1,"auk",1,"auloost",1,"aupfoitt",1,"aupjish",1,"aur",1,"aus",1,"authood",1,"auttyst",1,"auvjb",1,"auvon",1,"auzigh",1,"az",1,"besh",1,"birus",1,"bjit",1,"bjz",1,"blaich",1,"blaipf",1,"bleiz",1,"blikjigh",1,"bloob",1,"blouth",1,"boobjist",1,"boontoih",1,"boub",1,"bouch",1,"braul",1,"braut",1,"breinnyz",1,"brishoog",1,"brithith",1,"brjint",1,"brjth",1,"brubeist",1,"brugh",1,"bryvaip",1,"byl",1,"caleid",1,"ceir",1],"age":["12",60,"18",57,"14",56,"10",54,"11",53,"13",52,"16",50,"15",49,"17",44],"gpa":["2.34",6,"1.01",5,"1.43",5,"3.04",5,"3.14",5,"3.17",5,"3.87",5,"1.61",4,"2.24",4,"2.73",4,"2.76",4,"2.97",4,"3.28",4,"3.29",4,"3.35",4,"3.39",4,"3.67",4,"3.78",4,"3.85",4,"1.05",3,"1.1",3,"1.13",3,"1.22",3,"1.25",3,"1.3",3,"1.34",3,"1.37",3,"1.38",3,"1.39",3,"1.4",3,"1.44",3,"1.46",3,"1.53",3,"1.54",3,"1.55",3,"1.67",3,"1.72",3,"1.82",3,"1.91",3,"1.93",3,"11.0",3,"2.09",3,"2.11",3,"2.23",3,"2.26",3,"2.29",3,"2.46",3,"2.62",3,"2.71",3,"2.78",3,"2.79",3,"2.83",3,"2.84",3,"2.85",3,"2.92",3,"3.09",3,"3.11",3,"3.13",3,"3.23",3,"3.44",3,"3.76",3,"3.82",3,"3.88",3,"3.89",3,"3.92",3,"3.97",3,"4.0",3,"1.02",2,"1.11",2,"1.23",2,"1.26",2,"1.28",2,"1.35",2,"1.48",2,"1.56",2,"1.59",2,"1.63",2,"1.79",2,"1.8",2,"1.81",2,"1.97",2,"16.0",2,"2.01",2,"2.03",2,"2.05",2,"2.08",2,"2.12",2,"2.14",2,"2.17",2,"2.2",2,"2.25",2,"2.3",2,"2.35",2,"2.36",2,"2.41",2,"2.47",2,"2.49",2,"2.51",2,"2.54",2,"2.56",2],"date1":[],"date2":[],"country":[],"state":[],"city":[],"latitude":[],"longitude":[]},"facet_dates":{},"facet_ranges":{},"facet_intervals":{}},"highlighting":{"#31;�#8;w)�U#3;333320442�#2;�#27;�v":{},"#31;�#8;w)�U#3;344�457�4�#2;r��":{}}}""")
@@ -430,15 +428,15 @@ class TestWithMockedSolr(TestSearchBase):
         'query': json.dumps(QUERY)
     })
 
-    assert_false(b'alert alert-error' in response.content, response.content)
-    assert_false(b"'ascii' codec can't encode character u'\ufffd' in position" in response.content, response.content)
+    assert not b'alert alert-error' in response.content, response.content
+    assert not b"'ascii' codec can't encode character u'\ufffd' in position" in response.content, response.content
 
-    assert_true(b'bluhaid' in response.content, response.content)
+    assert b'bluhaid' in response.content, response.content
 
   def test_get_collection_fields(self):
     MockResource.set_solr_response("""{"responseHeader":{"status":0,"QTime":8},"index":{"numDocs":8,"maxDoc":8,"deletedDocs":0,"version":15,"segmentCount":5,"current":true,"hasDeletions":false,"directory":"org.apache.lucene.store.NRTCachingDirectory:NRTCachingDirectory(org.apache.solr.store.hdfs.HdfsDirectory@5efe087b lockFactory=org.apache.solr.store.hdfs.HdfsLockFactory@5106def2; maxCacheMB=192.0 maxMergeSizeMB=16.0)","userData":{"commitTimeMSec":"1389233070579"},"lastModified":"2014-01-09T02:04:30.579Z"},"fields":{"_version_":{"type":"long","schema":"ITS-----OF------","index":"-TS-------------","docs":8,"distinct":8,"topTerms":["1456716393276768256",1,"1456716398067712000",1,"1456716401465098240",1,"1460689159964327936",1,"1460689159981105152",1,"1460689159988445184",1,"1460689159993688064",1,"1456716273606983680",1],"histogram":["1",8]},"cat":{"type":"string","schema":"I-S-M---OF-----l","index":"ITS-----OF------","docs":4,"distinct":1,"topTerms":["currency",4],"histogram":["1",0,"2",0,"4",1]},"features":{"type":"text_general","schema":"ITS-M-----------","index":"ITS-------------","docs":4,"distinct":3,"topTerms":["coins",4,"notes",4,"and",4],"histogram":["1",0,"2",0,"4",3]},"id":{"type":"string","schema":"I-S-----OF-----l","index":"ITS-----OF------","docs":8,"distinct":8,"topTerms":["GBP",1,"NOK",1,"USD",1,"change.me",1,"change.me1",1,"change.me112",1,"change.me12",1,"EUR",1],"histogram":["1",8]},"inStock":{"type":"boolean","schema":"I-S-----OF-----l","index":"ITS-----OF------","docs":4,"distinct":1,"topTerms":["true",4],"histogram":["1",0,"2",0,"4",1]},"manu":{"type":"text_general","schema":"ITS-----O-------","index":"ITS-----O-------","docs":4,"distinct":7,"topTerms":["of",2,"bank",2,"european",1,"norway",1,"u.k",1,"union",1,"america",1],"histogram":["1",5,"2",2]},"manu_exact":{"type":"string","schema":"I-------OF-----l","index":"(unstored field)","docs":4,"distinct":4,"topTerms":["Bank of Norway",1,"European Union",1,"U.K.",1,"Bank of America",1],"histogram":["1",4]},"manu_id_s":{"type":"string","schema":"I-S-----OF-----l","dynamicBase":"*_s","index":"ITS-----OF------","docs":4,"distinct":4,"topTerms":["eu",1,"nor",1,"uk",1,"boa",1],"histogram":["1",4]},"name":{"type":"text_general","schema":"ITS-------------","index":"ITS-------------","docs":4,"distinct":6,"topTerms":["one",4,"euro",1,"krone",1,"dollar",1,"pound",1,"british",1],"histogram":["1",5,"2",0,"4",1]},"price_c":{"type":"currency","schema":"I-S------F------","dynamicBase":"*_c"},"price_c____amount_raw":{"type":"amount_raw_type_tlong","schema":"IT------O-------","dynamicBase":"*____amount_raw","index":"(unstored field)","docs":4,"distinct":8,"topTerms":["0",4,"0",4,"0",4,"0",4,"0",4,"0",4,"0",4,"100",4],"histogram":["1",0,"2",0,"4",8]},"price_c____currency":{"type":"currency_type_string","schema":"I-------O-------","dynamicBase":"*____currency","index":"(unstored field)","docs":4,"distinct":4,"topTerms":["GBP",1,"NOK",1,"USD",1,"EUR",1],"histogram":["1",4]},"romain_t":{"type":"text_general","schema":"ITS-------------","dynamicBase":"*_t","index":"ITS-------------","docs":1,"distinct":1,"topTerms":["true",1],"histogram":["1",1]},"text":{"type":"text_general","schema":"IT--M-----------","index":"(unstored field)","docs":8,"distinct":21,"topTerms":["and",4,"currency",4,"notes",4,"one",4,"coins",4,"bank",2,"of",2,"change.me112",1,"change.me1",1,"change.me",1],"histogram":["1",14,"2",2,"4",5]},"title":{"type":"text_general","schema":"ITS-M-----------","index":"ITS-------------","docs":4,"distinct":4,"topTerms":["change.me1",1,"change.me112",1,"change.me12",1,"change.me",1],"histogram":["1",4]}},"info":{"key":{"I":"Indexed","T":"Tokenized","S":"Stored","D":"DocValues","M":"Multivalued","V":"TermVector Stored","o":"Store Offset With TermVector","p":"Store Position With TermVector","O":"Omit Norms","F":"Omit Term Frequencies & Positions","P":"Omit Positions","H":"Store Offsets with Positions","L":"Lazy","B":"Binary","f":"Sort Missing First","l":"Sort Missing Last"},"NOTE":"Document Frequency (df) is not updated when a document is marked for deletion.  df values include deleted documents."}}""")
 
-    assert_equal(
+    assert (
         # Dynamic fields not included for now
         [{'isDynamic': False, 'isId': None, 'type': 'string', 'name': '&lt;script&gt;alert(1234)&lt;/script&gt;'},
          {'isDynamic': False, 'isId': None, 'type': 'long', 'name': '_version_'},
@@ -470,9 +468,8 @@ class TestWithMockedSolr(TestSearchBase):
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'title'},
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'url'},
          {'isDynamic': False, 'isId': None, 'type': 'float', 'name': 'weight'},
-         ],
-        self.collection.fields_data(self.user, 'collection_1')
-    )
+         ] ==
+        self.collection.fields_data(self.user, 'collection_1'))
 
   # TODO
   # test facet with userlocation: türkiye, 東京, new york
@@ -487,10 +484,10 @@ class TestWithMockedSolr(TestSearchBase):
     })
 
     json_response_content = json.loads(json_response.content)
-    assert_equal('application/json', json_response['Content-Type'])
-    assert_equal('attachment; filename="query_result.json"', json_response['Content-Disposition'])
-    assert_equal(4, len(json_response_content), len(json_response_content))
-    assert_equal('Investigations for neonatal seizures.', json_response_content[0]['article_title'])
+    assert 'application/json' == json_response['Content-Type']
+    assert 'attachment; filename="query_result.json"' == json_response['Content-Disposition']
+    assert 4 == len(json_response_content), len(json_response_content)
+    assert 'Investigations for neonatal seizures.' == json_response_content[0]['article_title']
 
     csv_response = self.c.post(reverse('dashboard:download'), {
         'type': 'csv',
@@ -498,12 +495,12 @@ class TestWithMockedSolr(TestSearchBase):
         'query': json.dumps(QUERY)
     })
     csv_response_content = b''.join(csv_response.streaming_content)
-    assert_equal('application/csv', csv_response['Content-Type'])
-    assert_equal('attachment; filename="query_result.csv"', csv_response['Content-Disposition'])
-    assert_equal(4 + 1 + 1, len(csv_response_content.split(b'\n')), csv_response_content.split(b'\n'))
-    assert_true(b'&lt;script&gt;alert(1234)&lt;/script&gt;,_version_,author,category,comments,content,content_type,description,features,id,inStock,includes,keywords,last_modified,links,manu,manu_exact,name,payloads,popularity,price,resourcename,sku,store,subject,text,text_rev,title,url,weight' in csv_response_content, csv_response_content)
+    assert 'application/csv' == csv_response['Content-Type']
+    assert 'attachment; filename="query_result.csv"' == csv_response['Content-Disposition']
+    assert 4 + 1 + 1 == len(csv_response_content.split(b'\n')), csv_response_content.split(b'\n')
+    assert b'&lt;script&gt;alert(1234)&lt;/script&gt;,_version_,author,category,comments,content,content_type,description,features,id,inStock,includes,keywords,last_modified,links,manu,manu_exact,name,payloads,popularity,price,resourcename,sku,store,subject,text,text_rev,title,url,weight' in csv_response_content, csv_response_content
     # Fields does not exactly match the response but this is because the collection schema does not match the query response.
-    assert_true(b""",1450807641462800385,"['B B Hallberg', 'M M Blennow']",,,,,,,23680099,,,,,,,,,,,,,,,,,,,,""" in csv_response_content, csv_response_content)
+    assert b""",1450807641462800385,"['B B Hallberg', 'M M Blennow']",,,,,,,23680099,,,,,,,,,,,,,,,,,,,,""" in csv_response_content, csv_response_content
 
     xls_response = self.c.post(reverse('dashboard:download'), {
         'type': 'xls',
@@ -511,9 +508,9 @@ class TestWithMockedSolr(TestSearchBase):
         'query': json.dumps(QUERY)
     })
     xls_response_content = bytes(xls_response.content)
-    assert_not_equal(0, len(xls_response_content))
-    assert_equal('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', xls_response['Content-Type'])
-    assert_equal('attachment; filename="query_result.xlsx"', xls_response['Content-Disposition'])
+    assert 0 != len(xls_response_content)
+    assert 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' == xls_response['Content-Type']
+    assert 'attachment; filename="query_result.xlsx"' == xls_response['Content-Disposition']
 
   def test_index_xss(self):
     doc = Document2.objects.create(
@@ -526,7 +523,7 @@ class TestWithMockedSolr(TestSearchBase):
 
     try:
       response = self.c.get(reverse('dashboard:index') + ('?collection=%s' % doc.id) + '&q=</script><script>alert(%27XSS%27)</script>')
-      assert_equal('{"fqs": [], "qs": [{"q": "alert(\'XSS\')"}], "start": 0}', json.dumps(json.loads(response.context[0]['query']), sort_keys=True))
+      assert '{"fqs": [], "qs": [{"q": "alert(\'XSS\')"}], "start": 0}' == json.dumps(json.loads(response.context[0]['query']), sort_keys=True)
     finally:
       doc.delete()
 

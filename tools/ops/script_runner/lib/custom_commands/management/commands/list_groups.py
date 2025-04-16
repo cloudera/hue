@@ -28,10 +28,7 @@ from django.contrib.auth.models import User, Group
 
 import desktop.conf
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 LOG = logging.getLogger(__name__)
 
@@ -66,12 +63,12 @@ class Command(BaseCommand):
             user = User.objects.get(username = options['username'])
             groups = user.groups.all()
             for group in groups:
-              print group.name
+              print (group.name)
           else:
             LOG.info("Listing all groups")
             groups = Group.objects.all()
             for group in groups:
-              print group.name
+              print (group.name)
 
         except Exception as e:
             LOG.warn("EXCEPTION: Listing groups failed, %s" % e)

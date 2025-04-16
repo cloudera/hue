@@ -25,4 +25,3 @@
 % endfor
 
 <StorageBrowserPage data-reactcomponent='StorageBrowserPage'></StorageBrowserPage>
-

@@ -195,7 +195,9 @@ ${ scheduler.import_sla_cron(coordinator_json) }
 
     huePubSub.subscribe('submit.popup.return', function (data) {
       if (data.type == 'schedule') {
-        $.jHueNotify.info('${_('Schedule submitted.')}');
+        huePubSub.publish('hue.global.info', {
+          message: "${_('Schedule submitted.')}"
+        });
         huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
         huePubSub.publish('browser.job.open.link', data.job_id);
         $('.submit-modal').modal('hide');

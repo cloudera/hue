@@ -27,7 +27,6 @@ xdescribe('sqlAutocomplete.js', () => {
 
   beforeEach(() => {
     dataCatalog.disableCache();
-    window.AUTOCOMPLETE_TIMEOUT = 1;
     jasmine.Ajax.install();
 
     jasmine.Ajax.stubRequest(/.*\/notebook\/api\/autocomplete\/$/).mockReturnValue({
@@ -65,7 +64,6 @@ xdescribe('sqlAutocomplete.js', () => {
       }
       fail('Still loading, missing ajax spec?');
     }
-    AUTOCOMPLETE_TIMEOUT = 0;
     dataCatalog.enableCache();
     jasmine.Ajax.uninstall();
   });

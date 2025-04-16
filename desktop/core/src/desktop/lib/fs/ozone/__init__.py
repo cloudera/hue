@@ -19,7 +19,6 @@ import posixpath
 
 from hadoop.fs import normpath as fs_normpath
 
-
 OFS_ROOT = 'ofs://'
 OFS_PATH_RE = re.compile('^/*[oO][fF][sS]?://([^/]+)(/(.*?([^/]+)?/?))?$')
 
@@ -40,7 +39,7 @@ def normpath(path):
     if is_root(path):
       normalized = path
     else:
-      normalized = '%s%s' % (OFS_ROOT, fs_normpath(path[len(OFS_ROOT):]))
+      normalized = '%s%s' % (OFS_ROOT, fs_normpath(path[len(OFS_ROOT) :]))
   else:
     normalized = fs_normpath(path)
   return normalized
@@ -66,16 +65,32 @@ def join(*comp_list):
       return '/%s/%s' % parse_uri(uri)[:2]
     except ValueError:
       return '/' if is_root(uri) else uri
+
   joined = posixpath.join(*list(map(_prep, comp_list)))
   return joined
 
-def _serviceid_join(path, ofs_serviceid):
-  if path and (path == '/' or path.startswith('/' + ofs_serviceid)):
+
+def _serviceid_join(path, ofs_serviceid, is_vol_serviceid_equal=False):
+  """
+  Modify the provided path based on the service ID and a flag indicating
+  if the volume service ID is equal to the service ID.
+
+  Args:
+    path (str): The path to be joined with ofs_serviceid.
+    ofs_serviceid (str): The ofs_serviceid to be joined with the path.
+    is_vol_serviceid_equal (bool, optional): Flag to indicate if ofs_serviceid is equal to the volume service ID. Defaults to False.
+
+  Returns:
+    str: The joined path.
+  """
+
+  if path and (path == '/' or path.startswith('/' + ofs_serviceid + '/') or path == '/' + ofs_serviceid) and not is_vol_serviceid_equal:
     path = 'ofs:/' + path
   elif path and not path.startswith(OFS_ROOT + ofs_serviceid + '/'):
     path = OFS_ROOT + ofs_serviceid + '/' + path.lstrip('/')
-  
+
   return path
+
 
 def _append_separator(path):
   if path and not path.endswith('/'):
@@ -87,8 +102,8 @@ def parse_uri(uri):
   """
   Returns tuple (service_id, key_name, key_basename).
   Raises ValueError if invalid OFS URI is passed.
-  
-  ofs://ozone1/volume1/bucket1/key1/key2 -> 
+
+  ofs://ozone1/volume1/bucket1/key1/key2 ->
   group1 -> ozone1
   group2 -> /volume1/bucket1/key1/key2
   group3 -> volume1/bucket1/key1/key2

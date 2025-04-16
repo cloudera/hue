@@ -15,21 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from hadoop import conf
-import logging
 import os
-import sys
+import logging
 import tempfile
 
-from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal, assert_raises
-
-from hadoop import hdfs_site
-
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
+from hadoop import conf, hdfs_site
 
 LOG = logging.getLogger()
 
@@ -53,13 +43,13 @@ def test_hdfs_site():
   </property>
 </configuration>
     """
-    open_file(os.path.join(hadoop_home, 'hdfs-site.xml'), 'w').write(xml)
+    open(os.path.join(hadoop_home, 'hdfs-site.xml'), 'w').write(xml)
 
     finish = conf.HDFS_CLUSTERS['default'].HADOOP_CONF_DIR.set_for_testing(hadoop_home)
     hdfs_site.reset()
 
-    assert_equal(set(hdfs_site.get_nn_sentry_prefixes()), set(['/path/a', '/path/b', '/path/c', '/path/d', '/path/1']))
-    assert_equal(len(hdfs_site.get_nn_sentry_prefixes()), 5)
+    assert set(hdfs_site.get_nn_sentry_prefixes()) == set(['/path/a', '/path/b', '/path/c', '/path/d', '/path/1'])
+    assert len(hdfs_site.get_nn_sentry_prefixes()) == 5
   finally:
     hdfs_site.reset()
     if finish:

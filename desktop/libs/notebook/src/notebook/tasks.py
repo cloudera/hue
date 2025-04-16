@@ -16,21 +16,19 @@
 # limitations under the License.
 
 from __future__ import absolute_import, unicode_literals
-from future import standard_library
-standard_library.install_aliases()
 
-from builtins import next, object
-
-import codecs
 import csv
-import datetime
-import json
-import logging
 import sys
+import json
 import time
+import codecs
+import logging
+import datetime
+from builtins import next, object
+from io import StringIO as string_io
 
-from celery.utils.log import get_task_logger
 from celery import states
+from celery.utils.log import get_task_logger
 from django.core.cache import caches
 from django.core.files.storage import get_storage_class
 from django.db import transaction
@@ -43,18 +41,11 @@ from desktop.conf import ENABLE_HUE_5, TASK_SERVER
 from desktop.lib import export_csvxls, fsmanager
 from desktop.models import Document2
 from desktop.settings import CACHES_CELERY_KEY, CACHES_CELERY_QUERY_RESULT_KEY
-from useradmin.models import User
-
 from notebook.api import _get_statement
-from notebook.connectors.base import get_api, QueryExpired, ExecutionWrapper, QueryError
-from notebook.models import make_notebook, MockedDjangoRequest, Notebook
+from notebook.connectors.base import ExecutionWrapper, QueryError, QueryExpired, get_api
+from notebook.models import MockedDjangoRequest, Notebook, make_notebook
 from notebook.sql_utils import get_current_statement
-
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from StringIO import StringIO as string_io
-
+from useradmin.models import User
 
 LOG_TASK = get_task_logger(__name__)
 LOG = logging.getLogger()
@@ -137,7 +128,7 @@ def download_to_file(notebook, snippet, file_format='csv', max_rows=-1, **kwargs
     if TASK_SERVER.RESULT_CACHE.get():
       with storage.open(result_key, 'rb') as store:
         with codecs.getreader('utf-8')(store) as text_file:
-          delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
+          delimiter = ','
           csv_reader = csv.reader(text_file, delimiter=delimiter)
           caches[CACHES_CELERY_QUERY_RESULT_KEY].set(result_key, [row for row in csv_reader], 60 * 5)
           LOG.info('Caching results %s.' % result_key)
@@ -305,7 +296,7 @@ def get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id
       return output.getvalue()
 
 
-def get_jobs(notebook, snippet, logs, **kwargs): # Re implementation to fetch updated guid in download_to_file from DB
+def get_jobs(notebook, snippet, logs, **kwargs):  # Re implementation to fetch updated guid in download_to_file from DB
   result = download_to_file.AsyncResult(notebook['uuid'])
   state = result.state
 
@@ -407,7 +398,7 @@ def _get_data(task_id):
     csv_reader = csv_reader[1:] if csv_reader else []
   else:
     f = storage.open(result_key, 'rb')
-    delimiter = ',' if sys.version_info[0] > 2 else ','.encode('utf-8')
+    delimiter = ','
     csv_reader = csv.reader(f, delimiter=delimiter)
     headers = next(csv_reader, [])
 
@@ -429,6 +420,7 @@ def fetch_result_size(*args, **kwargs):
 
   info = result.info
   return {'rows': info.get('row_counter', 0)}
+
 
 def cancel(*args, **kwargs):
   notebook = args[0]
@@ -490,6 +482,7 @@ def _cleanup(notebook, snippet):
   storage.delete(_log_key(notebook, snippet))
   caches[CACHES_CELERY_KEY].delete(_fetch_progress_key(notebook, snippet))
 
+
 def _get_query_key(notebook, snippet):
   if ENABLE_HUE_5.get():
     if snippet.get('executable'):
@@ -506,20 +499,26 @@ def _get_query_key(notebook, snippet):
   else:
     return query_key
 
+
 def _log_key(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_log'
+
 
 def _result_key(task_id):
   return task_id + '_result'
 
+
 def _fetch_progress_key(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_fetch_progress'
+
 
 def _cancel_statement_async_id(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_cancel'
 
+
 def _close_statement_async_id(notebook, snippet):
   return _get_query_key(notebook, snippet) + '_close'
+
 
 def _get_request(postdict=None, user_id=None):
   request = HttpRequest()

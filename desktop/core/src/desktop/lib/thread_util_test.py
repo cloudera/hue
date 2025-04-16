@@ -15,19 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from future import standard_library
-standard_library.install_aliases()
-import sys
-import threading
 import time
+import threading
+from io import StringIO as string_io
 
-from nose.tools import assert_true
 from desktop.lib.thread_util import dump_traceback
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-else:
-  from cStringIO import StringIO as string_io
 
 def test_dump_traceback():
   started = threading.Event()
@@ -37,7 +30,7 @@ def test_dump_traceback():
     def run(self):
       started.set()
       stopped.wait(10.0)
-      assert_true(stopped.is_set())
+      assert stopped.is_set()
 
   thread = Thread(name='thread_util_test thread')
   thread.start()
@@ -47,17 +40,17 @@ def test_dump_traceback():
 
   try:
     started.wait(10.0)
-    assert_true(started.is_set())
+    assert started.is_set()
 
     out = string_io()
     dump_traceback(file=out)
 
-    assert_true(header in out.getvalue())
+    assert header in out.getvalue()
 
     out = string_io()
     dump_traceback(file=out, all_threads=False)
 
-    assert_true(header not in out.getvalue())
+    assert header not in out.getvalue()
   finally:
     stopped.set()
     thread.join()

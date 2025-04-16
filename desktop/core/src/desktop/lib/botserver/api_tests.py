@@ -15,36 +15,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import sys
+import json
 import unittest
+from unittest.mock import Mock, patch
 
+import pytest
 from django.urls import reverse
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
 from desktop import conf
 from desktop.lib.django_test_util import make_logged_in_client
-
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
+@pytest.mark.django_db
 class TestApi(object):
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="api_user", recreate=True, is_superuser=False, is_admin=True)
     self.user = User.objects.get(username="api_user")
 
     self.hostname = 'testserver.gethue.com'
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     if not conf.SLACK.IS_ENABLED.get():
-      raise SkipTest
+      pytest.skip("Skipping Test")
 
   def test_get_channels(self):
     with patch('desktop.lib.botserver.api.slack_client.users_conversations') as users_conversations:
@@ -67,8 +63,8 @@ class TestApi(object):
       response = self.client.get(reverse('botserver.api.get_channels'))
       data = json.loads(response.content)
 
-      assert_equal(200, response.status_code)
-      assert_equal(['channel-1', 'channel-2'], data.get('channels'))
+      assert 200 == response.status_code
+      assert ['channel-1', 'channel-2'] == data.get('channels')
 
   def test_send_message(self):
     with patch('desktop.lib.botserver.api.slack_client.chat_postMessage') as chat_postMessage:
@@ -80,17 +76,17 @@ class TestApi(object):
       response = self.client.post(reverse('botserver.api.send_message'), {'channel': 'channel-1', 'message': 'message with link'})
       data = json.loads(response.content)
 
-      assert_equal(200, response.status_code)
+      assert 200 == response.status_code
       chat_postMessage.assert_called_with(channel='channel-1', text='@api_user: message with link', blocks=None, thread_ts=None)
-      assert_true(data.get('ok'))
-  
+      assert data.get('ok')
+
   def test_generate_slack_install_link(self):
     response = self.client.get(reverse('api:botserver.api.slack_install_link') + '/?hostname=' + self.hostname)
     data = json.loads(response.content)
 
-    assert_equal(200, response.status_code)
-    assert_equal(
-      data.get('link'),
+    assert 200 == response.status_code
+    assert (
+      data.get('link') ==
       ('https://api.slack.com/apps?new_app=1&manifest_yaml=_metadata%3A%0A++major_version%3A+1%0A++minor_version%3A+1%0Adisplay_information'
       '%3A%0A++background_color%3A+%27%23000000%27%0A++description%3A+Share+queries%2C+ask+where+is+the+data%2C+how+to+query+it..+questions.'
       '%0A++name%3A+SQL+Assistant%0Afeatures%3A%0A++app_home%3A%0A++++home_tab_enabled%3A+false%0A++++messages_tab_enabled%3A+false%0A++++'
@@ -99,5 +95,4 @@ class TestApi(object):
       '++++-+channels%3Aread%0A++++-+chat%3Awrite%0A++++-+files%3Awrite%0A++++-+links%3Aread%0A++++-+links%3Awrite%0A++++-+users%3Aread%0'
       'A++++-+users%3Aread.email%0Asettings%3A%0A++event_subscriptions%3A%0A++++bot_events%3A%0A++++-+app_mention%0A++++-+link_shared%0A'
       '++++-+message.channels%0A++++request_url%3A+https%3A%2F%2Ftestserver.gethue.com%2Fdesktop%2Fslack%2Fevents%2F%0A++is_hosted%3A+false%'
-      '0A++org_deploy_enabled%3A+false%0A++socket_mode_enabled%3A+false%0A')
-    )
+      '0A++org_deploy_enabled%3A+false%0A++socket_mode_enabled%3A+false%0A'))

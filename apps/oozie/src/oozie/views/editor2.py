@@ -15,46 +15,49 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import str
+import sys
 import json
 import logging
-import sys
-
+from builtins import str
 from datetime import datetime
-from django.urls import reverse
+
 from django.forms.formsets import formset_factory
 from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.translation import gettext as _
 
-from desktop.conf import USE_NEW_EDITOR, IS_MULTICLUSTER_ONLY
+from desktop.conf import IS_MULTICLUSTER_ONLY, USE_NEW_EDITOR
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_str, force_unicode
-from desktop.lib.rest.http_client import RestException
+from desktop.lib.i18n import force_unicode, smart_str
 from desktop.lib.json_utils import JSONEncoderForHTML
+from desktop.lib.rest.http_client import RestException
 from desktop.models import Document, Document2, get_cluster_config
-
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 from metadata.conf import DEFAULT_PUBLIC_KEY
 from notebook.connectors.base import Notebook
-
-from oozie.decorators import check_document_access_permission, check_document_modify_permission,\
-  check_editor_access_permission
+from oozie.decorators import check_document_access_permission, check_document_modify_permission, check_editor_access_permission
 from oozie.forms import ParameterForm
-from oozie.models import Workflow as OldWorklow, Coordinator as OldCoordinator, Bundle as OldBundle, Job
-from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflow_from_hue_3_7,\
-    find_dollar_variables, find_dollar_braced_variables, WorkflowBuilder,\
-  _import_workspace, _save_workflow
+from oozie.models import Bundle as OldBundle, Coordinator as OldCoordinator, Job, Workflow as OldWorklow
+from oozie.models2 import (
+  NODES,
+  WORKFLOW_NODE_PROPERTIES,
+  Bundle,
+  Coordinator,
+  Node,
+  Workflow,
+  WorkflowBuilder,
+  _import_workspace,
+  _save_workflow,
+  find_dollar_braced_variables,
+  find_dollar_variables,
+  import_workflow_from_hue_3_7,
+)
 from oozie.utils import convert_to_server_timezone
-from oozie.views.editor import edit_workflow as old_edit_workflow, edit_coordinator as old_edit_coordinator, edit_bundle as old_edit_bundle
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from oozie.views.editor import edit_bundle as old_edit_bundle, edit_coordinator as old_edit_coordinator, edit_workflow as old_edit_workflow
 
 LOG = logging.getLogger()
 
@@ -163,7 +166,7 @@ def delete_job(request):
         doc.can_write_or_exception(request.user)
         doc.delete()
         doc2.delete()
-    else: # Old version
+    else:  # Old version
       job = Job.objects.can_read_or_exception(request, job['object_id'])
       Job.objects.can_edit_or_exception(request, job)
       OldWorklow.objects.destroy(job, request.fs)
@@ -266,6 +269,7 @@ def _get_workflows(user):
         } for workflow in [d.content_object for d in Document.objects.get_docs(user, Document2, extra='workflow2').order_by('-id')]
     ]
   return workflows
+
 
 @check_editor_access_permission
 def add_node(request):
@@ -399,7 +403,9 @@ def submit_single_action(request, doc_id, node_id):
   workflow.import_workspace(request.fs, parent_wf.deployment_dir, request.user)
   workflow.document = parent_doc
 
-  return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:submit_single_action', kwargs={'doc_id': doc_id, 'node_id': node_id}))
+  return _submit_workflow_helper(
+    request, workflow, submit_action=reverse('oozie:submit_single_action', kwargs={'doc_id': doc_id, 'node_id': node_id})
+  )
 
 
 def _submit_workflow_helper(request, workflow, submit_action):
@@ -544,12 +550,12 @@ def edit_coordinator(request):
     if coordinator_id and not [a for a in workflows if a['uuid'] == coordinator.data['properties']['workflow']]:
       raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
 
-  if USE_NEW_EDITOR.get(): # In Hue 4, merge with above
+  if USE_NEW_EDITOR.get():  # In Hue 4, merge with above
     workflows = [dict([('uuid', d.uuid), ('name', d.name)])
                       for d in Document2.objects.documents(request.user, include_managed=False).search_documents(types=['oozie-workflow2'])]
 
   can_edit = doc is None or (doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user))
-  if request.GET.get('format') == 'json': # For Editor
+  if request.GET.get('format') == 'json':  # For Editor
     return JsonResponse({
       'coordinator': coordinator.get_data_for_json(),
       'credentials': list(credentials.credentials.keys()),
@@ -631,7 +637,9 @@ def save_coordinator(request):
         owner=request.user,
         is_managed=coordinator_data.get('isManaged')
     )
-    Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
+    Document.objects.link(
+      coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2'
+    )
 
   scheduled_id = coordinator_data['properties']['workflow'] or coordinator_data['properties']['document']
   if scheduled_id:
@@ -722,7 +730,7 @@ def submit_coordinator(request, doc_id):
     return render('/scheduler/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': coordinator.name,
-                 'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id}),
+                 'action': reverse('oozie:editor_submit_coordinator', kwargs={'doc_id': coordinator.id}),
                  'show_dryrun': True,
                  'return_json': request.GET.get('format') == 'json'
                 }, force_template=True)
@@ -734,17 +742,17 @@ def _submit_coordinator(request, coordinator, mapping):
     if IS_MULTICLUSTER_ONLY.get() and get_cluster_config(request.user)['has_computes']:
       mapping['auto-cluster'] = {
         u'additionalClusterResourceTags': [],
-        u'automaticTerminationCondition': u'EMPTY_JOB_QUEUE', #'u'NONE',
+        u'automaticTerminationCondition': u'EMPTY_JOB_QUEUE',  # 'u'NONE',
         u'cdhVersion': u'CDH514',
         u'clouderaManagerPassword': u'guest',
         u'clouderaManagerUsername': u'guest',
-        u'clusterName': u'analytics4', # Add time variable
+        u'clusterName': u'analytics4',  # Add time variable
         u'computeWorkersConfiguration': {
           u'bidUSDPerHr': 0,
           u'groupSize': 0,
           u'useSpot': False
         },
-        u'environmentName': u'crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:analytics/236ebdda-18bd-428a-9d2b-cd6973d42946',
+        u'environmentName': u'crn:altus:environments:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:environment:analytics/236ebdda-18bd-428a-9d2b-cd6973d42946',  # noqa: E501
         u'instanceBootstrapScript': u'',
         u'instanceType': u'm4.xlarge',
         u'jobSubmissionGroupName': u'',
@@ -777,7 +785,7 @@ def _submit_coordinator(request, coordinator, mapping):
   #           }
   #         }
         ],
-        u'namespaceName': u'crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410',
+        u'namespaceName': u'crn:altus:sdx:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:namespace:analytics/7ea35fe5-dbc9-4b17-92b1-97a1ab32e410',  # noqa: E501
         u'publicKey': DEFAULT_PUBLIC_KEY.get(),
         u'serviceType': u'SPARK',
         u'workersConfiguration': {},
@@ -794,7 +802,9 @@ def _submit_coordinator(request, coordinator, mapping):
     return job_id
   except RestException as ex:
     LOG.exception('Error submitting coordinator')
-    raise PopupException(_("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex), error_code=200)
+    raise PopupException(
+      _("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex), error_code=200
+    )
 
 
 @check_editor_access_permission
@@ -952,7 +962,7 @@ def submit_bundle(request, doc_id):
     return render('/scheduler/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': bundle.name,
-                 'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id}),
+                 'action': reverse('oozie:editor_submit_bundle', kwargs={'doc_id': bundle.id}),
                  'return_json': request.GET.get('format') == 'json',
                  'show_dryrun': False
                 }, force_template=True)
@@ -961,7 +971,12 @@ def submit_bundle(request, doc_id):
 def _submit_bundle(request, bundle, properties):
   try:
     deployment_mapping = {}
-    coords = dict([(c.uuid, c) for c in Document2.objects.filter(type='oozie-coordinator2', uuid__in=[b['coordinator'] for b in bundle.data['coordinators']])])
+    coords = dict(
+      [
+        (c.uuid, c)
+        for c in Document2.objects.filter(type='oozie-coordinator2', uuid__in=[b['coordinator'] for b in bundle.data['coordinators']])
+      ]
+    )
 
     for i, bundled in enumerate(bundle.data['coordinators']):
       coord = coords[bundled['coordinator']]

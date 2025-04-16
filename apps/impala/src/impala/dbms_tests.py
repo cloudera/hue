@@ -15,36 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import logging
-import sys
+from unittest.mock import Mock, patch
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_equal, assert_false, assert_raises
-
+import pytest
 from django.urls import reverse
 
 import desktop.conf as desktop_conf
 from desktop.lib.django_test_util import make_logged_in_client
-from useradmin.models import User
-
-
 from impala.dbms import get_query_server_config
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
-
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestDbms():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client()
-
 
   def test_get_connector_config(self):
     connector = {
@@ -59,4 +50,4 @@ class TestDbms():
       has_connectors.return_value = True
 
       config = get_query_server_config(connector)
-      assert_true('impersonation_enabled' in config, config)
+      assert 'impersonation_enabled' in config, config

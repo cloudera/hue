@@ -16,34 +16,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
+from unittest.mock import MagicMock, Mock, patch
 
+import pytest
 from celery import states
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
-from useradmin.models import User
-
 from notebook.connectors.sql_alchemy import SqlAlchemyApi
-from notebook.tasks import run_sync_query, download_to_file, close_statement, get_log
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
+from notebook.tasks import close_statement, download_to_file, get_log, run_sync_query
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
 
-
+@pytest.mark.django_db
 class TestRunAsyncQueryTask():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_run_query_only(self):
     with patch('notebook.tasks._get_request') as _get_request:
@@ -70,8 +63,7 @@ class TestRunAsyncQueryTask():
 
               meta = download_to_file(notebook, snippet)
 
-              assert_equal(meta['row_counter'], 2, meta)
-
+              assert meta['row_counter'] == 2, meta
 
   def test_close_statement(self):
     with patch('notebook.tasks._get_request') as _get_request:
@@ -93,8 +85,7 @@ class TestRunAsyncQueryTask():
 
             response = close_statement(notebook, snippet)
 
-            assert_equal(response, {'status': 0})
-
+            assert response == {'status': 0}
 
   def test_get_log(self):
     with patch('notebook.tasks._get_request') as _get_request:
@@ -114,16 +105,15 @@ class TestRunAsyncQueryTask():
 
         response = get_log(notebook, snippet, startFrom=None, size=None, postdict=None, user_id=None)
 
-        assert_equal(response, '')
+        assert response == ''
 
 
-
+@pytest.mark.django_db
 class TestRunSyncQueryTask():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_run_query(self):
     snippet = {'type': 'mysql', 'statement_raw': 'SHOW TABLES', 'variables': []}
@@ -146,4 +136,4 @@ class TestRunSyncQueryTask():
 
             task = run_sync_query(query, self.user)
 
-            assert_equal(task, {'history_uuid': '1', 'uuid': '1'})
+            assert task == {'history_uuid': '1', 'uuid': '1'}

@@ -1,0 +1,14 @@
+<script type="text/javascript"{% if request.csp_nonce %} nonce="{{ request.csp_nonce }}"{% endif %}>
+	window.onload = function() {
+		document.SSO_Login.submit();
+	};
+</script>
+<style type="text/css"{% if request.csp_nonce %} nonce="{{ request.csp_nonce }}"{% endif %}>
+   form#SSO_Login { display: none; } /* Hide the form */
+</style>
+<form method="post" action="{{ target_url }}" name="SSO_Login" id="SSO_Login">
+	{% for key, value in params.items %}
+	    <input type="hidden" name="{{ key }}" value="{{ value }}" />
+	{% endfor %}
+    <input type="submit" value="Log in" />
+</form>

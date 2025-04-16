@@ -18,9 +18,7 @@
 
 from builtins import object
 import logging
-
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_false, assert_not_equal, assert_true
+import pytest
 
 from indexer.conf import ENABLE_SQOOP
 from indexer.indexers.rdbms import _get_api
@@ -38,9 +36,9 @@ class TestRdbmsIndexer(object):
   @classmethod
   def setup_class(cls):
     if not ENABLE_SQOOP.get():
-      raise SkipTest
+      pytest.skip("Skipping Test")
     if not rdbms.get_query_server_config(server='mysql'):
-      raise SkipTest
+      pytest.skip("Skipping Test")
     cls.client = make_logged_in_client()
     cls.user = User.objects.get(username='test')
     cls.user = rewrite_user(cls.user)
@@ -57,8 +55,8 @@ class TestRdbmsIndexer(object):
   def test_get_sample_data(cls):
     data = cls.indexer.get_sample_data({}, database='hue', table='desktop_document2', column='id')
 
-    assert_equal(0, data['status'], data)
-    assert_not_equal('', data['rows'], data)
+    assert 0 == data['status'], data
+    assert '' != data['rows'], data
 
 class Bag(dict):
   pass

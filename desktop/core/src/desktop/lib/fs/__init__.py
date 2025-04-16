@@ -14,26 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
-from future import standard_library
-standard_library.install_aliases()
-from builtins import filter
 import posixpath
-import sys
+from urllib.parse import urlparse as lib_urlparse
 
 from desktop.lib.fs.proxyfs import ProxyFS  # Imported later from this module
-
-if sys.version_info[0] > 2:
-  from urllib.parse import urlparse as lib_urlparse
-else:
-  from urlparse import urlparse as lib_urlparse
 
 
 def splitpath(path):
   split = lib_urlparse(path)
   path_parsed_as_query = ''
-  
+
   # Make sure the splitpath can handle a path that contains "?" since
   # that is the case for the file browser paths.
   if '?' in path:

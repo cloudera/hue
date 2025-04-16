@@ -16,35 +16,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
+from unittest.mock import MagicMock, Mock, patch
 
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false, assert_raises
+import pytest
 
-from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.django_test_util import make_logged_in_client
-from useradmin.models import User
-
+from desktop.lib.exceptions_renderable import PopupException
 from impala.server import ImpalaDaemonApi, _get_impala_server_url
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestImpalaDaemonApi():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
   def test_get_impala_server_url_when_no_session(self):
-    assert_raises(PopupException, _get_impala_server_url, session=None)
-
+    with pytest.raises(PopupException):
+      _get_impala_server_url(session=None)
 
   def test_digest_auth(self):
 
@@ -71,7 +66,6 @@ class TestImpalaDaemonApi():
           server._client.set_digest_auth.assert_not_called()
           server._client.set_kerberos_auth.assert_not_called()
           server._client.set_basic_auth.assert_not_called()
-
 
   def test_basic_auth(self):
 
@@ -103,7 +97,6 @@ class TestImpalaDaemonApi():
             server._client.set_digest_auth.assert_not_called()
             server._client.set_kerberos_auth.assert_not_called()
 
-
   def test_kerberos_auth(self):
 
     with patch('impala.server.DAEMON_API_USERNAME.get') as DAEMON_API_USERNAME_get:
@@ -125,7 +118,6 @@ class TestImpalaDaemonApi():
       with patch('impala.server.DAEMON_API_PASSWORD.get') as DAEMON_API_PASSWORD_get:
         with patch('impala.server.HttpClient') as HttpClient:
           with patch('impala.server.is_webserver_spnego_enabled') as is_webserver_spnego_enabled:
-
 
             DAEMON_API_USERNAME_get.return_value = None
             DAEMON_API_PASSWORD_get.return_value = 'impala'

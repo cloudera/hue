@@ -22,21 +22,18 @@ class AceAutocompleteWrapper {
    * @param options.snippet
    * @param options.user
    * @param options.optEnabled
-   * @param {Number} options.timeout
    * @constructor
    */
   constructor(options) {
     const self = this;
     self.snippet = options.snippet;
-    self.timeout = options.timeout;
 
     self.topTables = {};
 
     const initializeAutocompleter = function () {
       self.autocompleter = new HdfsAutocompleter({
         user: options.user,
-        snippet: options.snippet,
-        timeout: options.timeout
+        snippet: options.snippet
       });
     };
     if (window.ENABLE_HUE_5) {

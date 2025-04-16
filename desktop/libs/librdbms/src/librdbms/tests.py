@@ -21,10 +21,10 @@ import librdbms.conf
 
 class TestDatabasePasswordConfig(desktop.tests.BaseTestPasswordConfig):
 
-  def setup(self):
+  def setup_method(self):
     self.finish = librdbms.conf.DATABASES.set_for_testing({'test': {}})
 
-  def teardown(self):
+  def teardown_method(self):
     self.finish()
 
   def get_config_password(self):

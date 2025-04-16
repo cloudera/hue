@@ -227,8 +227,8 @@ const ASSIST_TABLE_TEMPLATES = `
       <li class="assist-entry assist-no-entries"><!-- ko if: catalogEntry.isTableOrView() -->${I18n(
         'No columns found'
       )}<!--/ko--><!-- ko if: catalogEntry.isDatabase() -->${I18n(
-  'No tables found'
-)}<!--/ko--><!-- ko if: catalogEntry.isField() -->${I18n('No results found')}<!--/ko--></li>
+        'No tables found'
+      )}<!--/ko--><!-- ko if: catalogEntry.isField() -->${I18n('No results found')}<!--/ko--></li>
     </ul>
     <!-- /ko -->
     <!-- ko if: ! hasErrors() && hasEntries() && ! loading() && filteredEntries().length > 0 -->
@@ -292,7 +292,7 @@ const TEMPLATE =
       <!-- ko if: selectedSource().selectedNamespace() -->
       <!-- ko if: selectedSource().selectedNamespace().selectedDatabase() -->
       <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedNamespace().selectedDatabase() }">
-        <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="assist-sql--tables-breadcrumb-back--button"></i>
         <i class="fa assist-breadcrumb-text" data-bind="css: { 'fa-server': nonSqlType, 'fa-database': !nonSqlType }"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumbTitle }"></span>
       </a>
@@ -300,14 +300,14 @@ const TEMPLATE =
       <!-- ko ifnot: selectedSource().selectedNamespace().selectedDatabase() -->
       <!-- ko if: window.HAS_MULTI_CLUSTER-->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="assist-sql--databases-breadcrumb-back--button"></i>
         <i class="fa fa-snowflake-o assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumbTitle }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: window.HAS_MULTI_CLUSTER -->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="assist-sql--databases-breadcrumb-back--button"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
       </a>
@@ -316,7 +316,7 @@ const TEMPLATE =
       <!-- /ko -->
       <!-- ko ifnot: selectedSource().selectedNamespace() -->
       <a data-bind="click: back">
-        <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
+        <i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="assist-sql--namespaces-breadcrumb-back--button"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
       </a>

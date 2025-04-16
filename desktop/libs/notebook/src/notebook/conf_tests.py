@@ -15,31 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import json
 import unittest
-import sys
+from unittest.mock import Mock, patch
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_false
+import pytest
+from django.test import TestCase
 
 from desktop.auth.backend import rewrite_user
 from desktop.conf import ENABLE_CONNECTORS
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.django_test_util import make_logged_in_client
-from useradmin.models import User, update_app_permissions, get_default_user_group
-
-from notebook.conf import config_validator, get_ordered_interpreters, _excute_test_query
-
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
+from notebook.conf import _excute_test_query, config_validator, get_ordered_interpreters
+from useradmin.models import User, get_default_user_group, update_app_permissions
 
 
-class TestInterpreterConfig(unittest.TestCase):
+class TestInterpreterConfig(TestCase):
 
-  def setUp(self):
+  def setup_method(self, method):
     self.client = make_logged_in_client(
         username='test_check_config',
         groupname=get_default_user_group(),
@@ -50,16 +44,15 @@ class TestInterpreterConfig(unittest.TestCase):
     self.user = rewrite_user(self.user)
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     cls._class_resets = [
       ENABLE_CONNECTORS.set_for_testing(True),
     ]
 
   @classmethod
-  def tearDownClass(cls):
+  def teardown_class(cls):
     for reset in cls._class_resets:
       reset()
-
 
   def test_get_ordered_interpreters(self):
     with patch('desktop.lib.connectors.api._get_installed_connectors') as _get_installed_connectors:
@@ -76,17 +69,15 @@ class TestInterpreterConfig(unittest.TestCase):
 
       interpreters = get_ordered_interpreters(user=self.user)
 
-      assert_true(interpreters, interpreters)
-      assert_true(all(['dialect_properties' in interpreter for interpreter in interpreters]), interpreters)
-      assert_true(
-        any([interpreter.get('dialect_properties').get('sql_identifier_quote') for interpreter in interpreters]),
-        interpreters
-      )
+      assert interpreters, interpreters
+      assert all(['dialect_properties' in interpreter for interpreter in interpreters]), interpreters
+      assert any([interpreter.get('dialect_properties').get('sql_identifier_quote') for interpreter in interpreters]), interpreters
 
 
+@pytest.mark.django_db
 class TestCheckConfig():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(
         username='test_check_config',
         groupname=get_default_user_group(),
@@ -97,13 +88,13 @@ class TestCheckConfig():
     self.user = rewrite_user(self.user)
 
   @classmethod
-  def setUpClass(cls):
+  def setup_class(cls):
     cls._class_resets = [
       ENABLE_CONNECTORS.set_for_testing(True),
     ]
 
   @classmethod
-  def tearDownClass(cls):
+  def teardown_class(cls):
     for reset in cls._class_resets:
       reset()
 
@@ -125,23 +116,22 @@ class TestCheckConfig():
         _excute_test_query.return_value = Mock(content=json.dumps({'status': 0}))
 
         connectors = _get_installed_connectors(user=self.user)
-        assert_true(connectors, connectors)
+        assert connectors, connectors
 
         warnings = config_validator(user=self.user)
 
-        assert_false(warnings, warnings)
-
+        assert not warnings, warnings
 
         _excute_test_query.side_effect = Exception('')
 
         connectors = _get_installed_connectors(user=self.user)
-        assert_true(connectors, connectors)
+        assert connectors, connectors
 
         warnings = config_validator(user=self.user)
 
-        assert_true(warnings, warnings)
-        assert_equal('Hive - hive (hive-1)', warnings[0][0])
-        assert_true('Testing the connector connection failed' in warnings[0][1], warnings)
+        assert warnings, warnings
+        assert 'Hive - hive (hive-1)' == warnings[0][0]
+        assert 'Testing the connector connection failed' in warnings[0][1], warnings
 
   def test_excute_test_query(self):
     client = Mock()

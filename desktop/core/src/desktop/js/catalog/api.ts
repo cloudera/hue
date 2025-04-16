@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { AxiosResponseTransformer } from 'axios';
+
 import { Tags } from './GeneralDataCatalog';
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
 import {
@@ -506,13 +508,7 @@ export const fetchSample = ({
           queryResult.result.handle.has_result_set = resultStatus.has_result_set;
         }
         snippetJson = JSON.stringify(queryResult);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const transformResponse = (response: unknown) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          return JSON.bigdataParse(response);
-        };
+        const transformResponse: AxiosResponseTransformer = response => JSON.bigdataParse(response);
         const resultPromise = post<SampleResponse>(
           FETCH_RESULT_DATA_URL,
           {

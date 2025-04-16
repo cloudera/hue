@@ -17,30 +17,28 @@
 
 from __future__ import absolute_import
 
-from nose.tools import eq_
-
 from desktop.lib import fs
 
 
 def test_splitpath():
   s = fs.splitpath
 
-  eq_(s('s3a://'), ['s3a://'])
-  eq_(s('s3a://bucket'), ['s3a://', 'bucket'])
-  eq_(s('s3a://bucket/key'), ['s3a://', 'bucket', 'key'])
-  eq_(s('s3a://bucket/key/'), ['s3a://', 'bucket', 'key'])
-  eq_(s('s3a://bucket/bar/foo'), ['s3a://', 'bucket', 'bar', 'foo'])
-  eq_(s('s3a://bucket/bar/foo?I-have-a-questionmark-in-the-folder-name/me?to'), \
+  assert s('s3a://') == ['s3a://']
+  assert s('s3a://bucket') == ['s3a://', 'bucket']
+  assert s('s3a://bucket/key') == ['s3a://', 'bucket', 'key']
+  assert s('s3a://bucket/key/') == ['s3a://', 'bucket', 'key']
+  assert s('s3a://bucket/bar/foo') == ['s3a://', 'bucket', 'bar', 'foo']
+  assert (s('s3a://bucket/bar/foo?I-have-a-questionmark-in-the-folder-name/me?to') == \
     ['s3a://', 'bucket', 'bar', 'foo?I-have-a-questionmark-in-the-folder-name', 'me?to'])
-  eq_(s(u"s3a://bucket/all%20% ~@$&()*!+=;.?'Tжейкоб-åäö-你好"), \
+  assert (s(u"s3a://bucket/all%20% ~@$&()*!+=;.?'Tжейкоб-åäö-你好") == \
     ['s3a://', 'bucket', u"all%20% ~@$&()*!+=;.?'Tжейкоб-åäö-你好"])
   
 
-  eq_(s('/'), ['/'])
-  eq_(s('/dir'), ['/', 'dir'])
-  eq_(s('/dir/file'), ['/', 'dir', 'file'])
-  eq_(s('/dir/file/'), ['/', 'dir', 'file'])
-  eq_(s('/dir/file/foo?I-have-a-questionmark-in-the-folder-name/me?to'), \
+  assert s('/') == ['/']
+  assert s('/dir') == ['/', 'dir']
+  assert s('/dir/file') == ['/', 'dir', 'file']
+  assert s('/dir/file/') == ['/', 'dir', 'file']
+  assert (s('/dir/file/foo?I-have-a-questionmark-in-the-folder-name/me?to') == \
     ['/', 'dir', 'file', 'foo?I-have-a-questionmark-in-the-folder-name', 'me?to'])
-  eq_(s(u"/dir/all%20% ~@$&()*!+=;.?'Tжейкоб-åäö-你好"), \
+  assert (s(u"/dir/all%20% ~@$&()*!+=;.?'Tжейкоб-åäö-你好") == \
     ['/', 'dir', u"all%20% ~@$&()*!+=;.?'Tжейкоб-åäö-你好"])

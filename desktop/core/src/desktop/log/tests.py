@@ -19,8 +19,6 @@
 import logging
 import tempfile
 
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
-
 from desktop.log import get_audit_logger, AuditHandler
 from desktop.conf import AUDIT_EVENT_LOG_DIR, AUDIT_LOG_MAX_FILE_SIZE
 
@@ -37,12 +35,12 @@ def test_one_audit():
     audit_logger = get_audit_logger()
     audit_handler = audit_logger.handlers[0]
 
-    assert_equal(25 * 1024 ** 1, audit_handler.maxBytes)
-    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers)
-    assert_true(isinstance(audit_handler, AuditHandler), audit_logger.handlers)
+    assert 25 * 1024 ** 1 == audit_handler.maxBytes
+    assert len(audit_logger.handlers) == 1, audit_logger.handlers
+    assert isinstance(audit_handler, AuditHandler), audit_logger.handlers
 
     audit_logger = get_audit_logger()
-    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers) # Not adding handler twice
+    assert len(audit_logger.handlers) == 1, audit_logger.handlers # Not adding handler twice
 
     # Cleanup
     audit_logger.removeHandler(audit_handler)
@@ -59,12 +57,12 @@ def test_one_audit():
     audit_logger = get_audit_logger()
     audit_handler = audit_logger.handlers[0]
 
-    assert_equal(25 * 1024 ** 2, audit_handler.maxBytes)
-    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers)
-    assert_true(isinstance(audit_handler, AuditHandler), audit_logger.handlers)
+    assert 25 * 1024 ** 2 == audit_handler.maxBytes
+    assert len(audit_logger.handlers) == 1, audit_logger.handlers
+    assert isinstance(audit_handler, AuditHandler), audit_logger.handlers
 
     audit_logger = get_audit_logger()
-    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers) # Not adding handler twice
+    assert len(audit_logger.handlers) == 1, audit_logger.handlers # Not adding handler twice
 
     # Cleanup
     audit_logger.removeHandler(audit_handler)
@@ -81,12 +79,12 @@ def test_one_audit():
     audit_logger = get_audit_logger()
     audit_handler = audit_logger.handlers[0]
 
-    assert_equal(25 * 1024 ** 3, audit_handler.maxBytes)
-    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers)
-    assert_true(isinstance(audit_handler, AuditHandler), audit_logger.handlers)
+    assert 25 * 1024 ** 3 == audit_handler.maxBytes
+    assert len(audit_logger.handlers) == 1, audit_logger.handlers
+    assert isinstance(audit_handler, AuditHandler), audit_logger.handlers
 
     audit_logger = get_audit_logger()
-    assert_equal(len(audit_logger.handlers), 1, audit_logger.handlers) # Not adding handler twice
+    assert len(audit_logger.handlers) == 1, audit_logger.handlers # Not adding handler twice
 
     # Cleanup
     audit_logger.removeHandler(audit_handler)

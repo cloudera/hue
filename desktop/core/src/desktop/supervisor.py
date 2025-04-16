@@ -31,45 +31,27 @@ This entry point should point to a SuperviseeSpec instance in your module.
 """
 
 from __future__ import print_function
-from builtins import range
-from builtins import object
-import daemon
+
+import os
 import grp
+import pwd
+import sys
+import time
+import signal
 import logging
 import optparse
-import os
-import pkg_resources
-import pwd
-import signal
-import subprocess
-import sys
 import threading
-import time
+import subprocess
+from builtins import object, range
 
-import desktop.lib.daemon_utils
-import desktop.lib.paths
+import daemon
+import pkg_resources
+from daemon.daemon import DaemonContext
+from daemon.pidfile import TimeoutPIDLockFile
+
 import desktop.log
-
-
-if sys.version_info[0] > 2:
-  from daemon.pidfile import TimeoutPIDLockFile
-  from daemon.daemon import DaemonContext
-  open_file = open
-else:
-  from daemon.pidlockfile import PIDLockFile
-  open_file = file
-
-  class TimeoutPIDLockFile(PIDLockFile):
-    """A PIDLockFile subclass that passes through a timeout on acquisition."""
-
-    def __init__(self, lockfile, timeout, **kwargs):
-      PIDLockFile.__init__(self, lockfile, **kwargs)
-      self.timeout = timeout
-
-    def __enter__(self):
-      super(TimeoutPIDLockFile, self).acquire(timeout=self.timeout)
-      return self
-
+import desktop.lib.paths
+import desktop.lib.daemon_utils
 
 PROC_NAME = 'supervisor'
 LOG = logging.getLogger()
@@ -105,6 +87,7 @@ SHOULD_STOP = False
 # killing them forceably (seconds)
 WAIT_FOR_DEATH = 5
 
+
 class SuperviseeSpec(object):
   """
   A specification of something that should be supervised.
@@ -119,6 +102,7 @@ class SuperviseeSpec(object):
     """
     self.drop_root = drop_root
 
+
 class DjangoCommandSupervisee(SuperviseeSpec):
   """A supervisee which is simply a desktop django management command."""
   def __init__(self, django_command, **kwargs):
@@ -128,6 +112,7 @@ class DjangoCommandSupervisee(SuperviseeSpec):
   @property
   def cmdv(self):
     return [HUE_BIN, self.django_command]
+
 
 class Supervisor(threading.Thread):
   """A thread responsible for keeping the supervised subprocess running"""
@@ -149,7 +134,7 @@ class Supervisor(threading.Thread):
       while True:
         self.state = Supervisor.RUNNING
         LOG.info("Starting process %s" % proc_str)
-        pipe = subprocess.Popen(self.cmdv, close_fds=True, stdin=open_file("/dev/null"), **self.popen_kwargs)
+        pipe = subprocess.Popen(self.cmdv, close_fds=True, stdin=open("/dev/null"), **self.popen_kwargs)
         LOG.info("Started proceses (pid %s) %s" % (pipe.pid, proc_str))
         CHILD_PIDS.append(pipe.pid)
         exitcode = pipe.wait()
@@ -217,8 +202,10 @@ def shutdown(sups):
 
   sys.exit(1)
 
+
 def sig_handler(signum, frame):
   raise SystemExit("Signal %d received. Exiting" % signum)
+
 
 def parse_args():
   parser = optparse.OptionParser()
@@ -235,8 +222,10 @@ def parse_args():
   (options, args) = parser.parse_args()
   return options
 
+
 def get_pid_cmdline(pid):
   return subprocess.Popen(["ps", "-p", str(pid), "-o", "cmd", "h"], stdout=subprocess.PIPE, close_fds=True).communicate()[0]
+
 
 def get_supervisees():
   """Pull the supervisor specifications out of the entry point."""
@@ -333,10 +322,7 @@ def main():
     pidfile_context.break_lock()
 
   if options.daemonize:
-    if sys.version_info[0] > 2:
-      outfile = open_file(os.path.join(log_dir, 'supervisor.out'), 'ba+', 0)
-    else:
-      outfile = open_file(os.path.join(log_dir, 'supervisor.out'), 'a+', 0)
+    outfile = open(os.path.join(log_dir, 'supervisor.out'), 'ba+', 0)
     context = daemon.DaemonContext(
         working_directory=root,
         pidfile=pidfile_context,
@@ -368,10 +354,7 @@ def main():
         preexec_fn = None
 
       if options.daemonize:
-        if sys.version_info[0] > 2:
-          log_stdout = open_file(os.path.join(log_dir, name + '.out'), 'ba+', 0)
-        else:
-          log_stdout = open_file(os.path.join(log_dir, name + '.out'), 'a+', 0)
+        log_stdout = open(os.path.join(log_dir, name + '.out'), 'ba+', 0)
         log_stderr = log_stdout
       else:
         # Passing None to subprocess.Popen later makes the subprocess inherit the

@@ -13,6 +13,7 @@
         "scss/at-if-closing-brace-newline-after": null,
         "scss/at-if-closing-brace-space-after": null,
         "scss/at-import-partial-extension": null,
+        "scss/load-partial-extension": null,
         "scss/at-mixin-argumentless-call-parentheses": null,
         "scss/at-mixin-pattern": null,
         "scss/comment-no-empty": null,
@@ -37,7 +38,6 @@
         "declaration-block-no-redundant-longhand-properties": null,
         "function-url-quotes": null,
         "media-feature-name-no-vendor-prefix": null,
-        "number-leading-zero": null,
         "selector-attribute-quotes": null,
         "selector-id-pattern": null
       }
@@ -50,14 +50,11 @@
     "color-function-notation": null,
     "font-family-name-quotes": null,
     "keyframes-name-pattern": null,
-    "max-empty-lines": null,
-    "max-line-length": null,
     "no-descending-specificity": null,
     "number-max-precision": null,
     "property-no-vendor-prefix": null,
     "selector-class-pattern": null,
     "shorthand-property-no-redundant-values": null,
-    "string-quotes": null,
     "value-keyword-case": null,
     "value-no-vendor-prefix": null
   }

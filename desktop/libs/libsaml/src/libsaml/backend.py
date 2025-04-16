@@ -27,14 +27,12 @@ from django.contrib.auth import logout as auth_logout
 from django.http import HttpResponse
 from djangosaml2.backends import Saml2Backend as _Saml2Backend
 from djangosaml2.views import logout as saml_logout
-from libsaml import conf
-from libsaml import metrics
-
-from useradmin.models import get_profile, get_default_user_group, UserProfile, User
 
 from desktop.auth.backend import force_username_case, rewrite_user
 from desktop.conf import AUTH
-
+from desktop.lib.django_util import nonce_attribute
+from libsaml import conf, metrics
+from useradmin.models import User, UserProfile, get_default_user_group, get_profile
 
 LOG = logging.getLogger()
 
@@ -48,18 +46,15 @@ class SAML2Backend(_Saml2Backend):
   def manages_passwords_externally(cls):
     return True
 
-
   @metrics.saml2_authentication_time
   def authenticate(self, *args, **kwargs):
     return super(SAML2Backend, self).authenticate(*args, **kwargs)
-
 
   def clean_user_main_attribute(self, main_attribute):
     """
     Overrides the clean_user_main_attribute method to force case if needed
     """
     return force_username_case(main_attribute)
-
 
   def is_authorized(self, attributes, attribute_mapping):
     """Hook to allow custom authorization policies based on user belonging to a list of SAML groups."""
@@ -73,7 +68,6 @@ class SAML2Backend(_Saml2Backend):
     user = super(SAML2Backend, self).get_user(user_id)
     user = rewrite_user(user)
     return user
-
 
   def update_user(self, user, attributes, attribute_mapping, force_save=False):
     # Do this check up here, because the auth call creates a django user upon first login per user
@@ -115,7 +109,6 @@ class SAML2Backend(_Saml2Backend):
 
     return None
 
-
   def logout(self, request, next_page=None):
     if conf.LOGOUT_ENABLED.get():
       response = saml_logout(request)
@@ -124,13 +117,15 @@ class SAML2Backend(_Saml2Backend):
     elif conf.CDP_LOGOUT_URL.get():
       auth_logout(request)
       redirect_url = conf.get_logout_redirect_url()
-      html = '<html><body onload="document.forms[0].submit()">' \
-             '<form action="%s" method="POST"><input name="logoutRedirect" type="hidden" value="%s"/></form>' \
-             '</body></html>' % (conf.CDP_LOGOUT_URL.get(), redirect_url)
+
+      html = '<html><body>' \
+            '<form action="%s" method="POST">' \
+            '<input name="logoutRedirect" type="hidden" value="%s"></form>' \
+            '<script%s>document.addEventListener("DOMContentLoaded", function() { document.forms[0].submit(); });</script>' \
+            '</body></html>' % (conf.CDP_LOGOUT_URL.get(), redirect_url, nonce_attribute(request))
       return HttpResponse(html)
     else:
       return None
-
 
   def _get_user_by_username(self, username):
     try:

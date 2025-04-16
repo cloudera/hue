@@ -16,31 +16,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
 import sys
+import json
+import logging
+from unittest.mock import patch
 
+import pytest
 from django.urls import reverse
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
-
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestInstallExamples():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=True, is_admin=True)
     self.user = User.objects.get(username="test")
-
 
   def test_install_via_insert_mysql(self):
 
@@ -50,8 +45,8 @@ class TestInstallExamples():
         resp = self.client.post(reverse('beeswax:install_examples'), {'db_name': 'default'})
         data = json.loads(resp.content)
 
-        assert_equal(0, data['status'], data)
-        assert_equal('', data['message'], data)
+        assert 0 == data['status'], data
+        assert '' == data['message'], data
 
         SampleTable.assert_called()
         SampleQuery.assert_called()

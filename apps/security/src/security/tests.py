@@ -18,7 +18,6 @@
 
 from builtins import object
 from django.urls import reverse
-from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -34,19 +33,17 @@ class TestSecurity(object):
     grant_access("test_permissions", "test_permissions", "security")
     user = User.objects.get(username='test_permissions')
 
-    def check(client, assertz):
-      response = client.get(reverse("security:hive"))
-      assertz("Impersonate the user" in response.content, response.content)
-
     # Forbidden
-    check(client, assert_false)
+    response = client.get(reverse("security:hive"))
+    assert not "Impersonate the user" in response.content, response.content
 
     # Allowed
     group, created = Group.objects.get_or_create(name='test_permissions')
     perm, created = HuePermission.objects.get_or_create(app='security', action='impersonate')
     GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
 
-    check(client, assert_true)
+    response = client.get(reverse("security:hive"))
+    assert "Impersonate the user" in response.content, response.content
 
   def test_permissions(self):
     privilege = {

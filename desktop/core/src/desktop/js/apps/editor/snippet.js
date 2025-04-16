@@ -58,6 +58,7 @@ import {
   ASSIST_GET_SOURCE_EVENT,
   ASSIST_SET_SOURCE_EVENT
 } from 'ko/components/assist/events';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import { EXECUTABLE_UPDATED_TOPIC } from './execution/events';
 
 // TODO: Remove together with ENABLE_HUE_5. Temporary here for debug
@@ -581,8 +582,7 @@ export default class Snippet {
     this.autocompleter = new AceAutocompleteWrapper({
       snippet: this,
       user: this.parentVm.user,
-      optEnabled: false,
-      timeout: this.parentVm.autocompleteTimeout
+      optEnabled: false
     });
 
     this.activeExecutable = ko.observable();
@@ -871,7 +871,7 @@ export default class Snippet {
           // eslint-disable-next-line no-restricted-syntax
           console.log(data.statement_similarity);
         } else {
-          huePubSub.publish('hue.global.error', { message: data.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
         }
       })
       .catch(() => {});
@@ -911,7 +911,7 @@ export default class Snippet {
     } else if (data.status === 1 || data.status === -1) {
       this.status(STATUS.failed);
     } else {
-      huePubSub.publish('hue.global.error', { message: data.message });
+      huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
       this.status(STATUS.failed);
     }
   }
@@ -1031,12 +1031,12 @@ export default class Snippet {
           this.showSqlAnalyzer(true);
           this.hasSuggestion(true);
         } else {
-          huePubSub.publish('hue.global.error', { message: data.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
         }
       })
       .catch(xhr => {
         if (xhr.status !== 502) {
-          huePubSub.publish('hue.global.error', { message: xhr.responseText });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
         }
       })
       .finally(() => {
@@ -1138,14 +1138,14 @@ export default class Snippet {
       sourcePlatform: this.dialect()
     }).then(data => {
       if (data.status === 0) {
-        $(document).trigger(
-          'info',
-          data.upload_history[this.dialect()].count +
+        huePubSub.publish(GLOBAL_INFO_TOPIC, {
+          message:
+            data.upload_history[this.dialect()].count +
             ' queries uploaded successfully. Processing them...'
-        );
+        });
         this.watchUploadStatus(data.upload_history[this.dialect()].status.workloadId);
       } else {
-        huePubSub.publish('hue.global.error', { message: data.message });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
       }
     });
   }
@@ -1153,7 +1153,7 @@ export default class Snippet {
   uploadTableStats(options) {
     hueAnalytics.log('notebook', 'load_table_stats');
     if (options.showProgress) {
-      $(document).trigger('info', 'Preparing table data...');
+      huePubSub.publish(GLOBAL_INFO_TOPIC, { message: 'Preparing table data...' });
     }
 
     $.post(
@@ -1170,19 +1170,19 @@ export default class Snippet {
       data => {
         if (data.status === 0) {
           if (options.showProgress) {
-            $(document).trigger(
-              'info',
-              $.map(options.activeTables, table => {
-                return table.tableName;
-              }) + ' stats sent to analyse'
-            );
+            huePubSub.publish(GLOBAL_INFO_TOPIC, {
+              message:
+                $.map(options.activeTables, table => {
+                  return table.tableName;
+                }) + ' stats sent to analyse'
+            });
           }
           if (data.upload_table_ddl && options.showProgress) {
             // With showProgress only currently as can be very slow
             this.watchUploadStatus(data.upload_table_ddl.status.workloadId, options.showProgress);
           }
         } else if (options.showProgress) {
-          huePubSub.publish('hue.global.error', { message: data.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
         }
       }
     ).always(() => {
@@ -1198,26 +1198,28 @@ export default class Snippet {
     }).then(data => {
       if (data.status === 0) {
         if (showProgress) {
-          $(document).trigger('info', 'Query processing: ' + data.upload_status.status.state);
+          huePubSub.publish(GLOBAL_INFO_TOPIC, {
+            message: 'Query processing: ' + data.upload_status.status.state
+          });
         }
         if (['WAITING', 'IN_PROGRESS'].indexOf(data.upload_status.status.state) !== -1) {
           window.setTimeout(() => {
             this.watchUploadStatus(workloadId);
           }, 2000);
         } else if (showProgress) {
-          $(document).trigger(
-            'warn',
-            data.upload_status.status.statusMsg +
+          huePubSub.publish('hue,global.warning', {
+            message:
+              data.upload_status.status.statusMsg +
               (data.upload_status.status.failedQueries > 0
                 ? '. ' +
                   data.upload_status.status.failQueryDetails.map(query => {
                     return query.error;
                   })
                 : '')
-          );
+          });
         }
       } else if (showProgress) {
-        huePubSub.publish('hue.global.error', { message: data.message });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
       }
     });
   }

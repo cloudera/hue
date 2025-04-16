@@ -128,6 +128,26 @@ import { Pagination } from 'antd';
 import PrimaryButton from 'cuix/dist/components/Button/PrimaryButton';
 ```
 
+## Adding data-testid attribute
+
+data-testid attributes are custom attributes that can be added to HTML elements to identify them for testing purposes. They are commonly used in testing frameworks and tools to locate and interact with elements on web pages. 
+
+Hue follows a pattern of 
+```
+area--action--role
+```
+while adding data-testids
+
+Example:
+editor-coordinator--save-as--button , editor-sql-assist--refresh--button
+
+In this manner, these data-testids can be added along with the other HTML attributes. 
+
+Example:
+```
+<i class="fa fa-chevron-left assist-breadcrumb-back" data-testid="assist-sql--databases-breadcrumb-back--button"></i>
+```
+
 ## Styling
 
 Hue uses `Sass` while both cuix and Ant Design use `Less` for writing CSS. The core cuix variables are however stil available in sass.

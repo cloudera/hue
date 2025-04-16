@@ -21,7 +21,12 @@ module.exports = function (api) {
   api.cache(true);
   api.assertVersion('^7.4.5');
 
-  const presets = ['babel-preset-typescript-vue3', '@babel/typescript', '@babel/preset-env', '@babel/preset-react'];
+  const presets = [
+    'babel-preset-typescript-vue3',
+    '@babel/typescript',
+    '@babel/preset-env',
+    '@babel/preset-react'
+  ];
   const plugins = [
     [
       'module-resolver',
@@ -29,21 +34,7 @@ module.exports = function (api) {
         root: ['./desktop/core/src/desktop/js']
       }
     ],
-    '@babel/plugin-syntax-dynamic-import',
-    [
-      '@babel/plugin-proposal-decorators',
-      {
-        legacy: true
-      }
-    ],
-    [
-      '@babel/proposal-class-properties',
-      {
-        loose: true
-      }
-    ],
-    ['@babel/plugin-proposal-private-methods', { loose: true }],
-    '@babel/proposal-object-rest-spread'
+    ['@babel/plugin-proposal-decorators', { version: '2023-11' }]
   ];
 
   const overrides = [
@@ -65,8 +56,7 @@ module.exports = function (api) {
           {
             root: ['./desktop/core/src/desktop/js']
           }
-        ],
-        '@babel/plugin-syntax-dynamic-import'
+        ]
       ]
     }
   };

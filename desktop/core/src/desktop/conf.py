@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,34 +16,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-import glob
-import logging
 import os
-import socket
-import stat
 import sys
-
+import glob
+import stat
+import socket
+import logging
+import datetime
 from collections import OrderedDict
 
 from django.db import connection
-
-from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
+from django.utils.translation import gettext_lazy as _
 
 from desktop import appmanager
-from desktop.redaction.engine import parse_redaction_policy_from_file
-from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection, coerce_bool, coerce_csv, coerce_json_dict, \
-    validate_path, list_of_compiled_res, coerce_str_lowercase, coerce_password_from_script, coerce_string
+from desktop.lib.conf import (
+  Config,
+  ConfigSection,
+  UnspecifiedConfigSection,
+  coerce_bool,
+  coerce_csv,
+  coerce_json_dict,
+  coerce_password_from_script,
+  coerce_str_lowercase,
+  coerce_string,
+  list_of_compiled_res,
+  validate_path,
+)
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root, get_run_root
-
-if sys.version_info[0] > 2:
-  from builtins import str as new_str
-  from django.utils.translation import gettext_lazy as _
-else:
-  new_str = unicode
-  from django.utils.translation import ugettext_lazy as _
-
+from desktop.redaction.engine import parse_redaction_policy_from_file
+from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
 
 LOG = logging.getLogger()
 
@@ -51,6 +53,7 @@ LOG = logging.getLogger()
 def is_oozie_enabled():
   """Oozie needs to be available as it is the backend."""
   return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0
+
 
 def coerce_database(database):
   if database == 'mysql':
@@ -84,6 +87,7 @@ def coerce_file(path):
 def coerce_timedelta(value):
   return datetime.timedelta(seconds=int(value))
 
+
 def get_dn(fqdn=None):
   """This function returns fqdn(if possible)"""
   val = []
@@ -102,10 +106,11 @@ def get_dn(fqdn=None):
     else:
       LOG.warning("allowed_hosts value to '*'. It is a security risk")
       val.append('*')
-  except:
+  except Exception as e:
     LOG.warning("allowed_hosts value to '*'. It is a security risk")
     val.append('*')
   return val
+
 
 def coerce_positive_integer(integer):
   integer = int(integer)
@@ -115,9 +120,11 @@ def coerce_positive_integer(integer):
 
   return integer
 
+
 def is_lb_enabled():
   """Check for Hue Load Balancer is available"""
   return bool(HUE_LOAD_BALANCER.get())
+
 
 def coerce_zero_or_positive_integer(integer):
   integer = int(integer)
@@ -127,33 +134,41 @@ def coerce_zero_or_positive_integer(integer):
 
   return integer
 
+
 def is_https_enabled():
   """Hue is configured for HTTPS."""
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
+
 
 def get_slack_client_id():
   """Returns Slack Client ID if set as environment variable else None"""
   return os.environ.get('SLACK_CLIENT_ID')
 
+
 def get_slack_client_secret():
   """Returns Slack Client Secret if set as environment variable else None"""
   return os.environ.get('SLACK_CLIENT_SECRET')
+
 
 def get_slack_verification_token():
   """Returns Slack Verification Token if set as environment variable else None"""
   return os.environ.get('SLACK_VERIFICATION_TOKEN')
 
+
 def get_slack_bot_user_token():
   """Returns Slack Bot User Token if set as environment variable else None"""
   return os.environ.get('SLACK_BOT_USER_TOKEN')
+
 
 def is_python2():
   """Hue is running on Python 2."""
   return sys.version_info[0] == 2
 
+
 def is_custom_jwt_auth_enabled():
   """Returns True if key server url is set else returns False"""
   return bool(AUTH.JWT.KEY_SERVER_URL.get())
+
 
 USE_CHERRYPY_SERVER = Config(
   key="use_cherrypy_server",
@@ -165,13 +180,26 @@ GUNICORN_WORKER_CLASS = Config(
   key="gunicorn_work_class",
   help=_("Gunicorn work class: gevent or evenlet, gthread or sync."),
   type=str,
-  default="eventlet")
+  default="gthread")
 
 GUNICORN_NUMBER_OF_WORKERS = Config(
   key="gunicorn_number_of_workers",
   help=_("The number of Gunicorn worker processes. If not specified, it uses: (number of CPU * 2) + 1."),
   type=int,
   default=1)
+
+GUNICORN_WORKER_TIMEOUT = Config(
+  key="gunicorn_worker_timeout",
+  help=_("Workers silent for more than this many seconds are killed and restarted."),
+  type=int,
+  default=900)
+
+GUNICORN_WORKER_GRACEFUL_TIMEOUT = Config(
+  key="gunicorn_worker_graceful_timeout",
+  help=_("After receiving a restart signal, workers have this much time to finish serving requests. "
+         "Workers still alive after the timeout (starting from the receipt of the restart signal) are force killed."),
+  type=int,
+  default=900)
 
 HTTP_HOST = Config(
   key="http_host",
@@ -280,8 +308,10 @@ SSL_CIPHER_LIST = Config(
     '!KRB5-DES-CBC3-SHA',
   ]))
 
+
 def has_ssl_no_renegotiation():
   return sys.version_info[:2] >= (3, 7)
+
 
 SSL_NO_RENEGOTIATION = Config(
   key="ssl_no_renegotiation",
@@ -349,13 +379,20 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
   help=_('X-Content-Type-Options: nosniff. This is a HTTP response header feature that helps prevent attacks '
     'based on MIME-type confusion.'),
   type=str,
-  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;"+
-          "img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
-          "style-src 'self' 'unsafe-inline' fonts.googleapis.com;"+
-          "connect-src 'self' *.google-analytics.com;"+
-          "frame-src *;"+
-          "child-src 'self' data: *.vimeo.com;"+
+  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;" +
+          "img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;" +
+          "style-src 'self' 'unsafe-inline' fonts.googleapis.com;" +
+          "connect-src 'self' *.google-analytics.com;" +
+          "frame-src *;" +
+          "child-src 'self' data: *.vimeo.com;" +
           "object-src 'none'")
+
+CSP_NONCE = Config(
+  key="csp_nonce",
+  help=_('Generates a unique nonce for each request to strengthen CSP by disallowing '
+        '‘unsafe-inline’ scripts and styles.'),
+  type=coerce_bool,
+  default=False)
 
 SECURE_SSL_REDIRECT = Config(
   key="secure_ssl_redirect",
@@ -397,14 +434,17 @@ LDAP_USERNAME = Config(
   private=True,
   default="hue")
 
+
 def get_auth_username():
   """Backward compatibility"""
   return LDAP_USERNAME.get()
+
 
 AUTH_USERNAME = Config(
   key="auth_username",
   help=_("Auth username of the hue user used for authentications. For example for LDAP Authentication with HiveServer2/Impala."),
   dynamic_default=get_auth_username)
+
 
 def get_auth_password():
   """Get from script or backward compatibility"""
@@ -421,11 +461,12 @@ def get_auth_password():
   if password is not None:
     return password
 
-  password = LDAP_PASSWORD.get() # 2 levels for backward compatibility
+  password = LDAP_PASSWORD.get()  # 2 levels for backward compatibility
   if password:
     return password
 
   return LDAP_PASSWORD_SCRIPT.get()
+
 
 AUTH_PASSWORD = Config(
   key="auth_password",
@@ -534,9 +575,9 @@ REDIRECT_WHITELIST = Config(
   key="redirect_whitelist",
   help=_("Comma-separated list of regular expressions, which match the redirect URL."
          "For example, to restrict to your local domain and FQDN, the following value can be used:"
-         "  ^\/.*$,^http:\/\/www.mydomain.com\/.*$"),
+         r"  ^\/.*$,^http:\/\/www.mydomain.com\/.*$"),
   type=list_of_compiled_res(skip_empty=True),
-  default='^(\/[a-zA-Z0-9]+.*|\/)$')
+  default=r'^(\/[a-zA-Z0-9]+.*|\/)$')
 
 USE_X_FORWARDED_HOST = Config(
   key="use_x_forwarded_host",
@@ -575,7 +616,7 @@ CLUSTER_ID = Config(
   private=False,
   default='default')
 
-DEMO_ENABLED = Config( # Internal and Temporary
+DEMO_ENABLED = Config(  # Internal and Temporary
   key="demo_enabled",
   help=_("To set to true in combination when using Hue demo backend."),
   type=coerce_bool,
@@ -643,18 +684,25 @@ def default_secure_cookie():
   """Enable secure cookies if HTTPS is enabled."""
   return is_https_enabled()
 
+
 def default_ssl_cacerts():
   """Path to default Certificate Authority certificates"""
   return SSL_CACERTS.get()
+
 
 def default_ssl_validate():
   """Choose whether Hue should validate certificates received from the server."""
   return SSL_VALIDATE.get()
 
+
 #
 # Email (SMTP) settings
 #
+
+
 _default_from_email = None
+
+
 def default_from_email():
   """Email for hue@<host-fqdn>"""
   global _default_from_email
@@ -675,6 +723,7 @@ def default_database_options():
     return {'timeout': 30}
   else:
     return {}
+
 
 def get_deprecated_login_lock_out_by_combination_browser_user_agent():
   """Return value of deprecated LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP config"""
@@ -753,10 +802,12 @@ METRICS = ConfigSection(
   )
 )
 
+
 def is_gunicorn_report_enabled():
   return 'rungunicornserver' in sys.argv \
     and METRICS.LOCATION.get() is not None \
     and METRICS.COLLECTION_INTERVAL.get() is not None
+
 
 SLACK = ConfigSection(
   key='slack',
@@ -905,7 +956,7 @@ SESSION = ConfigSection(
       key='ttl',
       help=_("The cookie containing the users' session ID will expire after this amount of time in seconds."),
       type=int,
-      default=60*60*24*14,
+      default=60 * 60 * 24 * 14,
     ),
     SECURE=Config(
       key='secure',
@@ -929,7 +980,7 @@ SESSION = ConfigSection(
       key='csrf_cookie_age',
       help=_("CRSF cookie age defaults to 1 year. If the value is set to 0, it means per session. Time in seconds"),
       type=int,
-      default=60*60*24*7*52,
+      default=60 * 60 * 24 * 7 * 52,
     ),
     CONCURRENT_USER_SESSION_LIMIT=Config(
       key="concurrent_user_session_limit",
@@ -990,7 +1041,7 @@ KERBEROS = ConfigSection(
       key='reinit_frequency',
       help=_("Frequency in seconds with which Hue will renew its keytab."),
       type=int,
-      default=60*60), #1h
+      default=60 * 60),  # 1h
     CCACHE_PATH=Config(
       key='ccache_path',
       help=_("Path to keep Kerberos credentials cached."),
@@ -1008,7 +1059,7 @@ KERBEROS = ConfigSection(
       key='kinit_path',
       help=_("Path to Kerberos 'kinit' command."),
       type=str,
-      default="kinit", # use PATH!
+      default="kinit",  # use PATH!
     ),
     MUTUAL_AUTHENTICATION=Config(
       key='mutual_authentication',
@@ -1022,7 +1073,7 @@ KERBEROS = ConfigSection(
 SASL_MAX_BUFFER = Config(
   key="sasl_max_buffer",
   help=_("This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication."),
-  default=2*1024*1024,  # 2 MB
+  default=2 * 1024 * 1024,  # 2 MB
   type=int
 )
 
@@ -1611,6 +1662,13 @@ OIDC = ConfigSection(
       default=False
     ),
 
+    OIDC_AUTH_REQUEST_EXTRA_PARAMS=Config(
+      key="oidc_auth_request_extra_params",
+      help=_("OIDC authentication request extra params."),
+      type=coerce_json_dict,
+      default='{}'
+    ),
+
     LOGIN_REDIRECT_URL=Config(
       key="login_redirect_url",
       help=_("As relay party Hue URL path to redirect to after login."),
@@ -1668,6 +1726,7 @@ LOCAL_FILESYSTEMS = UnspecifiedConfigSection(
 def default_feedback_url():
   """A version-specific URL."""
   return "http://groups.google.com/a/cloudera.org/group/hue-user"
+
 
 FEEDBACK_URL = Config(
   key="feedback_url",
@@ -1752,9 +1811,11 @@ HTTP_500_DEBUG_MODE = Config(
   default=True
 )
 
+
 def get_instrumentation_default():
   """If django_debug_mode is True, this is automatically enabled"""
   return DJANGO_DEBUG_MODE.get()
+
 
 INSTRUMENTATION = Config(
   key='instrumentation',
@@ -1790,6 +1851,26 @@ DJANGO_EMAIL_BACKEND = Config(
   default="django.core.mail.backends.smtp.EmailBackend"
 )
 
+CORS_ENABLED = Config(
+  key="cors_enabled",
+  help=_("Enable or disable Cross-Origin Resource Sharing (CORS). Defaults to True."),
+  type=coerce_bool,
+  default=True
+)
+
+CORS_ALLOW_CREDENTIALS = Config(
+  key="cors_allow_credentials",
+  help=_("This value determines whether the server allows cookies in the cross-site HTTP requests. Defaults to True."),
+  type=coerce_bool,
+  default=True
+)
+
+CORS_ALLOWED_ORIGINS = Config(
+  key="cors_allowed_origins",
+  help=_("A comma separated list of origins allowed for CORS."),
+  type=coerce_csv
+)
+
 ENABLE_SQL_SYNTAX_CHECK = Config(
   key='enable_sql_syntax_check',
   default=True,
@@ -1797,11 +1878,11 @@ ENABLE_SQL_SYNTAX_CHECK = Config(
   help=_('Choose whether to enable SQL syntax check or not.')
 )
 
-EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
-  key='editor_autocomplete_timeout',
-  type=int,
-  default=30000,
-  help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled.')
+DISABLE_SOURCE_AUTOCOMPLETE = Config(
+  key='disable_source_autocomplete',
+  type=coerce_bool,
+  default=False,
+  help=_('Choose whether the editor autocomplete should gather suggestions from external sources or not.')
 )
 
 ENABLE_HUE_5 = Config(
@@ -1818,8 +1899,17 @@ ENABLE_NEW_STORAGE_BROWSER = Config(
   default=False
 )
 
+ENABLE_NEW_IMPORTER = Config(
+  key="enable_new_importer",
+  help=_("Feature flag to enable new Hue Importer."),
+  type=coerce_bool,
+  default=False
+)
+
+
 def is_chunked_fileuploader_enabled():
-  return ENABLE_CHUNKED_FILE_UPLOADER.get();
+  return ENABLE_CHUNKED_FILE_UPLOADER.get()
+
 
 ENABLE_CHUNKED_FILE_UPLOADER = Config(
   key="enable_chunked_file_uploader",
@@ -1828,7 +1918,7 @@ ENABLE_CHUNKED_FILE_UPLOADER = Config(
   default=False
 )
 
-USE_NEW_EDITOR = Config( # To remove in Hue 4
+USE_NEW_EDITOR = Config(  # To remove in Hue 4
   key='',
   default=True,
   type=coerce_bool,
@@ -1849,6 +1939,13 @@ ENABLE_SHARING = Config(
     'Global setting to enable or disable document sharing. Note that this does not affect currently shared documents.'),
   type=coerce_bool,
   default=True)
+
+ENABLE_WORKFLOW_CREATION_ACTION = Config(
+  key="enable_workflow_creation_action",
+  help=_('Global setting to enable or disable new workflow creation in Hue documents.'),
+  type=coerce_bool,
+  default=True,
+)
 
 USE_NEW_ASSIST_PANEL = Config(
   key='use_new_assist_panel',
@@ -1999,9 +2096,122 @@ TASK_SERVER = ConfigSection(
     ),
 ))
 
+TASK_SERVER_V2 = ConfigSection(
+  key="task_server_v2",
+  help=_("Task Server V2 configuration."),
+  members=dict(
+    ENABLED=Config(
+      key='enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('If resource intensive or blocking can be delegated to an already running task server.')
+    ),
+    BROKER_URL=Config(
+      key='broker_url',
+      default='amqp://guest:guest@localhost//',
+      help=_('How the task server and tasks communicate.')
+    ),
+    CELERY_RESULT_BACKEND=Config(
+      key='celery_result_backend',
+      dynamic_default=task_server_default_result_directory,
+      help=_('Where to store task results. Defaults to local file system path. Celery comes with a several other backends.')
+    ),
+    RESULT_CELERYD_OPTS=Config(
+      key='celeryd_opts',
+      default='--time-limit=300',
+      help=_('Default options provided to the task server at startup.')
+    ),
+    BEAT_ENABLED=Config(
+      key='beat_enabled',
+      default=False,
+      type=coerce_bool,
+      help=_('Switch on the integration with the Task Scheduler.')
+    ),
+    BEAT_SCHEDULES_FILE=Config(
+      key='beat_schedules_file',
+      default='',
+      type=str,
+      help=_('Path to a file containing a list of beat schedules.')
+    ),
+    FETCH_RESULT_LIMIT=Config(
+      key='fetch_result_limit',
+      default=2000,
+      type=coerce_positive_integer,
+      help=_('Number of query results rows to fetch into the result storage.')
+    ),
+    RESULT_CACHE=Config(
+      key='result_cache',
+      type=str,
+      help=_('Django file cache class to use to temporarily store query results'),
+      default='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://localhost:6379/0", '
+      '"OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
+    ),
+    RESULT_STORAGE=Config(
+      key='result_storage',
+      type=str,
+      help=_('Django file storage class to use to persist query results'),
+      default='{"backend": "django.core.files.storage.FileSystemStorage", "properties": {"location": "./logs"}}'
+    ),
+    EXECUTION_STORAGE=Config(
+      key='execution_storage',
+      type=str,
+      help=_('Django cache to use to store temporarily used data during query execution. '
+      'This is in addition to result_file_storage and result_backend.'),
+      default='{"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "celery-hue"}'
+    ),
+    CELERY_LOG_LEVEL=Config(
+      key='celery_log_level',
+      type=str,
+      help=_('Log level of celery workers.'),
+      default='INFO'
+    ),
+    CHECK_DISK_USAGE_AND_CLEAN_TASK_ENABLED=Config(
+      key='check_disk_usage_and_clean_task_enabled',
+      type=coerce_bool,
+      help=_('enable this peroidic cleaner which checks disk usage and makes space for file uploads'),
+      default=False
+    ),
+    CHECK_DISK_USAGE_AND_CLEAN_TASK_PERIODIC_INTERVAL=Config(
+      key='check_disk_usage_and_clean_task_periodic_interval',
+      type=coerce_positive_integer,
+      help=_('set the time interval in seconds to run this peroidic cleaner which checks disk usage and makes space for file uploads'),
+      default=1000
+    ),
+    DISK_USAGE_CLEANUP_THRESHOLD=Config(
+      key='disk_usage_cleanup_threshold',
+      type=coerce_positive_integer,
+      help=_('Clean up files in /tmp folder if the disk usage is beyond the threshold'),
+      default=90
+    ),
+    DISK_USAGE_AND_CLEAN_TASK_TIME_DELTA=Config(
+      key='disk_usage_and_clean_task_time_delta',
+      type=coerce_positive_integer,
+      help=_('Clean up files older than timedelta. Unit of timedelta is minutes'),
+      default=60
+    ),
+    CLEANUP_STALE_UPLOADS_IN_REDIS_ENABLED=Config(
+      key='cleanup_stale_uploads_in_redis_enabled',
+      type=coerce_bool,
+      help=_('enable this peroidic cleaner which cleans up failed upload tasks stored in redis'),
+      default=False
+    ),
+    CLEANUP_STALE_UPLOADS_IN_REDIS_PERIODIC_INTERVAL=Config(
+      key='cleanup_stale_uploads_task_periodic_interval',
+      type=coerce_positive_integer,
+      help=_('set the time interval in seconds to run this peroidic cleaner which cleans up failed upload tasks stored in redis'),
+      default=900
+    ),
+    CLEANUP_STALE_UPLOADS_TASK_TIME_DELTA=Config(
+      key='cleanup_stale_uploads_task_time_delta',
+      type=coerce_positive_integer,
+      help=_('Redis keys of format Upload__* older than timedelta will be cleaned up. Unit of timedelta is minutes'),
+      default=60
+    ),
+))
+
 
 def has_channels():
-  return sys.version_info[0] > 2 and WEBSOCKETS.ENABLED.get()
+  return WEBSOCKETS.ENABLED.get()
 
 
 WEBSOCKETS = ConfigSection(
@@ -2064,9 +2274,16 @@ def has_multi_clusters():
   '''If Hue is configured to talk to more than one completely independent clusters'''
   return len(CLUSTERS.get()) > 1
 
+
 def has_connectors():
   '''When the connector feature is turned on'''
   return ENABLE_CONNECTORS.get()
+
+
+def is_cdw_compute_enabled():
+  '''When the computes feature is turned on'''
+  clusters = CLUSTERS.get()
+  return bool(clusters and [c for c in clusters.values() if c.TYPE.get() == 'cdw'])
 
 
 CLUSTERS = UnspecifiedConfigSection(
@@ -2104,9 +2321,11 @@ ENABLE_GIST = Config(
   help=_('Turn on the Gist snippet sharing.')
 )
 
+
 def default_gist_preview():
   """Gist preview only enabled automatically in private setups."""
   return not ENABLE_ORGANIZATIONS.get()
+
 
 ENABLE_GIST_PREVIEW = Config(
   key='enable_gist_preview',
@@ -2135,6 +2354,13 @@ DISABLE_LOCAL_STORAGE = Config(
   type=coerce_bool,
   help=_("Hue uses Localstorage to keep the users settings and database preferences,"
          "please make this value true in case local storage should not be used.")
+)
+
+ENABLE_HELP_MENU = Config(
+  key='enable_help_menu',
+  default=True,
+  type=coerce_bool,
+  help=_("Whether or not to show the Help menu in the Sidebar")
 )
 
 ENABLE_CONNECTORS = Config(
@@ -2200,10 +2426,12 @@ CONNECTORS = UnspecifiedConfigSection(
   )
 )
 
+
 def _get_raz_url():
   """Check if we can guess if Raz is configured"""
   from hadoop.core_site import get_raz_api_url  # Avoid circular import
   return get_raz_api_url()
+
 
 def has_raz_url():
   """Check if we can guess if Raz is configured"""
@@ -2223,9 +2451,11 @@ SDXAAS = ConfigSection(
   )
 )
 
+
 def is_sdxaas_jwt_enabled():
   """Check if SDXaaS token url is configured"""
   return bool(SDXAAS.TOKEN_URL.get())
+
 
 def handle_raz_api_auth():
   """Return RAZ authentication type from JWT (if SDXaaS token URL is set) or KERBEROS"""
@@ -2336,33 +2566,34 @@ def validate_ldap(user, config):
       bind_password = get_ldap_bind_password(config)
 
       if bool(bind_dn) != bool(bind_password):
-        if bind_dn == None:
+        if bind_dn is None:
           res.append((LDAP.BIND_DN,
-                    new_str(_("If you set bind_password, then you must set bind_dn."))))
+                    str(_("If you set bind_password, then you must set bind_dn."))))
         else:
           res.append((LDAP.BIND_PASSWORD,
-                      new_str(_("If you set bind_dn, then you must set bind_password."))))
+                      str(_("If you set bind_dn, then you must set bind_password."))))
   else:
     if config.NT_DOMAIN.get() is not None or \
         config.LDAP_USERNAME_PATTERN.get() is not None:
       if config.LDAP_URL.get() is None:
         res.append((config.LDAP_URL,
-                    new_str(_("LDAP is only partially configured. An LDAP URL must be provided."))))
+                    str(_("LDAP is only partially configured. An LDAP URL must be provided."))))
 
     if config.LDAP_URL.get() is not None:
       if config.NT_DOMAIN.get() is None and \
           config.LDAP_USERNAME_PATTERN.get() is None:
         res.append((config.LDAP_URL,
-                    new_str(_("LDAP is only partially configured. An NT Domain or username "
+                    str(_("LDAP is only partially configured. An NT Domain or username "
                     "search pattern must be provided."))))
 
     if config.LDAP_USERNAME_PATTERN.get() is not None and \
         '<username>' not in config.LDAP_USERNAME_PATTERN.get():
       res.append((config.LDAP_USERNAME_PATTERN,
-                  new_str(_("The LDAP username pattern should contain the special"
+                  str(_("The LDAP username pattern should contain the special"
                   "<username> replacement string for authentication."))))
 
   return res
+
 
 def validate_database(user):
   res = []
@@ -2382,16 +2613,16 @@ def validate_database(user):
 
       # Promote InnoDB storage engine
       if innodb_table_count != total_table_count:
-        res.append(('PREFERRED_STORAGE_ENGINE', new_str(_('''We recommend MySQL InnoDB engine over
+        res.append(('PREFERRED_STORAGE_ENGINE', str(_('''We recommend MySQL InnoDB engine over
                                                       MyISAM which does not support transactions.'''))))
 
       if innodb_table_count != 0 and innodb_table_count != total_table_count:
-        res.append(('MYSQL_STORAGE_ENGINE', new_str(_('''All tables in the database must be of the same
+        res.append(('MYSQL_STORAGE_ENGINE', str(_('''All tables in the database must be of the same
                                                       storage engine type (preferably InnoDB).'''))))
     except Exception as ex:
       LOG.exception("Error in config validation of MYSQL_STORAGE_ENGINE: %s", ex)
   elif 'sqlite' in connection.vendor:
-    res.append(('SQLITE_NOT_FOR_PRODUCTION_USE', new_str(_('SQLite is only recommended for development environments. '
+    res.append(('SQLITE_NOT_FOR_PRODUCTION_USE', str(_('SQLite is only recommended for development environments. '
         'It might cause the "Database is locked" error. Migrating to MySQL, Oracle or PostgreSQL is strongly recommended.'))))
 
   # Check if django_migrations table is up to date
@@ -2412,7 +2643,7 @@ def validate_database(user):
             missing_migration_entries.append((app.name, migration_name))
 
     if missing_migration_entries:
-      res.append(('django_migrations', new_str(_(
+      res.append(('django_migrations', str(_(
         '''django_migrations table seems to be corrupted or incomplete.
         %s entries are missing in the table: %s''') % (len(missing_migration_entries), missing_migration_entries)))
       )
@@ -2420,6 +2651,7 @@ def validate_database(user):
     LOG.exception("Error in config validation of django_migrations")
 
   return res
+
 
 def config_validator(user):
   """
@@ -2429,56 +2661,59 @@ def config_validator(user):
   """
   from beeswax.models import QueryHistory, SavedQuery, Session
   from desktop.lib import i18n
-  from desktop.models import Document, Document2 # Avoid cyclic loop
-  from desktop.settings import DOCUMENT2_MAX_ENTRIES # Avoid cyclic loop
-  from oozie.models import Job
+  from desktop.models import Document, Document2  # Avoid cyclic loop
+  from desktop.settings import DOCUMENT2_MAX_ENTRIES  # Avoid cyclic loop
 
   res = []
 
   doc_count = Document.objects.count()
   if doc_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('DOCUMENT_CLEANUP_WARNING', new_str(_('Desktop Document has more than %d entries: %d, '
+    res.append(('DOCUMENT_CLEANUP_WARNING', str(_('Desktop Document has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc_count)))))
 
   doc2_count = Document2.objects.count()
   if doc2_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('DOCUMENT2_CLEANUP_WARNING', new_str(_('Desktop Document2 has more than %d entries: %d, '
+    res.append(('DOCUMENT2_CLEANUP_WARNING', str(_('Desktop Document2 has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, doc2_count)))))
 
   session_count = Session.objects.count()
   if session_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('SESSION_CLEANUP_WARNING', new_str(_('Desktop Session has more than %d entries: %d, '
+    res.append(('SESSION_CLEANUP_WARNING', str(_('Desktop Session has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, session_count)))))
 
   qh_count = QueryHistory.objects.count()
   if qh_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('QueryHistory_CLEANUP_WARNING', new_str(_('Query History has more than %d entries: %d, '
+    res.append(('QueryHistory_CLEANUP_WARNING', str(_('Query History has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, qh_count)))))
 
   sq_count = SavedQuery.objects.count()
   if sq_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('SavedQuery_CLEANUP_WARNING', new_str(_('Saved Query has more than %d entries: %d, '
+    res.append(('SavedQuery_CLEANUP_WARNING', str(_('Saved Query has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, sq_count)))))
 
-  job_count = Job.objects.count()
-  if job_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('OOZIEJOB_CLEANUP_WARNING', new_str(_('Oozie Job has more than %d entries: %d, '
-                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, job_count)))))
+  # Check if oozie is enabled and present in INSTALLED_APPS
+  from desktop.settings import INSTALLED_APPS  # Avoid circular import
+  if 'oozie' in INSTALLED_APPS:
+    from oozie.models import Job
+    job_count = Job.objects.count()
+    if job_count > DOCUMENT2_MAX_ENTRIES:
+      res.append(('OOZIEJOB_CLEANUP_WARNING', str(_('Oozie Job has more than %d entries: %d, '
+                  'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, job_count)))))
 
   if not get_secret_key():
-    res.append((SECRET_KEY, new_str(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
+    res.append((SECRET_KEY, str(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
 
   # Validate SSL setup
   if SSL_CERTIFICATE.get():
     res.extend(validate_path(SSL_CERTIFICATE, is_dir=False))
     if not SSL_PRIVATE_KEY.get():
-      res.append((SSL_PRIVATE_KEY, new_str(_("SSL private key file should be set to enable HTTPS."))))
+      res.append((SSL_PRIVATE_KEY, str(_("SSL private key file should be set to enable HTTPS."))))
     else:
       res.extend(validate_path(SSL_PRIVATE_KEY, is_dir=False))
 
   # Validate encoding
   if not i18n.validate_encoding(DEFAULT_SITE_ENCODING.get()):
-    res.append((DEFAULT_SITE_ENCODING, new_str(_("Encoding not supported."))))
+    res.append((DEFAULT_SITE_ENCODING, str(_("Encoding not supported."))))
 
   # Validate kerberos
   if KERBEROS.HUE_KEYTAB.get() is not None:
@@ -2507,19 +2742,19 @@ def config_validator(user):
     from oozie.views.editor2 import _is_oozie_mail_enabled
 
     if not _is_oozie_mail_enabled(user):
-      res.append(('OOZIE_EMAIL_SERVER', new_str(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
+      res.append(('OOZIE_EMAIL_SERVER', str(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
   except Exception as e:
     LOG.warning('Config check failed because Oozie app not installed %s' % e)
 
-  from notebook.models import make_notebook
   from notebook.api import _save_notebook
+  from notebook.models import make_notebook
 
   notebook = make_notebook(name='test', editor_type='hive', statement='select "ทดสอบ"', status='ready')
   notebook_doc = None
   try:
     notebook_doc, save_as = _save_notebook(notebook.get_data(), user)
-  except:
-    res.append(('DATABASE_CHARACTER_SET', new_str(
+  except Exception:
+    res.append(('DATABASE_CHARACTER_SET', str(
       _('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. <br>'
         '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))
       )
@@ -2528,9 +2763,10 @@ def config_validator(user):
     notebook_doc.delete()
 
   if 'use_new_editor' in USE_NEW_EDITOR.bind_to:
-    res.append(('[desktop] use_new_editor', new_str(_('This configuration flag has been deprecated.'))))
+    res.append(('[desktop] use_new_editor', str(_('This configuration flag has been deprecated.'))))
 
   return res
+
 
 def get_redaction_policy():
   """
@@ -2599,6 +2835,7 @@ def get_ldap_bind_password(ldap_config):
 
   return password
 
+
 PERMISSION_ACTION_GS = "gs_access"
 
 GC_ACCOUNTS = UnspecifiedConfigSection(
@@ -2611,26 +2848,34 @@ GC_ACCOUNTS = UnspecifiedConfigSection(
         key='json_credentials',
         type=str,
         default=None,
-      )
+      ),
+      DEFAULT_HOME_PATH=Config(
+        key="default_home_path",
+        type=str,
+        default=None,
+        help="Optionally set this for a different home directory path. e.g. gs://gethue"
+      ),
     )
   )
 )
+
 
 def is_cm_managed():
   return 'cloudera-scm-agent' in os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
 
 
 def is_gs_enabled():
-  from desktop.lib.idbroker import conf as conf_idbroker # Circular dependencies  desktop.conf -> idbroker.conf -> desktop.conf
+  from desktop.lib.idbroker import conf as conf_idbroker  # Circular dependencies  desktop.conf -> idbroker.conf -> desktop.conf
 
-  return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or \
-      conf_idbroker.is_idbroker_enabled('gs') or \
-      is_raz_gs()
+  return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or is_raz_gs() or \
+    conf_idbroker.is_idbroker_enabled('gs')
+
 
 def has_gs_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated and user.is_active and (
     is_admin(user) or user.has_hue_permission(action="gs_access", app="filebrowser") or is_raz_gs())
+
 
 def is_raz_gs():
   from desktop.conf import RAZ  # Must be imported dynamically in order to have proper value
@@ -2698,6 +2943,7 @@ OZONE = UnspecifiedConfigSection(
     )
   )
 )
+
 
 def is_ofs_enabled():
   return ('default' in list(OZONE.keys()) and OZONE['default'].get_raw() and OZONE['default'].WEBHDFS_URL.get())

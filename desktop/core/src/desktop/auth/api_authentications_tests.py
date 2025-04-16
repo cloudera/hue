@@ -15,31 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import sys
+import json
+from unittest.mock import MagicMock, Mock, patch
 
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises
-from nose.plugins.skip import SkipTest
-
-from desktop.auth.backend import rewrite_user
-from desktop.auth.api_authentications import JwtAuthentication
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.conf import AUTH
-
+import pytest
 from rest_framework import exceptions
 
+from desktop.auth.api_authentications import JwtAuthentication
+from desktop.auth.backend import rewrite_user
+from desktop.conf import AUTH
+from desktop.lib.django_test_util import make_logged_in_client
 from useradmin.models import User
 
 
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
-
+@pytest.mark.django_db
 class TestJwtAuthentication():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test_user", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test_user"))
 
@@ -57,7 +50,6 @@ class TestJwtAuthentication():
       }
     )
 
-
   def test_authenticate_existing_user(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
       with patch('desktop.auth.api_authentications.requests.get'):
@@ -72,13 +64,12 @@ class TestJwtAuthentication():
         try:
           user, token = JwtAuthentication().authenticate(request=self.request)
 
-          assert_equal(user, self.user)
-          assert_true(user.is_authenticated)
-          assert_false(user.is_superuser)
+          assert user == self.user
+          assert user.is_authenticated
+          assert not user.is_superuser
         finally:
           for reset in resets:
             reset()
-
 
   def test_authenticate_new_user(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
@@ -87,7 +78,7 @@ class TestJwtAuthentication():
           "sub": "test_new_user"
         }
 
-        assert_false(User.objects.filter(username="test_new_user").exists())
+        assert not User.objects.filter(username="test_new_user").exists()
 
         resets = [
           AUTH.JWT.VERIFY.set_for_testing(False),
@@ -96,14 +87,13 @@ class TestJwtAuthentication():
         try:
           user, token = JwtAuthentication().authenticate(request=self.request)
 
-          assert_true(User.objects.filter(username="test_new_user").exists())
-          assert_equal(User.objects.get(username="test_new_user"), user)
-          assert_true(user.is_authenticated)
-          assert_false(user.is_superuser)
+          assert User.objects.filter(username="test_new_user").exists()
+          assert User.objects.get(username="test_new_user") == user
+          assert user.is_authenticated
+          assert not user.is_superuser
         finally:
           for reset in resets:
             reset()
-
 
   def test_failed_authentication(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
@@ -112,12 +102,13 @@ class TestJwtAuthentication():
 
           # Invalid token
           jwt_decode.side_effect = exceptions.AuthenticationFailed('JwtAuthentication: Invalid token')
-          assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
+          with pytest.raises(exceptions.AuthenticationFailed):
+            JwtAuthentication().authenticate(self.request)
 
           # Expired token
           jwt_decode.side_effect = exceptions.AuthenticationFailed('JwtAuthentication: Token expired')
-          assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
-
+          with pytest.raises(exceptions.AuthenticationFailed):
+            JwtAuthentication().authenticate(self.request)
 
   def test_check_user_token_storage(self):
     with patch('desktop.auth.api_authentications.jwt.decode') as jwt_decode:
@@ -132,12 +123,11 @@ class TestJwtAuthentication():
         try:
           user, token = JwtAuthentication().authenticate(request=self.request)
 
-          assert_true('jwt_access_token' in user.profile.data)
-          assert_equal(user.profile.data['jwt_access_token'], self.sample_token)
+          assert 'jwt_access_token' in user.profile.data
+          assert user.profile.data['jwt_access_token'] == self.sample_token
         finally:
           for reset in resets:
             reset()
-
 
   def test_check_token_verification_flag(self):
     with patch('desktop.auth.api_authentications.requests.get'):
@@ -150,7 +140,8 @@ class TestJwtAuthentication():
             AUTH.JWT.USERNAME_HEADER.set_for_testing('sub')
           ]
           try:
-            assert_raises(exceptions.AuthenticationFailed, JwtAuthentication().authenticate, self.request)
+            with pytest.raises(exceptions.AuthenticationFailed):
+              JwtAuthentication().authenticate(self.request)
           finally:
             for reset in resets:
               reset()
@@ -163,11 +154,10 @@ class TestJwtAuthentication():
           try:
             user, token = JwtAuthentication().authenticate(request=self.request)
 
-            assert_equal(user, self.user)
+            assert user == self.user
           finally:
             for reset in resets:
               reset()
-
 
   def test_handle_public_key(self):
     with patch('desktop.auth.api_authentications.requests.get') as key_server_request:
@@ -210,7 +200,7 @@ class TestJwtAuthentication():
             algorithms=['RS256'],
             audience='audience',
             issuer='issuer',
-            jwt=self.sample_token, 
+            jwt=self.sample_token,
             key=b'-----BEGIN PUBLIC KEY-----\n'
             b'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwe9gTbRxHl4Ye9mY9abY\n'
             b'l/WHgx5QYZTwnHO5G5MX9gOiCbbxBqcOifVywX1/ienElksDIvjuQFL7zOSoXipu\n'
@@ -221,11 +211,10 @@ class TestJwtAuthentication():
             b'wwIDAQAB\n-----END PUBLIC KEY-----\n',
             options={'verify_signature': True}
           )
-          assert_equal(user, self.user)
+          assert user == self.user
         finally:
           for reset in resets:
             reset()
-
 
   def test_handle_jku_ha(self):
     with patch('desktop.auth.api_authentications.requests.get') as requests_get:
@@ -236,7 +225,7 @@ class TestJwtAuthentication():
 
       try:
         jku = JwtAuthentication()._handle_jku_ha()
-        assert_equal(jku, 'https://ext-authz:8000/api/v1/jwks.json')
+        assert jku == 'https://ext-authz:8000/api/v1/jwks.json'
       finally:
         reset()
 
@@ -245,7 +234,7 @@ class TestJwtAuthentication():
 
       try:
         jku = JwtAuthentication()._handle_jku_ha()
-        assert_equal(jku, 'https://ext-authz:8000/api/v1/jwks.json')
+        assert jku == 'https://ext-authz:8000/api/v1/jwks.json'
       finally:
         reset()
 
@@ -255,6 +244,6 @@ class TestJwtAuthentication():
 
       try:
         jku = JwtAuthentication()._handle_jku_ha()
-        assert_equal(jku, None)
+        assert jku is None
       finally:
         reset()

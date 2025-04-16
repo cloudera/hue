@@ -54,7 +54,7 @@ def set_cm_environment():
         LOG.exception("This appears to be a CM enabled cluster and supervisord is not running")
         LOG.exception("Make sure you are running as root and CM supervisord is running")
         sys.exit(1)
-    except Exception, e:
+    except Exception as e:
       LOG.exception("This appears to be a CM enabled cluster and supervisord is not running")
       LOG.exception("Make sure you are running as root and CM supervisord is running")
       sys.exit(1)
@@ -125,7 +125,7 @@ def set_cm_environment():
       os.environ["JAVA_HOME"] = JAVA_HOME
 
     if "JAVA_HOME" not in os.environ:
-      print "JAVA_HOME must be set and can't be found, please set JAVA_HOME environment variable"
+      print ("JAVA_HOME must be set and can't be found, please set JAVA_HOME environment variable")
       sys.exit(1)
 
     hue_config["LD_LIBRARY_PATH"] = None
@@ -157,24 +157,24 @@ def set_cm_environment():
 
       if "LD_LIBRARY_PATH" not in os.environ.keys() or not os.path.isfile(
               "%s/libclntsh.so.11.1" % os.environ["LD_LIBRARY_PATH"]):
-        print "You are using Oracle for backend DB"
+        print ("You are using Oracle for backend DB")
         if "LD_LIBRARY_PATH" in os.environ.keys():
-          print "LD_LIBRARY_PATH set to %s" % os.environ["LD_LIBRARY_PATH"]
-          print "LD_LIBRARY_PATH does not contain libclntsh.so.11.1"
-          print "Please set LD_LIBRARY_PATH correctly and rerun"
+          print ("LD_LIBRARY_PATH set to %s" % os.environ["LD_LIBRARY_PATH"])
+          print ("LD_LIBRARY_PATH does not contain libclntsh.so.11.1")
+          print ("Please set LD_LIBRARY_PATH correctly and rerun")
 
         else:
-          print "LD_LIBRARY_PATH can't be found, if you are using ORACLE for your Hue database"
-          print "then it must be set, if not, you can ignore"
+          print ("LD_LIBRARY_PATH can't be found, if you are using ORACLE for your Hue database")
+          print ("then it must be set, if not, you can ignore")
 
-        print "Here is an exmple, ONLY INCLUDE ONE PATH and NO VARIABLES"
-        print "  export LD_LIBRARY_PATH=/path/to/instantclient"
+        print ("Here is an exmple, ONLY INCLUDE ONE PATH and NO VARIABLES")
+        print ("  export LD_LIBRARY_PATH=/path/to/instantclient")
         sys.exit(1)
 
   else:
-    print "CM does not appear to be running on this server"
-    print "If this is a CM managed cluster make sure the agent and supervisor are running"
-    print "Running with /etc/hue/conf as the HUE_CONF_DIR"
+    print ("CM does not appear to be running on this server")
+    print ("If this is a CM managed cluster make sure the agent and supervisor are running")
+    print ("Running with /etc/hue/conf as the HUE_CONF_DIR")
     os.environ["HUE_CONF_DIR"] = "/etc/hue/conf"
 
   hue_config['hue_path'] = hue_path
@@ -197,7 +197,7 @@ def reload_with_cm_env():
       LOG.info("We need to reload the process to include any LD_LIBRARY_PATH changes")
       try:
         os.execv(sys.argv[0], sys.argv)
-      except Exception, exc:
+      except Exception as exc:
         LOG.warn('Failed re-exec:', exc)
         sys.exit(1)
 

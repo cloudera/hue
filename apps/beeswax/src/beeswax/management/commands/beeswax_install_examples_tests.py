@@ -16,33 +16,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
+from unittest.mock import patch
 
-from nose.tools import assert_equal, assert_not_equal, assert_true, assert_false
+import pytest
 
+from beeswax.management.commands.beeswax_install_examples import Command, SampleQuery, SampleTable
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.models import Document2
-from useradmin.models import User, install_sample_user
-
-from beeswax.management.commands.beeswax_install_examples import SampleTable, Command, SampleQuery
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from mock import patch, Mock, MagicMock
-
+from useradmin.models import User
 
 LOG = logging.getLogger()
 
 
+@pytest.mark.django_db
 class TestStandardTables():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
-
 
   def test_install_queries_mysql(self):
     design_dict = {
@@ -67,19 +61,20 @@ class TestStandardTables():
     interpreter = {'type': 'mysql', 'dialect': 'mysql'}
 
     design = SampleQuery(design_dict)
-    assert_false(Document2.objects.filter(name='TestStandardTables Query').exists())
+    assert not Document2.objects.filter(name='TestStandardTables Query').exists()
 
     with patch('notebook.models.get_interpreter') as get_interpreter:
       design.install(django_user=self.user, interpreter=interpreter)
 
-      assert_true(Document2.objects.filter(name='TestStandardTables Query').exists())
+      assert Document2.objects.filter(name='TestStandardTables Query').exists()
       query = Document2.objects.filter(name='TestStandardTables Query').get()
-      assert_equal('query-mysql', query.type)
+      assert 'query-mysql' == query.type
 
 
+@pytest.mark.django_db
 class TestHiveServer2():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -105,15 +100,14 @@ class TestHiveServer2():
     interpreter = {'type': 'hive', 'dialect': 'hive'}
 
     design = SampleQuery(design_dict)
-    assert_false(Document2.objects.filter(name='TestBeswaxHiveTables Query').exists())
+    assert not Document2.objects.filter(name='TestBeswaxHiveTables Query').exists()
 
     with patch('notebook.models.get_interpreter') as get_interpreter:
       design.install(django_user=self.user, interpreter=interpreter)
 
-      assert_true(Document2.objects.filter(name='TestBeswaxHiveTables Query').exists())
+      assert Document2.objects.filter(name='TestBeswaxHiveTables Query').exists()
       query = Document2.objects.filter(name='TestBeswaxHiveTables Query').get()
-      assert_equal('query-hive', query.type)
-
+      assert 'query-hive' == query.type
 
   def test_create_table_load_data_but_no_fs(self):
     table_data = {
@@ -133,13 +127,12 @@ class TestHiveServer2():
         make_notebook.assert_not_called()
 
 
-
+@pytest.mark.django_db
 class TestTransactionalTables():
 
-  def setUp(self):
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = rewrite_user(User.objects.get(username="test"))
-
 
   def test_load_sample_07_with_concurrency_support(self):
     table_data = {
@@ -158,7 +151,6 @@ class TestTransactionalTables():
         SampleTable(table_data, 'hive', 'default').install(self.user)
 
         make_notebook.assert_called()
-
 
   def test_load_web_logs_with_concurrency_support(self):
     table_data = {
@@ -201,7 +193,6 @@ class TestTransactionalTables():
         SampleTable(table_data, 'hive', 'default').install(self.user)
 
         make_notebook.assert_called()
-
 
   def test_create_phoenix_table(self):
     table_data = {

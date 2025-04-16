@@ -111,6 +111,35 @@ function set_samlcert() {
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
 }
 
+function task_server_enabled() {
+  for file in "$HUE_CONF_DIR/zhue_safety_valve.ini" "$HUE_CONF_DIR/zhue.ini" "$HUE_CONF_DIR/hue.ini"; do
+    echo "Checking task_server configs in: $file"
+    if grep -A 1 '^\[\[task_server_v2\]\]' "$file" | grep -qi 'enabled=True'; then
+      echo "Task server configs enabled in $file"
+      return 0
+    elif grep -A 1 '^\[\[task_server_v2\]\]' "$file" | grep -qi 'enabled=False'; then
+      echo "Task server configs disabled in $file"
+      return 1
+    else
+      echo "Task server configs not found in $file"
+    fi
+  done
+  return 2
+}
+
+function start_celery() {
+  echo "Starting Celery worker..."
+  # The schedule of periodic tasks performed by celery-beat is stored in the celerybeat-schedule file.
+  touch $HUE_HOME/celerybeat-schedule
+  chmod 644 $HUE_HOME/celerybeat-schedule
+  $HUE_BIN/hue runcelery worker --app desktop.celery --loglevel=INFO --schedule_file $HUE_HOME/celerybeat-schedule
+}
+
+function start_redis() {
+  echo "Starting Redis server..."
+  redis-server --port 6379 --daemonize no
+}
+
 # If database connectivity is not set then fail
 ret=$(db_connectivity_check)
 if [[ $ret == "fail" ]];  then
@@ -134,6 +163,18 @@ elif [[ $1 == rungunicornserver ]]; then
   fix_column_issue "axes_accesslog" "trusted"
   fix_column_issue "axes_accessattempt" "trusted"
   $HUE_BIN/hue rungunicornserver
+elif [[ $1 == start_celery ]]; then
+  if task_server_enabled; then
+    start_celery
+  else
+    exit 1
+  fi
+elif [[ $1 == start_redis ]]; then
+  if task_server_enabled; then
+    start_redis
+  else
+    exit 1
+  fi
 fi
 
 exit 0

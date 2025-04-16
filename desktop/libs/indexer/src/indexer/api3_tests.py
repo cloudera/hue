@@ -15,27 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import sys
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
-from django.utils.datastructures import MultiValueDict
+import json
+from unittest.mock import Mock, patch
+from urllib.parse import unquote as urllib_unquote
+
 from django.core.files.uploadhandler import InMemoryUploadedFile
+from django.utils.datastructures import MultiValueDict
 
 from desktop.settings import BASE_DIR
-from indexer.api3 import upload_local_file, guess_field_types, guess_format
-
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote
-  from unittest.mock import patch, Mock, MagicMock
-else:
-  from urllib import unquote as urllib_unquote
-  from mock import patch, Mock, MagicMock
+from indexer.api3 import guess_field_types, guess_format, upload_local_file
 
 
 def test_xlsx_local_file_upload():
-  if sys.version_info[0] < 3:
-    raise SkipTest
 
   csv_file = '''test 1,test.2,test_3,test_4
 2010-10-10 00:00:00,2012-10-11 01:00:00,30,
@@ -83,8 +75,8 @@ scattered,,,scattered
   with open(path, 'r') as _test_file:
     test_file = _test_file.read().replace('\r\n', '\n')
 
-    assert_equal(csv_file, test_file)
-    assert_true("book_1_xlsx" in path)
+    assert csv_file == test_file
+    assert "book_1_xlsx" in path
 
 
 def test_col_names():
@@ -104,28 +96,25 @@ def test_col_names():
 
   columns_name = [col['name'] for col in response['columns']]
 
-  assert_true('date_1_' in columns_name)
-  assert_true('hour_1' in columns_name)
-  assert_true('minute' in columns_name)
+  assert 'date_1_' in columns_name
+  assert 'hour_1' in columns_name
+  assert 'minute' in columns_name
 
 
 def test_guess_format_excel_remote_file():
-  if sys.version_info[0] > 2:
-    with patch('indexer.api3.pd') as pd:
-      with patch('indexer.api3.MorphlineIndexer') as MorphlineIndexer:
-        file_format = {
-          'inputFormat': 'file',
-          'path': 's3a://gethue/example1.xlsx',
-          'file_type': ''
-        }
-        file_format = json.dumps(file_format)
-        request = Mock(
-          POST={'fileFormat': file_format}
-        )
+  with patch('indexer.api3.pd') as pd:
+    with patch('indexer.api3.MorphlineIndexer') as MorphlineIndexer:
+      file_format = {
+        'inputFormat': 'file',
+        'path': 's3a://gethue/example1.xlsx',
+        'file_type': ''
+      }
+      file_format = json.dumps(file_format)
+      request = Mock(
+        POST={'fileFormat': file_format}
+      )
 
-        response = guess_format(request)
-        response = json.loads(response.content)
+      response = guess_format(request)
+      response = json.loads(response.content)
 
-        assert_equal(response['type'], "excel")
-  else:
-    raise SkipTest
+      assert response['type'] == "excel"

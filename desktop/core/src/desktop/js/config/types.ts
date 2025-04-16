@@ -49,6 +49,7 @@ export interface AppConfig<T extends Interpreter> {
 export interface EditorConfig extends AppConfig<EditorInterpreter> {
   default_limit: number | null;
   default_sql_interpreter: string;
+  source_autocomplete_disabled: boolean;
 }
 
 export enum AppType {
@@ -57,6 +58,16 @@ export enum AppType {
   dashboard = 'dashboard',
   scheduler = 'scheduler',
   sdkapps = 'sdkapps'
+}
+
+interface StorageBrowserConfig {
+  concurrent_max_connection: number;
+  enable_chunked_file_upload: boolean;
+  enable_extract_uploaded_archive: boolean;
+  enable_file_download_button: boolean;
+  enable_new_storage_browser: boolean;
+  file_upload_chunk_size: number;
+  max_file_editor_size: number;
 }
 
 export interface HueConfig extends GenericApiResponse {
@@ -82,7 +93,11 @@ export interface HueConfig extends GenericApiResponse {
   hue_config: {
     enable_sharing: boolean;
     collect_usage: boolean;
+    enable_task_server: boolean;
+    is_admin: boolean;
+    is_yarn_enabled: boolean;
   };
+  storage_browser: StorageBrowserConfig;
   hue_version?: string;
   img_version?: string;
   vw_name?: string;

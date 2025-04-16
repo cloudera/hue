@@ -14,33 +14,12 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-<%!
-import logging
-import sys
-
-from desktop.views import commonheader, commonfooter
-
-
-LOG = logging.getLogger()
-%>
-
 <%namespace name="layout" file="about_layout.mako" />
 
 ${ layout.menubar(section='dump_config') }
 
-<style type="text/css">
-  .card-heading .pull-right {
-    font-size: 12px;
-    font-weight: normal;
-  }
-</style>
+<script src="${ static('desktop/js/dumpconfig-inline.js') }" type="text/javascript"></script>
 
-<div id="aboutConfiguration">
-  <!-- ko component: { name: 'hue-config-tree' } --><!-- /ko -->
+<div id="Configuration">
+<Configuration class='antd cuix' data-reactcomponent='Configuration'></Configuration>
 </div>
-
-<script type="text/javascript">
-  $(document).ready(function () {
-    ko.applyBindings({}, $('#aboutConfiguration')[0]);
-  });
-</script>

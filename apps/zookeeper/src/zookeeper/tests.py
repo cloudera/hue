@@ -17,8 +17,6 @@
 
 
 from builtins import object
-from nose.tools import assert_true, assert_equal
-
 
 from zookeeper import stats
 from zookeeper.conf import CLUSTERS
@@ -37,14 +35,14 @@ class MockZooKeeperStats(object):
 
 class ZooKeeperMockBase(object):
 
-  def setUp(self):
+  def setup_method(self):
     # Beware: Monkey patch ZooKeeper with Mock API
     if not hasattr(stats, 'OriginalZooKeeperApi'):
       stats.OriginalZooKeeperApi = stats.ZooKeeperStats
 
     stats.ZooKeeperStats = MockZooKeeperStats
 
-  def tearDown(self):
+  def teardown_method(self):
     stats.ZooKeeperStats = stats.OriginalZooKeeperApi
 
 

@@ -16,8 +16,9 @@
 # limitations under the License.
 
 from builtins import object
-from nose.tools import assert_equal, assert_true, assert_false
+import pytest
 
+from django.test import TestCase
 from django.urls import reverse
 
 from indexer.solr_client import SolrClient
@@ -27,7 +28,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 
 
-class TestSolrClient(object):
+class TestSolrClient(TestCase):
 
   @classmethod
   def setup_class(cls):
@@ -48,10 +49,10 @@ class TestSolrClient(object):
     try:
       client = SolrClient(self.user, api=MockSolrCdhCloudHdfsApi())
 
-      assert_true(client.is_solr_cloud_mode())
-      assert_false(client.is_solr_six_or_more())
-      assert_true(client.is_solr_with_hdfs())
-      assert_equal('hue.com:2181/solr', client.get_zookeeper_host())
+      assert client.is_solr_cloud_mode()
+      assert not client.is_solr_six_or_more()
+      assert client.is_solr_with_hdfs()
+      assert 'hue.com:2181/solr' == client.get_zookeeper_host()
     finally:
       SolrClient._reset_properties()
 
@@ -60,10 +61,10 @@ class TestSolrClient(object):
     try:
       client = SolrClient(self.user, api=MockSolrUpstreamCloudApi())
 
-      assert_true(client.is_solr_cloud_mode())
-      assert_true(client.is_solr_six_or_more())
-      assert_false(client.is_solr_with_hdfs())
-      assert_equal('localhost:9983', client.get_zookeeper_host())
+      assert client.is_solr_cloud_mode()
+      assert client.is_solr_six_or_more()
+      assert not client.is_solr_with_hdfs()
+      assert 'localhost:9983' == client.get_zookeeper_host()
     finally:
       SolrClient._reset_properties()
 

@@ -16,15 +16,12 @@
 # limitations under the License.
 
 from builtins import oct
-import math
-import stat
 
 from django.utils.encoding import smart_str
 
-from hadoop.fs.hadoopfs import decode_fs_path
+from desktop.lib.fs.ozone import _serviceid_join, join as ofs_join
 from hadoop.fs.webhdfs_types import WebHdfsStat
 
-from desktop.lib.fs.ozone import _serviceid_join, join as ofs_join
 
 class OzoneFSStat(WebHdfsStat):
   """
@@ -35,7 +32,11 @@ class OzoneFSStat(WebHdfsStat):
 
   def __init__(self, file_status, parent_path, ofs_serviceid=''):
     super(OzoneFSStat, self).__init__(file_status, parent_path)
-    self.path = _serviceid_join(ofs_join(parent_path, self.name), ofs_serviceid)
+
+    # Check for edge case when volume name is equal to service_id,
+    # then forcefully append ofs://<service_id> in current path so that further directory level paths are consistent.
+    is_vol_serviceid_equal = parent_path.startswith(f'/{ofs_serviceid}')
+    self.path = _serviceid_join(ofs_join(parent_path, self.name), ofs_serviceid, is_vol_serviceid_equal)
 
   def __unicode__(self):
     return "[OzoneFSStat] %7s %8s %8s %12s %s%s" % (oct(self.mode), self.user, self.group, self.size, self.path, self.isDir and '/' or "")

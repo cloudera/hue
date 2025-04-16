@@ -17,8 +17,6 @@
 
 import logging
 
-from nose.tools import assert_equal
-
 from liboozie import conf
 from liboozie.types import WorkflowAction, Coordinator
 from liboozie.utils import config_gen
@@ -34,29 +32,29 @@ LOG = logging.getLogger()
 
 def test_valid_external_id():
   action = WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[0])
-  assert_equal('job_201208072118_0044', action.externalId)
-  assert_equal('/jobbrowser/jobs/job_201208072118_0044/single_logs', action.get_absolute_log_url())
-  assert_equal('/jobbrowser/jobs/job_201208072118_0044', action.get_external_id_url())
+  assert 'job_201208072118_0044' == action.externalId
+  assert '/jobbrowser/jobs/job_201208072118_0044/single_logs' == action.get_absolute_log_url()
+  assert '/jobbrowser/jobs/job_201208072118_0044' == action.get_external_id_url()
 
   action = WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[1])
-  assert_equal('-', action.externalId)
-  assert_equal(None, action.get_absolute_log_url())
-  assert_equal(None, action.get_external_id_url())
+  assert '-' == action.externalId
+  assert None == action.get_absolute_log_url()
+  assert None == action.get_external_id_url()
 
   action = WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[2])
-  assert_equal('', action.externalId)
-  assert_equal(None, action.get_absolute_log_url())
-  assert_equal(None, action.get_external_id_url())
+  assert '' == action.externalId
+  assert None == action.get_absolute_log_url()
+  assert None == action.get_external_id_url()
 
   action = WorkflowAction(MockOozieApi.JSON_WORKFLOW_LIST[3])
-  assert_equal(None, action.externalId)
-  assert_equal(None, action.get_absolute_log_url())
-  assert_equal(None, action.get_external_id_url())
+  assert None == action.externalId
+  assert None == action.get_absolute_log_url()
+  assert None == action.get_external_id_url()
 
 
 def aggregate_coordinator_instances():
   dates = ['1', '2', '3', '6', '7', '8', '10', '12', '15', '16', '20', '23', '30', '40']
-  assert_equal(['1-3', '6-8', '10-10', '12-12', '15-16', '20-20', '23-23', '30-30', '40-40'], Coordinator.aggreate(dates))
+  assert ['1-3', '6-8', '10-10', '12-12', '15-16', '20-20', '23-23', '30-30', '40-40'] == Coordinator.aggreate(dates)
 
 
 def test_config_gen():
@@ -64,7 +62,7 @@ def test_config_gen():
     'user.name': 'hue',
     'test.1': 'http://localhost/test?test1=test&test2=test'
   }
-  assert_equal(reformat_xml(b"""<configuration>
+  assert reformat_xml(b"""<configuration>
 <property>
   <name>test.1</name>
   <value><![CDATA[http://localhost/test?test1=test&test2=test]]></value>
@@ -73,14 +71,14 @@ def test_config_gen():
   <name>user.name</name>
   <value><![CDATA[hue]]></value>
 </property>
-</configuration>"""), reformat_xml(config_gen(properties)))
+</configuration>""") == reformat_xml(config_gen(properties))
 
 def test_config_gen_negative():
   properties = {
     'user.name': 'hue<foo>bar</foo>',
     'test.1': 'http://localhost/test?test1=test&test2=test]]>&test3=test'
   }
-  assert_equal(reformat_xml(b"""<configuration>
+  assert reformat_xml(b"""<configuration>
 <property>
   <name>test.1</name>
   <value><![CDATA[http://localhost/test?test1=test&test2=test&test3=test]]></value>
@@ -89,7 +87,7 @@ def test_config_gen_negative():
   <name>user.name</name>
   <value><![CDATA[hue<foo>bar</foo>]]></value>
 </property>
-</configuration>"""), reformat_xml(config_gen(properties)))
+</configuration>""") == reformat_xml(config_gen(properties))
 
 def test_ssl_validate():
   for desktop_kwargs, conf_kwargs, expected in [
@@ -111,8 +109,7 @@ def test_ssl_validate():
     ]
 
     try:
-      assert_equal(conf.SSL_CERT_CA_VERIFY.get(), expected,
-          'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.SSL_CERT_CA_VERIFY.get()))
+      assert conf.SSL_CERT_CA_VERIFY.get() == expected, 'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.SSL_CERT_CA_VERIFY.get())
     finally:
       for reset in resets:
         reset()

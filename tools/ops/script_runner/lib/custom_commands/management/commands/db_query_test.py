@@ -29,10 +29,7 @@ from django.db import connection
 
 import desktop.conf
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.utils.translation import gettext_lazy as _t, gettext as _
 
 LOG = logging.getLogger(__name__)
 
@@ -66,7 +63,7 @@ class Command(BaseCommand):
                       default=(datetime.datetime.now())),
       )
 
-  except AttributeError, e:
+  except AttributeError as e:
       baseoption_test = 'BaseCommand' in str(e) and 'option_list' in str(e)
       if baseoption_test:
           def add_arguments(self, parser):

@@ -15,8 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
 
 try:
   import MySQLdb as Database
@@ -33,23 +33,20 @@ if (version < (1, 2, 1) or (version[:3] == (1, 2, 1) and
   from django.core.exceptions import ImproperlyConfigured
   raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
+from django.utils.translation import gettext as _
 from MySQLdb.converters import FIELD_TYPE
 
 from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
-
 LOG = logging.getLogger()
 
 
-class DataTable(BaseRDBMSDataTable): pass
+class DataTable(BaseRDBMSDataTable):
+  pass
 
 
-class Result(BaseRDBMSResult): pass
+class Result(BaseRDBMSResult):
+  pass
 
 
 def _convert_types(t):
@@ -109,7 +106,6 @@ class MySQLClient(BaseRDMSClient):
     super(MySQLClient, self).__init__(*args, **kwargs)
     self.connection = Database.connect(**self._conn_params)
 
-
   @property
   def _conn_params(self):
     params = {
@@ -128,7 +124,6 @@ class MySQLClient(BaseRDMSClient):
 
     return params
 
-
   def use(self, database):
     if 'db' in self._conn_params and self._conn_params['db'] != database:
       raise RuntimeError(_("Database '%s' is not allowed. Please use database '%s'.") % (database, self._conn_params['db']))
@@ -136,7 +131,6 @@ class MySQLClient(BaseRDMSClient):
       cursor = self.connection.cursor()
       cursor.execute("USE `%s`" % database)
       self.connection.commit()
-
 
   def execute_statement(self, statement):
     cursor = self.connection.cursor()
@@ -148,7 +142,6 @@ class MySQLClient(BaseRDMSClient):
     else:
       columns = []
     return self.data_table_cls(cursor, columns)
-
 
   def get_databases(self):
     cursor = self.connection.cursor()
@@ -163,7 +156,6 @@ class MySQLClient(BaseRDMSClient):
     else:
       return databases
 
-
   def get_tables(self, database, table_names=[]):
     cursor = self.connection.cursor()
     query = 'SHOW TABLES'
@@ -175,7 +167,6 @@ class MySQLClient(BaseRDMSClient):
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
-
   def get_columns(self, database, table, names_only=True):
     cursor = self.connection.cursor()
     cursor.execute("SHOW COLUMNS FROM %s.%s" % (database, table))
@@ -185,7 +176,6 @@ class MySQLClient(BaseRDMSClient):
     else:
       columns = [dict(name=row[0], type=row[1], comment='') for row in cursor.fetchall()]
     return columns
-
 
   def get_sample_data(self, database, table, column=None, limit=100):
     column = '`%s`' % column if column else '*'

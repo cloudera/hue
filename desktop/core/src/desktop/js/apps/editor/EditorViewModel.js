@@ -27,6 +27,7 @@ import Notebook from 'apps/editor/notebook';
 import ChartTransformers from 'apps/notebook/chartTransformers';
 import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 import { findEditorConnector, getLastKnownConfig } from 'config/hueConfig';
+import { GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
 import huePubSub from 'utils/huePubSub';
 import { getFromLocalStorage, setInLocalStorage } from 'utils/storageUtils';
 import UUID from 'utils/string/UUID';
@@ -35,13 +36,8 @@ import changeURLParameter from 'utils/url/changeURLParameter';
 import getParameter from 'utils/url/getParameter';
 
 export default class EditorViewModel {
-  constructor(editorId, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
-    // eslint-disable-next-line no-restricted-syntax
-    console.log('Editor v2 enabled.');
-
-    this.editorId = editorId;
+  constructor(options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
     this.snippetViewSettings = options.snippetViewSettings;
-    this.notebooks = notebooks;
 
     this.URLS = {
       editor: '/hue/editor',
@@ -108,7 +104,6 @@ export default class EditorViewModel {
       }
     });
 
-    this.autocompleteTimeout = options.autocompleteTimeout;
     this.lastNotifiedDialect = undefined;
 
     this.combinedContent = ko.observable();
@@ -223,7 +218,9 @@ export default class EditorViewModel {
           const options = {
             successCallback: result => {
               if (result && result.exists) {
-                $(document).trigger('info', result.path + ' saved successfully.');
+                huePubSub.publish(GLOBAL_INFO_TOPIC, {
+                  message: result.path + ' saved successfully.'
+                });
               }
             }
           };
@@ -312,14 +309,13 @@ export default class EditorViewModel {
   }
 
   async init() {
-    if (this.editorId) {
-      await this.openNotebook(this.editorId);
+    const editorId = getParameter('editor');
+    if (editorId) {
+      await this.openNotebook(editorId);
     } else if (getParameter('gist') !== '' || getParameter('type') !== '') {
       await this.newNotebook(getParameter('type'));
     } else if (getParameter('editor') !== '') {
       await this.openNotebook(getParameter('editor'));
-    } else if (this.notebooks.length > 0) {
-      this.loadNotebook(this.notebooks[0]); // Old way of loading json for /browse
     } else {
       await this.newNotebook();
     }

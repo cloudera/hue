@@ -19,11 +19,10 @@ from builtins import str
 from builtins import range
 import logging
 import json
+import pytest
 import time
 
-from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 from django.urls import reverse
-from nose.plugins.skip import SkipTest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
@@ -35,10 +34,10 @@ from useradmin.models import User
 
 LOG = logging.getLogger()
 
-
+@pytest.mark.django_db
 class TestJobsubWithHadoop(OozieServerProvider):
 
-  def setUp(self):
+  def setup_method(self):
     OozieServerProvider.setup_class()
     self.cluster.fs.do_as_user('jobsub_test', self.cluster.fs.create_home_dir, '/user/jobsub_test')
     self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, '/user/jobsub_test', 0o777, True) # Hum?
@@ -60,7 +59,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
 
     self.design = self.create_design()
 
-  def tearDown(self):
+  def teardown_method(self):
     Workflow.objects.all().delete()
 
   def create_design(self):
@@ -88,7 +87,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
       },
       HTTP_X_REQUESTED_WITH='XMLHttpRequest'
     )
-    assert_equal(response.status_code, 200)
+    assert response.status_code == 200
     return Workflow.objects.all()[0]
 
   def test_new_design(self):
@@ -96,13 +95,13 @@ class TestJobsubWithHadoop(OozieServerProvider):
     #   - creator is owner.
     #   - workflow name and description are the same as action name and description.
     #   - workflow has one action.
-    assert_false(self.design.managed)
-    assert_equal(4, Node.objects.filter(workflow=self.design).count())
-    assert_equal(1, Kill.objects.filter(workflow=self.design).count())
-    assert_equal(1, Start.objects.filter(workflow=self.design).count())
-    assert_equal(1, End.objects.filter(workflow=self.design).count())
-    assert_equal(4, Node.objects.filter(workflow=self.design).count())
-    assert_equal(3, Link.objects.filter(parent__workflow=self.design).count())
+    assert not self.design.managed
+    assert 4 == Node.objects.filter(workflow=self.design).count()
+    assert 1 == Kill.objects.filter(workflow=self.design).count()
+    assert 1 == Start.objects.filter(workflow=self.design).count()
+    assert 1 == End.objects.filter(workflow=self.design).count()
+    assert 4 == Node.objects.filter(workflow=self.design).count()
+    assert 3 == Link.objects.filter(parent__workflow=self.design).count()
 
   def test_save_design(self):
     response = self.client.post(
@@ -129,15 +128,15 @@ class TestJobsubWithHadoop(OozieServerProvider):
       },
       HTTP_X_REQUESTED_WITH='XMLHttpRequest'
     )
-    assert_equal(response.status_code, 200)
+    assert response.status_code == 200
     self.design = Workflow.objects.get(id=self.design.id)
-    assert_equal(self.design.start.get_child('to').get_full_node().files, '[{"dummy": "", "name": "test"}]')
+    assert self.design.start.get_child('to').get_full_node().files == '[{"dummy": "", "name": "test"}]'
 
   def test_get_design(self):
     response = self.client.get(reverse('jobsub:jobsub.views.get_design',
       kwargs={'design_id': self.design.id}),
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-    assert_equal(response.status_code, 200)
+    assert response.status_code == 200
 
     client_note_me = make_logged_in_client(username='jobsub_test_note_me', is_superuser=False)
     grant_access("jobsub_test_note_me", "jobsub_test_note_me", "jobsub")
@@ -146,9 +145,9 @@ class TestJobsubWithHadoop(OozieServerProvider):
     response = client_note_me.get(reverse('jobsub:jobsub.views.get_design',
       kwargs={'design_id': self.design.id}),
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-    assert_equal(response.status_code, 500)
+    assert response.status_code == 500
     data = json.loads(response.content)
-    assert_true('does not have the permissions required to access document' in data.get('message', ''), response.content)
+    assert 'does not have the permissions required to access document' in data.get('message', ''), response.content
 
   def test_delete_design(self):
     # Trash
@@ -160,9 +159,9 @@ class TestJobsubWithHadoop(OozieServerProvider):
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-    assert_equal(response.status_code, 200)
-    assert_equal(n_available - 1, Document.objects.available_docs(Workflow, self.user).count())
-    assert_equal(n_trashed + 1, Document.objects.trashed_docs(Workflow, self.user).count())
+    assert response.status_code == 200
+    assert n_available - 1 == Document.objects.available_docs(Workflow, self.user).count()
+    assert n_trashed + 1 == Document.objects.trashed_docs(Workflow, self.user).count()
 
     # Destroy
     response = self.client.post(reverse('jobsub:jobsub.views.delete_design',
@@ -170,13 +169,13 @@ class TestJobsubWithHadoop(OozieServerProvider):
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-    assert_equal(response.status_code, 200)
-    assert_equal(n_available - 1, Document.objects.available_docs(Workflow, self.user).count())
-    assert_equal(n_trashed, Document.objects.trashed_docs(Workflow, self.user).count())
+    assert response.status_code == 200
+    assert n_available - 1 == Document.objects.available_docs(Workflow, self.user).count()
+    assert n_trashed == Document.objects.trashed_docs(Workflow, self.user).count()
 
   def test_clone_design(self):
     #@TODO@ Prakash fix this test
-    raise SkipTest
+    pytest.skip("Skipping Test")
     n_available = Document.objects.available_docs(Workflow, self.user).count()
 
     response = self.client.post(reverse('jobsub:jobsub.views.clone_design',
@@ -184,8 +183,8 @@ class TestJobsubWithHadoop(OozieServerProvider):
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-    assert_equal(response.status_code, 200)
-    assert_equal(n_available + 1, Document.objects.available_docs(Workflow, self.user).count())
+    assert response.status_code == 200
+    assert n_available + 1 == Document.objects.available_docs(Workflow, self.user).count()
 
   def test_restore_design(self):
     n_available = Document.objects.available_docs(Workflow, self.user).count()
@@ -196,15 +195,15 @@ class TestJobsubWithHadoop(OozieServerProvider):
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-    assert_equal(response.status_code, 200)
-    assert_equal(n_available - 1, Document.objects.available_docs(Workflow, self.user).count())
-    assert_equal(n_trashed + 1, Document.objects.trashed_docs(Workflow, self.user).count())
+    assert response.status_code == 200
+    assert n_available - 1 == Document.objects.available_docs(Workflow, self.user).count()
+    assert n_trashed + 1 == Document.objects.trashed_docs(Workflow, self.user).count()
 
     response = self.client.post(reverse('jobsub:jobsub.views.restore_design',
       kwargs={'design_id': self.design.id}),
       follow=True,
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-    assert_equal(response.status_code, 200)
-    assert_equal(n_available, Document.objects.available_docs(Workflow, self.user).count())
-    assert_equal(n_trashed, Document.objects.trashed_docs(Workflow, self.user).count())
+    assert response.status_code == 200
+    assert n_available == Document.objects.available_docs(Workflow, self.user).count()
+    assert n_trashed == Document.objects.trashed_docs(Workflow, self.user).count()

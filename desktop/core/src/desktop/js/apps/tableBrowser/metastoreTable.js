@@ -19,11 +19,12 @@ import $ from 'jquery';
 import * as ko from 'knockout';
 
 import apiHelper from 'api/apiHelper';
-import deXSS from 'utils/html/deXSS';
-import huePubSub from 'utils/huePubSub';
 import MetastoreColumn from 'apps/tableBrowser/metastoreColumn';
 import MetastoreTableSamples from 'apps/tableBrowser/metastoreTableSamples';
 import MetastoreTablePartitions from 'apps/tableBrowser/metastoreTablePartitions';
+import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from 'reactComponents/GlobalAlert/events';
+import deXSS from 'utils/html/deXSS';
+import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
 
 let contextPopoverTimeout = -1;
@@ -138,9 +139,9 @@ class MetastoreTable {
         })
         .catch(data => {
           this.refreshingTableStats(false);
-          $.jHueNotify.error(
-            I18n('An error occurred refreshing the table stats. Please try again.')
-          );
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+            message: I18n('An error occurred refreshing the table stats. Please try again.')
+          });
           console.error('apiHelper.refreshTableStats error');
           console.error(data);
         });
@@ -315,11 +316,12 @@ class MetastoreTable {
             this.partitions.loading(false);
             this.partitions.loaded(true);
           }
-
+          // Currently checking for Impala and Hive
+          const viewSqlPropertyColumnNames = new Set(['view original text:', 'original query:']);
           const found =
             analysis.properties &&
             analysis.properties.some(property => {
-              if (property.col_name.toLowerCase() === 'view original text:') {
+              if (viewSqlPropertyColumnNames.has(property.col_name.toLowerCase())) {
                 apiHelper
                   .formatSql({ statements: property.data_type })
                   .then(formatResponse => {
@@ -365,7 +367,7 @@ class MetastoreTable {
         if (resp.history_uuid) {
           huePubSub.publish('notebook.task.submitted', resp);
         } else {
-          huePubSub.publish('hue.global.error', { message: resp.message });
+          huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: resp.message });
         }
       });
     };
@@ -378,11 +380,11 @@ class MetastoreTable {
           if (data && data.status === 0) {
             this.relationshipsDetails(ko.mapping.fromJS(data));
           } else {
-            huePubSub.publish('hue.global.error', { message: data.message });
+            huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: data.message });
           }
         })
         .fail(xhr => {
-          $(document).trigger('info', xhr.responseText);
+          huePubSub.publish(GLOBAL_INFO_TOPIC, { message: xhr.responseText });
         });
     };
   }
@@ -422,7 +424,7 @@ class MetastoreTable {
         $('#import-data-modal').html(data['data']);
       })
       .fail(xhr => {
-        huePubSub.publish('hue.global.error', { message: xhr.responseText });
+        huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: xhr.responseText });
       });
   }
 

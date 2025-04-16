@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ko.assistKey.js should render component 1`] = `
-"<div data-bind=\\"descendantsComplete: descendantsComplete, component: { name: &quot;hue-assist-key&quot;, params: params }\\"><a class=\\"assist-field-link\\" style=\\"padding: 0 2px;\\" href=\\"javascript: void(0);\\" data-bind=\\"
+"<div data-bind="descendantsComplete: descendantsComplete, component: { name: &quot;hue-assist-key&quot;, params: params }"><a class="assist-field-link" style="padding: 0 2px;" href="javascript: void(0);" data-bind="
           tooltip: {
             title: foreignKeyTooltipHtml,
             html: true,
@@ -9,15 +9,15 @@ exports[`ko.assistKey.js should render component 1`] = `
           },
           click: foreignKeyClick,
           clickbubble: false
-        \\" data-original-title=\\"\\"><i class=\\"fa fa-key\\"></i></a><i class=\\"fa fa-key\\" style=\\"padding: 0 2px;\\" data-bind=\\"
+        " data-original-title=""><i class="fa fa-key"></i></a><i class="fa fa-key" style="padding: 0 2px;" data-bind="
           tooltip: {
             title: 'Foreign Key',
             placement: 'bottom'
           }
-        \\" data-original-title=\\"\\"></i><i class=\\"fa fa-key\\" style=\\"padding: 0 2px;\\" data-bind=\\"
+        " data-original-title=""></i><i class="fa fa-key" style="padding: 0 2px;" data-bind="
         tooltip: {
           title: entry.isPrimaryKey() ? 'Primary Key' : 'Partition Key',
           placement: 'bottom'
         }
-      \\" data-original-title=\\"\\"></i><i class=\\"fa fa-key\\"></i></div>"
+      " data-original-title=""></i><i class="fa fa-key"></i></div>"
 `;

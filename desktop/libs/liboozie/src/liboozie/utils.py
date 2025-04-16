@@ -18,34 +18,20 @@
 """
 Misc helper functions
 """
-from __future__ import print_function
 
-from future import standard_library
-standard_library.install_aliases()
-from past.builtins import basestring
-
-import logging
 import re
-import sys
 import time
-
+import logging
 from datetime import datetime
-from dateutil.parser import parse
+from io import StringIO as string_io
 from time import strftime
 from xml.sax.saxutils import escape
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-  new_str = str
-else:
-  try:
-    from cStringIO import StringIO as string_io
-  except:
-    from StringIO import StringIO as string_io
-  new_str = unicode
+from dateutil.parser import parse
+from past.builtins import basestring
 
 LOG = logging.getLogger()
-_NAME_REGEX = re.compile('^[a-zA-Z][\-_a-zA-Z0-0]*$')
+_NAME_REGEX = re.compile(r'^[a-zA-Z][\-_a-zA-Z0-0]*$')
 
 
 def catch_unicode_time(u_time):
@@ -67,7 +53,7 @@ def parse_timestamp(timestamp, time_format=None):
     return time.strptime(timestamp, time_format)
   except ValueError:
     try:
-      return time.strptime(re.sub(' \w+$', '', timestamp), time_format.replace(' %Z', ''))
+      return time.strptime(re.sub(r' \w+$', '', timestamp), time_format.replace(' %Z', ''))
     except ValueError:
       LOG.error("Failed to convert Oozie timestamp: %s" % time_format)
   except Exception:
@@ -84,7 +70,7 @@ def config_gen(dic):
   print("<configuration>", file=sio)
   # if dic's key contains <,>,& then it will be escaped and if dic's value contains ']]>' then ']]>' will be stripped
   for k, v in sorted(dic.items()):
-    print("<property>\n  <name>%s</name>\n  <value><![CDATA[%s]]></value>\n</property>\n" \
+    print("<property>\n  <name>%s</name>\n  <value><![CDATA[%s]]></value>\n</property>\n"
         % (escape(k), v.replace(']]>', '') if isinstance(v, basestring) else v), file=sio)
   print("</configuration>", file=sio)
   sio.flush()
@@ -95,23 +81,24 @@ def config_gen(dic):
 def is_valid_node_name(name):
   return _NAME_REGEX.match(name) is not None
 
+
 def format_time(time, format='%d %b %Y %H:%M:%S'):
   if time is None:
     return ''
 
   fmt_time = None
-  if type(time) == new_str:
+  if type(time) is str:
     return time
   else:
     try:
       fmt_time = strftime(format, time)
-    except:
+    except Exception:
       fmt_time = None
 
     if fmt_time is None:
       try:
-        fmt_time = strftime(format+" %f", time)
-      except:
+        fmt_time = strftime(format + " %f", time)
+      except Exception:
         fmt_time = None
 
     return fmt_time

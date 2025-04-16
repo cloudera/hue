@@ -41,7 +41,6 @@ import 'jquery/plugins/jquery.hdfs.autocomplete';
 import 'jquery/plugins/jquery.hiveautocomplete';
 import 'jquery/plugins/jquery.horizontalscrollbar';
 import 'jquery/plugins/jquery.huedatatable';
-import 'jquery/plugins/jquery.notify';
 import 'jquery/plugins/jquery.rowselector';
 import 'jquery/plugins/jquery.scrollleft';
 import 'jquery/plugins/jquery.scrollup';

@@ -22,7 +22,7 @@ from boto.s3.keyfile import KeyFile
 
 from aws.conf import get_key_expiry
 from aws.s3 import translate_s3_error
-from aws.s3.s3connection import UrlKey
+
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 

@@ -21,13 +21,12 @@ import atexit
 import getpass
 import logging
 import os
+import pytest
 import shutil
 import socket
 import subprocess
 import threading
 import time
-
-from nose.tools import assert_equal, assert_true, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
@@ -47,6 +46,8 @@ _oozie_lock = threading.Lock()
 LOG = logging.getLogger()
 
 
+@pytest.mark.requires_hadoop
+@pytest.mark.integration
 class OozieServerProvider(object):
   """
   Setup a Oozie server.
@@ -54,8 +55,6 @@ class OozieServerProvider(object):
   OOZIE_TEST_PORT = '18001'
   OOZIE_HOME = get_run_root('ext/oozie/oozie')
 
-  requires_hadoop = True
-  integration = True
   is_oozie_running = False
 
   @classmethod
@@ -254,19 +253,19 @@ class TestMiniOozie(OozieServerProvider):
   def test_oozie_status(self):
     user = getpass.getuser()
 
-    assert_equal(get_oozie(user).get_oozie_status()['systemMode'], 'NORMAL')
+    assert get_oozie(user).get_oozie_status()['systemMode'] == 'NORMAL'
 
     if is_live_cluster():
-      assert_true(self.cluster.fs.exists('/user/oozie/share/lib'))
+      assert self.cluster.fs.exists('/user/oozie/share/lib')
     else:
-      assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': user}))
+      assert self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': user})
 
 
+@pytest.mark.requires_hadoop
+@pytest.mark.integration
 class TestOozieWorkspace(object):
-  requires_hadoop = True
-  integration = True
 
-  def setUp(self):
+  def setup_method(self):
     self.cluster = pseudo_hdfs4.shared_cluster()
     self.cli = make_logged_in_client(username='admin', is_superuser=True)
     grant_access('admin', 'admin', 'filebrowser')
@@ -276,12 +275,12 @@ class TestOozieWorkspace(object):
     reset = REMOTE_SAMPLE_DIR.set_for_testing('/tmp/oozie_test_workspace_has_enough_permissions')
     try:
       resp = self.cli.get('/desktop/debug/check_config')
-      assert_false('The permissions of workspace' in resp.content, resp)
+      assert not 'The permissions of workspace' in resp.content, resp
 
       self.cluster.fs.mkdir(REMOTE_SAMPLE_DIR.get())
-      assert_equal(oct(0o40755), oct(self.cluster.fs.stats(REMOTE_SAMPLE_DIR.get())["mode"]))
+      assert oct(0o40755) == oct(self.cluster.fs.stats(REMOTE_SAMPLE_DIR.get())["mode"])
       resp = self.cli.get('/desktop/debug/check_config')
-      assert_true('The permissions of workspace' in resp.content, resp)
+      assert 'The permissions of workspace' in resp.content, resp
 
       permissions_dict = {
           'group_read': True, 'other_execute': True, 'user_write': True, 'user_execute': True,
@@ -294,10 +293,10 @@ class TestOozieWorkspace(object):
 
       # Add write permission to Others
       response = self.cli.post("/filebrowser/chmod", kwargs)
-      assert_equal(oct(0o40757), oct(self.cluster.fs.stats(REMOTE_SAMPLE_DIR.get())["mode"]))
+      assert oct(0o40757) == oct(self.cluster.fs.stats(REMOTE_SAMPLE_DIR.get())["mode"])
 
       resp = self.cli.get('/desktop/debug/check_config')
-      assert_false('The permissions of workspace' in resp.content, resp)
+      assert not 'The permissions of workspace' in resp.content, resp
 
     finally:
       self.cluster.fs.rmdir(REMOTE_SAMPLE_DIR.get(), skip_trash=True)

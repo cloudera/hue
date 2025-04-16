@@ -23,7 +23,7 @@ from desktop import conf
 from desktop.auth.backend import is_admin
 from desktop.conf import USE_NEW_EDITOR
 from desktop.models import hue_version
-from desktop.lib.i18n import smart_unicode
+from desktop.lib.i18n import smart_str
 from desktop.webpack_utils import get_hue_bundles
 
 if sys.version_info[0] > 2:
@@ -55,7 +55,7 @@ if USE_NEW_EDITOR.get():
 
 <%def name="get_title(title)">
   % if title:
-    - ${smart_unicode(title)}
+    - ${smart_str(title)}
   % endif
 </%def>
 
@@ -569,11 +569,3 @@ ${ hueIcons.symbols() }
   }
   </script>
 % endif
-
-<div id="jHueNotify" class="alert alert-dismissible alert-warning hide">
-  <button type="button" class="close" data-dismiss="alert">
-    <span aria-hidden="true">&times;</span>
-    <span class="sr-only">${ _('Close') }</span>
-  </button>
-  <p class="message"></p>
-</div>
