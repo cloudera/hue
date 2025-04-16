@@ -10,7 +10,8 @@ permissions:
 
 jobs:
   pytest-codecov-comment:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,7 +26,7 @@ jobs:
         with:
           # This path is specific to Ubuntu
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/generate_requirements.py') }}
           restore-keys: |
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
@@ -39,16 +40,15 @@ jobs:
       - name: Build Hue
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc g++ build-essential python3.11-dev python3.11-venv python3.11-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
-          sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.11
-          sudo apt-get install -y python3-setuptools
-          sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
+          sudo apt-get install -y build-essential asciidoc libkrb5-dev libldap2-dev libsasl2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libgdbm-dev
 
           export PYTHON_VER=python3.11
+          export SKIP_PYTHONDEV_CHECK=true
           export ROOT=$PWD
           make apps test_prep
 
       - name: Run python unit tests
+        continue-on-error: true
         run: |
           ./build/env/bin/pytest
       
@@ -58,15 +58,15 @@ jobs:
           pytest-xml-coverage-path: ./reports/code-cov/coverage.xml
           junitxml-path: ./reports/pytest/test_report.xml
           junitxml-title: Pytest Report
-          title: Backend Code Coverage Report
-          badge-title: Backend Codecov
+          title: Python Coverage Report
+          badge-title: Python Code Coverage
           report-only-changed-files: true
           xml-skip-covered: true
           remove-link-from-badge: true
           default-branch: master
   
   python-ut-files-comment:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -86,7 +86,7 @@ jobs:
         id: check-test-files
         run: |
           if [[ "${{ steps.changed-test-files.outputs.test_any_changed }}" == "true" ]]; then
-            echo "comment_message=✅ Test files were modified. Ensure that the tests cover all relevant changes" >> $GITHUB_ENV
+            echo "comment_message=✅ Test files were modified. Ensure that the tests cover all relevant changes. ✅" >> $GITHUB_ENV
           else
             echo "comment_message=⚠️ No test files modified. Please ensure that changes are properly tested. ⚠️" >> $GITHUB_ENV
           fi
