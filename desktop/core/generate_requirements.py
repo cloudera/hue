@@ -158,7 +158,7 @@ class RequirementsGenerator:
         }
         self.pytorch_requirements = {
             "default": [
-                "--extra-index-url \"https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu\" torch==2.2.2+cpu torchvision==0.17.2+cpu",
+                "--extra-index-url https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu torch==2.2.2+cpu torchvision==0.17.2+cpu",
             ]
         }
         self.arch_requirements_map = {
