@@ -1489,11 +1489,8 @@ def _setup_oozie_examples(request):
 
 
 def _setup_notebook_examples(request):
-  connector_id = request.POST.get('connector_id')
-  if not connector_id:
-    return JsonResponse({'message': "Missing parameter: connector_id is required."}, status=400)
+  connector = Connector.objects.get(id=request.POST.get('connector_id'))
 
-  connector = Connector.objects.get(id=connector_id)
   if connector:
     dialect = connector.dialect
     db_name = request.POST.get('database_name', 'default')

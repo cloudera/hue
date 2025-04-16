@@ -869,14 +869,6 @@ class TestInstallAppExampleAPI:
           dialect='impala', db_name='test_db', user=request.user, request=request, interpreter='mock_interpreter'
         )
 
-  def test_setup_notebook_examples_missing_connector_id(self):
-    request = Mock(method='POST', POST={}, user=Mock())
-
-    response = _setup_notebook_examples(request)
-
-    assert response.status_code == 400
-    assert json.loads(response.content.decode('utf-8'))['message'] == 'Missing parameter: connector_id is required.'
-
   def test_setup_notebook_examples_existing_connector(self):
     with patch('desktop.api2.Connector.objects.get') as mock_get_connector:
       with patch('desktop.api2.beeswax_install_examples.Command.handle') as mock_command:
@@ -895,7 +887,7 @@ class TestInstallAppExampleAPI:
     with patch('desktop.api2.Connector.objects.get') as mock_get_connector:
       with patch('desktop.api2.beeswax_install_examples.Command.handle') as mock_beeswax_install_command:
         with patch('desktop.api2.notebook_setup.Command.handle') as mock_notebook_setup_command:
-          request = Mock(method='POST', POST={'app_name': 'notebook', 'dialect': 'spark', 'connector_id': '1'}, user=Mock())
+          request = Mock(method='POST', POST={'app_name': 'notebook', 'dialect': 'spark'}, user=Mock())
           mock_get_connector.return_value = None
 
           _setup_notebook_examples(request)
