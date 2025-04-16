@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import Select from 'cuix/dist/components/Select/Select';
 import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
 import { i18nReact } from '../../../../utils/i18nReact';
@@ -33,14 +33,17 @@ const SourceConfiguration = ({
 }: SourceConfigurationProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const onChange = (value: string | number | boolean, name: keyof FileFormatResponse) => {
-    if (fileFormat) {
-      setFileFormat({
-        ...fileFormat,
-        [name]: value
-      });
-    }
-  };
+  const onChange = useCallback(
+    (value: string | number | boolean, name: keyof FileFormatResponse) => {
+      if (fileFormat) {
+        setFileFormat({
+          ...fileFormat,
+          [name]: value
+        });
+      }
+    },
+    [fileFormat, setFileFormat]
+  );
 
   return (
     <details className="hue-importer-configuration">
