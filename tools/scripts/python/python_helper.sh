@@ -19,15 +19,15 @@
 set -ex
 
 # Find the latest Python binary in build/env/bin
-LATEST_PYTHON=$(find "$HUE_HOME_DIR/build/env/bin" -name "python3*" -exec basename {} \; | sort -V | tail -n 1)
+LATEST_PYTHON=$([ -d "$HUE_HOME_DIR/build/env/bin" ] && find "$HUE_HOME_DIR/build/env/bin" -name "python3*" -exec basename {} \; | sort -V | tail -n 1 || echo "")
 
 # Extract version from the latest python binary (e.g., python3.11 → 3.11)
-LATEST_PYTHON_VERSION=$(echo "$LATEST_PYTHON" | grep -oP '\d+\.\d+')
+LATEST_PYTHON_VERSION=$(echo "$LATEST_PYTHON" | grep -oP '\d+\.\d+' || echo "")
 
 # Find all supported python versions from build/venvs and include latest version
 readarray -t SUPPORTED_VERSIONS < <(
   (
-    find "$HUE_HOME_DIR/build/venvs" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | grep -oP '\d+\.\d+';
+    [ -d "$HUE_HOME_DIR/build/venvs" ] && find "$HUE_HOME_DIR/build/venvs" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | grep -oP '\d+\.\d+'
     echo "$LATEST_PYTHON_VERSION"
   ) | sort -Vr | uniq
 )
