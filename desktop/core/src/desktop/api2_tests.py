@@ -737,7 +737,6 @@ class TestDocumentGist(object):
 
 
 class TestAvailableAppExamplesAPI:
-
   # Using custom MockApp instead of Mock to avoid conflicts with Mock's built in 'name' attribute.
   @dataclass
   class MockApp:
@@ -889,6 +888,18 @@ class TestInstallAppExampleAPI:
         with patch('desktop.api2.notebook_setup.Command.handle') as mock_notebook_setup_command:
           request = Mock(method='POST', POST={'app_name': 'notebook', 'dialect': 'spark'}, user=Mock())
           mock_get_connector.return_value = None
+
+          _setup_notebook_examples(request)
+
+          assert not mock_beeswax_install_command.called
+          mock_notebook_setup_command.assert_called_once_with(dialect='spark', user=request.user)
+
+  def test_setup_notebook_examples_connector_exception(self):
+    with patch('desktop.api2.Connector.objects.get') as mock_get_connector:
+      with patch('desktop.api2.beeswax_install_examples.Command.handle') as mock_beeswax_install_command:
+        with patch('desktop.api2.notebook_setup.Command.handle') as mock_notebook_setup_command:
+          request = Mock(method='POST', POST={'app_name': 'notebook', 'dialect': 'spark'}, user=Mock())
+          mock_get_connector.side_effect = Exception('Connector matching query does not exist.')
 
           _setup_notebook_examples(request)
 
