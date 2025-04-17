@@ -64,6 +64,7 @@ desktop/core/ext-py/lxml/src/lxml/lxml-version.h
 # Coverage reports
 .coverage*
 coverage.xml
+reports
 
 # Pytest reports
 report.html
