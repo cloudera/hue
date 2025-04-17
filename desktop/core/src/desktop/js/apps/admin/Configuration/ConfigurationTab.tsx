@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Spin, Alert } from 'antd';
+import Loading from 'cuix/dist/components/Loading';
+import Alert from 'cuix/dist/components/Alert';
 import { i18nReact } from '../../../utils/i18nReact';
 import AdminHeader from '../AdminHeader';
 import { ConfigurationValue } from './ConfigurationValue';
@@ -150,7 +151,7 @@ const Configuration: React.FC = (): JSX.Element => {
 
   return (
     <div className="config-component">
-      <Spin spinning={loading}>
+      <Loading spinning={loading}>
         {error && (
           <Alert
             message={`Error: ${error}`}
@@ -182,7 +183,7 @@ const Configuration: React.FC = (): JSX.Element => {
               ))}
           </>
         )}
-      </Spin>
+      </Loading>
     </div>
   );
 };
