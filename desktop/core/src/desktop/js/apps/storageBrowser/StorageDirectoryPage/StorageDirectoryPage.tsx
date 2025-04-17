@@ -158,7 +158,7 @@ const StorageDirectoryPage = ({
     {
       enabled: !!listDirectoryError,
       message: t('An error occurred while fetching the data'),
-      action: t('Retry'),
+      actionText: t('Retry'),
       onClick: reloadFilesData
     }
   ];

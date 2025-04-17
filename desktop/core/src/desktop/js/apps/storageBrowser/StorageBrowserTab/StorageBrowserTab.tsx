@@ -16,13 +16,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { Alert } from 'antd';
+import { AxiosError } from 'axios';
 import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
 import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 
 import { i18nReact } from '../../../utils/i18nReact';
-
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
 import { FILE_STATS_API_URL, TRASH_PATH } from '../api';
@@ -84,7 +84,8 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     loading,
     error,
     reloadData
-  } = useLoadData<FileStats>(FILE_STATS_API_URL, {
+  } = useLoadData<FileStats, { path: string }, AxiosError>(FILE_STATS_API_URL, {
+    fetchOptions: { isRawError: true },
     params: { path: filePath },
     skip: !filePath
   });
@@ -103,23 +104,29 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
 
   const errorConfig = [
     {
-      enabled: error?.response?.status === 404,
-      message: t('Error: Path "{{path}}" not found.', { path: filePath }),
-      action: t('Go to home directory'),
+      enabled: error?.response?.status === 404 && filePath !== fileSystem.userHomeDirectory,
+      message: t('Path "{{path}}" does not exist.', { path: filePath }),
+      actionText: t('Go to home directory'),
       onClick: () => setFilePath(fileSystem.userHomeDirectory)
     },
     {
+      enabled: error?.response?.status === 404 && filePath === fileSystem.userHomeDirectory,
+      message: t('User home directory "{{path}}" not created, Please contact support.', {
+        path: filePath
+      })
+    },
+    {
       enabled: !!error && error?.response?.status !== 404,
-      message: t('An error occurred while fetching filesystem "{{fileSystem}}".', {
-        fileSystem: fileSystem.name.toUpperCase()
+      message: t('An error occurred while fetching path "{{path}}".', {
+        path: filePath
       }),
-      action: t('Retry'),
+      actionText: t('Retry'),
       onClick: reloadData
     }
   ];
 
   return (
-    <LoadingErrorWrapper loading={loading} errors={errorConfig}>
+    <LoadingErrorWrapper loading={loading} errors={errorConfig} hideOnError>
       <div className="hue-storage-browser-tab" data-testid={testId}>
         <div
           className="hue-storage-browser-tab__title-bar-container"
