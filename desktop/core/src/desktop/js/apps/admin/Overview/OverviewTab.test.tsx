@@ -16,7 +16,8 @@
 
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Overview from './OverviewTab';
 import * as hueConfigModule from '../../../config/hueConfig';
 import Examples from './Examples';
@@ -61,15 +62,16 @@ describe('OverviewTab', () => {
       render(<Analytics />);
       const checkbox = screen.getByLabelText(/Help improve Hue with anonymous usage analytics./i);
 
-      fireEvent.click(checkbox);
-      await waitFor(() => expect(checkbox).toBeChecked());
+      expect(checkbox).not.toBeChecked();
+      await userEvent.click(checkbox);
+      expect(checkbox).toBeChecked();
       expect(post).toHaveBeenCalledWith('/about/update_preferences', {
-        collect_usage: 'on'
+        collect_usage: true
       });
-      fireEvent.click(checkbox);
+      userEvent.click(checkbox);
       await waitFor(() => expect(checkbox).not.toBeChecked());
       expect(post).toHaveBeenCalledWith('/about/update_preferences', {
-        collect_usage: null
+        collect_usage: false
       });
     });
   });
@@ -78,7 +80,8 @@ describe('OverviewTab', () => {
     const availableAppsResponse = {
       apps: {
         hive: 'Hive',
-        impala: 'Impala'
+        impala: 'Impala',
+        search: 'Solr Search'
       }
     };
     beforeEach(() => {
@@ -109,14 +112,34 @@ describe('OverviewTab', () => {
       });
     });
 
-    test('post call to install app example when the install button is clicked', async () => {
+    test('post call to install apps without data like hive when the install button is clicked', async () => {
       render(<Examples />);
 
       await waitFor(() => {
         const installButton = screen.getByText('Hive');
-        fireEvent.click(installButton);
+        userEvent.click(installButton);
         expect(post).toHaveBeenCalledWith(INSTALL_APP_EXAMPLES_API_URL, { app_name: 'hive' });
       });
+    });
+
+    test('post call to install Solr Search example and its data when the install button is clicked', async () => {
+      render(<Examples />);
+
+      const solrData = ['log_analytics_demo', 'twitter_demo', 'yelp_demo'];
+      await waitFor(() => screen.getByText('Solr Search'));
+      const installButton = screen.getByText('Solr Search');
+      userEvent.click(installButton);
+
+      await waitFor(() => {
+        solrData.forEach(dataEntry => {
+          expect(post).toHaveBeenCalledWith(INSTALL_APP_EXAMPLES_API_URL, {
+            app_name: 'search',
+            data: dataEntry
+          });
+        });
+      });
+
+      expect(post).toHaveBeenCalledTimes(solrData.length);
     });
   });
 });

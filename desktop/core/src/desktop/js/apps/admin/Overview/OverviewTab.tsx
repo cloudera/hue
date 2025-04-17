@@ -47,7 +47,7 @@ const Overview = (): JSX.Element => {
     <div className="hue-overview-component">
       <Tabs tabPosition="left" items={items} />
       <div className="overview__trademark-text">
-        t('Hue and the Hue logo are trademarks of Cloudera, Inc.')
+        {t('Hue and the Hue logo are trademarks of Cloudera, Inc.')}
       </div>
     </div>
   );

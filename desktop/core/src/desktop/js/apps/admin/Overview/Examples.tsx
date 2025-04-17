@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React, { useState, useEffect } from 'react';
-import { Button } from 'antd';
+import LinkButton from 'cuix/dist/components/Button/LinkButton';
 import { DownloadOutlined } from '@ant-design/icons';
 import Loading from 'cuix/dist/components/Loading';
 import {
@@ -46,7 +46,6 @@ const Examples = (): JSX.Element => {
 
   useEffect(() => {
     const fetchAvailableApps = async () => {
-      setLoading(true);
       try {
         const response = await get(INSTALL_AVAILABLE_EXAMPLES_API_URL, {});
         if (response.apps) {
@@ -66,7 +65,12 @@ const Examples = (): JSX.Element => {
     fetchAvailableApps();
   }, []);
 
-  const handleInstall = async exampleApp => {
+  const installExamplesCall = async (url: string, data: Record<string, unknown>) => {
+    const response = await post<InstallExamplesResponse>(url, data);
+    return response;
+  };
+
+  const handleInstall = (exampleApp: { id: string; name: string }) => {
     setInstallingAppId(exampleApp.id);
     const url = INSTALL_APP_EXAMPLES_API_URL;
 
@@ -82,36 +86,29 @@ const Examples = (): JSX.Element => {
         actualAppName = exampleApp.id;
     }
 
-    const payload = { app_name: actualAppName };
-
-    const appWithExtraData = exampleAppsWithData.find(app => app.id === exampleApp.id);
-    if (appWithExtraData && appWithExtraData.data) {
-      payload['data'] = appWithExtraData.data;
-      appWithExtraData.data.map(eachData => {
-        payload['data'] = eachData;
-        installExamplesCall(url, payload);
-      });
-    } else {
-      installExamplesCall(url, payload);
+    try {
+      const appWithExtraData = exampleAppsWithData.find(app => app.id === exampleApp.id);
+      if (appWithExtraData && appWithExtraData.data) {
+        for (const eachData of appWithExtraData.data) {
+          installExamplesCall(url, {
+            app_name: actualAppName,
+            data: eachData
+          });
+        }
+      } else {
+        installExamplesCall(url, { app_name: actualAppName });
+      }
+      const message = t('Examples refreshed');
+      huePubSub.publish('hue.global.info', { message });
+    } catch (error) {
+      const errorMessage = error.message
+        ? error.message
+        : t('An error occurred while installing examples.');
+      huePubSub.publish('hue.global.error', { message: errorMessage });
+    } finally {
+      setInstallingAppId('');
     }
   };
-
-  function installExamplesCall(url, data) {
-    post<InstallExamplesResponse>(url, data)
-      .then(response => {
-        const message = response.message ? response.message : t('Examples refreshed');
-        huePubSub.publish('hue.global.info', { message });
-      })
-      .catch(error => {
-        const errorMessage = error.message
-          ? error.message
-          : t('An error occurred while installing examples.');
-        huePubSub.publish('hue.global.error', { message: errorMessage });
-      })
-      .finally(() => {
-        setInstallingAppId('');
-      });
-  }
 
   return (
     <div className="overview-examples">
@@ -121,14 +118,16 @@ const Examples = (): JSX.Element => {
       ) : (
         Object.entries(availableApps).map(([appId, appName]) => (
           <div key={appId}>
-            <Button
-              type="link"
+            <LinkButton
               onClick={() => handleInstall({ id: appId, name: appName })}
               disabled={installingAppId === appId}
               icon={<DownloadOutlined />}
+              className="examples__install-btn"
             >
-              {installingAppId === appId ? t('Installing...') : appName}
-            </Button>
+              {installingAppId === appId
+                ? t('Installing...')
+                : appName[0].toUpperCase() + appName.slice(1)}
+            </LinkButton>
           </div>
         ))
       )}
