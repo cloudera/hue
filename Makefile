@@ -159,6 +159,7 @@ $(BLD_DIR_ENV)/bin/python:
 	@mkdir -p $(BLD_DIR_ENV)
 	@$(SYS_PYTHON) -m pip install --upgrade pip==$(PIP_VERSION)
 	@$(SYS_PYTHON) -m pip install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
+	@$(eval RELOCATABLE := $(shell which virtualenv-make-relocatable))
 	@$(SYS_PYTHON) -m virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV) --copies
 	@echo "REQUIREMENT_FILE is $(REQUIREMENT_FILE)"
 	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
