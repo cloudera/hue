@@ -20,6 +20,7 @@ import Alert from 'cuix/dist/components/Alert';
 import Table from 'cuix/dist/components/Table';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { CHECK_CONFIG_EXAMPLES_API_URL } from '../Components/utils';
+import { HUE_DOCS_CONFIG_URL } from '../Components/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import './Overview.scss';
 
@@ -32,7 +33,7 @@ interface CheckConfigResponse {
   configErrors: ConfigError[];
 }
 
-function ConfigStatus(): JSX.Element {
+const ConfigStatus = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const { data, loading, error } = useLoadData<CheckConfigResponse>(CHECK_CONFIG_EXAMPLES_API_URL);
 
@@ -83,11 +84,7 @@ function ConfigStatus(): JSX.Element {
               <Alert
                 message={
                   <span>
-                    <a
-                      href="https://docs.gethue.com/administrator/configuration/"
-                      target="_blank"
-                      className="config__link"
-                    >
+                    <a href={HUE_DOCS_CONFIG_URL} target="_blank" className="config__link">
                       {t('Potential misconfiguration detected.')}
                     </a>{' '}
                     {t('Fix and restart Hue.')}
@@ -98,7 +95,7 @@ function ConfigStatus(): JSX.Element {
               />
 
               <Table
-                dataSource={data['configErrors']}
+                dataSource={data.configErrors}
                 columns={columns}
                 rowKey={record => `${record.name}-${record.message.slice(1, 50)}`}
                 pagination={false}
@@ -116,6 +113,6 @@ function ConfigStatus(): JSX.Element {
       )}
     </div>
   );
-}
+};
 
 export default ConfigStatus;

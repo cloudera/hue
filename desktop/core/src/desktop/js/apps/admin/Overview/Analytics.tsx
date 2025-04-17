@@ -33,15 +33,19 @@ const Analytics = (): JSX.Element => {
 
   const saveCollectUsagePreference = async (collectUsage: boolean) => {
     const response = await post<UpdatePreferences>(ANALYTICS_PREFERENCES_API_URL, {
-      collect_usage: collectUsage ? 'on' : null
+      collect_usage: collectUsage
     });
 
     if (response.status === 0) {
-      huePubSub.publish('hue.global.info', { message: t('Configuration updated') });
+      const successMessage = collectUsage
+        ? t('Analytics have been activated.')
+        : t('Analytics have been deactivated.');
+      huePubSub.publish('hue.global.info', { message: successMessage });
     } else {
-      huePubSub.publish('hue.global.error', {
-        message: t('Error updating configuration')
-      });
+      const errorMessage = collectUsage
+        ? t('Failed to activate analytics.')
+        : t('Failed to deactivate analytics.');
+      huePubSub.publish('hue.global.error', { message: errorMessage });
     }
   };
 
