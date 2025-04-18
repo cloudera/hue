@@ -1489,7 +1489,11 @@ def _setup_oozie_examples(request):
 
 
 def _setup_notebook_examples(request):
-  connector = Connector.objects.get(id=request.POST.get('connector_id'))
+  try:
+    connector = Connector.objects.get(id=request.POST.get('connector_id'))
+  except Exception as e:
+    LOG.error(f'Error getting connector: {e}')
+    connector = None
 
   if connector:
     dialect = connector.dialect
