@@ -50,7 +50,7 @@ export interface PaginatedTableProps<T> {
 }
 
 const TABLE_HEADER_HEIGHT = 47;
-const PAGINATION_HEIGHT = 49;
+const PAGINATION_HEIGHT = 50;
 
 const PaginatedTable = <T extends object>({
   loading = false,
@@ -101,7 +101,8 @@ const PaginatedTable = <T extends object>({
   const getColumnsFromConfig = (columnsConfig: ColumnProps<T>[]) => {
     return columnsConfig.map(col => ({
       ...col,
-      defaultSortOrder: sortByColumn === col.dataIndex ? sortOrder : undefined
+      defaultSortOrder: sortByColumn === col.dataIndex ? sortOrder : undefined,
+      showSorterTooltip: false
     }));
   };
 

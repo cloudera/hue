@@ -70,7 +70,7 @@ const CreateAndUploadAction = ({
     onActionSuccess();
   };
 
-  const { save, loading } = useSaveData(undefined, {
+  const { save, loading, error } = useSaveData(undefined, {
     postOptions: { qsEncodeData: true }, // TODO: Remove once API supports RAW JSON payload
     onSuccess: onApiSuccess,
     onError: onActionError
@@ -153,6 +153,7 @@ const CreateAndUploadAction = ({
           onSubmit={handleCreate}
           onClose={onModalClose}
           loading={loading}
+          error={error}
         />
       )}
       <Modal

@@ -14,47 +14,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ApiFetchOptions, get } from '../../../api/utils';
-import { AxiosError } from 'axios';
 import { convertKeysToCamelCase } from '../../../utils/string/changeCasing';
 
-export interface Options<T, U> {
+export interface Options<T, U, E> {
   params?: U;
-  fetchOptions?: ApiFetchOptions<T>;
+  fetchOptions?: ApiFetchOptions<T, E>;
   skip?: boolean;
   onSuccess?: (data: T) => void;
-  onError?: (error: AxiosError) => void;
+  onError?: (error: E) => void;
   pollInterval?: number;
   transformKeys?: 'camelCase' | 'none';
 }
 
-interface UseLoadDataProps<T> {
+interface UseLoadDataProps<T, E> {
   data?: T;
   loading: boolean;
-  error?: AxiosError;
+  error?: E;
   reloadData: () => Promise<T | undefined>;
 }
 
-const useLoadData = <T, U = unknown>(
+const useLoadData = <T, U = unknown, E = string>(
   url?: string,
-  options?: Options<T, U>
-): UseLoadDataProps<T> => {
-  const [localOptions, setLocalOptions] = useState<Options<T, U> | undefined>(options);
+  options?: Options<T, U, E>
+): UseLoadDataProps<T, E> => {
+  const [localOptions, setLocalOptions] = useState<Options<T, U, E> | undefined>(options);
   const [data, setData] = useState<T>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<AxiosError>();
+  const [error, setError] = useState<E>();
 
-  const fetchOptionsDefault: ApiFetchOptions<T> = {
+  const fetchOptionsDefault: ApiFetchOptions<T, E> = {
     silenceErrors: true,
-    ignoreSuccessErrors: true,
-    isRawError: true
+    ignoreSuccessErrors: true
   };
-
-  const fetchOptions = useMemo(
-    () => ({ ...fetchOptionsDefault, ...localOptions?.fetchOptions }),
-    [localOptions]
-  );
 
   const transformResponse = (data: T): T => {
     if (options?.transformKeys === 'none') {
@@ -78,8 +71,13 @@ const useLoadData = <T, U = unknown>(
       setLoading(true);
       setError(undefined);
 
+      const fetchOptions = {
+        ...fetchOptionsDefault,
+        ...localOptions?.fetchOptions
+      };
+
       try {
-        const response = await get<T, U>(url, localOptions?.params, fetchOptions);
+        const response = await get<T, U, E>(url, localOptions?.params, fetchOptions);
         const transformedResponse = transformResponse(response);
         setData(transformedResponse);
         if (localOptions?.onSuccess) {
@@ -87,15 +85,15 @@ const useLoadData = <T, U = unknown>(
         }
         return transformedResponse;
       } catch (error) {
-        setError(error as AxiosError);
+        setError(error as E);
         if (localOptions?.onError) {
-          localOptions.onError(error as AxiosError);
+          localOptions.onError(error as E);
         }
       } finally {
         setLoading(false);
       }
     },
-    [url, localOptions, fetchOptions]
+    [url, localOptions]
   );
 
   useEffect(() => {

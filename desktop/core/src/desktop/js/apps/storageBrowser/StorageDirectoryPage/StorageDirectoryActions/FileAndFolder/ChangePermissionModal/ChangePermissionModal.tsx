@@ -25,6 +25,7 @@ import PaginatedTable, {
 import { StorageDirectoryTableData } from '../../../../types';
 import { BULK_CHANGE_PERMISSION_API_URL } from '../../../../api';
 import { getInitialPermissions, Permission } from './ChangePermissionModal.util';
+import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './ChangePermissionModal.scss';
 
@@ -48,7 +49,7 @@ const ChangePermissionModal = ({
   const initialPermissions = getInitialPermissions(files);
   const [permissions, setPermissions] = useState<Permission[]>(initialPermissions);
 
-  const { save, loading } = useSaveData(BULK_CHANGE_PERMISSION_API_URL, {
+  const { save, loading, error } = useSaveData(BULK_CHANGE_PERMISSION_API_URL, {
     skip: !files.length,
     onSuccess,
     onError
@@ -131,6 +132,8 @@ const ChangePermissionModal = ({
     }
   ];
 
+  const errors = [{ enabled: !!error, message: error }];
+
   return (
     <Modal
       cancelText={t('Cancel')}
@@ -147,7 +150,9 @@ const ChangePermissionModal = ({
       cancelButtonProps={{ disabled: loading }}
       closable={!loading}
     >
-      <PaginatedTable<Permission> data={permissions} columns={columns} rowKey="key" />
+      <LoadingErrorWrapper errors={errors}>
+        <PaginatedTable<Permission> data={permissions} columns={columns} rowKey="key" />
+      </LoadingErrorWrapper>
     </Modal>
   );
 };

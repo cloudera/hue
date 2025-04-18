@@ -17,7 +17,6 @@
 import React from 'react';
 import Modal from 'cuix/dist/components/Modal';
 
-import huePubSub from '../../../../../../utils/huePubSub';
 import { i18nReact } from '../../../../../../utils/i18nReact';
 import formatBytes from '../../../../../../utils/formatBytes';
 import useLoadData from '../../../../../../utils/hooks/useLoadData/useLoadData';
@@ -36,13 +35,13 @@ interface SummaryModalProps {
 const SummaryModal = ({ isOpen = true, onClose, path }: SummaryModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { data, loading } = useLoadData<ContentSummary>(CONTENT_SUMMARY_API_URL, {
-    params: { path: path },
-    onError: error => {
-      huePubSub.publish('hue.error', error);
-    },
-    skip: path === '' || path === undefined
-  });
+  const { data, loading, error, reloadData } = useLoadData<ContentSummary>(
+    CONTENT_SUMMARY_API_URL,
+    {
+      params: { path: path },
+      skip: path === '' || path === undefined
+    }
+  );
 
   const summary = [
     {
@@ -75,6 +74,15 @@ const SummaryModal = ({ isOpen = true, onClose, path }: SummaryModalProps): JSX.
     { key: 'numberOfFiles', label: t('Number of Files'), value: data?.fileCount }
   ];
 
+  const errors = [
+    {
+      enabled: !!error,
+      message: error,
+      actionText: t('Retry'),
+      onClick: reloadData
+    }
+  ];
+
   const shortendPath =
     path.split('/').length > 4 ? '...' + path.split('/').slice(-4).join('/') : path;
 
@@ -86,7 +94,7 @@ const SummaryModal = ({ isOpen = true, onClose, path }: SummaryModalProps): JSX.
       onCancel={onClose}
       footer={false}
     >
-      <LoadingErrorWrapper loading={loading}>
+      <LoadingErrorWrapper loading={loading} errors={errors} hideOnError>
         <div className="hue-summary-modal__grid">
           {summary?.map(item => (
             <div key={item.key} className="hue-summary-modal__grid__summary-item">

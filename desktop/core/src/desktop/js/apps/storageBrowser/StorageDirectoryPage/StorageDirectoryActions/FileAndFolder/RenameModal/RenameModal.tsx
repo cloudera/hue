@@ -38,7 +38,7 @@ const RenameModal = ({
 }: RenameModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { save, loading } = useSaveData(RENAME_API_URL, {
+  const { save, loading, error } = useSaveData(RENAME_API_URL, {
     postOptions: { qsEncodeData: true }, // TODO: Remove once API supports RAW JSON payload
     skip: !file.path,
     onSuccess,
@@ -60,6 +60,7 @@ const RenameModal = ({
       inputType="text"
       initialValue={file.name}
       loading={loading}
+      error={error}
     />
   );
 };
