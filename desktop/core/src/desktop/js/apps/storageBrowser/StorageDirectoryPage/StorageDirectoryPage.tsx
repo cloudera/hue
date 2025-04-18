@@ -168,7 +168,7 @@ const StorageDirectoryPage = ({
       title: t('Name'),
       dataIndex: 'name',
       key: 'name',
-      sorter: true,
+      sorter: (filesData?.files?.length ?? 0) > 1,
       width: '40%',
       render: (_, record) => (
         <Tooltip title={record.name} mouseEnterDelay={1.5}>
@@ -190,7 +190,7 @@ const StorageDirectoryPage = ({
       dataIndex: 'size',
       key: 'size',
       width: '10%',
-      sorter: true
+      sorter: (filesData?.files?.length ?? 0) > 1
     },
     {
       title: t('User'),
@@ -215,7 +215,7 @@ const StorageDirectoryPage = ({
       dataIndex: 'mtime',
       key: 'mtime',
       width: '20%',
-      sorter: true
+      sorter: (filesData?.files?.length ?? 0) > 1
     }
   ];
 

@@ -101,7 +101,8 @@ const PaginatedTable = <T extends object>({
   const getColumnsFromConfig = (columnsConfig: ColumnProps<T>[]) => {
     return columnsConfig.map(col => ({
       ...col,
-      defaultSortOrder: sortByColumn === col.dataIndex ? sortOrder : undefined
+      defaultSortOrder: sortByColumn === col.dataIndex ? sortOrder : undefined,
+      showSorterTooltip: false
     }));
   };
 
