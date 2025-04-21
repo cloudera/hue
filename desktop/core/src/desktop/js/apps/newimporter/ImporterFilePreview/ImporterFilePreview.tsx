@@ -28,9 +28,9 @@ import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL, FINISH_IMPORT_URL } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
+import EditColumn from './EditColumn/EditColumn';
 
 import './ImporterFilePreview.scss';
-import ColumnModal from './ColumnModal/ColumnModal';
 
 interface ImporterFilePreviewProps {
   fileMetaData: FileMetaData;
@@ -132,7 +132,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       <div className="hue-importer-preview-page__main-section">
         <div className="hue-importer-preview-page__header-section">
           <SourceConfiguration fileFormat={fileFormat} setFileFormat={setFileFormat} />
-          <ColumnModal />
+          <EditColumn />
         </div>
         <PaginatedTable<ImporterTableData>
           loading={guessingFormat || guessingFields}

@@ -14,29 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React from 'react';
 import { i18nReact } from '../../../../utils/i18nReact';
-import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
-import ColumnModalTable from './ColumnModalTable';
-import '../SourceConfiguration/SourceConfiguration.scss';
+import Modal from 'cuix/dist/components/Modal';
+import './EditColumn.scss';
 
-const ColumnModal = (): JSX.Element => {
+interface EditColumnModalProps {
+  isOpen: boolean;
+  closeModal: () => void;
+}
+
+const EditColumnModal = ({ isOpen, closeModal }: EditColumnModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleClose = () => {
-    setIsOpen(false);
-  };
 
   return (
-    <div className="hue-importer-columnmodal">
-      <summary className="hue-importer-columnmodal__button" onClick={() => setIsOpen(true)}>
-        <ConfigureIcon />
-        {t('Edit Columns')}
-      </summary>
-      <ColumnModalTable isOpen={isOpen} closeModal={handleClose} />
-    </div>
+    <Modal
+      cancelText={t('Cancel')}
+      okText={t('Done')}
+      title={t('Edit Column')}
+      open={isOpen}
+      onCancel={closeModal}
+    />
   );
 };
 
-export default ColumnModal;
+export default EditColumnModal;

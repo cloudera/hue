@@ -20,14 +20,7 @@
   .hue-importer-configuration {
     padding: 16px;
 
-    &__dropdown {
-      border: 1px solid vars.$fluidx-gray-600;
-      border-radius: vars.$border-radius-base;
-      width: 100%;
-    }
-  }
-
-    .hue-importer-configuration__summary, .hue-importer-columnmodal__button {
+    &__summary {
       display: flex;
       gap: 8px;
       width: max-content;
@@ -35,6 +28,13 @@
       color: vars.$fluidx-blue-600;
       cursor: pointer;
     }
+
+    &__dropdown {
+      border: 1px solid vars.$fluidx-gray-600;
+      border-radius: vars.$border-radius-base;
+      width: 100%;
+    }
+  }
 
   .hue-importer-configuration-options {
     padding-top: 16px;

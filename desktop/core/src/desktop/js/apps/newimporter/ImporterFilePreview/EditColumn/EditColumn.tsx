@@ -14,35 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useState } from 'react';
 import { i18nReact } from '../../../../utils/i18nReact';
-import Button from 'cuix/dist/components/Button';
-import Modal from 'cuix/dist/components/Modal';
-import './ColumnModal.scss';
+import EditColumnModal from './EditColumnModal';
+import BorderlessButton from 'cuix/dist/components/Button/BorderlessButton';
+import '../SourceConfiguration/SourceConfiguration.scss';
 
-interface ColumnModalTableProps {
-  isOpen: boolean;
-  closeModal: () => void;
-}
-
-const ColumnModalTable = ({ isOpen, closeModal }: ColumnModalTableProps): JSX.Element => {
+const EditColumn = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
 
   return (
-    <Modal
-      title={t('Edit Column')}
-      open={isOpen}
-      onCancel={closeModal}
-      footer={[
-        <Button key="back" onClick={closeModal}>
-          {t('Cancel')}
-        </Button>,
-        <Button key="submit" onClick={closeModal}>
-          {t('Done')}
-        </Button>
-      ]}
-    ></Modal>
+    <div className="hue-importer-columnmodal">
+      <BorderlessButton onClick={() => setIsOpen(true)}>{t('Edit Columns')}</BorderlessButton>
+      <EditColumnModal isOpen={isOpen} closeModal={handleClose} />
+    </div>
   );
 };
 
-export default ColumnModalTable;
+export default EditColumn;
