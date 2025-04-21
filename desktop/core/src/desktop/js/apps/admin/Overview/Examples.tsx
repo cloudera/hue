@@ -70,7 +70,7 @@ const Examples = (): JSX.Element => {
     return response;
   };
 
-  const handleInstall = (exampleApp: { id: string; name: string }) => {
+  const handleInstall = async (exampleApp: { id: string; name: string }) => {
     setInstallingAppId(exampleApp.id);
     const url = INSTALL_APP_EXAMPLES_API_URL;
 
@@ -89,21 +89,22 @@ const Examples = (): JSX.Element => {
     try {
       const appWithExtraData = exampleAppsWithData.find(app => app.id === exampleApp.id);
       if (appWithExtraData && appWithExtraData.data) {
-        for (const eachData of appWithExtraData.data) {
+        const installPromises = appWithExtraData.data.map(eachData =>
           installExamplesCall(url, {
             app_name: actualAppName,
             data: eachData
-          });
-        }
+          })
+        );
+        await Promise.all(installPromises);
       } else {
-        installExamplesCall(url, { app_name: actualAppName });
+        await installExamplesCall(url, { app_name: actualAppName });
       }
-      const message = t('Examples refreshed');
+      const message = `${exampleApp.name} ${t('examples installed successfully')}`;
       huePubSub.publish('hue.global.info', { message });
     } catch (error) {
       const errorMessage = error.message
-        ? error.message
-        : t('An error occurred while installing examples.');
+        ? `${t('An error occurred while installing')} ${exampleApp.name}: ${error.message}`
+        : `${t('An error occurred while installing')} ${exampleApp.name}.`;
       huePubSub.publish('hue.global.error', { message: errorMessage });
     } finally {
       setInstallingAppId('');
