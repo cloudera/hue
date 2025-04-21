@@ -30,6 +30,7 @@ import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL, FINISH_IMPORT_URL } from '../a
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 
 import './ImporterFilePreview.scss';
+import ColumnModal from './ColumnModal/ColumnModal';
 
 interface ImporterFilePreviewProps {
   fileMetaData: FileMetaData;
@@ -129,7 +130,10 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       </div>
       <div className="hue-importer-preview-page__metadata">{t('DESTINATION')}</div>
       <div className="hue-importer-preview-page__main-section">
-        <SourceConfiguration fileFormat={fileFormat} setFileFormat={setFileFormat} />
+        <div className="hue-importer-preview-page__header-section">
+          <SourceConfiguration fileFormat={fileFormat} setFileFormat={setFileFormat} />
+          <ColumnModal />
+        </div>
         <PaginatedTable<ImporterTableData>
           loading={guessingFormat || guessingFields}
           data={tableData}

@@ -17,29 +17,7 @@
 @use 'variables' as vars;
 
 .antd.cuix {
-  .hue-importer-configuration {
-    padding: 16px;
-
-    &__dropdown {
-      border: 1px solid vars.$fluidx-gray-600;
-      border-radius: vars.$border-radius-base;
-      width: 100%;
-    }
-  }
-
-    .hue-importer-configuration__summary, .hue-importer-columnmodal__button {
-      display: flex;
-      gap: 8px;
-      width: max-content;
-      list-style: none;
-      color: vars.$fluidx-blue-600;
-      cursor: pointer;
-    }
-
-  .hue-importer-configuration-options {
-    padding-top: 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    grid-gap: 16px;
+  .hue-importer-columnmodal {
+    padding: vars.$fluidx-spacing-s;
   }
 }
