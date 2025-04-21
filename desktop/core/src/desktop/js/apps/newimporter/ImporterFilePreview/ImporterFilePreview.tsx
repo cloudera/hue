@@ -26,7 +26,7 @@ import { convertToAntdColumns, convertToDataSource } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
-import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL } from '../api';
+import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL, FINISH_IMPORT_URL } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 
 import './ImporterFilePreview.scss';
@@ -54,6 +54,9 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     loading: guessingFields
   } = useSaveData<GuessFieldTypesResponse>(GUESS_FIELD_TYPES_URL);
 
+  const { save, loading: finishingImport } =
+    useSaveData<GuessFieldTypesResponse>(FINISH_IMPORT_URL);
+
   useEffect(() => {
     const guessFormatPayload = {
       inputFormat: fileMetaData.source,
@@ -80,6 +83,28 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     guessFields(formData);
   }, [fileMetaData.path, fileFormat]);
 
+  const handleFinishImport = () => {
+    const source = {
+      inputFormat: fileMetaData.source,
+      path: fileMetaData.path,
+      format: fileFormat,
+      sourceType: 'hive'
+    };
+    const destination = {
+      outputFormat: 'table',
+      nonDefaultLocation: fileMetaData.path,
+      name: fileMetaData.path.split('/').pop(),
+      sourceType: 'hive',
+      columns: previewData?.columns
+    };
+
+    const formData = new FormData();
+    formData.append('source', JSON.stringify(source));
+    formData.append('destination', JSON.stringify(destination));
+
+    save(formData);
+  };
+
   const columns = convertToAntdColumns(previewData?.columns ?? []);
   const tableData = convertToDataSource(columns, previewData?.sample);
 
@@ -91,7 +116,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
           <BorderlessButton data-testid="hue-importer-preview-page__header__actions__cancel">
             {t('Cancel')}
           </BorderlessButton>
-          <PrimaryButton data-testid="hue-importer-preview-page__header__actions__finish">
+          <PrimaryButton loading={finishingImport} onClick={handleFinishImport}>
             {t('Finish Import')}
           </PrimaryButton>
         </div>
