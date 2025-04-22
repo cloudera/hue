@@ -42,9 +42,9 @@ export const sourceConfigs: {
     name: 'type',
     label: 'File Type',
     options: [
-      { value: SupportedFileTypes.CSV, label: 'CSV File' },
+      { value: SupportedFileTypes.CSV, label: 'CSV' },
       { value: SupportedFileTypes.JSON, label: 'JSON' },
-      { value: SupportedFileTypes.EXCEL, label: 'Excel File' }
+      { value: SupportedFileTypes.EXCEL, label: 'Excel' }
     ]
   },
   {
