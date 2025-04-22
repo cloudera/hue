@@ -45,7 +45,7 @@ describe('SourceConfiguration Component', () => {
   });
 
   it('should show fieldSepator and other downdown when fileType is CSV', () => {
-    const { getAllByRole } = render(
+    const { getAllByRole, getByText } = render(
       <SourceConfiguration
         fileFormat={{ ...mockFileFormat, type: SupportedFileTypes.CSV }}
         setFileFormat={mockSetFileFormat}
@@ -55,15 +55,25 @@ describe('SourceConfiguration Component', () => {
     const selectElement = getAllByRole('combobox');
 
     expect(selectElement).toHaveLength(5);
+    expect(getByText('File Type')).toBeInTheDocument();
+    expect(getByText('Has Header')).toBeInTheDocument();
+    expect(getByText('Field Separator')).toBeInTheDocument();
+    expect(getByText('Record Separator')).toBeInTheDocument();
+    expect(getByText('Quote Character')).toBeInTheDocument();
   });
 
   it('should not show fieldSepator and other downdown when fileType is not CSV', () => {
-    const { getAllByRole } = render(
+    const { getAllByRole, getByText, queryByText } = render(
       <SourceConfiguration fileFormat={mockFileFormat} setFileFormat={mockSetFileFormat} />
     );
 
     const selectElement = getAllByRole('combobox');
 
     expect(selectElement).toHaveLength(2);
+    expect(getByText('File Type')).toBeInTheDocument();
+    expect(getByText('Has Header')).toBeInTheDocument();
+    expect(queryByText('Field Separator')).not.toBeInTheDocument();
+    expect(queryByText('Record Separator')).not.toBeInTheDocument();
+    expect(queryByText('Quote Character')).not.toBeInTheDocument();
   });
 });
