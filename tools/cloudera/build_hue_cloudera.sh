@@ -49,10 +49,13 @@ function install_prerequisite() {
   fi
 
   export SQLITE3_PATH=${SQLITE3_PATH:-"$TOOLS_HOME/sqlite/bin/sqlite3"}
-  # check_sqlite3
+  check_sqlite3
   if [[ $1 == "centos7" ]]; then
     export PYTHON38_PATH=/opt/cloudera/cm-agent
-    export pip38_bin="$PYTHON38_PATH/bin/pip3.8"
+    export pip_bin="$PYTHON38_PATH/bin/pip3.8"
+    export PATH="$PYTHON38_PATH/bin:$PATH"
+    export SYS_PYTHON="$PYTHON38_PATH/bin/python3.8"
+    export SYS_PIP="$PYTHON38_PATH/bin/pip3.8"
     centos7_install
   elif [[ $1 == "redhat8" || $1 == "snapshot" ]]; then
     redhat8_install
@@ -127,18 +130,21 @@ for PYTHON_VER in "${PYTHON_VERSIONS[@]}"; do
   HUE_SRC=$(realpath "$WORK_DIR/../..")
   cd "$HUE_SRC" || exit 1
 
-  BLD_DIR="${BLD_DIR:-build}"             # Default build directory if not set
+  BLD_DIR="${BLD_DIR:-$HUE_SRC/build}"             # Default build directory if not set
   if [[ $PYTHON_VER == "python3.11" ]]; then
     BLD_DIR_ENV="${BLD_DIR}/env"
   else
     BLD_DIR_ENV="${BLD_DIR}/venvs/${PYTHON_VER}"
   fi
+  if [[ $DOCKEROS == "sles12" || $DOCKEROS == "centos7" || $DOCKEROS == "ubuntu20" ]]; then
+    BLD_DIR_ENV="${BLD_DIR}/env"
+  fi
   echo "BLD_DIR_ENV=${BLD_DIR_ENV}"
 
   big_console_header "Hue Build Start for" $PYTHON_VER "$@"
-  PYTHON_VER=$PYTHON_VER make apps docs relocatable-env huecheck
+  BLD_DIR_ENV=$BLD_DIR_ENV PYTHON_VER=$PYTHON_VER make apps docs relocatable-env huecheck
   big_console_header "Hue Build End for" $PYTHON_VER "$@"
 done
 big_console_header "Hue PROD Build Start for" "$@"
-make release
+BLD_DIR_ENV=$BLD_DIR_ENV PYTHON_VER=$PYTHON_VER make release
 big_console_header "Hue PROD Build End for" "$@"
