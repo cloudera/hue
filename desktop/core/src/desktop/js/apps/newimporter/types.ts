@@ -14,6 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const enum SupportedFileTypes {
+  CSV = 'csv',
+  JSON = 'json',
+  EXCEL = 'excel'
+}
+
 export interface LocalFileUploadResponse {
   local_file_url: string;
   file_type: string;
@@ -25,7 +31,7 @@ export interface FileFormatResponse {
   quoteChar: string;
   recordSeparator: string;
   status: number;
-  type: string;
+  type: SupportedFileTypes;
 }
 
 export interface FileMetaData {
