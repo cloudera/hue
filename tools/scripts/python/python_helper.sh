@@ -68,7 +68,7 @@ _python_bin_path() {
   return 1
 }
 
-selected_python_version() {
+_choose_python_version() {
   # returns the latest py version, e.g., 3.11, 3.9 or 3.8
   # if HUE_PYTHON_VERSION is set, use it
   if [ -n "$HUE_PYTHON_VERSION" ]; then
@@ -87,10 +87,10 @@ selected_python_version() {
   return 1
 }
 
-latest_venv_bin_path() {
+_venv_path() {
   # returns the path to the env/bin of the latest python,
   # relative to the top-level hue directory.
-  local version="$(selected_python_version)"
+  local version="$1"
 
   if [ -z "$version" ]; then
     return 1  # Return error if no version provided/found
@@ -102,3 +102,6 @@ latest_venv_bin_path() {
     echo "build/venvs/python${version}/bin"
   fi
 }
+
+export SELECTED_PYTHON_VERSION="$(_choose_python_version)"
+export VENV_BIN_PATH=${HUE_HOME_DIR}/$(_venv_path "$SELECTED_PYTHON_VERSION")
