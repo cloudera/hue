@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import Select from 'cuix/dist/components/Select/Select';
 import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
 import { i18nReact } from '../../../../utils/i18nReact';
@@ -45,6 +45,11 @@ const SourceConfiguration = ({
     [fileFormat, setFileFormat]
   );
 
+  const filteredSourceConfigs = useMemo(
+    () => sourceConfigs.filter(config => !config.hidden?.(fileFormat?.type)),
+    [fileFormat?.type]
+  );
+
   return (
     <details className="hue-importer-configuration">
       <summary className="hue-importer-configuration__summary">
@@ -52,22 +57,20 @@ const SourceConfiguration = ({
         {t('Configure source')}
       </summary>
       <div className="hue-importer-configuration-options">
-        {sourceConfigs
-          .filter(config => !config.hidden?.(fileFormat?.type))
-          .map(config => (
-            <div key={config.name}>
-              <label htmlFor={config.name}>{t(config.label)}</label>
-              <Select
-                bordered={true}
-                className="hue-importer-configuration__dropdown"
-                id={config.name}
-                options={config.options}
-                onChange={value => onChange(value, config.name)}
-                value={fileFormat?.[config.name]}
-                getPopupContainer={triggerNode => triggerNode.parentElement}
-              />
-            </div>
-          ))}
+        {filteredSourceConfigs.map(config => (
+          <div key={config.name}>
+            <label htmlFor={config.name}>{t(config.label)}</label>
+            <Select
+              bordered={true}
+              className="hue-importer-configuration__dropdown"
+              id={config.name}
+              options={config.options}
+              onChange={value => onChange(value, config.name)}
+              value={fileFormat?.[config.name]}
+              getPopupContainer={triggerNode => triggerNode.parentElement}
+            />
+          </div>
+        ))}
       </div>
     </details>
   );

@@ -3,14 +3,14 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import SourceConfiguration from './SourceConfiguration';
-import { FileFormatResponse, SupportedFileTypes } from '../../types';
+import { FileFormatResponse, ImporterFileTypes } from '../../types';
 
 describe('SourceConfiguration Component', () => {
   const mockSetFileFormat = jest.fn();
   const mockFileFormat: FileFormatResponse = {
     quoteChar: '"',
     recordSeparator: '\\n',
-    type: SupportedFileTypes.EXCEL,
+    type: ImporterFileTypes.EXCEL,
     hasHeader: true,
     fieldSeparator: ',',
     status: 0
@@ -39,7 +39,7 @@ describe('SourceConfiguration Component', () => {
     await waitFor(() =>
       expect(mockSetFileFormat).toHaveBeenCalledWith({
         ...mockFileFormat,
-        type: SupportedFileTypes.CSV
+        type: ImporterFileTypes.CSV
       })
     );
   });
@@ -47,7 +47,7 @@ describe('SourceConfiguration Component', () => {
   it('should show fieldSepator and other downdown when fileType is CSV', () => {
     const { getAllByRole, getByText } = render(
       <SourceConfiguration
-        fileFormat={{ ...mockFileFormat, type: SupportedFileTypes.CSV }}
+        fileFormat={{ ...mockFileFormat, type: ImporterFileTypes.CSV }}
         setFileFormat={mockSetFileFormat}
       />
     );

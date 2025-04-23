@@ -14,10 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const enum SupportedFileTypes {
+export const enum ImporterFileTypes {
   CSV = 'csv',
   JSON = 'json',
   EXCEL = 'excel'
+}
+
+export enum ImporterFileSource {
+  LOCAL = 'localfile',
+  REMOTE = 'file'
 }
 
 export interface LocalFileUploadResponse {
@@ -31,13 +36,13 @@ export interface FileFormatResponse {
   quoteChar: string;
   recordSeparator: string;
   status: number;
-  type: SupportedFileTypes;
+  type: ImporterFileTypes;
 }
 
 export interface FileMetaData {
   path: string;
-  type?: string;
-  source: 'localfile' | 'file';
+  type: ImporterFileTypes;
+  source: ImporterFileSource;
 }
 
 export type GuessFieldTypesColumn = {
