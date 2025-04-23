@@ -14,14 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import '@testing-library/jest-dom';
 import React from 'react';
+import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Overview from './OverviewTab';
-import * as hueConfigModule from '../../../config/hueConfig';
 import Examples from './Examples';
 import Analytics from './Analytics';
+import * as hueConfigModule from '../../../config/hueConfig';
+import { UPDATE_USAGE_ANALYTICS_API_URL } from '../Components/utils';
 import {
   INSTALL_APP_EXAMPLES_API_URL,
   INSTALL_AVAILABLE_EXAMPLES_API_URL
@@ -56,22 +57,29 @@ describe('OverviewTab', () => {
     expect(screen.getByText('Analytics')).toBeInTheDocument();
   });
 
-  describe('Analytics Component', () => {
+  describe('Analytics', () => {
+    beforeEach(() => {
+      (get as jest.Mock).mockResolvedValue({ analytics_enabled: false });
+    });
+
     test('renders Analytics tab and can interact with the checkbox', async () => {
-      (post as jest.Mock).mockResolvedValue({ status: 0, message: 'Success' });
       render(<Analytics />);
+
       const checkbox = screen.getByLabelText(/Help improve Hue with anonymous usage analytics./i);
 
       expect(checkbox).not.toBeChecked();
+      (post as jest.Mock).mockResolvedValueOnce({ analytics_enabled: true });
       await userEvent.click(checkbox);
       expect(checkbox).toBeChecked();
-      expect(post).toHaveBeenCalledWith('/about/update_preferences', {
-        collect_usage: true
+      expect(post).toHaveBeenCalledWith(UPDATE_USAGE_ANALYTICS_API_URL, {
+        analytics_enabled: true
       });
-      userEvent.click(checkbox);
+
+      (post as jest.Mock).mockResolvedValueOnce({ analytics_enabled: false });
+      await userEvent.click(checkbox);
       await waitFor(() => expect(checkbox).not.toBeChecked());
-      expect(post).toHaveBeenCalledWith('/about/update_preferences', {
-        collect_usage: false
+      expect(post).toHaveBeenCalledWith(UPDATE_USAGE_ANALYTICS_API_URL, {
+        analytics_enabled: false
       });
     });
   });

@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 import Input from 'cuix/dist/components/Input';
-import { post } from '../../../api/utils';
-import { ANALYTICS_PREFERENCES_API_URL } from '../Components/utils';
+import { get, post } from '../../../api/utils';
+import { GET_USAGE_ANALYTICS_API_URL, UPDATE_USAGE_ANALYTICS_API_URL } from '../Components/utils';
 import './Overview.scss';
 
-interface UpdatePreferences {
-  status: number;
+interface UsageAnalyticsResponse {
+  analytics_enabled: boolean;
   message?: string;
 }
 
@@ -31,28 +31,46 @@ const Analytics = (): JSX.Element => {
   const [collectUsage, setCollectUsage] = useState<boolean>(false);
   const { t } = i18nReact.useTranslation();
 
-  const saveCollectUsagePreference = async (collectUsage: boolean) => {
-    const response = await post<UpdatePreferences>(ANALYTICS_PREFERENCES_API_URL, {
-      collect_usage: collectUsage
-    });
+  useEffect(() => {
+    const fetchAnalyticsPreference = async () => {
+      try {
+        const response = await get<UsageAnalyticsResponse>(GET_USAGE_ANALYTICS_API_URL);
+        if (response && response.analytics_enabled !== undefined) {
+          setCollectUsage(response.analytics_enabled);
+        }
+      } catch (error) {
+        console.error('Error fetching usage analytics settings:', error);
+      }
+    };
 
-    if (response.status === 0) {
-      const successMessage = collectUsage
-        ? t('Analytics have been activated.')
-        : t('Analytics have been deactivated.');
-      huePubSub.publish('hue.global.info', { message: successMessage });
-    } else {
-      const errorMessage = collectUsage
+    fetchAnalyticsPreference();
+  }, []);
+
+  const saveCollectUsagePreference = async (newPreference: boolean) => {
+    try {
+      const response = await post<UsageAnalyticsResponse>(UPDATE_USAGE_ANALYTICS_API_URL, {
+        analytics_enabled: newPreference
+      });
+
+      if (response && response.analytics_enabled !== undefined) {
+        setCollectUsage(response.analytics_enabled);
+        const successMessage = newPreference
+          ? t('Analytics have been activated.')
+          : t('Analytics have been deactivated.');
+        huePubSub.publish('hue.global.info', { message: successMessage });
+      }
+    } catch (error) {
+      console.error('Error updating usage analytics settings:', error);
+      const errorMessage = newPreference
         ? t('Failed to activate analytics.')
         : t('Failed to deactivate analytics.');
       huePubSub.publish('hue.global.error', { message: errorMessage });
     }
   };
 
-  const handleCheckboxChange = event => {
+  const handleCheckboxChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const newPreference = event.target.checked;
-    setCollectUsage(newPreference);
-    saveCollectUsagePreference(newPreference);
+    await saveCollectUsagePreference(newPreference);
   };
 
   return (
