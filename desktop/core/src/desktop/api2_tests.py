@@ -931,7 +931,7 @@ class TestCheckConfigAPI:
   def test_check_config_success(self):
     with patch('desktop.api2.os.path.realpath') as mock_hue_conf_dir:
       with patch('desktop.api2._get_config_errors') as mock_get_config_errors:
-        request = Mock(method='POST')
+        request = Mock(method='GET')
         mock_hue_conf_dir.return_value = '/test/hue/conf'
         mock_get_config_errors.return_value = [
           {"name": "Hive", "message": "The application won't work without a running HiveServer2."},
