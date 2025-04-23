@@ -16,11 +16,11 @@
 
 import React, { useState } from 'react';
 import { i18nReact } from '../../../../utils/i18nReact';
-import EditColumnModal from './EditColumnModal';
+import EditColumnsModal from './EditColumnsModal';
 import BorderlessButton from 'cuix/dist/components/Button/BorderlessButton';
 import '../SourceConfiguration/SourceConfiguration.scss';
 
-const EditColumn = (): JSX.Element => {
+const EditColumns = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -29,11 +29,11 @@ const EditColumn = (): JSX.Element => {
   };
 
   return (
-    <div className="hue-importer-columnmodal">
+    <div className="hue-importer-edit-columns">
       <BorderlessButton onClick={() => setIsOpen(true)}>{t('Edit Columns')}</BorderlessButton>
-      <EditColumnModal isOpen={isOpen} closeModal={handleClose} />
+      <EditColumnsModal isOpen={isOpen} closeModal={handleClose} />
     </div>
   );
 };
 
-export default EditColumn;
+export default EditColumns;

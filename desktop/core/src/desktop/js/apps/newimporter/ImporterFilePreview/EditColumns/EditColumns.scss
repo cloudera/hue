@@ -14,28 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
-import { i18nReact } from '../../../../utils/i18nReact';
-import Modal from 'cuix/dist/components/Modal';
-import './EditColumn.scss';
+@use 'variables' as vars;
 
-interface EditColumnModalProps {
-  isOpen: boolean;
-  closeModal: () => void;
+.antd.cuix {
+  .hue-importer-edit-columns {
+    padding: vars.$fluidx-spacing-s;
+  }
 }
-
-const EditColumnModal = ({ isOpen, closeModal }: EditColumnModalProps): JSX.Element => {
-  const { t } = i18nReact.useTranslation();
-
-  return (
-    <Modal
-      cancelText={t('Cancel')}
-      okText={t('Done')}
-      title={t('Edit Column')}
-      open={isOpen}
-      onCancel={closeModal}
-    />
-  );
-};
-
-export default EditColumnModal;
