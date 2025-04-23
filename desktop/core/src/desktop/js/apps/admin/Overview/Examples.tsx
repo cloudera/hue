@@ -99,12 +99,12 @@ const Examples = (): JSX.Element => {
       } else {
         await installExamplesCall(url, { app_name: actualAppName });
       }
-      const message = `${exampleApp.name} ${t('examples installed successfully')}`;
+      const message = `${actualAppName} ${t('examples installed successfully')}`;
       huePubSub.publish('hue.global.info', { message });
     } catch (error) {
       const errorMessage = error.message
-        ? `${t('An error occurred while installing')} ${exampleApp.name}: ${error.message}`
-        : `${t('An error occurred while installing')} ${exampleApp.name}.`;
+        ? `${t('An error occurred while installing')} ${actualAppName}: ${error.message}`
+        : `${t('An error occurred while installing')} ${actualAppName}.`;
       huePubSub.publish('hue.global.error', { message: errorMessage });
     } finally {
       setInstallingAppId('');
