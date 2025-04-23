@@ -114,7 +114,7 @@ const MetricsTable: React.FC<MetricsTableProps> = ({ caption, dataSource }) => {
     () =>
       dataSource.map(item => ({
         ...item,
-        name: t(metricLabels[item.name]) || item.name
+        name: metricLabels[item.name] || item.name
       })),
     [dataSource]
   );
