@@ -94,6 +94,8 @@ class TSaslClientTransport(TTransportBase, CReadableTransport):
 
   def _send_message(self, status, body):
     header = struct.pack(">BI", status, len(body))
+    if isinstance(body, str):
+      body = body.encode('utf-8')
     self._trans.write(header + body)
     self._trans.flush()
 
