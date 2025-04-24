@@ -60,8 +60,7 @@ export const getFileNameFromPath = (filePath: string, fileSource: ImporterFileSo
     return match?.[1] ?? '';
   }
 
-  // For Remote
-  // Remove extension and replace '.' with '_'
+  // For Remote, remove extension and replace '.' with '_'
   // Example: file.name.fileExtension -> file_name
   const fileName = getLastDirOrFileNameFromPath(filePath);
   if (fileName.split('.').length === 1) {
