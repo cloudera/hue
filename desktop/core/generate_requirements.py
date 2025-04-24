@@ -69,7 +69,6 @@ class RequirementsGenerator:
             "kerberos==1.3.0",
             "kubernetes==26.1.0",
             "Mako==1.2.3",
-            "Markdown==3.7",
             "openpyxl==3.0.9",
             "phoenixdb==1.2.1",
             "prompt-toolkit==3.0.39",
@@ -111,7 +110,7 @@ class RequirementsGenerator:
                 "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/pandas-1.4.3-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
                 "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/lxml-4.6.4-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
                 "PyYAML==5.4.1",
-                "sasl==0.3.1",
+                "Markdown==3.1",
             ],
             "3.9": [
                 "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/cryptography-41.0.1-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
@@ -119,7 +118,7 @@ class RequirementsGenerator:
                 "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/pandas-1.4.3-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
                 "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/lxml-4.6.4-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
                 "PyYAML==6.0.1",
-                "sasl==0.3.1",
+                "Markdown==3.8",
             ]
         }
         self.x86_64_requirements = {
@@ -129,6 +128,15 @@ class RequirementsGenerator:
                 "pandas==2.0.3",
                 "lxml==4.9.1",
                 "sasl==0.3.1",
+                "Markdown==3.1",
+            ],
+            "3.9": [
+                "pyopenssl==22.1.0",
+                "numpy==1.24.4",
+                "pandas==2.0.3",
+                "lxml==4.9.1",
+                "sasl==0.3.1",
+                "Markdown==3.8",
             ],
             "3.11": [
                 "cryptography==42.0.8",
@@ -137,6 +145,7 @@ class RequirementsGenerator:
                 "lxml==4.9.1",
                 "async-timeout==5.0.1",
                 "pure-sasl==0.6.2",
+                "Markdown==3.8",
             ],
         }
         self.aarch64_requirements = {
@@ -145,7 +154,15 @@ class RequirementsGenerator:
                 "numpy==1.24.4",
                 "pandas==2.0.3",
                 "lxml==4.9.1",
+                "Markdown==3.1",
+            ],
+            "3.9": [
+                "pyopenssl==22.1.0",
+                "numpy==1.24.4",
+                "pandas==2.0.3",
+                "lxml==4.9.1",
                 "sasl==0.3.1",
+                "Markdown==3.8",
             ],
             "3.11": [
                 "cryptography==42.0.8",
@@ -154,6 +171,7 @@ class RequirementsGenerator:
                 "lxml==4.9.1",
                 "async-timeout==5.0.1",
                 "pure-sasl==0.6.2",
+                "Markdown==3.8"
             ],
         }
         self.pytorch_requirements = {
