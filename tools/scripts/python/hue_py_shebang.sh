@@ -24,6 +24,6 @@ export HUE_HOME_DIR=$(dirname $(dirname $(dirname "$SCRIPT_DIR")))
 
 source $SCRIPT_DIR/python_helper.sh
 
-PYTHON_BIN="${HUE_HOME_DIR}/$(latest_venv_bin_path)/python"
+PYTHON_BIN="${VENV_BIN_PATH}/python"
 
 exec "$PYTHON_BIN" "$@"

@@ -27,25 +27,29 @@ export SCRIPT_DIR=`dirname $0`
 export HUE_HOME_DIR=$(dirname $(dirname "$SCRIPT_DIR"))
 
 source $SCRIPT_DIR/python/python_helper.sh
-PYTHON_BIN="${HUE_HOME_DIR}/$(latest_venv_bin_path)/python"
-HUE="${HUE_HOME_DIR}/$(latest_venv_bin_path)/hue"
+PYTHON_BIN="${VENV_BIN_PATH}/python"
+HUE="${VENV_BIN_PATH}/hue"
 HUE_LOGLISTENER="${HUE_HOME_DIR}/desktop/core/src/desktop/loglistener.py"
+
+echo "Hue Environment Variables:" 1>&2
+env 1>&2
 
 function set_path() {
    etpath=$(dirname $2)
    if [ "$1" == "PYTHONPATH" ]; then
      if [ -z ${PYTHONPATH:+x} ]; then
-       # Set only if PYTHONPATH is not set to allow for safety valve
        export PYTHONPATH=$etpath
+     else
+       export PYTHONPATH=$PYTHONPATH:$etpath
      fi
    elif [ "$1" == "LD_LIBRARY_PATH" ]; then
      if [ -z ${LD_LIBRARY_PATH:+x} ]; then
-       # Set only if LD_LIBRARY_PATH is not set to allow for safety valve
        export LD_LIBRARY_PATH=$etpath
+     else
+       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$etpath
      fi
    elif [ "$1" == "PATH" ]; then
      if [ -z ${PATH:+x} ]; then
-       # Set only if PATH is not set to allow for safety valve
        export PATH=$etpath
      else
        export PATH=$PATH:$etpath
@@ -93,36 +97,27 @@ function set_env_var() {
 }
 
 add_postgres_to_pythonpath_for_version() {
-  local version="$1"  # e.g. "3.8", "3.9", "3.10"
+  local version="${1:-$SELECTED_PYTHON_VERSION}"  # Use first arg if provided, otherwise use SELECTED_PYTHON_VERSION
   
   # If postgres engine is detected in *.ini files then check for proper psycopg2 version.
   if grep -q '^\s*engine\s*=\s*postgres\+' *.ini; then
-    if [ -z ${LD_LIBRARY_PATH:+x} ]; then
-      list=("/usr/lib*" "/usr/local/lib/python${version}/*-packages" \
-            "/usr/lib64/python${version}/*-packages" \
-            "/opt/rh/rh-postgresql*/root/usr/lib64" \
-            "/usr/pgsql-*/lib" \
-            )
-      set_env_var "libpq.so" "LD_LIBRARY_PATH" "${list[@]}"
-    else
-      echo "LD_LIBRARY_PATH is taken from safety valve, $LD_LIBRARY_PATH"
-    fi
+    list=("/usr/lib*" "/usr/local/lib/python${version}/*-packages" \
+          "/usr/lib64/python${version}/*-packages" \
+          "/opt/rh/rh-postgresql*/root/usr/lib64" \
+          "/usr/pgsql-*/lib" \
+          )
+    set_env_var "libpq.so" "LD_LIBRARY_PATH" "${list[@]}"
 
-    if [ -z ${PYTHONPATH:+x} ]; then
-      # If we've included a PSYCOPG2 for this platform, override on PYTHONPATH
-      list=("/usr/bin" "/opt/rh/rh-python${version//./}/root/usr/local/lib64/python${version}/site-packages" \
-            "/usr/local/lib/python${version}/*-packages" \
-            "/usr/lib64/python${version}/*-packages" \
-            )
-      set_env_var "psycopg2" "PYTHONPATH" "${list[@]}"
-    else
-      echo "PYTHONPATH is taken from safety valve, $PYTHONPATH"
-    fi
+    list=("/usr/bin" "/opt/rh/rh-python${version//./}/root/usr/local/lib64/python${version}/site-packages" \
+          "/usr/local/lib/python${version}/*-packages" \
+          "/usr/lib64/python${version}/*-packages" \
+          )
+    set_env_var "psycopg2" "PYTHONPATH" "${list[@]}"
   fi
 }
 
 add_mysql_to_pythonpath_for_version() {
-  local version="$1"  # e.g. "3.8", "3.9", "3.10"
+  local version="${1:-$SELECTED_PYTHON_VERSION}"  # Use first arg if provided, otherwise use SELECTED_PYTHON_VERSION
   
   # If mysql engine is detected in *.ini files then check for proper MySQL-python version.
   if grep -q '^\s*engine\s*=\s*mysql\+' *.ini; then
@@ -150,8 +145,8 @@ add_mysql_to_pythonpath_for_version() {
   fi
 }
 
-add_postgres_to_pythonpath_for_version "$(selected_python_version)"
-add_mysql_to_pythonpath_for_version "$(selected_python_version)"
+add_postgres_to_pythonpath_for_version "$SELECTED_PYTHON_VERSION"
+add_mysql_to_pythonpath_for_version "$SELECTED_PYTHON_VERSION"
 
 function stop_previous_hueprocs() {
   for p in $(cat /tmp/hue_${HUE_PORT}.pid); do
@@ -165,6 +160,16 @@ function run_syncdb_and_migrate_subcommands() {
   "$HUE" makemigrations --noinput
   "$HUE" migrate --fake-initial
 }
+
+if [[ "$1" == "kt_renewer" ]]; then
+  # The Kerberos ticket renewer needs to know where kinit is.
+  if [ -d /usr/kerberos/bin ]; then
+    export PATH=/usr/kerberos/bin:$PATH
+  fi
+  KINIT_PATH=`which kinit`
+  KINIT_PATH=${KINIT_PATH-/usr/bin/kinit}
+  perl -pi -e "s#\{\{KINIT_PATH}}#$KINIT_PATH#g" $HUE_CONF_DIR/*.ini
+fi
 
 if [[ "dumpdata" == "$1" ]]; then
   umask 037

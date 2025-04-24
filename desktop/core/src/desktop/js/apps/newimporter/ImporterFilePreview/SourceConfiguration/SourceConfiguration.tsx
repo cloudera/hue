@@ -45,6 +45,8 @@ const SourceConfiguration = ({
     [fileFormat, setFileFormat]
   );
 
+  const filteredSourceConfigs = sourceConfigs.filter(config => !config.hidden?.(fileFormat?.type));
+
   return (
     <details className="hue-importer-configuration">
       <summary className="hue-importer-configuration__summary">
@@ -52,7 +54,7 @@ const SourceConfiguration = ({
         {t('Configure source')}
       </summary>
       <div className="hue-importer-configuration-options">
-        {sourceConfigs.map(config => (
+        {filteredSourceConfigs.map(config => (
           <div key={config.name}>
             <label htmlFor={config.name}>{t(config.label)}</label>
             <Select

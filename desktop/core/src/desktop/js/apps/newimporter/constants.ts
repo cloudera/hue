@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FileFormatResponse } from './types';
+import { FileFormatResponse, ImporterFileTypes } from './types';
 
 export const separator = [
   { value: ',', label: 'Comma (,)' },
@@ -32,22 +32,20 @@ export const separator = [
 export const sourceConfigs: {
   name: keyof FileFormatResponse;
   label: string;
-  options: { label: string; value: string | boolean }[];
+  hidden?: (type?: ImporterFileTypes) => boolean;
+  options: {
+    label: string;
+    value: string | boolean;
+  }[];
 }[] = [
   {
-    name: 'fieldSeparator',
-    label: 'Field Separator',
-    options: separator
-  },
-  {
-    name: 'recordSeparator',
-    label: 'Record Separator',
-    options: separator
-  },
-  {
-    name: 'quoteChar',
-    label: 'Quote Character',
-    options: separator
+    name: 'type',
+    label: 'File Type',
+    options: [
+      { value: ImporterFileTypes.CSV, label: 'CSV' },
+      { value: ImporterFileTypes.JSON, label: 'JSON' },
+      { value: ImporterFileTypes.EXCEL, label: 'Excel' }
+    ]
   },
   {
     name: 'hasHeader',
@@ -58,12 +56,21 @@ export const sourceConfigs: {
     ]
   },
   {
-    name: 'type',
-    label: 'File Type',
-    options: [
-      { value: 'csv', label: 'CSV File' },
-      { value: 'json', label: 'JSON' },
-      { value: 'excel', label: 'Excel File' }
-    ]
+    name: 'fieldSeparator',
+    label: 'Field Separator',
+    hidden: (type?: ImporterFileTypes) => type !== ImporterFileTypes.CSV,
+    options: separator
+  },
+  {
+    name: 'recordSeparator',
+    label: 'Record Separator',
+    hidden: (type?: ImporterFileTypes) => type !== ImporterFileTypes.CSV,
+    options: separator
+  },
+  {
+    name: 'quoteChar',
+    label: 'Quote Character',
+    hidden: (type?: ImporterFileTypes) => type !== ImporterFileTypes.CSV,
+    options: separator
   }
 ];
