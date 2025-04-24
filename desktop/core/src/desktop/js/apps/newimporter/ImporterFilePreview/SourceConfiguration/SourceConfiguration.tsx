@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import Select from 'cuix/dist/components/Select/Select';
 import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
 import { i18nReact } from '../../../../utils/i18nReact';
@@ -45,10 +45,7 @@ const SourceConfiguration = ({
     [fileFormat, setFileFormat]
   );
 
-  const filteredSourceConfigs = useMemo(
-    () => sourceConfigs.filter(config => !config.hidden?.(fileFormat?.type)),
-    [fileFormat?.type]
-  );
+  const filteredSourceConfigs = sourceConfigs.filter(config => !config.hidden?.(fileFormat?.type));
 
   return (
     <details className="hue-importer-configuration">
