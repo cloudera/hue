@@ -27,7 +27,7 @@ export enum ImporterFileSource {
 
 export interface LocalFileUploadResponse {
   local_file_url: string;
-  file_type: string;
+  file_type: ImporterFileTypes;
 }
 
 export interface FileFormatResponse {
