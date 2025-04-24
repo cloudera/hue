@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import { type ColumnProps } from 'cuix/dist/components/Table';
-import { GuessFieldTypesColumn, ImporterTableData } from '../types';
+import { ImporterFileSource, GuessFieldTypesColumn, ImporterTableData } from '../types';
+import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 export const convertToAntdColumns = (
   input?: GuessFieldTypesColumn[]
@@ -49,4 +50,23 @@ export const convertToDataSource = (
     });
     return row;
   });
+};
+
+export const getFileNameFromPath = (filePath: string, fileSource: ImporterFileSource): string => {
+  // For local files, the file name is extracted from the path
+  // Example: /**/**/**:fileName;**.fileExtension
+  if (fileSource === ImporterFileSource.LOCAL) {
+    const match = filePath.match(/:(.*?);/);
+    return match?.[1] ?? '';
+  }
+
+  // For Remote
+  // Remove extension and replace '.' with '_'
+  // Example: file.name.fileExtension -> file_name
+  const fileName = getLastDirOrFileNameFromPath(filePath);
+  if (fileName.split('.').length === 1) {
+    // If there is no extension, return the file name as is
+    return fileName;
+  }
+  return fileName.split('.').slice(0, -1).join('_');
 };

@@ -15,8 +15,8 @@
 // limitations under the License.
 
 import { ColumnProps } from 'cuix/dist/components/Table';
-import { convertToAntdColumns, convertToDataSource } from './utils';
-import { GuessFieldTypesColumn } from '../types';
+import { convertToAntdColumns, convertToDataSource, getFileNameFromPath } from './utils';
+import { ImporterFileSource, GuessFieldTypesColumn, ImporterTableData } from '../types';
 
 describe('convertToAntdColumns', () => {
   it('should return an empty array when no input is provided', () => {
@@ -35,7 +35,7 @@ describe('convertToAntdColumns', () => {
 });
 
 describe('convertToDataSource', () => {
-  const columns: ColumnProps<GuessFieldTypesColumn>[] = [
+  const columns: ColumnProps<ImporterTableData>[] = [
     { title: 'Name', dataIndex: 'name', key: 'name', width: '100px' },
     { title: 'Age', dataIndex: 'age', key: 'age', width: '100px' }
   ];
@@ -56,5 +56,49 @@ describe('convertToDataSource', () => {
     ];
 
     expect(convertToDataSource(columns, apiResponse)).toEqual(expectedOutput);
+  });
+});
+
+describe('getFileNameFromPath', () => {
+  it('should extract file name from LOCALFILE path using pattern', () => {
+    const filePath = '/user/data/:myDocument;v1.pdf';
+    const result = getFileNameFromPath(filePath, ImporterFileSource.LOCAL);
+    expect(result).toBe('myDocument');
+  });
+
+  it('should return empty string if LOCALFILE pattern does not match', () => {
+    const filePath = '/user/data/myDocument.pdf';
+    const result = getFileNameFromPath(filePath, ImporterFileSource.LOCAL);
+    expect(result).toBe('');
+  });
+
+  it('should extract file name from REMOTE path as last part of path', () => {
+    const filePath = 'https://demo.gethue.com/hue/test-file.csv';
+    const result = getFileNameFromPath(filePath, ImporterFileSource.REMOTE);
+    expect(result).toBe('test-file');
+  });
+
+  it('should handle file names with multiple dots correctly', () => {
+    const filePath = 'https://demo.gethue.com/hue/test.file.name.csv';
+    const result = getFileNameFromPath(filePath, ImporterFileSource.REMOTE);
+    expect(result).toBe('test_file_name');
+  });
+
+  it('should handle file names with no extension correctly', () => {
+    const filePath = 'https://demo.gethue.com/hue/test-file';
+    const result = getFileNameFromPath(filePath, ImporterFileSource.REMOTE);
+    expect(result).toBe('test-file');
+  });
+
+  it('should handle file names with special characters correctly', () => {
+    const filePath = 'https://demo.gethue.com/hue/test-file@2023.csv';
+    const result = getFileNameFromPath(filePath, ImporterFileSource.REMOTE);
+    expect(result).toBe('test-file@2023');
+  });
+
+  it('should handle file names with spaces correctly', () => {
+    const filePath = 'https://demo.gethue.com/hue/test file.csv';
+    const result = getFileNameFromPath(filePath, ImporterFileSource.REMOTE);
+    expect(result).toBe('test file');
   });
 });

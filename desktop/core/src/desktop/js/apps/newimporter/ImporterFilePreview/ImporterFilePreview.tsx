@@ -22,7 +22,7 @@ import {
   GuessFieldTypesResponse,
   ImporterTableData
 } from '../types';
-import { convertToAntdColumns, convertToDataSource } from '../utils/utils';
+import { convertToAntdColumns, convertToDataSource, getFileNameFromPath } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
@@ -38,6 +38,8 @@ interface ImporterFilePreviewProps {
 const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
+
+  const fileName = getFileNameFromPath(fileMetaData.path, fileMetaData.source);
 
   const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
     GUESS_FORMAT_URL,
@@ -84,17 +86,21 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   }, [fileMetaData.path, fileFormat]);
 
   const handleFinishImport = () => {
+    // TODO: take the hardcoded values from the form once implemented
+    const dialect = 'impala';
+    const database = 'default';
+
     const source = {
       inputFormat: fileMetaData.source,
       path: fileMetaData.path,
       format: fileFormat,
-      sourceType: 'hive'
+      sourceType: dialect
     };
     const destination = {
       outputFormat: 'table',
       nonDefaultLocation: fileMetaData.path,
-      name: fileMetaData.path.split('/').pop(),
-      sourceType: 'hive',
+      name: `${database}.${fileName}`,
+      sourceType: dialect,
       columns: previewData?.columns
     };
 
