@@ -76,9 +76,11 @@ class RequirementsGenerator:
             "protobuf==3.20.3",
             "pyarrow==17.0.0",
             "pyformance==0.3.2",
+            "polars[calamine]==1.8.2",  # Python >= 3.8
             "python-dateutil==2.8.2",
             "python-daemon==2.2.4",
             "python-ldap==3.4.3",
+            "python-magic==0.4.27",
             "python-oauth2==1.1.0",
             "python-pam==2.0.2",
             "pytidylib==0.3.2",
