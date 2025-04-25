@@ -52,7 +52,7 @@ export const convertToDataSource = (
   });
 };
 
-export const getFileNameFromPath = (filePath: string, fileSource: ImporterFileSource): string => {
+export const getDefaultTableName = (filePath: string, fileSource: ImporterFileSource): string => {
   // For local files, the file name is extracted from the path
   // Example: /**/**/**:fileName;**.fileExtension
   if (fileSource === ImporterFileSource.LOCAL) {

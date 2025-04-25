@@ -22,7 +22,7 @@ import {
   GuessFieldTypesResponse,
   ImporterTableData
 } from '../types';
-import { convertToAntdColumns, convertToDataSource, getFileNameFromPath } from '../utils/utils';
+import { convertToAntdColumns, convertToDataSource, getDefaultTableName } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
@@ -39,7 +39,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const { t } = i18nReact.useTranslation();
   const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
 
-  const fileName = getFileNameFromPath(fileMetaData.path, fileMetaData.source);
+  const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
 
   const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
     GUESS_FORMAT_URL,
@@ -56,7 +56,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     loading: guessingFields
   } = useSaveData<GuessFieldTypesResponse>(GUESS_FIELD_TYPES_URL);
 
-  const { save, loading: finishingImport } =
+  const { save, loading: finalizingImport } =
     useSaveData<GuessFieldTypesResponse>(FINISH_IMPORT_URL);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     const destination = {
       outputFormat: 'table',
       nonDefaultLocation: fileMetaData.path,
-      name: `${database}.${fileName}`,
+      name: `${database}.${defaultTableName}`,
       sourceType: dialect,
       columns: previewData?.columns
     };
@@ -122,7 +122,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
           <BorderlessButton data-testid="hue-importer-preview-page__header__actions__cancel">
             {t('Cancel')}
           </BorderlessButton>
-          <PrimaryButton loading={finishingImport} onClick={handleFinishImport}>
+          <PrimaryButton loading={finalizingImport} onClick={handleFinishImport}>
             {t('Finish Import')}
           </PrimaryButton>
         </div>
