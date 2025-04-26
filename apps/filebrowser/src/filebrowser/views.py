@@ -259,10 +259,6 @@ def download(request, path):
   return response
 
 
-def view_new(request):
-  return render('storage_browser.mako', request, None)
-
-
 def view(request, path):
   """Dispatches viewing of a path to either index() or fileview(), depending on type."""
 

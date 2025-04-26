@@ -17,6 +17,12 @@
 .antd.cuix {
   .loading-error-wrapper__spinner {
     // this overrides the max-height: 400px in antd library
-    max-height: 100% !important;
+    height: 100%;
+
+    .ant-spin,
+    .ant-spin-nested-loading {
+      height: 100%;
+      max-height: 100%;
+    }
   }
 }

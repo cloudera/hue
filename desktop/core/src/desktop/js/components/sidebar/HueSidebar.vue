@@ -96,7 +96,7 @@
     mapreduce: `<i class="fa fa-fw fa-file-archive-o"></i>`,
     markdown: `<svg class="hi hi-fw"><use href="#hi-markdown"></use></svg>`,
     notebook: `<svg class="hi hi-fw"><use href="#hi-file-notebook"></use></svg>`,
-    newfilebrowser: `<svg class="hi hi-fw"><use href="#hi-data-browser"></use></svg>`,
+    storagebrowser: `<svg class="hi hi-fw"><use href="#hi-data-browser"></use></svg>`,
     newimporter: `<svg class="hi hi-fw"><use href="#hi-data-in"></use></svg>`,
     oozie: `<svg class="hi hi-fw"><use href="#hi-oozie"></use></svg>`,
     'oozie-bundle': `<svg class="hi hi-fw"><use href="#hi-oozie-bundle"></use></svg>`,
@@ -330,9 +330,6 @@
               adaptedName = 'hdfs';
             }
             break;
-          case 'newfilebrowser':
-            adaptedName = 'newfilebrowser';
-            break;
           case 'jobbrowser':
             adaptedName = 'yarn';
             break;
@@ -364,6 +361,7 @@
           case 'hbase':
           case 'importer':
           case 'newimporter':
+          case 'storagebrowser':
           case 'indexes':
           case 'kafka':
             break;

@@ -35,6 +35,10 @@
   .hue-pagination__page-size-menu-btn {
     background-color: transparent;
     color: vars.$fluidx-gray-700;
+
+    .icon {
+      vertical-align: middle;
+    }
   }
 
   .hue-pagination__rows-stats-display {
