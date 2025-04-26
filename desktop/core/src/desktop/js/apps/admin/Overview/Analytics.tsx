@@ -14,12 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
+import Alert from 'cuix/dist/components/Alert';
 import Input from 'cuix/dist/components/Input';
-import { get, post } from '../../../api/utils';
+import { post } from '../../../api/utils';
 import { GET_USAGE_ANALYTICS_API_URL, UPDATE_USAGE_ANALYTICS_API_URL } from '../Components/utils';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import './Overview.scss';
 
 interface UsageAnalyticsResponse {
@@ -28,23 +31,18 @@ interface UsageAnalyticsResponse {
 }
 
 const Analytics = (): JSX.Element => {
-  const [collectUsage, setCollectUsage] = useState<boolean>(false);
   const { t } = i18nReact.useTranslation();
+  const { data, loading, error, reloadData } = useLoadData<UsageAnalyticsResponse>(
+    GET_USAGE_ANALYTICS_API_URL
+  );
+
+  const [analyticsEnabled, setAnalyticsEnabled] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchAnalyticsPreference = async () => {
-      try {
-        const response = await get<UsageAnalyticsResponse>(GET_USAGE_ANALYTICS_API_URL);
-        if (response && response.analytics_enabled !== undefined) {
-          setCollectUsage(response.analytics_enabled);
-        }
-      } catch (error) {
-        console.error('Error fetching usage analytics settings:', error);
-      }
-    };
-
-    fetchAnalyticsPreference();
-  }, []);
+    if (data?.analytics_enabled !== undefined) {
+      setAnalyticsEnabled(data.analytics_enabled);
+    }
+  }, [data]);
 
   const saveCollectUsagePreference = async (newPreference: boolean) => {
     try {
@@ -53,7 +51,9 @@ const Analytics = (): JSX.Element => {
       });
 
       if (response && response.analytics_enabled !== undefined) {
-        setCollectUsage(response.analytics_enabled);
+        reloadData();
+        setAnalyticsEnabled(newPreference);
+
         const successMessage = newPreference
           ? t('Analytics have been activated.')
           : t('Analytics have been deactivated.');
@@ -74,21 +74,31 @@ const Analytics = (): JSX.Element => {
   };
 
   return (
-    <div className="overview-analytics">
-      <h3>{t('Anonymous usage analytics')}</h3>
-      <div className="analytics-checkbox-container">
-        <Input
-          type="checkbox"
-          className="analytics__checkbox-icon"
-          id="usage_analytics"
-          checked={collectUsage}
-          onChange={handleCheckboxChange}
-        />
-        <label htmlFor="usage_analytics" className="usage__analytics">
-          {t('Help improve Hue with anonymous usage analytics.')}
-        </label>
+    <LoadingErrorWrapper loading={loading}>
+      <div className="overview-analytics">
+        <h3>{t('Anonymous usage analytics')}</h3>
+        <div className="analytics-checkbox-container">
+          <Input
+            type="checkbox"
+            className="analytics__checkbox-icon"
+            id="usage_analytics"
+            checked={analyticsEnabled}
+            onChange={handleCheckboxChange}
+            disabled={loading}
+          />
+          <label htmlFor="usage_analytics" className="usage__analytics">
+            {t('Help improve Hue with anonymous usage analytics.')}
+          </label>
+        </div>
+        {error && (
+          <Alert
+            message={`${t('Error:')} ${error}`}
+            description={t('An error occurred while fetching usage analytics settings.')}
+            type="error"
+          />
+        )}
       </div>
-    </div>
+    </LoadingErrorWrapper>
   );
 };
 
