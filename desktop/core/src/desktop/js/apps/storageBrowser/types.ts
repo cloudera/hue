@@ -59,7 +59,6 @@ export interface FilePreview {
   length: number;
   mode: string;
   offset: number;
-  isContentReadable: boolean;
 }
 
 export interface ListDirectory {

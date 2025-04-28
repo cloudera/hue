@@ -110,11 +110,11 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
   const filePreviewUrl = `${fileDownloadUrl}&&disposition=inline`;
 
   const isEditingEnabled =
+    !error &&
     !isEditing &&
     config?.storage_browser.max_file_editor_size &&
     config?.storage_browser.max_file_editor_size > fileStats.size &&
     EDITABLE_FILE_FORMATS.has(fileType) &&
-    data?.isContentReadable &&
     !inTrash(fileStats.path);
 
   const pageStats = {
@@ -126,7 +126,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
 
   const errorConfig = [
     {
-      enabled: !!error,
+      enabled: !!error && error.response?.status !== 422,
       message: t('An error occurred while fetching file content for path "{{path}}".', {
         path: fileStats.path
       }),
@@ -190,24 +190,24 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
             </div>
 
             <div className="preview__content">
-              {data?.isContentReadable === true && (
-                <div className="preview__editable-file">
-                  <textarea
-                    value={fileContent}
-                    onChange={e => setFileContent(e.target.value)}
-                    readOnly={!isEditing}
-                    className="preview__textarea"
-                  />
-                  {pageStats.totalPages > 1 && (
-                    <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
-                  )}
-                </div>
-              )}
+              {!error ||
+                (error.response?.status !== 422 && (
+                  <div className="preview__editable-file">
+                    <textarea
+                      value={fileContent}
+                      onChange={e => setFileContent(e.target.value)}
+                      readOnly={!isEditing}
+                      className="preview__textarea"
+                    />
+                    {pageStats.totalPages > 1 && (
+                      <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
+                    )}
+                  </div>
+                ))}
 
-              {(data?.isContentReadable === false ||
-                fileType === SupportedFileTypes.COMPRESSED) && (
+              {(error?.response?.status === 422 || fileType === SupportedFileTypes.COMPRESSED) && (
                 <div className="preview__unsupported">
-                  {t('Preview is not available for this file.')}
+                  {t('Preview is not available for this file. Please download the file instead.')}
                 </div>
               )}
 
