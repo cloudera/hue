@@ -33,38 +33,24 @@ is_supported_python_version() {
   return $?
 }
 
-function install_python311() {
+function install_build_dependencies() {
   local DOCKEROS=${1:-"ubuntu22"}
-  local PYTHON_VERSION=${2:-"3.11.12"}
-
-  pushd .
-
-  cd $HOME
-  local INSTALL_PREFIX="/opt/python/${PYTHON_VERSION}"
-  local PYTHON_TGZ="Python-${PYTHON_VERSION}.tgz"
-  local PYTHON_SRC_DIR="Python-${PYTHON_VERSION}"
-
-  export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/mit/bin:$PATH
-  export LD_LIBRARY_PATH=${INSTALL_PREFIX}/lib:/opt/sqlite3/lib:${LD_LIBRARY_PATH}
-  export CPPFLAGS="-I/opt/sqlite3/include"
-  export LDFLAGS="-L/opt/sqlite3/lib"
-
   echo "Installing build dependencies..."
   case "${DOCKEROS}" in
-      ubuntu22)
+      ubuntu22|ubuntu20|ubuntu18)
           sudo -- sh -c 'apt update && \
             apt install -y \
             build-essential \
             libbz2-dev libncurses5-dev libgdbm-dev libreadline-dev libkrb5-dev \
             liblzma-dev uuid-dev libldap2-dev libffi-dev zlib1g-dev libssl-dev wget curl'
           ;;
-      redhat9|redhat8|redhat8-arm64)
+      redhat9|redhat8|redhat8-arm64|centos7)
           sudo -- sh -c 'yum groupinstall -y "Development Tools" && \
             yum install -y \
             bzip2-devel ncurses-devel gdbm-devel readline-devel krb5-devel \
             xz-devel libuuid-devel openldap-devel libffi-devel zlib-devel openssl-devel wget curl'
           ;;
-      sles15)
+      sles12|sles15)
           sudo -- sh -c 'zypper refresh'
           sudo -- sh -c 'zypper install -y \
             gcc gcc-c++ make \
@@ -76,19 +62,52 @@ function install_python311() {
           exit 1
           ;;
   esac
+}
 
-  echo "Installing sqlite3..."
-  sudo LD_LIBRARY_PATH=${LD_LIBRARY_PATH} PATH=${PATH} \
-    -- sh -c 'cd /tmp && \
-    mkdir -p /opt/sqlite3 && \
+function install_sqlite3() {
+  local install_prefix="$1"
+  local version="3.35.5"
+  sqlite_installed=0
+
+  if [[ -e "${install_prefix}/bin/sqlite3" ]]; then
+    local installed_version=$(${install_prefix}/bin/sqlite3 --version 2>&1 | awk '{print $1}')
+    if [[ "$installed_version" == "$version" ]]; then
+      if [[ -e "${install_prefix}/lib/libsqlite3.so" ]]; then
+        echo "sqlite3 already installed"
+        sqlite_installed=1
+      fi
+    fi
+  fi
+
+  if [[ $sqlite_installed -eq 0 ]]; then
+    echo "Installing sqlite3..."
+    sudo LD_LIBRARY_PATH=${LD_LIBRARY_PATH} PATH=${PATH} install_prefix=${install_prefix} \
+      -- sh -c 'cd /tmp && \
+    mkdir -p ${install_prefix} && \
     curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
-    tar zxvf sqlite-autoconf-3350500.tar.gz && \
-    cd sqlite-autoconf-3350500 && \
-    ./configure --prefix=/opt/sqlite3 && make && make install && \
-    libtool --finish /opt/sqlite3/lib'
+        tar zxvf sqlite-autoconf-3350500.tar.gz && \
+        cd sqlite-autoconf-3350500 && \
+        ./configure --prefix=${install_prefix} && make && make install && \
+        libtool --finish ${install_prefix}/lib'
+  fi
+}
+
+function install_python311() {
+  local PYTHON_VERSION=${1:-"3.11.12"}
+  local INSTALL_PREFIX=$2
+  local LD_LIBRARY_PATH=$3
+  local CPPFLAGS=$4
+  local LDFLAGS=$5
+  pushd . > /dev/null
+
+  cd $HOME
+  local PYTHON_TGZ="Python-${PYTHON_VERSION}.tgz"
+  local PYTHON_SRC_DIR="Python-${PYTHON_VERSION}"
+
+  export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/mit/bin:$PATH
 
   echo "Installing Python ${PYTHON_VERSION}..."
-  sudo DOCKEROS=${DOCKEROS} PYTHON_VERSION=${PYTHON_VERSION} INSTALL_PREFIX=${INSTALL_PREFIX} \
+  sudo PYTHON_VERSION=${PYTHON_VERSION} INSTALL_PREFIX=${INSTALL_PREFIX} \
     PYTHON_TGZ=${PYTHON_TGZ} PYTHON_SRC_DIR=${PYTHON_SRC_DIR} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
     CPPFLAGS=${CPPFLAGS} LDFLAGS=${LDFLAGS} PATH=${PATH} \
     -- sh -c 'cd /tmp && mkdir -p "${INSTALL_PREFIX}" && \
@@ -102,19 +121,149 @@ function install_python311() {
   # sudo -- sh -c '/usr/bin/strip "${INSTALL_PREFIX}/bin/python3.11" && \
   #   /usr/bin/strip "${INSTALL_PREFIX}/lib/libpython3.11.so.1.0"'
 
-  sudo DOCKEROS=${DOCKEROS} PYTHON_VERSION=${PYTHON_VERSION} INSTALL_PREFIX=${INSTALL_PREFIX} \
+  # Install pip
+  sudo PYTHON_VERSION=${PYTHON_VERSION} INSTALL_PREFIX=${INSTALL_PREFIX} \
     PYTHON_TGZ=${PYTHON_TGZ} PYTHON_SRC_DIR=${PYTHON_SRC_DIR} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
     CPPFLAGS=${CPPFLAGS} LDFLAGS=${LDFLAGS} PATH=${PATH} \
     -- sh -c 'cd /tmp && curl -sS https://bootstrap.pypa.io/get-pip.py | "${INSTALL_PREFIX}/bin/python3.11"'
 
-  export SQLITE3_PATH=/opt/sqlite3/bin/sqlite3
-  export PYTHON311_PATH=${INSTALL_PREFIX}
-  export PATH=${INSTALL_PREFIX}/bin:$PATH
-  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
-  popd
+  export PYTHON311_PATH="${INSTALL_PREFIX}"
+  export pip_bin=${PYTHON311_PATH}/bin/pip3.11
+  export VIRTUAL_ENV_VERSION="20.30.0"
+  # Pip modules install
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
+  popd > /dev/null
+}
+
+function install_python39() {
+  local PYTHON_VERSION=${1:-"3.9.16"}
+  local INSTALL_PREFIX=$2
+  local LD_LIBRARY_PATH=$3
+  local CPPFLAGS=$4
+  local LDFLAGS=$5
+  pushd . > /dev/null
+
+  cd $HOME
+  local PYTHON_TGZ="Python-${PYTHON_VERSION}.tgz"
+  local PYTHON_SRC_DIR="Python-${PYTHON_VERSION}"
+
+  export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/mit/bin:$PATH
+
+  echo "Installing Python ${PYTHON_VERSION}..."
+  sudo PYTHON_VERSION=${PYTHON_VERSION} INSTALL_PREFIX=${INSTALL_PREFIX} \
+    PYTHON_TGZ=${PYTHON_TGZ} PYTHON_SRC_DIR=${PYTHON_SRC_DIR} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
+    CPPFLAGS=${CPPFLAGS} LDFLAGS=${LDFLAGS} PATH=${PATH} \
+    -- sh -c 'cd /tmp && mkdir -p "${INSTALL_PREFIX}" && \
+    curl -o "${PYTHON_TGZ}" "https://www.python.org/ftp/python/${PYTHON_VERSION}/${PYTHON_TGZ}" && \
+    tar zxf "${PYTHON_TGZ}" && \
+    cd "${PYTHON_SRC_DIR}" && \
+    ./configure --prefix="${INSTALL_PREFIX}" --enable-shared --enable-optimizations --with-lto && \
+    make altinstall'
+
+  # echo "Stripping debug symbols to reduce size..."
+  # sudo -- sh -c '/usr/bin/strip "${INSTALL_PREFIX}/bin/python3.9" && \
+  #   /usr/bin/strip "${INSTALL_PREFIX}/lib/libpython3.9.so.1.0"'
+
+  # Install pip
+  sudo PYTHON_VERSION=${PYTHON_VERSION} INSTALL_PREFIX=${INSTALL_PREFIX} \
+    PYTHON_TGZ=${PYTHON_TGZ} PYTHON_SRC_DIR=${PYTHON_SRC_DIR} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
+    CPPFLAGS=${CPPFLAGS} LDFLAGS=${LDFLAGS} PATH=${PATH} \
+    -- sh -c 'cd /tmp && curl -sS https://bootstrap.pypa.io/get-pip.py | "${INSTALL_PREFIX}/bin/python3.9"'
+
+  export PYTHON39_PATH="${INSTALL_PREFIX}"
+  export pip_bin=${PYTHON39_PATH}/bin/pip3.9
+  export VIRTUAL_ENV_VERSION="20.30.0"
+  # Pip modules install
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
+  popd > /dev/null
+}
+
+function install_python38() {
+  local PYTHON_VERSION=${1:-"3.8.12"}
+  local INSTALL_PREFIX=$2
+  local LD_LIBRARY_PATH=$3
+  local CPPFLAGS=$4
+  local LDFLAGS=$5
+  pushd . > /dev/null
+
+  cd $HOME
+  local PYTHON_TGZ="Python-${PYTHON_VERSION}.tgz"
+  local PYTHON_SRC_DIR="Python-${PYTHON_VERSION}"
+
+  export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/mit/bin:$PATH
+
+  echo "Installing Python ${PYTHON_VERSION}..."
+  sudo PYTHON_VERSION=${PYTHON_VERSION} INSTALL_PREFIX=${INSTALL_PREFIX} \
+    PYTHON_TGZ=${PYTHON_TGZ} PYTHON_SRC_DIR=${PYTHON_SRC_DIR} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
+    CPPFLAGS=${CPPFLAGS} LDFLAGS=${LDFLAGS} PATH=${PATH} \
+    -- sh -c 'cd /tmp && mkdir -p "${INSTALL_PREFIX}" && \
+    curl -o "${PYTHON_TGZ}" "https://www.python.org/ftp/python/${PYTHON_VERSION}/${PYTHON_TGZ}" && \
+    tar zxf "${PYTHON_TGZ}" && \
+    cd "${PYTHON_SRC_DIR}" && \
+    ./configure --prefix="${INSTALL_PREFIX}" --enable-shared --enable-optimizations --with-lto && \
+    make altinstall'
+
+  # echo "Stripping debug symbols to reduce size..."
+  # sudo -- sh -c '/usr/bin/strip "${INSTALL_PREFIX}/bin/python3.8" && \
+  #   /usr/bin/strip "${INSTALL_PREFIX}/lib/libpython3.8.so.1.0"'
+
+  export PYTHON38_PATH="${INSTALL_PREFIX}"
+  export pip_bin=${PYTHON38_PATH}/bin/pip3.8
+  export VIRTUAL_ENV_VERSION="20.19.0"
+  # Pip modules install
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
+  sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
+  popd > /dev/null
+}
+
+function install_sqlite_python() {
+  local DOCKEROS="${1:-ubuntu22}"
+  local PYTHON_VERSION="${2:-3.11.12}"
+  local INSTALL_PREFIX="/opt/python/${PYTHON_VERSION}"
+  local SQLITE3_PATH="/opt/sqlite3"
+
+  pushd . > /dev/null
+
+  if [[ "$PYTHON_VERSION" == "$REQ_PYTHON311" ]]; then
+    if [[ -z ${PYTHON311_PATH+x} ]]; then
+      install_build_dependencies "$DOCKEROS"
+      install_sqlite3 "$SQLITE3_PATH"
+      export LD_LIBRARY_PATH="${INSTALL_PREFIX}/lib:${SQLITE3_PATH}/lib:${LD_LIBRARY_PATH}"
+      export CPPFLAGS="-I${SQLITE3_PATH}/include"
+      export LDFLAGS="-L${SQLITE3_PATH}/lib"
+      install_python311 "$PYTHON_VERSION" "$INSTALL_PREFIX" "$LD_LIBRARY_PATH" "$CPPFLAGS" "$LDFLAGS"
+    fi
+  elif [[ "$PYTHON_VERSION" == "$REQ_PYTHON39" ]]; then
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_build_dependencies "$DOCKEROS"
+      install_sqlite3 "$SQLITE3_PATH"
+      export LD_LIBRARY_PATH="${INSTALL_PREFIX}/lib:${SQLITE3_PATH}/lib:${LD_LIBRARY_PATH}"
+      export CPPFLAGS="-I${SQLITE3_PATH}/include"
+      export LDFLAGS="-L${SQLITE3_PATH}/lib"
+      install_python39 "$PYTHON_VERSION" "$INSTALL_PREFIX" "$LD_LIBRARY_PATH" "$CPPFLAGS" "$LDFLAGS"
+    fi
+  elif [[ "$PYTHON_VERSION" == "$REQ_PYTHON38" ]]; then
+    if [[ -z ${PYTHON38_PATH+x} ]]; then
+      install_build_dependencies "$DOCKEROS"
+      install_sqlite3 "$SQLITE3_PATH"
+      export LD_LIBRARY_PATH="${INSTALL_PREFIX}/lib:${SQLITE3_PATH}/lib:${LD_LIBRARY_PATH}"
+      export CPPFLAGS="-I${SQLITE3_PATH}/include"
+      export LDFLAGS="-L${SQLITE3_PATH}/lib"
+      install_python38 "$PYTHON_VERSION" "$INSTALL_PREFIX" "$LD_LIBRARY_PATH" "$CPPFLAGS" "$LDFLAGS"
+    fi
+  fi
+
+  popd > /dev/null
 }
 
 function centos7_install() {
+  local os=${1:-"centos7"}
+
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
     sudo -- sh -c 'yum install -y cyrus-sasl-gssapi \
@@ -147,34 +296,17 @@ function centos7_install() {
     # Node-v20-LTS is not supported by old OS'es - Redhat7_ppc, Centos7, Ubuntu18, Sles12. So upgrading to node-v16
     sudo -- sh -c 'cd /tmp && curl -fsSL https://rpm.nodesource.com/setup_16.x | sudo bash - && \
         yum install -y nodejs npm'
-    # sqlite3 install
-    sudo -- sh -c 'cd /tmp && curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
-        tar zxvf sqlite-autoconf-3350500.tar.gz && \
-        cd sqlite-autoconf-3350500 && \
-        ./configure --prefix=/opt/sqlite3 && make && make install'
-    # python3.8 re install for sqlite3 3.35.5 or higher version
-    sudo LD_LIBRARY_PATH=/opt/sqlite3/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_PATH \
-         LD_RUN_PATH=/opt/sqlite3/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH \
-         -- sh -c 'cd /tmp && curl -o Python-3.8.13.tgz https://www.python.org/ftp/python/3.8.13/Python-3.8.13.tgz && \
-      tar zxvf Python-3.8.13.tgz && \
-      cd Python-3.8.13 && \
-      ./configure --enable-shared --prefix=/opt/cloudera/cm-agent && \
-      make altinstall'
 
-    export SQLITE3_PATH=/opt/sqlite3/bin/sqlite3
-    export PYTHON38_PATH="/opt/cloudera/cm-agent"
-
-    pip_bin="${PYTHON38_PATH}/bin/pip3.8"
-    export VIRTUAL_ENV_VERSION="20.19.0"
-
-    # Pip modules install
-    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
+    unset PYTHON38_PATH
+    if [[ -z ${PYTHON38_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
   fi
 }
 
 function redhat8_install() {
+  local os=${1:-"redhat8"}
+
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
     sudo -- sh -c 'yum install -y \
@@ -203,20 +335,24 @@ function redhat8_install() {
     sudo -- sh -c 'cd /tmp && curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash - && \
       yum install -y nodejs'
 
-    if ! is_supported_python_version "$PYTHON311_PATH/bin/python3.11" $REQ_PYTHON311; then
-      install_python311 "redhat8" "$REQ_PYTHON311"
+    if [[ -z ${PYTHON311_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON311"
     fi
 
-    export pip_bin=${PYTHON311_PATH}/bin/pip3.11
-    export VIRTUAL_ENV_VERSION="20.30.0"
-    # Pip modules install
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON39"
+    fi
+
+    if [[ -z ${PYTHON38_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
+
   fi
 }
 
 function redhat8_arm64_install() {
+  local os=${1:-"redhat8-arm64"}
+
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
     sudo -- sh -c 'yum install -y \
@@ -237,20 +373,23 @@ function redhat8_arm64_install() {
       yum install -y nodejs'
     # Pip modules install
 
-    if ! is_supported_python_version "$PYTHON311_PATH/bin/python3.11" $REQ_PYTHON311; then
-      install_python311 "redhat8-arm64" "$REQ_PYTHON311"
+    if [[ -z ${PYTHON311_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON311"
     fi
 
-    export pip_bin=${PYTHON311_PATH}/bin/pip3.11
-    export VIRTUAL_ENV_VERSION="20.30.0"
-    # Pip modules install
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2-binary==2.9.6'
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON39"
+    fi
+
+    if [[ -z ${PYTHON38_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
   fi
 }
 
 function redhat9_install() {
+  local os=${1:-"redhat9"}
+
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
     sudo -- sh -c 'yum install -y \
@@ -278,20 +417,23 @@ function redhat9_install() {
     sudo -- sh -c 'cd /tmp && curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash - && \
       yum install -y nodejs'
 
-    if ! is_supported_python_version "$PYTHON311_PATH/bin/python3.11" $REQ_PYTHON311; then
-      install_python311 "redhat9" "$REQ_PYTHON311"
+    if [[ -z ${PYTHON311_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON311"
     fi
 
-    export pip_bin=${PYTHON311_PATH}/bin/pip3.11
-    export VIRTUAL_ENV_VERSION="20.30.0"
-    # Pip modules install
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON39"
+    fi
+
+    if [[ -z ${PYTHON38_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
   fi
 }
 
 function sles12_install() {
+  local os=${1:-"sles12"}
+
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
     sudo -- sh -c 'zypper refresh'
@@ -321,24 +463,16 @@ function sles12_install() {
     # Node-v20-LTS is not supported by old OS'es - Redhat7_ppc, Centos7, Ubuntu18, Sles12. So upgrading to node-v16
     sudo -- sh -c 'zypper install -y npm14 nodejs14'
 
-    pip_bin="${PYTHON38_PATH}/bin/pip3.8"
-    VIRTUAL_ENV_VERSION="20.19.0"
-
-    # Pip modules install
-    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
-    # sqlite3 install
-    sudo -- sh -c 'cd /tmp && curl --insecure -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
-        tar zxvf sqlite-autoconf-3350500.tar.gz && \
-        cd sqlite-autoconf-3350500 && \
-        ./configure --prefix=/opt/sqlite3 && make && make install'
-    export LD_LIBRARY_PATH=/opt/sqlite3/lib:$LD_LIBRARY_PATH
-    export SQLITE3_PATH=/opt/sqlite3/bin/sqlite3
+    unset PYTHON38_PATH
+    if [[ -z ${PYTHON38_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
   fi
 }
 
 function sles15_install() {
+  local os=${1:-"sles15"}
+
   if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
     sudo -- sh -c 'zypper refresh'
@@ -367,21 +501,24 @@ function sles15_install() {
     sudo -- sh -c 'rm -f /usr/local/bin/node && ln -s /usr/bin/node18 /usr/local/bin/node'
     sudo -- sh -c 'rm -f /usr/local/bin/npm && ln -s /usr/bin/npm20 /usr/local/bin/npm'
 
-    if ! is_supported_python_version "$PYTHON311_PATH/bin/python3.11" $REQ_PYTHON311; then
-      install_python311 "sles15" "$REQ_PYTHON311"
+    if [[ -z ${PYTHON311_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON311"
     fi
 
-    export pip_bin=${PYTHON311_PATH}/bin/pip3.11
-    export VIRTUAL_ENV_VERSION="20.30.0"
-    # Pip modules install
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON39"
+    fi
+
+    if [[ -z ${PYTHON38_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
   fi
 }
 
 function ubuntu18_install() {
-    if [[ $FORCEINSTALL -eq 1 ]]; then
+  local os=${1:-"ubuntu18"}
+
+  if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
     sudo -- sh -c 'apt-get update'
     sudo -- sh -c 'DEBIAN_FRONTEND=noninteractive apt -qq -y install  \
@@ -425,25 +562,24 @@ function ubuntu18_install() {
     sudo -- sh -c 'cd /tmp && curl -sL https://deb.nodesource.com/setup_16.x | sudo bash - && \
       apt -y install nodejs'
 
-    pip_bin="${PYTHON38_PATH}/bin/pip3.8"
-    VIRTUAL_ENV_VERSION="20.19.0"
+    if [[ -z ${PYTHON311_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON311"
+    fi
 
-    # Pip modules install
-    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
-    # sqlite3 install
-    sudo -- sh -c 'cd /tmp && curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
-        tar zxvf sqlite-autoconf-3350500.tar.gz && \
-        cd sqlite-autoconf-3350500 && \
-        ./configure --prefix=/opt/sqlite3 && make && make install'
-    export LD_LIBRARY_PATH=/opt/sqlite3/lib:$LD_LIBRARY_PATH
-    export SQLITE3_PATH=/opt/sqlite3/bin/sqlite3
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON39"
+    fi
+
+    if [[ -z ${PYTHON38_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
   fi
 }
 
 function ubuntu20_install() {
-    if [[ $FORCEINSTALL -eq 1 ]]; then
+  local os=${1:-"ubuntu20"}
+
+  if [[ $FORCEINSTALL -eq 1 ]]; then
     # pre-req install
     sudo -- sh -c 'DEBIAN_FRONTEND=noninteractive apt -qq -y install  \
         krb5-user \
@@ -487,44 +623,17 @@ function ubuntu20_install() {
       cd /tmp && curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
       apt-get install -y nodejs'
 
-    # sqlite3 install
-    sudo -- sh -c 'cd /tmp && curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
-        tar zxvf sqlite-autoconf-3350500.tar.gz && \
-        cd sqlite-autoconf-3350500 && \
-        ./configure --prefix=/opt/sqlite3 && make && make install'
-    # python3.8 re install for sqlite3 3.35.5 or higher version
-    sudo LD_LIBRARY_PATH=/opt/sqlite3/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_PATH \
-         LD_RUN_PATH=/opt/sqlite3/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH \
-         -- sh -c 'cd /tmp && curl -o Python-3.8.13.tgz https://www.python.org/ftp/python/3.8.13/Python-3.8.13.tgz && \
-      tar zxvf Python-3.8.13.tgz && \
-      cd Python-3.8.13 && \
-      ./configure --enable-shared --prefix=/opt/cloudera/cm-agent && \
-      make altinstall'
-
-    export SQLITE3_PATH=/opt/sqlite3/bin/sqlite3
-    export PYTHON38_PATH="/opt/cloudera/cm-agent"
-
-    export pip_bin="${PYTHON38_PATH}/bin/pip3.8"
-    VIRTUAL_ENV_VERSION="20.19.0"
-
-    # Pip modules install
-    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-    sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
-    # sqlite3 install
-    sudo -- sh -c 'cd /tmp && curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
-        tar zxvf sqlite-autoconf-3350500.tar.gz && \
-        cd sqlite-autoconf-3350500 && \
-        ./configure --prefix=/opt/sqlite3 && make && make install'
-    export LD_LIBRARY_PATH=/opt/sqlite3/lib:$LD_LIBRARY_PATH
-    export SQLITE3_PATH=/opt/sqlite3/bin/sqlite3
+    unset PYTHON38_PATH
+    if [[ -z ${PYTHON38_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
   fi
 }
 
 function ubuntu22_install() {
-    local PYTHON_VERSION=${1:-"python3.11"} # Default to Python 3.11 if not provided
+  local os=${1:-"ubuntu22"}
 
-    if [[ $FORCEINSTALL -eq 1 ]]; then
+  if [[ $FORCEINSTALL -eq 1 ]]; then
     sudo -- sh -c 'apt update'
     # Add deadsnakes PPA for Python 3.8
     sudo -- sh -c 'add-apt-repository ppa:deadsnakes/ppa -y'
@@ -560,15 +669,18 @@ function ubuntu22_install() {
       cd /tmp && curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
       apt-get install -y nodejs'
 
-    if ! is_supported_python_version "$PYTHON311_PATH/bin/python3.11" $REQ_PYTHON311; then
-      install_python311 "ubuntu22" "$REQ_PYTHON311"
+    unset PYTHON311_PATH
+    if [[ -z ${PYTHON311_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON311"
     fi
 
-    export pip_bin=${PYTHON311_PATH}/bin/pip3.11
-    export VIRTUAL_ENV_VERSION="20.30.0"
-    # Pip modules install
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
-    sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
+    if [[ -z ${PYTHON39_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON39"
+    fi
+
+    unset PYTHON38_PATH
+    if [[ -z ${PYTHON38_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
   fi
 }
