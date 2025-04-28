@@ -28,7 +28,7 @@ export interface HDFSFileSystemConfig {
 export interface FileSystem {
   name: string;
   userHomeDirectory: string;
-  config: HDFSFileSystemConfig;
+  config?: HDFSFileSystemConfig;
 }
 
 export interface FileStats {

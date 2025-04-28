@@ -22,6 +22,7 @@ from django.http import HttpResponse, QueryDict
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import AllowAny
 
+from about import api as about_api
 from beeswax import api as beeswax_api
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
@@ -71,7 +72,7 @@ def download_hue_logs(request):
   return logs_api.download_hue_logs(django_request)
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 def check_config(request):
   django_request = get_django_request(request)
   return desktop_api.check_config(django_request)
@@ -87,6 +88,18 @@ def install_app_examples(request):
 def available_app_examples(request):
   django_request = get_django_request(request)
   return desktop_api.available_app_examples(django_request)
+
+
+@api_view(["GET"])
+def get_usage_analytics(request):
+  django_request = get_django_request(request)
+  return about_api.get_usage_analytics(django_request)
+
+
+@api_view(["POST"])
+def update_usage_analytics(request):
+  django_request = get_django_request(request)
+  return about_api.update_usage_analytics(django_request)
 
 
 # Editor

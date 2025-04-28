@@ -16,6 +16,7 @@
 
 import React, { HTMLAttributes } from 'react';
 import Table, { type ColumnProps } from 'cuix/dist/components/Table';
+import { TablePaginationConfig } from 'antd/es/table';
 import {
   TableLocale,
   RowSelectionType,
@@ -24,11 +25,10 @@ import {
   SortOrder
 } from 'antd/lib/table/interface';
 import { PanelRender } from 'rc-table/lib/interface';
-import type { TableProps } from 'rc-table/lib/Table';
 import Pagination, { PaginationProps } from '../Pagination/Pagination';
+import useResizeObserver from '../../utils/hooks/useResizeObserver/useResizeObserver';
 
 import './PaginatedTable.scss';
-import { TablePaginationConfig } from 'antd/es/table';
 
 export interface PaginatedTableProps<T> {
   title?: PanelRender<T>;
@@ -37,7 +37,7 @@ export interface PaginatedTableProps<T> {
   onRowClick?: (record: T) => HTMLAttributes<HTMLElement>;
   locale?: TableLocale;
   onRowSelect?: (selectedRows: T[]) => void;
-  scroll?: TableProps<T>['scroll'];
+  isDynamicHeight?: boolean;
   sortByColumn?: ColumnProps<T>['dataIndex'];
   sortOrder?: SortOrder;
   setSortByColumn?: (column: ColumnProps<T>['dataIndex']) => void;
@@ -46,15 +46,20 @@ export interface PaginatedTableProps<T> {
   rowKey: ((record: T) => string) | string;
   pagination?: Partial<PaginationProps>;
   rowClassName?: ((record: T) => string) | string;
+  loading?: boolean;
 }
 
+const TABLE_HEADER_HEIGHT = 47;
+const PAGINATION_HEIGHT = 49;
+
 const PaginatedTable = <T extends object>({
+  loading = false,
   title,
   data,
   columns,
   onRowClick,
   onRowSelect,
-  scroll,
+  isDynamicHeight = false,
   sortByColumn,
   sortOrder,
   setSortByColumn,
@@ -100,8 +105,23 @@ const PaginatedTable = <T extends object>({
     }));
   };
 
+  const isPaginationEnabled =
+    pagination?.pageStats && pagination?.pageStats?.totalPages > 0 && pagination.setPageNumber;
+
+  const [tableRef, rect] = useResizeObserver();
+
+  const tableOffset = isPaginationEnabled
+    ? PAGINATION_HEIGHT + TABLE_HEADER_HEIGHT
+    : TABLE_HEADER_HEIGHT;
+  const tableBodyHeight = Math.max(rect.height - tableOffset, 100);
+
+  const tableScroll = isDynamicHeight ? { y: tableBodyHeight } : undefined;
+
   return (
-    <>
+    <div
+      ref={tableRef}
+      className={`hue-table-container ${loading ? 'hue-table-container__placeholder--hidden' : ''}`}
+    >
       <Table
         title={title}
         className="hue-table"
@@ -113,22 +133,21 @@ const PaginatedTable = <T extends object>({
         rowClassName={rowClassName}
         rowKey={rowKey}
         rowSelection={rowSelection}
-        scroll={scroll}
+        scroll={tableScroll}
         data-testid={testId}
         locale={locale}
+        loading={loading}
         sticky
       />
-      {pagination?.pageStats &&
-        pagination?.pageStats?.totalPages > 0 &&
-        pagination.setPageNumber && (
-          <Pagination
-            setPageSize={pagination.setPageSize}
-            pageSize={pagination.pageSize}
-            setPageNumber={pagination.setPageNumber}
-            pageStats={pagination?.pageStats}
-          />
-        )}
-    </>
+      {isPaginationEnabled && (
+        <Pagination
+          setPageSize={pagination.setPageSize}
+          pageSize={pagination.pageSize}
+          setPageNumber={pagination.setPageNumber!}
+          pageStats={pagination.pageStats!}
+        />
+      )}
+    </div>
   );
 };
 

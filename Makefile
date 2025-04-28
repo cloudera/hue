@@ -96,7 +96,7 @@ default:
 	@echo '  clean       : Remove desktop build products'
 	@echo '  distclean   : Remove desktop and thirdparty build products'
 # <<<< DEV ONLY
-	@echo '  doc 	      : Build documentation'
+	@echo '  doc 	     : Build documentation'
 	@echo '  prod        : Generate a tar file for production distribution'
 	@echo '  locales     : Extract strings and update dictionary of each locale'
 	@echo '  ace         : Builds the Ace Editor tool'
@@ -111,9 +111,8 @@ include Makefile.tarball
 ###################################
 # Build docs (unused)
 ###################################
-.PHONY: test_prep
-test_prep: apps
-	@$(ENV_PIP) install -r $(REQUIREMENT_TEST_FILE)
+test_prep:
+	@$(ENV_PYTHON) -m pip install -r $(REQUIREMENT_TEST_FILE)
 
 ###################################
 # Build docs (unused)
@@ -126,42 +125,46 @@ docs:
 ###################################
 # Install parent POM
 ###################################
+.PHONY: parent-pom
 parent-pom:
 ifneq (,$(BUILD_DB_PROXY))
 	cd $(ROOT)/maven && mvn install $(MAVEN_OPTIONS)
 endif
 
-.PHONY: parent-pom
-
+$(info "PYTHON_VER is $(PYTHON_VER)")
+$(info "SYS_PYTHON is $(SYS_PYTHON)")
+$(info "ENV_PYTHON is $(ENV_PYTHON)")
+$(info "SYS_PIP is $(SYS_PIP)")
+$(info "ENV_PIP is $(ENV_PIP)")
+$(info "PYTHON_INCLUDE_DIR is $(PYTHON_INCLUDE_DIR)")
+$(info "PYTHON_H is $(PYTHON_H)")
+$(info "PIP_VERSION is $(PIP_VERSION)")
+$(info "VIRTUAL_ENV_VERSION is $(VIRTUAL_ENV_VERSION)")
+$(info "RELOCATABLE is $(RELOCATABLE)")
+$(info "LOCAL_PY_BIN is $(LOCAL_PY_BIN)")
+$(info "BLD_DIR_ENV is $(BLD_DIR_ENV)")
+$(info "REQUIREMENT_FILE is $(REQUIREMENT_FILE)")
+$(info "INSTALL_DIR is $(INSTALL_DIR)")
+$(info "INST_DIR_ENV is $(INST_DIR_ENV)")
+$(info "PPC64LE is $(PPC64LE)")
 ###################################
 # virtual-env
+# Enhanced to support building and packaging Hue for multiple Python versions.
+# Adds per-Python virtual environment creation, improved logging and diagnostics,
+# Test push
 ###################################
-
-.PHONY: virtual-env
-virtual-env: $(BLD_DIR_ENV)/stamp
-$(BLD_DIR_ENV)/stamp:
-	@echo "--- Creating virtual environment at $(BLD_DIR_ENV) using $(PYTHON_VER)"
+virtual-env: $(BLD_DIR_ENV)/bin/python
+$(BLD_DIR_ENV)/bin/python:
+	@echo "--- Creating virtual environment for $(PYTHON_VER) ---"
+	@mkdir -p $(BLD_DIR_ENV)
 	@$(SYS_PYTHON) -m pip install --upgrade pip==$(PIP_VERSION)
-	$(SYS_PIP) install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
-	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
-	  $(SYS_PYTHON) -m venv $(BLD_DIR_ENV); \
-	 fi
-	@virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV)
-	@echo "--- Virtual environment $(BLD_DIR_ENV) ready"
-	@touch $@
-	@echo '--- Installing PIP_MODULES in virtual-env'
-	@if [[ "ppc64le" == $(PPC64LE) ]]; then \
-	  echo '--- Installing $(REQUIREMENT_PPC64LE_FILE) into virtual-env via $(ENV_PIP)'; \
-	  $(ENV_PIP) install -r $(REQUIREMENT_PPC64LE_FILE); \
-	  echo '--- Finished $(REQUIREMENT_PPC64LE_FILE) into virtual-env'; \
-	 else \
-	  echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'; \
-	  $(ENV_PIP) install -r $(REQUIREMENT_FILE); \
-	  echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'; \
-         fi
+	@$(SYS_PYTHON) -m pip install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
+	@$(SYS_PYTHON) -m virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV) --copies
+	@echo "REQUIREMENT_FILE is $(REQUIREMENT_FILE)"
+	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
+	@echo "--- Virtual environment setup complete for $(PYTHON_VER) ---"
 	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
-	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
-	@touch $(REQUIREMENT_DOT_FILE)
+	@echo "--- Finished installing $(NAVOPTAPI_WHL) into virtual-env ---"
 ###################################
 # Build desktop
 ###################################
@@ -173,6 +176,16 @@ desktop: parent-pom
 desktop: virtual-env
 	@$(MAKE) -C desktop
 
+###################################
+# relocatable-env
+# Enhanced to support relocatable .pth files.
+###################################
+relocatable-env:
+	@$(MAKE) virtual-env
+	@echo "--- Running $(SYS_PYTHON) $(RELOCATABLE) $(BLD_DIR_ENV)"
+	@$(SYS_PYTHON) $(RELOCATABLE) $(BLD_DIR_ENV)
+	@echo "--- Setting up pth files $(ENV_PYTHON) $(ROOT)/tools/relocatable.py"
+	@$(ENV_PYTHON) $(ROOT)/tools/relocatable.py
 
 ###################################
 # Build apps
@@ -190,8 +203,7 @@ INSTALL_CORE_FILES = \
 	Makefile* $(wildcard *.mk) \
 	ext \
 	tools/app_reg \
-	tools/virtual-bootstrap \
-	tools/relocatable.sh \
+	$(INSTALL_DIR) \
 	VERS* LICENSE* README*
 
 .PHONY: install
@@ -199,8 +211,10 @@ install: virtual-env install-check install-core-structure install-desktop instal
 
 .PHONY: install-check
 install-check:
-	@if [ -n '$(wildcard $(INSTALL_DIR)/*)' ] ; then \
-	  echo 'ERROR: $(INSTALL_DIR) not empty. Cowardly refusing to continue.' ; \
+	@if [ -n '$(wildcard $(INST_DIR_ENV)/*)' ] ; then \
+	  echo "ERROR: $(INST_DIR_ENV) is not empty. Contents:" ; \
+	  ls -la "$(INST_DIR_ENV)" ; \
+	  echo 'ERROR: $(INST_DIR_ENV) not empty. Cowardly refusing to continue.' ; \
 	  false ; \
 	fi
 
@@ -249,7 +263,8 @@ install-env:
 ###################################
 
 .PHONY: npm-install
-npm-install:
+npm-install: .npm-install-lock
+.npm-install-lock:
 	npm --version
 	node --version
 	npm install
@@ -258,10 +273,11 @@ npm-install:
 	npm run webpack-workers
 	node_modules/.bin/removeNPMAbsolutePaths .
 	rm -rf node_modules
+	touch .npm-install-lock
 
 .PHONY: create-static
 create-static:
-	./build/env/bin/python ./build/env/bin/hue collectstatic --noinput
+	$(ENV_PYTHON) $(BLD_DIR_BIN)/hue collectstatic --noinput
 
 # <<<< DEV ONLY
 .PHONY: doc
@@ -365,6 +381,10 @@ ext-clean:
 ###############################################
 # Misc (some used by automated test scripts)
 ###############################################
+
+huecheck:
+	@echo "Checking for release..."
+	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue check
 
 test:
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue test fast --with-xunit

@@ -55,7 +55,6 @@ const OverflowingItem = ({ label, onClick, testId }: OverflowingItemProps): JSX.
         className="hue-path-browser__overflowing-label"
         onClick={onClick}
         data-testid={`${testId}-label`}
-        data-event={''}
       >
         <span ref={textElementRef}>{label}</span>
       </BorderlessButton>

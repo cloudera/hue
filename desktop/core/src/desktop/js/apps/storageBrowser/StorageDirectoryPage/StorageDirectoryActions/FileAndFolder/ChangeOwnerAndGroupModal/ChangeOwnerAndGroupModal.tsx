@@ -21,6 +21,7 @@ import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
 import { Checkbox, Input, Select } from 'antd';
 import { HDFSFileSystemConfig, StorageDirectoryTableData } from '../../../../types';
 import { BULK_CHANGE_OWNER_API_URL } from '../../../../api';
+
 import './ChangeOwnerAndGroupModal.scss';
 
 interface ChangeOwnerAndGroupModalProps {
@@ -30,7 +31,6 @@ interface ChangeOwnerAndGroupModalProps {
   groups?: HDFSFileSystemConfig['groups'];
   isOpen?: boolean;
   files: StorageDirectoryTableData[];
-  setLoading: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
@@ -53,7 +53,6 @@ const ChangeOwnerAndGroupModal = ({
   groups = [],
   isOpen = true,
   files,
-  setLoading,
   onSuccess,
   onError,
   onClose
@@ -73,8 +72,6 @@ const ChangeOwnerAndGroupModal = ({
   });
 
   const handleChangeOwner = () => {
-    setLoading(true);
-
     const formData = new FormData();
     if (selectedUser === OTHERS_KEY && userOther) {
       formData.append('user', userOther);
@@ -124,15 +121,16 @@ const ChangeOwnerAndGroupModal = ({
 
   return (
     <Modal
-      cancelText={t('Cancel')}
-      className="cuix antd"
-      okText={t('Submit')}
-      onCancel={onClose}
-      onOk={handleChangeOwner}
       open={isOpen}
       title={t('Change Onwer / Group')}
-      okButtonProps={{ disabled: loading || !isSubmitEnabled }}
+      className="cuix antd"
+      okText={t('Submit')}
+      onOk={handleChangeOwner}
+      okButtonProps={{ disabled: !isSubmitEnabled, loading }}
+      cancelText={t('Cancel')}
+      onCancel={onClose}
       cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
       <div className="hue-change-owner-group">
         <span className="hue-change-owner-group__header-note">
@@ -149,12 +147,19 @@ const ChangeOwnerAndGroupModal = ({
           <div className="hue-change-owner-group__entity">
             <div className="hue-change-owner-group__label">{t('User')}</div>
             <div className="hue-change-owner-group__dropdown">
-              <Select options={usersOptions} onChange={setSelectedUser} value={selectedUser} />
+              <Select
+                options={usersOptions}
+                onChange={setSelectedUser}
+                value={selectedUser}
+                disabled={loading}
+                getPopupContainer={triggerNode => triggerNode.parentElement}
+              />
               {selectedUser === OTHERS_KEY && (
                 <Input
                   placeholder={t('Enter user')}
                   value={userOther}
                   onChange={e => setUserOther(e.target.value)}
+                  disabled={loading}
                   required
                 />
               )}
@@ -164,12 +169,19 @@ const ChangeOwnerAndGroupModal = ({
           <div className="hue-change-owner-group__entity">
             <div className="hue-change-owner-group__label">{t('Group')}</div>
             <div className="hue-change-owner-group__dropdown">
-              <Select options={groupOptions} onChange={setSelectedGroup} value={selectedGroup} />
+              <Select
+                options={groupOptions}
+                onChange={setSelectedGroup}
+                value={selectedGroup}
+                disabled={loading}
+                getPopupContainer={triggerNode => triggerNode.parentElement}
+              />
               {selectedGroup === OTHERS_KEY && (
                 <Input
                   placeholder={t('Enter group')}
                   value={groupOther}
                   onChange={e => setGroupOther(e.target.value)}
+                  disabled={loading}
                   required
                 />
               )}
@@ -181,6 +193,7 @@ const ChangeOwnerAndGroupModal = ({
             <Checkbox
               checked={isRecursive}
               onChange={() => setIsRecursive(prev => !prev)}
+              disabled={loading}
               name="recursive"
             />
           </div>

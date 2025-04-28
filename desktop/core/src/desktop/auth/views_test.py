@@ -15,17 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
+import logging
 import datetime
 from builtins import object
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock
 
 import pytest
 from django.conf import settings
-from django.db.utils import DataError
 from django.test import TestCase
 from django.test.client import Client
-from django_auth_ldap import backend as django_auth_ldap_backend
 
 from desktop import conf, middleware
 from desktop.auth import backend
@@ -38,6 +36,15 @@ from useradmin import ldap_access
 from useradmin.models import Group, User, get_default_user_group, get_profile
 from useradmin.tests import LdapTestConnection
 from useradmin.views import import_ldap_groups
+
+LOG = logging.getLogger()
+
+
+try:
+  from django_auth_ldap import backend as django_auth_ldap_backend
+except ImportError:
+  LOG.warning('django_auth_ldap module is not installed')
+  django_auth_ldap_backend = Mock(LDAPSettings=Mock(), LDAPBackend=Mock())
 
 
 def get_mocked_config():
@@ -166,6 +173,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
 
 
 @pytest.mark.django_db
+@pytest.mark.integration
 class TestLdapLogin(PseudoHdfsTestBase):
   reset = []
   test_username = 'test_ldap_login'

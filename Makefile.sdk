@@ -114,8 +114,7 @@ $(EXT_PY_ENV_INSTALL_TARGETS): CUR_EXT_PY=$(notdir $(@D))
 #   	Pip install any 3rd party package that are based on requirements.txt
 #
 .PHONY: ext-env-pip-install
-ext-env-pip-install: $(REQUIREMENT_DOT_FILE)
-$(REQUIREMENT_DOT_FILE):
+ext-env-pip-install:
 	@echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'
 	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
 	@echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'
@@ -222,7 +221,7 @@ sdist:
 	@mkdir -p $(SDIST_DIR)
 	@# Copy sources of our app
 	@rsync $(RSYNC_OPT) ./ $(SDIST_DIR)/ $(SDIST_EXCLUDES)
-	@$(MAKE) -C $(SDIST_DIR) clean
+	@PYTHON_VER=$(PYTHON_VER) ENV_PYTHON=$(ENV_PYTHON) VIRTUAL_ENV=$(BLD_DIR_ENV) $(MAKE) -C $(SDIST_DIR) clean
 	@# Also make a tarball
 	@tar -C $(SDIST_DIR)/.. -czf $(SDIST_TGZ) $(APP_FULL_NAME)
 	@echo "--- Created $(SDIST_TGZ)"
@@ -255,8 +254,8 @@ bdist: ext-eggs compile
 install-bdist: bdist
 	@echo "--- Install built distribution for $(APP_NAME) at $(INSTALL_DIR)"
 	@# Check that INSTALL_DIR is empty
-	@if [ -n '$(wildcard $(INSTALL_DIR)/*)' ] ; then \
-	  echo 'ERROR: $(INSTALL_DIR) not empty. Cowardly refusing to continue.' ; \
+	@if [ -n '$(wildcard $(INST_DIR_ENV)/*)' ] ; then \
+	  echo 'ERROR: $(INST_DIR_ENV) not empty. Cowardly refusing to continue.' ; \
 	  false ; \
 	fi
 	@mkdir -p $(INSTALL_DIR)

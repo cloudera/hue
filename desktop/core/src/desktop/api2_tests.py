@@ -737,7 +737,6 @@ class TestDocumentGist(object):
 
 
 class TestAvailableAppExamplesAPI:
-
   # Using custom MockApp instead of Mock to avoid conflicts with Mock's built in 'name' attribute.
   @dataclass
   class MockApp:
@@ -869,14 +868,6 @@ class TestInstallAppExampleAPI:
           dialect='impala', db_name='test_db', user=request.user, request=request, interpreter='mock_interpreter'
         )
 
-  def test_setup_notebook_examples_missing_connector_id(self):
-    request = Mock(method='POST', POST={}, user=Mock())
-
-    response = _setup_notebook_examples(request)
-
-    assert response.status_code == 400
-    assert json.loads(response.content.decode('utf-8'))['message'] == 'Missing parameter: connector_id is required.'
-
   def test_setup_notebook_examples_existing_connector(self):
     with patch('desktop.api2.Connector.objects.get') as mock_get_connector:
       with patch('desktop.api2.beeswax_install_examples.Command.handle') as mock_command:
@@ -895,8 +886,20 @@ class TestInstallAppExampleAPI:
     with patch('desktop.api2.Connector.objects.get') as mock_get_connector:
       with patch('desktop.api2.beeswax_install_examples.Command.handle') as mock_beeswax_install_command:
         with patch('desktop.api2.notebook_setup.Command.handle') as mock_notebook_setup_command:
-          request = Mock(method='POST', POST={'app_name': 'notebook', 'dialect': 'spark', 'connector_id': '1'}, user=Mock())
+          request = Mock(method='POST', POST={'app_name': 'notebook', 'dialect': 'spark'}, user=Mock())
           mock_get_connector.return_value = None
+
+          _setup_notebook_examples(request)
+
+          assert not mock_beeswax_install_command.called
+          mock_notebook_setup_command.assert_called_once_with(dialect='spark', user=request.user)
+
+  def test_setup_notebook_examples_connector_exception(self):
+    with patch('desktop.api2.Connector.objects.get') as mock_get_connector:
+      with patch('desktop.api2.beeswax_install_examples.Command.handle') as mock_beeswax_install_command:
+        with patch('desktop.api2.notebook_setup.Command.handle') as mock_notebook_setup_command:
+          request = Mock(method='POST', POST={'app_name': 'notebook', 'dialect': 'spark'}, user=Mock())
+          mock_get_connector.side_effect = Exception('Connector matching query does not exist.')
 
           _setup_notebook_examples(request)
 
@@ -928,7 +931,7 @@ class TestCheckConfigAPI:
   def test_check_config_success(self):
     with patch('desktop.api2.os.path.realpath') as mock_hue_conf_dir:
       with patch('desktop.api2._get_config_errors') as mock_get_config_errors:
-        request = Mock(method='POST')
+        request = Mock(method='GET')
         mock_hue_conf_dir.return_value = '/test/hue/conf'
         mock_get_config_errors.return_value = [
           {"name": "Hive", "message": "The application won't work without a running HiveServer2."},

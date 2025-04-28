@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
-import { Input, Checkbox } from 'antd';
+import Input from 'cuix/dist/components/Input';
 import Button from 'cuix/dist/components/Button';
 import Search from '@cloudera/cuix-core/icons/react/SearchIcon';
 import Download from '@cloudera/cuix-core/icons/react/DownloadIcon';
@@ -62,8 +62,9 @@ const ServerLogsHeader: React.FC<ServerLogsHeaderProps> = ({
       />
 
       <div className="server--right-actions">
-        <span className="server__host-text">{t(`Host: ${hostName}`)}</span>
-        <Checkbox
+        <span className="server__host-text">{`${t('Host:')} ${hostName}`}</span>
+        <Input
+          type="checkbox"
           onChange={e => {
             setWrapLogs(e.target.checked);
             onWrapLogsChange(e.target.checked);
@@ -78,7 +79,6 @@ const ServerLogsHeader: React.FC<ServerLogsHeaderProps> = ({
 
         <Button
           className="server__download-button"
-          data-event="download-button"
           icon={<Download />}
           onClick={handleDownloadClick}
         >

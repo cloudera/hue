@@ -19,7 +19,7 @@ import Button from 'cuix/dist/components/Button';
 import DocumentationIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import { hueWindow } from 'types/types';
 
-import { FileMetaData, LocalFileUploadResponse } from '../types';
+import { FileMetaData, ImporterFileSource, LocalFileUploadResponse } from '../types';
 import { i18nReact } from '../../../utils/i18nReact';
 import { UPLOAD_LOCAL_FILE_API_URL } from '../api';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
@@ -72,7 +72,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
           setFileMetaData({
             path: data.local_file_url,
             type: data.file_type,
-            source: 'localfile'
+            source: ImporterFileSource.LOCAL
           });
         },
         onError: error => {
@@ -94,7 +94,6 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
               className="hue-importer__source-selector-option-button"
               size="large"
               icon={<DocumentationIcon />}
-              data-event={''}
               onClick={handleUploadClick}
             ></Button>
             <span className="hue-importer__source-selector-option-btn-title">

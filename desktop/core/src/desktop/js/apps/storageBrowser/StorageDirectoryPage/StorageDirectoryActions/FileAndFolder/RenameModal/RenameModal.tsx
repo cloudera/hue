@@ -59,7 +59,7 @@ const RenameModal = ({
       onClose={onClose}
       inputType="text"
       initialValue={file.name}
-      buttonDisabled={loading}
+      loading={loading}
     />
   );
 };

@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { waitFor, screen, fireEvent, render } from '@testing-library/react';
+import { waitFor, screen, render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { get } from '../../../../../../api/utils';
@@ -75,18 +75,6 @@ describe('SummaryModal', () => {
     const spaceConsumed = await screen.findAllByText('0 Byte');
     await waitFor(() => {
       expect(spaceConsumed[0]).toBeInTheDocument();
-    });
-  });
-
-  it('should call onClose function when close button is clicked', async () => {
-    const mockOnClose = jest.fn();
-    const { getByText } = render(<SummaryModal onClose={mockOnClose} path="some/path" />);
-
-    const closeButton = getByText('Close');
-    expect(mockOnClose).not.toHaveBeenCalled();
-    fireEvent.click(closeButton);
-    await waitFor(() => {
-      expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
   });
 });

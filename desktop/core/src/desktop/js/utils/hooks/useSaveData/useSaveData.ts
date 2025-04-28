@@ -15,13 +15,14 @@
 // limitations under the License.
 
 import { useCallback, useEffect, useState } from 'react';
+import { AxiosError } from 'axios';
 import { ApiFetchOptions, post } from '../../../api/utils';
 import { isJSON } from '../../jsonUtils';
 
 interface saveOptions<T> {
   url?: string;
   onSuccess?: (data: T) => void;
-  onError?: (error: Error) => void;
+  onError?: (error: AxiosError) => void;
   postOptions?: ApiFetchOptions<T>;
 }
 
@@ -32,7 +33,7 @@ export interface Options<T> extends saveOptions<T> {
 interface UseSaveData<T, U> {
   data?: T;
   loading: boolean;
-  error?: Error;
+  error?: AxiosError;
   save: (body: U, saveOption?: saveOptions<T>) => void;
 }
 
@@ -40,11 +41,12 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
   const [localOptions, setLocalOptions] = useState<Options<T> | undefined>(options);
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | undefined>();
+  const [error, setError] = useState<AxiosError | undefined>();
 
   const postOptionsDefault: ApiFetchOptions<T> = {
     silenceErrors: false,
-    ignoreSuccessErrors: true
+    ignoreSuccessErrors: true,
+    isRawError: true
   };
 
   const saveData = useCallback(
