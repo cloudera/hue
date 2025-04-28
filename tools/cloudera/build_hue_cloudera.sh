@@ -37,8 +37,8 @@ BUILDTYPE=$1
 DOCKEROS=$2
 HUE_JAR_VERSION=$3
 
-PYTHON38_OSES=("centos7" "redhat8" "sles12" "ubuntu18" "ubuntu20")
-PYTHON39_OSES=("redhat8" "redhat8-arm64" "redhat9", "ubuntu22")
+PYTHON38_OSES=("centos7" "redhat8" "sles12" "ubuntu20" "ubuntu22")
+PYTHON39_OSES=("redhat8" "redhat8-arm64" "redhat9")
 PYTHON311_OSES=("redhat8" "redhat8-arm64" "redhat9" "sles15" "ubuntu22")
 
 LATEST_PYTHON="python3.11"
@@ -54,6 +54,7 @@ export SQLITE3_PATH=${SQLITE3_PATH:="${TOOLS_HOME}/sqlite/bin/sqlite3"}
 export ORACLE_INSTANTCLIENT19_PATH="/opt/toolchain/instantclient_19_15"
 export LD_LIBRARY_PATH="/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_LIBRARY_PATH"
 export LD_RUN_PATH="/usr/local/lib:$ORACLE_INSTANTCLIENT19_PATH:$LD_RUN_PATH"
+export ORIGINAL_PATH=$PATH
 
 setup_python_env() {
   local ver="$1" os="$2"
@@ -97,15 +98,15 @@ install_prerequisite() {
   local os="$1"
 
   case "$os" in
-    centos7) centos7_install ;;
-    redhat8|snapshot) redhat8_install ;;
-    redhat9) redhat9_install ;;
-    sles12) sles12_install ;;
-    sles15) sles15_install ;;
-    ubuntu18) ubuntu18_install ;;
-    ubuntu20) ubuntu20_install ;;
-    ubuntu22) ubuntu22_install ;;
-    redhat8-arm64) redhat8_arm64_install ;;
+    centos7) centos7_install "$os";;
+    redhat8|snapshot) redhat8_install "$os";;
+    redhat9) redhat9_install "$os";;
+    sles12) sles12_install "$os";;
+    sles15) sles15_install "$os";;
+    ubuntu18) ubuntu18_install "$os";;
+    ubuntu20) ubuntu20_install "$os";;
+    ubuntu22) ubuntu22_install "$os";;
+    redhat8-arm64) redhat8_arm64_install "$os";;
     *) echo "Unsupported OS: $os"; exit 1 ;;
   esac
 
