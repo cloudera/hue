@@ -411,7 +411,8 @@ def display(request):
       file_contents = contents.decode(encoding)
       mode = 'text'
     except UnicodeDecodeError:
-      is_content_readable = False
+      LOG.error("Cannot decode file contents with encoding: %s." % encoding)
+      return HttpResponse("Cannot display file content. Please download the file instead.", status=422)
 
   data = {
     'contents': file_contents,
