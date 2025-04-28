@@ -11,8 +11,12 @@ big_console_header() {
 }
 
 is_supported_os() {
-  local -n _array=$1
+  local _arrayname=$1
   local _os=$2
+
+  local _array=()
+  eval "_array=(\"\${${_arrayname}[@]}\")"
+
   for item in "${_array[@]}"; do
     if [[ "$item" == "$_os" ]]; then
       return 0
