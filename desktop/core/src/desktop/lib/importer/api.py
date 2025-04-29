@@ -33,6 +33,7 @@ from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from desktop.lib.importer.operations import local_file_upload
 from desktop.lib.importer.serializers import LocalFileUploadSerializer
 
 LOG = logging.getLogger()
@@ -58,18 +59,21 @@ def api_error_handler(view_fn):
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
 @api_error_handler
-def upload_local_file(request: Request) -> Response:
-  """
-  Upload a local file and process it.
+def upload_file(request: Request) -> Response:
+  """Handle the local file upload operation.
+
+  This endpoint allows users to upload a file from their local system.
+  Uploaded file is validated using LocalFileUploadSerializer and processed using local_file_upload operation.
 
   Args:
-    request: The request object containing the file to be uploaded.
+    request: Request object containing the file to upload
 
   Returns:
-    Response: A response object containing the result of the upload.
+    Response containing the result of the upload operation
 
-  Raises:
-    ValidationError: If the file is not valid or if there are issues processing it.
+  Note:
+    - File size limits apply based on server configuration
+    - Supported file types: CSV, TSV, Excel
   """
 
   # Validate the request data using the serializer
@@ -80,47 +84,10 @@ def upload_local_file(request: Request) -> Response:
 
   upload_file = serializer.validated_data['file']
 
-  # Generate a unique filename
-  username = request.user.username
-  safe_original_name = re.sub(r'[^0-9a-zA-Z]+', '_', upload_file.name)
-  unique_id = uuid.uuid4().hex[:8]
+  LOG.info(f'User {request.user.username} is uploading a local file: {upload_file.name}')
+  res = local_file_upload(upload_file, request.user.username)
 
-  filename = f"{username}_{unique_id}_{safe_original_name}"
-
-  # Process the file based on its type
-  result = process_uploaded_file(upload_file, filename)
-
-  return Response(result, status=status.HTTP_201_CREATED)
-
-
-def process_uploaded_file(upload_file, filename: str) -> Dict[str, Any]:
-  """
-  Process the uploaded file and save it to a temporary location.
-
-  Args:
-    upload_file: The uploaded file object
-    filename: The base filename to use
-
-  Returns:
-    A dictionary containing the filename and file path
-  """
-  # Create a temporary file with our generated filename
-  temp_dir = tempfile.gettempdir()
-  destination_path = os.path.join(temp_dir, filename)
-
-  try:
-    # Simply write the file content to temporary location
-    with open(destination_path, 'wb') as destination:
-      for chunk in upload_file.chunks():
-        destination.write(chunk)
-
-    return {'filename': filename, 'file_path': destination_path}
-
-  except Exception as e:
-    # Clean up the file if there was an error
-    if os.path.exists(destination_path):
-      os.remove(destination_path)
-    raise e
+  return Response(res, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
