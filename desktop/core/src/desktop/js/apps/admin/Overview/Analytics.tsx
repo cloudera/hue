@@ -19,9 +19,9 @@ import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 import Alert from 'cuix/dist/components/Alert';
 import Input from 'cuix/dist/components/Input';
-import { post } from '../../../api/utils';
 import { GET_USAGE_ANALYTICS_API_URL, UPDATE_USAGE_ANALYTICS_API_URL } from '../Components/utils';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import './Overview.scss';
 
@@ -44,39 +44,53 @@ const Analytics = (): JSX.Element => {
     }
   }, [data]);
 
-  const saveCollectUsagePreference = async (newPreference: boolean) => {
-    try {
-      const response = await post<UsageAnalyticsResponse>(UPDATE_USAGE_ANALYTICS_API_URL, {
-        analytics_enabled: newPreference
-      });
-
-      if (response && response.analytics_enabled !== undefined) {
-        reloadData();
-        setAnalyticsEnabled(newPreference);
-
-        const successMessage = newPreference
-          ? t('Analytics have been activated.')
-          : t('Analytics have been deactivated.');
-        huePubSub.publish('hue.global.info', { message: successMessage });
+  const { save: saveAnalyticsPreference, loading: savingPreference } =
+    useSaveData<UsageAnalyticsResponse>(UPDATE_USAGE_ANALYTICS_API_URL, {
+      onSuccess: response => {
+        if (response.analytics_enabled !== undefined) {
+          reloadData();
+          setAnalyticsEnabled(response.analytics_enabled);
+          const successMessage = response.analytics_enabled
+            ? t('Analytics have been activated.')
+            : t('Analytics have been deactivated.');
+          huePubSub.publish('hue.global.info', { message: successMessage });
+        }
+      },
+      onError: error => {
+        console.error('Error updating usage analytics settings:', error);
+        const errorMessage = analyticsEnabled
+          ? t('Failed to deactivate analytics.')
+          : t('Failed to activate analytics.');
+        huePubSub.publish('hue.global.error', { message: errorMessage });
+      },
+      postOptions: {
+        headers: {
+          'Content-Type': 'application/json',
+        }
       }
-    } catch (error) {
-      console.error('Error updating usage analytics settings:', error);
-      const errorMessage = newPreference
-        ? t('Failed to activate analytics.')
-        : t('Failed to deactivate analytics.');
-      huePubSub.publish('hue.global.error', { message: errorMessage });
-    }
+    });
+  
+const handleCheckboxChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const newPreference = event.target.checked;
+
+
+  const payload = {
+    analytics_enabled: newPreference 
   };
 
-  const handleCheckboxChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newPreference = event.target.checked;
-    await saveCollectUsagePreference(newPreference);
-  };
+  try {
+    await saveAnalyticsPreference(payload);
+    console.log('Payload sent to server:', payload);
+  } catch (err) {
+    console.error('Error during saveAnalyticsPreference:', err);
+  }
+};
 
   return (
-    <LoadingErrorWrapper loading={loading}>
+    <LoadingErrorWrapper loading={loading || savingPreference}>
       <div className="overview-analytics">
         <h3>{t('Anonymous usage analytics')}</h3>
+
         <div className="analytics-checkbox-container">
           <Input
             type="checkbox"
@@ -84,12 +98,13 @@ const Analytics = (): JSX.Element => {
             id="usage_analytics"
             checked={analyticsEnabled}
             onChange={handleCheckboxChange}
-            disabled={loading}
+            disabled={loading || savingPreference}
           />
           <label htmlFor="usage_analytics" className="usage__analytics">
             {t('Help improve Hue with anonymous usage analytics.')}
           </label>
         </div>
+
         {error && (
           <Alert
             message={`${t('Error:')} ${error}`}
