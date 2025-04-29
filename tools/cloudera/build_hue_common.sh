@@ -129,7 +129,7 @@ function install_python311() {
 
   export PYTHON311_PATH="${INSTALL_PREFIX}"
   export pip_bin=${PYTHON311_PATH}/bin/pip3.11
-  export VIRTUAL_ENV_VERSION="20.30.0"
+  export VIRTUAL_ENV_VERSION="20.24.4"
   # Pip modules install
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
@@ -174,7 +174,7 @@ function install_python39() {
 
   export PYTHON39_PATH="${INSTALL_PREFIX}"
   export pip_bin=${PYTHON39_PATH}/bin/pip3.9
-  export VIRTUAL_ENV_VERSION="20.30.0"
+  export VIRTUAL_ENV_VERSION="20.19.0"
   # Pip modules install
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
@@ -213,7 +213,7 @@ function install_python38() {
 
   export PYTHON38_PATH="${INSTALL_PREFIX}"
   export pip_bin=${PYTHON38_PATH}/bin/pip3.8
-  export VIRTUAL_ENV_VERSION="20.19.0"
+  export VIRTUAL_ENV_VERSION="20.24.4"
   # Pip modules install
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install virtualenv=='${VIRTUAL_ENV_VERSION}' virtualenv-make-relocatable==0.0.1 mysqlclient==2.1.1'
   sudo pip_bin=${pip_bin} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
