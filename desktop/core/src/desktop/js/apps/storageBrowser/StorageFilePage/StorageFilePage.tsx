@@ -190,20 +190,19 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
             </div>
 
             <div className="preview__content">
-              {!error ||
-                (error.response?.status !== 422 && (
-                  <div className="preview__editable-file">
-                    <textarea
-                      value={fileContent}
-                      onChange={e => setFileContent(e.target.value)}
-                      readOnly={!isEditing}
-                      className="preview__textarea"
-                    />
-                    {pageStats.totalPages > 1 && (
-                      <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
-                    )}
-                  </div>
-                ))}
+              {error?.response?.status !== 422 && (
+                <div className="preview__editable-file">
+                  <textarea
+                    value={fileContent}
+                    onChange={e => setFileContent(e.target.value)}
+                    readOnly={!isEditing}
+                    className="preview__textarea"
+                  />
+                  {pageStats.totalPages > 1 && (
+                    <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
+                  )}
+                </div>
+              )}
 
               {(error?.response?.status === 422 || fileType === SupportedFileTypes.COMPRESSED) && (
                 <div className="preview__unsupported">
