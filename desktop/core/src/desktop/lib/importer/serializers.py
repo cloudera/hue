@@ -31,9 +31,10 @@ class LocalFileUploadSerializer(serializers.Serializer):
 
   def validate_file(self, value):
     # Add file format validation
+    # TODO: To remove and allow all file formats?
     extension = value.name.split('.')[-1].lower()
-    if extension not in ['csv', 'xlsx', 'xls']:
-      raise serializers.ValidationError("Unsupported file format. Please upload a CSV or Excel file.")
+    if extension not in ['csv', 'tsv', 'xlsx', 'xls']:
+      raise serializers.ValidationError("Unsupported file format. Please upload a CSV, TSV or Excel file.")
 
     # TODO: Check upper limit for file size
     # Add file size validation (e.g., limit to 150 MiB)
