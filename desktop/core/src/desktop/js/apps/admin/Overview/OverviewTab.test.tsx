@@ -22,8 +22,8 @@ import Overview from './OverviewTab';
 import Examples from './Examples';
 import Analytics from './Analytics';
 import * as hueConfigModule from '../../../config/hueConfig';
-import { UPDATE_USAGE_ANALYTICS_API_URL } from '../Components/utils';
 import {
+  UPDATE_USAGE_ANALYTICS_API_URL,
   INSTALL_APP_EXAMPLES_API_URL,
   INSTALL_AVAILABLE_EXAMPLES_API_URL
 } from '../Components/utils';
