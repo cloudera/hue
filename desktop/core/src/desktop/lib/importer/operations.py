@@ -48,7 +48,6 @@ def local_file_upload(upload_file, username: str) -> Dict[str, str]:
 
   Returns:
     Dict[str, str]: A dictionary containing:
-      - filename: The generated unique filename
       - file_path: The full path where the file was saved
 
   Raises:
@@ -58,7 +57,7 @@ def local_file_upload(upload_file, username: str) -> Dict[str, str]:
   Example:
     >>> result = upload_local_file(request.FILES['file'], 'hue_user')
     >>> print(result)
-    {'filename': 'hue_user_a1b2c3d4_myfile.txt', 'file_path': '/tmp/hue_user_a1b2c3d4_myfile.txt'}
+    {'file_path': '/tmp/hue_user_a1b2c3d4_myfile.txt'}
   """
   if not upload_file:
     raise ValueError("Upload file cannot be None or empty")
@@ -82,7 +81,7 @@ def local_file_upload(upload_file, username: str) -> Dict[str, str]:
       for chunk in upload_file.chunks():
         destination.write(chunk)
 
-    return {'filename': filename, 'file_path': destination_path}
+    return {'file_path': destination_path}
 
   except Exception as e:
     # Clean up the file if there was an error
