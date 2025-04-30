@@ -137,6 +137,7 @@ class RequirementsGenerator:
                 "lxml==4.9.1",
                 "sasl==0.3.1",
                 "Markdown==3.8",
+                "decorator==5.1.1",
             ],
             "3.11": [
                 "cryptography==42.0.8",
@@ -163,6 +164,7 @@ class RequirementsGenerator:
                 "lxml==4.9.1",
                 "sasl==0.3.1",
                 "Markdown==3.8",
+                "decorator==5.1.1",
             ],
             "3.11": [
                 "cryptography==42.0.8",
