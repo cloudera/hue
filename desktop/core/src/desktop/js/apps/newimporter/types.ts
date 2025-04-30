@@ -41,7 +41,7 @@ export interface FileFormatResponse {
 
 export interface FileMetaData {
   path: string;
-  type: ImporterFileTypes;
+  type?: ImporterFileTypes;
   source: ImporterFileSource;
 }
 
