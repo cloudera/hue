@@ -23,8 +23,6 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-# TODO: Check if we need try/except for python-magic import because of libmagic
-import magic
 import polars as pl
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
@@ -66,10 +64,8 @@ def local_file_upload(upload_file, username: str) -> Dict[str, str]:
     raise ValueError("Username cannot be None or empty")
 
   # Generate a unique filename
-  safe_original_name = re.sub(r'[^0-9a-zA-Z]+', '_', upload_file.name)
   unique_id = uuid.uuid4().hex[:8]
-
-  filename = f"{username}_{unique_id}_{safe_original_name}"
+  filename = f"{username}_{unique_id}_{upload_file.name}"
 
   # Create a temporary file with our generated filename
   temp_dir = tempfile.gettempdir()
