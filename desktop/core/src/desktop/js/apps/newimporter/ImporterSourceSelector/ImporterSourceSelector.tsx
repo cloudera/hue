@@ -14,14 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Button from 'cuix/dist/components/Button';
 import DocumentationIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
+import S3Icon from '@cloudera/cuix-core/icons/react/S3Icon';
+import HDFSIcon from '@cloudera/cuix-core/icons/react/HDFSIcon';
+import OzoneIcon from '@cloudera/cuix-core/icons/react/OzoneIcon';
+import AdlsIcon from '../../../components/icons/AdlsIcon';
+
 import { hueWindow } from 'types/types';
 
-import { FileMetaData, ImporterFileSource, LocalFileUploadResponse } from '../types';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import FileChooserModal from '../../storageBrowser/FileChooserModal/FileChooserModal';
+import { FileMetaData, ImporterFileSource, LocalFileUploadResponse, FileSystem } from '../types';
 import { i18nReact } from '../../../utils/i18nReact';
-import { UPLOAD_LOCAL_FILE_API_URL } from '../api';
+import { UPLOAD_LOCAL_FILE_API_URL, FILESYSTEMS_API_URL } from '../api';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import huePubSub from '../../../utils/huePubSub';
 
@@ -34,8 +42,44 @@ interface ImporterSourceSelectorProps {
 const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const uploadRef = useRef<HTMLInputElement>(null);
+  const [showFileChooserModal, setShowFileChooserModal] = useState<boolean>(false);
+  const [filePath, setFilePath] = useState<string>('');
 
+  const {
+    data: fileSystemsData,
+    loading,
+    error,
+    reloadData
+  } = useLoadData<FileSystem[]>(FILESYSTEMS_API_URL);
   const { save: upload } = useSaveData<LocalFileUploadResponse>(UPLOAD_LOCAL_FILE_API_URL);
+
+  const errorConfig = [
+    {
+      enabled: !!error,
+      message: t('An error occurred while fetching the filesystem'),
+      action: t('Retry'),
+      onClick: reloadData
+    }
+  ];
+
+  const fileSystems = {
+    s3a: {
+      icon: <S3Icon />,
+      title: 'Amazon S3'
+    },
+    hdfs: {
+      icon: <HDFSIcon />,
+      title: 'Hadoop Distributed File System'
+    },
+    abfs: {
+      icon: <AdlsIcon />,
+      title: 'Azure Blob File System'
+    },
+    ofs: {
+      icon: <OzoneIcon />,
+      title: 'Ozone File System'
+    }
+  };
 
   const handleUploadClick = () => {
     if (!uploadRef || !uploadRef.current) {
@@ -82,34 +126,69 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
     }
   };
 
+  const handleFileSelection = async (destination_path: string) => {
+    setFileMetaData({
+      path: destination_path,
+      source: 'file'
+    });
+  };
+
   return (
-    <div className="hue-importer__source-selector cuix antd">
-      <div className="hue-importer__source-selector-title">
-        {t('Select a source to import from')}
+    <LoadingErrorWrapper loading={loading} errors={errorConfig}>
+      <div className="hue-importer__source-selector cuix antd">
+        <div className="hue-importer__source-selector-title">
+          {t('Select a source to import from')}
+        </div>
+        <div className="hue-importer__source-selector-options">
+          {(window as hueWindow).ENABLE_DIRECT_UPLOAD && (
+            <div className="hue-importer__source-selector-option">
+              <Button
+                className="hue-importer__source-selector-option-button"
+                size="large"
+                icon={<DocumentationIcon />}
+                onClick={handleUploadClick}
+              ></Button>
+              <span className="hue-importer__source-selector-option-btn-title">
+                {t('Upload from File')}
+              </span>
+              <input
+                ref={uploadRef}
+                type="file"
+                className="hue-importer__source-selector-option-upload"
+                onChange={handleFileUpload}
+                accept=".csv, .xlsx, .xls"
+              />
+            </div>
+          )}
+          {fileSystemsData?.map(filesystem => (
+            <div className="hue-importer__source-selector-option">
+              <Button
+                className="hue-importer__source-selector-option-button"
+                size="large"
+                icon={fileSystems[filesystem.name].icon}
+                onClick={() => {
+                  setFilePath(filesystem.userHomeDirectory);
+                  setShowFileChooserModal(true);
+                }}
+              ></Button>
+              <span className="hue-importer__source-selector-option-btn-title">
+                {t(fileSystems[filesystem.name].title)}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="hue-importer__source-selector-options">
-        {(window as hueWindow).ENABLE_DIRECT_UPLOAD && (
-          <div className="hue-importer__source-selector-option">
-            <Button
-              className="hue-importer__source-selector-option-button"
-              size="large"
-              icon={<DocumentationIcon />}
-              onClick={handleUploadClick}
-            ></Button>
-            <span className="hue-importer__source-selector-option-btn-title">
-              {t('Upload from File')}
-            </span>
-            <input
-              ref={uploadRef}
-              type="file"
-              className="hue-importer__source-selector-option-upload"
-              onChange={handleFileUpload}
-              accept=".csv, .xlsx, .xls"
-            />
-          </div>
-        )}
-      </div>
-    </div>
+      {showFileChooserModal && (
+        <FileChooserModal
+          onClose={() => setShowFileChooserModal(false)}
+          onSubmit={handleFileSelection}
+          showModal={showFileChooserModal}
+          title={t('Import file')}
+          sourcePath={filePath}
+          isImport={true}
+        />
+      )}
+    </LoadingErrorWrapper>
   );
 };
 

@@ -18,14 +18,14 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import FileChooserModal from './FileChooserModal';
-import { get } from '../../../api/utils';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
-// Mock the `get` function
-jest.mock('../../../api/utils', () => ({
-  get: jest.fn()
+jest.mock('../../../utils/hooks/useLoadData/useLoadData', () => ({
+  __esModule: true,
+  default: jest.fn()
 }));
 
-const mockGet = get as jest.MockedFunction<typeof get>;
+const mockReloadData = jest.fn();
 
 const mockData = [
   {
@@ -46,7 +46,12 @@ describe('FileChooserModal', () => {
   });
 
   beforeEach(() => {
-    mockGet.mockResolvedValue(mockData);
+    (useLoadData as jest.Mock).mockReturnValue({
+      data: { files: mockData },
+      loading: false,
+      error: null,
+      reloadData: mockReloadData
+    });
   });
 
   afterEach(() => {
@@ -71,7 +76,12 @@ describe('FileChooserModal', () => {
   });
 
   test('displays empty message if there are no files in the directory', async () => {
-    mockGet.mockResolvedValue([]);
+    (useLoadData as jest.Mock).mockReturnValueOnce({
+      data: { files: [] }, // Empty files array
+      loading: false,
+      error: null,
+      reloadData: mockReloadData
+    });
     render(
       <FileChooserModal
         showModal={true}
