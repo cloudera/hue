@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { StorageDirectoryTableData } from '../../../../types';
+import { BrowserViewType, StorageDirectoryTableData } from '../../../../types';
 import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
 import { RENAME_API_URL } from '../../../../api';
@@ -52,7 +52,7 @@ const RenameModal = ({
   return (
     <InputModal
       title={t('Rename')}
-      inputLabel={t('Enter new name')}
+      inputLabel={file.type === BrowserViewType.dir ? t('Folder name') : t('File name')}
       submitText={t('Rename')}
       showModal={isOpen}
       onSubmit={handleRename}

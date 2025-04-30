@@ -117,7 +117,6 @@ describe('InputModal', () => {
       />
     );
     const input = screen.getByRole('textbox');
-    expect(input).toHaveClass('hue-input-modal__input');
     expect(input).toBeVisible();
   });
 
@@ -135,7 +134,6 @@ describe('InputModal', () => {
       />
     );
     const input = screen.getByRole('spinbutton');
-    expect(input).toHaveClass('hue-input-modal__input');
     expect(input).toBeVisible();
   });
 

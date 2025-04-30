@@ -52,7 +52,7 @@ const ReplicationModal = ({
   return (
     <InputModal
       title={t('Setting Replication factor for: ') + file.path}
-      inputLabel={t('Replication factor:')}
+      inputLabel={t('Replication factor')}
       submitText={t('Submit')}
       showModal={isOpen}
       onSubmit={handleReplication}
