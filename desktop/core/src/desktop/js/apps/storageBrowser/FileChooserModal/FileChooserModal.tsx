@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Input, Tooltip } from 'antd';
 import Table, { ColumnProps } from 'cuix/dist/components/Table';
@@ -74,10 +74,10 @@ const FileChooserModal = ({
   const [destPath, setDestPath] = useState<string>(sourcePath);
   const [submitLoading, setSubmitLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [showCreateFolderModal, setShowCreateFolderModal] = useState<boolean>(false);
   const [polling, setPolling] = useState<boolean>(false);
   const [filesToUpload, setFilesToUpload] = useState<RegularFile[]>([]);
+  const uploadRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (showModal) {
@@ -177,8 +177,15 @@ const FileChooserModal = ({
     setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
   };
 
-  const onUpload = (files: File[]) => {
-    setShowUploadModal(false);
+  const handleUploadClick = () => {
+    if (!uploadRef || !uploadRef.current) {
+      return;
+    }
+    uploadRef.current.click();
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files as ArrayLike<File>);
     onFilesDrop(files);
   };
 
@@ -215,12 +222,33 @@ const FileChooserModal = ({
     onClose();
   };
 
+  const TableContent = (
+    <LoadingErrorWrapper loading={loading && !polling} errors={errorConfig}>
+      <Table
+        className="hue-filechooser-modal__table"
+        dataSource={tableData}
+        pagination={false}
+        columns={getColumns(tableData[0] ?? {})}
+        rowKey={r => `${r.path}__${r.type}__${r.name}`}
+        scroll={{ y: '250px' }}
+        rowClassName={record =>
+          record.type === BrowserViewType.file && !isImport
+            ? classNames('hue-filechooser-modal__table-row', 'disabled-row')
+            : 'hue-filechooser-modal__table-row'
+        }
+        onRow={onRowClicked}
+        locale={locale}
+        showHeader={false}
+      />
+    </LoadingErrorWrapper>
+  );
+
   return (
     <Modal
       open={showModal}
       title={title}
       className="hue-filechooser-modal cuix antd"
-      onOk={isImport ? () => setShowUploadModal(true) : handleOk}
+      onOk={isImport ? handleUploadClick : handleOk}
       okText={isImport ? t('Upload file') : submitText}
       okButtonProps={!isImport ? { disabled: sourcePath === destPath, loading: submitLoading } : {}}
       secondaryButtonText={t('Create folder')}
@@ -240,34 +268,15 @@ const FileChooserModal = ({
             handleSearch(event.target.value);
           }}
         />
-        <LoadingErrorWrapper loading={loading && !polling} errors={errorConfig}>
-          <Table
-            className="hue-filechooser-modal__table"
-            dataSource={tableData}
-            pagination={false}
-            columns={getColumns(tableData[0] ?? {})}
-            rowKey={r => `${r.path}__${r.type}__${r.name}`}
-            scroll={{ y: '250px' }}
-            rowClassName={record =>
-              record.type === BrowserViewType.file && !isImport
-                ? classNames('hue-filechooser-modal__table-row', 'disabled-row')
-                : 'hue-filechooser-modal__table-row'
-            }
-            onRow={onRowClicked}
-            locale={locale}
-            showHeader={false}
-          />
-        </LoadingErrorWrapper>
+        {isImport ? <DragAndDrop onDrop={onFilesDrop}>{TableContent}</DragAndDrop> : TableContent}
       </div>
-      <Modal
-        onCancel={() => setShowUploadModal(false)}
-        className="hue-file-upload-modal cuix antd"
-        open={showUploadModal}
-        title={t('Upload a File')}
-        destroyOnClose
-      >
-        <DragAndDrop onDrop={onUpload} />
-      </Modal>
+      <input
+        ref={uploadRef}
+        type="file"
+        className="hue-importer__source-selector-option-upload"
+        onChange={handleFileUpload}
+        accept=".csv, .xlsx, .xls"
+      />
       {filesToUpload.length > 0 && (
         <FileUploadQueue
           filesQueue={filesToUpload}
