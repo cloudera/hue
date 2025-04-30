@@ -46,13 +46,17 @@ const mockFiles: StorageDirectoryTableData[] = [
     replication: 1
   }
 ];
+
+const mockReloadData = jest.fn();
 jest.mock('../../../../../../utils/hooks/useLoadData/useLoadData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     data: {
       files: mockFiles
     },
-    loading: false
+    loading: false,
+    error: null,
+    reloadData: mockReloadData
   }))
 }));
 

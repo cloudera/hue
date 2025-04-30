@@ -42,6 +42,7 @@ $option-size: 80px;
       margin-top: 70px;
       max-width: 80%;
       gap: $option-size;
+      align-items: baseline;
     }
 
     &-option {
