@@ -83,3 +83,14 @@ $icon-margin: 5px;
     color: vars.$fluidx-blue-700;
   }
 }
+
+.hue-file-upload-modal {
+  .ant-modal-body {
+    cursor: pointer;
+    height: 150px;
+  }
+
+  .ant-modal-footer {
+    display: none;
+  }
+}
