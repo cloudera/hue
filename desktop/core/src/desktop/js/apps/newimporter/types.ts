@@ -41,7 +41,7 @@ export interface FileFormatResponse {
 
 export interface FileMetaData {
   path: string;
-  type: ImporterFileTypes;
+  type?: ImporterFileTypes;
   source: ImporterFileSource;
 }
 
@@ -72,4 +72,9 @@ export interface GuessFieldTypesResponse {
 export interface ImporterTableData {
   importerDataKey: string;
   [key: string]: string | number;
+}
+
+export interface FileSystem {
+  name: string;
+  userHomeDirectory: string;
 }
