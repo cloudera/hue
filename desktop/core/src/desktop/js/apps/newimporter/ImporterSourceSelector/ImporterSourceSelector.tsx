@@ -129,7 +129,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
   const handleFileSelection = async (destination_path: string) => {
     setFileMetaData({
       path: destination_path,
-      source: 'file'
+      source: ImporterFileSource.REMOTE
     });
   };
 
@@ -161,7 +161,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
             </div>
           )}
           {fileSystemsData?.map(filesystem => (
-            <div className="hue-importer__source-selector-option">
+            <div className="hue-importer__source-selector-option" key={filesystem.name}>
               <Button
                 className="hue-importer__source-selector-option-button"
                 size="large"
