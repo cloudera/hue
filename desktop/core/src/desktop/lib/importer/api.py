@@ -109,10 +109,11 @@ def guess_file_metadata(request: Request) -> Response:
       - quote_char: Quote character
       - record_separator: Record separator
   """
-  file_path = request.data.get('file_path')
-  import_type = request.data.get('import_type')
+  file_path = request.query_params.get('file_path')
+  import_type = request.query_params.get('import_type')
 
-  if not file_path or not os.path.exists(file_path):
+  # TODO: Add serializer for validating query params
+  if not file_path:
     return Response({'error': "Missing parameters: file_path is required."}, status=status.HTTP_400_BAD_REQUEST)
 
   if (import_type == 'local' and not os.path.isfile(file_path)) or (import_type == 'remote' and not request.fs.exists(file_path)):
@@ -179,9 +180,12 @@ def _get_excel_metadata(fh) -> Dict[str, Any]:
 def _get_delimited_metadata(file_sample, file_type: str) -> Dict[str, Any]:
   """Extract metadata for delimited files (CSV, TSV, etc.)"""
   try:
-    sniffer = csv.Sniffer()
-    dialect = sniffer.sniff(file_sample)
-    # has_header = sniffer.has_header(file_sample)  # TODO: Need to do like old implementation to check for has_header?
+    # Ensure file_sample is a string; decode bytes if necessary
+    if isinstance(file_sample, bytes):
+      file_sample = file_sample.decode('utf-8', errors='replace')
+
+    dialect = csv.Sniffer().sniff(file_sample)
+    # has_header = csv.Sniffer().has_header(file_sample)  # TODO: Need to do like old implementation to check for has_header?
 
     # TODO: Should we handle scenario where user uploads a file with extension .csv but the content is actually TSV or other format?
     if file_type == 'delimited_other':
@@ -200,5 +204,21 @@ def _get_delimited_metadata(file_sample, file_type: str) -> Dict[str, Any]:
     }
 
   except Exception as e:
-    LOG.error(f"Error detecting file format: {e}")
+    LOG.error(f"Error detecting file format: {e}", exc_info=True)
     return {}
+
+
+# @api_view(['GET'])
+# @parser_classes([JSONParser])
+# @api_error_handler
+# def preview_file(request: Request) -> Response:
+#   """Preview a file based on its path and import type.
+
+#   Args:
+#     request: Request object containing file_path and import_type
+#   Returns:
+#     Response containing a preview of the file content
+#   """
+
+
+# pass
