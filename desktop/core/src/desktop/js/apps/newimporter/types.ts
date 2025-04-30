@@ -80,3 +80,8 @@ export interface DestinationConfig {
   connectorId?: string;
   computeId?: string;
 }
+
+export interface FileSystem {
+  name: string;
+  userHomeDirectory: string;
+}
