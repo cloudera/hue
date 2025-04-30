@@ -25,8 +25,6 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-# TODO: Check if we need try/except for python-magic import because of libmagic
-import magic
 import polars as pl
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
@@ -38,6 +36,14 @@ from desktop.lib.importer.operations import local_file_upload
 from desktop.lib.importer.serializers import LocalFileUploadSerializer
 
 LOG = logging.getLogger()
+
+try:
+  import magic
+
+  is_magic_lib_available = True
+except ImportError as e:
+  LOG.exception(f'Failed to import python-magic: {str(e)}')
+  is_magic_lib_available = False
 
 
 # TODO: Improve error response further with better context -- Error UX Phase 2
@@ -143,32 +149,29 @@ def guess_file_metadata(request: Request) -> Response:
 
 
 def _detect_file_type(file_path: str, file_sample) -> str:
-  """Detect file type using both extension and content analysis"""
-  # Try extension first
-  extension = Path(file_path).suffix.lower()[1:]
-
-  if extension in ['xlsx', 'xls']:
-    return 'excel'
-  elif extension in ['csv', 'tsv']:
-    return extension
-
-  # If no extension or unknown, use libmagic to detect file type from content
+  """Detect the file type based on its content."""
+  # Use libmagic to detect file type from its sample content
+  # Not depending on file extension as it can be misleading sometimes such as a CSV file with TSV or Excel content
   detected_type = 'unknown'
-  if not extension or extension not in ['xlsx', 'xls', 'csv', 'tsv']:
-    file_type = magic.from_buffer(file_sample, mime=True)
+  if not is_magic_lib_available:
+    error = "Unable to guess file type. python-magic or its dependency libmagic is not installed."
+    LOG.error(error)
+    raise Exception(error)
 
-    if 'excel' in file_type or 'spreadsheet' in file_type:
-      detected_type = 'excel'
-    elif 'text' in file_type or 'csv' in file_type:
-      # For text files, analyze content later to determine if CSV/TSV or other related format
-      detected_type = 'delimited_other'
+  file_type = magic.from_buffer(file_sample, mime=True)
+
+  if 'excel' in file_type or 'spreadsheet' in file_type:
+    detected_type = 'excel'
+  elif 'text' in file_type or 'csv' in file_type:
+    # For text files, analyze content later to determine if CSV/TSV or other related format
+    detected_type = 'delimiter_format'
 
   return detected_type
 
 
 def _get_excel_metadata(fh) -> Dict[str, Any]:
   """Extract metadata for Excel files (.xlsx, .xls)"""
-  fh.seek(0)  # Reset file handle to read the file again
+  fh.seek(0)  # Reset file handle first
   sheet_names = pl.read_excel(BytesIO(fh.read()), sheet_id=0).keys()
 
   return {
@@ -180,24 +183,22 @@ def _get_excel_metadata(fh) -> Dict[str, Any]:
 def _get_delimited_metadata(file_sample, file_type: str) -> Dict[str, Any]:
   """Extract metadata for delimited files (CSV, TSV, etc.)"""
   try:
-    # Ensure file_sample is a string; decode bytes if necessary
+    # Convert bytes to string if needed
     if isinstance(file_sample, bytes):
       file_sample = file_sample.decode('utf-8', errors='replace')
 
     dialect = csv.Sniffer().sniff(file_sample)
-    # has_header = csv.Sniffer().has_header(file_sample)  # TODO: Need to do like old implementation to check for has_header?
 
-    # TODO: Should we handle scenario where user uploads a file with extension .csv but the content is actually TSV or other format?
-    if file_type == 'delimited_other':
-      # TODO: Extend to support other delimiters like '|', ';', etc. if needed else generic 'delimited_other' is set as file_type
-      if dialect.delimiter == '\t':
-        file_type = 'tsv'
-      elif dialect.delimiter == ',':
+    # After sniffing, try determining the file type based on the delimiter for better distinction
+    if file_type == 'delimiter_format':
+      if dialect.delimiter == ',':
         file_type = 'csv'
+      elif dialect.delimiter == '\t':
+        file_type = 'tsv'
+      # TODO: We can try mapping other delimiters like '|', ';', etc. if needed else generic 'delimiter_format' is set as file_type
 
     return {
       'type': file_type,
-      # 'has_header': has_header,
       'field_separator': dialect.delimiter,
       'quote_char': dialect.quotechar,
       'record_separator': dialect.lineterminator,
