@@ -65,14 +65,13 @@ describe('ChangeOwnerAndGroupModal Component', () => {
         users={users}
         groups={groups}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
       />
     );
 
-    expect(getByText('Change Onwer / Group')).toBeInTheDocument();
+    expect(getByText('Change Owner / Group')).toBeInTheDocument();
     expect(getByText('Submit')).toBeInTheDocument();
     expect(getByText('Cancel')).toBeInTheDocument();
     expect(getByText('User')).toBeInTheDocument();
@@ -94,7 +93,6 @@ describe('ChangeOwnerAndGroupModal Component', () => {
         users={users}
         groups={groups}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -123,7 +121,6 @@ describe('ChangeOwnerAndGroupModal Component', () => {
         users={users}
         groups={groups}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -152,7 +149,6 @@ describe('ChangeOwnerAndGroupModal Component', () => {
         users={users}
         groups={groups}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -176,7 +172,6 @@ describe('ChangeOwnerAndGroupModal Component', () => {
         users={users}
         groups={groups}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -204,7 +199,6 @@ describe('ChangeOwnerAndGroupModal Component', () => {
         users={users}
         groups={groups}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -231,7 +225,6 @@ describe('ChangeOwnerAndGroupModal Component', () => {
         users={users}
         groups={groups}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -254,7 +247,6 @@ describe('ChangeOwnerAndGroupModal Component', () => {
         users={users}
         groups={groups}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -274,7 +266,6 @@ describe('ChangeOwnerAndGroupModal Component', () => {
         users={users}
         groups={groups}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
