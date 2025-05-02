@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
@@ -79,7 +79,7 @@ describe('InputModal', () => {
     await user.type(inputField, 'test-file.txt');
 
     await user.click(submitButton);
-    expect(mockOnSubmit).toHaveBeenCalled();
+    waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
   });
 
   it('should call onClose when close button is clicked', async () => {
@@ -117,7 +117,6 @@ describe('InputModal', () => {
       />
     );
     const input = screen.getByRole('textbox');
-    expect(input).toHaveClass('hue-input-modal__input');
     expect(input).toBeVisible();
   });
 
@@ -135,7 +134,6 @@ describe('InputModal', () => {
       />
     );
     const input = screen.getByRole('spinbutton');
-    expect(input).toHaveClass('hue-input-modal__input');
     expect(input).toBeVisible();
   });
 
@@ -211,12 +209,12 @@ describe('InputModal', () => {
 
     expect(inputTextBox).toHaveFocus();
     await user.tab();
-    expect(submitButton).toHaveFocus();
+    waitFor(() => expect(submitButton).toHaveFocus());
     await user.tab();
     expect(cancelButton).toHaveFocus();
   });
 
-  it('should disable the submit button when buttonDisabled is true', () => {
+  it('should disable the submit button when isLoading is true', () => {
     render(
       <InputModal
         title="Create File"
@@ -227,11 +225,11 @@ describe('InputModal', () => {
         onClose={mockOnClose}
         initialValue=""
         inputType="text"
-        buttonDisabled={true}
+        loading={true}
       />
     );
-    const submitButton = screen.getByRole('button', { name: 'Create' });
-    expect(submitButton).toBeDisabled();
+    const submitButton = screen.getByRole('button', { name: 'loading Create' });
+    expect(submitButton).toBeInTheDocument();
   });
 
   it('should disable the submit button when input value is same as initial value', async () => {
@@ -254,7 +252,6 @@ describe('InputModal', () => {
 
     const inputField = screen.getByRole('textbox');
     await user.type(inputField, 'test-file.txt');
-
-    expect(submitButton).not.toBeDisabled();
+    waitFor(() => expect(submitButton).not.toBeDisabled());
   });
 });

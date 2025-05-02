@@ -15,20 +15,23 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
+import { Checkbox } from 'antd';
 import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
-import { Checkbox, Table } from 'antd';
+import PaginatedTable, {
+  ColumnProps
+} from '../../../../../../reactComponents/PaginatedTable/PaginatedTable';
 import { StorageDirectoryTableData } from '../../../../types';
 import { BULK_CHANGE_PERMISSION_API_URL } from '../../../../api';
 import { getInitialPermissions, Permission } from './ChangePermissionModal.util';
+import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './ChangePermissionModal.scss';
 
 interface ChangePermissionModalProps {
   isOpen?: boolean;
   files: StorageDirectoryTableData[];
-  setLoading: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
@@ -37,7 +40,6 @@ interface ChangePermissionModalProps {
 const ChangePermissionModal = ({
   isOpen = true,
   files,
-  setLoading,
   onSuccess,
   onError,
   onClose
@@ -47,18 +49,13 @@ const ChangePermissionModal = ({
   const initialPermissions = getInitialPermissions(files);
   const [permissions, setPermissions] = useState<Permission[]>(initialPermissions);
 
-  const { save, loading } = useSaveData(BULK_CHANGE_PERMISSION_API_URL, {
-    postOptions: {
-      qsEncodeData: false
-    },
+  const { save, loading, error } = useSaveData(BULK_CHANGE_PERMISSION_API_URL, {
     skip: !files.length,
     onSuccess,
     onError
   });
 
   const handleChangeOwner = () => {
-    setLoading(true);
-
     const formData = new FormData();
     const perm = permissions.reduce((acc, { key, user, group, other, common }) => {
       if (user) {
@@ -93,30 +90,36 @@ const ChangePermissionModal = ({
 
   const renderTableCheckbox = (key: keyof Permission) => (value: boolean, record: Permission) => {
     if (value !== undefined) {
-      return <Checkbox checked={value} onChange={() => handleCheckboxChange(record.key, key)} />;
+      return (
+        <Checkbox
+          checked={value}
+          onChange={() => handleCheckboxChange(record.key, key)}
+          disabled={loading}
+        />
+      );
     }
   };
 
-  const columns = [
+  const columns: ColumnProps<Permission>[] = [
     {
       title: '',
       dataIndex: 'key',
       key: 'key'
     },
     {
-      title: 'User',
+      title: t('User'),
       dataIndex: 'user',
       key: 'user',
       render: renderTableCheckbox('user')
     },
     {
-      title: 'Group',
+      title: t('Group'),
       dataIndex: 'group',
       key: 'group',
       render: renderTableCheckbox('group')
     },
     {
-      title: 'Other',
+      title: t('Other'),
       dataIndex: 'other',
       key: 'other',
       render: renderTableCheckbox('other')
@@ -129,6 +132,8 @@ const ChangePermissionModal = ({
     }
   ];
 
+  const errors = [{ enabled: !!error, message: error }];
+
   return (
     <Modal
       cancelText={t('Cancel')}
@@ -138,15 +143,16 @@ const ChangePermissionModal = ({
       onOk={handleChangeOwner}
       open={isOpen}
       title={t('Change Permissions')}
-      okButtonProps={{ disabled: loading }}
+      okButtonProps={{
+        loading,
+        disabled: JSON.stringify(initialPermissions) === JSON.stringify(permissions)
+      }}
       cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
-      <Table
-        dataSource={permissions}
-        columns={columns}
-        pagination={false}
-        className="hue-change-permission__table"
-      />
+      <LoadingErrorWrapper errors={errors}>
+        <PaginatedTable<Permission> data={permissions} columns={columns} rowKey="key" />
+      </LoadingErrorWrapper>
     </Modal>
   );
 };

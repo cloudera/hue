@@ -10,6 +10,9 @@ export async function loadComponent(name) {
     case 'StorageBrowserPage':
       return (await import('../apps/storageBrowser/StorageBrowserPage')).default;
 
+    case 'Overview':
+      return (await import('../apps/admin/Overview/OverviewTab')).default;
+
     case 'Metrics':
       return (await import('../apps/admin/Metrics/MetricsTab')).default;
 
@@ -29,14 +32,11 @@ export async function loadComponent(name) {
     case 'ReactExampleGlobal':
       return (await import('./ReactExampleGlobal/ReactExampleGlobal')).default;
 
-    case 'FileChooserWithButton':
-      return (await import('./FileChooser/FileChooserWithButton/FileChooserWithButton')).default;
-
     case 'WelcomeTour':
       return (await import('./WelcomeTour/WelcomeTour')).default;
 
-    case 'TaskBrowser':
-      return (await import('./TaskBrowser/TaskBrowser')).default;
+    case 'TaskServer':
+      return (await import('./TaskServer/TaskServer')).default;
 
     default:
       console.error(`A placeholder component is rendered because you probably forgot to include your new component in the 

@@ -38,7 +38,8 @@ const ReplicationModal = ({
 }: ReplicationModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { save, loading } = useSaveData(SET_REPLICATION_API_URL, {
+  const { save, loading, error } = useSaveData(SET_REPLICATION_API_URL, {
+    postOptions: { qsEncodeData: true }, // TODO: Remove once API supports RAW JSON payload
     skip: !file.path,
     onSuccess,
     onError
@@ -51,14 +52,15 @@ const ReplicationModal = ({
   return (
     <InputModal
       title={t('Setting Replication factor for: ') + file.path}
-      inputLabel={t('Replication factor:')}
+      inputLabel={t('Replication factor')}
       submitText={t('Submit')}
       showModal={isOpen}
       onSubmit={handleReplication}
       onClose={onClose}
       inputType="number"
       initialValue={file.replication}
-      buttonDisabled={loading}
+      loading={loading}
+      error={error}
     />
   );
 };

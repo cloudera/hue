@@ -29,13 +29,13 @@ import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../../api';
 import { FileStats } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import InputModal from '../../../../../reactComponents/InputModal/InputModal';
-import './CreateAndUploadAction.scss';
 import DragAndDrop from '../../../../../reactComponents/DragAndDrop/DragAndDrop';
+
+import './CreateAndUploadAction.scss';
 
 interface CreateAndUploadActionProps {
   currentPath: FileStats['path'];
   onActionSuccess: () => void;
-  setLoadingFiles: (value: boolean) => void;
   onFilesUpload: (files: File[]) => void;
   onActionError: (error: Error) => void;
 }
@@ -49,7 +49,6 @@ enum ActionType {
 const CreateAndUploadAction = ({
   currentPath,
   onActionSuccess,
-  setLoadingFiles,
   onFilesUpload,
   onActionError
 }: CreateAndUploadActionProps): JSX.Element => {
@@ -71,7 +70,8 @@ const CreateAndUploadAction = ({
     onActionSuccess();
   };
 
-  const { save, loading } = useSaveData(undefined, {
+  const { save, loading, error } = useSaveData(undefined, {
+    postOptions: { qsEncodeData: true }, // TODO: Remove once API supports RAW JSON payload
     onSuccess: onApiSuccess,
     onError: onActionError
   });
@@ -124,7 +124,6 @@ const CreateAndUploadAction = ({
     if (!url) {
       return;
     }
-    setLoadingFiles(true);
     save({ path: currentPath, name }, { url });
   };
 
@@ -138,7 +137,7 @@ const CreateAndUploadAction = ({
         }}
         trigger={['click']}
       >
-        <PrimaryButton data-event="">
+        <PrimaryButton>
           {t('New')}
           <DropDownIcon />
         </PrimaryButton>
@@ -153,7 +152,8 @@ const CreateAndUploadAction = ({
           submitText={t('Create')}
           onSubmit={handleCreate}
           onClose={onModalClose}
-          buttonDisabled={loading}
+          loading={loading}
+          error={error}
         />
       )}
       <Modal

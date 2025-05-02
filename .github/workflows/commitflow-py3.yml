@@ -8,9 +8,9 @@ on:
     branches:
     - master
 jobs:
-  build:
+  hue-build-and-tests:
 
-    runs-on: ${{ (matrix.python-version == '3.10' || matrix.python-version == '3.11') && 'ubuntu-22.04' || 'ubuntu-20.04' }}
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -36,7 +36,7 @@ jobs:
       with:
         # This path is specific to Ubuntu
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/requirements.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/generate_requirements.py') }}
         restore-keys: |
           ${{ runner.os }}-pip-
           ${{ runner.os }}-
@@ -50,24 +50,30 @@ jobs:
     - name: Build Hue
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc g++ build-essential python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-venv python${{ matrix.python-version }}-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
-        sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python${{ matrix.python-version }}
-        sudo apt-get install -y python3-setuptools
-        sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
+        sudo apt-get install -y build-essential asciidoc libkrb5-dev libldap2-dev libsasl2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libgdbm-dev
 
         export PYTHON_VER=python${{ matrix.python-version }}
+        export SKIP_PYTHONDEV_CHECK=true
         export ROOT=$PWD
-        make test_prep
+        make apps test_prep
 
-    - name: Run python unit tests
+    - name: Run unit tests
       run: |
-        ./build/env/bin/pytest
+        if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+          ./build/env/bin/pytest
+        else
+          ./build/venvs/python${{ matrix.python-version }}/bin/pytest
+        fi
 
-    - name: Run python lints
+    - name: Run python lint check
       run: |
-        PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+        if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+          PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+        else
+          PYTHONWARNINGS=always ./build/venvs/python${{ matrix.python-version }}/bin/hue runruff check
+        fi
 
-    - name: Run documentation lints
+    - name: Run documentation lint check
       run: |
         curl -O https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz
         tar -xvf go1.23.4.linux-amd64.tar.gz

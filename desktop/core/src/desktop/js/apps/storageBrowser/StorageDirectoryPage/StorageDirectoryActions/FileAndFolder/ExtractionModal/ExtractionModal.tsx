@@ -20,12 +20,12 @@ import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
 import { StorageDirectoryTableData } from '../../../../types';
 import { EXTRACT_API_URL } from '../../../../api';
+import LoadingErrorWrapper from '../../../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface ExtractActionProps {
   currentPath: string;
   isOpen?: boolean;
   file: StorageDirectoryTableData;
-  setLoading: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
@@ -35,27 +35,33 @@ const ExtractionModal = ({
   currentPath,
   isOpen = true,
   file,
-  setLoading,
   onSuccess,
   onError,
   onClose
 }: ExtractActionProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const { save, loading } = useSaveData(EXTRACT_API_URL, {
+  const { save, loading, error } = useSaveData(EXTRACT_API_URL, {
+    // TODO: Remove qsEncodeData once API supports RAW JSON payload
+    postOptions: { qsEncodeData: true },
     skip: !file,
     onSuccess,
     onError
   });
 
   const handleExtract = () => {
-    setLoading(true);
-
     save({
       upload_path: currentPath,
       archive_name: file.name
     });
   };
+
+  const errors = [
+    {
+      enabled: !!error,
+      message: error
+    }
+  ];
 
   return (
     <Modal
@@ -66,10 +72,13 @@ const ExtractionModal = ({
       onOk={handleExtract}
       open={isOpen}
       title={t('Extract Archive')}
-      okButtonProps={{ disabled: loading }}
+      okButtonProps={{ disabled: !!error, loading }}
       cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
-      {t('Are you sure you want to extract "{{fileName}}" file?', { fileName: file.name })}
+      <LoadingErrorWrapper errors={errors}>
+        {t('Are you sure you want to extract "{{fileName}}" file?', { fileName: file.name })}
+      </LoadingErrorWrapper>
     </Modal>
   );
 };

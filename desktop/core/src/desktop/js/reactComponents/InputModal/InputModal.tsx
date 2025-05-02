@@ -16,11 +16,11 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
-import { Input, InputRef } from 'antd';
+import { Input, InputRef, Form } from 'antd';
 
 import { i18nReact } from '../../utils/i18nReact';
 
-import './InputModal.scss';
+import LoadingErrorWrapper from '../LoadingErrorWrapper/LoadingErrorWrapper';
 
 interface InputModalProps {
   cancelText?: string;
@@ -32,7 +32,8 @@ interface InputModalProps {
   submitText?: string;
   showModal: boolean;
   title: string;
-  buttonDisabled?: boolean;
+  loading?: boolean;
+  error?: string;
 }
 
 const InputModal = ({
@@ -43,7 +44,8 @@ const InputModal = ({
   onSubmit,
   showModal,
   title,
-  buttonDisabled,
+  error,
+  loading = false,
   ...i18n
 }: InputModalProps): JSX.Element => {
   const inputRef = useRef<InputRef>(null);
@@ -60,31 +62,39 @@ const InputModal = ({
     inputRef?.current?.focus();
   }, [inputRef.current]);
 
+  const errors = [{ enabled: !!error, message: error }];
+
   return (
     <Modal
-      cancelText={cancelText}
-      className="hue-input-modal cuix antd"
-      okText={submitText}
-      onCancel={onClose}
-      onOk={handleSubmit}
       open={showModal}
       title={title}
-      secondaryButtonProps={{ disabled: buttonDisabled }}
-      okButtonProps={{ disabled: buttonDisabled || initialValue === value }}
-      cancelButtonProps={{ disabled: buttonDisabled }}
+      okText={submitText}
+      onOk={handleSubmit}
+      okButtonProps={{
+        disabled: initialValue === value,
+        loading
+      }}
+      cancelText={cancelText}
+      onCancel={onClose}
+      cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
-      <div className="hue-input-modal__input-label">{inputLabel}</div>
-      <Input
-        className="hue-input-modal__input"
-        defaultValue={value}
-        type={inputType}
-        disabled={buttonDisabled}
-        onPressEnter={handleSubmit}
-        ref={inputRef}
-        onChange={e => {
-          setValue(e.target.value);
-        }}
-      />
+      <LoadingErrorWrapper errors={errors}>
+        <Form layout="vertical">
+          <Form.Item label={inputLabel}>
+            <Input
+              defaultValue={value}
+              type={inputType}
+              disabled={loading}
+              onPressEnter={handleSubmit}
+              ref={inputRef}
+              onChange={e => {
+                setValue(e.target.value);
+              }}
+            />
+          </Form.Item>
+        </Form>
+      </LoadingErrorWrapper>
     </Modal>
   );
 };

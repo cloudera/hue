@@ -42,6 +42,7 @@ from desktop.conf import CHERRYPY_SERVER_THREADS, ENABLE_ORGANIZATIONS, ENABLE_S
 from desktop.lib.apputil import INFO_LEVEL_CALL_DURATION_MS, WARN_LEVEL_CALL_DURATION_MS
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 from desktop.lib.python_util import create_synchronous_io_multiplexer
+from desktop.lib.sasl_compat import PureSASLClient
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
 from desktop.lib.thrift_sasl import TSaslClientTransport
@@ -351,17 +352,34 @@ def connect_to_thrift(conf):
       mode.set_basic_auth(conf.username, conf.password)
 
   if conf.transport_mode == 'socket' and conf.use_sasl:
-    def sasl_factory():
-      saslc = sasl.Client()
-      saslc.setAttr("host", str(conf.host))
-      saslc.setAttr("service", str(conf.kerberos_principal))
-      if conf.mechanism == 'PLAIN':
-        saslc.setAttr("username", str(conf.username))
-        saslc.setAttr("password", str(conf.password))  # Defaults to 'hue' for a non-empty string unless using LDAP
-      else:
-        saslc.setAttr("maxbufsize", SASL_MAX_BUFFER.get())
-      saslc.init()
-      return saslc
+    try:
+      import sasl  # pylint: disable=import-error
+
+      def sasl_factory():
+        saslc = sasl.Client()
+        saslc.setAttr("host", str(conf.host))
+        saslc.setAttr("service", str(conf.kerberos_principal))
+        if conf.mechanism == 'PLAIN':
+          saslc.setAttr("username", str(conf.username))
+          saslc.setAttr("password", str(conf.password))  # Defaults to 'hue' for a non-empty string unless using LDAP
+        else:
+          saslc.setAttr("maxbufsize", SASL_MAX_BUFFER.get())
+        saslc.init()
+        return saslc
+
+    except Exception as e:
+      LOG.debug("Unable to import 'sasl'. Fallback to 'puresasl'.")
+      from desktop.lib.sasl_compat import PureSASLClient
+
+      def sasl_factory():
+        return PureSASLClient(
+          host=str(conf.host),
+          username=str(conf.username) if conf.mechanism == 'PLAIN' else None,
+          password=str(conf.password) if conf.mechanism == 'PLAIN' else None,
+          maxbufsize=SASL_MAX_BUFFER.get() if conf.mechanism != 'PLAIN' else None,
+          service=str(conf.kerberos_principal)
+        )
+
     transport = TSaslClientTransport(sasl_factory, conf.mechanism, mode)
   elif conf.transport == 'framed':
     transport = TFramedTransport(mode)

@@ -21,7 +21,6 @@ describe('CreateAndUploadAction', () => {
   const currentPath = '/some/path';
   const onActionSuccess = jest.fn();
   const onActionError = jest.fn();
-  const setLoadingFiles = jest.fn();
   const mockFilesUpload = jest.fn();
 
   beforeEach(() => {
@@ -29,7 +28,6 @@ describe('CreateAndUploadAction', () => {
       <CreateAndUploadAction
         currentPath={currentPath}
         onActionSuccess={onActionSuccess}
-        setLoadingFiles={setLoadingFiles}
         onFilesUpload={mockFilesUpload}
         onActionError={onActionError}
       />

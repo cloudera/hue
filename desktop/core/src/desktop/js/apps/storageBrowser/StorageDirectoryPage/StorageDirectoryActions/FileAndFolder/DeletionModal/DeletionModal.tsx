@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
+import React, { useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { i18nReact } from '../../../../../../utils/i18nReact';
 import useSaveData from '../../../../../../utils/hooks/useSaveData/useSaveData';
@@ -25,7 +25,6 @@ interface DeletionModalProps {
   isOpen?: boolean;
   isTrashEnabled?: boolean;
   files: StorageDirectoryTableData[];
-  setLoading: (value: boolean) => void;
   onSuccess: () => void;
   onError: (error: Error) => void;
   onClose: () => void;
@@ -35,25 +34,23 @@ const DeletionModal = ({
   isOpen = true,
   isTrashEnabled = false,
   files,
-  setLoading,
   onSuccess,
   onError,
   onClose
 }: DeletionModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
+  const [isMoveTrashClicked, setIsMoveTrashClicked] = useState<boolean>(false);
+
   const { save, loading } = useSaveData(undefined, {
-    postOptions: {
-      qsEncodeData: false
-    },
     skip: !files.length,
     onSuccess,
     onError
   });
 
   const handleDeletion = (isForedSkipTrash: boolean = false) => {
-    setLoading(true);
     const isSkipTrash = !isTrashEnabled || isForedSkipTrash;
+    setIsMoveTrashClicked(!isSkipTrash);
 
     const formData = new FormData();
     files.forEach(selectedFile => {
@@ -72,17 +69,23 @@ const DeletionModal = ({
 
   return (
     <Modal
-      cancelText={t('Cancel')}
-      className="hue-input-modal cuix antd"
-      okText={isTrashEnabled ? t('Move to Trash') : t('Delete Permanently')}
-      onCancel={onClose}
-      onOk={() => handleDeletion()}
       open={isOpen}
       title={t('Confirm Delete')}
+      className="hue-input-modal cuix antd"
+      cancelText={t('Cancel')}
+      okText={isTrashEnabled ? t('Move to Trash') : t('Delete Permanently')}
+      onOk={() => handleDeletion()}
+      okButtonProps={{
+        disabled: loading && !isMoveTrashClicked,
+        loading: loading && isMoveTrashClicked
+      }}
       secondaryButtonText={isTrashEnabled ? t('Delete Permanently') : undefined}
       onSecondary={() => handleDeletion(true)}
-      secondaryButtonProps={{ disabled: loading }}
-      okButtonProps={{ disabled: loading }}
+      secondaryButtonProps={{
+        disabled: loading && isMoveTrashClicked,
+        loading: loading && !isMoveTrashClicked
+      }}
+      onCancel={onClose}
       cancelButtonProps={{ disabled: loading }}
     >
       {isTrashEnabled

@@ -21,8 +21,12 @@
     background-color: $fluidx-gray-100;
     padding: 24px;
 
-    .config__section-header {
+    .config__section-dropdown-label {
       color: $fluidx-gray-700;
+    }
+
+    .config__section-header {
+      margin-top: 16px;
     }
 
     .config__main-item {

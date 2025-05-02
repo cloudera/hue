@@ -836,6 +836,9 @@ class OIDCBackend(OIDCAuthenticationBackend):
       ),
     }
 
+    oidc_extra_params = import_from_settings('OIDC_AUTH_REQUEST_EXTRA_PARAMS', {})
+    token_payload.update(oidc_extra_params)
+
     # Get the token
     token_info = self.get_token(token_payload)
     id_token = token_info.get('id_token')

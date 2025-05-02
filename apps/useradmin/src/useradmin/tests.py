@@ -20,14 +20,12 @@ import re
 import sys
 import json
 import time
-import urllib.error
+import logging
 import urllib.parse
-import urllib.request
 from builtins import object
 from datetime import datetime
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
-import ldap
 import pytest
 from django.conf import settings
 from django.contrib.sessions.models import Session
@@ -46,7 +44,7 @@ from desktop.conf import APP_BLACKLIST, ENABLE_ORGANIZATIONS, ENABLE_PROMETHEUS
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.i18n import smart_str
 from desktop.lib.test_utils import grant_access
-from desktop.views import home, samlgroup_check
+from desktop.views import home
 from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from useradmin.forms import UserChangeForm
@@ -54,6 +52,14 @@ from useradmin.hue_password_policy import reset_password_policy
 from useradmin.metrics import active_users, active_users_per_instance
 from useradmin.middleware import ConcurrentUserSessionMiddleware
 from useradmin.models import Group, GroupPermission, HuePermission, User, UserProfile, get_default_user_group, get_profile
+
+LOG = logging.getLogger()
+
+try:
+  from ldap import SCOPE_SUBTREE
+except ImportError:
+  LOG.warning('ldap module is not available')
+  SCOPE_SUBTREE = None
 
 
 class MockRequest(dict):
@@ -111,7 +117,7 @@ class LdapTestConnection(object):
   def remove_posix_user_group_for_test(self, user, group):
     self._instance.groups[group]['posix_members'].remove(user)
 
-  def find_users(self, username_pattern, search_attr=None, user_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def find_users(self, username_pattern, search_attr=None, user_name_attr=None, find_by_dn=False, scope=SCOPE_SUBTREE):
     """ Returns info for a particular user via a case insensitive search """
     if find_by_dn:
       data = [attrs for attrs in list(self._instance.users.values()) if attrs['dn'] == username_pattern]
@@ -123,12 +129,12 @@ class LdapTestConnection(object):
     return data
 
   def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None,
-                  group_member_attr=None, group_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+                  group_member_attr=None, group_filter=None, find_by_dn=False, scope=SCOPE_SUBTREE):
     """ Return all groups in the system with parents and children """
     if find_by_dn:
       data = [attrs for attrs in list(self._instance.groups.values()) if attrs['dn'] == groupname_pattern]
       # SCOPE_SUBTREE means we return all sub-entries of the desired entry along with the desired entry.
-      if data and scope == ldap.SCOPE_SUBTREE:
+      if data and scope == SCOPE_SUBTREE:
         sub_data = [attrs for attrs in list(self._instance.groups.values()) if attrs['dn'].endswith(data[0]['dn'])]
         data.extend(sub_data)
     else:
@@ -137,7 +143,7 @@ class LdapTestConnection(object):
       data = [self._instance.groups.get(groupname) for groupname in groupnames]
     return data
 
-  def find_members_of_group(self, dn, search_attr, ldap_filter, scope=ldap.SCOPE_SUBTREE):
+  def find_members_of_group(self, dn, search_attr, ldap_filter, scope=SCOPE_SUBTREE):
     members = []
     for group_info in self._instance.groups:
       if group_info['dn'] == dn:
