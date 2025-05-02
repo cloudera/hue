@@ -101,7 +101,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     } else if (urlFilePath && !filePath) {
       onFilePathChange(urlFilePath, true);
     }
-  }, [filePath, urlFilePath]);
+  }, [filePath, urlFilePath, onFilePathChange]);
 
   const errors = [
     {
