@@ -19,17 +19,22 @@ import { useState, useEffect } from 'react';
 interface Location {
   href: string;
   pathname: string;
-  search: string;
+  search: URLSearchParams;
   hash: string;
 }
 
-const getLatestLocation = (): Location => ({
-  pathname: window.location.pathname,
-  search: window.location.search,
-  hash: window.location.hash,
-  href: window.location.href
-});
+const getLatestLocation = (): Location => {
+  const { pathname, hash, href, search } = window.location;
+  let searchParams: URLSearchParams;
 
+  try {
+    searchParams = new URLSearchParams(decodeURIComponent(search));
+  } catch {
+    searchParams = new URLSearchParams();
+  }
+
+  return { pathname, hash, href, search: searchParams };
+};
 const useUrlListener = (): Location => {
   const [location, setLocation] = useState<Location>(getLatestLocation());
 

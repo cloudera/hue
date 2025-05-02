@@ -54,8 +54,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
   const { t } = i18nReact.useTranslation();
   const { pathname, search } = useUrlListener();
 
-  const urlSearchParams = new URLSearchParams(search);
-  const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
+  const urlFilePath = search.get('path') ?? '';
   const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
   const initialFilePath =
     urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
@@ -97,13 +96,12 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
   };
 
   useEffect(() => {
-    const searchPath = urlSearchParams.get('path');
-    if (!searchPath) {
+    if (filePath && (urlFilePath !== filePath || !urlFilePath)) {
       onFilePathChange(filePath, true);
-    } else if (searchPath !== filePath) {
-      onFilePathChange(searchPath, true);
+    } else if (urlFilePath && !filePath) {
+      onFilePathChange(urlFilePath, true);
     }
-  }, [filePath, urlSearchParams]);
+  }, [filePath, urlFilePath]);
 
   const errors = [
     {
@@ -200,7 +198,7 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
         {fileStats?.type === BrowserViewType.dir && !loading && (
           <StorageDirectoryPage
             fileStats={fileStats}
-            onFilePathChange={onFilePathChange}
+            onFilePathChange={setFilePath}
             fileSystem={fileSystem}
             reloadTrashPath={reloadTrashPath}
           />
