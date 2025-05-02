@@ -130,7 +130,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
       message: t('An error occurred while fetching file content for path "{{path}}".', {
         path: fileStats.path
       }),
-      action: t('Retry'),
+      actionText: t('Retry'),
       onClick: onReload
     }
   ];
@@ -151,7 +151,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
           ))}
         </div>
 
-        <LoadingErrorWrapper loading={loading || isSaving} errors={errorConfig} hideChildren>
+        <LoadingErrorWrapper loading={loading || isSaving} errors={errorConfig} hideOnLoading>
           <div className="preview">
             <div className="preview__title-bar">
               {t('Content')}

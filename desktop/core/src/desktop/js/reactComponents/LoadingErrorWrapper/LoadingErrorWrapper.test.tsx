@@ -42,7 +42,7 @@ describe('LoadingErrorWrapper', () => {
   it('should render action button for errors with onClick', () => {
     const mockOnClick = jest.fn();
     const errors = [
-      { enabled: true, message: 'Error with action', action: 'Retry', onClick: mockOnClick }
+      { enabled: true, message: 'Error with action', actionText: 'Retry', onClick: mockOnClick }
     ];
 
     const { getByText } = render(

@@ -19,4 +19,11 @@
     // this overrides the max-height: 400px in antd library
     max-height: 100% !important;
   }
+
+  .loading-error-wrapper__errors {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0;
+  }
 }
