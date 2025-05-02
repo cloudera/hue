@@ -25,4 +25,11 @@
       max-height: 100%;
     }
   }
+
+  .loading-error-wrapper__errors {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0;
+  }
 }

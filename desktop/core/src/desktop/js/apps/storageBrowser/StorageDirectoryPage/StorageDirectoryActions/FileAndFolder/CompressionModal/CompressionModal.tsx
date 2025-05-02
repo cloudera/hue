@@ -51,8 +51,6 @@ const CompressionModal = ({
     loading,
     error
   } = useSaveData(COMPRESS_API_URL, {
-    // TODO: remove silenceErrors once it is default to true in the hook
-    postOptions: { silenceErrors: true },
     skip: !files.length,
     onSuccess,
     onError
@@ -71,10 +69,8 @@ const CompressionModal = ({
 
   const errors = [
     {
-      enabled: error?.response?.status === 500,
-      message: t('An error occurred during compression. Please check configuration.'),
-      action: t('Retry'),
-      onClick: handleCompress
+      enabled: !!error,
+      message: error
     }
   ];
 

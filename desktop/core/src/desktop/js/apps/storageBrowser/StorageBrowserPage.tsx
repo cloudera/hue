@@ -43,7 +43,7 @@ const StorageBrowserPage = (): JSX.Element => {
     {
       enabled: !!error,
       message: t('An error occurred while fetching the filesystem'),
-      action: t('Retry'),
+      actionText: t('Retry'),
       onClick: reloadData
     }
   ];

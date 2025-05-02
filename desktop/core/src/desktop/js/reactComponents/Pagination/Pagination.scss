@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 @use 'variables' as vars;
 @use 'mixins';
 
@@ -25,6 +26,7 @@
     justify-content: flex-end;
     color: vars.$fluidx-gray-700;
     line-height: 32px;
+    max-height: 50px;
   }
 
   .hue-pagination__page-size-control {

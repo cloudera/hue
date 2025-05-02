@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
-import Alert from 'cuix/dist/components/Alert';
 import ServerLogsHeader from './ServerLogsHeader';
 import { i18nReact } from '../../../utils/i18nReact';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
@@ -33,29 +32,26 @@ const ServerLogs: React.FC = (): JSX.Element => {
   const [filter, setFilter] = useState<string>('');
   const [wrapLogs, setWrapLogs] = useState(true);
   const { t } = i18nReact.useTranslation();
-  const { data, loading, error } = useLoadData<ServerLogsData>(SERVER_LOGS_API_URL, {
+  const { data, loading, error, reloadData } = useLoadData<ServerLogsData>(SERVER_LOGS_API_URL, {
     params: {
       reverse: true
     }
   });
 
-  if (error) {
-    return (
-      <div className="hue-server-logs-component">
-        <Alert
-          message={`${t('Error:')} ${error}`}
-          description={t('An error occurred while fetching server logs.')}
-          type="error"
-        />
-      </div>
-    );
-  }
+  const errors = [
+    {
+      enabled: !!error,
+      message: t('An error occurred while fetching server logs.'),
+      actionText: t('Retry'),
+      onClick: reloadData
+    }
+  ];
 
   const isEmptyLogs = !data?.logs || !data?.logs?.some(log => log.length);
 
   return (
     <div className="hue-server-logs-component">
-      <LoadingErrorWrapper loading={loading}>
+      <LoadingErrorWrapper loading={loading} errors={errors}>
         <ServerLogsHeader
           onFilterChange={setFilter}
           onWrapLogsChange={setWrapLogs}

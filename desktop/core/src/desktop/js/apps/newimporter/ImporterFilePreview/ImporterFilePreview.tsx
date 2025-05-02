@@ -22,11 +22,11 @@ import {
   GuessFieldTypesResponse,
   ImporterTableData
 } from '../types';
-import { convertToAntdColumns, convertToDataSource } from '../utils/utils';
+import { convertToAntdColumns, convertToDataSource, getDefaultTableName } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
-import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL } from '../api';
+import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL, FINISH_IMPORT_URL } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 
 import './ImporterFilePreview.scss';
@@ -38,6 +38,8 @@ interface ImporterFilePreviewProps {
 const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
+
+  const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
 
   const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
     GUESS_FORMAT_URL,
@@ -53,6 +55,9 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     data: previewData,
     loading: guessingFields
   } = useSaveData<GuessFieldTypesResponse>(GUESS_FIELD_TYPES_URL);
+
+  const { save, loading: finalizingImport } =
+    useSaveData<GuessFieldTypesResponse>(FINISH_IMPORT_URL);
 
   useEffect(() => {
     const guessFormatPayload = {
@@ -80,6 +85,32 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     guessFields(formData);
   }, [fileMetaData.path, fileFormat]);
 
+  const handleFinishImport = () => {
+    // TODO: take the hardcoded values from the form once implemented
+    const dialect = 'impala';
+    const database = 'default';
+
+    const source = {
+      inputFormat: fileMetaData.source,
+      path: fileMetaData.path,
+      format: fileFormat,
+      sourceType: dialect
+    };
+    const destination = {
+      outputFormat: 'table',
+      nonDefaultLocation: fileMetaData.path,
+      name: `${database}.${defaultTableName}`,
+      sourceType: dialect,
+      columns: previewData?.columns
+    };
+
+    const formData = new FormData();
+    formData.append('source', JSON.stringify(source));
+    formData.append('destination', JSON.stringify(destination));
+
+    save(formData);
+  };
+
   const columns = convertToAntdColumns(previewData?.columns ?? []);
   const tableData = convertToDataSource(columns, previewData?.sample);
 
@@ -91,7 +122,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
           <BorderlessButton data-testid="hue-importer-preview-page__header__actions__cancel">
             {t('Cancel')}
           </BorderlessButton>
-          <PrimaryButton data-testid="hue-importer-preview-page__header__actions__finish">
+          <PrimaryButton loading={finalizingImport} onClick={handleFinishImport}>
             {t('Finish Import')}
           </PrimaryButton>
         </div>
