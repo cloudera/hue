@@ -110,6 +110,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
   const filePreviewUrl = `${fileDownloadUrl}&&disposition=inline`;
 
   const isEditingEnabled =
+    !error &&
     !isEditing &&
     config?.storage_browser.max_file_editor_size &&
     config?.storage_browser.max_file_editor_size > fileStats.size &&
@@ -125,7 +126,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
 
   const errorConfig = [
     {
-      enabled: !!error,
+      enabled: !!error && error.response?.status !== 422,
       message: t('An error occurred while fetching file content for path "{{path}}".', {
         path: fileStats.path
       }),
@@ -189,7 +190,7 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
             </div>
 
             <div className="preview__content">
-              {[SupportedFileTypes.TEXT, SupportedFileTypes.OTHER].includes(fileType) && (
+              {error?.response?.status !== 422 && (
                 <div className="preview__editable-file">
                   <textarea
                     value={fileContent}
@@ -200,6 +201,12 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                   {pageStats.totalPages > 1 && (
                     <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
                   )}
+                </div>
+              )}
+
+              {(error?.response?.status === 422 || fileType === SupportedFileTypes.COMPRESSED) && (
+                <div className="preview__unsupported">
+                  {t('Preview is not available for this file. Please download the file instead.')}
                 </div>
               )}
 
@@ -230,14 +237,6 @@ const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Ele
                   {t('Your browser does not support the video element.')}
                   <track kind="captions" src="" srcLang="en" label="English" />
                 </video>
-              )}
-
-              {fileType === SupportedFileTypes.COMPRESSED && (
-                <div className="preview__compresed">
-                  {t(
-                    'Preview not available for compressed file. Please download the file to view.'
-                  )}
-                </div>
               )}
             </div>
           </div>
