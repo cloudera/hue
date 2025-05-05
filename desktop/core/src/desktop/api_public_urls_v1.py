@@ -162,6 +162,7 @@ urlpatterns += [
 urlpatterns += [
   re_path(r'^importer/upload/file/?$', importer_api.upload_file, name='importer_upload_file'),
   re_path(r'^importer/file/guess_metadata/?$', importer_api.guess_file_metadata, name='importer_guess_file_metadata'),
+  re_path(r'^importer/file/preview/?$', importer_api.preview_file, name='importer_preview_file'),
 ]
 
 urlpatterns += [
