@@ -47,14 +47,15 @@ const LoadingErrorWrapper = ({
 }: LoadingErrorWrapperProps): JSX.Element => {
   if (loading) {
     return (
-      <Spin
-        spinning={loading}
-        indicator={<SpinnerIcon size="default" />}
-        data-testid="loading-error-wrapper__spinner"
-        className="loading-error-wrapper__spinner"
-      >
-        {hideOnLoading === false && children}
-      </Spin>
+      <div className="loading-error-wrapper__spinner">
+        <Spin
+          spinning={loading}
+          indicator={<SpinnerIcon size="default" />}
+          data-testid="loading-error-wrapper__spinner"
+        >
+          {hideOnLoading === false && children}
+        </Spin>
+      </div>
     );
   }
 
