@@ -15,10 +15,12 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import FileUploadQueue from './FileUploadQueue';
 import { FileStatus, RegularFile } from '../../utils/hooks/useFileUpload/types';
+import { act } from 'react-dom/test-utils';
+import huePubSub from '../../utils/huePubSub';
 
 const mockFilesQueue: RegularFile[] = [
   {
@@ -46,29 +48,31 @@ jest.mock('../../utils/hooks/useFileUpload/useFileUpload', () => ({
 
 describe('FileUploadQueue', () => {
   it('should render the component with initial files in the queue', () => {
-    const { getByText } = render(
-      <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
-    );
+    const { getByText } = render(<FileUploadQueue />);
+
+    act(() => huePubSub.publish('hue.file.upload.start', { files: mockFilesQueue }));
 
     expect(getByText('file1.txt')).toBeInTheDocument();
     expect(getByText('file2.txt')).toBeInTheDocument();
   });
 
   it('should toggle the visibility of the queue when the header is clicked', () => {
-    const { getByTestId } = render(
-      <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
-    );
+    const { getByText, getByTestId, queryByText } = render(<FileUploadQueue />);
 
-    const header = getByTestId('upload-queue__header');
-    expect(screen.getByText('file1.txt')).toBeVisible();
-    expect(screen.getByText('file2.txt')).toBeVisible();
+    act(() => huePubSub.publish('hue.file.upload.start', { files: mockFilesQueue }));
 
-    fireEvent.click(header!);
-    expect(screen.queryByText('file1.txt')).not.toBeVisible();
-    expect(screen.queryByText('file2.txt')).not.toBeVisible();
+    const header = getByTestId('hue-upload-queue-container__expand-button');
+    expect(getByText('file1.txt')).toBeVisible();
+    expect(getByText('file2.txt')).toBeVisible();
 
-    fireEvent.click(header!);
-    expect(screen.getByText('file1.txt')).toBeVisible();
-    expect(screen.getByText('file2.txt')).toBeVisible();
+    fireEvent.click(header);
+
+    expect(queryByText('file1.txt')).toBeNull();
+    expect(queryByText('file2.txt')).toBeNull();
+
+    fireEvent.click(header);
+
+    expect(getByText('file1.txt')).toBeVisible();
+    expect(getByText('file2.txt')).toBeVisible();
   });
 });
