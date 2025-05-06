@@ -61,5 +61,10 @@
       flex: 1;
       background-color: white;
     }
+
+    &__header-section {
+      display: flex;
+      justify-content: space-between;
+    }
   }
 }
