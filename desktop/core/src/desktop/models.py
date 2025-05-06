@@ -2015,11 +2015,11 @@ class ClusterConfig(object):
 
     if ENABLE_NEW_STORAGE_BROWSER.get():
       interpreters.append({
-        'type': 'newfilebrowser',
+        'type': 'storagebrowser',
         'displayName': _('Storage Browser'),
         'buttonName': _('Storage Browser'),
         'tooltip': _('Storage Browser'),
-        'page': '/filebrowser/new'
+        'page': '/storagebrowser'
       })
     else:
       for hdfs_connector in hdfs_connectors:

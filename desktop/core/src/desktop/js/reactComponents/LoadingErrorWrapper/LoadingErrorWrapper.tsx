@@ -25,7 +25,7 @@ interface WrapperError {
   enabled: boolean;
   message: AlertProps['message'];
   description?: AlertProps['description'];
-  action?: string;
+  actionText?: string;
   onClick?: AlertProps['onClick'];
   closable?: AlertProps['closable'];
 }
@@ -34,25 +34,28 @@ interface LoadingErrorWrapperProps {
   loading?: boolean;
   errors?: WrapperError[];
   children: React.ReactNode;
-  hideChildren?: boolean;
+  hideOnLoading?: boolean;
+  hideOnError?: boolean;
 }
 
 const LoadingErrorWrapper = ({
   loading = false,
   errors = [],
   children,
-  hideChildren = false
+  hideOnLoading = false,
+  hideOnError = false
 }: LoadingErrorWrapperProps): JSX.Element => {
   if (loading) {
     return (
-      <Spin
-        spinning={loading}
-        indicator={<SpinnerIcon size="default" />}
-        data-testid="loading-error-wrapper__spinner"
-        className="loading-error-wrapper__spinner"
-      >
-        {hideChildren === false && children}
-      </Spin>
+      <div className="loading-error-wrapper__spinner">
+        <Spin
+          spinning={loading}
+          indicator={<SpinnerIcon size="default" />}
+          data-testid="loading-error-wrapper__spinner"
+        >
+          {hideOnLoading === false && children}
+        </Spin>
+      </div>
     );
   }
 
@@ -60,17 +63,22 @@ const LoadingErrorWrapper = ({
   if (enabledErrors.length > 0) {
     return (
       <>
-        {enabledErrors.map(error => (
-          <Alert
-            key={error.message?.toString()}
-            type="error"
-            message={error.message}
-            description={error.description}
-            closable={error.closable}
-            onClick={error.onClick}
-            action={<BorderlessButton onClick={error.onClick}>{error.action}</BorderlessButton>}
-          />
-        ))}
+        <div className="loading-error-wrapper__errors">
+          {enabledErrors.map(error => (
+            <Alert
+              showIcon
+              key={error.message?.toString()}
+              type="error"
+              message={error.message}
+              description={error.description}
+              closable={error.closable}
+              action={
+                <BorderlessButton onClick={error.onClick}>{error.actionText}</BorderlessButton>
+              }
+            />
+          ))}
+        </div>
+        {hideOnError === false && children}
       </>
     );
   }

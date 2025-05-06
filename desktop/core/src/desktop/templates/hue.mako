@@ -220,13 +220,11 @@ ${ hueIcons.symbols() }
         <div id="embeddable_oozie_info" class="embeddable"></div>
         <div id="embeddable_jobbrowser" class="embeddable"></div>
         <div id="embeddable_filebrowser" class="embeddable"></div>
-        <div id="embeddable_newfilebrowser" class="embeddable hue-storage-browser__root-container"></div>
         <div id="embeddable_home" class="embeddable"></div>
         <div id="embeddable_catalog" class="embeddable"></div>
         <div id="embeddable_indexer" class="embeddable"></div>
         <div id="embeddable_kafka" class="embeddable"></div>
         <div id="embeddable_importer" class="embeddable"></div>
-        <div id="embeddable_newimporter" class="embeddable"></div>
         <div id="embeddable_collections" class="embeddable"></div>
         <div id="embeddable_indexes" class="embeddable"></div>
         <div id="embeddable_useradmin_users" class="embeddable"></div>
