@@ -21,6 +21,7 @@ import FileUploadQueue from './FileUploadQueue';
 import { FileStatus, RegularFile } from '../../utils/hooks/useFileUpload/types';
 import { act } from 'react-dom/test-utils';
 import huePubSub from '../../utils/huePubSub';
+import { FILE_UPLOAD_START_EVENT } from './event';
 
 const mockFilesQueue: RegularFile[] = [
   {
@@ -50,7 +51,7 @@ describe('FileUploadQueue', () => {
   it('should render the component with initial files in the queue', () => {
     const { getByText } = render(<FileUploadQueue />);
 
-    act(() => huePubSub.publish('hue.file.upload.start', { files: mockFilesQueue }));
+    act(() => huePubSub.publish(FILE_UPLOAD_START_EVENT, { files: mockFilesQueue }));
 
     expect(getByText('file1.txt')).toBeInTheDocument();
     expect(getByText('file2.txt')).toBeInTheDocument();
@@ -59,7 +60,7 @@ describe('FileUploadQueue', () => {
   it('should toggle the visibility of the queue when the header is clicked', () => {
     const { getByText, getByTestId, queryByText } = render(<FileUploadQueue />);
 
-    act(() => huePubSub.publish('hue.file.upload.start', { files: mockFilesQueue }));
+    act(() => huePubSub.publish(FILE_UPLOAD_START_EVENT, { files: mockFilesQueue }));
 
     const header = getByTestId('hue-upload-queue-container__expand-button');
     expect(getByText('file1.txt')).toBeVisible();

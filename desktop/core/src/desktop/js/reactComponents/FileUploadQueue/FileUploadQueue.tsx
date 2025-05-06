@@ -27,6 +27,7 @@ import FileUploadRow from './FileUploadRow/FileUploadRow';
 import { useHuePubSub } from '../../utils/hooks/useHuePubSub/useHuePubSub';
 import huePubSub from '../../utils/huePubSub';
 import { BorderlessButton } from 'cuix/dist/components/Button';
+import { FILE_UPLOAD_START_EVENT, FILE_UPLOAD_SUCCESS_EVENT } from './event';
 
 import './FileUploadQueue.scss';
 
@@ -52,16 +53,16 @@ const FileUploadQueue = (): JSX.Element => {
   const [expandQueue, setExpandQueue] = useState<boolean>(true);
 
   useHuePubSub<FileUploadEvent>({
-    topic: 'hue.file.upload.start',
-    callback: (newData?: FileUploadEvent) => {
-      if (newData?.files) {
-        setFilesQueue(newData.files);
+    topic: FILE_UPLOAD_START_EVENT,
+    callback: (data?: FileUploadEvent) => {
+      if (data?.files) {
+        setFilesQueue(data.files);
       }
     }
   });
 
   const onComplete = () => {
-    huePubSub.publish('hue.file.upload.complete');
+    huePubSub.publish(FILE_UPLOAD_SUCCESS_EVENT);
   };
 
   const onClose = () => {

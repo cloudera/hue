@@ -47,6 +47,10 @@ import PaginatedTable, {
 import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 import huePubSub from '../../../utils/huePubSub';
 import { useHuePubSub } from '../../../utils/hooks/useHuePubSub/useHuePubSub';
+import {
+  FILE_UPLOAD_START_EVENT,
+  FILE_UPLOAD_SUCCESS_EVENT
+} from '../../../reactComponents/FileUploadQueue/event';
 
 import './StorageDirectoryPage.scss';
 
@@ -151,13 +155,13 @@ const StorageDirectoryPage = ({
       };
     });
     setPolling(true);
-    huePubSub.publish('hue.file.upload.start', {
+    huePubSub.publish(FILE_UPLOAD_START_EVENT, {
       files: newUploadItems
     });
   };
 
   useHuePubSub({
-    topic: 'hue.file.upload.complete',
+    topic: FILE_UPLOAD_SUCCESS_EVENT,
     callback: () => {
       setPolling(false);
     }
