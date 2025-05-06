@@ -19,10 +19,10 @@
 .hue-upload-queue-container {
   display: flex;
   flex-direction: column;
-  position: absolute !important;
-  bottom: 0 !important;
-  right: 16px !important;
-  width: 520px !important;
+  position: absolute;
+  bottom: 0;
+  right: 16px;
+  width: 520px;
   box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
   z-index: 1000;
 }
