@@ -520,6 +520,8 @@ function ubuntu20_install() {
 }
 
 function ubuntu22_install() {
+    local PYTHON_VERSION=${1:-"python3.11"} # Default to Python 3.11 if not provided
+
     if [[ $FORCEINSTALL -eq 1 ]]; then
     sudo -- sh -c 'apt update'
     # Add deadsnakes PPA for Python 3.8
@@ -531,11 +533,11 @@ function ubuntu22_install() {
         krb5-kdc \
         krb5-config \
         libkrb5-dev'
-    sudo -- sh -c 'apt -y install \
+    sudo -- sh -c "apt -y install \
         ldap-utils \
-        libpython3.8-dev \
-        libpython3.8-minimal \
-        libpython3.8-stdlib \
+        lib${PYTHON_VERSION}-dev \
+        lib${PYTHON_VERSION}-minimal \
+        lib${PYTHON_VERSION}-stdlib \
         libxmlsec1 \
         libxmlsec1-openssl \
         libpq-dev \
@@ -547,11 +549,11 @@ function ubuntu22_install() {
         python3-psycopg2 \
         python3-setuptools \
         python3-wheel \
-        python3.8-venv \
+        ${PYTHON_VERSION}-venv \
         openssl \
         sudo \
         tar \
-        util-linux'
+        util-linux"
     # Ensure pg_config is available
     export PG_CONFIG=$(which pg_config)
     if [ -z "$PG_CONFIG" ]; then
@@ -570,9 +572,9 @@ function ubuntu22_install() {
     sudo pip_bin=${pip_bin} -- sh -c '${pip_bin} install psycopg2==2.9.6 --global-option=build_ext --global-option="--pg-config=$PG_CONFIG"'
     sudo pip_bin=${pip_bin} -- sh -c 'ln -fs ${pip_bin} $(dirname ${pip_bin})/pip'
     # sqlite3 install
-    sudo -- sh -c 'curl -o sqlite-autoconf-3350500.tar.gz https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
-        tar zxvf sqlite-autoconf-3350500.tar.gz && \
-        cd sqlite-autoconf-3350500 && \
+    sudo -- sh -c 'curl -o sqlite-autoconf-3450000.tar.gz https://sqlite.org/2024/sqlite-autoconf-3450000.tar.gz && \
+        tar zxvf sqlite-autoconf-3450000.tar.gz && \
+        cd sqlite-autoconf-3450000 && \
         ./configure --prefix=/usr/local/ && make && make install'
     export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
   fi
