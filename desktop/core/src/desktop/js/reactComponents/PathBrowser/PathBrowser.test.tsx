@@ -18,6 +18,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import { act } from 'react-dom/test-utils';
 
 import PathBrowser from './PathBrowser';
 
@@ -67,7 +68,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           filePath={mockFilePath}
           onFilepathChange={onFilepathChangeMock}
-          separator={'/'}
+          separator="/"
           showIcon
         />
       );
@@ -79,7 +80,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockLongFilePath}
-          separator={'/'}
+          separator="/"
           showIcon
         />
       );
@@ -92,7 +93,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockLongFilePath}
-          separator={'/'}
+          separator="/"
           showIcon
         />
       );
@@ -109,7 +110,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          separator={'/'}
+          separator="/"
           showIcon={false}
         />
       );
@@ -124,7 +125,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          separator={'/'}
+          separator="/"
           showIcon
         />
       );
@@ -137,7 +138,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          separator={'/'}
+          separator="/"
           showIcon={false}
         />
       );
@@ -152,7 +153,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          separator={'/'}
+          separator="/"
           showIcon
         />
       );
@@ -165,7 +166,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          separator={'/'}
+          separator="/"
           showIcon
         />
       );
@@ -175,6 +176,37 @@ describe('Pathbrowser', () => {
       await userEvent.click(editPathButton);
       input = screen.getByDisplayValue(mockFilePath);
       expect(input).not.toBeNull();
+    });
+  });
+
+  describe('Pathbrowser Copy Path Button', () => {
+    it('should show green tick icon for 2 seconds after copying path', async () => {
+      const user = userEvent.setup();
+      render(
+        <PathBrowser
+          onFilepathChange={onFilepathChangeMock}
+          filePath={mockFilePath}
+          separator="/"
+          showIcon
+        />
+      );
+
+      const copyPathButton = screen.getByRole('button', { name: 'Copy Path' });
+      expect(copyPathButton).toBeInTheDocument();
+      expect(screen.queryByTestId('hue-path-browser__status-success-icon')).not.toBeInTheDocument();
+      expect(screen.getByTestId('hue-path-browser__path-copy-icon')).toBeInTheDocument();
+
+      await user.click(copyPathButton);
+
+      expect(screen.getByTitle('Copied!')).toBeInTheDocument();
+
+      expect(screen.getByTestId('hue-path-browser__status-success-icon')).toBeInTheDocument();
+      expect(screen.queryByTestId('hue-path-browser__path-copy-icon')).not.toBeInTheDocument();
+
+      // Wait for 2 seconds and check if the green tick icon disappears
+      await act(() => new Promise(resolve => setTimeout(resolve, 2000)));
+      expect(screen.queryByTestId('hue-path-browser__status-success-icon')).not.toBeInTheDocument();
+      expect(screen.getByTestId('hue-path-browser__path-copy-icon')).toBeInTheDocument();
     });
   });
 });

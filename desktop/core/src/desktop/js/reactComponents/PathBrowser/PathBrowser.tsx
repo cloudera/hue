@@ -23,6 +23,7 @@ import HdfsIcon from '../../components/icons/HdfsIcon';
 import S3Icon from '../../components/icons/S3Icon';
 import AdlsIcon from '../../components/icons/AdlsIcon';
 import EditIcon from '@cloudera/cuix-core/icons/react/EditIcon';
+import StatusSuccessTableIcon from '@cloudera/cuix-core/icons/react/StatusSuccessTableIcon';
 import CopyPathIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
 
 import Breadcrumb from './Breadcrumb/Breadcrumb';
@@ -52,6 +53,7 @@ const PathBrowser = ({
   testId
 }: PathBrowserProps): JSX.Element => {
   const [isEditMode, setIsEditMode] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const icons = {
     hdfs: <HdfsIcon />,
@@ -92,6 +94,12 @@ const PathBrowser = ({
       };
     });
     return menu;
+  };
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(filePath);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (breadcrumbs) {
@@ -208,10 +216,16 @@ const PathBrowser = ({
           icon={<EditIcon />}
         />
         <BorderlessButton
-          onClick={() => navigator.clipboard.writeText(filePath)}
+          onClick={handleCopy}
           className="hue-path-browser__copy-path-btn"
-          title={'Copy Path'}
-          icon={<CopyPathIcon />}
+          title={copied ? 'Copied!' : 'Copy Path'}
+          icon={
+            copied ? (
+              <StatusSuccessTableIcon data-testid="hue-path-browser__status-success-icon" />
+            ) : (
+              <CopyPathIcon data-testid="hue-path-browser__path-copy-icon" />
+            )
+          }
         />
       </div>
     );
