@@ -70,8 +70,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
       upload(payload, {
         onSuccess: data => {
           setFileMetaData({
-            path: data.local_file_url,
-            type: data.file_type,
+            path: data.file_path,
             source: ImporterFileSource.LOCAL
           });
         },

@@ -16,6 +16,7 @@
 
 import React, { useEffect, useState } from 'react';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import {
   FileFormatResponse,
   FileMetaData,
@@ -41,8 +42,18 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
 
   const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
 
+  const { data, loading, error } = useLoadData(GUESS_FORMAT_URL, {
+    params: {
+      file_path: fileMetaData.path,
+      import_type: fileMetaData.source
+    },
+    skip: !fileMetaData.path
+  });
+
+  console.log('data :>> ', data);
+
   const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
-    GUESS_FORMAT_URL,
+    undefined,
     {
       onSuccess: data => {
         setFileFormat(data);
@@ -67,7 +78,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     };
     const guessFormatormData = new FormData();
     guessFormatormData.append('fileFormat', JSON.stringify(guessFormatPayload));
-    guessFormat(guessFormatormData);
+    // guessFormat(guessFormatormData);
   }, [fileMetaData]);
 
   useEffect(() => {
