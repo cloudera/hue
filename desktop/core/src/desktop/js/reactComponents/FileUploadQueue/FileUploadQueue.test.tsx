@@ -38,12 +38,12 @@ const mockFilesQueue: RegularFile[] = [
   }
 ];
 
-const mockOnCancel = jest.fn();
 jest.mock('../../utils/hooks/useFileUpload/useFileUpload', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     uploadQueue: mockFilesQueue,
-    onCancel: mockOnCancel
+    onCancel: jest.fn(),
+    addFiles: jest.fn()
   }))
 }));
 

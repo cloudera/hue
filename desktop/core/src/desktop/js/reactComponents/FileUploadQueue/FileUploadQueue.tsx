@@ -49,24 +49,11 @@ const sortOrder = [
 const FileUploadQueue = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const [filesQueue, setFilesQueue] = useState<RegularFile[]>([]);
   const [expandQueue, setExpandQueue] = useState<boolean>(true);
-
-  useHuePubSub<FileUploadEvent>({
-    topic: FILE_UPLOAD_START_EVENT,
-    callback: (data?: FileUploadEvent) => {
-      if (data?.files) {
-        setFilesQueue(data.files);
-      }
-    }
-  });
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const onComplete = () => {
     huePubSub.publish(FILE_UPLOAD_SUCCESS_EVENT);
-  };
-
-  const onClose = () => {
-    setFilesQueue([]);
   };
 
   const config = getLastKnownConfig();
@@ -74,10 +61,25 @@ const FileUploadQueue = (): JSX.Element => {
     (config?.storage_browser.enable_chunked_file_upload ?? DEFAULT_ENABLE_CHUNK_UPLOAD) &&
     !!config?.hue_config.enable_task_server;
 
-  const { uploadQueue, onCancel } = useFileUpload(filesQueue, {
+  const { uploadQueue, cancelFile, addFiles } = useFileUpload({
     isChunkUpload,
     onComplete
   });
+
+  useHuePubSub<FileUploadEvent>({
+    topic: FILE_UPLOAD_START_EVENT,
+    callback: (data?: FileUploadEvent) => {
+      if (data?.files) {
+        setIsVisible(true);
+        addFiles(data.files);
+      }
+    }
+  });
+
+  const onClose = () => {
+    uploadQueue.forEach(file => cancelFile(file));
+    setIsVisible(false);
+  };
 
   const uploadedCount = uploadQueue.filter(item => item.status === FileStatus.Uploaded).length;
   const pendingCount = uploadQueue.filter(
@@ -85,22 +87,29 @@ const FileUploadQueue = (): JSX.Element => {
   ).length;
   const failedCount = uploadQueue.filter(item => item.status === FileStatus.Failed).length;
 
-  if (!filesQueue.length) {
+  if (!isVisible) {
     return <></>;
   }
+
+  const getHeaderText = () => {
+    const fileText = uploadQueue.length > 1 ? 'files' : 'file';
+    const uploadedText = `{{uploadedCount}} ${fileText} uploaded`;
+    const pendingText = pendingCount > 0 ? `{{pendingCount}} ${fileText} remaining` : '';
+    const failedText = failedCount > 0 ? `, {{failedCount}} failed` : '';
+    if (pendingCount > 0) {
+      return `${pendingText}${failedText}`;
+    }
+    return `${uploadedText}${failedText}`;
+  };
 
   return (
     <div className="hue-upload-queue-container antd cuix">
       <div className="hue-upload-queue-container__header" data-testid="hue-upload-queue__header">
-        {pendingCount > 0
-          ? t('{{uploadedCount}} / {{totalCount}} uploaded, {{failedCount}} failed ', {
-              uploadedCount,
-              totalCount: uploadQueue.length,
-              failedCount
-            })
-          : t('{{count}} file(s) uploaded', {
-              count: uploadedCount
-            })}
+        {t(getHeaderText(), {
+          pendingCount,
+          uploadedCount,
+          failedCount
+        })}
         <div className="hue-upload-queue-container__header__button-group">
           <BorderlessButton
             onClick={() => setExpandQueue(!expandQueue)}
@@ -114,7 +123,7 @@ const FileUploadQueue = (): JSX.Element => {
           />
         </div>
       </div>
-      {expandQueue ? (
+      {expandQueue && (
         <div className="hue-upload-queue-container__list">
           {uploadQueue
             .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
@@ -122,12 +131,10 @@ const FileUploadQueue = (): JSX.Element => {
               <FileUploadRow
                 key={`${row.filePath}__${row.file.name}`}
                 data={row}
-                onCancel={() => onCancel(row)}
+                onCancel={() => cancelFile(row)}
               />
             ))}
         </div>
-      ) : (
-        <></>
       )}
     </div>
   );
