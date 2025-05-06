@@ -25,10 +25,10 @@ import { DEFAULT_ENABLE_CHUNK_UPLOAD } from '../../utils/constants/storageBrowse
 import { getLastKnownConfig } from '../../config/hueConfig';
 import FileUploadRow from './FileUploadRow/FileUploadRow';
 import { useHuePubSub } from '../../utils/hooks/useHuePubSub/useHuePubSub';
-
-import './FileUploadQueue.scss';
 import huePubSub from '../../utils/huePubSub';
 import { BorderlessButton } from 'cuix/dist/components/Button';
+
+import './FileUploadQueue.scss';
 
 interface FileUploadEvent {
   files: RegularFile[];

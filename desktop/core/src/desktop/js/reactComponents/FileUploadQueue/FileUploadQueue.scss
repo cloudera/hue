@@ -40,6 +40,10 @@
     &__button-group {
       display: flex;
       gap: 8px;
+
+      button {
+        color: vars.$fluidx-black;
+      }
     }
   }
 
