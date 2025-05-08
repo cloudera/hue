@@ -16,34 +16,44 @@
 
 @use 'variables' as vars;
 
+.hue-upload-queue-container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  bottom: 0;
+  right: 16px;
+  width: 520px;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
 .antd.cuix {
-  .upload-queue {
-    position: fixed;
-    bottom: 0;
-    right: 16px;
-    width: 520px;
+  .hue-upload-queue-container__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    color: vars.$fluidx-gray-900;
+    background-color: vars.$fluidx-gray-050;
+    font-size: 16px;
+
+    &__button-group {
+      display: flex;
+      gap: 8px;
+
+      button {
+        color: vars.$fluidx-black;
+      }
+    }
+  }
+
+  .hue-upload-queue-container__list {
+    display: flex;
+    flex-direction: column;
+    max-height: 40vh;
     background-color: vars.$fluidx-white;
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-
-    &__header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px;
-      color: vars.$fluidx-gray-900;
-      background-color: vars.$fluidx-gray-050;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    &__list {
-      display: flex;
-      flex-direction: column;
-      max-height: 40vh;
-      overflow: auto;
-      padding: 16px;
-      gap: 16px;
-    }
+    overflow: auto;
+    padding: 16px;
+    gap: 16px;
   }
 }

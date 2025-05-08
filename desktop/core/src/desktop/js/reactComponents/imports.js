@@ -38,6 +38,9 @@ export async function loadComponent(name) {
     case 'TaskServer':
       return (await import('./TaskServer/TaskServer')).default;
 
+    case 'FileUploadQueue':
+      return (await import('./FileUploadQueue/FileUploadQueue')).default;
+
     default:
       console.error(`A placeholder component is rendered because you probably forgot to include your new component in the 
       loadComponent function of reactComponents/imports.js`);
