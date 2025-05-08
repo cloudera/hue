@@ -20,6 +20,7 @@ import useChunkUpload from './useChunkUpload';
 import { DEFAULT_CONCURRENT_MAX_CONNECTIONS } from '../../constants/storageBrowser';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import { FileStatus, RegularFile, FileVariables } from './types';
+import { i18nReact } from '../../../utils/i18nReact';
 
 interface UseUploadQueueResponse {
   uploadQueue: RegularFile[];
@@ -37,6 +38,8 @@ const useFileUpload = ({
   isChunkUpload = false,
   onComplete
 }: UploadQueueOptions): UseUploadQueueResponse => {
+  const { t } = i18nReact.useTranslation();
+
   const config = getLastKnownConfig();
   const concurrentProcess =
     config?.storage_browser.concurrent_max_connection ?? DEFAULT_CONCURRENT_MAX_CONNECTIONS;
@@ -85,7 +88,7 @@ const useFileUpload = ({
   const cancelFile = (fileItem: RegularFile) => {
     const queueItem = uploadQueue.find(q => q.uuid === fileItem.uuid);
     if (queueItem?.status === FileStatus.Pending) {
-      const error = new Error('Upload cancelled');
+      const error = new Error(t('Upload cancelled'));
       updateFileVariables(fileItem.uuid, { status: FileStatus.Cancelled, error });
 
       if (isChunkUpload) {
