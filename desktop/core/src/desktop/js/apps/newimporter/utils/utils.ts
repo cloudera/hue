@@ -15,41 +15,45 @@
 // limitations under the License.
 
 import { type ColumnProps } from 'cuix/dist/components/Table';
-import { ImporterFileSource, GuessFieldTypesColumn, ImporterTableData } from '../types';
+import {
+  ImporterFileSource,
+  FilePreviewTableColumn,
+  ImporterTableData,
+  FilePreviewResponse
+} from '../types';
 import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import { toCamelCase } from '../../../utils/string/changeCasing';
 
 export const convertToAntdColumns = (
-  input?: GuessFieldTypesColumn[]
+  input?: FilePreviewTableColumn[]
 ): ColumnProps<ImporterTableData>[] => {
   if (!input) {
     return [];
   }
   return input?.map(item => ({
     title: item.name,
-    dataIndex: item.name,
+    dataIndex: toCamelCase(item.name),
     key: item.name,
     width: '100px'
   }));
 };
 
 export const convertToDataSource = (
-  columns: ColumnProps<ImporterTableData>[],
-  apiResponse?: string[][]
+  inputData: FilePreviewResponse['previewData']
 ): ImporterTableData[] => {
-  if (!apiResponse) {
-    return [];
-  }
-  return apiResponse?.map((rowData, index) => {
-    const row = {
-      importerDataKey: `${rowData[0]}__${index}` // this ensure the key is unique
+  const maxLength = Math.max(...Object.values(inputData).map(arr => arr.length));
+
+  const data = Array.from({ length: maxLength }, (_, index) => {
+    const row: ImporterTableData = {
+      importerDataKey: `importer-row__${index}`
     };
-    columns.forEach((column, index) => {
-      if (column.key) {
-        row[column.key] = rowData[index];
-      }
+    Object.keys(inputData).forEach(key => {
+      row[key] = inputData[key][index] ?? null;
     });
     return row;
   });
+
+  return data;
 };
 
 export const getDefaultTableName = (filePath: string, fileSource: ImporterFileSource): string => {

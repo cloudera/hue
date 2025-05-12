@@ -14,20 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
-import {
-  FileFormatResponse,
-  FileMetaData,
-  GuessFieldTypesResponse,
-  ImporterTableData
-} from '../types';
+import { FileFormatResponse, FileMetaData, FilePreviewResponse, ImporterTableData } from '../types';
 import { convertToAntdColumns, convertToDataSource, getDefaultTableName } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
-import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL, FINISH_IMPORT_URL } from '../api';
+import { FIle_FORMAT_URL, FILE_PREVIEW_URL, FINISH_IMPORT_URL } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 
 import './ImporterFilePreview.scss';
@@ -39,79 +34,63 @@ interface ImporterFilePreviewProps {
 const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
+  const defaultDialect = 'impala';
 
   const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
 
-  const { data, loading, error } = useLoadData(GUESS_FORMAT_URL, {
+  const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FIle_FORMAT_URL, {
     params: {
       file_path: fileMetaData.path,
       import_type: fileMetaData.source
     },
-    skip: !fileMetaData.path
+    skip: !fileMetaData.path,
+    onSuccess: data => {
+      setFileFormat(data);
+    }
   });
 
-  console.log('data :>> ', data);
-
-  const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
-    undefined,
+  const { data: previewData, loading: loadingPreview } = useLoadData<FilePreviewResponse>(
+    FILE_PREVIEW_URL,
     {
+      params: {
+        file_path: fileMetaData.path,
+        file_type: fileFormat?.type,
+        import_type: fileMetaData.source,
+        sql_dialect: defaultDialect,
+        has_header: fileFormat?.hasHeader
+      },
+      skip: !fileFormat?.type,
       onSuccess: data => {
-        setFileFormat(data);
+        setFileFormat(prev => {
+          if (!prev) {
+            return prev;
+          }
+          return {
+            ...prev,
+            hasHeader: data.hasHeader
+          };
+        });
       }
     }
   );
 
-  const {
-    save: guessFields,
-    data: previewData,
-    loading: guessingFields
-  } = useSaveData<GuessFieldTypesResponse>(GUESS_FIELD_TYPES_URL);
-
-  const { save, loading: finalizingImport } =
-    useSaveData<GuessFieldTypesResponse>(FINISH_IMPORT_URL);
-
-  useEffect(() => {
-    const guessFormatPayload = {
-      inputFormat: fileMetaData.source,
-      file_type: fileMetaData.type,
-      path: fileMetaData.path
-    };
-    const guessFormatormData = new FormData();
-    guessFormatormData.append('fileFormat', JSON.stringify(guessFormatPayload));
-    // guessFormat(guessFormatormData);
-  }, [fileMetaData]);
-
-  useEffect(() => {
-    if (!fileFormat) {
-      return;
-    }
-
-    const payload = {
-      path: fileMetaData.path,
-      format: fileFormat,
-      inputFormat: fileMetaData.source
-    };
-    const formData = new FormData();
-    formData.append('fileFormat', JSON.stringify(payload));
-    guessFields(formData);
-  }, [fileMetaData.path, fileFormat]);
+  const { save, loading: finalizingImport } = useSaveData(FINISH_IMPORT_URL);
 
   const handleFinishImport = () => {
     // TODO: take the hardcoded values from the form once implemented
-    const dialect = 'impala';
     const database = 'default';
 
     const source = {
       inputFormat: fileMetaData.source,
       path: fileMetaData.path,
       format: fileFormat,
-      sourceType: dialect
+      sourceType: defaultDialect
     };
     const destination = {
       outputFormat: 'table',
       nonDefaultLocation: fileMetaData.path,
       name: `${database}.${defaultTableName}`,
-      sourceType: dialect,
+      sourceType: defaultDialect,
       columns: previewData?.columns
     };
 
@@ -123,7 +102,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   };
 
   const columns = convertToAntdColumns(previewData?.columns ?? []);
-  const tableData = convertToDataSource(columns, previewData?.sample);
+  const tableData = convertToDataSource(previewData?.previewData ?? {});
 
   return (
     <div className="hue-importer-preview-page">
@@ -142,7 +121,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       <div className="hue-importer-preview-page__main-section">
         <SourceConfiguration fileFormat={fileFormat} setFileFormat={setFileFormat} />
         <PaginatedTable<ImporterTableData>
-          loading={guessingFormat || guessingFields}
+          loading={guessingFormat || loadingPreview}
           data={tableData}
           columns={columns}
           rowKey="importerDataKey"

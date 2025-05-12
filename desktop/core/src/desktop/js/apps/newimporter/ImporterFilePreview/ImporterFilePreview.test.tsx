@@ -18,28 +18,26 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import ImporterFilePreview from './ImporterFilePreview';
-import { FileMetaData } from '../types';
+import { FileMetaData, ImporterFileSource, ImporterFileTypes } from '../types';
 
-const mockSave = jest.fn();
-jest.mock('../../../utils/hooks/useSaveData/useSaveData', () => ({
+jest.mock('../../../utils/hooks/useLoadData/useLoadData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     data: {
       columns: [{ name: 'Name' }, { name: 'Age' }],
-      sample: [
-        ['Alice', '30'],
-        ['Bob', '25']
-      ]
+      previewData: {
+        name: ['Alice', 'Bob'],
+        age: ['30', '25']
+      }
     },
-    save: mockSave,
     loading: false
   }))
 }));
 
 describe('ImporterFilePreview', () => {
   const mockFileMetaData: FileMetaData = {
-    source: 'localfile',
-    type: 'csv',
+    source: ImporterFileSource.LOCAL,
+    type: ImporterFileTypes.CSV,
     path: '/path/to/file.csv'
   };
 
@@ -50,14 +48,6 @@ describe('ImporterFilePreview', () => {
       expect(screen.getByText('Preview')).toBeInTheDocument();
       expect(screen.getByText('Cancel')).toBeInTheDocument();
       expect(screen.getByText('Finish Import')).toBeInTheDocument();
-    });
-  });
-
-  it('should call guessFormat and guessFields when the component mounts', async () => {
-    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
-
-    await waitFor(() => {
-      expect(mockSave).toHaveBeenCalledTimes(2);
     });
   });
 

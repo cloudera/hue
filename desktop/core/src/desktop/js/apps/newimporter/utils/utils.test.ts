@@ -14,17 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ColumnProps } from 'cuix/dist/components/Table';
 import { convertToAntdColumns, convertToDataSource, getDefaultTableName } from './utils';
-import { ImporterFileSource, GuessFieldTypesColumn, ImporterTableData } from '../types';
+import { ImporterFileSource, FilePreviewTableColumn, FilePreviewTableData } from '../types';
 
 describe('convertToAntdColumns', () => {
   it('should return an empty array when no input is provided', () => {
     expect(convertToAntdColumns()).toEqual([]);
   });
 
-  it('should correctly convert GuessFieldTypesColumn[] to ColumnProps[]', () => {
-    const input: GuessFieldTypesColumn[] = [{ name: 'name' }, { name: 'age' }];
+  it('should correctly convert FilePreviewTableColumn[] to ColumnProps[]', () => {
+    const input: FilePreviewTableColumn[] = [{ name: 'name' }, { name: 'age' }];
     const expectedOutput = [
       { title: 'name', dataIndex: 'name', key: 'name', width: '100px' },
       { title: 'age', dataIndex: 'age', key: 'age', width: '100px' }
@@ -35,27 +34,22 @@ describe('convertToAntdColumns', () => {
 });
 
 describe('convertToDataSource', () => {
-  const columns: ColumnProps<ImporterTableData>[] = [
-    { title: 'Name', dataIndex: 'name', key: 'name', width: '100px' },
-    { title: 'Age', dataIndex: 'age', key: 'age', width: '100px' }
-  ];
-
   it('should return an empty array when no apiResponse is provided', () => {
-    expect(convertToDataSource(columns)).toEqual([]);
+    expect(convertToDataSource({})).toEqual([]);
   });
 
-  it('should correctly convert apiResponse to GuessFieldTypesColumn[]', () => {
-    const apiResponse: string[][] = [
-      ['Alice', '30'],
-      ['Bob', '25']
-    ];
+  it('should correctly convert apiResponse to FilePreviewTableColumn[]', () => {
+    const apiResponse: FilePreviewTableData = {
+      name: ['Alice', 'Bob'],
+      age: ['30', '25']
+    };
 
     const expectedOutput = [
-      { importerDataKey: 'Alice__0', name: 'Alice', age: '30' },
-      { importerDataKey: 'Bob__1', name: 'Bob', age: '25' }
+      { importerDataKey: 'importer-row__0', name: 'Alice', age: '30' },
+      { importerDataKey: 'importer-row__1', name: 'Bob', age: '25' }
     ];
 
-    expect(convertToDataSource(columns, apiResponse)).toEqual(expectedOutput);
+    expect(convertToDataSource(apiResponse)).toEqual(expectedOutput);
   });
 });
 
