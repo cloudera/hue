@@ -138,6 +138,7 @@ ${ hueIcons.symbols() }
     <AppBanner data-reactcomponent='AppBanner'></AppBanner>
     <GlobalAlert data-reactcomponent='GlobalAlert'></GlobalAlert>
     <WelcomeTour data-reactcomponent='WelcomeTour'></WelcomeTour>
+    <FileUploadQueue data-reactcomponent='FileUploadQueue'></FileUploadQueue>
 
     <nav class="navbar navbar-default">
       <div class="navbar-inner top-nav">

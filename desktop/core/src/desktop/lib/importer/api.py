@@ -34,7 +34,6 @@ from rest_framework.response import Response
 
 from desktop.lib.importer.operations import local_file_upload
 from desktop.lib.importer.serializers import LocalFileUploadSerializer
-from desktop.lib.conf import coerce_bool
 
 LOG = logging.getLogger()
 
