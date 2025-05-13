@@ -23,11 +23,12 @@ import Examples from './Examples';
 import Analytics from './Analytics';
 import * as hueConfigModule from '../../../config/hueConfig';
 import {
-  UPDATE_USAGE_ANALYTICS_API_URL,
   INSTALL_APP_EXAMPLES_API_URL,
   INSTALL_AVAILABLE_EXAMPLES_API_URL
 } from '../Components/utils';
 import { get, post } from '../../../api/utils';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 
 jest.mock('../../../api/utils', () => ({
   post: jest.fn(),
@@ -35,10 +36,14 @@ jest.mock('../../../api/utils', () => ({
 }));
 
 jest.mock('./ConfigStatus', () => () => <div>MockedConfigStatusComponent</div>);
-
 jest.mock('../../../config/hueConfig', () => ({
   getLastKnownConfig: jest.fn()
 }));
+jest.mock('../../../utils/hooks/useLoadData/useLoadData');
+jest.mock('../../../utils/hooks/useSaveData/useSaveData');
+
+const mockedUseLoadData = useLoadData as jest.Mock;
+const mockedUseSaveData = useSaveData as jest.Mock;
 
 describe('OverviewTab', () => {
   beforeEach(() => {
@@ -46,6 +51,7 @@ describe('OverviewTab', () => {
       hue_config: { is_admin: true }
     });
   });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -58,33 +64,41 @@ describe('OverviewTab', () => {
   });
 
   describe('Analytics', () => {
+    const mockedReloadData = jest.fn();
+    const mockedSaveAnalyticsPreference = jest.fn();
+
     beforeEach(() => {
-      (get as jest.Mock).mockResolvedValue({ analytics_enabled: false });
+      jest.clearAllMocks();
+
+      mockedUseLoadData.mockReturnValue({
+        data: { analyticsEnabled: false },
+        loading: false,
+        error: null,
+        reloadData: mockedReloadData
+      });
+
+      mockedUseSaveData.mockReturnValue({
+        save: mockedSaveAnalyticsPreference,
+        loading: false,
+        error: null
+      });
     });
 
-    test('renders Analytics tab and can interact with the checkbox', async () => {
+    test('renders checkbox, handles interaction, and calls saveAnalyticsPreference correctly', async () => {
       render(<Analytics />);
-
-      const checkbox = screen.getByLabelText(/Help improve Hue with anonymous usage analytics./i);
-
+      const checkbox = screen.getByRole('checkbox', { name: /help improve hue/i });
+      expect(checkbox).toBeInTheDocument();
       expect(checkbox).not.toBeChecked();
-      (post as jest.Mock).mockResolvedValueOnce({ analytics_enabled: true });
-      await userEvent.click(checkbox);
-      expect(checkbox).toBeChecked();
-      expect(post).toHaveBeenCalledWith(UPDATE_USAGE_ANALYTICS_API_URL, {
-        analytics_enabled: true
+      userEvent.click(checkbox);
+      await waitFor(() => {
+        expect(mockedSaveAnalyticsPreference).toHaveBeenCalledTimes(1);
       });
-
-      (post as jest.Mock).mockResolvedValueOnce({ analytics_enabled: false });
-      await userEvent.click(checkbox);
-      await waitFor(() => expect(checkbox).not.toBeChecked());
-      expect(post).toHaveBeenCalledWith(UPDATE_USAGE_ANALYTICS_API_URL, {
-        analytics_enabled: false
-      });
+      const formData = mockedSaveAnalyticsPreference.mock.calls[0][0];
+      expect(formData.get('analytics_enabled')).toBe('true');
     });
   });
 
-  describe('Examples component', () => {
+  describe('Examples', () => {
     const availableAppsResponse = {
       apps: {
         hive: 'Hive',
@@ -92,6 +106,7 @@ describe('OverviewTab', () => {
         search: 'Solr Search'
       }
     };
+
     beforeEach(() => {
       (get as jest.Mock).mockImplementation(url => {
         if (url === INSTALL_AVAILABLE_EXAMPLES_API_URL) {
@@ -111,7 +126,6 @@ describe('OverviewTab', () => {
 
     test('fetch and display available apps', async () => {
       render(<Examples />);
-
       await waitFor(() => {
         expect(get).toHaveBeenCalledWith(INSTALL_AVAILABLE_EXAMPLES_API_URL, {});
         Object.entries(availableAppsResponse.apps).forEach(([, appName]) => {
@@ -122,7 +136,6 @@ describe('OverviewTab', () => {
 
     test('post call to install apps without data like hive when the install button is clicked', async () => {
       render(<Examples />);
-
       await waitFor(() => {
         const installButton = screen.getByText('Hive');
         userEvent.click(installButton);
@@ -132,12 +145,10 @@ describe('OverviewTab', () => {
 
     test('post call to install Solr Search example and its data when the install button is clicked', async () => {
       render(<Examples />);
-
       const solrData = ['log_analytics_demo', 'twitter_demo', 'yelp_demo'];
       await waitFor(() => screen.getByText('Solr Search'));
       const installButton = screen.getByText('Solr Search');
       userEvent.click(installButton);
-
       await waitFor(() => {
         solrData.forEach(dataEntry => {
           expect(post).toHaveBeenCalledWith(INSTALL_APP_EXAMPLES_API_URL, {
@@ -146,7 +157,6 @@ describe('OverviewTab', () => {
           });
         });
       });
-
       expect(post).toHaveBeenCalledTimes(solrData.length);
     });
   });

@@ -19,6 +19,8 @@ import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 import Input from 'cuix/dist/components/Input';
 import { GET_USAGE_ANALYTICS_API_URL, UPDATE_USAGE_ANALYTICS_API_URL } from '../Components/utils';
+import { HueAlert } from '../../../reactComponents/GlobalAlert/types';
+import { GLOBAL_INFO_TOPIC } from '../../../reactComponents/GlobalAlert/events';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
@@ -47,6 +49,7 @@ const Analytics = (): JSX.Element => {
           ? t('Analytics have been activated.')
           : t('Analytics have been deactivated.');
         huePubSub.publish('hue.global.info', { message: successMessage });
+        huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: successMessage });
       }
     }
   });
@@ -54,14 +57,13 @@ const Analytics = (): JSX.Element => {
   const errors = [
     {
       enabled: !!error,
-      message: error?.message || t('An unknown error occurred while fetching data.')
+      message: t('An unknown error occurred while fetching data.')
     },
     {
       enabled: !!savingError,
-      message: savingError?.message || t('Failed to update analytics.')
+      message: t('Failed to update analytics.')
     }
   ];
-
   return (
     <LoadingErrorWrapper loading={loading || savingPreference} errors={errors}>
       <div className="overview-analytics">
