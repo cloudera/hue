@@ -21,52 +21,42 @@ export const enum ImporterFileTypes {
 }
 
 export enum ImporterFileSource {
-  LOCAL = 'localfile',
-  REMOTE = 'file'
+  LOCAL = 'local',
+  REMOTE = 'remote'
 }
 
 export interface LocalFileUploadResponse {
-  local_file_url: string;
-  file_type: ImporterFileTypes;
+  file_path: string;
 }
 
 export interface FileFormatResponse {
-  fieldSeparator: string;
-  hasHeader: boolean;
-  quoteChar: string;
-  recordSeparator: string;
-  status: number;
   type: ImporterFileTypes;
+  hasHeader?: boolean;
+  fieldSeparator?: string;
+  quoteChar?: string;
+  recordSeparator?: string;
 }
 
 export interface FileMetaData {
   path: string;
-  type: ImporterFileTypes;
+  type?: ImporterFileTypes;
   source: ImporterFileSource;
 }
 
-export type GuessFieldTypesColumn = {
+export type FilePreviewTableColumn = {
   importerDataKey?: string; // key for identifying unique data row
   name: string;
   type?: string;
-  unique?: boolean;
-  keep?: boolean;
-  required?: boolean;
-  multiValued?: boolean;
-  showProperties?: boolean;
-  level?: number;
-  length?: number;
-  keyType?: string;
-  isPartition?: boolean;
-  partitionValue?: string;
-  comment?: string;
-  scale?: number;
-  precision?: number;
 };
 
-export interface GuessFieldTypesResponse {
-  columns: GuessFieldTypesColumn[];
-  sample: string[][];
+export interface FilePreviewTableData {
+  [key: string]: (string | number)[];
+}
+
+export interface FilePreviewResponse {
+  columns: FilePreviewTableColumn[];
+  hasHeader: boolean;
+  previewData: FilePreviewTableData;
 }
 
 export interface ImporterTableData {
