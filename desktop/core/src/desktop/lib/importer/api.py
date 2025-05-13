@@ -32,6 +32,7 @@ from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from desktop.lib.conf import coerce_bool
 from desktop.lib.importer.operations import local_file_upload
 from desktop.lib.importer.serializers import LocalFileUploadSerializer
 
@@ -292,6 +293,8 @@ def _preview_excel_file(fh, file_type: str, sheet_name: str, dialect: str, has_h
         csv_snippet = csv_snippet.decode('utf-8', errors='replace')
 
       has_header = csv.Sniffer().has_header(csv_snippet)
+    else:
+      has_header = coerce_bool(has_header)
 
     fh.seek(0)
     df = pl.read_excel(BytesIO(fh.read()), sheet_name=sheet_name, has_header=has_header)
@@ -322,6 +325,8 @@ def _preview_delimited_file(
     if has_header is None:
       fh.seek(0)
       has_header = csv.Sniffer().has_header(fh.read(16 * 1024).decode('utf-8', errors='replace'))
+    else:
+      has_header = coerce_bool(has_header)
 
     fh.seek(0)
     df = pl.read_csv(
