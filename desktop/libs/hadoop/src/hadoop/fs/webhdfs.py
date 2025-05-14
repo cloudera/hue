@@ -451,12 +451,21 @@ class WebHdfs(Hdfs):
     if not success:
       raise IOError(_("Mkdir failed: %s") % path)
 
-  def rename(self, old, new):
+  def rename(self, old, new, overwrite=False):
     """rename(old, new)"""
     old = self.strip_normpath(old)
     if not self.is_absolute(new):
       new = Hdfs.join(Hdfs.dirname(old), new)
     new = self.strip_normpath(new)
+
+    if self.exists(new):
+        if overwrite:
+            LOG.info(_("Overwriting existing file: %s") % new)
+            self.remove(new, skip_trash=True)
+        else:
+            LOG.warning(_("Rename failed: Target path '%s' already exists.") % new)
+            raise IOError(errno.EEXIST, _("Destination file %s exists.") % new)
+
     params = self._getparams()
     params['op'] = 'RENAME'
     # Encode `new' because it's in the params
