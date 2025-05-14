@@ -525,32 +525,34 @@ def upload_file(request):
   dest_path = request.POST.get('destination_path')
   overwrite = coerce_bool(request.POST.get('overwrite', False))
 
-  # Check file type restrictions
+  # Check if the file type is restricted
   _, file_type = os.path.splitext(uploaded_file.name)
   if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-      return HttpResponse(f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.', status=400)
+    return HttpResponse(f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.', status=400)
 
-  # Check if the file size exceeds the maximum allowed sizes
+  # Check if the file size exceeds the maximum allowed size
   max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
   if max_size >= 0 and uploaded_file.size >= max_size:
     return HttpResponse(
-        f'File exceeds maximum allowed size of {max_size} bytes. Hue is configured to restrict uploads larger than this limit.', status=413
-      )
+      f'File exceeds maximum allowed size of {max_size} bytes. Hue is configured to restrict uploads larger than this limit.', status=413
+    )
 
-  # Check if the destination path exists
-  if not request.fs.exists(dest_path):
-      return HttpResponse(f'The destination path {dest_path} does not exist.', status=404)
+  # Check if the destination path is a directory and the file name contains a path separator
+  # This prevents directory traversal attacks
+  if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
+    return HttpResponse(f'Invalid filename. Path separators are not allowed.', status=400)
 
   # Determine the full file path and handle name conflicts
   filepath = request.fs.join(dest_path, uploaded_file.name)
   if request.fs.exists(filepath):
+  # If overwrite is true, attempt to remove the existing file
       if overwrite:
-          try:
-              request.fs.rmtree(filepath)
-          except Exception as e:
-              err_message = 'Failed to remove already existing file.'
-              LOG.exception(f'{err_message} {str(e)}')
-              return HttpResponse(err_message, status=500)
+        try:
+            request.fs.rmtree(filepath)
+        except Exception as e:
+            err_message = 'Failed to remove already existing file.'
+            LOG.exception(f'{err_message} {str(e)}')
+            return HttpResponse(err_message, status=500)
       else:
           # Automatically rename the file to avoid conflicts
           base_name, extension = os.path.splitext(uploaded_file.name)
@@ -564,7 +566,6 @@ def upload_file(request):
   # Check if the destination path already exists or not
   if not request.fs.exists(dest_path):
     return HttpResponse(f'The destination path {dest_path} does not exist.', status=404)
-  
   # Perform the upload
   try:
       request.fs.upload_v1(request.META, input_data=body_data_bytes, destination=filepath, username=request.user.username)
