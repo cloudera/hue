@@ -530,11 +530,11 @@ def upload_file(request):
   if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
       return HttpResponse(f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.', status=400)
 
-  # Check file size restrictions
+  # Check if the file size exceeds the maximum allowed sizes
   max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
   if max_size >= 0 and uploaded_file.size >= max_size:
-      return HttpResponse(
-          f'File exceeds maximum allowed size of {max_size} bytes. Hue is configured to restrict uploads larger than this limit.', status=413
+    return HttpResponse(
+        f'File exceeds maximum allowed size of {max_size} bytes. Hue is configured to restrict uploads larger than this limit.', status=413
       )
 
   # Check if the destination path exists
@@ -546,11 +546,11 @@ def upload_file(request):
   if request.fs.exists(filepath):
       if overwrite:
           try:
-              request.fs.remove(filepath, skip_trash=True)
-              LOG.info(f'Overwriting existing file: {filepath}')
+              request.fs.rmtree(filepath)
           except Exception as e:
-              LOG.exception(f'Failed to remove existing file: {e}')
-              return HttpResponse(f'Failed to overwrite existing file: {filepath}', status=500)
+              err_message = 'Failed to remove already existing file.'
+              LOG.exception(f'{err_message} {str(e)}')
+              return HttpResponse(err_message, status=500)
       else:
           # Automatically rename the file to avoid conflicts
           base_name, extension = os.path.splitext(uploaded_file.name)
@@ -561,6 +561,10 @@ def upload_file(request):
               counter += 1
           LOG.info(f'Automatically renamed file to "{os.path.basename(filepath)}" to avoid conflict.')
 
+  # Check if the destination path already exists or not
+  if not request.fs.exists(dest_path):
+    return HttpResponse(f'The destination path {dest_path} does not exist.', status=404)
+  
   # Perform the upload
   try:
       request.fs.upload_v1(request.META, input_data=body_data_bytes, destination=filepath, username=request.user.username)
