@@ -22,7 +22,6 @@ class RequirementsGenerator:
             "boto-2.49.0",
             "django-axes-5.13.0",
             "django-babel",
-            "djangosaml2-0.18.0",
             "pysaml2-7.3.1",
             "python-sasl-0.3.1",
         ]
@@ -58,6 +57,7 @@ class RequirementsGenerator:
             "djangomako==1.3.2",
             "djangorestframework-simplejwt==5.2.1",
             "djangorestframework==3.14.0",
+            "djangosaml2==1.9.3",
             "future==0.18.3",
             "gcs-oauth2-boto-plugin==3.0",
             "greenlet==3.1.1",
