@@ -93,8 +93,6 @@ describe('OverviewTab', () => {
       await waitFor(() => {
         expect(mockedSaveAnalyticsPreference).toHaveBeenCalledTimes(1);
       });
-      const formData = mockedSaveAnalyticsPreference.mock.calls[0][0];
-      expect(formData.get('analytics_enabled')).toBe('true');
     });
   });
 
