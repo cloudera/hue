@@ -207,7 +207,13 @@ CDP_LOGOUT_URL = Config(
   key="logout_url",
   type=str,
   default="",
-  help=_t("To log users out of magic-sso, CDP control panel use Logout URL"))
+  help=_t("To log users out of control plane, CDP control plane use Logout URL"))
+
+REDIRECT_URL = Config(
+  key="redirect_url",
+  type=str,
+  default="",
+  help=_t("After log users out of control plane, CDP control plane redirect to this URL"))
 
 
 def get_key_file_password():
@@ -231,16 +237,12 @@ def config_validator(user):
 
 def get_logout_redirect_url():
   # This logic was derived from KNOX.
-  prod_url = "consoleauth.altus.cloudera.com"
   logout_url = CDP_LOGOUT_URL.get()
   redirect_url = "https://sso.cloudera.com/logout"
-  if prod_url not in CDP_LOGOUT_URL.get():
+  if REDIRECT_URL.get():
+    redirect_url = REDIRECT_URL.get()
+  elif any(substr in CDP_LOGOUT_URL.get() for substr in ['-dev', '-int', '-stage']):
     redirect_url = "https://sso-stg.cat.cloudera.com/logout"
-  elif ("cdp.cloudera.com/" not in logout_url and "cloudera.com/consoleauth/logout" in logout_url):
-    # Dev/Staging environment
-    redirect_url = "https://sso-stg.cat.cloudera.com/logout"
-  elif ("cdp.cloudera.com/consoleauth/logout" in logout_url):
-    # Production environment
+  else:
     redirect_url = "https://sso.cloudera.com/logout"
-
   return redirect_url
