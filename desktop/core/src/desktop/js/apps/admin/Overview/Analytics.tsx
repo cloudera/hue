@@ -14,63 +14,79 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React from 'react';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 import Input from 'cuix/dist/components/Input';
-import { post } from '../../../api/utils';
-import { ANALYTICS_PREFERENCES_API_URL } from '../Components/utils';
+import { GET_USAGE_ANALYTICS_API_URL, UPDATE_USAGE_ANALYTICS_API_URL } from '../Components/utils';
+import { HueAlert } from '../../../reactComponents/GlobalAlert/types';
+import { GLOBAL_INFO_TOPIC } from '../../../reactComponents/GlobalAlert/events';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
+import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import './Overview.scss';
 
-interface UpdatePreferences {
-  status: number;
+interface UsageAnalyticsResponse {
+  analyticsEnabled?: boolean;
+  analytics_enabled?: boolean;
   message?: string;
 }
 
 const Analytics = (): JSX.Element => {
-  const [collectUsage, setCollectUsage] = useState<boolean>(false);
   const { t } = i18nReact.useTranslation();
-
-  const saveCollectUsagePreference = async (collectUsage: boolean) => {
-    const response = await post<UpdatePreferences>(ANALYTICS_PREFERENCES_API_URL, {
-      collect_usage: collectUsage
-    });
-
-    if (response.status === 0) {
-      const successMessage = collectUsage
-        ? t('Analytics have been activated.')
-        : t('Analytics have been deactivated.');
-      huePubSub.publish('hue.global.info', { message: successMessage });
-    } else {
-      const errorMessage = collectUsage
-        ? t('Failed to activate analytics.')
-        : t('Failed to deactivate analytics.');
-      huePubSub.publish('hue.global.error', { message: errorMessage });
+  const { data, loading, error, reloadData } = useLoadData<UsageAnalyticsResponse>(
+    GET_USAGE_ANALYTICS_API_URL
+  );
+  const {
+    save: saveAnalyticsPreference,
+    loading: savingPreference,
+    error: savingError
+  } = useSaveData<UsageAnalyticsResponse>(UPDATE_USAGE_ANALYTICS_API_URL, {
+    onSuccess: response => {
+      if (response.analytics_enabled !== undefined) {
+        reloadData();
+        const successMessage = response.analytics_enabled
+          ? t('Analytics have been activated.')
+          : t('Analytics have been deactivated.');
+        huePubSub.publish('hue.global.info', { message: successMessage });
+        huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: successMessage });
+      }
     }
-  };
+  });
 
-  const handleCheckboxChange = event => {
-    const newPreference = event.target.checked;
-    setCollectUsage(newPreference);
-    saveCollectUsagePreference(newPreference);
-  };
-
+  const errors = [
+    {
+      enabled: !!error,
+      message: t('An unknown error occurred while fetching data.')
+    },
+    {
+      enabled: !!savingError,
+      message: t('Failed to update analytics.')
+    }
+  ];
   return (
-    <div className="overview-analytics">
-      <h3>{t('Anonymous usage analytics')}</h3>
-      <div className="analytics-checkbox-container">
-        <Input
-          type="checkbox"
-          className="analytics__checkbox-icon"
-          id="usage_analytics"
-          checked={collectUsage}
-          onChange={handleCheckboxChange}
-        />
-        <label htmlFor="usage_analytics" className="usage__analytics">
-          {t('Help improve Hue with anonymous usage analytics.')}
-        </label>
+    <LoadingErrorWrapper loading={loading || savingPreference} errors={errors}>
+      <div className="overview-analytics">
+        <h3>{t('Anonymous usage analytics')}</h3>
+        <div className="analytics-checkbox-container">
+          <Input
+            type="checkbox"
+            className="analytics__checkbox-icon"
+            id="usage_analytics"
+            checked={!!data?.analyticsEnabled}
+            onChange={event =>
+              saveAnalyticsPreference(
+                new FormData().append('analytics_enabled', event.target.checked.toString())
+              )
+            }
+            disabled={loading || savingPreference}
+          />
+          <label htmlFor="usage_analytics" className="usage__analytics">
+            {t('Help improve Hue with anonymous usage analytics.')}
+          </label>
+        </div>
       </div>
-    </div>
+    </LoadingErrorWrapper>
   );
 };
 
