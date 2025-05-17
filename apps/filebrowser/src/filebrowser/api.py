@@ -542,37 +542,43 @@ def upload_file(request):
   if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
     return HttpResponse(f'Invalid filename. Path separators are not allowed.', status=400)
 
-  # Check if the file already exists at the destination path
+  # Determine the full file path and handle name conflicts
   filepath = request.fs.join(dest_path, uploaded_file.name)
   if request.fs.exists(filepath):
-    # If overwrite is true, attempt to remove the existing file
-    if overwrite:
-      try:
-        request.fs.rmtree(filepath)
-      except Exception as e:
-        err_message = 'Failed to remove already existing file.'
-        LOG.exception(f'{err_message} {str(e)}')
-        return HttpResponse(err_message, status=500)
-    else:
-      err_message = f'The file {uploaded_file.name} already exists at the destination path.'
-      LOG.error(err_message)
-      return HttpResponse(err_message, status=409)
+  # If overwrite is true, attempt to remove the existing file
+      if overwrite:
+        try:
+            request.fs.rmtree(filepath)
+        except Exception as e:
+            err_message = 'Failed to remove already existing file.'
+            LOG.exception(f'{err_message} {str(e)}')
+            return HttpResponse(err_message, status=500)
+      else:
+          # Automatically rename the file to avoid conflicts
+          base_name, extension = os.path.splitext(uploaded_file.name)
+          counter = 1
+          while request.fs.exists(filepath):
+              new_file_name = f"{base_name} ({counter}){extension}"
+              filepath = request.fs.join(dest_path, new_file_name)
+              counter += 1
+          LOG.info(f'Automatically renamed file to "{os.path.basename(filepath)}" to avoid conflict.')
 
   # Check if the destination path already exists or not
   if not request.fs.exists(dest_path):
     return HttpResponse(f'The destination path {dest_path} does not exist.', status=404)
-
+  # Perform the upload
   try:
-    request.fs.upload_v1(request.META, input_data=body_data_bytes, destination=dest_path, username=request.user.username)
+      request.fs.upload_v1(request.META, input_data=body_data_bytes, destination=filepath, username=request.user.username)
+      LOG.info(f'Uploaded file successfully to "{filepath}".')
   except Exception as ex:
-    return HttpResponse(f'Upload to {filepath} failed: {str(ex)}', status=500)
+      LOG.exception(f"Upload to {filepath} failed: {str(ex)}")
+      return HttpResponse(f'Upload to {filepath} failed: {str(ex)}', status=500)
 
+  # Return success with the file stats
   response = {
-    'uploaded_file_stats': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
+      'uploaded_file_stats': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
   }
-
   return JsonResponse(response)
-
 
 @api_error_handler
 def mkdir(request):
