@@ -14,11 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import Button from 'cuix/dist/components/Button';
-import DocumentationIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import S3Icon from '@cloudera/cuix-core/icons/react/S3Icon';
-import HDFSIcon from '@cloudera/cuix-core/icons/react/HDFSIcon';
+import HDFSIcon from '@cloudera/cuix-core/icons/react/HdfsIcon';
 import OzoneIcon from '@cloudera/cuix-core/icons/react/OzoneIcon';
 import AdlsIcon from '../../../components/icons/AdlsIcon';
 
@@ -26,14 +25,33 @@ import { hueWindow } from 'types/types';
 
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import FileChooserModal from '../../storageBrowser/FileChooserModal/FileChooserModal';
-import { FileMetaData, ImporterFileSource, LocalFileUploadResponse, FileSystem } from '../types';
+import { FileMetaData, ImporterFileSource } from '../types';
+import { FileSystem } from '../../storageBrowser/types';
 import { i18nReact } from '../../../utils/i18nReact';
-import { UPLOAD_LOCAL_FILE_API_URL, FILESYSTEMS_API_URL } from '../api';
+import { FILESYSTEMS_API_URL } from '../api';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
-import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
-import huePubSub from '../../../utils/huePubSub';
 
 import './ImporterSourceSelector.scss';
+import LocalFileUploadOption from './LocalFileUploadOption';
+
+const fileSystems = {
+  s3a: {
+    icon: <S3Icon />,
+    title: 'Amazon S3'
+  },
+  hdfs: {
+    icon: <HDFSIcon />,
+    title: 'Hadoop Distributed File System'
+  },
+  abfs: {
+    icon: <AdlsIcon />,
+    title: 'Azure Blob File System'
+  },
+  ofs: {
+    icon: <OzoneIcon />,
+    title: 'Ozone File System'
+  }
+};
 
 interface ImporterSourceSelectorProps {
   setFileMetaData: (fileMetaData: FileMetaData) => void;
@@ -41,9 +59,9 @@ interface ImporterSourceSelectorProps {
 
 const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const uploadRef = useRef<HTMLInputElement>(null);
-  const [showFileChooserModal, setShowFileChooserModal] = useState<boolean>(false);
-  const [filePath, setFilePath] = useState<string>('');
+  const [selectedUserHomeDirectory, setSelectedUserHomeDirectory] = useState<string | undefined>(
+    undefined
+  );
 
   const {
     data: fileSystemsData,
@@ -51,7 +69,6 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
     error,
     reloadData
   } = useLoadData<FileSystem[]>(FILESYSTEMS_API_URL);
-  const { save: upload } = useSaveData<LocalFileUploadResponse>(UPLOAD_LOCAL_FILE_API_URL);
 
   const errorConfig = [
     {
@@ -141,24 +158,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
         </div>
         <div className="hue-importer__source-selector-options">
           {(window as hueWindow).ENABLE_DIRECT_UPLOAD && (
-            <div className="hue-importer__source-selector-option">
-              <Button
-                className="hue-importer__source-selector-option-button"
-                size="large"
-                icon={<DocumentationIcon />}
-                onClick={handleUploadClick}
-              ></Button>
-              <span className="hue-importer__source-selector-option-btn-title">
-                {t('Upload from File')}
-              </span>
-              <input
-                ref={uploadRef}
-                type="file"
-                className="hue-importer__source-selector-option-upload"
-                onChange={handleFileUpload}
-                accept=".csv, .xlsx, .xls"
-              />
-            </div>
+            <LocalFileUploadOption setFileMetaData={setFileMetaData} />
           )}
           {fileSystemsData?.map(filesystem => (
             <div className="hue-importer__source-selector-option" key={filesystem.name}>
@@ -167,8 +167,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
                 size="large"
                 icon={fileSystems[filesystem.name].icon}
                 onClick={() => {
-                  setFilePath(filesystem.userHomeDirectory);
-                  setShowFileChooserModal(true);
+                  setSelectedUserHomeDirectory(filesystem.userHomeDirectory);
                 }}
               ></Button>
               <span className="hue-importer__source-selector-option-btn-title">
@@ -178,13 +177,15 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
           ))}
         </div>
       </div>
-      {showFileChooserModal && (
+      {selectedUserHomeDirectory && (
         <FileChooserModal
-          onClose={() => setShowFileChooserModal(false)}
+          onClose={() => {
+            setSelectedUserHomeDirectory(undefined);
+          }}
           onSubmit={handleFileSelection}
-          showModal={showFileChooserModal}
+          showModal={true}
           title={t('Import file')}
-          sourcePath={filePath}
+          sourcePath={selectedUserHomeDirectory}
           isImport={true}
         />
       )}

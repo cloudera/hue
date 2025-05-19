@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
-import { Input, Tooltip } from 'antd';
+import { Input, InputRef, Tooltip } from 'antd';
 import Table, { ColumnProps } from 'cuix/dist/components/Table';
 import classNames from 'classnames';
 
@@ -26,22 +26,26 @@ import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import { i18nReact } from '../../../utils/i18nReact';
 import useDebounce from '../../../utils/useDebounce';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
+import huePubSub from '../../../utils/huePubSub';
+import { useHuePubSub } from '../../../utils/hooks/useHuePubSub/useHuePubSub';
+import { FileStatus } from '../../../utils/hooks/useFileUpload/types';
+import UUID from '../../../utils/string/UUID';
+import { DEFAULT_POLLING_TIME } from '../../../utils/constants/storageBrowser';
 
 import { BrowserViewType, ListDirectory } from '../types';
 import { LIST_DIRECTORY_API_URL, CREATE_DIRECTORY_API_URL } from '../api';
 
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
+import BottomSlidePanel from '../../../reactComponents/BottomSlidePanel/BottomSlidePanel';
+import {
+  FILE_UPLOAD_START_EVENT,
+  FILE_UPLOAD_SUCCESS_EVENT
+} from '../../../reactComponents/FileUploadQueue/event';
 
 import './FileChooserModal.scss';
-import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
-import huePubSub from '../../../utils/huePubSub';
-import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
-import InputModal from '../../../reactComponents/InputModal/InputModal';
-import { FileStatus, RegularFile } from '../../../utils/hooks/useFileUpload/types';
-import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
-import UUID from '../../../utils/string/UUID';
-import { DEFAULT_POLLING_TIME } from '../../../utils/constants/storageBrowser';
 
 interface FileChooserModalProps {
   onClose: () => void;
@@ -76,14 +80,9 @@ const FileChooserModal = ({
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [showCreateFolderModal, setShowCreateFolderModal] = useState<boolean>(false);
   const [polling, setPolling] = useState<boolean>(false);
-  const [filesToUpload, setFilesToUpload] = useState<RegularFile[]>([]);
   const uploadRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (showModal) {
-      setDestPath(sourcePath);
-    }
-  }, [sourcePath]);
+  const createFolderInputRef = useRef<InputRef>(null);
+  const [createFolderValue, setCreateFolderValue] = useState<string>('');
 
   const {
     data: filesData,
@@ -100,17 +99,8 @@ const FileChooserModal = ({
     pollInterval: polling ? DEFAULT_POLLING_TIME : undefined
   });
 
-  const errorConfig = [
-    {
-      enabled: !!error,
-      message: t('An error occurred while fetching the filesystem'),
-      action: t('Retry'),
-      onClick: reloadData
-    }
-  ];
-
   const tableData: FileChooserTableData[] = useMemo(() => {
-    if (loading || error || !filesData?.files) {
+    if (!filesData?.files) {
       return [];
     }
 
@@ -174,8 +164,17 @@ const FileChooserModal = ({
       };
     });
     setPolling(true);
-    setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
+    huePubSub.publish(FILE_UPLOAD_START_EVENT, {
+      files: newUploadItems
+    });
   };
+
+  useHuePubSub({
+    topic: FILE_UPLOAD_SUCCESS_EVENT,
+    callback: () => {
+      setPolling(false);
+    }
+  });
 
   const handleUploadClick = () => {
     if (!uploadRef || !uploadRef.current) {
@@ -189,23 +188,21 @@ const FileChooserModal = ({
     onFilesDrop(files);
   };
 
-  const { save: createFolder, loading: createFolderLoading } = useSaveData(
-    CREATE_DIRECTORY_API_URL,
-    {
-      postOptions: { qsEncodeData: true } // TODO: Remove once API supports RAW JSON payload
-    }
-  );
+  const {
+    save: createFolder,
+    loading: createFolderLoading,
+    error: createFolderError
+  } = useSaveData(CREATE_DIRECTORY_API_URL, {
+    postOptions: { qsEncodeData: true } // TODO: Remove once API supports RAW JSON payload
+  });
 
-  const handleCreate = (name: string | number) => {
+  const handleCreate = () => {
     createFolder(
-      { path: destPath, name: name },
+      { path: destPath, name: createFolderValue },
       {
         onSuccess: () => {
           setShowCreateFolderModal(false);
           setDestPath(prev => `${prev}/${name}`);
-        },
-        onError: error => {
-          huePubSub.publish('hue.error', error);
         }
       }
     );
@@ -221,6 +218,22 @@ const FileChooserModal = ({
     setSubmitLoading(false);
     onClose();
   };
+
+  const errorConfig = [
+    {
+      enabled: !!error,
+      message: t('An error occurred while fetching the filesystem'),
+      action: t('Retry'),
+      onClick: reloadData
+    }
+  ];
+
+  const createFolderErrorConfig = [
+    {
+      enabled: !!createFolderError,
+      message: createFolderError
+    }
+  ];
 
   const TableContent = (
     <LoadingErrorWrapper loading={loading && !polling} errors={errorConfig}>
@@ -296,25 +309,30 @@ const FileChooserModal = ({
         onChange={handleFileUpload}
         accept=".csv, .xlsx, .xls"
       />
-      {filesToUpload.length > 0 && (
-        <FileUploadQueue
-          filesQueue={filesToUpload}
-          onClose={() => setFilesToUpload([])}
-          onComplete={() => {
-            reloadData();
-            setPolling(false);
-          }}
-        />
-      )}
-      <InputModal
-        showModal={showCreateFolderModal}
+      <BottomSlidePanel
+        visible={showCreateFolderModal}
         title={t('Create Folder')}
-        inputLabel={t('Folder name')}
-        submitText={t('Create')}
-        onSubmit={handleCreate}
-        onClose={() => setShowCreateFolderModal(false)}
-        loading={createFolderLoading}
-      />
+        cancelText="Cancel"
+        primaryText={t('Create')}
+        onClose={() => {
+          setShowCreateFolderModal(false);
+          setCreateFolderValue('');
+        }}
+        onPrimaryClick={handleCreate}
+      >
+        {/* TODO: Refactor CreateAndUpload to reuse */}
+        <LoadingErrorWrapper errors={createFolderErrorConfig}>
+          <Input
+            defaultValue={createFolderValue}
+            disabled={createFolderLoading}
+            onPressEnter={() => handleCreate}
+            ref={createFolderInputRef}
+            onChange={e => {
+              setCreateFolderValue(e.target.value);
+            }}
+          />
+        </LoadingErrorWrapper>
+      </BottomSlidePanel>
     </Modal>
   );
 };
