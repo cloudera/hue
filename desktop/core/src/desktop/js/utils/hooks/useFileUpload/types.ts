@@ -30,6 +30,7 @@ export interface RegularFile {
   status: FileStatus;
   progress?: number;
   error?: Error;
+  overwrite?: Boolean;
 }
 
 // Interface for file upload in chunks.
