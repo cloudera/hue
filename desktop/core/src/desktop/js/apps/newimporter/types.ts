@@ -73,8 +73,3 @@ export interface ImporterTableData {
   importerDataKey: string;
   [key: string]: string | number;
 }
-
-export interface FileSystem {
-  name: string;
-  userHomeDirectory: string;
-}

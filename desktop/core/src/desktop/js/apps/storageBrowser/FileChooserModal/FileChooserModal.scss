@@ -24,6 +24,9 @@ $icon-margin: 5px;
 .antd.cuix {
   .hue-filechooser-modal__body {
     height: 350px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
   }
 
   .hue-filechooser-modal__path-browser-panel {
