@@ -15,6 +15,7 @@
 // limitations under the License.
 
 import React, { useState, useEffect } from 'react';
+import { get } from '../../api/utils';
 import Modal from 'cuix/dist/components/Modal';
 import { Button } from 'antd'; 
 import ReactDOM from 'react-dom'
@@ -32,7 +33,6 @@ import huePubSub from '../../utils/huePubSub';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 import { FILE_UPLOAD_START_EVENT, FILE_UPLOAD_SUCCESS_EVENT } from './event';
 import { LIST_DIRECTORY_API_URL } from '../../apps/storageBrowser/api';
-import useLoadData from '../../utils/hooks/useLoadData/useLoadData';
 import './FileUploadQueue.scss';
 import { ListDirectory } from '../../apps/storageBrowser/types';
 
@@ -56,43 +56,59 @@ const FileUploadQueue = (): JSX.Element => {
 
   const [expandQueue, setExpandQueue] = useState<boolean>(true);
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [uploadedFiles, setUploadedFiles] = useState<RegularFile[]>([]); // Track successfully uploaded files.
-  const [conflictFiles, setConflictFiles] = useState<RegularFile[]>([]); // Track conflicting files.
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false); // State for controlling modal visibility.
+  const [uploadedFiles, setUploadedFiles] = useState<RegularFile[]>([]);
+  const [conflictFiles, setConflictFiles] = useState<RegularFile[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [path, setPath] = useState<string | null>(null);
+  const [isFetchingFiles, setIsFetchingFiles] = useState(false);
 
-  const { data: fetchedFiles, loading: isFetchingFiles } = useLoadData<ListDirectory>(LIST_DIRECTORY_API_URL, {
-    params: { path: '/user/admin', pagesize: '1000' },
-    skip: false // Trigger on component mount.
-  });
+  const fetchUploadedFiles = async (uploadPath: string) => {
+    setIsFetchingFiles(true);
+  
+    try {
+      const response = await get<ListDirectory>(LIST_DIRECTORY_API_URL, { path: uploadPath, pagesize: '1000' });
+      if (response?.files) {
+        setUploadedFiles(
+          response.files.map(file => ({
+            uuid: crypto.randomUUID(),
+            file: new File([''], file.path.split('/').pop() || ''),
+            status: FileStatus.Uploaded,
+            filePath: file.path
+          }))
+        );
+      }
+    } catch (error) {
+      console.error('Failed to fetch files:', error);
+    } finally {
+      setIsFetchingFiles(false);
+    }
+  };
 
   useEffect(() => {
-    if (fetchedFiles?.files) {
-      console.log('Fetched uploaded files:', fetchedFiles.files);
-      setUploadedFiles(
-        fetchedFiles.files.map(file => ({
-          uuid: crypto.randomUUID(), // Generate a unique identifier
-          file: new File([''], file.path.split('/').pop() || ''), // Create a valid File object
-          status: FileStatus.Uploaded,
-          filePath: file.path
-        }))
-      );
+    if (path) {
+      fetchUploadedFiles(path);
     }
-  }, [fetchedFiles]);
+  }, [path]);
 
+  useEffect(() => {
+    // Automatically resolve file conflicts after uploadedFiles updates
+    if (conflictFiles.length > 0) {
+      resolveFileConflicts(conflictFiles);
+    }
+  }, [uploadedFiles]);
 
   const onComplete = () => {
     huePubSub.publish(FILE_UPLOAD_SUCCESS_EVENT);
     const newlyUploadedFiles = uploadQueue.filter(file => file.status === FileStatus.Uploaded);
     
-    // Update uploadedFiles state and local reference
     setUploadedFiles(existing => {
       const updatedFiles = [
         ...existing,
         ...newlyUploadedFiles
       ].filter((file, index, self) =>
-        index === self.findIndex(f => f.file.name === file.file.name) // Prevent duplicates
+        index === self.findIndex(f => f.file.name === file.file.name)
       );
-      return updatedFiles; // Return updated files for state
+      return updatedFiles;
     });
   };
 
@@ -108,58 +124,50 @@ const FileUploadQueue = (): JSX.Element => {
 
   useHuePubSub<FileUploadEvent>({
     topic: FILE_UPLOAD_START_EVENT,
-    callback: (data?: FileUploadEvent) => {
-      if (data?.files) {
+    callback: async (data?: FileUploadEvent) => {
+      if ((data?.files ?? []).length > 0) {
+        const uploadPath = data?.files?.[0]?.filePath ?? null;
+        if (!uploadPath) {
+          console.error("File path missing for uploaded files");
+          return;
+        }
+
+        setPath(uploadPath);
+
+        await fetchUploadedFiles(uploadPath);
+
         setIsVisible(true);
-        resolveFileConflicts(data.files); // Resolve any conflicts on enqueue.
+
+        if (data?.files) {
+          setConflictFiles(data.files); // Store new files temporarily
+        }
       }
     }
   });
 
-
   const resolveFileConflicts = (newFiles: RegularFile[]) => {
-    console.log('Resolving file conflicts...');
-  
-    // Extract existing file names from uploaded files
     const existingFileNames = uploadedFiles.map(f => f.file.name);
-  
-    // Detect conflicts and group files into conflicting and non-conflicting
     const conflicts = newFiles.filter(newFile => existingFileNames.includes(newFile.file.name));
     const nonConflictingFiles = newFiles.filter(newFile => !existingFileNames.includes(newFile.file.name));
-  
-    console.log('Conflicting files:', conflicts);
-    console.log('Non-conflicting files:', nonConflictingFiles);
-  
+
     if (conflicts.length > 0) {
-      // Store conflicting files for modal resolution
       setConflictFiles(conflicts);
       setIsModalVisible(true);
     }
-    // Add non-conflicting files directly to the upload queue
-    if (nonConflictingFiles.length > 0) {
-    addFiles(nonConflictingFiles);
-    setIsVisible(true);
-  }
-};
-
-const handleModalOk = (overwrite: boolean) => {
-  if (overwrite) {
-    // Overwrite conflicting files by re-adding them with an overwrite flag
-    addFiles(conflictFiles, true);
-  } else {
-    // Skip conflicting files and only keep non-conflicting files
-    const nonConflictingFiles = conflictFiles.filter(
-      file => !uploadedFiles.some(uploadedFile => uploadedFile.file.name === file.file.name)
-    );
     if (nonConflictingFiles.length > 0) {
       addFiles(nonConflictingFiles);
+      setIsVisible(true);
     }
-  }
-  setConflictFiles([]); // Clear conflict list
-  setIsModalVisible(false); // Close the modal
-  setIsVisible(true);
-};
+  };
 
+  const handleModalOk = (overwrite: boolean) => {
+    if (overwrite) {
+      addFiles(conflictFiles, true);
+    }
+    setConflictFiles([]);
+    setIsModalVisible(false);
+    setIsVisible(true);
+  };
 
   const onClose = () => {
     uploadQueue.forEach(file => cancelFile(file));
@@ -196,10 +204,10 @@ const handleModalOk = (overwrite: boolean) => {
             open={isModalVisible}
             onCancel={() => setIsModalVisible(false)}
             footer={[
-              <Button key="keep" onClick={() => handleModalOk(false)} data-testid="keep-original-btn">
+              <Button key="keep" onClick={() => handleModalOk(false)}>
                 {t('Keep Original Files')}
               </Button>,
-              <Button key="overwrite" type="primary" onClick={() => handleModalOk(true)} data-testid="overwrite-btn">
+              <Button key="overwrite" type="primary" onClick={() => handleModalOk(true)}>
                 {t('Overwrite Files')}
               </Button>
             ]}
@@ -214,21 +222,15 @@ const handleModalOk = (overwrite: boolean) => {
           document.body
         )}
       <div className="hue-upload-queue-container antd cuix">
-        <div className="hue-upload-queue-container__header" data-testid="hue-upload-queue__header">
-          {t(getHeaderText(), {
-            pendingCount,
-            uploadedCount,
-            failedCount
-          })}
+        <div className="hue-upload-queue-container__header">
+          {t(getHeaderText(), { pendingCount, uploadedCount, failedCount })}
           <div className="hue-upload-queue-container__header__button-group">
             <BorderlessButton
               onClick={() => setExpandQueue(!expandQueue)}
-              data-testid="hue-upload-queue-container__expand-button"
               icon={expandQueue ? <CaratDownIcon /> : <CaratUpIcon />}
             />
             <BorderlessButton
               onClick={onClose}
-              data-testid="hue-upload-queue-container__close-button"
               icon={<CloseIcon />}
             />
           </div>
@@ -252,9 +254,3 @@ const handleModalOk = (overwrite: boolean) => {
 };
 
 export default FileUploadQueue;
-
-
-
-
-
-
