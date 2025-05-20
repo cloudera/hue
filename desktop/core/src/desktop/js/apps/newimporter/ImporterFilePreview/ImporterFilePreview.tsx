@@ -42,16 +42,8 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const { t } = i18nReact.useTranslation();
   const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
-  const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
-    tableName: getDefaultTableName(fileMetaData.path, fileMetaData.source)
-  });
-
-  const handleDestinationSettingsChange = (name: string, value: string) => {
-    setDestinationConfig(prevConfig => ({
-      ...prevConfig,
-      [name]: value
-    }));
-  };
+  const [columns, setColumns] = useState<any[]>([]);
+  const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
 
   const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
     GUESS_FORMAT_URL,
@@ -97,6 +89,14 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     guessFields(formData);
   }, [fileMetaData.path, fileFormat]);
 
+  // Update columns when previewData changes
+  useEffect(() => {
+    if (previewData?.columns) {
+      setColumns(convertToAntdColumns(previewData.columns));
+    }
+  }, [previewData]);
+
+  // Update previewData columns before finishing import
   const handleFinishImport = () => {
     const source = {
       inputFormat: fileMetaData.source,
@@ -104,12 +104,17 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       format: fileFormat,
       sourceType: destinationConfig.connectorId
     };
+    // Map columns back to original format for backend if needed
     const destination = {
       outputFormat: 'table',
       nonDefaultLocation: fileMetaData.path,
-      name: `${destinationConfig.database}.${destinationConfig.tableName}`,
-      sourceType: destinationConfig.connectorId,
-      columns: previewData?.columns
+      name: `${database}.${defaultTableName}`,
+      sourceType: dialect,
+      columns: columns.map(col => ({
+        name: col.title,
+        type: col.type || 'string',
+        comment: col.comment || ''
+      }))
     };
 
     const formData = new FormData();
@@ -119,8 +124,16 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     save(formData);
   };
 
-  const columns = convertToAntdColumns(previewData?.columns ?? []);
   const tableData = convertToDataSource(columns, previewData?.sample);
+
+  const sampleRows = Array.isArray(previewData?.sample?.[0])
+    ? previewData.sample.map(rowArr =>
+        columns.reduce((acc, col, idx) => {
+          acc[col.dataIndex] = rowArr[idx];
+          return acc;
+        }, {})
+      )
+    : previewData?.sample;
 
   return (
     <div className="hue-importer-preview-page">
@@ -144,7 +157,10 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       <div className="hue-importer-preview-page__main-section">
         <div className="hue-importer-preview-page__header-section">
           <SourceConfiguration fileFormat={fileFormat} setFileFormat={setFileFormat} />
-          <BorderlessButton onClick={() => setIsEditColumnsOpen(true)}>
+          <BorderlessButton
+            onClick={() => setIsEditColumnsOpen(true)}
+            className="hue-importer-preview-page__edit-columns-button"
+          >
             {t('Edit Columns')}
           </BorderlessButton>
         </div>
@@ -157,7 +173,14 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
           locale={{ emptyText: t('No data found in the file!') }}
         />
       </div>
-      <EditColumnsModal isOpen={isEditColumnsOpen} closeModal={() => setIsEditColumnsOpen(false)} />
+
+      <EditColumnsModal
+        isOpen={isEditColumnsOpen}
+        closeModal={() => setIsEditColumnsOpen(false)}
+        columns={columns}
+        setColumns={setColumns}
+        sample={sampleRows}
+      />
     </div>
   );
 };

@@ -14,10 +14,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
-
-.antd.cuix {
-  .hue-importer-edit-columns {
-    padding: vars.$fluidx-spacing-s;
-  }
-}
+//Will write tests after first review
