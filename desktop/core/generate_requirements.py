@@ -47,12 +47,10 @@ class RequirementsGenerator:
             "django-celery-results==2.5.1",
             "django-cors-headers==3.13.0",
             "django-crequest==2018.5.11",
-            "django-debug-panel==0.8.3",
-            "django-debug-toolbar==3.6.0",
             "django-extensions==3.2.1",
             "django-ipware==3.0.2",
             "django_opentracing==1.1.0",
-            "django_prometheus==1.0.15",
+            "django_prometheus==2.3.1",
             "django-webpack-loader==1.0.0",
             "djangomako==1.3.2",
             "djangorestframework-simplejwt==5.2.1",
@@ -176,11 +174,6 @@ class RequirementsGenerator:
                 "Markdown==3.8"
             ],
         }
-        self.pytorch_requirements = {
-            "default": [
-                "--extra-index-url \"https://cloudera-build-us-west-1.vpc.cloudera.com/whl/cpu\" torch==2.2.2+cpu torchvision==0.17.2+cpu",
-            ]
-        }
         self.arch_requirements_map = {
             "ppc64le": self.ppc64le_requirements,
             "x86_64": self.x86_64_requirements,
@@ -202,7 +195,6 @@ class RequirementsGenerator:
         arch_reqs = self.arch_requirements_map[self.arch]
         self.requirements.extend(arch_reqs.get(self.python_version_string, arch_reqs["default"]))
         self.requirements.extend(self.copy_local_requirements(self.python_version_string))
-        self.requirements.extend(self.pytorch_requirements.get(self.python_version_string, self.pytorch_requirements["default"]))
 
         with open(f"{this_dir}/requirements-{self.arch}-{self.python_version_string}.txt", "w") as f:
             f.write("\n".join(self.requirements))
