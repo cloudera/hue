@@ -13,15 +13,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import huePubSub from '../../utils/huePubSub';
 
-huePubSub.subscribe('app.dom.loaded', app => {
-  if (app === 'newfilebrowser') {
-    window.createReactComponents('#embeddable_newfilebrowser');
-    return;
-  }
-  if (app !== 'filebrowser') {
-    return;
-  }
-  window.createReactComponents('#embeddable_filebrowser');
-});
+export const FILE_UPLOAD_START_EVENT = 'hue.file.upload.start';
+export const FILE_UPLOAD_SUCCESS_EVENT = 'hue.file.upload.success';

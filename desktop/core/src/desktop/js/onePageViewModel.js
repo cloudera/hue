@@ -31,6 +31,7 @@ import getSearchParameter from 'utils/url/getSearchParameter';
 import { ASSIST_GET_DATABASE_EVENT, ASSIST_GET_SOURCE_EVENT } from 'ko/components/assist/events';
 import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
 import ImporterPage from '../js/apps/newimporter/ImporterPage';
+import StorageBrowserPage from '../js/apps/storageBrowser/StorageBrowserPage';
 
 class OnePageViewModel {
   constructor() {
@@ -764,7 +765,6 @@ class OnePageViewModel {
         }
       },
       { url: '/filebrowser/view=*', app: 'filebrowser' },
-      { url: '/filebrowser/new', app: 'newfilebrowser' },
       {
         url: '/filebrowser/*',
         app: function () {
@@ -794,6 +794,16 @@ class OnePageViewModel {
             appName: 'newimporter',
             component: ImporterPage,
             title: 'New Importer'
+          });
+        }
+      },
+      {
+        url: '/storagebrowser/',
+        app: function () {
+          showReactAppPage({
+            appName: 'storagebrowser',
+            component: StorageBrowserPage,
+            title: 'Storage Browser'
           });
         }
       },

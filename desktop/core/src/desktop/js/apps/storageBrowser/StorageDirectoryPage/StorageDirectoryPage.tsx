@@ -32,15 +32,12 @@ import {
   FileSystem
 } from '../types';
 import formatBytes from '../../../utils/formatBytes';
-
-import './StorageDirectoryPage.scss';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { DEFAULT_PAGE_SIZE, DEFAULT_POLLING_TIME } from '../../../utils/constants/storageBrowser';
 import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import UUID from '../../../utils/string/UUID';
-import { RegularFile, FileStatus } from '../../../utils/hooks/useFileUpload/types';
-import FileUploadQueue from '../../../reactComponents/FileUploadQueue/FileUploadQueue';
+import { FileStatus } from '../../../utils/hooks/useFileUpload/types';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import StorageDirectoryActions from './StorageDirectoryActions/StorageDirectoryActions';
 import PaginatedTable, {
@@ -48,6 +45,14 @@ import PaginatedTable, {
   ColumnProps
 } from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import huePubSub from '../../../utils/huePubSub';
+import { useHuePubSub } from '../../../utils/hooks/useHuePubSub/useHuePubSub';
+import {
+  FILE_UPLOAD_START_EVENT,
+  FILE_UPLOAD_SUCCESS_EVENT
+} from '../../../reactComponents/FileUploadQueue/event';
+
+import './StorageDirectoryPage.scss';
 
 interface StorageDirectoryPageProps {
   fileStats: FileStats;
@@ -69,7 +74,6 @@ const StorageDirectoryPage = ({
   reloadTrashPath
 }: StorageDirectoryPageProps): JSX.Element => {
   const [selectedFiles, setSelectedFiles] = useState<StorageDirectoryTableData[]>([]);
-  const [filesToUpload, setFilesToUpload] = useState<RegularFile[]>([]);
   const [polling, setPolling] = useState<boolean>(false);
 
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
@@ -151,14 +155,23 @@ const StorageDirectoryPage = ({
       };
     });
     setPolling(true);
-    setFilesToUpload(prevFiles => [...prevFiles, ...newUploadItems]);
+    huePubSub.publish(FILE_UPLOAD_START_EVENT, {
+      files: newUploadItems
+    });
   };
+
+  useHuePubSub({
+    topic: FILE_UPLOAD_SUCCESS_EVENT,
+    callback: () => {
+      setPolling(false);
+    }
+  });
 
   const errorConfig = [
     {
       enabled: !!listDirectoryError,
       message: t('An error occurred while fetching the data'),
-      action: t('Retry'),
+      actionText: t('Retry'),
       onClick: reloadFilesData
     }
   ];
@@ -168,7 +181,7 @@ const StorageDirectoryPage = ({
       title: t('Name'),
       dataIndex: 'name',
       key: 'name',
-      sorter: true,
+      sorter: (filesData?.files?.length ?? 0) > 1,
       width: '40%',
       render: (_, record) => (
         <Tooltip title={record.name} mouseEnterDelay={1.5}>
@@ -190,7 +203,7 @@ const StorageDirectoryPage = ({
       dataIndex: 'size',
       key: 'size',
       width: '10%',
-      sorter: true
+      sorter: (filesData?.files?.length ?? 0) > 1
     },
     {
       title: t('User'),
@@ -215,7 +228,7 @@ const StorageDirectoryPage = ({
       dataIndex: 'mtime',
       key: 'mtime',
       width: '20%',
-      sorter: true
+      sorter: (filesData?.files?.length ?? 0) > 1
     }
   ];
 
@@ -271,17 +284,6 @@ const StorageDirectoryPage = ({
           />
         </LoadingErrorWrapper>
       </DragAndDrop>
-
-      {filesToUpload.length > 0 && (
-        <FileUploadQueue
-          filesQueue={filesToUpload}
-          onClose={() => setFilesToUpload([])}
-          onComplete={() => {
-            reloadFilesData();
-            setPolling(false);
-          }}
-        />
-      )}
     </div>
   );
 };

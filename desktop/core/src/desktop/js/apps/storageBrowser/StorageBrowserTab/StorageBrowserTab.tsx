@@ -16,13 +16,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { Alert } from 'antd';
+import { AxiosError } from 'axios';
 import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
 import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
 import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
 import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 
 import { i18nReact } from '../../../utils/i18nReact';
-
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
 import { FILE_STATS_API_URL, TRASH_PATH } from '../api';
@@ -84,7 +84,8 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     loading,
     error,
     reloadData
-  } = useLoadData<FileStats>(FILE_STATS_API_URL, {
+  } = useLoadData<FileStats, { path: string }, AxiosError>(FILE_STATS_API_URL, {
+    fetchOptions: { isRawError: true },
     params: { path: filePath },
     skip: !filePath
   });
@@ -101,88 +102,98 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     }
   }, [filePath, urlPathname, urlFilePath, window.location]);
 
-  const errorConfig = [
+  const errors = [
     {
-      enabled: error?.response?.status === 404,
-      message: t('Error: Path "{{path}}" not found.', { path: filePath }),
-      action: t('Go to home directory'),
-      onClick: () => setFilePath(fileSystem.userHomeDirectory)
+      enabled: error?.response?.status === 404 && filePath !== fileSystem.userHomeDirectory,
+      message: t('Path "{{path}}" does not exist.', { path: filePath })
     },
     {
-      enabled: !!error && error?.response?.status !== 404,
-      message: t('An error occurred while fetching filesystem "{{fileSystem}}".', {
-        fileSystem: fileSystem.name.toUpperCase()
+      enabled: error?.response?.status === 404 && filePath === fileSystem.userHomeDirectory,
+      message: t('User home directory "{{path}}" does not exist.', {
+        path: filePath
+      })
+    },
+    {
+      enabled: error?.response?.status === 403,
+      message: t('Unauthorized access to the path "{{path}}".', {
+        path: filePath
+      })
+    },
+    {
+      enabled: !!error && error?.response?.status !== 404 && error?.response?.status !== 403,
+      message: t('An unkown error occurred while fetching path "{{path}}".', {
+        path: filePath
       }),
-      action: t('Retry'),
+      actionText: t('Retry'),
       onClick: reloadData
     }
   ];
 
   return (
-    <LoadingErrorWrapper loading={loading} errors={errorConfig}>
-      <div className="hue-storage-browser-tab" data-testid={testId}>
-        <div
-          className="hue-storage-browser-tab__title-bar-container"
-          data-testid={`${testId}-title-bar`}
-        >
-          <div className="hue-storage-browser-tab__title-bar">
-            <BucketIcon
-              className="hue-storage-browser-tab__title-bar-icon"
-              data-testid={`${testId}-icon`}
-            />
-            <h3
-              className="hue-storage-browser-tab__title-bar-name"
-              data-testid={`${testId}-folder-namer`}
-            >
-              {fileName}
-            </h3>
-          </div>
-          <div className="hue-storage-browser-tab__title-bar-button-group">
-            <BorderlessButton
-              onClick={() => {
-                setFilePath(fileSystem.userHomeDirectory);
-              }}
-              className="hue-storage-browser-tab__title-bar-button"
-              title={t('Home')}
-              icon={<HomeIcon />}
-            >
-              {t('Home')}
-            </BorderlessButton>
-            {fileSystem.config?.isTrashEnabled && (
-              <BorderlessButton
-                onClick={onTrashClick}
-                className="hue-storage-browser-tab__title-bar-button"
-                title={t('Trash')}
-                icon={<DeleteIcon />}
-                disabled={!trashData?.trashPath}
-              >
-                {t('Trash')}
-              </BorderlessButton>
-            )}
-            <BorderlessButton
-              onClick={reloadData}
-              className="hue-storage-browser-tab__title-bar-button"
-              title={t('Refresh')}
-              icon={<RefreshIcon />}
-            >
-              {t('Refresh')}
-            </BorderlessButton>
-          </div>
-        </div>
-        {!!inTrash(filePath) && fileSystem.name === 'hdfs' && (
-          <Alert
-            type="warning"
-            message={t(
-              'This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory.'
-            )}
+    <div className="hue-storage-browser-tab" data-testid={testId}>
+      <div
+        className="hue-storage-browser-tab__title-bar-container"
+        data-testid={`${testId}-title-bar`}
+      >
+        <div className="hue-storage-browser-tab__title-bar">
+          <BucketIcon
+            className="hue-storage-browser-tab__title-bar-icon"
+            data-testid={`${testId}-icon`}
           />
-        )}
-        <div
-          className="hue-storage-browser-tab__path-browser-container"
-          data-testid={`${testId}-path-browser-panel`}
-        >
-          <PathBrowser filePath={filePath} onFilepathChange={setFilePath} />
+          <h3
+            className="hue-storage-browser-tab__title-bar-name"
+            data-testid={`${testId}-folder-namer`}
+          >
+            {fileName}
+          </h3>
         </div>
+        <div className="hue-storage-browser-tab__title-bar-button-group">
+          <BorderlessButton
+            onClick={() => {
+              setFilePath(fileSystem.userHomeDirectory);
+            }}
+            className="hue-storage-browser-tab__title-bar-button"
+            title={t('Home')}
+            icon={<HomeIcon />}
+          >
+            {t('Home')}
+          </BorderlessButton>
+          {fileSystem.config?.isTrashEnabled && (
+            <BorderlessButton
+              onClick={onTrashClick}
+              className="hue-storage-browser-tab__title-bar-button"
+              title={t('Trash')}
+              icon={<DeleteIcon />}
+              disabled={!trashData?.trashPath}
+            >
+              {t('Trash')}
+            </BorderlessButton>
+          )}
+          <BorderlessButton
+            onClick={reloadData}
+            className="hue-storage-browser-tab__title-bar-button"
+            title={t('Refresh')}
+            icon={<RefreshIcon />}
+          >
+            {t('Refresh')}
+          </BorderlessButton>
+        </div>
+      </div>
+      {!!inTrash(filePath) && fileSystem.name === 'hdfs' && (
+        <Alert
+          type="warning"
+          message={t(
+            'This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory.'
+          )}
+        />
+      )}
+      <div
+        className="hue-storage-browser-tab__path-browser-container"
+        data-testid={`${testId}-path-browser-panel`}
+      >
+        <PathBrowser filePath={filePath} onFilepathChange={setFilePath} />
+      </div>
+      <LoadingErrorWrapper loading={loading} errors={errors}>
         {fileStats?.type === BrowserViewType.dir && !loading && (
           <StorageDirectoryPage
             fileStats={fileStats}
@@ -194,8 +205,8 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
         {fileStats?.type === BrowserViewType.file && !loading && (
           <StorageFilePage fileStats={fileStats} onReload={reloadData} />
         )}
-      </div>
-    </LoadingErrorWrapper>
+      </LoadingErrorWrapper>
+    </div>
   );
 };
 

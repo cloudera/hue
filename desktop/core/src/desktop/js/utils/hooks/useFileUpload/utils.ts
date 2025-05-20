@@ -29,18 +29,6 @@ import {
   RegularFile
 } from './types';
 
-export const getNewRegularFiles = (
-  newQueue: RegularFile[],
-  oldQueue: RegularFile[]
-): RegularFile[] => {
-  return newQueue.filter(
-    newItem =>
-      !oldQueue.some(
-        oldItem => oldItem.file.name === newItem.file.name && oldItem.filePath === newItem.filePath
-      )
-  );
-};
-
 export const getTotalChunk = (fileSize: number, DEFAULT_CHUNK_SIZE: number): number => {
   return Math.ceil(fileSize / DEFAULT_CHUNK_SIZE);
 };

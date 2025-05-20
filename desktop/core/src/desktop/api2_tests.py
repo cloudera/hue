@@ -737,7 +737,6 @@ class TestDocumentGist(object):
 
 
 class TestAvailableAppExamplesAPI:
-
   # Using custom MockApp instead of Mock to avoid conflicts with Mock's built in 'name' attribute.
   @dataclass
   class MockApp:
@@ -895,6 +894,18 @@ class TestInstallAppExampleAPI:
           assert not mock_beeswax_install_command.called
           mock_notebook_setup_command.assert_called_once_with(dialect='spark', user=request.user)
 
+  def test_setup_notebook_examples_connector_exception(self):
+    with patch('desktop.api2.Connector.objects.get') as mock_get_connector:
+      with patch('desktop.api2.beeswax_install_examples.Command.handle') as mock_beeswax_install_command:
+        with patch('desktop.api2.notebook_setup.Command.handle') as mock_notebook_setup_command:
+          request = Mock(method='POST', POST={'app_name': 'notebook', 'dialect': 'spark'}, user=Mock())
+          mock_get_connector.side_effect = Exception('Connector matching query does not exist.')
+
+          _setup_notebook_examples(request)
+
+          assert not mock_beeswax_install_command.called
+          mock_notebook_setup_command.assert_called_once_with(dialect='spark', user=request.user)
+
   def test_setup_search_examples_with_log_analytics_demo(self):
     with patch('desktop.api2.search_setup.Command.handle') as mock_search_setup_command:
       with patch('desktop.api2.indexer_setup.Command.handle') as mock_indexer_setup_command:
@@ -920,7 +931,7 @@ class TestCheckConfigAPI:
   def test_check_config_success(self):
     with patch('desktop.api2.os.path.realpath') as mock_hue_conf_dir:
       with patch('desktop.api2._get_config_errors') as mock_get_config_errors:
-        request = Mock(method='POST')
+        request = Mock(method='GET')
         mock_hue_conf_dir.return_value = '/test/hue/conf'
         mock_get_config_errors.return_value = [
           {"name": "Hive", "message": "The application won't work without a running HiveServer2."},

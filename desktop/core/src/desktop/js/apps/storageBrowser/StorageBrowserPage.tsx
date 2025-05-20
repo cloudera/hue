@@ -43,7 +43,7 @@ const StorageBrowserPage = (): JSX.Element => {
     {
       enabled: !!error,
       message: t('An error occurred while fetching the filesystem'),
-      action: t('Retry'),
+      actionText: t('Retry'),
       onClick: reloadData
     }
   ];
@@ -51,18 +51,20 @@ const StorageBrowserPage = (): JSX.Element => {
   return (
     <div className="hue-storage-browser cuix antd">
       <CommonHeader title={t('Storage Browser')} icon={<DataBrowserIcon />} />
-      <LoadingErrorWrapper loading={loading} errors={errorConfig}>
-        <Tabs
-          className="hue-storage-browser__tab"
-          destroyInactiveTabPane
-          defaultActiveKey={urlFileSystem ?? data?.[0]?.name}
-          items={data?.map(fileSystem => ({
-            label: fileSystem.name.toUpperCase(),
-            key: fileSystem.name,
-            children: <StorageBrowserTab fileSystem={fileSystem} />
-          }))}
-        />
-      </LoadingErrorWrapper>
+      <div className="hue-storage-browser__container">
+        <LoadingErrorWrapper loading={loading} errors={errorConfig}>
+          <Tabs
+            className="hue-storage-browser__tab"
+            destroyInactiveTabPane
+            defaultActiveKey={urlFileSystem ?? data?.[0]?.name}
+            items={data?.map(fileSystem => ({
+              label: fileSystem.name.toUpperCase(),
+              key: fileSystem.name,
+              children: <StorageBrowserTab fileSystem={fileSystem} />
+            }))}
+          />
+        </LoadingErrorWrapper>
+      </div>
     </div>
   );
 };
