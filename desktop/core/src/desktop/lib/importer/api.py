@@ -18,6 +18,7 @@ import os
 import re
 import csv
 import uuid
+import codecs
 import logging
 import tempfile
 from functools import wraps
@@ -262,7 +263,13 @@ def preview_file(request: Request) -> Response:
 
       result = _preview_excel_file(fh, file_type, sheet_name, sql_dialect, has_header)
     elif file_type in ['csv', 'tsv', 'delimiter_format']:
-      field_separator = request.query_params.get('field_separator', ',')
+      field_sep = request.query_params.get('field_separator', ',')
+      try:
+          field_separator = codecs.decode(field_sep, 'unicode_escape')
+      except Exception as e:
+          LOG.error(f"Error decoding field_separator: {e}", exc_info=True)
+          return Response({'error': "Invalid field_separator provided."}, status=status.HTTP_400_BAD_REQUEST)
+
       quote_char = request.query_params.get('quote_char', '"')
       record_separator = request.query_params.get('record_separator', '\n')
 
