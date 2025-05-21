@@ -30,7 +30,6 @@ from desktop.lib.importer.serializers import GuessFileMetadataSerializer, LocalF
 LOG = logging.getLogger()
 
 
-
 # TODO: Improve error response further with better context -- Error UX Phase 2
 def api_error_handler(view_fn):
   """
