@@ -30,15 +30,9 @@ class LocalFileUploadSerializer(serializers.Serializer):
   file = serializers.FileField(required=True, help_text="CSV or Excel file to upload and process")
 
   def validate_file(self, value):
-    # Add file format validation
-    # TODO: To remove and allow all file formats?
-    extension = value.name.split('.')[-1].lower()
-    if extension not in ['csv', 'tsv', 'xlsx', 'xls']:
-      raise serializers.ValidationError("Unsupported file format. Please upload a CSV, TSV or Excel file.")
-
     # TODO: Check upper limit for file size
     # Add file size validation (e.g., limit to 150 MiB)
-    if value.size > 150 * 1024 * 1024:  # 150 MiB in bytes
+    if value.size > 150 * 1024 * 1024:
       raise serializers.ValidationError("File too large. Maximum file size is 150 MiB.")
 
     return value
@@ -63,4 +57,65 @@ class GuessFileMetadataSerializer(serializers.Serializer):
     """Validate the complete data set."""
     # We can't check if the file exists here as we need the request object
     # This will be done in the view function
+    return data
+
+
+class PreviewFileSerializer(serializers.Serializer):
+  """Serializer for file preview request validation.
+
+  This serializer validates the parameters required for previewing file content.
+
+  Attributes:
+    file_path: Path to the file to preview
+    file_type: Type of file format (csv, tsv, excel, delimiter_format)
+    import_type: Type of import (local or remote)
+    sql_dialect: Target SQL dialect for type mapping
+    has_header: Whether the file has a header row (optional)
+    sheet_name: Sheet name for Excel files (required when file_type is excel)
+    field_separator: Field separator character (required for delimited files)
+    quote_char: Quote character (required for delimited files)
+    record_separator: Record separator character (required for delimited files)
+  """
+
+  file_path = serializers.CharField(required=True, help_text="Full path to the file to preview")
+  file_type = serializers.ChoiceField(
+    choices=['csv', 'tsv', 'excel', 'delimiter_format'], required=True, help_text="Type of file (csv, tsv, excel, delimiter_format)"
+  )
+  import_type = serializers.ChoiceField(
+    choices=['local', 'remote'], required=True, help_text="Whether the file is local or on a remote filesystem"
+  )
+  sql_dialect = serializers.ChoiceField(
+    choices=['hive', 'impala', 'trino', 'phoenix', 'sparksql'], required=True, help_text="SQL dialect for mapping column types"
+  )
+  has_header = serializers.BooleanField(required=False, allow_null=True, default=None, help_text="Whether the file has a header row")
+
+  # Excel-specific fields
+  sheet_name = serializers.CharField(required=False, help_text="Sheet name for Excel files")
+
+  # Delimited file-specific fields
+  field_separator = serializers.CharField(required=False, help_text="Field separator character")
+  quote_char = serializers.CharField(required=False, help_text="Quote character")
+  record_separator = serializers.CharField(required=False, help_text="Record separator character")
+
+  def validate(self, data):
+    """Validate the complete data set with interdependent field validation."""
+    if data.get('file_type') == 'excel' and not data.get('sheet_name'):
+      raise serializers.ValidationError({"sheet_name": "Sheet name is required for Excel files"})
+
+    if data.get('file_type') in ['csv', 'tsv', 'delimiter_format']:
+      if not data.get('field_separator'):
+        # If not provided, set default value based on file type
+        if data.get('file_type') == 'csv':
+          data['field_separator'] = ','
+        elif data.get('file_type') == 'tsv':
+          data['field_separator'] = '\t'
+        else:
+          raise serializers.ValidationError({"field_separator": "Field separator is required for delimited files"})
+
+      if not data.get('quote_char'):
+        data['quote_char'] = '"'  # Default quote character
+
+      if not data.get('record_separator'):
+        data['record_separator'] = '\n'  # Default record separator
+
     return data
