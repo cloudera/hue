@@ -87,6 +87,9 @@ class PreviewFileSerializer(serializers.Serializer):
   sql_dialect = serializers.ChoiceField(
     choices=['hive', 'impala', 'trino', 'phoenix', 'sparksql'], required=True, help_text="SQL dialect for mapping column types"
   )
+  # Default value for has_header is None, which means it needs to be set to True or False explicitly.
+  # This allows the user to specify if the file has a header row or not.
+  # If the value is not set, then we assume to auto-detect the header from file content.
   has_header = serializers.BooleanField(required=False, allow_null=True, default=None, help_text="Whether the file has a header row")
 
   # Excel-specific fields
