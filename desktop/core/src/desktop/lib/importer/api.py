@@ -34,8 +34,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from desktop.lib.conf import coerce_bool
-from desktop.lib.importer.operations import local_file_upload
-from desktop.lib.importer.serializers import LocalFileUploadSerializer
+from desktop.lib.importer import operations
+from desktop.lib.importer.serializers import GuessFileMetadataSerializer, LocalFileUploadSerializer
 
 LOG = logging.getLogger()
 
@@ -94,7 +94,7 @@ def upload_file(request: Request) -> Response:
   upload_file = serializer.validated_data['file']
 
   LOG.info(f'User {request.user.username} is uploading a local file: {upload_file.name}')
-  res = local_file_upload(upload_file, request.user.username)
+  res = operations.local_file_upload(upload_file, request.user.username)
 
   return Response(res, status=status.HTTP_201_CREATED)
 
@@ -106,118 +106,46 @@ def guess_file_metadata(request: Request) -> Response:
   """
   Guess the metadata of a file based on its content or extension.
 
+  This API endpoint detects file type and extracts metadata properties such as
+  delimiters for CSV files or sheet names for Excel files.
+
   Args:
-    request: Request object containing file_path and import_type
+    request: Request object containing query parameters:
+      - file_path: Path to the file
+      - import_type: 'local' or 'remote'
 
   Returns:
     Response containing file metadata including:
       - type: File type (e.g., excel, csv, tsv)
       - sheet_names: List of sheet names (for Excel files)
-      - field_separator: Field separator character
-      - quote_char: Quote character
-      - record_separator: Record separator
+      - field_separator: Field separator character (for delimited files)
+      - quote_char: Quote character (for delimited files)
+      - record_separator: Record separator (for delimited files)
   """
-  file_path = request.query_params.get('file_path')
-  import_type = request.query_params.get('import_type')
+  # Validate request parameters using serializer
+  serializer = GuessFileMetadataSerializer(data=request.query_params)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  # TODO: Add serializer for validating query params
-  if not file_path:
-    return Response({'error': "Missing parameters: file_path is required."}, status=status.HTTP_400_BAD_REQUEST)
+  validated_data = serializer.validated_data
+  file_path = validated_data['file_path']
+  import_type = validated_data['import_type']
 
-  if not import_type:
-    return Response({'error': "Missing parameters: import_type is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-  if (import_type == 'local' and not os.path.isfile(file_path)) or (import_type == 'remote' and not request.fs.exists(file_path)):
-    return Response({'error': f'File does not exist: {file_path}'}, status=status.HTTP_404_NOT_FOUND)
-
-  fh = open(file_path, 'rb') if import_type == 'local' else request.fs.open(file_path, 'rb')
   try:
-    sample = fh.read(16 * 1024)  # Read 16 KiB sample of the file to analyze its content
+    # Call the operation function with appropriate parameters
+    metadata = operations.guess_file_metadata(
+      file_path=file_path, import_type=import_type, fs=request.fs if import_type == 'remote' else None
+    )
 
-    # Detect file type
-    file_type = _detect_file_type(file_path, sample)
+    return Response(metadata, status=status.HTTP_200_OK)
 
-    if file_type == 'unknown':
-      return Response({'error': 'Unable to detect file format'}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Extract metadata based on file type
-    if file_type == 'excel':
-      metadata = _get_excel_metadata(fh)
-    else:
-      # CSV or TSV or other delimited formats
-      metadata = _get_delimited_metadata(sample, file_type)  # Send sample for sniffing
-  finally:
-    # Close the file handle
-    fh.close()
-
-  return Response(metadata, status=status.HTTP_200_OK)
-
-
-def _detect_file_type(file_path: str, file_sample) -> str:
-  """Detect the file type based on its content."""
-  # Use libmagic to detect file type from its sample content
-  # Not depending on file extension as it can be misleading sometimes such as a CSV file with TSV or Excel content
-  detected_type = 'unknown'
-  if not is_magic_lib_available:
-    error = "Unable to guess file type. python-magic or its dependency libmagic is not installed."
-    LOG.error(error)
-    raise Exception(error)
-
-  file_type = magic.from_buffer(file_sample, mime=True)
-
-  if 'excel' in file_type or 'spreadsheet' in file_type:
-    detected_type = 'excel'
-  elif 'text' in file_type or 'csv' in file_type:
-    # For text files, analyze content later to determine if CSV/TSV or other related format
-    detected_type = 'delimiter_format'
-
-  return detected_type
-
-
-def _get_excel_metadata(fh) -> Dict[str, Any]:
-  """Extract metadata for Excel files (.xlsx, .xls)"""
-  try:
-    fh.seek(0)  # Reset file handle first
-    sheet_names = pl.read_excel(BytesIO(fh.read()), sheet_id=0).keys()
-
-    return {
-      'type': 'excel',
-      'sheet_names': list(sheet_names),
-    }
+  except ValueError as e:
+    # Handle validation errors like file not found
+    return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
   except Exception as e:
-    message = f"Error detecting Excel file format: {e}"
-    LOG.error(message, exc_info=True)
-    raise Exception(message)
-
-
-def _get_delimited_metadata(file_sample, file_type: str) -> Dict[str, Any]:
-  """Extract metadata for delimited files (CSV, TSV, etc.)"""
-  try:
-    # Convert bytes to string if needed
-    if isinstance(file_sample, bytes):
-      file_sample = file_sample.decode('utf-8', errors='replace')
-
-    dialect = csv.Sniffer().sniff(file_sample)
-
-    # After sniffing, try determining the file type based on the delimiter for better distinction
-    if file_type == 'delimiter_format':
-      if dialect.delimiter == ',':
-        file_type = 'csv'
-      elif dialect.delimiter == '\t':
-        file_type = 'tsv'
-      # TODO: We can try mapping other delimiters like '|', ';', etc. if needed else generic 'delimiter_format' is set as file_type
-
-    return {
-      'type': file_type,
-      'field_separator': dialect.delimiter,
-      'quote_char': dialect.quotechar,
-      'record_separator': dialect.lineterminator,
-    }
-
-  except Exception as e:
-    message = f"Error detecting delimited file format: {e}"
-    LOG.error(message, exc_info=True)
-    raise Exception(message)
+    # Handle other errors
+    LOG.exception(f"Error guessing file metadata: {str(e)}")
+    return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -263,15 +191,19 @@ def preview_file(request: Request) -> Response:
 
       result = _preview_excel_file(fh, file_type, sheet_name, sql_dialect, has_header)
     elif file_type in ['csv', 'tsv', 'delimiter_format']:
-      field_sep = request.query_params.get('field_separator', ',')
-      try:
-          field_separator = codecs.decode(field_sep, 'unicode_escape')
-      except Exception as e:
-          LOG.error(f"Error decoding field_separator: {e}", exc_info=True)
-          return Response({'error': "Invalid field_separator provided."}, status=status.HTTP_400_BAD_REQUEST)
-
+      field_separator = request.query_params.get('field_separator', ',')
       quote_char = request.query_params.get('quote_char', '"')
       record_separator = request.query_params.get('record_separator', '\n')
+
+      try:
+        field_separator = codecs.decode(field_separator, 'unicode_escape')
+        quote_char = codecs.decode(quote_char, 'unicode_escape')
+        record_separator = codecs.decode(record_separator, 'unicode_escape')
+      except Exception as e:
+        LOG.error(f"Error decoding escape characters: {e}")
+        return Response(
+          {'error': "Invalid escape characters in field_separator, quote_char, or record_separator."}, status=status.HTTP_400_BAD_REQUEST
+        )
 
       if not field_separator or not quote_char or not record_separator:
         return Response(
