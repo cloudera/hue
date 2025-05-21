@@ -74,10 +74,10 @@ def upload_file(request: Request) -> Response:
   if not serializer.is_valid():
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  upload_file = serializer.validated_data['file']
+  uploaded_file = serializer.validated_data['file']
 
-  LOG.info(f'User {request.user.username} is uploading a local file: {upload_file.name}')
-  res = operations.local_file_upload(upload_file, request.user.username)
+  LOG.info(f'User {request.user.username} is uploading a local file: {uploaded_file.name}')
+  res = operations.local_file_upload(uploaded_file, request.user.username)
 
   return Response(res, status=status.HTTP_201_CREATED)
 
