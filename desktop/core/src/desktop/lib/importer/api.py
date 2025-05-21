@@ -65,7 +65,6 @@ def upload_file(request: Request) -> Response:
 
   Note:
     - File size limits apply based on server configuration
-    - Supported file types: CSV, TSV, Excel
   """
 
   # Validate the request data using the serializer
