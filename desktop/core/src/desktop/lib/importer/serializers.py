@@ -42,3 +42,25 @@ class LocalFileUploadSerializer(serializers.Serializer):
       raise serializers.ValidationError("File too large. Maximum file size is 150 MiB.")
 
     return value
+
+
+class GuessFileMetadataSerializer(serializers.Serializer):
+  """Serializer for file metadata guessing request validation.
+
+  This serializer validates the parameters required for guessing metadata from a file.
+
+  Attributes:
+    file_path: Path to the file
+    import_type: Type of import (local or remote)
+  """
+
+  file_path = serializers.CharField(required=True, help_text="Full path to the file to analyze")
+  import_type = serializers.ChoiceField(
+    choices=['local', 'remote'], required=True, help_text="Whether the file is local or on a remote filesystem"
+  )
+
+  def validate(self, data):
+    """Validate the complete data set."""
+    # We can't check if the file exists here as we need the request object
+    # This will be done in the view function
+    return data
