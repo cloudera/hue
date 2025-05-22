@@ -42,7 +42,7 @@ export const getMetaData = (item: ChunkedFile): FileChunkMetaData => ({
   qquuid: item.uuid
 });
 
-export const createChunks = (item: RegularFile, chunkSize: number): ChunkedFile[] => {
+export const createChunks = (item: RegularFile, chunkSize: number, overwrite: boolean): ChunkedFile[] => {
   const totalChunks = getTotalChunk(item.file.size, chunkSize);
 
   const chunks = Array.from({ length: totalChunks }, (_, i) => {
@@ -56,7 +56,8 @@ export const createChunks = (item: RegularFile, chunkSize: number): ChunkedFile[
       totalChunks,
       chunkNumber: i,
       chunkStartOffset,
-      chunkEndOffset
+      chunkEndOffset,
+      overwrite
     };
   });
 
@@ -87,6 +88,7 @@ export const getChunkItemPayload = (chunkItem: ChunkedFile): FileUploadApiPayloa
 
   const payload = new FormData();
   payload.append('hdfs_file', chunkItem.file);
+  payload.append('overwrite', chunkItem.overwrite ? 'true' : 'false'); // Pass overwrite flag
   return { url, payload };
 };
 

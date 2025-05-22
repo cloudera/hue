@@ -24,7 +24,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 
 interface UseUploadQueueResponse {
   uploadQueue: RegularFile[];
-  addFiles: (newFiles: RegularFile[]) => void;
+  addFiles: (newFiles: RegularFile[], overwrite?: boolean) => void;
   cancelFile: (item: RegularFile) => void;
   isLoading: boolean;
 }
@@ -99,15 +99,32 @@ const useFileUpload = ({
     }
   };
 
-  const addFiles = (fileItems: RegularFile[]) => {
-    if (fileItems.length > 0) {
-      setUploadQueue(prev => [...prev, ...fileItems]);
 
-      if (isChunkUpload) {
-        addToChunkUpload(fileItems);
-      } else {
-        addToRegularUpload(fileItems);
-      }
+  const addFiles = (files: RegularFile[], overwrite = false) => {
+    setUploadQueue(prev => {
+      const updatedQueue = [...prev];
+  
+      files.forEach(file => {
+        const existingFileIndex = updatedQueue.findIndex(
+          up => up.filePath === file.filePath && up.file.name === file.file.name
+        );
+  
+        if (existingFileIndex !== -1) {
+          if (overwrite) {
+            updatedQueue[existingFileIndex] = { ...file, status: FileStatus.Pending, overwrite: true };
+          }
+        } else {
+          updatedQueue.push({ ...file, status: FileStatus.Pending });
+        }
+      });
+  
+      return updatedQueue;
+    });
+  
+    if (isChunkUpload) {
+      addToChunkUpload(files);
+    } else {
+      addToRegularUpload(files);
     }
   };
 

@@ -14,7 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { get } from '../../api/utils';
+import Modal from 'cuix/dist/components/Modal';
+import { Button } from 'antd'; 
+import ReactDOM from 'react-dom'
 import CloseIcon from '@cloudera/cuix-core/icons/react/CloseIcon';
 import CaratDownIcon from '@cloudera/cuix-core/icons/react/CaratDownIcon';
 import CaratUpIcon from '@cloudera/cuix-core/icons/react/CaratUpIcon';
@@ -28,8 +32,9 @@ import { useHuePubSub } from '../../utils/hooks/useHuePubSub/useHuePubSub';
 import huePubSub from '../../utils/huePubSub';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 import { FILE_UPLOAD_START_EVENT, FILE_UPLOAD_SUCCESS_EVENT } from './event';
-
+import { LIST_DIRECTORY_API_URL } from '../../apps/storageBrowser/api';
 import './FileUploadQueue.scss';
+import { ListDirectory } from '../../apps/storageBrowser/types';
 
 interface FileUploadEvent {
   files: RegularFile[];
@@ -51,9 +56,60 @@ const FileUploadQueue = (): JSX.Element => {
 
   const [expandQueue, setExpandQueue] = useState<boolean>(true);
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [uploadedFiles, setUploadedFiles] = useState<RegularFile[]>([]);
+  const [conflictFiles, setConflictFiles] = useState<RegularFile[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [path, setPath] = useState<string | null>(null);
+  const [isFetchingFiles, setIsFetchingFiles] = useState(false);
+
+  const fetchUploadedFiles = async (uploadPath: string) => {
+    setIsFetchingFiles(true);
+  
+    try {
+      const response = await get<ListDirectory>(LIST_DIRECTORY_API_URL, { path: uploadPath, pagesize: '1000' });
+      if (response?.files) {
+        setUploadedFiles(
+          response.files.map(file => ({
+            uuid: crypto.randomUUID(),
+            file: new File([''], file.path.split('/').pop() || ''),
+            status: FileStatus.Uploaded,
+            filePath: file.path
+          }))
+        );
+      }
+    } catch (error) {
+      console.error('Failed to fetch files:', error);
+    } finally {
+      setIsFetchingFiles(false);
+    }
+  };
+
+  useEffect(() => {
+    if (path) {
+      fetchUploadedFiles(path);
+    }
+  }, [path]);
+
+  useEffect(() => {
+    // Automatically resolve file conflicts after uploadedFiles updates
+    if (conflictFiles.length > 0) {
+      resolveFileConflicts(conflictFiles);
+    }
+  }, [uploadedFiles]);
 
   const onComplete = () => {
     huePubSub.publish(FILE_UPLOAD_SUCCESS_EVENT);
+    const newlyUploadedFiles = uploadQueue.filter(file => file.status === FileStatus.Uploaded);
+    
+    setUploadedFiles(existing => {
+      const updatedFiles = [
+        ...existing,
+        ...newlyUploadedFiles
+      ].filter((file, index, self) =>
+        index === self.findIndex(f => f.file.name === file.file.name)
+      );
+      return updatedFiles;
+    });
   };
 
   const config = getLastKnownConfig();
@@ -68,13 +124,50 @@ const FileUploadQueue = (): JSX.Element => {
 
   useHuePubSub<FileUploadEvent>({
     topic: FILE_UPLOAD_START_EVENT,
-    callback: (data?: FileUploadEvent) => {
-      if (data?.files) {
+    callback: async (data?: FileUploadEvent) => {
+      if ((data?.files ?? []).length > 0) {
+        const uploadPath = data?.files?.[0]?.filePath ?? null;
+        if (!uploadPath) {
+          console.error("File path missing for uploaded files");
+          return;
+        }
+
+        setPath(uploadPath);
+
+        await fetchUploadedFiles(uploadPath);
+
         setIsVisible(true);
-        addFiles(data.files);
+
+        if (data?.files) {
+          setConflictFiles(data.files); // Store new files temporarily
+        }
       }
     }
   });
+
+  const resolveFileConflicts = (newFiles: RegularFile[]) => {
+    const existingFileNames = uploadedFiles.map(f => f.file.name);
+    const conflicts = newFiles.filter(newFile => existingFileNames.includes(newFile.file.name));
+    const nonConflictingFiles = newFiles.filter(newFile => !existingFileNames.includes(newFile.file.name));
+
+    if (conflicts.length > 0) {
+      setConflictFiles(conflicts);
+      setIsModalVisible(true);
+    }
+    if (nonConflictingFiles.length > 0) {
+      addFiles(nonConflictingFiles);
+      setIsVisible(true);
+    }
+  };
+
+  const handleModalOk = (overwrite: boolean) => {
+    if (overwrite) {
+      addFiles(conflictFiles, true);
+    }
+    setConflictFiles([]);
+    setIsModalVisible(false);
+    setIsVisible(true);
+  };
 
   const onClose = () => {
     uploadQueue.forEach(file => cancelFile(file));
@@ -103,40 +196,60 @@ const FileUploadQueue = (): JSX.Element => {
   };
 
   return (
-    <div className="hue-upload-queue-container antd cuix">
-      <div className="hue-upload-queue-container__header" data-testid="hue-upload-queue__header">
-        {t(getHeaderText(), {
-          pendingCount,
-          uploadedCount,
-          failedCount
-        })}
-        <div className="hue-upload-queue-container__header__button-group">
-          <BorderlessButton
-            onClick={() => setExpandQueue(!expandQueue)}
-            data-testid="hue-upload-queue-container__expand-button"
-            icon={expandQueue ? <CaratDownIcon /> : <CaratUpIcon />}
-          />
-          <BorderlessButton
-            onClick={onClose}
-            data-testid="hue-upload-queue-container__close-button"
-            icon={<CloseIcon />}
-          />
+    <>
+      {isModalVisible &&
+        ReactDOM.createPortal(
+          <Modal
+            title={t('Resolve Filename Conflicts')}
+            open={isModalVisible}
+            onCancel={() => setIsModalVisible(false)}
+            footer={[
+              <Button key="keep" onClick={() => handleModalOk(false)}>
+                {t('Keep Original Files')}
+              </Button>,
+              <Button key="overwrite" type="primary" onClick={() => handleModalOk(true)}>
+                {t('Overwrite Files')}
+              </Button>
+            ]}
+          >
+            {t('Some files you are trying to upload already exist in the uploaded files')}
+            <ul>
+              {conflictFiles.map(file => (
+                <li key={file.file.name}>{file.file.name}</li>
+              ))}
+            </ul>
+          </Modal>,
+          document.body
+        )}
+      <div className="hue-upload-queue-container antd cuix">
+        <div className="hue-upload-queue-container__header">
+          {t(getHeaderText(), { pendingCount, uploadedCount, failedCount })}
+          <div className="hue-upload-queue-container__header__button-group">
+            <BorderlessButton
+              onClick={() => setExpandQueue(!expandQueue)}
+              icon={expandQueue ? <CaratDownIcon /> : <CaratUpIcon />}
+            />
+            <BorderlessButton
+              onClick={onClose}
+              icon={<CloseIcon />}
+            />
+          </div>
         </div>
+        {expandQueue && (
+          <div className="hue-upload-queue-container__list">
+            {uploadQueue
+              .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
+              .map((row: RegularFile, index: number) => (
+                <FileUploadRow
+                  key={`${row.filePath}__${row.file.name}__${index}`}
+                  data={row}
+                  onCancel={() => cancelFile(row)}
+                />
+              ))}
+          </div>
+        )}
       </div>
-      {expandQueue && (
-        <div className="hue-upload-queue-container__list">
-          {uploadQueue
-            .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
-            .map((row: RegularFile) => (
-              <FileUploadRow
-                key={`${row.filePath}__${row.file.name}`}
-                data={row}
-                onCancel={() => cancelFile(row)}
-              />
-            ))}
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
