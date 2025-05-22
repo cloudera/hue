@@ -113,7 +113,6 @@ def guess_file_metadata(file_path: str, import_type: str, fs=None) -> Dict[str, 
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  # Validate input parameters
   if not file_path:
     raise ValueError("File path cannot be empty")
 
@@ -129,24 +128,19 @@ def guess_file_metadata(file_path: str, import_type: str, fs=None) -> Dict[str, 
   elif import_type == 'remote' and fs and not fs.exists(file_path):
     raise ValueError(f'Remote file does not exist: {file_path}')
 
-  # Open file based on import type
   fh = open(file_path, 'rb') if import_type == 'local' else fs.open(file_path, 'rb')
 
   try:
-    # Read sample of file content for analysis
     sample = fh.read(16 * 1024)  # Read 16 KiB sample
 
-    # Check if file is empty
     if not sample:
-      raise ValueError("File is empty, cannot detect file format")
+      raise ValueError("File is empty, cannot detect file format.")
 
-    # Detect file type from content
     file_type = _detect_file_type(sample)
 
     if file_type == 'unknown':
-      raise ValueError('Unable to detect file format')
+      raise ValueError('Unable to detect file format.')
 
-    # Extract metadata based on detected file type
     if file_type == 'excel':
       metadata = _get_excel_metadata(fh)
     else:
@@ -207,7 +201,6 @@ def preview_file(
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  # Validate input parameters
   if not file_path:
     raise ValueError("File path cannot be empty")
 
@@ -229,7 +222,6 @@ def preview_file(
   elif import_type == 'remote' and fs and not fs.exists(file_path):
     raise ValueError(f'Remote file does not exist: {file_path}')
 
-  # Open file based on import type
   fh = open(file_path, 'rb') if import_type == 'local' else fs.open(file_path, 'rb')
 
   try:
@@ -239,7 +231,6 @@ def preview_file(
 
       result = _preview_excel_file(fh, file_type, sheet_name, sql_dialect, has_header, preview_rows)
     elif file_type in ['csv', 'tsv', 'delimiter_format']:
-
       # Process escapable characters
       try:
         if field_separator:
@@ -288,7 +279,7 @@ def _detect_file_type(file_sample: bytes) -> str:
     # Use libmagic to detect MIME type from content
     file_type = magic.from_buffer(file_sample, mime=True)
 
-    # Map MIME type to our simplified type categories
+    # Map MIME type to the simplified type categories
     if any(keyword in file_type for keyword in ['excel', 'spreadsheet', 'officedocument.sheet']):
       return 'excel'
     elif any(keyword in file_type for keyword in ['text', 'csv', 'plain']):
@@ -429,7 +420,6 @@ def _preview_excel_file(
         if isinstance(csv_snippet, bytes):
           csv_snippet = csv_snippet.decode('utf-8', errors='replace')
 
-        # Use CSV Sniffer to detect header
         has_header = csv.Sniffer().has_header(csv_snippet)
         LOG.info(f"Auto-detected header for Excel file: {has_header}")
       except Exception as e:
@@ -443,16 +433,10 @@ def _preview_excel_file(
     fh.seek(0)
     df = pl.read_excel(BytesIO(fh.read()), sheet_name=sheet_name, has_header=has_header)
 
-    # Check if the dataframe is empty
+    # Return empty result if the df is empty
     if df.height == 0:
-      return {
-        'type': file_type,
-        'has_header': has_header,
-        'columns': [],
-        'preview_data': {},
-      }
+      return {'type': file_type, 'has_header': has_header, 'columns': [], 'preview_data': {}}
 
-    # Get schema and preview data
     schema = df.schema
 
     # Limit preview to specified number of rows for performance
@@ -462,7 +446,7 @@ def _preview_excel_file(
     columns = []
     for i, col in enumerate(df.columns):
       col_type = str(schema[col])
-      sql_type = map_polars_to_sql(dialect, col_type)
+      sql_type = _map_polars_dtype_to_sql_type(dialect, col_type)
 
       columns.append(
         {
@@ -472,14 +456,7 @@ def _preview_excel_file(
         }
       )
 
-    result = {
-      'type': file_type,
-      'has_header': has_header,
-      'columns': columns,
-      'preview_data': preview_data,
-      'total_rows': df.height,  # Include total row count
-      'sheet_name': sheet_name,  # Include sheet name in result
-    }
+    result = {'type': file_type, 'has_header': has_header, 'columns': columns, 'preview_data': preview_data}
 
     return result
 
@@ -517,8 +494,6 @@ def _preview_delimited_file(
       - has_header: Whether file has headers
       - columns: List of column metadata
       - preview_data: Preview of file data
-      - total_rows: Approximate total row count
-      - delimiters: Information about detected delimiters
 
   Raises:
     Exception: If there's an error processing the delimited file
@@ -552,9 +527,9 @@ def _preview_delimited_file(
       ignore_errors=True,
     )
 
-    # Check if the dataframe is empty
+    # Return empty result if the df is empty
     if df.height == 0:
-      return {'type': file_type, 'has_header': has_header, 'columns': [], 'preview_data': {}, 'total_rows': 0}
+      return {'type': file_type, 'has_header': has_header, 'columns': [], 'preview_data': {}}
 
     # Get schema and preview data
     schema = df.schema
@@ -566,7 +541,7 @@ def _preview_delimited_file(
     columns = []
     for i, col in enumerate(df.columns):
       col_type = str(schema[col])
-      sql_type = map_polars_to_sql(dialect, col_type)
+      sql_type = _map_polars_dtype_to_sql_type(dialect, col_type)
 
       columns.append(
         {
@@ -576,7 +551,7 @@ def _preview_delimited_file(
         }
       )
 
-    result = {'type': file_type, 'has_header': has_header, 'columns': columns, 'preview_data': preview_data, 'total_rows': df.height}
+    result = {'type': file_type, 'has_header': has_header, 'columns': columns, 'preview_data': preview_data}
 
     return result
 
@@ -586,7 +561,7 @@ def _preview_delimited_file(
     raise Exception(message)
 
 
-def map_polars_to_sql(dialect: str, polars_type: str) -> str:
+def _map_polars_dtype_to_sql_type(dialect: str, polars_type: str) -> str:
   """
   Map a Polars dtype to the corresponding SQL type for a given dialect.
 
