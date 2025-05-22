@@ -56,7 +56,7 @@ class GuessFileMetadataSerializer(serializers.Serializer):
   def validate(self, data):
     """Validate the complete data set."""
     # We can't check if the file exists here as we need the request object
-    # This will be done in the view function
+    # This will be done in the core method
     return data
 
 
@@ -87,9 +87,9 @@ class PreviewFileSerializer(serializers.Serializer):
   sql_dialect = serializers.ChoiceField(
     choices=['hive', 'impala', 'trino', 'phoenix', 'sparksql'], required=True, help_text="SQL dialect for mapping column types"
   )
-  # Default value for has_header is None, which means it needs to be set to True or False explicitly.
-  # This allows the user to specify if the file has a header row or not.
-  # If the value is not set, then we assume to auto-detect the header from file content.
+
+  # Default value has_header=None enables auto-detection of header row in file content.
+  # Explicitly set it to True/False to specify if the file has a header row or not.
   has_header = serializers.BooleanField(required=False, allow_null=True, default=None, help_text="Whether the file has a header row")
 
   # Excel-specific fields

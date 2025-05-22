@@ -66,7 +66,6 @@ def upload_file(request: Request) -> Response:
     - File size limits apply based on server configuration
   """
 
-  # Validate the request data using the serializer
   serializer = LocalFileUploadSerializer(data=request.data)
 
   if not serializer.is_valid():
@@ -103,8 +102,8 @@ def guess_file_metadata(request: Request) -> Response:
       - quote_char: Quote character (for delimited files)
       - record_separator: Record separator (for delimited files)
   """
-  # Validate request parameters using serializer
   serializer = GuessFileMetadataSerializer(data=request.query_params)
+
   if not serializer.is_valid():
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -113,7 +112,6 @@ def guess_file_metadata(request: Request) -> Response:
   import_type = validated_data['import_type']
 
   try:
-    # Call the operation function with appropriate parameters
     metadata = operations.guess_file_metadata(
       file_path=file_path, import_type=import_type, fs=request.fs if import_type == 'remote' else None
     )
@@ -140,7 +138,6 @@ def preview_file(request: Request) -> Response:
   Returns:
     Response containing a preview of the file content
   """
-  # Validate request parameters using serializer
   serializer = PreviewFileSerializer(data=request.query_params)
   if not serializer.is_valid():
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -154,7 +151,6 @@ def preview_file(request: Request) -> Response:
   has_header = validated_data.get('has_header')
 
   try:
-    # Call the operations function with appropriate parameters
     if file_type == 'excel':
       sheet_name = validated_data.get('sheet_name')
 
