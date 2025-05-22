@@ -86,7 +86,7 @@ class RequirementsGenerator:
             "requests-kerberos==0.14.0",
             "krb5==0.5.1",  # pinned for Sles12, dep of requests-kerberos 0.14.0
             "rsa==4.7.2",
-            "ruff==0.4.2",
+            "ruff==0.11.10",
             "slack-sdk==3.31.0",
             "SQLAlchemy==1.3.8",
             "sqlparse==0.5.0",

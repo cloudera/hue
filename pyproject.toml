@@ -110,6 +110,7 @@ select = [
     "E", # pycodestyle errors
     "W", # pycodestyle warnings
     "I", # isort
+    "F", # pyflakes
 ]
 ignore = ["E111", "E114", "E117", "W191", "E731"]
 
@@ -127,49 +128,22 @@ ignore = ["E111", "E114", "E117", "W191", "E731"]
 
 [tool.ruff.format]
 docstring-code-format = true
-docstring-code-line-length = 140
+docstring-code-line-length = "dynamic"
 indent-style = "space"
-quote-style = "preserve"
+quote-style = "double"
 
 [tool.ruff.lint.isort]
+case-sensitive = false
 combine-as-imports = true
-length-sort-straight = true
-known-first-party = [
-    "about",
-    "beeswax",
-    "filebrowser",
-    "hbase",
-    "help",
-    "hive",
-    "impala",
-    "jobbrowser",
-    "jobsub",
-    "metastore",
-    "oozie",
-    "pig",
-    "proxy",
-    "rdbms",
-    "search",
-    "security",
-    "spark",
-    "sqoop",
-    "useradmin",
-    "zookeeper",
-    "desktop",
-    "aws",
-    "azure",
-    "dashboard",
-    "hadoop",
-    "indexer",
-    "kafka",
-    "libanalyze",
-    "liboauth",
-    "liboozie",
-    "librdbms",
-    "libsaml",
-    "libsentry",
-    "libsolr",
-    "libzookeeper",
-    "metadata",
-    "notebook",
+force-sort-within-sections = false
+known-first-party = []
+known-third-party = []
+lines-after-imports = -1
+order-by-type = false
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder"
 ]
