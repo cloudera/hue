@@ -12,7 +12,7 @@ jobs:
   hue-build-and-tests-arm64:
     name: Build and Test (Python 3.11, ARM64)
     # Use GitHub-hosted ARM64 runner
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
 
     steps:
     - name: Checkout
@@ -51,7 +51,16 @@ jobs:
         export DEBIAN_FRONTEND=noninteractive
         sudo apt-get update -y
         sudo apt-get install -y gcc g++ build-essential git sudo curl
-        sudo apt-get install -y curl python3.11-dev python3.11-venv python3-distutils asciidoc rsync libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
+        sudo apt-get install -y curl software-properties-common asciidoc rsync libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
+        
+        # Install Python 3.11 using deadsnakes PPA
+        sudo add-apt-repository -y ppa:deadsnakes/ppa
+        sudo apt-get update -y
+        sudo apt-get install -y python3.11 python3.11-dev python3.11-venv python3.11-distutils
+        
+        # Install pip for Python 3.11
+        curl -sS https://bootstrap.pypa.io/get-pip.py | sudo python3.11
+        
         unset PIP_FIND_LINKS
         unset PIP_EXTRA_INDEX_URL
 
