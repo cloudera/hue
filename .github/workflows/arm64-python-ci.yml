@@ -10,9 +10,9 @@ on:
 
 jobs:
   hue-build-and-tests-arm64:
-    name: Build and Test (Python 3.9, ARM64)
+    name: Build and Test (Python 3.11, ARM64)
     # Use GitHub-hosted ARM64 runner
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-24.04-arm
 
     steps:
     - name: Checkout
@@ -24,19 +24,19 @@ jobs:
       run: |
         ./tools/ci/check_for_commit_message.sh
 
-    - name: Set up Python 3.9
+    - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
-        python-version: '3.9'
+        python-version: '3.11'
 
     - name: Cache pip
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-arm64-py39-pip-${{ hashFiles('desktop/core/generate_requirements.py') }}
+        key: ${{ runner.os }}-arm64-py311-pip-${{ hashFiles('desktop/core/generate_requirements.py') }}
         restore-keys: |
-          ${{ runner.os }}-arm64-py39-pip-
-          ${{ runner.os }}-arm64-py39-
+          ${{ runner.os }}-arm64-py311-pip-
+          ${{ runner.os }}-arm64-py311-
           ${{ runner.os }}-arm64-
 
     - name: Setup node 20 and cache npm
@@ -51,11 +51,11 @@ jobs:
         export DEBIAN_FRONTEND=noninteractive
         sudo apt-get update -y
         sudo apt-get install -y gcc g++ build-essential git sudo curl
-        sudo apt-get install -y curl python3.9-dev python3.9-venv python3.9-distutils asciidoc rsync libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
+        sudo apt-get install -y curl python3.11-dev python3.11-venv python3-distutils asciidoc rsync libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
         unset PIP_FIND_LINKS
         unset PIP_EXTRA_INDEX_URL
 
-        export PYTHON_VER=python3.9
+        export PYTHON_VER=python3.11
         export SKIP_PYTHONDEV_CHECK=true
         export ROOT=$PWD
         make apps docs test_prep
@@ -77,11 +77,11 @@ jobs:
 
     - name: Run python lint check
       run: |
-        PYTHONWARNINGS=always ./build/venvs/python3.9/bin/hue runruff check
+        PYTHONWARNINGS=always ./build/env/bin/hue runruff check
 
     - name: Run unit tests
       run: |
-        PYTHONWARNINGS=always ./build/venvs/python3.9/bin/pytest
+        PYTHONWARNINGS=always ./build/env/bin/pytest
 
     - name: Upload reports
       uses: actions/upload-artifact@v4
