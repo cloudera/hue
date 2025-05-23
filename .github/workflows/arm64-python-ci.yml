@@ -12,7 +12,7 @@ jobs:
   hue-build-and-tests-arm64:
     name: Build and Test (Python 3.9, ARM64)
     # Use GitHub-hosted ARM64 runner
-    runs-on: ubuntu-22.04-arm64
+    runs-on: ubuntu-22.04-arm
 
     steps:
     - name: Checkout
