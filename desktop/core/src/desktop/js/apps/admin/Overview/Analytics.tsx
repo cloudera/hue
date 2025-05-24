@@ -18,7 +18,13 @@ import React from 'react';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 import Input from 'cuix/dist/components/Input';
-import { GET_USAGE_ANALYTICS_API_URL, UPDATE_USAGE_ANALYTICS_API_URL } from '../Components/utils';
+import {
+  GET_USAGE_ANALYTICS_API_URL,
+  UPDATE_USAGE_ANALYTICS_API_URL,
+  UpdateUsageAnalyticsPayload
+} from '../Components/utils';
+import { HueAlert } from '../../../reactComponents/GlobalAlert/types';
+import { GLOBAL_INFO_TOPIC } from '../../../reactComponents/GlobalAlert/events';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
@@ -32,38 +38,45 @@ interface UsageAnalyticsResponse {
 
 const Analytics = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const { data, loading, error, reloadData } = useLoadData<UsageAnalyticsResponse>(
-    GET_USAGE_ANALYTICS_API_URL
-  );
   const {
-    save: saveAnalyticsPreference,
-    loading: savingPreference,
-    error: savingError
-  } = useSaveData<UsageAnalyticsResponse>(UPDATE_USAGE_ANALYTICS_API_URL, {
-    onSuccess: response => {
-      if (response.analytics_enabled !== undefined) {
-        reloadData();
-        const successMessage = response.analytics_enabled
-          ? t('Analytics have been activated.')
-          : t('Analytics have been deactivated.');
-        huePubSub.publish('hue.global.info', { message: successMessage });
+    data: usageAnalyticsData,
+    loading: loadingAnalytics,
+    error: usageAnalyticsError,
+    reloadData
+  } = useLoadData<UsageAnalyticsResponse>(GET_USAGE_ANALYTICS_API_URL);
+
+  const {
+    save: updateAnalyticsPreference,
+    loading: updatingAnalyticsPreference,
+    error: updateAnalyticsPreferenceError
+  } = useSaveData<UsageAnalyticsResponse, UpdateUsageAnalyticsPayload>(
+    UPDATE_USAGE_ANALYTICS_API_URL,
+    {
+      onSuccess: response => {
+        if (response.analytics_enabled !== undefined) {
+          reloadData();
+          const successMessage = response.analytics_enabled
+            ? t('Analytics have been activated.')
+            : t('Analytics have been deactivated.');
+          huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: successMessage });
+        }
       }
     }
-  });
+  );
 
   const errors = [
     {
-      enabled: !!error,
-      message: error?.message || t('An unknown error occurred while fetching data.')
+      enabled: !!usageAnalyticsError,
+      message: t('An unknown error occurred while fetching data.')
     },
     {
-      enabled: !!savingError,
-      message: savingError?.message || t('Failed to update analytics.')
+      enabled: !!updateAnalyticsPreferenceError,
+      message: t('Failed to update analytics.')
     }
   ];
 
   return (
-    <LoadingErrorWrapper loading={loading || savingPreference} errors={errors}>
+    <LoadingErrorWrapper loading={loadingAnalytics || updatingAnalyticsPreference} errors={errors}>
       <div className="overview-analytics">
         <h3>{t('Anonymous usage analytics')}</h3>
         <div className="analytics-checkbox-container">
@@ -71,13 +84,13 @@ const Analytics = (): JSX.Element => {
             type="checkbox"
             className="analytics__checkbox-icon"
             id="usage_analytics"
-            checked={!!data?.analyticsEnabled}
-            onChange={event =>
-              saveAnalyticsPreference(
-                new FormData().append('analytics_enabled', event.target.checked.toString())
-              )
+            checked={
+              usageAnalyticsData?.analyticsEnabled ?? usageAnalyticsData?.analytics_enabled ?? false
             }
-            disabled={loading || savingPreference}
+            onChange={event =>
+              updateAnalyticsPreference({ analytics_enabled: event.target.checked })
+            }
+            disabled={loadingAnalytics || updatingAnalyticsPreference}
           />
           <label htmlFor="usage_analytics" className="usage__analytics">
             {t('Help improve Hue with anonymous usage analytics.')}
