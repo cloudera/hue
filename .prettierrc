@@ -3,5 +3,26 @@
   "singleQuote": true,
   "trailingComma": "none",
   "arrowParens": "avoid",
-  "vueIndentScriptAndStyle": true
+  "vueIndentScriptAndStyle": true,
+  "overrides": [
+    {
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
+      "options": {
+        "plugins": [
+          "@trivago/prettier-plugin-sort-imports"
+        ],
+        "importOrder": [
+          "^react$",
+          "<THIRD_PARTY_MODULES>",
+          "^(?!.*\\.(s?css|sass|css)$)[./]",
+          "^.+\\.scss$"
+        ],
+        "importOrderSeparation": true,
+        "importOrderSortSpecifiers": true
+      }
+    }
+  ]
 }
