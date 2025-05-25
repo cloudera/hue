@@ -1,70 +1,120 @@
-[![CircleCI](https://img.shields.io/circleci/build/github/cloudera/hue/master.svg)](https://circleci.com/gh/cloudera/hue/tree/master)
-[![DockerPulls](https://img.shields.io/docker/pulls/gethue/hue.svg)](https://registry.hub.docker.com/u/gethue/hue/)
-![GitHub contributors](https://img.shields.io/github/contributors-anon/cloudera/hue.svg)
+<div align="center">
+
+# Hue - SQL Assistant for Databases and Data Warehouses
 
 ![Hue Logo](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png)
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/cloudera/hue/commitflow-py3.yml?style=for-the-badge&logo=githubactions)
+[![Docker Pulls](https://img.shields.io/docker/pulls/gethue/hue?style=for-the-badge&logo=docker&color=blue)](https://registry.hub.docker.com/u/gethue/hue/)
+[![GitHub contributors](https://img.shields.io/github/contributors-anon/cloudera/hue?style=for-the-badge&logo=github)](https://github.com/cloudera/hue/graphs/contributors)
+[![GitHub stars](https://img.shields.io/github/stars/cloudera/hue?style=for-the-badge&logo=github&color=yellow)](https://github.com/cloudera/hue/stargazers)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge&logo=opensourceinitiative)](LICENSE.txt)
 
-# Query. Explore. Share.
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/cloudera/hue)
 
-Hue is a mature SQL Assistant for querying Databases & Data Warehouses.
+**Query. Explore. Share.**
 
-* 1000+ customers
-* Top Fortune 500
+</div>
 
-use Hue to quickly answer questions via self-service querying and are executing 100s of 1000s of queries daily.
+## 📊 Overview
 
-Read more on [gethue.com](http://gethue.com) and
-- Connect to a [database](https://docs.gethue.com/administrator/configuration/connectors/)
-- Build your own Editor with the [SQL Scratchpad](https://docs.gethue.com/developer/components/scratchpad/)
-- Boot the [Query Service](https://docs.gethue.com/administrator/installation/cloud/#kubernetes) and query via the UI/[API](https://docs.gethue.com/developer/api/)
+Hue is a mature SQL Assistant for querying Databases & Data Warehouses, trusted by:
+
+* **1000+ customers** worldwide
+* **Top Fortune 500** enterprises 
+
+Organizations use Hue to quickly answer questions via self-service querying, executing hundreds of thousands of queries daily.
+
+### Key Features
+
+- 🔍 **Interactive SQL editing** with syntax highlighting and autocomplete
+- 📂 **File Browser** for navigating and operating on HDFS, S3, ABFS, Ozone, and Google Storage (GS) files
+- 🔄 **Job Browser** for monitoring and managing Hive queries, Impala queries, YARN applications, and Livy Spark jobs
+- 📋 **Table Browser** for exploring and managing database tables, schemas, and metadata
+- 📊 **Table Importer** for creating Hive and Impala tables from CSV/Excel files, with support for uploading from local system or importing from remote filesystems (HDFS, S3, ABFS, Ozone, GS)
+- 🔌 **Multiple database connectors** including Hive, Impala, MySQL, PostgreSQL, and more
+
+## 🔗 Useful Links
+
+- 🏠 **Website**: [gethue.com](https://gethue.com)
+- 📚 **Connect to a database**: [Configuration Guide](https://docs.gethue.com/administrator/configuration/connectors/)
+- 🧩 **Build your own Editor**: [SQL Scratchpad](https://docs.gethue.com/developer/components/scratchpad/)
+- ⚙️ **Query Service**: [Kubernetes Setup](https://docs.gethue.com/administrator/installation/cloud/#kubernetes) and [API](https://docs.gethue.com/developer/api/)
 
 ![Hue Editor](https://cdn.gethue.com/uploads/2021/02/hue-4.9.png)
 
-# Getting Started
+## 🚀 Getting Started
 
-Quick Demos:
+### Try Hue Now
 
-* Docker Compose: [Impala](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/), [Flink SQL](https://gethue.com/blog/sql-querying-live-kafka-logs-and-sending-live-updates-with-flink-sql/), [ksqlDB](https://gethue.com/blog/tutorial-query-live-data-stream-with-kafka-sql/), [Phoenix SQL / HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/), [Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
-* Live instance: [demo.gethue.com](https://demo.gethue.com/)
+- 🌐 **Live demo**: [demo.gethue.com](https://demo.gethue.com/)
+- 🧪 **Quick integrations**:
+  - [Hive](https://docs.gethue.com/administrator/configuration/connectors/#apache-hive)
+  - [Impala](https://gethue.com/blog/quickstart-sql-editor-for-apache-impala/)
+  - [Trino/Presto](https://docs.gethue.com/administrator/configuration/connectors/#trino-presto)
+  - [Phoenix SQL / HBase](https://gethue.com/blog/querying-live-kafka-data-in-apache-hbase-with-phoenix/)
+  - [Spark SQL](https://gethue.com/blog/querying-spark-sql-with-spark-thrift-server-and-hue-editor/)
 
-Three ways to start the server then configure the [databases](https://docs.gethue.com/administrator/configuration/connectors/) you want to query:
+Choose one of these deployment options to start the server, then [configure the databases](https://docs.gethue.com/administrator/configuration/connectors/) you want to query:
 
-## Docker
-Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/hue/tree/master/tools/docker/hue) or the
-[video blog post](http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/).
+### 🐳 Docker
 
-    docker run -it -p 8888:8888 gethue/hue:latest
+Start Hue instantly:
 
-Now Hue should be up and running on your default Docker IP on [http://localhost:8888](http://localhost:8888)!
+```bash
+docker run -it -p 8888:8888 gethue/hue:latest
+```
 
-## Kubernetes
+Hue will be available at [http://localhost:8888](http://localhost:8888)
 
-    helm repo add gethue https://helm.gethue.com
-    helm repo update
-    helm install hue gethue/hue
+📖 See the [Docker Guide](https://github.com/cloudera/hue/tree/master/tools/docker/hue) or watch the [Quick Start Video](http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/)
 
-Read more about configurations at [tools/kubernetes](tools/kubernetes/).
+### ☸️ Kubernetes
 
-## Development
+```bash
+helm repo add gethue https://helm.gethue.com
+helm repo update
+helm install hue gethue/hue
+```
 
-For a very Quick Start go with the [Dev Environment Docker](https://docs.gethue.com/developer/development/#dev-docker).
+📖 Read more about configurations in the [Kubernetes docs](tools/kubernetes/)
 
-Or install the [dependencies](https://docs.gethue.com/administrator/installation/dependencies/), clone the repository, build and get the server running.
+### 💻 Development Setup
 
-    # <install OS dependencies>
-    git clone https://github.com/cloudera/hue.git
-    cd hue
-    make apps
-    build/env/bin/hue runserver
+#### Quick Start with Docker
 
-Now Hue should be running on [http://localhost:8000](http://localhost:8000)!
+Use the [Dev Environment Docker](https://docs.gethue.com/developer/development/#dev-docker) for the fastest setup.
 
-Read more in the [documentation](https://docs.gethue.com/developer/development/).
+#### Manual Setup
 
-# Components
+1. Install [dependencies](https://docs.gethue.com/administrator/installation/dependencies/)
+2. Clone and build:
 
-SQL Editor, Parsers [components](https://docs.gethue.com/developer/components/) and REST/Python/CLI [APIs](https://docs.gethue.com/developer/api/).
+```bash
+git clone https://github.com/cloudera/hue.git
+cd hue
+make apps
+build/env/bin/hue runserver
+```
 
-# License
-[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+Hue will be available at [http://localhost:8000](http://localhost:8000)
+
+📖 Read more in the [development documentation](https://docs.gethue.com/developer/development/)
+
+## 🧩 Components
+
+Hue offers several powerful components:
+
+- **SQL Editor** - Interactive query interface
+- **SQL Parsers** - Syntax handling for multiple dialects
+- **REST/Python/CLI APIs** - Programmatic access to all functionality
+
+📖 Learn about [components](https://docs.gethue.com/developer/components/) and [APIs](https://docs.gethue.com/developer/api/)
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) guide to get started.
+
+## 📜 License
+
+[Apache License, Version 2.0](LICENSE.txt)
