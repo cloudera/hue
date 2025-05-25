@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Spin, Alert } from 'antd';
+import Loading from 'cuix/dist/components/Loading';
+import Alert from 'cuix/dist/components/Alert';
 import { i18nReact } from '../../../utils/i18nReact';
 import AdminHeader from '../AdminHeader';
 import { ConfigurationValue } from './ConfigurationValue';
@@ -51,20 +52,27 @@ interface HueConfig {
   conf_dir: string;
 }
 
+interface VisualSection {
+  header: string;
+  content: Array<AdminConfigValue>;
+}
+
 const Configuration: React.FC = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [hueConfig, setHueConfig] = useState<HueConfig>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
-  const [selectedApp, setSelectedApp] = useState<string>('desktop');
+  const [selectedSection, setSelectedSection] = useState<string>('desktop');
   const [filter, setFilter] = useState<string>('');
+
+  const ALL_SECTIONS_OPTION = t('ALL');
 
   useEffect(() => {
     ApiHelper.fetchHueConfigAsync()
       .then(data => {
         setHueConfig(data);
         if (data.apps.find(app => app.name === 'desktop')) {
-          setSelectedApp('desktop');
+          setSelectedSection('desktop');
         }
       })
       .catch(error => {
@@ -98,54 +106,84 @@ const Configuration: React.FC = (): JSX.Element => {
     return undefined;
   };
 
-  const selectedConfig = useMemo(() => {
-    const filterSelectedApp = hueConfig?.config?.find(config => config.key === selectedApp);
+  const visualSections = useMemo(() => {
+    const showAllSections = selectedSection === ALL_SECTIONS_OPTION;
+    const selectedFullConfigs = !hueConfig?.config
+      ? []
+      : showAllSections
+        ? hueConfig.config
+        : hueConfig.config.filter(config => config.key === selectedSection);
 
-    return filterSelectedApp?.values
-      .map(config => filterConfig(config, filter.toLowerCase()))
-      .filter(Boolean) as Config[];
-  }, [hueConfig, filter, selectedApp]);
+    return selectedFullConfigs
+      .map(selectedSection => ({
+        header: selectedSection.key,
+        content: selectedSection.values
+          .map(config => filterConfig(config, filter.toLowerCase()))
+          .filter(Boolean) as Config[]
+      }))
+      .filter(headerContentObj => !!headerContentObj.content) as Array<VisualSection>;
+  }, [hueConfig, filter, selectedSection]);
+
+  const renderVisualSection = (visualSection: VisualSection) => {
+    const showingMultipleSections = selectedSection === ALL_SECTIONS_OPTION;
+    const content = visualSection.content;
+    return content.length > 0 ? (
+      <>
+        {showingMultipleSections && (
+          <h4 className="config__section-header">{visualSection.header}</h4>
+        )}
+        {content.map((record, index) => (
+          <div key={index} className="config__main-item">
+            <ConfigurationKey record={record} />
+            <ConfigurationValue record={record} />
+          </div>
+        ))}
+      </>
+    ) : (
+      !showingMultipleSections && <i>{t('Empty configuration section')}</i>
+    );
+  };
+
+  const optionsIncludingAll = [
+    ALL_SECTIONS_OPTION,
+    ...(hueConfig?.apps.map(app => app.name) || [])
+  ];
 
   return (
     <div className="config-component">
-      <Spin spinning={loading}>
+      <Loading spinning={loading}>
         {error && (
           <Alert
             message={`Error: ${error}`}
-            description="Error in displaying the Configuration!"
+            description={t('Error in displaying the Configuration!')}
             type="error"
           />
         )}
 
         {!error && (
           <>
-            <div className="config__section-header">Sections</div>
+            <div className="config__section-dropdown-label">{t('Sections')}</div>
             <AdminHeader
-              options={hueConfig?.apps.map(app => app.name) || []}
-              selectedValue={selectedApp}
-              onSelectChange={setSelectedApp}
+              options={optionsIncludingAll}
+              selectedValue={selectedSection}
+              onSelectChange={setSelectedSection}
               filterValue={filter}
               onFilterChange={setFilter}
-              placeholder={`Filter in ${selectedApp}...`}
+              placeholder={
+                selectedSection === ALL_SECTIONS_OPTION
+                  ? t('Filter...')
+                  : `${t('Filter in')} ${selectedSection}...`
+              }
               configAddress={hueConfig?.conf_dir}
             />
-            {selectedApp &&
-              selectedConfig &&
-              (selectedConfig.length > 0 ? (
-                <>
-                  {selectedConfig.map((record, index) => (
-                    <div key={index} className="config__main-item">
-                      <ConfigurationKey record={record} />
-                      <ConfigurationValue record={record} />
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <i>{t('Empty configuration section')}</i>
+            {selectedSection &&
+              visualSections?.length &&
+              visualSections.map(visualSection => (
+                <div key={visualSection.header}>{renderVisualSection(visualSection)}</div>
               ))}
           </>
         )}
-      </Spin>
+      </Loading>
     </div>
   );
 };

@@ -498,8 +498,14 @@ if desktop.conf.KNOX.KNOX_PROXYHOSTS.get():  # The hosts provided here don't hav
   else:
     TRUSTED_ORIGINS += desktop.conf.KNOX.KNOX_PROXYHOSTS.get()
 
+CSRF_TRUSTED_ORIGINS = []
 if TRUSTED_ORIGINS:
-  CSRF_TRUSTED_ORIGINS = TRUSTED_ORIGINS
+  for origin in TRUSTED_ORIGINS:
+    if 'http://' in origin or 'https://' in origin:
+      CSRF_TRUSTED_ORIGINS.append(origin)
+    else:
+      CSRF_TRUSTED_ORIGINS.append('http://%s' % origin)
+      CSRF_TRUSTED_ORIGINS.append('https://%s' % origin)
 
 SECURE_HSTS_SECONDS = desktop.conf.SECURE_HSTS_SECONDS.get()
 SECURE_HSTS_INCLUDE_SUBDOMAINS = desktop.conf.SECURE_HSTS_INCLUDE_SUBDOMAINS.get()
@@ -605,6 +611,7 @@ if is_oidc_configured():
   OIDC_RP_IDP_SIGN_KEY = desktop.conf.OIDC.OIDC_RP_IDP_SIGN_KEY.get()
   OIDC_OP_JWKS_ENDPOINT = desktop.conf.OIDC.OIDC_OP_JWKS_ENDPOINT.get()
   OIDC_VERIFY_SSL = desktop.conf.OIDC.OIDC_VERIFY_SSL.get()
+  OIDC_AUTH_REQUEST_EXTRA_PARAMS = desktop.conf.OIDC.OIDC_AUTH_REQUEST_EXTRA_PARAMS.get()
   LOGIN_REDIRECT_URL = desktop.conf.OIDC.LOGIN_REDIRECT_URL.get()
   LOGOUT_REDIRECT_URL = desktop.conf.OIDC.LOGOUT_REDIRECT_URL.get()
   LOGIN_REDIRECT_URL_FAILURE = desktop.conf.OIDC.LOGIN_REDIRECT_URL_FAILURE.get()
@@ -653,7 +660,7 @@ from desktop.conf import ENABLE_NEW_STORAGE_BROWSER  # noqa: E402
 file_upload_handlers = []
 if is_chunked_fileuploader_enabled():
   file_upload_handlers = [
-    'hadoop.fs.upload.FineUploaderChunkedUploadHandler',
+    'hadoop.fs.upload.CustomDocumentsUploadHandler',
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
   ]

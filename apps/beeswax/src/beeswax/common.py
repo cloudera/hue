@@ -125,7 +125,7 @@ def find_compute(cluster=None, user=None, dialect=None, namespace_id=None):
     # Pick the most probable compute object
     selected_compute = (cluster if compute_check(cluster)
                         else compute if compute_check(compute)
-                        else connector if compute_check(connector) else None)
+                        else connector if compute_check(connector) else cluster)
 
     # If found, we will attempt to reload it, first by id then by name
     if selected_compute:
@@ -134,8 +134,11 @@ def find_compute(cluster=None, user=None, dialect=None, namespace_id=None):
         if c:
           return c.to_dict()
 
-      if selected_compute.get('name'):
-        c = Compute.objects.filter(name=selected_compute['name']).first()
+      # Compute name is sometimes passed in the type and dialect fields.
+      # So, we will attempt to load compute using name, type and dialect as name.
+      compute_name = selected_compute.get('name', selected_compute.get('type', selected_compute.get('dialect')))
+      if compute_name:
+        c = Compute.objects.filter(name=compute_name).first()
         if c:
           return c.to_dict()
 

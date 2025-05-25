@@ -54,29 +54,29 @@ jest.mock('api/utils', () => ({
 }));
 
 describe('Metrics', () => {
-  test('Filtering metrics based on name column value', async () => {
+  it('should filter metrics based on name column value', async () => {
     render(<Metrics />);
 
     const filterInput = screen.getByPlaceholderText('Filter metrics...');
     fireEvent.change(filterInput, { target: { value: 'value' } });
 
     await waitFor(() => {
-      expect(screen.getByText('queries.number')).toBeInTheDocument();
-      expect(screen.getByText('threads.daemon')).toBeInTheDocument();
-      expect(screen.getByText('threads.total')).toBeInTheDocument();
-      expect(screen.getByText('users')).toBeInTheDocument();
-      expect(screen.getByText('users.active')).toBeInTheDocument();
-      expect(screen.getByText('users.active.total')).toBeInTheDocument();
-      expect(screen.queryByText('requests.active')).not.toBeInTheDocument();
-      expect(screen.queryByText('requests.exceptions')).toBeNull();
-      expect(screen.queryByText('requests.response-time')).toBeNull();
+      expect(screen.getByText('Number of Queries')).toBeInTheDocument();
+      expect(screen.getByText('Daemon Threads')).toBeInTheDocument();
+      expect(screen.getByText('Total Threads')).toBeInTheDocument();
+      expect(screen.getByText('Users')).toBeInTheDocument();
+      expect(screen.getByText('Active Users')).toBeInTheDocument();
+      expect(screen.getByText('Total Active Users')).toBeInTheDocument();
+      expect(screen.queryByText('Active Requests')).not.toBeInTheDocument();
+      expect(screen.queryByText('Request Exceptions')).toBeNull();
+      expect(screen.queryByText('Request Response Time')).toBeNull();
     });
   });
 
-  test('Selecting a specific metric from the dropdown filters the data using click events', async () => {
+  it('should select a specific metric from the dropdown filters the data using click events', async () => {
     render(<Metrics />);
 
-    await waitFor(() => screen.getByText('queries.number'));
+    await waitFor(() => screen.getByText('Number of Queries'));
 
     const select = screen.getByTestId('admin-header--select').firstElementChild;
     if (select) {
@@ -98,7 +98,7 @@ describe('Metrics', () => {
     }
   });
 
-  test('Ensuring metrics starting with auth, multiprocessing and python.gc are not displayed', async () => {
+  it('should ensure metrics starting with auth, multiprocessing and python.gc are not displayed', async () => {
     jest.clearAllMocks();
     jest.mock('api/utils', () => ({
       get: jest.fn(() =>
@@ -133,7 +133,7 @@ describe('Metrics', () => {
       expect(screen.queryByText('auth.ldap.auth-time')).not.toBeInTheDocument();
       expect(screen.queryByText('multiprocessing.processes.total')).not.toBeInTheDocument();
       expect(screen.queryByText('python.gc.objects')).not.toBeInTheDocument();
-      expect(screen.queryByText('users')).toBeInTheDocument();
+      expect(screen.queryByText('Users')).toBeInTheDocument();
     });
   });
 });

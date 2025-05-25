@@ -21,15 +21,15 @@ commands:
           command: |
             sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
             export DEBIAN_FRONTEND=noninteractive
-            sudo apt-get update
-            sudo apt-get install -y gcc g++ build-essential python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev
+            sudo apt-get update -y
+            sudo apt-get install -y gcc g++ build-essential git sudo curl
+            sudo apt-get install -y curl python3.8-dev python3.8-venv python3.8-distutils asciidoc rsync curl libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
             curl -sL https://deb.nodesource.com/setup_20.x | sudo bash - && sudo apt-get install -y nodejs
+            unset PIP_FIND_LINKS
+            unset PIP_EXTRA_INDEX_URL
             curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python3.8
-            sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
 
-            export PYTHON_VER=python3.8
-            export ROOT=$PWD
-            make apps
+            PYTHON_VER=python3.8 make apps docs test_prep
 
       - run:
           name: run documentation lints
@@ -52,12 +52,12 @@ commands:
       - run:
           name: run python lints
           command: |
-            PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+            PYTHONWARNINGS=always ./build/venvs/python3.8/bin/hue runruff check
 
       - run:
           name: run tests
           command: |
-            PYTHONWARNINGS=always ./build/env/bin/pytest 
+            PYTHONWARNINGS=always ./build/venvs/python3.8/bin/pytest 
 
       - store_artifacts:
           path: test-reports

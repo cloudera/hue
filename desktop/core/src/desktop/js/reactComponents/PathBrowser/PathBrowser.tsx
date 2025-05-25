@@ -22,16 +22,22 @@ import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 import HdfsIcon from '../../components/icons/HdfsIcon';
 import S3Icon from '../../components/icons/S3Icon';
 import AdlsIcon from '../../components/icons/AdlsIcon';
+import EditIcon from '@cloudera/cuix-core/icons/react/EditIcon';
+import StatusSuccessTableIcon from '@cloudera/cuix-core/icons/react/StatusSuccessTableIcon';
+import CopyPathIcon from '@cloudera/cuix-core/icons/react/CopyClipboardIcon';
 
 import Breadcrumb from './Breadcrumb/Breadcrumb';
 import './PathBrowser.scss';
 import { getBreadcrumbs, getFileSystemAndPath, BreadcrumbData } from './PathBrowser.util';
 
+const DEFAULT_URL_SCHEMA_SEPARATOR = '://';
+const DEFAULT_PATH_SEPARATOR = '/';
+
 interface PathBrowserProps {
   filePath: string;
   onFilepathChange: (path: string) => void;
-  seperator: string;
-  showIcon: boolean;
+  separator?: string;
+  showIcon?: boolean;
   testId?: string;
 }
 
@@ -42,16 +48,17 @@ const defaultProps = {
 const PathBrowser = ({
   filePath,
   onFilepathChange,
-  seperator,
-  showIcon,
+  separator = DEFAULT_PATH_SEPARATOR,
+  showIcon = false,
   testId
 }: PathBrowserProps): JSX.Element => {
   const [isEditMode, setIsEditMode] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const icons = {
     hdfs: <HdfsIcon />,
     abfs: <AdlsIcon />,
-    s3: <S3Icon />
+    s3a: <S3Icon />
   };
 
   const { fileSystem, path } = getFileSystemAndPath(filePath);
@@ -89,6 +96,12 @@ const PathBrowser = ({
     return menu;
   };
 
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(filePath);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   if (breadcrumbs) {
     if (isEditMode) {
       return (
@@ -100,7 +113,6 @@ const PathBrowser = ({
               onFilepathChange((event.target as HTMLInputElement).value);
             }}
             className="hue-path-browser__input"
-            autoFocus
             data-testid={`${testId}-input`}
           />
         </div>
@@ -110,12 +122,12 @@ const PathBrowser = ({
     return (
       <div className="hue-path-browser" data-testid={`${testId}`}>
         {showIcon && (
-          <div
-            className="hue-path-browser__file-system-icon"
+          <span
             data-testid={`${testId}__file-system-icon`}
+            className="hue-path-browser__file-system-icon"
           >
             {icons[fileSystem]}
-          </div>
+          </span>
         )}
         <div className="hue-path-browser__breadcrumbs" data-testid={`${testId}-breadcrumb`}>
           {breadcrumbs.length <= 3 ? (
@@ -128,12 +140,12 @@ const PathBrowser = ({
                     url={item.url}
                     onFilepathChange={onFilepathChange}
                   />
-                  {index != breadcrumbs.length - 1 && (
+                  {(index === 0 || index != breadcrumbs.length - 1) && (
                     <div
-                      className="hue-path-browser__breadcrumb-seperator"
-                      data-testid={`${testId}-breadcrumb-seperator`}
+                      className="hue-path-browser__breadcrumb-separator"
+                      data-testid={`${testId}-breadcrumb-separator`}
                     >
-                      {seperator}
+                      {index === 0 ? DEFAULT_URL_SCHEMA_SEPARATOR : separator}
                     </div>
                   )}
                 </React.Fragment>
@@ -148,10 +160,10 @@ const PathBrowser = ({
                 key={breadcrumbs[0].url}
               />
               <div
-                className="hue-path-browser__breadcrumb-seperator"
-                data-testid={`${testId}-breadcrumb-seperator`}
+                className="hue-path-browser__breadcrumb-separator"
+                data-testid={`${testId}-breadcrumb-separator`}
               >
-                {seperator}
+                {DEFAULT_URL_SCHEMA_SEPARATOR}
               </div>
               <Dropdown
                 overlayClassName="hue-path-browser__dropdown cuix antd"
@@ -160,11 +172,9 @@ const PathBrowser = ({
                   className: 'hue-path-browser__dropdown-menu'
                 }}
                 trigger={['hover', 'click']}
-                autoFocus
                 data-testid={`${testId}-dropdown`}
               >
                 <BorderlessButton
-                  data-event=""
                   className="hue-path-browser__dropdown-button"
                   data-testid={`${testId}-dropdown-btn`}
                 >
@@ -172,10 +182,10 @@ const PathBrowser = ({
                 </BorderlessButton>
               </Dropdown>
               <div
-                className="hue-path-browser__breadcrumb-seperator"
-                data-testid={`${testId}-breadcrumb-seperator`}
+                className="hue-path-browser__breadcrumb-separator"
+                data-testid={`${testId}-breadcrumb-separator`}
               >
-                {seperator}
+                {separator}
               </div>
               <Breadcrumb
                 key={breadcrumbs[breadcrumbs.length - 2].url}
@@ -184,10 +194,10 @@ const PathBrowser = ({
                 onFilepathChange={onFilepathChange}
               />
               <div
-                className="hue-path-browser__breadcrumb-seperator"
-                data-testid={`${testId}-breadcrumb-seperator`}
+                className="hue-path-browser__breadcrumb-separator"
+                data-testid={`${testId}-breadcrumb-separator`}
               >
-                {seperator}
+                {separator}
               </div>
               <Breadcrumb
                 key={breadcrumbs[breadcrumbs.length - 1].url}
@@ -199,15 +209,24 @@ const PathBrowser = ({
           )}
         </div>
         <BorderlessButton
-          data-event=""
-          className="hue-path-browser__toggle-breadcrumb-input-btn"
-          aria-label="hue-path-browser__toggle-breadcrumb-input-btn"
-          title="Edit path"
-          onClick={() => {
-            setIsEditMode(true);
-          }}
-          data-testid={`${testId}-toggle-input-btn`}
-        ></BorderlessButton>
+          onClick={() => setIsEditMode(true)}
+          className="hue-path-browser__edit-path-btn"
+          data-testid="hue-path-browser__edit-path-btn"
+          title={'Edit Path'}
+          icon={<EditIcon />}
+        />
+        <BorderlessButton
+          onClick={handleCopy}
+          className="hue-path-browser__copy-path-btn"
+          title={copied ? 'Copied!' : 'Copy Path'}
+          icon={
+            copied ? (
+              <StatusSuccessTableIcon data-testid="hue-path-browser__status-success-icon" />
+            ) : (
+              <CopyPathIcon data-testid="hue-path-browser__path-copy-icon" />
+            )
+          }
+        />
       </div>
     );
   }

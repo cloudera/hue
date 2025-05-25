@@ -15,41 +15,34 @@
 // limitations under the License.
 
 import React, { useMemo, useState } from 'react';
-import {
-  BrowserViewType,
-  FilePreview,
-  FileStats
-} from '../../../reactComponents/FileChooser/types';
+import { BrowserViewType, FilePreview, FileStats } from '../types';
 import './StorageFilePage.scss';
 import { i18nReact } from '../../../utils/i18nReact';
 import Button, { PrimaryButton } from 'cuix/dist/components/Button';
 import { getFileMetaData, getFileType } from './StorageFilePage.util';
-import {
-  DOWNLOAD_API_URL,
-  FILE_PREVIEW_API_URL,
-  SAVE_FILE_API_URL
-} from '../../../reactComponents/FileChooser/api';
+import { DOWNLOAD_API_URL, FILE_PREVIEW_API_URL, SAVE_FILE_API_URL } from '../api';
 import huePubSub from '../../../utils/huePubSub';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import Pagination from '../../../reactComponents/Pagination/Pagination';
 import {
   DEFAULT_PREVIEW_PAGE_SIZE,
   EDITABLE_FILE_FORMATS,
-  SUPPORTED_FILE_EXTENSIONS,
   SupportedFileTypes
 } from '../../../utils/constants/storageBrowser';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { getLastKnownConfig } from '../../../config/hueConfig';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import { inTrash } from '../../../utils/storageBrowserUtils';
+import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 interface StorageFilePageProps {
   onReload: () => void;
-  fileName: string;
   fileStats: FileStats;
 }
 
-const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps): JSX.Element => {
+const StorageFilePage = ({ fileStats, onReload }: StorageFilePageProps): JSX.Element => {
   const config = getLastKnownConfig();
+  const fileName = getLastDirOrFileNameFromPath(fileStats.path);
   const fileType = getFileType(fileName);
 
   const { t } = i18nReact.useTranslation();
@@ -60,13 +53,11 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
   const pageSize = DEFAULT_PREVIEW_PAGE_SIZE;
   const pageOffset = (pageNumber - 1) * pageSize;
 
-  const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL);
+  const { loading: isSaving, save } = useSaveData(SAVE_FILE_API_URL, {
+    postOptions: { qsEncodeData: true } // TODO: Remove once API supports RAW JSON payload
+  });
 
-  const {
-    data: fileData,
-    loading: loadingPreview,
-    error: errorPreview
-  } = useLoadData<FilePreview>(FILE_PREVIEW_API_URL, {
+  const { data, loading, error } = useLoadData<FilePreview>(FILE_PREVIEW_API_URL, {
     params: {
       path: fileStats.path,
       offset: pageOffset,
@@ -88,7 +79,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
 
   const handleCancel = () => {
     setIsEditing(false);
-    setFileContent(fileData?.contents);
+    setFileContent(data?.contents);
   };
 
   const handleSave = () => {
@@ -119,25 +110,27 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
   const filePreviewUrl = `${fileDownloadUrl}&&disposition=inline`;
 
   const isEditingEnabled =
+    !error &&
     !isEditing &&
     config?.storage_browser.max_file_editor_size &&
     config?.storage_browser.max_file_editor_size > fileStats.size &&
-    EDITABLE_FILE_FORMATS.has(fileType);
+    EDITABLE_FILE_FORMATS.has(fileType) &&
+    !inTrash(fileStats.path);
 
   const pageStats = {
-    page_number: pageNumber,
-    total_pages: Math.ceil(fileStats.size / pageSize),
-    page_size: 0,
-    total_size: 0
+    pageNumber: pageNumber,
+    totalPages: Math.ceil(fileStats.size / pageSize),
+    pageSize: 0,
+    totalSize: 0
   };
 
   const errorConfig = [
     {
-      enabled: !!errorPreview,
+      enabled: !!error && error.response?.status !== 422,
       message: t('An error occurred while fetching file content for path "{{path}}".', {
         path: fileStats.path
       }),
-      action: t('Retry'),
+      actionText: t('Retry'),
       onClick: onReload
     }
   ];
@@ -158,17 +151,13 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
           ))}
         </div>
 
-        <LoadingErrorWrapper loading={loadingPreview || isSaving} errors={errorConfig}>
+        <LoadingErrorWrapper loading={loading || isSaving} errors={errorConfig} hideOnLoading>
           <div className="preview">
             <div className="preview__title-bar">
               {t('Content')}
               <div className="preview__action-group">
                 {isEditingEnabled && (
-                  <PrimaryButton
-                    data-testid="preview--edit--button"
-                    data-event=""
-                    onClick={handleEdit}
-                  >
+                  <PrimaryButton data-testid="preview--edit--button" onClick={handleEdit}>
                     {t('Edit')}
                   </PrimaryButton>
                 )}
@@ -176,16 +165,14 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                   <>
                     <PrimaryButton
                       data-testid="preview--save--button"
-                      data-event=""
                       onClick={handleSave}
-                      disabled={fileContent === fileData?.contents}
+                      disabled={fileContent === data?.contents}
                     >
                       {t('Save')}
                     </PrimaryButton>
                     <Button
                       role="button"
                       data-testid="preview--cancel--button"
-                      data-event=""
                       onClick={handleCancel}
                     >
                       {t('Cancel')}
@@ -194,11 +181,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                 )}
                 {config?.storage_browser.enable_file_download_button && (
                   <a href={fileDownloadUrl}>
-                    <PrimaryButton
-                      data-testid="preview--download--button"
-                      data-event=""
-                      onClick={handleDownload}
-                    >
+                    <PrimaryButton data-testid="preview--download--button" onClick={handleDownload}>
                       {t('Download')}
                     </PrimaryButton>
                   </a>
@@ -207,7 +190,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
             </div>
 
             <div className="preview__content">
-              {fileType === SupportedFileTypes.TEXT && (
+              {error?.response?.status !== 422 && (
                 <div className="preview__editable-file">
                   <textarea
                     value={fileContent}
@@ -215,9 +198,15 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                     readOnly={!isEditing}
                     className="preview__textarea"
                   />
-                  {!loadingPreview && pageStats.total_pages > 1 && (
+                  {pageStats.totalPages > 1 && (
                     <Pagination setPageNumber={setPageNumber} pageStats={pageStats} />
                   )}
+                </div>
+              )}
+
+              {(error?.response?.status === 422 || fileType === SupportedFileTypes.COMPRESSED) && (
+                <div className="preview__unsupported">
+                  {t('Preview is not available for this file. Please download the file instead.')}
                 </div>
               )}
 
@@ -226,11 +215,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
               {fileType === SupportedFileTypes.DOCUMENT && (
                 <div className="preview__document">
                   <div>
-                    <PrimaryButton
-                      data-testid=""
-                      data-event=""
-                      onClick={() => window.open(filePreviewUrl)}
-                    >
+                    <PrimaryButton data-testid="" onClick={() => window.open(filePreviewUrl)}>
                       {t('Preview document')}
                     </PrimaryButton>
                   </div>
@@ -242,6 +227,7 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                 <audio controls preload="auto" data-testid="preview__content__audio">
                   <source src={filePreviewUrl} />
                   {t('Your browser does not support the audio element.')}
+                  <track kind="captions" src="" srcLang="en" label="English" />
                 </audio>
               )}
 
@@ -249,16 +235,8 @@ const StorageFilePage = ({ fileName, fileStats, onReload }: StorageFilePageProps
                 <video controls preload="auto" data-testid="preview__content__video">
                   <source src={filePreviewUrl} />
                   {t('Your browser does not support the video element.')}
+                  <track kind="captions" src="" srcLang="en" label="English" />
                 </video>
-              )}
-
-              {fileType === SupportedFileTypes.OTHER && (
-                <div className="preview__unsupported">
-                  {t('Preview not available for this file. Please download the file to view.')}
-                  <br />
-                  {t(`Supported file extensions: 
-                ${Object.keys(SUPPORTED_FILE_EXTENSIONS).join(', ')}`)}
-                </div>
               )}
             </div>
           </div>

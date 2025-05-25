@@ -87,11 +87,11 @@ def sync_warehouses(args, options):
 
 
 def add_computes_to_warehouse(warehouse, computes):
+  external_ids = [c['external_id'] for c in computes]
+  models.Compute.objects.filter(namespace=warehouse).exclude(external_id__in=external_ids).delete()
   for c in computes:
     c['namespace'] = warehouse
     models.Compute.objects.update_or_create(external_id=c['external_id'], defaults=c)
-  external_ids = [c['external_id'] for c in computes]
-  models.Compute.objects.filter(namespace=warehouse).exclude(external_id__in=external_ids).delete()
 
 
 if __name__ == '__main__':
@@ -140,8 +140,15 @@ def update_hive_configs(namespace, hive, host, port=80):
 
   hive_configs = core_v1.read_namespaced_config_map('hive-conf-hiveserver2', namespace)
   hive_site_data = confparse.ConfParse(hive_configs.data['hive-site.xml'])
-  ldap_groups = hive_site_data.get('hive.server2.authentication.ldap.groupFilter', '')
   hive_metastore_uris = hive_site_data.get('hive.metastore.uris')
+
+  # We prioritize getting the ldapGroups from the service-discovery configmap.
+  # If there is no information found in service discovery, we switch to using hive-site
+  service_discovery_cm = core_v1.read_namespaced_config_map('service-discovery-metadata', namespace)
+  ldap_groups = service_discovery_cm.data.get('ldapGroups') if service_discovery_cm else None
+  if ldap_groups is None:
+    LOG.debug('ldap groups not found in cm/service-discovery-metadata for ns: %s' % namespace)
+    ldap_groups = hive_site_data.get('hive.server2.authentication.ldap.groupFilter', '')
 
   settings = [
     {"name": "server_host", "value": host},
@@ -207,11 +214,17 @@ def update_impala_configs(namespace, impala, host):
   hive_site_data = confparse.ConfParse(hive_configs.data['hive-site.xml'])
   hive_metastore_uris = hive_site_data.get('hive.metastore.uris')
 
-  impala_flag_file = core_v1.read_namespaced_config_map('impala-coordinator-flagfile', namespace)
-  flag_file_data = impala_flag_file.data['flagfile']
-  ldap_regex = r'--ldap_group_filter=(.*)'
-  match = re.search(ldap_regex, flag_file_data)
-  ldap_groups = match.group(1) if match and match.group(1) else None
+  # We prioritize getting the ldapGroups from the service-discovery configmap.
+  # If there is no information found in service discovery, we switch to using impala-coordinator-flagfile
+  service_discovery_cm = core_v1.read_namespaced_config_map('service-discovery-metadata', namespace)
+  ldap_groups = service_discovery_cm.data.get('ldapGroups') if service_discovery_cm else None
+  if ldap_groups is None:
+    LOG.debug('ldap groups not found in cm/service-discovery-metadata for ns: %s' % namespace)
+    impala_flag_file = core_v1.read_namespaced_config_map('impala-coordinator-flagfile', namespace)
+    flag_file_data = impala_flag_file.data['flagfile']
+    ldap_regex = r'--ldap_group_filter=(.*)'
+    match = re.search(ldap_regex, flag_file_data)
+    ldap_groups = match.group(1) if match and match.group(1) else None
 
   settings = [
     {"name": "server_host", "value": host},
@@ -220,7 +233,7 @@ def update_impala_configs(namespace, impala, host):
     {"name": "transport_mode", "value": 'http'},
     {"name": "http_url", "value": 'http://%s:%s/cliservice' % (host, impala['server_port'])},
     {"name": "api_url", "value": 'http://%s:%s' % (host, impala['api_port'])},
-    {"name": "impersonation_enabled", "value": False},
+    {"name": "impersonation_enabled", "value": True},
     {"name": "use_sasl", "value": False},
     {"name": "hive_metastore_uris", "value": hive_metastore_uris},
   ]

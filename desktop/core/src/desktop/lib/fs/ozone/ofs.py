@@ -39,7 +39,8 @@ from hadoop.hdfs_site import get_umask_mode
 LOG = logging.getLogger()
 
 
-def get_ofs_home_directory():
+def get_ofs_home_directory(user=None):
+  # TODO: Check if Ozone bring the concept of home directory in the future
   return OFS_ROOT
 
 

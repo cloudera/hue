@@ -200,7 +200,10 @@ class Snippet {
 
     const updateConnector = id => {
       if (id) {
-        self.connector(findEditorConnector(connector => connector.id === id));
+        // when computes are enabled, hive becomes hive-compute.
+        self.connector(
+          findEditorConnector(connector => id === connector.id || id === `${connector.id}-compute`)
+        );
       }
     };
 
@@ -217,7 +220,7 @@ class Snippet {
       return vm.getSnippetViewSettings(self.dialect()).sqlDialect;
     });
 
-    self.dialect = ko.pureComputed(() => this.connector().dialect);
+    self.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
 
     self.isBatchable = ko.computed(() => {
       return (

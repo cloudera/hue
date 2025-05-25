@@ -15,7 +15,7 @@ describe('LoadingErrorWrapper', () => {
       <LoadingErrorWrapper {...defaultProps} loading={true} />
     );
 
-    expect(getAllByTestId('loading-error-wrapper__sppiner')).toHaveLength(2);
+    expect(getAllByTestId('loading-error-wrapper__spinner')).toHaveLength(2);
     expect(queryByText('Children Content')).toBeInTheDocument();
   });
 
@@ -42,7 +42,7 @@ describe('LoadingErrorWrapper', () => {
   it('should render action button for errors with onClick', () => {
     const mockOnClick = jest.fn();
     const errors = [
-      { enabled: true, message: 'Error with action', action: 'Retry', onClick: mockOnClick }
+      { enabled: true, message: 'Error with action', actionText: 'Retry', onClick: mockOnClick }
     ];
 
     const { getByText } = render(

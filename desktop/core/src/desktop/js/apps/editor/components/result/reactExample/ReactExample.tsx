@@ -93,7 +93,7 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ activeExecutable, 
           {t('Open (cuix button)')}
         </PrimaryButton>
         <Dropdown menu={{ items }}>
-          <a>Hover me</a>
+          <a href="http://www.cloudera.com">Hover me</a>
         </Dropdown>
 
         <p className="react-example__description">

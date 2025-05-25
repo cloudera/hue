@@ -8,9 +8,9 @@ on:
     branches:
     - master
 jobs:
-  build:
+  hue-build-and-tests:
 
-    runs-on: ${{ (matrix.python-version == '3.10' || matrix.python-version == '3.11') && 'ubuntu-22.04' || 'ubuntu-20.04' }}
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -22,7 +22,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: run commit title format check
+    - name: Check commit title format
       run: |
         ./tools/ci/check_for_commit_message.sh
 
@@ -36,7 +36,7 @@ jobs:
       with:
         # This path is specific to Ubuntu
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/requirements.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/generate_requirements.py') }}
         restore-keys: |
           ${{ runner.os }}-pip-
           ${{ runner.os }}-
@@ -47,52 +47,33 @@ jobs:
         node-version: 20
         cache: 'npm'
 
-    - name: compile
+    - name: Build Hue
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc g++ build-essential python${{ matrix.python-version }}-dev python${{ matrix.python-version }}-venv python${{ matrix.python-version }}-distutils asciidoc rsync curl sudo libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev  libsasl2-modules-gssapi-mit libsnappy-dev libffi-dev # This should not be needed as some point
-        sudo curl -sL https://bootstrap.pypa.io/get-pip.py | sudo python${{ matrix.python-version }}
-        sudo apt-get install -y python3-setuptools
-        sudo apt-get install -y libncursesw5-dev libgdbm-dev libc6-dev libssl-dev openssl
+        sudo apt-get install -y build-essential asciidoc libkrb5-dev libldap2-dev libsasl2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libgdbm-dev
 
         export PYTHON_VER=python${{ matrix.python-version }}
+        export SKIP_PYTHONDEV_CHECK=true
         export ROOT=$PWD
-        make apps
+        make apps test_prep
 
-    - name: run tests
+    - name: Run unit tests
       run: |
-        mkdir -p test-reports  # Ensure the directory exists
-        PYTHONWARNINGS=always ./build/env/bin/pytest --html=test-reports/report_${{ matrix.python-version }}.html --self-contained-html
- 
-    - name: upload pytest report
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-reports-${{ matrix.python-version }}
-        path: test-reports
-
-    - name: Check and comment if no unit test files are modified
-      if: matrix.python-version == '3.11'
-      run: |
-        git fetch origin master
-        changed_files=$(git diff --name-only origin/master)
-        
-        if echo "$changed_files" | grep -qE '(^test|_test\.py|^tests|_tests\.py|.test)'; then
-          echo "✅ Unit test files were modified."
+        if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+          ./build/env/bin/pytest
         else
-          echo "⚠️ No unit test files modified."
-          
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            -d '{"body":"⚠️ No unit test files modified. Please ensure that changes are properly tested. ⚠️"}' \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+          ./build/venvs/python${{ matrix.python-version }}/bin/pytest
         fi
 
-    - name: run python lints
+    - name: Run python lint check
       run: |
-        PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+        if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+          PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+        else
+          PYTHONWARNINGS=always ./build/venvs/python${{ matrix.python-version }}/bin/hue runruff check
+        fi
 
-    - name: run documentation lints
+    - name: Run documentation lint check
       run: |
         curl -O https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz
         tar -xvf go1.23.4.linux-amd64.tar.gz
@@ -106,4 +87,11 @@ jobs:
         # Trigger linting if documentation changes
         ./tools/ci/check_for_website_dead_links.sh docs/docs-site
         # ./tools/ci/check_for_website_dead_links.sh docs/gethue
+
+    - name: Upload reports
+      if: matrix.python-version == '3.11'
+      uses: actions/upload-artifact@v4
+      with:
+        name: hue-reports
+        path: ./reports
 

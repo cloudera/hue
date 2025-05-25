@@ -22,12 +22,13 @@ import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 import { i18nReact } from '../../utils/i18nReact';
 import CommonHeader from '../../reactComponents/CommonHeader/CommonHeader';
 import StorageBrowserTab from './StorageBrowserTab/StorageBrowserTab';
-import { ApiFileSystem, FILESYSTEMS_API_URL } from '../../reactComponents/FileChooser/api';
+import { FILESYSTEMS_API_URL } from './api';
 
 import './StorageBrowserPage.scss';
 import useLoadData from '../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import { getFileSystemAndPath } from '../../reactComponents/PathBrowser/PathBrowser.util';
+import { FileSystem } from './types';
 
 const StorageBrowserPage = (): JSX.Element => {
   const urlSearchParams = new URLSearchParams(window.location.search);
@@ -36,13 +37,13 @@ const StorageBrowserPage = (): JSX.Element => {
 
   const { t } = i18nReact.useTranslation();
 
-  const { data, loading, error, reloadData } = useLoadData<ApiFileSystem[]>(FILESYSTEMS_API_URL);
+  const { data, loading, error, reloadData } = useLoadData<FileSystem[]>(FILESYSTEMS_API_URL);
 
   const errorConfig = [
     {
       enabled: !!error,
       message: t('An error occurred while fetching the filesystem'),
-      action: t('Retry'),
+      actionText: t('Retry'),
       onClick: reloadData
     }
   ];
@@ -50,20 +51,20 @@ const StorageBrowserPage = (): JSX.Element => {
   return (
     <div className="hue-storage-browser cuix antd">
       <CommonHeader title={t('Storage Browser')} icon={<DataBrowserIcon />} />
-      <LoadingErrorWrapper loading={loading} errors={errorConfig}>
-        <Tabs
-          className="hue-storage-browser__tab"
-          destroyInactiveTabPane
-          defaultActiveKey={urlFileSystem ?? data?.[0]?.file_system}
-          items={data?.map(fs => ({
-            label: fs.file_system.toUpperCase(),
-            key: fs.file_system,
-            children: (
-              <StorageBrowserTab homeDir={fs.user_home_directory} fileSystem={fs.file_system} />
-            )
-          }))}
-        />
-      </LoadingErrorWrapper>
+      <div className="hue-storage-browser__container">
+        <LoadingErrorWrapper loading={loading} errors={errorConfig}>
+          <Tabs
+            className="hue-storage-browser__tab"
+            destroyInactiveTabPane
+            defaultActiveKey={urlFileSystem ?? data?.[0]?.name}
+            items={data?.map(fileSystem => ({
+              label: fileSystem.name.toUpperCase(),
+              key: fileSystem.name,
+              children: <StorageBrowserTab fileSystem={fileSystem} />
+            }))}
+          />
+        </LoadingErrorWrapper>
+      </div>
     </div>
   );
 };

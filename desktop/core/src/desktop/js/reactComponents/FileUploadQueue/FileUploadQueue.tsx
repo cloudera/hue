@@ -15,116 +15,124 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
-import './FileUploadQueue.scss';
-import { Tooltip } from 'antd';
-import CloseIcon from '../../components/icons/CloseIcon';
+import CloseIcon from '@cloudera/cuix-core/icons/react/CloseIcon';
+import CaratDownIcon from '@cloudera/cuix-core/icons/react/CaratDownIcon';
+import CaratUpIcon from '@cloudera/cuix-core/icons/react/CaratUpIcon';
 import { i18nReact } from '../../utils/i18nReact';
-import formatBytes from '../../utils/formatBytes';
-import StatusPendingIcon from '@cloudera/cuix-core/icons/react/StatusPendingIcon';
-import StatusInProgressIcon from '@cloudera/cuix-core/icons/react/StatusInProgressIcon';
-import StatusSuccessIcon from '@cloudera/cuix-core/icons/react/StatusSuccessIcon';
-import StatusStoppedIcon from '@cloudera/cuix-core/icons/react/StatusStoppedIcon';
-import StatusErrorIcon from '@cloudera/cuix-core/icons/react/StatusErrorIcon';
-import { UploadItem } from '../../utils/hooks/useFileUpload/util';
+import { RegularFile, FileStatus } from '../../utils/hooks/useFileUpload/types';
 import useFileUpload from '../../utils/hooks/useFileUpload/useFileUpload';
-import {
-  DEFAULT_ENABLE_CHUNK_UPLOAD,
-  FileUploadStatus
-} from '../../utils/constants/storageBrowser';
+import { DEFAULT_ENABLE_CHUNK_UPLOAD } from '../../utils/constants/storageBrowser';
 import { getLastKnownConfig } from '../../config/hueConfig';
+import FileUploadRow from './FileUploadRow/FileUploadRow';
+import { useHuePubSub } from '../../utils/hooks/useHuePubSub/useHuePubSub';
+import huePubSub from '../../utils/huePubSub';
+import { BorderlessButton } from 'cuix/dist/components/Button';
+import { FILE_UPLOAD_START_EVENT, FILE_UPLOAD_SUCCESS_EVENT } from './event';
 
-interface FileUploadQueueProps {
-  filesQueue: UploadItem[];
-  onClose: () => void;
-  onComplete: () => void;
+import './FileUploadQueue.scss';
+
+interface FileUploadEvent {
+  files: RegularFile[];
 }
 
 const sortOrder = [
-  FileUploadStatus.Uploading,
-  FileUploadStatus.Failed,
-  FileUploadStatus.Pending,
-  FileUploadStatus.Canceled,
-  FileUploadStatus.Uploaded
-].reduce((acc: Record<string, number>, status: FileUploadStatus, index: number) => {
+  FileStatus.Uploading,
+  FileStatus.Failed,
+  FileStatus.Pending,
+  FileStatus.Cancelled,
+  FileStatus.Uploaded
+].reduce((acc: Record<string, number>, status: FileStatus, index: number) => {
   acc[status] = index + 1;
   return acc;
 }, {});
 
-const FileUploadQueue: React.FC<FileUploadQueueProps> = ({ filesQueue, onClose, onComplete }) => {
+const FileUploadQueue = (): JSX.Element => {
+  const { t } = i18nReact.useTranslation();
+
+  const [expandQueue, setExpandQueue] = useState<boolean>(true);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  const onComplete = () => {
+    huePubSub.publish(FILE_UPLOAD_SUCCESS_EVENT);
+  };
+
   const config = getLastKnownConfig();
   const isChunkUpload =
     (config?.storage_browser.enable_chunked_file_upload ?? DEFAULT_ENABLE_CHUNK_UPLOAD) &&
     !!config?.hue_config.enable_task_server;
 
-  const { t } = i18nReact.useTranslation();
-  const [isExpanded, setIsExpanded] = useState(true);
-
-  const { uploadQueue, onCancel } = useFileUpload(filesQueue, {
+  const { uploadQueue, cancelFile, addFiles } = useFileUpload({
     isChunkUpload,
     onComplete
   });
 
-  const uploadedCount = uploadQueue.filter(
-    item => item.status === FileUploadStatus.Uploaded
-  ).length;
-  const pendingCount = uploadQueue.filter(
-    item => item.status === FileUploadStatus.Pending || item.status === FileUploadStatus.Uploading
-  ).length;
+  useHuePubSub<FileUploadEvent>({
+    topic: FILE_UPLOAD_START_EVENT,
+    callback: (data?: FileUploadEvent) => {
+      if (data?.files) {
+        setIsVisible(true);
+        addFiles(data.files);
+      }
+    }
+  });
 
-  const statusIcon = {
-    [FileUploadStatus.Pending]: <StatusPendingIcon />,
-    [FileUploadStatus.Uploading]: <StatusInProgressIcon />,
-    [FileUploadStatus.Uploaded]: <StatusSuccessIcon />,
-    [FileUploadStatus.Canceled]: <StatusStoppedIcon />,
-    [FileUploadStatus.Failed]: <StatusErrorIcon />
+  const onClose = () => {
+    uploadQueue.forEach(file => cancelFile(file));
+    setIsVisible(false);
+  };
+
+  const uploadedCount = uploadQueue.filter(item => item.status === FileStatus.Uploaded).length;
+  const pendingCount = uploadQueue.filter(
+    item => item.status === FileStatus.Pending || item.status === FileStatus.Uploading
+  ).length;
+  const failedCount = uploadQueue.filter(item => item.status === FileStatus.Failed).length;
+
+  if (!isVisible) {
+    return <></>;
+  }
+
+  const getHeaderText = () => {
+    const fileText = uploadQueue.length > 1 ? 'files' : 'file';
+    const uploadedText = `{{uploadedCount}} ${fileText} uploaded`;
+    const pendingText = pendingCount > 0 ? `{{pendingCount}} ${fileText} remaining` : '';
+    const failedText = failedCount > 0 ? `, {{failedCount}} failed` : '';
+    if (pendingCount > 0) {
+      return `${pendingText}${failedText}`;
+    }
+    return `${uploadedText}${failedText}`;
   };
 
   return (
-    <div className="upload-queue cuix antd">
-      <div
-        className="upload-queue__header"
-        data-testid="upload-queue__header"
-        onClick={() => setIsExpanded(prev => !prev)}
-      >
-        {pendingCount > 0
-          ? t('{{count}} file(s) remaining', {
-              count: pendingCount
-            })
-          : t('{{count}} file(s) uploaded', {
-              count: uploadedCount
-            })}
-        <CloseIcon onClick={onClose} height={16} width={16} />
+    <div className="hue-upload-queue-container antd cuix">
+      <div className="hue-upload-queue-container__header" data-testid="hue-upload-queue__header">
+        {t(getHeaderText(), {
+          pendingCount,
+          uploadedCount,
+          failedCount
+        })}
+        <div className="hue-upload-queue-container__header__button-group">
+          <BorderlessButton
+            onClick={() => setExpandQueue(!expandQueue)}
+            data-testid="hue-upload-queue-container__expand-button"
+            icon={expandQueue ? <CaratDownIcon /> : <CaratUpIcon />}
+          />
+          <BorderlessButton
+            onClick={onClose}
+            data-testid="hue-upload-queue-container__close-button"
+            icon={<CloseIcon />}
+          />
+        </div>
       </div>
-      {isExpanded && (
-        <div className="upload-queue__list">
+      {expandQueue && (
+        <div className="hue-upload-queue-container__list">
           {uploadQueue
             .sort((a, b) => sortOrder[a.status] - sortOrder[b.status])
-            .map((row: UploadItem) => (
-              <div key={`${row.filePath}__${row.file.name}`} className="upload-queue__list__row">
-                <Tooltip
-                  title={row.status}
-                  mouseEnterDelay={1.5}
-                  className="upload-queue__list__row__status"
-                >
-                  {statusIcon[row.status]}
-                </Tooltip>
-                <div className="upload-queue__list__row__name">{row.file.name}</div>
-                <div className="upload-queue__list__row__size">{formatBytes(row.file.size)}</div>
-                {row.status === FileUploadStatus.Pending && (
-                  <Tooltip
-                    title={t('Cancel')}
-                    mouseEnterDelay={1.5}
-                    className="upload-queue__list__row__close"
-                  >
-                    <CloseIcon
-                      data-testid="upload-queue__list__row__close-icon"
-                      onClick={() => onCancel(row)}
-                      height={16}
-                      width={16}
-                    />
-                  </Tooltip>
-                )}
-              </div>
+            .map((row: RegularFile) => (
+              <FileUploadRow
+                key={`${row.filePath}__${row.file.name}`}
+                data={row}
+                onCancel={() => cancelFile(row)}
+              />
             ))}
         </div>
       )}

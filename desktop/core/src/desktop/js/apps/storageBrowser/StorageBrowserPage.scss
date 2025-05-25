@@ -21,32 +21,28 @@
   @include mixins.fillAbsolute;
   @include mixins.flexRowLayout;
 
-  height: 100%;
+  min-width: 300px;
 
-  .ant-spin-nested-loading {
+  .hue-storage-browser__container {
     height: 100%;
-
-    .ant-spin-container {
-      height: 100%;
-    }
-  }
-
-  .hue-storage-browser__tab {
-    display: flex;
-    height: 100%;
-    background-color: vars.$fluidx-gray-100;
+    overflow: auto;
     padding: 0 16px;
+    background-color: vars.$fluidx-gray-100;
 
-    .ant-tabs-content-holder {
+    .hue-storage-browser__tab {
       display: flex;
-      flex: 1;
-      overflow: auto;
+      height: 100%;
 
-      .ant-tabs-content,
-      .ant-tabs-tabpane-active {
+      .ant-tabs-content-holder {
         display: flex;
-        flex-direction: column;
         flex: 1;
+
+        .ant-tabs-content,
+        .ant-tabs-tabpane-active {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+        }
       }
     }
   }

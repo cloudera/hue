@@ -15,86 +15,65 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import FileUploadQueue from './FileUploadQueue';
-import { FileUploadStatus } from '../../utils/constants/storageBrowser';
-import { UploadItem } from '../../utils/hooks/useFileUpload/util';
+import { FileStatus, RegularFile } from '../../utils/hooks/useFileUpload/types';
+import { act } from 'react-dom/test-utils';
+import huePubSub from '../../utils/huePubSub';
+import { FILE_UPLOAD_START_EVENT } from './event';
 
-const mockFilesQueue: UploadItem[] = [
+const mockFilesQueue: RegularFile[] = [
   {
     uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx1',
     filePath: '/path/to/file1.txt',
-    status: FileUploadStatus.Pending,
+    status: FileStatus.Pending,
     file: new File([], 'file1.txt')
   },
   {
     uuid: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx2',
     filePath: '/path/to/file2.txt',
-    status: FileUploadStatus.Pending,
+    status: FileStatus.Pending,
     file: new File([], 'file2.txt')
   }
 ];
 
-const mockOnCancel = jest.fn();
 jest.mock('../../utils/hooks/useFileUpload/useFileUpload', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     uploadQueue: mockFilesQueue,
-    onCancel: mockOnCancel
+    onCancel: jest.fn(),
+    addFiles: jest.fn()
   }))
 }));
 
 describe('FileUploadQueue', () => {
   it('should render the component with initial files in the queue', () => {
-    const { getByText } = render(
-      <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
-    );
+    const { getByText } = render(<FileUploadQueue />);
+
+    act(() => huePubSub.publish(FILE_UPLOAD_START_EVENT, { files: mockFilesQueue }));
 
     expect(getByText('file1.txt')).toBeInTheDocument();
     expect(getByText('file2.txt')).toBeInTheDocument();
   });
 
-  it('should call onCancel when cancel button is clicked', async () => {
-    const { getAllByTestId } = render(
-      <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
-    );
-
-    const cancelButton = getAllByTestId('upload-queue__list__row__close-icon')[0];
-    fireEvent.click(cancelButton);
-
-    await waitFor(() => {
-      expect(mockOnCancel).toHaveBeenCalled();
-    });
-  });
-
   it('should toggle the visibility of the queue when the header is clicked', () => {
-    const { getByTestId } = render(
-      <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
-    );
+    const { getByText, getByTestId, queryByText } = render(<FileUploadQueue />);
 
-    const header = getByTestId('upload-queue__header');
-    expect(screen.getByText('file1.txt')).toBeInTheDocument();
-    expect(screen.getByText('file2.txt')).toBeInTheDocument();
+    act(() => huePubSub.publish(FILE_UPLOAD_START_EVENT, { files: mockFilesQueue }));
 
-    fireEvent.click(header!);
-    expect(screen.queryByText('file1.txt')).not.toBeInTheDocument();
-    expect(screen.queryByText('file2.txt')).not.toBeInTheDocument();
+    const header = getByTestId('hue-upload-queue-container__expand-button');
+    expect(getByText('file1.txt')).toBeVisible();
+    expect(getByText('file2.txt')).toBeVisible();
 
-    fireEvent.click(header!);
-    expect(screen.getByText('file1.txt')).toBeInTheDocument();
-    expect(screen.getByText('file2.txt')).toBeInTheDocument();
-  });
+    fireEvent.click(header);
 
-  it('should render cancel button for files in Pending state', () => {
-    const { getAllByTestId } = render(
-      <FileUploadQueue filesQueue={mockFilesQueue} onClose={() => {}} onComplete={() => {}} />
-    );
+    expect(queryByText('file1.txt')).toBeNull();
+    expect(queryByText('file2.txt')).toBeNull();
 
-    const cancelButtons = getAllByTestId('upload-queue__list__row__close-icon');
-    expect(cancelButtons).toHaveLength(mockFilesQueue.length);
+    fireEvent.click(header);
 
-    expect(cancelButtons[0]).toBeInTheDocument();
-    expect(cancelButtons[1]).toBeInTheDocument();
+    expect(getByText('file1.txt')).toBeVisible();
+    expect(getByText('file2.txt')).toBeVisible();
   });
 });

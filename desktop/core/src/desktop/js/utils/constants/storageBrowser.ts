@@ -27,15 +27,8 @@ export enum SupportedFileTypes {
   DOCUMENT = 'document',
   AUDIO = 'audio',
   VIDEO = 'video',
+  COMPRESSED = 'compressed',
   OTHER = 'other'
-}
-
-export enum FileUploadStatus {
-  Pending = 'Pending',
-  Uploading = 'Uploading',
-  Uploaded = 'Uploaded',
-  Canceled = 'Canceled',
-  Failed = 'Failed'
 }
 
 export const SUPPORTED_FILE_EXTENSIONS: Record<string, SupportedFileTypes> = {
@@ -59,9 +52,13 @@ export const SUPPORTED_FILE_EXTENSIONS: Record<string, SupportedFileTypes> = {
 
   mp3: SupportedFileTypes.AUDIO,
 
-  mp4: SupportedFileTypes.VIDEO
+  mp4: SupportedFileTypes.VIDEO,
+
+  zip: SupportedFileTypes.COMPRESSED,
+  'tar.gz': SupportedFileTypes.COMPRESSED,
+  tgz: SupportedFileTypes.COMPRESSED,
+  bz2: SupportedFileTypes.COMPRESSED,
+  bzip: SupportedFileTypes.COMPRESSED
 };
 
-export const EDITABLE_FILE_FORMATS = new Set([SupportedFileTypes.TEXT]);
-
-export const SUPPORTED_COMPRESSED_FILE_EXTENTION = ['zip', 'tar.gz', 'tgz', 'bz2', 'bzip'];
+export const EDITABLE_FILE_FORMATS = new Set([SupportedFileTypes.TEXT, SupportedFileTypes.OTHER]);

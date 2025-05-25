@@ -1662,6 +1662,13 @@ OIDC = ConfigSection(
       default=False
     ),
 
+    OIDC_AUTH_REQUEST_EXTRA_PARAMS=Config(
+      key="oidc_auth_request_extra_params",
+      help=_("OIDC authentication request extra params."),
+      type=coerce_json_dict,
+      default='{}'
+    ),
+
     LOGIN_REDIRECT_URL=Config(
       key="login_redirect_url",
       help=_("As relay party Hue URL path to redirect to after login."),
@@ -1892,6 +1899,13 @@ ENABLE_NEW_STORAGE_BROWSER = Config(
   default=False
 )
 
+ENABLE_NEW_IMPORTER = Config(
+  key="enable_new_importer",
+  help=_("Feature flag to enable new Hue Importer."),
+  type=coerce_bool,
+  default=False
+)
+
 
 def is_chunked_fileuploader_enabled():
   return ENABLE_CHUNKED_FILE_UPLOADER.get()
@@ -1925,6 +1939,13 @@ ENABLE_SHARING = Config(
     'Global setting to enable or disable document sharing. Note that this does not affect currently shared documents.'),
   type=coerce_bool,
   default=True)
+
+ENABLE_WORKFLOW_CREATION_ACTION = Config(
+  key="enable_workflow_creation_action",
+  help=_('Global setting to enable or disable new workflow creation in Hue documents.'),
+  type=coerce_bool,
+  default=True,
+)
 
 USE_NEW_ASSIST_PANEL = Config(
   key='use_new_assist_panel',
@@ -2642,7 +2663,6 @@ def config_validator(user):
   from desktop.lib import i18n
   from desktop.models import Document, Document2  # Avoid cyclic loop
   from desktop.settings import DOCUMENT2_MAX_ENTRIES  # Avoid cyclic loop
-  from oozie.models import Job
 
   res = []
 
@@ -2671,10 +2691,14 @@ def config_validator(user):
     res.append(('SavedQuery_CLEANUP_WARNING', str(_('Saved Query has more than %d entries: %d, '
                 'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, sq_count)))))
 
-  job_count = Job.objects.count()
-  if job_count > DOCUMENT2_MAX_ENTRIES:
-    res.append(('OOZIEJOB_CLEANUP_WARNING', str(_('Oozie Job has more than %d entries: %d, '
-                'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, job_count)))))
+  # Check if oozie is enabled and present in INSTALLED_APPS
+  from desktop.settings import INSTALLED_APPS  # Avoid circular import
+  if 'oozie' in INSTALLED_APPS:
+    from oozie.models import Job
+    job_count = Job.objects.count()
+    if job_count > DOCUMENT2_MAX_ENTRIES:
+      res.append(('OOZIEJOB_CLEANUP_WARNING', str(_('Oozie Job has more than %d entries: %d, '
+                  'please run "hue desktop_document_cleanup --cm-managed" to remove old entries' % (DOCUMENT2_MAX_ENTRIES, job_count)))))
 
   if not get_secret_key():
     res.append((SECRET_KEY, str(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))

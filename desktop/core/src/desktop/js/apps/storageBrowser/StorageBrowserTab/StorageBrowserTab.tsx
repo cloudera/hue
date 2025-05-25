@@ -15,25 +15,33 @@
 // limitations under the License.
 
 import React, { useEffect, useState } from 'react';
+import { Alert } from 'antd';
+import { AxiosError } from 'axios';
+import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
+import RefreshIcon from '@cloudera/cuix-core/icons/react/RefreshIcon';
+import HomeIcon from '@cloudera/cuix-core/icons/react/HomeIcon';
+import DeleteIcon from '@cloudera/cuix-core/icons/react/DeleteIcon';
 
 import { i18nReact } from '../../../utils/i18nReact';
-import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
-
 import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import StorageDirectoryPage from '../StorageDirectoryPage/StorageDirectoryPage';
-import { FILE_STATS_API_URL } from '../../../reactComponents/FileChooser/api';
-import { BrowserViewType, FileStats } from '../../../reactComponents/FileChooser/types';
+import { FILE_STATS_API_URL, TRASH_PATH } from '../api';
+import { BrowserViewType, FileStats, FileSystem, TrashData } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
-
-import './StorageBrowserTab.scss';
+import { BorderlessButton } from 'cuix/dist/components/Button';
 import StorageFilePage from '../StorageFilePage/StorageFilePage';
 import changeURL from '../../../utils/url/changeURL';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
-import { getFileSystemAndPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import {
+  getLastDirOrFileNameFromPath,
+  getFileSystemAndPath
+} from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import { inTrash } from '../../../utils/storageBrowserUtils';
+
+import './StorageBrowserTab.scss';
 
 interface StorageBrowserTabProps {
-  homeDir: string;
-  fileSystem: string;
+  fileSystem: FileSystem;
   testId?: string;
 }
 
@@ -41,28 +49,43 @@ const defaultProps = {
   testId: 'hue-storage-browser-tab-content'
 };
 
-const StorageBrowserTab = ({
-  homeDir,
-  fileSystem,
-  testId
-}: StorageBrowserTabProps): JSX.Element => {
+const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.Element => {
   const urlPathname = window.location.pathname;
   const urlSearchParams = new URLSearchParams(window.location.search);
   const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
   const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
-  const initialFilePath = urlFileSystem === fileSystem ? urlFilePath : homeDir;
+  const initialFilePath =
+    urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
-  const fileName = filePath.split('/').pop() ?? '';
+  const fileName = getLastDirOrFileNameFromPath(filePath);
 
   const { t } = i18nReact.useTranslation();
+
+  const { data: trashData, reloadData: onTrashPathReload } = useLoadData<TrashData>(TRASH_PATH, {
+    params: { path: fileSystem.userHomeDirectory },
+    skip: !fileSystem.config?.isTrashEnabled || !fileSystem.userHomeDirectory
+  });
+
+  const onTrashClick = async () => {
+    const latestTrashData = await onTrashPathReload();
+    setFilePath(latestTrashData?.trashPath ?? '');
+  };
+
+  const reloadTrashPath = () => {
+    if (trashData?.trashPath || !fileSystem.config?.isTrashEnabled) {
+      return;
+    }
+    onTrashPathReload();
+  };
 
   const {
     data: fileStats,
     loading,
     error,
     reloadData
-  } = useLoadData<FileStats>(FILE_STATS_API_URL, {
+  } = useLoadData<FileStats, { path: string }, AxiosError>(FILE_STATS_API_URL, {
+    fetchOptions: { isRawError: true },
     params: { path: filePath },
     skip: !filePath
   });
@@ -79,52 +102,111 @@ const StorageBrowserTab = ({
     }
   }, [filePath, urlPathname, urlFilePath, window.location]);
 
-  const errorConfig = [
+  const errors = [
     {
-      enabled: error?.response?.status === 404,
-      message: t('Error: Path "{{path}}" not found.', { path: filePath }),
-      action: t('Go to home directory'),
-      onClick: () => setFilePath(homeDir)
+      enabled: error?.response?.status === 404 && filePath !== fileSystem.userHomeDirectory,
+      message: t('Path "{{path}}" does not exist.', { path: filePath })
     },
     {
-      enabled: !!error && error?.response?.status !== 404,
-      message: t('An error occurred while fetching filesystem "{{fileSystem}}".', {
-        fileSystem: fileSystem.toUpperCase()
+      enabled: error?.response?.status === 404 && filePath === fileSystem.userHomeDirectory,
+      message: t('User home directory "{{path}}" does not exist.', {
+        path: filePath
+      })
+    },
+    {
+      enabled: error?.response?.status === 403,
+      message: t('Unauthorized access to the path "{{path}}".', {
+        path: filePath
+      })
+    },
+    {
+      enabled: !!error && error?.response?.status !== 404 && error?.response?.status !== 403,
+      message: t('An unkown error occurred while fetching path "{{path}}".', {
+        path: filePath
       }),
-      action: t('Retry'),
+      actionText: t('Retry'),
       onClick: reloadData
     }
   ];
 
   return (
-    <LoadingErrorWrapper loading={loading} errors={errorConfig}>
-      <div className="hue-storage-browser-tab-content" data-testid={testId}>
-        <div className="hue-storage-browser__title-bar" data-testid={`${testId}-title-bar`}>
-          <BucketIcon className="hue-storage-browser__icon" data-testid={`${testId}-icon`} />
-          <h3 className="hue-storage-browser__folder-name" data-testid={`${testId}-folder-namer`}>
+    <div className="hue-storage-browser-tab" data-testid={testId}>
+      <div
+        className="hue-storage-browser-tab__title-bar-container"
+        data-testid={`${testId}-title-bar`}
+      >
+        <div className="hue-storage-browser-tab__title-bar">
+          <BucketIcon
+            className="hue-storage-browser-tab__title-bar-icon"
+            data-testid={`${testId}-icon`}
+          />
+          <h3
+            className="hue-storage-browser-tab__title-bar-name"
+            data-testid={`${testId}-folder-namer`}
+          >
             {fileName}
           </h3>
         </div>
-        <div
-          className="hue-storage-browser__path-browser-panel"
-          data-testid={`${testId}-path-browser-panel`}
-        >
-          <span className="hue-storage-browser__filePath">{t('File Path:')}</span>
-          <PathBrowser
-            filePath={filePath}
-            onFilepathChange={setFilePath}
-            seperator={'/'}
-            showIcon={false}
-          />
+        <div className="hue-storage-browser-tab__title-bar-button-group">
+          <BorderlessButton
+            onClick={() => {
+              setFilePath(fileSystem.userHomeDirectory);
+            }}
+            className="hue-storage-browser-tab__title-bar-button"
+            title={t('Home')}
+            icon={<HomeIcon />}
+          >
+            {t('Home')}
+          </BorderlessButton>
+          {fileSystem.config?.isTrashEnabled && (
+            <BorderlessButton
+              onClick={onTrashClick}
+              className="hue-storage-browser-tab__title-bar-button"
+              title={t('Trash')}
+              icon={<DeleteIcon />}
+              disabled={!trashData?.trashPath}
+            >
+              {t('Trash')}
+            </BorderlessButton>
+          )}
+          <BorderlessButton
+            onClick={reloadData}
+            className="hue-storage-browser-tab__title-bar-button"
+            title={t('Refresh')}
+            icon={<RefreshIcon />}
+          >
+            {t('Refresh')}
+          </BorderlessButton>
         </div>
+      </div>
+      {!!inTrash(filePath) && fileSystem.name === 'hdfs' && (
+        <Alert
+          type="warning"
+          message={t(
+            'This is Hadoop trash. Files will be under a checkpoint, or timestamp named, directory.'
+          )}
+        />
+      )}
+      <div
+        className="hue-storage-browser-tab__path-browser-container"
+        data-testid={`${testId}-path-browser-panel`}
+      >
+        <PathBrowser filePath={filePath} onFilepathChange={setFilePath} />
+      </div>
+      <LoadingErrorWrapper loading={loading} errors={errors}>
         {fileStats?.type === BrowserViewType.dir && !loading && (
-          <StorageDirectoryPage fileStats={fileStats} onFilePathChange={setFilePath} />
+          <StorageDirectoryPage
+            fileStats={fileStats}
+            onFilePathChange={setFilePath}
+            fileSystem={fileSystem}
+            reloadTrashPath={reloadTrashPath}
+          />
         )}
         {fileStats?.type === BrowserViewType.file && !loading && (
-          <StorageFilePage fileName={fileName} fileStats={fileStats} onReload={reloadData} />
+          <StorageFilePage fileStats={fileStats} onReload={reloadData} />
         )}
-      </div>
-    </LoadingErrorWrapper>
+      </LoadingErrorWrapper>
+    </div>
   );
 };
 

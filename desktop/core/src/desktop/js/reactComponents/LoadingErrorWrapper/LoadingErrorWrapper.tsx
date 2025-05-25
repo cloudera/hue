@@ -14,38 +14,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Spin } from 'antd';
-import { PrimaryButton } from 'cuix/dist/components/Button';
 import React from 'react';
+import { Alert, AlertProps, Spin } from 'antd';
+import { BorderlessButton } from 'cuix/dist/components/Button';
+import SpinnerIcon from 'cuix/dist/components/SpinnerIcon';
+
 import './LoadingErrorWrapper.scss';
 
 interface WrapperError {
   enabled: boolean;
-  message: string;
-  action?: string;
-  onClick?: () => void;
+  message: AlertProps['message'];
+  description?: AlertProps['description'];
+  actionText?: string;
+  onClick?: AlertProps['onClick'];
+  closable?: AlertProps['closable'];
 }
 
 interface LoadingErrorWrapperProps {
-  loading: boolean;
-  errors: WrapperError[];
+  loading?: boolean;
+  errors?: WrapperError[];
   children: React.ReactNode;
+  hideOnLoading?: boolean;
+  hideOnError?: boolean;
 }
 
 const LoadingErrorWrapper = ({
-  loading,
-  errors,
-  children
+  loading = false,
+  errors = [],
+  children,
+  hideOnLoading = false,
+  hideOnError = false
 }: LoadingErrorWrapperProps): JSX.Element => {
   if (loading) {
-    // TODO: discuss in UI meeting, if we need to render children while loading
-    // Initial thoughts:
-    // -- On first render -> hide children
-    // -- On re-render -> render children
     return (
-      <Spin spinning={loading} data-testid="loading-error-wrapper__sppiner">
-        {children}
-      </Spin>
+      <div className="loading-error-wrapper__spinner">
+        <Spin
+          spinning={loading}
+          indicator={<SpinnerIcon size="default" />}
+          data-testid="loading-error-wrapper__spinner"
+        >
+          {hideOnLoading === false && children}
+        </Spin>
+      </div>
     );
   }
 
@@ -53,18 +63,22 @@ const LoadingErrorWrapper = ({
   if (enabledErrors.length > 0) {
     return (
       <>
-        {enabledErrors
-          .filter(error => error.enabled)
-          .map(error => (
-            <div className="loading-error-wrapper__error" key={error.message}>
-              <div>{error.message}</div>
-              {error.onClick && (
-                <PrimaryButton onClick={error.onClick} data-event="">
-                  {error.action}
-                </PrimaryButton>
-              )}
-            </div>
+        <div className="loading-error-wrapper__errors">
+          {enabledErrors.map(error => (
+            <Alert
+              showIcon
+              key={error.message?.toString()}
+              type="error"
+              message={error.message}
+              description={error.description}
+              closable={error.closable}
+              action={
+                <BorderlessButton onClick={error.onClick}>{error.actionText}</BorderlessButton>
+              }
+            />
           ))}
+        </div>
+        {hideOnError === false && children}
       </>
     );
   }

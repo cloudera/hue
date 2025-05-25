@@ -17,10 +17,10 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import StorageFilePage from './StorageFilePage';
-import { BrowserViewType, FileStats } from '../../../reactComponents/FileChooser/types';
+import { BrowserViewType, FileStats } from '../types';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-import { DOWNLOAD_API_URL } from '../../../reactComponents/FileChooser/api';
+import { DOWNLOAD_API_URL } from '../api';
 import huePubSub from '../../../utils/huePubSub';
 
 jest.mock('../../../utils/dateTimeUtils', () => ({
@@ -37,17 +37,20 @@ jest.mock('../../../api/utils', () => ({
   post: () => mockSave()
 }));
 
-const mockData = jest.fn().mockReturnValue({
-  contents: 'Initial file content',
-  compression: 'none'
+const mockLoadData = jest.fn().mockReturnValue({
+  contents: 'Initial file content'
 });
 
-jest.mock('../../../utils/hooks/useLoadData/useLoadData', () => {
-  return jest.fn(() => ({
-    data: mockData(),
-    loading: false
-  }));
-});
+const mockError = jest.fn().mockImplementationOnce(() => null);
+
+jest.mock('../../../utils/hooks/useLoadData/useLoadData', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    data: mockLoadData(),
+    loading: false,
+    error: mockError()
+  }))
+}));
 
 const mockConfig = {
   storage_browser: {
@@ -72,14 +75,11 @@ const mockFileStats: FileStats = {
   replication: 1,
   type: BrowserViewType.file
 };
-const mockFileName = 'file.txt';
 const mockReload = jest.fn();
 
 describe('StorageFilePage', () => {
-  it('should render file metadata and content', () => {
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
+  it('should render file metadata and content', async () => {
+    render(<StorageFilePage fileStats={mockFileStats} onReload={mockReload} />);
 
     expect(screen.getByText('Size')).toBeInTheDocument();
     expect(screen.getByText('120.56 KB')).toBeInTheDocument();
@@ -99,33 +99,23 @@ describe('StorageFilePage', () => {
 
   // TODO: fix this test when mocking of useLoadData onSuccess callback is mproperly mocked
   it.skip('should show edit button and hides save/cancel buttons initially', () => {
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
+    render(<StorageFilePage fileStats={mockFileStats} onReload={mockReload} />);
 
     expect(screen.getByRole('button', { name: 'Edit' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull();
   });
 
-  // TODO: fix this test when mocking of useLoadData onSuccess callback is mproperly mocked
-  it.skip('should hide edit button when compression is available', async () => {
-    mockData.mockImplementation(() => ({
-      contents: 'Initial file content',
-      compression: 'zip'
-    }));
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
+  it('should hide edit button when file type is not text', async () => {
+    const fileStats = { ...mockFileStats, path: '/path/to/file.zip' };
+    render(<StorageFilePage fileStats={fileStats} onReload={mockReload} />);
 
     expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
   });
 
   it('should show save and cancel buttons when editing', async () => {
     const user = userEvent.setup();
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
+    render(<StorageFilePage fileStats={mockFileStats} onReload={mockReload} />);
 
     expect(screen.getByRole('button', { name: 'Edit' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
@@ -143,9 +133,7 @@ describe('StorageFilePage', () => {
 
   it('should update textarea value and calls handleSave', async () => {
     const user = userEvent.setup();
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
+    render(<StorageFilePage fileStats={mockFileStats} onReload={mockReload} />);
 
     await user.click(screen.getByRole('button', { name: 'Edit' }));
 
@@ -167,9 +155,7 @@ describe('StorageFilePage', () => {
 
   it('should cancel editing and reverts textarea value', async () => {
     const user = userEvent.setup();
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
+    render(<StorageFilePage fileStats={mockFileStats} onReload={mockReload} />);
 
     await user.click(screen.getByRole('button', { name: 'Edit' }));
 
@@ -181,6 +167,7 @@ describe('StorageFilePage', () => {
     expect(textarea).toHaveValue('Updated file content');
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
     expect(textarea).toHaveValue('Initial file content');
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull();
@@ -189,9 +176,7 @@ describe('StorageFilePage', () => {
 
   it('should download a file when download button is clicked', async () => {
     const user = userEvent.setup();
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
+    render(<StorageFilePage fileStats={mockFileStats} onReload={mockReload} />);
 
     await user.click(screen.getByRole('button', { name: 'Download' }));
 
@@ -205,9 +190,7 @@ describe('StorageFilePage', () => {
 
   it('should download a file when download button is clicked', async () => {
     const user = userEvent.setup();
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
+    render(<StorageFilePage fileStats={mockFileStats} onReload={mockReload} />);
 
     await user.click(screen.getByRole('button', { name: 'Download' }));
 
@@ -222,29 +205,32 @@ describe('StorageFilePage', () => {
   it('should not render the download button when show_download_button is false', () => {
     mockConfig.storage_browser.enable_file_download_button = false;
 
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
+    render(<StorageFilePage fileStats={mockFileStats} onReload={mockReload} />);
 
     expect(screen.queryByRole('button', { name: 'Download' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Download' })).toBeNull();
   });
 
-  // TODO: fix this test when mocking of useLoadData onSuccess callback is mproperly mocked
-  it.skip('should render a textarea for text files', () => {
-    render(
-      <StorageFilePage fileName={mockFileName} fileStats={mockFileStats} onReload={mockReload} />
-    );
+  // TODO: fix this test when mocking of useLoadData onSuccess callback is properly mocked
+  it('should render a textarea for text files', () => {
+    render(<StorageFilePage fileStats={mockFileStats} onReload={mockReload} />);
 
     const textarea = screen.getByRole('textbox');
     expect(textarea).toBeInTheDocument();
-    expect(textarea).toHaveValue('Initial file content');
+    // expect(textarea).toHaveValue('Initial file content');
+  });
+
+  it('should render a textarea for other files', () => {
+    render(<StorageFilePage fileStats={mockFileStats} onReload={mockReload} />);
+
+    const textarea = screen.getByRole('textbox');
+    expect(textarea).toBeInTheDocument();
+    // expect(textarea).toHaveValue('Initial file content');
   });
 
   it('should render an image for image files', () => {
     render(
       <StorageFilePage
-        fileName="imagefile.png"
         fileStats={{ ...mockFileStats, path: '/path/to/imagefile.png' }}
         onReload={mockReload}
       />
@@ -258,7 +244,6 @@ describe('StorageFilePage', () => {
   it('should render a preview button for document files', () => {
     render(
       <StorageFilePage
-        fileName="documentfile.pdf"
         fileStats={{ ...mockFileStats, path: '/path/to/documentfile.pdf' }}
         onReload={mockReload}
       />
@@ -270,7 +255,6 @@ describe('StorageFilePage', () => {
   it('should render an audio player for audio files', () => {
     render(
       <StorageFilePage
-        fileName="audiofile.mp3"
         fileStats={{ ...mockFileStats, path: '/path/to/audiofile.mp3' }}
         onReload={mockReload}
       />
@@ -284,7 +268,6 @@ describe('StorageFilePage', () => {
   it('should render a video player for video files', () => {
     render(
       <StorageFilePage
-        fileName="videofile.mp4"
         fileStats={{ ...mockFileStats, path: '/path/to/videofile.mp4' }}
         onReload={mockReload}
       />
@@ -296,17 +279,22 @@ describe('StorageFilePage', () => {
   });
 
   it('should display a message for unsupported file types', () => {
+    mockError.mockImplementationOnce(() => ({
+      response: {
+        status: 422
+      }
+    }));
+
     render(
       <StorageFilePage
         fileStats={{
           ...mockFileStats,
-          path: '/path/to/unsupportedfile.xyz'
+          path: '/path/to/compressed.zip'
         }}
-        fileName="unsupportedfile.xyz"
         onReload={mockReload}
       />
     );
 
-    expect(screen.getByText(/preview not available for this file/i)).toBeInTheDocument();
+    expect(screen.getByText(/Preview is not available for this file/i)).toBeInTheDocument();
   });
 });

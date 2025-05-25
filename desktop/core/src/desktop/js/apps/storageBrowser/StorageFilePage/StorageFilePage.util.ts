@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { TFunction } from 'i18next';
-import { FileStats } from '../../../reactComponents/FileChooser/types';
+import { FileStats } from '../types';
 import { formatTimestamp } from '../../../utils/dateTimeUtils';
 import formatBytes from '../../../utils/formatBytes';
 import {
@@ -64,9 +64,10 @@ export const getFileMetaData = (t: TFunction, fileStats: FileStats): MetaData[][
 };
 
 export const getFileType = (fileName: string): SupportedFileTypes => {
-  const fileExtension = fileName?.split('.')?.pop()?.toLowerCase();
-  if (!fileExtension) {
-    return SupportedFileTypes.OTHER;
+  for (const fileExtension in SUPPORTED_FILE_EXTENSIONS) {
+    if (fileName.toLowerCase().endsWith(`.${fileExtension}`)) {
+      return SUPPORTED_FILE_EXTENSIONS[fileExtension];
+    }
   }
-  return SUPPORTED_FILE_EXTENSIONS[fileExtension] ?? SupportedFileTypes.OTHER;
+  return SupportedFileTypes.OTHER;
 };

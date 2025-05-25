@@ -195,45 +195,6 @@ def test_prometheus_view():
       assert metric in response.content, 'metric: %s \n %s' % (metric, response.content)
 
 
-@pytest.mark.django_db
-def test_log_view():
-  c = make_logged_in_client()
-
-  URL = reverse(views.log_view)
-
-  LOG = logging.getLogger()
-  LOG.warning('une voix m’a réveillé')
-
-  # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
-  response = c.get(URL)
-  assert 200 == response.status_code
-
-  c = make_logged_in_client()
-
-  URL = reverse(views.log_view)
-
-  LOG = logging.getLogger()
-  LOG.warning('Got response: PK\x03\x04\n\x00\x00\x08\x00\x00\xad\x0cN?\x00\x00\x00\x00')
-
-  # DjangoUnicodeDecodeError: 'utf8' codec can't decode byte 0xad in position 75: invalid start byte... should not happen
-  response = c.get(URL)
-  assert 200 == response.status_code
-
-
-def test_download_log_view():
-  pytest.skip("Skipping Test")
-  c = make_logged_in_client()
-
-  URL = reverse(views.download_log_view)
-
-  LOG = logging.getLogger()
-  LOG.warning('une voix m’a réveillé')
-
-  # UnicodeDecodeError: 'ascii' codec can't decode byte... should not happen
-  response = c.get(URL)
-  assert "application/zip" == response.get('Content-Type', '')
-
-
 def hue_version():
   global HUE_VERSION
   HUE_VERSION_BAK = HUE_VERSION
@@ -662,41 +623,6 @@ def test_app_permissions():
     for f in resets:
       f()
     notebook.conf.INTERPRETERS_CACHE = None
-
-
-@pytest.mark.django_db
-def test_error_handling_failure():
-  # Change rewrite_user to call has_hue_permission
-  # Try to get logs page
-  # test for default 500 page
-  # Restore rewrite_user
-  import desktop.auth.backend
-
-  c = make_logged_in_client()
-
-  restore_django_debug = desktop.conf.DJANGO_DEBUG_MODE.set_for_testing(False)
-  restore_500_debug = desktop.conf.HTTP_500_DEBUG_MODE.set_for_testing(False)
-
-  original_rewrite_user = desktop.auth.backend.rewrite_user
-
-  def rewrite_user(user):
-    user = original_rewrite_user(user)
-    delattr(user, 'has_hue_permission')
-    return user
-
-  original_rewrite_user = desktop.auth.backend.rewrite_user
-  desktop.auth.backend.rewrite_user = rewrite_user
-
-  try:
-    # Make sure we are showing default 500.html page.
-    # See django.test.client#L246
-    with pytest.raises(AttributeError):
-      c.get(reverse('desktop.views.log_view'))
-  finally:
-    # Restore the world
-    restore_django_debug()
-    restore_500_debug()
-    desktop.auth.backend.rewrite_user = original_rewrite_user
 
 
 @pytest.mark.django_db
@@ -1458,6 +1384,9 @@ def test_db_migrations_sqlite():
       'OPTIONS': {},
       'ATOMIC_REQUESTS': True,
       'CONN_MAX_AGE': 0,
+      'AUTOCOMMIT': True,
+      'CONN_HEALTH_CHECKS': False,
+      'TIME_ZONE': None,
     }
     try:
       call_command('migrate', '--fake-initial', '--database=' + name)

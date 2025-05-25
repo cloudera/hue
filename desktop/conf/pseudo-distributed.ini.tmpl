@@ -246,6 +246,9 @@
   # Note that this does not affect currently shared documents.
   ## enable_sharing=true
 
+  # Global setting to enable or disable new workflow creation in Hue documents.
+  ## enable_workflow_creation_action=true
+
   # Choose whether to enable the new SQL syntax checker or not
   ## enable_sql_syntax_check=true
 
@@ -844,6 +847,9 @@
 
     # Whether Hue as OpenID Connect client verify SSL cert
     ## oidc_verify_ssl=true
+
+    # OIDC authentication request extra params
+    ## oidc_auth_request_extra_params={}
 
     # As relay party Hue URL path to redirect to after login
     ## login_redirect_url=https://localhost:8888/oidc/callback/
@@ -2235,6 +2241,11 @@
   # Name of the SAML attribute containing the list of groups the user belongs to.
   ## required_groups_attribute=groups
 
+  # To log users out of magic-sso, CDP control panel use Logout URL
+  ## logout_url=
+
+  # after log users out of magic-sso, CDP control panel use redirect URL
+  ## redirect_url=
 
 ###########################################################################
 # Settings to configure OAuth

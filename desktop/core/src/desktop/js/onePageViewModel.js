@@ -19,6 +19,8 @@ import _ from 'lodash';
 import * as ko from 'knockout';
 import page from 'page';
 
+import { createElement } from 'react';
+import { createRoot } from 'react-dom/client';
 import { CONFIG_REFRESHED_TOPIC, GET_KNOWN_CONFIG_TOPIC } from 'config/events';
 import huePubSub from 'utils/huePubSub';
 import I18n from 'utils/i18n';
@@ -28,6 +30,8 @@ import getParameter from 'utils/url/getParameter';
 import getSearchParameter from 'utils/url/getSearchParameter';
 import { ASSIST_GET_DATABASE_EVENT, ASSIST_GET_SOURCE_EVENT } from 'ko/components/assist/events';
 import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
+import ImporterPage from '../js/apps/newimporter/ImporterPage';
+import StorageBrowserPage from '../js/apps/storageBrowser/StorageBrowserPage';
 
 class OnePageViewModel {
   constructor() {
@@ -360,7 +364,7 @@ class OnePageViewModel {
       }, 0);
     };
 
-    self.loadAppThrottled = (app, loadDeep) => {
+    self.loadAppThrottled = (app, loadDeep, options) => {
       if (self.currentApp() === 'editor' && $('#editorComponents').length) {
         const vm = ko.dataFor($('#editorComponents')[0]);
         if (vm.isPresentationMode()) {
@@ -402,7 +406,7 @@ class OnePageViewModel {
         $('#embeddable_security_hive2').html('');
         $('#embeddable_security_solr').html('');
       }
-      if (typeof self.embeddable_cache[app] === 'undefined') {
+      if (!options?.isFullyFrontend && typeof self.embeddable_cache[app] === 'undefined') {
         if (loadedApps.indexOf(app) === -1) {
           loadedApps.push(app);
         }
@@ -461,8 +465,8 @@ class OnePageViewModel {
               self.extraEmbeddableURLParams('');
               const currentPath = window.location.pathname; // Retrieve the current path from the window location
               const basePath = currentPath.split('=')[0];
-              const inlineScriptsUrls = ['oozie', 'beeswax', 'jobbrowser', 'jobsub', 'logs'].some(
-                segment => basePath.includes(segment)
+              const inlineScriptsUrls = ['oozie', 'beeswax', 'jobsub'].some(segment =>
+                basePath.includes(segment)
               );
               if (inlineScriptsUrls) {
                 self.processHeaders(response).done($rawHtml => {
@@ -520,7 +524,8 @@ class OnePageViewModel {
       } else {
         self.isLoadingEmbeddable(false);
       }
-      window.document.title = 'Hue - ' + window.EMBEDDABLE_PAGE_URLS[app].title;
+      const title = options?.title || window.EMBEDDABLE_PAGE_URLS[app].title;
+      window.document.title = 'Hue - ' + title;
       window.resumeAppIntervals(app);
       huePubSub.resumeAppSubscribers(app);
       $('.embeddable').hide();
@@ -603,6 +608,60 @@ class OnePageViewModel {
 
     self.lastContext = null;
 
+    const camelToDash = camelCaseString => {
+      return camelCaseString.replace(/[A-Z]/g, match => '-' + match.toLowerCase());
+    };
+    const createNewReactEmbeddable = (containerName, Component) => {
+      const containerDiv = document.createElement('div');
+      containerDiv.classList.add('embeddable', containerName, 'cuix', 'antd');
+      document.querySelector('.page-content').appendChild(containerDiv);
+      const root = createRoot(containerDiv);
+      root.render(createElement(Component, {}));
+      return containerDiv;
+    };
+
+    /* 
+    Use this function if you want to show a React based application page 
+    for a specific url without the need to use legacy mako templates.
+    1. Add a new appsItem in HueSidebar.vue that links to the new url
+    2. Import the new React component at the top of this file.
+    3. Add a new object to the pageMapping array below as examplified here:    
+
+      {
+        url: '/my-new-url', 
+        app: function () {
+          showReactAppPage({
+            appName: 'myNewAppName',
+            component: MyNewReactComponent,
+            title: 'My new APP title'
+          });
+        }
+      }
+    */
+    // eslint-disable-next-line
+    const showReactAppPage = ({
+      appName,
+      title,
+      component,
+      hideLeftAssist = true,
+      hideRightAssist = true
+    }) => {
+      if (hideLeftAssist) {
+        huePubSub.publish('left.assist.hide', true);
+      }
+      if (hideRightAssist) {
+        huePubSub.publish('right.assist.hide', true);
+      }
+      const containerName = `${camelToDash(appName)}-container`;
+
+      const appContainer =
+        document.querySelector(`.page-content .${containerName}`) ||
+        createNewReactEmbeddable(containerName, component);
+
+      self.loadAppThrottled(appName, false, { isFullyFrontend: true, title });
+      appContainer.style.display = 'block';
+    };
+
     const pageMapping = [
       { url: '/403', app: '403' },
       { url: '/500', app: '500' },
@@ -640,9 +699,6 @@ class OnePageViewModel {
         url: '/desktop/metrics',
         app: function () {
           self.loadApp('metrics');
-          self.getActiveAppViewModel(viewModel => {
-            viewModel.fetchMetrics();
-          });
         }
       },
       {
@@ -709,7 +765,6 @@ class OnePageViewModel {
         }
       },
       { url: '/filebrowser/view=*', app: 'filebrowser' },
-      { url: '/filebrowser/new', app: 'newfilebrowser' },
       {
         url: '/filebrowser/*',
         app: function () {
@@ -732,6 +787,26 @@ class OnePageViewModel {
       { url: '/indexer/indexes/*', app: 'indexes' },
       { url: '/indexer/', app: 'indexes' },
       { url: '/indexer/importer/', app: 'importer' },
+      {
+        url: '/newimporter/',
+        app: function () {
+          showReactAppPage({
+            appName: 'newimporter',
+            component: ImporterPage,
+            title: 'New Importer'
+          });
+        }
+      },
+      {
+        url: '/storagebrowser/',
+        app: function () {
+          showReactAppPage({
+            appName: 'storagebrowser',
+            component: StorageBrowserPage,
+            title: 'Storage Browser'
+          });
+        }
+      },
       {
         url: '/indexer/importer/prefill/*',
         app: function (ctx) {
@@ -962,13 +1037,16 @@ class OnePageViewModel {
 
     huePubSub.subscribe('open.link', href => {
       if (href) {
+        const prefix = '/hue';
         if (href.startsWith('/')) {
-          if (window.HUE_BASE_URL && !href.startsWith(window.HUE_BASE_URL)) {
+          if (window.HUE_BASE_URL.length && href.startsWith(window.HUE_BASE_URL)) {
+            page(href);
+          } else if (href.startsWith(prefix)) {
             page(window.HUE_BASE_URL + href);
           } else {
-            page(href); // Already includes the base_url
+            page(window.HUE_BASE_URL + prefix + href);
           }
-        } else if (href.indexOf('#') === 0) {
+        } else if (href.indexOf('#') == 0) {
           // Only place that seem to use this is hbase onclick row
           window.location.hash = href;
         } else {

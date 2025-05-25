@@ -18,6 +18,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import { act } from 'react-dom/test-utils';
 
 import PathBrowser from './PathBrowser';
 
@@ -30,33 +31,36 @@ describe('Pathbrowser', () => {
   const mockFilePath = 'abfs://test/folder';
   const mockLongFilePath = 'abfs://path/to/nested1/nested2/nested3/folder';
   describe('Pathbrowser breadcrumbs', () => {
-    it('should render the specified seperator to seperate the breadcrumbs', () => {
+    it('should render the specified separator to separate the breadcrumbs', () => {
       render(
         <PathBrowser
           filePath={mockFilePath}
           onFilepathChange={onFilepathChangeMock}
-          seperator={'%'}
+          separator={'%'}
           showIcon
         />
       );
-      const seperator = screen.getAllByText('%');
-      expect(seperator).not.toBeNull();
+      const separator = screen.getAllByText('%');
+      expect(separator).not.toBeNull();
     });
 
-    it('should not render a different seperator than specified to seperate the breadcrumbs', () => {
+    it('should not render a different separator than specified to separate the breadcrumbs', () => {
       render(
         <PathBrowser
           testId="pathbroswer"
           filePath={mockFilePath}
           onFilepathChange={onFilepathChangeMock}
-          seperator={'%'}
+          separator={'%'}
           showIcon
         />
       );
-      screen.getAllByTestId('pathbroswer-breadcrumb-seperator').forEach(element => {
-        expect(element).toBeVisible();
-        expect(element).toHaveTextContent('%');
-      });
+      screen
+        .getAllByTestId('pathbroswer-breadcrumb-separator')
+        .slice(1)
+        .forEach(element => {
+          expect(element).toBeVisible();
+          expect(element).toHaveTextContent('%');
+        });
     });
 
     it('should render breadcrumbs without dropdown button if there are less than or equal to 3 breadcrumbs', () => {
@@ -64,7 +68,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           filePath={mockFilePath}
           onFilepathChange={onFilepathChangeMock}
-          seperator={'/'}
+          separator="/"
           showIcon
         />
       );
@@ -76,7 +80,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockLongFilePath}
-          seperator={'/'}
+          separator="/"
           showIcon
         />
       );
@@ -89,7 +93,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockLongFilePath}
-          seperator={'/'}
+          separator="/"
           showIcon
         />
       );
@@ -106,7 +110,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          seperator={'/'}
+          separator="/"
           showIcon={false}
         />
       );
@@ -121,7 +125,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          seperator={'/'}
+          separator="/"
           showIcon
         />
       );
@@ -134,7 +138,7 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          seperator={'/'}
+          separator="/"
           showIcon={false}
         />
       );
@@ -149,12 +153,60 @@ describe('Pathbrowser', () => {
         <PathBrowser
           onFilepathChange={onFilepathChangeMock}
           filePath={mockFilePath}
-          seperator={'/'}
+          separator="/"
           showIcon
         />
       );
-      const input = screen.queryByDisplayValue('abfs://test/test1');
+      const input = screen.queryByDisplayValue(mockFilePath);
       expect(input).toBeNull();
+    });
+
+    it('should show input when edit path button is clicked', async () => {
+      render(
+        <PathBrowser
+          onFilepathChange={onFilepathChangeMock}
+          filePath={mockFilePath}
+          separator="/"
+          showIcon
+        />
+      );
+      let input = screen.queryByDisplayValue(mockFilePath);
+      expect(input).toBeNull();
+      const editPathButton = screen.getByTestId('hue-path-browser__edit-path-btn');
+      await userEvent.click(editPathButton);
+      input = screen.getByDisplayValue(mockFilePath);
+      expect(input).not.toBeNull();
+    });
+  });
+
+  describe('Pathbrowser Copy Path Button', () => {
+    it('should show green tick icon for 2 seconds after copying path', async () => {
+      const user = userEvent.setup();
+      render(
+        <PathBrowser
+          onFilepathChange={onFilepathChangeMock}
+          filePath={mockFilePath}
+          separator="/"
+          showIcon
+        />
+      );
+
+      const copyPathButton = screen.getByRole('button', { name: 'Copy Path' });
+      expect(copyPathButton).toBeInTheDocument();
+      expect(screen.queryByTestId('hue-path-browser__status-success-icon')).not.toBeInTheDocument();
+      expect(screen.getByTestId('hue-path-browser__path-copy-icon')).toBeInTheDocument();
+
+      await user.click(copyPathButton);
+
+      expect(screen.getByTitle('Copied!')).toBeInTheDocument();
+
+      expect(screen.getByTestId('hue-path-browser__status-success-icon')).toBeInTheDocument();
+      expect(screen.queryByTestId('hue-path-browser__path-copy-icon')).not.toBeInTheDocument();
+
+      // Wait for 2 seconds and check if the green tick icon disappears
+      await act(() => new Promise(resolve => setTimeout(resolve, 2000)));
+      expect(screen.queryByTestId('hue-path-browser__status-success-icon')).not.toBeInTheDocument();
+      expect(screen.getByTestId('hue-path-browser__path-copy-icon')).toBeInTheDocument();
     });
   });
 });

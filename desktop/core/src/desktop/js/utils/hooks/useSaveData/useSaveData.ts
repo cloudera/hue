@@ -14,45 +14,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { AxiosError } from 'axios';
 import { ApiFetchOptions, post } from '../../../api/utils';
+import { isJSON } from '../../jsonUtils';
 
-interface saveOptions<T> {
+interface saveOptions<T, E> {
   url?: string;
   onSuccess?: (data: T) => void;
-  onError?: (error: Error) => void;
+  onError?: (error: AxiosError) => void;
+  postOptions?: ApiFetchOptions<T, E>;
 }
 
-export interface Options<T> extends saveOptions<T> {
-  postOptions?: ApiFetchOptions<T>;
+export interface Options<T, E> extends saveOptions<T, E> {
   skip?: boolean;
 }
 
-interface UseSaveData<T, U> {
+interface UseSaveData<T, U, E> {
   data?: T;
   loading: boolean;
-  error?: Error;
-  save: (body: U, saveOption?: saveOptions<T>) => void;
+  error?: E;
+  save: (body: U, saveOption?: saveOptions<T, E>) => void;
 }
 
-const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSaveData<T, U> => {
-  const [localOptions, setLocalOptions] = useState<Options<T> | undefined>(options);
+const useSaveData = <T, U = unknown, E = string>(
+  url?: string,
+  options?: Options<T, E>
+): UseSaveData<T, U, E> => {
+  const [localOptions, setLocalOptions] = useState<Options<T, E> | undefined>(options);
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | undefined>();
+  const [error, setError] = useState<E | undefined>();
 
-  const postOptionsDefault: ApiFetchOptions<T> = {
-    silenceErrors: false,
+  const postOptionsDefault: ApiFetchOptions<T, E> = {
+    silenceErrors: true,
     ignoreSuccessErrors: true
   };
 
-  const postOptions = useMemo(
-    () => ({ ...postOptionsDefault, ...localOptions?.postOptions }),
-    [localOptions]
-  );
-
   const saveData = useCallback(
-    async (body: U, saveOptions?: saveOptions<T>) => {
+    async (body: U, saveOptions?: saveOptions<T, E>) => {
       // Avoid Posting data if the skip option is true
       // or if the URL is not provided
       const apiUrl = saveOptions?.url ?? url;
@@ -62,8 +62,15 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
       setLoading(true);
       setError(undefined);
 
+      const postOptions = {
+        ...postOptionsDefault,
+        qsEncodeData: body instanceof FormData || isJSON(body) ? false : true,
+        ...localOptions?.postOptions,
+        ...saveOptions?.postOptions
+      };
+
       try {
-        const response = await post<T, U>(apiUrl, body, postOptions);
+        const response = await post<T, U, E>(apiUrl, body, postOptions);
         setData(response);
         if (saveOptions?.onSuccess) {
           saveOptions.onSuccess(response);
@@ -83,7 +90,7 @@ const useSaveData = <T, U = unknown>(url?: string, options?: Options<T>): UseSav
         setLoading(false);
       }
     },
-    [url, localOptions, postOptions]
+    [url, localOptions]
   );
 
   useEffect(() => {

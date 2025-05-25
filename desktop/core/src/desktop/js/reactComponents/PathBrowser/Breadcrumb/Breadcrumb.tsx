@@ -16,7 +16,7 @@
 
 import React from 'react';
 
-import OverflowingItem from '../OverflowingItem';
+import OverflowingItem from '../OverflowingItem/OverflowingItem';
 import './Breadcrumb.scss';
 
 interface BreadcrumbProps {
@@ -30,13 +30,8 @@ const Breadcrumb = ({ label, url, onFilepathChange }: BreadcrumbProps): JSX.Elem
     onFilepathChange(url);
   };
 
-  const minWidth = '' + (label.length < 10 ? label.length : 10) + 'ch';
-
   return (
-    <div
-      className="hue-path-browser__breadcrumb"
-      style={{ '--min-width': `${minWidth}` } as React.CSSProperties}
-    >
+    <div className="hue-path-browser__breadcrumb">
       <OverflowingItem onClick={handleFilepathChange} label={label} />
     </div>
   );
