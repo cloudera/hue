@@ -35,6 +35,7 @@ import { FILE_UPLOAD_START_EVENT, FILE_UPLOAD_SUCCESS_EVENT } from './event';
 import { LIST_DIRECTORY_API_URL } from '../../apps/storageBrowser/api';
 import './FileUploadQueue.scss';
 import { ListDirectory } from '../../apps/storageBrowser/types';
+import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 
 interface FileUploadEvent {
   files: RegularFile[];
@@ -149,10 +150,15 @@ const FileUploadQueue = (): JSX.Element => {
     const existingFileNames = uploadedFiles.map(f => f.file.name);
     const conflicts = newFiles.filter(newFile => existingFileNames.includes(newFile.file.name));
     const nonConflictingFiles = newFiles.filter(newFile => !existingFileNames.includes(newFile.file.name));
-
+   
     if (conflicts.length > 0) {
       setConflictFiles(conflicts);
       setIsModalVisible(true);
+    }
+    else {
+      // Clear stale conflict state if no conflicts exist
+      setConflictFiles([]);
+      setIsModalVisible(false);
     }
     if (nonConflictingFiles.length > 0) {
       addFiles(nonConflictingFiles);
@@ -167,11 +173,6 @@ const FileUploadQueue = (): JSX.Element => {
     setConflictFiles([]);
     setIsModalVisible(false);
     setIsVisible(true);
-  };
-
-  const onClose = () => {
-    uploadQueue.forEach(file => cancelFile(file));
-    setIsVisible(false);
   };
 
   const uploadedCount = uploadQueue.filter(item => item.status === FileStatus.Uploaded).length;
@@ -202,22 +203,36 @@ const FileUploadQueue = (): JSX.Element => {
           <Modal
             title={t('Resolve Filename Conflicts')}
             open={isModalVisible}
-            onCancel={() => setIsModalVisible(false)}
+            closable={false} 
+            style={{
+              height: '50vh',
+              overflow: 'hidden', 
+            }} 
+            bodyStyle={{
+              maxHeight: 'calc(50vh - 100px)', // Adjust body height to fit within the modal
+              overflowY: 'auto'
+            }}
             footer={[
               <Button key="keep" onClick={() => handleModalOk(false)}>
-                {t('Keep Original Files')}
+                {t('Keep Original')}
               </Button>,
               <Button key="overwrite" type="primary" onClick={() => handleModalOk(true)}>
-                {t('Overwrite Files')}
-              </Button>
+                {t('Overwrite')}
+              </Button>,
+               <Button key="cancel" onClick={() => setIsModalVisible(false)}>
+               {t('Cancel')}
+             </Button>,
             ]}
           >
-            {t('Some files you are trying to upload already exist in the uploaded files')}
-            <ul>
-              {conflictFiles.map(file => (
-                <li key={file.file.name}>{file.file.name}</li>
-              ))}
-            </ul>
+            {t(`${conflictFiles.length} files you are trying to upload already exist in the uploaded files.`)}
+            <div style={{ marginTop: '3px' }}>
+             {conflictFiles.map(file => (
+          <div key={file.file.name} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <FileIcon /> 
+            <span>{file.file.name}</span>
+          </div>
+        ))}
+      </div>
           </Modal>,
           document.body
         )}
@@ -228,10 +243,6 @@ const FileUploadQueue = (): JSX.Element => {
             <BorderlessButton
               onClick={() => setExpandQueue(!expandQueue)}
               icon={expandQueue ? <CaratDownIcon /> : <CaratUpIcon />}
-            />
-            <BorderlessButton
-              onClick={onClose}
-              icon={<CloseIcon />}
             />
           </div>
         </div>
