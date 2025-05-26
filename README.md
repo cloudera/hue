@@ -16,7 +16,7 @@
 
 </div>
 
-## 📊 Overview
+## 🗄️ Overview
 
 Hue is a mature SQL Assistant for querying Databases & Data Warehouses, trusted by:
 
@@ -27,18 +27,18 @@ Organizations use Hue to quickly answer questions via self-service querying, exe
 
 ### Key Features
 
-- 🔍 **Interactive SQL editing** with syntax highlighting and autocomplete
-- 📂 **File Browser** for navigating and operating on HDFS, S3, ABFS, Ozone, and Google Storage (GS) files
-- 🔄 **Job Browser** for monitoring and managing Hive queries, Impala queries, YARN applications, and Livy Spark jobs
-- 📋 **Table Browser** for exploring and managing database tables, schemas, and metadata
-- 📊 **Table Importer** for creating Hive and Impala tables from CSV/Excel files, with support for uploading from local system or importing from remote filesystems (HDFS, S3, ABFS, Ozone, GS)
-- 🔌 **Multiple database connectors** including Hive, Impala, MySQL, PostgreSQL, and more
+- ✏️ **Interactive SQL editing** with syntax highlighting and autocomplete
+- 📁 **File Browser** for navigating and operating on HDFS, S3, ABFS, Ozone, and Google Storage (GS) files
+- 📊 **Job Browser** for monitoring and managing Hive queries, Impala queries, YARN applications, and Livy Spark jobs
+- 🗃️ **Table Browser** for exploring and managing database tables, schemas, and metadata
+- 📤 **Table Importer** for creating Hive and Impala tables from CSV/Excel files, with support for uploading from local system or importing from remote filesystems (HDFS, S3, ABFS, Ozone, GS)
+- 🔗 **Multiple database connectors** including Hive, Impala, MySQL, PostgreSQL, and more
 
 ## 🔗 Useful Links
 
 - 🏠 **Website**: [gethue.com](https://gethue.com)
-- 📚 **Connect to a database**: [Configuration Guide](https://docs.gethue.com/administrator/configuration/connectors/)
-- 🧩 **Build your own Editor**: [SQL Scratchpad](https://docs.gethue.com/developer/components/scratchpad/)
+- 🔌 **Connect to a database**: [Configuration Guide](https://docs.gethue.com/administrator/configuration/connectors/)
+- 🛠️ **Build your own Editor**: [SQL Scratchpad](https://docs.gethue.com/developer/components/scratchpad/)
 - ⚙️ **Query Service**: [Kubernetes Setup](https://docs.gethue.com/administrator/installation/cloud/#kubernetes) and [API](https://docs.gethue.com/developer/api/)
 
 ![Hue Editor](https://cdn.gethue.com/uploads/2021/02/hue-4.9.png)
