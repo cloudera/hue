@@ -14,7 +14,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
+
 from rest_framework import serializers
+
+from desktop.conf import IMPORTER
 
 
 class LocalFileUploadSerializer(serializers.Serializer):
@@ -30,10 +34,17 @@ class LocalFileUploadSerializer(serializers.Serializer):
   file = serializers.FileField(required=True, help_text="CSV or Excel file to upload and process")
 
   def validate_file(self, value):
-    # TODO: Check upper limit for file size
-    # Add file size validation (e.g., limit to 150 MiB)
-    if value.size > 150 * 1024 * 1024:
-      raise serializers.ValidationError("File too large. Maximum file size is 150 MiB.")
+    # Check if the file type is restricted
+    _, file_type = os.path.splitext(value.name)
+    restricted_extensions = IMPORTER.RESTRICT_LOCAL_FILE_EXTENSIONS.get()
+    if restricted_extensions and file_type.lower() in [ext.lower() for ext in restricted_extensions]:
+      raise serializers.ValidationError(f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.')
+
+    # Check file size
+    max_size = IMPORTER.MAX_LOCAL_FILE_SIZE_UPLOAD_LIMIT.get()
+    if value.size > max_size:
+      max_size_mib = max_size / (1024 * 1024)
+      raise serializers.ValidationError(f"File too large. Maximum file size is {max_size_mib:.0f} MiB.")
 
     return value
 
@@ -102,6 +113,7 @@ class PreviewFileSerializer(serializers.Serializer):
 
   def validate(self, data):
     """Validate the complete data set with interdependent field validation."""
+
     if data.get('file_type') == 'excel' and not data.get('sheet_name'):
       raise serializers.ValidationError({"sheet_name": "Sheet name is required for Excel files"})
 

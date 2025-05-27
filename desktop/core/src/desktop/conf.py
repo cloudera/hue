@@ -2952,3 +2952,32 @@ def is_ofs_enabled():
 def has_ofs_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="ofs_access", app="filebrowser"))
+
+
+IMPORTER = ConfigSection(
+  key='importer',
+  help=_("""Configuration options for the data file importer."""),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Enable or disable the new data file importer functionality'),
+      type=coerce_bool,
+      default=False,
+    ),
+    RESTRICT_LOCAL_FILE_EXTENSIONS=Config(
+      key='restrict_local_file_extensions',
+      default=None,
+      type=coerce_csv,
+      help=_(
+        'Security setting to specify local file extensions that are not allowed to be uploaded through the importer. '
+        'Provide a comma-separated list of extensions including the dot (e.g., ".exe, .zip, .rar, .tar, .gz").'
+      ),
+    ),
+    MAX_LOCAL_FILE_SIZE_UPLOAD_LIMIT=Config(
+      key="max_local_file_size_upload_limit",
+      default=157286400,  # 150 MiB
+      type=int,
+      help=_('Maximum local file size (in bytes) that users can upload through the importer. The default is 157286400 bytes (150 MiB).'),
+    ),
+  ),
+)

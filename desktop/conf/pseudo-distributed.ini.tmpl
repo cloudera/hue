@@ -1049,6 +1049,19 @@
   ## Enable integration with Google Storage for RAZ
   # is_raz_gs_enabled=false
 
+  ## Configuration options for the data file importer
+  # ------------------------------------------------------------------------
+  [[importer]]
+  # Turns on the data importer functionality
+  ## is_enabled=false
+
+  # A limit on the local file size (bytes) that can be uploaded through the importer. The default is 157286400 bytes (150 MiB).
+  ## max_local_file_size_upload_limit=157286400
+
+  # Security setting to specify local file extensions that are not allowed to be uploaded through the importer.
+  # Provide a comma-separated list of extensions including the dot (e.g., ".exe, .zip, .rar, .tar, .gz").
+  ## restrict_local_file_extensions=.exe, .zip, .rar, .tar, .gz
+
 ###########################################################################
 # Settings to configure the snippets available in the Notebook
 ###########################################################################
