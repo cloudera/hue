@@ -19,9 +19,11 @@ import csv
 import uuid
 import codecs
 import logging
+import zipfile
 import tempfile
+import xml.etree.ElementTree as ET
 from io import BytesIO
-from typing import Any, BinaryIO, Dict, Optional, Union
+from typing import Any, BinaryIO, Dict, List, Optional, Union
 
 import polars as pl
 
@@ -309,12 +311,16 @@ def _get_excel_metadata(fh: BinaryIO) -> Dict[str, Any]:
     Exception: If there's an error processing the Excel file
   """
   try:
-    # Reset file position to beginning
+    # Reset file position
     fh.seek(0)
 
-    # Read Excel file and get sheet names
-    excel_data = pl.read_excel(BytesIO(fh.read()), sheet_id=0)
-    sheet_names = excel_data.keys()
+    try:
+      sheet_names = _get_sheet_names_xlsx(BytesIO(fh.read()))
+    except Exception as e:
+      LOG.warning(f"Failed to read Excel file for sheet names with Zip + XML parsing approach, trying next with Polars package.")
+
+      fh.seek(0)  # Reset file position
+      sheet_names = pl.read_excel(BytesIO(fh.read()), sheet_id=0).keys()  # Possibly some other format instead of .xlsx
 
     return {
       'type': 'excel',
@@ -323,6 +329,30 @@ def _get_excel_metadata(fh: BinaryIO) -> Dict[str, Any]:
   except Exception as e:
     LOG.error(f"Error detecting Excel file format: {e}", exc_info=True)
     raise Exception(f"Failed to detect Excel file format: {e}")
+
+
+def _get_sheet_names_xlsx(fh: BinaryIO) -> List[str]:
+  """Quickly list sheet names from an .xlsx file handle.
+
+    - Uses only the stdlib (zipfile + xml.etree).
+    - Parses only the small `xl/workbook.xml` metadata (~10-20KB).
+    - No full worksheet data is loaded into memory.
+
+    Args:
+      fh: Binary file-like object of the workbook.
+
+    Returns:
+      A list of worksheet names.
+  """
+  with zipfile.ZipFile(fh, 'r') as z:
+    with z.open('xl/workbook.xml') as f:
+      tree = ET.parse(f)
+
+  # XML namespace for SpreadsheetML
+  ns = {'x': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'}
+  sheets = tree.getroot().find('x:sheets', ns)
+
+  return [s.get('name') for s in sheets]
 
 
 def _get_delimited_metadata(file_sample: Union[bytes, str], file_type: str) -> Dict[str, Any]:
