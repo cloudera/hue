@@ -30,6 +30,7 @@ from desktop.lib.importer.serializers import (
   GuessFileMetadataSerializer,
   LocalFileUploadSerializer,
   PreviewFileSerializer,
+  SqlTypeMapperSerializer,
 )
 
 LOG = logging.getLogger()
@@ -90,8 +91,7 @@ def local_file_upload(request: Request) -> Response:
 @parser_classes([JSONParser])
 @api_error_handler
 def guess_file_metadata(request: Request) -> Response:
-  """
-  Guess the metadata of a file based on its content or extension.
+  """Guess the metadata of a file based on its content or extension.
 
   This API endpoint detects file type and extracts metadata properties such as
   delimiters for CSV files or sheet names for Excel files.
@@ -203,8 +203,7 @@ def preview_file(request: Request) -> Response:
 @parser_classes([JSONParser])
 @api_error_handler
 def guess_file_header(request: Request) -> Response:
-  """
-  Guess whether a file has a header row.
+  """Guess whether a file has a header row.
 
   This API endpoint analyzes a file to determine if it contains a header row based on the
   content pattern. It works for both Excel files and delimited text files (CSV, TSV, etc.)
@@ -243,4 +242,40 @@ def guess_file_header(request: Request) -> Response:
   except Exception as e:
     # Handle other errors
     LOG.exception(f"Error detecting file header: {e}", exc_info=True)
+    return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@parser_classes([JSONParser])
+@api_error_handler
+def get_sql_type_mapping(request: Request) -> Response:
+  """Get mapping from Polars data types to SQL types for a specific dialect.
+
+  This API endpoint returns a dictionary mapping Polars data types to the corresponding
+  SQL types for a specific SQL dialect.
+
+  Args:
+    request: Request object containing query parameters:
+      - sql_dialect: The SQL dialect to get mappings for (e.g., 'hive', 'impala', 'trino')
+
+  Returns:
+    Response containing a mapping dictionary:
+      - A mapping from Polars data type names to SQL type names for the specified dialect
+  """
+  serializer = SqlTypeMapperSerializer(data=request.query_params)
+
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  validated_data = serializer.validated_data
+  sql_dialect = validated_data['sql_dialect']
+
+  try:
+    type_mapping = operations.get_sql_type_mapping(sql_dialect)
+    return Response(type_mapping, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error getting SQL type mapping: {e}", exc_info=True)
     return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

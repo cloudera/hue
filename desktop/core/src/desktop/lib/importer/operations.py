@@ -41,6 +41,73 @@ except ImportError as e:
   is_magic_lib_available = False
 
 
+# Base mapping for most SQL engines (Hive, Impala, SparkSQL)
+SQL_TYPE_BASE_MAP = {
+  # signed ints
+  "Int8": "TINYINT",
+  "Int16": "SMALLINT",
+  "Int32": "INT",
+  "Int64": "BIGINT",
+  # unsigned ints: same size signed by default (Hive/Impala/SparkSQL)
+  "UInt8": "TINYINT",
+  "UInt16": "SMALLINT",
+  "UInt32": "INT",
+  "UInt64": "BIGINT",
+  # floats & decimal
+  "Float32": "FLOAT",
+  "Float64": "DOUBLE",
+  "Decimal": "DECIMAL",  # Hive/Impala/SparkSQL use DECIMAL(precision,scale)
+  # boolean, string, binary
+  "Boolean": "BOOLEAN",
+  "Utf8": "STRING",  # STRING covers Hive/VARCHAR/CHAR for default
+  "String": "STRING",
+  "Categorical": "STRING",
+  "Enum": "STRING",
+  "Binary": "BINARY",
+  # temporal
+  "Date": "DATE",
+  "Time": "TIMESTAMP",  # Hive/Impala/SparkSQL have no pure TIME type
+  "Datetime": "TIMESTAMP",
+  "Duration": "INTERVAL DAY TO SECOND",
+  # nested & other
+  "Array": "ARRAY",
+  "List": "ARRAY",
+  "Struct": "STRUCT",
+  "Object": "STRING",
+  "Null": "STRING",  # no SQL NULL type—use STRING or handle as special case
+  "Unknown": "STRING",
+}
+
+# Per‑dialect overrides for the few differences
+SQL_TYPE_DIALECT_OVERRIDES = {
+  "hive": {},
+  "impala": {},
+  "sparksql": {},
+  "trino": {
+    "Int32": "INTEGER",
+    "UInt32": "INTEGER",
+    "Utf8": "VARCHAR",
+    "String": "VARCHAR",
+    "Binary": "VARBINARY",
+    "Float32": "REAL",
+    "Struct": "ROW",
+    "Object": "JSON",
+    "Duration": "INTERVAL DAY TO SECOND",  # explicit SQL syntax
+  },
+  "phoenix": {
+    **{f"UInt{b}": f"UNSIGNED_{t}" for b, t in [(8, "TINYINT"), (16, "SMALLINT"), (32, "INT"), (64, "LONG")]},
+    "Utf8": "VARCHAR",
+    "String": "VARCHAR",
+    "Binary": "VARBINARY",
+    "Duration": "STRING",  # Phoenix treats durations as strings
+    "Struct": "STRING",  # no native STRUCT type
+    "Object": "VARCHAR",
+    "Time": "TIME",  # Phoenix has its own TIME type
+    "Decimal": "DECIMAL",  # up to precision 38
+  },
+}
+
+
 def local_file_upload(upload_file, username: str) -> Dict[str, str]:
   """Uploads a local file to a temporary directory with a unique filename.
 
@@ -95,8 +162,7 @@ def local_file_upload(upload_file, username: str) -> Dict[str, str]:
 
 
 def guess_file_metadata(file_path: str, import_type: str, fs=None) -> Dict[str, Any]:
-  """
-  Guess the metadata of a file based on its content or extension.
+  """Guess the metadata of a file based on its content or extension.
 
   Args:
     file_path: Path to the file to analyze
@@ -177,8 +243,7 @@ def preview_file(
   fs=None,
   preview_rows: int = 50,
 ) -> Dict[str, Any]:
-  """
-  Generate a preview of a file's content with column type mapping.
+  """Generate a preview of a file's content with column type mapping.
 
   This method reads a file and returns a preview of its contents, along with
   column information and metadata for creating tables or further processing.
@@ -268,8 +333,7 @@ def preview_file(
 
 
 def _detect_file_type(file_sample: bytes) -> str:
-  """
-  Detect the file type based on its content.
+  """Detect the file type based on its content.
 
   Args:
     file_sample: Binary sample of the file content
@@ -308,8 +372,7 @@ def _detect_file_type(file_sample: bytes) -> str:
 
 
 def _get_excel_metadata(fh: BinaryIO) -> Dict[str, Any]:
-  """
-  Extract metadata for Excel files (.xlsx, .xls).
+  """Extract metadata for Excel files (.xlsx, .xls).
 
   Args:
     fh: File handle for the Excel file
@@ -371,8 +434,7 @@ def _get_sheet_names_xlsx(fh: BinaryIO) -> List[str]:
 
 
 def _get_delimited_metadata(file_sample: Union[bytes, str], file_type: str) -> Dict[str, Any]:
-  """
-  Extract metadata for delimited files (CSV, TSV, etc.).
+  """Extract metadata for delimited files (CSV, TSV, etc.).
 
   Args:
     file_sample: Binary or string sample of the file content
@@ -543,8 +605,7 @@ def _preview_delimited_file(
 
 
 def guess_file_header(file_path: str, file_type: str, import_type: str, sheet_name: Optional[str] = None, fs=None) -> bool:
-  """
-  Guess whether a file has a header row.
+  """Guess whether a file has a header row.
 
   This function analyzes a file to determine if it contains a header row based on the
   content pattern. It works for both Excel files and delimited text files (CSV, TSV, etc.).
@@ -633,15 +694,31 @@ def guess_file_header(file_path: str, file_type: str, import_type: str, sheet_na
     fh.close()
 
 
-def _map_polars_dtype_to_sql_type(dialect: str, polars_type: str) -> str:
-  """
-  Map a Polars dtype to the corresponding SQL type for a given dialect.
+def get_sql_type_mapping(dialect: str) -> Dict[str, str]:
+  """Get all type mappings from Polars dtypes to SQL types for a given SQL dialect.
 
-  Supports all Polars dtypes as listed in the Polars docs:
-  Int8, Int16, Int32, Int64, UInt8, UInt16, UInt32, UInt64,
-  Float32, Float64, Decimal, Boolean, Utf8/String, Categorical, Enum,
-  Binary, Date, Time, Datetime, Duration, Array, List, Struct,
-  Object, Null, Unknown.
+  This function returns a dictionary mapping of all Polars data types to their
+  corresponding SQL types for a specific dialect.
+
+  Args:
+    dialect: One of "hive", "impala", "trino", "phoenix", "sparksql".
+
+  Returns:
+    A dict mapping Polars dtype names to SQL type names.
+
+  Raises:
+    ValueError: If the dialect is not supported.
+  """
+  dl = dialect.lower()
+  if dl not in SQL_TYPE_DIALECT_OVERRIDES:
+    raise ValueError(f"Unsupported dialect: {dialect}")
+
+  # Merge base_map and overrides[dl] into a new dict, giving precedence to any overlapping keys in overrides[dl]
+  return {**SQL_TYPE_BASE_MAP, **SQL_TYPE_DIALECT_OVERRIDES[dl]}
+
+
+def _map_polars_dtype_to_sql_type(dialect: str, polars_type: str) -> str:
+  """Map a Polars dtype to the corresponding SQL type for a given dialect.
 
   Args:
     dialect: One of "hive", "impala", "trino", "phoenix", "sparksql".
@@ -653,78 +730,7 @@ def _map_polars_dtype_to_sql_type(dialect: str, polars_type: str) -> str:
   Raises:
     ValueError: If the dialect or polars_type is not supported.
   """
-  # Base mapping for most engines (Hive, Impala, SparkSQL)
-  base_map = {
-    # signed ints
-    "Int8": "TINYINT",
-    "Int16": "SMALLINT",
-    "Int32": "INT",
-    "Int64": "BIGINT",
-    # unsigned ints: same size signed by default (Hive/Impala/SparkSQL)
-    "UInt8": "TINYINT",
-    "UInt16": "SMALLINT",
-    "UInt32": "INT",
-    "UInt64": "BIGINT",
-    # floats & decimal
-    "Float32": "FLOAT",
-    "Float64": "DOUBLE",
-    "Decimal": "DECIMAL",  # Hive/Impala/SparkSQL use DECIMAL(precision,scale)
-    # boolean, string, binary
-    "Boolean": "BOOLEAN",
-    "Utf8": "STRING",  # STRING covers Hive/VARCHAR/CHAR for default
-    "String": "STRING",
-    "Categorical": "STRING",
-    "Enum": "STRING",
-    "Binary": "BINARY",
-    # temporal
-    "Date": "DATE",
-    "Time": "TIMESTAMP",  # Hive/Impala/SparkSQL have no pure TIME type
-    "Datetime": "TIMESTAMP",
-    "Duration": "INTERVAL DAY TO SECOND",
-    # nested & other
-    "Array": "ARRAY",
-    "List": "ARRAY",
-    "Struct": "STRUCT",
-    "Object": "STRING",
-    "Null": "STRING",  # no SQL NULL type—use STRING or handle as special case
-    "Unknown": "STRING",
-  }
-
-  # Per‑dialect overrides for the few differences
-  overrides = {
-    "hive": {},
-    "impala": {},
-    "sparksql": {},
-    "trino": {
-      "Int32": "INTEGER",
-      "UInt32": "INTEGER",
-      "Utf8": "VARCHAR",
-      "String": "VARCHAR",
-      "Binary": "VARBINARY",
-      "Float32": "REAL",
-      "Struct": "ROW",
-      "Object": "JSON",
-      "Duration": "INTERVAL DAY TO SECOND",  # explicit SQL syntax
-    },
-    "phoenix": {
-      **{f"UInt{b}": f"UNSIGNED_{t}" for b, t in [(8, "TINYINT"), (16, "SMALLINT"), (32, "INT"), (64, "LONG")]},
-      "Utf8": "VARCHAR",
-      "String": "VARCHAR",
-      "Binary": "VARBINARY",
-      "Duration": "STRING",  # Phoenix treats durations as strings
-      "Struct": "STRING",  # no native STRUCT type
-      "Object": "VARCHAR",
-      "Time": "TIME",  # Phoenix has its own TIME type
-      "Decimal": "DECIMAL",  # up to precision 38
-    },
-  }
-
-  dl = dialect.lower()
-  if dl not in overrides:
-    raise ValueError(f"Unsupported dialect: {dialect}")
-
-  # Merge base_map and overrides[dl] into a new dict, giving precedence to any overlapping keys in overrides[dl]
-  mapping = {**base_map, **overrides[dl]}
+  mapping = get_sql_type_mapping(dialect)
 
   if polars_type not in mapping:
     raise ValueError(f"No mapping for Polars dtype {polars_type} in dialect {dialect}")

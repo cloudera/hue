@@ -134,6 +134,25 @@ class PreviewFileSerializer(serializers.Serializer):
     return data
 
 
+class SqlTypeMapperSerializer(serializers.Serializer):
+  """Serializer for SQL type mapping requests.
+
+  This serializer validates the parameters required for retrieving type mapping information
+  from Polars data types to SQL types for a specific dialect.
+
+  Attributes:
+    sql_dialect: Target SQL dialect for type mapping
+  """
+
+  sql_dialect = serializers.ChoiceField(
+    choices=['hive', 'impala', 'trino', 'phoenix', 'sparksql'], required=True, help_text="SQL dialect for mapping column types"
+  )
+
+  def validate(self, data):
+    """Validate the complete data set."""
+    return data
+
+
 class GuessFileHeaderSerializer(serializers.Serializer):
   """Serializer for file header guessing request validation.
 
