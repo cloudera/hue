@@ -25,7 +25,12 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from desktop.lib.importer import operations
-from desktop.lib.importer.serializers import GuessFileMetadataSerializer, LocalFileUploadSerializer, PreviewFileSerializer
+from desktop.lib.importer.serializers import (
+  GuessFileHeaderSerializer,
+  GuessFileMetadataSerializer,
+  LocalFileUploadSerializer,
+  PreviewFileSerializer,
+)
 
 LOG = logging.getLogger()
 
@@ -50,7 +55,7 @@ def api_error_handler(view_fn):
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
 @api_error_handler
-def upload_file(request: Request) -> Response:
+def local_file_upload(request: Request) -> Response:
   """Handle the local file upload operation.
 
   This endpoint allows users to upload a file from their local system.
@@ -60,10 +65,12 @@ def upload_file(request: Request) -> Response:
     request: Request object containing the file to upload
 
   Returns:
-    Response containing the result of the upload operation
+    Response containing the result of the local upload operation, including:
+      - file_path: Path where the file was saved (if successful)
 
   Note:
-    - File size limits apply based on server configuration
+    - File size limits apply based on MAX_LOCAL_FILE_SIZE_UPLOAD_LIMIT configuration.
+    - File type restrictions apply based on RESTRICT_LOCAL_FILE_EXTENSIONS configuration.
   """
 
   serializer = LocalFileUploadSerializer(data=request.data)
@@ -74,9 +81,9 @@ def upload_file(request: Request) -> Response:
   uploaded_file = serializer.validated_data['file']
 
   LOG.info(f'User {request.user.username} is uploading a local file: {uploaded_file.name}')
-  res = operations.local_file_upload(uploaded_file, request.user.username)
+  result = operations.local_file_upload(uploaded_file, request.user.username)
 
-  return Response(res, status=status.HTTP_201_CREATED)
+  return Response(result, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET'])
@@ -122,7 +129,7 @@ def guess_file_metadata(request: Request) -> Response:
     return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
   except Exception as e:
     # Handle other errors
-    LOG.exception(f"Error guessing file metadata: {str(e)}")
+    LOG.exception(f"Error guessing file metadata: {e}", exc_info=True)
     return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -136,7 +143,10 @@ def preview_file(request: Request) -> Response:
     request: Request object containing query parameters for file preview
 
   Returns:
-    Response containing a preview of the file content
+    Response containing a dict preview of the file content, including:
+      - type: Type of the file (e.g., csv, tsv, excel)
+      - columns: List of column metadata
+      - preview_data: Sample data from the file
   """
   serializer = PreviewFileSerializer(data=request.query_params)
   if not serializer.is_valid():
@@ -154,7 +164,7 @@ def preview_file(request: Request) -> Response:
     if file_type == 'excel':
       sheet_name = validated_data.get('sheet_name')
 
-      result = operations.preview_file(
+      preview = operations.preview_file(
         file_path=file_path,
         file_type=file_type,
         import_type=import_type,
@@ -168,7 +178,7 @@ def preview_file(request: Request) -> Response:
       quote_char = validated_data.get('quote_char')
       record_separator = validated_data.get('record_separator')
 
-      result = operations.preview_file(
+      preview = operations.preview_file(
         file_path=file_path,
         file_type=file_type,
         import_type=import_type,
@@ -180,10 +190,57 @@ def preview_file(request: Request) -> Response:
         fs=request.fs if import_type == 'remote' else None,
       )
 
-    return Response(result, status=status.HTTP_200_OK)
+    return Response(preview, status=status.HTTP_200_OK)
 
   except ValueError as e:
     return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
   except Exception as e:
-    LOG.exception(f"Error previewing file: {str(e)}")
+    LOG.exception(f"Error previewing file: {e}", exc_info=True)
+    return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@parser_classes([JSONParser])
+@api_error_handler
+def guess_file_header(request: Request) -> Response:
+  """
+  Guess whether a file has a header row.
+
+  This API endpoint analyzes a file to determine if it contains a header row based on the
+  content pattern. It works for both Excel files and delimited text files (CSV, TSV, etc.)
+
+  Args:
+    request: Request object containing query parameters:
+      - file_path: Path to the file
+      - file_type: Type of file ('excel', 'csv', 'tsv', 'delimiter_format')
+      - import_type: 'local' or 'remote'
+      - sheet_name: Sheet name for Excel files (required for Excel)
+
+  Returns:
+    Response containing:
+      - has_header: Boolean indicating whether the file has a header row
+  """
+  serializer = GuessFileHeaderSerializer(data=request.query_params)
+
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  validated_data = serializer.validated_data
+
+  try:
+    has_header = operations.guess_file_header(
+      file_path=validated_data['file_path'],
+      file_type=validated_data['file_type'],
+      import_type=validated_data['import_type'],
+      sheet_name=validated_data.get('sheet_name'),
+      fs=request.fs if validated_data['import_type'] == 'remote' else None,
+    )
+
+    return Response({'has_header': has_header}, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    # Handle other errors
+    LOG.exception(f"Error detecting file header: {e}", exc_info=True)
     return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

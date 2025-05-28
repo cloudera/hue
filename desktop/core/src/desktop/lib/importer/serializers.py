@@ -81,7 +81,7 @@ class PreviewFileSerializer(serializers.Serializer):
     file_type: Type of file format (csv, tsv, excel, delimiter_format)
     import_type: Type of import (local or remote)
     sql_dialect: Target SQL dialect for type mapping
-    has_header: Whether the file has a header row (optional)
+    has_header: Whether the file has a header row or not
     sheet_name: Sheet name for Excel files (required when file_type is excel)
     field_separator: Field separator character (required for delimited files)
     quote_char: Quote character (required for delimited files)
@@ -99,9 +99,7 @@ class PreviewFileSerializer(serializers.Serializer):
     choices=['hive', 'impala', 'trino', 'phoenix', 'sparksql'], required=True, help_text="SQL dialect for mapping column types"
   )
 
-  # Default value has_header=None enables auto-detection of header row in file content.
-  # Explicitly set it to True/False to specify if the file has a header row or not.
-  has_header = serializers.BooleanField(required=False, allow_null=True, default=None, help_text="Whether the file has a header row")
+  has_header = serializers.BooleanField(required=True, help_text="Whether the file has a header row or not")
 
   # Excel-specific fields
   sheet_name = serializers.CharField(required=False, help_text="Sheet name for Excel files")
@@ -132,5 +130,37 @@ class PreviewFileSerializer(serializers.Serializer):
 
       if not data.get('record_separator'):
         data['record_separator'] = '\n'  # Default record separator
+
+    return data
+
+
+class GuessFileHeaderSerializer(serializers.Serializer):
+  """Serializer for file header guessing request validation.
+
+  This serializer validates the parameters required for guessing if a file has a header row.
+
+  Attributes:
+    file_path: Path to the file to analyze
+    file_type: Type of file format (csv, tsv, excel, delimiter_format)
+    import_type: Type of import (local or remote)
+    sheet_name: Sheet name for Excel files (required when file_type is excel)
+  """
+
+  file_path = serializers.CharField(required=True, help_text="Full path to the file to analyze")
+  file_type = serializers.ChoiceField(
+    choices=['csv', 'tsv', 'excel', 'delimiter_format'], required=True, help_text="Type of file (csv, tsv, excel, delimiter_format)"
+  )
+  import_type = serializers.ChoiceField(
+    choices=['local', 'remote'], required=True, help_text="Whether the file is local or on a remote filesystem"
+  )
+
+  # Excel-specific fields
+  sheet_name = serializers.CharField(required=False, help_text="Sheet name for Excel files")
+
+  def validate(self, data):
+    """Validate the complete data set with interdependent field validation."""
+
+    if data.get('file_type') == 'excel' and not data.get('sheet_name'):
+      raise serializers.ValidationError({"sheet_name": "Sheet name is required for Excel files"})
 
     return data
