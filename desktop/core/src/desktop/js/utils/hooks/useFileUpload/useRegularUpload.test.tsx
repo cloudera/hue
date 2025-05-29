@@ -50,10 +50,6 @@ jest.mock('../useSaveData/useSaveData', () => ({
   }))
 }));
 
-// jest.mock('./utils', () => ({
-//   getItemProgress: jest.fn(() => 55)
-// }));
-
 describe('useRegularUpload', () => {
   const mockUpdateFileVariables = jest.fn();
   const mockOnComplete = jest.fn();
@@ -70,7 +66,7 @@ describe('useRegularUpload', () => {
       })
     );
 
-    act(() => result.current.addFiles([mockFile]));
+    result.current.addFiles([mockFile]);
 
     expect(mockEnqueue).toHaveBeenCalledWith([mockFile]);
   });
@@ -83,7 +79,7 @@ describe('useRegularUpload', () => {
       })
     );
 
-    act(() => result.current.cancelFile(mockFile.uuid));
+    result.current.cancelFile(mockFile.uuid);
 
     expect(mockDequeue).toHaveBeenCalledWith(mockFile.uuid, 'uuid');
   });
@@ -96,7 +92,7 @@ describe('useRegularUpload', () => {
       })
     );
 
-    await act(() => result.current.addFiles([mockFile]));
+    result.current.addFiles([mockFile]);
 
     expect(mockSave).toHaveBeenCalledWith(expect.any(FormData), expect.any(Object));
     expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
@@ -116,7 +112,7 @@ describe('useRegularUpload', () => {
       })
     );
 
-    await act(() => result.current.addFiles([mockFile]));
+    result.current.addFiles([mockFile]);
 
     await waitFor(() => {
       expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
@@ -137,7 +133,7 @@ describe('useRegularUpload', () => {
       })
     );
 
-    await act(() => result.current.addFiles([mockFile]));
+    result.current.addFiles([mockFile]);
 
     await waitFor(() => {
       expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {

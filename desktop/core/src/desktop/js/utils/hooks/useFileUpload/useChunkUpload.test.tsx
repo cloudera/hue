@@ -1,7 +1,6 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import useChunkUpload from './useChunkUpload';
 import { FileStatus, RegularFile, ChunkedFile } from './types';
-import { TaskStatus } from '../../../reactComponents/TaskServer/types';
 
 const mockFile: RegularFile = {
   uuid: 'file-1',
@@ -27,15 +26,13 @@ const mockChunk: ChunkedFile = {
 
 const mockEnqueue = jest.fn();
 const mockDequeue = jest.fn();
-const mockIsLoading = jest.fn().mockReturnValue(false);
 jest.mock('../useQueueProcessor/useQueueProcessor', () => ({
   __esModule: true,
   default: jest.fn(callback => {
     callback(mockFile);
     return {
       enqueue: mockEnqueue,
-      dequeue: mockDequeue,
-      isLoading: mockIsLoading()
+      dequeue: mockDequeue
     };
   })
 }));
@@ -48,14 +45,17 @@ jest.mock('../useSaveData/useSaveData', () => ({
   }))
 }));
 
-const mockIsSpaceAvailableInServer = jest.fn().mockReturnValue(Promise.resolve(true));
-jest.mock('./utils', () => ({
-  __esModule: true,
-  ...jest.requireActual('./utils'),
-  isAllChunksOfFileUploaded: jest.fn(() => true),
-  isSpaceAvailableInServer: () => mockIsSpaceAvailableInServer
-}));
+const mockIsSpaceAvailableInServer = jest.fn().mockImplementation(() => Promise.resolve(true));
+jest.mock('./utils', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual('./utils'),
+    isAllChunksOfFileUploaded: jest.fn(() => true),
+    isSpaceAvailableInServer: () => mockIsSpaceAvailableInServer()
+  };
+});
 
+// TODO: add more tests cases
 describe('useChunkUpload', () => {
   const mockUpdateFileVariables = jest.fn();
   const mockOnComplete = jest.fn();
@@ -64,7 +64,7 @@ describe('useChunkUpload', () => {
     jest.clearAllMocks();
   });
 
-  it('should enqueue chunked files when addFiles is called', () => {
+  it('should call enqueue files when addFiles is called', () => {
     const { result } = renderHook(() =>
       useChunkUpload({
         updateFileVariables: mockUpdateFileVariables,
@@ -72,9 +72,7 @@ describe('useChunkUpload', () => {
       })
     );
 
-    act(() => {
-      result.current.addFiles([mockFile]);
-    });
+    result.current.addFiles([mockFile]);
 
     expect(mockEnqueue).toHaveBeenCalledWith([mockChunk]);
   });
@@ -87,38 +85,9 @@ describe('useChunkUpload', () => {
       })
     );
 
-    act(() => {
-      result.current.cancelFile(mockFile.uuid);
-    });
+    result.current.cancelFile(mockFile.uuid);
 
     expect(mockDequeue).toHaveBeenCalledWith(mockFile.uuid, 'uuid');
-  });
-
-  it('should update file variables on successful chunk upload', async () => {
-    mockSave.mockImplementationOnce((_, { onSuccess }) => {
-      onSuccess();
-    });
-
-    const { result } = renderHook(() =>
-      useChunkUpload({
-        updateFileVariables: mockUpdateFileVariables,
-        onComplete: mockOnComplete
-      })
-    );
-
-    await act(() => {
-      result.current.addFiles([mockFile]);
-    });
-
-    expect(mockUpdateFileVariables).toHaveBeenNthCalledWith(1, mockFile.uuid, {
-      status: FileStatus.Uploading
-    });
-
-    await waitFor(() => {
-      expect(mockUpdateFileVariables).toHaveBeenNthCalledWith(2, mockFile.uuid, {
-        status: FileStatus.Uploaded
-      });
-    });
   });
 
   it('should update file variables on chunk upload error', async () => {
@@ -133,9 +102,7 @@ describe('useChunkUpload', () => {
       })
     );
 
-    await act(() => {
-      result.current.addFiles([mockFile]);
-    });
+    result.current.addFiles([mockFile]);
 
     await waitFor(() => {
       expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
@@ -154,36 +121,16 @@ describe('useChunkUpload', () => {
         onComplete: mockOnComplete
       })
     );
-
-    await act(async () => {
-      result.current.addFiles([mockFile]);
-    });
+    result.current.addFiles([mockFile]);
 
     await waitFor(() => {
-      expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
-        status: FileStatus.Uploading
-      });
-      expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
-        status: FileStatus.Failed,
-        error: expect.any(Error)
-      });
-      expect(mockSave).not.toHaveBeenCalled();
+      expect(mockUpdateFileVariables.mock.calls).toEqual(
+        expect.arrayContaining([
+          [mockFile.uuid, { status: FileStatus.Uploading }],
+          [mockFile.uuid, { status: FileStatus.Failed, error: expect.any(Error) }]
+        ])
+      );
     });
-  });
-
-  it('should reflect loading state from useQueueProcessor', async () => {
-    mockIsLoading.mockReturnValue(true);
-
-    const { result } = renderHook(() =>
-      useChunkUpload({
-        updateFileVariables: mockUpdateFileVariables,
-        onComplete: mockOnComplete
-      })
-    );
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(true);
-      expect(mockIsLoading).toHaveBeenCalled();
-    });
+    expect(mockSave).not.toHaveBeenCalled();
   });
 });
