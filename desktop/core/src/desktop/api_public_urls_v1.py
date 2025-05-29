@@ -164,7 +164,7 @@ urlpatterns += [
   re_path(r'^importer/file/guess_metadata/?$', importer_api.guess_file_metadata, name='importer_guess_file_metadata'),
   re_path(r'^importer/file/guess_header/?$', importer_api.guess_file_header, name='importer_guess_file_header'),
   re_path(r'^importer/file/preview/?$', importer_api.preview_file, name='importer_preview_file'),
-  re_path(r'^importer/file/sql_type_mapping/?$', importer_api.get_sql_type_mapping, name='importer_get_sql_type_mapping'),
+  re_path(r'^importer/sql_type_mapping/?$', importer_api.get_sql_type_mapping, name='importer_get_sql_type_mapping'),
 ]
 
 urlpatterns += [

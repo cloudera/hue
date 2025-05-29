@@ -61,13 +61,11 @@ class GuessFileMetadataSerializer(serializers.Serializer):
 
   file_path = serializers.CharField(required=True, help_text="Full path to the file to analyze")
   import_type = serializers.ChoiceField(
-    choices=['local', 'remote'], required=True, help_text="Whether the file is local or on a remote filesystem"
+    choices=["local", "remote"], required=True, help_text="Whether the file is local or on a remote filesystem"
   )
 
   def validate(self, data):
     """Validate the complete data set."""
-    # We can't check if the file exists here as we need the request object
-    # This will be done in the core method
     return data
 
 
@@ -90,13 +88,13 @@ class PreviewFileSerializer(serializers.Serializer):
 
   file_path = serializers.CharField(required=True, help_text="Full path to the file to preview")
   file_type = serializers.ChoiceField(
-    choices=['csv', 'tsv', 'excel', 'delimiter_format'], required=True, help_text="Type of file (csv, tsv, excel, delimiter_format)"
+    choices=["csv", "tsv", "excel", "delimiter_format"], required=True, help_text="Type of file (csv, tsv, excel, delimiter_format)"
   )
   import_type = serializers.ChoiceField(
-    choices=['local', 'remote'], required=True, help_text="Whether the file is local or on a remote filesystem"
+    choices=["local", "remote"], required=True, help_text="Whether the file is local or on a remote filesystem"
   )
   sql_dialect = serializers.ChoiceField(
-    choices=['hive', 'impala', 'trino', 'phoenix', 'sparksql'], required=True, help_text="SQL dialect for mapping column types"
+    choices=["hive", "impala", "trino", "phoenix", "sparksql"], required=True, help_text="SQL dialect for mapping column types"
   )
 
   has_header = serializers.BooleanField(required=True, help_text="Whether the file has a header row or not")
@@ -112,24 +110,24 @@ class PreviewFileSerializer(serializers.Serializer):
   def validate(self, data):
     """Validate the complete data set with interdependent field validation."""
 
-    if data.get('file_type') == 'excel' and not data.get('sheet_name'):
-      raise serializers.ValidationError({"sheet_name": "Sheet name is required for Excel files"})
+    if data.get("file_type") == "excel" and not data.get("sheet_name"):
+      raise serializers.ValidationError({"sheet_name": "Sheet name is required for Excel files."})
 
-    if data.get('file_type') in ['csv', 'tsv', 'delimiter_format']:
-      if not data.get('field_separator'):
+    if data.get("file_type") in ["csv", "tsv", "delimiter_format"]:
+      if not data.get("field_separator"):
         # If not provided, set default value based on file type
-        if data.get('file_type') == 'csv':
-          data['field_separator'] = ','
-        elif data.get('file_type') == 'tsv':
-          data['field_separator'] = '\t'
+        if data.get("file_type") == "csv":
+          data["field_separator"] = ","
+        elif data.get("file_type") == "tsv":
+          data["field_separator"] = "\t"
         else:
           raise serializers.ValidationError({"field_separator": "Field separator is required for delimited files"})
 
-      if not data.get('quote_char'):
-        data['quote_char'] = '"'  # Default quote character
+      if not data.get("quote_char"):
+        data["quote_char"] = '"'  # Default quote character
 
-      if not data.get('record_separator'):
-        data['record_separator'] = '\n'  # Default record separator
+      if not data.get("record_separator"):
+        data["record_separator"] = "\n"  # Default record separator
 
     return data
 
@@ -145,7 +143,7 @@ class SqlTypeMapperSerializer(serializers.Serializer):
   """
 
   sql_dialect = serializers.ChoiceField(
-    choices=['hive', 'impala', 'trino', 'phoenix', 'sparksql'], required=True, help_text="SQL dialect for mapping column types"
+    choices=["hive", "impala", "trino", "phoenix", "sparksql"], required=True, help_text="SQL dialect for mapping column types"
   )
 
   def validate(self, data):
@@ -167,10 +165,10 @@ class GuessFileHeaderSerializer(serializers.Serializer):
 
   file_path = serializers.CharField(required=True, help_text="Full path to the file to analyze")
   file_type = serializers.ChoiceField(
-    choices=['csv', 'tsv', 'excel', 'delimiter_format'], required=True, help_text="Type of file (csv, tsv, excel, delimiter_format)"
+    choices=["csv", "tsv", "excel", "delimiter_format"], required=True, help_text="Type of file (csv, tsv, excel, delimiter_format)"
   )
   import_type = serializers.ChoiceField(
-    choices=['local', 'remote'], required=True, help_text="Whether the file is local or on a remote filesystem"
+    choices=["local", "remote"], required=True, help_text="Whether the file is local or on a remote filesystem"
   )
 
   # Excel-specific fields
@@ -179,7 +177,7 @@ class GuessFileHeaderSerializer(serializers.Serializer):
   def validate(self, data):
     """Validate the complete data set with interdependent field validation."""
 
-    if data.get('file_type') == 'excel' and not data.get('sheet_name'):
-      raise serializers.ValidationError({"sheet_name": "Sheet name is required for Excel files"})
+    if data.get("file_type") == "excel" and not data.get("sheet_name"):
+      raise serializers.ValidationError({"sheet_name": "Sheet name is required for Excel files."})
 
     return data

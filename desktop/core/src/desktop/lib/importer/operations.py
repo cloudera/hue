@@ -14,20 +14,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
-import csv
-import uuid
 import codecs
+import csv
 import logging
-import zipfile
+import os
 import tempfile
+import uuid
 import xml.etree.ElementTree as ET
+import zipfile
 from io import BytesIO
 from typing import Any, BinaryIO, Dict, List, Optional, Union
 
 import polars as pl
-
-from desktop.lib.conf import coerce_bool
 
 LOG = logging.getLogger()
 
@@ -37,7 +35,7 @@ try:
 
   is_magic_lib_available = True
 except ImportError as e:
-  LOG.exception(f'Failed to import python-magic: {str(e)}')
+  LOG.exception(f"Failed to import python-magic: {str(e)}")
   is_magic_lib_available = False
 
 
@@ -128,15 +126,15 @@ def local_file_upload(upload_file, username: str) -> Dict[str, str]:
     Exception: If there are issues with file operations
 
   Example:
-    >>> result = upload_local_file(request.FILES['file'], 'hue_user')
+    >>> result = upload_local_file(request.FILES["file"], "hue_user")
     >>> print(result)
     {'file_path': '/tmp/hue_user_a1b2c3d4_myfile.txt'}
   """
   if not upload_file:
-    raise ValueError("Upload file cannot be None or empty")
+    raise ValueError("Upload file cannot be None or empty.")
 
   if not username:
-    raise ValueError("Username cannot be None or empty")
+    raise ValueError("Username cannot be None or empty.")
 
   # Generate a unique filename
   unique_id = uuid.uuid4().hex[:8]
@@ -148,11 +146,11 @@ def local_file_upload(upload_file, username: str) -> Dict[str, str]:
 
   try:
     # Simply write the file content to temporary location
-    with open(destination_path, 'wb') as destination:
+    with open(destination_path, "wb") as destination:
       for chunk in upload_file.chunks():
         destination.write(chunk)
 
-    return {'file_path': destination_path}
+    return {"file_path": destination_path}
 
   except Exception as e:
     if os.path.exists(destination_path):
@@ -184,20 +182,20 @@ def guess_file_metadata(file_path: str, import_type: str, fs=None) -> Dict[str, 
   if not file_path:
     raise ValueError("File path cannot be empty")
 
-  if import_type not in ['local', 'remote']:
+  if import_type not in ["local", "remote"]:
     raise ValueError(f"Unsupported import type: {import_type}")
 
-  if import_type == 'remote' and fs is None:
-    raise ValueError("File system object (fs) is required for remote import type")
+  if import_type == "remote" and fs is None:
+    raise ValueError("File system object is required for remote import type")
 
   # Check if file exists based on import type
-  if import_type == 'local' and not os.path.isfile(file_path):
-    raise ValueError(f'Local file does not exist: {file_path}')
-  elif import_type == 'remote' and fs and not fs.exists(file_path):
-    raise ValueError(f'Remote file does not exist: {file_path}')
+  if import_type == "local" and not os.path.exists(file_path):
+    raise ValueError(f"Local file does not exist: {file_path}")
+  elif import_type == "remote" and fs and not fs.exists(file_path):
+    raise ValueError(f"Remote file does not exist: {file_path}")
 
   error_occurred = False
-  fh = open(file_path, 'rb') if import_type == 'local' else fs.open(file_path, 'rb')
+  fh = open(file_path, "rb") if import_type == "local" else fs.open(file_path, "rb")
 
   try:
     sample = fh.read(16 * 1024)  # Read 16 KiB sample
@@ -207,10 +205,10 @@ def guess_file_metadata(file_path: str, import_type: str, fs=None) -> Dict[str, 
 
     file_type = _detect_file_type(sample)
 
-    if file_type == 'unknown':
-      raise ValueError('Unable to detect file format.')
+    if file_type == "unknown":
+      raise ValueError("Unable to detect file format.")
 
-    if file_type == 'excel':
+    if file_type == "excel":
       metadata = _get_excel_metadata(fh)
     else:
       # CSV, TSV, or other delimited formats
@@ -225,7 +223,7 @@ def guess_file_metadata(file_path: str, import_type: str, fs=None) -> Dict[str, 
 
   finally:
     fh.close()
-    if import_type == 'local' and error_occurred and os.path.exists(file_path):
+    if import_type == "local" and error_occurred and os.path.exists(file_path):
       LOG.debug(f"Due to error in guess_file_metadata, cleaning up uploaded local file: {file_path}")
       os.remove(file_path)
 
@@ -237,9 +235,9 @@ def preview_file(
   sql_dialect: str,
   has_header: bool = False,
   sheet_name: Optional[str] = None,
-  field_separator: Optional[str] = ',',
+  field_separator: Optional[str] = ",",
   quote_char: Optional[str] = '"',
-  record_separator: Optional[str] = '\n',
+  record_separator: Optional[str] = "\n",
   fs=None,
   preview_rows: int = 50,
 ) -> Dict[str, Any]:
@@ -274,42 +272,42 @@ def preview_file(
   if not file_path:
     raise ValueError("File path cannot be empty")
 
-  if sql_dialect.lower() not in ['hive', 'impala', 'trino', 'phoenix', 'sparksql']:
+  if sql_dialect.lower() not in ["hive", "impala", "trino", "phoenix", "sparksql"]:
     raise ValueError(f"Unsupported SQL dialect: {sql_dialect}")
 
-  if file_type not in ['excel', 'csv', 'tsv', 'delimiter_format']:
+  if file_type not in ["excel", "csv", "tsv", "delimiter_format"]:
     raise ValueError(f"Unsupported file type: {file_type}")
 
-  if import_type not in ['local', 'remote']:
+  if import_type not in ["local", "remote"]:
     raise ValueError(f"Unsupported import type: {import_type}")
 
-  if import_type == 'remote' and fs is None:
-    raise ValueError("File system object (fs) is required for remote import type")
+  if import_type == "remote" and fs is None:
+    raise ValueError("File system object is required for remote import type")
 
   # Check if file exists based on import type
-  if import_type == 'local' and not os.path.isfile(file_path):
-    raise ValueError(f'Local file does not exist: {file_path}')
-  elif import_type == 'remote' and fs and not fs.exists(file_path):
-    raise ValueError(f'Remote file does not exist: {file_path}')
+  if import_type == "local" and not os.path.exists(file_path):
+    raise ValueError(f"Local file does not exist: {file_path}")
+  elif import_type == "remote" and fs and not fs.exists(file_path):
+    raise ValueError(f"Remote file does not exist: {file_path}")
 
   error_occurred = False
-  fh = open(file_path, 'rb') if import_type == 'local' else fs.open(file_path, 'rb')
+  fh = open(file_path, "rb") if import_type == "local" else fs.open(file_path, "rb")
 
   try:
-    if file_type == 'excel':
+    if file_type == "excel":
       if not sheet_name:
         raise ValueError("Sheet name is required for Excel files.")
 
       preview = _preview_excel_file(fh, file_type, sheet_name, sql_dialect, has_header, preview_rows)
-    elif file_type in ['csv', 'tsv', 'delimiter_format']:
+    elif file_type in ["csv", "tsv", "delimiter_format"]:
       # Process escapable characters
       try:
         if field_separator:
-          field_separator = codecs.decode(field_separator, 'unicode_escape')
+          field_separator = codecs.decode(field_separator, "unicode_escape")
         if quote_char:
-          quote_char = codecs.decode(quote_char, 'unicode_escape')
+          quote_char = codecs.decode(quote_char, "unicode_escape")
         if record_separator:
-          record_separator = codecs.decode(record_separator, 'unicode_escape')
+          record_separator = codecs.decode(record_separator, "unicode_escape")
 
       except Exception as e:
         LOG.exception(f"Error decoding escape characters: {e}", exc_info=True)
@@ -317,7 +315,7 @@ def preview_file(
 
       preview = _preview_delimited_file(fh, file_type, field_separator, quote_char, record_separator, sql_dialect, has_header, preview_rows)
     else:
-      raise ValueError(f'Unsupported file type: {file_type}')
+      raise ValueError(f"Unsupported file type: {file_type}")
 
     return preview
   except Exception as e:
@@ -327,7 +325,7 @@ def preview_file(
 
   finally:
     fh.close()
-    if import_type == 'local' and error_occurred and os.path.exists(file_path):
+    if import_type == "local" and error_occurred and os.path.exists(file_path):
       LOG.debug(f"Due to error in preview_file, cleaning up uploaded local file: {file_path}")
       os.remove(file_path)
 
@@ -356,14 +354,14 @@ def _detect_file_type(file_sample: bytes) -> str:
     file_type = magic.from_buffer(file_sample, mime=True)
 
     # Map MIME type to the simplified type categories
-    if any(keyword in file_type for keyword in ['excel', 'spreadsheet', 'officedocument.sheet']):
-      return 'excel'
-    elif any(keyword in file_type for keyword in ['text', 'csv', 'plain']):
-      # For text files, we'll analyze the content later to determine specific format
-      return 'delimiter_format'
+    if any(keyword in file_type for keyword in ["excel", "spreadsheet", "officedocument.sheet"]):
+      return "excel"
+    elif any(keyword in file_type for keyword in ["text", "csv", "plain"]):
+      # For text files, analyze the content later to determine specific format
+      return "delimiter_format"
 
     LOG.info(f"Detected MIME type: {file_type}, but not recognized as supported format")
-    return 'unknown'
+    return "unknown"
   except Exception as e:
     message = f"Error detecting file type: {e}"
     LOG.exception(message, exc_info=True)
@@ -389,8 +387,8 @@ def _get_excel_metadata(fh: BinaryIO) -> Dict[str, Any]:
     fh.seek(0)
     try:
       sheet_names = _get_sheet_names_xlsx(BytesIO(fh.read()))
-    except Exception as e:
-      LOG.warning(f"Failed to read Excel file for sheet names with Zip + XML parsing approach, trying next with Polars.")
+    except Exception:
+      LOG.warning("Failed to read Excel file for sheet names with Zip + XML parsing approach, trying next with Polars.")
 
       # Possibly some other format instead of .xlsx
       fh.seek(0)
@@ -400,8 +398,8 @@ def _get_excel_metadata(fh: BinaryIO) -> Dict[str, Any]:
       ).keys()  # No need to read rows for detecting sheet names
 
     return {
-      'type': 'excel',
-      'sheet_names': list(sheet_names),
+      "type": "excel",
+      "sheet_names": list(sheet_names),
     }
   except Exception as e:
     message = f"Error extracting Excel file metadata: {e}"
@@ -423,14 +421,14 @@ def _get_sheet_names_xlsx(fh: BinaryIO) -> List[str]:
   Returns:
     A list of worksheet names.
   """
-  with zipfile.ZipFile(fh, 'r') as z, z.open('xl/workbook.xml') as f:
+  with zipfile.ZipFile(fh, "r") as z, z.open("xl/workbook.xml") as f:
     tree = ET.parse(f)
 
   # XML namespace for SpreadsheetML
-  ns = {'x': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'}
-  sheets = tree.getroot().find('x:sheets', ns)
+  ns = {"x": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+  sheets = tree.getroot().find("x:sheets", ns)
 
-  return [s.get('name') for s in sheets]
+  return [s.get("name") for s in sheets]
 
 
 def _get_delimited_metadata(file_sample: Union[bytes, str], file_type: str) -> Dict[str, Any]:
@@ -451,7 +449,7 @@ def _get_delimited_metadata(file_sample: Union[bytes, str], file_type: str) -> D
     Exception: If there's an error processing the delimited file
   """
   if isinstance(file_sample, bytes):
-    file_sample = file_sample.decode('utf-8', errors='replace')
+    file_sample = file_sample.decode("utf-8", errors="replace")
 
   # Use CSV Sniffer to detect delimiter and other formatting
   try:
@@ -463,18 +461,18 @@ def _get_delimited_metadata(file_sample: Union[bytes, str], file_type: str) -> D
     raise Exception(message)
 
   # Refine file type based on detected delimiter
-  if file_type == 'delimiter_format':
-    if dialect.delimiter == ',':
-      file_type = 'csv'
-    elif dialect.delimiter == '\t':
-      file_type = 'tsv'
+  if file_type == "delimiter_format":
+    if dialect.delimiter == ",":
+      file_type = "csv"
+    elif dialect.delimiter == "\t":
+      file_type = "tsv"
     # Other delimiters remain as 'delimiter_format'
 
   return {
-    'type': file_type,
-    'field_separator': dialect.delimiter,
-    'quote_char': dialect.quotechar,
-    'record_separator': dialect.lineterminator,
+    "type": file_type,
+    "field_separator": dialect.delimiter,
+    "quote_char": dialect.quotechar,
+    "record_separator": dialect.lineterminator,
   }
 
 
@@ -509,7 +507,7 @@ def _preview_excel_file(
 
     # Return empty result if the df is empty
     if df.height == 0:
-      return {'type': file_type, 'columns': [], 'preview_data': {}}
+      return {"type": file_type, "columns": [], "preview_data": {}}
 
     schema = df.schema
     preview_data = df.to_dict(as_series=False)
@@ -520,9 +518,9 @@ def _preview_excel_file(
       col_type = str(schema[col])
       sql_type = _map_polars_dtype_to_sql_type(dialect, col_type)
 
-      columns.append({'name': col, 'type': sql_type})
+      columns.append({"name": col, "type": sql_type})
 
-    result = {'type': file_type, 'columns': columns, 'preview_data': preview_data}
+    result = {"type": file_type, "columns": columns, "preview_data": preview_data}
 
     return result
 
@@ -571,7 +569,7 @@ def _preview_delimited_file(
       BytesIO(fh.read()),
       separator=field_separator,
       quote_char=quote_char,
-      eol_char='\n' if record_separator == '\r\n' else record_separator,
+      eol_char="\n" if record_separator == "\r\n" else record_separator,
       has_header=has_header,
       infer_schema_length=10000,
       n_rows=preview_rows,
@@ -580,7 +578,7 @@ def _preview_delimited_file(
 
     # Return empty result if the df is empty
     if df.height == 0:
-      return {'type': file_type, 'columns': [], 'preview_data': {}}
+      return {"type": file_type, "columns": [], "preview_data": {}}
 
     schema = df.schema
     preview_data = df.to_dict(as_series=False)
@@ -591,9 +589,9 @@ def _preview_delimited_file(
       col_type = str(schema[col])
       sql_type = _map_polars_dtype_to_sql_type(dialect, col_type)
 
-      columns.append({'name': col, 'type': sql_type})
+      columns.append({"name": col, "type": sql_type})
 
-    result = {'type': file_type, 'columns': columns, 'preview_data': preview_data}
+    result = {"type": file_type, "columns": columns, "preview_data": preview_data}
 
     return result
 
@@ -625,29 +623,29 @@ def guess_file_header(file_path: str, file_type: str, import_type: str, sheet_na
     Exception: For various file processing errors
   """
   if not file_path:
-    raise ValueError("File path is required")
+    raise ValueError("File path cannot be empty")
 
-  if file_type not in ['excel', 'csv', 'tsv', 'delimiter_format']:
+  if file_type not in ["excel", "csv", "tsv", "delimiter_format"]:
     raise ValueError(f"Unsupported file type: {file_type}")
 
-  if import_type not in ['local', 'remote']:
+  if import_type not in ["local", "remote"]:
     raise ValueError(f"Unsupported import type: {import_type}")
 
-  if import_type == 'remote' and fs is None:
-    raise ValueError("File system object (fs) is required for remote import type")
+  if import_type == "remote" and fs is None:
+    raise ValueError("File system object is required for remote import type")
 
   # Check if file exists based on import type
-  if import_type == 'local' and not os.path.isfile(file_path):
-    raise ValueError(f'Local file does not exist: {file_path}')
-  elif import_type == 'remote' and fs and not fs.exists(file_path):
-    raise ValueError(f'Remote file does not exist: {file_path}')
+  if import_type == "local" and not os.path.exists(file_path):
+    raise ValueError(f"Local file does not exist: {file_path}")
+  elif import_type == "remote" and fs and not fs.exists(file_path):
+    raise ValueError(f"Remote file does not exist: {file_path}")
 
-  fh = open(file_path, 'rb') if import_type == 'local' else fs.open(file_path, 'rb')
+  fh = open(file_path, "rb") if import_type == "local" else fs.open(file_path, "rb")
 
   has_header = False
 
   try:
-    if file_type == 'excel':
+    if file_type == "excel":
       if not sheet_name:
         raise ValueError("Sheet name is required for Excel files.")
 
@@ -660,7 +658,7 @@ def guess_file_header(file_path: str, file_type: str, import_type: str, sheet_na
         ).write_csv(file=None)
 
         if isinstance(csv_snippet, bytes):
-          csv_snippet = csv_snippet.decode('utf-8', errors='replace')
+          csv_snippet = csv_snippet.decode("utf-8", errors="replace")
 
         has_header = csv.Sniffer().has_header(csv_snippet)
         LOG.info(f"Detected header for Excel file: {has_header}")
@@ -671,13 +669,13 @@ def guess_file_header(file_path: str, file_type: str, import_type: str, sheet_na
 
         raise Exception(message)
 
-    elif file_type in ['csv', 'tsv', 'delimiter_format']:
+    elif file_type in ["csv", "tsv", "delimiter_format"]:
       try:
         # Reset file position
         fh.seek(0)
 
         # Read 16 KiB sample
-        sample = fh.read(16 * 1024).decode('utf-8', errors='replace')
+        sample = fh.read(16 * 1024).decode("utf-8", errors="replace")
 
         has_header = csv.Sniffer().has_header(sample)
         LOG.info(f"Detected header for delimited file: {has_header}")
