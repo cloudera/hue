@@ -16,37 +16,38 @@
 # limitations under the License.
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-
-from djangosaml2.views import login, echo_attributes, metadata,\
-                              assertion_consumer_service, logout_service
+from djangosaml2.views import AssertionConsumerServiceView, EchoAttributesView, LoginView, LogoutView, MetadataView
 
 try:
-  from djangosaml2.views import logout_service_post
+  from djangosaml2.views import LogoutServicePostView
 except ImportError:
   # We are on an older version of djangosaml2
-  logout_service_post = None
+  LogoutServicePostView = None
 
 import libsaml.conf
 
 
-__all__ = ['login', 'echo_attributes', 'assertion_consumer_service', 'metadata']
-
-
-if logout_service_post is None:
-  _assertion_consumer_service = assertion_consumer_service
-
-  @require_POST
-  @csrf_exempt
-  def assertion_consumer_service(request, config_loader_path=None, attribute_mapping=None, create_unknown_user=None):
+# Customize AssertionConsumerServiceView
+class CustomAssertionConsumerServiceView(AssertionConsumerServiceView):
+  def dispatch(self, request, *args, **kwargs):
     username_source = libsaml.conf.USERNAME_SOURCE.get().lower()
-    return _assertion_consumer_service(request, config_loader_path, attribute_mapping, create_unknown_user, username_source)
+    return super().dispatch(request, *args, **kwargs)
+
+# Expose the views
 
 
-setattr(logout_service, 'login_notrequired', True)
-setattr(login, 'login_notrequired', True)
-setattr(echo_attributes, 'login_notrequired', True)
-setattr(assertion_consumer_service, 'login_notrequired', True)
-setattr(metadata, 'login_notrequired', True)
+login = LoginView
+echo_attributes = EchoAttributesView
+metadata = MetadataView
+assertion_consumer_service = CustomAssertionConsumerServiceView
+logout_service = LogoutView
+logout_service_post = LogoutServicePostView
 
-if logout_service_post is not None:
-  setattr(logout_service_post, 'login_notrequired', True)
+__all__ = ['login', 'echo_attributes', 'assertion_consumer_service', 'metadata', 'logout_service', 'logout_service_post']
+
+# Set login_notrequired attribute
+for view in [LogoutView, LoginView, EchoAttributesView, AssertionConsumerServiceView, MetadataView]:
+  setattr(view, 'login_notrequired', True)
+
+if LogoutServicePostView is not None:
+  setattr(LogoutServicePostView, 'login_notrequired', True)
