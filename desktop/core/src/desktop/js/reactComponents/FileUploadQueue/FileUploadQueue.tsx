@@ -166,6 +166,12 @@ const FileUploadQueue = (): JSX.Element => {
     }
   };
 
+  const onClose = () => {
+    uploadQueue.forEach(file => cancelFile(file));
+    setIsVisible(false);
+  };
+
+
   const handleModalOk = (overwrite: boolean) => {
     if (overwrite) {
       addFiles(conflictFiles, true);
@@ -201,39 +207,63 @@ const FileUploadQueue = (): JSX.Element => {
       {isModalVisible &&
         ReactDOM.createPortal(
           <Modal
-            title={t('Resolve Filename Conflicts')}
-            open={isModalVisible}
-            closable={false} 
+          title={t('Resolve Filename Conflicts')}
+          open={isModalVisible}
+          okText={t('Overwrite')}
+          onOk={() => handleModalOk(true)}
+          cancelText={t('Cancel')}
+          onCancel={() => setIsModalVisible(false)}
+          secondaryButtonText={t('Keep Original')}
+          onSecondary={() => handleModalOk(false)}
+          style={{
+            height: '50vh',
+          }}
+          bodyStyle={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px'
+          }}
+        >
+          {t(`${conflictFiles.length} files you are trying to upload already exist in the uploaded files.`)}
+          <div
             style={{
-              height: '50vh',
-              overflow: 'hidden', 
-            }} 
-            bodyStyle={{
-              maxHeight: 'calc(50vh - 100px)', // Adjust body height to fit within the modal
-              overflowY: 'auto'
+              marginTop: '8px',
+              overflowY: 'auto',
+              maxHeight: 'calc(50vh - 100px)',
+              borderTop: '1px solid #e9e9e9',
+              paddingTop: '8px'
             }}
-            footer={[
-              <Button key="keep" onClick={() => handleModalOk(false)}>
-                {t('Keep Original')}
-              </Button>,
-              <Button key="overwrite" type="primary" onClick={() => handleModalOk(true)}>
-                {t('Overwrite')}
-              </Button>,
-               <Button key="cancel" onClick={() => setIsModalVisible(false)}>
-               {t('Cancel')}
-             </Button>,
-            ]}
           >
-            {t(`${conflictFiles.length} files you are trying to upload already exist in the uploaded files.`)}
-            <div style={{ marginTop: '3px' }}>
-             {conflictFiles.map(file => (
-          <div key={file.file.name} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <FileIcon /> 
-            <span>{file.file.name}</span>
+            {conflictFiles.map(file => (
+              <div
+                key={file.file.name}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <div
+                  style={{
+                    flexShrink: 0, // Prevent icon from shrinking
+                    width: '20px', // Set icon's width
+                    height: '20px' // Set icon's height
+                  }}
+                >
+                  <FileIcon style={{ width: '100%', height: '100%' }} />
+                </div>
+                <span
+                  style={{
+                    wordBreak: 'break-word', // Allow long names to wrap
+                    maxWidth: 'calc(100% - 28px)' // Ensure the name takes the remaining space
+                  }}
+                >
+                  {file.file.name}
+                </span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-          </Modal>,
+        </Modal>,
           document.body
         )}
       <div className="hue-upload-queue-container antd cuix">
@@ -243,6 +273,10 @@ const FileUploadQueue = (): JSX.Element => {
             <BorderlessButton
               onClick={() => setExpandQueue(!expandQueue)}
               icon={expandQueue ? <CaratDownIcon /> : <CaratUpIcon />}
+            />
+             <BorderlessButton
+              onClick={onClose}
+              icon={<CloseIcon />}
             />
           </div>
         </div>
