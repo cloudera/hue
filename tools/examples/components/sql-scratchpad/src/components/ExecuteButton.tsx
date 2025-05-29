@@ -4,7 +4,7 @@ import SqlExecutable from 'gethue/apps/editor/execution/sqlExecutable';
 import { setWebCompProp } from './utils';
 
 export interface ExecuteButtonProps {
-  activeExecutable?: SqlExecutable
+  activeExecutable?: SqlExecutable;
 }
 
 interface ExecuteButtonElement extends HTMLElement {
@@ -15,7 +15,11 @@ export const ExecuteButton: FC<ExecuteButtonProps> = ({ activeExecutable }) => {
   const containerElement = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setWebCompProp<ExecuteButtonElement>(containerElement.current?.firstElementChild, 'executable', activeExecutable);
+    setWebCompProp<ExecuteButtonElement>(
+      containerElement.current?.firstElementChild,
+      'executable',
+      activeExecutable
+    );
   }, [activeExecutable, containerElement]);
 
   useEffect(() => {
@@ -24,5 +28,5 @@ export const ExecuteButton: FC<ExecuteButtonProps> = ({ activeExecutable }) => {
     }
   }, [containerElement]);
 
-  return <div ref={ containerElement }/>
+  return <div ref={containerElement} />;
 };

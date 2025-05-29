@@ -8,11 +8,12 @@ import { QueryEditor } from './QueryEditor';
 import { ExecuteButton } from './ExecuteButton';
 import { ExecuteProgress } from './ExecuteProgress';
 import { ResultTable } from './ResultTable';
-import { ExecuteLimit } from "./ExecuteLimit";
+import { ExecuteLimit } from './ExecuteLimit';
 
-const { configure, refreshConfig, findEditorConnector, createExecutor, getNamespaces } = hueComponents;
+const { configure, refreshConfig, findEditorConnector, createExecutor, getNamespaces } =
+  hueComponents;
 
-const HUE_BASE_URL = 'http://localhost:8888'
+const HUE_BASE_URL = 'http://localhost:8888';
 
 configure({
   baseUrl: HUE_BASE_URL
@@ -26,7 +27,7 @@ export const SqlScratchpad: FC = () => {
     try {
       await refreshConfig(HUE_BASE_URL);
     } catch {
-      console.warn('Failed loading the Hue config')
+      console.warn('Failed loading the Hue config');
       return;
     }
 
@@ -38,44 +39,48 @@ export const SqlScratchpad: FC = () => {
     }
 
     try {
-      const { namespaces } = await getNamespaces({connector})
+      const { namespaces } = await getNamespaces({ connector });
       if (!namespaces.length || !namespaces[0].computes.length) {
         console.warn('No namespace and/or compute found!');
         return;
       }
 
-      setExecutor(createExecutor({
-        compute: () => namespaces[0].computes[0],
-        connector: () => connector,
-        database: () => 'default',
-        namespace: () => namespaces[0],
-      }))
+      setExecutor(
+        createExecutor({
+          compute: () => namespaces[0].computes[0],
+          connector: () => connector,
+          database: () => 'default',
+          namespace: () => namespaces[0]
+        })
+      );
     } catch {
-      console.warn('Failed loading namespaces.')
+      console.warn('Failed loading namespaces.');
     }
-  }
+  };
 
   useEffect(() => {
     setup().catch();
   }, []);
 
   if (executor) {
-    return <React.Fragment>
-      <div className="ace-editor">
-        <QueryEditor executor={executor} setActiveExecutable={setActiveExecutable} />
-      </div>
-      <div className="executable-progress-bar">
-        <ExecuteProgress activeExecutable={activeExecutable} />
-      </div>
-      <div className="executable-actions">
-        <ExecuteButton activeExecutable={activeExecutable} />
-        <ExecuteLimit activeExecutable={activeExecutable} />
-      </div>
-      <div className="result-table">
-        <ResultTable activeExecutable={activeExecutable} />
-      </div>
-    </React.Fragment>
+    return (
+      <React.Fragment>
+        <div className="ace-editor">
+          <QueryEditor executor={executor} setActiveExecutable={setActiveExecutable} />
+        </div>
+        <div className="executable-progress-bar">
+          <ExecuteProgress activeExecutable={activeExecutable} />
+        </div>
+        <div className="executable-actions">
+          <ExecuteButton activeExecutable={activeExecutable} />
+          <ExecuteLimit activeExecutable={activeExecutable} />
+        </div>
+        <div className="result-table">
+          <ResultTable activeExecutable={activeExecutable} />
+        </div>
+      </React.Fragment>
+    );
   } else {
-    return <div>Loading Config...</div>
+    return <div>Loading Config...</div>;
   }
-}
+};
