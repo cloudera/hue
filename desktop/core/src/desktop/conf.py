@@ -16,13 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-import glob
-import stat
-import socket
-import logging
 import datetime
+import glob
+import logging
+import os
+import socket
+import stat
+import sys
 from collections import OrderedDict
 
 from django.db import connection
@@ -30,16 +30,16 @@ from django.utils.translation import gettext_lazy as _
 
 from desktop import appmanager
 from desktop.lib.conf import (
-  Config,
-  ConfigSection,
-  UnspecifiedConfigSection,
   coerce_bool,
   coerce_csv,
   coerce_json_dict,
   coerce_password_from_script,
   coerce_str_lowercase,
   coerce_string,
+  Config,
+  ConfigSection,
   list_of_compiled_res,
+  UnspecifiedConfigSection,
   validate_path,
 )
 from desktop.lib.i18n import force_unicode
@@ -106,7 +106,7 @@ def get_dn(fqdn=None):
     else:
       LOG.warning("allowed_hosts value to '*'. It is a security risk")
       val.append('*')
-  except Exception as e:
+  except Exception:
     LOG.warning("allowed_hosts value to '*'. It is a security risk")
     val.append('*')
   return val
