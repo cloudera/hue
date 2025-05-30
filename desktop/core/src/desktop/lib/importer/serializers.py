@@ -64,10 +64,6 @@ class GuessFileMetadataSerializer(serializers.Serializer):
     choices=["local", "remote"], required=True, help_text="Whether the file is local or on a remote filesystem"
   )
 
-  def validate(self, data):
-    """Validate the complete data set."""
-    return data
-
 
 class PreviewFileSerializer(serializers.Serializer):
   """Serializer for file preview request validation.
@@ -145,10 +141,6 @@ class SqlTypeMapperSerializer(serializers.Serializer):
   sql_dialect = serializers.ChoiceField(
     choices=["hive", "impala", "trino", "phoenix", "sparksql"], required=True, help_text="SQL dialect for mapping column types"
   )
-
-  def validate(self, data):
-    """Validate the complete data set."""
-    return data
 
 
 class GuessFileHeaderSerializer(serializers.Serializer):
