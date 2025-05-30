@@ -19,20 +19,20 @@ import { IdentifierLocation, SyntaxError } from 'parse/types';
 declare namespace Ace {
   export interface Editor {
     $blockScrolling: number;
-    addError(message:string, line:number): void;
-    addWarning(message:string, line:number): void;
+    addError(message: string, line: number): void;
+    addWarning(message: string, line: number): void;
     clearSelection(): void;
     container: HTMLElement;
     commands: {
       addCommand(command: {
-        name: string,
-        bindKey: { win: string; mac: string } | string,
-        exec(): void,
-        multiSelectAction?: string,
-        scrollIntoView?: string
+        name: string;
+        bindKey: { win: string; mac: string } | string;
+        exec(): void;
+        multiSelectAction?: string;
+        scrollIntoView?: string;
       }): void;
       bindKey(key: { win: string; mac: string } | string, command: string): void;
-    }
+    };
     completer: any;
     completers: any[];
     clearErrorsAndWarnings(type: string): void;
@@ -41,10 +41,10 @@ declare namespace Ace {
     execCommand(cmd: string, arg?: unknown): void;
     focus(): void;
     getCursorPosition(): Position;
-    getOption(option: string): string|boolean|number;
+    getOption(option: string): string | boolean | number;
     getSelectedText(): string;
     getSelectionRange(): Range;
-    getSession(): Session
+    getSession(): Session;
     getTextAfterCursor(): string;
     getTextBeforeCursor(): string;
     getValue(): string;
@@ -52,7 +52,7 @@ declare namespace Ace {
     keyBinding: {
       addKeyboardHandler(hashHandler: HashHandler): void;
       removeKeyboardHandler(hashHandler: HashHandler): void;
-    }
+    };
     lastChangeTime: number;
     moveCursorTo(row: number, col: number): void;
     moveCursorToPosition(position: Position): void;
@@ -74,7 +74,7 @@ declare namespace Ace {
       };
       screenToTextCoordinates(left: number, top: number): Position;
       scrollCursorIntoView(position?: Position, u?: number): void;
-      textToScreenCoordinates(row: number, column: number): { pageX: number; pageY: number }
+      textToScreenCoordinates(row: number, column: number): { pageX: number; pageY: number };
     };
     resize(force?: boolean): void;
     scrollToLine(line: number, center: boolean, animate: boolean, callback?: () => void): void;
