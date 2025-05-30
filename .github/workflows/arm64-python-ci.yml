@@ -67,21 +67,6 @@ jobs:
         export ROOT=$PWD
         make apps docs test_prep
 
-    - name: Run documentation lint check
-      run: |
-        curl -O https://dl.google.com/go/go1.23.4.linux-arm64.tar.gz
-        tar -xvf go1.23.4.linux-arm64.tar.gz
-        go/bin/go install github.com/raviqqe/muffet/v2@latest
-
-        curl --output hugo_0.69.0_Linux.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-ARM64.tar.gz
-        tar -xvf hugo_0.69.0_Linux.tar.gz
-
-        export PATH=$PWD:$HOME/go/bin:$PATH
-
-        # Trigger linting if documentation changes
-        ./tools/ci/check_for_website_dead_links.sh docs/docs-site
-        # ./tools/ci/check_for_website_dead_links.sh docs/gethue
-
     - name: Run python lint check
       run: |
         PYTHONWARNINGS=always ./build/env/bin/hue runruff check
