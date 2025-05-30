@@ -593,10 +593,12 @@ for middleware in desktop.conf.MIDDLEWARE.get():
 def is_oidc_configured():
   return 'desktop.auth.backend.OIDCBackend' in AUTHENTICATION_BACKENDS
 
+def only_oidc_configured():
+  return not [b for b in AUTHENTICATION_BACKENDS if b != 'desktop.auth.backend.OIDCBackend']
 
 if is_oidc_configured():
   INSTALLED_APPS.append('mozilla_django_oidc')
-  if 'desktop.auth.backend.AllowFirstUserDjangoBackend' not in AUTHENTICATION_BACKENDS:
+  if only_oidc_configured():
     # when multi-backend auth, standard login URL '/hue/accounts/login' is used.
     LOGIN_URL = '/oidc/authenticate/'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
