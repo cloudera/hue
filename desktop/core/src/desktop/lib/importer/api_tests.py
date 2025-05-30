@@ -142,15 +142,12 @@ class TestGuessFileMetadataAPI:
     mock_serializer = MagicMock(is_valid=MagicMock(return_value=False), errors={"file_path": ["This field is required"]})
     mock_serializer_class.return_value = mock_serializer
 
-    # Create request
     request = APIRequestFactory().get("importer/file/guess_metadata/")
     request.user = MagicMock(username="test_user")
     request.query_params = {}
 
-    # Call the view
     response = api.guess_file_metadata(request)
 
-    # Assertions
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.data == {"file_path": ["This field is required"]}
 

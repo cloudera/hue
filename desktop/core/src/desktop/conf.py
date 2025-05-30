@@ -2956,11 +2956,11 @@ def has_ofs_access(user):
 
 IMPORTER = ConfigSection(
   key='importer',
-  help=_("""Configuration options for the data file importer."""),
+  help=_("""Configuration options for the importer."""),
   members=dict(
     IS_ENABLED=Config(
       key='is_enabled',
-      help=_('Enable or disable the new data file importer functionality'),
+      help=_('Enable or disable the new importer functionality'),
       type=coerce_bool,
       default=False,
     ),
