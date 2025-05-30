@@ -147,19 +147,36 @@ const FileUploadQueue = (): JSX.Element => {
   });
 
   const resolveFileConflicts = (newFiles: RegularFile[]) => {
-    const existingFileNames = uploadedFiles.map(f => f.file.name);
-    const conflicts = newFiles.filter(newFile => existingFileNames.includes(newFile.file.name));
-    const nonConflictingFiles = newFiles.filter(newFile => !existingFileNames.includes(newFile.file.name));
-   
+    // Identify files currently in progress (Uploading or Pending) in the queue
+    const inProgressFileIdentifiers = uploadQueue
+      .filter(file => file.status === FileStatus.Uploading || file.status === FileStatus.Pending)
+      .map(file => `${file.filePath}/${file.file.name}`);
+  
+    // Filter out files that are in progress in the upload queue
+    const filteredNewFiles = newFiles.filter(
+      newFile => !inProgressFileIdentifiers.includes(`${newFile.filePath}/${newFile.file.name}`)
+    );
+  
+    // Check for conflicts only with files that are already uploaded
+    const existingUploadedFileNames = uploadedFiles.map(f => f.file.name);
+    const conflicts = filteredNewFiles.filter(newFile =>
+      existingUploadedFileNames.includes(newFile.file.name)
+    );
+  
+    // Non-conflicting files to be added
+    const nonConflictingFiles = filteredNewFiles.filter(
+      newFile => !existingUploadedFileNames.includes(newFile.file.name)
+    );
+  
     if (conflicts.length > 0) {
       setConflictFiles(conflicts);
       setIsModalVisible(true);
-    }
-    else {
+    } else {
       // Clear stale conflict state if no conflicts exist
       setConflictFiles([]);
       setIsModalVisible(false);
     }
+  
     if (nonConflictingFiles.length > 0) {
       addFiles(nonConflictingFiles);
       setIsVisible(true);
