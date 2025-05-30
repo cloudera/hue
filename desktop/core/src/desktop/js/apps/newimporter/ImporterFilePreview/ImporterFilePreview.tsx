@@ -28,6 +28,7 @@ import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL, FINISH_IMPORT_URL } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
+import EditColumnsModal from './EditColumns/EditColumnsModal';
 
 import './ImporterFilePreview.scss';
 
@@ -38,7 +39,7 @@ interface ImporterFilePreviewProps {
 const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
-
+  const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
   const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
 
   const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
@@ -129,7 +130,12 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       </div>
       <div className="hue-importer-preview-page__metadata">{t('DESTINATION')}</div>
       <div className="hue-importer-preview-page__main-section">
-        <SourceConfiguration fileFormat={fileFormat} setFileFormat={setFileFormat} />
+        <div className="hue-importer-preview-page__header-section">
+          <SourceConfiguration fileFormat={fileFormat} setFileFormat={setFileFormat} />
+          <BorderlessButton onClick={() => setIsEditColumnsOpen(true)}>
+            {t('Edit Columns')}
+          </BorderlessButton>
+        </div>
         <PaginatedTable<ImporterTableData>
           loading={guessingFormat || guessingFields}
           data={tableData}
@@ -139,6 +145,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
           locale={{ emptyText: t('No data found in the file!') }}
         />
       </div>
+      <EditColumnsModal isOpen={isEditColumnsOpen} closeModal={() => setIsEditColumnsOpen(false)} />
     </div>
   );
 };
