@@ -22,7 +22,7 @@ import { getItemProgress } from './utils';
 import { RegularFile, FileVariables, FileStatus } from './types';
 
 interface UseUploadQueueResponse {
-  addFiles: (item: RegularFile[]) => void;
+  addFiles: (items: RegularFile[], overwrite?: boolean) => void; 
   cancelFile: (uuid: RegularFile['uuid']) => void;
   isLoading: boolean;
 }
@@ -40,12 +40,13 @@ const useRegularUpload = ({
 }: UploadQueueOptions): UseUploadQueueResponse => {
   const { save } = useSaveData(UPLOAD_FILE_URL);
 
-  const processRegularFile = async (item: RegularFile) => {
+  const processRegularFile = async (item: RegularFile,  overwrite: boolean = false) => {
     updateFileVariables(item.uuid, { status: FileStatus.Uploading });
 
     const payload = new FormData();
     payload.append('file', item.file);
     payload.append('destination_path', item.filePath);
+    payload.append('overwrite', overwrite ? 'true' : 'false'); // Add `overwrite` parameter
 
     return save(payload, {
       onSuccess: () => {
@@ -67,10 +68,14 @@ const useRegularUpload = ({
     enqueue: addFiles,
     dequeue,
     isLoading
-  } = useQueueProcessor<RegularFile>(processRegularFile, {
-    concurrentProcess,
-    onSuccess: onComplete
-  });
+  } = useQueueProcessor<RegularFile>(
+    async (file: RegularFile) => processRegularFile(file, true), // Example: Set overwrite to `true` for now
+    {
+      concurrentProcess,
+      onSuccess: onComplete
+    }
+  );
+
 
   const cancelFile = (itemId: RegularFile['uuid']) => dequeue(itemId, 'uuid');
 
