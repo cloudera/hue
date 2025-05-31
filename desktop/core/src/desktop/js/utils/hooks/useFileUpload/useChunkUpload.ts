@@ -45,7 +45,7 @@ import {
 import { GET_TASKS_URL } from 'reactComponents/TaskServer/constants';
 
 interface UseChunkUploadResponse {
-  addFiles: (items: RegularFile[], overwrite?: boolean) => void; 
+  addFiles: (items: RegularFile[], overwrite?: boolean) => void;
   cancelFile: (item: RegularFile['uuid']) => void;
   isLoading: boolean;
 }

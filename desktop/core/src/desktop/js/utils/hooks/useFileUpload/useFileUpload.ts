@@ -99,28 +99,31 @@ const useFileUpload = ({
     }
   };
 
-
   const addFiles = (files: RegularFile[], overwrite = false) => {
     setUploadQueue(prev => {
       const updatedQueue = [...prev];
-  
+
       files.forEach(file => {
         const existingFileIndex = updatedQueue.findIndex(
           up => up.filePath === file.filePath && up.file.name === file.file.name
         );
-  
+
         if (existingFileIndex !== -1) {
           if (overwrite) {
-            updatedQueue[existingFileIndex] = { ...file, status: FileStatus.Pending, overwrite: true };
+            updatedQueue[existingFileIndex] = {
+              ...file,
+              status: FileStatus.Pending,
+              overwrite: true
+            };
           }
         } else {
           updatedQueue.push({ ...file, status: FileStatus.Pending });
         }
       });
-  
+
       return updatedQueue;
     });
-  
+
     if (isChunkUpload) {
       addToChunkUpload(files);
     } else {

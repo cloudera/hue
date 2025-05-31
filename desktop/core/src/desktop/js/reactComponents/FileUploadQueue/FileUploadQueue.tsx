@@ -17,8 +17,7 @@
 import React, { useState, useEffect } from 'react';
 import { get } from '../../api/utils';
 import Modal from 'cuix/dist/components/Modal';
-import { Button } from 'antd'; 
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom';
 import CloseIcon from '@cloudera/cuix-core/icons/react/CloseIcon';
 import CaratDownIcon from '@cloudera/cuix-core/icons/react/CaratDownIcon';
 import CaratUpIcon from '@cloudera/cuix-core/icons/react/CaratUpIcon';
@@ -61,13 +60,13 @@ const FileUploadQueue = (): JSX.Element => {
   const [conflictFiles, setConflictFiles] = useState<RegularFile[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [path, setPath] = useState<string | null>(null);
-  const [isFetchingFiles, setIsFetchingFiles] = useState(false);
 
   const fetchUploadedFiles = async (uploadPath: string) => {
-    setIsFetchingFiles(true);
-  
     try {
-      const response = await get<ListDirectory>(LIST_DIRECTORY_API_URL, { path: uploadPath, pagesize: '1000' });
+      const response = await get<ListDirectory>(LIST_DIRECTORY_API_URL, {
+        path: uploadPath,
+        pagesize: '1000'
+      });
       if (response?.files) {
         setUploadedFiles(
           response.files.map(file => ({
@@ -80,8 +79,6 @@ const FileUploadQueue = (): JSX.Element => {
       }
     } catch (error) {
       console.error('Failed to fetch files:', error);
-    } finally {
-      setIsFetchingFiles(false);
     }
   };
 
@@ -101,13 +98,10 @@ const FileUploadQueue = (): JSX.Element => {
   const onComplete = () => {
     huePubSub.publish(FILE_UPLOAD_SUCCESS_EVENT);
     const newlyUploadedFiles = uploadQueue.filter(file => file.status === FileStatus.Uploaded);
-    
+
     setUploadedFiles(existing => {
-      const updatedFiles = [
-        ...existing,
-        ...newlyUploadedFiles
-      ].filter((file, index, self) =>
-        index === self.findIndex(f => f.file.name === file.file.name)
+      const updatedFiles = [...existing, ...newlyUploadedFiles].filter(
+        (file, index, self) => index === self.findIndex(f => f.file.name === file.file.name)
       );
       return updatedFiles;
     });
@@ -129,7 +123,7 @@ const FileUploadQueue = (): JSX.Element => {
       if ((data?.files ?? []).length > 0) {
         const uploadPath = data?.files?.[0]?.filePath ?? null;
         if (!uploadPath) {
-          console.error("File path missing for uploaded files");
+          console.error('File path missing for uploaded files');
           return;
         }
 
@@ -151,23 +145,23 @@ const FileUploadQueue = (): JSX.Element => {
     const inProgressFileIdentifiers = uploadQueue
       .filter(file => file.status === FileStatus.Uploading || file.status === FileStatus.Pending)
       .map(file => `${file.filePath}/${file.file.name}`);
-  
+
     // Filter out files that are in progress in the upload queue
     const filteredNewFiles = newFiles.filter(
       newFile => !inProgressFileIdentifiers.includes(`${newFile.filePath}/${newFile.file.name}`)
     );
-  
+
     // Check for conflicts only with files that are already uploaded
     const existingUploadedFileNames = uploadedFiles.map(f => f.file.name);
     const conflicts = filteredNewFiles.filter(newFile =>
       existingUploadedFileNames.includes(newFile.file.name)
     );
-  
+
     // Non-conflicting files to be added
     const nonConflictingFiles = filteredNewFiles.filter(
       newFile => !existingUploadedFileNames.includes(newFile.file.name)
     );
-  
+
     if (conflicts.length > 0) {
       setConflictFiles(conflicts);
       setIsModalVisible(true);
@@ -176,7 +170,7 @@ const FileUploadQueue = (): JSX.Element => {
       setConflictFiles([]);
       setIsModalVisible(false);
     }
-  
+
     if (nonConflictingFiles.length > 0) {
       addFiles(nonConflictingFiles);
       setIsVisible(true);
@@ -187,7 +181,6 @@ const FileUploadQueue = (): JSX.Element => {
     uploadQueue.forEach(file => cancelFile(file));
     setIsVisible(false);
   };
-
 
   const handleModalOk = (overwrite: boolean) => {
     if (overwrite) {
@@ -224,63 +217,65 @@ const FileUploadQueue = (): JSX.Element => {
       {isModalVisible &&
         ReactDOM.createPortal(
           <Modal
-          title={t('Resolve Filename Conflicts')}
-          open={isModalVisible}
-          okText={t('Overwrite')}
-          onOk={() => handleModalOk(true)}
-          cancelText={t('Cancel')}
-          onCancel={() => setIsModalVisible(false)}
-          secondaryButtonText={t('Keep Original')}
-          onSecondary={() => handleModalOk(false)}
-          style={{
-            height: '50vh',
-          }}
-          bodyStyle={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px'
-          }}
-        >
-          {t(`${conflictFiles.length} files you are trying to upload already exist in the uploaded files.`)}
-          <div
+            title={t('Resolve Filename Conflicts')}
+            open={isModalVisible}
+            okText={t('Overwrite')}
+            onOk={() => handleModalOk(true)}
+            cancelText={t('Cancel')}
+            onCancel={() => setIsModalVisible(false)}
+            secondaryButtonText={t('Keep Original')}
+            onSecondary={() => handleModalOk(false)}
             style={{
-              marginTop: '8px',
-              overflowY: 'auto',
-              maxHeight: 'calc(50vh - 100px)',
-              borderTop: '1px solid #e9e9e9',
-              paddingTop: '8px'
+              height: '50vh'
+            }}
+            bodyStyle={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
             }}
           >
-            {conflictFiles.map(file => (
-              <div
-                key={file.file.name}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
+            {t(
+              `${conflictFiles.length} files you are trying to upload already exist in the uploaded files.`
+            )}
+            <div
+              style={{
+                marginTop: '8px',
+                overflowY: 'auto',
+                maxHeight: 'calc(50vh - 100px)',
+                borderTop: '1px solid #e9e9e9',
+                paddingTop: '8px'
+              }}
+            >
+              {conflictFiles.map(file => (
                 <div
+                  key={file.file.name}
                   style={{
-                    flexShrink: 0, // Prevent icon from shrinking
-                    width: '20px', // Set icon's width
-                    height: '20px' // Set icon's height
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
                   }}
                 >
-                  <FileIcon style={{ width: '100%', height: '100%' }} />
+                  <div
+                    style={{
+                      flexShrink: 0, // Prevent icon from shrinking
+                      width: '20px', // Set icon's width
+                      height: '20px' // Set icon's height
+                    }}
+                  >
+                    <FileIcon style={{ width: '100%', height: '100%' }} />
+                  </div>
+                  <span
+                    style={{
+                      wordBreak: 'break-word', // Allow long names to wrap
+                      maxWidth: 'calc(100% - 28px)' // Ensure the name takes the remaining space
+                    }}
+                  >
+                    {file.file.name}
+                  </span>
                 </div>
-                <span
-                  style={{
-                    wordBreak: 'break-word', // Allow long names to wrap
-                    maxWidth: 'calc(100% - 28px)' // Ensure the name takes the remaining space
-                  }}
-                >
-                  {file.file.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Modal>,
+              ))}
+            </div>
+          </Modal>,
           document.body
         )}
       <div className="hue-upload-queue-container antd cuix">
@@ -291,10 +286,7 @@ const FileUploadQueue = (): JSX.Element => {
               onClick={() => setExpandQueue(!expandQueue)}
               icon={expandQueue ? <CaratDownIcon /> : <CaratUpIcon />}
             />
-             <BorderlessButton
-              onClick={onClose}
-              icon={<CloseIcon />}
-            />
+            <BorderlessButton onClick={onClose} icon={<CloseIcon />} />
           </div>
         </div>
         {expandQueue && (

@@ -22,7 +22,7 @@ import { getItemProgress } from './utils';
 import { RegularFile, FileVariables, FileStatus } from './types';
 
 interface UseUploadQueueResponse {
-  addFiles: (items: RegularFile[], overwrite?: boolean) => void; 
+  addFiles: (items: RegularFile[], overwrite?: boolean) => void;
   cancelFile: (uuid: RegularFile['uuid']) => void;
   isLoading: boolean;
 }
@@ -40,7 +40,7 @@ const useRegularUpload = ({
 }: UploadQueueOptions): UseUploadQueueResponse => {
   const { save } = useSaveData(UPLOAD_FILE_URL);
 
-  const processRegularFile = async (item: RegularFile,  overwrite: boolean = false) => {
+  const processRegularFile = async (item: RegularFile, overwrite: boolean = false) => {
     updateFileVariables(item.uuid, { status: FileStatus.Uploading });
 
     const payload = new FormData();
@@ -75,7 +75,6 @@ const useRegularUpload = ({
       onSuccess: onComplete
     }
   );
-
 
   const cancelFile = (itemId: RegularFile['uuid']) => dequeue(itemId, 'uuid');
 
