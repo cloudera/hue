@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  tests-and-coverage:
+  backend-tests-and-coverage:
     runs-on: ubuntu-latest
 
     steps:
@@ -120,12 +120,10 @@ jobs:
       - name: Add jest coverage PR comment
         uses: MishaKav/jest-coverage-comment@v1
         with:
-          coverage-summary-path: ./reports/jest/coverage-final.json
-          title: UI Code Coverage
-          summary-title: Jest Coverage Report
+          coverage-summary-path: ./reports/jest/coverage-summary.json
+          summary-title: UI Coverage Report
           badge-title: Coverage
           hide-comment: false
           create-new-comment: false
           hide-summary: false
           coverage-title: Coverage Report
-
