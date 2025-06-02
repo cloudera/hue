@@ -20,8 +20,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 import Input from 'cuix/dist/components/Input';
 import {
   GET_USAGE_ANALYTICS_API_URL,
-  UPDATE_USAGE_ANALYTICS_API_URL,
-  UpdateUsageAnalyticsPayload
+  UPDATE_USAGE_ANALYTICS_API_URL
 } from '../Components/utils';
 import { HueAlert } from '../../../reactComponents/GlobalAlert/types';
 import { GLOBAL_INFO_TOPIC } from '../../../reactComponents/GlobalAlert/events';
@@ -49,20 +48,15 @@ const Analytics = (): JSX.Element => {
     save: updateAnalyticsPreference,
     loading: updatingAnalyticsPreference,
     error: updateAnalyticsPreferenceError
-  } = useSaveData<UsageAnalyticsResponse, UpdateUsageAnalyticsPayload>(
-    UPDATE_USAGE_ANALYTICS_API_URL,
-    {
-      onSuccess: response => {
-        if (response.analytics_enabled !== undefined) {
-          reloadData();
-          const successMessage = response.analytics_enabled
-            ? t('Analytics have been activated.')
-            : t('Analytics have been deactivated.');
-          huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: successMessage });
-        }
-      }
+  } = useSaveData<UsageAnalyticsResponse, FormData>(UPDATE_USAGE_ANALYTICS_API_URL, {
+    onSuccess: response => {
+        reloadData();
+        const successMessage = response.analytics_enabled
+          ? t('Analytics have been activated.')
+          : t('Analytics have been deactivated.');
+        huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: successMessage });
     }
-  );
+  });
 
   const errors = [
     {
@@ -87,9 +81,11 @@ const Analytics = (): JSX.Element => {
             checked={
               usageAnalyticsData?.analyticsEnabled ?? usageAnalyticsData?.analytics_enabled ?? false
             }
-            onChange={event =>
-              updateAnalyticsPreference({ analytics_enabled: event.target.checked })
-            }
+            onChange={event => {
+              const formData = new FormData();
+              formData.append('analytics_enabled', event.target.checked ? 'true' : 'false');
+              updateAnalyticsPreference(formData);
+            }}
             disabled={loadingAnalytics || updatingAnalyticsPreference}
           />
           <label htmlFor="usage_analytics" className="usage__analytics">
