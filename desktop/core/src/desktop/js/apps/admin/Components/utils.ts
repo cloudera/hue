@@ -21,6 +21,3 @@ export const INSTALL_AVAILABLE_EXAMPLES_API_URL = '/api/v1/available_app_example
 export const HUE_DOCS_CONFIG_URL = 'https://docs.gethue.com/administrator/configuration/';
 export const GET_USAGE_ANALYTICS_API_URL = '/api/v1/usage_analytics';
 export const UPDATE_USAGE_ANALYTICS_API_URL = '/api/v1/usage_analytics/update';
-export interface UpdateUsageAnalyticsPayload {
-  analytics_enabled: boolean | string;
-}
