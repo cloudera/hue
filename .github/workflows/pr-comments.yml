@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  pytest-codecov-comment:
+  pytest-codecov:
     runs-on: ubuntu-latest
 
     steps:
@@ -65,7 +65,7 @@ jobs:
           remove-link-from-badge: true
           default-branch: master
   
-  python-ut-files-comment:
+  python-ut-files-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -96,3 +96,38 @@ jobs:
         with:
           message: "${{ env.comment_message }}"
           allow-repeats: false
+  
+  ui-codecov:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache npm with setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci
+      
+      - name: Run js tests with coverage
+        run: |
+          # Modify the test-coverage script to include --runInBand
+          sed -i 's/"test-coverage": "jest --coverage --coverageDirectory=\\"reports\/jest\\""/"test-coverage": "jest --runInBand --coverage --coverageDirectory=\\"reports\/jest\\""/g' package.json
+
+          npm run test-coverage
+      
+      - name: Add jest coverage PR comment
+        uses: MishaKav/jest-coverage-comment@v1
+        with:
+          coverage-summary-path: ./reports/jest/coverage-final.json
+          title: UI Code Coverage
+          summary-title: Jest Coverage Report
+          badge-title: Coverage
+          hide-comment: false
+          create-new-comment: false
+          hide-summary: false
+          coverage-title: Coverage Report
+
