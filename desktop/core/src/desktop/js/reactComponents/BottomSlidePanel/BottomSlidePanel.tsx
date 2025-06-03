@@ -18,8 +18,8 @@ import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import React, { useEffect, useState } from 'react';
 import './BottomSlidePanel.scss';
 
-type BottomSlidePanelProps = {
-  visible: boolean;
+interface BottomSlidePanelProps {
+  isOpen: boolean;
   onClose: () => void;
   onPrimaryClick?: (unknown) => void;
   primaryText?: string;
@@ -29,10 +29,10 @@ type BottomSlidePanelProps = {
   className?: string;
   showMask?: boolean;
   maskClosable?: boolean;
-};
+}
 
 const BottomSlidePanel: React.FC<BottomSlidePanelProps> = ({
-  visible,
+  isOpen,
   onClose,
   onPrimaryClick,
   primaryText,
@@ -43,16 +43,16 @@ const BottomSlidePanel: React.FC<BottomSlidePanelProps> = ({
   showMask = true,
   maskClosable = true
 }) => {
-  const [shouldRender, setShouldRender] = useState(visible);
+  const [shouldRender, setShouldRender] = useState<boolean>(isOpen);
 
   useEffect(() => {
-    if (visible) {
+    if (isOpen) {
       setShouldRender(true);
     } else {
       const timeout = setTimeout(() => setShouldRender(false), 300); // match CSS duration
       return () => clearTimeout(timeout);
     }
-  }, [visible]);
+  }, [isOpen]);
 
   if (!shouldRender) {
     return null;
@@ -62,7 +62,7 @@ const BottomSlidePanel: React.FC<BottomSlidePanelProps> = ({
     <>
       {showMask && (
         <div
-          className={`hue-bottom-slide-mask ${visible ? 'fade-in' : 'fade-out'}`}
+          className={`hue-bottom-slide-mask ${isOpen ? 'fade-in' : 'fade-out'}`}
           role="button"
           tabIndex={0}
           onClick={maskClosable ? onClose : undefined}
@@ -76,7 +76,7 @@ const BottomSlidePanel: React.FC<BottomSlidePanelProps> = ({
         />
       )}
       <div
-        className={`hue-bottom-slide-panel ${visible ? 'hue-bottom-slide-in' : 'hue-bottom-slide-out'} ${className}`}
+        className={`hue-bottom-slide-panel ${isOpen ? 'hue-bottom-slide-in' : 'hue-bottom-slide-out'} ${className}`}
       >
         {title && <div className="hue-bottom-slide-panel__title">{title}</div>}
 

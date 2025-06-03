@@ -20,7 +20,6 @@ import '@testing-library/jest-dom';
 import LocalFileUploadOption from './LocalFileUploadOption';
 
 import { ImporterFileSource } from '../types';
-import huePubSub from '../../../utils/huePubSub';
 
 const mockSave = jest.fn();
 
@@ -31,44 +30,45 @@ jest.mock('../../../utils/hooks/useSaveData/useSaveData', () => ({
   }))
 }));
 
-jest.mock('../../../utils/huePubSub', () => ({
-  __esModule: true,
-  default: {
-    publish: jest.fn()
-  }
-}));
-
-jest.mock('../../../utils/i18nReact', () => ({
-  i18nReact: {
-    useTranslation: () => ({
-      t: (key: string) => key
-    })
-  }
-}));
-
 const mockSetFileMetaData = jest.fn();
+const mockSetUploadError = jest.fn();
 
 describe('LocalFileUploadOption', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('renders upload button and label', () => {
-    render(<LocalFileUploadOption setFileMetaData={mockSetFileMetaData} />);
+  it('should render upload button and label', () => {
+    render(
+      <LocalFileUploadOption
+        setFileMetaData={mockSetFileMetaData}
+        setUploadError={mockSetUploadError}
+      />
+    );
     expect(screen.getByRole('button')).toBeInTheDocument();
     expect(screen.getByText('Upload from File')).toBeInTheDocument();
   });
 
-  test('clicking the button triggers input click', () => {
-    render(<LocalFileUploadOption setFileMetaData={mockSetFileMetaData} />);
+  it('should trigger input click on button click', () => {
+    render(
+      <LocalFileUploadOption
+        setFileMetaData={mockSetFileMetaData}
+        setUploadError={mockSetUploadError}
+      />
+    );
     const fileInput = screen.getByTestId('hue-file-input');
     const clickSpy = jest.spyOn(fileInput, 'click');
     fireEvent.click(screen.getByRole('button'));
     expect(clickSpy).toHaveBeenCalled();
   });
 
-  test('shows warning for empty file', () => {
-    render(<LocalFileUploadOption setFileMetaData={mockSetFileMetaData} />);
+  it('should show warning for empty file', () => {
+    render(
+      <LocalFileUploadOption
+        setFileMetaData={mockSetFileMetaData}
+        setUploadError={mockSetUploadError}
+      />
+    );
 
     const file = new File([], 'empty.csv', { type: 'text/csv' });
 
@@ -76,32 +76,31 @@ describe('LocalFileUploadOption', () => {
       target: { files: [file] }
     });
 
-    expect(huePubSub.publish).toHaveBeenCalledWith(
-      'hue.global.warning',
-      expect.objectContaining({
-        message: 'This file is empty, please select another file.'
-      })
+    expect(mockSetUploadError).toHaveBeenCalledWith(
+      'This file is empty, please select another file.'
     );
   });
 
-  test('shows warning for file > 200KB', () => {
-    render(<LocalFileUploadOption setFileMetaData={mockSetFileMetaData} />);
+  it('should show error for file > 150mb', () => {
+    render(
+      <LocalFileUploadOption
+        setFileMetaData={mockSetFileMetaData}
+        setUploadError={mockSetUploadError}
+      />
+    );
 
-    const largeFile = new File([new ArrayBuffer(201000)], 'big.csv', { type: 'text/csv' });
+    const largeFile = new File([new ArrayBuffer(200000000)], 'big.csv', { type: 'text/csv' });
 
     fireEvent.change(screen.getByTestId('hue-file-input'), {
       target: { files: [largeFile] }
     });
 
-    expect(huePubSub.publish).toHaveBeenCalledWith(
-      'hue.global.warning',
-      expect.objectContaining({
-        message: expect.stringContaining('File size exceeds')
-      })
+    expect(mockSetUploadError).toHaveBeenCalledWith(
+      'File size exceeds the supported size (200 KB). Please use the S3, ABFS or HDFS browser to upload files.'
     );
   });
 
-  test('uploads file successfully and sets metadata', () => {
+  it('should upload file successfully and sets metadata', () => {
     mockSave.mockImplementation((_data, { onSuccess }) => {
       onSuccess({
         local_file_url: '/tmp/foo.csv',
@@ -109,7 +108,12 @@ describe('LocalFileUploadOption', () => {
       });
     });
 
-    render(<LocalFileUploadOption setFileMetaData={mockSetFileMetaData} />);
+    render(
+      <LocalFileUploadOption
+        setFileMetaData={mockSetFileMetaData}
+        setUploadError={mockSetUploadError}
+      />
+    );
 
     const file = new File(['dummy data'], 'data.csv', { type: 'text/csv' });
 
@@ -123,19 +127,24 @@ describe('LocalFileUploadOption', () => {
     });
   });
 
-  test('handles upload error and publishes hue.error', () => {
+  it('should handle upload error', () => {
     const error = new Error('upload failed');
     mockSave.mockImplementation((_data, { onError }) => {
       onError(error);
     });
 
-    render(<LocalFileUploadOption setFileMetaData={mockSetFileMetaData} />);
+    render(
+      <LocalFileUploadOption
+        setFileMetaData={mockSetFileMetaData}
+        setUploadError={mockSetUploadError}
+      />
+    );
 
     const file = new File(['data'], 'fail.csv', { type: 'text/csv' });
 
     fireEvent.change(screen.getByTestId('hue-file-input'), {
       target: { files: [file] }
     });
-    expect(huePubSub.publish).toHaveBeenCalledWith('hue.error', error);
+    expect(mockSetUploadError).toHaveBeenCalledWith(error.message);
   });
 });

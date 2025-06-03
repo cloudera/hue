@@ -46,16 +46,24 @@ describe('ImporterSourceSelector', () => {
     (window as hueWindow).ENABLE_DIRECT_UPLOAD = true;
   });
 
-  test('renders local upload and filesystem options', () => {
+  it('should render local upload and filesystem options', () => {
     render(<ImporterSourceSelector setFileMetaData={mockSetFileMetaData} />);
 
     expect(screen.getByText('Select a source to import from')).toBeInTheDocument();
-    expect(screen.getByTestId('local-upload')).toBeInTheDocument();
+    expect(screen.queryByText('LocalUpload')).toBeInTheDocument();
     expect(screen.getByText('Amazon S3')).toBeInTheDocument();
-    expect(screen.getByText('Hadoop Distributed File System')).toBeInTheDocument();
+    expect(screen.getByText('HDFS')).toBeInTheDocument();
   });
 
-  test('opens FileChooserModal when filesystem button is clicked', () => {
+  it('should not render local upload option if ENABLE_DIRECT_UPLOAD is false', () => {
+    (window as hueWindow).ENABLE_DIRECT_UPLOAD = false;
+    render(<ImporterSourceSelector setFileMetaData={mockSetFileMetaData} />);
+
+    expect(screen.getByText('Select a source to import from')).toBeInTheDocument();
+    expect(screen.queryByText('LocalUpload')).not.toBeInTheDocument();
+  });
+
+  it('should open FileChooserModal when filesystem button is clicked', () => {
     (FileChooserModal as jest.Mock).mockImplementation(({ showModal }) => {
       return showModal ? <div data-testid="file-chooser">FileChooserModal</div> : null;
     });
@@ -68,7 +76,7 @@ describe('ImporterSourceSelector', () => {
     expect(screen.getByTestId('file-chooser')).toBeInTheDocument();
   });
 
-  test('handles loading state', () => {
+  it('should handle loading state', () => {
     (useLoadData as jest.Mock).mockReturnValue({
       data: null,
       loading: true,
@@ -81,7 +89,7 @@ describe('ImporterSourceSelector', () => {
     expect(screen.getByText('Select a source to import from')).toBeInTheDocument();
   });
 
-  test('displays error message on fetch failure', () => {
+  it('should display error message on fetch failure', () => {
     const mockRetry = jest.fn();
     (useLoadData as jest.Mock).mockReturnValue({
       data: null,
