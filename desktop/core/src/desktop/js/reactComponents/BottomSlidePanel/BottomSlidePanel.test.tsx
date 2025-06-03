@@ -21,7 +21,7 @@ import BottomSlidePanel from './BottomSlidePanel';
 
 describe('BottomSlidePanel', () => {
   const defaultProps = {
-    visible: true,
+    isOpen: true,
     onClose: jest.fn(),
     onPrimaryClick: jest.fn(),
     primaryText: 'Create',
@@ -34,7 +34,7 @@ describe('BottomSlidePanel', () => {
     jest.clearAllMocks();
   });
 
-  test('renders when visible is true', () => {
+  it('should render when isOpen is true', () => {
     render(<BottomSlidePanel {...defaultProps} />);
     expect(screen.getByText('Create Folder')).toBeInTheDocument();
     expect(screen.getByText('Panel Content')).toBeInTheDocument();
@@ -42,39 +42,39 @@ describe('BottomSlidePanel', () => {
     expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
-  test('does not render when visible is false', () => {
-    const { queryByText } = render(<BottomSlidePanel {...defaultProps} visible={false} />);
+  it('should not render when isOpen is false', () => {
+    const { queryByText } = render(<BottomSlidePanel {...defaultProps} isOpen={false} />);
     expect(queryByText('Create Folder')).not.toBeInTheDocument();
     expect(queryByText('Panel Content')).not.toBeInTheDocument();
   });
 
-  test('calls onPrimaryClick when primary button is clicked', () => {
+  it('should call onPrimaryClick when primary button is clicked', () => {
     render(<BottomSlidePanel {...defaultProps} />);
     fireEvent.click(screen.getByText('Create'));
     expect(defaultProps.onPrimaryClick).toHaveBeenCalled();
   });
 
-  test('calls onClose when cancel button is clicked', () => {
+  it('should call onClose when cancel button is clicked', () => {
     render(<BottomSlidePanel {...defaultProps} />);
     fireEvent.click(screen.getByText('Cancel'));
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
-  test('calls onClose when mask is clicked and maskClosable is true', () => {
+  it('should call onClose when mask is clicked and maskClosable is true', () => {
     render(<BottomSlidePanel {...defaultProps} />);
     const mask = screen.getByTestId('mask');
     fireEvent.click(mask);
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
-  test('does not call onClose when mask is clicked and maskClosable is false', () => {
+  it('should not call onClose when mask is clicked and maskClosable is false', () => {
     render(<BottomSlidePanel {...defaultProps} maskClosable={false} />);
     const mask = screen.getByTestId('mask');
     fireEvent.click(mask);
     expect(defaultProps.onClose).not.toHaveBeenCalled();
   });
 
-  test('calls onClose on Enter or Space keydown on mask', () => {
+  it('should call onClose on Enter or Space keydown on mask', () => {
     render(<BottomSlidePanel {...defaultProps} />);
     const mask = screen.getByTestId('mask');
     fireEvent.keyDown(mask, { key: 'Enter' });
@@ -82,13 +82,13 @@ describe('BottomSlidePanel', () => {
     expect(defaultProps.onClose).toHaveBeenCalledTimes(2);
   });
 
-  test('applies custom className to panel', () => {
+  it('should apply custom className to panel', () => {
     const className = 'custom-class';
     const { container } = render(<BottomSlidePanel {...defaultProps} className={className} />);
     expect(container.querySelector('.hue-bottom-slide-panel')).toHaveClass(className);
   });
 
-  test('does not render footer if buttons are not provided', () => {
+  it('should not render footer if buttons are not provided', () => {
     render(<BottomSlidePanel {...defaultProps} primaryText={undefined} cancelText={undefined} />);
     expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
   });

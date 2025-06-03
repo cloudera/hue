@@ -21,14 +21,17 @@ import Button from 'cuix/dist/components/Button';
 import { FileMetaData, ImporterFileSource, LocalFileUploadResponse } from '../types';
 import { UPLOAD_LOCAL_FILE_API_URL } from '../api';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
-import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 
 interface LocalFileUploadOptionProps {
   setFileMetaData: (fileMetaData: FileMetaData) => void;
+  setUploadError: (error: string) => void;
 }
 
-const LocalFileUploadOption = ({ setFileMetaData }: LocalFileUploadOptionProps): JSX.Element => {
+const LocalFileUploadOption = ({
+  setFileMetaData,
+  setUploadError
+}: LocalFileUploadOptionProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const uploadRef = useRef<HTMLInputElement>(null);
 
@@ -52,17 +55,15 @@ const LocalFileUploadOption = ({ setFileMetaData }: LocalFileUploadOptionProps):
     const payload = new FormData();
     payload.append('file', file);
 
-    const file_size = file.size;
-    if (file_size === 0) {
-      huePubSub.publish('hue.global.warning', {
-        message: t('This file is empty, please select another file.')
-      });
-    } else if (file_size > 200 * 1000) {
-      huePubSub.publish('hue.global.warning', {
-        message: t(
+    const fileSize = file.size;
+    if (fileSize === 0) {
+      setUploadError(t('This file is empty, please select another file.'));
+    } else if (fileSize > 150 * 1024 * 1024) {
+      setUploadError(
+        t(
           'File size exceeds the supported size (200 KB). Please use the S3, ABFS or HDFS browser to upload files.'
         )
-      });
+      );
     } else {
       upload(payload, {
         onSuccess: data => {
@@ -73,7 +74,7 @@ const LocalFileUploadOption = ({ setFileMetaData }: LocalFileUploadOptionProps):
           });
         },
         onError: error => {
-          huePubSub.publish('hue.error', error);
+          setUploadError(error.message);
         }
       });
     }

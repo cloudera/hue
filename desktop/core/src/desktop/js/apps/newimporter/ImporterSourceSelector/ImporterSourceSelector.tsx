@@ -19,20 +19,21 @@ import Button from 'cuix/dist/components/Button';
 import S3Icon from '@cloudera/cuix-core/icons/react/S3Icon';
 import HDFSIcon from '@cloudera/cuix-core/icons/react/HdfsIcon';
 import OzoneIcon from '@cloudera/cuix-core/icons/react/OzoneIcon';
+import GoogleCloudIcon from '@cloudera/cuix-core/icons/react/GoogleCloudIcon';
 import AdlsIcon from '../../../components/icons/AdlsIcon';
 
 import { hueWindow } from 'types/types';
 
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import FileChooserModal from '../../storageBrowser/FileChooserModal/FileChooserModal';
+import LocalFileUploadOption from './LocalFileUploadOption';
+import { FILESYSTEMS_API_URL } from '../../storageBrowser/api';
 import { FileMetaData, ImporterFileSource } from '../types';
 import { FileSystem } from '../../storageBrowser/types';
 import { i18nReact } from '../../../utils/i18nReact';
-import { FILESYSTEMS_API_URL } from '../api';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 import './ImporterSourceSelector.scss';
-import LocalFileUploadOption from './LocalFileUploadOption';
 
 const fileSystems = {
   s3a: {
@@ -41,15 +42,23 @@ const fileSystems = {
   },
   hdfs: {
     icon: <HDFSIcon />,
-    title: 'Hadoop Distributed File System'
+    title: 'HDFS'
   },
   abfs: {
     icon: <AdlsIcon />,
-    title: 'Azure Blob File System'
+    title: 'Azure Storage'
   },
   ofs: {
     icon: <OzoneIcon />,
-    title: 'Ozone File System'
+    title: 'Ozone'
+  },
+  adls: {
+    icon: <AdlsIcon />,
+    title: 'Azure Storage'
+  },
+  gs: {
+    icon: <GoogleCloudIcon />,
+    title: 'Google Storage'
   }
 };
 
@@ -58,10 +67,11 @@ interface ImporterSourceSelectorProps {
 }
 
 const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps): JSX.Element => {
-  const { t } = i18nReact.useTranslation();
   const [selectedUserHomeDirectory, setSelectedUserHomeDirectory] = useState<string | undefined>(
     undefined
   );
+  const [uploadError, setUploadError] = useState<string | undefined>(undefined);
+  const { t } = i18nReact.useTranslation();
 
   const {
     data: fileSystemsData,
@@ -76,6 +86,10 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
       message: t('An error occurred while fetching the filesystem'),
       action: t('Retry'),
       onClick: reloadData
+    },
+    {
+      enabled: !!uploadError,
+      message: uploadError
     }
   ];
 
@@ -144,8 +158,9 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
   };
 
   const handleFileSelection = async (destination_path: string) => {
+  const handleFileSelection = async (destinationPath: string) => {
     setFileMetaData({
-      path: destination_path,
+      path: destinationPath,
       source: ImporterFileSource.REMOTE
     });
   };
@@ -158,7 +173,10 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
         </div>
         <div className="hue-importer__source-selector-options">
           {(window as hueWindow).ENABLE_DIRECT_UPLOAD && (
-            <LocalFileUploadOption setFileMetaData={setFileMetaData} />
+            <LocalFileUploadOption
+              setFileMetaData={setFileMetaData}
+              setUploadError={setUploadError}
+            />
           )}
           {fileSystemsData?.map(filesystem => (
             <div className="hue-importer__source-selector-option" key={filesystem.name}>
@@ -186,7 +204,8 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
           showModal={true}
           title={t('Import file')}
           sourcePath={selectedUserHomeDirectory}
-          isImport={true}
+          isFileSelectionAllowed={true}
+          isUploadEnabled={true}
         />
       )}
     </LoadingErrorWrapper>
