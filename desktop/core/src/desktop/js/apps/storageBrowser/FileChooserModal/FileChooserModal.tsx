@@ -49,13 +49,14 @@ import './FileChooserModal.scss';
 
 interface FileChooserModalProps {
   onClose: () => void;
-  onSubmit: (destination_path: string) => Promise<void>;
+  onSubmit: (destinationPath: string) => Promise<void>;
   showModal: boolean;
   title: string;
   sourcePath: string;
   submitText?: string;
   cancelText?: string;
-  isImport?: boolean;
+  isFileSelectionAllowed?: boolean;
+  isUploadEnabled?: boolean;
 }
 
 interface FileChooserTableData {
@@ -70,7 +71,8 @@ const FileChooserModal = ({
   onSubmit,
   title,
   sourcePath,
-  isImport,
+  isFileSelectionAllowed = false,
+  isUploadEnabled = false,
   ...i18n
 }: FileChooserModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
@@ -146,7 +148,7 @@ const FileChooserModal = ({
         if (record.type === BrowserViewType.dir) {
           setDestPath(record.path);
         }
-        if (isImport && record.type === BrowserViewType.file) {
+        if (isFileSelectionAllowed && record.type === BrowserViewType.file) {
           onSubmit(record.path);
           onClose();
         }
@@ -245,7 +247,7 @@ const FileChooserModal = ({
         rowKey={r => `${r.path}__${r.type}__${r.name}`}
         scroll={{ y: '250px' }}
         rowClassName={record =>
-          record.type === BrowserViewType.file && !isImport
+          record.type === BrowserViewType.file && !isFileSelectionAllowed
             ? classNames('hue-filechooser-modal__table-row', 'disabled-row')
             : 'hue-filechooser-modal__table-row'
         }
@@ -261,9 +263,11 @@ const FileChooserModal = ({
       open={showModal}
       title={title}
       className="hue-filechooser-modal cuix antd"
-      onOk={isImport ? handleUploadClick : handleOk}
-      okText={isImport ? t('Upload file') : submitText}
-      okButtonProps={!isImport ? { disabled: sourcePath === destPath, loading: submitLoading } : {}}
+      onOk={isUploadEnabled ? handleUploadClick : handleOk}
+      okText={isUploadEnabled ? t('Upload file') : submitText}
+      okButtonProps={
+        !isUploadEnabled ? { disabled: sourcePath === destPath, loading: submitLoading } : {}
+      }
       secondaryButtonText={t('Create folder')}
       onSecondary={() => setShowCreateFolderModal(true)}
       cancelText={cancelText}
@@ -301,6 +305,11 @@ const FileChooserModal = ({
           />
         </LoadingErrorWrapper>
         {isImport ? <DragAndDrop onDrop={onFilesDrop}>{TableContent}</DragAndDrop> : TableContent}
+        {isUploadEnabled ? (
+          <DragAndDrop onDrop={onFilesDrop}>{TableContent}</DragAndDrop>
+        ) : (
+          TableContent
+        )}
       </div>
       <input
         ref={uploadRef}
@@ -309,30 +318,32 @@ const FileChooserModal = ({
         onChange={handleFileUpload}
         accept=".csv, .xlsx, .xls"
       />
-      <BottomSlidePanel
-        visible={showCreateFolderModal}
-        title={t('Create Folder')}
-        cancelText="Cancel"
-        primaryText={t('Create')}
-        onClose={() => {
-          setShowCreateFolderModal(false);
-          setCreateFolderValue('');
-        }}
-        onPrimaryClick={handleCreate}
-      >
-        {/* TODO: Refactor CreateAndUpload to reuse */}
-        <LoadingErrorWrapper errors={createFolderErrorConfig}>
-          <Input
-            defaultValue={createFolderValue}
-            disabled={createFolderLoading}
-            onPressEnter={() => handleCreate}
-            ref={createFolderInputRef}
-            onChange={e => {
-              setCreateFolderValue(e.target.value);
-            }}
-          />
-        </LoadingErrorWrapper>
-      </BottomSlidePanel>
+      {showCreateFolderModal && (
+        <BottomSlidePanel
+          isOpen={showCreateFolderModal}
+          title={t('Create Folder')}
+          cancelText="Cancel"
+          primaryText={t('Create')}
+          onClose={() => {
+            setShowCreateFolderModal(false);
+            setCreateFolderValue('');
+          }}
+          onPrimaryClick={handleCreate}
+        >
+          {/* TODO: Refactor CreateAndUpload to reuse */}
+          <LoadingErrorWrapper errors={createFolderErrorConfig}>
+            <Input
+              defaultValue={createFolderValue}
+              disabled={createFolderLoading}
+              onPressEnter={() => handleCreate}
+              ref={createFolderInputRef}
+              onChange={e => {
+                setCreateFolderValue(e.target.value);
+              }}
+            />
+          </LoadingErrorWrapper>
+        </BottomSlidePanel>
+      )}
     </Modal>
   );
 };
