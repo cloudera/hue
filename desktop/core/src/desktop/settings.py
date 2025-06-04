@@ -594,7 +594,11 @@ def is_oidc_configured():
   return 'desktop.auth.backend.OIDCBackend' in AUTHENTICATION_BACKENDS
 
 def only_oidc_configured():
-    """Check if only the OIDC Auth Backend is enabled"""
+    """
+    Check if only the OIDC Auth Backend is enabled.
+
+    Also, ignore Axes Backend which is always added implicitly.
+    """
     return all(
         backend in ('desktop.auth.backend.OIDCBackend', 'axes.backends.AxesBackend')
         for backend in AUTHENTICATION_BACKENDS)
