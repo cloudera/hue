@@ -849,6 +849,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     verified_id = self.verify_token(id_token, nonce=nonce)
 
     if verified_id:
+      self.save_access_tokens(access_token)
       self.save_refresh_tokens(refresh_token)
       user = self.get_or_create_user(access_token, id_token, verified_id)
       user = rewrite_user(user)
@@ -864,6 +865,12 @@ class OIDCBackend(OIDCAuthenticationBackend):
     if not username:
       return self.UserModel.objects.none()
     return self.UserModel.objects.filter(username__iexact=username)
+
+  def save_access_tokens(self, access_token):
+    session = self.request.session
+
+    if import_from_settings('OIDC_STORE_ACCESS_TOKEN', False):
+      session['oidc_access_token'] = access_token
 
   def save_refresh_tokens(self, refresh_token):
     session = self.request.session
