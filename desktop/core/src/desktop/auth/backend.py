@@ -827,7 +827,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
 
     token_payload = {
       'client_id': self.OIDC_RP_CLIENT_ID,
-      'client_secret': self.OIDC_RP_CLIENT_SECRET,
+      'client_secret': self.OIDC_RP_CLIENT_SECRET or self.OIDC_RP_CLIENT_SECRET_SCRIPT,
       'grant_type': 'authorization_code',
       'code': code,
       'redirect_uri': absolutify(
@@ -940,7 +940,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     if access_token and refresh_token:
       oidc_logout_url = OIDC.LOGOUT_REDIRECT_URL.get()
       client_id = import_from_settings('OIDC_RP_CLIENT_ID')
-      client_secret = import_from_settings('OIDC_RP_CLIENT_SECRET')
+      client_secret = import_from_settings('OIDC_RP_CLIENT_SECRET') or import_from_settings('OIDC_RP_CLIENT_SECRET_SCRIPT')
       oidc_verify_ssl = import_from_settings('OIDC_VERIFY_SSL')
       form = {
         'client_id': client_id,
