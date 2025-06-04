@@ -18,25 +18,19 @@
 
 from __future__ import absolute_import
 
-import logging
-import json
 import os
 import sys
+import json
+import logging
 
 import sqlflow
+from django.utils.translation import gettext as _
 from sqlflow.rows import Rows
 
 from desktop.lib.i18n import force_unicode
-
 from notebook.connectors.base import Api, QueryError
-from notebook.decorators import ssh_error_handler, rewrite_ssh_api_url
+from notebook.decorators import rewrite_ssh_api_url, ssh_error_handler
 from notebook.models import escape_rows
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -62,11 +56,9 @@ class SqlFlowApi(Api):
     if self.options.get('has_ssh'):
       self.url = rewrite_ssh_api_url(self.url)['url']
 
-
   def _get_db(self):
     os.environ['SQLFLOW_DATASOURCE'] = self.interpreter['options']['datasource']
     return sqlflow.Client(server_url='172.18.1.3:50051')  # TODO Send as param instead of ENV
-
 
   @query_error_handler
   @ssh_error_handler
@@ -98,7 +90,6 @@ class SqlFlowApi(Api):
       }
     }
 
-
   def _execute(self, statement):
     db = self._get_db()
 
@@ -124,11 +115,9 @@ class SqlFlowApi(Api):
       'description': description,
     }
 
-
   @query_error_handler
   def check_status(self, notebook, snippet):
     return {'status': 'available'}
-
 
   @query_error_handler
   @ssh_error_handler
@@ -174,7 +163,6 @@ class SqlFlowApi(Api):
     ]
 
     return response
-
 
   def fetch_result(self, notebook, snippet, rows, start_over):
     """Only called at the end of a live query."""

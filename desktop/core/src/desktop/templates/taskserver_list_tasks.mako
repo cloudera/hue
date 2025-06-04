@@ -1,7 +1,5 @@
 <%!
 import sys
-from desktop.views import commonheader, commonfooter
-from desktop.auth.backend import is_admin
 
 if sys.version_info[0] > 2:
   from django.utils.translation import gettext as _
@@ -12,29 +10,10 @@ else:
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
 
-%if not is_embeddable:
-${ commonheader(_('Task Server'), "about", user, request) | n,unicode }
-%endif
-
 ${ layout.menubar(section='task_server') }
 
+<script src="${ static('desktop/js/task-browser-inline.js') }" type="text/javascript"></script>
 
-<div class="container-fluid">
-  <div class="card card-small">
-
-    <script type="text/javascript">
-      (function () {
-        window.createReactComponents('#taskbrowser-container');
-      })();
-    </script>
-
-    <div id="taskbrowser-container">
-      <MyComponent data-reactcomponent='TaskBrowser' data-props='{"myObj": {"id": 1}, "children": "mako template only", "version" : "${sys.version_info[0]}"}' ></MyComponent>
-    </div>
-
-  </div>
+<div id="taskbrowser-container" class="cuix antd" style="height: calc(100vh - 110px)">
+  <MyComponent data-reactcomponent='TaskServer'/>
 </div>
-
-%if not is_embeddable:
-${ commonfooter(request, messages) | n,unicode }
-%endif

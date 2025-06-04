@@ -15,31 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import filter
-from builtins import str
-
-import collections
-import logging
 import json
-import sys
-import threading
 import uuid
+import logging
+import threading
+import collections
+
+from django.utils.translation import gettext as _
 
 from beeswax.design import hql_query
+from beeswax.management.commands import create_table_query_data
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
-from beeswax.management.commands import create_table_query_data
-
-from desktop.lib.exceptions_renderable import raise_popup_exception, PopupException
 from desktop.lib import django_mako
-
+from desktop.lib.exceptions_renderable import PopupException, raise_popup_exception
 from useradmin.models import install_sample_user
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -50,8 +40,8 @@ HAS_CREATED_TABLE = False
 
 class QueryHistory(object):
   def __init__(self, max_user=10, max_history_per_user=25):
-    self.max_user=max_user
-    self.max_history_per_user=max_history_per_user
+    self.max_user = max_user
+    self.max_history_per_user = max_history_per_user
     self.by_user = collections.OrderedDict()
     self.no_user_key = str(uuid.uuid4())
     self.lock = threading.Lock()
@@ -131,16 +121,19 @@ class QueryHistory(object):
       self.lock.acquire()
       by_user = self.by_user.get(request_user)
       if by_user and by_user['filters'] == filters:
-        del self.by_user[request_user] # Moving request_user to head of queue
+        del self.by_user[request_user]  # Moving request_user to head of queue
         self.by_user[request_user] = by_user
         return by_user
       return None
     finally:
       self.lock.release()
 
+
 QUERY_HISTORY = QueryHistory(max_user=QUERY_HISTORY_CACHE_MAX_USER_COUNT, max_history_per_user=QUERY_HISTORY_CACHE_MAX_LENGTH_PER_USER)
 
-# If fresh user get from _get_query_history_latest else get _get_query_history_from. if results set from _get_query_history_from less than limit merge results with cache else call _get_query_history_latest
+
+# If fresh user get from _get_query_history_latest else get _get_query_history_from.
+# if results set from _get_query_history_from less than limit merge results with cache else call _get_query_history_latest
 def get_query_history(request_user=None, start_date=None, start_time=None, query_id=None, status=None, limit=None):
   _init_table()
 
@@ -151,7 +144,7 @@ def get_query_history(request_user=None, start_date=None, start_time=None, query
     last = history['max']
     data = _get_query_history_from(request_user=request_user,
                                    start_date=last['date'],
-                                   start_time=last['time']+1,
+                                   start_time=last['time'] + 1,
                                    query_id=query_id,
                                    status=status,
                                    limit=limit)
@@ -161,9 +154,18 @@ def get_query_history(request_user=None, start_date=None, start_time=None, query
       cached = _n_filter(filter_list, cached)[:limit]
       return {'data': cached}
 
-  data = _get_query_history_latest(request_user=request_user, start_date=start_date, start_time=start_time, query_id=query_id, status=status, limit=limit, force_refresh=True)
+  data = _get_query_history_latest(
+    request_user=request_user,
+    start_date=start_date,
+    start_time=start_time,
+    query_id=query_id,
+    status=status,
+    limit=limit,
+    force_refresh=True
+  )
   QUERY_HISTORY.set(request_user, data['data'], filters)
   return data
+
 
 # If id in cache return cache else _get_query_history_from
 def get_query_by_id(request_user=None, query_id=None):
@@ -173,9 +175,10 @@ def get_query_by_id(request_user=None, query_id=None):
   if datum:
     return {'data': [datum]}
   else:
-    data = _get_query_history_from(request_user=request_user, query_id=query_id) # force_refresh?
+    data = _get_query_history_from(request_user=request_user, query_id=query_id)  # force_refresh?
     cached = _groupby({'by_id': {}}, data['data'])
     return {'data': cached}
+
 
 def _init_table():
   global HAS_CREATED_TABLE
@@ -185,8 +188,21 @@ def _init_table():
   if not HAS_CREATED_TABLE:
     raise PopupException(_('Could not initialize query history table.'))
 
-def _get_query_history_latest(request_user=None, query_id=None, start_date=None, start_time=None, status=None, limit=25, force_refresh=False):
-  proposed_query = django_mako.render_to_string("select_table_query_data_latest.mako", {'table': {'name': 'query_data', 'request_user': request_user, 'query_id': query_id, 'start_date': start_date, 'start_time': start_time, 'status': status, 'limit': limit, 'force_refresh': force_refresh}})
+
+def _get_query_history_latest(
+    request_user=None, query_id=None, start_date=None, start_time=None, status=None, limit=25, force_refresh=False):
+  proposed_query = django_mako.render_to_string(
+    "select_table_query_data_latest.mako",
+    {'table': {
+      'name': 'query_data',
+      'request_user': request_user,
+      'query_id': query_id,
+      'start_date': start_date,
+      'start_time': start_time,
+      'status': status,
+      'limit': limit,
+      'force_refresh': force_refresh
+    }})
   data = _execute_query(proposed_query, limit)
   for row in data['data']:
     if row[1]:
@@ -196,6 +212,7 @@ def _get_query_history_latest(request_user=None, query_id=None, start_date=None,
     if row[8]:
       row[8] = json.loads(row[8])
   return data
+
 
 def _get_query_history_from(request_user=None, start_date=None, start_time=None, status=None, query_id=None, limit=25):
   proposed_query = django_mako.render_to_string("select_table_query_data_from.mako",
@@ -216,6 +233,7 @@ def _get_query_history_from(request_user=None, start_date=None, start_time=None,
     if row[8]:
       row[8] = [row[8]]
   return data
+
 
 def _execute_query(proposed_query, limit):
   user = install_sample_user()
@@ -243,6 +261,7 @@ def _execute_query(proposed_query, limit):
     except Exception as ex:
       raise_popup_exception(_('Error fetching query history.'))
 
+
 def _get_filter_list(filters):
   filter_list = []
   if filters.get("states"):
@@ -250,13 +269,16 @@ def _get_filter_list(filters):
 
   return filter_list
 
+
 def _get_status(row):
   return 'completed' if len(row[1]) >= 2 else 'running'
+
 
 def _n_filter(filters, tuples):
   for f in filters:
     tuples = list(filter(f, tuples))
   return tuples
+
 
 def _groupby(by_user, data):
   results = []
@@ -270,7 +292,7 @@ def _groupby(by_user, data):
       results.append(row)
     else:
       item = by_user['by_id'][row[0]]
-      if row[8][0] in item[8]: # we have dup
+      if row[8][0] in item[8]:  # we have dup
         continue
       if row[1]:
         item[1] += row[1]

@@ -14,7 +14,7 @@ import { Ace } from '../../../../../ext/ace';
 
 import { CURSOR_POSITION_CHANGED_EVENT } from '../../aceEditor/AceLocationHandler';
 import ReactExampleGlobal from '../../../../../reactComponents/ReactExampleGlobal/ReactExampleGlobal';
-import { useHuePubSub } from '../../../../../reactComponents/useHuePubSub';
+import { useHuePubSub } from '../../../../../utils/hooks/useHuePubSub/useHuePubSub';
 import SqlExecutable from '../../../execution/sqlExecutable';
 
 import './ReactExample.scss';
@@ -93,7 +93,7 @@ const ReactExample: FunctionComponent<ReactExampleProps> = ({ activeExecutable, 
           {t('Open (cuix button)')}
         </PrimaryButton>
         <Dropdown menu={{ items }}>
-          <a>Hover me</a>
+          <a href="http://www.cloudera.com">Hover me</a>
         </Dropdown>
 
         <p className="react-example__description">

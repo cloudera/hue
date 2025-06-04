@@ -1,12 +1,91 @@
+# pyproject.toml for Hue
+
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "desktop.settings"
-addopts = "-v -m 'not integration' --strict-markers --durations=10"
-norecursedirs = "desktop/core/ext-py3"
+console_output_style = "count"
+addopts = """
+-v \
+-m \
+'not integration' \
+--strict-markers \
+--disable-warnings \
+--junit-xml=reports/pytest/test_report.xml \
+--html=reports/pytest/report.html \
+--self-contained-html \
+--cov=./ \
+--cov-report html:reports/code-cov/coverage-html \
+--cov-report xml:reports/code-cov/coverage.xml \
+"""
+norecursedirs = "desktop/core/ext-py3 desktop/core/3.11 desktop/core/3.10 desktop/core/3.9 desktop/core/3.8"
 python_files = "tests.py test_*.py *_tests.py tests_* *_test.py"
 markers = [
-    "integration: live server based tests",
-    "requires_hadoop: live hadoop cluster based tests"
+  "integration: live server based tests",
+  "requires_hadoop: live hadoop cluster based tests"
 ]
+
+[tool.coverage.run]
+branch = true
+omit = [
+  "*/ext-py3/*",
+  "desktop/core/src/desktop/lib/wsgiserver.py",
+  "*/migrations/*",
+  "*/org_migrations/*",
+  "*/old_migrations/*",
+  "*/gen-py/*",
+  "desktop/core/src/desktop/app_template/src/app_name/*",
+  "desktop/core/src/desktop/app_template_proxy/src/app_name/*",
+  "*conf.py",
+  "*settings.py",
+  "*urls.py",
+  "*metrics.py",
+  "*tests.py*",
+  "test_*.py",
+  "*_tests.py",
+  "tests_*.py",
+  "*_test.py"
+]
+source = [
+  "about",
+  "aws",
+  "azure",
+  "beeswax",
+  "dashboard",
+  "desktop",
+  "filebrowser",
+  "hadoop",
+  "hbase",
+  "help",
+  "hive",
+  "impala",
+  "indexer",
+  "jobbrowser",
+  "jobsub",
+  "kafka",
+  "libanalyze",
+  "liboauth",
+  "liboozie",
+  "librdbms",
+  "libsaml",
+  "libsentry",
+  "libsolr",
+  "libzookeeper",
+  "metadata",
+  "metastore",
+  "notebook",
+  "oozie",
+  "pig",
+  "proxy",
+  "rdbms",
+  "search",
+  "security",
+  "spark",
+  "sqoop",
+  "useradmin",
+  "zookeeper"
+]
+
+[tool.coverage.report]
+precision = 2
 
 [tool.ruff]
 target-version = "py38"
@@ -27,65 +106,84 @@ extend-exclude = [
   "desktop/core/src/desktop/app_template_proxy/src/app_name/*"
 ]
 
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+indent-style = "space"
+quote-style = "double"
+
 [tool.ruff.lint]
 preview = true
 select = [
-    "E", # pycodestyle errors
-    "W", # pycodestyle warnings
-    "I", # isort
+  "E", # pycodestyle errors
+  "W", # pycodestyle warnings
+  "I", # isort
+  "F" # pyflakes
 ]
-ignore = [
-    "E111",
-    "E114",
-    "E117",
-    "W191",
-]
-
-[tool.ruff.format]
-docstring-code-format = true
-docstring-code-line-length = 140
-indent-style = "space"
-quote-style = "preserve"
+ignore = ["E111", "E114", "E117", "W191", "E731"]
 
 [tool.ruff.lint.isort]
+case-sensitive = false
 combine-as-imports = true
-length-sort-straight = true
+force-sort-within-sections = false
 known-first-party = [
-    "about",
-    "beeswax",
-    "filebrowser",
-    "hbase",
-    "help",
-    "hive",
-    "impala",
-    "jobbrowser",
-    "jobsub",
-    "metastore",
-    "oozie",
-    "pig",
-    "proxy",
-    "rdbms",
-    "search",
-    "security",
-    "spark",
-    "sqoop",
-    "useradmin",
-    "zookeeper",
-    "desktop",
-    "aws",
-    "azure",
-    "dashboard",
-    "hadoop",
-    "indexer",
-    "kafka",
-    "libanalyze",
-    "liboauth",
-    "liboozie",
-    "librdbms",
-    "libsaml",
-    "libsentry",
-    "libsolr",
-    "libzookeeper",
-    "metadata",
-    "notebook"
+  "about",
+  "aws",
+  "azure",
+  "beeswax",
+  "dashboard",
+  "desktop",
+  "filebrowser",
+  "hadoop",
+  "hbase",
+  "help",
+  "hive",
+  "impala",
+  "indexer",
+  "jobbrowser",
+  "jobsub",
+  "kafka",
+  "libanalyze",
+  "liboauth",
+  "liboozie",
+  "librdbms",
+  "libsaml",
+  "libsentry",
+  "libsolr",
+  "libzookeeper",
+  "metadata",
+  "metastore",
+  "notebook",
+  "oozie",
+  "pig",
+  "proxy",
+  "rdbms",
+  "search",
+  "security",
+  "spark",
+  "sqoop",
+  "useradmin",
+  "zookeeper"
 ]
+known-third-party = []
+lines-after-imports = -1
+order-by-type = false
+section-order = [
+  "future",
+  "standard-library",
+  "third-party",
+  "first-party",
+  "local-folder"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"desktop/libs/notebook/src/notebook/connectors/altus.py" = ["E501"]
+"desktop/libs/notebook/src/notebook/connectors/altus_adb.py" = ["E501"]
+"desktop/libs/metadata/src/metadata/catalog/dummy_client.py" = ["E501"]
+"desktop/libs/liboozie/src/liboozie/submission2.py" = ["E501"]
+"desktop/libs/libanalyze/src/libanalyze/rules.py" = ["E501"]
+"apps/hbase/src/hbase/api.py" = ["E501"]
+"desktop/libs/librdbms/src/librdbms/server/mysql_lib.py" = ["E402"]
+"desktop/core/src/desktop/urls.py" = ["E402"]
+"desktop/core/src/desktop/lib/thrift_util_test.py" = ["E402"]
+"desktop/core/src/desktop/auth/backend.py" = ["E402"]

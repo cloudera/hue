@@ -15,16 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging.handlers
 import sys
-from desktop.models import Document2
-from django.contrib.auth.models import User, Group
-from django.core.management.base import BaseCommand
+import logging
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _t, gettext as _
-else:
-  from django.utils.translation import ugettext_lazy as _t, ugettext as _
+from django.contrib.auth.models import Group, User
+from django.core.management.base import BaseCommand
+from django.utils.translation import gettext as _, gettext_lazy as _t
+
+from desktop.models import Document2
 
 LOG = logging.getLogger()
 
@@ -36,41 +34,42 @@ class Command(BaseCommand):
 
   try:
     from optparse import make_option
+
     option_list = BaseCommand.option_list + (
-      make_option("--shareusers", help=_t("Comma separated list of users to share all workflows with."),
-                  action="store"),
-      make_option("--sharegroups", help=_t("Comma separated list of groups to share all workflows with."),
-                  action="store"),
-      make_option("--owner", help=_t("Give permissions to only workflows owned by this user."),
-                  action="store"),
-      make_option("--permissions", help=_t("Comma separated list of permissions for the users and groups."
-                                           "read, write or read,write"), action="store"),
+      make_option("--shareusers", help=_t("Comma separated list of users to share all workflows with."), action="store"),
+      make_option("--sharegroups", help=_t("Comma separated list of groups to share all workflows with."), action="store"),
+      make_option("--owner", help=_t("Give permissions to only workflows owned by this user."), action="store"),
+      make_option(
+        "--permissions",
+        help=_t("Comma separated list of permissions for the users and groups." "read, write or read,write"),
+        action="store",
+      ),
     )
 
-  except AttributeError, e:
+  except AttributeError as e:
     baseoption_test = 'BaseCommand' in str(e) and 'option_list' in str(e)
     if baseoption_test:
+
       def add_arguments(self, parser):
-        parser.add_argument("--shareusers", help=_t("Comma separated list of users to share all workflows with."),
-                            action="store"),
-        parser.add_argument("--sharegroups", help=_t("Comma separated list of groups to share all workflows with."),
-                            action="store"),
-        parser.add_argument("--owner", help=_t("Give permissions to only workflows owned by this user."),
-                            action="store"),
-        parser.add_argument("--permissions", help=_t("Comma separated list of permissions for the users and groups."
-                                                     "read, write or read,write"), action="store")
+        parser.add_argument("--shareusers", help=_t("Comma separated list of users to share all workflows with."), action="store")
+        parser.add_argument("--sharegroups", help=_t("Comma separated list of groups to share all workflows with."), action="store")
+        parser.add_argument("--owner", help=_t("Give permissions to only workflows owned by this user."), action="store")
+        parser.add_argument(
+          "--permissions",
+          help=_t("Comma separated list of permissions for the users and groups." "read, write or read,write"),
+          action="store",
+        )
     else:
       LOG.exception(str(e))
       sys.exit(1)
 
   def handle(self, *args, **options):
-
     if not options['shareusers'] and not options['sharegroups']:
-      LOG.warn("You must set either shareusers or sharegroups or both")
+      LOG.warning("You must set either shareusers or sharegroups or both")
       sys.exit(1)
 
     if not options['permissions']:
-      LOG.warn("permissions option required either read, write or read,write")
+      LOG.warning("permissions option required either read, write or read,write")
       sys.exit(1)
 
     if options['shareusers']:
@@ -146,5 +145,5 @@ class Command(BaseCommand):
             users = User.objects.in_bulk(write_users)
             groups = Group.objects.in_bulk(write_groups)
 
-          LOG.warn("Setting %s on %s for users: %s : groups: %s" % (perm, oozie_doc.name, users, groups))
+          LOG.warning("Setting %s on %s for users: %s : groups: %s" % (perm, oozie_doc.name, users, groups))
           oozie_doc.share(owner, name=perm, users=users, groups=groups)

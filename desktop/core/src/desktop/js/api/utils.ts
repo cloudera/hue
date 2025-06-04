@@ -42,20 +42,21 @@ export interface DefaultApiResponse {
   content?: string;
 }
 
-export interface ApiFetchOptions<T, E = string> extends AxiosRequestConfig {
+export interface ApiFetchOptions<T, E = AxiosError<DefaultApiResponse>> extends AxiosRequestConfig {
   silenceErrors?: boolean;
   ignoreSuccessErrors?: boolean;
   transformResponse?: AxiosResponseTransformer;
   qsEncodeData?: boolean;
+  isRawError?: boolean;
   handleSuccess?: (
     response: T & DefaultApiResponse,
     resolve: (val: T) => void,
     reject: (err: unknown) => void
   ) => void;
   handleError?: (
-    errorResponse: AxiosError<E>,
+    errorResponse: AxiosError<DefaultApiResponse>,
     resolve: (val: T) => void,
-    reject: (err: unknown) => void
+    reject: (err: E) => void
   ) => void;
 }
 
@@ -104,7 +105,7 @@ export const successResponseIsError = (responseData?: DefaultApiResponse): boole
 const UNKNOWN_ERROR_MESSAGE = 'Unknown error occurred';
 
 export const extractErrorMessage = (
-  errorResponse?: DefaultApiResponse | AxiosError | string
+  errorResponse?: DefaultApiResponse | AxiosError<DefaultApiResponse> | string
 ): string => {
   if (!errorResponse) {
     return UNKNOWN_ERROR_MESSAGE;
@@ -156,18 +157,22 @@ const notifyError = <T>(
 const handleErrorResponse = <T>(
   err: AxiosError<DefaultApiResponse>,
   reject: (reason?: unknown) => void,
-  options?: Pick<ApiFetchOptions<T>, 'silenceErrors'>
+  options?: Pick<ApiFetchOptions<T>, 'silenceErrors' | 'isRawError'>
 ): void => {
   const errorMessage = extractErrorMessage(err.response && err.response.data);
-  reject(errorMessage);
+  if (options?.isRawError) {
+    reject(err);
+  } else {
+    reject(errorMessage);
+  }
   notifyError(errorMessage, (err && err.response) || err, options);
 };
 
-const handleResponse = <T>(
+const handleResponse = <T, E = unknown>(
   response: AxiosResponse<T & DefaultApiResponse>,
   resolve: (value?: T) => void,
   reject: (reason?: unknown) => void,
-  options?: ApiFetchOptions<T>
+  options?: ApiFetchOptions<T, E>
 ): void => {
   if (options && options.handleSuccess) {
     options.handleSuccess(response.data, resolve, reason => {
@@ -188,10 +193,10 @@ const getCancelToken = (): { cancelToken: CancelToken; cancel: () => void } => {
   return { cancelToken: cancelTokenSource.token, cancel: cancelTokenSource.cancel };
 };
 
-export const post = <T, U = unknown>(
+export const post = <T, U = unknown, E = AxiosError>(
   url: string,
   data?: U,
-  options?: ApiFetchOptions<T>
+  options?: ApiFetchOptions<T, E>
 ): CancellablePromise<T> =>
   new CancellablePromise((resolve, reject, onCancel) => {
     const { cancelToken, cancel } = getCancelToken();
@@ -207,7 +212,7 @@ export const post = <T, U = unknown>(
       .then(response => {
         handleResponse(response, resolve, reject, options);
       })
-      .catch((err: AxiosError) => {
+      .catch((err: AxiosError<DefaultApiResponse>) => {
         if (options && options.handleError) {
           options.handleError(err, resolve, reason => {
             handleErrorResponse(err, reject, options);
@@ -228,10 +233,10 @@ export const post = <T, U = unknown>(
     });
   });
 
-export const get = <T, U = unknown>(
+export const get = <T, U = unknown, E = AxiosError<DefaultApiResponse>>(
   url: string,
   data?: U,
-  options?: ApiFetchOptions<T>
+  options?: ApiFetchOptions<T, E>
 ): CancellablePromise<T> =>
   new CancellablePromise((resolve, reject, onCancel) => {
     const { cancelToken, cancel } = getCancelToken();
@@ -245,7 +250,7 @@ export const get = <T, U = unknown>(
       .then(response => {
         handleResponse(response, resolve, reject, options);
       })
-      .catch((err: AxiosError) => {
+      .catch((err: AxiosError<DefaultApiResponse>) => {
         handleErrorResponse(err, reject, options);
       })
       .finally(() => {

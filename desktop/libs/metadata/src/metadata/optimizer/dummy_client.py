@@ -16,18 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
+
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-
 from metadata.optimizer.base import Api
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -37,18 +32,14 @@ class DummyClient(Api):
   def __init__(self, user, api_url=None, auth_key=None, auth_key_secret=None, tenant_id=None):
     self.user = user
 
-
   def get_tenant(self, cluster_id='default'):
     pass
-
 
   def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
     pass
 
-
   def upload_status(self, workload_id):
     pass
-
 
   def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None, connector=None):
     data = {
@@ -82,14 +73,11 @@ class DummyClient(Api):
 
     return data
 
-
   def table_details(self, database_name, table_name, page_size=100, startingToken=None, connector=None):
     return {}
 
-
   def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None, connector=None):
     return {}
-
 
   def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None, connector=None):
     hints = []
@@ -101,7 +89,6 @@ class DummyClient(Api):
       'noDDL': response.get('noDDL', []),
     }
 
-
   def predict(self, query, source_platform, connector):
     hints = []
     response = {}
@@ -110,22 +97,18 @@ class DummyClient(Api):
       'hints': hints,
     }
 
-
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None, connector=None):
     raise PopupException(_('Call not supported'))
-
 
   def top_filters(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     results = {'results': []}
 
     return results
 
-
   def top_aggs(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     results = {'results': []}
 
     return results
-
 
   def top_columns(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     results = {
@@ -145,12 +128,10 @@ class DummyClient(Api):
 
     return results
 
-
   def top_joins(self, db_tables=None, page_size=100, startingToken=None, connector=None):
     results = {'results': []}
 
     return results
-
 
   def top_databases(self, page_size=100, startingToken=None, connector=None):
     results = {'results': []}

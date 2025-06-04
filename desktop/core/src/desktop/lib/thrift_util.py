@@ -30,7 +30,8 @@ import threading
 from builtins import map, object, range
 
 from django.conf import settings
-from past.builtins import basestring
+from django.utils.translation import gettext as _
+from past.builtins import basestring, long
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 from thrift.Thrift import TApplicationException, TType
@@ -41,16 +42,10 @@ from desktop.conf import CHERRYPY_SERVER_THREADS, ENABLE_ORGANIZATIONS, ENABLE_S
 from desktop.lib.apputil import INFO_LEVEL_CALL_DURATION_MS, WARN_LEVEL_CALL_DURATION_MS
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 from desktop.lib.python_util import create_synchronous_io_multiplexer
+from desktop.lib.sasl_compat import PureSASLClient
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
 from desktop.lib.thrift_sasl import TSaslClientTransport
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from past.builtins import long
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 
@@ -357,17 +352,34 @@ def connect_to_thrift(conf):
       mode.set_basic_auth(conf.username, conf.password)
 
   if conf.transport_mode == 'socket' and conf.use_sasl:
-    def sasl_factory():
-      saslc = sasl.Client()
-      saslc.setAttr("host", str(conf.host))
-      saslc.setAttr("service", str(conf.kerberos_principal))
-      if conf.mechanism == 'PLAIN':
-        saslc.setAttr("username", str(conf.username))
-        saslc.setAttr("password", str(conf.password))  # Defaults to 'hue' for a non-empty string unless using LDAP
-      else:
-        saslc.setAttr("maxbufsize", SASL_MAX_BUFFER.get())
-      saslc.init()
-      return saslc
+    try:
+      import sasl  # pylint: disable=import-error
+
+      def sasl_factory():
+        saslc = sasl.Client()
+        saslc.setAttr("host", str(conf.host))
+        saslc.setAttr("service", str(conf.kerberos_principal))
+        if conf.mechanism == 'PLAIN':
+          saslc.setAttr("username", str(conf.username))
+          saslc.setAttr("password", str(conf.password))  # Defaults to 'hue' for a non-empty string unless using LDAP
+        else:
+          saslc.setAttr("maxbufsize", SASL_MAX_BUFFER.get())
+        saslc.init()
+        return saslc
+
+    except Exception as e:
+      LOG.debug("Unable to import 'sasl'. Fallback to 'puresasl'.")
+      from desktop.lib.sasl_compat import PureSASLClient
+
+      def sasl_factory():
+        return PureSASLClient(
+          host=str(conf.host),
+          username=str(conf.username) if conf.mechanism == 'PLAIN' else None,
+          password=str(conf.password) if conf.mechanism == 'PLAIN' else None,
+          maxbufsize=SASL_MAX_BUFFER.get() if conf.mechanism != 'PLAIN' else None,
+          service=str(conf.kerberos_principal)
+        )
+
     transport = TSaslClientTransport(sasl_factory, conf.mechanism, mode)
   elif conf.transport == 'framed':
     transport = TFramedTransport(mode)
@@ -591,12 +603,8 @@ class SuperClient(object):
 
 def _unpack_guid_secret_in_handle(str_args):
   if 'operationHandle' in str_args or 'sessionHandle' in str_args:
-    if sys.version_info[0] > 2:
-      guid = re.search('guid=(b".*"), secret', str_args) or re.search('guid=(b\'.*\'), secret', str_args)
-      secret = re.search(r'secret=(b".+?")\)', str_args) or re.search('secret=(b\'.+?\')\\)', str_args)
-    else:
-      secret = re.search('secret=(".*"), guid', str_args) or re.search('secret=(\'.*\'), guid', str_args)
-      guid = re.search(r'guid=(".*")\)\)', str_args) or re.search('guid=(\'.*\')\\)\\)', str_args)
+    guid = re.search('guid=(b".*"), secret', str_args) or re.search('guid=(b\'.*\'), secret', str_args)
+    secret = re.search(r'secret=(b".+?")\)', str_args) or re.search('secret=(b\'.+?\')\\)', str_args)
 
     if secret and guid:
       try:
@@ -616,7 +624,7 @@ def unpack_guid(guid):
 
 
 def unpack_guid_base64(guid):
-  decoded_guid = base64.b64decode(guid) if sys.version_info[0] > 2 else base64.decodestring(guid)
+  decoded_guid = base64.b64decode(guid)
   return "%016x:%016x" % struct.unpack(b"QQ", decoded_guid)
 
 

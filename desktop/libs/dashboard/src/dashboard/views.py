@@ -15,60 +15,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import logging
 import re
 import sys
+import json
+import logging
 
 from django.urls import reverse
 from django.utils.html import escape
+from django.utils.translation import gettext as _
 
+from dashboard.conf import get_engines
+from dashboard.controller import DashboardController, can_edit_index
+from dashboard.dashboard_api import get_engine
+from dashboard.decorators import allow_owner_only
+from dashboard.models import Collection2
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2, Document
+from desktop.models import Document, Document2
 from desktop.views import antixss
-
-from search.conf import LATEST
 from indexer.views import importer
-
-from dashboard.dashboard_api import get_engine
-from dashboard.decorators import allow_owner_only
-from dashboard.conf import get_engines
-from dashboard.controller import DashboardController, can_edit_index
-from dashboard.models import Collection2
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from search.conf import LATEST
 
 LOG = logging.getLogger()
 
 
 DEFAULT_LAYOUT = [
-     {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
-     {"size":10,"rows":[{"widgets":[
-         {"size":12,"name":"Filter Bar","widgetType":"filter-widget", "id":"99923aef-b233-9420-96c6-15d48293532b",
-          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
-                        {"widgets":[
-         {"size":12,"name":"Grid Results","widgetType":"resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
-          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-        "drops":["temp"],"klass":"card card-home card-column span10"},
+     {"size": 2, "rows": [{"widgets": []}], "drops": ["temp"], "klass": "card card-home card-column span2"},
+     {"size": 10, "rows": [{"widgets": [
+         {"size": 12, "name": "Filter Bar", "widgetType": "filter-widget", "id": "99923aef-b233-9420-96c6-15d48293532b",
+          "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]},
+                        {"widgets": [
+         {"size": 12, "name": "Grid Results", "widgetType": "resultset-widget", "id": "14023aef-b233-9420-96c6-15d48293532b",
+          "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]}],
+        "drops": ["temp"], "klass": "card card-home card-column span10"},
 ]
 
 REPORT_LAYOUT = [
-  {u'klass': u'card card-home card-column span12', u'rows': [{"widgets":[]}], u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12}
+  {u'klass': u'card card-home card-column span12', u'rows': [{"widgets": []}], u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12}  # noqa: E501
 ]
 
 QUERY_BUILDER_LAYOUT = [
   {u'klass': u'card card-home card-column span12', u'rows': [
     {u'widgets': [
-        {u'name': u'Filter Bar', u'widgetType': u'filter-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'abe50df3-a5a0-408a-8122-019d779b4354', u'size': 12}],
+        {u'name': u'Filter Bar', u'widgetType': u'filter-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'abe50df3-a5a0-408a-8122-019d779b4354', u'size': 12}],  # noqa: E501
      u'id': u'22532a0a-8e43-603a-daa9-77d5d233fd7f', u'columns': []},
         {u'widgets': [], u'id': u'ebb7fe4d-64c5-c660-bdc0-02a77ff8321e', u'columns': []},
-        {u'widgets': [{u'name': u'Grid Results', u'widgetType': u'resultset-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'14023aef-b233-9420-96c6-15d48293532b', u'size': 12}],
+        {u'widgets': [{u'name': u'Grid Results', u'widgetType': u'resultset-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'14023aef-b233-9420-96c6-15d48293532b', u'size': 12}],  # noqa: E501
     u'id': u'2bfa8b4b-f7f3-1491-4de0-282130c6ab61', u'columns': []}
     ],
     u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12
@@ -76,19 +69,19 @@ QUERY_BUILDER_LAYOUT = [
 ]
 
 TEXT_SEARCH_LAYOUT = [
-     {"size":12,"rows":[{"widgets":[
-         {"size":12,"name":"Filter Bar","widgetType":"filter-widget", "id":"99923aef-b233-9420-96c6-15d48293532b",
-          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
-                        {"widgets":[
-         {"size":12,"name":"HTML Results","widgetType":"html-resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
-          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-        "drops":["temp"],"klass":"card card-home card-column span12"},
+     {"size": 12, "rows": [{"widgets": [
+         {"size": 12, "name": "Filter Bar", "widgetType": "filter-widget", "id": "99923aef-b233-9420-96c6-15d48293532b",
+          "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]},
+                        {"widgets": [
+         {"size": 12, "name": "HTML Results", "widgetType": "html-resultset-widget", "id": "14023aef-b233-9420-96c6-15d48293532b",
+          "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]}],
+        "drops": ["temp"], "klass": "card card-home card-column span12"},
 ]
 
 
 def index(request, is_mobile=False):
   engine = request.GET.get('engine', 'solr')
-  cluster = request.POST.get('cluster','""')
+  cluster = request.POST.get('cluster', '""')
   collection_id = request.GET.get('collection')
 
   collections = get_engine(request.user, engine, cluster=cluster).datasets() if engine != 'report' else ['default']
@@ -140,12 +133,14 @@ def index(request, is_mobile=False):
     'is_report': collection.data['collection'].get('engine') == 'report'
   })
 
+
 def index_m(request):
   return index(request, True)
 
+
 def new_search(request):
   engine = request.GET.get('engine', 'solr')
-  cluster = request.POST.get('cluster','""')
+  cluster = request.POST.get('cluster', '""')
 
   collections = get_engine(request.user, engine, cluster=cluster).datasets() if engine != 'report' else ['default']
 
@@ -190,12 +185,13 @@ def new_search(request):
       'is_report': engine == 'report'
     })
 
+
 def browse(request, name, is_mobile=False):
   engine = request.GET.get('engine', 'solr')
   source = request.GET.get('source', 'data')
 
   if engine == 'solr':
-    name = re.sub('^default\.', '', name)
+    name = re.sub(r'^default\.', '', name)
 
   database = name.split('.', 1)[0]
   collections = get_engine(request.user, engine, source=source).datasets(database=database)
@@ -217,10 +213,10 @@ def browse(request, name, is_mobile=False):
       'autoLoad': True,
       'collections': collections,
       'layout': [
-          {"size":12,"rows":[{"widgets":[
-              {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
-               "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-          "drops":["temp"],"klass":"card card-home card-column span10"}
+          {"size": 12, "rows": [{"widgets": [
+              {"size": 12, "name": "Grid Results", "id": "52f07188-f30f-1296-2450-f77e02e1a5c0", "widgetType": "resultset-widget",
+               "properties": {}, "offset": 0, "isLoading": True, "klass": "card card-widget span12"}]}],
+          "drops": ["temp"], "klass": "card card-home card-column span10"}
       ],
       'qb_layout': QUERY_BUILDER_LAYOUT,
       'text_search_layout': TEXT_SEARCH_LAYOUT,
@@ -252,8 +248,12 @@ def save(request):
     if collection['id']:
       dashboard_doc = Document2.objects.get(id=collection['id'])
     else:
-      dashboard_doc = Document2.objects.create(name=collection['name'], uuid=collection['uuid'], type='search-dashboard', owner=request.user, description=collection['label'])
-      Document.objects.link(dashboard_doc, owner=request.user, name=collection['name'], description=collection['label'], extra='search-dashboard')
+      dashboard_doc = Document2.objects.create(
+        name=collection['name'], uuid=collection['uuid'], type='search-dashboard', owner=request.user, description=collection['label']
+      )
+      Document.objects.link(
+        dashboard_doc, owner=request.user, name=collection['name'], description=collection['label'], extra='search-dashboard'
+      )
 
     dashboard_doc.update_data({
         'collection': collection,

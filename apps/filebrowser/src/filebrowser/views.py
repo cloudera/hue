@@ -15,9 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import io
 import os
 import re
 import sys
+import json
 import stat as stat_module
 import errno
 import logging
@@ -26,11 +28,16 @@ import mimetypes
 import posixpath
 import urllib.error
 import urllib.request
-from builtins import object
+from builtins import object, str as new_str
 from bz2 import decompress
 from datetime import datetime
 from functools import partial
+from gzip import decompress as decompress_gzip
+from io import BytesIO, StringIO as string_io
+from urllib.parse import quote as urllib_quote, unquote as urllib_unquote, urlparse as lib_urlparse
 
+import pandas as pd
+from avro import datafile, io
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
 from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
@@ -39,6 +46,7 @@ from django.template.defaultfilters import filesizeformat, stringformat
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import http_date
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
@@ -100,28 +108,6 @@ from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.upload import HDFSFineUploaderChunkedUpload, LocalFineUploaderChunkedUpload
 from useradmin.models import Group, User
 
-if sys.version_info[0] > 2:
-  import io
-  from builtins import str as new_str
-  from gzip import decompress as decompress_gzip
-  from io import StringIO as string_io
-  from urllib.parse import quote as urllib_quote, unquote as urllib_unquote, urlparse as lib_urlparse
-
-  from avro import datafile, io
-  from django.utils.translation import gettext as _
-else:
-  from urllib import quote as urllib_quote, unquote as urllib_unquote
-
-  from cStringIO import StringIO as string_io
-  from urlparse import urlparse as lib_urlparse
-  new_str = unicode
-  from gzip import GzipFile
-
-  import parquet
-  from avro import datafile, io
-  from django.utils.translation import ugettext as _
-
-
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4  # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024 * 1024  # 1MB
 
@@ -132,6 +118,9 @@ BYTES_PER_SENTENCE = 2
 
 # The maximum size the file editor will allow you to edit
 MAX_FILEEDITOR_SIZE = 256 * 1024
+
+# Parquet files start with a specific 4-byte magic number: 'PAR1'
+PARQUET_MAGIC_NUMBER = b'PAR1'
 
 INLINE_DISPLAY_MIMETYPE = re.compile(
     r'video/|image/|audio/|application/pdf|application/msword|application/excel|application/vnd\.ms|application/vnd\.openxmlformats'
@@ -162,14 +151,6 @@ if hasattr(ARCHIVE_UPLOAD_TEMPDIR, 'get') and not os.path.exists(ARCHIVE_UPLOAD_
 logger = logging.getLogger()
 
 
-class ParquetOptions(object):
-  def __init__(self, col=None, format='json', no_headers=True, limit=-1):
-    self.col = col
-    self.format = format
-    self.no_headers = no_headers
-    self.limit = limit
-
-
 def index(request):
   # Redirect to home directory by default
   path = request.user.get_home_directory()
@@ -187,9 +168,13 @@ def _decode_slashes(path):
   # This is a fix for some installations where the path is still having the slash (/) encoded
   # as %2F while the rest of the path is actually decoded.
   encoded_slash = '%2F'
-  if path and path.startswith(encoded_slash) or path.startswith('abfs:' + encoded_slash) or \
-    path.startswith('s3a:' + encoded_slash) or path.startswith('gs:' + encoded_slash) or \
-    path.startswith('ofs:' + encoded_slash):
+  if path and (
+    path.startswith(encoded_slash)
+    or path.startswith('abfs:' + encoded_slash)
+    or path.startswith('s3a:' + encoded_slash)
+    or path.startswith('gs:' + encoded_slash)
+    or path.startswith('ofs:' + encoded_slash)
+  ):
     path = path.replace(encoded_slash, '/')
 
   return path
@@ -235,7 +220,7 @@ def download(request, path):
   stats = request.fs.stats(path)
   mtime = stats['mtime']
   size = stats['size']
-  if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), mtime, size):
+  if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), mtime):
     return HttpResponseNotModified()
     # TODO(philip): Ideally a with statement would protect from leaks, but tricky to do here.
   fh = request.fs.open(path)
@@ -686,8 +671,8 @@ def listdir_paged(request, path):
       's3_listing_not_allowed': s3_listing_not_allowed
   }
 
-  if ENABLE_NEW_STORAGE_BROWSER.get():
-    return render('storage_browser.mako', request, data)
+  options_json = json.dumps(data)
+  data['options_json'] = options_json
   return render('listdir.mako', request, data)
 
 
@@ -825,24 +810,17 @@ def display(request, path):
   # Get contents as string for text mode, or at least try
   uni_contents = None
   if not mode or mode == 'text':
-    if sys.version_info[0] > 2:
-      if not isinstance(contents, str):
-        uni_contents = new_str(contents, encoding, errors='replace')
-        is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
-        # Auto-detect mode
-        if not mode:
-          mode = is_binary and 'binary' or 'text'
-      else:
-        # We already have a string.
-        uni_contents = contents
-        is_binary = False
-        mode = 'text'
-    else:
+    if not isinstance(contents, str):
       uni_contents = new_str(contents, encoding, errors='replace')
       is_binary = uni_contents.find(i18n.REPLACEMENT_CHAR) != -1
       # Auto-detect mode
       if not mode:
         mode = is_binary and 'binary' or 'text'
+    else:
+      # We already have a string.
+      uni_contents = contents
+      is_binary = False
+      mode = 'text'
 
   # Get contents as bytes
   if mode == "binary":
@@ -880,7 +858,7 @@ def display(request, path):
 
   data['breadcrumbs'] = parse_breadcrumbs(path)
   data['show_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
-
+  data['options_json'] = json.dumps(data)
   return render("display.mako", request, data)
 
 
@@ -1002,13 +980,16 @@ def _read_avro(fhandle, path, offset, length, stats):
 
 def _read_parquet(fhandle, path, offset, length, stats):
   try:
-    size = 1 * 128 * 1024 * 1024  # Buffer file stream to 128 MB chunks
-    data = string_io(fhandle.read(size))
+    size = 1 * 128 * 1024 * 1024  # Buffer file stream to 128 MiB chunks
 
-    dumped_data = string_io()
-    parquet._dump(data, ParquetOptions(limit=1000), out=dumped_data)
-    dumped_data.seek(offset)
-    return dumped_data.read()
+    fhandle.seek(offset)
+    file_data = BytesIO(fhandle.read(size))
+
+    data_frame = pd.read_parquet(file_data, engine='pyarrow')
+
+    data_chunk = data_frame.iloc[offset:offset + length].to_string()
+
+    return data_chunk
   except Exception as e:
     logging.exception('Could not read parquet file at "%s": %s' % (path, e))
     raise PopupException(_("Failed to read Parquet file."))
@@ -1019,10 +1000,7 @@ def _read_gzip(fhandle, path, offset, length, stats):
   if offset and offset != 0:
     raise PopupException(_("Offsets are not supported with Gzip compression."))
   try:
-    if sys.version_info[0] > 2:
-      contents = decompress_gzip(fhandle.read())
-    else:
-      contents = GzipFile('', 'r', 0, string_io(fhandle.read())).read(length)
+    contents = decompress_gzip(fhandle.read())
   except Exception as e:
     logging.exception('Could not decompress file at "%s": %s' % (path, e))
     raise PopupException(_("Failed to decompress file."))
@@ -1052,27 +1030,18 @@ def _read_simple(fhandle, path, offset, length, stats):
 
 def detect_gzip(contents):
   '''This is a silly small function which checks to see if the file is Gzip'''
-  if sys.version_info[0] > 2:
-    return contents[:2] == b'\x1f\x8b'
-  else:
-    return contents[:2] == '\x1f\x8b'
+  return contents[:2] == b'\x1f\x8b'
 
 
 def detect_bz2(contents):
   '''This is a silly small function which checks to see if the file is Bz2'''
-  if sys.version_info[0] > 2:
-    return contents[:3] == b'BZh'
-  else:
-    return contents[:3] == 'BZh'
+  return contents[:3] == b'BZh'
 
 
 def detect_avro(contents):
   '''This is a silly small function which checks to see if the file is Avro'''
   # Check if the first three bytes are 'O', 'b' and 'j'
-  if sys.version_info[0] > 2:
-    return contents[:3] == b'\x4F\x62\x6A'
-  else:
-    return contents[:3] == '\x4F\x62\x6A'
+  return contents[:3] == b'\x4F\x62\x6A'
 
 
 def detect_snappy(contents):
@@ -1092,9 +1061,12 @@ def detect_snappy(contents):
 def detect_parquet(fhandle):
   """
   Detect parquet from magic header bytes.
-  Python 2 only currently.
   """
-  return False if sys.version_info[0] > 2 else parquet._check_header_magic_bytes(fhandle)
+
+  fhandle.seek(0)
+  magic_number = fhandle.read(4)
+
+  return magic_number == PARQUET_MAGIC_NUMBER
 
 
 def snappy_installed():

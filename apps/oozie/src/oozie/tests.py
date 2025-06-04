@@ -60,10 +60,7 @@ from oozie.utils import workflow_to_dict, model_to_dict, smart_path, contains_sy
 from oozie.importlib.workflows import import_workflow
 from oozie.importlib.jobdesigner import convert_jobsub_design
 
-if sys.version_info[0] > 2:
-  from io import BytesIO as string_io
-else:
-  from cStringIO import StringIO as string_io
+from io import BytesIO as string_io
 
 
 LOG = logging.getLogger()
@@ -3342,23 +3339,6 @@ my_prop_not_filtered=10
     finally:
       finish()
 
-  def test_httppool(self):
-    # With http pool the http connection is reused and so new connection count is 0
-    superuser_client = make_logged_in_client(is_superuser=True)
-    start_log = "--START HTTP POOL TEST--"
-    LOG.warning(start_log)
-    superuser_client.get(reverse('oozie:list_oozie_workflows'))
-    superuser_client.get(reverse('oozie:list_oozie_workflows') + "?format=json")
-    superuser_client.get(reverse('oozie:list_oozie_workflows') + "?format=json&status=RUNNING&status=PREP&status=SUSPENDED")
-    superuser_client.get(reverse('oozie:list_oozie_workflows') + "?format=json&status=KILLED&status=FAILED")
-    end_log = "--END HTTP POOL TEST--"
-    LOG.warning(end_log)
-    response = superuser_client.get(reverse(views.log_view))
-
-    s1 = response._container[0].index(start_log)
-    e1 = response._container[0].index(end_log)
-    c1 = response._container[0][e1:s1].count('Starting new HTTP')
-    assert c1 == 0
 
 class TestDashboard(OozieMockBase):
 

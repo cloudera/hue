@@ -15,17 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import logging
 import os.path
-import subprocess
-import sys
 import argparse
+import subprocess
 
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
 
 from desktop.lib import paths
-
 
 LOG = logging.getLogger()
 
@@ -47,10 +46,10 @@ class Command(BaseCommand):
         ./build/env/bin/hue runruff check file1.py file2.py
 
       Run Ruff linting on files changed between the current branch and a specified diff branch:
-        ./build/env/bin/hue runruff check --diff-branch=origin/master
+        ./build/env/bin/hue runruff --diff-branch=origin/master check
 
       Automatically fix all Ruff errors on files changed between the current branch and a specified diff branch:
-        ./build/env/bin/hue runruff check --diff-branch=origin/master --fix
+        ./build/env/bin/hue runruff --diff-branch=origin/master check --fix
 
     Note:
       Make sure to install Ruff first by running `./build/env/bin/pip install ruff` in your environment.
@@ -108,7 +107,12 @@ class Command(BaseCommand):
       *args: Variable arguments.
       **options: Keyword arguments.
     """
-    ruff_package = paths.get_build_dir('env', 'bin', 'ruff')
+    PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}"
+
+    if PYTHON_VERSION == "3.11":
+        ruff_package = paths.get_build_dir('env', 'bin', 'ruff')
+    else:
+        ruff_package = paths.get_build_dir('venvs', f'python{PYTHON_VERSION}', 'bin', 'ruff')
 
     if not os.path.exists(ruff_package):
       msg = _(
@@ -132,6 +136,5 @@ class Command(BaseCommand):
       ret = subprocess.run(ruff_cmd, check=True)
       if ret.returncode != 0:
         sys.exit(1)
-    except subprocess.CalledProcessError as e:
-      LOG.debug(f"Ruff command: {e}")
+    except subprocess.CalledProcessError:
       sys.exit(1)

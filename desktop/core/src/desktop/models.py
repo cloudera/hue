@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 import os
-import sys
 import json
 import uuid
 import logging
@@ -26,6 +23,7 @@ import calendar
 from builtins import next, object
 from collections import OrderedDict
 from itertools import chain
+from urllib.parse import quote as urllib_quote
 
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -35,6 +33,7 @@ from django.db import connection, models, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.urls import NoReverseMatch, reverse
+from django.utils.translation import gettext as _, gettext_lazy as _t
 
 from dashboard.conf import HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED, get_engines
 from desktop import appmanager
@@ -44,6 +43,8 @@ from desktop.conf import (
   COLLECT_USAGE,
   DISABLE_SOURCE_AUTOCOMPLETE,
   ENABLE_CONNECTORS,
+  ENABLE_NEW_IMPORTER,
+  ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_ORGANIZATIONS,
   ENABLE_PROMETHEUS,
   ENABLE_SHARING,
@@ -72,16 +73,6 @@ from metadata.conf import get_optimizer_mode
 from notebook.conf import DEFAULT_INTERPRETER, DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
 from useradmin.models import Group, User, get_organization
 from useradmin.organization import _fitered_queryset
-
-if sys.version_info[0] > 2:
-  from urllib.parse import quote as urllib_quote
-
-  from django.utils.translation import gettext as _, gettext_lazy as _t
-else:
-  from urllib import quote as urllib_quote
-
-  from django.utils.translation import ugettext as _, ugettext_lazy as _t
-
 
 LOG = logging.getLogger()
 
@@ -1819,6 +1810,7 @@ class ClusterConfig(object):
         'enable_sharing': ENABLE_SHARING.get(),
         'collect_usage': COLLECT_USAGE.get()
       },
+      'storage_browser': {},
       'vw_name': hue_host_name,
       'img_version': img_version,
       'hue_version': version_of_hue
@@ -1909,7 +1901,7 @@ class ClusterConfig(object):
           'optimizer': get_optimizer_mode(),
           'page': '/editor/?type=%(type)s' % interpreter,
           'is_sql': interpreter['is_sql'],
-          'is_batchable': interpreter['dialect'] in ['hive', 'impala'] or interpreter['interface'] in ['oozie', 'sqlalchemy'],
+          'is_batchable': interpreter['dialect'] in ['hive', 'impala', 'trino'] or interpreter['interface'] in ['oozie', 'sqlalchemy'],
           'dialect': interpreter['dialect'],
           'dialect_properties': interpreter.get('dialect_properties'),
         })
@@ -2021,74 +2013,83 @@ class ClusterConfig(object):
 
     remote_home_storage = get_remote_home_storage(self.user)
 
-    for hdfs_connector in hdfs_connectors:
-      force_home = remote_home_storage and not remote_home_storage.startswith('/')
-      home_path = self.user.get_home_directory(force_home=force_home)
+    if ENABLE_NEW_STORAGE_BROWSER.get():
       interpreters.append({
-        'type': 'hdfs',
-        'displayName': hdfs_connector,
-        'buttonName': _('Browse'),
-        'tooltip': hdfs_connector,
-        'page': '/filebrowser/' + (
-          not self.user.is_anonymous and
-          'view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
-        )
+        'type': 'storagebrowser',
+        'displayName': _('Storage Browser'),
+        'buttonName': _('Storage Browser'),
+        'tooltip': _('Storage Browser'),
+        'page': '/storagebrowser'
       })
+    else:
+      for hdfs_connector in hdfs_connectors:
+        force_home = remote_home_storage and not remote_home_storage.startswith('/')
+        home_path = self.user.get_home_directory(force_home=force_home)
+        interpreters.append({
+          'type': 'hdfs',
+          'displayName': hdfs_connector,
+          'buttonName': _('Browse'),
+          'tooltip': hdfs_connector,
+          'page': '/filebrowser/' + (
+            not self.user.is_anonymous and
+            'view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS) or ''
+          )
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
-      from aws.s3.s3fs import get_s3_home_directory
-      home_path = get_s3_home_directory(self.user)
-      interpreters.append({
-        'type': 's3',
-        'displayName': _('S3'),
-        'buttonName': _('Browse'),
-        'tooltip': _('S3'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
+        from aws.s3.s3fs import get_s3_home_directory
+        home_path = get_s3_home_directory(self.user)
+        interpreters.append({
+          'type': 's3',
+          'displayName': _('S3'),
+          'buttonName': _('Browse'),
+          'tooltip': _('S3'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('gs', self.user):
-      from desktop.lib.fs.gc.gs import get_gs_home_directory
-      home_path = get_gs_home_directory(self.user)
-      interpreters.append({
-        'type': 'gs',
-        'displayName': _('GS'),
-        'buttonName': _('Browse'),
-        'tooltip': _('Google Storage'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('gs', self.user):
+        from desktop.lib.fs.gc.gs import get_gs_home_directory
+        home_path = get_gs_home_directory(self.user)
+        interpreters.append({
+          'type': 'gs',
+          'displayName': _('GS'),
+          'buttonName': _('Browse'),
+          'tooltip': _('Google Storage'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
-      # ADLS does not have a dedicated get_home_directory method
-      home_path = remote_home_storage if remote_home_storage else 'adl:/'
-      interpreters.append({
-        'type': 'adls',
-        'displayName': _('ADLS'),
-        'buttonName': _('Browse'),
-        'tooltip': _('ADLS'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('adl', self.user):
+        # ADLS does not have a dedicated get_home_directory method
+        home_path = remote_home_storage if remote_home_storage else 'adl:/'
+        interpreters.append({
+          'type': 'adls',
+          'displayName': _('ADLS'),
+          'buttonName': _('Browse'),
+          'tooltip': _('ADLS'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
-      from azure.abfs.__init__ import get_abfs_home_directory
-      home_path = get_abfs_home_directory(self.user)
-      interpreters.append({
-        'type': 'abfs',
-        'displayName': _('ABFS'),
-        'buttonName': _('Browse'),
-        'tooltip': _('ABFS'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('abfs', self.user):
+        from azure.abfs.__init__ import get_abfs_home_directory
+        home_path = get_abfs_home_directory(self.user)
+        interpreters.append({
+          'type': 'abfs',
+          'displayName': _('ABFS'),
+          'buttonName': _('Browse'),
+          'tooltip': _('ABFS'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
-    if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('ofs', self.user):
-      from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
-      home_path = get_ofs_home_directory()
-      interpreters.append({
-        'type': 'ofs',
-        'displayName': _('Ozone'),
-        'buttonName': _('Browse'),
-        'tooltip': _('Ozone'),
-        'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
-      })
+      if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('ofs', self.user):
+        from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
+        home_path = get_ofs_home_directory()
+        interpreters.append({
+          'type': 'ofs',
+          'displayName': _('Ozone'),
+          'buttonName': _('Browse'),
+          'tooltip': _('Ozone'),
+          'page': '/filebrowser/view=' + urllib_quote(home_path, safe=SAFE_CHARACTERS_URI_COMPONENTS)
+        })
 
     if 'metastore' in self.apps:
       interpreters.append({
@@ -2154,13 +2155,22 @@ class ClusterConfig(object):
         ENABLE_DIRECT_UPLOAD.get()
         ) \
         and 'importer' not in APP_BLACKLIST.get():
-      interpreters.append({
-        'type': 'importer',
-        'displayName': _('Importer'),
-        'buttonName': _('Import'),
-        'tooltip': _('Importer'),
-        'page': '/indexer/importer'
-      })
+        if ENABLE_NEW_IMPORTER.get():
+          interpreters.append({
+            'type': 'newimporter',
+            'displayName': _('New Importer'),
+            'buttonName': _('Import'),
+            'tooltip': _('New Importer'),
+            'page': '/newimporter'
+          })
+
+        interpreters.append({
+          'type': 'importer',
+          'displayName': _('Importer'),
+          'buttonName': _('Import'),
+          'tooltip': _('Importer'),
+          'page': '/indexer/importer'
+        })
 
     if 'sqoop' in self.apps:
       from sqoop.conf import IS_ENABLED

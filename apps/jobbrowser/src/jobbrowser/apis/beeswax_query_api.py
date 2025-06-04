@@ -14,23 +14,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from builtins import filter
-
-import logging
 import re
 import sys
-
+import logging
+from builtins import filter
 from datetime import datetime
+
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.python_util import current_ms_from_utc
-
 from jobbrowser.apis.base_api import Api
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
 
 LOG = logging.getLogger()
 
@@ -43,13 +37,13 @@ except Exception as e:
 class BeeswaxQueryApi(Api):
 
   def __init__(self, user, cluster=None):
-    self.user=user
-    self.cluster=cluster
+    self.user = user
+    self.cluster = cluster
 
   def apps(self, filters):
     filter_map = self._get_filter_map(filters)
     limit = filters.get('pagination', {'limit': 25}).get('limit')
-    jobs = query_history.get_query_history(request_user=filter_map.get('effective_user'), start_date=filter_map.get('date'), start_time=filter_map.get('time'), query_id=filter_map.get('query_id'), status=filter_map.get('status'), limit=limit)
+    jobs = query_history.get_query_history(request_user=filter_map.get('effective_user'), start_date=filter_map.get('date'), start_time=filter_map.get('time'), query_id=filter_map.get('query_id'), status=filter_map.get('status'), limit=limit)  # noqa: E501
 
     current_time = current_ms_from_utc()
     apps = {
@@ -123,7 +117,7 @@ class BeeswaxQueryApi(Api):
   def action(self, appid, action):
     message = {'message': '', 'status': 0}
 
-    return message;
+    return message
 
   def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
@@ -131,12 +125,12 @@ class BeeswaxQueryApi(Api):
   def profile(self, appid, app_type, app_property, app_filters):
     message = {'message': '', 'status': 0}
 
-    return message;
+    return message
 
   def profile_encoded(self, appid):
     message = {'message': '', 'status': 0}
 
-    return message;
+    return message
 
   def _get_status(self, job):
     return 'RUNNING' if len(job[1]) <= 1 else "FINISHED"
@@ -155,18 +149,18 @@ class BeeswaxQueryApi(Api):
     filter_map = {}
     if filters.get("text"):
       filter_names = {
-        'user':'effective_user',
-        'id':'query_id',
-        'name':'state',
-        'type':'stmt_type',
-        'status':'status'
+        'user': 'effective_user',
+        'id': 'query_id',
+        'name': 'state',
+        'type': 'stmt_type',
+        'status': 'status'
       }
 
       def make_lambda(name, value):
         return lambda app: app[name] == value
 
       for key, name in list(filter_names.items()):
-          text_filter = re.search(r"\s*("+key+")\s*:([^ ]+)", filters.get("text"))
+          text_filter = re.search(r"\s*(" + key + r")\s*:([^ ]+)", filters.get("text"))
           if text_filter and text_filter.group(1) == key:
             filter_map[name] = text_filter.group(2).strip()
 
@@ -191,9 +185,9 @@ class BeeswaxQueryApi(Api):
     elif period == 's':
       return float(time) * 1000
     elif period == 'm':
-      return float(time) * 60000 #1000*60
+      return float(time) * 60000  # 1000*60
     elif period == 'h':
-      return float(time) * 3600000 #1000*60*60
+      return float(time) * 3600000  # 1000*60*60
     elif period == 'd':
       return float(time) * 86400000  # 1000*60*60*24
     else:

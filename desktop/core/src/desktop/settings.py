@@ -30,6 +30,7 @@ import datetime
 from builtins import map, zip
 
 import pkg_resources
+from django.utils.translation import gettext_lazy as _
 
 import desktop.redaction
 from aws.conf import is_enabled as is_s3_enabled
@@ -39,11 +40,6 @@ from desktop.conf import TASK_SERVER_V2, is_chunked_fileuploader_enabled, is_gs_
 from desktop.lib import conf
 from desktop.lib.paths import get_desktop_root, get_run_root
 from desktop.lib.python_util import force_dict_to_strings
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext_lazy as _
-else:
-  from django.utils.translation import ugettext_lazy as _
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', '..', '..'))
@@ -116,7 +112,8 @@ USE_TZ = False
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # Setting this variable to 5MB as sometime request size > 2.5MB (default value)
+# https://docs.djangoproject.com/en/4.2/ref/settings/#data-upload-max-memory-size
+DATA_UPLOAD_MAX_MEMORY_SIZE = None
 
 ############################################################
 # Part 3: Django configuration
@@ -169,9 +166,6 @@ MIDDLEWARE = [
     'crequest.middleware.CrequestMiddleware',
 ]
 
-# if os.environ.get(ENV_DESKTOP_DEBUG):
-#   MIDDLEWARE.append('desktop.middleware.HtmlValidationMiddleware')
-#   logging.debug("Will try to validate generated HTML.")
 
 ROOT_URLCONF = 'desktop.urls'
 
@@ -510,8 +504,14 @@ if desktop.conf.KNOX.KNOX_PROXYHOSTS.get():  # The hosts provided here don't hav
   else:
     TRUSTED_ORIGINS += desktop.conf.KNOX.KNOX_PROXYHOSTS.get()
 
+CSRF_TRUSTED_ORIGINS = []
 if TRUSTED_ORIGINS:
-  CSRF_TRUSTED_ORIGINS = TRUSTED_ORIGINS
+  for origin in TRUSTED_ORIGINS:
+    if 'http://' in origin or 'https://' in origin:
+      CSRF_TRUSTED_ORIGINS.append(origin)
+    else:
+      CSRF_TRUSTED_ORIGINS.append('http://%s' % origin)
+      CSRF_TRUSTED_ORIGINS.append('https://%s' % origin)
 
 SECURE_HSTS_SECONDS = desktop.conf.SECURE_HSTS_SECONDS.get()
 SECURE_HSTS_INCLUDE_SUBDOMAINS = desktop.conf.SECURE_HSTS_INCLUDE_SUBDOMAINS.get()
@@ -533,8 +533,7 @@ else:
   AUTHENTICATION_BACKENDS = tuple(desktop.conf.AUTH.BACKEND.get())
 
 # AxesBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
-if sys.version_info[0] > 2:
-  AUTHENTICATION_BACKENDS = ('axes.backends.AxesBackend',) + AUTHENTICATION_BACKENDS
+AUTHENTICATION_BACKENDS = ('axes.backends.AxesBackend',) + AUTHENTICATION_BACKENDS
 
 EMAIL_HOST = desktop.conf.SMTP.HOST.get()
 EMAIL_PORT = desktop.conf.SMTP.PORT.get()
@@ -618,6 +617,7 @@ if is_oidc_configured():
   OIDC_RP_IDP_SIGN_KEY = desktop.conf.OIDC.OIDC_RP_IDP_SIGN_KEY.get()
   OIDC_OP_JWKS_ENDPOINT = desktop.conf.OIDC.OIDC_OP_JWKS_ENDPOINT.get()
   OIDC_VERIFY_SSL = desktop.conf.OIDC.OIDC_VERIFY_SSL.get()
+  OIDC_AUTH_REQUEST_EXTRA_PARAMS = desktop.conf.OIDC.OIDC_AUTH_REQUEST_EXTRA_PARAMS.get()
   LOGIN_REDIRECT_URL = desktop.conf.OIDC.LOGIN_REDIRECT_URL.get()
   LOGOUT_REDIRECT_URL = desktop.conf.OIDC.LOGOUT_REDIRECT_URL.get()
   LOGIN_REDIRECT_URL_FAILURE = desktop.conf.OIDC.LOGIN_REDIRECT_URL_FAILURE.get()
@@ -659,14 +659,18 @@ LOAD_BALANCER_COOKIE = 'ROUTEID'
 # This section must go after the desktop lib modules are loaded
 ################################################################
 
+# Import after configs are set
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER  # noqa: E402
+
 # Insert our custom upload handlers
+file_upload_handlers = []
 if is_chunked_fileuploader_enabled():
   file_upload_handlers = [
-    'hadoop.fs.upload.FineUploaderChunkedUploadHandler',
+    'hadoop.fs.upload.CustomDocumentsUploadHandler',
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
   ]
-else:
+elif not ENABLE_NEW_STORAGE_BROWSER.get():
   file_upload_handlers = [
     'hadoop.fs.upload.HDFSfileUploadHandler',
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
@@ -685,10 +689,8 @@ else:
   if is_ofs_enabled():
     file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
 
-  if is_ofs_enabled():
-    file_upload_handlers.insert(0, 'desktop.lib.fs.ozone.upload.OFSFileUploadHandler')
-
-FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
+if file_upload_handlers:
+  FILE_UPLOAD_HANDLERS = tuple(file_upload_handlers)
 
 ############################################################
 
@@ -714,10 +716,7 @@ if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE')
 
 # Instrumentation
 if desktop.conf.INSTRUMENTATION.get():
-  if sys.version_info[0] > 2:
-    gc.set_debug(gc.DEBUG_UNCOLLECTABLE)
-  else:
-    gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_OBJECTS)
+  gc.set_debug(gc.DEBUG_UNCOLLECTABLE)
 
 
 if not desktop.conf.DATABASE_LOGGING.get():
@@ -834,10 +833,7 @@ MODULES_TO_PATCH = (
     'django.utils.cache',
 )
 
-if sys.version_info[0] > 2:
-  MIDDLEWARE.append('axes.middleware.AxesMiddleware')  # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
-else:
-  MIDDLEWARE.remove('desktop.middleware.MultipleProxyMiddleware')
+MIDDLEWARE.append('axes.middleware.AxesMiddleware')  # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
 
 try:
   import hashlib

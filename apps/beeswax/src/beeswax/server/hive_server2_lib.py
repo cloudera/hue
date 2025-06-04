@@ -15,35 +15,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import next, filter, map, object
-import logging
-import json
 import re
-import sys
-
+import json
+import logging
 from operator import itemgetter
 
+from django.utils.translation import gettext as _
 from TCLIService import TCLIService
-from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq, TStatusCode, TGetResultSetMetadataReq, \
-  TGetColumnsReq, TTypeId, TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation, \
-  TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq, TCloseOperationReq, TFetchResultsResp, TRowSet, TGetFunctionsReq, \
-  TGetCrossReferenceReq, TGetPrimaryKeysReq
-
-from desktop.lib import python_util, thrift_util
-from desktop.conf import DEFAULT_USER, USE_THRIFT_HTTP_JWT, ENABLE_XFF_FOR_HIVE_IMPALA, ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA
+from TCLIService.ttypes import (
+  TCancelOperationReq,
+  TCloseOperationReq,
+  TCloseSessionReq,
+  TExecuteStatementReq,
+  TFetchOrientation,
+  TFetchResultsReq,
+  TFetchResultsResp,
+  TGetColumnsReq,
+  TGetCrossReferenceReq,
+  TGetFunctionsReq,
+  TGetLogReq,
+  TGetOperationStatusReq,
+  TGetPrimaryKeysReq,
+  TGetResultSetMetadataReq,
+  TGetSchemasReq,
+  TGetTablesReq,
+  TOpenSessionReq,
+  TRowSet,
+  TStatusCode,
+  TTypeId,
+)
 
 from beeswax import conf as beeswax_conf, hive_site
-from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT, MAX_CATALOG_SQL_ENTRIES
-from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
-from beeswax.server.dbms import Table, DataTable, QueryServerException, InvalidSessionQueryServerException, reset_ha
+from beeswax.hive_site import hiveserver2_use_ssl
+from beeswax.models import HiveServerQueryHandle, HiveServerQueryHistory, Session
+from beeswax.server.dbms import DataTable, InvalidSessionQueryServerException, QueryServerException, Table, reset_ha
+from desktop.conf import DEFAULT_USER, ENABLE_X_CSRF_TOKEN_FOR_HIVE_IMPALA, ENABLE_XFF_FOR_HIVE_IMPALA, USE_THRIFT_HTTP_JWT
+from desktop.lib import python_util, thrift_util
 from notebook.connectors.base import get_interpreter
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
 
 LOG = logging.getLogger()
 IMPALA_RESULTSET_CACHE_SIZE = 'impala.resultset.cache.size'
@@ -342,7 +351,7 @@ class HiveServerTColumnValue2(object):
 
   @classmethod
   def mark_nulls(cls, values, bytestring):
-    if sys.version_info[0] < 3 or isinstance(bytestring, bytes):
+    if isinstance(bytestring, bytes):
       mask = bytearray(bytestring)
     else:
       bitstring = python_util.from_string_to_bits(bytestring)
@@ -363,7 +372,7 @@ class HiveServerTColumnValue2(object):
   def set_nulls(cls, values, nulls):
     can_decode = True
     bytestring = nulls
-    if sys.version_info[0] == 3 and isinstance(bytestring, bytes):
+    if isinstance(bytestring, bytes):
       try:
         bytestring = bytestring.decode('utf-8')
       except Exception:
@@ -405,10 +414,7 @@ class HiveServerDataTable(DataTable):
       try:
         yield row.fields()
       except StopIteration as e:
-        if sys.version_info[0] > 2:
-          return  # pep-0479: expected Py3.8 generator raised StopIteration
-        else:
-          raise e
+        return  # pep-0479: expected Py3.8 generator raised StopIteration
 
 
 class HiveServerTTableSchema(object):
@@ -874,13 +880,21 @@ class HiveServerClient(object):
     req = TGetTablesReq(schemaName=database, tableName=table_names, tableTypes=table_types)
     (res, session) = self.call(self._client.GetTables, req)
 
-    results, schema = self.fetch_result(
-      res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=MAX_CATALOG_SQL_ENTRIES.get()
-    )
-    self._close(res.operationHandle, session)
-
+    table_metadata = []
     cols = ('TABLE_NAME', 'TABLE_TYPE', 'REMARKS')
-    return HiveServerTRowSet(results.results, schema.schema).cols(cols)
+
+    while True:
+      results, schema = self.fetch_result(
+        res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=MAX_CATALOG_SQL_ENTRIES.get()
+      )
+      fetched_tables = HiveServerTRowSet(results.results, schema.schema).cols(cols)
+      table_metadata += fetched_tables
+
+      if len(fetched_tables) == 0 or MAX_CATALOG_SQL_ENTRIES.get() == len(table_metadata):
+        break
+
+    self._close(res.operationHandle, session)
+    return table_metadata
 
   def get_tables(self, database, table_names, table_types=None):
     if not table_types:
@@ -1017,9 +1031,6 @@ class HiveServerClient(object):
     if self.query_server.get('dialect') == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
       configuration['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
-    if sys.version_info[0] == 2:
-      statement = statement.encode('utf-8')
-
     req = TExecuteStatementReq(statement=statement, confOverlay=configuration)
     (res, session) = self.call(self._client.ExecuteStatement, req, session=session)
 
@@ -1036,9 +1047,6 @@ class HiveServerClient(object):
 
     if self.query_server.get('dialect') == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
       conf_overlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
-
-    if sys.version_info[0] == 2:
-      statement = statement.encode('utf-8')
 
     (res, session) = self.call_return_result_and_session(thrift_function, thrift_request, session=session)
 
@@ -1106,8 +1114,8 @@ class HiveServerClient(object):
       (res, session) = self.call(self._client.GetLog, req)
       return res.log
     except Exception as e:
-      if 'Invalid query handle' in str(e):
-        message = 'Invalid query handle'
+      if 'Invalid query handle' in str(e) or 'Invalid or unknown query handle' in str(e):
+        message = 'Invalid or unknown query handle'
         LOG.error('%s: %s' % (message, e))
       else:
         message = 'Error when fetching the logs of the operation.'

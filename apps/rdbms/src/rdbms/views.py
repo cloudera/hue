@@ -15,29 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
 import sys
-
+import json
+import logging
 from functools import wraps
 
 from django.urls import reverse
-
-from desktop.context_processors import get_app_name
-from desktop.models import Document
-from desktop.lib.django_util import render
-
-from librdbms import conf
-from librdbms.design import SQLdesign
+from django.utils.translation import gettext as _
 
 from beeswax import models as beeswax_models
 from beeswax.views import safe_get_design
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from desktop.context_processors import get_app_name
+from desktop.lib.django_util import render
+from desktop.models import Document
+from librdbms import conf
+from librdbms.design import SQLdesign
 
 LOG = logging.getLogger()
 
@@ -53,6 +45,8 @@ def configuration_error(request, *args, **kwargs):
 """
 Decorators
 """
+
+
 def ensure_configuration(view_func):
   def _decorator(*args, **kwargs):
     if conf.DATABASES.get():
@@ -65,6 +59,8 @@ def ensure_configuration(view_func):
 """
 Queries Views
 """
+
+
 @ensure_configuration
 def execute_query(request, design_id=None, query_history_id=None):
   """

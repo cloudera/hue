@@ -1,0 +1,66 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+@use 'variables' as vars;
+@use 'mixins';
+
+$icon-margin: 5px;
+
+.antd.cuix {
+  .hue-storage-browser-directory {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    &__actions-bar {
+      display: flex;
+      margin: vars.$fluidx-spacing-s 0 vars.$fluidx-spacing-s vars.$fluidx-spacing-xxs;
+      justify-content: space-between;
+
+      &__search {
+        width: min(300px, calc(100% - 200px));
+
+        .ant-input {
+          box-shadow: none;
+        }
+      }
+
+      &__actions {
+        display: flex;
+        gap: vars.$fluidx-spacing-xs;
+
+        .cdp-icon-dropdown {
+          margin-left: $icon-margin;
+        }
+      }
+    }
+
+    &__name-column {
+      display: flex;
+      gap: 6px;
+      color: vars.$fluidx-blue-700;
+      cursor: pointer;
+
+      &__icon {
+        display: flex;
+      }
+
+      &__label {
+        @include mixins.nowrap-ellipsis;
+      }
+    }
+  }
+}

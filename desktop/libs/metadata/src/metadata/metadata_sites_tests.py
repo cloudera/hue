@@ -15,22 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from builtins import object
-import logging
 import os
 import shutil
-import sys
+import logging
 import tempfile
 
-from . import metadata_sites
 from metadata.conf import NAVIGATOR
 from metadata.metadata_sites import get_navigator_server_url
 
-if sys.version_info[0] > 2:
-  open_file = open
-else:
-  open_file = file
+from . import metadata_sites
 
 LOG = logging.getLogger()
 
@@ -44,7 +37,7 @@ class TestReadConfiguration(object):
     ]
 
     try:
-      open_file(os.path.join(tmpdir, 'navigator.lineage.client.properties'), 'w').write("""
+      open(os.path.join(tmpdir, 'navigator.lineage.client.properties'), 'w').write("""
 navigator.client.serviceType=HUE
 navigator.server.url=http://hue-rocks.com:7187
 navigator.client.roleName=HUE-1-HUE_SERVER-50cf99601c4bf64e9ccded4c8cd96d12
@@ -62,7 +55,6 @@ navigator.audit_log_max_file_size=100
         reset()
       shutil.rmtree(tmpdir)
 
-
   def test_missing_navigator_site(self):
     tmpdir = tempfile.mkdtemp()
     shutil.rmtree(tmpdir)
@@ -74,7 +66,7 @@ navigator.audit_log_max_file_size=100
     try:
       metadata_sites.reset()
 
-      assert get_navigator_server_url() == None
+      assert get_navigator_server_url() is None
     finally:
       metadata_sites.reset()
       for reset in resets:

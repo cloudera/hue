@@ -15,32 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import logging
-import re
-import sys
-import thrift
 
-from django.utils.encoding import smart_str, force_unicode
-
-import hadoop.cluster
-
-from desktop.lib import thrift_util
-from desktop.conf import KERBEROS
+from django.utils.encoding import force_unicode, smart_str
+from django.utils.translation import gettext as _
 from hive_metastore import ThriftHiveMetastore
 from TCLIService.ttypes import TOperationState
 
+import hadoop.cluster
 from beeswax import hive_site
 from beeswax.conf import SERVER_CONN_TIMEOUT
-from beeswax.server.hive_server2_lib import ResultCompatible
 from beeswax.models import HiveServerQueryHandle, QueryHistory
-from beeswax.server.dbms import Table, DataTable
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from beeswax.server.dbms import DataTable, Table
+from beeswax.server.hive_server2_lib import ResultCompatible
+from desktop.conf import KERBEROS
+from desktop.lib import thrift_util
 
 LOG = logging.getLogger()
 
@@ -105,7 +94,6 @@ class HiveDataTable(DataTable):
       yield parse_result_row(row)
 
 
-
 class HiveMetastoreClient(object):
 
   def __init__(self, query_server, user):
@@ -113,14 +101,11 @@ class HiveMetastoreClient(object):
     self.query_server = query_server
     self.meta_client = self.meta_client()
 
-
   def get_databases(self, *args, **kwargs):
     return self.meta_client.get_all_databases()
 
-
   def get_tables(self, *args, **kwargs):
     return self.meta_client.get_tables(*args, **kwargs)
-
 
   def get_tables_meta(self, *args, **kwargs):
     meta_tables = self.meta_client.get_table_meta(*args, **kwargs)
@@ -140,40 +125,31 @@ class HiveMetastoreClient(object):
 
     return table
 
-
   def get_partitions(self, db_name, tbl_name, max_parts):
     if max_parts is None:
       max_parts = -1
     return self.meta_client.get_partitions(db_name, tbl_name, max_parts)
 
-
   def use(self, query):
     pass
-
 
   def query(self, query, statement=0):
     return HiveServerQueryHandle(secret='mock', guid='mock')
 
-
   def get_state(self, handle):
     return QueryHistory.STATE.available
-
 
   def close(self, handle):
     pass
 
-
   def get_operation_status(self, handle):
     return MockFinishedOperation()
-
 
   def get_default_configuration(self, *args, **kwargs):
     return []
 
-
   def fetch(self, handle, start_over=False, max_rows=None):
     return EmptyResultCompatible()
-
 
   @classmethod
   def get_security(cls, query_server=None):
@@ -192,7 +168,6 @@ class HiveMetastoreClient(object):
       kerberos_principal_short_name = None
 
     return use_sasl, kerberos_principal_short_name
-
 
   def meta_client(self):
     """Get the Thrift client to talk to the metastore"""
@@ -281,7 +256,7 @@ class HiveMetastoreClient(object):
         self._encode_partition(new_part)
         return self._client.alter_partition(db_name, tbl_name, new_part)
 
-    use_sasl, kerberos_principal_short_name = HiveMetastoreClient.get_security() # TODO Reuse from HiveServer2 lib
+    use_sasl, kerberos_principal_short_name = HiveMetastoreClient.get_security()  # TODO Reuse from HiveServer2 lib
 
     client = thrift_util.get_client(
         ThriftHiveMetastore.Client,

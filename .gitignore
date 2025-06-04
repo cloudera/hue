@@ -61,10 +61,13 @@ desktop/core/ext-py/lxml/src/lxml/lxml-version.h
 # Nose --with-id's file
 /.noseids
 
-# Coverage product
-/.coverage
-/coverage.xml
-/coverage
+# Coverage reports
+.coverage*
+coverage.xml
+reports
+
+# Pytest reports
+report.html
 
 # Common utility alias
 /d
@@ -98,7 +101,6 @@ desktop/desktop-test.db
 ext/hadoop/
 ext/hive/
 ext/oozie/
-nosetests.xml
 oozie.sql
 tools/jenkins/ext/
 tools/jenkins/oozie.sql
@@ -127,3 +129,6 @@ docs/docs-site/public/
 
 # VSCode settings
 .vscode
+
+# Test data
+desktop/core/src/desktop/test_data/*

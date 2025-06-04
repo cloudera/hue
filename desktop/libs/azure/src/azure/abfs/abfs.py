@@ -20,8 +20,6 @@ Interfaces for ABFS
 """
 
 import os
-import re
-import sys
 import logging
 import threading
 import urllib.error
@@ -30,6 +28,8 @@ from builtins import object
 from math import ceil
 from posixpath import join
 from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
+
+from django.http.multipartparser import MultiPartParser
 
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
@@ -48,29 +48,27 @@ UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
 
 
 class ABFSFileSystemException(IOError):
-
   def __init__(self, *args, **kwargs):
     super(ABFSFileSystemException, self).__init__(*args, **kwargs)
 
 
 class ABFS(object):
-
   def __init__(
-      self,
-      url,
-      fs_defaultfs,
-      logical_name=None,
-      hdfs_superuser=None,
-      security_enabled=False,
-      ssl_cert_ca_verify=True,
-      temp_dir="/tmp",
-      umask=0o1022,
-      hdfs_supergroup=None,
-      access_token=None,
-      token_type=None,
-      expiration=None,
-      username=None
-    ):
+    self,
+    url,
+    fs_defaultfs,
+    logical_name=None,
+    hdfs_superuser=None,
+    security_enabled=False,
+    ssl_cert_ca_verify=True,
+    temp_dir="/tmp",
+    umask=0o1022,
+    hdfs_supergroup=None,
+    access_token=None,
+    token_type=None,
+    expiration=None,
+    username=None,
+  ):
     self._url = url
     self._superuser = hdfs_superuser
     self._security_enabled = security_enabled
@@ -102,18 +100,18 @@ class ABFS(object):
   def from_config(cls, hdfs_config, auth_provider):
     credentials = auth_provider.get_credentials()
     return cls(
-        url=hdfs_config.WEBHDFS_URL.get(),
-        fs_defaultfs=hdfs_config.FS_DEFAULTFS.get(),
-        logical_name=None,
-        security_enabled=False,
-        ssl_cert_ca_verify=False,
-        temp_dir=None,
-        umask=get_umask_mode(),
-        hdfs_supergroup=None,
-        access_token=credentials.get('access_token'),
-        token_type=credentials.get('token_type'),
-        expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on') is not None else None,
-        username=credentials.get('username')
+      url=hdfs_config.WEBHDFS_URL.get(),
+      fs_defaultfs=hdfs_config.FS_DEFAULTFS.get(),
+      logical_name=None,
+      security_enabled=False,
+      ssl_cert_ca_verify=False,
+      temp_dir=None,
+      umask=get_umask_mode(),
+      hdfs_supergroup=None,
+      access_token=credentials.get('access_token'),
+      token_type=credentials.get('token_type'),
+      expiration=int(credentials.get('expires_on')) * 1000 if credentials.get('expires_on') is not None else None,
+      username=credentials.get('username'),
     )
 
   def get_client(self, url):
@@ -145,17 +143,26 @@ class ABFS(object):
   # Parse info about filesystems, directories, and files
   # --------------------------------
   def isdir(self, path):
-    """
-    Checks if the path is a directory (note diabled because filebrowser/views is bugged)
-    """
-    resp = self.stats(path)
-    return resp.isDir
+    """Check if the given path is a directory or not."""
+    try:
+      stats = self.stats(path)
+      return stats.isDir
+    except Exception as e:
+      # If checking stats for path here gives 404 error, it means the path does not exist and therefore is not a directory.
+      if e.code == 404:
+        return False
+      raise e
 
   def isfile(self, path):
-    """
-    Checks if the path is a file
-    """
-    return not self.isdir(path)
+    """Check if the given path is a file or not."""
+    try:
+      stats = self.stats(path)
+      return not stats.isDir
+    except Exception as e:
+      # If checking stats for path here gives 404 error, it means the path does not exist and therefore is not a file.
+      if e.code == 404:
+        return False
+      raise e
 
   def exists(self, path):
     """
@@ -585,9 +592,6 @@ class ABFS(object):
     Renames a file
     """
     rename_source = Init_ABFS.strip_scheme(old)
-    if sys.version_info[0] < 3 and isinstance(rename_source, unicode):
-      rename_source = rename_source.encode('utf-8')
-
     headers = {'x-ms-rename-source': '/' + urllib_quote(rename_source)}
 
     try:
@@ -605,11 +609,20 @@ class ABFS(object):
     """
     self.rename(old_dir, new_dir)
 
+  # Deprecated
   def upload(self, file, path, *args, **kwargs):
     """
     Upload is done by the client
     """
     pass
+
+  def upload_v1(self, META, input_data, destination, username):
+    from azure.abfs.upload import ABFSNewFileUploadHandler  # Circular dependency
+
+    abfs_upload_handler = ABFSNewFileUploadHandler(destination, username)
+
+    parser = MultiPartParser(META, input_data, [abfs_upload_handler])
+    return parser.parse()
 
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
     """
@@ -660,7 +673,7 @@ class ABFS(object):
             offset += size
             chunk = src.read(chunk_size)
           self.flush(remote_dst, params={'position': offset})
-        except:
+        except Exception:
           LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
           raise
       finally:
@@ -716,7 +729,7 @@ class ABFS(object):
         length = chunk_size
       else:
         length = chunk
-      self._append(path, data[i * chunk_size:i * chunk_size + length], length)
+      self._append(path, data[i * chunk_size : i * chunk_size + length], length)
     self.flush(path, {'position': int(size)})
 
   # Use Patch HTTP request

@@ -15,18 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import sys
+import logging
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from django.urls import re_path
 
 LOG = logging.getLogger()
 
 try:
   from djangosaml2 import views as djangosaml2_views
+
   from libsaml import views as libsaml_views
 except ImportError:
   LOG.warning('djangosaml2 module not found')
@@ -41,18 +39,18 @@ except ImportError:
 
 if djangosaml2_views is not None:
   urlpatterns = [
-    re_path(r'^logout/$', djangosaml2_views.logout, name='saml2_logout')
+    re_path(r'^logout/$', djangosaml2_views.LogoutView.as_view(), name='saml2_logout')
   ]
 
   urlpatterns += [
-    re_path(r'^ls/$', libsaml_views.logout_service, name='saml2_ls'),
-    re_path(r'^acs/$', libsaml_views.assertion_consumer_service, name='saml2_acs'),
-    re_path(r'^login/$', libsaml_views.login, name='saml2_login'),
-    re_path(r'^metadata/$', libsaml_views.metadata, name='saml2_metadata'),
-    re_path(r'^test/$', libsaml_views.echo_attributes)
+    re_path(r'^ls/$', libsaml_views.LogoutView.as_view(), name='saml2_ls'),
+    re_path(r'^acs/$', libsaml_views.CustomAssertionConsumerServiceView.as_view(), name='saml2_acs'),
+    re_path(r'^login/$', libsaml_views.LoginView.as_view(), name='saml2_login'),
+    re_path(r'^metadata/$', libsaml_views.MetadataView.as_view(), name='saml2_metadata'),
+    re_path(r'^test/$', libsaml_views.EchoAttributesView.as_view())
   ]
 
   if logout_service_post is not None:
     urlpatterns += [
-      re_path(r'^ls/post/$', libsaml_views.logout_service_post, name='saml2_ls_post')
+      re_path(r'^ls/post/$', libsaml_views.LogoutServicePostView.as_view(), name='saml2_ls_post')
     ]

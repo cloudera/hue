@@ -17,12 +17,9 @@
 
 import sys
 
-from desktop.lib.botserver import views, api
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from desktop.lib.botserver import api, views
 
 urlpatterns = [
   re_path(r'^events/', views.slack_events, name='desktop.lib.botserver.views.slack_events'),

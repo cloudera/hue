@@ -115,7 +115,7 @@ def query_error_handler(func):
         raise QueryError(message)
     except QueryServerException as e:
       message = force_unicode(str(e))
-      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
+      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message or 'Invalid or unknown query handle' in message:
         raise QueryExpired(e)
       else:
         raise QueryError(message)
@@ -260,10 +260,11 @@ class HS2Api(Api):
 
     if not session_id:
       session = Session.objects.get_session(self.user, application=app_name)
-      decoded_guid = session.get_handle().sessionId.guid
-      session_decoded_id = unpack_guid(decoded_guid)
-      if source_method == "dt_logout":
-        LOG.debug("Closing Impala session id %s on logout for user %s" % (session_decoded_id, self.user.username))
+      if session:
+        decoded_guid = session.get_handle().sessionId.guid
+        session_decoded_id = unpack_guid(decoded_guid)
+        if source_method == "dt_logout":
+          LOG.debug("Closing Impala session id %s on logout for user %s" % (session_decoded_id, self.user.username))
 
     query_server = get_query_server_config(name=app_name)
 
@@ -340,9 +341,9 @@ class HS2Api(Api):
 
     # All good
     server_id, server_guid = handle.get()
-    if sys.version_info[0] > 2:
-      server_id = server_id.decode('utf-8')
-      server_guid = server_guid.decode('utf-8')
+
+    server_id = server_id.decode('utf-8')
+    server_guid = server_guid.decode('utf-8')
 
     response = {
       'secret': server_id,
@@ -394,7 +395,7 @@ class HS2Api(Api):
     try:
       results = db.fetch(handle, start_over=start_over, rows=rows)
     except QueryServerException as ex:
-      if re.search('(client inactivity)|(Invalid query handle)', str(ex)) and ex.message:
+      if re.search('(client inactivity)|(Invalid query handle)|(Invalid or unknown query handle)', str(ex)) and ex.message:
         raise QueryExpired(message=ex.message)
       else:
         raise QueryError(ex)
@@ -927,6 +928,14 @@ DROP TABLE IF EXISTS `%(table)s`;
 
   def describe_column(self, notebook, snippet, database=None, table=None, column=None):
     db = self._get_db(snippet, interpreter=self.interpreter)
+    tb = db.get_table(database, table)
+
+    # Column stats are not available for views in both Hive and Impala
+    if tb.is_view:
+      msg = f'Cannot describe column for view: {table}'
+      LOG.debug(msg)
+      return {'message': msg}
+
     return db.get_table_columns_stats(database, table, column)
 
   def describe_table(self, notebook, snippet, database=None, table=None):

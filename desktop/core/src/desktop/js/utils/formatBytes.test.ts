@@ -24,6 +24,14 @@ describe('formatBytes function', () => {
     expect(formatBytes(0)).toBe('0 Byte');
   });
 
+  test('returns "17 Byte" when bytes is 17', () => {
+    expect(formatBytes(17)).toBe('17 Bytes');
+  });
+
+  test('returns "18 Byte" when bytes is 17.98', () => {
+    expect(formatBytes(17.98)).toBe('18 Bytes');
+  });
+
   test('correctly formats bytes to KB', () => {
     expect(formatBytes(1024)).toBe('1.00 KB');
     expect(formatBytes(2048)).toBe('2.00 KB');

@@ -28,5 +28,18 @@ module.exports = {
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/calcite/test',
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/flink/test'
   ],
-  collectCoverageFrom: ['<rootDir>/desktop/core/src/desktop/js/**/*.{js,jsx,vue}']
+  coverageReporters: ["lcov", "text", "json-summary"],
+  collectCoverageFrom: [
+    '<rootDir>/desktop/core/src/desktop/js/**/*.{js,jsx,ts,tsx,vue}',
+    '!<rootDir>/desktop/core/src/desktop/js/ext/**',
+    '!<rootDir>/desktop/core/src/desktop/js/nvd3/**',
+    '!<rootDir>/desktop/core/src/desktop/js/parse/sql/ksql/**',
+    '!<rootDir>/desktop/core/src/desktop/js/parse/sql/elasticsearch/**',
+    '!<rootDir>/desktop/core/src/desktop/js/parse/sql/phoenix/**',
+    '!<rootDir>/desktop/core/src/desktop/js/parse/sql/druid/**',
+    '!<rootDir>/desktop/core/src/desktop/js/parse/sql/presto/**',
+    '!<rootDir>/desktop/core/src/desktop/js/parse/sql/calcite/**',
+    '!<rootDir>/desktop/core/src/desktop/js/parse/sql/flink/**',
+    '!<rootDir>/desktop/core/src/desktop/js/webComponents/**'
+  ]
 };

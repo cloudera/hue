@@ -15,30 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
-import errno
-import logging
 import os
 import re
 import sys
 import time
+import errno
+import logging
+from builtins import object
 
 from django.utils.functional import wraps
+from django.utils.translation import gettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.parameterization import find_variables
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
-
-from liboozie.oozie_api import get_oozie
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR
 from liboozie.credentials import Credentials
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from liboozie.oozie_api import get_oozie
 
 LOG = logging.getLogger()
 
@@ -51,7 +46,7 @@ def submit_dryrun(run_func):
     jt_address = cluster.get_cluster_addr_for_job_submission()
 
     if deployment_dir is None:
-      self._update_properties(jt_address) # Needed as we need to set some properties like Credentials before
+      self._update_properties(jt_address)  # Needed as we need to set some properties like Credentials before
       deployment_dir = self.deploy()
 
     self._update_properties(jt_address, deployment_dir)
@@ -73,7 +68,7 @@ class Submission(object):
     self.job = job
     self.user = user
     self.fs = fs
-    self.jt = jt # Deprecated with YARN, we now use logical names only for RM
+    self.jt = jt  # Deprecated with YARN, we now use logical names only for RM
     self.oozie_id = oozie_id
     self.api = get_oozie(self.user)
 
@@ -116,7 +111,7 @@ class Submission(object):
     if fail_nodes:
       self.properties.update({'oozie.wf.rerun.failnodes': fail_nodes})
     elif not skip_nodes:
-      self.properties.update({'oozie.wf.rerun.failnodes': 'false'}) # Case empty 'skip_nodes' list
+      self.properties.update({'oozie.wf.rerun.failnodes': 'false'})  # Case empty 'skip_nodes' list
     else:
       self.properties.update({'oozie.wf.rerun.skip.nodes': skip_nodes})
 
@@ -125,7 +120,6 @@ class Submission(object):
     LOG.info("Rerun: %s" % (self,))
 
     return self.oozie_id
-
 
   def rerun_coord(self, deployment_dir, params):
     jt_address = cluster.get_cluster_addr_for_job_submission()
@@ -138,7 +132,6 @@ class Submission(object):
 
     return self.oozie_id
 
-
   def rerun_bundle(self, deployment_dir, params):
     jt_address = cluster.get_cluster_addr_for_job_submission()
 
@@ -148,7 +141,6 @@ class Submission(object):
     LOG.info("Rerun: %s" % (self,))
 
     return self.oozie_id
-
 
   def deploy(self):
     try:
@@ -160,10 +152,10 @@ class Submission(object):
 
     if self.api.security_enabled:
       jt_address = cluster.get_cluster_addr_for_job_submission()
-      self._update_properties(jt_address) # Needed for coordinator deploying workflows
+      self._update_properties(jt_address)  # Needed for coordinator deploying workflows
 
     oozie_xml = self.job.to_xml(self.properties)
-    self._do_as(self.user.username , self._copy_files, deployment_dir, oozie_xml)
+    self._do_as(self.user.username, self._copy_files, deployment_dir, oozie_xml)
 
     if hasattr(self.job, 'actions'):
       for action in self.job.actions:
@@ -175,7 +167,6 @@ class Submission(object):
           sub_deploy.deploy()
 
     return deployment_dir
-
 
   def get_external_parameters(self, application_path):
     """From XML and job.properties HDFS files"""
@@ -192,11 +183,16 @@ class Submission(object):
 
   def _get_external_parameters(self, xml, properties=None):
     from oozie.models import DATASET_FREQUENCY
-    parameters = dict([(var, '') for var in find_variables(xml, include_named=False) if not self._is_coordinator() or var not in DATASET_FREQUENCY])
+    parameters = dict(
+      [(var, '') for var in find_variables(xml, include_named=False) if not self._is_coordinator() or var not in DATASET_FREQUENCY])
 
     if properties:
-      parameters.update(dict([re.split(r'(?<!\\)=', line.strip())
-                              for line in properties.split('\n') if not line.startswith('#') and len(re.split(r'(?<!\\)=', line.strip())) == 2]))
+      parameters.update(
+        dict(
+          [
+            re.split(r'(?<!\\)=',
+            line.strip()) for line in properties.split('\n') if not line.startswith('#') and len(re.split(r'(?<!\\)=', line.strip())) == 2
+          ]))
     return parameters
 
   def _update_properties(self, jobtracker_addr, deployment_dir=None):
@@ -313,8 +309,8 @@ class Submission(object):
     """Delete the workflow deployment directory."""
     try:
       path = self.job.deployment_dir
-      if self._do_as(self.user.username , self.fs.exists, path):
-        self._do_as(self.user.username , self.fs.rmtree, path)
+      if self._do_as(self.user.username, self.fs.exists, path):
+        self._do_as(self.user.username, self.fs.rmtree, path)
     except Exception as ex:
       LOG.warning("Failed to clean up workflow deployment directory for "
                "%s (owner %s). Caused by: %s",
@@ -341,4 +337,4 @@ def create_directories(fs, directory_list=[]):
         fs.do_as_user(fs.DEFAULT_USER, fs.create_home_dir, remote_home_dir)
       # Shared by all the users
       fs.do_as_user(fs.DEFAULT_USER, fs.mkdir, directory, 0o1777)
-      fs.do_as_user(fs.DEFAULT_USER, fs.chmod, directory, 0o1777) # To remove after https://issues.apache.org/jira/browse/HDFS-3491
+      fs.do_as_user(fs.DEFAULT_USER, fs.chmod, directory, 0o1777)  # To remove after https://issues.apache.org/jira/browse/HDFS-3491

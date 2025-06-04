@@ -15,16 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
+from django.urls import re_path
 
 from desktop import api_public
 from desktop.lib.botserver import api as botserver_api
-
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
-
+from desktop.lib.importer import api as importer_api
 
 # "New" query API (i.e. connector based, lean arguments).
 # e.g. https://demo.gethue.com/api/query/execute/hive
@@ -36,8 +31,15 @@ urlpatterns = [
 # Compatibility with "old" private API.
 # e.g. https://demo.gethue.com/notebook/api/execute/hive
 urlpatterns += [
-  re_path(r'^banners/?$', api_public.get_banners, name='core_banners'),
+  re_path(r'^banners/?$', api_public.get_banners, name='core_get_banners'),
+  re_path(r'^logs/?$', api_public.get_hue_logs, name='core_get_hue_logs'),
+  re_path(r'^logs/download/?$', api_public.download_hue_logs, name='core_download_hue_logs'),
+  re_path(r'^install_app_examples/?$', api_public.install_app_examples, name='core_install_app_examples'),
+  re_path(r'^available_app_examples/?$', api_public.available_app_examples, name='core_available_app_examples'),
+  re_path(r'^usage_analytics/?$', api_public.get_usage_analytics, name='core_get_usage_analytics'),
+  re_path(r'^usage_analytics/update/?$', api_public.update_usage_analytics, name='core_update_usage_analytics'),
   re_path(r'^get_config/?$', api_public.get_config),
+  re_path(r'^check_config/?$', api_public.check_config, name='core_check_config'),
   re_path(r'^get_namespaces/(?P<interface>[\w\-]+)/?$', api_public.get_context_namespaces),  # To remove
 ]
 
@@ -54,10 +56,12 @@ urlpatterns += [
   re_path(r'^editor/close_statement/?$', api_public.close_statement, name='editor_close_statement'),
   re_path(r'^editor/get_logs/?$', api_public.get_logs, name='editor_get_logs'),
   re_path(r'^editor/get_history/?', api_public.get_history, name='editor_get_history'),
-  re_path(r'^editor/describe/(?P<database>[^/]*)/?$', api_public.describe, name='editor_describe_database'),
-  re_path(r'^editor/describe/(?P<database>[^/]*)/(?P<table>[\w_\-]+)/?$', api_public.describe, name='editor_describe_table'),
+  re_path(r'^editor/describe/(?P<database>[^/?]*)/?$', api_public.describe, name='editor_describe_database'),
+  re_path(r'^editor/describe/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$', api_public.describe, name='editor_describe_table'),
   re_path(
-    r'^editor/describe/(?P<database>[^/]*)/(?P<table>\w+)/stats(?:/(?P<column>\w+))?/?$', api_public.describe, name='editor_describe_column'
+    r'^editor/describe/(?P<database>[^/?]*)/(?P<table>[^/?]+)/stats(?:/(?P<column>[^/?]+))?/?$',
+    api_public.describe,
+    name='editor_describe_column',
   ),
   re_path(r'^editor/autocomplete/?$', api_public.autocomplete, name='editor_autocomplete_databases'),
   re_path(
@@ -66,48 +70,74 @@ urlpatterns += [
     name="editor_autocomplete_tables",
   ),
   re_path(
-    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$",
+    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$",
     api_public.autocomplete,
     name="editor_autocomplete_columns",
   ),
   re_path(
-    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$",
+    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/?$",
     api_public.autocomplete,
     name="editor_autocomplete_column",
   ),
   re_path(
-    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
+    r"^editor/autocomplete/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/(?P<nested>.+)/?$",
     api_public.autocomplete,
     name="editor_autocomplete_nested",
   ),
-  re_path(r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/?$', api_public.get_sample_data, name='editor_sample_data'),
+  re_path(r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/?$', api_public.get_sample_data, name='editor_sample_data'),
   re_path(
-    r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$',
+    r'^editor/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/?$',
     api_public.get_sample_data,
     name='editor_sample_data_column',
   ),
   re_path(
-      r"^editor/sample/(?P<database>[^/?]*)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$",
-      api_public.get_sample_data,
-      name="editor_sample_data_nested",
+    r"^editor/sample/(?P<database>[^/?]*)/(?P<table>[^/?]+)/(?P<column>[^/?]+)/(?P<nested>.+)/?$",
+    api_public.get_sample_data,
+    name="editor_sample_data_nested",
+  ),
+]
+
+urlpatterns += [
+  re_path(
+    r'^taskserver/upload/available_space/?$',
+    api_public.taskserver_get_available_space_for_upload,
+    name='taskserver_get_available_space_for_upload',
   ),
 ]
 
 urlpatterns += [
   re_path(r'^storage/filesystems/?$', api_public.storage_get_filesystems, name='storage_get_filesystems'),
-  re_path(r'^storage/view=(?P<path>.*)$', api_public.storage_view, name='storage_view'),
-  re_path(r'^storage/download=(?P<path>.*)$', api_public.storage_download, name='storage_download'),
+  re_path(r'^storage/list/?$', api_public.storage_listdir_paged, name='storage_listdir_paged'),
+  re_path(r'^storage/create/file/?$', api_public.storage_touch, name='storage_touch'),
+  re_path(r'^storage/create/directory/?$', api_public.storage_mkdir, name='storage_mkdir'),
+  re_path(r'^storage/save/?$', api_public.storage_save_file, name="storage_save_file"),
+  re_path(r'^storage/rename/?$', api_public.storage_rename, name='storage_rename'),
+  re_path(r'^storage/move/?$', api_public.storage_move, name='storage_move'),
+  re_path(r'^storage/copy/?$', api_public.storage_copy, name='storage_copy'),
   re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),
-  re_path(r'^storage/mkdir$', api_public.storage_mkdir, name='storage_mkdir'),
-  re_path(r'^storage/touch$', api_public.storage_touch, name='storage_touch'),
-  re_path(r'^storage/rename$', api_public.storage_rename, name='storage_rename'),
-  re_path(r'^storage/content_summary=(?P<path>.*)$', api_public.storage_content_summary, name='storage_content_summary'),
-  re_path(r'^storage/move$', api_public.storage_move, name='storage_move'),
-  re_path(r'^storage/copy$', api_public.storage_copy, name='storage_copy'),
-  re_path(r'^storage/set_replication$', api_public.storage_set_replication, name='storage_set_replication'),
-  re_path(r'^storage/rmtree$', api_public.storage_rmtree, name='storage_rmtree'),
-  re_path(r'^storage/trash/restore$', api_public.storage_trash_restore, name='storage_trash_restore'),
-  re_path(r'^storage/trash/purge$', api_public.storage_trash_purge, name='storage_trash_purge'),
+  re_path(r'^storage/upload/chunks/?$', api_public.storage_upload_chunks, name='storage_upload_chunks'),
+  re_path(r'^storage/upload/complete/?$', api_public.storage_upload_complete, name='storage_upload_complete'),
+  re_path(r'^storage/stat/?$', api_public.storage_stat, name='storage_stat'),
+  re_path(r'^storage/display/?$', api_public.storage_display, name='storage_display'),
+  re_path(r'^storage/download/?$', api_public.storage_download, name='storage_download'),
+  re_path(r'^storage/delete/?$', api_public.storage_rmtree, name='storage_rmtree'),
+  re_path(r'^storage/content_summary/?$', api_public.storage_content_summary, name='storage_content_summary'),
+  re_path(r'^storage/replication/?$', api_public.storage_set_replication, name='storage_set_replication'),
+  re_path(r'^storage/trash/path/?$', api_public.storage_get_trash_path, name='storage_get_trash_path'),
+  re_path(r'^storage/trash/restore/?$', api_public.storage_trash_restore, name='storage_trash_restore'),
+  re_path(r'^storage/trash/purge/?$', api_public.storage_trash_purge, name='storage_trash_purge'),
+  re_path(r'^storage/chown/?$', api_public.storage_chown, name='storage_chown'),
+  re_path(r'^storage/chmod/?$', api_public.storage_chmod, name='storage_chmod'),
+  re_path(
+    r'^storage/extract_archive/?$', api_public.storage_extract_archive_using_batch_job, name='storage_extract_archive_using_batch_job'
+  ),
+  re_path(r'^storage/compress/?$', api_public.storage_compress_files_using_batch_job, name='storage_compress_files_using_batch_job'),
+  re_path(r'^storage/move/bulk/?$', api_public.storage_bulk_move, name='storage_bulk_move'),
+  re_path(r'^storage/copy/bulk/?$', api_public.storage_bulk_copy, name='storage_bulk_copy'),
+  re_path(r'^storage/delete/bulk/?$', api_public.storage_bulk_rmtree, name='storage_bulk_rmtree'),
+  re_path(r'^storage/trash/restore/bulk/?$', api_public.storage_trash_bulk_restore, name='storage_trash_bulk_restore'),
+  re_path(r'^storage/chown/bulk/?$', api_public.storage_bulk_chown, name='storage_bulk_chown'),
+  re_path(r'^storage/chmod/bulk/?$', api_public.storage_bulk_chmod, name='storage_bulk_chmod'),
 ]
 
 urlpatterns += [
@@ -127,6 +157,14 @@ urlpatterns += [
   re_path(r'^indexer/guess_format/?$', api_public.guess_format, name='indexer_guess_format'),
   re_path(r'^indexer/guess_field_types/?$', api_public.guess_field_types, name='indexer_guess_field_types'),
   re_path(r'^indexer/importer/submit', api_public.importer_submit, name='indexer_importer_submit'),
+]
+
+urlpatterns += [
+  re_path(r'^importer/upload/file/?$', importer_api.local_file_upload, name='importer_local_file_upload'),
+  re_path(r'^importer/file/guess_metadata/?$', importer_api.guess_file_metadata, name='importer_guess_file_metadata'),
+  re_path(r'^importer/file/guess_header/?$', importer_api.guess_file_header, name='importer_guess_file_header'),
+  re_path(r'^importer/file/preview/?$', importer_api.preview_file, name='importer_preview_file'),
+  re_path(r'^importer/sql_type_mapping/?$', importer_api.get_sql_type_mapping, name='importer_get_sql_type_mapping'),
 ]
 
 urlpatterns += [

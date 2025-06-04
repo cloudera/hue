@@ -1,0 +1,16 @@
+django-babel is written and maintained by the django-babel team and various
+contributors:
+
+Contributors:
+
+- Christopher Lenz <cmlenz@gmail.com>
+- Felix Schwarz <felix.schwarz@oss.schwarz.eu>
+- Jeroen Ruigrok van der Werven <asmodai@in-nomine.org>
+- Ramiro Morales <cramm0@gmail.com>
+- Thomas Grainger <tagrain@gmail.com>
+- Christopher Grebs <cg@webshox.org>
+
+
+django-babel was previously developed under the Copyright of Edgewall Software.
+The following copyright notice holds true for releases before 2013: "Copyright
+(c) 2007 - 2011 by Edgewall Software"

@@ -23,7 +23,6 @@ else:
 
 from desktop import conf
 from desktop.conf import USE_NEW_EDITOR
-from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
 from desktop.webpack_utils import get_hue_bundles
 from metastore.conf import SHOW_TABLE_ERD
@@ -972,66 +971,7 @@ ${ components.menubar(is_embeddable) }
 </div>
 </span>
 
-<script type="text/javascript">
-
-  function dropAndWatch(formElement) {
-    $(formElement).find('input[name=start_time]').val(ko.mapping.toJSON(new Date().getTime()));
-    $(formElement).ajaxSubmit({
-      dataType: 'json',
-      success: function(resp) {
-        if (resp.history_uuid) {
-          huePubSub.publish('notebook.task.submitted', resp);
-          huePubSub.publish('metastore.clear.selection');
-        } else if (resp && resp.message) {
-          huePubSub.publish('hue.global.error', {message: resp.message});
-        }
-        $("#dropTable").modal('hide');
-        $("#dropSingleTable").modal('hide');
-        $("#dropDatabase").modal('hide');
-        $("#dropPartition").modal('hide');
-      },
-      error: function (xhr) {
-        huePubSub.publish('hue.global.error', {message: xhr.responseText});
-      }
-    });
-  }
-
-  function browsePartitionFolder(url) {
-    $.get(url, {
-      format: "json"
-    },function(resp) {
-      if (resp.uri_path) {
-        huePubSub.publish('open.link', resp.uri_path);
-      } else if (resp.message) {
-        huePubSub.publish('hue.global.error', {message: resp.message});
-      }
-    }).fail(function (xhr) {
-      huePubSub.publish('hue.global.error', {message: xhr.responseText});
-    });
-  }
-
-  function queryAndWatchUrl(url, sourceType, namespaceId, compute) {
-    $.post(url, {
-      format: "json",
-      sourceType: sourceType,
-      namespace: namespaceId,
-      cluster: compute
-    },function(resp) {
-      if (resp.history_uuid) {
-        huePubSub.publish('open.editor.query', resp);
-      } else if (resp.message) {
-        huePubSub.publish('hue.global.error', {message: resp.message});
-      }
-    }).fail(function (xhr) {
-      huePubSub.publish('hue.global.error', {message: xhr.responseText});
-    });
-  }
-
-  function queryAndWatch(catalogEntry) {
-    queryAndWatchUrl('/notebook/browse/' + catalogEntry.path.join('/') + '/', catalogEntry.getConnector().id,
-            catalogEntry.namespace && catalogEntry.namespace.id, catalogEntry.compute)
-  }
-</script>
+<script src="${ static('desktop/js/metastore_inline.js') }" type="text/javascript"></script>
 </span>
 
 % if not is_embeddable:

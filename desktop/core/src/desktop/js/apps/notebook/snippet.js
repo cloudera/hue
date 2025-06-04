@@ -200,7 +200,10 @@ class Snippet {
 
     const updateConnector = id => {
       if (id) {
-        self.connector(findEditorConnector(connector => connector.id === id));
+        // when computes are enabled, hive becomes hive-compute.
+        self.connector(
+          findEditorConnector(connector => id === connector.id || id === `${connector.id}-compute`)
+        );
       }
     };
 
@@ -217,7 +220,7 @@ class Snippet {
       return vm.getSnippetViewSettings(self.dialect()).sqlDialect;
     });
 
-    self.dialect = ko.pureComputed(() => this.connector().dialect);
+    self.dialect = ko.pureComputed(() => this.connector() && this.connector().dialect);
 
     self.isBatchable = ko.computed(() => {
       return (
@@ -1864,6 +1867,7 @@ class Snippet {
             if (self.type() === 'trino') {
               const existing_handle = self.result.handle();
               existing_handle.row_count = data.handle.row_count;
+              existing_handle.rows_remaining = data.handle.rows_remaining;
               existing_handle.next_uri = data.handle.next_uri;
             }
             self.showLogs(true);
@@ -2195,6 +2199,7 @@ class Snippet {
                 if (self.type() === 'trino') {
                   const existing_handle = self.result.handle();
                   existing_handle.row_count = data.result.row_count;
+                  existing_handle.rows_remaining = data.result.rows_remaining;
                   existing_handle.next_uri = data.result.next_uri;
                 }
               } else {
@@ -2369,6 +2374,7 @@ class Snippet {
                   if (self.type() === 'trino') {
                     const existing_handle = self.result.handle();
                     existing_handle.row_count = 0;
+                    existing_handle.rows_remaining = 0;
                     existing_handle.next_uri = data.query_status.next_uri;
                   }
                   const delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s

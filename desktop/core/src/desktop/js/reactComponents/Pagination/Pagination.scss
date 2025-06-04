@@ -13,18 +13,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 @use 'variables' as vars;
 @use 'mixins';
 
 .antd.cuix {
   .hue-pagination {
     background-color: vars.$fluidx-gray-100;
-    padding: vars.$fluidx-spacing-s;
+    padding: vars.$fluidx-spacing-xs;
     display: flex;
     gap: vars.$fluidx-spacing-xxl;
     justify-content: flex-end;
     color: vars.$fluidx-gray-700;
     line-height: 32px;
+    max-height: 50px;
   }
 
   .hue-pagination__page-size-control {
@@ -35,6 +37,10 @@
   .hue-pagination__page-size-menu-btn {
     background-color: transparent;
     color: vars.$fluidx-gray-700;
+
+    .icon {
+      vertical-align: middle;
+    }
   }
 
   .hue-pagination__rows-stats-display {

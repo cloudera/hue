@@ -15,38 +15,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
-import sys
 import os
+import sys
+import json
+import logging
 from urllib.parse import urlsplit
-from tabulate import tabulate
-
-from desktop.lib.botserver.slack_client import slack_client, SLACK_VERIFICATION_TOKEN
-from desktop.lib.botserver.api import _send_message
-from desktop.lib.django_util import login_notrequired, JsonResponse
-from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2, _get_gist_document, get_cluster_config
-from desktop.api2 import _gist_create
-from desktop.auth.backend import rewrite_user
-
-from notebook.api import _fetch_result_data, _check_status, _execute_notebook
-from notebook.models import MockRequest, get_api
-from notebook.connectors.base import _get_snippet_name
-
-from metadata.assistant.queries_utils import get_all_queries
-
-from useradmin.models import User
 
 from django.http import HttpResponse
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
+from tabulate import tabulate
 
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
+from desktop.api2 import _gist_create
+from desktop.auth.backend import rewrite_user
+from desktop.lib.botserver.api import _send_message
+from desktop.lib.botserver.slack_client import SLACK_VERIFICATION_TOKEN, slack_client
+from desktop.lib.django_util import JsonResponse, login_notrequired
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.models import Document2, _get_gist_document, get_cluster_config
+from metadata.assistant.queries_utils import get_all_queries
+from notebook.api import _check_status, _execute_notebook, _fetch_result_data
+from notebook.connectors.base import _get_snippet_name
+from notebook.models import MockRequest, get_api
+from useradmin.models import User
 
 LOG = logging.getLogger()
+
 
 class SlackBotException(PopupException):
   def __init__(self, msg, detail=None, error_code=200):
@@ -58,7 +52,7 @@ class SlackBotException(PopupException):
 def slack_events(request):
   try:
     slack_message = json.loads(request.body)
-    
+
     if slack_message['token'] != SLACK_VERIFICATION_TOKEN:
       return HttpResponse(status=403)
 
@@ -66,7 +60,7 @@ def slack_events(request):
     if slack_message['type'] == 'url_verification':
       response_dict = {"challenge": slack_message['challenge']}
       return JsonResponse(response_dict, status=200)
-    
+
     if 'event' in slack_message:
       parse_events(request, slack_message['event'])
   except ValueError as err:
@@ -124,7 +118,7 @@ def help_message(user_id):
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "*Share query/gist links* in channel which unfurls in a rich preview, showing query details and result in message thread if available."
+        "text": "*Share query/gist links* in channel which unfurls in a rich preview, showing query details and result in message thread if available."  # noqa: E501
       }
     },
     {
@@ -187,7 +181,7 @@ def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements,
   # Ignore bot's own message since that will cause an infinite loop of messages if we respond.
   if bot_id is not None:
     return HttpResponse(status=200)
-  
+
   for element_block in elements:
     text = element_block['elements'][0].get('text', '') if element_block.get('elements') else ''
 
@@ -200,7 +194,11 @@ def handle_on_message(host_domain, is_http_secure, channel_id, bot_id, elements,
 
 
 def handle_select_statement(host_domain, is_http_secure, channel_id, user_id, statement, message_ts):
-  msg = 'Hi <@{user}> \n Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'.format(user=user_id)
+  msg = (
+    'Hi <@{user}> \n Looks like you are copy/pasting SQL, instead now you can send Editor links which unfurls in a rich preview!'.format(
+      user=user_id
+    )
+  )
   _send_message(channel_id, message=msg)
 
   # Check Slack user perms to send gist link
@@ -254,7 +252,7 @@ def handle_on_link_shared(host_domain, channel_id, message_ts, links, user_id):
       slack_client.chat_unfurl(channel=channel_id, ts=message_ts, unfurls=payload['payload'])
     except Exception as e:
       raise SlackBotException(_("Cannot unfurl link"), detail=e)
-    
+
     # Generate and upload result xlsx file only if result available
     if payload['file_status']:
       send_result_file(request, channel_id, message_ts, doc, 'xls')
@@ -299,7 +297,7 @@ def send_result_file(request, channel_id, message_ts, doc, file_format):
   try:
     slack_client.files_upload(
       channels=channel_id,
-      file=next(content_generator), 
+      file=next(content_generator),
       thread_ts=message_ts,
       filetype=file_format,
       filename='{name}.{format}'.format(name=file_name, format=file_format),
@@ -336,12 +334,12 @@ def _make_result_table(result):
     for row_data in data:
       # Replace non-breaking space HTML entity with whitespace
       if isinstance(row_data[idx], str):
-        row_data[idx] = row_data[idx].replace('&nbsp;', ' ') 
+        row_data[idx] = row_data[idx].replace('&nbsp;', ' ')
       pivot_row.append(row_data[idx])
 
     table.append(pivot_row)
 
-  return tabulate(table, headers=['Columns({count})'.format(count=idx+1), '', ''], tablefmt="simple")
+  return tabulate(table, headers=['Columns({count})'.format(count=idx + 1), '', ''], tablefmt="simple")
 
 
 def _make_unfurl_payload(request, url, id_type, doc, doc_type):
@@ -363,7 +361,7 @@ def _make_unfurl_payload(request, url, id_type, doc, doc_type):
         if fetch_result is not None:
           unfurl_result = _make_result_table(fetch_result)
           file_status = True
-    except:
+    except Exception:
       pass
 
     result_section = {

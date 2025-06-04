@@ -22,12 +22,14 @@ from django.http import HttpResponse, QueryDict
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import AllowAny
 
+from about import api as about_api
 from beeswax import api as beeswax_api
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
 from desktop.lib import fsmanager
 from desktop.lib.connectors import api as connector_api
-from filebrowser import api as filebrowser_api, views as filebrowser_views
+from desktop.log import api as logs_api
+from filebrowser import api as filebrowser_api
 from indexer import api3 as indexer_api3
 from metadata import optimizer_api
 from notebook import api as notebook_api
@@ -56,6 +58,48 @@ def get_context_namespaces(request, interface):
 @permission_classes([AllowAny])
 def get_banners(request):
   return desktop_api.get_banners(request)
+
+
+@api_view(["GET"])
+def get_hue_logs(request):
+  django_request = get_django_request(request)
+  return logs_api.get_hue_logs(django_request)
+
+
+@api_view(["GET"])
+def download_hue_logs(request):
+  django_request = get_django_request(request)
+  return logs_api.download_hue_logs(django_request)
+
+
+@api_view(["GET"])
+def check_config(request):
+  django_request = get_django_request(request)
+  return desktop_api.check_config(django_request)
+
+
+@api_view(["POST"])
+def install_app_examples(request):
+  django_request = get_django_request(request)
+  return desktop_api.install_app_examples(django_request)
+
+
+@api_view(["GET"])
+def available_app_examples(request):
+  django_request = get_django_request(request)
+  return desktop_api.available_app_examples(django_request)
+
+
+@api_view(["GET"])
+def get_usage_analytics(request):
+  django_request = get_django_request(request)
+  return about_api.get_usage_analytics(django_request)
+
+
+@api_view(["POST"])
+def update_usage_analytics(request):
+  django_request = get_django_request(request)
+  return about_api.update_usage_analytics(django_request)
 
 
 # Editor
@@ -212,25 +256,55 @@ def analyze_table(request, dialect, database, table, columns=None):
 @api_view(["GET"])
 def storage_get_filesystems(request):
   django_request = get_django_request(request)
-  return filebrowser_api.get_filesystems_with_home_dirs(django_request)
+  return filebrowser_api.get_all_filesystems(django_request)
 
 
 @api_view(["GET"])
-def storage_view(request, path):
+def storage_stat(request):
   django_request = get_django_request(request)
-  return filebrowser_views.view(django_request, path)
+  return filebrowser_api.stat(django_request)
 
 
 @api_view(["GET"])
-def storage_download(request, path):
+def storage_listdir_paged(request):
   django_request = get_django_request(request)
-  return filebrowser_views.download(django_request, path)
+  return filebrowser_api.listdir_paged(django_request)
+
+
+@api_view(["GET"])
+def storage_display(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.display(django_request)
+
+
+@api_view(["GET"])
+def storage_download(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.download(django_request)
+
+
+@api_view(["POST"])
+def storage_save_file(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.save_file(django_request)
 
 
 @api_view(["POST"])
 def storage_upload_file(request):
   django_request = get_django_request(request)
-  return filebrowser_views.upload_file(django_request)
+  return filebrowser_api.upload_file(django_request)
+
+
+@api_view(["POST"])
+def storage_upload_chunks(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.upload_chunks(django_request)
+
+
+@api_view(["POST"])
+def storage_upload_complete(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.upload_complete(django_request)
 
 
 @api_view(["POST"])
@@ -252,15 +326,27 @@ def storage_rename(request):
 
 
 @api_view(["GET"])
-def storage_content_summary(request, path):
+def storage_content_summary(request):
   django_request = get_django_request(request)
-  return filebrowser_api.content_summary(django_request, path)
+  return filebrowser_api.content_summary(django_request)
+
+
+@api_view(["POST"])
+def storage_bulk_move(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.move)
 
 
 @api_view(["POST"])
 def storage_move(request):
   django_request = get_django_request(request)
   return filebrowser_api.move(django_request)
+
+
+@api_view(["POST"])
+def storage_bulk_copy(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.copy)
 
 
 @api_view(["POST"])
@@ -282,15 +368,78 @@ def storage_rmtree(request):
 
 
 @api_view(["POST"])
+def storage_bulk_rmtree(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.rmtree)
+
+
+@api_view(["GET"])
+def storage_get_trash_path(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.get_trash_path(django_request)
+
+
+@api_view(["POST"])
 def storage_trash_restore(request):
   django_request = get_django_request(request)
   return filebrowser_api.trash_restore(django_request)
 
 
 @api_view(["POST"])
+def storage_trash_bulk_restore(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.trash_restore)
+
+
+@api_view(["POST"])
 def storage_trash_purge(request):
   django_request = get_django_request(request)
   return filebrowser_api.trash_purge(django_request)
+
+
+@api_view(["POST"])
+def storage_compress_files_using_batch_job(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.compress_files_using_batch_job(django_request)
+
+
+@api_view(["POST"])
+def storage_extract_archive_using_batch_job(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.extract_archive_using_batch_job(django_request)
+
+
+@api_view(["POST"])
+def storage_chown(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.chown(django_request)
+
+
+@api_view(["POST"])
+def storage_chmod(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.chmod(django_request)
+
+
+@api_view(["POST"])
+def storage_bulk_chown(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.chown)
+
+
+@api_view(["POST"])
+def storage_bulk_chmod(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.bulk_op(django_request, filebrowser_api.chmod)
+
+
+# Task Server
+
+
+@api_view(["GET"])
+def taskserver_get_available_space_for_upload(request):
+  django_request = get_django_request(request)
+  return filebrowser_api.get_available_space_for_upload(django_request)
 
 
 # Importer

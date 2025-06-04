@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import re
-import sys
 import json
 import logging
 from builtins import zip
@@ -87,7 +86,7 @@ def error_handler(view_fn):
         'message': message,
       }
 
-      if re.search('database is locked|Invalid query handle|not JSON serializable', message, re.IGNORECASE):
+      if re.search('database is locked|Invalid query handle|Invalid or unknown query handle|not JSON serializable', message, re.IGNORECASE):
         response['status'] = 2  # Frontend will not display this type of error
         LOG.warning('error_handler silencing the exception: %s' % e)
       return JsonResponse(response)

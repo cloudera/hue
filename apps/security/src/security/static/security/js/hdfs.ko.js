@@ -569,13 +569,13 @@ var HdfsViewModel = (function () {
     }
   }
 
-  var HdfsViewModel = function (initial) {
+  var HdfsViewModel = function () {
     var self = this;
 
-    self.assist = new Assist(self, initial);
+    self.assist = new Assist(self);
     self.lastHash = '';
 
-    self.doAs = ko.observable(initial.user);
+    self.doAs = ko.observable(window.LOGGED_USERNAME);
     self.doAs.subscribe(function () {
       self.assist.refreshTree();
     });

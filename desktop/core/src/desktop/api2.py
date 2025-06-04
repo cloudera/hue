@@ -15,33 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import re
-import sys
 import json
 import logging
-import zipfile
+import os
+import re
 import tempfile
+import zipfile
 from builtins import map
+from datetime import datetime
+from io import StringIO as string_io
 
 from celery.app.control import Control
-
-from desktop.conf import TASK_SERVER_V2
-
-if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
-  from desktop.celery import app as celery_app
-  from filebrowser.utils import parse_broker_url
-from collections import defaultdict
-from datetime import datetime
-
 from django.core import management
 from django.db import transaction
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.html import escape
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
+from beeswax import common
+from beeswax.management.commands import beeswax_install_examples
 from beeswax.models import Namespace
 from desktop import appmanager
 from desktop.auth.backend import is_admin
@@ -52,11 +47,13 @@ from desktop.conf import (
   ENABLE_GIST_PREVIEW,
   ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_SHARING,
-  IS_K8S_ONLY,
-  TASK_SERVER_V2,
+  ENABLE_WORKFLOW_CREATION_ACTION,
   get_clusters,
+  IMPORTER,
+  TASK_SERVER_V2,
 )
-from desktop.lib.conf import GLOBAL_CONFIG, BoundContainer, is_anonymous
+from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
+from desktop.lib.connectors.models import Connector
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
@@ -64,37 +61,46 @@ from desktop.lib.i18n import force_unicode, smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.log import DEFAULT_LOG_DIR
 from desktop.models import (
+  __paginate,
+  _get_gist_document,
   Directory,
   Document,
   Document2,
   FilesystemException,
-  UserPreferences,
-  __paginate,
-  _get_gist_document,
   get_cluster_config,
   get_user_preferences,
   set_user_preferences,
+  UserPreferences,
   uuid_default,
 )
-from desktop.views import get_banner_message, serve_403_error
+from desktop.views import _get_config_errors, get_banner_message, serve_403_error
+from filebrowser.conf import (
+  CONCURRENT_MAX_CONNECTIONS,
+  ENABLE_EXTRACT_UPLOADED_ARCHIVE,
+  FILE_UPLOAD_CHUNK_SIZE,
+  RESTRICT_FILE_EXTENSIONS,
+  SHOW_DOWNLOAD_BUTTON,
+)
 from filebrowser.tasks import check_disk_usage_and_clean_task, document_cleanup_task
+from filebrowser.views import MAX_FILEEDITOR_SIZE
 from hadoop.cluster import is_yarn
+from hbase.management.commands import hbase_setup
+from indexer.management.commands import indexer_setup
 from metadata.catalog_api import (
   _highlight,
   search_entities as metadata_search_entities,
   search_entities_interactive as metadata_search_entities_interactive,
 )
 from metadata.conf import has_catalog
-from notebook.connectors.base import Notebook
+from notebook.connectors.base import get_interpreter, Notebook
+from notebook.management.commands import notebook_setup
+from pig.management.commands import pig_setup
+from search.management.commands import search_setup
 from useradmin.models import Group, User
 
-if sys.version_info[0] > 2:
-  from io import StringIO as string_io
-
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-  from StringIO import StringIO as string_io
+if hasattr(TASK_SERVER_V2, 'get') and TASK_SERVER_V2.ENABLED.get():
+  from desktop.celery import app as celery_app
+  from filebrowser.utils import parse_broker_url
 
 LOG = logging.getLogger()
 
@@ -127,16 +133,43 @@ def get_banners(request):
 
 @api_error_handler
 def get_config(request):
+  """
+  Returns Hue application's config information.
+  Includes settings for various components like storage, task server, importer, etc.
+  """
+  # Get base cluster configuration
   config = get_cluster_config(request.user)
-  config['hue_config']['is_admin'] = is_admin(request.user)
-  config['hue_config']['is_yarn_enabled'] = is_yarn()
-  config['hue_config']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
-  config['hue_config']['enable_chunked_file_uploader'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
-  config['hue_config']['enable_task_server'] = TASK_SERVER_V2.ENABLED.get()
-  config['clusters'] = list(get_clusters(request.user).values())
-  config['documents'] = {
-    'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())
+
+  # Core application configuration
+  config['hue_config'] = {
+    'is_admin': is_admin(request.user),
+    'is_yarn_enabled': is_yarn(),
+    'enable_task_server': TASK_SERVER_V2.ENABLED.get(),
+    'enable_workflow_creation_action': ENABLE_WORKFLOW_CREATION_ACTION.get(),
   }
+
+  # Storage browser configuration
+  config['storage_browser'] = {
+    'enable_chunked_file_upload': ENABLE_CHUNKED_FILE_UPLOADER.get(),
+    'enable_new_storage_browser': ENABLE_NEW_STORAGE_BROWSER.get(),
+    'restrict_file_extensions': RESTRICT_FILE_EXTENSIONS.get(),
+    'concurrent_max_connection': CONCURRENT_MAX_CONNECTIONS.get(),
+    'file_upload_chunk_size': FILE_UPLOAD_CHUNK_SIZE.get(),
+    'enable_file_download_button': SHOW_DOWNLOAD_BUTTON.get(),
+    'max_file_editor_size': MAX_FILEEDITOR_SIZE,
+    'enable_extract_uploaded_archive': ENABLE_EXTRACT_UPLOADED_ARCHIVE.get(),
+  }
+
+  # Importer configuration
+  config['importer'] = {
+    'is_enabled': IMPORTER.IS_ENABLED.get(),
+    'restrict_local_file_extensions': IMPORTER.RESTRICT_LOCAL_FILE_EXTENSIONS.get(),
+    'max_local_file_size_upload_limit': IMPORTER.MAX_LOCAL_FILE_SIZE_UPLOAD_LIMIT.get(),
+  }
+
+  # Other general configuration
+  config['clusters'] = list(get_clusters(request.user).values())
+  config['documents'] = {'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())}
   config['status'] = 0
 
   return JsonResponse(config)
@@ -177,13 +210,12 @@ def get_hue_config(request):
         conf['values'] = recurse_conf(module.get().values())
       else:
         conf['default'] = str(module.config.default)
-        if 'password' in module.config.key:
+        if module.config.secret or 'password' in module.config.key:
           conf['value'] = '*' * 10
-        elif sys.version_info[0] > 2:
-          conf['value'] = str(module.get_raw())
         else:
-          conf['value'] = str(module.get_raw()).decode('utf-8', 'replace')
+          conf['value'] = str(module.get_raw())
         conf['value'] = re.sub('(.*)://(.*):(.*)@(.*)', r'\1://\2:**********@\4', conf['value'])
+
       attrs.append(conf)
 
     return attrs
@@ -615,7 +647,7 @@ def copy_document(request):
 
   # Import workspace for all oozie jobs
   if document.type == 'oozie-workflow2' or document.type == 'oozie-bundle2' or document.type == 'oozie-coordinator2':
-    from oozie.models2 import Bundle, Coordinator, Workflow, _import_workspace
+    from oozie.models2 import _import_workspace, Bundle, Coordinator, Workflow
     # Update the name field in the json 'data' field
     if document.type == 'oozie-workflow2':
       workflow = Workflow(document=document)
@@ -725,7 +757,7 @@ def share_document(request):
 
 @api_error_handler
 @require_POST
-def handle_submit(request):
+def handle_task_submit(request):
   # Extract the task name and params from the request
   try:
     data = json.loads(request.body)
@@ -734,8 +766,8 @@ def handle_submit(request):
   except json.JSONDecodeError as e:
     return JsonResponse({'error': str(e)}, status=500)
 
-  if task_name == 'document cleanup':
-    keep_days = task_params.get('keep-days')
+  if task_name == 'document_cleanup':
+    keep_days = task_params.get('keep_days')
     task_kwargs = {
       'keep_days': keep_days,
       'user_id': request.user.id,
@@ -752,9 +784,9 @@ def handle_submit(request):
       'task_id': task.id,  # The task ID generated by Celery
     })
 
-  elif task_name == 'tmp clean up':
-    cleanup_threshold = task_params.get('threshold for clean up')
-    disk_check_interval = task_params.get('disk check interval')
+  elif task_name == 'tmp_clean_up':
+    cleanup_threshold = task_params.get('cleanup_threshold')
+    disk_check_interval = task_params.get('disk_check_interval')
     task_kwargs = {
       'username': request.user.username,
       'cleanup_threshold': cleanup_threshold,
@@ -774,7 +806,8 @@ def handle_submit(request):
 
 
 @api_error_handler
-def get_taskserver_tasks(request):
+@require_GET
+def get_tasks(request):
   if not TASK_SERVER_V2.ENABLED.get():
     return JsonResponse({'error': 'Task server is not enabled'}, status=400)
 
@@ -801,7 +834,16 @@ def get_taskserver_tasks(request):
 
 
 @api_error_handler
-def check_upload_status(request, task_id):
+@require_GET
+def check_upload_task_status(request):
+  task_id = request.GET.get('task_id')
+  if not task_id:
+    return JsonResponse({'error': "Missing parameters: task_id is required"}, status=400)
+
+  return _check_upload_task_status(task_id)
+
+
+def _check_upload_task_status(task_id):
   redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
   try:
     task_key = f'celery-task-meta-{task_id}'
@@ -825,9 +867,14 @@ def check_upload_status(request, task_id):
 
 
 @api_error_handler
-def kill_task(request, task_id):
+@require_POST
+def kill_task(request):
+  task_id = request.POST.get('task_id')
+  if not task_id:
+    return JsonResponse({'error': "Missing parameters: task_id is required"}, status=400)
+
   # Check the current status of the task
-  status_response = check_upload_status(request, task_id)
+  status_response = _check_upload_task_status(task_id)
   status_data = json.loads(status_response.content)
 
   if status_data.get('isFinalized') or status_data.get('isRevoked') or status_data.get('isFailure'):
@@ -841,7 +888,13 @@ def kill_task(request, task_id):
     return JsonResponse({'status': 'error', 'message': f'Failed to terminate task {task_id}: {str(e)}'})
 
 
-def get_task_logs(request, task_id):
+@api_error_handler
+@require_GET
+def get_task_logs(request):
+  task_id = request.GET.get('task_id')
+  if not task_id:
+    return JsonResponse({'error': "Missing parameters: task_id is required"}, status=400)
+
   log_dir = os.getenv("DESKTOP_LOG_DIR", DEFAULT_LOG_DIR)
   log_file = "%s/celery.log" % (log_dir)
   task_log = []
@@ -956,54 +1009,6 @@ def export_documents(request):
     return make_response(f.getvalue(), 'json', filename)
 
 
-def topological_sort(docs):
-
-  '''There is a bug in django 1.11 (https://code.djangoproject.com/ticket/26291)
-     and we are handling it via sorting the given documents in topological format.
-
-     Hence this function is needed only if we are using Python2 based Hue as it uses django 1.11
-     and python3 based Hue don't require this method as it uses django 3.2.
-
-     input => docs: -> list of documents which needs to import in Hue
-     output => serialized_doc: -> list of sorted documents
-     (if document1 is dependent on document2 then document1 is listed after document2)'''
-
-  size = len(docs)
-  graph = defaultdict(list)
-  for doc in docs:     # creating a graph, assuming a document is a node of graph
-    dep_size = len(doc['fields']['dependencies'])
-    for i in range(dep_size):
-      graph[(doc['fields']['dependencies'])[i][0]].append(doc['fields']['uuid'])
-
-  visited = {}
-  _doc = {}
-  for doc in docs:     # making all the nodes of graph unvisited and capturing the doc in the dict with uuid as key
-    _doc[doc['fields']['uuid']] = doc
-    visited[doc['fields']['uuid']] = False
-
-  stack = []
-  for doc in docs:     # calling _topological_sort function to sort the doc if node is not visited
-    if not visited[doc['fields']['uuid']]:
-      _topological_sort(doc['fields']['uuid'], visited, stack, graph)
-
-  stack = stack[::-1]  # list is in revered order so we are just reversing it
-
-  serialized_doc = []
-  for i in range(size):
-    serialized_doc.append(_doc[stack[i]])
-
-  return serialized_doc
-
-
-def _topological_sort(vertex, visited, stack, graph):
-  visited[vertex] = True
-  for i in graph[vertex]:
-    if not visited[i]:
-      _topological_sort(i, visited, stack, graph)
-
-  stack.append(vertex)
-
-
 @ensure_csrf_cookie
 def import_documents(request):
   def is_reserved_directory(doc):
@@ -1016,7 +1021,7 @@ def import_documents(request):
       documents = json.loads(request.POST.get('documents'))
 
     documents = json.loads(documents)
-  except ValueError as e:
+  except ValueError:
     raise PopupException(_('Failed to import documents, the file does not contain valid JSON.'))
 
   # Validate documents
@@ -1058,11 +1063,6 @@ def import_documents(request):
       # Set last modified date to now
       doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
       docs.append(doc)
-
-  if sys.version_info[0] < 3:
-    # In Django 1.11 loaddata cannot deserialize fixtures with forward references hence
-    # calling the topological_sort function to sort the document
-    docs = topological_sort(docs)
 
   f = tempfile.NamedTemporaryFile(mode='w+', suffix='.json')
   f.write(json.dumps(docs))
@@ -1135,7 +1135,7 @@ def gist_create(request):
   statement = request.POST.get('statement', '')
   gist_type = request.POST.get('doc_type', 'hive')
   name = request.POST.get('name', '')
-  description = request.POST.get('description', '')
+  _ = request.POST.get('description', '')
 
   response = _gist_create(request.get_host(), request.is_secure(), request.user, statement, gist_type, name)
 
@@ -1356,7 +1356,7 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
       doc['pk'] = existing_doc.pk
     else:
       create_new = True
-  except FilesystemException as e:
+  except FilesystemException:
     create_new = True
 
   if create_new:
@@ -1439,3 +1439,115 @@ def _paginate(request, queryset):
   limit = int(request.GET.get('limit', 0))
 
   return __paginate(page, limit, queryset)
+
+
+@api_error_handler
+def available_app_examples(request):
+  """Returns a dictionary of available apps whose examples can be installed by the admin user."""
+
+  if not is_admin(request.user):
+    return JsonResponse({'message': "You must be a Hue admin to access this endpoint."}, status=403)
+
+  supported_app_examples = {'hive', 'impala', 'hbase', 'pig', 'oozie', 'notebook', 'search', 'spark', 'jobsub'}
+
+  # Filter apps based on supported list
+  available_examples = {app.name: app.nice_name for app in appmanager.get_apps(request.user) if app.name in supported_app_examples}
+
+  return JsonResponse({'apps': available_examples})
+
+
+@api_error_handler
+def install_app_examples(request):
+  app_name = request.POST.get('app_name')
+  if not app_name:
+    return JsonResponse({'message': "Missing parameter: app_name is required."}, status=400)
+
+  if not is_admin(request.user):
+    return JsonResponse({'message': "You must be a Hue admin to access this endpoint."}, status=403)
+
+  # Define supported apps and their setup functions
+  setup_functions = {
+    'hive': _setup_hive_impala_examples,
+    'impala': _setup_hive_impala_examples,
+    'hbase': _setup_hbase_examples,
+    'pig': _setup_pig_examples,
+    'oozie': _setup_oozie_examples,
+    'notebook': _setup_notebook_examples,
+    'search': _setup_search_examples,
+  }
+
+  if app_name not in setup_functions:
+    return JsonResponse({'message': f"Unsupported app name: {app_name}"}, status=400)
+
+  response = setup_functions[app_name](request)
+  return response if response else JsonResponse({'message': f"Successfully installed examples for {app_name}."})
+
+
+def _setup_hive_impala_examples(request):
+  dialect = request.POST.get('dialect', 'hive')
+  db_name = request.POST.get('database_name', 'default')
+
+  if dialect not in ('hive', 'impala'):
+    return JsonResponse({'message': "Invalid dialect: Must be 'hive' or 'impala'"}, status=400)
+
+  interpreter = common.find_compute(dialect=dialect, user=request.user)
+
+  # Execute Hive/Impala examples installation
+  beeswax_install_examples.Command().handle(dialect=dialect, db_name=db_name, user=request.user, request=request, interpreter=interpreter)
+
+
+def _setup_hbase_examples(request):
+  hbase_setup.Command().handle(user=request.user)
+
+
+def _setup_pig_examples(request):
+  pig_setup.Command().handle()
+
+
+def _setup_oozie_examples(request):
+  # Import dynamically to avoid oozie INSTALLED_APPS error
+  from oozie.management.commands import oozie_setup
+
+  oozie_setup.Command().handle()
+
+
+def _setup_notebook_examples(request):
+  try:
+    connector = Connector.objects.get(id=request.POST.get('connector_id'))
+  except Exception as e:
+    LOG.error(f'Error getting connector: {e}')
+    connector = None
+
+  if connector:
+    dialect = connector.dialect
+    db_name = request.POST.get('database_name', 'default')
+
+    # Execute Notebook examples installation using the specified connector
+    beeswax_install_examples.Command().handle(
+      dialect=dialect,
+      db_name=db_name,
+      user=request.user,
+      interpreter=get_interpreter(connector_type=connector.to_dict()['type'], user=request.user),
+      request=request,
+    )
+  else:
+    notebook_setup.Command().handle(user=request.user, dialect=request.POST.get('dialect', 'hive'))
+
+
+def _setup_search_examples(request):
+  data = request.POST.get('data')
+  indexer_setup.Command().handle(data=data)
+
+  if data == 'log_analytics_demo':
+    search_setup.Command().handle()
+
+
+@api_error_handler
+def check_config(request):
+  """Returns the configuration directory and the list of validation errors."""
+  response = {
+    'hue_config_dir': os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))),
+    'config_errors': _get_config_errors(request, cache=False),
+  }
+
+  return JsonResponse(response)

@@ -807,7 +807,7 @@ let num_of_pending_uploads = 0;
 
 function initUploader(path, _parent, el, labels) {
   let uploader;
-  if (window.getLastKnownConfig().hue_config.enable_chunked_file_uploader) {
+  if (window.getLastKnownConfig().storage_browser.enable_chunked_file_upload) {
     const action = '/filebrowser/upload/chunks/';
     const qqTemplate = document.createElement('div');
     qqTemplate.id = 'qq-template';
@@ -834,6 +834,43 @@ function initUploader(path, _parent, el, labels) {
       </div>
     `;
     document.body.appendChild(qqTemplate);
+
+    function pollForTaskProgress(taskId, listItem, fileName) {
+      let taskStatus = 'pending';
+      const pollingInterval = 10000; // 10 seconds
+
+      const doPoll = function () {
+        if (taskStatus === 'pending') {
+          $.get('/desktop/api2/taskserver/check_upload_status/' + taskId, data => {
+            if (data.isFinalized || data.isFailure || data.is_revoked) {
+              taskStatus = data.isFinalized ? 'finalized' : 'failed';
+
+              if (data.isFinalized) {
+                huePubSub.publish('hue.global.info', {
+                  message: fileName + ' uploaded successfully.'
+                });
+                if (!num_of_pending_uploads) {
+                  _parent.navigateTo(path);
+                  huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');
+                }
+              } else if (data.isFailure) {
+                huePubSub.publish('hue.global.error', {
+                  message: fileName + ' upload failed. Please check the logs for task id: ' + taskId
+                });
+              }
+            } else if (data.isRunning) {
+              setTimeout(doPoll, pollingInterval);
+            }
+          }).fail(xhr => {
+            if (xhr.status === 404) {
+              setTimeout(doPoll, pollingInterval); // Retry after interval
+            }
+          });
+        }
+      };
+      doPoll();
+    }
+
     uploader = new qq.FileUploader({
       element: el[0],
       request: {
@@ -866,13 +903,35 @@ function initUploader(path, _parent, el, labels) {
       callbacks: {
         onComplete: function (id, fileName, response) {
           num_of_pending_uploads--;
+          const listItem = $('.qq-upload-files')
+            .find('li')
+            .filter(function () {
+              return $(this).find('.qq-upload-file-selector').text() === fileName;
+            });
+
           if (response.status != 0) {
             huePubSub.publish('hue.global.error', { message: response.data });
-          } else if (!num_of_pending_uploads) {
-            _parent.navigateTo(path);
-            huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');
+          } else {
+            const taskId = response.task_id;
+
+            if (taskId) {
+              // polling for task progress
+              setTimeout(() => {
+                pollForTaskProgress(taskId, listItem, fileName, path);
+              }, 2000); // Delay to ensure task is started
+            } else {
+              // No task_id, consider upload complete
+              huePubSub.publish('hue.global.info', {
+                message: fileName + ' uploaded successfully.'
+              });
+              if (!num_of_pending_uploads) {
+                _parent.navigateTo(path);
+                huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');
+              }
+            }
           }
         },
+
         onSubmit: function (id, fileName) {
           const newPath =
             '/filebrowser/upload/chunks/file?dest=' + encodeURIComponent(path.normalize('NFC'));

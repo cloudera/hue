@@ -14,39 +14,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 import os
 import re
-import sys
 import time
 import logging
 import itertools
 import posixpath
+import urllib.error
+import urllib.request
 from builtins import object, str
+from urllib.parse import urlparse as lib_urlparse
 
 from boto.exception import BotoClientError, S3ResponseError
 from boto.s3.connection import Location
 from boto.s3.key import Key
 from boto.s3.prefix import Prefix
+from django.http.multipartparser import MultiPartParser
+from django.utils.translation import gettext as _
 
 from aws import s3
 from aws.conf import AWS_ACCOUNTS, PERMISSION_ACTION_S3, get_default_region, get_locations, is_raz_s3
 from aws.s3 import S3A_ROOT, normpath, s3file, translate_s3_error
 from aws.s3.s3stat import S3Stat
 from filebrowser.conf import REMOTE_STORAGE_HOME
-
-if sys.version_info[0] > 2:
-  import urllib.error
-  import urllib.request
-  from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
-
-  from django.utils.translation import gettext as _
-else:
-  from urllib import quote as urllib_quote
-
-  from django.utils.translation import ugettext as _
-  from urlparse import urlparse as lib_urlparse
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 BUCKET_NAME_PATTERN = re.compile(
@@ -364,7 +354,7 @@ class S3FileSystem(object):
   @auth_error_handler
   def rmtree(self, path, skipTrash=True):
     if not skipTrash:
-      raise NotImplementedError(_('Moving to trash is not implemented for S3'))
+      raise NotImplementedError('Moving to trash is not implemented for S3')
 
     bucket_name, key_name = s3.parse_uri(path)[:2]
     if bucket_name and not key_name:
@@ -581,9 +571,20 @@ class S3FileSystem(object):
         remote_file = remote_dst
       _copy_file(local_src, remote_file)
 
+  # Deprecated
   @translate_s3_error
   def upload(self, file, path, *args, **kwargs):
     pass  # upload is handled by S3FileUploadHandler
+
+  @translate_s3_error
+  @auth_error_handler
+  def upload_v1(self, META, input_data, destination, username):
+    from aws.s3.upload import S3NewFileUploadHandler  # Circular dependency
+
+    s3_upload_handler = S3NewFileUploadHandler(destination, username)
+
+    parser = MultiPartParser(META, input_data, [s3_upload_handler])
+    return parser.parse()
 
   @translate_s3_error
   @auth_error_handler

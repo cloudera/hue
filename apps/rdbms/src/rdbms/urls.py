@@ -17,15 +17,10 @@
 
 import sys
 
-from rdbms import views as rdbms_views
-from rdbms import api as rdbms_api
-from beeswax import views as beeswax_views
-from beeswax import api as beeswax_api
+from django.urls import re_path
 
-if sys.version_info[0] > 2:
-  from django.urls import re_path
-else:
-  from django.conf.urls import url as re_path
+from beeswax import api as beeswax_api, views as beeswax_views
+from rdbms import api as rdbms_api, views as rdbms_views
 
 # Views
 urlpatterns = [

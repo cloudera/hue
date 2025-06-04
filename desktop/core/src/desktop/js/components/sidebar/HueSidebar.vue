@@ -54,7 +54,7 @@
     ASSIST_ACTIVE_DB_CHANGED_EVENT,
     ASSIST_SET_DATABASE_EVENT
   } from 'ko/components/assist/events';
-  import { AppType, Connector, HueConfig, Namespace, BrowserInterpreter } from 'config/types';
+  import { AppType, Connector, HueConfig, Namespace } from 'config/types';
   import { hueWindow } from 'types/types';
   import { CONFIG_REFRESHED_TOPIC } from 'config/events';
   import { getLastKnownConfig } from 'config/hueConfig';
@@ -79,7 +79,6 @@
     abfs: `<svg class="hi hi-fw"><use href="#hi-adls"></use></svg>`,
     adls: `<svg class="hi hi-fw"><use href="#hi-adls"></use></svg>`,
     dashboard: `<svg class="hi hi-fw"><use href="#hi-dashboard"></use></svg>`,
-    'data-browser': `<svg class="hi hi-fw"><use href="#hi-data-browser"></use></svg>`,
     default: `<i class="fa fa-fw fa-database"></i>`,
     'dist-cp': `<i class="fa fa-fw fa-files-o"></i>`,
     documents: `<svg class="hi hi-fw"><use href="#hi-documents"></use></svg>`,
@@ -97,6 +96,8 @@
     mapreduce: `<i class="fa fa-fw fa-file-archive-o"></i>`,
     markdown: `<svg class="hi hi-fw"><use href="#hi-markdown"></use></svg>`,
     notebook: `<svg class="hi hi-fw"><use href="#hi-file-notebook"></use></svg>`,
+    storagebrowser: `<svg class="hi hi-fw"><use href="#hi-data-browser"></use></svg>`,
+    newimporter: `<svg class="hi hi-fw"><use href="#hi-data-in"></use></svg>`,
     oozie: `<svg class="hi hi-fw"><use href="#hi-oozie"></use></svg>`,
     'oozie-bundle': `<svg class="hi hi-fw"><use href="#hi-oozie-bundle"></use></svg>`,
     'oozie-coordinator': `<svg class="hi hi-fw"><use href="#hi-oozie-coordinator"></use></svg>`,
@@ -156,12 +157,14 @@
     });
   }
 
-  USER_DRAWER_CHILDREN.push({
-    type: 'navigation',
-    name: 'logOut',
-    displayName: I18n('Log Out'),
-    handler: (event: Event) => onHueLinkClick(event, '/accounts/logout')
-  });
+  if (window.ALLOW_HUE_LOGOUT) {
+    USER_DRAWER_CHILDREN.push({
+      type: 'navigation',
+      name: 'logOut',
+      displayName: I18n('Log Out'),
+      handler: (event: Event) => onHueLinkClick(event, '/accounts/logout')
+    });
+  }
 
   const HELP_DRAWER_CHILDREN: Omit<SidebarNavigationItem, 'iconHtml'>[] = [
     {
@@ -357,6 +360,8 @@
             break;
           case 'hbase':
           case 'importer':
+          case 'newimporter':
+          case 'storagebrowser':
           case 'indexes':
           case 'kafka':
             break;
@@ -483,34 +488,7 @@
             });
           }
           if (appConfig.browser && appConfig.browser.interpreters) {
-            // Replace old file browser entries with the new storage browser if the feature flag is enabled.
-            let browserInterpreters: BrowserInterpreter[] = [];
-            if (clusterConfig.hue_config.enable_new_storage_browser) {
-              let firstFileBrowserFound = false;
-              appConfig.browser.interpreters.forEach(browser => {
-                const isFileBrowser = /\/filebrowser/.test(browser.page);
-                if (isFileBrowser) {
-                  if (!firstFileBrowserFound) {
-                    browserInterpreters.push({
-                      buttonName: 'Browse',
-                      //TODO: Get i18n here
-                      displayName: 'Storage Browser',
-                      //by default the first filesystem's url in the config is used.
-                      page: browser.page,
-                      tooltip: 'Storage Browser',
-                      type: 'data-browser'
-                    });
-                  }
-                  firstFileBrowserFound = true;
-                } else {
-                  browserInterpreters.push(browser);
-                }
-              });
-            } else {
-              browserInterpreters = appConfig.browser.interpreters;
-            }
-
-            browserInterpreters.forEach(browser => {
+            appConfig.browser.interpreters.forEach(browser => {
               if (browser.type === 'tables') {
                 browserItems.push({
                   type: 'navigation',

@@ -18,36 +18,29 @@
 """
 Interfaces for Hadoop filesystem access via HttpFs/WebHDFS
 """
+
+import stat
 import errno
 import logging
 import posixpath
-import stat
-import sys
-import threading
+from urllib.parse import urlparse as lib_urlparse
 
+from django.http.multipartparser import MultiPartParser
 from django.utils.encoding import smart_str
+from django.utils.translation import gettext as _
 
-from desktop.lib.rest import http_client, resource
-from desktop.lib.fs.ozone import OFS_ROOT, normpath, is_root, parent_path, _serviceid_join, join as ofs_join
-from desktop.lib.fs.ozone.ofsstat import OzoneFSStat
 from desktop.conf import PERMISSION_ACTION_OFS
-
+from desktop.lib.fs.ozone import OFS_ROOT, _serviceid_join, is_root, join as ofs_join, normpath, parent_path
+from desktop.lib.fs.ozone.ofsstat import OzoneFSStat
 from hadoop.fs.exceptions import WebHdfsException
-from hadoop.hdfs_site import get_umask_mode
 from hadoop.fs.webhdfs import WebHdfs
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-  from urllib.parse import urlparse as lib_urlparse
-else:
-  from django.utils.translation import ugettext as _
-  from urlparse import urlparse as lib_urlparse
-
+from hadoop.hdfs_site import get_umask_mode
 
 LOG = logging.getLogger()
 
 
-def get_ofs_home_directory():
+def get_ofs_home_directory(user=None):
+  # TODO: Check if Ozone bring the concept of home directory in the future
   return OFS_ROOT
 
 
@@ -55,6 +48,7 @@ class OzoneFS(WebHdfs):
   """
   OzoneFS implements the filesystem interface via the WebHDFS/HttpFS REST protocol.
   """
+
   def __init__(self, url, fs_defaultfs, logical_name=None, security_enabled=False, ssl_cert_ca_verify=True, temp_dir="/tmp", umask=0o1022):
     super(OzoneFS, self).__init__(
       url,
@@ -63,7 +57,7 @@ class OzoneFS(WebHdfs):
       security_enabled=security_enabled,
       ssl_cert_ca_verify=ssl_cert_ca_verify,
       temp_dir=temp_dir,
-      umask=umask
+      umask=umask,
     )
 
     split = lib_urlparse(fs_defaultfs)
@@ -79,13 +73,13 @@ class OzoneFS(WebHdfs):
   @classmethod
   def from_config(cls, ofs_config):
     return cls(
-        url=ofs_config.WEBHDFS_URL.get(),
-        fs_defaultfs=ofs_config.FS_DEFAULTFS.get(),
-        logical_name=ofs_config.LOGICAL_NAME.get(),
-        security_enabled=ofs_config.SECURITY_ENABLED.get(),
-        ssl_cert_ca_verify=ofs_config.SSL_CERT_CA_VERIFY.get(),
-        temp_dir=ofs_config.TEMP_DIR.get(),
-        umask=get_umask_mode(),
+      url=ofs_config.WEBHDFS_URL.get(),
+      fs_defaultfs=ofs_config.FS_DEFAULTFS.get(),
+      logical_name=ofs_config.LOGICAL_NAME.get(),
+      security_enabled=ofs_config.SECURITY_ENABLED.get(),
+      ssl_cert_ca_verify=ofs_config.SSL_CERT_CA_VERIFY.get(),
+      temp_dir=ofs_config.TEMP_DIR.get(),
+      umask=get_umask_mode(),
     )
 
   def strip_normpath(self, path):
@@ -149,20 +143,30 @@ class OzoneFS(WebHdfs):
         if ex.server_exc == 'FileNotFoundException' or ex.code == 404:
           return None
         raise ex
-    
+
     return OzoneFSStat(json['FileStatus'], path, self._netloc)
-  
+
   def _handle_serviceid_path_status(self):
     json = {
       'FileStatuses': {
-        'FileStatus': [{
-          'pathSuffix': self._netloc, 'type': 'DIRECTORY', 'length': 0, 'owner': '', 'group': '', 
-          'permission': '777', 'accessTime': 0, 'modificationTime': 0, 'blockSize': 0, 'replication': 0
-          }]
-        }
+        'FileStatus': [
+          {
+            'pathSuffix': self._netloc,
+            'type': 'DIRECTORY',
+            'length': 0,
+            'owner': '',
+            'group': '',
+            'permission': '777',
+            'accessTime': 0,
+            'modificationTime': 0,
+            'blockSize': 0,
+            'replication': 0,
+          }
+        ]
       }
+    }
     return json
-  
+
   def stats(self, path):
     """
     stats(path) -> OzoneFSStat
@@ -175,11 +179,20 @@ class OzoneFS(WebHdfs):
   def filebrowser_action(self):
     return self._filebrowser_action
 
+  # Deprecated
   def upload(self, file, path, *args, **kwargs):
     """
     Upload is done by the OFSFileUploadHandler
     """
     pass
+
+  def upload_v1(self, META, input_data, destination, username):
+    from desktop.lib.fs.ozone.upload import OFSNewFileUploadHandler  # Circular dependency
+
+    ofs_upload_handler = OFSNewFileUploadHandler(destination, username)
+
+    parser = MultiPartParser(META, input_data, [ofs_upload_handler])
+    return parser.parse()
 
   def rename(self, old, new):
     """rename(old, new)"""
@@ -198,7 +211,7 @@ class OzoneFS(WebHdfs):
 
     if not result['boolean']:
       raise IOError(_("Rename failed: %s -> %s") % (smart_str(old, errors='replace'), smart_str(new, errors='replace')))
-  
+
   def rename_star(self, old_dir, new_dir):
     """Equivalent to `mv old_dir/* new"""
     if not self.isdir(old_dir):
@@ -208,7 +221,7 @@ class OzoneFS(WebHdfs):
       self.mkdir(new_dir)
     elif not self.isdir(new_dir):
       raise IOError(errno.ENOTDIR, _("'%s' is not a directory") % new_dir)
-  
+
     ls = self.listdir(old_dir)
     for dirent in ls:
       self.rename(_serviceid_join(ofs_join(old_dir, dirent), self._netloc), _serviceid_join(ofs_join(new_dir, dirent), self._netloc))
@@ -269,7 +282,7 @@ class OzoneFS(WebHdfs):
     if not self.exists(src):
       raise IOError(errno.ENOENT, _("File not found: %s") % src)
 
-    skip_file_list = '' # Store the files to skip copying which are greater than the upload_chunck_size()
+    skip_file_list = ''  # Store the files to skip copying which are greater than the upload_chunck_size()
 
     if self.isdir(src):
       # 'src' is directory.
@@ -290,7 +303,7 @@ class OzoneFS(WebHdfs):
       self.do_as_user(owner, self.mkdir, dest, mode=dir_mode)
 
       # Copy files in 'src' directory to 'dest'.
-      
+
       skip_file_list = self.copy_remote_dir(src, dest, dir_mode, owner, skip_file_list)
     else:
       # 'src' is a file.

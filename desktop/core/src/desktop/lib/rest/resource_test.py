@@ -17,44 +17,31 @@
 # limitations under the License.
 
 import json
-import sys
+from unittest.mock import Mock, patch
 
-from desktop.lib.i18n import smart_unicode, smart_str
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.resource import Resource
-
-
-if sys.version_info[0] > 2:
-  from unittest.mock import patch, Mock
-else:
-  from mock import patch, Mock
 
 
 def test_concat_unicode_with_ascii_python2():
   try:
     u'The currency is: %s' % '€'
-    if sys.version_info[0] == 2:
-      raise Exception('Should have failed.')
   except UnicodeDecodeError:
     pass
 
-  assert u'The currency is: €' == u'The currency is: %s' % smart_unicode('€')
-
+  assert u'The currency is: €' == u'The currency is: %s' % smart_str('€')
 
   try:
     u'%s' % '/user/domain/Джейкоб'
-    if sys.version_info[0] == 2:
-      raise Exception('Should have failed.')
   except UnicodeDecodeError:
     pass
 
   try:
     u'%s' % smart_str('/user/domain/Джейкоб')
-    if sys.version_info[0] == 2:
-      raise Exception('Should have failed.')
   except UnicodeDecodeError:
     pass
 
-  u'%s' % smart_unicode('/user/domain/Джейкоб')
+  u'%s' % smart_str('/user/domain/Джейкоб')
 
 
 def test_avoid_concat_unicode_with_ascii():

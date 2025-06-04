@@ -15,25 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import json
 import sys
+import json
+import logging
 
+from django.utils.translation import gettext as _
+
+from beeswax import hive_site
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import get_cluster_config
-
-from indexer.solr_client import SolrClient
+from impala import impala_flags
 from indexer.fields import FIELD_TYPES, Field
 from indexer.file_format import get_file_indexable_format_types
-from indexer.management.commands import indexer_setup
 from indexer.indexers.morphline_operations import OPERATORS
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from indexer.management.commands import indexer_setup
+from indexer.solr_client import SolrClient
 
 LOG = logging.getLogger()
 
@@ -117,16 +114,22 @@ def _importer(request, prefill):
   cluster_config = get_cluster_config(request.user)
 
   source_type = request.GET.get('sourceType') or cluster_config['default_sql_interpreter']
-
-  return render('importer.mako', request, {
+  data = {
       'is_embeddable': request.GET.get('is_embeddable', False),
       'fields_json': json.dumps({'solr': [field.name for field in FIELD_TYPES], 'hive': HIVE_TYPES, 'hivePrimitive': HIVE_PRIMITIVE_TYPES}),
       'operators_json': json.dumps([operator.to_dict() for operator in OPERATORS]),
       'file_types_json': json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
       'default_field_type': json.dumps(Field().to_dict()),
       'prefill': json.dumps(prefill),
-      'source_type': source_type
-  })
+      'source_type': source_type,
+      'is_transactional': impala_flags.is_transactional(),
+      'has_concurrency_support': hive_site.has_concurrency_support(),
+      'default_transactional_type': impala_flags.default_transactional_type(),
+  }
+
+  data['options_json'] = json.dumps(data)
+
+  return render('importer.mako', request, data)
 
 
 def install_examples(request, is_redirect=False):

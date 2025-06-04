@@ -15,26 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import next
-from builtins import zip
-import itertools
-import json
-import logging
 import re
 import sys
+import json
+import logging
+import itertools
+from builtins import next, zip
+
+from django.utils.translation import gettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-
 from indexer.controller import CollectionManagerController
 from indexer.solr_client import SolrClient
-from indexer.utils import fields_from_log, field_values_from_separated_file, get_type_from_morphline_type, get_field_types
-
-if sys.version_info[0] > 2:
-  from django.utils.translation import gettext as _
-else:
-  from django.utils.translation import ugettext as _
-
+from indexer.utils import field_values_from_separated_file, fields_from_log, get_field_types, get_type_from_morphline_type
 
 LOG = logging.getLogger()
 
@@ -70,7 +64,7 @@ def parse_fields(request):
           result['data'] = []
 
           for field_result in field_results:
-            result['data'].append( (field_result[1], get_type_from_morphline_type(field_result[0])) )
+            result['data'].append((field_result[1], get_type_from_morphline_type(field_result[0])))
 
           result['status'] = 0
         else:
@@ -92,6 +86,7 @@ def parse_fields(request):
     result['message'] = _('Source type %s not supported.') % source_type
 
   return JsonResponse(result)
+
 
 def autocomplete(request):
   searcher = CollectionManagerController(request.user)
@@ -167,7 +162,7 @@ def collections_create(request):
         table = request.POST.get('table')
         columns = [field['name'] for field in collection.get('fields', [])]
 
-        searcher.update_data_from_hive(db, collection.get('name'), database, table, columns) # Not up to date
+        searcher.update_data_from_hive(db, collection.get('name'), database, table, columns)  # Not up to date
 
       response['status'] = 0
       response['message'] = _('Collection created!')
@@ -193,7 +188,9 @@ def collections_import(request):
     unique_key, fields = searcher.get_fields(collection.get('name'))
 
     # Create collection and metadata.
-    hue_collection, created = Collection.objects.get_or_create(name=collection.get('name'), solr_properties='{}', is_enabled=True, user=request.user)
+    hue_collection, created = Collection.objects.get_or_create(
+      name=collection.get('name'), solr_properties='{}', is_enabled=True, user=request.user
+    )
     properties_dict = hue_collection.properties_dict
     properties_dict['data_type'] = 'separated'
     properties_dict['field_order'] = [field_name for field_name in fields]
@@ -206,6 +203,7 @@ def collections_import(request):
     response['message'] = _('Collection missing.')
 
   return JsonResponse(response)
+
 
 # Deprecated
 def collections_remove(request):
@@ -244,7 +242,9 @@ def collections_fields(request, collection):
   unique_key, fields = searcher.get_fields(collection)
 
   response['status'] = 0
-  response['fields'] = [(field, fields[field]['type'], fields[field].get('indexed', None), fields[field].get('stored', None)) for field in fields]
+  response['fields'] = [
+    (field, fields[field]['type'], fields[field].get('indexed', None), fields[field].get('stored', None)) for field in fields
+  ]
   response['unique_key'] = unique_key
 
   return JsonResponse(response)

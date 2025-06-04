@@ -15,12 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import glob
-import logging
 import os
 import sys
-from posixpath import curdir, sep, pardir, join
-
+import glob
+import logging
+from posixpath import curdir, join, pardir, sep
 
 # The root of the Hue installation
 INSTALL_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -37,15 +36,19 @@ HUE_PTH_DIR = os.environ.get('HUE_PTH_DIR', None)
 # The Hue config directory
 HUE_CONF_DIR = os.path.join(INSTALL_ROOT, 'desktop', 'conf')
 
-# Virtual env
-VIRTUAL_ENV = os.path.join(INSTALL_ROOT, 'build', 'env')
-
 # The Python executable in virtualenv
-ENV_PYTHON = os.path.join(VIRTUAL_ENV, 'bin', 'python')
+ENV_PYTHON = os.environ.get("ENV_PYTHON")
+
+PYTHON_VER = os.environ.get("PYTHON_VER", "")
+
+# Virtual env
+VIRTUAL_ENV = os.environ.get("VIRTUAL_ENV")
+
 
 def cmp_version(ver1, ver2):
   """Compare two version strings in the form of 1.2.34"""
   return cmp([int(v) for v in ver1.split('.')], [int(v) for v in ver2.split('.')])
+
 
 def _get_python_lib_dir():
   glob_path = os.path.join(VIRTUAL_ENV, 'lib', 'python*')
@@ -58,8 +61,10 @@ def _get_python_lib_dir():
                       "Please `make clean' first." % glob_path)
   return res[0]
 
+
 def _get_python_site_packages_dir():
   return os.path.join(_get_python_lib_dir(), 'site-packages')
+
 
 def cmp(x, y):
   """

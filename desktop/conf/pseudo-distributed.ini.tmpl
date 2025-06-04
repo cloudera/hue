@@ -142,6 +142,10 @@
   # X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.
   ## secure_content_security_policy="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.doubleclick.net data:;img-src 'self' *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;style-src 'self' 'unsafe-inline' fonts.googleapis.com;connect-src 'self' *.google-analytics.com;frame-src *;child-src 'self' data: *.vimeo.com;object-src 'none'"
 
+  # Enable nonce attribute to remove unsafe-inline and auto remove unsafe-inline from csp 
+  ## csp_nonce=true
+
+
   # Strict-Transport-Security HTTP Strict Transport Security(HSTS) is a policy which is communicated by the server to the user agent via HTTP response header field name "Strict-Transport-Security". HSTS policy specifies a period of time during which the user agent(browser) should only access the server in a secure fashion(https).
   ## secure_ssl_redirect=False
   ## secure_redirect_host=0.0.0.0
@@ -241,6 +245,9 @@
   # Global setting to enable or disable document sharing.
   # Note that this does not affect currently shared documents.
   ## enable_sharing=true
+
+  # Global setting to enable or disable new workflow creation in Hue documents.
+  ## enable_workflow_creation_action=true
 
   # Choose whether to enable the new SQL syntax checker or not
   ## enable_sql_syntax_check=true
@@ -841,6 +848,9 @@
     # Whether Hue as OpenID Connect client verify SSL cert
     ## oidc_verify_ssl=true
 
+    # OIDC authentication request extra params
+    ## oidc_auth_request_extra_params={}
+
     # As relay party Hue URL path to redirect to after login
     ## login_redirect_url=https://localhost:8888/oidc/callback/
 
@@ -1039,6 +1049,19 @@
   ## Enable integration with Google Storage for RAZ
   # is_raz_gs_enabled=false
 
+  ## Configuration options for the importer
+  # ------------------------------------------------------------------------
+  [[importer]]
+  # Turns on the data importer functionality
+  ## is_enabled=false
+
+  # A limit on the local file size (bytes) that can be uploaded through the importer. The default is 157286400 bytes (150 MiB).
+  ## max_local_file_size_upload_limit=157286400
+
+  # Security setting to specify local file extensions that are not allowed to be uploaded through the importer.
+  # Provide a comma-separated list of extensions including the dot (e.g., ".exe, .zip, .rar, .tar, .gz").
+  ## restrict_local_file_extensions=.exe, .zip, .rar, .tar, .gz
+
 ###########################################################################
 # Settings to configure the snippets available in the Notebook
 ###########################################################################
@@ -1046,13 +1069,16 @@
 [notebook]
 
   ## Show the notebook menu or not
-  # show_notebooks=true
+  # show_notebooks=false
 
   ## Flag to enable the selection of queries from files, saved queries into the editor or as snippet.
   # enable_external_statements=false
 
   ## Flag to enable the bulk submission of queries as a background task through Oozie.
   # enable_batch_execute=false
+
+  ## Flag to enable all interpreters (Hive and Impala are added by default) related to every whitelisted app.
+  # enable_all_interpreters=false
 
   ## Flag to turn on the SQL indexer.
   # enable_sql_indexer=false
@@ -1666,6 +1692,9 @@
   # Parameters are $TIME and $USER, e.g. /user/$USER/hue/workspaces/workflow-$TIME
   ## remote_data_dir=/user/hue/oozie/workspaces
 
+  # JDBC URL for Hive2 action
+  ## oozie_hs2_jdbc_url=jdbc:hive2://localhost:10000/default
+
   # Maximum of Oozie workflows or coodinators to retrieve in one API call.
   ## oozie_jobs_count=100
 
@@ -1715,6 +1744,9 @@
   # A limit on a file size (bytes) that can be uploaded to a filesystem.
   # A value of -1 means there will be no limit.
   ## max_file_size_upload_limit=-1
+
+  # Specify file extensions that are not allowed, separated by commas.
+  ## restrict_file_extensions=.exe, .zip, .rar, .tar, .gz
 
 
 ###########################################################################
@@ -2222,6 +2254,11 @@
   # Name of the SAML attribute containing the list of groups the user belongs to.
   ## required_groups_attribute=groups
 
+  # To log users out of magic-sso, CDP control panel use Logout URL
+  ## logout_url=
+
+  # after log users out of magic-sso, CDP control panel use redirect URL
+  ## redirect_url=
 
 ###########################################################################
 # Settings to configure OAuth

@@ -24,42 +24,40 @@ standard_library.install_aliases()
 from builtins import oct
 from builtins import object
 from datetime import datetime, timedelta
+import stat
+import time
 import errno
 import logging
 import posixpath
-import stat
-import sys
 import threading
-import time
-import urllib.request, urllib.error
+import urllib.error
+import urllib.request
+from builtins import object, oct
+from urllib.parse import unquote as urllib_unquote, urlparse
 
 from django.core.cache import caches
+from django.http.multipartparser import MultiPartParser
 from django.utils.encoding import smart_str
+from django.utils.translation import gettext as _
+from past.builtins import long
 
 import hadoop.conf
 
+import desktop.conf
 from desktop.lib.rest import http_client, resource
 from desktop.settings import CACHES_WEBHDFS_DELEGATION_TOKEN_KEY
 from past.builtins import long
 from hadoop.fs import normpath as fs_normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
-from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
-from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup, get_webhdfs_ssl
-
-if sys.version_info[0] > 2:
-  from urllib.parse import unquote as urllib_unquote, urlparse
-  from django.utils.translation import gettext as _
-else:
-  from urllib import unquote as urllib_unquote
-  from urlparse import urlparse
-  from django.utils.translation import ugettext as _
-
+from hadoop.fs.hadoopfs import Hdfs
+from hadoop.fs.webhdfs_types import WebHdfsContentSummary, WebHdfsStat
+from hadoop.hdfs_site import get_nn_sentry_prefixes, get_supergroup, get_umask_mode, get_webhdfs_ssl
 
 DEFAULT_HDFS_SUPERUSER = desktop.conf.DEFAULT_HDFS_SUPERUSER.get()
 
 # The number of bytes to read if not specified
-DEFAULT_READ_SIZE = 1024 * 1024 # 1MB
+DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 
 LOG = logging.getLogger()
 
@@ -263,7 +261,7 @@ class WebHdfs(Hdfs):
   @staticmethod
   def norm_path(path):
     path = fs_normpath(path)
-    #fs_normpath clears scheme:/ to scheme: which doesn't make sense
+    # fs_normpath clears scheme:/ to scheme: which doesn't make sense
     split = urlparse(path)
     if not split.path:
       path = split._replace(path="/").geturl()
@@ -314,7 +312,6 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     json = self._root.get(path, params, headers)
     return WebHdfsContentSummary(json['ContentSummary'])
-
 
   def _stats(self, path):
     """This version of stats returns None if the entry is not found"""
@@ -392,7 +389,6 @@ class WebHdfs(Hdfs):
     # Move path to trash path
     self.mkdir(self.dirname(trash_path))
     self.rename(path, trash_path)
-
 
   def _delete(self, path, recursive=False):
     """
@@ -534,7 +530,6 @@ class WebHdfs(Hdfs):
     else:
       self._root.put(path, params, headers=headers)
 
-
   def chmod(self, path, mode, recursive=False):
     """
     chmod(path, mode, recursive=False)
@@ -551,7 +546,6 @@ class WebHdfs(Hdfs):
         self._root.put(xpath, params, headers=headers)
     else:
       self._root.put(path, params, headers=headers)
-
 
   def get_home_dir(self):
     """get_home_dir() -> Home directory for the current user"""
@@ -604,7 +598,6 @@ class WebHdfs(Hdfs):
         return ""
       raise ex
 
-
   def open(self, path, mode='r'):
     """
     DEPRECATED!
@@ -615,14 +608,11 @@ class WebHdfs(Hdfs):
     """
     return File(self, path, mode)
 
-
   def getDefaultFilePerms(self):
     return 0o666 & (0o1777 ^ self._umask)
 
-
   def getDefaultDirPerms(self):
     return 0o1777 & (0o1777 ^ self._umask)
-
 
   def create(self, path, overwrite=False, blocksize=None, replication=None, permission=None, data=None):
     """
@@ -645,7 +635,6 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     self._invoke_with_redirect('PUT', path, params, data, headers)
 
-
   def append(self, path, data):
     """
     append(path, data)
@@ -658,7 +647,6 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     self._invoke_with_redirect('POST', path, params, data, headers)
 
-
   # e.g. ACLSPEC = user:joe:rwx,user::rw-
   def modify_acl_entries(self, path, aclspec):
     path = self.strip_normpath(path)
@@ -668,7 +656,6 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     return self._root.put(path, params, headers=headers)
 
-
   def remove_acl_entries(self, path, aclspec):
     path = self.strip_normpath(path)
     params = self._getparams()
@@ -677,7 +664,6 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     return self._root.put(path, params, headers=headers)
 
-
   def remove_default_acl(self, path):
     path = self.strip_normpath(path)
     params = self._getparams()
@@ -685,14 +671,12 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     return self._root.put(path, params, headers=headers)
 
-
   def remove_acl(self, path):
     path = self.strip_normpath(path)
     params = self._getparams()
     params['op'] = 'REMOVEACL'
     headers = self._getheaders()
     return self._root.put(path, params, headers=headers)
-
 
   def set_acl(self, path, aclspec):
     path = self.strip_normpath(path)
@@ -702,14 +686,12 @@ class WebHdfs(Hdfs):
     headers = self._getheaders()
     return self._root.put(path, params, headers=headers)
 
-
   def get_acl_status(self, path):
     path = self.strip_normpath(path)
     params = self._getparams()
     params['op'] = 'GETACLSTATUS'
     headers = self._getheaders()
     return self._root.get(path, params, headers=headers)
-
 
   def check_access(self, path, aclspec='rw-'):
     path = self.strip_normpath(path)
@@ -767,7 +749,6 @@ class WebHdfs(Hdfs):
 
       offset += cnt
 
-
   def copy_remote_dir(self, source, destination, dir_mode=None, owner=None):
     if owner is None:
       owner = self.DEFAULT_USER
@@ -785,7 +766,6 @@ class WebHdfs(Hdfs):
         self.copy_remote_dir(source_file, destination_file, dir_mode, owner)
       else:
         self.do_as_user(owner, self.copyfile, source_file, destination_file)
-
 
   def copy(self, src, dest, recursive=False, dir_mode=None, owner=None):
     """
@@ -849,15 +829,12 @@ class WebHdfs(Hdfs):
       else:
         self.copyfile(src, dest)
 
-
   @staticmethod
   def urlsplit(url):
     return Hdfs.urlsplit(url)
 
-
   def get_hdfs_path(self, path):
     return posixpath.join(self.fs_defaultfs, path.lstrip('/'))
-
 
   def _invoke_with_redirect(self, method, path, params=None, data=None, headers=None):
     """
@@ -888,7 +865,6 @@ class WebHdfs(Hdfs):
     headers["Content-Type"] = 'application/octet-stream'
     return resource.Resource(client).invoke(method, data=data, headers=headers)
 
-
   def _get_redirect_url(self, webhdfs_ex):
     """Retrieve the redirect url from an exception object"""
     try:
@@ -905,7 +881,6 @@ class WebHdfs(Hdfs):
       LOG.exception("Failed to read redirect from response: %s (%s)" % (webhdfs_ex, ex))
       raise webhdfs_ex
 
-
   def do_as_user(self, username, fn, *args, **kwargs):
     prev_user = self.user
     try:
@@ -914,10 +889,8 @@ class WebHdfs(Hdfs):
     finally:
       self.setuser(prev_user)
 
-
   def do_as_superuser(self, fn, *args, **kwargs):
     return self.do_as_user(self.superuser, fn, *args, **kwargs)
-
 
   def do_recursively(self, fn, path, *args, **kwargs):
     for stat in self.listdir_stats(path):
@@ -928,6 +901,7 @@ class WebHdfs(Hdfs):
       except Exception:
         pass
 
+  # Deprecated
   def upload(self, file, path, *args, **kwargs):
     username = kwargs.get('username')
     if not username:
@@ -937,6 +911,14 @@ class WebHdfs(Hdfs):
     tmp_file = file.get_temp_path()
 
     self.do_as_user(username, self.rename, tmp_file, dst)
+
+  def upload_v1(self, META, input_data, destination, username):
+    from hadoop.fs.upload import HDFSNewFileUploadHandler  # Circular dependency
+
+    hdfs_upload_handler = HDFSNewFileUploadHandler(destination, username)
+
+    parser = MultiPartParser(META, input_data, [hdfs_upload_handler])
+    return parser.parse()
 
   def filebrowser_action(self):
     return None
@@ -1017,7 +999,7 @@ def safe_octal(octal_value):
   This correctly handles octal values specified as a string or as a numeric.
   """
   try:
-    return oct(octal_value).replace('o', '') # fix futurized octal value with 0o prefix
+    return oct(octal_value).replace('o', '')  # fix futurized octal value with 0o prefix
   except TypeError:
     return str(octal_value).replace('o', '')
 
