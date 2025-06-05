@@ -115,10 +115,10 @@ $(EXT_PY_ENV_INSTALL_TARGETS): CUR_EXT_PY=$(notdir $(@D))
 #
 .PHONY: ext-env-pip-install
 ext-env-pip-install:
-	@echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PIP)'
-	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
+	@echo '--- Installing $(REQUIREMENT_FILE) into virtual-env via $(ENV_PYTHON) -m pip' # Updated echo message
+	@$(ENV_PYTHON) -m pip install --no-cache-dir --upgrade --force-reinstall -r $(REQUIREMENT_FILE)
 	@echo '--- Finished $(REQUIREMENT_FILE) into virtual-env'
-	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
+	@$(ENV_PYTHON) -m pip install --no-cache-dir --upgrade --force-reinstall $(NAVOPTAPI_WHL)
 	@echo '--- Finished $(NAVOPTAPI_WHL) into virtual-env'
 	@touch $@
 
@@ -174,6 +174,7 @@ clean:: ext-clean
 	@rm -Rf $(BUILD_DIR) dist
 	@find . -name \*.egg-info -prune -exec rm -Rf {} \;
 	@find . -name \*.py[co] -exec rm -f {} \;
+	@rm -rf $(APP_ROOT)/$(PYTHON_VER)
 
 .PHONY: distclean
 distclean:: clean

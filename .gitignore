@@ -107,7 +107,15 @@ tools/jenkins/oozie.sql
 apps/logs
 java-lib/
 dependency-reduced-pom.xml
+desktop/core/[0-9]*.[0-9]*/
 
+# Other generated build artifacts by Makefile and generate_requirements.py
+desktop/core/ext-env-pip-install
+desktop/core/requirements-aarch64-*.txt
+desktop/core/requirements-x86_64-*.txt
+
+# Python version file
+.python-version
 
 # Sublime Text temp files
 *.subl*

@@ -78,6 +78,12 @@
 ###################################
 ROOT := $(realpath .)
 PPC64LE := $(shell uname -m)
+# --- Start pyenv PATH fix for Make ---
+# Ensure pyenv shims are at the front of PATH for make operations
+# PYENV_ROOT must be correctly set in your shell environment (e.g., .zshrc)
+PYENV_ROOT ?= $(HOME)/.pyenv # Fallback if PYENV_ROOT is not already set by shell
+export PATH := $(PYENV_ROOT)/shims:$(PYENV_ROOT)/bin:$(PATH)
+# --- End pyenv PATH fix for Make ---
 
 include $(ROOT)/Makefile.vars.priv
 
@@ -163,9 +169,9 @@ $(BLD_DIR_ENV)/bin/python:
 	@$(ENV_PYTHON) -m pip install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
 	@$(eval RELOCATABLE := $(shell which virtualenv-make-relocatable))
 	@echo "REQUIREMENT_FILE is $(REQUIREMENT_FILE)"
-	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
+	@$(ENV_PYTHON) -m pip install -r $(REQUIREMENT_FILE)
 	@echo "--- Virtual environment setup complete for $(PYTHON_VER) ---"
-	@$(ENV_PIP) install $(NAVOPTAPI_WHL)
+	@$(ENV_PYTHON) -m pip install $(NAVOPTAPI_WHL)
 	@echo "--- Finished installing $(NAVOPTAPI_WHL) into virtual-env ---"
 ###################################
 # Build desktop
@@ -279,7 +285,7 @@ npm-install: .npm-install-lock
 
 .PHONY: create-static
 create-static:
-	$(ENV_PYTHON) $(BLD_DIR_BIN)/hue collectstatic --noinput
+	PYTHONPATH=$(ROOT) $(ENV_PYTHON) $(BLD_DIR_BIN)/hue collectstatic --noinput
 
 # <<<< DEV ONLY
 .PHONY: doc
@@ -362,6 +368,9 @@ clean:
 # END DEV ONLY >>>>
 	@rm -rf $(BLD_DIR_ENV)
 	@rm -rf $(STATIC_DIR)
+
+	# Added cleanup for the entire virtual environments base directory
+	@rm -rf $(BLD_DIR)/venvs
 
 #
 # Note: It is important for clean targets to *ONLY* clean products of the
