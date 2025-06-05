@@ -15,26 +15,28 @@
 // limitations under the License.
 
 import React, { useState, useEffect } from 'react';
-import { get } from '../../api/utils';
-import Modal from 'cuix/dist/components/Modal';
 import ReactDOM from 'react-dom';
+import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import CloseIcon from '@cloudera/cuix-core/icons/react/CloseIcon';
 import CaratDownIcon from '@cloudera/cuix-core/icons/react/CaratDownIcon';
+import { BorderlessButton } from 'cuix/dist/components/Button';
 import CaratUpIcon from '@cloudera/cuix-core/icons/react/CaratUpIcon';
+import Modal from 'cuix/dist/components/Modal';
+
 import { i18nReact } from '../../utils/i18nReact';
 import { RegularFile, FileStatus } from '../../utils/hooks/useFileUpload/types';
 import useFileUpload from '../../utils/hooks/useFileUpload/useFileUpload';
 import { DEFAULT_ENABLE_CHUNK_UPLOAD } from '../../utils/constants/storageBrowser';
+import { get } from '../../api/utils';
 import { getLastKnownConfig } from '../../config/hueConfig';
 import FileUploadRow from './FileUploadRow/FileUploadRow';
 import { useHuePubSub } from '../../utils/hooks/useHuePubSub/useHuePubSub';
 import huePubSub from '../../utils/huePubSub';
-import { BorderlessButton } from 'cuix/dist/components/Button';
 import { FILE_UPLOAD_START_EVENT, FILE_UPLOAD_SUCCESS_EVENT } from './event';
 import { LIST_DIRECTORY_API_URL } from '../../apps/storageBrowser/api';
-import './FileUploadQueue.scss';
 import { ListDirectory } from '../../apps/storageBrowser/types';
-import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
+
+import './FileUploadQueue.scss';
 
 interface FileUploadEvent {
   files: RegularFile[];
@@ -56,10 +58,8 @@ const FileUploadQueue = (): JSX.Element => {
 
   const [expandQueue, setExpandQueue] = useState<boolean>(true);
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [uploadedFiles, setUploadedFiles] = useState<RegularFile[]>([]);
   const [conflictFiles, setConflictFiles] = useState<RegularFile[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [path, setPath] = useState<string | null>(null);
 
   const fetchUploadedFiles = async (uploadPath: string) => {
     try {
@@ -67,44 +67,16 @@ const FileUploadQueue = (): JSX.Element => {
         path: uploadPath,
         pagesize: '1000'
       });
-      if (response?.files) {
-        setUploadedFiles(
-          response.files.map(file => ({
-            uuid: crypto.randomUUID(),
-            file: new File([''], file.path.split('/').pop() || ''),
-            status: FileStatus.Uploaded,
-            filePath: file.path
-          }))
-        );
-      }
+      return response.files ?? []; // Return an empty array if no files are found
     } catch (error) {
       console.error('Failed to fetch files:', error);
     }
   };
 
-  useEffect(() => {
-    if (path) {
-      fetchUploadedFiles(path);
-    }
-  }, [path]);
-
-  useEffect(() => {
-    // Automatically resolve file conflicts after uploadedFiles updates
-    if (conflictFiles.length > 0) {
-      resolveFileConflicts(conflictFiles);
-    }
-  }, [uploadedFiles]);
 
   const onComplete = () => {
     huePubSub.publish(FILE_UPLOAD_SUCCESS_EVENT);
     const newlyUploadedFiles = uploadQueue.filter(file => file.status === FileStatus.Uploaded);
-
-    setUploadedFiles(existing => {
-      const updatedFiles = [...existing, ...newlyUploadedFiles].filter(
-        (file, index, self) => index === self.findIndex(f => f.file.name === file.file.name)
-      );
-      return updatedFiles;
-    });
   };
 
   const config = getLastKnownConfig();
@@ -126,55 +98,55 @@ const FileUploadQueue = (): JSX.Element => {
           console.error('File path missing for uploaded files');
           return;
         }
-
-        setPath(uploadPath);
-
-        await fetchUploadedFiles(uploadPath);
-
-        setIsVisible(true);
-
-        if (data?.files) {
-          setConflictFiles(data.files); // Store new files temporarily
+        const uploadedFile = await fetchUploadedFiles(uploadPath);
+        const { conflicts, nonConflictingFiles } = resolveFileConflicts(
+          uploadedFile ?? [],
+          data?.files ?? []
+        );
+        if (conflicts.length > 0) {
+          setConflictFiles(conflicts);
+          setIsModalVisible(true);
+        } else {
+         
+          setConflictFiles([]);
+          setIsModalVisible(false);
         }
+        if (nonConflictingFiles.length > 0) {
+          addFiles(nonConflictingFiles);
+          setIsVisible(true);
+        }
+        setIsVisible(true);
       }
     }
   });
 
-  const resolveFileConflicts = (newFiles: RegularFile[]) => {
-    // Identify files currently in progress (Uploading or Pending) in the queue
-    const inProgressFileIdentifiers = uploadQueue
-      .filter(file => file.status === FileStatus.Uploading || file.status === FileStatus.Pending)
-      .map(file => `${file.filePath}/${file.file.name}`);
-
+  const resolveFileConflicts = (uploadedFiles: any[], newFiles: RegularFile[]) => {
+    console.log("uploadedFiles: ", uploadedFiles);
+  
+    const inProgressFileIdentifiers = new Set(
+      uploadQueue
+        .filter(file => file.status === FileStatus.Uploading || file.status === FileStatus.Pending)
+        .map(file => `${file.filePath}/${file.file.name}`)
+    );
+  
     // Filter out files that are in progress in the upload queue
     const filteredNewFiles = newFiles.filter(
-      newFile => !inProgressFileIdentifiers.includes(`${newFile.filePath}/${newFile.file.name}`)
+      newFile => !inProgressFileIdentifiers.has(`${newFile.filePath}/${newFile.file.name}`)
     );
-
+  
+    // Create a Set for existing uploaded file names for faster lookup
+    const existingUploadedFilePaths = new Set(uploadedFiles.map(f => f.path));
+  
     // Check for conflicts only with files that are already uploaded
-    const existingUploadedFileNames = uploadedFiles.map(f => f.file.name);
     const conflicts = filteredNewFiles.filter(newFile =>
-      existingUploadedFileNames.includes(newFile.file.name)
+      existingUploadedFilePaths.has(`${newFile.filePath}/${newFile.file.name}`)
     );
 
     // Non-conflicting files to be added
     const nonConflictingFiles = filteredNewFiles.filter(
-      newFile => !existingUploadedFileNames.includes(newFile.file.name)
-    );
-
-    if (conflicts.length > 0) {
-      setConflictFiles(conflicts);
-      setIsModalVisible(true);
-    } else {
-      // Clear stale conflict state if no conflicts exist
-      setConflictFiles([]);
-      setIsModalVisible(false);
-    }
-
-    if (nonConflictingFiles.length > 0) {
-      addFiles(nonConflictingFiles);
-      setIsVisible(true);
-    }
+      newFile => !existingUploadedFilePaths.has(`${newFile.filePath}/${newFile.file.name}`)
+    );  
+    return { conflicts, nonConflictingFiles };
   };
 
   const onClose = () => {
@@ -214,69 +186,32 @@ const FileUploadQueue = (): JSX.Element => {
 
   return (
     <>
-      {isModalVisible &&
-        ReactDOM.createPortal(
-          <Modal
-            title={t('Resolve Filename Conflicts')}
-            open={isModalVisible}
-            okText={t('Overwrite')}
-            onOk={() => handleModalOk(true)}
-            cancelText={t('Cancel')}
-            onCancel={() => setIsModalVisible(false)}
-            secondaryButtonText={t('Keep Original')}
-            onSecondary={() => handleModalOk(false)}
-            style={{
-              height: '50vh'
-            }}
-            bodyStyle={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px'
-            }}
-          >
-            {t(
-              `${conflictFiles.length} files you are trying to upload already exist in the uploaded files.`
-            )}
-            <div
-              style={{
-                marginTop: '8px',
-                overflowY: 'auto',
-                maxHeight: 'calc(50vh - 100px)',
-                borderTop: '1px solid #e9e9e9',
-                paddingTop: '8px'
-              }}
-            >
-              {conflictFiles.map(file => (
-                <div
-                  key={file.file.name}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                >
-                  <div
-                    style={{
-                      flexShrink: 0, // Prevent icon from shrinking
-                      width: '20px', // Set icon's width
-                      height: '20px' // Set icon's height
-                    }}
-                  >
-                    <FileIcon style={{ width: '100%', height: '100%' }} />
-                  </div>
-                  <span
-                    style={{
-                      wordBreak: 'break-word', // Allow long names to wrap
-                      maxWidth: 'calc(100% - 28px)' // Ensure the name takes the remaining space
-                    }}
-                  >
-                    {file.file.name}
-                  </span>
-                </div>
-              ))}
+      {isModalVisible && (
+      <Modal
+      title={t('Resolve Filename Conflicts')}
+      open={isModalVisible}
+      okText={t('Overwrite')}
+      onOk={() => handleModalOk(true)}
+      cancelText={t('Cancel')}
+      onCancel={() => setIsModalVisible(false)}
+      secondaryButtonText={t('Skip Upload')}
+      onSecondary={() => handleModalOk(false)}
+      className="hue-modal"
+    >
+      {t(
+        `${conflictFiles.length} files you are trying to upload already exist in the uploaded files.`
+      )}
+      <div className="conflict-files__container">
+        {conflictFiles.map(file => (
+          <div key={file.file.name} className="conflict-files__item">
+            <div className="file-icon">
+              <FileIcon />
             </div>
-          </Modal>,
-          document.body
+            <span className="file-name">{file.file.name}</span>
+          </div>
+        ))}
+      </div>
+          </Modal>
         )}
       <div className="hue-upload-queue-container antd cuix">
         <div className="hue-upload-queue-container__header">
