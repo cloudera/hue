@@ -202,6 +202,9 @@ class RequirementsGenerator:
       "aarch64": self.aarch64_requirements,
     }
     self.arch = platform.machine()
+    # Map 'arm64' to 'aarch64' as used in requirements map
+    if self.arch == 'arm64':
+      self.arch = 'aarch64'    
     self.python_version_string = f"{sys.version_info.major}.{sys.version_info.minor}"
 
   def copy_local_requirements(self, python_version_string):
