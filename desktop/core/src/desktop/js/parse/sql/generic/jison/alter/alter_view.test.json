@@ -4,9 +4,7 @@
     "beforeCursor": "ALTER VIEW baa.boo AS SELECT * FROM bla;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -15,9 +13,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER ",
     "afterCursor": "",
-    "containsKeywords": [
-      "VIEW"
-    ],
+    "containsKeywords": ["VIEW"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -56,9 +52,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER VIEW boo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "AS"
-    ],
+    "containsKeywords": ["AS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -69,9 +63,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   },
   {

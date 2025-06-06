@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "ANALYZE"
-    ],
+    "containsKeywords": ["ANALYZE"],
     "expectedResult": {
       "lowerCase": false
     }

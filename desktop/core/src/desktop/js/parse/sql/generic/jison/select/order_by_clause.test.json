@@ -5,9 +5,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "BY"
-      ],
+      "suggestKeywords": ["BY"],
       "suggestOrderBys": {
         "prefix": "BY",
         "tables": [
@@ -28,9 +26,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "BY"
-      ],
+      "suggestKeywords": ["BY"],
       "suggestOrderBys": {
         "prefix": "BY",
         "tables": [
@@ -49,9 +45,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM testTable ORDER BY ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -85,9 +79,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "suggestColumns": {
         "source": "order by",
@@ -129,33 +121,22 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "ASC",
-        "DESC",
-        "LIMIT",
-        "UNION"
-      ]
+      "suggestKeywords": ["ASC", "DESC", "LIMIT", "UNION"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo + ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "order by",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -175,9 +156,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo, ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -203,9 +182,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo + baa ASC, ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -231,9 +208,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo ASC, ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -261,22 +236,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "ASC",
-        "DESC",
-        "LIMIT",
-        "UNION"
-      ]
+      "suggestKeywords": ["ASC", "DESC", "LIMIT", "UNION"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo DESC, bar ",
     "afterCursor": ", bla",
-    "containsKeywords": [
-      "ASC",
-      "DESC"
-    ],
+    "containsKeywords": ["ASC", "DESC"],
     "expectedResult": {
       "lowerCase": false
     }
