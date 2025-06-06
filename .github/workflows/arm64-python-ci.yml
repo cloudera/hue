@@ -52,18 +52,20 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y build-essential asciidoc libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libncursesw5-dev libgdbm-dev
 
-      - name: Run python lint check
-        run: |
-          PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+          # Install Python 3.11 using deadsnakes PPA
+          sudo add-apt-repository -y ppa:deadsnakes/ppa
+          sudo apt-get install -y python3.11 python3.11-dev python3.11-venv python3.11-distutils
 
-            curl --output hugo_0.69.0_Linux.tar.gz -L https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-ARM64.tar.gz
-            tar -xvf hugo_0.69.0_Linux.tar.gz
+          # Install pip for Python 3.11
+          curl -sS https://bootstrap.pypa.io/get-pip.py | sudo python3.11
 
-            export PATH=$PWD:$HOME/go/bin:$PATH
+          unset PIP_FIND_LINKS
+          unset PIP_EXTRA_INDEX_URL
 
-            # Trigger linting if documentation changes
-            ./tools/ci/check_for_website_dead_links.sh docs/docs-site
-            # ./tools/ci/check_for_website_dead_links.sh docs/gethue
+          export PYTHON_VER=python3.11
+          export SKIP_PYTHONDEV_CHECK=true
+          export ROOT=$PWD
+          make apps docs test_prep
 
       - name: Run python lint check
         run: |
