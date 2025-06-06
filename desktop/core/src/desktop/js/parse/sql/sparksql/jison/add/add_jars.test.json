@@ -4,9 +4,7 @@
     "beforeCursor": "ADD JARS /tmp/test.txt \"/path with space/cde.txt\" '/path with space/fgh.txt';",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -15,9 +13,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ADD ",
     "afterCursor": "",
-    "containsKeywords": [
-      "JARS"
-    ],
+    "containsKeywords": ["JARS"],
     "expectedResult": {
       "lowerCase": false
     }

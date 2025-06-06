@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+.vscode
+
+desktop/core/src/desktop/js/ext
+**.js

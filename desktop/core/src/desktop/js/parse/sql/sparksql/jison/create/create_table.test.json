@@ -4,9 +4,7 @@
     "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE db.tbl USING CSV ROW FORMAT DELIMITED STORED AS PARQUET TBLPROPERTIES ('a'='b') LOCATION 'boo'; ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -15,10 +13,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TABLE",
-      "EXTERNAL TABLE"
-    ],
+    "containsKeywords": ["TABLE", "EXTERNAL TABLE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -29,9 +24,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TABLE"
-      ]
+      "suggestKeywords": ["TABLE"]
     }
   },
   {
@@ -40,9 +33,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF NOT EXISTS"
-      ],
+      "suggestKeywords": ["IF NOT EXISTS"],
       "suggestDatabases": {
         "appendDot": true
       }
@@ -54,9 +45,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "NOT EXISTS"
-      ]
+      "suggestKeywords": ["NOT EXISTS"]
     }
   },
   {
@@ -65,9 +54,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
@@ -123,18 +110,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "USING"
-      ]
+      "suggestKeywords": ["USING"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE bar USING ",
     "afterCursor": "",
-    "containsKeywords": [
-      "PARQUET"
-    ],
+    "containsKeywords": ["PARQUET"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -145,12 +128,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "ROW FORMAT",
-        "STORED AS",
-        "TBLPROPERTIES",
-        "LOCATION"
-      ]
+      "suggestKeywords": ["ROW FORMAT", "STORED AS", "TBLPROPERTIES", "LOCATION"]
     }
   },
   {
@@ -159,19 +137,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "FORMAT"
-      ]
+      "suggestKeywords": ["FORMAT"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE bar USING CSV ROW FORMAT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "DELIMITED",
-      "SERDE"
-    ],
+    "containsKeywords": ["DELIMITED", "SERDE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -180,10 +153,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE IF NOT EXISTS foo LIKE bar USING CSV ROW FORMAT DELIMITED ",
     "afterCursor": "",
-    "containsKeywords": [
-      "STORED AS",
-      "LOCATION"
-    ],
+    "containsKeywords": ["STORED AS", "LOCATION"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -194,18 +164,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "AS"
-      ]
+      "suggestKeywords": ["AS"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE foo LIKE bar USING CSV STORED AS ",
     "afterCursor": "",
-    "containsKeywords": [
-      "ORC"
-    ],
+    "containsKeywords": ["ORC"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -216,10 +182,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TBLPROPERTIES",
-        "LOCATION"
-      ]
+      "suggestKeywords": ["TBLPROPERTIES", "LOCATION"]
     }
   },
   {
@@ -228,9 +191,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "LOCATION"
-      ]
+      "suggestKeywords": ["LOCATION"]
     }
   },
   {
@@ -239,9 +200,7 @@
     "afterCursor": " foo LIKE bar USING CSV STORED AS ORC TBLPROPERTIES ('a' = 'b')",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF NOT EXISTS"
-      ]
+      "suggestKeywords": ["IF NOT EXISTS"]
     }
   },
   {
@@ -250,19 +209,14 @@
     "afterCursor": " foo LIKE bar USING CSV STORED AS ORC TBLPROPERTIES ('a' = 'b')",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "NOT EXISTS"
-      ]
+      "suggestKeywords": ["NOT EXISTS"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE boo (id ",
     "afterCursor": "",
-    "containsKeywords": [
-      "INT",
-      "INTERVAL MINUTE"
-    ],
+    "containsKeywords": ["INT", "INTERVAL MINUTE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -271,10 +225,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE boo (id INTERVAL MINUTE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "COMMENT",
-      "TO SECOND"
-    ],
+    "containsKeywords": ["COMMENT", "TO SECOND"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -283,9 +234,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE boo (id INTERVAL MINUTE, foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "STRING"
-    ],
+    "containsKeywords": ["STRING"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -294,12 +243,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE boo (id INTERVAL MINUTE, foo STRING) ",
     "afterCursor": "",
-    "containsKeywords": [
-      "COMMENT",
-      "USING",
-      "ROW FORMAT",
-      "AS"
-    ],
+    "containsKeywords": ["COMMENT", "USING", "ROW FORMAT", "AS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -308,9 +252,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE boo (id INTERVAL MINUTE, foo STRING) USING ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CSV"
-    ],
+    "containsKeywords": ["CSV"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -354,9 +296,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "BY"
-      ]
+      "suggestKeywords": ["BY"]
     }
   },
   {
@@ -365,13 +305,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "CLUSTERED BY",
-        "LOCATION",
-        "COMMENT",
-        "TBLPROPERTIES",
-        "AS"
-      ]
+      "suggestKeywords": ["CLUSTERED BY", "LOCATION", "COMMENT", "TBLPROPERTIES", "AS"]
     }
   },
   {
@@ -380,9 +314,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "BY"
-      ]
+      "suggestKeywords": ["BY"]
     }
   },
   {
@@ -391,10 +323,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SORTED BY",
-        "INTO"
-      ]
+      "suggestKeywords": ["SORTED BY", "INTO"]
     }
   },
   {
@@ -403,9 +332,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "BY"
-      ]
+      "suggestKeywords": ["BY"]
     }
   },
   {
@@ -414,9 +341,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "INTO"
-      ]
+      "suggestKeywords": ["INTO"]
     }
   },
   {
@@ -425,9 +350,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "BUCKETS"
-      ]
+      "suggestKeywords": ["BUCKETS"]
     }
   },
   {
@@ -436,9 +359,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "BUCKETS"
-      ]
+      "suggestKeywords": ["BUCKETS"]
     }
   },
   {
@@ -447,12 +368,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "LOCATION",
-        "COMMENT",
-        "TBLPROPERTIES",
-        "AS"
-      ]
+      "suggestKeywords": ["LOCATION", "COMMENT", "TBLPROPERTIES", "AS"]
     }
   },
   {
@@ -461,11 +377,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "COMMENT",
-        "TBLPROPERTIES",
-        "AS"
-      ]
+      "suggestKeywords": ["COMMENT", "TBLPROPERTIES", "AS"]
     }
   },
   {
@@ -474,10 +386,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TBLPROPERTIES",
-        "AS"
-      ]
+      "suggestKeywords": ["TBLPROPERTIES", "AS"]
     }
   },
   {
@@ -486,9 +395,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "AS"
-      ]
+      "suggestKeywords": ["AS"]
     }
   },
   {
@@ -497,18 +404,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE boo (id int) USING CSV AS SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*"
-    ],
+    "containsKeywords": ["*"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -533,9 +436,7 @@
     "afterCursor": " boo (id int) USING CSV AS SELECT * FROM foo;",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF NOT EXISTS"
-      ]
+      "suggestKeywords": ["IF NOT EXISTS"]
     }
   },
   {
@@ -544,9 +445,7 @@
     "afterCursor": " boo (id int) USING CSV AS SELECT * FROM foo;",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
@@ -562,7 +461,16 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) ",
     "afterCursor": "",
-    "containsKeywords": ["COMMENT","PARTITIONED BY","CLUSTERED BY","ROW FORMAT","STORED AS","LOCATION","TBLPROPERTIES","AS"],
+    "containsKeywords": [
+      "COMMENT",
+      "PARTITIONED BY",
+      "CLUSTERED BY",
+      "ROW FORMAT",
+      "STORED AS",
+      "LOCATION",
+      "TBLPROPERTIES",
+      "AS"
+    ],
     "expectedResult": {
       "lowerCase": false
     }
@@ -573,7 +481,15 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": ["PARTITIONED BY","CLUSTERED BY","ROW FORMAT","STORED AS","LOCATION","TBLPROPERTIES","AS"]
+      "suggestKeywords": [
+        "PARTITIONED BY",
+        "CLUSTERED BY",
+        "ROW FORMAT",
+        "STORED AS",
+        "LOCATION",
+        "TBLPROPERTIES",
+        "AS"
+      ]
     }
   },
   {
@@ -591,7 +507,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": ["CLUSTERED BY","ROW FORMAT","STORED AS","LOCATION","TBLPROPERTIES","AS"]
+      "suggestKeywords": [
+        "CLUSTERED BY",
+        "ROW FORMAT",
+        "STORED AS",
+        "LOCATION",
+        "TBLPROPERTIES",
+        "AS"
+      ]
     }
   },
   {
@@ -618,7 +541,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": ["ROW FORMAT","STORED AS","LOCATION","TBLPROPERTIES","AS"]
+      "suggestKeywords": ["ROW FORMAT", "STORED AS", "LOCATION", "TBLPROPERTIES", "AS"]
     }
   },
   {
@@ -634,7 +557,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE EXTERNAL TABLE foo (id int) ROW FORMAT DELIMITED ",
     "afterCursor": "",
-    "containsKeywords": ["STORED AS","LOCATION","TBLPROPERTIES","AS"],
+    "containsKeywords": ["STORED AS", "LOCATION", "TBLPROPERTIES", "AS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -654,7 +577,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": ["LOCATION","TBLPROPERTIES","AS"]
+      "suggestKeywords": ["LOCATION", "TBLPROPERTIES", "AS"]
     }
   },
   {
@@ -663,7 +586,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": ["TBLPROPERTIES","AS"]
+      "suggestKeywords": ["TBLPROPERTIES", "AS"]
     }
   },
   {
@@ -681,18 +604,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE boo (id int) AS SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*"
-    ],
+    "containsKeywords": ["*"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {

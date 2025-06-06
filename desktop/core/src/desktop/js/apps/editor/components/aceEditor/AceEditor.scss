@@ -236,7 +236,13 @@
     padding: 3px;
     cursor: pointer;
     position: relative;
-    font: 12px normal Roboto Mono, Menlo, Monaco, Consolas, "Courier New", monospace;
+    font:
+      12px normal Roboto Mono,
+      Menlo,
+      Monaco,
+      Consolas,
+      'Courier New',
+      monospace;
     direction: ltr;
     line-height: 18px;
   }
@@ -344,7 +350,13 @@
     background-color: $fluidx-gray-040;
     padding: 3px;
     color: $fluidx-gray-700;
-    font: 12px normal Roboto Mono, Menlo, Monaco, Consolas, "Courier New", monospace;
+    font:
+      12px normal Roboto Mono,
+      Menlo,
+      Monaco,
+      Consolas,
+      'Courier New',
+      monospace;
     direction: ltr;
   }
 

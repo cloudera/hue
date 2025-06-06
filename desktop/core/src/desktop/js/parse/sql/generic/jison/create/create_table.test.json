@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TABLE"
-    ],
+    "containsKeywords": ["TABLE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -16,9 +14,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF NOT EXISTS"
-      ]
+      "suggestKeywords": ["IF NOT EXISTS"]
     }
   },
   {
@@ -27,9 +23,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "NOT EXISTS"
-      ]
+      "suggestKeywords": ["NOT EXISTS"]
     }
   },
   {
@@ -38,18 +32,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
     "namePrefix": "should not report errors",
     "beforeCursor": "CREATE TABLE foo (id INT);",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -58,9 +48,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE foo (id ",
     "afterCursor": "",
-    "containsKeywords": [
-      "BOOLEAN"
-    ],
+    "containsKeywords": ["BOOLEAN"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -69,9 +57,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE TABLE foo (id INT, `some` FLOAT, bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "BOOLEAN"
-    ],
+    "containsKeywords": ["BOOLEAN"],
     "expectedResult": {
       "lowerCase": false
     }

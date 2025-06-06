@@ -28,6 +28,7 @@ module.exports = {
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/calcite/test',
     '<rootDir>/desktop/core/src/desktop/js/parse/sql/flink/test'
   ],
+  coverageReporters: ["lcov", "text", "json-summary"],
   collectCoverageFrom: [
     '<rootDir>/desktop/core/src/desktop/js/**/*.{js,jsx,ts,tsx,vue}',
     '!<rootDir>/desktop/core/src/desktop/js/ext/**',

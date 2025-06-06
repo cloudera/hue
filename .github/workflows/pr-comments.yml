@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  pytest-codecov-comment:
+  backend-tests-and-coverage:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,13 +30,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
-      
+
       - name: Setup node 20 and cache npm
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
-      
+
       - name: Build Hue
         run: |
           sudo apt-get update
@@ -51,7 +51,7 @@ jobs:
         continue-on-error: true
         run: |
           ./build/env/bin/pytest
-      
+
       - name: Add pytest and code coverage PR comment
         uses: MishaKav/pytest-coverage-comment@v1
         with:
@@ -64,8 +64,8 @@ jobs:
           xml-skip-covered: true
           remove-link-from-badge: true
           default-branch: master
-  
-  python-ut-files-comment:
+
+  python-ut-files-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -94,5 +94,36 @@ jobs:
       - name: Update PR with test file change status
         uses: mshick/add-pr-comment@v2
         with:
-          message: "${{ env.comment_message }}"
+          message: '${{ env.comment_message }}'
           allow-repeats: false
+
+  ui-tests-and-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache npm with setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run js tests with coverage
+        run: |
+          # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
+          npm run test-coverage -- --runInBand
+
+      - name: Add jest coverage PR comment
+        uses: MishaKav/jest-coverage-comment@v1
+        with:
+          coverage-summary-path: ./reports/jest/coverage-summary.json
+          summary-title: UI Coverage Report
+          badge-title: Coverage
+          hide-comment: false
+          create-new-comment: false
+          hide-summary: false
+          coverage-title: Coverage Report

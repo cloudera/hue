@@ -4,26 +4,20 @@
     "beforeCursor": "REFRESH FUNCTION func1; ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "REFRESH FUNCTION `foo db1`.`bar fun1`;`",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "REFRESH ",
     "afterCursor": "",
-    "containsKeywords": [
-      "FUNCTION"
-    ]
+    "containsKeywords": ["FUNCTION"]
   },
   {
     "namePrefix": "should suggest databases",

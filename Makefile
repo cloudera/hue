@@ -159,7 +159,9 @@ $(BLD_DIR_ENV)/bin/python:
 	@mkdir -p $(BLD_DIR_ENV)
 	@$(SYS_PYTHON) -m pip install --upgrade pip==$(PIP_VERSION)
 	@$(SYS_PYTHON) -m pip install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
-	@$(SYS_PYTHON) -m virtualenv -p $(PYTHON_VER) $(BLD_DIR_ENV) --copies
+	@$(SYS_PYTHON) -m virtualenv --system-site-packages --copies -p $(PYTHON_VER) $(BLD_DIR_ENV)
+	@$(ENV_PYTHON) -m pip install virtualenv==$(VIRTUAL_ENV_VERSION) virtualenv-make-relocatable==$(VIRTUAL_ENV_RELOCATABLE_VERSION)
+	@$(eval RELOCATABLE := $(shell which virtualenv-make-relocatable))
 	@echo "REQUIREMENT_FILE is $(REQUIREMENT_FILE)"
 	@$(ENV_PIP) install -r $(REQUIREMENT_FILE)
 	@echo "--- Virtual environment setup complete for $(PYTHON_VER) ---"
@@ -183,7 +185,7 @@ desktop: virtual-env
 relocatable-env:
 	@$(MAKE) virtual-env
 	@echo "--- Running $(SYS_PYTHON) $(RELOCATABLE) $(BLD_DIR_ENV)"
-	@$(SYS_PYTHON) $(RELOCATABLE) $(BLD_DIR_ENV)
+	@$(ENV_PYTHON) $(RELOCATABLE) $(BLD_DIR_ENV)
 	@echo "--- Setting up pth files $(ENV_PYTHON) $(ROOT)/tools/relocatable.py"
 	@$(ENV_PYTHON) $(ROOT)/tools/relocatable.py
 

@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "INSERT"
-    ],
+    "containsKeywords": ["INSERT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -39,9 +37,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TABLE"
-      ],
+      "suggestKeywords": ["TABLE"],
       "suggestDatabases": {
         "appendDot": true
       },
@@ -56,11 +52,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "DIRECTORY",
-        "LOCAL DIRECTORY",
-        "TABLE"
-      ],
+      "suggestKeywords": ["DIRECTORY", "LOCAL DIRECTORY", "TABLE"],
       "suggestDatabases": {
         "appendDot": true
       },

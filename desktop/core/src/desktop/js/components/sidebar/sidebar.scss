@@ -95,7 +95,6 @@
 
   &:hover,
   &:focus,
-    
   &:focus:not(:hover, .ant-btn) {
     text-decoration: none;
     outline: none;
@@ -376,7 +375,13 @@
   margin-left: $fluidx-spacing-m;
   color: $sidebar-default-text-color;
   flex-grow: 1;
-  font-family: Roboto Mono, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family:
+    Roboto Mono,
+    Menlo,
+    Monaco,
+    Consolas,
+    'Courier New',
+    monospace;
   font-size: $font-size-sm;
   overflow: hidden;
 
@@ -427,7 +432,8 @@
   .sidebar-header {
     padding: 0 0 0 11px;
     position: relative;
-    background: linear-gradient(to bottom right, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.1) 50%), $sidebar-selection-color;
+    background: linear-gradient(to bottom right, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+      $sidebar-selection-color;
   }
 
   .sidebar-header-logo {

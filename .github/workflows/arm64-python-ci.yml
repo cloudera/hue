@@ -1,0 +1,82 @@
+name: Python 3 ARM64 CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  hue-build-and-tests-arm64:
+    name: Build and Test (Python 3.11, ARM64)
+    # Use GitHub-hosted ARM64 runner
+    runs-on: ubuntu-22.04-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit title format
+        run: |
+          ./tools/ci/check_for_commit_message.sh
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-arm64-py311-pip-${{ hashFiles('desktop/core/generate_requirements.py') }}
+          restore-keys: |
+            ${{ runner.os }}-arm64-py311-pip-
+            ${{ runner.os }}-arm64-py311-
+            ${{ runner.os }}-arm64-
+
+      - name: Setup node 20 and cache npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Build Hue
+        run: |
+          sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update -y
+          sudo apt-get install -y build-essential asciidoc libkrb5-dev libldap2-dev libsasl2-dev libxml2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libncursesw5-dev libgdbm-dev
+
+          # Install Python 3.11 using deadsnakes PPA
+          sudo add-apt-repository -y ppa:deadsnakes/ppa
+          sudo apt-get install -y python3.11 python3.11-dev python3.11-venv python3.11-distutils
+
+          # Install pip for Python 3.11
+          curl -sS https://bootstrap.pypa.io/get-pip.py | sudo python3.11
+
+          unset PIP_FIND_LINKS
+          unset PIP_EXTRA_INDEX_URL
+
+          export PYTHON_VER=python3.11
+          export SKIP_PYTHONDEV_CHECK=true
+          export ROOT=$PWD
+          make apps docs test_prep
+
+      - name: Run python lint check
+        run: |
+          PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+
+      - name: Run unit tests
+        run: |
+          PYTHONWARNINGS=always ./build/env/bin/pytest
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: hue-reports-arm64
+          path: ./reports

@@ -3,11 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER ",
     "afterCursor": "",
-    "containsKeywords": [
-      "DATABASE",
-      "NAMESPACE",
-      "SCHEMA"
-    ],
+    "containsKeywords": ["DATABASE", "NAMESPACE", "SCHEMA"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -45,11 +41,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SET DBPROPERTIES",
-        "SET LOCATION",
-        "SET PROPERTIES"
-      ]
+      "suggestKeywords": ["SET DBPROPERTIES", "SET LOCATION", "SET PROPERTIES"]
     }
   },
   {
@@ -58,11 +50,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "DBPROPERTIES",
-        "LOCATION",
-        "PROPERTIES"
-      ]
+      "suggestKeywords": ["DBPROPERTIES", "LOCATION", "PROPERTIES"]
     }
   },
   {

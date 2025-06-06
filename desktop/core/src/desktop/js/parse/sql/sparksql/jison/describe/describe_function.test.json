@@ -4,34 +4,26 @@
     "beforeCursor": "DESC FUNCTION EXTENDED abs;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DESCRIBE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "FUNCTION"
-    ]
+    "containsKeywords": ["FUNCTION"]
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DESC ",
     "afterCursor": "",
-    "containsKeywords": [
-      "FUNCTION"
-    ]
+    "containsKeywords": ["FUNCTION"]
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DESCRIBE FUNCTION ",
     "afterCursor": "",
     "expectedResult": {
-      "suggestKeywords": [
-        "EXTENDED"
-      ],
+      "suggestKeywords": ["EXTENDED"],
       "suggestAggregateFunctions": {
         "tables": []
       },

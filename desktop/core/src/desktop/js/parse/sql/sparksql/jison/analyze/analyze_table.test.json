@@ -4,9 +4,7 @@
     "beforeCursor": "ANALYZE TABLE students COMPUTE STATISTICS NOSCAN;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -16,9 +14,7 @@
     "beforeCursor": "ANALYZE TABLE students PARTITION (student_id = 111111) COMPUTE STATISTICS;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -28,9 +24,7 @@
     "beforeCursor": "ANALYZE TABLE students COMPUTE STATISTICS FOR COLUMNS name;;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -39,9 +33,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ANALYZE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TABLE"
-    ],
+    "containsKeywords": ["TABLE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -79,10 +71,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PARTITION",
-        "COMPUTE STATISTICS"
-      ]
+      "suggestKeywords": ["PARTITION", "COMPUTE STATISTICS"]
     }
   },
   {
@@ -110,9 +99,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "COMPUTE STATISTICS"
-      ]
+      "suggestKeywords": ["COMPUTE STATISTICS"]
     }
   },
   {
@@ -121,9 +108,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "STATISTICS"
-      ]
+      "suggestKeywords": ["STATISTICS"]
     }
   },
   {
@@ -132,9 +117,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "STATISTICS"
-      ]
+      "suggestKeywords": ["STATISTICS"]
     }
   },
   {
@@ -143,11 +126,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "FOR ALL COLUMNS",
-        "FOR COLUMNS",
-        "NOSCAN"
-      ]
+      "suggestKeywords": ["FOR ALL COLUMNS", "FOR COLUMNS", "NOSCAN"]
     }
   },
   {
@@ -156,10 +135,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "ALL COLUMNS",
-        "COLUMNS"
-      ]
+      "suggestKeywords": ["ALL COLUMNS", "COLUMNS"]
     }
   },
   {
@@ -168,9 +144,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "COLUMNS"
-      ]
+      "suggestKeywords": ["COLUMNS"]
     }
   },
   {

@@ -3,27 +3,21 @@
     "namePrefix": "should accept statement",
     "beforeCursor": "LIST JAR;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "LIST JAR /tmp/test;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "LIST JAR \"ivy://group:module:version?exclude=group:module&transitive=true\";",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -33,9 +27,7 @@
     "beforeCursor": "LIST JAR \"/path/to/file/abc.txt\";",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -45,9 +37,7 @@
     "beforeCursor": "LIST JAR '/path/to/file with space/abc.txt';",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -56,9 +46,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "LIST ",
     "afterCursor": "",
-    "containsKeywords": [
-      "JAR"
-    ],
+    "containsKeywords": ["JAR"],
     "expectedResult": {
       "lowerCase": false
     }

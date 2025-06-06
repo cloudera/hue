@@ -3,11 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "FUNCTION",
-      "TEMPORARY FUNCTION",
-      "OR REPLACE"
-    ],
+    "containsKeywords": ["FUNCTION", "TEMPORARY FUNCTION", "OR REPLACE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -127,10 +123,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE ",
     "afterCursor": " FUNCTION foo AS 'SimpleUdf';",
-    "containsKeywords": [
-      "TEMPORARY",
-      "OR REPLACE"
-    ],
+    "containsKeywords": ["TEMPORARY", "OR REPLACE"],
     "expectedResult": {
       "lowerCase": false
     }
