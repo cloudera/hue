@@ -28,7 +28,6 @@ import './Overview.scss';
 
 interface UsageAnalyticsResponse {
   analyticsEnabled?: boolean;
-  analytics_enabled?: boolean;
   message?: string;
 }
 
@@ -45,7 +44,7 @@ const Analytics = (): JSX.Element => {
     save: updateAnalyticsPreference,
     loading: updatingAnalyticsPreference,
     error: updateAnalyticsPreferenceError
-  } = useSaveData<UsageAnalyticsResponse, FormData>(UPDATE_USAGE_ANALYTICS_API_URL, {
+  } = useSaveData<{ analytics_enabled: boolean }>(UPDATE_USAGE_ANALYTICS_API_URL, {
     onSuccess: response => {
       reloadData();
       const successMessage = response.analytics_enabled
@@ -58,15 +57,11 @@ const Analytics = (): JSX.Element => {
   const errors = [
     {
       enabled: !!usageAnalyticsError,
-      message: usageAnalyticsError
-        ? usageAnalyticsError
-        : t('An unknown error occurred while fetching data.')
+      message: usageAnalyticsError ?? t('An unknown error occurred while fetching data.')
     },
     {
       enabled: !!updateAnalyticsPreferenceError,
-      message: updateAnalyticsPreferenceError
-        ? updateAnalyticsPreferenceError
-        : t('Failed to update analytics.')
+      message: updateAnalyticsPreferenceError ?? t('Failed to update analytics.')
     }
   ];
 
