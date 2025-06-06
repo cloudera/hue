@@ -4,7 +4,7 @@ import SqlExecutable from 'gethue/apps/editor/execution/sqlExecutable';
 import { setWebCompProp } from './utils';
 
 export interface ExecuteLimitProps {
-  activeExecutable?: SqlExecutable;
+  activeExecutable?: SqlExecutable
 }
 
 interface ExecuteLimitElement extends HTMLElement {
@@ -15,11 +15,7 @@ export const ExecuteLimit: FC<ExecuteLimitProps> = ({ activeExecutable }) => {
   const containerElement = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setWebCompProp<ExecuteLimitElement>(
-      containerElement.current?.firstElementChild,
-      'executable',
-      activeExecutable
-    );
+    setWebCompProp<ExecuteLimitElement>(containerElement.current?.firstElementChild, 'executable', activeExecutable);
   }, [activeExecutable, containerElement]);
 
   useEffect(() => {
@@ -28,5 +24,5 @@ export const ExecuteLimit: FC<ExecuteLimitProps> = ({ activeExecutable }) => {
     }
   }, [containerElement]);
 
-  return <div ref={containerElement} />;
+  return <div ref={ containerElement }/>
 };

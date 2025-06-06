@@ -4,7 +4,7 @@ import hiveSyntaxParser from 'gethue/lib/parsers/hiveSyntaxParser';
 import hiveAutocompleteParser from 'gethue/lib/parsers/hiveAutocompleteParser';
 import Executor from 'gethue/lib/execution/executor';
 import SqlExecutable from 'gethue/apps/editor/execution/sqlExecutable';
-import { SetOptions, SqlReferenceProvider, UdfCategory } from 'gethue/sql/reference/types';
+import { SetOptions, SqlReferenceProvider, UdfCategory } from 'gethue/sql/reference/types'
 import { ActiveStatementChangedEvent } from 'gethue/apps/editor/components/aceEditor/types';
 import { setWebCompProp } from './utils';
 
@@ -21,7 +21,7 @@ const sqlReferenceProvider: SqlReferenceProvider = {
   hasUdfCategories(dialect: string): boolean {
     return false;
   }
-};
+}
 
 const sqlAutocompleteProvider: any = {
   getAutocompleteParser(dialect: string): Promise<any> {
@@ -30,7 +30,7 @@ const sqlAutocompleteProvider: any = {
   getSyntaxParser(dialect: string): Promise<any> {
     return Promise.resolve(hiveSyntaxParser);
   }
-};
+}
 
 interface QueryEditorElement extends HTMLElement {
   executor: Executor;
@@ -52,16 +52,8 @@ export const QueryEditor: FC<QueryEditorProps> = ({ setActiveExecutable, executo
       const queryEditorElement = document.createElement('query-editor');
       setWebCompProp<QueryEditorElement>(queryEditorElement, 'executor', executor);
       setWebCompProp<QueryEditorElement>(queryEditorElement, 'id', id || 'some-id');
-      setWebCompProp<QueryEditorElement>(
-        queryEditorElement,
-        'sql-parser-provider',
-        sqlAutocompleteProvider
-      );
-      setWebCompProp<QueryEditorElement>(
-        queryEditorElement,
-        'sql-reference-provider',
-        sqlReferenceProvider
-      );
+      setWebCompProp<QueryEditorElement>(queryEditorElement, 'sql-parser-provider', sqlAutocompleteProvider);
+      setWebCompProp<QueryEditorElement>(queryEditorElement, 'sql-reference-provider', sqlReferenceProvider);
       containerElement.current.innerHTML = '';
       containerElement.current?.appendChild(queryEditorElement);
     }
@@ -73,9 +65,9 @@ export const QueryEditor: FC<QueryEditorProps> = ({ setActiveExecutable, executo
         const activeStatementChangedEvent = event as ActiveStatementChangedEvent;
         executor.update(activeStatementChangedEvent.detail, false);
         setActiveExecutable(executor.activeExecutable);
-      });
+      })
     }
-  }, [setActiveExecutable, containerElement, executor]);
+  }, [setActiveExecutable, containerElement, executor])
 
-  return <div ref={containerElement} />;
+  return <div ref={ containerElement }/>
 };

@@ -4,7 +4,7 @@ import SqlExecutable from 'gethue/apps/editor/execution/sqlExecutable';
 import { setWebCompProp } from './utils';
 
 export interface ExecuteProgressProps {
-  activeExecutable?: SqlExecutable;
+  activeExecutable?: SqlExecutable
 }
 
 interface ProgressBarElement extends HTMLElement {
@@ -15,11 +15,7 @@ export const ExecuteProgress: FC<ExecuteProgressProps> = ({ activeExecutable }) 
   const containerElement = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setWebCompProp<ProgressBarElement>(
-      containerElement.current?.firstElementChild,
-      'executable',
-      activeExecutable
-    );
+    setWebCompProp<ProgressBarElement>(containerElement.current?.firstElementChild, 'executable', activeExecutable);
   }, [activeExecutable, containerElement]);
 
   useEffect(() => {
@@ -28,5 +24,5 @@ export const ExecuteProgress: FC<ExecuteProgressProps> = ({ activeExecutable }) 
     }
   }, [containerElement]);
 
-  return <div ref={containerElement} />;
+  return <div ref={ containerElement }/>
 };

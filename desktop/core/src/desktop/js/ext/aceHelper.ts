@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'ext/ace/ace';
+import 'ext/ace/ace'
 import 'ext/ace/ext-language_tools';
 import 'ext/ace/ext-searchbox';
 import 'ext/ace/ext-settings_menu';
@@ -29,7 +29,7 @@ import 'ext/ace/mode-impala';
 import 'ext/ace/mode-ksql';
 import 'ext/ace/mode-markdown';
 import 'ext/ace/mode-mysql';
-import 'ext/ace/mode-pgsql';
+import 'ext/ace/mode-pgsql'
 import 'ext/ace/mode-phoenix';
 import 'ext/ace/mode-presto';
 import 'ext/ace/mode-solr';
@@ -60,21 +60,21 @@ import './aceExtensions';
 export default (window as any).ace;
 
 const DIALECT_ACE_MODE_MAPPING: { [dialect: string]: string } = {
-  bigquery: 'ace/mode/bigquery',
-  druid: 'ace/mode/druid',
-  elasticsearch: 'ace/mode/elasticsearch',
-  flink: 'ace/mode/flink',
-  dasksql: 'ace/mode/dasksql',
-  hive: 'ace/mode/hive',
-  hplsql: 'ace/mode/hplsql',
-  impala: 'ace/mode/impala',
-  ksql: 'ace/mode/ksql',
-  mysql: 'ace/mode/mysql',
-  pgsq: 'ace/mode/pgsql',
-  phoenix: 'ace/mode/phoenix',
-  presto: 'ace/mode/presto',
-  solr: 'ace/mode/solr',
-  sql: 'ace/mode/sql'
+  'bigquery': 'ace/mode/bigquery',
+  'druid': 'ace/mode/druid',
+  'elasticsearch': 'ace/mode/elasticsearch',
+  'flink': 'ace/mode/flink',
+  'dasksql': 'ace/mode/dasksql',
+  'hive': 'ace/mode/hive',
+  'hplsql': 'ace/mode/hplsql',
+  'impala': 'ace/mode/impala',
+  'ksql': 'ace/mode/ksql',
+  'mysql': 'ace/mode/mysql',
+  'pgsq': 'ace/mode/pgsql',
+  'phoenix': 'ace/mode/phoenix',
+  'presto': 'ace/mode/presto',
+  'solr': 'ace/mode/solr',
+  'sql': 'ace/mode/sql'
 };
 
 export const getAceMode = (dialect?: string): string =>

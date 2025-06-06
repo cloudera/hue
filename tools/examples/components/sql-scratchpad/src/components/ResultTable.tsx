@@ -15,11 +15,7 @@ export const ResultTable: FC<ResultTableProps> = ({ activeExecutable }) => {
   const containerElement = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setWebCompProp<ResultTableElement>(
-      containerElement.current?.firstElementChild,
-      'executable',
-      activeExecutable
-    );
+    setWebCompProp<ResultTableElement>(containerElement.current?.firstElementChild, 'executable', activeExecutable);
   }, [activeExecutable, containerElement]);
 
   useEffect(() => {
@@ -28,5 +24,5 @@ export const ResultTable: FC<ResultTableProps> = ({ activeExecutable }) => {
     }
   }, [containerElement]);
 
-  return <div ref={containerElement} />;
-};
+  return <div ref={ containerElement }/>
+}
