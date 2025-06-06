@@ -44,7 +44,6 @@ class RequirementsGenerator:
     ]
 
     self.requirements = [
-      "setuptools==70.0.0",
       "apache-ranger==0.0.3",
       "asn1crypto==0.24.0",
       "avro-python3==1.8.2",
@@ -88,6 +87,7 @@ class RequirementsGenerator:
       "Mako==1.2.3",
       "openpyxl==3.0.9",
       "phoenixdb==1.2.1",
+      "polars[calamine]==1.8.2",  # Python >= 3.8
       "prompt-toolkit==3.0.39",
       "protobuf==3.20.3",
       "psutil==5.8.0",
@@ -97,6 +97,7 @@ class RequirementsGenerator:
       "python-daemon==2.2.4",
       "python-dateutil==2.8.2",
       "python-ldap==3.4.3",
+      "python-magic==0.4.27",
       "python-oauth2==1.1.0",
       "python-pam==2.0.2",
       "pytidylib==0.3.2",
@@ -107,6 +108,7 @@ class RequirementsGenerator:
       "requests-kerberos==0.14.0",
       "rsa==4.7.2",
       "ruff==0.11.10",
+      "setuptools==70.0.0",
       "six==1.16.0",
       "slack-sdk==3.31.0",
       "SQLAlchemy==1.3.8",
