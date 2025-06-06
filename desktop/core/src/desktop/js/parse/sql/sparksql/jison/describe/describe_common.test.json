@@ -3,9 +3,6 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "DESC",
-      "DESCRIBE"
-    ]
+    "containsKeywords": ["DESC", "DESCRIBE"]
   }
 ]

@@ -4,9 +4,7 @@
     "beforeCursor": "CREATE OR REPLACE GLOBAL TEMPORARY VIEW IF NOT EXISTS foo.bar (id int) COMMENT 'bla' TBLPROPERTIES ('a' = 'b') AS SELECT * FROM bla; ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -15,12 +13,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "OR REPLACE",
-      "GLOBAL TEMPORARY VIEW",
-      "TEMPORARY VIEW",
-      "VIEW"
-    ],
+    "containsKeywords": ["OR REPLACE", "GLOBAL TEMPORARY VIEW", "TEMPORARY VIEW", "VIEW"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -29,11 +22,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE OR REPLACE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "GLOBAL TEMPORARY VIEW",
-      "TEMPORARY VIEW",
-      "VIEW"
-    ],
+    "containsKeywords": ["GLOBAL TEMPORARY VIEW", "TEMPORARY VIEW", "VIEW"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -42,9 +31,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE OR REPLACE GLOBAL ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TEMPORARY"
-    ],
+    "containsKeywords": ["TEMPORARY"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -53,9 +40,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE OR REPLACE GLOBAL TEMPORARY ",
     "afterCursor": "",
-    "containsKeywords": [
-      "VIEW"
-    ],
+    "containsKeywords": ["VIEW"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -66,9 +51,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF NOT EXISTS"
-      ],
+      "suggestKeywords": ["IF NOT EXISTS"],
       "suggestDatabases": { "appendDot": true }
     }
   },
@@ -78,9 +61,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "NOT EXISTS"
-      ]
+      "suggestKeywords": ["NOT EXISTS"]
     }
   },
   {
@@ -89,9 +70,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
@@ -118,9 +97,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "COMMENT", "TBLPROPERTIES", "AS"
-      ]
+      "suggestKeywords": ["COMMENT", "TBLPROPERTIES", "AS"]
     }
   },
   {
@@ -129,9 +106,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TBLPROPERTIES", "AS"
-      ]
+      "suggestKeywords": ["TBLPROPERTIES", "AS"]
     }
   },
   {
@@ -140,18 +115,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "AS"
-      ]
+      "suggestKeywords": ["AS"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE VIEW foo COMMENT 'bla' TBLPROPERTIES ('a'='b') AS ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -162,9 +133,7 @@
     "afterCursor": " foo COMMENT 'bla' TBLPROPERTIES ('a'='b') AS SELECT * FROM foo; ",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF NOT EXISTS"
-      ]
+      "suggestKeywords": ["IF NOT EXISTS"]
     }
   }
 ]

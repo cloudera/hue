@@ -3,36 +3,28 @@
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW PARTITIONS customer;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW PARTITIONS salesdb.customer;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW PARTITIONS customer PARTITION (state = 'CA', city = 'Fremont');",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SHOW ",
     "afterCursor": "",
-    "containsKeywords": [
-      "PARTITIONS"
-    ]
+    "containsKeywords": ["PARTITIONS"]
   },
   {
     "namePrefix": "should suggest tables",
@@ -64,9 +56,7 @@
     "beforeCursor": "SHOW PARTITIONS foo ",
     "afterCursor": "",
     "expectedResult": {
-      "suggestKeywords": [
-        "PARTITION"
-      ]
+      "suggestKeywords": ["PARTITION"]
     }
   },
   {

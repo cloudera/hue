@@ -3,9 +3,7 @@
     "namePrefix": "should not find errors",
     "beforeCursor": "MSCK REPAIR TABLE db.tbl ADD PARTITIONS;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false
@@ -15,9 +13,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "MSCK ",
     "afterCursor": "",
-    "containsKeywords": [
-      "REPAIR TABLE"
-    ],
+    "containsKeywords": ["REPAIR TABLE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -26,9 +22,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "MSCK REPAIR ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TABLE"
-    ],
+    "containsKeywords": ["TABLE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -69,11 +63,7 @@
     "afterCursor": " ",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "ADD PARTITIONS",
-        "DROP PARTITIONS",
-        "SYNC PARTITIONS"
-      ]
+      "suggestKeywords": ["ADD PARTITIONS", "DROP PARTITIONS", "SYNC PARTITIONS"]
     }
   },
   {
@@ -82,9 +72,7 @@
     "afterCursor": " ",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PARTITIONS"
-      ]
+      "suggestKeywords": ["PARTITIONS"]
     }
   },
   {
@@ -93,9 +81,7 @@
     "afterCursor": " ",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PARTITIONS"
-      ]
+      "suggestKeywords": ["PARTITIONS"]
     }
   },
   {
@@ -104,9 +90,7 @@
     "afterCursor": " ",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PARTITIONS"
-      ]
+      "suggestKeywords": ["PARTITIONS"]
     }
   }
 ]
