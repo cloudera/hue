@@ -65,6 +65,12 @@ const Analytics = (): JSX.Element => {
     }
   ];
 
+  const handleAnalyticsCheckboxChange = (checked: boolean) => {
+    const formData = new FormData();
+    formData.append('analytics_enabled', checked ? 'true' : 'false');
+    updateAnalyticsPreference(formData);
+  };
+
   return (
     <LoadingErrorWrapper loading={loadingAnalytics || updatingAnalyticsPreference} errors={errors}>
       <div className="overview-analytics">
@@ -74,14 +80,8 @@ const Analytics = (): JSX.Element => {
             type="checkbox"
             className="analytics__checkbox-icon"
             id="usage_analytics"
-            checked={
-              usageAnalyticsData?.analyticsEnabled ?? usageAnalyticsData?.analytics_enabled ?? false
-            }
-            onChange={event => {
-              const formData = new FormData();
-              formData.append('analytics_enabled', event.target.checked ? 'true' : 'false');
-              updateAnalyticsPreference(formData);
-            }}
+            checked={!!usageAnalyticsData?.analyticsEnabled}
+            onChange={event => handleAnalyticsCheckboxChange(event.target.checked)}
             disabled={loadingAnalytics || updatingAnalyticsPreference}
           />
           <label htmlFor="usage_analytics" className="usage__analytics">
