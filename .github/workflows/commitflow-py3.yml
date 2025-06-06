@@ -78,10 +78,3 @@ jobs:
         with:
           name: hue-reports
           path: ./reports
-
-      - name: Upload reports
-        if: matrix.python-version == '3.11'
-        uses: actions/upload-artifact@v4
-        with:
-          name: hue-reports
-          path: ./reports
