@@ -22,7 +22,9 @@
   padding: 5px;
   background-color: #fff;
   position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) inset, 0 0 8px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.05) inset,
+    0 0 8px rgba(0, 0, 0, 0.15);
 
   .literal-value {
     text-align: center;
