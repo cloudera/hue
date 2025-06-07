@@ -200,6 +200,7 @@ class RequirementsGenerator:
       "ppc64le": self.ppc64le_requirements,
       "x86_64": self.x86_64_requirements,
       "aarch64": self.aarch64_requirements,
+      "arm64": self.aarch64_requirements,  # arm64 is treated as aarch64
     }
     self.arch = platform.machine()
     self.python_version_string = f"{sys.version_info.major}.{sys.version_info.minor}"
