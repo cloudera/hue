@@ -17,12 +17,19 @@
 import React, { useState } from 'react';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
-import { FileFormatResponse, FileMetaData, FilePreviewResponse, ImporterTableData } from '../types';
+import {
+  CombinedFileFormat,
+  FileFormatResponse,
+  FileMetaData,
+  FilePreviewResponse,
+  GuessHeaderResponse,
+  ImporterTableData
+} from '../types';
 import { convertToAntdColumns, convertToDataSource, getDefaultTableName } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
-import { FIle_FORMAT_URL, FILE_PREVIEW_URL, FINISH_IMPORT_URL } from '../api';
+import { FIle_FORMAT_URL, FILE_GUESS_HEADER, FILE_PREVIEW_URL, FINISH_IMPORT_URL } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 import EditColumnsModal from './EditColumns/EditColumnsModal';
 
@@ -34,11 +41,27 @@ interface ImporterFilePreviewProps {
 
 const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
+  const [fileFormat, setFileFormat] = useState<CombinedFileFormat | undefined>();
   const defaultDialect = 'impala';
 
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
   const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
+
+  useLoadData<GuessHeaderResponse>(FILE_GUESS_HEADER, {
+    params: {
+      file_path: fileMetaData.path,
+      file_type: fileFormat?.type,
+      import_type: fileMetaData.source,
+      sheet_name: fileFormat?.selectedSheetName
+    },
+    skip: !fileFormat?.type,
+    onSuccess: data => {
+      setFileFormat(prev => ({
+        ...(prev ?? {}),
+        hasHeader: data.hasHeader
+      }));
+    }
+  });
 
   const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FIle_FORMAT_URL, {
     params: {
@@ -47,7 +70,10 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     },
     skip: !fileMetaData.path,
     onSuccess: data => {
-      setFileFormat(data);
+      setFileFormat({
+        ...data,
+        selectedSheetName: data?.sheetNames?.[0]
+      });
     }
   });
 
@@ -59,20 +85,13 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
         file_type: fileFormat?.type,
         import_type: fileMetaData.source,
         sql_dialect: defaultDialect,
-        has_header: fileFormat?.hasHeader
+        has_header: fileFormat?.hasHeader,
+        sheet_name: fileFormat?.selectedSheetName,
+        field_separator: fileFormat?.fieldSeparator,
+        quote_char: fileFormat?.quoteChar,
+        record_separator: String(fileFormat?.recordSeparator)
       },
-      skip: !fileFormat?.type,
-      onSuccess: data => {
-        setFileFormat(prev => {
-          if (!prev) {
-            return prev;
-          }
-          return {
-            ...prev,
-            hasHeader: data.hasHeader
-          };
-        });
-      }
+      skip: !fileFormat?.type || fileFormat?.hasHeader === undefined
     }
   );
 

@@ -30,11 +30,19 @@ export interface LocalFileUploadResponse {
 }
 
 export interface FileFormatResponse {
-  type: ImporterFileTypes;
-  hasHeader?: boolean;
+  type?: ImporterFileTypes;
   fieldSeparator?: string;
   quoteChar?: string;
   recordSeparator?: string;
+  sheetNames?: string[];
+}
+
+export interface GuessHeaderResponse {
+  hasHeader?: boolean;
+}
+
+export interface CombinedFileFormat extends FileFormatResponse, GuessHeaderResponse {
+  selectedSheetName?: string;
 }
 
 export interface FileMetaData {
@@ -55,7 +63,6 @@ export interface FilePreviewTableData {
 
 export interface FilePreviewResponse {
   columns: FilePreviewTableColumn[];
-  hasHeader: boolean;
   previewData: FilePreviewTableData;
 }
 

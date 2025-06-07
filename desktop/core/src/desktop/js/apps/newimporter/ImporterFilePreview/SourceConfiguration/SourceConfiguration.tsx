@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react';
+import React from 'react';
 import Select from 'cuix/dist/components/Select/Select';
 import ConfigureIcon from '@cloudera/cuix-core/icons/react/ConfigureIcon';
 import { i18nReact } from '../../../../utils/i18nReact';
 import { sourceConfigs } from '../../constants';
-import { FileFormatResponse } from '../../types';
+import { CombinedFileFormat, FileFormatResponse } from '../../types';
 
 import './SourceConfiguration.scss';
 
@@ -33,17 +33,14 @@ const SourceConfiguration = ({
 }: SourceConfigurationProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
-  const onChange = useCallback(
-    (value: string | number | boolean, name: keyof FileFormatResponse) => {
-      if (fileFormat) {
-        setFileFormat({
-          ...fileFormat,
-          [name]: value
-        });
-      }
-    },
-    [fileFormat, setFileFormat]
-  );
+  const onChange = (value: string | number | boolean, name: keyof CombinedFileFormat) => {
+    if (fileFormat) {
+      setFileFormat({
+        ...fileFormat,
+        [name]: value
+      });
+    }
+  };
 
   const filteredSourceConfigs = sourceConfigs.filter(config => !config.hidden?.(fileFormat?.type));
 
