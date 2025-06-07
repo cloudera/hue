@@ -4,9 +4,7 @@
     "beforeCursor": "ANALYZE TABLES IN school_db COMPUTE STATISTICS NOSCAN;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -16,9 +14,7 @@
     "beforeCursor": "ANALYZE TABLES COMPUTE STATISTICS;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -27,9 +23,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ANALYZE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TABLES"
-    ],
+    "containsKeywords": ["TABLES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -38,11 +32,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ANALYZE TABLES ",
     "afterCursor": "",
-    "containsKeywords": [
-      "COMPUTE STATISTICS",
-      "FROM",
-      "IN"
-    ],
+    "containsKeywords": ["COMPUTE STATISTICS", "FROM", "IN"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -69,9 +59,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ANALYZE TABLES FROM foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "COMPUTE STATISTICS"
-    ],
+    "containsKeywords": ["COMPUTE STATISTICS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -80,9 +68,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ANALYZE TABLES IN foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "COMPUTE STATISTICS"
-    ],
+    "containsKeywords": ["COMPUTE STATISTICS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -91,9 +77,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ANALYZE TABLES COMPUTE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "STATISTICS"
-    ],
+    "containsKeywords": ["STATISTICS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -102,9 +86,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ANALYZE TABLES FROM foo COMPUTE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "STATISTICS"
-    ],
+    "containsKeywords": ["STATISTICS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -113,9 +95,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ANALYZE TABLES FROM foo COMPUTE STATISTICS ",
     "afterCursor": "",
-    "containsKeywords": [
-      "NOSCAN"
-    ],
+    "containsKeywords": ["NOSCAN"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -124,9 +104,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ANALYZE TABLES IN foo COMPUTE STATISTICS ",
     "afterCursor": "",
-    "containsKeywords": [
-      "NOSCAN"
-    ],
+    "containsKeywords": ["NOSCAN"],
     "expectedResult": {
       "lowerCase": false
     }

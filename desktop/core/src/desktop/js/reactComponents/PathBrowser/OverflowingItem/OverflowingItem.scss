@@ -25,7 +25,7 @@
     border: none;
     max-width: 30%;
 
-    >span {
+    > span {
       @include mixins.nowrap-ellipsis;
 
       display: inline !important;

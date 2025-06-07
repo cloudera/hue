@@ -31,7 +31,6 @@ $spinner-xlarge-size: 50px;
   position: relative;
   z-index: 10000;
 
-
   &.spinner {
     @include fillAbsolute;
 
@@ -68,8 +67,13 @@ $spinner-xlarge-size: 50px;
 
     .spinner-spin {
       @include keyframes(spin-frames) {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(359deg); }
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(359deg);
+        }
       }
 
       @include animation('spin-frames 0.8s linear infinite');
