@@ -1610,7 +1610,15 @@ OIDC = ConfigSection(
       key="oidc_rp_client_secret",
       help=_("The client secret as relay party set in OpenID provider."),
       type=str,
-      default="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+      default=""
+    ),
+
+    OIDC_RP_CLIENT_SECRET_SCRIPT=Config(
+      key="oidc_rp_client_secret_script",
+      help=_("Execute this script to produce the oidc rp client secret.",
+             "This will be used when 'oidc_rp_client_secret' is not set."),
+      type=coerce_password_from_script,
+      default=None,
     ),
 
     OIDC_OP_AUTHORIZATION_ENDPOINT=Config(
