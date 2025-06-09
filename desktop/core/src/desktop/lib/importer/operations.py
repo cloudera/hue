@@ -734,3 +734,31 @@ def _map_polars_dtype_to_sql_type(dialect: str, polars_type: str) -> str:
     raise ValueError(f"No mapping for Polars dtype {polars_type} in dialect {dialect}")
 
   return mapping[polars_type]
+
+
+def create_table(
+    file_path: str,
+    file_type: str,
+    import_type: str,
+    sql_dialect: str,
+    database_name: str,
+    table_name: str,
+    columns: List[Dict],
+    has_header: bool = False,
+    partition_columns: List[Dict] = None,
+    comment: str = "",
+    external: bool = False,
+    external_path: str = "",
+    table_format: str = "text",
+    is_transactional: bool = False,
+    is_iceberg: bool = False,
+    is_insert_only: bool = False,
+    primary_keys: List[str] = None,
+    sheet_name: Optional[str] = None,
+    field_separator: Optional[str] = ",",
+    quote_char: Optional[str] = '"',
+    record_separator: Optional[str] = "\n",
+    load_data: bool = True,
+    fs=None,
+) -> Dict[str, Any]:
+  pass
