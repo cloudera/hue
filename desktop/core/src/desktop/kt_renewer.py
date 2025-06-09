@@ -50,15 +50,15 @@ def renew_from_kt():
       subp_stdout = subp.stdout.readlines()
       subp_stderr = subp.stderr.readlines()
 
-      subp_stdout = [line.decode() for line in subp.stdout.readlines()]
-      subp_stderr = [line.decode() for line in subp.stderr.readlines()]
+      subp_stdout = [line.decode() for line in subp_stdout]
+      subp_stderr = [line.decode() for line in subp_stderr]
 
       LOG.error("Couldn't reinit from keytab! `kinit' exited with %s.\n%s\n%s" % (
                 subp.returncode, "\n".join(subp_stdout), "\n".join(subp_stderr)))
       if retries >= max_retries:
         LOG.error("FATAL: max_retries of %s reached. Exiting..." % max_retries)
         sys.exit(subp.returncode)
-      time.sleep(3)
+      time.sleep(10)
     elif CONF.ENABLE_RENEWLIFETIME.get() and max_retries == 0:
       break
 
