@@ -24,7 +24,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 
 interface UseUploadQueueResponse {
   uploadQueue: RegularFile[];
-  addFiles: (newFiles: RegularFile[]) => void;
+  addFiles: (newFiles: RegularFile[], overwrite?: boolean) => void;
   cancelFile: (item: RegularFile) => void;
   isLoading: boolean;
 }
@@ -99,15 +99,43 @@ const useFileUpload = ({
     }
   };
 
-  const addFiles = (fileItems: RegularFile[]) => {
-    if (fileItems.length > 0) {
-      setUploadQueue(prev => [...prev, ...fileItems]);
-
-      if (isChunkUpload) {
-        addToChunkUpload(fileItems);
-      } else {
-        addToRegularUpload(fileItems);
-      }
+  const addFiles = (files: RegularFile[], overwrite = false) => {
+    setUploadQueue(prev => {
+      const updatedQueue = [...prev]; // A copy of the current queue
+  
+      files.forEach(file => {
+        const existingFileIndex = updatedQueue.findIndex(
+          up => up.filePath === file.filePath && up.file.name === file.file.name
+        );
+  
+        if (existingFileIndex !== -1) {
+          if (overwrite) {
+            // Handle conflicting file by overwriting
+            updatedQueue[existingFileIndex] = {
+              ...file,
+              status: FileStatus.Pending,
+              overwrite: true
+            };
+          }
+          // Skip adding the file if no overwrite flag is present
+        } else {
+          // File does not exist in the queue; add it as a new one
+          updatedQueue.push({ ...file, status: FileStatus.Pending });
+        }
+      });
+  
+      return updatedQueue; // Return the updated queue
+    });
+  
+    const preparedFiles = files.map(file => ({
+      ...file,
+      overwrite: overwrite || !!file.overwrite
+    }));
+    // Pass prepared files with overwrite flag to the appropriate upload
+    if (isChunkUpload) {
+      addToChunkUpload(preparedFiles);
+    } else {
+      addToRegularUpload(preparedFiles);
     }
   };
 
