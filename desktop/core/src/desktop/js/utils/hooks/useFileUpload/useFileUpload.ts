@@ -101,33 +101,41 @@ const useFileUpload = ({
 
   const addFiles = (files: RegularFile[], overwrite = false) => {
     setUploadQueue(prev => {
-      const updatedQueue = [...prev];
-
+      const updatedQueue = [...prev]; // A copy of the current queue
+  
       files.forEach(file => {
         const existingFileIndex = updatedQueue.findIndex(
           up => up.filePath === file.filePath && up.file.name === file.file.name
         );
-
+  
         if (existingFileIndex !== -1) {
           if (overwrite) {
+            // Handle conflicting file by overwriting
             updatedQueue[existingFileIndex] = {
               ...file,
               status: FileStatus.Pending,
               overwrite: true
             };
           }
+          // Skip adding the file if no overwrite flag is present
         } else {
+          // File does not exist in the queue; add it as a new one
           updatedQueue.push({ ...file, status: FileStatus.Pending });
         }
       });
-
-      return updatedQueue;
+  
+      return updatedQueue; // Return the updated queue
     });
-
+  
+    const preparedFiles = files.map(file => ({
+      ...file,
+      overwrite: overwrite || !!file.overwrite
+    }));
+    // Pass prepared files with overwrite flag to the appropriate upload
     if (isChunkUpload) {
-      addToChunkUpload(files);
+      addToChunkUpload(preparedFiles);
     } else {
-      addToRegularUpload(files);
+      addToRegularUpload(preparedFiles);
     }
   };
 

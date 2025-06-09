@@ -121,8 +121,6 @@ const FileUploadQueue = (): JSX.Element => {
   });
 
   const resolveFileConflicts = (uploadedFiles: any[], newFiles: RegularFile[]) => {
-    console.log("uploadedFiles: ", uploadedFiles);
-  
     const inProgressFileIdentifiers = new Set(
       uploadQueue
         .filter(file => file.status === FileStatus.Uploading || file.status === FileStatus.Pending)
