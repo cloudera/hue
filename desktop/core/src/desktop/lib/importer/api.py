@@ -26,6 +26,7 @@ from rest_framework.response import Response
 
 from desktop.lib.importer import operations
 from desktop.lib.importer.serializers import (
+  CreateTableSerializer,
   GuessFileHeaderSerializer,
   GuessFileMetadataSerializer,
   LocalFileUploadSerializer,
@@ -278,4 +279,68 @@ def get_sql_type_mapping(request: Request) -> Response:
     return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
   except Exception as e:
     LOG.exception(f"Error getting SQL type mapping: {e}", exc_info=True)
+    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+@parser_classes([JSONParser])
+@api_error_handler
+def create_table(request: Request) -> Response:
+  """Create a table from a file based on the provided parameters.
+
+  This API endpoint creates a table in the specified database using
+  the file data as the source. It can handle different file formats,
+  storage formats, and SQL dialects.
+
+  Args:
+    request: Request object containing parameters for table creation
+
+  Returns:
+    Response containing the SQL query for table creation and metadata:
+      - sql: The SQL query to create the table
+      - table_name: The name of the created table
+      - database_name: The database name
+      - column_count: The number of columns
+  """
+
+  serializer = CreateTableSerializer(data=request.data)
+
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  validated_data = serializer.validated_data
+
+  try:
+    result = operations.create_table(
+      file_path=validated_data["file_path"],
+      file_type=validated_data["file_type"],
+      import_type=validated_data["import_type"],
+      sql_dialect=validated_data["sql_dialect"],
+      database_name=validated_data["database_name"],
+      table_name=validated_data["table_name"],
+      columns=validated_data["columns"],
+      has_header=validated_data.get("has_header", False),
+      partition_columns=validated_data.get("partition_columns", []),
+      comment=validated_data.get("comment", ""),
+      external=validated_data.get("external", False),
+      external_path=validated_data.get("external_path", ""),
+      table_format=validated_data.get("table_format", "text"),
+      is_transactional=validated_data.get("is_transactional", False),
+      is_iceberg=validated_data.get("is_iceberg", False),
+      is_insert_only=validated_data.get("is_insert_only", False),
+      primary_keys=validated_data.get("primary_keys", []),
+      sheet_name=validated_data.get("sheet_name"),
+      field_separator=validated_data.get("field_separator"),
+      quote_char=validated_data.get("quote_char"),
+      record_separator=validated_data.get("record_separator"),
+      load_data=validated_data.get("load_data", True),
+      fs=request.fs if validated_data["import_type"] == "remote" else None,
+    )
+
+    return Response(result, status=status.HTTP_200_OK)
+
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error creating table: {e}", exc_info=True)
     return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
