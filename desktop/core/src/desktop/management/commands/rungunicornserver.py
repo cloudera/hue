@@ -184,10 +184,21 @@ def argprocessing(args=[], options={}):
   # Currently gunicorn does not support passphrase suppored SSL Keyfile
   # https://github.com/benoitc/gunicorn/issues/2410
   ssl_keyfile = None
-  worker_tmp_dir = os.environ.get("HUE_CONF_DIR", get_desktop_root("conf"))
+
+  # HUE_RUN_DIR is set for CDW pods. If unset, fall back to previous behaviour (for base).
+  worker_tmp_dir = os.environ.get("HUE_RUN_DIR")
   if not worker_tmp_dir:
-    worker_tmp_dir = "/tmp"
+    worker_tmp_dir = os.environ.get("HUE_CONF_DIR", get_desktop_root("conf"))
+    if not worker_tmp_dir:
+      worker_tmp_dir = "/tmp"
   options['worker_tmp_dir'] = worker_tmp_dir
+
+  # Gunicorn needs chown privileges if the OS user/group does not match Gunicorn's user/group.
+  # This can happen when the OS user is not in our control to set (OpenShift).
+  if not os.environ.get("GUNICORN_USE_OS_USER"):
+    options['user'] = conf.SERVER_USER.get()
+    options['group'] = conf.SERVER_GROUP.get()
+
   if conf.SSL_CERTIFICATE.get() and conf.SSL_PRIVATE_KEY.get():
     ssl_password = str.encode(conf.get_ssl_password()) if conf.get_ssl_password() is not None else None
     if ssl_password:
@@ -222,7 +233,7 @@ def rungunicornserver(args=[], options={}):
       'errorlog': "-",
       'forwarded_allow_ips': None,
       'graceful_timeout': conf.GUNICORN_WORKER_GRACEFUL_TIMEOUT.get(),
-      'group': conf.SERVER_GROUP.get(),
+      'group': options.get('group'),
       'initgroups': None,
       'keepalive': 120,                       # seconds to wait for requests on a keep-alive connection.
       'keyfile': options['ssl_keyfile'],      # SSL key file
@@ -256,7 +267,7 @@ def rungunicornserver(args=[], options={}):
       'threads': conf.CHERRYPY_SERVER_THREADS.get(),
       'timeout': conf.GUNICORN_WORKER_TIMEOUT.get(),
       'umask': None,
-      'user': conf.SERVER_USER.get(),
+      'user': options.get('user'),
       'worker_class': conf.GUNICORN_WORKER_CLASS.get(),
       'worker_connections': 1000,
       'worker_tmp_dir': options['worker_tmp_dir'],
