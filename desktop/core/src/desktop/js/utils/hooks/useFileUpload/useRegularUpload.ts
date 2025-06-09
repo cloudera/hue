@@ -71,7 +71,7 @@ const useRegularUpload = ({
     dequeue,
     isLoading
   } = useQueueProcessor<RegularFile>(
-    async (file: RegularFile) => processRegularFile(file, file.overwrite), // Example: Set overwrite to `true` for now
+    async (file: RegularFile) => processRegularFile(file, file.overwrite), 
     {
       concurrentProcess,
       onSuccess: onComplete
