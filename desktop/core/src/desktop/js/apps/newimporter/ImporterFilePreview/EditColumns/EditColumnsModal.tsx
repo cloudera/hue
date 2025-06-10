@@ -20,6 +20,7 @@ import Modal from 'cuix/dist/components/Modal';
 import Table from 'cuix/dist/components/Table';
 import Input from 'cuix/dist/components/Input';
 import Select from 'cuix/dist/components/Select';
+import { SQL_TYPE_MAPPING_API_URL } from '../../../admin/Components/utils';
 
 export interface Column {
   title: string;
@@ -53,6 +54,29 @@ const EditColumnsModal = ({
 }: EditColumnsModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [editRows, setEditRows] = useState<EditRow[]>([]);
+  const [sqlTypes, setSqlTypes] = useState<string[]>([]);
+  const [typeError, setTypeError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Fetch SQL types on mount
+    const fetchSqlTypes = async () => {
+      try {
+        const res = await fetch(`${SQL_TYPE_MAPPING_API_URL}?sql_dialect=hive`);
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setSqlTypes(data);
+          setTypeError(null);
+        } else {
+          setSqlTypes([]);
+          setTypeError(t('No SQL types returned from server.'));
+        }
+      } catch (err) {
+        setSqlTypes([]);
+        setTypeError(t('Failed to fetch SQL types.'));
+      }
+    };
+    fetchSqlTypes();
+  }, [t]);
 
   useEffect(() => {
     setEditRows(
@@ -60,7 +84,10 @@ const EditColumnsModal = ({
         key: idx,
         name: col.title,
         type: col.type || 'string',
-        sample: sample && sample.length > 0 ? (sample[0][col.dataIndex] ?? '') : '',
+        sample:
+          sample && sample.length > 0 && sample[0][col.dataIndex] !== undefined
+            ? String(sample[0][col.dataIndex])
+            : '',
         comment: col.comment || ''
       }))
     );
@@ -106,11 +133,13 @@ const EditColumnsModal = ({
             onChange={(val: string) => handleChange(idx, 'type', val)}
             getPopupContainer={triggerNode => triggerNode.parentNode}
             style={{ border: '1px solid #838b92', borderRadius: '3px', width: '150px' }}
+            disabled={sqlTypes.length === 0}
           >
-            <Select.Option value="string">{t('String')}</Select.Option>
-            <Select.Option value="int">{t('Integer')}</Select.Option>
-            <Select.Option value="float">{t('Float')}</Select.Option>
-            <Select.Option value="bool">{t('Boolean')}</Select.Option>
+            {sqlTypes.map(type => (
+              <Select.Option key={type} value={type}>
+                {type}
+              </Select.Option>
+            ))}
           </Select>
         )
       },
@@ -140,7 +169,7 @@ const EditColumnsModal = ({
         )
       }
     ],
-    [t]
+    [t, sqlTypes]
   );
 
   return (
@@ -153,6 +182,9 @@ const EditColumnsModal = ({
       onOk={handleDone}
       width={800}
     >
+      {typeError && (
+        <div style={{ color: 'red', marginBottom: 16 }}>{typeError}</div>
+      )}
       <Table columns={modalColumns} dataSource={editRows} pagination={false} />
     </Modal>
   );
