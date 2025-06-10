@@ -29,6 +29,7 @@ import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTab
 import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL, FINISH_IMPORT_URL } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 import EditColumnsModal from './EditColumns/EditColumnsModal';
+import type { Column } from './EditColumns/EditColumnsModal';
 
 import './ImporterFilePreview.scss';
 
@@ -40,7 +41,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const { t } = i18nReact.useTranslation();
   const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
-  const [columns, setColumns] = useState<any[]>([]);
+  const [columns, setColumns] = useState<Column[]>([]);
   const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
 
   const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
