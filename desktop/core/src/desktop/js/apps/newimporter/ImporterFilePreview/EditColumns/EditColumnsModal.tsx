@@ -21,7 +21,7 @@ import Table from 'cuix/dist/components/Table';
 import Input from 'cuix/dist/components/Input';
 import Select from 'cuix/dist/components/Select';
 
-interface Column {
+export interface Column {
   title: string;
   dataIndex: string;
   type?: string;
@@ -41,7 +41,7 @@ interface EditColumnsModalProps {
   closeModal: () => void;
   columns: Column[];
   setColumns: (cols: Column[]) => void;
-  sample?: Record<string, any>[];
+  sample?: Record<string, unknown>[];
 }
 
 const EditColumnsModal = ({
@@ -148,7 +148,7 @@ const EditColumnsModal = ({
       open={isOpen}
       onCancel={closeModal}
       title={t('Edit Columns')}
-      cancelText={t('cancel')}
+      cancelText={t('Cancel')}
       okText={t('Done')}
       onOk={handleDone}
       width={800}
