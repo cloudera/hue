@@ -593,6 +593,7 @@ for middleware in desktop.conf.MIDDLEWARE.get():
 def is_oidc_configured():
   return 'desktop.auth.backend.OIDCBackend' in AUTHENTICATION_BACKENDS
 
+
 def only_oidc_configured():
     """
     Check if only the OIDC Auth Backend is enabled.
@@ -602,6 +603,7 @@ def only_oidc_configured():
     return all(
         backend in ('desktop.auth.backend.OIDCBackend', 'axes.backends.AxesBackend')
         for backend in AUTHENTICATION_BACKENDS)
+
 
 if is_oidc_configured():
   INSTALLED_APPS.append('mozilla_django_oidc')
