@@ -29,7 +29,12 @@ import { convertToAntdColumns, convertToDataSource, getDefaultTableName } from '
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
-import { FIle_FORMAT_URL, FILE_GUESS_HEADER, FILE_PREVIEW_URL, FINISH_IMPORT_URL } from '../api';
+import {
+  FILE_GUESS_METADATA,
+  FILE_GUESS_HEADER,
+  FILE_PREVIEW_URL,
+  FINISH_IMPORT_URL
+} from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 import EditColumnsModal from './EditColumns/EditColumnsModal';
 
@@ -63,7 +68,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     }
   });
 
-  const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FIle_FORMAT_URL, {
+  const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FILE_GUESS_METADATA, {
     params: {
       file_path: fileMetaData.path,
       import_type: fileMetaData.source

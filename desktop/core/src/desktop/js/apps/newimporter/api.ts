@@ -15,7 +15,7 @@
 // limitations under the License.
 
 export const UPLOAD_LOCAL_FILE_API_URL = '/api/v1/importer/upload/file';
-export const FIle_FORMAT_URL = '/api/v1/importer/file/guess_metadata';
-export const FILE_PREVIEW_URL = '/api/v1/importer/file/preview';
+export const FILE_GUESS_METADATA = '/api/v1/importer/file/guess_metadata';
 export const FILE_GUESS_HEADER = '/api/v1/importer/file/guess_header';
+export const FILE_PREVIEW_URL = '/api/v1/importer/file/preview';
 export const FINISH_IMPORT_URL = '/indexer/api/importer/submit';
