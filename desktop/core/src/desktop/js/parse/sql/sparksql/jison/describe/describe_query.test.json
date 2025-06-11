@@ -4,38 +4,27 @@
     "beforeCursor": "DESCRIBE QUERY SELECT age, sum(age) FROM person GROUP BY age;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "DESCRIBE QUERY WITH all_names_cte\n    AS (SELECT name from person) SELECT * FROM all_names_cte;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DESCRIBE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "QUERY",
-      "SELECT",
-      "WITH"
-    ]
+    "containsKeywords": ["QUERY", "SELECT", "WITH"]
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DESC QUERY ",
     "afterCursor": "",
     "expectedResult": {
-      "suggestKeywords": [
-        "SELECT",
-        "WITH"
-      ]
+      "suggestKeywords": ["SELECT", "WITH"]
     }
   },
   {
@@ -48,16 +37,12 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DESC SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*"
-    ]
+    "containsKeywords": ["*"]
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DESC WITH b AS (SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*"
-    ]
+    "containsKeywords": ["*"]
   }
 ]

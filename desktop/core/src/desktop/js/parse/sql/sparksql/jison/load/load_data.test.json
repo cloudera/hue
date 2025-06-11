@@ -4,9 +4,7 @@
     "beforeCursor": "LOAD DATA LOCAL INPATH '/warehouse/test_partition/c2=2/c3=3'\n    OVERWRITE INTO TABLE test_load_partition PARTITION (c2=2, c3=3);",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -15,9 +13,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "LOAD"
-    ],
+    "containsKeywords": ["LOAD"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -28,10 +24,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "DATA INPATH",
-        "DATA LOCAL INPATH"
-      ]
+      "suggestKeywords": ["DATA INPATH", "DATA LOCAL INPATH"]
     }
   },
   {
@@ -40,10 +33,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "INPATH",
-        "LOCAL INPATH"
-      ]
+      "suggestKeywords": ["INPATH", "LOCAL INPATH"]
     }
   },
   {
@@ -52,9 +42,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "INPATH"
-      ]
+      "suggestKeywords": ["INPATH"]
     }
   },
   {
@@ -96,10 +84,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "INTO TABLE",
-        "OVERWRITE INTO TABLE"
-      ]
+      "suggestKeywords": ["INTO TABLE", "OVERWRITE INTO TABLE"]
     }
   },
   {
@@ -108,10 +93,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "INTO TABLE",
-        "OVERWRITE INTO TABLE"
-      ]
+      "suggestKeywords": ["INTO TABLE", "OVERWRITE INTO TABLE"]
     }
   },
   {
@@ -120,9 +102,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "INTO TABLE"
-      ]
+      "suggestKeywords": ["INTO TABLE"]
     }
   },
   {
@@ -131,9 +111,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TABLE"
-      ]
+      "suggestKeywords": ["TABLE"]
     }
   },
   {
@@ -142,9 +120,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TABLE"
-      ]
+      "suggestKeywords": ["TABLE"]
     }
   },
   {
@@ -180,9 +156,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PARTITION"
-      ]
+      "suggestKeywords": ["PARTITION"]
     }
   },
   {

@@ -3,9 +3,7 @@
     "namePrefix": "should not report errors",
     "beforeCursor": "TRUNCATE TABLE baa.boo;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false
@@ -17,9 +15,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": true,
-      "suggestKeywords": [
-        "TABLE"
-      ]
+      "suggestKeywords": ["TABLE"]
     }
   },
   {
@@ -32,9 +28,7 @@
       "suggestDatabases": {
         "appendDot": true
       },
-      "suggestKeywords": [
-        "IF EXISTS"
-      ]
+      "suggestKeywords": ["IF EXISTS"]
     }
   }
 ]

@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DROP ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TABLE"
-    ],
+    "containsKeywords": ["TABLE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -14,9 +12,7 @@
     "namePrefix": "should not report errors",
     "beforeCursor": "DROP TABLE db.tbl PURGE;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false
@@ -31,9 +27,7 @@
       "suggestTables": {
         "onlyTables": true
       },
-      "suggestKeywords": [
-        "IF EXISTS"
-      ],
+      "suggestKeywords": ["IF EXISTS"],
       "suggestDatabases": {
         "appendDot": true
       }
@@ -61,9 +55,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {

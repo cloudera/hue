@@ -4,9 +4,7 @@
     "beforeCursor": "ADD ARCHIVE /tmp/test;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -16,9 +14,7 @@
     "beforeCursor": "ADD ARCHIVE \"/path/to/file/abc.txt\";",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -28,9 +24,7 @@
     "beforeCursor": "ADD ARCHIVE '/path/to/file with space/abc.txt';",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -39,9 +33,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ADD ",
     "afterCursor": "",
-    "containsKeywords": [
-      "ARCHIVE"
-    ],
+    "containsKeywords": ["ARCHIVE"],
     "expectedResult": {
       "lowerCase": false
     }

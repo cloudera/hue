@@ -15,12 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import re
 import json
 import logging
-import zipfile
+import os
+import re
 import tempfile
+import zipfile
 from builtins import map
 from datetime import datetime
 from io import StringIO as string_io
@@ -28,7 +28,7 @@ from io import StringIO as string_io
 from celery.app.control import Control
 from django.core import management
 from django.db import transaction
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.html import escape
 from django.utils.translation import gettext as _
@@ -48,10 +48,11 @@ from desktop.conf import (
   ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_SHARING,
   ENABLE_WORKFLOW_CREATION_ACTION,
-  TASK_SERVER_V2,
   get_clusters,
+  IMPORTER,
+  TASK_SERVER_V2,
 )
-from desktop.lib.conf import GLOBAL_CONFIG, BoundContainer, is_anonymous
+from desktop.lib.conf import BoundContainer, GLOBAL_CONFIG, is_anonymous
 from desktop.lib.connectors.models import Connector
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -60,16 +61,16 @@ from desktop.lib.i18n import force_unicode, smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.log import DEFAULT_LOG_DIR
 from desktop.models import (
+  __paginate,
+  _get_gist_document,
   Directory,
   Document,
   Document2,
   FilesystemException,
-  UserPreferences,
-  __paginate,
-  _get_gist_document,
   get_cluster_config,
   get_user_preferences,
   set_user_preferences,
+  UserPreferences,
   uuid_default,
 )
 from desktop.views import _get_config_errors, get_banner_message, serve_403_error
@@ -91,7 +92,7 @@ from metadata.catalog_api import (
   search_entities_interactive as metadata_search_entities_interactive,
 )
 from metadata.conf import has_catalog
-from notebook.connectors.base import Notebook, get_interpreter
+from notebook.connectors.base import get_interpreter, Notebook
 from notebook.management.commands import notebook_setup
 from pig.management.commands import pig_setup
 from search.management.commands import search_setup
@@ -132,19 +133,41 @@ def get_banners(request):
 
 @api_error_handler
 def get_config(request):
+  """
+  Returns Hue application's config information.
+  Includes settings for various components like storage, task server, importer, etc.
+  """
+  # Get base cluster configuration
   config = get_cluster_config(request.user)
-  config['hue_config']['is_admin'] = is_admin(request.user)
-  config['hue_config']['is_yarn_enabled'] = is_yarn()
-  config['hue_config']['enable_task_server'] = TASK_SERVER_V2.ENABLED.get()
-  config['hue_config']['enable_workflow_creation_action'] = ENABLE_WORKFLOW_CREATION_ACTION.get()
-  config['storage_browser']['enable_chunked_file_upload'] = ENABLE_CHUNKED_FILE_UPLOADER.get()
-  config['storage_browser']['enable_new_storage_browser'] = ENABLE_NEW_STORAGE_BROWSER.get()
-  config['storage_browser']['restrict_file_extensions'] = RESTRICT_FILE_EXTENSIONS.get()
-  config['storage_browser']['concurrent_max_connection'] = CONCURRENT_MAX_CONNECTIONS.get()
-  config['storage_browser']['file_upload_chunk_size'] = FILE_UPLOAD_CHUNK_SIZE.get()
-  config['storage_browser']['enable_file_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
-  config['storage_browser']['max_file_editor_size'] = MAX_FILEEDITOR_SIZE
-  config['storage_browser']['enable_extract_uploaded_archive'] = ENABLE_EXTRACT_UPLOADED_ARCHIVE.get()
+
+  # Core application configuration
+  config['hue_config'] = {
+    'is_admin': is_admin(request.user),
+    'is_yarn_enabled': is_yarn(),
+    'enable_task_server': TASK_SERVER_V2.ENABLED.get(),
+    'enable_workflow_creation_action': ENABLE_WORKFLOW_CREATION_ACTION.get(),
+  }
+
+  # Storage browser configuration
+  config['storage_browser'] = {
+    'enable_chunked_file_upload': ENABLE_CHUNKED_FILE_UPLOADER.get(),
+    'enable_new_storage_browser': ENABLE_NEW_STORAGE_BROWSER.get(),
+    'restrict_file_extensions': RESTRICT_FILE_EXTENSIONS.get(),
+    'concurrent_max_connection': CONCURRENT_MAX_CONNECTIONS.get(),
+    'file_upload_chunk_size': FILE_UPLOAD_CHUNK_SIZE.get(),
+    'enable_file_download_button': SHOW_DOWNLOAD_BUTTON.get(),
+    'max_file_editor_size': MAX_FILEEDITOR_SIZE,
+    'enable_extract_uploaded_archive': ENABLE_EXTRACT_UPLOADED_ARCHIVE.get(),
+  }
+
+  # Importer configuration
+  config['importer'] = {
+    'is_enabled': IMPORTER.IS_ENABLED.get(),
+    'restrict_local_file_extensions': IMPORTER.RESTRICT_LOCAL_FILE_EXTENSIONS.get(),
+    'max_local_file_size_upload_limit': IMPORTER.MAX_LOCAL_FILE_SIZE_UPLOAD_LIMIT.get(),
+  }
+
+  # Other general configuration
   config['clusters'] = list(get_clusters(request.user).values())
   config['documents'] = {'types': list(Document2.objects.documents(user=request.user).order_by().values_list('type', flat=True).distinct())}
   config['status'] = 0
@@ -624,7 +647,7 @@ def copy_document(request):
 
   # Import workspace for all oozie jobs
   if document.type == 'oozie-workflow2' or document.type == 'oozie-bundle2' or document.type == 'oozie-coordinator2':
-    from oozie.models2 import Bundle, Coordinator, Workflow, _import_workspace
+    from oozie.models2 import _import_workspace, Bundle, Coordinator, Workflow
     # Update the name field in the json 'data' field
     if document.type == 'oozie-workflow2':
       workflow = Workflow(document=document)
@@ -998,7 +1021,7 @@ def import_documents(request):
       documents = json.loads(request.POST.get('documents'))
 
     documents = json.loads(documents)
-  except ValueError as e:
+  except ValueError:
     raise PopupException(_('Failed to import documents, the file does not contain valid JSON.'))
 
   # Validate documents
@@ -1112,7 +1135,7 @@ def gist_create(request):
   statement = request.POST.get('statement', '')
   gist_type = request.POST.get('doc_type', 'hive')
   name = request.POST.get('name', '')
-  description = request.POST.get('description', '')
+  _ = request.POST.get('description', '')
 
   response = _gist_create(request.get_host(), request.is_secure(), request.user, statement, gist_type, name)
 
@@ -1333,7 +1356,7 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
       doc['pk'] = existing_doc.pk
     else:
       create_new = True
-  except FilesystemException as e:
+  except FilesystemException:
     create_new = True
 
   if create_new:

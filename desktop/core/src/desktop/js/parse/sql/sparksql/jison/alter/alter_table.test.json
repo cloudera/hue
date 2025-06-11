@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TABLE"
-    ],
+    "containsKeywords": ["TABLE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -41,10 +39,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "PARTITION",
-      "ADD"
-    ],
+    "containsKeywords": ["PARTITION", "ADD"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -53,10 +48,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo.bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "PARTITION",
-      "ADD"
-    ],
+    "containsKeywords": ["PARTITION", "ADD"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -65,10 +57,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "RENAME TO",
-      "PARTITION"
-    ],
+    "containsKeywords": ["RENAME TO", "PARTITION"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -77,9 +66,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo RENAME ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TO"
-    ],
+    "containsKeywords": ["TO"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -117,9 +104,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TO"
-      ]
+      "suggestKeywords": ["TO"]
     }
   },
   {
@@ -128,9 +113,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PARTITION"
-      ]
+      "suggestKeywords": ["PARTITION"]
     }
   },
   {
@@ -164,9 +147,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "ADD COLUMNS"
-    ],
+    "containsKeywords": ["ADD COLUMNS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -175,9 +156,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo ADD ",
     "afterCursor": "",
-    "containsKeywords": [
-      "COLUMNS"
-    ],
+    "containsKeywords": ["COLUMNS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -186,9 +165,7 @@
     "namePrefix": "should suggest column types",
     "beforeCursor": "ALTER TABLE foo ADD COLUMNS (a ",
     "afterCursor": "",
-    "containsKeywords": [
-      "DEC"
-    ],
+    "containsKeywords": ["DEC"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -197,10 +174,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "DROP COLUMN",
-      "DROP COLUMNS"
-    ],
+    "containsKeywords": ["DROP COLUMN", "DROP COLUMNS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -209,10 +183,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo DROP ",
     "afterCursor": "",
-    "containsKeywords": [
-      "COLUMN",
-      "COLUMNS"
-    ],
+    "containsKeywords": ["COLUMN", "COLUMNS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -278,9 +249,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "RENAME COLUMN"
-    ],
+    "containsKeywords": ["RENAME COLUMN"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -289,9 +258,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo RENAME ",
     "afterCursor": "",
-    "containsKeywords": [
-      "COLUMN"
-    ],
+    "containsKeywords": ["COLUMN"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -321,21 +288,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TO"
-      ]
+      "suggestKeywords": ["TO"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "ALTER",
-      "CHANGE",
-      "ALTER COLUMN",
-      "CHANGE COLUMN"
-    ],
+    "containsKeywords": ["ALTER", "CHANGE", "ALTER COLUMN", "CHANGE COLUMN"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -357,9 +317,7 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "COLUMN"
-      ]
+      "suggestKeywords": ["COLUMN"]
     }
   },
   {
@@ -379,9 +337,7 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "COLUMN"
-      ]
+      "suggestKeywords": ["COLUMN"]
     }
   },
   {
@@ -426,9 +382,7 @@
     "namePrefix": "should suggest types",
     "beforeCursor": "ALTER TABLE bar CHANGE foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "BIGINT"
-    ],
+    "containsKeywords": ["BIGINT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -437,9 +391,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "REPLACE COLUMNS"
-    ],
+    "containsKeywords": ["REPLACE COLUMNS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -448,9 +400,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar REPLACE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "COLUMNS"
-    ],
+    "containsKeywords": ["COLUMNS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -459,9 +409,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar PARTITION (a=1) REPLACE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "COLUMNS"
-    ],
+    "containsKeywords": ["COLUMNS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -470,10 +418,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "ADD",
-      "ADD IF NOT EXISTS"
-    ],
+    "containsKeywords": ["ADD", "ADD IF NOT EXISTS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -484,9 +429,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "NOT EXISTS"
-      ]
+      "suggestKeywords": ["NOT EXISTS"]
     }
   },
   {
@@ -495,9 +438,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
@@ -506,19 +447,14 @@
     "afterCursor": " (PARTITION (a=1));",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF NOT EXISTS"
-      ]
+      "suggestKeywords": ["IF NOT EXISTS"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "DROP",
-      "DROP IF EXISTS"
-    ],
+    "containsKeywords": ["DROP", "DROP IF EXISTS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -527,10 +463,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar DROP ",
     "afterCursor": "",
-    "containsKeywords": [
-      "IF EXISTS",
-      "PARTITION"
-    ],
+    "containsKeywords": ["IF EXISTS", "PARTITION"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -541,9 +474,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
@@ -552,9 +483,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PARTITION"
-      ]
+      "suggestKeywords": ["PARTITION"]
     }
   },
   {
@@ -563,20 +492,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PURGE"
-      ]
+      "suggestKeywords": ["PURGE"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SET",
-      "SET TBLPROPERTIES",
-      "UNSET TBLPROPERTIES"
-    ],
+    "containsKeywords": ["SET", "SET TBLPROPERTIES", "UNSET TBLPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -585,9 +508,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar SET ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TBLPROPERTIES"
-    ],
+    "containsKeywords": ["TBLPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -596,9 +517,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar UNSET ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TBLPROPERTIES"
-    ],
+    "containsKeywords": ["TBLPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -609,9 +528,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF EXISTS"
-      ]
+      "suggestKeywords": ["IF EXISTS"]
     }
   },
   {
@@ -620,20 +537,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SET",
-      "SET SERDE",
-      "SET SERDEPROPERTIES"
-    ],
+    "containsKeywords": ["SET", "SET SERDE", "SET SERDEPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -642,10 +553,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar SET ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SERDE",
-      "SERDEPROPERTIES"
-    ],
+    "containsKeywords": ["SERDE", "SERDEPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -654,11 +562,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar PARTITION (a=1) ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SET",
-      "SET SERDE",
-      "SET SERDEPROPERTIES"
-    ],
+    "containsKeywords": ["SET", "SET SERDE", "SET SERDEPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -667,10 +571,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar PARTITION (a=1) SET ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SERDE",
-      "SERDEPROPERTIES"
-    ],
+    "containsKeywords": ["SERDE", "SERDEPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -681,9 +582,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "WITH SERDEPROPERTIES"
-      ]
+      "suggestKeywords": ["WITH SERDEPROPERTIES"]
     }
   },
   {
@@ -692,20 +591,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SERDEPROPERTIES"
-      ]
+      "suggestKeywords": ["SERDEPROPERTIES"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SET",
-      "SET FILEFORMAT",
-      "SET LOCATION"
-    ],
+    "containsKeywords": ["SET", "SET FILEFORMAT", "SET LOCATION"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -714,11 +607,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar PARTITION (a=1) ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SET",
-      "SET FILEFORMAT",
-      "SET LOCATION"
-    ],
+    "containsKeywords": ["SET", "SET FILEFORMAT", "SET LOCATION"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -727,10 +616,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar SET ",
     "afterCursor": "",
-    "containsKeywords": [
-      "FILEFORMAT",
-      "LOCATION"
-    ],
+    "containsKeywords": ["FILEFORMAT", "LOCATION"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -739,10 +625,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar PARTITION (a=1) SET ",
     "afterCursor": "",
-    "containsKeywords": [
-      "FILEFORMAT",
-      "LOCATION"
-    ],
+    "containsKeywords": ["FILEFORMAT", "LOCATION"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -751,9 +634,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar SET FILEFORMAT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "PARQUET"
-    ],
+    "containsKeywords": ["PARQUET"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -762,9 +643,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "RECOVER PARTITIONS"
-    ],
+    "containsKeywords": ["RECOVER PARTITIONS"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -773,9 +652,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER TABLE bar RECOVER ",
     "afterCursor": "",
-    "containsKeywords": [
-      "PARTITIONS"
-    ],
+    "containsKeywords": ["PARTITIONS"],
     "expectedResult": {
       "lowerCase": false
     }

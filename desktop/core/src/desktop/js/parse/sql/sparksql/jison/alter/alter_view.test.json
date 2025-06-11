@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER ",
     "afterCursor": "",
-    "containsKeywords": [
-      "VIEW"
-    ],
+    "containsKeywords": ["VIEW"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -44,9 +42,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER VIEW foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SET TBLPROPERTIES"
-    ],
+    "containsKeywords": ["SET TBLPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -55,9 +51,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER VIEW foo.bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SET TBLPROPERTIES"
-    ],
+    "containsKeywords": ["SET TBLPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -66,9 +60,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER VIEW foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "RENAME TO"
-    ],
+    "containsKeywords": ["RENAME TO"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -77,9 +69,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER VIEW foo RENAME ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TO"
-    ],
+    "containsKeywords": ["TO"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -118,10 +108,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER VIEW bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SET TBLPROPERTIES",
-      "UNSET TBLPROPERTIES"
-    ],
+    "containsKeywords": ["SET TBLPROPERTIES", "UNSET TBLPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -130,9 +117,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER VIEW bar SET ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TBLPROPERTIES"
-    ],
+    "containsKeywords": ["TBLPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -141,9 +126,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER VIEW bar UNSET ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TBLPROPERTIES"
-    ],
+    "containsKeywords": ["TBLPROPERTIES"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -154,9 +137,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF EXISTS"
-      ]
+      "suggestKeywords": ["IF EXISTS"]
     }
   },
   {
@@ -165,18 +146,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER VIEW bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "AS SELECT"
-    ],
+    "containsKeywords": ["AS SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -187,18 +164,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER VIEW bar AS SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*"
-    ],
+    "containsKeywords": ["*"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {

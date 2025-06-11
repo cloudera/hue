@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -110,9 +108,7 @@
     "namePrefix": "should suggest tables and databases",
     "beforeCursor": "SELECT * ",
     "afterCursor": "",
-    "containsKeywords": [
-      "FROM"
-    ],
+    "containsKeywords": ["FROM"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -128,9 +124,7 @@
     "namePrefix": "should suggest tables and databases",
     "beforeCursor": "SELECT *\r\n",
     "afterCursor": "",
-    "containsKeywords": [
-      "FROM"
-    ],
+    "containsKeywords": ["FROM"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -154,12 +148,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT foo, bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "AS",
-      "+",
-      "FROM",
-      "DIV"
-    ],
+    "containsKeywords": ["AS", "+", "FROM", "DIV"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -175,10 +164,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT foo AS a, bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "AS",
-      "+"
-    ],
+    "containsKeywords": ["AS", "+"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -291,9 +277,7 @@
     "namePrefix": "should suggest databases or tables",
     "beforeCursor": "SELECT * fr",
     "afterCursor": "",
-    "containsKeywords": [
-      "FROM"
-    ],
+    "containsKeywords": ["FROM"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -310,9 +294,7 @@
     "beforeCursor": "SELECT 4 / 2; ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -322,9 +304,7 @@
     "beforeCursor": "SELECT 4 DIV 2; ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -334,9 +314,7 @@
     "beforeCursor": "SELECT bla NOT RLIKE 'ble', ble NOT REGEXP 'b' FROM tbl; ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -346,9 +324,7 @@
     "beforeCursor": "SELECT * FROM tbl limit ${limit=20}; ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -357,10 +333,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT IF(baa, boo, bee) AS b, ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "*",
-      "CASE"
-    ],
+    "containsKeywords": ["*", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -394,10 +367,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT IF(baa > 2, boo, bee) AS b, ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "*",
-      "CASE"
-    ],
+    "containsKeywords": ["*", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -432,9 +402,7 @@
     "beforeCursor": "select testUdf(not id), cos(-1), sin(1+id) from autocomp_test;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "locations": [
         {
@@ -482,9 +450,7 @@
             }
           ],
           "expression": {
-            "types": [
-              "BOOLEAN"
-            ],
+            "types": ["BOOLEAN"],
             "text": "not id"
           }
         },
@@ -538,9 +504,7 @@
             }
           ],
           "expression": {
-            "types": [
-              "NUMBER"
-            ],
+            "types": ["NUMBER"],
             "text": "- 1"
           }
         },
@@ -570,9 +534,7 @@
             }
           ],
           "expression": {
-            "types": [
-              "NUMBER"
-            ],
+            "types": ["NUMBER"],
             "text": "1 + id"
           }
         },
@@ -643,9 +605,7 @@
     "beforeCursor": "select count(*), tst.count, avg (id), avg from autocomp_test tst;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "locations": [
         {
@@ -761,9 +721,7 @@
             }
           ],
           "expression": {
-            "types": [
-              "COLREF"
-            ],
+            "types": ["COLREF"],
             "columnReference": [
               {
                 "name": "id"
@@ -879,11 +837,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -906,11 +860,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT ",
     "afterCursor": ";\n\nSELECT * FROM foo;",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -933,11 +883,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT * FROM foo;\n\nSELECT ",
     "afterCursor": ";",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -960,11 +906,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT ",
     "afterCursor": ";\n\nSELECT * FROM foo boo;",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -987,11 +929,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT * FROM foo boo;\n\nSELECT ",
     "afterCursor": ";",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -1014,11 +952,7 @@
     "namePrefix": "should suggest lowerCase",
     "beforeCursor": "select ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": true,
       "suggestAggregateFunctions": {
@@ -1041,14 +975,8 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT ALL ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*",
-      "CASE"
-    ],
-    "doesNotContainKeywords": [
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "CASE"],
+    "doesNotContainKeywords": ["ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -1071,13 +999,8 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT DISTINCT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*"
-    ],
-    "doesNotContainKeywords": [
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*"],
+    "doesNotContainKeywords": ["ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -1096,13 +1019,8 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT DISTINCT ",
     "afterCursor": " a, b, c FROM tbl",
-    "containsKeywords": [
-      "*"
-    ],
-    "doesNotContainKeywords": [
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*"],
+    "doesNotContainKeywords": ["ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -1251,11 +1169,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT ",
     "afterCursor": " FROM tableA;",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -1322,11 +1236,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT ",
     "afterCursor": " boo FROM tableA;",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -1393,11 +1303,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT ",
     "afterCursor": " FROM testWHERE",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -1431,9 +1337,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT (bl",
     "afterCursor": " AND boo FROM testWHERE",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -1455,9 +1359,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT (bla",
     "afterCursor": " AND boo FROM testWHERE",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -1479,11 +1381,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT ",
     "afterCursor": " FROM testON",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -1517,11 +1415,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT ",
     "afterCursor": " FROM transactions",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -1555,11 +1449,7 @@
     "namePrefix": "should suggest aliases",
     "beforeCursor": "SELECT ",
     "afterCursor": " FROM testTableA tta, testTableB",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -1619,9 +1509,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT TTA.",
     "afterCursor": " FROM testTableA tta",
-    "containsKeywords": [
-      "*"
-    ],
+    "containsKeywords": ["*"],
     "expectedResult": {
       "lowerCase": false,
       "suggestColumns": {
@@ -1642,9 +1530,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT tta.",
     "afterCursor": " FROM testTableA TTA",
-    "containsKeywords": [
-      "*"
-    ],
+    "containsKeywords": ["*"],
     "expectedResult": {
       "lowerCase": false,
       "suggestColumns": {
@@ -1665,11 +1551,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT ",
     "afterCursor": " FROM db.tbl1, db.tbl2",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -1739,11 +1621,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "select ",
     "afterCursor": " from database_two.testTable",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": true,
       "suggestAggregateFunctions": {
@@ -1783,11 +1661,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "select ",
     "afterCursor": " from `database one`.`test table`",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": true,
       "suggestAggregateFunctions": {
@@ -1899,10 +1773,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, ",
     "afterCursor": " FROM tableA;",
-    "containsKeywords": [
-      "*",
-      "CASE"
-    ],
+    "containsKeywords": ["*", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -1936,10 +1807,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a,",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "*",
-      "CASE"
-    ],
+    "containsKeywords": ["*", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -1973,10 +1841,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT *, ",
     "afterCursor": " FROM tableA;",
-    "containsKeywords": [
-      "*",
-      "CASE"
-    ],
+    "containsKeywords": ["*", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -2010,10 +1875,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT a ",
     "afterCursor": " FROM tableA;",
-    "containsKeywords": [
-      "AS",
-      "="
-    ],
+    "containsKeywords": ["AS", "="],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -2033,10 +1895,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT a ",
     "afterCursor": ", FROM tableA;",
-    "containsKeywords": [
-      "AS",
-      "="
-    ],
+    "containsKeywords": ["AS", "="],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -2056,10 +1915,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT a, b ",
     "afterCursor": " FROM tableA;",
-    "containsKeywords": [
-      "AS",
-      "="
-    ],
+    "containsKeywords": ["AS", "="],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -2079,10 +1935,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT a ",
     "afterCursor": ", b, c AS foo, d FROM tableA;",
-    "containsKeywords": [
-      "AS",
-      "="
-    ],
+    "containsKeywords": ["AS", "="],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -2102,11 +1955,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT ",
     "afterCursor": " a, cast(b as int), c, d FROM testTable WHERE a = 'US' AND b >= 998 ORDER BY c DESC LIMIT 15",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -2140,10 +1989,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, ",
     "afterCursor": ",c, d FROM testTable WHERE a = 'US' AND b >= 998 ORDER BY c DESC LIMIT 15",
-    "containsKeywords": [
-      "*",
-      "CASE"
-    ],
+    "containsKeywords": ["*", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -2400,11 +2246,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT ",
     "afterCursor": " FROM ${some_variable};",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -2438,10 +2280,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM testTable WHERE ${some_variable} ",
     "afterCursor": "",
-    "containsKeywords": [
-      "<",
-      "BETWEEN"
-    ],
+    "containsKeywords": ["<", "BETWEEN"],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -2485,22 +2324,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM testTable WHERE ${some_variable} + 1 = ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE",
-      "NULL"
-    ],
+    "containsKeywords": ["CASE", "NULL"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -2518,9 +2350,7 @@
     "beforeCursor": "SELECT row_number() OVER (PARTITION BY a) FROM testTable;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2530,9 +2360,7 @@
     "beforeCursor": "SELECT COUNT(DISTINCT a) OVER (PARTITION by c) FROM testTable;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2541,9 +2369,7 @@
     "namePrefix": "should suggest analytical functions",
     "beforeCursor": "SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*"
-    ],
+    "containsKeywords": ["*"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -2566,9 +2392,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT row_number() ",
     "afterCursor": "",
-    "containsKeywords": [
-      "OVER"
-    ],
+    "containsKeywords": ["OVER"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2577,9 +2401,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT row_number() ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "OVER"
-    ],
+    "containsKeywords": ["OVER"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2588,9 +2410,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT row_number() ",
     "afterCursor": ", b, c FROM testTable",
-    "containsKeywords": [
-      "OVER"
-    ],
+    "containsKeywords": ["OVER"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2599,9 +2419,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT count(DISTINCT a) ",
     "afterCursor": "",
-    "containsKeywords": [
-      "OVER"
-    ],
+    "containsKeywords": ["OVER"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -2617,9 +2435,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT count(DISTINCT a) ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "OVER"
-    ],
+    "containsKeywords": ["OVER"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2628,9 +2444,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT count(DISTINCT a) ",
     "afterCursor": ", b, c FROM testTable",
-    "containsKeywords": [
-      "OVER"
-    ],
+    "containsKeywords": ["OVER"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2639,9 +2453,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT row_number() OVER ( ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "PARTITION BY"
-    ],
+    "containsKeywords": ["PARTITION BY"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2650,9 +2462,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT row_number() OVER (PARTITION ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "BY"
-    ],
+    "containsKeywords": ["BY"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2661,9 +2471,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT row_number() OVER (PARTITION BY a, b ORDER ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "BY"
-    ],
+    "containsKeywords": ["BY"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2672,9 +2480,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT row_number() OVER (ORDER BY ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -2699,9 +2505,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT row_number() OVER (ORDER BY ",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -2726,10 +2530,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT row_number() OVER (ORDER BY a ",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "ASC",
-      "DESC"
-    ],
+    "containsKeywords": ["ASC", "DESC"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2738,9 +2539,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT row_number() OVER (PARTITION BY ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -2765,9 +2564,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT row_number() OVER (PARTITION BY a, ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -2792,11 +2589,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT row_number() OVER (PARTITION BY a ORDER BY b ",
     "afterCursor": "",
-    "containsKeywords": [
-      "ASC",
-      "ROWS BETWEEN",
-      "RANGE BETWEEN"
-    ],
+    "containsKeywords": ["ASC", "ROWS BETWEEN", "RANGE BETWEEN"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2807,10 +2600,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "CURRENT ROW",
-        "UNBOUNDED PRECEDING"
-      ]
+      "suggestKeywords": ["CURRENT ROW", "UNBOUNDED PRECEDING"]
     }
   },
   {
@@ -2819,9 +2609,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PRECEDING"
-      ]
+      "suggestKeywords": ["PRECEDING"]
     }
   },
   {
@@ -2830,9 +2618,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PRECEDING"
-      ]
+      "suggestKeywords": ["PRECEDING"]
     }
   },
   {
@@ -2841,9 +2627,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "ROW"
-      ]
+      "suggestKeywords": ["ROW"]
     }
   },
   {
@@ -2852,9 +2636,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "AND"
-      ]
+      "suggestKeywords": ["AND"]
     }
   },
   {
@@ -2863,9 +2645,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "AND"
-      ]
+      "suggestKeywords": ["AND"]
     }
   },
   {
@@ -2874,9 +2654,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "AND"
-      ]
+      "suggestKeywords": ["AND"]
     }
   },
   {
@@ -2885,10 +2663,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "CURRENT ROW",
-        "UNBOUNDED FOLLOWING"
-      ]
+      "suggestKeywords": ["CURRENT ROW", "UNBOUNDED FOLLOWING"]
     }
   },
   {
@@ -2897,10 +2672,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "CURRENT ROW",
-        "UNBOUNDED FOLLOWING"
-      ]
+      "suggestKeywords": ["CURRENT ROW", "UNBOUNDED FOLLOWING"]
     }
   },
   {
@@ -2909,10 +2681,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "CURRENT ROW",
-        "UNBOUNDED FOLLOWING"
-      ]
+      "suggestKeywords": ["CURRENT ROW", "UNBOUNDED FOLLOWING"]
     }
   },
   {
@@ -2921,9 +2690,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "ROW"
-      ]
+      "suggestKeywords": ["ROW"]
     }
   },
   {
@@ -2932,9 +2699,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "FOLLOWING"
-      ]
+      "suggestKeywords": ["FOLLOWING"]
     }
   },
   {
@@ -2943,19 +2708,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "FOLLOWING"
-      ]
+      "suggestKeywords": ["FOLLOWING"]
     }
   },
   {
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT COUNT(*) ",
     "afterCursor": "",
-    "containsKeywords": [
-      "AS",
-      "+"
-    ],
+    "containsKeywords": ["AS", "+"],
     "expectedResult": {
       "lowerCase": false,
       "suggestTables": {
@@ -2971,10 +2731,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT COUNT(foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "AND",
-      "="
-    ],
+    "containsKeywords": ["AND", "="],
     "expectedResult": {
       "lowerCase": false
     }
@@ -2983,9 +2740,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT COUNT(foo, ",
     "afterCursor": ") FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -3007,9 +2762,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT COUNT(foo, bl",
     "afterCursor": ",bla) FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -3031,10 +2784,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT COUNT(foo ",
     "afterCursor": ", bar)",
-    "containsKeywords": [
-      "AND",
-      "="
-    ],
+    "containsKeywords": ["AND", "="],
     "expectedResult": {
       "lowerCase": false
     }
@@ -3043,22 +2793,16 @@
     "namePrefix": "should suggest columns and values",
     "beforeCursor": "SELECT COUNT(foo, bl = ",
     "afterCursor": ",bla) FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "hasErrors": false,
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -3619,9 +3363,7 @@
     "namePrefix": "should suggest functions",
     "beforeCursor": "SELECT CAST(",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {}
@@ -3631,9 +3373,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CAST(",
     "afterCursor": " FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -3655,9 +3395,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CAST(bla",
     "afterCursor": " FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -3679,9 +3417,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CAST(",
     "afterCursor": " AS FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -3703,9 +3439,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CAST(",
     "afterCursor": " AS INT FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -3727,9 +3461,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CAST(",
     "afterCursor": " AS STRING) FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -3751,9 +3483,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CAST(bla",
     "afterCursor": " AS STRING) FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -3775,10 +3505,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT CAST(bla ",
     "afterCursor": "",
-    "containsKeywords": [
-      "AS",
-      "AND"
-    ],
+    "containsKeywords": ["AS", "AND"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -3787,10 +3514,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT CAST(bla ",
     "afterCursor": " FROM bar;",
-    "containsKeywords": [
-      "AS",
-      "="
-    ],
+    "containsKeywords": ["AS", "="],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -3810,10 +3534,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "select cast(bla as ",
     "afterCursor": "",
-    "containsKeywords": [
-      "INT",
-      "STRING"
-    ],
+    "containsKeywords": ["INT", "STRING"],
     "expectedResult": {
       "lowerCase": true
     }
@@ -3822,10 +3543,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT CAST(bla AS ",
     "afterCursor": " FROM bar;",
-    "containsKeywords": [
-      "INT",
-      "STRING"
-    ],
+    "containsKeywords": ["INT", "STRING"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -3834,10 +3552,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT CAST(bla AS ST",
     "afterCursor": ") FROM bar;",
-    "containsKeywords": [
-      "INT",
-      "STRING"
-    ],
+    "containsKeywords": ["INT", "STRING"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -3846,10 +3561,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT CAST(AS ",
     "afterCursor": "",
-    "containsKeywords": [
-      "INT",
-      "STRING"
-    ],
+    "containsKeywords": ["INT", "STRING"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -3858,9 +3570,7 @@
     "namePrefix": "should not report errors for",
     "beforeCursor": "SELECT db.customUdf(col) FROM bar;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
@@ -3935,9 +3645,7 @@
             }
           ],
           "expression": {
-            "types": [
-              "COLREF"
-            ],
+            "types": ["COLREF"],
             "columnReference": [
               {
                 "name": "col"
@@ -4010,9 +3718,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT db.customUdf(",
     "afterCursor": " FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4038,9 +3744,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT db.customUdf(1, ",
     "afterCursor": " FROM bar;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4066,10 +3770,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT AVG(",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "DISTINCT",
-      "CASE"
-    ],
+    "containsKeywords": ["DISTINCT", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4095,11 +3796,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT COUNT(",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "*",
-      "DISTINCT",
-      "CASE"
-    ],
+    "containsKeywords": ["*", "DISTINCT", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4121,10 +3818,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT STDDEV_POP(",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "DISTINCT",
-      "CASE"
-    ],
+    "containsKeywords": ["DISTINCT", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4150,10 +3844,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT STDDEV_SAMP(",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "DISTINCT",
-      "CASE"
-    ],
+    "containsKeywords": ["DISTINCT", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4179,10 +3870,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT SUM(",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "DISTINCT",
-      "CASE"
-    ],
+    "containsKeywords": ["DISTINCT", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4208,10 +3896,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT MAX(",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "DISTINCT",
-      "CASE"
-    ],
+    "containsKeywords": ["DISTINCT", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4237,10 +3922,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT MIN(",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "DISTINCT",
-      "CASE"
-    ],
+    "containsKeywords": ["DISTINCT", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4266,10 +3948,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT VAR_POP(",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "DISTINCT",
-      "CASE"
-    ],
+    "containsKeywords": ["DISTINCT", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4295,10 +3974,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT var_samp(",
     "afterCursor": ") FROM testTable",
-    "containsKeywords": [
-      "DISTINCT",
-      "CASE"
-    ],
+    "containsKeywords": ["DISTINCT", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4324,21 +4000,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT id, SUM(a * ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -4370,18 +4040,14 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "WHEN"
-      ]
+      "suggestKeywords": ["WHEN"]
     }
   },
   {
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN a = b AND ",
     "afterCursor": " THEN FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4403,9 +4069,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a = b AND ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4427,11 +4091,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT CASE a = b ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "WHEN",
-      "AND",
-      "<>"
-    ],
+    "containsKeywords": ["WHEN", "AND", "<>"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -4440,9 +4100,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN a = b OR ",
     "afterCursor": " THEN boo FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4464,9 +4122,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN a = b OR c THEN boo OR ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4488,21 +4144,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a =",
     "afterCursor": " WHEN c THEN d END FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -4530,21 +4180,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a =",
     "afterCursor": " WHEN c THEN d ELSE e END FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -4572,10 +4216,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a = c WHEN c THEN d ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "END",
-      "<>"
-    ],
+    "containsKeywords": ["END", "<>"],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -4595,21 +4236,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a = c WHEN c THEN d=",
     "afterCursor": " ELSE FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -4637,13 +4272,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT CASE a = c WHEN c THEN d=1 ",
     "afterCursor": " bla=foo FROM testTable",
-    "containsKeywords": [
-      "AND",
-      "WHEN",
-      "ELSE",
-      "END",
-      "<"
-    ],
+    "containsKeywords": ["AND", "WHEN", "ELSE", "END", "<"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -4652,12 +4281,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT CASE a = c WHEN c THEN d=1 ",
     "afterCursor": " bla=foo FROM testTable",
-    "containsKeywords": [
-      "AND",
-      "WHEN",
-      "ELSE",
-      ">"
-    ],
+    "containsKeywords": ["AND", "WHEN", "ELSE", ">"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -4666,9 +4290,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a = c WHEN c THEN d ELSE ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4690,9 +4312,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a = c WHEN c THEN d ELSE e AND ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4714,9 +4334,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE ELSE ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4753,9 +4371,7 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "WHEN"
-      ]
+      "suggestKeywords": ["WHEN"]
     }
   },
   {
@@ -4777,19 +4393,14 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "WHEN"
-      ]
+      "suggestKeywords": ["WHEN"]
     }
   },
   {
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a = c WHEN c THEN d ELSE e ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "END",
-      "="
-    ],
+    "containsKeywords": ["END", "="],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -4809,9 +4420,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN THEN boo OR ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -4835,9 +4444,7 @@
     "afterCursor": " a = b THEN FROM testTable",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "WHEN"
-      ]
+      "suggestKeywords": ["WHEN"]
     }
   },
   {
@@ -4846,9 +4453,7 @@
     "afterCursor": " a = b THEN boo FROM testTable",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "WHEN"
-      ]
+      "suggestKeywords": ["WHEN"]
     }
   },
   {
@@ -4857,9 +4462,7 @@
     "afterCursor": " THEN boo FROM testTable",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "WHEN"
-      ],
+      "suggestKeywords": ["WHEN"],
       "suggestFunctions": {},
       "suggestColumns": {
         "source": "select",
@@ -4881,9 +4484,7 @@
     "afterCursor": " boo FROM testTable",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "THEN"
-      ],
+      "suggestKeywords": ["THEN"],
       "suggestFunctions": {},
       "suggestColumns": {
         "source": "select",
@@ -4905,9 +4506,7 @@
     "afterCursor": " boo WHEN b THEN c END FROM testTable",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "THEN"
-      ],
+      "suggestKeywords": ["THEN"],
       "suggestFunctions": {},
       "suggestColumns": {
         "source": "select",
@@ -4929,9 +4528,7 @@
     "afterCursor": " boo ELSE c FROM testTable",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "THEN"
-      ],
+      "suggestKeywords": ["THEN"],
       "suggestFunctions": {},
       "suggestColumns": {
         "source": "select",
@@ -4953,9 +4550,7 @@
     "afterCursor": " boo WHEN d THEN e END FROM testTable",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "THEN"
-      ],
+      "suggestKeywords": ["THEN"],
       "suggestFunctions": {},
       "suggestColumns": {
         "source": "select",
@@ -4975,10 +4570,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT CASE a WHEN b THEN c ",
     "afterCursor": " WHEN d THEN e END FROM testTable",
-    "containsKeywords": [
-      "WHEN",
-      "<"
-    ],
+    "containsKeywords": ["WHEN", "<"],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -4998,10 +4590,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT CASE a WHEN b THEN c ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "WHEN",
-      ">"
-    ],
+    "containsKeywords": ["WHEN", ">"],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -5021,9 +4610,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN ",
     "afterCursor": " THEN FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5045,21 +4632,15 @@
     "namePrefix": "should suggest values",
     "beforeCursor": "SELECT CASE WHEN ",
     "afterCursor": " = a FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -5087,9 +4668,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN ab",
     "afterCursor": " THEN bla ELSE foo FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5111,9 +4690,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE bla WHEN ab",
     "afterCursor": " THEN bla ELSE foo END FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5135,9 +4712,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5159,9 +4734,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a WHEN ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5183,21 +4756,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN a = ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -5225,11 +4792,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN a = b ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "AND",
-      "THEN",
-      "<"
-    ],
+    "containsKeywords": ["AND", "THEN", "<"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -5238,10 +4801,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a = c WHEN c ",
     "afterCursor": " d FROM testTable",
-    "containsKeywords": [
-      "THEN",
-      ">"
-    ],
+    "containsKeywords": ["THEN", ">"],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -5261,9 +4821,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a = c WHEN c THEN ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5285,9 +4843,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE a = c WHEN c THEN ",
     "afterCursor": " g FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5309,9 +4865,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN THEN ",
     "afterCursor": " g FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5333,9 +4887,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT CASE WHEN THEN ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5357,15 +4909,11 @@
     "namePrefix": "should suggest functions for",
     "beforeCursor": "SELECT 'boo \\' baa' = ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "STRING"
-        ]
+        "types": ["STRING"]
       }
     }
   },
@@ -5373,15 +4921,11 @@
     "namePrefix": "should suggest functions",
     "beforeCursor": "SELECT \"boo \\\" baa\" = ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "STRING"
-        ]
+        "types": ["STRING"]
       }
     }
   },
@@ -5389,21 +4933,15 @@
     "namePrefix": "should suggest identifiers",
     "beforeCursor": "SELECT 1 = ",
     "afterCursor": " OR false FROM tableOne boo, tableTwo baa;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -5443,9 +4981,7 @@
       "lowerCase": false,
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "T"
-        ],
+        "types": ["T"],
         "tables": [
           {
             "identifierChain": [
@@ -5466,9 +5002,7 @@
       "lowerCase": false,
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "T"
-        ],
+        "types": ["T"],
         "tables": [
           {
             "identifierChain": [
@@ -5485,22 +5019,16 @@
     "namePrefix": "should suggest values",
     "beforeCursor": "SELECT * FROM testTable WHERE id =",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -5530,15 +5058,11 @@
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -5558,15 +5082,11 @@
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -5583,21 +5103,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT 1 < ",
     "afterCursor": " FROM testTable WHERE id = 1;",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -5614,21 +5128,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "select foo from tbl where ",
     "afterCursor": " % 2 = 0",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": true,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -5645,22 +5153,16 @@
     "namePrefix": "should suggest values",
     "beforeCursor": "SELECT * FROM testTable WHERE -id = ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -5687,9 +5189,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT greatest(1, 2, a, 4, ",
     "afterCursor": " FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5715,9 +5215,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT greatest(1, ",
     "afterCursor": ", a, 4) FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -5743,21 +5241,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT ",
     "afterCursor": " > id FROM testTable",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestColumns": {
         "source": "select",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -5785,22 +5277,16 @@
     "namePrefix": "should suggest values and columns",
     "beforeCursor": "SELECT * FROM testTable WHERE ",
     "afterCursor": " = id",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -5827,22 +5313,16 @@
     "namePrefix": "should suggest values and columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d >= ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -5869,22 +5349,16 @@
     "namePrefix": "should suggest values and columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d < ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -5911,22 +5385,16 @@
     "namePrefix": "should suggest values and columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d <= ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -5953,22 +5421,16 @@
     "namePrefix": "should suggest values and columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d <=> ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -5995,22 +5457,16 @@
     "namePrefix": "should suggest values and columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d <> ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -6037,22 +5493,16 @@
     "namePrefix": "should suggest values and columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d >= ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -6079,22 +5529,16 @@
     "namePrefix": "should suggest values and columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d > ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -6121,22 +5565,16 @@
     "namePrefix": "should suggest values and columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d != ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -6163,21 +5601,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d + 1 != ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6194,21 +5626,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE bla",
     "afterCursor": " + 1 != 3",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6225,21 +5651,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d + ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6256,21 +5676,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d - ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6287,21 +5701,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d * ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6318,21 +5726,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d / ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6349,21 +5751,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d % ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6380,21 +5776,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d | ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6411,21 +5801,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d & ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6442,21 +5826,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d ^ ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6497,15 +5875,11 @@
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -6522,10 +5896,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, c FROM testTable WHERE d ",
     "afterCursor": " RLIKE 'bla bla'",
-    "containsKeywords": [
-      "<",
-      "IN"
-    ],
+    "containsKeywords": ["<", "IN"],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -6685,14 +6056,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM foo WHERE id IS ",
     "afterCursor": "",
-    "containsKeywords": [
-      "NOT NULL",
-      "NULL",
-      "NOT TRUE",
-      "TRUE",
-      "NOT FALSE",
-      "FALSE"
-    ],
+    "containsKeywords": ["NOT NULL", "NULL", "NOT TRUE", "TRUE", "NOT FALSE", "FALSE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -6701,11 +6065,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM foo WHERE id IS NOT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "NULL",
-      "FALSE",
-      "TRUE"
-    ],
+    "containsKeywords": ["NULL", "FALSE", "TRUE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -6716,9 +6076,7 @@
     "afterCursor": " NULL",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "NOT"
-      ]
+      "suggestKeywords": ["NOT"]
     }
   },
   {
@@ -6727,9 +6085,7 @@
     "afterCursor": " FALSE",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "NOT"
-      ]
+      "suggestKeywords": ["NOT"]
     }
   },
   {
@@ -6738,9 +6094,7 @@
     "afterCursor": " TRUE",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "NOT"
-      ]
+      "suggestKeywords": ["NOT"]
     }
   },
   {
@@ -6750,15 +6104,11 @@
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "STRING"
-        ]
+        "types": ["STRING"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "STRING"
-        ],
+        "types": ["STRING"],
         "tables": [
           {
             "identifierChain": [
@@ -6775,9 +6125,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM foo WHERE id LIKE ('bla bla') ",
     "afterCursor": "",
-    "containsKeywords": [
-      "AND"
-    ],
+    "containsKeywords": ["AND"],
     "expectedResult": {
       "lowerCase": false,
       "suggestGroupBys": {
@@ -6810,9 +6158,7 @@
     "namePrefix": "should suggest identifiers",
     "beforeCursor": "SELECT * FROM foo bla, bar WHERE id IS NULL AND ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -6871,9 +6217,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM foo AS bla WHERE id IS NULL && ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -6914,9 +6258,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM foo AS bla WHERE id IS NULL OR ",
     "afterCursor": " AND 1 + 1 > 1",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -6957,9 +6299,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM foo AS bla WHERE id IS NULL || ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -7016,9 +6356,7 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "EXISTS"
-      ],
+      "suggestKeywords": ["EXISTS"],
       "suggestIdentifiers": [
         {
           "name": "bar.",
@@ -7034,15 +6372,11 @@
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "BOOLEAN"
-        ]
+        "types": ["BOOLEAN"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "BOOLEAN"
-        ],
+        "types": ["BOOLEAN"],
         "tables": [
           {
             "identifierChain": [
@@ -7081,10 +6415,7 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "EXISTS",
-        "NOT EXISTS"
-      ],
+      "suggestKeywords": ["EXISTS", "NOT EXISTS"],
       "suggestFilters": {
         "tables": [
           {
@@ -7117,10 +6448,7 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "EXISTS",
-        "NOT EXISTS"
-      ],
+      "suggestKeywords": ["EXISTS", "NOT EXISTS"],
       "suggestFilters": {
         "tables": [
           {
@@ -7138,12 +6466,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM testTable WHERE baa = 1 AND ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE",
-      "EXISTS",
-      "NOT",
-      "NULL"
-    ],
+    "containsKeywords": ["CASE", "EXISTS", "NOT", "NULL"],
     "expectedResult": {
       "lowerCase": false,
       "suggestColumns": {
@@ -7176,12 +6499,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM testTable WHERE ",
     "afterCursor": " AND baa = 1",
-    "containsKeywords": [
-      "CASE",
-      "EXISTS",
-      "NOT",
-      "NULL"
-    ],
+    "containsKeywords": ["CASE", "EXISTS", "NOT", "NULL"],
     "expectedResult": {
       "lowerCase": false,
       "suggestColumns": {
@@ -7214,12 +6532,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM testTable WHERE baa = 1 OR ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE",
-      "EXISTS",
-      "NOT",
-      "NULL"
-    ],
+    "containsKeywords": ["CASE", "EXISTS", "NOT", "NULL"],
     "expectedResult": {
       "lowerCase": false,
       "suggestColumns": {
@@ -7252,12 +6565,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM testTable WHERE ",
     "afterCursor": " OR baa = 1",
-    "containsKeywords": [
-      "CASE",
-      "EXISTS",
-      "NOT",
-      "NULL"
-    ],
+    "containsKeywords": ["CASE", "EXISTS", "NOT", "NULL"],
     "expectedResult": {
       "lowerCase": false,
       "suggestColumns": {
@@ -7305,19 +6613,14 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM testTable WHERE foo = 'bar' ",
     "afterCursor": "",
-    "containsKeywords": [
-      "AND",
-      "<"
-    ],
+    "containsKeywords": ["AND", "<"],
     "expectedResult": {
       "lowerCase": false,
       "suggestGroupBys": {
@@ -7350,10 +6653,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT a, b, c, d, e FROM tableOne WHERE c >= 9998 an",
     "afterCursor": "",
-    "containsKeywords": [
-      "AND",
-      "="
-    ],
+    "containsKeywords": ["AND", "="],
     "expectedResult": {
       "lowerCase": false,
       "suggestGroupBys": {
@@ -7386,9 +6686,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM testTable WHERE foo = 'bar' AND ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -7421,10 +6719,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a, b, \nc,\nd, ",
     "afterCursor": "\ng,\nf\nFROM testTable WHERE a > 1 AND b = 'b' ORDER BY c;",
-    "containsKeywords": [
-      "*",
-      "CASE"
-    ],
+    "containsKeywords": ["*", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -7458,9 +6753,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT a,b, ",
     "afterCursor": " c FROM testTable",
-    "containsKeywords": [
-      "*"
-    ],
+    "containsKeywords": ["*"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -7494,11 +6787,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT ",
     "afterCursor": " a, b, c FROM testTable",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -7532,10 +6821,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT a ",
     "afterCursor": ", b, c FROM testTable",
-    "containsKeywords": [
-      "AS",
-      ">"
-    ],
+    "containsKeywords": ["AS", ">"],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -7555,21 +6841,15 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM testTable WHERE ",
     "afterCursor": " = 'bar' AND ",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "STRING"
-        ]
+        "types": ["STRING"]
       },
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "STRING"
-        ],
+        "types": ["STRING"],
         "tables": [
           {
             "identifierChain": [
@@ -7586,10 +6866,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM testTable WHERE a ",
     "afterCursor": "",
-    "containsKeywords": [
-      "BETWEEN",
-      "NOT BETWEEN"
-    ],
+    "containsKeywords": ["BETWEEN", "NOT BETWEEN"],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -7633,12 +6910,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM testTable WHERE a NOT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "BETWEEN",
-      "EXISTS",
-      "IN",
-      "LIKE"
-    ],
+    "containsKeywords": ["BETWEEN", "EXISTS", "IN", "LIKE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -7647,22 +6919,16 @@
     "namePrefix": "should suggest values",
     "beforeCursor": "SELECT * FROM testTable WHERE a BETWEEN ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -7691,9 +6957,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   },
   {
@@ -7702,9 +6966,7 @@
     "afterCursor": " FROM testTable",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "*"
-      ],
+      "suggestKeywords": ["*"],
       "suggestColumns": {
         "source": "select",
         "tables": [
@@ -7725,9 +6987,7 @@
     "afterCursor": " FROM testTable tt",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "*"
-      ],
+      "suggestKeywords": ["*"],
       "suggestColumns": {
         "source": "select",
         "tables": [
@@ -7748,9 +7008,7 @@
     "afterCursor": " FROM database_two.testTable tt",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "*"
-      ],
+      "suggestKeywords": ["*"],
       "suggestColumns": {
         "source": "select",
         "tables": [
@@ -7774,9 +7032,7 @@
     "afterCursor": " FROM testTableA tta, testTableB ttb",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "*"
-      ],
+      "suggestKeywords": ["*"],
       "suggestColumns": {
         "source": "select",
         "tables": [
@@ -7797,9 +7053,7 @@
     "afterCursor": " FROM testTableA tta, testTableB ttb",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "*"
-      ],
+      "suggestKeywords": ["*"],
       "suggestColumns": {
         "source": "select",
         "tables": [
@@ -7818,12 +7072,8 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM testTable GROUP BY a ",
     "afterCursor": " LIMIT 10",
-    "doesNotContainKeywords": [
-      "LIMIT"
-    ],
-    "containsKeywords": [
-      "ORDER BY"
-    ],
+    "doesNotContainKeywords": ["LIMIT"],
+    "containsKeywords": ["ORDER BY"],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -7855,10 +7105,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM foo WHERE bar ",
     "afterCursor": "",
-    "containsKeywords": [
-      "IN",
-      "NOT IN"
-    ],
+    "containsKeywords": ["IN", "NOT IN"],
     "containsColRefKeywords": true,
     "expectedResult": {
       "lowerCase": false,
@@ -7902,9 +7149,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM foo WHERE bar NOT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "IN"
-    ],
+    "containsKeywords": ["IN"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -7915,20 +7160,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ],
+      "suggestKeywords": ["SELECT"],
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -7957,20 +7196,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": true,
-      "suggestKeywords": [
-        "SELECT"
-      ],
+      "suggestKeywords": ["SELECT"],
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -8014,22 +7247,16 @@
     "namePrefix": "should suggest values",
     "beforeCursor": "select * from foo, bar where bar.bla in ('a', ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": true,
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "suggestColumns": {
         "source": "where",
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -8073,11 +7300,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT * FROM foo WHERE bar IN (SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -8100,11 +7323,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT * FROM bar WHERE foo NOT IN (SELECT ",
     "afterCursor": ")",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -8129,9 +7348,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   },
   {
@@ -8140,18 +7357,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": true,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "select foo.* from (",
     "afterCursor": ") foo",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": true
     }
@@ -8160,11 +7373,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT * FROM (SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -8187,14 +7396,10 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT \"contains an even number\" FROM t1, t2 AS ta2 WHERE EXISTS (SELECT t3.foo FROM t3 WHERE ",
     "afterCursor": " % 2 = 0",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "suggestColumns": {
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "source": "where",
         "tables": [
           {
@@ -8222,9 +7427,7 @@
         ]
       },
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestIdentifiers": [
         {
@@ -8417,11 +7620,7 @@
     "namePrefix": "should suggest identifiers",
     "beforeCursor": "SELECT ",
     "afterCursor": " FROM testTable tt, (SELECT bla FROM abc WHERE foo > 1) bar",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "locations": [
         {
@@ -8669,11 +7868,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "select ",
     "afterCursor": " from (select id i, name as n, bla from foo) bar",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "suggestAggregateFunctions": {
         "tables": []
@@ -8760,9 +7955,7 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "*"
-      ],
+      "suggestKeywords": ["*"],
       "lowerCase": false,
       "subQueries": [
         {
@@ -8816,9 +8009,7 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "*"
-      ],
+      "suggestKeywords": ["*"],
       "subQueries": [
         {
           "alias": "boo",
@@ -8860,9 +8051,7 @@
     "namePrefix": "should suggest identifiers",
     "beforeCursor": "SELECT cos(",
     "afterCursor": " FROM (SELECT b FROM foo) boo, (SELECT a FROM bla) bar",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "suggestColumns": {
         "source": "select",
@@ -8939,11 +8128,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT * FROM (SELECT ",
     "afterCursor": ")",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -8966,11 +8151,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM (SELECT ",
     "afterCursor": " FROM tableOne) subQueryOne, someDb.tableTwo talias, (SELECT * FROM t3 JOIN t4 ON t3.id = t4.id) AS subQueryTwo;",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -9004,11 +8185,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT ",
     "afterCursor": " FROM (SELECT * FROM (SELECT * FROM tableOne) subQueryOne) subQueryTwo",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "suggestAggregateFunctions": {
         "tables": []
@@ -9076,11 +8253,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT ",
     "afterCursor": " FROM (SELECT * FROM (SELECT * FROM (SELECT * FROM tableOne) subQueryOne) subQueryTwo) subQueryThree",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -9166,11 +8339,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM (SELECT ",
     "afterCursor": " FROM (SELECT * FROM (SELECT * FROM tableOne) subQueryOne) subQueryTwo) subQueryThree",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -9238,11 +8407,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM (SELECT * FROM (SELECT ",
     "afterCursor": " FROM (SELECT * FROM tableOne) subQueryOne) subQueryTwo) subQueryThree",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -9305,9 +8470,7 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "*"
-      ],
+      "suggestKeywords": ["*"],
       "subQueries": [
         {
           "alias": "s2",

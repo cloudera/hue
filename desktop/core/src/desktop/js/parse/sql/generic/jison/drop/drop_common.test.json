@@ -3,13 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DROP ",
     "afterCursor": "",
-    "containsKeywords": [
-      "DATABASE",
-      "ROLE",
-      "SCHEMA",
-      "TABLE",
-      "VIEW"
-    ],
+    "containsKeywords": ["DATABASE", "ROLE", "SCHEMA", "TABLE", "VIEW"],
     "expectedResult": {
       "lowerCase": false
     }

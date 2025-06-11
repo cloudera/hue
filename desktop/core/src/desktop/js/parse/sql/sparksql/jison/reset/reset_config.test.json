@@ -3,26 +3,20 @@
     "namePrefix": "should not find errors",
     "beforeCursor": "RESET;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "RESET foo.bar.baz;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "RESET"
-    ]
+    "containsKeywords": ["RESET"]
   }
 ]

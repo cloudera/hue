@@ -1,0 +1,40 @@
+name: Docs Lint
+
+on:
+  pull_request:
+    paths:
+      - 'docs/docs-site/**'
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Hugo
+        run: |
+          curl -sL https://github.com/gohugoio/hugo/releases/download/v0.69.0/hugo_0.69.0_Linux-64bit.tar.gz -o hugo.tar.gz
+          tar -xzf hugo.tar.gz
+          sudo mv hugo /usr/local/bin/
+
+      - name: Build & serve Hugo site
+        working-directory: docs/docs-site
+        run: |
+          hugo server --port 1313 --bind 127.0.0.1 --watch=false &> /tmp/hugo.log &
+          echo "Hugo PID: $!"
+          sleep 5
+
+      - name: Run Lychee link check
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # point at your local server URL
+          args: http://localhost:1313/ --exclude "https://issues.cloudera.org*|http://localhost:8005|http://localhost:5555*|https://issues.apache.org/jira*|https://github.com*|http://demo.gethue.com*|https://twitter.com/gethue|https://cdn.gethue.com/downloads/*|https://pypi.org*"
+          fail: true # fail the job if any broken links are found
+          format: markdown
+
+      - name: Tear down Hugo
+        if: always()
+        run: pkill hugo || true

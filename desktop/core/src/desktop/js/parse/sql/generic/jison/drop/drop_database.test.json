@@ -3,10 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DROP ",
     "afterCursor": "",
-    "containsKeywords": [
-      "DATABASE",
-      "SCHEMA"
-    ],
+    "containsKeywords": ["DATABASE", "SCHEMA"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -18,9 +15,7 @@
     "expectedResult": {
       "lowerCase": false,
       "suggestDatabases": {},
-      "suggestKeywords": [
-        "IF EXISTS"
-      ]
+      "suggestKeywords": ["IF EXISTS"]
     }
   },
   {
@@ -30,9 +25,7 @@
     "expectedResult": {
       "lowerCase": false,
       "suggestDatabases": {},
-      "suggestKeywords": [
-        "IF EXISTS"
-      ]
+      "suggestKeywords": ["IF EXISTS"]
     }
   },
   {
@@ -41,9 +34,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
@@ -59,9 +50,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DROP DATABASE foo ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASCADE"
-    ],
+    "containsKeywords": ["CASCADE"],
     "expectedResult": {
       "lowerCase": false
     }

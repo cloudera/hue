@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "[;;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -14,9 +12,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": ";",
     "afterCursor": ";",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -25,9 +21,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": ";;;;",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -36,9 +30,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "foo",
     "afterCursor": "bar",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }

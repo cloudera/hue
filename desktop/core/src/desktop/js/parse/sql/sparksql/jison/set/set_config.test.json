@@ -4,9 +4,7 @@
     "beforeCursor": "set bla.bla=\"ble\";",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": true
     }
@@ -16,35 +14,27 @@
     "beforeCursor": "SET bla.bla='ble';",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should not report errors",
     "beforeCursor": "SET mem_limit;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should not report errors",
     "beforeCursor": "SET RESERVATION_REQUEST_TIMEOUT=900000;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should not report errors",
     "beforeCursor": "SET -v;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   }
 ]
