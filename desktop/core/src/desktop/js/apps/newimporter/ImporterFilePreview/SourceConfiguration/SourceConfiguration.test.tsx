@@ -106,7 +106,7 @@ describe('SourceConfiguration Component', () => {
     expect(getByText('Sheet Name')).toBeInTheDocument();
   });
 
-  it('should not show select sheet dropdown when fileType is EXCEL', () => {
+  it('should not show select sheet dropdown when fileType is not EXCEL', () => {
     const { getAllByRole, queryByText } = render(
       <SourceConfiguration
         fileFormat={{ ...mockFileFormat, type: ImporterFileTypes.CSV }}
