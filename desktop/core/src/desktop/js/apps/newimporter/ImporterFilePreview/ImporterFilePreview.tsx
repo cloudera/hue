@@ -52,7 +52,22 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
   const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
 
-  useLoadData<GuessHeaderResponse>(FILE_GUESS_HEADER, {
+  const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FILE_GUESS_METADATA, {
+    params: {
+      file_path: fileMetaData.path,
+      import_type: fileMetaData.source
+    },
+    skip: !fileMetaData.path,
+    onSuccess: data => {
+      setFileFormat({
+        ...data,
+        recordSeparator: data?.recordSeparator?.includes('\n') ? '\\n' : data?.recordSeparator,
+        selectedSheetName: data?.sheetNames?.[0]
+      });
+    }
+  });
+
+  const { loading: guessingHeader } = useLoadData<GuessHeaderResponse>(FILE_GUESS_HEADER, {
     params: {
       file_path: fileMetaData.path,
       file_type: fileFormat?.type,
@@ -65,20 +80,12 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
         ...(prev ?? {}),
         hasHeader: data.hasHeader
       }));
-    }
-  });
-
-  const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FILE_GUESS_METADATA, {
-    params: {
-      file_path: fileMetaData.path,
-      import_type: fileMetaData.source
     },
-    skip: !fileMetaData.path,
-    onSuccess: data => {
-      setFileFormat({
-        ...data,
-        selectedSheetName: data?.sheetNames?.[0]
-      });
+    onError: () => {
+      setFileFormat(prev => ({
+        ...(prev ?? {}),
+        hasHeader: false
+      }));
     }
   });
 
@@ -94,7 +101,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
         sheet_name: fileFormat?.selectedSheetName,
         field_separator: fileFormat?.fieldSeparator,
         quote_char: fileFormat?.quoteChar,
-        record_separator: String(fileFormat?.recordSeparator)
+        record_separator: fileFormat?.recordSeparator
       },
       skip: !fileFormat?.type || fileFormat?.hasHeader === undefined
     }
@@ -152,7 +159,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
           </BorderlessButton>
         </div>
         <PaginatedTable<ImporterTableData>
-          loading={guessingFormat || loadingPreview}
+          loading={guessingFormat || loadingPreview || guessingHeader}
           data={tableData}
           columns={columns}
           rowKey="importerDataKey"

@@ -19,7 +19,7 @@ import { CombinedFileFormat, ImporterFileTypes } from './types';
 export const separator = [
   { value: ',', label: 'Comma (,)' },
   { value: '\\t', label: '^Tab (\\t)' },
-  { value: '\r\n', label: '^New Line (\\r\\n)' },
+  { value: '\\n', label: '^New Line (\\n)' },
   { value: '|', label: 'Pipe (|)' },
   { value: '"', label: 'Double Quote (")' },
   { value: "'", label: "Single Quote (')" },
