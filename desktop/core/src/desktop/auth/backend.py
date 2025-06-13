@@ -28,7 +28,6 @@ Because Django's models are sometimes unfriendly, you'll want
 User to remain a django.contrib.auth.models.User object.
 """
 
-import sys
 import logging
 from builtins import object
 from importlib import import_module
@@ -67,8 +66,6 @@ try:
   from django_auth_ldap.config import LDAPSearch
 except ImportError:
   LOG.warning('django_auth_ldap module not found')
-  class LDAPSearch:
-    pass
   class LDAPSearch:
     pass
 
@@ -496,7 +493,7 @@ class LdapBackend(object):
               return User.objects.get_or_create(username=username)
           else:
             return User.objects.get_or_create(username=username)
-        except ValidationError as e:
+        except ValidationError:
           LOG.exception("LDAP username is invalid: %s" % username)
 
     self._backend = _LDAPBackend()
