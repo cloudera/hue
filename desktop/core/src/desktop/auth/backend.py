@@ -28,7 +28,6 @@ Because Django's models are sometimes unfriendly, you'll want
 User to remain a django.contrib.auth.models.User object.
 """
 
-import sys
 import logging
 from builtins import object
 from importlib import import_module
@@ -67,8 +66,6 @@ try:
   from django_auth_ldap.config import LDAPSearch
 except ImportError:
   LOG.warning('django_auth_ldap module not found')
-  class LDAPSearch:
-    pass
   class LDAPSearch:
     pass
 
@@ -496,7 +493,7 @@ class LdapBackend(object):
               return User.objects.get_or_create(username=username)
           else:
             return User.objects.get_or_create(username=username)
-        except ValidationError as e:
+        except ValidationError:
           LOG.exception("LDAP username is invalid: %s" % username)
 
     self._backend = _LDAPBackend()
@@ -827,7 +824,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
 
     token_payload = {
       'client_id': self.OIDC_RP_CLIENT_ID,
-      'client_secret': self.OIDC_RP_CLIENT_SECRET,
+      'client_secret': self.OIDC_RP_CLIENT_SECRET or self.OIDC_RP_CLIENT_SECRET_SCRIPT,
       'grant_type': 'authorization_code',
       'code': code,
       'redirect_uri': absolutify(
@@ -849,6 +846,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     verified_id = self.verify_token(id_token, nonce=nonce)
 
     if verified_id:
+      self.save_access_tokens(access_token)
       self.save_refresh_tokens(refresh_token)
       user = self.get_or_create_user(access_token, id_token, verified_id)
       user = rewrite_user(user)
@@ -864,6 +862,12 @@ class OIDCBackend(OIDCAuthenticationBackend):
     if not username:
       return self.UserModel.objects.none()
     return self.UserModel.objects.filter(username__iexact=username)
+
+  def save_access_tokens(self, access_token):
+    session = self.request.session
+
+    if import_from_settings('OIDC_STORE_ACCESS_TOKEN', False):
+      session['oidc_access_token'] = access_token
 
   def save_refresh_tokens(self, refresh_token):
     session = self.request.session
@@ -940,7 +944,7 @@ class OIDCBackend(OIDCAuthenticationBackend):
     if access_token and refresh_token:
       oidc_logout_url = OIDC.LOGOUT_REDIRECT_URL.get()
       client_id = import_from_settings('OIDC_RP_CLIENT_ID')
-      client_secret = import_from_settings('OIDC_RP_CLIENT_SECRET')
+      client_secret = import_from_settings('OIDC_RP_CLIENT_SECRET') or import_from_settings('OIDC_RP_CLIENT_SECRET_SCRIPT')
       oidc_verify_ssl = import_from_settings('OIDC_VERIFY_SSL')
       form = {
         'client_id': client_id,
