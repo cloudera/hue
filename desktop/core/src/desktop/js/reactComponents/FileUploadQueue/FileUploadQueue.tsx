@@ -30,7 +30,7 @@ import FileUploadRow from './FileUploadRow/FileUploadRow';
 import { useHuePubSub } from '../../utils/hooks/useHuePubSub/useHuePubSub';
 import huePubSub from '../../utils/huePubSub';
 import { FILE_UPLOAD_START_EVENT, FILE_UPLOAD_SUCCESS_EVENT } from './event';
-import { FILE_STATS_API_URL} from '../../apps/storageBrowser/api';
+import { FILE_STATS_API_URL } from '../../apps/storageBrowser/api';
 import './FileUploadQueue.scss';
 interface FileUploadEvent {
   files: RegularFile[];
