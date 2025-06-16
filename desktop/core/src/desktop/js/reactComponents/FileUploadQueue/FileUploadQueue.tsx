@@ -13,7 +13,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
@@ -22,7 +21,6 @@ import CaratDownIcon from '@cloudera/cuix-core/icons/react/CaratDownIcon';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 import CaratUpIcon from '@cloudera/cuix-core/icons/react/CaratUpIcon';
 import Modal from 'cuix/dist/components/Modal';
-
 import { i18nReact } from '../../utils/i18nReact';
 import { RegularFile, FileStatus } from '../../utils/hooks/useFileUpload/types';
 import useFileUpload from '../../utils/hooks/useFileUpload/useFileUpload';
@@ -33,15 +31,12 @@ import FileUploadRow from './FileUploadRow/FileUploadRow';
 import { useHuePubSub } from '../../utils/hooks/useHuePubSub/useHuePubSub';
 import huePubSub from '../../utils/huePubSub';
 import { FILE_UPLOAD_START_EVENT, FILE_UPLOAD_SUCCESS_EVENT } from './event';
-import { LIST_DIRECTORY_API_URL } from '../../apps/storageBrowser/api';
+import { FILE_STATS_API_URL, LIST_DIRECTORY_API_URL } from '../../apps/storageBrowser/api';
 import { ListDirectory } from '../../apps/storageBrowser/types';
-
 import './FileUploadQueue.scss';
-
 interface FileUploadEvent {
   files: RegularFile[];
 }
-
 const sortOrder = [
   FileStatus.Uploading,
   FileStatus.Failed,
@@ -52,98 +47,84 @@ const sortOrder = [
   acc[status] = index + 1;
   return acc;
 }, {});
-
 const FileUploadQueue = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-
   const [expandQueue, setExpandQueue] = useState<boolean>(true);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [conflictFiles, setConflictFiles] = useState<RegularFile[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-  const fetchUploadedFiles = async (uploadPath: string) => {
+  const checkFileExists = async (filePath: string): Promise<boolean> => {
     try {
-      const response = await get<ListDirectory>(LIST_DIRECTORY_API_URL, {
-        path: uploadPath,
-        pagesize: '1000'
-      });
-      return response.files ?? []; // Return an empty array if no files are found
+      const response = await get(FILE_STATS_API_URL, { path: filePath }, {silenceErrors: true});
+      if (response && typeof response === 'object' && 'path' in response && response.path === filePath) {
+        return true; 
+      }
+      return false; 
     } catch (error) {
-      console.error('Failed to fetch files:', error);
+      if (error.response?.status === 404) {
+        return false; 
+      }
+      return false;
     }
   };
-
-
   const onComplete = () => {
     huePubSub.publish(FILE_UPLOAD_SUCCESS_EVENT);
-    const newlyUploadedFiles = uploadQueue.filter(file => file.status === FileStatus.Uploaded);
   };
-
   const config = getLastKnownConfig();
   const isChunkUpload =
     (config?.storage_browser.enable_chunked_file_upload ?? DEFAULT_ENABLE_CHUNK_UPLOAD) &&
     !!config?.hue_config.enable_task_server;
-
   const { uploadQueue, cancelFile, addFiles } = useFileUpload({
     isChunkUpload,
     onComplete
   });
-
   useHuePubSub<FileUploadEvent>({
     topic: FILE_UPLOAD_START_EVENT,
     callback: async (data?: FileUploadEvent) => {
       if ((data?.files ?? []).length > 0) {
-        const uploadPath = data?.files?.[0]?.filePath ?? null;
-        if (!uploadPath) {
-          console.error('File path missing for uploaded files');
-          return;
-        }
-        const uploadedFile = await fetchUploadedFiles(uploadPath);
-        const { conflicts, nonConflictingFiles } = resolveFileConflicts(
-          uploadedFile ?? [],
-          data?.files ?? []
-        );
-        if (conflicts.length > 0) {
-          setConflictFiles(conflicts);
-          setIsModalVisible(true);
-        } else {
-         
-          setConflictFiles([]);
-          setIsModalVisible(false);
-        }
-        if (nonConflictingFiles.length > 0) {
-          addFiles(nonConflictingFiles);
-          setIsVisible(true);
-        }
-        setIsVisible(true);
+        const newFiles = data?.files ?? [];
+          const { conflicts, nonConflictingFiles } = await resolveFileConflicts(newFiles, uploadQueue);
+          if (conflicts.length > 0) {
+            setConflictFiles(conflicts); 
+            setIsModalVisible(true);
+          } else {
+            setConflictFiles([]);
+            setIsModalVisible(false);
+          }
+          if (nonConflictingFiles.length > 0) {
+            addFiles(nonConflictingFiles);
+            setIsVisible(true);
+          }
       }
     }
   });
 
-  const resolveFileConflicts = (uploadedFiles: any[], newFiles: RegularFile[]) => {
+  const resolveFileConflicts = async (
+    newFiles: RegularFile[],
+    uploadQueue: RegularFile[]
+  ): Promise<{ conflicts: RegularFile[]; nonConflictingFiles: RegularFile[] }> => {
+    const conflicts: RegularFile[] = [];
+    const nonConflictingFiles: RegularFile[] = [];
+  
     const inProgressFileIdentifiers = new Set(
       uploadQueue
         .filter(file => file.status === FileStatus.Uploading || file.status === FileStatus.Pending)
         .map(file => `${file.filePath}/${file.file.name}`)
     );
   
-    // Filter out files that are in progress in the upload queue
-    const filteredNewFiles = newFiles.filter(
-      newFile => !inProgressFileIdentifiers.has(`${newFile.filePath}/${newFile.file.name}`)
-    );
-  
-    // Create a Set for existing uploaded file names for faster lookup
-    const existingUploadedFilePaths = new Set(uploadedFiles.map(f => f.path));
-  
-    // Check for conflicts only with files that are already uploaded
-    const conflicts = filteredNewFiles.filter(newFile =>
-      existingUploadedFilePaths.has(`${newFile.filePath}/${newFile.file.name}`)
-    );
-
-    // Non-conflicting files to be added
-    const nonConflictingFiles = filteredNewFiles.filter(
-      newFile => !existingUploadedFilePaths.has(`${newFile.filePath}/${newFile.file.name}`)
-    );  
+    for (const newFile of newFiles) {
+      const fullFilePath = `${newFile.filePath}/${newFile.file.name}`;
+      if (inProgressFileIdentifiers.has(fullFilePath)) {
+        continue;
+      }
+      const exists = await checkFileExists(fullFilePath);
+      if (exists) {
+        conflicts.push(newFile);
+      } else {
+        nonConflictingFiles.push(newFile);
+      }
+    }
     return { conflicts, nonConflictingFiles };
   };
 
@@ -151,7 +132,6 @@ const FileUploadQueue = (): JSX.Element => {
     uploadQueue.forEach(file => cancelFile(file));
     setIsVisible(false);
   };
-
   const handleModalOk = (overwrite: boolean) => {
     if (overwrite) {
       addFiles(conflictFiles, true);
@@ -160,17 +140,14 @@ const FileUploadQueue = (): JSX.Element => {
     setIsModalVisible(false);
     setIsVisible(true);
   };
-
   const uploadedCount = uploadQueue.filter(item => item.status === FileStatus.Uploaded).length;
   const pendingCount = uploadQueue.filter(
     item => item.status === FileStatus.Pending || item.status === FileStatus.Uploading
   ).length;
   const failedCount = uploadQueue.filter(item => item.status === FileStatus.Failed).length;
-
-  if (!isVisible) {
+  if (!isVisible && !isModalVisible) {
     return <></>;
   }
-
   const getHeaderText = () => {
     const fileText = uploadQueue.length > 1 ? 'files' : 'file';
     const uploadedText = `{{uploadedCount}} ${fileText} uploaded`;
@@ -181,7 +158,6 @@ const FileUploadQueue = (): JSX.Element => {
     }
     return `${uploadedText}${failedText}`;
   };
-
   return (
     <>
       {isModalVisible && (
@@ -239,5 +215,4 @@ const FileUploadQueue = (): JSX.Element => {
     </>
   );
 };
-
 export default FileUploadQueue;
