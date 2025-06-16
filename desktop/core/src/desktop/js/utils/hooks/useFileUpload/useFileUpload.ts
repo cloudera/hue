@@ -102,12 +102,12 @@ const useFileUpload = ({
   const addFiles = (files: RegularFile[], overwrite = false) => {
     setUploadQueue(prev => {
       const updatedQueue = [...prev]; // A copy of the current queue
-  
+
       files.forEach(file => {
         const existingFileIndex = updatedQueue.findIndex(
           up => up.filePath === file.filePath && up.file.name === file.file.name
         );
-  
+
         if (existingFileIndex !== -1) {
           if (overwrite) {
             // Handle conflicting file by overwriting
@@ -123,10 +123,10 @@ const useFileUpload = ({
           updatedQueue.push({ ...file, status: FileStatus.Pending });
         }
       });
-  
+
       return updatedQueue; // Return the updated queue
     });
-  
+
     const preparedFiles = files.map(file => ({
       ...file,
       overwrite: overwrite || !!file.overwrite

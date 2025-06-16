@@ -13,8 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useState } from 'react';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import CloseIcon from '@cloudera/cuix-core/icons/react/CloseIcon';
 import CaratDownIcon from '@cloudera/cuix-core/icons/react/CaratDownIcon';
@@ -31,8 +30,7 @@ import FileUploadRow from './FileUploadRow/FileUploadRow';
 import { useHuePubSub } from '../../utils/hooks/useHuePubSub/useHuePubSub';
 import huePubSub from '../../utils/huePubSub';
 import { FILE_UPLOAD_START_EVENT, FILE_UPLOAD_SUCCESS_EVENT } from './event';
-import { FILE_STATS_API_URL, LIST_DIRECTORY_API_URL } from '../../apps/storageBrowser/api';
-import { ListDirectory } from '../../apps/storageBrowser/types';
+import { FILE_STATS_API_URL} from '../../apps/storageBrowser/api';
 import './FileUploadQueue.scss';
 interface FileUploadEvent {
   files: RegularFile[];
@@ -56,14 +54,19 @@ const FileUploadQueue = (): JSX.Element => {
 
   const checkFileExists = async (filePath: string): Promise<boolean> => {
     try {
-      const response = await get(FILE_STATS_API_URL, { path: filePath }, {silenceErrors: true});
-      if (response && typeof response === 'object' && 'path' in response && response.path === filePath) {
-        return true; 
+      const response = await get(FILE_STATS_API_URL, { path: filePath }, { silenceErrors: true });
+      if (
+        response &&
+        typeof response === 'object' &&
+        'path' in response &&
+        response.path === filePath
+      ) {
+        return true;
       }
-      return false; 
+      return false;
     } catch (error) {
       if (error.response?.status === 404) {
-        return false; 
+        return false;
       }
       return false;
     }
@@ -84,18 +87,21 @@ const FileUploadQueue = (): JSX.Element => {
     callback: async (data?: FileUploadEvent) => {
       if ((data?.files ?? []).length > 0) {
         const newFiles = data?.files ?? [];
-          const { conflicts, nonConflictingFiles } = await resolveFileConflicts(newFiles, uploadQueue);
-          if (conflicts.length > 0) {
-            setConflictFiles(conflicts); 
-            setIsModalVisible(true);
-          } else {
-            setConflictFiles([]);
-            setIsModalVisible(false);
-          }
-          if (nonConflictingFiles.length > 0) {
-            addFiles(nonConflictingFiles);
-            setIsVisible(true);
-          }
+        const { conflicts, nonConflictingFiles } = await resolveFileConflicts(
+          newFiles,
+          uploadQueue
+        );
+        if (conflicts.length > 0) {
+          setConflictFiles(conflicts);
+          setIsModalVisible(true);
+        } else {
+          setConflictFiles([]);
+          setIsModalVisible(false);
+        }
+        if (nonConflictingFiles.length > 0) {
+          addFiles(nonConflictingFiles);
+          setIsVisible(true);
+        }
       }
     }
   });
@@ -106,13 +112,11 @@ const FileUploadQueue = (): JSX.Element => {
   ): Promise<{ conflicts: RegularFile[]; nonConflictingFiles: RegularFile[] }> => {
     const conflicts: RegularFile[] = [];
     const nonConflictingFiles: RegularFile[] = [];
-  
     const inProgressFileIdentifiers = new Set(
       uploadQueue
         .filter(file => file.status === FileStatus.Uploading || file.status === FileStatus.Pending)
         .map(file => `${file.filePath}/${file.file.name}`)
     );
-  
     for (const newFile of newFiles) {
       const fullFilePath = `${newFile.filePath}/${newFile.file.name}`;
       if (inProgressFileIdentifiers.has(fullFilePath)) {
@@ -161,32 +165,32 @@ const FileUploadQueue = (): JSX.Element => {
   return (
     <>
       {isModalVisible && (
-      <Modal
-      title={t('Resolve Filename Conflicts')}
-      open={isModalVisible}
-      okText={t('Overwrite')}
-      onOk={() => handleModalOk(true)}
-      cancelText={t('Cancel')}
-      onCancel={() => setIsModalVisible(false)}
-      secondaryButtonText={t('Skip Upload')}
-      onSecondary={() => handleModalOk(false)}
-      className="hue-modal"
-    >
-      {t(
-        `${conflictFiles.length} files you are trying to upload already exist in the uploaded files.`
-      )}
-      <div className="conflict-files__container">
-        {conflictFiles.map(file => (
-          <div key={file.file.name} className="conflict-files__item">
-            <div className="file-icon">
-              <FileIcon />
-            </div>
-            <span className="file-name">{file.file.name}</span>
+        <Modal
+          title={t('Resolve Filename Conflicts')}
+          open={isModalVisible}
+          okText={t('Overwrite')}
+          onOk={() => handleModalOk(true)}
+          cancelText={t('Cancel')}
+          onCancel={() => setIsModalVisible(false)}
+          secondaryButtonText={t('Skip Upload')}
+          onSecondary={() => handleModalOk(false)}
+          className="hue-modal"
+        >
+          {t(
+            `${conflictFiles.length} files you are trying to upload already exist in the uploaded files.`
+          )}
+          <div className="conflict-files__container">
+            {conflictFiles.map(file => (
+              <div key={file.file.name} className="conflict-files__item">
+                <div className="file-icon">
+                  <FileIcon />
+                </div>
+                <span className="file-name">{file.file.name}</span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-          </Modal>
-        )}
+        </Modal>
+      )}
       <div className="hue-upload-queue-container antd cuix">
         <div className="hue-upload-queue-container__header">
           {t(getHeaderText(), { pendingCount, uploadedCount, failedCount })}
