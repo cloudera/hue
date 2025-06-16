@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "UPDATE"
-    ],
+    "containsKeywords": ["UPDATE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -16,9 +14,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SET"
-      ],
+      "suggestKeywords": ["SET"],
       "locations": [
         {
           "type": "statement",
@@ -50,9 +46,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "UPDATE bar SET id=1, foo=2 ",
     "afterCursor": "",
-    "containsKeywords": [
-      "WHERE"
-    ],
+    "containsKeywords": ["WHERE"],
     "expectedResult": {
       "lowerCase": false,
       "locations": [
@@ -136,9 +130,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "="
-      ],
+      "suggestKeywords": ["="],
       "locations": [
         {
           "type": "statement",
@@ -461,10 +453,7 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "EXISTS",
-        "NOT EXISTS"
-      ],
+      "suggestKeywords": ["EXISTS", "NOT EXISTS"],
       "locations": [
         {
           "type": "statement",
@@ -540,9 +529,7 @@
     "namePrefix": "should suggest values",
     "beforeCursor": "UPDATE bar.foo SET bla = 'foo' WHERE id = ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "locations": [
         {
@@ -641,9 +628,7 @@
         }
       ],
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestValues": {},
       "colRef": {
@@ -660,9 +645,7 @@
         ]
       },
       "suggestColumns": {
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -683,9 +666,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "UPDATE bar.foo SET bla = 'foo' WHERE id = 1 AND ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},

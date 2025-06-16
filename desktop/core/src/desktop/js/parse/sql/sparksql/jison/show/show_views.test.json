@@ -3,36 +3,28 @@
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW VIEWS;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW VIEWS IN userdb;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW VIEWS FROM default LIKE 'sam*';",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SHOW ",
     "afterCursor": "",
-    "containsKeywords": [
-      "VIEWS"
-    ]
+    "containsKeywords": ["VIEWS"]
   },
   {
     "namePrefix": "should suggest keywords",
