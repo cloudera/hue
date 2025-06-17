@@ -315,7 +315,7 @@ const FileChooserModal = ({
             <Input
               defaultValue={createFolderValue}
               disabled={createFolderLoading}
-              onPressEnter={() => handleCreate}
+              onPressEnter={() => handleCreate()}
               ref={createFolderInputRef}
               onChange={e => {
                 setCreateFolderValue(e.target.value);
