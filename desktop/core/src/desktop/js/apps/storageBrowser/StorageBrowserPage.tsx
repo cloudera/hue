@@ -55,6 +55,7 @@ const StorageBrowserPage = (): JSX.Element => {
         <LoadingErrorWrapper loading={loading} errors={errorConfig}>
           <Tabs
             className="hue-storage-browser__tab"
+            data-testid="hue-storage-browser__tabs"
             destroyInactiveTabPane
             defaultActiveKey={urlFileSystem ?? data?.[0]?.name}
             items={data?.map(fileSystem => ({
