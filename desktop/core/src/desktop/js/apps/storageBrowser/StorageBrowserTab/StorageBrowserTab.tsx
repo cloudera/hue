@@ -36,6 +36,7 @@ import {
   getLastDirOrFileNameFromPath,
   getFileSystemAndPath
 } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import useUrlListener from '../../../utils/hooks/useUrlListener/useUrlListener';
 import { inTrash } from '../../../utils/storageBrowserUtils';
 
 import './StorageBrowserTab.scss';
@@ -50,17 +51,16 @@ const defaultProps = {
 };
 
 const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.Element => {
-  const urlPathname = window.location.pathname;
-  const urlSearchParams = new URLSearchParams(window.location.search);
-  const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
+  const { t } = i18nReact.useTranslation();
+  const { pathname, search } = useUrlListener();
+
+  const urlFilePath = search.get('path') ?? '';
   const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
   const initialFilePath =
     urlFileSystem === fileSystem.name ? urlFilePath : fileSystem.userHomeDirectory;
 
   const [filePath, setFilePath] = useState<string>(initialFilePath);
   const fileName = getLastDirOrFileNameFromPath(filePath);
-
-  const { t } = i18nReact.useTranslation();
 
   const { data: trashData, reloadData: onTrashPathReload } = useLoadData<TrashData>(TRASH_PATH, {
     params: { path: fileSystem.userHomeDirectory },
@@ -90,17 +90,18 @@ const StorageBrowserTab = ({ fileSystem, testId }: StorageBrowserTabProps): JSX.
     skip: !filePath
   });
 
+  const onFilePathChange = (newFilePath: string, replace?: boolean) => {
+    setFilePath(newFilePath);
+    changeURL(pathname, { path: newFilePath }, replace);
+  };
+
   useEffect(() => {
-    const urlQueryParams = { path: filePath };
-    const encodedSearchParams = new URLSearchParams(urlQueryParams).toString();
-    if (filePath && urlFilePath && filePath !== urlFilePath) {
-      changeURL(urlPathname, urlQueryParams);
+    if (filePath && (urlFilePath !== filePath || !urlFilePath)) {
+      onFilePathChange(filePath, true);
+    } else if (urlFilePath && !filePath) {
+      onFilePathChange(urlFilePath, true);
     }
-    // if url path is correct but not encoded properly
-    else if (encodedSearchParams !== window.location.search) {
-      changeURL(urlPathname, urlQueryParams, true);
-    }
-  }, [filePath, urlPathname, urlFilePath, window.location]);
+  }, [filePath, urlFilePath, onFilePathChange]);
 
   const errors = [
     {
