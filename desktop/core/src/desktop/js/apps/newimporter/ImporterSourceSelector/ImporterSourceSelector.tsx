@@ -182,6 +182,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
             <div className="hue-importer__source-selector-option" key={filesystem.name}>
               <Button
                 className="hue-importer__source-selector-option-button"
+                aria-label={t(fileSystems[filesystem.name].title)}
                 size="large"
                 icon={fileSystems[filesystem.name].icon}
                 onClick={() => {

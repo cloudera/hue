@@ -36,7 +36,10 @@ describe('ImporterSourceSelector', () => {
     (useLoadData as jest.Mock).mockReturnValue({
       data: [
         { name: 's3a', userHomeDirectory: '/user/test/s3' },
-        { name: 'hdfs', userHomeDirectory: '/user/test/hdfs' }
+        { name: 'hdfs', userHomeDirectory: '/user/test/hdfs' },
+        { name: 'abfs', userHomeDirectory: '/user/test/abfs' },
+        { name: 'ofs', userHomeDirectory: '/user/test/ozone' },
+        { name: 'gs', userHomeDirectory: '/user/test/gs' }
       ],
       loading: false,
       error: null,
@@ -53,6 +56,9 @@ describe('ImporterSourceSelector', () => {
     expect(screen.queryByText('LocalUpload')).toBeInTheDocument();
     expect(screen.getByText('Amazon S3')).toBeInTheDocument();
     expect(screen.getByText('HDFS')).toBeInTheDocument();
+    expect(screen.getByText('Azure Storage')).toBeInTheDocument();
+    expect(screen.getByText('Ozone')).toBeInTheDocument();
+    expect(screen.getByText('Google Storage')).toBeInTheDocument();
   });
 
   it('should not render local upload option if ENABLE_DIRECT_UPLOAD is false', () => {
@@ -70,7 +76,7 @@ describe('ImporterSourceSelector', () => {
 
     render(<ImporterSourceSelector setFileMetaData={mockSetFileMetaData} />);
 
-    const s3Button = screen.getAllByRole('button')[1]; // second button (first is local upload)
+    const s3Button = screen.getByRole('button', { name: /Amazon S3/i }); // second button (first is local upload)
     fireEvent.click(s3Button);
 
     expect(screen.getByTestId('file-chooser')).toBeInTheDocument();
@@ -86,7 +92,7 @@ describe('ImporterSourceSelector', () => {
 
     render(<ImporterSourceSelector setFileMetaData={mockSetFileMetaData} />);
 
-    expect(screen.getByText('Select a source to import from')).toBeInTheDocument();
+    expect(screen.getAllByTestId('loading-error-wrapper__spinner')).toHaveLength(2);
   });
 
   it('should display error message on fetch failure', () => {
