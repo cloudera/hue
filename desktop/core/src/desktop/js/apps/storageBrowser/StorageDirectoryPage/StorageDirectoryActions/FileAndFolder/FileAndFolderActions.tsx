@@ -131,7 +131,7 @@ const FileAndFolderActions = ({
         trigger={['click']}
         disabled={!actionItems.length}
       >
-        <Button>
+        <Button data-testid="hue-storage-browser-directory__actions-bar__action-btn">
           {t('Actions')}
           <DropDownIcon />
         </Button>

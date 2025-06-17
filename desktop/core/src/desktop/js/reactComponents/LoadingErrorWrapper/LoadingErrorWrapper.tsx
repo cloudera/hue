@@ -63,7 +63,7 @@ const LoadingErrorWrapper = ({
   if (enabledErrors.length > 0) {
     return (
       <>
-        <div className="loading-error-wrapper__errors">
+        <div className="loading-error-wrapper__errors" data-testid="loading-error-wrapper__errors">
           {enabledErrors.map(error => (
             <Alert
               showIcon

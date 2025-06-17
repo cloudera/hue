@@ -165,6 +165,7 @@ const FileChooserModal = ({
         <LoadingErrorWrapper loading={loading}>
           <Table
             className="hue-filechooser-modal__table"
+            data-testid="hue-filechooser-modal__table"
             dataSource={tableData}
             pagination={false}
             columns={getColumns(tableData[0] ?? {})}
