@@ -20,8 +20,8 @@
   background: rgba(0, 0, 0, 0.35);
   z-index: 9;
   transition: opacity 0.3s ease;
-  }
-  
+}
+
 .fade-in {
   opacity: 1;
 }
@@ -29,7 +29,6 @@
 .fade-out {
   opacity: 0;
 }
-  
 
 .hue-bottom-slide-panel {
   position: absolute;
@@ -41,27 +40,29 @@
   padding: 16px;
   z-index: 10;
   border-top: 1px solid #eee;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 
   .hue-bottom-slide-panel__title {
     font-weight: 300;
     margin-bottom: 12px;
-     font-size: 16px;
+    font-size: 16px;
     padding: 16px 0 0 24px;
- }
+  }
 
-     /* Content section */
+  /* Content section */
   .hue-bottom-slide-panel__content {
     padding: 16px 24px 24px 24px;
   }
-  
+
   /* Footer with buttons */
   .hue-bottom-slide-panel__footer {
     display: flex;
     justify-content: space-between;
-    padding: 16px 24px
+    padding: 16px 24px;
   }
-  
+
   .hue-bottom-slide-panel__btn {
     padding: 6px 16px;
     border: none;
@@ -70,13 +71,13 @@
     cursor: pointer;
   }
 }
-  
+
 /* Animation classes */
 .hue-bottom-slide-in {
   transform: translateY(0%);
   opacity: 1;
 }
-  
+
 .hue-bottom-slide-out {
   opacity: 0;
-} 
+}
