@@ -81,7 +81,7 @@ describe('LocalFileUploadOption', () => {
     );
   });
 
-  it('should show error for file > 150mb', () => {
+  it('should show error for file > 150MB', () => {
     render(
       <LocalFileUploadOption
         setFileMetaData={mockSetFileMetaData}
@@ -96,7 +96,7 @@ describe('LocalFileUploadOption', () => {
     });
 
     expect(mockSetUploadError).toHaveBeenCalledWith(
-      'File size exceeds the supported size (200 KB). Please use the S3, ABFS or HDFS browser to upload files.'
+      'File size exceeds the supported size (150 MB). Please use the S3, ABFS or HDFS browser to upload files.'
     );
   });
 

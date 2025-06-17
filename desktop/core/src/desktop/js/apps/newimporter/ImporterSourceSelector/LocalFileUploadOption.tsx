@@ -37,13 +37,6 @@ const LocalFileUploadOption = ({
 
   const { save: upload } = useSaveData<LocalFileUploadResponse>(UPLOAD_LOCAL_FILE_API_URL);
 
-  const handleUploadClick = () => {
-    if (!uploadRef || !uploadRef.current) {
-      return;
-    }
-    uploadRef.current.click();
-  };
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) {
@@ -58,10 +51,10 @@ const LocalFileUploadOption = ({
     const fileSize = file.size;
     if (fileSize === 0) {
       setUploadError(t('This file is empty, please select another file.'));
-    } else if (fileSize > 150 * 1024 * 1024) {
+    } else if (fileSize > 150 * 1000 * 1000) {
       setUploadError(
         t(
-          'File size exceeds the supported size (200 KB). Please use the S3, ABFS or HDFS browser to upload files.'
+          'File size exceeds the supported size (150 MB). Please use the S3, ABFS or HDFS browser to upload files.'
         )
       );
     } else {
@@ -86,7 +79,7 @@ const LocalFileUploadOption = ({
         className="hue-importer__source-selector-option-button"
         size="large"
         icon={<DocumentationIcon />}
-        onClick={handleUploadClick}
+        onClick={() => uploadRef?.current?.click()}
       />
       <span className="hue-importer__source-selector-option-btn-title">
         {t('Upload from File')}
