@@ -87,7 +87,6 @@ class RequirementsGenerator:
       "Mako==1.2.3",
       "openpyxl==3.0.9",
       "phoenixdb==1.2.1",
-      "polars[calamine]==1.8.2",  # Python >= 3.8
       "prompt-toolkit==3.0.39",
       "protobuf==3.20.3",
       "psutil==5.8.0",
@@ -148,6 +147,7 @@ class RequirementsGenerator:
         "numpy==1.24.4",
         "pandas==2.0.3",
         "sasl==0.3.1",
+         "polars[calamine]==1.8.2",
       ],
       "3.9": [
         "decorator==5.1.1",
@@ -176,6 +176,7 @@ class RequirementsGenerator:
         "Markdown==3.1",
         "numpy==1.24.4",
         "pandas==2.0.3",
+        "polars-lts-cpu==1.8.2", 
       ],
       "3.9": [
         "decorator==5.1.1",
@@ -203,6 +204,9 @@ class RequirementsGenerator:
       "arm64": self.aarch64_requirements,  # arm64 is treated as aarch64
     }
     self.arch = platform.machine()
+    # Map 'arm64' to 'aarch64' as used in requirements map
+    if self.arch == 'arm64':
+      self.arch = 'aarch64'    
     self.python_version_string = f"{sys.version_info.major}.{sys.version_info.minor}"
 
   def copy_local_requirements(self, python_version_string):
