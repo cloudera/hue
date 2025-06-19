@@ -16,6 +16,10 @@
 
 @use 'variables' as vars;
 
+.ant-modal-content{
+  width: 800px;
+}
+
 .antd.cuix {
   .hue-importer-edit-columns-modal {
     &__input--name {
@@ -33,7 +37,7 @@
     }
 
     &__type-error {
-      color: red;
+      color: #ff0000;
       margin-bottom: 16px;
     }
   }
