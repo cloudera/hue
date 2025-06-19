@@ -154,6 +154,7 @@ function stop_previous_hueprocs() {
       kill -9 $p
     fi
   done
+  rm -f /tmp/hue_${HUE_PORT}.pid
 }
 
 function run_syncdb_and_migrate_subcommands() {
@@ -183,7 +184,10 @@ elif [[ "runcpserver" == "$1" ]]; then
   exec "$HUE" "runcpserver"
 elif [[ "rungunicornserver" == "$1" ]]; then
   stop_previous_hueprocs
-  exec "$PYTHON_BIN" "$HUE_LOGLISTENER" &
+  sleep 5 # wait to handle some unknown concurrency issue that can kill loglistener process
+  nohup "$PYTHON_BIN" "$HUE_LOGLISTENER" &
+  echo "Log Listener Status: $?" >&2
+  jobs -l >&2
   echo $! > /tmp/hue_${HUE_PORT}.pid
   run_syncdb_and_migrate_subcommands
   exec "$HUE" "rungunicornserver"
