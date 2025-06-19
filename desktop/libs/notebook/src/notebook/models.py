@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
+import simplejson as json
 import math
 import uuid
 import logging
@@ -53,7 +53,7 @@ def escape_rows(rows, nulls_only=False, encoding=None):
 
       for field in row:
         if isinstance(field, numbers.Number):
-          if math.isnan(field) or math.isinf(field):
+          if math.isnan(field) or math.isinf(field) or len(str(field)) > 16:
             escaped_field = json.dumps(field)
           else:
             escaped_field = field
