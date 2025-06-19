@@ -53,8 +53,8 @@ jobs:
         uses: MishaKav/pytest-coverage-comment@v1
         with:
           pytest-xml-coverage-path: ./reports/code-cov/coverage.xml
-          title: Python Coverage Report
-          badge-title: Python Code Coverage
+          title: Backend Code Coverage Report
+          badge-title: Coverage
           report-only-changed-files: true
           xml-skip-covered: true
           remove-link-from-badge: true
@@ -116,7 +116,7 @@ jobs:
         uses: MishaKav/jest-coverage-comment@v1
         with:
           coverage-summary-path: ./reports/jest/coverage-summary.json
-          summary-title: UI Coverage Report
+          summary-title: UI Code Coverage Report
           badge-title: Coverage
           hide-comment: false
           create-new-comment: false
