@@ -286,7 +286,7 @@ class TestS3FileSystemRmtree:
 
     # Check that the exception message is informative
     assert "1 errors occurred" in str(excinfo.value)
-    assert "folder/locked-file.txt: Access Denieds" in str(excinfo.value)
+    assert "folder/locked-file.txt: Access Denied" in str(excinfo.value)
 
 
 class S3FSTest(S3TestBase):
