@@ -393,7 +393,7 @@ class S3FileSystem(object):
       bucket = key.bucket
     except Exception as e:
       # Handle cases where the bucket might not exist or connection fails
-      LOG.error("Failed to connect to bucket '%s'. Error: %s", bucket_name, e)
+      LOG.error(f"Failed to connect to bucket '{bucket_name}'. Error: {e}")
       raise S3FileSystemException(f"Could not access bucket '{bucket_name}'.") from e
 
     if key.exists() or is_directory_key:  # Check both key.exists() and isdir to handle virtual dirs
@@ -411,7 +411,7 @@ class S3FileSystem(object):
         # Add the single key object
         keys_to_delete.append(key)
 
-      LOG.info("Found %d S3 object(s) to delete under prefix '%s'.", len(keys_to_delete), key_name)
+      LOG.info(f"Found {len(keys_to_delete)} S3 object(s) to delete under prefix '{key_name}'.")
 
       # Calculate total chunks using integer ceiling division.
       total_chunks = (len(keys_to_delete) + S3A_DELETE_CHUNK_SIZE - 1) // S3A_DELETE_CHUNK_SIZE
