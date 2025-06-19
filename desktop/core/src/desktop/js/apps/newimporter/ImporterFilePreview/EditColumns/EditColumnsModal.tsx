@@ -188,7 +188,6 @@ const EditColumnsModal = ({
       okText={t('Done')}
       onOk={handleDone}
       className="hue-importer-edit-columns-modal"
-      width={800}
     >
       {typeError && <div className="hue-importer-edit-columns-modal__type-error">{typeError}</div>}
       <Table columns={modalColumns} dataSource={editRows} pagination={false} />
