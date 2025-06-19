@@ -22,6 +22,7 @@ import Input from 'cuix/dist/components/Input';
 import Select from 'cuix/dist/components/Select';
 import { SQL_TYPE_MAPPING_API_URL } from '../../../admin/Components/utils';
 import useLoadData from '../../../../utils/hooks/useLoadData/useLoadData';
+import LoadingErrorWrapper from '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './EditColumnsModal.scss';
 
@@ -185,6 +186,13 @@ const EditColumnsModal = ({
     [t, sqlTypes, sqlTypesLoading]
   );
 
+  const errors = [
+    {
+      enabled: !!typeError,
+      message: typeError ?? t('An unknown error occurred while editing columns.')
+    }
+  ];
+
   return (
     <Modal
       open={isOpen}
@@ -195,8 +203,9 @@ const EditColumnsModal = ({
       onOk={handleDone}
       className="hue-importer-edit-columns-modal"
     >
-      {typeError && <div className="hue-importer-edit-columns-modal__type-error">{typeError}</div>}
-      <Table columns={modalColumns} dataSource={editRows} pagination={false} />
+      <LoadingErrorWrapper loading={sqlTypesLoading} errors={errors}>
+        <Table columns={modalColumns} dataSource={editRows} pagination={false} />
+      </LoadingErrorWrapper>
     </Modal>
   );
 };
