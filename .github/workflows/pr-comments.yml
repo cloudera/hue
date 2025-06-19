@@ -1,12 +1,9 @@
 name: PR Comments
 
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - master
-
-permissions:
-  pull-requests: write
 
 jobs:
   backend-tests-and-coverage:
