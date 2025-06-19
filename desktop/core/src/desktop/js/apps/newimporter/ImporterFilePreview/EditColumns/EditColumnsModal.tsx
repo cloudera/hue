@@ -21,6 +21,7 @@ import Table from 'cuix/dist/components/Table';
 import Input from 'cuix/dist/components/Input';
 import Select from 'cuix/dist/components/Select';
 import { SQL_TYPE_MAPPING_API_URL } from '../../../admin/Components/utils';
+import useLoadData from '../../../../utils/hooks/useLoadData/useLoadData';
 
 import './EditColumnsModal.scss';
 
@@ -56,32 +57,36 @@ const EditColumnsModal = ({
 }: EditColumnsModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [editRows, setEditRows] = useState<EditRow[]>([]);
-  const [sqlTypes, setSqlTypes] = useState<string[]>([]);
   const [typeError, setTypeError] = useState<string | null>(null);
 
+  const {
+    data: sqlTypesData,
+    loading: sqlTypesLoading,
+    error: sqlTypesError
+  } = useLoadData<string[]>(`${SQL_TYPE_MAPPING_API_URL}?sql_dialect=hive`);
+
+  const sqlTypes = useMemo(() => {
+    if (Array.isArray(sqlTypesData) && sqlTypesData.length > 0) {
+      return sqlTypesData;
+    } else if (
+      sqlTypesData &&
+      typeof sqlTypesData === 'object' &&
+      Object.keys(sqlTypesData).length > 0
+    ) {
+      return Array.from(new Set(Object.values(sqlTypesData))) as string[];
+    }
+    return [];
+  }, [sqlTypesData]);
+
   useEffect(() => {
-    const fetchSqlTypes = async () => {
-      try {
-        const res = await fetch(`${SQL_TYPE_MAPPING_API_URL}?sql_dialect=hive`);
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setSqlTypes(data);
-          setTypeError(null);
-        } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-          const typesArray = Array.from(new Set(Object.values(data)));
-          setSqlTypes(typesArray as string[]);
-          setTypeError(null);
-        } else {
-          setSqlTypes([]);
-          setTypeError(t('No SQL types returned from server.'));
-        }
-      } catch (err) {
-        setSqlTypes([]);
-        setTypeError(t('Failed to fetch SQL types.'));
-      }
-    };
-    fetchSqlTypes();
-  }, [t]);
+    if (sqlTypesError) {
+      setTypeError(t('Failed to fetch SQL types.'));
+    } else if (!sqlTypesLoading && sqlTypes.length === 0) {
+      setTypeError(t('No SQL types returned from server.'));
+    } else {
+      setTypeError(null);
+    }
+  }, [sqlTypesError, sqlTypesLoading, sqlTypes, t]);
 
   useEffect(() => {
     setEditRows(
@@ -139,7 +144,8 @@ const EditColumnsModal = ({
             onChange={(val: string) => handleChange(idx, 'type', val)}
             className="hue-importer-edit-columns-modal__select--type"
             getPopupContainer={triggerNode => triggerNode.parentNode}
-            disabled={sqlTypes.length === 0}
+            disabled={sqlTypesLoading || sqlTypes.length === 0}
+            loading={sqlTypesLoading}
           >
             {sqlTypes.map(type => (
               <Select.Option key={type} value={type}>
@@ -176,7 +182,7 @@ const EditColumnsModal = ({
         )
       }
     ],
-    [t, sqlTypes]
+    [t, sqlTypes, sqlTypesLoading]
   );
 
   return (
