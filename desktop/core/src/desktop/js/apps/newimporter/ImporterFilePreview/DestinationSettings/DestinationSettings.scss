@@ -19,7 +19,7 @@
 .antd.cuix {
   .importer-destination-settings {
     display: flex;
-    gap: 16px;
+    gap: vars.$cdl-spacing-s;
 
     .ant-form-item {
       margin-bottom: 0;
@@ -30,7 +30,6 @@
       border: 1px solid vars.$fluidx-gray-600;
       border-radius: vars.$border-radius-base;
       width: min(15vw, 250px);
-      height: 32px;
     }
 
   }

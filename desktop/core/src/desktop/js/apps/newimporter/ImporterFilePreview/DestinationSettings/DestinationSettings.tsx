@@ -138,42 +138,40 @@ const DestinationSettings = ({
 
   return (
     <div className="importer-destination-settings">
-      {inputConfig
-        .filter(({ hidden }) => !hidden)
-        .map(({ label, name, type, options }) => {
-          if (type === 'select') {
-            return (
-              <Form layout="vertical" key={name}>
-                <Form.Item key={name} label={label} htmlFor={name}>
-                  <Select
-                    getPopupContainer={triggerNode => triggerNode.parentElement}
-                    options={options}
-                    id={name}
-                    loading={loading}
-                    value={selectedSettings[name]}
-                    className="importer-destination-settings__select-dropdown"
-                    onChange={value => handleDropdownChange(name, value)}
-                  />
-                </Form.Item>
-              </Form>
-            );
-          }
-          if (type === 'input') {
-            return (
-              <Form layout="vertical" key={name}>
-                <Form.Item key={name} label={label} htmlFor={name}>
-                  <Input
-                    id={name}
-                    value={tableName}
-                    className="importer-destination-settings__input"
-                    onChange={e => handleTableChange(e.target.value)}
-                  />
-                </Form.Item>
-              </Form>
-            );
-          }
-          return <></>;
-        })}
+      {inputConfig.map(({ label, name, type, options }) => {
+        if (type === 'select') {
+          return (
+            <Form layout="vertical" key={name}>
+              <Form.Item key={name} label={label} htmlFor={name}>
+                <Select
+                  getPopupContainer={triggerNode => triggerNode.parentElement}
+                  options={options}
+                  id={name}
+                  loading={loading}
+                  value={selectedSettings[name]}
+                  className="importer-destination-settings__select-dropdown"
+                  onChange={value => handleDropdownChange(name, value)}
+                />
+              </Form.Item>
+            </Form>
+          );
+        }
+        if (type === 'input') {
+          return (
+            <Form layout="vertical" key={name}>
+              <Form.Item key={name} label={label} htmlFor={name}>
+                <Input
+                  id={name}
+                  value={tableName}
+                  className="importer-destination-settings__input"
+                  onChange={e => handleTableChange(e.target.value)}
+                />
+              </Form.Item>
+            </Form>
+          );
+        }
+        return <></>;
+      })}
     </div>
   );
 };
