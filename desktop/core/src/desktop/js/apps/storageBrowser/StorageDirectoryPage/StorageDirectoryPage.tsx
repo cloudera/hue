@@ -237,6 +237,7 @@ const StorageDirectoryPage = ({
       <div className="hue-storage-browser-directory__actions-bar">
         <Input
           className="hue-storage-browser-directory__actions-bar__search"
+          data-testid="hue-storage-browser-directory__actions-bar__search"
           placeholder={t('Search')}
           allowClear={true}
           onChange={event => handleSearch(event.target.value)}
