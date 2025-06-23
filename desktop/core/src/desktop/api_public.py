@@ -19,10 +19,9 @@ import json
 import logging
 
 from django.http import HttpResponse, QueryDict
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
-from about import api as about_api
 from beeswax import api as beeswax_api
 from desktop import api2 as desktop_api
 from desktop.auth.backend import rewrite_user
