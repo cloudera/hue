@@ -14,89 +14,110 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, patch
 
+import pytest
+from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import APIClient
 
-from about.api import get_usage_analytics, update_usage_analytics
+from useradmin.models import User
 
 
-class TestUsageAnalyticsAPI:
-  def test_get_usage_analytics_success(self):
-    with patch('about.api.is_admin') as mock_is_admin:
-      with patch('about.api.Settings.get_settings') as mock_get_settings:
-        mock_is_admin.return_value = True
-        mock_get_settings.return_value = Mock(collect_usage=True)
+@pytest.mark.django_db
+class TestUsageAnalyticsSettingsAPI:
+  @pytest.fixture
+  def api_client(self) -> APIClient:
+    return APIClient()
 
-        request = Mock(method='GET', user=Mock())
-        response = get_usage_analytics(request)
+  @pytest.fixture
+  def regular_user(self, db) -> User:
+    return User.objects.create_user(username="testuser", password="")
 
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data == {'analytics_enabled': True}
+  @pytest.fixture
+  def admin_user(self, db) -> User:
+    return User.objects.create_superuser(username="adminuser", password="")
 
-  def test_get_usage_analytics_unauthorized(self):
-    with patch('about.api.is_admin') as mock_is_admin:
-      mock_is_admin.return_value = False
+  @pytest.fixture
+  def analytics_settings_url(self) -> str:
+    return reverse("api:core_usage_analytics")
 
-      request = Mock(method='GET', user=Mock())
-      response = get_usage_analytics(request)
+  @patch("desktop.auth.api_permissions.is_admin", return_value=True)
+  @patch("about.api.Settings.get_settings")
+  def test_get_settings_as_admin_success(self, mock_get_settings, mock_is_admin, api_client, admin_user, analytics_settings_url):
+    mock_get_settings.return_value = MagicMock(collect_usage=True)
+    api_client.force_authenticate(user=admin_user)
 
-      assert response.status_code == status.HTTP_403_FORBIDDEN
-      assert response.data['message'] == "You must be a Hue admin to access this endpoint."
+    response = api_client.get(analytics_settings_url)
 
-  def test_get_usage_analytics_error(self):
-    with patch('about.api.is_admin') as mock_is_admin:
-      with patch('about.api.Settings.get_settings') as mock_get_settings:
-        mock_is_admin.return_value = True
-        mock_get_settings.side_effect = Exception("Test error")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == {"analytics_enabled": True}
 
-        request = Mock(method='GET', user=Mock())
-        response = get_usage_analytics(request)
+  @patch("desktop.auth.api_permissions.is_admin", return_value=False)
+  def test_get_settings_as_non_admin_forbidden(self, mock_is_admin, api_client, regular_user, analytics_settings_url):
+    api_client.force_authenticate(user=regular_user)
 
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert "Error retrieving usage analytics" in response.data['message']
+    response = api_client.get(analytics_settings_url)
 
-  def test_update_usage_analytics_success(self):
-    with patch('about.api.is_admin') as mock_is_admin:
-      with patch('about.api.Settings.get_settings') as mock_get_settings:
-        mock_is_admin.return_value = True
-        mock_get_settings.return_value = Mock(save=Mock())
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.data == {"detail": "You must be a Hue admin to perform this action."}
 
-        request = Mock(method='POST', user=Mock(), POST={'analytics_enabled': 'true'})
-        response = update_usage_analytics(request)
+  @patch("desktop.auth.api_permissions.is_admin", return_value=True)
+  @patch("about.api.Settings.get_settings")
+  def test_get_settings_as_admin_error(self, mock_get_settings, mock_is_admin, api_client, admin_user, analytics_settings_url):
+    mock_get_settings.side_effect = ObjectDoesNotExist("Settings not found")
+    api_client.force_authenticate(user=admin_user)
 
-        assert response.status_code == status.HTTP_200_OK
-        assert mock_get_settings.return_value.save.called
-        assert response.data == {'analytics_enabled': True}
+    response = api_client.get(analytics_settings_url)
 
-  def test_update_usage_analytics_unauthorized(self):
-    with patch('about.api.is_admin') as mock_is_admin:
-      mock_is_admin.return_value = False
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert response.data == {"error": "A server error occurred while retrieving settings."}
 
-      request = Mock(method='POST', user=Mock(), data={'analytics_enabled': 'true'})
-      response = update_usage_analytics(request)
+  @patch("desktop.auth.api_permissions.is_admin", return_value=True)
+  @patch("about.api.Settings.get_settings")
+  def test_put_settings_as_admin_success(self, mock_get_settings, mock_is_admin, api_client, admin_user, analytics_settings_url):
+    mock_settings = MagicMock()
+    mock_get_settings.return_value = mock_settings
+    api_client.force_authenticate(user=admin_user)
+    payload = {"analytics_enabled": False}
 
-      assert response.status_code == status.HTTP_403_FORBIDDEN
-      assert response.data['message'] == "You must be a Hue admin to access this endpoint."
+    response = api_client.put(analytics_settings_url, data=payload, format="json")
 
-  def test_update_usage_analytics_missing_param(self):
-    with patch('about.api.is_admin') as mock_is_admin:
-      mock_is_admin.return_value = True
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == payload
+    assert mock_settings.collect_usage is False
+    mock_settings.save.assert_called_once()
 
-      request = Mock(method='POST', user=Mock(), POST={})
-      response = update_usage_analytics(request)
+  @patch("desktop.auth.api_permissions.is_admin", return_value=False)
+  def test_put_settings_as_non_admin_forbidden(self, mock_is_admin, api_client, regular_user, analytics_settings_url):
+    api_client.force_authenticate(user=regular_user)
 
-      assert response.status_code == status.HTTP_400_BAD_REQUEST
-      assert response.data['message'] == 'Missing parameter: analytics_enabled is required.'
+    response = api_client.put(analytics_settings_url)
 
-  def test_update_usage_analytics_error(self):
-    with patch('about.api.is_admin') as mock_is_admin:
-      with patch('about.api.Settings.get_settings') as mock_get_settings:
-        mock_is_admin.return_value = True
-        mock_get_settings.side_effect = Exception("Test error")
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.data == {"detail": "You must be a Hue admin to perform this action."}
 
-        request = Mock(method='POST', user=Mock(), POST={'analytics_enabled': 'true'})
-        response = update_usage_analytics(request)
+  @patch("desktop.auth.api_permissions.is_admin", return_value=True)
+  @patch("about.api.Settings.get_settings")
+  def test_put_settings_as_admin_error(self, mock_get_settings, mock_is_admin, api_client, admin_user, analytics_settings_url):
+    mock_get_settings.side_effect = ObjectDoesNotExist("Settings not found")
+    api_client.force_authenticate(user=admin_user)
+    payload = {"analytics_enabled": False}
 
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert "Error updating usage analytics" in response.data['message']
+    response = api_client.put(analytics_settings_url, data=payload, format="json")
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert response.data == {"error": "A server error occurred while saving the settings."}
+
+  @patch("desktop.auth.api_permissions.is_admin", return_value=True)
+  @patch("about.api.Settings.get_settings")
+  def test_put_settings_as_admin_missing_field(self, mock_get_settings, mock_is_admin, api_client, admin_user, analytics_settings_url):
+    mock_get_settings.return_value = MagicMock(collect_usage=True)
+    api_client.force_authenticate(user=admin_user)
+    payload = {}
+
+    response = api_client.put(analytics_settings_url, data=payload, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data == {"analytics_enabled": ["This field is required."]}

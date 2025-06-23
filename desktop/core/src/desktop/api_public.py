@@ -90,18 +90,6 @@ def available_app_examples(request):
   return desktop_api.available_app_examples(django_request)
 
 
-@api_view(["GET"])
-def get_usage_analytics(request):
-  django_request = get_django_request(request)
-  return about_api.get_usage_analytics(django_request)
-
-
-@api_view(["POST"])
-def update_usage_analytics(request):
-  django_request = get_django_request(request)
-  return about_api.update_usage_analytics(django_request)
-
-
 # Editor
 
 
