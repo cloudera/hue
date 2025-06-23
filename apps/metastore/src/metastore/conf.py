@@ -41,3 +41,10 @@ SHOW_TABLE_ERD = Config(
   type=coerce_bool,
   help=_('Choose whether to show the table ERD component.')
 )
+
+ALLOW_SAMPLE_DATA_FROM_VIEWS = Config(
+  key='allow_sample_data_from_views',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to allow fetching sample data from views. By default, this is false to prevent potentially expensive queries.')
+)

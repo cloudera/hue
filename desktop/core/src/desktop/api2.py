@@ -36,6 +36,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
 
 from beeswax import common
+from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS
 from beeswax.management.commands import beeswax_install_examples
 from beeswax.models import Namespace
 from desktop import appmanager
@@ -146,6 +147,7 @@ def get_config(request):
     'is_yarn_enabled': is_yarn(),
     'enable_task_server': TASK_SERVER_V2.ENABLED.get(),
     'enable_workflow_creation_action': ENABLE_WORKFLOW_CREATION_ACTION.get(),
+    'allow_sample_data_from_views': ALLOW_SAMPLE_DATA_FROM_VIEWS.get(),
   }
 
   # Storage browser configuration

@@ -37,6 +37,7 @@ from django.utils.translation import gettext as _, gettext_lazy as _t
 
 from dashboard.conf import HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED, get_engines
 from desktop import appmanager
+from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS
 from desktop.auth.backend import is_admin
 from desktop.conf import (
   APP_BLACKLIST,
@@ -1808,7 +1809,8 @@ class ClusterConfig(object):
       'has_computes': self.cluster_type in ('cdw', 'altus', 'snowball'),  # or any grouped engine connectors
       'hue_config': {
         'enable_sharing': ENABLE_SHARING.get(),
-        'collect_usage': COLLECT_USAGE.get()
+        'collect_usage': COLLECT_USAGE.get(),
+        'allow_sample_data_from_views': ALLOW_SAMPLE_DATA_FROM_VIEWS.get(),
       },
       'storage_browser': {},
       'vw_name': hue_host_name,

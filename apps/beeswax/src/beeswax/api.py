@@ -28,6 +28,7 @@ from thrift.transport.TTransport import TTransportException
 
 import beeswax.models
 from beeswax.conf import USE_GET_LOG_API
+from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS
 from beeswax.data_export import upload
 from beeswax.design import HQLdesign
 from beeswax.forms import QueryForm
@@ -733,7 +734,7 @@ def _get_sample_data(db, database, table, column, nested, is_async=False, cluste
       query_server = get_query_server_config('impala', connector=cluster)
       db = dbms.get(db.client.user, query_server, cluster=cluster)
 
-  if table_obj and table_obj.is_view:
+  if table_obj and table_obj.is_view and not ALLOW_SAMPLE_DATA_FROM_VIEWS.get():
     response = {'status': -1}
     response['message'] = _('Not getting sample data as this is a view which can be expensive when run.')
     return response
