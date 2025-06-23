@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "ALTER"
-    ],
+    "containsKeywords": ["ALTER"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -14,10 +12,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "ALTER ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TABLE",
-      "VIEW"
-    ],
+    "containsKeywords": ["TABLE", "VIEW"],
     "expectedResult": {
       "lowerCase": false
     }

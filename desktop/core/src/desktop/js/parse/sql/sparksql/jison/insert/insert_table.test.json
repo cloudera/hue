@@ -4,9 +4,7 @@
     "beforeCursor": "INSERT INTO TABLE db.tbl PARTITION (a=1,b=2) (c,d) VALUES (NULL , 1), ( 2, 3 ); ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -16,9 +14,7 @@
     "beforeCursor": "INSERT INTO TABLE db.tbl PARTITION (a=1,b=2) (c,d) SELECT 1; ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -81,11 +77,7 @@
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PARTITION",
-        "SELECT",
-        "VALUES"
-      ]
+      "suggestKeywords": ["PARTITION", "SELECT", "VALUES"]
     }
   },
   {
@@ -161,10 +153,7 @@
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT",
-        "VALUES"
-      ]
+      "suggestKeywords": ["SELECT", "VALUES"]
     }
   },
   {
@@ -174,25 +163,14 @@
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT",
-        "VALUES"
-      ]
+      "suggestKeywords": ["SELECT", "VALUES"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "INSERT OVERWRITE tbl PARTITION (b = '123') SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*",
-      "CASE",
-      "ALL",
-      "DISTINCT",
-      "FALSE",
-      "NULL",
-      "TRUE"
-    ],
+    "containsKeywords": ["*", "CASE", "ALL", "DISTINCT", "FALSE", "NULL", "TRUE"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
@@ -218,13 +196,7 @@
     "afterCursor": " db.tbl VALUES (1);",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "INTO",
-        "INTO TABLE",
-        "OVERWRITE",
-        "OVERWRITE TABLE",
-        "TABLE"
-      ]
+      "suggestKeywords": ["INTO", "INTO TABLE", "OVERWRITE", "OVERWRITE TABLE", "TABLE"]
     }
   },
   {
@@ -233,9 +205,7 @@
     "afterCursor": " db.tbl VALUES (1);",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TABLE"
-      ]
+      "suggestKeywords": ["TABLE"]
     }
   },
   {
@@ -244,9 +214,7 @@
     "afterCursor": " SELECT * FROM foo;",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PARTITION"
-      ]
+      "suggestKeywords": ["PARTITION"]
     }
   }
 ]

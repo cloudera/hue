@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "USE"
-    ],
+    "containsKeywords": ["USE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -34,11 +32,7 @@
     "namePrefix": "should use a use statement",
     "beforeCursor": "use database_two; \nSELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "useDatabase": "database_two",
       "lowerCase": true,
@@ -62,11 +56,7 @@
     "namePrefix": "should use the last use statement",
     "beforeCursor": "USE other_db; USE closest_db; \n\tSELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "useDatabase": "closest_db",
       "lowerCase": false,
@@ -90,11 +80,7 @@
     "namePrefix": "should use the use statement",
     "beforeCursor": "USE other_db; USE closest_db; \n\tSELECT ",
     "afterCursor": "; USE some_other_db;",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "useDatabase": "closest_db",
       "lowerCase": false,
