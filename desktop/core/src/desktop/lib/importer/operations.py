@@ -35,7 +35,7 @@ try:
 
   is_magic_lib_available = True
 except ImportError as e:
-  LOG.exception(f"Failed to import python-magic: {str(e)}")
+  LOG.warning(f"Failed to import python-magic: {e}")
   is_magic_lib_available = False
 
 

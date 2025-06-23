@@ -77,9 +77,7 @@ $hue-panel-border-radius: 3px;
     -webkit-box-shadow: inset $top $left $blur $color;
     -moz-box-shadow: inset $top $left $blur $color;
     box-shadow: inset $top $left $blur $color;
-  }
-
-  @else {
+  } @else {
     -webkit-box-shadow: $top $left $blur $color;
     -moz-box-shadow: $top $left $blur $color;
     box-shadow: $top $left $blur $color;
@@ -149,8 +147,13 @@ $hue-panel-border-radius: 3px;
 }
 
 @include keyframes(fade-in-frames) {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @mixin fade-in {

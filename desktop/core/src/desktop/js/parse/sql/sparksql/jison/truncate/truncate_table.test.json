@@ -3,9 +3,7 @@
     "namePrefix": "should not find errors",
     "beforeCursor": "TRUNCATE TABLE table_identifier PARTITION (a = 1, b = 2);",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false
@@ -15,9 +13,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "TRUNCATE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TABLE"
-    ],
+    "containsKeywords": ["TABLE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -58,9 +54,7 @@
     "afterCursor": " ",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "PARTITION"
-      ]
+      "suggestKeywords": ["PARTITION"]
     }
   },
   {

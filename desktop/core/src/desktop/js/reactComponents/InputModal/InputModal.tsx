@@ -83,6 +83,7 @@ const InputModal = ({
         <Form layout="vertical">
           <Form.Item label={inputLabel}>
             <Input
+              data-testid="hue-input-modal__input"
               defaultValue={value}
               type={inputType}
               disabled={loading}

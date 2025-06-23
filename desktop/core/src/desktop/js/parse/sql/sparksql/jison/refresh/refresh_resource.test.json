@@ -4,8 +4,6 @@
     "beforeCursor": "REFRESH \"hdfs://path/to/table\";",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   }
 ]

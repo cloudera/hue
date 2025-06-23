@@ -4,9 +4,7 @@
     "beforeCursor": "INSERT INTO bla.boo VALUES (1, 2, 'a', 3); ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -15,9 +13,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "INSERT"
-    ],
+    "containsKeywords": ["INSERT"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false
@@ -27,9 +23,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "INSERT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "INTO"
-    ],
+    "containsKeywords": ["INTO"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false
@@ -46,9 +40,7 @@
       "suggestDatabases": {
         "appendDot": true
       },
-      "suggestKeywords": [
-        "TABLE"
-      ]
+      "suggestKeywords": ["TABLE"]
     }
   },
   {
@@ -87,9 +79,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "INSERT INTO baa ",
     "afterCursor": "",
-    "containsKeywords": [
-      "VALUES"
-    ],
+    "containsKeywords": ["VALUES"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false
@@ -99,9 +89,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "INSERT INTO TABLE baa ",
     "afterCursor": "",
-    "containsKeywords": [
-      "VALUES"
-    ],
+    "containsKeywords": ["VALUES"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false

@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DROP ",
     "afterCursor": "",
-    "containsKeywords": [
-      "ROLE"
-    ],
+    "containsKeywords": ["ROLE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -15,9 +13,7 @@
     "beforeCursor": "DROP ROLE boo;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }

@@ -3,27 +3,21 @@
     "namePrefix": "should accept statement",
     "beforeCursor": "LIST ARCHIVE;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "LIST ARCHIVE /tmp/test;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "LIST ARCHIVE \"/path/to/file/abc.txt\";",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -33,9 +27,7 @@
     "beforeCursor": "LIST ARCHIVE '/path/to/file with space/abc.txt';",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -44,9 +36,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "LIST ",
     "afterCursor": "",
-    "containsKeywords": [
-      "ARCHIVE"
-    ],
+    "containsKeywords": ["ARCHIVE"],
     "expectedResult": {
       "lowerCase": false
     }

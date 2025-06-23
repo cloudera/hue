@@ -5,9 +5,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "BY"
-      ],
+      "suggestKeywords": ["BY"],
       "suggestGroupBys": {
         "prefix": "BY",
         "tables": [
@@ -28,9 +26,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "BY"
-      ],
+      "suggestKeywords": ["BY"],
       "suggestGroupBys": {
         "prefix": "BY",
         "tables": [
@@ -63,18 +59,14 @@
           }
         ]
       },
-      "suggestKeywords": [
-        "BY"
-      ]
+      "suggestKeywords": ["BY"]
     }
   },
   {
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM testTable GROUP BY ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -107,9 +99,7 @@
     "namePrefix": "should suggest columns",
     "beforeCursor": "SELECT * FROM database_two.testTable GROUP BY ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -148,9 +138,7 @@
     "namePrefix": "should suggest identifiers",
     "beforeCursor": "SELECT * FROM testTableA tta, testTableB GROUP BY ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -209,9 +197,7 @@
     "namePrefix": "should suggest identifier",
     "beforeCursor": "SELECT * FROM testTableA tta, testTableB GROUP BY bla, ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -251,21 +237,15 @@
     "namePrefix": "should suggest identifier",
     "beforeCursor": "SELECT * FROM testTableA tta, testTableB GROUP BY bla+",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {
-        "types": [
-          "NUMBER"
-        ]
+        "types": ["NUMBER"]
       },
       "suggestColumns": {
         "source": "group by",
-        "types": [
-          "NUMBER"
-        ],
+        "types": ["NUMBER"],
         "tables": [
           {
             "identifierChain": [
@@ -300,9 +280,7 @@
     "namePrefix": "should suggest identifier",
     "beforeCursor": "SELECT * FROM testTableA tta, testTableB GROUP BY bla, ",
     "afterCursor": ", foo",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},

@@ -3,13 +3,12 @@ name: Python 3 CI
 on:
   push:
     branches:
-    - master
+      - master
   pull_request:
     branches:
-    - master
+      - master
 jobs:
   hue-build-and-tests:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -17,66 +16,65 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11']
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Check commit title format
-      run: |
-        ./tools/ci/check_for_commit_message.sh
+      - name: Check commit title format
+        run: |
+          ./tools/ci/check_for_commit_message.sh
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Cache pip
-      uses: actions/cache@v4
-      with:
-        # This path is specific to Ubuntu
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/generate_requirements.py') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-          ${{ runner.os }}-
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('desktop/core/generate_requirements.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
 
-    - name: Setup node 20 and cache npm
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'npm'
+      - name: Setup node 20 and cache npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
 
-    - name: Build Hue
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential asciidoc libkrb5-dev libldap2-dev libsasl2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libgdbm-dev
+      - name: Build Hue
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential asciidoc libkrb5-dev libldap2-dev libsasl2-dev libxslt-dev libsasl2-modules-gssapi-mit libsnappy-dev libgdbm-dev
 
-        export PYTHON_VER=python${{ matrix.python-version }}
-        export SKIP_PYTHONDEV_CHECK=true
-        export ROOT=$PWD
-        make apps test_prep
+          export PYTHON_VER=python${{ matrix.python-version }}
+          export SKIP_PYTHONDEV_CHECK=true
+          export ROOT=$PWD
+          make apps test_prep
 
-    - name: Run unit tests
-      run: |
-        if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
-          ./build/env/bin/pytest
-        else
-          ./build/venvs/python${{ matrix.python-version }}/bin/pytest
-        fi
+      - name: Run unit tests
+        run: |
+          if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+            ./build/env/bin/pytest
+          else
+            ./build/venvs/python${{ matrix.python-version }}/bin/pytest
+          fi
 
-    - name: Run python lint check
-      run: |
-        if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
-          PYTHONWARNINGS=always ./build/env/bin/hue runruff check
-        else
-          PYTHONWARNINGS=always ./build/venvs/python${{ matrix.python-version }}/bin/hue runruff check
-        fi
+      - name: Run python lint check
+        run: |
+          if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+            PYTHONWARNINGS=always ./build/env/bin/hue runruff check
+          else
+            PYTHONWARNINGS=always ./build/venvs/python${{ matrix.python-version }}/bin/hue runruff check
+          fi
 
-    - name: Upload reports
-      if: matrix.python-version == '3.11'
-      uses: actions/upload-artifact@v4
-      with:
-        name: hue-reports
-        path: ./reports
-
+      - name: Upload reports
+        if: matrix.python-version == '3.11'
+        uses: actions/upload-artifact@v4
+        with:
+          name: hue-reports
+          path: ./reports

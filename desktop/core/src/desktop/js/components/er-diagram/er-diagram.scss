@@ -29,7 +29,7 @@ $dot-space: 10px;
   font-weight: bold;
 
   &::before {
-    content: "\2922";
+    content: '\2922';
   }
 }
 
@@ -38,7 +38,7 @@ $dot-space: 10px;
   border: 1px solid #d6d8db;
   border-radius: 5px;
   position: relative;
-  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   line-height: 20px;
   font-size: 14px;
   background:
