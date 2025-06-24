@@ -30,7 +30,7 @@ from desktop.models import Settings
 LOG = logging.getLogger()
 
 
-class UsageAnalyticsSettingsView(APIView):
+class UsageAnalyticsAPI(APIView):
   """
   Provides GET and PUT handlers for the usage analytics setting.
 

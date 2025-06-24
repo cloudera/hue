@@ -40,7 +40,7 @@ urlpatterns += [
   re_path(r'^get_config/?$', api_public.get_config),
   re_path(r'^check_config/?$', api_public.check_config, name='core_check_config'),
   re_path(r'^get_namespaces/(?P<interface>[\w\-]+)/?$', api_public.get_context_namespaces),  # To remove
-  re_path(r'^usage_analytics/?$', about_api.UsageAnalyticsSettingsView.as_view(), name='core_usage_analytics'),
+  re_path(r'^usage_analytics/?$', about_api.UsageAnalyticsAPI.as_view(), name='core_usage_analytics'),
 ]
 
 urlpatterns += [
