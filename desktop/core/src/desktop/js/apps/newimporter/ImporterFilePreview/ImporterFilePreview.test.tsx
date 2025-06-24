@@ -17,19 +17,25 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import ImporterFilePreview from './ImporterFilePreview';
 import { FileMetaData, ImporterFileSource, ImporterFileTypes } from '../types';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import { mocked } from 'jest-mock';
 
-jest.mock('../../../utils/hooks/useLoadData/useLoadData', () => ({
+const mockPreviewData = jest.fn().mockReturnValue({
+  columns: [{ name: 'Name' }, { name: 'Age' }],
+  previewData: {
+    name: ['Alice', 'Bob'],
+    age: ['30', '25']
+  }
+});
+
+jest.mock('../../../utils/hooks/useLoadData/useLoadData');
+jest.mock('../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
-    data: {
-      columns: [{ name: 'Name' }, { name: 'Age' }],
-      previewData: {
-        name: ['Alice', 'Bob'],
-        age: ['30', '25']
-      }
-    },
+    save: jest.fn(),
     loading: false
   }))
 }));
@@ -40,6 +46,15 @@ describe('ImporterFilePreview', () => {
     type: ImporterFileTypes.CSV,
     path: '/path/to/file.csv'
   };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mocked(useLoadData).mockImplementation(() => ({
+      loading: false,
+      data: mockPreviewData(),
+      reloadData: jest.fn()
+    }));
+  });
 
   it('should render correctly', async () => {
     render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
@@ -59,6 +74,47 @@ describe('ImporterFilePreview', () => {
       expect(screen.getByText('30')).toBeInTheDocument();
       expect(screen.getByText('Bob')).toBeInTheDocument();
       expect(screen.getByText('25')).toBeInTheDocument();
+    });
+  });
+
+  it('should open edit columns modal when button is clicked', async () => {
+    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+
+    const editColumnsButton = screen.getByText('Edit Columns');
+    await userEvent.click(editColumnsButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+  });
+
+  it('should display source configuration', () => {
+    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+
+    expect(screen.getByText('Configure source')).toBeInTheDocument();
+  });
+
+  it('should display cancel button', () => {
+    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+
+    const cancelButton = screen.getByTestId('hue-importer-preview-page__header__actions__cancel');
+    expect(cancelButton).toBeInTheDocument();
+    expect(cancelButton).toHaveTextContent('Cancel');
+  });
+
+  it('should handle complete file format workflow', async () => {
+    mocked(useLoadData).mockImplementation(() => ({
+      loading: false,
+      data: mockPreviewData(),
+      reloadData: jest.fn()
+    }));
+
+    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Preview')).toBeInTheDocument();
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
     });
   });
 });

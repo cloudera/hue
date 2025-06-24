@@ -56,20 +56,22 @@ export const convertToDataSource = (
   return data;
 };
 
-export const getDefaultTableName = (filePath: string, fileSource: ImporterFileSource): string => {
-  // For local files, the file name is extracted from the path
-  // Example: /**/**/**:fileName;**.fileExtension
-  if (fileSource === ImporterFileSource.LOCAL) {
-    const match = filePath.match(/:(.*?);/);
-    return match?.[1] ?? '';
-  }
+const sanitizeTableName = (name: string): string => {
+  return name
+    .replace(/[^a-zA-Z0-9]/g, '_') // replace non-alphanumeric characters with underscores
+    .replace(/_+/g, '_') // replace multiple underscores with a single underscore
+    .replace(/^_+|_+$/g, ''); // remove leading and trailing underscores
+};
 
-  // For Remote, remove extension and replace '.' with '_'
-  // Example: file.name.fileExtension -> file_name
-  const fileName = getLastDirOrFileNameFromPath(filePath);
-  if (fileName.split('.').length === 1) {
-    // If there is no extension, return the file name as is
-    return fileName;
-  }
-  return fileName.split('.').slice(0, -1).join('_');
+const getLastDirOrFileNameWithoutExtension = (fileName: string): string => {
+  return fileName.split('.').length > 1 ? fileName.split('.').slice(0, -1).join('.') : fileName;
+};
+
+export const getDefaultTableName = (filePath: string, fileSource: ImporterFileSource): string => {
+  const rawFileName =
+    fileSource === ImporterFileSource.LOCAL
+      ? (filePath.match(/:(.*?);/)?.[1] ?? '')
+      : getLastDirOrFileNameWithoutExtension(getLastDirOrFileNameFromPath(filePath));
+
+  return sanitizeTableName(rawFileName);
 };
