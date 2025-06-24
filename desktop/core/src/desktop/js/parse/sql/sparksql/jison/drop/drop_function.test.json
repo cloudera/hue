@@ -3,9 +3,7 @@
     "namePrefix": "should not find errors",
     "beforeCursor": "DROP TEMPORARY FUNCTION IF EXISTS baa;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false
@@ -15,10 +13,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DROP ",
     "afterCursor": "",
-    "containsKeywords": [
-      "FUNCTION",
-      "TEMPORARY FUNCTION"
-    ],
+    "containsKeywords": ["FUNCTION", "TEMPORARY FUNCTION"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -27,9 +22,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DROP TEMPORARY ",
     "afterCursor": "",
-    "containsKeywords": [
-      "FUNCTION"
-    ],
+    "containsKeywords": ["FUNCTION"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -40,9 +33,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF EXISTS"
-      ]
+      "suggestKeywords": ["IF EXISTS"]
     }
   },
   {
@@ -51,9 +42,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   }
 ]

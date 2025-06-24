@@ -572,50 +572,279 @@ Purge the trash directory on **HDFS**:
 
     curl -X POST https://demo.gethue.com/api/v1/storage/trash/purge
 
-## Data Importer
+## Importer
 
-### File import
+The File Import API provides endpoints for uploading, analyzing, and previewing files that can be imported into various SQL engines. This API simplifies the process of creating database tables from files like CSV, TSV, and Excel spreadsheets.
 
-We have 2 options here.
+### Overview
 
-- **Remote file**
-  + In this option we are choosing a file from HDFS/S3 file system.
+The File Import API allows you to:
 
+- Upload files from your local system
+- Analyze file metadata to determine format and characteristics
+- Check whether files have headers
+- Preview file content with data types
+- Get SQL type mappings for different SQL dialects
 
-- **Small Local file**
-  + In this option we can choose a file from local file system.
+### Typical Import Workflow
 
-We need to pass two main parameters `inputFormat` and `path` to the `guess_format` api.
-  - For example:
-    + In remote file, parameters are `inputFormat=file` and `path=s3a://demo-gethue/data/web_logs/index_data.csv`
-    + In small local file, parameter are `inputFormat=localfile`  and `path=/Users/hue/Downloads/test_demo/flights11.csv`
+A typical workflow for importing a file into a database table involves these steps:
 
-**Note:** Here value of `inputFormat` is constant according to the option we choose and the value of `path` should be from valid file system as explained above.
+1. **Upload the file** using the `/api/importer/upload/file/` endpoint
+2. **Detect file metadata** using the `/api/importer/file/guess_metadata/` endpoint
+3. **Determine if the file has a header** using the `/api/importer/file/guess_header/` endpoint
+4. **Preview the file** with column type detection using the `/api/importer/file/preview/` endpoint
+5. Use the preview data to create a table in your SQL engine of choice
 
-Now guessing the format of the file:
+### Upload a Local File
 
-    curl -X POST https://demo.gethue.com/api/v1/indexer/guess_format  --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-gethue/data/web_logs/index_data.csv"}'
+Upload a file from your local system to the Hue server.
 
-    {"status": 0, "fieldSeparator": ",", "hasHeader": true, "quoteChar": "\"", "recordSeparator": "\\n", "type": "csv"}
+**Endpoint:** `/api/importer/upload/file/`
 
-Then getting some data sample as well as the column types (column names will be picked from the header line if present):
+**Method:** `POST`
 
-    curl -X POST https://demo.gethue.com/api/v1/indexer/guess_field_types  --data 'fileFormat={"inputFormat":"file","path":"s3a://demo-gethue/data/web_logs/index_data.csv","format":{"type":"csv","fieldSeparator":",","recordSeparator":"\\n","quoteChar":"\"","hasHeader":true,"status":0}}'
+**Content Type:** `multipart/form-data`
 
+**Request Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| file | File | Yes | The file to upload (csv, tsv, excel) |
+
+**Example using cURL:**
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
+  -F "file=@/path/to/sales_data.csv" \
+  https://demo.gethue.com/api/importer/upload/file/
+```
+
+**Response:**
+
+```json
+{
+  "file_path": "/tmp/username_abc123_sales_data.csv"
+}
+```
+
+**Status Codes:**
+
+- `201 Created` - File was uploaded successfully
+- `400 Bad Request` - Invalid file format or size
+- `500 Internal Server Error` - Server-side error
+
+**Restrictions:**
+- Maximum file size is determined by the configuration `IMPORTER.MAX_LOCAL_FILE_SIZE_UPLOAD_LIMIT`
+- Certain file extensions may be restricted based on `IMPORTER.RESTRICT_LOCAL_FILE_EXTENSIONS`
+
+### Guess File Metadata
+
+Analyze a file to determine its type and metadata properties such as delimiters for CSV files or sheet names for Excel files.
+
+**Endpoint:** `/api/importer/file/guess_metadata/`
+
+**Method:** `GET`
+
+**Request Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| file_path | String | Yes | Full path to the file to analyze |
+| import_type | String | Yes | Type of import, either `local` or `remote` |
+
+**Example using cURL:**
+
+```bash
+curl -X GET \
+  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
+  "https://demo.gethue.com/api/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local"
+```
+
+**Response Examples:**
+
+For CSV files:
+```json
+{
+  "type": "csv",
+  "field_separator": ",",
+  "quote_char": "\"",
+  "record_separator": "\n"
+}
+```
+
+For Excel files:
+```json
+{
+  "type": "excel",
+  "sheet_names": ["Sales 2024", "Sales 2025", "Analytics"]
+}
+```
+
+### Guess File Header
+
+Analyze a file to determine if it has a header row.
+
+**Endpoint:** `/api/importer/file/guess_header/`
+
+**Method:** `GET`
+
+**Request Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| file_path | String | Yes | Full path to the file to analyze |
+| file_type | String | Yes | Type of file (`csv`, `tsv`, `excel`, `delimiter_format`) |
+| import_type | String | Yes | Type of import, either `local` or `remote` |
+| sheet_name | String | No | Sheet name (required for Excel files) |
+
+**Example using cURL:**
+
+```bash
+curl -X GET \
+  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
+  "https://demo.gethue.com/api/importer/file/guess_header/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local"
+```
+
+**Response:**
+
+```json
+{
+  "has_header": true
+}
+```
+
+### Preview File
+
+Generate a preview of a file's content with column type mapping for creating SQL tables.
+
+**Endpoint:** `/api/importer/file/preview/`
+
+**Method:** `GET`
+
+**Request Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| file_path | String | Yes | Full path to the file to preview |
+| file_type | String | Yes | Type of file (`csv`, `tsv`, `excel`, `delimiter_format`) |
+| import_type | String | Yes | Type of import (`local` or `remote`) |
+| sql_dialect | String | Yes | SQL dialect for type mapping (`hive`, `impala`, `trino`, `phoenix`, `sparksql`) |
+| has_header | Boolean | Yes | Whether the file has a header row |
+| sheet_name | String | No | Sheet name (required for Excel files) |
+| field_separator | String | No | Field separator character (defaults to `,` for CSV, `\t` for TSV, required for `delimiter_format`) |
+| quote_char | String | No | Quote character (defaults to `"`) |
+| record_separator | String | No | Record separator character (defaults to `\n`) |
+
+**Example using cURL:**
+
+```bash
+curl -X GET \
+  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
+  "https://demo.gethue.com/api/importer/file/preview/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local&sql_dialect=hive&has_header=true"
+
+# For a custom pipe-delimited file using delimiter_format
+curl -X GET \
+  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
+  "https://demo.gethue.com/api/importer/file/preview/?file_path=/tmp/username_abc123_pipe_data.txt&file_type=delimiter_format&import_type=local&sql_dialect=hive&has_header=true&field_separator=|&quote_char=\"&record_separator=\n"
+```
+
+**About `delimiter_format` File Type:**
+
+The `delimiter_format` file type should be used for custom delimited files that don't follow standard CSV or TSV formats. When using this file type:
+- `field_separator` is required and must be explicitly specified
+- `quote_char` and `record_separator` should be provided for proper parsing
+- Values from the `guess_metadata` response should be passed to ensure consistent parsing
+
+**Parameter Validation Notes:**
+- For Excel files, `sheet_name` is required
+- For standard formats (CSV/TSV), appropriate defaults are applied
+- For `delimiter_format`, always specify the required parameters
+- It's recommended to always pass the `record_separator` from the `guess_metadata` response
+
+**Response:**
+
+```json
+{
+  "type": "csv",
+  "columns": [
     {
-      "sample": [["200", "HTTP/1.1", "GET /metastore/table/default/sample_07 HTTP/1.1", "metastore", "", "00", "SG", "8836e6ce-9a21-449f-a372-9e57641389b3", "Singapore", "table", "1.2931000000000097", "GET", "128.199.234.236", "Other", "1041", "-", "Singapore", "", "/metastore/table/default/sample_07", "", "103.85579999999999", "Other", "demo.gethue.com:80 128.199.234.236 - - [04/May/2014:06:35:49 +0000] \"GET /metastore/table/default/sample_07 HTTP/1.1\" 200 1041 \"-\" \"Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)\"\n", "Mozilla/5.0 (compatible; phpservermon/3.0.1; +http://www.phpservermonitor.org)", "2014-05-04T06:35:49Z", "Other", "SGP"],
-      ....
-      "columns": [{"operations": [], "comment": "", "nested": [], "name": "code", "level": 0, "keyType": "string", "required": false, "precision": 10, "keep": true, "isPartition": false, "length": 100, "partitionValue": "", "multiValued": false, "unique": false, "type": "long", "showProperties": false, "scale": 0}, {"operations": [], "comment": "", "nested": [], "name": "protocol", "level": 0, "keyType": "string", "required": false, "precision": 10, "keep": true, "isPartition": false, "length": 100, "partitionValue": "", "multiValued": false, "unique": false, "type": "string", "showProperties": false, "scale": 0},
-      .....
+      "name": "transaction_id",
+      "type": "INT"
+    },
+    {
+      "name": "product_name",
+      "type": "STRING"
+    },
+    {
+      "name": "price",
+      "type": "DOUBLE"
     }
+  ],
+  "preview_data": [
+    ["1001", "Laptop XPS 13", "1299.99"],
+    ["1002", "Wireless Headphones", "149.99"],
+    ["1003", "Office Chair", "249.50"]
+  ]
+}
+```
 
-Then we submit via `https://demo.gethue.com/api/v1/indexer/importer/submit` and provide the `source` and `destination` parameters. We get back an `operation id` (i.e. some SQL Editor query history id).
+### Get SQL Type Mapping
 
-If the `show_command` parameter is given, the API call will instead return the generated SQL queries that will import the data.
+Get mapping from Polars data types to SQL types for a specific SQL dialect.
 
-    curl -X  POST https://demo.gethue.com/api/v1/indexer/importer/submit --data 'source={"sourceType":"hive","inputFormat":"localfile","path":"/Users/hue/Downloads/test_demo/flights_13.csv","format":{"hasHeader":true}}&destination={"sourceType":"hive","name":"default.test1","outputFormat":"table","columns":[{"name":"date","type":"timestamp"},{"name":"hour","type":"bigint"},{"name":"minute","type":"bigint"},{"name":"dep","type":"bigint"},{"name":"arr","type":"bigint"},{"name":"dep_delay","type":"bigint"},{"name":"arr_delay","type":"bigint"},{"name":"carrier","type":"string"},{"name":"flight","type":"bigint"},{"name":"dest","type":"string"},{"name":"plane","type":"string"},{"name":"cancelled","type":"boolean"},{"name":"time","type":"bigint"},{"name":"dist","type":"bigint"}], "nonDefaultLocation":""}'
+**Endpoint:** `/api/importer/sql_type_mapping/`
 
-    {"status": 0, "handle": {"secret": "C5vnlrpVTxuOpHZfTrLfmg==", "guid": "8ytLYHTsTlq8vYSiYXoyKQ==", "operation_type": 0, "has_result_set": false, "modified_row_count": null, "log_context": null, "session_guid": "d04b246456e87e61:b86340ae83f6a586", "session_id": 748, "session_type": "hive", "statement_id": 0, "has_more_statements": false, "statements_count": 1, "previous_statement_hash": "94ea45e37bbbbc7bb7e20b5d0efe0db8c9794dd526b5a3386bae3596", "start": {"row": 0, "column": 0}, "end": {"row": 0, "column": 305}, "statement": "CREATE TABLE IF NOT EXISTS default.yuyu11 (\n  `date` timestamp,\n  `hour` bigint,\n  `minute` bigint,\n  `dep` bigint,\n  `arr` bigint,\n  `dep_delay` bigint,\n  `arr_delay` bigint,\n  `carrier` string,\n  `flight` bigint,\n  `dest` string,\n  `plane` string,\n  `cancelled` boolean,\n  `time` bigint,\n  `dist` bigint)"}, "history_id": 2492, "history_uuid": "c60dc4dd-4d39-42fd-85f5-af155d99b626"}
+**Method:** `GET`
+
+**Request Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| sql_dialect | String | Yes | SQL dialect for type mapping (`hive`, `impala`, `trino`, `phoenix`, `sparksql`) |
+
+**Example using cURL:**
+
+```bash
+curl -X GET \
+  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
+  "https://demo.gethue.com/api/importer/sql_type_mapping/?sql_dialect=hive"
+```
+
+**Response:**
+
+```json
+{
+  "Int8": "TINYINT",
+  "Int16": "SMALLINT",
+  "Int32": "INT",
+  "Int64": "BIGINT",
+  "UInt8": "TINYINT",
+  "UInt16": "SMALLINT",
+  "UInt32": "INT",
+  "UInt64": "BIGINT",
+  "Float32": "FLOAT",
+  "Float64": "DOUBLE",
+  "Boolean": "BOOLEAN",
+  "Utf8": "STRING",
+  "String": "STRING",
+  "Date": "DATE",
+  "Datetime": "TIMESTAMP"
+}
+```
+
+### Complete Workflow Example
+
+Here's an example workflow that combines all the APIs to import a CSV file into a Hive table:
+
+1. **Upload the file**
+2. **Detect file metadata**
+3. **Check for header row**
+4. **Preview the file with column type detection**
+5. **Generate SQL CREATE TABLE statement**
+
+For the full code example and best practices, refer to the [File Import documentation](/developer/api/rest/importer/).
 
 ## Connectors
 

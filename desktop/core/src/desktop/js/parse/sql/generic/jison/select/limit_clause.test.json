@@ -6,13 +6,7 @@
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "10",
-        "100",
-        "1000",
-        "10000",
-        "5000"
-      ]
+      "suggestKeywords": ["10", "100", "1000", "10000", "5000"]
     }
   }
 ]

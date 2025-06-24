@@ -4,9 +4,7 @@
     "beforeCursor": "CACHE TABLE testCache OPTIONS ('storageLevel' 'DISK_ONLY') SELECT * FROM testData;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -15,10 +13,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CACHE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "LAZY TABLE",
-      "TABLE"
-    ],
+    "containsKeywords": ["LAZY TABLE", "TABLE"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -29,9 +24,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "TABLE"
-      ]
+      "suggestKeywords": ["TABLE"]
     }
   },
   {
@@ -67,11 +60,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "OPTIONS",
-        "AS SELECT",
-        "SELECT"
-      ]
+      "suggestKeywords": ["OPTIONS", "AS SELECT", "SELECT"]
     }
   },
   {
@@ -80,18 +69,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "'storageLevel'"
-      ]
+      "suggestKeywords": ["'storageLevel'"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CACHE TABLE foo.bar OPTIONS ('storageLevel' ",
     "afterCursor": "",
-    "containsKeywords": [
-      "'MEMORY_AND_DISK_2'"
-    ],
+    "containsKeywords": ["'MEMORY_AND_DISK_2'"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -100,9 +85,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CACHE TABLE foo.bar OPTIONS ('storageLevel' = ",
     "afterCursor": "",
-    "containsKeywords": [
-      "'MEMORY_AND_DISK_2'"
-    ],
+    "containsKeywords": ["'MEMORY_AND_DISK_2'"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -113,10 +96,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "AS SELECT",
-        "SELECT"
-      ]
+      "suggestKeywords": ["AS SELECT", "SELECT"]
     }
   },
   {
@@ -125,18 +105,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CACHE TABLE foo.bar OPTIONS ('storageLevel' = 'MEMORY_AND_DISK_2') AS SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*"
-    ],
+    "containsKeywords": ["*"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -151,16 +127,15 @@
       "suggestDatabases": {
         "prependQuestionMark": true,
         "prependFrom": true,
-        "appendDot": true }
+        "appendDot": true
+      }
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CACHE TABLE foo SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*"
-    ],
+    "containsKeywords": ["*"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -175,7 +150,8 @@
       "suggestDatabases": {
         "prependQuestionMark": true,
         "prependFrom": true,
-        "appendDot": true }
+        "appendDot": true
+      }
     }
   }
 ]

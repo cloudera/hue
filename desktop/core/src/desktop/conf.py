@@ -16,13 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-import glob
-import stat
-import socket
-import logging
 import datetime
+import glob
+import logging
+import os
+import socket
+import stat
+import sys
 from collections import OrderedDict
 
 from django.db import connection
@@ -30,16 +30,16 @@ from django.utils.translation import gettext_lazy as _
 
 from desktop import appmanager
 from desktop.lib.conf import (
-  Config,
-  ConfigSection,
-  UnspecifiedConfigSection,
   coerce_bool,
   coerce_csv,
   coerce_json_dict,
   coerce_password_from_script,
   coerce_str_lowercase,
   coerce_string,
+  Config,
+  ConfigSection,
   list_of_compiled_res,
+  UnspecifiedConfigSection,
   validate_path,
 )
 from desktop.lib.i18n import force_unicode
@@ -106,7 +106,7 @@ def get_dn(fqdn=None):
     else:
       LOG.warning("allowed_hosts value to '*'. It is a security risk")
       val.append('*')
-  except Exception as e:
+  except Exception:
     LOG.warning("allowed_hosts value to '*'. It is a security risk")
     val.append('*')
   return val
@@ -1042,6 +1042,11 @@ KERBEROS = ConfigSection(
       help=_("Frequency in seconds with which Hue will renew its keytab."),
       type=int,
       default=60 * 60),  # 1h
+    KT_RENEWER_TIMEOUT=Config(
+      key='kt_renewer_timeout',
+      help=_("kt-renewer sleep timeout in seconds"),
+      type=int,
+      default=10),  # 10 secs
     CCACHE_PATH=Config(
       key='ccache_path',
       help=_("Path to keep Kerberos credentials cached."),
@@ -2952,3 +2957,32 @@ def is_ofs_enabled():
 def has_ofs_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated and user.is_active and (is_admin(user) or user.has_hue_permission(action="ofs_access", app="filebrowser"))
+
+
+IMPORTER = ConfigSection(
+  key='importer',
+  help=_("""Configuration options for the importer."""),
+  members=dict(
+    IS_ENABLED=Config(
+      key='is_enabled',
+      help=_('Enable or disable the new importer functionality'),
+      type=coerce_bool,
+      default=False,
+    ),
+    RESTRICT_LOCAL_FILE_EXTENSIONS=Config(
+      key='restrict_local_file_extensions',
+      default=None,
+      type=coerce_csv,
+      help=_(
+        'Security setting to specify local file extensions that are not allowed to be uploaded through the importer. '
+        'Provide a comma-separated list of extensions including the dot (e.g., ".exe, .zip, .rar, .tar, .gz").'
+      ),
+    ),
+    MAX_LOCAL_FILE_SIZE_UPLOAD_LIMIT=Config(
+      key="max_local_file_size_upload_limit",
+      default=157286400,  # 150 MiB
+      type=int,
+      help=_('Maximum local file size (in bytes) that users can upload through the importer. The default is 157286400 bytes (150 MiB).'),
+    ),
+  ),
+)

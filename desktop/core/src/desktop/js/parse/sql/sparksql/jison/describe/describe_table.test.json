@@ -4,27 +4,20 @@
     "beforeCursor": "DESC customer;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "DESCRIBE TABLE EXTENDED customer PARTITION (state = 'AR');",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ]
+    "containsKeywords": ["SELECT"]
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DESCRIBE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "EXTENDED",
-      "TABLE"
-    ],
+    "containsKeywords": ["EXTENDED", "TABLE"],
     "expectedResult": {
       "suggestTables": {},
       "suggestDatabases": {
@@ -76,9 +69,7 @@
     "beforeCursor": "DESCRIBE TABLE foo.bar ",
     "afterCursor": "",
     "expectedResult": {
-      "suggestKeywords": [
-        "PARTITION"
-      ],
+      "suggestKeywords": ["PARTITION"],
       "suggestColumns": {
         "tables": [
           {

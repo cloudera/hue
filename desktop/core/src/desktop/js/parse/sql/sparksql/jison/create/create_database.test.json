@@ -3,10 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "DATABASE",
-      "SCHEMA"
-    ],
+    "containsKeywords": ["DATABASE", "SCHEMA"],
     "expectedResult": {
       "lowerCase": false
     }

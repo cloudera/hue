@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "CREATE ",
     "afterCursor": "",
-    "containsKeywords": [
-      "VIEW"
-    ],
+    "containsKeywords": ["VIEW"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -15,10 +13,7 @@
     "beforeCursor": "CREATE VIEW foo AS SELECT a, ",
     "afterCursor": " FROM tableOne",
     "hasLocations": true,
-    "containsKeywords": [
-      "*",
-      "CASE"
-    ],
+    "containsKeywords": ["*", "CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -54,9 +49,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF NOT EXISTS"
-      ],
+      "suggestKeywords": ["IF NOT EXISTS"],
       "suggestDatabases": {
         "appendDot": true
       }
@@ -68,9 +61,7 @@
     "afterCursor": " boo AS SELECT * FROM baa;",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF NOT EXISTS"
-      ]
+      "suggestKeywords": ["IF NOT EXISTS"]
     }
   },
   {
@@ -79,9 +70,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "NOT EXISTS"
-      ]
+      "suggestKeywords": ["NOT EXISTS"]
     }
   },
   {
@@ -90,9 +79,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
@@ -101,9 +88,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   },
   {
@@ -112,9 +97,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   }
 ]

@@ -3,28 +3,21 @@
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW SCHEMAS;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW DATABASES LIKE 'pay*';",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SHOW ",
     "afterCursor": "",
-    "containsKeywords": [
-      "DATABASES",
-      "SCHEMAS"
-    ]
+    "containsKeywords": ["DATABASES", "SCHEMAS"]
   },
   {
     "namePrefix": "should suggest keywords",

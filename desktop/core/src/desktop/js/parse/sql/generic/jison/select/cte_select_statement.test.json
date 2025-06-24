@@ -4,9 +4,7 @@
     "beforeCursor": "WITH q1 AS ( SELECT key FROM src WHERE something) SELECT * FROM q1;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -17,9 +15,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "AS"
-      ]
+      "suggestKeywords": ["AS"]
     }
   },
   {
@@ -28,18 +24,14 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "SELECT"
-      ]
+      "suggestKeywords": ["SELECT"]
     }
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "WITH t1 AS (SELECT * FROM boo) ",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -49,11 +41,7 @@
     "beforeCursor": "WITH t1 AS (SELECT * FROM FOO) SELECT ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -101,11 +89,7 @@
     "namePrefix": "should suggest identifiers",
     "beforeCursor": "WITH t1 AS (SELECT * FROM FOO), t2 AS (SELECT ",
     "afterCursor": "",
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "suggestAggregateFunctions": {
         "tables": []

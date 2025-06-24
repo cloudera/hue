@@ -3,48 +3,51 @@ name: Frontend CI
 on:
   push:
     branches:
-    - master
+      - master
   pull_request:
     branches:
-    - master
+      - master
 
 jobs:
   hue-ui-checks-and-tests:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Cache npm with setup node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'npm'
+      - name: Cache npm with setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
 
-    - name: Install npm dependencies
-      run: npm ci
+      - name: Install npm dependencies
+        run: npm ci
 
-    - name: Run commit title format check
-      run: ./tools/ci/check_for_commit_message.sh 
+      - name: Run commit title format check
+        run: ./tools/ci/check_for_commit_message.sh
 
-    - name: Run npm version checker
-      run: npm run check-pinned-versions
+      - name: Run npm version checker
+        run: npm run check-pinned-versions
 
-    - name: Run npm license checker
-      run: npm run check-license
+      - name: Run npm license checker
+        run: npm run check-license
 
-    - name: Run npm absolute path detection
-      run: npm run check-absolute-paths
+      - name: Run npm absolute path detection
+        run: npm run check-absolute-paths
 
-    - name: Run js lint check
-      run: npm run lint
+      - name: Run prettier check
+        run: npm run prettier
 
-    - name: Run style lint check
-      run: npm run style-lint
+      - name: Run js lint check
+        run: npm run lint
 
-    - name: Run js tests
-      run: |
-        # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
-        sed -i 's/"test": "jest"/"test": "jest --runInBand"/g' package.json
+      - name: Run style lint check
+        run: npm run style-lint
 
-        npm run test
+      - name: Run js tests
+        run: |
+          # https://jestjs.io/docs/en/troubleshooting.html#tests-are-extremely-slow-on-docker-andor-continuous-integration-ci-server
+          sed -i 's/"test": "jest"/"test": "jest --runInBand"/g' package.json
+
+          npm run test
