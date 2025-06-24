@@ -17,28 +17,30 @@
 import { renderHook, act } from '@testing-library/react';
 import useFileUpload from './useFileUpload';
 import { FileStatus, RegularFile } from './types';
+import useRegularUpload from './useRegularUpload';
+import useChunkUpload from './useChunkUpload';
 
 const mockAddRegularFiles = jest.fn();
 const mockCancelRegularFile = jest.fn();
 const mockAddChunkFile = jest.fn();
 const mockCancelChunkFile = jest.fn();
-const mockLoading = jest.fn().mockReturnValue(false);
 
 jest.mock('./useRegularUpload', () => ({
   __esModule: true,
-  default: jest.fn(() => ({
-    addFiles: mockAddRegularFiles,
-    cancelFile: mockCancelRegularFile,
-    isLoading: mockLoading()
-  }))
+  default: jest.fn()
 }));
+
 jest.mock('./useChunkUpload', () => ({
   __esModule: true,
-  default: jest.fn(() => ({
-    addFiles: mockAddChunkFile,
-    cancelFile: mockCancelChunkFile,
-    isLoading: mockLoading()
-  }))
+  default: jest.fn()
+}));
+
+jest.mock('../../../config/hueConfig', () => ({
+  getLastKnownConfig: () => ({
+    storage_browser: {
+      concurrent_max_connection: 5
+    }
+  })
 }));
 
 describe('useFileUpload', () => {
@@ -46,28 +48,41 @@ describe('useFileUpload', () => {
 
   const mockFiles: RegularFile[] = [
     {
-      uuid: '1',
-      filePath: 'path/to/file',
-      file: new File(['content'], 'file.txt', { type: 'text/plain' }),
+      uuid: 'file-1',
+      filePath: '/path/to/test1.txt',
+      file: new File(['test content'], 'test1.txt', { type: 'text/plain' }),
       status: FileStatus.Pending,
-      error: undefined,
       progress: 0
     },
     {
-      uuid: '2',
-      filePath: 'path/to/file2',
-      file: new File(['content'], 'file2.txt', { type: 'text/plain' }),
+      uuid: 'file-2',
+      filePath: '/path/to/test2.txt',
+      file: new File(['test content 2'], 'test2.txt', { type: 'text/plain' }),
       status: FileStatus.Pending,
-      error: undefined,
       progress: 0
     }
   ];
 
+  const mockUseRegularUpload = jest.mocked(useRegularUpload);
+  const mockUseChunkUpload = jest.mocked(useChunkUpload);
+
   beforeEach(() => {
     jest.clearAllMocks();
+
+    mockUseRegularUpload.mockReturnValue({
+      addFiles: mockAddRegularFiles,
+      cancelFile: mockCancelRegularFile,
+      isLoading: false
+    });
+
+    mockUseChunkUpload.mockReturnValue({
+      addFiles: mockAddChunkFile,
+      cancelFile: mockCancelChunkFile,
+      isLoading: false
+    });
   });
 
-  it('adds files to the upload queue with regular upload', () => {
+  it('should add files to the upload queue with regular upload', () => {
     const { result } = renderHook(() =>
       useFileUpload({ isChunkUpload: false, onComplete: mockOnComplete })
     );
@@ -78,9 +93,10 @@ describe('useFileUpload', () => {
 
     expect(result.current.uploadQueue).toEqual(mockFiles);
     expect(mockAddRegularFiles).toHaveBeenCalledWith(mockFiles);
+    expect(mockAddChunkFile).not.toHaveBeenCalled();
   });
 
-  it('adds files to the upload queue with chunk upload', () => {
+  it('should add files to the upload queue with chunk upload', () => {
     const { result } = renderHook(() =>
       useFileUpload({ isChunkUpload: true, onComplete: mockOnComplete })
     );
@@ -91,9 +107,10 @@ describe('useFileUpload', () => {
 
     expect(result.current.uploadQueue).toEqual(mockFiles);
     expect(mockAddChunkFile).toHaveBeenCalledWith(mockFiles);
+    expect(mockAddRegularFiles).not.toHaveBeenCalled();
   });
 
-  it('cancels a pending file using regular upload', () => {
+  it('should cancel a pending file using regular upload', () => {
     const { result } = renderHook(() =>
       useFileUpload({ isChunkUpload: false, onComplete: mockOnComplete })
     );
@@ -103,13 +120,14 @@ describe('useFileUpload', () => {
     });
 
     act(() => {
-      result.current.cancelFile(mockFiles[1]);
+      result.current.cancelFile(mockFiles[0]);
     });
 
-    expect(mockCancelRegularFile).toHaveBeenCalledWith(mockFiles[1].uuid);
+    expect(mockCancelRegularFile).toHaveBeenCalledWith('file-1');
+    expect(result.current.uploadQueue[0].status).toBe(FileStatus.Cancelled);
   });
 
-  it('cancels a pending file using chunk upload', () => {
+  it('should cancel a pending file using chunk upload', () => {
     const { result } = renderHook(() =>
       useFileUpload({ isChunkUpload: true, onComplete: mockOnComplete })
     );
@@ -119,14 +137,20 @@ describe('useFileUpload', () => {
     });
 
     act(() => {
-      result.current.cancelFile(mockFiles[1]);
+      result.current.cancelFile(mockFiles[0]);
     });
 
-    expect(mockCancelChunkFile).toHaveBeenCalledWith(mockFiles[1].uuid);
+    expect(mockCancelChunkFile).toHaveBeenCalledWith('file-1');
+    expect(result.current.uploadQueue[0].status).toBe(FileStatus.Cancelled);
   });
 
-  it('returns isLoading as true if regular upload method is loading', () => {
-    mockLoading.mockReturnValue(true);
+  it('should return isLoading as true if regular upload method is loading', () => {
+    mockUseRegularUpload.mockReturnValue({
+      addFiles: mockAddRegularFiles,
+      cancelFile: mockCancelRegularFile,
+      isLoading: true
+    });
+
     const { result } = renderHook(() =>
       useFileUpload({ isChunkUpload: false, onComplete: mockOnComplete })
     );
@@ -134,12 +158,75 @@ describe('useFileUpload', () => {
     expect(result.current.isLoading).toBe(true);
   });
 
-  it('returns isLoading as true if chunk upload method is loading', () => {
-    mockLoading.mockReturnValue(true);
+  it('should return isLoading as true if chunk upload method is loading', () => {
+    mockUseChunkUpload.mockReturnValue({
+      addFiles: mockAddChunkFile,
+      cancelFile: mockCancelChunkFile,
+      isLoading: true
+    });
+
     const { result } = renderHook(() =>
       useFileUpload({ isChunkUpload: true, onComplete: mockOnComplete })
     );
 
     expect(result.current.isLoading).toBe(true);
+  });
+
+  it('should update queue with correct status sent from the queues', () => {
+    let capturedUpdateFileVariables: (uuid: string, variables: any) => void;
+
+    mockUseRegularUpload.mockImplementation(options => {
+      capturedUpdateFileVariables = options.updateFileVariables;
+      return {
+        addFiles: mockAddRegularFiles,
+        cancelFile: mockCancelRegularFile,
+        isLoading: false
+      };
+    });
+
+    const { result } = renderHook(() =>
+      useFileUpload({ isChunkUpload: false, onComplete: mockOnComplete })
+    );
+
+    act(() => {
+      result.current.addFiles(mockFiles);
+    });
+
+    expect(result.current.uploadQueue[0].status).toBe(FileStatus.Pending);
+    expect(result.current.uploadQueue[0].progress).toBe(0);
+
+    act(() => {
+      capturedUpdateFileVariables('file-1', {
+        status: FileStatus.Uploading,
+        progress: 50
+      });
+    });
+
+    expect(result.current.uploadQueue[0].status).toBe(FileStatus.Uploading);
+    expect(result.current.uploadQueue[0].progress).toBe(50);
+
+    act(() => {
+      capturedUpdateFileVariables('file-1', {
+        status: FileStatus.Uploaded,
+        progress: 100
+      });
+    });
+
+    expect(result.current.uploadQueue[0].status).toBe(FileStatus.Uploaded);
+    expect(result.current.uploadQueue[0].progress).toBe(100);
+
+    expect(result.current.uploadQueue[1].status).toBe(FileStatus.Pending);
+    expect(result.current.uploadQueue[1].progress).toBe(0);
+
+    const testError = new Error('Upload failed');
+    act(() => {
+      capturedUpdateFileVariables('file-2', {
+        status: FileStatus.Failed,
+        error: testError
+      });
+    });
+
+    expect(result.current.uploadQueue[1].status).toBe(FileStatus.Failed);
+    expect(result.current.uploadQueue[1].error).toBe(testError);
   });
 });
