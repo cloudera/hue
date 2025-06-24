@@ -105,6 +105,10 @@ describe('utils', () => {
 
     it('should create correct number of chunks', () => {
       const chunks = createChunks(mockRegularFile, 100);
+      expect(chunks).toHaveLength(3);
+      expect(chunks[0].chunkEndOffset).toBe(100);
+      expect(chunks[1].chunkEndOffset).toBe(200);
+      expect(chunks[2].chunkEndOffset).toBe(250);
     });
 
     it('should set correct chunk properties', () => {

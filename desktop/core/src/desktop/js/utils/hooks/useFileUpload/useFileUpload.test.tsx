@@ -16,7 +16,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import useFileUpload from './useFileUpload';
-import { FileStatus, RegularFile } from './types';
+import { FileStatus, FileVariables, RegularFile } from './types';
 import useRegularUpload from './useRegularUpload';
 import useChunkUpload from './useChunkUpload';
 
@@ -173,7 +173,7 @@ describe('useFileUpload', () => {
   });
 
   it('should update queue with correct status sent from the queues', () => {
-    let capturedUpdateFileVariables: (uuid: string, variables: any) => void;
+    let capturedUpdateFileVariables: (uuid: string, variables: FileVariables) => void;
 
     mockUseRegularUpload.mockImplementation(options => {
       capturedUpdateFileVariables = options.updateFileVariables;
