@@ -125,10 +125,19 @@ describe('useFileUpload', () => {
     expect(mockCancelChunkFile).toHaveBeenCalledWith(mockFiles[1].uuid);
   });
 
-  it('returns isLoading as true if either upload method is loading', () => {
+  it('returns isLoading as true if regular upload method is loading', () => {
     mockLoading.mockReturnValue(true);
     const { result } = renderHook(() =>
       useFileUpload({ isChunkUpload: false, onComplete: mockOnComplete })
+    );
+
+    expect(result.current.isLoading).toBe(true);
+  });
+
+  it('returns isLoading as true if chunk upload method is loading', () => {
+    mockLoading.mockReturnValue(true);
+    const { result } = renderHook(() =>
+      useFileUpload({ isChunkUpload: true, onComplete: mockOnComplete })
     );
 
     expect(result.current.isLoading).toBe(true);

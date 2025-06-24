@@ -30,10 +30,15 @@ const mockFile: RegularFile = {
 const mockEnqueue = jest.fn();
 const mockDequeue = jest.fn();
 const mockIsLoading = jest.fn().mockReturnValue(false);
+
+let mockProcessCallback: ((item: RegularFile) => Promise<void>) | null = null;
+let mockOnSuccessCallback: (() => void) | null = null;
+
 jest.mock('../useQueueProcessor/useQueueProcessor', () => ({
   __esModule: true,
-  default: jest.fn(callback => {
-    callback(mockFile);
+  default: jest.fn((processCallback, options) => {
+    mockProcessCallback = processCallback;
+    mockOnSuccessCallback = options.onSuccess;
     return {
       enqueue: mockEnqueue,
       dequeue: mockDequeue,
@@ -56,9 +61,11 @@ describe('useRegularUpload', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockProcessCallback = null;
+    mockOnSuccessCallback = null;
   });
 
-  it('should enqueue files when addFiles is called', () => {
+  it('should enqueue files when addFiles is called', async () => {
     const { result } = renderHook(() =>
       useRegularUpload({
         updateFileVariables: mockUpdateFileVariables,
@@ -94,17 +101,29 @@ describe('useRegularUpload', () => {
 
     result.current.addFiles([mockFile]);
 
-    expect(mockSave).toHaveBeenCalledWith(expect.any(FormData), expect.any(Object));
+    if (mockProcessCallback) {
+      await mockProcessCallback(mockFile);
+    }
+
+    const mockFormData = new FormData();
+    mockFormData.append('file', mockFile.file);
+    mockFormData.append('destination_path', mockFile.filePath);
+
+    expect(mockSave).toHaveBeenCalledWith(
+      mockFormData,
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function)
+      })
+    );
     expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
       status: FileStatus.Uploading
     });
+
+    expect(mockOnComplete).not.toHaveBeenCalled();
   });
 
   it('should call updateFileVariables with correct status on success', async () => {
-    mockSave.mockImplementationOnce((_, { onSuccess }) => {
-      onSuccess();
-    });
-
     const { result } = renderHook(() =>
       useRegularUpload({
         updateFileVariables: mockUpdateFileVariables,
@@ -113,6 +132,14 @@ describe('useRegularUpload', () => {
     );
 
     result.current.addFiles([mockFile]);
+
+    if (mockProcessCallback) {
+      mockSave.mockImplementationOnce((_, { onSuccess }) => {
+        onSuccess();
+      });
+
+      await mockProcessCallback(mockFile);
+    }
 
     await waitFor(() => {
       expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
@@ -122,10 +149,6 @@ describe('useRegularUpload', () => {
   });
 
   it('should call updateFileVariables with correct status on error', async () => {
-    mockSave.mockImplementationOnce((_, { onError }) => {
-      onError(new Error('Upload failed'));
-    });
-
     const { result } = renderHook(() =>
       useRegularUpload({
         updateFileVariables: mockUpdateFileVariables,
@@ -135,10 +158,18 @@ describe('useRegularUpload', () => {
 
     result.current.addFiles([mockFile]);
 
+    if (mockProcessCallback) {
+      mockSave.mockImplementationOnce((_, { onError }) => {
+        onError(new Error('Upload failed'));
+      });
+
+      await mockProcessCallback(mockFile);
+    }
+
     await waitFor(() => {
       expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
         status: FileStatus.Failed,
-        error: expect.any(Error)
+        error: new Error('Upload failed')
       });
     });
   });
@@ -154,5 +185,32 @@ describe('useRegularUpload', () => {
     );
 
     expect(result.current.isLoading).toBe(true);
+  });
+
+  it('should call onComplete when all files are processed', async () => {
+    const { result } = renderHook(() =>
+      useRegularUpload({
+        updateFileVariables: mockUpdateFileVariables,
+        onComplete: mockOnComplete
+      })
+    );
+
+    result.current.addFiles([mockFile]);
+
+    if (mockProcessCallback) {
+      mockSave.mockImplementationOnce((_, { onSuccess }) => {
+        onSuccess();
+      });
+
+      await mockProcessCallback(mockFile);
+
+      if (mockOnSuccessCallback) {
+        mockOnSuccessCallback();
+      }
+    }
+
+    await waitFor(() => {
+      expect(mockOnComplete).toHaveBeenCalled();
+    });
   });
 });
