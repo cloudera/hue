@@ -16,7 +16,7 @@
 # limitations under the License.
 
 import logging
-from typing import Any, List, Type
+from typing import Any
 
 from rest_framework import status
 from rest_framework.request import Request
@@ -38,7 +38,7 @@ class UsageAnalyticsSettingsView(APIView):
   the `collect_usage` setting and update it.
   """
 
-  permission_classes: List[Type[IsAdminUser]] = [IsAdminUser]
+  permission_classes = [IsAdminUser]
 
   def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
     """Handles GET requests to retrieve the current analytics setting."""
@@ -58,7 +58,7 @@ class UsageAnalyticsSettingsView(APIView):
       if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-      is_enabled: bool = serializer.validated_data["analytics_enabled"]
+      is_enabled = serializer.validated_data["analytics_enabled"]
 
       settings = Settings.get_settings()
       settings.collect_usage = is_enabled

@@ -32,7 +32,7 @@ LOG = logging.getLogger()
 class IsAdminUser(permissions.BasePermission):
   """A DRF permission class that only allows access to admin users."""
 
-  message: str = "You must be a Hue admin to perform this action."
+  message = "You must be a Hue admin to perform this action."
 
   def has_permission(self, request: Request, view: "APIView") -> bool:
     """Checks if the request's user is authenticated and is an admin."""
