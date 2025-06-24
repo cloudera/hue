@@ -19,6 +19,7 @@ import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import {
   CombinedFileFormat,
+  DestinationConfig,
   FileFormatResponse,
   FileMetaData,
   FilePreviewResponse,
@@ -37,6 +38,7 @@ import {
 } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 import EditColumnsModal from './EditColumns/EditColumnsModal';
+import DestinationSettings from './DestinationSettings/DestinationSettings';
 
 import './ImporterFilePreview.scss';
 
@@ -50,7 +52,16 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const defaultDialect = 'impala';
 
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
-  const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
+  const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
+    tableName: getDefaultTableName(fileMetaData.path, fileMetaData.source)
+  });
+
+  const handleDestinationSettingsChange = (name: string, value: string) => {
+    setDestinationConfig(prevConfig => ({
+      ...prevConfig,
+      [name]: value
+    }));
+  };
 
   const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FILE_GUESS_METADATA, {
     params: {
@@ -110,20 +121,17 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const { save, loading: finalizingImport } = useSaveData(FINISH_IMPORT_URL);
 
   const handleFinishImport = () => {
-    // TODO: take the hardcoded values from the form once implemented
-    const database = 'default';
-
     const source = {
       inputFormat: fileMetaData.source,
       path: fileMetaData.path,
       format: fileFormat,
-      sourceType: defaultDialect
+      sourceType: destinationConfig.connectorId
     };
     const destination = {
       outputFormat: 'table',
       nonDefaultLocation: fileMetaData.path,
-      name: `${database}.${defaultTableName}`,
-      sourceType: defaultDialect,
+      name: `${destinationConfig.database}.${destinationConfig.tableName}`,
+      sourceType: destinationConfig.connectorId,
       columns: previewData?.columns
     };
 
@@ -150,7 +158,12 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
           </PrimaryButton>
         </div>
       </div>
-      <div className="hue-importer-preview-page__metadata">{t('DESTINATION')}</div>
+      <div className="hue-importer-preview-page__metadata">
+        <DestinationSettings
+          defaultValues={destinationConfig}
+          onChange={handleDestinationSettingsChange}
+        />
+      </div>
       <div className="hue-importer-preview-page__main-section">
         <div className="hue-importer-preview-page__header-section">
           <SourceConfiguration fileFormat={fileFormat} setFileFormat={setFileFormat} />

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const enum ImporterFileTypes {
+export enum ImporterFileTypes {
   CSV = 'csv',
   JSON = 'json',
   EXCEL = 'excel'
@@ -69,4 +69,11 @@ export interface FilePreviewResponse {
 export interface ImporterTableData {
   importerDataKey: string;
   [key: string]: string | number;
+}
+
+export interface DestinationConfig {
+  database?: string;
+  tableName?: string;
+  connectorId?: string;
+  computeId?: string;
 }
