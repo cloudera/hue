@@ -143,7 +143,13 @@ describe('useChunkUpload', () => {
       expect(mockUpdateFileVariables.mock.calls).toEqual(
         expect.arrayContaining([
           [mockFile.uuid, { status: FileStatus.Uploading }],
-          [mockFile.uuid, { status: FileStatus.Failed, error: expect.any(Error) }]
+          [
+            mockFile.uuid,
+            {
+              status: FileStatus.Failed,
+              error: new Error('Upload server ran out of space. Try again later.')
+            }
+          ]
         ])
       );
     });
