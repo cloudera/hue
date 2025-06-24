@@ -123,7 +123,7 @@ describe('useChunkUpload', () => {
     await waitFor(() => {
       expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
         status: FileStatus.Failed,
-        error: expect.any(Error)
+        error: new Error('chunk upload failed')
       });
     });
   });
