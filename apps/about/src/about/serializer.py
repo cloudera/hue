@@ -17,7 +17,7 @@
 from rest_framework import serializers
 
 
-class AnalyticsSettingsSerializer(serializers.Serializer):
-  """Serializes and validates the analytics settings data."""
+class UsageAnalyticsSerializer(serializers.Serializer):
+  """Serializes and validates the usage analytics settings data."""
 
-  analytics_enabled = serializers.BooleanField(required=True, help_text="Indicates whether usage analytics collection is enabled.")
+  collect_usage = serializers.BooleanField(required=True, help_text="Indicates whether usage analytics collection is enabled.")

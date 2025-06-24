@@ -23,7 +23,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from about.serializer import AnalyticsSettingsSerializer
+from about.serializer import UsageAnalyticsSerializer
 from desktop.auth.api_permissions import IsAdminUser
 from desktop.models import Settings
 
@@ -44,21 +44,23 @@ class UsageAnalyticsAPI(APIView):
     """Handles GET requests to retrieve the current analytics setting."""
     try:
       settings = Settings.get_settings()
-      data = {"analytics_enabled": settings.collect_usage}
+      data = {"collect_usage": settings.collect_usage}
 
       return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
       LOG.error("Error retrieving usage analytics: %s", e)
-      return Response({"error": "A server error occurred while retrieving settings."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+      return Response(
+        {"error": "A server error occurred while retrieving usage analytics settings."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+      )
 
   def put(self, request: Request, *args: Any, **kwargs: Any) -> Response:
     """Handles PUT requests to update the analytics setting."""
     try:
-      serializer = AnalyticsSettingsSerializer(data=request.data)
+      serializer = UsageAnalyticsSerializer(data=request.data)
       if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-      is_enabled = serializer.validated_data["analytics_enabled"]
+      is_enabled = serializer.validated_data["collect_usage"]
 
       settings = Settings.get_settings()
       settings.collect_usage = is_enabled
@@ -67,4 +69,6 @@ class UsageAnalyticsAPI(APIView):
       return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
       LOG.error("Error updating usage analytics: %s", e)
-      return Response({"error": "A server error occurred while saving the settings."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+      return Response(
+        {"error": "A server error occurred while saving the usage analytics settings."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+      )

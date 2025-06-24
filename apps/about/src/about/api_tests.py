@@ -52,7 +52,7 @@ class TestUsageAnalyticsSettingsAPI:
     response = api_client.get(analytics_settings_url)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.data == {"analytics_enabled": True}
+    assert response.data == {"collect_usage": True}
 
   @patch("desktop.auth.api_permissions.is_admin", return_value=False)
   def test_get_settings_as_non_admin_forbidden(self, mock_is_admin, api_client, regular_user, analytics_settings_url):
@@ -72,7 +72,7 @@ class TestUsageAnalyticsSettingsAPI:
     response = api_client.get(analytics_settings_url)
 
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-    assert response.data == {"error": "A server error occurred while retrieving settings."}
+    assert response.data == {"error": "A server error occurred while retrieving usage analytics settings."}
 
   @patch("desktop.auth.api_permissions.is_admin", return_value=True)
   @patch("about.api.Settings.get_settings")
@@ -80,7 +80,7 @@ class TestUsageAnalyticsSettingsAPI:
     mock_settings = MagicMock()
     mock_get_settings.return_value = mock_settings
     api_client.force_authenticate(user=admin_user)
-    payload = {"analytics_enabled": False}
+    payload = {"collect_usage": False}
 
     response = api_client.put(analytics_settings_url, data=payload, format="json")
 
@@ -103,12 +103,12 @@ class TestUsageAnalyticsSettingsAPI:
   def test_put_settings_as_admin_error(self, mock_get_settings, mock_is_admin, api_client, admin_user, analytics_settings_url):
     mock_get_settings.side_effect = ObjectDoesNotExist("Settings not found")
     api_client.force_authenticate(user=admin_user)
-    payload = {"analytics_enabled": False}
+    payload = {"collect_usage": False}
 
     response = api_client.put(analytics_settings_url, data=payload, format="json")
 
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-    assert response.data == {"error": "A server error occurred while saving the settings."}
+    assert response.data == {"error": "A server error occurred while saving the usage analytics settings."}
 
   @patch("desktop.auth.api_permissions.is_admin", return_value=True)
   @patch("about.api.Settings.get_settings")
@@ -120,4 +120,4 @@ class TestUsageAnalyticsSettingsAPI:
     response = api_client.put(analytics_settings_url, data=payload, format="json")
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.data == {"analytics_enabled": ["This field is required."]}
+    assert response.data == {"collect_usage": ["This field is required."]}
