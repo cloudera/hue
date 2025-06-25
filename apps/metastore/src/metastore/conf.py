@@ -17,7 +17,7 @@
 
 from django.utils.translation import gettext_lazy as _
 
-from desktop.lib.conf import Config, coerce_bool
+from desktop.lib.conf import coerce_bool, Config
 
 ENABLE_NEW_CREATE_TABLE = Config(
   key="enable_new_create_table",

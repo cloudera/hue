@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
 import json
 import logging
+import re
 from builtins import zip
 
 from django.http import Http404
@@ -28,13 +28,12 @@ from thrift.transport.TTransport import TTransportException
 
 import beeswax.models
 from beeswax.conf import USE_GET_LOG_API
-from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS
 from beeswax.data_export import upload
 from beeswax.design import HQLdesign
 from beeswax.forms import QueryForm
 from beeswax.models import QueryHistory, Session
 from beeswax.server import dbms
-from beeswax.server.dbms import QueryServerException, QueryServerTimeoutException, SubQueryTable, expand_exception, get_query_server_config
+from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException, SubQueryTable
 from beeswax.views import (
   _get_query_handle_and_state,
   authorized_get_design,
@@ -53,9 +52,9 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.parameterization import substitute_variables
 from metastore import parser
-from metastore.conf import FORCE_HS2_METADATA
+from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS, FORCE_HS2_METADATA
 from metastore.views import _get_db, _get_servername
-from notebook.models import MockedDjangoRequest, escape_rows, make_notebook
+from notebook.models import escape_rows, make_notebook, MockedDjangoRequest
 from useradmin.models import User
 
 LOG = logging.getLogger()
@@ -607,7 +606,7 @@ def save_results_hdfs_file(request, query_history_id):
 
       try:
         handle, state = _get_query_handle_and_state(query_history)
-      except Exception as ex:
+      except Exception:
         response['message'] = _('Cannot find query handle and state: %s') % str(query_history)
         response['status'] = -2
         return JsonResponse(response)
@@ -670,7 +669,7 @@ def save_results_hive_table(request, query_history_id):
       try:
         handle, state = _get_query_handle_and_state(query_history)
         result_meta = db.get_results_metadata(handle)
-      except Exception as ex:
+      except Exception:
         response['message'] = _('Cannot find query handle and state: %s') % str(query_history)
         response['status'] = -2
         return JsonResponse(response)

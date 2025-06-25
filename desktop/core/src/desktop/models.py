@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import json
-import uuid
-import logging
 import calendar
+import json
+import logging
+import os
+import uuid
 from builtins import next, object
 from collections import OrderedDict
 from itertools import chain
@@ -35,44 +35,41 @@ from django.db.models.query import QuerySet
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _, gettext_lazy as _t
 
-from dashboard.conf import HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED, get_engines
+from dashboard.conf import get_engines, HAS_REPORT_ENABLED, IS_ENABLED as DASHBOARD_ENABLED
 from desktop import appmanager
-from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS
 from desktop.auth.backend import is_admin
 from desktop.conf import (
   APP_BLACKLIST,
   COLLECT_USAGE,
   DISABLE_SOURCE_AUTOCOMPLETE,
-  ENABLE_CONNECTORS,
   ENABLE_NEW_IMPORTER,
   ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_ORGANIZATIONS,
-  ENABLE_PROMETHEUS,
   ENABLE_SHARING,
   ENABLE_UNIFIED_ANALYTICS,
+  get_clusters,
+  has_connectors,
   HUE_HOST_NAME,
   HUE_IMAGE_VERSION,
   IS_MULTICLUSTER_ONLY,
   RAZ,
   TASK_SERVER,
-  get_clusters,
-  has_connectors,
 )
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
 from desktop.lib.connectors.models import Connector
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
-from desktop.lib.paths import SAFE_CHARACTERS_URI_COMPONENTS, get_run_root
+from desktop.lib.paths import get_run_root, SAFE_CHARACTERS_URI_COMPONENTS
 from desktop.redaction import global_redaction_engine
 from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH, HUE_DESKTOP_VERSION
 from filebrowser.conf import REMOTE_STORAGE_HOME
-from hadoop.core_site import get_raz_api_url, get_raz_s3_default_bucket
 from indexer.conf import ENABLE_DIRECT_UPLOAD
 from kafka.conf import has_kafka
 from metadata.conf import get_optimizer_mode
-from notebook.conf import DEFAULT_INTERPRETER, DEFAULT_LIMIT, SHOW_NOTEBOOKS, get_ordered_interpreters
-from useradmin.models import Group, User, get_organization
+from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS
+from notebook.conf import DEFAULT_INTERPRETER, DEFAULT_LIMIT, get_ordered_interpreters, SHOW_NOTEBOOKS
+from useradmin.models import get_organization, Group, User
 from useradmin.organization import _fitered_queryset
 
 LOG = logging.getLogger()
@@ -485,7 +482,7 @@ class DocumentManager(models.Manager):
               if not job.managed:
                 doc.extra = 'jobsub'
                 doc.save()
-    except Exception as e:
+    except Exception:
       LOG.exception('error syncing oozie')
 
     try:
@@ -497,7 +494,7 @@ class DocumentManager(models.Manager):
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
             if job.is_trashed:
               doc.send_to_trash()
-    except Exception as e:
+    except Exception:
       LOG.exception('error syncing beeswax')
 
     try:
@@ -507,7 +504,7 @@ class DocumentManager(models.Manager):
         with transaction.atomic():
           for job in find_jobs_with_no_doc(PigScript):
             Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
-    except Exception as e:
+    except Exception:
       LOG.exception('error syncing pig')
 
     try:
@@ -532,7 +529,7 @@ class DocumentManager(models.Manager):
                 Document.objects.link(dashboard_doc, owner=owner, name=dashboard.label, description=dashboard.label,
                                       extra='search-dashboard')
                 dashboard.save()
-    except Exception as e:
+    except Exception:
       LOG.exception('error syncing search')
 
     try:
@@ -552,7 +549,7 @@ class DocumentManager(models.Manager):
             else:
               extra = ''
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
-    except Exception as e:
+    except Exception:
       LOG.exception('error syncing Document2')
 
     if not doc2_only and Document._meta.db_table in table_names:
@@ -561,7 +558,7 @@ class DocumentManager(models.Manager):
         for doc in Document.objects.filter(tags=None):
           default_tag = DocumentTag.objects.get_default_tag(doc.owner)
           doc.tags.add(default_tag)
-      except Exception as e:
+      except Exception:
         LOG.exception('error adding at least one tag to docs')
 
       # Make sure all the sample user documents are shared.
@@ -576,7 +573,7 @@ class DocumentManager(models.Manager):
 
             doc.save()
             Document.objects.filter(id=doc.id).update(last_modified=doc_last_modified)
-      except Exception as e:
+      except Exception:
         LOG.exception('error sharing sample user documents')
 
       # For now remove the default tag from the examples
@@ -584,7 +581,7 @@ class DocumentManager(models.Manager):
         for doc in Document.objects.filter(tags__tag=DocumentTag.EXAMPLE):
           default_tag = DocumentTag.objects.get_default_tag(doc.owner)
           doc.tags.remove(default_tag)
-      except Exception as e:
+      except Exception:
         LOG.exception('error removing default tags')
 
       # ------------------------------------------------------------------------

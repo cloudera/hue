@@ -36,7 +36,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
 
 from beeswax import common
-from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS
 from beeswax.management.commands import beeswax_install_examples
 from beeswax.models import Namespace
 from desktop import appmanager
@@ -93,6 +92,7 @@ from metadata.catalog_api import (
   search_entities_interactive as metadata_search_entities_interactive,
 )
 from metadata.conf import has_catalog
+from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS
 from notebook.connectors.base import get_interpreter, Notebook
 from notebook.management.commands import notebook_setup
 from pig.management.commands import pig_setup
