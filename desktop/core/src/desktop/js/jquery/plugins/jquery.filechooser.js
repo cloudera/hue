@@ -953,6 +953,9 @@ function initUploader(path, _parent, el, labels) {
       },
       onComplete: function (id, fileName, responseJSON) {
         num_of_pending_uploads--;
+        if (responseJSON.status === 500 && responseJSON.responseText) {
+          huePubSub.publish('hue.global.error', { message: responseJSON.responseText });
+        }
         if (responseJSON.status == -1) {
           huePubSub.publish('hue.global.error', { message: responseJSON.data });
         } else if (!num_of_pending_uploads) {
