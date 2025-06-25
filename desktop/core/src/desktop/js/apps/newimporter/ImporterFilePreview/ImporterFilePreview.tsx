@@ -53,7 +53,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
 
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
   const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
-    tableName: getDefaultTableName(fileMetaData.path, fileMetaData.source)
+    tableName: getDefaultTableName(fileMetaData)
   });
 
   const handleDestinationSettingsChange = (name: string, value: string) => {

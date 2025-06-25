@@ -47,7 +47,7 @@ export interface CombinedFileFormat extends FileFormatResponse, GuessHeaderRespo
 
 export interface FileMetaData {
   path: string;
-  type?: ImporterFileTypes;
+  fileName?: string;
   source: ImporterFileSource;
 }
 

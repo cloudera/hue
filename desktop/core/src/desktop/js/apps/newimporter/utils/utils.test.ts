@@ -127,118 +127,183 @@ describe('convertToDataSource', () => {
 });
 
 describe('getDefaultTableName', () => {
-  it('should extract file name from LOCALFILE path using pattern', () => {
-    const filePath = '/user/data/:myDocument;v1.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.LOCAL);
+  it('should extract file name from LOCAL file metadata with fileName provided', () => {
+    const fileMetaData = {
+      path: '/user/data/myDocument.csv',
+      fileName: 'myDocument.csv',
+      source: ImporterFileSource.LOCAL
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('myDocument');
   });
 
-  it('should return empty string if LOCALFILE pattern does not match', () => {
-    const filePath = '/user/data/myDocument.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.LOCAL);
+  it('should return empty string if LOCAL file has no fileName property', () => {
+    const fileMetaData = {
+      path: '/user/data/myDocument.csv',
+      source: ImporterFileSource.LOCAL
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('');
   });
 
-  it('should handle LOCALFILE with complex filename', () => {
-    const filePath = '/user/data/:complex-file_name.with.dots;v1.xlsx';
-    const result = getDefaultTableName(filePath, ImporterFileSource.LOCAL);
+  it('should handle LOCAL file with complex filename', () => {
+    const fileMetaData = {
+      path: '/user/data/complex-file_name.with.dots.xlsx',
+      fileName: 'complex-file_name.with.dots.xlsx',
+      source: ImporterFileSource.LOCAL
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('complex_file_name_with_dots');
   });
 
-  it('should handle LOCALFILE with special characters in filename', () => {
-    const filePath = '/user/data/:file@2023#test;v1.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.LOCAL);
+  it('should handle LOCAL file with special characters in filename', () => {
+    const fileMetaData = {
+      path: '/user/data/file@2023#test.csv',
+      fileName: 'file@2023#test.csv',
+      source: ImporterFileSource.LOCAL
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('file_2023_test');
   });
 
-  it('should handle LOCALFILE with spaces in filename', () => {
-    const filePath = '/user/data/:my file name;v1.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.LOCAL);
+  it('should handle LOCAL file with spaces in filename', () => {
+    const fileMetaData = {
+      path: '/user/data/my file name.csv',
+      fileName: 'my file name.csv',
+      source: ImporterFileSource.LOCAL
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('my_file_name');
   });
 
   it('should extract file name from REMOTE path as last part of path', () => {
-    const filePath = 'https://demo.gethue.com/hue/test-file.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://demo.gethue.com/hue/test-file.csv',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('test_file');
   });
 
   it('should handle file names with multiple dots correctly', () => {
-    const filePath = 'https://demo.gethue.com/hue/test.file.name.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://demo.gethue.com/hue/test.file.name.csv',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('test_file_name');
   });
 
   it('should handle file names with no extension correctly', () => {
-    const filePath = 'https://demo.gethue.com/hue/test-file';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://demo.gethue.com/hue/test-file',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('test_file');
   });
 
   it('should handle file names with special characters correctly', () => {
-    const filePath = 'https://demo.gethue.com/hue/test-file@2023.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://demo.gethue.com/hue/test-file@2023.csv',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('test_file_2023');
   });
 
   it('should handle file names with spaces correctly', () => {
-    const filePath = 'https://demo.gethue.com/hue/test file.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://demo.gethue.com/hue/test file.csv',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('test_file');
   });
 
   it('should handle REMOTE files with only extension', () => {
-    const filePath = 'https://demo.gethue.com/hue/.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://demo.gethue.com/hue/.csv',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('');
   });
 
   it('should handle REMOTE files with multiple extensions', () => {
-    const filePath = 'https://demo.gethue.com/hue/file.backup.tar.gz';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://demo.gethue.com/hue/file.backup.tar.gz',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('file_backup_tar');
   });
 
   it('should handle REMOTE files with numbers and underscores', () => {
-    const filePath = 'https://demo.gethue.com/hue/data_file_2023_v1.xlsx';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://demo.gethue.com/hue/data_file_2023_v1.xlsx',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('data_file_2023_v1');
   });
 
   it('should handle S3 URLs', () => {
-    const filePath = 's3://bucket-name/folder/data-file.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 's3://bucket-name/folder/data-file.csv',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('data_file');
   });
 
   it('should handle Azure blob URLs', () => {
-    const filePath = 'https://storageaccount.blob.core.windows.net/container/data.file.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://storageaccount.blob.core.windows.net/container/data.file.csv',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('data_file');
   });
 
   it('should handle local file paths with forward slashes', () => {
-    const filePath = 'C:/Users/Documents/data.file.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'C:/Users/Documents/data.file.csv',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('data_file');
   });
 
-  it('should return empty string for empty file path', () => {
-    const result1 = getDefaultTableName('', ImporterFileSource.LOCAL);
-    const result2 = getDefaultTableName('', ImporterFileSource.REMOTE);
-    expect(result1).toBe('');
-    expect(result2).toBe('');
+  it('should return empty string for empty file paths', () => {
+    const localFileMetaData = {
+      path: '',
+      fileName: '',
+      source: ImporterFileSource.LOCAL
+    };
+    const remoteFileMetaData = {
+      path: '',
+      source: ImporterFileSource.REMOTE
+    };
+    expect(getDefaultTableName(localFileMetaData)).toBe('');
+    expect(getDefaultTableName(remoteFileMetaData)).toBe('');
   });
 
   it('should handle path with only directories (no file)', () => {
-    const filePath = 'https://demo.gethue.com/hue/';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://demo.gethue.com/hue/',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('hue');
   });
 
   it('should handle single character file names', () => {
-    const filePath = 'https://demo.gethue.com/hue/a.csv';
-    const result = getDefaultTableName(filePath, ImporterFileSource.REMOTE);
+    const fileMetaData = {
+      path: 'https://demo.gethue.com/hue/a.csv',
+      source: ImporterFileSource.REMOTE
+    };
+    const result = getDefaultTableName(fileMetaData);
     expect(result).toBe('a');
   });
 });

@@ -71,6 +71,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
         onSuccess: data => {
           setFileMetaData({
             path: data.file_path,
+            fileName: file.name,
             source: ImporterFileSource.LOCAL
           });
         },

@@ -19,7 +19,8 @@ import {
   ImporterFileSource,
   FilePreviewTableColumn,
   ImporterTableData,
-  FilePreviewResponse
+  FilePreviewResponse,
+  FileMetaData
 } from '../types';
 import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 import { toCamelCase } from '../../../utils/string/changeCasing';
@@ -67,11 +68,13 @@ const getLastDirOrFileNameWithoutExtension = (fileName: string): string => {
   return fileName.split('.').length > 1 ? fileName.split('.').slice(0, -1).join('.') : fileName;
 };
 
-export const getDefaultTableName = (filePath: string, fileSource: ImporterFileSource): string => {
+export const getDefaultTableName = (fileMetaData: FileMetaData): string => {
   const rawFileName =
-    fileSource === ImporterFileSource.LOCAL
-      ? (filePath.match(/:(.*?);/)?.[1] ?? '')
-      : getLastDirOrFileNameWithoutExtension(getLastDirOrFileNameFromPath(filePath));
+    fileMetaData.source === ImporterFileSource.LOCAL
+      ? (fileMetaData.fileName ?? '')
+      : getLastDirOrFileNameFromPath(fileMetaData.path);
 
-  return sanitizeTableName(rawFileName);
+  const fileNameWithoutExtension = getLastDirOrFileNameWithoutExtension(rawFileName);
+
+  return sanitizeTableName(fileNameWithoutExtension);
 };
