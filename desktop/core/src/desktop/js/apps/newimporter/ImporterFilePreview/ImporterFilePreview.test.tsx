@@ -19,7 +19,7 @@ import '@testing-library/jest-dom';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ImporterFilePreview from './ImporterFilePreview';
-import { FileMetaData, ImporterFileSource, ImporterFileTypes } from '../types';
+import { FileMetaData, ImporterFileSource } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { mocked } from 'jest-mock';
 
