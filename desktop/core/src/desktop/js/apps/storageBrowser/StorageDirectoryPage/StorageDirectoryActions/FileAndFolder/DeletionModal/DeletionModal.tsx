@@ -76,17 +76,18 @@ const DeletionModal = ({
       okText={isTrashEnabled ? t('Move to Trash') : t('Delete Permanently')}
       onOk={() => handleDeletion()}
       okButtonProps={{
-        disabled: loading && !isMoveTrashClicked,
-        loading: loading && isMoveTrashClicked
+        disabled: loading && isTrashEnabled && !isMoveTrashClicked,
+        loading: loading && (isTrashEnabled ? isMoveTrashClicked : !isMoveTrashClicked)
       }}
       secondaryButtonText={isTrashEnabled ? t('Delete Permanently') : undefined}
       onSecondary={() => handleDeletion(true)}
       secondaryButtonProps={{
-        disabled: loading && isMoveTrashClicked,
-        loading: loading && !isMoveTrashClicked
+        disabled: loading && isTrashEnabled && isMoveTrashClicked,
+        loading: loading && isTrashEnabled && !isMoveTrashClicked
       }}
       onCancel={onClose}
       cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
       {isTrashEnabled
         ? files.length > 1
