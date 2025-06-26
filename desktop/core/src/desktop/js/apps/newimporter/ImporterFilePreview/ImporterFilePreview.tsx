@@ -142,14 +142,13 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       importData: advancedSettings.importData,
       isIceberg: advancedSettings.isIceberg,
       useCopy: advancedSettings.useCopy,
-      description: advancedSettings.description,
-      hasHeader: advancedSettings.hasHeader,
-      useCustomDelimiters: advancedSettings.useCustomDelimiters,
-      customFieldDelimiter: advancedSettings.customFieldDelimiter,
-      customCollectionDelimiter: advancedSettings.customCollectionDelimiter,
-      customMapDelimiter: advancedSettings.customMapDelimiter,
-      customRegexp: advancedSettings.customRegexp,
-      primaryKeys: advancedSettings.primaryKeys
+      description: advancedSettings.description
+      // useCustomDelimiters: advancedSettings.useCustomDelimiters,
+      // customFieldDelimiter: advancedSettings.customFieldDelimiter,
+      // customCollectionDelimiter: advancedSettings.customCollectionDelimiter,
+      // customMapDelimiter: advancedSettings.customMapDelimiter,
+      // customRegexp: advancedSettings.customRegexp,
+      // primaryKeys: advancedSettings.primaryKeys
     };
 
     const formData = new FormData();

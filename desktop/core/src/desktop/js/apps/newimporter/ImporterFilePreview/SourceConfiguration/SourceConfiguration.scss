@@ -18,6 +18,9 @@
 
 .antd.cuix {
   .hue-importer-configuration {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
     padding: 16px;
 
     &__summary {
