@@ -49,7 +49,6 @@ interface ImporterFilePreviewProps {
 const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [fileFormat, setFileFormat] = useState<CombinedFileFormat | undefined>();
-  const defaultDialect = 'impala';
 
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
   const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
@@ -107,14 +106,17 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
         file_path: fileMetaData.path,
         file_type: fileFormat?.type,
         import_type: fileMetaData.source,
-        sql_dialect: defaultDialect,
+        sql_dialect: destinationConfig.connectorId,
         has_header: fileFormat?.hasHeader,
         sheet_name: fileFormat?.selectedSheetName,
         field_separator: fileFormat?.fieldSeparator,
         quote_char: fileFormat?.quoteChar,
         record_separator: fileFormat?.recordSeparator
       },
-      skip: !fileFormat?.type || fileFormat?.hasHeader === undefined
+      skip:
+        !fileFormat?.type ||
+        fileFormat?.hasHeader === undefined ||
+        destinationConfig.connectorId === undefined
     }
   );
 
