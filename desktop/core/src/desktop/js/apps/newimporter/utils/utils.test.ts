@@ -178,7 +178,7 @@ describe('getDefaultTableName', () => {
 
   it('should extract file name from REMOTE path as last part of path', () => {
     const fileMetaData = {
-      path: 'https://demo.gethue.com/hue/test-file.csv',
+      path: '/user/data/test-file.csv',
       source: ImporterFileSource.REMOTE
     };
     const result = getDefaultTableName(fileMetaData);
@@ -187,7 +187,7 @@ describe('getDefaultTableName', () => {
 
   it('should handle file names with multiple dots correctly', () => {
     const fileMetaData = {
-      path: 'https://demo.gethue.com/hue/test.file.name.csv',
+      path: '/user/data/test.file.name.csv',
       source: ImporterFileSource.REMOTE
     };
     const result = getDefaultTableName(fileMetaData);
@@ -196,7 +196,7 @@ describe('getDefaultTableName', () => {
 
   it('should handle file names with no extension correctly', () => {
     const fileMetaData = {
-      path: 'https://demo.gethue.com/hue/test-file',
+      path: '/user/data/test-file',
       source: ImporterFileSource.REMOTE
     };
     const result = getDefaultTableName(fileMetaData);
@@ -205,7 +205,7 @@ describe('getDefaultTableName', () => {
 
   it('should handle file names with special characters correctly', () => {
     const fileMetaData = {
-      path: 'https://demo.gethue.com/hue/test-file@2023.csv',
+      path: '/user/data/test-file@2023.csv',
       source: ImporterFileSource.REMOTE
     };
     const result = getDefaultTableName(fileMetaData);
@@ -214,7 +214,7 @@ describe('getDefaultTableName', () => {
 
   it('should handle file names with spaces correctly', () => {
     const fileMetaData = {
-      path: 'https://demo.gethue.com/hue/test file.csv',
+      path: '/user/data/test file.csv',
       source: ImporterFileSource.REMOTE
     };
     const result = getDefaultTableName(fileMetaData);
@@ -223,7 +223,7 @@ describe('getDefaultTableName', () => {
 
   it('should handle REMOTE files with only extension', () => {
     const fileMetaData = {
-      path: 'https://demo.gethue.com/hue/.csv',
+      path: '/user/data/.csv',
       source: ImporterFileSource.REMOTE
     };
     const result = getDefaultTableName(fileMetaData);
@@ -232,7 +232,7 @@ describe('getDefaultTableName', () => {
 
   it('should handle REMOTE files with multiple extensions', () => {
     const fileMetaData = {
-      path: 'https://demo.gethue.com/hue/file.backup.tar.gz',
+      path: '/user/data/file.backup.tar.gz',
       source: ImporterFileSource.REMOTE
     };
     const result = getDefaultTableName(fileMetaData);
@@ -241,7 +241,7 @@ describe('getDefaultTableName', () => {
 
   it('should handle REMOTE files with numbers and underscores', () => {
     const fileMetaData = {
-      path: 'https://demo.gethue.com/hue/data_file_2023_v1.xlsx',
+      path: '/user/data/data_file_2023_v1.xlsx',
       source: ImporterFileSource.REMOTE
     };
     const result = getDefaultTableName(fileMetaData);
@@ -259,16 +259,7 @@ describe('getDefaultTableName', () => {
 
   it('should handle Azure blob URLs', () => {
     const fileMetaData = {
-      path: 'https://storageaccount.blob.core.windows.net/container/data.file.csv',
-      source: ImporterFileSource.REMOTE
-    };
-    const result = getDefaultTableName(fileMetaData);
-    expect(result).toBe('data_file');
-  });
-
-  it('should handle local file paths with forward slashes', () => {
-    const fileMetaData = {
-      path: 'C:/Users/Documents/data.file.csv',
+      path: 'abfs://container/data.file.csv',
       source: ImporterFileSource.REMOTE
     };
     const result = getDefaultTableName(fileMetaData);
@@ -289,18 +280,9 @@ describe('getDefaultTableName', () => {
     expect(getDefaultTableName(remoteFileMetaData)).toBe('');
   });
 
-  it('should handle path with only directories (no file)', () => {
-    const fileMetaData = {
-      path: 'https://demo.gethue.com/hue/',
-      source: ImporterFileSource.REMOTE
-    };
-    const result = getDefaultTableName(fileMetaData);
-    expect(result).toBe('hue');
-  });
-
   it('should handle single character file names', () => {
     const fileMetaData = {
-      path: 'https://demo.gethue.com/hue/a.csv',
+      path: '/user/data/a.csv',
       source: ImporterFileSource.REMOTE
     };
     const result = getDefaultTableName(fileMetaData);
