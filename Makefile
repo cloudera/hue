@@ -209,7 +209,8 @@ INSTALL_CORE_FILES = \
 	VERS* LICENSE* README*
 
 .PHONY: install
-install: virtual-env install-check install-core-structure install-desktop install-apps install-env
+install: virtual-env install-check install-core-structure install-desktop install-apps
+	$(MAKE) install-env BLD_DIR_ENV=$(INST_DIR_ENV)
 
 .PHONY: install-check
 install-check:
