@@ -110,9 +110,8 @@ describe('ImporterFilePreview', () => {
       render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
     });
 
-    const cancelButton = screen.getByTestId('hue-importer-preview-page__header__actions__cancel');
+    const cancelButton = screen.getByRole('button', { name: 'Cancel' });
     expect(cancelButton).toBeInTheDocument();
-    expect(cancelButton).toHaveTextContent('Cancel');
   });
 
   it('should handle complete file format workflow', async () => {
