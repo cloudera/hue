@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FileFormatResponse, ImporterFileTypes } from './types';
+import { CombinedFileFormat, ImporterFileTypes } from './types';
 
 export const separator = [
   { value: ',', label: 'Comma (,)' },
@@ -30,7 +30,7 @@ export const separator = [
 ];
 
 export const sourceConfigs: {
-  name: keyof FileFormatResponse;
+  name: keyof CombinedFileFormat;
   label: string;
   hidden?: (type?: ImporterFileTypes) => boolean;
   options: {
@@ -72,5 +72,11 @@ export const sourceConfigs: {
     label: 'Quote Character',
     hidden: (type?: ImporterFileTypes) => type !== ImporterFileTypes.CSV,
     options: separator
+  },
+  {
+    name: 'selectedSheetName',
+    label: 'Sheet Name',
+    hidden: (type?: ImporterFileTypes) => type !== ImporterFileTypes.EXCEL,
+    options: []
   }
 ];

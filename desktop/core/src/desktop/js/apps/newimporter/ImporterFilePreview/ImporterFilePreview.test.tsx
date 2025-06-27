@@ -16,35 +16,50 @@
 
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import ImporterFilePreview from './ImporterFilePreview';
-import { FileMetaData } from '../types';
+import { FileMetaData, ImporterFileSource } from '../types';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
+import { mocked } from 'jest-mock';
 
-const mockSave = jest.fn();
+const mockPreviewData = jest.fn().mockReturnValue({
+  columns: [{ name: 'Name' }, { name: 'Age' }],
+  previewData: {
+    name: ['Alice', 'Bob'],
+    age: ['30', '25']
+  }
+});
+
+jest.mock('../../../utils/hooks/useLoadData/useLoadData');
 jest.mock('../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
-    data: {
-      columns: [{ name: 'Name' }, { name: 'Age' }],
-      sample: [
-        ['Alice', '30'],
-        ['Bob', '25']
-      ]
-    },
-    save: mockSave,
+    save: jest.fn(),
     loading: false
   }))
 }));
 
 describe('ImporterFilePreview', () => {
   const mockFileMetaData: FileMetaData = {
-    source: 'localfile',
-    type: 'csv',
-    path: '/path/to/file.csv'
+    source: ImporterFileSource.LOCAL,
+    path: '/path/to/file.csv',
+    fileName: 'file.csv'
   };
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mocked(useLoadData).mockImplementation(() => ({
+      loading: false,
+      data: mockPreviewData(),
+      reloadData: jest.fn()
+    }));
+  });
+
   it('should render correctly', async () => {
-    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+    await act(async () => {
+      render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Preview')).toBeInTheDocument();
@@ -53,22 +68,67 @@ describe('ImporterFilePreview', () => {
     });
   });
 
-  it('should call guessFormat and guessFields when the component mounts', async () => {
-    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
-
-    await waitFor(() => {
-      expect(mockSave).toHaveBeenCalledTimes(2);
-    });
-  });
-
   it('should display data in the table after previewData is available', async () => {
-    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+    await act(async () => {
+      render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Alice')).toBeInTheDocument();
       expect(screen.getByText('30')).toBeInTheDocument();
       expect(screen.getByText('Bob')).toBeInTheDocument();
       expect(screen.getByText('25')).toBeInTheDocument();
+    });
+  });
+
+  it('should open edit columns modal when button is clicked', async () => {
+    await act(async () => {
+      render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+    });
+
+    const editColumnsButton = screen.getByText('Edit Columns');
+
+    await act(async () => {
+      await userEvent.click(editColumnsButton);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+  });
+
+  it('should display source configuration', async () => {
+    await act(async () => {
+      render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+    });
+
+    expect(screen.getByText('Configure source')).toBeInTheDocument();
+  });
+
+  it('should display cancel button', async () => {
+    await act(async () => {
+      render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+    });
+
+    const cancelButton = screen.getByRole('button', { name: 'Cancel' });
+    expect(cancelButton).toBeInTheDocument();
+  });
+
+  it('should handle complete file format workflow', async () => {
+    mocked(useLoadData).mockImplementation(() => ({
+      loading: false,
+      data: mockPreviewData(),
+      reloadData: jest.fn()
+    }));
+
+    await act(async () => {
+      render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Preview')).toBeInTheDocument();
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
     });
   });
 });
