@@ -1806,8 +1806,7 @@ class ClusterConfig(object):
       'has_computes': self.cluster_type in ('cdw', 'altus', 'snowball'),  # or any grouped engine connectors
       'hue_config': {
         'enable_sharing': ENABLE_SHARING.get(),
-        'collect_usage': COLLECT_USAGE.get(),
-        'allow_sample_data_from_views': ALLOW_SAMPLE_DATA_FROM_VIEWS.get(),
+        'collect_usage': COLLECT_USAGE.get()
       },
       'storage_browser': {},
       'vw_name': hue_host_name,

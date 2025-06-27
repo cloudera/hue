@@ -20,7 +20,6 @@ import logging
 from unittest.mock import Mock, patch
 
 import pytest
-from django.test import TestCase
 from requests.exceptions import ReadTimeout
 
 from beeswax.api import _autocomplete, _get_functions, _get_sample_data
@@ -32,8 +31,8 @@ LOG = logging.getLogger()
 
 
 @pytest.mark.django_db
-class TestApi(TestCase):
-  def setUp(self):
+class TestApi:
+  def setup_method(self):
     self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="test")
 
@@ -95,39 +94,45 @@ class TestApi(TestCase):
     assert data["function"] == {}
 
   @patch("beeswax.api.dbms.get")
-  def test_get_sample_data_for_views(self, dbms_get_mock):
-    # Mock the db object that dbms.get() would return
-    db_mock = Mock()
-    dbms_get_mock.return_value = db_mock
-
+  def test_get_sample_data_for_views(self, mock_dbms_get):
     # Mock table_obj
-    table_obj_mock = Mock()
-    table_obj_mock.is_view = True
-    table_obj_mock.is_impala_only = False  # Assuming not Impala only for simplicity
+    table_obj_mock = Mock(is_view=True, is_impala_only=False)
 
-    db_mock.get_table.return_value = table_obj_mock
+    # Mock the db object that dbms.get() would return
+    db_mock = Mock(get_table=Mock(return_value=table_obj_mock))
+    mock_dbms_get.return_value = db_mock
 
     # Scenario 1: allow_sample_data_from_views is False
-    cleanup_false = ALLOW_SAMPLE_DATA_FROM_VIEWS.set_for_testing(False)
-    self.addCleanup(cleanup_false)
+    reset = ALLOW_SAMPLE_DATA_FROM_VIEWS.set_for_testing(False)
+    try:
+      response = _get_sample_data(db_mock, "default_db", "test_view_table", None, None)
 
-    response_false = _get_sample_data(db_mock, "default_db", "test_view_table", None, None)
-    assert response_false["status"] == -1
-    assert "Not getting sample data as this is a view" in response_false["message"]
+      assert response == {
+        "status": -1,
+        "message": "Not getting sample data as this is a view which can be expensive when run.",
+      }
+    finally:
+      reset()
 
     # Scenario 2: allow_sample_data_from_views is True
-    cleanup_true = ALLOW_SAMPLE_DATA_FROM_VIEWS.set_for_testing(True)
-    self.addCleanup(cleanup_true)
+    reset = ALLOW_SAMPLE_DATA_FROM_VIEWS.set_for_testing(True)
+    try:
+      # Mock db.get_sample to simulate successful data fetching past the view check
+      # We expect it to be called if the view check is passed.
+      db_mock.get_sample.return_value = Mock(
+        rows=Mock(return_value=[["col1_val", "col2_val"]]),
+        cols=Mock(return_value=["col1", "col2"]),
+        full_cols=Mock(return_value=[{"name": "col1"}, {"name": "col2"}]),
+      )
+      mock_dbms_get.return_value = db_mock
 
-    # Mock db.get_sample to simulate successful data fetching past the view check
-    # We expect it to be called if the view check is passed.
-    db_mock.get_sample.return_value = Mock(
-      rows=Mock(return_value=[["col1_val", "col2_val"]]),
-      cols=Mock(return_value=["col1", "col2"]),
-      full_cols=Mock(return_value=[{"name": "col1"}, {"name": "col2"}]),
-    )
-
-    response_true = _get_sample_data(db_mock, "default_db", "test_view_table", None, None)
-    assert response_true["status"] == 0
-    assert "Not getting sample data as this is a view" not in response_true.get("message", "")
-    db_mock.get_sample.assert_called_once_with("default_db", table_obj_mock, None, None, generate_sql_only=False, operation=None)
+      response = _get_sample_data(db_mock, "default_db", "test_view_table", None, None)
+      assert response == {
+        "status": 0,
+        "headers": ["col1", "col2"],
+        "full_headers": [{"name": "col1"}, {"name": "col2"}],
+        "rows": [["col1_val", "col2_val"]],
+      }
+      db_mock.get_sample.assert_called_once_with("default_db", table_obj_mock, None, None, generate_sql_only=False, operation=None)
+    finally:
+      reset()
