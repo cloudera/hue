@@ -186,14 +186,12 @@ class TestApi2(object):
 
     assert response.status_code == 200
 
-    # Check all top-level keys are exactly as expected
+    # Check all top-level keys are present
     expected_top_level_keys = {"hue_config", "storage_browser", "importer", "clusters", "documents", "status"}
 
-    assert set(config.keys()) >= expected_top_level_keys, (
-      f"Top-level keys mismatch. Expected: {expected_top_level_keys}, Got: {set(config.keys())}"
-    )
+    assert set(config.keys()) >= expected_top_level_keys, f"Missing top-level keys: {expected_top_level_keys - set(config.keys())}"
 
-    # Check all hue_config keys are exactly as expected
+    # Check all hue_config keys are present
     expected_hue_config_keys = {
       "is_admin",
       "is_yarn_enabled",
@@ -205,10 +203,10 @@ class TestApi2(object):
     }
 
     assert set(config["hue_config"].keys()) >= expected_hue_config_keys, (
-      f"hue_config keys mismatch. Expected: {expected_hue_config_keys}, Got: {set(config['hue_config'].keys())}"
+      f"Missing hue_config keys: {expected_hue_config_keys - set(config['hue_config'].keys())}"
     )
 
-    # Check all storage_browser keys are exactly as expected
+    # Check all storage_browser keys are present
     expected_storage_browser_keys = {
       "enable_chunked_file_upload",
       "enable_new_storage_browser",
@@ -221,14 +219,14 @@ class TestApi2(object):
     }
 
     assert set(config["storage_browser"].keys()) >= expected_storage_browser_keys, (
-      f"storage_browser keys mismatch. Expected: {expected_storage_browser_keys}, Got: {set(config['storage_browser'].keys())}"
+      f"Missing storage_browser keys: {expected_storage_browser_keys - set(config['storage_browser'].keys())}"
     )
 
-    # Check all importer keys are exactly as expected
+    # Check all importer keys are present
     expected_importer_keys = {"is_enabled", "restrict_local_file_extensions", "max_local_file_size_upload_limit"}
 
     assert set(config["importer"].keys()) >= expected_importer_keys, (
-      f"importer keys mismatch. Expected: {expected_importer_keys}, Got: {set(config['importer'].keys())}"
+      f"Missing importer keys: {expected_importer_keys - set(config['importer'].keys())}"
     )
 
     # Check documents structure
