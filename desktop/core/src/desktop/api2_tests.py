@@ -304,7 +304,6 @@ class TestDocumentApiSharingPermissions(object):
 
     # Add doc
     doc = self._add_doc("test_update_permissions")
-    doc_id = "%s" % doc.id
 
     response = self.client.get("/desktop/api2/docs/")
     assert json.loads(response.content)["documents"]
@@ -695,7 +694,7 @@ class TestDocumentGist(object):
 
     gist_dir1 = Directory.objects.create(name=Document2.GIST_DIR, owner=self.user, parent_directory=home_dir)
     gist_dir2 = Directory.objects.create(name=Document2.GIST_DIR, owner=self.user, parent_directory=home_dir)
-    gist_child = Document2.objects.create(
+    Document2.objects.create(
       name="test_gist_child",
       data=json.dumps({"statement": "SELECT 123"}),
       owner=self.user,

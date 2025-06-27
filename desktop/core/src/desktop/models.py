@@ -40,12 +40,10 @@ from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import (
   APP_BLACKLIST,
-  COLLECT_USAGE,
   DISABLE_SOURCE_AUTOCOMPLETE,
   ENABLE_NEW_IMPORTER,
   ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_ORGANIZATIONS,
-  ENABLE_SHARING,
   ENABLE_UNIFIED_ANALYTICS,
   get_clusters,
   has_connectors,
