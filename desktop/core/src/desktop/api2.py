@@ -41,6 +41,7 @@ from beeswax.models import Namespace
 from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import (
+  COLLECT_USAGE,
   CUSTOM,
   ENABLE_CHUNKED_FILE_UPLOADER,
   ENABLE_CONNECTORS,
@@ -148,6 +149,8 @@ def get_config(request):
     'enable_task_server': TASK_SERVER_V2.ENABLED.get(),
     'enable_workflow_creation_action': ENABLE_WORKFLOW_CREATION_ACTION.get(),
     'allow_sample_data_from_views': ALLOW_SAMPLE_DATA_FROM_VIEWS.get(),
+    'enable_sharing': ENABLE_SHARING.get(),
+    'collect_usage': COLLECT_USAGE.get(),
   }
 
   # Storage browser configuration

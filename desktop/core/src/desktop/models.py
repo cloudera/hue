@@ -40,12 +40,10 @@ from desktop import appmanager
 from desktop.auth.backend import is_admin
 from desktop.conf import (
   APP_BLACKLIST,
-  COLLECT_USAGE,
   DISABLE_SOURCE_AUTOCOMPLETE,
   ENABLE_NEW_IMPORTER,
   ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_ORGANIZATIONS,
-  ENABLE_SHARING,
   ENABLE_UNIFIED_ANALYTICS,
   get_clusters,
   has_connectors,
@@ -1803,11 +1801,6 @@ class ClusterConfig(object):
       'default_sql_interpreter': default_sql_interpreter,
       'cluster_type': self.cluster_type,
       'has_computes': self.cluster_type in ('cdw', 'altus', 'snowball'),  # or any grouped engine connectors
-      'hue_config': {
-        'enable_sharing': ENABLE_SHARING.get(),
-        'collect_usage': COLLECT_USAGE.get()
-      },
-      'storage_browser': {},
       'vw_name': hue_host_name,
       'img_version': img_version,
       'hue_version': version_of_hue
