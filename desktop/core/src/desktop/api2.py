@@ -92,6 +92,7 @@ from metadata.catalog_api import (
   search_entities_interactive as metadata_search_entities_interactive,
 )
 from metadata.conf import has_catalog
+from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS
 from notebook.connectors.base import get_interpreter, Notebook
 from notebook.management.commands import notebook_setup
 from pig.management.commands import pig_setup
@@ -146,6 +147,7 @@ def get_config(request):
     'is_yarn_enabled': is_yarn(),
     'enable_task_server': TASK_SERVER_V2.ENABLED.get(),
     'enable_workflow_creation_action': ENABLE_WORKFLOW_CREATION_ACTION.get(),
+    'allow_sample_data_from_views': ALLOW_SAMPLE_DATA_FROM_VIEWS.get(),
   }
 
   # Storage browser configuration
