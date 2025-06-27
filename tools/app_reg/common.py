@@ -42,7 +42,7 @@ ENV_PYTHON = os.environ.get("ENV_PYTHON")
 PYTHON_VER = os.environ.get("PYTHON_VER", "")
 
 # Virtual env
-VIRTUAL_ENV = os.environ.get("VIRTUAL_ENV")
+VIRTUAL_ENV = os.environ.get("BLD_DIR_ENV")
 
 
 def cmp_version(ver1, ver2):
