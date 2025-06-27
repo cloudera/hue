@@ -67,7 +67,6 @@ from filebrowser.conf import REMOTE_STORAGE_HOME
 from indexer.conf import ENABLE_DIRECT_UPLOAD
 from kafka.conf import has_kafka
 from metadata.conf import get_optimizer_mode
-from metastore.conf import ALLOW_SAMPLE_DATA_FROM_VIEWS
 from notebook.conf import DEFAULT_INTERPRETER, DEFAULT_LIMIT, get_ordered_interpreters, SHOW_NOTEBOOKS
 from useradmin.models import get_organization, Group, User
 from useradmin.organization import _fitered_queryset
