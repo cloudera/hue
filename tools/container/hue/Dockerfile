@@ -20,7 +20,7 @@ ENV NAME="hue" \
     HUE_SHAURL=${GSHA} \
     HUE_BRANCHURL=${GBRANCH} \
     HUE_VERSION=${VERSION} \
-    HUE_BIN="/opt/${HUEUSER}/build/env/bin" \
+    HUE_BIN="/opt/${HUEUSER}/build/venvs/python3.9/bin" \
     PATH=$PATH:${HUE_BIN} \
     SUPERVISOR_VERSION=4.0.2
 
@@ -68,7 +68,7 @@ ADD supervisor-files/hue_redis.conf /etc/supervisor.d/
 RUN chown -R ${HUEUSER}:${HUEUSER} /etc/supervisord.conf && chown -R ${HUEUSER}:${HUEUSER} /etc/supervisor.d
 
 # Remove chardet package
-RUN rm -rf ${HUE_HOME}/build/env/lib/python3.8/site-packages/pip/_vendor/chardet
+RUN rm -rf ${HUE_HOME}/build/venvs/python3.9/lib/python3.9/site-packages/pip/_vendor/chardet
 
 EXPOSE 8888 9111 6379
 

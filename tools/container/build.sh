@@ -33,7 +33,7 @@ compile_py3hue() {
   INSTALL_DIR=${HUE_HOME} make install
   cd $CONTAINER_HUE_OPT/${HUEUSER}
   APPS=$(find apps -maxdepth 2 -name "src" -type d|cut -d"/" -f2|sort| sed 's/[^ ]* */apps\/&/g')
-  ./build/env/bin/python tools/app_reg/app_reg.py --install $APPS --relative-paths
+  ENV_PYTHON=${HUE_HOME}/build/venvs/python3.9/bin/python3.9 VIRTUAL_ENV=${HUE_HOME}/build/venvs/python3.9 ./build/venvs/python3.9/bin/python tools/app_reg/app_reg.py --install $APPS --relative-paths
 }
 
 # Compile the bits in the docker and copy it out
