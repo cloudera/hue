@@ -15,18 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import itertools
+import logging
 import os
 import re
-import sys
 import time
-import logging
-import itertools
 from builtins import filter, range
 from datetime import datetime
 from urllib.parse import urlparse
 
 import pytz
-from babel import localtime
 from django.utils.translation import gettext as _
 
 from desktop.lib import export_csvxls
@@ -52,11 +50,13 @@ def _get_api(user, cluster=None):
       compute = Compute.objects.get(id=compute['id']).to_dict()  # Reload the full compute from db
     if compute.get('options') and compute['options'].get('api_url'):
       server_url = compute['options'].get('api_url')
+    application = compute.get('name')
   else:
     # TODO: multi computes if snippet.get('compute') or snippet['type'] has computes
     application = cluster['compute']['type'] if cluster.get('compute') else cluster.get('interface', 'impala')
-    session = Session.objects.get_session(user, application=application)
-    server_url = _get_impala_server_url(session)
+
+  session = Session.objects.get_session(user, application=application)
+  server_url = _get_impala_server_url(session)
   return get_impalad_api(user=user, url=server_url)
 
 
