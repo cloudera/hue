@@ -20,42 +20,6 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import EditColumnsModal, { Column } from './EditColumnsModal';
 
-jest.mock('cuix/dist/components/Modal', () => {
-  const Modal = ({ children, title, className, onOk, onCancel, okText, cancelText }: any) => (
-    <div data-testid="modal" className={className}>
-      <h2>{title}</h2>
-      {children}
-      <button onClick={onCancel}>{cancelText || 'Cancel'}</button>
-      <button onClick={onOk}>{okText || 'Done'}</button>
-    </div>
-  );
-  return Modal;
-});
-jest.mock('cuix/dist/components/Table', () => ({ columns, dataSource }: any) => (
-  <table>
-    <tbody>
-      {dataSource.map((row: any, idx: number) => (
-        <tr key={row.key}>
-          {columns.map((col: any, colIdx: number) => (
-            <td key={colIdx}>
-              {col.render ? col.render(row[col.dataIndex], row, idx) : row[col.dataIndex]}
-            </td>
-          ))}
-        </tr>
-      ))}
-    </tbody>
-  </table>
-));
-jest.mock('cuix/dist/components/Input', () => (props: any) => <input {...props} />);
-jest.mock('cuix/dist/components/Select', () => {
-  const Select = ({ children, value, onChange, ...props }: any) => (
-    <select {...props} value={value} onChange={e => onChange(e.target.value)}>
-      {children}
-    </select>
-  );
-  Select.Option = ({ children, ...props }: any) => <option {...props}>{children}</option>;
-  return Select;
-});
 jest.mock(
   '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper',
   () =>

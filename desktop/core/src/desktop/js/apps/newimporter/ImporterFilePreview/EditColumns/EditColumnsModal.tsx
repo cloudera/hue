@@ -58,7 +58,6 @@ const EditColumnsModal = ({
 }: EditColumnsModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [editRows, setEditRows] = useState<EditRow[]>([]);
-  const [typeError, setTypeError] = useState<string | null>(null);
 
   const {
     data: sqlTypesData,
@@ -79,16 +78,17 @@ const EditColumnsModal = ({
     return [];
   }, [sqlTypesData]);
 
-  useEffect(() => {
-    if (sqlTypesError) {
-      setTypeError(t('Failed to fetch SQL types.'));
-    } else if (!sqlTypesLoading && sqlTypes.length === 0) {
-      setTypeError(t('No SQL types returned from server.'));
-    } else {
-      setTypeError(null);
+  const errors = [
+    {
+      enabled: !!sqlTypesError,
+      message: t('Failed to fetch SQL types.')
+    },
+    {
+      enabled: !sqlTypesLoading && sqlTypes.length === 0,
+      message: t('No SQL types returned from server.')
     }
-  }, [sqlTypesError, sqlTypesLoading, sqlTypes, t]);
-
+  ];
+  
   useEffect(() => {
     setEditRows(
       columns.map((col, idx) => ({
@@ -123,17 +123,10 @@ const EditColumnsModal = ({
   const modalColumns = useMemo(
     () => [
       {
-        title: t('Name'),
-        dataIndex: 'name',
-        render: (text: string, _: EditRow, idx: number) => (
-          <Input
-            value={text}
-            className="hue-importer-edit-columns-modal__input--name"
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              handleChange(idx, 'name', e.target.value)
-            }
-            placeholder={t('Column Name')}
-          />
+        title: t('Sample'),
+        dataIndex: 'sample',
+        render: (text: string) => (
+          <span className="hue-importer-edit-columns-modal__sample-text">{text}</span>
         )
       },
       {
@@ -147,6 +140,7 @@ const EditColumnsModal = ({
             getPopupContainer={triggerNode => triggerNode.parentNode}
             disabled={sqlTypesLoading || sqlTypes.length === 0}
             loading={sqlTypesLoading}
+            // bordered={true}
           >
             {sqlTypes.map(type => (
               <Select.Option key={type} value={type}>
@@ -156,7 +150,7 @@ const EditColumnsModal = ({
           </Select>
         )
       },
-      {
+      { 
         title: t('Sample'),
         dataIndex: 'sample',
         render: (text: string, _: EditRow, idx: number) => (
@@ -186,13 +180,6 @@ const EditColumnsModal = ({
     [t, sqlTypes, sqlTypesLoading]
   );
 
-  const errors = [
-    {
-      enabled: !!typeError,
-      message: typeError ?? t('An unknown error occurred while editing columns.')
-    }
-  ];
-
   return (
     <Modal
       open={isOpen}
@@ -201,7 +188,7 @@ const EditColumnsModal = ({
       cancelText={t('Cancel')}
       okText={t('Done')}
       onOk={handleDone}
-      className="hue-importer-edit-columns-modal"
+      className="cuix antd hue-importer-edit-columns-modal"
     >
       <LoadingErrorWrapper loading={sqlTypesLoading} errors={errors}>
         <Table columns={modalColumns} dataSource={editRows} pagination={false} />
