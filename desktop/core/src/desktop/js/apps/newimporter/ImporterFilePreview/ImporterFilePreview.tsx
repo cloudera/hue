@@ -17,7 +17,6 @@
 import React, { useEffect, useState } from 'react';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import {
-  DestinationConfig,
   FileFormatResponse,
   FileMetaData,
   GuessFieldTypesResponse,
@@ -31,6 +30,7 @@ import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL, FINISH_IMPORT_URL } from '../a
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 import EditColumnsModal from './EditColumns/EditColumnsModal';
 import type { Column } from './EditColumns/EditColumnsModal';
+import DestinationSettings from './DestinationSettings/DestinationSettings';
 
 import './ImporterFilePreview.scss';
 
@@ -43,7 +43,12 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
   const [columns, setColumns] = useState<Column[]>([]);
+  const [destinationConfig, setDestinationConfig] = useState<any>({});
   const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
+
+  const handleDestinationSettingsChange = (newConfig: any) => {
+    setDestinationConfig(newConfig);
+  };
 
   const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
     GUESS_FORMAT_URL,
@@ -91,8 +96,15 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
 
   // Update columns when previewData changes
   useEffect(() => {
-    if (previewData?.columns) {
-      setColumns(convertToAntdColumns(previewData.columns));
+    if (previewData?.columns && Array.isArray(previewData.columns)) {
+      setColumns(
+        convertToAntdColumns(previewData.columns).map(col => ({
+          ...col,
+          title: col?.title != null ? String(col.title) : ''
+        }))
+      );
+    } else {
+      setColumns([]);
     }
   }, [previewData]);
 
