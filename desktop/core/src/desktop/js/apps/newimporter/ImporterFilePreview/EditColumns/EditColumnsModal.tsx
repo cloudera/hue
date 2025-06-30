@@ -82,7 +82,7 @@ const EditColumnsModal = ({
       message: t('No SQL types returned from server.')
     }
   ];
-  
+
   useEffect(() => {
     setEditRows(
       columns.map((col, idx) => ({
