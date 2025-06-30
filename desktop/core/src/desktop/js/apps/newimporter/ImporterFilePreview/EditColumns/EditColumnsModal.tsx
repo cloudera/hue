@@ -66,13 +66,7 @@ const EditColumnsModal = ({
   } = useLoadData<string[]>(`${SQL_TYPE_MAPPING_API_URL}?sql_dialect=hive`);
 
   const sqlTypes = useMemo(() => {
-    if (Array.isArray(sqlTypesData) && sqlTypesData.length > 0) {
-      return sqlTypesData;
-    } else if (
-      sqlTypesData &&
-      typeof sqlTypesData === 'object' &&
-      Object.keys(sqlTypesData).length > 0
-    ) {
+    if (sqlTypesData && typeof sqlTypesData === 'object' && Object.keys(sqlTypesData).length > 0) {
       return Array.from(new Set(Object.values(sqlTypesData))) as string[];
     }
     return [];
@@ -108,93 +102,100 @@ const EditColumnsModal = ({
     setEditRows(rows => rows.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
   };
 
-  const handleDone = () => {
-    setColumns(
-      editRows.map(row => ({
-        ...columns[row.key],
-        title: row.name,
-        type: row.type,
-        comment: row.comment
-      }))
-    );
+  const handleDone = async () => {
+    const updatedColumns = editRows.map(row => ({
+      ...columns[row.key],
+      title: row.name,
+      type: row.type,
+      comment: row.comment
+    }));
+
+    // Example: Save to backend
+    // await fetch('/api/save-columns', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(updatedColumns)
+    // });
+    
+    setColumns(updatedColumns);
     closeModal();
-  };
 
-  const modalColumns = useMemo(
-    () => [
-      {
-        title: t('Sample'),
-        dataIndex: 'sample',
-        render: (text: string) => (
-          <span className="hue-importer-edit-columns-modal__sample-text">{text}</span>
-        )
-      },
-      {
-        title: t('Type'),
-        dataIndex: 'type',
-        render: (value: string, _: EditRow, idx: number) => (
-          <Select
-            value={value}
-            onChange={(val: string) => handleChange(idx, 'type', val)}
-            className="hue-importer-edit-columns-modal__select--type"
-            getPopupContainer={triggerNode => triggerNode.parentNode}
-            disabled={sqlTypesLoading || sqlTypes.length === 0}
-            loading={sqlTypesLoading}
+    const modalColumns = useMemo(
+      () => [
+        {
+          title: t('Sample'),
+          dataIndex: 'sample',
+          render: (text: string) => (
+            <span className="hue-importer-edit-columns-modal__sample-text">{text}</span>
+          )
+        },
+        {
+          title: t('Type'),
+          dataIndex: 'type',
+          render: (value: string, _: EditRow, idx: number) => (
+            <Select
+              value={value}
+              onChange={(val: string) => handleChange(idx, 'type', val)}
+              className="hue-importer-edit-columns-modal__select--type"
+              getPopupContainer={triggerNode => triggerNode.parentNode}
+              disabled={sqlTypesLoading || sqlTypes.length === 0}
+              loading={sqlTypesLoading}
             // bordered={true}
-          >
-            {sqlTypes.map(type => (
-              <Select.Option key={type} value={type}>
-                {type}
-              </Select.Option>
-            ))}
-          </Select>
-        )
-      },
-      { 
-        title: t('Sample'),
-        dataIndex: 'sample',
-        render: (text: string, _: EditRow, idx: number) => (
-          <Input
-            value={text}
-            className="hue-importer-edit-columns-modal__input--sample"
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              handleChange(idx, 'sample', e.target.value)
-            }
-          />
-        )
-      },
-      {
-        title: t('Comment'),
-        dataIndex: 'comment',
-        render: (text: string, _: EditRow, idx: number) => (
-          <textarea
-            value={text}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              handleChange(idx, 'comment', e.target.value)
-            }
-            rows={2}
-          />
-        )
-      }
-    ],
-    [t, sqlTypes, sqlTypesLoading]
-  );
+            >
+              {sqlTypes.map(type => (
+                <Select.Option key={type} value={type}>
+                  {type}
+                </Select.Option>
+              ))}
+            </Select>
+          )
+        },
+        {
+          title: t('Sample'),
+          dataIndex: 'sample',
+          render: (text: string, _: EditRow, idx: number) => (
+            <Input
+              value={text}
+              className="hue-importer-edit-columns-modal__input--sample"
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                handleChange(idx, 'sample', e.target.value)
+              }
+            />
+          )
+        },
+        {
+          title: t('Comment'),
+          dataIndex: 'comment',
+          render: (text: string, _: EditRow, idx: number) => (
+            <textarea
+              value={text}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                handleChange(idx, 'comment', e.target.value)
+              }
+              rows={2}
+            />
+          )
+        }
+      ],
+      [t, sqlTypes, sqlTypesLoading]
+    );
 
-  return (
-    <Modal
-      open={isOpen}
-      onCancel={closeModal}
-      title={t('Edit Columns')}
-      cancelText={t('Cancel')}
-      okText={t('Done')}
-      onOk={handleDone}
-      className="cuix antd hue-importer-edit-columns-modal"
-    >
-      <LoadingErrorWrapper loading={sqlTypesLoading} errors={errors}>
-        <Table columns={modalColumns} dataSource={editRows} pagination={false} />
-      </LoadingErrorWrapper>
-    </Modal>
-  );
+    return (
+      <Modal
+        open={isOpen}
+        onCancel={closeModal}
+        title={t('Edit Columns')}
+        cancelText={t('Cancel')}
+        okText={t('Done')}
+        onOk={handleDone}
+        className="cuix antd hue-importer-edit-columns-modal"
+      >
+        <LoadingErrorWrapper loading={sqlTypesLoading} errors={errors}>
+          <Table columns={modalColumns} dataSource={editRows} pagination={false} />
+        </LoadingErrorWrapper>
+      </Modal>
+    );
+  };
 };
 
 export default EditColumnsModal;
