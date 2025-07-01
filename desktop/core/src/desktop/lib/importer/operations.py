@@ -18,14 +18,22 @@ import codecs
 import csv
 import logging
 import os
+import shutil
 import tempfile
-import uuid
 import xml.etree.ElementTree as ET
 import zipfile
 from io import BytesIO
-from typing import Any, BinaryIO, Dict, List, Optional, Union
+from typing import Any, BinaryIO, Dict, List, Union
 
 import polars as pl
+
+from desktop.lib.importer.schemas import (
+  GuessFileHeaderSchema,
+  GuessFileMetadataSchema,
+  LocalFileUploadSchema,
+  PreviewFileSchema,
+  SqlTypeMapperSchema,
+)
 
 LOG = logging.getLogger()
 
@@ -106,7 +114,7 @@ SQL_TYPE_DIALECT_OVERRIDES = {
 }
 
 
-def local_file_upload(upload_file, username: str) -> Dict[str, str]:
+def local_file_upload(data: LocalFileUploadSchema, username: str) -> Dict[str, str]:
   """Uploads a local file to a temporary directory with a unique filename.
 
   This function takes an uploaded file and username, generates a unique filename,
@@ -114,7 +122,7 @@ def local_file_upload(upload_file, username: str) -> Dict[str, str]:
   the username, a unique ID, and a sanitized version of the original filename.
 
   Args:
-    upload_file: The uploaded file object from Django's file upload handling.
+    data: A Pydantic schema containing the file to upload.
     username: The username of the user uploading the file.
 
   Returns:
@@ -122,33 +130,32 @@ def local_file_upload(upload_file, username: str) -> Dict[str, str]:
       - file_path: The full path where the file was saved
 
   Raises:
-    ValueError: If upload_file or username is None/empty
+    ValueError: If username is None/empty
     Exception: If there are issues with file operations
 
   Example:
-    >>> result = upload_local_file(request.FILES["file"], "hue_user")
+    >>> result = upload_local_file(data, "hue_user")
     >>> print(result)
     {'file_path': '/tmp/hue_user_a1b2c3d4_myfile.txt'}
   """
-  if not upload_file:
-    raise ValueError("Upload file cannot be None or empty.")
-
   if not username:
     raise ValueError("Username cannot be None or empty.")
 
-  # Generate a unique filename
-  unique_id = uuid.uuid4().hex[:8]
-  filename = f"{username}_{unique_id}_{upload_file.name}"
+  upload_file = data.file
+  sanitized_filename = os.path.basename(data.filename)
 
-  # Create a temporary file with our generated filename
-  temp_dir = tempfile.gettempdir()
-  destination_path = os.path.join(temp_dir, filename)
+  destination_file = tempfile.NamedTemporaryFile(
+    mode="wb",
+    delete=False,
+    prefix=f"{username}_",
+    suffix=f"_{sanitized_filename}",
+    dir=tempfile.gettempdir(),
+  )
+  destination_path = destination_file.name
 
   try:
-    # Simply write the file content to temporary location
-    with open(destination_path, "wb") as destination:
-      for chunk in upload_file.chunks():
-        destination.write(chunk)
+    with destination_file:
+      shutil.copyfileobj(upload_file, destination_file)
 
     return {"file_path": destination_path}
 
@@ -159,12 +166,11 @@ def local_file_upload(upload_file, username: str) -> Dict[str, str]:
     raise e
 
 
-def guess_file_metadata(file_path: str, import_type: str, fs=None) -> Dict[str, Any]:
+def guess_file_metadata(data: GuessFileMetadataSchema, fs=None) -> Dict[str, Any]:
   """Guess the metadata of a file based on its content or extension.
 
   Args:
-    file_path: Path to the file to analyze
-    import_type: Type of import ('local' or 'remote')
+    data: A Pydantic schema containing file_path and import_type.
     fs: File system object for remote files (default: None)
 
   Returns:
@@ -179,23 +185,17 @@ def guess_file_metadata(file_path: str, import_type: str, fs=None) -> Dict[str, 
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  if not file_path:
-    raise ValueError("File path cannot be empty")
-
-  if import_type not in ["local", "remote"]:
-    raise ValueError(f"Unsupported import type: {import_type}")
-
-  if import_type == "remote" and fs is None:
+  if data.import_type == "remote" and fs is None:
     raise ValueError("File system object is required for remote import type")
 
   # Check if file exists based on import type
-  if import_type == "local" and not os.path.exists(file_path):
-    raise ValueError(f"Local file does not exist: {file_path}")
-  elif import_type == "remote" and fs and not fs.exists(file_path):
-    raise ValueError(f"Remote file does not exist: {file_path}")
+  if data.import_type == "local" and not os.path.exists(data.file_path):
+    raise ValueError(f"Local file does not exist: {data.file_path}")
+  elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
+    raise ValueError(f"Remote file does not exist: {data.file_path}")
 
   error_occurred = False
-  fh = open(file_path, "rb") if import_type == "local" else fs.open(file_path, "rb")
+  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
 
   try:
     sample = fh.read(16 * 1024)  # Read 16 KiB sample
@@ -223,39 +223,19 @@ def guess_file_metadata(file_path: str, import_type: str, fs=None) -> Dict[str, 
 
   finally:
     fh.close()
-    if import_type == "local" and error_occurred and os.path.exists(file_path):
-      LOG.debug(f"Due to error in guess_file_metadata, cleaning up uploaded local file: {file_path}")
-      os.remove(file_path)
+    if data.import_type == "local" and error_occurred and os.path.exists(data.file_path):
+      LOG.debug(f"Due to error in guess_file_metadata, cleaning up uploaded local file: {data.file_path}")
+      os.remove(data.file_path)
 
 
-def preview_file(
-  file_path: str,
-  file_type: str,
-  import_type: str,
-  sql_dialect: str,
-  has_header: bool = False,
-  sheet_name: Optional[str] = None,
-  field_separator: Optional[str] = ",",
-  quote_char: Optional[str] = '"',
-  record_separator: Optional[str] = "\n",
-  fs=None,
-  preview_rows: int = 50,
-) -> Dict[str, Any]:
+def preview_file(data: PreviewFileSchema, fs=None, preview_rows: int = 50) -> Dict[str, Any]:
   """Generate a preview of a file's content with column type mapping.
 
   This method reads a file and returns a preview of its contents, along with
   column information and metadata for creating tables or further processing.
 
   Args:
-    file_path: Path to the file to preview
-    file_type: Type of file ('excel', 'csv', 'tsv', 'delimiter_format')
-    import_type: Type of import ('local' or 'remote')
-    sql_dialect: SQL dialect for type mapping ('hive', 'impala', etc.)
-    has_header: Whether the file has a header row or not
-    sheet_name: Sheet name for Excel files (required for Excel)
-    field_separator: Field separator character for delimited files
-    quote_char: Quote character for delimited files
-    record_separator: Record separator for delimited files
+    data: A Pydantic schema with all the required parameters.
     fs: File system object for remote files (default: None)
     preview_rows: Number of rows to include in preview (default: 50)
 
@@ -269,39 +249,27 @@ def preview_file(
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  if not file_path:
-    raise ValueError("File path cannot be empty")
-
-  if sql_dialect.lower() not in ["hive", "impala", "trino", "phoenix", "sparksql"]:
-    raise ValueError(f"Unsupported SQL dialect: {sql_dialect}")
-
-  if file_type not in ["excel", "csv", "tsv", "delimiter_format"]:
-    raise ValueError(f"Unsupported file type: {file_type}")
-
-  if import_type not in ["local", "remote"]:
-    raise ValueError(f"Unsupported import type: {import_type}")
-
-  if import_type == "remote" and fs is None:
+  if data.import_type == "remote" and fs is None:
     raise ValueError("File system object is required for remote import type")
 
   # Check if file exists based on import type
-  if import_type == "local" and not os.path.exists(file_path):
-    raise ValueError(f"Local file does not exist: {file_path}")
-  elif import_type == "remote" and fs and not fs.exists(file_path):
-    raise ValueError(f"Remote file does not exist: {file_path}")
+  if data.import_type == "local" and not os.path.exists(data.file_path):
+    raise ValueError(f"Local file does not exist: {data.file_path}")
+  elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
+    raise ValueError(f"Remote file does not exist: {data.file_path}")
 
   error_occurred = False
-  fh = open(file_path, "rb") if import_type == "local" else fs.open(file_path, "rb")
+  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
 
   try:
-    if file_type == "excel":
-      if not sheet_name:
-        raise ValueError("Sheet name is required for Excel files.")
-
-      preview = _preview_excel_file(fh, file_type, sheet_name, sql_dialect, has_header, preview_rows)
-    elif file_type in ["csv", "tsv", "delimiter_format"]:
+    if data.file_type == "excel":
+      preview = _preview_excel_file(fh, data.file_type, data.sheet_name, data.sql_dialect, data.has_header, preview_rows)
+    elif data.file_type in ["csv", "tsv", "delimiter_format"]:
       # Process escapable characters
       try:
+        field_separator = data.field_separator
+        quote_char = data.quote_char
+        record_separator = data.record_separator
         if field_separator:
           field_separator = codecs.decode(field_separator, "unicode_escape")
         if quote_char:
@@ -313,9 +281,18 @@ def preview_file(
         LOG.exception(f"Error decoding escape characters: {e}", exc_info=True)
         raise ValueError("Invalid escape characters in field_separator, quote_char, or record_separator.")
 
-      preview = _preview_delimited_file(fh, file_type, field_separator, quote_char, record_separator, sql_dialect, has_header, preview_rows)
+      preview = _preview_delimited_file(
+        fh,
+        data.file_type,
+        field_separator,
+        quote_char,
+        record_separator,
+        data.sql_dialect,
+        data.has_header,
+        preview_rows,
+      )
     else:
-      raise ValueError(f"Unsupported file type: {file_type}")
+      raise ValueError(f"Unsupported file type: {data.file_type}")
 
     return preview
   except Exception as e:
@@ -325,9 +302,9 @@ def preview_file(
 
   finally:
     fh.close()
-    if import_type == "local" and error_occurred and os.path.exists(file_path):
-      LOG.debug(f"Due to error in preview_file, cleaning up uploaded local file: {file_path}")
-      os.remove(file_path)
+    if data.import_type == "local" and error_occurred and os.path.exists(data.file_path):
+      LOG.debug(f"Due to error in preview_file, cleaning up uploaded local file: {data.file_path}")
+      os.remove(data.file_path)
 
 
 def _detect_file_type(file_sample: bytes) -> str:
@@ -602,17 +579,14 @@ def _preview_delimited_file(
     raise Exception(message)
 
 
-def guess_file_header(file_path: str, file_type: str, import_type: str, sheet_name: Optional[str] = None, fs=None) -> bool:
+def guess_file_header(data: GuessFileHeaderSchema, fs=None) -> bool:
   """Guess whether a file has a header row.
 
   This function analyzes a file to determine if it contains a header row based on the
   content pattern. It works for both Excel files and delimited text files (CSV, TSV, etc.).
 
   Args:
-    file_path: Path to the file to analyze
-    file_type: Type of file ('excel', 'csv', 'tsv', 'delimiter_format')
-    import_type: Type of import ('local' or 'remote')
-    sheet_name: Sheet name for Excel files (required for Excel)
+    data: A Pydantic schema with all the required parameters.
     fs: File system object for remote files (default: None)
 
   Returns:
@@ -622,39 +596,30 @@ def guess_file_header(file_path: str, file_type: str, import_type: str, sheet_na
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  if not file_path:
-    raise ValueError("File path cannot be empty")
-
-  if file_type not in ["excel", "csv", "tsv", "delimiter_format"]:
-    raise ValueError(f"Unsupported file type: {file_type}")
-
-  if import_type not in ["local", "remote"]:
-    raise ValueError(f"Unsupported import type: {import_type}")
-
-  if import_type == "remote" and fs is None:
+  if data.import_type == "remote" and fs is None:
     raise ValueError("File system object is required for remote import type")
 
   # Check if file exists based on import type
-  if import_type == "local" and not os.path.exists(file_path):
-    raise ValueError(f"Local file does not exist: {file_path}")
-  elif import_type == "remote" and fs and not fs.exists(file_path):
-    raise ValueError(f"Remote file does not exist: {file_path}")
+  if data.import_type == "local" and not os.path.exists(data.file_path):
+    raise ValueError(f"Local file does not exist: {data.file_path}")
+  elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
+    raise ValueError(f"Remote file does not exist: {data.file_path}")
 
-  fh = open(file_path, "rb") if import_type == "local" else fs.open(file_path, "rb")
+  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
 
   has_header = False
 
   try:
-    if file_type == "excel":
-      if not sheet_name:
-        raise ValueError("Sheet name is required for Excel files.")
-
+    if data.file_type == "excel":
       # Convert excel sample to CSV for header detection
       try:
         fh.seek(0)
 
         csv_snippet = pl.read_excel(
-          source=BytesIO(fh.read()), sheet_name=sheet_name, infer_schema_length=10000, read_options={"n_rows": 20}
+          source=BytesIO(fh.read()),
+          sheet_name=data.sheet_name,
+          infer_schema_length=10000,
+          read_options={"n_rows": 20},
         ).write_csv(file=None)
 
         if isinstance(csv_snippet, bytes):
@@ -669,7 +634,7 @@ def guess_file_header(file_path: str, file_type: str, import_type: str, sheet_na
 
         raise Exception(message)
 
-    elif file_type in ["csv", "tsv", "delimiter_format"]:
+    elif data.file_type in ["csv", "tsv", "delimiter_format"]:
       try:
         # Reset file position
         fh.seek(0)
@@ -692,14 +657,14 @@ def guess_file_header(file_path: str, file_type: str, import_type: str, sheet_na
     fh.close()
 
 
-def get_sql_type_mapping(dialect: str) -> Dict[str, str]:
+def get_sql_type_mapping(data: SqlTypeMapperSchema) -> Dict[str, str]:
   """Get all type mappings from Polars dtypes to SQL types for a given SQL dialect.
 
   This function returns a dictionary mapping of all Polars data types to their
   corresponding SQL types for a specific dialect.
 
   Args:
-    dialect: One of "hive", "impala", "trino", "phoenix", "sparksql".
+    data: A Pydantic schema with the SQL dialect.
 
   Returns:
     A dict mapping Polars dtype names to SQL type names.
@@ -707,9 +672,9 @@ def get_sql_type_mapping(dialect: str) -> Dict[str, str]:
   Raises:
     ValueError: If the dialect is not supported.
   """
-  dl = dialect.lower()
+  dl = data.sql_dialect.lower()
   if dl not in SQL_TYPE_DIALECT_OVERRIDES:
-    raise ValueError(f"Unsupported dialect: {dialect}")
+    raise ValueError(f"Unsupported dialect: {data.sql_dialect}")
 
   # Merge base_map and overrides[dl] into a new dict, giving precedence to any overlapping keys in overrides[dl]
   return {**SQL_TYPE_BASE_MAP, **SQL_TYPE_DIALECT_OVERRIDES[dl]}
@@ -728,7 +693,7 @@ def _map_polars_dtype_to_sql_type(dialect: str, polars_type: str) -> str:
   Raises:
     ValueError: If the dialect or polars_type is not supported.
   """
-  mapping = get_sql_type_mapping(dialect)
+  mapping = get_sql_type_mapping(SqlTypeMapperSchema(sql_dialect=dialect))
 
   if polars_type not in mapping:
     raise ValueError(f"No mapping for Polars dtype {polars_type} in dialect {dialect}")
