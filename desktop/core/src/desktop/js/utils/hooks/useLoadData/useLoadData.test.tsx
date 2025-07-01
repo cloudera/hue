@@ -19,7 +19,6 @@ import useLoadData from './useLoadData';
 import { get } from '../../../api/utils';
 import { convertKeysToCamelCase } from '../../string/changeCasing';
 
-// Mock the `get` function
 jest.mock('../../../api/utils', () => ({
   get: jest.fn()
 }));
@@ -219,6 +218,109 @@ describe('useLoadData', () => {
       expect(mockOnSuccess).not.toHaveBeenCalled();
       expect(mockOnError).toHaveBeenCalledWith(mockError);
     });
+  });
+
+  it('should force fetch data when reloadData is called even with skip option', async () => {
+    const { result } = renderHook(() => useLoadData(mockUrl, { skip: true }));
+
+    expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.loading).toBe(false);
+    expect(mockGet).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.reloadData();
+    });
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(mockUrl, undefined, expect.any(Object));
+      expect(result.current.data).toEqual(mockDataResponse);
+      expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should poll data at specified interval', async () => {
+    jest.useFakeTimers();
+
+    const pollInterval = 5000;
+    const { result } = renderHook(() => useLoadData(mockUrl, { pollInterval }));
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledTimes(1);
+      expect(result.current.data).toEqual(mockDataResponse);
+    });
+
+    mockGet.mockClear();
+
+    act(() => {
+      jest.advanceTimersByTime(pollInterval);
+    });
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledTimes(1);
+    });
+
+    mockGet.mockClear();
+    act(() => {
+      jest.advanceTimersByTime(pollInterval);
+    });
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledTimes(1);
+    });
+
+    jest.useRealTimers();
+  });
+
+  it('should clear polling interval when component unmounts', async () => {
+    jest.useFakeTimers();
+
+    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+    const pollInterval = 5000; // 5 seconds
+    const { result, unmount } = renderHook(() => useLoadData(mockUrl, { pollInterval }));
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockDataResponse);
+    });
+
+    unmount();
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
+
+    clearIntervalSpy.mockRestore();
+    jest.useRealTimers();
+  });
+
+  it('should clear previous interval when pollInterval changes', async () => {
+    jest.useFakeTimers();
+
+    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+    const setIntervalSpy = jest.spyOn(global, 'setInterval');
+
+    const { result, rerender } = renderHook(
+      (props: { pollInterval?: number }) =>
+        useLoadData(mockUrl, { pollInterval: props.pollInterval }),
+      { initialProps: { pollInterval: 5000 } }
+    );
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockDataResponse);
+    });
+
+    expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 5000);
+
+    rerender({ pollInterval: 10000 });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockDataResponse);
+      expect(clearIntervalSpy).toHaveBeenCalled();
+      expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 10000);
+    });
+
+    clearIntervalSpy.mockRestore();
+    setIntervalSpy.mockRestore();
+    jest.useRealTimers();
   });
 
   describe('transformKeys option', () => {

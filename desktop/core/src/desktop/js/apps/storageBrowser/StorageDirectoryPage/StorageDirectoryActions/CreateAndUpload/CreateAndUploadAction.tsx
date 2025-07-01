@@ -137,7 +137,7 @@ const CreateAndUploadAction = ({
         }}
         trigger={['click']}
       >
-        <PrimaryButton>
+        <PrimaryButton data-testid="hue-storage-browser-directory__actions-bar__new-btn">
           {t('New')}
           <DropDownIcon />
         </PrimaryButton>

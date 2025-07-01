@@ -3,39 +3,28 @@
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW SYSTEM FUNCTIONS concat;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW SYSTEM FUNCTIONS FROM salesdb LIKE 'max';",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SHOW ",
     "afterCursor": "",
-    "containsKeywords": [
-      "ALL FUNCTIONS",
-      "FUNCTIONS",
-      "SYSTEM FUNCTIONS",
-      "USER FUNCTIONS"
-    ]
+    "containsKeywords": ["ALL FUNCTIONS", "FUNCTIONS", "SYSTEM FUNCTIONS", "USER FUNCTIONS"]
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SHOW ALL ",
     "afterCursor": "",
     "expectedResult": {
-      "suggestKeywords": [
-        "FUNCTIONS"
-      ]
+      "suggestKeywords": ["FUNCTIONS"]
     }
   },
   {
@@ -43,9 +32,7 @@
     "beforeCursor": "SHOW SYSTEM ",
     "afterCursor": "",
     "expectedResult": {
-      "suggestKeywords": [
-        "FUNCTIONS"
-      ]
+      "suggestKeywords": ["FUNCTIONS"]
     }
   },
   {
@@ -53,9 +40,7 @@
     "beforeCursor": "SHOW USER ",
     "afterCursor": "",
     "expectedResult": {
-      "suggestKeywords": [
-        "FUNCTIONS"
-      ]
+      "suggestKeywords": ["FUNCTIONS"]
     }
   },
   {
@@ -63,11 +48,7 @@
     "beforeCursor": "SHOW USER FUNCTIONS ",
     "afterCursor": "",
     "expectedResult": {
-      "suggestKeywords": [
-        "FROM",
-        "IN",
-        "LIKE"
-      ],
+      "suggestKeywords": ["FROM", "IN", "LIKE"],
       "suggestAggregateFunctions": {
         "tables": []
       },
@@ -96,9 +77,7 @@
     "beforeCursor": "SHOW ALL FUNCTIONS IN foo ",
     "afterCursor": "",
     "expectedResult": {
-      "suggestKeywords": [
-        "LIKE"
-      ]
+      "suggestKeywords": ["LIKE"]
     }
   }
 ]

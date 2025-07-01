@@ -30,19 +30,12 @@ const mockData = { id: 1, product: 'Hue' };
 const mockBody = { id: 1 };
 
 describe('useSaveData', () => {
-  beforeAll(() => {
-    jest.clearAllMocks();
-  });
-
   beforeEach(() => {
+    jest.clearAllMocks();
     mockPost.mockResolvedValue(mockData);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('should save data with body successfully', async () => {
+  it('should save data successfully and update state', async () => {
     const { result } = renderHook(() => useSaveData(mockUrl));
 
     expect(result.current.data).toBeUndefined();
@@ -64,7 +57,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should handle save errors', async () => {
+  it('should handle errors and update error state', async () => {
     const mockError = new Error('Save error');
     mockPost.mockRejectedValue(mockError);
 
@@ -88,7 +81,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should respect the skip option', () => {
+  it('should not call post when skip option is true', () => {
     const { result } = renderHook(() => useSaveData(mockUrl, { skip: true }));
 
     act(() => {
@@ -101,7 +94,7 @@ describe('useSaveData', () => {
     expect(mockPost).not.toHaveBeenCalled();
   });
 
-  it('should update options correctly', async () => {
+  it('should update options when props change', async () => {
     const { result, rerender } = renderHook((props: { url: string }) => useSaveData(props.url), {
       initialProps: { url: mockUrl }
     });
@@ -143,7 +136,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should call onSuccess callback', async () => {
+  it('should call onSuccess callback when provided', async () => {
     const mockOnSuccess = jest.fn();
     const mockOnError = jest.fn();
     const { result } = renderHook(() =>
@@ -173,7 +166,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should call onError callback', async () => {
+  it('should call onError callback when provided', async () => {
     const mockError = new Error('Save error');
     mockPost.mockRejectedValue(mockError);
 
@@ -206,7 +199,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should auto set qsEncodeData to true when body is not a FormData or JSON', async () => {
+  it('should auto set qsEncodeData to true for non-JSON and non-FormData payloads', async () => {
     const { result } = renderHook(() => useSaveData(mockUrl));
 
     act(() => {
@@ -225,7 +218,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should not auto set qsEncodeData to true when body is a FormData', async () => {
+  it('should not auto set qsEncodeData for FormData payloads', async () => {
     const payload = new FormData();
 
     const { result } = renderHook(() => useSaveData(mockUrl));
@@ -246,7 +239,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should not auto set qsEncodeData to true when body is a JSON', async () => {
+  it('should not auto set qsEncodeData for JSON payloads', async () => {
     const payload = { project: 'hue' };
 
     const { result } = renderHook(() => useSaveData(mockUrl));
@@ -267,7 +260,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should take qsEncodeData value from saveOptions.postOptions when available', async () => {
+  it('should prioritize qsEncodeData from saveOptions.postOptions', async () => {
     const payload = new FormData();
 
     const { result } = renderHook(() =>

@@ -3,27 +3,21 @@
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW TABLE EXTENDED LIKE 'employee';",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW TABLE EXTENDED IN default LIKE 'employee' PARTITION (grade=1);",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SHOW ",
     "afterCursor": "",
-    "containsKeywords": [
-      "TABLE EXTENDED"
-    ]
+    "containsKeywords": ["TABLE EXTENDED"]
   },
   {
     "namePrefix": "should suggest keywords",
