@@ -178,7 +178,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
       is_allowed, err_message = is_file_upload_allowed(file_name)
       if not is_allowed:
         LOG.error(err_message)
-        self.request.META['upload_failed'] = err_message
+        self._request.META['upload_failed'] = err_message
         self._upload_rejected = True
         return None
 
