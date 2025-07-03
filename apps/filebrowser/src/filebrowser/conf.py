@@ -18,7 +18,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from desktop.conf import ENABLE_DOWNLOAD, is_oozie_enabled
-from desktop.lib.conf import Config, coerce_bool, coerce_csv
+from desktop.lib.conf import coerce_bool, coerce_csv, Config
 
 MAX_SNAPPY_DECOMPRESSION_SIZE = Config(
   key="max_snappy_decompression_size", help=_("Max snappy decompression size in bytes."), private=True, default=1024 * 1024 * 25, type=int
@@ -104,10 +104,18 @@ FILE_DOWNLOAD_CACHE_CONTROL = Config(
 )
 
 RESTRICT_FILE_EXTENSIONS = Config(
-  key='restrict_file_extensions',
+  key="restrict_file_extensions",
+  default=None,
+  type=coerce_csv,
+  help=_("Specify file extensions that are not allowed, separated by commas. For example: .exe, .zip, .rar, .tar, .gz"),
+)
+
+ALLOW_FILE_EXTENSIONS = Config(
+  key="allow_file_extensions",
   default=None,
   type=coerce_csv,
   help=_(
-    'Specify file extensions that are not allowed, separated by commas. For example: .exe, .zip, .rar, .tar, .gz'
+    "Specify file extensions that are allowed, separated by commas."
+    "When set, only these extensions will be permitted. For example: .tsv, .csv, .xlsx"
   ),
 )

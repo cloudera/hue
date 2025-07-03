@@ -19,11 +19,11 @@
 Classes for a custom upload handler to stream into HDFS.
 """
 
-import os
-import time
 import errno
 import logging
+import os
 import posixpath
+import time
 import unicodedata
 from builtins import object
 
@@ -35,8 +35,8 @@ import hadoop.cluster
 from desktop.lib import fsmanager
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
-from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR, RESTRICT_FILE_EXTENSIONS
-from filebrowser.utils import calculate_total_size, generate_chunks
+from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -328,6 +328,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
     self._activated = False
     self._destination = request.GET.get('dest', None)  # GET param avoids infinite looping
     self.request = request
+    self._upload_rejected = False
     fs = fsmanager.get_filesystem('default')
     if not fs:
       LOG.warning('No HDFS set for HDFS upload')
@@ -341,11 +342,13 @@ class HDFSfileUploadHandler(FileUploadHandler):
     if field_name.upper().startswith('HDFS'):
       LOG.info('Using HDFSfileUploadHandler to handle file upload.')
 
-      _, file_type = os.path.splitext(file_name)
-      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+      # Check file extension restrictions
+      is_allowed, err_message = is_file_upload_allowed(file_name)
+      if not is_allowed:
         LOG.error(err_message)
-        raise Exception(err_message)
+        self.request.META['upload_failed'] = err_message
+        self._upload_rejected = True
+        return None
 
       try:
         fs_ref = self.request.GET.get('fs', 'default')
@@ -362,6 +365,9 @@ class HDFSfileUploadHandler(FileUploadHandler):
       raise StopFutureHandlers()
 
   def receive_data_chunk(self, raw_data, start):
+    if self._upload_rejected:
+      return None
+
     LOG.debug("HDFSfileUploadHandler receive_data_chunk")
 
     if not self._activated:
@@ -379,6 +385,9 @@ class HDFSfileUploadHandler(FileUploadHandler):
       raise StopUpload()
 
   def file_complete(self, file_size):
+    if self._upload_rejected:
+      return None
+
     if not self._activated:
       return None
 
