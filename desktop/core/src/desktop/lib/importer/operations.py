@@ -14,7 +14,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import codecs
 import csv
 import logging
 import os
@@ -428,9 +427,7 @@ def _get_delimited_metadata(file_sample: Union[bytes, str], file_type: str) -> D
   }
 
 
-def _preview_excel_file(
-  fh: BinaryIO, data: PreviewFileSchema, preview_rows: int = 50
-) -> Dict[str, Any]:
+def _preview_excel_file(fh: BinaryIO, data: PreviewFileSchema, preview_rows: int = 50) -> Dict[str, Any]:
   """Preview an Excel file (.xlsx, .xls)
 
   Args:
@@ -451,7 +448,11 @@ def _preview_excel_file(
     fh.seek(0)
 
     df = pl.read_excel(
-      BytesIO(fh.read()), sheet_name=data.sheet_name, has_header=data.has_header, read_options={"n_rows": preview_rows}, infer_schema_length=10000
+      BytesIO(fh.read()),
+      sheet_name=data.sheet_name,
+      has_header=data.has_header,
+      read_options={"n_rows": preview_rows},
+      infer_schema_length=10000,
     )
 
     # Return empty result if the df is empty

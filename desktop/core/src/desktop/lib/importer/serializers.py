@@ -100,9 +100,9 @@ class PreviewFileSerializer(serializers.Serializer):
   )
   has_header = serializers.BooleanField(required=True, help_text="Whether the file has a header row or not")
   sheet_name = serializers.CharField(required=False, help_text="Sheet name for Excel files")
-  field_separator = serializers.CharField(required=False, help_text="Field separator character")
-  quote_char = serializers.CharField(required=False, help_text="Quote character")
-  record_separator = serializers.CharField(required=False, help_text="Record separator character")
+  field_separator = serializers.CharField(required=False, allow_null=True, help_text="Field separator character")
+  quote_char = serializers.CharField(required=False, allow_null=True, help_text="Quote character")
+  record_separator = serializers.CharField(required=False, allow_null=True, help_text="Record separator character")
 
   def validate(self, data):
     try:

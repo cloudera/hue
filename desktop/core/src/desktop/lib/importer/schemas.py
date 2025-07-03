@@ -19,7 +19,7 @@ import codecs
 import os
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, FilePath, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from desktop.conf import IMPORTER
 
@@ -53,12 +53,19 @@ class LocalFileUploadSchema(BaseModel):
 
 
 class GuessFileMetadataSchema(BaseModel):
-  file_path: FilePath = Field(..., description="Full path to the file to analyze")
+  file_path: str = Field(..., description="Full path to the file to analyze")
   import_type: Literal["local", "remote"] = Field(..., description="Whether the file is local or on a remote filesystem")
+
+  @field_validator("file_path")
+  @classmethod
+  def file_path_not_blank(cls, v: str) -> str:
+    if not v or v.strip() == "":
+      raise ValueError("File path cannot be empty or whitespace.")
+    return v
 
 
 class PreviewFileSchema(BaseModel):
-  file_path: FilePath = Field(..., description="Full path to the file to preview")
+  file_path: str = Field(..., description="Full path to the file to preview")
   file_type: Literal["csv", "tsv", "excel", "delimiter_format"] = Field(..., description="Type of file (csv, tsv, excel, delimiter_format)")
   import_type: Literal["local", "remote"] = Field(..., description="Whether the file is local or on a remote filesystem")
   sql_dialect: Literal["hive", "impala", "trino", "phoenix", "sparksql"] = Field(..., description="SQL dialect for mapping column types")
@@ -67,6 +74,13 @@ class PreviewFileSchema(BaseModel):
   field_separator: Optional[str] = Field(None, description="Field separator character")
   quote_char: Optional[str] = Field(None, description="Quote character")
   record_separator: Optional[str] = Field(None, description="Record separator character")
+
+  @field_validator("file_path")
+  @classmethod
+  def file_path_not_blank(cls, v: str) -> str:
+    if not v or v.strip() == "":
+      raise ValueError("File path cannot be empty or whitespace.")
+    return v
 
   @field_validator("field_separator", "quote_char", "record_separator", mode="before")
   @classmethod
@@ -109,10 +123,17 @@ class SqlTypeMapperSchema(BaseModel):
 
 
 class GuessFileHeaderSchema(BaseModel):
-  file_path: FilePath = Field(..., description="Full path to the file to analyze")
+  file_path: str = Field(..., description="Full path to the file to analyze")
   file_type: Literal["csv", "tsv", "excel", "delimiter_format"] = Field(..., description="Type of file (csv, tsv, excel, delimiter_format)")
   import_type: Literal["local", "remote"] = Field(..., description="Whether the file is local or on a remote filesystem")
   sheet_name: Optional[str] = Field(None, description="Sheet name for Excel files")
+
+  @field_validator("file_path")
+  @classmethod
+  def file_path_not_blank(cls, v: str) -> str:
+    if not v or v.strip() == "":
+      raise ValueError("File path cannot be empty or whitespace.")
+    return v
 
   @model_validator(mode="after")
   def sheet_name_required_for_excel(self) -> "GuessFileHeaderSchema":
