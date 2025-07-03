@@ -14,11 +14,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
 
+from pydantic import ValidationError
 from rest_framework import serializers
 
-from desktop.conf import IMPORTER
+from desktop.lib.importer.schemas import (
+  GuessFileHeaderSchema,
+  GuessFileMetadataSchema,
+  LocalFileUploadSchema,
+  PreviewFileSchema,
+  SqlTypeMapperSchema,
+)
 
 
 class LocalFileUploadSerializer(serializers.Serializer):
@@ -33,20 +39,14 @@ class LocalFileUploadSerializer(serializers.Serializer):
 
   file = serializers.FileField(required=True, help_text="CSV or Excel file to upload and process")
 
-  def validate_file(self, value):
-    # Check if the file type is restricted
-    _, file_type = os.path.splitext(value.name)
-    restricted_extensions = IMPORTER.RESTRICT_LOCAL_FILE_EXTENSIONS.get()
-    if restricted_extensions and file_type.lower() in [ext.lower() for ext in restricted_extensions]:
-      raise serializers.ValidationError(f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.')
-
-    # Check file size
-    max_size = IMPORTER.MAX_LOCAL_FILE_SIZE_UPLOAD_LIMIT.get()
-    if value.size > max_size:
-      max_size_mib = max_size / (1024 * 1024)
-      raise serializers.ValidationError(f"File too large. Maximum file size is {max_size_mib:.0f} MiB.")
-
-    return value
+  def validate(self, data):
+    uploaded_file = data["file"]
+    schema_data = {"file": uploaded_file, "filename": uploaded_file.name, "filesize": uploaded_file.size}
+    try:
+      # The serializer now directly returns the validated Pydantic model instance.
+      return LocalFileUploadSchema.model_validate(schema_data)
+    except ValidationError as e:
+      raise serializers.ValidationError(e.errors())
 
 
 class GuessFileMetadataSerializer(serializers.Serializer):
@@ -63,6 +63,12 @@ class GuessFileMetadataSerializer(serializers.Serializer):
   import_type = serializers.ChoiceField(
     choices=["local", "remote"], required=True, help_text="Whether the file is local or on a remote filesystem"
   )
+
+  def validate(self, data):
+    try:
+      return GuessFileMetadataSchema.model_validate(data)
+    except ValidationError as e:
+      raise serializers.ValidationError(e.errors())
 
 
 class PreviewFileSerializer(serializers.Serializer):
@@ -92,40 +98,18 @@ class PreviewFileSerializer(serializers.Serializer):
   sql_dialect = serializers.ChoiceField(
     choices=["hive", "impala", "trino", "phoenix", "sparksql"], required=True, help_text="SQL dialect for mapping column types"
   )
-
   has_header = serializers.BooleanField(required=True, help_text="Whether the file has a header row or not")
-
-  # Excel-specific fields
   sheet_name = serializers.CharField(required=False, help_text="Sheet name for Excel files")
-
-  # Delimited file-specific fields
-  field_separator = serializers.CharField(required=False, help_text="Field separator character")
-  quote_char = serializers.CharField(required=False, help_text="Quote character")
-  record_separator = serializers.CharField(required=False, help_text="Record separator character")
+  field_separator = serializers.CharField(required=False, allow_null=True, help_text="Field separator character")
+  quote_char = serializers.CharField(required=False, allow_null=True, help_text="Quote character")
+  record_separator = serializers.CharField(required=False, allow_null=True, help_text="Record separator character")
 
   def validate(self, data):
-    """Validate the complete data set with interdependent field validation."""
-
-    if data.get("file_type") == "excel" and not data.get("sheet_name"):
-      raise serializers.ValidationError({"sheet_name": "Sheet name is required for Excel files."})
-
-    if data.get("file_type") in ["csv", "tsv", "delimiter_format"]:
-      if not data.get("field_separator"):
-        # If not provided, set default value based on file type
-        if data.get("file_type") == "csv":
-          data["field_separator"] = ","
-        elif data.get("file_type") == "tsv":
-          data["field_separator"] = "\t"
-        else:
-          raise serializers.ValidationError({"field_separator": "Field separator is required for delimited files"})
-
-      if not data.get("quote_char"):
-        data["quote_char"] = '"'  # Default quote character
-
-      if not data.get("record_separator"):
-        data["record_separator"] = "\n"  # Default record separator
-
-    return data
+    try:
+      # Pydantic will handle interdependent validation
+      return PreviewFileSchema.model_validate(data)
+    except ValidationError as e:
+      raise serializers.ValidationError(e.errors())
 
 
 class SqlTypeMapperSerializer(serializers.Serializer):
@@ -141,6 +125,12 @@ class SqlTypeMapperSerializer(serializers.Serializer):
   sql_dialect = serializers.ChoiceField(
     choices=["hive", "impala", "trino", "phoenix", "sparksql"], required=True, help_text="SQL dialect for mapping column types"
   )
+
+  def validate(self, data):
+    try:
+      return SqlTypeMapperSchema.model_validate(data)
+    except ValidationError as e:
+      raise serializers.ValidationError(e.errors())
 
 
 class GuessFileHeaderSerializer(serializers.Serializer):
@@ -162,14 +152,11 @@ class GuessFileHeaderSerializer(serializers.Serializer):
   import_type = serializers.ChoiceField(
     choices=["local", "remote"], required=True, help_text="Whether the file is local or on a remote filesystem"
   )
-
-  # Excel-specific fields
   sheet_name = serializers.CharField(required=False, help_text="Sheet name for Excel files")
 
   def validate(self, data):
-    """Validate the complete data set with interdependent field validation."""
-
-    if data.get("file_type") == "excel" and not data.get("sheet_name"):
-      raise serializers.ValidationError({"sheet_name": "Sheet name is required for Excel files."})
-
-    return data
+    try:
+      # Pydantic will handle interdependent validation
+      return GuessFileHeaderSchema.model_validate(data)
+    except ValidationError as e:
+      raise serializers.ValidationError(e.errors())

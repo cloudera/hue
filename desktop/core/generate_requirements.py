@@ -92,6 +92,7 @@ class RequirementsGenerator:
       "protobuf==3.20.3",
       "psutil==5.8.0",
       "pyarrow==17.0.0",
+      "pydantic==2.10.6",
       "pyformance==0.3.2",
       "PyJWT==2.4.0",
       "python-daemon==2.2.4",
