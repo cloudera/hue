@@ -194,7 +194,7 @@ def guess_file_metadata(data: GuessFileMetadataSchema, fs=None) -> Dict[str, Any
   elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
-  error_occurred = False
+  should_cleanup = False
   fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
 
   try:
@@ -217,13 +217,13 @@ def guess_file_metadata(data: GuessFileMetadataSchema, fs=None) -> Dict[str, Any
     return metadata
 
   except Exception as e:
-    error_occurred = True
+    should_cleanup = True
     LOG.exception(f"Error guessing file metadata: {e}", exc_info=True)
     raise e
 
   finally:
     fh.close()
-    if data.import_type == "local" and error_occurred and os.path.exists(data.file_path):
+    if data.import_type == "local" and should_cleanup and os.path.exists(data.file_path):
       LOG.debug(f"Due to error in guess_file_metadata, cleaning up uploaded local file: {data.file_path}")
       os.remove(data.file_path)
 
@@ -258,7 +258,7 @@ def preview_file(data: PreviewFileSchema, fs=None, preview_rows: int = 50) -> Di
   elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
-  error_occurred = False
+  should_cleanup = False
   fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
 
   try:
@@ -271,13 +271,13 @@ def preview_file(data: PreviewFileSchema, fs=None, preview_rows: int = 50) -> Di
 
     return preview
   except Exception as e:
-    error_occurred = True
+    should_cleanup = True
     LOG.exception(f"Error previewing file: {e}", exc_info=True)
     raise e
 
   finally:
     fh.close()
-    if data.import_type == "local" and error_occurred and os.path.exists(data.file_path):
+    if data.import_type == "local" and should_cleanup and os.path.exists(data.file_path):
       LOG.debug(f"Due to error in preview_file, cleaning up uploaded local file: {data.file_path}")
       os.remove(data.file_path)
 
