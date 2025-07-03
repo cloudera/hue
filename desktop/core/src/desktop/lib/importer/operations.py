@@ -263,34 +263,9 @@ def preview_file(data: PreviewFileSchema, fs=None, preview_rows: int = 50) -> Di
 
   try:
     if data.file_type == "excel":
-      preview = _preview_excel_file(fh, data.file_type, data.sheet_name, data.sql_dialect, data.has_header, preview_rows)
+      preview = _preview_excel_file(fh, data, preview_rows)
     elif data.file_type in ["csv", "tsv", "delimiter_format"]:
-      # Process escapable characters
-      try:
-        field_separator = data.field_separator
-        quote_char = data.quote_char
-        record_separator = data.record_separator
-        if field_separator:
-          field_separator = codecs.decode(field_separator, "unicode_escape")
-        if quote_char:
-          quote_char = codecs.decode(quote_char, "unicode_escape")
-        if record_separator:
-          record_separator = codecs.decode(record_separator, "unicode_escape")
-
-      except Exception as e:
-        LOG.exception(f"Error decoding escape characters: {e}", exc_info=True)
-        raise ValueError("Invalid escape characters in field_separator, quote_char, or record_separator.")
-
-      preview = _preview_delimited_file(
-        fh,
-        data.file_type,
-        field_separator,
-        quote_char,
-        record_separator,
-        data.sql_dialect,
-        data.has_header,
-        preview_rows,
-      )
+      preview = _preview_delimited_file(fh, data)
     else:
       raise ValueError(f"Unsupported file type: {data.file_type}")
 
@@ -454,16 +429,13 @@ def _get_delimited_metadata(file_sample: Union[bytes, str], file_type: str) -> D
 
 
 def _preview_excel_file(
-  fh: BinaryIO, file_type: str, sheet_name: str, dialect: str, has_header: bool, preview_rows: int = 50
+  fh: BinaryIO, data: PreviewFileSchema, preview_rows: int = 50
 ) -> Dict[str, Any]:
   """Preview an Excel file (.xlsx, .xls)
 
   Args:
     fh: File handle for the Excel file
-    file_type: Type of file ('excel')
-    sheet_name: Name of the sheet to preview
-    dialect: SQL dialect for type mapping
-    has_header: Whether the file has a header row or not
+    data: A Pydantic schema with all the required parameters.
     preview_rows: Number of rows to include in preview (default: 50)
 
   Returns:
@@ -479,12 +451,12 @@ def _preview_excel_file(
     fh.seek(0)
 
     df = pl.read_excel(
-      BytesIO(fh.read()), sheet_name=sheet_name, has_header=has_header, read_options={"n_rows": preview_rows}, infer_schema_length=10000
+      BytesIO(fh.read()), sheet_name=data.sheet_name, has_header=data.has_header, read_options={"n_rows": preview_rows}, infer_schema_length=10000
     )
 
     # Return empty result if the df is empty
     if df.height == 0:
-      return {"type": file_type, "columns": [], "preview_data": {}}
+      return {"type": data.file_type, "columns": [], "preview_data": {}}
 
     schema = df.schema
     preview_data = df.to_dict(as_series=False)
@@ -493,11 +465,11 @@ def _preview_excel_file(
     columns = []
     for col in df.columns:
       col_type = str(schema[col])
-      sql_type = _map_polars_dtype_to_sql_type(dialect, col_type)
+      sql_type = _map_polars_dtype_to_sql_type(data.sql_dialect, col_type)
 
       columns.append({"name": col, "type": sql_type})
 
-    result = {"type": file_type, "columns": columns, "preview_data": preview_data}
+    result = {"type": data.file_type, "columns": columns, "preview_data": preview_data}
 
     return result
 
@@ -510,24 +482,14 @@ def _preview_excel_file(
 
 def _preview_delimited_file(
   fh: BinaryIO,
-  file_type: str,
-  field_separator: str,
-  quote_char: str,
-  record_separator: str,
-  dialect: str,
-  has_header: bool,
+  data: PreviewFileSchema,
   preview_rows: int = 50,
 ) -> Dict[str, Any]:
   """Preview a delimited file (CSV, TSV, etc.)
 
   Args:
     fh: File handle for the delimited file
-    file_type: Type of file ('csv', 'tsv', 'delimiter_format')
-    field_separator: Field separator character
-    quote_char: Quote character
-    record_separator: Record separator character
-    dialect: SQL dialect for type mapping
-    has_header: Whether the file has a header row or not
+    data: A Pydantic schema with all the required parameters.
     preview_rows: Number of rows to include in preview (default: 50)
 
   Returns:
@@ -544,10 +506,10 @@ def _preview_delimited_file(
 
     df = pl.read_csv(
       BytesIO(fh.read()),
-      separator=field_separator,
-      quote_char=quote_char,
-      eol_char="\n" if record_separator == "\r\n" else record_separator,
-      has_header=has_header,
+      separator=data.field_separator,
+      quote_char=data.quote_char,
+      eol_char=data.record_separator,
+      has_header=data.has_header,
       infer_schema_length=10000,
       n_rows=preview_rows,
       ignore_errors=True,
@@ -555,7 +517,7 @@ def _preview_delimited_file(
 
     # Return empty result if the df is empty
     if df.height == 0:
-      return {"type": file_type, "columns": [], "preview_data": {}}
+      return {"type": data.file_type, "columns": [], "preview_data": {}}
 
     schema = df.schema
     preview_data = df.to_dict(as_series=False)
@@ -564,11 +526,11 @@ def _preview_delimited_file(
     columns = []
     for col in df.columns:
       col_type = str(schema[col])
-      sql_type = _map_polars_dtype_to_sql_type(dialect, col_type)
+      sql_type = _map_polars_dtype_to_sql_type(data.sql_dialect, col_type)
 
       columns.append({"name": col, "type": sql_type})
 
-    result = {"type": file_type, "columns": columns, "preview_data": preview_data}
+    result = {"type": data.file_type, "columns": columns, "preview_data": preview_data}
 
     return result
 

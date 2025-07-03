@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import codecs
 import os
 from typing import Any, Literal, Optional
 
@@ -61,17 +62,28 @@ class PreviewFileSchema(BaseModel):
   file_type: Literal["csv", "tsv", "excel", "delimiter_format"] = Field(..., description="Type of file (csv, tsv, excel, delimiter_format)")
   import_type: Literal["local", "remote"] = Field(..., description="Whether the file is local or on a remote filesystem")
   sql_dialect: Literal["hive", "impala", "trino", "phoenix", "sparksql"] = Field(..., description="SQL dialect for mapping column types")
-  has_header: bool = Field(False, description="Whether the file has a header row or not")
+  has_header: bool = Field(..., description="Whether the file has a header row or not")
   sheet_name: Optional[str] = Field(None, description="Sheet name for Excel files")
   field_separator: Optional[str] = Field(None, description="Field separator character")
   quote_char: Optional[str] = Field(None, description="Quote character")
   record_separator: Optional[str] = Field(None, description="Record separator character")
+
+  @field_validator("field_separator", "quote_char", "record_separator", mode="before")
+  @classmethod
+  def decode_escape_sequences(cls, value: Optional[str]) -> Optional[str]:
+    if value is None:
+      return value
+    return codecs.decode(value, "unicode_escape")
 
   @model_validator(mode="after")
   def set_defaults_and_validate_dependencies(self) -> "PreviewFileSchema":
     # Validate sheet_name dependency for excel files
     if self.file_type == "excel" and not self.sheet_name:
       raise ValueError("Sheet name is required for Excel files.")
+
+    # Normalize record separator
+    if self.record_separator == "\r\n":
+      self.record_separator = "\n"
 
     # Set defaults for delimited files
     if self.file_type in ["csv", "tsv", "delimiter_format"]:
