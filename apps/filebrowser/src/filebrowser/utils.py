@@ -157,7 +157,7 @@ def is_file_upload_allowed(file_name):
     # Normalize extensions to lowercase with dots
     normalized_allow_list = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in allow_list]
     if file_type not in normalized_allow_list:
-      return False, f'File type "{file_type}" is not permitted. Modify file upload settings to allow this type.'
+      return False, f'File type "{file_type}" is not permitted. Modify file extension settings to allow this type.'
 
   # Check restrict list - if set, these extensions are not allowed
   restrict_list = RESTRICT_FILE_EXTENSIONS.get()
@@ -165,6 +165,6 @@ def is_file_upload_allowed(file_name):
     # Normalize extensions to lowercase with dots
     normalized_restrict_list = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in restrict_list]
     if file_type in normalized_restrict_list:
-      return False, f'File type "{file_type}" is restricted. Update file upload restrictions to allow this type.'
+      return False, f'File type "{file_type}" is restricted. Update file extension restrictions to allow this type.'
 
   return True, None
