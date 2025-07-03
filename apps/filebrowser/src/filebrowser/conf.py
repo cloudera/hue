@@ -115,7 +115,7 @@ ALLOW_FILE_EXTENSIONS = Config(
   default=None,
   type=coerce_csv,
   help=_(
-    "Specify file extensions that are allowed, separated by commas."
+    "Specify file extensions that are allowed, separated by commas. "
     "When set, only these extensions will be permitted. For example: .tsv, .csv, .xlsx"
   ),
 )
