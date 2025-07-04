@@ -50,6 +50,13 @@ class OFSFineUploaderChunkedUpload(object):
     self._part_size = UPLOAD_CHUNK_SIZE.get()
 
   def check_access(self):
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(self.file_name)
+    if not is_allowed:
+      LOG.error(err_message)
+      self._request.META["upload_failed"] = err_message
+      raise PopupException(err_message)
+
     if self._is_ofs_upload():
       self._fs = self._get_ofs(self._request)
 
@@ -224,7 +231,7 @@ class OFSFileUploadHandler(FileUploadHandler):
         raise StopFutureHandlers()
       except (OFSFileUploadError, WebHdfsException) as e:
         LOG.error("Encountered error in OFSUploadHandler check_access: %s" % e)
-        self.request.META['upload_failed'] = e
+        self._request.META["upload_failed"] = e
         raise StopUpload()
 
   def receive_data_chunk(self, raw_data, start):

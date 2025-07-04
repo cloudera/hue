@@ -65,6 +65,12 @@ class LocalFineUploaderChunkedUpload(object):
     self.chunk_size = 0
 
   def check_access(self):
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(self.file_name)
+    if not is_allowed:
+      LOG.error(err_message)
+      self._request.META["upload_failed"] = err_message
+      raise PopupException(err_message)
     pass
 
   def upload_chunks(self):
@@ -96,6 +102,13 @@ class HDFSFineUploaderChunkedUpload(object):
       self.chunk_size = kwargs.get('chunk_size')
 
   def check_access(self):
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(self.file_name)
+    if not is_allowed:
+      LOG.error(err_message)
+      self._request.META["upload_failed"] = err_message
+      raise PopupException(err_message)
+
     if self._request.fs.isdir(self.dest) and posixpath.sep in self.file_name:
       raise PopupException(_('HDFSFineUploaderChunkedUpload: Sorry, no "%(sep)s" in the filename %(name)s.' %
                              {'sep': posixpath.sep, 'name': self.file_name}))

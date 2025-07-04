@@ -57,6 +57,13 @@ class ABFSFineUploaderChunkedUpload(object):
       self._fs.stats(self.destination)
 
   def check_access(self):
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(self.file_name)
+    if not is_allowed:
+      LOG.error(err_message)
+      self._request.META["upload_failed"] = err_message
+      raise PopupException(err_message)
+
     LOG.info('ABFSFineUploaderChunkedUpload: handle file upload wit temp file %s.' % self.file_name)
     self.target_path = self._fs.join(self.destination, self.file_name)
     self.filepath = self.target_path
@@ -71,7 +78,7 @@ class ABFSFineUploaderChunkedUpload(object):
         self._fs.create(self.target_path)
     except (ABFSFileUploadError, ABFSFileSystemException) as e:
       LOG.error("ABFSFineUploaderChunkedUpload: Encountered error in ABFSUploadHandler check_access: %s" % e)
-      self.request.META['upload_failed'] = e
+      self._request.META["upload_failed"] = e
       raise PopupException("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s failed %s" % (self.target_path, e))
 
     if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
@@ -88,7 +95,7 @@ class ABFSFineUploaderChunkedUpload(object):
         self._fs.create(self.target_path)
       except (ABFSFileUploadError, ABFSFileSystemException) as e:
         LOG.error("ABFSFineUploaderChunkedUpload: Encountered error in ABFSUploadHandler check_access: %s" % e)
-        self.request.META['upload_failed'] = e
+        self._request.META['upload_failed'] = e
         raise PopupException("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s failed %s" % (self.target_path, e))
 
     try:

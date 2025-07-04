@@ -15,20 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import io
-import os
-import re
-import sys
-import json
-import stat as stat_module
 import errno
+import io
+import json
 import logging
-import operator
 import mimetypes
+import operator
+import os
 import posixpath
-import urllib.error
-import urllib.request
-from builtins import object, str as new_str
+import re
+import stat as stat_module
+from builtins import str as new_str
 from bz2 import decompress
 from datetime import datetime
 from functools import partial
@@ -38,28 +35,27 @@ from urllib.parse import quote as urllib_quote, unquote as urllib_unquote, urlpa
 
 import pandas as pd
 from avro import datafile, io
-from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
-from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
+from django.core.files.uploadhandler import StopUpload
+from django.core.paginator import EmptyPage, InvalidPage, Paginator
+from django.http import Http404, HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.template.defaultfilters import filesizeformat, stringformat
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import http_date
 from django.utils.translation import gettext as _
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 
-from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
+from aws.s3.s3fs import get_s3_home_directory, S3FileSystemException, S3ListAllBucketsException
 from aws.s3.upload import S3FineUploaderChunkedUpload
 from azure.abfs.upload import ABFSFineUploaderChunkedUpload
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, RAZ, TASK_SERVER_V2
-from desktop.lib import fsmanager, i18n
+from desktop.conf import RAZ, TASK_SERVER_V2
+from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
-from desktop.lib.django_util import JsonResponse, format_preserving_redirect, render
+from desktop.lib.django_util import format_preserving_redirect, JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import file_reader
 from desktop.lib.fs import splitpath
@@ -94,17 +90,13 @@ from filebrowser.forms import (
   SetReplicationFactorForm,
   TouchForm,
   TrashPurgeForm,
-  UploadArchiveForm,
   UploadFileForm,
 )
 from filebrowser.lib import xxd
-from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
-from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.core_site import get_trash_interval
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
-from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.upload import HDFSFineUploaderChunkedUpload, LocalFineUploaderChunkedUpload
 from useradmin.models import Group, User
 
@@ -1538,11 +1530,11 @@ def upload_chunks(request):
     for _ in request.FILES.values():  # This processes the upload.
       pass
   except StopUpload:
-    return JsonResponse({'success': False, 'error': 'Error in upload'})
+    return JsonResponse({"success": False, "error": "Error in upload"})
 
   # case where file is larger than the single chunk size
   if int(request.GET.get("qqtotalparts", 0)) > 0:
-    return JsonResponse({'success': True, 'uuid': request.GET.get('qquuid')})
+    return JsonResponse({"success": True, "uuid": request.GET.get("qquuid")})
 
   # case where file is smaller than the chunk size
   if int(request.GET.get("qqtotalparts", 0)) == 0:
@@ -1550,9 +1542,14 @@ def upload_chunks(request):
     try:
       response = perform_upload_task(request, **chunks)
       return JsonResponse(response)
+    except PopupException as e:
+      logger.error(f"Upload failed: {e}")
+      return JsonResponse({"success": False, "error": str(e)})
     except Exception as e:
-      return JsonResponse({'success': False, 'error': 'Error in upload %s' % str(e)})
-  return JsonResponse({'success': False, 'error': 'Unsupported request method'})
+      # For unexpected exceptions, log the full error but return a generic message
+      logger.exception(f"Unexpected error during upload: {e}")
+      return JsonResponse({"success": False, "error": "Upload failed due to an unexpected error"})
+  return JsonResponse({"success": False, "error": "Unsupported request method"})
 
 
 @require_http_methods(["POST"])
@@ -1568,8 +1565,13 @@ def upload_complete(request):
   try:
     response = perform_upload_task(request, **chunks)
     return JsonResponse(response)
+  except PopupException as e:
+    logger.error(f"Upload failed: {e}")
+    return JsonResponse({"success": False, "error": str(e)})
   except Exception as e:
-    return JsonResponse({'success': False, 'error': 'Error in upload'})
+    # For unexpected exceptions, log the full error but return a generic message
+    logger.exception(f"Unexpected error during upload: {e}")
+    return JsonResponse({"success": False, "error": "Upload failed due to an unexpected error"})
 
 
 @require_http_methods(["POST"])

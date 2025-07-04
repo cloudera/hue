@@ -62,6 +62,13 @@ class S3FineUploaderChunkedUpload(object):
       self.chunk_size = kwargs.get('chunk_size')
 
   def check_access(self):
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(self.file_name)
+    if not is_allowed:
+      LOG.error(err_message)
+      self._request.META["upload_failed"] = err_message
+      raise PopupException(err_message)
+
     if self._is_s3_upload():
       try:
         # Check access permissions before attempting upload
@@ -71,7 +78,7 @@ class S3FineUploaderChunkedUpload(object):
         self._mp = self._bucket.initiate_multipart_upload(self.filepath)
       except (S3FileUploadError, S3FileSystemException) as e:
         LOG.error("S3FineUploaderChunkedUpload: Encountered error in S3UploadHandler check_access: %s" % e)
-        self.request.META['upload_failed'] = e
+        self._request.META['upload_failed'] = e
         raise PopupException("S3FineUploaderChunkedUpload: Initiating S3 multipart upload to target path: %s failed" % self.filepath)
 
     self.chunk_size = DEFAULT_WRITE_SIZE
@@ -87,7 +94,7 @@ class S3FineUploaderChunkedUpload(object):
         self._mp = self._bucket.initiate_multipart_upload(self.filepath)
       except (S3FileUploadError, S3FileSystemException) as e:
         LOG.error("S3FineUploaderChunkedUpload: Encountered error in S3UploadHandler check_access: %s" % e)
-        self.request.META['upload_failed'] = e
+        self._request.META['upload_failed'] = e
         raise PopupException("S3FineUploaderChunkedUpload: Initiating S3 multipart upload to target path: %s failed" % self.filepath)
 
     try:
