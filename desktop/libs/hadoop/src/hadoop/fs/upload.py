@@ -200,7 +200,7 @@ class HDFStemporaryUploadedFile(object):
     try:
       self.size = size
       self.close()
-    except Exception as ex:
+    except Exception:
       LOG.exception('Error uploading file to %s' % (self._path,))
       raise
 
@@ -490,7 +490,7 @@ class HDFSNewTemporaryUploadedFile(object):
     # Check access permissions before attempting upload
     try:
       self._fs.check_access(destination, 'rw-')
-    except WebHdfsException as e:
+    except WebHdfsException:
       raise HDFSerror(_('User %s does not have permissions to write to path "%s".') % (username, destination))
 
     if self._fs.exists(self._path):
@@ -513,7 +513,7 @@ class HDFSNewTemporaryUploadedFile(object):
     try:
       self.size = size
       self.close()
-    except Exception as ex:
+    except Exception:
       LOG.exception('Error uploading file to %s' % (self._path))
       raise
 

@@ -56,7 +56,7 @@ class OFSFineUploaderChunkedUpload(object):
       # Verify that the path exists
       try:
         self._fs.stats(self.destination)
-      except Exception as e:
+      except Exception:
         raise PopupException(_('Destination path does not exist: %s' % self.destination))
 
       LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
@@ -80,7 +80,7 @@ class OFSFineUploaderChunkedUpload(object):
         # Verify that the path exists
         try:
           self._fs.stats(self.destination)
-        except Exception as e:
+        except Exception:
           raise PopupException(_('Destination path does not exist: %s' % self.destination))
 
         LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
@@ -195,7 +195,7 @@ class OFSFileUploadHandler(FileUploadHandler):
       # Verify that the path exists
       try:
         self._fs.stats(self.destination)
-      except Exception as e:
+      except Exception:
         raise OFSFileUploadError(_('Destination path does not exist: %s' % self.destination))
 
     LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
