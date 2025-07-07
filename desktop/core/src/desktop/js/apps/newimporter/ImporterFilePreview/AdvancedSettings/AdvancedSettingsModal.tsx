@@ -19,7 +19,12 @@ import Modal from 'cuix/dist/components/Modal';
 import { Form } from 'antd';
 import { i18nReact } from '../../../../utils/i18nReact';
 import { FileMetaData, ImporterFileSource } from '../../types';
-import { ADVANCED_SETTINGS_CONFIG, TableFormat, VisibilityContext } from './advancedSettingsConfig';
+import {
+  ADVANCED_SETTINGS_CONFIG,
+  StoreLocation,
+  TableFormat,
+  VisibilityContext
+} from './advancedSettingsConfig';
 import FormFieldRenderer from './FormFieldRenderer';
 
 import './AdvancedSettingsModal.scss';
@@ -28,28 +33,29 @@ interface AdvancedSettingsModalProps {
   isOpen: boolean;
   closeModal: () => void;
   fileMetaData: FileMetaData;
-  fileFormat?: any;
+  // fileFormat?: FileFormat;
   advancedSettings: AdvancedSettings;
   onSettingsChange: (settings: AdvancedSettings) => void;
 }
 
 export interface AdvancedSettings {
-  useDefaultLocation: boolean;
+  storeLocation: StoreLocation;
   isTransactional: boolean;
   isInsertOnly: boolean;
-  nonDefaultLocation: string;
+  externalLocation: string;
   importData: boolean;
-  isIceberg: boolean;
-  useCopy: boolean;
+  isIcebergTable: boolean;
+  isCopyFile: boolean;
   description: string;
   tableFormat: string;
+  primaryKeys: string[];
 }
 
 const AdvancedSettingsModal: React.FC<AdvancedSettingsModalProps> = ({
   isOpen,
   closeModal,
   fileMetaData,
-  fileFormat,
+  // fileFormat,
   advancedSettings,
   onSettingsChange
 }) => {
@@ -60,7 +66,7 @@ const AdvancedSettingsModal: React.FC<AdvancedSettingsModalProps> = ({
     setLocalSettings(advancedSettings);
   }, [advancedSettings]);
 
-  const handleChange = (fieldId: string, value: any) => {
+  const handleChange = (fieldId: string, value: string | boolean | string[]) => {
     setLocalSettings(prev => ({
       ...prev,
       [fieldId]: value
@@ -80,12 +86,15 @@ const AdvancedSettingsModal: React.FC<AdvancedSettingsModalProps> = ({
   // Create visibility context
   const tableFormat = localSettings.tableFormat || TableFormat.TEXT;
   const context: VisibilityContext = {
-    fileMetaData,
-    fileFormat,
-    settings: localSettings,
-    tableFormat,
-    isKudu: tableFormat === TableFormat.KUDU,
+    isManagedTable: localSettings.storeLocation === StoreLocation.MANAGED,
+    isRemoteTable: fileMetaData.source === ImporterFileSource.REMOTE,
+    isKuduTable: tableFormat === TableFormat.KUDU,
     isIcebergEnabled: true, // TODO: Get from config
+    isCopyFile: localSettings.isCopyFile,
+    isIcebergTable: localSettings.isIcebergTable,
+    fileMetaData,
+    settings: localSettings,
+    // tableFormat,
     isTransactionalVisible:
       tableFormat !== TableFormat.KUDU && fileMetaData.source !== ImporterFileSource.LOCAL,
     isTransactionalUpdateEnabled: localSettings.isTransactional && !localSettings.isInsertOnly

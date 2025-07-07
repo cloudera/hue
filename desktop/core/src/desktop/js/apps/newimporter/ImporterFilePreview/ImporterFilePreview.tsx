@@ -34,6 +34,7 @@ import DestinationSettings from './DestinationSettings/DestinationSettings';
 import AdvancedSettingsModal, { AdvancedSettings } from './AdvancedSettings/AdvancedSettingsModal';
 
 import './ImporterFilePreview.scss';
+import { StoreLocation, TableFormat } from './AdvancedSettings/advancedSettingsConfig';
 
 interface ImporterFilePreviewProps {
   fileMetaData: FileMetaData;
@@ -48,21 +49,20 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     tableName: getDefaultTableName(fileMetaData.path, fileMetaData.source)
   });
   const [advancedSettings, setAdvancedSettings] = useState<AdvancedSettings>({
-    useDefaultLocation: true,
+    storeLocation: StoreLocation.MANAGED,
     isTransactional: false,
     isInsertOnly: false,
-    nonDefaultLocation: '',
+    externalLocation: '',
     importData: true,
-    isIceberg: false,
-    useCopy: false,
+    isIcebergTable: false,
+    isCopyFile: false,
     description: '',
-    hasHeader: false,
-    useCustomDelimiters: false,
-    customFieldDelimiter: ',',
-    customCollectionDelimiter: '\t',
-    customMapDelimiter: '|',
-    customRegexp: '',
+    tableFormat: TableFormat.TEXT,
     primaryKeys: []
+    // useCustomDelimiters: false,
+    // customFieldDelimiter: ',',
+    // customCollectionDelimiter: '\t',
+    // customMapDelimiter: '|',
   });
 
   const handleDestinationSettingsChange = (name: string, value: string) => {
@@ -129,19 +129,17 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     };
     const destination = {
       outputFormat: 'table',
-      nonDefaultLocation: advancedSettings.useDefaultLocation
-        ? ''
-        : advancedSettings.nonDefaultLocation,
+      location: advancedSettings.storeLocation,
+      externalLocation: advancedSettings.externalLocation,
       name: `${destinationConfig.database}.${destinationConfig.tableName}`,
       sourceType: destinationConfig.connectorId,
       columns: previewData?.columns,
       // Include advanced settings
-      useDefaultLocation: advancedSettings.useDefaultLocation,
       isTransactional: advancedSettings.isTransactional,
       isInsertOnly: advancedSettings.isInsertOnly,
       importData: advancedSettings.importData,
-      isIceberg: advancedSettings.isIceberg,
-      useCopy: advancedSettings.useCopy,
+      isIcebergTable: advancedSettings.isIcebergTable,
+      isCopyFile: advancedSettings.isCopyFile,
       description: advancedSettings.description
       // useCustomDelimiters: advancedSettings.useCustomDelimiters,
       // customFieldDelimiter: advancedSettings.customFieldDelimiter,

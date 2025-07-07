@@ -14,7 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export type FieldType = 'checkbox' | 'input' | 'select';
+import { FileMetaData } from '../../types';
+import { AdvancedSettings } from './AdvancedSettingsModal';
+
+export type FieldType = 'checkbox' | 'input' | 'select' | 'radio';
 
 export interface FieldOption {
   value: string;
@@ -35,14 +38,16 @@ export interface FieldConfig {
 }
 
 export interface VisibilityContext {
-  fileMetaData: any;
-  fileFormat: any;
-  settings: any;
-  tableFormat: string;
-  isKudu: boolean;
+  isManagedTable: boolean;
+  isRemoteTable: boolean;
+  isKuduTable: boolean;
+  fileMetaData: FileMetaData;
+  settings: AdvancedSettings;
   isIcebergEnabled: boolean;
+  isIcebergTable: boolean;
   isTransactionalVisible: boolean;
   isTransactionalUpdateEnabled: boolean;
+  isCopyFile: boolean;
 }
 
 export enum TableFormat {
@@ -53,6 +58,11 @@ export enum TableFormat {
   JSON = 'json',
   KUDU = 'kudu',
   CSV = 'csv'
+}
+
+export enum StoreLocation {
+  MANAGED = 'managed',
+  EXTERNAL = 'external'
 }
 
 export const TABLE_FORMAT_OPTIONS: FieldOption[] = [
@@ -85,24 +95,29 @@ export const ADVANCED_SETTINGS_CONFIG: FieldConfig[] = [
     tooltip: 'This will only create the table and not import any data'
   },
   {
-    id: 'useDefaultLocation',
-    type: 'checkbox',
-    label: 'Store in Default location'
-    // isHidden: ({ isKudu, settings }) => isKudu || settings.isIceberg || settings.useCopy
+    id: 'storeLocation',
+    type: 'radio',
+    label: 'Store in',
+    options: [
+      { value: StoreLocation.MANAGED, label: 'Default location' },
+      { value: StoreLocation.EXTERNAL, label: 'External location' }
+    ],
+    isHidden: ({ isKuduTable, isIcebergTable, isCopyFile }) =>
+      isKuduTable || isIcebergTable || isCopyFile
   },
   {
-    id: 'nonDefaultLocation',
+    id: 'externalLocation',
     type: 'input',
     label: 'External location',
-    placeholder: 'Enter external location path',
-    isHidden: ({ settings }) => settings.useDefaultLocation
+    placeholder: 'External location',
+    isHidden: ({ settings }) => settings.storeLocation !== 'external'
   },
   {
     id: 'isTransactional',
     type: 'checkbox',
-    label: 'Transactional table'
-    // isHidden: ({ isTransactionalVisible, settings }) =>
-    // !isTransactionalVisible || settings.isIceberg || settings.useCopy
+    label: 'Transactional table',
+    isHidden: ({ isKuduTable, isRemoteTable, isIcebergTable, isCopyFile }) =>
+      isKuduTable || isRemoteTable || isIcebergTable || isCopyFile
   },
   {
     id: 'isInsertOnly',
@@ -111,26 +126,21 @@ export const ADVANCED_SETTINGS_CONFIG: FieldConfig[] = [
     tooltip: 'Full transactional support available in Hive with ORC',
     parentField: 'isTransactional',
     isHidden: ({ settings }) => !settings.isTransactional
-    // isHidden: ({ isTransactionalVisible, isTransactionalUpdateEnabled }) =>
-    // !isTransactionalVisible || !isTransactionalUpdateEnabled
   },
 
   {
-    id: 'isIceberg',
+    id: 'isIcebergTable',
     type: 'checkbox',
-    label: 'Iceberg table'
-    // isHidden: ({ isIcebergEnabled, fileMetaData }) =>
-    // !isIcebergEnabled || fileMetaData.source !== ImporterFileSource.REMOTE
+    label: 'Iceberg table',
+    isHidden: ({ isIcebergEnabled, isRemoteTable }) => !isIcebergEnabled || !isRemoteTable
   },
   {
-    id: 'useCopy',
+    id: 'isCopyFile',
     type: 'checkbox',
     label: 'Copy file',
     tooltip:
-      'Choosing this option will copy the file instead of moving it to the new location, and ensuring the original file remains unchanged.'
-    // isHidden: ({ settings, fileMetaData }) =>
-    // settings.useDefaultLocation ||
-    // settings.isTransactional ||
-    // fileMetaData.source !== ImporterFileSource.REMOTE
+      'Choosing this option will copy the file instead of moving it to the new location, and ensuring the original file remains unchanged.',
+    isHidden: ({ settings, isRemoteTable, isManagedTable }) =>
+      isManagedTable || settings.isTransactional || !isRemoteTable || settings.importData === false
   }
 ];

@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { Checkbox, Input, Form, Tooltip, Select } from 'antd';
+import { Checkbox, Input, Form, Tooltip, Select, Radio } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { i18nReact } from '../../../../utils/i18nReact';
 import { FieldConfig, VisibilityContext } from './advancedSettingsConfig';
@@ -77,6 +77,17 @@ const FormFieldRenderer: React.FC<FormFieldRendererProps> = ({
             getPopupContainer={triggerNode => triggerNode.parentElement}
             bordered
           />
+        );
+
+      case 'radio':
+        return (
+          <Radio.Group value={value} onChange={e => onChange(field.id, e.target.value)}>
+            {field.options?.map(option => (
+              <Radio key={option.value} value={option.value}>
+                {t(option.label)}
+              </Radio>
+            ))}
+          </Radio.Group>
         );
 
       default:
