@@ -16,11 +16,11 @@
 
 @use 'variables' as vars;
 
-.ant-modal-content{
-  width: 800px;
-}
-
 .antd.cuix {
+  .ant-modal-content {
+    width: 800px;
+  }
+
   .hue-importer-edit-columns-modal {
     &__input--name {
       width: 100px;
