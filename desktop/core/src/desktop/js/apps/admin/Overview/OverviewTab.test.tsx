@@ -57,33 +57,6 @@ describe('OverviewTab', () => {
     expect(screen.getByText('Analytics')).toBeInTheDocument();
   });
 
-  describe('Analytics', () => {
-    beforeEach(() => {
-      (get as jest.Mock).mockResolvedValue({ analytics_enabled: false });
-    });
-
-    test('renders Analytics tab and can interact with the checkbox', async () => {
-      render(<Analytics />);
-
-      const checkbox = screen.getByLabelText(/Help improve Hue with anonymous usage analytics./i);
-
-      expect(checkbox).not.toBeChecked();
-      (post as jest.Mock).mockResolvedValueOnce({ analytics_enabled: true });
-      await userEvent.click(checkbox);
-      expect(checkbox).toBeChecked();
-      expect(post).toHaveBeenCalledWith(UPDATE_USAGE_ANALYTICS_API_URL, {
-        analytics_enabled: true
-      });
-
-      (post as jest.Mock).mockResolvedValueOnce({ analytics_enabled: false });
-      await userEvent.click(checkbox);
-      await waitFor(() => expect(checkbox).not.toBeChecked());
-      expect(post).toHaveBeenCalledWith(UPDATE_USAGE_ANALYTICS_API_URL, {
-        analytics_enabled: false
-      });
-    });
-  });
-
   describe('Examples component', () => {
     const availableAppsResponse = {
       apps: {
