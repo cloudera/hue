@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import errno
-import io
 import json
 import logging
 import mimetypes
@@ -34,7 +33,7 @@ from io import BytesIO, StringIO as string_io
 from urllib.parse import quote as urllib_quote, unquote as urllib_unquote, urlparse as lib_urlparse
 
 import pandas as pd
-from avro import datafile, io
+from avro import datafile, io as avro_io
 from django.core.files.uploadhandler import StopUpload
 from django.core.paginator import EmptyPage, InvalidPage, Paginator
 from django.http import Http404, HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
@@ -211,7 +210,6 @@ def download(request, path):
   content_type = mimetypes.guess_type(path)[0] or 'application/octet-stream'
   stats = request.fs.stats(path)
   mtime = stats['mtime']
-  size = stats['size']
   if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), mtime):
     return HttpResponseNotModified()
     # TODO(philip): Ideally a with statement would protect from leaks, but tricky to do here.
@@ -947,7 +945,7 @@ def _read_avro(fhandle, path, offset, length, stats):
   contents = ''
   try:
     fhandle.seek(offset)
-    data_file_reader = datafile.DataFileReader(fhandle, io.DatumReader())
+    data_file_reader = datafile.DataFileReader(fhandle, avro_io.DatumReader())
 
     try:
       contents_list = []
@@ -1064,11 +1062,11 @@ def detect_parquet(fhandle):
 def snappy_installed():
   '''Snappy is library that isn't supported by python2.4'''
   try:
-    import snappy
+    import snappy  # noqa: F401
     return True
   except ImportError:
     return False
-  except Exception as e:
+  except Exception:
     logging.exception('failed to verify if snappy is installed')
     return False
 
@@ -1114,12 +1112,12 @@ def formset_initial_value_extractor(request, parameter_names):
   The formsets should then handle construction on their own.
   """
   def _intial_value_extractor(request):
-    if not submitted:
+    if not submitted:  # noqa: F821
       return []
     # Build data with list of in order parameters receive in POST data
     # Size can be inferred from largest list returned in POST data
     data = []
-    for param in submitted:
+    for param in submitted:  # noqa: F821
       i = 0
       for val in request.POST.getlist(param):
         if len(data) == i:
@@ -1128,7 +1126,7 @@ def formset_initial_value_extractor(request, parameter_names):
         i += 1
     # Extend every data object with recurring params
     for kwargs in data:
-      for recurrent in recurring:
+      for recurrent in recurring:  # noqa: F821
         kwargs[recurrent] = request.POST.get(recurrent)
     initial_data = data
     return {'initial': initial_data}
@@ -1246,7 +1244,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
         if piggyback:
           piggy_path = form.cleaned_data.get(piggyback)
           ret["result"] = _massage_stats(request, stat_absolute_path(piggy_path, request.fs.stats(piggy_path)))
-      except Exception as e:
+      except Exception:
         # Hard to report these more naturally here.  These happen either
         # because of a bug in the piggy-back code or because of a
         # race condition.
