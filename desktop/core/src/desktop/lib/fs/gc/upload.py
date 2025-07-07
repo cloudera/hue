@@ -21,7 +21,6 @@ Classes for a custom upload handler to stream into GS.
 See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
-import os
 import logging
 from io import BytesIO as stream_io
 
@@ -31,7 +30,7 @@ from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandler
 from desktop.lib.fs.gc import parse_uri
 from desktop.lib.fs.gc.gs import GSFileSystemException
 from desktop.lib.fsmanager import get_client
-from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
+from filebrowser.utils import is_file_upload_allowed
 
 LOG = logging.getLogger()
 
@@ -59,6 +58,7 @@ class GSFileUploadHandler(FileUploadHandler):
     self._request = request
     self._mp = None
     self._part_num = 1
+    self._upload_rejected = False
 
     if self._is_gs_upload():
       self._fs = get_client(fs='gs', user=request.user.username)
@@ -76,11 +76,13 @@ class GSFileUploadHandler(FileUploadHandler):
     if self._is_gs_upload():
       LOG.info('Using GSFileUploadHandler to handle file upload.')
 
-      _, file_type = os.path.splitext(file_name)
-      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+      # Check file extension restrictions
+      is_allowed, err_message = is_file_upload_allowed(file_name)
+      if not is_allowed:
         LOG.error(err_message)
-        raise Exception(err_message)
+        self._request.META['upload_failed'] = err_message
+        self._upload_rejected = True
+        return None
 
       super().new_file(field_name, file_name, *args, **kwargs)
 
@@ -106,6 +108,8 @@ class GSFileUploadHandler(FileUploadHandler):
 
     This method is called for each data chunk received during the upload process.
     """
+    if self._upload_rejected:
+      return None
     if self._is_gs_upload():
       try:
         LOG.debug("GSFileUploadHandler uploading file part: %d" % self._part_num)
@@ -125,6 +129,8 @@ class GSFileUploadHandler(FileUploadHandler):
 
     This method is called when the entire file has been uploaded.
     """
+    if self._upload_rejected:
+      return None
     if self._is_gs_upload():
       LOG.info("GSFileUploadHandler has completed file upload to GS, total file size is: %d." % file_size)
       self._mp.complete_upload()
