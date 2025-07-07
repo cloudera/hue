@@ -20,13 +20,13 @@
 # Local customizations are done by symlinking a file
 # as local_settings.py.
 
+import datetime
 import gc
+import json
+import logging
 import os
 import sys
-import json
 import uuid
-import logging
-import datetime
 from builtins import map, zip
 
 import pkg_resources
@@ -36,9 +36,9 @@ import desktop.redaction
 from aws.conf import is_enabled as is_s3_enabled
 from azure.conf import is_abfs_enabled
 from desktop import appmanager
-from desktop.conf import TASK_SERVER_V2, is_chunked_fileuploader_enabled, is_gs_enabled, is_ofs_enabled
+from desktop.conf import is_chunked_fileuploader_enabled, is_gs_enabled, is_ofs_enabled
 from desktop.lib import conf
-from desktop.lib.paths import get_desktop_root, get_run_root
+from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -579,7 +579,7 @@ LOGIN_URL = '/hue/accounts/login'
 # SAML
 SAML_AUTHENTICATION = 'libsaml.backend.SAML2Backend' in AUTHENTICATION_BACKENDS
 if SAML_AUTHENTICATION:
-  from libsaml.saml_settings import *
+  from libsaml.saml_settings import *  # noqa: F403
   INSTALLED_APPS.append('libsaml')
   LOGIN_URL = '/saml2/login/'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True

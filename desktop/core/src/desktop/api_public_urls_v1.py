@@ -17,8 +17,10 @@
 
 from django.urls import re_path
 
+from about import api as about_api
 from desktop import api_public
 from desktop.lib.botserver import api as botserver_api
+from desktop.lib.importer import api as importer_api
 
 # "New" query API (i.e. connector based, lean arguments).
 # e.g. https://demo.gethue.com/api/query/execute/hive
@@ -35,11 +37,10 @@ urlpatterns += [
   re_path(r'^logs/download/?$', api_public.download_hue_logs, name='core_download_hue_logs'),
   re_path(r'^install_app_examples/?$', api_public.install_app_examples, name='core_install_app_examples'),
   re_path(r'^available_app_examples/?$', api_public.available_app_examples, name='core_available_app_examples'),
-  re_path(r'^usage_analytics/?$', api_public.get_usage_analytics, name='core_get_usage_analytics'),
-  re_path(r'^usage_analytics/update/?$', api_public.update_usage_analytics, name='core_update_usage_analytics'),
   re_path(r'^get_config/?$', api_public.get_config),
   re_path(r'^check_config/?$', api_public.check_config, name='core_check_config'),
   re_path(r'^get_namespaces/(?P<interface>[\w\-]+)/?$', api_public.get_context_namespaces),  # To remove
+  re_path(r'^usage_analytics/?$', about_api.UsageAnalyticsAPI.as_view(), name='core_usage_analytics'),
 ]
 
 urlpatterns += [
@@ -156,6 +157,14 @@ urlpatterns += [
   re_path(r'^indexer/guess_format/?$', api_public.guess_format, name='indexer_guess_format'),
   re_path(r'^indexer/guess_field_types/?$', api_public.guess_field_types, name='indexer_guess_field_types'),
   re_path(r'^indexer/importer/submit', api_public.importer_submit, name='indexer_importer_submit'),
+]
+
+urlpatterns += [
+  re_path(r'^importer/upload/file/?$', importer_api.local_file_upload, name='importer_local_file_upload'),
+  re_path(r'^importer/file/guess_metadata/?$', importer_api.guess_file_metadata, name='importer_guess_file_metadata'),
+  re_path(r'^importer/file/guess_header/?$', importer_api.guess_file_header, name='importer_guess_file_header'),
+  re_path(r'^importer/file/preview/?$', importer_api.preview_file, name='importer_preview_file'),
+  re_path(r'^importer/sql_type_mapping/?$', importer_api.get_sql_type_mapping, name='importer_get_sql_type_mapping'),
 ]
 
 urlpatterns += [

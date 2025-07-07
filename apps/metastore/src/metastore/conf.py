@@ -17,7 +17,7 @@
 
 from django.utils.translation import gettext_lazy as _
 
-from desktop.lib.conf import Config, coerce_bool
+from desktop.lib.conf import coerce_bool, Config
 
 ENABLE_NEW_CREATE_TABLE = Config(
   key="enable_new_create_table",
@@ -40,4 +40,11 @@ SHOW_TABLE_ERD = Config(
   default=False,
   type=coerce_bool,
   help=_('Choose whether to show the table ERD component.')
+)
+
+ALLOW_SAMPLE_DATA_FROM_VIEWS = Config(
+  key='allow_sample_data_from_views',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to allow fetching sample data from views. By default, this is false to prevent potentially expensive queries.')
 )

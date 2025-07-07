@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "DROP ",
     "afterCursor": "",
-    "containsKeywords": [
-      "VIEW"
-    ],
+    "containsKeywords": ["VIEW"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -14,9 +12,7 @@
     "namePrefix": "should not report errors",
     "beforeCursor": "DROP VIEW boo;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false
@@ -26,9 +22,7 @@
     "namePrefix": "should not report errors",
     "beforeCursor": "DROP VIEW IF EXISTS baa.boo;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false
@@ -47,9 +41,7 @@
       "suggestDatabases": {
         "appendDot": true
       },
-      "suggestKeywords": [
-        "IF EXISTS"
-      ]
+      "suggestKeywords": ["IF EXISTS"]
     }
   },
   {
@@ -59,9 +51,7 @@
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "EXISTS"
-      ]
+      "suggestKeywords": ["EXISTS"]
     }
   },
   {
@@ -103,9 +93,7 @@
     "afterCursor": " foo.bar",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "IF EXISTS"
-      ]
+      "suggestKeywords": ["IF EXISTS"]
     }
   }
 ]

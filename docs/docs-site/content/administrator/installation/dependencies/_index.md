@@ -14,9 +14,10 @@ Hue employs some Python modules which use native code and requires certain devel
 Versions supported:
 * Python 3.8
 * Python 3.9
+* Python 3.11
 ```
-# If you are using Python 3.8, set PYTHON_VER before the build, like
-export PYTHON_VER=python3.8
+# If you are using Python 3.11, set PYTHON_VER before the build, like
+export PYTHON_VER=python3.11
 
 # Export ROOT which should point to your Hue directory
 export ROOT=<path_to_hue_directory>
@@ -141,19 +142,19 @@ Tip: if you run into building kerberos extension issue and see message `krb5-con
 * Xcode command line tools
 * [Homebrew](https://brew.sh)
 
-#### M1 or Intel based Macs with Python 3
+#### Apple Silicon (M1, M2, M3)
 
-This is a verified step-by-step guide on how to get Hue up and running on a fresh installation of macOS (Big Sur, Monterey 12.0.1), tested on both M1 and Intel based MacBook Pro.
+This is a verified step-by-step guide on how to get Hue up and running on a fresh installation of macOS, tested on Apple Silicon (M1, M2, M3).
 
 1. Clone the Hue repo
 
     `git clone https://github.com/cloudera/hue.git`
 
-2. Install Brew (if not already installed)
+2. Install Homebrew (if not already installed)
 
    `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
 
-3. Install postgres (unless you prefer something else)
+3. Install Postgres (unless you prefer something else)
 
    `brew install postgresql@14`
 
@@ -161,7 +162,7 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
    `brew services start postgresql@14`
 
-5. Create the hue database and set permissions
+5. Create the Hue database and set permissions
 
    ```
    # Create the DB
@@ -176,23 +177,26 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
    \q
    ```
 
-6. Install gmp, openssl and libffi (Note some might be installed from postgres)
+6. Install gmp, openssl, and libffi (Note: some might be installed from Postgres)
 
    `brew install gmp openssl libffi`
 
-7. Install python, tested with the **macOS 64-bit installer 3.8.10** direct download from python.org
-`https://www.python.org/ftp/python/3.8.10/python-3.8.10-macos11.pkg`
+7. Install Python, tested with the **macOS 64-bit (universal2) installer 3.11.x** direct download from python.org
+`https://www.python.org/ftp/python/3.11.9/python-3.11.9-macos11.pkg`
 
-   - For Intel Macs, only Python 3.8 works as April 2022. Python 3.8 via Homebrew might work. However, direct download from python.org is preferred and tested.
+   - For Apple Silicon (M1, M2, M3), Python 3.11 is recommended as of June 2025. You can install Python 3.11 either via Homebrew or by direct download from python.org—both options will work, but the direct download is preferred and tested.
+
+>**Note:** By default, Hue will use the highest available Python version on your system. If you want to use a specific lower Python version (such as Python 3.8 or 3.9), set the `PYTHON_VER` environment variable before building. 
+For Python 3.11, use `./build/env/bin/hue` as the command path. For Python versions lower than 3.11, the command path will be `./build/venvs/python3.x/bin/hue`, where `python3.x` matches your `PYTHON_VER` setting. Adjust all related commands accordingly if you use a lower Python version. Both options will work as long as you use the correct path for your Python version.
 
 8. Install node and npm (unless already present) using nvm or brew
 
    `brew install node`
 
-9. In the hue directory run:
+9. In the Hue directory run:
 
     ```
-    export PYTHON_VER=python3.8
+    export PYTHON_VER=python3.11
     export SKIP_PYTHONDEV_CHECK=true
     export CFLAGS="-I$(xcrun --show-sdk-path)/usr/include/sasl"
     export LDFLAGS="-L/usr/local/opt/libffi/lib -L/usr/local/opt/openssl@1.1/lib"
@@ -213,7 +217,7 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
     `desktop/conf/pseudo-distributed.ini`
 
-    According to step 5 above for postgres, set under `[desktop]`:
+    According to step 5 above for Postgres, set under `[desktop]`:
 
     ```
     [[database]]
@@ -225,7 +229,7 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
       name=hue_d
     ```
 
-11. If you use postgres as configured in the previous step you'll need to add the psycopg2 lib manually
+11. If you use Postgres as configured in the previous step you'll need to add the psycopg2 lib manually
 
     `./build/env/bin/pip install psycopg2-binary`
 
@@ -240,7 +244,8 @@ This is a verified step-by-step guide on how to get Hue up and running on a fres
 
     `./build/env/bin/hue runserver`
 
-#### 10.14, 10.15
+
+#### macOS 10.14, 10.15
 
 Install Dependencies via Homebrew
 

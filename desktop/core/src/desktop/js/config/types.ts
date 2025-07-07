@@ -96,6 +96,7 @@ export interface HueConfig extends GenericApiResponse {
     enable_task_server: boolean;
     is_admin: boolean;
     is_yarn_enabled: boolean;
+    allow_sample_data_from_views: boolean;
   };
   storage_browser: StorageBrowserConfig;
   hue_version?: string;

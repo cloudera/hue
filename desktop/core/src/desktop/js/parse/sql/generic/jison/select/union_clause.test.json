@@ -3,9 +3,7 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SELECT * FROM database_two.testTable ORDER BY foo LIMIT 10 ",
     "afterCursor": "",
-    "containsKeywords": [
-      "UNION"
-    ],
+    "containsKeywords": ["UNION"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -15,9 +13,7 @@
     "beforeCursor": "SELECT key FROM (SELECT key FROM src ORDER BY key LIMIT 10)subq1 UNION SELECT key FROM (SELECT key FROM src1 ORDER BY key LIMIT 10)subq2;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -27,9 +23,7 @@
     "beforeCursor": "SELECT * FROM t1 UNION DISTINCT SELECT * FROM t2;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -39,9 +33,7 @@
     "beforeCursor": "SELECT * FROM t1 UNION SELECT * FROM t2;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -53,11 +45,7 @@
     "noErrors": true,
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "ALL",
-        "DISTINCT",
-        "SELECT"
-      ]
+      "suggestKeywords": ["ALL", "DISTINCT", "SELECT"]
     }
   },
   {
@@ -65,11 +53,7 @@
     "beforeCursor": "SELECT * FROM t1 UNION ALL SELECT ",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "*",
-      "ALL",
-      "DISTINCT"
-    ],
+    "containsKeywords": ["*", "ALL", "DISTINCT"],
     "expectedResult": {
       "lowerCase": false,
       "suggestAggregateFunctions": {
@@ -93,9 +77,7 @@
     "beforeCursor": "WITH q1 AS (SELECT * FROM src WHERE something), q2 AS (SELECT * FROM src s2 WHERE something) SELECT * FROM q1 UNION ALL SELECT * FROM q2;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }
@@ -105,9 +87,7 @@
     "beforeCursor": "WITH t1 AS (SELECT 1) (WITH t2 AS (SELECT 2) SELECT * FROM t2) UNION ALL SELECT * FROM t1;",
     "afterCursor": "",
     "noErrors": true,
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "expectedResult": {
       "lowerCase": false
     }

@@ -16,75 +16,59 @@
 # limitations under the License.
 
 import logging
+from typing import Any
 
 from rest_framework import status
+from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from desktop.auth.backend import is_admin
-from desktop.lib.conf import coerce_bool
+from about.serializer import UsageAnalyticsSerializer
+from desktop.auth.api_permissions import IsAdminUser
 from desktop.models import Settings
 
 LOG = logging.getLogger()
 
 
-def get_usage_analytics(request) -> Response:
+class UsageAnalyticsAPI(APIView):
   """
-  Retrieve the user preference for analytics settings.
+  Provides GET and PUT handlers for the usage analytics setting.
 
-  Args:
-    request (Request): The HTTP request object.
-
-  Returns:
-    Response: JSON response containing the analytics_enabled preference or an error message.
-
-  Raises:
-    403: If the user is not a Hue admin.
-    500: If there is an error retrieving preference.
+  This view allows authorized admin users to retrieve the current state of
+  the `collect_usage` setting and update it.
   """
-  if not is_admin(request.user):
-    return Response({'message': "You must be a Hue admin to access this endpoint."}, status=status.HTTP_403_FORBIDDEN)
 
-  try:
-    settings = Settings.get_settings()
-    return Response({'analytics_enabled': settings.collect_usage}, status=status.HTTP_200_OK)
+  permission_classes = [IsAdminUser]
 
-  except Exception as e:
-    message = f"Error retrieving usage analytics: {e}"
-    LOG.error(message)
-    return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+  def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+    """Handles GET requests to retrieve the current analytics setting."""
+    try:
+      settings = Settings.get_settings()
+      data = {"collect_usage": settings.collect_usage}
 
+      return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+      LOG.error("Error retrieving usage analytics: %s", e)
+      return Response(
+        {"error": "A server error occurred while retrieving usage analytics settings."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+      )
 
-def update_usage_analytics(request) -> Response:
-  """
-  Update the user preference for analytics settings.
+  def put(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+    """Handles PUT requests to update the analytics setting."""
+    try:
+      serializer = UsageAnalyticsSerializer(data=request.data)
+      if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  Args:
-    request (Request): The HTTP request object containing 'analytics_enabled' parameter.
+      is_enabled = serializer.validated_data["collect_usage"]
 
-  Returns:
-    Response: JSON response with the updated analytics_enabled preference or an error message.
+      settings = Settings.get_settings()
+      settings.collect_usage = is_enabled
+      settings.save()
 
-  Raises:
-    403: If the user is not a Hue admin.
-    400: If 'analytics_enabled' parameter is missing or invalid.
-    500: If there is an error updating preference.
-  """
-  if not is_admin(request.user):
-    return Response({'message': "You must be a Hue admin to access this endpoint."}, status=status.HTTP_403_FORBIDDEN)
-
-  try:
-    analytics_enabled = request.POST.get('analytics_enabled')
-
-    if analytics_enabled is None:
-      return Response({'message': 'Missing parameter: analytics_enabled is required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    settings = Settings.get_settings()
-    settings.collect_usage = coerce_bool(analytics_enabled)
-    settings.save()
-
-    return Response({'analytics_enabled': settings.collect_usage}, status=status.HTTP_200_OK)
-
-  except Exception as e:
-    message = f"Error updating usage analytics: {e}"
-    LOG.error(message)
-    return Response({'message': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+      return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+      LOG.error("Error updating usage analytics: %s", e)
+      return Response(
+        {"error": "A server error occurred while saving the usage analytics settings."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+      )

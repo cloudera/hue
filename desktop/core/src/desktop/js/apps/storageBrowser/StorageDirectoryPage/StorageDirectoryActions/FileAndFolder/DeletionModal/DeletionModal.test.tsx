@@ -47,11 +47,12 @@ const mockFiles: StorageDirectoryTableData[] = [
 ];
 
 const mockSave = jest.fn();
+const mockLoading = jest.fn().mockReturnValue(false);
 jest.mock('../../../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     save: mockSave,
-    loading: false
+    loading: mockLoading()
   }))
 }));
 
@@ -59,7 +60,6 @@ describe('DeletionModal Component', () => {
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
   const mockOnClose = jest.fn();
-  const setLoading = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -70,7 +70,6 @@ describe('DeletionModal Component', () => {
       <DeletionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -89,7 +88,6 @@ describe('DeletionModal Component', () => {
       <DeletionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -98,7 +96,7 @@ describe('DeletionModal Component', () => {
     );
 
     expect(getByText('Confirm Delete')).toBeInTheDocument();
-    expect(queryByText('Move to Trash')).not.toBeInTheDocument();
+    expect(queryByText('Move to Trash')).not.toBeVisible();
     expect(getByText('Delete Permanently')).toBeInTheDocument();
     expect(getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
   });
@@ -108,7 +106,6 @@ describe('DeletionModal Component', () => {
       <DeletionModal
         isOpen={true}
         files={[mockFiles[0]]}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -130,7 +127,6 @@ describe('DeletionModal Component', () => {
       <DeletionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -154,7 +150,6 @@ describe('DeletionModal Component', () => {
       <DeletionModal
         isOpen={true}
         files={[mockFiles[0]]}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -175,7 +170,6 @@ describe('DeletionModal Component', () => {
       <DeletionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -201,7 +195,6 @@ describe('DeletionModal Component', () => {
       <DeletionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -219,7 +212,6 @@ describe('DeletionModal Component', () => {
       <DeletionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -230,5 +222,144 @@ describe('DeletionModal Component', () => {
     fireEvent.click(getByText('Cancel'));
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
+  });
+
+  describe('Loading and Disabled States', () => {
+    describe('When trash is enabled', () => {
+      it('should show normal state when not loading', () => {
+        mockLoading.mockReturnValue(false);
+
+        const { getByRole } = render(
+          <DeletionModal
+            isOpen={true}
+            files={mockFiles}
+            onSuccess={mockOnSuccess}
+            onError={mockOnError}
+            onClose={mockOnClose}
+            isTrashEnabled={true}
+          />
+        );
+
+        const moveToTrashButton = getByRole('button', { name: 'Move to Trash' });
+        const deletePermButton = getByRole('button', { name: 'Delete Permanently' });
+        const cancelButton = getByRole('button', { name: 'Cancel' });
+
+        expect(moveToTrashButton).not.toBeDisabled();
+        expect(deletePermButton).not.toBeDisabled();
+        expect(cancelButton).not.toBeDisabled();
+
+        expect(moveToTrashButton).not.toHaveClass('ant-btn-loading');
+        expect(deletePermButton).not.toHaveClass('ant-btn-loading');
+      });
+
+      it('should disable modal close when loading', () => {
+        mockLoading.mockReturnValue(true);
+
+        const { container } = render(
+          <DeletionModal
+            isOpen={true}
+            files={mockFiles}
+            onSuccess={mockOnSuccess}
+            onError={mockOnError}
+            onClose={mockOnClose}
+            isTrashEnabled={true}
+          />
+        );
+
+        const closeButton = container.querySelector('.ant-modal-close');
+        expect(closeButton).not.toBeInTheDocument();
+      });
+
+      it('should show correct button states when loading is true', () => {
+        mockLoading.mockReturnValue(true);
+
+        const { getByRole } = render(
+          <DeletionModal
+            isOpen={true}
+            files={mockFiles}
+            onSuccess={mockOnSuccess}
+            onError={mockOnError}
+            onClose={mockOnClose}
+            isTrashEnabled={true}
+          />
+        );
+
+        const moveToTrashButton = getByRole('button', { name: 'Move to Trash' });
+        // Initially isMoveTrashClicked is false, so "Delete Permanently" should show loading
+        const deletePermButton = getByRole('button', { name: 'loading Delete Permanently' });
+        const cancelButton = getByRole('button', { name: 'Cancel' });
+
+        expect(moveToTrashButton).toBeDisabled();
+        expect(deletePermButton).toHaveClass('ant-btn-loading');
+        expect(cancelButton).toBeDisabled();
+      });
+    });
+
+    describe('When trash is disabled', () => {
+      it('should disable modal close when loading', () => {
+        mockLoading.mockReturnValue(true);
+
+        const { container } = render(
+          <DeletionModal
+            isOpen={true}
+            files={mockFiles}
+            onSuccess={mockOnSuccess}
+            onError={mockOnError}
+            onClose={mockOnClose}
+            isTrashEnabled={false}
+          />
+        );
+
+        const closeButton = container.querySelector('.ant-modal-close');
+        expect(closeButton).not.toBeInTheDocument();
+      });
+
+      it('should show normal state when not loading', () => {
+        mockLoading.mockReturnValue(false);
+
+        const { getByRole, queryByRole } = render(
+          <DeletionModal
+            isOpen={true}
+            files={mockFiles}
+            onSuccess={mockOnSuccess}
+            onError={mockOnError}
+            onClose={mockOnClose}
+            isTrashEnabled={false}
+          />
+        );
+
+        const deletePermButton = getByRole('button', { name: 'Delete Permanently' });
+        const cancelButton = getByRole('button', { name: 'Cancel' });
+
+        expect(queryByRole('button', { name: 'Move to Trash' })).not.toBeInTheDocument();
+        expect(deletePermButton).not.toBeDisabled();
+        expect(cancelButton).not.toBeDisabled();
+
+        expect(deletePermButton).not.toHaveClass('ant-btn-loading');
+      });
+
+      it('should show correct button states when loading is true', () => {
+        mockLoading.mockReturnValue(true);
+
+        const { getByRole, queryByRole } = render(
+          <DeletionModal
+            isOpen={true}
+            files={mockFiles}
+            onSuccess={mockOnSuccess}
+            onError={mockOnError}
+            onClose={mockOnClose}
+            isTrashEnabled={false}
+          />
+        );
+
+        const deletePermButton = getByRole('button', { name: 'loading Delete Permanently' });
+        const cancelButton = getByRole('button', { name: 'Cancel' });
+
+        expect(queryByRole('button', { name: 'Move to Trash' })).not.toBeInTheDocument();
+
+        expect(deletePermButton).toHaveClass('ant-btn-loading');
+        expect(cancelButton).toBeDisabled();
+      });
+    });
   });
 });

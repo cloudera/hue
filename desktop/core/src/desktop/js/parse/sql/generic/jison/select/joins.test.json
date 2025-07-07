@@ -103,9 +103,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "JOIN"
-      ]
+      "suggestKeywords": ["JOIN"]
     }
   },
   {
@@ -114,10 +112,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "JOIN",
-        "OUTER JOIN"
-      ]
+      "suggestKeywords": ["JOIN", "OUTER JOIN"]
     }
   },
   {
@@ -126,9 +121,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "JOIN"
-      ]
+      "suggestKeywords": ["JOIN"]
     }
   },
   {
@@ -137,10 +130,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "JOIN",
-        "OUTER JOIN"
-      ]
+      "suggestKeywords": ["JOIN", "OUTER JOIN"]
     }
   },
   {
@@ -149,9 +139,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "JOIN"
-      ]
+      "suggestKeywords": ["JOIN"]
     }
   },
   {
@@ -160,10 +148,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "JOIN",
-        "OUTER JOIN"
-      ]
+      "suggestKeywords": ["JOIN", "OUTER JOIN"]
     }
   },
   {
@@ -172,9 +157,7 @@
     "afterCursor": "",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "JOIN"
-      ]
+      "suggestKeywords": ["JOIN"]
     }
   },
   {
@@ -211,9 +194,7 @@
     "namePrefix": "should suggest join conditions",
     "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ",
     "afterCursor": "",
-    "containsKeywords": [
-      "ON"
-    ],
+    "containsKeywords": ["ON"],
     "expectedResult": {
       "lowerCase": false,
       "suggestJoinConditions": {
@@ -298,9 +279,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "suggestColumns": {
         "tables": [
@@ -357,9 +336,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -397,9 +374,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable1.testColumn1 = testTable2.testColumn3 AND ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": false,
       "suggestFunctions": {},
@@ -437,9 +412,7 @@
     "namePrefix": "should suggest tables",
     "beforeCursor": "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (",
     "afterCursor": " AND testTable1.testColumn1 = testTable2.testColumn3",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "locations": [
         {
@@ -654,9 +627,7 @@
     "namePrefix": "should suggest identifiers",
     "beforeCursor": "select * from testTable1 join db.testTable2 on ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "lowerCase": true,
       "suggestFunctions": {},
@@ -719,9 +690,7 @@
     "namePrefix": "should suggest identifiers",
     "beforeCursor": "select * from testTable1 JOIN testTable2 on (testTable1.testColumn1 = ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CASE"
-    ],
+    "containsKeywords": ["CASE"],
     "expectedResult": {
       "suggestValues": {},
       "colRef": {
@@ -735,14 +704,10 @@
         ]
       },
       "suggestFunctions": {
-        "types": [
-          "COLREF"
-        ]
+        "types": ["COLREF"]
       },
       "suggestColumns": {
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -791,9 +756,7 @@
         ]
       },
       "suggestColumns": {
-        "types": [
-          "COLREF"
-        ],
+        "types": ["COLREF"],
         "tables": [
           {
             "identifierChain": [
@@ -931,9 +894,7 @@
     "afterCursor": " JOIN",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "OUTER"
-      ]
+      "suggestKeywords": ["OUTER"]
     }
   },
   {
@@ -942,18 +903,14 @@
     "afterCursor": " JOIN",
     "expectedResult": {
       "lowerCase": false,
-      "suggestKeywords": [
-        "OUTER"
-      ]
+      "suggestKeywords": ["OUTER"]
     }
   },
   {
     "namePrefix": "should suggest joins",
     "beforeCursor": "SELECT * FROM testTable1 ",
     "afterCursor": "",
-    "containsKeywords": [
-      "JOIN"
-    ],
+    "containsKeywords": ["JOIN"],
     "expectedResult": {
       "lowerCase": false,
       "suggestJoins": {

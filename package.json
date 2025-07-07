@@ -181,6 +181,8 @@
     "style-lint": "stylelint \"desktop/core/src/desktop/static/desktop/less/**/*.less\" \"desktop/core/src/desktop/js/**/*.scss\"",
     "style-lint-fix": "npm run style-lint -- --fix",
     "lint-vue-template": "vti diagnostics",
+    "prettier": "prettier --check \"desktop/core/src/desktop/js\"",
+    "prettier-fix": "prettier --write desktop/core/src/desktop/js tools/sql-docs tools/jison",
     "lint": "eslint desktop/core/src/desktop/js tools/sql-docs tools/jison",
     "lint-debug": "npm run lint -- --debug",
     "lint-fix": "npm run lint -- --fix",

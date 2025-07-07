@@ -3,8 +3,6 @@
     "namePrefix": "should suggest keywords",
     "beforeCursor": "",
     "afterCursor": "",
-    "containsKeywords": [
-      "REFRESH"
-    ]
+    "containsKeywords": ["REFRESH"]
   }
 ]

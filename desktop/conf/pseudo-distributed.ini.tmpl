@@ -1049,6 +1049,19 @@
   ## Enable integration with Google Storage for RAZ
   # is_raz_gs_enabled=false
 
+  ## Configuration options for the importer
+  # ------------------------------------------------------------------------
+  [[importer]]
+  # Turns on the data importer functionality
+  ## is_enabled=false
+
+  # A limit on the local file size (bytes) that can be uploaded through the importer. The default is 157286400 bytes (150 MiB).
+  ## max_local_file_size_upload_limit=157286400
+
+  # Security setting to specify local file extensions that are not allowed to be uploaded through the importer.
+  # Provide a comma-separated list of extensions including the dot (e.g., ".exe, .zip, .rar, .tar, .gz").
+  ## restrict_local_file_extensions=.exe, .zip, .rar, .tar, .gz
+
 ###########################################################################
 # Settings to configure the snippets available in the Notebook
 ###########################################################################
@@ -1534,7 +1547,6 @@
     # Choose whether Hue should validate certificates received from the server.
     ## validate=true
 
-
 ###########################################################################
 # Settings to configure Metastore
 ###########################################################################
@@ -1542,6 +1554,9 @@
 [metastore]
   # Flag to turn on the new version of the create table wizard.
   ## enable_new_create_table=true
+
+  # Allow fetching sample data from views. By default, this is false to prevent potentially expensive queries.
+  ## allow_sample_data_from_views=false
 
   # Flag to force all metadata calls (e.g. list tables, table or column details...) to happen via HiveServer2 if available instead of Impala.
   ## force_hs2_metadata=false

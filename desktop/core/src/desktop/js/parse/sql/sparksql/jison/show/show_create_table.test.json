@@ -3,27 +3,21 @@
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW CREATE TABLE test;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should not find errors",
     "beforeCursor": "SHOW CREATE TABLE foo.test AS SERDE;",
     "afterCursor": "",
-    "containsKeywords": [
-      "SELECT"
-    ],
+    "containsKeywords": ["SELECT"],
     "noErrors": true
   },
   {
     "namePrefix": "should suggest keywords",
     "beforeCursor": "SHOW ",
     "afterCursor": "",
-    "containsKeywords": [
-      "CREATE TABLE"
-    ]
+    "containsKeywords": ["CREATE TABLE"]
   },
   {
     "namePrefix": "should suggest keywords",
