@@ -50,19 +50,14 @@ describe('EditColumnsModal', () => {
       />
     );
 
-    // Name inputs
     expect(screen.getByDisplayValue('col1')).toBeInTheDocument();
     expect(screen.getByDisplayValue('col2')).toBeInTheDocument();
 
-    // Type selects (use getByText for AntD Select)
     expect(screen.getByText('string')).toBeInTheDocument();
     expect(screen.getByText('int')).toBeInTheDocument();
 
-    // Sample values
     expect(screen.getByText('val1')).toBeInTheDocument();
     expect(screen.getByText('42')).toBeInTheDocument();
-
-    // Comment textareas
     expect(screen.getByDisplayValue('comment1')).toBeInTheDocument();
     expect(screen.getByDisplayValue('comment2')).toBeInTheDocument();
   });
@@ -82,25 +77,22 @@ describe('EditColumnsModal', () => {
 
     const user = userEvent.setup();
 
-    // Change the name of the first column
     const nameInputs = screen.getAllByDisplayValue('col1');
     await user.clear(nameInputs[0]);
     await user.type(nameInputs[0], 'newCol1');
 
-    // Change the type of the second column
     const typeSelects = screen.getAllByText('int').map(el => el.closest('.ant-select'));
     if (typeSelects[0]) {
       await user.click(typeSelects[0].querySelector('.ant-select-selector')!);
-      // Wait for the dropdown to appear and select the correct option by role and name
+
       const floatOption = await screen.findByRole('option', { name: 'float' });
       await user.click(floatOption);
     }
-    // Change the comment of the first column
+
     const commentInputs = screen.getAllByDisplayValue('comment1');
     await user.clear(commentInputs[0]);
     await user.type(commentInputs[0], 'new comment');
 
-    // Click Done (ok) button
     const doneButton = screen.getByText('Done');
     await user.click(doneButton);
 
