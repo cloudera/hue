@@ -22,7 +22,6 @@ import Input from 'cuix/dist/components/Input';
 import Select from 'cuix/dist/components/Select';
 import { SQL_TYPE_MAPPING_API_URL } from '../../../admin/Components/utils';
 import useLoadData from '../../../../utils/hooks/useLoadData/useLoadData';
-import LoadingErrorWrapper from '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './EditColumnsModal.scss';
 
@@ -182,9 +181,12 @@ const EditColumnsModal = ({
       onOk={handleDone}
       className="cuix antd hue-importer-edit-columns-modal"
     >
-      <LoadingErrorWrapper loading={sqlTypesLoading} errors={errors}>
-        <Table columns={modalColumns} dataSource={editRows} pagination={false} />
-      </LoadingErrorWrapper>
+      <Table
+        columns={modalColumns}
+        dataSource={editRows}
+        pagination={false}
+        loading={sqlTypesLoading}
+      />
     </Modal>
   );
 };
