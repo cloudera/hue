@@ -152,7 +152,7 @@ const EditColumnsModal = ({
         title: t('Sample'),
         dataIndex: 'sample',
         render: (text: string) => (
-          <span className="hue-importer-edit-columns-modal__sample-text">{text}</span>
+          <span>{text}</span>
         )
       },
       {
