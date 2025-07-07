@@ -35,33 +35,34 @@ import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 import './ImporterSourceSelector.scss';
 
-const fileSystems = {
-  s3a: {
-    icon: <S3Icon />,
-    title: 'Amazon S3'
-  },
-  hdfs: {
-    icon: <HDFSIcon />,
-    title: 'HDFS'
-  },
-  abfs: {
-    icon: <AdlsIcon />,
-    title: 'Azure Storage'
-  },
-  ofs: {
-    icon: <OzoneIcon />,
-    title: 'Ozone'
-  },
-  adls: {
-    icon: <AdlsIcon />,
-    title: 'Azure Storage'
-  },
-  gs: {
-    icon: <GoogleCloudIcon />,
-    title: 'Google Storage'
-  }
+const getFileSystems = t => {
+  return {
+    s3a: {
+      icon: <S3Icon />,
+      title: t('Amazon S3')
+    },
+    hdfs: {
+      icon: <HDFSIcon />,
+      title: t('HDFS')
+    },
+    abfs: {
+      icon: <AdlsIcon />,
+      title: t('Azure Storage')
+    },
+    ofs: {
+      icon: <OzoneIcon />,
+      title: t('Ozone')
+    },
+    adls: {
+      icon: <AdlsIcon />,
+      title: t('Azure Storage')
+    },
+    gs: {
+      icon: <GoogleCloudIcon />,
+      title: t('Google Storage')
+    }
+  };
 };
-
 interface ImporterSourceSelectorProps {
   setFileMetaData: (fileMetaData: FileMetaData) => void;
 }
@@ -72,6 +73,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
   );
   const [uploadError, setUploadError] = useState<string | undefined>(undefined);
   const { t } = i18nReact.useTranslation();
+  const fileSystems = getFileSystems(t);
 
   const {
     data: fileSystemsData,

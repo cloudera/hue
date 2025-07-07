@@ -30,6 +30,11 @@ jest.mock('../../../utils/hooks/useSaveData/useSaveData', () => ({
   }))
 }));
 
+jest.mock('../constants', () => ({
+  ...jest.requireActual('../constants'),
+  SUPPORTED_UPLOAD_TYPES: '.csv, .xlsx, .xls'
+}));
+
 const mockSetFileMetaData = jest.fn();
 const mockSetUploadError = jest.fn();
 
@@ -96,7 +101,7 @@ describe('LocalFileUploadOption', () => {
     });
 
     expect(mockSetUploadError).toHaveBeenCalledWith(
-      'File size exceeds the supported size (150 MB). Please use the S3, ABFS or HDFS browser to upload files.'
+      'File size exceeds the supported size (150 MB). Please use any file browser to upload files.'
     );
   });
 

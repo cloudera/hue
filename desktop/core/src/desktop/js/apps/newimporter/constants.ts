@@ -80,3 +80,5 @@ export const sourceConfigs: {
     options: []
   }
 ];
+
+export const SUPPORTED_UPLOAD_TYPES = '.csv, .xlsx, .xls';

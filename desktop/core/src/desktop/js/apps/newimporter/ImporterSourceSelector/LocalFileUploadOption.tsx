@@ -22,7 +22,7 @@ import { FileMetaData, ImporterFileSource, LocalFileUploadResponse } from '../ty
 import { UPLOAD_LOCAL_FILE_API_URL } from '../api';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import { i18nReact } from '../../../utils/i18nReact';
-
+import { SUPPORTED_UPLOAD_TYPES } from '../constants';
 interface LocalFileUploadOptionProps {
   setFileMetaData: (fileMetaData: FileMetaData) => void;
   setUploadError: (error: string) => void;
@@ -54,7 +54,7 @@ const LocalFileUploadOption = ({
     } else if (fileSize > 150 * 1000 * 1000) {
       setUploadError(
         t(
-          'File size exceeds the supported size (150 MB). Please use the S3, ABFS or HDFS browser to upload files.'
+          'File size exceeds the supported size (150 MB). Please use any file browser to upload files.'
         )
       );
     } else {
@@ -73,6 +73,7 @@ const LocalFileUploadOption = ({
     }
   };
 
+  //TODO: Add loader or extend fileUploadQueue to accept local file upload
   return (
     <div className="hue-importer__source-selector-option">
       <Button
@@ -90,7 +91,7 @@ const LocalFileUploadOption = ({
         data-testid="hue-file-input"
         className="hue-importer__source-selector-option-upload"
         onChange={handleFileUpload}
-        accept=".csv, .xlsx, .xls"
+        accept={SUPPORTED_UPLOAD_TYPES}
       />
     </div>
   );

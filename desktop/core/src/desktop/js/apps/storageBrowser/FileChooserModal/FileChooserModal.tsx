@@ -17,7 +17,7 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import Modal from 'cuix/dist/components/Modal';
 import { Input, InputRef, Tooltip } from 'antd';
-import Table, { ColumnProps } from 'cuix/dist/components/Table';
+import { ColumnProps } from 'cuix/dist/components/Table';
 import classNames from 'classnames';
 
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
@@ -32,6 +32,7 @@ import { useHuePubSub } from '../../../utils/hooks/useHuePubSub/useHuePubSub';
 import { FileStatus } from '../../../utils/hooks/useFileUpload/types';
 import UUID from '../../../utils/string/UUID';
 import { DEFAULT_POLLING_TIME } from '../../../utils/constants/storageBrowser';
+import { SUPPORTED_UPLOAD_TYPES } from '../../newimporter/constants';
 
 import { BrowserViewType, ListDirectory } from '../types';
 import { LIST_DIRECTORY_API_URL, CREATE_DIRECTORY_API_URL } from '../api';
@@ -40,6 +41,7 @@ import PathBrowser from '../../../reactComponents/PathBrowser/PathBrowser';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 import DragAndDrop from '../../../reactComponents/DragAndDrop/DragAndDrop';
 import BottomSlidePanel from '../../../reactComponents/BottomSlidePanel/BottomSlidePanel';
+import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import {
   FILE_UPLOAD_START_EVENT,
   FILE_UPLOAD_SUCCESS_EVENT
@@ -238,21 +240,20 @@ const FileChooserModal = ({
   ];
 
   const TableContent = (
-    <LoadingErrorWrapper loading={loading && !polling} errors={errorConfig}>
-      <Table
-        className="hue-filechooser-modal__table"
-        dataSource={tableData}
-        pagination={false}
-        columns={getColumns(tableData[0] ?? {})}
+    <LoadingErrorWrapper errors={errorConfig}>
+      <PaginatedTable<FileChooserTableData>
+        loading={loading && !polling}
+        data={tableData}
+        isDynamicHeight
         rowKey={r => `${r.path}__${r.type}__${r.name}`}
-        scroll={{ y: '250px' }}
+        locale={locale}
+        columns={getColumns(tableData[0] ?? {})}
         rowClassName={record =>
           record.type === BrowserViewType.file && !isFileSelectionAllowed
             ? classNames('hue-filechooser-modal__table-row', 'disabled-row')
             : 'hue-filechooser-modal__table-row'
         }
-        onRow={onRowClicked}
-        locale={locale}
+        onRowClick={onRowClicked}
         showHeader={false}
       />
     </LoadingErrorWrapper>
@@ -285,26 +286,6 @@ const FileChooserModal = ({
             handleSearch(event.target.value);
           }}
         />
-        <LoadingErrorWrapper loading={loading && !polling} errors={errorConfig}>
-          <Table
-            className="hue-filechooser-modal__table"
-            data-testid="hue-filechooser-modal__table"
-            dataSource={tableData}
-            pagination={false}
-            columns={getColumns(tableData[0] ?? {})}
-            rowKey={r => `${r.path}__${r.type}__${r.name}`}
-            scroll={{ y: '250px' }}
-            rowClassName={record =>
-              record.type === BrowserViewType.file && !isImport
-                ? classNames('hue-filechooser-modal__table-row', 'disabled-row')
-                : 'hue-filechooser-modal__table-row'
-            }
-            onRow={onRowClicked}
-            locale={locale}
-            showHeader={false}
-          />
-        </LoadingErrorWrapper>
-        {isImport ? <DragAndDrop onDrop={onFilesDrop}>{TableContent}</DragAndDrop> : TableContent}
         {isUploadEnabled ? (
           <DragAndDrop onDrop={onFilesDrop}>{TableContent}</DragAndDrop>
         ) : (
@@ -316,7 +297,7 @@ const FileChooserModal = ({
         type="file"
         className="hue-importer__source-selector-option-upload"
         onChange={handleFileUpload}
-        accept=".csv, .xlsx, .xls"
+        accept={SUPPORTED_UPLOAD_TYPES}
       />
       {showCreateFolderModal && (
         <BottomSlidePanel
