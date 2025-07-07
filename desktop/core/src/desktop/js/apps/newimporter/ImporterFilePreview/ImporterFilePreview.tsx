@@ -43,10 +43,14 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
   const [columns, setColumns] = useState<Column[]>([]);
-  const [destinationConfig, setDestinationConfig] = useState<any>({});
+  interface DestinationConfig {
+    connectorId?: string;
+    [key: string]: unknown;
+  }
+  const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({});
   const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
 
-  const handleDestinationSettingsChange = (newConfig: any) => {
+  const handleDestinationSettingsChange = (newConfig: DestinationConfig) => {
     setDestinationConfig(newConfig);
   };
 

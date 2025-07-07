@@ -23,7 +23,7 @@ import EditColumnsModal, { Column } from './EditColumnsModal';
 jest.mock(
   '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper',
   () =>
-    ({ children }: any) => <>{children}</>
+    ({ children }: { children: React.ReactNode }) => <>{children}</>
 );
 
 jest.mock('../../../../utils/hooks/useLoadData/useLoadData', () => () => ({

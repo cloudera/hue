@@ -58,11 +58,9 @@ const EditColumnsModal = ({
   const { t } = i18nReact.useTranslation();
   const [editRows, setEditRows] = useState<EditRow[]>([]);
 
-  const {
-    data: sqlTypesData,
-    loading: sqlTypesLoading,
-    error: sqlTypesError
-  } = useLoadData<string[]>(`${SQL_TYPE_MAPPING_API_URL}?sql_dialect=hive`);
+  const { data: sqlTypesData, loading: sqlTypesLoading } = useLoadData<string[]>(
+    `${SQL_TYPE_MAPPING_API_URL}?sql_dialect=hive`
+  );
 
   const sqlTypes = useMemo(() => {
     if (sqlTypesData && typeof sqlTypesData === 'object' && Object.keys(sqlTypesData).length > 0) {
@@ -70,17 +68,6 @@ const EditColumnsModal = ({
     }
     return [];
   }, [sqlTypesData]);
-
-  const errors = [
-    {
-      enabled: !!sqlTypesError,
-      message: t('Failed to fetch SQL types.')
-    },
-    {
-      enabled: !sqlTypesLoading && sqlTypes.length === 0,
-      message: t('No SQL types returned from server.')
-    }
-  ];
 
   useEffect(() => {
     setEditRows(
