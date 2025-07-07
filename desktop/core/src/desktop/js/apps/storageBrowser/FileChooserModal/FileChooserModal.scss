@@ -44,14 +44,8 @@ $icon-margin: 5px;
     }
   }
 
-  .hue-filechooser-modal__table {
-    .ant-table-placeholder {
-      height: $table-placeholder-height;
-      text-align: center;
-    }
-
+  .hue-table {
     th.ant-table-cell {
-      height: $cell-height;
       border: none;
     }
 
@@ -67,6 +61,8 @@ $icon-margin: 5px;
   }
 
   .hue-filechooser-modal__table-row {
+    height: $cell-height;
+
     :hover {
       cursor: pointer;
     }

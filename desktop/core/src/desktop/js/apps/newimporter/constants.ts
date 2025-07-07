@@ -74,3 +74,5 @@ export const sourceConfigs: {
     options: separator
   }
 ];
+
+export const SUPPORTED_UPLOAD_TYPES = '.csv, .xlsx, .xls';

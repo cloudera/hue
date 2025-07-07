@@ -80,7 +80,7 @@ describe('MoveCopy Action Component', () => {
   });
 
   describe('Copy Actions', () => {
-    it('should render correctly and open the modal', () => {
+    it('should render correctly and open the modal', async () => {
       const { getByText } = render(
         <MoveCopyModal
           isOpen={true}
@@ -93,8 +93,10 @@ describe('MoveCopy Action Component', () => {
         />
       );
 
-      expect(getByText('Copy to')).toBeInTheDocument();
-      expect(getByText('Copy')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(getByText('Copy to')).toBeInTheDocument();
+        expect(getByText('Copy')).toBeInTheDocument();
+      });
     });
 
     it('should call handleCopyOrMove with the correct data when the form is submitted', async () => {
@@ -195,7 +197,7 @@ describe('MoveCopy Action Component', () => {
   });
 
   describe('Move Actions', () => {
-    it('should render correctly and open the modal', () => {
+    it('should render correctly and open the modal', async () => {
       const { getByText } = render(
         <MoveCopyModal
           isOpen={true}
@@ -207,9 +209,10 @@ describe('MoveCopy Action Component', () => {
           onClose={mockOnClose}
         />
       );
-
-      expect(getByText('Move to')).toBeInTheDocument();
-      expect(getByText('Move')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(getByText('Move to')).toBeInTheDocument();
+        expect(getByText('Move')).toBeInTheDocument();
+      });
     });
 
     it('should call handleCopyOrMove with the correct data when the form is submitted', async () => {
