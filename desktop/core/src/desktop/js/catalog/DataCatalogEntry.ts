@@ -18,6 +18,7 @@ import * as ko from 'knockout';
 import KnockoutObservable from '@types/knockout';
 
 import { Cancellable, CancellablePromise } from 'api/cancellablePromise';
+import { getLastKnownConfig } from 'config/hueConfig';
 import {
   addNavTags,
   deleteNavTags,
@@ -1662,7 +1663,8 @@ export default class DataCatalogEntry {
       operation?: string;
     }
   ): CancellablePromise<Sample> {
-    if (this.isView()) {
+    const config = getLastKnownConfig();
+    if (this.isView() && (!config || !config.hue_config?.allow_sample_data_from_views)) {
       return CancellablePromise.reject();
     }
 

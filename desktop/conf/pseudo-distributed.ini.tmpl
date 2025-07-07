@@ -1547,7 +1547,6 @@
     # Choose whether Hue should validate certificates received from the server.
     ## validate=true
 
-
 ###########################################################################
 # Settings to configure Metastore
 ###########################################################################
@@ -1555,6 +1554,9 @@
 [metastore]
   # Flag to turn on the new version of the create table wizard.
   ## enable_new_create_table=true
+
+  # Allow fetching sample data from views. By default, this is false to prevent potentially expensive queries.
+  ## allow_sample_data_from_views=false
 
   # Flag to force all metadata calls (e.g. list tables, table or column details...) to happen via HiveServer2 if available instead of Impala.
   ## force_hs2_metadata=false

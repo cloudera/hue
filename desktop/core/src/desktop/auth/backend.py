@@ -28,14 +28,13 @@ Because Django's models are sometimes unfriendly, you'll want
 User to remain a django.contrib.auth.models.User object.
 """
 
-import sys
 import logging
 from builtins import object
 from importlib import import_module
 from pwd import getpwnam
 
-import requests
 import django.contrib.auth.backends
+import requests
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.forms import ValidationError
@@ -47,7 +46,7 @@ from desktop.conf import AUTH, ENABLE_ORGANIZATIONS, LDAP, OIDC
 from desktop.settings import LOAD_BALANCER_COOKIE
 from liboauth.metrics import oauth_authentication_time
 from useradmin import ldap_access
-from useradmin.models import User, UserProfile, get_default_user_group, get_profile, install_sample_user
+from useradmin.models import get_default_user_group, get_profile, install_sample_user, User, UserProfile
 from useradmin.organization import get_organization
 
 LOG = logging.getLogger()
@@ -69,11 +68,11 @@ except ImportError:
   LOG.warning('django_auth_ldap module not found')
   class LDAPSearch:
     pass
-  class LDAPSearch:
+  class LDAPBackend:
     pass
 
 try:
-  from mozilla_django_oidc.auth import OIDCAuthenticationBackend, default_username_algo
+  from mozilla_django_oidc.auth import default_username_algo, OIDCAuthenticationBackend
   from mozilla_django_oidc.utils import absolutify, import_from_settings
 except ImportError:
   LOG.warning('mozilla_django_oidc module not found')
@@ -288,7 +287,7 @@ class DesktopBackendBase(object):
     Implementors should return a boolean value which determines
     whether the given username and password pair is valid.
     """
-    raise NotImplemented("Abstract class - must implement check_auth")
+    raise NotImplementedError("Abstract class - must implement check_auth")
 
 
 class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
@@ -496,7 +495,7 @@ class LdapBackend(object):
               return User.objects.get_or_create(username=username)
           else:
             return User.objects.get_or_create(username=username)
-        except ValidationError as e:
+        except ValidationError:
           LOG.exception("LDAP username is invalid: %s" % username)
 
     self._backend = _LDAPBackend()

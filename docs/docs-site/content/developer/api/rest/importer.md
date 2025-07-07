@@ -5,8 +5,6 @@ draft: false
 weight: 4
 ---
 
-# File Import API
-
 The File Import API provides endpoints for uploading, analyzing, and previewing files that can be imported into various SQL engines. This API simplifies the process of creating database tables from files like CSV, TSV, and Excel spreadsheets.
 
 > **Note**: All API endpoints require authentication. For endpoints that work with remote files (`import_type=remote`), the API uses the file system permissions associated with the authenticated user's session.
@@ -549,7 +547,7 @@ Authentication errors will return a standard HTTP 401 Unauthorized response.
 
 Here's an example workflow that combines all the APIs to import a CSV file into a Hive table:
 
-### Step 1: Upload the file
+### 1: Upload the file
 
 ```javascript
 // Upload the CSV file
@@ -568,7 +566,7 @@ const uploadResult = await uploadResponse.json();
 const filePath = uploadResult.file_path;
 ```
 
-### Step 2: Detect file metadata
+### 2: Detect file metadata
 
 ```javascript
 // Get file metadata
@@ -591,7 +589,7 @@ const quoteChar = metadata.quote_char;
 const recordSeparator = metadata.record_separator;
 ```
 
-### Step 3: Check for header row
+### 3: Check for header row
 
 ```javascript
 // Detect if file has a header
@@ -612,7 +610,7 @@ const headerResult = await headerResponse.json();
 const hasHeader = headerResult.has_header;
 ```
 
-### Step 4: Preview the file with column type detection
+### 4: Preview the file with column type detection
 
 ```javascript
 // Generate file preview with SQL types
@@ -637,7 +635,7 @@ const previewResponse = await fetch(`https://demo.gethue.com/api/importer/file/p
 const preview = await previewResponse.json();
 ```
 
-### Step 5: Generate SQL CREATE TABLE statement
+### 5: Generate SQL CREATE TABLE statement
 
 ```javascript
 // Generate SQL CREATE TABLE statement
