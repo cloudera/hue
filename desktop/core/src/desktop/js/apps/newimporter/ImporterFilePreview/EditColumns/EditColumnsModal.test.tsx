@@ -81,11 +81,11 @@ describe('EditColumnsModal', () => {
     await user.clear(nameInputs[0]);
     await user.type(nameInputs[0], 'newCol1');
 
-    const typeSelects = screen.getAllByText('int').map(el => el.closest('.ant-select'));
+    const typeSelects = screen.getAllByText('string').map(el => el.closest('.ant-select'));
     if (typeSelects[0]) {
       await user.click(typeSelects[0].querySelector('.ant-select-selector')!);
 
-      const floatOption = await screen.findByRole('option', { name: 'float' });
+      const floatOption = await screen.findByTitle('float');
       await user.click(floatOption);
     }
 
@@ -98,7 +98,7 @@ describe('EditColumnsModal', () => {
 
     await waitFor(() => {
       expect(setColumns).toHaveBeenCalledWith([
-        { ...columns[0], title: 'newCol1', type: 'string', comment: 'new comment' },
+        { ...columns[0], title: 'newCol1', type: 'float', comment: 'new comment' },
         { ...columns[1], title: 'col2', type: 'int', comment: 'comment2' }
       ]);
       expect(closeModal).toHaveBeenCalled();
