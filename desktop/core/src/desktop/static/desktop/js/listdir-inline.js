@@ -1448,7 +1448,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
               onComplete: function (id, fileName, response) {
                 self.pendingUploads(self.pendingUploads() - 1);
                 if (response.status != 0) {
-                  huePubSub.publish('hue.global.error', {message: window.I18n('Error: ') + response.data});
+                  huePubSub.publish('hue.global.error', {message: response.data});
                 }
                 else {
                   var task_id = response.task_id;
@@ -1562,7 +1562,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
               onComplete: function (id, fileName, response) {
                 self.pendingUploads(self.pendingUploads() - 1);
                 if (response.status != 0) {
-                  huePubSub.publish('hue.global.error', {message: window.I18n('Error: ') + response.data});
+                  huePubSub.publish('hue.global.error', {message: response.data});
                 }
                 else {
                   huePubSub.publish('hue.global.info', {message: response.path + window.I18n(' uploaded successfully.')});
@@ -1628,7 +1628,7 @@ var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
           onComplete: function (id, fileName, response) {
             self.pendingUploads(self.pendingUploads() - 1);
             if (response.status != 0) {
-              huePubSub.publish('hue.global.error', {message: window.I18n('Error: ') + response.data});
+              huePubSub.publish('hue.global.error', {message: response.data});
               
             }
             else {

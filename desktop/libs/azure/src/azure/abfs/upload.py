@@ -14,13 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import logging
 import unicodedata
 from io import BytesIO
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.files.uploadhandler import FileUploadHandler, SkipFile, StopFutureHandlers, StopUpload, UploadFileException
+from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload, UploadFileException
 from django.utils.translation import gettext as _
 
 from azure.abfs.__init__ import parse_uri
@@ -28,8 +27,7 @@ from azure.abfs.abfs import ABFSFileSystemException
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
-from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
-from filebrowser.utils import calculate_total_size, generate_chunks
+from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed
 
 DEFAULT_WRITE_SIZE = 100 * 1024 * 1024  # As per Azure doc, maximum blob size is 100MB
 
@@ -59,6 +57,13 @@ class ABFSFineUploaderChunkedUpload(object):
       self._fs.stats(self.destination)
 
   def check_access(self):
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(self.file_name)
+    if not is_allowed:
+      LOG.error(err_message)
+      self._request.META["upload_failed"] = err_message
+      raise PopupException(err_message)
+
     LOG.info('ABFSFineUploaderChunkedUpload: handle file upload wit temp file %s.' % self.file_name)
     self.target_path = self._fs.join(self.destination, self.file_name)
     self.filepath = self.target_path
@@ -73,7 +78,7 @@ class ABFSFineUploaderChunkedUpload(object):
         self._fs.create(self.target_path)
     except (ABFSFileUploadError, ABFSFileSystemException) as e:
       LOG.error("ABFSFineUploaderChunkedUpload: Encountered error in ABFSUploadHandler check_access: %s" % e)
-      self.request.META['upload_failed'] = e
+      self._request.META["upload_failed"] = e
       raise PopupException("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s failed %s" % (self.target_path, e))
 
     if self.totalfilesize != calculate_total_size(self.qquuid, self.qqtotalparts):
@@ -90,7 +95,7 @@ class ABFSFineUploaderChunkedUpload(object):
         self._fs.create(self.target_path)
       except (ABFSFileUploadError, ABFSFileSystemException) as e:
         LOG.error("ABFSFineUploaderChunkedUpload: Encountered error in ABFSUploadHandler check_access: %s" % e)
-        self.request.META['upload_failed'] = e
+        self._request.META['upload_failed'] = e
         raise PopupException("ABFSFineUploaderChunkedUpload: Initiating ABFS upload to target path: %s failed %s" % (self.target_path, e))
 
     try:
@@ -162,6 +167,7 @@ class ABFSFileUploadHandler(FileUploadHandler):
     self.file = None
     self._request = request
     self._part_size = DEFAULT_WRITE_SIZE
+    self._upload_rejected = False
 
     if self._is_abfs_upload():
       self._fs = self._get_abfs(request)
@@ -175,11 +181,13 @@ class ABFSFileUploadHandler(FileUploadHandler):
     if self._is_abfs_upload():
       LOG.info('Using ABFSFileUploadHandler to handle file upload wit temp file%s.' % file_name)
 
-      _, file_type = os.path.splitext(file_name)
-      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+      # Check file extension restrictions
+      is_allowed, err_message = is_file_upload_allowed(file_name)
+      if not is_allowed:
         LOG.error(err_message)
-        raise Exception(err_message)
+        self._request.META['upload_failed'] = err_message
+        self._upload_rejected = True
+        return None
 
       super(ABFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
@@ -198,6 +206,8 @@ class ABFSFileUploadHandler(FileUploadHandler):
         raise StopUpload()
 
   def receive_data_chunk(self, raw_data, start):
+    if self._upload_rejected:
+      return None
     if self._is_abfs_upload():
       try:
         LOG.debug("ABFSFileUploadHandler uploading file part with size: %s" % self._part_size)
@@ -212,6 +222,8 @@ class ABFSFileUploadHandler(FileUploadHandler):
       return raw_data
 
   def file_complete(self, file_size):
+    if self._upload_rejected:
+      return None
     if self._is_abfs_upload():
       # finish the upload
       self._fs.flush(self.target_path, {'position': int(file_size)})

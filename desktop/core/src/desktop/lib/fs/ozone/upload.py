@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import io
-import os
 import logging
 import unicodedata
 
@@ -26,8 +25,7 @@ from django.utils.translation import gettext as _
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
-from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
-from filebrowser.utils import calculate_total_size, generate_chunks
+from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -52,13 +50,20 @@ class OFSFineUploaderChunkedUpload(object):
     self._part_size = UPLOAD_CHUNK_SIZE.get()
 
   def check_access(self):
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(self.file_name)
+    if not is_allowed:
+      LOG.error(err_message)
+      self._request.META["upload_failed"] = err_message
+      raise PopupException(err_message)
+
     if self._is_ofs_upload():
       self._fs = self._get_ofs(self._request)
 
       # Verify that the path exists
       try:
         self._fs.stats(self.destination)
-      except Exception as e:
+      except Exception:
         raise PopupException(_('Destination path does not exist: %s' % self.destination))
 
       LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
@@ -82,7 +87,7 @@ class OFSFineUploaderChunkedUpload(object):
         # Verify that the path exists
         try:
           self._fs.stats(self.destination)
-        except Exception as e:
+        except Exception:
           raise PopupException(_('Destination path does not exist: %s' % self.destination))
 
         LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
@@ -189,6 +194,7 @@ class OFSFileUploadHandler(FileUploadHandler):
     self.file = None
     self._request = request
     self._part_size = UPLOAD_CHUNK_SIZE.get()
+    self._upload_rejected = False
 
     if self._is_ofs_upload():
       self._fs = self._get_ofs(request)
@@ -196,7 +202,7 @@ class OFSFileUploadHandler(FileUploadHandler):
       # Verify that the path exists
       try:
         self._fs.stats(self.destination)
-      except Exception as e:
+      except Exception:
         raise OFSFileUploadError(_('Destination path does not exist: %s' % self.destination))
 
     LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
@@ -205,11 +211,13 @@ class OFSFileUploadHandler(FileUploadHandler):
     if self._is_ofs_upload():
       LOG.info('Using OFSFileUploadHandler to handle file upload.')
 
-      _, file_type = os.path.splitext(file_name)
-      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+      # Check file extension restrictions
+      is_allowed, err_message = is_file_upload_allowed(file_name)
+      if not is_allowed:
         LOG.error(err_message)
-        raise Exception(err_message)
+        self._request.META['upload_failed'] = err_message
+        self._upload_rejected = True
+        return None
 
       super(OFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
@@ -223,10 +231,12 @@ class OFSFileUploadHandler(FileUploadHandler):
         raise StopFutureHandlers()
       except (OFSFileUploadError, WebHdfsException) as e:
         LOG.error("Encountered error in OFSUploadHandler check_access: %s" % e)
-        self.request.META['upload_failed'] = e
+        self._request.META["upload_failed"] = e
         raise StopUpload()
 
   def receive_data_chunk(self, raw_data, start):
+    if self._upload_rejected:
+      return None
     if self._is_ofs_upload():
       LOG.debug("OFSfileUploadHandler receive_data_chunk")
       try:
@@ -240,6 +250,8 @@ class OFSFileUploadHandler(FileUploadHandler):
       return raw_data
 
   def file_complete(self, file_size):
+    if self._upload_rejected:
+      return None
     if self._is_ofs_upload():
       # Finish the upload
       LOG.info("OFSFileUploadHandler has completed file upload to OFS, total file size is: %d." % file_size)

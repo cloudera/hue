@@ -15,20 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import io
-import os
-import re
-import sys
-import json
-import stat as stat_module
 import errno
+import json
 import logging
-import operator
 import mimetypes
+import operator
+import os
 import posixpath
-import urllib.error
-import urllib.request
-from builtins import object, str as new_str
+import re
+import stat as stat_module
+from builtins import str as new_str
 from bz2 import decompress
 from datetime import datetime
 from functools import partial
@@ -37,29 +33,28 @@ from io import BytesIO, StringIO as string_io
 from urllib.parse import quote as urllib_quote, unquote as urllib_unquote, urlparse as lib_urlparse
 
 import pandas as pd
-from avro import datafile, io
-from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
-from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
+from avro import datafile, io as avro_io
+from django.core.files.uploadhandler import StopUpload
+from django.core.paginator import EmptyPage, InvalidPage, Paginator
+from django.http import Http404, HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.template.defaultfilters import filesizeformat, stringformat
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import http_date
 from django.utils.translation import gettext as _
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 
-from aws.s3.s3fs import S3FileSystemException, S3ListAllBucketsException, get_s3_home_directory
+from aws.s3.s3fs import get_s3_home_directory, S3FileSystemException, S3ListAllBucketsException
 from aws.s3.upload import S3FineUploaderChunkedUpload
 from azure.abfs.upload import ABFSFineUploaderChunkedUpload
 from desktop import appmanager
 from desktop.auth.backend import is_admin
-from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, RAZ, TASK_SERVER_V2
-from desktop.lib import fsmanager, i18n
+from desktop.conf import RAZ, TASK_SERVER_V2
+from desktop.lib import i18n
 from desktop.lib.conf import coerce_bool
-from desktop.lib.django_util import JsonResponse, format_preserving_redirect, render
+from desktop.lib.django_util import format_preserving_redirect, JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import file_reader
 from desktop.lib.fs import splitpath
@@ -94,17 +89,13 @@ from filebrowser.forms import (
   SetReplicationFactorForm,
   TouchForm,
   TrashPurgeForm,
-  UploadArchiveForm,
   UploadFileForm,
 )
 from filebrowser.lib import xxd
-from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
-from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.core_site import get_trash_interval
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
-from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.upload import HDFSFineUploaderChunkedUpload, LocalFineUploaderChunkedUpload
 from useradmin.models import Group, User
 
@@ -219,7 +210,6 @@ def download(request, path):
   content_type = mimetypes.guess_type(path)[0] or 'application/octet-stream'
   stats = request.fs.stats(path)
   mtime = stats['mtime']
-  size = stats['size']
   if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), mtime):
     return HttpResponseNotModified()
     # TODO(philip): Ideally a with statement would protect from leaks, but tricky to do here.
@@ -955,7 +945,7 @@ def _read_avro(fhandle, path, offset, length, stats):
   contents = ''
   try:
     fhandle.seek(offset)
-    data_file_reader = datafile.DataFileReader(fhandle, io.DatumReader())
+    data_file_reader = datafile.DataFileReader(fhandle, avro_io.DatumReader())
 
     try:
       contents_list = []
@@ -1072,11 +1062,11 @@ def detect_parquet(fhandle):
 def snappy_installed():
   '''Snappy is library that isn't supported by python2.4'''
   try:
-    import snappy
+    import snappy  # noqa: F401
     return True
   except ImportError:
     return False
-  except Exception as e:
+  except Exception:
     logging.exception('failed to verify if snappy is installed')
     return False
 
@@ -1122,12 +1112,12 @@ def formset_initial_value_extractor(request, parameter_names):
   The formsets should then handle construction on their own.
   """
   def _intial_value_extractor(request):
-    if not submitted:
+    if not submitted:  # noqa: F821
       return []
     # Build data with list of in order parameters receive in POST data
     # Size can be inferred from largest list returned in POST data
     data = []
-    for param in submitted:
+    for param in submitted:  # noqa: F821
       i = 0
       for val in request.POST.getlist(param):
         if len(data) == i:
@@ -1136,7 +1126,7 @@ def formset_initial_value_extractor(request, parameter_names):
         i += 1
     # Extend every data object with recurring params
     for kwargs in data:
-      for recurrent in recurring:
+      for recurrent in recurring:  # noqa: F821
         kwargs[recurrent] = request.POST.get(recurrent)
     initial_data = data
     return {'initial': initial_data}
@@ -1254,7 +1244,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
         if piggyback:
           piggy_path = form.cleaned_data.get(piggyback)
           ret["result"] = _massage_stats(request, stat_absolute_path(piggy_path, request.fs.stats(piggy_path)))
-      except Exception as e:
+      except Exception:
         # Hard to report these more naturally here.  These happen either
         # because of a bug in the piggy-back code or because of a
         # race condition.
@@ -1538,11 +1528,11 @@ def upload_chunks(request):
     for _ in request.FILES.values():  # This processes the upload.
       pass
   except StopUpload:
-    return JsonResponse({'success': False, 'error': 'Error in upload'})
+    return JsonResponse({"success": False, "error": "Error in upload"})
 
   # case where file is larger than the single chunk size
   if int(request.GET.get("qqtotalparts", 0)) > 0:
-    return JsonResponse({'success': True, 'uuid': request.GET.get('qquuid')})
+    return JsonResponse({"success": True, "uuid": request.GET.get("qquuid")})
 
   # case where file is smaller than the chunk size
   if int(request.GET.get("qqtotalparts", 0)) == 0:
@@ -1550,9 +1540,14 @@ def upload_chunks(request):
     try:
       response = perform_upload_task(request, **chunks)
       return JsonResponse(response)
+    except PopupException as e:
+      logger.error(f"Upload failed: {e}")
+      return JsonResponse({"success": False, "error": str(e)})
     except Exception as e:
-      return JsonResponse({'success': False, 'error': 'Error in upload %s' % str(e)})
-  return JsonResponse({'success': False, 'error': 'Unsupported request method'})
+      # For unexpected exceptions, log the full error but return a generic message
+      logger.exception(f"Unexpected error during upload: {e}")
+      return JsonResponse({"success": False, "error": "Upload failed due to an unexpected error"})
+  return JsonResponse({"success": False, "error": "Unsupported request method"})
 
 
 @require_http_methods(["POST"])
@@ -1568,8 +1563,13 @@ def upload_complete(request):
   try:
     response = perform_upload_task(request, **chunks)
     return JsonResponse(response)
+  except PopupException as e:
+    logger.error(f"Upload failed: {e}")
+    return JsonResponse({"success": False, "error": str(e)})
   except Exception as e:
-    return JsonResponse({'success': False, 'error': 'Error in upload'})
+    # For unexpected exceptions, log the full error but return a generic message
+    logger.exception(f"Unexpected error during upload: {e}")
+    return JsonResponse({"success": False, "error": "Upload failed due to an unexpected error"})
 
 
 @require_http_methods(["POST"])
