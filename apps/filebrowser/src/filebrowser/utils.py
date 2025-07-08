@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import io
-import os
 import logging
+import os
 from datetime import datetime
 from urllib.parse import urlparse
 
@@ -23,7 +23,7 @@ import redis
 
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.django_util import JsonResponse
-from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+from filebrowser.conf import ALLOW_FILE_EXTENSIONS, ARCHIVE_UPLOAD_TEMPDIR, RESTRICT_FILE_EXTENSIONS
 
 LOG = logging.getLogger()
 
@@ -130,3 +130,41 @@ def release_reserved_space_for_file_uploads(uuid):
     LOG.exception("Failed to release reserved space: %s", str(e))
   finally:
     redis_client.close()
+
+
+def is_file_upload_allowed(file_name):
+  """
+  Check if a file upload is allowed based on file extension restrictions.
+
+  Args:
+    file_name: The name of the file being uploaded
+
+  Returns:
+    tuple: (is_allowed, error_message)
+      - is_allowed: Boolean indicating if the file upload is allowed
+      - error_message: String with error message if not allowed, None otherwise
+  """
+  if not file_name:
+    return True, None
+
+  _, file_type = os.path.splitext(file_name)
+  if file_type:
+    file_type = file_type.lower()
+
+  # Check allow list first - if set, only these extensions are allowed
+  allow_list = ALLOW_FILE_EXTENSIONS.get()
+  if allow_list:
+    # Normalize extensions to lowercase with dots
+    normalized_allow_list = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in allow_list]
+    if file_type not in normalized_allow_list:
+      return False, f'File type "{file_type}" is not permitted. Modify file extension settings to allow this type.'
+
+  # Check restrict list - if set, these extensions are not allowed
+  restrict_list = RESTRICT_FILE_EXTENSIONS.get()
+  if restrict_list:
+    # Normalize extensions to lowercase with dots
+    normalized_restrict_list = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in restrict_list]
+    if file_type in normalized_restrict_list:
+      return False, f'File type "{file_type}" is restricted. Update file extension restrictions to allow this type.'
+
+  return True, None
