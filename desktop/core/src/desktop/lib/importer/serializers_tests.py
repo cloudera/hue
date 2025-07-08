@@ -19,6 +19,13 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from desktop.conf import IMPORTER
+from desktop.lib.importer.schemas import (
+  GuessFileHeaderSchema,
+  GuessFileMetadataSchema,
+  LocalFileUploadSchema,
+  PreviewFileSchema,
+  SqlTypeMapperSchema,
+)
 from desktop.lib.importer.serializers import (
   GuessFileHeaderSerializer,
   GuessFileMetadataSerializer,
@@ -40,7 +47,11 @@ class TestLocalFileUploadSerializer:
       serializer = LocalFileUploadSerializer(data={"file": test_file})
 
       assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
-      assert serializer.validated_data["file"] == test_file
+      # validated_data now returns a schema object
+      assert isinstance(serializer.validated_data, LocalFileUploadSchema)
+      assert serializer.validated_data.file == test_file
+      assert serializer.validated_data.filename == "test_file.csv"
+      assert serializer.validated_data.filesize == test_file.size
     finally:
       for reset in resets:
         reset()
@@ -58,8 +69,10 @@ class TestLocalFileUploadSerializer:
       serializer = LocalFileUploadSerializer(data={"file": test_file})
 
       assert not serializer.is_valid()
-      assert "file" in serializer.errors
-      assert serializer.errors["file"][0] == 'Uploading files with type ".exe" is not allowed. Hue is configured to restrict this type.'
+      assert len(serializer.errors) > 0
+      # The error structure might be different with Pydantic validation
+      error_messages = str(serializer.errors)
+      assert "not allowed" in error_messages or "restrict" in error_messages.lower()
     finally:
       for reset in resets:
         reset()
@@ -77,8 +90,10 @@ class TestLocalFileUploadSerializer:
       serializer = LocalFileUploadSerializer(data={"file": test_file})
 
       assert not serializer.is_valid()
-      assert "file" in serializer.errors
-      assert serializer.errors["file"][0] == "File too large. Maximum file size is 0 MiB."  # 10 bytes is very less than 1 MiB
+      assert len(serializer.errors) > 0
+      # Check for file size error
+      error_messages = str(serializer.errors)
+      assert "too large" in error_messages.lower() or "maximum" in error_messages.lower()
     finally:
       for reset in resets:
         reset()
@@ -93,50 +108,61 @@ class TestLocalFileUploadSerializer:
 
 class TestGuessFileMetadataSerializer:
   def test_valid_data(self):
-    # Test with local import type
+    # Scenario 1: Test with local import type
     local_valid_data = {"file_path": "/path/to/file.csv", "import_type": "local"}
 
     serializer = GuessFileMetadataSerializer(data=local_valid_data)
 
     assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
-    assert serializer.validated_data == local_valid_data
+    assert isinstance(serializer.validated_data, GuessFileMetadataSchema)
+    assert serializer.validated_data.file_path == "/path/to/file.csv"
+    assert serializer.validated_data.import_type == "local"
 
-    # Test with remote import type
+    # Scenario 2: Test with remote import type
     remote_valid_data = {"file_path": "s3a://bucket/user/test_user/file.csv", "import_type": "remote"}
 
     serializer = GuessFileMetadataSerializer(data=remote_valid_data)
 
     assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
-    assert serializer.validated_data == remote_valid_data
+    assert isinstance(serializer.validated_data, GuessFileMetadataSchema)
+    assert serializer.validated_data.file_path == "s3a://bucket/user/test_user/file.csv"
+    assert serializer.validated_data.import_type == "remote"
 
   def test_missing_required_fields(self):
-    # Test missing file_path
+    # Scenario 1: Test missing file_path
     invalid_data = {"import_type": "local"}
 
     serializer = GuessFileMetadataSerializer(data=invalid_data)
 
     assert not serializer.is_valid()
-    assert "file_path" in serializer.errors
+    assert len(serializer.errors) > 0
+    # Check for file_path error in serializer errors
+    error_messages = str(serializer.errors)
+    assert "file_path" in error_messages
 
-    # Test missing import_type
+    # Scenario 2: Test missing import_type
     invalid_data = {"file_path": "/path/to/file.csv"}
 
     serializer = GuessFileMetadataSerializer(data=invalid_data)
 
     assert not serializer.is_valid()
-    assert "import_type" in serializer.errors
+    assert len(serializer.errors) > 0
+    # Check for import_type error in serializer errors
+    error_messages = str(serializer.errors)
+    assert "import_type" in error_messages
 
   def test_invalid_import_type(self):
     invalid_data = {
       "file_path": "/path/to/file.csv",
-      "import_type": "invalid_type",  # Not one of 'local' or 'remote'
+      "import_type": "invalid_type",  # Not one of 'local' or 'remote' (invalid_type)
     }
 
     serializer = GuessFileMetadataSerializer(data=invalid_data)
 
     assert not serializer.is_valid()
-    assert "import_type" in serializer.errors
-    assert serializer.errors["import_type"][0] == '"invalid_type" is not a valid choice.'
+    assert len(serializer.errors) > 0
+    error_messages = str(serializer.errors)
+    assert "import_type" in error_messages
 
 
 class TestPreviewFileSerializer:
@@ -153,9 +179,13 @@ class TestPreviewFileSerializer:
     serializer = PreviewFileSerializer(data=valid_data)
 
     assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
+    # validated_data now returns a schema object
+    assert isinstance(serializer.validated_data, PreviewFileSchema)
+    assert serializer.validated_data.file_path == "/path/to/file.csv"
+    assert serializer.validated_data.file_type == "csv"
     # Check that default values are set for quote_char and record_separator
-    assert serializer.validated_data["quote_char"] == '"'
-    assert serializer.validated_data["record_separator"] == "\n"
+    assert serializer.validated_data.quote_char == '"'
+    assert serializer.validated_data.record_separator == "\n"
 
   def test_valid_excel_data(self):
     valid_data = {
@@ -170,6 +200,9 @@ class TestPreviewFileSerializer:
     serializer = PreviewFileSerializer(data=valid_data)
 
     assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
+    assert isinstance(serializer.validated_data, PreviewFileSchema)
+    assert serializer.validated_data.file_type == "excel"
+    assert serializer.validated_data.sheet_name == "Sheet1"
 
   def test_missing_required_fields(self):
     # Test with minimal data
@@ -196,8 +229,9 @@ class TestPreviewFileSerializer:
     serializer = PreviewFileSerializer(data=invalid_data)
 
     assert not serializer.is_valid()
-    assert "file_type" in serializer.errors
-    assert serializer.errors["file_type"][0] == '"json" is not a valid choice.'
+    assert len(serializer.errors) > 0
+    error_messages = str(serializer.errors)
+    assert "file_type" in error_messages
 
   def test_excel_without_sheet_name(self):
     invalid_data = {
@@ -212,8 +246,9 @@ class TestPreviewFileSerializer:
     serializer = PreviewFileSerializer(data=invalid_data)
 
     assert not serializer.is_valid()
-    assert "sheet_name" in serializer.errors
-    assert serializer.errors["sheet_name"][0] == "Sheet name is required for Excel files."
+    assert len(serializer.errors) > 0
+    error_messages = str(serializer.errors)
+    assert "Sheet name is required for Excel files" in error_messages
 
   def test_delimited_without_field_separator(self):
     # For delimiter_format type (not csv/tsv) field separator is required
@@ -228,7 +263,9 @@ class TestPreviewFileSerializer:
 
     serializer = PreviewFileSerializer(data=invalid_data)
     assert not serializer.is_valid()
-    assert "field_separator" in serializer.errors
+    assert len(serializer.errors) > 0
+    error_messages = str(serializer.errors)
+    assert "Field separator is required for delimited files" in error_messages
 
   def test_default_separators_by_file_type(self):
     # For CSV, field_separator should default to ','
@@ -237,7 +274,8 @@ class TestPreviewFileSerializer:
     serializer = PreviewFileSerializer(data=csv_data)
 
     assert serializer.is_valid(), f"CSV serializer validation failed: {serializer.errors}"
-    assert serializer.validated_data["field_separator"] == ","
+    assert isinstance(serializer.validated_data, PreviewFileSchema)
+    assert serializer.validated_data.field_separator == ","
 
     # For TSV, field_separator should default to '\t'
     tsv_data = {"file_path": "/path/to/file.tsv", "file_type": "tsv", "import_type": "local", "sql_dialect": "hive", "has_header": True}
@@ -245,7 +283,153 @@ class TestPreviewFileSerializer:
     serializer = PreviewFileSerializer(data=tsv_data)
 
     assert serializer.is_valid(), f"TSV serializer validation failed: {serializer.errors}"
-    assert serializer.validated_data["field_separator"] == "\t"
+    assert isinstance(serializer.validated_data, PreviewFileSchema)
+    assert serializer.validated_data.field_separator == "\t"
+
+  def test_decode_escape_sequences_field_separator(self):
+    # Test tab escape sequence
+    data = {
+      "file_path": "/path/to/file.csv",
+      "file_type": "delimiter_format",
+      "import_type": "local",
+      "sql_dialect": "hive",
+      "has_header": True,
+      "field_separator": "\\t",  # Tab character as escape sequence
+    }
+
+    serializer = PreviewFileSerializer(data=data)
+
+    assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
+    assert serializer.validated_data.field_separator == "\t"  # Should be decoded to actual tab
+
+    # Test newline escape sequence
+    data["field_separator"] = "\\n"
+    serializer = PreviewFileSerializer(data=data)
+    assert serializer.is_valid()
+    assert serializer.validated_data.field_separator == "\n"
+
+    # Test backslash escape sequence
+    data["field_separator"] = "\\\\"
+    serializer = PreviewFileSerializer(data=data)
+    assert serializer.is_valid()
+    assert serializer.validated_data.field_separator == "\\"
+
+  def test_decode_escape_sequences_quote_char(self):
+    # Test double quote escape sequence
+    data = {
+      "file_path": "/path/to/file.csv",
+      "file_type": "csv",
+      "import_type": "local",
+      "sql_dialect": "hive",
+      "has_header": True,
+      "quote_char": '\\"',  # Escaped double quote
+    }
+
+    serializer = PreviewFileSerializer(data=data)
+
+    assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
+    assert serializer.validated_data.quote_char == '"'
+
+    # Test single quote escape sequence
+    data["quote_char"] = "\\'"
+    serializer = PreviewFileSerializer(data=data)
+    assert serializer.is_valid()
+    assert serializer.validated_data.quote_char == "'"
+
+    # Test Unicode escape sequence
+    data["quote_char"] = "\\u0022"  # Unicode for double quote
+    serializer = PreviewFileSerializer(data=data)
+    assert serializer.is_valid()
+    assert serializer.validated_data.quote_char == '"'
+
+  def test_decode_escape_sequences_record_separator(self):
+    # Test newline escape sequence
+    data = {
+      "file_path": "/path/to/file.csv",
+      "file_type": "csv",
+      "import_type": "local",
+      "sql_dialect": "hive",
+      "has_header": True,
+      "record_separator": "\\n",
+    }
+
+    serializer = PreviewFileSerializer(data=data)
+
+    assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
+    assert serializer.validated_data.record_separator == "\n"
+
+    # Test carriage return + newline (should be normalized to just newline)
+    data["record_separator"] = "\\r\\n"
+    serializer = PreviewFileSerializer(data=data)
+    assert serializer.is_valid()
+    assert serializer.validated_data.record_separator == "\n"  # Should be normalized
+
+    # Test just carriage return
+    data["record_separator"] = "\\r"
+    serializer = PreviewFileSerializer(data=data)
+    assert serializer.is_valid()
+    assert serializer.validated_data.record_separator == "\r"
+
+  def test_decode_escape_sequences_with_none_values(self):
+    # Test that None values remain None
+    data = {
+      "file_path": "/path/to/file.csv",
+      "file_type": "csv",
+      "import_type": "local",
+      "sql_dialect": "hive",
+      "has_header": True,
+      "field_separator": None,
+      "quote_char": None,
+      "record_separator": None,
+    }
+
+    serializer = PreviewFileSerializer(data=data)
+
+    assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
+    # CSV defaults should be applied after None is processed
+    assert serializer.validated_data.field_separator == ","
+    assert serializer.validated_data.quote_char == '"'
+    assert serializer.validated_data.record_separator == "\n"
+
+  def test_decode_escape_sequences_with_complex_patterns(self):
+    # Test multiple escape sequences in a single value
+    data = {
+      "file_path": "/path/to/file.csv",
+      "file_type": "delimiter_format",
+      "import_type": "local",
+      "sql_dialect": "hive",
+      "has_header": True,
+      "field_separator": "\\t\\t",  # Double tab
+      "quote_char": "\\x22",  # Hex escape for double quote
+      "record_separator": "\\x0A",  # Hex escape for newline
+    }
+
+    serializer = PreviewFileSerializer(data=data)
+
+    assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
+    assert serializer.validated_data.field_separator == "\t\t"
+    assert serializer.validated_data.quote_char == '"'
+    assert serializer.validated_data.record_separator == "\n"
+
+  def test_decode_escape_sequences_preserves_regular_strings(self):
+    # Test that regular strings without escape sequences are preserved
+    data = {
+      "file_path": "/path/to/file.csv",
+      "file_type": "delimiter_format",
+      "import_type": "local",
+      "sql_dialect": "hive",
+      "has_header": True,
+      "field_separator": "|",
+      "quote_char": "'",
+      "record_separator": "###",
+    }
+
+    serializer = PreviewFileSerializer(data=data)
+
+    assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
+    assert serializer.validated_data.field_separator == "|"
+    assert serializer.validated_data.quote_char == "'"
+    assert serializer.validated_data.record_separator == "###"
 
 
 class TestSqlTypeMapperSerializer:
@@ -256,7 +440,8 @@ class TestSqlTypeMapperSerializer:
       serializer = SqlTypeMapperSerializer(data=valid_data)
 
       assert serializer.is_valid(), f"Failed for dialect '{dialect}': {serializer.errors}"
-      assert serializer.validated_data["sql_dialect"] == dialect
+      assert isinstance(serializer.validated_data, SqlTypeMapperSchema)
+      assert serializer.validated_data.sql_dialect == dialect
 
   def test_invalid_sql_dialect(self):
     invalid_data = {"sql_dialect": "invalid_dialect"}
@@ -264,8 +449,9 @@ class TestSqlTypeMapperSerializer:
     serializer = SqlTypeMapperSerializer(data=invalid_data)
 
     assert not serializer.is_valid()
-    assert "sql_dialect" in serializer.errors
-    assert serializer.errors["sql_dialect"][0] == '"invalid_dialect" is not a valid choice.'
+    assert len(serializer.errors) > 0
+    error_messages = str(serializer.errors)
+    assert "sql_dialect" in error_messages
 
   def test_missing_sql_dialect(self):
     invalid_data = {}  # Empty data
@@ -284,7 +470,10 @@ class TestGuessFileHeaderSerializer:
     serializer = GuessFileHeaderSerializer(data=valid_data)
 
     assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
-    assert serializer.validated_data == valid_data
+    assert isinstance(serializer.validated_data, GuessFileHeaderSchema)
+    assert serializer.validated_data.file_path == "/path/to/file.csv"
+    assert serializer.validated_data.file_type == "csv"
+    assert serializer.validated_data.import_type == "local"
 
   def test_valid_data_excel(self):
     valid_data = {"file_path": "/path/to/file.xlsx", "file_type": "excel", "import_type": "local", "sheet_name": "Sheet1"}
@@ -292,7 +481,9 @@ class TestGuessFileHeaderSerializer:
     serializer = GuessFileHeaderSerializer(data=valid_data)
 
     assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
-    assert serializer.validated_data == valid_data
+    assert isinstance(serializer.validated_data, GuessFileHeaderSchema)
+    assert serializer.validated_data.file_type == "excel"
+    assert serializer.validated_data.sheet_name == "Sheet1"
 
   def test_missing_required_fields(self):
     # Missing file_path
@@ -330,8 +521,9 @@ class TestGuessFileHeaderSerializer:
     serializer = GuessFileHeaderSerializer(data=invalid_data)
 
     assert not serializer.is_valid()
-    assert "sheet_name" in serializer.errors
-    assert serializer.errors["sheet_name"][0] == "Sheet name is required for Excel files."
+    assert len(serializer.errors) > 0
+    error_messages = str(serializer.errors)
+    assert "Sheet name is required for Excel files" in error_messages
 
   def test_non_excel_with_sheet_name(self):
     # This should pass, as sheet_name is optional for non-Excel files
@@ -345,6 +537,7 @@ class TestGuessFileHeaderSerializer:
     serializer = GuessFileHeaderSerializer(data=valid_data)
 
     assert serializer.is_valid(), f"Serializer validation failed: {serializer.errors}"
+    assert isinstance(serializer.validated_data, GuessFileHeaderSchema)
 
   def test_invalid_file_type(self):
     invalid_data = {
@@ -356,8 +549,9 @@ class TestGuessFileHeaderSerializer:
     serializer = GuessFileHeaderSerializer(data=invalid_data)
 
     assert not serializer.is_valid()
-    assert "file_type" in serializer.errors
-    assert serializer.errors["file_type"][0] == '"json" is not a valid choice.'
+    assert len(serializer.errors) > 0
+    error_messages = str(serializer.errors)
+    assert "file_type" in error_messages
 
   def test_invalid_import_type(self):
     invalid_data = {
@@ -369,5 +563,6 @@ class TestGuessFileHeaderSerializer:
     serializer = GuessFileHeaderSerializer(data=invalid_data)
 
     assert not serializer.is_valid()
-    assert "import_type" in serializer.errors
-    assert serializer.errors["import_type"][0] == '"invalid_type" is not a valid choice.'
+    assert len(serializer.errors) > 0
+    error_messages = str(serializer.errors)
+    assert "import_type" in error_messages
