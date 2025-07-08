@@ -18,7 +18,7 @@ import React from 'react';
 import huePubSub from '../../../utils/huePubSub';
 import { i18nReact } from '../../../utils/i18nReact';
 import Input from 'cuix/dist/components/Input';
-import { GET_USAGE_ANALYTICS_API_URL, UPDATE_USAGE_ANALYTICS_API_URL } from '../Components/utils';
+import { USAGE_ANALYTICS_API_URL } from '../Components/utils';
 import { HueAlert } from '../../../reactComponents/GlobalAlert/types';
 import { GLOBAL_INFO_TOPIC } from '../../../reactComponents/GlobalAlert/events';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
@@ -38,13 +38,13 @@ const Analytics = (): JSX.Element => {
     loading: loadingAnalytics,
     error: usageAnalyticsError,
     reloadData
-  } = useLoadData<UsageAnalyticsResponse>(GET_USAGE_ANALYTICS_API_URL);
+  } = useLoadData<UsageAnalyticsResponse>(USAGE_ANALYTICS_API_URL);
 
   const {
     save: updateAnalyticsPreference,
     loading: updatingAnalyticsPreference,
     error: updateAnalyticsPreferenceError
-  } = useSaveData<{ analytics_enabled: boolean }>(UPDATE_USAGE_ANALYTICS_API_URL, {
+  } = useSaveData<{ analytics_enabled: boolean }>(USAGE_ANALYTICS_API_URL, {
     onSuccess: response => {
       reloadData();
       const successMessage = response.analytics_enabled
@@ -66,9 +66,7 @@ const Analytics = (): JSX.Element => {
   ];
 
   const handleAnalyticsCheckboxChange = (checked: boolean) => {
-    const formData = new FormData();
-    formData.append('analytics_enabled', checked ? 'true' : 'false');
-    updateAnalyticsPreference(formData);
+    updateAnalyticsPreference({ analytics_enabled: checked });
   };
 
   return (
