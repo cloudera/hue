@@ -16,10 +16,10 @@
 # limitations under the License.
 
 import ast
-import json
 import base64
-import logging
 import datetime
+import json
+import logging
 from enum import Enum
 
 from django.contrib.contenttypes.fields import GenericRelation
@@ -394,7 +394,7 @@ class SessionManager(models.Manager):
       if filter_open:
         q = q.filter(status_code=0)
       return q.latest("last_used")
-    except Session.DoesNotExist as e:
+    except Session.DoesNotExist:
       return None
 
   def get_n_sessions(self, user, n, application='beeswax', filter_open=True):
@@ -490,6 +490,17 @@ class Session(models.Model):
   def get_formatted_properties(self):
     return [dict({'key': key, 'value': value}) for key, value in list(self.get_properties().items())]
 
+  def get_cookies(self):
+    return self.get_properties().get('cookies', {})
+
+  def set_cookies(self, cookies):
+    self.set_property('cookies', cookies)
+
+  def set_property(self, key, value):
+    props = self.get_properties()
+    props[key] = value
+    self.properties = json.dumps(props)
+
   def __str__(self):
     return '%s %s' % (self.owner, self.last_used)
 
@@ -543,34 +554,15 @@ class HiveServerQueryHandle(QueryHandle):
         modifiedRowCount=self.modified_row_count
     )
 
+  def get_session(self):
+    return Session.objects.filter(id=self.session_id).first() if self.session_id else None
+
   @classmethod
   def get_decoded(cls, secret, guid):
     return base64.b64decode(secret), base64.b64decode(guid)
 
   def get_encoded(self):
     return base64.b64encode(self.secret), base64.b64encode(self.guid)
-
-
-# Deprecated. Could be removed.
-
-class BeeswaxQueryHandle(QueryHandle):
-  """
-  QueryHandle for Beeswax.
-  """
-  def __init__(self, secret, has_result_set, log_context):
-    super(BeeswaxQueryHandle, self).__init__(secret=secret,
-                                             has_result_set=has_result_set,
-                                             log_context=log_context)
-
-  def get(self):
-    return self.secret, None
-
-  def get_rpc_handle(self):
-    return BeeswaxdQueryHandle(id=self.secret, log_context=self.log_context)
-
-  # TODO remove
-  def get_encoded(self):
-    return self.get(), None
 
 
 class MetaInstall(models.Model):
