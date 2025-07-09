@@ -110,7 +110,7 @@ export const ADVANCED_SETTINGS_CONFIG: FieldConfig[] = [
     type: 'input',
     label: 'External location',
     placeholder: 'External location',
-    isHidden: ({ settings }) => settings.storeLocation !== 'external'
+    isHidden: ({ settings }) => settings.storeLocation !== StoreLocation.EXTERNAL
   },
   {
     id: 'isTransactional',
