@@ -481,10 +481,29 @@ class GSFileSystem(S3FileSystem):
 
   @translate_gs_error
   @auth_error_handler
-  def upload_v1(self, META, input_data, destination, username):
-    from desktop.lib.fs.gc.upload import GSNewFileUploadHandler  # Circular dependency
+  def simple_file_upload(self, file_data, destination, username):
+    """
+    Upload a file directly to Google Storage without using Django upload handlers.
 
-    gs_upload_handler = GSNewFileUploadHandler(destination, username)
+    Args:
+      file_data: File data as bytes or file-like object
+      destination: The full destination path including filename
+      username: The username to perform the upload as
+    """
+    # Parse destination to get bucket and key
+    bucket_name, key_name = parse_uri(destination)[:2]
 
-    parser = MultiPartParser(META, input_data, [gs_upload_handler])
-    return parser.parse()
+    # Read all data if it's a file-like object
+    data = file_data.read() if hasattr(file_data, "read") else file_data
+
+    # Get the bucket
+    bucket = self._get_bucket(bucket_name)
+
+    # Create a new key
+    key = Key(bucket)
+    key.key = key_name
+
+    # Upload the data
+    key.set_contents_from_string(data)
+
+    LOG.info(f"Successfully uploaded file to GS: {destination}")

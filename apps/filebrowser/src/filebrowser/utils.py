@@ -22,13 +22,25 @@ from urllib.parse import urlparse
 import redis
 
 from desktop.conf import TASK_SERVER_V2
+from desktop.lib import fsmanager
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.fs.proxyfs import ProxyFS
 from filebrowser.conf import ALLOW_FILE_EXTENSIONS, ARCHIVE_UPLOAD_TEMPDIR, RESTRICT_FILE_EXTENSIONS
 
 LOG = logging.getLogger()
 
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 128
+
+
+def get_user_filesystem(username: str) -> ProxyFS:
+  if not username:
+    raise ValueError("Username is required")
+
+  fs = fsmanager.get_filesystem("default")
+  fs.setuser(username)
+
+  return fs
 
 
 def calculate_total_size(uuid, totalparts):

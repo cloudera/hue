@@ -633,13 +633,32 @@ class S3FileSystem(object):
 
   @translate_s3_error
   @auth_error_handler
-  def upload_v1(self, META, input_data, destination, username):
-    from aws.s3.upload import S3NewFileUploadHandler  # Circular dependency
+  def simple_file_upload(self, file_data, destination, username):
+    """
+    Upload a file directly to S3 without using Django upload handlers.
 
-    s3_upload_handler = S3NewFileUploadHandler(destination, username)
+    Args:
+      file_data: File data as bytes or file-like object
+      destination: The full destination path including filename
+      username: The username to perform the upload as
+    """
+    # Parse destination to get bucket and key
+    bucket_name, key_name = s3.parse_uri(destination)[:2]
 
-    parser = MultiPartParser(META, input_data, [s3_upload_handler])
-    return parser.parse()
+    # Read all data if it's a file-like object
+    data = file_data.read() if hasattr(file_data, "read") else file_data
+
+    # Get the bucket
+    bucket = self._get_bucket(bucket_name)
+
+    # Create a new key
+    key = Key(bucket)
+    key.key = key_name
+
+    # Upload the data
+    key.set_contents_from_string(data)
+
+    LOG.info(f"Successfully uploaded file to S3: {destination}")
 
   @translate_s3_error
   @auth_error_handler

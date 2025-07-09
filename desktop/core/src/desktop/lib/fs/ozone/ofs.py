@@ -186,13 +186,31 @@ class OzoneFS(WebHdfs):
     """
     pass
 
-  def upload_v1(self, META, input_data, destination, username):
-    from desktop.lib.fs.ozone.upload import OFSNewFileUploadHandler  # Circular dependency
+  def simple_file_upload(self, file_data, destination, username):
+    """
+    Upload a file directly to OFS without using Django upload handlers.
 
-    ofs_upload_handler = OFSNewFileUploadHandler(destination, username)
+    Args:
+      file_data: File data as bytes or file-like object
+      destination: The full destination path including filename
+      username: The username to perform the upload as
+    """
+    # Read all data if it's a file-like object
+    data = file_data.read() if hasattr(file_data, "read") else file_data
 
-    parser = MultiPartParser(META, input_data, [ofs_upload_handler])
-    return parser.parse()
+    # OFS uses the same approach as HDFS since it extends WebHdfs
+    # Get parent directory stats to inherit permissions
+    parent_dir = self.dirname(destination)
+    try:
+      parent_stats = self.stats(parent_dir)
+      permission = oct(stat.S_IMODE(parent_stats.mode))
+    except Exception:
+      permission = None
+
+    # Create the file with the data
+    self.do_as_user(username, self.create, destination, overwrite=True, permission=permission, data=data)
+
+    LOG.info(f"Successfully uploaded file to OFS: {destination}")
 
   def rename(self, old, new):
     """rename(old, new)"""

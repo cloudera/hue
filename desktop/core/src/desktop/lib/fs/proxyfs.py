@@ -301,8 +301,8 @@ class ProxyFS(object):
   def upload(self, file, path, *args, **kwargs):
     self._get_fs(path).upload(file, path, *args, **kwargs)
 
-  def upload_v1(self, META, input_data, destination, username):
-    self._get_fs(destination).upload_v1(META, input_data, destination, username)
+  def simple_file_upload(self, file_data, destination, username):
+    self._get_fs(destination).simple_file_upload(file_data, destination, username)
 
   def check_access(self, path, *args, **kwargs):
     self._get_fs(path).check_access(path, *args, **kwargs)

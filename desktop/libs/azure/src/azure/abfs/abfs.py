@@ -445,15 +445,18 @@ class ABFS(object):
       params = {'position': int(resp['Content-Length']) + offset, 'action': 'append'}
     else:
       params['action'] = 'append'
+
     headers = {}
+    actual_data = data.getvalue() if hasattr(data, 'getvalue') else data
+
     if size == 0 or size == '0':
-      headers['Content-Length'] = str(len(data.getvalue()))
+      headers['Content-Length'] = str(len(actual_data))
       if headers['Content-Length'] == '0':
         return
     else:
       headers['Content-Length'] = str(size)
 
-    return self._patching_sl(path, params, data, headers, **kwargs)
+    return self._patching_sl(path, params, actual_data, headers, **kwargs)
 
   def flush(self, path, params=None, headers=None, **kwargs):
     """
@@ -616,13 +619,21 @@ class ABFS(object):
     """
     pass
 
-  def upload_v1(self, META, input_data, destination, username):
-    from azure.abfs.upload import ABFSNewFileUploadHandler  # Circular dependency
+  def simple_file_upload(self, file_data, destination, username):
+    """
+    Upload a file directly to ABFS without using Django upload handlers.
 
-    abfs_upload_handler = ABFSNewFileUploadHandler(destination, username)
+    Args:
+      file_data: File data as bytes or file-like object
+      destination: The full destination path including filename
+      username: The username to perform the upload as
+    """
+    # Read all data if it's a file-like object
+    data = file_data.read() if hasattr(file_data, "read") else file_data
 
-    parser = MultiPartParser(META, input_data, [abfs_upload_handler])
-    return parser.parse()
+    self.create(destination, overwrite=True, data=data)
+
+    LOG.info(f"Successfully uploaded file to ABFS: {destination}")
 
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
     """
@@ -718,19 +729,27 @@ class ABFS(object):
   # Write Files on creation
   # ----------------------------
   def _writedata(self, path, data, size):
-    """
-    Adds text to a given file
-    """
     chunk_size = self.get_upload_chuck_size()
-    cycles = ceil(float(size) / chunk_size)
-    for i in range(0, cycles):
-      chunk = size % chunk_size
-      if i != cycles or chunk == 0:
-        length = chunk_size
+    cycles = int(ceil(float(size) / chunk_size))
+
+    for i in range(cycles):
+      start = i * chunk_size
+      if i == cycles - 1:  # Last chunk
+        # For the last chunk, only write the remaining data
+        length = size - start
       else:
-        length = chunk
-      self._append(path, data[i * chunk_size : i * chunk_size + length], length)
-    self.flush(path, {'position': int(size)})
+        # For all other chunks, write full chunk size
+        length = chunk_size
+
+      end = start + length
+      chunk_data = data[start:end]
+
+      # Only append if we have data to write
+      if chunk_data:
+        self._append(path, chunk_data, size=length, params={"position": start})
+
+    # Flush at the end with the total size
+    self.flush(path, {"position": int(size)})
 
   # Use Patch HTTP request
   # ----------------------------

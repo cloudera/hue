@@ -15,13 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import json
 import logging
-import operator
 import mimetypes
+import os
 import posixpath
-from io import BytesIO as string_io
 from urllib.parse import quote
 
 from django.core.files.uploadhandler import StopUpload
@@ -30,8 +28,12 @@ from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedir
 from django.utils.http import http_date
 from django.utils.translation import gettext as _
 from django.views.static import was_modified_since
+from rest_framework import status
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import MultiPartParser
+from rest_framework.response import Response
 
-from aws.s3.s3fs import S3ListAllBucketsException, get_s3_home_directory
+from aws.s3.s3fs import get_s3_home_directory, S3ListAllBucketsException
 from azure.abfs.__init__ import get_abfs_home_directory
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER_V2
@@ -39,34 +41,34 @@ from desktop.lib import fsmanager, i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.export_csvxls import file_reader
-from desktop.lib.fs.gc.gs import GSListAllBucketsException, get_gs_home_directory
+from desktop.lib.fs.gc.gs import get_gs_home_directory, GSListAllBucketsException
 from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
 from desktop.lib.i18n import smart_str
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
+from filebrowser import operations
 from filebrowser.conf import (
   ENABLE_EXTRACT_UPLOADED_ARCHIVE,
   FILE_DOWNLOAD_CACHE_CONTROL,
-  MAX_FILE_SIZE_UPLOAD_LIMIT,
   REDIRECT_DOWNLOAD,
   RESTRICT_FILE_EXTENSIONS,
   SHOW_DOWNLOAD_BUTTON,
 )
 from filebrowser.lib.rwx import compress_mode, filetype, rwx
+from filebrowser.serializers import SimpleFileUploadSerializer
 from filebrowser.utils import parse_broker_url
 from filebrowser.views import (
-  DEFAULT_CHUNK_SIZE_BYTES,
-  MAX_CHUNK_SIZE_BYTES,
   _can_inline_display,
   _is_hdfs_superuser,
   _normalize_path,
+  DEFAULT_CHUNK_SIZE_BYTES,
   extract_upload_data,
+  MAX_CHUNK_SIZE_BYTES,
   perform_upload_task,
   read_contents,
   stat_absolute_path,
 )
-from hadoop.conf import has_hdfs_enabled, is_hdfs_trash_enabled
-from hadoop.core_site import get_trash_interval
+from hadoop.conf import is_hdfs_trash_enabled
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
 from useradmin.models import Group, User
@@ -516,62 +518,51 @@ def upload_complete(request):
     return HttpResponse(error_message, status=500)
 
 
-@api_error_handler
+@api_view(["POST"])
+@parser_classes([MultiPartParser])
 def upload_file(request):
-  # Read request body first to prevent RawPostDataException later on which occurs when trying to access body after it has already been read
-  body_data_bytes = string_io(request.body)
+  """
+  Upload a file to the specified destination.
 
-  uploaded_file = request.FILES['file']
-  dest_path = request.POST.get('destination_path')
-  overwrite = coerce_bool(request.POST.get('overwrite', False))
+  This endpoint uses a modular architecture with:
+  - DRF serializers for validation
+  - Pydantic schemas for data validation
+  - Operations module for core business logic
+  - Filesystem abstraction through ProxyFS
 
-  # Check if the file type is restricted
-  _, file_type = os.path.splitext(uploaded_file.name)
-  if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-    return HttpResponse(f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.', status=400)
+  POST Parameters:
+    - file: The file to upload (multipart/form-data)
+    - destination_path: The destination path where the file should be uploaded
+    - overwrite: Whether to overwrite if file already exists (optional, default: false)
 
-  # Check if the file size exceeds the maximum allowed size
-  max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
-  if max_size >= 0 and uploaded_file.size >= max_size:
-    return HttpResponse(
-      f'File exceeds maximum allowed size of {max_size} bytes. Hue is configured to restrict uploads larger than this limit.', status=413
-    )
+  Returns:
+    JsonResponse with:
+      - uploaded_file_stats: File statistics after upload
+      - path: The full path where the file was uploaded
+  """
+  serializer = SimpleFileUploadSerializer(data=request.data)
 
-  # Check if the destination path is a directory and the file name contains a path separator
-  # This prevents directory traversal attacks
-  if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
-    return HttpResponse(f'Invalid filename. Path separators are not allowed.', status=400)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  # Check if the file already exists at the destination path
-  filepath = request.fs.join(dest_path, uploaded_file.name)
-  if request.fs.exists(filepath):
-    # If overwrite is true, attempt to remove the existing file
-    if overwrite:
-      try:
-        request.fs.rmtree(filepath)
-      except Exception as e:
-        err_message = 'Failed to remove already existing file.'
-        LOG.exception(f'{err_message} {str(e)}')
-        return HttpResponse(err_message, status=500)
-    else:
-      err_message = f'The file {uploaded_file.name} already exists at the destination path.'
-      LOG.error(err_message)
-      return HttpResponse(err_message, status=409)
-
-  # Check if the destination path already exists or not
-  if not request.fs.exists(dest_path):
-    return HttpResponse(f'The destination path {dest_path} does not exist.', status=404)
-
+  validated_data = serializer.validated_data
   try:
-    request.fs.upload_v1(request.META, input_data=body_data_bytes, destination=dest_path, username=request.user.username)
-  except Exception as ex:
-    return HttpResponse(f'Upload to {filepath} failed: {str(ex)}', status=500)
+    LOG.info(f"User {request.user.username} is uploading a file: {validated_data.filename}")
 
-  response = {
-    'uploaded_file_stats': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
-  }
+    result = operations.simple_file_upload(data=validated_data, username=request.user.username)
+    return Response(result, status=status.HTTP_201_CREATED)
 
-  return JsonResponse(response)
+  except FileNotFoundError as e:
+    return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+  except FileExistsError as e:
+    return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+  except PermissionError as e:
+    return Response({"error": str(e)}, status=status.HTTP_403_FORBIDDEN)
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error uploading file: {str(e)}")
+    return Response({"error": "An error occurred while uploading the file."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_error_handler

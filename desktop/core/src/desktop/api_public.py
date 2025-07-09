@@ -277,12 +277,6 @@ def storage_save_file(request):
 
 
 @api_view(["POST"])
-def storage_upload_file(request):
-  django_request = get_django_request(request)
-  return filebrowser_api.upload_file(django_request)
-
-
-@api_view(["POST"])
 def storage_upload_chunks(request):
   django_request = get_django_request(request)
   return filebrowser_api.upload_chunks(django_request)
