@@ -55,7 +55,7 @@ from filebrowser.conf import (
   SHOW_DOWNLOAD_BUTTON,
 )
 from filebrowser.lib.rwx import compress_mode, filetype, rwx
-from filebrowser.serializers import SimpleFileUploadSerializer
+from filebrowser.serializers import UploadFileSerializer
 from filebrowser.utils import parse_broker_url
 from filebrowser.views import (
   _can_inline_display,
@@ -107,9 +107,6 @@ def get_filesystems(request):
 
 # TODO: Improve error response further with better context -- Error UX Phase 2
 def api_error_handler(view_fn):
-  """
-  Decorator to handle exceptions and return a JSON response with an error message.
-  """
 
   def decorator(*args, **kwargs):
     try:
@@ -521,26 +518,19 @@ def upload_complete(request):
 @api_view(["POST"])
 @parser_classes([MultiPartParser])
 def upload_file(request):
-  """
-  Upload a file to the specified destination.
+  """Handle file upload via REST API.
 
-  This endpoint uses a modular architecture with:
-  - DRF serializers for validation
-  - Pydantic schemas for data validation
-  - Operations module for core business logic
-  - Filesystem abstraction through ProxyFS
+  Accepts multipart form data with file content and validates before upload.
+  This method is intended for small to medium sized files (up to a few hundred MiBs).
+  For larger files, consider using chunked upload methods.
 
-  POST Parameters:
-    - file: The file to upload (multipart/form-data)
-    - destination_path: The destination path where the file should be uploaded
-    - overwrite: Whether to overwrite if file already exists (optional, default: false)
+  Args:
+    request: DRF request object containing file data and destination path.
 
   Returns:
-    JsonResponse with:
-      - uploaded_file_stats: File statistics after upload
-      - path: The full path where the file was uploaded
+    Response object with upload results or error details.
   """
-  serializer = SimpleFileUploadSerializer(data=request.data)
+  serializer = UploadFileSerializer(data=request.data)
 
   if not serializer.is_valid():
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -549,7 +539,7 @@ def upload_file(request):
   try:
     LOG.info(f"User {request.user.username} is uploading a file: {validated_data.filename}")
 
-    result = operations.simple_file_upload(data=validated_data, username=request.user.username)
+    result = operations.upload_file(data=validated_data, username=request.user.username)
     return Response(result, status=status.HTTP_201_CREATED)
 
   except FileNotFoundError as e:
@@ -986,7 +976,7 @@ def bulk_op(request, op):
 def _massage_stats(request, stats):
   """
   Massage a stats record as returned by the filesystem implementation
-  into the format that the views would like it in.
+  into the format expected by the API response.
   """
   stats_dict = stats.to_json_dict()
   normalized_path = request.fs.normpath(stats_dict.get('path'))

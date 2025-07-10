@@ -21,35 +21,33 @@ import posixpath
 from io import BytesIO
 from typing import Any, Dict, Union
 
-from filebrowser.schemas import SimpleFileUploadSchema
+from filebrowser.schemas import UploadFileSchema
 from filebrowser.utils import get_user_filesystem
 from filebrowser.views import filetype, rwx, stat_absolute_path
 
 LOG = logging.getLogger()
 
 
-def simple_file_upload(data: SimpleFileUploadSchema, username: str) -> Dict[str, Any]:
-  """
-  Uploads a file to the specified destination using the filesystem's simple_file_upload method.
+def upload_file(data: UploadFileSchema, username: str) -> Dict[str, Any]:
+  """Upload a file to the filesystem.
 
-  This function handles the core upload logic, including validation, path checking,
-  and delegating to the appropriate filesystem handler. It supports multiple input types
-  for maximum flexibility across different usage contexts (web, CLI, MCP).
+  This method is designed for small to medium sized files (up to a few hundred MiBs).
+  For larger files, chunked upload methods should be used to avoid memory issues
+  and timeouts.
 
   Args:
-    data: A Pydantic schema containing the file to upload, destination path, and overwrite flag
-    username: The username of the user uploading the file
+    data: Validated upload schema containing file data and metadata.
+    username: Username performing the upload.
 
   Returns:
-    Dict[str, Any]: A dictionary containing:
-      - uploaded_file_stats: Statistics about the uploaded file
-      - path: The full path where the file was uploaded
+    Dictionary containing uploaded file statistics.
 
   Raises:
-    FileNotFoundError: If the destination path doesn't exist
-    FileExistsError: If the file already exists and overwrite is False
-    PermissionError: If the user doesn't have write access to the destination
-    Exception: For other filesystem-related errors
+    ValueError: If filename contains invalid characters.
+    FileNotFoundError: If destination directory doesn't exist.
+    FileExistsError: If file exists and overwrite is False.
+    PermissionError: If user lacks write permissions.
+    Exception: For other upload failures.
   """
   destination_path = data.destination_path
   overwrite = data.overwrite
@@ -87,10 +85,10 @@ def simple_file_upload(data: SimpleFileUploadSchema, username: str) -> Dict[str,
   # Prepare file data for upload
   file_data = _prepare_file_data(data.file)
   try:
-    fs.simple_file_upload(file_data=file_data, destination=filepath, username=username)
+    fs.upload_file(file_data=file_data, destination=filepath)
 
     stats = fs.stats(filepath)
-    result = {"uploaded_file_stats": _massage_stats(fs, stat_absolute_path(filepath, stats)), "path": filepath}
+    result = {"uploaded_file_stats": _massage_stats(fs, stat_absolute_path(filepath, stats))}
     return result
 
   except Exception as e:
@@ -107,10 +105,10 @@ def _prepare_file_data(file_obj: Any) -> Union[BytesIO, bytes]:
   Prepare file data from various input types.
 
   Args:
-      file_obj: Can be Django UploadedFile, file-like object, or bytes
+    file_obj: Can be Django UploadedFile, file-like object, or bytes
 
   Returns:
-      BytesIO or bytes object containing the file data
+    BytesIO or bytes object containing the file data
   """
   # Handle Django UploadedFile
   if hasattr(file_obj, "chunks"):

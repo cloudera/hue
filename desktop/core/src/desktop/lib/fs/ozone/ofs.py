@@ -186,14 +186,15 @@ class OzoneFS(WebHdfs):
     """
     pass
 
-  def simple_file_upload(self, file_data, destination, username):
-    """
-    Upload a file directly to OFS without using Django upload handlers.
+  def upload_file(self, file_data, destination):
+    """Upload file data to Ozone File System.
 
     Args:
-      file_data: File data as bytes or file-like object
-      destination: The full destination path including filename
-      username: The username to perform the upload as
+      file_data: File data as bytes or file-like object.
+      destination: OFS path for the destination (e.g., 'ofs://volume/bucket/test_dir/').
+
+    Raises:
+      WebHdfsException: If upload fails.
     """
     # Read all data if it's a file-like object
     data = file_data.read() if hasattr(file_data, "read") else file_data
@@ -208,7 +209,7 @@ class OzoneFS(WebHdfs):
       permission = None
 
     # Create the file with the data
-    self.do_as_user(username, self.create, destination, overwrite=True, permission=permission, data=data)
+    self.create(destination, overwrite=True, permission=permission, data=data)
 
     LOG.info(f"Successfully uploaded file to OFS: {destination}")
 

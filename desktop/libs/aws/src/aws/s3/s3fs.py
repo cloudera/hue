@@ -633,14 +633,15 @@ class S3FileSystem(object):
 
   @translate_s3_error
   @auth_error_handler
-  def simple_file_upload(self, file_data, destination, username):
-    """
-    Upload a file directly to S3 without using Django upload handlers.
+  def upload_file(self, file_data, destination):
+    """Upload file data to S3.
 
     Args:
-      file_data: File data as bytes or file-like object
-      destination: The full destination path including filename
-      username: The username to perform the upload as
+      file_data: File data as bytes or file-like object.
+      destination: S3 URI for the destination (e.g., 's3a://bucket/test_dir/').
+
+    Raises:
+      S3FileSystemException: If upload fails.
     """
     # Parse destination to get bucket and key
     bucket_name, key_name = s3.parse_uri(destination)[:2]

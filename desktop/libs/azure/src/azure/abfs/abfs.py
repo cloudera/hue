@@ -619,14 +619,15 @@ class ABFS(object):
     """
     pass
 
-  def simple_file_upload(self, file_data, destination, username):
-    """
-    Upload a file directly to ABFS without using Django upload handlers.
+  def upload_file(self, file_data, destination):
+    """Upload file data to Azure Blob File System.
 
     Args:
-      file_data: File data as bytes or file-like object
-      destination: The full destination path including filename
-      username: The username to perform the upload as
+      file_data: File data as bytes or file-like object.
+      destination: ABFS path for the destination (e.g., 'abfs://container/test_dir/').
+
+    Raises:
+      ABFSFileSystemException: If upload fails.
     """
     # Read all data if it's a file-like object
     data = file_data.read() if hasattr(file_data, "read") else file_data

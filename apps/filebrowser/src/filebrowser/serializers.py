@@ -18,16 +18,22 @@
 from pydantic import ValidationError
 from rest_framework import serializers
 
-from filebrowser.schemas import SimpleFileUploadSchema
+from filebrowser.schemas import UploadFileSchema
 
 
-class SimpleFileUploadSerializer(serializers.Serializer):
+class UploadFileSerializer(serializers.Serializer):
+  """Django REST Framework serializer for file uploads.
+
+  Handles validation of file upload requests and converts
+  the data to UploadFileSchema for further processing.
+  """
 
   file = serializers.FileField(required=True, help_text="File to upload")
   destination_path = serializers.CharField(required=True, help_text="Destination path for the file")
   overwrite = serializers.BooleanField(default=False, help_text="Whether to overwrite existing file")
 
   def validate(self, data):
+    """Validate upload data against UploadFileSchema."""
     try:
       schema_data = {
         "file": data["file"],
@@ -36,6 +42,6 @@ class SimpleFileUploadSerializer(serializers.Serializer):
         "destination_path": data["destination_path"],
         "overwrite": data["overwrite"],
       }
-      return SimpleFileUploadSchema.model_validate(schema_data)
+      return UploadFileSchema.model_validate(schema_data)
     except ValidationError as e:
       raise serializers.ValidationError(e.errors())

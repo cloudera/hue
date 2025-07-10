@@ -301,8 +301,20 @@ class ProxyFS(object):
   def upload(self, file, path, *args, **kwargs):
     self._get_fs(path).upload(file, path, *args, **kwargs)
 
-  def simple_file_upload(self, file_data, destination, username):
-    self._get_fs(destination).simple_file_upload(file_data, destination, username)
+  def upload_file(self, file_data, destination):
+    """Upload file data to the appropriate filesystem.
+
+    Routes the upload to the correct filesystem implementation based on
+    the destination path scheme.
+
+    Args:
+      file_data: File data as bytes or file-like object.
+      destination: Full filesystem path for the destination.
+
+    Raises:
+      IOError: If upload fails or user lacks permissions.
+    """
+    self._get_fs(destination).upload_file(file_data, destination)
 
   def check_access(self, path, *args, **kwargs):
     self._get_fs(path).check_access(path, *args, **kwargs)

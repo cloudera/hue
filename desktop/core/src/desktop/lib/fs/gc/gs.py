@@ -481,14 +481,15 @@ class GSFileSystem(S3FileSystem):
 
   @translate_gs_error
   @auth_error_handler
-  def simple_file_upload(self, file_data, destination, username):
-    """
-    Upload a file directly to Google Storage without using Django upload handlers.
+  def upload_file(self, file_data, destination):
+    """Upload file data to Google Cloud Storage.
 
     Args:
-      file_data: File data as bytes or file-like object
-      destination: The full destination path including filename
-      username: The username to perform the upload as
+      file_data: File data as bytes or file-like object.
+      destination: GS path for the destination (e.g., 'gs://bucket/test_dir/').
+
+    Raises:
+      GSFileSystemException: If upload fails.
     """
     # Parse destination to get bucket and key
     bucket_name, key_name = parse_uri(destination)[:2]

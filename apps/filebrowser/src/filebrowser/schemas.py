@@ -24,7 +24,12 @@ from filebrowser.conf import MAX_FILE_SIZE_UPLOAD_LIMIT
 from filebrowser.utils import is_file_upload_allowed
 
 
-class SimpleFileUploadSchema(BaseModel):
+class UploadFileSchema(BaseModel):
+  """Schema for file upload validation.
+
+  Validates file upload parameters including filename, size limits,
+  and destination path. Ensures files meet security and size requirements.
+  """
   model_config = ConfigDict(arbitrary_types_allowed=True)
 
   file: Any = Field(..., description="File to upload - can be Django UploadedFile, file-like object, bytes, or string")
@@ -36,6 +41,7 @@ class SimpleFileUploadSchema(BaseModel):
   @field_validator("filename")
   @classmethod
   def validate_filename(cls, v: str) -> str:
+    """Validate filename for security and upload restrictions."""
     if not v or v.strip() == "":
       raise ValueError("Filename cannot be empty")
 
@@ -52,6 +58,7 @@ class SimpleFileUploadSchema(BaseModel):
   @field_validator("filesize")
   @classmethod
   def validate_filesize(cls, v: int) -> int:
+    """Validate file size against configured maximum limit."""
     max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
     if v > max_size:
       max_size_mib = max_size / (1024 * 1024)
