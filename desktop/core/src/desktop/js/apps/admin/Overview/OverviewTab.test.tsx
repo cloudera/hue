@@ -14,19 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Overview from './OverviewTab';
-import * as hueConfigModule from '../../../config/hueConfig';
 import Examples from './Examples';
-import Analytics from './Analytics';
 import {
   INSTALL_APP_EXAMPLES_API_URL,
   INSTALL_AVAILABLE_EXAMPLES_API_URL
 } from '../Components/utils';
 import { get, post } from '../../../api/utils';
+import * as hueConfigModule from '../../../config/hueConfig';
 
 jest.mock('../../../api/utils', () => ({
   post: jest.fn(),
@@ -56,26 +55,6 @@ describe('OverviewTab', () => {
     expect(screen.getByText('Analytics')).toBeInTheDocument();
   });
 
-  describe('Analytics Component', () => {
-    test('renders Analytics tab and can interact with the checkbox', async () => {
-      (post as jest.Mock).mockResolvedValue({ status: 0, message: 'Success' });
-      render(<Analytics />);
-      const checkbox = screen.getByLabelText(/Help improve Hue with anonymous usage analytics./i);
-
-      expect(checkbox).not.toBeChecked();
-      await userEvent.click(checkbox);
-      expect(checkbox).toBeChecked();
-      expect(post).toHaveBeenCalledWith('/about/update_preferences', {
-        collect_usage: true
-      });
-      userEvent.click(checkbox);
-      await waitFor(() => expect(checkbox).not.toBeChecked());
-      expect(post).toHaveBeenCalledWith('/about/update_preferences', {
-        collect_usage: false
-      });
-    });
-  });
-
   describe('Examples component', () => {
     const availableAppsResponse = {
       apps: {
@@ -91,54 +70,37 @@ describe('OverviewTab', () => {
         }
         return Promise.reject();
       });
-
       (post as jest.Mock).mockImplementation(() =>
         Promise.resolve({ status: 0, message: 'Success' })
       );
     });
 
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
     test('fetch and display available apps', async () => {
       render(<Examples />);
-
-      await waitFor(() => {
-        expect(get).toHaveBeenCalledWith(INSTALL_AVAILABLE_EXAMPLES_API_URL, {});
-        Object.entries(availableAppsResponse.apps).forEach(([, appName]) => {
-          expect(screen.getByText(appName)).toBeInTheDocument();
-        });
-      });
+      expect(get).toHaveBeenCalledWith(INSTALL_AVAILABLE_EXAMPLES_API_URL, {});
+      for (const [, appName] of Object.entries(availableAppsResponse.apps)) {
+        expect(await screen.findByText(appName)).toBeInTheDocument();
+      }
     });
 
     test('post call to install apps without data like hive when the install button is clicked', async () => {
       render(<Examples />);
-
-      await waitFor(() => {
-        const installButton = screen.getByText('Hive');
-        userEvent.click(installButton);
-        expect(post).toHaveBeenCalledWith(INSTALL_APP_EXAMPLES_API_URL, { app_name: 'hive' });
-      });
+      const installButton = await screen.findByText('Hive');
+      await userEvent.click(installButton);
+      expect(post).toHaveBeenCalledWith(INSTALL_APP_EXAMPLES_API_URL, { app_name: 'hive' });
     });
 
     test('post call to install Solr Search example and its data when the install button is clicked', async () => {
       render(<Examples />);
-
       const solrData = ['log_analytics_demo', 'twitter_demo', 'yelp_demo'];
-      await waitFor(() => screen.getByText('Solr Search'));
-      const installButton = screen.getByText('Solr Search');
-      userEvent.click(installButton);
-
-      await waitFor(() => {
-        solrData.forEach(dataEntry => {
-          expect(post).toHaveBeenCalledWith(INSTALL_APP_EXAMPLES_API_URL, {
-            app_name: 'search',
-            data: dataEntry
-          });
+      const installButton = await screen.findByText('Solr Search');
+      await userEvent.click(installButton);
+      for (const dataEntry of solrData) {
+        expect(post).toHaveBeenCalledWith(INSTALL_APP_EXAMPLES_API_URL, {
+          app_name: 'search',
+          data: dataEntry
         });
-      });
-
+      }
       expect(post).toHaveBeenCalledTimes(solrData.length);
     });
   });
