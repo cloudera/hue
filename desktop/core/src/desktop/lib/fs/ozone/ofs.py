@@ -186,13 +186,32 @@ class OzoneFS(WebHdfs):
     """
     pass
 
-  def upload_v1(self, META, input_data, destination, username):
-    from desktop.lib.fs.ozone.upload import OFSNewFileUploadHandler  # Circular dependency
+  def upload_file(self, file_data, destination):
+    """Upload file data to Ozone File System.
 
-    ofs_upload_handler = OFSNewFileUploadHandler(destination, username)
+    Args:
+      file_data: File data as bytes or file-like object.
+      destination: OFS path for the destination (e.g., 'ofs://volume/bucket/test_dir/').
 
-    parser = MultiPartParser(META, input_data, [ofs_upload_handler])
-    return parser.parse()
+    Raises:
+      WebHdfsException: If upload fails.
+    """
+    # Read all data if it's a file-like object
+    data = file_data.read() if hasattr(file_data, "read") else file_data
+
+    # OFS uses the same approach as HDFS since it extends WebHdfs
+    # Get parent directory stats to inherit permissions
+    parent_dir = self.dirname(destination)
+    try:
+      parent_stats = self.stats(parent_dir)
+      permission = oct(stat.S_IMODE(parent_stats.mode))
+    except Exception:
+      permission = None
+
+    # Create the file with the data
+    self.create(destination, overwrite=True, permission=permission, data=data)
+
+    LOG.info(f"Successfully uploaded file to OFS: {destination}")
 
   def rename(self, old, new):
     """rename(old, new)"""

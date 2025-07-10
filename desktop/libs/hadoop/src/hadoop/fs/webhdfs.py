@@ -908,13 +908,31 @@ class WebHdfs(Hdfs):
 
     self.do_as_user(username, self.rename, tmp_file, dst)
 
-  def upload_v1(self, META, input_data, destination, username):
-    from hadoop.fs.upload import HDFSNewFileUploadHandler  # Circular dependency
+  def upload_file(self, file_data, destination):
+    """Upload file data to HDFS.
 
-    hdfs_upload_handler = HDFSNewFileUploadHandler(destination, username)
+    Args:
+      file_data: File data as bytes or file-like object.
+      destination: HDFS path for the destination (e.g., '/user/hue_user/test_dir/').
 
-    parser = MultiPartParser(META, input_data, [hdfs_upload_handler])
-    return parser.parse()
+    Raises:
+      WebHdfsException: If upload fails.
+    """
+    # Read all data if it's a file-like object
+    data = file_data.read() if hasattr(file_data, "read") else file_data
+
+    # Get parent directory stats to inherit permissions
+    parent_dir = self.dirname(destination)
+    try:
+      parent_stats = self.stats(parent_dir)
+      permission = oct(stat.S_IMODE(parent_stats.mode))
+    except Exception:
+      permission = None
+
+    # Create the file with the data
+    self.create(destination, overwrite=True, permission=permission, data=data)
+
+    LOG.info(f"Successfully uploaded file to HDFS: {destination}")
 
   def filebrowser_action(self):
     return None

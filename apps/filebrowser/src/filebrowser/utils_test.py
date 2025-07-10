@@ -15,8 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from filebrowser.conf import ALLOW_FILE_EXTENSIONS, RESTRICT_FILE_EXTENSIONS
-from filebrowser.utils import is_file_upload_allowed
+from filebrowser.utils import get_user_filesystem, is_file_upload_allowed
 
 
 class TestIsFileUploadAllowed:
@@ -289,3 +293,35 @@ class TestIsFileUploadAllowed:
     finally:
       reset_allow()
       reset_restrict()
+
+
+class TestGetUserFilesystem:
+  @patch("filebrowser.utils.fsmanager.get_filesystem")
+  def test_get_user_filesystem_success(self, mock_get_filesystem):
+    mock_fs = MagicMock()
+    mock_get_filesystem.return_value = mock_fs
+
+    result = get_user_filesystem("testuser")
+
+    assert result == mock_fs
+    mock_get_filesystem.assert_called_once_with("default")
+    mock_fs.setuser.assert_called_once_with("testuser")
+
+  def test_get_user_filesystem_no_username(self):
+    with pytest.raises(ValueError, match="Username is required"):
+      get_user_filesystem("")
+
+    with pytest.raises(ValueError, match="Username is required"):
+      get_user_filesystem(None)  # type: ignore
+
+  @patch("filebrowser.utils.fsmanager.get_filesystem")
+  def test_get_user_filesystem_different_users(self, mock_get_filesystem):
+    mock_fs = MagicMock()
+    mock_get_filesystem.return_value = mock_fs
+
+    # Test with different users
+    get_user_filesystem("user1")
+    mock_fs.setuser.assert_called_with("user1")
+
+    get_user_filesystem("user2")
+    mock_fs.setuser.assert_called_with("user2")

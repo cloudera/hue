@@ -151,7 +151,6 @@ class ABFSFileUploadError(UploadFileException):
   pass
 
 
-# Deprecated and core logic to be replaced with ABFSNewFileUploadHandler
 class ABFSFileUploadHandler(FileUploadHandler):
   """
   This handler is triggered by any upload field whose destination path starts with "ABFS" (case insensitive).
@@ -254,51 +253,3 @@ class ABFSFileUploadHandler(FileUploadHandler):
         raise ABFSFileSystemException('Destination does not start with a valid scheme.')
     else:
       return None
-
-
-class ABFSNewFileUploadHandler(ABFSFileUploadHandler):
-  """
-  This handler uploads the file to ABFS if the destination path starts with "ABFS" (case insensitive).
-  Streams data chunks directly to ABFS.
-  """
-
-  def __init__(self, dest_path, username):
-    self.chunk_size = DEFAULT_WRITE_SIZE
-    self.target_path = None
-    self.file = None
-    self._part_size = DEFAULT_WRITE_SIZE
-
-    self.destination = dest_path
-    self.username = username
-
-    # TODO: _is_abfs_upload really required?
-    if self._is_abfs_upload():
-      self._fs = self._get_abfs(self.username)
-      self.filesystem, self.directory = parse_uri(self.destination)[:2]
-
-    LOG.debug("Chunk size = %d" % DEFAULT_WRITE_SIZE)
-
-  def new_file(self, field_name, file_name, *args, **kwargs):
-    if self._is_abfs_upload():
-      super(ABFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
-
-      LOG.info('Using ABFSFileUploadHandler to handle file upload wit temp file%s.' % file_name)
-      self.target_path = self._fs.join(self.destination, file_name)
-
-      try:
-        # Check access permissions before attempting upload
-        # self._check_access() #implement later
-        LOG.debug("Initiating ABFS upload to target path: %s" % self.target_path)
-        self._fs.create(self.target_path)
-        self.file = SimpleUploadedFile(name=file_name, content='')
-        raise StopFutureHandlers()
-      except (ABFSFileUploadError, ABFSFileSystemException) as e:
-        LOG.error("Encountered error in ABFSUploadHandler check_access: %s" % e)
-        raise StopUpload()
-
-  def _get_abfs(self, username):
-    fs = get_client(fs='abfs', user=username)
-    if not fs:
-      raise ABFSFileUploadError(_("No ABFS filesystem found"))
-
-    return fs

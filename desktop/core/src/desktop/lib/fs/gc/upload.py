@@ -41,7 +41,6 @@ class GSFileUploadError(UploadFileException):
   pass
 
 
-# Deprecated and core logic to be replaced with GSNewFileUploadHandler
 class GSFileUploadHandler(FileUploadHandler):
   """
   This handler is triggered by any upload field whose destination path starts with "GS" (case insensitive).
@@ -184,50 +183,3 @@ class GSFileUploadHandler(FileUploadHandler):
     fp.write(raw_data)
     fp.seek(0)
     return fp
-
-
-class GSNewFileUploadHandler(GSFileUploadHandler):
-  """This handler uploads the file to Google Storage if the destination path starts with "GS" (case insensitive).
-  Streams data chunks directly to Google Cloud Storage (GS).
-  """
-
-  def __init__(self, dest_path, username):
-    self.chunk_size = DEFAULT_WRITE_SIZE
-    self.destination = dest_path
-    self.username = username
-    self.target_path = None
-    self.file = None
-    self._mp = None
-    self._part_num = 1
-
-    # TODO: _is_gs_upload really required?
-    if self._is_gs_upload():
-      self._fs = get_client(fs='gs', user=self.username)
-      self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
-
-      self._bucket = self._fs._get_bucket(self.bucket_name)
-
-  def new_file(self, field_name, file_name, *args, **kwargs):
-    """Handle the start of a new file upload.
-
-    This method is called when a new file is encountered during the upload process.
-    """
-    if self._is_gs_upload():
-      super().new_file(field_name, file_name, *args, **kwargs)
-
-      LOG.info('Using GSFileUploadHandler to handle file upload.')
-      self.target_path = self._fs.join(self.key_name, file_name)
-
-      try:
-        # Check access permissions before attempting upload
-        self._check_access()
-
-        # Create a multipart upload request
-        LOG.debug("Initiating GS multipart upload to target path: %s" % self.target_path)
-        self._mp = self._bucket.initiate_multipart_upload(self.target_path)
-        self.file = SimpleUploadedFile(name=file_name, content='')
-
-        raise StopFutureHandlers()
-      except (GSFileUploadError, GSFileSystemException) as e:
-        LOG.error("Encountered error in GSUploadHandler check_access: %s" % e)
-        raise StopUpload()

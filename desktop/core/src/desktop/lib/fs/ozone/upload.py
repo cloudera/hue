@@ -178,7 +178,6 @@ class OFSFileUploadError(UploadFileException):
   pass
 
 
-# Deprecated and core logic to be replaced with OFSNewFileUploadHandler
 class OFSFileUploadHandler(FileUploadHandler):
   """
   This handler is triggered by any upload field whose destination path starts with "OFS" (case insensitive).
@@ -280,47 +279,3 @@ class OFSFileUploadHandler(FileUploadHandler):
     else:
       return None
 
-
-class OFSNewFileUploadHandler(OFSFileUploadHandler):
-  """
-  This handler uploads the file to Apache Ozone if the destination path starts with "OFS" (case insensitive).
-  Streams data chunks directly to OFS.
-  """
-
-  def __init__(self, dest_path, username):
-    self.chunk_size = UPLOAD_CHUNK_SIZE.get()
-    self.destination = dest_path
-    self.username = username
-    self.target_path = None
-    self.file = None
-    self._part_size = UPLOAD_CHUNK_SIZE.get()
-
-    # TODO: _is_ofs_upload really required?
-    if self._is_ofs_upload():
-      self._fs = self._get_ofs(self.username)
-
-    LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
-
-  def new_file(self, field_name, file_name, *args, **kwargs):
-    if self._is_ofs_upload():
-      super(OFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
-
-      LOG.info('Using OFSFileUploadHandler to handle file upload.')
-      self.target_path = self._fs.join(self.destination, file_name)
-
-      try:
-        # Check access permissions before attempting upload
-        # self._check_access() # Not implemented
-        LOG.debug("Initiating OFS upload to target path: %s" % self.target_path)
-        self.file = SimpleUploadedFile(name=file_name, content='')
-        raise StopFutureHandlers()
-      except (OFSFileUploadError, WebHdfsException) as e:
-        LOG.error("Encountered error in OFSUploadHandler check_access: %s" % e)
-        raise StopUpload()
-
-  def _get_ofs(self, username):
-    fs = get_client(fs='ofs', user=username)
-    if not fs:
-      raise OFSFileUploadError(_("No OFS filesystem found."))
-
-    return fs

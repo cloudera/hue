@@ -137,7 +137,6 @@ class S3FileUploadError(UploadFileException):
   pass
 
 
-# Deprecated and core logic to be replaced with S3NewFileUploadHandler
 class S3FileUploadHandler(FileUploadHandler):
   """
   This handler is triggered by any upload field whose destination path starts with "S3" (case insensitive).
@@ -242,46 +241,3 @@ class S3FileUploadHandler(FileUploadHandler):
     fp.write(raw_data)
     fp.seek(0)
     return fp
-
-
-class S3NewFileUploadHandler(S3FileUploadHandler):
-  """
-  This handler uploads the file to AWS S3 if the destination path starts with "S3" (case insensitive).
-  Streams data chunks directly to S3.
-  """
-  def __init__(self, dest_path, username):
-    self.chunk_size = DEFAULT_WRITE_SIZE
-    self.destination = dest_path
-    self.username = username
-    self.target_path = None
-    self.file = None
-    self._mp = None
-    self._part_num = 1
-
-    # TODO: _is_s3_upload really required?
-    if self._is_s3_upload():
-      self._fs = get_client(fs='s3a', user=self.username)
-      self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
-
-      self._bucket = self._fs._get_bucket(self.bucket_name)
-
-  def new_file(self, field_name, file_name, *args, **kwargs):
-    if self._is_s3_upload():
-      super(S3FileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
-
-      LOG.info('Using S3FileUploadHandler to handle file upload.')
-      self.target_path = self._fs.join(self.key_name, file_name)
-
-      try:
-        # Check access permissions before attempting upload
-        self._check_access()
-
-        # Create a multipart upload request
-        LOG.debug("Initiating S3 multipart upload to target path: %s" % self.target_path)
-        self._mp = self._bucket.initiate_multipart_upload(self.target_path)
-        self.file = SimpleUploadedFile(name=file_name, content='')
-
-        raise StopFutureHandlers()
-      except (S3FileUploadError, S3FileSystemException) as e:
-        LOG.error("Encountered error in S3UploadHandler check_access: %s" % e)
-        raise StopUpload()
