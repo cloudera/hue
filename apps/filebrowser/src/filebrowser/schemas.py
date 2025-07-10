@@ -60,9 +60,13 @@ class UploadFileSchema(BaseModel):
   def validate_filesize(cls, v: int) -> int:
     """Validate file size against configured maximum limit."""
     max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
+
+    # -1 means no limit
+    if max_size == -1:
+      return v
+
     if v > max_size:
-      max_size_mib = max_size / (1024 * 1024)
-      raise ValueError(f"File too large. Maximum file size is {max_size_mib:.0f} MiB.")
+      raise ValueError(f"File too large. Maximum file size is {max_size} bytes.")
     return v
 
   @field_validator("destination_path")

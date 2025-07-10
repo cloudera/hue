@@ -16,8 +16,6 @@
 # limitations under the License.
 
 import logging
-import os
-import posixpath
 from io import BytesIO
 from typing import Any, Dict, Union
 
@@ -54,22 +52,15 @@ def upload_file(data: UploadFileSchema, username: str) -> Dict[str, Any]:
 
   fs = get_user_filesystem(username)
 
-  # Check if the destination path is a directory and the file name contains a path separator
-  # This prevents directory traversal attacks
-  if fs.isdir(destination_path) and posixpath.sep in data.filename:
-    raise ValueError("Invalid filename. Path separators are not allowed.")
-
-  # Determine the full file path
-  if fs.isdir(destination_path):
-    filepath = fs.join(destination_path, data.filename)
-  else:
-    # If destination is not a directory, use it as the full file path
-    filepath = destination_path
-    destination_path = os.path.dirname(filepath)
-
   # Check if the destination directory exists
   if not fs.exists(destination_path):
-    raise FileNotFoundError(f"The destination path {destination_path} does not exist.")
+    raise ValueError(f"The destination path {destination_path} does not exist.")
+
+  # Check if the destination directory is a directory
+  if not fs.isdir(destination_path):
+    raise ValueError(f"The destination path {destination_path} is not a directory.")
+
+  filepath = fs.join(destination_path, data.filename)
 
   # Check if the file already exists
   if fs.exists(filepath):
