@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import json
 import logging
-import operator
 import mimetypes
+import operator
+import os
 import posixpath
 from io import BytesIO as string_io
 from urllib.parse import quote
@@ -30,16 +30,21 @@ from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedir
 from django.utils.http import http_date
 from django.utils.translation import gettext as _
 from django.views.static import was_modified_since
+from rest_framework import status
+from rest_framework.parsers import MultiPartParser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from aws.s3.s3fs import S3ListAllBucketsException, get_s3_home_directory
+from aws.s3.s3fs import get_s3_home_directory, S3ListAllBucketsException
 from azure.abfs.__init__ import get_abfs_home_directory
 from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib import fsmanager, i18n
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import file_reader
-from desktop.lib.fs.gc.gs import GSListAllBucketsException, get_gs_home_directory
+from desktop.lib.fs.gc.gs import get_gs_home_directory, GSListAllBucketsException
 from desktop.lib.fs.ozone.ofs import get_ofs_home_directory
 from desktop.lib.i18n import smart_str
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
@@ -53,14 +58,14 @@ from filebrowser.conf import (
   SHOW_DOWNLOAD_BUTTON,
 )
 from filebrowser.lib.rwx import compress_mode, filetype, rwx
-from filebrowser.utils import parse_broker_url
+from filebrowser.utils import get_user_filesystem, parse_broker_url
 from filebrowser.views import (
-  DEFAULT_CHUNK_SIZE_BYTES,
-  MAX_CHUNK_SIZE_BYTES,
   _can_inline_display,
   _is_hdfs_superuser,
   _normalize_path,
+  DEFAULT_CHUNK_SIZE_BYTES,
   extract_upload_data,
+  MAX_CHUNK_SIZE_BYTES,
   perform_upload_task,
   read_contents,
   stat_absolute_path,
@@ -80,9 +85,9 @@ def error_handler(view_fn):
     try:
       return view_fn(*args, **kwargs)
     except Exception as e:
-      LOG.exception('Error running %s' % view_fn)
-      response['status'] = -1
-      response['message'] = smart_str(e)
+      LOG.exception("Error running %s" % view_fn)
+      response["status"] = -1
+      response["message"] = smart_str(e)
     return JsonResponse(response)
 
   return decorator
@@ -97,8 +102,8 @@ def get_filesystems(request):
   for k in fsmanager.get_filesystems(request.user):
     filesystems[k] = True
 
-  response['status'] = 0
-  response['filesystems'] = filesystems
+  response["status"] = 0
+  response["filesystems"] = filesystems
 
   return JsonResponse(response)
 
@@ -113,8 +118,8 @@ def api_error_handler(view_fn):
     try:
       return view_fn(*args, **kwargs)
     except Exception as e:
-      LOG.exception(f'Error running {view_fn.__name__}: {str(e)}')
-      return JsonResponse({'error': str(e)}, status=500)
+      LOG.exception(f"Error running {view_fn.__name__}: {str(e)}")
+      return JsonResponse({"error": str(e)}, status=500)
 
   return decorator
 
@@ -125,16 +130,16 @@ def _get_hdfs_home_directory(user):
 
 def _get_config(fs, request):
   config = {}
-  if fs == 'hdfs':
+  if fs == "hdfs":
     is_hdfs_superuser = _is_hdfs_superuser(request)
     config = {
-      'is_trash_enabled': is_hdfs_trash_enabled(),
+      "is_trash_enabled": is_hdfs_trash_enabled(),
       # TODO: Check if any of the below fields should be part of new Hue user and group management APIs
-      'is_hdfs_superuser': is_hdfs_superuser,
-      'groups': [str(x) for x in Group.objects.values_list('name', flat=True)] if is_hdfs_superuser else [],
-      'users': [str(x) for x in User.objects.values_list('username', flat=True)] if is_hdfs_superuser else [],
-      'superuser': request.fs.superuser,
-      'supergroup': request.fs.supergroup,
+      "is_hdfs_superuser": is_hdfs_superuser,
+      "groups": [str(x) for x in Group.objects.values_list("name", flat=True)] if is_hdfs_superuser else [],
+      "users": [str(x) for x in User.objects.values_list("username", flat=True)] if is_hdfs_superuser else [],
+      "superuser": request.fs.superuser,
+      "supergroup": request.fs.supergroup,
     }
   return config
 
@@ -154,11 +159,11 @@ def get_all_filesystems(request):
     JsonResponse: A JSON response containing a list of filesystems with their configurations.
   """
   fs_home_dir_mapping = {
-    'hdfs': _get_hdfs_home_directory,
-    's3a': get_s3_home_directory,
-    'gs': get_gs_home_directory,
-    'abfs': get_abfs_home_directory,
-    'ofs': get_ofs_home_directory,
+    "hdfs": _get_hdfs_home_directory,
+    "s3a": get_s3_home_directory,
+    "gs": get_gs_home_directory,
+    "abfs": get_abfs_home_directory,
+    "ofs": get_ofs_home_directory,
   }
 
   filesystems = []
@@ -166,7 +171,7 @@ def get_all_filesystems(request):
     user_home_dir = fs_home_dir_mapping[fs](request.user)
     config = _get_config(fs, request)
 
-    filesystems.append({'name': fs, 'user_home_directory': user_home_dir, 'config': config})
+    filesystems.append({"name": fs, "user_home_directory": user_home_dir, "config": config})
 
   return JsonResponse(filesystems, safe=False)
 
@@ -184,21 +189,21 @@ def download(request):
   Returns:
     A response object with the file contents or an error message
   """
-  path = request.GET.get('path')
+  path = request.GET.get("path")
   path = _normalize_path(path)
 
   if not SHOW_DOWNLOAD_BUTTON.get():
-    return HttpResponse('Download operation is not allowed.', status=403)
+    return HttpResponse("Download operation is not allowed.", status=403)
 
   if not request.fs.exists(path):
-    return HttpResponse(f'File does not exist: {path}', status=404)
+    return HttpResponse(f"File does not exist: {path}", status=404)
 
   if not request.fs.isfile(path):
-    return HttpResponse(f'{path} is not a file.', status=400)
+    return HttpResponse(f"{path} is not a file.", status=400)
 
-  content_type = mimetypes.guess_type(path)[0] or 'application/octet-stream'
+  content_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
   stats = request.fs.stats(path)
-  if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), stats['mtime']):
+  if not was_modified_since(request.META.get("HTTP_IF_MODIFIED_SINCE"), stats["mtime"]):
     return HttpResponseNotModified()
 
   fh = request.fs.open(path)
@@ -208,48 +213,48 @@ def download(request):
     request.fs.read(path, offset=0, length=1)
   except WebHdfsException as e:
     if e.code == 403:
-      return HttpResponse(f'User {request.user.username} is not authorized to download file at path: {path}', status=403)
-    elif request.fs._get_scheme(path).lower() == 'abfs' and e.code == 416:
+      return HttpResponse(f"User {request.user.username} is not authorized to download file at path: {path}", status=403)
+    elif request.fs._get_scheme(path).lower() == "abfs" and e.code == 416:
       # Safe to skip ABFS exception of code 416 for zero length objects, file will get downloaded anyway.
-      LOG.debug('Skipping exception from ABFS:' + str(e))
+      LOG.debug("Skipping exception from ABFS:" + str(e))
     else:
-      return HttpResponse(f'Failed to download file at path {path}: {str(e)}', status=500)  # TODO: status code?
+      return HttpResponse(f"Failed to download file at path {path}: {str(e)}", status=500)  # TODO: status code?
 
-  if REDIRECT_DOWNLOAD.get() and hasattr(fh, 'read_url'):
+  if REDIRECT_DOWNLOAD.get() and hasattr(fh, "read_url"):
     response = HttpResponseRedirect(fh.read_url())
-    setattr(response, 'redirect_override', True)
+    setattr(response, "redirect_override", True)
   else:
     response = StreamingHttpResponse(file_reader(fh), content_type=content_type)
 
     content_disposition = (
-      request.GET.get('disposition') if request.GET.get('disposition') == 'inline' and _can_inline_display(path) else 'attachment'
+      request.GET.get("disposition") if request.GET.get("disposition") == "inline" and _can_inline_display(path) else "attachment"
     )
 
     # Extract filename for HDFS and OFS for now because the path stats object has a bug in fetching name field
     # TODO: Fix this super old bug when refactoring the underlying HDFS filesystem code
-    filename = os.path.basename(path) if request.fs._get_scheme(path).lower() in ('hdfs', 'ofs') else stats['name']
+    filename = os.path.basename(path) if request.fs._get_scheme(path).lower() in ("hdfs", "ofs") else stats["name"]
 
     # Set the filename in the Content-Disposition header with proper encoding for special characters
     encoded_filename = quote(filename)
-    response['Content-Disposition'] = f"{content_disposition}; filename*=UTF-8\'\'{encoded_filename}"
+    response["Content-Disposition"] = f"{content_disposition}; filename*=UTF-8''{encoded_filename}"
 
-    response["Last-Modified"] = http_date(stats['mtime'])
-    response["Content-Length"] = stats['size']
+    response["Last-Modified"] = http_date(stats["mtime"])
+    response["Content-Length"] = stats["size"]
 
     if FILE_DOWNLOAD_CACHE_CONTROL.get():
       response["Cache-Control"] = FILE_DOWNLOAD_CACHE_CONTROL.get()
 
   request.audit = {
-    'operation': 'DOWNLOAD',
-    'operationText': 'User %s downloaded file at path "%s"' % (request.user.username, path),
-    'allowed': True,
+    "operation": "DOWNLOAD",
+    "operationText": 'User %s downloaded file at path "%s"' % (request.user.username, path),
+    "allowed": True,
   }
 
   return response
 
 
 def _massage_page(page, paginator):
-  return {'page_number': page.number, 'page_size': paginator.per_page, 'total_pages': paginator.num_pages, 'total_size': paginator.count}
+  return {"page_number": page.number, "page_size": paginator.per_page, "total_pages": paginator.num_pages, "total_size": paginator.count}
 
 
 @api_error_handler
@@ -271,21 +276,21 @@ def listdir_paged(request):
   Raises:
     HttpResponse: With appropriate status codes for errors.
   """
-  path = request.GET.get('path', '/')  # Set default path for index directory
+  path = request.GET.get("path", "/")  # Set default path for index directory
   path = _normalize_path(path)
 
   if not request.fs.isdir(path):
-    return HttpResponse(f'{path} is not a directory.', status=400)
+    return HttpResponse(f"{path} is not a directory.", status=400)
 
   # Extract pagination parameters
-  pagenum = int(request.GET.get('pagenum', 1))
-  pagesize = int(request.GET.get('pagesize', 30))
+  pagenum = int(request.GET.get("pagenum", 1))
+  pagesize = int(request.GET.get("pagesize", 30))
 
   # Determine if operation should be performed as another user
   do_as = None
   if is_admin(request.user) or request.user.has_hue_permission(action="impersonate", app="security"):
-    do_as = request.GET.get('doas', request.user.username)
-  if hasattr(request, 'doas'):
+    do_as = request.GET.get("doas", request.user.username)
+  if hasattr(request, "doas"):
     do_as = request.doas
 
   # Get stats for all files in the directory
@@ -295,22 +300,22 @@ def listdir_paged(request):
     else:
       all_stats = request.fs.listdir_stats(path)
   except (S3ListAllBucketsException, GSListAllBucketsException) as e:
-    return HttpResponse(f'Bucket listing is not allowed: {e}', status=403)
+    return HttpResponse(f"Bucket listing is not allowed: {e}", status=403)
 
   # Apply filter first if specified
-  filter_string = request.GET.get('filter')
+  filter_string = request.GET.get("filter")
   if filter_string:
-    all_stats = [sb for sb in all_stats if filter_string in sb['name']]
+    all_stats = [sb for sb in all_stats if filter_string in sb["name"]]
 
   # Next, sort with proper handling of None values
-  sortby = request.GET.get('sortby', 'name')
-  descending = coerce_bool(request.GET.get('descending', False))
-  valid_sort_fields = {'type', 'name', 'atime', 'mtime', 'user', 'group', 'size'}
+  sortby = request.GET.get("sortby", "name")
+  descending = coerce_bool(request.GET.get("descending", False))
+  valid_sort_fields = {"type", "name", "atime", "mtime", "user", "group", "size"}
 
   if sortby not in valid_sort_fields:
     LOG.info(f"Ignoring invalid sort attribute '{sortby}' for list directory operation.")
   else:
-    numeric_fields = {'size', 'atime', 'mtime'}
+    numeric_fields = {"size", "atime", "mtime"}
 
     def sorting_key(item):
       """Generate a sorting key that handles None values for different field types."""
@@ -320,7 +325,7 @@ def listdir_paged(request):
         return 0 if value is None else value
       else:
         # Treat None as an empty string for non-numeric fields
-        return '' if value is None else value
+        return "" if value is None else value
 
     try:
       all_stats = sorted(all_stats, key=sorting_key, reverse=descending)
@@ -341,7 +346,7 @@ def listdir_paged(request):
   if page:
     page.object_list = [_massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats]
 
-  response = {'files': page.object_list if page else [], 'page': _massage_page(page, paginator) if page else {}}
+  response = {"files": page.object_list if page else [], "page": _massage_page(page, paginator) if page else {}}
 
   return JsonResponse(response)
 
@@ -356,13 +361,13 @@ def display(request):
 
   Note that display by length and offset are on bytes, not on characters.
   """
-  path = request.GET.get('path', '/')  # Set default path for index directory
+  path = request.GET.get("path", "/")  # Set default path for index directory
   path = _normalize_path(path)
 
   if not request.fs.isfile(path):
-    return HttpResponse(f'{path} is not a file.', status=400)
+    return HttpResponse(f"{path} is not a file.", status=400)
 
-  encoding = request.GET.get('encoding') or i18n.get_site_encoding()
+  encoding = request.GET.get("encoding") or i18n.get_site_encoding()
 
   # Need to deal with possibility that length is not present
   # because the offset came in via the toolbar manual byte entry.
@@ -388,14 +393,14 @@ def display(request):
   mode = request.GET.get("mode")
   compression = request.GET.get("compression")
 
-  if mode and mode != 'text':
+  if mode and mode != "text":
     return HttpResponse("Mode value must be 'text'.", status=400)
   if offset < 0:
     return HttpResponse("Offset may not be less than zero.", status=400)
   if length < 0:
     return HttpResponse("Length may not be less than zero.", status=400)
   if length > MAX_CHUNK_SIZE_BYTES:
-    return HttpResponse(f'Cannot request chunks greater than {MAX_CHUNK_SIZE_BYTES} bytes.', status=400)
+    return HttpResponse(f"Cannot request chunks greater than {MAX_CHUNK_SIZE_BYTES} bytes.", status=400)
 
   # Read out based on meta.
   _, offset, length, contents = read_contents(compression, path, request.fs, offset, length)
@@ -404,21 +409,21 @@ def display(request):
   file_contents = None
   if isinstance(contents, str):
     file_contents = contents
-    mode = 'text'
+    mode = "text"
   else:
     try:
       file_contents = contents.decode(encoding)
-      mode = 'text'
+      mode = "text"
     except UnicodeDecodeError:
       LOG.error("Cannot decode file contents with encoding: %s." % encoding)
       return HttpResponse("Cannot display file content. Please download the file instead.", status=422)
 
   data = {
-    'contents': file_contents,
-    'offset': offset,
-    'length': length,
-    'end': offset + len(contents),
-    'mode': mode,
+    "contents": file_contents,
+    "offset": offset,
+    "length": length,
+    "end": offset + len(contents),
+    "mode": mode,
   }
 
   return JsonResponse(data)
@@ -429,11 +434,11 @@ def stat(request):
   """
   Returns the generic stats of FS object.
   """
-  path = request.GET.get('path')
+  path = request.GET.get("path")
   path = _normalize_path(path)
 
   if not request.fs.exists(path):
-    return HttpResponse(f'Object does not exist: {path}', status=404)
+    return HttpResponse(f"Object does not exist: {path}", status=404)
 
   stats = request.fs.stats(path)
 
@@ -472,14 +477,14 @@ def upload_chunks(request):
     for _ in request.FILES.values():
       pass
   except StopUpload as e:
-    error_message = 'Error occurred during chunk file upload.'
-    LOG.error(f'{error_message} {str(e)}')
+    error_message = "Error occurred during chunk file upload."
+    LOG.error(f"{error_message} {str(e)}")
     return HttpResponse(error_message, status=500)
 
   # Check if the file is larger than the single chunk size
   total_parts = int(request.GET.get("qqtotalparts", 0))
   if total_parts > 0:
-    return JsonResponse({'uuid': request.GET.get('qquuid')})
+    return JsonResponse({"uuid": request.GET.get("qquuid")})
 
   # Check if the file is smaller than the chunk size
   elif total_parts == 0:
@@ -489,8 +494,8 @@ def upload_chunks(request):
       return JsonResponse(response)
 
     except Exception as e:
-      error_message = 'Error occurred during chunk file upload.'
-      LOG.error(f'{error_message} {str(e)}')
+      error_message = "Error occurred during chunk file upload."
+      LOG.error(f"{error_message} {str(e)}")
       return HttpResponse(error_message, status=500)
 
 
@@ -511,8 +516,8 @@ def upload_complete(request):
 
     return JsonResponse(response)
   except Exception as e:
-    error_message = 'Error occurred during chunk file upload completion.'
-    LOG.error(f'{error_message} {str(e)}')
+    error_message = "Error occurred during chunk file upload completion."
+    LOG.error(f"{error_message} {str(e)}")
     return HttpResponse(error_message, status=500)
 
 
@@ -521,9 +526,9 @@ def upload_file(request):
   # Read request body first to prevent RawPostDataException later on which occurs when trying to access body after it has already been read
   body_data_bytes = string_io(request.body)
 
-  uploaded_file = request.FILES['file']
-  dest_path = request.POST.get('destination_path')
-  overwrite = coerce_bool(request.POST.get('overwrite', False))
+  uploaded_file = request.FILES["file"]
+  dest_path = request.POST.get("destination_path")
+  overwrite = coerce_bool(request.POST.get("overwrite", False))
 
   # Check if the file type is restricted
   _, file_type = os.path.splitext(uploaded_file.name)
@@ -534,13 +539,13 @@ def upload_file(request):
   max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
   if max_size >= 0 and uploaded_file.size >= max_size:
     return HttpResponse(
-      f'File exceeds maximum allowed size of {max_size} bytes. Hue is configured to restrict uploads larger than this limit.', status=413
+      f"File exceeds maximum allowed size of {max_size} bytes. Hue is configured to restrict uploads larger than this limit.", status=413
     )
 
   # Check if the destination path is a directory and the file name contains a path separator
   # This prevents directory traversal attacks
   if request.fs.isdir(dest_path) and posixpath.sep in uploaded_file.name:
-    return HttpResponse(f'Invalid filename. Path separators are not allowed.', status=400)
+    return HttpResponse(f"Invalid filename. Path separators are not allowed.", status=400)
 
   # Check if the file already exists at the destination path
   filepath = request.fs.join(dest_path, uploaded_file.name)
@@ -550,28 +555,76 @@ def upload_file(request):
       try:
         request.fs.rmtree(filepath)
       except Exception as e:
-        err_message = 'Failed to remove already existing file.'
-        LOG.exception(f'{err_message} {str(e)}')
+        err_message = "Failed to remove already existing file."
+        LOG.exception(f"{err_message} {str(e)}")
         return HttpResponse(err_message, status=500)
     else:
-      err_message = f'The file {uploaded_file.name} already exists at the destination path.'
+      err_message = f"The file {uploaded_file.name} already exists at the destination path."
       LOG.error(err_message)
       return HttpResponse(err_message, status=409)
 
   # Check if the destination path already exists or not
   if not request.fs.exists(dest_path):
-    return HttpResponse(f'The destination path {dest_path} does not exist.', status=404)
+    return HttpResponse(f"The destination path {dest_path} does not exist.", status=404)
 
   try:
     request.fs.upload_v1(request.META, input_data=body_data_bytes, destination=dest_path, username=request.user.username)
   except Exception as ex:
-    return HttpResponse(f'Upload to {filepath} failed: {str(ex)}', status=500)
+    return HttpResponse(f"Upload to {filepath} failed: {str(ex)}", status=500)
 
   response = {
-    'uploaded_file_stats': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
+    "uploaded_file_stats": _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
   }
 
   return JsonResponse(response)
+
+
+class UploadFileAPI(APIView):
+  parser_classes = [MultiPartParser]
+
+  def initial(self, request, *args, **kwargs):
+    """Dynamically select and set the upload handler.
+
+    This method is called before the upload handler is used.
+    It sets the upload handler for the request.
+    """
+    username = request.user.username
+    destination_path = request.query_params.get("destination_path")
+    overwrite = coerce_bool(request.query_params.get("overwrite", False))
+
+    if not destination_path:
+      # Using DRF's exception handling for a clean 400 response
+      raise status.HTTP_400_BAD_REQUEST("destination_path query parameter is required.")
+
+    fs = get_user_filesystem(username)
+
+    upload_handler = fs.get_upload_handler(destination_path, overwrite)
+    if not upload_handler:
+      raise status.HTTP_400_BAD_REQUEST(f"No supported upload handler found for path: {destination_path}")
+
+    request.upload_handlers = [upload_handler]
+
+    super().initial(request, *args, **kwargs)
+
+  def post(self, request, *args, **kwargs):
+    """Handles the file upload after the upload handler has done its work.
+
+    This method is called after the upload handler has uploaded the file.
+    request.FILES now contains the metadata dict returned by the upload handler.
+    """
+    try:
+      uploaded_file = request.FILES.get("file")
+
+      if not isinstance(uploaded_file, dict):
+        return Response(
+          {"error": "File upload failed or was not handled correctly by the upload handler."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+      response_data = {"message": "File uploaded successfully.", "uploaded_file_stats": uploaded_file}
+
+      return Response(response_data, status=status.HTTP_201_CREATED)
+    except PopupException as e:
+      return Response({"error": e.message}, status=e.error_code)
 
 
 @api_error_handler
@@ -586,8 +639,8 @@ def mkdir(request):
     A HttpResponse with a status code and message indicating the success or failure of the directory creation.
   """
   # TODO: Check if this needs to be a PUT request
-  path = request.POST.get('path')
-  name = request.POST.get('name')
+  path = request.POST.get("path")
+  name = request.POST.get("name")
 
   # Check if path and name are provided
   if not path or not name:
@@ -609,8 +662,8 @@ def mkdir(request):
 
 @api_error_handler
 def touch(request):
-  path = request.POST.get('path')
-  name = request.POST.get('name')
+  path = request.POST.get("path")
+  name = request.POST.get("name")
 
   # Check if path and name are provided
   if not path or not name:
@@ -637,11 +690,11 @@ def save_file(request):
 
   Does the save and then redirects back to the edit page.
   """
-  path = request.POST.get('path')
+  path = request.POST.get("path")
   path = _normalize_path(path)
 
-  encoding = request.POST.get('encoding')
-  data = request.POST.get('contents').encode(encoding)
+  encoding = request.POST.get("encoding")
+  data = request.POST.get("contents").encode(encoding)
 
   if not path:
     return HttpResponse("Path parameter is required for saving the file.", status=400)
@@ -660,8 +713,8 @@ def save_file(request):
 
 @api_error_handler
 def rename(request):
-  source_path = request.POST.get('source_path', '')
-  destination_path = request.POST.get('destination_path', '')
+  source_path = request.POST.get("source_path", "")
+  destination_path = request.POST.get("destination_path", "")
 
   # Check if source and destination paths are provided
   if not source_path or not destination_path:
@@ -707,23 +760,23 @@ def _validate_copy_move_operation(request, source_path, destination_path):
 
   # Check if paths are identical
   if request.fs.normpath(source_path) == request.fs.normpath(destination_path):
-    return HttpResponse('Source and destination paths must be different.', status=400)
+    return HttpResponse("Source and destination paths must be different.", status=400)
 
   # Verify source path exists
   if not request.fs.exists(source_path):
-    return HttpResponse('Source file or folder does not exist.', status=404)
+    return HttpResponse("Source file or folder does not exist.", status=404)
 
   # Check if the destination path is a directory
   if not request.fs.isdir(destination_path):
-    return HttpResponse('Destination path must be a directory.', status=400)
+    return HttpResponse("Destination path must be a directory.", status=400)
 
   # Check if destination path is parent of source path
   if _is_destination_parent_of_source(request, source_path, destination_path):
-    return HttpResponse('Destination cannot be the parent directory of source.', status=400)
+    return HttpResponse("Destination cannot be the parent directory of source.", status=400)
 
   # Check if file or folder already exists at destination path
   if request.fs.exists(request.fs.join(destination_path, os.path.basename(source_path))):
-    return HttpResponse('File or folder already exists at destination path.', status=409)
+    return HttpResponse("File or folder already exists at destination path.", status=409)
 
 
 @api_error_handler
@@ -737,8 +790,8 @@ def move(request):
   Returns:
     Success or error response with appropriate status codes
   """
-  source_path = request.POST.get('source_path', '')
-  destination_path = request.POST.get('destination_path', '')
+  source_path = request.POST.get("source_path", "")
+  destination_path = request.POST.get("destination_path", "")
 
   # Validate the operation and return error response if any scenario fails
   validation_response = _validate_copy_move_operation(request, source_path, destination_path)
@@ -760,8 +813,8 @@ def copy(request):
   Returns:
     Success or error response with appropriate status codes
   """
-  source_path = request.POST.get('source_path', '')
-  destination_path = request.POST.get('destination_path', '')
+  source_path = request.POST.get("source_path", "")
+  destination_path = request.POST.get("destination_path", "")
 
   # Validate the operation and return error response if any scenario fails
   validation_response = _validate_copy_move_operation(request, source_path, destination_path)
@@ -769,10 +822,10 @@ def copy(request):
     return validation_response
 
   # Copy method for Ozone FS returns a string of skipped files if their size is greater than configured chunk size.
-  if source_path.startswith('ofs://'):
+  if source_path.startswith("ofs://"):
     ofs_skip_files = request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
     if ofs_skip_files:
-      return JsonResponse({'skipped_files': ofs_skip_files}, status=500)  # TODO: Status code?
+      return JsonResponse({"skipped_files": ofs_skip_files}, status=500)  # TODO: Status code?
   else:
     request.fs.copy(source_path, destination_path, recursive=True, owner=request.user)
 
@@ -781,24 +834,24 @@ def copy(request):
 
 @api_error_handler
 def content_summary(request):
-  path = request.GET.get('path')
+  path = request.GET.get("path")
   path = _normalize_path(path)
 
   if not path:
     return HttpResponse("Path parameter is required to fetch content summary.", status=400)
 
   if not request.fs.exists(path):
-    return HttpResponse(f'Path does not exist: {path}', status=404)
+    return HttpResponse(f"Path does not exist: {path}", status=404)
 
   response = {}
   try:
     content_summary = request.fs.get_content_summary(path)
-    replication_factor = request.fs.stats(path)['replication']
+    replication_factor = request.fs.stats(path)["replication"]
 
-    content_summary.summary.update({'replication': replication_factor})
+    content_summary.summary.update({"replication": replication_factor})
     response = content_summary.summary
   except Exception:
-    return HttpResponse(f'Failed to fetch content summary for path: {path}', status=500)
+    return HttpResponse(f"Failed to fetch content summary for path: {path}", status=500)
 
   return JsonResponse(response)
 
@@ -806,8 +859,8 @@ def content_summary(request):
 @api_error_handler
 def set_replication(request):
   # TODO: Check if this needs to be a PUT request
-  path = request.POST.get('path')
-  replication_factor = request.POST.get('replication_factor')
+  path = request.POST.get("path")
+  replication_factor = request.POST.get("replication_factor")
 
   result = request.fs.set_replication(path, replication_factor)
   if not result:
@@ -819,8 +872,8 @@ def set_replication(request):
 @api_error_handler
 def rmtree(request):
   # TODO: Check if this needs to be a DELETE request
-  path = request.POST.get('path')
-  skip_trash = coerce_bool(request.POST.get('skip_trash', False))
+  path = request.POST.get("path")
+  skip_trash = coerce_bool(request.POST.get("skip_trash", False))
 
   request.fs.rmtree(path, skip_trash)
 
@@ -829,26 +882,26 @@ def rmtree(request):
 
 @api_error_handler
 def get_trash_path(request):
-  path = request.GET.get('path')
+  path = request.GET.get("path")
   path = _normalize_path(path)
   response = {}
 
   trash_path = request.fs.trash_path(path)
-  user_home_trash_path = request.fs.join(request.fs.current_trash_path(trash_path), request.user.get_home_directory().lstrip('/'))
+  user_home_trash_path = request.fs.join(request.fs.current_trash_path(trash_path), request.user.get_home_directory().lstrip("/"))
 
   if request.fs.isdir(user_home_trash_path):
-    response['trash_path'] = user_home_trash_path
+    response["trash_path"] = user_home_trash_path
   elif request.fs.isdir(trash_path):
-    response['trash_path'] = trash_path
+    response["trash_path"] = trash_path
   else:
-    response['trash_path'] = None
+    response["trash_path"] = None
 
   return JsonResponse(response)
 
 
 @api_error_handler
 def trash_restore(request):
-  path = request.POST.get('path')
+  path = request.POST.get("path")
   request.fs.restore(path)
 
   return HttpResponse(status=200)
@@ -864,10 +917,10 @@ def trash_purge(request):
 @api_error_handler
 def chown(request):
   # TODO: Check if this needs to be a PUT request
-  path = request.POST.get('path')
+  path = request.POST.get("path")
   user = request.POST.get("user")
   group = request.POST.get("group")
-  recursive = coerce_bool(request.POST.get('recursive', False))
+  recursive = coerce_bool(request.POST.get("recursive", False))
 
   # TODO: Check if we need to explicitly handle encoding anywhere
   request.fs.chown(path, user, group, recursive=recursive)
@@ -891,12 +944,12 @@ def chmod(request):
     "other_execute",
     "sticky",
   )
-  path = request.POST.get('path')
-  permission = json.loads(request.POST.get("permission", '{}'))
+  path = request.POST.get("path")
+  permission = json.loads(request.POST.get("permission", "{}"))
 
   mode = compress_mode([coerce_bool(permission.get(p)) for p in perm_names])
 
-  request.fs.chmod(path, mode, recursive=coerce_bool(permission.get('recursive', False)))
+  request.fs.chmod(path, mode, recursive=coerce_bool(permission.get("recursive", False)))
 
   return HttpResponse(status=200)
 
@@ -907,8 +960,8 @@ def extract_archive_using_batch_job(request):
   if not ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
     return HttpResponse("Extract archive operation is disabled by configuration.", status=500)  # TODO: status code?
 
-  upload_path = request.fs.netnormpath(request.POST.get('upload_path'))
-  archive_name = request.POST.get('archive_name')
+  upload_path = request.fs.netnormpath(request.POST.get("upload_path"))
+  archive_name = request.POST.get("archive_name")
 
   if upload_path and archive_name:
     try:
@@ -917,7 +970,7 @@ def extract_archive_using_batch_job(request):
       # archive_name = urllib_unquote(archive_name)
       response = extract_archive_in_hdfs(request, upload_path, archive_name)
     except Exception as e:
-      return HttpResponse(f'Failed to extract archive: {str(e)}', status=500)  # TODO: status code?
+      return HttpResponse(f"Failed to extract archive: {str(e)}", status=500)  # TODO: status code?
 
   return JsonResponse(response)
 
@@ -928,17 +981,17 @@ def compress_files_using_batch_job(request):
   if not ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
     return HttpResponse("Compress files operation is disabled by configuration.", status=500)  # TODO: status code?
 
-  upload_path = request.fs.netnormpath(request.POST.get('upload_path'))
-  archive_name = request.POST.get('archive_name')
-  file_names = request.POST.getlist('file_name')
+  upload_path = request.fs.netnormpath(request.POST.get("upload_path"))
+  archive_name = request.POST.get("archive_name")
+  file_names = request.POST.getlist("file_name")
 
   if upload_path and file_names and archive_name:
     try:
       response = compress_files_in_hdfs(request, file_names, upload_path, archive_name)
     except Exception as e:
-      return HttpResponse(f'Failed to compress files: {str(e)}', status=500)  # TODO: status code?
+      return HttpResponse(f"Failed to compress files: {str(e)}", status=500)  # TODO: status code?
   else:
-    return HttpResponse('Output directory is not set.', status=500)  # TODO: status code?
+    return HttpResponse("Output directory is not set.", status=500)  # TODO: status code?
 
   return JsonResponse(response)
 
@@ -947,11 +1000,11 @@ def compress_files_using_batch_job(request):
 def get_available_space_for_upload(request):
   redis_client = parse_broker_url(TASK_SERVER_V2.BROKER_URL.get())
   try:
-    upload_available_space = int(redis_client.get('upload_available_space'))
+    upload_available_space = int(redis_client.get("upload_available_space"))
     if upload_available_space is None:
       return HttpResponse("upload_available_space key is not set in Redis.", status=500)  # TODO: status code?
 
-    return JsonResponse({'upload_available_space': upload_available_space})
+    return JsonResponse({"upload_available_space": upload_available_space})
   except Exception as e:
     message = f"Failed to get available space from Redis: {str(e)}"
     LOG.exception(message)
@@ -964,15 +1017,15 @@ def get_available_space_for_upload(request):
 def bulk_op(request, op):
   # TODO: Also try making a generic request data fetching helper method
   bulk_dict = request.POST.copy()
-  path_list = request.POST.getlist('source_path') if op in (copy, move) else request.POST.getlist('path')
+  path_list = request.POST.getlist("source_path") if op in (copy, move) else request.POST.getlist("path")
 
   error_dict = {}
   for p in path_list:
     tmp_dict = bulk_dict
     if op in (copy, move):
-      tmp_dict['source_path'] = p
+      tmp_dict["source_path"] = p
     else:
-      tmp_dict['path'] = p
+      tmp_dict["path"] = p
 
     request.POST = tmp_dict
     response = op(request)
@@ -980,11 +1033,11 @@ def bulk_op(request, op):
     if response.status_code != 200:
       # TODO: Improve the error handling with new error UX
       # Currently, we are storing the error in the error_dict based on response type for each path
-      res_content = response.content.decode('utf-8')
+      res_content = response.content.decode("utf-8")
       if isinstance(response, JsonResponse):
         error_dict[p] = json.loads(res_content)  # Simply assign to not have dupicate error fields
       else:
-        error_dict[p] = {'error': res_content}
+        error_dict[p] = {"error": res_content}
 
   if error_dict:
     return JsonResponse(error_dict, status=500)  # TODO: Check if we need diff status code or diff json structure?
@@ -998,13 +1051,13 @@ def _massage_stats(request, stats):
   into the format that the views would like it in.
   """
   stats_dict = stats.to_json_dict()
-  normalized_path = request.fs.normpath(stats_dict.get('path'))
+  normalized_path = request.fs.normpath(stats_dict.get("path"))
 
   stats_dict.update(
     {
-      'path': normalized_path,
-      'type': filetype(stats.mode),
-      'rwx': rwx(stats.mode, stats.aclBit),
+      "path": normalized_path,
+      "type": filetype(stats.mode),
+      "rwx": rwx(stats.mode, stats.aclBit),
     }
   )
 

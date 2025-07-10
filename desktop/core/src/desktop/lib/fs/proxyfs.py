@@ -312,3 +312,6 @@ class ProxyFS(object):
 
   def get_upload_chuck_size(self, path):
     return self._get_fs(path).get_upload_chuck_size()
+
+  def get_upload_handler(self, destination_path, overwrite):
+    return self._get_fs(destination_path).get_upload_handler(destination_path, overwrite)

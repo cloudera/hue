@@ -22,6 +22,7 @@ See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
 import logging
+import os
 import unicodedata
 from io import BytesIO as stream_io
 
@@ -34,6 +35,7 @@ from aws.s3.s3fs import S3FileSystemException
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
+from filebrowser.conf import MAX_FILE_SIZE_UPLOAD_LIMIT
 from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 128  # TODO: set in configuration (currently 128 MiB)
@@ -242,6 +244,103 @@ class S3FileUploadHandler(FileUploadHandler):
     fp.write(raw_data)
     fp.seek(0)
     return fp
+
+
+class S3StreamingUploadHandler(FileUploadHandler):
+  """
+  This handler uploads the file to AWS S3 if the destination path starts with "S3" (case insensitive).
+  Streams data chunks directly to S3.
+  """
+  def __init__(self, username, dest_path, overwrite):
+    self.chunk_size = DEFAULT_WRITE_SIZE
+    self.username = username
+    self.dest_path = dest_path
+    self.overwrite = overwrite
+    self.part_number = 1
+    self.multipart_upload = None
+    self.total_bytes_received = 0
+
+    self._fs = get_client(fs='s3a', user=self.username)
+    self.bucket_name, self.key_name = parse_uri(self.dest_path)[:2]
+
+    self._bucket = self._fs._get_bucket(self.bucket_name)
+
+  def new_file(self, field_name, file_name, *args, **kwargs):
+    super(S3StreamingUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
+
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(file_name)
+    if not is_allowed:
+      raise PopupException(err_message, error_code=400)
+
+    # Check if the destination path already exists or not
+    if not self._fs.exists(self.dest_path):
+      raise PopupException(f"The destination path {self.dest_path} does not exist.", error_code=404)
+
+    # Check if the destination path is a directory or not
+    if not self._fs.isdir(self.dest_path):
+      raise PopupException(f"The destination path {self.dest_path} is not a directory.", error_code=400)
+
+    # Check if the file name contains a path separator
+    # This prevents directory traversal attacks
+    if self._fs.isdir(self.dest_path) and os.path.sep in file_name:
+      raise PopupException("Invalid filename. Path separators are not allowed.", error_code=400)
+
+    # Check if the file already exists at the destination path
+    if self._fs.exists(self._fs.join(self.dest_path, file_name)):
+      if self.overwrite:
+        self._fs.remove(self._fs.join(self.dest_path, file_name))
+      else:
+        raise PopupException(f"The file {file_name} already exists at the destination path.", error_code=409)
+
+    self.target_key_path = self._fs.join(self.key_name, file_name)
+
+    # Check if the user has write access to the destination path
+    if not self._fs.check_access(self.dest_path, permission='WRITE'):
+      raise PopupException(f"Insufficient permissions to write to S3 path {self.dest_path}.", error_code=403)
+
+    # Create a multipart upload request
+    try:
+      LOG.debug(f"Initiating S3 multipart upload to target path: {self.target_key_path}")
+      self.multipart_upload = self._bucket.initiate_multipart_upload(self.target_key_path)
+    except Exception as e:
+      LOG.error(f"Initiating S3 multipart upload to target path failed: {e}")
+      raise PopupException(f"Failed to initiate S3 multipart upload to target path: {self.target_key_path}", error_code=500)
+
+  def receive_data_chunk(self, raw_data, start):
+    self.total_bytes_received += len(raw_data)
+    max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
+
+    # Perform max size check on the fly
+    if max_size != -1 and max_size >= 0 and self.total_bytes_received > max_size:
+      raise PopupException(f"File exceeds maximum allowed size of {max_size} bytes.", error_code=413)
+
+    # This chunk must be uploaded by the child class
+    self.upload_chunk(raw_data)
+    return None  # Return None to signal you are handling the data
+
+  def upload_chunk(self, raw_chunk):
+    try:
+      self.multipart_upload.upload_part_from_file(fp=self._get_file_part(raw_chunk), part_num=self.part_number)
+      self.part_number += 1
+    except Exception as e:
+      self.multipart_upload.cancel_upload()
+      raise PopupException(f"Failed to upload part: {e}", error_code=500)
+
+  def _get_file_part(self, raw_chunk):
+    fp = stream_io()
+    fp.write(raw_chunk)
+    fp.seek(0)
+    return fp
+
+  def file_complete(self, file_size):
+    # Finish the upload
+    self.multipart_upload.complete_upload()
+    return {
+      'filename': self.file_name,
+      'file_path': f"s3a://{self.bucket_name}/{self.target_key_path}",
+      'size': self.total_bytes_received,
+    }
 
 
 class S3NewFileUploadHandler(S3FileUploadHandler):

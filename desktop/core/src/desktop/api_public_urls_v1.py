@@ -21,6 +21,7 @@ from about import api as about_api
 from desktop import api_public
 from desktop.lib.botserver import api as botserver_api
 from desktop.lib.importer import api as importer_api
+from filebrowser import api as filebrowser_api
 
 # "New" query API (i.e. connector based, lean arguments).
 # e.g. https://demo.gethue.com/api/query/execute/hive
@@ -114,7 +115,7 @@ urlpatterns += [
   re_path(r'^storage/rename/?$', api_public.storage_rename, name='storage_rename'),
   re_path(r'^storage/move/?$', api_public.storage_move, name='storage_move'),
   re_path(r'^storage/copy/?$', api_public.storage_copy, name='storage_copy'),
-  re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),
+  re_path(r'^storage/upload/file/?$', filebrowser_api.UploadFileAPI.as_view(), name='storage_upload_file'),
   re_path(r'^storage/upload/chunks/?$', api_public.storage_upload_chunks, name='storage_upload_chunks'),
   re_path(r'^storage/upload/complete/?$', api_public.storage_upload_complete, name='storage_upload_complete'),
   re_path(r'^storage/stat/?$', api_public.storage_stat, name='storage_stat'),

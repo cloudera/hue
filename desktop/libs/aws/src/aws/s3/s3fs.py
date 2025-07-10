@@ -671,3 +671,7 @@ class S3FileSystem(object):
   def get_upload_chuck_size(self):
     from hadoop.conf import UPLOAD_CHUNK_SIZE  # circular dependency
     return UPLOAD_CHUNK_SIZE.get()
+
+  def get_upload_handler(self, destination_path, overwrite):
+    from aws.s3.upload import S3StreamingUploadHandler
+    return S3StreamingUploadHandler(self.user, destination_path, overwrite)
