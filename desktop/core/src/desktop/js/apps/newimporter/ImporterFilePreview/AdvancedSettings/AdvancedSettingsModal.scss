@@ -14,35 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
-
-.antd.cuix {
-  .hue-importer-configuration {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    padding: 16px;
-
-    &__summary {
-      display: flex;
-      gap: 8px;
-      width: max-content;
-      list-style: none;
-      color: vars.$fluidx-blue-600;
-      cursor: pointer;
-    }
-
-    &__dropdown {
-      border: 1px solid vars.$fluidx-gray-600;
-      border-radius: vars.$border-radius-base;
-      width: 100%;
-    }
+.importer-advanced-settings-modal {
+  .ant-modal-content {
+    max-height: 80vh;
+    overflow-y: auto;
   }
 
-  .hue-importer-configuration-options {
-    padding-top: 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    grid-gap: 16px;
+  .ant-form-item {
+    margin-bottom: 8px;
+  }
+
+  .ant-checkbox-wrapper {
+    margin-right: 8px;
+  }
+
+  .ant-divider {
+    margin: 16px 0;
+  }
+
+  .ant-tooltip {
+    cursor: help;
   }
 }
