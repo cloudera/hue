@@ -919,6 +919,10 @@ class WebHdfs(Hdfs):
   def filebrowser_action(self):
     return None
 
+  def get_upload_handler(self, destination_path, overwrite):
+    from hadoop.fs.upload import HDFSStreamingUploadHandler
+    return HDFSStreamingUploadHandler(self, destination_path, overwrite)
+
 
 class File(object):
   """

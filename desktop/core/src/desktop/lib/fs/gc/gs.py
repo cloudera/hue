@@ -488,3 +488,7 @@ class GSFileSystem(S3FileSystem):
 
     parser = MultiPartParser(META, input_data, [gs_upload_handler])
     return parser.parse()
+
+  def get_upload_handler(self, destination_path, overwrite):
+    from desktop.lib.fs.gc.upload import GSStreamingUploadHandler
+    return GSStreamingUploadHandler(self, destination_path, overwrite)

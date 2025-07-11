@@ -674,4 +674,4 @@ class S3FileSystem(object):
 
   def get_upload_handler(self, destination_path, overwrite):
     from aws.s3.upload import S3StreamingUploadHandler
-    return S3StreamingUploadHandler(self.user, destination_path, overwrite)
+    return S3StreamingUploadHandler(self, destination_path, overwrite)

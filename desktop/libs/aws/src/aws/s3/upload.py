@@ -36,7 +36,7 @@ from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
 from filebrowser.conf import MAX_FILE_SIZE_UPLOAD_LIMIT
-from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed
+from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed, massage_stats
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 128  # TODO: set in configuration (currently 128 MiB)
 
@@ -251,16 +251,15 @@ class S3StreamingUploadHandler(FileUploadHandler):
   This handler uploads the file to AWS S3 if the destination path starts with "S3" (case insensitive).
   Streams data chunks directly to S3.
   """
-  def __init__(self, username, dest_path, overwrite):
+  def __init__(self, fs, dest_path, overwrite):
     self.chunk_size = DEFAULT_WRITE_SIZE
-    self.username = username
+    self._fs = fs
     self.dest_path = dest_path
     self.overwrite = overwrite
     self.part_number = 1
     self.multipart_upload = None
     self.total_bytes_received = 0
 
-    self._fs = get_client(fs='s3a', user=self.username)
     self.bucket_name, self.key_name = parse_uri(self.dest_path)[:2]
 
     self._bucket = self._fs._get_bucket(self.bucket_name)
@@ -283,8 +282,12 @@ class S3StreamingUploadHandler(FileUploadHandler):
 
     # Check if the file name contains a path separator
     # This prevents directory traversal attacks
-    if self._fs.isdir(self.dest_path) and os.path.sep in file_name:
+    if os.path.sep in file_name:
       raise PopupException("Invalid filename. Path separators are not allowed.", error_code=400)
+
+    # Check if the user has write access to the destination path
+    if not self._fs.check_access(self.dest_path, permission='WRITE'):
+      raise PopupException(f"Insufficient permissions to write to S3 path {self.dest_path}.", error_code=403)
 
     # Check if the file already exists at the destination path
     if self._fs.exists(self._fs.join(self.dest_path, file_name)):
@@ -294,10 +297,6 @@ class S3StreamingUploadHandler(FileUploadHandler):
         raise PopupException(f"The file {file_name} already exists at the destination path.", error_code=409)
 
     self.target_key_path = self._fs.join(self.key_name, file_name)
-
-    # Check if the user has write access to the destination path
-    if not self._fs.check_access(self.dest_path, permission='WRITE'):
-      raise PopupException(f"Insufficient permissions to write to S3 path {self.dest_path}.", error_code=403)
 
     # Create a multipart upload request
     try:
@@ -336,11 +335,11 @@ class S3StreamingUploadHandler(FileUploadHandler):
   def file_complete(self, file_size):
     # Finish the upload
     self.multipart_upload.complete_upload()
-    return {
-      'filename': self.file_name,
-      'file_path': f"s3a://{self.bucket_name}/{self.target_key_path}",
-      'size': self.total_bytes_received,
-    }
+
+    file_stats = self._fs.stats(f"s3a://{self.bucket_name}/{self.target_key_path}")
+    file_stats = massage_stats(file_stats)
+
+    return file_stats
 
 
 class S3NewFileUploadHandler(S3FileUploadHandler):

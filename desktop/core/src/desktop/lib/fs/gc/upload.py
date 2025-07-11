@@ -22,15 +22,18 @@ See http://docs.djangoproject.com/en/1.9/topics/http/file-uploads/
 """
 
 import logging
+import os
 from io import BytesIO as stream_io
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload, UploadFileException
 
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs.gc import parse_uri
 from desktop.lib.fs.gc.gs import GSFileSystemException
 from desktop.lib.fsmanager import get_client
-from filebrowser.utils import is_file_upload_allowed
+from filebrowser.conf import MAX_FILE_SIZE_UPLOAD_LIMIT
+from filebrowser.utils import is_file_upload_allowed, massage_stats
 
 LOG = logging.getLogger()
 
@@ -231,3 +234,93 @@ class GSNewFileUploadHandler(GSFileUploadHandler):
       except (GSFileUploadError, GSFileSystemException) as e:
         LOG.error("Encountered error in GSUploadHandler check_access: %s" % e)
         raise StopUpload()
+
+
+class GSStreamingUploadHandler(FileUploadHandler):
+  """
+  This handler uploads the file to Google Cloud Storage if the destination path starts with "GS" (case insensitive).
+  Streams data chunks directly to Google Cloud Storage.
+  """
+  def __init__(self, fs, dest_path, overwrite):
+    self.chunk_size = DEFAULT_WRITE_SIZE
+    self._fs = fs
+    self.dest_path = dest_path
+    self.overwrite = overwrite
+    self.part_number = 1
+    self.multipart_upload = None
+    self.total_bytes_received = 0
+
+    self.bucket_name, self.key_name = parse_uri(self.dest_path)[:2]
+
+    self._bucket = self._fs._get_bucket(self.bucket_name)
+
+  def new_file(self, field_name, file_name, *args, **kwargs):
+    super(GSStreamingUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
+
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(file_name)
+    if not is_allowed:
+      raise PopupException(err_message, error_code=400)
+
+    # Check if the destination path already exists or not
+    if not self._fs.exists(self.dest_path):
+      raise PopupException(f"The destination path {self.dest_path} does not exist.", error_code=404)
+
+    # Check if the destination path is a directory or not
+    if not self._fs.isdir(self.dest_path):
+      raise PopupException(f"The destination path {self.dest_path} is not a directory.", error_code=400)
+
+    # Check if the file name contains a path separator
+    # This prevents directory traversal attacks
+    if os.path.sep in file_name:
+      raise PopupException("Invalid filename. Path separators are not allowed.", error_code=400)
+
+    # Check if the user has write access to the destination path
+    if not self._fs.check_access(self.dest_path, permission='WRITE'):
+      raise PopupException(f"Insufficient permissions to write to GS path {self.dest_path}.", error_code=403)
+
+    # Check if the file already exists at the destination path
+    if self._fs.exists(self._fs.join(self.dest_path, file_name)):
+      if self.overwrite:
+        self._fs.remove(self._fs.join(self.dest_path, file_name))
+      else:
+        raise PopupException(f"The file {file_name} already exists at the destination path.", error_code=409)
+
+    self.target_key_path = self._fs.join(self.key_name, file_name)
+
+    # Create a multipart upload request
+    try:
+      LOG.debug(f"Initiating GS multipart upload to target path: {self.target_key_path}")
+      self.multipart_upload = self._bucket.initiate_multipart_upload(self.target_key_path)
+    except Exception as e:
+      LOG.error(f"Initiating GS multipart upload to target path failed: {e}")
+      raise PopupException(f"Failed to initiate GS multipart upload to target path: {self.target_key_path}", error_code=500)
+
+  def receive_data_chunk(self, raw_data, start):
+    self.total_bytes_received += len(raw_data)
+    max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
+
+    # Perform max size check on the fly
+    if max_size != -1 and max_size >= 0 and self.total_bytes_received > max_size:
+      raise PopupException(f"File exceeds maximum allowed size of {max_size} bytes.", error_code=413)
+
+    # Upload the chunk
+    self.upload_chunk(raw_data)
+    return None
+
+  def upload_chunk(self, raw_chunk):
+    try:
+      self.multipart_upload.upload_part_from_file(fp=stream_io(raw_chunk), part_num=self.part_number)
+      self.part_number += 1
+    except Exception as e:
+      self.multipart_upload.cancel_upload()
+      raise PopupException(f"Failed to upload part: {e}", error_code=500)
+
+  def file_complete(self, file_size):
+    # Finish the upload
+    self.multipart_upload.complete_upload()
+
+    file_stats = self._fs.stats(f"gs://{self.bucket_name}/{self.target_key_path}")
+    file_stats = massage_stats(file_stats)
+
+    return file_stats

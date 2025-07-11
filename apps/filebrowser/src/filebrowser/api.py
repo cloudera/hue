@@ -593,7 +593,6 @@ class UploadFileAPI(APIView):
     overwrite = coerce_bool(request.query_params.get("overwrite", False))
 
     if not destination_path:
-      # Using DRF's exception handling for a clean 400 response
       raise status.HTTP_400_BAD_REQUEST("destination_path query parameter is required.")
 
     fs = get_user_filesystem(username)
@@ -607,7 +606,7 @@ class UploadFileAPI(APIView):
     super().initial(request, *args, **kwargs)
 
   def post(self, request, *args, **kwargs):
-    """Handles the file upload after the upload handler has done its work.
+    """Handles the file upload response after the upload handler has done its work.
 
     This method is called after the upload handler has uploaded the file.
     request.FILES now contains the metadata dict returned by the upload handler.
@@ -620,11 +619,14 @@ class UploadFileAPI(APIView):
           {"error": "File upload failed or was not handled correctly by the upload handler."}, status=status.HTTP_400_BAD_REQUEST
         )
 
-      response_data = {"message": "File uploaded successfully.", "uploaded_file_stats": uploaded_file}
+      response_data = {"file_stats": uploaded_file}
 
       return Response(response_data, status=status.HTTP_201_CREATED)
     except PopupException as e:
       return Response({"error": e.message}, status=e.error_code)
+    except Exception as e:
+      LOG.exception(f"An unexpected error occurred while uploading the file: {e}")
+      return Response({"error": "An unexpected error occurred while uploading the file."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_error_handler
