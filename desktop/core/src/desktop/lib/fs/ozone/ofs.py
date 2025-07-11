@@ -319,3 +319,7 @@ class OzoneFS(WebHdfs):
         skip_file_list += ' \n- ' + src
 
     return skip_file_list
+
+  def get_upload_handler(self, destination_path, overwrite):
+    from desktop.lib.fs.ozone.upload import OFSStreamingUploadHandler
+    return OFSStreamingUploadHandler(self, destination_path, overwrite)

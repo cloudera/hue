@@ -35,8 +35,8 @@ import hadoop.cluster
 from desktop.lib import fsmanager
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
-from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
-from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed
+from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR, MAX_FILE_SIZE_UPLOAD_LIMIT
+from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed, massage_stats
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -485,6 +485,118 @@ class HDFSNewFileUploadHandler(FileUploadHandler):
       raise HDFSerror(_("No HDFS found for upload operation."))
 
     return fs
+
+
+class HDFSStreamingUploadHandler(FileUploadHandler):
+  """
+  This handler uploads the file to HDFS if the destination path is an HDFS path.
+  Streams data chunks directly to HDFS.
+  """
+
+  def __init__(self, fs, dest_path, overwrite):
+    self.chunk_size = UPLOAD_CHUNK_SIZE.get()
+    self._fs = fs
+    self.dest_path = dest_path
+    self.overwrite = overwrite
+    self.total_bytes_received = 0
+    self.target_file_path = None
+
+  def new_file(self, field_name, file_name, *args, **kwargs):
+    super(HDFSStreamingUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
+
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(file_name)
+    if not is_allowed:
+      raise PopupException(err_message, error_code=400)
+
+    # Check if the destination path already exists or not
+    if not self._fs.exists(self.dest_path):
+      raise PopupException(f"The destination path {self.dest_path} does not exist.", error_code=404)
+
+    # Check if the destination path is a directory or not
+    if not self._fs.isdir(self.dest_path):
+      raise PopupException(f"The destination path {self.dest_path} is not a directory.", error_code=400)
+
+    # Check if the file name contains a path separator
+    # This prevents directory traversal attacks
+    if os.path.sep in file_name:
+      raise PopupException("Invalid filename. Path separators are not allowed.", error_code=400)
+
+    # Check if the user has write access to the destination path
+    try:
+      self._fs.check_access(self.dest_path, "rw-")
+    except WebHdfsException as e:
+      LOG.exception(f"Error checking access to path {self.dest_path}: {e}")
+      raise PopupException(f"Insufficient permissions to write to path {self.dest_path}.", error_code=403)
+
+    self.target_file_path = self._fs.join(self.dest_path, file_name)
+
+    # Check if the file already exists at the destination path
+    if self._fs.exists(self.target_file_path):
+      if self.overwrite:
+        self._fs.remove(self.target_file_path, skip_trash=True)
+      else:
+        raise PopupException(f"The file {file_name} already exists at the destination path.", error_code=409)
+
+    # Create the file directly at the destination
+    try:
+      LOG.info("Using HDFSStreamingUploadHandler to handle file upload.")
+      self._fs.create(
+        self.target_file_path,
+        overwrite=False,  # We already handled overwrite above
+        permission=0o644,  # Default file permissions
+      )
+    except Exception as ex:
+      LOG.error("Failed to create file for upload: %s" % (ex))
+      raise PopupException(f"Failed to initiate HDFS upload: {ex}", error_code=500)
+
+  def receive_data_chunk(self, raw_data, start):
+    self.total_bytes_received += len(raw_data)
+    max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
+
+    # Perform max size check on the fly
+    if max_size != -1 and max_size >= 0 and self.total_bytes_received > max_size:
+      raise PopupException(f"File exceeds maximum allowed size of {max_size} bytes.", error_code=413)
+
+    # Append the chunk directly to the destination file
+    try:
+      self._fs.append(self.target_file_path, raw_data)
+      return None
+    except Exception as e:
+      LOG.exception('Error appending data to file "%s"' % self.target_file_path)
+      try:  # Try to clean up the partial file
+        self._fs.remove(self.target_file_path, skip_trash=True)
+      except Exception:
+        pass
+
+      raise PopupException(f"Failed to write upload data: {e}", error_code=500)
+
+  def file_complete(self, file_size):
+    # Get file stats
+    file_stats = self._fs.stats(self.target_file_path)
+
+    # Perform size verification explicitly
+    actual_size = file_stats.size
+    if actual_size != file_size:
+      LOG.error(f"HDFS upload size mismatch for {self.target_file_path}: expected {file_size} bytes, got {actual_size} bytes")
+
+      # Clean up the corrupted file
+      try:
+        self._fs.remove(self.target_file_path, skip_trash=True)
+      except Exception as cleanup_error:
+        LOG.warning(f"Failed to clean up corrupted file {self.target_file_path}: {cleanup_error}")
+
+      # Raise exception to fail the upload
+      raise PopupException(
+        f"Upload verification failed: expected {file_size} bytes, but only {actual_size} bytes were written. "
+        f"The incomplete file has been removed.",
+        error_code=422,
+      )
+
+    LOG.info(f"HDFS upload completed successfully: {file_size} bytes written to {self.target_file_path}")
+
+    file_stats = massage_stats(file_stats)
+    return file_stats
 
 
 class HDFSNewTemporaryUploadedFile(object):

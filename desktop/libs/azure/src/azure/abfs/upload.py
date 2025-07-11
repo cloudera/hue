@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import logging
+import os
 import unicodedata
 from io import BytesIO
 
@@ -27,7 +28,8 @@ from azure.abfs.abfs import ABFSFileSystemException
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
-from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed
+from filebrowser.conf import MAX_FILE_SIZE_UPLOAD_LIMIT
+from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed, massage_stats
 
 DEFAULT_WRITE_SIZE = 100 * 1024 * 1024  # As per Azure doc, maximum blob size is 100MB
 
@@ -302,3 +304,108 @@ class ABFSNewFileUploadHandler(ABFSFileUploadHandler):
       raise ABFSFileUploadError(_("No ABFS filesystem found"))
 
     return fs
+
+
+class ABFSStreamingUploadHandler(FileUploadHandler):
+  """
+  This handler uploads the file to Azure Blob File System if the destination path starts with "ABFS" (case insensitive).
+  Streams data chunks directly to ABFS.
+  """
+
+  def __init__(self, fs, dest_path, overwrite):
+    self.chunk_size = DEFAULT_WRITE_SIZE
+    self._fs = fs
+    self.dest_path = dest_path
+    self.overwrite = overwrite
+    self.total_bytes_received = 0
+
+  def new_file(self, field_name, file_name, *args, **kwargs):
+    super(ABFSStreamingUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
+
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(file_name)
+    if not is_allowed:
+      raise PopupException(err_message, error_code=400)
+
+    # Check if the destination path already exists or not
+    if not self._fs.exists(self.dest_path):
+      raise PopupException(f"The destination path {self.dest_path} does not exist.", error_code=404)
+
+    # Check if the destination path is a directory or not
+    if not self._fs.isdir(self.dest_path):
+      raise PopupException(f"The destination path {self.dest_path} is not a directory.", error_code=400)
+
+    # Check if the file name contains a path separator
+    # This prevents directory traversal attacks
+    if os.path.sep in file_name:
+      raise PopupException("Invalid filename. Path separators are not allowed.", error_code=400)
+
+    # Check if the user has write access to the destination path
+    if not self._fs.check_access(self.dest_path, permission="WRITE"):
+      raise PopupException(f"Insufficient permissions to write to ABFS path {self.dest_path}.", error_code=403)
+
+    self.target_path = self._fs.join(self.dest_path, file_name)
+
+    # Check if the file already exists at the destination path
+    if self._fs.exists(self.target_path):
+      if self.overwrite:
+        self._fs.remove(self.target_path)
+      else:
+        raise PopupException(f"The file {file_name} already exists at the destination path.", error_code=409)
+
+    # Create the file
+    try:
+      LOG.debug(f"Initiating ABFS upload to target path: {self.target_path}")
+      self._fs.create(self.target_path)
+    except Exception as e:
+      LOG.error(f"Initiating ABFS upload to target path failed: {e}")
+      raise PopupException(f"Failed to initiate ABFS upload to target path: {self.target_path}", error_code=500)
+
+  def receive_data_chunk(self, raw_data, start):
+    self.total_bytes_received += len(raw_data)
+    max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
+
+    # Perform max size check on the fly
+    if max_size != -1 and max_size >= 0 and self.total_bytes_received > max_size:
+      raise PopupException(f"File exceeds maximum allowed size of {max_size} bytes.", error_code=413)
+
+    # Upload the chunk
+    self.upload_chunk(raw_data, start)
+    return None
+
+  def upload_chunk(self, raw_chunk, start):
+    try:
+      buffered_data = BytesIO(raw_chunk)
+      self._fs._append(self.target_path, buffered_data, params={"position": int(start)})
+    except Exception as e:
+      self._fs.remove(self.target_path)
+      raise PopupException(f"Failed to upload part: {e}", error_code=500)
+
+  def file_complete(self, file_size):
+    # Finish the upload by flushing
+    self._fs.flush(self.target_path, {"position": int(file_size)})
+
+    file_stats = self._fs.stats(self.target_path)
+
+    # Perform size verification explicitly
+    actual_size = file_stats.size if hasattr(file_stats, "size") else file_stats.get("size", 0)
+    if actual_size != file_size:
+      LOG.error(f"ABFS upload size mismatch for {self.target_path}: expected {file_size} bytes, got {actual_size} bytes")
+
+      # Clean up the corrupted file
+      try:
+        self._fs.remove(self.target_path)
+      except Exception as cleanup_error:
+        LOG.warning(f"Failed to clean up corrupted file {self.target_path}: {cleanup_error}")
+
+      raise PopupException(
+        f"Upload verification failed: expected {file_size} bytes, but only {actual_size} bytes were written. "
+        f"The incomplete file has been removed.",
+        error_code=422,
+      )
+
+    LOG.info(f"ABFS upload completed successfully: {file_size} bytes written to {self.target_path}")
+
+    file_stats = massage_stats(file_stats)
+
+    return file_stats
