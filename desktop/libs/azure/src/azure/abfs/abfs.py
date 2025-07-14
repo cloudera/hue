@@ -715,22 +715,42 @@ class ABFS(object):
 
   # Other Methods to condense stuff
   # ----------------------------
-  # Write Files on creation
-  # ----------------------------
   def _writedata(self, path, data, size):
     """
-    Adds text to a given file
+    Write data to a file in chunks.
+
+    This method splits the input data into chunks of the maximum allowed upload size and appends each chunk to the specified path.
+    After all chunks are written, it flushes the file to ensure all data is committed.
+
+    Args:
+      path (str): The destination file path in ABFS.
+      data (bytes or bytearray): The data to be written.
+      size (int): The total size of the data to be written.
+
+    Returns:
+      None
     """
     chunk_size = self.get_upload_chuck_size()
-    cycles = ceil(float(size) / chunk_size)
-    for i in range(0, cycles):
-      chunk = size % chunk_size
-      if i != cycles or chunk == 0:
-        length = chunk_size
+    cycles = int(ceil(float(size) / chunk_size))
+
+    for i in range(cycles):
+      start = i * chunk_size
+      if i == cycles - 1:  # Last chunk
+        # For the last chunk, only write the remaining data
+        length = size - start
       else:
-        length = chunk
-      self._append(path, data[i * chunk_size : i * chunk_size + length], length)
-    self.flush(path, {'position': int(size)})
+        # For all other chunks, write full chunk size
+        length = chunk_size
+
+      end = start + length
+      chunk_data = data[start:end]
+
+      # Only append if we have data to write
+      if chunk_data:
+        self._append(path, chunk_data, size=length, params={"position": start})
+
+    # Flush at the end with the total size
+    self.flush(path, {"position": int(size)})
 
   # Use Patch HTTP request
   # ----------------------------
