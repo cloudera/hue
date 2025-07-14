@@ -88,7 +88,7 @@ const EditColumnsModal = ({
       columns.map((col, idx) => ({
         key: idx,
         name: col.title,
-        type: col.type || 'string',
+        type: (col.type || 'string').toUpperCase(),
         sample:
           sample && sample.length > 0 && sample[0][col.dataIndex] !== undefined
             ? String(sample[0][col.dataIndex])
