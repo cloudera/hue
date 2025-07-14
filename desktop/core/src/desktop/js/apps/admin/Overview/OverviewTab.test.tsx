@@ -144,6 +144,10 @@ describe('OverviewTab', () => {
       (post as jest.Mock).mockImplementation(() => Promise.resolve({ collect_usage: true }));
     });
 
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
     test('renders analytics title and checkbox', async () => {
       render(<Analytics />);
 
@@ -158,7 +162,10 @@ describe('OverviewTab', () => {
       render(<Analytics />);
 
       await waitFor(() => {
-        expect(get).toHaveBeenCalledWith(USAGE_ANALYTICS_API_URL, undefined, expect.any(Object));
+        expect(get).toHaveBeenCalledWith(USAGE_ANALYTICS_API_URL, undefined, {
+          silenceErrors: true,
+          ignoreSuccessErrors: true
+        });
       });
 
       const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
@@ -213,7 +220,11 @@ describe('OverviewTab', () => {
         expect(post).toHaveBeenCalledWith(
           USAGE_ANALYTICS_API_URL,
           { collect_usage: true },
-          expect.any(Object)
+          {
+            silenceErrors: true,
+            ignoreSuccessErrors: true,
+            qsEncodeData: true
+          }
         );
       });
     });
@@ -232,7 +243,11 @@ describe('OverviewTab', () => {
         expect(post).toHaveBeenCalledWith(
           USAGE_ANALYTICS_API_URL,
           { collect_usage: false },
-          expect.any(Object)
+          {
+            silenceErrors: true,
+            ignoreSuccessErrors: true,
+            qsEncodeData: true
+          }
         );
       });
     });
@@ -344,7 +359,10 @@ describe('OverviewTab', () => {
       await userEvent.click(checkbox);
 
       await waitFor(() => {
-        expect(get).toHaveBeenCalledWith(USAGE_ANALYTICS_API_URL, undefined, expect.any(Object));
+        expect(get).toHaveBeenCalledWith(USAGE_ANALYTICS_API_URL, undefined, {
+          silenceErrors: true,
+          ignoreSuccessErrors: true
+        });
       });
     });
 
