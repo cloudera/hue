@@ -151,9 +151,7 @@ const EditColumnsModal = ({
       {
         title: t('Sample'),
         dataIndex: 'sample',
-        render: (text: string) => (
-          <span>{text}</span>
-        )
+        render: (text: string) => <span>{text}</span>
       },
       {
         title: t('Comment'),
