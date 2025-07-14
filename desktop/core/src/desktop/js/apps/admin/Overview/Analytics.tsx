@@ -27,8 +27,7 @@ import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/Lo
 import './Overview.scss';
 
 interface UsageAnalyticsResponse {
-  analyticsEnabled?: boolean;
-  message?: string;
+  collectUsage?: boolean;
 }
 
 const Analytics = (): JSX.Element => {
@@ -78,7 +77,7 @@ const Analytics = (): JSX.Element => {
             type="checkbox"
             className="analytics__checkbox-icon"
             id="usage_analytics"
-            checked={!!usageAnalyticsData?.analyticsEnabled}
+            checked={!!usageAnalyticsData?.collectUsage}
             onChange={handleAnalyticsCheckboxChange}
             disabled={loadingAnalytics || updatingAnalyticsPreference}
           />
