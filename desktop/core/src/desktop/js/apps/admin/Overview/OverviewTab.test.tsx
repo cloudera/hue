@@ -16,16 +16,19 @@
 
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Overview from './OverviewTab';
 import Examples from './Examples';
+import Analytics from './Analytics';
 import {
   INSTALL_APP_EXAMPLES_API_URL,
-  INSTALL_AVAILABLE_EXAMPLES_API_URL
+  INSTALL_AVAILABLE_EXAMPLES_API_URL,
+  USAGE_ANALYTICS_API_URL
 } from '../Components/utils';
 import { get, post } from '../../../api/utils';
 import * as hueConfigModule from '../../../config/hueConfig';
+import huePubSub from '../../../utils/huePubSub';
 
 jest.mock('../../../api/utils', () => ({
   post: jest.fn(),
@@ -37,6 +40,28 @@ jest.mock('./ConfigStatus', () => () => <div>MockedConfigStatusComponent</div>);
 jest.mock('../../../config/hueConfig', () => ({
   getLastKnownConfig: jest.fn()
 }));
+
+jest.mock('../../../utils/huePubSub', () => ({
+  publish: jest.fn()
+}));
+
+jest.mock(
+  '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper',
+  () =>
+    ({ children, loading, errors }) => (
+      <div data-testid="loading-error-wrapper">
+        {loading && <div data-testid="loading-spinner">Loading...</div>}
+        {errors
+          ?.filter(error => error.enabled)
+          .map((error, index) => (
+            <div key={index} data-testid="error-message">
+              {error.message}
+            </div>
+          ))}
+        {children}
+      </div>
+    )
+);
 
 describe('OverviewTab', () => {
   beforeEach(() => {
@@ -102,6 +127,260 @@ describe('OverviewTab', () => {
         });
       }
       expect(post).toHaveBeenCalledTimes(solrData.length);
+    });
+  });
+
+  describe('Analytics component', () => {
+    const mockAnalyticsData = { collectUsage: true };
+    const mockAnalyticsDataDisabled = { collectUsage: false };
+
+    beforeEach(() => {
+      (get as jest.Mock).mockImplementation(url => {
+        if (url === USAGE_ANALYTICS_API_URL) {
+          return Promise.resolve(mockAnalyticsData);
+        }
+        return Promise.reject();
+      });
+      (post as jest.Mock).mockImplementation(() => Promise.resolve({ collect_usage: true }));
+    });
+
+    test('renders analytics title and checkbox', async () => {
+      render(<Analytics />);
+
+      expect(screen.getByText('Anonymous usage analytics')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('Help improve Hue with anonymous usage analytics.')
+      ).toBeInTheDocument();
+      expect(screen.getByRole('checkbox')).toBeInTheDocument();
+    });
+
+    test('fetches and displays analytics data on mount', async () => {
+      render(<Analytics />);
+
+      await waitFor(() => {
+        expect(get).toHaveBeenCalledWith(USAGE_ANALYTICS_API_URL, undefined, expect.any(Object));
+      });
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(true);
+      });
+    });
+
+    test('checkbox reflects analytics data state when disabled', async () => {
+      (get as jest.Mock).mockResolvedValue(mockAnalyticsDataDisabled);
+
+      render(<Analytics />);
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(false);
+      });
+    });
+
+    test('shows loading state during initial data fetch', () => {
+      (get as jest.Mock).mockImplementation(() => new Promise(() => {})); // Never resolves
+
+      render(<Analytics />);
+
+      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+    });
+
+    test('shows error message when data fetch fails', async () => {
+      const errorMessage = 'Failed to fetch analytics data';
+      (get as jest.Mock).mockRejectedValue(errorMessage);
+
+      render(<Analytics />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('error-message')).toBeInTheDocument();
+      });
+    });
+
+    test('handles checkbox toggle to enable analytics', async () => {
+      (get as jest.Mock).mockResolvedValue(mockAnalyticsDataDisabled);
+
+      render(<Analytics />);
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(false);
+      });
+
+      await userEvent.click(checkbox);
+
+      await waitFor(() => {
+        expect(post).toHaveBeenCalledWith(
+          USAGE_ANALYTICS_API_URL,
+          { collect_usage: true },
+          expect.any(Object)
+        );
+      });
+    });
+
+    test('handles checkbox toggle to disable analytics', async () => {
+      render(<Analytics />);
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(true);
+      });
+
+      await userEvent.click(checkbox);
+
+      await waitFor(() => {
+        expect(post).toHaveBeenCalledWith(
+          USAGE_ANALYTICS_API_URL,
+          { collect_usage: false },
+          expect.any(Object)
+        );
+      });
+    });
+
+    test('disables checkbox during save operation', async () => {
+      (post as jest.Mock).mockImplementation(() => new Promise(() => {})); // Never resolves
+
+      render(<Analytics />);
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(true);
+      });
+
+      await userEvent.click(checkbox);
+
+      await waitFor(() => {
+        expect(checkbox.disabled).toBe(true);
+      });
+    });
+
+    test('shows loading state during save operation', async () => {
+      (post as jest.Mock).mockImplementation(() => new Promise(() => {})); // Never resolves
+
+      render(<Analytics />);
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(true);
+      });
+
+      await userEvent.click(checkbox);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+      });
+    });
+
+    test('shows error message when save operation fails', async () => {
+      const errorMessage = 'Failed to update analytics preference';
+      (post as jest.Mock).mockRejectedValue(errorMessage);
+
+      render(<Analytics />);
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(true);
+      });
+
+      await userEvent.click(checkbox);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('error-message')).toBeInTheDocument();
+      });
+    });
+
+    test('publishes success message when analytics are enabled', async () => {
+      (get as jest.Mock).mockResolvedValue(mockAnalyticsDataDisabled);
+      (post as jest.Mock).mockResolvedValue({ collect_usage: true });
+
+      render(<Analytics />);
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(false);
+      });
+
+      await userEvent.click(checkbox);
+
+      await waitFor(() => {
+        expect(huePubSub.publish).toHaveBeenCalledWith('hue.global.info', {
+          message: 'Analytics have been activated.'
+        });
+      });
+    });
+
+    test('publishes success message when analytics are disabled', async () => {
+      (post as jest.Mock).mockResolvedValue({ collect_usage: false });
+
+      render(<Analytics />);
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(true);
+      });
+
+      await userEvent.click(checkbox);
+
+      await waitFor(() => {
+        expect(huePubSub.publish).toHaveBeenCalledWith('hue.global.info', {
+          message: 'Analytics have been deactivated.'
+        });
+      });
+    });
+
+    test('reloads data after successful save', async () => {
+      (post as jest.Mock).mockResolvedValue({ collect_usage: false });
+
+      render(<Analytics />);
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(true);
+      });
+
+      // Clear the initial get call
+      (get as jest.Mock).mockClear();
+
+      await userEvent.click(checkbox);
+
+      await waitFor(() => {
+        expect(get).toHaveBeenCalledWith(USAGE_ANALYTICS_API_URL, undefined, expect.any(Object));
+      });
+    });
+
+    test('handles undefined analytics data gracefully', async () => {
+      (get as jest.Mock).mockResolvedValue({});
+
+      render(<Analytics />);
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await waitFor(() => {
+        expect(checkbox.checked).toBe(false);
+      });
+    });
+
+    test('handles multiple error states simultaneously', async () => {
+      const fetchError = 'Fetch failed';
+      const saveError = 'Save failed';
+
+      (get as jest.Mock).mockRejectedValue(fetchError);
+      (post as jest.Mock).mockRejectedValue(saveError);
+
+      render(<Analytics />);
+
+      // First error from fetch
+      await waitFor(() => {
+        expect(screen.getByTestId('error-message')).toBeInTheDocument();
+      });
+
+      const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+      await userEvent.click(checkbox);
+
+      // Should show both errors
+      await waitFor(() => {
+        const errorMessages = screen.getAllByTestId('error-message');
+        expect(errorMessages).toHaveLength(2);
+      });
     });
   });
 });
