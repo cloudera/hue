@@ -731,7 +731,8 @@ class ABFS(object):
       None
     """
     chunk_size = self.get_upload_chuck_size()
-    cycles = int(ceil(float(size) / chunk_size))
+    # Calculate number of chunks needed using integer ceiling division
+    cycles = (size + chunk_size - 1) // chunk_size
 
     for i in range(cycles):
       start = i * chunk_size
