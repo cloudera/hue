@@ -492,7 +492,6 @@ class ABFSTestBase(TestCase):
     test_dir3 = test_fs + '/test 3'
     test_file = test_fs + '/test.txt'
     test_file2 = test_fs + '/test2.txt'
-    test_file3 = test_fs + '/test 3.txt'
 
     self.client.mkdir(test_dir)
     assert self.client.exists(test_dir)
@@ -557,7 +556,7 @@ class ABFSTestBase(TestCase):
     with tempfile.NamedTemporaryFile() as local_file:
       # Make sure we can upload larger than the UPLOAD chunk size
       file_size = DEFAULT_WRITE_SIZE * 2
-      local_file.write('0' * file_size)
+      local_file.write(b'0' * file_size)
       local_file.flush()
       self.client.mkdir(self.test_fs + '/test_upload')
       dest_dir = self.test_fs + '/test_upload'
@@ -567,16 +566,15 @@ class ABFSTestBase(TestCase):
       add_permission(self.user.username, 'has_abfs', permname='abfs_access', appname='filebrowser')
       # Just upload the current python file
       try:
-        resp = self.c.post('/filebrowser/upload/file?dest=%s' % dest_dir, dict(dest=dest_dir, hdfs_file=file(local_file)))
+        resp = self.c.post('/filebrowser/upload/file?dest=%s' % dest_dir, dict(dest=dest_dir, hdfs_file=open(local_file, 'rb')))
         response = json.loads(resp.content)
       finally:
         remove_from_group(self.user.username, 'has_abfs')
 
       assert 0 == response['status'], response
-      stats = self.client.stats(dest_path)
 
       actual = self.client.read(dest_path)
-      expected = file(local_file).read()
+      expected = open(local_file, 'rb').read()
       assert actual == expected, 'files do not match: %s != %s' % (len(actual), len(expected))
 
   def test_copy_file(self):
