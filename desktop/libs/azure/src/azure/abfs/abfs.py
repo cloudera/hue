@@ -19,14 +19,10 @@
 Interfaces for ABFS
 """
 
-import os
 import logging
+import os
 import threading
-import urllib.error
-import urllib.request
 from builtins import object
-from math import ceil
-from posixpath import join
 from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
 
 from django.http.multipartparser import MultiPartParser
@@ -34,7 +30,7 @@ from django.http.multipartparser import MultiPartParser
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
-from azure.conf import PERMISSION_ACTION_ABFS, is_raz_abfs
+from azure.conf import is_raz_abfs, PERMISSION_ACTION_ABFS
 from desktop.conf import RAZ
 from desktop.lib.rest import http_client, resource
 from desktop.lib.rest.raz_http_client import RazHttpClient
@@ -531,7 +527,7 @@ class ABFS(object):
     """
     header = {}
     if permissionNumber is not None:
-      if isinstance(permissionNumber, basestring):
+      if isinstance(permissionNumber, str):
         header['x-ms-permissions'] = str(permissionNumber)
       else:
         header['x-ms-permissions'] = oct(permissionNumber)
@@ -571,7 +567,6 @@ class ABFS(object):
     """
     new_path = dst + '/' + Init_ABFS.strip_path(src)
     self.create(new_path)
-    chunk_size = self.get_upload_chuck_size()
     file = self.read(src)
     size = len(file)
     self._writedata(new_path, file, size)
@@ -641,16 +636,16 @@ class ABFS(object):
     """
     A wraper function for copying local directories
     """
-    self.mkdir(remote_dir)
+    self.mkdir(remote_dst)
 
-    for f in os.listdir(local_dir):
-      local_src = os.path.join(local_dir, f)
-      remote_dst = self.join(remote_dir, f)
+    for f in os.listdir(local_src):
+      local_src = os.path.join(local_src, f)
+      remote_dst = self.join(remote_dst, f)
 
       if os.path.isdir(local_src):
-        self._copy_dir(local_src, remote_dst, mode)
+        self._local_copy_dir(local_src, remote_dst)
       else:
-        self._copy_file(local_src, remote_dst)
+        self._local_copy_file(local_src, remote_dst)
 
   def _local_copy_file(self, local_src, remote_dst, chunk_size=UPLOAD_CHUCK_SIZE):
     """
@@ -658,10 +653,10 @@ class ABFS(object):
     """
     if os.path.isfile(local_src):
       if self.exists(remote_dst):
-        LOG.info('%s already exists. Skipping.' % remote_dst)
+        LOG.info(f'{remote_dst} already exists. Skipping.')
         return
 
-      src = file(local_src)
+      src = open(local_src, 'rb')
       try:
         try:
           self.create(remote_dst)
@@ -674,12 +669,12 @@ class ABFS(object):
             chunk = src.read(chunk_size)
           self.flush(remote_dst, params={'position': offset})
         except Exception:
-          LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
+          LOG.exception(f'Copying {local_src} -> {remote_dst} failed.')
           raise
       finally:
         src.close()
     else:
-      LOG.info(_('Skipping %s (not a file).') % local_src)
+      LOG.info(f'Skipping {local_src} (not a file).')
 
   def check_access(self, path, *args, **kwargs):
     """
