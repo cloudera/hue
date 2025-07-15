@@ -113,7 +113,7 @@ describe('DestinationSettings Component', () => {
       id: 'connector2',
       displayName: 'Connector 2'
     });
-    expect(defaultProps.onChange).toHaveBeenCalledWith('engine', 'connector2');
+    expect(defaultProps.onChange).toHaveBeenCalledWith('connectorId', 'connector2');
   });
 
   it('should call onChange when database dropdown changes', async () => {
