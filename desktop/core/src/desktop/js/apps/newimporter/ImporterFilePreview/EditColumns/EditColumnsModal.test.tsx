@@ -20,12 +20,6 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import EditColumnsModal, { Column } from './EditColumnsModal';
 
-jest.mock(
-  '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper',
-  () =>
-    ({ children }: { children: React.ReactNode }) => <>{children}</>
-);
-
 jest.mock('../../../../utils/hooks/useLoadData/useLoadData', () => () => ({
   data: ['string', 'int', 'float'],
   loading: false,

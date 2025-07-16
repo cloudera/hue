@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
+@import '../../../../components/styles/variables';
 
 .antd.cuix {
   .ant-modal-content {
@@ -28,7 +28,7 @@
 
     &__select--type {
       border: 1px solid #838b92;
-      border-radius: 3px;
+      border-radius: $fluidx-border-radius;
       width: 100px;
     }
   }
