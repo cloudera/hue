@@ -19,7 +19,6 @@ import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import {
   CombinedFileFormat,
-  DestinationConfig,
   FileFormatResponse,
   FileMetaData,
   FilePreviewResponse,
@@ -62,8 +61,11 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     tableName: getDefaultTableName(fileMetaData)
   });
 
-  const handleDestinationSettingsChange = (newConfig: DestinationConfig) => {
-    setDestinationConfig(newConfig);
+  const handleDestinationSettingsChange = (name: string, value: string) => {
+    setDestinationConfig(prevConfig => ({
+      ...prevConfig,
+      [name]: value
+    }));
   };
 
   const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FILE_GUESS_METADATA, {
@@ -126,13 +128,12 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
 
   const { save, loading: finalizingImport } = useSaveData(FINISH_IMPORT_URL);
 
-  // Update columns when previewData changes
   useEffect(() => {
     if (previewData?.columns && Array.isArray(previewData.columns)) {
       setColumns(
         convertToAntdColumns(previewData.columns).map(col => ({
-          ...col,
-          title: col?.title != null ? String(col.title) : ''
+          title: col?.title != null ? String(col.title) : '',
+          dataIndex: String(col.dataIndex || '')
         }))
       );
     } else {
@@ -140,7 +141,6 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     }
   }, [previewData]);
 
-  // Update previewData columns before finishing import
   const handleFinishImport = () => {
     const source = {
       inputFormat: fileMetaData.source,
@@ -148,7 +148,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       format: fileFormat,
       sourceType: destinationConfig.connectorId
     };
-    // Map columns back to original format for backend if needed
+
     const destination = {
       outputFormat: 'table',
       nonDefaultLocation: fileMetaData.path,
@@ -169,15 +169,6 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   };
 
   const tableData = convertToDataSource(previewData?.previewData ?? {});
-
-  // const sampleRows = Array.isArray(previewData?.previewData?.[0])
-  //   ? previewData.previewData.map(rowArr =>
-  //       columns.reduce((acc, col, idx) => {
-  //         acc[col.dataIndex] = rowArr[idx];
-  //         return acc;
-  //       }, {})
-  //     )
-  //   : previewData?.previewData;
 
   return (
     <div className="hue-importer-preview-page">
