@@ -14,19 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
+import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import {
+  CombinedFileFormat,
+  DestinationConfig,
   FileFormatResponse,
   FileMetaData,
-  GuessFieldTypesResponse,
+  FilePreviewResponse,
+  GuessHeaderResponse,
   ImporterTableData
 } from '../types';
 import { convertToAntdColumns, convertToDataSource, getDefaultTableName } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
 import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
-import { GUESS_FORMAT_URL, GUESS_FIELD_TYPES_URL, FINISH_IMPORT_URL } from '../api';
+import {
+  FILE_GUESS_METADATA,
+  FILE_GUESS_HEADER,
+  FILE_PREVIEW_URL,
+  FINISH_IMPORT_URL
+} from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 import EditColumnsModal from './EditColumns/EditColumnsModal';
 import type { Column } from './EditColumns/EditColumnsModal';
@@ -40,63 +49,82 @@ interface ImporterFilePreviewProps {
 
 const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [fileFormat, setFileFormat] = useState<FileFormatResponse | undefined>();
+  const [fileFormat, setFileFormat] = useState<CombinedFileFormat | undefined>();
+
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
   const [columns, setColumns] = useState<Column[]>([]);
   interface DestinationConfig {
     connectorId?: string;
     [key: string]: unknown;
   }
-  const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({});
-  const defaultTableName = getDefaultTableName(fileMetaData.path, fileMetaData.source);
+  const defaultTableName = getDefaultTableName(fileMetaData);
+  const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
+    tableName: getDefaultTableName(fileMetaData)
+  });
 
   const handleDestinationSettingsChange = (newConfig: DestinationConfig) => {
     setDestinationConfig(newConfig);
   };
 
-  const { save: guessFormat, loading: guessingFormat } = useSaveData<FileFormatResponse>(
-    GUESS_FORMAT_URL,
+  const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FILE_GUESS_METADATA, {
+    params: {
+      file_path: fileMetaData.path,
+      import_type: fileMetaData.source
+    },
+    skip: !fileMetaData.path,
+    onSuccess: data => {
+      setFileFormat({
+        ...data,
+        recordSeparator: data?.recordSeparator?.includes('\n') ? '\\n' : data?.recordSeparator,
+        selectedSheetName: data?.sheetNames?.[0]
+      });
+    }
+  });
+
+  const { loading: guessingHeader } = useLoadData<GuessHeaderResponse>(FILE_GUESS_HEADER, {
+    params: {
+      file_path: fileMetaData.path,
+      file_type: fileFormat?.type,
+      import_type: fileMetaData.source,
+      sheet_name: fileFormat?.selectedSheetName
+    },
+    skip: !fileFormat?.type,
+    onSuccess: data => {
+      setFileFormat(prev => ({
+        ...(prev ?? {}),
+        hasHeader: data.hasHeader
+      }));
+    },
+    onError: () => {
+      setFileFormat(prev => ({
+        ...(prev ?? {}),
+        hasHeader: false
+      }));
+    }
+  });
+
+  const { data: previewData, loading: loadingPreview } = useLoadData<FilePreviewResponse>(
+    FILE_PREVIEW_URL,
     {
-      onSuccess: data => {
-        setFileFormat(data);
-      }
+      params: {
+        file_path: fileMetaData.path,
+        file_type: fileFormat?.type,
+        import_type: fileMetaData.source,
+        sql_dialect: destinationConfig.connectorId,
+        has_header: fileFormat?.hasHeader,
+        sheet_name: fileFormat?.selectedSheetName,
+        field_separator: fileFormat?.fieldSeparator,
+        quote_char: fileFormat?.quoteChar,
+        record_separator: fileFormat?.recordSeparator
+      },
+      skip:
+        !fileFormat?.type ||
+        fileFormat?.hasHeader === undefined ||
+        destinationConfig.connectorId === undefined
     }
   );
 
-  const {
-    save: guessFields,
-    data: previewData,
-    loading: guessingFields
-  } = useSaveData<GuessFieldTypesResponse>(GUESS_FIELD_TYPES_URL);
-
-  const { save, loading: finalizingImport } =
-    useSaveData<GuessFieldTypesResponse>(FINISH_IMPORT_URL);
-
-  useEffect(() => {
-    const guessFormatPayload = {
-      inputFormat: fileMetaData.source,
-      file_type: fileMetaData.type,
-      path: fileMetaData.path
-    };
-    const guessFormatormData = new FormData();
-    guessFormatormData.append('fileFormat', JSON.stringify(guessFormatPayload));
-    guessFormat(guessFormatormData);
-  }, [fileMetaData]);
-
-  useEffect(() => {
-    if (!fileFormat) {
-      return;
-    }
-
-    const payload = {
-      path: fileMetaData.path,
-      format: fileFormat,
-      inputFormat: fileMetaData.source
-    };
-    const formData = new FormData();
-    formData.append('fileFormat', JSON.stringify(payload));
-    guessFields(formData);
-  }, [fileMetaData.path, fileFormat]);
+  const { save, loading: finalizingImport } = useSaveData(FINISH_IMPORT_URL);
 
   // Update columns when previewData changes
   useEffect(() => {
@@ -124,8 +152,8 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     const destination = {
       outputFormat: 'table',
       nonDefaultLocation: fileMetaData.path,
-      name: `${database}.${defaultTableName}`,
-      sourceType: dialect,
+      name: `${destinationConfig.database}.${defaultTableName}`,
+      sourceType: destinationConfig.connectorId,
       columns: columns.map(col => ({
         name: col.title,
         type: col.type || 'string',
@@ -140,16 +168,16 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     save(formData);
   };
 
-  const tableData = convertToDataSource(columns, previewData?.sample);
+  const tableData = convertToDataSource(previewData?.previewData ?? {});
 
-  const sampleRows = Array.isArray(previewData?.sample?.[0])
-    ? previewData.sample.map(rowArr =>
-        columns.reduce((acc, col, idx) => {
-          acc[col.dataIndex] = rowArr[idx];
-          return acc;
-        }, {})
-      )
-    : previewData?.sample;
+  // const sampleRows = Array.isArray(previewData?.previewData?.[0])
+  //   ? previewData.previewData.map(rowArr =>
+  //       columns.reduce((acc, col, idx) => {
+  //         acc[col.dataIndex] = rowArr[idx];
+  //         return acc;
+  //       }, {})
+  //     )
+  //   : previewData?.previewData;
 
   return (
     <div className="hue-importer-preview-page">
@@ -181,7 +209,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
           </BorderlessButton>
         </div>
         <PaginatedTable<ImporterTableData>
-          loading={guessingFormat || guessingFields}
+          loading={guessingFormat || loadingPreview || guessingHeader}
           data={tableData}
           columns={columns}
           rowKey="importerDataKey"
@@ -195,7 +223,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
         closeModal={() => setIsEditColumnsOpen(false)}
         columns={columns}
         setColumns={setColumns}
-        sample={sampleRows}
+        sample={tableData[0]}
       />
     </div>
   );
