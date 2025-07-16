@@ -25,6 +25,7 @@ import useLoadData from '../../../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './EditColumnsModal.scss';
+import { FilePreviewTableData } from '../../types';
 
 export interface Column {
   title: string;
@@ -46,7 +47,7 @@ interface EditColumnsModalProps {
   closeModal: () => void;
   columns: Column[];
   setColumns: (cols: Column[]) => void;
-  sample?: Record<string, unknown>[];
+  sample?: FilePreviewTableData;
 }
 
 const EditColumnsModal = ({
@@ -90,8 +91,8 @@ const EditColumnsModal = ({
         name: col.title,
         type: (col.type || 'string').toUpperCase(),
         sample:
-          sample && sample.length > 0 && sample[0][col.dataIndex] !== undefined
-            ? String(sample[0][col.dataIndex])
+          sample && sample[col.dataIndex] !== undefined
+            ? String(sample[col.dataIndex])
             : '',
         comment: col.comment || ''
       }))
