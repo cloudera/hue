@@ -137,7 +137,7 @@ UPLOAD_CLASSES = {
 }
 
 if hasattr(ARCHIVE_UPLOAD_TEMPDIR, 'get') and not os.path.exists(ARCHIVE_UPLOAD_TEMPDIR.get()):
-  os.makedirs(ARCHIVE_UPLOAD_TEMPDIR.get())
+  os.makedirs(ARCHIVE_UPLOAD_TEMPDIR.get(), exist_ok=True)
 
 logger = logging.getLogger()
 
