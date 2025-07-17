@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import math
 import logging
+import math
 import os.path
 
-from django.utils.translation import gettext as _, gettext_lazy as _t
+from django.utils.translation import gettext_lazy as _t
 
 from desktop.conf import (
   AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,
@@ -27,7 +27,7 @@ from desktop.conf import (
   default_ssl_cacerts,
   default_ssl_validate,
 )
-from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_csv, coerce_password_from_script
+from desktop.lib.conf import coerce_bool, coerce_csv, coerce_password_from_script, Config, ConfigSection
 
 LOG = logging.getLogger()
 

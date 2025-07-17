@@ -50,7 +50,7 @@ const DestinationSettings = ({
   const inputConfig = [
     {
       label: t('Engine'),
-      name: 'engine',
+      name: 'connectorId',
       type: 'select',
       options: connectors.map(connector => ({
         label: connector.displayName,
@@ -61,20 +61,22 @@ const DestinationSettings = ({
       label: t('Compute'),
       name: 'compute',
       type: 'select',
-      options: computes?.map(compute => ({
-        label: compute.name,
-        value: compute.id
-      })),
+      options:
+        computes?.map(compute => ({
+          label: compute.name,
+          value: compute.id
+        })) ?? [],
       hidden: computes?.length === 1
     },
     {
       label: t('Database'),
       name: 'database',
       type: 'select',
-      options: databases?.map(database => ({
-        label: database,
-        value: database
-      }))
+      options:
+        databases?.map(database => ({
+          label: database,
+          value: database
+        })) ?? []
     },
     {
       label: t('Table Name'),
@@ -84,7 +86,7 @@ const DestinationSettings = ({
   ].filter(({ hidden }) => !hidden);
 
   const handleDropdownChange = (name: string, value: string) => {
-    if (name === 'engine') {
+    if (name === 'connectorId') {
       const selectedConnector = connectors?.find(connector => connector.id === value);
       if (selectedConnector) {
         setConnector(selectedConnector);
@@ -109,28 +111,61 @@ const DestinationSettings = ({
   };
 
   useEffect(() => {
-    if (defaultValues?.connectorId && connectors?.length) {
+    if (!connectors?.length) {
+      return;
+    }
+
+    if (defaultValues?.connectorId) {
       const selectedConnector = connectors.find(conn => conn.id === defaultValues.connectorId);
       if (selectedConnector) {
         setConnector(selectedConnector);
       }
+    } else {
+      setConnector(connectors[0]);
+      onChange('connectorId', connectors[0].id);
     }
-    if (defaultValues?.database && databases?.length) {
+  }, [connectors, defaultValues?.connectorId]);
+
+  useEffect(() => {
+    if (!databases?.length) {
+      return;
+    }
+
+    if (defaultValues?.database) {
       const selectedDatabase = databases.find(db => db === defaultValues.database);
       if (selectedDatabase) {
         setDatabase(selectedDatabase);
       }
+    } else if (!database) {
+      setDatabase(databases[0]);
+      onChange('database', databases[0]);
     }
-    if (defaultValues?.computeId && computes?.length) {
+  }, [databases, defaultValues?.database]);
+
+  useEffect(() => {
+    if (!computes?.length) {
+      return;
+    }
+
+    if (defaultValues?.computeId) {
       const selectedCompute = computes.find(comp => comp.id === defaultValues.computeId);
       if (selectedCompute) {
         setCompute(selectedCompute);
       }
+    } else if (!compute) {
+      setCompute(computes[0]);
+      onChange('computeId', computes[0].id);
     }
-  }, [defaultValues, connectors, databases, computes, setConnector, setDatabase, setCompute]);
+  }, [computes, defaultValues?.computeId]);
+
+  useEffect(() => {
+    if (defaultValues?.tableName && defaultValues.tableName !== tableName) {
+      setTableName(defaultValues.tableName);
+    }
+  }, [defaultValues?.tableName]);
 
   const selectedSettings = {
-    engine: connector?.id,
+    connectorId: connector?.id,
     compute: compute?.id,
     database: database,
     tableName: tableName
