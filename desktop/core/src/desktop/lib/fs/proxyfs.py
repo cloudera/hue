@@ -24,9 +24,8 @@ from aws.s3.s3fs import get_s3_home_directory
 from azure.abfs.__init__ import get_abfs_home_directory
 from azure.conf import is_raz_abfs
 from desktop.auth.backend import is_admin
-from desktop.conf import DEFAULT_USER, ENABLE_ORGANIZATIONS, is_ofs_enabled, is_raz_gs
+from desktop.conf import DEFAULT_USER, is_ofs_enabled, is_raz_gs
 from desktop.lib.fs.gc.gs import get_gs_home_directory
-from desktop.lib.fs.ozone import OFS_ROOT
 from useradmin.models import User
 
 LOG = logging.getLogger()

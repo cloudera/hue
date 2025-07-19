@@ -27,8 +27,6 @@ import uuid
 from builtins import object
 from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
 
-from django.http.multipartparser import MultiPartParser
-
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat

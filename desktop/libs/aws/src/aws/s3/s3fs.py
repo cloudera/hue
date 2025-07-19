@@ -26,7 +26,6 @@ from boto.exception import BotoClientError, S3ResponseError
 from boto.s3.connection import Location
 from boto.s3.key import Key
 from boto.s3.prefix import Prefix
-from django.http.multipartparser import MultiPartParser
 from django.utils.translation import gettext as _
 
 from aws import s3

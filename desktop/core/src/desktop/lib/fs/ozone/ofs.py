@@ -27,7 +27,6 @@ import time
 import uuid
 from urllib.parse import urlparse as lib_urlparse
 
-from django.http.multipartparser import MultiPartParser
 from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
 
@@ -339,13 +338,13 @@ class OzoneFS(WebHdfs):
     if not self.exists(destination):
       self.do_as_user(owner, self.mkdir, destination, mode=dir_mode)
 
-    for stat in self.listdir_stats(source):
-      source_file = stat.path
-      destination_file = posixpath.join(destination, stat.name)
-      if stat.isDir:
+    for s in self.listdir_stats(source):
+      source_file = s.path
+      destination_file = posixpath.join(destination, s.name)
+      if s.isDir:
         self.copy_remote_dir(source_file, destination_file, dir_mode, owner, skip_file_list)
       else:
-        if stat.size > self.get_upload_chuck_size():
+        if s.size > self.get_upload_chuck_size():
           if skip_file_list is not None:
             skip_file_list += " \n- " + source_file
         else:

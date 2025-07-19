@@ -20,14 +20,13 @@ from io import BytesIO as string_io
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
 from rest_framework.exceptions import NotFound
 
 from aws.s3.s3fs import S3ListAllBucketsException
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.api import copy, download, get_all_filesystems, listdir_paged, mkdir, move, rename, touch, UploadFileAPI
-from filebrowser.conf import MAX_FILE_SIZE_UPLOAD_LIMIT, REDIRECT_DOWNLOAD, RESTRICT_FILE_EXTENSIONS, SHOW_DOWNLOAD_BUTTON
+from filebrowser.conf import REDIRECT_DOWNLOAD, RESTRICT_FILE_EXTENSIONS, SHOW_DOWNLOAD_BUTTON
 from hadoop.fs.exceptions import WebHdfsException
 
 
@@ -456,8 +455,8 @@ class TestGetFilesystemsAPI:
     with patch("filebrowser.api.fsmanager.get_filesystems") as get_filesystems:
       with patch("filebrowser.api.get_s3_home_directory") as get_s3_home_directory:
         with patch("filebrowser.api._is_hdfs_superuser") as _is_hdfs_superuser:
-          with patch("filebrowser.api.User") as User:
-            with patch("filebrowser.api.Group") as Group:
+          with patch("filebrowser.api.User"):
+            with patch("filebrowser.api.Group"):
               get_filesystems.return_value = ["hdfs", "s3a", "ofs"]
               get_s3_home_directory.return_value = "s3a://test-bucket/test-user-home-dir/"
               _is_hdfs_superuser.return_value = False

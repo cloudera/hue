@@ -34,7 +34,6 @@ from django.utils.translation import gettext as _
 import hadoop.cluster
 from desktop.lib import fsmanager
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.fsmanager import get_client
 from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR, MAX_FILE_SIZE_UPLOAD_LIMIT
 from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed, massage_stats
 from hadoop.conf import UPLOAD_CHUNK_SIZE

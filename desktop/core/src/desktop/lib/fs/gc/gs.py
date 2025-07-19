@@ -14,22 +14,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
-import re
-import time
 import logging
 import posixpath
+import re
 
 from boto.exception import BotoClientError, GSResponseError
-from boto.gs.connection import Location
 from boto.gs.key import Key
 from boto.s3.prefix import Prefix
-from django.http.multipartparser import MultiPartParser
 from django.utils.translation import gettext as _
 
 from aws.s3.s3fs import S3FileSystem
-from desktop.conf import GC_ACCOUNTS, PERMISSION_ACTION_GS, is_raz_gs
-from desktop.lib.fs.gc import GS_ROOT, abspath, join as gs_join, normpath, parse_uri, translate_gs_error
+from desktop.conf import GC_ACCOUNTS, is_raz_gs, PERMISSION_ACTION_GS
+from desktop.lib.fs.gc import abspath, GS_ROOT, join as gs_join, normpath, parse_uri, translate_gs_error
 from desktop.lib.fs.gc.gsfile import open as gsfile_open
 from desktop.lib.fs.gc.gsstat import GSStat
 from filebrowser.conf import REMOTE_STORAGE_HOME
@@ -290,7 +286,7 @@ class GSFileSystem(S3FileSystem):
       GSFileSystemException: If the removal operation fails.
     """
     if not skipTrash:
-      raise NotImplementedError(_('Moving to trash is not implemented for GS'))
+      raise NotImplementedError("Moving to trash is not implemented for GS")
 
     bucket_name, key_name = parse_uri(path)[:2]
     if bucket_name and not key_name:

@@ -19,26 +19,23 @@
 Interfaces for Hadoop filesystem access via HttpFs/WebHDFS
 """
 
-import stat
-import time
 import errno
 import logging
 import posixpath
+import stat
 import threading
-import urllib.error
-import urllib.request
+import time
 from builtins import object, oct
 from urllib.parse import unquote as urllib_unquote, urlparse
 
-from django.http.multipartparser import MultiPartParser
 from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
 from past.builtins import long
 
-import hadoop.conf
 import desktop.conf
+import hadoop.conf
 from desktop.lib.rest import http_client, resource
-from hadoop.fs import SEEK_CUR, SEEK_END, SEEK_SET, normpath as fs_normpath
+from hadoop.fs import normpath as fs_normpath, SEEK_CUR, SEEK_END, SEEK_SET
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.webhdfs_types import WebHdfsContentSummary, WebHdfsStat
@@ -217,7 +214,6 @@ class WebHdfs(Hdfs):
     return curr
 
   def is_absolute(self, path):
-    length = len(self._scheme)
     return path.startswith(self._scheme) if self._scheme else path == '/'
 
   def strip_normpath(self, path):
@@ -756,10 +752,10 @@ class WebHdfs(Hdfs):
     if not self.exists(destination):
       self.do_as_user(owner, self.mkdir, destination, mode=dir_mode)
 
-    for stat in self.listdir_stats(source):
-      source_file = stat.path
-      destination_file = posixpath.join(destination, stat.name)
-      if stat.isDir:
+    for s in self.listdir_stats(source):
+      source_file = s.path
+      destination_file = posixpath.join(destination, s.name)
+      if s.isDir:
         self.copy_remote_dir(source_file, destination_file, dir_mode, owner)
       else:
         self.do_as_user(owner, self.copyfile, source_file, destination_file)
@@ -903,11 +899,11 @@ class WebHdfs(Hdfs):
     return self.do_as_user(self.superuser, fn, *args, **kwargs)
 
   def do_recursively(self, fn, path, *args, **kwargs):
-    for stat in self.listdir_stats(path):
+    for s in self.listdir_stats(path):
       try:
-        if stat.isDir:
-          self.do_recursively(fn, stat.path, *args, **kwargs)
-        fn(stat.path, *args, **kwargs)
+        if s.isDir:
+          self.do_recursively(fn, s.path, *args, **kwargs)
+        fn(s.path, *args, **kwargs)
       except Exception:
         pass
 

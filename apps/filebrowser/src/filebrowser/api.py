@@ -18,17 +18,14 @@
 import json
 import logging
 import mimetypes
-import operator
 import os
 import posixpath
-from io import BytesIO as string_io
 from urllib.parse import quote
 
 from django.core.files.uploadhandler import StopUpload
 from django.core.paginator import EmptyPage, Paginator
 from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
 from django.utils.http import http_date
-from django.utils.translation import gettext as _
 from django.views.static import was_modified_since
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -53,7 +50,6 @@ from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_h
 from filebrowser.conf import (
   ENABLE_EXTRACT_UPLOADED_ARCHIVE,
   FILE_DOWNLOAD_CACHE_CONTROL,
-  MAX_FILE_SIZE_UPLOAD_LIMIT,
   REDIRECT_DOWNLOAD,
   RESTRICT_FILE_EXTENSIONS,
   SHOW_DOWNLOAD_BUTTON,
@@ -72,8 +68,7 @@ from filebrowser.views import (
   read_contents,
   stat_absolute_path,
 )
-from hadoop.conf import has_hdfs_enabled, is_hdfs_trash_enabled
-from hadoop.core_site import get_trash_interval
+from hadoop.conf import is_hdfs_trash_enabled
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
 from useradmin.models import Group, User
@@ -615,7 +610,7 @@ def mkdir(request):
 
   # Validate the 'name' parameter for invalid characters
   if posixpath.sep in name or "#" in name:
-    return HttpResponse(f"Slashes or hashes are not allowed in directory name. Please choose a different name.", status=400)
+    return HttpResponse("Slashes or hashes are not allowed in directory name. Please choose a different name.", status=400)
 
   dir_path = request.fs.join(path, name)
 
@@ -638,7 +633,7 @@ def touch(request):
 
   # Validate the 'name' parameter for invalid characters
   if name and (posixpath.sep in name):
-    return HttpResponse(f"Slashes are not allowed in filename. Please choose a different name.", status=400)
+    return HttpResponse("Slashes are not allowed in filename. Please choose a different name.", status=400)
 
   file_path = request.fs.join(path, name)
 
