@@ -15,12 +15,13 @@
 // limitations under the License.
 
 import React, { useEffect } from 'react';
-import { Form, Input, Select } from 'antd';
+import { Alert, Form } from 'antd';
 import { i18nReact } from '../../../../utils/i18nReact';
 import { useDataCatalog } from '../../../../utils/hooks/useDataCatalog/useDataCatalog';
 import { DestinationConfig } from '../../types';
 
 import './DestinationSettings.scss';
+import FormInput, { FieldType } from '../../../../reactComponents/FormInput/FormInput';
 
 interface DestinationSettingsProps {
   defaultValues: DestinationConfig;
@@ -32,6 +33,9 @@ const DestinationSettings = ({
   onChange
 }: DestinationSettingsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+  const [error, setError] = React.useState<{
+    tableName?: string;
+  }>({});
   const [tableName, setTableName] = React.useState<string | undefined>(defaultValues?.tableName);
 
   const {
@@ -42,6 +46,7 @@ const DestinationSettings = ({
     connector,
     computes,
     compute,
+    tables,
     setCompute,
     setConnector,
     setDatabase
@@ -51,7 +56,8 @@ const DestinationSettings = ({
     {
       label: t('Engine'),
       name: 'connectorId',
-      type: 'select',
+      type: FieldType.SELECT,
+      tooltip: t('Select the engine to use for the destination'),
       options: connectors.map(connector => ({
         label: connector.displayName,
         value: connector.id
@@ -59,8 +65,9 @@ const DestinationSettings = ({
     },
     {
       label: t('Compute'),
-      name: 'compute',
-      type: 'select',
+      name: 'computeId',
+      type: FieldType.SELECT,
+      tooltip: t('Select the compute to use for the destination'),
       options:
         computes?.map(compute => ({
           label: compute.name,
@@ -71,7 +78,8 @@ const DestinationSettings = ({
     {
       label: t('Database'),
       name: 'database',
-      type: 'select',
+      type: FieldType.SELECT,
+      tooltip: t('Select the database to use for the destination'),
       options:
         databases?.map(database => ({
           label: database,
@@ -81,7 +89,8 @@ const DestinationSettings = ({
     {
       label: t('Table Name'),
       name: 'tableName',
-      type: 'input'
+      type: FieldType.INPUT,
+      tooltip: t('Enter the name of the table to use for the destination')
     }
   ].filter(({ hidden }) => !hidden);
 
@@ -91,23 +100,27 @@ const DestinationSettings = ({
       if (selectedConnector) {
         setConnector(selectedConnector);
       }
-    } else if (name === 'database') {
-      const selectedDatabase = databases?.find(database => database === value);
-      if (selectedDatabase) {
-        setDatabase(selectedDatabase);
-      }
-    } else if (name === 'compute') {
+    } else if (name === 'computeId') {
       const selectedCompute = computes?.find(compute => compute.id === value);
       if (selectedCompute) {
         setCompute(selectedCompute);
       }
+    } else if (name === 'database') {
+      setDatabase(value);
+    } else if (name === 'tableName') {
+      setTableName(value);
     }
 
     onChange(name, value);
   };
 
-  const handleTableChange = (value: string) => {
-    setTableName(value);
+  const validateTableName = (name: string) => {
+    const tableExists = tables.some(table => table.name.toLowerCase() === name.toLowerCase());
+    if (tableExists) {
+      setError(prev => ({ ...prev, tableName: t('Table name already exists in the database') }));
+    } else {
+      setError(prev => ({ ...prev, tableName: undefined }));
+    }
   };
 
   useEffect(() => {
@@ -164,49 +177,46 @@ const DestinationSettings = ({
     }
   }, [defaultValues?.tableName]);
 
-  const selectedSettings = {
+  useEffect(() => {
+    if (tableName) {
+      validateTableName(tableName);
+    }
+  }, [tableName, tables]);
+
+  const selectedSettings: DestinationConfig = {
     connectorId: connector?.id,
-    compute: compute?.id,
+    computeId: compute?.id,
     database: database,
     tableName: tableName
   };
 
+  const loadingState = {
+    connectorId: loading.connector,
+    computeId: loading.compute,
+    database: loading.database,
+    tableName: loading.table
+  };
+
   return (
     <div className="importer-destination-settings">
-      {inputConfig.map(({ label, name, type, options }) => {
-        if (type === 'select') {
-          return (
-            <Form layout="vertical" key={name}>
-              <Form.Item key={name} label={label} htmlFor={name}>
-                <Select
-                  getPopupContainer={triggerNode => triggerNode.parentElement}
-                  options={options}
-                  id={name}
-                  loading={loading}
-                  value={selectedSettings[name]}
-                  className="importer-destination-settings__select-dropdown"
-                  onChange={value => handleDropdownChange(name, value)}
-                />
-              </Form.Item>
-            </Form>
-          );
-        }
-        if (type === 'input') {
-          return (
-            <Form layout="vertical" key={name}>
-              <Form.Item key={name} label={label} htmlFor={name}>
-                <Input
-                  id={name}
-                  value={tableName}
-                  className="importer-destination-settings__input"
-                  onChange={e => handleTableChange(e.target.value)}
-                />
-              </Form.Item>
-            </Form>
-          );
-        }
-        return <></>;
-      })}
+      {error && Object.values(error).some(Boolean) && (
+        <Alert message={error.tableName} type="error" showIcon />
+      )}
+      <div className="importer-destination-settings__form-container">
+        {inputConfig.map(field => (
+          <Form key={field.name} layout="vertical">
+            <FormInput<string, DestinationConfig>
+              field={field}
+              defaultValue={selectedSettings[field.name]}
+              value={selectedSettings[field.name]}
+              onChange={handleDropdownChange}
+              className="importer-destination-settings__input"
+              loading={loadingState[field.name]}
+              error={error[field.name]}
+            />
+          </Form>
+        ))}
+      </div>
     </div>
   );
 };
