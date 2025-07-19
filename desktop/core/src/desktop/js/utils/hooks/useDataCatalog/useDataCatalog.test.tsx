@@ -90,10 +90,10 @@ describe('useDataCatalog', () => {
     expect(result.current.databases).toEqual([]);
   });
 
-  it('should load connectors, namespaces, computes, and databases on mount', () => {
+  it('should load connectors, namespaces, computes, and databases on mount', async () => {
     const { result } = renderHook(() => useDataCatalog());
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(result.current.connectors).toEqual(mockConnectors);
       expect(result.current.connector).toEqual(mockConnectors[0]);
       expect(result.current.namespace).toEqual(mockNamespaces.namespaces[0]);
@@ -107,7 +107,7 @@ describe('useDataCatalog', () => {
     });
   });
 
-  it('should handle namespaces with no computes', () => {
+  it('should handle namespaces with no computes', async () => {
     mockFilterEditorConnectors.mockReturnValue([{ is_sql: true, id: 'c1' }]);
     mockGetNamespaces.mockResolvedValue({
       namespaces: [
@@ -118,7 +118,7 @@ describe('useDataCatalog', () => {
       ]
     });
     const { result } = renderHook(() => useDataCatalog());
-    waitFor(() => {
+    await waitFor(() => {
       expect(result.current.namespace).toEqual({ computes: [], id: 'namespace1' });
       expect(result.current.computes).toEqual([]);
       expect(result.current.compute).toBeNull();
@@ -130,11 +130,11 @@ describe('useDataCatalog', () => {
     });
   });
 
-  it('should handle errors gracefully', () => {
+  it('should handle errors gracefully', async () => {
     mockFilterEditorConnectors.mockReturnValue([{ is_sql: true }]);
     mockGetNamespaces.mockRejectedValue(new Error('Failed to load namespaces'));
     const { result } = renderHook(() => useDataCatalog());
-    waitFor(() => {
+    await waitFor(() => {
       expect(result.current.loading.connector).toBe(false);
       expect(result.current.loading.namespace).toBe(false);
       expect(result.current.loading.compute).toBe(false);
@@ -145,7 +145,7 @@ describe('useDataCatalog', () => {
     });
   });
 
-  it('should allow manual setting of connector, namespace, compute, and databases', () => {
+  it('should allow manual setting of connector, namespace, compute, and databases', async () => {
     mockFilterEditorConnectors.mockReturnValue([
       {
         is_sql: true,
@@ -172,7 +172,7 @@ describe('useDataCatalog', () => {
       ]
     });
     const { result } = renderHook(() => useDataCatalog());
-    waitFor(() => expect(result.current.connectors.length).toBeGreaterThan(0));
+    await waitFor(() => expect(result.current.connectors.length).toBeGreaterThan(0));
 
     result.current.setConnector({
       id: 'c2',
@@ -193,7 +193,7 @@ describe('useDataCatalog', () => {
     result.current.setCompute({ id: 'compute2', name: 'Compute 2', type: 'spark' });
     result.current.setDatabase('db2');
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(result.current.connector).toEqual({
         id: 'c2',
         displayName: 'Connector 2',
