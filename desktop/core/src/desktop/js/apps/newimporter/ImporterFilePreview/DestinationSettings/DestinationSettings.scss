@@ -19,13 +19,18 @@
 .antd.cuix {
   .importer-destination-settings {
     display: flex;
+    flex-direction: column;
     gap: vars.$cdl-spacing-s;
 
     .ant-form-item {
       margin-bottom: 0;
     }
 
-    &__select-dropdown,
+    &__form-container {
+      display: flex;
+      gap: vars.$cdl-spacing-s;
+    }
+
     &__input {
       border: 1px solid vars.$fluidx-gray-600;
       border-radius: vars.$border-radius-base;
