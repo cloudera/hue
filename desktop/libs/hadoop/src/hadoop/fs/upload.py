@@ -35,8 +35,8 @@ import hadoop.cluster
 from desktop.lib import fsmanager
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
-from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
-from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed
+from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR, MAX_FILE_SIZE_UPLOAD_LIMIT
+from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed, massage_stats
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -417,132 +417,162 @@ class HDFSfileUploadHandler(FileUploadHandler):
 
 class HDFSNewFileUploadHandler(FileUploadHandler):
   """
-  Handle file upload by storing data in a temp HDFS file.
+  Handles direct file uploads to HDFS using streaming append operations.
+
+  This handler creates the file directly in HDFS and appends chunks as they arrive,
+  leveraging HDFS's native append capabilities for efficient streaming uploads.
+
+  Key features:
+  - Direct streaming to HDFS (no temporary files)
+  - Uses HDFS append API for chunk-by-chunk uploads
+  - Automatic cleanup on failure
+  - Comprehensive validation and security checks
   """
-  def __init__(self, dest_path, username):
+
+  def __init__(self, fs, dest_path, overwrite):
     self.chunk_size = UPLOAD_CHUNK_SIZE.get()
-    self._file = None
-    self._starttime = 0
-    self._destination = dest_path
-    self.username = username
+    self._fs = fs
+    self.dest_path = dest_path
+    self.overwrite = overwrite
+    self.total_bytes_received = 0
+    self.target_file_path = None
 
-    self._fs = self._get_hdfs(self.username)
-
-    LOG.debug("Chunk size = %d" % self.chunk_size)
+    LOG.info(f"HDFSNewFileUploadHandler initialized - destination: {dest_path}, overwrite: {overwrite}")
 
   def new_file(self, field_name, file_name, *args, **kwargs):
     super(HDFSNewFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
-    LOG.info('Using HDFSfileUploadHandler to handle file upload.')
+    LOG.info(f"Starting HDFS upload for file: {file_name}")
+
+    # Validate upload prerequisites
+    self._validate_upload_prerequisites(file_name)
+
+    self.target_file_path = self._fs.join(self.dest_path, file_name)
+
+    # Create the file directly at the destination
     try:
-      self._file = HDFSNewTemporaryUploadedFile(self._fs, file_name, self._destination, self.username)
-      LOG.debug('Upload attempt to %s' % (self._file.get_temp_path()))
-
-      self._starttime = time.time()
+      LOG.debug(f"Creating HDFS file at: {self.target_file_path}")
+      self._fs.create(
+        self.target_file_path,
+        overwrite=False,  # We already handled overwrite above
+        permission=self._fs.getDefaultFilePerms(),
+      )
+      LOG.info(f"HDFS file created successfully: {self.target_file_path}")
     except Exception as ex:
-      LOG.error("Not using HDFS upload handler: %s" % (ex))
-      raise ex
+      LOG.error(f"Failed to create HDFS file for upload: {ex}")
+      raise PopupException(f"Failed to initiate HDFS upload: {ex}", error_code=500)
 
-    raise StopFutureHandlers()
+  def _validate_upload_prerequisites(self, file_name):
+    """Validate all prerequisites before initiating file upload to HDFS.
+
+    Performs security and permission checks including:
+    - File extension restrictions
+    - Destination path existence and type validation
+    - Directory traversal attack prevention
+    - Write permission verification
+    - File overwrite handling based on policy
+
+    Args:
+      file_name: Name of the file to be uploaded.
+
+    Raises:
+      PopupException: With appropriate HTTP error codes:
+        - 400: Invalid file extension or filename
+        - 403: Insufficient permissions
+        - 404: Destination path not found
+        - 409: File exists and overwrite is disabled
+    """
+    LOG.debug(f"Validating upload prerequisites for file: {file_name}")
+
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(file_name)
+    if not is_allowed:
+      LOG.warning(f"File upload rejected - {err_message}")
+      raise PopupException(err_message, error_code=400)
+
+    # Check if the destination path already exists or not
+    if not self._fs.exists(self.dest_path):
+      LOG.error(f"Destination path does not exist: {self.dest_path}")
+      raise PopupException(f"The destination path {self.dest_path} does not exist.", error_code=404)
+
+    # Check if the destination path is a directory or not
+    if not self._fs.isdir(self.dest_path):
+      LOG.error(f"Destination path is not a directory: {self.dest_path}")
+      raise PopupException(f"The destination path {self.dest_path} is not a directory.", error_code=400)
+
+    # Check if the file name contains a path separator
+    # This prevents directory traversal attacks
+    if os.path.sep in file_name:
+      LOG.warning(f"Invalid filename with path separator: {file_name}")
+      raise PopupException("Invalid filename. Path separators are not allowed.", error_code=400)
+
+    # Check if the user has write access to the destination path
+    try:
+      self._fs.check_access(self.dest_path, "rw-")
+    except WebHdfsException as e:
+      LOG.error(f"Error checking access to path {self.dest_path}: {e}")
+      raise PopupException(f"Insufficient permissions to write to path {self.dest_path}.", error_code=403)
+
+    # Check if the file already exists at the destination path
+    target_file_path = self._fs.join(self.dest_path, file_name)
+    if self._fs.exists(target_file_path):
+      if self.overwrite:
+        LOG.info(f"Overwriting existing file: {target_file_path}")
+        self._fs.remove(target_file_path, skip_trash=True)
+      else:
+        LOG.warning(f"File already exists and overwrite is disabled: {target_file_path}")
+        raise PopupException(f"The file {file_name} already exists at the destination path.", error_code=409)
+
+    LOG.debug("Upload prerequisites validation completed successfully")
 
   def receive_data_chunk(self, raw_data, start):
-    LOG.debug("HDFSfileUploadHandler receive_data_chunk")
+    self.total_bytes_received += len(raw_data)
+    max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
 
+    # Perform max size check on the fly
+    if max_size != -1 and max_size >= 0 and self.total_bytes_received > max_size:
+      LOG.error(f"File size exceeded limit - received: {self.total_bytes_received}, max: {max_size}")
+      raise PopupException(f"File exceeds maximum allowed size of {max_size} bytes.", error_code=413)
+
+    # Append the chunk directly to the destination file
     try:
-      self._file.write(raw_data)
-      self._file.flush()
+      LOG.debug(f"Appending chunk to HDFS file - size: {len(raw_data)} bytes, total: {self.total_bytes_received} bytes")
+      self._fs.append(self.target_file_path, raw_data)
       return None
-    except IOError:
-      LOG.exception('Error storing upload data in temporary file "%s"' % (self._file.get_temp_path()))
-      raise StopUpload()
+    except Exception as e:
+      LOG.exception(f'Error appending data to file "{self.target_file_path}"')
+      try:  # Try to clean up the partial file
+        LOG.info(f"Attempting to clean up partial file: {self.target_file_path}")
+        self._fs.remove(self.target_file_path, skip_trash=True)
+      except Exception:
+        pass
+
+      raise PopupException(f"Failed to write upload data: {e}", error_code=500)
 
   def file_complete(self, file_size):
-    try:
-      self._file.finish_upload(file_size)
-    except IOError:
-      LOG.exception('Error closing uploaded temporary file "%s"' % (self._file.get_temp_path()))
-      raise
+    # Get file stats
+    file_stats = self._fs.stats(self.target_file_path)
 
-    elapsed = time.time() - self._starttime
-    LOG.info('Uploaded %s bytes to HDFS in %s seconds' % (file_size, elapsed))
-    return self._file
+    # Perform size verification explicitly
+    actual_size = file_stats.size
+    if actual_size != file_size:
+      LOG.error(f"HDFS upload size mismatch for {self.target_file_path}: expected {file_size} bytes, got {actual_size} bytes")
 
-  def upload_complete(self):
-    LOG.debug("HDFSFileUploadHandler: Running after upload complete task")
-    original_file_path = self._fs.join(self._destination, self._file.name)
-    tmp_file = self._file.get_temp_path()
+      # Clean up the corrupted file
+      try:
+        self._fs.remove(self.target_file_path, skip_trash=True)
+        LOG.info(f"Successfully cleaned up corrupted file: {self.target_file_path}")
+      except Exception as cleanup_error:
+        LOG.warning(f"Failed to clean up corrupted file {self.target_file_path}: {cleanup_error}")
 
-    self._fs.do_as_user(self.username, self._fs.rename, tmp_file, original_file_path)
+      # Raise exception to fail the upload
+      raise PopupException(
+        f"Upload verification failed: expected {file_size} bytes, but only {actual_size} bytes were written. "
+        f"The incomplete file has been removed.",
+        error_code=422,
+      )
+    else:
+      LOG.info(f"Upload completed successfully: {self.target_file_path}, size: {file_size} bytes")
 
-  def upload_interrupted(self):
-    LOG.debug("HDFSFileUploadHandler: Attempting cleanup after upload interruption")
-    if self._file and hasattr(self._file, 'remove'):
-      self._file.remove()
-
-  def _get_hdfs(self, username):
-    fs = get_client(fs='hdfs', user=username)
-    if not fs:
-      raise HDFSerror(_("No HDFS found for upload operation."))
-
-    return fs
-
-
-class HDFSNewTemporaryUploadedFile(object):
-  """
-  A temporary HDFS file to store upload data.
-  This class does not have any file read methods.
-  """
-  def __init__(self, fs, name, destination, username):
-    self.name = name
-    self.size = None
-    self._do_cleanup = False
-    self._fs = fs
-
-    self._path = self._fs.mkswap(name, suffix='tmp', basedir=destination)
-
-    # Check access permissions before attempting upload
-    try:
-      self._fs.check_access(destination, 'rw-')
-    except WebHdfsException:
-      raise HDFSerror(_('User %s does not have permissions to write to path "%s".') % (username, destination))
-
-    if self._fs.exists(self._path):
-      self._fs._delete(self._path)
-
-    self._file = self._fs.open(self._path, 'w')
-
-    self._do_cleanup = True
-
-  def __del__(self):
-    if self._do_cleanup:
-      # Do not do cleanup here. It's hopeless. The self._fs threadlocal states
-      # are going to be all wrong.
-      LOG.debug(f"Check for left-over upload file for cleanup if the upload op was unsuccessful: {self._path}")
-
-  def get_temp_path(self):
-    return self._path
-
-  def finish_upload(self, size):
-    try:
-      self.size = size
-      self.close()
-    except Exception:
-      LOG.exception('Error uploading file to %s' % (self._path))
-      raise
-
-  def remove(self):
-    try:
-      self._fs.remove(self._path, skip_trash=True)
-      self._do_cleanup = False
-    except IOError as ex:
-      if ex.errno != errno.ENOENT:
-        LOG.exception('Failed to remove temporary upload file "%s". Please cleanup manually: %s' % (self._path, ex))
-
-  def write(self, data):
-    self._file.write(data)
-
-  def flush(self):
-    self._file.flush()
-
-  def close(self):
-    self._file.close()
+    file_stats = massage_stats(file_stats)
+    return file_stats

@@ -15,8 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from filebrowser.conf import ALLOW_FILE_EXTENSIONS, RESTRICT_FILE_EXTENSIONS
-from filebrowser.utils import is_file_upload_allowed
+from filebrowser.utils import get_user_fs, is_file_upload_allowed
 
 
 class TestIsFileUploadAllowed:
@@ -289,3 +293,60 @@ class TestIsFileUploadAllowed:
     finally:
       reset_allow()
       reset_restrict()
+
+
+class TestGetUserFs:
+  @patch("filebrowser.utils.fsmanager.get_filesystem")
+  def test_get_user_fs_success(self, mock_get_filesystem):
+    mock_fs = MagicMock()
+    mock_get_filesystem.return_value = mock_fs
+
+    result = get_user_fs("test_user")
+
+    assert result == mock_fs
+    mock_get_filesystem.assert_called_once_with("default")
+    mock_fs.setuser.assert_called_once_with("test_user")
+
+  @patch("filebrowser.utils.fsmanager.get_filesystem")
+  def test_get_user_fs_empty_username(self, mock_get_filesystem):
+    with pytest.raises(ValueError) as exc_info:
+      get_user_fs("")
+
+    assert str(exc_info.value) == "Username is required"
+    mock_get_filesystem.assert_not_called()
+
+  @patch("filebrowser.utils.fsmanager.get_filesystem")
+  def test_get_user_fs_none_username(self, mock_get_filesystem):
+    with pytest.raises(ValueError) as exc_info:
+      get_user_fs(None)
+
+    assert str(exc_info.value) == "Username is required"
+    mock_get_filesystem.assert_not_called()
+
+  @patch("filebrowser.utils.fsmanager.get_filesystem")
+  def test_get_user_fs_various_usernames(self, mock_get_filesystem):
+    mock_fs = MagicMock()
+    mock_get_filesystem.return_value = mock_fs
+
+    test_usernames = [
+      "user1",
+      "test-user",
+      "user.name",
+      "user_name",
+      "user123",
+      "user@domain.com",
+      "user with spaces",  # Unusual but should work
+      "user_with_unicode_ñáme",
+      "用户名",
+      "very_long_username_that_is_still_valid_123456789",
+    ]
+
+    for username in test_usernames:
+      mock_get_filesystem.reset_mock()
+      mock_fs.reset_mock()
+
+      result = get_user_fs(username)
+
+      assert result == mock_fs, f"Failed for username: {username}"
+      mock_get_filesystem.assert_called_once_with("default")
+      mock_fs.setuser.assert_called_once_with(username)

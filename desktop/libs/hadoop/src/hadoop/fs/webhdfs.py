@@ -592,6 +592,20 @@ class WebHdfs(Hdfs):
     return File(self, path, mode)
 
   def getDefaultFilePerms(self):
+    """
+    Calculate the default file permissions after applying the umask.
+
+    Files are created with default permissions of 0o666 (rw-rw-rw-).
+    The umask defines which permission bits to disable. This method
+    masks out those bits to compute the final permissions using:
+
+      0o666 & (0o1777 ^ umask)
+
+    The umask is set to 0o022 by default, which means that the default file permissions are 0o644 (rw-r--r--).
+
+    Returns:
+      int: Final permission bits for a new file (e.g., 0o644)
+    """
     return 0o666 & (0o1777 ^ self._umask)
 
   def getDefaultDirPerms(self):
@@ -908,16 +922,12 @@ class WebHdfs(Hdfs):
 
     self.do_as_user(username, self.rename, tmp_file, dst)
 
-  def upload_v1(self, META, input_data, destination, username):
-    from hadoop.fs.upload import HDFSNewFileUploadHandler  # Circular dependency
-
-    hdfs_upload_handler = HDFSNewFileUploadHandler(destination, username)
-
-    parser = MultiPartParser(META, input_data, [hdfs_upload_handler])
-    return parser.parse()
-
   def filebrowser_action(self):
     return None
+
+  def get_upload_handler(self, destination_path, overwrite):
+    from hadoop.fs.upload import HDFSNewFileUploadHandler
+    return HDFSNewFileUploadHandler(self, destination_path, overwrite)
 
 
 class File(object):

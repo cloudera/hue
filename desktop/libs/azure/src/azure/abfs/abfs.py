@@ -22,6 +22,8 @@ Interfaces for ABFS
 import logging
 import os
 import threading
+import time
+import uuid
 from builtins import object
 from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
 
@@ -441,15 +443,18 @@ class ABFS(object):
       params = {'position': int(resp['Content-Length']) + offset, 'action': 'append'}
     else:
       params['action'] = 'append'
+
     headers = {}
+    actual_data = data.getvalue() if hasattr(data, 'getvalue') else data
+
     if size == 0 or size == '0':
-      headers['Content-Length'] = str(len(data.getvalue()))
+      headers['Content-Length'] = str(len(actual_data))
       if headers['Content-Length'] == '0':
         return
     else:
       headers['Content-Length'] = str(size)
 
-    return self._patching_sl(path, params, data, headers, **kwargs)
+    return self._patching_sl(path, params, actual_data, headers, **kwargs)
 
   def flush(self, path, params=None, headers=None, **kwargs):
     """
@@ -611,14 +616,6 @@ class ABFS(object):
     """
     pass
 
-  def upload_v1(self, META, input_data, destination, username):
-    from azure.abfs.upload import ABFSNewFileUploadHandler  # Circular dependency
-
-    abfs_upload_handler = ABFSNewFileUploadHandler(destination, username)
-
-    parser = MultiPartParser(META, input_data, [abfs_upload_handler])
-    return parser.parse()
-
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
     """
     Copy a directory or file from Local (Testing)
@@ -676,11 +673,109 @@ class ABFS(object):
     else:
       LOG.info(f'Skipping {local_src} (not a file).')
 
-  def check_access(self, path, *args, **kwargs):
+  def check_access(self, path, permission="READ"):
     """
-    Check access of a file/directory (Work in Progress/Not Ready)
+    Check if the user has the requested permission for a given path.
+
+    This method verifies access by attempting operations that would require the
+    specified permission level. It handles both files and directories gracefully.
+
+    Args:
+      path (str): The ABFS path to check access for
+      permission (str): Permission type to check - 'READ' or 'WRITE' (case-insensitive)
+
+    Returns:
+      bool: True if user has the requested permission, False otherwise
+
+    Note:
+      - For READ permission: Checks if path exists and tries to access its metadata
+      - For WRITE permission: For directories, attempts to create a temporary file;
+        for files or non-existent paths, checks parent directory write access
     """
-    raise NotImplementedError("")
+    permission = permission.upper()
+
+    if permission not in ("READ", "WRITE"):
+      LOG.warning(f'Invalid permission type "{permission}". Must be READ or WRITE.')
+      return False
+
+    try:
+      if permission == "READ":
+        # For read access, we need to verify the path exists and is accessible
+        if not self.exists(path):
+          LOG.debug(f'Path "{path}" does not exist, cannot read.')
+          return False
+
+        try:
+          if self.isdir(path):
+            # For directories, attempt to list contents
+            self.listdir_stats(path, params={"maxResults": 1})  # Limit results for efficiency
+          else:
+            # For files, get file stats
+            self.stats(path)
+          return True
+        except WebHdfsException as e:
+          if e.code in (401, 403):  # Unauthorized or Forbidden
+            LOG.debug(f'No read permission for path "{path}": {str(e)}')
+            return False
+          # Re-raise unexpected errors
+          raise
+
+      # Check WRITE permission
+      else:
+        # For non-existent paths, check parent directory
+        if not self.exists(path):
+          parent = self.parent_path(path)
+
+          # If we can't determine parent or we're at root, deny access
+          if not parent or parent == path:
+            LOG.debug(f'Cannot determine parent for non-existent path "{path}"')
+            return False
+
+          # Recursively check parent write access
+          return self.check_access(parent, permission="WRITE")
+
+        # For existing paths
+        if self.isdir(path):
+          # For directories, try creating a temporary marker file
+          temp_file = None
+          try:
+            # Generate unique temporary filename with timestamp
+            temp_file = self.join(path, f".hue_access_check_{str(int(time.time() * 1000))}_{str(uuid.uuid4())[:8]}")
+
+            # Attempt to create the temporary file
+            self.create(temp_file, overwrite=True, data="")
+
+            # Clean up the temporary file if creation succeeded
+            try:
+              self.remove(temp_file)
+            except Exception as cleanup_error:
+              LOG.warning(f'Failed to clean up temporary file "{temp_file}": {cleanup_error}')
+
+            return True
+
+          except WebHdfsException as e:
+            if e.code in (401, 403):  # Unauthorized or Forbidden
+              LOG.debug(f'No write permission for directory "{path}": {str(e)}')
+              return False
+            # Re-raise unexpected errors
+            raise
+
+        else:
+          # For files, check write permission on parent directory
+          parent = self.parent_path(path)
+          if parent and parent != path:
+            return self.check_access(parent, permission="WRITE")
+          else:
+            LOG.debug(f'Cannot check write access for file "{path}", no valid parent found')
+            return False
+
+    except ABFSFileSystemException as e:
+      LOG.debug(f'ABFS filesystem error checking {permission} permission at path "{path}": {str(e)}')
+      return False
+    except Exception as e:
+      # Log unexpected errors but don't crash
+      LOG.warning(f'Unexpected error checking {permission} permission at path "{path}": {str(e)}')
+      return False
 
   def mkswap(self, filename, subdir='', suffix='swp', basedir=None):
     """
@@ -704,6 +799,10 @@ class ABFS(object):
     Gets the maximum size allowed to upload
     """
     return UPLOAD_CHUCK_SIZE
+
+  def get_upload_handler(self, destination_path, overwrite):
+    from azure.abfs.upload import ABFSNewFileUploadHandler
+    return ABFSNewFileUploadHandler(self, destination_path, overwrite)
 
   def filebrowser_action(self):
     return self._filebrowser_action

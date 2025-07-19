@@ -633,16 +633,6 @@ class S3FileSystem(object):
 
   @translate_s3_error
   @auth_error_handler
-  def upload_v1(self, META, input_data, destination, username):
-    from aws.s3.upload import S3NewFileUploadHandler  # Circular dependency
-
-    s3_upload_handler = S3NewFileUploadHandler(destination, username)
-
-    parser = MultiPartParser(META, input_data, [s3_upload_handler])
-    return parser.parse()
-
-  @translate_s3_error
-  @auth_error_handler
   def append(self, path, data):
     key = self._get_key(path, validate=False)
     current_data = key.get_contents_as_string() or ''
@@ -671,3 +661,7 @@ class S3FileSystem(object):
   def get_upload_chuck_size(self):
     from hadoop.conf import UPLOAD_CHUNK_SIZE  # circular dependency
     return UPLOAD_CHUNK_SIZE.get()
+
+  def get_upload_handler(self, destination_path, overwrite):
+    from aws.s3.upload import S3NewFileUploadHandler
+    return S3NewFileUploadHandler(self, destination_path, overwrite)

@@ -231,11 +231,6 @@ class ClusterMiddleware(Django4MiddlewareAdapterMixin):
   """
   Manages setting request.fs and request.jt
   """
-  def process_request(self, request):
-    # Workaround to prevent RawPostDataException: Store the request body for later access
-    # This is necessary because certain API calls (like file uploads) require the raw request body
-    # to be available. Without this, subsequent accesses to request.body might raise exceptions.
-    request._body = request.body
 
   def process_view(self, request, view_func, view_args, view_kwargs):
     """
