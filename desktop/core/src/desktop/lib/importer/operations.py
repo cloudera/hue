@@ -194,7 +194,7 @@ def guess_file_metadata(data: GuessFileMetadataSchema, username: str) -> Dict[st
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
   should_cleanup = False
-  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
+  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "r")
 
   try:
     sample = fh.read(16 * 1024)  # Read 16 KiB sample
@@ -257,7 +257,7 @@ def preview_file(data: PreviewFileSchema, username: str, preview_rows: int = 50)
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
   should_cleanup = False
-  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
+  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "r")
 
   try:
     if data.file_type == "excel":
@@ -566,7 +566,7 @@ def guess_file_header(data: GuessFileHeaderSchema, username: str) -> bool:
   elif data.import_type == "remote" and not fs.exists(data.file_path):
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
-  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
+  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "r")
 
   has_header = False
 
