@@ -117,7 +117,7 @@ def guess_file_metadata(request: Request) -> Response:
   metadata_params = serializer.validated_data
 
   try:
-    metadata = operations.guess_file_metadata(data=metadata_params, fs=request.fs if metadata_params.import_type == "remote" else None)
+    metadata = operations.guess_file_metadata(data=metadata_params, username=request.user.username)
     return Response(metadata, status=status.HTTP_200_OK)
 
   except ValueError as e:
@@ -150,7 +150,7 @@ def preview_file(request: Request) -> Response:
   preview_params = serializer.validated_data
 
   try:
-    preview = operations.preview_file(data=preview_params, fs=request.fs if preview_params.import_type == "remote" else None)
+    preview = operations.preview_file(data=preview_params, username=request.user.username)
     return Response(preview, status=status.HTTP_200_OK)
 
   except ValueError as e:
@@ -188,7 +188,7 @@ def guess_file_header(request: Request) -> Response:
   header_params = serializer.validated_data
 
   try:
-    has_header = operations.guess_file_header(data=header_params, fs=request.fs if header_params.import_type == "remote" else None)
+    has_header = operations.guess_file_header(data=header_params, username=request.user.username)
     return Response({"has_header": has_header}, status=status.HTTP_200_OK)
 
   except ValueError as e:

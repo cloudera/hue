@@ -33,6 +33,7 @@ from desktop.lib.importer.schemas import (
   PreviewFileSchema,
   SqlTypeMapperSchema,
 )
+from filebrowser.utils import get_user_fs
 
 LOG = logging.getLogger()
 
@@ -165,12 +166,12 @@ def local_file_upload(data: LocalFileUploadSchema, username: str) -> Dict[str, s
     raise e
 
 
-def guess_file_metadata(data: GuessFileMetadataSchema, fs=None) -> Dict[str, Any]:
+def guess_file_metadata(data: GuessFileMetadataSchema, username: str) -> Dict[str, Any]:
   """Guess the metadata of a file based on its content or extension.
 
   Args:
     data: A Pydantic schema containing file_path and import_type.
-    fs: File system object for remote files (default: None)
+    username: The name of the user to impersonate for filesystem operations.
 
   Returns:
     Dict containing the file metadata:
@@ -184,13 +185,12 @@ def guess_file_metadata(data: GuessFileMetadataSchema, fs=None) -> Dict[str, Any
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  if data.import_type == "remote" and fs is None:
-    raise ValueError("File system object is required for remote import type")
+  fs = get_user_fs(username) if data.import_type == "remote" else None
 
   # Check if file exists based on import type
   if data.import_type == "local" and not os.path.exists(data.file_path):
     raise ValueError(f"Local file does not exist: {data.file_path}")
-  elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
+  elif data.import_type == "remote" and not fs.exists(data.file_path):
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
   should_cleanup = False
@@ -227,7 +227,7 @@ def guess_file_metadata(data: GuessFileMetadataSchema, fs=None) -> Dict[str, Any
       os.remove(data.file_path)
 
 
-def preview_file(data: PreviewFileSchema, fs=None, preview_rows: int = 50) -> Dict[str, Any]:
+def preview_file(data: PreviewFileSchema, username: str, preview_rows: int = 50) -> Dict[str, Any]:
   """Generate a preview of a file's content with column type mapping.
 
   This method reads a file and returns a preview of its contents, along with
@@ -235,7 +235,7 @@ def preview_file(data: PreviewFileSchema, fs=None, preview_rows: int = 50) -> Di
 
   Args:
     data: A Pydantic schema with all the required parameters.
-    fs: File system object for remote files (default: None)
+    username: The name of the user to impersonate for filesystem operations.
     preview_rows: Number of rows to include in preview (default: 50)
 
   Returns:
@@ -248,13 +248,12 @@ def preview_file(data: PreviewFileSchema, fs=None, preview_rows: int = 50) -> Di
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  if data.import_type == "remote" and fs is None:
-    raise ValueError("File system object is required for remote import type")
+  fs = get_user_fs(username) if data.import_type == "remote" else None
 
   # Check if file exists based on import type
   if data.import_type == "local" and not os.path.exists(data.file_path):
     raise ValueError(f"Local file does not exist: {data.file_path}")
-  elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
+  elif data.import_type == "remote" and not fs.exists(data.file_path):
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
   should_cleanup = False
@@ -542,7 +541,7 @@ def _preview_delimited_file(
     raise Exception(message)
 
 
-def guess_file_header(data: GuessFileHeaderSchema, fs=None) -> bool:
+def guess_file_header(data: GuessFileHeaderSchema, username: str) -> bool:
   """Guess whether a file has a header row.
 
   This function analyzes a file to determine if it contains a header row based on the
@@ -550,7 +549,7 @@ def guess_file_header(data: GuessFileHeaderSchema, fs=None) -> bool:
 
   Args:
     data: A Pydantic schema with all the required parameters.
-    fs: File system object for remote files (default: None)
+    username: The name of the user to impersonate for filesystem operations.
 
   Returns:
     has_header: Boolean indicating whether the file has a header row
@@ -559,13 +558,12 @@ def guess_file_header(data: GuessFileHeaderSchema, fs=None) -> bool:
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  if data.import_type == "remote" and fs is None:
-    raise ValueError("File system object is required for remote import type")
+  fs = get_user_fs(username) if data.import_type == "remote" else None
 
   # Check if file exists based on import type
   if data.import_type == "local" and not os.path.exists(data.file_path):
     raise ValueError(f"Local file does not exist: {data.file_path}")
-  elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
+  elif data.import_type == "remote" and not fs.exists(data.file_path):
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
   fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")

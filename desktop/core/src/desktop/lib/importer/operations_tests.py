@@ -184,7 +184,7 @@ class TestGuessFileMetadata:
     # Create schema object
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
-    result = operations.guess_file_metadata(data=schema)
+    result = operations.guess_file_metadata(data=schema, username="test_user")
 
     assert result == {
       "type": "csv",
@@ -210,7 +210,7 @@ class TestGuessFileMetadata:
     # Create schema object
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
-    result = operations.guess_file_metadata(data=schema)
+    result = operations.guess_file_metadata(data=schema, username="test_user")
 
     assert result == {
       "type": "tsv",
@@ -248,7 +248,7 @@ class TestGuessFileMetadata:
     # Create schema object
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
-    result = operations.guess_file_metadata(data=schema)
+    result = operations.guess_file_metadata(data=schema, username="test_user")
 
     assert result == {
       "type": "excel",
@@ -271,21 +271,21 @@ class TestGuessFileMetadata:
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
     with pytest.raises(ValueError, match="Unable to detect file format."):
-      operations.guess_file_metadata(data=schema)
+      operations.guess_file_metadata(data=schema, username="test_user")
 
   def test_guess_file_metadata_nonexistent_file(self):
     # Create schema object
     schema = GuessFileMetadataSchema(file_path="/path/to/nonexistent/file.csv", import_type="local")
 
     with pytest.raises(ValueError, match="Local file does not exist."):
-      operations.guess_file_metadata(data=schema)
+      operations.guess_file_metadata(data=schema, username="test_user")
 
-  def test_guess_remote_file_metadata_no_fs(self):
+  def test_guess_remote_file_metadata_no_username(self):
     # Create schema object
     schema = GuessFileMetadataSchema(file_path="s3a://bucket/user/test_user/test.csv", import_type="remote")
 
-    with pytest.raises(ValueError, match="File system object is required for remote import type"):
-      operations.guess_file_metadata(data=schema, fs=None)
+    with pytest.raises(ValueError, match="Username is required"):
+      operations.guess_file_metadata(data=schema, username="")
 
   def test_guess_file_metadata_empty_file(self, cleanup_temp_files):
     temp_file = tempfile.NamedTemporaryFile(delete=False)
@@ -297,7 +297,7 @@ class TestGuessFileMetadata:
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
     with pytest.raises(ValueError, match="File is empty, cannot detect file format."):
-      operations.guess_file_metadata(data=schema)
+      operations.guess_file_metadata(data=schema, username="test_user")
 
   @patch("desktop.lib.importer.operations.is_magic_lib_available", False)
   def test_guess_file_metadata_no_magic_lib(self, cleanup_temp_files):
@@ -311,7 +311,7 @@ class TestGuessFileMetadata:
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
     with pytest.raises(RuntimeError, match="Unable to guess file type. python-magic or its dependency libmagic is not installed."):
-      operations.guess_file_metadata(data=schema)
+      operations.guess_file_metadata(data=schema, username="test_user")
 
 
 @pytest.mark.usefixtures("cleanup_temp_files")
@@ -358,7 +358,7 @@ class TestPreviewFile:
       file_path=temp_file.name, file_type="excel", import_type="local", sql_dialect="hive", has_header=True, sheet_name="Sheet1"
     )
 
-    result = operations.preview_file(data=schema)
+    result = operations.preview_file(data=schema, username="test_user")
 
     assert result == {
       "type": "excel",
@@ -390,7 +390,7 @@ class TestPreviewFile:
       record_separator="\n",
     )
 
-    result = operations.preview_file(data=schema)
+    result = operations.preview_file(data=schema, username="test_user")
 
     assert result == {
       "type": "csv",
@@ -422,7 +422,7 @@ class TestPreviewFile:
       record_separator="\n",
     )
 
-    result = operations.preview_file(data=schema)
+    result = operations.preview_file(data=schema, username="test_user")
 
     assert result == {
       "type": "csv",
@@ -450,7 +450,7 @@ class TestPreviewFile:
       record_separator="\n",
     )
 
-    result = operations.preview_file(data=schema)
+    result = operations.preview_file(data=schema, username="test_user")
 
     assert result == {
       "type": "csv",
@@ -458,14 +458,14 @@ class TestPreviewFile:
       "preview_data": {},
     }
 
-  def test_preview_remote_file_no_fs(self):
+  def test_preview_remote_file_no_username(self):
     # Create schema object
     schema = PreviewFileSchema(
       file_path="s3a://bucket/user/test_user/test.csv", file_type="csv", import_type="remote", sql_dialect="hive", has_header=True
     )
 
-    with pytest.raises(ValueError, match="File system object is required for remote import type"):
-      operations.preview_file(data=schema, fs=None)
+    with pytest.raises(ValueError, match="Username is required"):
+      operations.preview_file(data=schema, username="")
 
   @patch("os.path.exists")
   def test_preview_nonexistent_local_file(self, mock_exists):
@@ -477,7 +477,7 @@ class TestPreviewFile:
     )
 
     with pytest.raises(ValueError, match="Local file does not exist: /path/to/nonexistent.csv"):
-      operations.preview_file(data=schema)
+      operations.preview_file(data=schema, username="test_user")
 
   def test_preview_trino_dialect_type_mapping(self, cleanup_temp_files):
     test_content = "string_col\nfoo\nbar"
@@ -497,7 +497,7 @@ class TestPreviewFile:
       field_separator=",",
     )
 
-    result = operations.preview_file(data=schema)
+    result = operations.preview_file(data=schema, username="test_user")
 
     # Check the result for Trino-specific type mapping
     assert result["columns"][0]["type"] == "VARCHAR"  # Not STRING
@@ -528,7 +528,7 @@ class TestGuessFileHeader:
     # Create schema object
     schema = GuessFileHeaderSchema(file_path=temp_file.name, file_type="csv", import_type="local")
 
-    result = operations.guess_file_header(data=schema)
+    result = operations.guess_file_header(data=schema, username="test_user")
 
     assert result
 
@@ -559,7 +559,7 @@ class TestGuessFileHeader:
     # Create schema object
     schema = GuessFileHeaderSchema(file_path=temp_file.name, file_type="excel", import_type="local", sheet_name="Sheet1")
 
-    result = operations.guess_file_header(data=schema)
+    result = operations.guess_file_header(data=schema, username="test_user")
 
     assert result
 
@@ -568,14 +568,14 @@ class TestGuessFileHeader:
     schema = GuessFileHeaderSchema(file_path="/path/to/nonexistent/file.csv", file_type="csv", import_type="local")
 
     with pytest.raises(ValueError, match="Local file does not exist"):
-      operations.guess_file_header(data=schema)
+      operations.guess_file_header(data=schema, username="test_user")
 
-  def test_guess_header_remote_file_no_fs(self):
+  def test_guess_header_remote_file_no_username(self):
     # Create schema object
     schema = GuessFileHeaderSchema(file_path="s3a://bucket/user/test_user/test.csv", file_type="csv", import_type="remote")
 
-    with pytest.raises(ValueError, match="File system object is required for remote import type"):
-      operations.guess_file_header(data=schema, fs=None)
+    with pytest.raises(ValueError, match="Username is required"):
+      operations.guess_file_header(data=schema, username="")
 
 
 class TestSqlTypeMapping:
