@@ -185,6 +185,9 @@ def guess_file_metadata(data: GuessFileMetadataSchema, username: str) -> Dict[st
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
+  if not username:
+    raise ValueError("Username is required and cannot be empty.")
+
   fs = get_user_fs(username) if data.import_type == "remote" else None
 
   # Check if file exists based on import type
@@ -248,6 +251,9 @@ def preview_file(data: PreviewFileSchema, username: str, preview_rows: int = 50)
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
+  if not username:
+    raise ValueError("Username is required and cannot be empty.")
+
   fs = get_user_fs(username) if data.import_type == "remote" else None
 
   # Check if file exists based on import type
@@ -558,6 +564,9 @@ def guess_file_header(data: GuessFileHeaderSchema, username: str) -> bool:
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
+  if not username:
+    raise ValueError("Username is required and cannot be empty.")
+
   fs = get_user_fs(username) if data.import_type == "remote" else None
 
   # Check if file exists based on import type
