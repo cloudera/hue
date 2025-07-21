@@ -590,17 +590,17 @@ The File Import API allows you to:
 
 A typical workflow for importing a file into a database table involves these steps:
 
-1. **Upload the file** using the `/api/importer/upload/file/` endpoint
-2. **Detect file metadata** using the `/api/importer/file/guess_metadata/` endpoint
-3. **Determine if the file has a header** using the `/api/importer/file/guess_header/` endpoint
-4. **Preview the file** with column type detection using the `/api/importer/file/preview/` endpoint
+1. **Upload the file** using the `/api/v1/importer/upload/file/` endpoint
+2. **Detect file metadata** using the `/api/v1/importer/file/guess_metadata/` endpoint
+3. **Determine if the file has a header** using the `/api/v1/importer/file/guess_header/` endpoint
+4. **Preview the file** with column type detection using the `/api/v1/importer/file/preview/` endpoint
 5. Use the preview data to create a table in your SQL engine of choice
 
 ### Upload a Local File
 
 Upload a file from your local system to the Hue server.
 
-**Endpoint:** `/api/importer/upload/file/`
+**Endpoint:** `/api/v1/importer/upload/file/`
 
 **Method:** `POST`
 
@@ -618,7 +618,7 @@ Upload a file from your local system to the Hue server.
 curl -X POST \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
   -F "file=@/path/to/sales_data.csv" \
-  https://demo.gethue.com/api/importer/upload/file/
+  https://demo.gethue.com/api/v1/importer/upload/file/
 ```
 
 **Response:**
@@ -643,7 +643,7 @@ curl -X POST \
 
 Analyze a file to determine its type and metadata properties such as delimiters for CSV files or sheet names for Excel files.
 
-**Endpoint:** `/api/importer/file/guess_metadata/`
+**Endpoint:** `/api/v1/importer/file/guess_metadata/`
 
 **Method:** `GET`
 
@@ -659,7 +659,7 @@ Analyze a file to determine its type and metadata properties such as delimiters 
 ```bash
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local"
+  "https://demo.gethue.com/api/v1/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local"
 ```
 
 **Response Examples:**
@@ -686,7 +686,7 @@ For Excel files:
 
 Analyze a file to determine if it has a header row.
 
-**Endpoint:** `/api/importer/file/guess_header/`
+**Endpoint:** `/api/v1/importer/file/guess_header/`
 
 **Method:** `GET`
 
@@ -704,7 +704,7 @@ Analyze a file to determine if it has a header row.
 ```bash
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/guess_header/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local"
+  "https://demo.gethue.com/api/v1/importer/file/guess_header/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local"
 ```
 
 **Response:**
@@ -719,7 +719,7 @@ curl -X GET \
 
 Generate a preview of a file's content with column type mapping for creating SQL tables.
 
-**Endpoint:** `/api/importer/file/preview/`
+**Endpoint:** `/api/v1/importer/file/preview/`
 
 **Method:** `GET`
 
@@ -742,12 +742,12 @@ Generate a preview of a file's content with column type mapping for creating SQL
 ```bash
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/preview/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local&sql_dialect=hive&has_header=true"
+  "https://demo.gethue.com/api/v1/importer/file/preview/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local&sql_dialect=hive&has_header=true"
 
 # For a custom pipe-delimited file using delimiter_format
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/preview/?file_path=/tmp/username_abc123_pipe_data.txt&file_type=delimiter_format&import_type=local&sql_dialect=hive&has_header=true&field_separator=|&quote_char=\"&record_separator=\n"
+  "https://demo.gethue.com/api/v1/importer/file/preview/?file_path=/tmp/username_abc123_pipe_data.txt&file_type=delimiter_format&import_type=local&sql_dialect=hive&has_header=true&field_separator=|&quote_char=\"&record_separator=\n"
 ```
 
 **About `delimiter_format` File Type:**
@@ -794,7 +794,7 @@ The `delimiter_format` file type should be used for custom delimited files that 
 
 Get mapping from Polars data types to SQL types for a specific SQL dialect.
 
-**Endpoint:** `/api/importer/sql_type_mapping/`
+**Endpoint:** `/api/v1/importer/sql_type_mapping/`
 
 **Method:** `GET`
 
@@ -809,7 +809,7 @@ Get mapping from Polars data types to SQL types for a specific SQL dialect.
 ```bash
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/sql_type_mapping/?sql_dialect=hive"
+  "https://demo.gethue.com/api/v1/importer/sql_type_mapping/?sql_dialect=hive"
 ```
 
 **Response:**
