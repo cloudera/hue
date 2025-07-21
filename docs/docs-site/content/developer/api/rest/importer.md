@@ -402,7 +402,7 @@ The `delimiter_format` file type allows you to process custom delimited files th
 
 ## Get SQL Type Mapping
 
-Get mapping from Polars data types to SQL types for a specific SQL dialect. This helps in translating detected column types to appropriate SQL data types when creating tables.
+Get the list of unique SQL data types supported by a specific SQL dialect. This helps in understanding what SQL types are available when creating tables in different SQL engines.
 
 **Endpoint:** `/api/v1/importer/sql_type_mapping/`
 
@@ -432,73 +432,137 @@ fetch('https://demo.gethue.com/api/v1/importer/sql_type_mapping/?sql_dialect=hiv
   }
 })
 .then(response => response.json())
-.then(typeMappings => {
-  console.log(typeMappings);
-  // Use type mappings to generate SQL schema
+.then(sqlTypes => {
+  console.log(sqlTypes);
+  // Use SQL types list for validation or UI display
 })
 .catch(error => console.error('Error:', error));
 ```
 
 **Response:**
 
+The response is a sorted list of unique SQL data types supported by the specified dialect.
+
+For Hive:
 ```json
-{
-  "Int8": "TINYINT",
-  "Int16": "SMALLINT",
-  "Int32": "INT",
-  "Int64": "BIGINT",
-  "UInt8": "TINYINT",
-  "UInt16": "SMALLINT",
-  "UInt32": "INT",
-  "UInt64": "BIGINT",
-  "Float32": "FLOAT",
-  "Float64": "DOUBLE",
-  "Decimal": "DECIMAL",
-  "Boolean": "BOOLEAN",
-  "Utf8": "STRING",
-  "String": "STRING",
-  "Binary": "BINARY",
-  "Date": "DATE",
-  "Time": "TIMESTAMP",
-  "Datetime": "TIMESTAMP",
-  "Duration": "INTERVAL DAY TO SECOND",
-  "Array": "ARRAY",
-  "List": "ARRAY",
-  "Struct": "STRUCT"
-}
+[
+  "ARRAY",
+  "BIGINT",
+  "BINARY",
+  "BOOLEAN",
+  "DATE",
+  "DECIMAL",
+  "DOUBLE",
+  "FLOAT",
+  "INT",
+  "INTERVAL DAY TO SECOND",
+  "SMALLINT",
+  "STRING",
+  "STRUCT",
+  "TIMESTAMP",
+  "TINYINT"
+]
 ```
 
-**Dialect-Specific Type Mappings**
+**Dialect-Specific SQL Types**
 
-Different SQL dialects have variations in type names. Here are some key differences:
+Different SQL dialects support different sets of SQL types. Here are the unique types for each dialect:
 
-**Trino Types (compared to Hive):**
+**Trino:**
 ```json
-{
-  "Int32": "INTEGER",
-  "UInt32": "INTEGER",
-  "Utf8": "VARCHAR",
-  "String": "VARCHAR",
-  "Binary": "VARBINARY",
-  "Float32": "REAL",
-  "Struct": "ROW",
-  "Object": "JSON"
-}
+[
+  "ARRAY",
+  "BIGINT",
+  "BOOLEAN",
+  "DATE",
+  "DECIMAL",
+  "DOUBLE",
+  "INTEGER",
+  "INTERVAL DAY TO SECOND",
+  "JSON",
+  "REAL",
+  "ROW",
+  "SMALLINT",
+  "STRING",
+  "TIMESTAMP",
+  "TINYINT",
+  "VARBINARY",
+  "VARCHAR"
+]
 ```
 
-**Phoenix Types (compared to Hive):**
+**Impala:**
 ```json
-{
-  "UInt8": "UNSIGNED_TINYINT",
-  "UInt16": "UNSIGNED_SMALLINT",
-  "UInt32": "UNSIGNED_INT",
-  "UInt64": "UNSIGNED_LONG",
-  "Utf8": "VARCHAR",
-  "String": "VARCHAR",
-  "Binary": "VARBINARY",
-  "Time": "TIME"
-}
+[
+  "ARRAY",
+  "BIGINT",
+  "BINARY",
+  "BOOLEAN",
+  "DATE",
+  "DECIMAL",
+  "DOUBLE",
+  "FLOAT",
+  "INT",
+  "SMALLINT",
+  "STRING",
+  "STRUCT",
+  "TIMESTAMP",
+  "TINYINT"
+]
 ```
+
+**Phoenix:**
+```json
+[
+  "ARRAY",
+  "BIGINT",
+  "BOOLEAN",
+  "DATE",
+  "DECIMAL",
+  "DOUBLE",
+  "FLOAT",
+  "INT",
+  "SMALLINT",
+  "STRING",
+  "TIME",
+  "TIMESTAMP",
+  "TINYINT",
+  "UNSIGNED_INT",
+  "UNSIGNED_LONG",
+  "UNSIGNED_SMALLINT",
+  "UNSIGNED_TINYINT",
+  "VARBINARY",
+  "VARCHAR"
+]
+```
+
+**Spark SQL:**
+```json
+[
+  "ARRAY",
+  "BIGINT",
+  "BINARY",
+  "BOOLEAN",
+  "DATE",
+  "DECIMAL",
+  "DOUBLE",
+  "FLOAT",
+  "INT",
+  "INTERVAL DAY TO SECOND",
+  "SMALLINT",
+  "STRING",
+  "STRUCT",
+  "TIMESTAMP",
+  "TINYINT"
+]
+```
+
+**Key Differences Between Dialects:**
+
+- **Impala**: Does not support `INTERVAL` types (uses `STRING` for duration data)
+- **Trino**: Uses `INTEGER` instead of `INT`, `REAL` instead of `FLOAT`, `VARCHAR` instead of `STRING`, `ROW` instead of `STRUCT`, and supports `JSON` type
+- **Phoenix**: Supports unsigned integer types (`UNSIGNED_INT`, `UNSIGNED_LONG`, etc.) and has a dedicated `TIME` type
+- **Spark SQL**: Similar to Hive but follows more standard SQL conventions
 
 **Status Codes:**
 

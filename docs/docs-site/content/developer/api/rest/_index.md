@@ -792,7 +792,7 @@ The `delimiter_format` file type should be used for custom delimited files that 
 
 ### Get SQL Type Mapping
 
-Get mapping from Polars data types to SQL types for a specific SQL dialect.
+Get the list of unique SQL data types supported by a specific SQL dialect.
 
 **Endpoint:** `/api/v1/importer/sql_type_mapping/`
 
@@ -815,23 +815,23 @@ curl -X GET \
 **Response:**
 
 ```json
-{
-  "Int8": "TINYINT",
-  "Int16": "SMALLINT",
-  "Int32": "INT",
-  "Int64": "BIGINT",
-  "UInt8": "TINYINT",
-  "UInt16": "SMALLINT",
-  "UInt32": "INT",
-  "UInt64": "BIGINT",
-  "Float32": "FLOAT",
-  "Float64": "DOUBLE",
-  "Boolean": "BOOLEAN",
-  "Utf8": "STRING",
-  "String": "STRING",
-  "Date": "DATE",
-  "Datetime": "TIMESTAMP"
-}
+[
+  "ARRAY",
+  "BIGINT",
+  "BINARY",
+  "BOOLEAN",
+  "DATE",
+  "DECIMAL",
+  "DOUBLE",
+  "FLOAT",
+  "INT",
+  "INTERVAL DAY TO SECOND",
+  "SMALLINT",
+  "STRING",
+  "STRUCT",
+  "TIMESTAMP",
+  "TINYINT"
+]
 ```
 
 ### Complete Workflow Example
