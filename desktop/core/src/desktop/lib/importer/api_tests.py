@@ -103,13 +103,12 @@ class TestGuessFileMetadataAPI:
     request = APIRequestFactory().get("importer/file/guess_metadata/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.csv", "import_type": "local"}
-    request.fs = None
 
     response = api.guess_file_metadata(request)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == {"type": "csv", "field_separator": ",", "quote_char": '"', "record_separator": "\n"}
-    mock_guess_file_metadata.assert_called_once_with(data=mock_schema, fs=None)
+    mock_guess_file_metadata.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.GuessFileMetadataSerializer")
   @patch("desktop.lib.importer.api.operations.guess_file_metadata")
@@ -127,13 +126,12 @@ class TestGuessFileMetadataAPI:
     request = APIRequestFactory().get("importer/file/guess_metadata/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.xlsx", "import_type": "local"}
-    request.fs = None
 
     response = api.guess_file_metadata(request)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == {"type": "excel", "sheet_names": ["Sheet1", "Sheet2"]}
-    mock_guess_file_metadata.assert_called_once_with(data=mock_schema, fs=None)
+    mock_guess_file_metadata.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.GuessFileMetadataSerializer")
   @patch("desktop.lib.importer.api.operations.guess_file_metadata")
@@ -158,7 +156,7 @@ class TestGuessFileMetadataAPI:
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == {"type": "csv", "field_separator": ",", "quote_char": '"', "record_separator": "\n"}
-    mock_guess_file_metadata.assert_called_once_with(data=mock_schema, fs=mock_fs)
+    mock_guess_file_metadata.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.GuessFileMetadataSerializer")
   def test_guess_file_metadata_invalid_data(self, mock_serializer_class):
@@ -190,7 +188,6 @@ class TestGuessFileMetadataAPI:
     request = APIRequestFactory().get("importer/file/guess_metadata/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.csv", "import_type": "local"}
-    request.fs = None
 
     response = api.guess_file_metadata(request)
 
@@ -213,7 +210,6 @@ class TestGuessFileMetadataAPI:
     request = APIRequestFactory().get("importer/file/guess_metadata/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.csv", "import_type": "local"}
-    request.fs = None
 
     response = api.guess_file_metadata(request)
 
@@ -249,13 +245,12 @@ class TestPreviewFileAPI:
     request = APIRequestFactory().get("importer/file/preview/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.csv", "file_type": "csv", "import_type": "local"}
-    request.fs = None
 
     response = api.preview_file(request)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == mock_preview_result
-    mock_preview_file.assert_called_once_with(data=mock_schema, fs=None)
+    mock_preview_file.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.PreviewFileSerializer")
   @patch("desktop.lib.importer.api.operations.preview_file")
@@ -282,13 +277,12 @@ class TestPreviewFileAPI:
     request = APIRequestFactory().get("importer/file/preview/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.xlsx", "file_type": "excel", "import_type": "local"}
-    request.fs = None
 
     response = api.preview_file(request)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == mock_preview_result
-    mock_preview_file.assert_called_once_with(data=mock_schema, fs=None)
+    mock_preview_file.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.PreviewFileSerializer")
   @patch("desktop.lib.importer.api.operations.preview_file")
@@ -317,13 +311,12 @@ class TestPreviewFileAPI:
     request = APIRequestFactory().get("importer/file/preview/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.tsv", "file_type": "tsv", "import_type": "local"}
-    request.fs = None
 
     response = api.preview_file(request)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == mock_preview_result
-    mock_preview_file.assert_called_once_with(data=mock_schema, fs=None)
+    mock_preview_file.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.PreviewFileSerializer")
   @patch("desktop.lib.importer.api.operations.preview_file")
@@ -360,7 +353,7 @@ class TestPreviewFileAPI:
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == mock_preview_result
-    mock_preview_file.assert_called_once_with(data=mock_schema, fs=mock_fs)
+    mock_preview_file.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.PreviewFileSerializer")
   def test_preview_file_invalid_data(self, mock_serializer_class):
@@ -412,7 +405,6 @@ class TestPreviewFileAPI:
     request = APIRequestFactory().get("importer/file/preview/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.csv", "file_type": "csv", "import_type": "local"}
-    request.fs = None
 
     response = api.preview_file(request)
 
@@ -441,7 +433,6 @@ class TestPreviewFileAPI:
     request = APIRequestFactory().get("importer/file/preview/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.csv", "file_type": "csv", "import_type": "local"}
-    request.fs = None
 
     response = api.preview_file(request)
 
@@ -468,13 +459,12 @@ class TestGuessFileHeaderAPI:
     request = APIRequestFactory().get("importer/file/guess_header/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.csv", "file_type": "csv", "import_type": "local"}
-    request.fs = None
 
     response = api.guess_file_header(request)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == {"has_header": True}
-    mock_guess_file_header.assert_called_once_with(data=mock_schema, fs=None)
+    mock_guess_file_header.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.GuessFileHeaderSerializer")
   @patch("desktop.lib.importer.api.operations.guess_file_header")
@@ -494,13 +484,12 @@ class TestGuessFileHeaderAPI:
     request = APIRequestFactory().get("importer/file/guess_header/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.xlsx", "file_type": "excel", "import_type": "local", "sheet_name": "Sheet1"}
-    request.fs = None
 
     response = api.guess_file_header(request)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == {"has_header": True}
-    mock_guess_file_header.assert_called_once_with(data=mock_schema, fs=None)
+    mock_guess_file_header.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.GuessFileHeaderSerializer")
   @patch("desktop.lib.importer.api.operations.guess_file_header")
@@ -527,7 +516,7 @@ class TestGuessFileHeaderAPI:
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == {"has_header": True}
-    mock_guess_file_header.assert_called_once_with(data=mock_schema, fs=mock_fs)
+    mock_guess_file_header.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.GuessFileHeaderSerializer")
   @patch("desktop.lib.importer.api.operations.guess_file_header")
@@ -554,7 +543,7 @@ class TestGuessFileHeaderAPI:
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data == {"has_header": False}
-    mock_guess_file_header.assert_called_once_with(data=mock_schema, fs=mock_fs)
+    mock_guess_file_header.assert_called_once_with(data=mock_schema, username="test_user")
 
   @patch("desktop.lib.importer.api.GuessFileHeaderSerializer")
   def test_guess_file_header_invalid_data(self, mock_serializer_class):
@@ -588,7 +577,6 @@ class TestGuessFileHeaderAPI:
     request = APIRequestFactory().get("importer/file/guess_header/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.csv", "file_type": "csv", "import_type": "local"}
-    request.fs = None
 
     response = api.guess_file_header(request)
 
@@ -613,7 +601,6 @@ class TestGuessFileHeaderAPI:
     request = APIRequestFactory().get("importer/file/guess_header/")
     request.user = MagicMock(username="test_user")
     request.query_params = {"file_path": "/path/to/test.csv", "file_type": "csv", "import_type": "local"}
-    request.fs = None
 
     response = api.guess_file_header(request)
 
