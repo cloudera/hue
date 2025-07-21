@@ -23,17 +23,17 @@ The File Import API allows you to:
 
 A typical workflow for importing a file into a database table involves these steps:
 
-1. **Upload the file** using the `/api/importer/upload/file/` endpoint
-2. **Detect file metadata** using the `/api/importer/file/guess_metadata/` endpoint
-3. **Determine if the file has a header** using the `/api/importer/file/guess_header/` endpoint
-4. **Preview the file** with column type detection using the `/api/importer/file/preview/` endpoint
+1. **Upload the file** using the `/api/v1/importer/upload/file/` endpoint
+2. **Detect file metadata** using the `/api/v1/importer/file/guess_metadata/` endpoint
+3. **Determine if the file has a header** using the `/api/v1/importer/file/guess_header/` endpoint
+4. **Preview the file** with column type detection using the `/api/v1/importer/file/preview/` endpoint
 5. Use the preview data to create a table in your SQL engine of choice
 
 ## Upload a Local File
 
 Upload a file from your local system to the Hue server.
 
-**Endpoint:** `/api/importer/upload/file/`
+**Endpoint:** `/api/v1/importer/upload/file/`
 
 **Method:** `POST`
 
@@ -51,7 +51,7 @@ Upload a file from your local system to the Hue server.
 curl -X POST \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
   -F "file=@/path/to/sales_data.csv" \
-  https://demo.gethue.com/api/importer/upload/file/
+  https://demo.gethue.com/api/v1/importer/upload/file/
 ```
 
 **Example using JavaScript:**
@@ -61,7 +61,7 @@ curl -X POST \
 const formData = new FormData();
 formData.append('file', fileInputElement.files[0]);
 
-fetch('https://demo.gethue.com/api/importer/upload/file/', {
+fetch('https://demo.gethue.com/api/v1/importer/upload/file/', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
@@ -95,7 +95,7 @@ fetch('https://demo.gethue.com/api/importer/upload/file/', {
 
 Analyze a file to determine its type and metadata properties such as delimiters for CSV files or sheet names for Excel files.
 
-**Endpoint:** `/api/importer/file/guess_metadata/`
+**Endpoint:** `/api/v1/importer/file/guess_metadata/`
 
 **Method:** `GET`
 
@@ -112,19 +112,19 @@ Analyze a file to determine its type and metadata properties such as delimiters 
 # For a local file uploaded previously
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local"
+  "https://demo.gethue.com/api/v1/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local"
 
 # For a remote file on HDFS
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/guess_metadata/?file_path=/user/hue/data/sales_data.csv&import_type=remote"
+  "https://demo.gethue.com/api/v1/importer/file/guess_metadata/?file_path=/user/hue/data/sales_data.csv&import_type=remote"
 ```
 
 **Example using JavaScript:**
 
 ```javascript
 // Using fetch API for a local file
-fetch('https://demo.gethue.com/api/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local', {
+fetch('https://demo.gethue.com/api/v1/importer/file/guess_metadata/?file_path=/tmp/username_abc123_sales_data.csv&import_type=local', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
@@ -175,7 +175,7 @@ For Excel files:
 
 Analyze a file to determine if it has a header row. This API uses heuristics to detect if the first row appears to contain column names rather than data.
 
-**Endpoint:** `/api/importer/file/guess_header/`
+**Endpoint:** `/api/v1/importer/file/guess_header/`
 
 **Method:** `GET`
 
@@ -194,12 +194,12 @@ Analyze a file to determine if it has a header row. This API uses heuristics to 
 # For a CSV file
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/guess_header/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local"
+  "https://demo.gethue.com/api/v1/importer/file/guess_header/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local"
 
 # For an Excel file
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/guess_header/?file_path=/tmp/username_abc123_financial_report.xlsx&file_type=excel&import_type=local&sheet_name=Q1_Results"
+  "https://demo.gethue.com/api/v1/importer/file/guess_header/?file_path=/tmp/username_abc123_financial_report.xlsx&file_type=excel&import_type=local&sheet_name=Q1_Results"
 ```
 
 **Example using JavaScript:**
@@ -211,7 +211,7 @@ const params = new URLSearchParams({
   import_type: 'local'
 });
 
-fetch(`https://demo.gethue.com/api/importer/file/guess_header/?${params.toString()}`, {
+fetch(`https://demo.gethue.com/api/v1/importer/file/guess_header/?${params.toString()}`, {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
@@ -252,7 +252,7 @@ The header detection algorithm uses multiple factors to make an educated guess:
 
 Generate a preview of a file's content with column type mapping for creating SQL tables.
 
-**Endpoint:** `/api/importer/file/preview/`
+**Endpoint:** `/api/v1/importer/file/preview/`
 
 **Method:** `GET`
 
@@ -276,17 +276,17 @@ Generate a preview of a file's content with column type mapping for creating SQL
 # For a CSV file with header
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/preview/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local&sql_dialect=hive&has_header=true"
+  "https://demo.gethue.com/api/v1/importer/file/preview/?file_path=/tmp/username_abc123_sales_data.csv&file_type=csv&import_type=local&sql_dialect=hive&has_header=true"
 
 # For an Excel file with header
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/preview/?file_path=/tmp/username_abc123_financial_report.xlsx&file_type=excel&import_type=local&sql_dialect=impala&has_header=true&sheet_name=Q1_Results"
+  "https://demo.gethue.com/api/v1/importer/file/preview/?file_path=/tmp/username_abc123_financial_report.xlsx&file_type=excel&import_type=local&sql_dialect=impala&has_header=true&sheet_name=Q1_Results"
 
 # For a custom pipe-delimited file using delimiter_format
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/file/preview/?file_path=/tmp/username_abc123_pipe_data.txt&file_type=delimiter_format&import_type=local&sql_dialect=hive&has_header=true&field_separator=|&quote_char=\"&record_separator=\n"
+  "https://demo.gethue.com/api/v1/importer/file/preview/?file_path=/tmp/username_abc123_pipe_data.txt&file_type=delimiter_format&import_type=local&sql_dialect=hive&has_header=true&field_separator=|&quote_char=\"&record_separator=\n"
 ```
 
 **Example using JavaScript:**
@@ -302,7 +302,7 @@ const params = new URLSearchParams({
 });
 
 // Make the fetch request
-fetch(`https://demo.gethue.com/api/importer/file/preview/?${params.toString()}`, {
+fetch(`https://demo.gethue.com/api/v1/importer/file/preview/?${params.toString()}`, {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
@@ -404,7 +404,7 @@ The `delimiter_format` file type allows you to process custom delimited files th
 
 Get mapping from Polars data types to SQL types for a specific SQL dialect. This helps in translating detected column types to appropriate SQL data types when creating tables.
 
-**Endpoint:** `/api/importer/sql_type_mapping/`
+**Endpoint:** `/api/v1/importer/sql_type_mapping/`
 
 **Method:** `GET`
 
@@ -419,13 +419,13 @@ Get mapping from Polars data types to SQL types for a specific SQL dialect. This
 ```bash
 curl -X GET \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \
-  "https://demo.gethue.com/api/importer/sql_type_mapping/?sql_dialect=hive"
+  "https://demo.gethue.com/api/v1/importer/sql_type_mapping/?sql_dialect=hive"
 ```
 
 **Example using JavaScript:**
 
 ```javascript
-fetch('https://demo.gethue.com/api/importer/sql_type_mapping/?sql_dialect=hive', {
+fetch('https://demo.gethue.com/api/v1/importer/sql_type_mapping/?sql_dialect=hive', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
@@ -554,7 +554,7 @@ Here's an example workflow that combines all the APIs to import a CSV file into 
 const formData = new FormData();
 formData.append('file', fileInputElement.files[0]);
 
-const uploadResponse = await fetch('https://demo.gethue.com/api/importer/upload/file/', {
+const uploadResponse = await fetch('https://demo.gethue.com/api/v1/importer/upload/file/', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
@@ -575,7 +575,7 @@ const metadataParams = new URLSearchParams({
   import_type: 'local'
 });
 
-const metadataResponse = await fetch(`https://demo.gethue.com/api/importer/file/guess_metadata/?${metadataParams.toString()}`, {
+const metadataResponse = await fetch(`https://demo.gethue.com/api/v1/importer/file/guess_metadata/?${metadataParams.toString()}`, {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
@@ -599,7 +599,7 @@ const headerParams = new URLSearchParams({
   import_type: 'local'
 });
 
-const headerResponse = await fetch(`https://demo.gethue.com/api/importer/file/guess_header/?${headerParams.toString()}`, {
+const headerResponse = await fetch(`https://demo.gethue.com/api/v1/importer/file/guess_header/?${headerParams.toString()}`, {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
@@ -625,7 +625,7 @@ const previewParams = new URLSearchParams({
   record_separator: recordSeparator
 });
 
-const previewResponse = await fetch(`https://demo.gethue.com/api/importer/file/preview/?${previewParams.toString()}`, {
+const previewResponse = await fetch(`https://demo.gethue.com/api/v1/importer/file/preview/?${previewParams.toString()}`, {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer <YOUR_JWT_TOKEN>'
@@ -666,4 +666,4 @@ console.log(createTableSQL);
 
 6. **Access Control**: Ensure file permissions are properly set for any uploaded files, especially in multi-user environments.
 
-7. **Cleanup**: Consider implementing cleanup mechanisms for temporary uploaded files that are no longer needed. Files uploaded via the `/api/importer/upload/file/` endpoint are stored in temporary locations (typically `/tmp/`) and should be cleaned up after processing.
+7. **Cleanup**: Consider implementing cleanup mechanisms for temporary uploaded files that are no longer needed. Files uploaded via the `/api/v1/importer/upload/file/` endpoint are stored in temporary locations (typically `/tmp/`) and should be cleaned up after processing.
