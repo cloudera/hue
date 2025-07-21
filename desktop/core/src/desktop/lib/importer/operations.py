@@ -87,7 +87,9 @@ SQL_TYPE_BASE_MAP = {
 # Per‑dialect overrides for the few differences
 SQL_TYPE_DIALECT_OVERRIDES = {
   "hive": {},
-  "impala": {},
+  "impala": {
+    "Duration": "STRING",  # Impala doesn't support INTERVAL types
+  },
   "sparksql": {},
   "trino": {
     "Int32": "INTEGER",
@@ -627,14 +629,13 @@ def guess_file_header(data: GuessFileHeaderSchema, username: str) -> bool:
     fh.close()
 
 
-def get_sql_type_mapping(data: SqlTypeMapperSchema) -> Dict[str, str]:
-  """Get all type mappings from Polars dtypes to SQL types for a given SQL dialect.
+def _get_polars_to_sql_mapping(dialect: str) -> Dict[str, str]:
+  """Get full mapping from Polars dtypes to SQL types for a given SQL dialect.
 
-  This function returns a dictionary mapping of all Polars data types to their
-  corresponding SQL types for a specific dialect.
+  Internal function that returns the complete mapping dictionary.
 
   Args:
-    data: A Pydantic schema with the SQL dialect.
+    dialect: One of "hive", "impala", "trino", "phoenix", "sparksql".
 
   Returns:
     A dict mapping Polars dtype names to SQL type names.
@@ -642,12 +643,35 @@ def get_sql_type_mapping(data: SqlTypeMapperSchema) -> Dict[str, str]:
   Raises:
     ValueError: If the dialect is not supported.
   """
-  dl = data.sql_dialect.lower()
+  dl = dialect.lower()
   if dl not in SQL_TYPE_DIALECT_OVERRIDES:
-    raise ValueError(f"Unsupported dialect: {data.sql_dialect}")
+    raise ValueError(f"Unsupported dialect: {dialect}")
 
   # Merge base_map and overrides[dl] into a new dict, giving precedence to any overlapping keys in overrides[dl]
   return {**SQL_TYPE_BASE_MAP, **SQL_TYPE_DIALECT_OVERRIDES[dl]}
+
+
+def get_sql_type_mapping(data: SqlTypeMapperSchema) -> List[str]:
+  """Get all unique SQL types supported by a given SQL dialect.
+
+  This function returns a sorted list of unique SQL types that are supported
+  by the specified SQL dialect based on the Polars to SQL type mappings.
+
+  Args:
+    data: A Pydantic schema with the SQL dialect.
+
+  Returns:
+    A sorted list of unique SQL type names for the dialect.
+
+  Raises:
+    ValueError: If the dialect is not supported.
+  """
+  # Get the full mapping
+  mapping = _get_polars_to_sql_mapping(data.sql_dialect)
+
+  # Extract unique SQL types and return as sorted list
+  unique_sql_types = sorted(set(mapping.values()))
+  return unique_sql_types
 
 
 def _map_polars_dtype_to_sql_type(dialect: str, polars_type: str) -> str:
@@ -663,7 +687,7 @@ def _map_polars_dtype_to_sql_type(dialect: str, polars_type: str) -> str:
   Raises:
     ValueError: If the dialect or polars_type is not supported.
   """
-  mapping = get_sql_type_mapping(SqlTypeMapperSchema(sql_dialect=dialect))
+  mapping = _get_polars_to_sql_mapping(dialect)
 
   if polars_type not in mapping:
     raise ValueError(f"No mapping for Polars dtype {polars_type} in dialect {dialect}")

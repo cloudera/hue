@@ -203,18 +203,18 @@ def guess_file_header(request: Request) -> Response:
 @parser_classes([JSONParser])
 @api_error_handler
 def get_sql_type_mapping(request: Request) -> Response:
-  """Get mapping from Polars data types to SQL types for a specific dialect.
+  """Get SQL types supported by a specific dialect.
 
-  This API endpoint returns a dictionary mapping Polars data types to the corresponding
-  SQL types for a specific SQL dialect.
+  This API endpoint returns a sorted list of unique SQL types that are supported
+  by a specific SQL dialect.
 
   Args:
     request: Request object containing query parameters:
-      - sql_dialect: The SQL dialect to get mappings for (e.g., 'hive', 'impala', 'trino')
+      - sql_dialect: The SQL dialect to get types for (e.g., 'hive', 'impala', 'trino')
 
   Returns:
-    Response containing a mapping dictionary:
-      - A mapping from Polars data type names to SQL type names for the specified dialect
+    Response containing a list of SQL types:
+      - A sorted list of unique SQL type names supported by the specified dialect
   """
   serializer = SqlTypeMapperSerializer(data=request.query_params)
 

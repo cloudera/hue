@@ -619,7 +619,23 @@ class TestSqlTypeMappingAPI:
     mock_serializer = MagicMock(is_valid=MagicMock(return_value=True), validated_data=mock_schema)
     mock_serializer_class.return_value = mock_serializer
 
-    mock_get_sql_type_mapping.return_value = {"Int32": "INT", "Utf8": "STRING", "Float64": "DOUBLE", "Boolean": "BOOLEAN"}
+    mock_get_sql_type_mapping.return_value = [
+      "ARRAY",
+      "BIGINT",
+      "BINARY",
+      "BOOLEAN",
+      "DATE",
+      "DECIMAL",
+      "DOUBLE",
+      "FLOAT",
+      "INT",
+      "INTERVAL DAY TO SECOND",
+      "SMALLINT",
+      "STRING",
+      "STRUCT",
+      "TIMESTAMP",
+      "TINYINT",
+    ]
 
     request = APIRequestFactory().get("importer/sql_type_mapping/")
     request.user = MagicMock(username="test_user")
@@ -628,7 +644,23 @@ class TestSqlTypeMappingAPI:
     response = api.get_sql_type_mapping(request)
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.data == {"Int32": "INT", "Utf8": "STRING", "Float64": "DOUBLE", "Boolean": "BOOLEAN"}
+    assert response.data == [
+      "ARRAY",
+      "BIGINT",
+      "BINARY",
+      "BOOLEAN",
+      "DATE",
+      "DECIMAL",
+      "DOUBLE",
+      "FLOAT",
+      "INT",
+      "INTERVAL DAY TO SECOND",
+      "SMALLINT",
+      "STRING",
+      "STRUCT",
+      "TIMESTAMP",
+      "TINYINT",
+    ]
     mock_get_sql_type_mapping.assert_called_once_with(mock_schema)
 
   @patch("desktop.lib.importer.api.SqlTypeMapperSerializer")
