@@ -96,15 +96,29 @@ reset_ha()
 
 
 def get_zk_hs2():
-  hiveservers = None
+  hiveservers = []
   zk = KazooClient(hosts=libzookeeper_conf.ENSEMBLE.get(), read_only=True)
   zk.start(timeout=ZOOKEEPER_CONN_TIMEOUT.get())
   znode = HIVE_DISCOVERY_HIVESERVER2_ZNODE.get()
+
   if zk.exists(znode):
-    LOG.debug("Selecting up Hive server via the following node {0}".format(znode))
+    LOG.info("Selecting Hive server via the following node {0}".format(znode))
     hiveservers = zk.get_children(znode)
-    if hiveservers and 'sequence' in hiveservers[0]:
-      hiveservers.sort(key=lambda x: re.findall(r'sequence=\d+', x)[0])
+
+    # Filter nodes that match the expected pattern before sorting
+    sequence_nodes = [x for x in hiveservers if re.search(r'sequence=\d+', x)]
+    LOG.info("Selecting Hive server via the following sequence_nodes {0}".format(sequence_nodes))
+    #['serverUri=dw-dev18:10000;version=3.1.2;sequence=0000000052', 'serverUri=dw-dev17:10000;version=3.1.2;sequence=0000000051']
+
+    if sequence_nodes:
+      # Sort the filtered list based on the sequence number
+      sequence_nodes.sort(key=lambda x: int(re.findall(r'sequence=(\d+)', x)[0]))
+      hiveservers = sequence_nodes
+    else:
+      LOG.warning("No nodes matching 'sequence=\d+' found under {0}".format(znode))
+  else:
+    LOG.error("ZooKeeper node {0} does not exist.".format(znode))
+
   zk.stop()
   return hiveservers
 
