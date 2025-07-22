@@ -14,7 +14,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from pydantic import ValidationError
 from rest_framework import serializers
+
+from filebrowser.schemas import RenameSchema
 
 
 class UploadFileSerializer(serializers.Serializer):
@@ -24,3 +27,18 @@ class UploadFileSerializer(serializers.Serializer):
 
   destination_path = serializers.CharField(required=True, allow_blank=False)
   overwrite = serializers.BooleanField(default=False)
+
+
+class RenameSerializer(serializers.Serializer):
+  """
+  Validates the parameters for the file/directory rename API.
+  """
+
+  source_path = serializers.CharField(required=True, allow_blank=False)
+  destination_path = serializers.CharField(required=True, allow_blank=False)
+
+  def validate(self, data):
+    try:
+      return RenameSchema.model_validate(data)
+    except ValidationError as e:
+      raise serializers.ValidationError(e.errors())
