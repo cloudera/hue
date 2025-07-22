@@ -169,17 +169,105 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
     return self.load_wsgiapp()
 
 
+# def argprocessing(args=[], options={}):
+#   global PID_FILE
+#   if options['bind']:
+#     http_port = "8888"
+#     bind_addr = options['bind']
+#     if ":" in bind_addr:
+#       http_port = bind_addr.split(":")[1]
+#     PID_FILE = "/tmp/hue_%s.pid" % (http_port)
+#   else:
+#     bind_addr = conf.HTTP_HOST.get() + ":" + str(conf.HTTP_PORT.get())
+#     PID_FILE = "/tmp/hue_%s.pid" % (conf.HTTP_PORT.get())
+#   options['bind_addr'] = bind_addr
+
+import socket
+import ipaddress
+import logging
+
+def _format_ipv6_bind_address(http_host, http_port):
+  """
+  Formats the bind address for IPv6, handling all possible input scenarios:
+  - Already bracketed IPv6: [2001:db8::1] -> [2001:db8::1]:8888
+  - Raw IPv6 literal: 2001:db8::1 -> [2001:db8::1]:8888  
+  - IPv4 or hostname: 0.0.0.0 or hostname.com -> resolve to IPv6 and bracket
+  - Special addresses: ::1, :: -> [::1]:8888, [::]:8888
+  """
+  try:
+    # Case 1: Already properly bracketed IPv6 address
+    if http_host.startswith('[') and http_host.endswith(']'):
+      # Extract the address part and validate it
+      ipv6_part = http_host[1:-1]
+      ipaddress.IPv6Address(ipv6_part)  # Validate it's a proper IPv6
+      bind_addr = f"{http_host}:{http_port}"
+      logging.info(f"Using pre-bracketed IPv6 address: {http_host}")
+      return bind_addr
+      
+    # Case 2: Try to parse as raw IPv6 address literal
+    try:
+      ipaddress.IPv6Address(http_host)
+      # It's a valid IPv6 literal, bracket it
+      bind_addr = f"[{http_host}]:{http_port}"
+      logging.info(f"Formatted IPv6 literal {http_host} as {bind_addr}")
+      return bind_addr
+    except ipaddress.AddressValueError:
+      # Not an IPv6 literal, continue to hostname resolution
+      pass
+      
+    # Case 3: Not an IPv6 literal, treat as hostname/IPv4 and resolve to IPv6
+    try:
+      addr_info = socket.getaddrinfo(http_host, None, socket.AF_INET6, socket.SOCK_STREAM)
+      if addr_info:
+        # Get the first IPv6 address from resolution
+        ipv6_addr = str(addr_info[0][4][0])
+        # Remove any zone identifier (like %eth0) for binding
+        if '%' in ipv6_addr:
+          ipv6_addr = ipv6_addr.split('%')[0]
+        bind_addr = f"[{ipv6_addr}]:{http_port}"
+        logging.info(f"Resolved hostname {http_host} to IPv6 address {ipv6_addr}")
+        return bind_addr
+      else:
+        # No IPv6 resolution available, fallback
+        bind_addr = f"{http_host}:{http_port}"
+        logging.warning(f"No IPv6 address found for {http_host}, using as-is: {bind_addr}")
+        return bind_addr
+    except socket.gaierror as e:
+      # DNS resolution failed
+      bind_addr = f"{http_host}:{http_port}"
+      logging.warning(f"IPv6 DNS resolution failed for {http_host}: {e}, using as-is: {bind_addr}")
+      return bind_addr
+      
+  except Exception as e:
+    # Catch-all for any other issues
+    bind_addr = f"{http_host}:{http_port}"
+    logging.warning(f"IPv6 address formatting failed for {http_host}: {e}, using as-is: {bind_addr}")
+    return bind_addr
+
 def argprocessing(args=[], options={}):
   global PID_FILE
-  if options['bind']:
-    http_port = "8888"
-    bind_addr = options['bind']
-    if ":" in bind_addr:
-      http_port = bind_addr.split(":")[1]
-    PID_FILE = "/tmp/hue_%s.pid" % (http_port)
+
+  ipv6_enabled = conf.ENABLE_IPV6.get()  # This is already a bool
+
+  if options.get('bind'):
+      http_port = "8888"
+      bind_addr = options['bind']
+      if ":" in bind_addr:
+          http_port = bind_addr.split(":")[-1]  # Use last part in case of IPv6
+      PID_FILE = f"/tmp/hue_{http_port}.pid"
   else:
-    bind_addr = conf.HTTP_HOST.get() + ":" + str(conf.HTTP_PORT.get())
-    PID_FILE = "/tmp/hue_%s.pid" % (conf.HTTP_PORT.get())
+      http_host = conf.HTTP_HOST.get()
+      http_port = str(conf.HTTP_PORT.get())
+
+      if ipv6_enabled:
+          bind_addr = _format_ipv6_bind_address(http_host, http_port)
+      else:
+          # For IPv4, just use the original implementation
+          bind_addr = f"{http_host}:{http_port}"
+          logging.info(f"IPv6 disabled, using standard format: {bind_addr}")
+
+      PID_FILE = f"/tmp/hue_{http_port}.pid"
+
   options['bind_addr'] = bind_addr
 
   # Currently gunicorn does not support passphrase suppored SSL Keyfile
