@@ -41,6 +41,7 @@ from six import iteritems
 
 import desktop.log
 from desktop import conf
+from desktop.lib.ip_utils import fetch_ipv6_bind_address
 from desktop.lib.paths import get_desktop_root
 from filebrowser.utils import parse_broker_url
 
@@ -171,15 +172,27 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
 
 def argprocessing(args=[], options={}):
   global PID_FILE
-  if options['bind']:
-    http_port = "8888"
-    bind_addr = options['bind']
-    if ":" in bind_addr:
-      http_port = bind_addr.split(":")[1]
-    PID_FILE = "/tmp/hue_%s.pid" % (http_port)
+
+  ipv6_enabled = conf.ENABLE_IPV6.get()  # This is already a bool
+
+  if options.get('bind'):
+      http_port = "8888"
+      bind_addr = options['bind']
+      if ":" in bind_addr:
+          http_port = bind_addr.split(":")[-1]  # Use last part in case of IPv6
+      PID_FILE = f"/tmp/hue_{http_port}.pid"
   else:
-    bind_addr = conf.HTTP_HOST.get() + ":" + str(conf.HTTP_PORT.get())
-    PID_FILE = "/tmp/hue_%s.pid" % (conf.HTTP_PORT.get())
+      http_host = conf.HTTP_HOST.get()
+      http_port = str(conf.HTTP_PORT.get())
+
+      if ipv6_enabled:
+          bind_addr = fetch_ipv6_bind_address(http_host, http_port)
+      else:
+          bind_addr = f"{http_host}:{http_port}"
+          logging.info(f"IPv6 disabled, using standard format: {bind_addr}")
+
+      PID_FILE = f"/tmp/hue_{http_port}.pid"
+
   options['bind_addr'] = bind_addr
 
   # Currently gunicorn does not support passphrase suppored SSL Keyfile

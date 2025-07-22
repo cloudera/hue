@@ -213,6 +213,12 @@ HTTP_PORT = Config(
   type=int,
   default=8888)
 
+ENABLE_IPV6 = Config(
+  key="enable_ipv6",
+  help=_("Enable IPv6 support. If true, Hue will attempt to bind to IPv6 addresses."),
+  type=coerce_bool,
+  default=False)
+
 HTTP_ALLOWED_METHODS = Config(
   key="http_allowed_methods",
   help=_("HTTP methods the server will be allowed to service."),
