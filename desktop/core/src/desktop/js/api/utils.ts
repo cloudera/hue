@@ -264,6 +264,86 @@ export const get = <T, U = unknown, E = AxiosError<DefaultApiResponse>>(
     });
   });
 
+export const put = <T, U = unknown, E = AxiosError>(
+  url: string,
+  data?: U,
+  options?: ApiFetchOptions<T, E>
+): CancellablePromise<T> =>
+  new CancellablePromise((resolve, reject, onCancel) => {
+    const { cancelToken, cancel } = getCancelToken();
+    let completed = false;
+
+    const encodeData = options?.qsEncodeData == undefined || options?.qsEncodeData;
+
+    axiosInstance
+      .put<T & DefaultApiResponse>(url, encodeData ? qs.stringify(data) : data, {
+        cancelToken,
+        ...options
+      })
+      .then(response => {
+        handleResponse(response, resolve, reject, options);
+      })
+      .catch((err: AxiosError<DefaultApiResponse>) => {
+        if (options && options.handleError) {
+          options.handleError(err, resolve, reason => {
+            handleErrorResponse(err, reject, options);
+            notifyError(String(reason), err, options);
+          });
+        } else {
+          handleErrorResponse(err, reject, options);
+        }
+      })
+      .finally(() => {
+        completed = true;
+      });
+
+    onCancel(() => {
+      if (!completed) {
+        cancel();
+      }
+    });
+  });
+
+export const patch = <T, U = unknown, E = AxiosError>(
+  url: string,
+  data?: U,
+  options?: ApiFetchOptions<T, E>
+): CancellablePromise<T> =>
+  new CancellablePromise((resolve, reject, onCancel) => {
+    const { cancelToken, cancel } = getCancelToken();
+    let completed = false;
+
+    const encodeData = options?.qsEncodeData == undefined || options?.qsEncodeData;
+
+    axiosInstance
+      .patch<T & DefaultApiResponse>(url, encodeData ? qs.stringify(data) : data, {
+        cancelToken,
+        ...options
+      })
+      .then(response => {
+        handleResponse(response, resolve, reject, options);
+      })
+      .catch((err: AxiosError<DefaultApiResponse>) => {
+        if (options && options.handleError) {
+          options.handleError(err, resolve, reason => {
+            handleErrorResponse(err, reject, options);
+            notifyError(String(reason), err, options);
+          });
+        } else {
+          handleErrorResponse(err, reject, options);
+        }
+      })
+      .finally(() => {
+        completed = true;
+      });
+
+    onCancel(() => {
+      if (!completed) {
+        cancel();
+      }
+    });
+  });
+
 export const upload = async <T>(
   url: string,
   data: FormData,
