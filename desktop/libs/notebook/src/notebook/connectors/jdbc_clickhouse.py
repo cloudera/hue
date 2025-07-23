@@ -16,13 +16,14 @@
 # limitations under the License.
 
 from librdbms.jdbc import query_and_fetch
+from notebook.connectors.jdbc import Assist, JdbcApi
 
-from notebook.connectors.jdbc import JdbcApi
-from notebook.connectors.jdbc import Assist
+
 class JdbcApiClickhouse(JdbcApi):
 
   def _createAssist(self, db):
     return ClickhouseAssist(db)
+
 
 class ClickhouseAssist(Assist):
 
@@ -35,9 +36,10 @@ class ClickhouseAssist(Assist):
     return [{"comment": table[1] and table[1].strip(), "type": "Table", "name": table[0] and table[0].strip()} for table in tables]
 
   def get_columns_full(self, database, table):
-    columns, description = query_and_fetch(self.db, "SELECT name, type, '' FROM system.columns WHERE database='%s' AND table = '%s'" % (database, table))
+    query = "SELECT name, type, '' FROM system.columns WHERE database='%s' AND table = '%s'" % (database, table)
+    columns, description = query_and_fetch(self.db, query)
     return [{"comment": col[2] and col[2].strip(), "type": col[1], "name": col[0] and col[0].strip()} for col in columns]
 
-  def get_sample_data(self, database, table, column=None):
+  def get_sample_data(self, database, table, column=None, nested=None):
     column = column or '*'
     return query_and_fetch(self.db, 'SELECT %s FROM %s.%s limit 100' % (column, database, table))
