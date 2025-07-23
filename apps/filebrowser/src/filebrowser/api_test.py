@@ -184,7 +184,7 @@ class TestRenameAPI:
 
     mock_rename_operation.return_value = {"message": "Renamed successfully"}
 
-    request = APIRequestFactory().post("/filebrowser/rename", data=mock_schema, format="json")
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -199,7 +199,7 @@ class TestRenameAPI:
     mock_serializer = Mock(is_valid=Mock(return_value=False), errors={"source_path": ["This field is required."]})
     mock_serializer_class.return_value = mock_serializer
 
-    request = APIRequestFactory().post("/filebrowser/rename", data={}, format="json")
+    request = APIRequestFactory().post("/storage/rename", data={}, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -216,7 +216,7 @@ class TestRenameAPI:
 
     mock_rename_operation.side_effect = ValueError("Destination path already exists")
 
-    request = APIRequestFactory().post("/filebrowser/rename", data=mock_schema, format="json")
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -233,7 +233,7 @@ class TestRenameAPI:
 
     mock_rename_operation.side_effect = Exception("Filesystem error")
 
-    request = APIRequestFactory().post("/filebrowser/rename", data=mock_schema, format="json")
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -250,7 +250,7 @@ class TestRenameAPI:
 
     mock_rename_operation.return_value = {"message": "Renamed '/user/test/document.txt' to '/user/test/document_v2.txt' successfully"}
 
-    request = APIRequestFactory().post("/filebrowser/rename", data=mock_schema, format="json")
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -267,7 +267,7 @@ class TestRenameAPI:
 
     mock_rename_operation.return_value = {"message": "Renamed successfully"}
 
-    request = APIRequestFactory().post("/filebrowser/rename", data=mock_schema, format="json")
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -284,7 +284,7 @@ class TestRenameAPI:
 
     mock_rename_operation.return_value = {"message": "Renamed '/user/test/old_folder' to '/user/test/new_folder' successfully"}
 
-    request = APIRequestFactory().post("/filebrowser/rename", data=mock_schema, format="json")
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -303,7 +303,7 @@ class TestRenameAPI:
 
     mock_rename_operation.side_effect = Exception("Test error")
 
-    request = APIRequestFactory().post("/filebrowser/rename", data=mock_schema, format="json")
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -321,7 +321,7 @@ class TestRenameAPI:
     )
     mock_serializer_class.return_value = mock_serializer
 
-    request = APIRequestFactory().post("/filebrowser/rename", data={"source_path": "", "destination_path": "../etc"}, format="json")
+    request = APIRequestFactory().post("/storage/rename", data={"source_path": "", "destination_path": "../etc"}, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -339,7 +339,7 @@ class TestRenameAPI:
 
     mock_rename_operation.return_value = {"message": "Renamed '/user/test/文档.txt' to '/user/test/文档_新.txt' successfully"}
 
-    request = APIRequestFactory().post("/filebrowser/rename", data=mock_schema, format="json")
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -360,7 +360,7 @@ class TestRenameAPI:
 
     mock_rename_operation.return_value = {"message": "Renamed successfully"}
 
-    request = APIRequestFactory().post("/filebrowser/rename", data=mock_schema, format="json")
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
     request.user = Mock(username="test_user")
 
     response = rename(request)
@@ -381,7 +381,7 @@ class TestRenameAPI:
 
     mock_rename_operation.return_value = {"message": "Success"}
 
-    request = APIRequestFactory().post("/filebrowser/rename", data=mock_schema_data, format="json")
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema_data, format="json")
     request.user = Mock(username="test_user")
 
     rename(request)
