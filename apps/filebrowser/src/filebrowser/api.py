@@ -56,6 +56,7 @@ from filebrowser.conf import (
 )
 from filebrowser.lib.rwx import compress_mode, filetype, rwx
 from filebrowser.operations import rename_file_or_directory
+from filebrowser.schemas import RenameSchema
 from filebrowser.serializers import RenameSerializer, UploadFileSerializer
 from filebrowser.utils import get_user_fs, parse_broker_url
 from filebrowser.views import (
@@ -694,8 +695,7 @@ def rename(request):
   if not serializer.is_valid():
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  rename_params = serializer.validated_data
-
+  rename_params = RenameSchema(**serializer.validated_data)
   try:
     result = rename_file_or_directory(data=rename_params, username=request.user.username)
     return Response(result, status=status.HTTP_200_OK)

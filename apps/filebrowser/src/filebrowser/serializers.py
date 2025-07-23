@@ -39,6 +39,8 @@ class RenameSerializer(serializers.Serializer):
 
   def validate(self, data):
     try:
-      return RenameSchema.model_validate(data)
+      RenameSchema.model_validate(data)
     except ValidationError as e:
       raise serializers.ValidationError(e.errors())
+
+    return data
