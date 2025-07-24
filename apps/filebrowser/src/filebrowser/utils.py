@@ -22,13 +22,45 @@ from urllib.parse import urlparse
 import redis
 
 from desktop.conf import TASK_SERVER_V2
+from desktop.lib import fsmanager
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.fs.proxyfs import ProxyFS
 from filebrowser.conf import ALLOW_FILE_EXTENSIONS, ARCHIVE_UPLOAD_TEMPDIR, RESTRICT_FILE_EXTENSIONS
+from filebrowser.lib.rwx import filetype, rwx
 
 LOG = logging.getLogger()
 
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 128
+
+
+def get_user_fs(username: str) -> ProxyFS:
+  """Get a filesystem proxy for the given user.
+
+  This function returns a ProxyFS instance, which is a filesystem-like object
+  that routes operations to the appropriate underlying filesystem based on the
+  path's URI scheme (e.g., 'abfs://', 's3a://').
+
+  If a path has no scheme, it defaults to the first available filesystem
+  configured in Hue (e.g. HDFS). All operations are performed on behalf
+  of the specified user.
+
+  Args:
+    username: The name of the user to impersonate for filesystem operations.
+
+  Returns:
+    A ProxyFS object that can be used to access any configured filesystem.
+
+  Raises:
+    ValueError: If the username is empty.
+  """
+  if not username:
+    raise ValueError("Username is required")
+
+  fs = fsmanager.get_filesystem("default")
+  fs.setuser(username)
+
+  return fs
 
 
 def calculate_total_size(uuid, totalparts):
@@ -168,3 +200,27 @@ def is_file_upload_allowed(file_name):
       return False, f'File type "{file_type}" is restricted. Update file extension restrictions to allow this type.'
 
   return True, None
+
+
+def massage_stats(stats):
+  """Converts a file stats object into a dictionary with extra fields.
+
+  This function takes a file stats object (typically from an underlying
+  filesystem), converts it to a JSON-compatible dictionary, and enriches it
+  with 'type' (e.g., 'file', 'dir') and 'rwx' (e.g., 'rwxr-x---') fields.
+
+  Args:
+    stats: A file stats object from a filesystem implementation.
+
+  Returns:
+    A dictionary containing the file's stats and additional metadata.
+  """
+  stats_dict = stats.to_json_dict()
+  stats_dict.update(
+    {
+      "type": filetype(stats.mode),
+      "rwx": rwx(stats.mode, stats.aclBit),
+    }
+  )
+
+  return stats_dict

@@ -33,6 +33,7 @@ from desktop.lib.importer.schemas import (
   PreviewFileSchema,
   SqlTypeMapperSchema,
 )
+from filebrowser.utils import get_user_fs
 
 LOG = logging.getLogger()
 
@@ -86,7 +87,9 @@ SQL_TYPE_BASE_MAP = {
 # Per‑dialect overrides for the few differences
 SQL_TYPE_DIALECT_OVERRIDES = {
   "hive": {},
-  "impala": {},
+  "impala": {
+    "Duration": "STRING",  # Impala doesn't support INTERVAL types
+  },
   "sparksql": {},
   "trino": {
     "Int32": "INTEGER",
@@ -165,12 +168,12 @@ def local_file_upload(data: LocalFileUploadSchema, username: str) -> Dict[str, s
     raise e
 
 
-def guess_file_metadata(data: GuessFileMetadataSchema, fs=None) -> Dict[str, Any]:
+def guess_file_metadata(data: GuessFileMetadataSchema, username: str) -> Dict[str, Any]:
   """Guess the metadata of a file based on its content or extension.
 
   Args:
     data: A Pydantic schema containing file_path and import_type.
-    fs: File system object for remote files (default: None)
+    username: The name of the user to impersonate for filesystem operations.
 
   Returns:
     Dict containing the file metadata:
@@ -184,17 +187,19 @@ def guess_file_metadata(data: GuessFileMetadataSchema, fs=None) -> Dict[str, Any
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  if data.import_type == "remote" and fs is None:
-    raise ValueError("File system object is required for remote import type")
+  if not username:
+    raise ValueError("Username is required and cannot be empty.")
+
+  fs = get_user_fs(username) if data.import_type == "remote" else None
 
   # Check if file exists based on import type
   if data.import_type == "local" and not os.path.exists(data.file_path):
     raise ValueError(f"Local file does not exist: {data.file_path}")
-  elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
+  elif data.import_type == "remote" and not fs.exists(data.file_path):
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
   should_cleanup = False
-  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
+  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "r")
 
   try:
     sample = fh.read(16 * 1024)  # Read 16 KiB sample
@@ -227,7 +232,7 @@ def guess_file_metadata(data: GuessFileMetadataSchema, fs=None) -> Dict[str, Any
       os.remove(data.file_path)
 
 
-def preview_file(data: PreviewFileSchema, fs=None, preview_rows: int = 50) -> Dict[str, Any]:
+def preview_file(data: PreviewFileSchema, username: str, preview_rows: int = 50) -> Dict[str, Any]:
   """Generate a preview of a file's content with column type mapping.
 
   This method reads a file and returns a preview of its contents, along with
@@ -235,7 +240,7 @@ def preview_file(data: PreviewFileSchema, fs=None, preview_rows: int = 50) -> Di
 
   Args:
     data: A Pydantic schema with all the required parameters.
-    fs: File system object for remote files (default: None)
+    username: The name of the user to impersonate for filesystem operations.
     preview_rows: Number of rows to include in preview (default: 50)
 
   Returns:
@@ -248,17 +253,19 @@ def preview_file(data: PreviewFileSchema, fs=None, preview_rows: int = 50) -> Di
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  if data.import_type == "remote" and fs is None:
-    raise ValueError("File system object is required for remote import type")
+  if not username:
+    raise ValueError("Username is required and cannot be empty.")
+
+  fs = get_user_fs(username) if data.import_type == "remote" else None
 
   # Check if file exists based on import type
   if data.import_type == "local" and not os.path.exists(data.file_path):
     raise ValueError(f"Local file does not exist: {data.file_path}")
-  elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
+  elif data.import_type == "remote" and not fs.exists(data.file_path):
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
   should_cleanup = False
-  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
+  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "r")
 
   try:
     if data.file_type == "excel":
@@ -542,7 +549,7 @@ def _preview_delimited_file(
     raise Exception(message)
 
 
-def guess_file_header(data: GuessFileHeaderSchema, fs=None) -> bool:
+def guess_file_header(data: GuessFileHeaderSchema, username: str) -> bool:
   """Guess whether a file has a header row.
 
   This function analyzes a file to determine if it contains a header row based on the
@@ -550,7 +557,7 @@ def guess_file_header(data: GuessFileHeaderSchema, fs=None) -> bool:
 
   Args:
     data: A Pydantic schema with all the required parameters.
-    fs: File system object for remote files (default: None)
+    username: The name of the user to impersonate for filesystem operations.
 
   Returns:
     has_header: Boolean indicating whether the file has a header row
@@ -559,16 +566,18 @@ def guess_file_header(data: GuessFileHeaderSchema, fs=None) -> bool:
     ValueError: If the file does not exist or parameters are invalid
     Exception: For various file processing errors
   """
-  if data.import_type == "remote" and fs is None:
-    raise ValueError("File system object is required for remote import type")
+  if not username:
+    raise ValueError("Username is required and cannot be empty.")
+
+  fs = get_user_fs(username) if data.import_type == "remote" else None
 
   # Check if file exists based on import type
   if data.import_type == "local" and not os.path.exists(data.file_path):
     raise ValueError(f"Local file does not exist: {data.file_path}")
-  elif data.import_type == "remote" and fs and not fs.exists(data.file_path):
+  elif data.import_type == "remote" and not fs.exists(data.file_path):
     raise ValueError(f"Remote file does not exist: {data.file_path}")
 
-  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "rb")
+  fh = open(data.file_path, "rb") if data.import_type == "local" else fs.open(data.file_path, "r")
 
   has_header = False
 
@@ -620,14 +629,13 @@ def guess_file_header(data: GuessFileHeaderSchema, fs=None) -> bool:
     fh.close()
 
 
-def get_sql_type_mapping(data: SqlTypeMapperSchema) -> Dict[str, str]:
-  """Get all type mappings from Polars dtypes to SQL types for a given SQL dialect.
+def _get_polars_to_sql_mapping(dialect: str) -> Dict[str, str]:
+  """Get full mapping from Polars dtypes to SQL types for a given SQL dialect.
 
-  This function returns a dictionary mapping of all Polars data types to their
-  corresponding SQL types for a specific dialect.
+  Internal function that returns the complete mapping dictionary.
 
   Args:
-    data: A Pydantic schema with the SQL dialect.
+    dialect: One of "hive", "impala", "trino", "phoenix", "sparksql".
 
   Returns:
     A dict mapping Polars dtype names to SQL type names.
@@ -635,12 +643,35 @@ def get_sql_type_mapping(data: SqlTypeMapperSchema) -> Dict[str, str]:
   Raises:
     ValueError: If the dialect is not supported.
   """
-  dl = data.sql_dialect.lower()
+  dl = dialect.lower()
   if dl not in SQL_TYPE_DIALECT_OVERRIDES:
-    raise ValueError(f"Unsupported dialect: {data.sql_dialect}")
+    raise ValueError(f"Unsupported dialect: {dialect}")
 
   # Merge base_map and overrides[dl] into a new dict, giving precedence to any overlapping keys in overrides[dl]
   return {**SQL_TYPE_BASE_MAP, **SQL_TYPE_DIALECT_OVERRIDES[dl]}
+
+
+def get_sql_type_mapping(data: SqlTypeMapperSchema) -> List[str]:
+  """Get all unique SQL types supported by a given SQL dialect.
+
+  This function returns a sorted list of unique SQL types that are supported
+  by the specified SQL dialect based on the Polars to SQL type mappings.
+
+  Args:
+    data: A Pydantic schema with the SQL dialect.
+
+  Returns:
+    A sorted list of unique SQL type names for the dialect.
+
+  Raises:
+    ValueError: If the dialect is not supported.
+  """
+  # Get the full mapping
+  mapping = _get_polars_to_sql_mapping(data.sql_dialect)
+
+  # Extract unique SQL types and return as sorted list
+  unique_sql_types = sorted(set(mapping.values()))
+  return unique_sql_types
 
 
 def _map_polars_dtype_to_sql_type(dialect: str, polars_type: str) -> str:
@@ -656,7 +687,7 @@ def _map_polars_dtype_to_sql_type(dialect: str, polars_type: str) -> str:
   Raises:
     ValueError: If the dialect or polars_type is not supported.
   """
-  mapping = get_sql_type_mapping(SqlTypeMapperSchema(sql_dialect=dialect))
+  mapping = _get_polars_to_sql_mapping(dialect)
 
   if polars_type not in mapping:
     raise ValueError(f"No mapping for Polars dtype {polars_type} in dialect {dialect}")

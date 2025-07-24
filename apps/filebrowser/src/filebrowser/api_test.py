@@ -19,582 +19,394 @@ import json
 from io import BytesIO as string_io
 from unittest.mock import MagicMock, Mock, patch
 
-from django.core.files.uploadedfile import SimpleUploadedFile
+import pytest
 from django.http import HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
+from rest_framework import status
+from rest_framework.exceptions import NotFound
+from rest_framework.test import APIRequestFactory
 
 from aws.s3.s3fs import S3ListAllBucketsException
-from filebrowser.api import copy, download, get_all_filesystems, listdir_paged, mkdir, move, rename, touch, upload_file
-from filebrowser.conf import MAX_FILE_SIZE_UPLOAD_LIMIT, REDIRECT_DOWNLOAD, RESTRICT_FILE_EXTENSIONS, SHOW_DOWNLOAD_BUTTON
+from desktop.lib.exceptions_renderable import PopupException
+from filebrowser.api import copy, download, get_all_filesystems, listdir_paged, mkdir, move, rename, touch, UploadFileAPI
+from filebrowser.conf import REDIRECT_DOWNLOAD, SHOW_DOWNLOAD_BUTTON
 from hadoop.fs.exceptions import WebHdfsException
-
-
-class TestSimpleFileUploadAPI:
-  def test_file_upload_success(self):
-    with patch('filebrowser.api.string_io') as string_io:
-      with patch('filebrowser.api.stat_absolute_path') as stat_absolute_path:
-        with patch('filebrowser.api._massage_stats') as _massage_stats:
-          request = Mock(
-            method='POST',
-            META=Mock(),
-            POST={'destination_path': 's3a://test-bucket/test-user/'},
-            FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
-            body=Mock(),
-            fs=Mock(
-              join=Mock(),
-              exists=Mock(side_effect=[False, True]),
-              isdir=Mock(return_value=False),
-              upload_v1=Mock(return_value=None),
-              stats=Mock(),
-              rmtree=Mock(),
-            ),
-          )
-
-          _massage_stats.return_value = {
-            "path": "s3a://test-bucket/test-user/test_file.txt",
-            "size": 12,
-            "atime": 1731527617,
-            "mtime": 1731527620,
-            "mode": 33188,
-            "user": "test-user",
-            "group": "test-user",
-            "blockSize": 134217728,
-            "replication": 3,
-            "type": "file",
-            "rwx": "-rw-r--r--",
-          }
-
-          resets = [
-            RESTRICT_FILE_EXTENSIONS.set_for_testing(''),
-            MAX_FILE_SIZE_UPLOAD_LIMIT.set_for_testing(-1),
-          ]
-          try:
-            response = upload_file(request)
-            response_data = json.loads(response.content)
-
-            request.fs.rmtree.assert_not_called()
-            assert response.status_code == 200
-            assert response_data['uploaded_file_stats'] == {
-              "path": "s3a://test-bucket/test-user/test_file.txt",
-              "size": 12,
-              "atime": 1731527617,
-              "mtime": 1731527620,
-              "mode": 33188,
-              "user": "test-user",
-              "group": "test-user",
-              "blockSize": 134217728,
-              "replication": 3,
-              "type": "file",
-              "rwx": "-rw-r--r--",
-            }
-          finally:
-            for reset in resets:
-              reset()
-
-  def test_upload_invalid_file_type(self):
-    with patch('filebrowser.api.string_io') as string_io:
-      request = Mock(
-        method='POST',
-        META=Mock(),
-        POST={'destination_path': 's3a://test-bucket/test-user/'},
-        FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
-        body=Mock(),
-        fs=Mock(
-          join=Mock(),
-          exists=Mock(side_effect=[False, True]),
-          isdir=Mock(return_value=False),
-          upload_v1=Mock(return_value=None),
-          stats=Mock(),
-        ),
-      )
-      resets = [
-        RESTRICT_FILE_EXTENSIONS.set_for_testing('.exe,.txt'),
-        MAX_FILE_SIZE_UPLOAD_LIMIT.set_for_testing(-1),
-      ]
-      try:
-        response = upload_file(request)
-        res_content = response.content.decode('utf-8')
-
-        assert response.status_code == 400
-        assert res_content == 'Uploading files with type ".txt" is not allowed. Hue is configured to restrict this type.'
-      finally:
-        for reset in resets:
-          reset()
-
-  def test_upload_file_exceeds_max_size(self):
-    with patch('filebrowser.api.string_io') as string_io:
-      request = Mock(
-        method='POST',
-        META=Mock(),
-        POST={'destination_path': 's3a://test-bucket/test-user/'},
-        FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
-        body=Mock(),
-        fs=Mock(
-          join=Mock(),
-          exists=Mock(side_effect=[False, True]),
-          isdir=Mock(return_value=False),
-          upload_v1=Mock(return_value=None),
-          stats=Mock(),
-        ),
-      )
-      resets = [
-        RESTRICT_FILE_EXTENSIONS.set_for_testing(''),
-        MAX_FILE_SIZE_UPLOAD_LIMIT.set_for_testing(5),
-      ]
-      try:
-        response = upload_file(request)
-        res_content = response.content.decode('utf-8')
-
-        assert response.status_code == 413
-        assert res_content == 'File exceeds maximum allowed size of 5 bytes. Hue is configured to restrict uploads larger than this limit.'
-      finally:
-        for reset in resets:
-          reset()
-
-  def test_upload_file_already_exists(self):
-    with patch('filebrowser.api.string_io') as string_io:
-      request = Mock(
-        method='POST',
-        META=Mock(),
-        POST={'destination_path': 's3a://test-bucket/test-user/'},
-        FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
-        body=Mock(),
-        fs=Mock(
-          join=Mock(return_value='s3a://test-bucket/test-user/test_file.txt'),
-          exists=Mock(return_value=True),
-          isdir=Mock(return_value=True),
-          upload_v1=Mock(return_value=None),
-          stats=Mock(),
-        ),
-      )
-      resets = [
-        RESTRICT_FILE_EXTENSIONS.set_for_testing(''),
-        MAX_FILE_SIZE_UPLOAD_LIMIT.set_for_testing(-1),
-      ]
-      try:
-        response = upload_file(request)
-
-        assert response.status_code == 409
-        assert response.content.decode('utf-8') == 'The file test_file.txt already exists at the destination path.'
-      finally:
-        for reset in resets:
-          reset()
-
-  def test_overwrite_existing_file_success(self):
-    with patch('filebrowser.api.string_io') as string_io:
-      with patch('filebrowser.api.stat_absolute_path') as stat_absolute_path:
-        with patch('filebrowser.api._massage_stats') as _massage_stats:
-          request = Mock(
-            method='POST',
-            META=Mock(),
-            POST={'destination_path': 's3a://test-bucket/test-user/', 'overwrite': True},
-            FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
-            body=Mock(),
-            fs=Mock(
-              join=Mock(return_value='s3a://test-bucket/test-user/test_file.txt'),
-              exists=Mock(side_effect=[True, True]),
-              isdir=Mock(return_value=False),
-              upload_v1=Mock(return_value=None),
-              stats=Mock(),
-              rmtree=Mock(),
-            ),
-          )
-
-          _massage_stats.return_value = {
-            "path": "s3a://test-bucket/test-user/test_file.txt",
-            "size": 12,
-            "atime": 1731527617,
-            "mtime": 1731527620,
-            "mode": 33188,
-            "user": "test-user",
-            "group": "test-user",
-            "blockSize": 134217728,
-            "replication": 3,
-            "type": "file",
-            "rwx": "-rw-r--r--",
-          }
-
-          resets = [
-            RESTRICT_FILE_EXTENSIONS.set_for_testing(''),
-            MAX_FILE_SIZE_UPLOAD_LIMIT.set_for_testing(-1),
-          ]
-          try:
-            response = upload_file(request)
-            response_data = json.loads(response.content)
-
-            request.fs.rmtree.assert_called_once_with('s3a://test-bucket/test-user/test_file.txt')
-            assert response.status_code == 200
-            assert response_data['uploaded_file_stats'] == {
-              "path": "s3a://test-bucket/test-user/test_file.txt",
-              "size": 12,
-              "atime": 1731527617,
-              "mtime": 1731527620,
-              "mode": 33188,
-              "user": "test-user",
-              "group": "test-user",
-              "blockSize": 134217728,
-              "replication": 3,
-              "type": "file",
-              "rwx": "-rw-r--r--",
-            }
-          finally:
-            for reset in resets:
-              reset()
-
-  def test_overwrite_existing_file_exception(self):
-    with patch('filebrowser.api.string_io') as string_io:
-      request = Mock(
-        method='POST',
-        META=Mock(),
-        POST={'destination_path': 's3a://test-bucket/test-user/', 'overwrite': True},
-        FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
-        body=Mock(),
-        fs=Mock(
-          join=Mock(return_value='s3a://test-bucket/test-user/test_file.txt'),
-          exists=Mock(side_effect=[True, True]),
-          isdir=Mock(return_value=False),
-          upload_v1=Mock(return_value=None),
-          stats=Mock(),
-          rmtree=Mock(side_effect=Exception('Filesystem rmtree exception')),
-        ),
-      )
-
-      resets = [
-        RESTRICT_FILE_EXTENSIONS.set_for_testing(''),
-        MAX_FILE_SIZE_UPLOAD_LIMIT.set_for_testing(-1),
-      ]
-      try:
-        response = upload_file(request)
-
-        request.fs.rmtree.assert_called_once_with('s3a://test-bucket/test-user/test_file.txt')
-        assert response.status_code == 500
-        assert response.content.decode('utf-8') == 'Failed to remove already existing file.'
-      finally:
-        for reset in resets:
-          reset()
-
-  def test_destination_path_does_not_exists(self):
-    with patch('filebrowser.api.string_io') as string_io:
-      request = Mock(
-        method='POST',
-        META=Mock(),
-        POST={'destination_path': 's3a://test-bucket/test-user/'},
-        FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
-        body=Mock(),
-        fs=Mock(
-          join=Mock(),
-          exists=Mock(return_value=False),
-          isdir=Mock(return_value=True),
-          upload_v1=Mock(return_value=None),
-          stats=Mock(),
-        ),
-      )
-      resets = [
-        RESTRICT_FILE_EXTENSIONS.set_for_testing(''),
-        MAX_FILE_SIZE_UPLOAD_LIMIT.set_for_testing(-1),
-      ]
-      try:
-        response = upload_file(request)
-
-        assert response.status_code == 404
-        assert response.content.decode('utf-8') == 'The destination path s3a://test-bucket/test-user/ does not exist.'
-      finally:
-        for reset in resets:
-          reset()
-
-  def test_file_upload_failure(self):
-    with patch('filebrowser.api.string_io') as string_io:
-      request = Mock(
-        method='POST',
-        META=Mock(),
-        POST={'destination_path': 's3a://test-bucket/test-user/'},
-        FILES={'file': SimpleUploadedFile('test_file.txt', b'Hello World!')},
-        body=Mock(),
-        fs=Mock(
-          join=Mock(return_value='s3a://test-bucket/test-user/test_file.txt'),
-          exists=Mock(side_effect=[False, True]),
-          isdir=Mock(return_value=True),
-          upload_v1=Mock(side_effect=Exception('Upload exception occured!')),
-          stats=Mock(),
-        ),
-      )
-      resets = [
-        RESTRICT_FILE_EXTENSIONS.set_for_testing(''),
-        MAX_FILE_SIZE_UPLOAD_LIMIT.set_for_testing(-1),
-      ]
-      try:
-        response = upload_file(request)
-
-        assert response.status_code == 500
-        assert response.content.decode('utf-8') == 'Upload to s3a://test-bucket/test-user/test_file.txt failed: Upload exception occured!'
-      finally:
-        for reset in resets:
-          reset()
 
 
 class TestTouchAPI:
   def test_touch_success(self):
     request = Mock(
-      method='POST',
-      POST={'path': 's3a://test-bucket/test-user/', 'name': 'test_file.txt'},
+      method="POST",
+      POST={"path": "s3a://test-bucket/test-user/", "name": "test_file.txt"},
       fs=Mock(
         isfile=Mock(return_value=False),
-        join=Mock(return_value='s3a://test-bucket/test-user/test_file.txt'),
+        join=Mock(return_value="s3a://test-bucket/test-user/test_file.txt"),
         create=Mock(),
       ),
     )
     response = touch(request)
 
     assert response.status_code == 201
-    request.fs.create.assert_called_once_with('s3a://test-bucket/test-user/test_file.txt')
+    request.fs.create.assert_called_once_with("s3a://test-bucket/test-user/test_file.txt")
 
   def test_touch_file_exists(self):
     request = Mock(
-      method='POST',
-      POST={'path': 's3a://test-bucket/test-user/', 'name': 'test_file.txt'},
+      method="POST",
+      POST={"path": "s3a://test-bucket/test-user/", "name": "test_file.txt"},
       fs=Mock(
         isfile=Mock(return_value=True),
-        join=Mock(return_value='s3a://test-bucket/test-user/test_file.txt'),
+        join=Mock(return_value="s3a://test-bucket/test-user/test_file.txt"),
       ),
     )
     response = touch(request)
 
     assert response.status_code == 409
-    assert response.content.decode('utf-8') == 'Error creating test_file.txt file: File already exists.'
+    assert response.content.decode("utf-8") == "Error creating test_file.txt file: File already exists."
 
   def test_touch_invalid_name(self):
     request = Mock(
-      method='POST',
-      POST={'path': 's3a://test-bucket/test-user/', 'name': 'test/file.txt'},
+      method="POST",
+      POST={"path": "s3a://test-bucket/test-user/", "name": "test/file.txt"},
       fs=Mock(),
     )
     response = touch(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Slashes are not allowed in filename. Please choose a different name.'
+    assert response.content.decode("utf-8") == "Slashes are not allowed in filename. Please choose a different name."
 
   def test_touch_no_path(self):
     request = Mock(
-      method='POST',
-      POST={'name': 'test_file.txt'},
+      method="POST",
+      POST={"name": "test_file.txt"},
       fs=Mock(),
     )
     response = touch(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Missing parameters: path and name are required.'
+    assert response.content.decode("utf-8") == "Missing parameters: path and name are required."
 
   def test_touch_no_name(self):
     request = Mock(
-      method='POST',
-      POST={'path': 's3a://test-bucket/test-user/'},
+      method="POST",
+      POST={"path": "s3a://test-bucket/test-user/"},
       fs=Mock(),
     )
     response = touch(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Missing parameters: path and name are required.'
+    assert response.content.decode("utf-8") == "Missing parameters: path and name are required."
 
 
 class TestMkdirAPI:
   def test_mkdir_success(self):
     request = Mock(
-      method='POST',
-      POST={'path': 's3a://test-bucket/test-user/', 'name': 'new_dir'},
+      method="POST",
+      POST={"path": "s3a://test-bucket/test-user/", "name": "new_dir"},
       fs=Mock(
         mkdir=Mock(),
         isdir=Mock(return_value=False),
-        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+        join=Mock(return_value="s3a://test-bucket/test-user/new_dir"),
       ),
     )
     response = mkdir(request)
 
     assert response.status_code == 201
-    request.fs.mkdir.assert_called_once_with('s3a://test-bucket/test-user/new_dir')
+    request.fs.mkdir.assert_called_once_with("s3a://test-bucket/test-user/new_dir")
 
   def test_mkdir_directory_exists(self):
     request = Mock(
-      method='POST',
-      POST={'path': 's3a://test-bucket/test-user/', 'name': 'new_dir'},
+      method="POST",
+      POST={"path": "s3a://test-bucket/test-user/", "name": "new_dir"},
       fs=Mock(
         mkdir=Mock(),
         isdir=Mock(return_value=True),
-        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+        join=Mock(return_value="s3a://test-bucket/test-user/new_dir"),
       ),
     )
     response = mkdir(request)
 
     assert response.status_code == 409
-    assert response.content.decode('utf-8') == 'Error creating new_dir directory: Directory already exists.'
+    assert response.content.decode("utf-8") == "Error creating new_dir directory: Directory already exists."
 
   def test_mkdir_invalid_name(self):
     request = Mock(
-      method='POST',
-      POST={'path': 's3a://test-bucket/test-user/', 'name': 'new#dir'},
+      method="POST",
+      POST={"path": "s3a://test-bucket/test-user/", "name": "new#dir"},
       fs=Mock(
         mkdir=Mock(),
         isdir=Mock(return_value=False),
-        join=Mock(return_value='s3a://test-bucket/test-user/new#dir'),
+        join=Mock(return_value="s3a://test-bucket/test-user/new#dir"),
       ),
     )
     response = mkdir(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Slashes or hashes are not allowed in directory name. Please choose a different name.'
+    assert response.content.decode("utf-8") == "Slashes or hashes are not allowed in directory name. Please choose a different name."
 
   def test_mkdir_no_path(self):
     request = Mock(
-      method='POST',
-      POST={'name': 'new_dir'},
+      method="POST",
+      POST={"name": "new_dir"},
       fs=Mock(
         mkdir=Mock(),
         isdir=Mock(return_value=False),
-        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+        join=Mock(return_value="s3a://test-bucket/test-user/new_dir"),
       ),
     )
     response = mkdir(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Missing required parameters: path and name are required.'
+    assert response.content.decode("utf-8") == "Missing required parameters: path and name are required."
 
   def test_mkdir_no_name(self):
     request = Mock(
-      method='POST',
-      POST={'path': 's3a://test-bucket/test-user/'},
+      method="POST",
+      POST={"path": "s3a://test-bucket/test-user/"},
       fs=Mock(
         mkdir=Mock(),
         isdir=Mock(return_value=False),
-        join=Mock(return_value='s3a://test-bucket/test-user/new_dir'),
+        join=Mock(return_value="s3a://test-bucket/test-user/new_dir"),
       ),
     )
     response = mkdir(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Missing required parameters: path and name are required.'
+    assert response.content.decode("utf-8") == "Missing required parameters: path and name are required."
 
 
 class TestRenameAPI:
-  def test_rename_success(self):
-    request = Mock(
-      method='POST',
-      POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new_name.txt'},
-      fs=Mock(
-        exists=Mock(return_value=False),
-        join=Mock(return_value='s3a://test-bucket/test-user/new_name.txt'),
-        rename=Mock(),
-      ),
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_success(self, mock_rename_operation, mock_serializer_class):
+    # Create mock schema and serializer
+    mock_schema = {"source_path": "/user/test/file.txt", "destination_path": "/user/test/file_new.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.return_value = {"message": "Renamed successfully"}
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == {"message": "Renamed successfully"}
+    mock_rename_operation.assert_called_once()
+
+  @patch("filebrowser.api.RenameSerializer")
+  def test_rename_invalid_data(self, mock_serializer_class):
+    # Mock invalid serializer
+    mock_serializer = Mock(is_valid=Mock(return_value=False), errors={"source_path": ["This field is required."]})
+    mock_serializer_class.return_value = mock_serializer
+
+    request = APIRequestFactory().post("/storage/rename", data={}, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data == {"source_path": ["This field is required."]}
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_value_error(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/file.txt", "destination_path": "/user/test/existing.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.side_effect = ValueError("Destination path already exists")
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data == {"error": "Destination path already exists"}
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_general_exception(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/file.txt", "destination_path": "/user/test/file_new.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.side_effect = Exception("Filesystem error")
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert response.data == {"error": "An unexpected error occurred during rename operation"}
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_relative_path(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/document.txt", "destination_path": "document_v2.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.return_value = {"message": "Renamed '/user/test/document.txt' to '/user/test/document_v2.txt' successfully"}
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "successfully" in response.data["message"]
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_s3_paths(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "s3a://bucket/folder/file.txt", "destination_path": "s3a://bucket/folder/file_renamed.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.return_value = {"message": "Renamed successfully"}
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == {"message": "Renamed successfully"}
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_directory(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/old_folder", "destination_path": "/user/test/new_folder"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.return_value = {"message": "Renamed '/user/test/old_folder' to '/user/test/new_folder' successfully"}
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "old_folder" in response.data["message"]
+    assert "new_folder" in response.data["message"]
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  @patch("filebrowser.api.LOG.exception")
+  def test_rename_logs_exception(self, mock_log_exception, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/file.txt", "destination_path": "/user/test/file_new.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.side_effect = Exception("Test error")
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    mock_log_exception.assert_called_once()
+    assert "Error renaming file" in mock_log_exception.call_args[0][0]
+
+  @patch("filebrowser.api.RenameSerializer")
+  def test_rename_validation_errors(self, mock_serializer_class):
+    # Mock serializer with multiple validation errors
+    mock_serializer = Mock(
+      is_valid=Mock(return_value=False),
+      errors={"source_path": ["Path cannot be empty"], "destination_path": ["Path traversal patterns are not allowed"]},
     )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
-    try:
-      response = rename(request)
+    mock_serializer_class.return_value = mock_serializer
 
-      assert response.status_code == 200
-      request.fs.rename.assert_called_once_with('s3a://test-bucket/test-user/source.txt', 's3a://test-bucket/test-user/new_name.txt')
-    finally:
-      reset()
+    request = APIRequestFactory().post("/storage/rename", data={"source_path": "", "destination_path": "../etc"}, format="json")
+    request.user = Mock(username="test_user")
 
-  def test_rename_restricted_file_type(self):
-    request = Mock(
-      method='POST',
-      POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new_name.exe'},
-      fs=Mock(
-        rename=Mock(),
-      ),
-    )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing('.exe,.txt')
-    try:
-      response = rename(request)
+    response = rename(request)
 
-      assert response.status_code == 403
-      assert response.content.decode('utf-8') == 'Cannot rename file to a restricted file type: ".exe"'
-    finally:
-      reset()
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "source_path" in response.data
+    assert "destination_path" in response.data
 
-  def test_rename_hash_in_path(self):
-    request = Mock(
-      method='POST',
-      POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new#name.txt'},
-      fs=Mock(
-        rename=Mock(),
-      ),
-    )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
-    try:
-      response = rename(request)
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_unicode_paths(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/文档.txt", "destination_path": "/user/test/文档_新.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
 
-      assert response.status_code == 400
-      assert response.content.decode('utf-8') == 'Hashes are not allowed in file or directory names. Please choose a different name.'
-    finally:
-      reset()
+    mock_rename_operation.return_value = {"message": "Renamed '/user/test/文档.txt' to '/user/test/文档_新.txt' successfully"}
 
-  def test_rename_destination_exists(self):
-    request = Mock(
-      method='POST',
-      POST={'source_path': 's3a://test-bucket/test-user/source.txt', 'destination_path': 'new_name.txt'},
-      fs=Mock(
-        rename=Mock(),
-        exists=Mock(return_value=True),
-        join=Mock(return_value='s3a://test-bucket/test-user/new_name.txt'),
-      ),
-    )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
-    try:
-      response = rename(request)
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
 
-      assert response.status_code == 409
-      assert response.content.decode('utf-8') == 'The destination path s3a://test-bucket/test-user/new_name.txt already exists.'
-    finally:
-      reset()
+    response = rename(request)
 
-  def test_rename_no_source_path(self):
-    request = Mock(
-      method='POST',
-      POST={'destination_path': 'new_name.txt'},
-      fs=Mock(
-        rename=Mock(),
-      ),
-    )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
-    try:
-      response = rename(request)
+    assert response.status_code == status.HTTP_200_OK
+    assert "文档.txt" in response.data["message"]
+    assert "文档_新.txt" in response.data["message"]
 
-      assert response.status_code == 400
-      assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path'
-    finally:
-      reset()
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_special_characters(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {
+      "source_path": "/user/test/file with spaces & (special).txt",
+      "destination_path": "/user/test/file_with_spaces_and_special.txt",
+    }
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
 
-  def test_rename_no_destination_path(self):
-    request = Mock(
-      method='POST',
-      POST={'source_path': 's3a://test-bucket/test-user/source.txt'},
-      fs=Mock(
-        rename=Mock(),
-      ),
-    )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
-    try:
-      response = rename(request)
+    mock_rename_operation.return_value = {"message": "Renamed successfully"}
 
-      assert response.status_code == 400
-      assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path'
-    finally:
-      reset()
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == {"message": "Renamed successfully"}
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  @patch("filebrowser.api.RenameSchema")
+  def test_rename_schema_creation(self, mock_rename_schema_class, mock_rename_operation, mock_serializer_class):
+    mock_schema_data = {"source_path": "/user/test/file.txt", "destination_path": "/user/test/file_new.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema_data)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_schema_instance = Mock()
+    mock_rename_schema_class.return_value = mock_schema_instance
+
+    mock_rename_operation.return_value = {"message": "Success"}
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema_data, format="json")
+    request.user = Mock(username="test_user")
+
+    rename(request)
+
+    # Verify RenameSchema was created with the validated data
+    mock_rename_schema_class.assert_called_once_with(**mock_schema_data)
+    # Verify rename operation was called with the schema instance
+    mock_rename_operation.assert_called_once_with(data=mock_schema_instance, username="test_user")
 
 
 class TestMoveAPI:
   def test_move_success(self):
     request = Mock(
-      method='POST',
-      POST={'source_path': 's3a://test-bucket/test-user/src_dir/source.txt', 'destination_path': 's3a://test-bucket/test-user/dst_dir'},
+      method="POST",
+      POST={"source_path": "s3a://test-bucket/test-user/src_dir/source.txt", "destination_path": "s3a://test-bucket/test-user/dst_dir"},
       fs=Mock(
         exists=Mock(side_effect=[True, False]),
         isdir=Mock(return_value=True),
-        parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
-        join=Mock(return_value='s3a://test-bucket/test-user/dst_dir/source.txt'),
+        parent_path=Mock(return_value="s3a://test-bucket/test-user/src_dir"),
+        join=Mock(return_value="s3a://test-bucket/test-user/dst_dir/source.txt"),
         normpath=Mock(
           side_effect=[
-            's3a://test-bucket/test-user/src_dir/source.txt',
-            's3a://test-bucket/test-user/dst_dir',
-            's3a://test-bucket/test-user/dst_dir',
+            "s3a://test-bucket/test-user/src_dir/source.txt",
+            "s3a://test-bucket/test-user/dst_dir",
+            "s3a://test-bucket/test-user/dst_dir",
           ]
         ),
         rename=Mock(),
@@ -603,97 +415,97 @@ class TestMoveAPI:
     response = move(request)
 
     assert response.status_code == 200
-    request.fs.rename.assert_called_once_with('s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/dst_dir')
+    request.fs.rename.assert_called_once_with("s3a://test-bucket/test-user/src_dir/source.txt", "s3a://test-bucket/test-user/dst_dir")
 
   def test_move_no_source_path(self):
     request = Mock(
-      method='POST',
-      POST={'destination_path': 's3a://test-bucket/test-user/dst_dir'},
+      method="POST",
+      POST={"destination_path": "s3a://test-bucket/test-user/dst_dir"},
       fs=Mock(),
     )
     response = move(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path are required.'
+    assert response.content.decode("utf-8") == "Missing required parameters: source_path and destination_path are required."
 
   def test_move_no_destination_path(self):
     request = Mock(
-      method='POST',
-      POST={'source_path': 's3a://test-bucket/test-user/src_dir/source.txt'},
+      method="POST",
+      POST={"source_path": "s3a://test-bucket/test-user/src_dir/source.txt"},
       fs=Mock(),
     )
     response = move(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path are required.'
+    assert response.content.decode("utf-8") == "Missing required parameters: source_path and destination_path are required."
 
   def test_move_identical_paths(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 's3a://test-bucket/test-user/src_dir/source.txt',
+        "source_path": "s3a://test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "s3a://test-bucket/test-user/src_dir/source.txt",
       },
       fs=Mock(
-        normpath=Mock(side_effect=['s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/src_dir/source.txt']),
+        normpath=Mock(side_effect=["s3a://test-bucket/test-user/src_dir/source.txt", "s3a://test-bucket/test-user/src_dir/source.txt"]),
       ),
     )
     response = move(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Source and destination paths must be different.'
+    assert response.content.decode("utf-8") == "Source and destination paths must be different."
 
   def test_move_source_path_does_not_exist(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 's3a://test-bucket/test-user/dst_dir',
+        "source_path": "s3a://test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "s3a://test-bucket/test-user/dst_dir",
       },
       fs=Mock(
         exists=Mock(return_value=False),
-        normpath=Mock(side_effect=['s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/dst_dir']),
+        normpath=Mock(side_effect=["s3a://test-bucket/test-user/src_dir/source.txt", "s3a://test-bucket/test-user/dst_dir"]),
       ),
     )
     response = move(request)
 
     assert response.status_code == 404
-    assert response.content.decode('utf-8') == 'Source file or folder does not exist.'
+    assert response.content.decode("utf-8") == "Source file or folder does not exist."
 
   def test_move_destination_not_a_directory(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 's3a://test-bucket/test-user/dst_dir',
+        "source_path": "s3a://test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "s3a://test-bucket/test-user/dst_dir",
       },
       fs=Mock(
         exists=Mock(return_value=True),
         isdir=Mock(return_value=False),
-        normpath=Mock(side_effect=['s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/dst_dir']),
+        normpath=Mock(side_effect=["s3a://test-bucket/test-user/src_dir/source.txt", "s3a://test-bucket/test-user/dst_dir"]),
       ),
     )
     response = move(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Destination path must be a directory.'
+    assert response.content.decode("utf-8") == "Destination path must be a directory."
 
   def test_move_destination_is_parent_of_source(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 's3a://test-bucket/test-user/src_dir',
+        "source_path": "s3a://test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "s3a://test-bucket/test-user/src_dir",
       },
       fs=Mock(
         exists=Mock(return_value=True),
         isdir=Mock(return_value=True),
-        parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
+        parent_path=Mock(return_value="s3a://test-bucket/test-user/src_dir"),
         normpath=Mock(
           side_effect=[
-            's3a://test-bucket/test-user/src_dir/source.txt',
-            's3a://test-bucket/test-user/src_dir',
-            's3a://test-bucket/test-user/src_dir',
+            "s3a://test-bucket/test-user/src_dir/source.txt",
+            "s3a://test-bucket/test-user/src_dir",
+            "s3a://test-bucket/test-user/src_dir",
           ]
         ),
       ),
@@ -701,25 +513,25 @@ class TestMoveAPI:
     response = move(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Destination cannot be the parent directory of source.'
+    assert response.content.decode("utf-8") == "Destination cannot be the parent directory of source."
 
   def test_move_file_already_exists_at_destination(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 's3a://test-bucket/test-user/dst_dir',
+        "source_path": "s3a://test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "s3a://test-bucket/test-user/dst_dir",
       },
       fs=Mock(
         exists=Mock(side_effect=[True, True]),
         isdir=Mock(return_value=True),
-        parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
-        join=Mock(return_value='s3a://test-bucket/test-user/dst_dir/source.txt'),
+        parent_path=Mock(return_value="s3a://test-bucket/test-user/src_dir"),
+        join=Mock(return_value="s3a://test-bucket/test-user/dst_dir/source.txt"),
         normpath=Mock(
           side_effect=[
-            's3a://test-bucket/test-user/src_dir/source.txt',
-            's3a://test-bucket/test-user/dst_dir',
-            's3a://test-bucket/test-user/dst_dir',
+            "s3a://test-bucket/test-user/src_dir/source.txt",
+            "s3a://test-bucket/test-user/dst_dir",
+            "s3a://test-bucket/test-user/dst_dir",
           ]
         ),
       ),
@@ -727,19 +539,19 @@ class TestMoveAPI:
     response = move(request)
 
     assert response.status_code == 409
-    assert response.content.decode('utf-8') == 'File or folder already exists at destination path.'
+    assert response.content.decode("utf-8") == "File or folder already exists at destination path."
 
 
 class TestGetFilesystemsAPI:
   def test_get_all_filesystems_without_hdfs(self):
-    with patch('filebrowser.api.fsmanager.get_filesystems') as get_filesystems:
-      with patch('filebrowser.api.get_s3_home_directory') as get_s3_home_directory:
-        with patch('filebrowser.api._is_hdfs_superuser') as _is_hdfs_superuser:
-          get_filesystems.return_value = ['s3a', 'ofs']
-          get_s3_home_directory.return_value = 's3a://test-bucket/test-user-home-dir/'
+    with patch("filebrowser.api.fsmanager.get_filesystems") as get_filesystems:
+      with patch("filebrowser.api.get_s3_home_directory") as get_s3_home_directory:
+        with patch("filebrowser.api._is_hdfs_superuser") as _is_hdfs_superuser:
+          get_filesystems.return_value = ["s3a", "ofs"]
+          get_s3_home_directory.return_value = "s3a://test-bucket/test-user-home-dir/"
           _is_hdfs_superuser.return_value = False
           request = Mock(
-            method='GET',
+            method="GET",
             user=Mock(),
           )
 
@@ -748,25 +560,25 @@ class TestGetFilesystemsAPI:
 
           assert response.status_code == 200
           assert response_data == [
-            {'name': 's3a', 'user_home_directory': 's3a://test-bucket/test-user-home-dir/', 'config': {}},
-            {'name': 'ofs', 'user_home_directory': 'ofs://', 'config': {}},
+            {"name": "s3a", "user_home_directory": "s3a://test-bucket/test-user-home-dir/", "config": {}},
+            {"name": "ofs", "user_home_directory": "ofs://", "config": {}},
           ]
 
   def test_get_all_filesystems_success(self):
-    with patch('filebrowser.api.fsmanager.get_filesystems') as get_filesystems:
-      with patch('filebrowser.api.get_s3_home_directory') as get_s3_home_directory:
-        with patch('filebrowser.api._is_hdfs_superuser') as _is_hdfs_superuser:
-          with patch('filebrowser.api.User') as User:
-            with patch('filebrowser.api.Group') as Group:
-              get_filesystems.return_value = ['hdfs', 's3a', 'ofs']
-              get_s3_home_directory.return_value = 's3a://test-bucket/test-user-home-dir/'
+    with patch("filebrowser.api.fsmanager.get_filesystems") as get_filesystems:
+      with patch("filebrowser.api.get_s3_home_directory") as get_s3_home_directory:
+        with patch("filebrowser.api._is_hdfs_superuser") as _is_hdfs_superuser:
+          with patch("filebrowser.api.User"):
+            with patch("filebrowser.api.Group"):
+              get_filesystems.return_value = ["hdfs", "s3a", "ofs"]
+              get_s3_home_directory.return_value = "s3a://test-bucket/test-user-home-dir/"
               _is_hdfs_superuser.return_value = False
               request = Mock(
-                method='GET',
-                user=Mock(get_home_directory=Mock(return_value='/user/test-user')),
+                method="GET",
+                user=Mock(get_home_directory=Mock(return_value="/user/test-user")),
                 fs=Mock(
-                  superuser='test-user',
-                  supergroup='test-supergroup',
+                  superuser="test-user",
+                  supergroup="test-supergroup",
                 ),
               )
 
@@ -776,37 +588,37 @@ class TestGetFilesystemsAPI:
               assert response.status_code == 200
               assert response_data == [
                 {
-                  'name': 'hdfs',
-                  'user_home_directory': '/user/test-user',
-                  'config': {
-                    'is_trash_enabled': False,
-                    'is_hdfs_superuser': False,
-                    'groups': [],
-                    'users': [],
-                    'superuser': 'test-user',
-                    'supergroup': 'test-supergroup',
+                  "name": "hdfs",
+                  "user_home_directory": "/user/test-user",
+                  "config": {
+                    "is_trash_enabled": False,
+                    "is_hdfs_superuser": False,
+                    "groups": [],
+                    "users": [],
+                    "superuser": "test-user",
+                    "supergroup": "test-supergroup",
                   },
                 },
-                {'name': 's3a', 'user_home_directory': 's3a://test-bucket/test-user-home-dir/', 'config': {}},
-                {'name': 'ofs', 'user_home_directory': 'ofs://', 'config': {}},
+                {"name": "s3a", "user_home_directory": "s3a://test-bucket/test-user-home-dir/", "config": {}},
+                {"name": "ofs", "user_home_directory": "ofs://", "config": {}},
               ]
 
 
 class TestCopyAPI:
   def test_copy_normal_success(self):
     request = Mock(
-      method='POST',
-      POST={'source_path': 's3a://test-bucket/test-user/src_dir/source.txt', 'destination_path': 's3a://test-bucket/test-user/dst_dir'},
+      method="POST",
+      POST={"source_path": "s3a://test-bucket/test-user/src_dir/source.txt", "destination_path": "s3a://test-bucket/test-user/dst_dir"},
       fs=Mock(
         exists=Mock(side_effect=[True, False]),
         isdir=Mock(return_value=True),
-        parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
-        join=Mock(return_value='s3a://test-bucket/test-user/dst_dir/source.txt'),
+        parent_path=Mock(return_value="s3a://test-bucket/test-user/src_dir"),
+        join=Mock(return_value="s3a://test-bucket/test-user/dst_dir/source.txt"),
         normpath=Mock(
           side_effect=[
-            's3a://test-bucket/test-user/src_dir/source.txt',
-            's3a://test-bucket/test-user/dst_dir',
-            's3a://test-bucket/test-user/dst_dir',
+            "s3a://test-bucket/test-user/src_dir/source.txt",
+            "s3a://test-bucket/test-user/dst_dir",
+            "s3a://test-bucket/test-user/dst_dir",
           ]
         ),
         copy=Mock(),
@@ -817,29 +629,29 @@ class TestCopyAPI:
 
     assert response.status_code == 200
     request.fs.copy.assert_called_once_with(
-      's3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/dst_dir', recursive=True, owner=request.user
+      "s3a://test-bucket/test-user/src_dir/source.txt", "s3a://test-bucket/test-user/dst_dir", recursive=True, owner=request.user
     )
 
   def test_copy_ofs_success(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 'ofs://test_vol/test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 'ofs://test_vol/test-bucket/test-user/dst_dir',
+        "source_path": "ofs://test_vol/test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "ofs://test_vol/test-bucket/test-user/dst_dir",
       },
       fs=Mock(
         exists=Mock(side_effect=[True, False]),
         isdir=Mock(return_value=True),
-        parent_path=Mock(return_value='ofs://test_vol/test-bucket/test-user/src_dir'),
-        join=Mock(return_value='ofs://test_vol/test-bucket/test-user/dst_dir/source.txt'),
+        parent_path=Mock(return_value="ofs://test_vol/test-bucket/test-user/src_dir"),
+        join=Mock(return_value="ofs://test_vol/test-bucket/test-user/dst_dir/source.txt"),
         normpath=Mock(
           side_effect=[
-            'ofs://test_vol/test-bucket/test-user/src_dir/source.txt',
-            'ofs://test_vol/test-bucket/test-user/dst_dir',
-            'ofs://test_vol/test-bucket/test-user/dst_dir',
+            "ofs://test_vol/test-bucket/test-user/src_dir/source.txt",
+            "ofs://test_vol/test-bucket/test-user/dst_dir",
+            "ofs://test_vol/test-bucket/test-user/dst_dir",
           ]
         ),
-        copy=Mock(return_value=''),
+        copy=Mock(return_value=""),
         user=Mock(),
       ),
     )
@@ -847,135 +659,135 @@ class TestCopyAPI:
 
     assert response.status_code == 200
     request.fs.copy.assert_called_once_with(
-      'ofs://test_vol/test-bucket/test-user/src_dir/source.txt',
-      'ofs://test_vol/test-bucket/test-user/dst_dir',
+      "ofs://test_vol/test-bucket/test-user/src_dir/source.txt",
+      "ofs://test_vol/test-bucket/test-user/dst_dir",
       recursive=True,
       owner=request.user,
     )
 
   def test_copy_ofs_skip_files_error(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 'ofs://test_vol/test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 'ofs://test_vol/test-bucket/test-user/dst_dir',
+        "source_path": "ofs://test_vol/test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "ofs://test_vol/test-bucket/test-user/dst_dir",
       },
       fs=Mock(
         exists=Mock(side_effect=[True, False]),
         isdir=Mock(return_value=True),
-        parent_path=Mock(return_value='ofs://test_vol/test-bucket/test-user/src_dir'),
-        join=Mock(return_value='ofs://test_vol/test-bucket/test-user/dst_dir/source.txt'),
+        parent_path=Mock(return_value="ofs://test_vol/test-bucket/test-user/src_dir"),
+        join=Mock(return_value="ofs://test_vol/test-bucket/test-user/dst_dir/source.txt"),
         normpath=Mock(
           side_effect=[
-            'ofs://test_vol/test-bucket/test-user/src_dir/source.txt',
-            'ofs://test_vol/test-bucket/test-user/dst_dir',
-            'ofs://test_vol/test-bucket/test-user/dst_dir',
+            "ofs://test_vol/test-bucket/test-user/src_dir/source.txt",
+            "ofs://test_vol/test-bucket/test-user/dst_dir",
+            "ofs://test_vol/test-bucket/test-user/dst_dir",
           ]
         ),
-        copy=Mock(return_value=('ofs://test_vol/test-bucket/test-user/src_dir/source.txt')),
+        copy=Mock(return_value=("ofs://test_vol/test-bucket/test-user/src_dir/source.txt")),
         user=Mock(),
       ),
     )
     response = copy(request)
 
     assert response.status_code == 500
-    assert json.loads(response.content) == {'skipped_files': 'ofs://test_vol/test-bucket/test-user/src_dir/source.txt'}
+    assert json.loads(response.content) == {"skipped_files": "ofs://test_vol/test-bucket/test-user/src_dir/source.txt"}
     request.fs.copy.assert_called_once_with(
-      'ofs://test_vol/test-bucket/test-user/src_dir/source.txt',
-      'ofs://test_vol/test-bucket/test-user/dst_dir',
+      "ofs://test_vol/test-bucket/test-user/src_dir/source.txt",
+      "ofs://test_vol/test-bucket/test-user/dst_dir",
       recursive=True,
       owner=request.user,
     )
 
   def test_copy_no_source_path(self):
     request = Mock(
-      method='POST',
-      POST={'destination_path': 's3a://test-bucket/test-user/dst_dir'},
+      method="POST",
+      POST={"destination_path": "s3a://test-bucket/test-user/dst_dir"},
       fs=Mock(),
     )
     response = copy(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path are required.'
+    assert response.content.decode("utf-8") == "Missing required parameters: source_path and destination_path are required."
 
   def test_copy_no_destination_path(self):
     request = Mock(
-      method='POST',
-      POST={'source_path': 's3a://test-bucket/test-user/src_dir/source.txt'},
+      method="POST",
+      POST={"source_path": "s3a://test-bucket/test-user/src_dir/source.txt"},
       fs=Mock(),
     )
     response = copy(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Missing required parameters: source_path and destination_path are required.'
+    assert response.content.decode("utf-8") == "Missing required parameters: source_path and destination_path are required."
 
   def test_copy_identical_paths(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 's3a://test-bucket/test-user/src_dir/source.txt',
+        "source_path": "s3a://test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "s3a://test-bucket/test-user/src_dir/source.txt",
       },
       fs=Mock(
-        normpath=Mock(side_effect=['s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/src_dir/source.txt']),
+        normpath=Mock(side_effect=["s3a://test-bucket/test-user/src_dir/source.txt", "s3a://test-bucket/test-user/src_dir/source.txt"]),
       ),
     )
     response = copy(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Source and destination paths must be different.'
+    assert response.content.decode("utf-8") == "Source and destination paths must be different."
 
   def test_copy_source_path_does_not_exist(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 's3a://test-bucket/test-user/dst_dir',
+        "source_path": "s3a://test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "s3a://test-bucket/test-user/dst_dir",
       },
       fs=Mock(
         exists=Mock(return_value=False),
-        normpath=Mock(side_effect=['s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/dst_dir']),
+        normpath=Mock(side_effect=["s3a://test-bucket/test-user/src_dir/source.txt", "s3a://test-bucket/test-user/dst_dir"]),
       ),
     )
     response = copy(request)
 
     assert response.status_code == 404
-    assert response.content.decode('utf-8') == 'Source file or folder does not exist.'
+    assert response.content.decode("utf-8") == "Source file or folder does not exist."
 
   def test_copy_destination_not_a_directory(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 's3a://test-bucket/test-user/dst_dir',
+        "source_path": "s3a://test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "s3a://test-bucket/test-user/dst_dir",
       },
       fs=Mock(
         exists=Mock(return_value=True),
         isdir=Mock(return_value=False),
-        normpath=Mock(side_effect=['s3a://test-bucket/test-user/src_dir/source.txt', 's3a://test-bucket/test-user/dst_dir']),
+        normpath=Mock(side_effect=["s3a://test-bucket/test-user/src_dir/source.txt", "s3a://test-bucket/test-user/dst_dir"]),
       ),
     )
     response = copy(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Destination path must be a directory.'
+    assert response.content.decode("utf-8") == "Destination path must be a directory."
 
   def test_copy_destination_is_parent_of_source(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 's3a://test-bucket/test-user/src_dir',
+        "source_path": "s3a://test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "s3a://test-bucket/test-user/src_dir",
       },
       fs=Mock(
         exists=Mock(return_value=True),
         isdir=Mock(return_value=True),
-        parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
+        parent_path=Mock(return_value="s3a://test-bucket/test-user/src_dir"),
         normpath=Mock(
           side_effect=[
-            's3a://test-bucket/test-user/src_dir/source.txt',
-            's3a://test-bucket/test-user/src_dir',
-            's3a://test-bucket/test-user/src_dir',
+            "s3a://test-bucket/test-user/src_dir/source.txt",
+            "s3a://test-bucket/test-user/src_dir",
+            "s3a://test-bucket/test-user/src_dir",
           ]
         ),
       ),
@@ -983,25 +795,25 @@ class TestCopyAPI:
     response = copy(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 'Destination cannot be the parent directory of source.'
+    assert response.content.decode("utf-8") == "Destination cannot be the parent directory of source."
 
   def test_copy_file_already_exists_at_destination(self):
     request = Mock(
-      method='POST',
+      method="POST",
       POST={
-        'source_path': 's3a://test-bucket/test-user/src_dir/source.txt',
-        'destination_path': 's3a://test-bucket/test-user/dst_dir',
+        "source_path": "s3a://test-bucket/test-user/src_dir/source.txt",
+        "destination_path": "s3a://test-bucket/test-user/dst_dir",
       },
       fs=Mock(
         exists=Mock(side_effect=[True, True]),
         isdir=Mock(return_value=True),
-        parent_path=Mock(return_value='s3a://test-bucket/test-user/src_dir'),
-        join=Mock(return_value='s3a://test-bucket/test-user/dst_dir/source.txt'),
+        parent_path=Mock(return_value="s3a://test-bucket/test-user/src_dir"),
+        join=Mock(return_value="s3a://test-bucket/test-user/dst_dir/source.txt"),
         normpath=Mock(
           side_effect=[
-            's3a://test-bucket/test-user/src_dir/source.txt',
-            's3a://test-bucket/test-user/dst_dir',
-            's3a://test-bucket/test-user/dst_dir',
+            "s3a://test-bucket/test-user/src_dir/source.txt",
+            "s3a://test-bucket/test-user/dst_dir",
+            "s3a://test-bucket/test-user/dst_dir",
           ]
         ),
       ),
@@ -1009,7 +821,7 @@ class TestCopyAPI:
     response = copy(request)
 
     assert response.status_code == 409
-    assert response.content.decode('utf-8') == 'File or folder already exists at destination path.'
+    assert response.content.decode("utf-8") == "File or folder already exists at destination path."
 
 
 class TestListAPI:
@@ -1020,21 +832,21 @@ class TestListAPI:
     mock_stats.size = size
     mock_stats.atime = 0
     mock_stats.mtime = 0
-    mock_stats.type = 'file'
+    mock_stats.type = "file"
     mock_stats.user = user
     mock_stats.group = group
     mock_stats.mode = 33188
     mock_stats.to_json_dict = Mock(
       return_value={
-        'path': path,
-        'aclBit': False,
-        'size': size,
-        'atime': 0,
-        'mtime': 0,
-        'type': 'file',
-        'user': user,
-        'group': group,
-        'mode': 33188,
+        "path": path,
+        "aclBit": False,
+        "size": size,
+        "atime": 0,
+        "mtime": 0,
+        "type": "file",
+        "user": user,
+        "group": group,
+        "mode": 33188,
       }
     )
     return mock_stats
@@ -1055,98 +867,98 @@ class TestListAPI:
     return mock_paginator
 
   def test_listdir_paged_success(self):
-    with patch('filebrowser.api.is_admin') as is_admin:
+    with patch("filebrowser.api.is_admin") as is_admin:
       is_admin.return_value = False
 
       file1_stats = self._create_mock_file_stats(
-        name='file1.txt', path='s3a://test-bucket/test-user/test-dir/file1.txt', size=100, user='user1', group='group1'
+        name="file1.txt", path="s3a://test-bucket/test-user/test-dir/file1.txt", size=100, user="user1", group="group1"
       )
       file2_stats = self._create_mock_file_stats(
-        name='file2.txt', path='s3a://test-bucket/test-user/test-dir/file2.txt', size=200, user='user2', group='group2'
+        name="file2.txt", path="s3a://test-bucket/test-user/test-dir/file2.txt", size=200, user="user2", group="group2"
       )
 
       all_stats = [file2_stats, file1_stats]
 
       request = Mock(
-        method='GET',
-        GET={'pagenum': '1', 'pagesize': '30', 'path': 's3a://test-bucket/test-user/test-dir', 'sortby': 'name', 'descending': 'False'},
+        method="GET",
+        GET={"pagenum": "1", "pagesize": "30", "path": "s3a://test-bucket/test-user/test-dir", "sortby": "name", "descending": "False"},
         user=Mock(has_hue_permission=Mock(return_value=False)),
         fs=Mock(
           listdir_stats=Mock(return_value=all_stats),
           do_as_user=Mock(return_value=all_stats),
           isdir=Mock(return_value=True),
-          normpath=Mock(side_effect=['s3a://test-bucket/test-user/test-dir/file1.txt', 's3a://test-bucket/test-user/test-dir/file2.txt']),
+          normpath=Mock(side_effect=["s3a://test-bucket/test-user/test-dir/file1.txt", "s3a://test-bucket/test-user/test-dir/file2.txt"]),
         ),
       )
 
       mock_paginator = self._create_mock_paginator(all_stats)
 
-      with patch('filebrowser.api.Paginator', return_value=mock_paginator) as mock_paginator:
+      with patch("filebrowser.api.Paginator", return_value=mock_paginator) as mock_paginator:
         response = listdir_paged(request)
         response_data = json.loads(response.content)
 
         assert response.status_code == 200
         assert response_data == {
-          'files': [
+          "files": [
             {
-              'path': 's3a://test-bucket/test-user/test-dir/file1.txt',
-              'aclBit': False,
-              'size': 200,
-              'atime': 0,
-              'mtime': 0,
-              'type': 'file',
-              'user': 'user2',
-              'group': 'group2',
-              'mode': 33188,
-              'rwx': '-rw-r--r--+',
+              "path": "s3a://test-bucket/test-user/test-dir/file1.txt",
+              "aclBit": False,
+              "size": 200,
+              "atime": 0,
+              "mtime": 0,
+              "type": "file",
+              "user": "user2",
+              "group": "group2",
+              "mode": 33188,
+              "rwx": "-rw-r--r--+",
             },
             {
-              'path': 's3a://test-bucket/test-user/test-dir/file2.txt',
-              'aclBit': False,
-              'size': 100,
-              'atime': 0,
-              'mtime': 0,
-              'type': 'file',
-              'user': 'user1',
-              'group': 'group1',
-              'mode': 33188,
-              'rwx': '-rw-r--r--+',
+              "path": "s3a://test-bucket/test-user/test-dir/file2.txt",
+              "aclBit": False,
+              "size": 100,
+              "atime": 0,
+              "mtime": 0,
+              "type": "file",
+              "user": "user1",
+              "group": "group1",
+              "mode": 33188,
+              "rwx": "-rw-r--r--+",
             },
           ],
-          'page': {'page_number': 1, 'page_size': 30, 'total_pages': 1, 'total_size': 2},
+          "page": {"page_number": 1, "page_size": 30, "total_pages": 1, "total_size": 2},
         }
 
         # Assert correct sorting
-        assert response_data['files'][0]['path'] == 's3a://test-bucket/test-user/test-dir/file1.txt'
-        assert response_data['files'][1]['path'] == 's3a://test-bucket/test-user/test-dir/file2.txt'
+        assert response_data["files"][0]["path"] == "s3a://test-bucket/test-user/test-dir/file1.txt"
+        assert response_data["files"][1]["path"] == "s3a://test-bucket/test-user/test-dir/file2.txt"
 
   def test_listdir_paged_sorting_by_size_descending(self):
-    with patch('filebrowser.api.is_admin') as is_admin:
+    with patch("filebrowser.api.is_admin") as is_admin:
       is_admin.return_value = False
 
       file1_stats = self._create_mock_file_stats(
-        name='file1.txt', path='s3a://test-bucket/test-user/test-dir/file1.txt', size=100, user='user1', group='group1'
+        name="file1.txt", path="s3a://test-bucket/test-user/test-dir/file1.txt", size=100, user="user1", group="group1"
       )
       file2_stats = self._create_mock_file_stats(
-        name='file2.txt', path='s3a://test-bucket/test-user/test-dir/file2.txt', size=200, user='user2', group='group2'
+        name="file2.txt", path="s3a://test-bucket/test-user/test-dir/file2.txt", size=200, user="user2", group="group2"
       )
       file3_stats = self._create_mock_file_stats(
-        name='file3.txt', path='s3a://test-bucket/test-user/test-dir/file3.txt', size=300, user='user3', group='group3'
+        name="file3.txt", path="s3a://test-bucket/test-user/test-dir/file3.txt", size=300, user="user3", group="group3"
       )
       file4_stats = self._create_mock_file_stats(
-        name='file4.txt', path='s3a://test-bucket/test-user/test-dir/file4.txt', size=400, user='user4', group='group4'
+        name="file4.txt", path="s3a://test-bucket/test-user/test-dir/file4.txt", size=400, user="user4", group="group4"
       )
 
       all_stats = [file1_stats, file2_stats, file3_stats, file4_stats]
 
       request = Mock(
-        method='GET',
+        method="GET",
         GET={
-          'pagenum': '1',
-          'pagesize': '30',
-          'path': 's3a://test-bucket/test-user/test-dir',
-          'sortby': 'name',
-          'descending': 'True',
+          "pagenum": "1",
+          "pagesize": "30",
+          "path": "s3a://test-bucket/test-user/test-dir",
+          "sortby": "name",
+          "descending": "True",
         },
         user=Mock(has_hue_permission=Mock(return_value=False)),
         fs=Mock(
@@ -1155,10 +967,10 @@ class TestListAPI:
           isdir=Mock(return_value=True),
           normpath=Mock(
             side_effect=[
-              's3a://test-bucket/test-user/test-dir/file1.txt',
-              's3a://test-bucket/test-user/test-dir/file2.txt',
-              's3a://test-bucket/test-user/test-dir/file3.txt',
-              's3a://test-bucket/test-user/test-dir/file4.txt',
+              "s3a://test-bucket/test-user/test-dir/file1.txt",
+              "s3a://test-bucket/test-user/test-dir/file2.txt",
+              "s3a://test-bucket/test-user/test-dir/file3.txt",
+              "s3a://test-bucket/test-user/test-dir/file4.txt",
             ]
           ),
         ),
@@ -1166,24 +978,24 @@ class TestListAPI:
 
       mock_paginator = self._create_mock_paginator(sorted(all_stats, key=lambda x: x.size, reverse=True))
 
-      with patch('filebrowser.api.Paginator', return_value=mock_paginator) as mock_paginator:
+      with patch("filebrowser.api.Paginator", return_value=mock_paginator) as mock_paginator:
         response = listdir_paged(request)
         response_data = json.loads(response.content)
 
         assert response.status_code == 200
-        assert 'files' in response_data
-        assert len(response_data['files']) == 4
+        assert "files" in response_data
+        assert len(response_data["files"]) == 4
 
         # Assert correct sorting
-        assert response_data['files'][0]['size'] == 400
-        assert response_data['files'][1]['size'] == 300
-        assert response_data['files'][2]['size'] == 200
-        assert response_data['files'][3]['size'] == 100
+        assert response_data["files"][0]["size"] == 400
+        assert response_data["files"][1]["size"] == 300
+        assert response_data["files"][2]["size"] == 200
+        assert response_data["files"][3]["size"] == 100
 
   def test_listdir_paged_invalid_path(self):
     request = Mock(
-      method='GET',
-      GET={'pagenum': '1', 'pagesize': '30', 'path': 's3a://test-bucket/test-user/test-dir/test-file'},
+      method="GET",
+      GET={"pagenum": "1", "pagesize": "30", "path": "s3a://test-bucket/test-user/test-dir/test-file"},
       fs=Mock(
         isdir=Mock(return_value=False),
       ),
@@ -1192,33 +1004,33 @@ class TestListAPI:
     response = listdir_paged(request)
 
     assert response.status_code == 400
-    assert response.content.decode('utf-8') == 's3a://test-bucket/test-user/test-dir/test-file is not a directory.'
+    assert response.content.decode("utf-8") == "s3a://test-bucket/test-user/test-dir/test-file is not a directory."
 
   def test_listdir_paged_error_while_listing_bucket(self):
-    with patch('filebrowser.api.is_admin') as is_admin:
+    with patch("filebrowser.api.is_admin") as is_admin:
       is_admin.return_value = False
 
       request = Mock(
-        method='GET',
-        GET={'pagenum': '1', 'pagesize': '30', 'path': 's3a://test-bucket/'},
+        method="GET",
+        GET={"pagenum": "1", "pagesize": "30", "path": "s3a://test-bucket/"},
         fs=Mock(
           isdir=Mock(return_value=True),
-          listdir_stats=Mock(side_effect=S3ListAllBucketsException('Failed to list all buckets')),
-          do_as_user=Mock(side_effect=S3ListAllBucketsException('Failed to list all buckets')),
+          listdir_stats=Mock(side_effect=S3ListAllBucketsException("Failed to list all buckets")),
+          do_as_user=Mock(side_effect=S3ListAllBucketsException("Failed to list all buckets")),
         ),
       )
 
       response = listdir_paged(request)
 
       assert response.status_code == 403
-      assert response.content.decode('utf-8') == 'Bucket listing is not allowed: Failed to list all buckets'
+      assert response.content.decode("utf-8") == "Bucket listing is not allowed: Failed to list all buckets"
 
 
 class TestDownloadAPI:
   def test_download_not_allowed(self):
     request = Mock(
-      method='GET',
-      GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+      method="GET",
+      GET={"path": "s3a://test-bucket/test-user/test_file.txt"},
       fs=Mock(),
     )
 
@@ -1227,14 +1039,14 @@ class TestDownloadAPI:
       response = download(request)
 
       assert response.status_code == 403
-      assert response.content.decode('utf-8') == 'Download operation is not allowed.'
+      assert response.content.decode("utf-8") == "Download operation is not allowed."
     finally:
       reset()
 
   def test_download_file_not_exists(self):
     request = Mock(
-      method='GET',
-      GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+      method="GET",
+      GET={"path": "s3a://test-bucket/test-user/test_file.txt"},
       fs=Mock(
         exists=Mock(return_value=False),
       ),
@@ -1245,14 +1057,14 @@ class TestDownloadAPI:
       response = download(request)
 
       assert response.status_code == 404
-      assert response.content.decode('utf-8') == 'File does not exist: s3a://test-bucket/test-user/test_file.txt'
+      assert response.content.decode("utf-8") == "File does not exist: s3a://test-bucket/test-user/test_file.txt"
     finally:
       reset()
 
   def test_download_not_a_file(self):
     request = Mock(
-      method='GET',
-      GET={'path': 's3a://test-bucket/test-user/test_dir'},
+      method="GET",
+      GET={"path": "s3a://test-bucket/test-user/test_dir"},
       fs=Mock(
         exists=Mock(return_value=True),
         isfile=Mock(return_value=False),
@@ -1264,56 +1076,56 @@ class TestDownloadAPI:
       response = download(request)
 
       assert response.status_code == 400
-      assert response.content.decode('utf-8') == 's3a://test-bucket/test-user/test_dir is not a file.'
+      assert response.content.decode("utf-8") == "s3a://test-bucket/test-user/test_dir is not a file."
     finally:
       reset()
 
   def test_download_success(self):
-    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
-      with patch('filebrowser.api.was_modified_since') as was_modified_since:
-        guess_type.return_value = ('text/plain', None)
+    with patch("filebrowser.api.mimetypes.guess_type") as guess_type:
+      with patch("filebrowser.api.was_modified_since") as was_modified_since:
+        guess_type.return_value = ("text/plain", None)
         was_modified_since.return_value = True
 
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test_file.txt"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
             read=Mock(),
-            open=Mock(return_value=string_io(b'Hello, World!')),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test_file.txt"}),
           ),
         )
 
         reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
         try:
           response = download(request)
-          stream_response_content = b''.join(response.streaming_content)
+          stream_response_content = b"".join(response.streaming_content)
 
           assert isinstance(response, StreamingHttpResponse)
           assert response.status_code == 200
-          assert stream_response_content.decode('utf-8') == 'Hello, World!'
-          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test_file.txt"
+          assert stream_response_content.decode("utf-8") == "Hello, World!"
+          assert response["Content-Disposition"] == "attachment; filename*=UTF-8''test_file.txt"
         finally:
           reset()
 
   def test_download_different_filename(self):
-    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
-      with patch('filebrowser.api.was_modified_since') as was_modified_since:
-        guess_type.return_value = ('text/plain', None)
+    with patch("filebrowser.api.mimetypes.guess_type") as guess_type:
+      with patch("filebrowser.api.was_modified_since") as was_modified_since:
+        guess_type.return_value = ("text/plain", None)
         was_modified_since.return_value = True
 
         # Normal filename
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test_file.txt"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
             read=Mock(),
-            open=Mock(return_value=string_io(b'Hello, World!')),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test_file.txt"}),
           ),
         )
 
@@ -1322,20 +1134,20 @@ class TestDownloadAPI:
           response = download(request)
 
           assert response.status_code == 200
-          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test_file.txt"
+          assert response["Content-Disposition"] == "attachment; filename*=UTF-8''test_file.txt"
         finally:
           reset()
 
         # Filename with whitespaces
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test file name.txt'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test file name.txt"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
             read=Mock(),
-            open=Mock(return_value=string_io(b'Hello, World!')),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test file name.txt'}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test file name.txt"}),
           ),
         )
 
@@ -1344,20 +1156,20 @@ class TestDownloadAPI:
           response = download(request)
 
           assert response.status_code == 200
-          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test%20file%20name.txt"
+          assert response["Content-Disposition"] == "attachment; filename*=UTF-8''test%20file%20name.txt"
         finally:
           reset()
 
         # Filename with special characters
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/Tжейкоб-åäö.csv'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/Tжейкоб-åäö.csv"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
             read=Mock(),
-            open=Mock(return_value=string_io(b'Hello, World!')),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'Tжейкоб-åäö.csv'}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "Tжейкоб-åäö.csv"}),
           ),
         )
 
@@ -1367,21 +1179,21 @@ class TestDownloadAPI:
 
           assert response.status_code == 200
           assert (
-            response['Content-Disposition'] == "attachment; filename*=UTF-8''T%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1-%C3%A5%C3%A4%C3%B6.csv"
+            response["Content-Disposition"] == "attachment; filename*=UTF-8''T%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1-%C3%A5%C3%A4%C3%B6.csv"
           )
         finally:
           reset()
 
         # Filename with special characters and whitespaces
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/Tжейкоб åäö.csv'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/Tжейкоб åäö.csv"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
             read=Mock(),
-            open=Mock(return_value=string_io(b'Hello, World!')),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'Tжейкоб åäö.csv'}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "Tжейкоб åäö.csv"}),
           ),
         )
 
@@ -1391,21 +1203,21 @@ class TestDownloadAPI:
 
           assert response.status_code == 200
           assert (
-            response['Content-Disposition'] == "attachment; filename*=UTF-8''T%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%20%C3%A5%C3%A4%C3%B6.csv"
+            response["Content-Disposition"] == "attachment; filename*=UTF-8''T%D0%B6%D0%B5%D0%B9%D0%BA%D0%BE%D0%B1%20%C3%A5%C3%A4%C3%B6.csv"
           )
         finally:
           reset()
 
         # Filename with % character
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test%file.txt'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test%file.txt"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
             read=Mock(),
-            open=Mock(return_value=string_io(b'Hello, World!')),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test%file.txt'}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test%file.txt"}),
           ),
         )
 
@@ -1414,20 +1226,20 @@ class TestDownloadAPI:
           response = download(request)
 
           assert response.status_code == 200
-          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test%25file.txt"
+          assert response["Content-Disposition"] == "attachment; filename*=UTF-8''test%25file.txt"
         finally:
           reset()
 
         # Filename with %20 character
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test%20file.txt'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test%20file.txt"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
             read=Mock(),
-            open=Mock(return_value=string_io(b'Hello, World!')),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test%20file.txt'}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test%20file.txt"}),
           ),
         )
 
@@ -1436,20 +1248,20 @@ class TestDownloadAPI:
           response = download(request)
 
           assert response.status_code == 200
-          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test%2520file.txt"
+          assert response["Content-Disposition"] == "attachment; filename*=UTF-8''test%2520file.txt"
         finally:
           reset()
 
         # Filename with %20 character and whitespaces
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test%20file name.txt'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test%20file name.txt"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
             read=Mock(),
-            open=Mock(return_value=string_io(b'Hello, World!')),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test%20file name.txt'}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test%20file name.txt"}),
           ),
         )
 
@@ -1458,25 +1270,25 @@ class TestDownloadAPI:
           response = download(request)
 
           assert response.status_code == 200
-          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test%2520file%20name.txt"
+          assert response["Content-Disposition"] == "attachment; filename*=UTF-8''test%2520file%20name.txt"
         finally:
           reset()
 
   def test_download_file_redirection(self):
-    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
-      with patch('filebrowser.api.was_modified_since') as was_modified_since:
-        guess_type.return_value = ('text/plain', None)
+    with patch("filebrowser.api.mimetypes.guess_type") as guess_type:
+      with patch("filebrowser.api.was_modified_since") as was_modified_since:
+        guess_type.return_value = ("text/plain", None)
         was_modified_since.return_value = True
 
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test_file.txt"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
             read=Mock(),
-            open=Mock(return_value=Mock(read_url=Mock(return_value='https://gethue.redirect.com/test_file.txt'))),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+            open=Mock(return_value=Mock(read_url=Mock(return_value="https://gethue.redirect.com/test_file.txt"))),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test_file.txt"}),
           ),
         )
 
@@ -1488,26 +1300,26 @@ class TestDownloadAPI:
           assert isinstance(response, HttpResponseRedirect)
 
           assert response.redirect_override is True
-          assert response.url == 'https://gethue.redirect.com/test_file.txt'
+          assert response.url == "https://gethue.redirect.com/test_file.txt"
         finally:
           for reset in resets:
             reset()
 
   def test_download_modified_since(self):
-    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
-      with patch('filebrowser.api.was_modified_since') as was_modified_since:
-        guess_type.return_value = ('text/plain', None)
+    with patch("filebrowser.api.mimetypes.guess_type") as guess_type:
+      with patch("filebrowser.api.was_modified_since") as was_modified_since:
+        guess_type.return_value = ("text/plain", None)
         was_modified_since.return_value = False
 
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test_file.txt"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test_file.txt"}),
           ),
-          META={'HTTP_IF_MODIFIED_SINCE': 'Thu, 14 Jun 2018 10:00:00 GMT'},
+          META={"HTTP_IF_MODIFIED_SINCE": "Thu, 14 Jun 2018 10:00:00 GMT"},
         )
 
         reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
@@ -1520,21 +1332,21 @@ class TestDownloadAPI:
           reset()
 
   def test_download_read_permission_denied(self):
-    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
-      with patch('filebrowser.api.was_modified_since') as was_modified_since:
-        guess_type.return_value = ('text/plain', None)
+    with patch("filebrowser.api.mimetypes.guess_type") as guess_type:
+      with patch("filebrowser.api.was_modified_since") as was_modified_since:
+        guess_type.return_value = ("text/plain", None)
         was_modified_since.return_value = True
 
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
-          user=Mock(username='test-hue-user'),
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test_file.txt"},
+          user=Mock(username="test-hue-user"),
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
-            open=Mock(return_value=string_io(b'Hello, World!')),
-            read=Mock(side_effect=WebHdfsException(Mock(response=Mock(status_code=403, text='Signature Mismatch')))),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test_file.txt"}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
+            read=Mock(side_effect=WebHdfsException(Mock(response=Mock(status_code=403, text="Signature Mismatch")))),
           ),
         )
 
@@ -1544,58 +1356,58 @@ class TestDownloadAPI:
 
           assert response.status_code == 403
           assert (
-            response.content.decode('utf-8')
-            == 'User test-hue-user is not authorized to download file at path: s3a://test-bucket/test-user/test_file.txt'
+            response.content.decode("utf-8")
+            == "User test-hue-user is not authorized to download file at path: s3a://test-bucket/test-user/test_file.txt"
           )
         finally:
           reset()
 
   def test_download_abfs_zero_filesize_exception(self):
-    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
-      with patch('filebrowser.api.was_modified_since') as was_modified_since:
-        guess_type.return_value = ('text/plain', None)
+    with patch("filebrowser.api.mimetypes.guess_type") as guess_type:
+      with patch("filebrowser.api.was_modified_since") as was_modified_since:
+        guess_type.return_value = ("text/plain", None)
         was_modified_since.return_value = True
 
         request = Mock(
-          method='GET',
-          GET={'path': 'abfs://test-container/test-user/test_file.txt'},
+          method="GET",
+          GET={"path": "abfs://test-container/test-user/test_file.txt"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 0, 'name': 'test_file.txt'}),
-            open=Mock(return_value=string_io(b'')),
-            read=Mock(side_effect=WebHdfsException(Mock(response=Mock(status_code=416, text='Blob size is zero')))),
-            _get_scheme=Mock(return_value='abfs'),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 0, "name": "test_file.txt"}),
+            open=Mock(return_value=string_io(b"")),
+            read=Mock(side_effect=WebHdfsException(Mock(response=Mock(status_code=416, text="Blob size is zero")))),
+            _get_scheme=Mock(return_value="abfs"),
           ),
         )
 
         reset = SHOW_DOWNLOAD_BUTTON.set_for_testing(True)
         try:
           response = download(request)
-          stream_response_content = b''.join(response.streaming_content)
+          stream_response_content = b"".join(response.streaming_content)
 
           assert isinstance(response, StreamingHttpResponse)
           assert response.status_code == 200
-          assert stream_response_content.decode('utf-8') == ''
-          assert response['Content-Disposition'] == "attachment; filename*=UTF-8''test_file.txt"
+          assert stream_response_content.decode("utf-8") == ""
+          assert response["Content-Disposition"] == "attachment; filename*=UTF-8''test_file.txt"
         finally:
           reset()
 
   def test_download_unknown_exception(self):
-    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
-      with patch('filebrowser.api.was_modified_since') as was_modified_since:
-        guess_type.return_value = ('text/plain', None)
+    with patch("filebrowser.api.mimetypes.guess_type") as guess_type:
+      with patch("filebrowser.api.was_modified_since") as was_modified_since:
+        guess_type.return_value = ("text/plain", None)
         was_modified_since.return_value = True
 
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test_file.txt"},
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
-            open=Mock(return_value=string_io(b'Hello, World!')),
-            read=Mock(side_effect=WebHdfsException(Mock(response=Mock(status_code=500, text='Internal Server Error')))),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test_file.txt"}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
+            read=Mock(side_effect=WebHdfsException(Mock(response=Mock(status_code=500, text="Internal Server Error")))),
           ),
         )
 
@@ -1608,20 +1420,20 @@ class TestDownloadAPI:
           reset()
 
   def test_download_audit_log(self):
-    with patch('filebrowser.api.mimetypes.guess_type') as guess_type:
-      with patch('filebrowser.api.was_modified_since') as was_modified_since:
-        guess_type.return_value = ('text/plain', None)
+    with patch("filebrowser.api.mimetypes.guess_type") as guess_type:
+      with patch("filebrowser.api.was_modified_since") as was_modified_since:
+        guess_type.return_value = ("text/plain", None)
         was_modified_since.return_value = True
 
         request = Mock(
-          method='GET',
-          GET={'path': 's3a://test-bucket/test-user/test_file.txt'},
-          user=Mock(username='test-hue-user'),
+          method="GET",
+          GET={"path": "s3a://test-bucket/test-user/test_file.txt"},
+          user=Mock(username="test-hue-user"),
           fs=Mock(
             exists=Mock(return_value=True),
             isfile=Mock(return_value=True),
-            stats=Mock(return_value={'mtime': 1731527620, 'size': 1024, 'name': 'test_file.txt'}),
-            open=Mock(return_value=string_io(b'Hello, World!')),
+            stats=Mock(return_value={"mtime": 1731527620, "size": 1024, "name": "test_file.txt"}),
+            open=Mock(return_value=string_io(b"Hello, World!")),
             read=Mock(),
           ),
         )
@@ -1632,9 +1444,97 @@ class TestDownloadAPI:
 
           assert response.status_code == 200
           assert request.audit == {
-            'operation': 'DOWNLOAD',
-            'operationText': 'User test-hue-user downloaded file at path "s3a://test-bucket/test-user/test_file.txt"',
-            'allowed': True,
+            "operation": "DOWNLOAD",
+            "operationText": 'User test-hue-user downloaded file at path "s3a://test-bucket/test-user/test_file.txt"',
+            "allowed": True,
           }
         finally:
           reset()
+
+
+class TestUploadFileAPI:
+  def setup_method(self):
+    self.view = UploadFileAPI()
+    self.request = Mock()
+    self.request.user = Mock(username="test_user")
+    self.request.query_params = {}
+    self.request.FILES = {}
+
+  @patch("filebrowser.api.APIView.initial")
+  @patch("filebrowser.api.UploadFileSerializer")
+  @patch("filebrowser.api.get_user_fs")
+  def test_initial_success(self, get_user_fs_mock, upload_file_serializer_mock, api_view_initial_mock):
+    self.request.query_params = {"destination_path": "s3a://test-bucket/test-user/test/dest", "overwrite": False}
+
+    mock_serializer_instance = Mock()
+    mock_serializer_instance.is_valid.return_value = True
+    mock_serializer_instance.validated_data = {"destination_path": "s3a://test-bucket/test-user/test/dest", "overwrite": False}
+    upload_file_serializer_mock.return_value = mock_serializer_instance
+
+    mock_fs = Mock()
+    mock_upload_handler = Mock()
+    mock_fs.get_upload_handler.return_value = mock_upload_handler
+    get_user_fs_mock.return_value = mock_fs
+
+    self.view.initial(self.request)
+
+    upload_file_serializer_mock.assert_called_once_with(data=self.request.query_params)
+    mock_serializer_instance.is_valid.assert_called_once_with(raise_exception=True)
+    get_user_fs_mock.assert_called_once_with("test_user")
+    mock_fs.get_upload_handler.assert_called_once_with("s3a://test-bucket/test-user/test/dest", False)
+    assert self.request.upload_handlers == [mock_upload_handler]
+
+  @patch("filebrowser.api.UploadFileSerializer")
+  @patch("filebrowser.api.get_user_fs")
+  def test_initial_no_upload_handler_found(self, get_user_fs_mock, upload_file_serializer_mock):
+    self.request.query_params = {"destination_path": "s3a://test-bucket/test-user/test/dest", "overwrite": False}
+
+    mock_serializer_instance = Mock()
+    mock_serializer_instance.is_valid.return_value = True
+    mock_serializer_instance.validated_data = {"destination_path": "s3a://test-bucket/test-user/test/dest", "overwrite": False}
+    upload_file_serializer_mock.return_value = mock_serializer_instance
+
+    mock_fs = Mock()
+    mock_fs.get_upload_handler.return_value = None
+    get_user_fs_mock.return_value = mock_fs
+
+    with pytest.raises(NotFound):
+      self.view.initial(self.request)
+
+    get_user_fs_mock.assert_called_once_with("test_user")
+    mock_fs.get_upload_handler.assert_called_once_with("s3a://test-bucket/test-user/test/dest", False)
+
+  def test_post_success(self):
+    self.request.FILES = {"file": {"path": "s3a://test-bucket/test-user/test/dest/file.txt", "size": 123}}
+
+    response = self.view.post(self.request)
+
+    assert response.status_code == 201
+    assert response.data == {"file_stats": {"path": "s3a://test-bucket/test-user/test/dest/file.txt", "size": 123}}
+
+  def test_post_file_upload_failed(self):
+    self.request.FILES = {"file": "not_a_dict"}
+
+    response = self.view.post(self.request)
+
+    assert response.status_code == 400
+    assert response.data is not None
+    assert response.data.get("error") == "File upload failed or was not handled correctly by the upload handler."
+
+  def test_post_raises_popup_exception(self):
+    self.request.FILES = MagicMock()
+    self.request.FILES.get.side_effect = PopupException("Test PopupException", error_code=403)
+
+    response = self.view.post(self.request)
+
+    assert response.status_code == 403
+    assert response.data == {"error": "Test PopupException"}
+
+  def test_post_raises_generic_exception(self):
+    self.request.FILES = MagicMock()
+    self.request.FILES.get.side_effect = Exception("Generic error")
+
+    response = self.view.post(self.request)
+
+    assert response.status_code == 500
+    assert response.data == {"error": "An unexpected error occurred while uploading the file."}

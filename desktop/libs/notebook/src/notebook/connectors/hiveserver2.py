@@ -705,7 +705,7 @@ DROP TABLE IF EXISTS `%(table)s`;
         filters = {'id': session_id, 'application': 'beeswax' if type == 'hive' or type == 'llap' else type}
         if not is_admin(self.user):
           filters['owner'] = self.user
-        return Session.objects.get(**filters)
+        return Session.objects.filter(**filters).first()
 
   def _get_hive_execution_engine(self, notebook, snippet):
     # Get hive.execution.engine from snippet properties, if none, then get from session
