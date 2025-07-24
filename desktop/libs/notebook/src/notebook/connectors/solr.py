@@ -15,13 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import logging
 from builtins import object
 
 from django.utils.translation import gettext as _
 
-from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from indexer.solr_client import SolrClient
 from notebook.connectors.base import Api, QueryError
@@ -32,7 +30,7 @@ LOG = logging.getLogger()
 
 try:
   from libsolr.api import SolrApi as NativeSolrApi
-except (ImportError, AttributeError) as e:
+except (ImportError, AttributeError):
   LOG.exception('Search is not enabled')
 
 
@@ -147,7 +145,7 @@ class SolrApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     from search.conf import SOLR_URL
     db = NativeSolrApi(SOLR_URL.get(), self.user)
 
@@ -157,7 +155,7 @@ class SolrApi(Api):
     if snippet.get('source') == 'sql':
       sample_data = assist.get_sample_data_sql(database, table, column)
     else:
-      sample_data = assist.get_sample_data(database, table, column)
+      sample_data = assist.get_sample_data(database, table, column, nested)
 
     if sample_data:
       response['status'] = 0
@@ -199,7 +197,7 @@ class Assist(object):
       } for field in self.db.schema_fields(table)['fields']
     ]
 
-  def get_sample_data(self, database, table, column=None):
+  def get_sample_data(self, database, table, column=None, nested=None):
     # Note: currently ignores dynamic fields
     full_headers = self.get_columns(database, table)
     headers = [col['name'] for col in full_headers]

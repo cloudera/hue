@@ -18,11 +18,8 @@
 
 from __future__ import absolute_import
 
-import sys
 import json
 import logging
-
-from django.utils.translation import gettext as _
 
 from desktop.conf import has_channels
 from desktop.lib.i18n import force_unicode
@@ -33,7 +30,7 @@ LOG = logging.getLogger()
 
 
 if has_channels():
-  from notebook.consumer import _send_to_channel
+  pass
 
 
 def query_error_handler(func):
@@ -126,7 +123,7 @@ class KSqlApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     notebook = {}
 
     snippet = {

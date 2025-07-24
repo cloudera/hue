@@ -16,9 +16,7 @@
 # limitations under the License.
 
 from librdbms.jdbc import query_and_fetch
-
-from notebook.connectors.jdbc import JdbcApi
-from notebook.connectors.jdbc import Assist
+from notebook.connectors.jdbc import Assist, JdbcApi
 
 
 class JdbcApiTeradata(JdbcApi):
@@ -34,14 +32,19 @@ class TeradataAssist(Assist):
     return [db[0] and db[0].strip() for db in dbs]
 
   def get_tables_full(self, database, table_names=[]):
-    tables, description = query_and_fetch(self.db, "SELECT TableName, CommentString FROM dbc.tables WHERE tablekind = 'T' and databasename='%s' ORDER BY TableName" % database)
+    query = ("SELECT TableName, CommentString FROM dbc.tables WHERE tablekind = 'T' and "
+             "databasename='%s' ORDER BY TableName" % database)
+    tables, description = query_and_fetch(self.db, query)
     return [{"comment": table[1] and table[1].strip(), "type": "Table", "name": table[0] and table[0].strip()} for table in tables]
 
   def get_columns_full(self, database, table):
-    columns, description = query_and_fetch(self.db, "SELECT ColumnName, ColumnType, CommentString FROM DBC.Columns WHERE DatabaseName='%s' AND TableName='%s' ORDER BY ColumnName" % (database, table))
-    return [{"comment": col[1] and col[1].strip(), "type": self._type_converter(col[1]), "name": col[0] and col[0].strip()} for col in columns]
+    query = ("SELECT ColumnName, ColumnType, CommentString FROM DBC.Columns WHERE "
+             "DatabaseName='%s' AND TableName='%s' ORDER BY ColumnName" % (database, table))
+    columns, description = query_and_fetch(self.db, query)
+    return [{"comment": col[1] and col[1].strip(), "type": self._type_converter(col[1]),
+             "name": col[0] and col[0].strip()} for col in columns]
 
-  def get_sample_data(self, database, table, column=None):
+  def get_sample_data(self, database, table, column=None, nested=None):
     column = column or '*'
     return query_and_fetch(self.db, 'SELECT %s FROM %s.%s sample 100' % (column, database, table))
 

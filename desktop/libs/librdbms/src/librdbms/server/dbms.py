@@ -15,13 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import logging
+from builtins import object
 
 from desktop.lib.python_util import force_dict_to_strings
-
 from librdbms.conf import DATABASES, get_database_password
-
 
 LOG = logging.getLogger()
 
@@ -98,8 +96,8 @@ class Rdbms(object):
   def get_columns(self, database, table_name, names_only=True):
     return self.client.get_columns(database, table_name, names_only)
 
-  def get_sample_data(self, database, table_name, column=None, limit=100):
-    return self.client.get_sample_data(database, table_name, column, limit)
+  def get_sample_data(self, database, table_name, column=None, nested=None, limit=100):
+    return self.client.get_sample_data(database, table_name, column, nested, limit)
 
   def execute_statement(self, statement):
     return self.client.execute_statement(statement)
@@ -123,7 +121,11 @@ class Rdbms(object):
     )
     query_history.save()
 
-    LOG.debug("Updated QueryHistory id %s user %s statement_number: %s" % (query_history.id, self.client.user, query_history.statement_number))
+    LOG.debug(
+        "Updated QueryHistory id %s user %s statement_number: %s" % (
+            query_history.id, self.client.user, query_history.statement_number
+        )
+    )
 
     return query_history
 
