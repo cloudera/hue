@@ -25,18 +25,16 @@ import useLoadData from '../../../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
 
 import './EditColumnsModal.scss';
-import { ImporterTableData } from '../../types';
+import { ImporterTableData, BaseColumnProperties } from '../../types';
 
-export interface Column {
+export interface Column extends BaseColumnProperties {
   title: string;
   dataIndex: string;
-  type?: string;
-  comment?: string;
 }
 
-interface EditRow {
+interface EditRow extends Required<BaseColumnProperties> {
   key: number;
-  name: string;
+  title: string;
   type: string;
   sample: string;
   comment: string;
@@ -88,7 +86,7 @@ const EditColumnsModal = ({
     setEditRows(
       columns.map((col, idx) => ({
         key: idx,
-        name: col.title,
+        title: col.title,
         type: (col.type || 'string').toUpperCase(),
         sample: sample && sample[col.dataIndex] !== undefined ? String(sample[col.dataIndex]) : '',
         comment: col.comment || ''
@@ -103,7 +101,7 @@ const EditColumnsModal = ({
   const handleDone = async () => {
     const updatedColumns = editRows.map(row => ({
       ...columns[row.key],
-      title: row.name,
+      title: row.title,
       type: row.type,
       comment: row.comment
     }));
@@ -111,62 +109,59 @@ const EditColumnsModal = ({
     closeModal();
   };
 
-  const modalColumns = useMemo(
-    () => [
-      {
-        title: t('Name'),
-        dataIndex: 'name',
-        render: (text: string, _: EditRow, idx: number) => (
-          <Input
-            value={text}
-            className="hue-importer-edit-columns-modal__input--name"
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              handleChange(idx, 'name', e.target.value)
-            }
-          />
-        )
-      },
-      {
-        title: t('Type'),
-        dataIndex: 'type',
-        render: (value: string, _: EditRow, idx: number) => (
-          <Select
-            value={value}
-            onChange={(val: string) => handleChange(idx, 'type', val)}
-            className="hue-importer-edit-columns-modal__select--type"
-            getPopupContainer={triggerNode => triggerNode.parentNode}
-            disabled={sqlTypesLoading || sqlTypes.length === 0}
-            loading={sqlTypesLoading}
-          >
-            {sqlTypes.map(type => (
-              <Select.Option key={type} value={type}>
-                {type}
-              </Select.Option>
-            ))}
-          </Select>
-        )
-      },
-      {
-        title: t('Sample'),
-        dataIndex: 'sample',
-        render: (text: string) => <span>{text}</span>
-      },
-      {
-        title: t('Comment'),
-        dataIndex: 'comment',
-        render: (text: string, _: EditRow, idx: number) => (
-          <textarea
-            value={text}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              handleChange(idx, 'comment', e.target.value)
-            }
-            rows={2}
-          />
-        )
-      }
-    ],
-    [t, sqlTypes, sqlTypesLoading]
-  );
+  const modalColumns = [
+    {
+      title: t('Name'),
+      dataIndex: 'title',
+      render: (text: string, _: EditRow, idx: number) => (
+        <Input
+          value={text}
+          className="hue-importer-edit-columns-modal__input--name"
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            handleChange(idx, 'title', e.target.value)
+          }
+        />
+      )
+    },
+    {
+      title: t('Type'),
+      dataIndex: 'type',
+      render: (value: string, _: EditRow, idx: number) => (
+        <Select
+          value={value}
+          onChange={(val: string) => handleChange(idx, 'type', val)}
+          className="hue-importer-edit-columns-modal__select--type"
+          getPopupContainer={triggerNode => triggerNode.parentNode}
+          disabled={sqlTypesLoading || sqlTypes.length === 0}
+          loading={sqlTypesLoading}
+        >
+          {sqlTypes.map(type => (
+            <Select.Option key={type} value={type}>
+              {type}
+            </Select.Option>
+          ))}
+        </Select>
+      )
+    },
+    {
+      title: t('Sample'),
+      dataIndex: 'sample',
+      render: (text: string) => <span>{text}</span>
+    },
+    {
+      title: t('Comment'),
+      dataIndex: 'comment',
+      render: (text: string, _: EditRow, idx: number) => (
+        <textarea
+          value={text}
+          onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+            handleChange(idx, 'comment', e.target.value)
+          }
+          rows={2}
+        />
+      )
+    }
+  ];
 
   return (
     <Modal

@@ -51,11 +51,15 @@ export interface FileMetaData {
   source: ImporterFileSource;
 }
 
-export type FilePreviewTableColumn = {
+export interface BaseColumnProperties {
+  type?: string;
+  comment?: string;
+}
+
+export interface FilePreviewTableColumn extends BaseColumnProperties {
   importerDataKey?: string; // key for identifying unique data row
   name: string;
-  type?: string;
-};
+}
 
 export interface FilePreviewTableData {
   [key: string]: (string | number)[];
