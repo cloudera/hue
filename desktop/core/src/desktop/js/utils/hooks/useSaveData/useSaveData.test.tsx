@@ -15,14 +15,18 @@
 // limitations under the License.
 
 import { renderHook, act, waitFor } from '@testing-library/react';
-import useSaveData from './useSaveData';
-import { post } from '../../../api/utils';
+import useSaveData, { HttpMethod } from './useSaveData';
+import { post, put, patch } from '../../../api/utils';
 
 jest.mock('../../../api/utils', () => ({
-  post: jest.fn()
+  post: jest.fn(),
+  put: jest.fn(),
+  patch: jest.fn()
 }));
 
 const mockPost = post as jest.MockedFunction<typeof post>;
+const mockPut = put as jest.MockedFunction<typeof put>;
+const mockPatch = patch as jest.MockedFunction<typeof patch>;
 const mockUrlPrefix = 'https://api.example.com';
 const mockEndpoint = '/save-endpoint';
 const mockUrl = `${mockUrlPrefix}${mockEndpoint}`;
@@ -33,6 +37,8 @@ describe('useSaveData', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockPost.mockResolvedValue(mockData);
+    mockPut.mockResolvedValue(mockData);
+    mockPatch.mockResolvedValue(mockData);
   });
 
   it('should save data successfully and update state', async () => {
@@ -281,6 +287,80 @@ describe('useSaveData', () => {
       );
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
+      expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should use PUT method when specified in options', async () => {
+    mockPut.mockResolvedValue(mockData);
+
+    const { result } = renderHook(() => useSaveData(mockUrl, { method: HttpMethod.PUT }));
+
+    act(() => {
+      result.current.save(mockBody);
+    });
+
+    await waitFor(() => {
+      expect(mockPut).toHaveBeenCalledTimes(1);
+      expect(mockPut).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
+      expect(mockPost).not.toHaveBeenCalled();
+      expect(mockPatch).not.toHaveBeenCalled();
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should use PATCH method when specified in saveOptions', async () => {
+    mockPatch.mockResolvedValue(mockData);
+
+    const { result } = renderHook(() => useSaveData(mockUrl));
+
+    act(() => {
+      result.current.save(mockBody, { method: HttpMethod.PATCH });
+    });
+
+    await waitFor(() => {
+      expect(mockPatch).toHaveBeenCalledTimes(1);
+      expect(mockPatch).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
+      expect(mockPost).not.toHaveBeenCalled();
+      expect(mockPut).not.toHaveBeenCalled();
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should prioritize saveOptions method over options method', async () => {
+    mockPatch.mockResolvedValue(mockData);
+
+    const { result } = renderHook(() => useSaveData(mockUrl, { method: HttpMethod.PUT }));
+
+    act(() => {
+      result.current.save(mockBody, { method: HttpMethod.PATCH });
+    });
+
+    await waitFor(() => {
+      expect(mockPatch).toHaveBeenCalledTimes(1);
+      expect(mockPatch).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
+      expect(mockPost).not.toHaveBeenCalled();
+      expect(mockPut).not.toHaveBeenCalled();
+      expect(result.current.data).toEqual(mockData);
+      expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should default to POST when no method is specified', async () => {
+    const { result } = renderHook(() => useSaveData(mockUrl));
+
+    act(() => {
+      result.current.save(mockBody);
+    });
+
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledTimes(1);
+      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
+      expect(mockPut).not.toHaveBeenCalled();
+      expect(mockPatch).not.toHaveBeenCalled();
+      expect(result.current.data).toEqual(mockData);
       expect(result.current.loading).toBe(false);
     });
   });
