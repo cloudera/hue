@@ -39,8 +39,10 @@ import {
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 import EditColumnsModal from './EditColumns/EditColumnsModal';
 import DestinationSettings from './DestinationSettings/DestinationSettings';
+import AdvancedSettingsModal, { AdvancedSettings } from './AdvancedSettings/AdvancedSettingsModal';
 
 import './ImporterFilePreview.scss';
+import { StoreLocation, TableFormat } from './AdvancedSettings/advancedSettingsConfig';
 
 interface ImporterFilePreviewProps {
   fileMetaData: FileMetaData;
@@ -51,8 +53,25 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const [fileFormat, setFileFormat] = useState<CombinedFileFormat | undefined>();
 
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
+  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
   const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
     tableName: getDefaultTableName(fileMetaData)
+  });
+  const [advancedSettings, setAdvancedSettings] = useState<AdvancedSettings>({
+    storeLocation: StoreLocation.MANAGED,
+    isTransactional: false,
+    isInsertOnly: false,
+    externalLocation: '',
+    importData: true,
+    isIcebergTable: false,
+    isCopyFile: false,
+    description: '',
+    tableFormat: TableFormat.TEXT,
+    primaryKeys: []
+    // useCustomDelimiters: false,
+    // customFieldDelimiter: ',',
+    // customCollectionDelimiter: '\t',
+    // customMapDelimiter: '|',
   });
 
   const handleDestinationSettingsChange = (name: string, value: string) => {
@@ -60,6 +79,10 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       ...prevConfig,
       [name]: value
     }));
+  };
+
+  const handleAdvancedSettingsChange = (settings: AdvancedSettings) => {
+    setAdvancedSettings(settings);
   };
 
   const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FILE_GUESS_METADATA, {
@@ -131,10 +154,24 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     };
     const destination = {
       outputFormat: 'table',
-      nonDefaultLocation: fileMetaData.path,
+      location: advancedSettings.storeLocation,
+      externalLocation: advancedSettings.externalLocation,
       name: `${destinationConfig.database}.${destinationConfig.tableName}`,
       sourceType: destinationConfig.connectorId,
-      columns: previewData?.columns
+      columns: previewData?.columns,
+      // Include advanced settings
+      isTransactional: advancedSettings.isTransactional,
+      isInsertOnly: advancedSettings.isInsertOnly,
+      importData: advancedSettings.importData,
+      isIcebergTable: advancedSettings.isIcebergTable,
+      isCopyFile: advancedSettings.isCopyFile,
+      description: advancedSettings.description
+      // useCustomDelimiters: advancedSettings.useCustomDelimiters,
+      // customFieldDelimiter: advancedSettings.customFieldDelimiter,
+      // customCollectionDelimiter: advancedSettings.customCollectionDelimiter,
+      // customMapDelimiter: advancedSettings.customMapDelimiter,
+      // customRegexp: advancedSettings.customRegexp,
+      // primaryKeys: advancedSettings.primaryKeys
     };
 
     const formData = new FormData();
@@ -152,6 +189,12 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       <div className="hue-importer-preview-page__header">
         <div className="hue-importer-preview-page__header__title">{t('Preview')}</div>
         <div className="hue-importer-preview-page__header__actions">
+          <BorderlessButton
+            onClick={() => setIsAdvancedSettingsOpen(true)}
+            style={{ marginRight: 8 }}
+          >
+            {t('Advanced Settings')}
+          </BorderlessButton>
           <BorderlessButton data-testid="hue-importer-preview-page__header__actions__cancel">
             {t('Cancel')}
           </BorderlessButton>
@@ -183,6 +226,14 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
         />
       </div>
       <EditColumnsModal isOpen={isEditColumnsOpen} closeModal={() => setIsEditColumnsOpen(false)} />
+      <AdvancedSettingsModal
+        isOpen={isAdvancedSettingsOpen}
+        closeModal={() => setIsAdvancedSettingsOpen(false)}
+        fileMetaData={fileMetaData}
+        // fileFormat={fileFormat}
+        advancedSettings={advancedSettings}
+        onSettingsChange={handleAdvancedSettingsChange}
+      />
     </div>
   );
 };
