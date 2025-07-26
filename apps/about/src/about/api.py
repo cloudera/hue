@@ -53,7 +53,9 @@ class UsageAnalyticsAPI(APIView):
         {"error": "A server error occurred while retrieving usage analytics settings."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
       )
 
-  def put(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+# TODO: CHANGE THIS BACK TO PUT ONCE PUT IS SUPPORTED IN FRONTEND
+
+  def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
     """Handles PUT requests to update the analytics setting."""
     try:
       serializer = UsageAnalyticsSerializer(data=request.data)
