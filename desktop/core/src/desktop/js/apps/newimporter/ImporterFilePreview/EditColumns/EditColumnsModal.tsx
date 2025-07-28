@@ -65,8 +65,8 @@ const EditColumnsModal = ({
   } = useLoadData<string[]>(`${SQL_TYPE_MAPPING_API_URL}?sql_dialect=hive`);
 
   const sqlTypes = useMemo(() => {
-    if (sqlTypesData && typeof sqlTypesData === 'object' && Object.keys(sqlTypesData).length > 0) {
-      return Array.from(new Set(Object.values(sqlTypesData))) as string[];
+    if (sqlTypesData && Array.isArray(sqlTypesData) && sqlTypesData.length > 0) {
+      return sqlTypesData;
     }
     return [];
   }, [sqlTypesData]);

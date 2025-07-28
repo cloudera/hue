@@ -19,6 +19,7 @@ import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import {
   CombinedFileFormat,
+  DestinationConfig,
   FileFormatResponse,
   FileMetaData,
   FilePreviewResponse,
@@ -52,11 +53,6 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
 
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
   const [columns, setColumns] = useState<Column[]>([]);
-  interface DestinationConfig {
-    connectorId?: string;
-    [key: string]: unknown;
-  }
-  const defaultTableName = getDefaultTableName(fileMetaData);
   const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
     tableName: getDefaultTableName(fileMetaData)
   });
@@ -152,7 +148,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     const destination = {
       outputFormat: 'table',
       nonDefaultLocation: fileMetaData.path,
-      name: `${destinationConfig.database}.${defaultTableName}`,
+      name: `${destinationConfig.database}.${destinationConfig.tableName}`,
       sourceType: destinationConfig.connectorId,
       columns: columns.map(col => ({
         name: col.title,

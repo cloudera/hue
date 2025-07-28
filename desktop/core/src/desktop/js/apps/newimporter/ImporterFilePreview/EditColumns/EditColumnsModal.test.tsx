@@ -21,7 +21,7 @@ import '@testing-library/jest-dom';
 import EditColumnsModal, { Column } from './EditColumnsModal';
 
 jest.mock('../../../../utils/hooks/useLoadData/useLoadData', () => () => ({
-  data: ['string', 'int', 'float'],
+  data: ['STRING', 'INT', 'FLOAT'],
   loading: false,
   error: null
 }));
@@ -31,7 +31,7 @@ describe('EditColumnsModal', () => {
     { title: 'col1', dataIndex: 'col1', type: 'string', comment: 'comment1' },
     { title: 'col2', dataIndex: 'col2', type: 'int', comment: 'comment2' }
   ];
-  const sample = [{ col1: 'val1', col2: 42 }];
+  const sample = { importerDataKey: 'row1', col1: 'val1', col2: 42 };
 
   test('lists existing modal columns as expected', () => {
     render(
@@ -47,8 +47,8 @@ describe('EditColumnsModal', () => {
     expect(screen.getByDisplayValue('col1')).toBeInTheDocument();
     expect(screen.getByDisplayValue('col2')).toBeInTheDocument();
 
-    expect(screen.getByText('string')).toBeInTheDocument();
-    expect(screen.getByText('int')).toBeInTheDocument();
+    expect(screen.getByText('STRING')).toBeInTheDocument();
+    expect(screen.getByText('INT')).toBeInTheDocument();
 
     expect(screen.getByText('val1')).toBeInTheDocument();
     expect(screen.getByText('42')).toBeInTheDocument();
@@ -75,11 +75,11 @@ describe('EditColumnsModal', () => {
     await user.clear(nameInputs[0]);
     await user.type(nameInputs[0], 'newCol1');
 
-    const typeSelects = screen.getAllByText('string').map(el => el.closest('.ant-select'));
+    const typeSelects = screen.getAllByText('STRING').map(el => el.closest('.ant-select'));
     if (typeSelects[0]) {
       await user.click(typeSelects[0].querySelector('.ant-select-selector')!);
 
-      const floatOption = await screen.findByTitle('float');
+      const floatOption = await screen.findByTitle('FLOAT');
       await user.click(floatOption);
     }
 
@@ -92,8 +92,8 @@ describe('EditColumnsModal', () => {
 
     await waitFor(() => {
       expect(setColumns).toHaveBeenCalledWith([
-        { ...columns[0], title: 'newCol1', type: 'float', comment: 'new comment' },
-        { ...columns[1], title: 'col2', type: 'int', comment: 'comment2' }
+        { ...columns[0], title: 'newCol1', type: 'FLOAT', comment: 'new comment' },
+        { ...columns[1], title: 'col2', type: 'INT', comment: 'comment2' }
       ]);
       expect(closeModal).toHaveBeenCalled();
     });
