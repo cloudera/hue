@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import {
@@ -118,24 +118,23 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       skip:
         !fileFormat?.type ||
         fileFormat?.hasHeader === undefined ||
-        destinationConfig.connectorId === undefined
+        destinationConfig.connectorId === undefined,
+      onSuccess: data => {
+        if (data?.columns && Array.isArray(data.columns)) {
+          setColumns(
+            convertToAntdColumns(data.columns).map(col => ({
+              title: col?.title != null ? String(col.title) : '',
+              dataIndex: String(col.dataIndex || '')
+            }))
+          );
+        } else {
+          setColumns([]);
+        }
+      }
     }
   );
 
   const { save, loading: finalizingImport } = useSaveData(FINISH_IMPORT_URL);
-
-  useEffect(() => {
-    if (previewData?.columns && Array.isArray(previewData.columns)) {
-      setColumns(
-        convertToAntdColumns(previewData.columns).map(col => ({
-          title: col?.title != null ? String(col.title) : '',
-          dataIndex: String(col.dataIndex || '')
-        }))
-      );
-    } else {
-      setColumns([]);
-    }
-  }, [previewData]);
 
   const handleFinishImport = () => {
     const source = {

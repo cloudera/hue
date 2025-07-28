@@ -92,7 +92,7 @@ const EditColumnsModal = ({
         comment: col.comment || ''
       }))
     );
-  }, [columns, sample, isOpen]);
+  }, [columns, sample]);
 
   const handleChange = (idx: number, field: keyof EditRow, value: string) => {
     setEditRows(rows => rows.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
