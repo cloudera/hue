@@ -277,12 +277,6 @@ def storage_save_file(request):
 
 
 @api_view(["POST"])
-def storage_upload_file(request):
-  django_request = get_django_request(request)
-  return filebrowser_api.upload_file(django_request)
-
-
-@api_view(["POST"])
 def storage_upload_chunks(request):
   django_request = get_django_request(request)
   return filebrowser_api.upload_chunks(django_request)
@@ -304,12 +298,6 @@ def storage_mkdir(request):
 def storage_touch(request):
   django_request = get_django_request(request)
   return filebrowser_api.touch(django_request)
-
-
-@api_view(["POST"])
-def storage_rename(request):
-  django_request = get_django_request(request)
-  return filebrowser_api.rename(django_request)
 
 
 @api_view(["GET"])
