@@ -20,8 +20,8 @@ import DataInIcon from '@cloudera/cuix-core/icons/react/DataInIcon';
 import { i18nReact } from '../../utils/i18nReact';
 import { FileMetaData } from './types';
 import CommonHeader from '../../reactComponents/CommonHeader/CommonHeader';
+import FileImportTabs from './FileImportTabs/FileImportTabs';
 import ImporterSourceSelector from './ImporterSourceSelector/ImporterSourceSelector';
-import ImporterFilePreview from './ImporterFilePreview/ImporterFilePreview';
 
 import './ImporterPage.scss';
 
@@ -36,7 +36,7 @@ const ImporterPage = (): JSX.Element => {
         {!fileMetaData?.path ? (
           <ImporterSourceSelector setFileMetaData={setFileMetaData} />
         ) : (
-          <ImporterFilePreview fileMetaData={fileMetaData} />
+          <FileImportTabs fileMetaData={fileMetaData} />
         )}
       </div>
     </div>
