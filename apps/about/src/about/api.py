@@ -44,7 +44,7 @@ class UsageAnalyticsAPI(APIView):
     """Handles GET requests to retrieve the current analytics setting."""
     try:
       settings = Settings.get_settings()
-      data = {"collect_usage": settings.collect_usage}
+      data = {"collectUsage": settings.collect_usage}
 
       return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
