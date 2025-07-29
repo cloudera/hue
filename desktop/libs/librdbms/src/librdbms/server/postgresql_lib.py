@@ -25,14 +25,15 @@ except ImportError as e:
 
 from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
-
 LOG = logging.getLogger()
 
 
-class DataTable(BaseRDBMSDataTable): pass
+class DataTable(BaseRDBMSDataTable):
+  pass
 
 
-class Result(BaseRDBMSResult): pass
+class Result(BaseRDBMSResult):
+  pass
 
 
 class PostgreSQLClient(BaseRDMSClient):
@@ -44,7 +45,6 @@ class PostgreSQLClient(BaseRDMSClient):
   def __init__(self, *args, **kwargs):
     super(PostgreSQLClient, self).__init__(*args, **kwargs)
     self.connection = Database.connect(**self._conn_params)
-
 
   @property
   def _conn_params(self):
@@ -64,11 +64,9 @@ class PostgreSQLClient(BaseRDMSClient):
 
     return params
 
-
   def use(self, database):
     # No op since postgresql requires a new connection per database
     pass
-
 
   def execute_statement(self, statement):
     cursor = self.connection.cursor()
@@ -79,7 +77,6 @@ class PostgreSQLClient(BaseRDMSClient):
     else:
       columns = []
     return self.data_table_cls(cursor, columns)
-
 
   def get_databases(self):
     # List all the schemas in the database
@@ -92,7 +89,6 @@ class PostgreSQLClient(BaseRDMSClient):
       LOG.exception('Failed to select nspname from pg_catalog.pg_namespace')
       return [self._conn_params['database']]
 
-
   def get_tables(self, database, table_names=[]):
     cursor = self.connection.cursor()
     query = "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = '%s'" % database
@@ -102,7 +98,6 @@ class PostgreSQLClient(BaseRDMSClient):
     cursor.execute(query)
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
-
 
   def get_columns(self, database, table, names_only=True):
     cursor = self.connection.cursor()
@@ -133,7 +128,7 @@ class PostgreSQLClient(BaseRDMSClient):
       columns = [dict(name=row[0], type=row[1], comment='') for row in cursor.fetchall()]
     return columns
 
-  def get_sample_data(self, database, table, column=None, limit=100):
+  def get_sample_data(self, database, table, column=None, nested=None, limit=100):
     column = '"%s"' % column if column else '*'
     statement = 'SELECT %s FROM "%s"."%s" LIMIT %d' % (column, database, table, limit)
     return self.execute_statement(statement)

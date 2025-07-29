@@ -14,21 +14,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import io
-import os
 import logging
+import os
 from datetime import datetime
 from urllib.parse import urlparse
 
 import redis
 
 from desktop.conf import TASK_SERVER_V2
+from desktop.lib import fsmanager
 from desktop.lib.django_util import JsonResponse
-from filebrowser.conf import ARCHIVE_UPLOAD_TEMPDIR
+from desktop.lib.fs.proxyfs import ProxyFS
+from filebrowser.conf import ALLOW_FILE_EXTENSIONS, ARCHIVE_UPLOAD_TEMPDIR, RESTRICT_FILE_EXTENSIONS
+from filebrowser.lib.rwx import filetype, rwx
 
 LOG = logging.getLogger()
 
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 128
+
+
+def get_user_fs(username: str) -> ProxyFS:
+  """Get a filesystem proxy for the given user.
+
+  This function returns a ProxyFS instance, which is a filesystem-like object
+  that routes operations to the appropriate underlying filesystem based on the
+  path's URI scheme (e.g., 'abfs://', 's3a://').
+
+  If a path has no scheme, it defaults to the first available filesystem
+  configured in Hue (e.g. HDFS). All operations are performed on behalf
+  of the specified user.
+
+  Args:
+    username: The name of the user to impersonate for filesystem operations.
+
+  Returns:
+    A ProxyFS object that can be used to access any configured filesystem.
+
+  Raises:
+    ValueError: If the username is empty.
+  """
+  if not username:
+    raise ValueError("Username is required")
+
+  fs = fsmanager.get_filesystem("default")
+  fs.setuser(username)
+
+  return fs
 
 
 def calculate_total_size(uuid, totalparts):
@@ -130,3 +162,65 @@ def release_reserved_space_for_file_uploads(uuid):
     LOG.exception("Failed to release reserved space: %s", str(e))
   finally:
     redis_client.close()
+
+
+def is_file_upload_allowed(file_name):
+  """
+  Check if a file upload is allowed based on file extension restrictions.
+
+  Args:
+    file_name: The name of the file being uploaded
+
+  Returns:
+    tuple: (is_allowed, error_message)
+      - is_allowed: Boolean indicating if the file upload is allowed
+      - error_message: String with error message if not allowed, None otherwise
+  """
+  if not file_name:
+    return True, None
+
+  _, file_type = os.path.splitext(file_name)
+  if file_type:
+    file_type = file_type.lower()
+
+  # Check allow list first - if set, only these extensions are allowed
+  allow_list = ALLOW_FILE_EXTENSIONS.get()
+  if allow_list:
+    # Normalize extensions to lowercase with dots
+    normalized_allow_list = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in allow_list]
+    if file_type not in normalized_allow_list:
+      return False, f'File type "{file_type}" is not permitted. Modify file extension settings to allow this type.'
+
+  # Check restrict list - if set, these extensions are not allowed
+  restrict_list = RESTRICT_FILE_EXTENSIONS.get()
+  if restrict_list:
+    # Normalize extensions to lowercase with dots
+    normalized_restrict_list = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in restrict_list]
+    if file_type in normalized_restrict_list:
+      return False, f'File type "{file_type}" is restricted. Update file extension restrictions to allow this type.'
+
+  return True, None
+
+
+def massage_stats(stats):
+  """Converts a file stats object into a dictionary with extra fields.
+
+  This function takes a file stats object (typically from an underlying
+  filesystem), converts it to a JSON-compatible dictionary, and enriches it
+  with 'type' (e.g., 'file', 'dir') and 'rwx' (e.g., 'rwxr-x---') fields.
+
+  Args:
+    stats: A file stats object from a filesystem implementation.
+
+  Returns:
+    A dictionary containing the file's stats and additional metadata.
+  """
+  stats_dict = stats.to_json_dict()
+  stats_dict.update(
+    {
+      "type": filetype(stats.mode),
+      "rwx": rwx(stats.mode, stats.aclBit),
+    }
+  )
+
+  return stats_dict

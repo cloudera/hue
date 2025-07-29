@@ -17,31 +17,27 @@
 
 from __future__ import absolute_import
 
-import os
-import re
-import json
-import time
-import socket
 import inspect
+import json
 import logging
-import os.path
-import secrets
-import tempfile
 import mimetypes
+import secrets
+import socket
+import time
 import traceback
 from builtins import object
 from urllib.parse import quote, urlparse
 
-import kerberos
 import django.db
-import django_prometheus
 import django.views.static
+import django_prometheus
+import kerberos
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, authenticate, load_backend, login
+from django.contrib.auth import authenticate, BACKEND_SESSION_KEY, load_backend, login, REDIRECT_FIELD_NAME
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.core import exceptions
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect
 from django.urls import resolve
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -56,17 +52,15 @@ from desktop.conf import (
   AUTH,
   CSP_NONCE,
   CUSTOM_CACHE_CONTROL,
-  DJANGO_DEBUG_MODE,
   ENABLE_PROMETHEUS,
+  has_connectors,
   HTTP_ALLOWED_METHODS,
   HUE_LOAD_BALANCER,
+  is_gunicorn_report_enabled,
   KNOX,
-  METRICS,
   REDIRECT_WHITELIST,
   SECURE_CONTENT_SECURITY_POLICY,
   SERVER_USER,
-  has_connectors,
-  is_gunicorn_report_enabled,
 )
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, fsmanager, i18n
@@ -77,9 +71,7 @@ from desktop.lib.metrics import global_registry
 from desktop.lib.view_util import is_ajax
 from desktop.log import get_audit_logger
 from desktop.log.access import access_log, access_warn, log_page_hit
-from hadoop import cluster
 from libsaml.conf import CDP_LOGOUT_URL
-from useradmin.models import User
 
 
 def nonce_exists(response):
@@ -231,11 +223,6 @@ class ClusterMiddleware(Django4MiddlewareAdapterMixin):
   """
   Manages setting request.fs and request.jt
   """
-  def process_request(self, request):
-    # Workaround to prevent RawPostDataException: Store the request body for later access
-    # This is necessary because certain API calls (like file uploads) require the raw request body
-    # to be available. Without this, subsequent accesses to request.body might raise exceptions.
-    request._body = request.body
 
   def process_view(self, request, view_func, view_args, view_kwargs):
     """

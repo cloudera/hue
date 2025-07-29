@@ -18,13 +18,10 @@
 
 from __future__ import absolute_import
 
-import os
-import sys
-import json
 import logging
+import os
 
 import sqlflow
-from django.utils.translation import gettext as _
 from sqlflow.rows import Rows
 
 from desktop.lib.i18n import force_unicode
@@ -63,8 +60,6 @@ class SqlFlowApi(Api):
   @query_error_handler
   @ssh_error_handler
   def execute(self, notebook, snippet):
-    db = self._get_db()
-
     statement = snippet['statement']
     statement = statement.replace('LIMIT 5000', '')
 
@@ -145,7 +140,7 @@ class SqlFlowApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     result = self._execute('SELECT * FROM %s.%s LIMIT 10' % (database, table))
 
     response = {

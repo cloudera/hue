@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import json
 import logging
 import threading
@@ -52,7 +51,7 @@ def _get_impala_server_url(session):
     properties = session.get_properties()
     http_addr = properties.get('coordinator_host', properties.get('http_addr'))
 
-  http_addr = http_addr.replace('http://', '').replace('https://', '')
+  http_addr = http_addr.replace('http://', '').replace('https://', '').replace('coordinator-int.', '')
   return ('https://' if get_webserver_certificate_file() else 'http://') + http_addr
 
 
@@ -76,7 +75,7 @@ class ImpalaServerClient(HiveServerClient):
     # GetExecSummary() only works for closed queries
     try:
       self.close_operation(operation_handle)
-    except QueryServerException as e:
+    except QueryServerException:
       LOG.warning('Failed to close operation for query handle, query may be invalid or already closed.')
 
     resp = self.call(self._client.GetExecSummary, req)
@@ -93,7 +92,7 @@ class ImpalaServerClient(HiveServerClient):
     # TGetRuntimeProfileReq() only works for closed queries
     try:
       self.close_operation(operation_handle)
-    except QueryServerException as e:
+    except QueryServerException:
       LOG.warning('Failed to close operation for query handle, query may be invalid or already closed.')
 
     resp = self.call(self._client.GetRuntimeProfile, req)

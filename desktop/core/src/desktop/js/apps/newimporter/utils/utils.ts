@@ -15,57 +15,66 @@
 // limitations under the License.
 
 import { type ColumnProps } from 'cuix/dist/components/Table';
-import { ImporterFileSource, GuessFieldTypesColumn, ImporterTableData } from '../types';
+import {
+  ImporterFileSource,
+  FilePreviewTableColumn,
+  ImporterTableData,
+  FilePreviewResponse,
+  FileMetaData
+} from '../types';
 import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
+import { toCamelCase } from '../../../utils/string/changeCasing';
 
 export const convertToAntdColumns = (
-  input?: GuessFieldTypesColumn[]
+  input?: FilePreviewTableColumn[]
 ): ColumnProps<ImporterTableData>[] => {
   if (!input) {
     return [];
   }
   return input?.map(item => ({
     title: item.name,
-    dataIndex: item.name,
+    dataIndex: toCamelCase(item.name),
     key: item.name,
     width: '100px'
   }));
 };
 
 export const convertToDataSource = (
-  columns: ColumnProps<ImporterTableData>[],
-  apiResponse?: string[][]
+  inputData: FilePreviewResponse['previewData']
 ): ImporterTableData[] => {
-  if (!apiResponse) {
-    return [];
-  }
-  return apiResponse?.map((rowData, index) => {
-    const row = {
-      importerDataKey: `${rowData[0]}__${index}` // this ensure the key is unique
+  const maxLength = Math.max(...Object.values(inputData).map(arr => arr.length));
+
+  const data = Array.from({ length: maxLength }, (_, index) => {
+    const row: ImporterTableData = {
+      importerDataKey: `importer-row__${index}`
     };
-    columns.forEach((column, index) => {
-      if (column.key) {
-        row[column.key] = rowData[index];
-      }
+    Object.keys(inputData).forEach(key => {
+      row[key] = inputData[key][index] ?? null;
     });
     return row;
   });
+
+  return data;
 };
 
-export const getDefaultTableName = (filePath: string, fileSource: ImporterFileSource): string => {
-  // For local files, the file name is extracted from the path
-  // Example: /**/**/**:fileName;**.fileExtension
-  if (fileSource === ImporterFileSource.LOCAL) {
-    const match = filePath.match(/:(.*?);/);
-    return match?.[1] ?? '';
-  }
+const sanitizeTableName = (name: string): string => {
+  return name
+    .replace(/[^a-zA-Z0-9]/g, '_') // replace non-alphanumeric characters with underscores
+    .replace(/_+/g, '_') // replace multiple underscores with a single underscore
+    .replace(/^_+|_+$/g, ''); // remove leading and trailing underscores
+};
 
-  // For Remote, remove extension and replace '.' with '_'
-  // Example: file.name.fileExtension -> file_name
-  const fileName = getLastDirOrFileNameFromPath(filePath);
-  if (fileName.split('.').length === 1) {
-    // If there is no extension, return the file name as is
-    return fileName;
-  }
-  return fileName.split('.').slice(0, -1).join('_');
+const getLastDirOrFileNameWithoutExtension = (fileName: string): string => {
+  return fileName.split('.').length > 1 ? fileName.split('.').slice(0, -1).join('.') : fileName;
+};
+
+export const getDefaultTableName = (fileMetaData: FileMetaData): string => {
+  const rawFileName =
+    fileMetaData.source === ImporterFileSource.LOCAL
+      ? (fileMetaData.fileName ?? '')
+      : getLastDirOrFileNameFromPath(fileMetaData.path);
+
+  const fileNameWithoutExtension = getLastDirOrFileNameWithoutExtension(rawFileName);
+
+  return sanitizeTableName(fileNameWithoutExtension);
 };

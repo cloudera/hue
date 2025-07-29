@@ -16,14 +16,14 @@
 # limitations under the License.
 
 from librdbms.jdbc import query_and_fetch
+from notebook.connectors.jdbc import Assist, JdbcApi
 
-from notebook.connectors.jdbc import JdbcApi
-from notebook.connectors.jdbc import Assist
 
 class JdbcApiKyuubi(JdbcApi):
 
   def _createAssist(self, db):
     return KyuubiAssist(db)
+
 
 class KyuubiAssist(Assist):
 
@@ -39,7 +39,6 @@ class KyuubiAssist(Assist):
     columns, description = query_and_fetch(self.db, "DESCRIBE %s.%s" % (database, table))
     return [{"comment": col[2] and col[2].strip(), "type": col[1], "name": col[0] and col[0].strip()} for col in columns]
 
-  def get_sample_data(self, database, table, column=None):
+  def get_sample_data(self, database, table, column=None, nested=None):
     column = column or '*'
     return query_and_fetch(self.db, 'SELECT %s FROM %s.%s limit 100' % (column, database, table))
-

@@ -15,16 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import object
 import logging
 import sys
+from builtins import object
 
-from beeswax import data_export
+from django.utils.translation import gettext as _
+
 from desktop.lib.i18n import force_unicode, smart_str
 from librdbms.jdbc import Jdbc, query_and_fetch
-
-from notebook.connectors.base import Api, QueryError, AuthenticationRequired, _get_snippet_name
-from django.utils.translation import gettext as _
+from notebook.connectors.base import Api, AuthenticationRequired, QueryError
 
 LOG = logging.getLogger()
 
@@ -151,14 +150,14 @@ class JdbcApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     if self.db is None:
       raise AuthenticationRequired()
 
     assist = self._createAssist(self.db)
     response = {'status': -1, 'result': {}}
 
-    sample_data, description = assist.get_sample_data(database, table, column)
+    sample_data, description = assist.get_sample_data(database, table, column, nested)
 
     if sample_data or description:
       response['status'] = 0
@@ -226,7 +225,7 @@ class Assist(object):
             database, table))
         return [{"comment": col[2] and col[2].strip(), "type": col[1], "name": col[0] and col[0].strip()} for col in columns]
 
-  def get_sample_data(self, database, table, column=None):
+  def get_sample_data(self, database, table, column=None, nested=None):
     column = column or '*'
     # data, description =  query_and_fetch(self.db, 'SELECT %s FROM %s.%s limit 100' % (column, database, table))
     # response['rows'] = data
