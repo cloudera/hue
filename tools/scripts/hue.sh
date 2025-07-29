@@ -157,9 +157,39 @@ function stop_previous_hueprocs() {
   rm -f /tmp/hue_${HUE_PORT}.pid
 }
 
+
+# Executes Django database migrations with retry logic to handle
+# concurrent migration attempts from multiple hosts.
 function run_syncdb_and_migrate_subcommands() {
-  "$HUE" makemigrations --noinput
-  "$HUE" migrate --fake-initial
+  # Run the initial command first, but allow it to fail gracefully
+  echo "INFO: Running --fake-initial to sync history for legacy databases..."
+  if ! $HUE migrate --fake-initial --noinput; then
+    echo "WARN: --fake-initial failed, but continuing with regular migration..."
+  fi
+
+  # Now, attempt the main migration in a retry loop.
+  local max_attempts=3
+  local delay_seconds=5
+
+  for ((attempt=1; attempt<=max_attempts; attempt++)); do
+    echo "INFO: Applying migrations (Attempt $attempt of $max_attempts)..."
+
+    # If the migrate command succeeds, we're done.
+    if $HUE migrate --noinput; then
+      echo "INFO: Migration successful."
+      return 0
+    fi
+
+    # If we've not reached the max attempts, wait and retry.
+    if [ $attempt -lt $max_attempts ]; then
+      echo "WARN: Migration failed, likely due to a temporary lock. Retrying in $delay_seconds seconds..."
+      sleep $delay_seconds
+    fi
+  done
+
+  # If the loop finishes, all attempts have failed.
+  echo "ERROR: All migration attempts failed after $max_attempts tries." >&2
+  exit 1
 }
 
 if [[ "$1" == "kt_renewer" ]]; then
