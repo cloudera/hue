@@ -111,12 +111,12 @@ const EditColumnsModal = ({
 
   const modalColumns = [
     {
-      title: t('Name'),
+      title: t('Title'),
       dataIndex: 'title',
       render: (text: string, _: EditRow, idx: number) => (
         <Input
           value={text}
-          className="hue-importer-edit-columns-modal__input--name"
+          className="hue-importer-edit-columns-modal__input--title"
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             handleChange(idx, 'title', e.target.value)
           }
@@ -130,17 +130,12 @@ const EditColumnsModal = ({
         <Select
           value={value}
           onChange={(val: string) => handleChange(idx, 'type', val)}
-          className="hue-importer-edit-columns-modal__select--type"
+          className="hue-importer-edit-columns-modal__type-select"
           getPopupContainer={triggerNode => triggerNode.parentNode}
           disabled={sqlTypesLoading || sqlTypes.length === 0}
           loading={sqlTypesLoading}
-        >
-          {sqlTypes.map(type => (
-            <Select.Option key={type} value={type}>
-              {type}
-            </Select.Option>
-          ))}
-        </Select>
+          options={sqlTypes.map(type => ({ label: type, value: type }))}
+        />
       )
     },
     {

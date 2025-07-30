@@ -22,11 +22,11 @@
   }
 
   .hue-importer-edit-columns-modal {
-    &__input--name {
+    &__input--title {
       width: 100px;
     }
 
-    &__select--type {
+    &__type-select {
       border: 1px solid $fluidx-gray-600;
       border-radius: $fluidx-border-radius;
       width: 100px;

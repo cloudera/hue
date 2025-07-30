@@ -33,7 +33,7 @@ describe('EditColumnsModal', () => {
   ];
   const sample = { importerDataKey: 'row1', col1: 'val1', col2: 42 };
 
-  test('lists existing modal columns as expected', () => {
+  it('should list existing modal columns as expected', () => {
     render(
       <EditColumnsModal
         isOpen={true}
@@ -56,7 +56,7 @@ describe('EditColumnsModal', () => {
     expect(screen.getByDisplayValue('comment2')).toBeInTheDocument();
   });
 
-  test('Save should call setColumns with modified data from the table', async () => {
+  it('should call setColumns with modified data from the table when Save is clicked', async () => {
     const setColumns = jest.fn();
     const closeModal = jest.fn();
     render(
