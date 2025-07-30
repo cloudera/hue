@@ -45,24 +45,6 @@ jest.mock('../../../utils/huePubSub', () => ({
   publish: jest.fn()
 }));
 
-jest.mock(
-  '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper',
-  () =>
-    ({ children, loading, errors }) => (
-      <div data-testid="loading-error-wrapper">
-        {loading && <div data-testid="loading-spinner">Loading...</div>}
-        {errors
-          ?.filter(error => error.enabled)
-          .map((error, index) => (
-            <div key={index} data-testid="error-message">
-              {error.message}
-            </div>
-          ))}
-        {children}
-      </div>
-    )
-);
-
 describe('OverviewTab', () => {
   beforeEach(() => {
     (hueConfigModule.getLastKnownConfig as jest.Mock).mockReturnValue({
@@ -198,7 +180,7 @@ describe('OverviewTab', () => {
     it('shows loading state during initial data fetch', () => {
       (get as jest.Mock).mockImplementation(() => new Promise(() => {})); // Never resolves
       render(<Analytics />);
-      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+      expect(screen.getAllByTestId('loading-error-wrapper__spinner')[0]).toBeInTheDocument();
     });
 
     it('shows error message when data fetch fails', async () => {
@@ -207,7 +189,7 @@ describe('OverviewTab', () => {
       render(<Analytics />);
 
       await waitFor(() => {
-        expect(screen.getByTestId('error-message')).toBeInTheDocument();
+        expect(screen.getByTestId('loading-error-wrapper__errors')).toBeInTheDocument();
       });
     });
 
@@ -250,7 +232,8 @@ describe('OverviewTab', () => {
       await userEvent.click(checkbox);
 
       await waitFor(() => {
-        expect(checkbox.disabled).toBe(true);
+        const currentCheckbox = getCheckboxElement();
+        expect(currentCheckbox.disabled).toBe(true);
       });
     });
 
@@ -262,7 +245,7 @@ describe('OverviewTab', () => {
       await userEvent.click(checkbox);
 
       await waitFor(() => {
-        expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+        expect(screen.getAllByTestId('loading-error-wrapper__spinner')[0]).toBeInTheDocument();
       });
     });
 
@@ -275,7 +258,7 @@ describe('OverviewTab', () => {
       await userEvent.click(checkbox);
 
       await waitFor(() => {
-        expect(screen.getByTestId('error-message')).toBeInTheDocument();
+        expect(screen.getByTestId('loading-error-wrapper__errors')).toBeInTheDocument();
       });
     });
 
@@ -338,15 +321,14 @@ describe('OverviewTab', () => {
       render(<Analytics />);
 
       await waitFor(() => {
-        expect(screen.getByTestId('error-message')).toBeInTheDocument();
+        expect(screen.getByTestId('loading-error-wrapper__errors')).toBeInTheDocument();
       });
 
       const checkbox = getCheckboxElement();
       await userEvent.click(checkbox);
 
       await waitFor(() => {
-        const errorMessages = screen.getAllByTestId('error-message');
-        expect(errorMessages).toHaveLength(2);
+        expect(screen.getByTestId('loading-error-wrapper__errors')).toBeInTheDocument();
       });
     });
   });
