@@ -62,6 +62,7 @@ const EditColumnsModal = ({
     data: sqlTypesData,
     loading: sqlTypesLoading,
     error: sqlTypesError
+    //TODO: Make sql_dialect dynamic in future
   } = useLoadData<string[]>(`${SQL_TYPE_MAPPING_API_URL}?sql_dialect=hive`);
 
   const sqlTypes = useMemo(() => {
