@@ -16,14 +16,13 @@
 # limitations under the License.
 
 from __future__ import division
-from librdbms.jdbc import query_and_fetch
 
-from notebook.connectors.jdbc import JdbcApi
-from notebook.connectors.jdbc import Assist
-import time
 import logging
 import math
+import time
 
+from librdbms.jdbc import query_and_fetch
+from notebook.connectors.jdbc import Assist, JdbcApi
 
 LOG = logging.getLogger()
 
@@ -44,10 +43,9 @@ class VerticaAssist(Assist):
             cache_key not in self.cached_data
             or time.time() - self.cached_data[cache_key]["time"] > self.freeze_time
         ):
-            dbs, description = query_and_fetch(
-                self.db,
-                "select schema_name FROM v_catalog.schemata where is_system_schema=0 and schema_name not in ('v_func', 'v_txtindex') order by 1",
-            )
+            query = ("select schema_name FROM v_catalog.schemata where is_system_schema=0 "
+                     "and schema_name not in ('v_func', 'v_txtindex') order by 1")
+            dbs, description = query_and_fetch(self.db, query)
             list_of_db = [db[0] and db[0].strip() for db in dbs]
             VerticaAssist.cached_data[cache_key] = {
                 "time": time.time(),
@@ -128,7 +126,7 @@ class VerticaAssist(Assist):
             VerticaAssist.cache_use_stat["cache"] += 1
         return VerticaAssist.cached_data[cache_key]["result"]
 
-    def get_sample_data(self, database, table, column=None):
+    def get_sample_data(self, database, table, column=None, nested=None):
         column = column or "*"
         return query_and_fetch(
             self.db, "SELECT %s FROM %s.%s limit 10" % (column, database, table)

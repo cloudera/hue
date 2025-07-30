@@ -21,12 +21,14 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from django.http import HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
+from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.test import APIRequestFactory
 
 from aws.s3.s3fs import S3ListAllBucketsException
 from desktop.lib.exceptions_renderable import PopupException
 from filebrowser.api import copy, download, get_all_filesystems, listdir_paged, mkdir, move, rename, touch, UploadFileAPI
-from filebrowser.conf import REDIRECT_DOWNLOAD, RESTRICT_FILE_EXTENSIONS, SHOW_DOWNLOAD_BUTTON
+from filebrowser.conf import REDIRECT_DOWNLOAD, SHOW_DOWNLOAD_BUTTON
 from hadoop.fs.exceptions import WebHdfsException
 
 
@@ -172,111 +174,222 @@ class TestMkdirAPI:
 
 
 class TestRenameAPI:
-  def test_rename_success(self):
-    request = Mock(
-      method="POST",
-      POST={"source_path": "s3a://test-bucket/test-user/source.txt", "destination_path": "new_name.txt"},
-      fs=Mock(
-        exists=Mock(return_value=False),
-        join=Mock(return_value="s3a://test-bucket/test-user/new_name.txt"),
-        rename=Mock(),
-      ),
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_success(self, mock_rename_operation, mock_serializer_class):
+    # Create mock schema and serializer
+    mock_schema = {"source_path": "/user/test/file.txt", "destination_path": "/user/test/file_new.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.return_value = {"message": "Renamed successfully"}
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == {"message": "Renamed successfully"}
+    mock_rename_operation.assert_called_once()
+
+  @patch("filebrowser.api.RenameSerializer")
+  def test_rename_invalid_data(self, mock_serializer_class):
+    # Mock invalid serializer
+    mock_serializer = Mock(is_valid=Mock(return_value=False), errors={"source_path": ["This field is required."]})
+    mock_serializer_class.return_value = mock_serializer
+
+    request = APIRequestFactory().post("/storage/rename", data={}, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data == {"source_path": ["This field is required."]}
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_value_error(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/file.txt", "destination_path": "/user/test/existing.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.side_effect = ValueError("Destination path already exists")
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data == {"error": "Destination path already exists"}
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_general_exception(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/file.txt", "destination_path": "/user/test/file_new.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.side_effect = Exception("Filesystem error")
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert response.data == {"error": "An unexpected error occurred during rename operation"}
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_relative_path(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/document.txt", "destination_path": "document_v2.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.return_value = {"message": "Renamed '/user/test/document.txt' to '/user/test/document_v2.txt' successfully"}
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "successfully" in response.data["message"]
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_s3_paths(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "s3a://bucket/folder/file.txt", "destination_path": "s3a://bucket/folder/file_renamed.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.return_value = {"message": "Renamed successfully"}
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == {"message": "Renamed successfully"}
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_directory(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/old_folder", "destination_path": "/user/test/new_folder"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.return_value = {"message": "Renamed '/user/test/old_folder' to '/user/test/new_folder' successfully"}
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "old_folder" in response.data["message"]
+    assert "new_folder" in response.data["message"]
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  @patch("filebrowser.api.LOG.exception")
+  def test_rename_logs_exception(self, mock_log_exception, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/file.txt", "destination_path": "/user/test/file_new.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_rename_operation.side_effect = Exception("Test error")
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    mock_log_exception.assert_called_once()
+    assert "Error renaming file" in mock_log_exception.call_args[0][0]
+
+  @patch("filebrowser.api.RenameSerializer")
+  def test_rename_validation_errors(self, mock_serializer_class):
+    # Mock serializer with multiple validation errors
+    mock_serializer = Mock(
+      is_valid=Mock(return_value=False),
+      errors={"source_path": ["Path cannot be empty"], "destination_path": ["Path traversal patterns are not allowed"]},
     )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
-    try:
-      response = rename(request)
+    mock_serializer_class.return_value = mock_serializer
 
-      assert response.status_code == 200
-      request.fs.rename.assert_called_once_with("s3a://test-bucket/test-user/source.txt", "s3a://test-bucket/test-user/new_name.txt")
-    finally:
-      reset()
+    request = APIRequestFactory().post("/storage/rename", data={"source_path": "", "destination_path": "../etc"}, format="json")
+    request.user = Mock(username="test_user")
 
-  def test_rename_restricted_file_type(self):
-    request = Mock(
-      method="POST",
-      POST={"source_path": "s3a://test-bucket/test-user/source.txt", "destination_path": "new_name.exe"},
-      fs=Mock(
-        rename=Mock(),
-      ),
-    )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(".exe,.txt")
-    try:
-      response = rename(request)
+    response = rename(request)
 
-      assert response.status_code == 403
-      assert response.content.decode("utf-8") == 'Cannot rename file to a restricted file type: ".exe"'
-    finally:
-      reset()
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "source_path" in response.data
+    assert "destination_path" in response.data
 
-  def test_rename_hash_in_path(self):
-    request = Mock(
-      method="POST",
-      POST={"source_path": "s3a://test-bucket/test-user/source.txt", "destination_path": "new#name.txt"},
-      fs=Mock(
-        rename=Mock(),
-      ),
-    )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
-    try:
-      response = rename(request)
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_unicode_paths(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {"source_path": "/user/test/文档.txt", "destination_path": "/user/test/文档_新.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
 
-      assert response.status_code == 400
-      assert response.content.decode("utf-8") == "Hashes are not allowed in file or directory names. Please choose a different name."
-    finally:
-      reset()
+    mock_rename_operation.return_value = {"message": "Renamed '/user/test/文档.txt' to '/user/test/文档_新.txt' successfully"}
 
-  def test_rename_destination_exists(self):
-    request = Mock(
-      method="POST",
-      POST={"source_path": "s3a://test-bucket/test-user/source.txt", "destination_path": "new_name.txt"},
-      fs=Mock(
-        rename=Mock(),
-        exists=Mock(return_value=True),
-        join=Mock(return_value="s3a://test-bucket/test-user/new_name.txt"),
-      ),
-    )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
-    try:
-      response = rename(request)
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
 
-      assert response.status_code == 409
-      assert response.content.decode("utf-8") == "The destination path s3a://test-bucket/test-user/new_name.txt already exists."
-    finally:
-      reset()
+    response = rename(request)
 
-  def test_rename_no_source_path(self):
-    request = Mock(
-      method="POST",
-      POST={"destination_path": "new_name.txt"},
-      fs=Mock(
-        rename=Mock(),
-      ),
-    )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
-    try:
-      response = rename(request)
+    assert response.status_code == status.HTTP_200_OK
+    assert "文档.txt" in response.data["message"]
+    assert "文档_新.txt" in response.data["message"]
 
-      assert response.status_code == 400
-      assert response.content.decode("utf-8") == "Missing required parameters: source_path and destination_path"
-    finally:
-      reset()
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  def test_rename_special_characters(self, mock_rename_operation, mock_serializer_class):
+    mock_schema = {
+      "source_path": "/user/test/file with spaces & (special).txt",
+      "destination_path": "/user/test/file_with_spaces_and_special.txt",
+    }
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema)
+    mock_serializer_class.return_value = mock_serializer
 
-  def test_rename_no_destination_path(self):
-    request = Mock(
-      method="POST",
-      POST={"source_path": "s3a://test-bucket/test-user/source.txt"},
-      fs=Mock(
-        rename=Mock(),
-      ),
-    )
-    reset = RESTRICT_FILE_EXTENSIONS.set_for_testing(None)
-    try:
-      response = rename(request)
+    mock_rename_operation.return_value = {"message": "Renamed successfully"}
 
-      assert response.status_code == 400
-      assert response.content.decode("utf-8") == "Missing required parameters: source_path and destination_path"
-    finally:
-      reset()
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema, format="json")
+    request.user = Mock(username="test_user")
+
+    response = rename(request)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data == {"message": "Renamed successfully"}
+
+  @patch("filebrowser.api.RenameSerializer")
+  @patch("filebrowser.api.rename_file_or_directory")
+  @patch("filebrowser.api.RenameSchema")
+  def test_rename_schema_creation(self, mock_rename_schema_class, mock_rename_operation, mock_serializer_class):
+    mock_schema_data = {"source_path": "/user/test/file.txt", "destination_path": "/user/test/file_new.txt"}
+    mock_serializer = Mock(is_valid=Mock(return_value=True), validated_data=mock_schema_data)
+    mock_serializer_class.return_value = mock_serializer
+
+    mock_schema_instance = Mock()
+    mock_rename_schema_class.return_value = mock_schema_instance
+
+    mock_rename_operation.return_value = {"message": "Success"}
+
+    request = APIRequestFactory().post("/storage/rename", data=mock_schema_data, format="json")
+    request.user = Mock(username="test_user")
+
+    rename(request)
+
+    # Verify RenameSchema was created with the validated data
+    mock_rename_schema_class.assert_called_once_with(**mock_schema_data)
+    # Verify rename operation was called with the schema instance
+    mock_rename_operation.assert_called_once_with(data=mock_schema_instance, username="test_user")
 
 
 class TestMoveAPI:
@@ -1405,8 +1518,8 @@ class TestUploadFileAPI:
     response = self.view.post(self.request)
 
     assert response.status_code == 400
-    assert "error" in response.data
-    assert response.data["error"] == "File upload failed or was not handled correctly by the upload handler."
+    assert response.data is not None
+    assert response.data.get("error") == "File upload failed or was not handled correctly by the upload handler."
 
   def test_post_raises_popup_exception(self):
     self.request.FILES = MagicMock()
