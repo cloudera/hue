@@ -50,27 +50,21 @@ Each query statement grabs a connection from the engine and will return it after
 Disposing the engine closes all its connections.
 '''
 
-import re
-import sys
-import json
-import uuid
-import logging
 import datetime
+import json
+import logging
+import re
 import textwrap
+import uuid
 from string import Template
 from urllib.parse import parse_qs as urllib_parse_qs, quote_plus as urllib_quote_plus, urlparse as urllib_urlparse
 
-from django.core.cache import caches
-from django.utils.translation import gettext as _
 from past.builtins import long
-from sqlalchemy import MetaData, Table, create_engine, inspect
+from sqlalchemy import create_engine, inspect, MetaData, Table
 from sqlalchemy.exc import CompileError, NoSuchTableError, OperationalError, ProgrammingError, UnsupportedCompilationError
 
-from beeswax import data_export
-from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
-from librdbms.server import dbms
-from notebook.connectors.base import Api, AuthenticationRequired, QueryError, QueryExpired, _get_snippet_name
+from notebook.connectors.base import Api, AuthenticationRequired, QueryError, QueryExpired
 from notebook.models import escape_rows
 
 ENGINES = {}
@@ -463,14 +457,14 @@ class SqlAlchemyApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     engine = self._get_engine()
     inspector = inspect(engine)
 
     assist = Assist(inspector, engine, backticks=self.backticks, api=self)
     response = {'status': -1, 'result': {}}
 
-    metadata, sample_data = assist.get_sample_data(database, table, column=column, operation=operation)
+    metadata, sample_data = assist.get_sample_data(database, table, column=column, nested=nested, operation=operation)
 
     response['status'] = 0
     response['rows'] = escape_rows(sample_data)
@@ -548,7 +542,7 @@ class Assist(object):
     except NoSuchTableError:
       return []
 
-  def get_sample_data(self, database, table, column=None, operation=None):
+  def get_sample_data(self, database, table, column=None, nested=None, operation=None):
     if operation == 'hello':
       statement = "SELECT 'Hello World!'"
     else:
