@@ -24,17 +24,17 @@
     height: 100%;
 
     &__metadata {
-      background-color: white;
+      background-color: vars.$cdl-white;
       padding: 16px;
       font-size: 12px;
-      color: #5a656d;
+      color: vars.$cdl-gray-700;
     }
 
     &__main-section {
       display: flex;
       flex-direction: column;
       flex: 1;
-      background-color: white;
+      background-color: vars.$cdl-white;
     }
 
     &__header-section {

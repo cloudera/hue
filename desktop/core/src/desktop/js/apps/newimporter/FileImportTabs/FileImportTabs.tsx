@@ -50,7 +50,7 @@ const FileImportTabs = ({
     }));
   };
 
-  const { save, loading: finalizingImport } = useSaveData(FINISH_IMPORT_URL);
+  const { save: finishImport, loading: finalizingImport } = useSaveData(FINISH_IMPORT_URL);
 
   const handleFinishImport = () => {
     const source = {
@@ -71,7 +71,7 @@ const FileImportTabs = ({
     formData.append('source', JSON.stringify(source));
     formData.append('destination', JSON.stringify(destination));
 
-    save(formData);
+    finishImport(formData);
   };
 
   const tabItems = [
