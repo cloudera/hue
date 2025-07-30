@@ -116,7 +116,7 @@ const EditColumnsModal = ({
       render: (text: string, _: EditRow, idx: number) => (
         <Input
           value={text}
-          className="hue-importer-edit-columns-modal__input--title"
+          className="hue-importer-edit-columns-modal__input-title"
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             handleChange(idx, 'title', e.target.value)
           }

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@import '../../../../components/styles/variables';
+@use 'variables' as vars;
 
 .antd.cuix {
   .ant-modal-content {
@@ -22,13 +22,13 @@
   }
 
   .hue-importer-edit-columns-modal {
-    &__input--title {
+    &__input-title {
       width: 100px;
     }
 
     &__type-select {
-      border: 1px solid $fluidx-gray-600;
-      border-radius: $fluidx-border-radius;
+      border: 1px solid vars.$fluidx-gray-600;
+      border-radius: vars.$fluidx-border-radius;
       width: 100px;
     }
   }
