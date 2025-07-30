@@ -42,6 +42,12 @@ export interface DefaultApiResponse {
   content?: string;
 }
 
+export enum HttpMethod {
+  POST = 'post',
+  PUT = 'put',
+  PATCH = 'patch'
+}
+
 export interface ApiFetchOptions<T, E = AxiosError<DefaultApiResponse>> extends AxiosRequestConfig {
   silenceErrors?: boolean;
   ignoreSuccessErrors?: boolean;
@@ -193,7 +199,9 @@ const getCancelToken = (): { cancelToken: CancelToken; cancel: () => void } => {
   return { cancelToken: cancelTokenSource.token, cancel: cancelTokenSource.cancel };
 };
 
-export const post = <T, U = unknown, E = AxiosError>(
+// Shared HTTP method for post, put, patch requests
+export const sendApiRequest = <T, U = unknown, E = AxiosError>(
+  method: HttpMethod,
   url: string,
   data?: U,
   options?: ApiFetchOptions<T, E>
@@ -204,11 +212,10 @@ export const post = <T, U = unknown, E = AxiosError>(
 
     const encodeData = options?.qsEncodeData == undefined || options?.qsEncodeData;
 
-    axiosInstance
-      .post<T & DefaultApiResponse>(url, encodeData ? qs.stringify(data) : data, {
-        cancelToken,
-        ...options
-      })
+    axiosInstance[method]<T & DefaultApiResponse>(url, encodeData ? qs.stringify(data) : data, {
+      cancelToken,
+      ...options
+    })
       .then(response => {
         handleResponse(response, resolve, reject, options);
       })
@@ -232,6 +239,24 @@ export const post = <T, U = unknown, E = AxiosError>(
       }
     });
   });
+
+export const post = <T, U = unknown, E = AxiosError>(
+  url: string,
+  data?: U,
+  options?: ApiFetchOptions<T, E>
+): CancellablePromise<T> => sendApiRequest(HttpMethod.POST, url, data, options);
+
+export const put = <T, U = unknown, E = AxiosError>(
+  url: string,
+  data?: U,
+  options?: ApiFetchOptions<T, E>
+): CancellablePromise<T> => sendApiRequest(HttpMethod.PUT, url, data, options);
+
+export const patch = <T, U = unknown, E = AxiosError>(
+  url: string,
+  data?: U,
+  options?: ApiFetchOptions<T, E>
+): CancellablePromise<T> => sendApiRequest(HttpMethod.PATCH, url, data, options);
 
 export const get = <T, U = unknown, E = AxiosError<DefaultApiResponse>>(
   url: string,
@@ -252,86 +277,6 @@ export const get = <T, U = unknown, E = AxiosError<DefaultApiResponse>>(
       })
       .catch((err: AxiosError<DefaultApiResponse>) => {
         handleErrorResponse(err, reject, options);
-      })
-      .finally(() => {
-        completed = true;
-      });
-
-    onCancel(() => {
-      if (!completed) {
-        cancel();
-      }
-    });
-  });
-
-export const put = <T, U = unknown, E = AxiosError>(
-  url: string,
-  data?: U,
-  options?: ApiFetchOptions<T, E>
-): CancellablePromise<T> =>
-  new CancellablePromise((resolve, reject, onCancel) => {
-    const { cancelToken, cancel } = getCancelToken();
-    let completed = false;
-
-    const encodeData = options?.qsEncodeData == undefined || options?.qsEncodeData;
-
-    axiosInstance
-      .put<T & DefaultApiResponse>(url, encodeData ? qs.stringify(data) : data, {
-        cancelToken,
-        ...options
-      })
-      .then(response => {
-        handleResponse(response, resolve, reject, options);
-      })
-      .catch((err: AxiosError<DefaultApiResponse>) => {
-        if (options && options.handleError) {
-          options.handleError(err, resolve, reason => {
-            handleErrorResponse(err, reject, options);
-            notifyError(String(reason), err, options);
-          });
-        } else {
-          handleErrorResponse(err, reject, options);
-        }
-      })
-      .finally(() => {
-        completed = true;
-      });
-
-    onCancel(() => {
-      if (!completed) {
-        cancel();
-      }
-    });
-  });
-
-export const patch = <T, U = unknown, E = AxiosError>(
-  url: string,
-  data?: U,
-  options?: ApiFetchOptions<T, E>
-): CancellablePromise<T> =>
-  new CancellablePromise((resolve, reject, onCancel) => {
-    const { cancelToken, cancel } = getCancelToken();
-    let completed = false;
-
-    const encodeData = options?.qsEncodeData == undefined || options?.qsEncodeData;
-
-    axiosInstance
-      .patch<T & DefaultApiResponse>(url, encodeData ? qs.stringify(data) : data, {
-        cancelToken,
-        ...options
-      })
-      .then(response => {
-        handleResponse(response, resolve, reject, options);
-      })
-      .catch((err: AxiosError<DefaultApiResponse>) => {
-        if (options && options.handleError) {
-          options.handleError(err, resolve, reason => {
-            handleErrorResponse(err, reject, options);
-            notifyError(String(reason), err, options);
-          });
-        } else {
-          handleErrorResponse(err, reject, options);
-        }
       })
       .finally(() => {
         completed = true;
