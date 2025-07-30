@@ -25,14 +25,15 @@ except ImportError as e:
 
 from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
-
 LOG = logging.getLogger()
 
 
-class DataTable(BaseRDBMSDataTable): pass
+class DataTable(BaseRDBMSDataTable):
+  pass
 
 
-class Result(BaseRDBMSResult): pass
+class Result(BaseRDBMSResult):
+  pass
 
 
 class OracleClient(BaseRDMSClient):
@@ -66,11 +67,9 @@ class OracleClient(BaseRDMSClient):
     return "%s/%s@%s" % (self.query_server['username'],
                          self.query_server['password'], dsn)
 
-
   def use(self, database):
     # Oracle credentials are on a per database basis.
     pass
-
 
   def execute_statement(self, statement):
     cursor = self.connection.cursor()
@@ -82,10 +81,8 @@ class OracleClient(BaseRDMSClient):
       columns = []
     return self.data_table_cls(cursor, columns)
 
-
   def get_databases(self):
     return [self.query_server['name']]
-
 
   def get_tables(self, database, table_names=[]):
     cursor = self.connection.cursor()
@@ -97,7 +94,6 @@ class OracleClient(BaseRDMSClient):
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
-
   def get_columns(self, database, table, names_only=True):
     cursor = self.connection.cursor()
     cursor.execute("SELECT column_name, data_type FROM user_tab_cols WHERE table_name = '%s'" % table)
@@ -108,7 +104,7 @@ class OracleClient(BaseRDMSClient):
       columns = [dict(name=row[0], type=row[1], comment='') for row in cursor.fetchall()]
     return columns
 
-  def get_sample_data(self, database, table, column=None, limit=100):
-    column = '"%s"' % column  if column else '*'
+  def get_sample_data(self, database, table, column=None, nested=None, limit=100):
+    column = '"%s"' % column if column else '*'
     statement = 'SELECT %s FROM "%s"."%s" LIMIT %d' % (column, database, table, limit)
     return self.execute_statement(statement)
