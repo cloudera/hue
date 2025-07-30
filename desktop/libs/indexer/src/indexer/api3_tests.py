@@ -15,9 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import json
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 from urllib.parse import unquote as urllib_unquote
 
 from django.core.files.uploadhandler import InMemoryUploadedFile
@@ -102,19 +101,17 @@ def test_col_names():
 
 
 def test_guess_format_excel_remote_file():
-  with patch('indexer.api3.pd') as pd:
-    with patch('indexer.api3.MorphlineIndexer') as MorphlineIndexer:
-      file_format = {
-        'inputFormat': 'file',
-        'path': 's3a://gethue/example1.xlsx',
-        'file_type': ''
-      }
-      file_format = json.dumps(file_format)
-      request = Mock(
-        POST={'fileFormat': file_format}
-      )
+  file_format = {
+    'inputFormat': 'file',
+    'path': 's3a://gethue/example1.xlsx',
+    'file_type': ''
+  }
+  file_format = json.dumps(file_format)
+  request = Mock(
+    POST={'fileFormat': file_format}
+  )
 
-      response = guess_format(request)
-      response = json.loads(response.content)
+  response = guess_format(request)
+  response = json.loads(response.content)
 
-      assert response['type'] == "excel"
+  assert response['type'] == "excel"
