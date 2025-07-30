@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
 import json
+import logging
+import re
 import time
 import uuid
-import logging
 from builtins import object
 
 from django.utils.encoding import smart_str
@@ -27,10 +27,9 @@ from django.utils.translation import gettext as _
 
 from beeswax.common import find_compute, is_compute
 from desktop.auth.backend import is_admin
-from desktop.conf import TASK_SERVER, has_connectors, is_cdw_compute_enabled
+from desktop.conf import has_connectors, is_cdw_compute_enabled, TASK_SERVER
 from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_str
 from metadata.optimizer.base import get_api as get_optimizer_api
 from notebook.conf import get_ordered_interpreters
 from notebook.sql_utils import get_current_statement
@@ -594,7 +593,7 @@ class Api(object):
   def get_jobs(self, notebook, snippet, logs):
     return []
 
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     raise NotImplementedError()
 
   def explain(self, notebook, snippet):

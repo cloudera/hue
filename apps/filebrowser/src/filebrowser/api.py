@@ -28,8 +28,9 @@ from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedir
 from django.utils.http import http_date
 from django.views.static import was_modified_since
 from rest_framework import status
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.exceptions import NotFound
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -51,11 +52,12 @@ from filebrowser.conf import (
   ENABLE_EXTRACT_UPLOADED_ARCHIVE,
   FILE_DOWNLOAD_CACHE_CONTROL,
   REDIRECT_DOWNLOAD,
-  RESTRICT_FILE_EXTENSIONS,
   SHOW_DOWNLOAD_BUTTON,
 )
 from filebrowser.lib.rwx import compress_mode, filetype, rwx
-from filebrowser.serializers import UploadFileSerializer
+from filebrowser.operations import rename_file_or_directory
+from filebrowser.schemas import RenameSchema
+from filebrowser.serializers import RenameSerializer, UploadFileSerializer
 from filebrowser.utils import get_user_fs, parse_broker_url
 from filebrowser.views import (
   _can_inline_display,
@@ -673,39 +675,36 @@ def save_file(request):
   return HttpResponse(status=200)
 
 
-@api_error_handler
+@api_view(["POST"])
+@parser_classes([JSONParser])
 def rename(request):
-  source_path = request.POST.get("source_path", "")
-  destination_path = request.POST.get("destination_path", "")
+  """
+  Rename a file or directory.
 
-  # Check if source and destination paths are provided
-  if not source_path or not destination_path:
-    return HttpResponse("Missing required parameters: source_path and destination_path", status=400)
+  This endpoint renames a file or directory from a source path to a destination path.
+  The destination can be an absolute path or a relative path from the source's parent directory.
 
-  # Extract file extensions from paths
-  _, source_path_ext = os.path.splitext(source_path)
-  _, dest_path_ext = os.path.splitext(destination_path)
+  Args:
+    request (HttpRequest): The request object containing source and destination paths.
 
-  restricted_file_types = [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()] if RESTRICT_FILE_EXTENSIONS.get() else []
-  # Check if destination path has a restricted file type and it doesn't match the source file type
-  if dest_path_ext.lower() in restricted_file_types and (source_path_ext.lower() != dest_path_ext.lower()):
-    return HttpResponse(f'Cannot rename file to a restricted file type: "{dest_path_ext}"', status=403)
+  Returns:
+    Response: A Response object with a success message or an error message with the appropriate status code.
+  """
+  serializer = RenameSerializer(data=request.data)
 
-  # Check if destination path contains a hash character
-  if "#" in destination_path:
-    return HttpResponse("Hashes are not allowed in file or directory names. Please choose a different name.", status=400)
+  if not serializer.is_valid():
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  # If destination path doesn't have a directory specified, use the same directory as the source path
-  if "/" not in destination_path:
-    source_dir = os.path.dirname(source_path)
-    destination_path = request.fs.join(source_dir, destination_path)
+  rename_params = RenameSchema(**serializer.validated_data)
+  try:
+    result = rename_file_or_directory(data=rename_params, username=request.user.username)
+    return Response(result, status=status.HTTP_200_OK)
 
-  # Check if destination path already exists
-  if request.fs.exists(destination_path):
-    return HttpResponse(f"The destination path {destination_path} already exists.", status=409)
-
-  request.fs.rename(source_path, destination_path)
-  return HttpResponse(status=200)
+  except ValueError as e:
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+  except Exception as e:
+    LOG.exception(f"Error renaming file: {e}")
+    return Response({"error": "An unexpected error occurred during rename operation"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 def _is_destination_parent_of_source(request, source_path, destination_path):

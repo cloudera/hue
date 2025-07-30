@@ -15,13 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
-import sys
 import json
-import time
 import logging
+import re
 import textwrap
-from builtins import object, range
+import time
+from builtins import object
 
 from django.utils.translation import gettext as _
 
@@ -32,8 +31,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.models import DefaultConfiguration
-from notebook.connectors.base import Api, QueryError, SessionExpired, _get_snippet_session
-from notebook.data_export import download as spark_download
+from notebook.connectors.base import _get_snippet_session, Api, QueryError, SessionExpired
 
 LOG = logging.getLogger()
 
@@ -41,7 +39,7 @@ LOG = logging.getLogger()
 try:
   from spark.conf import LIVY_SERVER_SESSION_KIND
   from spark.livy_client import get_api as get_spark_api
-except ImportError as e:
+except ImportError:
   LOG.exception('Spark is not enabled')
 
 SESSION_KEY = '%(username)s-%(interpreter_name)s'
@@ -118,7 +116,7 @@ class SparkApi(Api):
     api = self.get_api()
     try:
       session_present = api.get_session(session['id'])
-    except Exception as e:
+    except Exception:
       session_present = None
 
     if session_present and session_present['state'] not in ('dead', 'shutting_down', 'error', 'killed'):
@@ -348,7 +346,7 @@ class SparkApi(Api):
     session = self._handle_session_health_check(session)
 
     try:
-      response = api.cancel(session['id'])
+      api.cancel(session['id'])
     except Exception as e:
       message = force_unicode(str(e)).lower()
       LOG.debug(message)
@@ -487,7 +485,7 @@ class SparkApi(Api):
 
   def _show_tables(self, api, session, snippet_type, database):
     use_db_execute = self._execute(api, session, snippet_type, 'USE %(database)s' % {'database': database})
-    use_db_resp = self._check_status_and_fetch_result(api, session, use_db_execute)
+    self._check_status_and_fetch_result(api, session, use_db_execute)
 
     show_tables_execute = self._execute(api, session, snippet_type, 'SHOW TABLES')
     tables_list = self._check_status_and_fetch_result(api, session, show_tables_execute)
@@ -497,7 +495,7 @@ class SparkApi(Api):
 
   def _get_columns(self, api, session, snippet_type, database, table):
     use_db_execute = self._execute(api, session, snippet_type, 'USE %(database)s' % {'database': database})
-    use_db_resp = self._check_status_and_fetch_result(api, session, use_db_execute)
+    self._check_status_and_fetch_result(api, session, use_db_execute)
 
     describe_tables_execute = self._execute(api, session, snippet_type, 'DESCRIBE %(table)s' % {'table': table})
     columns_list = self._check_status_and_fetch_result(api, session, describe_tables_execute)
@@ -519,7 +517,7 @@ class SparkApi(Api):
 
       return cols
 
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     api = self.get_api()
     response = {
       'status': 0,
@@ -797,7 +795,7 @@ class SparkDescribeTable(Table):
       elif 'LazySimpleSerDe' in self.serde:
         details_format = 'text'
       else:
-        details_format = serde.rsplit('.', 1)[-1]
+        details_format = self.serde.rsplit('.', 1)[-1]
 
       self._details = {
         'stats': self.stats,

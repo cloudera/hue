@@ -15,14 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import logging
+import sys
 from builtins import next, object
 
-from beeswax import data_export
+from django.utils.translation import gettext as _
+
 from desktop.lib.i18n import force_unicode
 from librdbms.server import dbms
-from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name
+from notebook.connectors.base import Api, QueryError, QueryExpired
 
 LOG = logging.getLogger()
 
@@ -130,14 +131,14 @@ class RdbmsApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     query_server = self._get_query_server()
     db = dbms.get(self.user, query_server)
 
     assist = Assist(db)
     response = {'status': -1, 'result': {}}
 
-    sample_data = assist.get_sample_data(database, table, column)
+    sample_data = assist.get_sample_data(database, table, column, nested)
 
     if sample_data:
       response['status'] = 0
@@ -204,7 +205,7 @@ class Assist(object):
   def get_columns(self, database, table):
     return self.db.get_columns(database, table, names_only=False)
 
-  def get_sample_data(self, database, table, column=None):
+  def get_sample_data(self, database, table, column=None, nested=None):
     return self.db.get_sample_data(database, table, column)
 
 

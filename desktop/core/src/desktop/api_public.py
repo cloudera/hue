@@ -300,12 +300,6 @@ def storage_touch(request):
   return filebrowser_api.touch(django_request)
 
 
-@api_view(["POST"])
-def storage_rename(request):
-  django_request = get_django_request(request)
-  return filebrowser_api.rename(django_request)
-
-
 @api_view(["GET"])
 def storage_content_summary(request):
   django_request = get_django_request(request)
