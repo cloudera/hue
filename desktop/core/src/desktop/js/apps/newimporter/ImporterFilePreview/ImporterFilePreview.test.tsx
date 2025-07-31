@@ -85,6 +85,7 @@ jest.mock('./DestinationSettings/DestinationSettings', () => {
     defaultValues?: Record<string, unknown>;
     onChange: (name: string, value: string) => void;
   }) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const React = require('react');
 
     React.useEffect(() => {
