@@ -20,12 +20,26 @@ import { DataCatalog } from '../../../catalog/dataCatalog';
 import { filterEditorConnectors } from '../../../config/hueConfig';
 import { getNamespaces } from '../../../catalog/contextCatalog';
 
+interface TableEntry {
+  name: string;
+  type: string;
+  comment: string;
+}
+
+interface LoadingState {
+  connector: boolean;
+  namespace: boolean;
+  compute: boolean;
+  database: boolean;
+  table: boolean;
+}
+
 const fetchSourceMeta = async (
   connector: Connector,
   namespace: Namespace,
   compute: Compute,
   path: string[] = []
-): Promise<{ databases?: string[]; tables_meta?: string[] }> => {
+): Promise<{ databases?: string[]; tables_meta?: TableEntry[] }> => {
   const dataCatalog = new DataCatalog(connector);
   const dataEntry = await dataCatalog.getEntry({
     namespace,
@@ -37,19 +51,19 @@ const fetchSourceMeta = async (
 };
 
 interface UseDataCatalog {
-  loading: boolean;
+  loading: LoadingState;
   connectors: EditorInterpreter[];
   connector: Connector | null;
   namespace: Namespace | null;
   computes: Compute[];
   compute: Compute | null;
-  database: string | null;
+  database: string | undefined;
   databases: string[];
-  tables: string[];
+  tables: TableEntry[];
   setConnector: (connector: Connector) => void;
   setNamespace: (namespace: Namespace) => void;
   setCompute: (compute: Compute) => void;
-  setDatabase: (database: string | null) => void;
+  setDatabase: (database: string | undefined) => void;
 }
 
 export const useDataCatalog = (): UseDataCatalog => {
@@ -58,10 +72,16 @@ export const useDataCatalog = (): UseDataCatalog => {
   const [connector, setConnector] = useState<Connector | null>(null);
   const [namespace, setNamespace] = useState<Namespace | null>(null);
   const [compute, setCompute] = useState<Compute | null>(null);
-  const [loading, setLoading] = useState(true);
   const [databases, setDatabases] = useState<string[]>([]);
-  const [database, setDatabase] = useState<string | null>(null);
-  const [tables, setTables] = useState<string[]>([]);
+  const [database, setDatabase] = useState<string | undefined>();
+  const [tables, setTables] = useState<TableEntry[]>([]);
+  const [loading, setLoading] = useState<LoadingState>({
+    connector: false,
+    namespace: false,
+    compute: false,
+    database: false,
+    table: false
+  });
 
   const loadDatabases = async (
     namespace: Namespace,
@@ -69,15 +89,16 @@ export const useDataCatalog = (): UseDataCatalog => {
     connector: Connector
   ): Promise<void> => {
     try {
-      setLoading(true);
+      setLoading(prev => ({ ...prev, database: true }));
       const databaseEntries = await fetchSourceMeta(connector, namespace, compute);
       setDatabases(databaseEntries?.databases ?? []);
-      setDatabase(databaseEntries.databases?.[0] ?? null);
-      await loadTables(connector, namespace, compute, databaseEntries.databases?.[0]);
+      setDatabase(databaseEntries.databases?.[0]);
     } catch (error) {
-      console.error('Error loading databases:', error);
+      setDatabases([]);
+      setDatabase(undefined);
+      setTables([]);
     } finally {
-      setLoading(false);
+      setLoading(prev => ({ ...prev, database: false }));
     }
   };
 
@@ -91,20 +112,22 @@ export const useDataCatalog = (): UseDataCatalog => {
       return;
     }
     try {
-      setLoading(true);
+      setLoading(prev => ({ ...prev, table: true }));
       const tableEntries = await fetchSourceMeta(connector, namespace, compute, [database]);
-      setTables(tableEntries?.tables_meta ?? []);
+      const tables = tableEntries?.tables_meta?.filter(
+        table => table.type?.toLowerCase() === 'table'
+      );
+      setTables(tables ?? []);
     } catch (error) {
-      console.error('Error loading tables:', error);
       setTables([]);
     } finally {
-      setLoading(false);
+      setLoading(prev => ({ ...prev, table: false }));
     }
   };
 
   const loadNamespaces = async (connector: Connector) => {
     try {
-      setLoading(true);
+      setLoading(prev => ({ ...prev, namespace: true, compute: true }));
       const { namespaces } = await getNamespaces({ connector });
 
       const namespacesWithCompute = namespaces.filter(namespace => namespace.computes.length);
@@ -123,9 +146,13 @@ export const useDataCatalog = (): UseDataCatalog => {
         setNamespace(namespaces[0]);
       }
     } catch (error) {
-      console.error('Error loading namespaces:', error);
+      setNamespace(null);
+      setCompute(null);
+      setDatabases([]);
+      setDatabase(undefined);
+      setTables([]);
     } finally {
-      setLoading(false);
+      setLoading(prev => ({ ...prev, namespace: false, compute: false }));
     }
   };
 
@@ -136,6 +163,7 @@ export const useDataCatalog = (): UseDataCatalog => {
   }, [namespace, compute, connector, database]);
 
   useEffect(() => {
+    setLoading(prev => ({ ...prev, connector: true }));
     const availableConnectors = filterEditorConnectors(connector => connector.is_sql);
 
     if (availableConnectors.length > 0) {
@@ -143,6 +171,7 @@ export const useDataCatalog = (): UseDataCatalog => {
       setConnector(availableConnectors[0]);
       loadNamespaces(availableConnectors[0]);
     }
+    setLoading(prev => ({ ...prev, connector: false }));
   }, []);
 
   return {
