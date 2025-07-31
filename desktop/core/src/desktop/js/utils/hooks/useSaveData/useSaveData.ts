@@ -16,14 +16,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
-import { ApiFetchOptions, post, put, patch } from '../../../api/utils';
+import { ApiFetchOptions, HttpMethod, sendApiRequest } from '../../../api/utils';
 import { isJSON } from '../../jsonUtils';
-
-export enum HttpMethod {
-  POST = 'POST',
-  PUT = 'PUT',
-  PATCH = 'PATCH'
-}
 
 interface saveOptions<T, E> {
   url?: string;
@@ -79,13 +73,7 @@ const useSaveData = <T, U = unknown, E = string>(
       const method = saveOptions?.method ?? localOptions?.method ?? HttpMethod.POST;
 
       try {
-        const apiMethod = {
-          [HttpMethod.POST]: post<T, U, E>,
-          [HttpMethod.PUT]: put<T, U, E>,
-          [HttpMethod.PATCH]: patch<T, U, E>
-        }[method];
-
-        const response = await apiMethod(apiUrl, body, requestOptions);
+        const response = await sendApiRequest(method, apiUrl, body, requestOptions);
 
         setData(response);
         if (saveOptions?.onSuccess) {

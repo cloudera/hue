@@ -15,30 +15,36 @@
 // limitations under the License.
 
 import { renderHook, act, waitFor } from '@testing-library/react';
-import useSaveData, { HttpMethod } from './useSaveData';
-import { post, put, patch } from '../../../api/utils';
+import useSaveData from './useSaveData';
+import { HttpMethod, sendApiRequest } from '../../../api/utils';
 
-jest.mock('../../../api/utils', () => ({
-  post: jest.fn(),
-  put: jest.fn(),
-  patch: jest.fn()
-}));
+jest.mock('../../../api/utils', () => {
+  const original = jest.requireActual('../../../api/utils');
+  return {
+    ...original,
+    post: jest.fn(),
+    put: jest.fn(),
+    patch: jest.fn(),
+    sendApiRequest: jest.fn()
+  };
+});
 
-const mockPost = post as jest.MockedFunction<typeof post>;
-const mockPut = put as jest.MockedFunction<typeof put>;
-const mockPatch = patch as jest.MockedFunction<typeof patch>;
+const mockSendApiRequest = sendApiRequest as jest.MockedFunction<typeof sendApiRequest>;
 const mockUrlPrefix = 'https://api.example.com';
 const mockEndpoint = '/save-endpoint';
 const mockUrl = `${mockUrlPrefix}${mockEndpoint}`;
 const mockData = { id: 1, product: 'Hue' };
 const mockBody = { id: 1 };
+const mockRequestOptions = {
+  ignoreSuccessErrors: true,
+  qsEncodeData: false,
+  silenceErrors: true
+};
 
 describe('useSaveData', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockPost.mockResolvedValue(mockData);
-    mockPut.mockResolvedValue(mockData);
-    mockPatch.mockResolvedValue(mockData);
+    mockSendApiRequest.mockResolvedValue(mockData);
   });
 
   it('should save data successfully and update state', async () => {
@@ -55,8 +61,13 @@ describe('useSaveData', () => {
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledTimes(1);
-      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
+      expect(mockSendApiRequest).toHaveBeenCalledTimes(1);
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
+        mockUrl,
+        mockBody,
+        mockRequestOptions
+      );
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
@@ -65,7 +76,7 @@ describe('useSaveData', () => {
 
   it('should handle errors and update error state', async () => {
     const mockError = new Error('Save error');
-    mockPost.mockRejectedValue(mockError);
+    mockSendApiRequest.mockRejectedValue(mockError);
 
     const { result } = renderHook(() => useSaveData(mockUrl));
 
@@ -80,7 +91,12 @@ describe('useSaveData', () => {
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
+        mockUrl,
+        mockBody,
+        mockRequestOptions
+      );
       expect(result.current.data).toBeUndefined();
       expect(result.current.error).toEqual(mockError);
       expect(result.current.loading).toBe(false);
@@ -97,7 +113,7 @@ describe('useSaveData', () => {
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeUndefined();
     expect(result.current.loading).toBe(false);
-    expect(mockPost).not.toHaveBeenCalled();
+    expect(mockSendApiRequest).not.toHaveBeenCalled();
   });
 
   it('should update options when props change', async () => {
@@ -116,7 +132,12 @@ describe('useSaveData', () => {
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
+        mockUrl,
+        mockBody,
+        mockRequestOptions
+      );
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
@@ -124,7 +145,7 @@ describe('useSaveData', () => {
 
     const newBody = { id: 2 };
     const newMockData = { ...mockData, id: 2 };
-    mockPost.mockResolvedValueOnce(newMockData);
+    mockSendApiRequest.mockResolvedValueOnce(newMockData);
 
     rerender({ url: mockUrl });
 
@@ -135,7 +156,12 @@ describe('useSaveData', () => {
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(mockUrl, newBody, expect.any(Object));
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
+        mockUrl,
+        newBody,
+        mockRequestOptions
+      );
       expect(result.current.data).toEqual(newMockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
@@ -163,7 +189,12 @@ describe('useSaveData', () => {
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
+        mockUrl,
+        mockBody,
+        mockRequestOptions
+      );
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
@@ -174,7 +205,7 @@ describe('useSaveData', () => {
 
   it('should call onError callback when provided', async () => {
     const mockError = new Error('Save error');
-    mockPost.mockRejectedValue(mockError);
+    mockSendApiRequest.mockRejectedValue(mockError);
 
     const mockOnSuccess = jest.fn();
     const mockOnError = jest.fn();
@@ -196,7 +227,12 @@ describe('useSaveData', () => {
     expect(result.current.loading).toBe(true);
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
+        mockUrl,
+        mockBody,
+        mockRequestOptions
+      );
       expect(result.current.data).toBeUndefined();
       expect(result.current.error).toEqual(mockError);
       expect(result.current.loading).toBe(false);
@@ -213,7 +249,8 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
         mockUrl,
         'hue data',
         expect.objectContaining({ qsEncodeData: true })
@@ -234,7 +271,8 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
         mockUrl,
         payload,
         expect.objectContaining({ qsEncodeData: false })
@@ -255,7 +293,8 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
         mockUrl,
         payload,
         expect.objectContaining({ qsEncodeData: false })
@@ -280,7 +319,8 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
         mockUrl,
         payload,
         expect.objectContaining({ qsEncodeData: true })
@@ -292,7 +332,7 @@ describe('useSaveData', () => {
   });
 
   it('should use PUT method when specified in options', async () => {
-    mockPut.mockResolvedValue(mockData);
+    mockSendApiRequest.mockResolvedValue(mockData);
 
     const { result } = renderHook(() => useSaveData(mockUrl, { method: HttpMethod.PUT }));
 
@@ -301,17 +341,20 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockPut).toHaveBeenCalledTimes(1);
-      expect(mockPut).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
-      expect(mockPost).not.toHaveBeenCalled();
-      expect(mockPatch).not.toHaveBeenCalled();
+      expect(mockSendApiRequest).toHaveBeenCalledTimes(1);
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.PUT,
+        mockUrl,
+        mockBody,
+        mockRequestOptions
+      );
       expect(result.current.data).toEqual(mockData);
       expect(result.current.loading).toBe(false);
     });
   });
 
   it('should use PATCH method when specified in saveOptions', async () => {
-    mockPatch.mockResolvedValue(mockData);
+    mockSendApiRequest.mockResolvedValue(mockData);
 
     const { result } = renderHook(() => useSaveData(mockUrl));
 
@@ -320,17 +363,20 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockPatch).toHaveBeenCalledTimes(1);
-      expect(mockPatch).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
-      expect(mockPost).not.toHaveBeenCalled();
-      expect(mockPut).not.toHaveBeenCalled();
+      expect(mockSendApiRequest).toHaveBeenCalledTimes(1);
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.PATCH,
+        mockUrl,
+        mockBody,
+        mockRequestOptions
+      );
       expect(result.current.data).toEqual(mockData);
       expect(result.current.loading).toBe(false);
     });
   });
 
   it('should prioritize saveOptions method over options method', async () => {
-    mockPatch.mockResolvedValue(mockData);
+    mockSendApiRequest.mockResolvedValue(mockData);
 
     const { result } = renderHook(() => useSaveData(mockUrl, { method: HttpMethod.PUT }));
 
@@ -339,10 +385,13 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockPatch).toHaveBeenCalledTimes(1);
-      expect(mockPatch).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
-      expect(mockPost).not.toHaveBeenCalled();
-      expect(mockPut).not.toHaveBeenCalled();
+      expect(mockSendApiRequest).toHaveBeenCalledTimes(1);
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.PATCH,
+        mockUrl,
+        mockBody,
+        mockRequestOptions
+      );
       expect(result.current.data).toEqual(mockData);
       expect(result.current.loading).toBe(false);
     });
@@ -356,10 +405,13 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledTimes(1);
-      expect(mockPost).toHaveBeenCalledWith(mockUrl, mockBody, expect.any(Object));
-      expect(mockPut).not.toHaveBeenCalled();
-      expect(mockPatch).not.toHaveBeenCalled();
+      expect(mockSendApiRequest).toHaveBeenCalledTimes(1);
+      expect(mockSendApiRequest).toHaveBeenCalledWith(
+        HttpMethod.POST,
+        mockUrl,
+        mockBody,
+        mockRequestOptions
+      );
       expect(result.current.data).toEqual(mockData);
       expect(result.current.loading).toBe(false);
     });
