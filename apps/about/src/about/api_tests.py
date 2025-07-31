@@ -69,7 +69,7 @@ class TestUsageAnalyticsSettingsAPI(TestCase):
     mock_settings = MagicMock()
     mock_get_settings.return_value = mock_settings
     self.api_client.force_authenticate(user=self.admin_user)
-    payload = {"collect_usage": False}
+    payload = {"collectUsage": False}
 
     response = self.api_client.post(self.analytics_settings_url, data=payload, format="json")
 
@@ -92,7 +92,7 @@ class TestUsageAnalyticsSettingsAPI(TestCase):
   def test_post_settings_as_admin_error(self, mock_get_settings, mock_is_admin):
     mock_get_settings.side_effect = ObjectDoesNotExist("Settings not found")
     self.api_client.force_authenticate(user=self.admin_user)
-    payload = {"collect_usage": False}
+    payload = {"collectUsage": False}
 
     response = self.api_client.post(self.analytics_settings_url, data=payload, format="json")
 
@@ -109,4 +109,4 @@ class TestUsageAnalyticsSettingsAPI(TestCase):
     response = self.api_client.post(self.analytics_settings_url, data=payload, format="json")
 
     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    self.assertEqual(response.data, {"collect_usage": ["This field is required."]})
+    self.assertEqual(response.data, {"collectUsage": ["This field is required."]})

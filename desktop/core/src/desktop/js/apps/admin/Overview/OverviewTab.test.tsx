@@ -149,7 +149,7 @@ describe('OverviewTab', () => {
         }
         return Promise.reject();
       });
-      (post as jest.Mock).mockImplementation(() => Promise.resolve({ collect_usage: true }));
+      (post as jest.Mock).mockImplementation(() => Promise.resolve({ collectUsage: true }));
     });
 
     afterEach(() => {
@@ -203,7 +203,7 @@ describe('OverviewTab', () => {
       await waitFor(() => {
         expect(post).toHaveBeenCalledWith(
           USAGE_ANALYTICS_API_URL,
-          { collect_usage: true },
+          { collectUsage: true },
           expectedPostOptions
         );
       });
@@ -218,7 +218,7 @@ describe('OverviewTab', () => {
       await waitFor(() => {
         expect(post).toHaveBeenCalledWith(
           USAGE_ANALYTICS_API_URL,
-          { collect_usage: false },
+          { collectUsage: false },
           expectedPostOptions
         );
       });
@@ -264,7 +264,7 @@ describe('OverviewTab', () => {
 
     it('publishes success message when analytics are enabled', async () => {
       (get as jest.Mock).mockResolvedValue(mockAnalyticsDataDisabled);
-      (post as jest.Mock).mockResolvedValue({ collect_usage: true });
+      (post as jest.Mock).mockResolvedValue({ collectUsage: true });
       await renderAnalyticsAndWaitForLoad();
 
       const checkbox = await expectCheckboxState(false);
@@ -278,7 +278,7 @@ describe('OverviewTab', () => {
     });
 
     it('publishes success message when analytics are disabled', async () => {
-      (post as jest.Mock).mockResolvedValue({ collect_usage: false });
+      (post as jest.Mock).mockResolvedValue({ collectUsage: false });
       await renderAnalyticsAndWaitForLoad();
 
       const checkbox = await expectCheckboxState(true);
@@ -292,7 +292,7 @@ describe('OverviewTab', () => {
     });
 
     it('reloads data after successful save', async () => {
-      (post as jest.Mock).mockResolvedValue({ collect_usage: false });
+      (post as jest.Mock).mockResolvedValue({ collectUsage: false });
       await renderAnalyticsAndWaitForLoad();
 
       const checkbox = await expectCheckboxState(true);

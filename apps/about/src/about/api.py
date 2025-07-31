@@ -62,7 +62,7 @@ class UsageAnalyticsAPI(APIView):
       if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-      is_enabled = serializer.validated_data["collect_usage"]
+      is_enabled = serializer.validated_data["collectUsage"]
 
       settings = Settings.get_settings()
       settings.collect_usage = is_enabled
