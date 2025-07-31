@@ -49,7 +49,7 @@ export const convertToDataSource = (
       importerDataKey: `importer-row__${index}`
     };
     Object.keys(inputData).forEach(key => {
-      row[key] = inputData[key][index] ?? null;
+      row[toCamelCase(key)] = inputData[key][index] ?? null;
     });
     return row;
   });

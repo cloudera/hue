@@ -38,6 +38,7 @@ import {
 } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 import EditColumnsModal from './EditColumns/EditColumnsModal';
+import type { Column } from './EditColumns/EditColumnsModal';
 import DestinationSettings from './DestinationSettings/DestinationSettings';
 
 import './ImporterFilePreview.scss';
@@ -51,6 +52,7 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   const [fileFormat, setFileFormat] = useState<CombinedFileFormat | undefined>();
 
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
+  const [columns, setColumns] = useState<Column[]>([]);
   const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
     tableName: getDefaultTableName(fileMetaData)
   });
@@ -116,7 +118,19 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       skip:
         !fileFormat?.type ||
         fileFormat?.hasHeader === undefined ||
-        destinationConfig.connectorId === undefined
+        destinationConfig.connectorId === undefined,
+      onSuccess: data => {
+        if (data?.columns && Array.isArray(data.columns)) {
+          setColumns(
+            convertToAntdColumns(data.columns).map(col => ({
+              title: col?.title != null ? String(col.title) : '',
+              dataIndex: String(col.dataIndex || '')
+            }))
+          );
+        } else {
+          setColumns([]);
+        }
+      }
     }
   );
 
@@ -129,12 +143,17 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       format: fileFormat,
       sourceType: destinationConfig.connectorId
     };
+
     const destination = {
       outputFormat: 'table',
       nonDefaultLocation: fileMetaData.path,
       name: `${destinationConfig.database}.${destinationConfig.tableName}`,
       sourceType: destinationConfig.connectorId,
-      columns: previewData?.columns
+      columns: columns.map(col => ({
+        name: col.title,
+        type: col.type || 'string',
+        comment: col.comment || ''
+      }))
     };
 
     const formData = new FormData();
@@ -144,7 +163,6 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     save(formData);
   };
 
-  const columns = convertToAntdColumns(previewData?.columns ?? []);
   const tableData = convertToDataSource(previewData?.previewData ?? {});
 
   return (
@@ -169,7 +187,10 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
       <div className="hue-importer-preview-page__main-section">
         <div className="hue-importer-preview-page__header-section">
           <SourceConfiguration fileFormat={fileFormat} setFileFormat={setFileFormat} />
-          <BorderlessButton onClick={() => setIsEditColumnsOpen(true)}>
+          <BorderlessButton
+            onClick={() => setIsEditColumnsOpen(true)}
+            className="hue-importer-preview-page__edit-columns-button"
+          >
             {t('Edit Columns')}
           </BorderlessButton>
         </div>
@@ -182,7 +203,14 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
           locale={{ emptyText: t('No data found in the file!') }}
         />
       </div>
-      <EditColumnsModal isOpen={isEditColumnsOpen} closeModal={() => setIsEditColumnsOpen(false)} />
+
+      <EditColumnsModal
+        isOpen={isEditColumnsOpen}
+        closeModal={() => setIsEditColumnsOpen(false)}
+        columns={columns}
+        setColumns={setColumns}
+        sample={tableData[0]}
+      />
     </div>
   );
 };
