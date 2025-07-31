@@ -49,9 +49,10 @@ const FileUploadQueue = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [expandQueue, setExpandQueue] = useState<boolean>(true);
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [conflictFiles, setConflictFiles] = useState<RegularFile[]>([]);
+  const [conflictingFiles, setconflictingFiles] = useState<RegularFile[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
+  // TODO: Need to change this function with a new endpoint once available.
   const checkFileExists = async (filePath: string): Promise<boolean> => {
     try {
       const response = await get(FILE_STATS_API_URL, { path: filePath }, { silenceErrors: true });
@@ -71,17 +72,21 @@ const FileUploadQueue = (): JSX.Element => {
       return false;
     }
   };
+
   const onComplete = () => {
     huePubSub.publish(FILE_UPLOAD_SUCCESS_EVENT);
   };
+
   const config = getLastKnownConfig();
   const isChunkUpload =
     (config?.storage_browser.enable_chunked_file_upload ?? DEFAULT_ENABLE_CHUNK_UPLOAD) &&
     !!config?.hue_config.enable_task_server;
+
   const { uploadQueue, cancelFile, addFiles } = useFileUpload({
     isChunkUpload,
     onComplete
   });
+
   useHuePubSub<FileUploadEvent>({
     topic: FILE_UPLOAD_START_EVENT,
     callback: async (data?: FileUploadEvent) => {
@@ -92,10 +97,10 @@ const FileUploadQueue = (): JSX.Element => {
           uploadQueue
         );
         if (conflicts.length > 0) {
-          setConflictFiles(conflicts);
+          setconflictingFiles(conflicts);
           setIsModalVisible(true);
         } else {
-          setConflictFiles([]);
+          setconflictingFiles([]);
           setIsModalVisible(false);
         }
         if (nonConflictingFiles.length > 0) {
@@ -110,40 +115,54 @@ const FileUploadQueue = (): JSX.Element => {
     newFiles: RegularFile[],
     uploadQueue: RegularFile[]
   ): Promise<{ conflicts: RegularFile[]; nonConflictingFiles: RegularFile[] }> => {
-    const conflicts: RegularFile[] = [];
-    const nonConflictingFiles: RegularFile[] = [];
     const inProgressFileIdentifiers = new Set(
       uploadQueue
         .filter(file => file.status === FileStatus.Uploading || file.status === FileStatus.Pending)
         .map(file => `${file.filePath}/${file.file.name}`)
     );
-    for (const newFile of newFiles) {
-      const fullFilePath = `${newFile.filePath}/${newFile.file.name}`;
-      if (inProgressFileIdentifiers.has(fullFilePath)) {
-        continue;
-      }
-      const exists = await checkFileExists(fullFilePath);
-      if (exists) {
-        conflicts.push(newFile);
-      } else {
-        nonConflictingFiles.push(newFile);
-      }
-    }
-    return { conflicts, nonConflictingFiles };
+  
+    const result = await newFiles.reduce<Promise<{ conflicts: RegularFile[]; nonConflictingFiles: RegularFile[] }>>(
+      async (accPromise, newFile) => {
+        const acc = await accPromise; 
+        const fullFilePath = `${newFile.filePath}/${newFile.file.name}`;
+  
+        if (inProgressFileIdentifiers.has(fullFilePath)) {
+          return acc; 
+        }
+  
+        const exists = await checkFileExists(fullFilePath);
+        if (exists) {
+          return {
+            ...acc,
+            conflicts: [...acc.conflicts, newFile],
+          };
+        } else {
+          return {
+            ...acc,
+            nonConflictingFiles: [...acc.nonConflictingFiles, newFile],
+          };
+        }
+      },
+      Promise.resolve({ conflicts: [], nonConflictingFiles: [] }) 
+    );
+  
+    return result;
   };
 
   const onClose = () => {
     uploadQueue.forEach(file => cancelFile(file));
     setIsVisible(false);
   };
+
   const handleModalOk = (overwrite: boolean) => {
     if (overwrite) {
-      addFiles(conflictFiles, true);
+      addFiles(conflictingFiles, true);
     }
-    setConflictFiles([]);
+    setconflictingFiles([]);
     setIsModalVisible(false);
     setIsVisible(true);
   };
+
   const uploadedCount = uploadQueue.filter(item => item.status === FileStatus.Uploaded).length;
   const pendingCount = uploadQueue.filter(
     item => item.status === FileStatus.Pending || item.status === FileStatus.Uploading
@@ -152,6 +171,7 @@ const FileUploadQueue = (): JSX.Element => {
   if (!isVisible && !isModalVisible) {
     return <></>;
   }
+  
   const getHeaderText = () => {
     const fileText = uploadQueue.length > 1 ? 'files' : 'file';
     const uploadedText = `{{uploadedCount}} ${fileText} uploaded`;
@@ -174,13 +194,13 @@ const FileUploadQueue = (): JSX.Element => {
           onCancel={() => setIsModalVisible(false)}
           secondaryButtonText={t('Skip Upload')}
           onSecondary={() => handleModalOk(false)}
-          className="hue-modal"
+          className="hue-conflict-resolve-modal"
         >
           {t(
-            `${conflictFiles.length} files you are trying to upload already exist in the uploaded files.`
+            `${conflictingFiles.length} files you are trying to upload already exist in the uploaded files.`
           )}
           <div className="conflict-files__container">
-            {conflictFiles.map(file => (
+            {conflictingFiles.map(file => (
               <div key={file.file.name} className="conflict-files__item">
                 <div className="file-icon">
                   <FileIcon />

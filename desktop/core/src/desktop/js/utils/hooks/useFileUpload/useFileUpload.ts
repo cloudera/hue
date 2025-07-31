@@ -99,43 +99,36 @@ const useFileUpload = ({
     }
   };
 
-  const addFiles = (files: RegularFile[], overwrite = false) => {
+const addFiles = (files: RegularFile[]) => {
     setUploadQueue(prev => {
       const updatedQueue = [...prev]; // A copy of the current queue
-
       files.forEach(file => {
         const existingFileIndex = updatedQueue.findIndex(
           up => up.filePath === file.filePath && up.file.name === file.file.name
         );
 
         if (existingFileIndex !== -1) {
-          if (overwrite) {
+        if (file.overwrite) {
             // Handle conflicting file by overwriting
             updatedQueue[existingFileIndex] = {
               ...file,
-              status: FileStatus.Pending,
-              overwrite: true
+            status: FileStatus.Pending
             };
           }
-          // Skip adding the file if no overwrite flag is present
+        // If the `overwrite` flag is not set, the file is skipped.
         } else {
           // File does not exist in the queue; add it as a new one
           updatedQueue.push({ ...file, status: FileStatus.Pending });
         }
       });
-
       return updatedQueue; // Return the updated queue
     });
 
-    const preparedFiles = files.map(file => ({
-      ...file,
-      overwrite: overwrite || !!file.overwrite
-    }));
-    // Pass prepared files with overwrite flag to the appropriate upload
+  // Pass prepared files directly, as `overwrite` is now an inherent property of each file.
     if (isChunkUpload) {
-      addToChunkUpload(preparedFiles);
+    addToChunkUpload(files);
     } else {
-      addToRegularUpload(preparedFiles);
+    addToRegularUpload(files);
     }
   };
 

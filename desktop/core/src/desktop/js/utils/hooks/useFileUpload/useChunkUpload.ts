@@ -45,7 +45,7 @@ import {
 import { GET_TASKS_URL } from 'reactComponents/TaskServer/constants';
 
 interface UseChunkUploadResponse {
-  addFiles: (items: RegularFile[], overwrite?: boolean) => void;
+  addFiles: (items: RegularFile[]) => void;
   cancelFile: (item: RegularFile['uuid']) => void;
   isLoading: boolean;
 }
@@ -160,9 +160,9 @@ const useChunkUpload = ({
     concurrentProcess
   });
 
-  const addFiles = (newFiles: RegularFile[], overwrite = false) => {
+  const addFiles = (newFiles: RegularFile[]) => {
     newFiles.forEach(file => {
-      const chunks = createChunks(file, chunkSize, overwrite);
+      const chunks = createChunks(file, chunkSize, file.overwrite ?? false);
       enqueue(chunks);
     });
   };

@@ -92,7 +92,7 @@ export const getChunkItemPayload = (chunkItem: ChunkedFile): FileUploadApiPayloa
 
   const payload = new FormData();
   payload.append('hdfs_file', chunkItem.file);
-  payload.append('overwrite', chunkItem.overwrite ? 'true' : 'false'); // Pass overwrite flag
+  payload.append('overwrite', chunkItem.overwrite ? 'true' : 'false');
   return { url, payload };
 };
 
