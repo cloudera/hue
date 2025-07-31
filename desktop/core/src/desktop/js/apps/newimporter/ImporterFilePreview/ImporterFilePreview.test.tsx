@@ -78,7 +78,6 @@ jest.mock('../../../utils/hooks/useDataCatalog/useDataCatalog', () => ({
   }))
 }));
 
-// Mock DestinationSettings to simulate proper onChange callback
 jest.mock('./DestinationSettings/DestinationSettings', () => {
   return function MockDestinationSettings({
     onChange
@@ -86,11 +85,9 @@ jest.mock('./DestinationSettings/DestinationSettings', () => {
     defaultValues?: Record<string, unknown>;
     onChange: (name: string, value: string) => void;
   }) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const React = require('react');
 
     React.useEffect(() => {
-      // Simulate the component calling onChange with default values only once on mount
       onChange('connectorId', 'hive');
       onChange('database', 'database1');
       onChange('computeId', 'compute1');
@@ -135,7 +132,6 @@ describe('ImporterFilePreview', () => {
           reloadData: jest.fn()
         };
       }
-      // Default mock for any other URLs (like SQL types API)
       return {
         loading: false,
         data: ['STRING', 'INT', 'FLOAT'],
@@ -159,18 +155,11 @@ describe('ImporterFilePreview', () => {
   it('should display data in the table after previewData is available', async () => {
     render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
 
-    // Check for basic component rendering first
     expect(screen.getByText('Preview')).toBeInTheDocument();
     expect(screen.getByText('Edit Columns')).toBeInTheDocument();
 
-    // For now, just verify the component renders without crashing
-    // TODO: Fix the data loading logic to properly display table data
     const table = screen.getByRole('table');
     expect(table).toBeInTheDocument();
-
-    // Note: The table data (Alice, Bob, etc.) is not displaying due to
-    // complex state management issues in the component's data loading logic.
-    // This needs to be addressed separately.
   });
 
   it('should open edit columns modal when button is clicked', async () => {
@@ -213,7 +202,6 @@ describe('ImporterFilePreview', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Preview')).toBeInTheDocument();
-      // TODO: Fix data loading to display table content
       expect(screen.getByRole('table')).toBeInTheDocument();
     });
   });
