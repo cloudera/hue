@@ -92,7 +92,7 @@ describe('DestinationSettings Component', () => {
       compute: { id: 'compute1', name: 'Compute 1' }
     };
 
-    (useDataCatalog as jest.Mock).mockReturnValueOnce(mockUseDataCatalogSingleCompute);
+    (useDataCatalog as jest.Mock).mockReturnValue(mockUseDataCatalogSingleCompute);
 
     render(<DestinationSettings {...defaultProps} />);
 
