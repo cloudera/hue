@@ -41,7 +41,7 @@ from desktop.models import Document2
 from filebrowser.forms import UploadLocalFileForm
 from indexer.controller import CollectionManagerController
 from indexer.fields import Field, guess_field_type_from_samples
-from indexer.file_format import HiveFormat
+from indexer.file_format import get_file_format_instance, HiveFormat
 from indexer.indexers.base import get_api
 from indexer.indexers.envelope import _envelope_job
 from indexer.indexers.flink_sql import FlinkIndexer
@@ -137,17 +137,14 @@ def guess_format(request):
       path = excel_to_csv_file_name_change(path)
       request.fs.create(path, overwrite=True, data=_csv_data)
 
-    indexer = MorphlineIndexer(request.user, request.fs)
     if not request.fs.isfile(path):
       raise PopupException(_('Path %(path)s is not a file') % file_format)
 
     stream = request.fs.open(path)
-    format_ = indexer.guess_format({
-      "file": {
-        "stream": stream,
-        "name": path
-      }
-    })
+    format_ = get_file_format_instance({
+      "stream": stream,
+      "name": path
+    }).get_format()
     _convert_format(format_)
 
     if file_format["path"][-3:] == 'xls' or file_format["path"][-4:] == 'xlsx':
@@ -277,7 +274,6 @@ def guess_field_types(request):
       }
 
   elif file_format['inputFormat'] == 'file':
-    indexer = MorphlineIndexer(request.user, request.fs)
     path = file_format["path"]
 
     if path[-3:] == 'xls' or path[-4:] == 'xlsx':
@@ -288,13 +284,8 @@ def guess_field_types(request):
     stream.seek(0)
     _convert_format(file_format["format"], inverse=True)
 
-    format_ = indexer.guess_field_types({
-      "file": {
-          "stream": stream,
-          "name": path
-        },
-      "format": file_format['format']
-    })
+    file_format = get_file_format_instance({"stream": stream, "name": path}, file_format['format'])
+    format_ = file_format.get_fields() if file_format else {'columns': []}
 
     # Note: Would also need to set charset to table (only supported in Hive)
     if 'sample' in format_ and format_['sample']:
