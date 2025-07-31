@@ -16,13 +16,12 @@
 # limitations under the License.
 
 import json
-import time
 import logging
 import textwrap
+import time
 from urllib.parse import urlparse
 
 import requests
-from django.utils.translation import gettext as _
 from trino.auth import BasicAuthentication
 from trino.client import ClientSession, TrinoQuery, TrinoRequest
 from trino.exceptions import TrinoConnectionError
@@ -33,8 +32,7 @@ from desktop.conf import AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, AUTH_USERNAME a
 from desktop.lib import export_csvxls
 from desktop.lib.conf import coerce_password_from_script
 from desktop.lib.i18n import force_unicode
-from desktop.lib.rest.http_client import HttpClient, RestException
-from desktop.lib.rest.resource import Resource
+from desktop.lib.rest.http_client import RestException
 from notebook.connectors.base import Api, ExecutionWrapper, QueryError, ResultWrapper
 
 LOG = logging.getLogger()
@@ -289,7 +287,7 @@ class TrinoApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=False, is_async=False, operation=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, nested=None, is_async=False, operation=None):
     statement = self._get_select_query(database, table, column, operation)
     query_client = TrinoQuery(self.trino_request, statement)
     query_client.execute()

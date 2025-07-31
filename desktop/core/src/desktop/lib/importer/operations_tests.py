@@ -184,7 +184,7 @@ class TestGuessFileMetadata:
     # Create schema object
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
-    result = operations.guess_file_metadata(data=schema)
+    result = operations.guess_file_metadata(data=schema, username="test_user")
 
     assert result == {
       "type": "csv",
@@ -210,7 +210,7 @@ class TestGuessFileMetadata:
     # Create schema object
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
-    result = operations.guess_file_metadata(data=schema)
+    result = operations.guess_file_metadata(data=schema, username="test_user")
 
     assert result == {
       "type": "tsv",
@@ -248,7 +248,7 @@ class TestGuessFileMetadata:
     # Create schema object
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
-    result = operations.guess_file_metadata(data=schema)
+    result = operations.guess_file_metadata(data=schema, username="test_user")
 
     assert result == {
       "type": "excel",
@@ -271,21 +271,21 @@ class TestGuessFileMetadata:
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
     with pytest.raises(ValueError, match="Unable to detect file format."):
-      operations.guess_file_metadata(data=schema)
+      operations.guess_file_metadata(data=schema, username="test_user")
 
   def test_guess_file_metadata_nonexistent_file(self):
     # Create schema object
     schema = GuessFileMetadataSchema(file_path="/path/to/nonexistent/file.csv", import_type="local")
 
     with pytest.raises(ValueError, match="Local file does not exist."):
-      operations.guess_file_metadata(data=schema)
+      operations.guess_file_metadata(data=schema, username="test_user")
 
-  def test_guess_remote_file_metadata_no_fs(self):
+  def test_guess_remote_file_metadata_no_username(self):
     # Create schema object
     schema = GuessFileMetadataSchema(file_path="s3a://bucket/user/test_user/test.csv", import_type="remote")
 
-    with pytest.raises(ValueError, match="File system object is required for remote import type"):
-      operations.guess_file_metadata(data=schema, fs=None)
+    with pytest.raises(ValueError, match="Username is required"):
+      operations.guess_file_metadata(data=schema, username="")
 
   def test_guess_file_metadata_empty_file(self, cleanup_temp_files):
     temp_file = tempfile.NamedTemporaryFile(delete=False)
@@ -297,7 +297,7 @@ class TestGuessFileMetadata:
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
     with pytest.raises(ValueError, match="File is empty, cannot detect file format."):
-      operations.guess_file_metadata(data=schema)
+      operations.guess_file_metadata(data=schema, username="test_user")
 
   @patch("desktop.lib.importer.operations.is_magic_lib_available", False)
   def test_guess_file_metadata_no_magic_lib(self, cleanup_temp_files):
@@ -311,7 +311,7 @@ class TestGuessFileMetadata:
     schema = GuessFileMetadataSchema(file_path=temp_file.name, import_type="local")
 
     with pytest.raises(RuntimeError, match="Unable to guess file type. python-magic or its dependency libmagic is not installed."):
-      operations.guess_file_metadata(data=schema)
+      operations.guess_file_metadata(data=schema, username="test_user")
 
 
 @pytest.mark.usefixtures("cleanup_temp_files")
@@ -358,7 +358,7 @@ class TestPreviewFile:
       file_path=temp_file.name, file_type="excel", import_type="local", sql_dialect="hive", has_header=True, sheet_name="Sheet1"
     )
 
-    result = operations.preview_file(data=schema)
+    result = operations.preview_file(data=schema, username="test_user")
 
     assert result == {
       "type": "excel",
@@ -390,7 +390,7 @@ class TestPreviewFile:
       record_separator="\n",
     )
 
-    result = operations.preview_file(data=schema)
+    result = operations.preview_file(data=schema, username="test_user")
 
     assert result == {
       "type": "csv",
@@ -422,7 +422,7 @@ class TestPreviewFile:
       record_separator="\n",
     )
 
-    result = operations.preview_file(data=schema)
+    result = operations.preview_file(data=schema, username="test_user")
 
     assert result == {
       "type": "csv",
@@ -450,7 +450,7 @@ class TestPreviewFile:
       record_separator="\n",
     )
 
-    result = operations.preview_file(data=schema)
+    result = operations.preview_file(data=schema, username="test_user")
 
     assert result == {
       "type": "csv",
@@ -458,14 +458,14 @@ class TestPreviewFile:
       "preview_data": {},
     }
 
-  def test_preview_remote_file_no_fs(self):
+  def test_preview_remote_file_no_username(self):
     # Create schema object
     schema = PreviewFileSchema(
       file_path="s3a://bucket/user/test_user/test.csv", file_type="csv", import_type="remote", sql_dialect="hive", has_header=True
     )
 
-    with pytest.raises(ValueError, match="File system object is required for remote import type"):
-      operations.preview_file(data=schema, fs=None)
+    with pytest.raises(ValueError, match="Username is required"):
+      operations.preview_file(data=schema, username="")
 
   @patch("os.path.exists")
   def test_preview_nonexistent_local_file(self, mock_exists):
@@ -477,7 +477,7 @@ class TestPreviewFile:
     )
 
     with pytest.raises(ValueError, match="Local file does not exist: /path/to/nonexistent.csv"):
-      operations.preview_file(data=schema)
+      operations.preview_file(data=schema, username="test_user")
 
   def test_preview_trino_dialect_type_mapping(self, cleanup_temp_files):
     test_content = "string_col\nfoo\nbar"
@@ -497,7 +497,7 @@ class TestPreviewFile:
       field_separator=",",
     )
 
-    result = operations.preview_file(data=schema)
+    result = operations.preview_file(data=schema, username="test_user")
 
     # Check the result for Trino-specific type mapping
     assert result["columns"][0]["type"] == "VARCHAR"  # Not STRING
@@ -528,7 +528,7 @@ class TestGuessFileHeader:
     # Create schema object
     schema = GuessFileHeaderSchema(file_path=temp_file.name, file_type="csv", import_type="local")
 
-    result = operations.guess_file_header(data=schema)
+    result = operations.guess_file_header(data=schema, username="test_user")
 
     assert result
 
@@ -559,7 +559,7 @@ class TestGuessFileHeader:
     # Create schema object
     schema = GuessFileHeaderSchema(file_path=temp_file.name, file_type="excel", import_type="local", sheet_name="Sheet1")
 
-    result = operations.guess_file_header(data=schema)
+    result = operations.guess_file_header(data=schema, username="test_user")
 
     assert result
 
@@ -568,14 +568,14 @@ class TestGuessFileHeader:
     schema = GuessFileHeaderSchema(file_path="/path/to/nonexistent/file.csv", file_type="csv", import_type="local")
 
     with pytest.raises(ValueError, match="Local file does not exist"):
-      operations.guess_file_header(data=schema)
+      operations.guess_file_header(data=schema, username="test_user")
 
-  def test_guess_header_remote_file_no_fs(self):
+  def test_guess_header_remote_file_no_username(self):
     # Create schema object
     schema = GuessFileHeaderSchema(file_path="s3a://bucket/user/test_user/test.csv", file_type="csv", import_type="remote")
 
-    with pytest.raises(ValueError, match="File system object is required for remote import type"):
-      operations.guess_file_header(data=schema, fs=None)
+    with pytest.raises(ValueError, match="Username is required"):
+      operations.guess_file_header(data=schema, username="")
 
 
 class TestSqlTypeMapping:
@@ -585,42 +585,25 @@ class TestSqlTypeMapping:
 
     result = operations.get_sql_type_mapping(schema)
 
-    # Test all integer types (signed and unsigned)
-    assert result["Int8"] == "TINYINT"
-    assert result["Int16"] == "SMALLINT"
-    assert result["Int32"] == "INT"
-    assert result["Int64"] == "BIGINT"
-    assert result["UInt8"] == "TINYINT"  # Unsigned mapped to signed in Hive
-    assert result["UInt16"] == "SMALLINT"
-    assert result["UInt32"] == "INT"
-    assert result["UInt64"] == "BIGINT"
-
-    # Test floating point and decimal types
-    assert result["Float32"] == "FLOAT"
-    assert result["Float64"] == "DOUBLE"
-    assert result["Decimal"] == "DECIMAL"
-
-    # Test boolean, string, and binary types
-    assert result["Boolean"] == "BOOLEAN"
-    assert result["Utf8"] == "STRING"
-    assert result["String"] == "STRING"
-    assert result["Categorical"] == "STRING"
-    assert result["Enum"] == "STRING"
-    assert result["Binary"] == "BINARY"
-
-    # Test temporal types
-    assert result["Date"] == "DATE"
-    assert result["Time"] == "TIMESTAMP"  # No pure TIME type in Hive
-    assert result["Datetime"] == "TIMESTAMP"
-    assert result["Duration"] == "INTERVAL DAY TO SECOND"
-
-    # Test nested and other types
-    assert result["Array"] == "ARRAY"
-    assert result["List"] == "ARRAY"
-    assert result["Struct"] == "STRUCT"
-    assert result["Object"] == "STRING"
-    assert result["Null"] == "STRING"
-    assert result["Unknown"] == "STRING"
+    # Test that Hive returns the expected unique SQL types
+    expected_hive_types = [
+      "ARRAY",
+      "BIGINT",
+      "BINARY",
+      "BOOLEAN",
+      "DATE",
+      "DECIMAL",
+      "DOUBLE",
+      "FLOAT",
+      "INT",
+      "INTERVAL DAY TO SECOND",
+      "SMALLINT",
+      "STRING",
+      "STRUCT",
+      "TIMESTAMP",
+      "TINYINT",
+    ]
+    assert result == expected_hive_types
 
   def test_get_sql_type_mapping_trino(self):
     # Create schema object
@@ -628,26 +611,27 @@ class TestSqlTypeMapping:
 
     result = operations.get_sql_type_mapping(schema)
 
-    # Test Trino-specific overrides
-    assert result["Int32"] == "INTEGER"  # Not INT
-    assert result["UInt32"] == "INTEGER"  # Not INT
-    assert result["Float32"] == "REAL"  # Not FLOAT
-    assert result["Utf8"] == "VARCHAR"  # Not STRING
-    assert result["String"] == "VARCHAR"  # Not STRING
-    assert result["Binary"] == "VARBINARY"  # Not BINARY
-    assert result["Struct"] == "ROW"  # Not STRUCT
-    assert result["Object"] == "JSON"  # Not STRING
-    assert result["Duration"] == "INTERVAL DAY TO SECOND"
-
-    # Test types that remain the same as base mapping
-    assert result["Int8"] == "TINYINT"
-    assert result["Int16"] == "SMALLINT"
-    assert result["Int64"] == "BIGINT"
-    assert result["Float64"] == "DOUBLE"
-    assert result["Boolean"] == "BOOLEAN"
-    assert result["Date"] == "DATE"
-    assert result["Time"] == "TIMESTAMP"
-    assert result["Datetime"] == "TIMESTAMP"
+    # Test that Trino returns the expected unique SQL types
+    expected_trino_types = [
+      "ARRAY",
+      "BIGINT",
+      "BOOLEAN",
+      "DATE",
+      "DECIMAL",
+      "DOUBLE",
+      "INTEGER",
+      "INTERVAL DAY TO SECOND",
+      "JSON",
+      "REAL",
+      "ROW",
+      "SMALLINT",
+      "STRING",
+      "TIMESTAMP",
+      "TINYINT",
+      "VARBINARY",
+      "VARCHAR",
+    ]
+    assert result == expected_trino_types
 
   def test_get_sql_type_mapping_phoenix(self):
     # Create schema object
@@ -655,34 +639,29 @@ class TestSqlTypeMapping:
 
     result = operations.get_sql_type_mapping(schema)
 
-    # Test Phoenix-specific unsigned integer mappings
-    assert result["UInt8"] == "UNSIGNED_TINYINT"
-    assert result["UInt16"] == "UNSIGNED_SMALLINT"
-    assert result["UInt32"] == "UNSIGNED_INT"
-    assert result["UInt64"] == "UNSIGNED_LONG"
-
-    # Test other Phoenix-specific overrides
-    assert result["Utf8"] == "VARCHAR"  # Not STRING
-    assert result["String"] == "VARCHAR"  # Not STRING
-    assert result["Binary"] == "VARBINARY"  # Not BINARY
-    assert result["Duration"] == "STRING"  # Phoenix treats durations as strings
-    assert result["Struct"] == "STRING"  # No native STRUCT type
-    assert result["Object"] == "VARCHAR"  # Not STRING
-    assert result["Time"] == "TIME"  # Phoenix has its own TIME type
-    assert result["Decimal"] == "DECIMAL"
-
-    # Test signed integers (use base mapping)
-    assert result["Int8"] == "TINYINT"
-    assert result["Int16"] == "SMALLINT"
-    assert result["Int32"] == "INT"
-    assert result["Int64"] == "BIGINT"
-
-    # Test other types that remain the same
-    assert result["Float32"] == "FLOAT"
-    assert result["Float64"] == "DOUBLE"
-    assert result["Boolean"] == "BOOLEAN"
-    assert result["Date"] == "DATE"
-    assert result["Datetime"] == "TIMESTAMP"
+    # Test that Phoenix returns the expected unique SQL types
+    expected_phoenix_types = [
+      "ARRAY",
+      "BIGINT",
+      "BOOLEAN",
+      "DATE",
+      "DECIMAL",
+      "DOUBLE",
+      "FLOAT",
+      "INT",
+      "SMALLINT",
+      "STRING",
+      "TIME",
+      "TIMESTAMP",
+      "TINYINT",
+      "UNSIGNED_INT",
+      "UNSIGNED_LONG",
+      "UNSIGNED_SMALLINT",
+      "UNSIGNED_TINYINT",
+      "VARBINARY",
+      "VARCHAR",
+    ]
+    assert result == expected_phoenix_types
 
   def test_get_sql_type_mapping_impala(self):
     # Create schema object
@@ -690,30 +669,25 @@ class TestSqlTypeMapping:
 
     result = operations.get_sql_type_mapping(schema)
 
-    # Impala uses all base mappings (no overrides)
-    # Test a comprehensive set to ensure no overrides are applied
-    assert result["Int8"] == "TINYINT"
-    assert result["Int16"] == "SMALLINT"
-    assert result["Int32"] == "INT"
-    assert result["Int64"] == "BIGINT"
-    assert result["UInt8"] == "TINYINT"
-    assert result["UInt16"] == "SMALLINT"
-    assert result["UInt32"] == "INT"
-    assert result["UInt64"] == "BIGINT"
-    assert result["Float32"] == "FLOAT"
-    assert result["Float64"] == "DOUBLE"
-    assert result["Decimal"] == "DECIMAL"
-    assert result["Boolean"] == "BOOLEAN"
-    assert result["Utf8"] == "STRING"
-    assert result["String"] == "STRING"
-    assert result["Binary"] == "BINARY"
-    assert result["Date"] == "DATE"
-    assert result["Time"] == "TIMESTAMP"
-    assert result["Datetime"] == "TIMESTAMP"
-    assert result["Duration"] == "INTERVAL DAY TO SECOND"
-    assert result["Array"] == "ARRAY"
-    assert result["Struct"] == "STRUCT"
-    assert result["Object"] == "STRING"
+    # Test that Impala returns the expected unique SQL types
+    # Note: Impala doesn't support INTERVAL types, so Duration maps to STRING
+    expected_impala_types = [
+      "ARRAY",
+      "BIGINT",
+      "BINARY",
+      "BOOLEAN",
+      "DATE",
+      "DECIMAL",
+      "DOUBLE",
+      "FLOAT",
+      "INT",
+      "SMALLINT",
+      "STRING",
+      "STRUCT",
+      "TIMESTAMP",
+      "TINYINT",
+    ]
+    assert result == expected_impala_types
 
   def test_get_sql_type_mapping_sparksql(self):
     # Create schema object
@@ -721,73 +695,66 @@ class TestSqlTypeMapping:
 
     result = operations.get_sql_type_mapping(schema)
 
-    # SparkSQL uses all base mappings (no overrides)
-    # Test a comprehensive set to ensure no overrides are applied
-    assert result["Int8"] == "TINYINT"
-    assert result["Int16"] == "SMALLINT"
-    assert result["Int32"] == "INT"
-    assert result["Int64"] == "BIGINT"
-    assert result["UInt8"] == "TINYINT"
-    assert result["UInt16"] == "SMALLINT"
-    assert result["UInt32"] == "INT"
-    assert result["UInt64"] == "BIGINT"
-    assert result["Float32"] == "FLOAT"
-    assert result["Float64"] == "DOUBLE"
-    assert result["Decimal"] == "DECIMAL"
-    assert result["Boolean"] == "BOOLEAN"
-    assert result["Utf8"] == "STRING"
-    assert result["String"] == "STRING"
-    assert result["Binary"] == "BINARY"
-    assert result["Date"] == "DATE"
-    assert result["Time"] == "TIMESTAMP"
-    assert result["Datetime"] == "TIMESTAMP"
-    assert result["Duration"] == "INTERVAL DAY TO SECOND"
-    assert result["Array"] == "ARRAY"
-    assert result["Struct"] == "STRUCT"
-    assert result["Object"] == "STRING"
+    # Test that SparkSQL returns the expected unique SQL types (same as Hive)
+    expected_sparksql_types = [
+      "ARRAY",
+      "BIGINT",
+      "BINARY",
+      "BOOLEAN",
+      "DATE",
+      "DECIMAL",
+      "DOUBLE",
+      "FLOAT",
+      "INT",
+      "INTERVAL DAY TO SECOND",
+      "SMALLINT",
+      "STRING",
+      "STRUCT",
+      "TIMESTAMP",
+      "TINYINT",
+    ]
+    assert result == expected_sparksql_types
 
   def test_get_sql_type_mapping_all_dialects_consistency(self):
-    # Test that all dialects return mappings for all base types
+    # Test that all dialects return a non-empty list of SQL types
     dialects = ["hive", "impala", "sparksql", "trino", "phoenix"]
-    base_types = [
-      "Int8",
-      "Int16",
-      "Int32",
-      "Int64",
-      "UInt8",
-      "UInt16",
-      "UInt32",
-      "UInt64",
-      "Float32",
-      "Float64",
-      "Decimal",
-      "Boolean",
-      "Utf8",
-      "String",
-      "Categorical",
-      "Enum",
-      "Binary",
-      "Date",
-      "Time",
-      "Datetime",
-      "Duration",
-      "Array",
-      "List",
-      "Struct",
-      "Object",
-      "Null",
-      "Unknown",
-    ]
 
     for dialect in dialects:
       schema = SqlTypeMapperSchema(sql_dialect=dialect)
       result = operations.get_sql_type_mapping(schema)
 
-      # Ensure all base types have mappings
-      for base_type in base_types:
-        assert base_type in result, f"Missing mapping for {base_type} in {dialect} dialect"
-        assert isinstance(result[base_type], str), f"Invalid mapping type for {base_type} in {dialect} dialect"
-        assert len(result[base_type]) > 0, f"Empty mapping for {base_type} in {dialect} dialect"
+      # Ensure result is a list
+      assert isinstance(result, list), f"Result for {dialect} is not a list"
+
+      # Ensure the list is not empty
+      assert len(result) > 0, f"Empty result for {dialect} dialect"
+
+      # Ensure all items in the list are strings
+      for sql_type in result:
+        assert isinstance(sql_type, str), f"Invalid type in result for {dialect}: {sql_type}"
+        assert len(sql_type) > 0, f"Empty SQL type string in {dialect} dialect"
+
+  def test_get_polars_to_sql_mapping(self):
+    # Test the internal function that returns the full mapping
+
+    # Test Hive dialect
+    hive_mapping = operations._get_polars_to_sql_mapping("hive")
+    assert isinstance(hive_mapping, dict)
+    assert hive_mapping["Int32"] == "INT"
+    assert hive_mapping["Utf8"] == "STRING"
+    assert hive_mapping["Boolean"] == "BOOLEAN"
+
+    # Test Trino dialect with overrides
+    trino_mapping = operations._get_polars_to_sql_mapping("trino")
+    assert isinstance(trino_mapping, dict)
+    assert trino_mapping["Int32"] == "INTEGER"  # Override
+    assert trino_mapping["Float32"] == "REAL"  # Override
+    assert trino_mapping["Utf8"] == "VARCHAR"  # Override
+    assert trino_mapping["Boolean"] == "BOOLEAN"  # No override
+
+    # Test unsupported dialect
+    with pytest.raises(ValueError, match="Unsupported dialect"):
+      operations._get_polars_to_sql_mapping("unsupported_dialect")
 
   def test_map_polars_dtype_to_sql_type(self):
     # Test comprehensive type mapping for each dialect
@@ -816,6 +783,11 @@ class TestSqlTypeMapping:
     assert operations._map_polars_dtype_to_sql_type("phoenix", "Time") == "TIME"
     assert operations._map_polars_dtype_to_sql_type("phoenix", "Duration") == "STRING"
     assert operations._map_polars_dtype_to_sql_type("phoenix", "Struct") == "STRING"
+
+    # Impala dialect tests (with Duration override)
+    assert operations._map_polars_dtype_to_sql_type("impala", "Duration") == "STRING"
+    assert operations._map_polars_dtype_to_sql_type("impala", "Int32") == "INT"  # No override
+    assert operations._map_polars_dtype_to_sql_type("impala", "Utf8") == "STRING"  # No override
 
     # Test error for unknown type
     with pytest.raises(ValueError, match="No mapping for Polars dtype"):
