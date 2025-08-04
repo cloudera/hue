@@ -49,8 +49,8 @@ const FileUploadQueue = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [expandQueue, setExpandQueue] = useState<boolean>(true);
   const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [conflictingFiles, setconflictingFiles] = useState<RegularFile[]>([]);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [conflictingFiles, setConflictingFiles] = useState<RegularFile[]>([]);
+
 
   // TODO: Need to change this function with a new endpoint once available.
   const checkFileExists = async (filePath: string): Promise<boolean> => {
@@ -90,18 +90,16 @@ const FileUploadQueue = (): JSX.Element => {
   useHuePubSub<FileUploadEvent>({
     topic: FILE_UPLOAD_START_EVENT,
     callback: async (data?: FileUploadEvent) => {
-      if ((data?.files ?? []).length > 0) {
-        const newFiles = data?.files ?? [];
+      const newFiles = data?.files ?? [];
+      if (newFiles.length > 0) {
         const { conflicts, nonConflictingFiles } = await resolveFileConflicts(
           newFiles,
           uploadQueue
         );
         if (conflicts.length > 0) {
-          setconflictingFiles(conflicts);
-          setIsModalVisible(true);
+          setConflictingFiles(conflicts);
         } else {
-          setconflictingFiles([]);
-          setIsModalVisible(false);
+          setConflictingFiles([]);
         }
         if (nonConflictingFiles.length > 0) {
           addFiles(nonConflictingFiles);
@@ -156,10 +154,13 @@ const FileUploadQueue = (): JSX.Element => {
 
   const handleModalOk = (overwrite: boolean) => {
     if (overwrite) {
-      addFiles(conflictingFiles, true);
+      const updatedFilesWithOverwriteFlag = conflictingFiles.map(file => ({
+        ...file,
+        overwrite: true
+      }));
+      addFiles(updatedFilesWithOverwriteFlag);
     }
-    setconflictingFiles([]);
-    setIsModalVisible(false);
+    setConflictingFiles([]);
     setIsVisible(true);
   };
 
@@ -168,7 +169,7 @@ const FileUploadQueue = (): JSX.Element => {
     item => item.status === FileStatus.Pending || item.status === FileStatus.Uploading
   ).length;
   const failedCount = uploadQueue.filter(item => item.status === FileStatus.Failed).length;
-  if (!isVisible && !isModalVisible) {
+  if (!isVisible && conflictingFiles.length === 0) {
     return <></>;
   }
   
@@ -184,14 +185,14 @@ const FileUploadQueue = (): JSX.Element => {
   };
   return (
     <>
-      {isModalVisible && (
+      {conflictingFiles.length > 0  && (
         <Modal
           title={t('Resolve Filename Conflicts')}
-          open={isModalVisible}
+          open={true}
           okText={t('Overwrite')}
           onOk={() => handleModalOk(true)}
           cancelText={t('Cancel')}
-          onCancel={() => setIsModalVisible(false)}
+          onCancel={() => setConflictingFiles([])}
           secondaryButtonText={t('Skip Upload')}
           onSecondary={() => handleModalOk(false)}
           className="hue-conflict-resolve-modal"
