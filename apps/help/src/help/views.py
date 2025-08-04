@@ -20,7 +20,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-import markdown
+import markdown2
 
 from desktop import appmanager
 from desktop.lib.django_util import render
@@ -75,7 +75,7 @@ def view(request, app, path):
     content = str(content, 'utf-8', errors='replace')
   if path.lower().endswith(".md"):
     content = ('<div class="print rendered-markdown">' +
-               markdown.markdown(content, ['extra']) +
+               markdown2.markdown(content, ['extra']) +
                '</div>')
   elif path.lower().endswith(".html"):
     content = '<div class="print">%s</div>' % (content,)
