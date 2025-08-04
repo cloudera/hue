@@ -19,18 +19,19 @@
 Interfaces for Hadoop filesystem access via HttpFs/WebHDFS
 """
 
-import stat
 import errno
 import logging
 import posixpath
+import stat
+import time
+import uuid
 from urllib.parse import urlparse as lib_urlparse
 
-from django.http.multipartparser import MultiPartParser
 from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
 
 from desktop.conf import PERMISSION_ACTION_OFS
-from desktop.lib.fs.ozone import OFS_ROOT, _serviceid_join, is_root, join as ofs_join, normpath, parent_path
+from desktop.lib.fs.ozone import _serviceid_join, is_root, join as ofs_join, normpath, OFS_ROOT, parent_path
 from desktop.lib.fs.ozone.ofsstat import OzoneFSStat
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs import WebHdfs
@@ -82,11 +83,15 @@ class OzoneFS(WebHdfs):
       umask=get_umask_mode(),
     )
 
+  @property
+  def temp_dir(self):
+    return self._temp_dir
+
   def strip_normpath(self, path):
     if path.startswith(OFS_ROOT + self._netloc):
       path = path.split(OFS_ROOT + self._netloc)[1]
-    elif path.startswith('ofs:/' + self._netloc):
-      path = path.split('ofs:/' + self._netloc)[1]
+    elif path.startswith("ofs:/" + self._netloc):
+      path = path.split("ofs:/" + self._netloc)[1]
 
     return path
 
@@ -115,13 +120,13 @@ class OzoneFS(WebHdfs):
       params = self._getparams()
 
       if glob is not None:
-        params['filter'] = glob
-      params['op'] = 'LISTSTATUS'
+        params["filter"] = glob
+      params["op"] = "LISTSTATUS"
       headers = self._getheaders()
 
       json = self._root.get(path, params, headers)
 
-    filestatus_list = json['FileStatuses']['FileStatus']
+    filestatus_list = json["FileStatuses"]["FileStatus"]
     return [OzoneFSStat(st, path, self._netloc) for st in filestatus_list]
 
   def _stats(self, path):
@@ -129,38 +134,38 @@ class OzoneFS(WebHdfs):
     This stats method returns None if the entry is not found.
     """
     if path == OFS_ROOT:
-      serviceid_path_status = self._handle_serviceid_path_status()['FileStatuses']['FileStatus'][0]
-      json = {'FileStatus': serviceid_path_status}
+      serviceid_path_status = self._handle_serviceid_path_status()["FileStatuses"]["FileStatus"][0]
+      json = {"FileStatus": serviceid_path_status}
     else:
       path = self.strip_normpath(path)
       params = self._getparams()
-      params['op'] = 'GETFILESTATUS'
+      params["op"] = "GETFILESTATUS"
       headers = self._getheaders()
 
       try:
         json = self._root.get(path, params, headers)
       except WebHdfsException as ex:
-        if ex.server_exc == 'FileNotFoundException' or ex.code == 404:
+        if ex.server_exc == "FileNotFoundException" or ex.code == 404:
           return None
         raise ex
 
-    return OzoneFSStat(json['FileStatus'], path, self._netloc)
+    return OzoneFSStat(json["FileStatus"], path, self._netloc)
 
   def _handle_serviceid_path_status(self):
     json = {
-      'FileStatuses': {
-        'FileStatus': [
+      "FileStatuses": {
+        "FileStatus": [
           {
-            'pathSuffix': self._netloc,
-            'type': 'DIRECTORY',
-            'length': 0,
-            'owner': '',
-            'group': '',
-            'permission': '777',
-            'accessTime': 0,
-            'modificationTime': 0,
-            'blockSize': 0,
-            'replication': 0,
+            "pathSuffix": self._netloc,
+            "type": "DIRECTORY",
+            "length": 0,
+            "owner": "",
+            "group": "",
+            "permission": "777",
+            "accessTime": 0,
+            "modificationTime": 0,
+            "blockSize": 0,
+            "replication": 0,
           }
         ]
       }
@@ -176,6 +181,111 @@ class OzoneFS(WebHdfs):
       return res
     raise IOError(errno.ENOENT, _("File %s not found") % path)
 
+  def check_access(self, path, permission="READ"):
+    """
+    Check if the user has the requested permission for a given path.
+
+    Since Ozone doesn't have a native check access API, this method verifies access
+    by attempting operations that would require the specified permission level.
+
+    Args:
+      path (str): The OFS path to check access for
+      permission (str): Permission type to check - 'READ' or 'WRITE' (case-insensitive)
+
+    Returns:
+      bool: True if user has the requested permission, False otherwise
+
+    Note:
+      - For READ permission: Checks if path exists and tries to access its metadata
+      - For WRITE permission: For directories, attempts to create a temporary file;
+        for files or non-existent paths, checks parent directory write access
+    """
+    permission = permission.upper()
+
+    if permission not in ("READ", "WRITE"):
+      LOG.warning(f'Invalid permission type "{permission}". Must be READ or WRITE.')
+      return False
+
+    try:
+      if permission == "READ":
+        # For read access, we need to verify the path exists and is accessible
+        if not self.exists(path):
+          LOG.debug(f'Path "{path}" does not exist, cannot read.')
+          return False
+
+        try:
+          if self.isdir(path):
+            # For directories, attempt to list contents
+            # Use a small limit for efficiency
+            self.listdir_stats(path)[:1]
+          else:
+            # For files, get file stats
+            self.stats(path)
+          return True
+        except WebHdfsException as e:
+          if e.code in (401, 403):  # Unauthorized or Forbidden
+            LOG.debug(f'No read permission for path "{path}": {str(e)}')
+            return False
+          # Re-raise unexpected errors
+          raise
+
+      # Check WRITE permission
+      else:
+        # For non-existent paths, check parent directory
+        if not self.exists(path):
+          parent = self.parent_path(path)
+
+          # If we can't determine parent or we're at root, deny access
+          if not parent or parent == path:
+            LOG.debug(f'Cannot determine parent for non-existent path "{path}"')
+            return False
+
+          # Recursively check parent write access
+          return self.check_access(parent, permission="WRITE")
+
+        # For existing paths
+        if self.isdir(path):
+          # For directories, try creating a temporary marker file
+          temp_file = None
+          try:
+            # Generate unique temporary filename with timestamp
+            temp_file = self.join(path, f".hue_access_check_{str(int(time.time() * 1000))}_{str(uuid.uuid4())[:8]}")
+
+            # Attempt to create the temporary file
+            self.create(temp_file, overwrite=True, data="")
+
+            # Clean up the temporary file if creation succeeded
+            try:
+              self.remove(temp_file)
+            except Exception as cleanup_error:
+              LOG.warning(f'Failed to clean up temporary file "{temp_file}": {cleanup_error}')
+
+            return True
+
+          except WebHdfsException as e:
+            if e.code in (401, 403):  # Unauthorized or Forbidden
+              LOG.debug(f'No write permission for directory "{path}": {str(e)}')
+              return False
+            # Re-raise unexpected errors
+            raise
+
+        else:
+          # For files, check write permission on parent directory
+          parent = self.parent_path(path)
+          if parent and parent != path:
+            return self.check_access(parent, permission="WRITE")
+          else:
+            LOG.debug(f'Cannot check write access for file "{path}", no valid parent found')
+            return False
+
+    except WebHdfsException as e:
+      LOG.debug(f'Ozone filesystem error checking {permission} permission at path "{path}": {str(e)}')
+      return False
+    except Exception as e:
+      # Log unexpected errors but don't crash
+      LOG.warning(f'Unexpected error checking {permission} permission at path "{path}": {str(e)}')
+      return False
+
   def filebrowser_action(self):
     return self._filebrowser_action
 
@@ -186,14 +296,6 @@ class OzoneFS(WebHdfs):
     """
     pass
 
-  def upload_v1(self, META, input_data, destination, username):
-    from desktop.lib.fs.ozone.upload import OFSNewFileUploadHandler  # Circular dependency
-
-    ofs_upload_handler = OFSNewFileUploadHandler(destination, username)
-
-    parser = MultiPartParser(META, input_data, [ofs_upload_handler])
-    return parser.parse()
-
   def rename(self, old, new):
     """rename(old, new)"""
     old = self.strip_normpath(old)
@@ -202,15 +304,15 @@ class OzoneFS(WebHdfs):
     new = self.strip_normpath(new)
 
     params = self._getparams()
-    params['op'] = 'RENAME'
+    params["op"] = "RENAME"
     # Encode `new' because it's in the params
-    params['destination'] = smart_str(new)
+    params["destination"] = smart_str(new)
     headers = self._getheaders()
 
     result = self._root.put(old, params, headers=headers)
 
-    if not result['boolean']:
-      raise IOError(_("Rename failed: %s -> %s") % (smart_str(old, errors='replace'), smart_str(new, errors='replace')))
+    if not result["boolean"]:
+      raise IOError(_("Rename failed: %s -> %s") % (smart_str(old, errors="replace"), smart_str(new, errors="replace")))
 
   def rename_star(self, old_dir, new_dir):
     """Equivalent to `mv old_dir/* new"""
@@ -236,15 +338,15 @@ class OzoneFS(WebHdfs):
     if not self.exists(destination):
       self.do_as_user(owner, self.mkdir, destination, mode=dir_mode)
 
-    for stat in self.listdir_stats(source):
-      source_file = stat.path
-      destination_file = posixpath.join(destination, stat.name)
-      if stat.isDir:
+    for s in self.listdir_stats(source):
+      source_file = s.path
+      destination_file = posixpath.join(destination, s.name)
+      if s.isDir:
         self.copy_remote_dir(source_file, destination_file, dir_mode, owner, skip_file_list)
       else:
-        if stat.size > self.get_upload_chuck_size():
+        if s.size > self.get_upload_chuck_size():
           if skip_file_list is not None:
-            skip_file_list += ' \n- ' + source_file
+            skip_file_list += " \n- " + source_file
         else:
           self.do_as_user(owner, self.copyfile, source_file, destination_file)
     return skip_file_list
@@ -282,7 +384,7 @@ class OzoneFS(WebHdfs):
     if not self.exists(src):
       raise IOError(errno.ENOENT, _("File not found: %s") % src)
 
-    skip_file_list = ''  # Store the files to skip copying which are greater than the upload_chunck_size()
+    skip_file_list = ""  # Store the files to skip copying which are greater than the upload_chunck_size()
 
     if self.isdir(src):
       # 'src' is directory.
@@ -316,6 +418,11 @@ class OzoneFS(WebHdfs):
         else:
           self.copyfile(src, dest)
       else:
-        skip_file_list += ' \n- ' + src
+        skip_file_list += " \n- " + src
 
     return skip_file_list
+
+  def get_upload_handler(self, destination_path, overwrite):
+    from desktop.lib.fs.ozone.upload import OFSNewFileUploadHandler
+
+    return OFSNewFileUploadHandler(self, destination_path, overwrite)

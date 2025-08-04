@@ -48,8 +48,13 @@ const DeletionModal = ({
     onError
   });
 
-  const handleDeletion = (isForedSkipTrash: boolean = false) => {
-    const isSkipTrash = !isTrashEnabled || isForedSkipTrash;
+  const isMoveTrashButtonDisabled = loading && !isMoveTrashClicked;
+  const isMoveTrashButtonLoading = loading && isMoveTrashClicked;
+  const isDeletePermanentlyButtonDisabled = loading && isMoveTrashClicked;
+  const isDeletePermanentlyButtonLoading = loading && !isMoveTrashClicked;
+  const hasMultipleFiles = files.length > 1;
+
+  const handleDeletion = (isSkipTrash: boolean) => {
     setIsMoveTrashClicked(!isSkipTrash);
 
     const formData = new FormData();
@@ -60,7 +65,7 @@ const DeletionModal = ({
       formData.append('skip_trash', String(isSkipTrash));
     }
 
-    if (files.length > 1) {
+    if (hasMultipleFiles) {
       save(formData, { url: BULK_DELETION_API_URL });
     } else {
       save(formData, { url: DELETION_API_URL });
@@ -73,26 +78,29 @@ const DeletionModal = ({
       title={t('Confirm Delete')}
       className="hue-input-modal cuix antd"
       cancelText={t('Cancel')}
-      okText={isTrashEnabled ? t('Move to Trash') : t('Delete Permanently')}
-      onOk={() => handleDeletion()}
+      okText={t('Move to Trash')}
+      onOk={() => handleDeletion(false)}
       okButtonProps={{
-        disabled: loading && !isMoveTrashClicked,
-        loading: loading && isMoveTrashClicked
+        disabled: isMoveTrashButtonDisabled,
+        loading: isMoveTrashButtonLoading,
+        hidden: !isTrashEnabled
       }}
-      secondaryButtonText={isTrashEnabled ? t('Delete Permanently') : undefined}
+      secondaryButtonText={t('Delete Permanently')}
       onSecondary={() => handleDeletion(true)}
       secondaryButtonProps={{
-        disabled: loading && isMoveTrashClicked,
-        loading: loading && !isMoveTrashClicked
+        disabled: isDeletePermanentlyButtonDisabled,
+        loading: isDeletePermanentlyButtonLoading,
+        danger: true
       }}
       onCancel={onClose}
       cancelButtonProps={{ disabled: loading }}
+      closable={!loading}
     >
       {isTrashEnabled
-        ? files.length > 1
+        ? hasMultipleFiles
           ? t('Do you want to move {{count}} items to trash?', { count: files.length })
           : t('Do you want to move "{{name}}" to trash?', { name: files[0]?.name })
-        : files.length > 1
+        : hasMultipleFiles
           ? t('Do you want to delete {{count}} items permanently?', { count: files.length })
           : t('Do you want to delete "{{name}}" permanently?', { name: files[0]?.name })}
     </Modal>

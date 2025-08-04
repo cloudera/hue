@@ -16,11 +16,12 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
-import { ApiFetchOptions, post } from '../../../api/utils';
+import { ApiFetchOptions, HttpMethod, sendApiRequest } from '../../../api/utils';
 import { isJSON } from '../../jsonUtils';
 
 interface saveOptions<T, E> {
   url?: string;
+  method?: HttpMethod;
   onSuccess?: (data: T) => void;
   onError?: (error: AxiosError) => void;
   postOptions?: ApiFetchOptions<T, E>;
@@ -46,14 +47,14 @@ const useSaveData = <T, U = unknown, E = string>(
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<E | undefined>();
 
-  const postOptionsDefault: ApiFetchOptions<T, E> = {
+  const requestOptionsDefault: ApiFetchOptions<T, E> = {
     silenceErrors: true,
     ignoreSuccessErrors: true
   };
 
   const saveData = useCallback(
     async (body: U, saveOptions?: saveOptions<T, E>) => {
-      // Avoid Posting data if the skip option is true
+      // Avoid sending data if the skip option is true
       // or if the URL is not provided
       const apiUrl = saveOptions?.url ?? url;
       if (options?.skip || !apiUrl) {
@@ -62,15 +63,18 @@ const useSaveData = <T, U = unknown, E = string>(
       setLoading(true);
       setError(undefined);
 
-      const postOptions = {
-        ...postOptionsDefault,
+      const requestOptions = {
+        ...requestOptionsDefault,
         qsEncodeData: body instanceof FormData || isJSON(body) ? false : true,
         ...localOptions?.postOptions,
         ...saveOptions?.postOptions
       };
 
+      const method = saveOptions?.method ?? localOptions?.method ?? HttpMethod.POST;
+
       try {
-        const response = await post<T, U, E>(apiUrl, body, postOptions);
+        const response = await sendApiRequest(method, apiUrl, body, requestOptions);
+
         setData(response);
         if (saveOptions?.onSuccess) {
           saveOptions.onSuccess(response);
@@ -79,12 +83,12 @@ const useSaveData = <T, U = unknown, E = string>(
           localOptions.onSuccess(response);
         }
       } catch (error) {
-        setError(error);
+        setError(error as E);
         if (saveOptions?.onError) {
-          saveOptions.onError(error);
+          saveOptions.onError(error as AxiosError);
         }
         if (localOptions?.onError) {
-          localOptions.onError(error);
+          localOptions.onError(error as AxiosError);
         }
       } finally {
         setLoading(false);

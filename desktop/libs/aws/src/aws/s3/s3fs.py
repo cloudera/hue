@@ -14,14 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
+import posixpath
 import re
 import time
-import logging
-import itertools
-import posixpath
-import urllib.error
-import urllib.request
 from builtins import object, str
 from urllib.parse import urlparse as lib_urlparse
 
@@ -29,18 +26,18 @@ from boto.exception import BotoClientError, S3ResponseError
 from boto.s3.connection import Location
 from boto.s3.key import Key
 from boto.s3.prefix import Prefix
-from django.http.multipartparser import MultiPartParser
 from django.utils.translation import gettext as _
 
 from aws import s3
-from aws.conf import AWS_ACCOUNTS, PERMISSION_ACTION_S3, get_default_region, get_locations, is_raz_s3
-from aws.s3 import S3A_ROOT, normpath, s3file, translate_s3_error
+from aws.conf import AWS_ACCOUNTS, get_default_region, get_locations, is_raz_s3, PERMISSION_ACTION_S3
+from aws.s3 import normpath, S3A_ROOT, s3file, translate_s3_error
 from aws.s3.s3stat import S3Stat
 from filebrowser.conf import REMOTE_STORAGE_HOME
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 BUCKET_NAME_PATTERN = re.compile(
   r"^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9_\-]*[A-Za-z0-9]))$")
+S3A_DELETE_CHUNK_SIZE = 1000  # S3 API limit for bulk delete operations
 
 LOG = logging.getLogger()
 
@@ -353,38 +350,95 @@ class S3FileSystem(object):
   @translate_s3_error
   @auth_error_handler
   def rmtree(self, path, skipTrash=True):
+    """
+    Recursively deletes objects from an S3 path.
+
+    This method can delete a single object, all objects under a given prefix (a "directory"),
+    or an entire bucket. It handles paginating through keys for deletion to respect
+    S3's 1000-key limit per bulk delete request.
+
+    Args:
+      path (str): The S3 URI to delete (e.g., 's3a://test-bucket/test-folder/').
+      skipTrash (bool): If False, this operation is not supported and will fail.
+
+    Raises:
+      NotImplementedError: If `skipTrash` is set to False.
+      S3FileSystemException: If any errors occur during the deletion process.
+      ValueError: If the provided path is not a valid S3 URI.
+    """
     if not skipTrash:
-      raise NotImplementedError('Moving to trash is not implemented for S3')
+      raise NotImplementedError("Moving to trash is not implemented for S3.")
 
-    bucket_name, key_name = s3.parse_uri(path)[:2]
+    try:
+      bucket_name, key_name = s3.parse_uri(path)[:2]
+    except Exception:
+      raise ValueError(f"Invalid S3 URI provided: {path}")
+
+    LOG.info(f"Attempting to recursively delete path: {path}")
+    LOG.debug(f"Parsed bucket: '{bucket_name}', key: '{key_name}'")
+
     if bucket_name and not key_name:
-      self._delete_bucket(bucket_name)
-    else:
-      if self.isdir(path):
-        path = self._append_separator(path)  # Really need to make sure we end with a '/'
+      return self._delete_bucket(bucket_name)
 
+    # Ensure directory-like paths end with a '/' to be used as a prefix
+    if self.isdir(path):
+      path = self._append_separator(path)
+      key_name = self._append_separator(key_name)
+
+    is_directory_key = key_name and key_name.endswith("/")
+
+    try:
       key = self._get_key(path, validate=False)
+      bucket = key.bucket
+    except Exception as e:
+      # Handle cases where the bucket might not exist or connection fails
+      LOG.error(f"Failed to connect to bucket '{bucket_name}'. Error: {e}")
+      raise S3FileSystemException(f"Could not access bucket '{bucket_name}'.") from e
 
-      if key.exists():
-        dir_keys = []
+    if key.exists() or is_directory_key:  # Check both key.exists() and isdir to handle virtual dirs
+      keys_to_delete = []
 
-        if self.isdir(path):
-          _, dir_key_name = s3.parse_uri(path)[:2]
-          dir_keys = key.bucket.list(prefix=dir_key_name)
+      if is_directory_key:
+        for k in bucket.list(prefix=key_name):
+          keys_to_delete.append(k)
 
-        if not dir_keys:
-          # Avoid Raz bulk delete issue
-          deleted_key = key.delete()
-          if deleted_key.exists():
-            raise S3FileSystemException('Could not delete key %s' % deleted_key)
-        else:
-          result = key.bucket.delete_keys(list(dir_keys))
+        # Explicitly add the current directory marker (empty object) if it exists but wasn't included
+        dir_marker = bucket.get_key(key_name)
+        if dir_marker is not None and dir_marker not in keys_to_delete:
+          keys_to_delete.append(dir_marker)
+      else:
+        # Add the single key object
+        keys_to_delete.append(key)
+
+      LOG.info(f"Found {len(keys_to_delete)} S3 object(s) to delete under prefix '{key_name}'.")
+
+      # Calculate total chunks using integer ceiling division.
+      total_chunks = (len(keys_to_delete) + S3A_DELETE_CHUNK_SIZE - 1) // S3A_DELETE_CHUNK_SIZE
+      all_errors = []
+
+      # Process keys in chunks of 1000 (S3 API limit)
+      for i in range(0, len(keys_to_delete), S3A_DELETE_CHUNK_SIZE):
+        chunk = keys_to_delete[i : i + S3A_DELETE_CHUNK_SIZE]
+
+        LOG.debug(f"Deleting chunk {i // S3A_DELETE_CHUNK_SIZE + 1} of {total_chunks} (size: {len(chunk)} keys).")
+        try:
+          result = bucket.delete_keys(chunk)
           if result.errors:
-            msg = "%d errors occurred while attempting to delete the following S3 paths:\n%s" % (
-              len(result.errors), '\n'.join(['%s: %s' % (error.key, error.message) for error in result.errors])
-            )
-            LOG.error(msg)
-            raise S3FileSystemException(msg)
+            LOG.warning(f"Encountered {len(result.errors)} errors in this deletion chunk.")
+            all_errors.extend(result.errors)
+        except S3ResponseError as e:
+          # Catch potential connection errors or access denied on the delete call itself
+          LOG.error(f"An S3 API error occurred during key deletion: {e}")
+          raise S3FileSystemException(f"Failed to delete objects: {e.message}") from e
+
+      # After deleting all keys, handle any accumulated errors
+      if all_errors:
+        error_details = "\n".join([f"- {err.key}: {err.message}" for err in all_errors])
+        msg = f"{len(all_errors)} errors occurred while deleting objects from '{path}':\n{error_details}"
+        LOG.error(msg)
+        raise S3FileSystemException(msg)
+
+      LOG.info(f"Successfully deleted {len(keys_to_delete)} object(s) from path: {path}")
 
   @translate_s3_error
   @auth_error_handler
@@ -578,16 +632,6 @@ class S3FileSystem(object):
 
   @translate_s3_error
   @auth_error_handler
-  def upload_v1(self, META, input_data, destination, username):
-    from aws.s3.upload import S3NewFileUploadHandler  # Circular dependency
-
-    s3_upload_handler = S3NewFileUploadHandler(destination, username)
-
-    parser = MultiPartParser(META, input_data, [s3_upload_handler])
-    return parser.parse()
-
-  @translate_s3_error
-  @auth_error_handler
   def append(self, path, data):
     key = self._get_key(path, validate=False)
     current_data = key.get_contents_as_string() or ''
@@ -616,3 +660,7 @@ class S3FileSystem(object):
   def get_upload_chuck_size(self):
     from hadoop.conf import UPLOAD_CHUNK_SIZE  # circular dependency
     return UPLOAD_CHUNK_SIZE.get()
+
+  def get_upload_handler(self, destination_path, overwrite):
+    from aws.s3.upload import S3NewFileUploadHandler
+    return S3NewFileUploadHandler(self, destination_path, overwrite)

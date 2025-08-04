@@ -46,8 +46,7 @@ export const createChunks = (
   item: RegularFile,
   chunkSize: number,
 ): ChunkedFile[] => {
-  const totalChunks = getTotalChunk(item.file.size, chunkSize);
-
+  const totalChunks = Math.max(1, getTotalChunk(item.file.size, chunkSize));
   const chunks = Array.from({ length: totalChunks }, (_, i) => {
     const chunkStartOffset = i * chunkSize;
     const chunkEndOffset = Math.min(chunkStartOffset + chunkSize, item.file.size);

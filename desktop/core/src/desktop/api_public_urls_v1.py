@@ -17,9 +17,11 @@
 
 from django.urls import re_path
 
+from about import api as about_api
 from desktop import api_public
 from desktop.lib.botserver import api as botserver_api
 from desktop.lib.importer import api as importer_api
+from filebrowser import api as filebrowser_api
 
 # "New" query API (i.e. connector based, lean arguments).
 # e.g. https://demo.gethue.com/api/query/execute/hive
@@ -36,11 +38,10 @@ urlpatterns += [
   re_path(r'^logs/download/?$', api_public.download_hue_logs, name='core_download_hue_logs'),
   re_path(r'^install_app_examples/?$', api_public.install_app_examples, name='core_install_app_examples'),
   re_path(r'^available_app_examples/?$', api_public.available_app_examples, name='core_available_app_examples'),
-  re_path(r'^usage_analytics/?$', api_public.get_usage_analytics, name='core_get_usage_analytics'),
-  re_path(r'^usage_analytics/update/?$', api_public.update_usage_analytics, name='core_update_usage_analytics'),
   re_path(r'^get_config/?$', api_public.get_config),
   re_path(r'^check_config/?$', api_public.check_config, name='core_check_config'),
   re_path(r'^get_namespaces/(?P<interface>[\w\-]+)/?$', api_public.get_context_namespaces),  # To remove
+  re_path(r'^usage_analytics/?$', about_api.UsageAnalyticsAPI.as_view(), name='core_usage_analytics'),
 ]
 
 urlpatterns += [
@@ -111,10 +112,10 @@ urlpatterns += [
   re_path(r'^storage/create/file/?$', api_public.storage_touch, name='storage_touch'),
   re_path(r'^storage/create/directory/?$', api_public.storage_mkdir, name='storage_mkdir'),
   re_path(r'^storage/save/?$', api_public.storage_save_file, name="storage_save_file"),
-  re_path(r'^storage/rename/?$', api_public.storage_rename, name='storage_rename'),
+  re_path(r'^storage/rename/?$', filebrowser_api.rename, name='storage_rename'),
   re_path(r'^storage/move/?$', api_public.storage_move, name='storage_move'),
   re_path(r'^storage/copy/?$', api_public.storage_copy, name='storage_copy'),
-  re_path(r'^storage/upload/file/?$', api_public.storage_upload_file, name='storage_upload_file'),
+  re_path(r'^storage/upload/file/?$', filebrowser_api.UploadFileAPI.as_view(), name='storage_upload_file'),
   re_path(r'^storage/upload/chunks/?$', api_public.storage_upload_chunks, name='storage_upload_chunks'),
   re_path(r'^storage/upload/complete/?$', api_public.storage_upload_complete, name='storage_upload_complete'),
   re_path(r'^storage/stat/?$', api_public.storage_stat, name='storage_stat'),

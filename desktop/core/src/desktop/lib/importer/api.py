@@ -79,10 +79,10 @@ def local_file_upload(request: Request) -> Response:
   if not serializer.is_valid():
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  uploaded_file = serializer.validated_data["file"]
+  upload_data = serializer.validated_data
 
-  LOG.info(f"User {request.user.username} is uploading a local file: {uploaded_file.name}")
-  result = operations.local_file_upload(uploaded_file, request.user.username)
+  LOG.info(f"User {request.user.username} is uploading a local file: {upload_data.filename}")
+  result = operations.local_file_upload(upload_data, request.user.username)
 
   return Response(result, status=status.HTTP_201_CREATED)
 
@@ -114,15 +114,10 @@ def guess_file_metadata(request: Request) -> Response:
   if not serializer.is_valid():
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  validated_data = serializer.validated_data
-  file_path = validated_data["file_path"]
-  import_type = validated_data["import_type"]
+  metadata_params = serializer.validated_data
 
   try:
-    metadata = operations.guess_file_metadata(
-      file_path=file_path, import_type=import_type, fs=request.fs if import_type == "remote" else None
-    )
-
+    metadata = operations.guess_file_metadata(data=metadata_params, username=request.user.username)
     return Response(metadata, status=status.HTTP_200_OK)
 
   except ValueError as e:
@@ -152,44 +147,10 @@ def preview_file(request: Request) -> Response:
   if not serializer.is_valid():
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  # Get validated data
-  validated_data = serializer.validated_data
-  file_path = validated_data["file_path"]
-  file_type = validated_data["file_type"]
-  import_type = validated_data["import_type"]
-  sql_dialect = validated_data["sql_dialect"]
-  has_header = validated_data.get("has_header")
+  preview_params = serializer.validated_data
 
   try:
-    if file_type == "excel":
-      sheet_name = validated_data.get("sheet_name")
-
-      preview = operations.preview_file(
-        file_path=file_path,
-        file_type=file_type,
-        import_type=import_type,
-        sql_dialect=sql_dialect,
-        has_header=has_header,
-        sheet_name=sheet_name,
-        fs=request.fs if import_type == "remote" else None,
-      )
-    else:  # Delimited file types
-      field_separator = validated_data.get("field_separator")
-      quote_char = validated_data.get("quote_char")
-      record_separator = validated_data.get("record_separator")
-
-      preview = operations.preview_file(
-        file_path=file_path,
-        file_type=file_type,
-        import_type=import_type,
-        sql_dialect=sql_dialect,
-        has_header=has_header,
-        field_separator=field_separator,
-        quote_char=quote_char,
-        record_separator=record_separator,
-        fs=request.fs if import_type == "remote" else None,
-      )
-
+    preview = operations.preview_file(data=preview_params, username=request.user.username)
     return Response(preview, status=status.HTTP_200_OK)
 
   except ValueError as e:
@@ -224,17 +185,10 @@ def guess_file_header(request: Request) -> Response:
   if not serializer.is_valid():
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  validated_data = serializer.validated_data
+  header_params = serializer.validated_data
 
   try:
-    has_header = operations.guess_file_header(
-      file_path=validated_data["file_path"],
-      file_type=validated_data["file_type"],
-      import_type=validated_data["import_type"],
-      sheet_name=validated_data.get("sheet_name"),
-      fs=request.fs if validated_data["import_type"] == "remote" else None,
-    )
-
+    has_header = operations.guess_file_header(data=header_params, username=request.user.username)
     return Response({"has_header": has_header}, status=status.HTTP_200_OK)
 
   except ValueError as e:
@@ -249,31 +203,29 @@ def guess_file_header(request: Request) -> Response:
 @parser_classes([JSONParser])
 @api_error_handler
 def get_sql_type_mapping(request: Request) -> Response:
-  """Get mapping from Polars data types to SQL types for a specific dialect.
+  """Get SQL types supported by a specific dialect.
 
-  This API endpoint returns a dictionary mapping Polars data types to the corresponding
-  SQL types for a specific SQL dialect.
+  This API endpoint returns a sorted list of unique SQL types that are supported
+  by a specific SQL dialect.
 
   Args:
     request: Request object containing query parameters:
-      - sql_dialect: The SQL dialect to get mappings for (e.g., 'hive', 'impala', 'trino')
+      - sql_dialect: The SQL dialect to get types for (e.g., 'hive', 'impala', 'trino')
 
   Returns:
-    Response containing a mapping dictionary:
-      - A mapping from Polars data type names to SQL type names for the specified dialect
+    Response containing a list of SQL types:
+      - A sorted list of unique SQL type names supported by the specified dialect
   """
   serializer = SqlTypeMapperSerializer(data=request.query_params)
 
   if not serializer.is_valid():
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  validated_data = serializer.validated_data
-  sql_dialect = validated_data["sql_dialect"]
+  type_mapping_params = serializer.validated_data
 
   try:
-    type_mapping = operations.get_sql_type_mapping(sql_dialect)
+    type_mapping = operations.get_sql_type_mapping(type_mapping_params)
     return Response(type_mapping, status=status.HTTP_200_OK)
-
   except ValueError as e:
     return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
   except Exception as e:

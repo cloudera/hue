@@ -20,7 +20,7 @@ import logging
 try:
   try:
     from pysqlite2 import dbapi2 as Database
-  except ImportError as e1:
+  except ImportError:
     from sqlite3 import dbapi2 as Database
 except ImportError as exc:
   from django.core.exceptions import ImproperlyConfigured
@@ -28,14 +28,15 @@ except ImportError as exc:
 
 from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
-
 LOG = logging.getLogger()
 
 
-class DataTable(BaseRDBMSDataTable): pass
+class DataTable(BaseRDBMSDataTable):
+  pass
 
 
-class Result(BaseRDBMSResult): pass
+class Result(BaseRDBMSResult):
+  pass
 
 
 class SQLiteClient(BaseRDMSClient):
@@ -47,7 +48,6 @@ class SQLiteClient(BaseRDMSClient):
   def __init__(self, *args, **kwargs):
     super(SQLiteClient, self).__init__(*args, **kwargs)
     self.connection = Database.connect(**self._conn_params)
-
 
   @property
   def _conn_params(self):
@@ -64,11 +64,9 @@ class SQLiteClient(BaseRDMSClient):
 
     return params
 
-
   def use(self, database):
     # Do nothing because SQLite has one database per path.
     pass
-
 
   def execute_statement(self, statement):
     cursor = self.connection.cursor()
@@ -80,10 +78,8 @@ class SQLiteClient(BaseRDMSClient):
       columns = []
     return self.data_table_cls(cursor, columns)
 
-
   def get_databases(self):
     return [self._conn_params['database']]
-
 
   def get_tables(self, database, table_names=[]):
     # Doesn't use database and only retrieves tables for database currently in use.
@@ -96,7 +92,6 @@ class SQLiteClient(BaseRDMSClient):
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
-
   def get_columns(self, database, table, names_only=True):
     cursor = self.connection.cursor()
     cursor.execute("PRAGMA table_info(%s)" % table)
@@ -107,7 +102,7 @@ class SQLiteClient(BaseRDMSClient):
       columns = [dict(name=row[1], type=row[2], comment='') for row in cursor.fetchall()]
     return columns
 
-  def get_sample_data(self, database, table, column=None, limit=100):
+  def get_sample_data(self, database, table, column=None, nested=None, limit=100):
     column = '`%s`' % column if column else '*'
     statement = 'SELECT %s FROM `%s` LIMIT %d' % (column, table, limit)
     return self.execute_statement(statement)

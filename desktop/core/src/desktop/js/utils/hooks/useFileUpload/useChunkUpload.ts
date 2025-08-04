@@ -24,6 +24,7 @@ import {
 } from '../../constants/storageBrowser';
 import useLoadData from '../useLoadData/useLoadData';
 import { TaskServerResponse, TaskStatus } from '../../../reactComponents/TaskServer/types';
+import { GET_TASKS_URL } from '../../../reactComponents/TaskServer/constants';
 import {
   getChunksCompletePayload,
   getItemProgress,
@@ -42,7 +43,6 @@ import {
   FileStatus,
   ChunkedFilesInProgress
 } from './types';
-import { GET_TASKS_URL } from 'reactComponents/TaskServer/constants';
 
 interface UseChunkUploadResponse {
   addFiles: (items: RegularFile[]) => void;

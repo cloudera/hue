@@ -19,22 +19,18 @@
 Interfaces for ABFS
 """
 
-import os
 import logging
+import os
 import threading
-import urllib.error
-import urllib.request
+import time
+import uuid
 from builtins import object
-from math import ceil
-from posixpath import join
 from urllib.parse import quote as urllib_quote, urlparse as lib_urlparse
-
-from django.http.multipartparser import MultiPartParser
 
 import azure.abfs.__init__ as Init_ABFS
 from azure.abfs.abfsfile import ABFSFile
 from azure.abfs.abfsstats import ABFSStat
-from azure.conf import PERMISSION_ACTION_ABFS, is_raz_abfs
+from azure.conf import is_raz_abfs, PERMISSION_ACTION_ABFS
 from desktop.conf import RAZ
 from desktop.lib.rest import http_client, resource
 from desktop.lib.rest.raz_http_client import RazHttpClient
@@ -445,15 +441,18 @@ class ABFS(object):
       params = {'position': int(resp['Content-Length']) + offset, 'action': 'append'}
     else:
       params['action'] = 'append'
+
     headers = {}
+    actual_data = data.getvalue() if hasattr(data, 'getvalue') else data
+
     if size == 0 or size == '0':
-      headers['Content-Length'] = str(len(data.getvalue()))
+      headers['Content-Length'] = str(len(actual_data))
       if headers['Content-Length'] == '0':
         return
     else:
       headers['Content-Length'] = str(size)
 
-    return self._patching_sl(path, params, data, headers, **kwargs)
+    return self._patching_sl(path, params, actual_data, headers, **kwargs)
 
   def flush(self, path, params=None, headers=None, **kwargs):
     """
@@ -531,7 +530,7 @@ class ABFS(object):
     """
     header = {}
     if permissionNumber is not None:
-      if isinstance(permissionNumber, basestring):
+      if isinstance(permissionNumber, str):
         header['x-ms-permissions'] = str(permissionNumber)
       else:
         header['x-ms-permissions'] = oct(permissionNumber)
@@ -571,7 +570,6 @@ class ABFS(object):
     """
     new_path = dst + '/' + Init_ABFS.strip_path(src)
     self.create(new_path)
-    chunk_size = self.get_upload_chuck_size()
     file = self.read(src)
     size = len(file)
     self._writedata(new_path, file, size)
@@ -616,14 +614,6 @@ class ABFS(object):
     """
     pass
 
-  def upload_v1(self, META, input_data, destination, username):
-    from azure.abfs.upload import ABFSNewFileUploadHandler  # Circular dependency
-
-    abfs_upload_handler = ABFSNewFileUploadHandler(destination, username)
-
-    parser = MultiPartParser(META, input_data, [abfs_upload_handler])
-    return parser.parse()
-
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
     """
     Copy a directory or file from Local (Testing)
@@ -641,16 +631,16 @@ class ABFS(object):
     """
     A wraper function for copying local directories
     """
-    self.mkdir(remote_dir)
+    self.mkdir(remote_dst)
 
-    for f in os.listdir(local_dir):
-      local_src = os.path.join(local_dir, f)
-      remote_dst = self.join(remote_dir, f)
+    for f in os.listdir(local_src):
+      local_src = os.path.join(local_src, f)
+      remote_dst = self.join(remote_dst, f)
 
       if os.path.isdir(local_src):
-        self._copy_dir(local_src, remote_dst, mode)
+        self._local_copy_dir(local_src, remote_dst)
       else:
-        self._copy_file(local_src, remote_dst)
+        self._local_copy_file(local_src, remote_dst)
 
   def _local_copy_file(self, local_src, remote_dst, chunk_size=UPLOAD_CHUCK_SIZE):
     """
@@ -658,10 +648,10 @@ class ABFS(object):
     """
     if os.path.isfile(local_src):
       if self.exists(remote_dst):
-        LOG.info('%s already exists. Skipping.' % remote_dst)
+        LOG.info(f'{remote_dst} already exists. Skipping.')
         return
 
-      src = file(local_src)
+      src = open(local_src, 'rb')
       try:
         try:
           self.create(remote_dst)
@@ -674,18 +664,116 @@ class ABFS(object):
             chunk = src.read(chunk_size)
           self.flush(remote_dst, params={'position': offset})
         except Exception:
-          LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
+          LOG.exception(f'Copying {local_src} -> {remote_dst} failed.')
           raise
       finally:
         src.close()
     else:
-      LOG.info(_('Skipping %s (not a file).') % local_src)
+      LOG.info(f'Skipping {local_src} (not a file).')
 
-  def check_access(self, path, *args, **kwargs):
+  def check_access(self, path, permission="READ"):
     """
-    Check access of a file/directory (Work in Progress/Not Ready)
+    Check if the user has the requested permission for a given path.
+
+    This method verifies access by attempting operations that would require the
+    specified permission level. It handles both files and directories gracefully.
+
+    Args:
+      path (str): The ABFS path to check access for
+      permission (str): Permission type to check - 'READ' or 'WRITE' (case-insensitive)
+
+    Returns:
+      bool: True if user has the requested permission, False otherwise
+
+    Note:
+      - For READ permission: Checks if path exists and tries to access its metadata
+      - For WRITE permission: For directories, attempts to create a temporary file;
+        for files or non-existent paths, checks parent directory write access
     """
-    raise NotImplementedError("")
+    permission = permission.upper()
+
+    if permission not in ("READ", "WRITE"):
+      LOG.warning(f'Invalid permission type "{permission}". Must be READ or WRITE.')
+      return False
+
+    try:
+      if permission == "READ":
+        # For read access, we need to verify the path exists and is accessible
+        if not self.exists(path):
+          LOG.debug(f'Path "{path}" does not exist, cannot read.')
+          return False
+
+        try:
+          if self.isdir(path):
+            # For directories, attempt to list contents
+            self.listdir_stats(path, params={"maxResults": 1})  # Limit results for efficiency
+          else:
+            # For files, get file stats
+            self.stats(path)
+          return True
+        except WebHdfsException as e:
+          if e.code in (401, 403):  # Unauthorized or Forbidden
+            LOG.debug(f'No read permission for path "{path}": {str(e)}')
+            return False
+          # Re-raise unexpected errors
+          raise
+
+      # Check WRITE permission
+      else:
+        # For non-existent paths, check parent directory
+        if not self.exists(path):
+          parent = self.parent_path(path)
+
+          # If we can't determine parent or we're at root, deny access
+          if not parent or parent == path:
+            LOG.debug(f'Cannot determine parent for non-existent path "{path}"')
+            return False
+
+          # Recursively check parent write access
+          return self.check_access(parent, permission="WRITE")
+
+        # For existing paths
+        if self.isdir(path):
+          # For directories, try creating a temporary marker file
+          temp_file = None
+          try:
+            # Generate unique temporary filename with timestamp
+            temp_file = self.join(path, f".hue_access_check_{str(int(time.time() * 1000))}_{str(uuid.uuid4())[:8]}")
+
+            # Attempt to create the temporary file
+            self.create(temp_file, overwrite=True, data="")
+
+            # Clean up the temporary file if creation succeeded
+            try:
+              self.remove(temp_file)
+            except Exception as cleanup_error:
+              LOG.warning(f'Failed to clean up temporary file "{temp_file}": {cleanup_error}')
+
+            return True
+
+          except WebHdfsException as e:
+            if e.code in (401, 403):  # Unauthorized or Forbidden
+              LOG.debug(f'No write permission for directory "{path}": {str(e)}')
+              return False
+            # Re-raise unexpected errors
+            raise
+
+        else:
+          # For files, check write permission on parent directory
+          parent = self.parent_path(path)
+          if parent and parent != path:
+            return self.check_access(parent, permission="WRITE")
+          else:
+            LOG.debug(f'Cannot check write access for file "{path}", no valid parent found')
+            return False
+
+    except ABFSFileSystemException as e:
+      LOG.debug(f'ABFS filesystem error checking {permission} permission at path "{path}": {str(e)}')
+      return False
+    except Exception as e:
+      # Log unexpected errors but don't crash
+      LOG.warning(f'Unexpected error checking {permission} permission at path "{path}": {str(e)}')
+      return False
 
   def mkswap(self, filename, subdir='', suffix='swp', basedir=None):
     """
@@ -710,27 +798,52 @@ class ABFS(object):
     """
     return UPLOAD_CHUCK_SIZE
 
+  def get_upload_handler(self, destination_path, overwrite):
+    from azure.abfs.upload import ABFSNewFileUploadHandler
+    return ABFSNewFileUploadHandler(self, destination_path, overwrite)
+
   def filebrowser_action(self):
     return self._filebrowser_action
 
   # Other Methods to condense stuff
   # ----------------------------
-  # Write Files on creation
-  # ----------------------------
   def _writedata(self, path, data, size):
     """
-    Adds text to a given file
+    Write data to a file in chunks.
+
+    This method splits the input data into chunks of the maximum allowed upload size and appends each chunk to the specified path.
+    After all chunks are written, it flushes the file to ensure all data is committed.
+
+    Args:
+      path (str): The destination file path in ABFS.
+      data (bytes or bytearray): The data to be written.
+      size (int): The total size of the data to be written.
+
+    Returns:
+      None
     """
     chunk_size = self.get_upload_chuck_size()
-    cycles = ceil(float(size) / chunk_size)
-    for i in range(0, cycles):
-      chunk = size % chunk_size
-      if i != cycles or chunk == 0:
-        length = chunk_size
+    # Calculate number of chunks needed using integer ceiling division
+    cycles = (size + chunk_size - 1) // chunk_size
+
+    for i in range(cycles):
+      start = i * chunk_size
+      if i == cycles - 1:  # Last chunk
+        # For the last chunk, only write the remaining data
+        length = size - start
       else:
-        length = chunk
-      self._append(path, data[i * chunk_size : i * chunk_size + length], length)
-    self.flush(path, {'position': int(size)})
+        # For all other chunks, write full chunk size
+        length = chunk_size
+
+      end = start + length
+      chunk_data = data[start:end]
+
+      # Only append if we have data to write
+      if chunk_data:
+        self._append(path, chunk_data, size=length, params={"position": start})
+
+    # Flush at the end with the total size
+    self.flush(path, {"position": int(size)})
 
   # Use Patch HTTP request
   # ----------------------------

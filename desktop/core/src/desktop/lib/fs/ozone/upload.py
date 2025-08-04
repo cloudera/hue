@@ -15,8 +15,9 @@
 # limitations under the License.
 
 import io
-import os
 import logging
+import os
+import tempfile
 import unicodedata
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -26,8 +27,8 @@ from django.utils.translation import gettext as _
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fsmanager import get_client
-from filebrowser.conf import RESTRICT_FILE_EXTENSIONS
-from filebrowser.utils import calculate_total_size, generate_chunks
+from filebrowser.conf import MAX_FILE_SIZE_UPLOAD_LIMIT
+from filebrowser.utils import calculate_total_size, generate_chunks, is_file_upload_allowed, massage_stats
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -52,13 +53,20 @@ class OFSFineUploaderChunkedUpload(object):
     self._part_size = UPLOAD_CHUNK_SIZE.get()
 
   def check_access(self):
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(self.file_name)
+    if not is_allowed:
+      LOG.error(err_message)
+      self._request.META["upload_failed"] = err_message
+      raise PopupException(err_message)
+
     if self._is_ofs_upload():
       self._fs = self._get_ofs(self._request)
 
       # Verify that the path exists
       try:
         self._fs.stats(self.destination)
-      except Exception as e:
+      except Exception:
         raise PopupException(_('Destination path does not exist: %s' % self.destination))
 
       LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
@@ -82,7 +90,7 @@ class OFSFineUploaderChunkedUpload(object):
         # Verify that the path exists
         try:
           self._fs.stats(self.destination)
-        except Exception as e:
+        except Exception:
           raise PopupException(_('Destination path does not exist: %s' % self.destination))
 
         LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
@@ -189,6 +197,7 @@ class OFSFileUploadHandler(FileUploadHandler):
     self.file = None
     self._request = request
     self._part_size = UPLOAD_CHUNK_SIZE.get()
+    self._upload_rejected = False
 
     if self._is_ofs_upload():
       self._fs = self._get_ofs(request)
@@ -196,7 +205,7 @@ class OFSFileUploadHandler(FileUploadHandler):
       # Verify that the path exists
       try:
         self._fs.stats(self.destination)
-      except Exception as e:
+      except Exception:
         raise OFSFileUploadError(_('Destination path does not exist: %s' % self.destination))
 
     LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
@@ -205,11 +214,13 @@ class OFSFileUploadHandler(FileUploadHandler):
     if self._is_ofs_upload():
       LOG.info('Using OFSFileUploadHandler to handle file upload.')
 
-      _, file_type = os.path.splitext(file_name)
-      if RESTRICT_FILE_EXTENSIONS.get() and file_type.lower() in [ext.lower() for ext in RESTRICT_FILE_EXTENSIONS.get()]:
-        err_message = f'Uploading files with type "{file_type}" is not allowed. Hue is configured to restrict this type.'
+      # Check file extension restrictions
+      is_allowed, err_message = is_file_upload_allowed(file_name)
+      if not is_allowed:
         LOG.error(err_message)
-        raise Exception(err_message)
+        self._request.META['upload_failed'] = err_message
+        self._upload_rejected = True
+        return None
 
       super(OFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
@@ -223,10 +234,12 @@ class OFSFileUploadHandler(FileUploadHandler):
         raise StopFutureHandlers()
       except (OFSFileUploadError, WebHdfsException) as e:
         LOG.error("Encountered error in OFSUploadHandler check_access: %s" % e)
-        self.request.META['upload_failed'] = e
+        self._request.META["upload_failed"] = e
         raise StopUpload()
 
   def receive_data_chunk(self, raw_data, start):
+    if self._upload_rejected:
+      return None
     if self._is_ofs_upload():
       LOG.debug("OFSfileUploadHandler receive_data_chunk")
       try:
@@ -240,6 +253,8 @@ class OFSFileUploadHandler(FileUploadHandler):
       return raw_data
 
   def file_complete(self, file_size):
+    if self._upload_rejected:
+      return None
     if self._is_ofs_upload():
       # Finish the upload
       LOG.info("OFSFileUploadHandler has completed file upload to OFS, total file size is: %d." % file_size)
@@ -269,46 +284,236 @@ class OFSFileUploadHandler(FileUploadHandler):
       return None
 
 
-class OFSNewFileUploadHandler(OFSFileUploadHandler):
+class OFSNewFileUploadHandler(FileUploadHandler):
   """
-  This handler uploads the file to Apache Ozone if the destination path starts with "OFS" (case insensitive).
-  Streams data chunks directly to OFS.
+  Handles file uploads to Ozone File System using temporary file buffering.
+
+  Unlike direct streaming approaches, this handler uses a temporary file to buffer
+  the entire upload before transferring to Ozone, as Ozone lacks native append/concat APIs.
+
+  Key features:
+  - Temporary file buffering for reliable uploads
+  - Automatic cleanup of temp files on success/failure
+  - Comprehensive validation and security checks
+  - Memory-efficient handling of large files
   """
 
-  def __init__(self, dest_path, username):
+  def __init__(self, fs, dest_path, overwrite):
     self.chunk_size = UPLOAD_CHUNK_SIZE.get()
-    self.destination = dest_path
-    self.username = username
-    self.target_path = None
-    self.file = None
-    self._part_size = UPLOAD_CHUNK_SIZE.get()
+    self._fs = fs
+    self.dest_path = dest_path
+    self.overwrite = overwrite
+    self.total_bytes_received = 0
+    self.target_file_path = None
+    self._temp_file = None
+    self._temp_file_path = None
 
-    # TODO: _is_ofs_upload really required?
-    if self._is_ofs_upload():
-      self._fs = self._get_ofs(self.username)
-
-    LOG.debug("Chunk size = %d" % UPLOAD_CHUNK_SIZE.get())
+    LOG.info(f"OFSNewFileUploadHandler initialized - destination: {dest_path}, overwrite: {overwrite}")
 
   def new_file(self, field_name, file_name, *args, **kwargs):
-    if self._is_ofs_upload():
-      super(OFSFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
+    super(OFSNewFileUploadHandler, self).new_file(field_name, file_name, *args, **kwargs)
 
-      LOG.info('Using OFSFileUploadHandler to handle file upload.')
-      self.target_path = self._fs.join(self.destination, file_name)
+    LOG.info(f"Starting OFS upload for file: {file_name}")
 
+    # Validate upload prerequisites
+    self._validate_upload_prerequisites(file_name)
+
+    # Build the target path
+    self.target_file_path = self._fs.join(self.dest_path, file_name)
+    LOG.info(f"OFS upload target path: {self.target_file_path}")
+
+    # Create a temporary file in the configured temp directory to buffer the upload data
+    try:
+      self._temp_file = tempfile.NamedTemporaryFile(
+        mode="wb",
+        dir=self._fs.temp_dir,
+        prefix="ofs_upload_",
+        suffix=".tmp",
+        delete=False,  # We'll handle deletion manually for better error handling
+      )
+      self._temp_file_path = self._temp_file.name
+      LOG.info(f"Created temporary file for OFS upload: {self._temp_file_path}")
+    except Exception as ex:
+      LOG.error(f"Failed to create temporary file for upload: {ex}")
+      raise PopupException("Failed to create temporary upload file: %s" % ex, error_code=500)
+
+    LOG.debug("OFS upload initialization completed successfully")
+
+  def _validate_upload_prerequisites(self, file_name):
+    """Validate all prerequisites before initiating file upload to Ozone.
+
+    Performs security and permission checks including:
+    - File extension restrictions
+    - Destination path existence and type validation
+    - Directory traversal attack prevention
+    - Write permission verification
+    - File overwrite handling based on policy
+
+    Args:
+      file_name: Name of the file to be uploaded.
+
+    Raises:
+      PopupException: With appropriate HTTP error codes:
+        - 400: Invalid file extension or filename
+        - 403: Insufficient permissions
+        - 404: Destination path not found
+        - 409: File exists and overwrite is disabled
+    """
+    LOG.debug(f"Validating upload prerequisites for file: {file_name}")
+
+    # Check file extension restrictions
+    is_allowed, err_message = is_file_upload_allowed(file_name)
+    if not is_allowed:
+      LOG.warning(f"File upload rejected - {err_message}")
+      raise PopupException(err_message, error_code=400)
+
+    # Check if the destination path already exists or not
+    if not self._fs.exists(self.dest_path):
+      LOG.error(f"Destination path does not exist: {self.dest_path}")
+      raise PopupException("The destination path %s does not exist." % self.dest_path, error_code=404)
+
+    # Check if the destination path is a directory or not
+    if not self._fs.isdir(self.dest_path):
+      LOG.error(f"Destination path is not a directory: {self.dest_path}")
+      raise PopupException("The destination path %s is not a directory." % self.dest_path, error_code=400)
+
+    # Check if the file name contains a path separator
+    # This prevents directory traversal attacks
+    if os.path.sep in file_name:
+      LOG.warning(f"Invalid filename with path separator: {file_name}")
+      raise PopupException("Invalid filename. Path separators are not allowed.", error_code=400)
+
+    # Check if the user has write access to the destination path
+    if not self._fs.check_access(self.dest_path, "WRITE"):
+      LOG.error(f"Insufficient permissions for destination: {self.dest_path}")
+      raise PopupException("Insufficient permissions to write to OFS path %s." % self.dest_path, error_code=403)
+
+    # Build the target path for file existence check
+    target_file_path = self._fs.join(self.dest_path, file_name)
+
+    # Check if file exists and handle overwrite
+    if self._fs.exists(target_file_path):
+      if self.overwrite:
+        LOG.info(f"Overwriting existing file: {target_file_path}")
+        self._fs.remove(target_file_path, skip_trash=True)
+      else:
+        LOG.warning(f"File already exists and overwrite is disabled: {target_file_path}")
+        raise PopupException("File already exists: %s" % target_file_path, error_code=409)
+
+    LOG.debug("Upload prerequisites validation completed successfully")
+
+  def receive_data_chunk(self, raw_data, start):
+    if not self._temp_file:
+      LOG.error("Upload handler not properly initialized - temp file is None")
+      raise PopupException("Upload handler not properly initialized", error_code=500)
+
+    self.total_bytes_received += len(raw_data)
+    max_size = MAX_FILE_SIZE_UPLOAD_LIMIT.get()
+
+    # Perform max size check on the fly
+    if max_size != -1 and max_size >= 0 and self.total_bytes_received > max_size:
+      LOG.error(f"File size exceeded limit - received: {self.total_bytes_received}, max: {max_size}")
+      self._cleanup_temp_file()
+      raise PopupException("File exceeds maximum allowed size of %d bytes." % max_size, error_code=413)
+
+    # Write the data chunk to the temporary file
+    try:
+      self._temp_file.write(raw_data)
+      self._temp_file.flush()  # Ensure data is written to disk
+      LOG.debug(f"Written chunk to temp file - size: {len(raw_data)} bytes, total: {self.total_bytes_received} bytes")
+    except Exception as e:
+      LOG.exception(f"Error writing to temporary file {self._temp_file_path}")
+      self._cleanup_temp_file()
+      raise PopupException("Failed to buffer upload data: %s" % e, error_code=500)
+
+    return None
+
+  def file_complete(self, file_size):
+    # Close the temp file for writing
+    if self._temp_file and not self._temp_file.closed:
+      self._temp_file.close()
+
+    # Verify we received all data
+    if self.total_bytes_received != file_size:
+      LOG.error(f"OFS upload size mismatch - expected: {file_size} bytes, received: {self.total_bytes_received} bytes")
+      self._cleanup_temp_file()
+      raise PopupException(
+        "Upload data size mismatch: expected %d bytes, received %d bytes." % (file_size, self.total_bytes_received), error_code=422
+      )
+
+    try:
+      # Stream from temp file directly to Ozone
+      LOG.info("Creating file %s with %d bytes from temporary file" % (self.target_file_path, file_size))
+
+      # Open temp file for reading and pass the file handle
+      # The requests library will stream from the file handle automatically
+      with open(self._temp_file_path, "rb") as temp_file_handle:
+        self._fs.create(
+          self.target_file_path,
+          overwrite=False,  # We already handled overwrite above
+          permission=self._fs.getDefaultFilePerms(),  # Default file permissions
+          data=temp_file_handle,
+        )
+
+      # Verify the upload succeeded by getting the file stats
+      file_stats = self._fs.stats(self.target_file_path)
+
+      # Perform size verification explicitly
+      actual_size = file_stats.size
+
+      if actual_size != file_size:
+        LOG.error(
+          "OFS upload size mismatch after write for %s: expected %d bytes, got %d bytes" % (self.target_file_path, file_size, actual_size)
+        )
+
+        # Clean up the corrupted file
+        try:
+          self._fs.remove(self.target_file_path, skip_trash=True)
+        except Exception as cleanup_error:
+          LOG.warning("Failed to clean up corrupted file %s: %s" % (self.target_file_path, cleanup_error))
+
+        # Raise exception to fail the upload
+        raise PopupException(
+          "Upload verification failed: expected %d bytes, but only %d bytes were written. "
+          "The incomplete file has been removed." % (file_size, actual_size),
+          error_code=422,
+        )
+
+      LOG.info("OFS upload completed successfully: %d bytes written to %s" % (file_size, self.target_file_path))
+
+    except Exception as e:
+      LOG.exception('Error creating file "%s" in OFS' % self.target_file_path)
+
+      # Try to clean up if file was partially created
       try:
-        # Check access permissions before attempting upload
-        # self._check_access() # Not implemented
-        LOG.debug("Initiating OFS upload to target path: %s" % self.target_path)
-        self.file = SimpleUploadedFile(name=file_name, content='')
-        raise StopFutureHandlers()
-      except (OFSFileUploadError, WebHdfsException) as e:
-        LOG.error("Encountered error in OFSUploadHandler check_access: %s" % e)
-        raise StopUpload()
+        if self._fs.exists(self.target_file_path):
+          self._fs.remove(self.target_file_path, skip_trash=True)
+      except Exception:
+        pass
 
-  def _get_ofs(self, username):
-    fs = get_client(fs='ofs', user=username)
-    if not fs:
-      raise OFSFileUploadError(_("No OFS filesystem found."))
+      if isinstance(e, PopupException):
+        raise
+      else:
+        raise PopupException("Failed to upload file in OFS: %s" % str(e), error_code=500)
+    finally:
+      # Always clean up the temporary file
+      self._cleanup_temp_file()
 
-    return fs
+    file_stats = massage_stats(file_stats)
+    return file_stats
+
+  def _cleanup_temp_file(self):
+    """Clean up the temporary file if it exists."""
+    if self._temp_file and not self._temp_file.closed:
+      try:
+        self._temp_file.close()
+      except Exception:
+        pass
+
+    if self._temp_file_path:
+      try:
+        if os.path.exists(self._temp_file_path):
+          os.unlink(self._temp_file_path)
+          LOG.debug("Cleaned up temporary file: %s" % self._temp_file_path)
+      except Exception as e:
+        LOG.exception("Failed to clean up temporary file %s: %s" % (self._temp_file_path, e))
