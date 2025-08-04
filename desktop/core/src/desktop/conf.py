@@ -1007,13 +1007,13 @@ SESSION = ConfigSection(
       key='expire_at_browser_close',
       help=_("Use session-length cookies. Logs out the user when she closes the browser window."),
       type=coerce_bool,
-      default=False
+      default=True
     ),
     CSRF_COOKIE_AGE=Config(
       key='csrf_cookie_age',
       help=_("CRSF cookie age defaults to 1 year. If the value is set to 0, it means per session. Time in seconds"),
       type=int,
-      default=60 * 60 * 24 * 7 * 52,
+      default=0,
     ),
     CONCURRENT_USER_SESSION_LIMIT=Config(
       key="concurrent_user_session_limit",
