@@ -79,26 +79,8 @@ jest.mock('../../../utils/hooks/useDataCatalog/useDataCatalog', () => ({
 }));
 
 jest.mock('./DestinationSettings/DestinationSettings', () => {
-  return function MockDestinationSettings({
-    onChange
-  }: {
-    defaultValues?: Record<string, unknown>;
-    onChange: (name: string, value: string) => void;
-  }) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const React = require('react');
-
-    React.useEffect(() => {
-      onChange('connectorId', 'hive');
-      onChange('database', 'database1');
-      onChange('computeId', 'compute1');
-    }, []); // Empty dependency array to only run once
-
-    return React.createElement(
-      'div',
-      { className: 'importer-destination-settings' },
-      React.createElement('div', null, 'Destination Settings Mock')
-    );
+  return function MockDestinationSettings() {
+    return <div data-testid="destination-settings">Destination Settings</div>;
   };
 });
 
@@ -111,34 +93,36 @@ describe('ImporterFilePreview', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mocked(useLoadData).mockImplementation((url?: string) => {
-      if (url === '/api/v1/importer/file/guess_metadata') {
+    (mocked(useLoadData) as jest.MockedFunction<typeof useLoadData>).mockImplementation(
+      (url?: string) => {
+        if (url === '/api/v1/importer/file/guess_metadata') {
+          return {
+            loading: false,
+            data: mockFileFormatData,
+            reloadData: jest.fn()
+          };
+        }
+        if (url === '/api/v1/importer/file/guess_header') {
+          return {
+            loading: false,
+            data: mockHeaderData,
+            reloadData: jest.fn()
+          };
+        }
+        if (url === '/api/v1/importer/file/preview') {
+          return {
+            loading: false,
+            data: mockPreviewData,
+            reloadData: jest.fn()
+          };
+        }
         return {
           loading: false,
-          data: mockFileFormatData,
+          data: ['STRING', 'INT', 'FLOAT'],
           reloadData: jest.fn()
         };
       }
-      if (url === '/api/v1/importer/file/guess_header') {
-        return {
-          loading: false,
-          data: mockHeaderData,
-          reloadData: jest.fn()
-        };
-      }
-      if (url === '/api/v1/importer/file/preview') {
-        return {
-          loading: false,
-          data: mockPreviewData,
-          reloadData: jest.fn()
-        };
-      }
-      return {
-        loading: false,
-        data: ['STRING', 'INT', 'FLOAT'],
-        reloadData: jest.fn()
-      };
-    });
+    );
   });
 
   it('should render correctly', async () => {
