@@ -44,7 +44,7 @@ class UsageAnalyticsAPI(APIView):
     """Handles GET requests to retrieve the current analytics setting."""
     try:
       settings = Settings.get_settings()
-      data = {"collectUsage": settings.collect_usage}
+      data = {"collect_usage": settings.collect_usage}
 
       return Response(data, status=status.HTTP_200_OK)
     except Exception as e:
@@ -53,16 +53,14 @@ class UsageAnalyticsAPI(APIView):
         {"error": "A server error occurred while retrieving usage analytics settings."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
       )
 
-# TODO: CHANGE THIS BACK TO PUT ONCE PUT IS SUPPORTED IN FRONTEND
-
-  def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+  def put(self, request: Request, *args: Any, **kwargs: Any) -> Response:
     """Handles PUT requests to update the analytics setting."""
     try:
       serializer = UsageAnalyticsSerializer(data=request.data)
       if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-      is_enabled = serializer.validated_data["collectUsage"]
+      is_enabled = serializer.validated_data["collect_usage"]
 
       settings = Settings.get_settings()
       settings.collect_usage = is_enabled
