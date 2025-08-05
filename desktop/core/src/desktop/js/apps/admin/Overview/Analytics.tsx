@@ -43,10 +43,10 @@ const Analytics = (): JSX.Element => {
     save: updateAnalyticsPreference,
     loading: updatingAnalyticsPreference,
     error: updateAnalyticsPreferenceError
-  } = useSaveData<{ collectUsage: boolean }>(USAGE_ANALYTICS_API_URL, {
+  } = useSaveData<{ collect_usage: boolean }>(USAGE_ANALYTICS_API_URL, {
     onSuccess: response => {
       reloadData();
-      const successMessage = response.collectUsage
+      const successMessage = response.collect_usage
         ? t('Analytics have been activated.')
         : t('Analytics have been deactivated.');
       huePubSub.publish<HueAlert>(GLOBAL_INFO_TOPIC, { message: successMessage });
@@ -65,7 +65,7 @@ const Analytics = (): JSX.Element => {
   ];
 
   const handleAnalyticsCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    updateAnalyticsPreference({ collectUsage: event.target.checked });
+    updateAnalyticsPreference({ collect_usage: event.target.checked });
   };
 
   return (
