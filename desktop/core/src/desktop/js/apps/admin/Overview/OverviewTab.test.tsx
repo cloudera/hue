@@ -26,13 +26,19 @@ import {
   INSTALL_AVAILABLE_EXAMPLES_API_URL,
   USAGE_ANALYTICS_API_URL
 } from '../Components/utils';
-import { get, post } from '../../../api/utils';
+import { get, post, sendApiRequest } from '../../../api/utils';
 import * as hueConfigModule from '../../../config/hueConfig';
 import huePubSub from '../../../utils/huePubSub';
 
 jest.mock('../../../api/utils', () => ({
   post: jest.fn(),
-  get: jest.fn()
+  get: jest.fn(),
+  sendApiRequest: jest.fn(),
+  HttpMethod: {
+    POST: 'post',
+    PUT: 'put',
+    PATCH: 'patch'
+  }
 }));
 
 jest.mock('./ConfigStatus', () => () => <div>MockedConfigStatusComponent</div>);
@@ -149,7 +155,9 @@ describe('OverviewTab', () => {
         }
         return Promise.reject();
       });
-      (post as jest.Mock).mockImplementation(() => Promise.resolve({ collectUsage: true }));
+      (sendApiRequest as jest.Mock).mockImplementation(() =>
+        Promise.resolve({ collect_usage: true })
+      );
     });
 
     afterEach(() => {
@@ -201,9 +209,10 @@ describe('OverviewTab', () => {
       await userEvent.click(checkbox);
 
       await waitFor(() => {
-        expect(post).toHaveBeenCalledWith(
+        expect(sendApiRequest).toHaveBeenCalledWith(
+          'post',
           USAGE_ANALYTICS_API_URL,
-          { collectUsage: true },
+          { collect_usage: true },
           expectedPostOptions
         );
       });
@@ -216,16 +225,17 @@ describe('OverviewTab', () => {
       await userEvent.click(checkbox);
 
       await waitFor(() => {
-        expect(post).toHaveBeenCalledWith(
+        expect(sendApiRequest).toHaveBeenCalledWith(
+          'post',
           USAGE_ANALYTICS_API_URL,
-          { collectUsage: false },
+          { collect_usage: false },
           expectedPostOptions
         );
       });
     });
 
     it('disables checkbox during save operation', async () => {
-      (post as jest.Mock).mockImplementation(() => new Promise(() => {})); // Never resolves
+      (sendApiRequest as jest.Mock).mockImplementation(() => new Promise(() => {})); // Never resolves
       await renderAnalyticsAndWaitForLoad();
 
       const checkbox = await expectCheckboxState(true);
@@ -238,7 +248,7 @@ describe('OverviewTab', () => {
     });
 
     it('shows loading state during save operation', async () => {
-      (post as jest.Mock).mockImplementation(() => new Promise(() => {}));
+      (sendApiRequest as jest.Mock).mockImplementation(() => new Promise(() => {}));
       await renderAnalyticsAndWaitForLoad();
 
       const checkbox = await expectCheckboxState(true);
@@ -251,7 +261,7 @@ describe('OverviewTab', () => {
 
     it('shows error message when save operation fails', async () => {
       const errorMessage = 'Failed to update analytics preference';
-      (post as jest.Mock).mockRejectedValue(errorMessage);
+      (sendApiRequest as jest.Mock).mockRejectedValue(errorMessage);
       await renderAnalyticsAndWaitForLoad();
 
       const checkbox = await expectCheckboxState(true);
@@ -264,7 +274,7 @@ describe('OverviewTab', () => {
 
     it('publishes success message when analytics are enabled', async () => {
       (get as jest.Mock).mockResolvedValue(mockAnalyticsDataDisabled);
-      (post as jest.Mock).mockResolvedValue({ collectUsage: true });
+      (sendApiRequest as jest.Mock).mockResolvedValue({ collect_usage: true });
       await renderAnalyticsAndWaitForLoad();
 
       const checkbox = await expectCheckboxState(false);
@@ -278,7 +288,7 @@ describe('OverviewTab', () => {
     });
 
     it('publishes success message when analytics are disabled', async () => {
-      (post as jest.Mock).mockResolvedValue({ collectUsage: false });
+      (sendApiRequest as jest.Mock).mockResolvedValue({ collect_usage: false });
       await renderAnalyticsAndWaitForLoad();
 
       const checkbox = await expectCheckboxState(true);
@@ -292,7 +302,7 @@ describe('OverviewTab', () => {
     });
 
     it('reloads data after successful save', async () => {
-      (post as jest.Mock).mockResolvedValue({ collectUsage: false });
+      (sendApiRequest as jest.Mock).mockResolvedValue({ collect_usage: false });
       await renderAnalyticsAndWaitForLoad();
 
       const checkbox = await expectCheckboxState(true);
@@ -316,7 +326,7 @@ describe('OverviewTab', () => {
       const saveError = 'Save failed';
 
       (get as jest.Mock).mockRejectedValue(fetchError);
-      (post as jest.Mock).mockRejectedValue(saveError);
+      (sendApiRequest as jest.Mock).mockRejectedValue(saveError);
 
       render(<Analytics />);
 
