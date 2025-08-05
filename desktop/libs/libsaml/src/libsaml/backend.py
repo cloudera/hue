@@ -25,6 +25,8 @@ import logging
 
 from django.contrib.auth import logout as auth_logout
 from django.http import HttpResponse
+
+import libsaml.views
 from djangosaml2.backends import Saml2Backend as _Saml2Backend
 from djangosaml2.views import LogoutView
 
@@ -114,6 +116,8 @@ class SAML2Backend(_Saml2Backend):
       response = LogoutView.as_view()(request)
       auth_logout(request)
       return response
+    elif conf.LOCAL_LOGOUT.get():
+      return libsaml.views.local_logout(request)
     elif conf.CDP_LOGOUT_URL.get():
       auth_logout(request)
       redirect_url = conf.get_logout_redirect_url()
