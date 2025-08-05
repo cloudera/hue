@@ -15,7 +15,6 @@
 // limitations under the License.
 
 import React, { useState } from 'react';
-import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import {
   CombinedFileFormat,
@@ -26,41 +25,32 @@ import {
   GuessHeaderResponse,
   ImporterTableData
 } from '../types';
-import { convertToAntdColumns, convertToDataSource, getDefaultTableName } from '../utils/utils';
+import { convertToAntdColumns, convertToDataSource } from '../utils/utils';
 import { i18nReact } from '../../../utils/i18nReact';
-import { BorderlessButton, PrimaryButton } from 'cuix/dist/components/Button';
+import { BorderlessButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
-import {
-  FILE_GUESS_METADATA,
-  FILE_GUESS_HEADER,
-  FILE_PREVIEW_URL,
-  FINISH_IMPORT_URL
-} from '../api';
+import { FILE_GUESS_METADATA, FILE_GUESS_HEADER, FILE_PREVIEW_URL } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
 import EditColumnsModal from './EditColumns/EditColumnsModal';
 import DestinationSettings from './DestinationSettings/DestinationSettings';
 
-import './ImporterFilePreview.scss';
+import './FilePreviewTab.scss';
 
-interface ImporterFilePreviewProps {
+interface FilePreviewTabProps {
   fileMetaData: FileMetaData;
+  destinationConfig: DestinationConfig;
+  onDestinationConfigChange: (name: string, value: string) => void;
 }
 
-const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.Element => {
+const FilePreviewTab = ({
+  fileMetaData,
+  destinationConfig,
+  onDestinationConfigChange
+}: FilePreviewTabProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [fileFormat, setFileFormat] = useState<CombinedFileFormat | undefined>();
 
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
-  const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
-    tableName: getDefaultTableName(fileMetaData)
-  });
-
-  const handleDestinationSettingsChange = (name: string, value: string) => {
-    setDestinationConfig(prevConfig => ({
-      ...prevConfig,
-      [name]: value
-    }));
-  };
 
   const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FILE_GUESS_METADATA, {
     params: {
@@ -120,50 +110,15 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
     }
   );
 
-  const { save, loading: finalizingImport } = useSaveData(FINISH_IMPORT_URL);
-
-  const handleFinishImport = () => {
-    const source = {
-      inputFormat: fileMetaData.source,
-      path: fileMetaData.path,
-      format: fileFormat,
-      sourceType: destinationConfig.connectorId
-    };
-    const destination = {
-      outputFormat: 'table',
-      nonDefaultLocation: fileMetaData.path,
-      name: `${destinationConfig.database}.${destinationConfig.tableName}`,
-      sourceType: destinationConfig.connectorId,
-      columns: previewData?.columns
-    };
-
-    const formData = new FormData();
-    formData.append('source', JSON.stringify(source));
-    formData.append('destination', JSON.stringify(destination));
-
-    save(formData);
-  };
-
   const columns = convertToAntdColumns(previewData?.columns ?? []);
   const tableData = convertToDataSource(previewData?.previewData ?? {});
 
   return (
     <div className="hue-importer-preview-page">
-      <div className="hue-importer-preview-page__header">
-        <div className="hue-importer-preview-page__header__title">{t('Preview')}</div>
-        <div className="hue-importer-preview-page__header__actions">
-          <BorderlessButton data-testid="hue-importer-preview-page__header__actions__cancel">
-            {t('Cancel')}
-          </BorderlessButton>
-          <PrimaryButton loading={finalizingImport} onClick={handleFinishImport}>
-            {t('Finish Import')}
-          </PrimaryButton>
-        </div>
-      </div>
       <div className="hue-importer-preview-page__metadata">
         <DestinationSettings
           defaultValues={destinationConfig}
-          onChange={handleDestinationSettingsChange}
+          onChange={onDestinationConfigChange}
         />
       </div>
       <div className="hue-importer-preview-page__main-section">
@@ -187,4 +142,4 @@ const ImporterFilePreview = ({ fileMetaData }: ImporterFilePreviewProps): JSX.El
   );
 };
 
-export default ImporterFilePreview;
+export default FilePreviewTab;
