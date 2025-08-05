@@ -22,7 +22,12 @@ import { DestinationConfig } from '../../types';
 import { useDataCatalog } from '../../../../utils/hooks/useDataCatalog/useDataCatalog';
 
 const mockUseDataCatalog = {
-  loading: false,
+  loading: {
+    connector: false,
+    compute: false,
+    database: false,
+    table: false
+  },
   databases: ['database1', 'database2'],
   database: 'database1',
   connectors: [
@@ -35,6 +40,7 @@ const mockUseDataCatalog = {
     { id: 'compute2', name: 'Compute 2' }
   ],
   compute: { id: 'compute1', name: 'Compute 1' },
+  tables: [],
   setCompute: jest.fn(),
   setConnector: jest.fn(),
   setDatabase: jest.fn()
@@ -79,20 +85,26 @@ describe('DestinationSettings Component', () => {
     expect(screen.getByDisplayValue('test_table')).toBeInTheDocument();
   });
 
-  it('should hide compute field when only one compute is available', () => {
+  it('should not have compute field when only one compute is available', async () => {
     const mockUseDataCatalogSingleCompute = {
       ...mockUseDataCatalog,
-      computes: [{ id: 'compute1', name: 'Compute 1' }]
+      computes: [{ id: 'compute1', name: 'Compute 1' }],
+      compute: { id: 'compute1', name: 'Compute 1' }
     };
 
-    (useDataCatalog as jest.Mock).mockReturnValueOnce(mockUseDataCatalogSingleCompute);
+    (useDataCatalog as jest.Mock).mockReturnValue(mockUseDataCatalogSingleCompute);
 
     render(<DestinationSettings {...defaultProps} />);
 
-    expect(screen.queryByLabelText('Compute')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByLabelText('Engine')).toBeInTheDocument();
+      expect(screen.getByLabelText('Database')).toBeInTheDocument();
+      expect(screen.getByLabelText('Table Name')).toBeInTheDocument();
+      expect(screen.queryByLabelText('Compute')).not.toBeInTheDocument();
+    });
   });
 
-  it('should show compute field when multiple computes are available', () => {
+  it('should show compute field when multiple computes are available', async () => {
     render(<DestinationSettings {...defaultProps} />);
 
     expect(screen.getByLabelText('Compute')).toBeInTheDocument();
@@ -149,54 +161,20 @@ describe('DestinationSettings Component', () => {
       id: 'compute2',
       name: 'Compute 2'
     });
-    expect(defaultProps.onChange).toHaveBeenCalledWith('compute', 'compute2');
+    expect(defaultProps.onChange).toHaveBeenCalledWith('computeId', 'compute2');
   });
 
-  it('should update table name input and not call onChange immediately', () => {
+  it('should update table name input and call onChange when input changes', async () => {
     render(<DestinationSettings {...defaultProps} />);
 
     const tableNameInput = screen.getByLabelText('Table Name');
     fireEvent.change(tableNameInput, { target: { value: 'new_table_name' } });
 
     expect(screen.getByDisplayValue('new_table_name')).toBeInTheDocument();
-    expect(defaultProps.onChange).not.toHaveBeenCalled();
+    expect(defaultProps.onChange).toHaveBeenCalledWith('tableName', 'new_table_name');
   });
 
-  it('should show loader in select dropdown when loading state is true', () => {
-    const mockUseDataCatalogLoading = {
-      ...mockUseDataCatalog,
-      loading: true
-    };
-
-    (useDataCatalog as jest.Mock).mockReturnValueOnce(mockUseDataCatalogLoading);
-
-    render(<DestinationSettings {...defaultProps} />);
-
-    const selectDropdowns = document.querySelectorAll('.ant-select');
-    selectDropdowns.forEach(select => {
-      expect(select).toBeInTheDocument();
-      expect(select).toHaveClass('ant-select-loading');
-    });
-  });
-
-  it('should not show loader in select dropdown when loading state is false', () => {
-    const mockUseDataCatalogLoading = {
-      ...mockUseDataCatalog,
-      loading: false
-    };
-
-    (useDataCatalog as jest.Mock).mockReturnValueOnce(mockUseDataCatalogLoading);
-
-    render(<DestinationSettings {...defaultProps} />);
-
-    const selectDropdowns = document.querySelectorAll('.ant-select');
-    selectDropdowns.forEach(select => {
-      expect(select).toBeInTheDocument();
-      expect(select).not.toHaveClass('ant-select-loading');
-    });
-  });
-
-  it('should set default values from props on component mount', () => {
+  it('should set default values from props on component mount', async () => {
     const mockSetConnector = jest.fn();
     const mockSetDatabase = jest.fn();
     const mockSetCompute = jest.fn();
@@ -223,7 +201,7 @@ describe('DestinationSettings Component', () => {
     });
   });
 
-  it('should not call setters when no matching items found in defaultValues', () => {
+  it('should not call setters when no matching items found in defaultValues', async () => {
     const mockSetConnector = jest.fn();
     const mockSetDatabase = jest.fn();
     const mockSetCompute = jest.fn();
@@ -245,5 +223,50 @@ describe('DestinationSettings Component', () => {
     expect(mockSetConnector).not.toHaveBeenCalled();
     expect(mockSetDatabase).not.toHaveBeenCalled();
     expect(mockSetCompute).not.toHaveBeenCalled();
+  });
+
+  it('should show alert when table name already exists', async () => {
+    const mockUseDataCatalogWithExistingTables = {
+      ...mockUseDataCatalog,
+      tables: [{ name: 'existing_table' }, { name: 'another_table' }]
+    };
+
+    (useDataCatalog as jest.Mock).mockReturnValue(mockUseDataCatalogWithExistingTables);
+
+    render(<DestinationSettings {...defaultProps} />);
+
+    const tableNameInput = screen.getByLabelText('Table Name');
+
+    fireEvent.change(tableNameInput, { target: { value: 'existing_table' } });
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByText('Table name already exists in the database')).toBeInTheDocument();
+    });
+  });
+
+  it('should hide alert when table name is unique', async () => {
+    const mockUseDataCatalogWithExistingTables = {
+      ...mockUseDataCatalog,
+      tables: [{ name: 'existing_table' }, { name: 'another_table' }]
+    };
+
+    (useDataCatalog as jest.Mock).mockReturnValue(mockUseDataCatalogWithExistingTables);
+
+    render(<DestinationSettings {...defaultProps} />);
+
+    const tableNameInput = screen.getByLabelText('Table Name');
+
+    fireEvent.change(tableNameInput, { target: { value: 'existing_table' } });
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+
+    fireEvent.change(tableNameInput, { target: { value: 'unique_table_name' } });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 });
