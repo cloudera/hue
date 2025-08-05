@@ -24,6 +24,7 @@ import { GLOBAL_INFO_TOPIC } from '../../../reactComponents/GlobalAlert/events';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import LoadingErrorWrapper from '../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
+import { HttpMethod } from '../../../api/utils';
 import './Overview.scss';
 
 interface UsageAnalyticsResponse {
@@ -44,6 +45,7 @@ const Analytics = (): JSX.Element => {
     loading: updatingAnalyticsPreference,
     error: updateAnalyticsPreferenceError
   } = useSaveData<{ collect_usage: boolean }>(USAGE_ANALYTICS_API_URL, {
+    method: HttpMethod.PUT,
     onSuccess: response => {
       reloadData();
       const successMessage = response.collect_usage
