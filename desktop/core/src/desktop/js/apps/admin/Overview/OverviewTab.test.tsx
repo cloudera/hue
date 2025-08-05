@@ -210,7 +210,7 @@ describe('OverviewTab', () => {
 
       await waitFor(() => {
         expect(sendApiRequest).toHaveBeenCalledWith(
-          'post',
+          'put',
           USAGE_ANALYTICS_API_URL,
           { collect_usage: true },
           expectedPostOptions
@@ -226,7 +226,7 @@ describe('OverviewTab', () => {
 
       await waitFor(() => {
         expect(sendApiRequest).toHaveBeenCalledWith(
-          'post',
+          'put',
           USAGE_ANALYTICS_API_URL,
           { collect_usage: false },
           expectedPostOptions
