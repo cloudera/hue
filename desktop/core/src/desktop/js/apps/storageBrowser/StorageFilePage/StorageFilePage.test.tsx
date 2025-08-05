@@ -32,10 +32,14 @@ jest.mock('../../../utils/huePubSub', () => ({
   publish: jest.fn()
 }));
 
-const mockSave = jest.fn();
-jest.mock('../../../api/utils', () => ({
-  post: () => mockSave()
-}));
+const mockSendApiRequest = jest.fn();
+jest.mock('../../../api/utils', () => {
+  const original = jest.requireActual('../../../api/utils');
+  return {
+    ...original,
+    sendApiRequest: () => mockSendApiRequest()
+  };
+});
 
 const mockLoadData = jest.fn().mockReturnValue({
   contents: 'Initial file content'
