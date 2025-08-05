@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import FileImportTabs from './FileImportTabs';
@@ -71,32 +71,37 @@ describe('FileImportTabs', () => {
     });
   });
 
-  it('renders the component with header and tabs', () => {
+  it('renders the component with header and tabs', async () => {
     render(<FileImportTabs {...defaultProps} />);
 
-    expect(screen.getByText('file.csv')).toBeInTheDocument();
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
-    expect(screen.getByText('Finish Import')).toBeInTheDocument();
-
-    expect(screen.getByText('Preview')).toBeInTheDocument();
-    expect(screen.getByText('Settings')).toBeInTheDocument();
-    expect(screen.getByText('Partitions')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('file.csv')).toBeInTheDocument();
+      expect(screen.getByText('Cancel')).toBeInTheDocument();
+      expect(screen.getByText('Finish Import')).toBeInTheDocument();
+      expect(screen.getByText('Preview')).toBeInTheDocument();
+      expect(screen.getByText('Settings')).toBeInTheDocument();
+      expect(screen.getByText('Partitions')).toBeInTheDocument();
+    });
   });
 
-  it('renders FilePreviewTab in the Preview tab by default', () => {
+  it('renders FilePreviewTab in the Preview tab by default', async () => {
     render(<FileImportTabs {...defaultProps} />);
 
-    expect(screen.getByText('Preview')).toBeInTheDocument();
-    expect(screen.getByLabelText('Engine')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Preview')).toBeInTheDocument();
+      expect(screen.getByLabelText('Engine')).toBeInTheDocument();
+    });
   });
 
-  it('starts with custom default active tab', () => {
+  it('starts with custom default active tab', async () => {
     render(<FileImportTabs {...defaultProps} defaultActiveKey="settings" />);
 
-    expect(screen.getByText('Settings')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Settings')).toBeInTheDocument();
+    });
   });
 
-  it('has finish import button that calls save function', () => {
+  it('has finish import button that calls save function', async () => {
     const mockSave = jest.fn();
     mockedUseSaveData.mockReturnValue({
       save: mockSave,
@@ -108,10 +113,12 @@ describe('FileImportTabs', () => {
     const finishButton = screen.getByText('Finish Import');
     fireEvent.click(finishButton);
 
-    expect(mockSave).toHaveBeenCalledWith(expect.any(FormData));
+    await waitFor(() => {
+      expect(mockSave).toHaveBeenCalledWith(expect.any(FormData));
+    });
   });
 
-  it('shows loading state on finish import button', () => {
+  it('shows loading state on finish import button', async () => {
     mockedUseSaveData.mockReturnValue({
       save: jest.fn(),
       loading: true
@@ -120,6 +127,8 @@ describe('FileImportTabs', () => {
     render(<FileImportTabs {...defaultProps} />);
 
     const finishButton = screen.getByText('Finish Import');
-    expect(finishButton.closest('button')).toHaveClass('ant-btn-loading');
+    await waitFor(() => {
+      expect(finishButton.closest('button')).toHaveClass('ant-btn-loading');
+    });
   });
 });

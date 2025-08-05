@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useDataCatalog } from './useDataCatalog';
 import { filterEditorConnectors } from '../../../config/hueConfig';
@@ -174,24 +174,26 @@ describe('useDataCatalog', () => {
     const { result } = renderHook(() => useDataCatalog());
     await waitFor(() => expect(result.current.connectors.length).toBeGreaterThan(0));
 
-    result.current.setConnector({
-      id: 'c2',
-      displayName: 'Connector 2',
-      buttonName: 'Button',
-      page: '',
-      tooltip: '',
-      type: '',
-      dialect: '',
-      optimizer: ''
+    act(() => {
+      result.current.setConnector({
+        id: 'c2',
+        displayName: 'Connector 2',
+        buttonName: 'Button',
+        page: '',
+        tooltip: '',
+        type: '',
+        dialect: '',
+        optimizer: ''
+      });
+      result.current.setNamespace({
+        computes: [],
+        id: 'namespace2',
+        name: 'Namespace 2',
+        status: 'active'
+      });
+      result.current.setCompute({ id: 'compute2', name: 'Compute 2', type: 'spark' });
+      result.current.setDatabase('db2');
     });
-    result.current.setNamespace({
-      computes: [],
-      id: 'namespace2',
-      name: 'Namespace 2',
-      status: 'active'
-    });
-    result.current.setCompute({ id: 'compute2', name: 'Compute 2', type: 'spark' });
-    result.current.setDatabase('db2');
 
     await waitFor(() => {
       expect(result.current.connector).toEqual({

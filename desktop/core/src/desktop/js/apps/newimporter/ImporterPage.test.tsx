@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { fireEvent, render, screen, act } from '@testing-library/react';
+import { fireEvent, render, screen, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import ImporterPage from './ImporterPage';
@@ -112,7 +112,9 @@ describe('ImporterPage', () => {
       }
     });
 
-    expect(screen.getByText('test.csv')).toBeInTheDocument();
-    expect(screen.getByText('Preview')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('test.csv')).toBeInTheDocument();
+      expect(screen.getByText('Preview')).toBeInTheDocument();
+    });
   });
 });

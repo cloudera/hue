@@ -115,7 +115,7 @@ const DestinationSettings = ({
   };
 
   const validateTableName = (name: string) => {
-    const tableExists = tables.some(table => table.name.toLowerCase() === name.toLowerCase());
+    const tableExists = tables?.some(table => table.name.toLowerCase() === name.toLowerCase());
     if (tableExists) {
       setError(prev => ({ ...prev, tableName: t('Table name already exists in the database') }));
     } else {
