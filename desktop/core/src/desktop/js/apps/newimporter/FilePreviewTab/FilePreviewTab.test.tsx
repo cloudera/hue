@@ -18,7 +18,7 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ImporterFilePreview from './ImporterFilePreview';
+import FilePreviewTab from './FilePreviewTab';
 import { FileMetaData, ImporterFileSource } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { mocked } from 'jest-mock';
@@ -59,11 +59,21 @@ jest.mock('../../../utils/hooks/useDataCatalog/useDataCatalog', () => ({
 }));
 
 describe('ImporterFilePreview', () => {
+describe('FilePreviewTab', () => {
   const mockFileMetaData: FileMetaData = {
     source: ImporterFileSource.LOCAL,
     path: '/path/to/file.csv',
     fileName: 'file.csv'
   };
+
+  const mockDestinationConfig = {
+    tableName: 'test_table',
+    connectorId: 'hive',
+    database: 'default',
+    computeId: 'compute1'
+  };
+
+  const mockOnDestinationConfigChange = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -77,6 +87,33 @@ describe('ImporterFilePreview', () => {
 
   it('should render preview section and edit columns button', () => {
     render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+    }));
+  });
+
+  it('should render correctly', async () => {
+    render(
+      <FilePreviewTab
+        fileMetaData={mockFileMetaData}
+        destinationConfig={mockDestinationConfig}
+        onDestinationConfigChange={mockOnDestinationConfigChange}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Engine')).toBeInTheDocument();
+      expect(screen.getByText('Database')).toBeInTheDocument();
+      expect(screen.getByText('Table Name')).toBeInTheDocument();
+    });
+  });
+
+  it('should display data in the table after previewData is available', async () => {
+    render(
+      <FilePreviewTab
+        fileMetaData={mockFileMetaData}
+        destinationConfig={mockDestinationConfig}
+        onDestinationConfigChange={mockOnDestinationConfigChange}
+      />
+    );
 
     // Check for key elements without complex interactions
     expect(screen.getByText('Preview')).toBeInTheDocument();
@@ -101,10 +138,34 @@ describe('ImporterFilePreview', () => {
     render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
 
     const editColumnsButton = screen.getByText('Edit Columns');
+    render(
+      <FilePreviewTab
+        fileMetaData={mockFileMetaData}
+        destinationConfig={mockDestinationConfig}
+        onDestinationConfigChange={mockOnDestinationConfigChange}
+      />
+    );
+
+    const editColumnsButton = screen.getByText('Edit Columns');
+
     await userEvent.click(editColumnsButton);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+  });
+
+  it('should display source configuration', async () => {
+    render(
+      <FilePreviewTab
+        fileMetaData={mockFileMetaData}
+        destinationConfig={mockDestinationConfig}
+        onDestinationConfigChange={mockOnDestinationConfigChange}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Configure source')).toBeInTheDocument();
     });
   });
 });

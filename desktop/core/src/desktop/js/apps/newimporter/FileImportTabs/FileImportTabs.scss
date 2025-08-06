@@ -17,12 +17,13 @@
 @use 'variables' as vars;
 
 .antd.cuix {
-  .hue-importer-preview-page {
+  .hue-file-import-tabs {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 8px 24px 24px;
     height: 100%;
+    overflow: auto;
+    gap: vars.$cdl-spacing-s;
+    padding: vars.$cdl-spacing-s vars.$cdl-spacing-m vars.$cdl-spacing-s vars.$cdl-spacing-m;
 
     &__header {
       display: flex;
@@ -39,7 +40,7 @@
       &__actions {
         display: flex;
         align-items: center;
-        gap: 24px;
+        gap: vars.$cdl-spacing-m;
 
         .action {
           margin-left: 10px;
@@ -47,23 +48,21 @@
       }
     }
 
-    &__metadata {
-      background-color: white;
-      padding: 16px;
-      font-size: 12px;
-      color: #5a656d;
-    }
-
-    &__main-section {
+    &__tabs {
       display: flex;
-      flex-direction: column;
-      flex: 1;
-      background-color: white;
-    }
+      height: 100%;
 
-    &__header-section {
-      display: flex;
-      justify-content: space-between;
+      .ant-tabs-content-holder {
+        display: flex;
+        flex: 1;
+
+        .ant-tabs-content,
+        .ant-tabs-tabpane-active {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+        }
+      }
     }
 
     &__edit-columns-button {
