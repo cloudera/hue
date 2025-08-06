@@ -124,8 +124,18 @@ const FilePreviewTab = ({
     }
   );
 
-  const columns = convertToAntdColumns(previewData?.columns ?? []);
+  const originalColumns = convertToAntdColumns(previewData?.columns ?? []);
   const tableData = convertToDataSource(previewData?.previewData ?? {});
+
+  const displayColumns =
+    editableColumns.length > 0
+      ? editableColumns.map(col => ({
+          title: col.title,
+          dataIndex: col.dataIndex,
+          key: col.dataIndex,
+          width: '100px'
+        }))
+      : originalColumns;
 
   return (
     <div className="hue-importer-preview-page">
@@ -148,7 +158,7 @@ const FilePreviewTab = ({
         <PaginatedTable<ImporterTableData>
           loading={guessingFormat || loadingPreview || guessingHeader}
           data={tableData}
-          columns={columns}
+          columns={displayColumns}
           rowKey="importerDataKey"
           isDynamicHeight
           locale={{ emptyText: t('No data found in the file!') }}

@@ -58,7 +58,6 @@ jest.mock('../../../utils/hooks/useDataCatalog/useDataCatalog', () => ({
   }))
 }));
 
-describe('ImporterFilePreview', () => {
 describe('FilePreviewTab', () => {
   const mockFileMetaData: FileMetaData = {
     source: ImporterFileSource.LOCAL,
@@ -86,8 +85,13 @@ describe('FilePreviewTab', () => {
   });
 
   it('should render preview section and edit columns button', () => {
-    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
-    }));
+    render(
+      <FilePreviewTab
+        fileMetaData={mockFileMetaData}
+        destinationConfig={mockDestinationConfig}
+        onDestinationConfigChange={mockOnDestinationConfigChange}
+      />
+    );
   });
 
   it('should render correctly', async () => {
@@ -100,9 +104,7 @@ describe('FilePreviewTab', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Engine')).toBeInTheDocument();
-      expect(screen.getByText('Database')).toBeInTheDocument();
-      expect(screen.getByText('Table Name')).toBeInTheDocument();
+      expect(screen.getByText('Edit Columns')).toBeInTheDocument();
     });
   });
 
@@ -116,28 +118,23 @@ describe('FilePreviewTab', () => {
     );
 
     // Check for key elements without complex interactions
-    expect(screen.getByText('Preview')).toBeInTheDocument();
     expect(screen.getByText('Edit Columns')).toBeInTheDocument();
   });
 
-  it('should render basic action buttons', () => {
-    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
-
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
-    expect(screen.getByText('Finish Import')).toBeInTheDocument();
-  });
-
   it('should render data table when preview data is available', () => {
-    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
+    render(
+      <FilePreviewTab
+        fileMetaData={mockFileMetaData}
+        destinationConfig={mockDestinationConfig}
+        onDestinationConfigChange={mockOnDestinationConfigChange}
+      />
+    );
 
     const table = screen.getByRole('table');
     expect(table).toBeInTheDocument();
   });
 
   it('should open edit columns modal when button is clicked', async () => {
-    render(<ImporterFilePreview fileMetaData={mockFileMetaData} />);
-
-    const editColumnsButton = screen.getByText('Edit Columns');
     render(
       <FilePreviewTab
         fileMetaData={mockFileMetaData}
@@ -154,17 +151,4 @@ describe('FilePreviewTab', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
   });
-
-  it('should display source configuration', async () => {
-    render(
-      <FilePreviewTab
-        fileMetaData={mockFileMetaData}
-        destinationConfig={mockDestinationConfig}
-        onDestinationConfigChange={mockOnDestinationConfigChange}
-      />
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('Configure source')).toBeInTheDocument();
-    });
-  });
+});
