@@ -49,9 +49,9 @@ jest.mock('../../../utils/hooks/useSaveData/useSaveData', () => ({
 jest.mock('../../../utils/hooks/useDataCatalog/useDataCatalog', () => ({
   useDataCatalog: jest.fn(() => ({
     loading: false,
-    databases: [],
-    connectors: [],
-    computes: [],
+    databases: [{ name: 'default' }],
+    connectors: [{ id: 'hive', displayName: 'Hive' }],
+    computes: [{ id: 'compute1', name: 'Compute 1' }],
     setCompute: jest.fn(),
     setConnector: jest.fn(),
     setDatabase: jest.fn()
@@ -105,6 +105,7 @@ describe('FilePreviewTab', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Edit Columns')).toBeInTheDocument();
+      expect(screen.getByText('Engine')).toBeInTheDocument();
     });
   });
 
