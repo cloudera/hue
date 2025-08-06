@@ -24,12 +24,12 @@ from urllib.parse import quote
 
 from django.core.files.uploadhandler import StopUpload
 from django.core.paginator import EmptyPage, Paginator
-from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
+from django.http import HttpResponse, HttpResponseNotModified, HttpResponseRedirect, JsonResponse, StreamingHttpResponse
 from django.utils.http import http_date
 from django.views.static import was_modified_since
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import APIException, NotFound
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -40,7 +40,6 @@ from desktop.auth.backend import is_admin
 from desktop.conf import TASK_SERVER_V2
 from desktop.lib import fsmanager, i18n
 from desktop.lib.conf import coerce_bool
-from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import file_reader
 from desktop.lib.fs.gc.gs import get_gs_home_directory, GSListAllBucketsException
@@ -523,43 +522,56 @@ def upload_complete(request):
 class UploadFileAPI(APIView):
   parser_classes = [MultiPartParser]
 
-  def initial(self, request, *args, **kwargs):
-    """Dynamically select and set the upload handler.
-
-    This method is called before the upload handler is used.
-    It sets the upload handler for the request.
+  def dispatch(self, request, *args, **kwargs):
     """
-    LOG.info(f"UploadFileAPI.initial called by user: {request.user.username}")
+    Overrides the default dispatch method to set a dynamic upload handler.
 
+    This method is the primary entry point for the view. It runs before
+    any other view-specific logic, making it the ideal place to configure
+    request-level settings like upload handlers before DRF's parsers
+    are invoked.
+
+    Exception handling within this method is done using Django's standard
+    `JsonResponse` instead of DRF's `Response`. This is a deliberate
+    choice to bypass the DRF rendering lifecycle, which is not fully
+    initialized at this early stage and would otherwise cause errors.
+    """
     try:
-      # Validate and parse request parameters
-      serializer = UploadFileSerializer(data=request.query_params)
+      # IMPORTANT: Validate query parameters from request.GET for upload handler configuration.
+      serializer = UploadFileSerializer(data=request.GET)
       serializer.is_valid(raise_exception=True)
+      validated_data = serializer.validated_data
 
-      destination_path = serializer.validated_data["destination_path"]
-      overwrite = serializer.validated_data["overwrite"]
+      destination_path = validated_data["destination_path"]
+      overwrite = validated_data["overwrite"]
 
-      LOG.debug(f"Upload request - destination: {destination_path}, overwrite: {overwrite}")
+      LOG.debug(f"Dispatching upload for user '{request.user.username}' to '{destination_path}' (overwrite: {overwrite}).")
 
-      username = request.user.username
-      fs = get_user_fs(username)
-
-      LOG.debug(f"Retrieved filesystem for user: {username}")
-
-      # Get the appropriate upload handler
+      # Retrieve user-specific filesystem and the appropriate handler.
+      fs = get_user_fs(request.user.username)
       upload_handler = fs.get_upload_handler(destination_path, overwrite)
+
       if not upload_handler:
-        LOG.error(f"No upload handler found for path: {destination_path}")
+        LOG.error(f"No supported upload handler found for user '{request.user.username}' at path: {destination_path}")
+        # raise NotFound(detail=f"The destination path '{destination_path}' is not supported.")
         raise NotFound({"error": f"No supported upload handler found for path: {destination_path}"})
 
-      LOG.info(f"Selected upload handler: {upload_handler.__class__.__name__} for destination: {destination_path}")
+      LOG.info(f"Applying upload handler '{upload_handler.__class__.__name__}' for user '{request.user.username}'.")
       request.upload_handlers = [upload_handler]
 
-      super().initial(request, *args, **kwargs)
-
+    except APIException as e:
+      # For known API errors (4xx status), build a simple JsonResponse.
+      # This is the key to avoiding DRF's renderer lifecycle issues.
+      LOG.warning(f"API Exception during upload setup in UploadFileAPI.dispatch: {e.detail}")
+      return JsonResponse(e.detail, status=e.status_code)
     except Exception as e:
-      LOG.error(f"Error in UploadFileAPI.initial: {e}")
-      raise
+      # For any unexpected server error, log the full traceback for debugging
+      # but return a generic, safe error message to the client.
+      LOG.exception(f"An unexpected error occurred while setting the upload handler in UploadFileAPI.dispatch: {e}")
+      return JsonResponse({"error": "A server error occurred during upload initialization."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # IMPORTANT: After setup, continue to the standard DRF dispatch process.
+    return super().dispatch(request, *args, **kwargs)
 
   def post(self, request, *args, **kwargs):
     """Handles the file upload response after the upload handler has done its work.

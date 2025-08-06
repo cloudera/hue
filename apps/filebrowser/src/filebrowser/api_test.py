@@ -19,15 +19,14 @@ import json
 from io import BytesIO as string_io
 from unittest.mock import MagicMock, Mock, patch
 
-import pytest
-from django.http import HttpResponseNotModified, HttpResponseRedirect, StreamingHttpResponse
+from django.http import HttpResponseNotModified, HttpResponseRedirect, JsonResponse, StreamingHttpResponse
 from rest_framework import status
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIRequestFactory
 
 from aws.s3.s3fs import S3ListAllBucketsException
 from desktop.lib.exceptions_renderable import PopupException
-from filebrowser.api import copy, download, get_all_filesystems, listdir_paged, mkdir, move, rename, touch, UploadFileAPI
+from filebrowser.api import APIView, copy, download, get_all_filesystems, listdir_paged, mkdir, move, rename, touch, UploadFileAPI
 from filebrowser.conf import REDIRECT_DOWNLOAD, SHOW_DOWNLOAD_BUTTON
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -1460,50 +1459,6 @@ class TestUploadFileAPI:
     self.request.query_params = {}
     self.request.FILES = {}
 
-  @patch("filebrowser.api.APIView.initial")
-  @patch("filebrowser.api.UploadFileSerializer")
-  @patch("filebrowser.api.get_user_fs")
-  def test_initial_success(self, get_user_fs_mock, upload_file_serializer_mock, api_view_initial_mock):
-    self.request.query_params = {"destination_path": "s3a://test-bucket/test-user/test/dest", "overwrite": False}
-
-    mock_serializer_instance = Mock()
-    mock_serializer_instance.is_valid.return_value = True
-    mock_serializer_instance.validated_data = {"destination_path": "s3a://test-bucket/test-user/test/dest", "overwrite": False}
-    upload_file_serializer_mock.return_value = mock_serializer_instance
-
-    mock_fs = Mock()
-    mock_upload_handler = Mock()
-    mock_fs.get_upload_handler.return_value = mock_upload_handler
-    get_user_fs_mock.return_value = mock_fs
-
-    self.view.initial(self.request)
-
-    upload_file_serializer_mock.assert_called_once_with(data=self.request.query_params)
-    mock_serializer_instance.is_valid.assert_called_once_with(raise_exception=True)
-    get_user_fs_mock.assert_called_once_with("test_user")
-    mock_fs.get_upload_handler.assert_called_once_with("s3a://test-bucket/test-user/test/dest", False)
-    assert self.request.upload_handlers == [mock_upload_handler]
-
-  @patch("filebrowser.api.UploadFileSerializer")
-  @patch("filebrowser.api.get_user_fs")
-  def test_initial_no_upload_handler_found(self, get_user_fs_mock, upload_file_serializer_mock):
-    self.request.query_params = {"destination_path": "s3a://test-bucket/test-user/test/dest", "overwrite": False}
-
-    mock_serializer_instance = Mock()
-    mock_serializer_instance.is_valid.return_value = True
-    mock_serializer_instance.validated_data = {"destination_path": "s3a://test-bucket/test-user/test/dest", "overwrite": False}
-    upload_file_serializer_mock.return_value = mock_serializer_instance
-
-    mock_fs = Mock()
-    mock_fs.get_upload_handler.return_value = None
-    get_user_fs_mock.return_value = mock_fs
-
-    with pytest.raises(NotFound):
-      self.view.initial(self.request)
-
-    get_user_fs_mock.assert_called_once_with("test_user")
-    mock_fs.get_upload_handler.assert_called_once_with("s3a://test-bucket/test-user/test/dest", False)
-
   def test_post_success(self):
     self.request.FILES = {"file": {"path": "s3a://test-bucket/test-user/test/dest/file.txt", "size": 123}}
 
@@ -1538,3 +1493,101 @@ class TestUploadFileAPI:
 
     assert response.status_code == 500
     assert response.data == {"error": "An unexpected error occurred while uploading the file."}
+
+
+class TestUploadFileAPIDispatch:
+  def setup_method(self):
+    self.factory = APIRequestFactory()
+    self.view = UploadFileAPI()
+    self.user = Mock(username="test_user")
+
+  @patch("filebrowser.api.UploadFileSerializer")
+  @patch("filebrowser.api.get_user_fs")
+  @patch.object(APIView, "dispatch")  # Mock the parent dispatch
+  def test_dispatch_success(self, mock_super_dispatch, mock_get_user_fs, mock_serializer):
+    query_params = {"destination_path": "s3a://bucket/path", "overwrite": "true"}
+    request = self.factory.post(f"/fake-url?destination_path={query_params['destination_path']}&overwrite={query_params['overwrite']}")
+    request.user = self.user
+
+    # Mock serializer to be valid
+    mock_serializer_instance = mock_serializer.return_value
+    mock_serializer_instance.is_valid.return_value = True
+    mock_serializer_instance.validated_data = {"destination_path": "s3a://bucket/path", "overwrite": True}
+
+    # Mock filesystem and handler
+    mock_handler = Mock(name="S3UploadHandler")
+    mock_fs = mock_get_user_fs.return_value
+    mock_fs.get_upload_handler.return_value = mock_handler
+
+    # Mock the response from the parent dispatch call
+    mock_super_dispatch.return_value = "SuccessResponse"
+
+    response = self.view.dispatch(request)
+
+    mock_serializer.assert_called_once_with(data=request.GET)
+    mock_serializer_instance.is_valid.assert_called_once_with(raise_exception=True)
+    mock_get_user_fs.assert_called_once_with("test_user")
+    mock_fs.get_upload_handler.assert_called_once_with("s3a://bucket/path", True)
+    assert request.upload_handlers == [mock_handler]
+    mock_super_dispatch.assert_called_once_with(request)
+    assert response == "SuccessResponse"
+
+  @patch("filebrowser.api.UploadFileSerializer")
+  def test_dispatch_validation_error(self, mock_serializer):
+    request = self.factory.post("/fake-url")
+    request.user = self.user
+
+    # Configure the mock serializer to raise a ValidationError
+    validation_error_detail = {"destination_path": ["This field is required."]}
+    mock_serializer_instance = mock_serializer.return_value
+    mock_serializer_instance.is_valid.side_effect = ValidationError(validation_error_detail)
+
+    response = self.view.dispatch(request)
+    response_data = json.loads(response.content)
+
+    assert isinstance(response, JsonResponse)
+    assert response.status_code == 400
+    assert response_data == validation_error_detail
+
+  @patch("filebrowser.api.get_user_fs")
+  @patch("filebrowser.api.UploadFileSerializer")
+  def test_dispatch_handler_not_found(self, mock_serializer, mock_get_user_fs):
+    query_params = {"destination_path": "unsupported://path", "overwrite": "false"}
+    request = self.factory.post(f"/fake-url?destination_path={query_params['destination_path']}&overwrite={query_params['overwrite']}")
+    request.user = self.user
+
+    mock_serializer_instance = mock_serializer.return_value
+    mock_serializer_instance.is_valid.return_value = True
+    mock_serializer_instance.validated_data = {"destination_path": "unsupported://path", "overwrite": False}
+
+    # Mock the filesystem to return None for the handler
+    mock_fs = mock_get_user_fs.return_value
+    mock_fs.get_upload_handler.return_value = None
+
+    response = self.view.dispatch(request)
+    response_data = json.loads(response.content)
+
+    assert isinstance(response, JsonResponse)
+    assert response.status_code == 404
+    assert "No supported upload handler found" in response_data["error"]
+
+  @patch("filebrowser.api.get_user_fs")
+  @patch("filebrowser.api.UploadFileSerializer")
+  def test_dispatch_unexpected_exception(self, mock_serializer, mock_get_user_fs):
+    query_params = {"destination_path": "s3a://path", "overwrite": "false"}
+    request = self.factory.post(f"/fake-url?destination_path={query_params['destination_path']}&overwrite={query_params['overwrite']}")
+    request.user = self.user
+
+    mock_serializer_instance = mock_serializer.return_value
+    mock_serializer_instance.is_valid.return_value = True
+    mock_serializer_instance.validated_data = {"destination_path": "s3a://path", "overwrite": False}
+
+    # Mock get_user_fs to raise a generic exception
+    mock_get_user_fs.side_effect = Exception("Something went wrong with the FS!")
+
+    response = self.view.dispatch(request)
+    response_data = json.loads(response.content)
+
+    assert isinstance(response, JsonResponse)
+    assert response.status_code == 500
+    assert "server error" in response_data["error"]
