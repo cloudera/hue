@@ -55,8 +55,25 @@
         send_page_view: false, 
         page_location: 'redacted',
         page_referrer: 'redacted',
-        allow_google_signals: false
+        allow_google_signals: false,
+        // Make GA cookies session-based (expire when browser closes)
+        cookie_flags: 'secure;samesite=strict',
+        anonymize_ip: true,
+        storage: 'none'
         });
+      
+      // Clear GA cookies when browser/tab closes
+      function clearGACookies() {
+        const gaCookies = ['_ga', '_ga_' + '${conf.GTAG_ID.get()}'.replace('G-', ''), '_gid', '_gat'];
+        gaCookies.forEach(function(cookieName) {
+          document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=' + window.location.hostname;
+          document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.' + window.location.hostname;
+        });
+      }
+      
+      // Clear cookies on page unload
+      window.addEventListener('beforeunload', clearGACookies);
+      window.addEventListener('pagehide', clearGACookies);
     </script>
   % endif
 

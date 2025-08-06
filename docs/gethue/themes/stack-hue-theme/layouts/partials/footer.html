@@ -74,7 +74,23 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'UA-37637545-1');
+  gtag('config', 'UA-37637545-1', {
+    storage: 'none',
+    anonymize_ip: true,
+    cookie_flags: 'secure;samesite=strict'
+  });
+  
+  // Clear GA cookies when browser/tab closes
+  function clearGACookies() {
+    const gaCookies = ['_ga', '_ga_UA_37637545_1', '_gid', '_gat'];
+    gaCookies.forEach(function(cookieName) {
+      document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=' + window.location.hostname;
+      document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.' + window.location.hostname;
+    });
+  }
+  
+  window.addEventListener('beforeunload', clearGACookies);
+  window.addEventListener('pagehide', clearGACookies);
 </script>
 
 </body>
