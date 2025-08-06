@@ -553,7 +553,6 @@ class UploadFileAPI(APIView):
 
       if not upload_handler:
         LOG.error(f"No supported upload handler found for user '{request.user.username}' at path: {destination_path}")
-        # raise NotFound(detail=f"The destination path '{destination_path}' is not supported.")
         raise NotFound({"error": f"No supported upload handler found for path: {destination_path}"})
 
       LOG.info(f"Applying upload handler '{upload_handler.__class__.__name__}' for user '{request.user.username}'.")
