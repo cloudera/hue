@@ -168,4 +168,3 @@ describe('FilePreviewTab', () => {
       expect(screen.getByText('Configure source')).toBeInTheDocument();
     });
   });
-});
