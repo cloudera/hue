@@ -26,6 +26,8 @@ import { PrimaryButton } from 'cuix/dist/components/Button';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import { FINISH_IMPORT_URL } from '../api';
 import { getDefaultTableName } from '../utils/utils';
+import SettingsTab from '../SettingsTab/SettingsTab';
+import { ImporterSettings, StoreLocation, TableFormat } from '../types';
 
 interface FileImportTabsProps {
   fileMetaData: FileMetaData;
@@ -35,12 +37,30 @@ interface FileImportTabsProps {
 
 const FileImportTabs = ({
   fileMetaData,
-  defaultActiveKey = 'preview'
+  defaultActiveKey = 'settings'
 }: FileImportTabsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
     tableName: getDefaultTableName(fileMetaData)
+  });
+  const [settings, setSettings] = useState<ImporterSettings>({
+    storeLocation: StoreLocation.MANAGED,
+    isTransactional: false,
+    isInsertOnly: false,
+    externalLocation: '',
+    importData: true,
+    isIcebergTable: false,
+    isCopyFile: false,
+    description: '',
+    tableFormat: TableFormat.TEXT,
+    primaryKeys: [],
+    createEmptyTable: false,
+    useExternalLocation: false,
+    customCharDelimiters: false,
+    fieldDelimiter: '',
+    arrayMapDelimiter: '',
+    structDelimiter: ''
   });
 
   const handleDestinationConfigChange = (name: string, value: string) => {
@@ -88,8 +108,14 @@ const FileImportTabs = ({
     },
     {
       label: t('Settings'),
-      key: 'settings'
-      // children: <SettingsTab />
+      key: 'settings',
+      children: (
+        <SettingsTab
+          fileMetaData={fileMetaData}
+          settings={settings}
+          onSettingsChange={setSettings}
+        />
+      )
     },
     {
       label: t('Partitions'),
