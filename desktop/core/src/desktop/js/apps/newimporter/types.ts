@@ -40,6 +40,12 @@ export enum StoreLocation {
   EXTERNAL = 'external'
 }
 
+export enum ImporterTabs {
+  PREVIEW = 'preview',
+  SETTINGS = 'settings',
+  PARTITION = 'partition'
+}
+
 export interface LocalFileUploadResponse {
   file_path: string;
 }

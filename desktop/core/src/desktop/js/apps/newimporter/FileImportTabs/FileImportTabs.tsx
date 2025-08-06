@@ -28,17 +28,13 @@ import { FINISH_IMPORT_URL } from '../api';
 import { getDefaultTableName } from '../utils/utils';
 import SettingsTab from '../SettingsTab/SettingsTab';
 import { ImporterSettings, StoreLocation, TableFormat } from '../types';
+import { ImporterTabs } from '../types';
 
 interface FileImportTabsProps {
   fileMetaData: FileMetaData;
-  onTabChange?: (activeKey: string) => void;
-  defaultActiveKey?: string;
 }
 
-const FileImportTabs = ({
-  fileMetaData,
-  defaultActiveKey = 'settings'
-}: FileImportTabsProps): JSX.Element => {
+const FileImportTabs = ({ fileMetaData }: FileImportTabsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
@@ -97,7 +93,7 @@ const FileImportTabs = ({
   const tabItems = [
     {
       label: t('Preview'),
-      key: 'preview',
+      key: ImporterTabs.PREVIEW,
       children: (
         <FilePreviewTab
           fileMetaData={fileMetaData}
@@ -108,7 +104,7 @@ const FileImportTabs = ({
     },
     {
       label: t('Settings'),
-      key: 'settings',
+      key: ImporterTabs.SETTINGS,
       children: (
         <SettingsTab
           fileMetaData={fileMetaData}
@@ -119,7 +115,7 @@ const FileImportTabs = ({
     },
     {
       label: t('Partitions'),
-      key: 'partitions'
+      key: ImporterTabs.PARTITION
       // children: <PartitionsTab />
     }
   ];
@@ -137,11 +133,7 @@ const FileImportTabs = ({
           </PrimaryButton>
         </div>
       </div>
-      <Tabs
-        defaultActiveKey={defaultActiveKey}
-        items={tabItems}
-        className="hue-file-import-tabs__tabs"
-      />
+      <Tabs items={tabItems} className="hue-file-import-tabs__tabs" />
     </div>
   );
 };

@@ -32,14 +32,12 @@ import { i18nReact } from '../../../utils/i18nReact';
 
 interface SettingsTabProps {
   fileMetaData: FileMetaData;
-  // fileFormat?: FileFormat;
   settings: ImporterSettings;
   onSettingsChange: (settings: ImporterSettings) => void;
 }
 
 const SettingsTab = ({
   fileMetaData,
-  // fileFormat,
   settings,
   onSettingsChange
 }: SettingsTabProps): JSX.Element => {
@@ -63,7 +61,6 @@ const SettingsTab = ({
     isIcebergTable: settings.isIcebergTable,
     fileMetaData,
     settings: settings,
-    // tableFormat,
     isTransactionalVisible:
       tableFormat !== TableFormat.KUDU && fileMetaData.source !== ImporterFileSource.LOCAL,
     isTransactionalUpdateEnabled: settings.isTransactional && !settings.isInsertOnly
