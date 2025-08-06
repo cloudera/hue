@@ -52,17 +52,7 @@ const FilePreviewTab = ({
   const [fileFormat, setFileFormat] = useState<CombinedFileFormat | undefined>();
 
   const [isEditColumnsOpen, setIsEditColumnsOpen] = useState(false);
-  const [columns, setColumns] = useState<Column[]>([]);
-  const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
-    tableName: getDefaultTableName(fileMetaData)
-  });
-
-  const handleDestinationSettingsChange = (name: string, value: string) => {
-    setDestinationConfig(prevConfig => ({
-      ...prevConfig,
-      [name]: value
-    }));
-  };
+  const [editableColumns, setEditableColumns] = useState<Column[]>([]);
 
   const { loading: guessingFormat } = useLoadData<FileFormatResponse>(FILE_GUESS_METADATA, {
     params: {
@@ -121,47 +111,18 @@ const FilePreviewTab = ({
         destinationConfig.connectorId === undefined,
       onSuccess: data => {
         if (data?.columns && Array.isArray(data.columns)) {
-          setColumns(
+          setEditableColumns(
             convertToAntdColumns(data.columns).map(col => ({
               title: col?.title != null ? String(col.title) : '',
               dataIndex: String(col.dataIndex || '')
             }))
           );
         } else {
-          setColumns([]);
+          setEditableColumns([]);
         }
       }
     }
   );
-
-  const { save, loading: finalizingImport } = useSaveData(FINISH_IMPORT_URL);
-
-  const handleFinishImport = () => {
-    const source = {
-      inputFormat: fileMetaData.source,
-      path: fileMetaData.path,
-      format: fileFormat,
-      sourceType: destinationConfig.connectorId
-    };
-
-    const destination = {
-      outputFormat: 'table',
-      nonDefaultLocation: fileMetaData.path,
-      name: `${destinationConfig.database}.${destinationConfig.tableName}`,
-      sourceType: destinationConfig.connectorId,
-      columns: columns.map(col => ({
-        name: col.title,
-        type: col.type || 'string',
-        comment: col.comment || ''
-      }))
-    };
-
-    const formData = new FormData();
-    formData.append('source', JSON.stringify(source));
-    formData.append('destination', JSON.stringify(destination));
-
-    save(formData);
-  };
 
   const columns = convertToAntdColumns(previewData?.columns ?? []);
   const tableData = convertToDataSource(previewData?.previewData ?? {});
@@ -197,8 +158,8 @@ const FilePreviewTab = ({
       <EditColumnsModal
         isOpen={isEditColumnsOpen}
         closeModal={() => setIsEditColumnsOpen(false)}
-        columns={columns}
-        setColumns={setColumns}
+        columns={editableColumns}
+        setColumns={setEditableColumns}
         sample={tableData[0]}
       />
     </div>
