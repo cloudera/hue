@@ -119,6 +119,17 @@ export interface ImporterSettings {
   structDelimiter: string;
 }
 
+export interface Partition {
+  id: string;
+  name: string;
+  type: string;
+  value: string;
+}
+
+export interface PartitionConfig {
+  partitions: Partition[];
+}
+
 // TODO: verify if ImporterSettings can be used as context
 export interface SettingsContext {
   isManagedTable: boolean;

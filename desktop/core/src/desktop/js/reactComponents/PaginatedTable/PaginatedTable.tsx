@@ -121,11 +121,11 @@ const PaginatedTable = <T extends object>({
   return (
     <div
       ref={tableRef}
-      className={`hue-table-container ${loading ? 'hue-table-container__placeholder--hidden' : ''}`}
+      className={`hue-paginated-table-container ${loading ? 'hue-paginated-table-container__placeholder--hidden' : ''}`}
     >
       <Table
         title={title}
-        className="hue-table"
+        className="hue-paginated-table"
         onChange={onColumnClick}
         columns={getColumnsFromConfig(columns)}
         dataSource={data}

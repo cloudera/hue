@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import { Tabs } from 'antd';
 import { i18nReact } from '../../../utils/i18nReact';
-import { DestinationConfig, FileMetaData } from '../types';
+import { DestinationConfig, FileMetaData, Partition } from '../types';
 
 import './FileImportTabs.scss';
 import FilePreviewTab from '../FilePreviewTab/FilePreviewTab';
@@ -27,6 +27,7 @@ import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import { FINISH_IMPORT_URL } from '../api';
 import { getDefaultTableName } from '../utils/utils';
 import SettingsTab from '../SettingsTab/SettingsTab';
+import PartitionsTab from '../PartitionsTab/PartitionsTab';
 import { ImporterSettings, StoreLocation, TableFormat } from '../types';
 import { ImporterTabs } from '../types';
 
@@ -58,6 +59,7 @@ const FileImportTabs = ({ fileMetaData }: FileImportTabsProps): JSX.Element => {
     arrayMapDelimiter: '',
     structDelimiter: ''
   });
+  const [partitions, setPartitions] = useState<Partition[]>([]);
 
   const handleDestinationConfigChange = (name: string, value: string) => {
     setDestinationConfig(prevConfig => ({
@@ -115,8 +117,8 @@ const FileImportTabs = ({ fileMetaData }: FileImportTabsProps): JSX.Element => {
     },
     {
       label: t('Partitions'),
-      key: ImporterTabs.PARTITION
-      // children: <PartitionsTab />
+      key: ImporterTabs.PARTITION,
+      children: <PartitionsTab partitions={partitions} onPartitionsChange={setPartitions} />
     }
   ];
 
