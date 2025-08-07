@@ -524,48 +524,67 @@ class UploadFileAPI(APIView):
 
   def dispatch(self, request, *args, **kwargs):
     """
-    Overrides the default dispatch method to set a dynamic upload handler.
+    Overrides dispatch to perform manual authentication and set a dynamic upload handler.
 
-    This method is the primary entry point for the view. It runs before
-    any other view-specific logic, making it the ideal place to configure
-    request-level settings like upload handlers before DRF's parsers
-    are invoked.
+    This is necessary to solve a lifecycle conflict where user authentication
+    (from a JWT token) must happen before DRF's parsing is triggered, but
+    the upload handler must be set before the request body is read.
 
     Exception handling within this method is done using Django's standard
     `JsonResponse` instead of DRF's `Response`. This is a deliberate
     choice to bypass the DRF rendering lifecycle, which is not fully
     initialized at this early stage and would otherwise cause errors.
     """
+    # Manually perform authentication if the user is not already authenticated
+    # by a preceding middleware (like SessionMiddleware).
+    if not request.user.is_authenticated:
+      LOG.debug("User not authenticated, attempting manual authentication in UploadFileAPI.dispatch...")
+      try:
+        # Use the view's configured authenticators to check for credentials (e.g., JWT).
+        for authenticator in self.get_authenticators():
+          user_auth_tuple = authenticator.authenticate(request)
+          if user_auth_tuple is not None:
+            # On successful authentication, attach the user to the request.
+            request.user, request.auth = user_auth_tuple
+            LOG.debug(f"Manual authentication successful for user '{request.user.username}'.")
+            break
+      except APIException as e:
+        # If authentication itself fails (e.g., invalid token), return an error.
+        LOG.warning(f"Manual authentication failed in UploadFileAPI.dispatch: {e.detail}")
+        return JsonResponse(e.detail, status=e.status_code)
+
+    # After authentication, we can now proceed with the main logic.
+    if not request.user.is_authenticated:
+      # If still not authenticated, it's a genuine credentials issue.
+      return JsonResponse({"error": "Authentication credentials were not provided or were invalid."}, status=status.HTTP_401_UNAUTHORIZED)
+
     try:
       # IMPORTANT: Validate query parameters from request.GET for upload handler configuration.
       serializer = UploadFileSerializer(data=request.GET)
       serializer.is_valid(raise_exception=True)
       validated_data = serializer.validated_data
+      username = request.user.username
 
       destination_path = validated_data["destination_path"]
       overwrite = validated_data["overwrite"]
 
-      LOG.debug(f"Dispatching upload for user '{request.user.username}' to '{destination_path}' (overwrite: {overwrite}).")
+      LOG.debug(f"Dispatching upload for user '{username}' to '{destination_path}' (overwrite: {overwrite}).")
 
       # Retrieve user-specific filesystem and the appropriate handler.
-      fs = get_user_fs(request.user.username)
+      fs = get_user_fs(username)
       upload_handler = fs.get_upload_handler(destination_path, overwrite)
 
       if not upload_handler:
-        LOG.error(f"No supported upload handler found for user '{request.user.username}' at path: {destination_path}")
+        LOG.error(f"No supported upload handler found for user '{username}' at path: {destination_path}")
         raise NotFound({"error": f"No supported upload handler found for path: {destination_path}"})
 
-      LOG.info(f"Applying upload handler '{upload_handler.__class__.__name__}' for user '{request.user.username}'.")
+      LOG.info(f"Applying upload handler '{upload_handler.__class__.__name__}' for user '{username}'.")
       request.upload_handlers = [upload_handler]
 
     except APIException as e:
-      # For known API errors (4xx status), build a simple JsonResponse.
-      # This is the key to avoiding DRF's renderer lifecycle issues.
       LOG.warning(f"API Exception during upload setup in UploadFileAPI.dispatch: {e.detail}")
       return JsonResponse(e.detail, status=e.status_code)
     except Exception as e:
-      # For any unexpected server error, log the full traceback for debugging
-      # but return a generic, safe error message to the client.
       LOG.exception(f"An unexpected error occurred while setting the upload handler in UploadFileAPI.dispatch: {e}")
       return JsonResponse({"error": "A server error occurred during upload initialization."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

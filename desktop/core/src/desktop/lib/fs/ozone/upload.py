@@ -332,10 +332,10 @@ class OFSNewFileUploadHandler(FileUploadHandler):
         delete=False,  # We'll handle deletion manually for better error handling
       )
       self._temp_file_path = self._temp_file.name
-      LOG.info(f"Created temporary file for OFS upload: {self._temp_file_path}")
+      LOG.info(f"Created temporary file for OFS upload at {self._temp_file_path}")
     except Exception as ex:
       LOG.error(f"Failed to create temporary file for upload: {ex}")
-      raise PopupException("Failed to create temporary upload file: %s" % ex, error_code=500)
+      raise PopupException(f"Failed to create temporary upload file: {ex}", error_code=500)
 
     LOG.debug("OFS upload initialization completed successfully")
 
@@ -398,7 +398,7 @@ class OFSNewFileUploadHandler(FileUploadHandler):
         self._fs.remove(target_file_path, skip_trash=True)
       else:
         LOG.warning(f"File already exists and overwrite is disabled: {target_file_path}")
-        raise PopupException("File already exists: %s" % target_file_path, error_code=409)
+        raise PopupException(f"File already exists: {target_file_path}", error_code=409)
 
     LOG.debug("Upload prerequisites validation completed successfully")
 
@@ -414,7 +414,7 @@ class OFSNewFileUploadHandler(FileUploadHandler):
     if max_size != -1 and max_size >= 0 and self.total_bytes_received > max_size:
       LOG.error(f"File size exceeded limit - received: {self.total_bytes_received}, max: {max_size}")
       self._cleanup_temp_file()
-      raise PopupException("File exceeds maximum allowed size of %d bytes." % max_size, error_code=413)
+      raise PopupException(f"File exceeds maximum allowed size of {max_size} bytes.", error_code=413)
 
     # Write the data chunk to the temporary file
     try:
@@ -424,7 +424,7 @@ class OFSNewFileUploadHandler(FileUploadHandler):
     except Exception as e:
       LOG.exception(f"Error writing to temporary file {self._temp_file_path}")
       self._cleanup_temp_file()
-      raise PopupException("Failed to buffer upload data: %s" % e, error_code=500)
+      raise PopupException(f"Failed to buffer upload data: {e}", error_code=500)
 
     return None
 
@@ -438,12 +438,12 @@ class OFSNewFileUploadHandler(FileUploadHandler):
       LOG.error(f"OFS upload size mismatch - expected: {file_size} bytes, received: {self.total_bytes_received} bytes")
       self._cleanup_temp_file()
       raise PopupException(
-        "Upload data size mismatch: expected %d bytes, received %d bytes." % (file_size, self.total_bytes_received), error_code=422
+        f"Upload data size mismatch: expected {file_size} bytes, received {self.total_bytes_received} bytes.", error_code=422
       )
 
     try:
       # Stream from temp file directly to Ozone
-      LOG.info("Creating file %s with %d bytes from temporary file" % (self.target_file_path, file_size))
+      LOG.info(f"Creating file {self.target_file_path} with {file_size} bytes from temporary file")
 
       # Open temp file for reading and pass the file handle
       # The requests library will stream from the file handle automatically
@@ -462,27 +462,25 @@ class OFSNewFileUploadHandler(FileUploadHandler):
       actual_size = file_stats.size
 
       if actual_size != file_size:
-        LOG.error(
-          "OFS upload size mismatch after write for %s: expected %d bytes, got %d bytes" % (self.target_file_path, file_size, actual_size)
-        )
+        LOG.error(f"OFS upload size mismatch after write for {self.target_file_path}: expected {file_size} bytes, got {actual_size} bytes")
 
         # Clean up the corrupted file
         try:
           self._fs.remove(self.target_file_path, skip_trash=True)
         except Exception as cleanup_error:
-          LOG.warning("Failed to clean up corrupted file %s: %s" % (self.target_file_path, cleanup_error))
+          LOG.warning(f"Failed to clean up corrupted file {self.target_file_path}: {cleanup_error}")
 
         # Raise exception to fail the upload
         raise PopupException(
-          "Upload verification failed: expected %d bytes, but only %d bytes were written. "
-          "The incomplete file has been removed." % (file_size, actual_size),
+          f"Upload verification failed: expected {file_size} bytes, but only {actual_size} bytes were written. "
+          "The incomplete file has been removed.",
           error_code=422,
         )
 
-      LOG.info("OFS upload completed successfully: %d bytes written to %s" % (file_size, self.target_file_path))
+      LOG.info(f"OFS upload completed successfully for {self.target_file_path}, {file_size} bytes written")
 
     except Exception as e:
-      LOG.exception('Error creating file "%s" in OFS' % self.target_file_path)
+      LOG.exception(f'Error creating file "{self.target_file_path}" in OFS')
 
       # Try to clean up if file was partially created
       try:
@@ -494,7 +492,7 @@ class OFSNewFileUploadHandler(FileUploadHandler):
       if isinstance(e, PopupException):
         raise
       else:
-        raise PopupException("Failed to upload file in OFS: %s" % str(e), error_code=500)
+        raise PopupException(f"Failed to upload file in OFS: {str(e)}", error_code=500)
     finally:
       # Always clean up the temporary file
       self._cleanup_temp_file()
@@ -514,6 +512,6 @@ class OFSNewFileUploadHandler(FileUploadHandler):
       try:
         if os.path.exists(self._temp_file_path):
           os.unlink(self._temp_file_path)
-          LOG.debug("Cleaned up temporary file: %s" % self._temp_file_path)
+          LOG.debug(f"Cleaned up temporary file: {self._temp_file_path}")
       except Exception as e:
-        LOG.exception("Failed to clean up temporary file %s: %s" % (self._temp_file_path, e))
+        LOG.exception(f"Failed to clean up temporary file {self._temp_file_path}: {e}")
