@@ -148,15 +148,13 @@ const PartitionsTab = ({ partitions, onPartitionsChange }: PartitionsTabProps): 
         {`+ ${t('Add partitions')}`}
       </LinkButton>
 
-      <div className="hue-partitions-tab__table-container">
-        {partitions.length > 0 && (
-          <PaginatedTable
-            data={partitions}
-            columns={getTableColumns()}
-            rowKey={(record: Partition) => record.id}
-          />
-        )}
-      </div>
+      {partitions.length > 0 && (
+        <PaginatedTable
+          data={partitions}
+          columns={getTableColumns()}
+          rowKey={(record: Partition) => record.id}
+        />
+      )}
     </div>
   );
 };

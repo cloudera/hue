@@ -30,16 +30,8 @@
       font-weight: 500;
     }
 
-    &__table-container {
-      flex: 1;
-    }
-
     &__delete-button {
-      color: vars.$cdl-gray-500;
-      padding: 4px;
-      min-width: auto;
-      width: auto;
-      height: auto;
+      color: vars.$cdl-blue-600;
     }
   }
 }
