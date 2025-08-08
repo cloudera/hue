@@ -24,7 +24,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 
 interface UseUploadQueueResponse {
   uploadQueue: RegularFile[];
-  addFiles: (newFiles: RegularFile[]) => void;
+  addFiles: (newFiles: RegularFile[], overwrite?: boolean) => void;
   cancelFile: (item: RegularFile) => void;
   isLoading: boolean;
 }
@@ -102,7 +102,7 @@ const useFileUpload = ({
   const addFiles = (fileItems: RegularFile[]) => {
     if (fileItems.length > 0) {
       setUploadQueue(prev => [...prev, ...fileItems]);
-
+  
       if (isChunkUpload) {
         addToChunkUpload(fileItems);
       } else {

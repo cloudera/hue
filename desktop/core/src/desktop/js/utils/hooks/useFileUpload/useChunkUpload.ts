@@ -45,7 +45,7 @@ import {
 } from './types';
 
 interface UseChunkUploadResponse {
-  addFiles: (item: RegularFile[]) => void;
+  addFiles: (items: RegularFile[]) => void;
   cancelFile: (item: RegularFile['uuid']) => void;
   isLoading: boolean;
 }
