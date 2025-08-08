@@ -133,7 +133,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       name: 'fieldDelimiter',
       type: FieldType.SELECT,
       label: 'Field',
-      placeholder: 'New line',
+      placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Field delimiter',
       isHidden: (context?: SettingsContext) => !context?.settings.customCharDelimiters
@@ -142,7 +142,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       name: 'arrayMapDelimiter',
       type: FieldType.SELECT,
       label: 'Array Map',
-      placeholder: 'Choose',
+      placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Array map delimiter',
       isHidden: (context?: SettingsContext) => !context?.settings.customCharDelimiters
@@ -151,7 +151,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       name: 'structDelimiter',
       type: FieldType.SELECT,
       label: 'Struct',
-      placeholder: 'Choose',
+      placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Struct delimiter',
       isHidden: (context?: SettingsContext) => !context?.settings.customCharDelimiters
