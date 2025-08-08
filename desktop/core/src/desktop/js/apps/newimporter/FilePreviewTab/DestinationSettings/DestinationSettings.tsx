@@ -149,7 +149,7 @@ const DestinationSettings = ({
       if (selectedDatabase) {
         setDatabase(selectedDatabase);
       }
-    } else if (!database) {
+    } else if (!defaultValues?.database) {
       setDatabase(databases[0]);
       onChange('database', databases[0]);
     }

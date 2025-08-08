@@ -58,7 +58,6 @@ describe('CompressionModal Component', () => {
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
   const mockOnClose = jest.fn();
-  const setLoading = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -69,7 +68,6 @@ describe('CompressionModal Component', () => {
       <CompressionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -88,7 +86,6 @@ describe('CompressionModal Component', () => {
       <CompressionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -106,7 +103,6 @@ describe('CompressionModal Component', () => {
       <CompressionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -131,7 +127,6 @@ describe('CompressionModal Component', () => {
       <CompressionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -150,7 +145,6 @@ describe('CompressionModal Component', () => {
       <CompressionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -171,7 +165,6 @@ describe('CompressionModal Component', () => {
       <CompressionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={setLoading}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
