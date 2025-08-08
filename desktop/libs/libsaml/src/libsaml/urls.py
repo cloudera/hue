@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import logging
 
 from django.urls import re_path
@@ -23,34 +22,25 @@ from django.urls import re_path
 LOG = logging.getLogger()
 
 try:
-  from djangosaml2 import views as djangosaml2_views
+  from libsaml.views import AssertionConsumerServiceView, EchoAttributesView, LoginView, LogoutView, MetadataView
 
-  from libsaml import views as libsaml_views
+  urlpatterns = [
+    re_path(r'^logout/$', LogoutView.as_view(), name='saml2_logout'),
+    re_path(r'^ls/$', LogoutView.as_view(), name='saml2_ls'),
+    re_path(r'^acs/$', AssertionConsumerServiceView.as_view(), name='saml2_acs'),
+    re_path(r'^login/$', LoginView.as_view(), name='saml2_login'),
+    re_path(r'^metadata/$', MetadataView.as_view(), name='saml2_metadata'),
+    re_path(r'^test/$', EchoAttributesView.as_view())
+  ]
+
+  try:
+    from libsaml.views import LogoutServicePostView
+
+    urlpatterns += [
+      re_path(r'^ls/post/$', LogoutServicePostView.as_view(), name='saml2_ls_post')
+    ]
+  except ImportError:
+    # We are on an older version of djangosaml2
+    pass
 except ImportError:
   LOG.warning('djangosaml2 module not found')
-  djangosaml2_views = None
-
-try:
-  from djangosaml2.views import logout_service_post
-except ImportError:
-  # We are on an older version of djangosaml2
-  logout_service_post = None
-
-
-if djangosaml2_views is not None:
-  urlpatterns = [
-    re_path(r'^logout/$', djangosaml2_views.LogoutView.as_view(), name='saml2_logout')
-  ]
-
-  urlpatterns += [
-    re_path(r'^ls/$', libsaml_views.LogoutView.as_view(), name='saml2_ls'),
-    re_path(r'^acs/$', libsaml_views.CustomAssertionConsumerServiceView.as_view(), name='saml2_acs'),
-    re_path(r'^login/$', libsaml_views.LoginView.as_view(), name='saml2_login'),
-    re_path(r'^metadata/$', libsaml_views.MetadataView.as_view(), name='saml2_metadata'),
-    re_path(r'^test/$', libsaml_views.EchoAttributesView.as_view())
-  ]
-
-  if logout_service_post is not None:
-    urlpatterns += [
-      re_path(r'^ls/post/$', libsaml_views.LogoutServicePostView.as_view(), name='saml2_ls_post')
-    ]
