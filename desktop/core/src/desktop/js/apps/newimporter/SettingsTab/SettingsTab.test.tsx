@@ -82,7 +82,10 @@ describe('SettingsTab', () => {
 
       const descriptionInput = screen.getByLabelText('Description');
       expect(descriptionInput).toBeInTheDocument();
-      expect(descriptionInput).toHaveAttribute('placeholder', 'Description goes here');
+      expect(descriptionInput).toHaveAttribute(
+        'placeholder',
+        "A table to store customer data imported from the marketing team's CRM."
+      );
     });
 
     it('should render format select field', () => {
