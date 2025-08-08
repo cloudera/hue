@@ -56,7 +56,7 @@ class SAML2Backend(_Saml2Backend):
     """
     return force_username_case(main_attribute)
 
-  def is_authorized(self, attributes, attribute_mapping):
+  def is_authorized(self, attributes, attribute_mapping, user=None, session_info=None):
     """Hook to allow custom authorization policies based on user belonging to a list of SAML groups."""
     LOG.debug('is_authorized() attributes = %s' % attributes)
     LOG.debug('is_authorized() attribute_mapping = %s' % attribute_mapping)

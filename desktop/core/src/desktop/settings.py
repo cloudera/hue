@@ -581,8 +581,11 @@ SAML_AUTHENTICATION = 'libsaml.backend.SAML2Backend' in AUTHENTICATION_BACKENDS
 if SAML_AUTHENTICATION:
   from libsaml.saml_settings import *
   INSTALLED_APPS.append('libsaml')
+  INSTALLED_APPS.append('djangosaml2')
   LOGIN_URL = '/saml2/login/'
   SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+  # Add required middleware for djangosaml2 1.9.3+
+  MIDDLEWARE.append('djangosaml2.middleware.SamlSessionMiddleware')
 
 # Middleware classes.
 for middleware in desktop.conf.MIDDLEWARE.get():

@@ -27,27 +27,73 @@ except ImportError:
 import libsaml.conf
 
 
+# Create custom view classes with login_notrequired = True for djangosaml2 1.9.3 compatibility
+class LoginViewNoLoginRequired(LoginView):
+  @csrf_exempt
+  def dispatch(self, request, *args, **kwargs):
+    return super().dispatch(request, *args, **kwargs)
+
+
+class EchoAttributesViewNoLoginRequired(EchoAttributesView):
+  @csrf_exempt
+  def dispatch(self, request, *args, **kwargs):
+    return super().dispatch(request, *args, **kwargs)
+
+
+class MetadataViewNoLoginRequired(MetadataView):
+  @csrf_exempt
+  def dispatch(self, request, *args, **kwargs):
+    return super().dispatch(request, *args, **kwargs)
+
+
+class LogoutViewNoLoginRequired(LogoutView):
+  @csrf_exempt
+  def dispatch(self, request, *args, **kwargs):
+    return super().dispatch(request, *args, **kwargs)
+
+
 # Customize AssertionConsumerServiceView
 class CustomAssertionConsumerServiceView(AssertionConsumerServiceView):
+  @csrf_exempt
   def dispatch(self, request, *args, **kwargs):
     username_source = libsaml.conf.USERNAME_SOURCE.get().lower()
     return super().dispatch(request, *args, **kwargs)
 
-# Expose the views
+
+# Set login_notrequired on dispatch methods so Django's as_view() copies it to the wrapper function
+LoginViewNoLoginRequired.dispatch.login_notrequired = True
+EchoAttributesViewNoLoginRequired.dispatch.login_notrequired = True
+MetadataViewNoLoginRequired.dispatch.login_notrequired = True
+LogoutViewNoLoginRequired.dispatch.login_notrequired = True
+CustomAssertionConsumerServiceView.dispatch.login_notrequired = True
 
 
-login = LoginView
-echo_attributes = EchoAttributesView
-metadata = MetadataView
-assertion_consumer_service = CustomAssertionConsumerServiceView
-logout_service = LogoutView
-logout_service_post = LogoutServicePostView
-
-__all__ = ['login', 'echo_attributes', 'assertion_consumer_service', 'metadata', 'logout_service', 'logout_service_post']
-
-# Set login_notrequired attribute
-for view in [LogoutView, LoginView, EchoAttributesView, AssertionConsumerServiceView, MetadataView]:
-  setattr(view, 'login_notrequired', True)
-
+# Create LogoutServicePostView subclass if available
 if LogoutServicePostView is not None:
-  setattr(LogoutServicePostView, 'login_notrequired', True)
+  class LogoutServicePostViewNoLoginRequired(LogoutServicePostView):
+    def dispatch(self, request, *args, **kwargs):
+      return super().dispatch(request, *args, **kwargs)
+  
+  # Set login_notrequired on dispatch method
+  LogoutServicePostViewNoLoginRequired.dispatch.login_notrequired = True
+else:
+  LogoutServicePostViewNoLoginRequired = None
+
+
+# Expose the views with backward compatibility
+login = LoginViewNoLoginRequired
+echo_attributes = EchoAttributesViewNoLoginRequired
+metadata = MetadataViewNoLoginRequired
+assertion_consumer_service = CustomAssertionConsumerServiceView
+logout_service = LogoutViewNoLoginRequired
+logout_service_post = LogoutServicePostViewNoLoginRequired
+
+# For direct class access in URLs
+LoginView = LoginViewNoLoginRequired
+EchoAttributesView = EchoAttributesViewNoLoginRequired
+MetadataView = MetadataViewNoLoginRequired
+LogoutView = LogoutViewNoLoginRequired
+LogoutServicePostView = LogoutServicePostViewNoLoginRequired
+
+__all__ = ['login', 'echo_attributes', 'assertion_consumer_service', 'metadata', 'logout_service', 'logout_service_post',
+           'LoginView', 'EchoAttributesView', 'MetadataView', 'LogoutView', 'CustomAssertionConsumerServiceView', 'LogoutServicePostView']
