@@ -28,7 +28,6 @@ import { FINISH_IMPORT_URL } from '../api';
 import { getDefaultTableName } from '../utils/utils';
 import SettingsTab from '../SettingsTab/SettingsTab';
 import { ImporterSettings, StoreLocation, TableFormat } from '../types';
-import { ImporterTabs } from '../types';
 
 interface FileImportTabsProps {
   fileMetaData: FileMetaData;
@@ -93,7 +92,7 @@ const FileImportTabs = ({ fileMetaData }: FileImportTabsProps): JSX.Element => {
   const tabItems = [
     {
       label: t('Preview'),
-      key: ImporterTabs.PREVIEW,
+      key: 'preview',
       children: (
         <FilePreviewTab
           fileMetaData={fileMetaData}
@@ -104,7 +103,7 @@ const FileImportTabs = ({ fileMetaData }: FileImportTabsProps): JSX.Element => {
     },
     {
       label: t('Settings'),
-      key: ImporterTabs.SETTINGS,
+      key: 'settings',
       children: (
         <SettingsTab
           fileMetaData={fileMetaData}
@@ -115,7 +114,7 @@ const FileImportTabs = ({ fileMetaData }: FileImportTabsProps): JSX.Element => {
     },
     {
       label: t('Partitions'),
-      key: ImporterTabs.PARTITION
+      key: 'partition'
       // children: <PartitionsTab />
     }
   ];

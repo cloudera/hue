@@ -49,8 +49,9 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       name: 'description',
       type: FieldType.INPUT,
       label: 'Description',
-      placeholder: 'Description goes here',
-      tooltip: 'Enter table description'
+      placeholder: "A table to store customer data imported from the marketing team's CRM.",
+      tooltip:
+        "This description will be used as the comment for the new database table. It helps other developers understand the table's purpose."
     }
   ],
   properties: [
@@ -58,7 +59,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       name: 'tableFormat',
       type: FieldType.SELECT,
       label: 'Format',
-      placeholder: 'Choose format',
+      placeholder: 'Choose an option',
       options: TABLE_FORMAT_OPTIONS,
       tooltip: 'Format of the table'
     },
@@ -83,7 +84,8 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       name: 'isInsertOnly',
       type: FieldType.CHECKBOX,
       label: 'Insert only',
-      tooltip: 'Insert only',
+      tooltip:
+        'Table will be created with insert only mode, when disabled, the table will be created with insert, delete and update mode',
       isHidden: (context?: SettingsContext) => !context?.settings.isTransactional
     },
     {
