@@ -22,7 +22,9 @@ import { FileMetaData, ImporterFileSource, LocalFileUploadResponse } from '../ty
 import { UPLOAD_LOCAL_FILE_API_URL } from '../api';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import { i18nReact } from '../../../utils/i18nReact';
-import { SUPPORTED_UPLOAD_TYPES } from '../constants';
+import { SUPPORTED_UPLOAD_TYPES, DEFAULT_UPLOAD_LIMIT } from '../constants';
+import { getLastKnownConfig } from '../../../config/hueConfig';
+
 interface LocalFileUploadOptionProps {
   setFileMetaData: (fileMetaData: FileMetaData) => void;
   setUploadError: (error: string) => void;
@@ -34,6 +36,7 @@ const LocalFileUploadOption = ({
 }: LocalFileUploadOptionProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const uploadRef = useRef<HTMLInputElement>(null);
+  const config = getLastKnownConfig()?.importer;
 
   const { save: upload } = useSaveData<LocalFileUploadResponse>(UPLOAD_LOCAL_FILE_API_URL);
 
@@ -51,18 +54,16 @@ const LocalFileUploadOption = ({
     const fileSize = file.size;
     if (fileSize === 0) {
       setUploadError(t('This file is empty, please select another file.'));
-    } else if (fileSize > 150 * 1000 * 1000) {
+    } else if (fileSize > (config?.max_local_file_size_upload_limit ?? DEFAULT_UPLOAD_LIMIT)) {
       setUploadError(
-        t(
-          'File size exceeds the supported size (150 MB). Please use any file browser to upload files.'
-        )
+        t('File size exceeds the supported size. Please use any file browser to upload files.')
       );
     } else {
       upload(payload, {
         onSuccess: data => {
           setFileMetaData({
-            path: data.local_file_url,
-            type: data.file_type,
+            path: data.file_path,
+            fileName: file.name,
             source: ImporterFileSource.LOCAL
           });
         },

@@ -32,7 +32,8 @@ jest.mock('../../../utils/hooks/useSaveData/useSaveData', () => ({
 
 jest.mock('../constants', () => ({
   ...jest.requireActual('../constants'),
-  SUPPORTED_UPLOAD_TYPES: '.csv, .xlsx, .xls'
+  SUPPORTED_UPLOAD_TYPES: '.csv, .xlsx, .xls',
+  DEFAULT_UPLOAD_LIMIT: 150 * 1000 * 1000
 }));
 
 const mockSetFileMetaData = jest.fn();
@@ -101,15 +102,16 @@ describe('LocalFileUploadOption', () => {
     });
 
     expect(mockSetUploadError).toHaveBeenCalledWith(
-      'File size exceeds the supported size (150 MB). Please use any file browser to upload files.'
+      'File size exceeds the supported size. Please use any file browser to upload files.'
     );
   });
 
   it('should upload file successfully and sets metadata', () => {
     mockSave.mockImplementation((_data, { onSuccess }) => {
       onSuccess({
-        local_file_url: '/tmp/foo.csv',
-        file_type: 'csv'
+        file_path: '/tmp/data.csv',
+        fileName: 'data.csv',
+        source: ImporterFileSource.LOCAL
       });
     });
 
@@ -126,8 +128,8 @@ describe('LocalFileUploadOption', () => {
       target: { files: [file] }
     });
     expect(mockSetFileMetaData).toHaveBeenCalledWith({
-      path: '/tmp/foo.csv',
-      type: 'csv',
+      path: '/tmp/data.csv',
+      fileName: 'data.csv',
       source: ImporterFileSource.LOCAL
     });
   });

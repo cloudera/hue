@@ -32,7 +32,6 @@ import { useHuePubSub } from '../../../utils/hooks/useHuePubSub/useHuePubSub';
 import { FileStatus } from '../../../utils/hooks/useFileUpload/types';
 import UUID from '../../../utils/string/UUID';
 import { DEFAULT_POLLING_TIME } from '../../../utils/constants/storageBrowser';
-import { SUPPORTED_UPLOAD_TYPES } from '../../newimporter/constants';
 
 import { BrowserViewType, ListDirectory } from '../types';
 import { LIST_DIRECTORY_API_URL, CREATE_DIRECTORY_API_URL } from '../api';
@@ -135,7 +134,12 @@ const FileChooserModal = ({
             <span className="hue-filechooser-modal__table-cell-icon">
               {record.type === BrowserViewType.dir ? <FolderIcon /> : <FileIcon />}
             </span>
-            <span className="hue-filechooser-modal__table-cell-name">{record.name}</span>
+            <span
+              className="hue-filechooser-modal__table-cell-name"
+              data-testid="hue-filechooser-modal__table-cell-name"
+            >
+              {record.name}
+            </span>
           </Tooltip>
         );
       }
@@ -206,7 +210,7 @@ const FileChooserModal = ({
       {
         onSuccess: () => {
           setShowCreateFolderModal(false);
-          setDestPath(prev => `${prev}/${name}`);
+          setDestPath(prev => `${prev}/${createFolderValue}`);
         }
       }
     );
@@ -260,72 +264,75 @@ const FileChooserModal = ({
   );
 
   return (
-    <Modal
-      open={showModal}
-      title={title}
-      className="hue-filechooser-modal cuix antd"
-      onOk={isUploadEnabled ? handleUploadClick : handleOk}
-      okText={isUploadEnabled ? t('Upload file') : submitText}
-      okButtonProps={
-        !isUploadEnabled ? { disabled: sourcePath === destPath, loading: submitLoading } : {}
-      }
-      secondaryButtonText={t('Create folder')}
-      onSecondary={() => setShowCreateFolderModal(true)}
-      cancelText={cancelText}
-      onCancel={onClose}
-    >
-      <div className="hue-filechooser-modal__body">
-        <div className="hue-filechooser-modal__path-browser-panel">
-          <PathBrowser filePath={destPath} onFilepathChange={setDestPath} showIcon={false} />
-        </div>
-        <Input
-          className="hue-filechooser-modal__search"
-          placeholder={t('Search')}
-          allowClear={true}
-          onChange={event => {
-            handleSearch(event.target.value);
-          }}
-        />
-        {isUploadEnabled ? (
-          <DragAndDrop onDrop={onFilesDrop}>{TableContent}</DragAndDrop>
-        ) : (
-          TableContent
-        )}
-      </div>
-      <input
-        ref={uploadRef}
-        type="file"
-        className="hue-importer__source-selector-option-upload"
-        onChange={handleFileUpload}
-        accept={SUPPORTED_UPLOAD_TYPES}
-      />
-      {showCreateFolderModal && (
-        <BottomSlidePanel
-          isOpen={showCreateFolderModal}
-          title={t('Create Folder')}
-          cancelText="Cancel"
-          primaryText={t('Create')}
-          onClose={() => {
-            setShowCreateFolderModal(false);
-            setCreateFolderValue('');
-          }}
-          onPrimaryClick={handleCreate}
+    <>
+      {showModal && (
+        <Modal
+          open={showModal}
+          title={title}
+          className="hue-filechooser-modal cuix antd"
+          onOk={isUploadEnabled ? handleUploadClick : handleOk}
+          okText={isUploadEnabled ? t('Upload file') : submitText}
+          okButtonProps={
+            !isUploadEnabled ? { disabled: sourcePath === destPath, loading: submitLoading } : {}
+          }
+          secondaryButtonText={t('Create folder')}
+          onSecondary={() => setShowCreateFolderModal(true)}
+          cancelText={cancelText}
+          onCancel={onClose}
         >
-          {/* TODO: Refactor CreateAndUpload to reuse */}
-          <LoadingErrorWrapper errors={createFolderErrorConfig}>
+          <div className="hue-filechooser-modal__body">
+            <div className="hue-filechooser-modal__path-browser-panel">
+              <PathBrowser filePath={destPath} onFilepathChange={setDestPath} showIcon={false} />
+            </div>
             <Input
-              defaultValue={createFolderValue}
-              disabled={createFolderLoading}
-              onPressEnter={() => handleCreate()}
-              ref={createFolderInputRef}
-              onChange={e => {
-                setCreateFolderValue(e.target.value);
+              className="hue-filechooser-modal__search"
+              placeholder={t('Search')}
+              allowClear={true}
+              onChange={event => {
+                handleSearch(event.target.value);
               }}
             />
-          </LoadingErrorWrapper>
-        </BottomSlidePanel>
+            {isUploadEnabled ? (
+              <DragAndDrop onDrop={onFilesDrop}>{TableContent}</DragAndDrop>
+            ) : (
+              TableContent
+            )}
+          </div>
+          <input
+            ref={uploadRef}
+            type="file"
+            className="hue-importer__source-selector-option-upload"
+            onChange={handleFileUpload}
+          />
+          {showCreateFolderModal && (
+            <BottomSlidePanel
+              isOpen={showCreateFolderModal}
+              title={t('Create Folder')}
+              cancelText="Cancel"
+              primaryText={t('Create')}
+              onClose={() => {
+                setShowCreateFolderModal(false);
+                setCreateFolderValue('');
+              }}
+              onPrimaryClick={handleCreate}
+            >
+              {/* TODO: Refactor CreateAndUpload to reuse */}
+              <LoadingErrorWrapper errors={createFolderErrorConfig}>
+                <Input
+                  defaultValue={createFolderValue}
+                  disabled={createFolderLoading}
+                  onPressEnter={() => handleCreate()}
+                  ref={createFolderInputRef}
+                  onChange={e => {
+                    setCreateFolderValue(e.target.value);
+                  }}
+                />
+              </LoadingErrorWrapper>
+            </BottomSlidePanel>
+          )}
+        </Modal>
       )}
-    </Modal>
+    </>
   );
 };
 
