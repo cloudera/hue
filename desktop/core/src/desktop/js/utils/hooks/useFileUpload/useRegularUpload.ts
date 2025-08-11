@@ -21,13 +21,13 @@ import useSaveData from '../useSaveData/useSaveData';
 import { getItemProgress } from './utils';
 import { RegularFile, FileVariables, FileStatus } from './types';
 
-interface UseUploadQueueResponse {
+interface UseRegularUploadResponse {
   addFiles: (items: RegularFile[], overwrite?: boolean) => void;
   cancelFile: (uuid: RegularFile['uuid']) => void;
   isLoading: boolean;
 }
 
-interface UploadQueueOptions {
+interface UseRegularUploadProps {
   concurrentProcess?: number;
   updateFileVariables: (item: RegularFile['uuid'], variables: FileVariables) => void;
   onComplete: () => void;
@@ -37,7 +37,7 @@ const useRegularUpload = ({
   concurrentProcess = DEFAULT_CONCURRENT_MAX_CONNECTIONS,
   updateFileVariables,
   onComplete
-}: UploadQueueOptions): UseUploadQueueResponse => {
+}: UseRegularUploadProps): UseRegularUploadResponse => {
   const { save } = useSaveData(UPLOAD_FILE_URL);
 
   const processRegularFile = async (item: RegularFile) => {
@@ -58,6 +58,9 @@ const useRegularUpload = ({
         updateFileVariables(item.uuid, { status: FileStatus.Failed, error });
       },
       postOptions: {
+        params: {
+          destination_path: item.filePath
+        },
         onUploadProgress: progress => {
           const itemProgress = getItemProgress(progress);
           updateFileVariables(item.uuid, { progress: itemProgress });
