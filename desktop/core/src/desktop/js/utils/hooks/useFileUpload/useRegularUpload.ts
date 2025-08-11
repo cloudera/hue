@@ -40,7 +40,7 @@ const useRegularUpload = ({
 }: UseRegularUploadProps): UseRegularUploadResponse => {
   const { save } = useSaveData(UPLOAD_FILE_URL);
 
-  const processRegularFile = async (item: RegularFile) => {
+  const processRegularFile = async (item: RegularFile, overwrite?: boolean | undefined) => {
     updateFileVariables(item.uuid, { status: FileStatus.Uploading });
 
     const payload = new FormData();
@@ -59,7 +59,10 @@ const useRegularUpload = ({
       },
       postOptions: {
         params: {
-          destination_path: item.filePath
+          destination_path: item.filePath,
+          // Backend UploadFileAPI reads overwrite from query params (request.GET)
+          // so we must include it here instead of only in the multipart body
+          overwrite: item.overwrite ? 'true' : 'false'
         },
         onUploadProgress: progress => {
           const itemProgress = getItemProgress(progress);
@@ -74,7 +77,7 @@ const useRegularUpload = ({
     dequeue,
     isLoading
   } = useQueueProcessor<RegularFile>(
-    async (file: RegularFile) => processRegularFile(file),
+    async (file: RegularFile) => processRegularFile(file, file.overwrite),
     {
       concurrentProcess,
       onSuccess: onComplete
