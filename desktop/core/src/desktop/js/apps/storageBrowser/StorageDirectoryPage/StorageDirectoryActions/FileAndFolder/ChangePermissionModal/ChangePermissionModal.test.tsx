@@ -57,7 +57,6 @@ describe('ChangePermissionModal Component', () => {
       <ChangePermissionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -81,7 +80,6 @@ describe('ChangePermissionModal Component', () => {
       <ChangePermissionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -105,7 +103,6 @@ describe('ChangePermissionModal Component', () => {
       <ChangePermissionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -115,8 +112,14 @@ describe('ChangePermissionModal Component', () => {
     fireEvent.click(getByText('Submit'));
 
     waitFor(() => {
+      const expectedFormData = new FormData();
+      expectedFormData.append(
+        'permission',
+        '{"user_read":true,"user_write":true,"user_execute":true,"group_read":true,"group_write":true,"group_execute":true,"other_read":true,"other_write":true,"other_execute":true}'
+      );
+      expectedFormData.append('path', 'test/path/file1.txt');
       expect(mockSave).toHaveBeenCalledTimes(1);
-      expect(mockSave).toHaveBeenCalledWith(expect.any(FormData));
+      expect(mockSave).toHaveBeenCalledWith(expectedFormData);
     });
   });
 
@@ -129,7 +132,6 @@ describe('ChangePermissionModal Component', () => {
       <ChangePermissionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -150,7 +152,6 @@ describe('ChangePermissionModal Component', () => {
       <ChangePermissionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -167,7 +168,6 @@ describe('ChangePermissionModal Component', () => {
       <ChangePermissionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
@@ -183,7 +183,6 @@ describe('ChangePermissionModal Component', () => {
       <ChangePermissionModal
         isOpen={true}
         files={mockFiles}
-        setLoading={jest.fn()}
         onSuccess={mockOnSuccess}
         onError={mockOnError}
         onClose={mockOnClose}
