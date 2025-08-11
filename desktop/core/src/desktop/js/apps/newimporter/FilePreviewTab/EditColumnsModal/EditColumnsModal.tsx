@@ -167,7 +167,7 @@ const EditColumnsModal = ({
       cancelText={t('Cancel')}
       okText={t('Done')}
       onOk={handleDone}
-      className="cuix antd hue-importer-edit-columns-modal"
+      className="hue-importer-edit-columns-modal"
     >
       <LoadingErrorWrapper loading={sqlTypesLoading} errors={errors}>
         <Table columns={modalColumns} dataSource={editRows} pagination={false} />
