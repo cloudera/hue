@@ -31,8 +31,8 @@ import { BorderlessButton } from 'cuix/dist/components/Button';
 import PaginatedTable from '../../../reactComponents/PaginatedTable/PaginatedTable';
 import { FILE_GUESS_METADATA, FILE_GUESS_HEADER, FILE_PREVIEW_URL } from '../api';
 import SourceConfiguration from './SourceConfiguration/SourceConfiguration';
-import EditColumnsModal from './EditColumns/EditColumnsModal';
-import type { Column } from './EditColumns/EditColumnsModal';
+import EditColumnsModal from './EditColumnsModal/EditColumnsModal';
+import type { Column } from './EditColumnsModal/EditColumnsModal';
 import DestinationSettings from './DestinationSettings/DestinationSettings';
 
 import './FilePreviewTab.scss';
