@@ -44,8 +44,7 @@ export const getMetaData = (item: ChunkedFile): FileChunkMetaData => ({
 
 export const createChunks = (
   item: RegularFile,
-  chunkSize: number,
-  overwrite: boolean
+  chunkSize: number
 ): ChunkedFile[] => {
   const totalChunks = Math.max(1, getTotalChunk(item.file.size, chunkSize));
   const chunks = Array.from({ length: totalChunks }, (_, i) => {

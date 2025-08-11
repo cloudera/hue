@@ -162,7 +162,7 @@ const useChunkUpload = ({
 
   const addFiles = (newFiles: RegularFile[]) => {
     newFiles.forEach(file => {
-      const chunks = createChunks(file, chunkSize, file.overwrite ?? false);
+      const chunks = createChunks(file, chunkSize);
       enqueue(chunks);
     });
   };
