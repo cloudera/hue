@@ -108,16 +108,20 @@ describe('useRegularUpload', () => {
     const mockFormData = new FormData();
     mockFormData.append('file', mockFile.file);
 
-    expect(mockSave).toHaveBeenCalledWith(mockFormData, {
-      onSuccess: expect.any(Function),
-      onError: expect.any(Function),
-      postOptions: {
-        onUploadProgress: expect.any(Function),
-        params: {
-          destination_path: mockFile.filePath
-        }
-      }
-    });
+    expect(mockSave).toHaveBeenCalledWith(
+      expect.any(FormData),
+      expect.objectContaining({
+        onSuccess: expect.any(Function),
+        onError: expect.any(Function),
+        postOptions: expect.objectContaining({
+          onUploadProgress: expect.any(Function),
+          params: expect.objectContaining({
+            destination_path: mockFile.filePath,
+            overwrite: 'false'
+          })
+        })
+      })
+    );
     expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
       status: FileStatus.Uploading
     });

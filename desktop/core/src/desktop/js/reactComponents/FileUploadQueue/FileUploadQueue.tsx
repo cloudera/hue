@@ -13,7 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import CloseIcon from '@cloudera/cuix-core/icons/react/CloseIcon';
 import CaratDownIcon from '@cloudera/cuix-core/icons/react/CaratDownIcon';
@@ -85,6 +85,13 @@ const FileUploadQueue = (): JSX.Element => {
     isChunkUpload,
     onComplete
   });
+
+  // If there are already files in the queue (e.g., restored state), ensure the queue is visible
+  useEffect(() => {
+    if (uploadQueue.length > 0) {
+      setIsVisible(true);
+    }
+  }, [uploadQueue.length]);
 
   useHuePubSub<FileUploadEvent>({
     topic: FILE_UPLOAD_START_EVENT,
@@ -220,6 +227,7 @@ const FileUploadQueue = (): JSX.Element => {
             <BorderlessButton
               onClick={() => setExpandQueue(!expandQueue)}
               icon={expandQueue ? <CaratDownIcon /> : <CaratUpIcon />}
+              data-testid="hue-upload-queue-container__expand-button"
             />
             <BorderlessButton onClick={onClose} icon={<CloseIcon />} />
           </div>
