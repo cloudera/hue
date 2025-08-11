@@ -160,7 +160,7 @@ const useChunkUpload = ({
     concurrentProcess
   });
 
-  const addFiles = (newFiles: RegularFile[], ) => {
+  const addFiles = (newFiles: RegularFile[]) => {
     newFiles.forEach(file => {
       const chunks = createChunks(file, chunkSize, file.overwrite ?? false);
       enqueue(chunks);

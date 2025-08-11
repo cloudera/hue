@@ -47,7 +47,7 @@ const useRegularUpload = ({
     payload.append('file', item.file);
     payload.append('destination_path', item.filePath);
     if (item.overwrite) {
-      payload.append('overwrite', item.overwrite ? 'true' : 'false'); 
+      payload.append('overwrite', item.overwrite ? 'true' : 'false');
     }
 
     return save(payload, {
@@ -74,13 +74,10 @@ const useRegularUpload = ({
     enqueue: addFiles,
     dequeue,
     isLoading
-  } = useQueueProcessor<RegularFile>(
-    async (file: RegularFile) => processRegularFile(file),
-    {
-      concurrentProcess,
-      onSuccess: onComplete
-    }
-  );
+  } = useQueueProcessor<RegularFile>(async (file: RegularFile) => processRegularFile(file), {
+    concurrentProcess,
+    onSuccess: onComplete
+  });
 
   const cancelFile = (itemId: RegularFile['uuid']) => dequeue(itemId, 'uuid');
 

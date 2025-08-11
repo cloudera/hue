@@ -51,7 +51,6 @@ const FileUploadQueue = (): JSX.Element => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [conflictingFiles, setConflictingFiles] = useState<RegularFile[]>([]);
 
-
   // TODO: Need to change this function with a new endpoint once available.
   const checkFileExists = async (filePath: string): Promise<boolean> => {
     try {
@@ -118,32 +117,34 @@ const FileUploadQueue = (): JSX.Element => {
         .filter(file => file.status === FileStatus.Uploading || file.status === FileStatus.Pending)
         .map(file => `${file.filePath}/${file.file.name}`)
     );
-  
-    const result = await newFiles.reduce<Promise<{ conflicts: RegularFile[]; nonConflictingFiles: RegularFile[] }>>(
+
+    const result = await newFiles.reduce<
+      Promise<{ conflicts: RegularFile[]; nonConflictingFiles: RegularFile[] }>
+    >(
       async (accPromise, newFile) => {
-        const acc = await accPromise; 
+        const acc = await accPromise;
         const fullFilePath = `${newFile.filePath}/${newFile.file.name}`;
-  
+
         if (inProgressFileIdentifiers.has(fullFilePath)) {
-          return acc; 
+          return acc;
         }
-  
+
         const exists = await checkFileExists(fullFilePath);
         if (exists) {
           return {
             ...acc,
-            conflicts: [...acc.conflicts, newFile],
+            conflicts: [...acc.conflicts, newFile]
           };
         } else {
           return {
             ...acc,
-            nonConflictingFiles: [...acc.nonConflictingFiles, newFile],
+            nonConflictingFiles: [...acc.nonConflictingFiles, newFile]
           };
         }
       },
-      Promise.resolve({ conflicts: [], nonConflictingFiles: [] }) 
+      Promise.resolve({ conflicts: [], nonConflictingFiles: [] })
     );
-  
+
     return result;
   };
 
@@ -172,7 +173,7 @@ const FileUploadQueue = (): JSX.Element => {
   if (!isVisible && conflictingFiles.length === 0) {
     return <></>;
   }
-  
+
   const getHeaderText = () => {
     const fileText = uploadQueue.length > 1 ? 'files' : 'file';
     const uploadedText = `{{uploadedCount}} ${fileText} uploaded`;
@@ -185,7 +186,7 @@ const FileUploadQueue = (): JSX.Element => {
   };
   return (
     <>
-      {conflictingFiles.length > 0  && (
+      {conflictingFiles.length > 0 && (
         <Modal
           title={t('Resolve Filename Conflicts')}
           open={true}

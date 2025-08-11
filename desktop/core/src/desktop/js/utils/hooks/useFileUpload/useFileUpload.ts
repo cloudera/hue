@@ -102,7 +102,7 @@ const useFileUpload = ({
   const addFiles = (fileItems: RegularFile[]) => {
     if (fileItems.length > 0) {
       setUploadQueue(prev => [...prev, ...fileItems]);
-  
+
       if (isChunkUpload) {
         addToChunkUpload(fileItems);
       } else {
