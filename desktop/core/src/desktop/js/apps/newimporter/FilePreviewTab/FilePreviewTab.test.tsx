@@ -23,20 +23,18 @@ import { FileMetaData, ImporterFileSource } from '../types';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 import { mocked } from 'jest-mock';
 
-// Minimal mock data for basic rendering tests
 const mockPreviewData = {
   columns: [
     { name: 'Name', type: 'string' },
     { name: 'Age', type: 'int' }
   ],
   previewData: {
-    Name: ['Alice', 'Bob'],
-    Age: ['30', '25']
+    name: ['Alice', 'Bob'],
+    age: ['30', '25']
   }
 };
 
 jest.mock('../../../utils/hooks/useLoadData/useLoadData');
-// Simple mock for useSaveData hook
 jest.mock('../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
@@ -45,7 +43,6 @@ jest.mock('../../../utils/hooks/useSaveData/useSaveData', () => ({
   }))
 }));
 
-// Simple mock for useDataCatalog hook - only provide what's needed for basic rendering
 jest.mock('../../../utils/hooks/useDataCatalog/useDataCatalog', () => ({
   useDataCatalog: jest.fn(() => ({
     loading: false,
@@ -76,7 +73,6 @@ describe('FilePreviewTab', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Simplified mock for useLoadData - provide minimal data needed for basic rendering
     (mocked(useLoadData) as jest.MockedFunction<typeof useLoadData>).mockReturnValue({
       loading: false,
       data: mockPreviewData,
@@ -106,6 +102,8 @@ describe('FilePreviewTab', () => {
     await waitFor(() => {
       expect(screen.getByText('Edit Columns')).toBeInTheDocument();
       expect(screen.getByText('Engine')).toBeInTheDocument();
+      expect(screen.getByText('Database')).toBeInTheDocument();
+      expect(screen.getByText('Table Name')).toBeInTheDocument();
     });
   });
 
@@ -118,8 +116,12 @@ describe('FilePreviewTab', () => {
       />
     );
 
-    // Check for key elements without complex interactions
-    expect(screen.getByText('Edit Columns')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Alice')).toBeInTheDocument();
+      expect(screen.getByText('30')).toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
+      expect(screen.getByText('25')).toBeInTheDocument();
+    });
   });
 
   it('should render data table when preview data is available', () => {
