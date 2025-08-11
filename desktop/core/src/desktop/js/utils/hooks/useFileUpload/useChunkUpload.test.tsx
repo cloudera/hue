@@ -292,18 +292,13 @@ describe('useChunkUpload', () => {
     mockQueueCallback(mockChunk);
 
     await waitFor(() => {
-      expect(mockUpdateFileVariables.mock.calls).toEqual(
-        expect.arrayContaining([
-          [mockFile.uuid, { status: FileStatus.Uploading }],
-          [
-            mockFile.uuid,
-            {
-              status: FileStatus.Failed,
-              error: new Error('Upload server ran out of space. Try again later.')
-            }
-          ]
-        ])
-      );
+      expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
+        status: FileStatus.Uploading
+      });
+      expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
+        status: FileStatus.Failed,
+        error: new Error('Upload server ran out of space. Try again later.')
+      });
     });
     expect(mockSave).not.toHaveBeenCalled();
   });
@@ -379,14 +374,11 @@ describe('useChunkUpload', () => {
       })
     );
 
-    expect(mockLoadData).toHaveBeenCalledWith(
-      GET_TASKS_URL,
-      expect.objectContaining({
-        pollInterval: 5000,
-        skip: true,
-        onSuccess: expect.any(Function)
-      })
-    );
+    expect(mockLoadData).toHaveBeenCalledWith(GET_TASKS_URL, {
+      pollInterval: 5000,
+      skip: true,
+      onSuccess: expect.any(Function)
+    });
 
     mockIsAllChunksOfFileUploaded.mockReturnValue(true);
     mockSave
@@ -399,14 +391,11 @@ describe('useChunkUpload', () => {
     });
 
     await waitFor(() => {
-      expect(mockLoadData).toHaveBeenCalledWith(
-        GET_TASKS_URL,
-        expect.objectContaining({
-          pollInterval: 5000,
-          skip: false,
-          onSuccess: expect.any(Function)
-        })
-      );
+      expect(mockLoadData).toHaveBeenCalledWith(GET_TASKS_URL, {
+        pollInterval: 5000,
+        skip: false,
+        onSuccess: expect.any(Function)
+      });
     });
   });
 
@@ -561,7 +550,7 @@ describe('useChunkUpload', () => {
       })
     );
 
-    expect(useQueueProcessor).toHaveBeenCalledWith(expect.any(Function), {
+    expect(useQueueProcessor).toHaveBeenCalledWith(mockQueueCallback, {
       concurrentProcess: DEFAULT_CONCURRENT_MAX_CONNECTIONS
     });
   });
@@ -593,12 +582,9 @@ describe('useChunkUpload', () => {
       expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
         status: FileStatus.Uploading
       });
-      expect(mockUpdateFileVariables).toHaveBeenCalledWith(
-        mockFile.uuid,
-        expect.objectContaining({
-          progress: 75
-        })
-      );
+      expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
+        progress: 75
+      });
     });
   });
 

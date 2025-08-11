@@ -289,7 +289,7 @@ class S3NewFileUploadHandler(FileUploadHandler):
     try:
       LOG.debug(f"Initiating S3 multipart upload to target path: {self.target_key_path}")
       self.multipart_upload = self._bucket.initiate_multipart_upload(self.target_key_path)
-      LOG.info(f"Multipart upload initiated successfully for: {self.target_key_path}")
+      LOG.info(f"Multipart upload initiated successfully for {self.target_key_path}")
     except Exception as e:
       LOG.error(f"Failed to initiate S3 multipart upload for {self.target_key_path}: {e}")
       raise PopupException(f"Failed to initiate S3 multipart upload to target path: {self.target_key_path}", error_code=500)
@@ -370,11 +370,11 @@ class S3NewFileUploadHandler(FileUploadHandler):
 
   def upload_chunk(self, raw_chunk):
     try:
-      LOG.debug(f"Uploading part {self.part_number}, size: {len(raw_chunk)} bytes")
+      LOG.debug(f"Uploading part {self.part_number} for {self.target_key_path}, size: {len(raw_chunk)} bytes")
       self.multipart_upload.upload_part_from_file(fp=self._get_file_part(raw_chunk), part_num=self.part_number)
       self.part_number += 1
     except Exception as e:
-      LOG.error(f"Failed to upload part {self.part_number}: {e}")
+      LOG.error(f"Failed to upload part {self.part_number} for {self.target_key_path}: {e}")
       self.multipart_upload.cancel_upload()
       raise PopupException(f"Failed to upload part: {e}", error_code=500)
 
@@ -386,12 +386,12 @@ class S3NewFileUploadHandler(FileUploadHandler):
 
   def file_complete(self, file_size):
     # Finish the upload
-    LOG.info(f"Completing multipart upload - total size: {file_size} bytes, parts: {self.part_number - 1}")
+    LOG.info(f"Completing multipart upload for {self.target_key_path} - total size: {file_size} bytes, parts: {self.part_number - 1}")
     self.multipart_upload.complete_upload()
 
     file_stats = self._fs.stats(f"s3a://{self.bucket_name}/{self.target_key_path}")
 
-    LOG.info(f"Upload completed successfully: {self.target_key_path}")
+    LOG.info(f"Upload completed successfully for {self.target_key_path}")
 
     file_stats = massage_stats(file_stats)
 
