@@ -22,7 +22,7 @@ from django.urls import re_path
 LOG = logging.getLogger()
 
 try:
-  from libsaml.views import AssertionConsumerServiceView, EchoAttributesView, LoginView, LogoutView, MetadataView
+  from libsaml.views import AssertionConsumerServiceView, EchoAttributesView, local_logout, LoginView, LogoutView, MetadataView
 
   urlpatterns = [
     re_path(r'^logout/$', LogoutView.as_view(), name='saml2_logout'),
@@ -30,7 +30,8 @@ try:
     re_path(r'^acs/$', AssertionConsumerServiceView.as_view(), name='saml2_acs'),
     re_path(r'^login/$', LoginView.as_view(), name='saml2_login'),
     re_path(r'^metadata/$', MetadataView.as_view(), name='saml2_metadata'),
-    re_path(r'^test/$', EchoAttributesView.as_view())
+    re_path(r'^test/$', EchoAttributesView.as_view()),
+    re_path(r'^local_logout/$', local_logout, name='saml2_local_logout')
   ]
 
   try:
