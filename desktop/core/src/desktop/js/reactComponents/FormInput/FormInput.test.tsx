@@ -28,8 +28,7 @@ describe('FormInput Component', () => {
   const mockOnChange = jest.fn();
   const defaultProps = {
     loading: false,
-    onChange: mockOnChange,
-    className: 'test-class'
+    onChange: mockOnChange
   };
 
   beforeEach(() => {
@@ -41,7 +40,8 @@ describe('FormInput Component', () => {
       name: 'testInput',
       type: FieldType.INPUT,
       label: 'Test Input',
-      placeholder: 'Enter text'
+      placeholder: 'Enter text',
+      className: 'test-class'
     };
 
     it('should render input field with correct props', () => {
@@ -147,13 +147,7 @@ describe('FormInput Component', () => {
       const user = userEvent.setup();
       const onChangeSpy = jest.fn();
       render(
-        <FormInput
-          field={selectField}
-          value="option1"
-          onChange={onChangeSpy}
-          loading={false}
-          className="test-class"
-        />
+        <FormInput field={selectField} value="option1" onChange={onChangeSpy} loading={false} />
       );
 
       const select = screen.getByRole('combobox');
