@@ -445,8 +445,8 @@ class S3FileSystem(object):
   def remove(self, path, skip_trash=True):
     self.rmtree(path, skipTrash=skip_trash)
 
-  def restore(self, *args, **kwargs):
-    raise NotImplementedError(_('Moving to trash is not implemented for S3'))
+  def restore(self, path):
+    raise NotImplementedError("Moving to trash is not implemented for S3")
 
   def filebrowser_action(self):
     return self._filebrowser_action
@@ -664,3 +664,24 @@ class S3FileSystem(object):
   def get_upload_handler(self, destination_path, overwrite):
     from aws.s3.upload import S3NewFileUploadHandler
     return S3NewFileUploadHandler(self, destination_path, overwrite)
+
+  def get_content_summary(self, path):
+    raise NotImplementedError("get_content_summary is not implemented for S3")
+
+  def set_replication(self, path, replication_factor):
+    raise NotImplementedError("set_replication is not implemented for S3")
+
+  def chown(self, path, *args, **kwargs):
+    raise NotImplementedError("chown is not implemented for S3")
+
+  def chmod(self, path, *args, **kwargs):
+    raise NotImplementedError("chmod is not implemented for S3")
+
+  def trash_path(self, path):
+    raise NotImplementedError("trash_path is not implemented for S3")
+
+  def current_trash_path(self, trash_path):
+    return NotImplementedError("current_trash_path is not implemented for S3")
+
+  def purge_trash(self):
+    raise NotImplementedError("purge_trash is not implemented for S3")

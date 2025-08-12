@@ -202,6 +202,9 @@ class ProxyFS(object):
   def trash_path(self, path):
     return self._get_fs(path).trash_path(path)
 
+  def current_trash_path(self, trash_path):
+    return self._get_fs(trash_path).current_trash_path(trash_path)
+
   def create_home_dir(self, home_path=None):
     """
     Initially home_path will have path value for HDFS, try creating the user home dir for it first.
@@ -301,7 +304,7 @@ class ProxyFS(object):
     self._get_fs(path).upload(file, path, *args, **kwargs)
 
   def check_access(self, path, *args, **kwargs):
-    self._get_fs(path).check_access(path, *args, **kwargs)
+    return self._get_fs(path).check_access(path, *args, **kwargs)
 
   def mkswap(self, filename, subdir='', suffix='swp', basedir=None):
     return self._get_fs(basedir).mkswap(filename, subdir, suffix, basedir)
