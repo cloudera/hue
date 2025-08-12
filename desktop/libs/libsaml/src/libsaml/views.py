@@ -16,6 +16,8 @@
 # limitations under the License.
 from djangosaml2.views import AssertionConsumerServiceView, EchoAttributesView, LoginView, LogoutView, MetadataView
 
+from desktop.lib.django_util import render
+
 LoginView.dispatch.login_notrequired = True
 EchoAttributesView.dispatch.login_notrequired = True
 MetadataView.dispatch.login_notrequired = True
@@ -29,3 +31,22 @@ try:
 except ImportError:
   # We are on an older version of djangosaml2
   pass
+
+
+def local_logout(request, next_page=None):
+  """
+  Local logout: clears Django session only, not the SAML session.
+  Then presents a button to redirect to SAML login.
+  """
+  import libsaml.conf
+  base_url = libsaml.conf.BASE_URL.get()
+  logout_url = libsaml.conf.CDP_LOGOUT_URL.get()
+  authenticate_url = logout_url.replace("logout", "authenticate")
+  login_url = f"{authenticate_url}?loginRedirect={base_url}"
+
+  return render('logged_out.mako', request, {
+    'login_url': login_url,
+  })
+
+
+setattr(local_logout, 'login_notrequired', True)
