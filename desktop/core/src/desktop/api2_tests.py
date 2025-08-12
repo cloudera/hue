@@ -39,6 +39,12 @@ from desktop.models import Directory, Document2
 from useradmin.models import get_default_user_group, User
 
 
+class _DummyUnboundConfig:
+  """Simulates an unbound Config (no .get()), exposing only a declared default."""
+  def __init__(self, default_value):
+    self.default = default_value
+
+
 @pytest.mark.django_db
 class TestApi2(object):
   def setup_method(self):
@@ -261,6 +267,33 @@ class TestApi2(object):
       # Cleanup test documents
       for doc in hue_docs:
         doc.delete()
+
+  @patch('desktop.api2.ALLOW_SAMPLE_DATA_FROM_VIEWS', new=_DummyUnboundConfig(True))
+  @patch('desktop.api2.ENABLE_EXTRACT_UPLOADED_ARCHIVE', new=_DummyUnboundConfig(False))
+  @patch('desktop.api2.SHOW_DOWNLOAD_BUTTON', new=_DummyUnboundConfig(True))
+  @patch('desktop.api2.FILE_UPLOAD_CHUNK_SIZE', new=_DummyUnboundConfig(5242880))
+  @patch('desktop.api2.CONCURRENT_MAX_CONNECTIONS', new=_DummyUnboundConfig(5))
+  @patch('desktop.api2.RESTRICT_FILE_EXTENSIONS', new=_DummyUnboundConfig(None))
+  def test_get_config_with_unbound_optional_configs(self, *_):
+    """Ensure get_config works when optional app configs are unbound (no .get())."""
+
+    response = self.client.get("/desktop/api2/get_config")
+    assert response.status_code == 200
+
+    config = json.loads(response.content)
+
+    # Validate hue_config side
+    hue_config = config.get('hue_config', {})
+    assert 'allow_sample_data_from_views' in hue_config
+    assert hue_config['allow_sample_data_from_views'] is True
+
+    # Validate storage_browser side picks defaults and does not crash
+    storage = config.get('storage_browser', {})
+    assert storage.get('restrict_file_extensions') is None
+    assert storage.get('concurrent_max_connection') == 5
+    assert storage.get('file_upload_chunk_size') == 5242880
+    assert storage.get('enable_file_download_button') is True
+    assert storage.get('enable_extract_uploaded_archive') is False
 
 
 @pytest.mark.django_db
