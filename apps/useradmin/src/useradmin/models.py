@@ -54,7 +54,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
 from useradmin.conf import AUTO_ASSIGN_FILEBROWSER_PERMISSIONS_TO_DEFAULT_GROUP, DEFAULT_USER_GROUP
-from useradmin.permissions import GroupPermission, HuePermission
+from useradmin.permissions import GroupPermission, HuePermission, LdapGroup  # noqa: F401
 
 if ENABLE_ORGANIZATIONS.get():
   from useradmin.organization import get_organization, Organization, OrganizationGroup as Group, OrganizationUser as User
