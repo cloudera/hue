@@ -96,10 +96,7 @@ const FileUploadQueue = (): JSX.Element => {
         return;
       }
       if (newFiles.length > 0) {
-        const { conflicts, nonConflictingFiles } = await detectFileConflicts(
-          newFiles,
-          uploadQueue
-        );
+        const { conflicts, nonConflictingFiles } = await detectFileConflicts(newFiles, uploadQueue);
         if (conflicts.length > 0) {
           setConflictingFiles(conflicts);
         } else {
@@ -207,7 +204,9 @@ const FileUploadQueue = (): JSX.Element => {
             const count = conflictingFiles.length;
             const noun = count === 1 ? 'file' : 'files';
             const verb = count === 1 ? 'exists' : 'exist';
-            return t(`${count} ${noun} you are trying to upload already ${verb} in the uploaded files.`);
+            return t(
+              `${count} ${noun} you are trying to upload already ${verb} in the uploaded files.`
+            );
           })()}
           <div className="conflict-files__container">
             {conflictingFiles.map(file => (
