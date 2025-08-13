@@ -54,16 +54,12 @@ const FileUploadQueue = (): JSX.Element => {
   // TODO: Need to change this function with a new endpoint once available.
   const checkFileExists = async (filePath: string): Promise<boolean> => {
     try {
-      const response = await get(FILE_STATS_API_URL, { path: filePath }, { silenceErrors: true });
-      if (
-        response &&
-        typeof response === 'object' &&
-        'path' in response &&
-        response.path === filePath
-      ) {
-        return true;
-      }
-      return false;
+      const response = await get<{ path: string }>(
+        FILE_STATS_API_URL,
+        { path: filePath },
+        { silenceErrors: true }
+      );
+      return response?.path === filePath;
     } catch (error) {
       if (error.response?.status === 404) {
         return false;
@@ -86,7 +82,6 @@ const FileUploadQueue = (): JSX.Element => {
     onComplete
   });
 
-  // If there are already files in the queue (e.g., restored state), ensure the queue is visible
   useEffect(() => {
     if (uploadQueue.length > 0) {
       setIsVisible(true);
@@ -97,8 +92,11 @@ const FileUploadQueue = (): JSX.Element => {
     topic: FILE_UPLOAD_START_EVENT,
     callback: async (data?: FileUploadEvent) => {
       const newFiles = data?.files ?? [];
+      if (newFiles.length === 0) {
+        return;
+      }
       if (newFiles.length > 0) {
-        const { conflicts, nonConflictingFiles } = await resolveFileConflicts(
+        const { conflicts, nonConflictingFiles } = await detectFileConflicts(
           newFiles,
           uploadQueue
         );
@@ -115,7 +113,7 @@ const FileUploadQueue = (): JSX.Element => {
     }
   });
 
-  const resolveFileConflicts = async (
+  const detectFileConflicts = async (
     newFiles: RegularFile[],
     uploadQueue: RegularFile[]
   ): Promise<{ conflicts: RegularFile[]; nonConflictingFiles: RegularFile[] }> => {
@@ -160,7 +158,7 @@ const FileUploadQueue = (): JSX.Element => {
     setIsVisible(false);
   };
 
-  const handleModalOk = (overwrite: boolean) => {
+  const handleConflictResolution = (overwrite: boolean) => {
     if (overwrite) {
       const updatedFilesWithOverwriteFlag = conflictingFiles.map(file => ({
         ...file,
@@ -195,26 +193,29 @@ const FileUploadQueue = (): JSX.Element => {
     <>
       {conflictingFiles.length > 0 && (
         <Modal
-          title={t('Resolve Filename Conflicts')}
+          title={t('Detected Filename Conflicts')}
           open={true}
           okText={t('Overwrite')}
-          onOk={() => handleModalOk(true)}
+          onOk={() => handleConflictResolution(true)}
           cancelText={t('Cancel')}
           onCancel={() => setConflictingFiles([])}
           secondaryButtonText={t('Skip Upload')}
-          onSecondary={() => handleModalOk(false)}
-          className="hue-conflict-resolve-modal"
+          onSecondary={() => handleConflictResolution(false)}
+          className="hue-conflict-detect-modal"
         >
-          {t(
-            `${conflictingFiles.length} files you are trying to upload already exist in the uploaded files.`
-          )}
+          {(() => {
+            const count = conflictingFiles.length;
+            const noun = count === 1 ? 'file' : 'files';
+            const verb = count === 1 ? 'exists' : 'exist';
+            return t(`${count} ${noun} you are trying to upload already ${verb} in the uploaded files.`);
+          })()}
           <div className="conflict-files__container">
             {conflictingFiles.map(file => (
               <div key={file.file.name} className="conflict-files__item">
-                <div className="file-icon">
+                <div className="conflict-files__icon">
                   <FileIcon />
                 </div>
-                <span className="file-name">{file.file.name}</span>
+                <span className="conflict-files__name">{file.file.name}</span>
               </div>
             ))}
           </div>

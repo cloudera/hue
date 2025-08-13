@@ -58,7 +58,7 @@
   }
 }
 
-.hue-conflict-resolve-modal {
+.hue-conflict-detect-modal {
   height: 50vh;
 
   &__body {
@@ -82,7 +82,7 @@
   gap: 8px;
 }
 
-.file-icon {
+.conflict-files__icon {
   flex-shrink: 0;
   width: 20px;
   height: 20px;
@@ -93,7 +93,7 @@
   }
 }
 
-.file-name {
+.conflict-files__name {
   word-break: break-word;
   max-width: calc(100% - 28px);
 }
