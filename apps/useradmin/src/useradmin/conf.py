@@ -18,17 +18,23 @@
 Configuration options for the "user admin" application
 """
 
-import sys
 
 from django.utils.translation import gettext_lazy as _
 
-from desktop.lib.conf import Config, ConfigSection, coerce_bool
+from desktop.lib.conf import coerce_bool, Config, ConfigSection
 
 HOME_DIR_PERMISSIONS = Config(
     key="home_dir_permissions",
     help=_("New user home directory is created with these permissions"),
     type=str,
     default="0755")
+
+AUTO_ASSIGN_FILEBROWSER_PERMISSIONS_TO_DEFAULT_GROUP = Config(
+  key="auto_assign_filebrowser_permissions_to_default_group",
+  help=_("Auto assign filebrowser permissions to default group."),
+  type=coerce_bool,
+  default=True,
+)
 
 USE_HOME_DIR_PERMISSIONS = Config(
     key="use_home_dir_permissions",
