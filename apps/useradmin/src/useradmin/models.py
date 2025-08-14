@@ -51,7 +51,6 @@ from desktop import appmanager
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_ORGANIZATIONS
 from desktop.lib.connectors.models import _get_installed_connectors, Connector
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
 from useradmin.conf import DEFAULT_USER_GROUP
 from useradmin.permissions import GroupPermission, HuePermission, LdapGroup  # noqa: F401
