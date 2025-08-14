@@ -15,13 +15,18 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import FileUploadQueue from './FileUploadQueue';
 import { FileStatus, RegularFile } from '../../utils/hooks/useFileUpload/types';
 import { act } from 'react-dom/test-utils';
 import huePubSub from '../../utils/huePubSub';
 import { FILE_UPLOAD_START_EVENT } from './event';
+
+jest.mock('../../api/utils', () => ({
+  __esModule: true,
+  get: jest.fn(() => Promise.reject({ response: { status: 404 } }))
+}));
 
 const mockFilesQueue: RegularFile[] = [
   {
@@ -42,29 +47,36 @@ jest.mock('../../utils/hooks/useFileUpload/useFileUpload', () => ({
   __esModule: true,
   default: jest.fn(() => ({
     uploadQueue: mockFilesQueue,
-    onCancel: jest.fn(),
-    addFiles: jest.fn()
+    cancelFile: jest.fn(),
+    addFiles: jest.fn(() => {}),
+    isLoading: false
   }))
 }));
 
 describe('FileUploadQueue', () => {
-  it('should render the component with initial files in the queue', () => {
-    const { getByText } = render(<FileUploadQueue />);
+  it('should render the component with initial files in the queue', async () => {
+    const { findByText } = render(<FileUploadQueue />);
 
-    act(() => huePubSub.publish(FILE_UPLOAD_START_EVENT, { files: mockFilesQueue }));
+    act(() => {
+      huePubSub.publish(FILE_UPLOAD_START_EVENT, { files: mockFilesQueue });
+    });
 
-    expect(getByText('file1.txt')).toBeInTheDocument();
-    expect(getByText('file2.txt')).toBeInTheDocument();
+    expect(await findByText('file1.txt')).toBeInTheDocument();
+    expect(await findByText('file2.txt')).toBeInTheDocument();
   });
 
-  it('should toggle the visibility of the queue when the header is clicked', () => {
-    const { getByText, getByTestId, queryByText } = render(<FileUploadQueue />);
+  it('should toggle the visibility of the queue when the header is clicked', async () => {
+    const { getByText, queryByText, getByRole } = render(<FileUploadQueue />);
 
-    act(() => huePubSub.publish(FILE_UPLOAD_START_EVENT, { files: mockFilesQueue }));
+    act(() => {
+      huePubSub.publish(FILE_UPLOAD_START_EVENT, { files: mockFilesQueue });
+    });
 
-    const header = getByTestId('hue-upload-queue-container__expand-button');
-    expect(getByText('file1.txt')).toBeVisible();
-    expect(getByText('file2.txt')).toBeVisible();
+    // Wait for items to appear
+    await waitFor(() => expect(getByText('file1.txt')).toBeVisible());
+    await waitFor(() => expect(getByText('file2.txt')).toBeVisible());
+
+    const header = getByRole('button', { name: /toggle upload queue/i });
 
     fireEvent.click(header);
 
@@ -73,7 +85,7 @@ describe('FileUploadQueue', () => {
 
     fireEvent.click(header);
 
-    expect(getByText('file1.txt')).toBeVisible();
-    expect(getByText('file2.txt')).toBeVisible();
+    await waitFor(() => expect(getByText('file1.txt')).toBeVisible());
+    await waitFor(() => expect(getByText('file2.txt')).toBeVisible());
   });
 });
