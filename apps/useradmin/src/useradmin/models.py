@@ -53,7 +53,7 @@ from desktop.lib.connectors.models import _get_installed_connectors, Connector
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
-from useradmin.conf import AUTO_ASSIGN_FILEBROWSER_PERMISSIONS_TO_DEFAULT_GROUP, DEFAULT_USER_GROUP
+from useradmin.conf import DEFAULT_USER_GROUP
 from useradmin.permissions import GroupPermission, HuePermission, LdapGroup  # noqa: F401
 
 if ENABLE_ORGANIZATIONS.get():
@@ -290,19 +290,6 @@ def update_app_permissions(**kwargs):
           (new_dp.app == "security" and new_dp.action == "impersonate"),
           (new_dp.app == "oozie" and new_dp.action == "disable_editor_access"),
         ]
-
-        # Conditionally add the cloud storage permissions to the blacklist
-        # ONLY if the feature flag is disabled.
-        if not AUTO_ASSIGN_FILEBROWSER_PERMISSIONS_TO_DEFAULT_GROUP.get():
-          blacklist_conditions.extend(
-            [
-              (new_dp.app == "filebrowser" and new_dp.action == "s3_access" and not is_idbroker_enabled("s3a")),
-              (new_dp.app == "filebrowser" and new_dp.action == "gs_access" and not is_idbroker_enabled("gs")),
-              (new_dp.app == "filebrowser" and new_dp.action == "adls_access"),
-              (new_dp.app == "filebrowser" and new_dp.action == "abfs_access"),
-              (new_dp.app == "filebrowser" and new_dp.action == "ofs_access"),
-            ]
-          )
 
         # If the current permission does not match ANY of the blacklist conditions, grant it.
         if not any(blacklist_conditions):
