@@ -99,7 +99,9 @@ describe('useRegularUpload', () => {
     );
 
     result.current.addFiles([mockFile]);
-    if (mockProcessCallback) await mockProcessCallback(mockFile);
+    if (mockProcessCallback) {
+      await mockProcessCallback(mockFile);
+    }
 
     expect(mockSave).toHaveBeenCalledTimes(1);
     const [formDataArg, optionsArg] = mockSave.mock.calls[0];
@@ -138,7 +140,9 @@ describe('useRegularUpload', () => {
 
     const fileWithOverwrite: RegularFile = { ...mockFile, overwrite: true };
     result.current.addFiles([fileWithOverwrite]);
-    if (mockProcessCallback) await mockProcessCallback(fileWithOverwrite);
+    if (mockProcessCallback) {
+      await mockProcessCallback(fileWithOverwrite);
+    }
 
     const [formDataArg, optionsArg] = mockSave.mock.calls.at(-1)!;
 
