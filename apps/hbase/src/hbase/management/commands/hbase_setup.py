@@ -83,5 +83,5 @@ class Command(BaseCommand):
     root = os.path.join(get_apps_root(), 'hbase', 'example', 'documents')
 
     api.putRow(cluster_name, 'document_demo', today, {'doc:img': open(root + '/hue-logo.png', "rb").read()})
-    api.putRow(cluster_name, 'document_demo', today, {'doc:html': open(root + '/gethue.com.html', "rb").read()})
+    api.putRow(cluster_name, 'document_demo', today, {'doc:html': open(root + '/example-page.html', "rb").read()})
     api.putRow(cluster_name, 'document_demo', today, {'doc:pdf': open(root + '/gethue.pdf', "rb").read()})
