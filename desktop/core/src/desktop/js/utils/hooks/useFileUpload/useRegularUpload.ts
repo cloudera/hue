@@ -55,7 +55,8 @@ const useRegularUpload = ({
       },
       postOptions: {
         params: {
-          destination_path: item.filePath
+          destination_path: item.filePath,
+          overwrite: item.overwrite ? 'true' : 'false'
         },
         onUploadProgress: progress => {
           const itemProgress = getItemProgress(progress);
