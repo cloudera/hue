@@ -45,7 +45,6 @@ const useRegularUpload = ({
 
     const payload = new FormData();
     payload.append('file', item.file);
-    payload.append('destination_path', item.filePath);
     if (item.overwrite) {
       payload.append('overwrite', item.overwrite ? 'true' : 'false');
     }
@@ -74,7 +73,7 @@ const useRegularUpload = ({
     enqueue: addFiles,
     dequeue,
     isLoading
-  } = useQueueProcessor<RegularFile>(async (file: RegularFile) => processRegularFile(file), {
+  } = useQueueProcessor<RegularFile>(processRegularFile, {
     concurrentProcess,
     onSuccess: onComplete
   });

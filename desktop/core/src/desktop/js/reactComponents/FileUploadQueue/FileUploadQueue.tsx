@@ -93,6 +93,7 @@ const FileUploadQueue = (): JSX.Element => {
     callback: async (data?: FileUploadEvent) => {
       const newFiles = data?.files ?? [];
       if (newFiles.length === 0) {
+        huePubSub.publish('hue.global.error', { message: 'Something went wrong!' });
         return;
       }
       if (newFiles.length > 0) {

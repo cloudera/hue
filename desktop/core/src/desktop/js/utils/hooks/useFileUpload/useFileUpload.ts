@@ -24,7 +24,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 
 interface UseUploadQueueResponse {
   uploadQueue: RegularFile[];
-  addFiles: (newFiles: RegularFile[], overwrite?: boolean) => void;
+  addFiles: (newFiles: RegularFile[]) => void;
   cancelFile: (item: RegularFile) => void;
   isLoading: boolean;
 }
