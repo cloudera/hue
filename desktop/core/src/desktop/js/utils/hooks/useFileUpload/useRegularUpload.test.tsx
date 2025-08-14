@@ -97,13 +97,13 @@ describe('useRegularUpload', () => {
         onComplete: mockOnComplete
       })
     );
-  
+
     result.current.addFiles([mockFile]);
     if (mockProcessCallback) await mockProcessCallback(mockFile);
-  
+
     expect(mockSave).toHaveBeenCalledTimes(1);
     const [formDataArg, optionsArg] = mockSave.mock.calls[0];
-  
+
     // FormData: only the file is sent
     expect(formDataArg).toBeInstanceOf(FormData);
     const fdFile = formDataArg.get('file') as File;
@@ -111,7 +111,7 @@ describe('useRegularUpload', () => {
     expect(fdFile.name).toBe('file.txt');
     expect(formDataArg.has('destination_path')).toBe(false);
     expect(formDataArg.has('overwrite')).toBe(false);
-  
+
     // Params: destination_path and overwrite=false
     expect(optionsArg).toBeDefined();
     expect(optionsArg.postOptions).toBeDefined();
@@ -122,7 +122,7 @@ describe('useRegularUpload', () => {
     expect(typeof optionsArg.onSuccess).toBe('function');
     expect(typeof optionsArg.onError).toBe('function');
     expect(typeof optionsArg.postOptions.onUploadProgress).toBe('function');
-  
+
     expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
       status: FileStatus.Uploading
     });
@@ -135,19 +135,19 @@ describe('useRegularUpload', () => {
         onComplete: mockOnComplete
       })
     );
-  
+
     const fileWithOverwrite: RegularFile = { ...mockFile, overwrite: true };
     result.current.addFiles([fileWithOverwrite]);
     if (mockProcessCallback) await mockProcessCallback(fileWithOverwrite);
-  
+
     const [formDataArg, optionsArg] = mockSave.mock.calls.at(-1)!;
-  
+
     // FormData still only has the file
     expect(formDataArg).toBeInstanceOf(FormData);
     expect((formDataArg.get('file') as File).name).toBe('file.txt');
     expect(formDataArg.has('destination_path')).toBe(false);
     expect(formDataArg.has('overwrite')).toBe(false);
-  
+
     // Params: destination_path and overwrite=true
     expect(optionsArg.postOptions.params).toEqual({
       destination_path: '/uploads/',
