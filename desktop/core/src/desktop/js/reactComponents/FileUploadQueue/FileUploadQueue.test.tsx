@@ -66,7 +66,7 @@ describe('FileUploadQueue', () => {
   });
 
   it('should toggle the visibility of the queue when the header is clicked', async () => {
-    const { getByText, queryByText, getByTestId } = render(<FileUploadQueue />);
+    const { getByText, queryByText, getByRole } = render(<FileUploadQueue />);
 
     act(() => {
       huePubSub.publish(FILE_UPLOAD_START_EVENT, { files: mockFilesQueue });
@@ -76,7 +76,7 @@ describe('FileUploadQueue', () => {
     await waitFor(() => expect(getByText('file1.txt')).toBeVisible());
     await waitFor(() => expect(getByText('file2.txt')).toBeVisible());
 
-    const header = getByTestId('hue-upload-queue-container__expand-button');
+    const header = getByRole('button', { name: /toggle upload queue/i });
 
     fireEvent.click(header);
 

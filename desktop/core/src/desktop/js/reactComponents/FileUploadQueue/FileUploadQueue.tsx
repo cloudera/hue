@@ -227,6 +227,7 @@ const FileUploadQueue = (): JSX.Element => {
             <BorderlessButton
               onClick={() => setExpandQueue(!expandQueue)}
               icon={expandQueue ? <CaratDownIcon /> : <CaratUpIcon />}
+              aria-label={t('Toggle upload queue')}
               data-testid="hue-upload-queue-container__expand-button"
             />
             <BorderlessButton onClick={onClose} icon={<CloseIcon />} />
