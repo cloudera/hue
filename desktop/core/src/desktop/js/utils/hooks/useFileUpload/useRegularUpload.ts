@@ -45,9 +45,6 @@ const useRegularUpload = ({
 
     const payload = new FormData();
     payload.append('file', item.file);
-    if (item.overwrite) {
-      payload.append('overwrite', item.overwrite ? 'true' : 'false');
-    }
 
     return save(payload, {
       onSuccess: () => {
