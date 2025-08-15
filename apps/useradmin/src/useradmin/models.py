@@ -37,15 +37,11 @@ Note that Django itself has a notion of users, groups, and permissions. We re-us
 notion of permissions. The permissions notion in Django is strongly tied to what models you may or may not edit, and there are
 elaborations to manipulate this row by row. This does not map nicely onto actions which may not relate to database models.
 """
-import sys
+import collections
 import json
 import logging
-import collections
-from datetime import datetime
 from enum import Enum
 
-from django.contrib.auth import models as auth_models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.cache import cache
 from django.db import connection, models, transaction
 from django.utils import timezone as dtz
@@ -53,15 +49,14 @@ from django.utils.translation import gettext_lazy as _t
 
 from desktop import appmanager
 from desktop.conf import ENABLE_CONNECTORS, ENABLE_ORGANIZATIONS
-from desktop.lib.connectors.models import Connector, _get_installed_connectors
+from desktop.lib.connectors.models import _get_installed_connectors, Connector
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.idbroker.conf import is_idbroker_enabled
 from desktop.monkey_patches import monkey_patch_username_validator
 from useradmin.conf import DEFAULT_USER_GROUP
-from useradmin.permissions import GroupPermission, HuePermission, LdapGroup
+from useradmin.permissions import GroupPermission, HuePermission, LdapGroup  # noqa: F401
 
 if ENABLE_ORGANIZATIONS.get():
-  from useradmin.organization import Organization, OrganizationGroup as Group, OrganizationUser as User, get_organization
+  from useradmin.organization import get_organization, Organization, OrganizationGroup as Group, OrganizationUser as User
 else:
   from django.contrib.auth.models import Group, User
   def get_organization(): pass
@@ -157,7 +152,7 @@ def get_profile(user):
     # Lazily create profile.
     try:
       profile = UserProfile.objects.get(user=user)
-    except UserProfile.DoesNotExist as e:
+    except UserProfile.DoesNotExist:
       profile = create_profile_for_user(user)
     user._cached_userman_profile = profile
     return profile
@@ -285,17 +280,18 @@ def update_app_permissions(**kwargs):
     default_group = get_default_user_group()
     if default_group:
       for new_dp in added:
-        if not (new_dp.app == 'useradmin' and new_dp.action == 'access') and \
-            not (new_dp.app == 'useradmin' and new_dp.action == 'superuser') and \
-            not (new_dp.app == 'metastore' and new_dp.action == 'write') and \
-            not (new_dp.app == 'hbase' and new_dp.action == 'write') and \
-            not (new_dp.app == 'security' and new_dp.action == 'impersonate') and \
-            not (new_dp.app == 'filebrowser' and new_dp.action == 's3_access' and not is_idbroker_enabled('s3a')) and \
-            not (new_dp.app == 'filebrowser' and new_dp.action == 'gs_access' and not is_idbroker_enabled('gs')) and \
-            not (new_dp.app == 'filebrowser' and new_dp.action == 'adls_access') and \
-            not (new_dp.app == 'filebrowser' and new_dp.action == 'abfs_access') and \
-            not (new_dp.app == 'filebrowser' and new_dp.action == 'ofs_access') and \
-            not (new_dp.app == 'oozie' and new_dp.action == 'disable_editor_access'):
+        # Start with the list of permissions that should ALWAYS be blacklisted.
+        blacklist_conditions = [
+          (new_dp.app == "useradmin" and new_dp.action == "access"),
+          (new_dp.app == "useradmin" and new_dp.action == "superuser"),
+          (new_dp.app == "metastore" and new_dp.action == "write"),
+          (new_dp.app == "hbase" and new_dp.action == "write"),
+          (new_dp.app == "security" and new_dp.action == "impersonate"),
+          (new_dp.app == "oozie" and new_dp.action == "disable_editor_access"),
+        ]
+
+        # If the current permission does not match ANY of the blacklist conditions, grant it.
+        if not any(blacklist_conditions):
           GroupPermission.objects.create(group=default_group, hue_permission=new_dp)
 
     available = HuePermission.objects.count()
@@ -317,7 +313,7 @@ def install_sample_user(django_user=None):
   """
   Setup the de-activated sample user with a certain id. Do not create a user profile.
   """
-  from desktop.models import SAMPLE_USER_ID, get_sample_user_install
+  from desktop.models import get_sample_user_install, SAMPLE_USER_ID
   from hadoop import cluster
 
   user = None
