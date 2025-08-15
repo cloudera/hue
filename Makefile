@@ -77,7 +77,6 @@
 # Global variables
 ###################################
 ROOT := $(realpath .)
-PPC64LE := $(shell uname -m)
 
 include $(ROOT)/Makefile.vars.priv
 
@@ -146,7 +145,6 @@ $(info "BLD_DIR_ENV is $(BLD_DIR_ENV)")
 $(info "REQUIREMENT_FILE is $(REQUIREMENT_FILE)")
 $(info "INSTALL_DIR is $(INSTALL_DIR)")
 $(info "INST_DIR_ENV is $(INST_DIR_ENV)")
-$(info "PPC64LE is $(PPC64LE)")
 ###################################
 # virtual-env
 # Enhanced to support building and packaging Hue for multiple Python versions.
