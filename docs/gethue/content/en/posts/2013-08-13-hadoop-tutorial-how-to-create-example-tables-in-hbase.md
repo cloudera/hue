@@ -127,7 +127,7 @@ Then insert a picture, and HTML page and a PDF:
 <pre class="code">root='/tmp/hadoop-tutorials-examples'
 
 HbaseApi().putRow('Cluster', 'events', 'hue-20130801', {'doc:img': open(root + '/hbase-tables/data/hue-logo.png', "rb").read()})
-HbaseApi().putRow('Cluster', 'events', 'hue-20130801', {'doc:html': open(root + '/hbase-tables/data/gethue.com.html', "rb").read()})
+HbaseApi().putRow('Cluster', 'events', 'hue-20130801', {'doc:html': open(root + '/hbase-tables/data/example-page.html', "rb").read()})
 HbaseApi().putRow('Cluster', 'events', 'hue-20130801', {'doc:pdf': open(root + '/hbase-tables/data/gethue.pdf', "rb").read()})</pre>
 
 Notice that the column names do not matter for the type detection. The go look at the [events][15] table and play around!
