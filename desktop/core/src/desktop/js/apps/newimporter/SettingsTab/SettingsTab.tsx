@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { Form } from 'antd';
+
 import {
   FileMetaData,
   ImporterFileSource,
@@ -24,11 +25,11 @@ import {
   StoreLocation,
   TableFormat
 } from '../types';
-import { ADVANCED_SETTINGS_CONFIG } from './SeetingsTabConfig';
+import { ADVANCED_SETTINGS_CONFIG, SettingsFieldConfig } from './SeetingsTabConfig';
+import FormInput from '../../../reactComponents/FormInput/FormInput';
+import { i18nReact } from '../../../utils/i18nReact';
 
 import './SettingsTab.scss';
-import FormInput, { FieldConfig } from '../../../reactComponents/FormInput/FormInput';
-import { i18nReact } from '../../../utils/i18nReact';
 
 interface SettingsTabProps {
   fileMetaData: FileMetaData;
@@ -53,37 +54,28 @@ const SettingsTab = ({
   // Create visibility context
   const tableFormat = settings.tableFormat || TableFormat.TEXT;
   const context: SettingsContext = {
+    ...settings,
     isManagedTable: settings.storeLocation === StoreLocation.MANAGED,
     isRemoteTable: fileMetaData.source === ImporterFileSource.REMOTE,
     isKuduTable: tableFormat === TableFormat.KUDU,
     isIcebergEnabled: true, // TODO: Get from config
-    isCopyFile: settings.isCopyFile,
-    isIcebergTable: settings.isIcebergTable,
     fileMetaData,
-    settings: settings,
     isTransactionalVisible:
       tableFormat !== TableFormat.KUDU && fileMetaData.source !== ImporterFileSource.LOCAL,
     isTransactionalUpdateEnabled: settings.isTransactional && !settings.isInsertOnly
   };
 
-  const renderSection = (
-    fields: FieldConfig<SettingsContext>[],
-    title?: string,
-    isSingleRow?: boolean
-  ) => (
+  const renderSection = (fields: SettingsFieldConfig[], title?: string, isSingleRow?: boolean) => (
     <div className="hue-importer-settings-tab__section">
       {title && <div className="hue-importer-settings-tab__section__title">{title}</div>}
       <div
         className={`${isSingleRow ? 'hue-importer-settings-tab__section__single-row' : 'hue-importer-settings-tab__section__fields'}`}
       >
-        {fields.map(field => (
-          <FormInput<string, SettingsContext>
-            key={field.name}
-            field={field}
-            context={context}
-            onChange={handleChange}
-          />
-        ))}
+        {fields
+          .filter(field => !field.isHidden?.(context))
+          .map(field => (
+            <FormInput<string> key={field.name} field={field} onChange={handleChange} />
+          ))}
       </div>
     </div>
   );

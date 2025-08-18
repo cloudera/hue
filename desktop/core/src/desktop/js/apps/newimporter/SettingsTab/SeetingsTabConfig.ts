@@ -43,7 +43,11 @@ export const EXTERNAL_LOCATION_OPTIONS: FieldOption[] = [
   { value: 'custom', label: 'Custom' }
 ];
 
-export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContext>[]> = {
+export interface SettingsFieldConfig extends FieldConfig {
+  isHidden?: (context?: SettingsContext) => boolean;
+}
+
+export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
   description: [
     {
       name: 'description',
@@ -86,7 +90,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       label: 'Insert only',
       tooltip:
         'Table will be created with insert only mode, when disabled, the table will be created with insert, delete and update mode',
-      isHidden: (context?: SettingsContext) => !context?.settings.isTransactional
+      isHidden: (context?: SettingsContext) => !context?.isTransactional
     },
     {
       name: 'isIcebergTable',
@@ -102,9 +106,9 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
         'Choosing this option will copy the file instead of moving it to the new location, and ensuring the original file remains unchanged.',
       isHidden: (context?: SettingsContext) =>
         context?.isManagedTable ||
-        context?.settings.isTransactional ||
+        context?.isTransactional ||
         !context?.isRemoteTable ||
-        context?.settings.importData === false
+        context?.importData === false
     },
     {
       name: 'useExternalLocation',
@@ -116,7 +120,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       name: 'externalLocation',
       type: FieldType.INPUT,
       placeholder: 'External location',
-      isHidden: (context?: SettingsContext) => !context?.settings.useExternalLocation
+      isHidden: (context?: SettingsContext) => !context?.useExternalLocation
     }
   ],
 
@@ -136,7 +140,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Field delimiter',
-      isHidden: (context?: SettingsContext) => !context?.settings.customCharDelimiters
+      isHidden: (context?: SettingsContext) => !context?.customCharDelimiters
     },
     {
       name: 'arrayMapDelimiter',
@@ -145,7 +149,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Array map delimiter',
-      isHidden: (context?: SettingsContext) => !context?.settings.customCharDelimiters
+      isHidden: (context?: SettingsContext) => !context?.customCharDelimiters
     },
     {
       name: 'structDelimiter',
@@ -154,7 +158,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Struct delimiter',
-      isHidden: (context?: SettingsContext) => !context?.settings.customCharDelimiters
+      isHidden: (context?: SettingsContext) => !context?.customCharDelimiters
     }
   ]
 };

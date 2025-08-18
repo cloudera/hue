@@ -159,7 +159,7 @@ describe('SettingsTab', () => {
 
     render(<SettingsTab {...defaultProps} fileMetaData={localFileMetaData} />);
 
-    expect(screen.getByText('Transactional table')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /transactional table/i })).toBeInTheDocument();
   });
 
   it('should show insert only checkbox when transactional is enabled', () => {
@@ -170,7 +170,7 @@ describe('SettingsTab', () => {
 
     render(<SettingsTab {...defaultProps} settings={transactionalSettings} />);
 
-    expect(screen.getByText('Insert only')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /insert only/i })).toBeInTheDocument();
   });
 
   it('should hide insert only checkbox when transactional is disabled', () => {
@@ -182,7 +182,7 @@ describe('SettingsTab', () => {
   it('should show iceberg table checkbox for remote tables when iceberg is enabled', () => {
     render(<SettingsTab {...defaultProps} />);
 
-    expect(screen.getByText('Iceberg table')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /iceberg table/i })).toBeInTheDocument();
   });
 
   it('should hide iceberg table checkbox for local files', () => {
@@ -204,7 +204,7 @@ describe('SettingsTab', () => {
 
     render(<SettingsTab {...defaultProps} settings={externalSettings} />);
 
-    expect(screen.getByText('Copy file')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /copy file/i })).toBeInTheDocument();
   });
 
   it('should hide copy file checkbox for managed tables', () => {
@@ -261,16 +261,16 @@ describe('SettingsTab', () => {
 
     render(<SettingsTab {...defaultProps} settings={customDelimiterSettings} />);
 
-    expect(screen.getByText('Field')).toBeInTheDocument();
-    expect(screen.getByText('Array Map')).toBeInTheDocument();
-    expect(screen.getByText('Struct')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /field/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /array map/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /struct/i })).toBeInTheDocument();
   });
 
   it('should hide delimiter fields when customCharDelimiters is disabled', () => {
     render(<SettingsTab {...defaultProps} />);
 
-    expect(screen.queryByText('Field')).not.toBeInTheDocument();
-    expect(screen.queryByText('Array Map')).not.toBeInTheDocument();
-    expect(screen.queryByText('Struct')).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /field/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /array map/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: /struct/i })).not.toBeInTheDocument();
   });
 });
