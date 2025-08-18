@@ -70,6 +70,11 @@ interface StorageBrowserConfig {
   max_file_editor_size: number;
 }
 
+interface ImporterConfig {
+  is_enabled: boolean;
+  restrict_local_file_extensions: [];
+  max_local_file_size_upload_limit: number;
+}
 export interface HueConfig extends GenericApiResponse {
   app_config: {
     [AppType.browser]?: AppConfig<BrowserInterpreter>;
@@ -99,6 +104,7 @@ export interface HueConfig extends GenericApiResponse {
     allow_sample_data_from_views: boolean;
   };
   storage_browser: StorageBrowserConfig;
+  importer: ImporterConfig;
   hue_version?: string;
   img_version?: string;
   vw_name?: string;

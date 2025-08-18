@@ -253,7 +253,11 @@ describe('useSaveData', () => {
         HttpMethod.POST,
         mockUrl,
         'hue data',
-        expect.objectContaining({ qsEncodeData: true })
+        expect.objectContaining({
+          qsEncodeData: true,
+          silenceErrors: true,
+          ignoreSuccessErrors: true
+        })
       );
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
@@ -271,12 +275,10 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockSendApiRequest).toHaveBeenCalledWith(
-        HttpMethod.POST,
-        mockUrl,
-        payload,
-        expect.objectContaining({ qsEncodeData: false })
-      );
+      expect(mockSendApiRequest).toHaveBeenCalledWith(HttpMethod.POST, mockUrl, payload, {
+        ...mockRequestOptions,
+        qsEncodeData: false
+      });
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
@@ -293,12 +295,10 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockSendApiRequest).toHaveBeenCalledWith(
-        HttpMethod.POST,
-        mockUrl,
-        payload,
-        expect.objectContaining({ qsEncodeData: false })
-      );
+      expect(mockSendApiRequest).toHaveBeenCalledWith(HttpMethod.POST, mockUrl, payload, {
+        ...mockRequestOptions,
+        qsEncodeData: false
+      });
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);
@@ -319,12 +319,10 @@ describe('useSaveData', () => {
     });
 
     await waitFor(() => {
-      expect(mockSendApiRequest).toHaveBeenCalledWith(
-        HttpMethod.POST,
-        mockUrl,
-        payload,
-        expect.objectContaining({ qsEncodeData: true })
-      );
+      expect(mockSendApiRequest).toHaveBeenCalledWith(HttpMethod.POST, mockUrl, payload, {
+        ...mockRequestOptions,
+        qsEncodeData: true
+      });
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
       expect(result.current.loading).toBe(false);

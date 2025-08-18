@@ -80,3 +80,6 @@ export const sourceConfigs: {
     options: []
   }
 ];
+
+export const SUPPORTED_UPLOAD_TYPES = '.csv, .xlsx, .xls';
+export const DEFAULT_UPLOAD_LIMIT = 150 * 1000 * 1000;
