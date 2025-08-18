@@ -121,26 +121,6 @@ class RequirementsGenerator:
       "git+https://github.com/gethue/thrift.git",
     ]
 
-    self.ppc64le_requirements = {
-      "default": [],
-      "3.8": [
-        "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/cryptography-41.0.1-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-        "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/lxml-4.6.4-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-        "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/numpy-1.23.1-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-        "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/pandas-1.4.3-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-        "Markdown==3.1",
-        "PyYAML==5.4.1",
-      ],
-      "3.9": [
-        "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/cryptography-41.0.1-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-        "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/lxml-4.6.4-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-        "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/numpy-1.23.1-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-        "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/pandas-1.4.3-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-        "Markdown==3.8",
-        "PyYAML==6.0.1",
-      ],
-    }
-
     self.x86_64_requirements = {
       "default": [
         "cryptography==42.0.8",
@@ -198,7 +178,6 @@ class RequirementsGenerator:
       ],
     }
     self.arch_requirements_map = {
-      "ppc64le": self.ppc64le_requirements,
       "x86_64": self.x86_64_requirements,
       "aarch64": self.aarch64_requirements,
       "arm64": self.aarch64_requirements,  # arm64 is treated as aarch64
