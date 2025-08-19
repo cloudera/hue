@@ -124,7 +124,6 @@ export interface PartitionConfig {
   partitions: Partition[];
 }
 
-// TODO: verify if ImporterSettings can be used as context
 export interface SettingsContext extends ImporterSettings {
   isRemoteTable: boolean;
   isIcebergEnabled: boolean;
