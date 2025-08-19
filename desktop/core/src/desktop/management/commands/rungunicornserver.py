@@ -109,6 +109,135 @@ def enable_logging(args, options):
   logging.info("Welcome to Hue from Gunicorn server " + HUE_DESKTOP_VERSION)
 
 
+def get_optimal_ssl_protocol():
+  """
+  Get the optimal SSL protocol version using centralized utilities.
+  Returns:
+    ssl.PROTOCOL constant for the best available TLS version
+  """
+  try:
+    from desktop.lib.tls_utils import get_optimal_ssl_protocol
+    # Use the centralized, optimized protocol selection
+    protocol = get_optimal_ssl_protocol()
+    logging.debug(f"Gunicorn using optimized SSL protocol: {protocol}")
+    return protocol
+  except ImportError:
+    logging.warning("TLS utilities not available, falling back to basic protocol selection")
+    # Fallback implementation
+    try:
+      import ssl
+      if conf.SSL_TLS13_ENABLED.get() and hasattr(ssl, 'PROTOCOL_TLS'):
+        logging.info("Using ssl.PROTOCOL_TLS with TLS 1.3 support")
+        return ssl.PROTOCOL_TLS
+      elif hasattr(ssl, 'PROTOCOL_TLSv1_2'):
+        logging.info("Using TLS 1.2")
+        return ssl.PROTOCOL_TLSv1_2
+      else:
+        return getattr(ssl, 'PROTOCOL_SSLv23', 2)
+    except (ImportError, AttributeError):
+      logging.error("SSL module not available")
+      return ssl.PROTOCOL_TLSv1_2
+
+
+def configure_tls_options():
+  """
+  Configure TLS protocol version limits and other SSL context options.
+
+  Returns:
+    dict: SSL context configuration options for Gunicorn
+  """
+  ssl_options = {}
+
+  try:
+    import ssl
+
+    # Configure protocol version limits if TLSVersion is available (Python 3.7+)
+    if hasattr(ssl, 'TLSVersion'):
+      try:
+        # Set minimum to TLS 1.2 for security and compatibility
+        ssl_options['ssl_minimum_version'] = ssl.TLSVersion.TLSv1_2
+
+        # Set maximum to TLS 1.3 if available, otherwise TLS 1.2
+        if conf.SSL_TLS13_ENABLED.get() and hasattr(ssl.TLSVersion, 'TLSv1_3'):
+          ssl_options['ssl_maximum_version'] = ssl.TLSVersion.TLSv1_3
+        else:
+          ssl_options['ssl_maximum_version'] = ssl.TLSVersion.TLSv1_2
+
+        logging.info(f"Configured TLS version range: TLSv1.2 to {'TLSv1.3' if conf.SSL_TLS13_ENABLED.get() else 'TLSv1.2'}")
+      except AttributeError:
+        logging.debug("TLS version limits not available in this SSL context")
+
+  except Exception as e:
+    logging.debug(f"Could not configure TLS version limits: {e}")
+
+  return ssl_options
+
+
+def get_cipher_configuration():
+  """
+  Get cipher configuration for both TLS 1.2 and TLS 1.3.
+
+  Returns:
+    tuple: (cipher_list_for_tls12, ciphersuites_for_tls13)
+  """
+  # TLS 1.2 and earlier cipher list
+  cipher_list = conf.SSL_CIPHER_LIST.get()
+
+  # Use configured TLS 1.3 ciphersuites if TLS 1.3 is enabled
+  ciphersuites = None
+  if conf.SSL_TLS13_ENABLED.get():
+    # Get configured TLS 1.3 ciphersuites
+    ciphersuites = conf.SSL_TLS13_CIPHER_SUITES.get()
+    logging.info(f"TLS 1.3 enabled with configured ciphersuites: {ciphersuites}")
+
+  logging.info(f"TLS 1.2 cipher list: {cipher_list[:100]}...")
+
+  return cipher_list, ciphersuites
+
+
+def log_tls_configuration():
+  """Log comprehensive TLS configuration using centralized utilities."""
+  try:
+    from desktop.lib.tls_utils import get_tls_configuration_summary
+    if conf.SSL_CERTIFICATE.get() and conf.SSL_PRIVATE_KEY.get():
+      logging.info("="*50)
+      logging.info("TLS Configuration Summary")
+      logging.info("="*50)
+      # Get comprehensive configuration summary
+      summary = get_tls_configuration_summary()
+      # System capabilities
+      system = summary['system']
+      logging.info(f"System TLS 1.3 support: {system.get('has_tls13', False)}")
+      logging.info(f"PROTOCOL_TLS available: {system.get('has_protocol_tls', False)}")
+      logging.info(f"TLSVersion enum available: {system.get('has_tlsversion_enum', False)}")
+      logging.info(f"OpenSSL version: {system.get('openssl_version', 'Unknown')}")
+      # Configuration
+      config = summary['configuration']
+      logging.info(f"TLS 1.3 enabled in config: {config['tls13_enabled']}")
+      # Cipher configuration
+      logging.info(f"TLS 1.2 cipher list: {config['tls12_cipher_list'][:100]}...")
+      if config['tls13_cipher_suites']:
+        logging.info(f"TLS 1.3 ciphersuites: {config['tls13_cipher_suites']}")
+      # Compatibility and effective settings
+      compatibility = summary['compatibility']
+      logging.info(f"Can use TLS 1.3: {compatibility['can_use_tls13']}")
+      logging.info(f"Optimal protocol: {compatibility['optimal_protocol']}")
+      logging.info("="*50)
+  except ImportError:
+    logging.warning("TLS utilities not available, using basic TLS configuration logging")
+    # Fallback to basic logging
+    try:
+      import ssl
+      if conf.SSL_CERTIFICATE.get() and conf.SSL_PRIVATE_KEY.get():
+        has_tls13 = conf.has_tls13_support()
+        logging.info(f"Basic TLS info - TLS 1.3 support: {has_tls13}, enabled: {conf.SSL_TLS13_ENABLED.get()}")
+        logging.info(f"OpenSSL version: {getattr(ssl, 'OPENSSL_VERSION', 'Unknown')}")
+    except Exception as e:
+      logging.debug(f"Basic TLS logging failed: {e}")
+  except Exception as e:
+    logging.debug(f"Could not log TLS configuration: {e}")
+
+
 def initialize_free_disk_space_in_redis():
   conn_success = False
   for retries in range(5):
@@ -215,6 +344,11 @@ def argprocessing(args=[], options={}):
 
 
 def rungunicornserver(args=[], options={}):
+  # Get TLS configuration
+  ssl_protocol = get_optimal_ssl_protocol()
+  tls_options = configure_tls_options()
+  cipher_list, ciphersuites = get_cipher_configuration()
+
   gunicorn_options = {
       'accesslog': "-",
       'access_log_format': "%({x-forwarded-for}i)s %(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s %(b)s '%(f)s' '%(a)s'",
@@ -226,7 +360,7 @@ def rungunicornserver(args=[], options={}):
       'certfile': conf.SSL_CERTIFICATE.get(),  # SSL certificate file
       'chdir': None,
       'check_config': None,
-      'ciphers': conf.SSL_CIPHER_LIST.get(),  # Ciphers to use (see stdlib ssl module)
+      'ciphers': cipher_list,                 # TLS 1.2 and earlier ciphers
       'config': None,
       'daemon': None,
       'do_handshake_on_connect': False,       # Whether to perform SSL handshake on socket connect.
@@ -257,7 +391,7 @@ def rungunicornserver(args=[], options={}):
       'reload_engine': None,
       'sendfile': True,
       'spew': None,
-      'ssl_version': ssl.PROTOCOL_TLSv1_2,    # SSL version to use
+      'ssl_version': ssl_protocol,            # Optimal SSL/TLS protocol version
       'statsd_host': None,
       'statsd_prefix': None,
       'suppress_ragged_eofs': None,           # Suppress ragged EOFs (see stdlib ssl module)
@@ -277,6 +411,22 @@ def rungunicornserver(args=[], options={}):
       'post_worker_init': post_worker_init,
       'worker_int': worker_int
   }
+
+  # Add TLS 1.3 ciphersuites if available and supported
+  if ciphersuites and conf.has_tls13_support():
+    try:
+      # Some versions of Gunicorn support the ciphersuites parameter
+      gunicorn_options['ciphersuites'] = ciphersuites
+      logging.info(f"Added TLS 1.3 ciphersuites to Gunicorn config: {ciphersuites}")
+    except Exception as e:
+      logging.debug(f"Could not set TLS 1.3 ciphersuites in Gunicorn: {e}")
+
+  # Add TLS version limits if supported
+  gunicorn_options.update(tls_options)
+
+  # Log comprehensive TLS configuration
+  log_tls_configuration()
+
   StandaloneApplication(handler_app, gunicorn_options).run()
 
 

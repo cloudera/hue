@@ -298,6 +298,125 @@ def construct_superclient(conf):
   return SuperClient(service, transport, timeout_seconds=conf.timeout_seconds)
 
 
+def get_thrift_ssl_protocol():
+  """
+  Get the optimal SSL protocol for Thrift connections using centralized utilities.
+  Returns:
+    ssl.PROTOCOL constant for the best available TLS version
+  """
+  try:
+    from desktop.lib.tls_utils import get_optimal_ssl_protocol
+    # Use the centralized, optimized protocol selection
+    protocol = get_optimal_ssl_protocol()
+    LOG.debug(f"Thrift client using optimized SSL protocol: {protocol}")
+    return protocol
+  except ImportError:
+    LOG.warning("TLS utilities not available, falling back to basic protocol selection")
+    # Fallback implementation
+    from desktop import conf
+    try:
+      import ssl
+      if conf.SSL_TLS13_ENABLED.get() and hasattr(ssl, 'PROTOCOL_TLS'):
+        return ssl.PROTOCOL_TLS
+      elif hasattr(ssl, 'PROTOCOL_TLSv1_2'):
+        return ssl.PROTOCOL_TLSv1_2
+      else:
+        return getattr(ssl, 'PROTOCOL_SSLv23', 2)
+    except (ImportError, AttributeError):
+      LOG.error("SSL module not available for Thrift client")
+      return 2
+
+
+def create_thrift_ssl_context(validate=True, ca_certs=None, keyfile=None, certfile=None):
+  """
+  Create an SSL context for Thrift connections with TLS 1.3 support.
+
+  Args:
+    validate: Whether to validate server certificates
+    ca_certs: Path to CA certificates
+    keyfile: Path to client private key
+    certfile: Path to client certificate
+
+  Returns:
+    ssl.SSLContext configured for TLS 1.3 if available
+  """
+  from desktop import conf
+
+  try:
+    import ssl
+
+    # Create SSL context with the best available protocol
+    if hasattr(ssl, 'create_default_context'):
+      context = ssl.create_default_context()
+    elif hasattr(ssl, 'SSLContext'):
+      if conf.SSL_TLS13_ENABLED.get() and hasattr(ssl, 'PROTOCOL_TLS'):
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+      else:
+        context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+    else:
+      LOG.warning("SSLContext not available, falling back to basic SSL")
+      return None
+
+    # Configure TLS 1.2 ciphers
+    cipher_list = conf.SSL_CIPHER_LIST.get()
+    context.set_ciphers(cipher_list)
+
+    # Configure TLS 1.3 ciphersuites if supported and enabled
+    if (conf.SSL_TLS13_ENABLED.get() and
+        hasattr(context, 'set_ciphersuites') and
+        hasattr(ssl, 'HAS_TLSv1_3') and
+        ssl.HAS_TLSv1_3):
+      try:
+        # Use configured TLS 1.3 ciphersuites
+        ciphersuites = conf.SSL_TLS13_CIPHER_SUITES.get()
+        context.set_ciphersuites(ciphersuites)
+        LOG.info(f"Thrift SSL context configured with TLS 1.3 ciphersuites: {ciphersuites}")
+      except Exception as e:
+        LOG.debug(f"Could not set TLS 1.3 ciphersuites for Thrift: {e}")
+
+    # Configure protocol version limits if available
+    if hasattr(ssl, 'TLSVersion') and hasattr(context, 'minimum_version'):
+      try:
+        # Set minimum to TLS 1.2 for security and compatibility
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+
+        # Set maximum to TLS 1.3 if available and enabled, otherwise TLS 1.2
+        if conf.SSL_TLS13_ENABLED.get() and hasattr(ssl.TLSVersion, 'TLSv1_3'):
+          context.maximum_version = ssl.TLSVersion.TLSv1_3
+        else:
+          context.maximum_version = ssl.TLSVersion.TLSv1_2
+
+      except Exception as e:
+        LOG.debug(f"Could not set TLS version limits for Thrift: {e}")
+
+    # Configure certificate verification
+    if validate:
+      context.check_hostname = False  # Thrift handles hostname validation separately
+      context.verify_mode = ssl.CERT_REQUIRED
+      if ca_certs:
+        context.load_verify_locations(ca_certs)
+    else:
+      context.check_hostname = False
+      context.verify_mode = ssl.CERT_NONE
+
+    # Load client certificate if provided
+    if keyfile and certfile:
+      try:
+        context.load_cert_chain(certfile, keyfile)
+        LOG.debug("Loaded client certificate for Thrift SSL context")
+      except Exception as e:
+        LOG.warning(f"Could not load client certificate for Thrift: {e}")
+
+    tls13_support = conf.SSL_TLS13_ENABLED.get() and conf.has_tls13_support()
+    LOG.info(f"Thrift SSL context created with TLS 1.3 support: {tls13_support}")
+
+    return context
+
+  except Exception as e:
+    LOG.error(f"Failed to create Thrift SSL context: {e}")
+    return None
+
+
 def connect_to_thrift(conf):
   """
   Connect to a thrift endpoint as determined by the 'conf' parameter.
@@ -310,17 +429,78 @@ def connect_to_thrift(conf):
     mode.set_verify(conf.validate)
   else:
     if conf.use_ssl:
-      try:
-        from ssl import PROTOCOL_TLS
-        PROTOCOL_SSLv23 = PROTOCOL_TLS
-      except ImportError:
+      # Get the optimal SSL protocol
+      ssl_protocol = get_thrift_ssl_protocol()
+
+      # Try to create SSL context for enhanced TLS 1.3 support
+      ssl_context = create_thrift_ssl_context(
+        validate=conf.validate,
+        ca_certs=conf.ca_certs,
+        keyfile=conf.keyfile,
+        certfile=conf.certfile
+      )
+
+      # Use SSL context if available, otherwise fall back to ssl_version parameter
+      if ssl_context:
         try:
-          from ssl import PROTOCOL_SSLv23 as PROTOCOL_TLS
+          # Check if TSSLSocketWithWildcardSAN supports ssl_context parameter
+          import inspect
+          if hasattr(TSSLSocketWithWildcardSAN, '__init__'):
+            sig = inspect.signature(TSSLSocketWithWildcardSAN.__init__)
+            if 'ssl_context' in sig.parameters:
+              mode = TSSLSocketWithWildcardSAN(
+                conf.host, conf.port,
+                validate=conf.validate,
+                ca_certs=conf.ca_certs,
+                keyfile=conf.keyfile,
+                certfile=conf.certfile,
+                ssl_context=ssl_context
+              )
+              LOG.debug("Using TSSLSocketWithWildcardSAN with SSL context")
+            else:
+              # Fall back to ssl_version parameter
+              mode = TSSLSocketWithWildcardSAN(
+                conf.host, conf.port,
+                validate=conf.validate,
+                ca_certs=conf.ca_certs,
+                keyfile=conf.keyfile,
+                certfile=conf.certfile,
+                ssl_version=ssl_protocol
+              )
+              LOG.debug("Using TSSLSocketWithWildcardSAN with ssl_version parameter")
+          else:
+            # Fallback for older versions
+            mode = TSSLSocketWithWildcardSAN(
+              conf.host, conf.port,
+              validate=conf.validate,
+              ca_certs=conf.ca_certs,
+              keyfile=conf.keyfile,
+              certfile=conf.certfile,
+              ssl_version=ssl_protocol
+            )
+        except Exception as e:
+          LOG.warning(f"Could not use SSL context for Thrift, falling back to ssl_version: {e}")
+          mode = TSSLSocketWithWildcardSAN(
+            conf.host, conf.port,
+            validate=conf.validate,
+            ca_certs=conf.ca_certs,
+            keyfile=conf.keyfile,
+            certfile=conf.certfile,
+            ssl_version=ssl_protocol
+          )
+      else:
+        # Fallback to the previous method if SSL context creation failed
+        try:
+          from ssl import PROTOCOL_TLS
           PROTOCOL_SSLv23 = PROTOCOL_TLS
         except ImportError:
-          PROTOCOL_SSLv23 = PROTOCOL_TLS = 2
-      mode = TSSLSocketWithWildcardSAN(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs,
-                                       keyfile=conf.keyfile, certfile=conf.certfile, ssl_version=PROTOCOL_SSLv23)
+          try:
+            from ssl import PROTOCOL_SSLv23 as PROTOCOL_TLS
+            PROTOCOL_SSLv23 = PROTOCOL_TLS
+          except ImportError:
+            PROTOCOL_SSLv23 = PROTOCOL_TLS = 2
+        mode = TSSLSocketWithWildcardSAN(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs,
+                                        keyfile=conf.keyfile, certfile=conf.certfile, ssl_version=PROTOCOL_SSLv23)
     else:
       mode = TSocket(conf.host, conf.port)
 
