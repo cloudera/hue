@@ -50,7 +50,7 @@ const sortOrder = [
   return acc;
 }, {});
 
-const getCount = (uploadQueue: RegularFile[]) => {
+const getCountByStatus = (uploadQueue: RegularFile[]) => {
   return uploadQueue.reduce(
     (acc, item) => {
       if (item.status === FileStatus.Uploaded) {
@@ -190,7 +190,7 @@ const FileUploadQueue = (): JSX.Element => {
     setConflictingFiles([]);
   };
 
-  const uploadCountByStatus = getCount(uploadQueue);
+  const uploadCountByStatus = getCountByStatus(uploadQueue);
   const headerText = getHeaderText(uploadQueue, uploadCountByStatus);
 
   if (!uploadQueue.length && conflictingFiles.length === 0) {
