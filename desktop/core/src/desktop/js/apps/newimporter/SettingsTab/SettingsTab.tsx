@@ -25,7 +25,7 @@ import {
   StoreLocation,
   TableFormat
 } from '../types';
-import { ADVANCED_SETTINGS_CONFIG, SettingsFieldConfig } from './SeetingsTabConfig';
+import { ADVANCED_SETTINGS_CONFIG, SettingsFieldConfig } from './SettingsTabConfig';
 import FormInput from '../../../reactComponents/FormInput/FormInput';
 import { i18nReact } from '../../../utils/i18nReact';
 
