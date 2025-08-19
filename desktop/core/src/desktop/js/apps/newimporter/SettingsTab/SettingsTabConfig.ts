@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { FieldConfig, FieldOption, FieldType } from '../../../reactComponents/FormInput/FormInput';
-import { SettingsContext, TableFormat } from '../types';
+import { SettingsContext, StoreLocation, TableFormat } from '../types';
 
 export const TABLE_FORMAT_OPTIONS: FieldOption[] = [
   { value: TableFormat.TEXT, label: 'Text' },
@@ -43,14 +43,19 @@ export const EXTERNAL_LOCATION_OPTIONS: FieldOption[] = [
   { value: 'custom', label: 'Custom' }
 ];
 
-export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContext>[]> = {
+export interface SettingsFieldConfig extends FieldConfig {
+  isHidden?: (context: SettingsContext) => boolean;
+}
+
+export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
   description: [
     {
       name: 'description',
       type: FieldType.INPUT,
       label: 'Description',
-      placeholder: 'Description goes here',
-      tooltip: 'Enter table description'
+      placeholder: "A table to store customer data imported from the marketing team's CRM.",
+      tooltip:
+        "This description will be used as the comment for the new database table. It helps other developers understand the table's purpose."
     }
   ],
   properties: [
@@ -58,7 +63,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       name: 'tableFormat',
       type: FieldType.SELECT,
       label: 'Format',
-      placeholder: 'Choose format',
+      placeholder: 'Choose an option',
       options: TABLE_FORMAT_OPTIONS,
       tooltip: 'Format of the table'
     },
@@ -73,24 +78,25 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       type: FieldType.CHECKBOX,
       label: 'Transactional table',
       tooltip: 'Transactional table',
-      isHidden: (context?: SettingsContext) =>
-        context?.isKuduTable ||
-        context?.isRemoteTable ||
-        context?.isIcebergTable ||
-        context?.isCopyFile
+      isHidden: (context: SettingsContext) =>
+        context.tableFormat === TableFormat.KUDU ||
+        context.isRemoteTable ||
+        context.isIcebergTable ||
+        context.isCopyFile
     },
     {
       name: 'isInsertOnly',
       type: FieldType.CHECKBOX,
       label: 'Insert only',
-      tooltip: 'Insert only',
-      isHidden: (context?: SettingsContext) => !context?.settings.isTransactional
+      tooltip:
+        'Table will be created with insert only mode, when disabled, the table will be created with insert, delete and update mode',
+      isHidden: (context: SettingsContext) => !context.isTransactional
     },
     {
       name: 'isIcebergTable',
       type: FieldType.CHECKBOX,
       label: 'Iceberg table',
-      isHidden: (context?: SettingsContext) => !context?.isIcebergEnabled || !context?.isRemoteTable
+      isHidden: (context: SettingsContext) => !context.isIcebergEnabled || !context.isRemoteTable
     },
     {
       name: 'isCopyFile',
@@ -98,11 +104,11 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       label: 'Copy file',
       tooltip:
         'Choosing this option will copy the file instead of moving it to the new location, and ensuring the original file remains unchanged.',
-      isHidden: (context?: SettingsContext) =>
-        context?.isManagedTable ||
-        context?.settings.isTransactional ||
-        !context?.isRemoteTable ||
-        context?.settings.importData === false
+      isHidden: (context: SettingsContext) =>
+        context.storeLocation === StoreLocation.MANAGED ||
+        context.isTransactional ||
+        !context.isRemoteTable ||
+        context.importData === false
     },
     {
       name: 'useExternalLocation',
@@ -114,7 +120,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       name: 'externalLocation',
       type: FieldType.INPUT,
       placeholder: 'External location',
-      isHidden: (context?: SettingsContext) => !context?.settings.useExternalLocation
+      isHidden: (context: SettingsContext) => !context.useExternalLocation
     }
   ],
 
@@ -131,28 +137,28 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, FieldConfig<SettingsContex
       name: 'fieldDelimiter',
       type: FieldType.SELECT,
       label: 'Field',
-      placeholder: 'New line',
+      placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Field delimiter',
-      isHidden: (context?: SettingsContext) => !context?.settings.customCharDelimiters
+      isHidden: (context: SettingsContext) => !context.customCharDelimiters
     },
     {
       name: 'arrayMapDelimiter',
       type: FieldType.SELECT,
       label: 'Array Map',
-      placeholder: 'Choose',
+      placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Array map delimiter',
-      isHidden: (context?: SettingsContext) => !context?.settings.customCharDelimiters
+      isHidden: (context: SettingsContext) => !context.customCharDelimiters
     },
     {
       name: 'structDelimiter',
       type: FieldType.SELECT,
       label: 'Struct',
-      placeholder: 'Choose',
+      placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Struct delimiter',
-      isHidden: (context?: SettingsContext) => !context?.settings.customCharDelimiters
+      isHidden: (context: SettingsContext) => !context.customCharDelimiters
     }
   ]
 };

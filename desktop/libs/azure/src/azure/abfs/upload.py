@@ -376,7 +376,7 @@ class ABFSNewFileUploadHandler(FileUploadHandler):
 
   def upload_chunk(self, raw_chunk, start):
     try:
-      LOG.debug(f"Appending chunk to ABFS file - position: {start}, size: {len(raw_chunk)} bytes")
+      LOG.debug(f"Appending chunk to ABFS file at {self.target_path} - position: {start}, size: {len(raw_chunk)} bytes")
       buffered_data = BytesIO(raw_chunk)
       # TODO: Try encapsulating the _append method in the ABFS class with correct refactoring
       self._fs._append(self.target_path, buffered_data, params={"position": int(start)})
@@ -387,7 +387,7 @@ class ABFSNewFileUploadHandler(FileUploadHandler):
 
   def file_complete(self, file_size):
     # Finish the upload by flushing
-    LOG.info(f"Flushing ABFS file - total size: {file_size} bytes")
+    LOG.info(f"Flushing ABFS file at {self.target_path} - total size: {file_size} bytes")
     self._fs.flush(self.target_path, {"position": int(file_size)})
 
     file_stats = self._fs.stats(self.target_path)
@@ -410,7 +410,7 @@ class ABFSNewFileUploadHandler(FileUploadHandler):
         error_code=422,
       )
 
-    LOG.info(f"ABFS upload completed successfully: {file_size} bytes written to {self.target_path}")
+    LOG.info(f"ABFS upload completed successfully for {self.target_path}, {file_size} bytes written")
 
     file_stats = massage_stats(file_stats)
 

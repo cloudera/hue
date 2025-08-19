@@ -16,12 +16,12 @@
 
 import logging
 
-import pytest
 from django.test import TestCase
 
 from aws import conf
 from desktop.conf import RAZ
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import add_permission, revoke_permission
 from useradmin.models import User
 
 LOG = logging.getLogger()
@@ -83,7 +83,7 @@ class TestAWSConf(TestCase):
       conf.clear_cache()
 
   def test_has_s3_access(self):
-    # When RAZ is not enabled
+    # When user is not admin, RAZ is not enabled and only s3 perms are already present in the "default" group
     resets = [
       RAZ.IS_ENABLED.set_for_testing(False),
       conf.AWS_ACCOUNTS.set_for_testing({'default': {
@@ -93,29 +93,13 @@ class TestAWSConf(TestCase):
       }})
     ]
     try:
-      assert not conf.has_s3_access(self.user)
+      assert conf.has_s3_access(self.user)
     finally:
       for reset in resets:
         reset()
       conf.clear_cache()
 
-    # When only RAZ is enabled (S3 in Azure cluster)
-    resets = [
-      RAZ.IS_ENABLED.set_for_testing(True),
-      conf.AWS_ACCOUNTS.set_for_testing({'default': {
-        'region': None,
-        'host': None,
-        'allow_environment_credentials': 'false'
-      }})
-    ]
-    try:
-      assert not conf.has_s3_access(self.user)
-    finally:
-      for reset in resets:
-        reset()
-      conf.clear_cache()
-
-    # When RAZ is enabled along with S3 config
+    # When user is not admin, RAZ is enabled along with S3 config and s3 perms are not present in the "default" group
     resets = [
       RAZ.IS_ENABLED.set_for_testing(True),
       conf.AWS_ACCOUNTS.set_for_testing({'default': {
@@ -125,8 +109,34 @@ class TestAWSConf(TestCase):
       }})
     ]
     try:
+      revoke_permission('default', 'filebrowser', 's3_access')
       assert conf.has_s3_access(self.user)
     finally:
+      add_permission('test_user', 'default', 's3_access', 'filebrowser')
+      for reset in resets:
+        reset()
+      conf.clear_cache()
+
+    # When only user is admin, RAZ is not enabled along with S3 config but s3 perms are not present in the "default" group
+    resets = [
+      RAZ.IS_ENABLED.set_for_testing(False),
+      conf.AWS_ACCOUNTS.set_for_testing({'default': {
+        'region': None,
+        'host': None,
+        'allow_environment_credentials': 'false'
+      }})
+    ]
+    try:
+      revoke_permission('default', 'filebrowser', 's3_access')
+      self.user.is_superuser = True
+      self.user.save()
+      assert conf.has_s3_access(self.user)
+    finally:
+      add_permission('test_user', 'default', 's3_access', 'filebrowser')
+
+      self.user.is_superuser = False
+      self.user.save()
+
       for reset in resets:
         reset()
       conf.clear_cache()

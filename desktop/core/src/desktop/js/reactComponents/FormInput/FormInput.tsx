@@ -35,23 +35,22 @@ export interface FieldOption {
   label: string;
 }
 
-export interface FieldConfig<U = unknown> {
+export interface FieldConfig {
   name: string;
   type: FieldType;
   label?: string;
   placeholder?: string;
   tooltip?: string;
   options?: FieldOption[];
-  isHidden?: (context?: U) => boolean | undefined;
+  hidden?: boolean;
   style?: React.CSSProperties;
   nested?: boolean;
   parentField?: string;
   className?: string;
 }
 
-interface FormInputProps<T = string, U = unknown> {
-  field: FieldConfig<U>;
-  context?: U;
+interface FormInputProps<T = string> {
+  field: FieldConfig;
   defaultValue?: T;
   loading?: boolean;
   value?: T;
@@ -59,19 +58,18 @@ interface FormInputProps<T = string, U = unknown> {
   error?: boolean;
 }
 
-const FormInput = <T, U = unknown>({
+const FormInput = <T,>({
   field,
-  context,
   defaultValue,
   loading,
   value,
   onChange,
   error
-}: FormInputProps<T, U>): JSX.Element => {
+}: FormInputProps<T>): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   // Check if field should be hidden
-  if (field.isHidden && field.isHidden(context)) {
+  if (field.hidden) {
     return <></>;
   }
 

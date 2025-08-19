@@ -36,8 +36,8 @@
       gap: vars.$cdl-spacing-xs;
 
       &__title {
-        font-size: 16px;
-        font-weight: 500;
+        font-size: vars.$font-size-lg;
+        font-weight: vars.$cdl-text-default-bold-weight;
         color: vars.$cdl-gray-900;
       }
 

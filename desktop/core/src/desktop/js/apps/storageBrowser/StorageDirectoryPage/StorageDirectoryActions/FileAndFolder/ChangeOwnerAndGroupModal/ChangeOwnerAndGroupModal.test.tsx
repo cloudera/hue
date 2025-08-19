@@ -181,8 +181,12 @@ describe('ChangeOwnerAndGroupModal Component', () => {
     fireEvent.click(getByText('Submit'));
 
     await waitFor(() => {
+      const expectedFormData = new FormData();
+      expectedFormData.append('user', 'user1');
+      expectedFormData.append('group', 'group1');
+      expectedFormData.append('path', 'test/path/file1.txt');
       expect(mockSave).toHaveBeenCalledTimes(1);
-      expect(mockSave).toHaveBeenCalledWith(expect.any(FormData));
+      expect(mockSave).toHaveBeenCalledWith(expectedFormData);
     });
   });
 

@@ -40,12 +40,6 @@ export enum StoreLocation {
   EXTERNAL = 'external'
 }
 
-export enum ImporterTabs {
-  PREVIEW = 'preview',
-  SETTINGS = 'settings',
-  PARTITION = 'partition'
-}
-
 export interface LocalFileUploadResponse {
   file_path: string;
 }
@@ -131,15 +125,7 @@ export interface PartitionConfig {
 }
 
 // TODO: verify if ImporterSettings can be used as context
-export interface SettingsContext {
-  isManagedTable: boolean;
+export interface SettingsContext extends ImporterSettings {
   isRemoteTable: boolean;
-  isKuduTable: boolean;
-  fileMetaData: FileMetaData;
-  settings: ImporterSettings;
   isIcebergEnabled: boolean;
-  isIcebergTable: boolean;
-  isTransactionalVisible: boolean;
-  isTransactionalUpdateEnabled: boolean;
-  isCopyFile: boolean;
 }
