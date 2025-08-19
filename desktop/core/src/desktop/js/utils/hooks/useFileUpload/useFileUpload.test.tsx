@@ -229,4 +229,64 @@ describe('useFileUpload', () => {
     expect(result.current.uploadQueue[1].status).toBe(FileStatus.Failed);
     expect(result.current.uploadQueue[1].error).toBe(testError);
   });
+
+  it('should call onComplete when all files are processed', () => {
+    let capturedOnComplete: () => void;
+
+    mockUseRegularUpload.mockImplementation(options => {
+      capturedOnComplete = options.onComplete;
+      return {
+        addFiles: mockAddRegularFiles,
+        cancelFile: mockCancelRegularFile,
+        isLoading: false
+      };
+    });
+
+    renderHook(() => useFileUpload({ isChunkUpload: false, onComplete: mockOnComplete }));
+
+    act(() => {
+      capturedOnComplete();
+    });
+
+    expect(mockOnComplete).toHaveBeenCalled();
+  });
+
+  it('should remove all files from the queue', () => {
+    const { result } = renderHook(() =>
+      useFileUpload({ isChunkUpload: false, onComplete: mockOnComplete })
+    );
+
+    act(() => {
+      result.current.addFiles(mockFiles);
+    });
+
+    expect(result.current.uploadQueue.length).toBe(2);
+
+    act(() => {
+      result.current.removeAllFiles();
+    });
+
+    expect(result.current.uploadQueue.length).toBe(0);
+    expect(mockCancelRegularFile).toHaveBeenCalledWith('file-1');
+    expect(mockCancelRegularFile).toHaveBeenCalledWith('file-2');
+  });
+
+  it('should not cancel a file that is not pending', () => {
+    const { result } = renderHook(() =>
+      useFileUpload({ isChunkUpload: false, onComplete: mockOnComplete })
+    );
+
+    const nonPendingFile = { ...mockFiles[0], status: FileStatus.Uploading };
+
+    act(() => {
+      result.current.addFiles([nonPendingFile]);
+    });
+
+    act(() => {
+      result.current.cancelFile(nonPendingFile);
+    });
+
+    expect(mockCancelRegularFile).not.toHaveBeenCalled();
+    expect(result.current.uploadQueue[0].status).toBe(FileStatus.Uploading);
+  });
 });
