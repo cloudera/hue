@@ -18,13 +18,14 @@
 @use 'mixins';
 
 .antd.cuix {
-  .hue-table-container {
+  .hue-paginated-table-container {
     display: flex;
     flex-direction: column;
     flex: 1;
   }
 
   .hue-paginated-table-container__placeholder--hidden {
+
     // In CUIX implementation, label.loading is rendering along with spinner
     // this ensures the placeholder is hidden when loading is true
     .ant-table-placeholder {
