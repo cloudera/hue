@@ -115,11 +115,6 @@ export interface ImporterSettings {
 
 // TODO: verify if ImporterSettings can be used as context
 export interface SettingsContext extends ImporterSettings {
-  isManagedTable: boolean;
   isRemoteTable: boolean;
-  isKuduTable: boolean;
-  fileMetaData: FileMetaData;
   isIcebergEnabled: boolean;
-  isTransactionalVisible: boolean;
-  isTransactionalUpdateEnabled: boolean;
 }

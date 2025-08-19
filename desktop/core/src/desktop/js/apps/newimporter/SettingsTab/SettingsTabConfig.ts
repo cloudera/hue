@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import { FieldConfig, FieldOption, FieldType } from '../../../reactComponents/FormInput/FormInput';
-import { SettingsContext, TableFormat } from '../types';
+import { SettingsContext, StoreLocation, TableFormat } from '../types';
 
 export const TABLE_FORMAT_OPTIONS: FieldOption[] = [
   { value: TableFormat.TEXT, label: 'Text' },
@@ -44,7 +44,7 @@ export const EXTERNAL_LOCATION_OPTIONS: FieldOption[] = [
 ];
 
 export interface SettingsFieldConfig extends FieldConfig {
-  isHidden?: (context?: SettingsContext) => boolean;
+  isHidden?: (context: SettingsContext) => boolean;
 }
 
 export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
@@ -78,11 +78,11 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
       type: FieldType.CHECKBOX,
       label: 'Transactional table',
       tooltip: 'Transactional table',
-      isHidden: (context?: SettingsContext) =>
-        context?.isKuduTable ||
-        context?.isRemoteTable ||
-        context?.isIcebergTable ||
-        context?.isCopyFile
+      isHidden: (context: SettingsContext) =>
+        context.tableFormat === TableFormat.KUDU ||
+        context.isRemoteTable ||
+        context.isIcebergTable ||
+        context.isCopyFile
     },
     {
       name: 'isInsertOnly',
@@ -90,13 +90,13 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
       label: 'Insert only',
       tooltip:
         'Table will be created with insert only mode, when disabled, the table will be created with insert, delete and update mode',
-      isHidden: (context?: SettingsContext) => !context?.isTransactional
+      isHidden: (context: SettingsContext) => !context.isTransactional
     },
     {
       name: 'isIcebergTable',
       type: FieldType.CHECKBOX,
       label: 'Iceberg table',
-      isHidden: (context?: SettingsContext) => !context?.isIcebergEnabled || !context?.isRemoteTable
+      isHidden: (context: SettingsContext) => !context.isIcebergEnabled || !context.isRemoteTable
     },
     {
       name: 'isCopyFile',
@@ -104,11 +104,11 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
       label: 'Copy file',
       tooltip:
         'Choosing this option will copy the file instead of moving it to the new location, and ensuring the original file remains unchanged.',
-      isHidden: (context?: SettingsContext) =>
-        context?.isManagedTable ||
-        context?.isTransactional ||
-        !context?.isRemoteTable ||
-        context?.importData === false
+      isHidden: (context: SettingsContext) =>
+        context.storeLocation === StoreLocation.MANAGED ||
+        context.isTransactional ||
+        !context.isRemoteTable ||
+        context.importData === false
     },
     {
       name: 'useExternalLocation',
@@ -120,7 +120,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
       name: 'externalLocation',
       type: FieldType.INPUT,
       placeholder: 'External location',
-      isHidden: (context?: SettingsContext) => !context?.useExternalLocation
+      isHidden: (context: SettingsContext) => !context.useExternalLocation
     }
   ],
 
@@ -140,7 +140,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
       placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Field delimiter',
-      isHidden: (context?: SettingsContext) => !context?.customCharDelimiters
+      isHidden: (context: SettingsContext) => !context.customCharDelimiters
     },
     {
       name: 'arrayMapDelimiter',
@@ -149,7 +149,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
       placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Array map delimiter',
-      isHidden: (context?: SettingsContext) => !context?.customCharDelimiters
+      isHidden: (context: SettingsContext) => !context.customCharDelimiters
     },
     {
       name: 'structDelimiter',
@@ -158,7 +158,7 @@ export const ADVANCED_SETTINGS_CONFIG: Record<string, SettingsFieldConfig[]> = {
       placeholder: 'Choose an option',
       options: DELIMITER_OPTIONS,
       tooltip: 'Struct delimiter',
-      isHidden: (context?: SettingsContext) => !context?.customCharDelimiters
+      isHidden: (context: SettingsContext) => !context.customCharDelimiters
     }
   ]
 };

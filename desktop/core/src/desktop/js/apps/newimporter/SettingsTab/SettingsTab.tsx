@@ -17,14 +17,7 @@
 import React from 'react';
 import { Form } from 'antd';
 
-import {
-  FileMetaData,
-  ImporterFileSource,
-  ImporterSettings,
-  SettingsContext,
-  StoreLocation,
-  TableFormat
-} from '../types';
+import { FileMetaData, ImporterFileSource, ImporterSettings, SettingsContext } from '../types';
 import { ADVANCED_SETTINGS_CONFIG, SettingsFieldConfig } from './SettingsTabConfig';
 import FormInput from '../../../reactComponents/FormInput/FormInput';
 import { i18nReact } from '../../../utils/i18nReact';
@@ -52,17 +45,10 @@ const SettingsTab = ({
   };
 
   // Create visibility context
-  const tableFormat = settings.tableFormat || TableFormat.TEXT;
   const context: SettingsContext = {
     ...settings,
-    isManagedTable: settings.storeLocation === StoreLocation.MANAGED,
     isRemoteTable: fileMetaData.source === ImporterFileSource.REMOTE,
-    isKuduTable: tableFormat === TableFormat.KUDU,
-    isIcebergEnabled: true, // TODO: Get from config
-    fileMetaData,
-    isTransactionalVisible:
-      tableFormat !== TableFormat.KUDU && fileMetaData.source !== ImporterFileSource.LOCAL,
-    isTransactionalUpdateEnabled: settings.isTransactional && !settings.isInsertOnly
+    isIcebergEnabled: true // TODO: Get from config
   };
 
   const renderSection = (fields: SettingsFieldConfig[], title?: string, isSingleRow?: boolean) => (
