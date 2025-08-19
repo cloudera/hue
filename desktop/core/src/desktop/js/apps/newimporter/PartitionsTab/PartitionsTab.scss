@@ -15,35 +15,23 @@
 // limitations under the License.
 
 @use 'variables' as vars;
-@use 'mixins';
 
 .antd.cuix {
-  .hue-paginated-table-container {
+  .hue-partitions-tab {
     display: flex;
-    flex-direction: column;
     flex: 1;
-  }
+    gap: vars.$cdl-spacing-m;
+    flex-direction: column;
+    padding: vars.$cdl-spacing-s;
+    background-color: vars.$cdl-white;
 
-  .hue-paginated-table-container__placeholder--hidden {
-    // In CUIX implementation, label.loading is rendering along with spinner
-    // this ensures the placeholder is hidden when loading is true
-    .ant-table-placeholder {
-      visibility: hidden;
-    }
-  }
-
-  .hue-paginated-table {
-    .ant-table-selection-column {
-      // This prevents the eplipses from being applied to the selection column
-      text-overflow: initial;
+    &__add-button {
+      text-align: left;
+      font-weight: 500;
     }
 
-    .ant-table-placeholder {
-      height: 100px;
-
-      .ant-table-cell {
-        text-align: center;
-      }
+    &__delete-button {
+      color: vars.$cdl-blue-600;
     }
   }
 }

@@ -94,7 +94,7 @@ describe('FileImportTabs', () => {
   });
 
   it('starts with custom default active tab', async () => {
-    render(<FileImportTabs {...defaultProps} defaultActiveKey="settings" />);
+    render(<FileImportTabs {...defaultProps} />);
 
     await waitFor(() => {
       expect(screen.getByText('Settings')).toBeInTheDocument();

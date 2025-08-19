@@ -22,8 +22,8 @@
     flex-direction: column;
     height: 100%;
     overflow: auto;
-    gap: vars.$cdl-spacing-s;
-    padding: vars.$cdl-spacing-s vars.$cdl-spacing-m vars.$cdl-spacing-s vars.$cdl-spacing-m;
+    gap: vars.$cdl-spacing-xxs;
+    padding: vars.$cdl-spacing-xxs vars.$cdl-spacing-m vars.$cdl-spacing-s vars.$cdl-spacing-m;
 
     &__header {
       display: flex;

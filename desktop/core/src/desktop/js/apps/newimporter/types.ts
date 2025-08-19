@@ -113,7 +113,17 @@ export interface ImporterSettings {
   structDelimiter: string;
 }
 
-// TODO: verify if ImporterSettings can be used as context
+export interface Partition {
+  id: string;
+  name: string;
+  type: string;
+  value: string;
+}
+
+export interface PartitionConfig {
+  partitions: Partition[];
+}
+
 export interface SettingsContext extends ImporterSettings {
   isRemoteTable: boolean;
   isIcebergEnabled: boolean;
