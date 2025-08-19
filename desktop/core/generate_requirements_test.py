@@ -77,7 +77,7 @@ class TestRequirementsGenerator:
     assert isinstance(generator.requirements, list)
     assert isinstance(generator.local_requirements, list)
     assert "x86_64" in generator.arch_requirements_map
-    assert "ppc64le" in generator.arch_requirements_map
+
     assert "aarch64" in generator.arch_requirements_map
 
   @mock.patch("generate_requirements.this_dir", create=True)
@@ -163,46 +163,6 @@ class TestRequirementsGenerator:
       result = generator.get_file_name()
 
       assert result == f"{self.temp_dir}/requirements-x86_64-3.9.txt"
-
-  @mock.patch("generate_requirements.this_dir")
-  @mock.patch("builtins.open", new_callable=mock.mock_open)
-  def test_generate_requirements_ppc64le(self, mock_open, mock_this_dir):
-    """Test generating requirements for ppc64le architecture."""
-
-    # Need to make this_dir return the string value directly, not a MagicMock
-    mock_this_dir.__str__.return_value = self.temp_dir
-
-    with mock.patch.object(RequirementsGenerator, "__init__", return_value=None):
-      generator = RequirementsGenerator()
-      generator.arch = "ppc64le"
-      generator.python_version_string = "3.8"
-      generator.requirements = ["setuptools==70.0.0"]
-      generator.local_requirements = []
-      generator.arch_requirements_map = {
-        "ppc64le": {
-          "default": [],
-          "3.8": [
-            "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/numpy-1.23.1-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-            "Markdown==3.1",
-          ],
-        }
-      }
-
-      generator.copy_local_requirements = mock.MagicMock(return_value=[])
-
-      generator.generate_requirements()
-
-      mock_open.assert_called_once_with(f"{self.temp_dir}/requirements-ppc64le-3.8.txt", "w")
-
-      expected_requirements = "\n".join(
-        [
-          "setuptools==70.0.0",
-          "http://ibm-ppc-builds.s3.amazonaws.com/silx-py-libs/numpy-1.23.1-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl",
-          "Markdown==3.1",
-        ]
-      )
-
-      mock_open().write.assert_called_once_with(expected_requirements)
 
   @mock.patch("generate_requirements.this_dir")
   @mock.patch("builtins.open", new_callable=mock.mock_open)

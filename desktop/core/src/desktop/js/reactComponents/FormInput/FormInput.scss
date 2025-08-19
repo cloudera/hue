@@ -15,35 +15,35 @@
 // limitations under the License.
 
 @use 'variables' as vars;
-@use 'mixins';
 
 .antd.cuix {
-  .hue-paginated-table-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
+  .hue-form-input {
+    width: 100%;
+    margin-bottom: 0;
 
-  .hue-paginated-table-container__placeholder--hidden {
-    // In CUIX implementation, label.loading is rendering along with spinner
-    // this ensures the placeholder is hidden when loading is true
-    .ant-table-placeholder {
-      visibility: hidden;
-    }
-  }
+    &__checkbox {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0;
+      gap: vars.$cdl-spacing-xs;
 
-  .hue-paginated-table {
-    .ant-table-selection-column {
-      // This prevents the eplipses from being applied to the selection column
-      text-overflow: initial;
-    }
+      input {
+        width: fit-content;
 
-    .ant-table-placeholder {
-      height: 100px;
-
-      .ant-table-cell {
-        text-align: center;
+        &:focus {
+          box-shadow: none;
+        }
       }
     }
+
+    &__select {
+      border: 1px solid vars.$cdl-gray-600;
+      border-radius: vars.$border-radius-base;
+      width: 100%;
+    }
+  }
+
+  .hue-form-input__tooltip-icon {
+    margin-left: vars.$cdl-spacing-tiny;
   }
 }

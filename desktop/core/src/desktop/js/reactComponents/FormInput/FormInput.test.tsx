@@ -18,18 +18,13 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import FormInput, { FieldType, FieldConfig } from './FormInput';
-
-interface MockContext {
-  hideField: boolean;
-}
+import FormInput, { FieldType, BaseFieldConfig } from './FormInput';
 
 describe('FormInput Component', () => {
   const mockOnChange = jest.fn();
   const defaultProps = {
     loading: false,
-    onChange: mockOnChange,
-    className: 'test-class'
+    onChange: mockOnChange
   };
 
   beforeEach(() => {
@@ -37,11 +32,12 @@ describe('FormInput Component', () => {
   });
 
   describe('INPUT field type', () => {
-    const inputField: FieldConfig = {
+    const inputField: BaseFieldConfig = {
       name: 'testInput',
       type: FieldType.INPUT,
       label: 'Test Input',
-      placeholder: 'Enter text'
+      placeholder: 'Enter text',
+      className: 'test-class'
     };
 
     it('should render input field with correct props', () => {
@@ -69,7 +65,7 @@ describe('FormInput Component', () => {
     });
 
     it('should render tooltip icon when tooltip is provided', () => {
-      const inputWithTooltip: FieldConfig = {
+      const inputWithTooltip: BaseFieldConfig = {
         name: 'testInputTooltip',
         type: FieldType.INPUT,
         label: 'Input with Tooltip',
@@ -82,49 +78,35 @@ describe('FormInput Component', () => {
     });
 
     it('should handle visibility conditions - render when not hidden', () => {
-      const visibilityField: FieldConfig<MockContext> = {
+      const visibilityField: BaseFieldConfig = {
         name: 'conditionalField',
         type: FieldType.INPUT,
         label: 'Conditional Field',
-        isHidden: (context?: MockContext) => context?.hideField === true
+        hidden: false
       };
 
-      render(
-        <FormInput
-          field={visibilityField}
-          context={{ hideField: false }}
-          value=""
-          {...defaultProps}
-        />
-      );
+      render(<FormInput field={visibilityField} value="" {...defaultProps} />);
 
-      expect(screen.getByDisplayValue('')).toBeInTheDocument();
-      expect(screen.getByText('Conditional Field')).toBeInTheDocument();
+      expect(screen.queryByDisplayValue('')).toBeInTheDocument();
+      expect(screen.queryByRole('textbox', { name: /conditional field/i })).toBeInTheDocument();
     });
 
     it('should handle visibility conditions - not render when hidden', () => {
-      const visibilityField: FieldConfig<MockContext> = {
+      const visibilityField: BaseFieldConfig = {
         name: 'conditionalField',
         type: FieldType.INPUT,
         label: 'Conditional Field',
-        isHidden: (context?: MockContext) => context?.hideField === true
+        hidden: true
       };
 
-      render(
-        <FormInput
-          field={visibilityField}
-          context={{ hideField: true }}
-          value=""
-          {...defaultProps}
-        />
-      );
+      render(<FormInput field={visibilityField} value="" {...defaultProps} />);
 
-      expect(screen.queryByText('Conditional Field')).not.toBeInTheDocument();
+      expect(screen.queryByRole('textbox', { name: /conditional field/i })).not.toBeInTheDocument();
     });
   });
 
   describe('SELECT field type', () => {
-    const selectField: FieldConfig = {
+    const selectField: BaseFieldConfig = {
       name: 'testSelect',
       type: FieldType.SELECT,
       label: 'Test Select',
@@ -147,13 +129,7 @@ describe('FormInput Component', () => {
       const user = userEvent.setup();
       const onChangeSpy = jest.fn();
       render(
-        <FormInput
-          field={selectField}
-          value="option1"
-          onChange={onChangeSpy}
-          loading={false}
-          className="test-class"
-        />
+        <FormInput field={selectField} value="option1" onChange={onChangeSpy} loading={false} />
       );
 
       const select = screen.getByRole('combobox');
@@ -169,7 +145,7 @@ describe('FormInput Component', () => {
     });
 
     it('should render tooltip icon when tooltip is provided', () => {
-      const selectWithTooltip: FieldConfig = {
+      const selectWithTooltip: BaseFieldConfig = {
         name: 'testSelectTooltip',
         type: FieldType.SELECT,
         label: 'Select with Tooltip',
@@ -184,7 +160,7 @@ describe('FormInput Component', () => {
   });
 
   describe('CHECKBOX field type', () => {
-    const checkboxField: FieldConfig = {
+    const checkboxField: BaseFieldConfig = {
       name: 'testCheckbox',
       type: FieldType.CHECKBOX,
       label: 'Test Checkbox',
@@ -233,7 +209,7 @@ describe('FormInput Component', () => {
   });
 
   describe('RADIO field type', () => {
-    const radioField: FieldConfig = {
+    const radioField: BaseFieldConfig = {
       name: 'testRadio',
       type: FieldType.RADIO,
       label: 'Test Radio',
@@ -275,7 +251,7 @@ describe('FormInput Component', () => {
     });
 
     it('should render tooltip icon when tooltip is provided', () => {
-      const radioWithTooltip: FieldConfig = {
+      const radioWithTooltip: BaseFieldConfig = {
         name: 'testRadioTooltip',
         type: FieldType.RADIO,
         label: 'Radio with Tooltip',

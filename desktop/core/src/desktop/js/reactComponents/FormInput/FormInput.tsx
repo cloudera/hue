@@ -19,11 +19,13 @@ import Input from 'cuix/dist/components/Input';
 import Select from 'cuix/dist/components/Select';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { i18nReact } from '../../utils/i18nReact';
-import { Form, Radio, Tooltip } from 'antd';
+import { Form, Radio, Tooltip, Input as AntdInput } from 'antd';
+import './FormInput.scss';
 
 export enum FieldType {
   CHECKBOX = 'checkbox',
   INPUT = 'input',
+  TEXTAREA = 'textarea',
   SELECT = 'select',
   RADIO = 'radio'
 }
@@ -33,44 +35,41 @@ export interface FieldOption {
   label: string;
 }
 
-export interface FieldConfig<U = unknown> {
+export interface FieldConfig {
   name: string;
   type: FieldType;
   label?: string;
   placeholder?: string;
   tooltip?: string;
   options?: FieldOption[];
-  isHidden?: (context?: U) => boolean;
+  hidden?: boolean;
   style?: React.CSSProperties;
   nested?: boolean;
   parentField?: string;
+  className?: string;
 }
 
-interface FormInputProps<T = string, U = unknown> {
-  field: FieldConfig<U>;
-  context?: U;
+interface FormInputProps<T = string> {
+  field: FieldConfig;
   defaultValue?: T;
-  loading: boolean;
+  loading?: boolean;
   value?: T;
-  className?: string;
   onChange: (fieldId: string, value: T) => void;
   error?: boolean;
 }
 
-const FormInput = <T, U = unknown>({
+const FormInput = <T,>({
   field,
-  context,
   defaultValue,
   loading,
   value,
   onChange,
-  className,
   error
-}: FormInputProps<T, U>): JSX.Element => {
+}: FormInputProps<T>): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   // Check if field should be hidden
-  if (field.isHidden && field.isHidden(context)) {
+  if (field.hidden) {
     return <></>;
   }
 
@@ -79,7 +78,7 @@ const FormInput = <T, U = unknown>({
       {field.label && t(field.label)}
       {field.tooltip && (
         <Tooltip title={t(field.tooltip)}>
-          <InfoCircleOutlined style={{ marginLeft: 4 }} />
+          <InfoCircleOutlined className="hue-form-input__tooltip-icon" />
         </Tooltip>
       )}
     </>
@@ -89,20 +88,18 @@ const FormInput = <T, U = unknown>({
     switch (field.type) {
       case FieldType.CHECKBOX:
         return (
-          <>
+          <div className="hue-form-input__checkbox">
             <Input
               type="checkbox"
               checked={value as boolean}
               onChange={e => onChange(field.name, e.target.checked as T)}
               defaultChecked={value === undefined ? (defaultValue as boolean) : undefined}
-              className={className}
+              className={field.className}
               status={error ? 'error' : undefined}
               id={field.name}
             />
-            <label htmlFor={field.name} style={{ marginLeft: 8 }}>
-              {renderLabel()}
-            </label>
-          </>
+            <label htmlFor={field.name}>{renderLabel()}</label>
+          </div>
         );
 
       case FieldType.INPUT:
@@ -111,9 +108,22 @@ const FormInput = <T, U = unknown>({
             value={value as string}
             onChange={e => onChange(field.name, e.target.value as T)}
             placeholder={field.placeholder ? t(field.placeholder) : undefined}
-            className={className}
+            className={field.className}
             status={error ? 'error' : undefined}
             id={field.name}
+          />
+        );
+
+      case FieldType.TEXTAREA:
+        return (
+          <AntdInput.TextArea
+            value={value as string}
+            onChange={e => onChange(field.name, e.target.value as T)}
+            placeholder={field.placeholder ? t(field.placeholder) : undefined}
+            className={field.className}
+            status={error ? 'error' : undefined}
+            id={field.name}
+            rows={3}
           />
         );
 
@@ -131,7 +141,7 @@ const FormInput = <T, U = unknown>({
             bordered
             loading={loading}
             defaultValue={defaultValue as string}
-            className={className}
+            className={`hue-form-input__select ${field.className}`}
             status={error ? 'error' : undefined}
             id={field.name}
           />
@@ -143,7 +153,7 @@ const FormInput = <T, U = unknown>({
             value={value as string}
             defaultValue={defaultValue as string}
             onChange={e => onChange(field.name, e.target.value as T)}
-            className={className}
+            className={field.className}
             id={field.name}
           >
             {field.options?.map(option => (
@@ -161,7 +171,8 @@ const FormInput = <T, U = unknown>({
 
   return (
     <Form.Item
-      label={field.type === FieldType.CHECKBOX ? undefined : renderLabel()}
+      className="hue-form-input"
+      label={field.type === FieldType.CHECKBOX || !field.label ? undefined : renderLabel()}
       htmlFor={field.name}
     >
       {renderField()}

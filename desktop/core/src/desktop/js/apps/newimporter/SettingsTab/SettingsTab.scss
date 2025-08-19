@@ -17,51 +17,42 @@
 @use 'variables' as vars;
 
 .antd.cuix {
-  .hue-file-import-tabs {
+  .hue-importer-settings-tab {
     display: flex;
+    flex: 1;
     flex-direction: column;
-    height: 100%;
-    overflow: auto;
-    gap: vars.$cdl-spacing-xxs;
-    padding: vars.$cdl-spacing-xxs vars.$cdl-spacing-m vars.$cdl-spacing-s vars.$cdl-spacing-m;
+    padding: vars.$cdl-spacing-s;
+    background-color: vars.$cdl-white;
 
-    &__header {
+    &__form {
       display: flex;
-      justify-content: space-between;
-
-      &__title {
-        display: flex;
-        align-items: center;
-        font-size: vars.$fluidx-heading-h3-size;
-        font-weight: vars.$fluidx-heading-h3-weight;
-        color: vars.$fluidx-gray-900;
-      }
-
-      &__actions {
-        display: flex;
-        align-items: center;
-        gap: vars.$cdl-spacing-m;
-
-        .action {
-          margin-left: 10px;
-        }
-      }
+      flex-direction: column;
+      gap: vars.$cdl-spacing-m;
     }
 
-    &__tabs {
+    &__section {
       display: flex;
-      height: 100%;
+      flex-direction: column;
+      gap: vars.$cdl-spacing-xs;
 
-      .ant-tabs-content-holder {
+      &__title {
+        font-size: vars.$font-size-lg;
+        font-weight: vars.$cdl-text-default-bold-weight;
+        color: vars.$cdl-gray-900;
+      }
+
+      &__single-row {
         display: flex;
+        flex-direction: row;
         flex: 1;
+        width: 100%;
+        gap: vars.$cdl-spacing-m;
+      }
 
-        .ant-tabs-content,
-        .ant-tabs-tabpane-active {
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-        }
+      &__fields {
+        display: flex;
+        flex-direction: column;
+        gap: vars.$cdl-spacing-xs;
       }
     }
   }

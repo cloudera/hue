@@ -34,6 +34,7 @@ import { i18nReact } from '../../../utils/i18nReact';
 import useLoadData from '../../../utils/hooks/useLoadData/useLoadData';
 
 import './ImporterSourceSelector.scss';
+import { getLastDirOrFileNameFromPath } from '../../../reactComponents/PathBrowser/PathBrowser.util';
 
 const getFileSystems = t => {
   return {
@@ -98,6 +99,7 @@ const ImporterSourceSelector = ({ setFileMetaData }: ImporterSourceSelectorProps
   const handleFileSelection = async (destinationPath: string) => {
     setFileMetaData({
       path: destinationPath,
+      fileName: getLastDirOrFileNameFromPath(destinationPath),
       source: ImporterFileSource.REMOTE
     });
   };
