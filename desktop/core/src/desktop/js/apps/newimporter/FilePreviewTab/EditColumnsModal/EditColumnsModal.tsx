@@ -121,6 +121,7 @@ const EditColumnsModal = ({
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             handleChange(idx, 'title', e.target.value)
           }
+          aria-label={t('Column title')}
         />
       )
     },
@@ -136,6 +137,7 @@ const EditColumnsModal = ({
           disabled={sqlTypesLoading || sqlTypes.length === 0}
           loading={sqlTypesLoading}
           options={sqlTypes.map(type => ({ label: type, value: type }))}
+          aria-label={t('Column type')}
         />
       )
     },
@@ -154,6 +156,7 @@ const EditColumnsModal = ({
             handleChange(idx, 'comment', e.target.value)
           }
           rows={2}
+          aria-label={t('Column comment')}
         />
       )
     }
