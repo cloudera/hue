@@ -32,7 +32,7 @@ export interface Column extends BaseColumnProperties {
   dataIndex: string;
 }
 
-interface EditRow extends Required<BaseColumnProperties> {
+interface EditableRow extends Required<BaseColumnProperties> {
   key: number;
   title: string;
   type: string;
@@ -56,7 +56,7 @@ const EditColumnsModal = ({
   sample
 }: EditColumnsModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
-  const [editRows, setEditRows] = useState<EditRow[]>([]);
+  const [editableRows, setEditableRows] = useState<EditableRow[]>([]);
 
   const {
     data: sqlTypesData,
@@ -84,7 +84,7 @@ const EditColumnsModal = ({
   ];
 
   useEffect(() => {
-    setEditRows(
+    setEditableRows(
       columns.map((col, idx) => ({
         key: idx,
         title: col.title,
@@ -95,12 +95,12 @@ const EditColumnsModal = ({
     );
   }, [columns, sample]);
 
-  const handleChange = (idx: number, field: keyof EditRow, value: string) => {
-    setEditRows(rows => rows.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
+  const handleChange = (idx: number, field: keyof EditableRow, value: string) => {
+    setEditableRows(rows => rows.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
   };
 
   const handleDone = async () => {
-    const updatedColumns = editRows.map(row => ({
+    const updatedColumns = editableRows.map(row => ({
       ...columns[row.key],
       title: row.title,
       type: row.type,
@@ -114,7 +114,7 @@ const EditColumnsModal = ({
     {
       title: t('Title'),
       dataIndex: 'title',
-      render: (text: string, _: EditRow, idx: number) => (
+      render: (text: string, _: EditableRow, idx: number) => (
         <Input
           value={text}
           className="hue-importer-edit-columns-modal__input-title"
@@ -128,7 +128,7 @@ const EditColumnsModal = ({
     {
       title: t('Type'),
       dataIndex: 'type',
-      render: (value: string, _: EditRow, idx: number) => (
+      render: (value: string, _: EditableRow, idx: number) => (
         <Select
           value={value}
           onChange={(val: string) => handleChange(idx, 'type', val)}
@@ -149,7 +149,7 @@ const EditColumnsModal = ({
     {
       title: t('Comment'),
       dataIndex: 'comment',
-      render: (text: string, _: EditRow, idx: number) => (
+      render: (text: string, _: EditableRow, idx: number) => (
         <textarea
           value={text}
           onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
@@ -173,7 +173,7 @@ const EditColumnsModal = ({
       className="hue-importer-edit-columns-modal"
     >
       <LoadingErrorWrapper loading={sqlTypesLoading} errors={errors}>
-        <Table columns={modalColumns} dataSource={editRows} pagination={false} />
+        <Table columns={modalColumns} dataSource={editableRows} pagination={false} />
       </LoadingErrorWrapper>
     </Modal>
   );
