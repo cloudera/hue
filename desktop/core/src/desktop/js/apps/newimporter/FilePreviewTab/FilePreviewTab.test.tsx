@@ -100,7 +100,7 @@ describe('FilePreviewTab', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Edit Columns')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Edit Columns' })).toBeInTheDocument();
       expect(screen.getByText('Engine')).toBeInTheDocument();
       expect(screen.getByText('Database')).toBeInTheDocument();
       expect(screen.getByText('Table Name')).toBeInTheDocument();
@@ -117,24 +117,11 @@ describe('FilePreviewTab', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Alice')).toBeInTheDocument();
-      expect(screen.getByText('30')).toBeInTheDocument();
-      expect(screen.getByText('Bob')).toBeInTheDocument();
-      expect(screen.getByText('25')).toBeInTheDocument();
+      expect(screen.getByText('Alice')).toBeVisible();
+      expect(screen.getByText('30')).toBeVisible();
+      expect(screen.getByText('Bob')).toBeVisible();
+      expect(screen.getByText('25')).toBeVisible();
     });
-  });
-
-  it('should render data table when preview data is available', () => {
-    render(
-      <FilePreviewTab
-        fileMetaData={mockFileMetaData}
-        destinationConfig={mockDestinationConfig}
-        onDestinationConfigChange={mockOnDestinationConfigChange}
-      />
-    );
-
-    const table = screen.getByRole('table');
-    expect(table).toBeInTheDocument();
   });
 
   it('should open edit columns modal when button is clicked', async () => {
@@ -146,7 +133,7 @@ describe('FilePreviewTab', () => {
       />
     );
 
-    const editColumnsButton = screen.getByText('Edit Columns');
+    const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
 
     await userEvent.click(editColumnsButton);
 
