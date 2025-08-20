@@ -41,7 +41,7 @@ export enum StoreLocation {
 }
 
 export interface LocalFileUploadResponse {
-  file_path: string;
+  filePath: string;
 }
 
 export interface FileFormatResponse {

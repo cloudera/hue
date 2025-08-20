@@ -116,14 +116,14 @@ describe('useRegularUpload', () => {
 
     // Params: destination_path and overwrite=false
     expect(optionsArg).toBeDefined();
-    expect(optionsArg.postOptions).toBeDefined();
-    expect(optionsArg.postOptions.params).toEqual({
+    expect(optionsArg.options).toBeDefined();
+    expect(optionsArg.options.params).toEqual({
       destination_path: '/uploads/',
       overwrite: 'false'
     });
     expect(typeof optionsArg.onSuccess).toBe('function');
     expect(typeof optionsArg.onError).toBe('function');
-    expect(typeof optionsArg.postOptions.onUploadProgress).toBe('function');
+    expect(typeof optionsArg.options.onUploadProgress).toBe('function');
 
     expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
       status: FileStatus.Uploading
@@ -153,7 +153,7 @@ describe('useRegularUpload', () => {
     expect(formDataArg.has('overwrite')).toBe(false);
 
     // Params: destination_path and overwrite=true
-    expect(optionsArg.postOptions.params).toEqual({
+    expect(optionsArg.options.params).toEqual({
       destination_path: '/uploads/',
       overwrite: 'true'
     });

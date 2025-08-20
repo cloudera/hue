@@ -62,7 +62,7 @@ const LocalFileUploadOption = ({
       upload(payload, {
         onSuccess: data => {
           setFileMetaData({
-            path: data.file_path,
+            path: data.filePath,
             fileName: file.name,
             source: ImporterFileSource.LOCAL
           });
