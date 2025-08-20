@@ -80,17 +80,7 @@ describe('FilePreviewTab', () => {
     });
   });
 
-  it('should render preview section and edit columns button', () => {
-    render(
-      <FilePreviewTab
-        fileMetaData={mockFileMetaData}
-        destinationConfig={mockDestinationConfig}
-        onDestinationConfigChange={mockOnDestinationConfigChange}
-      />
-    );
-  });
-
-  it('should render correctly', async () => {
+  it('should render correctly with Edit Columns button visible', async () => {
     render(
       <FilePreviewTab
         fileMetaData={mockFileMetaData}
@@ -100,7 +90,10 @@ describe('FilePreviewTab', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Edit Columns' })).toBeInTheDocument();
+      const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
+      expect(editColumnsButton).toBeInTheDocument();
+      expect(editColumnsButton).toBeVisible();
+
       expect(screen.getByText('Engine')).toBeInTheDocument();
       expect(screen.getByText('Database')).toBeInTheDocument();
       expect(screen.getByText('Table Name')).toBeInTheDocument();
@@ -124,7 +117,42 @@ describe('FilePreviewTab', () => {
     });
   });
 
-  it('should open edit columns modal when button is clicked', async () => {
+  it('should open edit columns modal when Edit Columns button is clicked', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <FilePreviewTab
+        fileMetaData={mockFileMetaData}
+        destinationConfig={mockDestinationConfig}
+        onDestinationConfigChange={mockOnDestinationConfigChange}
+      />
+    );
+
+    await waitFor(() => {
+      const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
+      expect(editColumnsButton).toBeInTheDocument();
+      expect(editColumnsButton).toBeVisible();
+    });
+
+    const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
+
+    await user.click(editColumnsButton);
+
+    await waitFor(() => {
+      const modal = screen.getByRole('dialog');
+      expect(modal).toBeInTheDocument();
+      expect(modal).toBeVisible();
+
+      expect(modal).toHaveTextContent('Edit Columns');
+
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
+    });
+  });
+
+  it('should close edit columns modal when Cancel button is clicked', async () => {
+    const user = userEvent.setup();
+
     render(
       <FilePreviewTab
         fileMetaData={mockFileMetaData}
@@ -134,11 +162,17 @@ describe('FilePreviewTab', () => {
     );
 
     const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
-
-    await userEvent.click(editColumnsButton);
+    await user.click(editColumnsButton);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    const cancelButton = screen.getByRole('button', { name: 'Cancel' });
+    await user.click(cancelButton);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
 });
