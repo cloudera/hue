@@ -95,8 +95,10 @@ const EditColumnsModal = ({
     );
   }, [columns, sample]);
 
-  const handleChange = (idx: number, field: keyof EditableRow, value: string) => {
-    setEditableRows(rows => rows.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
+  const handleChange = (rowIndex: number, field: keyof EditableRow, value: string) => {
+    setEditableRows(rows =>
+      rows.map((row, i) => (i === rowIndex ? { ...row, [field]: value } : row))
+    );
   };
 
   const handleDone = async () => {
@@ -114,12 +116,12 @@ const EditColumnsModal = ({
     {
       title: t('Title'),
       dataIndex: 'title',
-      render: (text: string, _: EditableRow, idx: number) => (
+      render: (text: string, _: EditableRow, rowIndex: number) => (
         <Input
           value={text}
           className="hue-importer-edit-columns-modal__input-title"
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            handleChange(idx, 'title', e.target.value)
+            handleChange(rowIndex, 'title', e.target.value)
           }
           aria-label={t('Column title')}
         />
@@ -128,10 +130,10 @@ const EditColumnsModal = ({
     {
       title: t('Type'),
       dataIndex: 'type',
-      render: (value: string, _: EditableRow, idx: number) => (
+      render: (value: string, _: EditableRow, rowIndex: number) => (
         <Select
           value={value}
-          onChange={(val: string) => handleChange(idx, 'type', val)}
+          onChange={(val: string) => handleChange(rowIndex, 'type', val)}
           className="hue-importer-edit-columns-modal__type-select"
           getPopupContainer={triggerNode => triggerNode.parentNode}
           disabled={sqlTypesLoading || sqlTypes.length === 0}
@@ -149,11 +151,11 @@ const EditColumnsModal = ({
     {
       title: t('Comment'),
       dataIndex: 'comment',
-      render: (text: string, _: EditableRow, idx: number) => (
+      render: (text: string, _: EditableRow, rowIndex: number) => (
         <textarea
           value={text}
           onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-            handleChange(idx, 'comment', e.target.value)
+            handleChange(rowIndex, 'comment', e.target.value)
           }
           rows={2}
           aria-label={t('Column comment')}
