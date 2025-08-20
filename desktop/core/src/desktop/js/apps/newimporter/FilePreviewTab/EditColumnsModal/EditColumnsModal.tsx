@@ -46,6 +46,7 @@ interface EditColumnsModalProps {
   columns: Column[];
   setColumns: (cols: Column[]) => void;
   sample?: ImporterTableData;
+  sqlDialect?: string;
 }
 
 const EditColumnsModal = ({
@@ -53,7 +54,8 @@ const EditColumnsModal = ({
   closeModal,
   columns,
   setColumns,
-  sample
+  sample,
+  sqlDialect = 'hive'
 }: EditColumnsModalProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
   const [editableRows, setEditableRows] = useState<EditableRow[]>([]);
@@ -62,8 +64,7 @@ const EditColumnsModal = ({
     data: sqlTypesData,
     loading: sqlTypesLoading,
     error: sqlTypesError
-    //TODO: Make sql_dialect dynamic in future
-  } = useLoadData<string[]>(`${SQL_TYPE_MAPPING_API_URL}?sql_dialect=hive`);
+  } = useLoadData<string[]>(`${SQL_TYPE_MAPPING_API_URL}?sql_dialect=${sqlDialect}`);
 
   const sqlTypes = useMemo(() => {
     if (sqlTypesData && Array.isArray(sqlTypesData) && sqlTypesData.length > 0) {

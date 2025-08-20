@@ -41,6 +41,7 @@ describe('EditColumnsModal', () => {
         columns={columns}
         setColumns={jest.fn()}
         sample={sample}
+        sqlDialect="hive"
       />
     );
 
@@ -66,6 +67,7 @@ describe('EditColumnsModal', () => {
         columns={columns}
         setColumns={setColumns}
         sample={sample}
+        sqlDialect="hive"
       />
     );
 
