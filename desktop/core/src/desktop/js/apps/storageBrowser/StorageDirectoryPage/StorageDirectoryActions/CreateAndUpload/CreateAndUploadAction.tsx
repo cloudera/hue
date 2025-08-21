@@ -16,16 +16,30 @@
 
 import React, { useState, useRef } from 'react';
 import { Dropdown } from 'antd';
-import { MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
-
+import { ItemType, MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
+import Modal from 'cuix/dist/components/Modal';
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
 import ImportIcon from '@cloudera/cuix-core/icons/react/ImportIcon';
+import BucketIcon from '@cloudera/cuix-core/icons/react/BucketIcon';
+import DatabaseIcon from '@cloudera/cuix-core/icons/react/DatabaseIcon';
+import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 import { PrimaryButton } from 'cuix/dist/components/Button';
 
 import { i18nReact } from '../../../../../utils/i18nReact';
 import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../../api';
+import {
+  isOFS,
+  isABFSRoot,
+  isGSRoot,
+  isOFSServiceID,
+  isOFSVol,
+  isS3Root,
+  isABFS,
+  isGS,
+  isS3
+} from '../../../../../utils/storageBrowserUtils';
 import { FileStats } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import InputModal from '../../../../../reactComponents/InputModal/InputModal';
@@ -39,10 +53,18 @@ interface CreateAndUploadActionProps {
   onActionError: (error: Error) => void;
 }
 
+interface CreateInputModalTitleAndLabel {
+  title: string;
+  label: string;
+}
+
 enum ActionType {
   createFile = 'createFile',
   createFolder = 'createFolder',
-  uploadFile = 'uploadFile'
+  uploadFile = 'uploadFile',
+  createBucket = 'createBucket',
+  createVolume = 'createVolume',
+  createFileSystem = 'createFileSystem'
 }
 
 const CreateAndUploadAction = ({
@@ -82,6 +104,123 @@ const CreateAndUploadAction = ({
     }
     // Reset the input value so the same file can be selected again
     e.target.value = '';
+  }
+  
+  const getCreateActionChildren = (): ItemType[] => {
+    const fileActions: ItemType[] = [
+      {
+        icon: <FileIcon />,
+        key: ActionType.createFile,
+        label: t('New File'),
+        onClick: onActionClick(ActionType.createFile)
+      },
+      {
+        icon: <FolderIcon />,
+        key: ActionType.createFolder,
+        label: t('New Folder'),
+        onClick: onActionClick(ActionType.createFolder)
+      }
+    ];
+
+    if (isS3(currentPath)) {
+      return isS3Root(currentPath)
+        ? [
+            {
+              icon: <BucketIcon />,
+              key: ActionType.createBucket,
+              label: t('New Bucket'),
+              onClick: onActionClick(ActionType.createBucket)
+            }
+          ]
+        : fileActions;
+    }
+
+    if (isGS(currentPath)) {
+      return isGSRoot(currentPath)
+        ? [
+            {
+              icon: <BucketIcon />,
+              key: ActionType.createBucket,
+              label: t('New Bucket'),
+              onClick: onActionClick(ActionType.createBucket)
+            }
+          ]
+        : fileActions;
+    }
+
+    if (isABFS(currentPath)) {
+      return isABFSRoot(currentPath)
+        ? [
+            {
+              icon: <DataBrowserIcon />,
+              key: ActionType.createFileSystem,
+              label: t('New File System'),
+              onClick: onActionClick(ActionType.createFileSystem)
+            }
+          ]
+        : fileActions;
+    }
+
+    if (isOFS(currentPath)) {
+      if (isOFSServiceID(currentPath)) {
+        return [
+          {
+            icon: <DatabaseIcon />,
+            key: ActionType.createVolume,
+            label: t('New Volume'),
+            onClick: onActionClick(ActionType.createVolume)
+          }
+        ];
+      }
+      if (isOFSVol(currentPath)) {
+        return [
+          {
+            icon: <BucketIcon />,
+            key: ActionType.createBucket,
+            label: t('New Bucket'),
+            onClick: onActionClick(ActionType.createBucket)
+          }
+        ];
+      }
+      return fileActions;
+    }
+
+    return fileActions;
+  };
+
+  const getInputModalTitleAndLabel = (action: ActionType): CreateInputModalTitleAndLabel => {
+    switch (action) {
+      case ActionType.createFolder:
+        return {
+          title: t('Create Folder'),
+          label: t('Folder name')
+        };
+      case ActionType.createFile:
+        return {
+          title: t('Create File'),
+          label: t('File name')
+        };
+      case ActionType.createBucket:
+        return {
+          title: t('Create Bucket'),
+          label: t('Bucket name')
+        };
+      case ActionType.createVolume:
+        return {
+          title: t('Create Volume'),
+          label: t('Volume name')
+        };
+      case ActionType.createFileSystem:
+        return {
+          title: t('Create File System'),
+          label: t('File system name')
+        };
+      default:
+        return {
+          title: t('Create'),
+          label: t('Name')
+        };
+    }
   };
 
   const newActionsMenuItems: MenuItemGroupType[] = [
@@ -89,20 +228,7 @@ const CreateAndUploadAction = ({
       key: 'create',
       type: 'group',
       label: t('CREATE'),
-      children: [
-        {
-          icon: <FileIcon />,
-          key: ActionType.createFile,
-          label: t('New File'),
-          onClick: onActionClick(ActionType.createFile)
-        },
-        {
-          icon: <FolderIcon />,
-          key: ActionType.createFolder,
-          label: t('New Folder'),
-          onClick: onActionClick(ActionType.createFolder)
-        }
-      ]
+      children: getCreateActionChildren()
     },
     {
       key: 'upload',
@@ -122,7 +248,10 @@ const CreateAndUploadAction = ({
   const handleCreate = (name: string | number) => {
     const url = {
       [ActionType.createFile]: CREATE_FILE_API_URL,
-      [ActionType.createFolder]: CREATE_DIRECTORY_API_URL
+      [ActionType.createFolder]: CREATE_DIRECTORY_API_URL,
+      [ActionType.createBucket]: CREATE_DIRECTORY_API_URL,
+      [ActionType.createFileSystem]: CREATE_DIRECTORY_API_URL,
+      [ActionType.createVolume]: CREATE_DIRECTORY_API_URL
     }[selectedAction ?? ''];
 
     if (!url) {
@@ -146,14 +275,11 @@ const CreateAndUploadAction = ({
           <DropDownIcon />
         </PrimaryButton>
       </Dropdown>
-
-      {(selectedAction === ActionType.createFolder || selectedAction === ActionType.createFile) && (
+      {selectedAction !== undefined && (
         <InputModal
           showModal={true}
-          title={selectedAction === ActionType.createFolder ? t('Create Folder') : t('Create File')}
-          inputLabel={
-            selectedAction === ActionType.createFolder ? t('Folder name') : t('File name')
-          }
+          title={getInputModalTitleAndLabel(selectedAction).title}
+          inputLabel={getInputModalTitleAndLabel(selectedAction).label}
           submitText={t('Create')}
           onSubmit={handleCreate}
           onClose={onModalClose}
