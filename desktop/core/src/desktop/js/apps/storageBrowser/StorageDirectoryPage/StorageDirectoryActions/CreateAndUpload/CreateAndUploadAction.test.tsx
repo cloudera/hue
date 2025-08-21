@@ -24,6 +24,8 @@ describe('CreateAndUploadAction', () => {
   const mockFilesUpload = jest.fn();
 
   beforeEach(() => {
+    jest.clearAllMocks();
+
     render(
       <CreateAndUploadAction
         currentPath={currentPath}
@@ -35,7 +37,7 @@ describe('CreateAndUploadAction', () => {
   });
 
   it('should render the dropdown with actions', async () => {
-    const newButton = screen.getByText('New');
+    const newButton = screen.getByRole('button', { name: 'New' });
     expect(newButton).toBeInTheDocument();
 
     await act(async () => fireEvent.click(newButton));
@@ -46,75 +48,85 @@ describe('CreateAndUploadAction', () => {
   });
 
   it('should open the folder creation modal when "New Folder" is clicked', async () => {
-    const newButton = screen.getByText('New');
+    const newButton = screen.getByRole('button', { name: 'New' });
     await act(async () => fireEvent.click(newButton));
 
-    const newFolderButton = screen.getByText('New Folder');
+    const newFolderButton = screen.getByRole('menuitem', { name: 'New Folder' });
     await act(async () => fireEvent.click(newFolderButton));
 
-    expect(screen.getByText('Create Folder')).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Create Folder' })).toBeInTheDocument();
   });
 
   it('should open the file creation modal when "New File" is clicked', async () => {
-    const newButton = screen.getByText('New');
+    const newButton = screen.getByRole('button', { name: 'New' });
     await act(async () => fireEvent.click(newButton));
 
-    const newFileButton = screen.getByText('New File');
+    const newFileButton = screen.getByRole('menuitem', { name: 'New File' });
     await act(async () => fireEvent.click(newFileButton));
 
-    expect(screen.getByText('Create File')).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Create File' })).toBeInTheDocument();
   });
 
-  it('should open the upload file modal when "New Upload" is clicked', async () => {
-    const newButton = screen.getByText('New');
-    await act(async () => fireEvent.click(newButton));
+  it('should render hidden file input for upload functionality', async () => {
+    const fileInput = document.querySelector('input[type="file"]');
+    expect(fileInput).toBeInTheDocument();
+    expect(fileInput).toHaveAttribute('hidden');
+    expect(fileInput).toHaveAttribute('multiple');
+  });
 
-    const newUploadButton = screen.getByText('Upload File');
-    fireEvent.click(newUploadButton);
+  it('should handle file selection and call onFilesUpload', async () => {
+    const fileInput = document.querySelector('input[type="file"]');
+    expect(fileInput).toBeInTheDocument();
 
-    // Check if the upload modal is opened
-    expect(screen.getByText('Upload a File')).toBeInTheDocument();
+    const file1 = new File(['test content 1'], 'test1.txt', { type: 'text/plain' });
+    const file2 = new File(['test content 2'], 'test2.txt', { type: 'text/plain' });
+
+    fireEvent.change(fileInput!, {
+      target: { files: [file1, file2] }
+    });
+
+    expect(mockFilesUpload).toHaveBeenCalledWith([file1, file2]);
   });
 
   it('should call the correct API for creating a folder', async () => {
-    const newButton = screen.getByText('New');
+    const newButton = screen.getByRole('button', { name: 'New' });
     await act(async () => fireEvent.click(newButton));
 
-    const newFolderButton = screen.getByText('New Folder');
+    const newFolderButton = screen.getByRole('menuitem', { name: 'New Folder' });
     await act(async () => fireEvent.click(newFolderButton));
 
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'Test Folder' } });
 
-    const createButton = screen.getByText('Create');
+    const createButton = screen.getByRole('button', { name: 'Create' });
     fireEvent.click(createButton);
 
     await waitFor(() => {
       expect(mockSave).toHaveBeenCalledWith(
         { path: currentPath, name: 'Test Folder' },
-        { url: CREATE_DIRECTORY_API_URL } // This URL is assumed from the code.
+        { url: CREATE_DIRECTORY_API_URL }
       );
     });
   });
 
   it('should call the correct API for creating a file', async () => {
-    const newButton = screen.getByText('New');
+    const newButton = screen.getByRole('button', { name: 'New' });
     await act(async () => fireEvent.click(newButton));
 
-    const newFileButton = screen.getByText('New File');
+    const newFileButton = screen.getByRole('menuitem', { name: 'New File' });
     await act(async () => fireEvent.click(newFileButton));
 
     // Simulate file name submission
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'Test File' } });
 
-    const createButton = screen.getByText('Create');
+    const createButton = screen.getByRole('button', { name: 'Create' });
     fireEvent.click(createButton);
 
     await waitFor(() => {
       expect(mockSave).toHaveBeenCalledWith(
         { path: currentPath, name: 'Test File' },
-        { url: CREATE_FILE_API_URL } // This URL is assumed from the code.
+        { url: CREATE_FILE_API_URL }
       );
     });
   });

@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Dropdown } from 'antd';
 import { MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
-import Modal from 'cuix/dist/components/Modal';
+
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
@@ -29,7 +29,6 @@ import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../../api';
 import { FileStats } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import InputModal from '../../../../../reactComponents/InputModal/InputModal';
-import DragAndDrop from '../../../../../reactComponents/DragAndDrop/DragAndDrop';
 
 import './CreateAndUploadAction.scss';
 
@@ -53,16 +52,12 @@ const CreateAndUploadAction = ({
   onActionError
 }: CreateAndUploadActionProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedAction, setSelectedAction] = useState<ActionType>();
 
   const onModalClose = () => {
     setSelectedAction(undefined);
-  };
-
-  const onUpload = (files: File[]) => {
-    onModalClose();
-    onFilesUpload(files);
   };
 
   const onApiSuccess = () => {
@@ -78,6 +73,15 @@ const CreateAndUploadAction = ({
 
   const onActionClick = (action: ActionType) => () => {
     setSelectedAction(action);
+  };
+
+  const onFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const filesArray = Array.from(e.target.files);
+      onFilesUpload(filesArray);
+    }
+    // Reset the input value so the same file can be selected again
+    e.target.value = '';
   };
 
   const newActionsMenuItems: MenuItemGroupType[] = [
@@ -109,7 +113,7 @@ const CreateAndUploadAction = ({
           icon: <ImportIcon />,
           key: ActionType.uploadFile,
           label: t('Upload File'),
-          onClick: onActionClick(ActionType.uploadFile)
+          onClick: () => fileInputRef.current?.click()
         }
       ]
     }
@@ -142,6 +146,7 @@ const CreateAndUploadAction = ({
           <DropDownIcon />
         </PrimaryButton>
       </Dropdown>
+
       {(selectedAction === ActionType.createFolder || selectedAction === ActionType.createFile) && (
         <InputModal
           showModal={true}
@@ -156,14 +161,15 @@ const CreateAndUploadAction = ({
           error={error}
         />
       )}
-      <Modal
-        onCancel={onModalClose}
-        className="hue-file-upload-modal cuix antd"
-        open={selectedAction === ActionType.uploadFile}
-        title={t('Upload a File')}
-      >
-        <DragAndDrop onDrop={onUpload} />
-      </Modal>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        id="file-upload-input"
+        hidden
+        multiple
+        onChange={onFileUpload}
+      />
     </>
   );
 };
