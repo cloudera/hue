@@ -109,7 +109,7 @@ describe('LocalFileUploadOption', () => {
   it('should upload file successfully and sets metadata', () => {
     mockSave.mockImplementation((_data, { onSuccess }) => {
       onSuccess({
-        file_path: '/tmp/data.csv',
+        filePath: '/tmp/data.csv',
         fileName: 'data.csv',
         source: ImporterFileSource.LOCAL
       });

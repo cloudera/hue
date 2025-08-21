@@ -305,12 +305,12 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should prioritize qsEncodeData from saveOptions.postOptions', async () => {
+  it('should prioritize qsEncodeData from saveOptions.options', async () => {
     const payload = new FormData();
 
     const { result } = renderHook(() =>
       useSaveData(mockUrl, {
-        postOptions: { qsEncodeData: true }
+        options: { qsEncodeData: true }
       })
     );
 
@@ -412,6 +412,53 @@ describe('useSaveData', () => {
       );
       expect(result.current.data).toEqual(mockData);
       expect(result.current.loading).toBe(false);
+    });
+  });
+
+  it('should transform response keys to camelCase by default', async () => {
+    const mockRawData = { product_id: 1, product_name: 'Hue' };
+    const mockCamelCaseData = { productId: 1, productName: 'Hue' };
+    mockSendApiRequest.mockResolvedValue(mockRawData);
+
+    const { result } = renderHook(() => useSaveData(mockUrl));
+
+    act(() => {
+      result.current.save(mockBody);
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockCamelCaseData);
+    });
+  });
+
+  it('should transform response keys to camelCase when transformKeys is "camelCase"', async () => {
+    const mockRawData = { product_id: 1, product_name: 'Hue' };
+    const mockCamelCaseData = { productId: 1, productName: 'Hue' };
+    mockSendApiRequest.mockResolvedValue(mockRawData);
+
+    const { result } = renderHook(() => useSaveData(mockUrl, { transformKeys: 'camelCase' }));
+
+    act(() => {
+      result.current.save(mockBody);
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockCamelCaseData);
+    });
+  });
+
+  it('should not transform response keys when transformKeys is "none"', async () => {
+    const mockRawData = { product_id: 1, product_name: 'Hue' };
+    mockSendApiRequest.mockResolvedValue(mockRawData);
+
+    const { result } = renderHook(() => useSaveData(mockUrl, { transformKeys: 'none' }));
+
+    act(() => {
+      result.current.save(mockBody);
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockRawData);
     });
   });
 });

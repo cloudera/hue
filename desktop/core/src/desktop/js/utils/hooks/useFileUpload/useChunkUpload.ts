@@ -136,7 +136,7 @@ const useChunkUpload = ({
       url,
       onSuccess: onChunkUploadSuccess(chunk),
       onError: error => updateFileVariables(chunk.uuid, { status: FileStatus.Failed, error }),
-      postOptions: { onUploadProgress: onUploadProgress(chunk) }
+      options: { onUploadProgress: onUploadProgress(chunk) }
     });
   };
 

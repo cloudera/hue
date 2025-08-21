@@ -18,13 +18,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
 import { ApiFetchOptions, HttpMethod, sendApiRequest } from '../../../api/utils';
 import { isJSON } from '../../jsonUtils';
+import { convertKeysToCamelCase } from '../../../utils/string/changeCasing';
 
 interface saveOptions<T, E> {
   url?: string;
   method?: HttpMethod;
   onSuccess?: (data: T) => void;
   onError?: (error: AxiosError) => void;
-  postOptions?: ApiFetchOptions<T, E>;
+  options?: ApiFetchOptions<T, E>;
+  transformKeys?: 'camelCase' | 'none';
 }
 
 export interface Options<T, E> extends saveOptions<T, E> {
@@ -52,6 +54,18 @@ const useSaveData = <T, U = unknown, E = string>(
     ignoreSuccessErrors: true
   };
 
+  const transformResponse = (data: T): T => {
+    if (options?.transformKeys === 'none') {
+      return data;
+    }
+
+    if (data && (options?.transformKeys === undefined || options?.transformKeys === 'camelCase')) {
+      return convertKeysToCamelCase<T>(data);
+    }
+
+    return data;
+  };
+
   const saveData = useCallback(
     async (body: U, saveOptions?: saveOptions<T, E>) => {
       // Avoid sending data if the skip option is true
@@ -66,21 +80,21 @@ const useSaveData = <T, U = unknown, E = string>(
       const requestOptions = {
         ...requestOptionsDefault,
         qsEncodeData: body instanceof FormData || isJSON(body) ? false : true,
-        ...localOptions?.postOptions,
-        ...saveOptions?.postOptions
+        ...localOptions?.options,
+        ...saveOptions?.options
       };
 
       const method = saveOptions?.method ?? localOptions?.method ?? HttpMethod.POST;
 
       try {
         const response = await sendApiRequest(method, apiUrl, body, requestOptions);
-
-        setData(response);
+        const transformedResponse = transformResponse(response);
+        setData(transformedResponse);
         if (saveOptions?.onSuccess) {
-          saveOptions.onSuccess(response);
+          saveOptions.onSuccess(transformedResponse);
         }
         if (localOptions?.onSuccess) {
-          localOptions.onSuccess(response);
+          localOptions.onSuccess(transformedResponse);
         }
       } catch (error) {
         setError(error as E);
