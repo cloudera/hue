@@ -1,35 +1,7 @@
-// Mock jQuery at the top level before any imports
-const mockSelect2 = jest.fn().mockReturnThis();
-const mockOn = jest.fn().mockReturnThis();
-const mockData = jest.fn().mockReturnValue({
-  search: {
-    prop: jest.fn().mockReturnThis(),
-    attr: jest.fn().mockReturnThis(),
-    wrap: jest.fn().mockReturnThis()
-  }
-});
-
-const mockJQueryObject = {
-  select2: mockSelect2,
-  on: mockOn,
-  data: mockData
-};
-
-// Mock jQuery globally
-global.$ = jest.fn(() => mockJQueryObject);
-
 import * as ko from 'knockout';
-
-// Import the binding after mocking jQuery
-import './ko.select2';
 import { applySelect2SecurityFix } from './ko.select2';
 
 describe('ko.select2.js - XSS Security Fix', () => {
-
-  beforeEach(() => {
-    // Clear all mocks before each test
-    jest.clearAllMocks();
-  });
 
   it('should apply security fix that sanitizes HTML in formatResult function', () => {
     // Test the exported security fix function directly
@@ -74,7 +46,7 @@ describe('ko.select2.js - XSS Security Fix', () => {
     };
     
     // Apply the security fix
-    applySelect2SecurityFix(options)
+    applySelect2SecurityFix(options);
     
     const formatResult = options.formatResult;
     
