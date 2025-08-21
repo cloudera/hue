@@ -37,7 +37,7 @@ function install_build_dependencies() {
   local DOCKEROS=${1:-"ubuntu22"}
   echo "Installing build dependencies..."
   case "${DOCKEROS}" in
-      ubuntu22|ubuntu20|ubuntu18)
+      ubuntu24|ubuntu22|ubuntu20|ubuntu18)
           sudo -- sh -c 'apt update && \
             apt install -y \
             build-essential \
@@ -81,7 +81,18 @@ function install_sqlite3() {
 
   if [[ $sqlite_installed -eq 0 ]]; then
     echo "Installing sqlite3..."
-    sudo LD_LIBRARY_PATH=${LD_LIBRARY_PATH} PATH=${PATH} install_prefix=${install_prefix} \
+    # Fix curl library conflicts by prioritizing system libraries
+    # Detect system library path based on architecture and OS
+    local SYSTEM_LIB_PATH=""
+    if [[ -d "/usr/lib/$(uname -m)-linux-gnu" ]]; then
+      SYSTEM_LIB_PATH="/usr/lib/$(uname -m)-linux-gnu"
+    elif [[ -d "/usr/lib64" ]]; then
+      SYSTEM_LIB_PATH="/usr/lib64"
+    else
+      SYSTEM_LIB_PATH="/usr/lib"
+    fi
+    
+    sudo LD_LIBRARY_PATH="${SYSTEM_LIB_PATH}:${LD_LIBRARY_PATH}" PATH=${PATH} install_prefix=${install_prefix} \
       -- sh -c 'cd /tmp && \
     mkdir -p ${install_prefix} && \
     curl -o sqlite-autoconf-3350500.tar.gz https://www.sqlite.org/2021/sqlite-autoconf-3350500.tar.gz && \
@@ -681,6 +692,52 @@ function ubuntu22_install() {
     unset PYTHON38_PATH
     if [[ -z ${PYTHON38_PATH+x} ]]; then
       install_sqlite_python "$os" "$REQ_PYTHON38"
+    fi
+  fi
+}
+
+function ubuntu24_install() {
+  local os=${1:-"ubuntu24"}
+
+  if [[ $FORCEINSTALL -eq 1 ]]; then
+    sudo -- sh -c 'apt update'
+    # pre-req install
+    sudo -- sh -c 'DEBIAN_FRONTEND=noninteractive apt -qq -y install  \
+        krb5-user \
+        krb5-kdc \
+        krb5-config \
+        libkrb5-dev'
+    sudo -- sh -c "apt -y install \
+        ldap-utils \
+        libxmlsec1 \
+        libxmlsec1-openssl \
+        libpq-dev \
+        netcat-openbsd \
+        nmap \
+        openssl \
+        sudo \
+        tar \
+        util-linux"
+    # Ensure pg_config is available
+    export PG_CONFIG=$(which pg_config)
+    if [ -z "$PG_CONFIG" ]; then
+      echo "Error: pg_config not found. Ensure PostgreSQL development libraries are installed."
+      exit 1
+    fi
+    echo "PG_CONFIG is set to $PG_CONFIG"
+    # MySQLdb install
+    # It is pre-installed
+
+    # NODEJS 20 install
+    # Force curl to use system libraries to avoid conflicts from /usr/local/lib
+    sudo -- sh -c 'export LD_LIBRARY_PATH="/usr/lib/$(uname -m)-linux-gnu:/usr/lib64:/usr/lib:$LD_LIBRARY_PATH"; \
+      apt-get install -y curl && \
+      cd /tmp && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+      apt-get install -y nodejs'
+
+    unset PYTHON311_PATH
+    if [[ -z ${PYTHON311_PATH+x} ]]; then
+      install_sqlite_python "$os" "$REQ_PYTHON311"
     fi
   fi
 }
