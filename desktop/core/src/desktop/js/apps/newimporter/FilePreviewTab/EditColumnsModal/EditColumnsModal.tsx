@@ -175,7 +175,7 @@ const EditColumnsModal = ({
       onOk={handleDone}
       className="hue-importer-edit-columns-modal"
     >
-      <LoadingErrorWrapper loading={sqlTypesLoading} errors={errors}>
+      <LoadingErrorWrapper loading={sqlTypesLoading} errors={errors} hideOnError={true}>
         <Table columns={modalColumns} dataSource={editableRows} pagination={false} />
       </LoadingErrorWrapper>
     </Modal>
