@@ -49,9 +49,7 @@ const TrashActions = ({
   const [selectedAction, setSelectedAction] = useState<Actions | undefined>();
 
   const { save, loading } = useSaveData(undefined, {
-    onSuccess: () => {
-      setIsModalOpen(false);
-    },
+    onSuccess: () => setIsModalOpen(false),
     onError: onActionError
   });
 
