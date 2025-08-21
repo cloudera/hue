@@ -16,6 +16,10 @@
 
 // see https://github.com/select2/select2/issues/3992 for the patch, hopefully it's gonna be fixed in a next release of Select2
 
+// Note on Cross-site scripting (XSS)
+// This legacy version of select2 is only used via the Knockout.js binding in ko.select2.js
+// where a patch for XSS is applied. 
+
 /*!
  * Select2 4.0.3
  * https://select2.github.io
