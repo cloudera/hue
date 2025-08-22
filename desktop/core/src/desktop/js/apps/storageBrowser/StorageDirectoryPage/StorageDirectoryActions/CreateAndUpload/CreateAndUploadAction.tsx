@@ -17,7 +17,6 @@
 import React, { useState, useRef } from 'react';
 import { Dropdown } from 'antd';
 import { ItemType, MenuItemGroupType } from 'antd/lib/menu/hooks/useItems';
-import Modal from 'cuix/dist/components/Modal';
 import FolderIcon from '@cloudera/cuix-core/icons/react/ProjectIcon';
 import FileIcon from '@cloudera/cuix-core/icons/react/DocumentationIcon';
 import DropDownIcon from '@cloudera/cuix-core/icons/react/DropdownIcon';
@@ -70,6 +69,23 @@ type ActionItem = {
     label: string;
   };
   api?: string;
+  visible: (path: string) => boolean;
+};
+
+const canShowFileFolderActions = (path: string): boolean => {
+  if (isS3(path)) {
+    return !isS3Root(path);
+  }
+  if (isGS(path)) {
+    return !isGSRoot(path);
+  }
+  if (isABFS(path)) {
+    return !isABFSRoot(path);
+  }
+  if (isOFS(path)) {
+    return !isOFSServiceID(path) && !isOFSVol(path);
+  }
+  return true;
 };
 
 const actionConfig: Record<ActionType, ActionItem> = {
@@ -77,35 +93,41 @@ const actionConfig: Record<ActionType, ActionItem> = {
     icon: <FileIcon />,
     label: 'New File',
     modal: { title: 'Create File', label: 'File name' },
-    api: CREATE_FILE_API_URL
+    api: CREATE_FILE_API_URL,
+    visible: path => canShowFileFolderActions(path)
   },
   [ActionType.createFolder]: {
     icon: <FolderIcon />,
     label: 'New Folder',
     modal: { title: 'Create Folder', label: 'Folder name' },
-    api: CREATE_DIRECTORY_API_URL
+    api: CREATE_DIRECTORY_API_URL,
+    visible: path => canShowFileFolderActions(path)
   },
   [ActionType.createBucket]: {
     icon: <BucketIcon />,
     label: 'New Bucket',
     modal: { title: 'Create Bucket', label: 'Bucket name' },
-    api: CREATE_DIRECTORY_API_URL
+    api: CREATE_DIRECTORY_API_URL,
+    visible: path => isS3Root(path) || isGSRoot(path) || isOFSVol(path)
   },
   [ActionType.createVolume]: {
     icon: <DatabaseIcon />,
     label: 'New Volume',
     modal: { title: 'Create Volume', label: 'Volume name' },
-    api: CREATE_DIRECTORY_API_URL
+    api: CREATE_DIRECTORY_API_URL,
+    visible: path => isOFSServiceID(path)
   },
   [ActionType.createFileSystem]: {
     icon: <DataBrowserIcon />,
     label: 'New File System',
     modal: { title: 'Create File System', label: 'File system name' },
-    api: CREATE_DIRECTORY_API_URL
+    api: CREATE_DIRECTORY_API_URL,
+    visible: path => isABFSRoot(path)
   },
   [ActionType.uploadFile]: {
     icon: <ImportIcon />,
-    label: 'Upload File'
+    label: 'Upload File',
+    visible: path => canShowFileFolderActions(path)
   }
 };
 
@@ -146,103 +168,42 @@ const CreateAndUploadAction = ({
     }
     // Reset the input value so the same file can be selected again
     e.target.value = '';
-  }
-  
+  };
+
   const getCreateActionChildren = (): ItemType[] => {
-    const fileActions = [ActionType.createFile, ActionType.createFolder].map(a => ({
-      icon: actionConfig[a].icon,
-      key: a,
-      label: t(actionConfig[a].label),
-      onClick: onActionClick(a)
-    }));
-
-    if (isS3(currentPath)) {
-      return isS3Root(currentPath)
-        ? [
-            {
-              icon: actionConfig[ActionType.createBucket].icon,
-              key: ActionType.createBucket,
-              label: t(actionConfig[ActionType.createBucket].label),
-              onClick: onActionClick(ActionType.createBucket)
-            }
-          ]
-        : fileActions;
-    }
-
-    if (isGS(currentPath)) {
-      return isGSRoot(currentPath)
-        ? [
-            {
-              icon: actionConfig[ActionType.createBucket].icon,
-              key: ActionType.createBucket,
-              label: t(actionConfig[ActionType.createBucket].label),
-              onClick: onActionClick(ActionType.createBucket)
-            }
-          ]
-        : fileActions;
-    }
-
-    if (isABFS(currentPath)) {
-      return isABFSRoot(currentPath)
-        ? [
-            {
-              icon: actionConfig[ActionType.createFileSystem].icon,
-              key: ActionType.createFileSystem,
-              label: t(actionConfig[ActionType.createFileSystem].label),
-              onClick: onActionClick(ActionType.createFileSystem)
-            }
-          ]
-        : fileActions;
-    }
-
-    if (isOFS(currentPath)) {
-      if (isOFSServiceID(currentPath)) {
-        return [
-          {
-            icon: actionConfig[ActionType.createVolume].icon,
-            key: ActionType.createVolume,
-            label: t(actionConfig[ActionType.createVolume].label),
-            onClick: onActionClick(ActionType.createVolume)
-          }
-        ];
-      }
-      if (isOFSVol(currentPath)) {
-        return [
-          {
-            icon: actionConfig[ActionType.createBucket].icon,
-            key: ActionType.createBucket,
-            label: t(actionConfig[ActionType.createBucket].label),
-            onClick: onActionClick(ActionType.createBucket)
-          }
-        ];
-      }
-      return fileActions;
-    }
-
-    return fileActions;
+    return (Object.entries(actionConfig) as [ActionType, (typeof actionConfig)[ActionType]][])
+      .filter(([action, cfg]) => action !== ActionType.uploadFile && cfg.visible(currentPath))
+      .map(([action, cfg]) => ({
+        icon: cfg.icon,
+        key: action,
+        label: t(cfg.label),
+        onClick: onActionClick(action)
+      }));
   };
 
   const newActionsMenuItems: MenuItemGroupType[] = [
     {
       key: 'create',
-      type: 'group',
+      type: 'group' as const,
       label: t('CREATE'),
       children: getCreateActionChildren()
     },
     {
       key: 'upload',
-      type: 'group',
+      type: 'group' as const,
       label: t('UPLOAD'),
-      children: [
-        {
-          icon: <ImportIcon />,
-          key: ActionType.uploadFile,
-          label: t('Upload File'),
-          onClick: () => fileInputRef.current?.click()
-        }
-      ]
+      children: actionConfig[ActionType.uploadFile].visible(currentPath)
+        ? [
+            {
+              icon: <ImportIcon />,
+              key: ActionType.uploadFile,
+              label: t('Upload File'),
+              onClick: () => fileInputRef.current?.click()
+            }
+          ]
+        : []
     }
-  ];
+  ].filter(group => group.children && group.children.length > 0);
 
   const handleCreate = (name: string | number) => {
     const url = selectedAction ? actionConfig[selectedAction]?.api : undefined;

@@ -15,7 +15,8 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import CreateAndUploadAction from './CreateAndUploadAction';
 import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../../api';
@@ -47,13 +48,8 @@ describe('CreateAndUploadAction', () => {
       />
     );
 
-  const openDropdown = async () => {
-    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'New' })));
-  };
-
-  const clickMenuOption = async (label: string) => {
-    await openDropdown();
-    await act(async () => fireEvent.click(screen.getByText(label)));
+  const openDropdown = async user => {
+    await user.click(screen.getByRole('button', { name: 'New' }));
   };
 
   beforeEach(() => {
@@ -63,6 +59,11 @@ describe('CreateAndUploadAction', () => {
     jest.spyOn(storageUtils, 'isABFS').mockReturnValue(false);
     jest.spyOn(storageUtils, 'isOFS').mockReturnValue(false);
   });
+
+  const clickMenuOption = async (label: string, user) => {
+    await openDropdown(user);
+    await user.click(screen.getByRole('menuitem', { name: label }));
+  };
 
   afterEach(() => {
     cleanup();
@@ -75,8 +76,9 @@ describe('CreateAndUploadAction', () => {
   });
 
   it('should render the dropdown with CREATE and UPLOAD group actions', async () => {
+    const user = userEvent.setup();
     setup();
-    await openDropdown();
+    await openDropdown(user);
     // Check that the "Create" and "Upload" groups are in the dropdown
     expect(screen.getByText('CREATE')).toBeInTheDocument();
     expect(screen.getByText('UPLOAD')).toBeInTheDocument();
@@ -87,15 +89,16 @@ describe('CreateAndUploadAction', () => {
       { label: 'New Folder', modalTitle: 'Create Folder', api: CREATE_DIRECTORY_API_URL },
       { label: 'New File', modalTitle: 'Create File', api: CREATE_FILE_API_URL }
     ])('opens ${label} modal and calls correct API', async ({ label, modalTitle, api }) => {
+      const user = userEvent.setup();
       setup();
-      await clickMenuOption(label);
+      await clickMenuOption(label, user);
 
       expect(screen.getByText(modalTitle)).toBeInTheDocument();
 
       const input = screen.getByRole('textbox');
       fireEvent.change(input, { target: { value: `Test ${label}` } });
 
-      fireEvent.click(screen.getByText('Create'));
+      fireEvent.click(screen.getByRole('button', { name: 'Create' }));
 
       await waitFor(() => {
         expect(mockSave).toHaveBeenCalledWith(
@@ -107,39 +110,89 @@ describe('CreateAndUploadAction', () => {
   });
 
   describe('upload actions', () => {
-    it('opens upload modal when "Upload File" is clicked', async () => {
+    it('should render hidden file input for upload functionality', async () => {
       setup();
-      await clickMenuOption('Upload File');
-      expect(screen.getByText('Upload a File')).toBeInTheDocument();
+      const fileInput = document.querySelector('input[type="file"]');
+      expect(fileInput).toBeInTheDocument();
+      expect(fileInput).toHaveAttribute('hidden');
+      expect(fileInput).toHaveAttribute('multiple');
+    });
+
+    it('should handle file selection and call onFilesUpload', async () => {
+      setup();
+      const fileInput = document.querySelector('input[type="file"]');
+      expect(fileInput).toBeInTheDocument();
+
+      const file1 = new File(['test content 1'], 'test1.txt', { type: 'text/plain' });
+      const file2 = new File(['test content 2'], 'test2.txt', { type: 'text/plain' });
+
+      fireEvent.change(fileInput!, {
+        target: { files: [file1, file2] }
+      });
+
+      expect(mockFilesUpload).toHaveBeenCalledWith([file1, file2]);
     });
   });
 
   describe('storage-specific actions', () => {
-    it('shows Create Bucket when S3 root', async () => {
+    it('shows New Bucket when S3 root', async () => {
+      const user = userEvent.setup();
       jest.spyOn(storageUtils, 'isS3').mockReturnValue(true);
       jest.spyOn(storageUtils, 'isS3Root').mockReturnValue(true);
 
       setup('/');
-      await openDropdown();
-      expect(screen.getByText('New Bucket')).toBeInTheDocument();
+      await openDropdown(user);
+      expect(screen.getByRole('menuitem', { name: 'New Bucket' })).toBeInTheDocument();
     });
 
-    it('shows Create File System when ABFS root', async () => {
+    it('shows New Bucket when OFS root', async () => {
+      const user = userEvent.setup();
+      jest.spyOn(storageUtils, 'isOFS').mockReturnValue(true);
+      jest.spyOn(storageUtils, 'isOFSRoot').mockReturnValue(true);
+
+      setup('/');
+      await openDropdown(user);
+      expect(screen.getByRole('menuitem', { name: 'New Bucket' })).toBeInTheDocument();
+    });
+
+    it('does not show New Bucket when not in S3 root', async () => {
+      const user = userEvent.setup();
+      jest.spyOn(storageUtils, 'isS3').mockReturnValue(true);
+      jest.spyOn(storageUtils, 'isS3Root').mockReturnValue(false);
+
+      setup('s3://user');
+      await openDropdown(user);
+      expect(screen.queryByRole('menuitem', { name: 'New Bucket' })).not.toBeInTheDocument();
+    });
+
+    it('shows New File System when ABFS root', async () => {
+      const user = userEvent.setup();
       jest.spyOn(storageUtils, 'isABFS').mockReturnValue(true);
       jest.spyOn(storageUtils, 'isABFSRoot').mockReturnValue(true);
 
       setup('/');
-      await openDropdown();
-      expect(screen.getByText('New File System')).toBeInTheDocument();
+      await openDropdown(user);
+      expect(screen.getByRole('menuitem', { name: 'New File System' })).toBeInTheDocument();
     });
 
-    it('shows Create Volume when OFS service ID', async () => {
+    it('shows New Volume when OFS service ID', async () => {
+      const user = userEvent.setup();
       jest.spyOn(storageUtils, 'isOFS').mockReturnValue(true);
       jest.spyOn(storageUtils, 'isOFSServiceID').mockReturnValue(true);
 
       setup('/ofs-service');
-      await openDropdown();
-      expect(screen.getByText('New Volume')).toBeInTheDocument();
+      await openDropdown(user);
+      expect(screen.getByRole('menuitem', { name: 'New Volume' })).toBeInTheDocument();
+    });
+
+    it('does not show New Volume when OFS service ID', async () => {
+      const user = userEvent.setup();
+      jest.spyOn(storageUtils, 'isOFS').mockReturnValue(true);
+      jest.spyOn(storageUtils, 'isOFSServiceID').mockReturnValue(false);
+
+      setup('/ofs-service');
+      await openDropdown(user);
+      expect(screen.queryByRole('menuitem', { name: 'New Volume' })).not.toBeInTheDocument();
     });
   });
 });
