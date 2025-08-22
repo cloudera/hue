@@ -128,7 +128,7 @@ describe('OverviewTab', () => {
     const expectedPostOptions = {
       silenceErrors: true,
       ignoreSuccessErrors: true,
-      qsEncodeData: false
+      encodeData: false
     };
 
     const renderAnalyticsAndWaitForLoad = async () => {

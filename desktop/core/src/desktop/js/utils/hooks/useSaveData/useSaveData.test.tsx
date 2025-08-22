@@ -37,7 +37,7 @@ const mockData = { id: 1, product: 'Hue' };
 const mockBody = { id: 1 };
 const mockRequestOptions = {
   ignoreSuccessErrors: true,
-  qsEncodeData: false,
+  encodeData: false,
   silenceErrors: true
 };
 
@@ -241,7 +241,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should auto set qsEncodeData to true for non-JSON and non-FormData payloads', async () => {
+  it('should auto set encodeData to true for non-JSON and non-FormData payloads', async () => {
     const { result } = renderHook(() => useSaveData(mockUrl));
 
     act(() => {
@@ -254,7 +254,7 @@ describe('useSaveData', () => {
         mockUrl,
         'hue data',
         expect.objectContaining({
-          qsEncodeData: true,
+          encodeData: true,
           silenceErrors: true,
           ignoreSuccessErrors: true
         })
@@ -265,7 +265,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should not auto set qsEncodeData for FormData payloads', async () => {
+  it('should not auto set encodeData for FormData payloads', async () => {
     const payload = new FormData();
 
     const { result } = renderHook(() => useSaveData(mockUrl));
@@ -277,7 +277,7 @@ describe('useSaveData', () => {
     await waitFor(() => {
       expect(mockSendApiRequest).toHaveBeenCalledWith(HttpMethod.POST, mockUrl, payload, {
         ...mockRequestOptions,
-        qsEncodeData: false
+        encodeData: false
       });
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
@@ -285,7 +285,7 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should not auto set qsEncodeData for JSON payloads', async () => {
+  it('should not auto set encodeData for JSON payloads', async () => {
     const payload = { project: 'hue' };
 
     const { result } = renderHook(() => useSaveData(mockUrl));
@@ -297,7 +297,7 @@ describe('useSaveData', () => {
     await waitFor(() => {
       expect(mockSendApiRequest).toHaveBeenCalledWith(HttpMethod.POST, mockUrl, payload, {
         ...mockRequestOptions,
-        qsEncodeData: false
+        encodeData: false
       });
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();
@@ -305,12 +305,12 @@ describe('useSaveData', () => {
     });
   });
 
-  it('should prioritize qsEncodeData from saveOptions.postOptions', async () => {
+  it('should prioritize encodeData from saveOptions.postOptions', async () => {
     const payload = new FormData();
 
     const { result } = renderHook(() =>
       useSaveData(mockUrl, {
-        postOptions: { qsEncodeData: true }
+        postOptions: { encodeData: true }
       })
     );
 
@@ -321,7 +321,7 @@ describe('useSaveData', () => {
     await waitFor(() => {
       expect(mockSendApiRequest).toHaveBeenCalledWith(HttpMethod.POST, mockUrl, payload, {
         ...mockRequestOptions,
-        qsEncodeData: true
+        encodeData: true
       });
       expect(result.current.data).toEqual(mockData);
       expect(result.current.error).toBeUndefined();

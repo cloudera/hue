@@ -26,7 +26,6 @@ export interface Options<T, U, E> {
   onError?: (error: E) => void;
   pollInterval?: number;
   transformKeys?: 'camelCase' | 'none';
-  encode?: boolean;
 }
 
 interface UseLoadDataProps<T, E> {
@@ -46,6 +45,7 @@ const useLoadData = <T, U = unknown, E = string>(
   const [error, setError] = useState<E>();
 
   const optionsDefault: ApiFetchOptions<T, E> = {
+    encodeData: true,
     silenceErrors: true,
     ignoreSuccessErrors: true
   };
@@ -60,19 +60,6 @@ const useLoadData = <T, U = unknown, E = string>(
     }
 
     return data;
-  };
-
-  const encodeParams = (params?: U): U | Options<T, U, E>['params'] => {
-    if (options?.encode === false || !params) {
-      return params;
-    }
-
-    return Object.entries(params).reduce((acc, [key, value]) => {
-      if (value) {
-        acc[encodeURIComponent(key) as keyof U] = encodeURIComponent(String(value)) as U[keyof U];
-      }
-      return acc;
-    }, {} as U);
   };
 
   const loadData = useCallback(
@@ -91,8 +78,7 @@ const useLoadData = <T, U = unknown, E = string>(
       };
 
       try {
-        const encodedParams = encodeParams(localOptions?.params);
-        const response = await get<T, U, E>(url, encodedParams, fetchOptions);
+        const response = await get<T, U, E>(url, localOptions?.params, fetchOptions);
         const transformedResponse = transformResponse(response);
         setData(transformedResponse);
         if (localOptions?.onSuccess) {
