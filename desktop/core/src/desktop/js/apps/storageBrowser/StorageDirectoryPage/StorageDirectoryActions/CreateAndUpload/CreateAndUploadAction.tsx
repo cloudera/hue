@@ -29,21 +29,19 @@ import { PrimaryButton } from 'cuix/dist/components/Button';
 import { i18nReact } from '../../../../../utils/i18nReact';
 import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../../api';
 import {
-  isOFS,
   isABFSRoot,
   isGSRoot,
   isOFSServiceID,
   isOFSVol,
   isS3Root,
-  isABFS,
-  isGS,
-  isS3
+  isFileSystemRoot
 } from '../../../../../utils/storageBrowserUtils';
 import { FileStats } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import InputModal from '../../../../../reactComponents/InputModal/InputModal';
 
 import './CreateAndUploadAction.scss';
+import { TFunction } from 'i18next';
 
 interface CreateAndUploadActionProps {
   currentPath: FileStats['path'];
@@ -70,66 +68,57 @@ type ActionItem = {
   };
   api?: string;
   visible: (path: string) => boolean;
+  group: string;
 };
 
-const canShowFileFolderActions = (path: string): boolean => {
-  if (isS3(path)) {
-    return !isS3Root(path);
-  }
-  if (isGS(path)) {
-    return !isGSRoot(path);
-  }
-  if (isABFS(path)) {
-    return !isABFSRoot(path);
-  }
-  if (isOFS(path)) {
-    return !isOFSServiceID(path) && !isOFSVol(path);
-  }
-  return true;
-};
-
-const actionConfig: Record<ActionType, ActionItem> = {
+const getActionConfig = (t: TFunction): Record<ActionType, ActionItem> => ({
   [ActionType.createFile]: {
     icon: <FileIcon />,
-    label: 'New File',
-    modal: { title: 'Create File', label: 'File name' },
+    label: t('New File'),
+    modal: { title: t('Create File'), label: t('File name') },
     api: CREATE_FILE_API_URL,
-    visible: path => canShowFileFolderActions(path)
+    group: 'create',
+    visible: path => isFileSystemRoot(path)
   },
   [ActionType.createFolder]: {
     icon: <FolderIcon />,
-    label: 'New Folder',
-    modal: { title: 'Create Folder', label: 'Folder name' },
+    label: t('New Folder'),
+    modal: { title: t('Create Folder'), label: t('Folder name') },
     api: CREATE_DIRECTORY_API_URL,
-    visible: path => canShowFileFolderActions(path)
+    group: 'create',
+    visible: path => isFileSystemRoot(path)
   },
   [ActionType.createBucket]: {
     icon: <BucketIcon />,
-    label: 'New Bucket',
-    modal: { title: 'Create Bucket', label: 'Bucket name' },
+    label: t('New Bucket'),
+    modal: { title: t('Create Bucket'), label: t('Bucket name') },
     api: CREATE_DIRECTORY_API_URL,
+    group: 'create',
     visible: path => isS3Root(path) || isGSRoot(path) || isOFSVol(path)
   },
   [ActionType.createVolume]: {
     icon: <DatabaseIcon />,
-    label: 'New Volume',
-    modal: { title: 'Create Volume', label: 'Volume name' },
+    label: t('New Volume'),
+    modal: { title: t('Create Volume'), label: t('Volume name') },
     api: CREATE_DIRECTORY_API_URL,
+    group: 'create',
     visible: path => isOFSServiceID(path)
   },
   [ActionType.createFileSystem]: {
     icon: <DataBrowserIcon />,
-    label: 'New File System',
-    modal: { title: 'Create File System', label: 'File system name' },
+    label: t('New File System'),
+    modal: { title: t('Create File System'), label: t(')File system name') },
     api: CREATE_DIRECTORY_API_URL,
+    group: 'create',
     visible: path => isABFSRoot(path)
   },
   [ActionType.uploadFile]: {
     icon: <ImportIcon />,
-    label: 'Upload File',
-    visible: path => canShowFileFolderActions(path)
+    label: t('Upload File'),
+    group: 'upload',
+    visible: path => isFileSystemRoot(path)
   }
-};
+});
 
 const CreateAndUploadAction = ({
   currentPath,
@@ -141,6 +130,7 @@ const CreateAndUploadAction = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedAction, setSelectedAction] = useState<ActionType>();
+  const actionConfig = getActionConfig(t);
 
   const onModalClose = () => {
     setSelectedAction(undefined);
@@ -172,11 +162,11 @@ const CreateAndUploadAction = ({
 
   const getCreateActionChildren = (): ItemType[] => {
     return (Object.entries(actionConfig) as [ActionType, (typeof actionConfig)[ActionType]][])
-      .filter(([action, cfg]) => action !== ActionType.uploadFile && cfg.visible(currentPath))
+      .filter(([, cfg]) => cfg.group !== 'upload' && cfg.visible(currentPath))
       .map(([action, cfg]) => ({
         icon: cfg.icon,
         key: action,
-        label: t(cfg.label),
+        label: cfg.label,
         onClick: onActionClick(action)
       }));
   };
@@ -197,7 +187,7 @@ const CreateAndUploadAction = ({
             {
               icon: actionConfig[ActionType.uploadFile].icon,
               key: ActionType.uploadFile,
-              label: t(actionConfig[ActionType.uploadFile].label),
+              label: actionConfig[ActionType.uploadFile].label,
               onClick: () => fileInputRef.current?.click()
             }
           ]
@@ -235,12 +225,12 @@ const CreateAndUploadAction = ({
           showModal={true}
           title={
             actionConfig[selectedAction].modal
-              ? t(actionConfig[selectedAction].modal.title)
+              ? actionConfig[selectedAction].modal.title
               : t('Create')
           }
           inputLabel={
             actionConfig[selectedAction].modal
-              ? t(actionConfig[selectedAction].modal.label)
+              ? actionConfig[selectedAction].modal.label
               : t('Name')
           }
           submitText={t('Create')}
