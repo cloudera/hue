@@ -53,11 +53,6 @@ interface CreateAndUploadActionProps {
   onActionError: (error: Error) => void;
 }
 
-interface CreateInputModalTitleAndLabel {
-  title: string;
-  label: string;
-}
-
 enum ActionType {
   createFile = 'createFile',
   createFolder = 'createFolder',
@@ -66,6 +61,53 @@ enum ActionType {
   createVolume = 'createVolume',
   createFileSystem = 'createFileSystem'
 }
+
+type ActionItem = {
+  icon: React.ReactElement;
+  label: string;
+  modal?: {
+    title: string;
+    label: string;
+  };
+  api?: string;
+};
+
+const actionConfig: Record<ActionType, ActionItem> = {
+  [ActionType.createFile]: {
+    icon: <FileIcon />,
+    label: 'New File',
+    modal: { title: 'Create File', label: 'File name' },
+    api: CREATE_FILE_API_URL
+  },
+  [ActionType.createFolder]: {
+    icon: <FolderIcon />,
+    label: 'New Folder',
+    modal: { title: 'Create Folder', label: 'Folder name' },
+    api: CREATE_DIRECTORY_API_URL
+  },
+  [ActionType.createBucket]: {
+    icon: <BucketIcon />,
+    label: 'New Bucket',
+    modal: { title: 'Create Bucket', label: 'Bucket name' },
+    api: CREATE_DIRECTORY_API_URL
+  },
+  [ActionType.createVolume]: {
+    icon: <DatabaseIcon />,
+    label: 'New Volume',
+    modal: { title: 'Create Volume', label: 'Volume name' },
+    api: CREATE_DIRECTORY_API_URL
+  },
+  [ActionType.createFileSystem]: {
+    icon: <DataBrowserIcon />,
+    label: 'New File System',
+    modal: { title: 'Create File System', label: 'File system name' },
+    api: CREATE_DIRECTORY_API_URL
+  },
+  [ActionType.uploadFile]: {
+    icon: <ImportIcon />,
+    label: 'Upload File'
+  }
+};
 
 const CreateAndUploadAction = ({
   currentPath,
@@ -107,28 +149,20 @@ const CreateAndUploadAction = ({
   }
   
   const getCreateActionChildren = (): ItemType[] => {
-    const fileActions: ItemType[] = [
-      {
-        icon: <FileIcon />,
-        key: ActionType.createFile,
-        label: t('New File'),
-        onClick: onActionClick(ActionType.createFile)
-      },
-      {
-        icon: <FolderIcon />,
-        key: ActionType.createFolder,
-        label: t('New Folder'),
-        onClick: onActionClick(ActionType.createFolder)
-      }
-    ];
+    const fileActions = [ActionType.createFile, ActionType.createFolder].map(a => ({
+      icon: actionConfig[a].icon,
+      key: a,
+      label: t(actionConfig[a].label),
+      onClick: onActionClick(a)
+    }));
 
     if (isS3(currentPath)) {
       return isS3Root(currentPath)
         ? [
             {
-              icon: <BucketIcon />,
+              icon: actionConfig[ActionType.createBucket].icon,
               key: ActionType.createBucket,
-              label: t('New Bucket'),
+              label: t(actionConfig[ActionType.createBucket].label),
               onClick: onActionClick(ActionType.createBucket)
             }
           ]
@@ -139,9 +173,9 @@ const CreateAndUploadAction = ({
       return isGSRoot(currentPath)
         ? [
             {
-              icon: <BucketIcon />,
+              icon: actionConfig[ActionType.createBucket].icon,
               key: ActionType.createBucket,
-              label: t('New Bucket'),
+              label: t(actionConfig[ActionType.createBucket].label),
               onClick: onActionClick(ActionType.createBucket)
             }
           ]
@@ -152,9 +186,9 @@ const CreateAndUploadAction = ({
       return isABFSRoot(currentPath)
         ? [
             {
-              icon: <DataBrowserIcon />,
+              icon: actionConfig[ActionType.createFileSystem].icon,
               key: ActionType.createFileSystem,
-              label: t('New File System'),
+              label: t(actionConfig[ActionType.createFileSystem].label),
               onClick: onActionClick(ActionType.createFileSystem)
             }
           ]
@@ -165,9 +199,9 @@ const CreateAndUploadAction = ({
       if (isOFSServiceID(currentPath)) {
         return [
           {
-            icon: <DatabaseIcon />,
+            icon: actionConfig[ActionType.createVolume].icon,
             key: ActionType.createVolume,
-            label: t('New Volume'),
+            label: t(actionConfig[ActionType.createVolume].label),
             onClick: onActionClick(ActionType.createVolume)
           }
         ];
@@ -175,9 +209,9 @@ const CreateAndUploadAction = ({
       if (isOFSVol(currentPath)) {
         return [
           {
-            icon: <BucketIcon />,
+            icon: actionConfig[ActionType.createBucket].icon,
             key: ActionType.createBucket,
-            label: t('New Bucket'),
+            label: t(actionConfig[ActionType.createBucket].label),
             onClick: onActionClick(ActionType.createBucket)
           }
         ];
@@ -186,41 +220,6 @@ const CreateAndUploadAction = ({
     }
 
     return fileActions;
-  };
-
-  const getInputModalTitleAndLabel = (action: ActionType): CreateInputModalTitleAndLabel => {
-    switch (action) {
-      case ActionType.createFolder:
-        return {
-          title: t('Create Folder'),
-          label: t('Folder name')
-        };
-      case ActionType.createFile:
-        return {
-          title: t('Create File'),
-          label: t('File name')
-        };
-      case ActionType.createBucket:
-        return {
-          title: t('Create Bucket'),
-          label: t('Bucket name')
-        };
-      case ActionType.createVolume:
-        return {
-          title: t('Create Volume'),
-          label: t('Volume name')
-        };
-      case ActionType.createFileSystem:
-        return {
-          title: t('Create File System'),
-          label: t('File system name')
-        };
-      default:
-        return {
-          title: t('Create'),
-          label: t('Name')
-        };
-    }
   };
 
   const newActionsMenuItems: MenuItemGroupType[] = [
@@ -246,17 +245,12 @@ const CreateAndUploadAction = ({
   ];
 
   const handleCreate = (name: string | number) => {
-    const url = {
-      [ActionType.createFile]: CREATE_FILE_API_URL,
-      [ActionType.createFolder]: CREATE_DIRECTORY_API_URL,
-      [ActionType.createBucket]: CREATE_DIRECTORY_API_URL,
-      [ActionType.createFileSystem]: CREATE_DIRECTORY_API_URL,
-      [ActionType.createVolume]: CREATE_DIRECTORY_API_URL
-    }[selectedAction ?? ''];
+    const url = selectedAction ? actionConfig[selectedAction]?.api : undefined;
 
     if (!url) {
       return;
     }
+
     save({ path: currentPath, name }, { url });
   };
 
@@ -275,11 +269,19 @@ const CreateAndUploadAction = ({
           <DropDownIcon />
         </PrimaryButton>
       </Dropdown>
-      {selectedAction !== undefined && (
+      {selectedAction !== undefined && selectedAction !== ActionType.uploadFile && (
         <InputModal
           showModal={true}
-          title={getInputModalTitleAndLabel(selectedAction).title}
-          inputLabel={getInputModalTitleAndLabel(selectedAction).label}
+          title={
+            actionConfig[selectedAction].modal
+              ? t(actionConfig[selectedAction].modal.title)
+              : t('Create')
+          }
+          inputLabel={
+            actionConfig[selectedAction].modal
+              ? t(actionConfig[selectedAction].modal.label)
+              : t('Name')
+          }
           submitText={t('Create')}
           onSubmit={handleCreate}
           onClose={onModalClose}

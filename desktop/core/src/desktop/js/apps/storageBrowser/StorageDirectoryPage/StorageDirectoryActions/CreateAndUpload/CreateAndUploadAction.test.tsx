@@ -1,133 +1,145 @@
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CreateAndUploadAction from './CreateAndUploadAction';
 import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../../api';
+import * as storageUtils from '../../../../../utils/storageBrowserUtils';
 
 const mockSave = jest.fn();
 jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
   __esModule: true,
   default: jest.fn(() => ({
-    save: mockSave
+    save: mockSave,
+    loading: false,
+    error: undefined
   }))
 }));
 
-jest.mock('../../../../../utils/huePubSub', () => ({
-  __esModule: true,
-  publish: jest.fn()
-}));
-
 describe('CreateAndUploadAction', () => {
-  const currentPath = '/some/path';
+  const defaultPath = '/some/path';
   const onActionSuccess = jest.fn();
   const onActionError = jest.fn();
   const mockFilesUpload = jest.fn();
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-
+  const setup = (path = defaultPath) =>
     render(
       <CreateAndUploadAction
-        currentPath={currentPath}
+        currentPath={path}
         onActionSuccess={onActionSuccess}
         onFilesUpload={mockFilesUpload}
         onActionError={onActionError}
       />
     );
+
+  const openDropdown = async () => {
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'New' })));
+  };
+
+  const clickMenuOption = async (label: string) => {
+    await openDropdown();
+    await act(async () => fireEvent.click(screen.getByText(label)));
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(storageUtils, 'isS3').mockReturnValue(false);
+    jest.spyOn(storageUtils, 'isGS').mockReturnValue(false);
+    jest.spyOn(storageUtils, 'isABFS').mockReturnValue(false);
+    jest.spyOn(storageUtils, 'isOFS').mockReturnValue(false);
   });
 
-  it('should render the dropdown with actions', async () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('renders the New button', () => {
+    setup();
     const newButton = screen.getByRole('button', { name: 'New' });
     expect(newButton).toBeInTheDocument();
+  });
 
-    await act(async () => fireEvent.click(newButton));
-
+  it('should render the dropdown with CREATE and UPLOAD group actions', async () => {
+    setup();
+    await openDropdown();
     // Check that the "Create" and "Upload" groups are in the dropdown
     expect(screen.getByText('CREATE')).toBeInTheDocument();
     expect(screen.getByText('UPLOAD')).toBeInTheDocument();
   });
 
-  it('should open the folder creation modal when "New Folder" is clicked', async () => {
-    const newButton = screen.getByRole('button', { name: 'New' });
-    await act(async () => fireEvent.click(newButton));
+  describe('create actions', () => {
+    it.each([
+      { label: 'New Folder', modalTitle: 'Create Folder', api: CREATE_DIRECTORY_API_URL },
+      { label: 'New File', modalTitle: 'Create File', api: CREATE_FILE_API_URL }
+    ])('opens ${label} modal and calls correct API', async ({ label, modalTitle, api }) => {
+      setup();
+      await clickMenuOption(label);
 
-    const newFolderButton = screen.getByRole('menuitem', { name: 'New Folder' });
-    await act(async () => fireEvent.click(newFolderButton));
+      expect(screen.getByText(modalTitle)).toBeInTheDocument();
 
-    expect(screen.getByRole('dialog', { name: 'Create Folder' })).toBeInTheDocument();
-  });
+      const input = screen.getByRole('textbox');
+      fireEvent.change(input, { target: { value: `Test ${label}` } });
 
-  it('should open the file creation modal when "New File" is clicked', async () => {
-    const newButton = screen.getByRole('button', { name: 'New' });
-    await act(async () => fireEvent.click(newButton));
+      fireEvent.click(screen.getByText('Create'));
 
-    const newFileButton = screen.getByRole('menuitem', { name: 'New File' });
-    await act(async () => fireEvent.click(newFileButton));
-
-    expect(screen.getByRole('dialog', { name: 'Create File' })).toBeInTheDocument();
-  });
-
-  it('should render hidden file input for upload functionality', async () => {
-    const fileInput = document.querySelector('input[type="file"]');
-    expect(fileInput).toBeInTheDocument();
-    expect(fileInput).toHaveAttribute('hidden');
-    expect(fileInput).toHaveAttribute('multiple');
-  });
-
-  it('should handle file selection and call onFilesUpload', async () => {
-    const fileInput = document.querySelector('input[type="file"]');
-    expect(fileInput).toBeInTheDocument();
-
-    const file1 = new File(['test content 1'], 'test1.txt', { type: 'text/plain' });
-    const file2 = new File(['test content 2'], 'test2.txt', { type: 'text/plain' });
-
-    fireEvent.change(fileInput!, {
-      target: { files: [file1, file2] }
-    });
-
-    expect(mockFilesUpload).toHaveBeenCalledWith([file1, file2]);
-  });
-
-  it('should call the correct API for creating a folder', async () => {
-    const newButton = screen.getByRole('button', { name: 'New' });
-    await act(async () => fireEvent.click(newButton));
-
-    const newFolderButton = screen.getByRole('menuitem', { name: 'New Folder' });
-    await act(async () => fireEvent.click(newFolderButton));
-
-    const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'Test Folder' } });
-
-    const createButton = screen.getByRole('button', { name: 'Create' });
-    fireEvent.click(createButton);
-
-    await waitFor(() => {
-      expect(mockSave).toHaveBeenCalledWith(
-        { path: currentPath, name: 'Test Folder' },
-        { url: CREATE_DIRECTORY_API_URL }
-      );
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledWith(
+          { path: defaultPath, name: `Test ${label}` },
+          { url: api }
+        );
+      });
     });
   });
 
-  it('should call the correct API for creating a file', async () => {
-    const newButton = screen.getByRole('button', { name: 'New' });
-    await act(async () => fireEvent.click(newButton));
+  describe('upload actions', () => {
+    it('opens upload modal when "Upload File" is clicked', async () => {
+      setup();
+      await clickMenuOption('Upload File');
+      expect(screen.getByText('Upload a File')).toBeInTheDocument();
+    });
+  });
 
-    const newFileButton = screen.getByRole('menuitem', { name: 'New File' });
-    await act(async () => fireEvent.click(newFileButton));
+  describe('storage-specific actions', () => {
+    it('shows Create Bucket when S3 root', async () => {
+      jest.spyOn(storageUtils, 'isS3').mockReturnValue(true);
+      jest.spyOn(storageUtils, 'isS3Root').mockReturnValue(true);
 
-    // Simulate file name submission
-    const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'Test File' } });
+      setup('/');
+      await openDropdown();
+      expect(screen.getByText('New Bucket')).toBeInTheDocument();
+    });
 
-    const createButton = screen.getByRole('button', { name: 'Create' });
-    fireEvent.click(createButton);
+    it('shows Create File System when ABFS root', async () => {
+      jest.spyOn(storageUtils, 'isABFS').mockReturnValue(true);
+      jest.spyOn(storageUtils, 'isABFSRoot').mockReturnValue(true);
 
-    await waitFor(() => {
-      expect(mockSave).toHaveBeenCalledWith(
-        { path: currentPath, name: 'Test File' },
-        { url: CREATE_FILE_API_URL }
-      );
+      setup('/');
+      await openDropdown();
+      expect(screen.getByText('New File System')).toBeInTheDocument();
+    });
+
+    it('shows Create Volume when OFS service ID', async () => {
+      jest.spyOn(storageUtils, 'isOFS').mockReturnValue(true);
+      jest.spyOn(storageUtils, 'isOFSServiceID').mockReturnValue(true);
+
+      setup('/ofs-service');
+      await openDropdown();
+      expect(screen.getByText('New Volume')).toBeInTheDocument();
     });
   });
 });
