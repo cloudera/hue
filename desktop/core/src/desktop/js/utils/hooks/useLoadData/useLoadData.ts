@@ -20,12 +20,13 @@ import { convertKeysToCamelCase } from '../../../utils/string/changeCasing';
 
 export interface Options<T, U, E> {
   params?: U;
-  fetchOptions?: ApiFetchOptions<T, E>;
+  options?: ApiFetchOptions<T, E>;
   skip?: boolean;
   onSuccess?: (data: T) => void;
   onError?: (error: E) => void;
   pollInterval?: number;
   transformKeys?: 'camelCase' | 'none';
+  encode?: boolean;
 }
 
 interface UseLoadDataProps<T, E> {
@@ -44,7 +45,7 @@ const useLoadData = <T, U = unknown, E = string>(
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<E>();
 
-  const fetchOptionsDefault: ApiFetchOptions<T, E> = {
+  const optionsDefault: ApiFetchOptions<T, E> = {
     silenceErrors: true,
     ignoreSuccessErrors: true
   };
@@ -61,6 +62,19 @@ const useLoadData = <T, U = unknown, E = string>(
     return data;
   };
 
+  const encodeParams = (params?: U): U | Options<T, U, E>['params'] => {
+    if (options?.encode === false || !params) {
+      return params;
+    }
+
+    return Object.entries(params).reduce((acc, [key, value]) => {
+      if (value) {
+        acc[encodeURIComponent(key) as keyof U] = encodeURIComponent(String(value)) as U[keyof U];
+      }
+      return acc;
+    }, {} as U);
+  };
+
   const loadData = useCallback(
     async (isForced: boolean = false) => {
       // Avoid fetching data if the skip option is true
@@ -72,12 +86,13 @@ const useLoadData = <T, U = unknown, E = string>(
       setError(undefined);
 
       const fetchOptions = {
-        ...fetchOptionsDefault,
-        ...localOptions?.fetchOptions
+        ...optionsDefault,
+        ...localOptions?.options
       };
 
       try {
-        const response = await get<T, U, E>(url, localOptions?.params, fetchOptions);
+        const encodedParams = encodeParams(localOptions?.params);
+        const response = await get<T, U, E>(url, encodedParams, fetchOptions);
         const transformedResponse = transformResponse(response);
         setData(transformedResponse);
         if (localOptions?.onSuccess) {
