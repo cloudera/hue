@@ -21,6 +21,8 @@ import CaratDownIcon from '@cloudera/cuix-core/icons/react/CaratDownIcon';
 import { BorderlessButton } from 'cuix/dist/components/Button';
 import CaratUpIcon from '@cloudera/cuix-core/icons/react/CaratUpIcon';
 import Modal from 'cuix/dist/components/Modal';
+import { TFunction } from 'i18next';
+
 import { i18nReact } from '../../utils/i18nReact';
 import { RegularFile, FileStatus } from '../../utils/hooks/useFileUpload/types';
 import useFileUpload from '../../utils/hooks/useFileUpload/useFileUpload';
@@ -66,17 +68,26 @@ const getCountByStatus = (uploadQueue: RegularFile[]) => {
   );
 };
 
-const getHeaderText = (
-  uploadQueue: RegularFile[],
-  uploadCountByStatus: { uploaded: number; pending: number; failed: number }
-) => {
-  const fileText = uploadQueue.length > 1 ? 'files' : 'file';
-  const uploadedText = `{{uploaded}} ${fileText} uploaded`;
-  const pendingText = uploadCountByStatus.pending > 0 ? `{{pending}} ${fileText} remaining` : '';
-  const failedText = uploadCountByStatus.failed > 0 ? `, {{failed}} failed` : '';
+const getHeaderText = (t: TFunction, uploadQueue: RegularFile[]) => {
+  const uploadCountByStatus = getCountByStatus(uploadQueue);
+  const fileText = uploadQueue.length > 1 ? t('files') : t('file');
+  const failedText =
+    uploadCountByStatus.failed > 0
+      ? t(', {{failed}} failed', { failed: uploadCountByStatus.failed })
+      : '';
+
+  const pendingText = t('{{pending}} {{fileText}} remaining', {
+    pending: uploadCountByStatus.pending,
+    fileText
+  });
   if (uploadCountByStatus.pending > 0) {
     return `${pendingText}${failedText}`;
   }
+
+  const uploadedText = t('{{uploaded}} {{fileText}} uploaded', {
+    uploaded: uploadQueue.length,
+    fileText
+  });
   return `${uploadedText}${failedText}`;
 };
 
@@ -160,7 +171,7 @@ const FileUploadQueue = (): JSX.Element => {
   const handleFileUploadStart = async (data?: FileUploadEvent) => {
     const newFiles = data?.files ?? [];
     if (newFiles.length === 0) {
-      huePubSub.publish('hue.global.error', { message: 'Something went wrong!' });
+      huePubSub.publish('hue.global.error', { message: t('No new files to upload!') });
       return;
     }
 
@@ -189,9 +200,6 @@ const FileUploadQueue = (): JSX.Element => {
     }
     setConflictingFiles([]);
   };
-
-  const uploadCountByStatus = getCountByStatus(uploadQueue);
-  const headerText = getHeaderText(uploadQueue, uploadCountByStatus);
 
   if (!uploadQueue.length && conflictingFiles.length === 0) {
     return <></>;
@@ -234,7 +242,7 @@ const FileUploadQueue = (): JSX.Element => {
 
       <div className="hue-upload-queue-container antd cuix">
         <div className="hue-upload-queue-container__header">
-          {t(headerText, uploadCountByStatus)}
+          {getHeaderText(t, uploadQueue)}
           <div className="hue-upload-queue-container__header__button-group">
             <BorderlessButton
               onClick={() => setExpandQueue(!expandQueue)}
