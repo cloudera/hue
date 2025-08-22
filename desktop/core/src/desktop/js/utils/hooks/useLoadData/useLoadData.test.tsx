@@ -30,10 +30,11 @@ const mockUrl = `${mockUrlPrefix}${mockEndpoint}`;
 const mockData = { product_id: 1, product_name: 'Hue' };
 const mockDataResponse = convertKeysToCamelCase(mockData);
 const mockOptions = {
-  params: { id: '1' }
+  params: { id: 1 }
 };
 
 const mockRequestOptions = {
+  encodeData: true,
   silenceErrors: true,
   ignoreSuccessErrors: true
 };
@@ -159,7 +160,7 @@ describe('useLoadData', () => {
     });
 
     const newOptions = {
-      params: { id: '2' }
+      params: { id: 2 }
     };
     const newMockData = { ...mockDataResponse, productId: 2 };
     mockGet.mockResolvedValueOnce(newMockData);
@@ -436,53 +437,6 @@ describe('useLoadData', () => {
         expect(result.current.data).toEqual(mockData);
         expect(result.current.error).toBeUndefined();
         expect(result.current.loading).toBe(false);
-      });
-    });
-
-    it('should encode parameters when encode option is true', async () => {
-      const mockOptionsWithEncode = {
-        params: { id: '1', name: 'test name' },
-        encode: true
-      };
-      const encodedParams = {
-        id: '1',
-        name: 'test%20name'
-      };
-      renderHook(() => useLoadData(mockUrl, mockOptionsWithEncode));
-
-      await waitFor(() => {
-        expect(mockGet).toHaveBeenCalledWith(mockUrl, encodedParams, mockRequestOptions);
-      });
-    });
-
-    it('should not encode parameters when params are not provided', async () => {
-      const mockOptions = {
-        params: { id: '1', name: 'test name' }
-      };
-      const encodedParams = {
-        id: '1',
-        name: 'test%20name'
-      };
-      renderHook(() => useLoadData(mockUrl, mockOptions));
-
-      await waitFor(() => {
-        expect(mockGet).toHaveBeenCalledWith(mockUrl, encodedParams, mockRequestOptions);
-      });
-    });
-
-    it('should not encode parameters when encode option is false', async () => {
-      const mockOptionsWithEncode = {
-        params: { id: '1', name: 'test name' },
-        encode: false
-      };
-      renderHook(() => useLoadData(mockUrl, mockOptionsWithEncode));
-
-      await waitFor(() => {
-        expect(mockGet).toHaveBeenCalledWith(
-          mockUrl,
-          mockOptionsWithEncode.params,
-          mockRequestOptions
-        );
       });
     });
   });

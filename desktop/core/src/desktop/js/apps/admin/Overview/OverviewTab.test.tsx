@@ -123,7 +123,8 @@ describe('OverviewTab', () => {
     const mockAnalyticsDataDisabled = { collectUsage: false };
     const expectedFetchOptions = {
       silenceErrors: true,
-      ignoreSuccessErrors: true
+      ignoreSuccessErrors: true,
+      encodeData: true
     };
     const expectedPostOptions = {
       silenceErrors: true,
