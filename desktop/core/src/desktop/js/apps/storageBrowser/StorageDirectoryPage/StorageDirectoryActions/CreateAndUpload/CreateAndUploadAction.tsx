@@ -195,9 +195,9 @@ const CreateAndUploadAction = ({
       children: actionConfig[ActionType.uploadFile].visible(currentPath)
         ? [
             {
-              icon: <ImportIcon />,
+              icon: actionConfig[ActionType.uploadFile].icon,
               key: ActionType.uploadFile,
-              label: t('Upload File'),
+              label: t(actionConfig[ActionType.uploadFile].label),
               onClick: () => fileInputRef.current?.click()
             }
           ]
