@@ -31,8 +31,7 @@ import { getFileSystemAndPath } from '../../reactComponents/PathBrowser/PathBrow
 import { FileSystem } from './types';
 
 const StorageBrowserPage = (): JSX.Element => {
-  const urlSearchParams = new URLSearchParams(window.location.search);
-  const urlFilePath = decodeURIComponent(urlSearchParams.get('path') ?? '');
+  const urlFilePath = new URLSearchParams(window.location.search).get('path') ?? '';
   const { fileSystem: urlFileSystem } = getFileSystemAndPath(urlFilePath);
 
   const { t } = i18nReact.useTranslation();
