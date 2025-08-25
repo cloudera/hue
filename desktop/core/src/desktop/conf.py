@@ -2909,6 +2909,98 @@ def is_gs_enabled():
     conf_idbroker.is_idbroker_enabled('gs')
 
 
+PERMISSION_ACTION_S3 = "s3_access"
+
+S3_OBJECT_STORES = UnspecifiedConfigSection(
+  's3_object_stores',
+  help=_('One entry for each S3-compatible object store instance'),
+  each=ConfigSection(
+    help=_('Information about a single S3-compatible object store instance'),
+    members=dict(
+      NAME=Config(
+        key='name',
+        type=str,
+        default=None,
+        help=_('Display name of the object store instance')
+      ),
+      PROVIDER=Config(
+        key='provider',
+        type=str,
+        default='aws',  # aws, netapp, dell, generic
+        help=_('Object store provider type')
+      ),
+      REGION=Config(
+        key='region',
+        type=str,
+        default=None,
+        help=_('Default region for the object store')
+      ),
+      ENDPOINT=Config(
+        key='endpoint',
+        type=str,
+        default=None,
+        help=_('Custom endpoint URL for S3-compatible stores')
+      ),
+      AUTH_TYPE=Config(
+        key='auth_type',
+        type=str,
+        default='key',  # key, iam, raz, idbroker
+        help=_('Authentication type to use')
+      ),
+      ACCESS_KEY_ID=Config(
+        key='access_key_id',
+        type=str,
+        default=None,
+        help=_('Access key ID for key-based auth')
+      ),
+      SECRET_KEY=Config(
+        key='secret_key',
+        type=str,
+        private=True,
+        default=None,
+        help=_('Secret key for key-based auth')
+      ),
+      IAM_ROLE=Config(
+        key='iam_role',
+        type=str,
+        default=None,
+        help=_('IAM role to assume for AWS IAM auth')
+      ),
+      RAZ_URL=Config(
+        key='raz_url',
+        type=str,
+        default=None,
+        help=_('RAZ server URL for RAZ auth')
+      ),
+      IDBROKER_URL=Config(
+        key='idbroker_url',
+        type=str,
+        default=None,
+        help=_('IDBroker URL for IDBroker auth')
+      ),
+      BUCKET_REGION_MAP=Config(
+        key='bucket_region_map',
+        type=coerce_json_dict,
+        default='{}',
+        help=_('JSON mapping of bucket names to their regions')
+      ),
+      DEFAULT_HOME_PATH=Config(
+        key="default_home_path",
+        type=str,
+        default=None,
+        help=_("Default home directory path. e.g. s3a://gethue")
+      ),
+      OPTIONS=Config(
+        key='options',
+        type=coerce_json_dict,
+        default='{}',
+        help=_('Additional provider-specific options as JSON')
+      )
+    )
+  )
+)
+
+
 def has_gs_access(user):
   from desktop.auth.backend import is_admin
   return user.is_authenticated and user.is_active and (
