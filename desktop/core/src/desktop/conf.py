@@ -286,7 +286,7 @@ SSL_CERTIFICATE_CHAIN = Config(
 
 SSL_CIPHER_LIST = Config(
   key="ssl_cipher_list",
-  help=_("List of allowed and disallowed ciphers"),
+  help=_("List of allowed and disallowed ciphers for TLS 1.2 and earlier"),
 
   # Based on "Intermediate compatibility" recommendations from
   # https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
@@ -295,6 +295,10 @@ SSL_CIPHER_LIST = Config(
   default=':'.join([
     'ECDHE-RSA-AES128-GCM-SHA256',
     'ECDHE-RSA-AES256-GCM-SHA384',
+    'ECDHE-ECDSA-AES128-GCM-SHA256',
+    'ECDHE-ECDSA-AES256-GCM-SHA384',
+    'DHE-RSA-AES128-GCM-SHA256',
+    'DHE-RSA-AES256-GCM-SHA384',
     '!aNULL',
     '!eNULL',
     '!EXPORT',
@@ -307,6 +311,27 @@ SSL_CIPHER_LIST = Config(
     '!EDH-RSA-DES-CBC3-SHA',
     '!KRB5-DES-CBC3-SHA',
   ]))
+
+# TLS 1.3 Configuration
+def has_tls13_support():
+  """Check if TLS 1.3 is supported by the current Python/OpenSSL version."""
+  try:
+    import ssl
+    return hasattr(ssl, 'HAS_TLSv1_3') and ssl.HAS_TLSv1_3
+  except ImportError:
+    return False
+
+SSL_TLS13_ENABLED = Config(
+  key="ssl_tls13_enabled",
+  help=_("Enable TLS 1.3 support when available. Requires OpenSSL 1.1.1+ and Python 3.7+"),
+  type=coerce_bool,
+  dynamic_default=has_tls13_support)
+
+SSL_TLS12_ENABLED = Config(
+  key="ssl_tls12_enabled",
+  help=_("Enable TLS 1.2 support when available. This is the default behavior."),
+  type=coerce_bool,
+  default=True)
 
 
 def has_ssl_no_renegotiation():
@@ -390,7 +415,7 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
 CSP_NONCE = Config(
   key="csp_nonce",
   help=_('Generates a unique nonce for each request to strengthen CSP by disallowing '
-        '‘unsafe-inline’ scripts and styles.'),
+        '"unsafe-inline" scripts and styles.'),
   type=coerce_bool,
   default=False)
 

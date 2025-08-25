@@ -42,16 +42,16 @@ from desktop.conf import CHERRYPY_SERVER_THREADS, ENABLE_ORGANIZATIONS, ENABLE_S
 from desktop.lib.apputil import INFO_LEVEL_CALL_DURATION_MS, WARN_LEVEL_CALL_DURATION_MS
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 from desktop.lib.python_util import create_synchronous_io_multiplexer
-from desktop.lib.sasl_compat import PureSASLClient
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
 from desktop.lib.thrift_sasl import TSaslClientTransport
+from desktop.lib.tls_utils import get_ssl_protocol, create_thrift_ssl_context
 
 LOG = logging.getLogger()
 
 
 try:
-  import sasl
+  import sasl  # noqa: F401 - Imported for later use in sasl_factory
 except Exception as e:
   # Workaround potential version `GLIBCXX_3.4.26' not found
   LOG.warn('Could not import sasl: %s' % e)
@@ -310,17 +310,78 @@ def connect_to_thrift(conf):
     mode.set_verify(conf.validate)
   else:
     if conf.use_ssl:
-      try:
-        from ssl import PROTOCOL_TLS
-        PROTOCOL_SSLv23 = PROTOCOL_TLS
-      except ImportError:
+      # Get the optimal SSL protocol
+      ssl_protocol = get_ssl_protocol()
+
+      # Try to create SSL context for enhanced TLS 1.3 support
+      ssl_context = create_thrift_ssl_context(
+        validate=conf.validate,
+        ca_certs=conf.ca_certs,
+        keyfile=conf.keyfile,
+        certfile=conf.certfile
+      )
+
+      # Use SSL context if available, otherwise fall back to ssl_version parameter
+      if ssl_context:
         try:
-          from ssl import PROTOCOL_SSLv23 as PROTOCOL_TLS
+          # Check if TSSLSocketWithWildcardSAN supports ssl_context parameter
+          import inspect
+          if hasattr(TSSLSocketWithWildcardSAN, '__init__'):
+            sig = inspect.signature(TSSLSocketWithWildcardSAN.__init__)
+            if 'ssl_context' in sig.parameters:
+              mode = TSSLSocketWithWildcardSAN(
+                conf.host, conf.port,
+                validate=conf.validate,
+                ca_certs=conf.ca_certs,
+                keyfile=conf.keyfile,
+                certfile=conf.certfile,
+                ssl_context=ssl_context
+              )
+              LOG.debug("Using TSSLSocketWithWildcardSAN with SSL context")
+            else:
+              # Fall back to ssl_version parameter
+              mode = TSSLSocketWithWildcardSAN(
+                conf.host, conf.port,
+                validate=conf.validate,
+                ca_certs=conf.ca_certs,
+                keyfile=conf.keyfile,
+                certfile=conf.certfile,
+                ssl_version=ssl_protocol
+              )
+              LOG.debug("Using TSSLSocketWithWildcardSAN with ssl_version parameter")
+          else:
+            # Fallback for older versions
+            mode = TSSLSocketWithWildcardSAN(
+              conf.host, conf.port,
+              validate=conf.validate,
+              ca_certs=conf.ca_certs,
+              keyfile=conf.keyfile,
+              certfile=conf.certfile,
+              ssl_version=ssl_protocol
+            )
+        except Exception as e:
+          LOG.warning(f"Could not use SSL context for Thrift, falling back to ssl_version: {e}")
+          mode = TSSLSocketWithWildcardSAN(
+            conf.host, conf.port,
+            validate=conf.validate,
+            ca_certs=conf.ca_certs,
+            keyfile=conf.keyfile,
+            certfile=conf.certfile,
+            ssl_version=ssl_protocol
+          )
+      else:
+        # Fallback to the previous method if SSL context creation failed
+        try:
+          from ssl import PROTOCOL_TLS
           PROTOCOL_SSLv23 = PROTOCOL_TLS
         except ImportError:
-          PROTOCOL_SSLv23 = PROTOCOL_TLS = 2
-      mode = TSSLSocketWithWildcardSAN(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs,
-                                       keyfile=conf.keyfile, certfile=conf.certfile, ssl_version=PROTOCOL_SSLv23)
+          try:
+            from ssl import PROTOCOL_SSLv23 as PROTOCOL_TLS
+            PROTOCOL_SSLv23 = PROTOCOL_TLS
+          except ImportError:
+            PROTOCOL_SSLv23 = PROTOCOL_TLS = 2
+        mode = TSSLSocketWithWildcardSAN(conf.host, conf.port, validate=conf.validate, ca_certs=conf.ca_certs,
+                                        keyfile=conf.keyfile, certfile=conf.certfile, ssl_version=PROTOCOL_SSLv23)
     else:
       mode = TSocket(conf.host, conf.port)
 
@@ -367,7 +428,7 @@ def connect_to_thrift(conf):
         saslc.init()
         return saslc
 
-    except Exception as e:
+    except Exception:
       LOG.debug("Unable to import 'sasl'. Fallback to 'puresasl'.")
       from desktop.lib.sasl_compat import PureSASLClient
 
