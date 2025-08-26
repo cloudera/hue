@@ -29,8 +29,8 @@ hue/
 │   ├── filebrowser/               # File system browser
 │   ├── impala/                    # Impala query interface
 │   ├── jobbrowser/                # Job monitoring
-│   ├── metastore/                 # Metadata management
-│   ├── notebook/                  # Interactive notebooks
+│   ├── metastore/                 # DB Table Browser
+│   ├── notebook/                  # Interactive sql Editor
 │   ├── oozie/                     # Workflow management
 │   ├── rdbms/                     # RDBMS connectors
 │   └── ...                        # Other backend apps
