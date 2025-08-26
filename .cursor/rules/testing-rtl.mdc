@@ -1,0 +1,40 @@
+---
+description: Frontend testing with React Testing Library best practices.
+globs: ["**/*.test.ts", "**/*.test.tsx", "jest.config.*"]
+alwaysApply: false
+---
+
+# Testing Rules
+- Use **React Testing Library**; prefer `user-event` over `fireEvent`.
+- Test primary flows, edge cases, and a11y roles/labels.
+- Avoid implementation details; assert on behavior and DOM.
+- prefer role/name queries, e.g. getByRole; avoid brittle hardcoded strings if translated.
+- Use the component name in the describe and use "it" over "test" for better readbility. 
+
+## Example
+```ts
+describe('MyComponent', () => {
+  it('renders calls action when clicked', () => {
+    const user = userEvent.setup();
+    render(<Foo title="Hi" />);
+    await user.click(screen.getByRole('button', { name: /click/i }));
+    expect(onAction).toHaveBeenCalled();
+  })
+})
+```
+
+# Executing tests
+```shell
+# Run all tests
+npm run test
+npm run test-coverage
+npm run test-clearCache
+# Run a single file
+npm test -- --testPathPattern=WelcomeTour
+# Run tests with verbose output
+npm test -- --verbose
+# Run tests and show console output
+npm test -- --verbose --silent=false
+# Run tests and stop on first failure
+npm test -- --bail
+```

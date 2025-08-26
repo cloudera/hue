@@ -1,0 +1,12 @@
+---
+description: Accessibility rules for components, styles, and templates.
+globs: ["**/*.tsx", "**/templates/**", "**/*.scss"]
+alwaysApply: false
+---
+
+# A11y Essentials
+- Use semantic elements; controls must have accessible names.
+- Dialogs: trap focus, restore on close, label/describe properly.
+- Announce async states (loading, error, empty); no color-only meanings.
+- Use ARIA when elements might not fully describe a complex widget's purpose or behavior
+

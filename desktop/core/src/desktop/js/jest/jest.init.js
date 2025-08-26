@@ -124,7 +124,14 @@ process.on('unhandledRejection', err => {
   fail(err);
 });
 
-jest.mock('../utils/i18nReact');
+jest.mock('../utils/i18nReact', () => ({
+  i18nReact: {
+    useTranslation: () => ({
+      t: key => key, // The mock t() function just returns the key
+      ready: true
+    })
+  }
+}));
 jest.mock('../utils/hueAnalytics');
 
 //Official workaround for TypeError: window.matchMedia is not a function
