@@ -1,6 +1,6 @@
 ---
 description: Strategy for migrating jQuery/KO/Less pieces toward React/SCSS.
-globs: ["**/jquery/**", "**/*.less", "**/*.ko", "**/*.vue", "**/*.tsx"]
+globs: ["**/jquery/**", "**/*.less", "**/*.ko.js", "**/*.vue", "**/*.tsx"]
 alwaysApply: false
 ---
 
