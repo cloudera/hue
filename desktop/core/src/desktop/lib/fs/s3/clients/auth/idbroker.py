@@ -17,13 +17,13 @@
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from desktop.lib.fs.s3.clients.base import S3AuthProvider
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class IDBrokerAuthProvider(S3AuthProvider):

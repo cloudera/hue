@@ -16,19 +16,17 @@
 # limitations under the License.
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from urllib.parse import urlencode, urlparse
 
 import boto3
-from botocore.auth import SigV4Auth
 from botocore.awsrequest import AWSRequest
 from botocore.hooks import EventAliaser, HierarchicalEmitter
-from botocore.model import ServiceModel
 
 from desktop.lib.fs.s3.clients.base import S3AuthProvider
 from desktop.lib.raz.raz_client import get_raz_client
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class RazEventHandler:

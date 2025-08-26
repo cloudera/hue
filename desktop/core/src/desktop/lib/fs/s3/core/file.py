@@ -17,7 +17,7 @@
 
 import io
 import os
-from typing import BinaryIO, Callable, Optional, Union
+from typing import Union
 
 from botocore.exceptions import ClientError
 
@@ -31,7 +31,7 @@ class S3File:
   Supports both reading and writing with buffering.
   """
 
-  def __init__(self, fs: "S3FileSystem", path: Union[str, S3Path], mode: str = "rb"):
+  def __init__(self, fs, path: Union[str, S3Path], mode: str = "rb"):
     """
     Initialize S3File.
 

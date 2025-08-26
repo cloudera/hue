@@ -21,7 +21,6 @@ from typing import Any, Dict, Optional
 import boto3
 from boto3.session import Session
 from botocore.credentials import Credentials
-from botocore.exceptions import ClientError
 
 from desktop.lib.fs.s3.clients.auth.key import KeyAuthProvider
 from desktop.lib.fs.s3.clients.base import S3AuthProvider, S3ClientInterface

@@ -17,14 +17,13 @@
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import boto3
-from botocore.credentials import Credentials
 
 from desktop.lib.fs.s3.clients.base import S3AuthProvider
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class IAMAuthProvider(S3AuthProvider):
