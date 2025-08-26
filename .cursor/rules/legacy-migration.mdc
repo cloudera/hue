@@ -1,0 +1,11 @@
+---
+description: Strategy for migrating jQuery/KO/Less pieces toward React/SCSS.
+globs: ["**/jquery/**", "**/*.less", "**/*.ko.js", "**/*.vue", "**/*.tsx"]
+alwaysApply: false
+---
+
+# Migration Strategy
+- When touching legacy code, always ask before adding typed adapters and moving logic to React/TS.
+- Replace jQuery DOM ops with state/effects; keep remaining jQuery isolated.
+- Only convert Less→SCSS for code that is migrated to react.js, don't mix less and scss for the same component.
+- Add regression tests before refactors.

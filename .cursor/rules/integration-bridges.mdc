@@ -1,0 +1,15 @@
+---
+description: Guidance for React mounting in templates and KO/Vue boundaries.
+globs: ["**/templates/**", "**/*.ko", "**/*.vue", "**/*.tsx"]
+alwaysApply: false
+---
+
+# Integration Patterns
+- **KO → React**: use `reactWrapper` binding; keep KO observables at boundary.
+- **Templates (Mako/HTML)**: mount via `data-reactcomponent` on stable containers.
+- **Vue legacy**: do not introduce new Vue; prefer React for new work.
+
+## Pitfalls
+- Ensure cuix/antd CSS scope present at React root.
+- Avoid dual ownership of DOM by different frameworks.
+

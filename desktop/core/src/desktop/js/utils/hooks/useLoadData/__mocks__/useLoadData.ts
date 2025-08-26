@@ -14,8 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-@use 'variables' as vars;
+import { jest } from '@jest/globals';
 
-.react-example-global {
-  background-color: vars.$fluidx-gray-100;
-}
+const useLoadData = jest.fn(() => ({
+  data: { history: [], total: 0 },
+  loading: false,
+  error: undefined,
+  reloadData: jest.fn()
+}));
+
+export default useLoadData;
