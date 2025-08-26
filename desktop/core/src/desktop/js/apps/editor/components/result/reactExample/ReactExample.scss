@@ -1,16 +1,57 @@
-// Component styling using BEM notation
+// Licensed to Cloudera, Inc. under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  Cloudera, Inc. licenses this file
+// to you under the Apache License, Version 2.0 (the
+// 'License'); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an 'AS IS' BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 @use 'classes';
 @use 'variables' as vars;
 @use 'mixins';
 
-$my-color: #f8f8f8;
+.antd.cuix {
+  .react-example {
+    &__title,
+    &__description {
+      color: vars.$hue-primary-color-dark;
+      @include mixins.fade-in();
+    }
 
-.react-example {
-  background-color: $my-color;
-}
+    &__history-section {
+      margin-top: vars.$fluidx-spacing-m;
+      padding: vars.$fluidx-spacing-m;
+      border: 1px solid vars.$hue-border-color;
+      border-radius: vars.$border-radius-base;
+      background-color: vars.$fluidx-gray-100;
+    }
 
-.react-example__title,
-.react-example__description {
-  color: vars.$hue-primary-color-dark;
-  @include mixins.fade-in();
+    &__history-section-title {
+      margin-top: 0;
+      margin-bottom: vars.$fluidx-spacing-m;
+      color: vars.$hue-primary-color-dark;
+    }
+    
+    &__history-item {
+      padding: vars.$fluidx-spacing-s 0;
+      border-bottom: 1px solid vars.$hue-border-color;
+      font-size: vars.$font-size-sm;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    &__history-item-status {
+      color: vars.$hue-primary-color-dark;
+    }
+  }
 }

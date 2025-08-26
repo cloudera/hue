@@ -1,0 +1,21 @@
+---
+description: i18n and microcopy rules for all user-facing text.
+globs: ["**/*.tsx", "**/*.ts", "**/*.vue", "**/*.ko", "**/templates/**"]
+alwaysApply: false
+---
+
+# i18n & Copy
+- All user-facing strings go through i18n (`useTranslation()` in `i18nReact`).
+- Copy should be concise, action-oriented, and consistent.
+- Error messages = clear cause + actionable next step.
+- Default namespace `translation` unless justified otherwise.
+
+
+## Example
+```ts
+import { i18nReact } from '../../../utils/i18nReact';
+
+const { t } = i18nReact.useTranslation();
+
+const buttonLabel = t('click me')
+```t
