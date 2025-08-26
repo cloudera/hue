@@ -48,6 +48,7 @@ class RequirementsGenerator:
       "asn1crypto==0.24.0",
       "avro-python3==1.8.2",
       "Babel==2.9.1",
+      "boto3==1.37.38",
       "celery[redis]==5.4.0",
       "cffi==1.15.0",
       "channels==4.2.2",
