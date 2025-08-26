@@ -2911,6 +2911,13 @@ def is_gs_enabled():
 
 PERMISSION_ACTION_S3 = "s3_access"
 
+USE_NEW_S3_IMPLEMENTATION = Config(
+    key='use_new_s3_implementation',
+    type=coerce_bool,
+    default=False,  # Default to old implementation for now
+    help=_('Use new boto3-based S3 implementation with support for multiple providers and auth methods')
+)
+
 S3_OBJECT_STORES = UnspecifiedConfigSection(
   's3_object_stores',
   help=_('One entry for each S3-compatible object store instance'),

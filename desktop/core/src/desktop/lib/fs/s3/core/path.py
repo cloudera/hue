@@ -53,14 +53,19 @@ class S3Path:
     if parsed.scheme not in ("s3", "s3a"):
       raise ValueError(f"Invalid S3 path: {path}")
 
-    # Split path into bucket and key
-    parts = parsed.path.lstrip("/").split("/", 1)
-    bucket = unquote(parts[0]) if parts else None
-    key = unquote(parts[1]) if len(parts) > 1 else None
+    # Get bucket from netloc if present, otherwise from path
+    bucket = parsed.netloc
+    path_parts = parsed.path.lstrip("/").split("/", 1)
+
+    if not bucket and path_parts:
+      bucket = path_parts[0]
+      key = path_parts[1] if len(path_parts) > 1 else None
+    else:
+      key = parsed.path.lstrip("/") if parsed.path else None
 
     # Normalize empty strings to None
-    bucket = bucket if bucket else None
-    key = key if key else None
+    bucket = unquote(bucket) if bucket else None
+    key = unquote(key) if key else None
 
     return cls(bucket=bucket, key=key)
 

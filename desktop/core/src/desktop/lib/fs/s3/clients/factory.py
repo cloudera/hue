@@ -15,11 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Type
+from typing import List, Optional
 
 from desktop.conf import S3_OBJECT_STORES
-from desktop.lib.fs.s3.clients.base import S3AuthProvider, S3ClientInterface
+from desktop.lib.fs.s3.clients.aws import AWSS3Client
+from desktop.lib.fs.s3.clients.base import S3ClientInterface
+from desktop.lib.fs.s3.clients.generic import GenericS3Client
+
+LOG = logging.getLogger()
 
 
 @dataclass
@@ -36,9 +41,6 @@ class ClientConfig:
 
 class S3ClientFactory:
   """Factory for creating S3 clients"""
-
-  _PROVIDER_MAP = {}  # Will be populated by register_provider
-  _AUTH_PROVIDER_MAP = {}  # Will be populated by register_auth_provider
 
   @classmethod
   def get_available_clients(cls, user: str) -> List[ClientConfig]:
@@ -67,29 +69,14 @@ class S3ClientFactory:
 
     provider_conf = S3_OBJECT_STORES[provider_id]
     provider_type = provider_conf.PROVIDER.get().lower()
-    auth_type = provider_conf.AUTH_TYPE.get()
 
-    # Validate provider and auth type
-    if provider_type not in cls._PROVIDER_MAP:
-      raise ValueError(f"Unknown provider type: {provider_type}")
-    if auth_type not in cls._AUTH_PROVIDER_MAP:
-      raise ValueError(f"Unknown auth type: {auth_type}")
-
-    # Create client with auth provider
-    client_class = cls._PROVIDER_MAP[provider_type]
-    auth_provider_class = cls._AUTH_PROVIDER_MAP[auth_type]
-
-    client = client_class(provider_id, user)
-    client.auth_provider = auth_provider_class(provider_id, user)
-
-    return client
-
-  @classmethod
-  def register_provider(cls, provider_type: str, client_class: Type[S3ClientInterface]) -> None:
-    """Register a new provider type"""
-    cls._PROVIDER_MAP[provider_type.lower()] = client_class
-
-  @classmethod
-  def register_auth_provider(cls, auth_type: str, auth_provider_class: Type[S3AuthProvider]) -> None:
-    """Register a new auth provider type"""
-    cls._AUTH_PROVIDER_MAP[auth_type.lower()] = auth_provider_class
+    try:
+      if provider_type == "aws":
+        return AWSS3Client(provider_id, user)
+      elif provider_type == "generic":
+        return GenericS3Client(provider_id, user)
+      else:
+        raise ValueError(f"Unknown provider type: {provider_type}")
+    except Exception as e:
+      LOG.error(f"Failed to create S3 client: {e}")
+      raise

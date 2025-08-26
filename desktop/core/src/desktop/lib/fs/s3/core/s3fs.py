@@ -22,13 +22,14 @@ from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
 
 from botocore.exceptions import ClientError
 
+from desktop.conf import PERMISSION_ACTION_S3
 from desktop.lib.fs.s3.clients.factory import S3ClientFactory
 from desktop.lib.fs.s3.constants import DEFAULT_CHUNK_SIZE, MAX_POOL_CONNECTIONS, S3_DELIMITER
 from desktop.lib.fs.s3.core.file import S3File
 from desktop.lib.fs.s3.core.path import S3Path
 from desktop.lib.fs.s3.core.stat import S3Stat
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class S3FileSystem:
@@ -47,6 +48,13 @@ class S3FileSystem:
     """
     self.provider_id = provider_id
     self.user = user
+
+    # Backward compatibility attributes
+    self.is_sentry_managed = lambda path: False  # S3 doesn't use Sentry
+    self.superuser = None  # No superuser concept in S3
+    self.supergroup = None  # No supergroup concept in S3
+    self.expiration = None  # No expiration for S3
+    self._filebrowser_action = PERMISSION_ACTION_S3  # S3 uses filebrowser_action
 
     # Initialize client
     self.client = S3ClientFactory.get_client(provider_id, user)
@@ -73,6 +81,50 @@ class S3FileSystem:
       elif error_code == "403":
         raise PermissionError(f"Access denied to bucket: {bucket_name}")
       raise
+
+  def filebrowser_action(self):
+    return self._filebrowser_action
+
+  def setuser(self, user):
+    self.user = user
+
+  def get_upload_chuck_size(self):
+    return DEFAULT_CHUNK_SIZE
+
+  def get_upload_handler(self, destination_path, overwrite):
+    # TODO: Implement upload flow for new S3 filesystem
+    return None
+
+  def normpath(self, path: str) -> str:
+    """
+    Normalize S3 path.
+    Converts 's3://' to 's3a://' and handles path components.
+    """
+    if path.startswith("s3://"):
+      path = "s3a://" + path[5:]
+    s3path = S3Path.from_path(path)
+    return str(s3path)
+
+  def netnormpath(self, path: str) -> str:
+    """
+    Network normalize path - same as normpath for S3.
+    """
+    return self.normpath(path)
+
+  def parent_path(self, path: str) -> str:
+    """Get parent path"""
+    s3path = S3Path.from_path(path)
+    return str(s3path.parent())
+
+  def join(self, first: str, *comp_list: str) -> str:
+    """Join path components"""
+    s3path = S3Path.from_path(first)
+    return str(s3path.join(*comp_list))
+
+  def isroot(self, path: str) -> bool:
+    """Check if path is root"""
+    s3path = S3Path.from_path(path)
+    return s3path.is_root()
 
   def _get_object(self, path: Union[str, S3Path], validate: bool = True):
     """Get object by path"""
@@ -371,3 +423,30 @@ class S3FileSystem:
       if e.response["Error"]["Code"] == "403":
         raise PermissionError(f"Access denied to generate URL for: {path}")
       raise
+
+  def create_home_dir(self, home_path: Optional[str] = None) -> None:
+    """
+    Create home directory for the user.
+
+    Args:
+        home_path: Optional explicit home path, if not provided will be determined from config
+
+    Raises:
+        PermissionError: If user doesn't have permission to create directory
+        IOError: If directory creation fails
+    """
+    from desktop.lib.fs.s3.fsmanager import get_s3_home_directory
+
+    try:
+      # Get home directory path
+      if not home_path:
+        home_path = get_s3_home_directory(self.user)
+
+      # Create directory if it doesn't exist
+      if not self.exists(home_path):
+        LOG.info(f"Creating home directory at: {home_path}")
+        self.mkdir(home_path)
+
+    except Exception as e:
+      LOG.error(f"Failed to create home directory at {home_path}: {e}")
+      raise IOError(f"Failed to create home directory: {e}")

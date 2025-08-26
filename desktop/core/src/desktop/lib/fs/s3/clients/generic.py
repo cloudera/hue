@@ -23,10 +23,11 @@ from boto3.session import Session
 from botocore.credentials import Credentials
 from botocore.exceptions import ClientError
 
-from desktop.lib.fs.s3.clients.base import S3ClientInterface
+from desktop.lib.fs.s3.clients.auth.key import KeyAuthProvider
+from desktop.lib.fs.s3.clients.base import S3AuthProvider, S3ClientInterface
 from desktop.lib.fs.s3.constants import DEFAULT_REGION
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger()
 
 
 class GenericS3Client(S3ClientInterface):
@@ -49,6 +50,10 @@ class GenericS3Client(S3ClientInterface):
 
     # Apply provider-specific settings
     self._setup_provider_specific_config()
+
+  def _create_auth_provider(self) -> S3AuthProvider:
+    """Create auth provider - only key auth is supported for generic providers"""
+    return KeyAuthProvider(self.provider_id, self.user)
 
   def _get_signature_version(self) -> str:
     """Get signature version based on provider"""
