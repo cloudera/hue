@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional
 from urllib.parse import unquote, urlparse
 
 from desktop.lib.fs.s3.constants import S3_DELIMITER

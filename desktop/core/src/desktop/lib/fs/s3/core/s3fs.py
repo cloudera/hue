@@ -16,15 +16,13 @@
 # limitations under the License.
 
 import logging
-import os
-from concurrent.futures import ThreadPoolExecutor
-from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
+from typing import BinaryIO, List, Optional, Union
 
 from botocore.exceptions import ClientError
 
 from desktop.conf import PERMISSION_ACTION_S3
 from desktop.lib.fs.s3.clients.factory import S3ClientFactory
-from desktop.lib.fs.s3.constants import DEFAULT_CHUNK_SIZE, MAX_POOL_CONNECTIONS, S3_DELIMITER
+from desktop.lib.fs.s3.constants import DEFAULT_CHUNK_SIZE, S3_DELIMITER
 from desktop.lib.fs.s3.core.file import S3File
 from desktop.lib.fs.s3.core.path import S3Path
 from desktop.lib.fs.s3.core.stat import S3Stat
@@ -62,9 +60,6 @@ class S3FileSystem:
     # Get boto3 clients
     self.s3_client = self.client.s3_client
     self.s3_resource = self.client.s3_resource
-
-    # Initialize thread pool for parallel operations
-    self.thread_pool = ThreadPoolExecutor(max_workers=MAX_POOL_CONNECTIONS)
 
   def _get_bucket(self, bucket_name: str, validate: bool = True):
     """Get bucket by name"""
@@ -364,7 +359,7 @@ class S3FileSystem:
             self.s3_client.copy(copy_source, dst.bucket, dst_key)
     except ClientError as e:
       if e.response["Error"]["Code"] == "403":
-        raise PermissionError(f"Access denied for copy operation")
+        raise PermissionError("Access denied for copy operation")
       raise
 
   def rename(self, old: Union[str, S3Path], new: Union[str, S3Path]) -> None:
