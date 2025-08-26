@@ -17,27 +17,22 @@
 
 from __future__ import absolute_import
 
-from functools import partial
 import logging
+from functools import partial
 
 import aws.client
 import azure.client
 import desktop.lib.fs.gc.client
 import desktop.lib.fs.ozone.client
-
-from aws.conf import is_enabled as is_s3_enabled, has_s3_access
-from azure.conf import is_adls_enabled, is_abfs_enabled, has_adls_access, has_abfs_access
-
-
-from desktop.conf import is_gs_enabled, has_gs_access, DEFAULT_USER, is_ofs_enabled, has_ofs_access, RAZ
-
+from aws.conf import has_s3_access, is_enabled as is_s3_enabled
+from azure.conf import has_abfs_access, has_adls_access, is_abfs_enabled, is_adls_enabled
+from desktop.conf import DEFAULT_USER, has_gs_access, has_ofs_access, is_gs_enabled, is_ofs_enabled, RAZ, USE_NEW_S3_IMPLEMENTATION
 from desktop.lib.fs.proxyfs import ProxyFS
-from desktop.lib.python_util import current_ms_from_utc
+from desktop.lib.fs.s3.fsmanager import make_s3_client
 from desktop.lib.idbroker import conf as conf_idbroker
-
-from hadoop.cluster import get_hdfs, _make_filesystem
+from desktop.lib.python_util import current_ms_from_utc
+from hadoop.cluster import _make_filesystem, get_hdfs
 from hadoop.conf import has_hdfs_enabled
-
 
 SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs', 'gs', 'ofs']
 CLIENT_CACHE = None
@@ -61,6 +56,8 @@ def has_access(fs=None, user=None):
   elif fs == 'adl':
     return has_adls_access(user)
   elif fs == 's3a':
+    if USE_NEW_S3_IMPLEMENTATION.get():
+      return True
     return has_s3_access(user)
   elif fs == 'abfs':
     return has_abfs_access(user)
@@ -76,6 +73,8 @@ def is_enabled(fs):
   elif fs == 'adl':
     return is_adls_enabled()
   elif fs == 's3a':
+    if USE_NEW_S3_IMPLEMENTATION.get():
+      return True
     return is_s3_enabled()
   elif fs == 'abfs':
     return is_abfs_enabled()
@@ -93,6 +92,8 @@ def _make_client(fs, name, user):
   if fs == 'hdfs':
     return _make_filesystem(name)
   elif fs == 's3a':
+    if USE_NEW_S3_IMPLEMENTATION.get():
+      return make_s3_client(name, user)
     return aws.client._make_client(name, user)
   elif fs == 'adl':
     return azure.client._make_adls_client(name, user)

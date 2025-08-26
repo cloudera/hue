@@ -23,8 +23,14 @@ from boto3.session import Session
 from botocore.credentials import Credentials
 from botocore.exceptions import ClientError
 
-from desktop.lib.fs.s3.clients.base import S3ClientInterface
+from desktop.conf import RAZ
+from desktop.lib.fs.s3.clients.auth.iam import IAMAuthProvider
+from desktop.lib.fs.s3.clients.auth.idbroker import IDBrokerAuthProvider
+from desktop.lib.fs.s3.clients.auth.key import KeyAuthProvider
+from desktop.lib.fs.s3.clients.auth.raz import RazAuthProvider
+from desktop.lib.fs.s3.clients.base import S3AuthProvider, S3ClientInterface
 from desktop.lib.fs.s3.constants import DEFAULT_REGION
+from desktop.lib.idbroker import conf as conf_idbroker
 
 LOG = logging.getLogger(__name__)
 
@@ -47,6 +53,17 @@ class AWSS3Client(S3ClientInterface):
         "use_dualstack_endpoint": self.config.OPTIONS.get().get("use_dualstack", False),
       }
     )
+
+  def _create_auth_provider(self) -> S3AuthProvider:
+    """Create appropriate auth provider based on config"""
+    if RAZ.IS_ENABLED.get():
+      return RazAuthProvider(self.provider_id, self.user)
+    elif conf_idbroker.is_idbroker_enabled("s3a"):
+      return IDBrokerAuthProvider(self.provider_id, self.user)
+    elif self.config.IAM_ROLE.get():
+      return IAMAuthProvider(self.provider_id, self.user)
+    else:
+      return KeyAuthProvider(self.provider_id, self.user)
 
   def _create_session(self) -> Session:
     """Create boto3 session with credentials from auth provider"""

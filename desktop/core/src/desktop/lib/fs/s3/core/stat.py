@@ -16,7 +16,7 @@
 # limitations under the License.
 
 import stat
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, Optional, Union
 
@@ -33,7 +33,7 @@ class S3Stat:
   path: str  # Full path
   name: str  # File/directory name
   size: int  # Size in bytes
-  mtime: Optional[datetime]  # Last modified time
+  mtime: Optional[int]  # Last modified time
   is_dir: bool  # True if directory
 
   # Optional S3-specific attributes
@@ -41,6 +41,44 @@ class S3Stat:
   version_id: Optional[str] = None
   storage_class: Optional[str] = None
   metadata: Optional[Dict[str, str]] = None
+
+  # Additional attributes needed for compatibility
+  atime: Optional[int] = None  # Access time (same as mtime for S3)
+  aclBit: bool = False  # ACL bit flag
+  replication: int = 1  # Replication factor (always 1 for S3)
+  user: str = ""  # Owner
+  group: str = ""  # Group
+
+  # Internal dict to store dynamic attributes
+  _attrs: Dict[str, Any] = field(default_factory=dict)
+
+  def __post_init__(self):
+    # For backward compatibility - expose is_dir as isDir
+    self.isDir = self.is_dir
+
+  def __getitem__(self, key: str) -> Any:
+    """Support dict-like access to attributes"""
+    # First check internal attrs dict
+    if key in self._attrs:
+      return self._attrs[key]
+
+    # Then check instance attributes
+    if hasattr(self, key):
+      return getattr(self, key)
+
+    # Finally check property methods
+    if key in ["type", "mode"]:
+      return getattr(self, key)
+
+    raise KeyError(key)
+
+  def __setitem__(self, key: str, value: Any) -> None:
+    """Support dict-like setting of attributes"""
+    # For path attribute, also update the instance attribute
+    if key == "path":
+      self.path = value
+    # Store in internal attrs dict
+    self._attrs[key] = value
 
   @property
   def mode(self) -> int:
@@ -93,7 +131,8 @@ class S3Stat:
       path=f"s3a://{obj.bucket_name}/{obj.key}",
       name=obj.key.rstrip("/").split("/")[-1],
       size=obj.content_length,
-      mtime=obj.last_modified,
+      mtime=int(obj.last_modified.timestamp()),  # Convert to timestamp
+      atime=int(obj.last_modified.timestamp()),  # Convert to timestamp
       is_dir=obj.key.endswith("/"),
       etag=obj.e_tag.strip('"') if obj.e_tag else None,
       version_id=obj.version_id,
@@ -116,11 +155,17 @@ class S3Stat:
     if isinstance(path, str):
       path = S3Path.from_path(path)
 
+    last_modified = head_response["LastModified"]
+    if isinstance(last_modified, str):
+      last_modified = datetime.strptime(last_modified, "%Y-%m-%dT%H:%M:%S.%fZ")
+    timestamp = int(last_modified.timestamp())
+
     return cls(
       path=str(path),
       name=path.name(),
       size=head_response["ContentLength"],
-      mtime=head_response["LastModified"],
+      mtime=timestamp,  # Store as timestamp
+      atime=timestamp,  # Store as timestamp
       is_dir=path.key.endswith("/"),
       etag=head_response.get("ETag", "").strip('"'),
       version_id=head_response.get("VersionId"),
@@ -144,20 +189,29 @@ class S3Stat:
 
     return cls(path=str(path), name=path.name(), size=0, mtime=None, is_dir=True)
 
-  def to_json(self) -> Dict[str, Any]:
+  def to_json_dict(self) -> Dict[str, Any]:
     """Convert to JSON-serializable dict"""
-    return {
+    base = {
       "path": self.path,
       "name": self.name,
       "size": self.size,
-      "mtime": self.mtime.isoformat() if self.mtime else None,
+      "mtime": self.mtime,  # Already an integer timestamp
+      "atime": self.atime,  # Already an integer timestamp
       "type": self.type,
       "mode": self.mode,
+      "user": self.user,
+      "group": self.group,
+      "aclBit": self.aclBit,
+      "replication": self.replication,
       "etag": self.etag,
       "version_id": self.version_id,
       "storage_class": self.storage_class,
       "metadata": self.metadata,
+      "isDir": self.is_dir,  # Add for backward compatibility
     }
+    # Include any dynamic attributes
+    base.update(self._attrs)
+    return base
 
   def __eq__(self, other: object) -> bool:
     """Compare stats"""
