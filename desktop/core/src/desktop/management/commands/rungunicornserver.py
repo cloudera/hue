@@ -43,6 +43,7 @@ import desktop.log
 from desktop import conf
 from desktop.lib.ip_utils import fetch_ipv6_bind_address
 from desktop.lib.paths import get_desktop_root
+from desktop.lib.tls_utils import get_tls_settings
 from filebrowser.utils import parse_broker_url
 
 GUNICORN_SERVER_HELP = r"""
@@ -228,6 +229,79 @@ def argprocessing(args=[], options={}):
 
 
 def rungunicornserver(args=[], options={}):
+  # Get TLS configuration
+  tls_settings = get_tls_settings()
+
+  def gunicorn_ssl_context(conf, default_ssl_context_factory):
+    """
+    Create and configure SSL context for Gunicorn based on TLS settings.
+
+    Args:
+        conf: Gunicorn configuration object
+        default_ssl_context_factory: Default SSL context factory function
+
+    Returns:
+        Configured SSL context
+    """
+    context = default_ssl_context_factory()
+
+    try:
+      # Validate TLS settings before applying
+      if "error" in tls_settings:
+        logging.warning(f"TLS configuration error: {tls_settings['error']}")
+        return context
+
+      # Configure maximum TLS version
+      max_version = tls_settings.get("tls_maximum_version")
+      if max_version == "TLSv1.3":
+        if hasattr(ssl, "HAS_TLSv1_3") and ssl.HAS_TLSv1_3 and hasattr(ssl, "TLSVersion"):
+          context.maximum_version = ssl.TLSVersion.TLSv1_3
+          logging.info("Set maximum TLS version to TLSv1.3")
+        else:
+          logging.warning("TLS 1.3 requested but not supported by system, falling back to TLS 1.2")
+          if hasattr(ssl, "TLSVersion"):
+            context.maximum_version = ssl.TLSVersion.TLSv1_2
+      elif max_version == "TLSv1.2":
+        if hasattr(ssl, "TLSVersion"):
+          context.maximum_version = ssl.TLSVersion.TLSv1_2
+          logging.info("Set maximum TLS version to TLSv1.2")
+
+      # Configure minimum TLS version
+      min_version = tls_settings.get("tls_minimum_version")
+      if min_version == "TLSv1.3":
+        if hasattr(ssl, "HAS_TLSv1_3") and ssl.HAS_TLSv1_3 and hasattr(ssl, "TLSVersion"):
+          context.minimum_version = ssl.TLSVersion.TLSv1_3
+          logging.info("Set minimum TLS version to TLSv1.3")
+        else:
+          logging.warning("TLS 1.3 minimum requested but not supported, falling back to TLS 1.2")
+          if hasattr(ssl, "TLSVersion"):
+            context.minimum_version = ssl.TLSVersion.TLSv1_2
+      elif min_version == "TLSv1.2":
+        if hasattr(ssl, "TLSVersion"):
+          context.minimum_version = ssl.TLSVersion.TLSv1_2
+          logging.info("Set minimum TLS version to TLSv1.2")
+
+      # Configure ciphers (only for TLS 1.2)
+      ciphers = tls_settings.get("ciphers", "")
+      if ciphers and ciphers.strip():  # Only set if ciphers is not empty
+        try:
+          context.set_ciphers(ciphers)
+          logging.info(f"Successfully configured ciphers: {ciphers}")
+        except ssl.SSLError as e:
+          logging.error(f"Invalid cipher configuration '{ciphers}': {e}")
+        except Exception as e:
+          logging.error(f"Unexpected error setting ciphers '{ciphers}': {e}")
+      elif max_version == "TLSv1.3":
+        logging.info("TLS 1.3 enabled - cipher configuration handled automatically")
+      else:
+        logging.info("No custom ciphers configured, using system defaults")
+
+    except Exception as e:
+      logging.error(f"Error configuring SSL context: {e}")
+      logging.info("Using default SSL context configuration")
+
+    return context
+
   gunicorn_options = {
       'accesslog': "-",
       'access_log_format': "%({x-forwarded-for}i)s %(h)s %(l)s %(u)s %(t)s '%(r)s' %(s)s %(b)s '%(f)s' '%(a)s'",
@@ -239,7 +313,6 @@ def rungunicornserver(args=[], options={}):
       'certfile': conf.SSL_CERTIFICATE.get(),  # SSL certificate file
       'chdir': None,
       'check_config': None,
-      'ciphers': conf.SSL_CIPHER_LIST.get(),  # Ciphers to use (see stdlib ssl module)
       'config': None,
       'daemon': None,
       'do_handshake_on_connect': False,       # Whether to perform SSL handshake on socket connect.
@@ -270,7 +343,7 @@ def rungunicornserver(args=[], options={}):
       'reload_engine': None,
       'sendfile': True,
       'spew': None,
-      'ssl_version': ssl.PROTOCOL_TLSv1_2,    # SSL version to use
+      'ssl_context': gunicorn_ssl_context,
       'statsd_host': None,
       'statsd_prefix': None,
       'suppress_ragged_eofs': None,           # Suppress ragged EOFs (see stdlib ssl module)
@@ -290,6 +363,7 @@ def rungunicornserver(args=[], options={}):
       'post_worker_init': post_worker_init,
       'worker_int': worker_int
   }
+
   StandaloneApplication(handler_app, gunicorn_options).run()
 
 
