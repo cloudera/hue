@@ -62,6 +62,7 @@ const SourceConfiguration = ({
                 onChange={value => onChange(value, config.name)}
                 value={fileFormat?.[config.name]}
                 getPopupContainer={triggerNode => triggerNode.parentElement}
+                aria-label={t(config.label)}
               />
             </div>
           ))}
