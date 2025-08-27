@@ -26,7 +26,7 @@ from django.utils.http import urlencode
 from requests import exceptions
 from requests.adapters import HTTPAdapter
 from requests.auth import AuthBase, HTTPBasicAuth, HTTPDigestAuth
-from requests_kerberos import DISABLED, OPTIONAL, REQUIRED, HTTPKerberosAuth
+from requests_kerberos import DISABLED, HTTPKerberosAuth, OPTIONAL, REQUIRED
 from urllib3.contrib import pyopenssl
 
 from desktop import conf

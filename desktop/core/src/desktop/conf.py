@@ -318,6 +318,7 @@ SSL_CIPHER_LIST = Config(
     '!KRB5-DES-CBC3-SHA',
   ]))
 
+
 # TLS 1.3 Configuration
 def has_tls13_support():
   """Check if TLS 1.3 is supported by the current Python/OpenSSL version."""
@@ -326,6 +327,7 @@ def has_tls13_support():
     return hasattr(ssl, 'HAS_TLSv1_3') and ssl.HAS_TLSv1_3
   except ImportError:
     return False
+
 
 SSL_TLS13_ENABLED = Config(
   key="ssl_tls13_enabled",

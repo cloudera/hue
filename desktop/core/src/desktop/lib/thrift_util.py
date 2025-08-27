@@ -17,16 +17,16 @@
 #
 from __future__ import division
 
-import re
-import sys
-import math
-import time
-import queue
 import base64
+import logging
+import math
+import queue
+import re
 import socket
 import struct
-import logging
+import sys
 import threading
+import time
 from builtins import map, object, range
 
 from django.conf import settings
@@ -45,7 +45,7 @@ from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
 from desktop.lib.thrift_sasl import TSaslClientTransport
-from desktop.lib.tls_utils import get_ssl_protocol, create_thrift_ssl_context
+from desktop.lib.tls_utils import create_thrift_ssl_context, get_ssl_protocol
 
 LOG = logging.getLogger()
 
