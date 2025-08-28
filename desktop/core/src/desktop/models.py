@@ -52,6 +52,7 @@ from desktop.conf import (
   IS_MULTICLUSTER_ONLY,
   RAZ,
   TASK_SERVER,
+  USE_NEW_S3_IMPLEMENTATION,
 )
 from desktop.lib import fsmanager
 from desktop.lib.connectors.api import _get_installed_connectors
@@ -2027,8 +2028,13 @@ class ClusterConfig(object):
         })
 
       if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
-        from aws.s3.s3fs import get_s3_home_directory
+        if USE_NEW_S3_IMPLEMENTATION.get():
+          from desktop.lib.fs.s3.fsmanager import get_s3_home_directory
+        else:
+          from aws.s3.s3fs import get_s3_home_directory
+
         home_path = get_s3_home_directory(self.user)
+
         interpreters.append({
           'type': 's3',
           'displayName': _('S3'),
