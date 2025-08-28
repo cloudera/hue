@@ -74,9 +74,12 @@ class S3Stat:
 
   def __setitem__(self, key: str, value: Any) -> None:
     """Support dict-like setting of attributes"""
-    # For path attribute, also update the instance attribute
+    # For path and name attribute, also update the instance attribute
     if key == "path":
       self.path = value
+    elif key == "name":
+      self.name = value
+
     # Store in internal attrs dict
     self._attrs[key] = value
 
@@ -103,10 +106,10 @@ class S3Stat:
     Create stats from bucket.
 
     Args:
-        bucket: boto3 Bucket object
+      bucket: boto3 Bucket object
 
     Returns:
-        S3Stat instance
+      S3Stat instance
     """
     return cls(
       path=f"s3a://{bucket.name}",
@@ -122,10 +125,10 @@ class S3Stat:
     Create stats from S3 object.
 
     Args:
-        obj: boto3 Object object
+      obj: boto3 Object object
 
     Returns:
-        S3Stat instance
+      S3Stat instance
     """
     return cls(
       path=f"s3a://{obj.bucket_name}/{obj.key}",
@@ -146,11 +149,11 @@ class S3Stat:
     Create stats from head_object response.
 
     Args:
-        head_response: Response from head_object API call
-        path: S3 path
+      head_response: Response from head_object API call
+      path: S3 path
 
     Returns:
-        S3Stat instance
+      S3Stat instance
     """
     if isinstance(path, str):
       path = S3Path.from_path(path)
@@ -179,10 +182,10 @@ class S3Stat:
     Create stats for directory path.
 
     Args:
-        path: S3 path
+      path: S3 path
 
     Returns:
-        S3Stat instance
+      S3Stat instance
     """
     if isinstance(path, str):
       path = S3Path.from_path(path)
