@@ -43,8 +43,8 @@ class S3FileSystem:
     Initialize S3FileSystem.
 
     Args:
-        provider_id: ID from S3_OBJECT_STORES config
-        user: Username for operations
+      provider_id: ID from S3_OBJECT_STORES config
+      user: Username for operations
     """
     self.provider_id = provider_id
     self.user = user
@@ -419,11 +419,11 @@ class S3FileSystem:
     Create home directory for the user.
 
     Args:
-        home_path: Optional explicit home path, if not provided will be determined from config
+      home_path: Optional explicit home path, if not provided will be determined from config
 
     Raises:
-        PermissionError: If user doesn't have permission to create directory
-        IOError: If directory creation fails
+      PermissionError: If user doesn't have permission to create directory
+      IOError: If directory creation fails
     """
     from desktop.lib.fs.s3.fsmanager import get_s3_home_directory
 
