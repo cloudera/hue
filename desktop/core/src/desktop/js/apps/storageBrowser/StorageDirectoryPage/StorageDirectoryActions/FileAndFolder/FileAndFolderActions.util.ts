@@ -29,7 +29,7 @@ import {
   isS3,
   isOFSRoot,
   inTrash
-} from '../../../../../utils/storageBrowserUtils';
+} from '../../../utils/utils';
 import { SupportedFileTypes } from '../../../../../utils/constants/storageBrowser';
 import { TFunction } from 'i18next';
 import { getFileType } from '../../../StorageFilePage/StorageFilePage.util';
