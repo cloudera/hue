@@ -5,5 +5,12 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'UA-37637545-1');
+  gtag('config', '${ conf.GTAG_ID.get()}', {
+    // Prevent GA from accidentally passing client meta data present in urls
+    send_page_view: false, 
+    page_location: 'redacted',
+    page_referrer: 'redacted',
+    allow_google_signals: false,
+    cookie_expires: 0
+  });
 </script>

@@ -55,7 +55,8 @@
         send_page_view: false, 
         page_location: 'redacted',
         page_referrer: 'redacted',
-        allow_google_signals: false
+        allow_google_signals: false,
+        cookie_expires: 0
         });
     </script>
   % endif
