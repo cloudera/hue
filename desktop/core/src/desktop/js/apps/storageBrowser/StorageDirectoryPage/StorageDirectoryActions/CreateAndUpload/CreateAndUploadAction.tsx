@@ -34,8 +34,8 @@ import {
   isOFSServiceID,
   isOFSVol,
   isS3Root,
-  isFileSystemRoot
-} from '../../../../../utils/storageBrowserUtils';
+  isFileSystemNonRoot
+} from '../../../utils/utils';
 import { FileStats } from '../../../types';
 import useSaveData from '../../../../../utils/hooks/useSaveData/useSaveData';
 import InputModal from '../../../../../reactComponents/InputModal/InputModal';
@@ -78,7 +78,7 @@ const getActionConfig = (t: TFunction): Record<ActionType, ActionItem> => ({
     modal: { title: t('Create File'), label: t('File name') },
     api: CREATE_FILE_API_URL,
     group: 'create',
-    visible: path => isFileSystemRoot(path)
+    visible: path => isFileSystemNonRoot(path)
   },
   [ActionType.createFolder]: {
     icon: <FolderIcon />,
@@ -86,7 +86,7 @@ const getActionConfig = (t: TFunction): Record<ActionType, ActionItem> => ({
     modal: { title: t('Create Folder'), label: t('Folder name') },
     api: CREATE_DIRECTORY_API_URL,
     group: 'create',
-    visible: path => isFileSystemRoot(path)
+    visible: path => isFileSystemNonRoot(path)
   },
   [ActionType.createBucket]: {
     icon: <BucketIcon />,
@@ -116,7 +116,7 @@ const getActionConfig = (t: TFunction): Record<ActionType, ActionItem> => ({
     icon: <ImportIcon />,
     label: t('Upload File'),
     group: 'upload',
-    visible: path => isFileSystemRoot(path)
+    visible: path => isFileSystemNonRoot(path)
   }
 });
 

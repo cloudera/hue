@@ -36,7 +36,7 @@ import {
   getLastDirOrFileNameFromPath,
   getFileSystemAndPath
 } from '../../../reactComponents/PathBrowser/PathBrowser.util';
-import { inTrash } from '../../../utils/storageBrowserUtils';
+import { inTrash } from '../utils/utils';
 
 import './StorageBrowserTab.scss';
 

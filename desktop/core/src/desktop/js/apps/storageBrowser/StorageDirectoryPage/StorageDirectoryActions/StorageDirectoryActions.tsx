@@ -15,7 +15,7 @@
 // limitations under the License.
 
 import React from 'react';
-import { inTrash } from '../../../../utils/storageBrowserUtils';
+import { inTrash } from '../../utils/utils';
 import CreateAndUploadAction from './CreateAndUpload/CreateAndUploadAction';
 import TrashActions from './Trash/TrashActions';
 import FileAndFolderActions from './FileAndFolder/FileAndFolderActions';
