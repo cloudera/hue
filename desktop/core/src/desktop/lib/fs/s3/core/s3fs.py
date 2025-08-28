@@ -16,7 +16,9 @@
 # limitations under the License.
 
 import logging
-from typing import BinaryIO, List, Optional, Union
+import os
+import time
+from typing import Any, BinaryIO, List, Optional, Union
 
 from botocore.exceptions import ClientError
 
@@ -77,49 +79,35 @@ class S3FileSystem:
         raise PermissionError(f"Access denied to bucket: {bucket_name}")
       raise
 
-  def filebrowser_action(self):
-    return self._filebrowser_action
+  def _create_bucket(self, bucket_name: str) -> Any:
+    """Create bucket in the correct region"""
+    region = self.client.get_region(bucket_name)
+    kwargs = {}
 
-  def setuser(self, user):
-    self.user = user
+    if region and region != "us-east-1":
+      kwargs["CreateBucketConfiguration"] = {"LocationConstraint": region}
 
-  def get_upload_chuck_size(self):
-    return DEFAULT_CHUNK_SIZE
+    return self.s3_client.create_bucket(Bucket=bucket_name, **kwargs)
 
-  def get_upload_handler(self, destination_path, overwrite):
-    # TODO: Implement upload flow for new S3 filesystem
-    return None
+  def _delete_bucket(self, bucket_name: str) -> None:
+    """Delete bucket and all its contents"""
+    try:
+      bucket = self._get_bucket(bucket_name)
 
-  def normpath(self, path: str) -> str:
-    """
-    Normalize S3 path.
-    Converts 's3://' to 's3a://' and handles path components.
-    """
-    if path.startswith("s3://"):
-      path = "s3a://" + path[5:]
-    s3path = S3Path.from_path(path)
-    return str(s3path)
+      # Delete objects in batches
+      paginator = self.s3_client.get_paginator("list_objects_v2")
+      for page in paginator.paginate(Bucket=bucket_name):
+        objects_to_delete = [{"Key": obj["Key"]} for obj in page.get("Contents", [])]
+        if objects_to_delete:
+          self.s3_client.delete_objects(Bucket=bucket_name, Delete={"Objects": objects_to_delete})
 
-  def netnormpath(self, path: str) -> str:
-    """
-    Network normalize path - same as normpath for S3.
-    """
-    return self.normpath(path)
+      # Delete the empty bucket
+      bucket.delete()
 
-  def parent_path(self, path: str) -> str:
-    """Get parent path"""
-    s3path = S3Path.from_path(path)
-    return str(s3path.parent())
-
-  def join(self, first: str, *comp_list: str) -> str:
-    """Join path components"""
-    s3path = S3Path.from_path(first)
-    return str(s3path.join(*comp_list))
-
-  def isroot(self, path: str) -> bool:
-    """Check if path is root"""
-    s3path = S3Path.from_path(path)
-    return s3path.is_root()
+    except ClientError as e:
+      if e.response["Error"]["Code"] == "403":
+        raise PermissionError(f"Access denied to delete bucket: {bucket_name}")
+      raise
 
   def _get_object(self, path: Union[str, S3Path], validate: bool = True):
     """Get object by path"""
@@ -149,20 +137,41 @@ class S3FileSystem:
       f.seek(offset)
       return f.read(length)
 
-  def write(self, path: Union[str, S3Path], data: Union[bytes, BinaryIO], overwrite: bool = False) -> None:
-    """Write data to file"""
+  def create(self, path: Union[str, S3Path], overwrite: bool = False, data: Optional[Union[str, bytes]] = None) -> None:
+    """
+    Create a new file with optional initial content.
+
+    Args:
+      path: S3 path for new file
+      overwrite: If True, overwrite existing file. If False, raise error if file exists
+      data: Optional initial content (string or bytes)
+
+    Raises:
+      FileExistsError: If file exists and overwrite=False
+      ClientError: For S3 API errors
+    """
+    if isinstance(path, str):
+      path = S3Path.from_path(path)
+
+    # Check if file exists
     if not overwrite and self.exists(path):
       raise FileExistsError(f"File already exists: {path}")
 
-    with self.open(path, "wb") as f:
-      if isinstance(data, bytes):
-        f.write(data)
-      else:
-        while True:
-          chunk = data.read(DEFAULT_CHUNK_SIZE)
-          if not chunk:
-            break
-          f.write(chunk)
+    # Convert string data to bytes if needed
+    if isinstance(data, str):
+      data = data.encode("utf-8")
+    elif data is None:
+      data = b""
+
+    try:
+      self.s3_client.put_object(Bucket=path.bucket, Key=path.key, Body=data)
+    except ClientError as e:
+      error_code = e.response["Error"]["Code"]
+      if error_code == "NoSuchBucket":
+        raise FileNotFoundError(f"Bucket does not exist: {path.bucket}")
+      elif error_code == "AccessDenied":
+        raise PermissionError(f"Access denied creating file: {path}")
+      raise
 
   def exists(self, path: Union[str, S3Path]) -> bool:
     """Check if path exists"""
@@ -269,8 +278,7 @@ class S3FileSystem:
 
     try:
       if path.is_bucket():
-        # Create bucket
-        self.s3_client.create_bucket(Bucket=path.bucket)
+        self._create_bucket(path.bucket)
       else:
         # Create directory marker
         key = path.key.rstrip("/") + "/"
@@ -290,9 +298,7 @@ class S3FileSystem:
 
     try:
       if path.is_bucket():
-        # Delete bucket
-        bucket = self._get_bucket(path.bucket)
-        bucket.delete()
+        self._delete_bucket(path.bucket)
       else:
         # Delete object
         self.s3_client.delete_object(Bucket=path.bucket, Key=path.key)
@@ -310,26 +316,29 @@ class S3FileSystem:
       path = S3Path.from_path(path)
 
     try:
-      bucket = self._get_bucket(path.bucket)
-
       if path.is_bucket():
-        # Delete entire bucket
-        bucket.objects.all().delete()
-        bucket.delete()
+        self._delete_bucket(path.bucket)
+      elif self.isfile(path):
+        self.remove(path, skip_trash=skip_trash)  # Delete file in rmtree for backward compatibility
       else:
-        # Delete prefix
+        # Get prefix for directory
         prefix = path.key
         if not prefix.endswith("/"):
           prefix += "/"
 
-        # Use bulk delete for efficiency
-        bucket.objects.filter(Prefix=prefix).delete()
+        # Delete objects in batches
+        paginator = self.s3_client.get_paginator("list_objects_v2")
+        for page in paginator.paginate(Bucket=path.bucket, Prefix=prefix):
+          objects_to_delete = [{"Key": obj["Key"]} for obj in page.get("Contents", [])]
+          if objects_to_delete:
+            self.s3_client.delete_objects(Bucket=path.bucket, Delete={"Objects": objects_to_delete})
+
     except ClientError as e:
       if e.response["Error"]["Code"] == "403":
         raise PermissionError(f"Access denied to delete: {path}")
       raise
 
-  def copy(self, src: Union[str, S3Path], dst: Union[str, S3Path], recursive: bool = False) -> None:
+  def copy(self, src: Union[str, S3Path], dst: Union[str, S3Path], recursive: bool = False, *args, **kwargs) -> None:
     """Copy file or directory"""
     if isinstance(src, str):
       src = S3Path.from_path(src)
@@ -405,20 +414,6 @@ class S3FileSystem:
         raise PermissionError(f"Access denied to download from: {src_path}")
       raise
 
-  def get_presigned_url(self, path: Union[str, S3Path], method: str = "GET", expiration: int = 3600) -> str:
-    """Get presigned URL for object"""
-    if isinstance(path, str):
-      path = S3Path.from_path(path)
-
-    try:
-      return self.s3_client.generate_presigned_url(
-        "get_object" if method == "GET" else "put_object", Params={"Bucket": path.bucket, "Key": path.key}, ExpiresIn=expiration
-      )
-    except ClientError as e:
-      if e.response["Error"]["Code"] == "403":
-        raise PermissionError(f"Access denied to generate URL for: {path}")
-      raise
-
   def create_home_dir(self, home_path: Optional[str] = None) -> None:
     """
     Create home directory for the user.
@@ -445,3 +440,261 @@ class S3FileSystem:
     except Exception as e:
       LOG.error(f"Failed to create home directory at {home_path}: {e}")
       raise IOError(f"Failed to create home directory: {e}")
+
+  # Backward compatibility methods
+
+  def filebrowser_action(self):
+    return self._filebrowser_action
+
+  def setuser(self, user):
+    self.user = user
+
+  def get_upload_chuck_size(self):
+    return DEFAULT_CHUNK_SIZE
+
+  def get_upload_handler(self, destination_path, overwrite):
+    # TODO: Implement upload flow for new S3 filesystem
+    return None
+
+  def normpath(self, path: str) -> str:
+    """
+    Normalize S3 path.
+    Converts 's3://' to 's3a://' and handles path components.
+    """
+    if path.startswith("s3://"):
+      path = "s3a://" + path[5:]
+    s3path = S3Path.from_path(path)
+    return str(s3path)
+
+  def netnormpath(self, path: str) -> str:
+    """
+    Network normalize path - same as normpath for S3.
+    """
+    return self.normpath(path)
+
+  def parent_path(self, path: str) -> str:
+    """Get parent path"""
+    s3path = S3Path.from_path(path)
+    return str(s3path.parent())
+
+  def join(self, first: str, *comp_list: str) -> str:
+    """Join path components"""
+    s3path = S3Path.from_path(first)
+    return str(s3path.join(*comp_list))
+
+  def isroot(self, path: str) -> bool:
+    """Check if path is root"""
+    s3path = S3Path.from_path(path)
+    return s3path.is_root()
+
+  def restore(self, *args, **kwargs):
+    raise NotImplementedError("restore is not implemented for S3")
+
+  def chmod(self, path: Union[str, S3Path], mode: int) -> None:
+    """Change file mode"""
+    raise NotImplementedError("chmod is not implemented for S3")
+
+  def chown(self, path: Union[str, S3Path], user: str, group: str, *args, **kwargs) -> None:
+    """Change file owner"""
+    raise NotImplementedError("chown is not implemented for S3")
+
+  def copyfile(self, src: Union[str, S3Path], dst: Union[str, S3Path], *args, **kwargs) -> None:
+    """Copy single file (no recursion)"""
+    return self.copy(src, dst, recursive=False)
+
+  def copy_remote_dir(self, src: Union[str, S3Path], dst: Union[str, S3Path], *args, **kwargs) -> None:
+    """Copy directory recursively"""
+    return self.copy(src, dst, recursive=True)
+
+  def rename_star(self, old_dir: Union[str, S3Path], new_dir: Union[str, S3Path]) -> None:
+    """
+    Rename contents of old_dir to new_dir without renaming the directory itself.
+    Useful when you want to move directory contents but preserve the directory.
+
+    Args:
+      old_dir: Source directory
+      new_dir: Destination directory
+
+    Raises:
+      NotADirectoryError: If old_dir is not a directory
+      ClientError: For S3 API errors
+    """
+    if isinstance(old_dir, str):
+      old_dir = S3Path.from_path(old_dir)
+    if isinstance(new_dir, str):
+      new_dir = S3Path.from_path(new_dir)
+
+    if not self.isdir(old_dir):
+      raise NotADirectoryError(f"Source is not a directory: {old_dir}")
+
+    # Get directory contents and rename each entry
+    entries = self.listdir(old_dir)
+    for entry in entries:
+      src = old_dir.join(entry)
+      dst = new_dir.join(entry)
+      self.rename(src, dst)
+
+  def copyFromLocal(self, local_src: str, remote_dst: str, *args, **kwargs) -> None:
+    """
+    Copy local file or directory to S3.
+
+    The method preserves directory structure when copying directories.
+    For single files, if remote_dst is a directory, the file is copied into it.
+    Otherwise remote_dst is used as the destination file path.
+
+    Args:
+      local_src: Local file/directory path
+      remote_dst: S3 destination path
+      *args, **kwargs: Additional arguments (for backward compatibility)
+    """
+    if isinstance(remote_dst, str):
+      remote_dst = S3Path.from_path(remote_dst)
+
+    # Handle directory copy
+    if os.path.isdir(local_src):
+      # Walk directory tree
+      for root, dirs, files in os.walk(local_src, followlinks=False):
+        # Calculate relative path
+        rel_path = os.path.relpath(root, local_src)
+
+        # Create remote directory path
+        remote_dir = remote_dst.join(rel_path) if rel_path != "." else remote_dst
+
+        # Create empty directory if no contents
+        if not dirs and not files:
+          self.mkdir(remote_dir)
+          continue
+
+        # Copy each file
+        for file_name in files:
+          local_file = os.path.join(root, file_name)
+          remote_file = remote_dir.join(file_name)
+
+          self.s3_client.upload_file(Filename=local_file, Bucket=remote_file.bucket, Key=remote_file.key)
+
+    # Handle single file copy
+    else:
+      if self.isdir(remote_dst):
+        remote_file = remote_dst.join(os.path.basename(local_src))
+      else:
+        remote_file = remote_dst
+
+      self.s3_client.upload_file(Filename=local_src, Bucket=remote_file.bucket, Key=remote_file.key)
+
+  def append(self, path: Union[str, S3Path], data: Union[str, bytes]) -> None:
+    """
+    Append data to file by reading existing content and writing back.
+    Not recommended for large files.
+
+    Args:
+      path: S3 path
+      data: Data to append
+    """
+    if isinstance(path, str):
+      path = S3Path.from_path(path)
+
+    # Convert string data to bytes
+    if isinstance(data, str):
+      data = data.encode("utf-8")
+
+    try:
+      # Get existing content
+      try:
+        response = self.s3_client.get_object(Bucket=path.bucket, Key=path.key)
+        current = response["Body"].read()
+      except ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchKey":
+          current = b""
+        else:
+          raise
+
+      # Write back with appended data
+      self.s3_client.put_object(Bucket=path.bucket, Key=path.key, Body=current + data)
+    except ClientError as e:
+      if e.response["Error"]["Code"] == "403":
+        raise PermissionError(f"Access denied to path: {path}")
+      raise
+
+  def check_access(self, path: Union[str, S3Path], permission: str = "READ") -> bool:
+    """
+    Check if user has specified permission on path.
+
+    This method verifies access permissions by attempting actual operations:
+    - READ: Tries to access the file/directory
+    - WRITE: Tries to create a temporary file and delete it
+
+    Args:
+      path: Path to check
+      permission: Permission type ("READ" or "WRITE")
+
+    Returns:
+      True if access is allowed, False otherwise
+    """
+    path = S3Path.from_path(path) if isinstance(path, str) else path
+    permission = permission.upper()
+
+    try:
+      # For write permission, try creating and deleting a temporary file
+      if permission == "WRITE":
+        temp_filename = f"temp_{int(time.time() * 1000)}"
+
+        if path.is_root():
+          return False  # Can't write to root
+        elif path.is_bucket():
+          # For bucket, try creating a temp file in the bucket
+          temp_path = S3Path(bucket=path.bucket, key=temp_filename)
+        else:
+          # For directory/file path, create temp file in same directory
+          if self.isdir(str(path)):
+            temp_path = path.join(temp_filename)  # It's a directory, create temp file inside it
+          else:
+            # It's a file, create temp file in parent directory
+            parent = path.parent()
+            if parent.is_root():
+              return False
+            temp_path = parent.join(temp_filename)
+
+        try:
+          self.s3_client.put_object(Bucket=temp_path.bucket, Key=temp_path.key, Body=b"")
+          self.s3_client.delete_object(Bucket=temp_path.bucket, Key=temp_path.key)  # Delete the temporary file
+          return True
+        except ClientError as e:
+          error_code = e.response["Error"]["Code"]
+          if error_code in ("AccessDenied", "Forbidden", "NoSuchBucket"):
+            return False
+          raise
+      else:  # READ permission
+        if path.is_root():
+          try:
+            self.s3_client.list_buckets()  # Root is always readable (list buckets)
+            return True
+          except ClientError:
+            return False
+        elif path.is_bucket():
+          try:
+            self.s3_client.list_objects_v2(Bucket=path.bucket, MaxKeys=1)  # Try to list bucket contents
+            return True
+          except ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code in ("AccessDenied", "Forbidden", "NoSuchBucket"):
+              return False
+            raise
+        else:
+          # Try to access the specific object
+          try:
+            self.s3_client.head_object(Bucket=path.bucket, Key=path.key)
+            return True
+          except ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code in ("AccessDenied", "Forbidden", "NoSuchKey"):
+              # For NoSuchKey, check if we can at least list the parent directory
+              if error_code == "NoSuchKey":
+                parent = path.parent()
+                if not parent.is_root():
+                  return self.check_access(str(parent), "READ")
+              return False
+            raise
+
+    except Exception as e:
+      LOG.warning(f"S3 check_access encountered error verifying {permission} permission at path '{path}': {e}")
+      return False

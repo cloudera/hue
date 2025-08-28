@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import io
+import logging
 import os
 from typing import Union
 
@@ -24,47 +25,55 @@ from botocore.exceptions import ClientError
 from desktop.lib.fs.s3.constants import DEFAULT_CHUNK_SIZE
 from desktop.lib.fs.s3.core.path import S3Path
 
+LOG = logging.getLogger()
+
 
 class S3File:
   """
-  File-like object for S3.
-  Supports both reading and writing with buffering.
+  File-like object for reading from S3.
+  Provides buffered read access with seek support.
+  Only supports read modes ('r' or 'rb').
   """
 
   def __init__(self, fs, path: Union[str, S3Path], mode: str = "rb"):
     """
-    Initialize S3File.
+    Initialize S3File for reading.
 
     Args:
-        fs: Parent S3FileSystem instance
-        path: File path
-        mode: File mode ('rb' or 'wb')
+      fs: Parent S3FileSystem instance
+      path: File path
+      mode: File mode ('r' or 'rb' only)
 
     Raises:
-        ValueError: If mode is not supported
+      ValueError: If mode is not supported
     """
-    if mode not in ("rb", "wb"):
-      raise ValueError(f"Unsupported file mode: {mode}")
+    # Only allow read modes
+    if mode not in ("r", "rb"):
+      raise ValueError(f"Unsupported file mode: {mode}. Only 'r' and 'rb' modes are supported")
 
     self.fs = fs
     self.path = S3Path.from_path(path) if isinstance(path, str) else path
     self.mode = mode
     self.closed = False
 
-    # Initialize buffers
+    # Initialize read buffer and position tracking
     self._read_buffer = io.BytesIO()
-    self._write_buffer = io.BytesIO()
     self._buffer_size = DEFAULT_CHUNK_SIZE
-
-    # Initialize position tracking
     self._position = 0
     self._size = None
 
-    if mode == "rb":
-      self._load_size()
+    # Load file size
+    self._load_size()
 
   def _load_size(self) -> None:
-    """Load file size for reading"""
+    """
+    Load file size for reading.
+
+    Raises:
+      FileNotFoundError: If file does not exist
+      PermissionError: If access is denied
+      ClientError: For other S3 API errors
+    """
     try:
       response = self.fs.s3_client.head_object(Bucket=self.path.bucket, Key=self.path.key)
       self._size = response["ContentLength"]
@@ -80,19 +89,21 @@ class S3File:
     Read from file.
 
     Args:
-        size: Number of bytes to read (-1 for all)
+      size: Number of bytes to read (-1 for all)
 
     Returns:
-        Bytes read
+      Bytes read
 
     Raises:
-        ValueError: If file is closed
-        IOError: If file not open for reading
+      ValueError: If file is closed
+      ClientError: For S3 API errors
     """
     if self.closed:
       raise ValueError("I/O operation on closed file")
-    if self.mode != "rb":
-      raise IOError("File not open for reading")
+
+    # Handle empty files
+    if self._size == 0:
+      return b""
 
     # Handle full file read
     if size < 0:
@@ -118,7 +129,11 @@ class S3File:
         data += self._read_buffer.read(size - read_size)
 
       except ClientError as e:
-        if e.response["Error"]["Code"] == "404":
+        if e.response["Error"]["Code"] == "InvalidRange":
+          # Should never happen with our range checks
+          LOG.error(f"Invalid range request: bytes={start}-{end} for file size {self._size}")
+          return data
+        elif e.response["Error"]["Code"] == "404":
           raise FileNotFoundError(f"File not found: {self.path}")
         elif e.response["Error"]["Code"] == "403":
           raise PermissionError(f"Access denied to file: {self.path}")
@@ -127,79 +142,22 @@ class S3File:
     self._position += len(data)
     return data
 
-  def write(self, data: Union[bytes, bytearray]) -> int:
-    """
-    Write to file.
-
-    Args:
-        data: Data to write
-
-    Returns:
-        Number of bytes written
-
-    Raises:
-        ValueError: If file is closed
-        IOError: If file not open for writing
-    """
-    if self.closed:
-      raise ValueError("I/O operation on closed file")
-    if self.mode != "wb":
-      raise IOError("File not open for writing")
-
-    # Write to buffer
-    bytes_written = self._write_buffer.write(data)
-    self._position += bytes_written
-
-    # Flush if buffer is full
-    if self._write_buffer.tell() >= self._buffer_size:
-      self.flush()
-
-    return bytes_written
-
-  def flush(self) -> None:
-    """
-    Flush write buffer to S3.
-
-    Raises:
-        ValueError: If file is closed
-    """
-    if self.closed:
-      raise ValueError("I/O operation on closed file")
-
-    if self.mode == "wb" and self._write_buffer.tell() > 0:
-      try:
-        # Upload buffer contents
-        self._write_buffer.seek(0)
-        self.fs.s3_client.put_object(Bucket=self.path.bucket, Key=self.path.key, Body=self._write_buffer.read())
-
-        # Reset buffer
-        self._write_buffer = io.BytesIO()
-
-      except ClientError as e:
-        if e.response["Error"]["Code"] == "403":
-          raise PermissionError(f"Access denied to file: {self.path}")
-        raise
-
   def seek(self, offset: int, whence: int = os.SEEK_SET) -> int:
     """
     Seek to position in file.
 
     Args:
-        offset: Offset in bytes
-        whence: Reference point (SEEK_SET, SEEK_CUR, SEEK_END)
+      offset: Offset in bytes
+      whence: Reference point (SEEK_SET, SEEK_CUR, SEEK_END)
 
     Returns:
-        New position
+      New position
 
     Raises:
-        ValueError: If file is closed
-        IOError: If seeking is not supported
+      ValueError: If file is closed or position invalid
     """
     if self.closed:
       raise ValueError("I/O operation on closed file")
-
-    if self.mode == "wb":
-      raise IOError("Seek not supported in write mode")
 
     # Calculate new position
     if whence == os.SEEK_SET:
@@ -234,11 +192,8 @@ class S3File:
     return self._position
 
   def close(self) -> None:
-    """Close file and flush buffers"""
-    if not self.closed:
-      if self.mode == "wb":
-        self.flush()
-      self.closed = True
+    """Close file"""
+    self.closed = True
 
   def __enter__(self) -> "S3File":
     """Context manager enter"""
@@ -260,9 +215,20 @@ class S3File:
     return line
 
   def readline(self, size: int = -1) -> bytes:
-    """Read a line from file"""
-    if self.mode != "rb":
-      raise IOError("File not open for reading")
+    """
+    Read a line from file.
+
+    Args:
+      size: Maximum bytes to read (-1 for no limit)
+
+    Returns:
+      Line of bytes
+
+    Raises:
+      ValueError: If file is closed
+    """
+    if self.closed:
+      raise ValueError("I/O operation on closed file")
 
     # Read until newline or size
     line = b""
