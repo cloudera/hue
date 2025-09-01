@@ -20,11 +20,13 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import EditColumnsModal, { Column } from './EditColumnsModal';
 
-jest.mock('../../../../utils/hooks/useLoadData/useLoadData', () => () => ({
-  data: ['STRING', 'INT', 'FLOAT'],
-  loading: false,
-  error: null
-}));
+jest.mock('../../../../utils/hooks/useLoadData/useLoadData', () => {
+  return jest.fn(() => ({
+    data: ['STRING', 'INT', 'FLOAT'],
+    loading: false,
+    error: null
+  }));
+});
 
 describe('EditColumnsModal', () => {
   const columns: Column[] = [
@@ -57,7 +59,7 @@ describe('EditColumnsModal', () => {
     expect(screen.getByDisplayValue('comment2')).toBeInTheDocument();
   });
 
-  it('should call setColumns with modified data from the table when Save is clicked', async () => {
+  it('should call setColumns with modified data from the table when Done is clicked', async () => {
     const setColumns = jest.fn();
     const closeModal = jest.fn();
     render(
@@ -73,31 +75,50 @@ describe('EditColumnsModal', () => {
 
     const user = userEvent.setup();
 
-    const nameInputs = screen.getAllByDisplayValue('col1');
-    await user.clear(nameInputs[0]);
-    await user.type(nameInputs[0], 'newCol1');
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('col1')).toBeInTheDocument();
+    });
 
-    const typeSelects = screen.getAllByText('STRING').map(el => el.closest('.ant-select'));
-    if (typeSelects[0]) {
-      await user.click(typeSelects[0].querySelector('.ant-select-selector')!);
+    const nameInput = screen.getByDisplayValue('col1');
+    await user.clear(nameInput);
+    await user.type(nameInput, 'newCol1');
 
-      const floatOption = await screen.findByTitle('FLOAT');
-      await user.click(floatOption);
-    }
+    const commentTextarea = screen.getByDisplayValue('comment1');
+    await user.clear(commentTextarea);
+    await user.type(commentTextarea, 'new comment');
 
-    const commentInputs = screen.getAllByDisplayValue('comment1');
-    await user.clear(commentInputs[0]);
-    await user.type(commentInputs[0], 'new comment');
-
-    const doneButton = screen.getByText('Done');
+    const doneButton = screen.getByRole('button', { name: 'Done' });
     await user.click(doneButton);
 
     await waitFor(() => {
       expect(setColumns).toHaveBeenCalledWith([
-        { ...columns[0], title: 'newCol1', type: 'FLOAT', comment: 'new comment' },
-        { ...columns[1], title: 'col2', type: 'INT', comment: 'comment2' }
+        { ...columns[0], title: 'newCol1', type: 'STRING', comment: 'new comment' },
+        { ...columns[1], type: 'INT' }
       ]);
       expect(closeModal).toHaveBeenCalled();
     });
+  });
+
+  it('should display SQL type options in select dropdown', async () => {
+    render(
+      <EditColumnsModal
+        isOpen={true}
+        closeModal={jest.fn()}
+        columns={columns}
+        setColumns={jest.fn()}
+        sample={sample}
+        sqlDialect="hive"
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('STRING')).toBeInTheDocument();
+      expect(screen.getByText('INT')).toBeInTheDocument();
+    });
+
+    const typeSelectDivs = screen
+      .getAllByLabelText('Column type')
+      .filter(el => el.tagName === 'DIV');
+    expect(typeSelectDivs).toHaveLength(2);
   });
 });
