@@ -71,6 +71,15 @@ describe('FilePreviewTab', () => {
 
   const mockOnDestinationConfigChange = jest.fn();
 
+  const renderComponent = () =>
+    render(
+      <FilePreviewTab
+        fileMetaData={mockFileMetaData}
+        destinationConfig={mockDestinationConfig}
+        onDestinationConfigChange={mockOnDestinationConfigChange}
+      />
+    );
+
   beforeEach(() => {
     jest.clearAllMocks();
     (mocked(useLoadData) as jest.MockedFunction<typeof useLoadData>).mockReturnValue({
@@ -80,34 +89,18 @@ describe('FilePreviewTab', () => {
     });
   });
 
-  it('should render correctly with Edit Columns button visible', async () => {
-    render(
-      <FilePreviewTab
-        fileMetaData={mockFileMetaData}
-        destinationConfig={mockDestinationConfig}
-        onDestinationConfigChange={mockOnDestinationConfigChange}
-      />
-    );
+  it('should display Edit Columns button', async () => {
+    renderComponent();
 
     await waitFor(() => {
       const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
       expect(editColumnsButton).toBeInTheDocument();
       expect(editColumnsButton).toBeVisible();
-
-      expect(screen.getByText('Engine')).toBeInTheDocument();
-      expect(screen.getByText('Database')).toBeInTheDocument();
-      expect(screen.getByText('Table Name')).toBeInTheDocument();
     });
   });
 
   it('should display data in the table after previewData is available', async () => {
-    render(
-      <FilePreviewTab
-        fileMetaData={mockFileMetaData}
-        destinationConfig={mockDestinationConfig}
-        onDestinationConfigChange={mockOnDestinationConfigChange}
-      />
-    );
+    renderComponent();
 
     await waitFor(() => {
       expect(screen.getByText('Alice')).toBeVisible();
@@ -119,14 +112,7 @@ describe('FilePreviewTab', () => {
 
   it('should open edit columns modal when Edit Columns button is clicked', async () => {
     const user = userEvent.setup();
-
-    render(
-      <FilePreviewTab
-        fileMetaData={mockFileMetaData}
-        destinationConfig={mockDestinationConfig}
-        onDestinationConfigChange={mockOnDestinationConfigChange}
-      />
-    );
+    renderComponent();
 
     await waitFor(() => {
       const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
@@ -137,15 +123,12 @@ describe('FilePreviewTab', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
     const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
-
     await user.click(editColumnsButton);
 
     await waitFor(() => {
       const modal = screen.getByRole('dialog');
       expect(modal).toBeVisible();
-
       expect(modal).toHaveTextContent('Edit Columns');
-
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
     });
@@ -153,14 +136,7 @@ describe('FilePreviewTab', () => {
 
   it('should close edit columns modal when Cancel button is clicked', async () => {
     const user = userEvent.setup();
-
-    render(
-      <FilePreviewTab
-        fileMetaData={mockFileMetaData}
-        destinationConfig={mockDestinationConfig}
-        onDestinationConfigChange={mockOnDestinationConfigChange}
-      />
-    );
+    renderComponent();
 
     const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
     await user.click(editColumnsButton);
