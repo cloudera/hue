@@ -134,13 +134,14 @@ describe('FilePreviewTab', () => {
       expect(editColumnsButton).toBeVisible();
     });
 
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
     const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
 
     await user.click(editColumnsButton);
 
     await waitFor(() => {
       const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
       expect(modal).toBeVisible();
 
       expect(modal).toHaveTextContent('Edit Columns');
@@ -165,7 +166,7 @@ describe('FilePreviewTab', () => {
     await user.click(editColumnsButton);
 
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeVisible();
     });
 
     const cancelButton = screen.getByRole('button', { name: 'Cancel' });
