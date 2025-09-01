@@ -94,7 +94,7 @@ describe('FileImportTabs', () => {
   });
 
   it('starts with custom default active tab', async () => {
-    render(<FileImportTabs {...defaultProps} defaultActiveKey="settings" />);
+    render(<FileImportTabs {...defaultProps} />);
 
     await waitFor(() => {
       expect(screen.getByText('Settings')).toBeInTheDocument();
@@ -113,8 +113,26 @@ describe('FileImportTabs', () => {
     const finishButton = screen.getByText('Finish Import');
     fireEvent.click(finishButton);
 
+    const expectedFormData = new FormData();
+    expectedFormData.append(
+      'source',
+      JSON.stringify({
+        inputFormat: 'local',
+        path: '/test/path/file.csv',
+        sourceType: 'hive'
+      })
+    );
+    expectedFormData.append(
+      'destination',
+      JSON.stringify({
+        outputFormat: 'table',
+        nonDefaultLocation: '/test/path/file.csv',
+        name: 'default.file',
+        sourceType: 'hive'
+      })
+    );
     await waitFor(() => {
-      expect(mockSave).toHaveBeenCalledWith(expect.any(FormData));
+      expect(mockSave).toHaveBeenCalledWith(expectedFormData);
     });
   });
 

@@ -37,6 +37,7 @@ export interface PaginatedTableProps<T> {
   onRowClick?: (record: T) => HTMLAttributes<HTMLElement>;
   locale?: TableLocale;
   onRowSelect?: (selectedRows: T[]) => void;
+  showHeader?: boolean;
   isDynamicHeight?: boolean;
   sortByColumn?: ColumnProps<T>['dataIndex'];
   sortOrder?: SortOrder;
@@ -68,7 +69,8 @@ const PaginatedTable = <T extends object>({
   testId,
   locale,
   rowKey,
-  rowClassName
+  rowClassName,
+  showHeader = true
 }: PaginatedTableProps<T>): JSX.Element => {
   const rowSelection = onRowSelect
     ? {
@@ -111,9 +113,9 @@ const PaginatedTable = <T extends object>({
 
   const [tableRef, rect] = useResizeObserver();
 
-  const tableOffset = isPaginationEnabled
-    ? PAGINATION_HEIGHT + TABLE_HEADER_HEIGHT
-    : TABLE_HEADER_HEIGHT;
+  const headerHeight = showHeader ? TABLE_HEADER_HEIGHT : 0;
+  const paginationHeight = isPaginationEnabled ? PAGINATION_HEIGHT : 0;
+  const tableOffset = headerHeight + paginationHeight;
   const tableBodyHeight = Math.max(rect.height - tableOffset, 100);
 
   const tableScroll = isDynamicHeight ? { y: tableBodyHeight } : undefined;
@@ -121,11 +123,11 @@ const PaginatedTable = <T extends object>({
   return (
     <div
       ref={tableRef}
-      className={`hue-table-container ${loading ? 'hue-table-container__placeholder--hidden' : ''}`}
+      className={`hue-paginated-table-container ${loading ? 'hue-paginated-table-container__placeholder--hidden' : ''}`}
     >
       <Table
         title={title}
-        className="hue-table"
+        className="hue-paginated-table"
         onChange={onColumnClick}
         columns={getColumnsFromConfig(columns)}
         dataSource={data}
@@ -139,6 +141,7 @@ const PaginatedTable = <T extends object>({
         locale={locale}
         loading={loading}
         sticky
+        showHeader={showHeader}
       />
       {isPaginationEnabled && (
         <Pagination

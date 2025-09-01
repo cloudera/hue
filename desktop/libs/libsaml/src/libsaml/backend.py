@@ -32,7 +32,7 @@ from desktop.auth.backend import force_username_case, rewrite_user
 from desktop.conf import AUTH
 from desktop.lib.django_util import nonce_attribute
 from libsaml import conf, metrics
-from useradmin.models import User, UserProfile, get_default_user_group, get_profile
+from useradmin.models import get_default_user_group, get_profile, User, UserProfile
 
 LOG = logging.getLogger()
 
@@ -56,7 +56,7 @@ class SAML2Backend(_Saml2Backend):
     """
     return force_username_case(main_attribute)
 
-  def is_authorized(self, attributes, attribute_mapping):
+  def is_authorized(self, attributes, attribute_mapping, user=None, session_info=None):
     """Hook to allow custom authorization policies based on user belonging to a list of SAML groups."""
     LOG.debug('is_authorized() attributes = %s' % attributes)
     LOG.debug('is_authorized() attribute_mapping = %s' % attribute_mapping)
@@ -133,6 +133,6 @@ class SAML2Backend(_Saml2Backend):
         user = User.objects.get(username__iexact=username)
       else:
         user = User.objects.get(username=username)
-    except User.DoesNotExist as e:
+    except User.DoesNotExist:
       user = None
     return user

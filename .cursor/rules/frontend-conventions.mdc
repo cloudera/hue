@@ -1,0 +1,32 @@
+---
+description: Conventions for React/TS, imports, naming, structure; auto-attach to UI code.
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: false
+---
+
+# React + TS Conventions
+- Use `interface` for props; no `any`; narrow `unknown`.
+- Import order: externals → internal utils/hooks → types → styles (last).
+- Keep components cohesive; lift state; split large parts into small pure pieces.
+
+## New react components 
+- Component folder: `ComponentName/ComponentName.tsx` + `ComponentName.test.tsx` + `ComponentName.scss`.
+- Do not create an index.ts file 
+- Always the create a unit test and if needed the scss file
+- Always include the Cloudera copyright msg at the beginning of the file
+- Global and reusable components are placed in folder `desktop/core/src/desktop/js/reactComponents`
+- Put app specific components under that app, e.g. `desktop/core/src/desktop/js/apps/editor/components/`
+
+## Example Skeleton
+```ts
+export interface FooProps { title: string; onAction?: () => void }
+export const Foo = ({ title, onAction }: FooProps) => (
+  <div className="foo">
+    <h2>{title}</h2>
+    <button onClick={onAction}>{t('Click me')}</button>
+  </div>
+);
+```
+
+## Performance
+Lazy-load heavy chunks; debounce/cancel network work; memoize expensive calcs.

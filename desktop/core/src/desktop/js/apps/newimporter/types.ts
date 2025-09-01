@@ -25,8 +25,23 @@ export enum ImporterFileSource {
   REMOTE = 'remote'
 }
 
+export enum TableFormat {
+  TEXT = 'text',
+  PARQUET = 'parquet',
+  AVRO = 'avro',
+  ORC = 'orc',
+  JSON = 'json',
+  KUDU = 'kudu',
+  CSV = 'csv'
+}
+
+export enum StoreLocation {
+  MANAGED = 'managed',
+  EXTERNAL = 'external'
+}
+
 export interface LocalFileUploadResponse {
-  file_path: string;
+  filePath: string;
 }
 
 export interface FileFormatResponse {
@@ -80,4 +95,40 @@ export interface DestinationConfig {
   tableName?: string;
   connectorId?: string;
   computeId?: string;
+}
+
+// TODO: Verify the fields once Backend is ready
+export interface ImporterSettings {
+  storeLocation: StoreLocation;
+  isTransactional: boolean;
+  isInsertOnly: boolean;
+  externalLocation: string;
+  importData: boolean;
+  isIcebergTable: boolean;
+  isCopyFile: boolean;
+  description: string;
+  tableFormat: string;
+  primaryKeys: string[];
+  createEmptyTable: boolean;
+  useExternalLocation: boolean;
+  customCharDelimiters: boolean;
+  fieldDelimiter: string;
+  arrayMapDelimiter: string;
+  structDelimiter: string;
+}
+
+export interface Partition {
+  id: string;
+  name: string;
+  type: string;
+  value: string;
+}
+
+export interface PartitionConfig {
+  partitions: Partition[];
+}
+
+export interface SettingsContext extends ImporterSettings {
+  isRemoteTable: boolean;
+  isIcebergEnabled: boolean;
 }

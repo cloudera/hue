@@ -1,0 +1,15 @@
+---
+description: Build/dev scripts norms; attach to package/build/config files.
+globs: ["package.json", "webpack*.js", "tsconfig.json", "Makefile", "pyproject.toml"]
+alwaysApply: false
+---
+
+# Build/Dev
+- Frontend dev: `npm run dev`, `dev-login`, `dev-workers`.
+- Production bundles: `npm run webpack*`.
+- Python apps: `make apps` / `make desktop`.
+- CI: scripts must be non-interactive and idempotent.
+
+## Checklists
+- Register new React roots in relevant imports/bootstrap as required by Hue.
+- Keep TS strict; no downlevel that breaks antd/cuix typings.

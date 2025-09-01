@@ -21,7 +21,7 @@ import pytest
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.fs import ProxyFS
-from desktop.lib.test_utils import add_permission, remove_from_group
+from desktop.lib.test_utils import add_permission, revoke_permission
 from useradmin.models import User
 
 
@@ -140,7 +140,7 @@ class MockFs(object):
 class TestFsPermissions(object):
 
   def test_fs_permissions_regular_user(self):
-    user_client = make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
+    make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
     user = User.objects.get(username='test')
 
     s3fs, adls, hdfs = MockFs("s3_access"), MockFs("adls_access"), MockFs()
@@ -153,13 +153,13 @@ class TestFsPermissions(object):
 
     f = proxy_fs._get_fs
 
-    remove_from_group(user.username, 'has_s3')
-    remove_from_group(user.username, 'has_adls')
-    remove_from_group(user.username, 'has_abfs')
-    remove_from_group(user.username, 'has_gs')
-    remove_from_group(user.username, 'has_ofs')
+    # FS permissions are present by default, so we'll revoke them firstand check if the exception is raised
+    revoke_permission('default', 'filebrowser', 's3_access')
+    revoke_permission('default', 'filebrowser', 'adls_access')
+    revoke_permission('default', 'filebrowser', 'abfs_access')
+    revoke_permission('default', 'filebrowser', 'gs_access')
+    revoke_permission('default', 'filebrowser', 'ofs_access')
 
-    # No perms by default
     with pytest.raises(Exception):
       f('s3a://bucket')
     with pytest.raises(Exception):
@@ -177,32 +177,25 @@ class TestFsPermissions(object):
     f('hdfs://path')
     f('/tmp')
 
-    try:
-      # Add perm
-      add_permission('test', 'has_s3', permname='s3_access', appname='filebrowser')
-      add_permission('test', 'has_adls', permname='adls_access', appname='filebrowser')
-      add_permission('test', 'has_abfs', permname='abfs_access', appname='filebrowser')
-      add_permission('test', 'has_gs', permname='gs_access', appname='filebrowser')
-      add_permission('test', 'has_ofs', permname='ofs_access', appname='filebrowser')
+    # Then add the perms and check if the exception is not raised
+    add_permission('test', 'has_s3', permname='s3_access', appname='filebrowser')
+    add_permission('test', 'has_adls', permname='adls_access', appname='filebrowser')
+    add_permission('test', 'has_abfs', permname='abfs_access', appname='filebrowser')
+    add_permission('test', 'has_gs', permname='gs_access', appname='filebrowser')
+    add_permission('test', 'has_ofs', permname='ofs_access', appname='filebrowser')
 
-      f('s3a://bucket')
-      f('S3A://bucket/key')
-      f('adl://net/key')
-      f('adl:/key')
-      f('abfs:/key')
-      f('hdfs://path')
-      f('/tmp')
-      f('gs://bucket')
-      f('ofs://volume/bucket/key')
-    finally:
-      remove_from_group(user.username, 'has_s3')
-      remove_from_group(user.username, 'has_adls')
-      remove_from_group(user.username, 'has_abfs')
-      remove_from_group(user.username, 'has_gs')
-      remove_from_group(user.username, 'has_ofs')
+    f('s3a://bucket')
+    f('S3A://bucket/key')
+    f('adl://net/key')
+    f('adl:/key')
+    f('abfs:/key')
+    f('hdfs://path')
+    f('/tmp')
+    f('gs://bucket')
+    f('ofs://volume/bucket/key')
 
   def test_fs_permissions_admin_user(self):
-    user_client = make_logged_in_client(username='admin', groupname='default', recreate=True, is_superuser=True)
+    make_logged_in_client(username='admin', groupname='default', recreate=True, is_superuser=True)
     user = User.objects.get(username='admin')
 
     s3fs, adls, hdfs = MockFs("s3_access"), MockFs("adls_access"), MockFs()

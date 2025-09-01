@@ -15,18 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
 import logging
+import os
 from datetime import datetime, timedelta
 
 from django.core.management.base import BaseCommand
-from django.utils.translation import gettext as _
 from hbased.ttypes import AlreadyExists
 
 from desktop.lib.paths import get_apps_root
 from hbase.api import HbaseApi
-from useradmin.models import User, install_sample_user
+from useradmin.models import install_sample_user
 
 LOG = logging.getLogger()
 
@@ -83,5 +81,5 @@ class Command(BaseCommand):
     root = os.path.join(get_apps_root(), 'hbase', 'example', 'documents')
 
     api.putRow(cluster_name, 'document_demo', today, {'doc:img': open(root + '/hue-logo.png', "rb").read()})
-    api.putRow(cluster_name, 'document_demo', today, {'doc:html': open(root + '/gethue.com.html', "rb").read()})
+    api.putRow(cluster_name, 'document_demo', today, {'doc:html': open(root + '/example-page.html', "rb").read()})
     api.putRow(cluster_name, 'document_demo', today, {'doc:pdf': open(root + '/gethue.pdf', "rb").read()})

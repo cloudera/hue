@@ -90,7 +90,6 @@ describe('useRegularUpload', () => {
 
     expect(mockDequeue).toHaveBeenCalledWith(mockFile.uuid, 'uuid');
   });
-
   it('should call save with correct payload and update file variables on success', async () => {
     const { result } = renderHook(() =>
       useRegularUpload({
@@ -100,27 +99,64 @@ describe('useRegularUpload', () => {
     );
 
     result.current.addFiles([mockFile]);
-
     if (mockProcessCallback) {
       await mockProcessCallback(mockFile);
     }
 
-    const mockFormData = new FormData();
-    mockFormData.append('file', mockFile.file);
-    mockFormData.append('destination_path', mockFile.filePath);
+    expect(mockSave).toHaveBeenCalledTimes(1);
+    const [formDataArg, optionsArg] = mockSave.mock.calls[0];
 
-    expect(mockSave).toHaveBeenCalledWith(
-      mockFormData,
-      expect.objectContaining({
-        onSuccess: expect.any(Function),
-        onError: expect.any(Function)
-      })
-    );
+    // FormData: only the file is sent
+    expect(formDataArg).toBeInstanceOf(FormData);
+    const fdFile = formDataArg.get('file') as File;
+    expect(fdFile).toBeInstanceOf(File);
+    expect(fdFile.name).toBe('file.txt');
+    expect(formDataArg.has('destination_path')).toBe(false);
+    expect(formDataArg.has('overwrite')).toBe(false);
+
+    // Params: destination_path and overwrite=false
+    expect(optionsArg).toBeDefined();
+    expect(optionsArg.options).toBeDefined();
+    expect(optionsArg.options.params).toEqual({
+      destination_path: '/uploads/',
+      overwrite: 'false'
+    });
+    expect(typeof optionsArg.onSuccess).toBe('function');
+    expect(typeof optionsArg.onError).toBe('function');
+    expect(typeof optionsArg.options.onUploadProgress).toBe('function');
+
     expect(mockUpdateFileVariables).toHaveBeenCalledWith(mockFile.uuid, {
       status: FileStatus.Uploading
     });
+  });
 
-    expect(mockOnComplete).not.toHaveBeenCalled();
+  it('should include overwrite=true in params when file has overwrite flag', async () => {
+    const { result } = renderHook(() =>
+      useRegularUpload({
+        updateFileVariables: mockUpdateFileVariables,
+        onComplete: mockOnComplete
+      })
+    );
+
+    const fileWithOverwrite: RegularFile = { ...mockFile, overwrite: true };
+    result.current.addFiles([fileWithOverwrite]);
+    if (mockProcessCallback) {
+      await mockProcessCallback(fileWithOverwrite);
+    }
+
+    const [formDataArg, optionsArg] = mockSave.mock.calls.at(-1)!;
+
+    // FormData still only has the file
+    expect(formDataArg).toBeInstanceOf(FormData);
+    expect((formDataArg.get('file') as File).name).toBe('file.txt');
+    expect(formDataArg.has('destination_path')).toBe(false);
+    expect(formDataArg.has('overwrite')).toBe(false);
+
+    // Params: destination_path and overwrite=true
+    expect(optionsArg.options.params).toEqual({
+      destination_path: '/uploads/',
+      overwrite: 'true'
+    });
   });
 
   it('should call updateFileVariables with correct status on success', async () => {

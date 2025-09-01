@@ -124,6 +124,20 @@ def api_error_handler(func):
   return decorator
 
 
+def _safe_conf_get(conf_obj):
+  """Return config value if bound, else the declared default (or None).
+
+  Some app configs (e.g., from `filebrowser.conf`) might not be bound when the
+  app is blacklisted via `app_blacklist`. In that case, the imported object is a
+  bare `Config` (no `.get()`), so return its declared default/dynamic default.
+  """
+  getter = getattr(conf_obj, 'get', None)
+  if callable(getter):
+    return getter()
+  # For unbound Config, use declared default or None
+  return getattr(conf_obj, 'default', None)
+
+
 @api_error_handler
 def get_banners(request):
   banners = {
@@ -148,7 +162,7 @@ def get_config(request):
     'is_yarn_enabled': is_yarn(),
     'enable_task_server': TASK_SERVER_V2.ENABLED.get(),
     'enable_workflow_creation_action': ENABLE_WORKFLOW_CREATION_ACTION.get(),
-    'allow_sample_data_from_views': ALLOW_SAMPLE_DATA_FROM_VIEWS.get(),
+    'allow_sample_data_from_views': _safe_conf_get(ALLOW_SAMPLE_DATA_FROM_VIEWS),
     'enable_sharing': ENABLE_SHARING.get(),
     'collect_usage': COLLECT_USAGE.get(),
   }
@@ -157,12 +171,12 @@ def get_config(request):
   config['storage_browser'] = {
     'enable_chunked_file_upload': ENABLE_CHUNKED_FILE_UPLOADER.get(),
     'enable_new_storage_browser': ENABLE_NEW_STORAGE_BROWSER.get(),
-    'restrict_file_extensions': RESTRICT_FILE_EXTENSIONS.get(),
-    'concurrent_max_connection': CONCURRENT_MAX_CONNECTIONS.get(),
-    'file_upload_chunk_size': FILE_UPLOAD_CHUNK_SIZE.get(),
-    'enable_file_download_button': SHOW_DOWNLOAD_BUTTON.get(),
+    'restrict_file_extensions': _safe_conf_get(RESTRICT_FILE_EXTENSIONS),
+    'concurrent_max_connection': _safe_conf_get(CONCURRENT_MAX_CONNECTIONS),
+    'file_upload_chunk_size': _safe_conf_get(FILE_UPLOAD_CHUNK_SIZE),
+    'enable_file_download_button': _safe_conf_get(SHOW_DOWNLOAD_BUTTON),
     'max_file_editor_size': MAX_FILEEDITOR_SIZE,
-    'enable_extract_uploaded_archive': ENABLE_EXTRACT_UPLOADED_ARCHIVE.get(),
+    'enable_extract_uploaded_archive': _safe_conf_get(ENABLE_EXTRACT_UPLOADED_ARCHIVE),
   }
 
   # Importer configuration

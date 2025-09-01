@@ -18,13 +18,13 @@
 @use 'mixins';
 
 .antd.cuix {
-  .hue-table-container {
+  .hue-paginated-table-container {
     display: flex;
     flex-direction: column;
     flex: 1;
   }
 
-  .hue-table-container__placeholder--hidden {
+  .hue-paginated-table-container__placeholder--hidden {
     // In CUIX implementation, label.loading is rendering along with spinner
     // this ensures the placeholder is hidden when loading is true
     .ant-table-placeholder {
@@ -32,7 +32,7 @@
     }
   }
 
-  .hue-table {
+  .hue-paginated-table {
     .ant-table-selection-column {
       // This prevents the eplipses from being applied to the selection column
       text-overflow: initial;

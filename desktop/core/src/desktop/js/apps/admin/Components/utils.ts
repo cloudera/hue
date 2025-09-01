@@ -16,8 +16,8 @@
 
 export const SERVER_LOGS_API_URL = '/api/v1/logs';
 export const CHECK_CONFIG_EXAMPLES_API_URL = '/api/v1/check_config';
-export const ANALYTICS_PREFERENCES_API_URL = '/about/update_preferences';
 export const INSTALL_APP_EXAMPLES_API_URL = '/api/v1/install_app_examples';
 export const INSTALL_AVAILABLE_EXAMPLES_API_URL = '/api/v1/available_app_examples';
 export const SQL_TYPE_MAPPING_API_URL = '/api/v1/importer/sql_type_mapping';
 export const HUE_DOCS_CONFIG_URL = 'https://docs.gethue.com/administrator/configuration/';
+export const USAGE_ANALYTICS_API_URL = '/api/v1/usage_analytics';

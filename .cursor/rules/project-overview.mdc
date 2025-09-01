@@ -1,0 +1,68 @@
+---
+description: Terse Hue overview + global constraints; always include in all requests.
+globs:
+alwaysApply: true
+---
+
+# Hue Overview (short)
+- Backend: Python/Django; Frontend: React (primary) + some Vue/KO/jQuery.
+- Styling: SCSS (BEM). Avoid adding new Less; migrate to SCSS when touching.
+- UI libs: Ant Design (antd) + Cloudera UI (cuix).
+- TS strict; avoid `any`. Prefer named type imports.
+- No CSS Modules; use global SCSS conventions.
+
+## Golden Rules
+- Focus on the task given, do not expand your tasks without requesting confirmation first.
+- Do not automatically start coding if you are asked a question. Only code when asked to.
+- Always try to follow best practices and avoid hacks
+- Write Clean Code with Meaningful names, Single responsibility, Expressive code etc
+- Prefer **React + TypeScript** for new UI.
+- Maintain KO↔React via `reactWrapper` where used.
+- No hardcoded color codes; use tokens/variables.
+- All user-facing text must be i18n'd.
+
+
+## Project Structure
+hue/
+├── apps/                          # Backend Django applications
+│   ├── beeswax/                   # Hive query interface
+│   ├── filebrowser/               # File system browser
+│   ├── impala/                    # Impala query interface
+│   ├── jobbrowser/                # Job monitoring
+│   ├── metastore/                 # DB Table Browser
+│   ├── notebook/                  # Interactive sql Editor
+│   ├── oozie/                     # Workflow management
+│   ├── rdbms/                     # RDBMS connectors
+│   └── ...                        # Other backend apps
+├── desktop/                       # Core desktop functionality
+│   ├── core/                      # Core desktop components
+│   │   └── src/desktop/
+│   │       ├── js/                # Frontend JavaScript/TypeScript
+│   │       │   ├── apps/          # Application-specific components
+│   │       │   │   ├── editor/    # SQL Editor app
+│   │       │   │   ├── notebook/  # Notebook app
+│   │       │   │   ├── tableBrowser/
+│   │       │   │   └── jobBrowser/
+│   │       │   ├── reactComponents/ # Shared React components
+│   │       │   ├── vue/           # Vue.js components
+│   │       │   ├── ko/            # Knockout.js components
+│   │       │   ├── components/    # Legacy components
+│   │       │   ├── utils/         # Utility functions
+│   │       │   ├── api/           # API utilities
+│   │       │   └── types/         # TypeScript type definitions
+│   │       ├── static/            # Static assets
+│   │       └── templates/         # Django templates
+│   └── libs/                      # Shared libraries
+├── tools/                         # Build and development tools
+├── docs/                          # Documentation
+├── ext/                           # External dependencies
+├── maven/                         # Maven build configuration
+├── package.json                   # Frontend dependencies
+├── pyproject.toml                 # Python project configuration
+├── webpack.config.js              # Webpack configuration
+├── tsconfig.json                  # TypeScript configuration
+├── jest.config.js                 # Jest testing configuration
+├── .eslintrc.js                   # ESLint configuration
+├── .prettierrc                    # Prettier configuration
+├── .stylelintrc                   # Stylelint configuration
+└── Makefile                       # Build automation

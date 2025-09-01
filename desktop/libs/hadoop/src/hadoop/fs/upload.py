@@ -450,13 +450,13 @@ class HDFSNewFileUploadHandler(FileUploadHandler):
 
     # Create the file directly at the destination
     try:
-      LOG.debug(f"Creating HDFS file at: {self.target_file_path}")
+      LOG.debug(f"Creating HDFS file at {self.target_file_path}")
       self._fs.create(
         self.target_file_path,
         overwrite=False,  # We already handled overwrite above
         permission=self._fs.getDefaultFilePerms(),
       )
-      LOG.info(f"HDFS file created successfully: {self.target_file_path}")
+      LOG.info(f"HDFS file created successfully for {self.target_file_path}")
     except Exception as ex:
       LOG.error(f"Failed to create HDFS file for upload: {ex}")
       raise PopupException(f"Failed to initiate HDFS upload: {ex}", error_code=500)
@@ -535,13 +535,15 @@ class HDFSNewFileUploadHandler(FileUploadHandler):
 
     # Append the chunk directly to the destination file
     try:
-      LOG.debug(f"Appending chunk to HDFS file - size: {len(raw_data)} bytes, total: {self.total_bytes_received} bytes")
+      LOG.debug(
+        f"Appending chunk to HDFS file at {self.target_file_path} - size: {len(raw_data)} bytes, total: {self.total_bytes_received} bytes"
+      )
       self._fs.append(self.target_file_path, raw_data)
       return None
     except Exception as e:
       LOG.exception(f'Error appending data to file "{self.target_file_path}"')
       try:  # Try to clean up the partial file
-        LOG.info(f"Attempting to clean up partial file: {self.target_file_path}")
+        LOG.info(f"Attempting to clean up partial file at {self.target_file_path}")
         self._fs.remove(self.target_file_path, skip_trash=True)
       except Exception:
         pass
@@ -571,7 +573,7 @@ class HDFSNewFileUploadHandler(FileUploadHandler):
         error_code=422,
       )
     else:
-      LOG.info(f"Upload completed successfully: {self.target_file_path}, size: {file_size} bytes")
+      LOG.info(f"Upload completed successfully for {self.target_file_path}, {file_size} bytes written")
 
     file_stats = massage_stats(file_stats)
     return file_stats

@@ -17,7 +17,7 @@
 import React, { useState } from 'react';
 import { Tabs } from 'antd';
 import { i18nReact } from '../../../utils/i18nReact';
-import { DestinationConfig, FileMetaData } from '../types';
+import { DestinationConfig, FileMetaData, Partition } from '../types';
 
 import './FileImportTabs.scss';
 import FilePreviewTab from '../FilePreviewTab/FilePreviewTab';
@@ -26,22 +26,39 @@ import { PrimaryButton } from 'cuix/dist/components/Button';
 import useSaveData from '../../../utils/hooks/useSaveData/useSaveData';
 import { FINISH_IMPORT_URL } from '../api';
 import { getDefaultTableName } from '../utils/utils';
+import SettingsTab from '../SettingsTab/SettingsTab';
+import PartitionsTab from '../PartitionsTab/PartitionsTab';
+import { ImporterSettings, StoreLocation, TableFormat } from '../types';
 
 interface FileImportTabsProps {
   fileMetaData: FileMetaData;
-  onTabChange?: (activeKey: string) => void;
-  defaultActiveKey?: string;
 }
 
-const FileImportTabs = ({
-  fileMetaData,
-  defaultActiveKey = 'preview'
-}: FileImportTabsProps): JSX.Element => {
+const FileImportTabs = ({ fileMetaData }: FileImportTabsProps): JSX.Element => {
   const { t } = i18nReact.useTranslation();
 
   const [destinationConfig, setDestinationConfig] = useState<DestinationConfig>({
     tableName: getDefaultTableName(fileMetaData)
   });
+  const [settings, setSettings] = useState<ImporterSettings>({
+    storeLocation: StoreLocation.MANAGED,
+    isTransactional: false,
+    isInsertOnly: false,
+    externalLocation: '',
+    importData: true,
+    isIcebergTable: false,
+    isCopyFile: false,
+    description: '',
+    tableFormat: TableFormat.TEXT,
+    primaryKeys: [],
+    createEmptyTable: false,
+    useExternalLocation: false,
+    customCharDelimiters: false,
+    fieldDelimiter: '',
+    arrayMapDelimiter: '',
+    structDelimiter: ''
+  });
+  const [partitions, setPartitions] = useState<Partition[]>([]);
 
   const handleDestinationConfigChange = (name: string, value: string) => {
     setDestinationConfig(prevConfig => ({
@@ -88,13 +105,19 @@ const FileImportTabs = ({
     },
     {
       label: t('Settings'),
-      key: 'settings'
-      // children: <SettingsTab />
+      key: 'settings',
+      children: (
+        <SettingsTab
+          fileMetaData={fileMetaData}
+          settings={settings}
+          onSettingsChange={setSettings}
+        />
+      )
     },
     {
       label: t('Partitions'),
-      key: 'partitions'
-      // children: <PartitionsTab />
+      key: 'partition',
+      children: <PartitionsTab partitions={partitions} onPartitionsChange={setPartitions} />
     }
   ];
 
@@ -111,11 +134,7 @@ const FileImportTabs = ({
           </PrimaryButton>
         </div>
       </div>
-      <Tabs
-        defaultActiveKey={defaultActiveKey}
-        items={tabItems}
-        className="hue-file-import-tabs__tabs"
-      />
+      <Tabs items={tabItems} className="hue-file-import-tabs__tabs" />
     </div>
   );
 };
