@@ -32,6 +32,22 @@ jest.mock('../../../../utils/hooks/useLoadData/useLoadData', () => {
   return jest.fn().mockImplementation(() => mockUseLoadData());
 });
 
+jest.mock('../../../../utils/i18nReact', () => ({
+  i18nReact: {
+    useTranslation: () => ({
+      t: (key: string, params?: Record<string, unknown>) => {
+        if (params) {
+          return Object.entries(params).reduce((str, [param, value]) => {
+            return str.replace(new RegExp(`{{${param}}}`, 'g'), String(value));
+          }, key);
+        }
+        return key;
+      },
+      ready: true
+    })
+  }
+}));
+
 describe('EditColumnsModal', () => {
   const DEFAULT_COLUMNS: Column[] = [
     { title: 'col1', dataIndex: 'col1', type: 'string', comment: 'comment1' },
@@ -172,7 +188,7 @@ describe('EditColumnsModal', () => {
       expect(screen.queryByDisplayValue('col2')).not.toBeInTheDocument();
     });
 
-    it('should detect and allow duplicate column names', async () => {
+    it('should prevent saving when duplicate column names exist', async () => {
       const duplicateColumns: Column[] = [
         { title: 'col1', dataIndex: 'col1', type: 'string', comment: 'comment1' },
         { title: 'col1', dataIndex: 'col2', type: 'int', comment: 'comment2' }
@@ -180,22 +196,20 @@ describe('EditColumnsModal', () => {
 
       const { setColumns } = renderModal({ columns: duplicateColumns });
 
-      const nameInputs = screen.getAllByDisplayValue('col1');
-      expect(nameInputs).toHaveLength(2);
+      await waitFor(() => {
+        expect(screen.getByText('Duplicate column name: col1')).toBeInTheDocument();
+      });
+
+      const doneButton = screen.getByRole('button', { name: 'Done' });
+      expect(doneButton).toBeDisabled();
 
       const user = userEvent.setup();
-      const doneButton = screen.getByRole('button', { name: 'Done' });
       await user.click(doneButton);
 
-      await waitFor(() => {
-        expect(setColumns).toHaveBeenCalledWith([
-          { ...duplicateColumns[0], type: 'STRING' },
-          { ...duplicateColumns[1], type: 'INT' }
-        ]);
-      });
+      expect(setColumns).not.toHaveBeenCalled();
     });
 
-    it('should handle empty column names', async () => {
+    it('should prevent saving when empty column names exist', async () => {
       const columnsWithEmpty: Column[] = [
         { title: '', dataIndex: 'col1', type: 'string', comment: 'comment1' },
         { title: 'col2', dataIndex: 'col2', type: 'int', comment: 'comment2' }
@@ -203,19 +217,145 @@ describe('EditColumnsModal', () => {
 
       const { setColumns } = renderModal({ columns: columnsWithEmpty });
 
-      const emptyNameInput = screen.getAllByLabelText('Column title')[0];
-      expect(emptyNameInput).toHaveValue('');
+      await waitFor(() => {
+        expect(screen.getByText('1 column(s) have empty names')).toBeInTheDocument();
+      });
+
+      const doneButton = screen.getByRole('button', { name: 'Done' });
+      expect(doneButton).toBeDisabled();
 
       const user = userEvent.setup();
+      await user.click(doneButton);
+
+      expect(setColumns).not.toHaveBeenCalled();
+    });
+
+    it('should allow saving when duplicate names are fixed', async () => {
+      const duplicateColumns: Column[] = [
+        { title: 'col1', dataIndex: 'col1', type: 'string', comment: 'comment1' },
+        { title: 'col1', dataIndex: 'col2', type: 'int', comment: 'comment2' }
+      ];
+
+      const { setColumns } = renderModal({ columns: duplicateColumns });
+      const user = userEvent.setup();
+
+      // Initially should show error and disable button
+      await waitFor(() => {
+        expect(screen.getByText('Duplicate column name: col1')).toBeInTheDocument();
+      });
+      expect(screen.getByRole('button', { name: 'Done' })).toBeDisabled();
+
+      // Fix the duplicate by changing one name
+      const nameInputs = screen.getAllByDisplayValue('col1');
+      await user.clear(nameInputs[1]);
+      await user.type(nameInputs[1], 'col2_fixed');
+
+      // Error should disappear and button should be enabled
+      await waitFor(() => {
+        expect(screen.queryByText('Duplicate column name: col1')).not.toBeInTheDocument();
+      });
+
       const doneButton = screen.getByRole('button', { name: 'Done' });
+      expect(doneButton).not.toBeDisabled();
+
+      // Should now allow saving
       await user.click(doneButton);
 
       await waitFor(() => {
         expect(setColumns).toHaveBeenCalledWith([
-          { ...columnsWithEmpty[0], title: '', type: 'STRING' },
+          { ...duplicateColumns[0], title: 'col1', type: 'STRING' },
+          { ...duplicateColumns[1], title: 'col2_fixed', type: 'INT' }
+        ]);
+      });
+    });
+
+    it('should show error status on inputs with validation errors', async () => {
+      const duplicateColumns: Column[] = [
+        { title: 'col1', dataIndex: 'col1', type: 'string', comment: 'comment1' },
+        { title: 'col1', dataIndex: 'col2', type: 'int', comment: 'comment2' }
+      ];
+
+      renderModal({ columns: duplicateColumns });
+
+      await waitFor(() => {
+        const nameInputs = screen.getAllByDisplayValue('col1');
+        // Both inputs should have error status since they're duplicates
+        expect(nameInputs[0].closest('.ant-input')).toHaveClass('ant-input-status-error');
+        expect(nameInputs[1].closest('.ant-input')).toHaveClass('ant-input-status-error');
+      });
+    });
+
+    it('should allow saving when empty names are fixed', async () => {
+      const columnsWithEmpty: Column[] = [
+        { title: '', dataIndex: 'col1', type: 'string', comment: 'comment1' },
+        { title: 'col2', dataIndex: 'col2', type: 'int', comment: 'comment2' }
+      ];
+
+      const { setColumns } = renderModal({ columns: columnsWithEmpty });
+      const user = userEvent.setup();
+
+      await waitFor(() => {
+        expect(screen.getByText('1 column(s) have empty names')).toBeInTheDocument();
+      });
+
+      const emptyNameInput = screen.getAllByLabelText('Column title')[0];
+      await user.type(emptyNameInput, 'fixed_name');
+
+      await waitFor(() => {
+        expect(screen.queryByText('1 column(s) have empty names')).not.toBeInTheDocument();
+      });
+
+      const doneButton = screen.getByRole('button', { name: 'Done' });
+      expect(doneButton).not.toBeDisabled();
+
+      await user.click(doneButton);
+
+      await waitFor(() => {
+        expect(setColumns).toHaveBeenCalledWith([
+          { ...columnsWithEmpty[0], title: 'fixed_name', type: 'STRING' },
           { ...columnsWithEmpty[1], type: 'INT' }
         ]);
       });
+    });
+
+    it('should handle multiple validation errors simultaneously', async () => {
+      const problematicColumns: Column[] = [
+        { title: '', dataIndex: 'col1', type: 'string', comment: 'comment1' },
+        { title: 'duplicate', dataIndex: 'col2', type: 'int', comment: 'comment2' },
+        { title: 'duplicate', dataIndex: 'col3', type: 'string', comment: 'comment3' }
+      ];
+
+      const { setColumns } = renderModal({ columns: problematicColumns });
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Duplicate column name: duplicate. 1 column(s) have empty names')
+        ).toBeInTheDocument();
+      });
+
+      const doneButton = screen.getByRole('button', { name: 'Done' });
+      expect(doneButton).toBeDisabled();
+
+      const user = userEvent.setup();
+      await user.click(doneButton);
+
+      expect(setColumns).not.toHaveBeenCalled();
+    });
+
+    it('should trim whitespace from column names during validation', async () => {
+      const columnsWithWhitespace: Column[] = [
+        { title: '  col1  ', dataIndex: 'col1', type: 'string', comment: 'comment1' },
+        { title: 'col1', dataIndex: 'col2', type: 'int', comment: 'comment2' }
+      ];
+
+      renderModal({ columns: columnsWithWhitespace });
+
+      await waitFor(() => {
+        expect(screen.getByText('Duplicate column name: col1')).toBeInTheDocument();
+      });
+
+      const doneButton = screen.getByRole('button', { name: 'Done' });
+      expect(doneButton).toBeDisabled();
     });
   });
 
@@ -228,7 +368,7 @@ describe('EditColumnsModal', () => {
       await waitFor(() => {
         expect(
           screen.getByText(
-            /Failed to fetch SQL types for engine {{engine}}, make sure the engine is properly configured in Hue/
+            'Failed to fetch SQL types for engine hive, make sure the engine is properly configured in Hue.'
           )
         ).toBeInTheDocument();
       });

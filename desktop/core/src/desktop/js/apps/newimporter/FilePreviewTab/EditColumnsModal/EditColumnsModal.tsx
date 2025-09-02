@@ -20,6 +20,7 @@ import Modal from 'cuix/dist/components/Modal';
 import Table from 'cuix/dist/components/Table';
 import Input from 'cuix/dist/components/Input';
 import Select from 'cuix/dist/components/Select';
+import { Alert } from 'antd';
 import { SQL_TYPE_MAPPING_API_URL } from '../../../admin/Components/utils';
 import useLoadData from '../../../../utils/hooks/useLoadData/useLoadData';
 import LoadingErrorWrapper from '../../../../reactComponents/LoadingErrorWrapper/LoadingErrorWrapper';
@@ -73,6 +74,61 @@ const EditColumnsModal = ({
     return [];
   }, [sqlTypesData]);
 
+  const validateColumnNames = useMemo(() => {
+    const errors = new Set<number>();
+    const titleCounts = new Map<string, number[]>();
+
+    editableRows.forEach((row, index) => {
+      const title = row.title.trim();
+
+      if (!title) {
+        errors.add(index);
+      }
+
+      if (!titleCounts.has(title)) {
+        titleCounts.set(title, []);
+      }
+      titleCounts.get(title)!.push(index);
+    });
+
+    titleCounts.forEach(indices => {
+      if (indices.length > 1) {
+        indices.forEach(index => errors.add(index));
+      }
+    });
+
+    return { errors, duplicates: titleCounts };
+  }, [editableRows]);
+
+  const hasValidationErrors = validateColumnNames.errors.size > 0;
+
+  const getValidationErrorMessages = (): string[] => {
+    const messages: string[] = [];
+    const duplicateNames = new Set<string>();
+
+    validateColumnNames.duplicates.forEach((indices, title) => {
+      if (indices.length > 1 && title.trim()) {
+        duplicateNames.add(title.trim());
+      }
+    });
+
+    if (duplicateNames.size > 0) {
+      duplicateNames.forEach(name => {
+        messages.push(t('Duplicate column name: {{name}}', { name }));
+      });
+    }
+
+    const emptyCount = Array.from(validateColumnNames.errors).filter(
+      index => !editableRows[index]?.title.trim()
+    ).length;
+
+    if (emptyCount > 0) {
+      messages.push(t('{{count}} column(s) have empty names', { count: emptyCount }));
+    }
+
+    return messages;
+  };
+
   const errors = [
     {
       enabled: !!sqlTypesError,
@@ -106,9 +162,13 @@ const EditColumnsModal = ({
   };
 
   const handleDone = async () => {
+    if (hasValidationErrors) {
+      return;
+    }
+
     const updatedColumns = editableRows.map(row => ({
       ...columns[row.key],
-      title: row.title,
+      title: row.title.trim(),
       type: row.type,
       comment: row.comment
     }));
@@ -128,6 +188,7 @@ const EditColumnsModal = ({
             handleChange(rowIndex, 'title', e.target.value)
           }
           aria-label={t('Column title')}
+          status={validateColumnNames.errors.has(rowIndex) ? 'error' : undefined}
         />
       )
     },
@@ -168,6 +229,8 @@ const EditColumnsModal = ({
     }
   ];
 
+  const validationErrorMessages = getValidationErrorMessages();
+
   return (
     <Modal
       open={isOpen}
@@ -176,9 +239,18 @@ const EditColumnsModal = ({
       cancelText={t('Cancel')}
       okText={t('Done')}
       onOk={handleDone}
+      okButtonProps={{ disabled: hasValidationErrors }}
       className="hue-importer-edit-columns-modal"
     >
       <LoadingErrorWrapper loading={sqlTypesLoading} errors={errors} hideOnError={true}>
+        {validationErrorMessages.length > 0 && (
+          <Alert
+            message={validationErrorMessages.join('. ')}
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
         <Table columns={modalColumns} dataSource={editableRows} pagination={false} />
       </LoadingErrorWrapper>
     </Modal>
