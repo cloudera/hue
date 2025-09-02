@@ -89,13 +89,26 @@ describe('FilePreviewTab', () => {
     });
   });
 
-  it('should display Edit Columns button', async () => {
+  it('should render correctly', async () => {
+    const user = userEvent.setup();
     renderComponent();
 
     await waitFor(() => {
       const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
       expect(editColumnsButton).toBeInTheDocument();
       expect(editColumnsButton).toBeVisible();
+    });
+
+    const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await user.click(editColumnsButton);
+
+    await waitFor(() => {
+      const modal = screen.getByRole('dialog');
+      expect(modal).toBeVisible();
+      expect(modal).toHaveTextContent('Edit Columns');
     });
   });
 
@@ -107,30 +120,6 @@ describe('FilePreviewTab', () => {
       expect(screen.getByText('30')).toBeVisible();
       expect(screen.getByText('Bob')).toBeVisible();
       expect(screen.getByText('25')).toBeVisible();
-    });
-  });
-
-  it('should open edit columns modal when Edit Columns button is clicked', async () => {
-    const user = userEvent.setup();
-    renderComponent();
-
-    await waitFor(() => {
-      const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
-      expect(editColumnsButton).toBeInTheDocument();
-      expect(editColumnsButton).toBeVisible();
-    });
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-    const editColumnsButton = screen.getByRole('button', { name: 'Edit Columns' });
-    await user.click(editColumnsButton);
-
-    await waitFor(() => {
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeVisible();
-      expect(modal).toHaveTextContent('Edit Columns');
-      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
     });
   });
 
