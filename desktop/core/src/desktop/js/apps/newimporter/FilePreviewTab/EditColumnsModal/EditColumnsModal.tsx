@@ -76,7 +76,10 @@ const EditColumnsModal = ({
   const errors = [
     {
       enabled: !!sqlTypesError,
-      message: t('Failed to fetch SQL types.')
+      message: t(
+        'Failed to fetch SQL types for engine {{engine}}, make sure the engine is properly configured in Hue.',
+        { engine: sqlDialect }
+      )
     },
     {
       enabled: !sqlTypesLoading && sqlTypes.length === 0,
