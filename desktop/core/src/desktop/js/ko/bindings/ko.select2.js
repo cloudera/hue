@@ -16,6 +16,18 @@
 
 import $ from 'jquery';
 import * as ko from 'knockout';
+import deXSS from 'utils/html/deXSS';
+
+// Export the security fix function for testing
+export function applySelect2SecurityFix(options) {
+  const originalFormatResult = options.formatResult;
+  options.formatResult = function(data) {
+    if (data && typeof data.text === 'string') {
+      data.text = deXSS(data.text);
+    }
+    return (originalFormatResult ? originalFormatResult.call(this, data) : (data ? data.text : undefined));
+  };
+}
 
 // TODO: Depends on Role
 
@@ -118,6 +130,10 @@ ko.bindingHandlers.select2 = {
         }
       }
     }
+    // XSS FIX: Apply HTML escaping to Select2 options when used via Knockout Options binding
+    // E.g. <select data-bind="options: model.dataX, select2: {...}"></select>
+    applySelect2SecurityFix(options);
+    
     $element
       .select2(options)
       .on('change', e => {
