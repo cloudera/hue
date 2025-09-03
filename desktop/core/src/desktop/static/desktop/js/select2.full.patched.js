@@ -18,7 +18,7 @@
 
 // Note on Cross-site scripting (XSS)
 // This legacy version of select2 is only used via the Knockout.js binding in ko.select2.js
-// where a patch for XSS is applied. 
+// where a patch for XSS is applied. See CVE-2016-10744.
 
 /*!
  * Select2 4.0.3
