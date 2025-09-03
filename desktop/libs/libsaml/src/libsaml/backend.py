@@ -69,7 +69,7 @@ class SAML2Backend(_Saml2Backend):
     user = rewrite_user(user)
     return user
 
-  def update_user(self, user, attributes, attribute_mapping, force_save=False):
+  def _update_user(self, user, attributes, attribute_mapping, force_save=False):
     # Do this check up here, because the auth call creates a django user upon first login per user
     is_super = False
     if not UserProfile.objects.filter(creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists():
@@ -77,16 +77,22 @@ class SAML2Backend(_Saml2Backend):
       # become a superuser
       is_super = True
     else:
-      user = self._get_user_by_username(user.username)
-      if user is not None:
+      # Check if user exists, but don't reassign the user variable to avoid None
+      existing_user = self._get_user_by_username(user.username)
+      if existing_user is not None:
         # If the user already exists, we shouldn't change its superuser
         # privileges. However, if there's a naming conflict with a non-external
         # user, we should do the safe thing and turn off superuser privs.
-        existing_profile = get_profile(user)
+        existing_profile = get_profile(existing_user)
         if existing_profile.creation_method == UserProfile.CreationMethod.EXTERNAL.name:
-          is_super = user.is_superuser
+          is_super = existing_user.is_superuser
 
-    user = super(SAML2Backend, self).update_user(user, attributes, attribute_mapping, force_save)
+    # Ensure user is not None before calling parent method
+    if user is None:
+      LOG.error("User object is None, cannot update SAML user")
+      return None
+
+    user = super(SAML2Backend, self)._update_user(user, attributes, attribute_mapping, force_save)
 
     if user is not None and user.is_active:
       user.username = force_username_case(user.username)
