@@ -16,7 +16,7 @@
 # limitations under the License.
 
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, TYPE_CHECKING
 from urllib.parse import urlencode, urlparse
 
 import boto3
@@ -25,6 +25,9 @@ from botocore.hooks import EventAliaser, HierarchicalEmitter
 
 from desktop.lib.fs.s3.clients.base import S3AuthProvider
 from desktop.lib.raz.raz_client import get_raz_client
+
+if TYPE_CHECKING:
+  from desktop.lib.fs.s3.config_utils import ConnectorConfig
 
 LOG = logging.getLogger()
 
@@ -46,7 +49,9 @@ class RazEventHandler:
 
     # Register event handlers
     emitter.register("before-sign.*.*", self._handle_before_sign)
-    emitter.register("before-send.*.*", self._handle_before_send)
+
+    # TODO: Is this needed?
+    # emitter.register("before-send.*.*", self._handle_before_send)
 
     # Create aliaser for compatibility
     return EventAliaser(emitter)
@@ -120,14 +125,22 @@ class RazAuthProvider(S3AuthProvider):
   Uses boto3's event system to intercept and sign requests.
   """
 
-  def __init__(self, provider_id: str, user: str):
-    super().__init__(provider_id, user)
+  def __init__(self, connector_config: "ConnectorConfig", user: str):
+    super().__init__(connector_config, user)
 
-    self.raz_handler = RazEventHandler(user=user, raz_url=self.config.RAZ_URL.get())
+    # Use existing global RAZ configuration
+    raz_url = self._get_raz_url_from_global_config()
+    self.raz_handler = RazEventHandler(user=user, raz_url=raz_url)
 
     # Store boto3 session with RAZ event handlers
-    self.session = boto3.Session(aws_access_key_id="dummy", aws_secret_access_key="dummy", region_name=self.config.REGION.get())
+    self.session = boto3.Session(aws_access_key_id="dummy", aws_secret_access_key="dummy", region_name=connector_config.region)
     self.session.events = self.raz_handler.event_emitter
+
+  def _get_raz_url_from_global_config(self) -> str:
+    """Get RAZ URL from existing global RAZ configuration"""
+    from desktop.conf import RAZ
+
+    return RAZ.API_URL.get()
 
   def get_credentials(self) -> Dict[str, Any]:
     """
@@ -141,7 +154,7 @@ class RazAuthProvider(S3AuthProvider):
     Get kwargs for creating boto3 session.
     Returns pre-configured session with RAZ event handlers.
     """
-    return {"aws_access_key_id": "dummy", "aws_secret_access_key": "dummy", "region_name": self.config.REGION.get()}
+    return {"aws_access_key_id": "dummy", "aws_secret_access_key": "dummy", "region_name": self.connector_config.region}
 
   def refresh(self) -> None:
     """No refresh needed as we sign per-request"""

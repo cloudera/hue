@@ -16,15 +16,20 @@
 # limitations under the License.
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, TYPE_CHECKING
 
 import boto3
 from boto3.session import Session
 from botocore.credentials import Credentials
 
+from desktop.conf import RAZ
 from desktop.lib.fs.s3.clients.auth.key import KeyAuthProvider
+from desktop.lib.fs.s3.clients.auth.raz import RazAuthProvider
 from desktop.lib.fs.s3.clients.base import S3AuthProvider, S3ClientInterface
 from desktop.lib.fs.s3.constants import DEFAULT_REGION
+
+if TYPE_CHECKING:
+  from desktop.lib.fs.s3.config_utils import ConnectorConfig
 
 LOG = logging.getLogger()
 
@@ -35,8 +40,8 @@ class GenericS3Client(S3ClientInterface):
   Supports any storage that implements the S3 API (Netapp, Dell, etc).
   """
 
-  def __init__(self, provider_id: str, user: str):
-    super().__init__(provider_id, user)
+  def __init__(self, connector_config: "ConnectorConfig", user: str):
+    super().__init__(connector_config, user)
 
     # Override client config for generic providers
     self.client_config.signature_version = self._get_signature_version()
@@ -51,13 +56,20 @@ class GenericS3Client(S3ClientInterface):
     self._setup_provider_specific_config()
 
   def _create_auth_provider(self) -> S3AuthProvider:
-    """Create auth provider - only key auth is supported for generic providers"""
-    return KeyAuthProvider(self.provider_id, self.user)
+    """Create appropriate auth provider for generic providers"""
+    connector = self.connector_config
+
+    # Support RAZ authentication for generic providers
+    if RAZ.IS_ENABLED.get() or connector.auth_type == "raz":
+      return RazAuthProvider(connector, self.user)
+    else:
+      # Default to key auth for generic providers
+      return KeyAuthProvider(connector, self.user)
 
   def _get_signature_version(self) -> str:
     """Get signature version based on provider"""
-    provider = self.config.PROVIDER.get().lower()
-    options = self.config.OPTIONS.get()
+    provider = self.connector_config.provider.lower()
+    options = self.connector_config.options or {}
 
     # Allow override via options
     if "signature_version" in options:
@@ -73,8 +85,8 @@ class GenericS3Client(S3ClientInterface):
 
   def _setup_provider_specific_config(self) -> None:
     """Setup provider-specific configurations"""
-    provider = self.config.PROVIDER.get().lower()
-    options = self.config.OPTIONS.get()
+    provider = self.connector_config.provider.lower()
+    options = self.connector_config.options or {}
 
     if provider == "netapp":
       self._setup_netapp_config(options)
@@ -112,13 +124,13 @@ class GenericS3Client(S3ClientInterface):
   def _create_client(self) -> Any:
     """Create boto3 S3 client"""
     return self.session.client(
-      "s3", config=self.client_config, endpoint_url=self.config.ENDPOINT.get(), verify=getattr(self.client_config, "verify", None)
+      "s3", config=self.client_config, endpoint_url=self.connector_config.endpoint, verify=getattr(self.client_config, "verify", None)
     )
 
   def _create_resource(self) -> Any:
     """Create boto3 S3 resource"""
     return self.session.resource(
-      "s3", config=self.client_config, endpoint_url=self.config.ENDPOINT.get(), verify=getattr(self.client_config, "verify", None)
+      "s3", config=self.client_config, endpoint_url=self.connector_config.endpoint, verify=getattr(self.client_config, "verify", None)
     )
 
   def get_credentials(self) -> Optional[Credentials]:
@@ -131,16 +143,18 @@ class GenericS3Client(S3ClientInterface):
 
   def get_region(self, bucket: str) -> str:
     """
-    Get region for a bucket.
+    Get region for a bucket with smart bucket config support.
     Most S3-compatible systems don't use regions,
     so return configured region or default.
     """
-    # Check bucket region map first
-    region_map = self.config.BUCKET_REGION_MAP.get()
-    if bucket in region_map:
-      return region_map[bucket]
+    # Check bucket-specific region from bucket_configs first
+    if bucket and self.connector_config.bucket_configs:
+      bucket_config = self.connector_config.bucket_configs.get(bucket)
+      if bucket_config and bucket_config.region:
+        return bucket_config.region
 
-    return self.config.REGION.get() or DEFAULT_REGION
+    # Fall back to connector default region
+    return self.connector_config.region or DEFAULT_REGION
 
   def validate_region(self, bucket: str) -> bool:
     """

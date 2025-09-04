@@ -16,14 +16,16 @@
 # limitations under the License.
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, TYPE_CHECKING
 
 from boto3.session import Session
 from botocore.client import Config
 from botocore.credentials import Credentials
 
-from desktop.conf import S3_OBJECT_STORES
 from desktop.lib.fs.s3.constants import CLIENT_CONFIG, TRANSFER_CONFIG
+
+if TYPE_CHECKING:
+  from desktop.lib.fs.s3.config_utils import ConnectorConfig
 
 
 class S3AuthProvider(ABC):
@@ -32,10 +34,9 @@ class S3AuthProvider(ABC):
   Each auth method (key, IAM, RAZ) must implement this interface.
   """
 
-  def __init__(self, provider_id: str, user: str):
-    self.provider_id = provider_id
+  def __init__(self, connector_config: "ConnectorConfig", user: str):
+    self.connector_config = connector_config
     self.user = user
-    self.config = S3_OBJECT_STORES[provider_id]
 
   @abstractmethod
   def get_credentials(self) -> Dict[str, Any]:
@@ -65,10 +66,12 @@ class S3ClientInterface(ABC):
   Base interface for S3 clients. All provider-specific clients must implement this interface.
   """
 
-  def __init__(self, provider_id: str, user: str):
-    self.provider_id = provider_id
+  def __init__(self, connector_config: "ConnectorConfig", user: str):
+    self.connector_config = connector_config
     self.user = user
-    self.config = S3_OBJECT_STORES[provider_id]
+
+    # Backward compatibility attributes
+    self.provider_id = connector_config.id
 
     # Initialize auth provider
     self.auth_provider = self._create_auth_provider()
@@ -77,7 +80,7 @@ class S3ClientInterface(ABC):
     self.client_config = Config(
       **{
         **CLIENT_CONFIG,
-        "region_name": self.config.REGION.get(),
+        "region_name": connector_config.region,
         "s3": {
           "addressing_style": "path"  # Use path style for compatibility
         },

@@ -19,64 +19,110 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional
 
-from desktop.conf import S3_OBJECT_STORES
 from desktop.lib.fs.s3.clients.aws import AWSS3Client
 from desktop.lib.fs.s3.clients.base import S3ClientInterface
 from desktop.lib.fs.s3.clients.generic import GenericS3Client
+from desktop.lib.fs.s3.config_utils import ConnectorConfig, get_all_connectors, get_connector
 
 LOG = logging.getLogger()
 
 
 @dataclass
-class ClientConfig:
-  """Configuration for a single client instance"""
+class ConnectorInfo:
+  """Information about an available connector for API consumers"""
 
-  provider_id: str
-  name: str
-  provider_type: str
+  id: str
+  provider: str
   auth_type: str
   endpoint: Optional[str]
   region: Optional[str]
+  bucket_names: List[str]  # Buckets configured for this connector
 
 
 class S3ClientFactory:
-  """Factory for creating S3 clients"""
+  """Simplified factory for creating S3 clients using connector architecture"""
 
   @classmethod
-  def get_available_clients(cls, user: str) -> List[ClientConfig]:
-    """Get list of all available client configurations"""
-    configs = []
+  def get_available_connectors(cls, user: str) -> List[ConnectorInfo]:
+    """Get list of all available connectors with their bucket information"""
+    connector_infos = []
 
-    for provider_id, provider_conf in S3_OBJECT_STORES.items():
-      configs.append(
-        ClientConfig(
-          provider_id=provider_id,
-          name=provider_conf.NAME.get(),
-          provider_type=provider_conf.PROVIDER.get().lower(),
-          auth_type=provider_conf.AUTH_TYPE.get(),
-          endpoint=provider_conf.ENDPOINT.get(),
-          region=provider_conf.REGION.get(),
+    try:
+      connectors = get_all_connectors()
+
+      for connector_id, connector in connectors.items():
+        bucket_names = list(connector.bucket_configs.keys()) if connector.bucket_configs else []
+
+        connector_infos.append(
+          ConnectorInfo(
+            id=connector_id,
+            provider=connector.provider,
+            auth_type=connector.auth_type,
+            endpoint=connector.endpoint,
+            region=connector.region,
+            bucket_names=bucket_names,
+          )
         )
-      )
+    except Exception as e:
+      LOG.error(f"Failed to get available connectors: {e}")
 
-    return configs
+    return connector_infos
 
   @classmethod
-  def get_client(cls, provider_id: str, user: str) -> S3ClientInterface:
-    """Get S3 client instance for given provider"""
-    if provider_id not in S3_OBJECT_STORES:
-      raise ValueError(f"Unknown provider ID: {provider_id}")
+  def get_client_for_connector(cls, connector_id: str, user: str) -> S3ClientInterface:
+    """
+    Get S3 client instance for a specific connector.
 
-    provider_conf = S3_OBJECT_STORES[provider_id]
-    provider_type = provider_conf.PROVIDER.get().lower()
+    Args:
+      connector_id: ID of the connector
+      user: Username for the client
+
+    Returns:
+      S3ClientInterface instance configured for the connector
+
+    Raises:
+      ValueError: If connector not found
+    """
+    try:
+      connector = get_connector(connector_id)
+
+      if not connector:
+        available = list(get_all_connectors().keys())
+        raise ValueError(f"Unknown connector ID: {connector_id}. Available connectors: {available}")
+
+      return cls._create_client_for_connector(connector, user)
+
+    except Exception as e:
+      LOG.error(f"Failed to create S3 client for connector '{connector_id}': {e}")
+      raise
+
+  @classmethod
+  def _create_client_for_connector(cls, connector: ConnectorConfig, user: str) -> S3ClientInterface:
+    """Create appropriate client based on connector provider type"""
+    provider_type = connector.provider.lower()
 
     try:
       if provider_type == "aws":
-        return AWSS3Client(provider_id, user)
-      elif provider_type == "generic":
-        return GenericS3Client(provider_id, user)
+        return AWSS3Client(connector, user)
+      elif provider_type in ("generic", "netapp", "dell"):
+        return GenericS3Client(connector, user)
       else:
         raise ValueError(f"Unknown provider type: {provider_type}")
     except Exception as e:
-      LOG.error(f"Failed to create S3 client: {e}")
+      LOG.error(f"Failed to create {provider_type} client: {e}")
       raise
+
+  @classmethod
+  def get_client(cls, connector_id: str, user: str) -> S3ClientInterface:
+    """
+    Get S3 client instance for a connector.
+    This is the main public method for getting clients.
+
+    Args:
+      connector_id: ID of the connector
+      user: Username for the client
+
+    Returns:
+      S3ClientInterface instance
+    """
+    return cls.get_client_for_connector(connector_id, user)

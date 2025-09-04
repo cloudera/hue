@@ -1,47 +1,41 @@
 #!/usr/bin/env python
 
+import logging
 from typing import Optional
 
-from desktop.conf import S3_OBJECT_STORES
+from desktop.lib.fs.s3.config_utils import get_s3_home_directory as get_home_dir
 from desktop.lib.fs.s3.core.s3fs import S3FileSystem
 
+LOG = logging.getLogger()
 
-def make_s3_client(name: str, user: str) -> S3FileSystem:
+
+def make_s3_client(connector_id: str, user: str) -> S3FileSystem:
   """
   Create a new S3FileSystem instance.
 
   Args:
-      name: Provider ID from S3_OBJECT_STORES config
-      user: Username for operations
+    connector_id: ID of the S3 connector to use
+    user: Username for operations
 
   Returns:
-      S3FileSystem instance
+    S3FileSystem instance
 
   Raises:
-      ValueError: If provider configuration is invalid
+    ValueError: If connector configuration is invalid
   """
-  return S3FileSystem(name, user)
+  return S3FileSystem(connector_id, user)
 
 
-def get_s3_home_directory(user: Optional[str] = None) -> str:
+def get_s3_home_directory(user: Optional[str] = None, connector_id: str = None, bucket_name: str = None) -> str:
   """
-  Get the S3 home directory for a user.
+  Get the S3 home directory for a user with smart defaults.
 
   Args:
-      user: Optional username, uses current user if None
+    user: Optional username
+    connector_id: Optional connector ID (uses smart default if not provided)
+    bucket_name: Optional bucket name (uses smart bucket selection if not provided)
 
   Returns:
-      S3 home directory path
+    S3 home directory path with intelligent fallbacks
   """
-  # Get first available provider
-  for provider_id in S3_OBJECT_STORES:
-    provider_conf = S3_OBJECT_STORES[provider_id]
-    home_path = provider_conf.DEFAULT_HOME_PATH.get()
-    if home_path:
-      # If user provided, append username
-      if user and home_path.rstrip("/").endswith("/user"):
-        return f"{home_path.rstrip('/')}/{user}"
-      return home_path
-
-  # Default to S3 root if no home path configured
-  return "s3a://"
+  return get_home_dir(connector_id, bucket_name, user)
