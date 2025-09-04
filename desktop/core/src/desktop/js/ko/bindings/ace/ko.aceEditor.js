@@ -796,6 +796,16 @@ registerBinding(NAME, {
     });
     editor.$blockScrolling = Infinity;
     snippet.ace(editor);
+
+    // Publish a single editor.ready event after ace editor has been initialized 
+    // and is ready to be used, e.g. to insert sql at cursor.    
+    if (!$el.data('editor-ready-published')) {
+      $el.data('editor-ready-published', true);
+      // Let the render cycle complete before publishing the event.
+      setTimeout(() => {        
+        huePubSub.publish('editor.ready');
+      }, 0);
+    }
   },
 
   update: function (element, valueAccessor) {
