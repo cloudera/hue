@@ -2803,6 +2803,19 @@ def config_validator(user):
   if 'use_new_editor' in USE_NEW_EDITOR.bind_to:
     res.append(('[desktop] use_new_editor', str(_('This configuration flag has been deprecated.'))))
 
+  # Validate S3 configuration
+  if USE_STORAGE_CONNECTORS.get():
+    try:
+      from desktop.lib.fs.s3.config_utils import validate_s3_configuration
+
+      # Validate storage connector configuration structure
+      s3_errors = validate_s3_configuration()
+      for error in s3_errors:
+        res.append(("STORAGE_CONNECTOR_CONFIGURATION", error))
+
+    except Exception as e:
+      res.append(("STORAGE_CONNECTOR_CONFIGURATION", f"Failed to validate storage connector configuration: {e}"))
+
   return res
 
 
@@ -2911,97 +2924,73 @@ def is_gs_enabled():
 
 PERMISSION_ACTION_S3 = "s3_access"
 
-USE_NEW_S3_IMPLEMENTATION = Config(
-    key='use_new_s3_implementation',
+USE_STORAGE_CONNECTORS = Config(
+    key='use_storage_connectors',
     type=coerce_bool,
     default=False,  # Default to old implementation for now
-    help=_('Use new boto3-based S3 implementation with support for multiple providers and auth methods')
+    help=_('Use storage connector system for multi-cloud object storage access')
 )
 
-S3_OBJECT_STORES = UnspecifiedConfigSection(
-  's3_object_stores',
-  help=_('One entry for each S3-compatible object store instance'),
+STORAGE_CONNECTORS = UnspecifiedConfigSection(
+  'storage_connectors',
+  help=_('Storage connector definitions with bucket-specific configurations'),
   each=ConfigSection(
-    help=_('Information about a single S3-compatible object store instance'),
+    help=_('Configuration for a single S3-compatible storage connector'),
     members=dict(
-      NAME=Config(
-        key='name',
-        type=str,
-        default=None,
-        help=_('Display name of the object store instance')
-      ),
       PROVIDER=Config(
         key='provider',
         type=str,
         default='aws',  # aws, netapp, dell, generic
-        help=_('Object store provider type')
-      ),
-      REGION=Config(
-        key='region',
-        type=str,
-        default=None,
-        help=_('Default region for the object store')
-      ),
-      ENDPOINT=Config(
-        key='endpoint',
-        type=str,
-        default=None,
-        help=_('Custom endpoint URL for S3-compatible stores')
+        help=_('Storage provider type (aws, netapp, dell, generic)')
       ),
       AUTH_TYPE=Config(
         key='auth_type',
         type=str,
         default='key',  # key, iam, raz, idbroker
-        help=_('Authentication type to use')
+        help=_('Authentication method (key, iam, raz, idbroker)')
+      ),
+      REGION=Config(
+        key='region',
+        type=str,
+        default=None,
+        help=_('Default AWS region (required for AWS provider)')
+      ),
+      ENDPOINT=Config(
+        key='endpoint',
+        type=str,
+        default=None,
+        help=_('Custom endpoint URL (required for non-AWS providers)')
       ),
       ACCESS_KEY_ID=Config(
         key='access_key_id',
         type=str,
         default=None,
-        help=_('Access key ID for key-based auth')
+        help=_('Access key ID (required for key auth)')
       ),
       SECRET_KEY=Config(
         key='secret_key',
         type=str,
         private=True,
         default=None,
-        help=_('Secret key for key-based auth')
+        help=_('Secret access key (required for key auth)')
       ),
       IAM_ROLE=Config(
         key='iam_role',
         type=str,
         default=None,
-        help=_('IAM role to assume for AWS IAM auth')
+        help=_('IAM role ARN to assume (for iam auth)')
       ),
-      RAZ_URL=Config(
-        key='raz_url',
-        type=str,
-        default=None,
-        help=_('RAZ server URL for RAZ auth')
-      ),
-      IDBROKER_URL=Config(
-        key='idbroker_url',
-        type=str,
-        default=None,
-        help=_('IDBroker URL for IDBroker auth')
-      ),
-      BUCKET_REGION_MAP=Config(
-        key='bucket_region_map',
+      BUCKET_CONFIGS=Config(
+        key='bucket_configs',
         type=coerce_json_dict,
         default='{}',
-        help=_('JSON mapping of bucket names to their regions')
-      ),
-      DEFAULT_HOME_PATH=Config(
-        key="default_home_path",
-        type=str,
-        default=None,
-        help=_("Default home directory path. e.g. s3a://gethue")
+        help=_('Per-bucket configuration: {"bucket-name": {"default_home_path": "/path/", "region": "us-east-1"}}')
       ),
       OPTIONS=Config(
         key='options',
         type=coerce_json_dict,
         default='{}',
-        help=_('Additional provider-specific options as JSON')
+        help=_('Provider-specific configuration options as JSON')
       )
     )
   )

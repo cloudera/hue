@@ -17,11 +17,14 @@
 
 import logging
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, TYPE_CHECKING
 
 from desktop.lib.fs.s3.clients.base import S3AuthProvider
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.idbroker.client import IDBroker
+
+if TYPE_CHECKING:
+  from desktop.lib.fs.s3.config_utils import ConnectorConfig
 
 LOG = logging.getLogger()
 
@@ -32,15 +35,16 @@ class IDBrokerAuthProvider(S3AuthProvider):
   IDBroker provides temporary credentials for S3 access.
   """
 
-  def __init__(self, provider_id: str, user: str):
-    super().__init__(provider_id, user)
+  def __init__(self, connector_config: "ConnectorConfig", user: str):
+    super().__init__(connector_config, user)
     self._credentials = None
     self._idbroker = None
     self._init_idbroker()
 
   def _init_idbroker(self) -> None:
-    """Initialize IDBroker client"""
+    """Initialize IDBroker client using existing global configuration"""
     try:
+      # Use existing IDBroker configuration from core-site
       self._idbroker = IDBroker.from_core_site("s3a", self.user)
       self._load_credentials()
     except Exception as e:
@@ -82,7 +86,7 @@ class IDBrokerAuthProvider(S3AuthProvider):
       "aws_access_key_id": creds["access_key_id"],
       "aws_secret_access_key": creds["secret_access_key"],
       "aws_session_token": creds.get("session_token"),
-      "region_name": self.config.REGION.get(),
+      "region_name": self.connector_config.region,
     }
 
   def _should_refresh(self) -> bool:

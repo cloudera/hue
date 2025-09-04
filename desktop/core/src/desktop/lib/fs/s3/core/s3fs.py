@@ -18,36 +18,41 @@
 import logging
 import os
 import time
-from typing import Any, BinaryIO, List, Optional, Union
+from typing import Any, BinaryIO, List, Optional, TYPE_CHECKING, Union
 
 from botocore.exceptions import ClientError
 
 from desktop.conf import PERMISSION_ACTION_S3
 from desktop.lib.fs.s3.clients.factory import S3ClientFactory
+from desktop.lib.fs.s3.config_utils import get_all_connectors, get_connector
 from desktop.lib.fs.s3.constants import DEFAULT_CHUNK_SIZE, S3_DELIMITER
 from desktop.lib.fs.s3.core.file import S3File
 from desktop.lib.fs.s3.core.path import S3Path
 from desktop.lib.fs.s3.core.stat import S3Stat
+
+if TYPE_CHECKING:
+  from desktop.lib.fs.s3.config_utils import ConnectorConfig
 
 LOG = logging.getLogger()
 
 
 class S3FileSystem:
   """
-  S3FileSystem implementation using boto3.
-  Supports multiple providers and auth methods.
+  Simplified S3FileSystem implementation using boto3.
+  Takes connector_id and user, extracts bucket from paths during operations.
   """
 
-  def __init__(self, provider_id: str, user: str):
+  def __init__(self, connector_id: str, user: str):
     """
-    Initialize S3FileSystem.
+    Initialize S3FileSystem for a specific connector.
 
     Args:
-      provider_id: ID from S3_OBJECT_STORES config
+      connector_id: ID of the S3 connector to use
       user: Username for operations
     """
-    self.provider_id = provider_id
+    self.connector_id = connector_id
     self.user = user
+    self.connector_config = None
 
     # Backward compatibility attributes
     self.is_sentry_managed = lambda path: False  # S3 doesn't use Sentry
@@ -56,12 +61,34 @@ class S3FileSystem:
     self.expiration = None  # No expiration for S3
     self._filebrowser_action = PERMISSION_ACTION_S3  # S3 uses filebrowser_action
 
-    # Initialize client
-    self.client = S3ClientFactory.get_client(provider_id, user)
+    # Load configuration and initialize client
+    self._load_connector_config()
+    self._initialize_client()
 
-    # Get boto3 clients
-    self.s3_client = self.client.s3_client
-    self.s3_resource = self.client.s3_resource
+  def _load_connector_config(self) -> None:
+    """Load connector configuration"""
+    self.connector_config = get_connector(self.connector_id)
+
+    if not self.connector_config:
+      available = list(get_all_connectors().keys()) if get_all_connectors() else []
+      raise ValueError(f"Unknown connector ID: {self.connector_id}. Available connectors: {available}")
+
+  def _initialize_client(self) -> None:
+    """Initialize the S3 client using connector configuration"""
+    try:
+      # Create client using factory
+      self.client = S3ClientFactory.get_client_for_connector(self.connector_id, self.user)
+
+      # Get boto3 clients for direct use
+      self.s3_client = self.client.s3_client
+      self.s3_resource = self.client.s3_resource
+
+      # Backward compatibility
+      self.provider_id = self.connector_config.id
+
+    except Exception as e:
+      LOG.error(f"Failed to initialize S3 client: {e}")
+      raise
 
   def _get_bucket(self, bucket_name: str, validate: bool = True):
     """Get bucket by name"""
@@ -416,7 +443,7 @@ class S3FileSystem:
 
   def create_home_dir(self, home_path: Optional[str] = None) -> None:
     """
-    Create home directory for the user.
+    Create home directory for the user with smart path resolution.
 
     Args:
       home_path: Optional explicit home path, if not provided will be determined from config
@@ -425,12 +452,10 @@ class S3FileSystem:
       PermissionError: If user doesn't have permission to create directory
       IOError: If directory creation fails
     """
-    from desktop.lib.fs.s3.fsmanager import get_s3_home_directory
-
     try:
-      # Get home directory path
+      # Get home directory path using smart defaults
       if not home_path:
-        home_path = get_s3_home_directory(self.user)
+        home_path = self._get_smart_home_directory()
 
       # Create directory if it doesn't exist
       if not self.exists(home_path):
@@ -440,6 +465,53 @@ class S3FileSystem:
     except Exception as e:
       LOG.error(f"Failed to create home directory at {home_path}: {e}")
       raise IOError(f"Failed to create home directory: {e}")
+
+  def _get_smart_home_directory(self) -> str:
+    """
+    Get smart home directory using connector bucket configuration.
+
+    Logic:
+    - Single bucket configured: Use that bucket's home path
+    - Multiple buckets: Use generic s3a://
+    - No buckets: Use generic s3a://
+    """
+    from desktop.lib.fs.s3.config_utils import get_default_bucket_home_path
+
+    return get_default_bucket_home_path(self.connector_id, self.user)
+
+  # Configuration access methods
+  # ============================
+
+  def get_connector_config(self) -> "ConnectorConfig":
+    """Get the connector configuration for this filesystem"""
+    return self.connector_config
+
+  def get_bucket_config(self, bucket_name: str):
+    """Get bucket-specific configuration"""
+    return self.connector_config.get_bucket_config(bucket_name)
+
+  def get_bucket_home_path(self, bucket_name: str) -> str:
+    """Get home path for a specific bucket"""
+    bucket_config = self.get_bucket_config(bucket_name)
+    return bucket_config.get_effective_home_path(self.user)
+
+  def get_bucket_region(self, bucket_name: str) -> Optional[str]:
+    """Get region for a specific bucket with smart defaults"""
+    from desktop.lib.fs.s3.config_utils import get_effective_bucket_region
+
+    return get_effective_bucket_region(self.connector_id, bucket_name)
+
+  def validate_bucket_access(self, bucket_name: str) -> bool:
+    """Check if this filesystem can access the specified bucket"""
+    from desktop.lib.fs.s3.config_utils import validate_bucket_access
+
+    return validate_bucket_access(self.connector_id, bucket_name)
+
+  def get_available_buckets(self) -> List[str]:
+    """Get list of buckets configured for this connector"""
+    from desktop.lib.fs.s3.config_utils import get_available_buckets
+
+    return get_available_buckets(self.connector_id)
 
   # Backward compatibility methods
 

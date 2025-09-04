@@ -15,9 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict
+from typing import Any, Dict, TYPE_CHECKING
 
 from desktop.lib.fs.s3.clients.base import S3AuthProvider
+
+if TYPE_CHECKING:
+  from desktop.lib.fs.s3.config_utils import ConnectorConfig
 
 
 class KeyAuthProvider(S3AuthProvider):
@@ -26,17 +29,18 @@ class KeyAuthProvider(S3AuthProvider):
   Simple static credentials without refresh.
   """
 
-  def __init__(self, provider_id: str, user: str):
-    super().__init__(provider_id, user)
+  def __init__(self, connector_config: "ConnectorConfig", user: str):
+    super().__init__(connector_config, user)
     self._credentials = None
     self._load_credentials()
 
   def _load_credentials(self) -> None:
-    """Load credentials from config"""
-    self._credentials = {"access_key_id": self.config.ACCESS_KEY_ID.get(), "secret_access_key": self.config.SECRET_KEY.get()}
+    """Load credentials from connector config"""
+    connector = self.connector_config
+    self._credentials = {"access_key_id": connector.access_key_id, "secret_access_key": connector.secret_key}
 
     if not self._credentials["access_key_id"] or not self._credentials["secret_access_key"]:
-      raise ValueError(f"Missing access key or secret key for provider {self.provider_id}")
+      raise ValueError(f"Missing access key or secret key for connector {connector.id}")
 
   def get_credentials(self) -> Dict[str, Any]:
     """Get static credentials"""
@@ -47,7 +51,7 @@ class KeyAuthProvider(S3AuthProvider):
     return {
       "aws_access_key_id": self._credentials["access_key_id"],
       "aws_secret_access_key": self._credentials["secret_access_key"],
-      "region_name": self.config.REGION.get(),
+      "region_name": self.connector_config.region,
     }
 
   def refresh(self) -> None:

@@ -17,11 +17,14 @@
 
 import logging
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, TYPE_CHECKING
 
 import boto3
 
 from desktop.lib.fs.s3.clients.base import S3AuthProvider
+
+if TYPE_CHECKING:
+  from desktop.lib.fs.s3.config_utils import ConnectorConfig
 
 LOG = logging.getLogger()
 
@@ -35,11 +38,11 @@ class IAMAuthProvider(S3AuthProvider):
   3. Explicit IAM role assumption
   """
 
-  def __init__(self, provider_id: str, user: str):
-    super().__init__(provider_id, user)
+  def __init__(self, connector_config: "ConnectorConfig", user: str):
+    super().__init__(connector_config, user)
     self._credentials = None
     self._sts_client = None
-    self._role_arn = self.config.IAM_ROLE.get()
+    self._role_arn = connector_config.iam_role
     self._session_name = f"hue-{user}-session"
     self._init_sts()
 
@@ -87,7 +90,7 @@ class IAMAuthProvider(S3AuthProvider):
       "aws_access_key_id": creds["access_key_id"],
       "aws_secret_access_key": creds["secret_access_key"],
       "aws_session_token": creds.get("session_token"),
-      "region_name": self.config.REGION.get(),
+      "region_name": self.connector_config.region,
     }
 
   def _should_refresh(self) -> bool:

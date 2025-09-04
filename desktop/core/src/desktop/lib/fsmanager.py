@@ -26,7 +26,7 @@ import desktop.lib.fs.gc.client
 import desktop.lib.fs.ozone.client
 from aws.conf import has_s3_access, is_enabled as is_s3_enabled
 from azure.conf import has_abfs_access, has_adls_access, is_abfs_enabled, is_adls_enabled
-from desktop.conf import DEFAULT_USER, has_gs_access, has_ofs_access, is_gs_enabled, is_ofs_enabled, RAZ, USE_NEW_S3_IMPLEMENTATION
+from desktop.conf import DEFAULT_USER, has_gs_access, has_ofs_access, is_gs_enabled, is_ofs_enabled, RAZ, USE_STORAGE_CONNECTORS
 from desktop.lib.fs.proxyfs import ProxyFS
 from desktop.lib.fs.s3.fsmanager import make_s3_client
 from desktop.lib.idbroker import conf as conf_idbroker
@@ -56,8 +56,16 @@ def has_access(fs=None, user=None):
   elif fs == 'adl':
     return has_adls_access(user)
   elif fs == 's3a':
-    if USE_NEW_S3_IMPLEMENTATION.get():
-      return True
+    if USE_STORAGE_CONNECTORS.get():
+      # For storage connector system, check if any connectors are available
+      try:
+        from desktop.lib.fs.s3.config_utils import get_all_connectors
+
+        connectors = get_all_connectors()
+        return bool(connectors)  # User has access if there are connectors
+      except Exception as e:
+        logging.warning(f"Failed to check S3 connector access: {e}")
+        return False
     return has_s3_access(user)
   elif fs == 'abfs':
     return has_abfs_access(user)
@@ -73,8 +81,15 @@ def is_enabled(fs):
   elif fs == 'adl':
     return is_adls_enabled()
   elif fs == 's3a':
-    if USE_NEW_S3_IMPLEMENTATION.get():
-      return True
+    if USE_STORAGE_CONNECTORS.get():
+      # Check if there are any storage connectors configured
+      try:
+        from desktop.lib.fs.s3.config_utils import get_config_manager
+
+        return get_config_manager().has_connectors()
+      except Exception as e:
+        logging.warning(f"Failed to check storage connector configurations: {e}")
+        return False
     return is_s3_enabled()
   elif fs == 'abfs':
     return is_abfs_enabled()
@@ -92,8 +107,10 @@ def _make_client(fs, name, user):
   if fs == 'hdfs':
     return _make_filesystem(name)
   elif fs == 's3a':
-    if USE_NEW_S3_IMPLEMENTATION.get():
-      return make_s3_client(name, user)
+    if USE_STORAGE_CONNECTORS.get():
+      # For storage connector system, use connector_id (default to 'default' or first available)
+      connector_id = name if name != "default" else _get_default_s3_connector()
+      return make_s3_client(connector_id, user)
     return aws.client._make_client(name, user)
   elif fs == 'adl':
     return azure.client._make_adls_client(name, user)
@@ -104,6 +121,25 @@ def _make_client(fs, name, user):
   elif fs == 'ofs':
     return desktop.lib.fs.ozone.client._make_ofs_client(name, user)
   return None
+
+
+def _get_default_s3_connector() -> str:
+  """Get the default S3 connector ID (first available or 'default')"""
+  try:
+    from desktop.lib.fs.s3.config_utils import get_all_connectors
+
+    connectors = get_all_connectors()
+
+    # Prefer 'default' if it exists
+    if "default" in connectors:
+      return "default"
+
+    # Otherwise return first available
+    return next(iter(connectors.keys())) if connectors else "default"
+
+  except Exception as e:
+    logging.warning(f"Failed to get default S3 connector: {e}")
+    return "default"
 
 
 def _get_client(fs=None):

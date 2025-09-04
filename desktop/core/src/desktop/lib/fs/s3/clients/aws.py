@@ -16,7 +16,7 @@
 # limitations under the License.
 
 import logging
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
 import boto3
 from boto3.session import Session
@@ -32,7 +32,10 @@ from desktop.lib.fs.s3.clients.base import S3AuthProvider, S3ClientInterface
 from desktop.lib.fs.s3.constants import DEFAULT_REGION
 from desktop.lib.idbroker import conf as conf_idbroker
 
-LOG = logging.getLogger(__name__)
+if TYPE_CHECKING:
+  from desktop.lib.fs.s3.config_utils import ConnectorConfig
+
+LOG = logging.getLogger()
 
 
 class AWSS3Client(S3ClientInterface):
@@ -41,29 +44,34 @@ class AWSS3Client(S3ClientInterface):
   Handles AWS-specific features and optimizations.
   """
 
-  def __init__(self, provider_id: str, user: str):
-    super().__init__(provider_id, user)
+  def __init__(self, connector_config: "ConnectorConfig", user: str):
+    super().__init__(connector_config, user)
 
     # AWS specific config
     self.client_config.signature_version = "s3v4"
+
+    options = connector_config.options or {}
     self.client_config.s3.update(
       {
-        "use_accelerate_endpoint": self.config.OPTIONS.get().get("use_accelerate", False),
         "payload_signing_enabled": True,
-        "use_dualstack_endpoint": self.config.OPTIONS.get().get("use_dualstack", False),
+        "use_accelerate_endpoint": options.get("use_accelerate", False),
+        "use_dualstack_endpoint": options.get("use_dualstack", False),
       }
     )
 
   def _create_auth_provider(self) -> S3AuthProvider:
-    """Create appropriate auth provider based on config"""
-    if RAZ.IS_ENABLED.get():
-      return RazAuthProvider(self.provider_id, self.user)
-    elif conf_idbroker.is_idbroker_enabled("s3a"):
-      return IDBrokerAuthProvider(self.provider_id, self.user)
-    elif self.config.IAM_ROLE.get():
-      return IAMAuthProvider(self.provider_id, self.user)
+    """Create appropriate auth provider based on connector config"""
+    connector = self.connector_config
+
+    # Priority-based auth provider selection
+    if RAZ.IS_ENABLED.get() or connector.auth_type == "raz":
+      return RazAuthProvider(connector, self.user)
+    elif conf_idbroker.is_idbroker_enabled("s3a") or connector.auth_type == "idbroker":
+      return IDBrokerAuthProvider(connector, self.user)
+    elif connector.auth_type == "iam" or connector.iam_role:
+      return IAMAuthProvider(connector, self.user)
     else:
-      return KeyAuthProvider(self.provider_id, self.user)
+      return KeyAuthProvider(connector, self.user)
 
   def _create_session(self) -> Session:
     """Create boto3 session with credentials from auth provider"""
@@ -72,11 +80,11 @@ class AWSS3Client(S3ClientInterface):
 
   def _create_client(self) -> Any:
     """Create boto3 S3 client"""
-    return self.session.client("s3", config=self.client_config, endpoint_url=self.config.ENDPOINT.get())
+    return self.session.client("s3", config=self.client_config, endpoint_url=self.connector_config.endpoint)
 
   def _create_resource(self) -> Any:
     """Create boto3 S3 resource"""
-    return self.session.resource("s3", config=self.client_config, endpoint_url=self.config.ENDPOINT.get())
+    return self.session.resource("s3", config=self.client_config, endpoint_url=self.connector_config.endpoint)
 
   def get_credentials(self) -> Optional[Credentials]:
     """Get current credentials"""
@@ -88,19 +96,22 @@ class AWSS3Client(S3ClientInterface):
 
   def get_region(self, bucket: str) -> str:
     """
-    Get region for a bucket.
+    Get region for a bucket with smart bucket config support.
     Checks:
-    1. Bucket region map from config
-    2. Bucket location constraint
-    3. Default region
+    1. Bucket-specific region from bucket_configs
+    2. Bucket location constraint (AWS API)
+    3. Connector default region
+    4. System default region
     """
-    # Check bucket region map first
-    region_map = self.config.BUCKET_REGION_MAP.get()
-    if bucket in region_map:
-      return region_map[bucket]
+    # Check bucket-specific region from bucket_configs first
+    if bucket and self.connector_config.bucket_configs:
+      bucket_config = self.connector_config.bucket_configs.get(bucket)
+      if bucket_config and bucket_config.region:
+        LOG.debug(f"Using bucket-specific region '{bucket_config.region}' for bucket '{bucket}'")
+        return bucket_config.region
 
     try:
-      # Try to get region from bucket location
+      # Try to get region from AWS API bucket location
       response = self.s3_client.get_bucket_location(Bucket=bucket)
       region = response.get("LocationConstraint")
 
@@ -112,11 +123,12 @@ class AWSS3Client(S3ClientInterface):
         # Legacy EU region
         return "eu-west-1"
 
+      LOG.debug(f"Detected bucket '{bucket}' in region '{region}' via AWS API")
       return region
     except ClientError as e:
-      LOG.warning(f"Failed to get region for bucket {bucket}: {e}")
-      # Fall back to default region
-      return self.config.REGION.get() or DEFAULT_REGION
+      LOG.debug(f"Could not detect region for bucket {bucket} via AWS API: {e}")
+      # Fall back to connector default or system default
+      return self.connector_config.region or DEFAULT_REGION
 
   def validate_region(self, bucket: str) -> bool:
     """
@@ -124,7 +136,7 @@ class AWSS3Client(S3ClientInterface):
     Important for signature v4 compatibility.
     """
     actual_region = self.get_region(bucket)
-    current_region = self.config.REGION.get() or DEFAULT_REGION
+    current_region = self.connector_config.region or DEFAULT_REGION
 
     if actual_region != current_region:
       LOG.warning(f"Bucket {bucket} is in region {actual_region} but client is configured for {current_region}")
