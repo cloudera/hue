@@ -1,0 +1,596 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""
+Configuration utilities for the simplified S3 connector system.
+Uses bucket-embedded configuration for clean, simple setup.
+"""
+
+import logging
+from dataclasses import dataclass
+from typing import Dict, List, Optional
+from urllib.parse import urlparse
+
+from desktop.conf import RAZ, STORAGE_CONNECTORS
+
+LOG = logging.getLogger()
+
+
+@dataclass
+class BucketConfig:
+  """Configuration for a specific bucket within a connector"""
+
+  name: str
+  default_home_path: Optional[str] = None
+  region: Optional[str] = None
+  options: Optional[Dict[str, any]] = None
+
+  def get_effective_home_path(self, user: str = None) -> str:
+    """
+    Get effective home path for this bucket, handling relative paths and user context.
+
+    Args:
+      user: Username for RAZ user directory handling
+
+    Returns:
+      Absolute S3 path
+    """
+    if not self.default_home_path:
+      # Default to bucket root
+      path = f"s3a://{self.name}/"
+    elif self.default_home_path.startswith("s3a://"):
+      # Already absolute
+      path = self.default_home_path
+    else:
+      # Relative path - make it absolute
+      path = f"s3a://{self.name}/{self.default_home_path.lstrip('/')}"
+      if not path.endswith("/"):
+        path += "/"
+
+    # Handle RAZ user directory logic
+    if user and RAZ.IS_ENABLED.get():
+      from desktop.models import _handle_user_dir_raz
+
+      path = _handle_user_dir_raz(user, path)
+
+    return path
+
+
+@dataclass
+class ConnectorConfig:
+  """Simplified S3 connector configuration"""
+
+  id: str
+  provider: str
+  auth_type: str
+  region: Optional[str] = None
+  endpoint: Optional[str] = None
+  access_key_id: Optional[str] = None
+  secret_key: Optional[str] = None
+  iam_role: Optional[str] = None
+  bucket_configs: Optional[Dict[str, BucketConfig]] = None
+  options: Optional[Dict[str, any]] = None
+
+  def get_bucket_config(self, bucket_name: str) -> BucketConfig:
+    """Get configuration for a specific bucket, creating default if not found"""
+    if self.bucket_configs and bucket_name in self.bucket_configs:
+      return self.bucket_configs[bucket_name]
+
+    # Return default bucket config
+    return BucketConfig(name=bucket_name)
+
+  def get_bucket_region(self, bucket_name: str) -> Optional[str]:
+    """Get region for a specific bucket (bucket override > connector default)"""
+    bucket_config = self.get_bucket_config(bucket_name)
+    return bucket_config.region or self.region
+
+
+class ConfigurationError(Exception):
+  """Raised when configuration validation fails"""
+
+  pass
+
+
+class S3ConfigManager:
+  """
+  Simplified S3 connector configuration manager.
+  No more sources, just connectors with embedded bucket configs.
+  """
+
+  def __init__(self):
+    self._connectors: Dict[str, ConnectorConfig] = {}
+    self._loaded = False
+
+  def load_configurations(self) -> None:
+    """Load and validate connector configurations"""
+    if self._loaded:
+      return
+
+    try:
+      self._load_connectors()
+      self._validate_configurations()
+
+      self._loaded = True
+      LOG.info(f"Successfully loaded {len(self._connectors)} S3 connectors")
+
+    except Exception as e:
+      LOG.error(f"Failed to load S3 configurations: {e}")
+      raise ConfigurationError(f"Configuration loading failed: {e}")
+
+  def _load_connectors(self) -> None:
+    """Load connector configurations from STORAGE_CONNECTORS"""
+    if not STORAGE_CONNECTORS.keys():
+      LOG.debug("No STORAGE_CONNECTORS configuration found")
+      return
+
+    for connector_id in STORAGE_CONNECTORS.keys():
+      connector_conf = STORAGE_CONNECTORS[connector_id]
+      try:
+        # Parse bucket configurations
+        bucket_configs = {}
+        bucket_configs_raw = connector_conf.BUCKET_CONFIGS.get()
+
+        for bucket_name, bucket_conf_dict in bucket_configs_raw.items():
+          bucket_configs[bucket_name] = BucketConfig(
+            name=bucket_name,
+            default_home_path=bucket_conf_dict.get("default_home_path"),
+            region=bucket_conf_dict.get("region"),
+            options=bucket_conf_dict.get("options"),
+          )
+
+        connector = ConnectorConfig(
+          id=connector_id,
+          provider=connector_conf.PROVIDER.get(),
+          auth_type=connector_conf.AUTH_TYPE.get(),
+          region=connector_conf.REGION.get(),
+          endpoint=connector_conf.ENDPOINT.get(),
+          access_key_id=connector_conf.ACCESS_KEY_ID.get(),
+          secret_key=connector_conf.SECRET_KEY.get(),
+          iam_role=connector_conf.IAM_ROLE.get(),
+          bucket_configs=bucket_configs,
+          options=connector_conf.OPTIONS.get(),
+        )
+
+        self._connectors[connector_id] = connector
+
+        bucket_info = f"with {len(bucket_configs)} buckets" if bucket_configs else "no bucket configs"
+        LOG.debug(f"Loaded connector: {connector_id} ({connector.provider}, {connector.auth_type}) {bucket_info}")
+
+      except Exception as e:
+        raise ConfigurationError(f"Failed to load connector '{connector_id}': {e}")
+
+  def _validate_configurations(self) -> None:
+    """Validate connector configurations"""
+    errors = []
+
+    for connector_id, connector in self._connectors.items():
+      try:
+        self._validate_connector(connector)
+      except ConfigurationError as e:
+        errors.append(f"Connector '{connector_id}': {e}")
+
+    if errors:
+      raise ConfigurationError("Configuration validation failed:\n" + "\n".join(f"  - {err}" for err in errors))
+
+  def _validate_connector(self, connector: ConnectorConfig) -> None:
+    """Validate a single connector configuration"""
+    # Rule: AWS provider requires region
+    if connector.provider == "aws" and not connector.region:
+      raise ConfigurationError("AWS provider requires 'region' to be specified")
+
+    # Rule: Non-AWS providers require endpoint
+    if connector.provider != "aws" and not connector.endpoint:
+      raise ConfigurationError(f"Provider '{connector.provider}' requires 'endpoint' to be specified")
+
+    # Rule: Key auth requires access_key_id and secret_key
+    if connector.auth_type == "key":
+      if not connector.access_key_id:
+        raise ConfigurationError("Key authentication requires 'access_key_id'")
+      if not connector.secret_key:
+        raise ConfigurationError("Key authentication requires 'secret_key'")
+
+    # Rule: RAZ auth requires global RAZ configuration
+    if connector.auth_type == "raz":
+      if not RAZ.IS_ENABLED.get():
+        raise ConfigurationError("RAZ authentication requires global [desktop] [[raz]] configuration to be enabled")
+
+    # Rule: IDBroker auth requires global IDBroker configuration
+    if connector.auth_type == "idbroker":
+      from desktop.lib.idbroker import conf as conf_idbroker
+
+      if not conf_idbroker.is_idbroker_enabled("s3a"):
+        raise ConfigurationError("IDBroker authentication requires global IDBroker configuration in core-site.xml")
+
+  def get_connector(self, connector_id: str) -> Optional[ConnectorConfig]:
+    """Get connector by ID"""
+    self.load_configurations()
+    return self._connectors.get(connector_id)
+
+  def get_all_connectors(self) -> Dict[str, ConnectorConfig]:
+    """Get all connectors"""
+    self.load_configurations()
+    return self._connectors.copy()
+
+  def has_connectors(self) -> bool:
+    """Check if any connectors are configured"""
+    try:
+      return bool(STORAGE_CONNECTORS.keys())
+    except Exception as e:
+      LOG.error(f"Failed to check if any connectors are configured: {e}")
+      return False
+
+
+# Singleton instance for global access
+_config_manager = S3ConfigManager()
+
+
+def get_config_manager() -> S3ConfigManager:
+  """Get the global configuration manager instance"""
+  return _config_manager
+
+
+def get_all_connectors() -> Dict[str, ConnectorConfig]:
+  """Get all configured S3 connectors"""
+  return _config_manager.get_all_connectors()
+
+
+def get_connector(connector_id: str) -> Optional[ConnectorConfig]:
+  """Get specific connector by ID"""
+  return _config_manager.get_connector(connector_id)
+
+
+def validate_s3_configuration() -> List[str]:
+  """
+  Validate S3 configuration and return list of validation errors.
+  Used by Hue's configuration validation system.
+  """
+  try:
+    _config_manager.load_configurations()
+    return []
+  except ConfigurationError as e:
+    return [str(e)]
+  except Exception as e:
+    return [f"Unexpected error validating S3 configuration: {e}"]
+
+
+def get_s3_home_directory(connector_id: str = None, bucket_name: str = None, user: str = None) -> str:
+  """
+  Get S3 home directory with smart defaulting logic.
+
+  Args:
+    connector_id: Optional connector ID (defaults to 'default' or first available)
+    bucket_name: Optional bucket name (uses smart bucket selection if not provided)
+    user: Optional username for RAZ handling
+
+  Returns:
+    S3 home directory path
+  """
+  try:
+    # Smart connector defaulting (like _get_default_s3_connector)
+    if not connector_id:
+      connector_id = _get_default_connector()
+
+    connector = get_connector(connector_id)
+    if not connector:
+      LOG.error(f"Connector '{connector_id}' not found, defaulting to s3a://")
+      return "s3a://"
+
+    # Smart bucket defaulting
+    if not bucket_name:
+      bucket_name = _get_default_bucket_for_connector(connector)
+
+    if bucket_name:
+      bucket_config = connector.get_bucket_config(bucket_name)
+      return bucket_config.get_effective_home_path(user)
+
+    # No bucket available, return generic path
+    return "s3a://"
+
+  except Exception as e:
+    LOG.error(f"Failed to get S3 home directory, defaulting to s3a://: {e}")
+    return "s3a://"
+
+
+def _get_default_connector() -> str:
+  """
+  Get the default connector ID using smart selection logic.
+
+  Logic (same as fsmanager._get_default_s3_connector):
+  1. Prefer 'default' if it exists
+  2. Otherwise return first available
+  3. Fall back to 'default' string if no connectors (for error handling)
+  """
+  try:
+    connectors = get_all_connectors()
+
+    # Prefer 'default' if it exists
+    if "default" in connectors:
+      LOG.debug("Using 'default' connector")
+      return "default"
+
+    # Otherwise return first available
+    if connectors:
+      first_id = next(iter(connectors.keys()))
+      LOG.debug(f"No 'default' connector found, using first available: '{first_id}'")
+      return first_id
+
+    # No connectors configured - return 'default' for error handling
+    LOG.warning("No connectors configured, returning 'default' (will likely fail)")
+    return "default"
+
+  except Exception as e:
+    LOG.warning(f"Failed to get default connector: {e}")
+    return "default"
+
+
+def _get_default_bucket_for_connector(connector: ConnectorConfig) -> Optional[str]:
+  """
+  Get default bucket for a connector using smart selection logic.
+
+  Logic:
+  - Multiple buckets: Return None (let caller handle bucket-specific logic)
+  - Single bucket: Return that bucket name
+  - No buckets: Return None
+  """
+  if not connector.bucket_configs:
+    LOG.debug(f"Connector '{connector.id}' has no bucket configs")
+    return None
+
+  bucket_names = list(connector.bucket_configs.keys())
+
+  if len(bucket_names) == 1:
+    # Single bucket - return it as default
+    default_bucket = bucket_names[0]
+    LOG.debug(f"Connector '{connector.id}' has single bucket '{default_bucket}', using as default")
+    return default_bucket
+  elif len(bucket_names) > 1:
+    # Multiple buckets - no clear default
+    LOG.debug(f"Connector '{connector.id}' has {len(bucket_names)} buckets, no clear default")
+    return None
+
+  return None
+
+
+def extract_bucket_from_path(path: str) -> Optional[str]:
+  """Extract bucket name from S3 path"""
+  try:
+    if not path or not path.startswith(("s3a://", "s3://")):
+      return None
+
+    # Parse s3a://bucket-name/path/to/file
+    parsed = urlparse(path)
+    if parsed.netloc:
+      return parsed.netloc
+    elif parsed.path:
+      # Handle s3a:///bucket-name/path format
+      path_parts = parsed.path.strip("/").split("/", 1)
+      return path_parts[0] if path_parts[0] else None
+
+    return None
+  except Exception as e:
+    LOG.error(f"Failed to extract bucket from path: {e}")
+    return None
+
+
+def get_connector_for_path(path: str) -> Optional[ConnectorConfig]:
+  """
+  Find appropriate connector for an S3 path using smart selection logic.
+
+  Priority:
+  1. Connector with explicit bucket config for this bucket
+  2. Default connector (if it exists)
+  3. First available connector
+  4. None (if no connectors configured)
+  """
+  bucket_name = extract_bucket_from_path(path)
+  connectors = get_all_connectors()
+
+  if not connectors:
+    LOG.warning("No S3 connectors configured")
+    return None
+
+  # If we have a bucket name, look for specific bucket config first
+  if bucket_name:
+    for connector in connectors.values():
+      if connector.bucket_configs and bucket_name in connector.bucket_configs:
+        LOG.debug(f"Found connector '{connector.id}' with explicit config for bucket '{bucket_name}'")
+        return connector
+
+  # Fall back to default connector selection
+  default_connector_id = _get_default_connector()
+  default_connector = connectors.get(default_connector_id)
+
+  if default_connector:
+    LOG.debug(f"Using default connector '{default_connector_id}' for path '{path}'")
+    return default_connector
+
+  # Last resort: first available connector
+  first_connector = next(iter(connectors.values()))
+  LOG.debug(f"Using first available connector '{first_connector.id}' for path '{path}'")
+  return first_connector
+
+
+def get_effective_bucket_region(connector_id: str, bucket_name: str) -> Optional[str]:
+  """
+  Get effective region for a bucket using smart priority logic.
+
+  Priority:
+  1. Bucket-specific region override
+  2. Connector default region
+  3. System default region
+  """
+  try:
+    connector = get_connector(connector_id)
+    if not connector:
+      return "us-east-1"  # System default
+
+    # Get bucket-specific region if configured
+    if bucket_name:
+      bucket_region = connector.get_bucket_region(bucket_name)
+      if bucket_region:
+        LOG.debug(f"Using bucket-specific region '{bucket_region}' for {bucket_name}")
+        return bucket_region
+
+    # Fall back to connector default
+    if connector.region:
+      LOG.debug(f"Using connector default region '{connector.region}'")
+      return connector.region
+
+    # System default
+    from desktop.lib.fs.s3.constants import DEFAULT_REGION
+
+    LOG.debug(f"Using system default region '{DEFAULT_REGION}'")
+    return DEFAULT_REGION
+
+  except Exception as e:
+    LOG.error(f"Failed to get effective region, using default: {e}")
+    from desktop.lib.fs.s3.constants import DEFAULT_REGION
+
+    return DEFAULT_REGION
+
+
+def get_default_bucket_home_path(connector_id: str = None, user: str = None) -> str:
+  """
+  Get default home path when no specific bucket is provided.
+
+  Smart Logic:
+  - Single bucket configured: Use that bucket's home path
+  - Multiple buckets: Return s3a:// (generic)
+  - No buckets: Return s3a:// (generic)
+  """
+  try:
+    if not connector_id:
+      connector_id = _get_default_connector()
+
+    connector = get_connector(connector_id)
+    if not connector:
+      return "s3a://"
+
+    # Check if connector has buckets configured
+    if not connector.bucket_configs:
+      LOG.debug(f"Connector '{connector_id}' has no bucket configs, using s3a://")
+      return "s3a://"
+
+    bucket_names = list(connector.bucket_configs.keys())
+
+    if len(bucket_names) == 1:
+      # Single bucket - use its home path as default
+      bucket_name = bucket_names[0]
+      bucket_config = connector.get_bucket_config(bucket_name)
+      home_path = bucket_config.get_effective_home_path(user)
+      LOG.debug(f"Using single bucket '{bucket_name}' home path: {home_path}")
+      return home_path
+
+    elif len(bucket_names) > 1:
+      # Multiple buckets - no clear default, use generic
+      LOG.debug(f"Connector '{connector_id}' has {len(bucket_names)} buckets, using generic s3a://")
+      return "s3a://"
+
+    return "s3a://"
+
+  except Exception as e:
+    LOG.error(f"Failed to get default bucket home path: {e}")
+    return "s3a://"
+
+
+def validate_bucket_access(connector_id: str, bucket_name: str) -> bool:
+  """
+  Validate if a bucket can be accessed through a connector.
+
+  Returns True if:
+  - Bucket is explicitly configured in connector
+  - Connector allows general bucket access (no bucket_configs means any bucket allowed)
+  """
+  try:
+    connector = get_connector(connector_id)
+    if not connector:
+      return False
+
+    # If no bucket configs specified, allow access to any bucket
+    if not connector.bucket_configs:
+      LOG.debug(f"Connector '{connector_id}' allows access to any bucket including '{bucket_name}'")
+      return True
+
+    # Check if bucket is explicitly configured
+    if bucket_name in connector.bucket_configs:
+      LOG.debug(f"Bucket '{bucket_name}' is explicitly configured in connector '{connector_id}'")
+      return True
+
+    LOG.warning(f"Bucket '{bucket_name}' is not configured in connector '{connector_id}', but allowing access")
+    # For now, allow access even to unconfigured buckets (graceful handling)
+    return True
+
+  except Exception as e:
+    LOG.error(f"Failed to validate bucket access: {e}")
+    return False
+
+
+def get_available_buckets(connector_id: str = None) -> List[str]:
+  """
+  Get list of available buckets for a connector.
+
+  Args:
+    connector_id: Optional connector ID (uses default if not specified)
+
+  Returns:
+    List of bucket names (empty if none configured)
+  """
+  try:
+    if not connector_id:
+      connector_id = _get_default_connector()
+
+    connector = get_connector(connector_id)
+    if not connector or not connector.bucket_configs:
+      return []
+
+    return list(connector.bucket_configs.keys())
+
+  except Exception as e:
+    LOG.error(f"Failed to get available buckets: {e}")
+    return []
+
+
+def get_connector_summary() -> Dict[str, Dict]:
+  """
+  Get summary of all connectors for debugging/admin purposes.
+
+  Returns:
+    Dict with connector info including bucket counts and auth status
+  """
+  summary = {}
+
+  try:
+    connectors = get_all_connectors()
+
+    for conn_id, connector in connectors.items():
+      bucket_count = len(connector.bucket_configs) if connector.bucket_configs else 0
+      bucket_names = list(connector.bucket_configs.keys()) if connector.bucket_configs else []
+
+      summary[conn_id] = {
+        "provider": connector.provider,
+        "auth_type": connector.auth_type,
+        "region": connector.region,
+        "endpoint": connector.endpoint,
+        "bucket_count": bucket_count,
+        "bucket_names": bucket_names,
+        "allows_any_bucket": bucket_count == 0,  # No bucket_configs means any bucket allowed
+      }
+
+  except Exception as e:
+    LOG.error(f"Failed to generate connector summary: {e}")
+
+  return summary
