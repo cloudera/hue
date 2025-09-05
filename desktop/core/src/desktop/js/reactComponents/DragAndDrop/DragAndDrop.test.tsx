@@ -15,77 +15,185 @@
 // limitations under the License.
 
 import React from 'react';
-import { render, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, fireEvent, waitFor, act, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import DragAndDrop from './DragAndDrop';
 
+const createMockFile = (name = 'test.txt', content = 'file content', type = 'text/plain') => {
+  const file = new File([content], name, { type });
+  Object.defineProperty(file, 'size', { value: content.length });
+  return file;
+};
+
+const createDragEvent = (files: File[]) => ({
+  dataTransfer: {
+    files,
+    items: files.map(file => ({
+      kind: 'file',
+      type: file.type,
+      getAsFile: () => file
+    })),
+    types: ['Files']
+  }
+});
+
 describe('DragAndDrop', () => {
-  const mockOnFilesDrop = jest.fn();
+  const mockOnDrop = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should render the initial message when not dragging and children not present', () => {
-    const { getByText } = render(<DragAndDrop onDrop={mockOnFilesDrop} />);
+  it('should render the default message when no children provided', () => {
+    render(<DragAndDrop onDrop={mockOnDrop} />);
 
-    expect(getByText('Browse files or drag and drop files')).toBeInTheDocument();
+    expect(screen.getByText('Select file')).toBeInTheDocument();
+    expect(screen.getByText('Browse files or drag and drop files')).toBeInTheDocument();
   });
 
   it('should render children when provided and not dragging', () => {
-    const { getByText } = render(
-      <DragAndDrop onDrop={mockOnFilesDrop}>
+    render(
+      <DragAndDrop onDrop={mockOnDrop}>
         <div>Custom Child Element</div>
       </DragAndDrop>
     );
 
-    expect(getByText('Custom Child Element')).toBeInTheDocument();
+    expect(screen.getByText('Custom Child Element')).toBeInTheDocument();
+    expect(screen.queryByText('Browse files or drag and drop files')).not.toBeInTheDocument();
   });
 
-  it('should not display the default message when children are passed', () => {
-    const { queryByText, getByText } = render(
-      <DragAndDrop onDrop={mockOnFilesDrop}>
-        <div>Custom Child Element</div>
-      </DragAndDrop>
-    );
+  it('should handle single file selection', async () => {
+    const user = userEvent.setup();
+    render(<DragAndDrop onDrop={mockOnDrop} />);
 
-    expect(queryByText('Browse files or drag and drop files')).not.toBeInTheDocument();
-    expect(getByText('Custom Child Element')).toBeInTheDocument();
+    const fileInput = screen.getByTestId('drag-drop__input');
+    const file = createMockFile();
+
+    await user.upload(fileInput, file);
+
+    // react-dropzone calls onDrop with (acceptedFiles, fileRejections, event)
+    expect(mockOnDrop).toHaveBeenCalledWith(expect.arrayContaining([file]), [], expect.any(Object));
   });
 
-  it('should display the dragging message when dragging files', async () => {
-    const { getByText, getByTestId } = render(<DragAndDrop onDrop={mockOnFilesDrop} />);
+  it('should handle multiple file selection', async () => {
+    const user = userEvent.setup();
+    render(<DragAndDrop onDrop={mockOnDrop} />);
 
-    await act(async () => fireEvent.dragEnter(getByTestId('drag-drop__input')));
+    const fileInput = screen.getByTestId('drag-drop__input');
+    const files = [
+      createMockFile('file1.txt'),
+      createMockFile('file2.txt'),
+      createMockFile('file3.jpg', 'image content', 'image/jpeg')
+    ];
+
+    await user.upload(fileInput, files);
+
+    // react-dropzone calls onDrop with (acceptedFiles, fileRejections, event)
+    expect(mockOnDrop).toHaveBeenCalledWith(files, [], expect.any(Object));
+  });
+
+  it('should display drop message when dragging files over the component', async () => {
+    render(<DragAndDrop onDrop={mockOnDrop} />);
+
+    const dropzone = screen.getByTestId('drag-drop__input');
+
+    await act(async () => {
+      fireEvent.dragEnter(dropzone);
+    });
 
     await waitFor(() => {
-      expect(getByText('Drop files here')).toBeInTheDocument();
+      expect(screen.getByText('Drop files here')).toBeInTheDocument();
     });
   });
 
-  it('should call onDrop when files are dropped', async () => {
-    const files = [new File(['fileContents'], 'test.txt', { type: 'text/plain' })];
+  it('should call onDrop with correct files when files are dropped', async () => {
+    const files = [createMockFile('dropped.txt', 'dropped content')];
+    render(<DragAndDrop onDrop={mockOnDrop} />);
 
-    const { getByTestId } = render(<DragAndDrop onDrop={mockOnFilesDrop} />);
+    const dropzone = screen.getByTestId('drag-drop__input');
+    const dropEvent = createDragEvent(files);
 
-    const dropzone = getByTestId('drag-drop__input');
-
-    const dropEvent = {
-      dataTransfer: {
-        files,
-        items: files.map(file => ({
-          kind: 'file',
-          type: file.type,
-          getAsFile: () => file
-        })),
-        types: ['Files']
-      }
-    };
-
-    await act(async () => fireEvent.drop(dropzone, dropEvent));
+    await act(async () => {
+      fireEvent.drop(dropzone, dropEvent);
+    });
 
     await waitFor(() => {
-      expect(mockOnFilesDrop).toHaveBeenCalledTimes(1);
+      // react-dropzone calls onDrop with (acceptedFiles, fileRejections, event)
+      expect(mockOnDrop).toHaveBeenCalledWith(files, [], expect.any(Object));
+      expect(mockOnDrop).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('should handle multiple files being dropped', async () => {
+    const files = [
+      createMockFile('file1.pdf', 'pdf content', 'application/pdf'),
+      createMockFile('file2.jpg', 'image content', 'image/jpeg'),
+      createMockFile('file3.txt', 'text content', 'text/plain')
+    ];
+    render(<DragAndDrop onDrop={mockOnDrop} />);
+
+    const dropzone = screen.getByTestId('drag-drop__input');
+    const dropEvent = createDragEvent(files);
+
+    await act(async () => {
+      fireEvent.drop(dropzone, dropEvent);
+    });
+
+    await waitFor(() => {
+      // react-dropzone calls onDrop with (acceptedFiles, fileRejections, event)
+      expect(mockOnDrop).toHaveBeenCalledWith(files, [], expect.any(Object));
+      expect(mockOnDrop).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('should return to normal state after drag ends', async () => {
+    render(<DragAndDrop onDrop={mockOnDrop} />);
+
+    const dropzone = screen.getByTestId('drag-drop__input');
+
+    await act(async () => {
+      fireEvent.dragEnter(dropzone);
+    });
+
+    expect(screen.getByText('Drop files here')).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.dragLeave(dropzone);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText('Drop files here')).not.toBeInTheDocument();
+      expect(screen.getByText('Browse files or drag and drop files')).toBeInTheDocument();
+    });
+  });
+
+  it('should not call onDrop when disabled and files are dropped', async () => {
+    const files = [createMockFile()];
+    render(<DragAndDrop onDrop={mockOnDrop} disabled />);
+
+    const dropzone = screen.getByTestId('drag-drop__input');
+    const dropEvent = createDragEvent(files);
+
+    await act(async () => {
+      fireEvent.drop(dropzone, dropEvent);
+    });
+
+    await waitFor(() => {
+      expect(mockOnDrop).not.toHaveBeenCalled();
+    });
+  });
+
+  it('should not show drag state when disabled', async () => {
+    render(<DragAndDrop onDrop={mockOnDrop} disabled />);
+
+    const dropzone = screen.getByTestId('drag-drop__input');
+
+    await act(async () => {
+      fireEvent.dragEnter(dropzone);
+    });
+
+    // Should not show drag message when disabled
+    expect(screen.queryByText('Drop files here')).not.toBeInTheDocument();
   });
 });

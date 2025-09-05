@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import CreateAndUploadAction from './CreateAndUploadAction';
 import { CREATE_DIRECTORY_API_URL, CREATE_FILE_API_URL } from '../../../api';
-import * as storageUtils from '../../../../../utils/storageBrowserUtils';
+import * as storageUtils from '../../../utils/utils';
 
 const mockSave = jest.fn();
 jest.mock('../../../../../utils/hooks/useSaveData/useSaveData', () => ({
