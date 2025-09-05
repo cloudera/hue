@@ -15,15 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
 import fnmatch
 import logging
+import os
 import os.path
-import traceback
 import subprocess
+import sys
 
 LOG = logging.getLogger()
+
+
+def setup_debug_logging():
+  """Setup debug logging and Django debug if --debug flag is present"""
+  if "--debug" in sys.argv:
+    sys.argv.remove("--debug")
+    logging.basicConfig(
+      level=logging.DEBUG,
+      format='%(asctime)s [%(name)s] %(levelname)s: %(message)s',
+      stream=sys.stderr
+    )
+    # Also enable Django debug mode
+    os.environ['DJANGO_DEBUG'] = '1'
+    LOG.debug("Debug logging and Django debug mode enabled")
+    return True
+  return False
 
 
 def _deprecation_check(arg0):
@@ -55,9 +70,11 @@ def reload_with_cm_env(cm_managed):
 def entry():
   _deprecation_check(sys.argv[0])
 
+  # Setup debug logging early (also enables Django debug)
+  setup_debug_logging()
+
   from django.core.exceptions import ImproperlyConfigured
-  from django.core.management import CommandParser, execute_from_command_line, find_commands
-  from django.core.management.base import BaseCommand
+  from django.core.management import CommandParser, execute_from_command_line
 
   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
   cm_config_file = '/etc/cloudera-scm-agent/config.ini'
@@ -79,8 +96,10 @@ def entry():
   if "--cm-managed" in sys.argv:
     sys.argv.remove("--cm-managed")
     cm_managed = True
+    LOG.debug("--cm-managed flag detected and removed from argv")
   else:
     cm_managed = False
+    LOG.debug("--cm-managed flag NOT found in argv")
 
   if len(sys.argv) > 1:
     subcommand = sys.argv[1]
@@ -92,23 +111,36 @@ def entry():
   if len(sys.argv) > 1:
     prof_id = subcommand = sys.argv[1]
     # Check if this is a CM managed cluster
+    LOG.debug("Checking CM environment - cm_config_file exists: %s, cm_managed: %s, skip_reload: %s",
+              os.path.isfile(cm_config_file), cm_managed, skip_reload)
     if os.path.isfile(cm_config_file) and not cm_managed and not skip_reload:
       print("ALERT: This appears to be a CM Managed environment")
       print("ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment")
       print("ALERT: Please run 'hue <command> --cm-managed'")
+    elif os.path.isfile(cm_config_file) and cm_managed:
+      LOG.debug("CM managed environment detected and --cm-managed flag is set")
+    elif not os.path.isfile(cm_config_file):
+      LOG.debug("Not a CM managed environment (config file not found)")
   else:
     prof_id = str(os.getpid())
 
   # CM managed configure env vars
   if cm_managed:
+    LOG.debug("Starting CM managed configuration setup")
+    LOG.debug("Environment before CM setup:")
+    for key, value in sorted(os.environ.items()):
+      LOG.debug("  %s=%s", key, value)
     from configparser import NoOptionError, RawConfigParser
 
     config = RawConfigParser(strict=False)
     config.read(cm_config_file)
+    LOG.debug("Successfully read CM config file: %s", cm_config_file)
     try:
       cm_agent_run_dir = config.get('General', 'agent_wide_credential_cache_location')
+      LOG.debug("Found cm_agent_run_dir in config: %s", cm_agent_run_dir)
     except NoOptionError:
       cm_agent_run_dir = '/var/run/cloudera-scm-agent'
+      LOG.debug("Using default cm_agent_run_dir: %s", cm_agent_run_dir)
       pass
 
     # Parse CM supervisor include file for Hue and set env vars
@@ -118,17 +150,24 @@ def entry():
     envline = None
     cm_hue_string = "HUE_SERVER"
 
+    LOG.debug("Searching for Hue config in supervisor dir: %s", cm_supervisor_dir)
     for file in os.listdir(cm_supervisor_dir):
       if cm_hue_string in file:
         hue_env_conf = file
         hue_env_conf = cm_supervisor_dir + "/" + hue_env_conf
+        LOG.debug("Found Hue supervisor config: %s", hue_env_conf)
+        break
 
     if hue_env_conf is None:
+      LOG.debug("No supervisor config found, searching process dirs in: %s", cm_process_dir)
       process_dirs = fnmatch.filter(os.listdir(cm_process_dir), '*%s*' % cm_hue_string)
       process_dirs.sort()
+      LOG.debug("Found process dirs: %s", process_dirs)
       hue_process_dir = cm_process_dir + "/" + process_dirs[-1]
+      LOG.debug("Using latest process dir: %s", hue_process_dir)
       hue_env_conf = fnmatch.filter(os.listdir(hue_process_dir), 'supervisor.conf')[0]
       hue_env_conf = hue_process_dir + "/" + hue_env_conf
+      LOG.debug("Found process supervisor config: %s", hue_env_conf)
 
     if hue_env_conf is not None:
       if os.path.isfile(hue_env_conf):
@@ -136,9 +175,11 @@ def entry():
         for line in hue_env_conf_file:
           if "environment" in line:
             envline = line
+            LOG.debug("Found environment line in config. envline: %s", envline)
           if "directory" in line:
             empty, hue_conf_dir = line.split("directory=")
             os.environ["HUE_CONF_DIR"] = hue_conf_dir.rstrip()
+            LOG.debug("Set HUE_CONF_DIR to: %s", os.environ["HUE_CONF_DIR"])
     else:
       print("This appears to be a CM managed cluster, but the")
       print("supervisor/include file for Hue could not be found")
@@ -146,7 +187,7 @@ def entry():
       print("the database you need to set the following env vars:")
       print("")
       print("  export JAVA_HOME=<java_home>")
-      print("  export HUE_CONF_DIR=\"%s/`ls -1 %s | grep %s | sort -n | tail -1 `\"" % (cm_processs_dir, cm_process_dir, cm_hue_string))
+      print("  export HUE_CONF_DIR=\"%s/`ls -1 %s | grep %s | sort -n | tail -1 `\"" % (cm_process_dir, cm_process_dir, cm_hue_string))
       print("  export HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1")
       print("  export HUE_DATABASE_PASSWORD=<hueDBpassword>")
       print("If using Oracle as your database:")
@@ -210,6 +251,10 @@ def entry():
       print("LD_LIBRARY_PATH can't be found, if you are using ORACLE for your Hue database")
       print("then it must be set, if not, you can ignore")
       print("  export LD_LIBRARY_PATH=/path/to/instantclient")
+
+    LOG.debug("Environment after CM setup:")
+    for key, value in sorted(os.environ.items()):
+      LOG.debug("  %s=%s", key, value)
 
   if "LD_LIBRARY_PATH" in list(os.environ.keys()):
     if ld_path_orig is not None and ld_path_orig == os.environ["LD_LIBRARY_PATH"]:
