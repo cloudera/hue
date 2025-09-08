@@ -71,6 +71,15 @@ class TrinoApi(Api):
       self.auth_password = auth_password
       self.auth = BasicAuthentication(self.auth_username, self.auth_password)
 
+    if self.http_scheme == "https":
+      verify = self.options.get('verify')
+      if verify is not None:
+        self.verify = verify
+      else:
+        # Setting a non-existant trust store if the verify parameter is not set.
+        # This was admins must explictly set verify=False to disable TLS host verification.
+        self.verify = '/days/of/no/trust'
+
     self.session_info = self.create_session()
     self.trino_session = ClientSession(self.user.username, properties=self.session_info['properties'])
     self.trino_request = TrinoRequest(
@@ -78,7 +87,8 @@ class TrinoApi(Api):
       port=self.server_port,
       client_session=self.trino_session,
       http_scheme=self.http_scheme,
-      auth=self.auth
+      auth=self.auth,
+      verify=self.verify
     )
 
   def get_auth_password(self):
