@@ -509,6 +509,29 @@
                   },
                   iconHtml: getIconHtml(browser.type)
                 });
+              } else if (browser.type === 'tablebrowser') {
+                browserItems.push({
+                  type: 'navigation',
+                  name: browser.type,
+                  displayName: browser.displayName,
+                  url: browser.page,
+                  handler: (event: Event) => {
+                    const details = this.lastEditorDatabase || this.lastAssistDatabase;
+                    let url = browser.page;
+                    if (details) {
+                      const sourceType =
+                        details.connector && details.connector.type
+                          ? details.connector.type
+                          : 'hive';
+                      const dbName =
+                        (<EditorDatabaseDetails>details).name ||
+                        (<AssistDatabaseDetails>details).database;
+                      url += `${encodeURIComponent(sourceType)}/${encodeURIComponent(dbName)}`;
+                    }
+                    onHueLinkClick(event, url);
+                  },
+                  iconHtml: getIconHtml(browser.type)
+                });
               } else {
                 browserItems.push({
                   type: 'navigation',
