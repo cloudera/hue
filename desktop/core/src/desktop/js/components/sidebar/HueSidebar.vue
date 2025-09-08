@@ -122,6 +122,7 @@
     sqoop: `<svg class="hi hi-fw"><use href="#hi-sqoop"></use></svg>`,
     support: `<svg class="hi hi-fw"><use href="#hi-support"></use></svg>`,
     tables: `<i class="fa fa-fw fa-database"></i>`,
+    tablebrowser: `<i class="fa fa-fw fa-table"></i>`,
     text: `<i class="fa fa-fw fa-i-cursor"></i>`,
     warehouses: `<i class="altus-icon altus-adb-cluster" style="margin: 0 1px 0 3px"></i>`,
     workflows: `<svg class="hi hi-fw"><use href="#hi-oozie"></use></svg>`,

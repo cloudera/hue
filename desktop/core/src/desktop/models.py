@@ -41,6 +41,7 @@ from desktop.auth.backend import is_admin
 from desktop.conf import (
   APP_BLACKLIST,
   DISABLE_SOURCE_AUTOCOMPLETE,
+  ENABLE_NEW_TABLE_BROWSER,
   ENABLE_NEW_IMPORTER,
   ENABLE_NEW_STORAGE_BROWSER,
   ENABLE_ORGANIZATIONS,
@@ -2089,6 +2090,16 @@ class ClusterConfig(object):
         'tooltip': _('Tables'),
         'page': '/metastore/tables'
       })
+
+      # Add a separate entry for the new React Table Browser, mirroring Storage Browser approach
+      if ENABLE_NEW_TABLE_BROWSER.get():
+        interpreters.append({
+          'type': 'tablebrowser',
+          'displayName': _('Table Browser'),
+          'buttonName': _('Table Browser'),
+          'tooltip': _('Table Browser'),
+          'page': '/tablebrowser/'
+        })
 
     if 'search' in self.apps:
       interpreters.append({
