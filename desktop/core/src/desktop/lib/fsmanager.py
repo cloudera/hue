@@ -24,7 +24,6 @@ import aws.client
 import azure.client
 import desktop.lib.fs.gc.client
 import desktop.lib.fs.ozone.client
-from aws.conf import has_s3_access, is_enabled as is_s3_enabled
 from azure.conf import has_abfs_access, has_adls_access, is_abfs_enabled, is_adls_enabled
 from desktop.conf import DEFAULT_USER, has_gs_access, has_ofs_access, is_gs_enabled, is_ofs_enabled, RAZ, USE_STORAGE_CONNECTORS
 from desktop.lib.fs.proxyfs import ProxyFS
@@ -33,6 +32,11 @@ from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.python_util import current_ms_from_utc
 from hadoop.cluster import _make_filesystem, get_hdfs
 from hadoop.conf import has_hdfs_enabled
+
+if USE_STORAGE_CONNECTORS.get():
+  from desktop.lib.fs.s3.conf_utils import has_s3_access, is_enabled as is_s3_enabled
+else:
+  from aws.conf import has_s3_access, is_enabled as is_s3_enabled
 
 SUPPORTED_FS = ['hdfs', 's3a', 'adl', 'abfs', 'gs', 'ofs']
 CLIENT_CACHE = None
@@ -56,16 +60,6 @@ def has_access(fs=None, user=None):
   elif fs == 'adl':
     return has_adls_access(user)
   elif fs == 's3a':
-    if USE_STORAGE_CONNECTORS.get():
-      # For storage connector system, check if any connectors are available
-      try:
-        from desktop.lib.fs.s3.conf_utils import get_all_connectors
-
-        connectors = get_all_connectors()
-        return bool(connectors)  # User has access if there are connectors
-      except Exception as e:
-        logging.warning(f"Failed to check S3 connector access: {e}")
-        return False
     return has_s3_access(user)
   elif fs == 'abfs':
     return has_abfs_access(user)
@@ -81,15 +75,6 @@ def is_enabled(fs):
   elif fs == 'adl':
     return is_adls_enabled()
   elif fs == 's3a':
-    if USE_STORAGE_CONNECTORS.get():
-      # Check if there are any storage connectors configured
-      try:
-        from desktop.lib.fs.s3.conf_utils import S3ConfigManager
-
-        return S3ConfigManager().has_connectors()
-      except Exception as e:
-        logging.warning(f"Failed to check storage connector configurations: {e}")
-        return False
     return is_s3_enabled()
   elif fs == 'abfs':
     return is_abfs_enabled()

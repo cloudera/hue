@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
-from aws.conf import AWS_ACCOUNTS, is_raz_s3
+from aws.conf import AWS_ACCOUNTS, is_raz_s3 as legacy_is_raz_s3
 from desktop.conf import RAZ, STORAGE_CONNECTORS, USE_STORAGE_CONNECTORS
 from desktop.lib.idbroker import conf as conf_idbroker
 from filebrowser.conf import REMOTE_STORAGE_HOME
@@ -90,9 +90,8 @@ def _load_legacy_aws_accounts_as_connectors() -> Dict[str, "ConnectorConfig"]:
 
 def _detect_provider_from_aws_config(aws_config) -> str:
   """Detect provider type from AWS config"""
-  host = aws_config.HOST.get()
-
   # Check if it's a standard AWS endpoint
+  host = aws_config.HOST.get()
   if not host or "amazonaws.com" in host:
     return "aws"
 
@@ -110,7 +109,7 @@ def _detect_auth_type_from_aws_config(aws_config) -> str:
   """
   try:
     # Priority 1: RAZ authentication
-    if is_raz_s3():
+    if legacy_is_raz_s3():
       return "raz"
 
     # Priority 2: IDBroker authentication
@@ -803,3 +802,102 @@ def get_connector_summary() -> Dict[str, Dict]:
     LOG.error(f"Failed to generate connector summary: {e}")
 
   return summary
+
+
+def is_enabled() -> bool:
+  """
+  Check if Storage Connector S3 system is enabled.
+  Equivalent to aws.conf.is_enabled() for the new system.
+
+  Returns:
+    True if Storage Connectors are available via:
+    - STORAGE_CONNECTORS configuration
+    - Legacy AWS_ACCOUNTS (when feature flag enabled)
+    - Global RAZ/IDBroker systems
+  """
+  try:
+    # Check if Storage Connectors are directly configured
+    if STORAGE_CONNECTORS.keys():
+      return True
+
+    # Check if legacy AWS accounts can be auto-converted
+    if USE_STORAGE_CONNECTORS.get():
+      legacy_connectors = _load_legacy_aws_accounts_as_connectors()
+      if legacy_connectors:
+        return True
+
+    # Check if global RAZ or IDBroker provide S3 access (same pattern as legacy)
+    if is_raz_s3():
+      return True
+
+    if conf_idbroker.is_idbroker_enabled("s3a"):
+      return True
+
+    return False
+
+  except Exception as e:
+    LOG.warning(f"Failed to check Storage Connector S3 availability: {e}")
+    return False
+
+
+def has_s3_access(user) -> bool:
+  """
+  Check if user has access to Storage Connector S3 system.
+  Equivalent to aws.conf.has_s3_access() for the new system.
+
+  Args:
+    user: User object to check permissions for
+
+  Returns:
+    True if user has S3 access via Storage Connectors
+  """
+  try:
+    # Same user validation logic as legacy
+    if not (user.is_authenticated and user.is_active):
+      return False
+
+    from desktop.auth.backend import is_admin
+
+    # Admin always has access
+    if is_admin(user):
+      return True
+
+    # Check if user has S3 permission
+    if user.has_hue_permission(action="s3_access", app="filebrowser"):
+      return True
+
+    # RAZ users get access if system is enabled
+    if is_raz_s3():
+      return True
+
+    return False
+
+  except Exception as e:
+    LOG.warning(f"Failed to check Storage Connector S3 access for user {user}: {e}")
+    return False
+
+
+def is_raz_s3() -> bool:
+  """
+  Check if RAZ S3 is enabled for Storage Connector system.
+  Equivalent to aws.conf.is_raz_s3() for the new system.
+
+  Returns:
+    True if RAZ is enabled AND at least one storage connector exists
+  """
+  try:
+    # Must have RAZ enabled globally
+    if not RAZ.IS_ENABLED.get():
+      return False
+
+    # Must have at least one storage connector (like legacy AWS_ACCOUNTS check)
+    connectors = get_all_connectors()
+    if not connectors:
+      return False
+
+    # RAZ can work with any connector, so any connector + RAZ = RAZ S3 enabled for now
+    return True
+
+  except Exception as e:
+    LOG.warning(f"Failed to check Storage Connector RAZ S3 status: {e}")
+    return False
