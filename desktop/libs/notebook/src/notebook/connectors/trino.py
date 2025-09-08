@@ -77,7 +77,7 @@ class TrinoApi(Api):
         self.verify = verify
       else:
         # Setting a non-existant trust store if the verify parameter is not set.
-        # This was admins must explictly set verify=False to disable TLS host verification.
+        # This means that admins must explictly set verify=False to disable TLS host verification.
         self.verify = '/days/of/no/trust'
 
     self.session_info = self.create_session()
