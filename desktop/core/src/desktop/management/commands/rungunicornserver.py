@@ -111,7 +111,7 @@ def start_server(args, options):
     # Set up a timer to periodically update the recovery file
     def update_recovery_file():
         while True:
-            time.sleep(30)  # Update every 30 seconds
+            time.sleep(int(30 * 60))  # Update every 30 minutes
             try:
                 write_process_recovery_file(socket_path=LOG_LISTENER_SOCKET_PATH, pid_file=PID_FILE)
             except Exception as e:
