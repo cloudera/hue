@@ -18,7 +18,7 @@
 import logging
 import sys
 
-from django.utils.translation import gettext as _, gettext_lazy as _t
+from django.utils.translation import gettext as _
 
 import beeswax.hive_site
 from beeswax.settings import NICE_NAME
@@ -63,7 +63,7 @@ def config_validator(user):
         res.append((NICE_NAME, _(msg)))
       else:
         raise e
-  except Exception as e:
+  except Exception:
     msg = "The application won't work without a running HiveServer2."
     LOG.exception(msg)
     res.append((NICE_NAME, _(msg)))

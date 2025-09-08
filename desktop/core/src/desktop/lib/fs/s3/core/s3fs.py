@@ -18,7 +18,7 @@
 import logging
 import os
 import time
-from typing import Any, List, Optional, TYPE_CHECKING, Union
+from typing import Any, List, Optional, Union
 
 from botocore.exceptions import ClientError
 
@@ -28,9 +28,6 @@ from desktop.lib.fs.s3.constants import DEFAULT_CHUNK_SIZE, S3_DELIMITER
 from desktop.lib.fs.s3.core.file import S3File
 from desktop.lib.fs.s3.core.path import S3Path
 from desktop.lib.fs.s3.core.stat import S3Stat
-
-if TYPE_CHECKING:
-  from desktop.lib.fs.s3.conf_utils import ConnectorConfig
 
 LOG = logging.getLogger()
 
