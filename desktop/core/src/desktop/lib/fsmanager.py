@@ -59,7 +59,7 @@ def has_access(fs=None, user=None):
     if USE_STORAGE_CONNECTORS.get():
       # For storage connector system, check if any connectors are available
       try:
-        from desktop.lib.fs.s3.config_utils import get_all_connectors
+        from desktop.lib.fs.s3.conf_utils import get_all_connectors
 
         connectors = get_all_connectors()
         return bool(connectors)  # User has access if there are connectors
@@ -84,9 +84,9 @@ def is_enabled(fs):
     if USE_STORAGE_CONNECTORS.get():
       # Check if there are any storage connectors configured
       try:
-        from desktop.lib.fs.s3.config_utils import get_config_manager
+        from desktop.lib.fs.s3.conf_utils import S3ConfigManager
 
-        return get_config_manager().has_connectors()
+        return S3ConfigManager().has_connectors()
       except Exception as e:
         logging.warning(f"Failed to check storage connector configurations: {e}")
         return False
@@ -126,7 +126,7 @@ def _make_client(fs, name, user):
 def _get_default_s3_connector() -> str:
   """Get the default S3 connector ID (first available or 'default')"""
   try:
-    from desktop.lib.fs.s3.config_utils import get_all_connectors
+    from desktop.lib.fs.s3.conf_utils import get_all_connectors
 
     connectors = get_all_connectors()
 

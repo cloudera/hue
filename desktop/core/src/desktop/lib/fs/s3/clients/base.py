@@ -25,7 +25,7 @@ from botocore.credentials import Credentials
 from desktop.lib.fs.s3.constants import CLIENT_CONFIG, TRANSFER_CONFIG
 
 if TYPE_CHECKING:
-  from desktop.lib.fs.s3.config_utils import ConnectorConfig
+  from desktop.lib.fs.s3.conf_utils import ConnectorConfig
 
 
 class S3AuthProvider(ABC):

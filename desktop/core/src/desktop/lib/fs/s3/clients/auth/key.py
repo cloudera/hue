@@ -20,7 +20,7 @@ from typing import Any, Dict, TYPE_CHECKING
 from desktop.lib.fs.s3.clients.base import S3AuthProvider
 
 if TYPE_CHECKING:
-  from desktop.lib.fs.s3.config_utils import ConnectorConfig
+  from desktop.lib.fs.s3.conf_utils import ConnectorConfig
 
 
 class KeyAuthProvider(S3AuthProvider):

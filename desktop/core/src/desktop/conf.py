@@ -2806,7 +2806,7 @@ def config_validator(user):
   # Validate S3 configuration
   if USE_STORAGE_CONNECTORS.get():
     try:
-      from desktop.lib.fs.s3.config_utils import validate_s3_configuration
+      from desktop.lib.fs.s3.conf_utils import validate_s3_configuration
 
       # Validate storage connector configuration structure
       s3_errors = validate_s3_configuration()

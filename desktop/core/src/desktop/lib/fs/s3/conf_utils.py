@@ -25,9 +25,199 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
-from desktop.conf import RAZ, STORAGE_CONNECTORS
+from aws.conf import AWS_ACCOUNTS, is_raz_s3
+from desktop.conf import RAZ, STORAGE_CONNECTORS, USE_STORAGE_CONNECTORS
+from desktop.lib.idbroker import conf as conf_idbroker
 
 LOG = logging.getLogger()
+
+
+class ConfigurationError(Exception):
+  """Raised when configuration validation fails"""
+
+  pass
+
+
+def _load_legacy_aws_accounts_as_connectors() -> Dict[str, "ConnectorConfig"]:
+  """
+  Convert legacy AWS_ACCOUNTS configurations to ConnectorConfig format.
+  This provides backward compatibility for existing AWS configurations.
+
+  Returns:
+    Dict mapping connector IDs to ConnectorConfig objects
+  """
+  try:
+    connectors = {}
+
+    for account_id in AWS_ACCOUNTS.keys():
+      aws_config = AWS_ACCOUNTS[account_id]
+
+      # Skip accounts without basic configuration
+      if not aws_config.get_raw():
+        continue
+
+      try:
+        connector = ConnectorConfig(
+          id=account_id,
+          provider=_detect_provider_from_aws_config(aws_config),
+          auth_type=_detect_auth_type_from_aws_config(aws_config),
+          region=aws_config.REGION.get(),
+          endpoint=_convert_aws_endpoint_to_new_format(aws_config),
+          access_key_id=aws_config.ACCESS_KEY_ID.get(),
+          secret_key=aws_config.SECRET_ACCESS_KEY.get(),
+          bucket_configs=_extract_bucket_configs_from_aws(aws_config),
+          options=_convert_aws_options_to_new_format(aws_config),
+        )
+
+        connectors[account_id] = connector
+        LOG.debug(
+          f"Converted legacy AWS account '{account_id}' to storage connector: provider={connector.provider}, auth={connector.auth_type}"
+        )
+
+      except Exception as e:
+        LOG.warning(f"Failed to convert legacy AWS account '{account_id}': {e}")
+        continue
+
+    if connectors:
+      LOG.info(f"Auto-converted {len(connectors)} legacy AWS accounts to storage connectors")
+
+    return connectors
+  except Exception as e:
+    LOG.error(f"Failed to load legacy AWS accounts: {e}")
+    return {}
+
+
+def _detect_provider_from_aws_config(aws_config) -> str:
+  """Detect provider type from AWS config"""
+  host = aws_config.HOST.get()
+
+  # Check if it's a standard AWS endpoint
+  if not host or "amazonaws.com" in host:
+    return "aws"
+
+  # Custom endpoint means generic S3-compatible provider
+  return "generic"
+
+
+def _detect_auth_type_from_aws_config(aws_config) -> str:
+  """
+  Detect authentication type from AWS config using priority order:
+  1. RAZ (highest priority - global setting)
+  2. IDBroker (global setting)
+  3. IAM (if environment credentials allowed)
+  4. Key (static keys - default)
+  """
+  try:
+    # Priority 1: RAZ authentication
+    if is_raz_s3():
+      return "raz"
+
+    # Priority 2: IDBroker authentication
+    if conf_idbroker.is_idbroker_enabled("s3a"):
+      return "idbroker"
+
+    # Priority 3: IAM roles (if environment credentials are allowed)
+    if aws_config.ALLOW_ENVIRONMENT_CREDENTIALS.get():
+      return "iam"
+
+    # Priority 4: Static key authentication (default)
+    return "key"
+
+  except Exception as e:
+    LOG.warning(f"Failed to detect auth type, defaulting to 'key': {e}")
+    return "key"
+
+
+def _convert_aws_endpoint_to_new_format(aws_config) -> Optional[str]:
+  """Convert AWS HOST config to new endpoint format"""
+  host = aws_config.HOST.get()
+  if not host:
+    return None
+
+  # Ensure proper URL format
+  if not host.startswith(("http://", "https://")):
+    # Default to HTTPS for security, but respect IS_SECURE setting
+    is_secure = aws_config.IS_SECURE.get() if hasattr(aws_config, "IS_SECURE") else True
+    protocol = "https" if is_secure else "http"
+    host = f"{protocol}://{host}"
+
+  return host
+
+
+def _extract_bucket_configs_from_aws(aws_config) -> Dict[str, "BucketConfig"]:
+  """Extract bucket configurations from AWS default_home_path"""
+  default_home = aws_config.DEFAULT_HOME_PATH.get()
+  if not default_home:
+    return {}
+
+  try:
+    # Parse s3a://bucket-name/path/to/home/
+    bucket_name = extract_bucket_from_path(default_home)
+    if not bucket_name:
+      return {}
+
+    # Extract the path part and make it relative
+    path_part = default_home
+    if path_part.startswith(("s3a://", "s3://")):
+      # Remove s3a://bucket-name/ prefix to get relative path
+      scheme_and_bucket = f"s3a://{bucket_name}/"
+      if path_part.startswith(scheme_and_bucket):
+        relative_path = path_part[len(scheme_and_bucket) :]
+      else:
+        relative_path = None
+    else:
+      relative_path = path_part
+
+    return {
+      bucket_name: BucketConfig(
+        name=bucket_name,
+        default_home_path=relative_path if relative_path else None,
+        region=None,  # Will be inherited from connector
+        options=None,
+      )
+    }
+  except Exception as e:
+    LOG.warning(f"Failed to extract bucket config from default_home_path '{default_home}': {e}")
+    return {}
+
+
+def _convert_aws_options_to_new_format(aws_config) -> Dict[str, any]:
+  """Convert AWS-specific options to new options format"""
+  options = {}
+
+  try:
+    # Proxy settings
+    if aws_config.PROXY_ADDRESS.get():
+      options["proxy_address"] = aws_config.PROXY_ADDRESS.get()
+    if aws_config.PROXY_PORT.get():
+      options["proxy_port"] = aws_config.PROXY_PORT.get()
+    if aws_config.PROXY_USER.get():
+      options["proxy_user"] = aws_config.PROXY_USER.get()
+    if aws_config.PROXY_PASS.get():
+      options["proxy_pass"] = aws_config.PROXY_PASS.get()
+
+    # SSL/Security settings
+    if hasattr(aws_config, "IS_SECURE"):
+      options["is_secure"] = aws_config.IS_SECURE.get()
+
+    # Calling format (for compatibility)
+    if hasattr(aws_config, "CALLING_FORMAT"):
+      calling_format = aws_config.CALLING_FORMAT.get()
+      if calling_format and calling_format != "boto.s3.connection.OrdinaryCallingFormat":
+        options["calling_format"] = calling_format
+
+    # Session token (if available)
+    if aws_config.SECURITY_TOKEN.get():
+      options["security_token"] = aws_config.SECURITY_TOKEN.get()
+
+    # Environment credentials setting
+    if aws_config.ALLOW_ENVIRONMENT_CREDENTIALS.get() is not None:
+      options["allow_environment_credentials"] = aws_config.ALLOW_ENVIRONMENT_CREDENTIALS.get()
+
+  except Exception as e:
+    LOG.warning(f"Failed to convert some AWS options: {e}")
+
+  return options if options else {}
 
 
 @dataclass
@@ -99,12 +289,6 @@ class ConnectorConfig:
     return bucket_config.region or self.region
 
 
-class ConfigurationError(Exception):
-  """Raised when configuration validation fails"""
-
-  pass
-
-
 class S3ConfigManager:
   """
   Simplified S3 connector configuration manager.
@@ -132,46 +316,58 @@ class S3ConfigManager:
       raise ConfigurationError(f"Configuration loading failed: {e}")
 
   def _load_connectors(self) -> None:
-    """Load connector configurations from STORAGE_CONNECTORS"""
-    if not STORAGE_CONNECTORS.keys():
-      LOG.debug("No STORAGE_CONNECTORS configuration found")
-      return
+    """Load connector configurations from STORAGE_CONNECTORS and legacy AWS_ACCOUNTS"""
 
-    for connector_id in STORAGE_CONNECTORS.keys():
-      connector_conf = STORAGE_CONNECTORS[connector_id]
-      try:
-        # Parse bucket configurations
-        bucket_configs = {}
-        bucket_configs_raw = connector_conf.BUCKET_CONFIGS.get()
+    # First, load new STORAGE_CONNECTORS (if any)
+    if STORAGE_CONNECTORS.keys():
+      for connector_id in STORAGE_CONNECTORS.keys():
+        connector_conf = STORAGE_CONNECTORS[connector_id]
+        try:
+          # Parse bucket configurations
+          bucket_configs = {}
+          bucket_configs_raw = connector_conf.BUCKET_CONFIGS.get()
 
-        for bucket_name, bucket_conf_dict in bucket_configs_raw.items():
-          bucket_configs[bucket_name] = BucketConfig(
-            name=bucket_name,
-            default_home_path=bucket_conf_dict.get("default_home_path"),
-            region=bucket_conf_dict.get("region"),
-            options=bucket_conf_dict.get("options"),
+          for bucket_name, bucket_conf_dict in bucket_configs_raw.items():
+            bucket_configs[bucket_name] = BucketConfig(
+              name=bucket_name,
+              default_home_path=bucket_conf_dict.get("default_home_path"),
+              region=bucket_conf_dict.get("region"),
+              options=bucket_conf_dict.get("options"),
+            )
+
+          connector = ConnectorConfig(
+            id=connector_id,
+            provider=connector_conf.PROVIDER.get(),
+            auth_type=connector_conf.AUTH_TYPE.get(),
+            region=connector_conf.REGION.get(),
+            endpoint=connector_conf.ENDPOINT.get(),
+            access_key_id=connector_conf.ACCESS_KEY_ID.get(),
+            secret_key=connector_conf.SECRET_KEY.get(),
+            iam_role=connector_conf.IAM_ROLE.get(),
+            bucket_configs=bucket_configs,
+            options=connector_conf.OPTIONS.get(),
           )
 
-        connector = ConnectorConfig(
-          id=connector_id,
-          provider=connector_conf.PROVIDER.get(),
-          auth_type=connector_conf.AUTH_TYPE.get(),
-          region=connector_conf.REGION.get(),
-          endpoint=connector_conf.ENDPOINT.get(),
-          access_key_id=connector_conf.ACCESS_KEY_ID.get(),
-          secret_key=connector_conf.SECRET_KEY.get(),
-          iam_role=connector_conf.IAM_ROLE.get(),
-          bucket_configs=bucket_configs,
-          options=connector_conf.OPTIONS.get(),
-        )
+          self._connectors[connector_id] = connector
 
-        self._connectors[connector_id] = connector
+          bucket_info = f"with {len(bucket_configs)} buckets" if bucket_configs else "no bucket configs"
+          LOG.debug(f"Loaded connector: {connector_id} ({connector.provider}, {connector.auth_type}) {bucket_info}")
 
-        bucket_info = f"with {len(bucket_configs)} buckets" if bucket_configs else "no bucket configs"
-        LOG.debug(f"Loaded connector: {connector_id} ({connector.provider}, {connector.auth_type}) {bucket_info}")
+        except Exception as e:
+          raise ConfigurationError(f"Failed to load connector '{connector_id}': {e}")
+    else:
+      LOG.debug("No STORAGE_CONNECTORS configuration found")
 
-      except Exception as e:
-        raise ConfigurationError(f"Failed to load connector '{connector_id}': {e}")
+    # Second, auto-convert legacy AWS_ACCOUNTS (only when storage connectors feature is enabled)
+    if USE_STORAGE_CONNECTORS.get():
+      legacy_connectors = _load_legacy_aws_accounts_as_connectors()
+
+      for connector_id, connector in legacy_connectors.items():
+        # Don't override new STORAGE_CONNECTORS configs
+        if connector_id not in self._connectors:
+          self._connectors[connector_id] = connector
+        else:
+          LOG.debug(f"Skipping legacy AWS account '{connector_id}' - already configured in STORAGE_CONNECTORS")
 
   def _validate_configurations(self) -> None:
     """Validate connector configurations"""
@@ -210,8 +406,6 @@ class S3ConfigManager:
 
     # Rule: IDBroker auth requires global IDBroker configuration
     if connector.auth_type == "idbroker":
-      from desktop.lib.idbroker import conf as conf_idbroker
-
       if not conf_idbroker.is_idbroker_enabled("s3a"):
         raise ConfigurationError("IDBroker authentication requires global IDBroker configuration in core-site.xml")
 
@@ -234,23 +428,14 @@ class S3ConfigManager:
       return False
 
 
-# Singleton instance for global access
-_config_manager = S3ConfigManager()
-
-
-def get_config_manager() -> S3ConfigManager:
-  """Get the global configuration manager instance"""
-  return _config_manager
-
-
 def get_all_connectors() -> Dict[str, ConnectorConfig]:
   """Get all configured S3 connectors"""
-  return _config_manager.get_all_connectors()
+  return S3ConfigManager().get_all_connectors()
 
 
 def get_connector(connector_id: str) -> Optional[ConnectorConfig]:
   """Get specific connector by ID"""
-  return _config_manager.get_connector(connector_id)
+  return S3ConfigManager().get_connector(connector_id)
 
 
 def validate_s3_configuration() -> List[str]:
@@ -259,7 +444,7 @@ def validate_s3_configuration() -> List[str]:
   Used by Hue's configuration validation system.
   """
   try:
-    _config_manager.load_configurations()
+    S3ConfigManager().load_configurations()
     return []
   except ConfigurationError as e:
     return [str(e)]

@@ -33,7 +33,7 @@ from desktop.lib.fs.s3.constants import DEFAULT_REGION
 from desktop.lib.idbroker import conf as conf_idbroker
 
 if TYPE_CHECKING:
-  from desktop.lib.fs.s3.config_utils import ConnectorConfig
+  from desktop.lib.fs.s3.conf_utils import ConnectorConfig
 
 LOG = logging.getLogger()
 

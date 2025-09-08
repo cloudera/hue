@@ -24,14 +24,14 @@ from botocore.exceptions import ClientError
 
 from desktop.conf import PERMISSION_ACTION_S3
 from desktop.lib.fs.s3.clients.factory import S3ClientFactory
-from desktop.lib.fs.s3.config_utils import get_all_connectors, get_connector
+from desktop.lib.fs.s3.conf_utils import get_all_connectors, get_connector
 from desktop.lib.fs.s3.constants import DEFAULT_CHUNK_SIZE, S3_DELIMITER
 from desktop.lib.fs.s3.core.file import S3File
 from desktop.lib.fs.s3.core.path import S3Path
 from desktop.lib.fs.s3.core.stat import S3Stat
 
 if TYPE_CHECKING:
-  from desktop.lib.fs.s3.config_utils import ConnectorConfig
+  from desktop.lib.fs.s3.conf_utils import ConnectorConfig
 
 LOG = logging.getLogger()
 
@@ -475,7 +475,7 @@ class S3FileSystem:
     - Multiple buckets: Use generic s3a://
     - No buckets: Use generic s3a://
     """
-    from desktop.lib.fs.s3.config_utils import get_default_bucket_home_path
+    from desktop.lib.fs.s3.conf_utils import get_default_bucket_home_path
 
     return get_default_bucket_home_path(self.connector_id, self.user)
 
@@ -497,19 +497,19 @@ class S3FileSystem:
 
   def get_bucket_region(self, bucket_name: str) -> Optional[str]:
     """Get region for a specific bucket with smart defaults"""
-    from desktop.lib.fs.s3.config_utils import get_effective_bucket_region
+    from desktop.lib.fs.s3.conf_utils import get_effective_bucket_region
 
     return get_effective_bucket_region(self.connector_id, bucket_name)
 
   def validate_bucket_access(self, bucket_name: str) -> bool:
     """Check if this filesystem can access the specified bucket"""
-    from desktop.lib.fs.s3.config_utils import validate_bucket_access
+    from desktop.lib.fs.s3.conf_utils import validate_bucket_access
 
     return validate_bucket_access(self.connector_id, bucket_name)
 
   def get_available_buckets(self) -> List[str]:
     """Get list of buckets configured for this connector"""
-    from desktop.lib.fs.s3.config_utils import get_available_buckets
+    from desktop.lib.fs.s3.conf_utils import get_available_buckets
 
     return get_available_buckets(self.connector_id)
 

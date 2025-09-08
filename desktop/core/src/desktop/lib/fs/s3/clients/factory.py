@@ -22,7 +22,7 @@ from typing import List, Optional
 from desktop.lib.fs.s3.clients.aws import AWSS3Client
 from desktop.lib.fs.s3.clients.base import S3ClientInterface
 from desktop.lib.fs.s3.clients.generic import GenericS3Client
-from desktop.lib.fs.s3.config_utils import ConnectorConfig, get_all_connectors, get_connector
+from desktop.lib.fs.s3.conf_utils import ConnectorConfig, get_all_connectors, get_connector
 
 LOG = logging.getLogger()
 

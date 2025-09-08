@@ -3,7 +3,7 @@
 import logging
 from typing import Optional
 
-from desktop.lib.fs.s3.config_utils import get_s3_home_directory as get_home_dir
+from desktop.lib.fs.s3.conf_utils import get_s3_home_directory as get_home_dir
 from desktop.lib.fs.s3.core.s3fs import S3FileSystem
 
 LOG = logging.getLogger()

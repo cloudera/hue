@@ -27,7 +27,7 @@ from desktop.lib.fs.s3.clients.base import S3AuthProvider
 from desktop.lib.raz.raz_client import get_raz_client
 
 if TYPE_CHECKING:
-  from desktop.lib.fs.s3.config_utils import ConnectorConfig
+  from desktop.lib.fs.s3.conf_utils import ConnectorConfig
 
 LOG = logging.getLogger()
 
