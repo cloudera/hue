@@ -197,6 +197,7 @@
   window.ENABLE_ENVELOPE = '${ hasattr(ENABLE_ENVELOPE, 'get') and ENABLE_ENVELOPE.get() }' === 'True';
   window.REQUEST_FS = '${hasattr(request, "fs")}' === 'True';
   window.RAZ_IS_ENABLED = '${ RAZ.IS_ENABLED.get() }' === 'True';
+  window.ENABLE_NEW_TABLE_BROWSER = '${ hasattr(conf, 'ENABLE_NEW_TABLE_BROWSER') and hasattr(conf.ENABLE_NEW_TABLE_BROWSER, 'get') and conf.ENABLE_NEW_TABLE_BROWSER.get() }' === 'True';
 
   window.ENABLE_HISTORY_V2 = '${ hasattr(ENABLE_HISTORY_V2, 'get') and ENABLE_HISTORY_V2.get() }' === 'True';
   window.ENABLE_HIVE_QUERY_BROWSER = '${ hasattr(ENABLE_HIVE_QUERY_BROWSER, 'get') and ENABLE_HIVE_QUERY_BROWSER.get() }' === 'True';

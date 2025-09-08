@@ -47,6 +47,7 @@ from desktop.conf import (
   ENABLE_CONNECTORS,
   ENABLE_GIST_PREVIEW,
   ENABLE_NEW_STORAGE_BROWSER,
+  ENABLE_NEW_TABLE_BROWSER,
   ENABLE_SHARING,
   ENABLE_WORKFLOW_CREATION_ACTION,
   get_clusters,
@@ -184,6 +185,11 @@ def get_config(request):
     'is_enabled': IMPORTER.IS_ENABLED.get(),
     'restrict_local_file_extensions': IMPORTER.RESTRICT_LOCAL_FILE_EXTENSIONS.get(),
     'max_local_file_size_upload_limit': IMPORTER.MAX_LOCAL_FILE_SIZE_UPLOAD_LIMIT.get(),
+  }
+
+  # Table browser configuration
+  config['table_browser'] = {
+    'enable_new_table_browser': ENABLE_NEW_TABLE_BROWSER.get(),
   }
 
   # Other general configuration

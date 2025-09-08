@@ -1937,6 +1937,13 @@ ENABLE_NEW_STORAGE_BROWSER = Config(
   default=False
 )
 
+ENABLE_NEW_TABLE_BROWSER = Config(
+  key="enable_new_table_browser",
+  help=_("Feature flag to enable new React Table Browser."),
+  type=coerce_bool,
+  default=False
+)
+
 ENABLE_NEW_IMPORTER = Config(
   key="enable_new_importer",
   help=_("Feature flag to enable new Hue Importer."),
