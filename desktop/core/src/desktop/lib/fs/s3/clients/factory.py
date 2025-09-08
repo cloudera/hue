@@ -16,8 +16,6 @@
 # limitations under the License.
 
 import logging
-from dataclasses import dataclass
-from typing import List, Optional
 
 from desktop.lib.fs.s3.clients.aws import AWSS3Client
 from desktop.lib.fs.s3.clients.base import S3ClientInterface

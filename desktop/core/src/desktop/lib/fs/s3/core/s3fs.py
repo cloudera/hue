@@ -18,13 +18,12 @@
 import logging
 import os
 import time
-from typing import Any, BinaryIO, List, Optional, TYPE_CHECKING, Union
+from typing import Any, List, Optional, TYPE_CHECKING, Union
 
 from botocore.exceptions import ClientError
 
 from desktop.conf import PERMISSION_ACTION_S3
 from desktop.lib.fs.s3.clients.factory import S3ClientFactory
-from desktop.lib.fs.s3.conf_utils import get_all_connectors, get_connector
 from desktop.lib.fs.s3.constants import DEFAULT_CHUNK_SIZE, S3_DELIMITER
 from desktop.lib.fs.s3.core.file import S3File
 from desktop.lib.fs.s3.core.path import S3Path

@@ -436,14 +436,6 @@ class S3ConfigManager:
     self.load_configurations()
     return self._connectors.copy()
 
-  def has_connectors(self) -> bool:
-    """Check if any connectors are configured"""
-    try:
-      return bool(STORAGE_CONNECTORS.keys())
-    except Exception as e:
-      LOG.error(f"Failed to check if any connectors are configured: {e}")
-      return False
-
 
 def get_all_connectors() -> Dict[str, ConnectorConfig]:
   """Get all configured S3 connectors"""
@@ -589,44 +581,6 @@ def extract_bucket_from_path(path: str) -> Optional[str]:
     return None
 
 
-def get_connector_for_path(path: str) -> Optional[ConnectorConfig]:
-  """
-  Find appropriate connector for an S3 path using smart selection logic.
-
-  Priority:
-  1. Connector with explicit bucket config for this bucket
-  2. Default connector (if it exists)
-  3. First available connector
-  4. None (if no connectors configured)
-  """
-  bucket_name = extract_bucket_from_path(path)
-  connectors = get_all_connectors()
-
-  if not connectors:
-    LOG.warning("No S3 connectors configured")
-    return None
-
-  # If we have a bucket name, look for specific bucket config first
-  if bucket_name:
-    for connector in connectors.values():
-      if connector.bucket_configs and bucket_name in connector.bucket_configs:
-        LOG.debug(f"Found connector '{connector.id}' with explicit config for bucket '{bucket_name}'")
-        return connector
-
-  # Fall back to default connector selection
-  default_connector_id = get_default_connector()
-  default_connector = connectors.get(default_connector_id)
-
-  if default_connector:
-    LOG.debug(f"Using default connector '{default_connector_id}' for path '{path}'")
-    return default_connector
-
-  # Last resort: first available connector
-  first_connector = next(iter(connectors.values()))
-  LOG.debug(f"Using first available connector '{first_connector.id}' for path '{path}'")
-  return first_connector
-
-
 def get_default_bucket_home_path(connector_id: str = None, user: str = None) -> str:
   """
   Get default home path when no specific bucket is provided.
@@ -669,38 +623,6 @@ def get_default_bucket_home_path(connector_id: str = None, user: str = None) -> 
   except Exception as e:
     LOG.error(f"Failed to get default bucket home path: {e}")
     return "s3a://"
-
-
-def get_connector_summary() -> Dict[str, Dict]:
-  """
-  Get summary of all connectors for debugging/admin purposes.
-
-  Returns:
-    Dict with connector info including bucket counts and auth status
-  """
-  summary = {}
-
-  try:
-    connectors = get_all_connectors()
-
-    for conn_id, connector in connectors.items():
-      bucket_count = len(connector.bucket_configs) if connector.bucket_configs else 0
-      bucket_names = list(connector.bucket_configs.keys()) if connector.bucket_configs else []
-
-      summary[conn_id] = {
-        "provider": connector.provider,
-        "auth_type": connector.auth_type,
-        "region": connector.region,
-        "endpoint": connector.endpoint,
-        "bucket_count": bucket_count,
-        "bucket_names": bucket_names,
-        "allows_any_bucket": bucket_count == 0,  # No bucket_configs means any bucket allowed
-      }
-
-  except Exception as e:
-    LOG.error(f"Failed to generate connector summary: {e}")
-
-  return summary
 
 
 def is_enabled() -> bool:
