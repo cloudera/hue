@@ -56,7 +56,6 @@ class S3FileSystem:
     """
     self.connector_id = connector_id
     self.user = user
-    self.connector_config = None
 
     # Backward compatibility attributes
     self.is_sentry_managed = lambda path: False  # S3 doesn't use Sentry
@@ -65,17 +64,8 @@ class S3FileSystem:
     self.expiration = None  # No expiration for S3
     self._filebrowser_action = PERMISSION_ACTION_S3  # S3 uses filebrowser_action
 
-    # Load configuration and initialize client
-    self._load_connector_config()
+    # Initialize client
     self._initialize_client()
-
-  def _load_connector_config(self) -> None:
-    """Load connector configuration"""
-    self.connector_config = get_connector(self.connector_id)
-
-    if not self.connector_config:
-      available = list(get_all_connectors().keys()) if get_all_connectors() else []
-      raise ValueError(f"Unknown connector ID: {self.connector_id}. Available connectors: {available}")
 
   def _initialize_client(self) -> None:
     """Initialize the S3 client using connector configuration"""
@@ -458,25 +448,6 @@ class S3FileSystem:
   def upload(self, file, path, *args, **kwargs):
     pass  # upload is handled by S3ConnectorUploadHandler
 
-  def download(self, src_path: Union[str, S3Path], dst_file: BinaryIO, callback: Optional[callable] = None) -> None:
-    """Download file with progress callback"""
-    if isinstance(src_path, str):
-      src_path = S3Path.from_path(src_path)
-
-    try:
-      if callback:
-
-        def _callback(bytes_transferred):
-          callback(bytes_transferred)
-
-        self.s3_client.download_fileobj(src_path.bucket, src_path.key, dst_file, Callback=_callback)
-      else:
-        self.s3_client.download_fileobj(src_path.bucket, src_path.key, dst_file)
-    except ClientError as e:
-      if e.response["Error"]["Code"] == "403":
-        raise PermissionError(f"Access denied to download from: {src_path}")
-      raise
-
   def create_home_dir(self, home_path: Optional[str] = None) -> None:
     """
     Create home directory for the user with smart path resolution.
@@ -514,40 +485,6 @@ class S3FileSystem:
     from desktop.lib.fs.s3.conf_utils import get_default_bucket_home_path
 
     return get_default_bucket_home_path(self.connector_id, self.user)
-
-  # Configuration access methods
-  # ============================
-
-  def get_connector_config(self) -> "ConnectorConfig":
-    """Get the connector configuration for this filesystem"""
-    return self.connector_config
-
-  def get_bucket_config(self, bucket_name: str):
-    """Get bucket-specific configuration"""
-    return self.connector_config.get_bucket_config(bucket_name)
-
-  def get_bucket_home_path(self, bucket_name: str) -> str:
-    """Get home path for a specific bucket"""
-    bucket_config = self.get_bucket_config(bucket_name)
-    return bucket_config.get_effective_home_path(self.user)
-
-  def get_bucket_region(self, bucket_name: str) -> Optional[str]:
-    """Get region for a specific bucket with smart defaults"""
-    from desktop.lib.fs.s3.conf_utils import get_effective_bucket_region
-
-    return get_effective_bucket_region(self.connector_id, bucket_name)
-
-  def validate_bucket_access(self, bucket_name: str) -> bool:
-    """Check if this filesystem can access the specified bucket"""
-    from desktop.lib.fs.s3.conf_utils import validate_bucket_access
-
-    return validate_bucket_access(self.connector_id, bucket_name)
-
-  def get_available_buckets(self) -> List[str]:
-    """Get list of buckets configured for this connector"""
-    from desktop.lib.fs.s3.conf_utils import get_available_buckets
-
-    return get_available_buckets(self.connector_id)
 
   # Backward compatibility methods
 

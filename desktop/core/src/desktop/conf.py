@@ -2927,7 +2927,7 @@ PERMISSION_ACTION_S3 = "s3_access"
 USE_STORAGE_CONNECTORS = Config(
     key='use_storage_connectors',
     type=coerce_bool,
-    default=False,  # Default to old implementation for now
+    default=True,
     help=_('Use storage connector system for multi-cloud object storage access')
 )
 

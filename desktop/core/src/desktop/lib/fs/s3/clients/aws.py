@@ -64,11 +64,11 @@ class AWSS3Client(S3ClientInterface):
     connector = self.connector_config
 
     # Priority-based auth provider selection
-    if RAZ.IS_ENABLED.get() or connector.auth_type == "raz":
+    if RAZ.IS_ENABLED.get() and connector.auth_type == "raz":
       return RazAuthProvider(connector, self.user)
-    elif conf_idbroker.is_idbroker_enabled("s3a") or connector.auth_type == "idbroker":
+    elif conf_idbroker.is_idbroker_enabled("s3a") and connector.auth_type == "idbroker":
       return IDBrokerAuthProvider(connector, self.user)
-    elif connector.auth_type == "iam" or connector.iam_role:
+    elif connector.auth_type == "iam" and connector.iam_role:
       return IAMAuthProvider(connector, self.user)
     else:
       return KeyAuthProvider(connector, self.user)
@@ -129,16 +129,3 @@ class AWSS3Client(S3ClientInterface):
       LOG.debug(f"Could not detect region for bucket {bucket} via AWS API: {e}")
       # Fall back to connector default or system default
       return self.connector_config.region or DEFAULT_REGION
-
-  def validate_region(self, bucket: str) -> bool:
-    """
-    Validate that we're using the correct region for a bucket.
-    Important for signature v4 compatibility.
-    """
-    actual_region = self.get_region(bucket)
-    current_region = self.connector_config.region or DEFAULT_REGION
-
-    if actual_region != current_region:
-      LOG.warning(f"Bucket {bucket} is in region {actual_region} but client is configured for {current_region}")
-      return False
-    return True

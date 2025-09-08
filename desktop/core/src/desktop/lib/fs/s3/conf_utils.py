@@ -305,10 +305,6 @@ class ConnectorConfig:
     # Return default bucket config
     return BucketConfig(name=bucket_name)
 
-  def get_bucket_region(self, bucket_name: str) -> Optional[str]:
-    """Get region for a specific bucket (bucket override > connector default)"""
-    bucket_config = self.get_bucket_config(bucket_name)
-    return bucket_config.region or self.region
 
 
 class S3ConfigManager:
@@ -632,45 +628,6 @@ def get_connector_for_path(path: str) -> Optional[ConnectorConfig]:
   return first_connector
 
 
-def get_effective_bucket_region(connector_id: str, bucket_name: str) -> Optional[str]:
-  """
-  Get effective region for a bucket using smart priority logic.
-
-  Priority:
-  1. Bucket-specific region override
-  2. Connector default region
-  3. System default region
-  """
-  try:
-    connector = get_connector(connector_id)
-    if not connector:
-      return "us-east-1"  # System default
-
-    # Get bucket-specific region if configured
-    if bucket_name:
-      bucket_region = connector.get_bucket_region(bucket_name)
-      if bucket_region:
-        LOG.debug(f"Using bucket-specific region '{bucket_region}' for {bucket_name}")
-        return bucket_region
-
-    # Fall back to connector default
-    if connector.region:
-      LOG.debug(f"Using connector default region '{connector.region}'")
-      return connector.region
-
-    # System default
-    from desktop.lib.fs.s3.constants import DEFAULT_REGION
-
-    LOG.debug(f"Using system default region '{DEFAULT_REGION}'")
-    return DEFAULT_REGION
-
-  except Exception as e:
-    LOG.error(f"Failed to get effective region, using default: {e}")
-    from desktop.lib.fs.s3.constants import DEFAULT_REGION
-
-    return DEFAULT_REGION
-
-
 def get_default_bucket_home_path(connector_id: str = None, user: str = None) -> str:
   """
   Get default home path when no specific bucket is provided.
@@ -713,63 +670,6 @@ def get_default_bucket_home_path(connector_id: str = None, user: str = None) -> 
   except Exception as e:
     LOG.error(f"Failed to get default bucket home path: {e}")
     return "s3a://"
-
-
-def validate_bucket_access(connector_id: str, bucket_name: str) -> bool:
-  """
-  Validate if a bucket can be accessed through a connector.
-
-  Returns True if:
-  - Bucket is explicitly configured in connector
-  - Connector allows general bucket access (no bucket_configs means any bucket allowed)
-  """
-  try:
-    connector = get_connector(connector_id)
-    if not connector:
-      return False
-
-    # If no bucket configs specified, allow access to any bucket
-    if not connector.bucket_configs:
-      LOG.debug(f"Connector '{connector_id}' allows access to any bucket including '{bucket_name}'")
-      return True
-
-    # Check if bucket is explicitly configured
-    if bucket_name in connector.bucket_configs:
-      LOG.debug(f"Bucket '{bucket_name}' is explicitly configured in connector '{connector_id}'")
-      return True
-
-    LOG.warning(f"Bucket '{bucket_name}' is not configured in connector '{connector_id}', but allowing access")
-    # For now, allow access even to unconfigured buckets (graceful handling)
-    return True
-
-  except Exception as e:
-    LOG.error(f"Failed to validate bucket access: {e}")
-    return False
-
-
-def get_available_buckets(connector_id: str = None) -> List[str]:
-  """
-  Get list of available buckets for a connector.
-
-  Args:
-    connector_id: Optional connector ID (uses default if not specified)
-
-  Returns:
-    List of bucket names (empty if none configured)
-  """
-  try:
-    if not connector_id:
-      connector_id = _get_default_connector()
-
-    connector = get_connector(connector_id)
-    if not connector or not connector.bucket_configs:
-      return []
-
-    return list(connector.bucket_configs.keys())
-
-  except Exception as e:
-    LOG.error(f"Failed to get available buckets: {e}")
-    return []
 
 
 def get_connector_summary() -> Dict[str, Dict]:

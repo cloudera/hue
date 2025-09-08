@@ -60,7 +60,7 @@ class GenericS3Client(S3ClientInterface):
     connector = self.connector_config
 
     # Support RAZ authentication for generic providers
-    if RAZ.IS_ENABLED.get() or connector.auth_type == "raz":
+    if RAZ.IS_ENABLED.get() and connector.auth_type == "raz":
       return RazAuthProvider(connector, self.user)
     else:
       # Default to key auth for generic providers
@@ -145,11 +145,3 @@ class GenericS3Client(S3ClientInterface):
 
     # Fall back to connector default region
     return self.connector_config.region or DEFAULT_REGION
-
-  def validate_region(self, bucket: str) -> bool:
-    """
-    Validate region configuration.
-    Most S3-compatible systems don't use regions,
-    so always return True.
-    """
-    return True

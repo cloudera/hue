@@ -27,46 +27,8 @@ from desktop.lib.fs.s3.conf_utils import ConnectorConfig, get_all_connectors, ge
 LOG = logging.getLogger()
 
 
-@dataclass
-class ConnectorInfo:
-  """Information about an available connector for API consumers"""
-
-  id: str
-  provider: str
-  auth_type: str
-  endpoint: Optional[str]
-  region: Optional[str]
-  bucket_names: List[str]  # Buckets configured for this connector
-
-
 class S3ClientFactory:
   """Simplified factory for creating S3 clients using connector architecture"""
-
-  @classmethod
-  def get_available_connectors(cls, user: str) -> List[ConnectorInfo]:
-    """Get list of all available connectors with their bucket information"""
-    connector_infos = []
-
-    try:
-      connectors = get_all_connectors()
-
-      for connector_id, connector in connectors.items():
-        bucket_names = list(connector.bucket_configs.keys()) if connector.bucket_configs else []
-
-        connector_infos.append(
-          ConnectorInfo(
-            id=connector_id,
-            provider=connector.provider,
-            auth_type=connector.auth_type,
-            endpoint=connector.endpoint,
-            region=connector.region,
-            bucket_names=bucket_names,
-          )
-        )
-    except Exception as e:
-      LOG.error(f"Failed to get available connectors: {e}")
-
-    return connector_infos
 
   @classmethod
   def get_client_for_connector(cls, connector_id: str, user: str) -> S3ClientInterface:
@@ -111,18 +73,3 @@ class S3ClientFactory:
     except Exception as e:
       LOG.error(f"Failed to create {provider_type} client: {e}")
       raise
-
-  @classmethod
-  def get_client(cls, connector_id: str, user: str) -> S3ClientInterface:
-    """
-    Get S3 client instance for a connector.
-    This is the main public method for getting clients.
-
-    Args:
-      connector_id: ID of the connector
-      user: Username for the client
-
-    Returns:
-      S3ClientInterface instance
-    """
-    return cls.get_client_for_connector(connector_id, user)
