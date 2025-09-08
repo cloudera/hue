@@ -184,19 +184,17 @@
   window.ENABLE_NEW_CREATE_TABLE = '${ hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get()}' === 'True';
   window.ENABLE_HUE_5 = '${ ENABLE_HUE_5.get() }' === 'True';
   window.ENABLE_PREDICT = '${ OPTIMIZER.ENABLE_PREDICT.get() }' === 'True';
-  window.ENABLE_SQL_INDEXER = '${ ENABLE_SQL_INDEXER.get() }' === 'True';
-
   window.ENABLE_QUERY_BUILDER = '${ ENABLE_QUERY_BUILDER.get() }' === 'True';
   window.ENABLE_QUERY_SCHEDULING = '${ ENABLE_QUERY_SCHEDULING.get() }' === 'True';
   window.ENABLE_UNIFIED_ANALYTICS = '${ ENABLE_UNIFIED_ANALYTICS.get() }' === 'True';
-  window.ENABLE_DIRECT_UPLOAD = '${ ENABLE_DIRECT_UPLOAD.get() }' === 'True';
-  window.ENABLE_SQOOP = '${ ENABLE_SQOOP.get() }' === 'True';
-  window.ENABLE_KAFKA = '${ ENABLE_KAFKA.get() }' === 'True';
-  window.ENABLE_ALTUS = '${ ENABLE_ALTUS.get() }' === 'True';
-  window.ENABLE_FIELD_EDITOR = '${ ENABLE_FIELD_EDITOR.get() }' === 'True';
-  window.CONFIG_INDEXER_LIBS_PATH = '${ CONFIG_INDEXER_LIBS_PATH.get()}'
+  window.ENABLE_DIRECT_UPLOAD = '${ hasattr(ENABLE_DIRECT_UPLOAD, 'get') and ENABLE_DIRECT_UPLOAD.get() }' === 'True';
+  window.ENABLE_SQOOP = '${ hasattr(ENABLE_SQOOP, 'get') and ENABLE_SQOOP.get() }' === 'True';
+  window.ENABLE_KAFKA = '${ hasattr(ENABLE_KAFKA, 'get') and ENABLE_KAFKA.get() }' === 'True';
+  window.ENABLE_ALTUS = '${ hasattr(ENABLE_ALTUS, 'get') and ENABLE_ALTUS.get() }' === 'True';
+  window.ENABLE_FIELD_EDITOR = '${ hasattr(ENABLE_FIELD_EDITOR, 'get') and ENABLE_FIELD_EDITOR.get() }' === 'True';
+  window.CONFIG_INDEXER_LIBS_PATH = '${ CONFIG_INDEXER_LIBS_PATH.get() if hasattr(CONFIG_INDEXER_LIBS_PATH, 'get') else ''}';
   window.ENABLE_SQL_INDEXER = '${ ENABLE_SQL_INDEXER.get() }' === 'True';
-  window.ENABLE_ENVELOPE = '${ ENABLE_ENVELOPE.get() }' === 'True';
+  window.ENABLE_ENVELOPE = '${ hasattr(ENABLE_ENVELOPE, 'get') and ENABLE_ENVELOPE.get() }' === 'True';
   window.REQUEST_FS = '${hasattr(request, "fs")}' === 'True';
   window.RAZ_IS_ENABLED = '${ RAZ.IS_ENABLED.get() }' === 'True';
 
