@@ -20,9 +20,9 @@ import logging
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload, UploadFileException
 
+from desktop.lib.fs.s3.conf_utils import get_default_connector
 from desktop.lib.fs.s3.core.path import S3Path
 from desktop.lib.fs.s3.core.s3fs import make_s3_client
-from desktop.lib.fsmanager import _get_default_s3_connector
 from filebrowser.utils import is_file_upload_allowed
 
 LOG = logging.getLogger()
@@ -78,7 +78,7 @@ class S3ConnectorUploadHandler(FileUploadHandler):
     """
     # TODO: In the future, we could extract connector from the destination path or request params
     # For now, use the default connector selection
-    return _get_default_s3_connector()
+    return get_default_connector()
 
   def _validate_destination(self) -> None:
     """Validate that we can upload to the destination"""

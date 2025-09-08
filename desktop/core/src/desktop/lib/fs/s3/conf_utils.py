@@ -306,7 +306,6 @@ class ConnectorConfig:
     return BucketConfig(name=bucket_name)
 
 
-
 class S3ConfigManager:
   """
   Simplified S3 connector configuration manager.
@@ -486,7 +485,7 @@ def get_s3_home_directory(user: Optional[str] = None, connector_id: str = None, 
   try:
     # Smart connector defaulting
     if not connector_id:
-      connector_id = _get_default_connector()
+      connector_id = get_default_connector()
 
     connector = get_connector(connector_id)
     if not connector:
@@ -509,11 +508,11 @@ def get_s3_home_directory(user: Optional[str] = None, connector_id: str = None, 
     return "s3a://"
 
 
-def _get_default_connector() -> str:
+def get_default_connector() -> str:
   """
   Get the default connector ID using smart selection logic.
 
-  Logic (same as fsmanager._get_default_s3_connector):
+  Logic:
   1. Prefer 'default' if it exists
   2. Otherwise return first available
   3. Fall back to 'default' string if no connectors (for error handling)
@@ -615,7 +614,7 @@ def get_connector_for_path(path: str) -> Optional[ConnectorConfig]:
         return connector
 
   # Fall back to default connector selection
-  default_connector_id = _get_default_connector()
+  default_connector_id = get_default_connector()
   default_connector = connectors.get(default_connector_id)
 
   if default_connector:
@@ -639,7 +638,7 @@ def get_default_bucket_home_path(connector_id: str = None, user: str = None) -> 
   """
   try:
     if not connector_id:
-      connector_id = _get_default_connector()
+      connector_id = get_default_connector()
 
     connector = get_connector(connector_id)
     if not connector:

@@ -27,6 +27,7 @@ import desktop.lib.fs.ozone.client
 from azure.conf import has_abfs_access, has_adls_access, is_abfs_enabled, is_adls_enabled
 from desktop.conf import DEFAULT_USER, has_gs_access, has_ofs_access, is_gs_enabled, is_ofs_enabled, RAZ, USE_STORAGE_CONNECTORS
 from desktop.lib.fs.proxyfs import ProxyFS
+from desktop.lib.fs.s3.conf_utils import get_default_connector
 from desktop.lib.fs.s3.core.s3fs import make_s3_client
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.python_util import current_ms_from_utc
@@ -94,7 +95,7 @@ def _make_client(fs, name, user):
   elif fs == 's3a':
     if USE_STORAGE_CONNECTORS.get():
       # For storage connector system, use connector_id (default to 'default' or first available)
-      connector_id = name if name != "default" else _get_default_s3_connector()
+      connector_id = name if name != "default" else get_default_connector()
       return make_s3_client(connector_id, user)
     return aws.client._make_client(name, user)
   elif fs == 'adl':
@@ -106,25 +107,6 @@ def _make_client(fs, name, user):
   elif fs == 'ofs':
     return desktop.lib.fs.ozone.client._make_ofs_client(name, user)
   return None
-
-
-def _get_default_s3_connector() -> str:
-  """Get the default S3 connector ID (first available or 'default')"""
-  try:
-    from desktop.lib.fs.s3.conf_utils import get_all_connectors
-
-    connectors = get_all_connectors()
-
-    # Prefer 'default' if it exists
-    if "default" in connectors:
-      return "default"
-
-    # Otherwise return first available
-    return next(iter(connectors.keys())) if connectors else "default"
-
-  except Exception as e:
-    logging.warning(f"Failed to get default S3 connector: {e}")
-    return "default"
 
 
 def _get_client(fs=None):
