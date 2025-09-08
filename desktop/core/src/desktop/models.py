@@ -2029,7 +2029,7 @@ class ClusterConfig(object):
 
       if 'filebrowser' in self.apps and fsmanager.is_enabled_and_has_access('s3a', self.user):
         if USE_STORAGE_CONNECTORS.get():
-          from desktop.lib.fs.s3.fsmanager import get_s3_home_directory
+          from desktop.lib.fs.s3.conf_utils import get_s3_home_directory
         else:
           from aws.s3.s3fs import get_s3_home_directory
 

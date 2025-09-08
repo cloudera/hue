@@ -67,21 +67,11 @@ class GenericS3Client(S3ClientInterface):
       return KeyAuthProvider(connector, self.user)
 
   def _get_signature_version(self) -> str:
-    """Get signature version based on provider"""
-    provider = self.connector_config.provider.lower()
+    """Get signature version with option to override via configuration"""
     options = self.connector_config.options or {}
 
-    # Allow override via options
-    if "signature_version" in options:
-      return options["signature_version"]
-
-    # Provider-specific defaults
-    if provider == "netapp":
-      return "s3v4"  # NetApp StorageGRID uses v4
-    elif provider == "dell":
-      return "s3"  # Dell ECS defaults to v2
-    else:
-      return "s3v4"  # Default to v4
+    # Allow override via options for legacy systems
+    return options.get("signature_version", "s3v4")
 
   def _setup_provider_specific_config(self) -> None:
     """Setup provider-specific configurations"""

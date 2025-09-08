@@ -475,21 +475,21 @@ def validate_s3_configuration() -> List[str]:
     return [f"Unexpected error validating S3 configuration: {e}"]
 
 
-def get_s3_home_directory(connector_id: str = None, bucket_name: str = None, user: str = None) -> str:
+def get_s3_home_directory(user: Optional[str] = None, connector_id: str = None, bucket_name: str = None) -> str:
   """
   Get S3 home directory with smart defaulting logic.
   Priority is already handled during config loading (REMOTE_STORAGE_HOME vs DEFAULT_HOME_PATH).
 
   Args:
+    user: Optional username for RAZ handling
     connector_id: Optional connector ID (defaults to 'default' or first available)
     bucket_name: Optional bucket name (uses smart bucket selection if not provided)
-    user: Optional username for RAZ handling
 
   Returns:
     S3 home directory path
   """
   try:
-    # Smart connector defaulting (like _get_default_s3_connector)
+    # Smart connector defaulting
     if not connector_id:
       connector_id = _get_default_connector()
 

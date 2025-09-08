@@ -220,7 +220,7 @@ class ProxyFS(object):
     # Get the new home_path for S3/ABFS/GS when RAZ is enabled.
     if is_raz_s3():
       if USE_STORAGE_CONNECTORS.get():
-        from desktop.lib.fs.s3.fsmanager import get_s3_home_directory
+        from desktop.lib.fs.s3.conf_utils import get_s3_home_directory
       else:
         from aws.s3.s3fs import get_s3_home_directory
 

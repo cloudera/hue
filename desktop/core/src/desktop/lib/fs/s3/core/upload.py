@@ -21,7 +21,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload, UploadFileException
 
 from desktop.lib.fs.s3.core.path import S3Path
-from desktop.lib.fs.s3.fsmanager import make_s3_client
+from desktop.lib.fs.s3.core.s3fs import make_s3_client
 from desktop.lib.fsmanager import _get_default_s3_connector
 from filebrowser.utils import is_file_upload_allowed
 

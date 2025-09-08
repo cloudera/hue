@@ -70,9 +70,6 @@ class S3ClientInterface(ABC):
     self.connector_config = connector_config
     self.user = user
 
-    # Backward compatibility attributes
-    self.provider_id = connector_config.id
-
     # Initialize auth provider
     self.auth_provider = self._create_auth_provider()
 

@@ -28,7 +28,7 @@ from aws.conf import has_s3_access, is_enabled as is_s3_enabled
 from azure.conf import has_abfs_access, has_adls_access, is_abfs_enabled, is_adls_enabled
 from desktop.conf import DEFAULT_USER, has_gs_access, has_ofs_access, is_gs_enabled, is_ofs_enabled, RAZ, USE_STORAGE_CONNECTORS
 from desktop.lib.fs.proxyfs import ProxyFS
-from desktop.lib.fs.s3.fsmanager import make_s3_client
+from desktop.lib.fs.s3.core.s3fs import make_s3_client
 from desktop.lib.idbroker import conf as conf_idbroker
 from desktop.lib.python_util import current_ms_from_utc
 from hadoop.cluster import _make_filesystem, get_hdfs

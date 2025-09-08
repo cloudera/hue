@@ -36,6 +36,10 @@ if TYPE_CHECKING:
 LOG = logging.getLogger()
 
 
+def make_s3_client(connector_id: str, user: str) -> "S3FileSystem":
+  return S3FileSystem(connector_id, user)
+
+
 class S3FileSystem:
   """
   Simplified S3FileSystem implementation using boto3.
@@ -82,9 +86,6 @@ class S3FileSystem:
       # Get boto3 clients for direct use
       self.s3_client = self.client.s3_client
       self.s3_resource = self.client.s3_resource
-
-      # Backward compatibility
-      self.provider_id = self.connector_config.id
 
     except Exception as e:
       LOG.error(f"Failed to initialize S3 client: {e}")
