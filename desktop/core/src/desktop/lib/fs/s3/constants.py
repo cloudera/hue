@@ -18,14 +18,14 @@
 from __future__ import absolute_import
 
 # Multipart upload settings
-DEFAULT_CHUNK_SIZE = 1024 * 1024 * 8  # 8MB
+DEFAULT_CHUNK_SIZE = 1024 * 1024 * 8  # 8MiB
 MULTIPART_THRESHOLD = DEFAULT_CHUNK_SIZE  # Start multipart upload if file size > threshold
 MAX_POOL_CONNECTIONS = 10
 MAX_RETRIES = 3
 
 # Timeouts (in seconds)
-CONNECT_TIMEOUT = 30
-READ_TIMEOUT = 30
+CONNECT_TIMEOUT = 120
+READ_TIMEOUT = 120
 
 # S3 specific constants
 S3_DELIMITER = "/"

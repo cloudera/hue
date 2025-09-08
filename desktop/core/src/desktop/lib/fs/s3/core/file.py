@@ -182,10 +182,10 @@ class S3File:
     Get current position in file.
 
     Returns:
-        Current position
+      Current position
 
     Raises:
-        ValueError: If file is closed
+      ValueError: If file is closed
     """
     if self.closed:
       raise ValueError("I/O operation on closed file")

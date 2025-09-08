@@ -38,13 +38,13 @@ class S3Path:
     Create S3Path from string path.
 
     Args:
-        path: S3 path (s3://bucket/key or s3a://bucket/key)
+      path: S3 path (s3://bucket/key or s3a://bucket/key)
 
     Returns:
-        S3Path instance
+      S3Path instance
 
     Raises:
-        ValueError: If path is not a valid S3 path
+      ValueError: If path is not a valid S3 path
     """
     if path in ("s3://", "s3a://"):
       return cls(bucket=None, key=None)
@@ -82,10 +82,10 @@ class S3Path:
     Join path components.
 
     Args:
-        *components: Path components to join
+      *components: Path components to join
 
     Returns:
-        New S3Path with joined components
+      New S3Path with joined components
     """
     if self.is_root() and not components:
       return self
