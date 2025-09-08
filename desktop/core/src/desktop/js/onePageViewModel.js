@@ -32,6 +32,7 @@ import { ASSIST_GET_DATABASE_EVENT, ASSIST_GET_SOURCE_EVENT } from 'ko/component
 import { GLOBAL_ERROR_TOPIC } from 'reactComponents/GlobalAlert/events';
 import ImporterPage from '../js/apps/newimporter/ImporterPage';
 import StorageBrowserPage from '../js/apps/storageBrowser/StorageBrowserPage';
+import TableBrowserPage from '../js/apps/tableBrowserReact/TableBrowserPage';
 
 class OnePageViewModel {
   constructor() {
@@ -804,6 +805,16 @@ class OnePageViewModel {
             appName: 'storagebrowser',
             component: StorageBrowserPage,
             title: 'Storage Browser'
+          });
+        }
+      },
+      {
+        url: '/tablebrowser/',
+        app: function () {
+          showReactAppPage({
+            appName: 'tablebrowser',
+            component: TableBrowserPage,
+            title: 'Table Browser'
           });
         }
       },
