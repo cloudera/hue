@@ -28,6 +28,7 @@ from urllib.parse import urlparse
 from aws.conf import AWS_ACCOUNTS, is_raz_s3
 from desktop.conf import RAZ, STORAGE_CONNECTORS, USE_STORAGE_CONNECTORS
 from desktop.lib.idbroker import conf as conf_idbroker
+from filebrowser.conf import REMOTE_STORAGE_HOME
 
 LOG = logging.getLogger()
 
@@ -145,28 +146,49 @@ def _convert_aws_endpoint_to_new_format(aws_config) -> Optional[str]:
 
 
 def _extract_bucket_configs_from_aws(aws_config) -> Dict[str, "BucketConfig"]:
-  """Extract bucket configurations from AWS default_home_path"""
-  default_home = aws_config.DEFAULT_HOME_PATH.get()
-  if not default_home:
+  """
+  Extract bucket configurations from AWS config following old priority logic:
+  1. REMOTE_STORAGE_HOME (global, highest priority)
+  2. DEFAULT_HOME_PATH (per AWS account)
+  """
+  # Priority 1: Check REMOTE_STORAGE_HOME (global override, same logic as old get_s3_home_directory)
+  home_path = None
+  try:
+    if hasattr(REMOTE_STORAGE_HOME, "get") and REMOTE_STORAGE_HOME.get():
+      remote_home = REMOTE_STORAGE_HOME.get()
+      if remote_home.startswith("s3a://"):
+        home_path = remote_home
+        LOG.debug(f"Using REMOTE_STORAGE_HOME for bucket config: {home_path}")
+  except Exception as e:
+    LOG.warning(f"Failed to check REMOTE_STORAGE_HOME: {e}")
+
+  # Priority 2: Fall back to DEFAULT_HOME_PATH (per AWS account)
+  if not home_path:
+    default_home = aws_config.DEFAULT_HOME_PATH.get()
+    if default_home and default_home.startswith("s3a://"):
+      home_path = default_home
+      LOG.debug(f"Using DEFAULT_HOME_PATH for bucket config: {home_path}")
+
+  # If still no home path configured, return empty dict
+  if not home_path:
     return {}
 
   try:
     # Parse s3a://bucket-name/path/to/home/
-    bucket_name = extract_bucket_from_path(default_home)
+    bucket_name = extract_bucket_from_path(home_path)
     if not bucket_name:
       return {}
 
     # Extract the path part and make it relative
-    path_part = default_home
-    if path_part.startswith(("s3a://", "s3://")):
+    if home_path.startswith(("s3a://", "s3://")):
       # Remove s3a://bucket-name/ prefix to get relative path
       scheme_and_bucket = f"s3a://{bucket_name}/"
-      if path_part.startswith(scheme_and_bucket):
-        relative_path = path_part[len(scheme_and_bucket) :]
+      if home_path.startswith(scheme_and_bucket):
+        relative_path = home_path[len(scheme_and_bucket) :]
       else:
         relative_path = None
     else:
-      relative_path = path_part
+      relative_path = home_path
 
     return {
       bucket_name: BucketConfig(
@@ -176,8 +198,9 @@ def _extract_bucket_configs_from_aws(aws_config) -> Dict[str, "BucketConfig"]:
         options=None,
       )
     }
+
   except Exception as e:
-    LOG.warning(f"Failed to extract bucket config from default_home_path '{default_home}': {e}")
+    LOG.warning(f"Failed to extract bucket config from home path '{home_path}': {e}")
     return {}
 
 
@@ -455,6 +478,7 @@ def validate_s3_configuration() -> List[str]:
 def get_s3_home_directory(connector_id: str = None, bucket_name: str = None, user: str = None) -> str:
   """
   Get S3 home directory with smart defaulting logic.
+  Priority is already handled during config loading (REMOTE_STORAGE_HOME vs DEFAULT_HOME_PATH).
 
   Args:
     connector_id: Optional connector ID (defaults to 'default' or first available)
