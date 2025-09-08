@@ -17,14 +17,13 @@
 
 import logging
 from typing import Any, Dict, TYPE_CHECKING
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlencode, urlparse, urlunparse
 
 import boto3
 from botocore.awsrequest import AWSRequest
-from botocore.hooks import EventAliaser, HierarchicalEmitter
 
 from desktop.lib.fs.s3.clients.base import S3AuthProvider
-from desktop.lib.raz.raz_client import get_raz_client
+from desktop.lib.raz.clients import S3RazClient
 
 if TYPE_CHECKING:
   from desktop.lib.fs.s3.conf_utils import ConnectorConfig
@@ -38,23 +37,10 @@ class RazEventHandler:
   Intercepts requests before they're signed and sent to S3.
   """
 
-  def __init__(self, user: str, raz_url: str):
+  def __init__(self, user: str):
     self.user = user
-    self.raz_client = get_raz_client(raz_url=raz_url, username=user)
-    self.event_emitter = self._create_event_emitter()
-
-  def _create_event_emitter(self) -> HierarchicalEmitter:
-    """Create boto3 event emitter with RAZ handlers"""
-    emitter = HierarchicalEmitter()
-
-    # Register event handlers
-    emitter.register("before-sign.*.*", self._handle_before_sign)
-
-    # TODO: Is this needed?
-    # emitter.register("before-send.*.*", self._handle_before_send)
-
-    # Create aliaser for compatibility
-    return EventAliaser(emitter)
+    # Use existing S3RazClient which has the correct get_url() interface
+    self.raz_client = S3RazClient(username=user)
 
   def _handle_before_sign(self, request: AWSRequest, **kwargs) -> None:
     """
@@ -91,6 +77,7 @@ class RazEventHandler:
     This is called after signing but before sending.
     We clean up any leftover AWS headers here.
     """
+    # TODO: Is this needed?
     # Remove any AWS specific headers that RAZ doesn't need
     aws_headers = ["X-Amz-Security-Token", "X-Amz-Date", "X-Amz-Content-SHA256", "Authorization"]
 
@@ -116,7 +103,7 @@ class RazEventHandler:
       # Remove bucket from path
       url_parts[2] = url_parts[2].replace(f"/{bucket}", "", 1)
 
-    return urlparse.urlunparse(url_parts)
+    return urlunparse(url_parts)
 
 
 class RazAuthProvider(S3AuthProvider):
@@ -128,19 +115,14 @@ class RazAuthProvider(S3AuthProvider):
   def __init__(self, connector_config: "ConnectorConfig", user: str):
     super().__init__(connector_config, user)
 
-    # Use existing global RAZ configuration
-    raz_url = self._get_raz_url_from_global_config()
-    self.raz_handler = RazEventHandler(user=user, raz_url=raz_url)
+    # Create RAZ event handler (uses global RAZ configuration internally)
+    self.raz_event_handler = RazEventHandler(user=user)
 
     # Store boto3 session with RAZ event handlers
     self.session = boto3.Session(aws_access_key_id="dummy", aws_secret_access_key="dummy", region_name=connector_config.region)
-    self.session.events = self.raz_handler.event_emitter
 
-  def _get_raz_url_from_global_config(self) -> str:
-    """Get RAZ URL from existing global RAZ configuration"""
-    from desktop.conf import RAZ
-
-    return RAZ.API_URL.get()
+    # Register RAZ handlers with the session's event system
+    self.session.events.register("before-sign.*.*", self.raz_event_handler._handle_before_sign)
 
   def get_credentials(self) -> Dict[str, Any]:
     """
