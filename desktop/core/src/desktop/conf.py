@@ -2803,6 +2803,19 @@ def config_validator(user):
   if 'use_new_editor' in USE_NEW_EDITOR.bind_to:
     res.append(('[desktop] use_new_editor', str(_('This configuration flag has been deprecated.'))))
 
+  # Validate S3 configuration
+  if USE_STORAGE_CONNECTORS.get():
+    try:
+      from desktop.lib.fs.s3.conf_utils import validate_s3_configuration
+
+      # Validate storage connector configuration structure
+      s3_errors = validate_s3_configuration()
+      for error in s3_errors:
+        res.append(("STORAGE_CONNECTOR_CONFIGURATION", error))
+
+    except Exception as e:
+      res.append(("STORAGE_CONNECTOR_CONFIGURATION", f"Failed to validate storage connector configuration: {e}"))
+
   return res
 
 
@@ -2907,6 +2920,81 @@ def is_gs_enabled():
 
   return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or is_raz_gs() or \
     conf_idbroker.is_idbroker_enabled('gs')
+
+
+PERMISSION_ACTION_S3 = "s3_access"
+
+USE_STORAGE_CONNECTORS = Config(
+    key='use_storage_connectors',
+    type=coerce_bool,
+    default=True,
+    help=_('Use storage connector system for multi-cloud object storage access')
+)
+
+STORAGE_CONNECTORS = UnspecifiedConfigSection(
+  'storage_connectors',
+  help=_('Storage connector definitions with bucket-specific configurations'),
+  each=ConfigSection(
+    help=_('Configuration for a single S3-compatible storage connector'),
+    members=dict(
+      PROVIDER=Config(
+        key='provider',
+        type=str,
+        default='aws',  # aws, netapp, dell, generic
+        help=_('Storage provider type (aws, netapp, dell, generic)')
+      ),
+      AUTH_TYPE=Config(
+        key='auth_type',
+        type=str,
+        default='key',  # key, iam, raz, idbroker
+        help=_('Authentication method (key, iam, raz, idbroker)')
+      ),
+      REGION=Config(
+        key='region',
+        type=str,
+        default=None,
+        help=_('Default AWS region (required for AWS provider)')
+      ),
+      ENDPOINT=Config(
+        key='endpoint',
+        type=str,
+        default=None,
+        help=_('Custom endpoint URL (required for non-AWS providers)')
+      ),
+      ACCESS_KEY_ID=Config(
+        key='access_key_id',
+        type=str,
+        default=None,
+        help=_('Access key ID (required for key auth)')
+      ),
+      SECRET_KEY=Config(
+        key='secret_key',
+        type=str,
+        private=True,
+        default=None,
+        help=_('Secret access key (required for key auth)')
+      ),
+      IAM_ROLE=Config(
+        key='iam_role',
+        type=str,
+        default=None,
+        help=_('IAM role ARN to assume (for iam auth)')
+      ),
+      BUCKET_CONFIGS=Config(
+        key='bucket_configs',
+        type=coerce_json_dict,
+        default='{}',
+        help=_('Per-bucket configuration: {"bucket-name": {"default_home_path": "/path/", "region": "us-east-1"}}')
+      ),
+      OPTIONS=Config(
+        key='options',
+        type=coerce_json_dict,
+        default='{}',
+        help=_('Provider-specific configuration options as JSON')
+      )
+    )
+  )
+)
 
 
 def has_gs_access(user):
