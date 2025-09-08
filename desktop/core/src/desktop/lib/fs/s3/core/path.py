@@ -95,7 +95,7 @@ class S3Path:
     if self.bucket:
       parts.append(self.bucket)
     if self.key:
-      parts.append(self.key)
+      parts.append(self.key.rstrip("/"))
 
     # Add new components
     for comp in components:

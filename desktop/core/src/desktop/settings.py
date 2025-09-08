@@ -665,7 +665,7 @@ LOAD_BALANCER_COOKIE = 'ROUTEID'
 ################################################################
 
 # Import after configs are set
-from desktop.conf import ENABLE_NEW_STORAGE_BROWSER  # noqa: E402
+from desktop.conf import ENABLE_NEW_STORAGE_BROWSER, USE_STORAGE_CONNECTORS  # noqa: E402
 
 # Insert our custom upload handlers
 file_upload_handlers = []
@@ -682,8 +682,13 @@ elif not ENABLE_NEW_STORAGE_BROWSER.get():
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
   ]
 
-  if is_s3_enabled():
-    file_upload_handlers.insert(0, 'aws.s3.upload.S3FileUploadHandler')
+  # S3 upload handler selection: Storage Connector (new) vs Legacy AWS (old)
+  if USE_STORAGE_CONNECTORS.get():
+    # Use Storage Connector upload handler (new system with boto3)
+    file_upload_handlers.insert(0, "desktop.lib.fs.s3.upload.S3ConnectorUploadHandler")
+  elif is_s3_enabled():
+    # Use Legacy AWS upload handler (old system with boto2)
+    file_upload_handlers.insert(0, "aws.s3.upload.S3FileUploadHandler")
 
   if is_gs_enabled():
     file_upload_handlers.insert(0, 'desktop.lib.fs.gc.upload.GSFileUploadHandler')

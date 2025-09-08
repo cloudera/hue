@@ -372,55 +372,90 @@ class S3FileSystem:
     if isinstance(dst, str):
       dst = S3Path.from_path(dst)
 
-    if not recursive and self.isdir(src):
-      raise IsADirectoryError(f"Source is a directory: {src}")
+    # Validate source exists
+    if not self.exists(src):
+      raise FileNotFoundError(f"Source does not exist: {src}")
+
+    src_is_dir = self.isdir(src)
+
+    # Check if we can copy directory
+    if src_is_dir and not recursive:
+      raise IsADirectoryError(f"Source is a directory (use recursive=True): {src}")
 
     try:
-      if self.isfile(src):
+      if not src_is_dir:
+        # Handle file-to-directory copy case
+        if self.exists(dst) and self.isdir(dst):
+          src_filename = src.name()
+          dst = dst.join(src_filename)
+          LOG.debug(f"File-to-directory copy: appending filename to destination → {dst}")
+
         # Copy single file
-        copy_source = {"Bucket": src.bucket, "Key": src.key}
-        self.s3_client.copy(copy_source, dst.bucket, dst.key)
+        self._copy_file(src, dst)
       else:
-        # Copy directory
-        src_prefix = src.key.rstrip("/") + "/"
-        dst_prefix = dst.key.rstrip("/") + "/"
+        # Handle directory-to-directory copy case
+        if self.exists(dst) and self.isdir(dst):
+          src_dirname = src.name()
+          dst = dst.join(src_dirname)
+          LOG.debug(f"Directory-to-directory copy: appending source name to destination → {dst}")
 
-        paginator = self.s3_client.get_paginator("list_objects_v2")
-        for page in paginator.paginate(Bucket=src.bucket, Prefix=src_prefix):
-          for obj in page.get("Contents", []):
-            src_key = obj["Key"]
-            dst_key = dst_prefix + src_key[len(src_prefix) :]
+        # Copy directory recursively
+        self._copy_directory(src, dst)
 
-            copy_source = {"Bucket": src.bucket, "Key": src_key}
-            self.s3_client.copy(copy_source, dst.bucket, dst_key)
     except ClientError as e:
-      if e.response["Error"]["Code"] == "403":
-        raise PermissionError("Access denied for copy operation")
-      raise
+      error_code = e.response["Error"]["Code"]
+      if error_code == "403":
+        raise PermissionError(f"Access denied for copy operation: {src} → {dst}")
+      elif error_code == "NoSuchBucket":
+        raise FileNotFoundError(f"Destination bucket does not exist: {dst.bucket}")
+      elif error_code == "NoSuchKey":
+        raise FileNotFoundError(f"Source not found: {src}")
+      else:
+        LOG.error(f"S3 copy operation failed: {error_code} - {e.response['Error'].get('Message', str(e))}")
+        raise
+
+  def _copy_file(self, src: S3Path, dst: S3Path) -> None:
+    """Copy a single file using boto3 copy_object API"""
+    copy_source = {"Bucket": src.bucket, "Key": src.key}
+
+    LOG.debug(f"Copying file: {src} → {dst}")
+
+    self.s3_client.copy_object(CopySource=copy_source, Bucket=dst.bucket, Key=dst.key)
+
+  def _copy_directory(self, src: S3Path, dst: S3Path) -> None:
+    """Copy directory recursively using boto3"""
+    src_prefix = src.key.rstrip("/") + "/" if src.key else ""
+    dst_prefix = dst.key.rstrip("/") + "/" if dst.key else ""
+
+    LOG.debug(f"Copying directory: {src} → {dst} (src_prefix='{src_prefix}', dst_prefix='{dst_prefix}')")
+
+    copied_files = 0
+    paginator = self.s3_client.get_paginator("list_objects_v2")
+
+    for page in paginator.paginate(Bucket=src.bucket, Prefix=src_prefix):
+      for obj in page.get("Contents", []):
+        src_key = obj["Key"]
+
+        # Calculate destination key by replacing src_prefix with dst_prefix
+        relative_key = src_key[len(src_prefix) :]
+        dst_key = dst_prefix + relative_key
+
+        # Copy each file
+        copy_source = {"Bucket": src.bucket, "Key": src_key}
+        self.s3_client.copy_object(CopySource=copy_source, Bucket=dst.bucket, Key=dst_key)
+
+        copied_files += 1
+
+    LOG.debug(f"Directory copy completed: {copied_files} files copied")
 
   def rename(self, old: Union[str, S3Path], new: Union[str, S3Path]) -> None:
     """Rename/move file or directory"""
     self.copy(old, new, recursive=True)
     self.rmtree(old)
 
-  def upload(self, src_file: BinaryIO, dst_path: Union[str, S3Path], callback: Optional[callable] = None) -> None:
-    """Upload file with progress callback"""
-    if isinstance(dst_path, str):
-      dst_path = S3Path.from_path(dst_path)
-
-    try:
-      if callback:
-
-        def _callback(bytes_transferred):
-          callback(bytes_transferred)
-
-        self.s3_client.upload_fileobj(src_file, dst_path.bucket, dst_path.key, Callback=_callback)
-      else:
-        self.s3_client.upload_fileobj(src_file, dst_path.bucket, dst_path.key)
-    except ClientError as e:
-      if e.response["Error"]["Code"] == "403":
-        raise PermissionError(f"Access denied to upload to: {dst_path}")
-      raise
+  # Deprecated
+  def upload(self, file, path, *args, **kwargs):
+    pass  # upload is handled by S3ConnectorUploadHandler
 
   def download(self, src_path: Union[str, S3Path], dst_file: BinaryIO, callback: Optional[callable] = None) -> None:
     """Download file with progress callback"""
@@ -572,11 +607,35 @@ class S3FileSystem:
 
   def copyfile(self, src: Union[str, S3Path], dst: Union[str, S3Path], *args, **kwargs) -> None:
     """Copy single file (no recursion)"""
-    return self.copy(src, dst, recursive=False)
+    if isinstance(src, str):
+      src = S3Path.from_path(src)
+    if isinstance(dst, str):
+      dst = S3Path.from_path(dst)
+
+    # Validate source is a file
+    if not self.exists(src):
+      raise FileNotFoundError(f"Source file does not exist: {src}")
+    if self.isdir(src):
+      raise IsADirectoryError(f"Source is a directory, use copy() with recursive=True: {src}")
+    if self.isdir(dst):
+      raise IsADirectoryError(f"Destination is a directory, specify file path: {dst}")
+
+    return self._copy_file(src, dst)
 
   def copy_remote_dir(self, src: Union[str, S3Path], dst: Union[str, S3Path], *args, **kwargs) -> None:
     """Copy directory recursively"""
-    return self.copy(src, dst, recursive=True)
+    if isinstance(src, str):
+      src = S3Path.from_path(src)
+    if isinstance(dst, str):
+      dst = S3Path.from_path(dst)
+
+    # Validate source is a directory
+    if not self.exists(src):
+      raise FileNotFoundError(f"Source directory does not exist: {src}")
+    if not self.isdir(src):
+      raise NotADirectoryError(f"Source is not a directory: {src}")
+
+    return self._copy_directory(src, dst)
 
   def rename_star(self, old_dir: Union[str, S3Path], new_dir: Union[str, S3Path]) -> None:
     """
