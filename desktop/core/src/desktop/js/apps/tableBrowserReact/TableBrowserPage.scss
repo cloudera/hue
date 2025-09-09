@@ -1,7 +1,35 @@
-.hue-table-browser {
-  &__container {
-    padding: 16px;
+@use 'variables' as vars;
+@use 'mixins';
+
+.cuix.antd {
+  .hue-table-browser {
+    @include mixins.fillAbsolute;
+    @include mixins.flexRowLayout;
+    
+    min-width: 300px;
+    
+    &__container {
+      height: 100%;
+      background-color: vars.$fluidx-gray-100;
+      padding: 16px;
+    }
+
+    &__filter {
+      margin-bottom: 16px;
+    }
+
+    // Fixes for For Breadcrumbs
+    .ant-typography {
+      margin-bottom: 0;
+    }
+    .ant-btn>span {
+      display: inline-flex;
+    }
+    
+
+    // Fixes for Filter
+    .ant-input {
+      box-shadow: none;
+    }
   }
 }
-
-

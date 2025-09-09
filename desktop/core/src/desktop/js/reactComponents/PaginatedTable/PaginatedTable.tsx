@@ -109,7 +109,7 @@ const PaginatedTable = <T extends object>({
   };
 
   const isPaginationEnabled =
-    pagination?.pageStats && pagination?.pageStats?.totalPages > 0 && pagination.setPageNumber;
+    pagination?.pageStats && pagination?.pageStats?.totalPages > 1 && pagination.setPageNumber;
 
   const [tableRef, rect] = useResizeObserver();
 
@@ -119,6 +119,25 @@ const PaginatedTable = <T extends object>({
   const tableBodyHeight = Math.max(rect.height - tableOffset, 100);
 
   const tableScroll = isDynamicHeight ? { y: tableBodyHeight } : undefined;
+
+  const mergedOnRow = onRowClick
+    ? (record: T) => {
+        const attrs = onRowClick(record) || {};
+        const originalOnKeyDown = (attrs as HTMLAttributes<HTMLElement>).onKeyDown;
+        const originalOnClick = (attrs as HTMLAttributes<HTMLElement>).onClick;
+        return {
+          tabIndex: 0,
+          ...attrs,
+          onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              originalOnClick && originalOnClick(e as unknown as React.MouseEvent<HTMLElement>);
+            }
+            originalOnKeyDown && originalOnKeyDown(e);
+          }
+        } as HTMLAttributes<HTMLElement>;
+      }
+    : undefined;
 
   return (
     <div
@@ -131,7 +150,7 @@ const PaginatedTable = <T extends object>({
         onChange={onColumnClick}
         columns={getColumnsFromConfig(columns)}
         dataSource={data}
-        onRow={onRowClick}
+        onRow={mergedOnRow as unknown as (record: T, index?: number) => HTMLAttributes<HTMLElement>}
         pagination={false}
         rowClassName={rowClassName}
         rowKey={rowKey}

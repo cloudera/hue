@@ -169,10 +169,16 @@ export const useDataCatalog = (): UseDataCatalog => {
     if (availableConnectors.length > 0) {
       setConnectors(availableConnectors);
       setConnector(availableConnectors[0]);
-      loadNamespaces(availableConnectors[0]);
     }
     setLoading(prev => ({ ...prev, connector: false }));
   }, []);
+
+  // Reload namespaces, computes and databases when connector changes (e.g., source switch)
+  useEffect(() => {
+    if (connector) {
+      loadNamespaces(connector);
+    }
+  }, [connector]);
 
   return {
     loading,

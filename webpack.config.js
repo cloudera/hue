@@ -105,6 +105,10 @@ const config = {
         ]
       },
       {
+        test: /\.svg$/i,
+        type: 'asset/inline'
+      },
+      {
         test: /\.html$/,
         exclude: /node_modules/,
         use: { loader: 'html', options: { interpolater: true, removeComments: false } }
@@ -148,7 +152,10 @@ const config = {
     modules: ['node_modules', 'js'],
     alias: {
       bootstrap: __dirname + '/node_modules/bootstrap-2.3.2/js',
-      vue$: __dirname + '/node_modules/vue/dist/vue.esm-browser.prod.js'
+      vue$: __dirname + '/node_modules/vue/dist/vue.esm-browser.prod.js',
+      // Created the shim exporting nothing to satisfy the import of 'cdp-js/dist/lib/utilityTypes' in cuix
+      // TODO: Root cause this.
+      'cdp-js/dist/lib/utilityTypes': __dirname + '/desktop/core/src/desktop/js/shims/cdp-utilityTypes.js'
     }
   }
 };
