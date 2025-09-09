@@ -15,12 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import logging.config
 import os
+import os.path
 import re
 import sys
-import logging
-import os.path
-import logging.config
 from io import StringIO as string_io
 from logging import FileHandler
 from logging.handlers import RotatingFileHandler, SocketHandler
@@ -29,11 +29,11 @@ from desktop.lib.paths import get_desktop_root
 from desktop.log import formatter
 from desktop.log.formatter import MessageOnlyFormatter
 
-DEFAULT_LOG_DIR = 'logs'
-LOG_FORMAT = '[%(asctime)s] %(module)-12s %(levelname)-8s %(message)s'
-DATE_FORMAT = '%d/%b/%Y %H:%M:%S %z'
+DEFAULT_LOG_DIR = "logs"
+LOG_FORMAT = "[%(asctime)s] %(module)-12s %(levelname)-8s %(message)s"
+DATE_FORMAT = "%d/%b/%Y %H:%M:%S %z"
 FORCE_DEBUG = False
-CONF_RE = re.compile('%LOG_DIR%|%PROC_NAME%')
+CONF_RE = re.compile("%LOG_DIR%|%PROC_NAME%")
 
 _log_dir = None
 
@@ -44,14 +44,15 @@ def _read_log_conf(proc_name, log_dir):
 
   This method also replaces the %LOG_DIR% and %PROC_NAME% occurrences.
   """
+
   def _repl(match):
-    if match.group(0) == '%LOG_DIR%':
+    if match.group(0) == "%LOG_DIR%":
       return log_dir
-    elif match.group(0) == '%PROC_NAME%':
+    elif match.group(0) == "%PROC_NAME%":
       return proc_name
 
-  log_conf_file = os.getenv("DESKTOP_LOG_CONF_FILE", 'log.conf')
-  log_conf = get_desktop_root('conf', log_conf_file)
+  log_conf_file = os.getenv("DESKTOP_LOG_CONF_FILE", "log.conf")
+  log_conf = get_desktop_root("conf", log_conf_file)
 
   if not os.path.isfile(log_conf):
     return None
@@ -80,10 +81,10 @@ class AuditHandler(RotatingFileHandler):
 def get_audit_logger():
   from desktop.conf import AUDIT_EVENT_LOG_DIR, AUDIT_LOG_MAX_FILE_SIZE
 
-  audit_logger = logging.getLogger('audit')
+  audit_logger = logging.getLogger("audit")
   if not [hclass for hclass in audit_logger.handlers if isinstance(hclass, AuditHandler)]:  # Don't add handler twice
     size, unit = int(AUDIT_LOG_MAX_FILE_SIZE.get()[:-2]), AUDIT_LOG_MAX_FILE_SIZE.get()[-2:]
-    maxBytes = size * 1024 ** (1 if unit == 'KB' else 2 if unit == 'MB' else 3)
+    maxBytes = size * 1024 ** (1 if unit == "KB" else 2 if unit == "MB" else 3)
 
     audit_handler = AuditHandler(AUDIT_EVENT_LOG_DIR.get(), maxBytes=maxBytes, backupCount=50)
     audit_handler.setFormatter(MessageOnlyFormatter())
@@ -107,7 +108,7 @@ def chown_log_dir(uid, gid):
       os.chown(os.path.join(_log_dir, entry), uid, gid)
     return True
   except OSError as ex:
-    print('Failed to chown log directory %s: ex' % (_log_dir, ex), file=sys.stderr)
+    print("Failed to chown log directory %s: %s" % (_log_dir, str(ex)), file=sys.stderr)
     return False
 
 
@@ -160,13 +161,13 @@ def basic_logging(proc_name, log_dir=None):
 
   # Handle env variables
   env_loglevel = os.getenv("DESKTOP_LOGLEVEL")
-  env_debug = os.getenv('DESKTOP_DEBUG') or FORCE_DEBUG
+  env_debug = os.getenv("DESKTOP_DEBUG") or FORCE_DEBUG
   if env_debug:
-    env_loglevel = 'DEBUG'
+    env_loglevel = "DEBUG"
 
   # In Python 3, function setLevel will call clear cache in the root logger
   if not env_loglevel:
-    env_loglevel = 'INFO'
+    env_loglevel = "INFO"
 
   try:
     lvl = getattr(logging, env_loglevel.upper())
@@ -183,16 +184,20 @@ def basic_logging(proc_name, log_dir=None):
     handler.setLevel(lvl)
 
   # Set all loggers but error.log to the same logging level
-  for h in root_logger.__dict__['handlers']:
-    if ((isinstance(h, (SocketHandler)) and h.level != 40) or
-        (isinstance(h, (FileHandler, RotatingFileHandler)) and os.path.basename(h.baseFilename) != 'error.log')):
+  for h in root_logger.__dict__["handlers"]:
+    if (isinstance(h, (SocketHandler)) and h.level != 40) or (
+      isinstance(h, (FileHandler, RotatingFileHandler)) and os.path.basename(h.baseFilename) != "error.log"
+    ):
       h.setLevel(lvl)
 
   from desktop.conf import DATABASE_LOGGING
-  if hasattr(DATABASE_LOGGING, 'get') and not DATABASE_LOGGING.get():
+
+  if hasattr(DATABASE_LOGGING, "get") and not DATABASE_LOGGING.get():
+
     def disable_database_logging():
       logger = logging.getLogger()
-      logger.manager.loggerDict['django.db.backends'].level = 20  # INFO level
+      logger.manager.loggerDict["django.db.backends"].level = 20  # INFO level
+
     disable_database_logging()
 
 
@@ -219,6 +224,7 @@ def get_all_debug():
 
 def set_all_debug():
   from desktop.settings import ENV_HUE_PROCESS_NAME  # Circular dependency
+
   global FORCE_DEBUG
 
   FORCE_DEBUG = True
@@ -228,6 +234,7 @@ def set_all_debug():
 
 def reset_all_debug():
   from desktop.settings import ENV_HUE_PROCESS_NAME  # Circular dependency
+
   global FORCE_DEBUG
 
   FORCE_DEBUG = False
