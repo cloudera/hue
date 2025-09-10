@@ -14,29 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Col, Row, Input, Skeleton } from 'antd';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Col, Row } from 'antd';
+import Button from 'cuix/dist/components/Button/Button';
 import Loading from 'cuix/dist/components/Loading';
-import EmptyState from 'cuix/dist/components/EmptyState';
-import Filter from 'cuix/dist/components/Filter';
-import PaginatedTable, {
-  type ColumnProps as PaginatedColumnProps
-} from '../../reactComponents/PaginatedTable/PaginatedTable';
-import type { FilterOutput } from 'cuix/dist/components/Filter/types';
+//
+//
 
 import DataBrowserIcon from '@cloudera/cuix-core/icons/react/DataBrowserIcon';
 
 import { i18nReact } from '../../utils/i18nReact';
 import CommonHeader from '../../reactComponents/CommonHeader/CommonHeader';
 import changeURL from '../../utils/url/changeURL';
+import { buildTableBrowserPath, parseTableBrowserPath } from './utils/routing';
 import { useDataCatalog } from '../../utils/hooks/useDataCatalog/useDataCatalog';
 import Breadcrumbs from './components/Breadcrumbs';
-import Toolbar from './components/Toolbar';
 import Tabs, { TabKey } from './components/Tabs';
 import Overview from './components/Overview';
 import SampleGrid from './components/SampleGrid';
-import DetailsSchema from './components/DetailsSchema';
+// import DetailsSchema from './components/DetailsSchema';
+import DetailsProperties from './components/DetailsProperties';
 import Partitions from './components/Partitions';
+import SourcesList from './components/SourcesList';
+import DatabasesList from './components/DatabasesList';
+import TablesList from './components/TablesList';
 import dataCatalog from '../../catalog/dataCatalog';
 import type { Analysis, SampleMeta } from '../../catalog/DataCatalogEntry';
 import ViewSql from './components/ViewSql';
@@ -44,28 +45,23 @@ import Queries from './components/Queries';
 import Privileges from './components/Privileges';
 import huePubSub from '../../utils/huePubSub';
 import { GLOBAL_ERROR_TOPIC, GLOBAL_INFO_TOPIC } from '../../reactComponents/GlobalAlert/events';
+import formatBytes from '../../utils/formatBytes';
+import { formatTimestamp } from '../../utils/dateTimeUtils';
 
 import './TableBrowserPage.scss';
 
-function parsePath(pathname: string): { sourceType?: string; database?: string; table?: string } {
-  // Expect: <base>/tablebrowser[/<sourceType>[/<database>[/<table>]]]
-  const idx = pathname.indexOf('/tablebrowser');
-  if (idx === -1) {
-    return {};
-  }
-  const rest = pathname.substring(idx + '/tablebrowser'.length);
-  const segments = rest.split('/').filter(Boolean);
-  return {
-    sourceType: segments[0],
-    database: segments[1],
-    table: segments[2]
-  };
-}
+// routing helpers moved to utils/routing
 
 const TableBrowserPage = (): JSX.Element => {
   const { t } = i18nReact.useTranslation();
+  const [locationPath, setLocationPath] = useState<string>(window.location.pathname);
+  const route = useMemo(() => parseTableBrowserPath(locationPath), [locationPath]);
 
-  const route = useMemo(() => parsePath(window.location.pathname), [window.location.pathname]);
+  useEffect(() => {
+    const onPopState = () => setLocationPath(window.location.pathname);
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   const {
     loading: loadingStates,
@@ -77,8 +73,10 @@ const TableBrowserPage = (): JSX.Element => {
     namespace,
     compute,
     connectors,
-    setConnector
-  } = useDataCatalog();
+    setConnector,
+    reloadDatabases,
+    reloadTables
+  } = useDataCatalog({ autoSelectFirstDatabase: false });
 
   const [table, setTable] = useState<string | undefined>(route.table);
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
@@ -99,7 +97,7 @@ const TableBrowserPage = (): JSX.Element => {
   const [sourceFilter, setSourceFilter] = useState('');
   const [sourcePageSize, setSourcePageSize] = useState(50);
   const [sourcePageNumber, setSourcePageNumber] = useState(1);
-  const [forceShowSources, setForceShowSources] = useState(false);
+  // Removed forceShowSources per follow-up TODO; derive strictly from URL
 
   const updatePath = useCallback(
     (nextDatabase?: string, nextTable?: string) => {
@@ -112,16 +110,10 @@ const TableBrowserPage = (): JSX.Element => {
           ((connector as unknown as { id?: string }).id ||
             (connector as unknown as { type?: string }).type)) ||
         '';
-      const nextPath = [
-        base,
-        '/tablebrowser',
-        sourceType ? `/${encodeURIComponent(sourceType)}` : '',
-        nextDatabase ? `/${encodeURIComponent(nextDatabase)}` : '',
-        nextTable ? `/${encodeURIComponent(nextTable)}` : ''
-      ].join('');
-      changeURL(nextPath);
+      changeURL(buildTableBrowserPath(base, sourceType, nextDatabase, nextTable));
+      setLocationPath(window.location.pathname);
     },
-    [window.location.pathname, route.sourceType, connector]
+    [locationPath, route.sourceType, connector]
   );
 
   // Initialize from URL on mount (partial sync)
@@ -139,7 +131,7 @@ const TableBrowserPage = (): JSX.Element => {
 
   // Apply sourceType from URL to connector selection once connectors are loaded
   useEffect(() => {
-    if (route.sourceType && connectors && connectors.length) {
+    if (route.sourceType && connectors && connectors.length && !connector) {
       const wanted = connectors.find(c => {
         const connectorId = (c as unknown as { id?: string }).id;
         return c.type === route.sourceType || connectorId === route.sourceType;
@@ -148,7 +140,7 @@ const TableBrowserPage = (): JSX.Element => {
         setConnector(wanted as unknown as never);
       }
     }
-  }, [route.sourceType, connectors]);
+  }, [route.sourceType, connectors, connector]);
 
   // Ensure database matches URL when the list is available
   useEffect(() => {
@@ -184,6 +176,14 @@ const TableBrowserPage = (): JSX.Element => {
   };
 
   // Spinner lifecycle handled explicitly in onRefresh
+
+  // Focus management after crumb navigation
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (panelRef.current) {
+      panelRef.current.focus({ preventScroll: false } as unknown as FocusOptions);
+    }
+  }, [route.sourceType, currentDb, table]);
 
   // Prefetch database descriptions (Navigator or source metadata) when listing databases
   useEffect(() => {
@@ -394,6 +394,13 @@ const TableBrowserPage = (): JSX.Element => {
       sample?: string;
     }[]
   >([]);
+  const [detailsProperties, setDetailsProperties] = useState<{ name: string; value: string }[]>([]);
+  const [detailsSections, setDetailsSections] = useState<{
+    baseInfo?: { name: string; value: string }[];
+    tableParameters?: { name: string; value: string }[];
+    storageInfo?: { name: string; value: string }[];
+    storageDescParams?: { name: string; value: string }[];
+  }>({});
 
   const fetchData = useCallback(async () => {
     setLoadingData(true);
@@ -412,12 +419,218 @@ const TableBrowserPage = (): JSX.Element => {
         path: [currentDb, table]
       });
       const analysis: Analysis = await entry.getAnalysis({ silenceErrors: true });
-      const props = (analysis.properties || []).map(p => ({
-        name: (p as unknown as { col_name?: string }).col_name || '',
-        value: (p as unknown as { data_type?: string }).data_type || ''
-      }));
+      const analysisDetails = (
+        analysis as unknown as {
+          details?: { properties?: Record<string, string>; stats?: Record<string, string> };
+        }
+      ).details;
+      const isPartitioned = analysisDetails?.properties?.partitioned;
+      const tableType = analysisDetails?.properties?.table_type;
+      const createdBy = analysisDetails?.properties?.owner || 'hive';
+      const createdTime = analysisDetails?.stats?.created_time;
+      const createdTimeFormatted = createdTime
+        ? (() => {
+            const numeric = Number(createdTime);
+            if (!isNaN(numeric) && isFinite(numeric)) {
+              const ms = numeric < 1e12 ? numeric * 1000 : numeric;
+              return formatTimestamp(new Date(ms));
+            }
+            const d = new Date(createdTime as unknown as string);
+            return isNaN(d.getTime()) ? String(createdTime) : formatTimestamp(d);
+          })()
+        : undefined;
+      const props = [
+        { name: t('Partitioned Table'), value: isPartitioned ? t('Yes') : t('No') },
+        {
+          name: t('Managed and stored in location'),
+          value:
+            (tableType === 'MANAGED_TABLE' ? t('Managed') + ' · ' : t('External') + ' · ') +
+            ((analysis as unknown as { hdfs_link?: string })?.hdfs_link || '-')
+        },
+        {
+          name: t('Created'),
+          value: createdTimeFormatted
+            ? `${t('by')} ${createdBy} ${t('on')} ${createdTimeFormatted}`
+            : '-'
+        }
+      ];
       const hdfsLink = (analysis as unknown as { hdfs_link?: string })?.hdfs_link;
-      setOverviewProps({ properties: props, hdfsLink });
+      const detailStats = (analysis as unknown as { details?: { stats?: Record<string, string> } })
+        ?.details?.stats;
+      const stats = detailStats
+        ? (() => {
+            const files =
+              (detailStats as Record<string, string>).num_files ||
+              (detailStats as Record<string, string>).numFiles ||
+              (detailStats as Record<string, string>).files;
+            const rows =
+              (detailStats as Record<string, string>).num_rows ||
+              (detailStats as Record<string, string>).numRows ||
+              (detailStats as Record<string, string>).rows;
+            const rawTotalSize =
+              (detailStats as Record<string, string>).total_size ||
+              (detailStats as Record<string, string>).totalSize ||
+              (detailStats as Record<string, string>).size;
+            const totalSize = (() => {
+              const n = Number(rawTotalSize);
+              return !isNaN(n) && isFinite(n)
+                ? formatBytes(n)
+                : (rawTotalSize as unknown as string);
+            })();
+            const rawLastUpdated =
+              (detailStats as Record<string, string>).last_modified_time ||
+              (detailStats as Record<string, string>).lastModified ||
+              (detailStats as Record<string, string>).lastUpdated;
+            const lastUpdated = (() => {
+              const n = Number(rawLastUpdated);
+              if (!isNaN(n) && isFinite(n)) {
+                const ms = n < 1e12 ? n * 1000 : n;
+                return formatTimestamp(new Date(ms));
+              }
+              const d = new Date(rawLastUpdated as unknown as string);
+              return isNaN(d.getTime())
+                ? (rawLastUpdated as unknown as string)
+                : formatTimestamp(d);
+            })();
+            return { files, rows, totalSize, lastUpdated };
+          })()
+        : undefined;
+      const columnsForOverview = (analysis.cols || []).map(c => ({
+        name: (c as unknown as { name: string }).name,
+        type: (c as unknown as { type: string }).type,
+        comment: (c as unknown as { comment?: string }).comment
+      }));
+      setOverviewProps({ properties: props, hdfsLink, stats });
+      // Build structured Details sections similar to legacy Metastore
+      const rawProps = (analysisDetails?.properties || {}) as Record<string, unknown>;
+      const baseInfo: { name: string; value: string }[] = [];
+      const storageInfo: { name: string; value: string }[] = [];
+      const storageDescParams: { name: string; value: string }[] = [];
+      const tableParameters: { name: string; value: string }[] = [];
+
+      const add = (arr: { name: string; value: string }[], name: string, value?: unknown) => {
+        if (typeof value !== 'undefined' && value !== null && String(value) !== '') {
+          arr.push({ name, value: String(value) });
+        }
+      };
+
+      // Detailed Table Information
+      add(baseInfo, t('Database'), currentDb || '');
+      add(baseInfo, t('OwnerType'), rawProps.owner_type || rawProps.ownertype);
+      add(baseInfo, t('Owner'), rawProps.owner);
+      add(baseInfo, t('CreateTime'), createdTimeFormatted);
+      const lastAccessRaw =
+        (rawProps as Record<string, unknown>).last_access_time ||
+        (rawProps as Record<string, unknown>).lastAccessTime ||
+        'UNKNOWN';
+      const lastAccessFormatted = (() => {
+        if (lastAccessRaw === 'UNKNOWN') {
+          return 'UNKNOWN';
+        }
+        const n = Number(lastAccessRaw as unknown as string);
+        if (!isNaN(n) && isFinite(n)) {
+          const ms = n < 1e12 ? n * 1000 : n;
+          return formatTimestamp(new Date(ms));
+        }
+        const d = new Date(lastAccessRaw as unknown as string);
+        return isNaN(d.getTime()) ? String(lastAccessRaw) : formatTimestamp(d);
+      })();
+      add(baseInfo, t('LastAccessTime'), lastAccessFormatted);
+      add(baseInfo, t('Retention'), rawProps.retention);
+      add(baseInfo, t('Location'), (analysis as unknown as { hdfs_link?: string })?.hdfs_link);
+      add(baseInfo, t('Table Type'), rawProps.table_type || rawProps.tableType);
+
+      // Table Parameters: everything under details.stats and details.properties that looks like parameters
+      Object.keys(analysis.details.stats || {}).forEach(key => {
+        const valueRaw = (analysis.details.stats as Record<string, unknown>)[key];
+        const lower = key.toLowerCase();
+        let value: string | undefined;
+        if (lower.includes('size') || lower.includes('bytes') || lower.endsWith('length')) {
+          const n = Number(valueRaw as unknown as string);
+          if (!isNaN(n) && isFinite(n)) {
+            value = formatBytes(n);
+          }
+        } else if (
+          lower.includes('time') ||
+          lower.includes('timestamp') ||
+          lower.includes('date') ||
+          lower.includes('modified')
+        ) {
+          const n = Number(valueRaw as unknown as string);
+          if (!isNaN(n) && isFinite(n)) {
+            const ms = n < 1e12 ? n * 1000 : n;
+            value = formatTimestamp(new Date(ms));
+          } else if (typeof valueRaw === 'string') {
+            const d = new Date(valueRaw);
+            if (!isNaN(d.getTime())) {
+              value = formatTimestamp(d);
+            }
+          }
+        }
+        tableParameters.push({ name: key, value: String(value ?? valueRaw ?? '') });
+      });
+      // Legacy lists some from properties as well (transactional, etc.)
+      [
+        'transactional',
+        'transactional_properties',
+        'transient_lastDdlTime',
+        'COLUMN_STATS_ACCURATE',
+        'bucketing_version'
+      ].forEach(key => {
+        if (typeof rawProps[key] !== 'undefined') {
+          tableParameters.push({ name: key, value: String(rawProps[key] as unknown as string) });
+        }
+      });
+
+      // Storage Information
+      add(
+        storageInfo,
+        t('SerDe Library'),
+        rawProps['SerDe Library:'] || rawProps.serde_lib || rawProps.serdeLibName
+      );
+      add(
+        storageInfo,
+        t('InputFormat'),
+        rawProps.InputFormat || rawProps.input_format || rawProps.inputFormat
+      );
+      add(
+        storageInfo,
+        t('OutputFormat'),
+        rawProps.OutputFormat || rawProps.output_format || rawProps.outputFormat
+      );
+      add(storageInfo, t('Compressed'), rawProps.compressed ? t('Yes') : t('No'));
+      add(storageInfo, t('Num Buckets'), rawProps.numBuckets || rawProps.num_buckets || -1);
+      add(
+        storageInfo,
+        t('Bucket Columns'),
+        Array.isArray(rawProps.bucketCols)
+          ? JSON.stringify(rawProps.bucketCols)
+          : rawProps.bucketCols || '[]'
+      );
+      add(
+        storageInfo,
+        t('Sort Columns'),
+        Array.isArray(rawProps.sortCols)
+          ? JSON.stringify(rawProps.sortCols)
+          : rawProps.sortCols || '[]'
+      );
+
+      // Storage Desc Params: try to parse properties following legacy conventions
+      if (rawProps['Storage Desc Params:']) {
+        storageDescParams.push({
+          name: t('serialization.format'),
+          value: String(rawProps['Storage Desc Params:'])
+        });
+      }
+
+      // Fallback simple flat list
+      const allProps = Object.keys(rawProps).map(key => ({
+        name: key,
+        value: String(rawProps[key] ?? '')
+      }));
+      setDetailsProperties(allProps);
+      setDetailsSections({ baseInfo, tableParameters, storageInfo, storageDescParams });
+      setDetailsColumns(columnsForOverview);
       const sample = await entry.getSample({ silenceErrors: true });
       const headers = Array.isArray(sample.meta)
         ? (sample.meta as SampleMeta[]).map((m: SampleMeta) => m.name)
@@ -456,8 +669,8 @@ const TableBrowserPage = (): JSX.Element => {
             const base = baseIdx !== -1 ? urlPathname.substring(0, baseIdx) : '';
             selectDb(undefined);
             setTable(undefined);
-            setForceShowSources(true);
-            changeURL(`${base}/tablebrowser/`);
+            changeURL(buildTableBrowserPath(base));
+            setLocationPath(window.location.pathname);
           }}
           onClickDatabases={() => {
             // Navigate to source root and clear db/table selection
@@ -467,8 +680,8 @@ const TableBrowserPage = (): JSX.Element => {
             const sourceType = route.sourceType || 'hive';
             selectDb(undefined);
             setTable(undefined);
-            setForceShowSources(false);
-            changeURL(`${base}/tablebrowser/${encodeURIComponent(sourceType)}`);
+            changeURL(buildTableBrowserPath(base, sourceType));
+            setLocationPath(window.location.pathname);
           }}
           onClickDatabase={(db: string) => {
             // Navigate to db and clear table selection
@@ -480,9 +693,8 @@ const TableBrowserPage = (): JSX.Element => {
               selectDb(db);
             }
             setTable(undefined);
-            changeURL(
-              `${base}/tablebrowser/${encodeURIComponent(sourceType)}/${encodeURIComponent(db)}`
-            );
+            changeURL(buildTableBrowserPath(base, sourceType, db));
+            setLocationPath(window.location.pathname);
           }}
           onSelectSource={src => {
             const wanted = (connectors || []).find(
@@ -497,454 +709,200 @@ const TableBrowserPage = (): JSX.Element => {
             const urlPathname = window.location.pathname;
             const baseIdx = urlPathname.indexOf('/tablebrowser');
             const base = baseIdx !== -1 ? urlPathname.substring(0, baseIdx) : '';
-            changeURL(`${base}/tablebrowser/${encodeURIComponent(src)}`);
+            changeURL(buildTableBrowserPath(base, src));
+            setLocationPath(window.location.pathname);
           }}
         />
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            margin: '8px 0 12px'
-          }}
-        >
-          <div />
-          <Toolbar
-            sourceType={route.sourceType}
-            database={currentDb}
-            table={table}
-            onRefresh={async () => {
-              try {
-                if (currentDb && table && connector && namespace && compute) {
-                  const entry = await dataCatalog.getEntry({
-                    connector,
-                    namespace,
-                    compute,
-                    path: [currentDb, table]
-                  });
-                  await entry.clearCache({ cascade: true, silenceErrors: true });
-                } else if (!currentDb && connector && namespace && compute) {
-                  setIsRefreshing(true);
-                  const sourceEntry = await dataCatalog.getEntry({
-                    connector,
-                    namespace,
-                    compute,
-                    path: []
-                  });
-                  await sourceEntry.clearCache({ cascade: true, silenceErrors: true });
-                  window.setTimeout(() => setIsRefreshing(false), 600);
-                } else if (currentDb && !table && connector && namespace && compute) {
-                  setIsRefreshing(true);
-                  const dbEntry = await dataCatalog.getEntry({
-                    connector,
-                    namespace,
-                    compute,
-                    path: [currentDb]
-                  });
-                  await dbEntry.clearCache({ cascade: true, silenceErrors: true });
-                  window.setTimeout(() => setIsRefreshing(false), 600);
-                }
-              } catch {
-                huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: t('Failed to refresh metadata') });
-                setIsRefreshing(false);
-              }
-              // Reload current view data via Data Catalog (no full reload)
-              if (currentDb && table) {
-                fetchData();
-              }
-            }}
-            onLoadData={async () => {
-              if (!currentDb || !table) {
-                return;
-              }
-              try {
-                await fetch(
-                  `/metastore/table/${encodeURIComponent(currentDb)}/${encodeURIComponent(
-                    table
-                  )}/load`,
-                  {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                    },
-                    body: 'is_embeddable=true'
-                  }
-                );
-                huePubSub.publish(GLOBAL_INFO_TOPIC, { message: t('Load data request sent') });
-              } catch {
-                huePubSub.publish(GLOBAL_ERROR_TOPIC, {
-                  message: t('Failed to load data into table')
-                });
-              } finally {
-                fetchData();
-              }
-            }}
-            onDrop={async () => {
-              if (!currentDb || !table) {
-                return;
-              }
-              // Call legacy drop endpoint in the background
-              try {
-                await fetch(`/metastore/tables/drop/${encodeURIComponent(currentDb)}`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-                  body: `table_selection=${encodeURIComponent(JSON.stringify([table]))}&skip_trash=off&is_embeddable=true`
-                });
-                // Navigate back to db on success
-                updatePath(currentDb, undefined);
-              } catch {
-                huePubSub.publish(GLOBAL_ERROR_TOPIC, { message: t('Failed to drop table') });
-              }
-            }}
-          />
-        </div>
         <Row gutter={16}>
           <Col span={24}>
-            <div className="hue-table-browser__panel" data-testid="tb-right-panel">
-              {(!route.sourceType || forceShowSources) && (
-                <div>
-                  <div style={{ marginBottom: 8 }}>{t('Data sources')}</div>
-                  <Loading spinning={!!loadingStates.database || isRefreshing}>
-                    <div className="hue-table-browser__filter">
-                      <Filter
-                        search={{ placeholder: t('Filter sources') }}
-                        onChange={(output: FilterOutput) => {
-                          const searchValue = String(
-                            (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
-                          );
-                          setSourceFilter(searchValue);
-                        }}
-                      />
-                    </div>
-                    {(() => {
-                      const list = (connectors || []).map(
-                        c => c.type || (c as unknown as { id?: string }).id || ''
-                      );
-                      const unique = Array.from(new Set(list)).filter(Boolean) as string[];
-                      const filtered = unique.filter(src =>
-                        sourceFilter ? src.toLowerCase().includes(sourceFilter.toLowerCase()) : true
-                      );
-                      if (!loadingStates.database && filtered.length === 0) {
-                        return <EmptyState title={t('No sources')} />;
-                      }
-                      const sourceColumns: PaginatedColumnProps<{ name: string }>[] = [
-                        {
-                          title: t('Source'),
-                          dataIndex: 'name',
-                          key: 'name',
-                          render: (text: string, record: { name: string }) => (
-                            <Button
-                              type="link"
-                              aria-label={t('Open source')}
-                              onClick={() => {
-                                const src = record.name;
-                                const wanted = (connectors || []).find(
-                                  c =>
-                                    c.type === src || (c as unknown as { id?: string }).id === src
-                                );
-                                if (wanted) {
-                                  setConnector(wanted as unknown as never);
-                                }
-                                selectDb(undefined);
-                                setTable(undefined);
-                                setForceShowSources(false);
-                                const urlPathname = window.location.pathname;
-                                const baseIdx = urlPathname.indexOf('/tablebrowser');
-                                let base = '';
-                                if (baseIdx !== -1) {
-                                  base = urlPathname.substring(0, baseIdx);
-                                }
-                                changeURL(`${base}/tablebrowser/${encodeURIComponent(src)}`);
-                              }}
-                            >
-                              {text.toUpperCase()}
-                            </Button>
-                          )
-                        }
-                      ];
-                      const sourceData = filtered.map(name => ({ key: name, name }));
-                      const totalSize = sourceData.length;
-                      const totalPages = Math.max(Math.ceil(totalSize / sourcePageSize), 1);
-                      const start = (sourcePageNumber - 1) * sourcePageSize;
-                      const pageData = sourceData.slice(start, start + sourcePageSize);
-                      return (
-                        <PaginatedTable<{ name: string }>
-                          data={pageData}
-                          columns={sourceColumns}
-                          rowKey="key"
-                          pagination={{
-                            pageStats: {
-                              pageNumber: sourcePageNumber,
-                              totalPages,
-                              pageSize: sourcePageSize,
-                              totalSize
-                            },
-                            setPageNumber: setSourcePageNumber,
-                            setPageSize: setSourcePageSize
-                          }}
-                        />
-                      );
-                    })()}
-                  </Loading>
-                </div>
+            <div
+              className="hue-table-browser__panel"
+              data-testid="tb-right-panel"
+              tabIndex={-1}
+              ref={panelRef}
+            >
+              {!route.sourceType && (
+                <SourcesList
+                  sources={
+                    Array.from(
+                      new Set(
+                        (connectors || []).map(
+                          c => c.type || (c as unknown as { id?: string }).id || ''
+                        )
+                      )
+                    ).filter(Boolean) as string[]
+                  }
+                  loading={!!loadingStates.database}
+                  isRefreshing={isRefreshing}
+                  sourceFilter={sourceFilter}
+                  setSourceFilter={setSourceFilter}
+                  sourcePageNumber={sourcePageNumber}
+                  setSourcePageNumber={setSourcePageNumber}
+                  sourcePageSize={sourcePageSize}
+                  setSourcePageSize={setSourcePageSize}
+                  onOpenSource={src => {
+                    const wanted = (connectors || []).find(
+                      c => c.type === src || (c as unknown as { id?: string }).id === src
+                    );
+                    if (wanted) {
+                      setConnector(wanted as unknown as never);
+                    }
+                    selectDb(undefined);
+                    setTable(undefined);
+                    const urlPathname = window.location.pathname;
+                    const baseIdx = urlPathname.indexOf('/tablebrowser');
+                    const base = baseIdx !== -1 ? urlPathname.substring(0, baseIdx) : '';
+                    changeURL(buildTableBrowserPath(base, src));
+                    setLocationPath(window.location.pathname);
+                  }}
+                />
               )}
               {route.sourceType && !currentDb && (
-                <div>
-                  <div style={{ marginBottom: 8 }}>{t('Databases')}</div>
-                  <Loading spinning={!!loadingStates.database || isRefreshing}>
-                    <div className="hue-table-browser__filter">
-                      <Filter
-                        search={{ placeholder: t('Filter databases') }}
-                        onChange={(output: FilterOutput) => {
-                          const searchValue = String(
-                            (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
-                          );
-                          setDbFilter(searchValue);
-                        }}
-                      />
-                    </div>
-                    {(() => {
-                      const filtered = (databases || []).filter(db =>
-                        dbFilter ? db.toLowerCase().includes(dbFilter.toLowerCase()) : true
-                      );
-                      if (!loadingStates.database && filtered.length === 0) {
-                        return <EmptyState title={t('No databases')} />;
+                <DatabasesList
+                  databases={databases || []}
+                  loading={!!loadingStates.database}
+                  isRefreshing={isRefreshing}
+                  onRefresh={async () => {
+                    try {
+                      if (connector && namespace && compute) {
+                        setIsRefreshing(true);
+                        const sourceEntry = await dataCatalog.getEntry({
+                          connector,
+                          namespace,
+                          compute,
+                          path: []
+                        });
+                        await sourceEntry.clearCache({ cascade: true, silenceErrors: true });
+                        await reloadDatabases();
                       }
-                      const dbColumns: PaginatedColumnProps<{
-                        name: string;
-                        description?: string;
-                      }>[] = [
-                        {
-                          title: t('Database'),
-                          dataIndex: 'name',
-                          key: 'name',
-                          render: (text: string, record: { name: string }) => (
-                            <Button
-                              type="link"
-                              aria-label={t('Open database')}
-                              onClick={() => {
-                                const db = record.name;
-                                selectDb(db);
-                                setTable(undefined);
-                                updatePath(db, undefined);
-                              }}
-                            >
-                              {text}
-                            </Button>
-                          )
+                    } catch {
+                      huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+                        message: t('Failed to refresh databases')
+                      });
+                    } finally {
+                      setIsRefreshing(false);
+                    }
+                  }}
+                  dbFilter={dbFilter}
+                  setDbFilter={setDbFilter}
+                  dbPageNumber={dbPageNumber}
+                  setDbPageNumber={setDbPageNumber}
+                  dbPageSize={dbPageSize}
+                  setDbPageSize={setDbPageSize}
+                  dbDescriptions={dbDescriptions}
+                  editingDb={editingDb}
+                  editingValue={editingValue}
+                  setEditingDb={setEditingDb}
+                  setEditingValue={setEditingValue}
+                  onOpenDatabase={db => {
+                    if (db !== currentDb) {
+                      selectDb(db);
+                    }
+                    setTable(undefined);
+                    updatePath(db, undefined);
+                  }}
+                  onSaveDescription={saveDbDescription}
+                  onDropDatabases={async names => {
+                    try {
+                      await fetch(`/metastore/databases/drop`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
                         },
-                        {
-                          title: t('Description'),
-                          dataIndex: 'description',
-                          key: 'description',
-                          render: (_: string | undefined, record: { name: string }) => {
-                            const hasValue = Object.prototype.hasOwnProperty.call(
-                              dbDescriptions,
-                              record.name
-                            );
-                            const current = dbDescriptions[record.name] || '';
-                            if (editingDb === record.name) {
-                              return (
-                                <Input.TextArea
-                                  autoSize={{ minRows: 1, maxRows: 4 }}
-                                  value={editingValue}
-                                  onChange={e => setEditingValue(e.target.value)}
-                                  onBlur={() => saveDbDescription(record.name, editingValue)}
-                                  onPressEnter={e => {
-                                    e.preventDefault();
-                                    saveDbDescription(record.name, editingValue);
-                                  }}
-                                />
-                              );
-                            }
-                            if (!hasValue) {
-                              return (
-                                <Skeleton.Input active size="small" style={{ width: '60%' }} />
-                              );
-                            }
-                            return (
-                              <div>
-                                <span style={{ whiteSpace: 'pre-wrap' }}>{current || ''}</span>
-                                <Button
-                                  type="link"
-                                  size="small"
-                                  onClick={() => {
-                                    setEditingDb(record.name);
-                                    setEditingValue(current);
-                                  }}
-                                >
-                                  {t('Edit')}
-                                </Button>
-                              </div>
-                            );
-                          }
-                        }
-                      ];
-                      const dbData = filtered.map(name => ({ key: name, name }));
-                      const dbTotalSize = dbData.length;
-                      const dbTotalPages = Math.max(Math.ceil(dbTotalSize / dbPageSize), 1);
-                      const start = (dbPageNumber - 1) * dbPageSize;
-                      const pageData = dbData.slice(start, start + dbPageSize);
-                      return (
-                        <PaginatedTable<{ name: string; description?: string }>
-                          data={pageData}
-                          columns={dbColumns}
-                          rowKey="key"
-                          pagination={{
-                            pageStats: {
-                              pageNumber: dbPageNumber,
-                              totalPages: dbTotalPages,
-                              pageSize: dbPageSize,
-                              totalSize: dbTotalSize
-                            },
-                            setPageNumber: setDbPageNumber,
-                            setPageSize: setDbPageSize
-                          }}
-                        />
-                      );
-                    })()}
-                  </Loading>
-                </div>
+                        body: names
+                          .map(n => `database_selection=${encodeURIComponent(n)}`)
+                          .concat(['is_embeddable=true'])
+                          .join('&')
+                      });
+                      await reloadDatabases();
+                    } catch {
+                      huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+                        message: t('Failed to drop databases')
+                      });
+                    }
+                  }}
+                />
               )}
 
               {route.sourceType && !!currentDb && !table && (
-                <div>
-                  <div style={{ marginBottom: 8 }}>{t('Tables')}</div>
-                  <Loading spinning={!!loadingStates.table || isRefreshing}>
-                    <div className="hue-table-browser__filter">
-                      <Filter
-                        search={{ placeholder: t('Filter tables') }}
-                        onChange={(output: FilterOutput) => {
-                          const searchValue = String(
-                            (output as unknown as { search?: unknown[] }).search?.[0] ?? ''
-                          );
-                          setTableFilter(searchValue);
-                        }}
-                      />
-                    </div>
-                    {(() => {
-                      const filtered = (tables || []).filter(item =>
-                        tableFilter
-                          ? item.name.toLowerCase().includes(tableFilter.toLowerCase())
-                          : true
-                      );
-                      if (!loadingStates.table && filtered.length === 0) {
-                        return <EmptyState title={t('No tables')} />;
+                <TablesList
+                  tables={(tables || []).map(item => ({
+                    name: item.name,
+                    type: item.type,
+                    comment: item.comment
+                  }))}
+                  loading={!!loadingStates.table}
+                  isRefreshing={isRefreshing}
+                  onRefresh={async () => {
+                    try {
+                      if (connector && namespace && compute && currentDb) {
+                        setIsRefreshing(true);
+                        const dbEntry = await dataCatalog.getEntry({
+                          connector,
+                          namespace,
+                          compute,
+                          path: [currentDb]
+                        });
+                        await dbEntry.clearCache({ cascade: true, silenceErrors: true });
+                        await reloadTables();
                       }
-                      const tableColumns: PaginatedColumnProps<{
-                        name: string;
-                        type: string;
-                        comment: string;
-                      }>[] = [
+                    } catch {
+                      huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+                        message: t('Failed to refresh tables')
+                      });
+                    } finally {
+                      setIsRefreshing(false);
+                    }
+                  }}
+                  tableFilter={tableFilter}
+                  setTableFilter={setTableFilter}
+                  tablePageNumber={tablePageNumber}
+                  setTablePageNumber={setTablePageNumber}
+                  tablePageSize={tablePageSize}
+                  setTablePageSize={setTablePageSize}
+                  tableDescriptions={tableDescriptions}
+                  editingTableName={editingTableName}
+                  editingTableValue={editingTableValue}
+                  setEditingTableName={setEditingTableName}
+                  setEditingTableValue={setEditingTableValue}
+                  onOpenTable={tbl => {
+                    setTable(tbl);
+                    updatePath(currentDb, tbl);
+                  }}
+                  onSaveDescription={saveTableDescription}
+                  onViewSelection={name => {
+                    setTable(name);
+                    updatePath(currentDb, name);
+                  }}
+                  onQuerySelection={name => {
+                    huePubSub.publish('open.editor.new.query', {
+                      type: route.sourceType || 'hive',
+                      statementType: 'text',
+                      statementPath: currentDb && name ? `${currentDb}.${name}` : undefined
+                    });
+                  }}
+                  onDropSelection={async names => {
+                    try {
+                      await fetch(
+                        `/metastore/tables/drop/${encodeURIComponent(currentDb as string)}`,
                         {
-                          title: t('Table'),
-                          dataIndex: 'name',
-                          key: 'name',
-                          render: (text: string, record: { name: string }) => (
-                            <Button
-                              type="link"
-                              aria-label={t('Open table')}
-                              onClick={() => {
-                                const tbl = record.name;
-                                setTable(tbl);
-                                updatePath(currentDb, tbl);
-                              }}
-                            >
-                              {text}
-                            </Button>
-                          )
-                        },
-                        { title: t('Type'), dataIndex: 'type', key: 'type' },
-                        {
-                          title: t('Description'),
-                          dataIndex: 'comment',
-                          key: 'description',
-                          render: (_: string, record: { name: string }) => {
-                            const hasValue = Object.prototype.hasOwnProperty.call(
-                              tableDescriptions,
-                              record.name
-                            );
-                            const current = tableDescriptions[record.name] || '';
-                            if (editingTableName === record.name) {
-                              return (
-                                <Input.TextArea
-                                  autoSize={{ minRows: 1, maxRows: 4 }}
-                                  value={editingTableValue}
-                                  onChange={e => setEditingTableValue(e.target.value)}
-                                  onBlur={() =>
-                                    saveTableDescription(record.name, editingTableValue)
-                                  }
-                                  onPressEnter={e => {
-                                    e.preventDefault();
-                                    saveTableDescription(record.name, editingTableValue);
-                                  }}
-                                />
-                              );
-                            }
-                            if (!hasValue) {
-                              return (
-                                <Skeleton.Input active size="small" style={{ width: '60%' }} />
-                              );
-                            }
-                            return (
-                              <div>
-                                <span style={{ whiteSpace: 'pre-wrap' }}>{current || ''}</span>
-                                <Button
-                                  type="link"
-                                  size="small"
-                                  onClick={() => {
-                                    setEditingTableName(record.name);
-                                    setEditingTableValue(current);
-                                  }}
-                                >
-                                  {t('Edit')}
-                                </Button>
-                              </div>
-                            );
-                          }
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                          },
+                          body: `table_selection=${encodeURIComponent(
+                            JSON.stringify(names)
+                          )}&skip_trash=off&is_embeddable=true`
                         }
-                      ];
-                      const tableData = filtered.map(item => ({
-                        key: item.name,
-                        name: item.name,
-                        type: item.type,
-                        comment: item.comment
-                      }));
-                      const totalSize = tableData.length;
-                      const totalPages = Math.max(Math.ceil(totalSize / tablePageSize), 1);
-                      const start = (tablePageNumber - 1) * tablePageSize;
-                      const pageData = tableData.slice(start, start + tablePageSize);
-                      return (
-                        <PaginatedTable<{
-                          name: string;
-                          type: string;
-                          comment: string;
-                        }>
-                          data={pageData}
-                          columns={tableColumns}
-                          rowKey="key"
-                          onRowClick={record => ({
-                            onClick: () => {
-                              const tbl = (record as unknown as { name: string }).name;
-                              setTable(tbl);
-                              updatePath(currentDb, tbl);
-                            }
-                          })}
-                          pagination={{
-                            pageStats: {
-                              pageNumber: tablePageNumber,
-                              totalPages,
-                              pageSize: tablePageSize,
-                              totalSize
-                            },
-                            setPageNumber: setTablePageNumber,
-                            setPageSize: setTablePageSize
-                          }}
-                        />
                       );
-                    })()}
-                  </Loading>
-                </div>
+                      await reloadTables();
+                    } catch {
+                      huePubSub.publish(GLOBAL_ERROR_TOPIC, {
+                        message: t('Failed to drop tables')
+                      });
+                    }
+                  }}
+                />
               )}
 
               {!!currentDb && !!table && (
@@ -953,13 +911,20 @@ const TableBrowserPage = (): JSX.Element => {
                     activeKey={activeTab}
                     onChange={onTabChange}
                     sampleCount={sampleData?.rows?.length}
+                    partitionsCount={
+                      overviewProps?.stats ? Number(overviewProps?.stats?.files) : undefined
+                    }
                   />
-                  <Loading spinning={loadingData}>
+                  <Loading spinning={false}>
                     {activeTab === 'overview' && (
                       <Overview
                         properties={overviewProps?.properties}
                         stats={overviewProps?.stats}
                         hdfsLink={overviewProps?.hdfsLink}
+                        columns={detailsColumns}
+                        loadingProperties={loadingData && !overviewProps?.properties}
+                        loadingStats={loadingData && !overviewProps?.stats}
+                        loadingColumns={loadingData && !detailsColumns.length}
                         onRefreshStats={async () => {
                           // Reuse toolbar refresh to invalidate and refetch
                           try {
@@ -979,39 +944,73 @@ const TableBrowserPage = (): JSX.Element => {
                         }}
                       />
                     )}
-                    {activeTab === 'sample' && <SampleGrid data={sampleData} />}
-                    {activeTab === 'details' && <DetailsSchema columns={detailsColumns} />}
+                    {activeTab === 'sample' && (
+                      <Loading spinning={loadingData && !sampleData}>
+                        <SampleGrid data={sampleData} />
+                      </Loading>
+                    )}
+                    {activeTab === 'details' && (
+                      <Loading
+                        spinning={
+                          loadingData &&
+                          !(
+                            detailsProperties?.length ||
+                            detailsSections.baseInfo?.length ||
+                            detailsSections.tableParameters?.length ||
+                            detailsSections.storageInfo?.length ||
+                            detailsSections.storageDescParams?.length
+                          )
+                        }
+                      >
+                        <DetailsProperties
+                          properties={detailsProperties}
+                          baseInfo={detailsSections.baseInfo}
+                          tableParameters={detailsSections.tableParameters}
+                          storageInfo={detailsSections.storageInfo}
+                          storageDescParams={detailsSections.storageDescParams}
+                        />
+                      </Loading>
+                    )}
                     {activeTab === 'partitions' && (
-                      <Partitions
-                        connector={connector}
-                        namespace={namespace}
-                        compute={compute}
-                        database={currentDb}
-                        table={table}
-                      />
+                      <Loading spinning={loadingData && !overviewProps}>
+                        <Partitions
+                          connector={connector}
+                          namespace={namespace}
+                          compute={compute}
+                          database={currentDb}
+                          table={table}
+                          onCountChange={() => {}}
+                        />
+                      </Loading>
                     )}
                     {activeTab === 'queries' && (
-                      <Queries
-                        connector={connector}
-                        namespace={namespace}
-                        compute={compute}
-                        database={currentDb}
-                        table={table}
-                      />
+                      <Loading spinning={loadingData && !overviewProps}>
+                        <Queries
+                          connector={connector}
+                          namespace={namespace}
+                          compute={compute}
+                          database={currentDb}
+                          table={table}
+                        />
+                      </Loading>
                     )}
                     {activeTab === 'viewSql' && (
-                      <ViewSql
-                        sql={
-                          (overviewProps?.properties || []).find(
-                            p =>
-                              p.name.toLowerCase() === 'view original text:' ||
-                              p.name.toLowerCase() === 'original query:'
-                          )?.value
-                        }
-                      />
+                      <Loading spinning={loadingData && !overviewProps?.properties}>
+                        <ViewSql
+                          sql={
+                            (overviewProps?.properties || []).find(
+                              p =>
+                                p.name.toLowerCase() === 'view original text:' ||
+                                p.name.toLowerCase() === 'original query:'
+                            )?.value
+                          }
+                        />
+                      </Loading>
                     )}
                     {activeTab === 'privileges' && (
-                      <Privileges database={currentDb} table={table} />
+                      <Loading spinning={loadingData && !overviewProps}>
+                        <Privileges database={currentDb} table={table} />
+                      </Loading>
                     )}
                   </Loading>
                   {!!table && (

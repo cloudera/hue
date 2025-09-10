@@ -31,6 +31,7 @@ npm run test-coverage
 npm run test-clearCache
 # Run a single file
 npm test -- --testPathPattern=WelcomeTour
+npm test -- desktop/core/src/desktop/js/sidePanelViewModel.test.js
 # Run tests with verbose output
 npm test -- --verbose
 # Run tests and show console output

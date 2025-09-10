@@ -16,6 +16,7 @@ alwaysApply: false
 - Always include the Cloudera copyright msg at the beginning of the file
 - Global and reusable components are placed in folder `desktop/core/src/desktop/js/reactComponents`
 - Put app specific components under that app, e.g. `desktop/core/src/desktop/js/apps/editor/components/`
+- Always prefer cuix components over antd components.
 
 ## Example Skeleton
 ```ts

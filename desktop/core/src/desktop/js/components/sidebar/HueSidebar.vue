@@ -518,15 +518,15 @@
                   handler: (event: Event) => {
                     const details = this.lastEditorDatabase || this.lastAssistDatabase;
                     let url = browser.page;
-                    if (details) {
-                      const sourceType =
-                        details.connector && details.connector.type
-                          ? details.connector.type
-                          : 'hive';
+                    if (details && details.connector && details.connector.type) {
+                      const sourceType = details.connector.type;
                       const dbName =
                         (<EditorDatabaseDetails>details).name ||
                         (<AssistDatabaseDetails>details).database;
-                      url += `${encodeURIComponent(sourceType)}/${encodeURIComponent(dbName)}`;
+                      url += `${encodeURIComponent(sourceType)}`;
+                      if (dbName) {
+                        url += `/${encodeURIComponent(dbName)}`;
+                      }
                     }
                     onHueLinkClick(event, url);
                   },

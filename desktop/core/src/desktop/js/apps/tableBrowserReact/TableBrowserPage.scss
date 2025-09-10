@@ -14,8 +14,20 @@
       padding: 16px;
     }
 
+    &__heading {
+      color: #1B2329;
+      font: Roboto;
+      font-size: 24px;
+      font-weight: 300;
+    }
+
     &__filter {
       margin-bottom: 16px;
+    }
+
+    &__empty-state {
+      margin-top: 16px;
+      max-width: 100%;
     }
 
     // Fixes for For Breadcrumbs
@@ -31,5 +43,13 @@
     .ant-input {
       box-shadow: none;
     }
+  }
+}
+
+.cuix.antd {
+  .hue-table-browser__details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 16px;
   }
 }

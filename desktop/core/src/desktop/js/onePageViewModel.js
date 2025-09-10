@@ -866,36 +866,6 @@ class OnePageViewModel {
           });
         }
       },
-      // Optional client-side redirects from legacy Metastore patterns to new Table Browser
-      ...(window.ENABLE_NEW_TABLE_BROWSER
-        ? [
-            {
-              url: '/metastore/table/*',
-              app: function (ctx) {
-                // Matches /metastore/table/<db>/<table>
-                const parts = ctx.path.split('/').filter(Boolean);
-                const db = parts[2] || '';
-                const tbl = parts[3] || '';
-                const qs = new URLSearchParams(ctx.querystring);
-                const sourceType = qs.get('source_type') || 'hive';
-                const target = `/tablebrowser/${encodeURIComponent(sourceType)}/${encodeURIComponent(db)}/${encodeURIComponent(tbl)}`;
-                page.redirect(target);
-              }
-            },
-            {
-              url: '/metastore/tables/*',
-              app: function (ctx) {
-                // Matches /metastore/tables/<db>
-                const parts = ctx.path.split('/').filter(Boolean);
-                const db = parts[2] || '';
-                const qs = new URLSearchParams(ctx.querystring);
-                const sourceType = qs.get('source_type') || 'hive';
-                const target = `/tablebrowser/${encodeURIComponent(sourceType)}/${encodeURIComponent(db)}`;
-                page.redirect(target);
-              }
-            }
-          ]
-        : []),
       {
         url: '/indexer/importer/prefill/*',
         app: function (ctx) {

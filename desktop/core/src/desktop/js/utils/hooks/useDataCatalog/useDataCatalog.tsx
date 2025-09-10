@@ -64,9 +64,16 @@ interface UseDataCatalog {
   setNamespace: (namespace: Namespace) => void;
   setCompute: (compute: Compute) => void;
   setDatabase: (database: string | undefined) => void;
+  reloadDatabases: () => Promise<void>;
+  reloadTables: () => Promise<void>;
 }
 
-export const useDataCatalog = (): UseDataCatalog => {
+interface UseDataCatalogOptions {
+  autoSelectFirstDatabase?: boolean;
+}
+
+export const useDataCatalog = (options?: UseDataCatalogOptions): UseDataCatalog => {
+  const { autoSelectFirstDatabase = true } = options || {};
   const [connectors, setConnectors] = useState<EditorInterpreter[]>([]);
   const [computes, setComputes] = useState<Compute[]>([]);
   const [connector, setConnector] = useState<Connector | null>(null);
@@ -92,7 +99,9 @@ export const useDataCatalog = (): UseDataCatalog => {
       setLoading(prev => ({ ...prev, database: true }));
       const databaseEntries = await fetchSourceMeta(connector, namespace, compute);
       setDatabases(databaseEntries?.databases ?? []);
-      setDatabase(databaseEntries.databases?.[0]);
+      if (autoSelectFirstDatabase) {
+        setDatabase(databaseEntries.databases?.[0]);
+      }
     } catch (error) {
       setDatabases([]);
       setDatabase(undefined);
@@ -118,6 +127,40 @@ export const useDataCatalog = (): UseDataCatalog => {
         table => table.type?.toLowerCase() === 'table'
       );
       setTables(tables ?? []);
+    } catch (error) {
+      setTables([]);
+    } finally {
+      setLoading(prev => ({ ...prev, table: false }));
+    }
+  };
+
+  const reloadDatabases = async (): Promise<void> => {
+    if (!connector || !namespace || !compute) {
+      return;
+    }
+    try {
+      setLoading(prev => ({ ...prev, database: true }));
+      const databaseEntries = await fetchSourceMeta(connector, namespace, compute);
+      setDatabases(databaseEntries?.databases ?? []);
+      // Do not auto-select a database on reload; preserve current selection
+    } catch (error) {
+      setDatabases([]);
+    } finally {
+      setLoading(prev => ({ ...prev, database: false }));
+    }
+  };
+
+  const reloadTables = async (): Promise<void> => {
+    if (!connector || !namespace || !compute || !database) {
+      return;
+    }
+    try {
+      setLoading(prev => ({ ...prev, table: true }));
+      const tableEntries = await fetchSourceMeta(connector, namespace, compute, [database]);
+      const onlyTables = tableEntries?.tables_meta?.filter(
+        table => table.type?.toLowerCase() === 'table'
+      );
+      setTables(onlyTables ?? []);
     } catch (error) {
       setTables([]);
     } finally {
@@ -193,6 +236,8 @@ export const useDataCatalog = (): UseDataCatalog => {
     setConnector,
     setNamespace,
     setCompute,
-    setDatabase
+    setDatabase,
+    reloadDatabases,
+    reloadTables
   };
 };
