@@ -213,6 +213,12 @@ HTTP_PORT = Config(
   type=int,
   default=8888)
 
+ENABLE_IPV6 = Config(
+  key="enable_ipv6",
+  help=_("Enable IPv6 support. If true, Hue will attempt to bind to IPv6 addresses."),
+  type=coerce_bool,
+  default=False)
+
 HTTP_ALLOWED_METHODS = Config(
   key="http_allowed_methods",
   help=_("HTTP methods the server will be allowed to service."),
@@ -286,7 +292,7 @@ SSL_CERTIFICATE_CHAIN = Config(
 
 SSL_CIPHER_LIST = Config(
   key="ssl_cipher_list",
-  help=_("List of allowed and disallowed ciphers"),
+  help=_("List of allowed and disallowed ciphers for TLS 1.2"),
 
   # Based on "Intermediate compatibility" recommendations from
   # https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
@@ -295,6 +301,10 @@ SSL_CIPHER_LIST = Config(
   default=':'.join([
     'ECDHE-RSA-AES128-GCM-SHA256',
     'ECDHE-RSA-AES256-GCM-SHA384',
+    'ECDHE-ECDSA-AES128-GCM-SHA256',
+    'ECDHE-ECDSA-AES256-GCM-SHA384',
+    'DHE-RSA-AES128-GCM-SHA256',
+    'DHE-RSA-AES256-GCM-SHA384',
     '!aNULL',
     '!eNULL',
     '!EXPORT',
@@ -307,6 +317,29 @@ SSL_CIPHER_LIST = Config(
     '!EDH-RSA-DES-CBC3-SHA',
     '!KRB5-DES-CBC3-SHA',
   ]))
+
+
+# TLS 1.3 Configuration
+def has_tls13_support():
+  """Check if TLS 1.3 is supported by the current Python/OpenSSL version."""
+  try:
+    import ssl
+    return hasattr(ssl, 'HAS_TLSv1_3') and ssl.HAS_TLSv1_3
+  except ImportError:
+    return False
+
+
+SSL_TLS13_ENABLED = Config(
+  key="ssl_tls13_enabled",
+  help=_("Enable TLS 1.3 support when available. Requires OpenSSL 1.1.1+ and Python 3.7+"),
+  type=coerce_bool,
+  dynamic_default=has_tls13_support)
+
+SSL_TLS12_ENABLED = Config(
+  key="ssl_tls12_enabled",
+  help=_("Enable TLS 1.2 support when available. This is the default behavior."),
+  type=coerce_bool,
+  default=True)
 
 
 def has_ssl_no_renegotiation():
@@ -390,7 +423,7 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
 CSP_NONCE = Config(
   key="csp_nonce",
   help=_('Generates a unique nonce for each request to strengthen CSP by disallowing '
-        '‘unsafe-inline’ scripts and styles.'),
+        '"unsafe-inline" scripts and styles.'),
   type=coerce_bool,
   default=False)
 
@@ -974,13 +1007,13 @@ SESSION = ConfigSection(
       key='expire_at_browser_close',
       help=_("Use session-length cookies. Logs out the user when she closes the browser window."),
       type=coerce_bool,
-      default=False
+      default=True
     ),
     CSRF_COOKIE_AGE=Config(
       key='csrf_cookie_age',
       help=_("CRSF cookie age defaults to 1 year. If the value is set to 0, it means per session. Time in seconds"),
       type=int,
-      default=60 * 60 * 24 * 7 * 52,
+      default=0,
     ),
     CONCURRENT_USER_SESSION_LIMIT=Config(
       key="concurrent_user_session_limit",
@@ -2770,6 +2803,19 @@ def config_validator(user):
   if 'use_new_editor' in USE_NEW_EDITOR.bind_to:
     res.append(('[desktop] use_new_editor', str(_('This configuration flag has been deprecated.'))))
 
+  # Validate S3 configuration
+  if USE_STORAGE_CONNECTORS.get():
+    try:
+      from desktop.lib.fs.s3.conf_utils import validate_s3_configuration
+
+      # Validate storage connector configuration structure
+      s3_errors = validate_s3_configuration()
+      for error in s3_errors:
+        res.append(("STORAGE_CONNECTOR_CONFIGURATION", error))
+
+    except Exception as e:
+      res.append(("STORAGE_CONNECTOR_CONFIGURATION", f"Failed to validate storage connector configuration: {e}"))
+
   return res
 
 
@@ -2874,6 +2920,81 @@ def is_gs_enabled():
 
   return ('default' in list(GC_ACCOUNTS.keys()) and GC_ACCOUNTS['default'].JSON_CREDENTIALS.get()) or is_raz_gs() or \
     conf_idbroker.is_idbroker_enabled('gs')
+
+
+PERMISSION_ACTION_S3 = "s3_access"
+
+USE_STORAGE_CONNECTORS = Config(
+    key='use_storage_connectors',
+    type=coerce_bool,
+    default=True,
+    help=_('Use storage connector system for multi-cloud object storage access')
+)
+
+STORAGE_CONNECTORS = UnspecifiedConfigSection(
+  'storage_connectors',
+  help=_('Storage connector definitions with bucket-specific configurations'),
+  each=ConfigSection(
+    help=_('Configuration for a single S3-compatible storage connector'),
+    members=dict(
+      PROVIDER=Config(
+        key='provider',
+        type=str,
+        default='aws',  # aws, netapp, dell, generic
+        help=_('Storage provider type (aws, netapp, dell, generic)')
+      ),
+      AUTH_TYPE=Config(
+        key='auth_type',
+        type=str,
+        default='key',  # key, iam, raz, idbroker
+        help=_('Authentication method (key, iam, raz, idbroker)')
+      ),
+      REGION=Config(
+        key='region',
+        type=str,
+        default=None,
+        help=_('Default AWS region (required for AWS provider)')
+      ),
+      ENDPOINT=Config(
+        key='endpoint',
+        type=str,
+        default=None,
+        help=_('Custom endpoint URL (required for non-AWS providers)')
+      ),
+      ACCESS_KEY_ID=Config(
+        key='access_key_id',
+        type=str,
+        default=None,
+        help=_('Access key ID (required for key auth)')
+      ),
+      SECRET_KEY=Config(
+        key='secret_key',
+        type=str,
+        private=True,
+        default=None,
+        help=_('Secret access key (required for key auth)')
+      ),
+      IAM_ROLE=Config(
+        key='iam_role',
+        type=str,
+        default=None,
+        help=_('IAM role ARN to assume (for iam auth)')
+      ),
+      BUCKET_CONFIGS=Config(
+        key='bucket_configs',
+        type=coerce_json_dict,
+        default='{}',
+        help=_('Per-bucket configuration: {"bucket-name": {"default_home_path": "/path/", "region": "us-east-1"}}')
+      ),
+      OPTIONS=Config(
+        key='options',
+        type=coerce_json_dict,
+        default='{}',
+        help=_('Provider-specific configuration options as JSON')
+      )
+    )
+  )
+)
 
 
 def has_gs_access(user):
