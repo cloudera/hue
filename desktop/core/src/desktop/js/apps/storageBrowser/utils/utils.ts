@@ -84,7 +84,7 @@ export const inRestorableTrash = (path: string): boolean => {
   return path.match(/^\/user\/.+?\/\.Trash\/.+?/) !== null;
 };
 
-export const isFileSystemRoot = (path: string): boolean => {
+export const isFileSystemNonRoot = (path: string): boolean => {
   if (isS3(path)) {
     return !isS3Root(path);
   }
